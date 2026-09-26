@@ -304,7 +304,10 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   (mobility → activation → dynamic movement → plyo/stride primer) rather than repeat the same
   short list twice.
 - **Time-budget check (required — not optional):** estimate each day's actual working time
-  (Σ sets × (rest + ~30–45s per set), plus warm-up) against its session-length cap. If there's
+  (Σ sets × (rest + ~30–45s per set), plus warm-up) against its session-length cap. **The cap
+  is the athlete's real session length, not the form's number** (COACHING-PRINCIPLES,
+  2026-09-26: people who write "60 minutes" train 75 and never complain). Running past it is a
+  line at the checkpoint, never a reason to cut work; only a real hard stop binds. If there's
   real headroom (15+ min) and recovery capacity allows it, that's under-dosed, not "done" —
   fill it with genuine volume: push a target muscle further toward its evidence-based ceiling
   (~10–20 hard sets/muscle/week, most benefit by ~10 — see COACHING-PRINCIPLES.md → "Volume &
@@ -351,7 +354,8 @@ the BUILT programme, so it runs in /program-assemble (Step 3 checks, Step 3b rev
    and the athlete's bans (`--ban`, from your contraindication read). Every FAIL is fixed. It
    covers what the old panel mostly found: the 10-set floors, the 4-set cap, the new-athlete
    8-rep rule, a banned movement in any exercise or fallback, RPE floors in every note,
-   session length, back-to-back days, the Spine gate and the Quality Map.
+   back-to-back days, the Spine gate and the Quality Map. Session length is only a warning
+   (the cap is soft); pass `--cap` the athlete's real minutes when they are known.
 2. **NEW athlete: ONE reviewer** (one agent, files only) for what a script cannot judge:
    injury logic, exercise choice, transfer, and whether the notes cover every exercise they
    should. **RETURNING athlete: no reviewer** unless Amir asks for one.

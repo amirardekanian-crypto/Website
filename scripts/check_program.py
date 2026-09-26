@@ -18,7 +18,9 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
   --female        the women's lower-body floor: quads, hamstrings, glutes each >= 10 sets/week
   --new           a new athlete's first cycle: no weighted exercise under 8 reps, and no
                   working circuits (supersets) at all
-  --cap MIN       the session cap in minutes (default 60)
+  --cap MIN       the session cap in minutes (default 60). SOFT: a day past it is a WARN, never a
+                  FAIL (Amir, 2026-09-26: the form's session length is a guess). Pass the
+                  athlete's real logged minutes when you have them.
   --ban WORDS     comma list of words this athlete must not be given (goblet,hanging,...);
                   without it, the spec's "bans: ..." line is used
   --spec FILE     the design spec: its fallback lines are scanned for banned words too
@@ -282,8 +284,10 @@ def check_time(data, args):
         mins, assumed = day_minutes(d)
         note = ' (some rests not prescribed, 60 s assumed)' if assumed else ''
         line = f"Day {d.get('id')} ≈ {mins:.0f} min{note}"
-        if mins > args.cap * 1.10: fail(f"{line}: over the {args.cap:g}-min cap by more than 10%")
-        elif mins > args.cap: warn(f"{line}: a little over the {args.cap:g}-min cap")
+        # The cap is SOFT (Amir, 2026-09-26: athletes who write "60 minutes" train 75 and never
+        # complain, "so days time cap, is usually not very important"). Never a FAIL: the design
+        # says the expected real length at the checkpoint instead of cutting work to fit.
+        if mins > args.cap: warn(f"{line}: past the {args.cap:g}-min cap (soft: tell Amir the expected real length)")
         else: info(line)
 
 # ── volume, from the coaching log's per-exercise table ────────────────────────

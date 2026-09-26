@@ -335,7 +335,17 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   (mobility → activation → dynamic movement → plyo/stride primer) rather than repeating the
   same short list twice — that progression is the point, not the rep count. *(2026-07-08)*
 - **Time-limited clients (esp. tennis): cap sessions ~45–50 min.** Power work (low volume,
-  long rest, few reps) is naturally shorter and fits the constraint. *(2026-06-15)*
+  long rest, few reps) is naturally shorter and fits the constraint. *(2026-06-15)* Only for a
+  REAL limit: see the next bullet.
+- **The session length on the intake form is a starting guess, not a limit.** Athletes who write
+  "I only have 60 minutes" routinely spend 75 in the gym and never complain, which means they
+  could do more. Design to what the logs show (the real minutes per day), not what the form says,
+  and never cut useful work to fit a stated cap. A cap binds only when there is a real hard stop:
+  the athlete says so plainly, the logs show sessions cut short, or they complain about length.
+  When a design runs past the form's number, say the expected real length at the checkpoint and
+  move on. *(2026-09-26, Amir, verbatim: "sometimes an athlete when filling the form say i only
+  have 60 minute, but then eveytime they go to the gym, they spend 75 minutes, and they NEVER
+  complain, it means they could do more 😃 so days time cap, is usually not very important")*
 - **Sequencing:** power/CNS → primary strength → accessories → corrective/core. *(2026-06-15)*
 - **Standard section (block) names** — Activation & Prep → [power] → Primary → Accessory →
   Core → [conditioning]; use these so the app's section headers stay consistent across
@@ -508,7 +518,8 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   a hard rule, unless you have a very good reason not to" — Athlete G C2 first shipped with quads at
   5.5 and hamstrings at 7.5 sets/wk, both wrongly justified as secondary-by-design.)*
 - **Check for unused session-time budget before calling a day "done."** Estimate the day's
-  actual working time (sets × rest + set duration) against its time cap — if there's real
+  actual working time (sets × rest + set duration) against its time cap (the athlete's real
+  session length, not the form's number: see 2026-09-26 under Session structure) — if there's real
   headroom (15+ min) and the athlete's recovery capacity allows it, that's free volume, not a
   reason to stop. Fill it with low-priority, low-CNS-cost work (arms, calves, a secondary
   muscle under its dose range) rather than leaving the session light. A session with room to
@@ -788,8 +799,9 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   **(2) Cycle designs**: Claude drafts the spec with full context (the STEP 1 checkpoint with
   Amir still comes first). The built programme then goes through `scripts/check_program.py`
   and every FAIL is fixed: the 10-set floors, the 4-set cap, the new-athlete 8-rep rule, a
-  banned movement in any exercise or fallback, RPE floors in every note, session length,
-  back-to-back days, the Spine gate and the Quality Map. Then a **new athlete** gets ONE
+  banned movement in any exercise or fallback, RPE floors in every note, back-to-back days,
+  the Spine gate and the Quality Map (a day past the time cap is only a warning since
+  2026-09-26: the cap is soft). Then a **new athlete** gets ONE
   reviewer, files only, for what a script cannot judge (injury logic, exercise choice,
   transfer, whether the notes cover every exercise they should), and every surviving
   must-fix/should-fix is applied. A **returning athlete** gets no reviewer unless Amir asks.

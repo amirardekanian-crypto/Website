@@ -197,19 +197,21 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   python3 scripts/check_program.py data/<id>.json --spine-sql      # prints ONE query: run it
   # save the query's raw result as-is (the JSON the tool returns loads directly), then:
   python3 scripts/check_program.py data/<id>.json --log <scratch>/log_entry.md --spec <scratch>/spec.md \
-      --spine <scratch>/spine_<id>.json [--female] [--new] [--cap 60] [--week "Sat:1,Sun:2,Mon:3,Wed:4"]
+      --spine <scratch>/spine_<id>.json [--female] [--new] [--cap <real minutes>] [--week "Sat:1,Sun:2,Mon:3,Wed:4"]
   ```
   `--new` for a new athlete's first cycle, `--female` for the women's lower-body floor; the bans
   come from the spec's `bans:` line (or `--ban "goblet,hanging"`). **Fix every FAIL and re-run
   until 0 FAIL; read every WARN.** It fails a muscle under its floor, a volume table that
   disagrees with the programme, more than 4 sets, a weighted lift under 8 reps (new athlete), a
   superset in a first cycle, a banned movement in any exercise, setup or fallback, an RPE under
-  6 anywhere in the text, a note that lowers the RPE without naming the floor, a day over the
-  time cap, chips or cues on a card, a missing `exId`, a Because over 140 characters or more
+  6 anywhere in the text, a note that lowers the RPE without naming the floor, chips or cues on
+  a card, a missing `exId`, a Because over 140 characters or more
   than 10 of them, a notes card that isn't HTML, any `setup` (floating text: a grip is the pill,
   anything else the Coach's Note),
   an exercise with no library entry or no cues, a quality outside the ten,
-  and a headline quality outside the week's top two. It prints what the handoff needs: minutes
+  and a headline quality outside the week's top two. A day past `--cap` is only a WARN (Amir,
+  2026-09-26: the form's session length is a guess, athletes who write 60 train 75 and never
+  complain), so pass the athlete's real minutes when the logs have them. It prints what the handoff needs: minutes
   per day, sets per muscle and the **QUALITY** line. The first programme it was run on (a new
   athlete's live Cycle 1) passes it with 0 FAIL; a copy with twelve faults planted in it fails on
   all twelve.
