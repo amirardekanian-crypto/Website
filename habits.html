@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
 <meta name="robots" content="noindex, nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -479,8 +479,6 @@
                 transition: transform .2s cubic-bezier(.2,.8,.2,1); }
   .msth.open .chev { transform: rotate(180deg); }
   .selrow .lbl { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px; line-height: 1.15; text-transform: uppercase; }
-  .selrow .desc { font-size: 12px; line-height: 1.35; opacity: .75; margin-top: 5px; }
-  .selrow .mark { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .1em; }
 
   /* ── Tab bar ── */
   /* The active-tab block used to be a background on the button, so it teleported.
@@ -525,7 +523,6 @@
   }
   .grid35 .c.hit { background: var(--accent); border-color: var(--accent); }
   .grid35 .c.part { background: var(--accent-100); border-color: var(--accent); }
-  .grid35 .c.future { opacity: .25; }
   /* Before you started. Not a miss — a miss is a day you had and did not use,
      and a new athlete was being shown five weeks of them. */
   .grid35 .c.pre { border-style: dotted; opacity: .4; }
@@ -1992,6 +1989,12 @@
   }
   #app .rccomp .input::placeholder { color: rgba(246,244,255,.42); }
   #app .rccomp .input:focus-visible { border-color: var(--accent); }
+  /* Pinch-zoom is allowed since 2026-09-26 (the viewport said user-scalable=no).
+     With zoom on, iOS zooms the whole page into any field under 16px the moment
+     it takes focus, so on iOS only the text fields go to 16px. */
+  @supports (-webkit-touch-callout: none) {
+    #app .input, #app .rccomp .input { font-size: 16px; }
+  }
   #app .rccomp .noterow .mono { color: #A9A3C9; font-size: 11.5px; }
   #app .rccomp .noterow .mono.tight { color: var(--clay); }
   #app .rccomp .btn-secondary { background: none; border-color: rgba(246,244,255,.28); color: #F6F4FF; }
@@ -2594,6 +2597,15 @@ const NUDGES = {
     'Your programme is one tap away and it already has a plan for you.',
     'Nothing in this app pays like training does. Go and take it.',
     'Show up and do the thing. Partial credit is still credit.'
+  ],
+  // A habit the athlete added themselves. It has no bucket of its own (its id is
+  // made up when they add it), and it used to fall through to `empty`, so a day
+  // with six things done opened with "Nothing logged yet". {name} is theirs.
+  custom: [
+    'You added {name} yourself. Nobody else is going to do it for you.',
+    'Still open: {name}. It was your idea, so it is your move.',
+    'Still waiting on {name}. You put it on the list. Go and tick it.',
+    'Not done yet: {name}. Small thing. Do it and move on.'
   ],
   // ── Situational ──
   empty: [
@@ -4418,19 +4430,23 @@ function dayPct(dayKey)  { const p = dayParts(dayKey, 'score'); return p.total ?
 function gatePct(dayKey) { const p = dayParts(dayKey, 'gate');  return p.total ? Math.round(p.done / p.total * 100) : 0; }
 function isPerfect(dayKey) { const hs = rosterOn(dayKey); return hs.length > 0 && hs.every(h => isDone(h, dayKey)); }
 // ⚠️ TWO WAYS THROUGH THE GATE, and the second one is the promise.
+// (Numbers below are from when the threshold was 75. It is 80 again since
+// 2026-08-02, XP_RULES.streakQualifyPct, so the percentage door alone is
+// stricter than this story says and the one-miss door matters even more.)
 // `streakQualifyPct` was tuned against the EIGHT-habit roster — gate denominator
-// 250, worst single miss steps at 190/250 = 76%, just clear — and the promise
+// 250, worst single miss steps at 190/250 = 76%, just clear of 75 — and the promise
 // written down beside it was "miss any one thing and the day still counts".
 // But defaultCfg() starts every add-on OFF, so the shipped default is the five
 // core habits and the gate denominator is 180. On that roster missing steps
 // alone is 120/180 = 67% and missing sleep alone is 130/180 = 72%: both fatal.
-// The athletes the 75% gate exists to protect were the only ones it did not
+// The athletes the gate exists to protect were the only ones it did not
 // cover, while a veteran with three add-ons on got the forgiving version — and
 // since padding the denominator softens the gate, opting into the cheapest
 // self-reported habits was literally streak insurance. Backwards twice over.
 //
-// So the rule is now the promise itself, said out loud: clear 75% of the
-// weight, OR leave at most one thing undone. `done > 0` keeps a roster of one
+// So the rule is now the promise itself, said out loud: clear 80% of the
+// weight (streakQualifyPct, rounded like the server), OR leave at most one
+// thing undone. `done > 0` keeps a roster of one
 // from qualifying on an empty day.
 // The gate's percentage is ROUNDED before it is compared, exactly as the server's `qualday` does
 // (round(gpart / glive * 100) >= qpct, stage24). The phone used to compare the raw number, so a day
@@ -4946,7 +4962,7 @@ function nudge() {
     ? Math.max(1, Math.ceil(t.target - valOf(TKEY(), t.id)))
     : 1;
   return { key: 'h:' + t.id,
-           line: pickLine(NUDGES[t.id] ? t.id : 'empty', 'h:' + t.id,
+           line: pickLine(NUDGES[t.id] ? t.id : 'custom', 'h:' + t.id,
                           { n: fmtVal(t, left), name: t.name.toLowerCase(), unit: t.unit }),
            cta: t.locked ? 'OPEN YOUR PROGRAMME' : 'SORT ' + t.name,
            target: t.locked ? null : t.id };
@@ -5557,8 +5573,11 @@ async function fetchBoard() {
     LB.rows = data || [];
     LB.joined = !!(LB.rows.length && LB.rows[0].joined);
     applyBoardDeltas();
-    // `joined` comes back on every row; when the board is empty ask separately.
-    if (!LB.rows.length) LB.joined = false;
+    // `joined` comes back on every row. An empty answer says nothing either way
+    // (it is also what the RPC returns when xp_rules is missing), so it is not
+    // taken as "you left".
+    if (LB.rows.length) applyServerJoined(LB.joined);
+    else LB.joined = false;
     LB.error = null;
   } catch (e) {
     const msg = String((e && e.message) || e);
@@ -5567,6 +5586,45 @@ async function fetchBoard() {
              : (navigator.onLine === false ? 'offline' : 'failed');
   }
   LB.loading = false; LB.loaded = true; render();
+}
+// The server's leaderboard_optin row is the truth; CFG.onBoard is only this
+// phone's copy of it. LB.joined used to be set and never read, so an athlete
+// the coach took off the board kept seeing "You are on the board" and could
+// still post to roll call. This only ever FOLLOWS the server: it never calls
+// set_leaderboard_optin, so it cannot put anyone back on. Taken off by the
+// coach counts as settled, the same as leaving, so boardSwept is stamped and
+// the one-time sweep will not re-join them. Quiet save on purpose: this is
+// news from the server, not a change the athlete made (see saveCfgQuiet()).
+// A "not joined" answer for someone this phone already had off the board changes
+// nothing, and above all does not stamp boardSwept: that would switch the sweep
+// off for a new athlete who opened Crew before their first workout.
+function applyServerJoined(joined) {
+  if (joined) {
+    if (CFG.onBoard && CFG.boardSwept) return;
+  } else if (!CFG.onBoard) {
+    return;
+  }
+  CFG.onBoard = !!joined;
+  CFG.boardSwept = true;
+  if (!window.IS_PREVIEW) saveCfgQuiet();
+}
+// Boot check, so Settings and the Today notice are right before Crew is ever
+// opened. Only for an athlete this phone thinks is on the board, which is the
+// case that goes stale. One small read, no write to the board.
+async function checkBoardStatus() {
+  if (window.IS_DEMO || window.IS_PREVIEW || window.IS_EMBED || !ATHLETE_ID) return;
+  if (!CFG.onBoard || LB.loaded || LB.loading) return;
+  try {
+    const sb = _sb();
+    if (!sb) return;
+    const { data, error } = await sb.rpc('leaderboard_top', {
+      p_athlete_id: ATHLETE_ID, p_key: KEY, p_scope: 'season', p_limit: 1
+    });
+    if (error || !Array.isArray(data) || !data.length) return;
+    const was = !!CFG.onBoard;
+    applyServerJoined(data[0].joined);
+    if (was !== !!CFG.onBoard) render();
+  } catch (e) { /* offline: keep what we have */ }
 }
 // ── Everyone is on the board ───────────────────────────────────────────────
 // Amir, 2026-09-12: every athlete using the app should already be on the
@@ -8243,7 +8301,9 @@ function renderDetail(h) {
     logRows.push({
       day: i === 1 ? 'YESTERDAY' : d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric' }).toUpperCase(),
       note: h.kind === 'count' ? fmtVal(h, v) + ' ' + h.unit + ' logged' : (hit ? 'Logged in the app' : 'Nothing logged'),
-      val: hit ? 'HIT' : 'MISS', hit, xp: xpFor(h, v)
+      // A day before the season earns nothing, the same as dayXp() and habitXp().
+      // This row printed raw xpFor(), so a pre-season day read "+36 XP" here.
+      val: hit ? 'HIT' : 'MISS', hit, pre: !inSeason(k), xp: inSeason(k) ? xpFor(h, v) : 0
     });
   }
   // Units sit inside the figure at a smaller size rather than being welded to
@@ -8336,7 +8396,7 @@ function renderDetail(h) {
           </span>
           <span style="text-align:right">
             <span class="mono" style="display:block;font-size:10px;font-weight:700;color:${l.hit ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${l.val}</span>
-            <span class="mono" style="display:block;font-size:9px;color:var(--muted-soft);margin-top:3px">+${l.xp} XP</span>
+            <span class="mono" style="display:block;font-size:9px;color:var(--muted-soft);margin-top:3px">${l.pre ? 'BEFORE THE SEASON' : '+' + l.xp + ' XP'}</span>
           </span>
         </div>`).join('')
         // On day one every one of these rows would be a day from before the
@@ -8413,10 +8473,13 @@ function renderLibOffer() {
 
 // ── "You are on the board" ────────────────────────────────────────────────
 // The leaderboard is automatic now, so the athlete has to MEET that fact, not
-// be left to find it in a policy document. Same standing banner the body-weight
-// default uses, and it clears the moment they tap it (which lands them on the
-// board setting, where leaving is one more tap) — or the moment they visit Crew
-// and see the board for themselves.
+// be left to find it in a policy document. It is the same rcprompt card as the
+// library offer above, and it clears the moment they tap it (which lands them on
+// the board setting, where leaving is one more tap). Only the sweep arms it
+// (autoJoinBoard() sets boardNoticed false); visiting Crew does not clear it.
+// (It used to say it matched a body-weight banner; body weight left Proof for the
+// training app on 12 September.) It reads CFG.onBoard, which follows the server
+// since 2026-09-26, so a coach removal hides it: see applyServerJoined().
 function renderBoardNotice() {
   if (!CFG.onBoard || CFG.boardNoticed || editingPast()) return '';
   return `<button class="rcprompt" data-k="lbnotice" ${on(() => {
@@ -9990,8 +10053,9 @@ function renderSettings() {
                                toast(SYNC.dirty ? 'Still offline — it is saved here and will go up on its own.' : 'Everything is up to date.'); })}
         <!-- Destructive, so it asks once. The armed state disarms itself after a
              couple of seconds if the second tap never comes. -->
-        ${navRow('🧨', "Reset today's log",
-                 'Wipes today only. XP already banked stays banked.',
+        ${navRow('🧨', editingPast() ? 'Reset ' + dayLong(AKEY()) + "'s log" : "Reset today's log",
+                 editingPast() ? 'Wipes ' + dayLong(AKEY()) + ' only. Every other day stays as it is.'
+                               : 'Wipes today only. XP already banked stays banked.',
                  `<span class="navpill">${UI.confirmReset ? 'Sure?' : 'Wipe'}</span>`,
                  () => {
                    if (!UI.confirmReset) {
@@ -10000,7 +10064,12 @@ function renderSettings() {
                      return;
                    }
                    UI.confirmReset = false;
-                   LOG[TKEY()] = {}; saveLog(); go('today'); toast('Clean slate. Try not to waste it.');
+                   // The day the strip is showing, which the row names above. It
+                   // wiped TKEY() while the strip sat on another day, so the athlete
+                   // lost today while looking at Tuesday. AKEY() is today unless a
+                   // past day is picked, and it can only be a day still open to log.
+                   const k = AKEY(), tag = dayTag();
+                   LOG[k] = {}; saveLog(); go('today'); toast('Clean slate' + tag + '. Try not to waste it.');
                  },
                  'danger' + (UI.confirmReset ? ' armed' : ''))}
       </div>
@@ -10352,7 +10421,9 @@ function showError(msg) {
   }
 
   // The board sweep, now gated on having actually trained. See autoJoinBoard().
-  if (!window.IS_EMBED) autoJoinBoard();
+  // Then the board status is checked against the server (checkBoardStatus()),
+  // after the sweep so the two never race. It only reads.
+  if (!window.IS_EMBED) autoJoinBoard().then(checkBoardStatus, () => {});
 
   // Anything still unsent from a previous session goes up now.
   if (SYNC.dirty) pushNow();

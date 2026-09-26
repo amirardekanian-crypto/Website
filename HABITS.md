@@ -138,10 +138,13 @@ after they have **finished a workout** (`autoJoinBoard()`, see *The leaderboard*
 free athlete in practice never has: their WORKOUT is locked, only a session finished in
 `program.html` ticks it, and free mode points every route to `program.html` at
 `/form.html`. So a free signup **joins by hand**, from Crew, where `boardName` has already
-filled in the box. The join has to happen on the device either way: `CFG.onBoard` is a
-**client** flag that is never read back from the server (`fetchBoard()` writes
-`LB.joined` and nothing reads it), so a server-side join would list someone on everyone
-else's board while their own screen said *Not joined* and roll call refused them.
+filled in the box. `CFG.onBoard` is this phone's copy of the server's
+`leaderboard_optin` row, and since 2026-09-26 it **follows the server**: every
+`fetchBoard()` hands `LB.joined` to `applyServerJoined()`, and a boot check
+(`checkBoardStatus()`, one `leaderboard_top` read, only for an athlete the phone thinks is
+on) catches a coach removal before Crew is opened. It only ever reads; see *The
+leaderboard*. Until then `LB.joined` was written and never read, so an athlete the coach
+removed still saw "You are on the board".
 
 `isFree()` is the only test in the app, and anything that is not `"free"` counts as
 coached — so no existing athlete record needs touching. In free mode:
@@ -268,9 +271,11 @@ The screen they actually live on. **In this order, and the order is the point:**
    counter habit you have not finished reads `5 of 8 glasses · 3 to go` — the position
    *and* the job.
 5. **The nudge** — one clay card whose copy reacts to what is actually missing, drawn at
-   random from a library of **83 lines across 13 situations** (`NUDGES`): one bucket per
-   habit, plus nothing-logged-yet, one-habit-left, all-done, streak-at-risk and
-   streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
+   random from a library of **87 lines across 14 situations** (`NUDGES`): one bucket per
+   habit, one shared `custom` bucket for habits the athlete added (their ids are made up
+   when added, so they have no bucket of their own; until 2026-09-26 they fell through to
+   nothing-logged-yet and a day with six things done opened with "Nothing logged yet"),
+   plus nothing-logged-yet, one-habit-left, all-done, streak-at-risk and streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
    tomorrow** — over 21 days a bucket of 10 uses all 10 lines with no back-to-back
    repeats. Its button opens the habit in question. The "nudge" half of *nudge and recap*.
 6. **Roll call pointer** — a single row into the CREW tab, shown only while today's
@@ -784,7 +789,9 @@ Progress carries a second door to the manual.
 
 **Habit detail** (reached from here or from Today) shows that habit's rank and level
 progress, a log button, its consistency ladder, this-week / best-streak / 35-day-rate
-stats, a 35-day grid, and the last five days with the XP each earned.
+stats, a 35-day grid, and the last five days with the XP each earned. A day before the
+season earned nothing and says **BEFORE THE SEASON** instead of an XP figure (2026-09-26;
+the row printed raw `xpFor()` and disagreed with `dayXp()`).
 
 **Missed and not-yet-started are different, everywhere a day is drawn.** Days before
 `firstLoggedDay()` render as `.c.pre` in the 35-day grid (dotted, with its own key entry),
@@ -1140,7 +1147,7 @@ each row a door with an icon tile, a name, a line of explanation and its current
 | — | **Profile** — name, `Day N · rank · coached/free`. Tapping it opens the **Locker**, because that is where the rank lives. |
 | Tracking | **Habits & targets** (`N of M add-ons on`) · **Appearance** (`Dark`/`Light`) · **Install on your phone** (only while `installable()`) |
 | How this works | **The tour** · **The manual — how XP works** · **The long game** (Locker) · **Open your programme** / **See about coaching** |
-| Crew & data | **Crew board** (your board name, or `Not joined`) · **Sync** (live `syncLabel()`, tap to sync now) · **Reset today's log** (destructive, still two-tap armed) |
+| Crew & data | **Crew board** (your board name, or `Not joined`) · **Sync** (live `syncLabel()`, tap to sync now) · **Reset today's log** (destructive, still two-tap armed; it wipes the day the backfill strip is showing, `AKEY()`, and names it: *Reset yesterday's log* when yesterday is picked. It used to wipe today whatever the strip showed.) |
 
 Two rows open **sub-screens** rather than navigating: `UI.sub` is `'habits'` or
 `'appearance'`, nothing else reads it, and `go()` clears it on the way out so leaving
@@ -2159,6 +2166,17 @@ preview:
 would mean an athlete could tap *Leave the leaderboard*, watch it succeed, and be back on
 the board next launch with no way out. **If they leave, they left.**
 
+**The phone follows the server's answer, and never argues with it** (2026-09-26).
+`applyServerJoined()` takes the `joined` flag `leaderboard_top` returns: from `fetchBoard()`
+whenever Crew loads, and from `checkBoardStatus()` once per boot, after the sweep, only
+when `CFG.onBoard` is true (not in demo, preview or embed). Joined on the server → on here.
+Off on the server while this phone had them on (the coach removed them) → off here, and
+`boardSwept` is stamped so the sweep never puts them back: removed counts as settled, the
+same as leaving. A "not joined" answer for someone already off changes nothing and stamps
+nothing, or a new athlete who opened Crew before their first workout would lose the sweep.
+An empty answer is ignored. It saves with `saveCfgQuiet()` (server news, not a change the
+athlete made) and never calls `set_leaderboard_optin`.
+
 **The free tier, honestly:** a free athlete's WORKOUT is locked for life and free mode
 points every route to `program.html` at `/form.html`, so in practice the sweep never
 reaches a free signup. They are on the board only if they **join by hand** from Crew —
@@ -2288,7 +2306,7 @@ these keys when it syncs.
 ## Voice
 
 Dry, blunt, a little rude — the same coach who says *"your hamstrings have filed a
-complaint with HR"*. The whole nudge library (`NUDGES`, 83 lines) is written in it, and
+complaint with HR"*. The whole nudge library (`NUDGES`, 87 lines) is written in it, and
 anything added to it has to be: never chirpy, never therapeutic, funny because it is
 true. Tokens available in a line are `{n}` (how many are left), `{name}`, `{unit}` and
 `{st}` (streak days). Never chirpy, never therapeutic. It notices what you skipped and
