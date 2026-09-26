@@ -164,7 +164,7 @@ places, and a stale copy reached athletes.)*
 | COM-3 | Everything an athlete reads sounds like Amir typed it: plain words, short sentences; no em-dashes, semicolons, triads or brochure lines. | engage · report | warn (em-dash) |
 | COM-4 | 5–10 personal Becauses (`why`) a cycle, on exercises chosen for this athlete: the body part not the diagnosis, the next step not the failure. | engage | ✓ |
 | COM-5 | Notes name days as Day N and their on-screen names, never internal labels like "the Control day". | engage | |
-| COM-6 | Guidance about one exercise is its Coach's Note; notes cards carry programme-wide guidance only. | engage · assemble | |
+| COM-6 | Guidance about one exercise is its Coach's Note; notes cards carry programme-wide guidance only. | engage · assemble | warn (flagged vs placed) |
 | COM-7 | Coach-facing reports (the volume tables) go to chat and the coaching log, never the app. | assemble | |
 | COM-8 | Note bodies are real HTML: 2–4 short paragraphs, a list when the content is a list, one bold phrase per paragraph. | engage | ✓ |
 | COM-9 | Every required note is on the spec's `obligations:` list; engage writes those first and tags each card. | design · engage | ✓ |

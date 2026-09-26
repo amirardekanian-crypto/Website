@@ -269,6 +269,15 @@ out = run(BASE, spec="bans: box jump\nroadmap_amend: cycle 3: art → voltage (b
 expect('a roadmap_amend: line is not a fallback', not has(out, 'FAIL', 'a fallback or swap gives a banned'), out)
 expect('a real fallback to a banned word still fails', has(run(BASE, spec="bans: box jump\nFallback: step-up → box jump\n"), 'FAIL', 'a fallback or swap gives a banned'))
 
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['note'] = "Start shallow and let the first set tell you."
+SPEC2 = ("Barbell Back Squat | role: primary\nnote_flag: staged knee return, shallow first\n"
+         "Lat Pulldown | role: primary\nnote_flag: neutral grip only, elbow history\n")
+expect("a flagged Coach's Note that never landed warns", has(run(d, spec=SPEC2), 'WARN', "flags 2 Coach's Notes and the programme carries 1"))
+d['workouts']['days'][1]['blocks'][0]['exercises'][0]['note'] = "Neutral grip only."
+expect('every flagged note placed: no warning', not has(run(d, spec=SPEC2), 'WARN', "Coach's Notes and the programme"))
+expect('template placeholders are not flags', not has(run(BASE, spec="note_flag: [optional]\nnote_flag: -\n"), 'WARN', "Coach's Notes and the programme"))
+expect('a Because with no why_flag warns', has(run(with_why({"src": "goal", "text": "Your legs drive every serve."}), spec="bans: -\n"), 'WARN', 'flags 0 Becauses and the programme carries 1'))
+
 # ── 6. the rule index guard (scripts/check_rule_index.py) ────────────────────
 spec_ri = importlib.util.spec_from_file_location('cri', os.path.join(REPO, 'scripts', 'check_rule_index.py'))
 P = os.path.join(REPO, '.claude', 'COACHING-PRINCIPLES.md')

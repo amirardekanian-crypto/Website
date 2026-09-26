@@ -171,8 +171,9 @@ flag's reason (injury, plateau, unclear log) so it reads as coaching, not filler
 same issue also has a notes card** (e.g. a standing injury protocol), the card is where the
 full protocol/stop-rule ladder lives — the exercise note gives only the point-of-action
 specifics for that exercise (starting depth, load, cue) and does not re-explain the ladder.
-List these separately from the cycle notes cards — tag each with the exercise name so
-assemble can place it. Skip an exercise with no flag; don't invent notes design didn't ask for.
+List these separately from the cycle notes cards — tag each with the card's **`exId`** from the
+built programme (Part A stamped one on every card) and its name, so assemble places it by id: a
+name can differ between the spec and the built card, an id cannot. Skip an exercise with no flag; don't invent notes design didn't ask for.
 
 **PART 3b — Because (from design's `why_flag`s, 2026-09-24).** For every exercise design
 flagged with a `why_flag`, write `{ src, part?, text }`: why THIS athlete has THIS exercise. It
@@ -190,7 +191,7 @@ opens the About sheet under **Why you**, and the cycle's Why page groups them by
 - `part` only with `src: body` (knee, back, shoulder, hip, elbow, ankle, wrist, groin), so the
   tag reads "Your knee". `cycle` names what moved when it did (*"your hip thrust went 60 to 75
   kg, so it stays and gets heavier"*); the numbers come from the athlete's own logs.
-- List them with the exercise name, like the Coach's Notes. Amir reviews them with the rest.
+- List them with the card's `exId` and name, like the Coach's Notes. Amir reviews them with the rest.
 
 **PART 3c — The two special weeks (2026-09-26).** From design's `week1:` and `lastweek:` lines,
 write the words the app shows the athlete during that week (`cycles[n].weekNotes`, SCHEMA.md),

@@ -319,6 +319,24 @@ def why_basics(d, ex):
     if len(text) > 140: fail(f"{where}: {len(text)} characters (140 max)", 'COM-4')
     if re.search(r'[—;]', text): fail(f"{where}: an em-dash or semicolon", 'COM-4')
 
+def check_placed(data, args):
+    """Every note_flag and why_flag in the spec should land on the programme (2026-09-26): engage
+    writes the words and Part B places them by exId. A count that differs means one was dropped on
+    the way (a name that changed between the spec and the card) or invented without a flag."""
+    if not args.spec: return
+    text = open(args.spec, encoding='utf-8').read()
+    real = lambda key: sum(1 for v in re.findall(rf'{key}\s*:\s*([^|\n]*)', text)
+                           if v.strip() and not v.strip().startswith('[') and not blank(v))
+    flags, wflags = real('note_flag'), real('why_flag')
+    notes = sum(1 for d, b, ex, it in exercises(data) if (it or ex).get('note'))
+    whys = sum(1 for d, b, ex, it in exercises(data) if not it and ex.get('why') is not None)
+    if flags != notes:
+        warn(f"the spec flags {flags} Coach's Notes and the programme carries {notes}: one was dropped or "
+             "invented on the way (engage tags each by exId, Part B places it by exId)", 'COM-6')
+    if wflags != whys:
+        warn(f"the spec flags {wflags} Becauses and the programme carries {whys}: one was dropped or "
+             "invented on the way", 'COM-4')
+
 def check_week_notes(data, args):
     """The first and last week of the cycle being built (cycles[currentCycleIndex].weekNotes).
     Every cycle is 4 loading weeks + 1 back-off week, and the card never changes mid-cycle, so
@@ -981,7 +999,7 @@ def main():
     # --stage build runs straight after design, BEFORE engage writes a word (2026-09-26): a FAIL
     # there changes the programme while no note, Because or message has been written around it.
     if args.stage == 'final':
-        check_text(data); check_cards(data); check_whys(data); check_obligations(data, args)
+        check_text(data); check_cards(data); check_whys(data); check_obligations(data, args); check_placed(data, args)
     else:
         info('--stage build: the text checks (notes, Becauses, week-note words, RPE in text) run in the final pass')
     check_week_notes(data, args)

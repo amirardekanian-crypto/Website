@@ -202,8 +202,10 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   it, and it is what puts them on the roster). Publishing then updates that row rather
   than inventing a second identity for the same person.
 
-**2f — Part B: place engage's words** (after /program-engage; matched by exercise name, or better
-by `exId`, since Part A stamped one on every card).
+**2f — Part B: place engage's words** (after /program-engage), **matched by `exId`**: engage tags
+every Coach's Note and Because with the card's id (Part A stamped one on every card); the name is
+only the fallback for a card with none. The full check warns when the spec's `note_flag`/`why_flag`
+count and what landed on the cards differ, which is how a dropped or invented one shows.
 - `completionTitle` / `completionMessage` per day from engage PART 4;
   `cycles[currentCycleIndex].message` = PART 1 message + outcomes; next cycle's `teaser` = PART 2;
   `notes.cards` from PART 3, each card's `TAGS:` as `"tags": ["film"]` (pipeline-only, the app
