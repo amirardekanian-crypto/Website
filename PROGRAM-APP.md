@@ -532,9 +532,14 @@ sits in front of the whole site).
   `sessionIsStale()`, the one test, used by the boot sweep, Start/Pause, `openGuided()` and
   `liveExerciseKeys()`). A session started at 23:30 used to lose its clock and check-in on a reopen after
   midnight, and a Start/Pause tap reset it; one finished at 23:50 lost its unsent note and rating.
-- **Not done (Amir's call):** a day logged but never finished still carries its ticks into next week and never
-  reaches the coach; recording it (as a partial session on its own date) or asking the athlete is open in
-  `Content/FRESH-EYES.md`. The sweep still runs at launch only, not when the app returns to the foreground.
+- **An unfinished day is asked about** (Amir, 2026-09-26: "Ask the athlete next open"). A real tick
+  (`toggleCheckOnly()`, `syncExerciseCheck()`, via `markTouched()`) records the day it happened in
+  `<id>_touched_d<N>`; the redraws that also run `updateProgress()` never write it. On a later open, a day with
+  logged work, no finish stamp and no session running (6 h grace) whose ticks are from an earlier date gets one
+  card above This Week: "Tuesday's Day 2 was never sent · 2 of 9 sets logged", **Send it** (a partial session
+  filed under the day it was trained: the finish stamp carries that date) or **Clear it** (two taps). Both then
+  let the sweep close the day as it would at midnight. Ticks from before 2026-09-26 carry no date and are not
+  asked about. The sweep still runs at launch only, not when the app returns to the foreground.
 
 ## 📅 This Week is built from the session history (HOME-01, 2026-09-26)
 

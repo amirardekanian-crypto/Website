@@ -108,7 +108,9 @@
 //      open), and the welcome's button opens Day 1.
 // v56: program.html changed (2026-09-26, REC-01): the estimated max is off the working card (it stays in
 //      Personal Records, which fill themselves and keep "+ Log a max").
-const CACHE = 'aap-v56';
+// v57: program.html changed (2026-09-26, DATA-02): a day logged but never finished is asked about on a
+//      later open ("Tuesday's Day 2 was never sent": Send it / Clear it).
+const CACHE = 'aap-v57';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

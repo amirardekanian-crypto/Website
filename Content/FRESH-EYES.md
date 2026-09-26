@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**14 done · 10 partly done · 20 open**, of 44. Each was checked against the code on `main`.
+**15 done · 9 partly done · 20 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -59,9 +59,10 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#252](https://github.com/amirardekanian-crypto/Website/pull/252) | Polish: the side rail only in a day view, under the overlays and labelled; every screen lights its tab; the demo banner clears the dark toggle and Guided's ✕; no AA Proof line in the coach preview; four dead functions gone | POL-01 |
 | [#254](https://github.com/amirardekanian-crypto/Website/pull/254) | Game Plan folds past and future cycles to a slim row (the current one open); the welcome's button opens Day 1 (Amir: "Fold past and future") | PLAN-01 |
 | [#255](https://github.com/amirardekanian-crypto/Website/pull/255) | The estimated max is off the working card; Personal Records fill themselves and keep "+ Log a max" (Amir: "Off the card, keep in Records") | REC-01 |
+| [#256](https://github.com/amirardekanian-crypto/Website/pull/256) | An unfinished day is asked about on a later open: "Tuesday's Day 2 was never sent", Send it (filed under Tuesday) or Clear it (Amir: "Ask the athlete next open") | DATA-02 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02.
 
 **Partly done, and what is still open on each:**
 - **WK-01.** The quick part is done. Still open: kg on the rest screen beside reps and RPE, the live row
@@ -76,8 +77,6 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
   (`user-scalable=no`, a card change); and following the phone's dark setting (*Open calls*).
 - **NAV-01.** Back closes the top layer in both apps. Still open: one close grammar for the buttons
   (← for screens, ✕ top-right for overlays, drag or tap outside for sheets).
-- **DATA-02.** Local dates and the midnight grace are done. Still open: an unfinished day (ticks, never
-  finished) is never recorded or cleaned up (*Open calls*), and the sweep runs at launch only.
 - **POL-01.** Swept. Still open: the rest screen still lets the card show through faintly (97%), the
   Quality sheet's "How we measure it" names tests athletes never meet (Amir's words to change), and
   returning from a Library session resets the scroll.
@@ -109,7 +108,7 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 2. **Foundations:** HOME-02's Today block: a mockup page first, then build after his yes.
 3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
    Confirm the card freeze with Amir first (below).
-4. **Home and progress:** PROG-01, and DATA-02's unfinished-day prompt ("You didn't finish Tuesday. Send it?", his answer).
+4. **Home and progress:** PROG-01.
 5. **Coach and Proof:** COACH-02, NAV-02, SEAM-01 (after the habit count below), PRF-01, PRF-02,
    PRF-03.
 6. **System and polish:** DS-01, DS-03, CONS-01, PRF-05, LIB-01, POL-01, POL-02, DOC-01.
@@ -147,7 +146,7 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 - **An unfinished day (DATA-02).** Sets ticked on a day that was never finished carry into next week and never
   reach Amir. Options: record it automatically as a partial session on the day it was logged (Amir sees
   it in coach.html like a Finish Anyway), ask the athlete on their next open ("You didn't finish Tuesday:
-  send it?"), or leave it. **Answered: ask the athlete** (2026-09-26).
+  send it?"), or leave it. **Answered: ask the athlete** (2026-09-26), and built.
 - **The readiness thresholds** (amber at 2.5 or 0.75 under the athlete's last-10 average, red at 2.0
   or any answer at 1, sore at 2) are judgement calls. Review them at the eight-cycle review.
 
