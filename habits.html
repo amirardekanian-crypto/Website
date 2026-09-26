@@ -6243,6 +6243,52 @@ function render() {
     CFG.dark ? '#17142B' : ({ morning: '#FAF0E9', afternoon: '#F6F4FF', evening: '#EDEAF9' })[_dp]);
   publishCardSnapshot();
   embedPost();
+  navSync();
+}
+
+// ── Back closes the top layer (NAV-01, 2026-09-26) ─────────────────────────
+// The same design as program.html: while anything is open over Today there is ONE guard
+// history entry (same URL), Back pops it, topLayer() closes what is on top, and the guard
+// re-arms while something is still open. Everything here is drawn from UI, so the state is
+// read from UI, never a parallel stack, and render() re-syncs after every change.
+// ⚠️ NEVER in the embedded strip: it lives in an iframe on the training app's Home, and
+// an iframe's history entries are the parent page's, so it would steal the app's Back.
+// A new overlay, sheet or screen goes into topLayer(), or Back closes what sits under it.
+const BACKNAV = { armed: false, ignore: false, popping: false };
+function topLayer() {
+  if (UI.celebrate.length) return dismissCelebration;
+  if (TOUR.on) return () => endTour(false);
+  if (UI.share) return () => { UI.share = null; render(); };
+  if (UI.install) return closeInstall;
+  if (UI.sheet) return () => { UI.sheet = null; render(); };
+  if (UI.screen === 'settings' || UI.screen === 'manual') return overlayBack;   // one step, as its own ←
+  if (UI.screen === 'detail') return () => go(UI.from === 'today' ? 'today' : 'progress');
+  if (UI.screen !== 'today') return () => go('today');
+  if (UI.day) return () => { UI.day = null; render(); };    // filling in a past day
+  return null;
+}
+function navSync() {
+  if (window.IS_EMBED || window.IS_PREVIEW || !CFG || !CFG.onboarded) return;
+  const open = !!topLayer();
+  if (open && !BACKNAV.armed) {
+    try { history.pushState({ aaBack: 1 }, ''); BACKNAV.armed = true; } catch (e) {}
+  } else if (!open && BACKNAV.armed && !BACKNAV.popping) {
+    BACKNAV.armed = false; BACKNAV.ignore = true;
+    try { history.back(); } catch (e) { BACKNAV.ignore = false; }
+  }
+}
+if (!window.IS_EMBED && !window.IS_PREVIEW) {
+  window.addEventListener('popstate', () => {
+    if (BACKNAV.ignore) { BACKNAV.ignore = false; return; }
+    BACKNAV.armed = false;
+    const close = topLayer();
+    if (close) {
+      BACKNAV.popping = true;
+      try { close(); } catch (e) {}
+      BACKNAV.popping = false;
+    }
+    navSync();
+  });
 }
 
 // ── Embedded on the training app's Home (Fork 1B, B2, Amir, 2026-09-26) ──────────

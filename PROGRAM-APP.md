@@ -535,7 +535,8 @@ view. When the last layer closes through its own button, `navSync()` takes the g
 on Home still leaves the app, with no dead press. Nothing is tracked in a parallel stack: the page is the state,
 so it cannot drift. `initBackNav()` watches the overlays' `visible` class, the day view's `hidden` and each
 `.screen`'s class; `shared.js`'s video pop-up calls `navSync()` itself. Not in the coach preview.
-**Still open:** AA Proof, and one close grammar for the buttons (←, ✕, Close).
+**AA Proof does the same** (HABITS.md → *The phone's Back button*), and never from the embedded strip on Home.
+**Still open:** one close grammar for the buttons (←, ✕, Close).
 
 ## 🔍 Readable in both themes (A11Y-01, 2026-09-26)
 

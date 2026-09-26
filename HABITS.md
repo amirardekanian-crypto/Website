@@ -942,6 +942,18 @@ the top of Settings; and Settings → *The long game*. Top to bottom it draws:
 *How rewards work* at the foot opens the manual. The design, and the three shapes it went
 through, are in *The long game* below.
 
+### The phone's Back button (NAV-01, 2026-09-26)
+
+Back used to leave AA Proof from any screen or sheet. Now, while anything is open over Today, there is one
+guard history entry (same URL); Back pops it and `topLayer()` closes what is on top, read straight from `UI`:
+a celebration, the tour (ended, as its own ✕ does), the share card, the install sheet, a log sheet, then
+Settings or the manual one step at a time (`overlayBack()`, exactly like its ←), a habit's detail back to where
+it was opened, any other tab back to Today, and a past day being filled in back to today. `render()` ends with
+`navSync()`, which arms the guard when something is open and quietly takes it back off when the last thing
+closes by its own button, so Back on Today still leaves the app. ⚠️ **Never in the embedded strip**
+(`?embed=1`): an iframe's history entries belong to the training app's page, so it would steal that app's Back.
+Not in the coach preview, or before onboarding. A new sheet or screen goes into `topLayer()`.
+
 ## Body weight — MOVED OUT, 2026-09-12
 
 ⚠️ **It is not in this app any more.** The card, the history screen, the chart, logging and
