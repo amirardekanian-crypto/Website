@@ -521,6 +521,15 @@ sits in front of the whole site).
   Waiting less when a copy exists would open slow-but-working connections on the copy more often; it is
   a separate call.
 
+## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26)
+
+The session bar (`.session-timer`) never cuts the clock: under 480 px it is two rows (label and clock on one
+line, Start/Pause and Guided full width under it), and at any width the buttons wrap before the clock
+shrinks. The label is one line ("Ready when you are", "In progress", "Paused", "Session duration"; "Click
+Start to begin" was a desktop phrase). A Home day card shows **In progress · Resume** for a day started today
+and not finished (`dayInProgress()`: a clock started today, or a ticked set), and **Done** once finished;
+`paintDayCardPills()` repaints them whenever the day view closes, because Home's cards are built once.
+
 ## 📲 The install ask waits for a finished session (HOME-03, 2026-09-26)
 
 The "Install app" toast (`A2HS` in `assets/js/shared.js`) used to fire 2.5 s after the first sign-in, on

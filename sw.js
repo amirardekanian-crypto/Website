@@ -86,7 +86,9 @@
 //      tick, its OPEN YOUR PROGRAMME button opens the programme, and "logged nothing" means nothing.
 // v45: program.html, shared.js and habits.html changed (2026-09-26, HOME-03): the install ask waits
 //      for a finished session, its words match the phone, and Proof stops asking coached athletes.
-const CACHE = 'aap-v45';
+// v46: program.html changed (2026-09-26, WK-03): the session bar never clips the clock, and a Home day
+//      card shows "In progress · Resume" for a session started today.
+const CACHE = 'aap-v46';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
