@@ -59,7 +59,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#252](https://github.com/amirardekanian-crypto/Website/pull/252) | Polish: the side rail only in a day view, under the overlays and labelled; every screen lights its tab; the demo banner clears the dark toggle and Guided's ✕; no AA Proof line in the coach preview; four dead functions gone | POL-01 |
 | [#254](https://github.com/amirardekanian-crypto/Website/pull/254) | Game Plan folds past and future cycles to a slim row (the current one open); the welcome's button opens Day 1 (Amir: "Fold past and future") | PLAN-01 |
 | [#255](https://github.com/amirardekanian-crypto/Website/pull/255) | The estimated max is off the working card; Personal Records fill themselves and keep "+ Log a max" (Amir: "Off the card, keep in Records") | REC-01 |
-| DATA-02 prompt PR | An unfinished day is asked about on a later open: "Tuesday's Day 2 was never sent", Send it (filed under Tuesday) or Clear it (Amir: "Ask the athlete next open") | DATA-02 |
+| [#256](https://github.com/amirardekanian-crypto/Website/pull/256) | An unfinished day is asked about on a later open: "Tuesday's Day 2 was never sent", Send it (filed under Tuesday) or Clear it (Amir: "Ask the athlete next open") | DATA-02 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02.
