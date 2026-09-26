@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**8 done · 7 partly done · 29 open**, of 44. Each was checked against the code on `main`.
+**8 done · 8 partly done · 28 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -47,12 +47,15 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#239](https://github.com/amirardekanian-crypto/Website/pull/239) | The guide's finish, report and rest-timer cards name the real buttons; the Library promises a habit tick only when that habit is on (`_wsHabitOn()`); the guide joins CLAUDE.md's keep-in-sync rules | CNT-01 |
 | [#240](https://github.com/amirardekanian-crypto/Website/pull/240) | Guided never pauses a running clock, reopens at the first unfinished set, and its last button (Finish Session ✓) really finishes, or lands on "Wrap up early?" when a circuit is open | WK-01 |
 | [#241](https://github.com/amirardekanian-crypto/Website/pull/241) | Anything that deletes takes two taps (`armedTap()`): Reset Session, a weight reading, a Personal Record; Reset moved away from Send | LOG-02 |
+| PRF-04 PR | Proof's nudge never asks for the session it cannot tick (`sessionLeft` / `freeDone`), OPEN YOUR PROGRAMME opens the programme, "logged nothing" means nothing | PRF-04 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02.
 
 **Partly done, and what is still open on each:**
 - **WK-01.** The quick part is done. Still open: kg on the rest screen beside reps and RPE, the live row
   pinned above the footer (it sits under it at 390 px), and circuits as one step per round.
+- **PRF-04.** The three misfires are fixed (display only). Still open: a rest day that *credits* the
+  other habits, which changes scoring (see *Open calls*).
 - **WK-03.** Only the Guided button's label colour is fixed. Still open: a slim session bar, hiding
   the tab bar mid-session, "In progress · Resume" on the day card, the clock clipped under 405 px.
 - **HOME-02.** Training leads Home. Still open: the Today block (next session with Start or Resume),
@@ -65,7 +68,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
   still sends a new athlete to the plan instead of Day 1.
 
 **Open.** P1: WK-02, CARD-01, HOME-01, NAV-01, A11Y-01. P2: PROG-01,
-PRF-01, PRF-02, PRF-03, PRF-04, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03, BW-01,
+PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03, BW-01,
 HOME-03, DATA-02. P3: DS-03, CONS-01, SHEET-01, PRF-05, WK-05, LIB-01, POL-01, POL-02, DOC-01.
 
 ## Next, in order
@@ -77,7 +80,7 @@ account is `PROGRAM-APP.md` → *No signal*.
 (`'on' | 'coming' | 'off'`); a coached athlete who has not trained yet is told the name they will appear
 under, can change it, and can keep off in advance. Full account: `HABITS.md` → *Who is on it*.
 
-1. **The rest of "stop the bleeding":** A11Y-01, WK-03, PRF-04, HOME-03.
+1. **The rest of "stop the bleeding":** A11Y-01, WK-03, HOME-03.
 2. **Foundations:** NAV-01 (Back closes the top layer), then HOME-01 (the week built from session
    history) with HOME-02's Today block.
 3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
@@ -106,6 +109,12 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 - **One bar of signal (REL-01).** With a saved plan on the phone, a stalled connection still costs
   the 6 s `get_program` wait before the copy opens. Waiting less when a copy exists is a separate call
   (slow-but-working connections would then open on the copy more often). Raise it if athletes notice.
+- **A rest day in AA Proof (PRF-04).** The session habit is locked and core, so on a rest day a coached
+  athlete misses it and spends the day gate's one-miss door on it: every other habit must then be done
+  for the day to count. Proof does not know the training week. Options: leave it (the door exists for
+  exactly this); let the athlete mark a rest day (a new tap, and scoring on both sides: `dayQualifies()`
+  and the server's copy); or read the programme's days per week and excuse that many non-training days.
+  Nudge copy already treats it kindly. Amir's call; it changes both scorers.
 - **The readiness thresholds** (amber at 2.5 or 0.75 under the athlete's last-10 average, red at 2.0
   or any answer at 1, sore at 2) are judgement calls. Review them at the eight-cycle review.
 

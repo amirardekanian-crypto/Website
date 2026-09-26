@@ -2627,6 +2627,21 @@ const NUDGES = {
     '{name} is the only thing standing between you and a clean day.',
     'You are one habit from perfect. Do not make this a story about {name}.'
   ],
+  // Everything they can tick here is done; the one thing left is the session, which only a
+  // workout finished in the programme app ticks (PRF-04, 2026-09-26). Until then this fell into
+  // `lastOne` and scolded "One habit left" on a rest day, over a habit Proof cannot tick.
+  sessionLeft: [
+    'Everything you can tick here is done. The session comes from your programme, and a rest day is part of it.',
+    'All yours is handled. The only thing left is a session, and that lives in the programme app.',
+    'Nothing left on this list that I can blame you for. Train today, or rest because the plan says so.',
+    'Your part is done. If today is a training day, the programme has it. If not, enjoy the rest.'
+  ],
+  // The same day for a free athlete, whose session habit is locked for good: done is done.
+  freeDone: [
+    'Everything on your list is done. The session habit is for coached athletes; the rest of today is yours.',
+    'Clean day, as far as you can take it. Nothing left for me to chase.',
+    'All of it, done. The locked one is not yours to worry about.'
+  ],
   allDone: [
     'Everything is checked. I have nothing to nag about, which is deeply unsettling for me.',
     'Clean sweep. I would like it on record that I barely had to say anything.',
@@ -5001,6 +5016,9 @@ function shortOfQualifying() {
 // number in place instead of retyping the whole line from scratch.
 function nudge() {
   const hs = live(), missing = hs.filter(h => !isDone(h));
+  // The session is `locked`: only a workout finished in the programme app ticks it, so Proof
+  // can never ask for it by name or open it (PRF-04). Everything below reasons about `open`.
+  const open = missing.filter(h => !h.locked);
 
   // Loss beats gain: a real streak on the line tonight outranks everything.
   if (atRisk()) {
@@ -5017,21 +5035,31 @@ function nudge() {
     return { key: 'done', line: pickLine('allDone', 'done'), cta: 'SEE WHERE YOU STAND', target: null };
   }
 
-  // Nothing logged at all yet: point at the cheapest win rather than the biggest.
-  const doneCount = hs.length - missing.length;
-  if (doneCount === 0) {
-    const easy = missing.filter(h => !h.locked).sort((a, b) => baseXp(a) - baseXp(b))[0] || missing[0];
+  // Only the session is left: nothing here to tick. Coached → point at the programme (the
+  // button used to say OPEN YOUR PROGRAMME and open Progress); free → the day is done.
+  if (!open.length) {
+    return isFree()
+      ? { key: 'freeDone', line: pickLine('freeDone', 'freeDone'), cta: 'SEE WHERE YOU STAND', target: null }
+      : { key: 'sessionLeft', line: pickLine('sessionLeft', 'sessionLeft'),
+          cta: 'OPEN YOUR PROGRAMME', target: 'program' };
+  }
+
+  // Nothing logged at all yet: point at the cheapest win rather than the biggest. "Nothing"
+  // means nothing: 3,000 steps is not done but it is logged, and this used to call that day
+  // "You have logged nothing" (PRF-04).
+  const anyLogged = hs.some(h => valOf(TKEY(), h.id) > 0);
+  if (!anyLogged) {
+    const easy = open.slice().sort((a, b) => baseXp(a) - baseXp(b))[0];
     return { key: 'empty', line: pickLine('empty', 'empty'),
              cta: 'START WITH ' + easy.name, target: easy.id };
   }
 
-  // Down to one. Name it — being specific is what makes it land.
-  if (missing.length === 1) {
-    const only = missing[0];
+  // Down to one they can tick. Name it — being specific is what makes it land.
+  if (open.length === 1 && missing.length === 1) {
+    const only = open[0];
     return { key: 'last:' + only.id,
              line: pickLine('lastOne', 'last:' + only.id, { name: only.name.toLowerCase() }),
-             cta: only.locked ? 'OPEN YOUR PROGRAMME' : 'FINISH ' + only.name,
-             target: only.locked ? null : only.id };
+             cta: 'FINISH ' + only.name, target: only.id };
   }
 
   // A run going well and today already qualifies: say so instead of inventing a
@@ -5043,15 +5071,14 @@ function nudge() {
   }
 
   // Otherwise: the most valuable thing they can still action, in its own words.
-  const t = missing.filter(h => !h.locked).sort((a, b) => baseXp(b) - baseXp(a))[0] || missing[0];
+  const t = open.slice().sort((a, b) => baseXp(b) - baseXp(a))[0];
   const left = t.kind === 'count'
     ? Math.max(1, Math.ceil(t.target - valOf(TKEY(), t.id)))
     : 1;
   return { key: 'h:' + t.id,
            line: pickLine(NUDGES[t.id] ? t.id : 'custom', 'h:' + t.id,
                           { n: fmtVal(t, left), name: t.name.toLowerCase(), unit: t.unit }),
-           cta: t.locked ? 'OPEN YOUR PROGRAMME' : 'SORT ' + t.name,
-           target: t.locked ? null : t.id };
+           cta: 'SORT ' + t.name, target: t.id };
 }
 
 // ── Level-up detection ────────────────────────────────────────────────────
@@ -8014,7 +8041,7 @@ function renderToday(LI, doneCount, pct) {
       ${past ? '' : `<div class="coachcard ${risk ? 'risk' : ''}" data-k="nudge">
         <div class="eyebrow">${risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
         <div class="say" data-k="say:${esc(n.key)}" data-static data-type data-full="${esc(n.line)}">${esc(n.line)}</div>
-        <button class="cta" ${on(() => (n.target ? openHabit(n.target, 'today') : go('progress')))}>${esc(n.cta)}</button>
+        <button class="cta" ${on(() => (n.target === 'program' ? goProgram() : n.target ? openHabit(n.target, 'today') : go('progress')))}>${esc(n.cta)}</button>
       </div>`}
 
 

@@ -82,7 +82,9 @@
 //      resumes at the first unfinished set, and its last button (Finish Session ✓) really finishes.
 // v43: program.html changed (2026-09-26, LOG-02): Reset Session, a weight reading and a Personal
 //      Record take two taps (armedTap()), and Reset moved away from Send.
-const CACHE = 'aap-v43';
+// v44: habits.html changed (2026-09-26, PRF-04): the nudge stops asking for the session Proof cannot
+//      tick, its OPEN YOUR PROGRAMME button opens the programme, and "logged nothing" means nothing.
+const CACHE = 'aap-v44';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

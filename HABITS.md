@@ -298,13 +298,22 @@ The screen they actually live on. **In this order, and the order is the point:**
    counter habit you have not finished reads `5 of 8 glasses · 3 to go` — the position
    *and* the job.
 5. **The nudge** — one clay card whose copy reacts to what is actually missing, drawn at
-   random from a library of **87 lines across 14 situations** (`NUDGES`): one bucket per
+   random from a library of **94 lines across 16 situations** (`NUDGES`): one bucket per
    habit, one shared `custom` bucket for habits the athlete added (their ids are made up
    when added, so they have no bucket of their own; until 2026-09-26 they fell through to
    nothing-logged-yet and a day with six things done opened with "Nothing logged yet"),
    plus nothing-logged-yet, one-habit-left, all-done, streak-at-risk and streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
    tomorrow** — over 21 days a bucket of 10 uses all 10 lines with no back-to-back
    repeats. Its button opens the habit in question. The "nudge" half of *nudge and recap*.
+   **The session is never asked for by name** (PRF-04, 2026-09-26): it is `locked`, ticked only by
+   a workout finished in the programme app, so `nudge()` reasons about the habits the athlete can
+   tick (`open`). When the session is the only thing left, a coached athlete gets `sessionLeft`
+   ("Your part is done… a rest day is part of it") with **OPEN YOUR PROGRAMME**, which really opens
+   the programme app (`target: 'program'` → `goProgram()`; it used to open Progress), and a free
+   athlete gets `freeDone`. "Nothing logged yet" needs **nothing logged**: 3,000 steps is not done
+   but it is logged, and used to be greeted with "You have logged nothing". Display only: no scorer
+   moved, and a rest day still counts against the day exactly as before (see *Open calls* in
+   `Content/FRESH-EYES.md`).
 6. **Roll call pointer** — a single row into the CREW tab, shown only while today's
    sentence is unwritten. The composer itself lives in CREW with its feed.
 7. **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
@@ -2347,7 +2356,7 @@ these keys when it syncs.
 ## Voice
 
 Dry, blunt, a little rude — the same coach who says *"your hamstrings have filed a
-complaint with HR"*. The whole nudge library (`NUDGES`, 87 lines) is written in it, and
+complaint with HR"*. The whole nudge library (`NUDGES`, 94 lines) is written in it, and
 anything added to it has to be: never chirpy, never therapeutic, funny because it is
 true. Tokens available in a line are `{n}` (how many are left), `{name}`, `{unit}` and
 `{st}` (streak days). Never chirpy, never therapeutic. It notices what you skipped and
