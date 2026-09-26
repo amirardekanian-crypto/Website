@@ -517,7 +517,7 @@ lives only as "engage should write a card about X" can no longer slip. List ever
 - `film: <exercises, weeks>` — any gate that resolves to film.
 - `weigh-in` — a cycle that depends on body mass (Home → Body Weight, never Proof).
 - `double-day` — a concurrent athlete (sport and gym on the same days).
-- `low-readiness` — everyone (the one line); the full kit for high-stress and concurrent athletes.
+- `low-readiness` — everyone (REC-2); high-stress and concurrent athletes add REC-6 on the same card.
 - `period` — only when Amir confirmed it at the checkpoint this cycle.
 - `start-lower: <what, the number>` — a start-lower longer than week 1 (a staged return).
 - `close-loop: <what resolved>` — a standing issue confirmed resolved.
@@ -584,12 +584,12 @@ the same instruction a third time (the pill was the second), and it costs one of
 cues. Say something the numbers cannot: what to feel, where to brace, what usually goes wrong.
 Write it for anyone; a point about this athlete's training age goes in their `note:`.
 
-**AUTOREGULATION (required output):** every athlete gets the one line — drop every RPE by 1 on
-low-readiness days **but never below 6** (the app's selector floor — state the floor in the
-same sentence, or the note prescribes an RPE 5 she cannot log on every exercise authored at
-6). High-stress and concurrent athletes also get the minimum effective dose (first power move +
-first primary) and a flexible session order. Leans on the app's readiness check + ACWR.
-*(Made universal 2026-09-26: REC-2.)*
+**AUTOREGULATION (required output):** `low-readiness` goes on every athlete's obligations (REC-2),
+with REC-6 for high-stress and concurrent athletes. Design's part is making REC-2's red day readable
+on every day: the warm-up, the first power move and the first primary lift sit where SES-9 puts them,
+under the standard block names, and a day with no Primary block names its first working block as
+that day's minimum dose in the spec. Every jump and landing needs the Spine's `impact` filled
+(`/spine` Upkeep), because a sore day trims exactly those. Leans on the app's readiness check + ACWR.
 
 **Do NOT output:** videoUrl · completionTitle/Message · currentCycleIndex · cycles[] ·
 programHistory. /program-engage and /program-assemble own those.

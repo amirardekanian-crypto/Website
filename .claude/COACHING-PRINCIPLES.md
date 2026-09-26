@@ -97,10 +97,11 @@ places, and a stale copy reached athletes.)*
 | ID | Rule | Stage | Check |
 |---|---|---|---|
 | REC-1 | Recovery capacity gates everything: set the weekly volume ceiling before the number of sessions. | roadmap · design | |
-| REC-2 | Every programme carries the low-readiness line (1 off every RPE, never below 6); high-stress and concurrent athletes add a minimum dose and flexible order. | design · engage | oblig `low-readiness` |
+| REC-2 | Low-readiness days: amber, 1 off every RPE (never below 6); red, warm-up, first power and first primary, rest optional; sore, half the jumps and landings. | design · engage | oblig `low-readiness` |
 | REC-3 | Separate training fatigue from life load in every review. | design · report | |
 | REC-4 | Never program past a fatigue wall: every cycle's last week is a back-off, written as `weekNotes.last`. | design | ✓ |
 | REC-5 | A concurrent athlete gets a double-day rule: gym after sport or 4–6 hours apart, otherwise the minimum dose with the primary at RPE 6. | design · engage | oblig `double-day` |
+| REC-6 | High-stress and concurrent athletes also get a flexible session order in their notes. | design · engage | |
 
 ### Session structure & time
 | ID | Rule | Stage | Check |
@@ -500,13 +501,37 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
 ## Recovery & autoregulation
 - `REC-1` **Recovery capacity gates everything** — set the weekly volume ceiling *before*
   choosing session count. *(2026-06-15)*
-- `REC-2` **Every athlete gets the low-readiness rule; high-stress and concurrent athletes get the full
-  kit.** Everyone has rough days and the app already asks about readiness, so every programme
-  carries one line: on a low-readiness day, take 1 off every RPE, **never below 6** (anything at 6
-  stays at 6). High- or chronic-stress clients and concurrent athletes also get a minimum effective
-  dose (first power move + first primary lift) and a flexible session order. *(2026-06-15, floor
-  added 2026-08-21, the one line made universal 2026-09-26: Amir left the scope to the
-  recommendation)*
+- `REC-2` **Readiness changes the day in three ways, and never the programme.** *(2026-06-15; the RPE 6
+  floor 2026-08-21; made universal 2026-09-26; rewritten as three levels the same day, Amir: "see which
+  kind of readiness should affect what, and then if they should reduce sets, or rpe or what". The
+  break PRC-25 asks for: athletes answered the check-in before 90% of sessions and nothing changed.)*
+  Cards are prescribed by RPE, so a bad day already means a lighter weight at the same RPE. The rule
+  moves what RPE does not: effort, sets and impact work.
+  - **Two signals.** Sleep, energy, stress and overall move together (across 348 answered check-ins,
+    overall tracks energy r .77, stress .55, sleep .49); their mean is the day's score **S**. Soreness
+    barely tracks any of them (r .12 to .28), so it moves impact work only. **B** is the athlete's own
+    mean S over their last 10 check-ins, used once there are 5.
+  - **Amber**: S 2.5 or lower, or at least 0.75 below B. 1 off every RPE, circuit rounds included,
+    never below 6; the same sets, reps and order.
+  - **Red**: S 2.0 or lower, or sleep, energy, stress or overall at 1. Amber, and the session is the
+    warm-up, the first power move and the first primary lift (all its sets); the rest is optional,
+    cut from the end. A day with no Primary block: the warm-up and the first working block.
+  - **Sore**, on any level: soreness 2 or lower. Plyometric and landing items (the Spine's `impact`)
+    at half the sets, rounded down, at least one; at 1, skipped. Lifts are unchanged: a sore muscle
+    can still be lifted, and RPE already regulates it.
+  - **Never** below RPE 6 (CHP-4), below the warm-up and the minimum dose, or an edit to the card
+    (PRG-4). Week notes and readiness do not stack: the lower target wins, floor 6. A flagged retest
+    (TST-1) waits for a green day. The athlete may always train as written, and that choice is logged.
+  - **A run of low days is Amir's call, not the rule's**: three amber or red check-ins in five, or
+    stress 2 or lower on three of five (REC-3, PRG-1).
+  - **Why these numbers.** Simulated on 348 answered check-ins (27 athletes, April to September
+    2026), something changes on about 1 in 6: amber 6.9%, red 2.9%, sore 8.9%. "Any answer at 2 or
+    lower" was rejected because it fires on 26.7%. The fixed 2.5 alone never reached 14 of 20 regular
+    athletes, which is why B exists. The direction of each change is evidence-led (cut volume before
+    intensity: Bosquet 2007, Spiering 2021; stopping further from failure costs little strength:
+    Robinson 2024, Grgic 2022; soreness lowers jump output: Byrne & Eston 2002, Cheung 2003; sleep
+    loss: Craven 2022). Every threshold is judgement: review them at the PRC-25 eight-cycle review.
+  - Until the app applies it, the athlete applies it from the notes card tagged `low-readiness`.
 - `REC-3` **Separate training fatigue from life load** in every review — a readiness dip from
   poor sleep/stress is not the same as training fatigue (Athlete D's end-cycle dip was
   life, not load). *(2026-06-15)*
@@ -519,6 +544,10 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   impossible, run the minimum effective dose with the primary capped at RPE 6. Silence on
   double days is a design gap, not a detail — at 5–6 sport days/week they are the norm, not
   the edge case. *(2026-08-02, Athlete J C1 — caught by the dose/time audit)*
+- `REC-6` **High-stress and concurrent athletes also get a flexible session order.** *(Split out of
+  REC-2 on 2026-09-26, when REC-2 became three levels: it is the second half of the 2026-06-15 rule,
+  not a new one.)* The minimum dose that used to come with it now belongs to every athlete's red day
+  (REC-2).
 
 ## Session structure & time
 - `SES-1` **`workouts.days[]` is authored in the best execution order.** The order days appear in
