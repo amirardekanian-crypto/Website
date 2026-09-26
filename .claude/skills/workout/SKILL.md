@@ -255,9 +255,7 @@ much."*
 **Cues: exactly three. One external, one internal, one avoid.** External +
 internal go in `cues.good[]`, the avoid cue in `cues.bad[]` — so `good` has 2
 entries and `bad` has 1, on every exercise, **including every item inside a
-circuit**. This is `COACHING-PRINCIPLES.md` → **Coaching cues**, not a
-library-only rule. Go past three only when something is genuinely important
-enough to earn it.
+circuit**. This is CUE-1, not a library-only rule: never more, never fewer.
 
 **Do not write a `note` on most exercises.** Neither workout Amir authored
 himself uses one at all. A note is for a caveat the cues cannot hold — a

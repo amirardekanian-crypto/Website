@@ -26,8 +26,14 @@ Durable context for working in this repo. Read the linked docs before diving in.
   habit-tracker related: the three tabs, the eight habits, how progression works, the
   leaderboard, and how it links both ways with `program.html`.
 - `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
-- `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy; `/program-*` skills read it.
-- **`scripts/check_program.py`** — the house rules as a script (2026-09-25). `/program-assemble` runs it on every built programme before any review: floors, set cap, the new-athlete 8-rep rule, bans, RPE floors in every note, session length, the Spine gate, the Quality Map, and the publish fingerprint. A new athlete then gets ONE reviewer; a returning athlete none unless Amir asks (COACHING-PRINCIPLES → Process).
+- `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy. **It opens with the RULE INDEX**
+  (2026-09-26): one numbered line per rule (`VOL-8`, `SEL-4` …), the stage that applies it and whether
+  the checker enforces it; the dated bullets below it are the stories. **The index line is the rule**:
+  where this file, a skill or SCHEMA restates one, the index wins, and new text cites the ID instead of
+  restating (PRC-23). `scripts/check_rule_index.py` (pre-commit) keeps the index, its stories, the
+  checker and every cited ID in agreement. Design reads the whole file; engage and the reviewers read
+  the index and their own sections.
+- **`scripts/check_program.py`** — the house rules as a script (2026-09-25). `/program-assemble` runs it on every built programme before any review: floors, set cap, the new-athlete 8-rep rule, bans, RPE floors in every note, session length, the Spine gate, the Quality Map, and the publish fingerprint. Every FAIL and WARN it prints names its rule ID. A new athlete then gets ONE reviewer; a returning athlete none unless Amir asks (PRC-4).
 - `.claude/skills/*` + `.claude/agents/athlete-brief.md` (data prep only since 2026-09-26: the new athlete's intake form, and the Gmail session import /cycle-report runs first) — the coaching pipeline (intake → roadmap → design → assemble **Part A** (build + every programming check) → engage → assemble **Part B** (words, full check, publish) → **`/cycle-report`** at the end of every cycle: the athlete's WhatsApp report plus a coach-only `## Debrief` section in their coaching log, which `/program-design` reads before the next cycle). the coach-only per-athlete rationale log now lives in `public.coaching_logs`, read and
   written from coach.html (it used to be `.claude/coaching-log/*.md`, in this public repo).
 
@@ -57,7 +63,7 @@ straight to `programs` and keeps the previous version in `program_versions`.
 **✅ Every programme write ends the same way** (Amir, 2026-09-24: *"every time i update, write a new
 program, if an exercise comes up, add it, if it can be updated, or linked better to anything, be
 done when the program is done"*). Whether it is `/program-assemble` (a new cycle), `/program-edit`
-(a change) or `/workout` (a library session), the run is not finished until:
+(a change) or `/workout` (a library session), the run is not finished until (CUE-4, CUE-3, PRC-24, COM-4, PRC-12):
 1. **Spine upkeep** (`/spine` → Upkeep): every exercise has an entry; empty fields filled; aliases
    added for new spellings; `exId` stamped on every card; a new exercise linked to its
    regressions, progressions and alternatives from both sides; **body parts** (`loads` + `impact`)
@@ -74,7 +80,8 @@ done when the program is done"*). Whether it is `/program-assemble` (a new cycle
 Never approve anything without Amir's word, and never put athlete-specific detail on a Spine entry.
 Details live in `/spine` → Upkeep and `/program-assemble` Step 8.
 
-**⛔ Three rules for every programme run** (Amir, 2026-09-25, after a correction went wrong):
+**⛔ Three rules for every programme run** (Amir, 2026-09-25, after a correction went wrong; PRC-1,
+NAM-9 with CUE-5, PRC-2):
 - **Never touch the app while writing, correcting or delivering a programme.** No edit to any
   `.html` page or `assets/js/*`; an idea or a bug seen on the way goes in the handoff (*"this is a
   strict rule … dont touch the html file, if you see anything or want to prescribe better in a way ,

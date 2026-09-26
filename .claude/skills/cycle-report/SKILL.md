@@ -36,7 +36,7 @@ Files here: **`queries.sql`** (four read-only queries, tested on real rows) · *
 2. **Never guess what the log can't tell you.** Whole bar or per side, a typo ("250" for 25),
    warm-ups typed into working rows: say what the log shows and ask. The athlete message *teaches*
    the fix ("log the whole bar, bar included") instead of assuming either answer.
-3. **Never a weight to lift.** RPE, never load (COACHING-PRINCIPLES → *Prescribe RPE, never load*).
+3. **Never a weight to lift.** RPE, never load (PRG-2).
    Quoting what he lifted is history and is fine; telling him what to lift next is not.
 4. **Promise the retest, never the result.** "We'll measure your broad jump in week 1", not
    "you'll jump 10 cm further".

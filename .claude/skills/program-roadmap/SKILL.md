@@ -15,14 +15,16 @@ never drift from the plan.
   returning athlete who somehow has no roadmap yet, their latest Debrief (/cycle-report) and
   coaching log are the brief.
 - **PROGRAM_START_DATE** (`YYYY-MM-DD`). If unknown, ask once.
+- **The rule index** at the top of `.claude/COACHING-PRINCIPLES.md`, plus the Process stories for
+  PRC-3, PRC-14 and PRC-17 (the roadmap's own rules). Open another story only when its line is
+  not enough.
 - **The context pull** from /program-design STEP 0 (one database call). A new athlete reaches
   the roadmap before design, so run it here, once; design reuses the same result rather than
   asking again. The roadmap needs its `cycle_names_in_use`.
 
 ## Rules
 - **One coherent pass, then one independent reviewer** (reshaped 2026-09-26 on Amir's *"you
-  decide what gets the highest quality program"*; COACHING-PRINCIPLES.md → Process → "Every
-  design pass is checked"). It replaces the three-lens panel, whose grafting produced the
+  decide what gets the highest quality program"*; PRC-3). It replaces the three-lens panel, whose grafting produced the
   recorded roadmap errors.
   1. **Read the athlete first**, before any arc: the recovery ceiling (sleep, stress, life
      load), every restriction and what it rules out, the goal order (primary, secondary), and
@@ -33,12 +35,13 @@ never drift from the plan.
      power-leaning one) and write the one you would defend. Never graft cycles from different
      arcs: a cycle only makes sense in the sequence around it.
   3. **One reviewer agent** (the Agent tool, files only) critiques the finished arc against the
-     brief, the read and the principles: does each cycle set up the next, does anything break a
+     brief, the read and the rule index (pass the path of `.claude/COACHING-PRINCIPLES.md` and
+     tell it to read the index, open a rule's story only to check a must-fix, and cite every
+     must-fix by rule ID): does each cycle set up the next, does anything break a
      restriction, does Cycle 1 respect the first-cycle rules (no weighted lift under 8 reps, no
      supersets). Write the brief, the read and the arc to scratchpad files first, pass their real
      paths, and tell it in so many words not to call the database or any MCP tool
-     (COACHING-PRINCIPLES.md → Process → "Background agents work from files"). Apply every
-     must-fix.
+     (PRC-5). Apply every must-fix.
   4. **It locks without Amir's sign-off** (Amir, 2026-09-26: *"no doesnt need me"*): show it in
      chat and carry on to /program-design.
   - **No literature search unless Amir asks for one.**
@@ -60,11 +63,10 @@ never drift from the plan.
 - ⚠️ **The cards carry the athlete's NORMAL prescription.** Week 1 and the back-off week live in
   the cycle's `weekNotes`; a low-readiness stretch lives in a notes card. None of these is ever
   written as a lower RPE/volume on the exercise itself. Amir does not change a program
-  mid-cycle, so the card is a stable reference all cycle. Full rule: `.claude/COACHING-PRINCIPLES.md` →
-  Progression → "The RPE printed on a card is the athlete's NORMAL working target". Write
+  mid-cycle, so the card is a stable reference all cycle (PRG-4, PRC-15). Write
   roadmap focus lines the same way — describe how he trains *normally*, not how week 1 runs.
 - **Cycle 1 of a new athlete is never a heavy, low-rep block.** Their first cycle has no weighted
-  lift under 8 reps and no supersets (COACHING-PRINCIPLES.md → Volume & dosing), so give it a
+  lift under 8 reps and no supersets (VOL-11, SES-11), so give it a
   foundation job (`bedrock`, `armour`, `build`), not `iron` or `voltage`.
 - **Name each cycle to be COOL and evocative** — a punchy 1–2 word power-name that *sells*
   the phase, not a dry label ("Lower Body Block" ✗). Lean on build / material / machine /

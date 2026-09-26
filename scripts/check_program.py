@@ -80,8 +80,12 @@ NEGATION = re.compile(r"\b(no|not|never|nothing|without|avoid|avoids|banned|ban|
                       r"are out|is out|ruled out|off the table)\b", re.I)
 
 out = {'FAIL': [], 'WARN': [], 'INFO': []}
-def fail(m): out['FAIL'].append(m)
-def warn(m): out['WARN'].append(m)
+# Every FAIL and WARN names the rule it enforces, from the rule index at the top of
+# .claude/COACHING-PRINCIPLES.md (2026-09-26: one owner per rule; skills and this script cite it).
+# scripts/check_rule_index.py holds the index's Check column to the ids cited here.
+def tagged(m, rules): return (f"[{' · '.join(rules)}] " if rules else '') + m
+def fail(m, *rules): out['FAIL'].append(tagged(m, rules))
+def warn(m, *rules): out['WARN'].append(tagged(m, rules))
 def info(m): out['INFO'].append(m)
 
 def num(v):
@@ -172,43 +176,43 @@ def check_structure(data, args, spine=None):
         where = f"Day {d.get('id')} · {b.get('title')} · {o.get('name')}"
         prep = bool(PREP.search(b.get('title') or ''))
         if not it and ex.get('type') not in ('standard', 'simple', 'circuit'):
-            fail(f"{where}: type must be standard, simple or circuit (got {ex.get('type')!r})")
-        if o.get('chips'): fail(f"{where}: carries chips[] (write rx, never chips)")
-        if o.get('cues'): fail(f"{where}: carries cues (cues come from the Spine entry only)")
+            fail(f"{where}: type must be standard, simple or circuit (got {ex.get('type')!r})", 'CHP-5')
+        if o.get('chips'): fail(f"{where}: carries chips[] (write rx, never chips)", 'CHP-5')
+        if o.get('cues'): fail(f"{where}: carries cues (cues come from the Spine entry only)", 'CUE-2')
         if not it and ex.get('type') == 'circuit':
             if not prep and args.new:
-                fail(f"{where}: a working circuit (superset) in a new athlete's first cycle: straight sets only")
+                fail(f"{where}: a working circuit (superset) in a new athlete's first cycle: straight sets only", 'SES-11')
             continue
-        if not o.get('exId'): fail(f"{where}: no exId")
+        if not o.get('exId'): fail(f"{where}: no exId", 'CUE-4')
         # No floating text on a card (Amir, 2026-09-25: "i dont like floating text and remember this").
         # A grip is the athlete's CHIP ("grips should be a chip on the card not a free text"): the only
         # chip an rx card draws is `intent`, the pill his older cards use for "neutral grip". Any other
         # detail for this athlete (a hand position, a bench) is the Coach's Note.
         if re.search(r'\bgrip|\bpalms?\b|pronat|supinat|\boverhand\b|\bunderhand\b', o.get('setup') or '', re.I):
-            fail(f"{where}: a grip written as free text ('{o['setup']}'): make it the chip, the exercise's intent (e.g. \"neutral grip\")")
+            fail(f"{where}: a grip written as free text ('{o['setup']}'): make it the chip, the exercise's intent (e.g. \"neutral grip\")", 'NAM-5')
         elif o.get('setup'):
-            fail(f"{where}: floating text on the card ('{o['setup']}'): put it in the Coach's Note")
+            fail(f"{where}: floating text on the card ('{o['setup']}'): put it in the Coach's Note", 'CHP-1')
         # A superset is a circuit, never a pill on two standard cards (it shipped once: each card got
         # its own rest timer and nothing showed they were paired). Was a manual grep in assemble.
         if not it and re.search(r'super-?set|paired with|pair with|complex with', o.get('intent') or '', re.I):
-            fail(f"{where}: a pairing written as a pill ('{o['intent']}'): make the pair ONE circuit (SCHEMA → circuit)")
+            fail(f"{where}: a pairing written as a pill ('{o['intent']}'): make the pair ONE circuit (SCHEMA → circuit)", 'SES-12', 'CHP-2')
         rx = o.get('rx') or {}
         doses = [k for k in ('reps', 'time', 'distance', 'work') if rx.get(k) not in (None, '')]
-        if len(doses) > 1: fail(f"{where}: two doses ({' + '.join(doses)})")
+        if len(doses) > 1: fail(f"{where}: two doses ({' + '.join(doses)})", 'CHP-5')
         if isinstance(rx.get('reps'), str) and re.search(r'\d\s*[-–]\s*\d', rx['reps']):
-            fail(f"{where}: a rep range ({rx['reps']}): one number, never a range")
+            fail(f"{where}: a rep range ({rx['reps']}): one number, never a range", 'PRG-6')
         sets = num(rx.get('sets'))
         # 4 is the cap for everyone who hasn't proven more in OUR logs (Amir, 2026-09-26: people
         # who call themselves pro can be very weak in practice, "but if we have an athlete who
         # proved himself, in the logs, and in our cycles, why not go over").
         if sets and sets > 4:
             if args.proven: info(f"{where}: {int(sets)} sets, over the usual 4, allowed because the athlete has proven the volume in our logs (--proven)")
-            else: fail(f"{where}: {int(sets)} sets (never more than 4 on one exercise until the athlete has proven more in our logs: add an exercise, or pass --proven and name the evidence)")
+            else: fail(f"{where}: {int(sets)} sets (never more than 4 on one exercise until the athlete has proven more in our logs: add an exercise, or pass --proven and name the evidence)", 'VOL-8')
         rpe = num(str(rx.get('rpe', '')).split('-')[0]) if rx.get('rpe') not in (None, '') else None
-        if rpe is not None and rpe < 6: fail(f"{where}: RPE {rx.get('rpe')} is under the floor of 6")
-        if prep and rx.get('rpe') not in (None, ''): warn(f"{where}: RPE on a warm-up item")
+        if rpe is not None and rpe < 6: fail(f"{where}: RPE {rx.get('rpe')} is under the floor of 6", 'CHP-4')
+        if prep and rx.get('rpe') not in (None, ''): warn(f"{where}: RPE on a warm-up item", 'SES-5')
         if rx.get('tempo') and not re.match(r'^(iso|\d+(\.\d+)?([-–]\d+(\.\d+)?){2,3})$', str(rx['tempo']).strip(), re.I):
-            fail(f"{where}: tempo {rx['tempo']!r} should be iso or 3-4 numbers")
+            fail(f"{where}: tempo {rx['tempo']!r} should be iso or 3-4 numbers", 'CHP-3')
         if not prep and not it and ex.get('type') == 'standard':
             reps = num(rx.get('reps'))
             if args.new and reps is not None and reps < 8:
@@ -220,7 +224,7 @@ def check_structure(data, args, spine=None):
                 if w is None: w, why = bool(rx.get('tempo')), 'no Spine entry, so read from the tempo'
                 else: why = 'from its Spine entry'
                 if w:
-                    fail(f"{where}: {int(reps)} reps. A new athlete's first cycle has no weighted exercise under 8 reps ({why})")
+                    fail(f"{where}: {int(reps)} reps. A new athlete's first cycle has no weighted exercise under 8 reps ({why})", 'VOL-11')
                 else:
                     info(f"{where}: {int(reps)} reps, not a weighted lift ({why}), so exempt from the 8-rep rule")
         # Each working exercise once per cycle, circuit items included (a conditioning finisher
@@ -229,7 +233,7 @@ def check_structure(data, args, spine=None):
             key = (o.get('exId') or o.get('name', '')).lower()
             seen.setdefault(key, []).append(f"Day {d.get('id')}")
     for key, days in seen.items():
-        if len(days) > 1: fail(f"{key}: in {len(days)} working blocks ({', '.join(days)}): each working exercise once per cycle")
+        if len(days) > 1: fail(f"{key}: in {len(days)} working blocks ({', '.join(days)}): each working exercise once per cycle", 'SEL-15')
     # A grind: a day with 7 or more working exercises spikes fatigue even at low RPE
     # (COACHING-PRINCIPLES → Volume & dosing → manage load per DAY).
     for d in (data.get('workouts') or {}).get('days') or []:
@@ -238,48 +242,48 @@ def check_structure(data, args, spine=None):
             if PREP.search(b.get('title') or ''): continue
             for ex in b.get('exercises') or []:
                 n += len(ex.get('items') or []) if ex.get('type') == 'circuit' else 1
-        if n >= 7: warn(f"Day {d.get('id')}: {n} working exercises, a grind (7 or more): check the day's load identity")
+        if n >= 7: warn(f"Day {d.get('id')}: {n} working exercises, a grind (7 or more): check the day's load identity", 'VOL-2')
 
 def check_text(data):
     for where, s in text_fields(data):
         for m in re.finditer(r'RPE\s*(?:of\s*)?(\d+(?:\.\d+)?)', s):
-            if float(m.group(1)) < 6: fail(f"{where}: says RPE {m.group(1)}, under the floor of 6")
+            if float(m.group(1)) < 6: fail(f"{where}: says RPE {m.group(1)}, under the floor of 6", 'CHP-4')
         for sen in sentences(s):
             if re.search(r'\b(take|drop|minus|subtract|lower|knock)\b.{0,40}\bRPE', sen, re.I) and '6' not in sen:
-                fail(f"{where}: lowers the RPE without naming the floor of 6 in the same sentence: \"{sen[:90]}\"")
-        if '—' in s: warn(f"{where}: an em-dash (not how Amir writes)")
+                fail(f"{where}: lowers the RPE without naming the floor of 6 in the same sentence: \"{sen[:90]}\"", 'CHP-4')
+        if '—' in s: warn(f"{where}: an em-dash (not how Amir writes)", 'COM-3')
         m = re.search(r'\b(\d+)\s*[-–]\s*(\d+)\s*reps?\b', s, re.I)
-        if m: warn(f"{where}: a rep range in the text ({m.group(0)})")
+        if m: warn(f"{where}: a rep range in the text ({m.group(0)})", 'PRG-6')
 
 def check_cards(data):
     for c in (data.get('notes') or {}).get('cards') or []:
         body, t = c.get('body', ''), c.get('title')
-        if not re.search(r'<(p|ul)\b', body): fail(f"card '{t}': the body is not HTML (<p>, <ul><li>)")
+        if not re.search(r'<(p|ul)\b', body): fail(f"card '{t}': the body is not HTML (<p>, <ul><li>)", 'COM-8')
         stack = []
         for m in re.finditer(r'<(/?)([a-z]+)[^>]*?(/?)>', body):
             close, tag, selfclose = m.group(1), m.group(2), m.group(3)
             if tag in ('br', 'hr', 'img') or selfclose: continue
             if close:
-                if not stack or stack.pop() != tag: fail(f"card '{t}': unbalanced </{tag}>"); break
+                if not stack or stack.pop() != tag: fail(f"card '{t}': unbalanced </{tag}>", 'COM-8'); break
             else: stack.append(tag)
         else:
-            if stack: fail(f"card '{t}': unclosed <{'>, <'.join(stack)}>")
-        if '<ol' in body: warn(f"card '{t}': <ol> has no styling in .note-body, use <ul>")
+            if stack: fail(f"card '{t}': unclosed <{'>, <'.join(stack)}>", 'COM-8')
+        if '<ol' in body: warn(f"card '{t}': <ol> has no styling in .note-body, use <ul>", 'COM-8')
 
 def check_whys(data):
     whys = [(d, ex) for d, b, ex, it in exercises(data) if not it and ex.get('why') is not None]
     n = len(whys)
-    if n > 10: fail(f"{n} Becauses: keep the 5-10 real personal decisions")
-    elif n < 5: warn(f"{n} Becauses: a cycle carries 5-10 (fewer than 3 hides the Why-your-plan button)")
+    if n > 10: fail(f"{n} Becauses: keep the 5-10 real personal decisions", 'COM-4')
+    elif n < 5: warn(f"{n} Becauses: a cycle carries 5-10 (fewer than 3 hides the Why-your-plan button)", 'COM-4')
     for d, ex in whys:
         w, where = ex['why'], f"Day {d.get('id')} {ex.get('name')} why"
-        if not isinstance(w, dict): fail(f"{where}: must be {{src, text}}"); continue
-        if w.get('src') not in ('goal', 'body', 'test', 'cycle', 'you', 'court'): fail(f"{where}: src {w.get('src')!r}")
-        if w.get('src') == 'body' and not w.get('part'): fail(f"{where}: src body needs a part")
-        if w.get('part') and w.get('src') != 'body': fail(f"{where}: part only goes with src body")
+        if not isinstance(w, dict): fail(f"{where}: must be {{src, text}}", 'COM-4'); continue
+        if w.get('src') not in ('goal', 'body', 'test', 'cycle', 'you', 'court'): fail(f"{where}: src {w.get('src')!r}", 'COM-4')
+        if w.get('src') == 'body' and not w.get('part'): fail(f"{where}: src body needs a part", 'COM-4')
+        if w.get('part') and w.get('src') != 'body': fail(f"{where}: part only goes with src body", 'COM-4')
         text = (w.get('text') or '').strip()
-        if len(text) > 140: fail(f"{where}: {len(text)} characters (140 max)")
-        if re.search(r'[—;]', text): fail(f"{where}: an em-dash or semicolon")
+        if len(text) > 140: fail(f"{where}: {len(text)} characters (140 max)", 'COM-4')
+        if re.search(r'[—;]', text): fail(f"{where}: an em-dash or semicolon", 'COM-4')
 
 def check_week_notes(data, args):
     """The first and last week of the cycle being built (cycles[currentCycleIndex].weekNotes).
@@ -293,37 +297,37 @@ def check_week_notes(data, args):
     cyc = cycles[i] if 0 <= i < len(cycles) else {}
     wn = cyc.get('weekNotes')
     if wn is not None and not isinstance(wn, dict):
-        fail(f"cycle {cyc.get('num')}: weekNotes must be an object {{first, last}}"); return
+        fail(f"cycle {cyc.get('num')}: weekNotes must be an object {{first, last}}", 'PRC-15'); return
     wn = wn or {}
     for key in ('first', 'last'):
         n = wn.get(key)
         if n is None: continue
         where = f"cycle {cyc.get('num')} weekNotes.{key}"
         if not isinstance(n, dict):
-            fail(f"{where}: must be an object {{text, setsDrop?, rpeDrop?, rpeCap?}}"); continue
+            fail(f"{where}: must be an object {{text, setsDrop?, rpeDrop?, rpeCap?}}", 'PRC-15'); continue
         text = str(n.get('text') or '').strip()
         # At --stage build only design's numbers exist; engage writes the words after the checks.
         if not text and args.stage == 'final':
-            fail(f"{where}: needs a text, the words the athlete reads")
+            fail(f"{where}: needs a text, the words the athlete reads", 'PRC-15')
         for f in ('setsDrop', 'rpeDrop'):
             if f in n and not (isinstance(n[f], int) and 1 <= n[f] <= 3):
-                fail(f"{where}: {f} is how many fewer (a whole number, 1 to 3), got {n[f]!r}")
+                fail(f"{where}: {f} is how many fewer (a whole number, 1 to 3), got {n[f]!r}", 'PRC-15')
         if 'rpeCap' in n and not (isinstance(n['rpeCap'], (int, float)) and 6 <= n['rpeCap'] <= 9):
-            fail(f"{where}: rpeCap must be 6 to 9 (the app's floor is 6), got {n['rpeCap']!r}")
-        if len(text) > 260: warn(f"{where}: {len(text)} characters; it's a note, keep it under ~260")
+            fail(f"{where}: rpeCap must be 6 to 9 (the app's floor is 6), got {n['rpeCap']!r}", 'PRC-15', 'CHP-4')
+        if len(text) > 260: warn(f"{where}: {len(text)} characters; it's a note, keep it under ~260", 'PRC-15')
         label = (n.get('title') or ('Back-off week' if key == 'last' else 'Week 1')).lower()
         if text and text.lower().startswith(label):
-            warn(f"{where}: the text starts by repeating its label ('{label}'); start with the instruction")
+            warn(f"{where}: the text starts by repeating its label ('{label}'); start with the instruction", 'PRC-15')
     last = wn.get('last')
     if args.no_backoff:
         info('no back-off week this cycle (--no-backoff: only on Amir\'s word)')
     elif not isinstance(last, dict):
         fail(f"cycle {cyc.get('num')}: no weekNotes.last. Every cycle ends with a back-off week: "
-             "design sets the dose (setsDrop / rpeDrop / rpeCap) and engage writes the text")
+             "design sets the dose (setsDrop / rpeDrop / rpeCap) and engage writes the text", 'REC-4', 'PRC-15')
     elif not any(k in last for k in ('setsDrop', 'rpeDrop', 'rpeCap')):
-        fail(f"cycle {cyc.get('num')} weekNotes.last: name the back-off dose as numbers (setsDrop, rpeDrop or rpeCap), not only words")
+        fail(f"cycle {cyc.get('num')} weekNotes.last: name the back-off dose as numbers (setsDrop, rpeDrop or rpeCap), not only words", 'PRC-15')
     if args.new and not isinstance(wn.get('first'), dict):
-        fail(f"cycle {cyc.get('num')}: a new athlete's first cycle needs weekNotes.first (how week 1 finds their weights, with the number)")
+        fail(f"cycle {cyc.get('num')}: a new athlete's first cycle needs weekNotes.first (how week 1 finds their weights, with the number)", 'PRG-5', 'PRC-15')
     elif not isinstance(wn.get('first'), dict):
         info(f"cycle {cyc.get('num')}: no weekNotes.first (fine when nothing in week 1 is different)")
 
@@ -333,8 +337,11 @@ def check_week_notes(data, args):
 # weigh-in. Now design names every required note in the spec's "obligations:" block, engage tags
 # the card that carries each one (notes.cards[].tags, which the app never shows), and this
 # checks that each is there. backoff and week1 are carried by the cycle's weekNotes.
-OBLIGATIONS = ('backoff', 'week1', 'explainer', 'pain-ladder', 'modification-menu', 'film', 'weigh-in',
-               'double-day', 'low-readiness', 'period', 'start-lower', 'close-loop', 'win')
+OBLIG_RULES = {'backoff': 'PRC-15', 'week1': 'PRG-5', 'explainer': 'PRG-8', 'pain-ladder': 'INT-6',
+               'modification-menu': 'INT-10', 'film': 'PRC-8', 'weigh-in': 'COM-13', 'double-day': 'REC-5',
+               'low-readiness': 'REC-2', 'period': 'PRC-21', 'start-lower': 'PRG-5', 'close-loop': 'INT-8',
+               'win': 'COM-11'}  # key -> the rule in the index that requires the note
+OBLIGATIONS = tuple(OBLIG_RULES)
 
 def spec_obligations(args):
     if not args.spec: return []
@@ -349,7 +356,7 @@ def spec_obligations(args):
 def check_obligations(data, args):
     keys = spec_obligations(args)
     if not keys:
-        if args.spec: warn("no obligations: block in the spec, so the required notes were not checked")
+        if args.spec: warn("no obligations: block in the spec, so the required notes were not checked", 'COM-9')
         return
     cycles = data.get('cycles') or []
     i = data.get('currentCycleIndex') or 0
@@ -357,14 +364,14 @@ def check_obligations(data, args):
     tags = {str(t).lower() for c in (data.get('notes') or {}).get('cards') or [] for t in (c.get('tags') or [])}
     for k in keys:
         if k not in OBLIGATIONS:
-            warn(f"obligation '{k}' is not one of the known ones ({', '.join(OBLIGATIONS)})"); continue
+            warn(f"obligation '{k}' is not one of the known ones ({', '.join(OBLIGATIONS)})", 'COM-9'); continue
         if k in ('backoff', 'week1'):
             n = wn.get('last' if k == 'backoff' else 'first')
             ok = isinstance(n, dict) and str(n.get('text') or '').strip()
             where = 'weekNotes.' + ('last' if k == 'backoff' else 'first')
         else:
             ok, where = k in tags, f"a notes card tagged '{k}'"
-        if not ok: fail(f"obligation '{k}' is not met: {where} must carry it")
+        if not ok: fail(f"obligation '{k}' is not met: {where} must carry it", OBLIG_RULES[k], 'COM-9')
     extra = sorted(tags - set(keys))
     if extra: info(f"cards tagged {', '.join(extra)} though the spec didn't list them (fine if they're real)")
 
@@ -387,13 +394,13 @@ def check_bans(data, args):
         for k in ('name', 'setup', 'intent'):
             for w in words:
                 if ban_hit(w, o.get(k) or ''):
-                    fail(f"Day {d.get('id')} {o.get('name')}: banned for this athlete ('{w}' in {k})")
+                    fail(f"Day {d.get('id')} {o.get('name')}: banned for this athlete ('{w}' in {k})", 'SEL-11')
     for where, s in text_fields(data):
         if ' setup' in where or ' intent' in where: continue
         for sen in sentences(s):
             for w in words:
                 if ban_hit(w, sen) and not NEGATION.search(sen):  # a ban sentence names what it bans
-                    warn(f"{where}: mentions '{w}' outside a ban: \"{sen[:100]}\"")
+                    warn(f"{where}: mentions '{w}' outside a ban: \"{sen[:100]}\"", 'SEL-11')
     if args.spec:
         fence = False
         for i, line in enumerate(open(args.spec, encoding='utf-8'), 1):
@@ -403,7 +410,7 @@ def check_bans(data, args):
             for w in words:
                 m = ban_hit(w, line)
                 if m and not NEGATION.search(line[:m.start()]):
-                    fail(f"spec line {i}: a fallback or swap gives a banned '{w}': {line.strip()[:110]}")
+                    fail(f"spec line {i}: a fallback or swap gives a banned '{w}': {line.strip()[:110]}", 'SEL-12')
 
 # ── session length ────────────────────────────────────────────────────────────
 def work_secs(rx, simple=False):
@@ -459,7 +466,7 @@ def check_time(data, args):
         # complain, "so days time cap, is usually not very important"). Never a FAIL: the design
         # says the expected real length at the checkpoint instead of cutting work to fit.
         cap = args.cap if args.cap is not None else 60
-        if mins > cap: warn(f"{line}: past the {cap:g}-min cap (soft: tell Amir the expected real length)")
+        if mins > cap: warn(f"{line}: past the {cap:g}-min cap (soft: tell Amir the expected real length)", 'SES-7')
         else: info(line)
 
 # ── volume, from the coaching log's per-exercise table ────────────────────────
@@ -491,7 +498,7 @@ def norm_muscle(m):
 def check_volume(data, args):
     rows = parse_volume(args.log)
     if not rows:
-        fail(f"{args.log}: no per-exercise volume table (| Day | Exercise | Sets | Counts toward |)"); return {}
+        fail(f"{args.log}: no per-exercise volume table (| Day | Exercise | Sets | Counts toward |)", 'VOL-10'); return {}
     prog, loaded = {}, {}
     for d, b, ex, it in exercises(data):
         o = it or ex
@@ -506,20 +513,20 @@ def check_volume(data, args):
     for r in rows:
         key = r['name'].lower(); listed.add(key)
         if key not in prog:
-            fail(f"volume table lists '{r['name']}', which the programme does not have"); continue
+            fail(f"volume table lists '{r['name']}', which the programme does not have", 'VOL-10'); continue
         if not any(abs(s - r['sets']) < 0.01 for _, s, _ in prog[key]):
-            fail(f"volume table: '{r['name']}' at {r['sets']:g} sets, the programme has {', '.join(f'{s:g}' for _, s, _ in prog[key])}")
+            fail(f"volume table: '{r['name']}' at {r['sets']:g} sets, the programme has {', '.join(f'{s:g}' for _, s, _ in prog[key])}", 'VOL-10')
         dm = re.match(r'D(?:ay)?\s*(\d+)', r['day'], re.I)
         if dm and all(str(day) != dm.group(1) for day, _, _ in prog[key]):
-            warn(f"volume table: '{r['name']}' filed under {r['day']}, the programme has it on Day {prog[key][0][0]}")
+            warn(f"volume table: '{r['name']}' filed under {r['day']}, the programme has it on Day {prog[key][0][0]}", 'VOL-10')
         for m, n, w in r['parts']:
             if abs(n - r['sets'] * w) > 0.01:
-                fail(f"volume table: '{r['name']}' {m} {n:g} should be {r['sets'] * w:g} ({r['sets']:g} sets x {w:g})")
+                fail(f"volume table: '{r['name']}' {m} {n:g} should be {r['sets'] * w:g} ({r['sets']:g} sets x {w:g})", 'VOL-10')
             mm = norm_muscle(m)
             total[mm] = total.get(mm, 0) + n
             if dm: per_day.setdefault(dm.group(1), {}).setdefault(mm, 0); per_day[dm.group(1)][mm] += n
     for key, (day, name) in loaded.items():
-        if key not in listed: fail(f"Day {day} {name}: a loaded exercise missing from the volume table (count every exercise that loads a muscle)")
+        if key not in listed: fail(f"Day {day} {name}: a loaded exercise missing from the volume table (count every exercise that loads a muscle)", 'VOL-10')
     # The 10-set floor is hypertrophy science, so it binds a programme whose aim is strength and
     # muscle, man or woman; a sport-performance athlete gets what is best for them (Amir,
     # 2026-09-26). --floor switches it on; floor-except names a muscle excused for a stated reason.
@@ -528,12 +535,12 @@ def check_volume(data, args):
         v = total[mm]
         if args.floor and mm in MAJOR and v < 10:
             if mm in excused: info(f"{mm} {v:g} sets/week: under 10, excused (floor-except)")
-            else: fail(f"{mm} {v:g} sets/week: under the floor of 10 for a strength-and-muscle programme (or floor-except it, with the reason in the spec)")
-        elif v > 20: warn(f"{mm} {v:g} sets/week: over 20")
-        elif mm == 'shoulder' and v < 10: warn(f"shoulder {v:g} sets/week: under the usual 10-20")
+            else: fail(f"{mm} {v:g} sets/week: under the floor of 10 for a strength-and-muscle programme (or floor-except it, with the reason in the spec)", 'VOL-4')
+        elif v > 20: warn(f"{mm} {v:g} sets/week: over 20", 'VOL-3')
+        elif mm == 'shoulder' and v < 10: warn(f"shoulder {v:g} sets/week: under the usual 10-20", 'VOL-7')
         else: info(f"{mm} {v:g} sets/week")
     for mm in MAJOR:
-        if args.floor and mm not in total and mm not in excused: fail(f"{mm}: 0 sets/week (not in the volume table)")
+        if args.floor and mm not in total and mm not in excused: fail(f"{mm}: 0 sets/week (not in the volume table)", 'VOL-4')
     return per_day
 
 def floor_excused(args):
@@ -562,7 +569,7 @@ def check_week(data, args, per_day):
     for i in range(7):
         a, b = plan.get(i), plan.get((i + 1) % 7)
         if a and b and kind(a) and kind(b):
-            warn(f"example week: Day {a} ({kind(a)}) on {WEEKDAYS[i].title()} is right before Day {b} ({kind(b)}): two hard lower-body days back to back")
+            warn(f"example week: Day {a} ({kind(a)}) on {WEEKDAYS[i].title()} is right before Day {b} ({kind(b)}): two hard lower-body days back to back", 'VOL-2')
     info('example week: ' + ', '.join(f"{WEEKDAYS[i].title()} Day {plan[i]}" for i in sorted(plan)))
 
 # ── the saved --spine-sql result: the Spine, last cycle, the ledger ───────────
@@ -621,7 +628,7 @@ def blank(v): return not v or v.strip().lower() in ('-', 'none', 'no', 'n/a')
 
 def apply_profile(args, prof, source):
     if not prof:
-        warn("no athlete profile (```profile block) in the spec or the coaching log: the flags come from the command line only")
+        warn("no athlete profile (```profile block) in the spec or the coaching log: the flags come from the command line only", 'PRC-16')
         return
     did = []
     aim = (prof.get('aim') or '').lower()
@@ -719,11 +726,11 @@ def check_continuity(data, args, ctx):
             share = len(kept) / total
             names = ', '.join(o.get('name', '') for o in kept)
             msg = f"{len(kept)} of {total} non-primary working exercises carried over unchanged from last cycle ({share:.0%})"
-            if share >= 0.7: fail(f"{msg}: rotate by variant; 70% or more is the old 83% failure ({names})")
+            if share >= 0.7: fail(f"{msg}: rotate by variant; 70% or more is the old 83% failure ({names})", 'SEL-4', 'SEL-5')
             else: info(msg + (f": {names}" if kept else ''))
         for o in kept:
             if not (names_of(o, spine) & keep):
-                warn(f"{o.get('name')}: kept from last cycle. Rotate it by variant, or name it on the spec's keep: line with the reason")
+                warn(f"{o.get('name')}: kept from last cycle. Rotate it by variant, or name it on the spec's keep: line with the reason", 'SEL-4')
         # A kept exercise must still move: sets, reps or time, RPE, tempo, rounds, or a harder variant.
         # Compared only where BOTH sides' doses can be read (a legacy circuit item's free text often
         # can't), so an unreadable dose is never called identical.
@@ -732,7 +739,7 @@ def check_continuity(data, args, ctx):
         views = rx_views(flat) if flat else []
         rounds_of = lambda c: re.sub(r'\D', '', str(((c or {}).get('rx') or {}).get('rounds') or (c or {}).get('rounds') or ''))
         if views is None:
-            warn('node could not run assets/js/chips.js, so kept doses were not compared with last cycle')
+            warn('node could not run assets/js/chips.js, so kept doses were not compared with last cycle', 'SEL-7')
         else:
             for k, (o, prim, parent, (po, pparent)) in enumerate(pairs):
                 va, vb = views[2 * k], views[2 * k + 1]
@@ -741,8 +748,8 @@ def check_continuity(data, args, ctx):
                 if parent: a, b = a + '|r' + rounds_of(parent), b + '|r' + rounds_of(pparent)
                 if a != b: continue
                 what = f"{o.get('name')}" + (f" (in {parent.get('name')})" if parent else '')
-                if prim: warn(f"{what}: the same sets, reps and RPE as last cycle. Say how it progresses (load at the same RPE counts)")
-                else: fail(f"{what}: kept with the same dose as last cycle. Move it (sets, reps, RPE, tempo, rounds or a harder variant) or rotate it by variant")
+                if prim: warn(f"{what}: the same sets, reps and RPE as last cycle. Say how it progresses (load at the same RPE counts)", 'SEL-7')
+                else: fail(f"{what}: kept with the same dose as last cycle. Move it (sets, reps, RPE, tempo, rounds or a harder variant) or rotate it by variant", 'SEL-7')
     elif old:
         info("currentCycleIndex is the live programme's own, so this is the live cycle, not a new one: continuity not compared "
              "(a new cycle's build must advance currentCycleIndex)")
@@ -765,11 +772,11 @@ def check_continuity(data, args, ctx):
                 if name not in mine: continue
                 where = f"Day {d.get('id')} {o.get('name')}"
                 if any(s in status for s in BLOCKED) and name not in back:
-                    fail(f"{where}: the Exercise Ledger says {status}. It comes back only with a reason on the spec's reintroduce: line")
+                    fail(f"{where}: the Exercise Ledger says {status}. It comes back only with a reason on the spec's reintroduce: line", 'SEL-17')
                 elif any(s in status for s in RETIRED):
-                    warn(f"{where}: the Exercise Ledger says {status}: check the kit or space is there now")
+                    warn(f"{where}: the Exercise Ledger says {status}: check the kit or space is there now", 'SEL-17')
                 elif re.search(r"(do not|don't|never) re-?introduce", note, re.I) and name not in back:
-                    warn(f"{where}: its ledger note says not to reintroduce it without a check: \"{note[:90]}\"")
+                    warn(f"{where}: its ledger note says not to reintroduce it without a check: \"{note[:90]}\"", 'SEL-17')
 
 def qm_sets(rx):
     """How many sets one working exercise counts for in the Quality Map. An exercise dosed by
@@ -815,13 +822,13 @@ def check_spine(data, args, spine):
     # entry, so a draft is listed for Amir's yes before the login is made.
     for i in sorted(ids):
         if i not in spine:
-            fail(f"{i}: not in the library yet. Add it with /spine (cues and every detail, linked like the others)")
+            fail(f"{i}: not in the library yet. Add it with /spine (cues and every detail, linked like the others)", 'NAM-9')
             continue
-        if not spine[i]['cues']: fail(f"{i}: the library entry has no cues, so the card shows none")
+        if not spine[i]['cues']: fail(f"{i}: the library entry has no cues, so the card shows none", 'NAM-9')
         # Only Amir's ten quality pills (2026-09-25: "just use the 10 pills i have, this is a rule").
         bad = [q for q in spine[i]['q'] if q not in QUALITIES]
-        if bad: fail(f"{i}: tagged {', '.join(bad)}, not one of the ten qualities ({', '.join(QUALITIES)})")
-    if drafts: warn(f"{len(drafts)} library entries are drafts, so their cards show no cues until Amir approves them. Ask him in the handoff: {', '.join(drafts)}")
+        if bad: fail(f"{i}: tagged {', '.join(bad)}, not one of the ten qualities ({', '.join(QUALITIES)})", 'CUE-3')
+    if drafts: warn(f"{len(drafts)} library entries are drafts, so their cards show no cues until Amir approves them. Ask him in the handoff: {', '.join(drafts)}", 'CUE-5')
     days = (data.get('workouts') or {}).get('days') or []
     now, later = [], []
     week = {}
@@ -838,7 +845,7 @@ def check_spine(data, args, spine):
     head = ART_HEADLINE.get(art)
     ranked = sorted(week, key=lambda q: -week[q])
     top = ', '.join(f"{q} {week[q]:g}" for q in ranked[:3])
-    if not art: warn('no cycle art word, so no headline check')
+    if not art: warn('no cycle art word, so no headline check', 'PRC-24')
     elif not head: info(f"headline: '{art}' is a phase (bedrock, peak or reset), no headline check. Week: {top}")
     elif head in ranked[:2]: info(f"headline {art} → {head}: in the week's top two ✓ ({top})")
     else:
@@ -850,7 +857,7 @@ def check_spine(data, args, spine):
                 if head in ('power', 'speed', 'spring') else
                 "add work for it, or change the art word if the block really trains something else")
         warn(f"headline {art} → {head} is not in the week's top two ({top}). Tell Amir in the handoff with "
-             f"your recommendation (suggested: {hint}). Never add volume only to satisfy this line")
+             f"your recommendation (suggested: {hint}). Never add volume only to satisfy this line", 'PRC-24')
 
 # ── the two printouts ─────────────────────────────────────────────────────────
 def spine_sql(data):

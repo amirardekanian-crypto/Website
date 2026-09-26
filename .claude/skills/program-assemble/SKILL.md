@@ -156,7 +156,7 @@ prep — `Activation & Prep`, `Prime`, `Warm-Up`, or a free name containing *mob
 *activation* / *prep*; a prep block named something unrecognised will log like a working one.
 Warm-up `simple` items carry the dose only — **no `rpe`, no `tempo`, no `rest`** (an RPE on a
 warm-up is noise; readiness check covers feel). With only a dose, the app drops the grid and
-renders the item as a name and a number on one line, which is what a warm-up should look like. Per COACHING-PRINCIPLES "Session structure & time".
+renders the item as a name and a number on one line, which is what a warm-up should look like (SES-5).
 
 **RETURNING — advance the cycle (per SCHEMA.md "Advancing to the Next Cycle"):**
 1. Put the OLD `workouts` FIRST in `programHistory`, in the simplified
@@ -300,8 +300,10 @@ by `exId`, since Part A stamped one on every card).
 ## Step 3b — ONE review, new athletes only (Part A; 2026-09-25, moved before engage 2026-09-26)
 Once the build checks pass, a **NEW athlete's** programme gets ONE reviewer: one agent (the Agent
 tool), working from files only. Give it the paths to the brief, the spec, the built
-`data/<id>.json` and the check output, and say in so many words: *do not call the database or
-any MCP tool* (COACHING-PRINCIPLES.md → Process → "Background agents work from files"). Its job
+`data/<id>.json`, the check output and `.claude/COACHING-PRINCIPLES.md` (tell it to read the
+rule index, then the Intake & assessment and Exercise selection stories in full, and to cite
+every must-fix by rule ID), and say in so many words: *do not call the database or
+any MCP tool* (PRC-5). Its job
 is only what a script cannot judge: the injury logic against the brief, exercise choice and
 transfer, whether a fallback is safe for THIS athlete, whether week 1, the back-off and the
 outside days are dosed sensibly, and what the notes must cover (the period card, an arm or knee
@@ -394,7 +396,7 @@ The athlete app never reads the log. The entry template is /program-design's COA
   per-muscle total against its goal range. Standing order from Amir (2026-09-08): *"whenever you
   calculate the sets, add that table to the athlete coaching log so i can see."* If /program-design
   handed over only the summary table, build the per-exercise one here rather than shipping without
-  it. Counting convention: COACHING-PRINCIPLES.md → "Volume & dosing".
+  it. Counting convention: VOL-10.
 - **⚖️ The athlete profile — write this cycle's, in place (2026-09-26).** The spec opens with
   the current ```` ```profile ```` block; it goes into the log as the `## Athlete profile` section,
   right after the header and before the Exercise Ledger, **replacing** the old one (like the
@@ -446,8 +448,7 @@ The athlete app never reads the log. The entry template is /program-design's COA
 **Amir's standing order (2026-08-08).** Before shipping, print a clearly-headed section in chat
 telling him everything the program now requires of *him*. This is a to-do list he can act on, not
 a recap of the programming — he must never have to reverse-engineer his own responsibilities out
-of the design write-up. See COACHING-PRINCIPLES.md → Process → "EVERY program build ENDS with a
-COACH HANDOFF BRIEF". Cover, one line each, each with its reason:
+of the design write-up (PRC-12). Cover, one line each, each with its reason:
 *Build these lines from the spec's `obligations:` list (2026-09-26): every film, weigh-in,
 pain-ladder, double-day and period obligation is a line below, so nothing the athlete was told to
 do is missing from what Amir is told to watch.*

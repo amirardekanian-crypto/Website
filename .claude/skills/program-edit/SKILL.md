@@ -33,7 +33,7 @@ Review a program JSON against Amir's coaching principles, flag issues, then appl
 
 ## Step 0 — Read principles, then the file
 
-1. Read **`.claude/COACHING-PRINCIPLES.md`** first — it is the single source of truth for naming, exercise selection, structure, dosing, etc. The rules below are the *editing audit checklist* (the lens for reviewing an existing program); where a rule here overlaps a principle, **the principles file wins** — never let this skill drift from it.
+1. Read **`.claude/COACHING-PRINCIPLES.md`** first: its **rule index** is the single source of truth for naming, exercise selection, structure, dosing, etc. (the line is the rule; the stories below it are why). The rules below are the *editing audit checklist* (the lens for reviewing an existing program); where a rule here overlaps the index, **the index wins**, and a finding cites the rule's ID. A correction still changes only what Amir named (PRC-2).
 2. Read the programme from the server (`select data from programs where athlete_id = '<athlete_id>';`). Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts. Also skim the coaching log (`select body from coaching_logs where athlete_id = '<athlete_id>';`) for this cycle's rationale, so edits respect *why* each piece was chosen.
 
 ## Step 0b — Mid-cycle adjustment: the process
@@ -45,7 +45,7 @@ reasoning stays in her log on the server; only the transferable process is here.
 
 1. **Pull the evidence before proposing anything.** `select ... from session_history where
    athlete_id = '<id>' and completed_on >= '<date of the last edit>'`. Mid-cycle changes are
-   report-driven (COACHING-PRINCIPLES → Progression, 2026-07-12), and the sessions since the
+   report-driven (PRG-1), and the sessions since the
    last edit routinely change the recommendation. They tell you whether the last edit actually
    worked, and they surface what nobody reported: an exercise quietly skipped twice, a capped
    RPE being overshot, a rep count she reduced herself. **Never design the adjustment off the
@@ -99,8 +99,8 @@ reasoning stays in her log on the server; only the transferable process is here.
 
 Go through every day's blocks in order and flag any violation of the rules below. Present a summary to Amir before changing anything.
 
-*Rules 1–1c are COACHING-PRINCIPLES.md → Session structure → "What goes in a warm-up" (moved there
-2026-09-26 so the design pass applies them too). If the two ever differ, the principles win.*
+*Rules 1–1c are SES-4 (moved into the principles 2026-09-26 so the design pass applies them too).
+If the two ever differ, the index wins.*
 
 ### Rule 1 — No movement drills in gym sessions
 
@@ -133,7 +133,7 @@ Joint-isolation mobility drills do **not** belong in the prep circuit. Replace t
 - Hip mobility → Reverse Lunge, Lateral Lunge, Cossack Squat, World's Greatest Stretch
 - Shoulder mobility → Band Shoulder Pass-Through, Band Pull-Apart, Cat-Cow
 
-The replacement should prime the patterns trained later that session. (Name it per COACHING-PRINCIPLES → "Exercise naming" — bare movement for bodyweight, etc.; don't restate the rule here.)
+The replacement should prime the patterns trained later that session. (Name it per NAM-1 to NAM-4; don't restate the rules here.)
 
 ### Rule 1c — Warm-ups use gym equipment when the client has gym access
 
@@ -168,7 +168,7 @@ Two tallies, both before touching any numbers and both shown to Amir for sign-of
 
 **4a. Weekly sets per muscle** — tally and present. Targets for a foundation/beginner cycle (adjust upward in later cycles):
 - Large muscles (glutes, quads, hamstrings, back, chest): 10–20 sets/week
-- Small muscles (biceps, triceps): 6–12 sets/week. **Shoulder is ONE muscle group on the 10–20 range** — see COACHING-PRINCIPLES.md
+- Small muscles (biceps, triceps): 6–12 sets/week. **Shoulder is ONE muscle group on the 10–20 range** (VOL-7)
 - Core: count every set regardless of where it sits — activation circuit rounds count as sets just like Primary/Accessory block sets
 
 **⚖️ COUNT EVERY EXERCISE THAT LOADS THE MUSCLE, NOT JUST THE ISOLATION WORK.** An RDL is
@@ -176,7 +176,7 @@ hamstring volume; a row is back volume and half a set of biceps. Scoring isolati
 well-trained muscle read under-dosed and then contorts the programme around a number that was
 never true. **1.0** prime mover · **0.5** significant synergist or prime mover in a shortened /
 partial range · **0** stabiliser. Warm-up and activation circuits don't count (except core).
-Full convention + the worked example: COACHING-PRINCIPLES.md → "Volume & dosing".
+Full convention + the worked example: VOL-10 and its story.
 
 Flag anything very low (chest at 3 sets) **or over the ceiling** — the fractional count surfaces
 over-dosing that a direct-only count hides. A missing machine is never a reason to bend the
@@ -187,7 +187,7 @@ programme: clear the 10-set floor with what the gym has.
 - Do two high-load days for the **same pattern** sit back-to-back (e.g. heavy hinge on consecutive days)?
 - Is any day a **grind** (≫6 working exercises) — a long session spikes cortisol even at low RPE, which matters most for poor-recovery clients.
 
-For low-sleep / high-stress athletes, **distribution is the primary lever — not total volume.** Present the cost-weighted table and a recommended undulation before proposing changes. See COACHING-PRINCIPLES.md → "Volume & dosing".
+For low-sleep / high-stress athletes, **distribution is the primary lever — not total volume.** Present the cost-weighted table and a recommended undulation before proposing changes (VOL-2).
 
 ## Step 2 — Present the audit
 

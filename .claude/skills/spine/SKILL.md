@@ -79,7 +79,7 @@ the existing ids for the links, and they show you which names are only variants.
   ⓘ draws it as a pill, and Amir's rule is to never create a new pill (2026-09-25: *"pattern pills
   are good, if its ones i created in my library, ofcourse use them"* and *"remember to never create
   new pills"*).
-- **purpose:** one sentence in Amir's voice (`COACHING-PRINCIPLES.md` → *Communication*). Say what
+- **purpose:** one sentence in Amir's voice (COM-3). Say what
   it does for anyone, in plain words: short, no em-dashes, no textbook terms. It is general. The
   *why for this athlete* belongs to the programme, not to the entry.
 - **tennis:** the court moment it serves, or `""` when there honestly isn't one. Do not stretch.

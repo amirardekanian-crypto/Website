@@ -77,7 +77,10 @@ you decide what's learned.
 Just tell me: *"in program design, cap tennis sessions at 40 minutes"* or *"add
 hamstring curls to the default."* Or open the files yourself in
 `.claude/skills/` (they're plain text). To edit your saved philosophy, open
-`.claude/COACHING-PRINCIPLES.md`.
+`.claude/COACHING-PRINCIPLES.md`. It starts with the **rule index**: every rule on one numbered
+line (like `VOL-8`, the 4-set cap), what stage uses it, and whether the checker enforces it. The
+dated stories below it say why each rule exists. Change a rule on its line; the skills point to
+the number, so the change reaches every stage at once.
 
 ## Using it in other chats / on another computer
 

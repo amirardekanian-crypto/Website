@@ -29,7 +29,11 @@ You are a performance coach and brand writer. The science program (from
 engagement around the program to maximise buy-in and retention. **Change no
 programming.** Read the roadmap — never rewrite it (that's /program-roadmap, locked).
 
-First, read **`.claude/COACHING-PRINCIPLES.md`** for voice and communication preferences.
+First, read the **rule index** at the top of **`.claude/COACHING-PRINCIPLES.md`** (one numbered line
+per rule, and the line is the rule), then the **Communication & in-app text** stories in full
+(COM-1 to COM-13): they are this stage's job. Open any other rule's story, by searching its ID,
+only when its line is not enough to write the note. Design already applied the rest, and the
+whole file is about 90 KB you do not need (2026-09-26, from the pipeline audit).
 
 This is the right place for the **NOTES** work: it runs *after* /program-design and after
 /program-assemble **Part A** has built and checked the programme (2026-09-26), so it never
@@ -55,7 +59,7 @@ field; the athlete self-selects load against the prescribed RPE/rep target every
 like "I'm reading your numbers to set the real loads" or "those logs are what I calculate your
 weight from" are wrong and must not appear in the cycle message, outcomes, or notes. Progression
 is the *program* changing (RPE targets, rep numbers, exercise selection) driven by what she
-logs — never "here's your number." See COACHING-PRINCIPLES.md → "Progression (coach-driven)".
+logs — never "here's your number." (PRG-7)
 
 **OUTCOMES** — 3–6 concrete, measurable, athlete-specific results for THIS cycle. Short
 phrases, not sentences (they render as a ticked checklist).
@@ -97,7 +101,7 @@ fine, don't force it.
 teaches the mechanism; week 1's actual number (the RPE cap or drop) is the week note in PART 3c,
 not a line in this card. It teaches how the weight-selection
 system actually works, because the app never assigns a weight — the athlete finds it every
-time against the RPE target (see COACHING-PRINCIPLES.md → Progression). When it fires, cover:
+time against the RPE target (PRG-2, PRG-8). When it fires, cover:
 (1) calibrating a **new movement** — pick conservative, let the first set's RPE say go up or
 down; (2) **week-to-week progression** on the same exercise — hit the prescribed reps at or
 under target RPE → small jump next week; RPE at the ceiling or reps missed → hold and repeat;
@@ -109,7 +113,7 @@ card: repeating an already-learned mechanism every cycle regardless dilutes "wri
 cycle." When it does fire, write it in that cycle's own voice/specifics — never a template.
 
 **Female athletes: the period-week protocol runs only when design flags it confirmed this
-cycle** (Amir checks with her per cycle — see COACHING-PRINCIPLES.md → Process; it is never
+cycle** (Amir checks with her per cycle, PRC-21; it is never
 auto-included from a prior cycle or a stored preference). When confirmed, write the standing
 fallback (an adherence tool, not performance phasing) restated in that cycle's actual
 exercises (which lifts cut to 2 sets, which get skipped for direct ab-bracing) — never
@@ -129,7 +133,7 @@ diagnosis/restriction:
   changing how you move → stop that exercise, use the card's fallback, message the coach ·
   sharp/radiating/numb/unfamiliar → stop the session, message before the next one.
 Never generic — anchor it to their real restriction (e.g. "your L4-L5 history" not "your back").
-See COACHING-PRINCIPLES.md → "Intake & assessment".
+This is INT-6 (and INT-10 for an athlete who hides pain).
 
 **When design flags a standing issue confirmed resolved this cycle, close the loop.** One
 line, in whichever card fits naturally (or its own short card if nothing else fits) —

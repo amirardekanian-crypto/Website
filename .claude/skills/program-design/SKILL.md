@@ -59,13 +59,16 @@ checkpoint:** after STEP 1, show your analysis + the locked lists and ask *"anyt
 change before I build?"* before writing exercises.
 
 ## LEARNING LOOP — get smarter each cycle
-- **Read `.claude/COACHING-PRINCIPLES.md` at STEP 0** and apply it. Never re-ask a question
-  it already answers.
+- **Read `.claude/COACHING-PRINCIPLES.md` at STEP 0** and apply it: the **rule index** at the
+  top first (one numbered line per rule, and the line is the rule), then the stories below it.
+  Never re-ask a question it already answers. Where a rule decides something in the spec or the
+  log, cite its ID (`VOL-8`) rather than restating it (PRC-23).
 - When Amir makes a call during design that is **generalizable** (would apply to other
   athletes — e.g. an exercise preference, a dosing rule, a communication choice), ask:
-  *"Save this as a principle?"* On yes, append a dated one-line bullet under the right
-  section of COACHING-PRINCIPLES.md. **One-off, athlete-specific calls are NOT saved** —
-  Amir curates what's learned.
+  *"Save this as a principle?"* On yes, add it the way the file's *How to add* says: one index
+  line with the next free ID in its section (25 words or fewer, its stage, its check) and a dated
+  story bullet tagged with the same ID; `scripts/check_rule_index.py` checks the pair. **One-off,
+  athlete-specific calls are NOT saved** — Amir curates what's learned.
 
 ## STEP 0 — Setup
 0. **Sync first — `git pull --rebase` before reading anything.** COACHING-PRINCIPLES,
@@ -80,7 +83,7 @@ change before I build?"* before writing exercises.
    it from the stale working tree.** On 2026-09-26 the checkout was 101 commits behind with other
    sessions' edits in the way, and the skill as loaded still allowed rep ranges, cues in the spec
    and the retired three-agent panel.
-1. Read **`.claude/COACHING-PRINCIPLES.md`** (apply throughout).
+1. Read **`.claude/COACHING-PRINCIPLES.md`**: the rule index, then the stories (apply throughout).
 2. Establish `athlete_id`. If Amir pasted athlete info, proceed without commentary.
 3. **ONE context pull: everything design reads from the server, in a single call.** Run it once
    per athlete and keep the result for the whole pipeline (roadmap, design, assemble). Never look
@@ -185,13 +188,13 @@ change before I build?"* before writing exercises.
    status (Active / Available / Disliked / Pain-flagged / Banned), so you don't have to
    reconstruct exposure history by reading every prior cycle's prose. Cross-check it against
    the Debrief's exercise-specific signals (dislikes and pain tied to a named exercise, not just
-   general injury) before finalizing REPLACE — see COACHING-PRINCIPLES.md
-   → "Exercise selection" (the ledger's columns: Exercise · Status · Last cycle · Note).
+   general injury) before finalizing REPLACE (SEL-17; the ledger's columns: Exercise · Status ·
+   Last cycle · Note).
 6. Read the **locked roadmap** (`cycles[]`) and `Content/PRODUCT.md` for system context.
    Honour the roadmap's focus for THIS cycle; deviate only if the brief demands it, and
    state the data point + reason.
 7. **Female athlete — flag, don't assume, the period-week note.** Whether the period-week
-   protocol (COACHING-PRINCIPLES → Process) belongs in this cycle's notes is confirmed with
+   protocol (PRC-21) belongs in this cycle's notes is confirmed with
    Amir every cycle — never stored, never auto-included. Add it to the questions you batch
    at the STEP 1 checkpoint below, don't decide it yourself.
 8. Run STEP 1A (returning) or STEP 1B (new).
@@ -232,9 +235,8 @@ movement skill and what the logs know, and it is not "new to the client", so fro
 supersetted. A genuinely new pattern is still fine when the athlete needs one; it runs as straight
 sets its first cycle.
 
-**Check the rotation rate before finalizing REPLACE** (see COACHING-PRINCIPLES.md →
-Exercise selection). Roughly tally how many non-primary, non-warm-up exercises from the
-prior cycle would carry over unchanged into this one. North of ~70% is a signal, not a
+**Check the rotation rate before finalizing REPLACE** (SEL-4, SEL-5). Roughly tally how many
+non-primary, non-warm-up exercises from the prior cycle would carry over unchanged into this one. North of ~70% is a signal, not a
 detail — it happened once at 83%, caught only on review, not at design time. The
 "keep best-in-class" exception is for rehab/corrective work only; don't stretch it to
 accessories just because their load is progressing well on paper — that kind of progress
@@ -284,15 +286,12 @@ the bottleneck) before it chose the arc. Start from it: confirm or correct it wi
 say what changed. Don't redo it from scratch.
 - **RECOVERY CAPACITY — assess first; it gates everything.** Sleep quality + hours +
   stress → real recovery capacity. State the weekly **volume ceiling** before any session
-  count — anchor it to the evidence-based range (~10–20 hard sets/muscle/week, most benefit
-  captured by ~10; ~5–10 sets/muscle/session is likely near-optimal, don't stack a single
-  session much past ~10 direct sets on one muscle — see COACHING-PRINCIPLES.md → "Volume &
-  dosing"), not just intuition. If desired frequency exceeds capacity, say so and justify
-  the cut.
+  count (REC-1), anchored to the evidence-based range (VOL-3), not just intuition. If desired
+  frequency exceeds capacity, say so and justify the cut.
 - **PRIORITY TARGETS** — for each priority muscle/pattern pick the highest-**SFR** option
-  from available equipment and say why (baseline hierarchy in COACHING-PRINCIPLES.md;
-  extend as equipment dictates). **For sport-performance athletes, transfer may override
-  SFR — state the trade-off.** Give the minimum effective frequency per priority muscle.
+  from available equipment and say why (SEL-1; extend as equipment dictates). For a
+  sport-performance athlete, write the trade-off whenever transfer wins (SEL-2, SEL-3). Give the
+  minimum effective frequency per priority muscle.
 - **CONTRAINDICATIONS & RISKS** — every injury/restriction/lifestyle factor → the specific
   exercise-level implication (not general caution).
 - **STRUCTURAL DECISION** — optimal split + day count; name the obvious alternative and why
@@ -320,24 +319,18 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   days. Verify: (1) cost-weighted load per day is intentional, (2) no two high-load days for
   the same pattern land back-to-back, (3) no session is a grind (≫6 working exercises spikes
   cortisol even at low RPE). For poor-recovery clients this distribution is the primary lever
-  — see COACHING-PRINCIPLES.md → "Volume & dosing".
-- **Warm-up + prep = 10–15 min** every session (cardio raise + mobilisation/activation
-  circuit) — never a token 5-min bookend. It's programmed dose, not filler.
-- **Lifting-day warm-ups can repeat rounds (×2); cardio/running-day warm-ups shouldn't.** A
-  lifting-day prep circuit is fine at ×2 rounds of a tight movement list. A cardio/running-day
-  warm-up should instead build through **more distinct movements in a single pass**
-  (mobility → activation → dynamic movement → plyo/stride primer) rather than repeat the same
-  short list twice.
+  (VOL-2).
+- **Warm-up + prep** on every day: 10–15 minutes (SES-3), its contents by SES-4, and its shape
+  by SES-6 (lifting days may repeat rounds; cardio and running days build through distinct
+  movements in one pass). Sweep it against every restriction (SEL-11, SEL-18).
 - **Time-budget check (required — not optional):** estimate each day's actual working time
   (Σ sets × (rest + ~30–45s per set), plus warm-up) against its session-length cap. **The cap
-  is the athlete's real session length, not the form's number** (COACHING-PRINCIPLES,
-  2026-09-26: people who write "60 minutes" train 75 and never complain). Running past it is a
+  is the athlete's real session length, not the form's number** (SES-7). Running past it is a
   line at the checkpoint, never a reason to cut work; only a real hard stop binds. If there's
-  real headroom (15+ min) and recovery capacity allows it, that's under-dosed, not "done" —
-  fill it with genuine volume: push a target muscle further toward its evidence-based ceiling
-  (~10–20 hard sets/muscle/week, most benefit by ~10 — see COACHING-PRINCIPLES.md → "Volume &
-  dosing"), or add a low-priority/low-CNS-cost exercise (arms, calves) if the priority muscles
-  are already well-dosed. A session that fits comfortably under its cap with nothing added is a
+  real headroom (15+ min) and recovery capacity allows it, that's under-dosed, not "done"
+  (VOL-5): fill it with genuine volume, pushing a target muscle further toward its
+  evidence-based ceiling (VOL-3), or add a low-priority/low-CNS-cost exercise (arms, calves) if
+  the priority muscles are already well-dosed. A session that fits comfortably under its cap with nothing added is a
   design miss, not a light day — light days should be a deliberate undulation choice (see
   PER-DAY LOAD DISTRIBUTION above), not leftover time.
   **RETURNING athlete: calibrate against reality first.** Put the last cycle's days through the
@@ -348,24 +341,12 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   **NEW athlete: no logs yet, so design to the form's minutes plus 15** (Amir, 2026-09-26:
   *"form + 15"*), unless they said plainly that the time is a hard stop.
 - **Sequencing within a day:** power/CNS → Primary → Accessory → corrective/Core →
-  conditioning. (These are the section blocks — see STEP 3 CLASSIFICATION.)
-- **Superset** non-competing pairs to fit the time ceiling — **except** an athlete's first
-  cycle, or any exercise new to that client: straight sets until each has a cycle of logged
-  working weights (see COACHING-PRINCIPLES.md → "Session structure & time"). A rotated
-  accessory that is a **variant** of a movement they have logged is not new, so from Cycle 2 it
-  can be paired. **A superset is
-  a structural decision, not a per-exercise tag** — spec the whole pair as ONE circuit-role
-  entry (see the STEP 3 template below), never as two accessory-role entries each carrying
-  `intent: superset`. That exact mistake shipped once (all 4 days of one cycle): two independent
-  standard exercises with a decorative pill, no visible pairing, and a stray rest after the
-  first lift instead of one shared rest per round.
-- **Never superset a unilateral Primary lift** (Split Squat, Single-Leg Hip Thrust, Single-Leg
-  RDL — any main lift dosed Each Side/Each Leg). It already costs double the per-set time/
-  fatigue of a bilateral Primary, and it's the exact lift the progression sheet tracks e1RM/RPE
-  on cycle-over-cycle — pairing it dilutes that read and rushes the side that most needs full
-  rest. Straight sets, independent rest, same as any other Primary. Unilateral **Accessory**
-  work is unaffected — it can still superset per the rule above (see COACHING-PRINCIPLES.md →
-  "Session structure & time").
+  conditioning (SES-9; these are the section blocks, see STEP 3 CLASSIFICATION).
+- **Superset** non-competing pairs to fit the time ceiling (SES-10), never in a first cycle or on
+  a movement new to the athlete (SES-11; a **variant** of a logged movement is not new, so from
+  Cycle 2 a rotated accessory can be paired), and never a unilateral Primary (SES-10). Spec the
+  whole pair as ONE circuit-role entry (the STEP 3 template below), never two accessory-role
+  entries carrying `intent: superset` (SES-12).
 - **WEEK 1 AND THE LAST WEEK (required output, 2026-09-26).** Every cycle is four loading weeks
   plus a back-off week, and the cards never change, so decide both special weeks here, as
   numbers. The app shows them to the athlete during that week (`cycles[n].weekNotes`, SCHEMA.md).
@@ -389,7 +370,7 @@ Day count + type of each day; one line of rationale per day citing Step 1.
 
 **CHECKS, THEN ONE REVIEW (Amir's standing order, reshaped 2026-09-25).** Every spec is
 still checked before Amir sees the finished programme, but the three-agent panel is gone
-(COACHING-PRINCIPLES.md → Process → "Every design pass is checked"). The review happens on
+(PRC-4). The review happens on
 the BUILT programme, in /program-assemble **Part A**, straight after this spec and BEFORE engage
 writes anything (so a fix never leaves notes describing the old programme):
 1. **`scripts/check_program.py`** on the built file, with this spec's volume table (`--log`)
@@ -418,13 +399,9 @@ accessory (rotate between cycles) → **Accessory** block · activation/correcti
 **resolving injury**, place the current rehab stage. (Section names + order are fixed by
 SCHEMA "Standard section names"; assemble assigns titles + icons.)
 
-**NAMING:** Follow COACHING-PRINCIPLES.md → "Exercise naming" (read at STEP 0 — it is the
-single source of truth; don't restate or re-derive it here). In one line: `[modification]
-[equipment] [movement]`, bodyweight = bare name (no "Bodyweight" prefix), defining setups
-in the name, everything else (grip/intent/range/tempo/holds/digits/punctuation) → the dose
-fields or `intent` (a grip is the pill: `intent: neutral grip`),
-and match the `exercise_library.json` spelling. If a name is rough mid-design, flag it and
-move on — /program-assemble lint-checks names against the library.
+**NAMING:** NAM-1 to NAM-9 (read at STEP 0; don't restate or re-derive them here). If a name
+is rough mid-design, flag it and move on: /program-assemble lint-checks names against the
+library (PRC-22).
 
 **PRESCRIPTION — emit the DOSE as plain fields.** These fields ARE the storage format now
 (`rx` — see SCHEMA.md): /program-assemble copies them across rather than rendering anything,
@@ -459,7 +436,7 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   `note:`. A variant that changes the exercise (Short-Lever Copenhagen Plank) is its own exercise,
   a `new_exercise:` with its own cues, never the parent plus a note.
   It must be something the athlete actively does mid-set, never a restatement of the target
-  muscle/category already covered by a cue (see COACHING-PRINCIPLES.md → "Chips & modifiers").
+  muscle/category already covered by a cue (CHP-2).
   **`intent` is never a structural pairing like `superset`** — a superset is a circuit-role
   decision (see above), not an `intent` on a standard exercise.
 - Tempo = Eccentric–Pause–Concentric–Reset (e.g. 3-0-1-0). RPE 1–10.
@@ -489,7 +466,7 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   actual "Coach's Note" copy from this flag + the full athlete picture, and /program-assemble
   places it on the exercise. This is the ONLY athlete-facing place a weight number may ever
   appear (in engage's copy, never in the dose). Program-wide guidance goes to engage's notes
-  cards instead — see COACHING-PRINCIPLES.md → "Communication & in-app text".
+  cards instead (COM-6).
 
 **FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).
 
@@ -576,7 +553,7 @@ low-readiness days **but never below 6** (the app's selector floor — state the
 same sentence, or the note prescribes an RPE 5 she cannot log on every exercise authored at
 6). High-stress and concurrent athletes also get the minimum effective dose (first power move +
 first primary) and a flexible session order. Leans on the app's readiness check + ACWR.
-*(Made universal 2026-09-26; COACHING-PRINCIPLES → Recovery & autoregulation.)*
+*(Made universal 2026-09-26: REC-2.)*
 
 **Do NOT output:** videoUrl · completionTitle/Message · currentCycleIndex · cycles[] ·
 programHistory. /program-engage and /program-assemble own those.
@@ -671,9 +648,8 @@ freshness, safe to reuse later) unless the brief/Amir flagged it as `Disliked`,
 exercise → `Active`. If nothing changed status this cycle beyond the normal rotate/keep,
 say so in one line rather than omitting the section.
 
-**Volume & Dose** — **TWO tables, both of them, every time.** See COACHING-PRINCIPLES.md →
-"Volume & dosing" → *Count every exercise that loads the muscle* for the counting convention;
-never score isolation-only.
+**Volume & Dose** — **TWO tables, both of them, every time.** The counting convention is VOL-10
+(its story has the 1 / 0.5 / 0 table); never score isolation-only.
 
 1. **Per-exercise contribution** — day · exercise · sets · what it counts toward, with the
    fraction shown where it is not 1.0 (`Glutes 2 (×0.5)`). This is the working, and Amir reads it.
@@ -724,8 +700,7 @@ kilos say much less about a player than kilos per kilo of them.
 
 **How it may and may not be used:**
 - ✅ As the basis for a **starting-load suggestion on an exercise's `note`** — the one place
-  in the whole app a weight is allowed to appear (see COACHING-PRINCIPLES → RPE-only
-  prescription). *"Last cycle's estimate puts your squat around 125kg. Start the top set
+  in the whole app a weight is allowed to appear (PRG-2). *"Last cycle's estimate puts your squat around 125kg. Start the top set
   near 100 and let RPE decide from there."*
 - ✅ As **evidence in the cycle review** — is the estimate climbing, flat or falling? That
   answers "did the last block work?" far better than a single logged load, because it
@@ -745,7 +720,7 @@ about RPE 9, stopping at the first rep that slows or breaks position** on a main
 most accurate: the equation holds under about 10 reps, and an athlete's own sense of reps in
 reserve is roughly 2 reps out at RPE 9 against 5 reps out at RPE 5 (Zourdos 2021). RPE 9, not
 10: the estimate comes out *Good* rather than *Sharp*, and an athlete training alone never grinds
-a rep (COACHING-PRINCIPLES → Testing, 2026-09-26). **Never prescribe a true 1RM** — it buys
+a rep (TST-2, TST-3). **Never prescribe a true 1RM** — it buys
 almost nothing over a hard triple and costs warm-up time, fatigue and risk.
 
 **The app now asks for it, so you do not have to remember to.** Put `test_flag: 5RM` on the

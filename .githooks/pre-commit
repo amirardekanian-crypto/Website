@@ -1,5 +1,5 @@
 #!/bin/sh
-# Six guards. Each runs only when its own files are staged, so a commit that
+# Seven guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -150,6 +150,22 @@ if [ -f "$ids_file" ]; then
       echo "Write 'one athlete' or the next 'Athlete <letter>' instead; their record lives in public.coaching_logs."
       failed=1
     fi
+  fi
+fi
+
+# ── 7. the coaching rulebook holds together (added 2026-09-26) ───────────────
+# Why: one rule used to live in up to ten places, and a stale copy reached athletes.
+# Each rule now has one owner, a numbered line in the rule index at the top of
+# .claude/COACHING-PRINCIPLES.md, and everything else cites its ID. This fails a
+# rule with no story, a skill citing an ID that doesn't exist, and an index "Check"
+# column that scripts/check_program.py doesn't actually back.
+if git diff --cached --name-only --diff-filter=ACMD \
+     | grep -qE '^(\.claude/(COACHING-PRINCIPLES|COACHING-HOWTO)\.md|\.claude/(skills|agents)/|scripts/check_(program|rule_index)\.py|CLAUDE\.md|SCHEMA\.md)'; then
+  echo "pre-commit: coaching rules or their citations changed — checking the rule index..."
+  if ! "$PY" scripts/check_rule_index.py; then
+    echo ""
+    echo "pre-commit: BLOCKED — the rule index and its citations disagree (details above)."
+    failed=1
   fi
 fi
 
