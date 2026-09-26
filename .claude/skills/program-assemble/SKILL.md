@@ -59,7 +59,7 @@ the Spine"). Something only this athlete needs arrives as engage's Coach's Note 
 as a cue. **Stamp `exId`**
 on every exercise whose name resolves to a `public.exercises` entry (approved or draft), so the
 card follows the id even if the name is edited later. `sport.badge` ← design's `SPORT_BADGE` line.
-Leave `videoUrl: null` (auto-resolved by name downstream). The words come in Part B (2f).
+Leave `videoUrl` out: the app finds the video by the card's name in `exercise_library.json`. The one exception is a card whose name misses that file while its Spine entry has a `video` (an entry named differently from the card): copy the entry's `video` into `videoUrl`. The words come in Part B (2f).
 - **Set `type` from the design category** (the spec never emits it): standard grinding lift
   / ballistic / loaded carry → `"standard"`; working or prep circuit → `"circuit"`; warm-up
   `simple` item (bike, mobility drill) → `"simple"`.
@@ -507,6 +507,9 @@ localise a mistake. Publish in stages, one top-level key per statement, verifyin
 2. **`jsonb_set(data,'{workouts}', $W$…$W$::jsonb)`** — the new cycle's days.
 3. **`jsonb_set(data,'{notes}', …)`**, plus `{cycles,N}` for the current cycle's
    `message`/`focuses`/`weekNotes` and `{cycles,N+1,teaser}`. These fit comfortably in one call.
+   **`cycles[]` changes only as the spec says** (PRC-17): this cycle's `message` and `weekNotes`,
+   a gate line PRC-12 adds to its `focuses`, the next cycle's `teaser`, and exactly what the spec's
+   `roadmap_amend:` lines name. Nothing else in the roadmap moves.
 
 **New athlete (no `workouts` on the row yet).** Skip 7.1: there is nothing to archive and the
 index stays 0. The row may hold only `athlete` and `sport` from intake, or not exist at all, and

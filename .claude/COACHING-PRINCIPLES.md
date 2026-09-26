@@ -210,7 +210,7 @@ places, and a stale copy reached athletes.)*
 | PRC-14 | The roadmap is 5 cycles of 5 weeks, each 4 loading weeks and 1 back-off. Deviate only on Amir's word, and say so. | roadmap | |
 | PRC-15 | Week 1 and the back-off: design sets the dose as numbers, engage writes the words, assemble stores them as `weekNotes`. | design · engage · assemble | ✓ |
 | PRC-16 | One current athlete profile heads the coaching log: intake drafts it, every run keeps it current, and the checker reads it. | intake · design · edit | warn (missing) |
-| PRC-17 | The roadmap is written once and locked; design and engage read it and never rewrite it. | roadmap | |
+| PRC-17 | The roadmap is written once and locked. A change goes through design's `roadmap_amend:` line at the checkpoint, never a quiet rewrite. | roadmap · design | |
 | PRC-18 | Every cycle's rationale is appended to the coach-only coaching log and never overwritten. | assemble | |
 | PRC-19 | An athlete whose cycle ends without a renewal keeps the app and gets no coaching until Amir says so. | every stage | |
 | PRC-20 | Cycles continue, they don't reset: read the log and the roadmap, progress the same logic; the latest rationale is the operative one. | design | |
@@ -1233,6 +1233,11 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   told what to check by the run it was checking. `scripts/check_program.py` now reads `aim`,
   `proven`, `bans`, `floor-except` and `cap` from it.
 - `PRC-17` **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
+  A change the data forces goes through design's `roadmap_amend:` line: what changes and why,
+  shown to Amir at the checkpoint and written by assemble. Beyond that, a run touches only this
+  cycle's message, `weekNotes` and a gate line in its focuses (PRC-12), and the next cycle's
+  teaser. *(2026-09-26, from the pipeline audit: four stages were changing the locked roadmap and
+  none of them owned the change.)*
 - `PRC-18` **Every cycle's design rationale is archived.** /program-assemble appends the design read +
   locked decisions + ledger changes + the two volume tables to the coach-only
   `public.coaching_logs` row as its last step: append-only, never the programme. Prior cycles are

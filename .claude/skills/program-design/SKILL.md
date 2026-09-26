@@ -83,6 +83,10 @@ change before I build?"* before writing exercises.
    it from the stale working tree.** On 2026-09-26 the checkout was 101 commits behind with other
    sessions' edits in the way, and the skill as loaded still allowed rep ranges, cues in the spec
    and the retired three-agent panel.
+   **When the pull succeeds, the loaded skill can still be old**: the Skill tool read this file
+   before the pull. Note `git rev-parse HEAD` first; after the pull, `git diff --name-only <that>
+   HEAD -- .claude SCHEMA.md scripts` lists what changed, and every pipeline file on that list
+   (this skill included) is Read from disk again before going on.
 1. Read **`.claude/COACHING-PRINCIPLES.md`**: the rule index, then the stories (apply throughout).
 2. Establish `athlete_id`. If Amir pasted athlete info, proceed without commentary.
 3. **ONE context pull: everything design reads from the server, in a single call.** Run it once
@@ -226,7 +230,10 @@ cycle's log entry).
   close the loop with a one-line acknowledgment instead of letting it silently vanish.
 - **CAPACITY** — increase, hold, or cut volume/intensity? State it.
 - **ROADMAP CHECK** — confirm the locked plan fits, or name the data point forcing a
-  deviation + the adjustment.
+  deviation + the adjustment. A change to any cycle's roadmap entry (name, `art`, focuses,
+  dates) is a **`roadmap_amend:`** line in the spec: what changes and the data point that forces
+  it. Amir sees it at the checkpoint, assemble writes exactly that, and nothing else in
+  `cycles[]` moves (PRC-17).
 
 **Rotate accessories BY VARIANT** (Amir, 2026-09-26: *"rotate by variant"*). The REPLACE pick is
 the same movement pattern on a different implement, stance, angle or grip (the Spine entry's
@@ -447,7 +454,9 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   only where a rep max is a fair test of the quality being trained: a grinding bilateral or
   loaded unilateral lift, never a jump, a carry, a warm-up or anything prescribed by time.
   The nudge earns its attention by being rare — an athlete asked to retest six things at the
-  end of a block retests none of them. Assemble renders this as `"test": "5RM"`.
+  end of a block retests none of them. Assemble renders this as `"test": "5RM"`. For each flagged
+  lift, the coaching log entry says in one line what its number decides next cycle (e.g. *"5RM up
+  5% or more: the primary moves to 4×4"*), so the retest feeds a decision instead of a record.
 - `why_flag` (optional, NOT athlete-facing wording — Because, 2026-09-24): on an exercise that
   was chosen **for this athlete**, name the source and the reason in coach words, e.g.
   `why_flag: body/knee — reverse lunge over forward, knee history` or
@@ -579,6 +588,7 @@ obligations:
 - [week1 · explainer · pain-ladder: knee · film: … · weigh-in · double-day · low-readiness · …, one per line]
 keep: [exercise (why it stays), … — returning athletes, anything carried over on purpose]
 reintroduce: [exercise (what earned it back), … — only for a Disliked / Pain-flagged / Banned ledger row]
+roadmap_amend: [cycle N: field → new value (the data point that forces it) — only when the locked roadmap must change]
 
 ---
 DAY [N] — [plain working title: what it trains] | load identity: [peak/moderate/low]

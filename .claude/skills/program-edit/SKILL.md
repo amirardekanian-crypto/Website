@@ -131,7 +131,7 @@ Joint-isolation mobility drills do **not** belong in the prep circuit. Replace t
 
 **Replace with a movement that fits the day:**
 - Hip mobility → Reverse Lunge, Lateral Lunge, Cossack Squat, World's Greatest Stretch
-- Shoulder mobility → Band Shoulder Pass-Through, Band Pull-Apart, Cat-Cow
+- Shoulder mobility → Band Shoulder Pass-Through, Band Pull-Apart, Cat-Cow (Cat-Cow only where the back allows flexion: SEL-11)
 
 The replacement should prime the patterns trained later that session. (Name it per NAM-1 to NAM-4; don't restate the rules here.)
 
@@ -145,15 +145,15 @@ Postural or scap-control correctives (scapular wall slides, postural-specific wo
 
 ### Rule 2 — Core exercises go at the end
 
-Core isolation work (dead bug, bird dog, plank variations, ab work, Pallof press, hollow body) must appear in the **Core block, after Primary/Accessory** (before any conditioning), never in the warm-up or prep circuit.
+Core work that costs something (plank variations for time, Pallof press, hollow body, ab work) belongs in the **Core block, after Primary/Accessory** (before any conditioning), never in the warm-up or prep circuit.
 
-The only exception: an exercise doubles as activation AND core (e.g. dead bug as a breathing drill before a heavy hinge session) — flag it for Amir's judgement, don't auto-move it.
+A low-load drill that primes the brace (a dead bug or bird dog before a heavy hinge) may stay in prep. It still counts toward core volume wherever it sits (VOL-10), so leave it where it is and count it.
 
 ### Rule 3 — Gym session block order
 
 Correct structure for a gym-based session — standard section names + order per SCHEMA "Standard section names" (the single source):
 
-1. **Activation & Prep** — Warm-Up + prep, must total **10–15 minutes** (cardio raise + mobilisation/activation circuit). Never a token 5-min bookend — this is programmed dose that primes the session's patterns. Block `title` is always exactly "Activation & Prep"; the circuit `name` inside can be descriptive ("Glute Activation", etc.). Logs nothing — no RPE chip.
+1. **Activation & Prep** — Warm-Up + prep, must total **10–15 minutes** (cardio raise + mobilisation/activation circuit). Never a token 5-min bookend — this is programmed dose that primes the session's patterns. Block `title` is "Activation & Prep" (or "Prime", SCHEMA's standard names); the circuit `name` inside can be descriptive ("Glute Activation", etc.). It logs nothing and carries no RPE (SES-5).
 2. **[Power]** — if present (explosive/CNS work); free-named by content
 3. **Primary** — the main lifts (progression drivers), compound first
 4. **Accessory** — assistance / isolation work
@@ -250,7 +250,7 @@ and every athlete sees the same three. A cue change that would help anyone is an
 (coach.html → Exercises). A point about this athlete only is the exercise's `note` (Coach's Note),
 one sentence. Never add or change `cues` on a programme card.
 
-Edit the programme JSON using precise string matches, block by block — never rewrite the whole thing. Then either hand it to Amir to publish from coach.html, or apply it with an `update programs set data = ...` through the Supabase MCP.
+Edit the programme JSON using precise string matches, block by block — never rewrite the whole thing. Then write it yourself, path by path (Step 0b: one `jsonb_set` per path you changed, never a whole-object `update`), and list every path you wrote in the report, so it can be read against what Amir asked for (PRC-2).
 
 After editing, re-tally the set counts to confirm the numbers match what was agreed.
 
@@ -286,9 +286,9 @@ have its row updated (status, last cycle, and *why*), or the next cycle's design
 that no longer exists.
 
 ⚠️ **The log is `public.coaching_logs`, not a file** — see the banner at the top of this skill.
-Update the local `.claude/coaching-log/<id>.md` scratch copy too, then push and verify with
-`md5(body)`; both sides are plain text so a straight hash comparison IS valid here (normalise
-CRLF → LF first — the local file has Windows line endings and the row does not).
+Append the section to the row (`body = body || $L$…$L$`) and check `length(body)` grew by exactly
+what you added. The row is the only copy: there is no local log file to keep in step, and the old
+`.claude/coaching-log/` folder is gone for good.
 
 **⚖️ If the edit changed ANY set count, the new tables go in the log** — both of them,
 per-exercise and per-muscle, per Rule 4a. Amir asked for this explicitly (2026-09-08: *"i want

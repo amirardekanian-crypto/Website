@@ -63,14 +63,12 @@ Best for: warm-up drills, mobility movements, cool-down, time/distance entries t
 {
   "type": "simple",
   "name": "Easy Jog",
-  "videoUrl": null,
-  "rx": { "time": "5 min" },
-  "cues": {
-    "good": ["Keep effort conversational"],
-    "bad": ["Don't go hard — this is warm-up"]
-  }
+  "exId": "easy-jog",
+  "rx": { "time": "5 min" }
 }
 ```
+
+No `cues` on a new session's exercises: each shows its Spine entry's three (CUE-1, CUE-2).
 
 **`rx` is the prescription, and the only rule is: write what you prescribed, omit what you
 did not.** An absent field means *not prescribed*, and the app draws no cell for it. (Before
@@ -103,13 +101,9 @@ Best for: all strength exercises, single-exercise loaded rows, any set/rep work 
 ```json
 {
   "type": "standard",
-  "name": "Back Squat",
-  "videoUrl": null,
-  "rx": { "sets": 4, "reps": 5, "rpe": 8, "tempo": "3-0-1-0", "rest": 180 },
-  "cues": {
-    "good": ["Push the floor away", "Brace through the whole set"],
-    "bad": ["Knees caving in", "Chest collapsing forward"]
-  }
+  "name": "Barbell Back Squat",
+  "exId": "barbell-back-squat",
+  "rx": { "sets": 4, "reps": 5, "rpe": 8, "tempo": "3-0-1-0", "rest": 180 }
 }
 ```
 
@@ -134,7 +128,7 @@ junk drawer of 121 labels:**
 |---|---|---|
 | `setup` | **Don't use it** (Amir, 2026-09-25: *"i dont like floating text"*). A detail like `"In 4, out 8"` or `"alternate sides"` goes in the `note`; a grip is the `intent` pill | quiet grey line under the name |
 | `intent` | a **grip** (`"neutral grip"`) or **ONE** intention (`"max intent"`, `"max speed"`); both join in the one pill: `"neutral grip · max intent"` | the green pill (the only pill) |
-| `cues` | technique, `good[]` / `bad[]` | the cues list |
+| `cues` | **don't write them**: the exercise's Spine entry supplies its three (the 42 older sessions keep theirs) | the cues list |
 
 **Never restate the tempo in `intent` — or in a cue.** The card already shows `rx.tempo` with
 its key digits in clay, so `"3s eccentric"` as a pill, or "three seconds down, one second
@@ -163,35 +157,23 @@ Best for: conditioning circuits, activation circuits, mobility flows, combinatio
 {
   "type": "circuit",
   "name": "Activation Circuit",
-  "rounds": "3 Rounds",
-  "restSec": 60,
+  "rx": { "rounds": 3, "rest": 60 },
   "items": [
-    {
-      "name": "Glute Bridge",
-      "detail": "×12",
-      "cues": {
-        "good": ["Drive the hips up and squeeze at the top"],
-        "bad": ["Arching the lower back"]
-      }
-    },
-    {
-      "name": "Band Pull-Apart",
-      "detail": "×15",
-      "cues": {
-        "good": ["Pull to chest height, squeeze the shoulder blades"],
-        "bad": ["Letting the arms drop below shoulder height"]
-      }
-    }
+    { "name": "Glute Bridge", "exId": "glute-bridge", "rx": { "reps": 12 } },
+    { "name": "Band Pull-Apart", "exId": "band-pull-apart", "rx": { "reps": 15 } }
   ]
 }
 ```
 
-`rounds` is a display string: `"3 Rounds"`, `"4 Rounds"`. `restSec` is the rest after the full round (default 60s). Sub-items have `name`, `detail` (reps/duration as a string), and optional `cues`.
+`rx.rounds` is a **number** (the old `"rounds": "3 Rounds"` string is still read, never written) and
+`rx.rest` the rest after the full round (60s when you give none). Each item carries `name`, `exId`
+and its own `rx`, or a free-text `detail` when the wording says more than a number (*"15 sec,
+switch legs each round"*). No `cues` on items either.
 
 ---
 
 ### `videoUrl`
-Any exercise can have `"videoUrl": "https://..."` for a demo video. Set to `null` if no video — the app auto-resolves from `exercise_library.json` by exercise name.
+Leave it out: the app finds the video by the exercise's name in `exercise_library.json`. A `"videoUrl": "https://..."` on the exercise overrides that.
 
 ---
 

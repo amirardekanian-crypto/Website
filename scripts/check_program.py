@@ -406,6 +406,8 @@ def check_bans(data, args):
         for i, line in enumerate(open(args.spec, encoding='utf-8'), 1):
             if line.lstrip().startswith('```'): fence = line.strip().startswith('```profile'); continue
             if fence: continue  # the profile block describes the athlete; it prescribes nothing
+            # A roadmap amendment ("cycle 3: art → iron") changes a later cycle, not this one's kit.
+            if re.match(r'\s*roadmap_amend\s*:', line, re.I): continue
             if not re.search(r'fallback|->|→|instead|swap', line, re.I): continue
             for w in words:
                 m = ban_hit(w, line)

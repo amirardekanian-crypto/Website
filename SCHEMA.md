@@ -20,15 +20,20 @@
   **never** two separate `"standard"` exercises each carrying a `"superset"` chip — that
   anti-pattern breaks the whole point of a superset (each exercise gets its own independent
   rest timer instead of alternating into one shared rest) and leaves no visual grouping to
-  show which exercises are paired. It shipped once (see COACHING-PRINCIPLES.md → "Session
-  structure & time," 2026-07-18) — see "Common mistake" under `type: "circuit"` below.
-- Chip `style`, if used, must be exactly `"yellow"` or `"dark"` (or omitted).
+  show which exercises are paired. It shipped once (SES-12 in COACHING-PRINCIPLES.md,
+  2026-07-18) — see "Common mistake" under `type: "circuit"` below.
+- The prescription is **`rx`** (see "`rx` — the prescription"). **Never write `chips[]`**: it is
+  legacy, still read by the app, never written (CHP-5). No `cues` either: every card shows its
+  exercise's Spine entry's cues, found by `exId` (CUE-2).
 - The `type` field decides what tools an exercise gets — no separate flags needed:
   - `"simple"` → just the row. No rest, no weight, no RPE, no note.
   - `"standard"` → always has rest timer + weight log + RPE selector + personal note.
   - `"circuit"` → rest timer at the end + personal note, and **the block decides whether it logs**: a circuit in a **prep/activation block logs nothing**; a circuit in any **working block** gets an inline **weight field per item** plus **one RPE per round** (supersets, complexes, conditioning). Override either way with `logWeight` / `logRPE`. See "Circuit logging" below.
-- `"restSec"` (number, seconds) controls the rest timer duration. Defaults if omitted: **120s for `standard`**, **60s for `circuit`**. Override per exercise as needed.
-- A `"circuit"` exercise must include `rounds` (string) and `items[]` (array).
+- Rest is **`rx.rest`** (seconds), or **`block.rest`** once for a whole section. A `standard` exercise
+  invents none: omit it and the card draws no rest cell (its timer still opens at 2 minutes). A
+  circuit's rest paces the round, so it falls back to 60s. `restSec` is the old spelling, still read.
+- A `"circuit"` carries `items[]` and its rounds as **`rx.rounds`, a number**. The old
+  `"rounds": "×3 Rounds"` string is still read, never written.
 - The legacy `"hasRest"` field is no longer used and can be removed. Old files that still contain it will keep working — the field is simply ignored.
 - Output strict, valid JSON. No comments. No trailing commas.
 
@@ -40,7 +45,6 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
 {
   "athlete": {
     "id": "firstname_lastname",
-    "key": "0123456789abcdef0123456789abcdef",
     "firstName": "First",
     "lastName": "Last",
     "avatar": "https://example.com/photo.jpg"
@@ -54,6 +58,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
       "num": 1,
       "name": "Cycle Name",
       "tagline": "Short italic line (optional)",
+      "art": "bedrock",
       "weeks": "Weeks 1–5",
       "startDate": "2024-04-28",
       "endDate": "2024-06-01",
@@ -70,6 +75,10 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
           "Expected outcome one",
           "Expected outcome two"
         ]
+      },
+      "weekNotes": {
+        "first": { "rpeCap": 7, "text": "What week 1 does differently, with the number." },
+        "last": { "setsDrop": 1, "rpeCap": 6, "text": "What the back-off week does, never below RPE 6." }
       }
     },
     {
@@ -94,45 +103,43 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
     "days": [
       {
         "id": 1,
-        "focusTag": "Lower Body",
+        "focusTag": "Built From The Legs Up",
+        "art": "lower",
         "completionTitle": "Great Work",
-        "completionMessage": "Day complete — recover well.",
+        "completionMessage": "Day complete. Recover well.",
         "blocks": [
           {
-            "title": "Warm-Up",
+            "title": "Activation & Prep",
             "icon": "🔥",
             "exercises": [
               {
                 "type": "simple",
                 "name": "Bike",
+                "exId": "bike",
                 "rx": { "time": "5 min" }
               },
               {
                 "type": "circuit",
-                "name": "Dynamic Mobility",
-                "rounds": "×3 Rounds",
-                "restSec": 60,
-                "warmup": true,
+                "name": "Hip Prep",
+                "rx": { "rounds": 2 },
                 "items": [
-                  {
-                    "name": "90/90 Hip Rotations",
-                    "detail": "×12",
-                    "cues": {
-                      "good": ["Keep hips grounded"],
-                      "bad": ["Don't arch the back"]
-                    }
-                  }
+                  { "name": "90/90 Hip Switch", "exId": "90-90-hip-switch", "rx": { "reps": 6, "side": true } }
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "title": "Primary",
+            "icon": "🎯",
+            "rest": 180,
+            "exercises": [
               {
                 "type": "standard",
-                "name": "Back Squat",
-                "videoUrl": "https://www.youtube.com/watch?v=example",
-                "rx": { "sets": 4, "reps": 6, "rpe": 7, "tempo": "3-1-1-0", "rest": 180 },
-                "cues": {
-                  "good": ["Push the floor away"],
-                  "bad": ["Don't let the knees cave in"]
-                }
+                "name": "Barbell Back Squat",
+                "exId": "barbell-back-squat",
+                "rx": { "sets": 4, "reps": 6, "rpe": 7, "tempo": "3-1-1-0" },
+                "note": "One sentence only this athlete needs: the Coach's Note.",
+                "why": { "src": "goal", "text": "Why THIS athlete has this exercise, in one plain sentence." }
               }
             ]
           }
@@ -144,9 +151,10 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
     "greeting": "For You, First",
     "cards": [
       {
-        "icon": "⏱",
-        "title": "Understanding Tempo",
-        "body": "The numbers next to an exercise (e.g. 3-1-1) describe tempo in seconds: eccentric — pause — concentric."
+        "icon": "🔋",
+        "title": "Rough Days",
+        "body": "<p>On a low-readiness day, take 1 off every RPE, but never go below 6.</p>",
+        "tags": ["low-readiness"]
       }
     ]
   }
@@ -156,33 +164,31 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
 ### Placeholder guidance
 
 - `athlete.id` → lowercase, underscore-separated (e.g. `john_doe`).
-- `athlete.boardName` → the name they chose, used only to pre-fill the join box in Proof's Crew tab. It never joins anyone to the leaderboard.
+- `athlete.boardName` → the name they chose. AA Proof puts them on the shared leaderboard under it once they have finished a workout (`autoJoinBoard()`, since 2026-09-12); they can rename it or leave in Crew.
 - `athlete.tier` → `"free"` for a free Proof user; omit for a coaching client.
 - `sport.badge` → short line shown above the name, e.g. `"🎾 Tennis Performance"`. Omit the whole `sport` object if not relevant.
 - `focuses[]` → one-line training focus statements. Any number allowed.
 - `message.paragraphs[]` → 1–3 short paragraphs on why the current cycle matters.
 - `message.outcomes[]` → 3–6 concrete, measurable expected outcomes.
 - `teaser` → hype section for the NEXT cycle only. Omit the whole `teaser` object if there is no next cycle planned.
-- `rx` → the prescription as data: `sets` · one of `reps`/`time`/`distance`/`work` · `side` · `rpe` · `tempo` · `rest`. **Write what you prescribed and omit the rest** — an absent field draws no cell. Full table under "`rx` — the prescription". Beside it: `intent` (the one green pill: a grip like `neutral grip`, or one intention), `note`, `cues`. No `setup` (no floating text). Never write `chips[]`.
-- `videoUrl` → full YouTube / Vimeo URL. Omit the field entirely if no video exists.
-- `notes` → optional. Remove the whole object if there are no coaching notes to add.
+- `art` (cycle and day) → the picture word; see `cycles[n]` and "How a day finds its picture".
+- `weekNotes` → required on every new cycle: week 1 and the back-off week (see below).
+- `rx` → the prescription as data: `sets` · one of `reps`/`time`/`distance`/`work` · `side` · `rpe` · `tempo` · `rest` · `rounds` (circuits). **Write what you prescribed and omit the rest** — an absent field draws no cell. Full table under "`rx` — the prescription". Beside it: `exId` (the exercise's Spine id), `intent` (the one green pill: a grip like `neutral grip`, or one intention), `note` (the Coach's Note) and `why` (Because). **No `cues`** (they come from the Spine entry), no `setup` (no floating text), never `chips[]`.
+- `videoUrl` → normally leave it out: the app finds the video by the exercise's name in `exercise_library.json`. A URL here overrides that.
+- `notes` → optional. Each card's `body` is HTML (`<p>`, `<ul><li>`), and `tags` names the obligation keys it carries. Remove the whole object if there are no notes.
 
 ---
 
 ## Architecture Overview
 
-```
-amirardekani.com/
-├── program.html          ← Single template (never edit per athlete)
-├── data/
-│   ├── john_doe.json     ← Athlete 1
-│   ├── sarah_chen.json   ← Athlete 2
-│   └── ...               ← Unlimited athletes
-```
+One HTML file, `program.html`, serves every athlete and is never edited per athlete. Each
+athlete's programme is a **row in `public.programs`**, whose `data` column holds the JSON this
+guide describes. The athlete signs in with a username and password, and the app reads their
+row through `get_program()`, which checks who is asking (see "How an athlete is authorised").
 
-**URL format:** `program.html?client=john_doe`
-
-The template reads the `client` parameter, fetches `data/john_doe.json`, and renders everything dynamically. One HTML file serves every athlete.
+`data/<id>.json` is only a local, gitignored working copy on Amir's PC: it is 404 on the live
+site and the app never reads it. A built file reaches the row through `/program-assemble`'s
+publish step, or coach.html → Athletes → **↑ Publish programme file**.
 
 ---
 
@@ -242,7 +248,7 @@ card has something to open (see "Advancing to the Next Cycle").
 | `athlete.id` | string | ✅ | Unique ID, used for localStorage. Format: `firstname_lastname` |
 | `athlete.key` | string | ⚠️ **retired** | Dead field. Authorises nothing (`athlete_keys` is empty and every keyed path fails closed). Don't add it; drop it from old files. |
 | `athlete.tier` | string | optional | `"free"` = free Proof user (locks WORKOUT, swaps programme links for coaching CTAs). Absent or anything else = coached. |
-| `athlete.boardName` | string | optional | Name used to pre-fill Proof's Crew join box. Joins nobody to the board. |
+| `athlete.boardName` | string | optional | The name AA Proof puts them on the shared leaderboard under, once they have finished a workout (since 2026-09-12). They can rename it or leave in Crew. |
 | `athlete.firstName` | string | ✅ | First name (white in hero) |
 | `athlete.lastName` | string | ✅ | Last name (yellow accent in hero) |
 | `athlete.avatar` | string | optional | URL or path to athlete's photo. Falls back to initials when missing. |
@@ -355,6 +361,7 @@ writes the object on `cycles[currentCycleIndex]`.
   "num": 1,
   "name": "Foundation Forge",
   "tagline": "Build the Platform",
+  "art": "bedrock",
   "weeks": "Weeks 1–5",
   "focuses": [
     "Build foundational movement quality across all major patterns.",
@@ -375,6 +382,10 @@ writes the object on `cycles[currentCycleIndex]`.
       "Cycle 2 is where the body begins to genuinely change.",
       "Earn it in these five weeks."
     ]
+  },
+  "weekNotes": {
+    "first": { "rpeCap": 7, "text": "Everything is new, so keep every set at RPE 7 or under. From week 2 the card is your target." },
+    "last": { "setsDrop": 1, "rpeCap": 6, "text": "One set fewer on every exercise and every RPE at 6. You get stronger in the easy week too." }
   }
 }
 ```
@@ -465,14 +476,13 @@ Best for: warm-ups, cool-downs, single-item entries that don't need rest, weight
 {
   "type": "simple",
   "name": "Bike",
-  "videoUrl": "https://www.youtube.com/watch?v=example",
-  "rx": { "time": "5 min" },
-  "cues": {
-    "good": ["Steady pace"],
-    "bad": ["Don't go all-out"]
-  }
+  "exId": "bike",
+  "rx": { "time": "5 min" }
 }
 ```
+
+No `cues` and no `videoUrl` on a card: the cues come from the exercise's Spine entry (found by
+`exId`, see "`exId` and the Spine") and the video from `exercise_library.json` by name.
 
 #### `type: "circuit"` — Multiple sub-exercises as one checklist item
 Best for: mobility circuits, activation circuits, conditioning circuits, combination drills.
@@ -480,23 +490,18 @@ Best for: mobility circuits, activation circuits, conditioning circuits, combina
 ```json
 {
   "type": "circuit",
-  "name": "Conditioning Circuit",
-  "videoUrl": "https://www.youtube.com/watch?v=example",
-  "rounds": "×3 Rounds",
-  "restSec": 90,
+  "name": "Engine Room",
+  "rx": { "rounds": 3, "rest": 90 },
   "items": [
-    {
-      "name": "Kettlebell Swing",
-      "detail": "×12 · RPE 7",
-      "cues": { "good": ["..."], "bad": ["..."] }
-    }
+    { "name": "Kettlebell Swing", "exId": "kettlebell-swing", "rx": { "reps": 12, "rpe": 7 } },
+    { "name": "Battle Rope Waves", "exId": "battle-rope-waves", "rx": { "time": "30s", "rpe": 8 } }
   ]
 }
 ```
 
 Every circuit gets, automatically:
-- A **Rest** button at the bottom (rests once, after the whole round of sub-items is done — default **60s**, override with `restSec`).
-- An **RPE** selector for the whole circuit (one per round).
+- A **Rest** button at the bottom (rests once, after the whole round of sub-items is done — `rx.rest`, else the block's `rest`, else **60s**).
+- In a working block, a weight field on each item and **one RPE per round**. A circuit in a prep block logs nothing (see "Circuit logging").
 - A free-form **Note** row where the client can log weights, equipment, and how it felt (e.g. *"KB 16, slam 6, box 50, third round felt heavy"*).
 
 ##### Circuit logging (`warmup`, and optional `logWeight` / `logRPE`)
@@ -535,19 +540,18 @@ pairing at all. The correct shape is ONE `"circuit"` entry per pair:
 {
   "type": "circuit",
   "name": "Push-Pull Superset",
-  "rounds": "×4 Rounds",
-  "restSec": 90,
+  "rx": { "rounds": 4, "rest": 90 },
   "items": [
-    { "name": "Dumbbell Bench Press", "detail": "×10 · RPE 8", "cues": { "good": ["..."], "bad": ["..."] } },
-    { "name": "Chest-Supported Dumbbell Row", "detail": "×12 · RPE 8", "cues": { "good": ["..."], "bad": ["..."] } }
+    { "name": "Dumbbell Bench Press", "exId": "dumbbell-bench-press", "rx": { "reps": 10, "rpe": 8 } },
+    { "name": "Chest-Supported Dumbbell Row", "exId": "chest-supported-dumbbell-row", "rx": { "reps": 12, "rpe": 8 } }
   ]
 }
 ```
 
 Name the circuit descriptively so the name itself communicates the pairing (`"Push-Pull
-Superset"`, `"Arm Superset"`, `"Delt Superset"` — see `amir_ardekani.json` /
-`Mhrnz_khdm2.json` for live examples) — never a generic `"Superset A/B"`. Note there is no
-per-item `tempo` field; circuit items carry reps + RPE only (`"×N · RPE N"`).
+Superset"`, `"Arm Superset"`, `"Delt Superset"`) — never a generic `"Superset A/B"`. A circuit
+item draws its dose and its RPE only (`itemDose()` in `program.html`): a tempo on an item is not
+shown.
 
 #### `type: "standard"` — Loaded exercise with rest, weight, RPE
 Best for: all loaded exercises (strength, plyos, accessories) — and any single-exercise row that should be logged.
@@ -555,13 +559,9 @@ Best for: all loaded exercises (strength, plyos, accessories) — and any single
 ```json
 {
   "type": "standard",
-  "name": "Back Squat",
-  "videoUrl": "https://www.youtube.com/watch?v=example",
-  "rx": { "sets": 4, "reps": 6, "rpe": 7, "tempo": "3-1-1-0", "rest": 180 },
-  "cues": {
-    "good": ["Push the floor away"],
-    "bad": ["Don't let knees cave"]
-  }
+  "name": "Barbell Back Squat",
+  "exId": "barbell-back-squat",
+  "rx": { "sets": 4, "reps": 6, "rpe": 7, "tempo": "3-1-1-0", "rest": 180 }
 }
 ```
 
@@ -610,7 +610,10 @@ a rep count, flagged or not, from Personal Records → **+ Log a max**.
 
 ### `videoUrl` — Optional Exercise Video
 
-Any exercise (any type) can include a `videoUrl`. When present, a play button appears next to the name. When omitted, no button renders.
+Any exercise can carry a `videoUrl`, and it wins. **Normally leave it out:** the app finds the
+video by the exercise's name in `exercise_library.json` (`getVideoUrl()`: the exact name, then a
+forgiving match on case, punctuation and accents). A play button shows only when one of the two
+gives a URL.
 
 ### `note` — Exercise coach's note (optional, any exercise type)
 
@@ -627,9 +630,9 @@ Exercise-scoped guidance the athlete must see, attached to that exercise:
 
 Renders as a clay **"Coach's Note"** pill on the collapsed row plus a highlighted callout at the top of the expanded card (works on `standard`, `simple`, and `circuit`). **Plain text — no HTML.** It's a short 1–3 sentence callout, not a notes card; `program.html` renders it escaped, not as innerHTML, so any markup would show as literal characters.
 
-**Placement rule (per COACHING-PRINCIPLES → Communication):** anything about ONE exercise — an injury caveat ("start shallow, pain-free only"), a starting-weight suggestion drawn from the athlete's own past logs, how to load it — belongs here, so the athlete sees it exactly where it applies. Program-wide guidance belongs in the `notes` cards instead. This is also the only athlete-facing place a weight number may appear (as a suggestion based on their logs — chips never carry weights).
+**Placement rule (COM-6):** anything about ONE exercise — an injury caveat ("start shallow, pain-free only"), a starting-weight suggestion drawn from the athlete's own past logs, how to load it — belongs here, so the athlete sees it exactly where it applies. Program-wide guidance belongs in the `notes` cards instead. This is also the only athlete-facing place a weight number may appear (as a suggestion based on their logs — `rx` never carries a weight, PRG-2).
 
-**Authorship split (pipeline convention):** /program-design only flags *which* exercise needs one and *why*, in one short coaching-domain line (a `note_flag`, not athlete-facing prose) — it doesn't draft the sentence. /program-engage writes the actual copy from that flag plus the full athlete picture. /program-assemble places the finished text on the exercise. This keeps wording/formatting decisions out of the programming pass, same as chips and `focusTag` — see COACHING-PRINCIPLES.md → "Athlete-first; naming & styling are downstream."
+**Authorship split (pipeline convention):** /program-design only flags *which* exercise needs one and *why*, in one short coaching-domain line (a `note_flag`, not athlete-facing prose) — it doesn't draft the sentence. /program-engage writes the actual copy from that flag plus the full athlete picture. /program-assemble places the finished text on the exercise. This keeps wording/formatting decisions out of the programming pass, same as `intent` and `focusTag` (PRC-22).
 
 ### `rx` — the prescription (2026-09-20)
 
@@ -808,8 +811,8 @@ renders as a name and a dose on one line. That is what a warm-up should look lik
 ```
 
 An exercise with **no countable dose at all** ("Start the Run", "Empty Bar Warm-Up Sets")
-carries **no `rx` key** — its instruction lives in `setup` and `cues`. An empty `rx: {}` is
-a lint error.
+carries **no `rx` key**; what to do goes in its Coach's Note (`note`), since a programme card has
+no `setup` line and its cues come from the Spine. An empty `rx: {}` is a lint error.
 
 #### Legacy `chips[]` — still read, never written
 
@@ -1069,8 +1072,10 @@ Same shape as an athlete training **day** (so the app can render it with the
 existing exercise cards): `focusTag` + `blocks[].exercises[]`. Each file also
 repeats its own `id` / `title` / `duration` / `equipment` (used when the workout
 is opened). Supported per exercise: `rx` (the prescription — see "`rx` — the
-prescription"), `cues.good[]` / `cues.bad[]`, and `videoUrl` (or leave it `null` to
-auto-resolve a video by exercise name from `exercise_library.json`).
+prescription"), `exId`, `note`, and `videoUrl` (leave it out to resolve a video by the
+exercise's name from `exercise_library.json`). **A new session writes no `cues`**: like a
+programme card, each exercise shows its Spine entry's cues (2026-09-24). The 42 sessions written
+before then keep the cues they carry.
 RPE and tempo are usually omitted in the library, which costs nothing: the card
 simply draws fewer cells. All 42 sessions were converted from `chips[]` to `rx` on
 2026-09-20 by `scripts/migrate_rx.js`.
@@ -1092,9 +1097,8 @@ simply draws fewer cells. All 42 sessions were converted from `chips[]` to `rx` 
   "focusTag": "Full-Body Strength",
   "blocks": [
     { "title": "Strength", "icon": "🎯", "exercises": [
-      { "type": "standard", "name": "Barbell Back Squat", "videoUrl": null,
-        "rx": { "sets": 5, "reps": 5, "rest": 150 },
-        "cues": { "good": ["Brace before each rep"], "bad": ["Chest collapsing forward"] } }
+      { "type": "standard", "name": "Barbell Back Squat", "exId": "barbell-back-squat",
+        "rx": { "sets": 5, "reps": 5, "rest": 150 } }
     ] }
   ]
 }
@@ -1140,7 +1144,7 @@ much."
 | **`before`** | What to stop for: who should not do it today, red flags, spacing, first-time dose | rows of `{label, text}`, **about 50–210 words** in all |
 | **`intro`** | Why this session exists, how it runs, what kit and timing | **1–2 paragraphs, about 100–150 words** |
 | **`note`** | One thing about *this exercise* the cues cannot carry | **one sentence**, and only where it earns its place |
-| **`cues`** | How to do the rep | **exactly 3** — see below |
+| **`cues`** | How to do the rep | **exactly 3**, on the exercise's Spine entry — see below |
 
 **`before` is the safety card, and it is why `intro` can stay short.** It is drawn as a white card
 above the intro and **is never behind a toggle**. Measured 2026-09-20: the intro's *Why this session*
@@ -1152,13 +1156,13 @@ First time · Who it's for · Check the space/setup/kit · While you train · Ne
 and `intro` carries only the why and the how. Never put the same warning in both. The wording of the rows
 every session shares is in the `/workout` skill, **Standard rows**: copy it, so one warning reads the same everywhere.
 
-**Cues are exactly three, never more, never fewer** — one **external** (where to
+**Cues are exactly three, never more, never fewer** (CUE-1) — one **external** (where to
 push, what to move toward), one **internal** (what to feel), one **avoid** (the
 single mistake that most risks injury). External + internal go in `cues.good[]`,
-the avoid cue in `cues.bad[]`, so every exercise is `good: [2], bad: [1]`. This
-is not a library rule, it is `COACHING-PRINCIPLES.md` → **Coaching cues**, and it
-applies to programmes too. Amir's own Front-Rack Rescue holds it on every
-exercise; it is the reference.
+the avoid cue in `cues.bad[]`, so every exercise is `good: [2], bad: [1]`. Since
+2026-09-24 they are written once, on the exercise's Spine entry, for programmes and
+the library alike; a new session writes none. Amir's own Front-Rack Rescue holds
+the three-cue shape on every exercise; it is the reference.
 
 **Most exercises need no `note` at all.** Neither workout Amir wrote himself uses
 one. Reach for it when there is a genuine caveat the cues cannot hold — a
