@@ -147,9 +147,10 @@ genuinely right for you. At the end of each cycle, all of that week-by-week
 information is read together to decide what the next cycle should do. You're never
 running a stale plan.
 
-**Your coach is one WhatsApp message away.** The button is at the top of the app's Coach tab,
-alongside personal notes written for you and an in-app guide if you need it. Send questions,
-swaps, anything that hurts, and form-check videos there.
+**Your coach is one WhatsApp message away.** The button is at the top of the app's Coach tab, at
+the end of every session and on every exercise, and it already says which day or exercise you're
+asking about. Send questions, swaps, anything that hurts, and form-check videos there. The Coach tab
+also holds personal notes written for you and an in-app guide if you need it.
 
 ---
 

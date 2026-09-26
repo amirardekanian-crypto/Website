@@ -56,7 +56,7 @@ Programme (~6 months)
 - **Readiness check** before a session (sleep · energy · soreness · stress · overall, each 1–5, 5 = best) → auto-regulation; the coach sees the scores.
 - **Session timer** + a full-screen **rest timer** between sets.
 - **Finish session** → rate session RPE, leave a note, **send data to coach**.
-- **Direct WhatsApp line** to the coach (a button in the Coach tab; the in-app chat was removed 2026-09-26, WhatsApp first); coach-authored **personal notes** + an in-app **guide**.
+- **Direct WhatsApp line** to the coach, the only place Amir answers (buttons in the Coach tab, at the end of every session and on every exercise's info sheet, each pre-filled with who is writing and what it's about; the in-app chat was removed 2026-09-26); coach-authored **personal notes** + an in-app **guide**.
 - **Library — Playbook** articles (coach-published; deep-link `?article=<id>` gives each article its own shareable URL) + **Sessions** on-demand workouts (deep-link `?workout=<id>`), **archive** of past cycles, **dark mode**, add-to-home-screen.
 
 > A visual catalog of every card the app uses lives in **`card-preview.html`** (in this folder) — handy when you want content to mirror the real UI.

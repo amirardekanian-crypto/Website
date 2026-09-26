@@ -125,10 +125,12 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`.
 - **An RPE off its target is coloured** clay (over) or steel blue (under), the one exception to "clay is the
   only accent", through `rpeVs()`/`rpeMark()` on every screen.
-- **There is no in-app chat (2026-09-26, Amir: *"whatsapp first"*).** The Coach tab opens WhatsApp
-  (`COACH_WHATSAPP`, the number the site's buy buttons use) and coach.html answers a session note on
-  WhatsApp. The `messages` table stays on the server and nothing reads it. Do not bring a chat back
-  unasked: two channels means one goes unwatched. Details in `PROGRAM-APP.md`.
+- **There is no in-app chat, and Amir answers ONLY on WhatsApp (2026-09-26: *"Im only gonna reply to
+  them when they send me a message on whatsapp"*).** The app's job is to get athletes there fast, with
+  context: the Coach tab, the end of every session (the note comes along) and every exercise's About
+  sheet open WhatsApp pre-filled (`coachWhatsAppUrl(about)`, `COACH_WHATSAPP` = the site's buy-button
+  number). coach.html only marks session notes read. The `messages` table stays on the server and
+  nothing reads it. Do not bring a chat back unasked. Details in `PROGRAM-APP.md`.
 - **Home leads with the training** (This Week, then the day cards), then the Daily Habits card.
 - **No yellow, gold, ochre or amber in either app**, AA Proof's metals included (its gold tier became
   emerald on 2026-09-26; Amir, asked whether Proof was an exception: *"fix"*).
