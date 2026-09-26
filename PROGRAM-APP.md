@@ -280,12 +280,13 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
     `core` also lights the low back.
   - **Every new entry needs it:** `credits: {}` means `muscles` is required (`draft_sql.py` refuses the
     batch without it, `/spine` → Upkeep lists it as a gap, coach.html marks the entry *no muscles on
-    the map* and edits it under the body parts). ⚠ Changing an entry's credits now also changes what
+    the map* and edits it under the body parts, where it also DRAWS the same body, redrawn as Amir types
+    the counts, muscles or body parts: `spineMapHtml()` copies `bodyPartsHtml()`'s logic, so change both). ⚠ Changing an entry's credits now also changes what
     every athlete sees lit.
   - **The drawing is generated, never hand-edited.** A Higgsfield GPT Image 2.5 chart (round 1,
     candidate C, job `f37ea7da-2673-43d7-9b4c-30d1b3633927`), mirrored so both sides match, traced
     into one path per muscle group. The master, the three tracing scripts, the traced
-    `bodymap.json` and `inject.py` (writes `BODYMAP_SVG` between the `BODYMAP:BEGIN/END` markers;
+    `bodymap.json` and `inject.py` (writes `BODYMAP_SVG` into program.html AND coach.html, between the `BODYMAP:BEGIN/END` markers;
     `--check` says whether it is stale) are in `.claude/skills/image/bodymap/`. ⚠ The muscle ids now
     exist SIX times: stage39's `spine_credits_ok()`, coach.html `SPINE_MUSCLES`, check_program.py
     and draft_sql.py `MUSCLES`, program.html `MAP_MUSCLE`, and the drawing's `data-g` groups.

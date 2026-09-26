@@ -10,11 +10,11 @@ never hand-edit `BODYMAP_SVG` in program.html.
 | `bm2_label.py` | Labels every muscle shape (`lab_<view>.npy`, `bm_regions.json`) and draws numbered overlays to assign them |
 | `bm3_trace.py` | `GROUP` maps each shape to a muscle id; traces shapes, line art and the outline into `bodymap.json` |
 | `bodymap.json` | The traced result: `groups[view][muscle] = path`, `line`, `sil`, `place`, `viewBox` |
-| `inject.py` | Writes `BODYMAP_SVG` into program.html between `// BODYMAP:BEGIN` and `// BODYMAP:END`. `--check` exits 1 if stale |
+| `inject.py` | Writes `BODYMAP_SVG` into program.html and coach.html (Exercises editor) between `// BODYMAP:BEGIN` and `// BODYMAP:END`. `--check` exits 1 if stale |
 
 **To change which shape is which muscle:** run the three scripts in a scratch copy of this folder
 (they write their work files beside themselves), edit `GROUP` in `bm3_trace.py`, rerun it, copy the
-new `bodymap.json` back here, run `inject.py`, and bump `CACHE` in `sw.js`.
+new `bodymap.json` back here, run `inject.py` (it updates both pages), and bump `CACHE` in `sw.js`.
 
 Decisions baked in: the front uses the LEFT half mirrored, the back the RIGHT half (cleaner abs;
 better triceps and shoulder blade). The muscle mask drops pixels within 3 px of the pale outline,
