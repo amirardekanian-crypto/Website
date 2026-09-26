@@ -1663,6 +1663,10 @@
     padding: 0;
   }
   .readiness-overlay.visible { display: flex; animation: fadeUp 0.25s ease both; }
+  /* The sheet's ‹ Back (SHEET-01): only when a page was opened from another page. */
+  .sheet-back { display: block; margin: -6px 0 8px -8px; padding: 10px 8px; min-height: 44px;
+    background: none; border: 0; cursor: pointer; font-family: 'Space Mono', monospace; font-size: 12px;
+    font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--green-ink); }
   .readiness-modal {
     background: var(--grey-bg);
     width: 100%; max-width: 520px;
@@ -7868,7 +7872,7 @@ function topLayer() {
   if (vm) return () => window.VideoModal && window.VideoModal.close();
   if (on('timerOverlay')) return closeTimer;
   if (on('readiness-overlay')) return cancelReadiness;
-  if (on('hist-overlay')) return closeHistorySheet;
+  if (on('hist-overlay')) return _SHEET.stack.length ? sheetBack : closeHistorySheet;   // a page back first (SHEET-01)
   if (on('stepOverlay')) return closeStepMode;
   const scr = document.querySelector('.screen.active');
   const id = scr ? scr.id.replace('screen-', '') : 'home';
@@ -13138,6 +13142,64 @@ function closeHistorySheet() {
 window.openHistorySheet = openHistorySheet;
 window.closeHistorySheet = closeHistorySheet;
 
+// ── ONE SHEET, SEVERAL PAGES: a way back (SHEET-01, 2026-09-26) ─────────────
+// History, About, Why and Quality all draw into the one #hist-overlay, so About → a quality
+// → another exercise replaced each page with the next, and the only way out was Close (and,
+// since NAV-01, Back closed the lot). Each opener is wrapped (wrapSheetOpeners(), at the end of
+// the script): opening a page while the sheet is up remembers how to redraw the page before
+// it, a "‹ Back" button sits at the top, and the phone's Back steps back a page first
+// (topLayer() → sheetBack()). Closing the sheet forgets the trail.
+const _SHEET = { cur: null, stack: [], restoring: false };
+function sheetWrap(fn) {
+  return function () {
+    const args = arguments, self = this;
+    const ov = document.getElementById('hist-overlay');
+    const m = ov && ov.querySelector('.readiness-modal');
+    const was = !!(ov && ov.classList.contains('visible'));
+    const before = m ? m.innerHTML : '', prevCur = _SHEET.cur, depth = _SHEET.stack.length;
+    if (!_SHEET.restoring) {
+      if (was && _SHEET.cur) _SHEET.stack.push(_SHEET.cur);
+      else if (!was) _SHEET.stack = [];
+    }
+    _SHEET.cur = () => fn.apply(self, args);
+    const r = fn.apply(self, args);
+    // An opener that drew nothing (no data for that page) is not a step: undo the push.
+    if (was && !_SHEET.restoring && m && m.innerHTML === before) { _SHEET.stack.length = depth; _SHEET.cur = prevCur; }
+    paintSheetBack();
+    return r;
+  };
+}
+function sheetBack() {
+  const prev = _SHEET.stack.pop();
+  if (!prev) { closeHistorySheet(); return; }
+  _SHEET.restoring = true;
+  try { prev(); } finally { _SHEET.restoring = false; }
+  _SHEET.cur = prev;   // the saved closure calls the plain opener, so the wrapper never saw this page
+  paintSheetBack();
+}
+window.sheetBack = sheetBack;
+function paintSheetBack() {
+  const m = document.querySelector('#hist-overlay .readiness-modal');
+  if (!m) return;
+  const has = m.querySelector(':scope > .sheet-back');
+  if (!_SHEET.stack.length) { if (has) has.remove(); return; }
+  if (!has) m.insertAdjacentHTML('afterbegin', '<button type="button" class="sheet-back" onclick="sheetBack()">‹ Back</button>');
+}
+function wrapSheetOpeners() {
+  openHistorySheet = sheetWrap(openHistorySheet);
+  openExerciseSheet = sheetWrap(openExerciseSheet);
+  openWhyPlan = sheetWrap(openWhyPlan);
+  openQualitySheet = sheetWrap(openQualitySheet);
+  window.openHistorySheet = openHistorySheet; window.openExerciseSheet = openExerciseSheet;
+  window.openWhyPlan = openWhyPlan; window.openQualitySheet = openQualitySheet;
+  const close0 = closeHistorySheet;
+  closeHistorySheet = function () { _SHEET.stack = []; _SHEET.cur = null; return close0.apply(this, arguments); };
+  window.closeHistorySheet = closeHistorySheet;
+  // A page that redraws itself later (History fills in after its fetch) keeps its Back.
+  const m = document.querySelector('#hist-overlay .readiness-modal');
+  if (m) new MutationObserver(() => paintSheetBack()).observe(m, { childList: true });
+}
+
 // ── THE SPINE (2026-09-24) ───────────────────────────────────────────────
 // Idea #1 of "The Coaching Graph": one record per exercise Amir programmes
 // (supabase/stage31_spine.sql). Amir: "I just dont want to make my exercise cards
@@ -13731,6 +13793,7 @@ function esc(str) {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   }
+  wrapSheetOpeners();   // the sheet's ‹ Back (SHEET-01)
   // Back closes the top layer instead of leaving the app (NAV-01).
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initBackNav);
   else initBackNav();

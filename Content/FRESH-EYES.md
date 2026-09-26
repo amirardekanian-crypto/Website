@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**11 done · 11 partly done · 22 open**, of 44. Each was checked against the code on `main`.
+**12 done · 11 partly done · 21 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -55,9 +55,10 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#248](https://github.com/amirardekanian-crypto/Website/pull/248) | This Week is built from the session history: Done pills that last the week, the right day suggested, "2 of 3 sessions done this week", updated without a reload | HOME-01 |
 | [#249](https://github.com/amirardekanian-crypto/Website/pull/249) | The weigh-in box sits under the headline number, above the chart and every reading; the trend lines read in dark mode | BW-01 |
 | [#250](https://github.com/amirardekanian-crypto/Website/pull/250) | A session is filed under the local day it was finished, one date for every save of it; a session past midnight keeps its clock, check-in, note and rating for 6 hours | DATA-02 |
+| SHEET-01 PR | The info sheet keeps a trail: ‹ Back at the top, and the phone's Back steps back a page before it closes the sheet | SHEET-01 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01.
 
 **Partly done, and what is still open on each:**
 - **WK-01.** The quick part is done. Still open: kg on the rest screen beside reps and RPE, the live row
@@ -84,7 +85,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
   still sends a new athlete to the plan instead of Day 1.
 
 **Open.** P1: WK-02, CARD-01. P2: PROG-01,
-PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03. P3: DS-03, CONS-01, SHEET-01, PRF-05, WK-05, LIB-01, POL-01, POL-02, DOC-01.
+PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03. P3: DS-03, CONS-01, PRF-05, WK-05, LIB-01, POL-01, POL-02, DOC-01.
 
 ## Next, in order
 
@@ -103,7 +104,7 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 4. **Home and progress:** REC-01 (the estimate off the card), PROG-01, PLAN-01, DATA-02 (the unfinished day, after his call).
 5. **Coach and Proof:** COACH-02, NAV-02, SEAM-01 (after the habit count below), PRF-01, PRF-02,
    PRF-03.
-6. **System and polish:** DS-01, DS-03, CONS-01, SHEET-01, PRF-05, LIB-01, POL-01, POL-02, DOC-01.
+6. **System and polish:** DS-01, DS-03, CONS-01, PRF-05, LIB-01, POL-01, POL-02, DOC-01.
 
 ## Open calls and things to watch (put these to Amir)
 

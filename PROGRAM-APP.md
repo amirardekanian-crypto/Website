@@ -562,6 +562,10 @@ view. When the last layer closes through its own button, `navSync()` takes the g
 on Home still leaves the app, with no dead press. Nothing is tracked in a parallel stack: the page is the state,
 so it cannot drift. `initBackNav()` watches the overlays' `visible` class, the day view's `hidden` and each
 `.screen`'s class; `shared.js`'s video pop-up calls `navSync()` itself. Not in the coach preview.
+**One sheet, several pages (SHEET-01):** History, About, Why and Quality share `#hist-overlay`. Opening a page
+while the sheet is up remembers the page before it (`sheetWrap()` around each opener; an opener that draws
+nothing adds no step), a **‹ Back** sits at the top, and the phone's Back steps back a page before it closes
+the sheet. Closing forgets the trail. A new sheet opener gets wrapped in `wrapSheetOpeners()`.
 **AA Proof does the same** (HABITS.md → *The phone's Back button*), and never from the embedded strip on Home.
 **Still open:** one close grammar for the buttons (←, ✕, Close).
 
