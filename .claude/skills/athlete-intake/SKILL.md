@@ -59,11 +59,16 @@ Grouped into one round of questions, the genuine gaps to close:
 
 ## Step 3 — Emit the brief + register the athlete
 - Output the **ATHLETE BRIEF** (same structure the subagent uses), and under it the **first draft
-  of the athlete profile** (2026-09-26): the `profile` block whose format is in /program-assemble
-  Step 5. Fill what the form and Amir's answers settle (aim, sport, sex and age, training age,
-  goals in order, days, minutes, cap = form + 15, kit, injuries with status, bans, recovery,
-  language) and leave `bottleneck` for the roadmap. It is what every later check reads, so an
-  `aim` of strength-muscle vs sport is a question for Amir, not a guess.
+  of the athlete profile** (2026-09-26): the `profile` block whose format is in
+  `.claude/skills/program-design/PROFILE.md`. Fill what the form and Amir's answers settle (aim,
+  tier, sport, sex and age, training age, goals in order, days, minutes, cap = form + 15, kit,
+  injuries with status, bans, recovery, language) and leave `bottleneck` for the roadmap, which saves
+  the draft to the coaching log when it locks. It is what every later check reads, so an `aim` of
+  strength-muscle vs sport is a question for Amir, not a guess.
+  **`tier: academy (Etminan)`** when the intake row's `programme` is the Etminan Tennis Academy's:
+  that deal fixes 2 sessions of up to 60 minutes (a hard stop), home or court with minimum kit, and
+  no mid-cycle changes, so write `days: 2`, `cap: 60` and `aim: sport`, and ask Amir for the 3
+  priorities he takes from the player's match video (PROFILE.md). Every other athlete: `tier: -`.
 - **Register them: two server-side rows, written in ONE call** (both inserts in the same
   `execute_sql`). **No file, no key.**
   ⚠️ The old `athlete_keys` + `?client=&key=` mechanism is **retired** (2026-09-07). The

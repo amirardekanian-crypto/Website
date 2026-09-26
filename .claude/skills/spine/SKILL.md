@@ -164,8 +164,9 @@ the existing ids for the links, and they show you which names are only variants.
 Save the ids from `select id from public.exercises order by 1` to
 `<scratchpad>/existing_ids.txt`, one per line. Then:
 ```
-python3 .claude/skills/spine/draft_sql.py <scratchpad>/spine_batchN.json <scratchpad>/existing_ids.txt > <scratchpad>/spine_batchN.sql
+python .claude/skills/spine/draft_sql.py <scratchpad>/spine_batchN.json <scratchpad>/existing_ids.txt > <scratchpad>/spine_batchN.sql
 ```
+(`python` on Amir's PC, where `python3` is the Microsoft Store stub; `python3` in a cloud session.)
 The tool refuses the batch (exit 1, one line per problem) if it finds any of these: an id that
 already exists, a link to an id that doesn't exist, an unknown pattern, flag or quality, a
 self-link, an entry with no qualities or more than three, or no `credits`/`cost` (or a muscle not
@@ -268,7 +269,8 @@ no SFR. Answer them once and they stop mattering.
   Coach's Note.
 - Every write sets `updated_by = 'claude-pipeline'` and `updated_at = now()`.
 
-**3. Report it in one block at the end of the handoff** (`/program-assemble` Step 6):
+**3. Report it in one block at the end of the handoff** (`/program-assemble` Step 6b, the closing
+block after publishing):
 `SPINE — added 2 drafts (names) · filled 5 gaps (what) · body parts on 4 · counts on 2 · body-map muscles on 1 · tagged qualities on 3 (2 as suggestions on
 approved entries) · linked 2 (regressions/progressions/alternatives) · 3 new proposals on the pending list (entry: field old → new) ·
 7 waiting in all, yes or no on each? · N entries this programme uses are still drafts, approve them in coach.html → Exercises.`
@@ -281,9 +283,8 @@ A proposed change to a field that already has content on an **approved** entry (
 tennis, equipment, a link, a count, SFR, flags) is never written on the entry (rule 1) and never
 only printed in a handoff (it was lost if nobody acted that day: pipeline audit 5.2 item 7). It
 goes on the entry's coach-only half, `exercise_coach.suggested_changes`, beside
-`suggested_qualities`. The shape is in `supabase/stage43_spine_proposals.sql`. ⚠ That file is
-**not applied yet**: until it is, the write below fails with *column "suggested_changes" does not
-exist*. Then print the proposals in the handoff as before and say "stage43 not applied".
+`suggested_qualities`. The shape is in `supabase/stage43_spine_proposals.sql` (applied 2026-09-26:
+the column is live).
 
 **Write** (Upkeep step 2, one statement for all of the run's proposals; `why` is general, never an
 athlete's name or detail; `from` is the skill and the date):

@@ -104,11 +104,12 @@ Three layers, in the order a designer should read them:
 
 The brain behind every program. Read the principles before touching sets/reps.
 
-- **Philosophy:** [`.claude/COACHING-PRINCIPLES.md`](.claude/COACHING-PRINCIPLES.md) — Amir's codified S&C method («هیچی بی‌دلیل نیست» — nothing without a reason).
+- **Philosophy:** [`.claude/COACHING-PRINCIPLES.md`](.claude/COACHING-PRINCIPLES.md) — Amir's codified S&C method («هیچی بی‌دلیل نیست» — nothing without a reason): the rule index, then what each rule means. Its history (dates, Amir's words, where each rule came from) is [`.claude/COACHING-PRINCIPLES-HISTORY.md`](.claude/COACHING-PRINCIPLES-HISTORY.md), which no stage reads.
 - **How to run the pipeline:** [`.claude/COACHING-HOWTO.md`](.claude/COACHING-HOWTO.md)
 - **The brief agent:** [`.claude/agents/athlete-brief.md`](.claude/agents/athlete-brief.md) — data prep only: a new athlete's intake form from Gmail, and the Gmail session-report import /cycle-report runs first.
 - **Per-athlete rationale log:** coach-only *why* notes in `public.coaching_logs` on the server, read and written from coach.html → the athlete → File (it used to be `.claude/coaching-log/`, in this public repo).
 - **The 26 Sept 2026 pipeline audit:** [`.claude/PIPELINE-AUDIT-2026-09-26.md`](.claude/PIPELINE-AUDIT-2026-09-26.md) — what it found, what shipped, and what is still open.
+- **The second audit (26–27 Sept 2026):** [`.claude/PIPELINE-AUDIT-2026-09-27.md`](.claude/PIPELINE-AUDIT-2026-09-27.md) — speed, token cost, contradictions; Amir's nine answers and what shipped.
 
 **The skill pipeline** (`.claude/skills/` — run as `/name`):
 
@@ -116,9 +117,9 @@ The brain behind every program. Read the principles before touching sets/reps.
 |---|---|---|
 | 1 | [`athlete-intake`](.claude/skills/athlete-intake/SKILL.md) | Onboard a new client → Athlete Brief |
 | 2 | [`program-roadmap`](.claude/skills/program-roadmap/SKILL.md) | Lock the multi-cycle plan (run once) |
-| 3 | [`program-design`](.claude/skills/program-design/SKILL.md) | Design one cycle (the core S&C pass) |
-| 4 | [`program-engage`](.claude/skills/program-engage/SKILL.md) | Write the in-app messages/notes |
-| 5 | [`program-assemble`](.claude/skills/program-assemble/SKILL.md) | Build & validate `data/<id>.json` |
+| 3 | [`program-design`](.claude/skills/program-design/SKILL.md) | Design one cycle (the core S&C pass). [Queries](.claude/skills/program-design/queries.sql) (the one context pull, the log slice) · [The athlete profile](.claude/skills/program-design/PROFILE.md) (its format, the academy tier) |
+| 4 | [`program-assemble`](.claude/skills/program-assemble/SKILL.md) | **Part A:** build the programme and run every programming check (`scripts/check_program.py`), then straight on to step 5. **Part B**, after "ship it": place the words, full check, publish in one call (`publish_cycle()`) |
+| 5 | [`program-engage`](.claude/skills/program-engage/SKILL.md) | Write the in-app messages, notes, week notes and WhatsApp |
 | 6 | [`cycle-report`](.claude/skills/cycle-report/SKILL.md) | End of a cycle: the athlete's WhatsApp cycle report (wins, what they told you, what's next, what you need from them, 3 questions) + a coach-only **Debrief** section in their coaching log, which step 3 reads next time. [Queries](.claude/skills/cycle-report/queries.sql) · [Shamsi dates](.claude/skills/cycle-report/shamsi.py) |
 | ✎ | [`program-edit`](.claude/skills/program-edit/SKILL.md) | Review / fix an existing program |
 | 🔬 | [`sc-research`](.claude/skills/sc-research/SKILL.md) | Find & translate the S&C evidence |

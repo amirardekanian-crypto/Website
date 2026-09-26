@@ -961,6 +961,9 @@ No HTML editing required.
 
 ### Advancing to the Next Cycle
 
+The coaching pipeline never does this by hand: `public.publish_cycle()` does steps 1 to 3 on the
+server, building the archive entry from the live row (/program-assemble Step 7). What it does:
+
 1. **Put the previous `workouts` content FIRST in `programHistory`, with an `id`** (`"prog<N>"`; the simplified `{id, label, subtitle, days:[{label, focus, exercises[{name, detail}]}]}` shape). This is what the new past program card opens — don't skip it, or the card won't appear. Newest first and an `id` on every entry: see *How `programHistory` powers the home "past program" card*.
 2. **Replace `workouts.days`** with the new cycle's training days.
 3. **Increment `currentCycleIndex` by 1.**

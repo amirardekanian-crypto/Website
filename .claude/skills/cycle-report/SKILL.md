@@ -59,8 +59,8 @@ Files here: **`queries.sql`** (four read-only queries, tested on real rows) · *
 
 Run **Q1** in `queries.sql` (replace `ATHLETE_ID`). It returns the current cycle (`cycle`: name,
 `startDate`, `endDate`, `art`, `focuses`, `message.outcomes`), the next one (`next_cycle`:
-name, dates, focuses, `teaser`), the sport and the titles of the notes cards. **Read the note
-cards in full too** (`select data->'notes'->'cards' from programs where athlete_id = '…'`). They
+name, dates, focuses, `teaser`), the sport and **the notes cards in full** (Q1 returns them since
+2026-09-27; it used to take a second query). They
 hold the cycle's promises ("8 to 15 cm on a broad jump"), its gates ("the weight doesn't go up
 until I've cleared the film") and its rules ("week five you back off"). The report checks each one.
 
@@ -88,9 +88,10 @@ because athletes often start a day or two before the date) and run them:
   ⚠ In summaries written before the countersigned set log, every set line ends in ✓, so
   `ticked` is not evidence of ticking on those rows. Use the progress blob's `_setlog_` `d`
   flags, or leave it out.
-- **Q4** weigh-ins in the window, Personal Records entries, in-app messages, call logs, and the
-  coaching log. (It returns the log's head, profile, Exercise Ledger and roadmap, plus the cycle
-  just trained: its design read, its in-cycle edits. Older cycles are left out on purpose.)
+- **Q4** weigh-ins in the window, Personal Records entries, call logs, and the coaching log. (It
+  returns the log's head, profile, Exercise Ledger and roadmap, plus the cycle just trained: its
+  design read, its in-cycle edits. Older cycles are left out, unless the log has no finished
+  profile yet: then it comes back whole.)
 
 ## Step 2 · The read (for Amir first, then the athlete)
 
@@ -100,7 +101,7 @@ Work through this list. Each line is a finding only if the data says so.
 |---|---|---|
 | **Adherence** | sessions done / (weeks × days per week); name the missed day | The headline win, or the first thing to fix |
 | **Tolerance** | readiness avg + lowest; soreness "none" count; session RPE spread; any day notes | "Room to push" or "hold" for the next cycle |
-| **Time** | avg / min / max minutes, drop outliers under 15 (a timer left off) vs the design time in the log | The next cycle's time cap |
+| **Time** | avg / min / max minutes, drop outliers under 15 (a timer left off), against the modelled minutes in the cycle entry's day table (the checker writes them since 2026-09-27): real ÷ model per day and overall | The next cycle's time cap: the ratio goes in the Debrief, and design sizes the next cycle with it |
 | **Load trend** per primary | `top` per week, first → last | The win the athlete feels most |
 | **Flat lifts** | same `weights` string every session | Where the next cycle has the most room |
 | **Working sets** | `sets_at_top` vs the prescribed sets | 1–2 of 4 at the top weight = warm-ups typed into working rows, or a pyramid. Less stimulus than designed |
@@ -194,8 +195,9 @@ Coach-only. Only what changes a coaching decision. Sources: <n> session_history 
 (<first>–<last>), Gmail import: <its line>, <film review / calls / messages>. Athlete message:
 <language>, <channel>.
 
-**Adherence & tolerance** — sessions, missed days, readiness, soreness, session RPE, time vs
-design, sleep. End with the read ("absorbed easily, room to push" / "hold").
+**Adherence & tolerance** — sessions, missed days, readiness, soreness, session RPE, time (logged
+minutes against the modelled ones, and the ratio real ÷ model, which the next design's time check
+uses), sleep. End with the read ("absorbed easily, room to push" / "hold").
 
 **Loads as logged (top set per week)** — one line per primary; flag typos; film gate verdict.
 

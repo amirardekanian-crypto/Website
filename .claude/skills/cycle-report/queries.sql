@@ -13,11 +13,10 @@ select i,
        data->'cycles'->i                     as cycle,       -- name, dates, art, focuses, message.outcomes
        data->'cycles'->(i + 1)               as next_cycle,  -- name, dates, focuses, teaser
        jsonb_array_length(data->'cycles')    as n_cycles,
-       (select jsonb_agg(c->>'title') from jsonb_array_elements(data->'notes'->'cards') c) as note_cards
+       data->'notes'->'cards'                as note_cards   -- in full (2026-09-27: was a second query)
 from p;
--- Read the note cards themselves too (data->'notes'->'cards'): they hold promises
--- ("8 to 15 cm on a broad jump"), gates ("weight doesn't go up until I've cleared the film")
--- and rules ("week five you back off") that the report must check.
+-- The note cards hold promises ("8 to 15 cm on a broad jump"), gates ("weight doesn't go up until
+-- I've cleared the film") and rules ("week five you back off") that the report must check.
 
 -- ─── Q2 · every session in the window ───────────────────────────────────────────────────
 with params as (select 'ATHLETE_ID'::text id, date 'START' - 3 s, date 'END' e)
@@ -96,21 +95,21 @@ select
   (select jsonb_agg(c) from public.athlete_progress ap,
           jsonb_array_elements((ap.data->>(params.id || '_1rm'))::jsonb) c
    where ap.athlete_id = params.id and not coalesce((c->>'del')::boolean, false))  ceiling,
-  (select jsonb_agg(jsonb_build_object('at', m.created_at, 'from', m.sender, 'body', m.body) order by m.created_at)
-   from public.messages m where m.athlete_id = params.id
-     and m.created_at::date between params.s and params.e)                  messages,
+  -- (public.messages is no longer read: the in-app chat went, and Amir answers only on WhatsApp)
   (select jsonb_agg(jsonb_build_object('date', c.call_date, 'week', c.week, 'summary', c.summary,
                                        'done', c.sessions_done, 'planned', c.sessions_planned) order by c.call_date)
    from public.call_logs c where c.athlete_id = params.id
      and c.call_date between params.s and params.e)                          calls,
   -- the log's head (profile, ledger, roadmap) + the latest cycle's sections; the same slice as
-  -- /program-design STEP 0's 'log' (2026-09-26). A log whose cycles share one number comes back whole.
-  (select case when k > 1
+  -- /program-design's queries.sql Q1. It comes back whole when the log has one cycle, or no finished
+  -- profile (none yet, or one marked "status: partial"), so the Debrief can say what the profile misses.
+  (select case when k > 1 and cl_body_has_profile
       then substring(body from '^(.*?)\n## Cycle')
         || E'\n\n[Older cycle sections left out.]\n'
         || substring(body from ('\n## Cycle 0*' || n || '\M.*'))
       else body end
    from (select cl.body,
+           (cl.body ~ '```profile' and cl.body !~ '\nstatus:\s*partial') cl_body_has_profile,
            (select max(m[1]::int) from regexp_matches(cl.body, '\n## Cycle 0*(\d+)', 'g') m) n,
            (select count(distinct m[1]::int) from regexp_matches(cl.body, '\n## Cycle 0*(\d+)', 'g') m) k
          from public.coaching_logs cl where cl.athlete_id = params.id) lg)                coaching_log

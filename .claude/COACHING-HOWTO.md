@@ -15,10 +15,10 @@ server now, so nothing here needs "commit and push" to reach an athlete.)*
 | Say this | What happens |
 |---|---|
 | "onboard new client [name]" | Gathers their intake (their form + asks you the gaps) |
-| "build the roadmap" | Lays out their 5 cycles and locks them (no sign-off needed) |
+| "build the roadmap" | Lays out their 5 cycles, locks them (no sign-off needed) and saves them to their record straight away |
 | "cycle report for [name]" | End of a cycle: their WhatsApp report + the Debrief the next design reads |
-| **"do prompt 1"** (or "design [name]'s program") | Designs the cycle, asks you on real decisions, then builds it and runs every check |
-| **"do prompt 2"** (or "write her notes") | Writes the app message, notes, week-1 and back-off notes, completion text, WhatsApp |
+| **"do prompt 1"** (or "design [name]'s program") | Designs the cycle, asks you on real decisions, then builds it, runs every check and writes the notes |
+| "do prompt 2" (or "write her notes") | Only needed when the notes didn't follow on their own (a check stopped to show you something) |
 | "ship it" | Places the words, runs the full check, asks about any new library exercise, publishes |
 
 You can talk normally — "design [name]'s next cycle," "write her notes,"
@@ -34,20 +34,21 @@ You can talk normally — "design [name]'s next cycle," "write her notes,"
 2. Say **"design [name]'s next program."** → I read the Debrief and *why* we built the last
    cycle the way we did (your coaching log), and **stop to check with you** on any real
    decision. Answer my questions.
-3. Say **"go ahead."** → I write the programme, build it and run every check on it, before a
-   word of the notes exists.
-4. Say **"do prompt 2."** → app message, notes, the week-1 and back-off notes, WhatsApp.
-5. Say **"ship it."** → it goes live on their phone, and this cycle's reasoning is saved to
-   their coaching log.
+3. Say **"go ahead."** → I write the programme, build it and run every check on it, and then
+   write the app message, notes, the week-1 and back-off notes and WhatsApp. If a check overturns
+   something you decided, I stop and show you first.
+4. Read it all, then say **"ship it."** → it goes live on their phone, and this cycle's reasoning
+   is saved to their coaching log.
 
 ## New client — onboarding
 
 1. Say **"onboard new client [name]"** → I pull their intake form and ask you
    what's missing (injuries, equipment, days/week).
-2. Say **"build the roadmap."** → their 5 cycles, with a second opinion from one reviewer.
+2. Say **"build the roadmap."** → their 5 cycles, with a second opinion from one reviewer, saved to
+   their record straight away, so the next step can be a new chat.
 3. Say **"do prompt 1."** → their first programme, built and checked (a new athlete also gets
-   one independent review).
-4. Say **"do prompt 2."** → **"ship it."**
+   one independent review), then the notes.
+4. Read it all, then say **"ship it."**
 
 ---
 
@@ -82,8 +83,9 @@ rule into one skill file: the other stages would never see it (PRC-23). The skil
 `.claude/skills/` are plain text if you want to read them. To edit your saved philosophy, open
 `.claude/COACHING-PRINCIPLES.md`. It starts with the **rule index**: every rule on one numbered
 line (like `VOL-8`, the 4-set cap), what stage uses it, and whether the checker enforces it. The
-dated stories below it say why each rule exists. Change a rule on its line; the skills point to
-the number, so the change reaches every stage at once.
+stories below it say what each rule means in practice; the dates and your own words are in
+`.claude/COACHING-PRINCIPLES-HISTORY.md`. Change a rule on its line; the skills point to the
+number, so the change reaches every stage at once.
 
 ## Using it in other chats / on another computer
 

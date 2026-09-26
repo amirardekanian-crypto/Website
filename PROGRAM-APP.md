@@ -136,7 +136,7 @@ Amir: *"update the app in a way that it can show first week or last week"*.
 - **The athlete profile** (same day): a `profile` block at the top of each coaching log (aim,
   goals, bottleneck, minutes/cap, kit, bans, injuries, proven…), kept current like the Exercise
   Ledger. Design copies it into the spec and the checker sets its flags from it. Older athletes get
-  theirs at their next cycle. Format: /program-assemble Step 5.
+  theirs at their next cycle. Format: `.claude/skills/program-design/PROFILE.md`.
 - The same day `check_program.py` took Amir's answers from the audit: the 10-set floor is `--floor`
   (strength-and-muscle aims only, every major muscle, any sex; `floor-except:` names an excused
   muscle), more than 4 sets needs `--proven`, a first cycle switches the new-athlete rules on by

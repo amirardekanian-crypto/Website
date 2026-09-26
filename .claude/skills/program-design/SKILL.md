@@ -1,25 +1,11 @@
 ---
 name: program-design
-description: Design one athlete's training program for a cycle — the core S&C design pass, run as an assistant-coach who consults Amir on genuine forks and learns his style over time. Use when Amir says "design <name>'s program", "do prompt 1", "write her next cycle", or after /athlete-intake + /program-roadmap for a new client. Auto-detects NEW (athlete analysis, SFR selection) vs RETURNING (cycle review, progress/replace/add). Reads the locked roadmap, a clean Athlete Brief, and COACHING-PRINCIPLES.md; outputs the program SPEC + coach-facing reports. Then /program-assemble Part A builds and checks it, /program-engage (Prompt 2) writes the words, and /program-assemble Part B publishes.
+description: Design one athlete's training program for a cycle — the core S&C design pass, run as an assistant-coach who consults Amir on genuine forks and learns his style over time. Use when Amir says "design <name>'s program", "do prompt 1", "write her next cycle", or after /athlete-intake + /program-roadmap for a new client. Auto-detects NEW (athlete analysis, SFR selection) vs RETURNING (cycle review, progress/replace/add). Reads the locked roadmap, a clean Athlete Brief, and COACHING-PRINCIPLES.md; outputs the program SPEC + coach-facing reports. Then /program-assemble Part A builds and checks it and goes straight on to /program-engage (the words), and /program-assemble Part B publishes after Amir's "ship it".
 ---
 
-> ## ⚠️ Programmes live on the SERVER, not in files
-> `data/*.json` is deleted, gitignored and 404 on the live site. The authoritative
-> copy of every programme is a row in `public.programs` on Supabase.
->
-> **To read one:** query it through the Supabase MCP —
-> `select data from programs where athlete_id = '<id>';`
-> A `data/<id>.json` on this PC is a local scratch copy and may be stale the moment
-> Amir edits anything in the dashboard. Never trust it over the table.
->
-> **To write one:** a whole new cycle is published by **/program-assemble Step 7** in one call
-> (`public.publish_cycle()`: the programme, the roadmap patch and the coaching log together),
-> never handed to Amir as a file. A change inside the live cycle is /program-edit's (it writes
-> the changed paths). Amir's own small changes go through the dashboard's inline editor, which
-> versions every save.
->
-> **The coaching log is on the server too** — `public.coaching_logs`, coach-only.
-> It is no longer `.claude/coaching-log/<id>.md`, which was tracked in a public repo.
+> Programmes and coaching logs live on the server (`public.programs`, `public.coaching_logs`;
+> CLAUDE.md → *THE BIG ONE*). A local `data/<id>.json` is scratch, never the truth. A new cycle is
+> published by /program-assemble Step 7; a change inside the live cycle is /program-edit's.
 
 
 # Program Designer — Prompt 1 (Stage B)
@@ -66,100 +52,45 @@ change before I build?"* before writing exercises.
 - When Amir makes a call during design that is **generalizable** (would apply to other
   athletes — e.g. an exercise preference, a dosing rule, a communication choice), ask:
   *"Save this as a principle?"* On yes, add it the way the file's *How to add* says: one index
-  line with the next free ID in its section (25 words or fewer, its stage, its check) and a dated
-  story bullet tagged with the same ID; `scripts/check_rule_index.py` checks the pair. **One-off,
+  line with the next free ID in its section (25 words or fewer, its stage, its check), a story
+  bullet tagged with the same ID, and its date and Amir's words in `COACHING-PRINCIPLES-HISTORY.md`;
+  `scripts/check_rule_index.py` checks the pair. **One-off,
   athlete-specific calls are NOT saved** — Amir curates what's learned. **During the rule freeze
   (PRC-25)** offer this only when his call fixes something that actually broke.
 
 ## STEP 0 — Setup
-0. **Sync first — `git pull --rebase` before reading anything.** COACHING-PRINCIPLES,
-   SCHEMA, and the pipeline skills are edited from Amir's other sessions/machines;
-   designing against a stale working copy silently drops his newest rules (it happened:
-   a cycle shipped with rep ranges + plain-text notes because the rules landed in git
-   mid-design). If the pull fails (conflicts/WIP), say so and continue with a warning.
-   **When it fails, read the pipeline from `origin/main` instead**: `git fetch`, then
-   `MSYS_NO_PATHCONV=1 git show origin/main:<path>` (Git Bash otherwise rewrites
-   `origin/main:.claude/…` into a Windows path) for COACHING-PRINCIPLES, SCHEMA, the three
-   program skills and `scripts/check_program.py`. **That includes this file: the Skill tool loaded
-   it from the stale working tree.** On 2026-09-26 the checkout was 101 commits behind with other
-   sessions' edits in the way, and the skill as loaded still allowed rep ranges, cues in the spec
-   and the retired three-agent panel.
-   **When the pull succeeds, the loaded skill can still be old**: the Skill tool read this file
-   before the pull. Note `git rev-parse HEAD` first; after the pull, `git diff --name-only <that>
-   HEAD -- .claude SCHEMA.md scripts` lists what changed, and every pipeline file on that list
-   (this skill included) is Read from disk again before going on.
+0. **Check the pipeline is current, without pulling** (2026-09-27). The rules and skills are edited
+   from Amir's other sessions, and designing against a stale copy silently drops his newest rules
+   (on 2026-09-26 a checkout 101 commits behind still allowed rep ranges and the retired panel). But
+   this folder is shared by several sessions: `git pull` refuses when one has work in progress, and
+   when it runs it moves the one HEAD they all share. So never pull here. Run
+   `git fetch -q origin && git diff --name-only HEAD origin/main -- .claude SCHEMA.md scripts assets/js/chips.js`.
+   An empty list means the local files are current. Every file on it is newer on `origin/main`:
+   read it from there with `MSYS_NO_PATHCONV=1 git show origin/main:<path>` (Git Bash otherwise
+   rewrites the path), **this skill included**, since the Skill tool loaded the local copy. If
+   `scripts/check_program.py` or `assets/js/chips.js` is on the list, write both from `origin/main`
+   into `<scratch>/pipeline/` at the same paths and run `python <scratch>/pipeline/scripts/check_program.py`
+   for the whole run: run it, never read it.
 1. Read **`.claude/COACHING-PRINCIPLES.md`**: the rule index, then the stories (apply throughout).
+   Not `COACHING-PRINCIPLES-HISTORY.md`: its dates and quotes change no decision.
 2. Establish `athlete_id`. If Amir pasted athlete info, proceed without commentary.
-3. **ONE context pull: everything design reads from the server, in a single call.** Run it once
-   per athlete and keep the result for the whole pipeline (roadmap, design, assemble). Never look
-   these up again one at a time, and never discover the schema: the tables and columns are all
-   named here. *(2026-09-25: the last new-athlete run made 43 database calls, 36 of them lookups,
-   and every one was an approval prompt for Amir.)*
-   ```sql
-   select jsonb_build_object(
-     'row', (select jsonb_build_object(
-               'has_workouts', jsonb_typeof(data->'workouts'->'days') = 'array',
-               'cci', coalesce((data->>'currentCycleIndex')::int, 0),
-               'athlete', data->'athlete', 'sport', data->'sport', 'cycles', data->'cycles',
-               'notes', (select jsonb_agg(c->'title') from jsonb_array_elements(coalesce(data->'notes'->'cards', '[]'::jsonb)) c),
-               'programme', (select jsonb_agg(jsonb_build_object('day', d->'id', 'tag', d->'focusTag', 'blocks',
-                   (select jsonb_agg(jsonb_build_object('t', b->'title', 'x',
-                      (select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('n', e->'name', 'rx', e->'rx', 'rounds', e->'rounds',
-                          'note', e->'note', 'test', e->'test',
-                          'chips', (select jsonb_agg(coalesce(ch->'label', ch)) from jsonb_array_elements(case when jsonb_typeof(e->'chips') = 'array' then e->'chips' else '[]'::jsonb end) ch),
-                          'items', (select jsonb_agg(i->'name') from jsonb_array_elements(case when jsonb_typeof(e->'items') = 'array' then e->'items' else '[]'::jsonb end) i))))
-                       from jsonb_array_elements(b->'exercises') e)))
-                    from jsonb_array_elements(d->'blocks') b)))
-                 from jsonb_array_elements(case when jsonb_typeof(data->'workouts'->'days') = 'array' then data->'workouts'->'days' else '[]'::jsonb end) d))
-             from public.programs where athlete_id = '<id>'),
-     'sessions', (select jsonb_build_object('n', count(*), 'last', max(completed_on),
-                    'minutes_by_day', (select jsonb_object_agg(dd, m) from (select day as dd, round(avg(duration_min)) as m
-                       from public.session_history where athlete_id = '<id>' and duration_min > 10
-                        and completed_on >= current_date - 42 group by day) x))
-                  from public.session_history where athlete_id = '<id>'),
-     -- The log's head (profile, ledger, roadmap) + everything from the latest cycle's first
-     -- section on (its edits, its Debrief). Older cycle sections stay on the server (2026-09-26).
-     'log', (select case when k > 1
-                then substring(body from '^(.*?)\n## Cycle')
-                  || E'\n\n[Older cycle sections left out: ctx.log_index lists every heading.]\n'
-                  || substring(body from ('\n## Cycle 0*' || n || '\M.*'))
-                else body end
-             from (select body,
-                     (select max(m[1]::int) from regexp_matches(body, '\n## Cycle 0*(\d+)', 'g') m) as n,
-                     (select count(distinct m[1]::int) from regexp_matches(body, '\n## Cycle 0*(\d+)', 'g') m) as k
-                   from public.coaching_logs where athlete_id = '<id>') lg),
-     'log_index', (select jsonb_agg(m[1]) from public.coaching_logs l,
-                     regexp_matches(l.body, '\n(## [^\n]+)', 'g') m where l.athlete_id = '<id>'),
-     'cycle_names_in_use', (select jsonb_agg(distinct c->>'name') from public.programs p,
-                            jsonb_array_elements(coalesce(p.data->'cycles', '[]'::jsonb)) c),
-     'qualities', (select jsonb_agg(id order by sort) from public.qualities where status = 'approved')
-   ) as ctx,
-   (select string_agg(concat_ws('|', e.id, e.name, coalesce(e.pattern, ''), e.status, coalesce(c.sfr::text, '-'),
-             coalesce(array_to_string(c.flags, ','), ''), coalesce(array_to_string(e.qualities, ','), ''),
-             coalesce(array_to_string(e.loads, ','), ''), coalesce(e.impact, '-'),
-             coalesce(array_to_string(e.easier, ','), '') || '>' || coalesce(array_to_string(e.harder, ','), '') || '>' ||
-             coalesce(array_to_string(e.alts, ','), ''),
-             coalesce(array_to_string(e.aliases, ';'), ''), case when e.video is null then 'novideo' else 'video' end,
-             case when c.credits is null then '-' when c.credits = '{}'::jsonb then 'none' else
-               (select string_agg(k || ':' || w, ',' order by k) from jsonb_each_text(c.credits) t(k, w)) end,
-             coalesce(c.cost, '-')),
-             E'\n' order by e.pattern, c.sfr nulls last, e.id)
-    from public.exercises e left join public.exercise_coach c using (id)) as spine;
-   ```
+3. **ONE context pull: everything design reads from the server, in a single call**: **Q1 in
+   `queries.sql`** (this skill's folder; replace `<id>`). Run it once per athlete and keep the result
+   for the whole pipeline (roadmap, design, assemble). Never look these up again one at a time, and
+   never discover the schema: the tables and columns are all named there (PRC-6).
    - **Mode** from `ctx.row.has_workouts` and `ctx.sessions.n` (`data/*.json` is deleted, so a
-     file test calls everyone NEW). Workouts and logged sessions → **RETURNING**; no row, or a
-     row holding only intake's `athlete`/`sport` → **NEW**. Workouts but **no** sessions → the
-     athlete never trained the last cycle (no login yet? check `athlete_identities`): stop and
-     ask Amir before designing.
+     file test calls everyone NEW). Workouts and logged sessions → **RETURNING**; no row, or a row
+     with no workouts (intake's identity, and the roadmap once it has locked) → **NEW**. Workouts
+     but **no** sessions → the athlete never trained the last cycle (no login yet? check
+     `athlete_identities`): stop and ask Amir before designing.
    - `ctx.log` is the coaching log's **head** (header, athlete profile, Exercise Ledger, roadmap
      rationale) plus **everything from the latest cycle on** (its entry, its in-cycle edits, its
-     Debrief). Older cycle sections are left out on purpose: they cost 5–20k characters a run and
-     rarely change a decision (the audit, 2026-09-26). `ctx.log_index` lists every `##` heading;
-     when the latest entry points back to an older one, fetch just that section:
-     `select substring(body from position('<heading>' in body) for 15000) from public.coaching_logs
-     where athlete_id = '<id>'` and read it up to the next `## `. A log whose cycle headings all
-     share one number comes back whole. `ctx.cycle_names_in_use` stops a roadmap reusing a
-     cycle name. `ctx.qualities` are the Quality Map words.
+     Debrief). Older cycle sections are left out on purpose. It comes back **whole** when the log has
+     one cycle, or no finished profile (none yet, or one marked `status: partial`), because step 5a
+     then builds the profile from all of it. `ctx.log_index` lists every `##` heading; when the
+     latest entry points back to an older one, fetch just that section with **Q3**.
+     `ctx.cycle_names_in_use` stops a roadmap reusing a cycle name. `ctx.qualities` are the Quality
+     Map words.
    - `ctx.row.programme` is the cycle being reviewed as prescribed: every day, block and exercise
      with its `rx` (or legacy `chips`), Coach's Note and test flag. STEP 1A needs no other read of
      it. `ctx.row.cycles` is the whole roadmap and `ctx.row.athlete`/`sport` the identity block,
@@ -170,11 +101,11 @@ change before I build?"* before writing exercises.
      first: `id|name|pattern|status|sfr|flags|qualities|loads|impact|easier>harder>alts|aliases|video|credits|cost`.
      `credits` is what one working set counts toward (`glutes:0.5,quads:1`; `none` = nothing) and
      `cost` its day-load tier: size the week's volume with them, since the checker counts from them.
-     It replaces the catalogue query under THE SPINE below. Save it to the scratchpad to grep it;
-     its first field is also `draft_sql.py`'s existing-ids list. The entry's `name` is not always
-     the card's (`Inverted Row (BW)`, whose card says Inverted Row); the card follows its `exId`, so it
-     gets the entry's cues and video either way. Every `novideo` exercise you prescribe goes on the
-     handoff's film list (videos live on the entries, added in coach.html → Exercises).
+     **Read it here and never copy it into a file** (it is 39,000 characters): Part A's checker
+     resolves every card name on the server (2026-09-27). The entry's `name` is not always the card's
+     (`Inverted Row (BW)`, whose card says Inverted Row); the card follows its `exId`, so it gets the
+     entry's cues and video either way. Every `novideo` exercise you prescribe goes on the handoff's
+     film list (videos live on the entries, added in coach.html → Exercises).
 4. **Get the brief:**
    - RETURNING → **the Debrief IS the brief** (the one evidence path since 2026-09-26). If
      `ctx.log` has no **`## Debrief`** for the cycle just trained, run **/cycle-report** first: it
@@ -187,17 +118,22 @@ change before I build?"* before writing exercises.
      2026-09-26: it spent ~225k tokens and 10 minutes re-deriving what a Debrief says, with its own
      e1RM formula. The e1RM this design uses is the Debrief's **The Ceiling** line (see *The
      Ceiling* below for how it may be used).
-   - NEW → use the ATHLETE BRIEF from /athlete-intake. If none, stop and ask Amir to run
+   - NEW → use the ATHLETE BRIEF from /athlete-intake. In a new chat, the profile draft and the
+     roadmap's read and rationale in `ctx.log` (saved when the roadmap locked, PRC-3) plus intake's one
+     lookup (/athlete-intake Step 1) stand in for it. If neither exists, stop and ask Amir to run
      /athlete-intake first.
 5a. **The athlete profile — read it first** (2026-09-26). The `## Athlete profile` block at the
    top of `ctx.log` says who the athlete is today: aim (sport / strength-muscle / general), goals in
    order, the bottleneck, days and real minutes, kit, standing bans, injuries with status,
    recovery. Apply the Debrief's **Profile changes** to it. **No profile yet** (every athlete before
-   2026-09-26): build it this cycle from the WHOLE log (`select body from public.coaching_logs where
-   athlete_id = '<id>'`, once: the old injuries and bans may sit in an early cycle's section), the
-   latest Debrief, the roadmap and the intake form, and show the whole block at the checkpoint. A NEW athlete's comes from /athlete-intake's
-   brief plus the roadmap's read. The format is in /program-assemble Step 5. It opens the spec,
-   and the checker takes `aim`, `proven`, `bans`, `floor-except` and `cap` from it.
+   2026-09-26), **or one marked `status: partial`**: `ctx.log` is then the whole log (Q1 returns it
+   whole, since the old injuries and bans may sit in an early cycle's section). Build or complete
+   the profile from it, the latest Debrief, the roadmap and the intake form (whose `programme` sets
+   the `tier`), keeping any lines already there, and show the whole block at the checkpoint. A NEW athlete's comes from
+   /athlete-intake's draft plus the roadmap's read. **The format, the academy tier and `partial` are
+   in `PROFILE.md`** (this skill's folder). An academy athlete (`tier: academy`) is designed to that
+   tier's limits. The profile opens the spec, and the checker takes `aim`, `proven`, `bans`,
+   `floor-except` and `cap` from it.
 5. **RETURNING — read the prior rationale:** `ctx.log` from the context pull (step 3).
    This is the *why* behind the last cycle — why each primary was chosen, what changed
    mid-cycle and why — and it is the thread you continue. The next
@@ -221,9 +157,8 @@ change before I build?"* before writing exercises.
    the Debrief's exercise-specific signals (dislikes and pain tied to a named exercise, not just
    general injury) before finalizing REPLACE (SEL-17; the ledger's columns: Exercise · Status ·
    Last cycle · Note).
-6. Read the **locked roadmap** (`cycles[]`) and `Content/PRODUCT.md` for system context.
-   Honour the roadmap's focus for THIS cycle; deviate only if the brief demands it, and
-   state the data point + reason.
+6. Read the **locked roadmap** (`ctx.row.cycles`). Honour the roadmap's focus for THIS cycle;
+   deviate only if the brief demands it, and state the data point + reason.
 7. **Female athlete — flag, don't assume, the period-week note.** Whether the period-week
    protocol (PRC-21) belongs in this cycle's notes is confirmed with
    Amir every cycle — never stored, never auto-included. Add it to the questions you batch
@@ -237,8 +172,8 @@ change before I build?"* before writing exercises.
 coherent multi-cycle logic, not designing fresh. Progress and edit from the data; change the
 *logic* only when a data point forces it — and when you do, name the why (it becomes this
 cycle's log entry).
-- **ADAPTATION RESPONSE** — strength/RPE trends, loads progressed, rep ranges hit; the
-  **e1RM trend** per primary (the Debrief's The Ceiling, with each grade); where she
+- **ADAPTATION RESPONSE** — strength/RPE trends, loads progressed, reps hit; the
+  **e1RM trend** per primary (the Debrief's The Ceiling, with each grade); where they
   over/under-performed + the read.
 - **RECOVERY & LIFESTYLE INTEGRATION** *(required)* — sleep, stress, session-RPE trend AND
   the check-in chat. Separate training fatigue from life load. Close with a concrete
@@ -274,7 +209,7 @@ non-primary, non-warm-up exercises from the prior cycle would carry over unchang
 detail — it happened once at 83%, caught only on review, not at design time. The
 "keep best-in-class" exception is for rehab/corrective work only; don't stretch it to
 accessories just because their load is progressing well on paper — that kind of progress
-is invisible to the athlete, new movements are what read as forward motion, and she pays
+is invisible to the athlete, new movements are what read as forward motion, and they pay
 monthly expecting to feel it. Anything genuinely kept (equipment constraint, a real
 rehab/corrective reason) must still carry a visible dose progression — more sets, more
 rounds, more load, or a harder variant. Never re-ship an identical prescription cycle to
@@ -293,8 +228,8 @@ have had. `Disliked`, `Pain-flagged` and `Banned` never come back without a stat
 variant they did two cycles ago is allowed (it is still a variant), but prefer one they haven't
 done recently, so the cycle reads as new: diffing only against the last cycle once passed two
 "fresh" picks the athlete had already done in the cycle before. If the ledger predates this
-athlete (not yet backfilled), fall back to scanning prior `programHistory` entries further back
-than just the last one.
+athlete (not yet backfilled), fall back to the older cycle sections of the log (`ctx.log_index`;
+fetch one with Q3).
 
 Close with three **LOCKED LISTS** (Step 3 executes exactly), then classify retained items
 (primary / accessory / activation-corrective):
@@ -366,11 +301,13 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   the priority muscles are already well-dosed. A session that fits comfortably under its cap with nothing added is a
   design miss, not a light day — light days should be a deliberate undulation choice (see
   PER-DAY LOAD DISTRIBUTION above), not leftover time.
-  **RETURNING athlete: calibrate against reality first.** Put the last cycle's days through the
-  script's own timing (`day_minutes()` in `scripts/check_program.py`) and compare them with
-  `ctx.sessions.minutes_by_day`. One athlete's Cycle 1 modelled ~48 min and ran 69 (×1.44), so a
-  55-minute design meant ~75 real. Tell Amir the expected real length at the checkpoint, not
-  only the model's number, and note the ratio in the log for the next cycle.
+  **RETURNING athlete: calibrate against reality first.** The model runs short: one athlete's
+  Cycle 1 modelled ~48 min and ran 69 (×1.44), so a 55-minute design meant ~75 real. Take the ratio
+  from the last Debrief's time line (logged minutes against the modelled minutes that `--tables`
+  writes into each log entry since 2026-09-27); without one, set your estimate against
+  `ctx.sessions.minutes_by_day`. Part A's check prints the exact ratio (last cycle's model against
+  its logged minutes) and each new day's expected real length, and holds the soft cap against that.
+  Tell Amir the expected real length at the checkpoint, not only the model's number.
   **NEW athlete: no logs yet, so design to the form's minutes plus 15** (Amir, 2026-09-26:
   *"form + 15"*), unless they said plainly that the time is a hard stop.
 - **Sequencing within a day:** power/CNS → Primary → Accessory → corrective/Core →
@@ -406,16 +343,15 @@ still checked before Amir sees the finished programme, but the three-agent panel
 (PRC-4). The review happens on
 the BUILT programme, in /program-assemble **Part A**, straight after this spec and BEFORE engage
 writes anything (so a fix never leaves notes describing the old programme):
-1. **`scripts/check_program.py`** on the built file, with the Spine file (`--spine`: it counts the
-   volume from each exercise's credits and writes both tables with `--tables`) and the athlete's
-   bans (`--ban`, from your contraindication read). Every FAIL is fixed. It
-   covers what the old panel mostly found: the 10-set floor (only with `--floor`, when the
-   programme's aim is strength and muscle; a sport-performance athlete gets what is best for
-   them, Amir 2026-09-26), the 4-set cap (`--proven` once our own logs show the athlete handles
-   more), the new-athlete rules (on by themselves in a first cycle), a banned movement in any
-   exercise or fallback, RPE floors in every note, the week-1 and back-off notes, back-to-back
-   days and the Spine gate. Session length and the Quality headline are only warnings; pass
-   `--cap` the athlete's real minutes when they are known.
+1. **`scripts/check_program.py`** on the built file (Part A runs it). **Your spec's athlete profile
+   sets its flags**: `aim: strength-muscle` turns on the 10-set floor (never for a sport athlete, VOL-4),
+   `proven` lifts the 4-set cap (VOL-8), `bans` and `floor-except` are read as written, and `cap` is
+   the soft session length; a first cycle turns the new-athlete rules on by itself. So get the
+   profile right rather than typing flags (a typed flag only ever adds one). What it checks is the
+   rule index's Check column: the floors, the set cap, the new-athlete rules, bans in any exercise
+   or fallback, RPE floors in every note, the week notes, back-to-back days, the Spine gate, the card
+   names, retest flags, block order and continuity. Every FAIL is fixed; session length and the
+   Quality headline are warnings.
 2. **NEW athlete: ONE reviewer** (one agent, files only) for what a script cannot judge:
    injury logic, exercise choice, transfer, and whether the notes cover every exercise they
    should. **RETURNING athlete: no reviewer** unless Amir asks for one.
@@ -527,8 +463,8 @@ The same list drives WhatsApp message 2 and your handoff (MEASURE, GATE, FILM, D
 **THE SPINE — read it before choosing (2026-09-24).** Every exercise Amir programmes has (or
 will have) one entry in `public.exercises`, with its coach-only half in `public.exercise_coach`.
 You already have all of it: the `spine` column of STEP 0's context pull, one line per entry
-(`id|pattern|status|sfr|flags|qualities|loads|impact|easier>harder>alts|aliases`). Don't query
-it again exercise by exercise. Use it for the decisions this pass already makes: **SFR** order within a pattern (`sfr` 1 = best),
+(`id|name|pattern|status|sfr|flags|qualities|loads|impact|easier>harder>alts|aliases|video|credits|cost`).
+Don't query it again exercise by exercise. Use it for the decisions this pass already makes: **SFR** order within a pattern (`sfr` 1 = best),
 **restrictions** (`flags`: `loaded-knee-flexion`, `axial-load`, `free-hinge`, `high-impact`,
 `overhead` — check every flag against the athlete's injury picture), and **PROGRESS/REPLACE**
 with the entry's links: `harder` = progressions (the same movement made harder), `easier` =
@@ -543,9 +479,10 @@ are the one approval question in the handoff. Never swap a movement out because 
 
 **THE QUALITY CHECK — before the spec goes to Amir (Quality Map, 2026-09-24).** Each Spine entry
 carries `qualities` (first = primary) from the ten: `strength · muscle · power · spring · speed ·
-brakes · rotation · engine · armour · movement`. The cycle's `art` word is its headline
-(`iron`→strength, `build`→muscle, `voltage`→power, `spring`, `brakes`, `engine`, `armour`,
-`bedrock`, `peak` and `reset` are phases, a foundation, sharpening or recovery block that trains a mix on purpose, so no headline). Count the designed week's
+brakes · rotation · engine · armour · movement`. The cycle's `art` word names its headline:
+`iron` strength, `build` muscle, `voltage` power, and `spring`, `brakes`, `engine` and `armour` each
+their own quality. Only `bedrock`, `peak` and `reset` have no headline: they are phases (a
+foundation, a sharpening or a recovery block) that train a mix on purpose (PRC-24). Count the designed week's
 working sets per quality (PRC-26): primary 1, secondary ½, prep blocks skipped, and an exercise dosed by
 time with no sets (a 30-min ride) counts one set per 10 minutes, never less than 1 (the same rule
 as the athlete's day cards and coach.html → Exercises → *Quality check*; 2026-09-26). **The headline
@@ -601,7 +538,7 @@ Primary · Accessory · Core · [conditioning]); assemble assigns titles, icons,
 vivid `focusTag`, and canonical names.
 ````
 ```profile
-[the current athlete profile, updated this cycle: /program-assemble Step 5 has the format]
+[the current athlete profile, updated this cycle: PROFILE.md has the format]
 ```
 ATHLETE_ID: [id]
 SPORT_BADGE: [emoji] [label]
@@ -610,7 +547,7 @@ week: [the usual training week, e.g. Sat:1, Mon:2, Wed:3 — turns on the back-t
 week1: [rpeCap 7 / rpeDrop 1 on what, and what moves them back to the card] (or "same as the card")
 lastweek: [setsDrop 1 · rpeCap 6, plus anything else that changes] (every cycle)
 bans: [one line, if any]
-floor-except: [muscle (reason), only when --floor applies and a muscle is excused]
+floor-except: [muscle (reason), only when the aim is strength-muscle and a muscle is excused]
 obligations:
 - backoff
 - [week1 · explainer · pain-ladder: knee · film: … · weigh-in · double-day · low-readiness · …, one per line]
@@ -689,7 +626,8 @@ say so in one line rather than omitting the section.
 **Volume & Dose** — **the checker writes the tables; nobody types them** (2026-09-26). Part A's
 build check (`check_program.py --tables`) counts every exercise from its Spine entry's credits
 (VOL-10: 1 prime mover, 0.5 helper; warm-ups count only core) and writes the per-exercise table,
-the per-muscle totals against 10–20 and each day's cost-weighted load. /program-assemble pastes
+the per-muscle totals against 10–20, and each day's cost-weighted load and minutes (modelled, and
+the expected real length once a ratio exists). /program-assemble pastes
 that file here as written. Leave the line `<the checker's tables>` in your draft, and write only
 what the numbers can't say, in a few lines: a time-limited under-dose framed as maintenance and
 where to invest if time allows (VOL-1), a muscle under 10 by choice and why (VOL-9, the spec's
@@ -705,71 +643,31 @@ went on 2026-09-26. An e1RM that drove a decision belongs in "The read", with it
 Then **build and check before any words are written** (2026-09-26): **/program-assemble Part A**
 builds the workouts, drafts any new exercise into the Spine, runs `check_program.py --stage build`
 and, for a new athlete, the one review. Every FAIL there is yours: change this spec and the log
-entry together, and rebuild. Only then **/program-engage** (Prompt 2) writes the words, and
-**/program-assemble Part B** places them, runs the full check, writes the log and publishes.
+entry together, and rebuild. When the build passes and no FAIL overturned a checkpoint answer, Part
+A goes straight on to **/program-engage** (PRC-4: no "do prompt 2"), and after Amir's "ship it"
+**/program-assemble Part B** places the words, runs the full check, writes the log and publishes.
 
-## THE CEILING — the athlete's 1RM tracker (a design input, not a prescription)
+## THE CEILING — the e1RM (a design input, never a prescription)
 
-Athletes now carry an **estimated 1RM per lift**, built from the sets they already log.
-`program.html` derives it from any set that has both a weight and an RPE (reps in reserve
-= 10 − RPE, added back before the maths), and the history lives in **Personal Records**, reached
-from its card on Home (the screen was called The Ceiling until 2026-09-26). Since then a finished
-session's best set goes on by itself whenever it beats the lift's best (`auto`). Nobody has to
-test a true max for this to exist.
-
-**Read it before you set loads.** For a RETURNING athlete it arrives as the Debrief's **The
-Ceiling** line (the one e1RM this pass uses: estimate, grade, date), and it also
-carries **relative strength** (estimated 1RM ÷ body weight, from the athlete's latest
-weigh-in). **Body weight is logged on the programme app's Home → Body Weight card** (tap it, then
-Weigh in). ⚠️ Never send anyone to AA Proof to weigh in: the weight screen left Proof on
-2026-09-12, and two programmes written that week still pointed there. For tennis and padel that ratio is the number that matters — absolute
-kilos say much less about a player than kilos per kilo of them.
-
-**Every estimate is graded, and the grade is the instruction:**
-- **Sharp** (≤3 effective reps) — trust it. Usable as a starting-load reference.
-- **Good** (4–6) — trust the direction and roughly the number.
-- **Rough** (7–10) — a trend line only. Never set a load off a single Rough estimate (TST-6).
-
-**How it may and may not be used:**
-- ✅ As the basis for a **starting-load suggestion on an exercise's `note`** — the one place
-  in the whole app a weight is allowed to appear (PRG-2). *"Last cycle's estimate puts your squat around 125kg. Start the top set
-  near 100 and let RPE decide from there."*
-- ✅ As **evidence in the cycle review** — is the estimate climbing, flat or falling? That
-  answers "did the last block work?" far better than a single logged load, because it
-  normalises for the reps and RPE the set was done at.
-- ✅ To spot a **lagging lift** — if lower-body relative strength has stalled while upper
-  has moved, that is a cycle focus, stated with the number behind it.
-- ❌ **Never as a %1RM prescription.** No "4×5 @ 80%" in the dose, cards or notes. The
-  prescription stays RPE. A predicted max carries roughly ±5% error at best, so a
-  percentage built on it is false precision wearing a lab coat.
-- ❌ Never write the estimate into the athlete JSON as a target. It is derived on their
-  device from their own log.
-
-**Refreshing the number — the under-5RM test.** Where an athlete's estimates have all gone
-Rough (long sets, low RPE) and you want a real number, prescribe **one set of 3–5 reps at
-about RPE 9, stopping at the first rep that slows or breaks position** on a main lift, about
-**once a month**. That is close to the condition where both halves of the estimate are at their
-most accurate: the equation holds under about 10 reps, and an athlete's own sense of reps in
-reserve is roughly 2 reps out at RPE 9 against 5 reps out at RPE 5 (Zourdos 2021). RPE 9, not
-10: the estimate comes out *Good* rather than *Sharp*, and an athlete training alone never grinds
-a rep (TST-2, TST-3). **Never prescribe a true 1RM** — it buys
-almost nothing over a hard triple and costs warm-up time, fatigue and risk.
-
-**The app now asks for it, so you do not have to remember to.** Put `test_flag: 5RM` on the
-lift in the spec (see STEP 3's exercise fields) and Personal Records tracks how long it has
-been since that lift got a number, then asks for a retest in the cycle's **closing week** —
-which is the right place for one anyway: it measures the block that is ending and hands the
-next one a real starting figure. The athlete taps through to a form with the reps already
-set, warm-up instructions in place, and the same estimator the exercise card uses. **Two or
-three flags a cycle at most** — the nudge works because it is rare.
-
-They can also log a max for any lift in the cycle without a flag, from Personal Records →
-**+ Log a max**. So a test you asked for in a `note` still reaches the record; the flag is
-what makes the app chase it.
-
-Suitability first: an athlete in their first cycle, in pain, or with poor technique under
-load does not get a max-effort set — and does not get a `test_flag` either. Rough estimates
-are fine for them.
+For a RETURNING athlete it arrives as the Debrief's **The Ceiling** line: each primary's estimated
+1RM (from logged weight, reps and RPE), its grade and date, and relative strength (e1RM ÷ the latest
+body weight, the number that matters for tennis and padel). The app keeps the history on its
+Personal Records screen and adds a new best by itself. Body weight is weighed in on the programme
+app's Home → Body Weight card, never in AA Proof (COM-13).
+- **The grade is the instruction** (TST-6): Sharp (≤3 effective reps) trust it · Good (4–6) trust
+  the direction and roughly the number · Rough (7–10) a trend only, never a starting load.
+- ✅ A **starting-load suggestion on an exercise's `note`**, the one place a weight may appear
+  (PRG-2): *"Last cycle's estimate puts your squat around 125 kg. Start the top set near 100 and let
+  RPE decide from there."*
+- ✅ **Evidence in the cycle review** (climbing, flat or falling) and to spot a **lagging lift**,
+  stated with its number.
+- ❌ **Never a %1RM prescription** ("4×5 @ 80%" nowhere), and never written into the programme as a
+  target: a predicted max is ±5% at best, so a percentage on it is false precision.
+- **Retests:** `test_flag: 5RM` on two or three lifts the cycle is about (TST-5). The app then asks
+  for one set of 3–5 at about RPE 9 in the closing week, stopping at the first rep that slows (TST-2).
+  Never a true 1RM. **A first cycle, an athlete in pain or with poor technique under load gets no
+  max-effort set and no test flag** (TST-3: the first cycle's logs are its baseline). The athlete can
+  also log a max from Personal Records → + Log a max, so a test asked for in a `note` still lands.
 
 ---
 

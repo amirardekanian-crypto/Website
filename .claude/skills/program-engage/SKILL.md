@@ -1,25 +1,11 @@
 ---
 name: program-engage
-description: Wrap the engagement layer around a designed program — current-cycle message + outcomes, next-cycle teaser, coaching notes, and per-day completion messages. Use after /program-design and /program-assemble Part A (the programme is built and checked before any words are written), or when Amir says "do prompt 2", "write her notes/message". Reads the locked roadmap, the program spec, and COACHING-PRINCIPLES.md; changes no programming. All in-app text is ENGLISH.
+description: Wrap the engagement layer around a designed program — current-cycle message + outcomes, next-cycle teaser, coaching notes, and per-day completion messages. Runs straight after /program-assemble Part A when the build passes (the programme is built and checked before any words are written), or when Amir says "do prompt 2", "write her notes/message". Reads the locked roadmap, the program spec, and COACHING-PRINCIPLES.md; changes no programming. All in-app text is ENGLISH.
 ---
 
-> ## ⚠️ Programmes live on the SERVER, not in files
-> `data/*.json` is deleted, gitignored and 404 on the live site. The authoritative
-> copy of every programme is a row in `public.programs` on Supabase.
->
-> **To read one:** query it through the Supabase MCP —
-> `select data from programs where athlete_id = '<id>';`
-> A `data/<id>.json` on this PC is a local scratch copy and may be stale the moment
-> Amir edits anything in the dashboard. Never trust it over the table.
->
-> **To write one:** a whole new cycle is published by **/program-assemble Step 7** in one call
-> (`public.publish_cycle()`: the programme, the roadmap patch and the coaching log together),
-> never handed to Amir as a file. A change inside the live cycle is /program-edit's (it writes
-> the changed paths). Amir's own small changes go through the dashboard's inline editor, which
-> versions every save.
->
-> **The coaching log is on the server too** — `public.coaching_logs`, coach-only.
-> It is no longer `.claude/coaching-log/<id>.md`, which was tracked in a public repo.
+> Programmes and coaching logs live on the server (`public.programs`, `public.coaching_logs`;
+> CLAUDE.md → *THE BIG ONE*). Engage writes words only; /program-assemble Part B places and
+> publishes them.
 
 
 # Engagement Layer — Stage C
@@ -31,12 +17,13 @@ programming.** Read the roadmap — never rewrite it (that's /program-roadmap, l
 
 First, read the **rule index** at the top of **`.claude/COACHING-PRINCIPLES.md`** (one numbered line
 per rule, and the line is the rule), then the **Communication & in-app text** stories in full
-(COM-1 to COM-13): they are this stage's job. Open any other rule's story, by searching its ID,
-only when its line is not enough to write the note. Design already applied the rest, and the
-whole file is about 90 KB you do not need (2026-09-26, from the pipeline audit).
+(COM-1 to COM-16): they are this stage's job. Open any other rule's story, by searching its ID,
+only when its line is not enough to write the note. Design already applied the rest: the rest of
+the file (about 80 KB) you do not need, and `COACHING-PRINCIPLES-HISTORY.md` none of it.
 
 This is the right place for the **NOTES** work: it runs *after* /program-design and after
-/program-assemble **Part A** has built and checked the programme (2026-09-26), so it never
+/program-assemble **Part A** has built and checked the programme (2026-09-26; Part A hands
+straight to it when the build passes, PRC-4), so it never
 competes with the design pass's budget and it writes about the programme that passed, and
 *before* Part B places the words and publishes. Notes draw on the **full athlete picture** — the program spec + the brief that's in
 the conversation from design (data, loads, readiness, injuries, the check-in chat). If
@@ -58,14 +45,14 @@ by the end. Reference the real review (e.g. "squat went 10→50 kg") when it mot
 field; the athlete self-selects load against the prescribed RPE/rep target every time. Lines
 like "I'm reading your numbers to set the real loads" or "those logs are what I calculate your
 weight from" are wrong and must not appear in the cycle message, outcomes, or notes. Progression
-is the *program* changing (RPE targets, rep numbers, exercise selection) driven by what she
-logs — never "here's your number." (PRG-7)
+is the *program* changing (RPE targets, rep numbers, exercise selection) driven by what they
+log — never "here's your number." (PRG-7)
 
 **OUTCOMES** — 3–6 concrete, measurable, athlete-specific results for THIS cycle. Short
 phrases, not sentences (they render as a ticked checklist).
 
 ## PART 2 — NEXT CYCLE TEASER
-3–4 lines that make her want to earn it; reveal no specific exercises or structure.
+3–4 lines that make them want to earn it; reveal no specific exercises or structure.
 End with a single punchy hook on its own line (it auto-italicises). Omit entirely if
 there is no next cycle in the roadmap.
 
@@ -224,14 +211,16 @@ programme over, so they are written in **the athlete's own language** — Farsi 
 Farsi-speaking athletes, English otherwise. They are pipeline output now, not an on-request extra.
 They live in chat + a scratch file, **never** in `data/<id>.json`.
 
-**MESSAGE 1 — the introduction.** Welcome · tell them to sign in with **their username and
-password** — ⚠️ **NEVER a `?client=`/`&key=` link. Every secret link was retired 2026-09-07
-and `athlete_keys` is empty, so any such URL is refused whatever key it carries.** If they do
-not have a login yet, create one first in coach.html → Athletes → Create login · one line telling
-them to add it to their home screen · **why their programme looks the way it does**
-(the actual diagnosis, in plain words they'll recognise from their own body) · the week's shape
-and which day is non-negotiable · what they should have by the end · and a pointer that the
-second message is coming and matters.
+**MESSAGE 1 — the introduction.** **A new athlete:** welcome · tell them to sign in with **their
+username and password** — ⚠️ **NEVER a `?client=`/`&key=` link. Every secret link was retired
+2026-09-07 and `athlete_keys` is empty, so any such URL is refused whatever key it carries.** If
+they have no login yet, say so in the handoff: Amir creates it in coach.html → Athletes → Create
+login (Claude can't) · one line telling them to add it to their home screen. **A returning
+athlete** already has all that, so their message opens the new cycle instead: its name and what
+changed from the last one. **Then, for both:** **why their programme looks the way it does** (the
+actual diagnosis, in plain words they'll recognise from their own body) · the week's shape and
+which day is non-negotiable · what they should have by the end · and a pointer that the second
+message is coming and matters.
 
 **MESSAGE 2 — what to watch for. Built from design's `obligations:` list, not written freehand**
 (2026-09-26; COM-9). The cards are driven by that list and checked; this message now is too. **One
@@ -259,7 +248,7 @@ appointment or referral with its trigger, fuelling, and any outstanding question
 volume, missing history), folded in so the answer comes back without a separate ask.
 **Self-check, one line, coach-only, under the message (never pasted to the athlete):**
 `MSG2 CHECK — obligations N · lines N · same order ✓`. Assemble copies the count into its
-OBLIGATIONS CHECK (Step 6).
+OBLIGATIONS CHECK (Step 6a).
 
 Voice: COM-3, for both messages and for every line built from the list: the table above says
 what a line covers, never how to word it. Warm, direct, simple words, short sentences. When writing Farsi, use natural colloquial Farsi with **Persian
@@ -274,7 +263,7 @@ Hand off to **/program-assemble Part B**, which places the words, runs the full 
 - Don't write Farsi in the JSON; in-app is English.
 - Don't invent results or numbers — use the real review.
 - Don't write any line implying the coach assigns/calculates a specific weight for the
-  athlete — she self-selects load via RPE; see PART 1.
+  athlete — they self-select load via RPE; see PART 1.
 - Don't skip the progression/regression note for a NEW athlete, or the pain-management note
   for a confirmed-live injury/restriction (PART 3) — both required when their trigger applies.
 - Don't include the period-week note without design having confirmed it applies this cycle,

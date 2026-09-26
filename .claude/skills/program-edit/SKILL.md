@@ -1,30 +1,14 @@
 ---
 name: program-edit
-description: Review and edit an athlete's program JSON — apply Amir's coaching principles before touching any sets/reps. Use when Amir asks to review, change, or fix a program, or after /program-design produces a draft.
+description: Review and edit an athlete's live programme — apply Amir's coaching principles before touching any sets/reps. Use when Amir asks to review, change, or fix a programme that is already on the server, including a mid-cycle adjustment. A new cycle is /program-design and /program-assemble, not this.
 ---
 
-> ## ⚠️ Programmes live on the SERVER, not in files
-> `data/*.json` is deleted, gitignored and 404 on the live site. The authoritative
-> copy of every programme is a row in `public.programs` on Supabase.
->
-> **To read one:** query it through the Supabase MCP —
-> `select data from programs where athlete_id = '<id>';`
-> A `data/<id>.json` on this PC is a local scratch copy and may be stale the moment
-> Amir edits anything in the dashboard. Never trust it over the table.
->
-> **To write one:** ⚠️ **corrected 2026-09-19 — do not hand Amir a publish step.** He is the
-> coach of record, not a deployment stage; asking him to click Publish for work he has already
-> approved just adds a hop where the change sits unshipped. *(Amir, 2026-09-07, verbatim: "go
-> live, we dont use json files anymore, upload to the servers.")* **Once he approves, write it
-> to `public.programs` yourself through the Supabase MCP and report it live.** Amir's inline
-> dashboard editor still exists and he may use it whenever he likes — that is why you verify
-> the row against local scratch before editing (Step 0b.3), not a reason to wait for him.
-> A **new cycle** ships via /program-assemble Step 7; a change **inside the live cycle** ships
-> via **Step 0b** below. `data/<id>.json` stays local scratch you lint and diff against, never
-> the deliverable, and never committed.
->
-> **The coaching log is on the server too** — `public.coaching_logs`, coach-only.
-> It is no longer `.claude/coaching-log/<id>.md`, which was tracked in a public repo.
+> Programmes and coaching logs live on the server (`public.programs`, `public.coaching_logs`;
+> CLAUDE.md → *THE BIG ONE*). **Once Amir approves an edit, write it to `public.programs` yourself
+> through the Supabase MCP and report it live** (Amir, 2026-09-07: *"go live, we dont use json files
+> anymore, upload to the servers"*): never hand him a publish step. His inline dashboard editor may
+> have changed the row since you read it, which is why Step 0b.3 checks it first. A **new cycle**
+> ships via /program-assemble Step 7; a change **inside the live cycle** ships via **Step 0b**.
 
 
 # Program Edit — AA Performance
@@ -33,8 +17,8 @@ Review a program JSON against Amir's coaching principles, flag issues, then appl
 
 ## Step 0 — Read principles, then the file
 
-1. Read **`.claude/COACHING-PRINCIPLES.md`** first: its **rule index** is the single source of truth for naming, exercise selection, structure, dosing, etc. (the line is the rule; the stories below it are why). The rules below are the *editing audit checklist* (the lens for reviewing an existing program); where a rule here overlaps the index, **the index wins**, and a finding cites the rule's ID. A correction still changes only what Amir named (PRC-2).
-2. Read the programme from the server (`select data from programs where athlete_id = '<athlete_id>';`). Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts. Also read this cycle's part of the coaching log for its rationale, so edits respect *why* each piece was chosen: the `'log'` slice in /program-design STEP 0 (the head plus everything from the latest `## Cycle` on) returns just that.
+1. Read the **rule index** at the top of **`.claude/COACHING-PRINCIPLES.md`** first: it is the single source of truth for naming, exercise selection, structure, dosing, etc. (the line is the rule). Open a rule's story, by searching its ID, only when its line is not enough for the edit in hand; the rest of the file (about 90 KB of stories) and `COACHING-PRINCIPLES-HISTORY.md` are not needed for an edit. The rules below are the *editing audit checklist* (the lens for reviewing an existing program); where a rule here overlaps the index, **the index wins**, and a finding cites the rule's ID. A correction still changes only what Amir named (PRC-2).
+2. Read the programme from the server (`select data from programs where athlete_id = '<athlete_id>';`). Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts. Also read this cycle's part of the coaching log for its rationale, so edits respect *why* each piece was chosen: **Q2 in `.claude/skills/program-design/queries.sql`** (the head plus everything from the latest `## Cycle` on) returns just that.
 
 ## Step 0b — Mid-cycle adjustment: the process
 
@@ -48,7 +32,7 @@ reasoning stays in her log on the server; only the transferable process is here.
    report-driven (PRG-1), and the sessions since the
    last edit routinely change the recommendation. They tell you whether the last edit actually
    worked, and they surface what nobody reported: an exercise quietly skipped twice, a capped
-   RPE being overshot, a rep count she reduced herself. **Never design the adjustment off the
+   RPE being overshot, a rep count they reduced themselves. **Never design the adjustment off the
    conversation alone** — Amir is reporting what he has been told, not what the log holds.
 
 2. **Check where you are in the cycle.** `cycles[currentCycleIndex].endDate` against today. If
@@ -57,9 +41,10 @@ reasoning stays in her log on the server; only the transferable process is here.
 
 3. **Verify the live row against the local scratch BEFORE editing.** `data/<id>.json` is
    gitignored scratch and can drift from `public.programs` the moment Amir edits in the
-   dashboard. Fingerprint first — per-exercise `md5(note)` + length walked days → blocks →
-   exercises — and only then treat the local file as a safe base. Skip this and a later
-   whole-object write silently reverts his dashboard edit.
+   dashboard. Compare `select public.programme_fingerprint('<id>')` with
+   `python scripts/check_program.py data/<id>.json --fingerprint` (the same walk, the one publishing
+   uses) and only then treat the local file as a safe base. Skip this and a later write built from
+   the file silently reverts his dashboard edit.
 
 4. **Patch PATHS, never the whole object.** Chain
    `jsonb_set(data, '{workouts,days,N,blocks,N,exercises,N,note}', $tag$…$tag$::jsonb)` — one
@@ -78,9 +63,9 @@ reasoning stays in her log on the server; only the transferable process is here.
    And prefer wording that expires into a coach decision (*"this holds until we build the next
    block"*) over wording that expires into silence.
 
-6. **Verify with the content fingerprint**, not a row count — reuse the method in
-   /program-assemble Step 7 ("Verify with a CONTENT FINGERPRINT"), and assert the `athlete`
-   block is unchanged after every write. The version trigger snapshots the prior state into
+6. **Verify with the content fingerprint**, not a row count: `select public.programme_fingerprint('<id>')`
+   against `--fingerprint` on your edited local copy (as /program-assemble Step 7 does), and assert
+   the `athlete` block is unchanged after every write. The version trigger snapshots the prior state into
    `program_versions` on its own; do not hand-roll a backup.
 
 7. **Log it — and mind what append-only means for a recommendation that is now WRONG.** The
@@ -164,14 +149,17 @@ Never collapse Primary + Accessory into one "Strength" block (SES-9).
 
 ### Rule 4 — Set / muscle review AND per-day load before changing load
 
-Both before touching any numbers, and both shown to Amir for sign-off. **The checker counts them;
-never tally by hand** (2026-09-26): save the live row to `<scratch>/<id>.json`, run
-`python3 scripts/check_program.py <scratch>/<id>.json --spine-sql`, run the query it prints and save
-the result, then `python3 scripts/check_program.py <scratch>/<id>.json --stage build --spine <result>
---tables <scratch>/volume_<id>.md`. The file is the audit's VOLUME section: the per-exercise table
-(each exercise counted from its Spine entry's credits, VOL-10), the weekly total per muscle against
-10–20, and each day's cost-weighted load (VOL-2). Run it again on the edited programme so Amir sees
-before and after.
+**Only when the edit changes a set count, an exercise or a day's load** (a note or a pill needs none
+of this): both before touching any numbers, and both shown to Amir for sign-off. **The checker
+counts them; never tally by hand** (2026-09-26): save the live row to `<scratch>/<id>.json`, run
+`python scripts/check_program.py <scratch>/<id>.json --spine-sql`, run the query it prints and save
+the result exactly as returned, then `python scripts/check_program.py <scratch>/<id>.json --stage build
+--spine <result> --tables <scratch>/volume_<id>.md` (`python` on Amir's PC; `python3` in a cloud
+session). The file is the audit's VOLUME section: the per-exercise table (each exercise counted from
+its Spine entry's credits, VOL-10), the weekly total per muscle against 10–20, and each day's
+cost-weighted load and minutes (VOL-2). Run it again on the edited programme so Amir sees before and
+after. **A FAIL or WARN on a part you are not changing is reported to Amir, never fixed on the side**
+(PRC-2): a live programme from before a rule can break it.
 
 **4a. Weekly sets per muscle.** Flag anything very low (chest at 3 sets) **or over the ceiling**
 (VOL-3); shoulder is one group (VOL-7). Small muscles (biceps, triceps): 6–12 sets/week in a
@@ -251,8 +239,8 @@ proposed for an approved entry (written to `/spine`'s pending list, not only pri
 
 **If the edit changes who the athlete is** (a new injury or ban, one resolved, new kit, a new
 schedule), update the `## Athlete profile` block at the top of their coaching log in place (format
-in /program-assemble Step 5) and say why in the in-cycle note below, or the next cycle's checks
-run on the old facts.
+in `.claude/skills/program-design/PROFILE.md`) and say why in the in-cycle note below, or the next
+cycle's checks run on the old facts.
 
 **Then log the change.** Append a dated in-cycle note under an `## In-cycle edits — Cycle N`
 heading — what changed + why (e.g. *In-cycle edit (2026-06-28): Bulgarian Split Squat → Split
