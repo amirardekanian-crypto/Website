@@ -69,7 +69,15 @@ fine, just not a *cycle* report).
 
 ## Step 1 · Pull the data
 
-Put the cycle's `startDate` and `endDate` into **Q2–Q4** (they open the window 3 days early,
+**First, complete the log.** Run the `athlete-brief` agent in **MODE=import**, in the foreground,
+with the window (`startDate − 3` to `endDate`). It adds any session that reached Amir's inbox as a
+Web3Forms report but not the database (Amir, 2026-09-26: the import is still needed), and returns
+one line. Put that line in the Debrief's Sources.
+
+**This report is the evidence for the next cycle** (2026-09-26): /program-design reads the Debrief
+as its brief and no longer builds a separate one, so a returning athlete's next cycle starts here.
+
+Then put the cycle's `startDate` and `endDate` into **Q2–Q4** (they open the window 3 days early,
 because athletes often start a day or two before the date) and run them:
 
 - **Q2** sessions: date, weekday, day, session RPE, minutes, readiness (composite, sleep,
@@ -97,6 +105,9 @@ Work through this list. Each line is a finding only if the data says so.
 | **Flat lifts** | same `weights` string every session | Where the next cycle has the most room |
 | **Working sets** | `sets_at_top` vs the prescribed sets | 1–2 of 4 at the top weight = warm-ups typed into working rows, or a pyramid. Less stimulus than designed |
 | **RPE coverage** | sessions with RPE on the main lift | No RPE = no Personal Records estimate and no way to judge "working weight" |
+| **RPE as a rep counter** | Q3 `at_10` ÷ `n_rpe`, summed; and whether the logged RPE matches the prescribed reps (a set of 10 logged "@10") | New athletes often tap the button that matches their reps. Over ~30% at 10 in the first ten sessions: the per-set RPE is not effort. Don't write a starting-load note from it; the report teaches the scale |
+| **The Ceiling** | Q4 `ceiling`: each flagged lift's estimate, its grade (Sharp / Good / Rough) and date; relative strength when there is a weigh-in | The one e1RM the next design uses. A Rough estimate is a trend, never a starting load |
+| **Profile changes** | calls, messages, notes, the log: a new injury or one resolved, new kit or a new gym, a changed schedule or goal | They update the athlete profile at the top of the coaching log (/program-design applies them) |
 | **Units** | compare barbell and dumbbell loads at similar RPE | An empty-bar squat at RPE 8 next to 2 × 20 kg dumbbells = whole bar vs per side unknown |
 | **Typos** | a jump ×10 (250 after 20) | Never quote it; note it for Amir |
 | **Back-off week** | the closing week's `n_sets` and `top` vs weeks 1–4, against the cycle's `weekNotes.last` (what it prescribed, since 2026-09-26) | Full sets and a new top = the back-off didn't happen |
@@ -180,7 +191,8 @@ English, coach-only. Template:
 ## Debrief — Cycle NN <Name> · <YYYY-MM-DD> · end of cycle, before C<NN+1> design
 
 Coach-only. Only what changes a coaching decision. Sources: <n> session_history rows
-(<first>–<last>), <film review / calls / messages>. Athlete message: <language>, <channel>.
+(<first>–<last>), Gmail import: <its line>, <film review / calls / messages>. Athlete message:
+<language>, <channel>.
 
 **Adherence & tolerance** — sessions, missed days, readiness, soreness, session RPE, time vs
 design, sleep. End with the read ("absorbed easily, room to push" / "hold").
@@ -188,7 +200,14 @@ design, sleep. End with the read ("absorbed easily, room to push" / "hold").
 **Loads as logged (top set per week)** — one line per primary; flag typos; film gate verdict.
 
 **Data quality — read before writing any starting-load note** — units, warm-ups in working
-rows, RPE coverage, weigh-ins, Personal Records, back-off week. Say what the athlete was told.
+rows, RPE coverage, the share of sets logged at RPE 10, weigh-ins, Personal Records, back-off
+week. Say what the athlete was told.
+
+**The Ceiling** — one line per flagged or primary lift: estimate, grade, date, and relative
+strength if there's a weigh-in. The next design reads its e1RM here, nowhere else.
+
+**Profile changes** — only what changed: an injury new or resolved, kit, schedule, goal. "None"
+when nothing did.
 
 **The athlete's words** — what he said, and what Amir answered, in their words.
 

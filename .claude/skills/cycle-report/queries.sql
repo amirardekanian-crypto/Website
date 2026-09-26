@@ -73,7 +73,11 @@ select completed_on, day, block, ex,
        count(*) n_sets,
        string_agg(coalesce(reps, '·'), ' / ' order by set_no) reps,
        string_agg(coalesce(rpe, '–'), ' / ' order by set_no) rpes,
-       count(*) filter (where ticked) ticked
+       count(*) filter (where ticked) ticked,
+       -- RPE as a rep counter (2026-09-26): sum these over all rows. New athletes often tap the
+       -- RPE button that matches their reps; over ~30% at 10 = the per-set RPE is not effort.
+       count(rpe) n_rpe,
+       count(*) filter (where rpe ~ '^10([.]0)?$') at_10
 from ranked
 group by completed_on, day, block, ex
 having count(w) > 0

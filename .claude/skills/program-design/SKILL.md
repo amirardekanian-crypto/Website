@@ -37,9 +37,9 @@ on real decisions, and get smarter every cycle by reading and adding to his prin
 You read: a clean **ATHLETE BRIEF**, the **locked roadmap**, and **`.claude/COACHING-PRINCIPLES.md`**.
 You output: the **program spec** (for the athlete app) + **coach-facing reports** (for Amir —
 printed in chat and archived as the cycle's COACHING LOG ENTRY to the coach-only coaching log).
-You do not pull SQL, fetch email, write JSON, or write messages — the
-`athlete-brief` subagent, /program-assemble, and /program-engage do those, so your whole
-context stays on coaching.
+You do not fetch email, write JSON, or write messages — /cycle-report (the evidence),
+/program-assemble and /program-engage do those, so your whole context stays on coaching. Your
+one database read is the context pull in STEP 0.
 
 Do not write a single exercise until STEP 1 is complete. Every Step 2–3 decision must
 trace to a Step 1 point or a stated principle.
@@ -143,20 +143,17 @@ change before I build?"* before writing exercises.
      the card's (`Inverted Row (BW)`, whose card says Inverted Row: assemble copies the library's
      video into `videoUrl`), and every `novideo` exercise you prescribe goes on the handoff's film list.
 4. **Get the brief:**
-   - RETURNING with a **`## Debrief`** in `ctx.log` dated on or after `ctx.sessions.last` → **the
-     Debrief IS the brief: don't launch `athlete-brief`.** /cycle-report already read every
-     session, the calls and the log's data problems, and `ctx.row.programme` holds the
-     prescription. On 2026-09-26 the agent spent 10 minutes and ~225k tokens re-deriving what that
-     Debrief already said.
-   - RETURNING without one, or with sessions logged after it → invoke the **`athlete-brief`**
-     subagent (MODE=returning), **in the foreground**
-     (`run_in_background: false`: it is the one agent that reads the database, and a background
-     agent's approval prompts do not reach Amir), passing any check-in chat Amir pasted, and the
-     Debrief's date if there is one, so it reads only the sessions after it. It returns the one-page brief (loads, RPE, readiness,
-     **e1RM from heaviest logged sets**, injuries) and imports any missing sessions. Use
-     the brief — don't re-pull raw data. The athlete also has a dated estimated-1RM
-     history of their own — see **The Ceiling** below for what it is and how it may be
-     used when you set loads.
+   - RETURNING → **the Debrief IS the brief** (the one evidence path since 2026-09-26). If
+     `ctx.log` has no **`## Debrief`** for the cycle just trained, run **/cycle-report** first: it
+     runs the Gmail import, reads every session, the calls and the log's data problems, the
+     RPE-at-10 trap, The Ceiling and any profile change, and appends the Debrief. (Its WhatsApp
+     report is Amir's to send or not.) If sessions were logged after the Debrief, read just those
+     with cycle-report's Q2 and Q3, the Debrief's date as the start. Paste any check-in chat Amir
+     gives you into the read. `ctx.row.programme` holds the prescription.
+     ⚠ **Never the old returning brief.** The `athlete-brief` agent's returning mode was retired on
+     2026-09-26: it spent ~225k tokens and 10 minutes re-deriving what a Debrief says, with its own
+     e1RM formula. The e1RM this design uses is the Debrief's **The Ceiling** line (see *The
+     Ceiling* below for how it may be used).
    - NEW → use the ATHLETE BRIEF from /athlete-intake. If none, stop and ask Amir to run
      /athlete-intake first.
 5. **RETURNING — read the prior rationale:** `ctx.log` from the context pull (step 3).
@@ -179,8 +176,8 @@ change before I build?"* before writing exercises.
    (if present) — a fast lookup of every exercise this athlete has ever been given and its
    status (Active / Available / Disliked / Pain-flagged / Banned), so you don't have to
    reconstruct exposure history by reading every prior cycle's prose. Cross-check it against
-   the brief's exercise-specific signals (athlete-brief flags dislikes/pain tied to a named
-   exercise, not just general injury) before finalizing REPLACE — see COACHING-PRINCIPLES.md
+   the Debrief's exercise-specific signals (dislikes and pain tied to a named exercise, not just
+   general injury) before finalizing REPLACE — see COACHING-PRINCIPLES.md
    → "Exercise selection" (the ledger's columns: Exercise · Status · Last cycle · Note).
 6. Read the **locked roadmap** (`cycles[]`) and `Content/PRODUCT.md` for system context.
    Honour the roadmap's focus for THIS cycle; deviate only if the brief demands it, and
@@ -199,7 +196,8 @@ coherent multi-cycle logic, not designing fresh. Progress and edit from the data
 *logic* only when a data point forces it — and when you do, name the why (it becomes this
 cycle's log entry).
 - **ADAPTATION RESPONSE** — strength/RPE trends, loads progressed, rep ranges hit; the
-  **e1RM trend** per primary (from the brief); where she over/under-performed + the read.
+  **e1RM trend** per primary (the Debrief's The Ceiling, with each grade); where she
+  over/under-performed + the read.
 - **RECOVERY & LIFESTYLE INTEGRATION** *(required)* — sleep, stress, session-RPE trend AND
   the check-in chat. Separate training fatigue from life load. Close with a concrete
   consequence (session length, frequency, autoregulation, deload) or an explicit "no
@@ -670,8 +668,8 @@ Athletes now carry an **estimated 1RM per lift**, built from the sets they alrea
 = 10 − RPE, added back before the maths), and the history lives in **The Ceiling**, the
 strength section on My Plan. Nobody has to test a true max for this to exist.
 
-**Read it before you set loads.** For a RETURNING athlete the brief's *"e1RM from heaviest
-logged sets"* is the same idea; The Ceiling is the tidier, dated version of it, and it also
+**Read it before you set loads.** For a RETURNING athlete it arrives as the Debrief's **The
+Ceiling** line (the one e1RM this pass uses: estimate, grade, date), and it also
 carries **relative strength** (estimated 1RM ÷ body weight, from the athlete's latest
 weigh-in). **Body weight is logged on the programme app's Home → Body Weight card** (tap it, then
 Weigh in). ⚠️ Never send anyone to AA Proof to weigh in: the weight screen left Proof on

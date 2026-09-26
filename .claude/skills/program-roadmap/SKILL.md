@@ -12,8 +12,8 @@ never drift from the plan.
 
 ## Inputs
 - The **ATHLETE BRIEF** (goal, athlete type, timeline, days/week, constraints). For a
-  returning athlete who somehow has no roadmap yet, the `athlete-brief` subagent can
-  generate the brief first.
+  returning athlete who somehow has no roadmap yet, their latest Debrief (/cycle-report) and
+  coaching log are the brief.
 - **PROGRAM_START_DATE** (`YYYY-MM-DD`). If unknown, ask once.
 - **The context pull** from /program-design STEP 0 (one database call). A new athlete reaches
   the roadmap before design, so run it here, once; design reuses the same result rather than

@@ -35,8 +35,8 @@ This is the right place for the **NOTES** work: it runs *after* /program-design,
 never competes with the design pass's budget, and *before* /program-assemble builds the
 JSON. Notes draw on the **full athlete picture** — the program spec + the brief that's in
 the conversation from design (data, loads, readiness, injuries, the check-in chat). If
-engage is run standalone without that context, re-pull it via the **`athlete-brief`**
-subagent first.
+engage is run standalone without that context, read the spec and the athlete's coaching log
+(the latest Debrief and cycle entry) first; there is no separate brief to pull any more.
 
 All athlete-facing **in-app** text is **English** (Farsi briefs for WhatsApp/IG are a
 separate request). Tone: direct, confident, coach-to-athlete, no filler.
