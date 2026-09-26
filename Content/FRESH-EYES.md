@@ -58,7 +58,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#251](https://github.com/amirardekanian-crypto/Website/pull/251) | The info sheet keeps a trail: ‹ Back at the top, and the phone's Back steps back a page before it closes the sheet | SHEET-01 |
 | [#252](https://github.com/amirardekanian-crypto/Website/pull/252) | Polish: the side rail only in a day view, under the overlays and labelled; every screen lights its tab; the demo banner clears the dark toggle and Guided's ✕; no AA Proof line in the coach preview; four dead functions gone | POL-01 |
 | [#254](https://github.com/amirardekanian-crypto/Website/pull/254) | Game Plan folds past and future cycles to a slim row (the current one open); the welcome's button opens Day 1 (Amir: "Fold past and future") | PLAN-01 |
-| REC-01 PR | The estimated max is off the working card; Personal Records fill themselves and keep "+ Log a max" (Amir: "Off the card, keep in Records") | REC-01 |
+| [#255](https://github.com/amirardekanian-crypto/Website/pull/255) | The estimated max is off the working card; Personal Records fill themselves and keep "+ Log a max" (Amir: "Off the card, keep in Records") | REC-01 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01.
@@ -103,7 +103,7 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
    HOME-03, WK-03's quick parts, A11Y-01 in the training app. So are NAV-01 (both apps), HOME-01, BW-01,
    DATA-02's safe part, SHEET-01 and POL-01 (#239–#252, Amir: "keep going, only pause if you want me to choose").
    **Amir answered four of the six calls** (2026-09-26, each his recommended option): the Today block →
-   a mockup first; Game Plan → fold past and future (#254); the estimate → off the card (REC-01 PR); the
+   a mockup first; Game Plan → fold past and future (#254); the estimate → off the card (#255); the
    unfinished day → ask the athlete on their next open. Two remain: a rest day in Proof, following the
    phone's dark setting.
 2. **Foundations:** HOME-02's Today block: a mockup page first, then build after his yes.
