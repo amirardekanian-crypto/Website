@@ -4518,10 +4518,17 @@ function isPerfect(dayKey) { const hs = rosterOn(dayKey); return hs.length > 0 &
 // So the rule is now the promise itself, said out loud: clear 75% of the
 // weight, OR leave at most one thing undone. `done > 0` keeps a roster of one
 // from qualifying on an empty day.
+// The gate's percentage is ROUNDED before it is compared, exactly as the server's `qualday` does
+// (round(gpart / glive * 100) >= qpct, stage24). The phone used to compare the raw number, so a day
+// at 79.5-79.9% counted on the board and not on the phone (Amir, 2026-09-26: "yes"). Multiplying
+// before dividing keeps an exact .5 exact, so it rounds up the way Postgres does.
+function gatePasses(done, total) {
+  return total > 0 && Math.round(done * 100 / total) >= XP_RULES.streakQualifyPct;
+}
 function dayQualifies(dayKey) {
   const p = dayParts(dayKey, 'gate');
   if (!p.total) return false;
-  if (p.done / p.total * 100 >= XP_RULES.streakQualifyPct) return true;
+  if (gatePasses(p.done, p.total)) return true;
   return p.missing <= 1 && p.done > 0;
 }
 function currentDayStreak() { return dayStreakAt(TKEY()); }
@@ -4960,11 +4967,10 @@ function atRisk() {
 function shortOfQualifying() {
   const p = dayParts(TKEY(), 'gate');
   if (!p.total) return 0;
-  const need = p.total * XP_RULES.streakQualifyPct / 100;
   const left = rosterOn(TKEY()).filter(h => !isDone(h) && !h.locked)
                                .sort((a, b) => baseXp(b) - baseXp(a));
   let have = p.done, n = 0;
-  while (have < need && n < left.length) { have += baseXp(left[n]); n++; }
+  while (!gatePasses(have, p.total) && n < left.length) { have += baseXp(left[n]); n++; }
   // The gate has a second door — at most one thing left undone — so the honest
   // answer to "what saves today" is whichever route is fewer taps. Without this
   // the nudge kept quoting the heaviest-first number while the athlete was
@@ -5054,6 +5060,9 @@ function rulesSignature() {
     // quest kind, so moving it has to re-baseline rather than silently restate
     // an athlete's history at them.
     XP_RULES.streakQualifyPct,
+    // The gate rounds like the server since 2026-09-26 (gatePasses()); a day that newly counts
+    // re-baselines quietly instead of firing a celebration nobody earned today.
+    'gate-rounded',
     // Tier days AND their multipliers, plus every milestone's cost and payout —
     // all of these now move real XP, so retuning any of them has to re-baseline
     // rather than fire a wall of celebrations nobody earned today.

@@ -63,6 +63,8 @@
 // v36: program.html and habits.html changed (2026-09-26, REL-01): both open with no signal from
 //      the last plan the phone loaded (localStorage `plancache`), stop waiting at once when the
 //      Supabase library could not download, and say what really went wrong when they cannot open.
+//      It also carries habits.html's rounded day gate (gatePasses(), b821468), which shipped without
+//      a bump of its own.
 const CACHE = 'aap-v36';
 
 // Pre-cached on install — the minimum needed to open the app offline.

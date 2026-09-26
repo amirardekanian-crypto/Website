@@ -273,9 +273,10 @@ search in Iran). The routine (Search Console, the monthly checklist, how titles 
   script, same as `index-fa.html`. `/reach/` measures Google Fonts; if it is blocked, self-host the font.
 
 ## How Amir works (preferences)
-- **Ship it live.** He expects work committed, pushed, AND merged so it's live — he iterates on the
-  live site. Dev on branch `claude/website-write-access-o2o0kj`; ship via PR → merge to `main`
-  (Pages auto-deploys). Don't stop at "pushed to branch."
+- **Ship it live, straight to `main`** (Amir, 2026-09-26). He iterates on the live site: commit and
+  push `main` by itself, one push at a time (Pages deploys it; see *Verifying the live site*). A
+  session that has to work on a branch (a cloud session) merges its PR the same day. Don't stop at
+  "pushed to a branch".
 - **Push back** when something's wrong or stale; fix at the **source** and keep the two language
   sites consistent on facts. He gives blunt feedback — that's normal, not a problem.
 - **Verify before merging.** Render changes headless and check them.

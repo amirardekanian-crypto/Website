@@ -105,8 +105,8 @@ Work through this list. Each line is a finding only if the data says so.
 | **Flat lifts** | same `weights` string every session | Where the next cycle has the most room |
 | **Working sets** | `sets_at_top` vs the prescribed sets | 1–2 of 4 at the top weight = warm-ups typed into working rows, or a pyramid. Less stimulus than designed |
 | **RPE coverage** | sessions with RPE on the main lift | No RPE = no Personal Records estimate and no way to judge "working weight" |
-| **RPE as a rep counter** | Q3 `at_10` ÷ `n_rpe`, summed; and whether the logged RPE matches the prescribed reps (a set of 10 logged "@10") | New athletes often tap the button that matches their reps. Over ~30% at 10 in the first ten sessions: the per-set RPE is not effort. Don't write a starting-load note from it; the report teaches the scale |
-| **The Ceiling** | Q4 `ceiling`: each flagged lift's estimate, its grade (Sharp / Good / Rough) and date; relative strength when there is a weigh-in | The one e1RM the next design uses. A Rough estimate is a trend, never a starting load |
+| **RPE as a rep counter** | Q3 `at_10` ÷ `n_rpe`, summed; and whether the logged RPE matches the prescribed reps (a set of 10 logged "@10") | New athletes often tap the button that matches their reps. Over ~30% at 10 in the first ten sessions: the per-set RPE is not effort (PRG-11). Don't write a starting-load note from it; the report teaches the scale |
+| **The Ceiling** | Q4 `ceiling`: each flagged lift's estimate, its grade (Sharp / Good / Rough) and date; relative strength when there is a weigh-in | The one e1RM the next design uses. A Rough estimate is a trend, never a starting load (TST-6) |
 | **Profile changes** | calls, messages, notes, the log: a new injury or one resolved, new kit or a new gym, a changed schedule or goal | They update the athlete profile at the top of the coaching log (/program-design applies them) |
 | **Units** | compare barbell and dumbbell loads at similar RPE | An empty-bar squat at RPE 8 next to 2 × 20 kg dumbbells = whole bar vs per side unknown |
 | **Typos** | a jump ×10 (250 after 20) | Never quote it; note it for Amir |

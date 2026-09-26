@@ -245,7 +245,7 @@ def check_structure(data, args, spine=None):
             if PREP.search(b.get('title') or ''): continue
             for ex in b.get('exercises') or []:
                 n += len(ex.get('items') or []) if ex.get('type') == 'circuit' else 1
-        if n >= 7: warn(f"Day {d.get('id')}: {n} working exercises, a grind (7 or more): check the day's load identity", 'VOL-2')
+        if n >= 7: warn(f"Day {d.get('id')}: {n} working exercises, a grind (7 or more): check the day's load identity", 'SES-15', 'VOL-2')
 
 def check_text(data):
     for where, s in text_fields(data):
@@ -319,7 +319,7 @@ def why_basics(d, ex):
     if w.get('src') == 'body' and not w.get('part'): fail(f"{where}: src body needs a part", 'COM-4')
     if w.get('part') and w.get('src') != 'body': fail(f"{where}: part only goes with src body", 'COM-4')
     text = (w.get('text') or '').strip()
-    if len(text) > 140: fail(f"{where}: {len(text)} characters (140 max)", 'COM-4')
+    if len(text) > 140: fail(f"{where}: {len(text)} characters (140 max)", 'COM-15')
     if re.search(r'[—;]', text): fail(f"{where}: an em-dash or semicolon", 'COM-4')
 
 def check_placed(data, args):
@@ -369,10 +369,10 @@ def check_week_notes(data, args):
                 fail(f"{where}: {f} is how many fewer (a whole number, 1 to 3), got {n[f]!r}", 'PRC-15')
         if 'rpeCap' in n and not (isinstance(n['rpeCap'], (int, float)) and 6 <= n['rpeCap'] <= 9):
             fail(f"{where}: rpeCap must be 6 to 9 (the app's floor is 6), got {n['rpeCap']!r}", 'PRC-15', 'CHP-4')
-        if len(text) > 260: warn(f"{where}: {len(text)} characters; it's a note, keep it under ~260", 'PRC-15')
+        if len(text) > 260: warn(f"{where}: {len(text)} characters; it's a note, keep it under ~260", 'COM-16')
         label = (n.get('title') or ('Back-off week' if key == 'last' else 'Week 1')).lower()
         if text and text.lower().startswith(label):
-            warn(f"{where}: the text starts by repeating its label ('{label}'); start with the instruction", 'PRC-15')
+            warn(f"{where}: the text starts by repeating its label ('{label}'); start with the instruction", 'COM-16')
     last = wn.get('last')
     if args.no_backoff:
         info('no back-off week this cycle (--no-backoff: only on Amir\'s word)')

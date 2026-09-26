@@ -98,10 +98,9 @@ Grouped into one round of questions, the genuine gaps to close:
           'intake', 'coached', '<one line: where they came from, the deal, paid or not>')
   on conflict (athlete_id) do nothing;
   ```
-  ⚠️ **Do not call the `add_contact()` RPC to do this.** It still inserts an
-  `athlete_keys` row as a side effect — the dead mechanism above — and it is guarded by
-  `is_coach()`, which reads the caller's JWT email, so from a plain SQL connection it only
-  raises `coach only`. Insert directly.
+  ⚠️ **Do not call the `add_contact()` RPC to do this.** It is guarded by `is_coach()`,
+  which reads the caller's JWT email, so from a plain SQL connection it only raises
+  `coach only`. Insert directly. (It stopped minting a dead `athlete_keys` row in stage41.)
 
 - **Add the id to `.claude/athlete-ids.local`** (one per line, gitignored), so the pre-commit
   guard keeps it out of the public skill files: `printf '%s\n' '<id>' >> .claude/athlete-ids.local`.

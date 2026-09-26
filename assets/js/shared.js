@@ -233,9 +233,9 @@
       // ⚠️ www.youtube.com, NOT youtube-nocookie.com, and it must match program.html's
       // loadInlineVideo() exactly. In Iran YouTube puts a "sign in to confirm you're not a
       // bot" wall in front of the cookieless nocookie player, while the same video plays
-      // from youtube.com/embed on the same phone (Ehsan, 2026-09-20: standard exercises
+      // from youtube.com/embed on the same phone (an athlete in Iran, 2026-09-20: standard exercises
       // played, every circuit item behind the small play button did not — this was the
-      // only difference between the two paths). privacy.html section 2.6 says the same.
+      // only difference between the two paths). privacy.html section 2.7 says the same.
       frame.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" title="Exercise video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
       el.classList.add('is-open');
       document.body.style.overflow = 'hidden';
