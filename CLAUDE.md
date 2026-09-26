@@ -133,7 +133,10 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   target rule exists twice, `dayRpe()` here and `dayTargetC()` in coach.html: change both.
 - **Body weight lives in `program.html`** under the key `<id>_hab_wt`; AA Proof must never write it, and it
   is never scored.
-- **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`.
+- **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`, and **`plancache`**, the one saved plan
+  that opens both apps with no signal (REL-01, 2026-09-26): written only from a real server answer (never the
+  demo, the coach preview or Proof's strip), opened only when the server cannot be reached, deleted when it
+  answers no. `habits.html` keeps the same key, so change both. Details: `PROGRAM-APP.md` → *No signal*.
 - **An RPE off its target is coloured** clay (over) or steel blue (under), the one exception to "clay is the
   only accent", through `rpeVs()`/`rpeMark()` on every screen.
 - **There is no in-app chat, and Amir answers ONLY on WhatsApp (2026-09-26: *"Im only gonna reply to
@@ -201,7 +204,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v35` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v36` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
