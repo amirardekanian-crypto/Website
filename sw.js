@@ -110,7 +110,9 @@
 //      Personal Records, which fill themselves and keep "+ Log a max").
 // v57: program.html changed (2026-09-26, DATA-02): a day logged but never finished is asked about on a
 //      later open ("Tuesday's Day 2 was never sent": Send it / Clear it).
-const CACHE = 'aap-v57';
+// v58: program.html changed (2026-09-26, HOME-02): Home is led by the training: a small cycle line, done days
+//      as small rows, the in-progress card with Resume, and habits / records / weight as one row each.
+const CACHE = 'aap-v58';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

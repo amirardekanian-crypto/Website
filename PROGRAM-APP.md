@@ -541,6 +541,24 @@ sits in front of the whole site).
   let the sweep close the day as it would at midnight. Ticks from before 2026-09-26 carry no date and are not
   asked about. The sweep still runs at launch only, not when the app returns to the foreground.
 
+## 🏠 Home, led by the training (HOME-02, 2026-09-26)
+
+Built from Amir's notes on the mockup: "I like how small the other cards like habits, records and weight
+are · I like the in progress day card · I like the small cycle details · If the days are done, make the day
+card into that small one, if not, still big". And one refusal: **no rest-day design**, "because we don't know
+their rest days, athlete can move the days". So:
+
+- The cycle is one line under the greeting (`.home-cyc`, → Game Plan), with the week when the cycle has dates.
+- `dayCardHTML()`: a day done this week (`weekDoneDays()`) is a `.dc-row` (✓, name, DONE); a day not done is the
+  big photo card; a day in progress (`dayInProgress()`) gets `.dc-live` under its banner (sets done of total, the
+  clock ticking via `paintLiveClocks()`, **Resume**). `paintWeek()` redraws the cards, so a card changes shape
+  the moment a day is finished. The suggested day is found by `data-dc`, since rows and cards now mix.
+- Habits, Personal Records and Body weight are one `.hrow` each (label, the number, one small line, a spark
+  where there is a trend). Where there is nothing yet, a quiet dashed row with one line replaces the old giant
+  clay "NO RECORDS YET" / "NOT TRACKED YET". The habits row is still followed by AA Proof's strip, so habits
+  are ticked on Home (fork 1B), and it shows Proof's count once instead of a hero card and a strip.
+- A week where every day is done says "All 3 sessions done this week", with every day a row. Nothing more.
+
 ## 📅 This Week is built from the session history (HOME-01, 2026-09-26)
 
 Home's week used to know only today: a Done pill lasted until midnight (the `<id>_completed_d<N>` stamp) and
