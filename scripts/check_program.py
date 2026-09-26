@@ -18,6 +18,9 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
                   exercise's Spine credits and cost (stage39), so it needs --spine. The volume
                   checks themselves (floors, over 20, per-session, flat week, back-to-back) run
                   whenever --spine is given. (--log, the hand-typed table this replaced, is retired.)
+                  The day table also carries each day's modelled minutes, and the expected real
+                  minutes once last cycle's logs give a real-to-model ratio, so the log keeps them
+                  for the next cycle's time check (2026-09-27).
   --floor         the programme's aim is to get strong and build muscle (Amir, 2026-09-26:
                   "that rule is based on science of hypertrophy, for athletes, do what is best
                   for them"): every major muscle (quads, hamstrings, glutes, back, chest,
@@ -25,6 +28,7 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
                   --female, which only floored women's lower body.
   --floor-except  comma list of major muscles excused from the floor, each for a reason the
                   spec states (chest, posture). Without it, the spec's "floor-except: ..." line
+                  is used
   --proven        the athlete has PROVEN the volume in our own logs, so an exercise may carry
                   more than 4 sets (Amir, 2026-09-26: a self-described "pro" is not proof)
   --no-backoff    this cycle has no back-off week, ONLY because Amir said so for this athlete
@@ -43,8 +47,12 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
                   Map, "weighted" for the 8-rep rule, and (from last cycle and the Exercise Ledger in the same
                   result) the continuity checks: kept accessories, a kept dose that didn't move,
                   a Disliked / Pain-flagged / Banned exercise back. The spec's "keep:" and
-                  "reintroduce:" lines name the ones kept or brought back on purpose, with reasons
+                  "reintroduce:" lines name the ones kept or brought back on purpose, with reasons.
+                  It also says how every card's NAME resolves in the Spine (the name scan that was
+                  a separate node step in /program-assemble until 2026-09-27), and it carries
+                  checksums: a saved copy that differs from what the server sent stops the run
   --spine-sql     print the one query whose result is the --spine file, then stop
+  --art WORD      the cycle's art word for the headline check, when the built file has none
   --stage S       build = straight after design, before engage writes any text: every
                   programming check, none of the text ones. final (default) = everything
   --fingerprint   print the content fingerprint and the SQL that computes the server's, then stop
@@ -170,7 +178,17 @@ def norm_name(s):
     return re.sub(r'\s+', ' ', re.sub(r"[^a-z0-9]+", ' ', str(s or '').lower().replace("'", ''))).strip()
 
 # ── the rule checks ───────────────────────────────────────────────────────────
-def check_structure(data, args, spine=None):
+def name_hint(name, names):
+    """What the Spine knows about a card name with no exId, from --spine-sql's `names` (2026-09-27)."""
+    r = (names or {}).get(name or '')
+    if r is None: return ''
+    if r['hit']: return f": the Spine has it as {r['hit']}, so stamp that exId"
+    if r['near']: return f": no entry by that name or alias, and the nearest is {r['near_name']} [{r['near']}]: use its name (NAM-8), or draft a new entry with /spine if it is a different movement"
+    return (": not in the Spine by that name. If it is a movement the Spine already has under another name "
+            "(Back Squat for Barbell Back Squat), stamp that id and add this name as an alias; if it is new, "
+            "draft it with /spine, in full (NAM-9)")
+
+def check_structure(data, args, spine=None, names=None):
     seen = {}
     for d, b, ex, it in exercises(data):
         o = it or ex
@@ -184,7 +202,7 @@ def check_structure(data, args, spine=None):
             if not prep and args.new:
                 fail(f"{where}: a working circuit (superset) in a new athlete's first cycle: straight sets only", 'SES-11')
             continue
-        if not o.get('exId'): fail(f"{where}: no exId", 'CUE-4')
+        if not o.get('exId'): fail(f"{where}: no exId{name_hint(o.get('name'), names)}", 'CUE-4')
         # No floating text on a card (Amir, 2026-09-25: "i dont like floating text and remember this").
         # A grip is the athlete's CHIP ("grips should be a chip on the card not a free text"): the only
         # chip an rx card draws is `intent`, the pill his older cards use for "neutral grip". Any other
@@ -247,6 +265,77 @@ def check_structure(data, args, spine=None):
                 n += len(ex.get('items') or []) if ex.get('type') == 'circuit' else 1
         if n >= 7: warn(f"Day {d.get('id')}: {n} working exercises, a grind (7 or more): check the day's load identity", 'SES-15', 'VOL-2')
 
+# ── names, retest flags and block order (2026-09-27, the second audit) ────────
+# The name hygiene below was a node snippet in /program-assemble Step 4 that read the whole Spine
+# catalogue, re-typed into a scratch file (39,000 characters) every cycle. The checker's one query
+# now resolves each card's name on the server, so the catalogue never has to be copied.
+def check_names(data, ctx):
+    spine, names = ctx.get('spine') or {}, ctx.get('names') or {}
+    for d, b, ex, it in exercises(data):
+        if not it and ex.get('type') == 'circuit': continue  # a circuit's name is its pairing, not an exercise
+        o = it or ex
+        nm, where = o.get('name') or '', f"Day {d.get('id')} · {o.get('name')}"
+        if re.match(r'\s*bodyweight\s+', nm, re.I):
+            fail(f"{where}: drop the 'Bodyweight' prefix: a bodyweight move takes the bare name", 'NAM-2')
+        if re.search(r'[(),:]', nm):
+            fail(f"{where}: brackets, colons or commas in a name. A grip goes to the intent pill, a variant that "
+                 "changes the exercise is its own entry, anything else is the Coach's Note", 'NAM-4')
+        e = spine.get(o.get('exId') or '')
+        if not e or not e.get('name'): continue
+        known = {norm_name(e['name'])} | {norm_name(a) for a in e.get('aliases') or []}
+        if norm_name(nm) in known: continue
+        hit = (names.get(nm) or {}).get('hit')
+        if hit and hit != o.get('exId'):
+            warn(f"{where}: its name is the Spine entry {hit}, but its exId is {o.get('exId')}: check which one is right, "
+                 "since the card shows the exId's cues and video", 'NAM-8')
+        else:
+            info(f"{where}: not the name or an alias of {o.get('exId')} ({e['name']}): add it as an alias in the Spine upkeep")
+
+def check_tests(data, args):
+    """TST-5: two or three retest flags a cycle, on grinding standard lifts, and none in a first cycle
+    (TST-3, Amir 2026-09-27: a new athlete's first cycle gets no max-effort set; the logs are its baseline)."""
+    flagged = []
+    for d, b, ex, it in exercises(data):
+        o = it or ex
+        if not o.get('test'): continue
+        where = f"Day {d.get('id')} · {o.get('name')}"
+        flagged.append(where)
+        rx = o.get('rx') or {}
+        if it or ex.get('type') != 'standard' or PREP.search(b.get('title') or '') or rx.get('time') or rx.get('distance'):
+            warn(f"{where}: a retest flag belongs on a grinding standard lift, never a circuit item, a warm-up, "
+                 "or anything timed or measured in metres", 'TST-5')
+    if flagged and args.new:
+        fail(f"{len(flagged)} retest flag{'s' if len(flagged) > 1 else ''} in a first cycle ({'; '.join(flagged)}): "
+             "a first cycle has no max-effort set and no test flag", 'TST-5')
+    elif len(flagged) > 3:
+        fail(f"{len(flagged)} retest flags ({'; '.join(flagged)}): two or three a cycle at most, or the nudge stops working", 'TST-5')
+
+WARMUP_TITLE = re.compile(r'warm|activation|prep|prime', re.I)  # the opening blocks; mobility and a cool-down may sit anywhere
+BLOCK_ORDER = ((2, re.compile(r'\bprimary\b', re.I)), (3, re.compile(r'\baccessor(?:y|ies)\b', re.I)), (4, re.compile(r'\bcore\b', re.I)))
+
+def block_rank(title):
+    if WARMUP_TITLE.search(title or ''): return 0
+    for rank, rx in BLOCK_ORDER:
+        if rx.search(title or ''): return rank
+    return None  # power and conditioning blocks are free-named, so their place isn't checked
+
+def check_blocks(data):
+    """SES-9: never one "Strength" block for Primary and Accessory, and the standard order
+    Activation & Prep, [power], Primary, Accessory, Core, [conditioning] (SCHEMA → Standard section names)."""
+    for d in (data.get('workouts') or {}).get('days') or []:
+        seen = []
+        for b in d.get('blocks') or []:
+            t = b.get('title') or ''
+            if re.sub(r'[^a-z]', '', t.lower()) == 'strength':
+                fail(f"Day {d.get('id')}: a block called '{t}'. Primary and Accessory are two blocks, never one Strength block", 'SES-9')
+            r = block_rank(t)
+            if r is None: continue
+            after = next((pt for pr, pt in seen if pr > r), None)
+            if after:
+                warn(f"Day {d.get('id')}: '{t}' comes after '{after}'. The order is Activation & Prep, [power], "
+                     "Primary, Accessory, Core, [conditioning]", 'SES-9')
+            seen.append((r, t))
+
 # COM-13: weighing in happens on Home → Body Weight in program.html. AA Proof has had no weight
 # screen since 2026-09-12, yet eleven live lines in six programmes still sent athletes there (the
 # 2026-09-26 audit, 5.1). A sentence that names Proof AND weighing in fails; a sleep or protein
@@ -277,6 +366,11 @@ def weigh_in_proof(sentence):
         if PROOF.search(c) and WEIGH_IN.search(c) and not PROOF_NEGATED.search(c): return True
     return not (RIGHT_DOOR.search(sentence) or PROOF_NEGATED.search(sentence))
 
+# A sentence that lowers the RPE must name the floor of 6 (CHP-4). Until 2026-09-27 any "6" passed,
+# "Day 6" included; now the 6 has to sit next to a floor word, or be written as "RPE 6".
+FLOOR6 = re.compile(r"(?:floor|below|under|beneath|lower than|less than|lowest|minimum|at least|no lower|stays?(?:\s+at)?|never)"
+                    r"[^.!?]{0,30}?\b6\b|\b6\b[^.!?]{0,20}?(?:floor|minimum|lowest|stays?)|\bRPE\s*(?:of\s*)?6\b", re.I)
+
 def check_text(data):
     for where, s in text_fields(data):
         for sen in sentences(s):
@@ -286,7 +380,7 @@ def check_text(data):
         for m in re.finditer(r'RPE\s*(?:of\s*)?(\d+(?:\.\d+)?)', s):
             if float(m.group(1)) < 6: fail(f"{where}: says RPE {m.group(1)}, under the floor of 6", 'CHP-4')
         for sen in sentences(s):
-            if re.search(r'\b(take|drop|minus|subtract|lower|knock)\b.{0,40}\bRPE', sen, re.I) and '6' not in sen:
+            if re.search(r'\b(take|drop|minus|subtract|lower|knock)\b.{0,40}\bRPE', sen, re.I) and not FLOOR6.search(sen):
                 fail(f"{where}: lowers the RPE without naming the floor of 6 in the same sentence: \"{sen[:90]}\"", 'CHP-4')
         if '—' in s: warn(f"{where}: an em-dash (not how Amir writes)", 'COM-3')
         m = re.search(r'\b(\d+)\s*[-–]\s*(\d+)\s*reps?\b', s, re.I)
@@ -548,17 +642,41 @@ def day_minutes(day):
                 if primary and rx.get('tempo'): total += 120  # ramp-up sets before a main lift
     return total / 60, assumed
 
-def check_time(data, args):
+def time_ratio(ctx):
+    """Real minutes ÷ modelled minutes for the cycle just trained (2026-09-27): `prev` from --spine-sql
+    (the live programme before this build) through day_minutes(), against the logged average per day
+    over the last six weeks. The model runs short (one athlete's 48 modelled minutes took 69), so the
+    ratio turns this cycle's model into an expected real length. None when either side is missing or
+    the ratio is implausible (a timer left running)."""
+    prev, logged = (ctx or {}).get('prev'), (ctx or {}).get('minutes') or {}
+    if not prev or not logged: return None, ''
+    model = {str(d.get('id')): day_minutes(d)[0] for d in prev_programme(prev)['workouts']['days']}
+    both = sorted((k for k in logged if k in model and model[k] > 0 and num(logged[k])), key=day_order)
+    if not both: return None, ''
+    ratio = sum(num(logged[k]) for k in both) / sum(model[k] for k in both)
+    detail = ' · '.join(f"D{k} {model[k]:.0f}→{num(logged[k]):.0f}" for k in both)
+    if not 0.6 <= ratio <= 2.5:
+        return None, f"last cycle, modelled → logged minutes: {detail}: ×{ratio:.2f} is too far off to use"
+    return ratio, f"last cycle, modelled → logged minutes: {detail} (real ≈ ×{ratio:.2f} the model)"
+
+def check_time(data, args, ctx=None):
+    ratio, said = time_ratio(ctx)
+    if said: info(said)
+    timing = {}
     for d in (data.get('workouts') or {}).get('days') or []:
         mins, assumed = day_minutes(d)
+        real = mins * ratio if ratio else None
+        timing[str(d.get('id'))] = (mins, real)
         note = ' (some rests not prescribed, 60 s assumed)' if assumed else ''
-        line = f"Day {d.get('id')} ≈ {mins:.0f} min{note}"
+        line = f"Day {d.get('id')} ≈ {mins:.0f} min{note}" + (f", about {real:.0f} real at last cycle's ×{ratio:.2f}" if real else '')
         # The cap is SOFT (Amir, 2026-09-26: athletes who write "60 minutes" train 75 and never
         # complain, "so days time cap, is usually not very important"). Never a FAIL: the design
-        # says the expected real length at the checkpoint instead of cutting work to fit.
+        # says the expected real length at the checkpoint instead of cutting work to fit. The cap is
+        # in real minutes, so it is held against the expected real length when there is a ratio.
         cap = args.cap if args.cap is not None else 60
-        if mins > cap: warn(f"{line}: past the {cap:g}-min cap (soft: tell Amir the expected real length)", 'SES-7')
+        if (real or mins) > cap: warn(f"{line}: past the {cap:g}-min cap (soft: tell Amir the expected real length)", 'SES-7')
         else: info(line)
+    return timing
 
 # ── volume, counted from each exercise's Spine credits (2026-09-26) ───────────
 # VOL-10's count (1 prime mover, 0.5 synergist) and VOL-2's cost live ONCE, on the exercise's Spine
@@ -604,7 +722,7 @@ def compute_volume(data, spine):
         v['load'][day] += n * c; v['sets'][day] += n
     return v
 
-def check_volume(data, args, spine):
+def check_volume(data, args, spine, timing=None):
     v = compute_volume(data, spine)
     if v['nocredit']:
         fail(f"no muscle credits on the Spine entr{'y' if len(v['nocredit']) == 1 else 'ies'} {', '.join(sorted(v['nocredit']))}, "
@@ -640,14 +758,14 @@ def check_volume(data, args, spine):
         info('day load (working sets x cost: heavy 1.5, moderate 1, isolation 0.5): ' + ' · '.join(
             f"Day {d} {round(v['load'][d], 1):g} from {round(v['sets'][d], 1):g} sets" for d in sorted(v['load'], key=day_order)))
     if args.tables:
-        open(args.tables, 'w', encoding='utf-8').write(volume_tables(v, excused))
+        open(args.tables, 'w', encoding='utf-8').write(volume_tables(v, excused, timing))
         info(f"volume tables written to {args.tables}: paste them into the log's Volume & Dose section as they are")
     return v['day']
 
 def day_order(d): return (0, int(d)) if str(d).isdigit() else (1, str(d))
 
-def volume_tables(v, excused):
-    """VOL-10's two tables and VOL-2's day loads, as markdown for the coaching log."""
+def volume_tables(v, excused, timing=None):
+    """VOL-10's two tables and VOL-2's day loads (with each day's minutes), as markdown for the coaching log."""
     def cells(sets, parts):
         return ' · '.join(f"{m.title()} {sets * w:g}" + ('' if w == 1 else f" (×{w:g})")
                           for m, w in sorted(parts.items(), key=lambda kv: (-kv[1], MUSCLES.index(kv[0]) if kv[0] in MUSCLES else 99)))
@@ -662,9 +780,11 @@ def volume_tables(v, excused):
             verdict = 'over 20' if n > 20 else 'in range' if n >= 10 else 'under 10, excused (floor-except)' if m in excused else 'under 10'
             L.append(f"| {m.title()} | {n:g} | 10–20 | {verdict} |")
         else: L.append(f"| {m.title()} | {n:g} | | |")
-    L += ['', '| Day | Working sets | Load (sets × cost) |', '|---|---|---|']
+    L += ['', '| Day | Working sets | Load (sets × cost) | Minutes (model) |', '|---|---|---|---|']
     for day in sorted(v['load'], key=day_order):
-        L.append(f"| D{day} | {round(v['sets'][day], 1):g} | {round(v['load'][day], 1):g} |")
+        m = (timing or {}).get(day)
+        mins = '' if not m else f"{m[0]:.0f}" + (f" (≈ {m[1]:.0f} real)" if m[1] else '')
+        L.append(f"| D{day} | {round(v['sets'][day], 1):g} | {round(v['load'][day], 1):g} | {mins} |")
     return '\n'.join(L) + '\n'
 
 def floor_excused(args):
@@ -703,11 +823,12 @@ def load_context(path):
     the athlete's live programme BEFORE this build (`prev`: the cycle just trained), and the
     Exercise Ledger table from their coaching log. So continuity costs no extra lookup."""
     raw = open(path, encoding='utf-8').read().strip()
-    lines, prev, ledger, profile = [], None, None, None
+    lines, prev, ledger, profile, names, minutes = [], None, None, None, {}, {}
     if raw[:1] in '[{':
         rows = json.loads(raw)
         for o in (rows if isinstance(rows, list) else [rows]):
             if not isinstance(o, dict): continue
+            verify_copy(o, path)
             if 'spine' in o: lines += str(o['spine'] or '').splitlines()
             elif 'id' in o:
                 lines.append('|'.join([o['id'], o.get('status', ''), str(o.get('has_cues', '')).lower(),
@@ -715,6 +836,13 @@ def load_context(path):
             if o.get('prev') is not None: prev = o['prev'] if isinstance(o['prev'], dict) else json.loads(o['prev'])
             if o.get('ledger'): ledger = str(o['ledger'])
             if o.get('profile'): profile = str(o['profile'])
+            # card name|hit id|near id|the Spine name of hit or near (2026-09-27)
+            for l in str(o.get('names') or '').splitlines():
+                p = l.split('|')
+                if len(p) >= 4: names[p[0]] = {'hit': p[1] or None, 'near': p[2] or None, 'near_name': p[3]}
+            if o.get('minutes'):
+                m = o['minutes'] if isinstance(o['minutes'], dict) else json.loads(o['minutes'])
+                minutes = {str(k): v for k, v in m.items()}
     else:
         lines = raw.splitlines()
     spine = {}
@@ -733,7 +861,23 @@ def load_context(path):
                 e['credits'] = {norm_muscle(k): float(w) for k, w in (x.split(':') for x in p[9].split(',') if ':' in x)}
             e['cost'] = p[10] or None
         spine[p[0]] = e
-    return {'spine': spine, 'prev': prev, 'ledger': ledger, 'profile': profile}
+    return {'spine': spine, 'prev': prev, 'ledger': ledger, 'profile': profile, 'names': names, 'minutes': minutes}
+
+def verify_copy(o, path):
+    """The --spine file reaches disk only by being copied from the database's answer, so a slip in
+    the copy would quietly change a volume table or a ledger check. --spine-sql returns an md5 of each
+    text it sends, and of how many exercises `prev` holds; a mismatch stops the run (2026-09-27)."""
+    for key in ('spine', 'names', 'ledger'):
+        want = o.get(key + '_md5')
+        if want and hashlib.md5(str(o.get(key) or '').encode('utf-8')).hexdigest() != want:
+            sys.exit(f"STOP  {path}: the saved '{key}' is not what the server sent (its checksum differs). "
+                     "Save the query's result again, exactly as it came back, and re-run.")
+    if o.get('prev_n') is not None and o.get('prev') is not None:
+        prev = o['prev'] if isinstance(o['prev'], dict) else json.loads(o['prev'])
+        n = sum(len(b.get('x') or []) for d in (prev or {}).get('days') or [] for b in d.get('blocks') or [])
+        if n != int(o['prev_n']):
+            sys.exit(f"STOP  {path}: the saved 'prev' holds {n} exercises and the server sent {o['prev_n']}. "
+                     "Save the query's result again, exactly as it came back, and re-run.")
 
 def load_spine(path):
     return load_context(path)['spine']
@@ -796,7 +940,7 @@ def prev_programme(prev):
                                                   'detail': i.get('detail')}.items() if v is not None}
                                for i in (x.get('items') or [])]}
                 exs.append({k: v for k, v in e.items() if v not in (None, [])})
-            blocks.append({'title': b.get('t') or '', 'exercises': exs})
+            blocks.append({'title': b.get('t') or '', 'rest': b.get('r'), 'exercises': exs})
         days.append({'id': d.get('id'), 'blocks': blocks})
     return {'workouts': {'days': days}}
 
@@ -989,39 +1133,77 @@ def check_spine(data, args, spine):
              f"your recommendation (suggested: {hint}). Never add volume only to satisfy this line", 'PRC-24')
 
 # ── the two printouts ─────────────────────────────────────────────────────────
+def sql_text(s): return "'" + str(s).replace("'", "''") + "'"
+
+# How a name is matched, on the server, the way the old node scan did it: exact after lower-casing
+# and dropping punctuation, else "loose" (db/bb/kb spelled out, "machine" dropped, words sorted).
+NORM_SQL = "trim(regexp_replace(regexp_replace(lower({x}), '''', '', 'g'), '[^a-z0-9]+', ' ', 'g'))"
+LOOSE_SQL = ("(select coalesce(string_agg(t, ' ' order by t), '') from (select case w when 'db' then 'dumbbell' "
+             "when 'bb' then 'barbell' when 'kb' then 'kettlebell' else w end t from unnest(string_to_array({n}, ' ')) w) z "
+             "where t not in ('machine', ''))")
+
 def spine_sql(data):
     ids = sorted({(it or ex).get('exId') for d, b, ex, it in exercises(data) if (it or ex).get('exId')})
+    names = sorted({(it or ex).get('name') for d, b, ex, it in exercises(data)
+                    if (it or ex).get('name') and not (not it and ex.get('type') == 'circuit')})
     aid = re.sub(r"[^A-Za-z0-9_.-]", '', (data.get('athlete') or {}).get('id') or '')
-    idlist = ', '.join(f"'{i}'" for i in ids) or "''"
-    print(f"""-- Run once, save the raw result to the scratchpad, pass it as --spine. Missing ids = no entry.
--- It also returns the athlete's live programme BEFORE this build (prev: the cycle just trained),
--- their Exercise Ledger and their stored athlete profile (2026-09-26). Read-only, one call.
+    idlist = ', '.join(sql_text(i) for i in ids) or "''"
+    namelist = ', '.join(sql_text(n) for n in names)
+    print(f"""-- Run once, save the raw result to the scratchpad EXACTLY as returned, pass it as --spine.
+-- Read-only, one call. It returns the Spine lines for this programme's exercises (by exId, or found by a
+-- card's name), how each card name resolves (the old node name scan, 2026-09-27), the athlete's live
+-- programme BEFORE this build (prev: the cycle just trained), their Exercise Ledger, their stored athlete
+-- profile, the real minutes per day, and checksums: the checker stops if the saved copy differs.
 -- Each Spine line ends with the entry's muscle credits and cost, which the volume count reads.
-select
- (select string_agg(e.id || '|' || e.status || '|' || (e.cues is not null)::text || '|' || array_to_string(e.qualities, ',')
+with cards(n) as (select unnest(array[{namelist}]::text[])),
+cat as (select e.id, e.name, k, {NORM_SQL.format(x='k')} nk
+        from public.exercises e, unnest(array[e.name] || e.aliases) k),
+catl as (select cat.*, {LOOSE_SQL.format(n='cat.nk')} lk from cat),
+cardl as (select n, nk, {LOOSE_SQL.format(n='nk')} lk from (select n, {NORM_SQL.format(x='n')} nk from cards) c),
+res as (select c.n,
+          (select l.id from catl l where l.nk = c.nk order by (l.k = l.name) desc, l.id limit 1) hit,
+          (select l.id from catl l where l.lk = c.lk and c.lk <> '' order by l.id limit 1) near
+        from cardl c),
+s as (select
+ (select string_agg(e.id || '|' || e.status || '|'
+     || (coalesce(jsonb_array_length(case when jsonb_typeof(e.cues->'good') = 'array' then e.cues->'good' end), 0) > 0)::text
+     || '|' || array_to_string(e.qualities, ',')
      || '|' || coalesce(e.pattern, '') || '|' || coalesce(e.impact, '') || '|' || array_to_string(e.equipment, ';')
      || '|' || e.name || '|' || array_to_string(e.aliases, ';')
      || '|' || coalesce(case when c.credits = '{{}}'::jsonb then 'none' else
           (select string_agg(k || ':' || w, ',' order by k) from jsonb_each_text(c.credits) t(k, w)) end, '')
      || '|' || coalesce(c.cost, ''), E'\\n' order by e.id)
-  from public.exercises e left join public.exercise_coach c using (id) where e.id in ({idlist})) as spine,
+  from public.exercises e left join public.exercise_coach c using (id)
+  where e.id in ({idlist}) or e.id in (select hit from res) or e.id in (select near from res)) as spine,
+ (select string_agg(r.n || '|' || coalesce(r.hit, '') || '|' || coalesce(case when r.hit is null then r.near end, '')
+     || '|' || coalesce((select x.name from public.exercises x where x.id = coalesce(r.hit, r.near)), ''), E'\\n' order by r.n)
+  from res r) as names,
  (select jsonb_build_object('cci', coalesce((p.data->>'currentCycleIndex')::int, 0), 'days',
     (select jsonb_agg(jsonb_build_object('id', d->'id', 'blocks',
-       (select jsonb_agg(jsonb_build_object('t', b->>'title', 'x',
+       (select jsonb_agg(jsonb_build_object('t', b->>'title', 'r', b->'rest', 'x',
           (select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('n', e->>'name', 'id', e->>'exId', 'type', e->>'type',
                'rx', e->'rx', 'chips', e->'chips', 'rounds', e->'rounds',
                'items', (select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('n', i->>'name', 'id', i->>'exId',
                                                                                'rx', i->'rx', 'detail', i->'detail')))
                          from jsonb_array_elements(case when jsonb_typeof(e->'items') = 'array' then e->'items' else '[]'::jsonb end) i))))
-           from jsonb_array_elements(b->'exercises') e)))
-        from jsonb_array_elements(d->'blocks') b)))
+           from jsonb_array_elements(case when jsonb_typeof(b->'exercises') = 'array' then b->'exercises' else '[]'::jsonb end) e)))
+        from jsonb_array_elements(case when jsonb_typeof(d->'blocks') = 'array' then d->'blocks' else '[]'::jsonb end) b)))
      from jsonb_array_elements(case when jsonb_typeof(p.data->'workouts'->'days') = 'array'
                                     then p.data->'workouts'->'days' else '[]'::jsonb end) d))
   from public.programs p where p.athlete_id = '{aid}') as prev,
  (select substring(body from '(\\| *Exercise *\\| *Status[^\\n]*\\n(?:\\|[^\\n]*\\n?)*)')
   from public.coaching_logs where athlete_id = '{aid}') as ledger,
  (select substring(body from '(```profile.*?\\n *```)')
-  from public.coaching_logs where athlete_id = '{aid}') as profile;""")
+  from public.coaching_logs where athlete_id = '{aid}') as profile,
+ (select jsonb_object_agg(dd, m) from (select day::text dd, round(avg(duration_min)) m from public.session_history
+     where athlete_id = '{aid}' and day is not null and duration_min > 10 and completed_on >= current_date - 42
+     group by day) x) as minutes)
+select spine, md5(coalesce(spine, '')) spine_md5, names, md5(coalesce(names, '')) names_md5,
+       prev, (select count(*) from jsonb_array_elements(case when jsonb_typeof(prev->'days') = 'array' then prev->'days' else '[]'::jsonb end) d,
+                jsonb_array_elements(case when jsonb_typeof(d->'blocks') = 'array' then d->'blocks' else '[]'::jsonb end) b,
+                jsonb_array_elements(case when jsonb_typeof(b->'x') = 'array' then b->'x' else '[]'::jsonb end) x) prev_n,
+       ledger, md5(coalesce(ledger, '')) ledger_md5, profile, minutes
+from s;""")
 
 KEYS = ['athlete', 'sport', 'currentCycleIndex', 'cycles', 'workouts', 'notes']
 def fingerprint(data, athlete_id):
@@ -1080,7 +1262,8 @@ def main():
     else: apply_profile(args, parse_profile(ctx.get('profile')), 'coaching log')
     if not args.week and spec_lines(args, 'week'):
         args.week = spec_lines(args, 'week')[0]  # the spec's example week (2026-09-26)
-    check_structure(data, args, ctx['spine'])
+    check_structure(data, args, ctx['spine'], ctx.get('names'))
+    check_names(data, ctx); check_tests(data, args); check_blocks(data)
     # --stage build runs straight after design, BEFORE engage writes a word (2026-09-26): a FAIL
     # there changes the programme while no note, Because or message has been written around it.
     if args.stage == 'final':
@@ -1088,8 +1271,8 @@ def main():
     else:
         info('--stage build: the text checks (notes, Becauses, week-note words, RPE in text) run in the final pass')
     check_week_notes(data, args)
-    check_bans(data, args); check_time(data, args)
-    per_day = check_volume(data, args, ctx['spine']) if args.spine else {}
+    check_bans(data, args); timing = check_time(data, args, ctx)
+    per_day = check_volume(data, args, ctx['spine'], timing) if args.spine else {}
     check_week(data, args, per_day)
     if args.spine:
         check_spine(data, args, ctx['spine']); check_continuity(data, args, ctx)

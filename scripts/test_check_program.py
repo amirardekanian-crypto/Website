@@ -377,6 +377,75 @@ for line in ["Weigh In On Proof", "log your weight in AA Proof",
 out = run(with_card("Weigh in on Proof", "<p>Monday.</p>"), '--stage', 'build')
 expect('COM-13: --stage build skips it (no words yet)', not has(out, 'FAIL', '[COM-13]'), out)
 
+# ── 10. added 2026-09-27 (the second audit): retest flags, block order, the RPE floor, names ──
+def flag(d, day, block, i, test='5RM'): d['workouts']['days'][day]['blocks'][block]['exercises'][i]['test'] = test; return d
+d = flag(copy.deepcopy(BASE), 0, 1, 0)
+expect('TST-5: one retest flag in a returning cycle passes', not has(run(d, ctx=CTX), 'FAIL', '[TST-5]'))
+d['currentCycleIndex'] = 0; d['cycles'][0]['weekNotes'] = {"first": {"rpeCap": 7, "text": "Start lighter and keep every set at RPE 7 or under."},
+                                                           "last": {"setsDrop": 1, "text": "One set fewer on everything."}}
+expect('TST-5: a retest flag in a first cycle fails', has(run(d, ctx=CTX), 'FAIL', 'retest flag in a first cycle'))
+d = copy.deepcopy(BASE)
+d['workouts']['days'][0]['blocks'][2]['exercises'] += [ex("Goblet Squat", "goblet-squat", sets=3, reps=10, rpe=8),
+                                                       ex("Dumbbell Bench Press", "dumbbell-bench-press", sets=3, reps=10, rpe=8)]
+for i in range(3): flag(d, 0, 2, i)
+flag(d, 0, 1, 0)
+expect('TST-5: four retest flags fail', has(run(d, ctx=CTX), 'FAIL', '4 retest flags'))
+d = copy.deepcopy(BASE); flag(d, 0, 0, 0)
+expect('TST-5: a flag on a timed warm-up warns', has(run(d, ctx=CTX), 'WARN', 'a retest flag belongs on a grinding standard lift'))
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['title'] = 'Strength'
+expect('SES-9: a block called Strength fails', has(run(d, ctx=CTX), 'FAIL', "a block called 'Strength'"))
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'].insert(1, {"title": "Core", "exercises": [ex("Dead Bug", "dead-bug", sets=2, reps=8, side=True)]})
+expect('SES-9: Core before Primary warns', has(run(d, ctx=CTX), 'WARN', "'Primary' comes after 'Core'"))
+expect('SES-9: the standard order is quiet', not has(run(BASE, ctx=CTX), 'WARN', '[SES-9]'))
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'].append({"title": "Mobility Flow", "exercises": [{"type": "simple", "name": "Couch Stretch", "exId": "couch-stretch", "rx": {"time": "60s"}}]})
+expect('SES-9: a mobility block at the end is fine', not has(run(d), 'WARN', '[SES-9]'))
+for text, ok in [("Drop 1 RPE on Day 6.", False), ("Knock 1 off every RPE: 6 is the floor.", True),
+                 ("Anything already at 6 stays at 6 when you take 1 off every RPE.", True),
+                 ("Take 1 off every RPE, never below 6.", True), ("Take 1 off every RPE and never go under your target.", False)]:
+    out = run(with_card("Rough days", f"<p>{text}</p>"))
+    expect(f"CHP-4 {'passes' if ok else 'fails'}: {text[:45]}", has(out, 'FAIL', 'without naming the floor') != ok, out)
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][2]['exercises'][0]['name'] = 'Bodyweight Reverse Lunge'
+expect('NAM-2: a "Bodyweight" prefix fails', has(run(d, ctx=CTX), 'FAIL', "drop the 'Bodyweight' prefix"))
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][2]['exercises'][0]['name'] = 'Machine Seated Leg Curl (slow)'
+expect('NAM-4: brackets in a name fail', has(run(d, ctx=CTX), 'FAIL', 'brackets, colons or commas'))
+NAMES = "\n".join(["Back Squat|barbell-back-squat||Barbell Back Squat", "DB Goblet Squat||goblet-squat|Goblet Squat",
+                   "Sled Push|||", "Lat Pulldown|lat-pulldown||Lat Pulldown"])
+d = copy.deepcopy(BASE)
+d['workouts']['days'][0]['blocks'][1]['exercises'][0].pop('exId'); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['name'] = 'Back Squat'
+d['workouts']['days'][0]['blocks'][2]['exercises'].append({"type": "standard", "name": "DB Goblet Squat", "rx": {"sets": 3, "reps": 10, "rpe": 8}})
+d['workouts']['days'][1]['blocks'][0]['exercises'].append({"type": "standard", "name": "Sled Push", "rx": {"sets": 3, "distance": "20m", "rpe": 8}})
+out = run(d, ctx=[{"spine": SB, "prev": None, "ledger": None, "names": NAMES}])
+expect('names: an alias hit says which exId to stamp', has(out, 'FAIL', 'no exId: the Spine has it as barbell-back-squat'), out)
+expect('names: a near miss names the entry', has(out, 'FAIL', 'the nearest is Goblet Squat [goblet-squat]'), out)
+expect('names: an unknown name says alias or draft', has(out, 'FAIL', 'not in the Spine by that name') and 'draft it with /spine' in out, out)
+d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'][0]['exercises'][0]['exId'] = 'chest-supported-dumbbell-row'
+expect('NAM-8: a name that is another entry warns', has(run(d, ctx=[{"spine": SB, "prev": None, "ledger": None, "names": NAMES}]),
+       'WARN', 'its name is the Spine entry lat-pulldown, but its exId is chest-supported-dumbbell-row'))
+import hashlib
+good = {"spine": SB, "spine_md5": hashlib.md5(SB.encode('utf-8')).hexdigest(), "prev": None, "ledger": None}
+out = run(BASE, ctx=[good])
+expect('checksum: a faithful copy runs', 'STOP' not in out and 'FAIL' not in out.split('\n')[0], out)
+bad_copy = dict(good, spine=SB.replace('quads:1', 'quads:0.5'))
+out = run(BASE, ctx=[bad_copy])
+expect('checksum: a mistyped copy stops the run', 'STOP' in out and "the saved 'spine' is not what the server sent" in out, out)
+PREV_T = {"cci": 0, "days": [{"id": 1, "blocks": [{"t": "Primary", "r": 120, "x": [{"n": "Barbell Back Squat", "type": "standard", "rx": {"sets": 4, "reps": 6, "rpe": 7}}]}]},
+                             {"id": 2, "blocks": [{"t": "Primary", "r": 90, "x": [{"n": "Lat Pulldown", "type": "standard", "rx": {"sets": 4, "reps": 8, "rpe": 8}}]}]}]}
+out, tab = tables(BASE, ctx=[{"spine": SB, "prev": PREV_T, "ledger": None, "minutes": {"1": 15, "2": 12}, "prev_n": 2}])
+expect('minutes: last cycle modelled vs logged gives a ratio', has(out, 'INFO', 'modelled → logged minutes') and 'real ≈ ×' in out, out)
+expect('minutes: this cycle gets an expected real length', has(out, 'INFO', "real at last cycle's ×") or has(out, 'WARN', "real at last cycle's ×"), out)
+expect('minutes: the day table carries them', '| Minutes (model) |' in tab and 'real)' in tab, tab)
+out = run(BASE, ctx=[{"spine": SB, "prev": PREV_T, "ledger": None, "minutes": {"1": 90, "2": 80}, "prev_n": 2}])
+expect('minutes: a ratio past 2.5 (a timer left running) is not used', has(out, 'INFO', 'too far off to use') and "real at last cycle's" not in out, out)
+out = run(BASE, ctx=[{"spine": SB, "prev": PREV_T, "ledger": None, "prev_n": 5}])
+expect('checksum: a prev with missing exercises stops the run', "the saved 'prev' holds 2 exercises" in out, out)
+d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'][0]['exercises'].append(
+    {"type": "circuit", "name": "Carry Pair", "items": [{"name": "Farmer's Carry", "rx": {"distance": "20m"}}]})
+p = os.path.join(TMP, 'sql.json'); json.dump(d, open(p, 'w', encoding='utf-8'))
+sql = subprocess.run([sys.executable, CHECK, p, '--spine-sql'], capture_output=True, text=True, encoding='utf-8', cwd=REPO).stdout
+expect("--spine-sql: a card name's apostrophe is doubled", "'Farmer''s Carry'" in sql and 'cards(n)' in sql, sql[:400])
+expect("--spine-sql: a circuit's own name is not a card", "'Carry Pair'" not in sql, sql[:400])
+expect('--spine-sql: checksums and minutes are asked for', 'spine_md5' in sql and 'prev_n' in sql and 'as minutes' in sql, sql[-600:])
+
 # ── 6. the rule index guard (scripts/check_rule_index.py) ────────────────────
 spec_ri = importlib.util.spec_from_file_location('cri', os.path.join(REPO, 'scripts', 'check_rule_index.py'))
 P = os.path.join(REPO, '.claude', 'COACHING-PRINCIPLES.md')
