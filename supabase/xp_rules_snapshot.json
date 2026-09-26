@@ -1,7 +1,7 @@
 {
  "_about": "A copy of public.xp_rules (id 1).rules, minus questRuns (server-only, changes with every quest week). scripts/check_xp_rules.py compares it with habits.html's constants. Refresh it after changing the row: see the header of that script.",
  "read_at": "2026-09-26",
- "row_updated_at": "2026-08-10 17:57:55.044344+00",
+ "row_updated_at": "2026-09-26 22:09:56.20517+00",
  "keys_on_row": 18,
  "rules": {
   "base": 300,
@@ -113,28 +113,28 @@
    {
     "xp": 200,
     "code": "BF",
-    "name": "BACK IN THE FIGHT",
+    "name": "BACK IN THE FIGHT I",
     "need": 7,
     "measure": "comebackRun"
    },
    {
     "xp": 400,
     "code": "LR",
-    "name": "THE LONG ROAD BACK",
+    "name": "BACK IN THE FIGHT II",
     "need": 21,
     "measure": "comebackRun"
    },
    {
     "xp": 300,
     "code": "HK",
-    "name": "HARD TO KILL",
+    "name": "HARD TO KILL I",
     "need": 3,
     "measure": "comebacksStuck"
    },
    {
     "xp": 600,
     "code": "US",
-    "name": "UNSINKABLE",
+    "name": "HARD TO KILL II",
     "need": 5,
     "measure": "comebacksStuck"
    },
@@ -361,7 +361,7 @@
     "xp": 200,
     "kind": "total:steps",
     "need": 50000,
-    "note": "50,000 steps across the week",
+    "note": "50,000 steps this week",
     "title": "FIFTY THOUSAND"
    },
    {
@@ -369,7 +369,7 @@
     "xp": 280,
     "kind": "total:steps",
     "need": 70000,
-    "note": "70,000 steps across the week",
+    "note": "70,000 steps this week",
     "title": "THE LONG WAY ROUND"
    },
    {
@@ -417,7 +417,7 @@
     "xp": 250,
     "kind": "daysHit:strength",
     "need": 3,
-    "note": "Three sessions in the week",
+    "note": "Three sessions this week",
     "title": "THREE HARD DAYS"
    },
    {

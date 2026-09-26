@@ -156,9 +156,12 @@ so did the rest except where noted.
 - **5.2.5** The site video modal uses the app's YouTube rules and never invents an id.
 - **5.2.6** /ad stage 16b AUDIO and `.claude/skills/reel/tools/mux_audio.py` (-14 LUFS, checks sound).
 - **5.2.7** /spine has a pending list for wording proposals, in
-  `exercise_coach.suggested_changes`. **The column is not on the server yet**: see 5.1.
+  `exercise_coach.suggested_changes` (stage43, applied on Amir's word).
 - **5.2.8** WhatsApp message 2 and the handoff's OBLIGATIONS block are built from the spec's
   obligations list, with a count-and-order self-check.
+- **XP wording** (found by the new guard): the app's wording won (Amir). The `xp_rules` row now
+  carries the four "I / II" milestone names and the three "this week" quest notes, and the
+  snapshot is refreshed; the guard reads 0 FAIL, 0 NOTE.
 - **5.5** The six AA Proof bugs and the two stale habits.html comments are fixed.
 
 ### 5.1 Needs Amir
@@ -166,16 +169,11 @@ so did the rest except where noted.
 1. **Rotate the Supabase keys from May** (Amir, 26 September: not sure they were). Project Settings →
    API → roll the secret key; Account → Access Tokens → revoke the old token; then update the MCP
    config with the new one.
-2. **Apply `supabase/stage43_spine_proposals.sql`** (one new coach-only column, additive). Until it
-   is applied, /spine and /program-assemble print proposals in the handoff as before.
-3. **XP display wording drifts** (found by the new guard; scoring agrees): four milestone names
-   (the server row has the old names, habits.html the "I / II" names) and three quest notes ("across
-   the week" vs "this week"). Which wording wins? Then update the row with `jsonb_set`.
-4. **A recovery-band table** (REC-1): recovery band → starting sets per muscle and an RPE ceiling.
+2. **A recovery-band table** (REC-1): recovery band → starting sets per muscle and an RPE ceiling.
    It needs his numbers.
-5. **Optional rule-index line**, proposed by the 5.2.8 work, for after the freeze (PRC-25): COM-9
+3. **Optional rule-index line**, proposed by the 5.2.8 work, for after the freeze (PRC-25): COM-9
    extended so WhatsApp message 2 and the handoff follow the obligations list in order.
-6. **Git history still holds the names that were scrubbed.** Recommendation: leave it.
+4. **Git history still holds the names that were scrubbed.** Recommendation: leave it.
 
 ### 5.2 Recommended, no decision needed
 

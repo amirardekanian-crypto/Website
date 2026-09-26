@@ -4394,6 +4394,11 @@ async function spineSave(id, approve) {
   if (cr.bad.length) { alert('Counts toward: write each one as a muscle and 1 or 0.5, e.g. "quads 1, glutes 0.5".\n\nMuscles: ' + SPINE_MUSCLES.join(', ') + '\n\nNot understood: ' + cr.bad.join(', ')); return; }
   const k0 = S.spine.coach[id] || {};
   const credits = Object.keys(cr.out).length ? cr.out : (k0.credits == null && !f('credits').trim() ? null : {});
+  // The muscle map (stage42): display only, for an entry that counts toward nothing. The app shows
+  // the counts when they name a muscle, so this is ignored then. Same list and grammar as the counts.
+  const mu = spineParseCredits(f('muscles'));
+  if (mu.bad.length) { alert('Muscles shown: write each one as a muscle and 1 or 0.5, e.g. "calves 1, shins 0.5".\n\nMuscles: ' + SPINE_MUSCLES.join(', ') + '\n\nNot understood: ' + mu.bad.join(', ')); return; }
+  row.muscles = Object.keys(mu.out).length ? mu.out : null;
   const a = await sb.from('exercises').upsert(row, { onConflict: 'id' });
   if (a.error) { alert('Could not save: ' + a.error.message); return; }
   const b = await sb.from('exercise_coach').upsert({ id, sfr: sfr > 0 ? sfr : null, flags, notes: f('notes').trim() || null,
@@ -4570,6 +4575,9 @@ function renderExercises() {
         <select data-sf="impact" style="${field.replace('width:100%;', '')};width:auto"><option value="">— impact —</option>${
           SPINE_IMPACTS.map(([id, nm]) => `<option value="${id}"${e.impact === id ? ' selected' : ''}>${nm}</option>`).join('')}</select>
       </div>
+      ${lbl('Muscles shown on the body map · only when "Counts toward" is empty (1 = main, 0.5 = helper)')}
+      <input data-sf="muscles" value="${esc(spineCreditsText(e.muscles))}"
+        placeholder="${k.credits && Object.keys(k.credits).length ? 'not needed: the map shows what it counts toward' : 'e.g. calves 1, shins 0.5'}" style="${field}">
       <div style="border-top:1px dashed var(--line);margin-top:14px;padding-top:4px">
         ${lbl('Coach only · never sent to a phone')}
         <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
@@ -4594,7 +4602,8 @@ function renderExercises() {
   };
   const row = e => `<div class="credrow" style="cursor:pointer" data-open="${esc(e.id)}">
       <span class="credname">${esc(e.name)} <span class="muted">· ${esc(e.pattern || 'no pattern')} · ${nAth(e.id)} athlete${nAth(e.id) === 1 ? '' : 's'}</span></span>
-      <span class="muted">${e.cues ? 'cues ✓' : 'no cues'}${e.video ? ' · video ✓' : ''}${(e.qualities || []).length ? ' · ' + esc(e.qualities.join(', ')) : ' · <b style="color:var(--clay)">no qualities</b>'}${(S.spine.coach[e.id] || {}).credits == null ? ' · <b style="color:var(--clay)">no count</b>' : ''}</span>
+      <span class="muted">${e.cues ? 'cues ✓' : 'no cues'}${e.video ? ' · video ✓' : ''}${(e.qualities || []).length ? ' · ' + esc(e.qualities.join(', ')) : ' · <b style="color:var(--clay)">no qualities</b>'}${(S.spine.coach[e.id] || {}).credits == null ? ' · <b style="color:var(--clay)">no count</b>' : ''}${
+        (() => { const cc = (S.spine.coach[e.id] || {}).credits; return cc && !Object.keys(cc).length && !(e.muscles && Object.keys(e.muscles).length); })() ? ' · <b style="color:var(--clay)">no muscles on the map</b>' : ''}</span>
       <span class="acts"><button class="btn sm" data-open="${esc(e.id)}">${_spineOpen === e.id ? 'Close' : 'Open'}</button></span>
     </div>` + (_spineOpen === e.id ? editor(e) : '');
 
