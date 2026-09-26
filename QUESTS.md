@@ -69,6 +69,11 @@ select rules -> 'questRuns' from public.xp_rules where id = 1;
 
 ---
 
+> **Ticked from the training app's Home** (Proof's embedded strip, 2026-09-26): quest progress
+> counts exactly the same, because it is the same log. The quest's medal takeover waits for the
+> next time Proof itself opens (`checkLevelUps()` stands down in the strip). `HABITS.md` →
+> *Embedded on the training app's Home*.
+
 ## Two ways to pull the lever
 
 **From the dashboard** (the everyday way): `coach.html` → **Today** → **Quest week**.

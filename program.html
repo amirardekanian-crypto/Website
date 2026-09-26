@@ -2957,6 +2957,13 @@
      Same structure so an athlete learns it once — XP ring around the level, the
      rank crest, distance to the next level, and the seven-day strip. The crest
      markup and every number arrive from Proof; nothing here re-derives them. ── */
+  /* Today's habits, embedded from AA Proof (mountProofStrip()). The frame draws its own
+     card; it only needs to sit flush under the Daily Habits card. */
+  .proof-strip { margin: -2px 24px 14px; }       /* in line with the .nc cards */
+  /* Collapsed, NOT display:none, while Proof loads: a frame that is not laid out
+     measures its page at 0px, and the strip would wait for ever for a height. */
+  .proof-strip.off { height: 0; margin: 0; overflow: hidden; visibility: hidden; }
+  .proof-frame { display: block; width: 100%; height: 0; border: 0; background: transparent; }
   .nc-hero { padding-bottom: 14px; }
   .nch-top { display: flex; align-items: center; gap: 14px; margin-top: 13px; }
   .nch-lv { position: relative; width: 62px; height: 62px; flex: none; }
@@ -4337,6 +4344,8 @@
          2026-09-12, and in the fortnight after, 5 of 40 athletes logged a habit
          in a week while 16 trained, so the session leads and habits follow. -->
     <div id="home-habits-wrap"></div>
+    <!-- Today's habits, ticked right here: AA Proof itself, embedded (mountProofStrip()). -->
+    <div id="home-proof-strip" class="proof-strip off"></div>
 
     <!-- Personal Records stays below the week: it is about the training just
          above it, and it only changes when a lift moves. Body weight sits
@@ -5300,6 +5309,8 @@ function getVideoUrl(ex) {
   renderPlan();
   renderHome();
   renderNotes();
+  _proofCardSig = proofCardSig();
+  mountProofStrip();
 
   restoreState();
   // The Card Remembers: paint last time from the phone's copy now, then refresh
@@ -7412,6 +7423,60 @@ function habitsUrl() {
 }
 function goHabits() { window.location.href = habitsUrl(); }
 window.goHabits = goHabits;
+
+// ── Today's habits on Home: AA Proof, embedded (Fork 1B, B2, Amir, 2026-09-26) ──────
+// "Part of the training app": the athlete ticks today's habits under the Daily Habits
+// card without leaving. AA Proof draws the rows itself (habits.html?embed=1 in a frame,
+// renderEmbed() there) and makes every write through its own toggleHabit(), bump() and
+// sync, so this app STILL holds no habit state, no XP maths and writes no <id>_hab_* key.
+//   · Loaded only once the card is near the screen, and shown only when Proof says it is
+//     ready; until then, and if it never is (Proof not set up, offline), the card alone.
+//   · Every Proof render republishes its card snapshot, so the card above is redrawn
+//     when (and only when) its numbers moved.
+//   · Never in the coach's preview: the frame would open Proof as the coach.
+let _proofStrip = null, _proofCardSig = '';
+function mountProofStrip() {
+  if (_proofStrip || window.IS_PREVIEW || !ATHLETE_ID) return;
+  const host = document.getElementById('home-proof-strip');
+  const card = document.getElementById('home-habits-wrap');
+  if (!host || !card || !('IntersectionObserver' in window)) return;
+  _proofStrip = { host: host, frame: null };
+  const io = new IntersectionObserver(entries => {
+    if (!entries.some(e => e.isIntersecting)) return;
+    io.disconnect();
+    const f = document.createElement('iframe');
+    f.className = 'proof-frame';
+    f.title = "Today's habits";
+    f.src = habitsUrl() + '&embed=1';
+    host.appendChild(f);
+    _proofStrip.frame = f;
+  }, { rootMargin: '300px 0px' });
+  io.observe(card);
+}
+function proofCardSig() {
+  const s = habCardSnapshot();
+  return s ? [s.lv, s.streak, s.done, s.total, s.qualified, s.pct, JSON.stringify(s.days || s.week || [])].join('|') : '';
+}
+window.addEventListener('message', e => {
+  if (e.origin !== location.origin || !e.data || e.data.type !== 'aa-proof-embed') return;
+  const ps = _proofStrip;
+  if (!ps || !ps.frame || e.source !== ps.frame.contentWindow) return;
+  if (e.data.state !== 'ready' || !(e.data.h > 0)) { ps.host.classList.add('off'); return; }
+  ps.frame.style.height = e.data.h + 'px';
+  ps.host.classList.remove('off');
+  const sig = proofCardSig();
+  if (sig !== _proofCardSig) {
+    _proofCardSig = sig;
+    const hw = document.getElementById('home-habits-wrap');
+    if (hw) hw.innerHTML = habitCardHtml();
+  }
+});
+function proofStripTheme() {
+  const ps = _proofStrip;
+  if (!ps || !ps.frame || !ps.frame.contentWindow) return;
+  try { ps.frame.contentWindow.postMessage({ type: 'aa-proof-theme', dark: document.body.hasAttribute('data-dark') }, location.origin); }
+  catch (e) { /* the strip follows on its next load */ }
+}
 
 
 // The one card, used on Home and at the end of My Plan. Deliberately a plain
@@ -11679,6 +11744,7 @@ function toggleDark(e) {
   on ? document.body.removeAttribute('data-dark') : document.body.setAttribute('data-dark', '');
   localStorage.setItem('dark_mode', on ? '' : '1');
   syncDarkToggle();
+  proofStripTheme();
 }
 
 // Reflect the active theme on the floating toggle: sun = tap to go light (dark

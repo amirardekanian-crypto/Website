@@ -58,7 +58,9 @@
 //      and a "Same as last" button; Personal Records fill themselves with each new best.
 // v34: program.html changed (2026-09-26): the readiness check sets today's targets (REC-2),
 //      and a running session's Guided button is visible again.
-const CACHE = 'aap-v34';
+// v35: program.html and habits.html changed (2026-09-26): today's habits are ticked on Home,
+//      in AA Proof's embedded strip (habits.html?embed=1).
+const CACHE = 'aap-v35';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

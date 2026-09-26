@@ -493,6 +493,11 @@ A full-screen, game-style takeover fires for these:
 | **A weekly quest** completed (this week only) | `checkUnlocks()` | badge ground, metal medal |
 | **A reward** (title or card) unlocked | `claimRewards()` | badge ground, the plate/skin itself |
 
+**Ticked from the training app's Home** (the embedded strip, `?embed=1`, 2026-09-26): the XP
+is identical, because the tap goes through the same `toggleHabit()`/`bump()`/`setVal()`, but
+`checkLevelUps()` stands down there. `CFG.seen` does not move, so every takeover in this
+table is still waiting when Proof itself next opens. Nothing is detected twice or skipped.
+
 Routine habit levels flash a small chip in that habit's row instead. This split is
 deliberate: an athlete completing eight habits on day one would otherwise get nine
 full-screen takeovers back to back. If several big ones land together they queue and
