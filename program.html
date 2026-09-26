@@ -1252,6 +1252,19 @@
     color: var(--grey-dark);
   }
   /* "2 of 3 sessions done this week" (HOME-01), from paintWeek(). */
+  /* An unfinished day (DATA-02): one card above This Week, clay edge like a Coach's Note. */
+  .uf-card { margin: 0 24px 16px; padding: 14px 16px; border-radius: 12px; display: grid; gap: 6px;
+    background: rgba(199,85,47,0.08); box-shadow: inset 3px 0 0 var(--ice); }
+  .uf-k { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--clay-ink); }
+  .uf-t { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 20px; color: var(--grey-dark); }
+  .uf-s { font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--grey-text); }
+  .uf-a { display: flex; gap: 10px; margin-top: 6px; }
+  .uf-send, .uf-clear { min-height: 44px; padding: 0 16px; border-radius: 8px; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; }
+  .uf-send { flex: 1; background: var(--yellow); color: var(--on-accent); border: 0; }
+  .uf-clear { background: transparent; color: var(--grey-text); border: 1px solid var(--grey-mid); }
+  .uf-clear.armed { color: #C7552F; border-color: #C7552F; }
   .home-week-sum { font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--grey-text);
     margin: -6px 24px 12px; }
   .home-week-sum:empty { display: none; }
@@ -4463,6 +4476,7 @@
     <div id="home-cycle-wrap"></div>
 
     <!-- "This Week" header + current-week indicator (only when dates exist) -->
+    <div id="home-unfinished-wrap"></div>
     <div id="home-week-wrap"></div>
 
     <!-- Day cards — each opens that day's workout -->
@@ -5006,7 +5020,7 @@ function staleCloudPlan(data, prefix) {
     if (k.indexOf(prefix) !== 0) return;
     const rel = k.slice(prefix.length);
     // Exactly the per-day keys autoResetStaleDays() owns.
-    const dm = rel.match(/^(?:completed_d|daynote_|srpe_|sent_d|timer_|readiness_)(\d+)$/);
+    const dm = rel.match(/^(?:completed_d|daynote_|srpe_|sent_d|timer_|readiness_|touched_d)(\d+)$/);
     if (dm && over[dm[1]]) { plan.skip.add(k); return; }
     // A timer/readiness for a day with no completed stamp at all still carries its
     // own date — a session abandoned last week must not come back running.
@@ -5712,6 +5726,7 @@ const ERROR_ICONS = {
   refreshQualities();
   isLoading = false;
   paintWeek();   // pills, suggested day and the week's count (HOME-01)
+  paintUnfinished();   // "Tuesday's Day 2 was never sent" (DATA-02)
   // restoreState() ran updateProgress() while isLoading was still true, which
   // suppresses the Finish Session card. Re-run it now so users who closed the
   // page after checking the last set still see the prompt when they return.
@@ -6455,6 +6470,63 @@ function weekDoneDays() {
   ids.forEach(id => { if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) done.add(id); });
   return done;
 }
+// ── AN UNFINISHED DAY (DATA-02, Amir 2026-09-26: "Ask the athlete next open") ─────────
+// Sets ticked on a day that was never finished used to carry into next week and never reach
+// the coach. On a later open, a day with logged work, no finish stamp and no session running
+// (6 h grace, sessionIsStale()) whose ticks are from an EARLIER date gets one card at the top
+// of Home: Send it (a partial session, filed under the day it was trained) or Clear it. Only
+// days with a <id>_touched_d<N> date are asked about: ticks from before this shipped have none.
+function unfinishedDays() {
+  const today = new Date().toDateString();
+  return (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id)).filter(id => {
+    const on = localStorage.getItem(ATHLETE_ID + '_touched_d' + id);
+    if (!on || on === today || isNaN(new Date(on))) return false;
+    if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) return false;
+    if (sessionStartedToday(id, today)) return false;
+    try { return getDayCompletion(id).done > 0; } catch (e) { return false; }
+  });
+}
+function paintUnfinished() {
+  const wrap = document.getElementById('home-unfinished-wrap');
+  if (!wrap) return;
+  if (window.IS_DEMO || window.IS_PREVIEW) { wrap.innerHTML = ''; return; }
+  const id = unfinishedDays()[0];
+  if (!id) { wrap.innerHTML = ''; return; }
+  const on = new Date(localStorage.getItem(ATHLETE_ID + '_touched_d' + id));
+  const dayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][on.getDay()];
+  const st = getDayCompletion(id);
+  wrap.innerHTML = `<div class="uf-card">
+      <div class="uf-k">Not finished</div>
+      <div class="uf-t">${esc(dayName)}'s Day ${esc(id)} was never sent</div>
+      <div class="uf-s">${st.done} of ${st.total} sets logged. Send it to me as it is, or clear it.</div>
+      <div class="uf-a">
+        <button type="button" class="uf-send" onclick="sendUnfinished('${esc(id)}')">Send it</button>
+        <button type="button" class="uf-clear" onclick="armedTap(this, 'Tap again to clear', () => clearUnfinished('${esc(id)}'))">Clear it</button>
+      </div>
+    </div>`;
+}
+// Both close the day as the midnight sweep would, filed under the day it was trained:
+// the finish stamp carries that date, so sessionDateFor() names it, and the sweep then
+// clears it (carrySet() keeps the weights as last time's hint).
+function closeUnfinished(id) {
+  const on = localStorage.getItem(ATHLETE_ID + '_touched_d' + id);
+  localStorage.setItem(ATHLETE_ID + '_completed_d' + id, on + '|' + progToken());
+}
+async function sendUnfinished(id) {
+  const btn = document.querySelector('#home-unfinished-wrap .uf-send');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+  closeUnfinished(id);
+  try { await Promise.race([recordSessionToCloud(id), new Promise(r => setTimeout(r, 6000))]); } catch (e) {}
+  // No signal: recordSessionToCloud() already queued it for the next open (_replayQueue).
+  location.reload();
+}
+function clearUnfinished(id) {
+  closeUnfinished(id);
+  location.reload();
+}
+window.sendUnfinished = sendUnfinished;
+window.clearUnfinished = clearUnfinished;
+
 // Repaint everything the week drives: the pills, the suggested day, the count line.
 // Called when the day view closes and whenever the history arrives.
 function paintWeek() {
@@ -7518,7 +7590,17 @@ function toggleCheckOnly(item, day) {
     if (!item.classList.contains('checked'))           item.classList.remove('collapsed');
   }
   saveState();
+  markTouched(day);
   updateProgress(day);
+}
+
+// The day this session was trained on (DATA-02). Ticks carry no time of their own, so without
+// it a day logged on Tuesday and never finished looked like today's. Written ONLY by a real tick
+// (toggleCheckOnly(), syncExerciseCheck()), never by the redraws that also run updateProgress()
+// (boot, switchDay, paintToday, restoreState), which would re-date Tuesday's ticks to today.
+function markTouched(day) {
+  if (isLoading || day == null) return;
+  localStorage.setItem(ATHLETE_ID + '_touched_d' + day, new Date().toDateString());
 }
 
 // Toggle the .collapsed class (expand/collapse)
@@ -10146,6 +10228,7 @@ function markSuggestedDay() {
 }
 
 function resetDay(day) {
+  localStorage.removeItem(ATHLETE_ID + '_touched_d' + day);   // nothing left to call unfinished (DATA-02)
   // Clear UI state for every exercise in this day
   document.querySelectorAll(`[data-day="${day}"]`).forEach(card => {
     card.classList.remove('checked');
@@ -10445,6 +10528,7 @@ function autoResetStaleDays() {
       localStorage.removeItem(ATHLETE_ID + '_sent_d'   + day.id);
       localStorage.removeItem(ATHLETE_ID + '_timer_'   + day.id);
       localStorage.removeItem(ATHLETE_ID + '_readiness_' + day.id);
+      localStorage.removeItem(ATHLETE_ID + '_touched_d' + day.id);
       // Per-exercise RPE + per-set RPE/done for this day's exercises. The weights
       // move out of the boxes into last time's hint (carrySet); personal notes stay.
       (day.blocks || []).forEach(block => {
@@ -11936,6 +12020,7 @@ function syncExerciseCheck(card, log) {
   const allDone = log.length > 0 && log.every(s => s.d);
   card.classList.toggle('checked', allDone);
   saveState();
+  markTouched(card.dataset.day);
   updateProgress(card.dataset.day);
 }
 
