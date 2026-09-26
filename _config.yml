@@ -14,7 +14,6 @@ exclude:
   - IMAGES.md
   - IMPORTING_SESSION_REPORTS.md
   - MAP.md
-  - NOTION_SYNC.md
   - PROGRAM-APP.md
   - QUESTS.md
   - SCHEMA.md
@@ -25,7 +24,6 @@ exclude:
   - assets/js/jump/README.md
   # Local tooling — run on Amir's PC, never fetched by the site.
   - backup_supabase.py
-  - sync_notion.py
   - scripts/           # pre-commit guards + node test
   - assets/img/generate_icons.py
   - chips-selftest.html   # dev harness — embeds athlete ids, and reads data/*.json; run it locally

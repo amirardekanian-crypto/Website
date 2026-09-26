@@ -88,7 +88,7 @@ places, and a stale copy reached athletes.)*
 | NAM-5 | A grip or one intention is the card's `intent` pill: the athlete's own, never free text, never on the library entry. | assemble | ✓ (grip as text) |
 | NAM-6 | A variant that changes the exercise (Short-Lever Copenhagen Plank) is its own exercise, with its own name, entry and cues. | design · spine | |
 | NAM-7 | A hold on a dynamic exercise keeps the canonical name; `rx.tempo: "iso"`, the time and a Coach's Note carry the hold. | assemble | |
-| NAM-8 | Use the library's canonical spelling (word, digit and possessive differences matter); the library is not a whitelist, so prescribe any real movement. | design · assemble | |
+| NAM-8 | Use the Spine entry's name or an alias (word, digit and possessive differences matter); the Spine is not a whitelist: prescribe any real movement. | design · assemble | |
 | NAM-9 | A newly prescribed exercise joins the library in the same run, in full: cues, details, qualities, links both ways. Never swap it out instead. | assemble · spine | ✓ |
 | NAM-10 | Cycle names are punchy, evocative one- or two-word power-names, set in the roadmap. | roadmap | |
 | NAM-11 | Day names (`focusTag`) have sports-headline energy, never spreadsheet labels. | design · assemble | |
@@ -398,7 +398,8 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   2026-07-30, verbatim: "i will always add url for all the videos that doesnt have a url, this is
   not your worry, you always prescribe what is best for the athlete, and the ill add videos
   manually.")* Prescribe the best movement for the athlete, always; don't downgrade a choice,
-  substitute a lesser exercise, or hedge because a name isn't in `exercise_library.json` yet.
+  substitute a lesser exercise, or hedge because an exercise has no video yet (videos live on the
+  Spine entries since 2026-09-26, and Amir adds them in coach.html → Exercises).
   Off-library picks are normal and expected — follow the naming convention, and since 2026-09-25
   the new exercise joins the Spine in full in the same run (Exercise naming, below). Extends "the library is a video-join key, not a whitelist" (Exercise naming) from
   permission into a standing instruction.
@@ -467,16 +468,18 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   helps, and a Coach's Note that states it's one continuous hold, not reps. When telling Amir about a
   program, point at where the isometric lives (exercise + day) rather than assuming the
   card reads as one. Longer-term option stands: add a dedicated isometric (Wall Sit,
-  Spanish Squat…) with its own video to the Notion library and rotate it in.
-- `NAM-8` **`exercise_library.json` (generated from Notion) is the source of truth for names —
-  it is the video join key.** Author each exercise to the library's canonical spelling
-  exactly; `/program-assemble` validates and normalizes misses. *(2026-06-15)*
+  Spanish Squat…) with its own video to the Spine and rotate it in.
+- `NAM-8` **The Spine is the source of truth for names and videos.** Author each exercise to its
+  entry's name or an alias; `/program-assemble` Step 4 normalizes misses, and every card carries
+  its entry's `exId`. *(2026-06-15, when the source was `exercise_library.json`, generated from
+  Notion; the Spine replaced it on 2026-09-26, Amir: yes to "take videos from the exercise library
+  and retire the Notion-synced list".)*
 - `NAM-8` `NAM-9` **The library is a video-join key, not a whitelist — programming is never restricted to what's
-  already catalogued.** Pick whatever real movement is right for the athlete; a name not yet in
-  `exercise_library.json` just ships without a demo video until it's filmed and added to Notion
-  (the app handles a missing video gracefully — no play button, nothing breaks). Follow the naming
-  *convention* above regardless of whether the name is already catalogued. Compensate for the
-  missing video with a clear setup note when the movement is new to the athlete. *(2026-07-27,
+  already catalogued.** Pick whatever real movement is right for the athlete; a new one joins the
+  Spine in the same run and ships without a demo video until Amir adds one in coach.html →
+  Exercises (the app handles a missing video gracefully — no play button, nothing breaks). Follow
+  the naming *convention* above regardless of whether the name is already catalogued. Compensate
+  for the missing video with a clear Coach's Note when the movement is new to the athlete. *(2026-07-27,
   Amir, verbatim: "you can prescribe any movement that you like" — said after Athlete G C2 avoided a
   genuinely better exercise, a leaning cable lateral raise, out of a mistaken belief that only
   library entries were available.)*
@@ -490,9 +493,9 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   first cycle had shipped seven new outside-day drills as bare drafts, so every card was blank; the
   "fix" then removed the drills, which was worse.)*
 - `NAM-8` **The app resolver normalizes case/punctuation/accents** as a safety net, so minor
-  drift still finds the video and Notion renames don't break old programs — but
+  drift still finds the entry and renames don't break old programmes — but
   word/digit/possessive differences (Leg Press vs Machine Leg Press, Farmer vs Farmer's)
-  still need the exact canonical name. *(2026-06-15)*
+  need the entry's name or an alias on it. *(2026-06-15)*
 
 ## Recovery & autoregulation
 - `REC-1` **Recovery capacity gates everything** — set the weekly volume ceiling *before*
@@ -1293,8 +1296,7 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   reasoning into the coaching decisions + analysis (athlete read, SFR/transfer selection,
   volume, sequencing, progression). Exercise **names, chips, day names, and formatting are a
   polish pass AFTER the program exists** — nail the right movement + dose first; wording is
-  tidied later (/program-assemble format-lints, names finalize in Notion when videos are
-  added). Don't burn design budget perfecting names/chips mid-analysis; if a name/chip is
+  tidied later (/program-assemble format-lints, and names settle on the Spine entry). Don't burn design budget perfecting names/chips mid-analysis; if a name/chip is
   rough, flag it and move on. *(2026-06-15)*
 - `PRC-23` **Skills cite rule IDs; they never restate a rule.** *(2026-09-26, from the pipeline audit:
   "reps are one number" was stated about ten times across CLAUDE.md, this file, three skills,

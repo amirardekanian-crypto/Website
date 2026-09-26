@@ -3,8 +3,7 @@
 backup_supabase.py
 ==================
 Takes a dated, offline copy of the whole coaching database and writes it to a
-folder on this PC. Same idea as sync_notion.py, pointed the other way: that one
-pulls Notion INTO the site, this one pulls the server OUT to somewhere safe.
+folder on this PC: it pulls the server OUT to somewhere safe.
 
 WHY THIS EXISTS
 ---------------

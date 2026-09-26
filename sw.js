@@ -43,12 +43,14 @@
 // v27: program.html changed (2026-09-26): a day's reset clears every circuit round's RPE on
 // programmes written with rx.rounds (it cleared round 1 only), and the Quality mix counts a legacy
 // "×3 Rounds" circuit as three rounds, not one. coach.html's Quality check reads rounds the same way.
-const CACHE = 'aap-v27';
+// v28: program.html changed (2026-09-26): exercise videos come from the Spine entries; the app
+// no longer fetches exercise_library.json (retired with its Notion sync), so the shell stops
+// pre-caching it.
+const CACHE = 'aap-v28';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
   '/program.html',
-  '/exercise_library.json',
   // On the login screen since 2026-09-12 — the first image an athlete ever loads.
   '/court-sessions.jpg',
   '/manifest.json',
@@ -148,15 +150,6 @@ self.addEventListener('fetch', e => {
   // mean the installed icon never hits the copy the other one warmed.
   if (request.mode === 'navigate') {
     e.respondWith(staleWhileRevalidate(e, request, url.origin + url.pathname));
-    return;
-  }
-
-  // The exercise library is a generated, same-for-everyone lookup of name → video
-  // URL. boot() awaits it before the first render, so on the network-first branch
-  // below it cost a round trip on every open to fetch a file that changes maybe
-  // monthly. Same stale-while-revalidate treatment, for the same reason.
-  if (url.pathname.endsWith('/exercise_library.json')) {
-    e.respondWith(staleWhileRevalidate(e, request, request));
     return;
   }
 

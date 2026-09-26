@@ -151,7 +151,7 @@ One [brief per ad](Content/tps-ads/) from [`BRIEF-TEMPLATE.md`](.claude/skills/a
 | **Read** (articles) | [`articles/index.json`](articles/index.json) | `articles/<category>/*.json` (+ `*.fa.json` website translations) | Library → Read · and `/en/articles/`, `/fa/articles/` on the site |
 | **Train** (workouts) | [`workouts/index.json`](workouts/index.json) | `workouts/<category>/*.json` | Library → Train |
 | **Athlete programs** | — | `data/<athlete-id>.json` (one per athlete) | the whole app |
-| **Exercise → video** | [`exercise_library.json`](exercise_library.json) | *generated from Notion* | video pop-ups |
+| **Exercise → video** | the Spine (`public.exercises.video`) | coach.html → Exercises | video pop-ups |
 
 Each article/workout is shareable: `program.html?article=<id>` / `?workout=<id>`.
 Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
@@ -185,8 +185,8 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
   [`stage28_library_sessions`](supabase/stage28_library_sessions.sql) (a Library workout
   can be marked done — `log_library_session` writes it, `get_library_days` ticks the
   habit it actually is in Proof, coach-only `library_sessions_for` is the report).
-- **Notion sync (exercise videos):** [`sync_notion.py`](sync_notion.py) +
-  [`NOTION_SYNC.md`](NOTION_SYNC.md) → regenerates `exercise_library.json`.
+- **Exercise videos:** on the Spine entries, edited in coach.html → Exercises (the Notion sync
+  was retired 2026-09-26).
 - **Importing reports:** [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md).
 
 ---
@@ -259,7 +259,7 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
 | [`CALL_LOG.md`](CALL_LOG.md) | `call-log.html` manual |
 | [`supabase/stage29_affiliates.sql`](supabase/stage29_affiliates.sql) | **Affiliate coaches** — the referral-code roster moved out of the public `AFFILIATES.md` into the coach-only `public.affiliates` table (2026-09-13). Manage it in `coach.html` → Affiliates; the deal and how-to are in [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) §2 |
 | [`IMAGES.md`](IMAGES.md) | What every marketing image is + how to make more |
-| [`NOTION_SYNC.md`](NOTION_SYNC.md) · [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md) | Sync / import how-tos |
+| [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md) | Import how-to |
 | [`QUESTS.md`](QUESTS.md) | **The quest catalogue** — what's running, the built quests, ready-made weeks, idea bank |
 | [`CLAUDE.md`](CLAUDE.md) | Working notes / preferences for AI assistants |
 

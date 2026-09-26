@@ -173,7 +173,7 @@ switch legs each round"*). No `cues` on items either.
 ---
 
 ### `videoUrl`
-Leave it out: the app finds the video by the exercise's name in `exercise_library.json`. A `"videoUrl": "https://..."` on the exercise overrides that.
+Leave it out: the app plays the exercise's Spine entry's video (by `exId`, then name; videos are added in coach.html → Exercises). A `"videoUrl": "https://..."` on the exercise overrides that.
 
 ---
 

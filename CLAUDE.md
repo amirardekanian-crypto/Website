@@ -128,7 +128,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   one number; a grip is the `intent` pill; no `setup` line. The tempo cell has had four shapes: do not
   re-litigate it.
 - **Week 1 and the back-off week are `cycles[n].weekNotes`**; the app never invents a back-off.
-- **The Spine**: only approved entries reach a phone; cues live on the entry and a programme writes none;
+- **The Spine**: only approved entries reach a phone; cues and **videos** live on the entry (a video is added
+  in coach.html → Exercises; `exercise_library.json` and its Notion sync were retired 2026-09-26);
   two entries never share a name or alias; rungs are gone for good; Library has three doors (Sessions,
   Playbook, Exercises) and **no Qualities door**.
 - **A delete is a tombstone** (The Ceiling `{del: true}`, body weight `kg: null` with a fresh `t`), and every

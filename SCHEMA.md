@@ -174,7 +174,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
 - `art` (cycle and day) → the picture word; see `cycles[n]` and "How a day finds its picture".
 - `weekNotes` → required on every new cycle: week 1 and the back-off week (see below).
 - `rx` → the prescription as data: `sets` · one of `reps`/`time`/`distance`/`work` · `side` · `rpe` · `tempo` · `rest` · `rounds` (circuits). **Write what you prescribed and omit the rest** — an absent field draws no cell. Full table under "`rx` — the prescription". Beside it: `exId` (the exercise's Spine id), `intent` (the one green pill: a grip like `neutral grip`, or one intention), `note` (the Coach's Note) and `why` (Because). **No `cues`** (they come from the Spine entry), no `setup` (no floating text), never `chips[]`.
-- `videoUrl` → normally leave it out: the app finds the video by the exercise's name in `exercise_library.json`. A URL here overrides that.
+- `videoUrl` → normally leave it out: the app plays the exercise's Spine entry's video (by `exId`, then name). A URL here overrides that.
 - `notes` → optional. Each card's `body` is HTML (`<p>`, `<ul><li>`), and `tags` names the obligation keys it carries. Remove the whole object if there are no notes.
 
 ---
@@ -482,7 +482,7 @@ Best for: warm-ups, cool-downs, single-item entries that don't need rest, weight
 ```
 
 No `cues` and no `videoUrl` on a card: the cues come from the exercise's Spine entry (found by
-`exId`, see "`exId` and the Spine") and the video from `exercise_library.json` by name.
+`exId`, see "`exId` and the Spine"), and so does the video.
 
 #### `type: "circuit"` — Multiple sub-exercises as one checklist item
 Best for: mobility circuits, activation circuits, conditioning circuits, combination drills.
@@ -610,10 +610,11 @@ a rep count, flagged or not, from Personal Records → **+ Log a max**.
 
 ### `videoUrl` — Optional Exercise Video
 
-Any exercise can carry a `videoUrl`, and it wins. **Normally leave it out:** the app finds the
-video by the exercise's name in `exercise_library.json` (`getVideoUrl()`: the exact name, then a
-forgiving match on case, punctuation and accents). A play button shows only when one of the two
-gives a URL.
+Any exercise can carry a `videoUrl`, and it wins. **Normally leave it out:** the app plays the
+exercise's Spine entry's `video` (`getVideoUrl()` → `spineFor()`: the `exId`, then the name through
+four matching tiers). A play button shows only when one of the two gives a URL. Videos are added
+on the entry in coach.html → Exercises; `exercise_library.json` and its Notion sync were retired on
+2026-09-26.
 
 ### `note` — Exercise coach's note (optional, any exercise type)
 
@@ -1072,8 +1073,8 @@ Same shape as an athlete training **day** (so the app can render it with the
 existing exercise cards): `focusTag` + `blocks[].exercises[]`. Each file also
 repeats its own `id` / `title` / `duration` / `equipment` (used when the workout
 is opened). Supported per exercise: `rx` (the prescription — see "`rx` — the
-prescription"), `exId`, `note`, and `videoUrl` (leave it out to resolve a video by the
-exercise's name from `exercise_library.json`). **A new session writes no `cues`**: like a
+prescription"), `exId`, `note`, and `videoUrl` (leave it out and the exercise's Spine entry's
+video plays). **A new session writes no `cues`**: like a
 programme card, each exercise shows its Spine entry's cues (2026-09-24). The 42 sessions written
 before then keep the cues they carry.
 RPE and tempo are usually omitted in the library, which costs nothing: the card

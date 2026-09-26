@@ -26,8 +26,11 @@ for stream in (sys.stdout, sys.stderr):
     stream.reconfigure(encoding='utf-8')
 batch = json.load(open(sys.argv[1], encoding='utf-8'))
 existing = {l.strip() for l in open(sys.argv[2], encoding='utf-8') if l.strip()}
-lib = json.load(open(ROOT / 'exercise_library.json', encoding='utf-8'))
-def yt(v):  # exercise_library.json holds a few non-video links (a Notion page) and bare 'youtube.com/...' ones
+# Videos live on the Spine entries now (coach.html -> Exercises). exercise_library.json, the
+# Notion-synced list, was retired on 2026-09-26; the few videos it held under names no entry
+# carries are kept in legacy_videos.json, so a new draft of one of those still gets its video.
+lib = json.load(open(Path(__file__).with_name('legacy_videos.json'), encoding='utf-8')).get('videos', {})
+def yt(v):
     if not isinstance(v, str) or not re.search(r'(youtube\.com|youtu\.be)/', v): return None
     return v if v.startswith('http') else 'https://' + v.lstrip('/')
 libn = {re.sub(r'\s+', ' ', k.lower()).strip(): yt(v) for k, v in lib.items() if yt(v)}

@@ -59,7 +59,7 @@ the Spine"). Something only this athlete needs arrives as engage's Coach's Note 
 as a cue. **Stamp `exId`**
 on every exercise whose name resolves to a `public.exercises` entry (approved or draft), so the
 card follows the id even if the name is edited later. `sport.badge` ← design's `SPORT_BADGE` line.
-Leave `videoUrl` out: the app finds the video by the card's name in `exercise_library.json`. The one exception is a card whose name misses that file while its Spine entry has a `video` (an entry named differently from the card): copy the entry's `video` into `videoUrl`. The words come in Part B (2f).
+Leave `videoUrl` out: the app plays the card's Spine entry's video (found by `exId`, then by name). Set it only for a video that belongs to this card alone. The words come in Part B (2f).
 - **Set `type` from the design category** (the spec never emits it): standard grinding lift
   / ballistic / loaded carry → `"standard"`; working or prep circuit → `"circuit"`; warm-up
   `simple` item (bike, mobility drill) → `"simple"`.
@@ -278,15 +278,22 @@ checks and his checkpoint already cover a cycle that continues a known logic.
 
 ## Step 4 — Normalize exercise names and draft new Spine entries (Part A, before the check)
 Names from /program-design are rough by design — **this is the correction pass.** It enforces
-COACHING-PRINCIPLES "Exercise naming" + the `exercise_library.json` canonical spelling. Run
-the scan, FIX every mechanical issue in the JSON, then surface only the judgment calls.
+NAM-1 to NAM-9 and the Spine's spelling (an entry's name or one of its aliases; the Spine replaced
+`exercise_library.json` as the name and video source on 2026-09-26). Run the scan against the
+`spine` lines design saved from its context pull, FIX every mechanical issue in the JSON, then
+surface only the judgment calls.
 
 ```
 node -e "
 const fs=require('fs');
 const norm=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[^\x00-\x7f]/g,'').replace(/'/g,'').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
-const lib=JSON.parse(fs.readFileSync('exercise_library.json','utf8'));
-const N={};for(const k of Object.keys(lib)){const n=norm(k);if(!(n in N))N[n]=k;}
+const loose=s=>norm(s).split(' ').map(t=>({db:'dumbbell',bb:'barbell',kb:'kettlebell'})[t]||t).filter(t=>t!=='machine').sort().join(' ');
+const S={},L={};
+for(const line of fs.readFileSync('<scratch>/spine_<id>.txt','utf8').split('\n')){
+  const f=line.split('|');if(f.length<12)continue;
+  const e={id:f[0],name:f[1],video:f[11].trim()==='video'};
+  [f[1]].concat(f[10]?f[10].split(';'):[]).forEach(n=>{S[norm(n)]=e;L[loose(n)]=L[loose(n)]||e;});
+}
 const d=JSON.parse(fs.readFileSync('data/<id>.json','utf8'));
 const seen=new Set();
 for(const day of d.workouts.days)for(const b of day.blocks)for(const e of b.exercises)for(const it of (e.items||[e])){
@@ -294,10 +301,9 @@ for(const day of d.workouts.days)for(const b of day.blocks)for(const e of b.exer
   const flags=[];
   if(/^bodyweight\s+/i.test(nm))flags.push('DROP \"Bodyweight\" prefix');
   if(/[(),:]/.test(nm))flags.push('REMOVE punctuation ()/:,');
-  let lm;
-  if(nm in lib){lm=lib[nm]?'OK':'GAP (in lib, no video yet)';}
-  else{const c=N[norm(nm)]||N[norm(nm.replace(/^bodyweight\s+/i,''))];lm=c?('MISS -> canonical: '+c):'MISS (not in library)';}
-  console.log((flags.length?'[FIX] '+flags.join('; ')+' | ':'')+lm+'  <- '+nm);
+  const hit=S[norm(nm)],near=!hit&&L[loose(nm)];
+  const st=hit?('OK '+hit.id+(hit.video?'':' NOVIDEO')):near?('MISS -> canonical: '+near.name+' ['+near.id+']'):'NEW (not in the Spine)';
+  console.log((flags.length?'[FIX] '+flags.join('; ')+' | ':'')+st+'  <- '+nm);
 }
 console.log('done');
 "
@@ -323,15 +329,14 @@ their cards show cues?"* Approve only on his word (he said *"Approve them"* for 
 - **Mechanical → FIX in-file now** (deterministic, no judgment): strip the `Bodyweight` prefix;
   remove `()` `:` `,` (if the qualifier carried meaning: a grip goes to the pill; a variant that
   changes the exercise, like "(short lever)", is its own exercise with its own entry; anything else
-  is the Coach's Note); snap spelling/
-  casing to the library's canonical key whenever `MISS -> canonical:` shows one. Edit the JSON,
-  then **re-run until clean** (every line `OK`/`GAP`, no `[FIX]`, no fixable `MISS`).
-- **Judgment → SURFACE to Amir, never silently invent:** a true `MISS (not in library)` is a new
+  is the Coach's Note); snap the name to the Spine entry's whenever `MISS -> canonical:` shows one.
+  Edit the JSON, then **re-run until clean** (every line `OK`, no `[FIX]`, no fixable `MISS`).
+- **Judgment → SURFACE to Amir, never silently invent:** a `NEW (not in the Spine)` is a new
   movement: draft it into the Spine NOW with `/spine` (in full, so its card gets an `exId` before
-  the check; its video comes when Amir films it), an exercise that looks like the *wrong*
-  movement, or a corrective/postural drill with no noted indication (per COACHING-PRINCIPLES).
+  the check; its video comes when Amir adds one in coach.html → Exercises), an exercise that looks
+  like the *wrong* movement, or a corrective/postural drill with no noted indication (SEL-14).
 
-`GAP` = in library, no video yet (fine, ship it). Validate JSON again after any name edit.
+`NOVIDEO` = in the Spine with no video yet: fine, ship it, and it goes on the handoff's film list.
 
 ## Step 5 — Archive the cycle rationale (coach-only, append-only) + update the profile and the Exercise Ledger
 Persist the **COACHING LOG ENTRY** from /program-design — the coach-only record of WHY this

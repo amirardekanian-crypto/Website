@@ -1,0 +1,33 @@
+{
+  "_about": "Videos that lived only in exercise_library.json (the Notion-synced list, retired 2026-09-26) under names no Spine entry carries. draft_sql.py gives a NEW Spine draft its video from here when the names match exactly (case-insensitive). Everything else in that list was already on a Spine entry. Videos are edited in coach.html -> Exercises now.",
+  "videos": {
+    "Barbell Rollout": "https://www.youtube.com/watch?v=6pTAoXD2X6c",
+    "Bent-Over Dumbbell Rear Delt Raise": "https://www.youtube.com/watch?v=hf7jnF45N_I",
+    "Body Saw": "https://www.youtube.com/watch?v=FGLRgxgG084",
+    "Box Drop": "https://www.youtube.com/watch?v=Er1wW-YMvNo",
+    "Child's Pose": "https://www.youtube.com/watch?v=_ZX_zTOBgp8",
+    "Child's Pose with Lateral Reach": "https://www.youtube.com/watch?v=5uQ2Xuc3LiE",
+    "Conditioning Circuit": "https://www.youtube.com/watch?v=1FjAoO5McVI",
+    "Decline Sit-Ups": "https://www.youtube.com/watch?v=N7hf1_vcX5w",
+    "Diaphragmatic Breathing": "https://www.youtube.com/watch?v=Q1Me3bMx5Dc",
+    "Farmer's Walk": "https://www.youtube.com/watch?v=8OtwXwrJizk",
+    "Half-Kneeling Hip Flexor with Overhead Reach": "https://www.youtube.com/watch?v=Xp-J3fRRduY",
+    "Hanging Knee Raise": "https://www.youtube.com/watch?v=ACnl_apRkqU",
+    "Incline Dumbbell Curl": "https://www.youtube.com/watch?v=XVQBeug_9LU",
+    "Medicine Ball Rotational Slam": "https://www.youtube.com/watch?v=bxmEsIhAfCg",
+    "Medicine Ball Slam": "https://www.youtube.com/watch?v=CkO1mfSBvv4",
+    "Modified Curl-Up": "https://www.youtube.com/watch?v=I_drRVYlHbc",
+    "Plank to Forearm Reach": "https://www.youtube.com/watch?v=rFwsard85T8",
+    "Side Bridge": "https://www.youtube.com/watch?v=I_drRVYlHbc",
+    "Single-Arm Dumbbell Overhead Press": "https://www.youtube.com/watch?v=FUwme_oBDsA",
+    "Single-Arm Dumbbell Push Press": "https://www.youtube.com/watch?v=XCErz4Rwwm0",
+    "Single-Leg Dumbbell RDL": "https://www.youtube.com/watch?v=lI8-igvsnVQ",
+    "Slam & Carry Circuit": "https://www.youtube.com/watch?v=8OtwXwrJizk",
+    "Stability Ball Rollout": "https://www.youtube.com/watch?v=g3-j-FYpIgQ",
+    "Standing Cable Chest Fly": "https://www.youtube.com/watch?v=PRw7ieDBLl4",
+    "Supine Figure-4 Stretch": "https://www.youtube.com/watch?v=SSbRKbeoFCs",
+    "Supine Rest, Calves Elevated": "https://www.youtube.com/watch?v=0SqnP9ol5GA",
+    "TRX Fallout": "https://www.youtube.com/watch?v=idLF4ltm_3g",
+    "Wall Ball": "https://www.youtube.com/watch?v=fpUD0mcFp_0"
+  }
+}

@@ -13,7 +13,7 @@ This is a small, hand-built website. It has:
 - A shared "look and feel" system so every page matches
 - A tiny bit of JavaScript that adds the menu, footer, video pop-ups, and the "install app" prompt
 - A **Supabase** database (added after this site first launched) that backs up athlete progress to the cloud and powers the coach dashboard and two-way messaging
-- A small **Notion sync** that keeps the exercise-video list up to date
+- Exercise videos live on the Spine entries (edited in coach.html → Exercises); the old Notion sync was retired 2026-09-26
 - Some support files for Google, hosting, and icons
 
 No build step. When you edit a page, it's live the moment it's pushed to GitHub. The only "backend" is Supabase — a hosted database the pages talk to directly; there is no server of your own to run.
@@ -55,7 +55,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   handles that gracefully. `openTimer()`'s rest overlay grew an optional auto-start/auto-advance path
   (`openTimerAuto()`) and a `+15s` button, used only from Guided Mode — the manual Rest button is unchanged.
 - **If deleted:** All athletes lose access to their programme.
-- **Depends on:** `data/*.json` (one per athlete), `content/index.json` + `content/**/*.json` (Read article library), `workouts/index.json` + `workouts/**/*.json` (Train workout library), `exercise_library.json` (maps exercise names to videos), `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json`, icon files, and **Supabase** (it backs up each athlete's progress to the cloud and reads/sends messages).
+- **Depends on:** `data/*.json` (one per athlete), `content/index.json` + `content/**/*.json` (Read article library), `workouts/index.json` + `workouts/**/*.json` (Train workout library), the Spine (`get_exercises()`: cues, videos), `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json`, icon files, and **Supabase** (it backs up each athlete's progress to the cloud and reads/sends messages).
 - **Every picture in the app comes from `assets/art/`** (2026-09-19), including the 13 Library shelf pictures (7 Sessions + 6 Playbook) — whose paths live in `public.library_categories.banner`, with the index JSONs as the offline fallback, and which also fill each workout card's thumbnail and the header of each workout's own screen (`libBannerFor()`). Ten cycle-card
   images keyed by FAMILY, not by cycle name (`APP_ART` + `cycleArt()`), plus seven
   moment images: three for the session-complete card, three for a new best on The
@@ -254,7 +254,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **⚠ It never scores Proof itself.** XP/levels/streaks/day scores are already computed twice (the client in `habits.html` and plpgsql in Supabase) and those two must agree — a third scorer here would be the first to drift. Every Proof number on this page is either a **presence fact** (a day's `hab_log` entry is a non-empty object — the same test `contact_list()` uses) or a value the server returned (`hab_season_level`, `leaderboard_top`, `contact_list`). To show a new Proof number, teach the server to return it.
 - **Preview mode:** `coach.html?demo=1` renders the whole layout against synthetic fixtures — no network, every write a no-op. Use it for design work and screenshots.
 - **If deleted:** You lose the dashboard. Athletes are unaffected — their apps keep working — but you can no longer view progress, mint links, message anyone, post the day's coach line, moderate the wall, or start a quest week from a UI (the SQL editor still does all of the last three).
-- **Depends on:** Supabase (`supabase-js` from a CDN, plus the tables/RPCs in the `supabase/` folder), Google sign-in, `data/<id>.json`, `exercise_library.json`, `articles/index.json`, `workouts/index.json`, `favicon.ico`. It does **not** use the shared CSS/JS partials — it's self-contained.
+- **Depends on:** Supabase (`supabase-js` from a CDN, plus the tables/RPCs in the `supabase/` folder), Google sign-in, `data/<id>.json`, the Spine (`exercises`), `articles/index.json`, `workouts/index.json`, `favicon.ico`. It does **not** use the shared CSS/JS partials — it's self-contained.
 - **Edit this when:** You want to change what the dashboard shows, add a panel, or change a coach workflow.
 - **Don't touch:** The Supabase URL/key and the sign-in email check unless you know what they do. `AMIR_ATHLETE_ID` — the board is fetched through Amir's own athlete identity, so `leaderboard_top()` gets a valid key. This page is `noindex` on purpose — keep it that way.
 - **Watch for:** Plan-vs-log matching is by **exercise name**, so a session logged before the program was rewritten shows every prescribed row as *not logged* and the real work under *Logged, not prescribed*. That is honest, and the card says so in as many words when a whole day comes back empty — don't "fix" it by fuzzy-matching names. CSS class collisions. The topbar's `.who` (white, nowrap) once painted the wall's athlete names white-on-white; grid children need `min-width: 0` or one nowrap label scrolls the page sideways on a phone.
@@ -410,17 +410,16 @@ The site started with no backend. It now uses **Supabase** (a hosted Postgres da
 
 ---
 
-### Keeping Exercise Videos in Sync (Notion)
+### Exercise videos (the Spine)
 
-#### `exercise_library.json` — Exercise-name → video-link list
-- **What it does:** `program.html` reads this at load to turn an exercise name into its demo video. It is **generated**, not hand-edited — the source of truth is a Notion database.
-- **If deleted:** Exercises lose their "watch video" links until you regenerate it.
-
-#### `sync_notion.py` + `NOTION_SYNC.md` — The regenerator
-- **What they do:** `sync_notion.py` pulls every exercise + video URL from the Notion "Exercise Library" database and rewrites `exercise_library.json`. `NOTION_SYNC.md` is the step-by-step guide for running it (setup, the token, troubleshooting).
-- **If deleted:** You lose the ability to refresh videos from Notion (and the guide). The site keeps working with whatever `exercise_library.json` it already has.
-- **Edit this when:** Almost never. You add/change videos *in Notion*, then run `python sync_notion.py` and commit the new `exercise_library.json`.
-- **Don't touch:** `.notion_token` is your private Notion secret — it's gitignored and must never be committed.
+Since 2026-09-26 an exercise's video is its **Spine entry's `video`** (`public.exercises`), added or
+changed in **coach.html → Exercises** → the entry → *Video*. `program.html`'s `getVideoUrl()` plays a
+card's own `videoUrl` first, else its entry's (found by `exId`, then by name), and `coach.html` does
+the same. `exercise_library.json`, `sync_notion.py` and `NOTION_SYNC.md` (the Notion-synced
+name → video list) were retired that day: every video they held was already on an entry, apart from
+two copied across and twelve kept as `videoUrl` on the library sessions that used them. The 28 left
+over, under names no entry carries, are in `.claude/skills/spine/legacy_videos.json`, so a new draft
+of one still picks its video up. `.notion_token` is no longer needed.
 
 ---
 

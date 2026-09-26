@@ -167,8 +167,9 @@ change before I build?"* before writing exercises.
      first: `id|name|pattern|status|sfr|flags|qualities|loads|impact|easier>harder>alts|aliases|video`.
      It replaces the catalogue query under THE SPINE below. Save it to the scratchpad to grep it;
      its first field is also `draft_sql.py`'s existing-ids list. The entry's `name` is not always
-     the card's (`Inverted Row (BW)`, whose card says Inverted Row: assemble copies the library's
-     video into `videoUrl`), and every `novideo` exercise you prescribe goes on the handoff's film list.
+     the card's (`Inverted Row (BW)`, whose card says Inverted Row); the card follows its `exId`, so it
+     gets the entry's cues and video either way. Every `novideo` exercise you prescribe goes on the
+     handoff's film list (videos live on the entries, added in coach.html → Exercises).
 4. **Get the brief:**
    - RETURNING → **the Debrief IS the brief** (the one evidence path since 2026-09-26). If
      `ctx.log` has no **`## Debrief`** for the cycle just trained, run **/cycle-report** first: it

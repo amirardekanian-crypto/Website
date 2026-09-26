@@ -2400,15 +2400,22 @@ function decode(athleteId, blob) {
   return { days, ex };
 }
 
-// --- exercise library (ported) ----------------------------------------------
-let _exlib = null;
+// --- exercise videos: from the Spine (2026-09-26) --------------------------------------
+// exercise_library.json and its Notion sync were retired: a video lives on the exercise's Spine
+// entry (edited under Exercises), found the way a card finds it, by exId and then by name.
 async function exLib() {
-  if (_exlib) return _exlib;
-  try { const r = await fetch('exercise_library.json', { cache: 'no-cache' }); _exlib = r.ok ? await r.json() : {}; }
-  catch (e) { _exlib = {}; }
-  return _exlib;
+  if (!S.spine) await loadSpine();
+  const list = (S.spine && S.spine.list) || [];
+  const byId = {};
+  list.forEach(e => { byId[e.id] = e; });
+  return { idx: spineIndexC(list), byId };
 }
-function vidUrl(ex, lib) { return (ex && ex.videoUrl) || (lib && lib[(ex.name || '').trim()]) || ''; }
+function vidUrl(ex, lib) {
+  if (ex && ex.videoUrl) return ex.videoUrl;
+  if (!ex || !lib) return '';
+  const id = spineForC(lib.idx, ex.name, ex.exId, lib.byId);
+  return (id && lib.byId[id] && lib.byId[id].video) || '';
+}
 // Everything after the "Exercise log:" header, verbatim — what the athlete's
 // app actually sent, kept as the last word when a parse looks wrong.
 function exerciseLogPart(summary) {

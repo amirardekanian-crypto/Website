@@ -138,8 +138,9 @@ python3 .claude/skills/spine/draft_sql.py <scratchpad>/spine_batchN.json <scratc
 ```
 The tool refuses the batch (exit 1, one line per problem) if it finds any of these: an id that
 already exists, a link to an id that doesn't exist, an unknown pattern, flag or quality, a
-self-link, or an entry with no qualities or more than three. Fix the problems and run it again. It picks up the video from `exercise_library.json`
-by exact name.
+self-link, or an entry with no qualities or more than three. Fix the problems and run it again. A new
+draft whose name matches one in `legacy_videos.json` (the videos the retired Notion list held under names
+no entry carries) gets that video; every other video is added in coach.html → Exercises.
 
 **5. Run the SQL** with the Supabase MCP `execute_sql` (project `bvipfipbdcyqnbczjmaq`). It is
 `on conflict do nothing`, so running it again is safe. Then check it:
