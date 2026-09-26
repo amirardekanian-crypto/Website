@@ -271,6 +271,11 @@ proposed for an approved entry; qualities and body parts (`loads` + `impact`) fi
 - **Quality Map.** Re-read the day's top three after the edit. If the swap changed what the day
   card says it builds (a power day now reading Armour first), say so in the Step 4 report.
 
+**If the edit changes who the athlete is** (a new injury or ban, one resolved, new kit, a new
+schedule), update the `## Athlete profile` block at the top of their coaching log in place (format
+in /program-assemble Step 5) and say why in the in-cycle note below, or the next cycle's checks
+run on the old facts.
+
 **Then log the change.** Append a dated in-cycle note under an `## In-cycle edits — Cycle N`
 heading — what changed + why (e.g. *In-cycle edit (2026-06-28): Bulgarian Split Squat → Split
 Squat — R-knee pain on BSS*). This keeps the coaching log the complete running record (design

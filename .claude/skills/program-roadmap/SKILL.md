@@ -27,7 +27,8 @@ never drift from the plan.
   1. **Read the athlete first**, before any arc: the recovery ceiling (sleep, stress, life
      load), every restriction and what it rules out, the goal order (primary, secondary), and
      the bottleneck, the one thing that would move the goal most. /program-design STEP 1B builds
-     on this read instead of redoing it.
+     on this read instead of redoing it. Write the goal order and the bottleneck into the athlete
+     profile draft from /athlete-intake (its `goals` and `bottleneck` lines).
   2. **Weigh two or three arcs in one place** (say strength-first, durability-first, a
      power-leaning one) and write the one you would defend. Never graft cycles from different
      arcs: a cycle only makes sense in the sequence around it.

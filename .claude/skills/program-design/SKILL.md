@@ -156,6 +156,14 @@ change before I build?"* before writing exercises.
      Ceiling* below for how it may be used).
    - NEW → use the ATHLETE BRIEF from /athlete-intake. If none, stop and ask Amir to run
      /athlete-intake first.
+5a. **The athlete profile — read it first** (2026-09-26). The `## Athlete profile` block at the
+   top of `ctx.log` says who the athlete is today: aim (sport / strength-muscle / general), goals in
+   order, the bottleneck, days and real minutes, kit, standing bans, injuries with status,
+   recovery. Apply the Debrief's **Profile changes** to it. **No profile yet** (every athlete before
+   2026-09-26): build it this cycle from the log, the latest Debrief, the roadmap and the intake
+   form, and show the whole block at the checkpoint. A NEW athlete's comes from /athlete-intake's
+   brief plus the roadmap's read. The format is in /program-assemble Step 5. It opens the spec,
+   and the checker takes `aim`, `proven`, `bans`, `floor-except` and `cap` from it.
 5. **RETURNING — read the prior rationale:** `ctx.log` from the context pull (step 3).
    This is the *why* behind the last cycle(s) — why each primary was chosen, what changed
    mid-cycle and why, the progression levers — and it is the thread you continue. The next
@@ -259,7 +267,9 @@ PROGRESS: [primary → how + how much, set the increment from the logged data]
 REPLACE:  [accessory to rotate → safe replacement + why]
 ADD:      [new element → why THIS cycle]
 ```
-**→ CHECKPOINT:** show this analysis + the lists and ask Amir for changes before building.
+**→ CHECKPOINT:** show this analysis + the lists and ask Amir for changes before building. Show the
+profile's changes too (the whole block when it is new); a wrong `aim` or ban there mis-sets every
+check that follows.
 Always add one fixed question: **the day the athlete starts this cycle** (default: their next
 usual training day, never the roadmap's nominal Monday). Assemble writes it as the cycle's
 `startDate`, the app's week counter and retest window read it, and the WhatsApp dates come from
@@ -292,8 +302,8 @@ Close with the **LOCKED LIST**:
 ```
 PRIMARY LIFT SELECTIONS: [muscle/pattern → exercise, SFR/transfer rationale]
 ```
-**→ CHECKPOINT:** show this analysis + selections and ask Amir for changes before building, and
-ask the day the athlete starts (see STEP 1A's checkpoint).
+**→ CHECKPOINT:** show this analysis + selections and the new athlete profile block, and ask Amir
+for changes before building, and ask the day the athlete starts (see STEP 1A's checkpoint).
 
 ---
 
@@ -558,6 +568,9 @@ decisions in plain domain terms. No emoji, no JSON, no formatting — those are
 /program-assemble's job. Use the semantic SECTION names (Activation & Prep · [power] ·
 Primary · Accessory · Core · [conditioning]); assemble assigns titles, icons, the
 vivid `focusTag`, and canonical names.
+````
+```profile
+[the current athlete profile, updated this cycle: /program-assemble Step 5 has the format]
 ```
 ATHLETE_ID: [id]
 SPORT_BADGE: [emoji] [label]
@@ -604,7 +617,7 @@ SECTION: Core
 (fallback per primary: one same-pattern swap if pain / station busy)
 ---
 [repeat for all days]
-```
+````
 
 ---
 
@@ -626,6 +639,9 @@ reasoning ("how we were thinking"); drop the throat-clearing.
 **Decisions** — the LOCKED LISTS verbatim (PROGRESS / REPLACE / ADD, or PRIMARY LIFT
 SELECTIONS), plus any fork Amir settled at the checkpoint and the call he made ("why we
 changed something").
+
+**Profile changes** — what changed in the athlete profile this cycle and why, one line each, or
+"none". The block itself is kept current at the top of the log; this line is its history.
 
 **Exercise Ledger Updates** — deltas only, not the whole table (/program-assemble applies
 these to the persisted ledger): every REPLACE'd-out exercise → `Available` (rotated for

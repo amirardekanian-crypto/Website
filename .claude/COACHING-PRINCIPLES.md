@@ -981,6 +981,15 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   without them. *(The audit that day found 16 of 34 live programmes with no back-off at all, and
   no drop in week-5 session RPE across 12 finished cycles. Amir: "update the app in a way that it
   can show first week or last week".)*
+- **One record of who the athlete is today: the athlete profile.** *(2026-09-26, from the pipeline
+  audit.)* Goals in order, the bottleneck, days and real minutes, kit, standing bans, injuries with
+  their status, recovery, and whether the aim is sport or strength-and-muscle live in a small
+  `profile` block at the top of the coaching log, kept current like the Exercise Ledger:
+  /athlete-intake drafts it, the roadmap adds the bottleneck, each design updates it (the Debrief's
+  profile changes), and a mid-cycle edit that changes a constraint updates it too. Until then these
+  facts were re-read from prose every cycle, so a ban could quietly drop out, and the checker was
+  told what to check by the run it was checking. `scripts/check_program.py` now reads `aim`,
+  `proven`, `bans`, `floor-except` and `cap` from it.
 - **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
 - **Every cycle's design rationale is archived.** /program-assemble appends the design read +
   locked decisions + ledger changes + the two volume tables to the coach-only

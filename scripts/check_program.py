@@ -45,6 +45,10 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
                   programming check, none of the text ones. final (default) = everything
   --fingerprint   print the content fingerprint and the SQL that computes the server's, then stop
 
+The athlete profile (a ```profile block at the top of the spec, else the one stored at the top of
+the coaching log, which --spine-sql returns) sets --floor (aim: strength-muscle), --proven, the
+bans, floor-except and --cap, so no run has to remember them. A flag typed here overrides it.
+
 Exit code 1 if anything FAILs. FAIL = a house rule is broken. WARN = look at it.
 """
 import argparse, hashlib, json, os, re, subprocess, sys
@@ -323,12 +327,16 @@ def check_week_notes(data, args):
 def ban_hit(word, s):
     return re.search(r'(?<![a-z])' + re.escape(word.lower()) + r'(e?s)?(?![a-z])', s.lower())
 
+def spec_lines(args, key):
+    """Every 'key: value' line in the spec (the profile block's and the spec's own), comments off."""
+    if not args.spec: return []
+    found = re.findall(rf'^\s*{key}\s*:\s*(.+)$', open(args.spec, encoding='utf-8').read(), re.I | re.M)
+    return [re.sub(r'\s+#.*$', '', f).strip() for f in found]
+
 def check_bans(data, args):
-    ban = args.ban
-    if not ban and args.spec:  # the spec names them once: "bans: goblet, hanging, ..."
-        m = re.search(r'^\s*bans?\s*:\s*(.+)$', open(args.spec, encoding='utf-8').read(), re.I | re.M)
-        ban = m.group(1) if m else ''
-    words = [w.strip() for w in (ban or '').split(',') if w.strip()]
+    # --ban, the profile's standing bans and the spec's "bans:" line(s) for this cycle, together.
+    ban = ', '.join([x for x in [args.ban] if x] + spec_lines(args, r'bans?'))
+    words = sorted({w.strip() for w in ban.split(',') if w.strip() and not blank(w)})
     if not words: return
     for d, b, ex, it in exercises(data):
         o = it or ex
@@ -343,7 +351,10 @@ def check_bans(data, args):
                 if ban_hit(w, sen) and not NEGATION.search(sen):  # a ban sentence names what it bans
                     warn(f"{where}: mentions '{w}' outside a ban: \"{sen[:100]}\"")
     if args.spec:
+        fence = False
         for i, line in enumerate(open(args.spec, encoding='utf-8'), 1):
+            if line.lstrip().startswith('```'): fence = line.strip().startswith('```profile'); continue
+            if fence: continue  # the profile block describes the athlete; it prescribes nothing
             if not re.search(r'fallback|->|→|instead|swap', line, re.I): continue
             for w in words:
                 m = ban_hit(w, line)
@@ -403,7 +414,8 @@ def check_time(data, args):
         # The cap is SOFT (Amir, 2026-09-26: athletes who write "60 minutes" train 75 and never
         # complain, "so days time cap, is usually not very important"). Never a FAIL: the design
         # says the expected real length at the checkpoint instead of cutting work to fit.
-        if mins > args.cap: warn(f"{line}: past the {args.cap:g}-min cap (soft: tell Amir the expected real length)")
+        cap = args.cap if args.cap is not None else 60
+        if mins > cap: warn(f"{line}: past the {cap:g}-min cap (soft: tell Amir the expected real length)")
         else: info(line)
 
 # ── volume, from the coaching log's per-exercise table ────────────────────────
@@ -481,12 +493,9 @@ def check_volume(data, args):
     return per_day
 
 def floor_excused(args):
-    """Major muscles excused from --floor: --floor-except, else the spec's 'floor-except:' line."""
-    s = args.floor_except
-    if not s and args.spec:
-        m = re.search(r'^\s*floor[- ]except\s*:\s*(.+)$', open(args.spec, encoding='utf-8').read(), re.I | re.M)
-        s = m.group(1) if m else ''
-    return {norm_muscle(re.sub(r'\(.*?\)', '', w)) for w in (s or '').split(',') if w.strip()}
+    """Major muscles excused from --floor: --floor-except plus every 'floor-except:' line."""
+    s = ', '.join([x for x in [args.floor_except] if x] + spec_lines(args, r'floor[- ]except'))
+    return {norm_muscle(re.sub(r'\(.*?\)', '', w)) for w in s.split(',') if w.strip() and not blank(w)}
 
 def check_week(data, args, per_day):
     if not args.week: return
@@ -519,7 +528,7 @@ def load_context(path):
     the athlete's live programme BEFORE this build (`prev`: the cycle just trained), and the
     Exercise Ledger table from their coaching log. So continuity costs no extra lookup."""
     raw = open(path, encoding='utf-8').read().strip()
-    lines, prev, ledger = [], None, None
+    lines, prev, ledger, profile = [], None, None, None
     if raw[:1] in '[{':
         rows = json.loads(raw)
         for o in (rows if isinstance(rows, list) else [rows]):
@@ -530,6 +539,7 @@ def load_context(path):
                                        ','.join(o.get('qualities') or [])]))
             if o.get('prev') is not None: prev = o['prev'] if isinstance(o['prev'], dict) else json.loads(o['prev'])
             if o.get('ledger'): ledger = str(o['ledger'])
+            if o.get('profile'): profile = str(o['profile'])
     else:
         lines = raw.splitlines()
     spine = {}
@@ -541,10 +551,47 @@ def load_context(path):
             e.update(pattern=p[4] or None, impact=p[5] or None, equipment=[x for x in p[6].split(';') if x],
                      name=p[7], aliases=[x for x in p[8].split(';') if x])
         spine[p[0]] = e
-    return {'spine': spine, 'prev': prev, 'ledger': ledger}
+    return {'spine': spine, 'prev': prev, 'ledger': ledger, 'profile': profile}
 
 def load_spine(path):
     return load_context(path)['spine']
+
+# ── the athlete profile (2026-09-26) ──────────────────────────────────────────
+# The checker used to be told what to check by the model it was checking: --floor, --proven,
+# the bans and the minutes all came from the run's own memory, and a forgotten flag skipped a
+# rule without a word. The athlete profile is a small ```profile block at the top of the
+# coaching log, kept current like the Exercise Ledger; design copies the current one into the
+# spec. Its keys set the flags; a flag typed on the command line still wins.
+def parse_profile(text):
+    m = re.search(r'```profile[^\n]*\n(.*?)\n\s*```', text or '', re.S)
+    if not m: return None
+    prof = {}
+    for line in m.group(1).splitlines():
+        line = re.sub(r'\s+#.*$', '', line).strip()
+        if ':' in line:
+            k, v = line.split(':', 1)
+            prof[k.strip().lower()] = v.strip()
+    return prof
+
+def blank(v): return not v or v.strip().lower() in ('-', 'none', 'no', 'n/a')
+
+def apply_profile(args, prof, source):
+    if not prof:
+        warn("no athlete profile (```profile block) in the spec or the coaching log: the flags come from the command line only")
+        return
+    did = []
+    aim = (prof.get('aim') or '').lower()
+    if ('strength' in aim or 'muscle' in aim) and not args.floor:
+        args.floor = True; did.append('--floor (aim is strength and muscle)')
+    if not blank(prof.get('proven')) and not args.proven:
+        args.proven = True; did.append('--proven (' + prof['proven'][:60] + ')')
+    for key, attr in (('bans', 'ban'), ('floor-except', 'floor_except')):
+        if not blank(prof.get(key)):
+            setattr(args, attr, ', '.join(x for x in [getattr(args, attr), prof[key]] if x)); did.append(key)
+    m = re.search(r'\d+', prof.get('cap') or '')
+    if m and args.cap is None:
+        args.cap = float(m.group()); did.append(f'--cap {m.group()}')
+    info(f"athlete profile from the {source}: " + (', '.join(did) or 'no flags to set'))
 
 # ── continuity: this cycle against the one just trained (2026-09-26) ──────────
 # A returning athlete gets no reviewer, and every rotation and re-ship failure on record was a
@@ -767,8 +814,8 @@ def spine_sql(data):
     aid = re.sub(r"[^A-Za-z0-9_.-]", '', (data.get('athlete') or {}).get('id') or '')
     idlist = ', '.join(f"'{i}'" for i in ids) or "''"
     print(f"""-- Run once, save the raw result to the scratchpad, pass it as --spine. Missing ids = no entry.
--- It also returns the athlete's live programme BEFORE this build (prev: the cycle just trained)
--- and their Exercise Ledger, for the continuity checks (2026-09-26). Read-only, one call.
+-- It also returns the athlete's live programme BEFORE this build (prev: the cycle just trained),
+-- their Exercise Ledger and their stored athlete profile (2026-09-26). Read-only, one call.
 select
  (select string_agg(e.id || '|' || e.status || '|' || (e.cues is not null)::text || '|' || array_to_string(e.qualities, ',')
      || '|' || coalesce(e.pattern, '') || '|' || coalesce(e.impact, '') || '|' || array_to_string(e.equipment, ';')
@@ -788,7 +835,9 @@ select
                                     then p.data->'workouts'->'days' else '[]'::jsonb end) d))
   from public.programs p where p.athlete_id = '{aid}') as prev,
  (select substring(body from '(\\| *Exercise *\\| *Status[^\\n]*\\n(?:\\|[^\\n]*\\n?)*)')
-  from public.coaching_logs where athlete_id = '{aid}') as ledger;""")
+  from public.coaching_logs where athlete_id = '{aid}') as ledger,
+ (select substring(body from '(```profile.*?\\n *```)')
+  from public.coaching_logs where athlete_id = '{aid}') as profile;""")
 
 KEYS = ['athlete', 'sport', 'currentCycleIndex', 'cycles', 'workouts', 'notes']
 def fingerprint(data, athlete_id):
@@ -826,7 +875,7 @@ def main():
     ap.add_argument('--floor', action='store_true'); ap.add_argument('--floor-except')
     ap.add_argument('--proven', action='store_true'); ap.add_argument('--no-backoff', action='store_true')
     ap.add_argument('--female', action='store_true', help=argparse.SUPPRESS)  # retired 2026-09-26
-    ap.add_argument('--cap', type=float, default=60); ap.add_argument('--ban'); ap.add_argument('--spec')
+    ap.add_argument('--cap', type=float, default=None); ap.add_argument('--ban'); ap.add_argument('--spec')
     ap.add_argument('--week'); ap.add_argument('--spine'); ap.add_argument('--art')
     ap.add_argument('--spine-sql', action='store_true'); ap.add_argument('--fingerprint', action='store_true')
     ap.add_argument('--stage', choices=['build', 'final'], default='final')
@@ -842,7 +891,11 @@ def main():
     if not args.new and (data.get('currentCycleIndex') or 0) == 0:
         args.new = True
         info('currentCycleIndex is 0, so the new-athlete rules apply (no weighted lift under 8 reps, no working circuits, a first-week note)')
-    ctx = load_context(args.spine) if args.spine else {'spine': {}, 'prev': None, 'ledger': None}
+    ctx = load_context(args.spine) if args.spine else {'spine': {}, 'prev': None, 'ledger': None, 'profile': None}
+    # The athlete profile sets the flags: this cycle's copy in the spec first, else the stored one.
+    prof = parse_profile(open(args.spec, encoding='utf-8').read()) if args.spec else None
+    if prof: apply_profile(args, prof, 'spec')
+    else: apply_profile(args, parse_profile(ctx.get('profile')), 'coaching log')
     check_structure(data, args, ctx['spine'])
     # --stage build runs straight after design, BEFORE engage writes a word (2026-09-26): a FAIL
     # there changes the programme while no note, Because or message has been written around it.

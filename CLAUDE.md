@@ -379,6 +379,10 @@ Amir: *"update the app in a way that it can show first week or last week"*.
   /program-engage writes the words (PART 3c), /program-assemble stores them, and
   `scripts/check_program.py` FAILs a cycle with no `weekNotes.last` (and a first cycle with no
   `weekNotes.first`). The 32 older programmes gain it with their next cycle, not by a bulk write.
+- **The athlete profile** (same day): a `profile` block at the top of each coaching log (aim,
+  goals, bottleneck, minutes/cap, kit, bans, injuries, proven…), kept current like the Exercise
+  Ledger. Design copies it into the spec and the checker sets its flags from it. Older athletes get
+  theirs at their next cycle. Format: /program-assemble Step 5.
 - The same day `check_program.py` took Amir's answers from the audit: the 10-set floor is `--floor`
   (strength-and-muscle aims only, every major muscle, any sex; `floor-except:` names an excused
   muscle), more than 4 sets needs `--proven`, a first cycle switches the new-athlete rules on by

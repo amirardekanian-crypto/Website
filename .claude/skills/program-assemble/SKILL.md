@@ -230,12 +230,12 @@ by `exId`, since Part A stamped one on every card).
   # Part B: the same command without --stage build (the default is the full run). Re-run
   # --spine-sql only if Part B added an exercise; the saved result is still good otherwise.
   ```
-  `--floor` only when the programme's aim is strength and muscle (the 10-set floor on every major
-  muscle; a sport-performance athlete gets what is best for them, Amir 2026-09-26), with any
-  excused muscle on the spec's `floor-except:` line. `--proven` only when design named the evidence
-  that the athlete handles more than 4 sets on an exercise. The new-athlete rules switch on by
-  themselves in a first cycle. `--no-backoff` only on Amir's word. The bans come from the spec's
-  `bans:` line (or `--ban "goblet,hanging"`). **Fix every FAIL and re-run
+  **The athlete profile at the top of the spec sets the flags** (2026-09-26): `aim: strength-muscle`
+  turns on `--floor` (the 10-set floor on every major muscle; a sport-performance athlete gets what
+  is best for them, Amir 2026-09-26), `proven:` turns on `--proven`, and its `bans`,
+  `floor-except` and `cap` join the spec's own lines. Type a flag only to override it. The
+  new-athlete rules switch on by themselves in a first cycle. `--no-backoff` only on Amir's word.
+  A run with no profile anywhere gets a WARN, and the flags come from the command line only. **Fix every FAIL and re-run
   until 0 FAIL; read every WARN.** It fails a muscle under its floor, a volume table that
   disagrees with the programme, more than 4 sets, a weighted lift under 8 reps (new athlete), a
   superset in a first cycle, a banned movement in any exercise, setup or fallback, an RPE under
@@ -365,7 +365,7 @@ their cards show cues?"* Approve only on his word (he said *"Approve them"* for 
 
 `GAP` = in library, no video yet (fine, ship it). Validate JSON again after any name edit.
 
-## Step 5 — Archive the cycle rationale (coach-only, append-only) + update the Exercise Ledger
+## Step 5 — Archive the cycle rationale (coach-only, append-only) + update the profile and the Exercise Ledger
 Persist the **COACHING LOG ENTRY** from /program-design — the coach-only record of WHY this
 cycle looks the way it does (the read, decisions, ledger changes, the volume tables, the special
 weeks).
@@ -376,7 +376,7 @@ splice. Read it with `select body from coaching_logs where athlete_id = '<id>'`.
 PUBLIC repo, world-readable, which is exactly why the log moved; never re-create it in git.
 The athlete app never reads the log. The entry template is /program-design's COACHING LOG ENTRY.
 - **No row (new athlete):** insert one with the header (`# Coaching Log — <First Last> (<id>)`
-  + the coach-only note), an empty **Exercise Ledger** table (header row only:
+  + the coach-only note), the `## Athlete profile` section (below), an empty **Exercise Ledger** table (header row only:
   `| Exercise | Status | Last cycle | Note |`), then `## Roadmap — <date>` with /program-roadmap's
   exit tests and ROADMAP RATIONALE, then the entry.
 - **Row exists (returning):** **append** the new `## Cycle NN — …` section to the end.
@@ -393,6 +393,41 @@ The athlete app never reads the log. The entry template is /program-design's COA
   calculate the sets, add that table to the athlete coaching log so i can see."* If /program-design
   handed over only the summary table, build the per-exercise one here rather than shipping without
   it. Counting convention: COACHING-PRINCIPLES.md → "Volume & dosing".
+- **⚖️ The athlete profile — write this cycle's, in place (2026-09-26).** The spec opens with
+  the current ```` ```profile ```` block; it goes into the log as the `## Athlete profile` section,
+  right after the header and before the Exercise Ledger, **replacing** the old one (like the
+  ledger, it is current state, not history; each cycle's entry says what changed and why). A log
+  that has none yet (every athlete before 2026-09-26) gets it inserted there, at that athlete's
+  next cycle, never in a bulk write. Splice, don't retype: replace the text between
+  `## Athlete profile` and the next section heading or the ledger's `| Exercise` header row with
+  `substring()`, then check the
+  rest of the body's md5 is unchanged. The format, one `key: value` per line (made-up values):
+  ````
+  ## Athlete profile
+  ```profile
+  aim: sport                 # sport | strength-muscle | general (strength-muscle = the 10-set floor)
+  sport: padel
+  sex: male · age: 34
+  training-age: 5 years in a gym; demonstrated: strong on machines, new to free weights
+  goals: 1 a faster first step · 2 a knee that lasts three matches a week · 3 lose 4 kg
+  bottleneck: single-leg strength on the bad side
+  days: 3 gym
+  minutes: form 60 · logs 70 · hard stop: no
+  cap: 70                    # what design aims at: the real minutes, or form + 15 for a new athlete
+  equipment: commercial gym
+  proven: -                  # the evidence that lets an exercise go past 4 sets, or -
+  bans: jump, depth, deep squat   # words the checker looks for in names and fallbacks
+  floor-except: -            # a major muscle excused from the floor, with the reason
+  injuries: right knee, managed (patellar tendon) · low back, resolved
+  dislikes: burpees
+  recovery: sleep 6 h, poor · stress moderate · life load high
+  language: English
+  updated: 2026-09-26 · /program-design, Cycle 3
+  ```
+  ````
+  `scripts/check_program.py` reads `aim`, `proven`, `bans`, `floor-except` and `cap` from it and
+  sets its own flags, so no run has to remember them. No athlete names or ids inside it beyond
+  the log's own header; it lives in the coach-only row.
 - **Exercise Ledger — apply design's "Exercise Ledger Updates" deltas.** Unlike the cycle
   sections, this table (sitting right after the file header, before the first `## Cycle`
   section) is mutated in place every cycle — it's a current-state index, not a historical

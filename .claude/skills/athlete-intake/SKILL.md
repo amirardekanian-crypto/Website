@@ -58,7 +58,12 @@ Grouped into one round of questions, the genuine gaps to close:
   design honestly reframes the goal as maintenance, not failure)
 
 ## Step 3 — Emit the brief + register the athlete
-- Output the **ATHLETE BRIEF** (same structure the subagent uses).
+- Output the **ATHLETE BRIEF** (same structure the subagent uses), and under it the **first draft
+  of the athlete profile** (2026-09-26): the `profile` block whose format is in /program-assemble
+  Step 5. Fill what the form and Amir's answers settle (aim, sport, sex and age, training age,
+  goals in order, days, minutes, cap = form + 15, kit, injuries with status, bans, recovery,
+  language) and leave `bottleneck` for the roadmap. It is what every later check reads, so an
+  `aim` of strength-muscle vs sport is a question for Amir, not a guess.
 - **Register them: two server-side rows, written in ONE call** (both inserts in the same
   `execute_sql`). **No file, no key.**
   ⚠️ The old `athlete_keys` + `?client=&key=` mechanism is **retired** (2026-09-07). The
