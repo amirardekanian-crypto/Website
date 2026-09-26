@@ -1251,6 +1251,44 @@
     font-size: 22px; letter-spacing: 0.5px; text-transform: uppercase;
     color: var(--grey-dark);
   }
+  /* ── HOME-02 (Amir, 2026-09-26): the small cycle line, done days as rows, the in-progress
+     card, and habits / records / weight as one row each. ── */
+  .home-cyc { display: flex; align-items: center; gap: 8px; width: calc(100% - 48px); margin: 12px 24px 4px;
+    padding: 11px 14px; border: 0; border-radius: 10px; background: var(--grey-card); cursor: pointer; text-align: left;
+    font: 700 11px/1.2 'Space Mono', monospace; letter-spacing: .03em; text-transform: uppercase; color: var(--grey-dark); }
+  .home-cyc .ct { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .home-cyc b { color: var(--green-ink); }
+  .home-cyc i { font-style: normal; color: var(--green-ink); font-size: 16px; }
+  .dc-row { display: flex; align-items: center; gap: 12px; margin: 0 24px 10px; padding: 12px 14px; cursor: pointer;
+    border-radius: 12px; background: var(--white); border: 1px solid var(--grey-mid); }
+  .dc-tick { width: 24px; height: 24px; border-radius: 50%; flex: none; display: grid; place-items: center;
+    background: var(--yellow); color: #fff; font: 700 13px/1 'Barlow', sans-serif; }
+  .dc-nm { min-width: 0; font: 800 16px/1.1 'Barlow Condensed', sans-serif; text-transform: uppercase; color: var(--grey-dark); }
+  .dc-nm small { display: block; font: 400 13px/1.3 'Barlow', sans-serif; text-transform: none; color: var(--grey-text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .dc-st { margin-left: auto; font: 700 11px/1 'Space Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
+  .dc-live { padding: 12px 16px 14px; display: grid; gap: 9px; background: var(--white); }
+  .dc-live-k { display: flex; justify-content: space-between; font: 700 11px/1 'Space Mono', monospace; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--clay-ink); font-variant-numeric: tabular-nums; }
+  .dc-bar { height: 6px; border-radius: 3px; background: var(--grey-card); overflow: hidden; }
+  .dc-bar i { display: block; height: 100%; background: var(--ice); }
+  .dc-resume { min-height: 46px; border: 0; border-radius: 10px; background: var(--ice); color: #fff; cursor: pointer;
+    font: 800 16px/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .hrow { display: flex; align-items: center; gap: 12px; width: calc(100% - 48px); margin: 0 24px 10px; padding: 12px 14px;
+    border: 0; border-radius: 12px; background: #122A22; color: #fff; cursor: pointer; text-align: left; }
+  .hrow-b { display: grid; gap: 5px; min-width: 0; }
+  .hrow-l { font: 700 11px/1 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.74); }
+  .hrow-v { font: 900 22px/1 'Barlow Condensed', sans-serif; color: #E06B43; white-space: nowrap; }
+  .hrow-v small { font: 700 11px/1 'Space Mono', monospace; color: rgba(255,255,255,.8); margin-left: 8px; letter-spacing: .03em; }
+  .hrow-sp { margin-left: auto; flex: none; }
+  .hrow-sp .nc-spark { width: 60px; height: 24px; display: block; }
+  .hrow-a { margin-left: auto; color: #FAF7F2; font-size: 20px; flex: none; }
+  .hrow-sp + .hrow-a { margin-left: 4px; }
+  .hrow.quiet { background: var(--white); color: var(--grey-text); border: 1px dashed var(--grey-mid); }
+  .hrow.quiet .hrow-l { color: var(--grey-text); }
+  .hrow-q { font: 400 14px/1.35 'Barlow', sans-serif; color: var(--grey-dark); }
+  .hrow.quiet .hrow-a { color: var(--grey-text); }
+  #home-habits-wrap { margin-top: 24px; }
   /* "2 of 3 sessions done this week" (HOME-01), from paintWeek(). */
   /* An unfinished day (DATA-02): one card above This Week, clay edge like a Coach's Note. */
   .uf-card { margin: 0 24px 16px; padding: 14px 16px; border-radius: 12px; display: grid; gap: 6px;
@@ -6388,6 +6426,16 @@ function dayImageCategory(day) {
 function dayCardHTML(day, dayNum, total, opts) {
   opts = opts || {};
   const id = day.id != null ? day.id : dayNum;
+  // Done this week → one small row (HOME-02, Amir 2026-09-26: "If the days are done, make the
+  // day card into that small one, if not, still big"). Home never names a rest day: athletes
+  // move their days, so the app cannot know one.
+  if (!opts.static && weekDoneDays().has(String(id))) {
+    const nm = day.title || day.focusTag || ('Day ' + dayNum);
+    return `<div class="dc-row" data-dc="${esc(String(id))}" role="button" tabindex="0" onclick="openDayView('${esc(String(id))}')">
+      <span class="dc-tick" aria-hidden="true">✓</span>
+      <span class="dc-nm">Day ${dayNum}<small>${esc(nm)}</small></span>
+      <span class="dc-st">Done</span></div>`;
+  }
   // Descriptive day name = title, else focusTag (e.g. "Squat & Glute Activation").
   const name = day.title || day.focusTag || ('Day ' + dayNum);
   // Shared category image — one of the eight in assets/art/days/. A missing file
@@ -6411,7 +6459,7 @@ function dayCardHTML(day, dayNum, total, opts) {
   h += `<img class="cm-banner-img" alt="${esc(name)}" ` +
        `src="${catImg}" onerror="dayImgError(this)">`;
   h += `<div class="cm-banner-scrim"></div>`;
-  if (!opts.static) h += dayCardPill(id);
+  if (!opts.static && dayInProgress(id)) h += `<div class="cm-pill cm-pill-live">In progress</div>`;
   h += `<div class="cm-banner-caption">`;
   h += `<div class="cm-name day-card-num">Day ${dayNum}</div>`;
   h += `<div class="day-card-name">${esc(name)}</div>`;
@@ -6419,7 +6467,19 @@ function dayCardHTML(day, dayNum, total, opts) {
   // The Quality Map: what this day builds. Filled by paintDayQualities() once the
   // Spine and the approved qualities are in memory; empty (and invisible) until then.
   h += `<div class="dq-row" data-dq="${idStr}"></div>`;
-  h += `</div></div></div>`;
+  h += `</div></div>`;
+  // A session under way: the card says where it is and Resumes it (HOME-02).
+  if (!opts.static && dayInProgress(id)) {
+    let st = { done: 0, total: 0 };
+    try { st = getDayCompletion(String(id)); } catch (e) {}
+    const pct = st.total ? Math.round(st.done / st.total * 100) : 0;
+    h += `<div class="dc-live">
+      <div class="dc-live-k"><span>${st.done} of ${st.total} sets</span><span class="dc-clock" data-day="${idStr}">${fmtClock(timerElapsedMs(String(id)))}</span></div>
+      <div class="dc-bar"><i style="width:${pct}%"></i></div>
+      <button type="button" class="dc-resume" onclick="event.stopPropagation(); openDayView('${idStr}')">Resume ▶</button>
+    </div>`;
+  }
+  h += `</div>`;
   return h;
 }
 
@@ -6530,7 +6590,13 @@ window.clearUnfinished = clearUnfinished;
 // Repaint everything the week drives: the pills, the suggested day, the count line.
 // Called when the day view closes and whenever the history arrives.
 function paintWeek() {
-  paintDayCardPills();
+  const cw = document.getElementById('day-cards-wrap');
+  const days = (DATA.workouts && DATA.workouts.days) || [];
+  if (cw && days.length) {
+    cw.innerHTML = days.map((d, i) => dayCardHTML(d, i + 1, days.length)).join('');
+    if (typeof paintDayQualities === 'function') paintDayQualities();
+  }
+  paintLiveClocks();
   markSuggestedDay();
   const el = document.getElementById('home-week-sum');
   if (!el) return;
@@ -6543,6 +6609,17 @@ function paintWeek() {
   el.classList.toggle('all', n >= ids.length);
 }
 
+// The in-progress card's clock ticks while Home is on screen.
+let _liveClockT = null;
+function paintLiveClocks() {
+  clearInterval(_liveClockT); _liveClockT = null;
+  if (!document.querySelector('.dc-clock')) return;
+  _liveClockT = setInterval(() => {
+    const els = document.querySelectorAll('.dc-clock');
+    if (!els.length) { clearInterval(_liveClockT); _liveClockT = null; return; }
+    els.forEach(el => { el.textContent = fmtClock(timerElapsedMs(el.dataset.day)); });
+  }, 1000);
+}
 function dayCardPill(id) {
   if (weekDoneDays().has(String(id))) return `<div class="cm-pill cm-pill-done">Done</div>`;
   if (dayInProgress(id)) return `<div class="cm-pill cm-pill-live">In progress · Resume</div>`;
@@ -6824,16 +6901,14 @@ function renderHome() {
 
   // Current-cycle card — the same builder as My Plan, but with a "View Plan"
   // pill that opens My Plan, and no Read-more (noDetail).
+  // The cycle is one small line under the greeting (HOME-02, Amir 2026-09-26: "I like the small
+  // cycle details"). It was a full photo card; the photos now belong to the day cards below.
   const cycleWrap = document.getElementById('home-cycle-wrap');
   if (cycleWrap) {
+    const wk = cycleWeekInfo(cur);
     cycleWrap.innerHTML = cur
-      ? cycleCardHTML(cur, {
-          pill: 'View Plan',
-          pillStyle: 'view',
-          total: cycles.length,
-          onclick: "goTo('plan')",
-          noDetail: true
-        })
+      ? `<button type="button" class="home-cyc" onclick="goTo('plan')"><span class="ct">Cycle ${cIdx + 1} of ${cycles.length} · <b>${esc(cur.name || '')}</b>${
+          wk && !wk.before && !wk.after ? ` · Week ${wk.wk} of ${wk.total}` : (cur.weeks ? ' · ' + esc(cur.weeks) : '')}</span><i aria-hidden="true">›</i></button>`
       : '';
   }
 
@@ -6844,7 +6919,6 @@ function renderHome() {
     weekWrap.innerHTML = `
       <div class="home-section-head">
         <div class="home-section-title">This Week</div>
-        ${weekLabel ? `<div class="home-week-chip">${esc(weekLabel)}</div>` : ''}
       </div>
       <div class="home-week-sum" id="home-week-sum"></div>${weekNoteHTML(cur)}`;
   }
@@ -8144,69 +8218,18 @@ function habCardSnapshot() {
 
 function habitCardHtml() {
   const s = habCardSnapshot();
-  const head = `
-    <div class="home-section-head">
-      <div class="home-section-title">Daily Habits</div>
-    </div>`;
 
-  // No snapshot — never open on this device. Say what it is, promise no number.
+  // HOME-02 (Amir 2026-09-26: "I like how small the other cards are"): one row, the count and
+  // the streak. Today's habits are ticked right under it, in AA Proof's own strip (fork 1B).
   if (!s) {
-    return head + `
-      <button type="button" class="nc" onclick="goHabits()">
-        <div class="nc-k"><span>AA Proof</span></div>
-        <div class="nc-big">Track today</div>
-        <div class="nc-f">Sleep, steps, water, protein<span class="nc-a">→</span></div>
-      </button>`;
+    return `<button type="button" class="hrow quiet" onclick="goHabits()">
+      <span class="hrow-b"><span class="hrow-l">Daily habits</span><span class="hrow-q">Sleep, steps, water, protein: tick them in AA Proof.</span></span><span class="hrow-a">›</span></button>`;
   }
+  return `<button type="button" class="hrow" onclick="goHabits()">
+    <span class="hrow-b"><span class="hrow-l">${s.qualified ? 'Daily habits · day complete' : 'Daily habits'}</span>
+      <span class="hrow-v">${s.done != null && s.total ? `${s.done} of ${s.total}` : `Level ${s.lv}`}<small>${s.streak} day${s.streak === 1 ? '' : 's'} in a row</small></span></span>
+    <span class="hrow-a">›</span></button>`;
 
-  // Status light (idea 1): breathes while today is still open, and goes solid
-  // green the moment the day qualifies. The motion stopping IS the message.
-  const dotCls = s.qualified ? 'nc-dot done' : 'nc-dot live';
-  const dotTxt = s.qualified ? 'Day complete' : 'Logging today';
-
-  // The XP ring, drawn around the level exactly as Proof's Today hero draws it:
-  // r=15.5 in a 36 viewBox, so the circumference is ~97.4.
-  const pct  = typeof s.pct === 'number' ? s.pct : 0;
-  const ring = `<svg class="nch-ring" viewBox="0 0 36 36" aria-hidden="true">
-      <circle class="rail" cx="18" cy="18" r="15.5"></circle>
-      <circle class="run" cx="18" cy="18" r="15.5" style="stroke-dashoffset:${(97.4 * (1 - pct / 100)).toFixed(1)}"></circle>
-    </svg>`;
-
-  // The seven-day strip. `days` carries a percentage per day; a snapshot from a
-  // Proof that predates it falls back to the yes/no week so the card still draws.
-  const days = Array.isArray(s.days) && s.days.length
-    ? s.days
-    : (s.week || []).map((on, i, a) => ({ p: on ? 100 : 0, l: '', now: i === a.length - 1 }));
-  const strip = days.map((d, i) => {
-    const fill = d.p > 0 ? (0.22 + 0.78 * d.p / 100).toFixed(2) : '0';
-    const pulse = d.now && !s.qualified ? ' now' : '';
-    return `<div class="nch-d">
-      <span class="nch-bar${pulse}" style="animation-delay:${(0.05 + i * 0.05).toFixed(2)}s"><i style="opacity:${fill}"></i></span>
-      <span class="nch-l${d.now ? ' now' : ''}">${esc(d.l || '')}</span>
-    </div>`;
-  }).join('');
-
-  // Crest comes rendered from Proof so the METALS ladder is never rebuilt here.
-  const crest = s.crest || '';
-
-  return head + `
-    <button type="button" class="nc nc-hero" onclick="goHabits()">
-      <div class="nc-k"><span class="${dotCls}"></span>${esc(dotTxt)}<span class="nc-r">${s.streak} day${s.streak === 1 ? '' : 's'} in a row</span></div>
-      <div class="nch-top">
-        <div class="nch-lv">${ring}<span class="nch-in"><b>${s.lv}</b><i>LEVEL</i></span></div>
-        <div class="nch-body">
-          <div class="nch-rank">${crest}<span class="nch-name">${esc(s.rank || '')}</span><span class="nc-a">→</span></div>
-          ${typeof s.toNext === 'number'
-            ? `<div class="nch-xp"><b>${String(s.toNext).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</b> XP to level ${s.lv + 1}</div>`
-            : ''}
-          <div class="nch-bar-rail"><span style="width:${pct}%"></span></div>
-        </div>
-      </div>
-      <div class="nch-week">
-        <span class="nch-cap">7 Days</span>
-        <div class="nch-days">${strip}</div>
-      </div>
-    </button>`;
 }
 
 // ── THE CEILING — the My Plan card + its own screen ────────────────────
@@ -8215,18 +8238,10 @@ function habitCardHtml() {
 // empty promise.
 function ceilingCardHtml() {
   const lifts = ceilingLifts();
-  const head = `
-    <div class="home-section-head">
-      <div class="home-section-title">Personal Records</div>
-    </div>`;
 
   if (!lifts.length) {
-    return head + `
-      <button type="button" class="nc" onclick="goTo('ceiling')">
-        <div class="nc-k"><span>One-rep maxes</span></div>
-        <div class="nc-big">No records yet</div>
-        <div class="nc-f">Log a weight and your RPE on any lift<span class="nc-a">→</span></div>
-      </button>`;
+    return `<button type="button" class="hrow quiet" onclick="goTo('ceiling')">
+      <span class="hrow-b"><span class="hrow-l">Personal records</span><span class="hrow-q">Fill in by themselves as you train.</span></span><span class="hrow-a">›</span></button>`;
   }
 
   const best = lifts.reduce((a, b) => (b.latest.kg > a.latest.kg ? b : a));
@@ -8242,16 +8257,10 @@ function ceilingCardHtml() {
   const seen = ceilingSeen();
   const from = (seen != null && seen !== best.latest.kg) ? seen : null;
 
-  return head + `
-    <button type="button" class="nc" onclick="goTo('ceiling')">
-      <div class="nc-k"><span>Best lift</span><span class="nc-r">${delta}</span></div>
-      <div class="nc-row">
-        <div class="nc-n" data-to="${best.latest.kg}"${from != null ? ` data-from="${from}"` : ''}>${from != null ? from : best.latest.kg}</div>
-        <div class="nc-u">KG</div>
-        <div class="nc-sp">${ncSpark(best.entries)}</div>
-      </div>
-      <div class="nc-f">${foot}<span class="nc-a">→</span></div>
-    </button>`;
+  return `<button type="button" class="hrow" onclick="goTo('ceiling')">
+    <span class="hrow-b"><span class="hrow-l">Personal records</span>
+      <span class="hrow-v"><span class="hrow-n" data-to="${best.latest.kg}"${from != null ? ` data-from="${from}"` : ''}>${from != null ? from : best.latest.kg}</span> kg<small>${esc(shortLift(best.lift))}${delta ? ' · ' + delta : ''}</small></span></span>
+    <span class="hrow-sp">${ncSpark(best.entries)}</span><span class="hrow-a">›</span></button>`;
 }
 
 // The best figure the athlete has already been shown, so a number that has not
@@ -8263,7 +8272,7 @@ function ceilingSeen() {
 }
 // Run the count-up on any card just rendered, then record what was shown.
 function ceilingCountUp(root) {
-  const el = (root || document).querySelector('.nc-n[data-from]');
+  const el = (root || document).querySelector('.nc-n[data-from], .hrow-n[data-from]');
   const best = ceilingLifts();
   if (best.length) {
     const top = best.reduce((a, b) => (b.latest.kg > a.latest.kg ? b : a));
@@ -10223,7 +10232,8 @@ function markSuggestedDay() {
   if (i < 0) i = dayIds.findIndex(id => !done.has(id));
   if (i >= 0) {
     tabs[i]?.classList.add('suggested');
-    cards[i]?.classList.add('suggested');
+    const c = document.querySelector(`.day-ov-card[data-dc="${dayIds[i]}"]`);
+    if (c) c.classList.add('suggested');
   }
 }
 
@@ -11759,18 +11769,10 @@ function bodyWeightSeries() {
 // card and the tracker itself, and either is a fine place to point someone.
 function weightCardHtml() {
   const series = bodyWeightSeries();
-  const head = `
-    <div class="home-section-head">
-      <div class="home-section-title">Body Weight</div>
-    </div>`;
 
   if (!series.length) {
-    return head + `
-      <button type="button" class="nc" onclick="goWeight()">
-        <div class="nc-k"><span>Body weight</span></div>
-        <div class="nc-big">Not tracked yet</div>
-        <div class="nc-f">Tap to add today's weight<span class="nc-a">→</span></div>
-      </button>`;
+    return `<button type="button" class="hrow quiet" onclick="goWeight()">
+      <span class="hrow-b"><span class="hrow-l">Body weight</span><span class="hrow-q">Tap to add your first reading.</span></span><span class="hrow-a">›</span></button>`;
   }
 
   const last = series[series.length - 1];
@@ -11785,15 +11787,10 @@ function weightCardHtml() {
     : diff === 0 ? 'Level over the last month'
     : `${diff > 0 ? '▲' : '▼'} ${Math.abs(diff)} kg since ${fmtCeilDate(older.d)}`;
 
-  return head + `
-    <button type="button" class="nc" onclick="goWeight()">
-      <div class="nc-k"><span>Body weight</span><span class="nc-r">${esc(fmtCeilDate(last.d))}</span></div>
-      <div class="nc-row">
-        <div class="nc-n">${last.kg}</div><div class="nc-u">KG</div>
-        <div class="nc-sp">${ncSpark(series.map(e => ({ kg: e.kg })))}</div>
-      </div>
-      <div class="nc-f">${esc(trend)}<span class="nc-a">→</span></div>
-    </button>`;
+  return `<button type="button" class="hrow" onclick="goWeight()">
+    <span class="hrow-b"><span class="hrow-l">Body weight</span>
+      <span class="hrow-v">${last.kg} kg<small>${esc(trend)}</small></span></span>
+    <span class="hrow-sp">${ncSpark(series.map(e => ({ kg: e.kg })))}</span><span class="hrow-a">›</span></button>`;
 }
 
 // ── Writing body weight ────────────────────────────────────────────────────

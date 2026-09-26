@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**15 done · 9 partly done · 20 open**, of 44. Each was checked against the code on `main`.
+**16 done · 8 partly done · 20 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -59,10 +59,11 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#252](https://github.com/amirardekanian-crypto/Website/pull/252) | Polish: the side rail only in a day view, under the overlays and labelled; every screen lights its tab; the demo banner clears the dark toggle and Guided's ✕; no AA Proof line in the coach preview; four dead functions gone | POL-01 |
 | [#254](https://github.com/amirardekanian-crypto/Website/pull/254) | Game Plan folds past and future cycles to a slim row (the current one open); the welcome's button opens Day 1 (Amir: "Fold past and future") | PLAN-01 |
 | [#255](https://github.com/amirardekanian-crypto/Website/pull/255) | The estimated max is off the working card; Personal Records fill themselves and keep "+ Log a max" (Amir: "Off the card, keep in Records") | REC-01 |
+| HOME-02 PR | Home led by the training: a small cycle line, done days as small rows, the in-progress card with Resume, habits / records / weight as one row each, quiet empty states, never a rest day (Amir's notes on the mockup) | HOME-02 |
 | [#256](https://github.com/amirardekanian-crypto/Website/pull/256) | An unfinished day is asked about on a later open: "Tuesday's Day 2 was never sent", Send it (filed under Tuesday) or Clear it (Amir: "Ask the athlete next open") | DATA-02 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02.
 
 **Partly done, and what is still open on each:**
 - **WK-01.** The quick part is done. Still open: kg on the rest screen beside reps and RPE, the live row
@@ -80,8 +81,6 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **POL-01.** Swept. Still open: the rest screen still lets the card show through faintly (97%), the
   Quality sheet's "How we measure it" names tests athletes never meet (Amir's words to change), and
   returning from a Library session resets the scroll.
-- **HOME-02.** Training leads Home. Still open: the Today block (next session with Start or Resume),
-  compact rows for habits, records and weight, and quiet empty states.
 - **SEAM-01.** Habits are ticked on Home. The full Proof app still has no way back to training,
   offers a second install, keeps its own dark-mode switch, and reads workout ticks only at launch.
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
@@ -105,8 +104,8 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
    a mockup first; Game Plan → fold past and future (#254); the estimate → off the card (#255); the
    unfinished day → ask the athlete on their next open. Two remain: a rest day in Proof, following the
    phone's dark setting.
-2. **Foundations:** HOME-02's Today block. The mockup is up (https://claude.ai/artifact/S8Tvtt32JTakH4A6LCmF8H):
-   Now vs four states (training day, in progress, rest day, new athlete) and three questions. Build after his yes.
+2. **Foundations:** done. HOME-02 shipped from Amir's notes on the mockup (HOME-02 PR): no separate Today card, no
+   rest-day design ("we don't know their rest days"); done days small, undone days big, the in-progress card.
 3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
    Confirm the card freeze with Amir first (below).
 4. **Home and progress:** PROG-01.
@@ -116,7 +115,7 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 
 ## Open calls and things to watch (put these to Amir)
 
-- **Answered 2026-09-26:** Today block → mockup first (built, awaiting his yes) · Game Plan → fold (#254) ·
+- **Answered 2026-09-26:** Today block → mockup first, then built from his notes (HOME-02 PR) · Game Plan → fold (#254) ·
   estimate → off the card (#255) · unfinished day → ask the athlete (#256). Still his: a rest day in Proof, following the phone's dark setting (below).
 - **The demo breaks two of his rules.** It has a "Week 4 — Deload" notes card instead of
   `weekNotes.last` (REC-4; the demo has no week notes at all), and "Use 2–3 kg" in a notes card
@@ -212,8 +211,8 @@ The app cannot reach Supabase from here, so stub it and feed it a local programm
 
 ## Paste this to start the next chat
 
-> Continue the Fresh Eyes work. Read `Content/FRESH-EYES.md` first, then the "Watch and decide" panel on
-> the Fresh Eyes page (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). Show me the HOME-02 Today block
-> mockup first (I asked for one before it touches the app), then build it after my yes, using the same loop as before: restate the
-> problem, give two or three directions with trade-offs and your recommendation, name the architectural
+> Continue the Fresh Eyes work. Read `Content/FRESH-EYES.md` first, then the Fresh Eyes page
+> (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). Stages one and two are done. Ask me to confirm the card
+> freeze, then start the session project (CARD-01 first) with the same loop as before: restate the problem,
+> give two or three directions with trade-offs and your recommendation, name the architectural
 > consequences, and wait for my yes before building.
