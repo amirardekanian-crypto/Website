@@ -106,7 +106,9 @@
 //      every screen lights its tab, the demo banner clears the dark toggle and Guided's ✕, dead code gone.
 // v55: program.html changed (2026-09-26, PLAN-01): Game Plan folds past and future cycles (the current one
 //      open), and the welcome's button opens Day 1.
-const CACHE = 'aap-v55';
+// v56: program.html changed (2026-09-26, REC-01): the estimated max is off the working card (it stays in
+//      Personal Records, which fill themselves and keep "+ Log a max").
+const CACHE = 'aap-v56';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

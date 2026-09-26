@@ -8587,7 +8587,8 @@ function openCeilingForm(i, asTest) {
 }
 window.openCeilingForm = openCeilingForm;
 
-// Live recompute. Mirrors paintFromFields() on the exercise card, including its
+// Live recompute. (It mirrored paintFromFields() on the exercise card until REC-01 removed
+// that door, 2026-09-26; this is the only copy now.) Including its
 // hard-won distinction between "you have not filled this in" and "these numbers
 // are too far from a single to be honest about" — saying the wrong one of those
 // is what made the card read as broken.
@@ -11571,8 +11572,8 @@ function ceilAliasMap() {
 // next to a prescribed "Barbell Back Squat" splits their history in two the
 // first time they do it, with no way back.
 //
-// ⚠ Deliberately does NOT apply the reps-to-failure ceiling attachCeiling()
-// uses. That gate is about estimating off the set in front of you — a 3×12 leg
+// ⚠ Deliberately does NOT apply the reps-to-failure ceiling the card's estimate
+// used (removed with it, REC-01). That gate was about estimating off the set in front of you — a 3×12 leg
 // press cannot produce an honest single, so the card offers nothing there. It
 // says nothing about whether a 5RM test on the leg press is worth having. What
 // was PRESCRIBED stops mattering the moment the athlete is entering what they
@@ -11924,180 +11925,11 @@ function latestBodyWeight() {
   return { kg: wt[d].kg, d: d };
 }
 
-// Append the Ceiling line + panel to a standard exercise card. Renders nothing
-// at all when the exercise could never produce an honest estimate: no rep count
-// (holds, carries, intervals), or so many reps that even RPE 10 lands past the
-// effective-reps ceiling.
-function attachCeiling(card) {
-  const reps = prescribedReps(card.dataset.reps);
-  if (reps == null || reps > ONE_RM_MAX_EFFECTIVE) return;
-
-  const name  = card.querySelector('.item-name').textContent.trim();
-  const total = parseInt(card.dataset.sets, 10) || 1;
-
-  const box = document.createElement('div');
-  box.className = 'ex-1rm is-empty';   // refresh() reveals it once a set is logged
-  box.addEventListener('click', e => e.stopPropagation());
-  box.innerHTML = `
-    <button type="button" class="ex-1rm-line">
-      <span class="ex-1rm-txt"></span><span class="ex-1rm-arr">&rsaquo;</span>
-    </button>
-    <div class="ex-1rm-panel">
-      <div class="ex-1rm-inputs">
-        <div class="ex-1rm-field"><input class="ex-1rm-kg"  type="text" inputmode="decimal" aria-label="Weight in kilograms"><span>kg</span></div>
-        <div class="ex-1rm-field"><input class="ex-1rm-rp"  type="text" inputmode="numeric" aria-label="Reps"><span>reps</span></div>
-        <div class="ex-1rm-field"><input class="ex-1rm-rpe" type="text" inputmode="numeric" aria-label="RPE"><span>rpe</span></div>
-      </div>
-      <div class="ex-1rm-out"></div>
-      <div class="ex-1rm-grade"></div>
-      <div class="ex-1rm-from"></div>
-      <div class="ex-1rm-auto">A new best goes on your Personal Records by itself when you finish the session.</div>
-      <button type="button" class="ex-1rm-save">Save to Personal Records</button>
-      <button type="button" class="ex-1rm-go">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 5-7 4 5"/><path d="M3 21h18"/></svg>
-        <span>Personal Records</span><span class="ex-1rm-go-a">→</span>
-      </button>
-    </div>`;
-  logSlotFor(card).appendChild(box);
-
-  const line = box.querySelector('.ex-1rm-line');
-  const txt  = box.querySelector('.ex-1rm-txt');
-  const out   = box.querySelector('.ex-1rm-out');
-  const grade = box.querySelector('.ex-1rm-grade');
-  const from  = box.querySelector('.ex-1rm-from');
-  const save  = box.querySelector('.ex-1rm-save');
-  const autoNote = box.querySelector('.ex-1rm-auto');
-  const fKg  = box.querySelector('.ex-1rm-kg');
-  const fRp  = box.querySelector('.ex-1rm-rp');
-  const fRpe = box.querySelector('.ex-1rm-rpe');
-
-  // Once the athlete edits a field the panel is theirs — a later set logged on
-  // the rows must not overwrite what they are in the middle of typing.
-  let touched = false;
-
-  // Recompute from whatever is in the three fields and paint both the panel and
-  // the closed line, so the card never shows two different numbers.
-  function paintFromFields(source) {
-    const kgV = parseLoggedKg(fKg.value), rpV = Number(fRp.value), rpeV = Number(fRpe.value);
-    const est = estimateOneRM(kgV, rpV, rpeV);
-    if (est == null) {
-      out.innerHTML = `<b>&mdash;</b>`;
-      grade.textContent = '';
-      grade.className = 'ex-1rm-grade';
-      save.hidden = true;
-      autoNote.hidden = true;
-      // Two different failures, and telling them apart matters: saying "put in
-      // a weight" to somebody who just put one in is how this read as broken.
-      if (kgV > 0 && rpV > 0 && rpeV > 0) {
-        const rir = Math.max(0, 10 - rpeV), eff = rpV + rir;
-        from.innerHTML = `${rpV} reps with ${rir} left in you is <b>${eff} to failure</b>.<br>`
-          + `Past ${ONE_RM_MAX_EFFECTIVE} the maths is a guess, not an estimate. `
-          + `Try a heavier set of 5 or fewer.`;
-        txt.textContent = 'Too many reps to work out a one-rep max';
-      } else {
-        from.innerHTML = 'Put in a weight, the reps and your RPE.';
-        txt.textContent = 'What could you lift for one rep?';
-      }
-      return;
-    }
-    // Numbers read off the set log need no Save: the finished session puts a new best
-    // on the record by itself (fillRecordsFrom). Only numbers the athlete typed into
-    // the panel, which no set holds, need the button, and so does a lift the app does
-    // not file by itself (recordsItself(): a jump, a throw, a carry...).
-    const auto = !touched && recordsItself(name, card.dataset.exid);
-    save.hidden = auto;
-    autoNote.hidden = !auto;
-    save.disabled = false;
-    save.textContent = 'Save to Personal Records';
-    const rir  = Math.max(0, 10 - Number(fRpe.value));
-    const eff  = Number(fRp.value) + rir;
-    const q    = ceilingQuality(eff);
-    const tank = rir === 0 ? 'nothing left in you'
-                           : rir + ' rep' + (rir === 1 ? '' : 's') + ' left in you';
-    out.innerHTML = `<b>${est}</b><i>KG</i>`;
-    // "Sharp / Good / Rough" says how much to trust it. The word alone is not
-    // enough for someone meeting this for the first time, so it is captioned.
-    grade.innerHTML = q.label + ' <em>&middot; how much to trust it</em>';
-    grade.className = 'ex-1rm-grade g' + (eff <= 3 ? '1' : eff <= 6 ? '2' : '3');
-    from.innerHTML = source + ' &middot; ' + tank + '<br>' + q.hint;
-    // Says what the number IS, not what it is called. "Est. max" means nothing
-    // to someone who has never heard of a one-rep max.
-    txt.textContent = '≈ ' + est + ' kg for one rep';
-  }
-
-  // Refresh from the set log. Skipped once the panel has been hand-edited.
-  function refresh() {
-    if (touched) return;
-    const log  = loadSetLog(name, total);
-    const best = bestCeilingSet(log, reps);
-    const anyLogged = log.some(s => parseLoggedKg(s.w) != null && Number(s.r) > 0);
-
-    if (!best) {
-      // Nothing logged yet — stay out of the way entirely. An unloaded exercise
-      // (box jump, bodyweight work) never gets a weight typed in, so it never
-      // offers a max estimate, and no flag had to be added to the programme
-      // JSON to arrange that. Once a real weight IS logged but the reps are too
-      // far from a single to be honest about, the line appears and says so
-      // rather than silently doing nothing.
-      box.classList.toggle('is-empty', !anyLogged);
-      // ⚠️ NOT disabled. It used to be, and that made the feature look broken:
-      // an athlete logged a real set, got "too many reps", tapped the line and
-      // nothing happened at all — no panel, no explanation, no way to try
-      // different numbers. Refusing to estimate is right; refusing to open is
-      // not. The panel explains itself and the three fields stay editable.
-      line.disabled = false;
-      txt.textContent = 'Too many reps to work out a one-rep max';
-      // Seed the fields from the set anyway, so opening it shows the athlete
-      // their own numbers and what is wrong with them.
-      const s = (log || []).find(x => parseLoggedKg(x.w) != null && Number(x.r) > 0);
-      if (s && !touched) {
-        fKg.value = parseLoggedKg(s.w); fRp.value = setReps(s, reps); fRpe.value = Number(s.r);
-        paintFromFields(`From your set · ${parseLoggedKg(s.w)} kg × ${setReps(s, reps)} @ RPE ${Number(s.r)}`);
-        txt.textContent = 'Too many reps to work out a one-rep max';
-      }
-      return;
-    }
-    box.classList.remove('is-empty');
-    line.disabled = false;
-    fKg.value  = best.kg;
-    fRp.value  = best.reps;
-    fRpe.value = best.rpe;
-    paintFromFields(`From set ${best.idx + 1} &middot; ${best.kg} kg &times; ${best.reps} @ RPE ${best.rpe}`);
-  }
-
-  line.addEventListener('click', ev => {
-    ev.stopPropagation();
-    box.classList.toggle('open');
-  });
-
-  [fKg, fRp, fRpe].forEach(f => {
-    f.addEventListener('input', () => { touched = true; paintFromFields('Your numbers'); });
-    f.addEventListener('click', ev => ev.stopPropagation());
-  });
-
-  // The one thing in here that writes anything. Everything above is derived
-  // from the set log; this is what puts a dated entry on the athlete's record.
-  // Straight through to Personal Records, remembering where to come back to.
-  box.querySelector('.ex-1rm-go').addEventListener('click', ev => {
-    ev.stopPropagation();
-    openCeilingFrom(card);
-  });
-
-  save.addEventListener('click', ev => {
-    ev.stopPropagation();
-    const kg  = parseLoggedKg(fKg.value);
-    const est = estimateOneRM(kg, fRp.value, fRpe.value);
-    if (est == null) return;
-    const isBest = noteNewBest(name, est, ceilingToday());
-    saveCeilingEntry(name, est, kg, Number(fRp.value), Number(fRpe.value));
-    save.textContent = isBest ? 'New best ✓' : 'Saved ✓';
-    save.disabled = true;
-    if (navigator.vibrate) navigator.vibrate(12);
-  });
-
-  card._ceilingRefresh = refresh;
-  refresh();
-}
+// The estimated max used to sit on the working card, under the sets (attachCeiling(), with its
+// own hand-entry panel). Removed 2026-09-26 (REC-01, Amir: "Off the card, keep in Records"):
+// nothing on the card suggests a weight mid-set, which is his rule (history, never a
+// prescription). Personal Records fill themselves from a finished session, and Records →
+// "+ Log a max" (paintCeilingForm()) is the one hand-entry door now.
 
 // Reflect "all sets done?" on the exercise-level check and the day progress.
 function syncExerciseCheck(card, log) {
@@ -12129,10 +11961,8 @@ function initSetOrRPE() {
       // Circuit logging — weight grid and/or per-round RPE, per the JSON flags.
       attachCircuitLog(card);
     } else {
-      // Standard exercise — per-set table, then The Ceiling underneath it.
-      // Order matters: attachCeiling() reads the log the table just seeded.
+      // Standard exercise — the per-set table. (The estimate under it went, REC-01.)
       attachSetLog(card);
-      attachCeiling(card);
     }
     paintLastTime(card);
   });
@@ -12404,8 +12234,8 @@ function updateRing(fraction) {
 // ── Guided Mode ──────────────────────────────────────────────────────
 // Walks the day's "standard" exercises (the ones with a per-set log — see
 // hasStandard/renderExercise) one set at a time, reusing the REAL DOM already built
-// and wired by attachSetLog()/attachCeiling(): the weight input, RPE buttons, per-set
-// check circle and Ceiling panel are the exact same nodes and listeners the list view
+// and wired by attachSetLog(): the weight input, RPE buttons and per-set
+// check circle are the exact same nodes and listeners the list view
 // uses, just relocated into this overlay while it's open. Nothing about how a set is
 // logged, saved or estimated is reimplemented here — see CODEBASE.md's warning about
 // coach.html's parseSessionLog being "a second reader of a grammar program.html owns";
