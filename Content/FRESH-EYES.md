@@ -48,7 +48,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#240](https://github.com/amirardekanian-crypto/Website/pull/240) | Guided never pauses a running clock, reopens at the first unfinished set, and its last button (Finish Session ✓) really finishes, or lands on "Wrap up early?" when a circuit is open | WK-01 |
 | [#241](https://github.com/amirardekanian-crypto/Website/pull/241) | Anything that deletes takes two taps (`armedTap()`): Reset Session, a weight reading, a Personal Record; Reset moved away from Send | LOG-02 |
 | [#242](https://github.com/amirardekanian-crypto/Website/pull/242) | Proof's nudge never asks for the session it cannot tick (`sessionLeft` / `freeDone`), OPEN YOUR PROGRAMME opens the programme, "logged nothing" means nothing | PRF-04 |
-| HOME-03 PR | The install ask waits for a finished session, says what works on that phone (no dead Install button), and Proof stops asking coached athletes for a second install | HOME-03 |
+| [#243](https://github.com/amirardekanian-crypto/Website/pull/243) | The install ask waits for a finished session, says what works on that phone (no dead Install button), and Proof stops asking coached athletes for a second install | HOME-03 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03.
 
