@@ -105,7 +105,8 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
    a mockup first; Game Plan → fold past and future (#254); the estimate → off the card (#255); the
    unfinished day → ask the athlete on their next open. Two remain: a rest day in Proof, following the
    phone's dark setting.
-2. **Foundations:** HOME-02's Today block: a mockup page first, then build after his yes.
+2. **Foundations:** HOME-02's Today block. The mockup is up (https://claude.ai/artifact/S8Tvtt32JTakH4A6LCmF8H):
+   Now vs four states (training day, in progress, rest day, new athlete) and three questions. Build after his yes.
 3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
    Confirm the card freeze with Amir first (below).
 4. **Home and progress:** PROG-01.
@@ -115,8 +116,8 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 
 ## Open calls and things to watch (put these to Amir)
 
-- **Answered 2026-09-26:** Today block → mockup first · Game Plan → fold (#254) · estimate → off the card ·
-  unfinished day → ask the athlete. Still his: a rest day in Proof, following the phone's dark setting (below).
+- **Answered 2026-09-26:** Today block → mockup first (built, awaiting his yes) · Game Plan → fold (#254) ·
+  estimate → off the card (#255) · unfinished day → ask the athlete (#256). Still his: a rest day in Proof, following the phone's dark setting (below).
 - **The demo breaks two of his rules.** It has a "Week 4 — Deload" notes card instead of
   `weekNotes.last` (REC-4; the demo has no week notes at all), and "Use 2–3 kg" in a notes card
   rather than in that exercise's Coach's Note (PRG-2). The words were left as written when the demo
