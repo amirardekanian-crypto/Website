@@ -5355,6 +5355,10 @@ function inAppBrowser() {
 
 function maybeOfferInstall() {
   if (window.IS_EMBED) return;             // the training app is the one on the home screen
+  // One app to install (HOME-03, 2026-09-26): a coached athlete is asked to install the
+  // training app, whose Home carries Proof, so Proof no longer asks for a second icon. The
+  // Settings row still offers it to anyone who wants it. A free athlete's only app is this.
+  if (!isFree()) return;
   if (!installable() || !CFG || CFG.installAsked || _installTimer) return;
   _installTimer = setTimeout(() => {
     _installTimer = null;

@@ -109,7 +109,9 @@ The offer is a sheet, and **it is not shown on arrival**. It fires once, ~1.5s a
 athlete logs their **first** habit — `setVal()` is the one door into the log, so that is
 where it hooks. Before anything has happened it is a pop-up from a stranger; straight
 after the first tick it is *keep this*. It stands down for a celebration, the log sheet,
-any screen other than Today, demo mode, and an app already running standalone. Saying
+any screen other than Today, demo mode, and an app already running standalone. **It is offered to
+free athletes only** (HOME-03, 2026-09-26): a coached athlete is asked once to install the training
+app, whose Home carries Proof, and was being asked for a second icon here. Saying
 *Not now* sets `CFG.installAsked` and it never asks again — **Settings keeps a permanent
 row**, which is also the only route for someone on a new phone. The row disappears once
 the app is installed, where it would do nothing.

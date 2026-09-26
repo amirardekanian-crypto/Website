@@ -10806,6 +10806,9 @@ async function sendSession(day) {
 
     status.className = 'send-session-status success';
     status.textContent = '✓ Sent — your coach will see it shortly.';
+    // The session is done and nothing is left to tap: the one moment an install ask
+    // interrupts nothing (HOME-03). Once only; A2HS remembers a dismissal.
+    setTimeout(maybeOfferInstall, 1800);
     btn.textContent = 'Sent ✓';
     if (window.plausible) window.plausible('Session Sent');
 
@@ -11723,6 +11726,21 @@ window.logWeightToday = logWeightToday;
 
 function deleteWeight(day) { saveWeight(day, null); renderWeightScreen(); }
 window.deleteWeight = deleteWeight;
+
+// Has this athlete finished a session? The session-history cache (sessions on the server,
+// copied down) or a finish on this phone. The install ask waits for this (HOME-03).
+function hasFinishedASession() {
+  try { const h = JSON.parse(localStorage.getItem(ATHLETE_ID + '_histcache') || 'null'); if (Array.isArray(h) && h.length) return true; } catch (e) {}
+  try { return Object.keys(localStorage).some(k => k.indexOf(ATHLETE_ID + '_completed_d') === 0 || k.indexOf(ATHLETE_ID + '_sent_d') === 0); } catch (e) { return false; }
+}
+function maybeOfferInstall() {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
+  const signin = document.getElementById('signin-screen');
+  if (signin && signin.classList.contains('visible')) return;
+  if (!hasFinishedASession()) return;
+  if (window.A2HS && typeof window.A2HS.show === 'function') window.A2HS.show();
+}
+window.maybeOfferInstall = maybeOfferInstall;
 
 // ⚠️ ONE RULE FOR ANYTHING THAT DELETES (LOG-02, 2026-09-26): a second tap. The first tap arms
 // the button (its label says what the next tap does, class `armed`), the second within 4 s acts,
@@ -13486,21 +13504,13 @@ function esc(str) {
     navigator.serviceWorker.register('/sw.js');
   }
 
-  // Offer Add-to-Home-Screen a few seconds after first paint.
-  // Skipped in demo mode — don't nag marketing visitors to install.
-  // Also skipped while the sign-in screen is up: asking someone to install an app
-  // they have not got into yet is noise, and it covers the password field on a
-  // small phone.
-  // Also skipped in a coach preview: Amir is looking at someone else's app, not
-  // installing it.
+  // Offer Add-to-Home-Screen once the athlete has FINISHED A SESSION, never on first open
+  // (HOME-03, 2026-09-26): the toast used to land 2.5 s after the first sign-in, on top of
+  // the welcome and over Day 1. Now it waits for a later open, or comes right after a Send
+  // (maybeOfferInstall() in sendSession()). A2HS.show() itself stands down when installed
+  // or once dismissed. Not in the demo, a coach preview, or over the sign-in screen.
   if (!window.IS_DEMO && !window.IS_PREVIEW) {
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const signin = document.getElementById('signin-screen');
-        if (signin && signin.classList.contains('visible')) return;
-        if (window.A2HS && typeof window.A2HS.show === 'function') window.A2HS.show();
-      }, 2500);
-    });
+    window.addEventListener('load', () => setTimeout(maybeOfferInstall, 2500));
   }
 </script>
 
