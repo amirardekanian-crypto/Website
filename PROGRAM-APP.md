@@ -521,6 +521,21 @@ sits in front of the whole site).
   Waiting less when a copy exists would open slow-but-working connections on the copy more often; it is
   a separate call.
 
+## 🌙 Midnight is not the end of a session (DATA-02, 2026-09-26)
+
+- **A session's date is the local day it was finished** (`sessionDateFor()`: the finish stamp, else today),
+  and every save of it (finish, a later RPE or note, Send) names that same day. It was `toISOString()`, a UTC
+  date worked out again on each save: in Iran a session after midnight was filed under the day before (and
+  ticked AA Proof's WORKOUT on the wrong day), and one finished before 00:00 UTC but saved again after it got
+  a second `session_history` row. Rows saved before this carry a UTC date.
+- **A session stays live for 6 hours** after it started, or after it finished (`SESSION_GRACE_MS`,
+  `sessionIsStale()`, the one test, used by the boot sweep, Start/Pause, `openGuided()` and
+  `liveExerciseKeys()`). A session started at 23:30 used to lose its clock and check-in on a reopen after
+  midnight, and a Start/Pause tap reset it; one finished at 23:50 lost its unsent note and rating.
+- **Not done (Amir's call):** a day logged but never finished still carries its ticks into next week and never
+  reaches the coach; recording it (as a partial session on its own date) or asking the athlete is open in
+  `Content/FRESH-EYES.md`. The sweep still runs at launch only, not when the app returns to the foreground.
+
 ## 📅 This Week is built from the session history (HOME-01, 2026-09-26)
 
 Home's week used to know only today: a Done pill lasted until midnight (the `<id>_completed_d<N>` stamp) and
@@ -530,8 +545,8 @@ phone today. The window is the **cycle's own training week** (`cycleWeekInfo()`:
 (wk − 1) × 7`), or Monday–Sunday for a cycle with no dates. `paintWeek()` draws the day cards' Done pills, the
 suggested day (a session in progress first, then the first day not done this week, none when all are done) and
 the line under **This Week**, "2 of 3 sessions done this week"; it runs at boot, when the history arrives, and
-whenever the day view closes, so a finished session shows on Home without a reload. ⚠️ `completed_on` is a UTC
-date (DATA-02): a session finished between 00:00 and 03:30 in Iran is filed under the day before.
+whenever the day view closes, so a finished session shows on Home without a reload. `completed_on` is the local
+day the session was finished since DATA-02 (rows before it carry a UTC date).
 
 ## ↩️ Back closes the top layer (NAV-01, 2026-09-26)
 

@@ -112,7 +112,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   the body drawing's groups; see PROGRAM-APP.md *The muscle map*) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
   `parseSetText()`) · the records rename matcher (`matchRenamed()` / `ceilAliasMapC()`) and its hand-entry
   doors (`paintCeilingForm()` mirrors `paintFromFields()`) · how a session's set ends (`carrySet()`, called by
-  the midnight sweep, the cloud copy and a rename).
+  the midnight sweep, the cloud copy and a rename) · whether a session is over (`sessionIsStale()`, 6 h grace past
+  midnight; DATA-02) and the date it is filed under (`sessionDateFor()`, the local day it was finished).
 - **`rxOf()` returns a VIEW** (strings, the dose as `dose: {kind, value, side, label}`), not the `rx` object:
   test app code against real `rxOf()` output.
 - **A prescription is `rx`**; legacy `chips[]` is read, never written; **rest is never invented**; reps are
@@ -222,7 +223,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v51` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v52` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

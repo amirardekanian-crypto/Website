@@ -6404,8 +6404,8 @@ function dayInProgress(id) {
 // training week (cycleWeekInfo(): 7 days from startDate + (wk-1)×7), or Monday–Sunday for
 // a cycle with no dates, and a day is done this week when a session of it is in HIST
 // (get_my_history, or its phone copy) inside that window, or finished on this phone today.
-// ⚠️ completed_on is a UTC date (DATA-02): a session finished between 00:00 and 03:30 in
-// Iran is filed under the day before, which can only move it across a week boundary.
+// completed_on is the LOCAL day the session was finished since DATA-02 (sessionDateFor());
+// rows saved before 2026-09-26 carry a UTC date, off by a day only for 00:00–03:30 in Iran.
 function ymdLocal(d) {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
@@ -9687,7 +9687,7 @@ function toggleSessionTimer(day) {
   // A timer stamped on a previous calendar date is leftover state, not today's
   // session (long-lived PWA that never reloaded, so autoResetStaleDays never
   // swept it). Clear it — and its readiness — and treat this tap as a fresh start.
-  if (t && t.sessionStart && new Date(t.sessionStart).toDateString() !== new Date().toDateString()) {
+  if (t && t.sessionStart && sessionIsStale(t.sessionStart)) {
     localStorage.removeItem(timerKey(day));
     localStorage.removeItem(readinessKey(day));
     t = null;
@@ -10412,11 +10412,35 @@ function adoptRenamedExercises() {
 // and those two need telling apart (see liveNames in autoResetStaleDays). The
 // timer and the readiness check are the two things a started session always
 // leaves behind, and both carry their own date.
+// ⚠️ MIDNIGHT IS NOT THE END OF A SESSION (DATA-02, 2026-09-26). A session started at 23:30
+// used to be "yesterday's" the moment the clock passed 00:00: the next boot swept its clock and
+// check-in, and a Start/Pause tap reset it. A session now stays live for SESSION_GRACE_MS after
+// it started (or after it finished, so its note and rating can still be sent). The ONE test for
+// "is this session over": sessionIsStale(). Used by the boot sweep, the Start/Pause toggle,
+// openGuided() and liveExerciseKeys().
+const SESSION_GRACE_MS = 6 * 3600000;
+function sessionIsStale(stamp) {
+  if (!stamp) return false;
+  const d = new Date(stamp);
+  if (isNaN(d)) return false;
+  return d.toDateString() !== new Date().toDateString() && (Date.now() - d.getTime()) > SESSION_GRACE_MS;
+}
 function sessionStartedToday(dayId, today) {
   const t = loadTimer(dayId), r = loadReadiness(dayId);
-  if (t && t.sessionStart && new Date(t.sessionStart).toDateString() === today) return true;
-  if (r && r.timestamp   && new Date(r.timestamp).toDateString()   === today) return true;
+  if (t && t.sessionStart && (new Date(t.sessionStart).toDateString() === today || !sessionIsStale(t.sessionStart))) return true;
+  if (r && r.timestamp   && (new Date(r.timestamp).toDateString()   === today || !sessionIsStale(r.timestamp))) return true;
   return false;
+}
+// The date a session is filed under: the LOCAL day it was finished (the finish stamp), or
+// today. It used to be new Date().toISOString(), a UTC date worked out again on every save:
+// in Iran a session after midnight was filed under the day before (and ticked AA Proof's
+// WORKOUT on the wrong day), and one finished before 00:00 UTC but sent after it got a
+// SECOND session_history row. Every save of one session (finish, a later RPE or note, send)
+// now names the same day.
+function sessionDateFor(day) {
+  const on = completedDate(localStorage.getItem(ATHLETE_ID + '_completed_d' + day));
+  const d = on ? new Date(on) : new Date();
+  return ymdLocal(isNaN(d) ? new Date() : d);
 }
 
 // Per-exercise keys are built from the NAME alone (setLogKey), and 21 of the 22
@@ -10497,14 +10521,17 @@ function autoResetStaleDays() {
     if (!completedOn) {
       const t = loadTimer(day.id);
       const r = loadReadiness(day.id);
-      const staleT = t && t.sessionStart && new Date(t.sessionStart).toDateString() !== today;
-      const staleR = r && r.timestamp && new Date(r.timestamp).toDateString() !== today;
+      const staleT = t && t.sessionStart && sessionIsStale(t.sessionStart);
+      const staleR = r && r.timestamp && sessionIsStale(r.timestamp);
       if (staleT || staleR) {
         localStorage.removeItem(timerKey(day.id));
         localStorage.removeItem(readinessKey(day.id));
       }
     }
-    if (completedOn && completedOn !== today) {
+    // Finished last night and not yet six hours ago: its note, rating and Send stay (DATA-02).
+    const tDone = completedOn && completedOn !== today ? loadTimer(day.id) : null;
+    const justFinished = !!(tDone && tDone.sessionEnd && !sessionIsStale(tDone.sessionEnd));
+    if (completedOn && completedOn !== today && !justFinished) {
       // Per-day per-session data
       localStorage.removeItem(completedKey);
       localStorage.removeItem(ATHLETE_ID + '_daynote_' + day.id);
@@ -10866,7 +10893,7 @@ async function recordSessionToCloud(day) {
   if (window.IS_PREVIEW || day == null) return;
   const D = buildSessionData(day);
   if (!D) return;
-  const completedOn = new Date().toISOString().slice(0, 10);
+  const completedOn = sessionDateFor(day);
   // Personal Records follow the session record, on every save of it (finish, a later
   // RPE or note, send), under the date the server files it by. They stay on the
   // phone, so the demo gets them too; nothing below this line runs in the demo.
@@ -12492,7 +12519,7 @@ function openGuided(day) {
   // has not started (it goes through the readiness check), a leftover from an earlier day (the
   // toggle clears it), or a paused one (they are about to train, so it resumes) is toggled.
   const t = loadTimer(day);
-  const stale = !!(t && t.sessionStart && new Date(t.sessionStart).toDateString() !== new Date().toDateString());
+  const stale = !!(t && t.sessionStart && sessionIsStale(t.sessionStart));
   if (!t || stale || (!t.running && !t.finished)) toggleSessionTimer(day);
   const ro = document.getElementById('readiness-overlay');
   if (!ro || !ro.classList.contains('visible')) {
@@ -12786,11 +12813,11 @@ function histFromRows(rows) {
 function histSetLogged(s) { return !!(s && (s.w || s.r || s.d)); }
 
 // Every past session of this exercise, newest first. Today's own session is left
-// out: it is the one being logged right now. `completed_on` is written as a UTC
-// date (recordSessionToCloud), so "today" is compared on the same basis.
+// out: it is the one being logged right now. `completed_on` is the local day the session
+// was finished since DATA-02 (sessionDateFor()), so "today" is the local day too.
 function historyFor(name) {
   if (!HIST) return [];
-  const want = histNorm(name), todayUtc = new Date().toISOString().slice(0, 10);
+  const want = histNorm(name), todayUtc = ymdLocal(new Date());   // local since DATA-02 (the name stays)
   const out = [];
   HIST.forEach(s => {
     if (s.date >= todayUtc) return;
@@ -12822,7 +12849,7 @@ function buildHistAlias() {
 function histDateLabel(iso) {
   const d = new Date(iso + 'T12:00:00');
   if (isNaN(d)) return iso;
-  const days = Math.round((new Date(new Date().toISOString().slice(0, 10) + 'T12:00:00') - d) / 86400000);
+  const days = Math.round((new Date(ymdLocal(new Date()) + 'T12:00:00') - d) / 86400000);
   // "Tue 22 Sep" — built by hand: toLocaleDateString gives "Tue, 22 Sept" in en-GB.
   const when = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()] + ' ' + d.getDate() + ' '
              + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
@@ -13000,7 +13027,7 @@ function demoHistory() {
             return { w, n: planned ? planned - (lastSet ? 1 : 0) : null, r: String(Math.min(10, tgt + (lastSet ? 1 : (i === 0 ? -1 : 0)))), d: true };
           }) });
       }));
-      rows.push({ completed_on: dt.toISOString().slice(0, 10), day: d.id, readiness: k === 2 ? 2.5 : 4, log });
+      rows.push({ completed_on: ymdLocal(dt), day: d.id, readiness: k === 2 ? 2.5 : 4, log });
     }
   });
   return rows.sort((a, b) => (a.completed_on < b.completed_on ? 1 : -1));
