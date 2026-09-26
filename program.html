@@ -564,6 +564,12 @@
     background: linear-gradient(to top,
       rgba(150,58,28,0.80) 0%, rgba(150,58,28,0.30) 44%, rgba(150,58,28,0) 74%);
   }
+  /* A folded cycle (past or future, PLAN-01) is one slim row until opened: the caption sets the
+     height, and the tagline waits for Read more. */
+  .planlike .current-message.is-folded:not(.is-open) .cm-banner { aspect-ratio: auto; min-height: 0; }
+  .planlike .current-message.is-folded:not(.is-open) .cm-tagline { display: none; }
+  .planlike .current-message.is-folded:not(.is-open) .cm-banner-caption .cm-name { font-size: 22px; padding-right: 118px; }
+  .planlike .current-message.is-folded:not(.is-open) .cm-banner-caption { padding-top: 44px; }   /* under the pill */
   .planlike .cm-banner-caption {
     position: relative; z-index: 2;
     align-self: flex-end;
@@ -6101,11 +6107,17 @@ function maybeWelcome() {
     '<div class="wel-sheet">' +
       '<p>' + plan + '</p>' +
       '<p class="sub">Any questions, message me on WhatsApp. The button is in the Coach tab.</p>' +
-      '<button type="button" class="wel-go">See my game plan</button>' +
+      '<button type="button" class="wel-go">Open Day 1</button>' +
       '<button type="button" class="wel-skip">Look around first</button>' +
     '</div>';
   document.body.appendChild(el);
-  el.querySelector('.wel-go').addEventListener('click', function () { el.remove(); goTo('plan'); });
+  // To the training, not the plan (PLAN-01, Amir 2026-09-26): a new athlete's first tap lands on Day 1.
+  el.querySelector('.wel-go').addEventListener('click', function () {
+    el.remove();
+    const d0 = (DATA.workouts && DATA.workouts.days || [])[0];
+    goTo('home');
+    if (d0) openDayView(String(d0.id));
+  });
   el.querySelector('.wel-skip').addEventListener('click', function () { el.remove(); });
 }
 
@@ -6122,7 +6134,11 @@ function cycleCardHTML(cycle, opts) {
   // the reasoning behind each block, and hiding it behind "Read more" meant most
   // athletes never read a word of it. They can still collapse any card, and
   // toggleCycleCard() below flips it back the other way.
-  const cls = 'current-message is-open' + (opts.onclick ? ' is-clickable' : '');
+  // ⚠️ REVISED (Amir, 2026-09-26, PLAN-01: "Fold past and future"): only the CURRENT cycle
+  // opens expanded. Past and future cycles pass `folded`: collapsed, on a slim banner, so
+  // Game Plan reaches this cycle's reasoning without scrolling past last month's.
+  const folded = !!opts.folded;
+  const cls = 'current-message' + (folded ? ' is-folded' : ' is-open') + (opts.onclick ? ' is-clickable' : '');
   // ⚠️ The card's own tap must ignore taps on the Read less/more button inside
   // it. stopPropagation() in toggleCycleCard() was not enough on its own — a
   // tap on the toggle of a clickable card both collapsed it AND navigated away.
@@ -6201,9 +6217,9 @@ function cycleCardHTML(cycle, opts) {
   if (detail) {
     // Toggle button lives on the banner (bottom-right); the collapsible body
     // sits below it. Close the banner div first, then add the body.
-    // Starts expanded, so the button starts as the way OUT of the card.
-    h += `<button class="cm-toggle" aria-expanded="true" onclick="toggleCycleCard(this, event)">`;
-    h += `<span class="cm-toggle-label">Read less</span><span class="cm-toggle-chev" aria-hidden="true">▾</span>`;
+    // An open card's button is the way OUT; a folded one's is the way in.
+    h += `<button class="cm-toggle" aria-expanded="${folded ? 'false' : 'true'}" onclick="toggleCycleCard(this, event)">`;
+    h += `<span class="cm-toggle-label">${folded ? 'Read more' : 'Read less'}</span><span class="cm-toggle-chev" aria-hidden="true">▾</span>`;
     h += `</button>`;
     h += `</div>`; // .cm-banner
     h += `<div class="cm-collapse"><div class="cm-cardbody">${detail}</div></div>`;
@@ -6610,6 +6626,7 @@ function renderPlan() {
   if (prevCycle && archiveList.length) {
     const histId = archiveList[0].id;
     document.getElementById('past-card-wrap').innerHTML = cycleCardHTML(prevCycle, {
+      folded: true,
       pill: 'Done',
       alt: artAlt(prevCycle),
       total: cycles.length,
@@ -6681,6 +6698,7 @@ function renderPlan() {
       // First future card is the immediate next cycle; everything after is locked.
       const isNext = i === 0;
       html += cycleCardHTML(c, {
+        folded: true,
         pill: isNext ? 'Up next!' : 'Locked',
         alt: artAlt(c),
         pillStyle: isNext ? 'next' : 'locked',

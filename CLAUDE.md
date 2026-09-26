@@ -169,7 +169,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   emerald on 2026-09-26; Amir, asked whether Proof was an exception: *"fix"*).
 - **No new exercise-card features until most athletes are on the new format** (Amir, 2026-09-26, Five
   Forks fork 4 B). The demo was converted that day; everyone else changes over at their next cycle.
-  The tab that holds the whole plan is **Game Plan** (it was My Plan).
+  The tab that holds the whole plan is **Game Plan** (it was My Plan). Only the current cycle opens expanded;
+  past and future cycles are folded (Amir, 2026-09-26, PLAN-01), and the welcome's button opens Day 1.
 
 ## The habit app (`habits.html`, AA Proof) — read `HABITS.md` before changing it
 
@@ -223,7 +224,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v54` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v55` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**12 done · 12 partly done · 20 open**, of 44. Each was checked against the code on `main`.
+**13 done · 11 partly done · 20 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -57,9 +57,10 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#250](https://github.com/amirardekanian-crypto/Website/pull/250) | A session is filed under the local day it was finished, one date for every save of it; a session past midnight keeps its clock, check-in, note and rating for 6 hours | DATA-02 |
 | [#251](https://github.com/amirardekanian-crypto/Website/pull/251) | The info sheet keeps a trail: ‹ Back at the top, and the phone's Back steps back a page before it closes the sheet | SHEET-01 |
 | [#252](https://github.com/amirardekanian-crypto/Website/pull/252) | Polish: the side rail only in a day view, under the overlays and labelled; every screen lights its tab; the demo banner clears the dark toggle and Guided's ✕; no AA Proof line in the coach preview; four dead functions gone | POL-01 |
+| [#254](https://github.com/amirardekanian-crypto/Website/pull/254) | Game Plan folds past and future cycles to a slim row (the current one open); the welcome's button opens Day 1 (Amir: "Fold past and future") | PLAN-01 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01.
 
 **Partly done, and what is still open on each:**
 - **WK-01.** The quick part is done. Still open: kg on the rest screen beside reps and RPE, the live row
@@ -85,42 +86,9 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
   offers a second install, keeps its own dark-mode switch, and reads workout ticks only at launch.
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
 - **REC-01.** The estimated max still sits on the working card during the set.
-- **PLAN-01.** Game Plan still opens on the finished cycle with every card expanded, and the welcome
-  still sends a new athlete to the plan instead of Day 1.
-
-**Open.** P1: WK-02, CARD-01. P2: PROG-01,
-PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03. P3: DS-03, CONS-01, PRF-05, WK-05, LIB-01, POL-02, DOC-01.
-
-## Next, in order
-
-**REL-01 is done** (#237, 2026-09-26): both apps open with no signal from `plancache`; the full
-account is `PROGRAM-APP.md` → *No signal*.
-
-**PRIV-01 is done** (#238, 2026-09-26, Amir's call B): every line about the board reads `boardState()`
-(`'on' | 'coming' | 'off'`); a coached athlete who has not trained yet is told the name they will appear
-under, can change it, and can keep off in advance. Full account: `HABITS.md` → *Who is on it*.
-
-1. **"Stop the bleeding" is done** (2026-09-26): REL-01, PRIV-01, CNT-01, WK-01's quick part, LOG-02, PRF-04,
-   HOME-03, WK-03's quick parts, A11Y-01 in the training app. So are NAV-01 (both apps), HOME-01, BW-01,
-   DATA-02's safe part, SHEET-01 and POL-01 (#239–#252, Amir: "keep going, only pause if you want me to choose").
-   **Six calls wait for Amir** (the first six under *Open calls*): the Today block, Game Plan folding,
-   the estimate on the card, a rest day in Proof, the unfinished day, following the phone's dark setting.
-2. **Foundations:** HOME-02's Today block, once he answers.
-3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
-   Confirm the card freeze with Amir first (below).
-4. **Home and progress:** REC-01 (the estimate off the card), PROG-01, PLAN-01, DATA-02 (the unfinished day, after his call).
-5. **Coach and Proof:** COACH-02, NAV-02, SEAM-01 (after the habit count below), PRF-01, PRF-02,
-   PRF-03.
-6. **System and polish:** DS-01, DS-03, CONS-01, PRF-05, LIB-01, POL-01, POL-02, DOC-01.
-
-## Open calls and things to watch (put these to Amir)
-
 - **Home's Today block (HOME-02).** The next session (or "Rest day" with one suggestion) with Start or
   Resume, then one-line rows for habits, records and weight, empty states a single quiet line. A visible
   redesign of Home: build as described, or mockup first?
-- **Game Plan opening (PLAN-01).** On 2026-09-12 Amir asked for every cycle card open. Folding the past and
-  future cycles to one line (the current one open) reaches this cycle's reasoning without scrolling past
-  last month. Reverses his rule, so his call. Also: the welcome's "See my game plan" → Day 1?
 - **The estimate on the working card (REC-01).** The estimated max still sits on the card mid-set. Take it off
   the card (it stays in Records) or keep it?
 
