@@ -96,6 +96,16 @@ dual-read costs nothing). They convert one at a time, for free, whenever an exer
 converted in bulk (`scripts/migrate_rx.js`, git is the undo). Never author `chips[]` again, and
 never leave `chips` sitting beside an `rx`.
 
+**The public demo was converted on 2026-09-26** (Amir, Five Forks, fork 4 B: it is the one programme
+every prospect sees): `rx` through the same `toRx()`/`circuitToRx()` the ✎ editor uses, `exId` on every
+card, card cues and videos dropped wherever the approved Spine entry has its own, seven `why`s, a
+`test` flag on the squat and the RDL, and the REC-2 *Rough Days* card; no set, rep, RPE or exercise
+changed, and `program_versions` holds the old row. The two medicine-ball slams keep their own cues
+until their draft Spine entries are approved. Every athlete still changes over at their next cycle,
+and **until most have, no new exercise-card features** (same fork): the work goes to the Proof seam,
+readiness and the weight boxes instead. The demo has no cycle dates, so week-based features (the
+week notes, the retest nudge, "Week 3 of 5") cannot show in it.
+
 **Writing a programme got shorter, which was the point.** `/program-design` already emitted plain
 dose fields; `/program-assemble` step 2b used to convert them into chips under a page of rules
 (`×`-prefix, style colours, chip order, "never put a dose in a modifier"). That step is now a copy.
