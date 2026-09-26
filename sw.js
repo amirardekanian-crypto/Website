@@ -96,7 +96,9 @@
 //      sheet, Settings a step at a time, a tab) instead of leaving the app; never in the embedded strip.
 // v50: program.html changed (2026-09-26, HOME-01): This Week is built from the session history (Done pills
 //      that last the week, the right day suggested, "2 of 3 sessions done this week").
-const CACHE = 'aap-v50';
+// v51: program.html changed (2026-09-26, BW-01): the weigh-in box sits under the headline number, above
+//      the chart and the list; the weight and Records trend lines read in dark mode.
+const CACHE = 'aap-v51';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
