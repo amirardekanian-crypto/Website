@@ -345,6 +345,38 @@ fp = subprocess.run([sys.executable, CHECK, p, '--fingerprint'], capture_output=
 expect('fingerprint keeps "7.0" and "7.50" as written, like the server', '4 leaves  9 chars' in fp, fp)
 expect('volume: no --spine, no count', has(run(BASE), 'WARN', 'the volume count'))
 
+# ── 9. COM-13: weighing in is Home → Body Weight, never Proof (2026-09-26, audit 5.2.1) ──
+def with_card(title, body, **extra):
+    d = copy.deepcopy(BASE); d['notes'] = {"cards": [{"title": title, "body": body}]}
+    for k, v in extra.items(): d['cycles'][1][k] = v
+    return d
+def weigh_fail(d): return has(run(d), 'FAIL', '[COM-13]')
+expect('COM-13: the old walk-through to Proof fails',
+       weigh_fail(with_card("Your weight", "<p>Open Proof → Today → the weight card → Weigh in, every Monday.</p>")))
+expect('COM-13: a card title pairing the two fails', weigh_fail(with_card("Weigh in on AA Proof", "<p>Every Monday morning.</p>")))
+expect('COM-13: a focus line fails', weigh_fail(with_card("Hi", "<p>Hello.</p>", focuses=["Log your body weight in Proof every week"])))
+expect('COM-13: an outcome line fails', weigh_fail(with_card("Hi", "<p>Hello.</p>", message={"paragraphs": [], "outcomes": ["A weekly weigh-in tracked in Proof"]})))
+expect('COM-13: sleep and protein in Proof pass',
+       not weigh_fail(with_card("Recovery", "<p>Tick sleep and protein in Proof every day. It is how I see your week.</p>")))
+expect('COM-13: a bodyweight squat beside Proof passes',
+       not weigh_fail(with_card("Rest days", "<p>Do 20 bodyweight squats and tick Movement in Proof.</p>")))
+expect('COM-13: the right place passes, with Proof in the next sentence',
+       not weigh_fail(with_card("Your weight", "<p>Weigh in on Home → Body Weight every Monday. Keep ticking sleep in Proof.</p>")))
+expect('COM-13: "not in Proof" passes',
+       not weigh_fail(with_card("Your weight", "<p>Weigh in on Home → Body Weight, not in Proof.</p>")))
+# Lines from the live programmes (2026-09-26): judged by clause, not by the two words sharing a text.
+for line in ["Weekly weigh-in on the Body Weight card, habits logged in Proof",
+             "Weigh yourself once a week, same day, same time, before breakfast. Log it on the Body Weight card on your Home screen, not in Proof.",
+             "Log it in Proof every day so we can put your sleep next to your training and your weight",
+             "Track the protein habit in AA Proof. Once I can see a few weeks of it next to your weight, we adjust."]:
+    expect(f'COM-13 passes: {line[:50]}', not weigh_fail(with_card("Hi", "<p>Hello.</p>", focuses=[line])))
+for line in ["Weigh In On Proof", "log your weight in AA Proof",
+             "Open AA Proof, go to Today, find the weight card and tap Weigh in",
+             "Weight logged in Proof every two weeks"]:
+    expect(f'COM-13 fails: {line[:50]}', weigh_fail(with_card("Hi", "<p>Hello.</p>", focuses=[line])))
+out = run(with_card("Weigh in on Proof", "<p>Monday.</p>"), '--stage', 'build')
+expect('COM-13: --stage build skips it (no words yet)', not has(out, 'FAIL', '[COM-13]'), out)
+
 # ── 6. the rule index guard (scripts/check_rule_index.py) ────────────────────
 spec_ri = importlib.util.spec_from_file_location('cri', os.path.join(REPO, 'scripts', 'check_rule_index.py'))
 P = os.path.join(REPO, '.claude', 'COACHING-PRINCIPLES.md')

@@ -181,7 +181,7 @@ places, and a stale copy reached athletes.)*
 | COM-10 | Card count is a byproduct: write what is required and what carries weight, never pad. Past 8 cards, say why. | engage | warn (over 8) |
 | COM-11 | Celebrate a genuine win each cycle on its own card; never invent one. | engage | oblig `win` |
 | COM-12 | A notes card and the matching Coach's Note never repeat: the card holds the protocol, the note the point-of-action detail. | engage | |
-| COM-13 | When a cycle turns on body mass, a card sends the athlete to Home → Body Weight in the programme app, never AA Proof. | engage | oblig `weigh-in` |
+| COM-13 | When a cycle turns on body mass, a card sends the athlete to Home → Body Weight in the programme app, never AA Proof. | engage | ✓ (weighing in + Proof) · oblig `weigh-in` |
 | COM-14 | A Coach's Note is one to three short sentences of plain text about this athlete only; never a cue. | engage | |
 | COM-15 | A Because is one sentence of 140 characters at most, written fresh each cycle, never carried over. | engage | ✓ (140 characters) |
 | COM-16 | A week note is one or two short sentences under about 260 characters, starting with the instruction; no notes card repeats it. | engage | warn (length, label) |

@@ -1,0 +1,487 @@
+{
+ "_about": "A copy of public.xp_rules (id 1).rules, minus questRuns (server-only, changes with every quest week). scripts/check_xp_rules.py compares it with habits.html's constants. Refresh it after changing the row: see the header of that script.",
+ "read_at": "2026-09-26",
+ "row_updated_at": "2026-08-10 17:57:55.044344+00",
+ "keys_on_row": 18,
+ "rules": {
+  "base": 300,
+  "comebackStick": 7,
+  "comebackXp": 50,
+  "completionBonus": 1.2,
+  "customXp": 25,
+  "gateV2": true,
+  "growth": 0.55,
+  "lapseDays": 3,
+  "maxCustom": 3,
+  "milestones": [
+   {
+    "xp": 50,
+    "code": "FB",
+    "need": 1,
+    "measure": "daysHit:strength"
+   },
+   {
+    "xp": 100,
+    "code": "CS",
+    "need": 1,
+    "measure": "perfectDays"
+   },
+   {
+    "xp": 100,
+    "code": "HS",
+    "need": 5,
+    "measure": "streak:water"
+   },
+   {
+    "xp": 120,
+    "code": "TS",
+    "need": 3,
+    "measure": "streak:strength"
+   },
+   {
+    "xp": 130,
+    "code": "SW",
+    "need": 7,
+    "measure": "daysHit:steps"
+   },
+   {
+    "xp": 110,
+    "code": "FF",
+    "need": 5,
+    "measure": "daysHit:fuel"
+   },
+   {
+    "xp": 75,
+    "code": "DP",
+    "need": 10,
+    "measure": "daysWith3"
+   },
+   {
+    "xp": 100,
+    "code": "ZM",
+    "need": 10,
+    "measure": "streak:breathe"
+   },
+   {
+    "xp": 150,
+    "code": "BA",
+    "need": 10,
+    "measure": "streak:sleep"
+   },
+   {
+    "xp": 150,
+    "code": "HM",
+    "need": 12,
+    "measure": "streak:strength"
+   },
+   {
+    "xp": 150,
+    "code": "RB",
+    "need": 14,
+    "measure": "streak:mobility"
+   },
+   {
+    "xp": 150,
+    "code": "IM",
+    "need": 16,
+    "measure": "streak:supps"
+   },
+   {
+    "xp": 200,
+    "code": "RR",
+    "need": 30,
+    "measure": "daysHit:steps"
+   },
+   {
+    "xp": 750,
+    "code": "MC",
+    "need": 150,
+    "measure": "daysHit:strength"
+   },
+   {
+    "xp": 600,
+    "code": "UB",
+    "need": 60,
+    "measure": "streak:water"
+   },
+   {
+    "xp": 1200,
+    "code": "CN",
+    "need": 100,
+    "measure": "perfectDays"
+   },
+   {
+    "xp": 200,
+    "code": "BF",
+    "name": "BACK IN THE FIGHT",
+    "need": 7,
+    "measure": "comebackRun"
+   },
+   {
+    "xp": 400,
+    "code": "LR",
+    "name": "THE LONG ROAD BACK",
+    "need": 21,
+    "measure": "comebackRun"
+   },
+   {
+    "xp": 300,
+    "code": "HK",
+    "name": "HARD TO KILL",
+    "need": 3,
+    "measure": "comebacksStuck"
+   },
+   {
+    "xp": 600,
+    "code": "US",
+    "name": "UNSINKABLE",
+    "need": 5,
+    "measure": "comebacksStuck"
+   },
+   {
+    "xp": 40,
+    "code": "GO",
+    "name": "DAWN PATROL I",
+    "need": 1,
+    "measure": "daysWith3"
+   },
+   {
+    "xp": 250,
+    "code": "HS2",
+    "name": "HUMAN SPRINKLER II",
+    "need": 20,
+    "measure": "streak:water"
+   },
+   {
+    "xp": 300,
+    "code": "FF2",
+    "name": "FULLY FUELLED II",
+    "need": 25,
+    "measure": "daysHit:fuel"
+   },
+   {
+    "xp": 300,
+    "code": "CS2",
+    "name": "CLEAN SWEEP II",
+    "need": 10,
+    "measure": "perfectDays"
+   },
+   {
+    "xp": 280,
+    "code": "ZM2",
+    "name": "ZEN MACHINE II",
+    "need": 30,
+    "measure": "streak:breathe"
+   },
+   {
+    "xp": 250,
+    "code": "DP3",
+    "name": "DAWN PATROL III",
+    "need": 50,
+    "measure": "daysWith3"
+   },
+   {
+    "xp": 350,
+    "code": "BA2",
+    "name": "BLACKOUT ARTIST II",
+    "need": 30,
+    "measure": "streak:sleep"
+   },
+   {
+    "xp": 350,
+    "code": "HM3",
+    "name": "HEAVY METAL III",
+    "need": 30,
+    "measure": "streak:strength"
+   },
+   {
+    "xp": 350,
+    "code": "RB2",
+    "name": "RUBBER BAND II",
+    "need": 40,
+    "measure": "streak:mobility"
+   },
+   {
+    "xp": 380,
+    "code": "IM2",
+    "name": "IRON MONK II",
+    "need": 45,
+    "measure": "streak:supps"
+   },
+   {
+    "xp": 600,
+    "code": "CS3",
+    "name": "CLEAN SWEEP III",
+    "need": 30,
+    "measure": "perfectDays"
+   },
+   {
+    "xp": 500,
+    "code": "SW3",
+    "name": "GROUND COVERED III",
+    "need": 100,
+    "measure": "daysHit:steps"
+   }
+  ],
+  "passTrack": [
+   {
+    "id": "t_sunforged",
+    "lv": 0,
+    "kind": "title",
+    "name": "SUN-FORGED"
+   },
+   {
+    "id": "t_bedrock",
+    "lv": 0,
+    "kind": "title",
+    "name": "BEDROCK"
+   },
+   {
+    "id": "t_coldforged",
+    "lv": 0,
+    "kind": "title",
+    "name": "COLD-FORGED"
+   },
+   {
+    "id": "t_stillhere",
+    "lv": 0,
+    "kind": "title",
+    "name": "STILL HERE"
+   },
+   {
+    "id": "t_signed",
+    "lv": 2,
+    "kind": "title",
+    "name": "SIGNED ON"
+   },
+   {
+    "id": "t_23",
+    "lv": 4,
+    "kind": "title",
+    "name": "THE TWENTY-THREE"
+   },
+   {
+    "id": "c_ember",
+    "lv": 6,
+    "kind": "card",
+    "name": "EMBER"
+   },
+   {
+    "id": "t_early",
+    "lv": 8,
+    "kind": "title",
+    "name": "EARLY DOORS"
+   },
+   {
+    "id": "t_night",
+    "lv": 11,
+    "kind": "title",
+    "name": "NIGHT SHIFT"
+   },
+   {
+    "id": "c_blueprint",
+    "lv": 14,
+    "kind": "card",
+    "name": "BLUEPRINT"
+   },
+   {
+    "id": "t_between",
+    "lv": 17,
+    "kind": "title",
+    "name": "BETWEEN SESSIONS"
+   },
+   {
+    "id": "t_iron",
+    "lv": 21,
+    "kind": "title",
+    "name": "IRONCLAD"
+   },
+   {
+    "id": "c_night",
+    "lv": 25,
+    "kind": "card",
+    "name": "NIGHTFALL"
+   },
+   {
+    "id": "t_metronome",
+    "lv": 29,
+    "kind": "title",
+    "name": "THE METRONOME"
+   },
+   {
+    "id": "t_weather",
+    "lv": 34,
+    "kind": "title",
+    "name": "WEATHERPROOF"
+   },
+   {
+    "id": "c_flare",
+    "lv": 39,
+    "kind": "card",
+    "name": "FLARE"
+   },
+   {
+    "id": "t_unbroken",
+    "lv": 44,
+    "kind": "title",
+    "name": "UNBROKEN"
+   },
+   {
+    "id": "t_proof",
+    "lv": 50,
+    "kind": "title",
+    "name": "PROOF ITSELF"
+   },
+   {
+    "id": "t_unbowed",
+    "lv": 0,
+    "kind": "title",
+    "name": "UNBOWED"
+   }
+  ],
+  "quests": [
+   {
+    "id": "w_water5",
+    "xp": 150,
+    "kind": "daysHit:water",
+    "need": 5,
+    "note": "Full water on 5 days",
+    "title": "THE WELL RUNS DEEP"
+   },
+   {
+    "id": "w_water7",
+    "xp": 220,
+    "kind": "daysHit:water",
+    "need": 7,
+    "note": "Full water every single day",
+    "title": "SEVEN FOR SEVEN"
+   },
+   {
+    "id": "w_steps50k",
+    "xp": 200,
+    "kind": "total:steps",
+    "need": 50000,
+    "note": "50,000 steps across the week",
+    "title": "FIFTY THOUSAND"
+   },
+   {
+    "id": "w_steps70k",
+    "xp": 280,
+    "kind": "total:steps",
+    "need": 70000,
+    "note": "70,000 steps across the week",
+    "title": "THE LONG WAY ROUND"
+   },
+   {
+    "id": "w_sleep5",
+    "xp": 180,
+    "kind": "daysHit:sleep",
+    "need": 5,
+    "note": "Hit your sleep target 5 nights",
+    "title": "LIGHTS OUT"
+   },
+   {
+    "id": "w_mob4",
+    "xp": 120,
+    "kind": "daysHit:mobility",
+    "need": 4,
+    "note": "Mobility on 4 days",
+    "title": "OILED HINGES"
+   },
+   {
+    "id": "w_breathe4",
+    "xp": 100,
+    "kind": "daysHit:breathe",
+    "need": 4,
+    "note": "Breathe on 4 days",
+    "title": "DEAD CALM"
+   },
+   {
+    "id": "w_supps7",
+    "xp": 140,
+    "kind": "daysHit:supps",
+    "need": 7,
+    "note": "Supplements every day",
+    "title": "NO NEGOTIATION"
+   },
+   {
+    "id": "w_fuel5",
+    "xp": 140,
+    "kind": "daysHit:fuel",
+    "need": 5,
+    "note": "Log your meals on 5 days",
+    "title": "ON THE RECORD"
+   },
+   {
+    "id": "w_train3",
+    "xp": 250,
+    "kind": "daysHit:strength",
+    "need": 3,
+    "note": "Three sessions in the week",
+    "title": "THREE HARD DAYS"
+   },
+   {
+    "id": "w_qualify5",
+    "xp": 220,
+    "kind": "qualify",
+    "need": 5,
+    "note": "5 days on target",
+    "title": "FIVE ON TARGET"
+   },
+   {
+    "id": "w_perfect2",
+    "xp": 300,
+    "kind": "perfect",
+    "need": 2,
+    "note": "Two clean sweeps",
+    "title": "TWICE PERFECT"
+   }
+  ],
+  "streakQualifyPct": 80,
+  "targets": {
+   "fuel": 3,
+   "sleep": 7.5,
+   "steps": 10000,
+   "supps": 1,
+   "water": 8,
+   "breathe": 1,
+   "mobility": 1,
+   "strength": 1
+  },
+  "tiers": [
+   {
+    "days": 5,
+    "mult": 0.5
+   },
+   {
+    "days": 10,
+    "mult": 1
+   },
+   {
+    "days": 20,
+    "mult": 2
+   },
+   {
+    "days": 30,
+    "mult": 3
+   },
+   {
+    "days": 60,
+    "mult": 6
+   }
+  ],
+  "unearnable": [
+   "strength"
+  ],
+  "weights": {
+   "fuel": 40,
+   "sleep": 50,
+   "steps": 60,
+   "supps": 20,
+   "water": 30,
+   "breathe": 20,
+   "mobility": 30,
+   "strength": 100
+  }
+ }
+}

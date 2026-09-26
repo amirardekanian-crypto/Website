@@ -247,8 +247,42 @@ def check_structure(data, args, spine=None):
                 n += len(ex.get('items') or []) if ex.get('type') == 'circuit' else 1
         if n >= 7: warn(f"Day {d.get('id')}: {n} working exercises, a grind (7 or more): check the day's load identity", 'SES-15', 'VOL-2')
 
+# COM-13: weighing in happens on Home → Body Weight in program.html. AA Proof has had no weight
+# screen since 2026-09-12, yet eleven live lines in six programmes still sent athletes there (the
+# 2026-09-26 audit, 5.1). A sentence that names Proof AND weighing in fails; a sleep or protein
+# line about Proof is fine, and so is "bodyweight squat" (bodyweight as the load, not a reading).
+PROOF = re.compile(r'\bproof\b', re.I)
+PROOF_NEGATED = re.compile(r"\b(?:not|never|no longer|isn't|is not|no)\b[^.!?]{0,25}\bproof\b", re.I)
+BW_AS_LOAD = (r'(?![\s-]+(?:only|squats?|lunges?|split|exercises?|work|movements?|circuits?|drills?|versions?|'
+              r'reps?|sets?|strength|training|holds?|rows?|push|pull|dips?|jumps?|bridges?|planks?|step|calf|'
+              r'glute|hip|box|single|flow|options?|variations?|progressions?|conditioning|skills?)\b)')
+WEIGH_IN = re.compile(r'\bweigh(?:s|ed|ing)?\b|\bweigh-?ins?\b'
+                      r'|\b(?:log|logs|logged|logging|track|tracks|tracked|tracking|record|records|recording|enter|entering)'
+                      r'\s+(?:your\s+|the\s+|a\s+|today\'?s\s+)?(?:body[\s-]?)?weight\b'
+                      r'|\bweight\s+(?:card|screen|chart|trend|readings?|log|tab|tile|entry|entries)\b'
+                      r'|\bweight\s+(?:is\s+|gets\s+|was\s+)?(?:logged|tracked|recorded|entered)\b'
+                      r'|\bbody[\s-]?weight\b' + BW_AS_LOAD, re.I)
+# The right door, named in the sentence: Home, or the Body Weight card (capitalised, as on screen).
+RIGHT_DOOR = re.compile(r'\bHome\b|\bBody Weight\b')
+CLAUSE = re.compile(r'[,;:]|\s+(?:and|but|then|while)\s+|\s+[–-]\s+')
+
+def weigh_in_proof(sentence):
+    """True when a sentence sends the athlete INTO Proof to weigh in (COM-13), judged by clause:
+    'Weekly weigh-in on the Body Weight card, habits logged in Proof' passes (the weighing is on the
+    right door, Proof only holds the habits), 'Open AA Proof, go to Today, find the weight card and
+    tap Weigh in' fails (a walk through Proof that ends in weighing in, with no right door named)."""
+    if not (PROOF.search(sentence) and WEIGH_IN.search(sentence)): return False
+    clauses = [c for c in CLAUSE.split(sentence) if c and c.strip()]
+    for c in clauses:
+        if PROOF.search(c) and WEIGH_IN.search(c) and not PROOF_NEGATED.search(c): return True
+    return not (RIGHT_DOOR.search(sentence) or PROOF_NEGATED.search(sentence))
+
 def check_text(data):
     for where, s in text_fields(data):
+        for sen in sentences(s):
+            if weigh_in_proof(sen):
+                fail(f"{where}: sends the athlete to Proof to weigh in, and Proof has had no weight screen since "
+                     f"12 Sept. Point them at Home → Body Weight in this app: \"{sen[:100]}\"", 'COM-13')
         for m in re.finditer(r'RPE\s*(?:of\s*)?(\d+(?:\.\d+)?)', s):
             if float(m.group(1)) < 6: fail(f"{where}: says RPE {m.group(1)}, under the floor of 6", 'CHP-4')
         for sen in sentences(s):

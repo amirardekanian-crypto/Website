@@ -1023,6 +1023,13 @@ no server equivalent — §1) and `seasonStart` / `seasonName` (the authority is
 Read the live row with:
 `select jsonb_object_keys(rules) from public.xp_rules where id = 1;`
 
+**A check holds the pair together** (2026-09-26): `scripts/check_xp_rules.py` compares every
+key in the table above with its `habits.html` constant, against a committed copy of the row,
+`supabase/xp_rules_snapshot.json` (the pre-commit hook runs it whenever either is staged). It
+fails on anything that scores differently and prints display-text differences as notes. After
+changing the row, refresh the copy with `--live` (the script's header has the query) and commit
+both. The SQL function bodies in the second table are not covered.
+
 ### Changing the database copy — merge, never rewrite
 
 Merge the keys you changed into the row, in the Supabase SQL editor:

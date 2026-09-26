@@ -1,0 +1,10 @@
+{
+ "_about": "The live database's copies of the shared word lists, read with the Supabase MCP on read_at. scripts/check_parity.py compares them with every other copy. Refresh with the query in that script's header (never by hand).",
+ "read_at": "2026-09-26",
+ "qualities": ["strength", "muscle", "power", "spring", "speed", "brakes", "rotation", "engine", "armour", "movement"],
+ "quality_family": {"strength": "iron", "muscle": "build", "power": "voltage", "spring": "spring", "speed": null, "brakes": "brakes", "rotation": null, "engine": "engine", "armour": "armour", "movement": "bedrock"},
+ "muscles": ["quads", "hamstrings", "glutes", "adductors", "calves", "shins", "peroneals", "back", "chest", "shoulder", "biceps", "triceps", "forearm", "core", "neck"],
+ "regions": ["ankle-foot", "calf-achilles", "knee", "hip-groin", "hamstring", "low-back", "trunk", "shoulder", "elbow-forearm-wrist", "neck"],
+ "impacts": ["none", "running", "plyometric", "landing"],
+ "costs": ["heavy", "moderate", "isolation", "none"]
+}

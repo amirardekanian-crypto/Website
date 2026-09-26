@@ -1,5 +1,5 @@
 #!/bin/sh
-# Eight guards. Each runs only when its own files are staged, so a commit that
+# Eleven guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -181,6 +181,57 @@ if git diff --cached --name-only --diff-filter=ACMD \
     echo ""
     echo "pre-commit: BLOCKED — the checker's tests failed (details above)."
     failed=1
+  fi
+fi
+
+# ── 9. the set-log line grammar (added 2026-09-26) ───────────────────────────
+# Why: program.html's buildSessionData() writes every session as text
+# ("Set 2: 2×20 ×8 @7 ✓") and two readers parse it back, parseSetLine() in
+# coach.html and parseSetText() in program.html. A weight typed with × was read
+# as the rep count by both until 2026-09-26, and nothing errored. This runs the
+# real writer through both readers and checks every set comes back as it went in.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|coach\.html|scripts/check_setlog\.js)$'; then
+  echo "pre-commit: set-log writer or readers changed — checking the round trip..."
+  if node scripts/check_setlog.js >/dev/null; then
+    echo "pre-commit: set log OK."
+  else
+    node scripts/check_setlog.js 2>&1 | grep -E 'FAIL|could not find|Error' | head -20
+    echo ""
+    echo "pre-commit: BLOCKED — a logged set no longer reads back as it was written (details above)."
+    echo "buildSessionData(), parseSetLine() and parseSetText() are one grammar: change all three."
+    failed=1
+  fi
+fi
+
+# ── 10. the XP rules, scored twice (added 2026-09-26) ────────────────────────
+# Why: the leaderboard scores from public.xp_rules (id 1) and the phone from habits.html's
+# constants. When they drift, the board and the athlete's own screen disagree and nothing errors
+# (XP_SYSTEM.md §8). The row can't be read from here, so supabase/xp_rules_snapshot.json is a
+# committed copy of it: refresh it with --live after changing the row (the script's header).
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(habits\.html|supabase/xp_rules_snapshot\.json|scripts/check_xp_rules\.py)$'; then
+  echo "pre-commit: habits.html or the xp_rules snapshot changed — checking the two scorers agree..."
+  if ! "$PY" scripts/check_xp_rules.py; then
+    echo ""
+    echo "pre-commit: BLOCKED — habits.html and the xp_rules row disagree (details above). Change BOTH sides."
+    failed=1
+  fi
+fi
+
+# ── 11. the shared word lists (added 2026-09-26) ─────────────────────────────
+# Why: the qualities, muscles, patterns, body parts, cost tiers, art words and the Quality mix's
+# numbers are typed out in program.html, coach.html, check_program.py, the spine skill's
+# draft_sql.py, the stage SQL and the database (supabase/word_lists_snapshot.json). A copy that
+# drifts offers a word another copy refuses, silently.
+if git diff --cached --name-only --diff-filter=ACM \
+     | grep -qE '^(program\.html|coach\.html|SCHEMA\.md|scripts/check_(program|parity)\.py|\.claude/skills/spine/draft_sql\.py|supabase/(word_lists_snapshot\.json|stage3[269]_[a-z_]+\.sql)|tennis/app/app\.js)$'; then
+  echo "pre-commit: a copy of the shared word lists changed — checking every copy agrees..."
+  if ! "$PY" scripts/check_parity.py >/dev/null; then
+    "$PY" scripts/check_parity.py | grep -E '^(DIFF|FAIL)|missing|order' | head -30
+    echo ""
+    echo "pre-commit: BLOCKED — the word lists disagree (details above). Change every copy."
+    failed=1
+  else
+    echo "pre-commit: word lists OK."
   fi
 fi
 
