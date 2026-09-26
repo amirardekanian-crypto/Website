@@ -80,7 +80,9 @@
 //      name the real buttons, and the Library promises a habit tick only when that habit is on.
 // v42: program.html changed (2026-09-26, WK-01): opening Guided never pauses a running clock, it
 //      resumes at the first unfinished set, and its last button (Finish Session ✓) really finishes.
-const CACHE = 'aap-v42';
+// v43: program.html changed (2026-09-26, LOG-02): Reset Session, a weight reading and a Personal
+//      Record take two taps (armedTap()), and Reset moved away from Send.
+const CACHE = 'aap-v43';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
