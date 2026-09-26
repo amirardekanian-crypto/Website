@@ -52,7 +52,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#244](https://github.com/amirardekanian-crypto/Website/pull/244) | The session bar never clips the clock or wraps its label (two rows under 480 px); a day started today shows "In progress · Resume" on Home | WK-03 |
 | [#245](https://github.com/amirardekanian-crypto/Website/pull/245) | Dark mode readable (`--green-ink`/`--clay-ink` text tokens, a dark rest timer, the habits card), grey tab bar at 11 px, no label under 11 px, 44 px session rating and ⓘ | A11Y-01 |
 | [#246](https://github.com/amirardekanian-crypto/Website/pull/246) | The phone's Back closes the top layer in the training app (one guard entry, `topLayer()` reads the page) instead of leaving the app | NAV-01 |
-| NAV-01 Proof PR | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
+| [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03.
 
