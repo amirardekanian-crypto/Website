@@ -140,7 +140,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   sheet open WhatsApp pre-filled (`coachWhatsAppUrl(about)`, `COACH_WHATSAPP` = the site's buy-button
   number). coach.html only marks session notes read. The `messages` table stays on the server and
   nothing reads it. Do not bring a chat back unasked. Details in `PROGRAM-APP.md`.
-- **Home leads with the training** (This Week, then the day cards), then the Daily Habits card.
+- **Home leads with the training** (This Week, then the day cards), then the Daily Habits card, and under it
+  **today's habits, ticked in place**: AA Proof itself, embedded (`habits.html?embed=1`, `mountProofStrip()`).
+  program.html still holds no habit state and writes no `<id>_hab_*` key but body weight; Proof does every write.
 - **No yellow, gold, ochre or amber in either app**, AA Proof's metals included (its gold tier became
   emerald on 2026-09-26; Amir, asked whether Proof was an exception: *"fix"*).
 - **No new exercise-card features until most athletes are on the new format** (Amir, 2026-09-26, Five
@@ -174,6 +176,9 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   that names the number; a quest note never spells it out.
 - **Roll call pays no XP** and no scorer reads `hab_notes`. The client shows 7 days and the server
   keeps 9, on purpose.
+- **Embedded (`?embed=1`, on the training app's Home) Proof only logs today** through its own doors;
+  `checkLevelUps()`, the reward baseline, the tour, the install offer and the board sweep all stand down there,
+  so every level-up and reward still gets its takeover in the full app (`HABITS.md` → *Embedded…*).
 - **The leaderboard sweep runs once.** `autoJoinBoard()` puts a coached athlete on the board after their
   first finished workout (a free athlete's WORKOUT is locked, so they join from Crew themselves).
   `CFG.boardSwept`, stamped by the sweep and by any join or leave the athlete makes, means leaving

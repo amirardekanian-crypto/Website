@@ -425,6 +425,12 @@ athlete to WhatsApp from wherever the question comes up, with the context alread
   phone may run the old copy for a launch or two and could still post into the table; check it once.
 - **Do not bring a chat back** without Amir asking for it.
 
+**Today's habits on Home (Fork 1B, B2, same day).** Under the Daily Habits card the athlete ticks
+today's habits in place: AA Proof itself, embedded (`habits.html?embed=1` in a frame,
+`mountProofStrip()`). Proof draws the rows and does every write; this app holds no habit state.
+Loaded only near the screen, shown only when Proof reports `ready`, and never in the coach's
+preview. Details: `HABITS.md` → *Embedded on the training app's Home*.
+
 **Home order (same day).** This Week and the day cards come first; the Daily Habits card follows.
 It sat above them from 2026-09-12, and in the fortnight after, 5 of 40 athletes logged a habit in a
 week while 16 trained. The training is why the app is opened, so it leads.

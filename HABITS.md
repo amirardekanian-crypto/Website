@@ -58,7 +58,7 @@ The two apps are **linked both ways**:
 
 | From | To | Where |
 |---|---|---|
-| `program.html` | Proof | **Daily Habits card** on Home *and* at the end of Game Plan (a plain shortcut — it shows no level or XP, because that is Proof's job). On Home it sits **below** This Week and the day cards since 2026-09-26: training leads, habits follow |
+| `program.html` | Proof | **Daily Habits card** on Home *and* at the end of Game Plan (a plain shortcut — it shows no level or XP, because that is Proof's job). On Home it sits **below** This Week and the day cards since 2026-09-26: training leads, habits follow. Under it on Home, **today's habits, ticked in place** (Proof embedded, `?embed=1`; see *Embedded on the training app's Home*) |
 | Proof | `program.html` | **Your training programme** card at the bottom of Today, and a row in Settings (behind the initials button) |
 
 Both are the same origin with the same PWA scope, so tapping through from an installed
@@ -1675,6 +1675,31 @@ to a card with no numbers rather than showing wrong ones. The write is wrapped i
 
 Add a field here and nothing breaks; the reader treats every field as optional apart from
 `lv`, which is what it tests to decide the snapshot is real.
+
+### Embedded on the training app's Home — `?embed=1` (Fork 1B, 2026-09-26)
+
+Amir: Proof should be *"part of the training app"*, and of the ways to build it he took
+**B2**: the athlete ticks today's habits on `program.html`'s Home, and **Proof draws that
+strip itself**. Home loads `habits.html?client=<id>&embed=1` in a frame under the Daily
+Habits card (`mountProofStrip()` there), only once the card is near the screen, and shows
+it only when this app says it is ready. The card stays either way.
+- **`renderEmbed()`** draws today's roster (`rosterOn(TKEY())`) as compact rows in the
+  training app's clothes: paper, green, clay, Barlow (the `html.embed` styles, scoped so the
+  full app never meets them). The box is `toggleHabit()`, **+** is `bump()`, the name opens
+  the full app on that habit (`?open=<id>`, handled at the end of boot). A locked habit says
+  where it comes from (`h.source`). Only today: earlier days are filled in here.
+- **Every write is this app's own**: `setVal()`, the log, the sync. Nothing is scored, stored
+  or synced twice, and `program.html` still writes no `<id>_hab_*` key (body weight, which
+  it owns, aside). It redraws its card from the snapshot `publishCardSnapshot()` republishes.
+- **What waits for the full app:** `checkLevelUps()` stands down in the strip, so `CFG.seen`
+  does not move and every level-up, reward, perfect day and quest medal is still waiting for
+  its takeover the next time Proof opens. So are the tour, the install offer, the XP flights,
+  the board sweep (`autoJoinBoard()`), the silent reward baseline, title minting, and
+  Progress, Crew and the Locker. The toast shows inline under the rows.
+- The strip follows the training app's dark mode (`dark_mode`, then a message on each
+  toggle), and reports `ready` with its height, `setup` (never onboarded: no strip) or
+  `error` (sign-in or load failure: no strip) through `postMessage`, same origin only.
+- Never in the coach's preview, and never for a free athlete (they have no training app).
 
 ### The WORKOUT habit is LOCKED and fed by the training programme — through the server
 

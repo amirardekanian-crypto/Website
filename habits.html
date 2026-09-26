@@ -31,6 +31,16 @@
     // REAL data (the athlete RPCs accept the coach) but must never write — a stray tick
     // while looking around would otherwise land in that athlete's own habit log.
     window.IS_PREVIEW = params.get('preview') === '1';
+    // Embedded on the training app's Home (program.html, Fork 1B, 2026-09-26): today's
+    // habits only, in that app's clothes. See renderEmbed().
+    window.IS_EMBED = params.get('embed') === '1';
+    if (window.IS_EMBED) {
+      document.documentElement.classList.add('embed');
+      var ef = document.createElement('link');
+      ef.rel = 'stylesheet';
+      ef.href = 'https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&family=Space+Mono:wght@400;700&display=swap';
+      document.head.appendChild(ef);
+    }
 
     // A signed-in athlete needs no key — the session identifies them — so the
     // generated manifest is only for a legacy keyed link. Once everyone is on a
@@ -2089,6 +2099,50 @@
     background: var(--clay-100); color: var(--clay-deep); line-height: 1.45; }
   .signin-help { margin: 16px 0 0; font-size: 12px; color: var(--muted-soft); text-align: center; }
 </style>
+<style>
+  /* ── Embedded on the training app's Home (Fork 1B, 2026-09-26) — see renderEmbed() ──
+     That app's own clothes: paper, green, clay, Barlow. Every rule is scoped to
+     html.embed, so the full AA Proof never meets one of them. The page sizes to its
+     rows (the frame's height follows it), instead of filling a phone screen. */
+  html.embed, html.embed body { height: auto; overflow: visible; background: transparent; }
+  html.embed .loading, html.embed .errscreen, html.embed .signin-screen { display: none !important; }
+  html.embed #app.app.emb { height: auto; max-width: none; margin: 0; display: block; overflow: visible; background: transparent; }
+  html.embed #app.emb, html.embed #app.emb * { font-family: 'Barlow', system-ui, sans-serif; }
+  html.embed #app.emb .e-wrap { background: #FFFFFF; border: 1px solid #EDE8E0; border-radius: 14px; overflow: hidden; }
+  html.embed #app.emb .e-head { display: flex; align-items: baseline; gap: 8px; padding: 11px 14px 9px; border-bottom: 1px solid #EDE8E0; }
+  html.embed #app.emb .e-k { font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: #5C5C5C; }
+  html.embed #app.emb .e-n { font-size: 13px; font-weight: 600; color: #1A1A1A; }
+  html.embed #app.emb .e-open { margin-left: auto; font-size: 13px; font-weight: 600; color: #C7552F; text-decoration: none; white-space: nowrap; }
+  html.embed #app.emb .e-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 12px; border-bottom: 1px solid #EDE8E0; }
+  html.embed #app.emb .e-row:last-of-type { border-bottom: 0; }
+  html.embed #app.emb .e-row.done { background: rgba(14,74,54,0.06); }
+  html.embed #app.emb .e-box { position: relative; flex: 0 0 auto; width: 44px; height: 44px; border-radius: 12px; background: #EDE8E0;
+    display: flex; align-items: center; justify-content: center; font-size: 20px; line-height: 1; color: #1A1A1A; }
+  html.embed #app.emb .e-row.done .e-box { background: #0E4A36; }
+  html.embed #app.emb .e-mark { position: absolute; right: -4px; bottom: -4px; width: 20px; height: 20px; border-radius: 99px;
+    background: #FFFFFF; border: 2px solid #D8D1C5; display: flex; align-items: center; justify-content: center; }
+  html.embed #app.emb .e-row.done .e-mark { background: #0E4A36; border-color: #FFFFFF; }
+  html.embed #app.emb .e-mark svg.tick { width: 12px; height: 12px; }
+  html.embed #app.emb .e-mark svg.tick path { fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  html.embed #app.emb .e-row.locked .e-box { opacity: 0.55; }
+  html.embed #app.emb .e-body { flex: 1 1 auto; min-width: 0; display: grid; gap: 2px; text-decoration: none; color: inherit; }
+  html.embed #app.emb .e-nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 16px; line-height: 1.1; text-transform: uppercase; letter-spacing: 0.01em; color: #1A1A1A; }
+  html.embed #app.emb .e-st { font-size: 12.5px; line-height: 1.3; color: #5C5C5C; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  html.embed #app.emb .e-plus { flex: 0 0 auto; width: 40px; height: 40px; border-radius: 99px; border: 1.5px solid #0E4A36;
+    color: #0E4A36; font-size: 22px; font-weight: 600; line-height: 1; display: flex; align-items: center; justify-content: center; }
+  html.embed #app.emb .e-toast { padding: 9px 14px 11px; font-size: 13px; color: #0E4A36; font-weight: 600; background: rgba(14,74,54,0.06); }
+  html.embed body[data-dark] #app.emb .e-wrap { background: #202020; border-color: #2a2a2a; }
+  html.embed body[data-dark] #app.emb .e-head, html.embed body[data-dark] #app.emb .e-row { border-color: #2a2a2a; }
+  html.embed body[data-dark] #app.emb .e-k, html.embed body[data-dark] #app.emb .e-st { color: #888; }
+  html.embed body[data-dark] #app.emb .e-n, html.embed body[data-dark] #app.emb .e-nm, html.embed body[data-dark] #app.emb .e-box { color: #EEE; }
+  html.embed body[data-dark] #app.emb .e-box { background: #2a2a2a; }
+  html.embed body[data-dark] #app.emb .e-row.done { background: rgba(62,156,116,0.12); }
+  html.embed body[data-dark] #app.emb .e-row.done .e-box, html.embed body[data-dark] #app.emb .e-row.done .e-mark { background: #3E9C74; }
+  html.embed body[data-dark] #app.emb .e-mark { background: #202020; border-color: #444; }
+  html.embed body[data-dark] #app.emb .e-plus { color: #9fd3bd; border-color: #9fd3bd; }
+  html.embed body[data-dark] #app.emb .e-open { color: #E06B43; }
+  html.embed body[data-dark] #app.emb .e-toast { color: #9fd3bd; background: rgba(62,156,116,0.12); }
+</style>
 </head>
 <body>
 
@@ -3931,6 +3985,7 @@ function hasStoredSession() {
 }
 
 function showSignIn() {
+  embedPost('error');                      // the training app keeps its card; nobody signs in inside a strip
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('signin-screen').classList.add('visible');
 
@@ -4941,6 +4996,9 @@ function rulesSignature() {
 }
 function seedSeenLevels() { CFG.seen = currentLevels(); CFG.rulesSig = rulesSignature(); seedUnlocks(); saveCfg(); }
 function checkLevelUps() {
+  // Embedded (renderEmbed()): leave CFG.seen alone, so every level-up and reward earned
+  // from the training app's Home is still waiting for its moment in the full app.
+  if (window.IS_EMBED) return;
   const sig = rulesSignature();
   if (!CFG.seen || CFG.rulesSig !== sig) {
     const rescored = !!CFG.seen && CFG.rulesSig !== sig;
@@ -5158,6 +5216,7 @@ function inAppBrowser() {
 }
 
 function maybeOfferInstall() {
+  if (window.IS_EMBED) return;             // the training app is the one on the home screen
   if (!installable() || !CFG || CFG.installAsked || _installTimer) return;
   _installTimer = setTimeout(() => {
     _installTimer = null;
@@ -5943,8 +6002,8 @@ let _mounted = false;
 function render() {
   _handlers = {};
   const app = document.getElementById('app');
-  app.className = 'app on';
-  const html = CFG.onboarded ? renderApp() : renderOnboarding();
+  app.className = 'app on' + (window.IS_EMBED ? ' emb' : '');
+  const html = window.IS_EMBED ? renderEmbed() : (CFG.onboarded ? renderApp() : renderOnboarding());
   if (!_mounted) {
     app.innerHTML = html;
     _mounted = true;
@@ -5970,6 +6029,64 @@ function render() {
   document.querySelector('meta[name="theme-color"]').setAttribute('content',
     CFG.dark ? '#17142B' : ({ morning: '#FAF0E9', afternoon: '#F6F4FF', evening: '#EDEAF9' })[_dp]);
   publishCardSnapshot();
+  embedPost();
+}
+
+// ── Embedded on the training app's Home (Fork 1B, B2, Amir, 2026-09-26) ──────────
+// program.html loads this app with ?embed=1 in a frame under its Daily Habits card, so an
+// athlete ticks today's habits where they train. It draws today's rows in that app's
+// clothes (the html.embed styles), and every tap goes through the same doors as the full
+// app: toggleHabit(), bump(), setVal(), the sync. Nothing is scored, stored or synced twice,
+// and program.html still holds no habit state.
+// What waits for the full app: level-ups and rewards (checkLevelUps() stands down here, so
+// CFG.seen does not move and the moment is still there the next time AA Proof opens), the
+// tour, the install offer, the XP flights, the board sweep, and Progress, Crew and the
+// Locker. Only today: an earlier day is filled in inside AA Proof.
+// The training app's own dark-mode flag (program.html keeps it under this key).
+function embedDark() { try { return !!localStorage.getItem('dark_mode'); } catch (e) { return false; } }
+function proofUrl(openId) {
+  let url = 'habits.html?client=' + encodeURIComponent(ATHLETE_ID);
+  if (KEY) url += '&key=' + encodeURIComponent(KEY);
+  if (openId) url += '&open=' + encodeURIComponent(openId);
+  return url;
+}
+function renderEmbed() {
+  if (!CFG.onboarded) return '';            // never set up: the training app keeps its card
+  UI.day = null;
+  const t = TKEY(), rows = rosterOn(t);
+  const done = rows.filter(h => isDone(h, t)).length;
+  return `<div class="e-wrap">
+    <div class="e-head"><span class="e-k">Today</span><span class="e-n">${done} of ${rows.length} done</span>
+      <a class="e-open" href="${esc(proofUrl())}" target="_top">Open AA Proof →</a></div>
+    ${rows.map(h => embedRow(h, t)).join('')}
+    ${UI.toast ? `<div class="e-toast">${esc(UI.toast)}</div>` : ''}
+  </div>`;
+}
+function embedRow(h, t) {
+  const v = valOf(t, h.id), done = isDone(h, t), locked = !!h.locked && !done;
+  const left = h.kind === 'count' && !done && !locked ? h.target - v : 0;
+  // A locked habit says where it comes from; its full lockedHint is one tap away in AA Proof.
+  const status = locked ? ((isFree() && h.freeHint) || h.source || 'Earned elsewhere.')
+    : h.kind === 'count'
+      ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit + (left > 0 ? ' · ' + fmtVal(h, left) + ' to go' : '')
+      : (done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source || ''));
+  const parts = splitEmoji(h.name), emo = parts[0], label = parts[1];
+  return `<div class="e-row${done ? ' done' : ''}${locked ? ' locked' : ''}">
+    <button class="e-box" ${on(() => toggleHabit(h))} aria-label="${locked ? esc(label) + ' is earned in your programme' : 'Toggle ' + esc(label)}">${emo || esc(h.code)}<span class="e-mark">${done ? TICK : ''}</span></button>
+    <a class="e-body" href="${esc(proofUrl(h.id))}" target="_top"><span class="e-nm">${esc(label)}</span><span class="e-st">${esc(status)}</span></a>
+    ${h.kind === 'count' && !h.locked ? `<button class="e-plus" ${on(() => bump(h))} aria-label="Add to ${esc(label)}">+</button>` : ''}
+  </div>`;
+}
+// Tells the training app what to show: 'ready' with the height the frame needs, 'setup'
+// (Proof never set up here), or 'error'. Same origin only.
+function embedPost(state) {
+  if (!window.IS_EMBED || window.parent === window) return;
+  try {
+    const app = document.getElementById('app');
+    const st = state || ((typeof CFG !== 'undefined' && CFG && CFG.onboarded) ? 'ready' : 'setup');
+    window.parent.postMessage({ type: 'aa-proof-embed', state: st,
+      h: app ? Math.ceil(app.getBoundingClientRect().height) : 0 }, location.origin);
+  } catch (e) { /* the strip is a courtesy; it must never break the tracker */ }
 }
 
 // ── What program.html draws on its Daily Habits card ──────────────────────
@@ -6268,6 +6385,7 @@ function startRepeat(btn) {
 // the habit that earned them and land on the level that owns them, which then
 // takes the hit. Without this the hero is a label; with it, it is a destination.
 function flyXp(amount, rect) {
+  if (window.IS_EMBED) return;             // nowhere to fly to in the strip: the toast says it
   if (reduced() || !amount || amount <= 0 || !rect) return;
   const app = document.getElementById('app');
   const fx = document.getElementById('fx');
@@ -6315,6 +6433,7 @@ function flyXp(amount, rect) {
 // be wallpaper by Wednesday.
 const TICK_CONF = ['#6C5CE7', '#35D0BA', '#3EC6E0', '#FF8A5B', '#F27DA8', '#8F7BF0'];
 function tickJuice(h, rect) {
+  if (window.IS_EMBED) return;
   if (reduced()) return;
   const row = document.querySelector('[data-k="row:' + h.id + '"]');
   const tile = row && row.querySelector('.htile');
@@ -6656,6 +6775,7 @@ function tourSteps() {
 }
 
 function startTour(back) {
+  if (window.IS_EMBED) return;
   if (!CFG) return;
   TOUR.steps = tourSteps();
   TOUR.i = 0;
@@ -8611,6 +8731,7 @@ function renderManual() {
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game — they build your level, your rank in each habit, and your place on the leaderboard.`) +
         p(`Clear the whole list and that is a <strong style="color:var(--ink)">perfect day</strong>, and the app will stop what it is doing to say so. It does the same for a new level, a rank promotion, a consistency tier and a milestone. Anything smaller than that just flashes in the row and gets out of your way.`) +
         p(`Nothing here needs a signal. Whatever you tick is saved on your phone straight away and sent up on its own when you're back online.`) +
+        (isFree() ? '' : p(`<strong style="color:var(--ink)">You can tick today's list from your training app too</strong>, on its Home under Daily Habits. It is this same list, saved the same way, for the same points. A new level or a reward waits for you here, so the moment is never spent on a small strip.`)) +
         p(`<strong style="color:var(--ink)">Put it on your home screen</strong> and it opens in one tap, looks like any other app and keeps working with no signal. ${isIOS() ? 'Tap Share in the browser bar, then Add to Home Screen.' : 'There is a row for it in Settings.'} There is nothing to download — it is this page, kept somewhere you can reach it.`))}
 
       ${block(h2('Forgot to log a day?') +
@@ -10056,6 +10177,7 @@ function renderSheet() {
 
 // ── Boot ──────────────────────────────────────────────────────────────────
 function showError(msg) {
+  embedPost('error');
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('error-msg').textContent = msg;
   document.getElementById('error').classList.add('on');
@@ -10180,7 +10302,8 @@ function showError(msg) {
   // Levels that arrived with a sync still get their moment; a first run (or a
   // changed XP system) only re-baselines, so nobody is ambushed by a queue.
   checkLevelUps();
-  if (CFG.dark) document.body.setAttribute('data-dark', '');
+  // Embedded, the strip follows the TRAINING app's dark mode, the page it sits in.
+  if (window.IS_EMBED ? embedDark() : CFG.dark) document.body.setAttribute('data-dark', '');
   document.title = 'AA Proof — ' + (ATHLETE.firstName || 'AA Performance');
 
   // An athlete who arrives with history owns whatever their level already
@@ -10190,20 +10313,37 @@ function showError(msg) {
   // Unconditional, not `if (!CFG.pass)`: the config loader fills defaults from
   // defaultCfg(), so CFG.pass always exists and that guard never fired. It is
   // idempotent anyway — claimRewards only ever adds what is missing.
-  claimRewards(true);
-  claimEventTitles(true);
-  // And the other half of the same record. Minting on boot is what makes the
-  // server's copy keep up with a level that is about to reset: the peak is
-  // captured on the day it happens, while the level is still there to prove it.
-  syncTitles();
+  // Embedded, all four wait for the full app: claiming a reward here would bank it
+  // without its moment, and the board sweep is Proof's to make (renderEmbed()).
+  if (!window.IS_EMBED) {
+    claimRewards(true);
+    claimEventTitles(true);
+    // And the other half of the same record. Minting on boot is what makes the
+    // server's copy keep up with a level that is about to reset: the peak is
+    // captured on the day it happens, while the level is still there to prove it.
+    syncTitles();
+  }
 
 
   render();
   armIdle();
   document.getElementById('loading').classList.add('hidden');
+  if (window.IS_EMBED) {
+    // Web fonts land after the first paint and change the height; so does a toast.
+    if ('ResizeObserver' in window) new ResizeObserver(() => embedPost()).observe(document.getElementById('app'));
+    window.addEventListener('message', e => {
+      if (e.origin !== location.origin || !e.data || e.data.type !== 'aa-proof-theme') return;
+      if (e.data.dark) document.body.setAttribute('data-dark', ''); else document.body.removeAttribute('data-dark');
+      render();
+    });
+  } else {
+    // A door from the training app's strip straight to one habit: ?open=<id>.
+    const openId = params.get('open');
+    if (openId && rosterOn(TKEY()).some(h => h.id === openId)) openHabit(openId, 'today');
+  }
 
   // The board sweep, now gated on having actually trained. See autoJoinBoard().
-  autoJoinBoard();
+  if (!window.IS_EMBED) autoJoinBoard();
 
   // Anything still unsent from a previous session goes up now.
   if (SYNC.dirty) pushNow();
@@ -10230,7 +10370,7 @@ function showError(msg) {
     CFG.installAsked = true; saveCfg();
     render();                       // drops the Settings row — it has no job now
   });
-  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js').catch(() => {});
+  if (!window.IS_EMBED && 'serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js').catch(() => {});
 })();
 </script>
 </body>
