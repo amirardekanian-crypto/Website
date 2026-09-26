@@ -134,6 +134,9 @@ A portable brand + design spec for generating on-brand content (Instagram carous
 Cover · Myth (strike) · Statement · Stat (one big number) · Quote · **Compare** (file/coach) · List · **Rule-cards** · Heatmap · **CTA** (canonical outro) · **Feature** (full-bleed app image) · **Journey** (linked cycle timeline) · **Result** (proof + face) · **Checklist** · **Photo-story** (full-bleed lifestyle photo + green scrim) · **Proof** (real screenshot in a phone card + branded KPIs) · **App-as-Product** (cinematic phone — see §7).
 
 **Carousel graphics layer — "RALLY"** (lives in `Carousel-Kit.html`, the 23-template kit):
+> ⚠️ **Superseded 2026-07-06** (`DESIGN-ATLAS.md` → *Current vs retired*): the dashed rally arc and the
+> tennis-ball pagination are retired. A slide now carries one plain tennis ball in negative space and a
+> huge translucent background page number. The court-line, grain and flat-background rules below still hold.
 - **The rally arc** — ONE dashed clay ball-path per slide (`stroke:var(--clay)`, clay-2 on dark, `stroke-dasharray: 2 26`, round caps), placed in negative space, ending in a **clay tennis ball** (a real ball PNG, base64-embedded as the `#tennis-ball` SVG symbol, ~32px). Under `.fa` the arc group is mirrored `scaleX(-1)` so the shot travels the RTL reading direction — an authored dot at `cx` displays at `1080−cx`. On the CTA the ball lands near the mantra payoff.
 - **Court-line substrate** — faint court geometry (baseline + service box + centre line) raked across the lower third; white `rgba(255,255,255,.16)` on green, green `rgba(14,74,54,.10)` on paper. Open type-led slides only — never on dense card/grid slides.
 - **Film grain** — a barely-there fractal-noise texture on every canvas (SVG data-URI tile, opacity ~.05, **no blend-mode** — compositing blend layers across many canvases hangs the page).
@@ -221,10 +224,10 @@ A persistent device, app UI animating inside:
 ## 10. Voice & content rules
 
 - **Language:** Persian/Farsi, **colloquial Tehrani** — warm, direct, confident, no fluff. (The English wordmark voice is sharp & athletic: *Move Better. Hit Harder. Last Longer.*)
-- **Audience:** general-fitness clients in the Farsi market (not only athletes), even though the English site speaks to competitive tennis/padel players. Speak to the everyday trainee. ⚠️ The Farsi **website** (`index-fa.html`, `/fa/articles/`) moved to tennis & padel players on 2026-09-13; this line still describes Farsi social content.
+- **Audience:** tennis and padel players (and their coaches) in Iran, for the website since 2026-09-13 and for social content since Amir's 2026-09-21 answers (`.claude/skills/ad/BRAND.md` §1–2, where general-fitness trainees are the wrong fit). The English site speaks to competitive tennis/padel players internationally.
 - **Goal of content:** justify the premium price & retain clients (show depth and the behind-the-scenes work) — not cheap lead-gen.
 - **Format:** vertical reels/carousels, hook in the first 2 seconds, **burned-in captions** (many watch muted).
-- **Credibility to lean on when useful:** ارشدِ قدرت و آمادگی · ارشدِ فیزیولوژیِ ورزشی (two MSc degrees) · ۵۰۰+ ورزشکار. *(In Farsi say «ارشد», never "MSc".)*
+- **Credibility to lean on when useful:** ارشدِ قدرت و آمادگی · ارشدِ فیزیولوژیِ ورزشی (two MSc degrees) · ۱۰۰۰+ بازیکن (the number the website uses). *(In Farsi say «ارشد», never "MSc".)*
 - Lead with the **no-BS / "everything has a reason"** idea; close with the **canonical outro** + handle.
 - **Accuracy of claims:** he holds an exercise-physiology ارشد and fact-checks, so every training/physiology number must be right. Prefer a **simple round figure with no on-slide math** (e.g. «ضربانِ قلب، زیرِ ۱۴۰») over a formula or a percentage you haven't verified. Note: Zone 2 is a metabolic threshold (LT1/VT1 ≈ lactate 2 mmol/L), **not** a fixed % of max HR — don't publish "60–70% of max" as if it were exact.
 

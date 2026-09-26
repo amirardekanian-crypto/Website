@@ -7,10 +7,10 @@ Durable context for working in this repo. Read the linked docs before diving in.
   Exercise Physiology; 1000+ tennis & padel players). Sells premium individualised
   programmes (USD tiers: $70/1mo · $180/3mo · $300/6mo — see `Content/PRODUCT.md`)
   delivered through a private web app (`program.html`, a PWA), backed by Supabase.
-- **The free habit tracker is the top of the funnel.** `habits.html` ("Proof") is offered
+- **The free habit tracker is the top of the funnel.** `habits.html` (AA Proof) is offered
   free to non-clients via `proof.html` (Instagram bio link, deliberately not in the nav).
   They give a name, email and WhatsApp; Amir runs **`/proof-signup`** and they are live in
-  under two minutes. Free and coached athletes share **one board**. See *Free tier* below.
+  under two minutes. Free and coached athletes share **one board** (`HABITS.md` → *Two kinds of user*).
 - **Two audiences, deliberately different** (don't force them identical — match *facts &
   features*, not wording):
   - **English** site = competitive **tennis/padel** players. Voice: sharp, athletic, evidence-based.
@@ -22,8 +22,8 @@ Durable context for working in this repo. Read the linked docs before diving in.
 - `CODEBASE.md` — technical map of the repo.
 - `Content/PRODUCT.md` — what the product/business actually is (internal brief; pricing, voice, backend).
 - `Content/HOW-IT-WORKS.md` — customer-facing explainer of the coaching process.
-- `HABITS.md` — **the habit app (`habits.html`, "Proof") brief.** Start here for anything
-  habit-tracker related: the three tabs, the eight habits, how progression works, the
+- `HABITS.md` — **the habit app (`habits.html`, AA Proof) brief.** Start here for anything
+  habit-tracker related: the four tabs, the eight habits, how progression works, the
   leaderboard, and how it links both ways with `program.html`.
 - `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
 - `FARSI-PRODUCTS.md` — the paid course app (`/tennis/app/`), the testing app's page and the Farsi
@@ -133,374 +133,45 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **No yellow, gold, ochre or amber in either app**, AA Proof's metals included (its gold tier became
   emerald on 2026-09-26; Amir, asked whether Proof was an exception: *"fix"*).
 
-## Working on the habit app (`habits.html`) — keep four things in sync
-Whenever you change how Proof behaves, update **all** of these in the same PR, or the
-next chat will be working from a lie:
-1. **`HABITS.md`** — the brief (what it is, what each tab does).
-2. **`XP_SYSTEM.md`** — if you touched XP, levels, ranks, consistency or pacing.
-3. **The in-app manual** — `renderManual()` in `habits.html`, which athletes open from
-   the initials button (top-right) → *The manual*. Its **numbers** read from the live
-   constants and update
-   themselves; its **prose** does not — fix that by hand when behaviour changes.
-4. **`privacy.html`** — if you changed what data is stored or shared.
-5. **`tourSteps()`** — the 15-step guided tour points a clay box at real controls and
-   says out loud what each one does. Move a button, rename a tab or change what a tap
-   does and the tour is actively lying, on the first screen a new athlete sees.
+## The habit app (`habits.html`, AA Proof) — read `HABITS.md` before changing it
 
-**The tour is the first run.** *Start tracking* on the onboarding screen goes straight
-into it; it is replayable for ever from **Settings → The tour**
-and from the manual's **Start here** section, and `CFG.toured` defaults to false for
-existing athletes so they get the offer once too. ⚠️ Two of its steps now open and close
-a **Settings sub-screen** in their `before` hook (the habit roster moved behind *Habits &
-targets*) — see the Settings section of `HABITS.md`. It lives in its own `<div id="tour">`
-**outside `#app`** — `render()` morphs `#app` against the template and would delete it —
-and its dimmer is four mask panes with a **real hole**, not a transparent lid, so a step
-marked `act` can be completed by actually doing the thing. Full detail in `HABITS.md`.
-
-**Navigation is four tabs: `TODAY · PROGRESS · CREW · LOCKER`** (Amir's own redesign,
-2026-07-29, promoted the reward track from a row inside Progress to its own tab). Settings
-is still **not** a tab — it lives behind the athlete's initials at the top-right of the
-header, and that same button becomes the way out of Settings and the manual.
-**Settings is a list of doors now** (Amir, 2026-08-01): a profile card and three grouped
-cards, with the habit roster and the appearance switches behind their own sub-screens
-(`UI.sub`). Every overlay screen carries a **back chevron on the left of the header** —
-`overlayBack()` goes exactly one step, while the `✕` on the right still leaves the whole
-overlay in one tap. Full account in `HABITS.md`.
-
-**The five screens Amir picked out are PANELS** (2026-08-01, from reference screens he
-sent): Today opens on a **hero card** that carries the level, the streak tile and a
-seven-day report inside one card; the roll-call composer is an inverted dark card and
-every line on the wall is its own card with **achievement chips** under it; the
-leaderboard is a framed panel of row-cards with medals for the top three; and counted
-habits (water, protein, steps, sleep) draw a **segmented meter — one pip per `step`** —
-rather than a straight bar. The palette, type and tokens are unchanged (the MEADOW skin);
-this is layout only. ⚠️ Two of those carry a real data limit: **your own** streak and
-days-on-target are computed from the log on this device, and nobody else's are, because
-neither `roll_call()` nor `leaderboard_top()` returns them. The client reads `r.streak`
-first and falls back to the local calculation, so teaching either RPC to return one is
-all it would take — see `HABITS.md`. Do not fill the gap by inventing a number.
-**CREW holds the entire social layer**: the roll-call composer, the wall, the leaderboard
-and joining/renaming. It opens on Roll Call, with the leaderboard as the second view.
-Today keeps a one-line *pointer* to Crew (not a second composer) that disappears once the
-athlete has written. **LOCKER is the reward track** (`PASS_TRACK` — see *The long game*
-below): the shareable rank card up top, titles and card skins as horizontal rails, then
-**the road** — the rank ladder and the 14 rewards merged into one scroll (2026-07-30: the
-standalone ladder screen is gone; tapping the rank *or the level ring* on Today's hero
-opens Locker directly now — Progress dropped its own level/rank strip the same day, so
-the rank lives in exactly one place outside the Locker itself).
-
-**Ranks, titles and medals wear metal now** — `METALS` (bronze → silver → emerald →
-amethyst → prismatic) is a shared visual language (the third tier was **gold until
-2026-09-26**; Amir: *"fix"*, when asked whether Proof was an exception to "no yellow or
-gold, ever". It is not, and nothing in Proof may be yellow or gold again): `rankCrest()` draws the tier-shaped,
-metal-rimmed badge next to a rank name (ladder, hero, share card all call the same
-function so a rank never looks different in two places); `titlePlate()` renders an owned
-title as a metal nameplate, rarity tied to the level it unlocks at (bronze under 13,
-silver 13+, emerald 21+) with **event titles and PROOF ITSELF prismatic** regardless of
-level; `achMedal()`/`evMedal()` render a badge/event's own emoji in a tinted disc behind
-a metal rim (dashed and greyed while unearned). All of it is presentation over the same
-underlying data — `RANKS`, `PASS_TRACK`, `ACHIEVEMENTS`, `EVENTS` — nothing here changes
-what is earned or when, only how it is drawn.
-
-**The app is called `AA Proof` everywhere on the site — not just once installed** (Amir,
-2026-07-27: "all over my website this is called AA Proof"). Use "AA Proof" in page titles,
-headings, body copy and docs; bare "Proof" is only correct as short-form inside a sentence
-that has already named it in full ("...Proof tracks the part nobody watches" reads fine
-right after an "AA Proof" heading). The name lives in three places that must move together
-for the PWA install identity specifically: `manifest.name`, `manifest.short_name` and the
-`apple-mobile-web-app-title` meta (iOS labels the home-screen icon from the meta and
-ignores the manifest). The offer
-is a sheet fired **once, after the athlete's first log** — never on arrival — with a
-permanent Settings row as the way back. iOS gets instructions, not a button:
-`beforeinstallprompt` is Chromium-only.
-
-**The long game** is the reward track (`PASS_TRACK` in `habits.html`) — 14 titles and
-card looks unlocked purely by levelling, reached from Progress. **Rewards are the one
-thing in this app that is stored rather than derived** (`CFG.pass.owned`) and **nothing
-may ever revoke one** — not a season reset, not a retune, not switching a habit off. That
-is what lets levels keep resetting each season. Everything on the track must stay **free
-to mint**: the moment a reward costs Amir an hour, forty consistent athletes become forty
-hours he owes. **Titles now show on the leaderboard and the roll call wall** (stage17);
-cards deliberately do not, because a card is drawn on the athlete's own phone and nobody
-else reads it. The server keeps its own record of what was earned (`public.hab_titles`)
-and **mints rather than recomputes** — a level can fall. Season resets drop everyone to 1
-by design, so any check against the *current* level would revoke titles people already own.
-(It could also fall mid-season, from the roster bug stage18 fixed; that half is gone, the
-season half is permanent, and either one alone justifies minting.) The track is a third
-thing scored twice: `PASS_TRACK` in `habits.html` and `passTrack` on the `xp_rules` row.
-
-**One word — `streak` — and two SCOPES.** (Amir, 2026-07-29: *"instead of Run i want to
-use word Streak everywhere in my App"*.) A **habit's streak** is consecutive days on *one*
-habit ("24-day streak", on its row). The **day streak** is consecutive days where the
-athlete cleared `streakQualifyPct` of the day's weight ("2-day streak", in the band at the
-top of Today and Progress).
-
-⚠️ This *reverses* the earlier rule, which called the per-habit one a **run** precisely so
-those two numbers could never be confused — the app had used five phrasings and a 24-day
-run beside a 2-day streak read as one number arguing with itself. Amir asked for one word,
-so the job of keeping them apart moved from the noun to the **label**: every place that
-shows a habit's streak sits *on that habit* (its row, its detail header), and the day one
-is always captioned **DAY STREAK**. Keep it that way, and do not reintroduce "run" — the
-manual and the day-one note on Progress are the only places that teach the difference, and
-they now teach it by scope. `bestHabitRun()` keeps its internal name; nothing shows it.
-
-**Roll Call** (one sentence a day, visible to everyone on the board) and the **3-day
-backfill window** on the log are both live — see `HABITS.md`, `XP_SYSTEM.md` §6.5 and §11.
-Roll call pays **no XP** on purpose and no scoring function reads `hab_notes`; keep it
-that way. Amir posts the day's coach line and moderates the wall from **`coach.html` →
-Today** (composer at the top of *The wall*; Hide/Show on any line) — or in SQL with
-`select public.set_coach_note('…');` and
-`select public.hide_note('<athlete_id>', '<date>');`. Same two functions either way.
-
-### ⚠️ Everything in Proof that is scored TWICE — change both or they disagree
-
-The leaderboard scores **server-side**, the athlete's own screens score **client-side**,
-and they read from two different copies of the same rules. If you change one and not the
-other, the board and the athlete's phone will quietly show different numbers — the worst
-class of bug in this app, because nothing errors.
-
-The Supabase copy is **one row**: `public.xp_rules where id = 1`. It has 13 keys, and
-every one of them mirrors a constant in `habits.html`:
-
-| `xp_rules` key | `habits.html` | What breaks if they drift |
-|---|---|---|
-| `base`, `growth` | `XP_RULES.base/.growth` | Levels differ between board and phone |
-| `completionBonus`, `customXp` | `XP_RULES` | Daily XP differs |
-| `streakQualifyPct` | `XP_RULES` | The `qualify` quest and day-streaks differ |
-| `unearnable` | `HABITS[].locked` | The streak **gate** differs — a rest day counts on one side only (stage19) |
-| `weights` | `XP_RULES.weights` | Every habit's value differs |
-| `targets` | `HABITS[].target` | What counts as "done" differs |
-| `tiers` | `CONSISTENCY_TIERS` | Badge XP differs |
-| `milestones` | `ACHIEVEMENTS` | Milestone XP differs |
-| `quests` | `QUEST_POOL` | A quest pays on one side only |
-| `passTrack` | `PASS_TRACK` | **Server refuses a title the app already gave** |
-| `questRuns` | — | Server-only; set by `set_quests()` / `clear_quests()` |
-| `gateV2` | the two-door rule in `dayQualifies()` | Day streaks and the `qualify` quest differ (stage22) |
-| `lapseDays`, `comebackXp`, `comebackStick` | `LAPSE_DAYS`/`COMEBACK_XP`/`COMEBACK_STICK` | **The comeback pays on one side only** (stage22) |
-| `maxCustom` | `MAX_CUSTOM` | A tampered log outscores the board (stage24) |
-
-Read the live row with:
-`select jsonb_object_keys(rules) from public.xp_rules where id = 1;`
-
-**Not** on the row, deliberately: `dailyCap` (a client write-time clamp in `setVal()`, no
-server equivalent — see `XP_SYSTEM.md` §1) and `seasonStart`/`seasonName` (the authority is
-`public.seasons`; the `XP_RULES` values are an offline fallback only).
-
-The scoring **logic** is also written twice — `bonusEvents()` in `habits.html` against
-`hab_bonus_xp()` in plpgsql (**stage18** owns the current version; stage14 owns its
-6-arg signature and everything else in it). Those two walk the
-log the same way on purpose. Changing how a badge or milestone is *counted* — not just
-what it pays — means editing both.
-
-Beyond scoring, three more things live in more than one place:
-- **App name** — `manifest.name`, `manifest.short_name`, `apple-mobile-web-app-title`.
-- **Docs** — `HABITS.md`, `XP_SYSTEM.md`, the manual prose in `renderManual()`,
-  `privacy.html`. (The manual's *numbers* read from live constants; its *prose* does not.)
-- **Rewards** — owned titles are recorded on the client (`CFG.pass.owned`) **and** the
-  server (`public.hab_titles`). Both are append-only; neither may ever subtract.
-
-### CORE vs ADD-ON — five habits everyone has, and the rest opt-in
-
-(Amir, 2026-07-30: *"lets say for example 5 habits are mandatory for everyone … then someone
-tries to turn on supplements or breathing only to get additional xp and achievements. this
-should be a bonus."*)
-
-**`core: true`** on five habits — train · steps · sleep · protein · water — means always
-tracked, **no off switch** (`live()` honours `core` regardless of `CFG.on`). Same five for
-every athlete, so a day score finally means the same thing across the board. Everything
-else is an **add-on**: opted in for the extra XP and badges, and once on it *counts*.
-
-**Two rules in `stampRoster()`, and they answer "why did Friday change Wednesday":**
-- **Adding lands TODAY.** You opted in, today is still yours to finish, and Settings says so
-  before you tap.
-- **Removing lands TOMORROW.** Otherwise switching a habit off at 23:00 deletes a miss you
-  already made, which would make the day score worthless. `lockedOnToday()` is what lets the
-  UI say *"still counts today"*.
-
-Neither ever reaches a closed day. Proven: adding supps today leaves Wednesday at 100% and
-takes today to 93%; switching it straight back off leaves today at **93%** and dates the
-removal to tomorrow.
-
-### Days are settled units — the rule, and the thing that enforces it
-
-**A day is scored against the habits that were switched on THAT day. A closed day never
-moves again.** Changing what you track changes what happens next, never what already
-happened.
-
-What enforces it is `CFG.roster` — a **timeline** of the tracked set, one entry per change,
-each naming the day it took effect. `rosterOn(day)` reads the entry in force; `dayPct()`,
-`isPerfect()` and the `daysWith3`/`perfectDays` counters take their denominator from it
-instead of `live()`. `hab_bonus_xp()` reads the same array out of the config and its
-`daylive`/`perday` CTEs join per day (stage18). **Only `stampRoster()` writes it, it is
-called from `saveCfg()` so every mutation path is covered, and it only ever appends.**
-
-Before stage18 all of those read `live()` — "habits switched on right now" — and re-judged
-history against a roster from the future. It cost 500xp (the CN milestone) in both
-directions: adding a habit deleted perfect days already earned, switching one off handed
-back perfect days that never happened. Both are proven fixed in the stage18 header.
-
-⚠️ **`live()` is for the present tense only** — what to draw on Today, what to nudge, what
-a perfect day is worth from here. **Any function that takes a `dayKey` must use
-`rosterOn(dayKey)`.** That is the whole invariant; it is one line to get wrong.
-
-**It got that one line wrong again, 2026-07-30 — in the UI, not the scoring.** Every
-scoring function already read `rosterOn(dayKey)` correctly, but `renderToday()` built the
-tappable row list itself from `live()` even while backfilling a past day. The header's
-`dayPct()` was right; the rows the athlete could actually see and tick were missing
-whatever add-on habit had since been switched off — so ticking every visible row could
-still leave the day short of 100%, with nothing on screen explaining why. Fixed by
-splitting `hs` (still `live()`, for "your week": the heat map and strongest/weakest
-ranking, correctly about *now* regardless of which day is open) from `rows`
-(`rosterOn(AKEY())`, what actually gets rendered and logged). See `HABITS.md`'s
-*backfill window* section for the full account.
-
-**Seasons.** Scoring runs in seasons; only days from the current season's start earn XP,
-for personal levels *and* the boards. Currently **Pre-Season (opened 26 July 2026)** —
-Amir launches the real one on command with `select public.start_season('Season 1');` in
-the Supabase SQL editor. That resets every score to zero and deletes nothing; streaks and
-consistency badges survive. The server (`public.seasons`) is the authority; the app
-fetches and caches it, with `XP_RULES.seasonStart` only as an offline fallback.
-
-**Habit names are TASKS** — `🚶 Walk 10,000 steps`, not `STEPS`. Display only; the
-`id` never changes, so no history moves. **`EVENTS`** are **multi-goal milestones** — three goals each, rendered as **milestone
-rows** (goals on the note line, title where XP goes; the `evcard` is quests-only) in an
-`A few weeks` group *inside* the Milestones section, between the week badges and the long
-ones. **No dates at all**: the few weeks is how long the WORK takes, not a window you can
-miss (Amir, 2026-07-30, after two wrong shapes — calendar seasons, then rotating 28-day
-windows). Measured over all history, like every other badge. They pay a **title, never
-XP**, to avoid a third thing scored twice — but their title ids must exist in `passTrack`
-on the `xp_rules` row or the server refuses them. **Milestones
-carry a `tier`** (`week`/`long`/`rare`) for grouping on Progress; nothing scores off
-it. Full detail in `HABITS.md`.
-
-**`stage24_marks_quests_customcap.sql` — applied 2026-08-02** (as `stage24a/b/c`). Three
-things that all had to hit both scorers at once: `hab_xp()` gained the `maxCustom` ceiling
-on unrecognised keys; `hab_bonus_xp()`'s `qruns` CTE now clips a run at the next run's
-start so overlapping runs cannot double-pay a shared quest; and the twelve new milestone
-rungs plus THE CENTURION's 500 → 1,200 retune landed on the `milestones` array. It also
-dropped the fossil map-object still sitting at `passTrack[0]` from the stage20 incident.
-
-**`stage25_season_record.sql` — applied 2026-08-02.** Closes the last open economy
-decision. A closing season now archives every athlete's final level and XP into
-`public.hab_season_results` (the Locker's **Seasons shelf**) and mints a title naming that
-season to everyone who reached level 5 — unrepeatable by definition, which is the one
-thing the level track cannot offer. ⚠️ It also fixes a **pre-existing security hole**:
-`start_season()` — the function that resets every score — had no coach guard while being
-executable by `anon`, unlike `set_quests`/`clear_quests`/`set_coach_note`/`hide_note`. It
-now carries the same `auth.jwt()` guard, refuses future-dated starts (which silently froze
-the archive weeks early and could never be corrected), and ships `undo_season()`. Season
-titles are deliberately **not** in `passTrack` — an `lv:0` entry there is self-awardable
-since stage23 — so `set_title()` grew a third branch: an unrecognised title is allowed only
-if the server already minted it. The first draft of this file was rewritten after an
-adversarial review found 20 defects in it, 2 critical; the traps are documented in its
-header.
-
-**Supabase stages 9–23 are applied and live** (leaderboard, workout-days feed, seasons,
-bonus XP for consistency tiers + milestones, weekly quests, roll call, contacts, titles,
-per-day rosters, weighted day scores, milestone tiers + event titles, weighted-gate +
-comeback economy, the roll-call retention prune, the title-mint fix).
-
-**`stage21_roll_call_retention.sql` — applied 2026-08-02.** The wall's SAVED half now
-matches its SHOWN half: a statement-level trigger on `hab_notes` sweeps anything older
-than `current_date - 8` on every write, so the table self-maintains with no cron. The
-client still shows exactly 7 days (`ROLL_DAYS`/`rollFloor()`, local clock); the server
-keeps 9 days (UTC, with two days of timezone slack) so nobody's post vanishes from the
-server side of the date line before the client's own week is up. **Do not match the two
-floors** — that slack is why nothing inside any athlete's real 7-day window is ever
-deleted early. `select public.purge_old_notes()` is available for an on-demand sweep;
-the trigger already keeps it clean without it.
-
-⚠️ **`stage23_title_mint_fix.sql` — applied 2026-08-02.** `hab_mint_titles()` and
-`set_title()` were written against `passTrack` as a plain `{title_id: level}` object
-(stage17's original shape); at some point before stage22, the live `xp_rules.passTrack`
-drifted into a JSONB ARRAY of `{id, lv, kind, name}` objects (mirroring `PASS_TRACK` in
-`habits.html`, plus the four EVENT titles at `lv:0`) and neither function was updated to
-match. `jsonb_each_text()` on an array is a hard Postgres error, called with no exception
-handling from both `claim_titles()` (every app boot) and `set_title()` (equipping a
-title) — so **no title minted server-side for four days** before this was found and
-fixed (`select max(earned_on) from hab_titles` was 2026-07-29; 11 athletes were owed a
-title at the time of the fix, all backfilled). The fix reads the array correctly and
-draws a real distinction the naive fix would have missed: entries with a genuine `lv > 0`
-(the level track) are minted only when `hab_season_level() >= lv`; entries at `lv: 0`
-(event titles — completion is computed client-side only, with no independent server
-check, same trust boundary the rest of the app already runs on) are recorded directly
-when equipped. Cards are still never auto-minted server-side, unchanged from stage17.
-`supabase/stage23_title_mint_fix.sql` has the full account and is safe to re-run.
-
-**The day score is WEIGHTED, and it is two numbers.** `dayParts(day, mode)` in
-`habits.html` sums `baseXp()` over `rosterOn(day)` rather than counting heads. `dayPct()`
-is what the day was *worth* (whole roster — header, day strip, wall); `gatePct()` is what
-the athlete could *do* (a **locked** habit they did not earn that day leaves the
-denominator) and **day streaks read only that**. The gate is not a nicety: WORKOUT is
-28.6% of the default day, so weighting it into the denominator makes it a *precondition* —
-a rest day could never qualify and a free-tier athlete, whose WORKOUT is locked for life,
-would never have a qualifying day again. `isPerfect()` stays unweighted and ungated, which
-is what keeps `proof.html`'s promise true. `streakQualifyPct` moved 80 → 75 with it, and
-back to **80** on 2026-08-02 (Amir: *"I think 75% is very low"*) — safe now only because
-the gate has a **second door**: `dayQualifies()` also passes a day that left **at most one
-thing undone**, so missing one habit still counts at 80, and 80 only tightens the day that
-missed *several* things by a little each. Nobody lost XP, a title or a level to the change
-(all derived-but-never-revoked; verified across all 11 athletes) — only streak counters
-moved. Full detail in `XP_SYSTEM.md` §6; server half in `supabase/stage19_weighted_days.sql`.
-
-⚠️ Changing this threshold means **both scorers plus the prose**: `XP_RULES.streakQualifyPct`
-in `habits.html`, `streakQualifyPct` on the `xp_rules` row, and any quest `note` that spells
-the number out (`w_qualify5` said "5 days at 75% or better" in *both* pools — it now says
-"5 days on target" so the text can never name a stale bar again).
-
-**Free tier.** `"tier": "free"` inside the `athlete` object is the *only* switch —
-`isFree()` is the only test, and anything not `"free"` is coached. Free mode keeps
-WORKOUT locked (with a line saying coached athletes earn it) and points every
-`program.html` route at `/form.html`. **Scoring is identical and the board is shared** —
-that is deliberate, and it is what makes upgrading free: flip the field, the pipeline
-writes the programme into the same row, and the athlete's whole history, level and board
-place carry over on the same id and login.
-⚠️ **Contact details still never belong in a programme record.** Contact details live in
-`public.hab_contacts` (stage16), coach-only behind RLS: `add_contact()` signs someone up
-in one call, `contact_list()` shows who signed up **and how many days they have logged**
-(the qualifying signal), `forget_contact()` erases them. Full walkthrough:
-`.claude/skills/proof-signup/SKILL.md`.
-⚠️ **REVERSED 2026-09-12 — everyone is on the leaderboard now.** This used to read
-*"signing someone up must never join them to the leaderboard"*. Amir decided the opposite,
-with the consequences stated: the board is shared by coached clients **and** free signups,
-so every athlete's display name (first name + last initial by default), level and rank are
-visible to everyone on it. He also chose to include athletes who had **previously left** —
-they are indistinguishable in the data from athletes who never decided, so the sweep puts
-everyone on once.
-
-`autoJoinBoard()` in `habits.html` runs on boot, and **is gated on having finished a
-workout** (Amir revised the blanket sweep the same day): it returns early unless the
-locked WORKOUT habit has been ticked at least once, which only the server can do. Two
-consequences, both deliberate — **an athlete who has stopped using the app never qualifies
-and is left off the board rather than dragged back onto it**, and nobody lands there at
-0 XP with nothing to show.
-
-**`CFG.boardSwept` makes it a ONE-TIME sweep — do not remove that.** Re-joining on every
-boot would mean an athlete could tap *Leave the board*, watch it succeed, and be back on it
-next launch with no way out. **If they leave, they left.** The flag is stamped only after a
-join actually succeeds, so a first boot with no signal is retried rather than marked done.
-
-Because it is automatic, it **cannot be consent**: `privacy.html` moved the board entry to
-**legitimate interests (Art. 6(1)(f))** with leaving as the objection route — the same
-reasoning body weight uses. Roll Call stays consent, because nothing appears unless the
-athlete writes it. `renderBoardNotice()` is the standing banner that makes the athlete
-*meet* this on the day screen rather than find it in a policy document; it names the
-display name others see and links to the setting.
-
-The name typed on the signup form still goes in the programme record as
-`athlete.boardName`, and is now what the athlete is auto-joined under.
-
-**Quests are a lever Amir pulls, not a standing feature.** There are **none** unless he
-starts a run, and a run lasts **7 days from its start date** (not Mon→Sun). Pull the lever
-from **`coach.html` → Today → Quest week** (tick 1–4 from the pool, *Start the week*;
-*Cancel this run* while one is live) — or in SQL with
-`select public.set_quests('2026-07-29', array['w_water5','w_steps50k']);` and
-`select public.clear_quests('2026-07-29');`. The dashboard always starts a run **from
-today**; SQL is the way to back-date or future-date one. Past runs are kept
-so their XP keeps counting. The 12-quest pool lives on the `xp_rules` row **and** as
-`QUEST_POOL` in `habits.html` (offline fallback) — change both together.
-**`QUESTS.md` is the catalogue** — what's running, the built quests, ready-made themed
-weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
+The full account (the four tabs, the habits, progression, the leaderboard, roll call, the reward
+track, seasons, quests, the free tier) is in **`HABITS.md`**; every XP tunable and the server copy of
+the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved out of this file on
+2026-09-26 and corrected against the code). What must never break:
+- **Change behaviour, update all six in the same PR**: `HABITS.md`, `XP_SYSTEM.md`, `QUESTS.md`, the
+  `renderManual()` prose (its numbers read the live constants, its prose does not), `privacy.html`
+  (anything stored or shared) and `tourSteps()`. The tour points at real controls, so a moved button
+  or a renamed tab makes it lie on a new athlete's first screen.
+- **Scored twice.** The leaderboard scores on the server from `public.xp_rules` (id 1), the phone
+  from constants in `habits.html`, and when they drift nothing errors. Every key on the row mirrors
+  a constant (18 keys on 2026-09-26; the table is in `XP_SYSTEM.md` §8), and `bonusEvents()` mirrors `hab_bonus_xp()`: change both
+  sides. Update the row with `rules || jsonb_build_object(…)` or `jsonb_set`, never by rewriting the
+  whole object.
+- **`live()` is present tense only**: anything that takes a `dayKey` uses `rosterOn(dayKey)`, UI row
+  lists included. Only `stampRoster()` writes `CFG.roster`, append-only: a habit added lands today, a
+  habit removed lands tomorrow, and a closed day never moves.
+- **Rewards are never revoked.** `CFG.pass.owned` and `public.hab_titles` only ever add; titles are
+  minted, never recomputed (a season reset drops every level). `PASS_TRACK` and `passTrack` change
+  together, and season titles never go in `passTrack`.
+- **One word, `streak`, two scopes**: a habit's streak sits on that habit, the day streak is always
+  captioned DAY STREAK, and "run" never comes back.
+- **"On target" means `dayQualifies()`.** Changing `streakQualifyPct` means both scorers and any text
+  that names the number; a quest note never spells it out.
+- **Roll call pays no XP** and no scorer reads `hab_notes`. The client shows 7 days and the server
+  keeps 9, on purpose.
+- **The leaderboard sweep runs once.** `autoJoinBoard()` puts a coached athlete on the board after their
+  first finished workout (a free athlete's WORKOUT is locked, so they join from Crew themselves).
+  `CFG.boardSwept`, stamped by the sweep and by any join or leave the athlete makes, means leaving
+  sticks. Never re-join on boot.
+- **Never invent another athlete's number** that an RPC does not return.
+- **It is called AA Proof** in titles, headings and copy. `manifest.name`, `manifest.short_name` and
+  the `apple-mobile-web-app-title` meta move together.
+- **Free tier:** `"tier": "free"` in the athlete block is the only switch (`isFree()` the only test).
+  Contact details live in `public.hab_contacts` (`/proof-signup`), never in a programme record.
+- Quest weeks are a lever Amir pulls from coach.html → Today (`QUESTS.md`); a new season starts only on
+  his word, with `start_season()` (`HABITS.md` → Seasons). Body weight lives in `program.html` (above);
+  the backtick guard is at the end of this file.
 
 ## Site layout (GitHub Pages → amirardekani.com)
 - **English is the default**: `/` = `index.html`. **Farsi** = `/index-fa.html`. `index-en.html` is a

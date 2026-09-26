@@ -5571,6 +5571,10 @@ async function joinBoard(name, joining) {
     if (error) throw error;
     CFG.boardName = joining ? (name || defaultDisplayName()) : null;
     CFG.onBoard = !!joining;
+    // Any decision the athlete makes here settles the one-time sweep. Without it, an athlete
+    // who joined and left before the sweep had run was put back on after their first
+    // workout (2026-09-26). If they leave, they left.
+    CFG.boardSwept = true;
     saveCfg();
     // Joining creates the row with no title on it, so anything already equipped
     // has to be published now or it would silently not appear.
@@ -6540,7 +6544,7 @@ function tourSteps() {
 
   S.push({
     title: 'Tap the name for its history',
-    body: `Its rank, its longest run, the last 35 days and what it pays. It is the biggest
+    body: `Its rank, its longest streak, the last 35 days and what it pays. It is the biggest
            part of the row and the only part that logs nothing — so tapping a habit to read
            about it never costs you a day.`,
     screen: 'today', sel: () => $t('.hrow:not(.locked) .body')
@@ -6579,9 +6583,9 @@ function tourSteps() {
   });
 
   S.push({
-    title: 'Three tabs',
+    title: 'Four tabs',
     body: `<strong>Today</strong> is where you log. <strong>Progress</strong> is where you stand.
-           <strong>Crew</strong> is everyone else. That is the whole of it — there is no fourth screen hiding.`,
+           <strong>Crew</strong> is everyone else. <strong>Locker</strong> is what you have earned: your titles, your card looks and the road ahead.`,
     screen: 'today', sel: () => $t('.tabs'), pad: 0
   });
 
@@ -6599,8 +6603,8 @@ function tourSteps() {
       ? `You are on it. Everyone else here is racing the same season, and each of you gets
          <strong>one sentence a day</strong> on the wall — worth no points at all, which is exactly why
          people write something true on it.`
-      : `Nobody can see you until you join, and joining takes a name you pick yourself — other
-         athletes see <strong>that name and your points</strong>, nothing else. Join and you also get
+      : `Nobody can see you until you join, and joining takes a name you pick yourself. Other
+         athletes see <strong>that name, your points, your rank and your title</strong>, nothing else. Join and you also get
          <strong>one sentence a day</strong> on the wall. Leave whenever you like.`,
     screen: 'crew', before: () => { LB.view = 'board'; },
     sel: () => $t('[data-tour="join"]')
@@ -7186,7 +7190,7 @@ function renderBadgeCelebration(ev) {
         + 'The habit did not get easier. You got harder to stop. '
         + (paid > 0
             ? 'The badge is yours for good.'
-            : 'The badge is yours for good. The run started before ' + seasonName()
+            : 'The badge is yours for good. The streak started before ' + seasonName()
               + ', so it pays nothing this season.');
     // The medal, in the habit's own colour, instead of a number in a box.
     const h0 = ev.habits[0];
@@ -7218,7 +7222,7 @@ function renderBadgeCelebration(ev) {
     title = 'SECOND WIND';
     xpLine = COMEBACK_XP;
     sub = ev.gone + ' days off, and you opened it anyway. That is the hard part — '
-        + 'the run starts again from today, not from where it broke.';
+        + 'the streak starts again from today, not from where it broke.';
     art = `<div class="lvflame"><span class="fl">🔄</span><span class="n">${ev.gone}</span></div>`;
   } else if (ev.kind === 'quest') {
     badge = 'Q'; badgeLabel = 'QUEST'; codeClass = ' code';
@@ -8532,7 +8536,7 @@ function renderBoardJoin() {
       <div class="block" data-k="join" data-tour="join" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
         <div class="hd" style="font-size:20px;line-height:1">Join the board</div>
         <div style="font-size:13px;line-height:1.5;color:var(--muted)">
-          Other athletes will see the name you pick here and your points — nothing else. No habits, no logs, no real name unless you use it. You can leave any time.
+          Other athletes will see the name you pick here, your points, your rank and the title you wear. No habits, no logs, no real name unless you use it. You can leave any time.
         </div>
         <div style="display:flex;gap:8px">
           <input class="input" id="boardname" maxlength="24" placeholder="${esc(defaultDisplayName())}" value="${esc(LB.nameDraft)}" style="flex:1">
@@ -8595,7 +8599,7 @@ function renderManual() {
           <div>▸ <strong style="color:var(--ink)">Every habit row takes three different taps.</strong> The
             <strong style="color:var(--ink)">box</strong> logs it. The <strong style="color:var(--ink)">name</strong>
             opens that habit's history. <strong style="color:var(--ink)">+</strong> adds one unit at a time, and holding it goes faster.</div>
-          <div>▸ <strong style="color:var(--ink)">Three tabs.</strong> Today is where you log, Progress is where you stand, Crew is everyone else.</div>
+          <div>▸ <strong style="color:var(--ink)">Four tabs.</strong> Today is where you log, Progress is where you stand, Crew is everyone else, and Locker holds what you have earned.</div>
           <div>▸ <strong style="color:var(--ink)">Your initials, top right,</strong> open Settings from any screen — and close it again. Everything not on a tab is behind them, including this page.</div>
           <div>▸ <strong style="color:var(--ink)">Everything you log pays XP</strong>, and XP is the only currency here. There is nothing to buy.</div>
         </div>` +
@@ -8676,7 +8680,7 @@ function renderManual() {
         if (!run || !qs.length) {
           return block(h2('Quests') +
             p(`From time to time your coach sets a <strong style="color:var(--ink)">run of quests</strong> — targets for the week rather than the day, worth real points on top of your habits.`) +
-            p(`There are none running right now. When there are, they appear on your Today screen with a countdown, and everybody on the app gets the same ones.`));
+            p(`There are none running right now. When there are, they appear on Progress with a countdown, and everybody on the app gets the same ones.`));
         }
         return block(h2('Quests') +
           p(`Your coach has quests on right now: <strong style="color:var(--ink)">${qs.length} of them</strong>, ending ${esc(runEndLabel(run))}. They are targets for the week rather than the day, and they expire on that date, finished or not.`) +
@@ -8719,8 +8723,8 @@ function renderManual() {
           if (!tot || !lock) return '';
           return p(`<strong style="color:var(--ink)">Your streak does not punish you for that.</strong> It only asks about what you could actually tick, so a locked session you have not earned is left out of the sum entirely. Do everything else on a rest day and the streak sees a full day — even while the score above it reads ${Math.round((tot - lock) / tot * 100)}%. Do the session and it counts twice over: it comes back into the day already finished.`);
         })()) +
-        p(`Your streak sits at the top of <strong style="color:var(--ink)">Today</strong> and <strong style="color:var(--ink)">Progress</strong>, with the last seven days beside it — a filled square is a day that counted. The best day streak you have ever had is beside it on Progress, and each habit carries its own streak in its row.`) +
-        p(`Every badge is earned on your longest run ever — the ${CONSISTENCY_TIERS.length} tiers on each habit and the streak milestones alike — so breaking a run never takes one back.`) +
+        p(`Your day streak is on the card at the top of <strong style="color:var(--ink)">Today</strong>, above your last seven days, and again on <strong style="color:var(--ink)">Progress</strong> beside the best you have ever had. Each habit carries its own streak in its row.`) +
+        p(`Every badge is earned on your longest streak ever, the ${CONSISTENCY_TIERS.length} tiers on each habit and the streak milestones alike, so breaking a streak never takes one back.`) +
         // The athlete-facing half of "days are settled units". They will not read
         // the word roster, and they should not have to: what they need to know is
         // that changing the list is safe.
@@ -8748,8 +8752,10 @@ function renderManual() {
         p(`When a new season opens, <strong style="color:var(--ink)">every score goes back to zero</strong> and everyone starts together. Nothing is deleted, and your consistency badges stay yours.`))}
 
       ${block(h2('The leaderboard') +
-        p(`It is <strong style="color:var(--ink)">off until you join</strong>. Nobody sees you before that.`) +
-        p(`When you join you pick your own name — it does not have to be your real one. Other athletes see <strong style="color:var(--ink)">that name and your points</strong>. They never see your habits, your logs, your programme or anything else. You can rename yourself or leave whenever you like.`) +
+        p(isFree()
+          ? `You join it from Crew when you want to. Nobody sees you before that.`
+          : `Once you finish your first workout in the programme app, you are put on it under your first name and last initial.`) +
+        p(`You can rename yourself whenever you like (it does not have to be your real name), or leave in Settings, Crew board. <strong style="color:var(--ink)">If you leave, you stay off.</strong> Other athletes see <strong style="color:var(--ink)">your name, your points, your rank and the title you wear</strong>. They never see your habits, your logs, your programme or anything else.`) +
         p(`There are two boards. <strong style="color:var(--ink)">This season</strong> is every point since ${esc(seasonName().toLowerCase())} opened. <strong style="color:var(--ink)">Past week</strong> is a rolling seven days, so a strong week always shows and anyone can win it.`) +
         p(`Your points are worked out on the server from what you have actually logged — so the board is honest, and there is nothing to gain from fiddling with your phone.`))}
 
@@ -8759,10 +8765,10 @@ function renderManual() {
 
       ${block(h2('Your data') +
         p(`Everything is saved to your phone the moment you tap it, then synced to your coach when you have a connection. Losing signal, closing the app or flying somewhere loses nothing.`) +
-        p(`<strong style="color:var(--ink)">There is no password, and no sign-in — your link is your account.</strong> Put it on your home screen or keep the message it came in. Losing the link is the only way to lose your way back in, and even then nothing is deleted: ask me for a fresh one and your whole history is still there.`) +
-        p(`Your coach can see your habits — and your weight, if you switched that on — as part of coaching you. Other athletes cannot see either, unless you join the leaderboard, and even then only your chosen name and points.`) +
+        p(`<strong style="color:var(--ink)">You sign in with the username and password I sent you.</strong> Put the app on your home screen and it stays signed in. Forget the password and nothing is lost: ask me for a new one and your whole history is still there.`) +
+        p(`Your coach can see your habits — and your weight, if you switched that on — as part of coaching you. Other athletes never see either: on the leaderboard they see only your name, points, rank and title.`) +
         (isFree()
-          ? p(`You signed up for this without a programme, so the only other things held about you are the <strong style="color:var(--ink)">email and number you gave</strong> — used to send you this link and nothing else. Ask and it is all deleted, log included. The full notice is at <strong style="color:var(--ink)">amirardekani.com/privacy.html</strong>.`)
+          ? p(`You signed up for this without a programme, so the only other things held about you are the <strong style="color:var(--ink)">email and number you gave</strong> — used to send you your sign-in and nothing else. Ask and it is all deleted, log included. The full notice is at <strong style="color:var(--ink)">amirardekani.com/privacy.html</strong>.`)
           : ''))}
 
       <div style="padding:4px 20px 34px">
@@ -8986,7 +8992,7 @@ function renderPass() {
           <b>${esc(LI.label.toUpperCase())}</b>
         </span>
         <span class="lo-body">
-          <span class="lo-line">${eqT ? 'Wearing ' + titlePlate(eqT, true) : 'No title'} on the <strong style="color:var(--ink)">${esc(eqC.name)}</strong> skin — this is what the crew sees.</span>
+          <span class="lo-line">${eqT ? 'Wearing ' + titlePlate(eqT, true) : 'No title'} on the <strong style="color:var(--ink)">${esc(eqC.name)}</strong> skin. The crew sees your title; the skin is yours alone.</span>
           <button class="btn btn-primary" style="padding:9px 16px;font-size:12.5px" ${on(() => openShare('rank'))}>Share it →</button>
         </span>
       </div>
@@ -9869,15 +9875,14 @@ function renderSettings() {
                  'danger' + (UI.confirmReset ? ' armed' : ''))}
       </div>
 
-      <!-- There is no password, no sign-in and no account screen, so the app
-           never had a reason to mention any of it — and therefore never told
-           anyone that the WhatsApp link IS the account. Losing it is the one
-           way to lose the lot, and it is worth one sentence. -->
+      <!-- Athletes sign in with a username and password since 2026-09-07; this note
+           used to say the link was the account. One sentence on where the data
+           lives and how to get back in. -->
       <div class="setnote">
         Every tick is written to this phone the moment you make it, then sent up when
-        there's a connection. There is no password here — <strong>your link is your
-        account</strong>. Put it on your home screen, or keep the message. If you lose
-        it, ask ${isFree() ? 'Amir' : 'your coach'} for a fresh one; nothing is gone.
+        there's a connection. You sign in with your <strong>username and password</strong>;
+        forget the password and ${isFree() ? 'Amir' : 'your coach'} can set a new one. Nothing
+        is lost either way.
       </div>
       <div style="height:20px"></div>
     </div>`;

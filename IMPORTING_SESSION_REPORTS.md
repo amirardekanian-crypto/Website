@@ -104,21 +104,11 @@ on conflict (athlete_id, day, completed_on) do update set
 - **Older emails (before ~13 May 2026)** used a template without Duration/Readiness, so
   those rows have no load/readiness — they still count fully toward adherence.
 
-## Known data issues (tracked separately)
+## Known data issues (both resolved)
 
-- ~~Program files misnamed vs their id, so the plan won't render in coach view on a
-  case-sensitive host: `data/Ghzl_pak.json` should be `data/ghazal_pakbaten.json`;
-  `data/mhrnz_khdm1.json` should be `data/Mhrnz_khdm1.json`.~~ **Fixed 5 Jun 2026** —
-  both files renamed to match their `athlete_id` exactly.
-- ~~Stale / duplicate athlete records to clean up: `pooya_pasandideh`, the orphan
-  `data/pooya_pnd1.json`, and `mhrn_zhr1` vs `mhrn_zhr2`.~~ **Done 9 Aug 2026.** Three
-  retired ids deleted from Supabase (`pooya_pasandideh`, `pegah_hemmati`, `Mhrnz_khdm1`
-  — 3 progress rows, 15 sessions, 2 keys) plus their orphan files
-  (`data/pooya_pnd1.json`, `data/Pegah_hmt1.json`, `data/Mhrnz_khdm1.json`). Each
-  athlete's **live** id was left untouched: `pooya_pnd2` (48 sessions), `pegah_hmt2`
-  (36), `Mhrnz_khdm2` (3). Mehrnaz's two ids never overlapped — the old one's last
-  session was 11 Jul, the new one's first was 25 Jul.
-  Every deleted row is restorable from `public.retired_ids_backup_20260809` (RLS on,
-  coach-only). Drop it once you're happy: `drop table public.retired_ids_backup_20260809;`
+- Two programme files were misnamed against their id (fixed 5 Jun 2026, renamed to match).
+- Duplicate athlete ids were retired on 9 Aug 2026: three old ids and their rows deleted, each
+  athlete's live id untouched. Every deleted row is restorable from
+  `public.retired_ids_backup_20260809` (RLS on, coach-only) until that table is dropped.
 
 _Last full backfill: 5 Jun 2026 — 85 sessions, 8 athletes, 21 Apr–5 Jun._

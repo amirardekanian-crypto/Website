@@ -3678,7 +3678,9 @@ async function renderProof() {
 function setBoardScope(s) { _boardScope = s; renderProof(); }
 async function forgetContact(athleteId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!confirm(`Forget ${athleteId}?\n\nThis erases their contact details (privacy promise). Their logs and board place are untouched.`)) return;
+  // Says exactly what forget_contact() deletes (checked against the live function, 2026-09-26: this
+  // used to say "Their logs and board place are untouched", the opposite of what it does).
+  if (!confirm(`Forget ${athleteId}?\n\nThis PERMANENTLY deletes their contact details, their whole habit log and progress, their board place and their roll-call lines. There is no undo and no automatic backup: take a ⤓ Backup first if you are not sure.\n\nTheir programme, login, session history, titles and season results stay.`)) return;
   const { error } = await sb.rpc('forget_contact', { p_athlete_id: athleteId });
   if (error) { alert('Could not forget: ' + error.message); return; }
   toast('Forgotten');

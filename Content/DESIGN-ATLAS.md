@@ -207,7 +207,7 @@ Site CSS: [`tokens.css`](../assets/css/tokens.css) → [`base.css`](../assets/cs
   Persian numerals, RTL. English site voice stays sharp/athletic for the EN site only. Match facts
   across languages, never wording.
 - **Ads have their own skill and their own brief:** `.claude/skills/ad/` — `BRAND.md` (who the
-  audience is and the four hard refusals), `STRATEGY.md` (seven angles, hooks, CTA ladder).
+  audience is and the four hard refusals), `STRATEGY.md` (ten angles, thirteen hooks, three CTAs).
   Read those before designing anything that sells. **Amir is on camera now** (2026-09-21), so
   talking-head plus b-roll is the default ad shape, not fully-generated animation.
 - He gives **blunt feedback** — normal, not a problem. Push back when something's off; fix at the source.

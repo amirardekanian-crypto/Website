@@ -74,14 +74,16 @@ units*), so the season reset is now the only way a level falls. It is reason eno
 and therefore who qualifies for a title *from here on*. Everything already minted stays
 minted, on both sides. That is the intended behaviour, not a rounding error to clean up.
 
-**Free users score on exactly these rules.** `"tier": "free"` in `data/<id>.json`
-(`isFree()` in the app) changes what the athlete can *reach* — WORKOUT stays locked and
-the programme links point at the apply form — and changes **nothing** about scoring.
-There is no free-tier multiplier, no separate ladder and no separate board, on the client
-or in Postgres; the server scores every athlete from the same `hab_log` with the same
-`xp_rules` row and does not know the tier exists. That is deliberate on both ends: the
-board is only worth topping if it is one board, and upgrading someone is then a one-field
-edit that costs them no history. See `HABITS.md` → *Two kinds of user*.
+**Free users score on exactly these rules.** The switch is `"tier": "free"` inside the
+`athlete` object of their programme record (their row in `public.programs`, read through
+`get_program()`; `isFree()` in the app). It changes what the athlete can *reach* — WORKOUT
+stays locked and the programme links point at the apply form — and changes **nothing**
+about scoring. There is no free-tier multiplier, no separate ladder and no separate board,
+on the client or in Postgres; the server scores every athlete from the same `hab_log` with
+the same `xp_rules` row and does not know the tier exists. That is deliberate on both
+ends: the board is only worth topping if it is one board, and upgrading someone is then a
+one-field edit on the same row — same id, same login, no history lost. See `HABITS.md` →
+*Two kinds of user*.
 
 ---
 
@@ -376,20 +378,22 @@ an empty log is the proof that there is no closed day to re-judge, which is the 
 the tomorrow rule protects. Full account in `HABITS.md` → *The eight habits*.
 
 Milestones keep flat values — they are one-off and genuinely hard — totalling
-**3,585 XP** across the sixteen, in three tiers (`tier` on each entry: `week`,
-`long`, `rare`; grouping only, nothing scores off it). The 1,350 that sits in `rare`
-needs 150 sessions or a 60-day water run, so it is a year of work rather than a
-windfall; the 610 in `week` is the deliberate part, because an athlete's first
-fortnight used to be worth almost nothing in one-offs and that is exactly the
-fortnight where people quit. **Seasonal events (`EVENTS`) pay no XP at all** — they
-pay a title, for the reasons in `HABITS.md`. The exception is **FIRST BLOOD** (`FB`, 50xp, one logged
+**9,585 XP** across the 32 (§4.6), in three tiers (`tier` on each entry: `week`,
+`long`, `rare`; grouping only, nothing scores off it). The 3,650 that sits in `rare`
+needs 150 sessions, 100 perfect days, 100 step days, a 60-day water run or five comebacks
+that stuck, so it is a year of work rather than a windfall; the 650 in `week` (seven
+badges) is the deliberate part, because an athlete's first fortnight used to be worth
+almost nothing in one-offs and that is exactly the fortnight where people quit.
+**Seasonal events (`EVENTS`) pay no XP at all** — they pay a title, for the reasons in
+`HABITS.md`. The exception is **FIRST BLOOD** (`FB`, 50xp, one logged
 session): every other milestone needs at least five days, so the whole section was
 unreachable for an athlete's first working week and rendered as nine greyed rows on the
 screen they open to see how they are doing. It pays the least of any of them precisely
 because it is the easiest — the ladder only stays honest while the hardest work pays most.
 Note it is WORKOUT-gated, so a free-tier athlete cannot earn it (the habit is locked and
 only a finished session in `program.html` ticks it); the same was already true of
-HEAVY METAL.
+HEAVY METAL. (This paragraph predates the marks: `DAWN PATROL I`, 40 XP, and
+`CLEAN SWEEP I`, one perfect day, are day-one badges too now — §4.6.)
 
 ⚠️ **`measureAch()` and `bonusEvents()` are the display half and the paying half of the
 same measures, and they must agree.** `daysWith3` read `live()` in the display half long
@@ -650,9 +654,16 @@ The eight-habit reasoning still holds and is kept below for the record.
 | sleep + supps | 180 | 72 | ❌ |
 | steps + supps | 170 | 68 | ❌ |
 
-**Nobody's streak got shorter when this shipped.** Verified over a 61-day log: 0 days
-stopped qualifying, 6 started. Set it to `100` to demand a perfect day, or lower to be
-kinder. This also drives the "days on target" figure in the weekly recap.
+**Nobody's streak got shorter when the weighted gate shipped at 75** — verified over a
+61-day log: 0 days stopped qualifying, 6 started. **The move back to 80 (2026-08-02) was
+different, and it is the cost of this knob:** streaks are derived, so raising the bar
+shortens them retroactively. Measured across the eleven athletes then on the board, five
+lost qualifying days and three had a shorter current day streak — the largest was Amir's
+own, 5 → 2 (the per-athlete table, anonymised, is in `HABITS.md` → *…and back to 80*).
+**Nobody lost XP, a title or a level** (checked at both thresholds): only derived streak
+counters moved, and rewards are append-only anyway. Set it to `100` to demand a perfect
+day, or lower to be kinder. This also drives the "days on target" figure in the weekly
+recap.
 
 **Both halves are scored twice**, as ever. The server mirror is
 `supabase/stage19_weighted_days.sql` — the `perday` CTE gains `wdone`/`glive`, and the `qd`
@@ -689,8 +700,8 @@ purpose**, and this section exists so nobody goes looking for the tunable that i
 
 - **No XP, on either side.** Not per reading, not per streak of readings, not as a
   milestone or a badge or a quest. There is **no `xp_rules` key** for it, because there is
-  no rule to mirror — it is the one feature in the app that cannot appear on the
-  "scored twice" table in `CLAUDE.md`.
+  no rule to mirror — it is the one feature that cannot appear on the "scored twice"
+  table in §8.
 - **It cannot move a day score.** It is not in `HABITS`, not in `live()`, not in
   `rosterOn()`, and never written to `LOG` — so `dayParts()`, `dayPct()`, `gatePct()` and
   `isPerfect()` cannot see it. Proven in the browser: writing a weight leaves
@@ -701,15 +712,21 @@ purpose**, and this section exists so nobody goes looking for the tunable that i
   today and removing lands tomorrow precisely because the day score is at stake — the
   weight toggle has no scoring consequence in either direction and no roster entry.
 
-The only numbers it has are presentational, and they live in `habits.html` alone:
-`WT_AVG_WINDOW` (7, the rolling-average window), `WT_RANGES` (7 / 30 / 90 days),
-`WT_STEP` (0.1 kg) and `WT_MIN`/`WT_MAX` (25/350 kg, sanity rails on a single reading).
-Changing any of them changes a picture, never a score, so none of them needs a server
-counterpart and none can put the board and the phone into disagreement.
+⚠️ **It is not in `habits.html` any more.** Since 2026-09-12 body weight lives in
+`program.html` (Home → Body Weight), which owns `<id>_hab_wt` outright — it writes, pushes
+and merges it, and `habits.html` must never write that key (both apps share the origin's
+localStorage). See `HABITS.md` → *Body weight — MOVED OUT*.
+
+The only numbers it has are presentational, and the live ones are `program.html`'s: a
+7-day rolling-average window (`WT_AVG_WINDOW`) and range chips of 7 / 30 / 90 days.
+`habits.html` still declares `WT_STEP`, `WT_MIN`/`WT_MAX`, `WT_RANGES` and `WT_AVG_WINDOW`,
+but only for a few leftover readers that draw nothing. Changing any of them changes a
+picture, never a score, so none of them needs a server counterpart and none can put the
+board and the phone into disagreement.
 
 ⚠️ **If a future change ever makes weight pay XP, it stops being free.** It would need a
-key on the `xp_rules` row, a branch in `hab_xp()` or `hab_bonus_xp()`, and an entry in the
-table in `CLAUDE.md` — and it would hand every athlete a scoring lever that a bathroom
+key on the `xp_rules` row, a branch in `hab_xp()` or `hab_bonus_xp()`, and a row in the
+§8 table — and it would hand every athlete a scoring lever that a bathroom
 scale, rather than any behaviour, controls. Don't.
 
 ---
@@ -882,7 +899,9 @@ and the reason to finish a season rather than coast the last fortnight.
 `supabase/stage25_season_record.sql` and prints the exact numbers that are about to be
 frozen, using the same expression the archive uses.
 
-Three traps worth knowing, all found by review before this shipped:
+The file was rewritten before it shipped, after an adversarial review of its first draft
+found 20 defects, 2 of them critical; its header documents all five traps. Three are worth
+knowing here:
 
 - ⚠️ **The archived `level` is derived from the archived `xp`**, not from
   `hab_season_level()`. That function is hard-wired to `current_season()` and
@@ -945,41 +964,89 @@ never synced.
 >
 > | Where | What | When to change it |
 > |---|---|---|
-> | `XP_RULES`, `CONSISTENCY_TIERS`, `ACHIEVEMENTS`, `QUEST_POOL` in `habits.html` | What each athlete sees in their own app | Always |
-> | the `xp_rules` table row in Supabase | What the leaderboard ranks people by | Always, at the same time |
+> | `XP_RULES` and its sibling constants (`HABITS`, `CONSISTENCY_TIERS`, `ACHIEVEMENTS`, `QUEST_POOL`, `PASS_TRACK`, …) in `habits.html` | What each athlete sees in their own app | Always |
+> | the `xp_rules` table row in Supabase, and a few SQL function bodies | What the leaderboard ranks people by | Always, at the same time |
 >
 > If you change one and not the other, athletes' own screens and the leaderboard
-> will quietly disagree.
+> will quietly disagree — the worst class of bug in this app, because nothing errors.
 
-To update the database copy, run this in the Supabase SQL editor (adjust the
-numbers to match whatever you just put in the app):
+### Everything scored twice — change both, or they disagree
+
+The Supabase copy is **one row**, `public.xp_rules where id = 1`, holding one `rules`
+object. **It has 18 keys** (read from the live row, 2026-09-26), and every one but
+`questRuns` mirrors something in `habits.html`:
+
+| `xp_rules` key | `habits.html` | What breaks if they drift |
+|---|---|---|
+| `base`, `growth` | `XP_RULES.base` / `.growth` | Levels differ between board and phone |
+| `completionBonus`, `customXp` | `XP_RULES.completionBonus` / `.customXp` | Daily XP differs |
+| `weights` | `XP_RULES.weights` | Every habit's value differs |
+| `targets` | `HABITS[].target` | What counts as "done" differs |
+| `streakQualifyPct` | `XP_RULES.streakQualifyPct` | Which days count differs — the `qualify` quest and the comeback pay on one side only |
+| `unearnable` | `HABITS[].locked` | The streak **gate** differs — a rest day counts on one side only (stage19) |
+| `gateV2` | the two-door rule in `dayQualifies()` | Which days count differs — same fallout as `streakQualifyPct` (stage22) |
+| `lapseDays`, `comebackXp`, `comebackStick` | `LAPSE_DAYS`, `COMEBACK_XP`, `COMEBACK_STICK` | **The comeback pays on one side only** (stage22) |
+| `maxCustom` | `MAX_CUSTOM` | A tampered log outscores the board (stage24) |
+| `tiers` | `CONSISTENCY_TIERS` | Badge XP differs |
+| `milestones` | `ACHIEVEMENTS` (32 rungs) | Milestone XP differs |
+| `quests` | `QUEST_POOL` | A quest pays on one side only |
+| `passTrack` | `PASS_TRACK`, plus the event titles in `EVENTS` | **The server refuses a title the app already gave** |
+| `questRuns` | — (cached on the phone as `CFG.questRuns`) | Server-only; written by `set_quests()` / `clear_quests()` |
+
+Three more mirrors live in **SQL function bodies**, not on the row:
+
+| SQL | `habits.html` | What breaks if they drift |
+|---|---|---|
+| `hab_rank_label()` — its `names` array, 5 subs a rank, 50 levels a cycle | `RANKS`, `SUBS_PER_RANK` | The board prints a different rank name from the athlete's own screen |
+| `hab_level()` — the level curve, reading `base`/`growth` off the row | `levelCost()` / `levelInfo()` | Levels differ |
+| `hab_clean_note()` — its default `p_max` of 200, which `set_day_note()` uses | `NOTE_MAX` | A roll-call line is cut at a different length; the server's cut is the one that stands |
+
+The scoring **logic** is written twice too: `bonusEvents()` / `questEvents()` /
+`comebackRuns()` against `hab_bonus_xp()`, `xpFor()` / `habitXp()` against `hab_xp()`, and
+`dayQualifies()` against the `qualday` CTE. The latest definition of `hab_bonus_xp()` and
+`hab_xp()` is currently `supabase/stage24_marks_quests_customcap.sql` (see the foot of this
+section). Changing how a badge or milestone is *counted* — not just what it pays — means
+editing both.
+
+**Not on the row, deliberately:** `dailyCap` (a client write-time clamp in `setVal()`, with
+no server equivalent — §1) and `seasonStart` / `seasonName` (the authority is
+`public.seasons`; the `XP_RULES` values are an offline fallback only — §7).
+
+Read the live row with:
+`select jsonb_object_keys(rules) from public.xp_rules where id = 1;`
+
+### Changing the database copy — merge, never rewrite
+
+Merge the keys you changed into the row, in the Supabase SQL editor:
 
 ```sql
-update public.xp_rules set rules = jsonb_build_object(
-  'base', 300,
-  'growth', 0.55,
-  'completionBonus', 1.2,
-  'customXp', 25,
-  'weights', '{"strength":100,"steps":60,"sleep":50,"fuel":40,
-               "water":30,"mobility":30,"breathe":20,"supps":20}'::jsonb,
-  'targets', '{"strength":1,"steps":10000,"sleep":7.5,"fuel":3,
-               "water":8,"mobility":1,"breathe":1,"supps":1}'::jsonb,
-  -- mirrors CONSISTENCY_TIERS
-  'tiers', '[{"days":5,"mult":0.5},{"days":10,"mult":1},{"days":20,"mult":2},
-             {"days":30,"mult":3},{"days":60,"mult":6}]'::jsonb,
-  -- mirrors ACHIEVEMENTS; `measure` strings are read exactly as the app reads them
-  'milestones', '[{"code":"FB","need":1,"xp":50,"measure":"daysHit:strength"},
-                  {"code":"RR","need":30,"xp":200,"measure":"daysHit:steps"},
-                  {"code":"IM","need":16,"xp":150,"measure":"streak:supps"},
-                  {"code":"HM","need":12,"xp":150,"measure":"streak:strength"},
-                  {"code":"HS","need":5,"xp":100,"measure":"streak:water"},
-                  {"code":"DP","need":10,"xp":75,"measure":"daysWith3"},
-                  {"code":"ZM","need":10,"xp":100,"measure":"streak:breathe"},
-                  {"code":"BA","need":10,"xp":150,"measure":"streak:sleep"},
-                  {"code":"RB","need":14,"xp":150,"measure":"streak:mobility"},
-                  {"code":"CN","need":100,"xp":500,"measure":"perfectDays"}]'::jsonb
-), updated_at = now() where id = 1;
+-- one key
+update public.xp_rules
+set rules = rules || jsonb_build_object('customXp', 25), updated_at = now()
+where id = 1;
+
+-- several keys at once
+update public.xp_rules
+set rules = rules || '{"base":300,"growth":0.55,"completionBonus":1.2}'::jsonb,
+    updated_at = now()
+where id = 1;
+
+-- one value inside an object (a single habit's weight)
+update public.xp_rules
+set rules = jsonb_set(rules, '{weights,water}', '30'::jsonb), updated_at = now()
+where id = 1;
 ```
+
+⚠️ **Never rewrite the whole object** — no `set rules = jsonb_build_object(…)`, no
+`set rules = '{…}'::jsonb`. Either one replaces all 18 keys with only the ones you typed and
+silently deletes the rest — `streakQualifyPct`, `unearnable`, `quests`, `questRuns` (every
+run ever started, and the XP athletes earned in them), `passTrack` (nothing new could mint,
+and an unminted title is refused), `gateV2`, the comeback keys, `maxCustom` and the
+32-rung `milestones` array — and the server quietly falls back to defaults for each. This
+section used to print exactly such a snippet, with ten milestones and THE CENTURION at 500.
+To change a whole array (`milestones`, `quests`, `tiers`, `passTrack`), set that one key
+with `jsonb_set(rules, '{milestones}', '[ … the complete array … ]'::jsonb)`. Count the keys
+before and after.
 
 Note `targets` as well as `weights` — the server needs targets to score partial
 progress on counter habits the same way the app does. Custom habits an athlete
@@ -1010,9 +1077,13 @@ units*.
 
 ### How the board works
 
-- **Opt-in only.** No row in `leaderboard_optin` means invisible. Athletes join
-  from the Leaderboard tab and pick their own display name (defaults to first
-  name + last initial). They can rename or leave at any time.
+- **Everyone is on it** (since 2026-09-12; it was opt-in until then). The app joins an
+  athlete itself, once, the first time it opens after their first finished workout
+  (`autoJoinBoard()`), and anyone can join by hand from Crew; no row in
+  `leaderboard_optin` still means invisible. The display name is `athlete.boardName`
+  if the programme record has one, else first name + last initial. Athletes can rename
+  or leave at any time, and leaving sticks. The full rule, including why a free
+  athlete in practice only ever joins by hand, is `HABITS.md` → *The leaderboard*.
 - **Two boards.** *This season* is the default; *past week* is a **rolling seven
   days** — today and the six before it, never reaching earlier than the season start.
   (Stage 12 fixed a mismatch here: the app was changed to say "rolling seven days"
@@ -1020,32 +1091,45 @@ units*.
   agreed only on a Sunday.)
 - **Badges score on the board too**, on the same day-of-crossing rule — so a tier
   cleared inside those seven days pays on the weekly board. See §4.5.
-- **Reading it is key-checked**, so client display names are not exposed to the
-  open internet — only real athletes see the board.
-- **No athlete IDs are ever returned.** An ID alone is enough to fetch
-  `/data/<id>.json`, which is someone's whole programme. The function returns
-  display names, points, level and rank only, plus an `is_me` flag.
+- **Reading it needs a signed-in athlete** — since 2026-09-07 the RPCs check identity
+  server-side (`current_athlete_id()`), so display names are not exposed to the open
+  internet; only real athletes see the board.
+- **No athlete IDs are ever returned.** An id is the athlete's sign-in username (and it
+  used to be enough to fetch `/data/<id>.json`, which is 404 since 2026-09-07).
+  `leaderboard_top()` returns display name, title, points, level and rank only, plus
+  `is_me` and `joined` flags.
 - Rank names and the level curve are mirrored in SQL too (`hab_rank_label`,
   `hab_level`), so renaming a rank means updating `RANKS` in `habits.html` **and**
-  the `names` array in that function.
+  the `names` array in that function (see the table above).
 
-The SQL lives in `supabase/stage9_leaderboard.sql`, with seasons in
+The SQL began in `supabase/stage9_leaderboard.sql`, with seasons in
 `stage11_seasons.sql`, bonus XP in `stage12_bonus_xp.sql` and quest runs in
-`stage14_quest_runs.sql` (which holds the current `hab_bonus_xp`) — **all applied
-and live**.
+`stage14_quest_runs.sql` — **all applied and live**, like every Proof stage through 25
+(listed in `HABITS.md` → *The leaderboard*). The folder is a changelog, not a schema: the
+live `hab_bonus_xp()` and `hab_xp()` are **the latest definition, currently
+`stage24_marks_quests_customcap.sql`**; `leaderboard_top()` was last redefined in
+`stage17_titles.sql`; and since 2026-09-07 the live board RPCs also carry a sign-in
+identity check that no file holds. Read `pg_get_functiondef()` before trusting or
+re-running any of them.
 
 ---
 
 ## 8.5 Quests — a run you start, not a standing feature
 
 Quests are a **lever**, not a background system. There are **none** unless you start a
-run, and a run lasts **seven days from the day it starts** — not Monday to Sunday. When
-it ends the block disappears from Today until you start another.
+run, and a run lasts **seven days from the day it starts** — not Monday to Sunday. The
+run is drawn on **Progress** (it moved off Today) as the event-style quest card;
+when it ends, that section falls back to one muted line until you start another.
 
 That is deliberate: an athlete seeing quests means *something is on this week*. If they
 were always there they would be wallpaper.
 
 ### 🎯 Starting a run
+
+The everyday lever is **coach.html → Today → *Quest week***: tick one to four quests from
+the pool and press *Start the week* — a dashboard run always starts **today** — and
+*Cancel this run* while one is live. The SQL below does the same job and is the way to
+back-date or future-date a run:
 
 ```sql
 select public.set_quests('2026-07-29', array['w_water5','w_steps50k','w_perfect2']);
@@ -1120,7 +1204,7 @@ stale the first time one is edited.
 |---|---|
 | `daysHit:<habit>` | Completed that habit on N separate days of the run |
 | `total:<habit>` | Accumulated N units across the run (target or not) |
-| `qualify` | N days at `streakQualifyPct` or better |
+| `qualify` | N days that pass `dayQualifies()` — `streakQualifyPct` of the day's weight **or** at most one thing left undone (the two-door gate, §6). The server's twin is the `qualday` CTE in `hab_bonus_xp()` |
 | `perfect` | N days with every tracked habit done |
 
 Everything is measured **from the log alone**, so nothing new is stored and both scorers
@@ -1142,6 +1226,14 @@ where id = 1;
 **`QUEST_POOL` in `habits.html` is the offline fallback and must be kept in step** — an
 athlete with no signal scores off it. Same rule as everything else in §8. Quest names
 follow the house rule: cool, not literal, with the plain description in `note`.
+
+⚠️ **A quest's `note` never spells out a threshold number.** `w_qualify5` read *"5 days at
+75% or better"* in **both** pools until 2026-08-02, the day the gate moved back to 80 — a
+stale bar printed on every athlete's screen, and a wrong one, since the gate also has a
+second door that no percentage describes. It now reads *"5 days on target"*, in
+`QUEST_POOL` and on the row alike. Describe a target in words (*on target*, *full water*),
+so retuning `streakQualifyPct` can never leave a note naming the old bar — and remember that
+changing the threshold means both scorers **plus** any prose that states the number.
 
 > **Careful with `xp`.** Three quests at 150–300 is 450–750 for the run, against ~2,900
 > from a perfect week of habits — a 15–25% top-up, which is the intent. Push much past
