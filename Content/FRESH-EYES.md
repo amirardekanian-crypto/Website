@@ -55,7 +55,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#248](https://github.com/amirardekanian-crypto/Website/pull/248) | This Week is built from the session history: Done pills that last the week, the right day suggested, "2 of 3 sessions done this week", updated without a reload | HOME-01 |
 | [#249](https://github.com/amirardekanian-crypto/Website/pull/249) | The weigh-in box sits under the headline number, above the chart and every reading; the trend lines read in dark mode | BW-01 |
 | [#250](https://github.com/amirardekanian-crypto/Website/pull/250) | A session is filed under the local day it was finished, one date for every save of it; a session past midnight keeps its clock, check-in, note and rating for 6 hours | DATA-02 |
-| SHEET-01 PR | The info sheet keeps a trail: ‹ Back at the top, and the phone's Back steps back a page before it closes the sheet | SHEET-01 |
+| [#251](https://github.com/amirardekanian-crypto/Website/pull/251) | The info sheet keeps a trail: ‹ Back at the top, and the phone's Back steps back a page before it closes the sheet | SHEET-01 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01.
