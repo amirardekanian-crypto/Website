@@ -48,7 +48,9 @@
 // pre-caching it.
 // v29: program.html changed (2026-09-26): a legacy circuit ("×3 Rounds", no rx) draws all its rounds
 // again. Since 2026-09-20 renderCircuit() read parseInt("×3 Rounds") as NaN and drew one round.
-const CACHE = 'aap-v29';
+// v30: program.html changed (2026-09-26): the in-app chat is gone (the Coach tab opens WhatsApp
+// instead), Home puts the training before the habits, and the last ochre and amber are clay/paper.
+const CACHE = 'aap-v30';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

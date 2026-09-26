@@ -633,21 +633,8 @@
   .prog-cycle-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 17px; letter-spacing: .03em; }
   .prog-focus { margin: 6px 0 0 18px; font-size: 13px; color: var(--muted); line-height: 1.5; }
 
-  /* Messaging (ported) */
-  .cthread { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-  .cmsg { display: flex; flex-direction: column; max-width: 80%; }
-  .cmsg.coach { align-self: flex-end; align-items: flex-end; }
-  .cmsg.ath { align-self: flex-start; align-items: flex-start; }
-  .cmsg-bubble { font-size: 14px; line-height: 1.45; padding: 9px 12px; border-radius: 13px; }
-  .cmsg.coach .cmsg-bubble { background: var(--court); color: #fff; border-bottom-right-radius: 3px; }
-  .cmsg.ath .cmsg-bubble { background: #EFEAE0; color: var(--ink); border-bottom-left-radius: 3px; }
-  .cmsg-meta { font-size: 10px; color: var(--muted); margin-top: 3px; }
-  .cmsg-tag { background: var(--clay-100); color: var(--clay); padding: 1px 6px; border-radius: 8px; font-weight: 600; }
-  .creply { display: flex; gap: 8px; }
-  .creply textarea, .session-reply textarea { flex: 1; resize: vertical; min-height: 40px; border: 1px solid var(--line);
-    border-radius: 10px; padding: 8px 10px; font-size: 14px; background: var(--paper); }
+  /* Session-note actions (Reply on WhatsApp · Mark read) */
   .note-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-  .session-reply { display: flex; gap: 8px; margin-top: 8px; }
 
   /* Import form (ported) */
   .add-session { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
@@ -812,7 +799,6 @@ function copyText(t, btn) {
   }, () => alert('Copy failed — here it is:\n\n' + t));
 }
 function isPartialStatus(s) { return String(s || '').toLowerCase().indexOf('partial') === 0; }
-function ctxLabel(ctx) { const m = String(ctx || '').match(/^session:(\d+):/); return m ? 'Day ' + m[1] : ''; }
 function sessionHasNote(s) { return !!((s.day_note && s.day_note.trim()) || (s.summary && /\n\s+Note:/.test(s.summary))); }
 function sessionNeedsReply(s) { return sessionHasNote(s) && (s.coach_status || 'new') === 'new'; }
 function sessionNoteText(s) {
@@ -831,7 +817,6 @@ const S = {
   prog: [],        // athlete_progress rows
   hist: [],        // session_history rows (full)
   keys: {},        // athlete_id -> secret_key
-  msgs: [],        // messages rows
   notes: [],       // hab_notes rows, last 7 days, hidden included
   contacts: [],    // contact_list() rows
   intake: [],      // intake_list() rows — coaching apply-form submissions
@@ -863,10 +848,9 @@ const S = {
 
 async function loadAll() {
   if (DEMO) { demoStore(); S.ready = true; return; }
-  const [prog, hist, msgs, notes, contacts, rules, seasons, titles, optin, intake, affs] = await Promise.all([
+  const [prog, hist, notes, contacts, rules, seasons, titles, optin, intake, affs] = await Promise.all([
     sb.from('athlete_progress').select('athlete_id, athlete_name, data, updated_at'),
     sb.from('session_history').select('*'),
-    sb.from('messages').select('*').order('created_at', { ascending: true }),
     sb.from('hab_notes').select('*').gte('day', addDays(todayKey(), -7)),
     sb.rpc('contact_list'),
     sb.from('xp_rules').select('rules').eq('id', 1).maybeSingle(),
@@ -876,11 +860,10 @@ async function loadAll() {
     sb.rpc('intake_list'),
     sb.from('affiliates').select('*').order('code'),
   ]);
-  const firstErr = [prog, hist, msgs, notes, rules, seasons, titles, optin].find(r => r && r.error);
+  const firstErr = [prog, hist, notes, rules, seasons, titles, optin].find(r => r && r.error);
   if (firstErr) throw new Error(firstErr.error.message);
   S.prog = prog.data || [];
   S.hist = hist.data || [];
-  S.msgs = msgs.data || [];
   S.notes = notes.data || [];
   S.contacts = (contacts && contacts.data) || [];   // RPC may be missing pre-stage16; degrade quietly
   S.rules = (rules.data && rules.data.rules) || null;
@@ -907,7 +890,6 @@ async function refetch(parts) {
   if (parts.includes('intake')) jobs.push(sb.rpc('intake_list').then(r => { if (!r.error) S.intake = r.data || []; }));
   if (parts.includes('affiliates')) jobs.push(sb.from('affiliates').select('*').order('code').then(r => { if (!r.error) S.affiliates = r.data || []; }));
   if (parts.includes('hist')) jobs.push(sb.from('session_history').select('*').then(r => { if (!r.error) { S.hist = r.data || []; assemble(); } }));
-  if (parts.includes('msgs')) jobs.push(sb.from('messages').select('*').order('created_at', { ascending: true }).then(r => { if (!r.error) { S.msgs = r.data || []; assemble(); } }));
   await Promise.all(jobs);
   render();
 }
@@ -1592,7 +1574,7 @@ function assemble() {
   const get = (id) => (map[id] = map[id] || {
     id, name: id, lastActive: null, sessions: [], finished: 0,
     habDays: {}, habLast: null, isHab: false, contact: null,
-    unreadMsgs: 0, toReply: 0,
+    toReply: 0,
   });
   S.prog.forEach(r => {
     const a = get(r.athlete_id);
@@ -1650,8 +1632,7 @@ function assemble() {
     a.needReplySessions = a.sessions.filter(sessionNeedsReply);
     a.needReplyRecent = a.needReplySessions.filter(s => s.completed_on && s.completed_on >= cut);
     a.needReplyStale = a.needReplySessions.length - a.needReplyRecent.length;
-    a.unreadMsgs = S.msgs.filter(m => m.athlete_id === a.id && m.sender === 'athlete' && !m.read_by_coach).length;
-    a.toReply = a.needReplyRecent.length + a.unreadMsgs;
+    a.toReply = a.needReplyRecent.length;
     const t = todayKey();
     a.habToday = !!a.habDays[t];
     a.hab7 = 0; for (let i = 0; i < 7; i++) if (a.habDays[addDays(t, -i)]) a.hab7++;
@@ -1730,15 +1711,18 @@ const TABS = [
   { id: 'assess', label: 'Testing app' },
   { id: 'course', label: 'Course' },
 ];
-// #a/<id> opens an athlete's file; #a/<id>/<sub> opens it on one of its five
-// screens, so any of them can be bookmarked or reloaded in place.
+// #a/<id> opens an athlete's file; #a/<id>/<sub> opens it on one of its four
+// screens, so any of them can be bookmarked or reloaded in place. A retired
+// screen's old link (/chat, removed 2026-09-26) still reads as a screen, so it
+// lands on The work instead of being taken for part of the athlete's id.
+const RETIRED_SUBS = ['chat'];
 function route() {
   const h = (location.hash || '#today').slice(1);
   if (h.startsWith('a/')) {
     const rest = h.slice(2);
     const cut = rest.lastIndexOf('/');
     const maybeSub = cut > 0 ? rest.slice(cut + 1) : '';
-    const isSub = SUBTABS.some(t => t.id === maybeSub);
+    const isSub = SUBTABS.some(t => t.id === maybeSub) || RETIRED_SUBS.includes(maybeSub);
     return { view: 'detail', id: decodeURIComponent(isSub ? rest.slice(0, cut) : rest), sub: isSub ? maybeSub : 'work' };
   }
   return { view: TABS.some(t => t.id === h) ? h : 'today' };
@@ -1909,8 +1893,9 @@ window.postCoachLine = postCoachLine;
 window.clearCoachLine = clearCoachLine;
 window.toggleHide = toggleHide;
 
-// Who needs the coach, in one list: session notes waiting on a reply, unread
-// chat messages, coached athletes gone quiet, Proof athletes gone silent.
+// Who needs the coach, in one list: session notes waiting on a reply, coached
+// athletes gone quiet, Proof athletes gone silent. (Unread chat messages left
+// with the in-app chat on 2026-09-26: athletes reach Amir on WhatsApp.)
 function needPanelHtml() {
   const items = [];
   Object.values(S.ath).forEach(a => {
@@ -1918,7 +1903,6 @@ function needPanelHtml() {
       sev: 'clay', id: a.id, n: a.name,
       s: `Day ${s.day} note: “${sessionNoteText(s)}”`, sort: 0,
     }));
-    if (a.unreadMsgs > 0) items.push({ sev: 'clay', id: a.id, n: a.name, s: `${a.unreadMsgs} unread message${a.unreadMsgs === 1 ? '' : 's'}`, sort: 1 });
   });
   Object.values(S.ath).forEach(a => {
     if (a.tier === 'coached' && a.finished > 0) {
@@ -2251,7 +2235,6 @@ window.setRosterFilter = setRosterFilter;
 function rosterReasons(a) {
   const out = [];
   if (a.needReplyRecent && a.needReplyRecent.length) out.push({ tone: 'warn', text: a.needReplyRecent.length + ' note' + (a.needReplyRecent.length === 1 ? '' : 's') + ' to reply' });
-  if (a.unreadMsgs) out.push({ tone: 'warn', text: a.unreadMsgs + ' unread message' + (a.unreadMsgs === 1 ? '' : 's') });
   if (a.tier === 'coached' && a.finished > 0) {
     const gap = daysSince(a.lastSession ? a.lastSession + 'T12:00:00' : null);
     if (gap > QUIET_SESSION_DAYS) out.push({ tone: 'note', text: 'no session for ' + gap + ' days' });
@@ -2956,12 +2939,8 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   const noteBox = (s && s.day_note) ? `<div class="daynote">
       <div class="dn-txt">“${esc(s.day_note)}”</div>
       ${sessionNeedsReply(s) ? `<div class="note-actions">
-        <button class="btn sm primary" onclick="openSessionReply('${uid}')">Reply</button>
+        <button class="btn sm primary" onclick="replyOnWhatsApp('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}', this)">Reply on WhatsApp</button>
         <button class="btn sm" onclick="markNoteRead('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Mark read</button>
-      </div>
-      <div class="session-reply" id="sr-${uid}" style="display:none">
-        <textarea id="srinput-${uid}" placeholder="Reply…"></textarea>
-        <button class="btn sm primary" onclick="sendSessionReply('${uid}', '${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Send</button>
       </div>` : '<div class="dn-read">answered</div>'}
     </div>` : '';
 
@@ -3156,7 +3135,6 @@ let _detailName = '', _detailHistory = [], _detailCallLogs = [], _D = null;
 const SUBTABS = [
   { id: 'work',  label: 'The work' },
   { id: 'proof', label: 'Proof' },
-  { id: 'chat',  label: 'Chat' },
   { id: 'calls', label: 'Calls' },
   { id: 'file',  label: 'File' },
 ];
@@ -3188,15 +3166,9 @@ async function renderDetail(athleteId, sub) {
     _workSel = {}; _workOpen = {};
     _detailName = a.name; _detailHistory = history; _detailCallLogs = _D.callLogs;
 
-    // Mark this athlete's chat read the moment the coach opens their file.
-    if (!DEMO && a.unreadMsgs > 0) {
-      sb.from('messages').update({ read_by_coach: true })
-        .eq('athlete_id', athleteId).eq('sender', 'athlete').eq('read_by_coach', false)
-        .then(() => { S.msgs.forEach(m => { if (m.athlete_id === athleteId && m.sender === 'athlete') m.read_by_coach = true; }); assemble(); renderRail(); });
-    }
   }
   _D.sub = SUBTABS.some(t => t.id === sub) ? sub : 'work';
-  const has = { proof: !!(a.isHab || a.contact), calls: true, chat: true, work: true, file: true };
+  const has = { proof: !!(a.isHab || a.contact), calls: true, work: true, file: true };
   const lv = S.levels[athleteId];
   const sub2 = [];
   if (_D.history.length) sub2.push(_D.history.length + ' session' + (_D.history.length === 1 ? '' : 's'));
@@ -3214,8 +3186,7 @@ async function renderDetail(athleteId, sub) {
       </div>
     </div>
     <div class="subrail">${SUBTABS.filter(t => has[t.id]).map(t => {
-        const n = t.id === 'chat' ? a.unreadMsgs
-                : t.id === 'work' ? a.needReplySessions.length
+        const n = t.id === 'work' ? a.needReplySessions.length
                 : t.id === 'calls' ? _D.callLogs.length : 0;
         return `<a class="stab ${_D.sub === t.id ? 'active' : ''}" href="#a/${encodeURIComponent(athleteId)}/${t.id}">${t.label}${n ? `<span class="n ${t.id === 'calls' ? 'quiet' : ''}">${n}</span>` : ''}</a>`;
       }).join('')}</div>
@@ -3229,7 +3200,6 @@ function renderDetailBody() {
   const D = _D;
   if (D.sub === 'work') box.innerHTML = workTabHtml(D);
   else if (D.sub === 'proof') box.innerHTML = proofTabHtml(D);
-  else if (D.sub === 'chat') box.innerHTML = chatTabHtml(D);
   else if (D.sub === 'calls') box.innerHTML = callsTabHtml(D);
   else box.innerHTML = fileTabHtml(D);
 }
@@ -3295,9 +3265,6 @@ function weightPanel(a) {
         + `<div class="chart-legend">${WT_AVG_WINDOW}-day rolling average, last 90 days · ${keys.length} reading${keys.length === 1 ? '' : 's'} all time</div>`
       : `<p class="empty">One reading so far — a line needs a few more.</p>`}
   </div></section>`;
-}
-function chatTabHtml(D) {
-  return sessionMsgPanel(D.athleteId, S.msgs.filter(m => m.athlete_id === D.athleteId));
 }
 function callsTabHtml(D) {
   const { athleteId, callLogs } = D;
@@ -3405,63 +3372,32 @@ function fileTabHtml(D) {
     </section>
     <div class="sec"><span>Danger zone</span></div>
     <section class="panel">
-      <p class="empty" style="padding:0 0 10px">Deletes every session, message and progress row for this athlete. The data file on disk is not touched.</p>
+      <p class="empty" style="padding:0 0 10px">Deletes every session and progress row for this athlete. The data file on disk is not touched.</p>
       <button class="btn sm danger" onclick="deleteAthlete('${esc(athleteId)}')">Delete all data</button>
     </section>`;
 }
 
-// --- coach messaging (ported) -----------------------------------------------
-function sessionMsgPanel(athleteId, msgs) {
-  const bubbles = msgs.map(m => {
-    const coach = m.sender === 'coach';
-    const tag = ctxLabel(m.context);
-    return `<div class="cmsg ${coach ? 'coach' : 'ath'}">
-      <div class="cmsg-bubble">${esc(m.body)}</div>
-      <div class="cmsg-meta">${tag ? '<span class="cmsg-tag">' + esc(tag) + '</span> · ' : ''}${coach ? 'You' : esc(_detailName)} · ${esc(timeAgo(m.created_at))}</div>
-    </div>`;
-  }).join('');
-  return `<div class="panel" style="box-shadow:none">
-    ${msgs.length ? `<div class="cthread">${bubbles}</div>` : `<p class="empty" style="padding-top:0">No conversation yet — the athlete's in-app notes land here once you reply to one.</p>`}
-    <div class="creply">
-      <textarea id="coach-msg-input" placeholder="Message ${esc(_detailName)}…"></textarea>
-      <button class="btn primary sm" onclick="coachSend('${esc(athleteId)}')">Send</button>
-    </div>
-  </div>`;
-}
-async function coachSend(athleteId) {
-  const ta = $('coach-msg-input');
-  if (!ta) return;
-  const body = ta.value.trim();
-  if (!body) return;
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const ins = await sb.from('messages').insert({ athlete_id: athleteId, sender: 'coach', body, context: null, read_by_athlete: false, read_by_coach: true });
-  if (ins.error) { alert('Could not send: ' + ins.error.message); return; }
-  await refetch(['msgs']);
-}
-function openSessionReply(uid) {
-  const el = $('sr-' + uid);
-  if (!el) return;
-  el.style.display = el.style.display === 'none' ? 'flex' : 'none';
-  const ta = $('srinput-' + uid);
-  if (ta && el.style.display !== 'none') ta.focus();
-}
-async function sendSessionReply(uid, athleteId, day, completedOn) {
-  const ta = $('srinput-' + uid);
-  if (!ta) return;
-  const reply = ta.value.trim();
-  if (!reply) return;
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const s = _detailHistory.find(x => Number(x.day) === Number(day) && x.completed_on === completedOn);
-  const noteText = s ? sessionNoteText(s) : '';
-  const ctx = 'session:' + day + ':' + completedOn;
-  const rows = [];
-  if (noteText) rows.push({ athlete_id: athleteId, sender: 'athlete', body: noteText, context: ctx, read_by_athlete: true, read_by_coach: true });
-  rows.push({ athlete_id: athleteId, sender: 'coach', body: reply, context: ctx, read_by_athlete: false, read_by_coach: true });
-  const ins = await sb.from('messages').insert(rows);
-  if (ins.error) { alert('Could not send: ' + ins.error.message); return; }
-  await sb.from('session_history').update({ coach_status: 'replied' }).eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn);
-  toast('Replied');
-  refetch(['msgs', 'hist']);
+// --- replying to a session note ---------------------------------------------
+// On WhatsApp, not in the app (Amir, 2026-09-26: "whatsapp first, remove in app
+// chat from app and coach.html"). The note is quoted so the athlete sees what the
+// reply answers. The athlete's number comes from their contact row when there is
+// one (on 2026-09-26 only 1 of 17 active coached athletes had one: their numbers
+// live in Amir's phone, not in hab_contacts). Without it WhatsApp opens with the
+// reply already typed and he picks their chat (wa.me/?text= is WhatsApp's own
+// "choose a chat" link). Either way the session is marked replied, the same flag
+// the old in-app reply set, so it leaves Waiting on you.
+async function replyOnWhatsApp(athleteId, day, completedOn, btn) {
+  const s = (_detailHistory || []).find(x => Number(x.day) === Number(day) && x.completed_on === completedOn);
+  const note = s ? sessionNoteText(s) : '';
+  const text = 'Re your Day ' + day + ' note (' + prettyDate(completedOn) + '): "' + note + '"\n\n';
+  const a = S.ath[athleteId];
+  const wa = a && a.contact && a.contact.whatsapp ? affWa(a.contact.whatsapp) : '';
+  window.open((wa || 'https://wa.me/') + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
+  if (!wa) toast('No number on file for them: pick their chat in WhatsApp, the reply is already typed');
+  if (DEMO) return;
+  const { error } = await sb.from('session_history').update({ coach_status: 'replied' }).eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn);
+  if (error) { alert('Could not update: ' + error.message); return; }
+  refetch(['hist']);
 }
 async function markNoteRead(athleteId, day, completedOn) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
@@ -3469,9 +3405,7 @@ async function markNoteRead(athleteId, day, completedOn) {
   if (error) { alert('Could not update: ' + error.message); return; }
   refetch(['hist']);
 }
-window.coachSend = coachSend;
-window.openSessionReply = openSessionReply;
-window.sendSessionReply = sendSessionReply;
+window.replyOnWhatsApp = replyOnWhatsApp;
 window.markNoteRead = markNoteRead;
 
 // --- import a past session from a coach email (ported) ----------------------
@@ -4888,9 +4822,6 @@ function demoStore() {
     mkSession('faraz_etminan', 'Faraz', 2, 30, 6, 40, 'Complete', 'No space for suitcase walks here'),
   ];
   S.keys = { pegah_hmt2: 'demo', elmira_askari: 'demo', dela_yazdani: 'demo', amir_ardekani: 'demo', faraz_etminan: 'demo', reza_jamal: 'demo' };
-  S.msgs = [
-    { athlete_id: 'elmira_askari', sender: 'athlete', body: 'Can we swap Thursday to Friday this week?', context: null, read_by_coach: false, created_at: new Date().toISOString() },
-  ];
   S.notes = [
     { athlete_id: '__coach__', day: d(1), body: 'Quest week is live — steps, train, water. Go.', hidden: false, pct: null },
     { athlete_id: 'pegah_hmt2', day: t, body: 'Im gonna enjoy my moment up top 🏆', hidden: false, pct: 95 },

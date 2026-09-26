@@ -125,6 +125,13 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`.
 - **An RPE off its target is coloured** clay (over) or steel blue (under), the one exception to "clay is the
   only accent", through `rpeVs()`/`rpeMark()` on every screen.
+- **There is no in-app chat (2026-09-26, Amir: *"whatsapp first"*).** The Coach tab opens WhatsApp
+  (`COACH_WHATSAPP`, the number the site's buy buttons use) and coach.html answers a session note on
+  WhatsApp. The `messages` table stays on the server and nothing reads it. Do not bring a chat back
+  unasked: two channels means one goes unwatched. Details in `PROGRAM-APP.md`.
+- **Home leads with the training** (This Week, then the day cards), then the Daily Habits card.
+- **No yellow, gold, ochre or amber in either app**, AA Proof's metals included (its gold tier became
+  emerald on 2026-09-26; Amir, asked whether Proof was an exception: *"fix"*).
 
 ## Working on the habit app (`habits.html`) — keep four things in sync
 Whenever you change how Proof behaves, update **all** of these in the same PR, or the
@@ -182,12 +189,14 @@ standalone ladder screen is gone; tapping the rank *or the level ring* on Today'
 opens Locker directly now — Progress dropped its own level/rank strip the same day, so
 the rank lives in exactly one place outside the Locker itself).
 
-**Ranks, titles and medals wear metal now** — `METALS` (bronze → silver → gold →
-amethyst → prismatic) is a shared visual language: `rankCrest()` draws the tier-shaped,
+**Ranks, titles and medals wear metal now** — `METALS` (bronze → silver → emerald →
+amethyst → prismatic) is a shared visual language (the third tier was **gold until
+2026-09-26**; Amir: *"fix"*, when asked whether Proof was an exception to "no yellow or
+gold, ever". It is not, and nothing in Proof may be yellow or gold again): `rankCrest()` draws the tier-shaped,
 metal-rimmed badge next to a rank name (ladder, hero, share card all call the same
 function so a rank never looks different in two places); `titlePlate()` renders an owned
 title as a metal nameplate, rarity tied to the level it unlocks at (bronze under 13,
-silver 13+, gold 21+) with **event titles and PROOF ITSELF prismatic** regardless of
+silver 13+, emerald 21+) with **event titles and PROOF ITSELF prismatic** regardless of
 level; `achMedal()`/`evMedal()` render a badge/event's own emoji in a tinted disc behind
 a metal rim (dashed and greyed while unearned). All of it is presentation over the same
 underlying data — `RANKS`, `PASS_TRACK`, `ACHIEVEMENTS`, `EVENTS` — nothing here changes

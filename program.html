@@ -184,9 +184,10 @@
 <script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
 <style>
   :root {
-    /* Primary brand = Roland-Garros green; secondary = clay; tertiary = ochre.
-       Token names kept (--yellow/--ice/--purple) so the existing refs need no
-       renaming; only their values changed for the warm-paper light theme. */
+    /* Primary brand = Roland-Garros green; the one accent = clay. There is no
+       third colour: the ochre that sat in --purple was retired with the rest of
+       the gold (2026-09-26). Token names kept (--yellow/--ice) so the existing
+       refs need no renaming; only their values changed for the warm-paper theme. */
     --yellow: #0E4A36;
     --yellow-dim: rgba(14,74,54,0.08);
     --yellow-mid: rgba(14,74,54,0.22);
@@ -203,18 +204,13 @@
        would not. Used ONLY for an RPE against its target, nowhere else. */
     --rpe-under: #3E6A92;
 
-    --purple: #A8741C;
-    --purple-dim: rgba(168,116,28,0.08);
-    --purple-mid: rgba(168,116,28,0.22);
-    --purple-glow: rgba(168,116,28,0.2);
-
     --grey-bg: #FAF7F2;
     --grey-mid: #D8D1C5;
     --grey-dark: #1A1A1A;
     --grey-card: #EDE8E0;
     --grey-text: #5C5C5C;
     --white: #FFFFFF;
-    --on-accent: #FFFFFF;  /* text/icons that sit on green/clay/ochre fills */
+    --on-accent: #FFFFFF;  /* text/icons that sit on green/clay fills */
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -617,7 +613,7 @@
   .global-tabs.is-hidden { display: none; }
 
   /* ─── HOME-ONLY: yellow-only palette ─────────────────────────────
-     Remap the ice + purple tokens to yellow ONLY inside #screen-plan,
+     Remap the ice tokens to yellow ONLY inside #screen-plan,
      so the home page reads as a single-accent design without affecting
      Program / Notes / Archive / Guide. */
   #screen-plan {
@@ -625,10 +621,6 @@
     --ice-dim:   var(--yellow-dim);
     --ice-mid:   var(--yellow-mid);
     --ice-glow:  var(--yellow-glow);
-    --purple:      var(--yellow);
-    --purple-dim:  var(--yellow-dim);
-    --purple-mid:  var(--yellow-mid);
-    --purple-glow: var(--yellow-glow);
   }
 
   /* Soft steady glow on the current cycle segment — no size change, just light. */
@@ -1013,7 +1005,7 @@
   .wl-tile { width: 60px; height: 60px; flex-shrink: 0; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; background-color: #0E4A36; background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.12) 0 9px, transparent 9px 18px), linear-gradient(135deg, #0E4A36, #156A4D); }
   .wl-tile svg { width: 26px; height: 26px; }
   .wl-tile.tone-clay  { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.13) 0 9px, transparent 9px 18px), linear-gradient(135deg, #C7552F, #d56b46); }
-  .wl-tile.tone-ochre { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.13) 0 9px, transparent 9px 18px), linear-gradient(135deg, #A8741C, #c08a2a); }
+  .wl-tile.tone-paper { color: #0E4A36; background-color: #F1ECE3; background-image: repeating-linear-gradient(135deg, rgba(14,74,54,0.07) 0 9px, transparent 9px 18px), linear-gradient(135deg, #F1ECE3, #E7E2D9); box-shadow: inset 0 0 0 1px rgba(14,74,54,0.10); }
   .wl-card-eyebrow { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-text); }
   .wl-card-cta { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ice); margin-top: 6px; }
 
@@ -1700,21 +1692,28 @@
     transition: background 0.15s ease, color 0.15s ease;
   }
 
-  /* Partial state — softer amber accent so it reads as "heads up" not "go". */
+  /* Partial state — a soft clay wash so it reads as "heads up", not "go".
+     (It was amber until 2026-09-26; the brand has no yellow or gold.) The text
+     is a deeper clay (#A8431F, 6:1 on white) because plain clay is 4.4:1. */
   .session-confirm.partial {
     flex-direction: column; align-items: stretch;
-    border-color: rgba(255,180,80,0.45);
-    background: linear-gradient(180deg, rgba(255,180,80,0.10), var(--white));
+    border-color: rgba(199,85,47,0.45);
+    background: linear-gradient(180deg, rgba(199,85,47,0.07), var(--white));
   }
-  .session-confirm.partial .confirm-text { color: #B26B00; }
+  .session-confirm.partial .confirm-text { color: #A8431F; }
   .session-confirm.partial .confirm-btn {
-    background: transparent; color: #B26B00;
-    border: 1px solid rgba(178,107,0,0.5);
+    background: transparent; color: #A8431F;
+    border: 1px solid rgba(168,67,31,0.5);
   }
   .session-confirm.partial .confirm-btn.arming {
-    background: #ffb450; color: #1a1a1a; border-color: #ffb450;
+    background: #C7552F; color: #fff; border-color: #C7552F;
     animation: armPulse 1s ease infinite;
   }
+  body[data-dark] .session-confirm.partial .confirm-text,
+  body[data-dark] .session-confirm.partial .confirm-btn,
+  body[data-dark] .session-confirm.partial .confirm-missing-tag { color: #E06B43; }
+  body[data-dark] .session-confirm.partial .confirm-btn { border-color: rgba(224,107,67,0.5); }
+  body[data-dark] .session-confirm.partial .confirm-btn.arming { color: #fff; background: #C7552F; border-color: #C7552F; }
   .confirm-missing { display: none; margin-top: 10px; }
   .session-confirm.partial .confirm-missing { display: block; }
   .confirm-missing-label {
@@ -1735,11 +1734,11 @@
   .confirm-missing-tag {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
     font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
-    color: #B26B00; white-space: nowrap;
+    color: #A8431F; white-space: nowrap;
   }
   @keyframes armPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,180,80,0.55); }
-    50%      { box-shadow: 0 0 0 8px rgba(255,180,80,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(199,85,47,0.55); }
+    50%      { box-shadow: 0 0 0 8px rgba(199,85,47,0); }
   }
 
   /* ── Timer Exercise Name ── */
@@ -3436,24 +3435,7 @@
   .notes-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 42px; color: #fff; text-transform: uppercase; line-height: 1; }
   .notes-subtitle { font-size: 12px; color: rgba(255,255,255,0.72); margin-top: 6px; font-weight: 300; }
 
-  /* ── Coach messaging (two-way) ────────────────────────────────────── */
-  .coach-thread-card { background-color: var(--white); background-image: linear-gradient(rgba(250,247,242,0.88), rgba(250,247,242,0.88)), url('court-sessions.jpg'); background-size: cover; background-position: center; border: 1px solid var(--grey-mid); border-radius: 14px; padding: 14px; margin: 0 16px 18px; }
-  .coach-thread-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px; color: var(--ice); margin-bottom: 10px; }
-  .coach-thread { display: flex; flex-direction: column; gap: 10px; }
-  .cmsg { display: flex; flex-direction: column; max-width: 84%; }
-  .cmsg.coach { align-self: flex-start; align-items: flex-start; }
-  .cmsg.mine  { align-self: flex-end;   align-items: flex-end; }
-  .cmsg-bubble { font-family: 'Barlow', sans-serif; font-size: 14px; line-height: 1.45; padding: 9px 12px; border-radius: 13px; }
-  .cmsg.coach .cmsg-bubble { background: var(--yellow); color: #fff; border-bottom-left-radius: 3px; }
-  .cmsg.mine  .cmsg-bubble { background: var(--grey-card); color: var(--grey-dark); border-bottom-right-radius: 3px; }
-  .cmsg-meta { font-size: 10px; color: var(--grey-text); margin-top: 3px; }
-  .cmsg-tag { background: var(--ice-dim); color: var(--ice); padding: 1px 6px; border-radius: 8px; font-weight: 600; }
-  .coach-reply { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--grey-mid); }
-  .coach-reply textarea { flex: 1; resize: none; border: 1px solid var(--grey-mid); border-radius: 10px; padding: 9px 11px; font-family: 'Barlow', sans-serif; font-size: 14px; background: var(--grey-bg); color: var(--grey-dark); }
-  .coach-reply button { background: var(--yellow); color: #fff; border: none; border-radius: 10px; width: 44px; font-size: 16px; cursor: pointer; flex-shrink: 0; }
   .global-tabs .nav-item { position: relative; }
-  #coach-tab-dot { position: absolute; top: 3px; left: calc(50% + 7px); width: 8px; height: 8px; border-radius: 50%; background: var(--ice); }
-  #coach-tab-dot[hidden] { display: none; }
   .note-card { background: var(--white); border-radius: 8px; margin: 0 20px 12px; overflow: hidden; border: 1px solid var(--grey-mid); }
   .note-card-header { padding: 16px 18px 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
   .note-icon { width: 32px; height: 32px; background-color: #C7552F; background-image: linear-gradient(135deg, rgba(199,85,47,0.65) 0%, rgba(199,85,47,0.5) 100%), url('court-playbook.jpg'); background-size: cover; background-position: center; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
@@ -3503,15 +3485,6 @@
     font-family: 'Space Mono', monospace; font-size: 12px;
     letter-spacing: 1px; text-transform: uppercase; color: var(--grey-text);
   }
-  .coach-status-dot {
-    width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: #1BB66B;
-    animation: coachOnlinePulse 2.4s ease-in-out infinite;
-  }
-  @keyframes coachOnlinePulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(27,182,107,0.55); }
-    50%      { box-shadow: 0 0 0 5px rgba(27,182,107,0); }
-  }
-  @media (prefers-reduced-motion: reduce) { .coach-status-dot { animation: none; } }
   body[data-dark] .coach-name { color: #f0f0f0; }
 
   /* ── Section labels ("Personal notes" / "Using the app") ── */
@@ -3521,37 +3494,42 @@
     color: var(--grey-text); margin: 26px 24px 12px;
   }
 
-  /* ── Chat composer (always visible) — pill input + round green send ── */
-  .coach-chat { margin: 14px 24px 6px; }
-  .coach-thread { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
-  .coach-composer {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--white); border: 1px solid var(--grey-mid);
-    border-radius: 999px; padding: 5px 5px 5px 18px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  /* ── Message me on WhatsApp (replaced the in-app chat, 2026-09-26) ── */
+  .coach-wa {
+    display: flex; align-items: center; gap: 14px; margin: 14px 24px 0;
+    padding: 14px 16px; min-height: 64px; border-radius: 16px;
+    background: var(--yellow); color: #fff; text-decoration: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    transition: transform 0.12s ease;
   }
-  .coach-composer textarea {
-    flex: 1; resize: none; border: none; outline: none; background: transparent;
-    font-family: 'Barlow', sans-serif; font-size: 15px; color: var(--grey-dark);
-    line-height: 1.4; max-height: 120px; padding: 9px 0;
+  .coach-wa:active { transform: scale(0.98); }
+  .coach-wa:focus-visible { outline: 2px solid var(--ice); outline-offset: 3px; }
+  .coach-wa-ico {
+    width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%;
+    background: rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center;
   }
-  .coach-composer textarea::placeholder { color: var(--grey-text); }
-  .coach-send {
-    width: 46px; height: 46px; flex-shrink: 0; border: none; cursor: pointer;
-    border-radius: 50%; background: var(--yellow); color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    transition: transform 0.12s ease, background 0.15s ease;
+  .coach-wa-ico svg { width: 22px; height: 22px; }
+  .coach-wa-txt { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+  .coach-wa-txt b {
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px;
+    text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.05;
   }
-  .coach-send:active { transform: scale(0.92); }
-  .coach-send svg { width: 20px; height: 20px; }
+  .coach-wa-txt small { font-family: 'Barlow', sans-serif; font-size: 14px; line-height: 1.3; opacity: 0.88; }
+  .coach-wa-go { font-size: 20px; flex-shrink: 0; }
+  .coach-wa-num {
+    margin: 8px 24px 0; font-family: 'Space Mono', monospace; font-size: 12px;
+    letter-spacing: 1px; color: var(--grey-text); user-select: all;
+  }
+  body[data-dark] .coach-wa { background: #14684C; }
 
   /* ── Note cards: rounder, taller radius for both note types ── */
   .note-card { border-radius: 14px; }
 
   /* Personal note card — category-banner thumbnail + dark title + green CTA */
   .note-card-row { display: flex; align-items: center; gap: 14px; padding: 14px; cursor: pointer; user-select: none; }
-  /* Brand-colour tile (green / clay / ochre) with the day-card diagonal-stripe
-     texture and the note's emoji centred — no photos, fully on-palette. */
+  /* Brand-colour tile (green / clay / paper) with the day-card diagonal-stripe
+     texture and the note's icon centred — no photos, fully on-palette. The third
+     tone was ochre until 2026-09-26; the brand has no yellow or gold. */
   .note-tile {
     width: 64px; height: 64px; flex-shrink: 0; border-radius: 10px; overflow: hidden;
     display: flex; align-items: center; justify-content: center;
@@ -3567,11 +3545,24 @@
     background-size: cover;
     background-position: center;
   }
-  .note-tile.tone-ochre {
-    background-color: #A8741C;
+  .note-tile.tone-paper {
+    color: #0E4A36;
+    background-color: #F1ECE3;
     background-image:
-      repeating-linear-gradient(135deg, rgba(255,255,255,0.12) 0 9px, rgba(255,255,255,0) 9px 18px),
-      linear-gradient(135deg, #A8741C 0%, #c08a2a 100%);
+      repeating-linear-gradient(135deg, rgba(14,74,54,0.07) 0 9px, rgba(14,74,54,0) 9px 18px),
+      linear-gradient(135deg, #F1ECE3 0%, #E7E2D9 100%);
+    box-shadow: inset 0 0 0 1px rgba(14,74,54,0.10);
+  }
+  /* In dark mode a paper tile would be the one bright square on the screen, so it
+     turns to a dark warm tile with a paper icon; still the third, distinct tone. */
+  body[data-dark] .note-tile.tone-paper,
+  body[data-dark] .wl-tile.tone-paper {
+    color: #F1ECE3;
+    background-color: #2F2B25;
+    background-image:
+      repeating-linear-gradient(135deg, rgba(241,236,227,0.06) 0 9px, rgba(241,236,227,0) 9px 18px),
+      linear-gradient(135deg, #3A352E 0%, #2A2621 100%);
+    box-shadow: inset 0 0 0 1px rgba(241,236,227,0.12);
   }
   .note-tile svg { width: 30px; height: 30px; }
   .note-card-main { flex: 1; min-width: 0; }
@@ -3591,7 +3582,7 @@
 
   /* "Using the app" cards — green icon tile + dark title (general, every client).
      These are constant app-UI icons, so they always use the brand green tile
-     (the per-note clay/ochre rotation only applies to personal notes above). */
+     (the per-note clay/paper rotation only applies to personal notes above). */
   .app-card .note-card-title { color: var(--grey-dark); }
   body[data-dark] .app-card .note-card-title { color: #f0f0f0; }
   .app-card-icon {
@@ -4242,15 +4233,17 @@
     <!-- Current cycle card (View Plan pill → My Plan, no Read more) -->
     <div id="home-cycle-wrap"></div>
 
-    <!-- Daily Habits — Proof's own Today hero. Sits ABOVE the week (Amir,
-         2026-09-12): it is the thing that changes every day, so it leads. -->
-    <div id="home-habits-wrap"></div>
-
     <!-- "This Week" header + current-week indicator (only when dates exist) -->
     <div id="home-week-wrap"></div>
 
     <!-- Day cards — each opens that day's workout -->
     <div id="day-cards-wrap"></div>
+
+    <!-- Daily Habits — Proof's own Today hero. Training comes first (2026-09-26:
+         Amir left the order to the audit's call). It sat ABOVE the week from
+         2026-09-12, and in the fortnight after, 5 of 40 athletes logged a habit
+         in a week while 16 trained, so the session leads and habits follow. -->
+    <div id="home-habits-wrap"></div>
 
     <!-- Personal Records stays below the week: it is about the training just
          above it, and it only changes when a lift moves. Body weight sits
@@ -4289,8 +4282,7 @@
     <div class="coach-hero-main">
       <h1 class="coach-name">Coach Amir</h1>
       <div class="coach-status">
-        <span class="coach-status-dot"></span>
-        <span>Online · usually replies in a few hours</span>
+        <span>Strength &amp; conditioning coach</span>
       </div>
     </div>
   </div>
@@ -4309,7 +4301,6 @@
   </button>
   <button class="nav-item" data-tab="notes" onclick="goTo('notes')">
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.6-.8L3 21l1.8-5.9A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg></span>
-    <span class="nav-dot" id="coach-tab-dot" hidden></span>
     <span class="nav-label">Coach</span>
   </button>
   <button class="nav-item" data-tab="workouts" onclick="goLibrary()">
@@ -5171,7 +5162,6 @@ function getVideoUrl(ex) {
   // Stage 2: pass the per-athlete key so keyed athletes can write.
   if (!window.IS_DEMO && !window.IS_PREVIEW) setupCloudBackup(ATHLETE_ID, DATA, effectiveKey);
   if (!window.IS_DEMO && !window.IS_PREVIEW) _replayQueue();   // replay any sessions that failed to save last time
-  if (!window.IS_DEMO && !window.IS_PREVIEW) fetchMessages();   // load coach messages → sets the Coach-tab dot
 
   if (localStorage.getItem('dark_mode')) document.body.setAttribute('data-dark', '');
 
@@ -5588,7 +5578,7 @@ function maybeWelcome() {
     '</div>' +
     '<div class="wel-sheet">' +
       '<p>' + plan + '</p>' +
-      '<p class="sub">Any questions, message me from the Coach tab.</p>' +
+      '<p class="sub">Any questions, message me on WhatsApp. The button is in the Coach tab.</p>' +
       '<button type="button" class="wel-go">See my plan</button>' +
       '<button type="button" class="wel-skip">Look around first</button>' +
     '</div>';
@@ -7008,10 +6998,10 @@ function renderNotes() {
   const notes = DATA.notes || {};
 
   // ── Personal notes (per-client, from JSON). Closed by default; tap to open.
-  //    Each card gets an on-brand colour tile (green/clay/ochre, cycled). The
+  //    Each card gets an on-brand colour tile (green/clay/paper, cycled). The
   //    note's emoji is resolved to a matching line icon via resolveIconKey() —
   //    coaches keep authoring with emoji; the app translates them. No raw emoji.
-  const TONES = ['', 'tone-clay', 'tone-ochre'];
+  const TONES = ['', 'tone-clay', 'tone-paper'];
   const personalCards = (notes.cards || []).map((card, i) => `
     <div class="note-card note-personal" onclick="toggleNote(this)">
       <div class="note-card-row">
@@ -7030,11 +7020,9 @@ function renderNotes() {
   const appCards = buildAppGuideCards();
 
   document.getElementById('notes-container').innerHTML =
-    '<div id="coach-section"></div>' +
+    coachContactHtml() +
     (personalCards ? `<div class="notes-section-label">Personal notes</div>${personalCards}` : '') +
     (appCards ? `<div class="notes-section-label">Using the app</div>${appCards}` : '');
-
-  renderCoachThread();
 }
 
 // "Using the app" — the general how-to content shown to every athlete in the
@@ -7081,7 +7069,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your current cycle, your progress, and what's coming next.</li><li><strong>My Plan</strong> — your actual training. The tabs at the top (D1, D2, D3…) switch between days; tap any exercise to open it.</li><li><strong>Coach</strong> — message me directly, read the personal notes I write you, and find this "Using the app" guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout ticks the matching habit in AA Proof.</li></ul>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training. This week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>My Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you, the button to message me on WhatsApp, and this guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout ticks the matching habit in AA Proof.</li></ul>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
   { icon: 'activity', title: 'RPE & Tempo',
@@ -7108,7 +7096,7 @@ const APP_GUIDE = [
   { icon: 'tool', title: 'Built-in tools',
     body: `<ul><li><strong>Rest timer</strong> — tap the timer icon on an exercise to start a countdown between sets.</li><li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li><li><strong>Dark mode</strong> — tap the moon button (top-right) to switch themes for low-light gym sessions.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
-    body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me right here in the app — use the message box at the top of the Coach tab.</p><p>For form-check videos, send them over WhatsApp. Either way, don't sit on something for days; quick check-ins beat long waits.</p>` },
+    body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp: the button is at the top of the Coach tab. Send form-check videos there too.</p><p>Don't sit on something for days; quick check-ins beat long waits.</p>` },
 ];
 
 function buildAppGuideCards() {
@@ -7128,81 +7116,37 @@ function buildAppGuideCards() {
 // ═══════════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════════
-//  COACH MESSAGING (two-way, coach-initiated) — athlete side
-//  Inbound notes still flow via session_history; the coach starts a thread by
-//  replying. Here the athlete reads replies and can answer back on a thread.
+//  COACH CONTACT — WhatsApp, and nothing in-app (Amir, 2026-09-26: "whatsapp
+//  first, remove in app chat from app and coach.html"). The chat had not been
+//  answered in the app since July while the Coach tab promised replies "in a few
+//  hours". public.messages and its rows stay in the database; nothing here reads
+//  or writes them any more.
 // ═══════════════════════════════════════════════════════════════════════
-let _msgs = [];
-async function fetchMessages() {
-  if (window.IS_DEMO) return;
-  const sb = _sb();
-  if (!sb || !ATHLETE_ID) return;
-  try {
-    const { data, error } = await sb.rpc('get_messages', { p_athlete_id: ATHLETE_ID, p_key: _sbKey });
-    if (error) return;
-    _msgs = data || [];
-    updateCoachDot();
-    const ns = document.getElementById('screen-notes');
-    if (ns && ns.classList.contains('active')) { renderCoachThread(); markCoachRead(); }
-  } catch (e) { /* offline — fine */ }
+const COACH_WHATSAPP = '447435363461';        // the number the site's buy buttons use
+const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
+// Pre-fills who is writing and where they are in the plan, so a message that
+// arrives cold on WhatsApp still has its context. The athlete edits it freely.
+function coachWhatsAppUrl() {
+  let text;
+  if (window.IS_DEMO) {
+    text = "Hi Amir, I'm trying the AA app demo. ";
+  } else {
+    const first = (DATA && DATA.athlete && DATA.athlete.firstName) || '';
+    const cyc = currentCycle();
+    const wk = cycleWeekInfo(cyc);
+    const where = cyc && cyc.name ? ' (' + cyc.name + (wk ? ', week ' + wk.wk : '') + ')' : '';
+    text = 'Hi Amir, it\'s ' + first + where + '. ';
+  }
+  return 'https://wa.me/' + COACH_WHATSAPP + '?text=' + encodeURIComponent(text);
 }
-function unreadFromCoach() { return _msgs.filter(m => m.sender === 'coach' && !m.read_by_athlete).length; }
-function updateCoachDot() {
-  const dot = document.getElementById('coach-tab-dot');
-  if (dot) dot.hidden = unreadFromCoach() === 0;
+function coachContactHtml() {
+  return `<a class="coach-wa" href="${esc(coachWhatsAppUrl())}" target="_blank" rel="noopener">
+      <span class="coach-wa-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.6-.8L3 21l1.8-5.9A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg></span>
+      <span class="coach-wa-txt"><b>Message me on WhatsApp</b><small>Questions, swaps, anything that hurts, form videos.</small></span>
+      <span class="coach-wa-go" aria-hidden="true">→</span>
+    </a>
+    <div class="coach-wa-num">${COACH_WHATSAPP_SHOWN}</div>`;
 }
-function ctxLabel(ctx) {
-  const m = String(ctx || '').match(/^session:(\d+):/);
-  return m ? 'Day ' + m[1] : '';
-}
-function renderCoachThread() {
-  const wrap = document.getElementById('coach-section');
-  if (!wrap) return;
-  // The composer is ALWAYS shown so the athlete can start a note anytime; any
-  // existing thread bubbles render above it.
-  const bubbles = _msgs.map(m => {
-    const mine = m.sender === 'athlete';
-    const tag = ctxLabel(m.context);
-    return `<div class="cmsg ${mine ? 'mine' : 'coach'}">
-      <div class="cmsg-bubble">${esc(m.body)}</div>
-      <div class="cmsg-meta">${tag ? '<span class="cmsg-tag">' + esc(tag) + '</span> · ' : ''}${mine ? 'You' : 'Coach'}</div>
-    </div>`;
-  }).join('');
-  wrap.innerHTML = `<div class="coach-chat">
-    <div class="notes-section-label" style="margin:6px 0 12px;">Chat with Amir</div>
-    ${_msgs.length ? `<div class="coach-thread">${bubbles}</div>` : ''}
-    <div class="coach-composer">
-      <textarea id="coach-reply-input" rows="1" placeholder="Send Amir a note…"></textarea>
-      <button type="button" class="coach-send" onclick="sendCoachReply()" aria-label="Send message">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
-      </button>
-    </div>
-  </div>`;
-}
-async function sendCoachReply() {
-  // Coach preview: the composer is on screen, but send_athlete_message accepts the
-  // coach, so a note typed here would be posted as if the athlete had written it.
-  if (window.IS_PREVIEW) return;
-  const ta = document.getElementById('coach-reply-input');
-  if (!ta) return;
-  const body = ta.value.trim();
-  if (!body) return;
-  ta.value = '';
-  const lastCtx = _msgs.length ? _msgs[_msgs.length - 1].context : null;
-  _msgs.push({ sender: 'athlete', body, context: lastCtx, read_by_athlete: true, read_by_coach: false });
-  renderCoachThread();
-  try {
-    const sb = _sb();
-    if (sb) await sb.rpc('send_athlete_message', { p_athlete_id: ATHLETE_ID, p_body: body, p_context: lastCtx, p_key: _sbKey });
-  } catch (e) { /* offline — will not retry; kept simple */ }
-}
-async function markCoachRead() {
-  if (!unreadFromCoach()) return;
-  _msgs.forEach(m => { if (m.sender === 'coach') m.read_by_athlete = true; });
-  updateCoachDot();
-  try { const sb = _sb(); if (sb) await sb.rpc('mark_athlete_read', { p_athlete_id: ATHLETE_ID, p_key: _sbKey }); } catch (e) {}
-}
-window.sendCoachReply = sendCoachReply;
 
 function goTo(screen, historyId, keepContent) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -7263,9 +7207,6 @@ function goTo(screen, historyId, keepContent) {
   // may return from a day view, which had hidden them).
   document.getElementById('global-tabs').classList.remove('is-hidden');
   document.getElementById('global-dark-toggle').classList.remove('is-hidden');
-
-  // Coach tab: show the thread and clear the unread dot
-  if (screen === 'notes') { renderCoachThread(); markCoachRead(); }
 
   window.scrollTo(0, 0);
 }
@@ -8233,7 +8174,7 @@ async function renderReadLibrary() {
     return;
   }
 
-  const TONES = ['', 'tone-clay', 'tone-ochre'];   // rotate the tile colour per category
+  const TONES = ['', 'tone-clay', 'tone-paper'];   // rotate the tile colour per category
   scroll.innerHTML = cats.map((cat, ci) => {
     const list = Array.isArray(cat.articles) ? cat.articles : [];
     const count = list.length;

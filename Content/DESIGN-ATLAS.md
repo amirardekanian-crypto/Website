@@ -165,7 +165,7 @@ is just the quick-reference.
 ## The app's look — for mockups & reels
 
 - **Default is light warm-paper**; dark mode is opt-in `body[data-dark]` (bg `#181818`, cards `#202020`). There is **no `theme-light` class** in program.html — that's stale terminology.
-- ⚠ Token names lie: in program.html `--yellow` = **green #0E4A36**, `--ice` = **clay #C7552F**, `--purple` = **ochre #A8741C** (legacy names, re-pointed values).
+- ⚠ Token names lie: in program.html `--yellow` = **green #0E4A36**, `--ice` = **clay #C7552F** (legacy names, re-pointed values). `--purple` (ochre) was deleted on 2026-09-26 with the last ochre and amber in both apps; the third tile tone is now **paper** (`tone-paper`: `#F1ECE3` with a green icon). AA Proof's METALS run bronze → silver → **emerald** → amethyst → prismatic.
 - Fonts: Barlow Condensed (all display, uppercase) · Barlow (body) · Space Mono (eyebrows/meta/timers).
 - Chrome: no top nav; bottom tab bar (Home / Coach / Library / My Plan), green icons, active gets glow.
 - Signature elements: greeting eyebrow (Space Mono clay) over giant Barlow Condensed 900 first name · cycle cards = white card, 16:9 photo banner + green scrim + "CYCLE n OF N" + pills · day cards = 5:2 banner + "DAY n" · cycle meter = 5px segments (done green, current glowing) · exercise rows = white cards w/ 3px block-coloured left stripe (warm-up/power clay, strength green) · RPE squares fill green · rest timer = full-screen ring, 96px mono · Library = Two Doors (Sessions green photo / Playbook clay photo) · article reader "Center Court" = clay drop-cap, tennis-ball bullets, clay callouts.

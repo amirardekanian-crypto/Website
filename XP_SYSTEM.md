@@ -484,7 +484,7 @@ A full-screen, game-style takeover fires for these:
 | **A rank promotion** on any habit (water crossing GRINDER 5 → OPERATOR 1) | `checkLevelUps()` | full grape |
 | **A consistency tier** cleared on any habit | `checkUnlocks()` | badge ground, metal medal |
 | **A milestone** unlocked | `checkUnlocks()` | badge ground, metal medal |
-| **A perfect day** — every tracked habit done | `checkUnlocks()` | badge ground, gold medal |
+| **A perfect day** — every tracked habit done | `checkUnlocks()` | badge ground, emerald medal (gold until 2026-09-26) |
 | **A day streak crossing a mark** — 3/7/14/21/30/50/75/100/150/200/300/365 days | `checkUnlocks()` | ember ground, a drawn flame |
 | **A weekly quest** completed (this week only) | `checkUnlocks()` | badge ground, metal medal |
 | **A reward** (title or card) unlocked | `claimRewards()` | badge ground, the plate/skin itself |

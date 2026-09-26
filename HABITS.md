@@ -49,7 +49,7 @@ The two apps are **linked both ways**:
 
 | From | To | Where |
 |---|---|---|
-| `program.html` | Proof | **Daily Habits card** on Home *and* at the end of My Plan (a plain shortcut — it shows no level or XP, because that is Proof's job) |
+| `program.html` | Proof | **Daily Habits card** on Home *and* at the end of My Plan (a plain shortcut — it shows no level or XP, because that is Proof's job). On Home it sits **below** This Week and the day cards since 2026-09-26: training leads, habits follow |
 | Proof | `program.html` | **Your training programme** card at the bottom of Today, and a row in Settings (behind the initials button) |
 
 Both are the same origin with the same PWA scope, so tapping through from an installed
@@ -1272,11 +1272,12 @@ what is **owned** (titles and skins both), so the road below stays the only plac
 thing is ever listed — nothing appears twice.
 
 Ranks, titles and medals all wear the same metal language (`METALS` in `habits.html`:
-bronze → silver → gold → amethyst → prismatic). `rankCrest()` draws a tier-shaped,
+bronze → silver → emerald → amethyst → prismatic; the third tier was gold until 2026-09-26,
+when the brand's "no yellow or gold, ever" was applied to Proof too). `rankCrest()` draws a tier-shaped,
 metal-rimmed badge for a rank — the road, the Today hero and the share card all call
 it, so a rank never looks different in two places. `titlePlate()` renders an owned title
 as a metal nameplate; rarity follows the level it unlocks at (bronze under 13, silver from
-13, gold from 21), except **event titles and PROOF ITSELF, which are always prismatic**
+13, emerald from 21), except **event titles and PROOF ITSELF, which are always prismatic**
 regardless of level. None of this changes what is earned or when — it is presentation
 over the same `PASS_TRACK`/`ACHIEVEMENTS`/`EVENTS` data.
 
