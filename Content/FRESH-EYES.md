@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**9 done · 8 partly done · 27 open**, of 44. Each was checked against the code on `main`.
+**9 done · 9 partly done · 26 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -50,6 +50,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#242](https://github.com/amirardekanian-crypto/Website/pull/242) | Proof's nudge never asks for the session it cannot tick (`sessionLeft` / `freeDone`), OPEN YOUR PROGRAMME opens the programme, "logged nothing" means nothing | PRF-04 |
 | [#243](https://github.com/amirardekanian-crypto/Website/pull/243) | The install ask waits for a finished session, says what works on that phone (no dead Install button), and Proof stops asking coached athletes for a second install | HOME-03 |
 | [#244](https://github.com/amirardekanian-crypto/Website/pull/244) | The session bar never clips the clock or wraps its label (two rows under 480 px); a day started today shows "In progress · Resume" on Home | WK-03 |
+| [#245](https://github.com/amirardekanian-crypto/Website/pull/245) | Dark mode readable (`--green-ink`/`--clay-ink` text tokens, a dark rest timer, the habits card), grey tab bar at 11 px, no label under 11 px, 44 px session rating and ⓘ | A11Y-01 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03.
 
@@ -61,6 +62,9 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **WK-03.** Done: the Guided label colour (#234), the clock never clipped and the label on one line at
   any width, and "In progress · Resume" on the day card (#244). Still open, with the session project:
   a slim session bar, and hiding the tab bar mid-session with a clear "Leave session" (needs NAV-01).
+- **A11Y-01.** The training app is done on the screens measured. Still open: AA Proof's small type and
+  its accent buttons in dark mode (3.35:1), which go with PRF-02 / DS-03; pinch-zoom in program.html
+  (`user-scalable=no`, a card change); and following the phone's dark setting (*Open calls*).
 - **HOME-02.** Training leads Home. Still open: the Today block (next session with Start or Resume),
   compact rows for habits, records and weight, and quiet empty states.
 - **SEAM-01.** Habits are ticked on Home. The full Proof app still has no way back to training,
@@ -70,7 +74,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **PLAN-01.** Game Plan still opens on the finished cycle with every card expanded, and the welcome
   still sends a new athlete to the plan instead of Day 1.
 
-**Open.** P1: WK-02, CARD-01, HOME-01, NAV-01, A11Y-01. P2: PROG-01,
+**Open.** P1: WK-02, CARD-01, HOME-01, NAV-01. P2: PROG-01,
 PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03, BW-01,
 DATA-02. P3: DS-03, CONS-01, SHEET-01, PRF-05, WK-05, LIB-01, POL-01, POL-02, DOC-01.
 
@@ -83,7 +87,8 @@ account is `PROGRAM-APP.md` → *No signal*.
 (`'on' | 'coming' | 'off'`); a coached athlete who has not trained yet is told the name they will appear
 under, can change it, and can keep off in advance. Full account: `HABITS.md` → *Who is on it*.
 
-1. **The rest of "stop the bleeding":** A11Y-01.
+1. **"Stop the bleeding" is done** (2026-09-26): REL-01, PRIV-01, CNT-01, WK-01's quick part, LOG-02, PRF-04,
+   HOME-03, WK-03's quick parts, A11Y-01 in the training app.
 2. **Foundations:** NAV-01 (Back closes the top layer), then HOME-01 (the week built from session
    history) with HOME-02's Today block.
 3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
@@ -118,6 +123,9 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
   exactly this); let the athlete mark a rest day (a new tap, and scoring on both sides: `dayQualifies()`
   and the server's copy); or read the programme's days per week and excuse that many non-training days.
   Nudge copy already treats it kindly. Amir's call; it changes both scorers.
+- **Follow the phone's dark setting (A11Y-01).** Both apps start light and switch only on a tap. Following the
+  phone by default means athletes whose phones go dark at night see the app dark without choosing it; the
+  dark theme reads properly since A11Y-01. Amir's call: it changes how the app looks for many athletes.
 - **The readiness thresholds** (amber at 2.5 or 0.75 under the athlete's last-10 average, red at 2.0
   or any answer at 1, sore at 2) are judgement calls. Review them at the eight-cycle review.
 
