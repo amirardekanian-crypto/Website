@@ -20,7 +20,7 @@ vm.createContext(chipsCtx);
 vm.runInContext(fs.readFileSync('assets/js/chips.js', 'utf8'), chipsCtx);
 
 const sandbox = { round1: n => Math.round(n * 10) / 10, window: chipsCtx.window };
-new Function('ctx', 'with (ctx) {' + code + '\nObject.assign(ctx, {parseSetLine, parseSessionLog, parseChips, compareExercise, compareDay, dayVerdict, loadSummary, rpeTarget, normEx, logIndex, rxLine});}')(sandbox);
+new Function('ctx', 'with (ctx) {' + code + '\nObject.assign(ctx, {parseSetLine, parseSessionLog, parseChips, compareExercise, compareDay, dayVerdict, loadSummary, rpeTarget, normEx, logIndex, rxLine, dayTargetC, dayDropC});}')(sandbox);
 const { parseSessionLog, parseChips, compareDay, compareExercise, dayVerdict, loadSummary } = sandbox;
 
 let pass = 0, fail = 0;
@@ -219,6 +219,42 @@ console.log('8. reps');
   const mk2 = { name: 'X', label: '✓', done: true, items: [], note: '', rounds: '', gear: '',
                 sets: [{ w: '', rpe: '', done: true, skipped: false, reps: 10 }, { w: '', rpe: '', done: true, skipped: false }] };
   is(compareExercise(rex, mk2).flags.filter(f => /under/.test(f.text)).length, 0, 'range: typed 10 and a bare tick are not short');
+}
+
+// ── 9. Today's targets (REC-2, 2026-09-26): the athlete's check-in eased the day
+console.log("9. today's targets");
+{
+  const { dayTargetC, dayDropC, rpeTarget } = sandbox;
+  is(dayTargetC(rpeTarget('8'), 1), { lo: 7, hi: 7, label: '7', written: '8' }, '8 → 7');
+  is(dayTargetC(rpeTarget('7-8'), 1).label, '6–7', 'range: one off each end');
+  is(dayTargetC(rpeTarget('6'), 1).label, '6', 'never below 6');
+  is(dayTargetC(rpeTarget('5'), 1).label, '5', 'never above what was written');
+  is(dayDropC('{"level":"amber","drop":1}'), 1, 'drop read from text');
+  is(dayDropC({ level: 'red', drop: 1, asWritten: true }), 0, 'trained as written: no drop');
+  const c = (...l) => l.map(label => ({ label }));
+  const mk = rpes => ({ name: 'X', label: '✓', done: true, items: [], note: '', rounds: '', gear: '',
+                        sets: rpes.map(r => ({ w: '', rpe: String(r), done: true, skipped: false })) });
+  const pex = { name: 'X', chips: c('3 Sets', '×5 Reps', 'RPE 8') };
+  is(compareExercise(pex, mk([5, 5, 5]), 1).flags.map(f => f.text), ['2 under target RPE'], 'judged against the day: 7');
+  is(compareExercise(pex, mk([7, 7, 7]), 1).flags.length, 0, 'on the day target: no flag');
+  const plan = { id: 1, blocks: [{ title: 'Primary', exercises: [
+    { name: 'Back Squat', chips: c('4 Sets', '×5 Reps', 'RPE 8') },
+    { name: 'Leg Curl', chips: c('3 Sets', '×10 Reps', 'RPE 7') }] }] };
+  const sess = { readiness: { level: 'red', drop: 1 }, summary: `Exercise log:
+[Primary]
+• Back Squat (✓)
+    Set 1: 100 ×5 @7 ✓
+    Set 2: 100 ×5 @7 ✓
+    Set 3: 100 ×5 @7 ✓
+    Set 4: 100 ×5 @7 ✓
+• Leg Curl (optional today)
+    Set 1: skipped
+` };
+  const { groups } = compareDay(plan, sess);
+  const rows = groups.flatMap(g => g.rows);
+  is([rows[0].tgt.label, rows[0].flags.length], ['7', 0], 'squat judged against 7 that day');
+  is([rows[1].state, rows[1].flags.map(f => f.text)], ['excused', ['optional today']], 'optional work is excused, not missed');
+  is(dayVerdict(groups), { total: 1, clean: 1, off: 0, missing: 0 }, 'excused work is out of the count');
 }
 
 console.log('\n' + (fail ? 'FAILED ' + fail + ' / ' + (pass + fail) : 'all ' + pass + ' assertions passed'));

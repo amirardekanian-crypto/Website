@@ -143,6 +143,46 @@ Amir: *"update the app in a way that it can show first week or last week"*.
   itself (`--female` is retired), and the Quality headline is a WARN reported with a recommendation.
   All of it is in COACHING-PRINCIPLES.md, with the dates.
 
+## 🌡️ Today's targets — the check-in changes the DAY, never the programme (2026-09-26)
+
+Fork 2A. Amir asked which readiness should change what; the answer is REC-2 (the rule index), and
+the app applies it. The readiness sheet used to say *"This doesn't change your plan"* while the
+sales pages promised a session that adapts, and 12 of 36 programmes already told athletes to ease
+off in their notes.
+- **The level is worked out ONCE, at the check-in** (`beginSession()` → `readinessPlan()`), and
+  stored in the same `<id>_readiness_<day>` object: `{ level: green|amber|red, sore: ''|half|skip,
+  drop, score, base, asWritten }`. The session record carries it to the server, so coach.html, the
+  email and a reload all read what the athlete was shown; nothing recomputes it later.
+  `score` (S) is the mean of sleep, energy, stress and overall; `base` (B) is the athlete's own mean
+  S over their last 10 answered check-ins, once there are 5, from `get_my_history()`'s `ready`
+  (**`supabase/stage40_history_readiness.sql`**). The old `composite` is untouched.
+- **`paintToday(day)` paints it; nothing is written but the check-in.** A banner under the timer
+  says what changed and offers **Train as written** (`setAsWritten()`, kept as `asWritten` and sent
+  with the session). Every card with an RPE shows `RPE 8 → 7 today` (the stats cell and the closed
+  pill); `data-target-today` makes the set-log and Guided colours compare against today's number.
+  Red: `redDayCore()` keeps the warm-up (`isPrepBlockTitle()`), the first exercise of the first
+  power block and of the first Primary/Strength block; the rest is tagged *Optional today*. A day
+  with no Primary block keeps the warm-up and the whole first working block. Sore: exercises whose
+  Spine entry has `impact` plyometric or landing (a name match when there is no entry) show
+  *2 of 4 sets today* with the extra rows dimmed, or *Skip today* at soreness 1; circuit items get
+  *Every other round* / *Skip today*.
+- **`dayRpe()`** is the one place a target moves: 1 off each end, never below 6, never above the
+  written number, and it does not stack with the week note (`weekNoteNow()`): the lower target wins.
+  ⚠️ **coach.html's `dayTargetC()` is its twin** (without the week note): change both.
+- **Completion follows the day.** `getDayCompletion()` does not count optional or skipped work as
+  missing, and a halved exercise asks for its halved sets, so a red day with its core done is
+  *Complete*, not *Partial*. The report tags that work `(optional today)` / `(skipped today: sore)`
+  instead of `(✓)`, and adds a `Today:` line after the check-in answers (after them on purpose:
+  coach.html's email import reads the first "sore…: n" it meets).
+- A flagged retest waits for a green day: the Records screen's retest strip says *Not today* while
+  today's check-in came back lower (and the athlete did not choose to train as written).
+- **coach.html** shows *lower day* / *short day* / *sore* on the session, prints the prescribed RPE as
+  `RPE 7 → 6 that day`, judges the sets against that, leaves excused work out of *not done*, and
+  lists **a run of low days** under Needs you: 3 of the last 5 check-ins (within 3 weeks) on a
+  lower or short day, or stress 2 or lower on 3 of 5. That run is Amir's call, never the app's.
+- Found while testing: a running session's **Guided** button was clay text on a clay fill, a blank
+  block, for the whole session. Fixed in the same change.
+
 ## 🕘 The Card Remembers — last time on every exercise (2026-09-24)
 
 Idea #5 of `/ideas` round 1, built from the brief Amir approved ("go with your suggestions"). Every

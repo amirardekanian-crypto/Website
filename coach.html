@@ -494,6 +494,7 @@
   .cmp-did { font-family: 'Space Mono', monospace; font-size: 12.5px; line-height: 1.5; }
   .cmp-did > span { display: inline-block; margin-right: 8px; }
   .did-sets.ok { color: var(--court); } .did-sets.warn { color: var(--ochre); } .did-sets.miss { color: var(--clay); }
+  .did-sets.note { color: var(--muted); }
   .did-load { color: var(--ink); }
   .did-rpe.ok { color: var(--muted); } .did-rpe.warn { color: var(--clay); font-weight: 700; } .did-rpe.note { color: var(--ochre); }
   .did-none { color: var(--muted-soft); }
@@ -1625,6 +1626,7 @@ function assemble() {
     a.lastSession = a.sessions.length ? a.sessions.map(s => s.completed_on).sort().slice(-1)[0] : null;
     // Needs both halves, so it runs here rather than in either pass above.
     a.syncGaps = syncGapsOf(a.blob, a.id, a.sessions);
+    a.lowRun = a.tier === 'coached' ? lowRunOf(a.sessions) : '';
     // Split unanswered notes at the window: `recent` is what "waiting" means
     // anywhere a count is shown; `stale` is backlog. Every note still keeps its
     // own reply buttons on the athlete's file regardless of age.
@@ -1905,6 +1907,7 @@ function needPanelHtml() {
     }));
   });
   Object.values(S.ath).forEach(a => {
+    if (a.lowRun) items.push({ sev: 'clay', id: a.id, n: a.name, s: `Run of low days: ${a.lowRun}`, sort: 1 });
     if (a.tier === 'coached' && a.finished > 0) {
       const idle = daysSince(a.lastSession ? a.lastSession + 'T12:00:00' : null);
       if (idle > QUIET_SESSION_DAYS) items.push({ sev: 'ochre', id: a.id, n: a.name, s: `No session for ${idle} days`, sort: 2 + idle / 100 });
@@ -2235,6 +2238,7 @@ window.setRosterFilter = setRosterFilter;
 function rosterReasons(a) {
   const out = [];
   if (a.needReplyRecent && a.needReplyRecent.length) out.push({ tone: 'warn', text: a.needReplyRecent.length + ' note' + (a.needReplyRecent.length === 1 ? '' : 's') + ' to read' });
+  if (a.lowRun) out.push({ tone: 'warn', text: 'run of low days' });
   if (a.tier === 'coached' && a.finished > 0) {
     const gap = daysSince(a.lastSession ? a.lastSession + 'T12:00:00' : null);
     if (gap > QUIET_SESSION_DAYS) out.push({ tone: 'note', text: 'no session for ' + gap + ' days' });
@@ -2529,6 +2533,52 @@ function rpeTarget(target) {
   const hi = m[2] ? parseFloat(m[2]) : lo;
   return { lo, hi, label: m[2] ? `${m[1]}–${m[2]}` : m[1] };
 }
+// Today's targets (program.html, REC-2, 2026-09-26). The athlete's app works the day's
+// level out at the check-in and stores it with the check-in: { level, sore, drop,
+// asWritten }. Nothing here recomputes it; it reads what the athlete was shown.
+// ⚠ dayTargetC() is dayRpe() in program.html without the week note (a session does not
+// record which week it was): 1 off each end, never below 6, never above what was written.
+function dayTargetC(t, drop) {
+  if (!t || !drop) return t;
+  const one = v => Math.min(v, Math.max(6, v - drop));
+  const lo = one(t.lo), hi = one(t.hi);
+  if (lo === t.lo && hi === t.hi) return t;
+  return { lo, hi, label: lo === hi ? String(lo) : `${lo}–${hi}`, written: t.label };
+}
+function dayDropC(rd) {
+  // Parses on its own (the check-in arrives as text or as an object), so the comparison
+  // block stays self-contained: scripts/test_coach_compare.js runs it without the page.
+  if (typeof rd === 'string') { try { rd = JSON.parse(rd); } catch (e) { rd = null; } }
+  return (rd && typeof rd === 'object' && !rd.asWritten && Number(rd.drop)) || 0;
+}
+function planLabelC(rd) {
+  if (!rd || typeof rd !== 'object' || !rd.level) return '';
+  const bits = [];
+  if (rd.level === 'red') bits.push('short day');
+  else if (rd.level === 'amber') bits.push('lower day');
+  if (rd.sore === 'half') bits.push('sore: jumps halved');
+  if (rd.sore === 'skip') bits.push('sore: no jumps');
+  if (!bits.length) return '';
+  return bits.join(' · ') + (rd.asWritten ? ' (trained as written)' : '');
+}
+// A run of low days is Amir's call, not the app's (REC-2): 3 of the last 5 answered
+// check-ins (in the last 3 weeks) on a lower or short day, or stress 2 or lower on 3 of 5.
+// Levels come from the athlete's app since 2026-09-26; older check-ins count for stress.
+const LOW_RUN_DAYS = 21;
+function lowRunOf(sessions) {
+  const cut = addDays(todayKey(), -LOW_RUN_DAYS);
+  const rs = (sessions || []).filter(s => s.completed_on && s.completed_on >= cut)
+    .sort((x, y) => String(y.completed_on).localeCompare(String(x.completed_on)))
+    .map(s => jparse(s.readiness)).filter(r => r && typeof r === 'object' && !r.skipped && r.stress != null)
+    .slice(0, 5);
+  if (rs.length < 3) return '';
+  const low = rs.filter(r => r.level === 'amber' || r.level === 'red').length;
+  const stressed = rs.filter(r => Number(r.stress) <= 2).length;
+  if (low >= 3) return `${low} of the last ${rs.length} check-ins were lower days`;
+  if (stressed >= 3) return `stress 2 or lower on ${stressed} of the last ${rs.length} check-ins`;
+  return '';
+}
+
 // Weights are free text, so only compare the ones that read as numbers and
 // show anything else verbatim rather than guessing at it.
 function loadSummary(sets) {
@@ -2545,10 +2595,10 @@ function loadSummary(sets) {
 // One prescribed exercise against its log line. Returns only what is actually
 // known. Reps are logged per set since 2026-09-24 ("×5"); older sessions have
 // none, and nothing here claims a rep count that was never recorded.
-function compareExercise(pex, logged) {
+function compareExercise(pex, logged, drop) {
   const rx = legacyRx(pex);
   const want = rx.sets ? parseInt(rx.sets, 10) : null;
-  const tgt = rpeTarget(rx.target);
+  const tgt = dayTargetC(rpeTarget(rx.target), drop);
   const c = {
     name: (pex && pex.name) || (logged && logged.name) || '', pex, rx, tgt, logged,
     state: 'none', doneSets: 0, allSets: 0, load: '', rpeMean: null, rpePer: '', repsPer: '',
@@ -2569,6 +2619,13 @@ function compareExercise(pex, logged) {
   if (reps.length) c.repsPer = reps.join(' · ');
   const touched = c.doneSets > 0 || rpes.length > 0 || sets.some(s => s.w) || logged.rounds || logged.gear;
   c.state = logged.done ? 'done' : (touched ? 'part' : 'skip');
+  // Left out because the day's check-in said so ("optional today", "skipped today: sore"):
+  // not a miss. The athlete did what the day asked.
+  if (c.state === 'skip' && /^(optional today|skipped today)/.test(logged.label || '')) {
+    c.state = 'excused';
+    c.flags.push({ tone: 'note', text: logged.label });
+    return c;
+  }
   if (c.state === 'skip') c.flags.push({ tone: 'miss', text: 'not done' });
   else if (want && c.doneSets && c.doneSets < want)
     c.flags.push({ tone: 'miss', text: (want - c.doneSets) + ' set' + (want - c.doneSets === 1 ? '' : 's') + ' short' });
@@ -2594,10 +2651,11 @@ function compareDay(programDay, session) {
   const byName = logIndex(blocks);
   const seen = new Set();
   const groups = [];
+  const drop = dayDropC(session && session.readiness);
   ((programDay && programDay.blocks) || []).forEach((b, bi) => {
     const rows = (b.exercises || []).map((pex, ei) => {
       seen.add(normEx(pex.name));
-      const row = compareExercise(pex, byName[normEx(pex.name)]);
+      const row = compareExercise(pex, byName[normEx(pex.name)], drop);
       // Where this exercise lives in the programme, so the editor can write it
       // back. Index-based rather than name-based: two blocks can hold the same
       // movement, and a rename would otherwise lose the row.
@@ -2616,7 +2674,7 @@ function compareDay(programDay, session) {
 function dayVerdict(groups) {
   let total = 0, clean = 0, off = 0, missing = 0;
   groups.forEach(g => g.rows.forEach(r => {
-    if (r.extra) return;
+    if (r.extra || r.state === 'excused') return;
     total++;
     if (r.state === 'skip' || r.state === 'none') missing++;
     else if (r.flags.length) off++;
@@ -2644,11 +2702,12 @@ function cmpCell(c) {
   const bits = [];
   // Circuits and timed pieces carry no set rows at all — "0 sets" would read as
   // a miss on work that was actually done, so those just say "done".
-  const setTxt = c.state === 'skip' ? 'skipped'
+  const setTxt = c.state === 'excused' ? c.logged.label
+    : c.state === 'skip' ? 'skipped'
     : c.want ? `${c.doneSets}/${c.want} sets`
     : c.allSets > 1 ? `${c.doneSets} sets`
     : 'done';
-  const tone = c.state === 'done' ? 'ok' : c.state === 'part' ? 'warn' : 'miss';
+  const tone = c.state === 'done' ? 'ok' : c.state === 'part' ? 'warn' : c.state === 'excused' ? 'note' : 'miss';
   bits.push(`<span class="did-sets ${tone}">${esc(setTxt)}</span>`);
   if (c.load) bits.push(`<span class="did-load">${esc(c.load)} kg</span>`);
   if (c.rpeMean != null) {
@@ -2681,7 +2740,8 @@ function cmpRowHtml(c, lib, athleteId) {
   const warn = c.pex ? Chips.audit(c.pex).concat(Chips.auditRx(c.pex)) : [];
   const rxBits = [];
   if (dose) rxBits.push(`<span class="rx-dose">${esc(dose)}</span>`);
-  if (rx.target) rxBits.push(`<span class="rx-rpe">RPE ${esc(rpeTarget(rx.target) ? rpeTarget(rx.target).label : rx.target.replace(/^@/, ''))}</span>`);
+  if (rx.target) rxBits.push(`<span class="rx-rpe">RPE ${esc(rpeTarget(rx.target) ? rpeTarget(rx.target).label : rx.target.replace(/^@/, ''))}${
+    c.tgt && c.tgt.written ? ` → ${esc(c.tgt.label)} that day` : ''}</span>`);
   const rxSub = [];
   if (rx.tempo) rxSub.push('tempo ' + esc(rx.tempo));
   (rx.extras || []).forEach(x => rxSub.push(esc(x.label)));
@@ -2920,6 +2980,8 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
     const rd = jparse(s.readiness);
     if (rd && !rd.skipped && rd.composite != null) meta.push('readiness ' + rd.composite + '/5');
     else if (rd && rd.skipped) meta.push('readiness skipped');
+    const plan = planLabelC(rd);
+    if (plan) meta.push(plan);
   }
   // Say both when both are true — a day can have work skipped AND work done at
   // the wrong dose, and only naming the worse of the two hides half the story.
@@ -3500,7 +3562,7 @@ function fmtCycleData(name, cyc, weeklies, sessions) {
   weeklies.forEach((w, i) => { L.push(`\n--- ${w.week || ('Week ' + (i + 1))} (${w.call_date || '—'}) ---`); L.push(w.summary || '(no detail saved)'); });
   L.push('\n=== LOGGED WORKOUT SESSIONS ===');
   if (!sessions.length) L.push('(No logged sessions found in the cycle window.)');
-  else sessions.forEach(s => { const rd = jparse(s.readiness); const comp = rd && typeof rd === 'object' ? rd.composite : null; L.push(`${s.completed_on} · Day ${s.day ?? '—'} · ${s.status || '—'} · RPE ${s.session_rpe ?? '—'} · ${s.duration_min ?? '—'}min${comp != null ? ' · readiness ' + comp + '/5' : ''}${s.focus ? ' · ' + s.focus : ''}${s.day_note ? ' · note: ' + s.day_note : ''}`); });
+  else sessions.forEach(s => { const rd = jparse(s.readiness); const comp = rd && typeof rd === 'object' ? rd.composite : null; const plan = planLabelC(rd); L.push(`${s.completed_on} · Day ${s.day ?? '—'} · ${s.status || '—'} · RPE ${s.session_rpe ?? '—'} · ${s.duration_min ?? '—'}min${comp != null ? ' · readiness ' + comp + '/5' : ''}${plan ? ' · ' + plan : ''}${s.focus ? ' · ' + s.focus : ''}${s.day_note ? ' · note: ' + s.day_note : ''}`); });
   return L.join('\n');
 }
 function copyDashCyclePrompt() {
