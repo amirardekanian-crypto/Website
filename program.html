@@ -1539,7 +1539,7 @@
   .v-progress {
     position: fixed; right: 0; top: 120px; bottom: 70px;
     width: 12px; background: var(--grey-mid);
-    border-radius: 6px 0 0 6px; z-index: 200; overflow: hidden;
+    border-radius: 6px 0 0 6px; z-index: 35; overflow: hidden;   /* under every overlay (POL-01) */
     display: none;
   }
   .v-progress.active { display: block; }
@@ -1587,6 +1587,9 @@
   /* Push everything below the fixed banner; park the sticky timer beneath it. */
   body.is-demo { padding-top: 44px; }
   body.is-demo .session-timer { top: 52px; }
+  /* The fixed demo banner (44 px, z 120) sat on the dark-mode button and on Guided's ✕ (POL-01). */
+  body.is-demo .global-dark-toggle { top: 58px; }
+  body.is-demo .step-overlay { top: 44px; }
   @media (max-width: 460px) {
     .demo-banner { gap: 8px; padding: 7px 10px; font-size: 11px; }
   }
@@ -4486,7 +4489,7 @@
     <div class="prog-cycle-hero" id="prog-cycle-hero" hidden></div>
     <div class="day-tabs" id="day-tabs" hidden></div>
     <div id="day-panels"></div>
-    <div class="v-progress" id="v-progress"><div class="v-progress-fill" id="v-fill"></div></div>
+    <div class="v-progress" id="v-progress" role="progressbar" aria-label="Sets done in this session"><div class="v-progress-fill" id="v-fill"></div></div>
   </div>
 
 </div>
@@ -5727,7 +5730,7 @@ const ERROR_ICONS = {
     const darkToggle = document.getElementById('global-dark-toggle');
     if (darkToggle) darkToggle.classList.remove('is-hidden');
     syncDarkToggle();
-    document.getElementById('v-progress').classList.add('active');
+    { const _dv = document.getElementById('day-view'); if (_dv && !_dv.hidden) document.getElementById('v-progress').classList.add('active'); }
 
     // Deep-link: ?workout=<id|category/slug|path.json> opens that library
     // workout immediately, while the full app stays loaded behind it. Tapping
@@ -6474,6 +6477,7 @@ function openDayView(dayId) {
   const dv = document.getElementById('day-view');
   if (ov) ov.hidden = true;
   if (dv) dv.hidden = false;
+  document.getElementById('v-progress').classList.add('active');
   // The day view carries its own .day-view-dark button — hide the global one.
   const gToggle = document.getElementById('global-dark-toggle');
   if (gToggle) gToggle.classList.add('is-hidden');
@@ -6504,6 +6508,7 @@ function closeDayView() {
   const dv = document.getElementById('day-view');
   if (dv) dv.hidden = true;
   if (ov) ov.hidden = false;
+  document.getElementById('v-progress').classList.remove('active');
   paintWeek();
   // Back on a nav screen — bring the global dark-mode toggle back.
   const gToggle = document.getElementById('global-dark-toggle');
@@ -7558,17 +7563,6 @@ function handlePlayVideo(url) {
   window.open(url, '_blank');
 }
 
-// Builds the cues toggle that sits at the bottom of the card (in the rest area).
-// Compact summary "Coaching Cues" + chevron; expands to colored-text cues.
-function renderCues(cues) {
-  if (!cues || (!cues.good?.length && !cues.bad?.length)) return '';
-  let body = '';
-  (cues.good || []).forEach(c => { body += `<span class="cue good">${esc(c)}</span>`; });
-  (cues.bad  || []).forEach(c => { body += `<span class="cue bad">${esc(c)}</span>`; });
-  const summary = `<summary><svg class="chev" viewBox="0 0 10 10"><path d="M3 1 L7 5 L3 9"/></svg>Coaching Cues</summary>`;
-  return `<details class="cues">${summary}<div class="cue-body">${body}</div></details>`;
-}
-
 // Round cues — same yellow/red accent-line design as standard exercise cues.
 // Always visible inside the expanded circuit (no collapse).
 function renderRoundCues(cues) {
@@ -7788,7 +7782,9 @@ function coachContactHtml() {
 function goTo(screen, historyId, keepContent) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + screen).classList.add('active');
-  document.getElementById('v-progress').classList.toggle('active', screen === 'home');
+  // The rail is the open day's progress: only in a day view (POL-01; it sat on the overview too).
+  const _dv = document.getElementById('day-view');
+  document.getElementById('v-progress').classList.toggle('active', screen === 'home' && !!_dv && !_dv.hidden);
 
   // Home tab always lands on the overview (not a previously opened day view).
   if (screen === 'home') closeDayView();
@@ -7835,7 +7831,8 @@ function goTo(screen, historyId, keepContent) {
 
   // Update the global tab bar's active button. The Ceiling is reached from
   // Home, so that tab stays lit while you are inside it.
-  const litTab = (screen === 'ceiling' || screen === 'weight') ? 'home' : screen;
+  // Every screen lights the tab it belongs to (POL-01: Workout, Article and Archive lit none).
+  const litTab = ({ ceiling: 'home', weight: 'home', workout: 'workouts', article: 'workouts', archive: 'plan' })[screen] || screen;
   document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
     n.classList.toggle('active', n.dataset.tab === litTab);
   });
@@ -8895,122 +8892,8 @@ async function renderPlaybook() {
   _playbookRendered = true;
 }
 
-// ── TRAIN: free workouts ──
-let _trainLibLoaded = false;
-async function renderTrainLibrary() {
-  if (_trainLibLoaded) return;
-  _trainLibLoaded = true;
-  const scroll = document.getElementById('wl-scroll-train');
-  if (!scroll) return;
-
-  let manifest;
-  try {
-    const res = await fetch('workouts/index.json', { cache: 'no-cache' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    manifest = await res.json();
-  } catch (e) {
-    _trainLibLoaded = false;
-    scroll.innerHTML = `<div class="wl-empty">Couldn't load workouts. Check your connection and try again.</div>`;
-    return;
-  }
-
-  const cats = manifest.categories || [];
-  if (!cats.length) {
-    scroll.innerHTML = `<div class="wl-empty">No workout categories yet — check back soon.</div>`;
-    return;
-  }
-
-  scroll.innerHTML = cats.map(cat => {
-    const list = Array.isArray(cat.workouts) ? cat.workouts : [];
-    const count = list.length;
-    const countLabel = count + ' ' + (count === 1 ? 'Workout' : 'Workouts');
-    const banner = `
-      <div class="wl-banner" style="background-image:url('${esc(cat.banner || '')}')" role="button" tabindex="0" onclick="toggleLibCat(this,'wl-scroll-train')">
-        <span class="wl-banner-chev" aria-hidden="true">▾</span>
-        <div class="wl-banner-row">
-          <div class="wl-banner-title">${esc(cat.title)}</div>
-          <div class="wl-banner-count">${countLabel}</div>
-        </div>
-      </div>`;
-    const body = count
-      ? list.map(w => `
-          <div class="wl-card" role="button" tabindex="0" data-file="${esc(w.file || '')}" onclick="openWorkout(this.dataset.file)">
-            <div class="wl-card-thumb"></div>
-            <div class="wl-card-body">
-              <div class="wl-card-title">${esc(w.title || '')}</div>
-              <div class="wl-card-meta">${esc(w.duration || '')}${w.duration && w.equipment ? ' · ' : ''}${esc(w.equipment || '')}</div>
-            </div>
-            <div class="wl-card-play" aria-hidden="true">▶</div>
-          </div>`).join('')
-      : `<div class="wl-coming">Your coach is adding ${esc((cat.title || '').toLowerCase())} workouts — check back soon.</div>`;
-    return `<div class="wl-group">${banner}<div class="wl-group-body">${body}</div></div>`;
-  }).join('');
-}
-
-// ── READ: blog articles ──
-let _readLibLoaded = false;
-async function renderReadLibrary() {
-  if (_readLibLoaded) return;
-  _readLibLoaded = true;
-  const scroll = document.getElementById('wl-scroll-read');
-  if (!scroll) return;
-
-  let manifest;
-  try {
-    const res = await fetch('articles/index.json', { cache: 'no-cache' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    manifest = await res.json();
-  } catch (e) {
-    _readLibLoaded = false;
-    scroll.innerHTML = `<div class="wl-empty">Couldn't load articles. Check your connection and try again.</div>`;
-    return;
-  }
-
-  const cats = manifest.categories || [];
-  if (!cats.length) {
-    scroll.innerHTML = `<div class="wl-empty">No articles yet — check back soon.</div>`;
-    return;
-  }
-
-  const TONES = ['', 'tone-clay', 'tone-paper'];   // rotate the tile colour per category
-  scroll.innerHTML = cats.map((cat, ci) => {
-    const list = Array.isArray(cat.articles) ? cat.articles : [];
-    const count = list.length;
-    const countLabel = count + ' ' + (count === 1 ? 'Article' : 'Articles');
-    const tone = TONES[ci % TONES.length];
-    const icon = window.ICON(window.resolveIconKey(cat.icon || 'note'));
-    const banner = `
-      <div class="wl-banner" style="background-image:url('${esc(cat.banner || '')}')" role="button" tabindex="0" onclick="toggleLibCat(this,'wl-scroll-read')">
-        <span class="wl-banner-chev" aria-hidden="true">▾</span>
-        <div class="wl-banner-row">
-          <div class="wl-banner-title">${esc(cat.title)}</div>
-          <div class="wl-banner-count">${countLabel}</div>
-        </div>
-      </div>`;
-    const body = count
-      ? list.map(a => `
-          <div class="wl-card" role="button" tabindex="0" data-file="${esc(a.file || '')}" onclick="openArticle(this.dataset.file)">
-            <div class="wl-tile ${tone}">${icon}</div>
-            <div class="wl-card-body">
-              <div class="wl-card-eyebrow">${esc(cat.title || '')}</div>
-              <div class="wl-card-title">${esc(a.title || '')}</div>
-              <div class="wl-card-cta">Read${a.readMins ? ' · ' + esc(String(a.readMins)) + ' min' : ''} →</div>
-            </div>
-          </div>`).join('')
-      : `<div class="wl-coming">Your coach is adding ${esc((cat.title || '').toLowerCase())} articles — check back soon.</div>`;
-    return `<div class="wl-group">${banner}<div class="wl-group-body">${body}</div></div>`;
-  }).join('');
-}
-
-// Shared accordion toggle — scoped to whichever scroll container called it.
-function toggleLibCat(banner, scrollId) {
-  const group = banner.closest('.wl-group');
-  if (!group) return;
-  const wasOpen = group.classList.contains('open');
-  document.querySelectorAll(`#${scrollId} .wl-group.open`).forEach(g => g.classList.remove('open'));
-  if (!wasOpen) group.classList.add('open');
-}
-window.toggleLibCat = toggleLibCat;
+// (renderTrainLibrary, renderReadLibrary, toggleLibCat and renderCues were removed on
+// 2026-09-26, POL-01: nothing had called them since the Library became three doors.)
 
 // ── OPEN ARTICLE (single article reader) ──
 async function openArticle(file) {
@@ -10203,7 +10086,7 @@ function confirmSession(day) {
   // recordSessionToCloud() above already told the server this session happened.
   // The habit tracker reads that record itself — this app writes nothing into
   // Proof's space — so all we do here is say so.
-  if (!window.IS_DEMO) {
+  if (!window.IS_DEMO && !window.IS_PREVIEW) {   // nobody's habit ticked in a demo or a preview (POL-01)
     const tick = document.getElementById('habit-tick-' + day);
     if (tick) {
       tick.hidden = false;

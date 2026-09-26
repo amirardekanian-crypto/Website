@@ -102,7 +102,9 @@
 //      (one date for every save of it), and a session running past midnight keeps its clock and check-in.
 // v53: program.html changed (2026-09-26, SHEET-01): the info sheet keeps a trail, with a ‹ Back and the
 //      phone's Back stepping back a page before it closes.
-const CACHE = 'aap-v53';
+// v54: program.html changed (2026-09-26, POL-01): the side rail only in a day view and under the overlays,
+//      every screen lights its tab, the demo banner clears the dark toggle and Guided's ✕, dead code gone.
+const CACHE = 'aap-v54';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

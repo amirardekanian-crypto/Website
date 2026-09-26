@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**12 done · 11 partly done · 21 open**, of 44. Each was checked against the code on `main`.
+**12 done · 12 partly done · 20 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -56,6 +56,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#249](https://github.com/amirardekanian-crypto/Website/pull/249) | The weigh-in box sits under the headline number, above the chart and every reading; the trend lines read in dark mode | BW-01 |
 | [#250](https://github.com/amirardekanian-crypto/Website/pull/250) | A session is filed under the local day it was finished, one date for every save of it; a session past midnight keeps its clock, check-in, note and rating for 6 hours | DATA-02 |
 | [#251](https://github.com/amirardekanian-crypto/Website/pull/251) | The info sheet keeps a trail: ‹ Back at the top, and the phone's Back steps back a page before it closes the sheet | SHEET-01 |
+| [#252](https://github.com/amirardekanian-crypto/Website/pull/252) | Polish: the side rail only in a day view, under the overlays and labelled; every screen lights its tab; the demo banner clears the dark toggle and Guided's ✕; no AA Proof line in the coach preview; four dead functions gone | POL-01 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01.
@@ -75,6 +76,9 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
   (← for screens, ✕ top-right for overlays, drag or tap outside for sheets).
 - **DATA-02.** Local dates and the midnight grace are done. Still open: an unfinished day (ticks, never
   finished) is never recorded or cleaned up (*Open calls*), and the sweep runs at launch only.
+- **POL-01.** Swept. Still open: the rest screen still lets the card show through faintly (97%), the
+  Quality sheet's "How we measure it" names tests athletes never meet (Amir's words to change), and
+  returning from a Library session resets the scroll.
 - **HOME-02.** Training leads Home. Still open: the Today block (next session with Start or Resume),
   compact rows for habits, records and weight, and quiet empty states.
 - **SEAM-01.** Habits are ticked on Home. The full Proof app still has no way back to training,
@@ -85,7 +89,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
   still sends a new athlete to the plan instead of Day 1.
 
 **Open.** P1: WK-02, CARD-01. P2: PROG-01,
-PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03. P3: DS-03, CONS-01, PRF-05, WK-05, LIB-01, POL-01, POL-02, DOC-01.
+PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03. P3: DS-03, CONS-01, PRF-05, WK-05, LIB-01, POL-02, DOC-01.
 
 ## Next, in order
 
