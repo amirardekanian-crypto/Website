@@ -57,8 +57,11 @@ Testing app and Course tabs work the same way. `demo` is named explicitly as
 public inside `get_program()` so the marketing link still opens.
 
 **The coaching pipeline writes to the server.** It may still produce a local
-`data/<id>.json` as a working artifact, but that file is never published — it goes up via
-coach.html → Athletes → **↑ Publish programme file**. Day-to-day changes (sets, reps, RPE,
+`data/<id>.json` as a working artifact, but that file is never published as a file: a new cycle
+goes up in ONE call to **`public.publish_cycle()`** (`supabase/stage38_publish_cycle.sql`, 2026-09-26:
+archive, cycle advance, workouts, notes, roadmap patch and the coaching-log splice, all or nothing,
+returning the fingerprint), or by hand through coach.html → Athletes → **↑ Publish programme file**.
+Execute is revoked from anon and authenticated. Day-to-day changes (sets, reps, RPE,
 tempo, rest, the coach's note) are made in the dashboard's inline editor, which writes
 straight to `programs` and keeps the previous version in `program_versions`.
 

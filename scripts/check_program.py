@@ -961,18 +961,9 @@ def fingerprint(data, athlete_id):
     leaves.sort(key=lambda p: p[0].encode('utf-8'))
     s = '\n'.join(p + '=' + t for p, t in leaves)
     print(f"local: {hashlib.md5(s.encode('utf-8')).hexdigest()}  {len(leaves)} leaves  {sum(len(t) for _, t in leaves)} chars")
-    keys = ','.join(f"'{k}'" for k in KEYS if k in data)
-    print(f"""-- The server's, computed the same way. The two lines must match exactly.
-with recursive walk(path, val) as (
-  select k, p.data->k from public.programs p, unnest(array[{keys}]) k where p.athlete_id = '{athlete_id}'
-  union all
-  select w.path || '/' || c.k, c.v from walk w cross join lateral (
-    select e.key as k, e.value as v from jsonb_each(case when jsonb_typeof(w.val) = 'object' then w.val else '{{}}'::jsonb end) e
-    union all
-    select (a.idx - 1)::text, a.value from jsonb_array_elements(case when jsonb_typeof(w.val) = 'array' then w.val else '[]'::jsonb end) with ordinality a(value, idx)) c)
-select md5(string_agg(path || '=' || (val #>> '{{}}'), E'\\n' order by path collate "C")) as fp, count(*) as leaves,
-       sum(length(val #>> '{{}}')) as chars
-from walk where jsonb_typeof(val) not in ('object', 'array');""")
+    # The server computes the same walk (JSON nulls skipped, as here) in public.programme_fingerprint(),
+    # stage38; publish_cycle() returns it too. The two lines must match exactly.
+    print(f"-- The server's, the same walk:\nselect public.programme_fingerprint('{athlete_id}');")
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])

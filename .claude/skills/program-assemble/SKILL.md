@@ -343,8 +343,8 @@ Persist the **COACHING LOG ENTRY** from /program-design — the coach-only recor
 cycle looks the way it does (the read, decisions, ledger changes, the volume tables, the special
 weeks).
 ⚠️ **The record is the `public.coaching_logs` row, not a file.** Coach-only, read from
-coach.html → athlete → File; Step 7 (*The coaching log goes to the server too*) has the
-splice. Read it with `select body from coaching_logs where athlete_id = '<id>'`. The old
+coach.html → athlete → File; Step 7's `publish_cycle()` writes it (the profile, the ledger and the
+new entry, in the same call as the programme). Read it with `select body from coaching_logs where athlete_id = '<id>'`. The old
 `.claude/coaching-log/` folder (and the README it named) is gone: it was git-tracked in this
 PUBLIC repo, world-readable, which is exactly why the log moved; never re-create it in git.
 The athlete app never reads the log. The entry template is /program-design's COACHING LOG ENTRY.
@@ -375,10 +375,9 @@ The athlete app never reads the log. The entry template is /program-design's COA
   right after the header and before the Exercise Ledger, **replacing** the old one (like the
   ledger, it is current state, not history; each cycle's entry says what changed and why). A log
   that has none yet (every athlete before 2026-09-26) gets it inserted there, at that athlete's
-  next cycle, never in a bulk write. Splice, don't retype: replace the text between
-  `## Athlete profile` and the next section heading or the ledger's `| Exercise` header row with
-  `substring()`, then check the
-  rest of the body's md5 is unchanged. The format, one `key: value` per line (made-up values):
+  next cycle, never in a bulk write. `publish_cycle()` does the splice (`p_log_profile`): it replaces
+  the old block in place, or adds the first one under `## Athlete profile` before the ledger, and
+  moves nothing else. The format, one `key: value` per line (made-up values):
   ````
   ## Athlete profile
   ```profile
@@ -465,77 +464,55 @@ the Supabase MCP (`execute_sql`) and tell him it is live. `data/<id>.json` stays
 gitignored scratch artifact — useful to lint and diff against, never the deliverable, and
 never committed.
 
-**The payload is ~30 KB of JSON. One giant `update … set data = '<whole thing>'` is the
-wrong shape** — it is a wall of text to get exactly right in one shot and there is no way to
-localise a mistake. Publish in stages, one top-level key per statement, verifying between:
+**One call publishes the whole cycle: `public.publish_cycle()`** (`supabase/stage38_publish_cycle.sql`,
+2026-09-26; Amir: yes to *"publish a cycle in one database call instead of several approval
+prompts"*). It replaced a staged publish of about six calls, each an approval prompt. In one
+transaction, all or nothing, it:
+- builds the finished cycle's archive entry **from the live row** (never from your file), puts it FIRST
+  in `programHistory` with `"id": "prog<N>"`, and advances `currentCycleIndex` (`p_new_cycle => true`);
+- writes the new `workouts` and `notes`; merges `p_cycle_patch` into the cycles it names (this cycle's
+  `message`/`focuses`/`weekNotes`, the next one's `teaser`, and exactly what `roadmap_amend:` names,
+  PRC-17); takes a whole roadmap (`p_cycles`) only when the row has none; sets `sport` if given;
+- refuses to change the `athlete` block, to replace a roadmap that exists, or to patch a cycle that
+  isn't there, with a message saying which;
+- splices the coaching log: `p_log_profile` replaces the ```` ```profile ```` block in place (or adds it
+  under `## Athlete profile`, before the ledger), `p_log_ledger` replaces the Exercise Ledger table, and
+  `p_log_section` is appended; a first log comes whole in `p_log_new`. Nothing else in the body moves;
+- returns the programme's content fingerprint and the log's md5 and length. The version trigger keeps
+  ONE snapshot of the old row (`program_versions` holds only the last 20 per athlete).
 
-1. **`programHistory` + `currentCycleIndex` — derive the archive SERVER-SIDE.** Do NOT emit
-   it. The live row still holds the OLD `workouts`, so build the history entry from it with
-   `jsonb_agg` over `days → blocks → exercises` (`detail` = the dose read off `rx`, e.g.
-   `4 × 6 · RPE 7` — or the old chip labels joined with ` · ` on a row not yet migrated,
-   or `rounds` for a circuit), give it `"id": "prog<N>"` (N = the finished cycle's number),
-   put it FIRST (`jsonb_build_array(entry) || coalesce(data->'programHistory', '[]')`, never
-   append), and bump `currentCycleIndex` in the same statement. This is strictly better than sending your local copy: the archive
-   is then provably what the athlete actually had, not what your file says they had.
-2. **`jsonb_set(data,'{workouts}', $W$…$W$::jsonb)`** — the new cycle's days.
-3. **`jsonb_set(data,'{notes}', …)`**, plus `{cycles,N}` for the current cycle's
-   `message`/`focuses`/`weekNotes` and `{cycles,N+1,teaser}`. These fit comfortably in one call.
-   **`cycles[]` changes only as the spec says** (PRC-17): this cycle's `message` and `weekNotes`,
-   a gate line PRC-12 adds to its `focuses`, the next cycle's `teaser`, and exactly what the spec's
-   `roadmap_amend:` lines name. Nothing else in the roadmap moves.
+**Build the call with a script written by the Write tool, then run it verbatim** (never in a Bash
+heredoc: Git Bash halves backslashes, and a `regexp_replace(…, '×\1 Rounds')` once arrived as a control
+character). Take every payload from the finished local `data/<id>.json` and the log entry, dollar-quote
+each with a tag it does not contain, and count control characters in the generated file first:
+```sql
+select public.publish_cycle(
+  p_athlete_id  => '<id>',
+  p_workouts    => $W$<data/<id>.json → workouts>$W$::jsonb,
+  p_notes       => $N$<… → notes>$N$::jsonb,
+  p_new_cycle   => true,
+  p_cycle_patch => $P${"<N>": {"message": {…}, "focuses": […], "weekNotes": {…}}, "<N+1>": {"teaser": {…}}}$P$::jsonb,
+  p_sport       => $S${"badge": "…"}$S$::jsonb,
+  p_log_section => $C$## Cycle NN — …$C$,
+  p_log_profile => $F$```profile … ```$F$,
+  p_log_ledger  => $L$| Exercise | Status | Last cycle | Note |…$L$);
+```
+`<N>` is the NEW `currentCycleIndex` (the old one + 1). **A new athlete** (intake left a row with only
+`athlete` and `sport`): `p_new_cycle => false`, `p_cycles => <the whole roadmap>`, and `p_log_new =>` the
+first log (header, `## Athlete profile`, the empty Exercise Ledger, `## Roadmap — <date>` with the exit
+tests and rationale) instead of the profile and ledger arguments.
 
-**New athlete (no `workouts` on the row yet).** Skip 7.1: there is nothing to archive and the
-index stays 0. The row may hold only `athlete` and `sport` from intake, or not exist at all, and
-`jsonb_set(data, '{cycles,N}', …)` does NOTHING on a path that is not there. So write the
-missing keys by merging, not by path: `update programs set data = data || jsonb_build_object(
-'currentCycleIndex', 0, 'cycles', $C$…$C$::jsonb, 'workouts', $W$…$W$::jsonb, 'notes', $N$…$N$::jsonb)`
-(or `insert` the whole object when there is no row), then verify every key is present.
-
-**Dollar-quote everything** (`$W$ … $W$`) and check the payload does not contain your tag.
-Apostrophes are everywhere in athlete-facing copy and single-quoting will shred it.
-
-**Generate each statement with a script written by the Write tool, then read it back and run
-it verbatim.** Never build SQL inside a Bash heredoc: Git Bash halves backslashes there, and a
-`regexp_replace(…, '×\1 Rounds')` arrived as a control character (caught before it ran,
-2026-09-26). Count control characters in the generated file before running it.
-
-**Never touch the `athlete` block.** Assert `athlete.id` and the names are unchanged after
-every statement — a `jsonb_set` on the wrong path rewrites identity silently. (An old file
-may still carry a dead `athlete.key`; it authorises nothing and can simply go.)
-
-**The version trigger does the backup for you.** `programs_version_trg` snapshots the row
-into `program_versions` on every update, so the pre-publish state is preserved automatically
-and a staged publish simply leaves a few extra versions behind. Harmless — do not try to
-avoid it, and do not hand-roll a backup.
-
-### Verify with a CONTENT FINGERPRINT, not `md5(data::text)`
-`jsonb` reorders keys (by length, then bytewise), so the server's text hash can never match
-your local file's. Instead compute the same canonical string on both sides and compare —
-walk days → blocks → exercises in array order and join `type · name · rx fields (or chip
-labels, on a row not yet migrated) · setup · intent · rounds · note · test · cues.good ·
-cues.bad · circuit items`; do the same for `notes.cards` and the
-cycle `focuses`/`paragraphs`/`outcomes`. `jsonb_array_elements(...) with ordinality`
-preserves array order, so the SQL and the Python agree. Compare md5 AND length. Anything
-less than this is not verification — a `jsonb_set` that silently wrote a string where an
-object belonged still looks fine to a row-count check.
-**Don't hand-write it: `python3 scripts/check_program.py data/<id>.json --fingerprint`** prints
-the local fingerprint (md5, leaves, characters) AND the exact SQL that computes the server's the
-same way (every leaf with its path, sorted bytewise). Run that SQL once; the two lines must
-match. Proven 2026-09-25 on a live programme: the same md5, 509 leaves and 19,004 characters on
-both sides.
+**Verify from its answer, not with more calls.** Its `fingerprint` must equal
+`python3 scripts/check_program.py data/<id>.json --fingerprint` (md5, leaves and characters: the same
+walk over athlete, sport, currentCycleIndex, cycles, workouts and notes), and the log must say
+`"section_at_end": true`. A mismatch means a payload was not what the file holds; fix it and run the
+call again on the NEW-cycle row with `p_new_cycle => false` (the cycle has already advanced).
+`select public.programme_fingerprint('<id>')` re-reads the row any time.
 
 **`get_program()` will fail for you with `invalid athlete key`. That is correct.** The RPC
 fails closed and the MCP connection is neither an athlete session nor a signed-in coach.
 It reads `public.programs`, so a verified row IS what the app serves. Confirm the row, not
 the RPC.
-
-### The coaching log goes to the server too
-`public.coaching_logs` (`athlete_id, body, updated_at`), coach-only, read from coach.html →
-athlete → File. Same problem, same trick: **splice, don't retype.** Replace the ledger block
-between the header rule and the first `\n---\n` with `substring(body from 1 for <pos>) || …
-|| substring(body from <pos>)`, then append the new `## Cycle NN` section with `body || $C2$…$C2$`.
-The C1 prose is never re-emitted, so it cannot be corrupted. Here the local file and the DB
-are both plain text, so a straight `md5(body)` comparison IS valid — use it.
 
 - Summarise the diff (cycle advanced N→N+1, days, swaps) and confirm both the programme row
   and the coaching-log row verified.
