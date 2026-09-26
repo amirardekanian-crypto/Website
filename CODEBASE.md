@@ -145,7 +145,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
     cosmetic.
   - **The cycle half exists because day ids restart at 1-2-3 every cycle** and nothing clears these
     on a cycle advance. Publishing a new cycle on a day the athlete had already trained used to
-    leave the new cycle's day wearing a Done pill it never earned (Behnam, 2026-09-05). Only
+    leave the new cycle's day wearing a Done pill it never earned (an athlete's report, 2026-09-05). Only
     *display* keys off the cycle; the midnight sweep in `autoResetStaleDays()` still keys off the
     **date alone** (`completedDate`), so a mismatch never destroys data that has not aged out.
   - **Legacy bare-date stamps are adopted into the current cycle on boot**, not treated as foreign
@@ -157,7 +157,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   `session_history` row the coach dashboard is built from) and a Web3Forms email. Either can fail
   alone. A failed `save_session` queues in `<id>_csq` and retries on a later app open, which may
   never come before the next cycle — so the coach's inbox can hold a session the dashboard has no
-  row for, silently (Behnam, 2026-09-05). Two guards now: `sendSession()` re-runs the cloud save
+  row for, silently (the same athlete's report, 2026-09-05). Two guards now: `sendSession()` re-runs the cloud save
   **and drains the queue** right after the email succeeds (proof the network is up), and
   `coach.html`'s `syncGapsOf()` flags any athlete whose `<id>_sent_d<N>` has no matching
   `session_history` row, as a *needs you* reason on the roster.
@@ -177,7 +177,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   from `aa_athlete_id`, the athlete who last signed in on this browser, whenever a session exists — and
   Amir's coach sign-in counts as one. A stale value (his own test of a new athlete's login leaves one,
   and `coach.html` never clears it) replaced `?client=`, so every *View their app* opened the same wrong
-  athlete: Ehsan's opened Elmira's. In preview the URL now wins and the identity lookup is skipped.
+  athlete: one athlete's button opened another's app. In preview the URL now wins and the identity lookup is skipped.
   `habits.html` never had this — it asks the server who the session is on every load, and for the coach
   that answer is empty.
 - **`habits.html` had the same hole, in six places** (fixed 2026-09-13, same review pass). Their
@@ -324,7 +324,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **If deleted:** No menu. No footer. No video pop-ups. No mobile nav. The site looks unfinished and bare.
 - **Depends on:** `partials/nav.html`, `partials/footer.html`.
 - **Edit this when:** You want to change how the video pop-up or "install app" prompt behaves.
-- ⚠️ **The video pop-up embeds from `www.youtube.com`, on purpose — do not "restore" `youtube-nocookie.com`.** (2026-09-20.) It is the small play button on circuit items; standard exercises play through `loadInlineVideo()` in `program.html`, which always used `www.youtube.com`. In Iran the cookieless nocookie player gets YouTube's "sign in to confirm you're not a bot" wall while the other one plays on the same phone (Ehsan reported exactly that split). Keep the two players on the same host, and keep `privacy.html` §2.6 in step. The Farsi course app (`tennis/app/app.js`, built in the private `tps-content` repo) still uses nocookie and could show the same wall to buyers in Iran.
+- ⚠️ **The video pop-up embeds from `www.youtube.com`, on purpose — do not "restore" `youtube-nocookie.com`.** (2026-09-20.) It is the small play button on circuit items; standard exercises play through `loadInlineVideo()` in `program.html`, which always used `www.youtube.com`. In Iran the cookieless nocookie player gets YouTube's "sign in to confirm you're not a bot" wall while the other one plays on the same phone (an athlete in Iran reported exactly that split). Keep the two players on the same host, and keep `privacy.html` §2.6 in step. The Farsi course app (`tennis/app/app.js`, `ytId()`) moved to `www.youtube.com/embed` as well on 2026-09-23 (`FARSI-PRODUCTS.md`).
 - **Don't touch:** Unless you're comfortable with JavaScript. This is the most fragile file to edit by hand.
 
 #### `assets/js/fa-nav.js` — The phone menu on the Farsi pages

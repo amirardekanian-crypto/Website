@@ -77,7 +77,7 @@ cards in the demo claimed "REST 2m" while every `restSec` in it was `null` — a
 back squat shown as identical, and a Pallof press told to sit for two minutes. Omit `rest` and
 there is no rest cell; the timer button stays, labelled *Rest timer*.
 
-⚠ **`rxOf()` / `repCount()` / `tempoWords()` EXIST TWICE** — inline in `program.html` (the offline
+⚠ **`rxOf()` / `repCount()` / `tempoDisplay()` EXIST TWICE** — inline in `program.html` (the offline
 PWA, deliberately self-contained) and in `assets/js/chips.js` (which `coach.html` loads). Drift
 means the coach's dashboard and the athlete's phone show different prescriptions for the same
 exercise and **nothing errors**. `scripts/check_rx.js` runs fixtures through both copies and is in

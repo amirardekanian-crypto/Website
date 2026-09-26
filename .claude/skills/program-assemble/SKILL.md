@@ -51,8 +51,8 @@ prescription as DATA (`rx`), and design's dose fields already ARE that data — 
 copies them, it does not render them. There is no chip formatting left to get wrong.
 
 **2a — Structure.** `workouts.label` = `Program 0N · <Cycle Name>`; `workouts.days[]` from
-the spec. Each exercise → `type` + `rx` (+ `setup`/`intent`/`note` where the spec has them);
-circuits → `rounds` + `items[]`. **Write NO `cues`, on any exercise or circuit item** (Amir,
+the spec. Each exercise → `type` + `rx` (+ `intent`/`note` where the spec has them; never `setup`, CHP-1);
+circuits → `rx.rounds` + `items[]`. **Write NO `cues`, on any exercise or circuit item** (Amir,
 2026-09-24: *"the aim is to use these cues for all the exercises that everyone has from now on"*).
 The app draws every card's cues from its Spine entry, circuit items included (SCHEMA "`exId` and
 the Spine"). Something only this athlete needs arrives as engage's Coach's Note (`note`), never
@@ -64,8 +64,9 @@ Leave `videoUrl` out: the app plays the card's Spine entry's video (found by `ex
   / ballistic / loaded carry → `"standard"`; working or prep circuit → `"circuit"`; warm-up
   `simple` item (bike, mobility drill) → `"simple"`.
   **A superset/complex is always `"circuit"`** — if the spec pairs two (or more) exercises as
-  a superset, the whole pair becomes ONE circuit block: shared `name` + `rounds` + `restSec`,
-  each paired exercise its own `items[]` entry (`detail: "×N · RPE N"` — no per-item tempo).
+  a superset, the whole pair becomes ONE circuit block: one `name` and `rx: {rounds, rest, rpe}` (one RPE for
+  the whole round, SES-13), each paired exercise its own `items[]` entry with its own `rx`
+  (`{"reps": N}`), no per-item tempo or RPE.
   **Never** render a superset pair as two separate `"standard"` exercises each carrying a
   `superset` chip — that shipped once (all 4 days of one cycle): it broke the shared rest (each
   exercise got its own independent rest timer instead of alternating) and left no visual

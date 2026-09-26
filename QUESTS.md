@@ -30,8 +30,8 @@ select public.set_quests('2026-08-03', array['w_steps50k','w_train3','w_water5']
 **Why this set** (Amir picked it after the 27 Jul run was reviewed). The previous week
 ran `NO NEGOTIATION` + `LIGHTS OUT` — supplements and sleep, the two cheapest,
 purely self-reported habits in the pool (`supps` carries the *lowest* weight of all
-eight, 20). Elmira cleared both and took the board on **+320 quest XP** while walking
-**500 steps a day** and never once finishing her water; Pegooli, who led base XP by 447,
+eight, 20). One athlete (F below) cleared both and took the board on **+320 quest XP** while walking
+**500 steps a day** and never once finishing her water; athlete A, who led base XP by 447,
 finished third. Nothing was miscalculated — both scorers agreed to the XP — but a 140 XP
 quest sitting on a 24 XP/day box is a 7× multiplier on the easiest thing in the app,
 against 2.5× on `w_train3`. **When picking a set, check the multiplier against the
@@ -44,12 +44,12 @@ seven days, for sizing:
 | | steps | sessions | full-water days |
 |---|---|---|---|
 | Amir | 68,000 | 3 | 7 |
-| Pegooli | 51,500 | 2 | 6 |
-| Nillish | 40,500 | 4 | ~4 |
-| Dela | 39,500 | 1 | 0 |
-| Pooya | 22,000 | 2 | 1 |
-| Mehraneh | 16,500 | 1 | 1 |
-| Elmira | 2,500 | 5 | 0 |
+| Athlete A | 51,500 | 2 | 6 |
+| Athlete B | 40,500 | 4 | ~4 |
+| Athlete C | 39,500 | 1 | 0 |
+| Athlete D | 22,000 | 2 | 1 |
+| Athlete E | 16,500 | 1 | 1 |
+| Athlete F | 2,500 | 5 | 0 |
 
 ⚠️ 50k, not 70k: **nobody** cleared 70,000 steps that week — Amir topped the board at
 68,000 — so `THE LONG WAY ROUND` would have gone unclaimed by everyone. A quest no one

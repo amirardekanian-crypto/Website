@@ -29,7 +29,7 @@ A single row sets the context for the whole call:
 
 | Field | What it does |
 |---|---|
-| **Athlete · Program** | Dropdown of your athletes. When someone has more than one program file (e.g. `mhrn_zhr1` *and* `mhrn_zhr2`), the option shows **— P1 / — P2** so you know which block you're logging against. A badge underneath spells out the exact file (`mhrn_zhr2.json`). |
+| **Athlete · Program** | Dropdown of your athletes. When someone has more than one program file (e.g. `jane_doe1` *and* `jane_doe2`), the option shows **— P1 / — P2** so you know which block you're logging against. A badge underneath spells out the exact programme (`jane_doe2`). |
 | **Week** | Plain **1–6** picker — which week of the cycle this call is. |
 | **Cycle** | Plain **1–6** picker — which cycle of the program. *(This is the tag the end-of-cycle report groups by — §7.)* |
 | **Date** | Defaults to today. |
@@ -38,7 +38,7 @@ A single row sets the context for the whole call:
 
 **Where the athlete list comes from:** the roster (`programs`) plus anyone who has
 synced progress (`athlete_progress`). The friendly name comes from their synced data;
-before they've synced you'll see their id (e.g. `mhrn_zhr2`) instead of a name — that's
+before they've synced you'll see their id (e.g. `jane_doe2`) instead of a name — that's
 expected. (It used to read `athlete_keys`, which has been empty since the secret links
 were retired, so anyone who had a programme but had not yet synced silently vanished
 from the dropdown.)

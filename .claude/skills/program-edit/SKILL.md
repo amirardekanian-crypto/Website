@@ -199,7 +199,8 @@ Format:
 ```
 STRUCTURAL
 - Day 1 Movement Drills block: remove (forward skip, lateral step-touch — gym session)
-- Day 3 core exercises (dead bug, bird dog) in prep circuit: move to end
+- Day 3 plank and Pallof press in the prep circuit: move to the Core block (a dead bug that
+  primes the brace may stay in prep, Rule 2)
 
 VOLUME — the checker's --tables file, as written (per exercise, per muscle, per-day load)
 → Glutes 22: over 20. Chest 3: under by design (posture, VOL-9)

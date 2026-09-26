@@ -275,8 +275,8 @@ wording the coaches' panel reviewed on the 20 new sessions. *Lightheaded* was wr
 | Swollen calf | If one calf is swollen, warm or tender and you didn't strain it playing, see a doctor the same day. | any session that stretches or rolls the calf |
 | Lightheaded | Dizzy, or pins and needles in your hands or face? Stop counting and breathe normally. Never do breath holds in water or while driving. | box breathing and any breath hold |
 
-**Check before publishing:** every exercise `good: [2], bad: [1]`, every note one
-sentence, `intro` present and about 100–150 words, `before` present with no warning also repeated in the intro.
+**Check before publishing:** every exercise resolves to an approved Spine entry with cues (a new
+session writes no `cues`), every note one sentence, `intro` present and about 100–150 words, `before` present with no warning also repeated in the intro.
 
 ### ⚠️ `countsAs` is required — decide it, don't omit it
 
@@ -367,14 +367,15 @@ Before committing:
 - `file` path in the manifest exactly matches the file you created
 - Every `standard` exercise has `rx.sets` and exactly one dose
   (`reps` / `time` / `distance` / `work`)
-- No dose hiding in `intent` or `setup` — `intent` is a grip or ONE intention, `setup` is kit/position,
-  and a grip is never in `setup` (Amir, 2026-09-25: a grip is a chip, never free text)
+- No dose hiding in `intent`, and no `setup` at all — `intent` is a grip or ONE intention, any other
+  detail is the `note` (Amir, 2026-09-25: a grip is a chip, never free text; no floating text)
 - No `chips[]` anywhere, and no `chips` left beside an `rx`
 - Circuits use `rx.rounds` (a NUMBER) and `rx.rest`; items take their own `rx` when the dose is
   plain and keep free-text `detail` only when the wording says more than a number
 - **`node scripts/check_rx.js` passes** — it audits every `rx` in the library and is in the
   pre-commit hook anyway
-- Every exercise `good: [2], bad: [1]`, every `note` one sentence, `intro` present (about 100–150 words)
+- Every exercise resolves to an approved Spine entry (no `cues` on a new session), every `note` one
+  sentence, `intro` present (about 100–150 words)
 - `before` present on anything with load or speed, and no warning repeated between it and the intro
 - `countsAs` is set deliberately
 

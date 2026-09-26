@@ -831,7 +831,7 @@ Nothing needs migrating by hand:
 
 #### Where the code lives
 
-`rxOf()` / `repCount()` / `tempoWords()` exist **twice**: inline in `program.html` (the
+`rxOf()` / `repCount()` / `tempoDisplay()` exist **twice**: inline in `program.html` (the
 offline PWA, deliberately self-contained) and in `assets/js/chips.js` (loaded by
 `coach.html`). ⚠ **Change both.** `scripts/check_rx.js` runs fixtures through both copies
 and fails on any difference; it is in `.githooks/pre-commit`. `assets/js/chips.js` also

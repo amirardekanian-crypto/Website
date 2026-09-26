@@ -10,9 +10,10 @@ The brand *why* lives in [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) — read the two
 (Known clashes are listed in [Open flags](#open-flags--for-amir) below.)
 
 **Newest-taste references** (imitate these, not older files):
-[`carousel-warmup-tennis.html`](carousel-warmup-tennis.html) for carousels ·
-[`reel-5-system.html`](reel-5-system.html) (scene-swap) + [`reel-4-app.html`](reel-4-app.html)
-(App-as-Product phone) for reels · [`../index-fa.html`](../index-fa.html) for web.
+[`carousel-period-training.html`](carousel-period-training.html) for carousel chrome (its copy is English;
+new decks are Farsi) · [`reel-8-course.html`](reel-8-course.html) + [`reel-7-course.html`](reel-7-course.html)
+(Farsi ads) and [`reel-6-system.html`](reel-6-system.html) (scene-swap motion) for reels ·
+[`reel-4-app.html`](reel-4-app.html) (App-as-Product phone) · [`../index-fa.html`](../index-fa.html) for web.
 
 ---
 
@@ -22,6 +23,7 @@ The brand *why* lives in [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) — read the two
 |---|---|
 | Palette | green `#0E4A36` · green-2 `#156A4D` · **clay `#C7552F` = THE one accent** · clay-2 `#E06B43` (accent text on dark) · paper `#FAF7F2` · paper-2 `#F1ECE3` · ink `#1A1A1A` · ink-2 `#5C5C5C` · hairline `#E7E2D9` · good `#1F7A4D` / bad `#C0392B` (✅/❌ semantic only) · stage/room `#0c0f0b→#16161A` radial |
 | Banned | **Yellow/gold — retired, never returns** (not even on green). No second accent. |
+| Language | **Farsi for all new social content** (Amir, 2026-09-21; `.claude/skills/ad/BRAND.md` §6): Vazirmatn, RTL, no uppercase or letter-spacing, Persian numerals. English only when he asks. Barlow stays for app screens and Latin numerals. |
 | Fonts | Farsi = **Vazirmatn** 400–900 · Latin display & numerals = **Barlow Condensed** 700–900 (*italic* only for the wordmark) · app/phone UI = **Barlow** · EN-site body = DM Sans · app mono = Space Mono · EN-site labels = JetBrains Mono. All Google Fonts (needs internet; base64-embed woff2 for true offline). |
 | Farsi hard rules | never `letter-spacing` (breaks cursive joining) · no UPPERCASE · Persian numerals «۰۱۲» · `direction:ltr` on counters, KPIs, handles, phone mock-ups |
 | Motion | house ease `cubic-bezier(.16,1,.3,1)` everywhere |
@@ -50,6 +52,7 @@ Never reuse anything in the right column, even though old files still contain it
 | Flat green/paper canvases + film grain ~.05 (no blend-mode) | Clay "stadium-lamp" glow background (tried, rejected; dead `--lx/--ly` tokens remain in kit) |
 | Logo only via Bio-slide photo + AA PERFORMANCE card | AA monogram/seal chips in slide chrome ("messy") |
 | Clay-2 `#E06B43` accents on dark | Gold `#E9B949` (reels 1–3 predate the rule) |
+| Farsi social content (2026-09-21) | English-only social (the 2026-07-02 directive); shipped English work stays as built |
 | Mantra without «کامل»/comma | «یه نقشه‌ی کامل…», «یه مربی، تو جیبت» (still in kit line ~1612 + reels 2–4) |
 | Library "Two Doors" (Sessions green / Playbook clay) | Read\|Train segmented control (dead CSS in program.html) |
 | Cycle-name system ("Cycle 2 of 5 · Strength Engine") | "Program 02 · Month Two" |
@@ -86,7 +89,7 @@ Never reuse anything in the right column, even though old files still contain it
 
 ## Recipe: carousel (IG 4:5, 1080×1350)
 
-- **Build with** the [`/carousel` skill](../.claude/skills/carousel/SKILL.md); templates + chrome = [`Carousel-Kit.html`](Carousel-Kit.html) (23 `tpl-*` classes: cover, myth, big, heatmap, rules, stat, quote, compare, list, cta, feature, journey, result, checklist, index, step, split, define, qa, diagram, formula, schedule, bio). **Current best output / newest chrome reference: [`carousel-period-training.html`](carousel-period-training.html)** (EN, base64) — supersedes `carousel-warmup-tennis.html` for chrome mechanics (see the pagination/ball/eyebrow bullet below); warmup-tennis is still fine as a template-variety reference (list, stat, rules-with-player-photo).
+- **Build with** the [`/carousel` skill](../.claude/skills/carousel/SKILL.md); templates + chrome = [`Carousel-Kit.html`](Carousel-Kit.html) (23 `tpl-*` classes: cover, myth, big, heatmap, rules, stat, quote, compare, list, cta, feature, journey, result, checklist, index, step, split, define, qa, diagram, formula, schedule, bio). **Current best output / newest chrome reference: [`carousel-period-training.html`](carousel-period-training.html)** (EN, base64) — supersedes `carousel-warmup-tennis.html` (deleted 2026-07-31; `build_warmup_en.py` rebuilds it) for chrome mechanics (see the pagination/ball/eyebrow bullet below); warmup-tennis is still fine as a template-variety reference (list, stat, rules-with-player-photo).
 - **Chrome (current, 2026-07-06):** header = clay dot + handle (unchanged) · **footer pagination is gone — a huge translucent background page-number (`ghost-num`, one per slide, ~460–640px) tells you which slide you're on instead** · swipe hint «Swipe →» slide 1 only, no dots · inset frame `.30`/dark · grain `.06` dark / `.045` light · **eyebrow is a solid hard-corner "stamp-tag" box** (white/paper bg + black text on dark/photo slides; dark-green bg + paper text on light/paper slides) — replaces the old thin chip-B dash-line eyebrow.
 - **Backgrounds:** dark slide = **black-blend** gradient (`rgba(10,10,10,.30→.88)`, moodier than the old green-tinted wash) over base64 court photo; light slide = flat paper. **Every green- or clay-toned slide keeps the real court photo behind it — never a flat color.** One **plain tennis-ball image** (no path/arc) per slide, placed once in clear negative space — the dashed rally-arc is retired.
 - **Ball placement is deliberately scattered, not formulaic (2026-07-06, Amir: "completely random... maybe even funny places").** Don't default to "float it beside the highlighted word" on every slide — that reads as a template. Vary corner/edge per slide across the deck: peeking half-cropped off the top edge or a corner (the canvas's own `overflow:hidden` crops it — a nice "flying in" effect), resting on a rule/border line, tucked top-left on one slide and bottom-right on another, etc. A few degrees of rotation (`transform:rotate(Ndeg)` on the plain `<img>`, confirmed html2canvas-safe when it's not standing in for position/centering) adds a tumbled, un-arranged feel. The one hard constraint: never over text.

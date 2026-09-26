@@ -42,25 +42,20 @@ Never use a plain `INSERT` for imports. Always the `insert ... on conflict ... d
 form above. (Two *different* days on the same date, or the same day on two different
 dates, are correctly kept as separate rows.)
 
-## Athlete name → id map (file rows under the right id)
+## Athlete name → id (file rows under the right id)
 
-| Name in email | athlete_id |
-|---|---|
-| Lemuel Cassidy | `lem_cass1` |
-| Pooya Pasandideh | `pooya_pnd2` |
-| Pegah Hemmati | `pegah_hmt2` |
-| Mehraneh Zohourian | `mhrn_zhr2` |
-| Mehrnaz Khadem | `Mhrnz_khdm2` |
-| Dela Yazdani | `dela_yazdani` |
-| Juan Galbete | `juan_glbt` |
-| Ghazal Pakbaten | `ghazal_pakbaten` |
+The server is the one map: look the name up in `public.programs` (every athlete's row carries
+their name), never in a list kept in this public repo.
 
-Retired duplicate ids, all **deleted 9 Aug 2026** — if one turns up in an old email,
-file the session under the live id in the table above, never re-create these:
-`pooya_pasandideh`, `pooya_pnd1`, `pegah_hemmati`, `Pegah_hmt1`, `Mhrnz_khdm1`,
-`mhrn_zhr1`.
-For a new athlete, the id is whatever their secure link uses (`?client=<id>`), which
-must match a `data/<id>.json` program file.
+```sql
+select athlete_id, data->'athlete'->>'firstName' as first, data->'athlete'->>'lastName' as last
+from public.programs order by 2;
+```
+
+Some athletes once had duplicate ids; the duplicates were **deleted on 9 Aug 2026**. If an old
+email names an id the query above doesn't return, file the session under the athlete's live id and
+never re-create the old one. Sign-in is by username and password since 2026-09-07, so there are no
+secure links to read an id from.
 
 ## Procedure
 
