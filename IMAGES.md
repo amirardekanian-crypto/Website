@@ -80,7 +80,7 @@ text safe zone for every image — is the artifact at
 Superseded by section 0 on 2026-09-19. Kept because the public homepages still
 load one of these files. The app no longer reads this folder.
 
-The image at the top of each cycle card on the **My Plan** page.
+The image at the top of each cycle card on the **Game Plan** page.
 
 - **Aspect ratio:** 16:9 (the banner is locked to 16:9, so the whole image shows
   identically on every device).

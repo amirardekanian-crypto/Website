@@ -24,7 +24,7 @@ idea gets pitched for a feature that already shipped. Line numbers drift, so sea
 
 ## program.html (coached athletes)
 
-Home (cycle card, this week, day cards, Ceiling/Weight/Habits cards) · My Plan (cycle meter, current
+Home (cycle card, this week, day cards, Ceiling/Weight/Habits cards) · Game Plan (cycle meter, current
 cycle message + outcomes, future teasers) · session view (blocks, exercise cards with rx grid, tempo,
 video, cues, set log, rest timer, Guided mode, readiness modal, finish + completion card) · The
 Ceiling (e1RM per lift, retest window for `test` lifts, + Log a max) · Body weight · Coach tab (chat
