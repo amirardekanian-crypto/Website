@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**9 done · 10 partly done · 25 open**, of 44. Each was checked against the code on `main`.
+**10 done · 10 partly done · 24 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -52,9 +52,10 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#244](https://github.com/amirardekanian-crypto/Website/pull/244) | The session bar never clips the clock or wraps its label (two rows under 480 px); a day started today shows "In progress · Resume" on Home | WK-03 |
 | [#245](https://github.com/amirardekanian-crypto/Website/pull/245) | Dark mode readable (`--green-ink`/`--clay-ink` text tokens, a dark rest timer, the habits card), grey tab bar at 11 px, no label under 11 px, 44 px session rating and ⓘ | A11Y-01 |
 | [#246](https://github.com/amirardekanian-crypto/Website/pull/246) | The phone's Back closes the top layer in the training app (one guard entry, `topLayer()` reads the page) instead of leaving the app | NAV-01 |
+| [#248](https://github.com/amirardekanian-crypto/Website/pull/248) | This Week is built from the session history: Done pills that last the week, the right day suggested, "2 of 3 sessions done this week", updated without a reload | HOME-01 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01.
 
 **Partly done, and what is still open on each:**
 - **WK-01.** The quick part is done. Still open: kg on the rest screen beside reps and RPE, the live row
@@ -78,7 +79,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **PLAN-01.** Game Plan still opens on the finished cycle with every card expanded, and the welcome
   still sends a new athlete to the plan instead of Day 1.
 
-**Open.** P1: WK-02, CARD-01, HOME-01. P2: PROG-01,
+**Open.** P1: WK-02, CARD-01. P2: PROG-01,
 PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03, BW-01,
 DATA-02. P3: DS-03, CONS-01, SHEET-01, PRF-05, WK-05, LIB-01, POL-01, POL-02, DOC-01.
 
@@ -93,8 +94,7 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 
 1. **"Stop the bleeding" is done** (2026-09-26): REL-01, PRIV-01, CNT-01, WK-01's quick part, LOG-02, PRF-04,
    HOME-03, WK-03's quick parts, A11Y-01 in the training app.
-2. **Foundations:** HOME-01 (the week built from session
-   history) with HOME-02's Today block.
+2. **Foundations:** HOME-02's Today block (HOME-01, the week from history, is done).
 3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
    Confirm the card freeze with Amir first (below).
 4. **Home and progress:** REC-01 (the estimate off the card), PROG-01, PLAN-01, BW-01, DATA-02.

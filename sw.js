@@ -94,7 +94,9 @@
 //      layer (a sheet, the rest timer, Guided, a screen, the day) instead of leaving the app.
 // v49: habits.html changed (2026-09-26, NAV-01): the phone's Back button closes AA Proof's top layer (a
 //      sheet, Settings a step at a time, a tab) instead of leaving the app; never in the embedded strip.
-const CACHE = 'aap-v49';
+// v50: program.html changed (2026-09-26, HOME-01): This Week is built from the session history (Done pills
+//      that last the week, the right day suggested, "2 of 3 sessions done this week").
+const CACHE = 'aap-v50';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
