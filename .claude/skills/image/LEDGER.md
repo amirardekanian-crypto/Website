@@ -290,3 +290,19 @@ Colour: muted saturation, fine film grain. The pencil is the only strong colour.
 
 Avoid: readable numbers on the tape, text, logos, watermark, people.
 ```
+
+## 6. The muscle map's drawing (program.html About sheet, 2026-09-26)
+
+Not a picture: a flat vector chart, traced into the live SVG `BODYMAP_SVG` (see `bodymap/README.md`).
+`gpt_image_2_5`, flare, medium, **2k**, 4:3, 1 credit each. 11 credits in all.
+
+| Round | Jobs (index) | What | Verdict |
+|---|---|---|---|
+| 1, detailed chart | `9c22d16e-d068-4de1-bcf6-56f133e023ae` (A) · `b0a36a6e-3e58-4450-a59d-c6d12b7d1486` (B) · `f37ea7da-2673-43d7-9b4c-30d1b3633927` (C) | front + back, every muscle a grey shape with dark gaps | **C shipped** (Amir: "liked the one at right"). A: stray rib lines, toes on the back view. B: grainy fills |
+| 2, simpler ideas | blocks `92a4faa3…` / `a739a0e2…` · line `9b54363d…` / `fc07b404…` · rounded `170c270e…` / `192dff4c…` · silhouette `6b6ea752…` / `f6f40956…` | four simpler styles, two tries each | none chosen; line art leaks (its lines do not close) |
+
+The prompt that won (round 1):
+```
+Flat vector anatomical muscle chart of one lean athletic human figure, drawn twice at the same size: front view on the left, back view on the right. Standing straight, arms slightly away from the body, feet slightly apart, perfectly symmetrical, straight-on, whole body visible with space around it. Every muscle is a separate flat mid-grey shape with a thin dark gap between neighbours: neck, shoulders, chest, biceps, triceps, forearms, abs, obliques, upper back, lats, lower back, glutes, inner thighs, quads, hamstrings, calves, shins. One thin pale outline around the whole body. Head, hands and feet drawn as outline only. Smooth bald head, no face, hair or ears; neutral build, neither clearly male nor female. Plain near-black background. No shading, gradients, texture, text or labels.
+```
+Asking for "gender-neutral" did not work in any of the 11: every figure came out male.

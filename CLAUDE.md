@@ -71,7 +71,8 @@ straight to `programs` and keeps the previous version in `program_versions`.
 
 **✅ Every programme write ends the same way** (Amir, 2026-09-24): `/program-assemble`, `/program-edit`
 and `/workout` are not finished until (1) Spine upkeep has run (`/spine` → Upkeep: a full entry for
-every exercise, `exId` on every card, links both ways, body parts and the count filled; CUE-4),
+every exercise, `exId` on every card, links both ways, body parts and the count filled, and the
+body-map `muscles` on any entry whose count is `{}` (stage42); CUE-4),
 (2) every exercise carries qualities from the ten only (CUE-3), (3) the Quality check is reported
 (PRC-24), (4) the Becauses are fresh (COM-4: 5–10 on a new cycle; on an edit, only the exercises it
 changes), and (5) the handoff has one `SPINE …` / `QUALITY …` block (PRC-12). Never approve anything
@@ -106,8 +107,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   numbers and nothing errors.** `rxOf()`/`repCount()`/`tempoDisplay()` (program.html + `assets/js/chips.js`,
   guarded by `scripts/check_rx.js`) · the Quality mix and its minutes rule (`qualityMix()`, `qualityCheckC()`,
   `/program-design`, `check_program.py`) · the Spine resolver (`spineFor()` / `spineForC()`) · the body-part
-  region and impact lists (four copies) · the muscle list of the Spine's volume credits (four copies:
-  `spine_credits_ok()`, coach.html, `check_program.py`, `draft_sql.py`) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
+  region and impact lists (four copies) · the muscle list of the Spine's volume credits (SIX copies since the
+  muscle map: `spine_credits_ok()`, coach.html, `check_program.py`, `draft_sql.py`, program.html `MAP_MUSCLE` and
+  the body drawing's groups; see PROGRAM-APP.md *The muscle map*) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
   `parseSetText()`) · the records rename matcher (`matchRenamed()` / `ceilAliasMapC()`) and its hand-entry
   doors (`paintCeilingForm()` mirrors `paintFromFields()`) · how a session's set ends (`carrySet()`, called by
   the midnight sweep, the cloud copy and a rename).

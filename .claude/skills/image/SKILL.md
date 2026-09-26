@@ -309,3 +309,10 @@ Add a dated line whenever a round teaches something. This section is the reason 
 - **2026-09-20** — Shell notes for this PC: long heredocs fail (write the script with the Write tool, then run
   it); on localhost the course worker serves its old cached shell, so clear it before testing; the preview
   server can be stopped by the app between turns.
+- **2026-09-26 (the muscle map)** — A diagram, not a picture: a flat vector chart generated once and
+  TRACED into an SVG (`bodymap/`), so every exercise lights its own muscles with no further credits.
+  What worked: dark background + mid-grey shapes + dark gaps (clean to segment), 2k at 1 credit,
+  three tries of one prompt. Amir picked the detailed chart over four "simpler" styles, then asked for
+  it on the page's own background. Line art is a trap for tracing (its lines never close). Every
+  figure came out male whatever the prompt said. Amir's viewer blocks JavaScript: a preview sent with
+  SendUserFile must work on radio buttons and CSS alone.

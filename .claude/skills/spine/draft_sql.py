@@ -8,10 +8,14 @@
 #     "easier": [...ids or names], "harder": [...ids or names], "alts": [...ids or names],
 #     "sfr": 3, "flags": ["loaded-knee-flexion"],
 #     "credits": {"quads": 1, "glutes": 0.5}, "cost": "moderate",
+#     "muscles": {"calves": 1, "shins": 0.5},   (only when credits is {}: see below)
 #     "cues": {"good": [ext, int], "bad": [avoid]} }   (optional; written for anyone)
 # credits: what one working set counts toward (VOL-10: 1 prime mover, 0.5 helper; {} = nothing, as
 # for a stretch or a sprint). cost: heavy | moderate | isolation | none (VOL-2). Both required: the
 # checker counts every programme's volume tables and day loads from them (stage39).
+# muscles: what the athlete sees lit on the muscle map (stage42), same list and 1/0.5. REQUIRED when
+# credits is {} (a stretch, a jump, a sprint still works something) and refused otherwise, because
+# the map shows the credits whenever they name a muscle. Display only: no checker reads it.
 # existing_ids.txt: one id per line, from `select id from public.exercises order by 1`.
 #
 # The batch file carries the coach-only half (sfr, flags), which is why it stays in the scratchpad
@@ -87,6 +91,13 @@ for e in batch:
         for m, w in cr.items():
             if m not in MUSCLES: problems.append(f'{i}: unknown muscle {m!r} in credits (one of {sorted(MUSCLES)})')
             if w not in (0.5, 1): problems.append(f'{i}: credit {m} {w!r} must be 1 or 0.5')
+    mu = e.get('muscles')
+    if isinstance(cr, dict) and not cr:
+        if not isinstance(mu, dict) or not mu: problems.append(f'{i}: credits are {{}}, so give muscles (what the body map lights, e.g. {{"calves": 1, "shins": 0.5}})')
+    elif mu: problems.append(f'{i}: muscles is only for an entry whose credits are {{}}; the map already shows the credits')
+    for m, w in (mu or {}).items():
+        if m not in MUSCLES: problems.append(f'{i}: unknown muscle {m!r} in muscles (one of {sorted(MUSCLES)})')
+        if w not in (0.5, 1): problems.append(f'{i}: muscles {m} {w!r} must be 1 or 0.5')
     if e.get('cost') not in COSTS: problems.append(f'{i}: cost must be one of {sorted(COSTS)}')
     for k in ('easier', 'harder', 'alts'):
         for x in e.get(k, []):
@@ -108,11 +119,12 @@ for e in batch:
         q(e.get('purpose')), q(e.get('tennis')), arr(e.get('equipment')), arr(e.get('loads')), q(e.get('impact')),
         arr(e.get('easier')), arr(e.get('harder')), arr(e.get('alts')), arr(e.get('qualities')), q(vid),
         # cues written in the batch (for anyone: 2 good + 1 bad) win; otherwise the UPDATE below copies them
-        (q(json.dumps(e['cues'])) + '::jsonb') if e.get('cues') else 'null', "'draft'", "'claude-draft'"]) + ')')
+        (q(json.dumps(e['cues'])) + '::jsonb') if e.get('cues') else 'null',
+        (q(json.dumps(e['muscles'])) + '::jsonb') if e.get('muscles') else 'null', "'draft'", "'claude-draft'"]) + ')')
     crow.append(f"({q(e['id'])},{'null' if e.get('sfr') is None else int(e['sfr'])},{arr(e.get('flags'))},"
                 f"{q(json.dumps(e['credits']))}::jsonb,{q(e['cost'])})")
 
-print('insert into public.exercises (id,name,aliases,pattern,purpose,tennis,equipment,loads,impact,easier,harder,alts,qualities,video,cues,status,updated_by) values')
+print('insert into public.exercises (id,name,aliases,pattern,purpose,tennis,equipment,loads,impact,easier,harder,alts,qualities,video,cues,muscles,status,updated_by) values')
 print(',\n'.join(rows) + '\non conflict (id) do nothing;')
 print('insert into public.exercise_coach (id,sfr,flags,credits,cost) values')
 print(',\n'.join(crow) + '\non conflict (id) do nothing;')

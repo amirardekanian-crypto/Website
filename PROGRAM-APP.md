@@ -266,6 +266,29 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   new or touched exercise through `/spine` → Upkeep, which flags a missing one.
   The region and impact lists exist FOUR times (program.html `SPINE_REGION`/`SPINE_IMPACT`,
   coach.html `SPINE_REGIONS`/`SPINE_IMPACTS`, `draft_sql.py`, the stage36 checks): change all four.
+- **The muscle map** (Amir, 2026-09-26: *"this is amazing, lets build"*; `supabase/stage42_muscle_map.sql`).
+  The About sheet's body section is a **front-and-back body with the worked muscles lit**: main (`1`)
+  in full clay, helpers (`0.5`) in soft clay, listed under it as *Main* and *Helping*, then the impact
+  pill (*No impact* is quiet now; Jumping, Landing, Running stay clay). The body sits on the sheet
+  itself, warm greys on paper and dark greys in dark mode (Amir: *"the body should be on a light
+  background, whatever it is in that page"*). `bodyPartsHtml()` draws it; `BODYMAP_SVG` is the drawing.
+  - **What lights:** `get_exercises()` sends `muscles` = the entry's volume **credits** when they name a
+    muscle, else its display-only **`exercises.muscles`** (the 60 stretches, jumps, sprints and rides
+    whose credits are `{}` still work something). Only muscle names and 1/0.5 reach a phone, never cost,
+    SFR or flags. An entry with neither falls back to *Body parts involved* on the same drawing: the
+    zones light their muscles, and the knee and the ankle get a clay ring, since they are joints.
+    `core` also lights the low back.
+  - **Every new entry needs it:** `credits: {}` means `muscles` is required (`draft_sql.py` refuses the
+    batch without it, `/spine` → Upkeep lists it as a gap, coach.html marks the entry *no muscles on
+    the map* and edits it under the body parts). ⚠ Changing an entry's credits now also changes what
+    every athlete sees lit.
+  - **The drawing is generated, never hand-edited.** A Higgsfield GPT Image 2.5 chart (round 1,
+    candidate C, job `f37ea7da-2673-43d7-9b4c-30d1b3633927`), mirrored so both sides match, traced
+    into one path per muscle group. The master, the three tracing scripts, the traced
+    `bodymap.json` and `inject.py` (writes `BODYMAP_SVG` between the `BODYMAP:BEGIN/END` markers;
+    `--check` says whether it is stale) are in `.claude/skills/image/bodymap/`. ⚠ The muscle ids now
+    exist SIX times: stage39's `spine_credits_ok()`, coach.html `SPINE_MUSCLES`, check_program.py
+    and draft_sql.py `MUSCLES`, program.html `MAP_MUSCLE`, and the drawing's `data-g` groups.
 - **Cues are written once, on the entry, and they are THE cues for everyone** (Amir, 2026-09-24:
   *"the aim is to use these cues for all the exercises that everyone has from now on … if there is
   a cue for someone specific, it should be in coach's notes. thats why its there"*). The pipeline

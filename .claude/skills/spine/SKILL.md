@@ -147,6 +147,18 @@ the existing ids for the links, and they show you which names are only variants.
     RDL, bench, leg press, hack squat), `moderate` (×1: dumbbell, cable and machine compounds, rows,
     presses, carries, jumps, sprints, conditioning), `isolation` (×0.5: single-joint work, core,
     bodyweight drills done as sets), `none` (×0: stretches, mobility, walking, technique drills).
+- **muscles = what the body map lights, when the count is `{}`** (stage42, 2026-09-26). The About
+  sheet draws a front-and-back body with the worked muscles lit: main (`1`) in full clay, helpers
+  (`0.5`) in soft clay. It reads `credits` whenever they name a muscle, so most entries need nothing
+  more. But a stretch, a jump, a sprint or a ride has `credits: {}` and still works something, so
+  **every entry whose credits are `{}` gets `muscles`**, same list and same 1/0.5 (Amir, 2026-09-26:
+  *"wherever a new exercise is added to the Spine, ask for the detail as well"*). It is display only:
+  no checker reads it, so it never moves a volume number. Name what the athlete FEELS working, main
+  first: pogo jump = `calves 1, shins 0.5`; box jump = `quads 1, glutes 1, calves 0.5`; hamstring
+  stretch = `hamstrings 1`; hip flexor stretch = `quads 1, glutes 0.5` (the list has no hip flexor);
+  thoracic rotation = `back 1, core 0.5`; bike = `quads 1, glutes 0.5`; sprint = `hamstrings 1,
+  calves 1, glutes 0.5`. `draft_sql.py` refuses `{}` credits without it, and refuses it beside real
+  credits. The 60 that existed on 2026-09-26 are in `supabase/stage42_muscle_map.sql`: calibrate on them.
 
 **4. Generate and check.**
 Save the ids from `select id from public.exercises order by 1` to
@@ -157,7 +169,7 @@ python3 .claude/skills/spine/draft_sql.py <scratchpad>/spine_batchN.json <scratc
 The tool refuses the batch (exit 1, one line per problem) if it finds any of these: an id that
 already exists, a link to an id that doesn't exist, an unknown pattern, flag or quality, a
 self-link, an entry with no qualities or more than three, or no `credits`/`cost` (or a muscle not
-on the list, a credit other than 1 or 0.5). Fix the problems and run it again. A new
+on the list, a credit other than 1 or 0.5), or `credits: {}` without `muscles`. Fix the problems and run it again. A new
 draft whose name matches one in `legacy_videos.json` (the videos the retired Notion list held under names
 no entry carries) gets that video; every other video is added in coach.html → Exercises.
 
@@ -195,7 +207,7 @@ with ex as (
 hit as (
   select ex.*, x.id, x.status, x.aliases, x.video, x.cues, x.purpose, x.tennis, x.equipment,
          x.loads, x.impact, x.easier, x.harder, x.alts, x.qualities, c.sfr, c.flags, c.suggested_qualities,
-         c.credits, c.cost
+         c.credits, c.cost, x.muscles
   from ex left join public.exercises x
     on x.id = ex.exid or lower(x.name) = lower(ex.nm)
        or lower(ex.nm) = any(select lower(a) from unnest(x.aliases) a)
@@ -214,6 +226,7 @@ select nm, id, status,
     case when cardinality(easier) + cardinality(harder) + cardinality(alts) = 0 then 'links' end,
     case when id is not null and cardinality(qualities) = 0 and cardinality(coalesce(suggested_qualities, '{}')) = 0 then 'qualities' end,
     case when id is not null and (credits is null or cost is null) then 'count (credits + cost)' end,
+    case when id is not null and credits = '{}'::jsonb and muscles is null then 'muscles (body map)' end,
     case when id is not null and exid is null then 'exId on the card' end,
     case when id is not null and sfr is null then 'sfr?' end], null) gaps
 from hit order by (id is null) desc, status, nm;
@@ -228,7 +241,8 @@ no SFR. Answer them once and they stop mattering.
 | **Empty field** (video, alias, equipment, a regression/progression/alternative, SFR, flags) | Fill it | Fill it. Adding what was missing changes nothing an athlete already reads |
 | **Body parts** (`loads` + `impact`; `impact` null means never checked) | Fill both | Fill both, on Amir's standing word (2026-09-24: *"remember if we add a exercise … to add these details"*). Since stage37 every entry has both, so a gap here is a new exercise or one somebody cleared |
 | **No qualities** (the Quality Map) | Fill `qualities` (first = primary, max 3) | **Don't write them.** Put them in `exercise_coach.suggested_qualities`: coach.html pre-fills his editor with them, and they reach phones only when he saves |
-| **No count** (`credits` + `cost`, coach-only) | Fill both | Fill both: no phone reads them, and without them the checker FAILs every programme that uses the entry. **Changing** a count already there is a proposal: it changes every athlete's volume tables |
+| **No count** (`credits` + `cost`, coach-only) | Fill both | Fill both: without them the checker FAILs every programme that uses the entry, and the body map has nothing to light. Since stage42 the phone receives the credits' muscle names and 1/0.5 (never the cost). **Changing** a count already there is a proposal: it changes every athlete's volume tables AND their body map |
+| **No muscles for the body map** (`credits` is `{}` and `muscles` is empty) | Fill `muscles` | Fill `muscles`, on Amir's standing word (2026-09-26). Changing muscles already there is a proposal |
 | **A field that has content** (cues, purpose, tennis) | Improve it | **Don't change it. Propose it**: write it to the pending list (below) and name it in the handoff, old → new |
 - **Video:** the card's `videoUrl` wins when the entry has none (YouTube only, as `draft_sql.py`).
 - **Alias:** the programme's spelling goes on the entry (rule 4). Never rename the card.
@@ -255,7 +269,7 @@ no SFR. Answer them once and they stop mattering.
 - Every write sets `updated_by = 'claude-pipeline'` and `updated_at = now()`.
 
 **3. Report it in one block at the end of the handoff** (`/program-assemble` Step 6):
-`SPINE — added 2 drafts (names) · filled 5 gaps (what) · body parts on 4 · counts on 2 · tagged qualities on 3 (2 as suggestions on
+`SPINE — added 2 drafts (names) · filled 5 gaps (what) · body parts on 4 · counts on 2 · body-map muscles on 1 · tagged qualities on 3 (2 as suggestions on
 approved entries) · linked 2 (regressions/progressions/alternatives) · 3 new proposals on the pending list (entry: field old → new) ·
 7 waiting in all, yes or no on each? · N entries this programme uses are still drafts, approve them in coach.html → Exercises.`
 The proposals in that line are read back from the pending list, not retyped, so the handoff and the
