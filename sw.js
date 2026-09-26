@@ -76,7 +76,9 @@
 //      "Keep me off the board" before it happens.
 // v40: program.html changed (2026-09-26): ytVideoId() embeds only a YouTube address, the same
 //      host check as the site modal; any other link opens as a link.
-const CACHE = 'aap-v40';
+// v41: program.html changed (2026-09-26, CNT-01): the guide's finish, report and rest-timer cards
+//      name the real buttons, and the Library promises a habit tick only when that habit is on.
+const CACHE = 'aap-v41';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
