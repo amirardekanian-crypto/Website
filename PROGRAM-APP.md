@@ -521,6 +521,21 @@ sits in front of the whole site).
   Waiting less when a copy exists would open slow-but-working connections on the copy more often; it is
   a separate call.
 
+## 🔍 Readable in both themes (A11Y-01, 2026-09-26)
+
+- **Text tokens.** `--green-ink` and `--clay-ink` carry every green or clay *text* colour (37 + 58 rules were
+  swapped by pattern: `color: var(--yellow|--ice)`). Light mode: the brand colours, so nothing moved. Dark mode
+  (`body[data-dark]`): #6DBE95 and #E06B43. `#screen-plan`'s single-accent remap covers `--clay-ink` too.
+- **Dark mode fixes that were plain bugs:** the rest timer overlay stayed light while its digits went light
+  ("2:00" at 1.08:1); the Home habits card coloured its arrows and streak count with `--grey-bg`, near-black in
+  dark, on a card that is always dark green.
+- **Tab bar:** inactive tabs grey at full strength (they were 55%-faded green), labels 11 px, 48 px tall.
+- **Sizes:** no label under 11 px on Home, the day, the finish card, the rest timer, Coach and Game Plan
+  (glyphs, the Level ring and the day letters excepted, at 9–10.5 px). Session notes 16 px. The session rating
+  is two rows of five at 44 px (ten in a row were ~24 px); the ⓘ keeps its 20 px look with a 44 px hit area.
+- **Not done:** program.html still sets `maximum-scale=1, user-scalable=no`, so pinch-zoom is off (AA Proof
+  allowed it on 2026-09-26). Allowing it means 16 px set-log boxes on iOS, a card change (the freeze).
+
 ## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26)
 
 The session bar (`.session-timer`) never cuts the clock: under 480 px it is two rows (label and clock on one

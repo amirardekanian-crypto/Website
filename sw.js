@@ -88,7 +88,9 @@
 //      for a finished session, its words match the phone, and Proof stops asking coached athletes.
 // v46: program.html changed (2026-09-26, WK-03): the session bar never clips the clock, and a Home day
 //      card shows "In progress · Resume" for a session started today.
-const CACHE = 'aap-v46';
+// v47: program.html changed (2026-09-26, A11Y-01): dark mode text reads (--green-ink/--clay-ink), the rest
+//      timer is dark in dark mode, the tab bar and labels are 11 px, and the session rating is 44 px.
+const CACHE = 'aap-v47';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
