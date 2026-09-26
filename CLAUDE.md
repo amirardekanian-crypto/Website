@@ -150,6 +150,10 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Home leads with the training** (This Week, then the day cards), then the Daily Habits card, and under it
   **today's habits, ticked in place**: AA Proof itself, embedded (`habits.html?embed=1`, `mountProofStrip()`).
   program.html still holds no habit state and writes no `<id>_hab_*` key but body weight; Proof does every write.
+- **Back closes the top layer** (NAV-01, 2026-09-26): one guard history entry while anything is open over
+  Home's overview, and `topLayer()` decides what Back closes by reading the page, top of the z-order first.
+  A new overlay, sheet or screen goes into `topLayer()` (and `initBackNav()`'s observer if a class shows it),
+  or Back closes whatever sits under it.
 - **Green or clay TEXT reads `--green-ink` / `--clay-ink`, never the fill tokens** (A11Y-01, 2026-09-26). In light
   mode they are the brand colours; in dark mode they are tints that read on #202020. `--yellow` (green) and
   `--ice` (clay) stay for fills and borders. Before this, green text sat on near-black at 1.4–1.7:1.
@@ -216,7 +220,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v47` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v48` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

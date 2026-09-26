@@ -7786,6 +7786,80 @@ function goTo(screen, historyId, keepContent) {
   window.scrollTo(0, 0);
 }
 
+// ── BACK CLOSES THE TOP LAYER (NAV-01, 2026-09-26) ────────────────────────
+// Screens, sheets and overlays are shown and hidden in place, so the browser never knew
+// they existed and the phone's Back button (or an Android swipe) LEFT THE APP from any
+// of them. Now: while anything is open over Home's overview, there is exactly ONE guard
+// entry in history (same URL, so deep links are untouched). Back pops it, and we close
+// whatever is visibly on top, then re-arm if something is still open. When the last layer
+// closes through its own button, the guard entry is consumed silently, so a later Back on
+// Home leaves the app as it always did.
+//
+// ⚠️ Nothing is tracked in a parallel stack: topLayer() reads the page itself, top of the
+// z-order first, so it cannot drift from what is on screen. A NEW overlay, sheet or screen
+// must be added to topLayer() (and to the observer in initBackNav() if it is shown by a
+// class), or Back will close whatever sits under it.
+const BACKNAV = { armed: false, ignore: false, popping: false };
+function _visibleBtn(root, sel) {
+  if (!root) return null;
+  return [...root.querySelectorAll(sel)].find(b => b.getClientRects().length && getComputedStyle(b).visibility !== 'hidden') || null;
+}
+function topLayer() {
+  const on = id => { const e = document.getElementById(id); return !!(e && e.classList.contains('visible')); };
+  const vm = document.querySelector('.video-modal.is-open');
+  if (vm) return () => window.VideoModal && window.VideoModal.close();
+  if (on('timerOverlay')) return closeTimer;
+  if (on('readiness-overlay')) return cancelReadiness;
+  if (on('hist-overlay')) return closeHistorySheet;
+  if (on('stepOverlay')) return closeStepMode;
+  const scr = document.querySelector('.screen.active');
+  const id = scr ? scr.id.replace('screen-', '') : 'home';
+  if (id !== 'home') {
+    // The screen's own ← first: it knows where it came from (Records → the exercise,
+    // an article → its Library pane, the archive → Game Plan). A tab has none: Home.
+    const b = _visibleBtn(scr, '.nav-back, .archive-back');
+    return b ? () => b.click() : () => goTo('home');
+  }
+  const dv = document.getElementById('day-view');
+  if (dv && !dv.hidden) return closeDayView;
+  return null;
+}
+function navSync() {
+  if (window.IS_PREVIEW) return;
+  const open = !!topLayer();
+  if (open && !BACKNAV.armed) {
+    try { history.pushState({ aaBack: 1 }, ''); BACKNAV.armed = true; } catch (e) {}
+  } else if (!open && BACKNAV.armed && !BACKNAV.popping) {
+    // Closed by its own button: take the guard entry back off, quietly.
+    BACKNAV.armed = false; BACKNAV.ignore = true;
+    try { history.back(); } catch (e) { BACKNAV.ignore = false; }
+  }
+}
+window.navSync = navSync;
+function initBackNav() {
+  if (window.IS_PREVIEW) return;
+  window.addEventListener('popstate', () => {
+    if (BACKNAV.ignore) { BACKNAV.ignore = false; return; }
+    BACKNAV.armed = false;
+    const close = topLayer();
+    if (close) {
+      BACKNAV.popping = true;
+      try { close(); } catch (e) {}
+      BACKNAV.popping = false;
+    }
+    navSync();   // something still open: arm again, so the next Back closes that too
+  });
+  // Every way a layer opens or closes goes through one of these nodes' class or hidden
+  // attribute, so watching them catches all of them without touching each function.
+  const mo = new MutationObserver(() => navSync());
+  ['timerOverlay', 'readiness-overlay', 'hist-overlay', 'stepOverlay', 'day-view'].forEach(id => {
+    const e = document.getElementById(id);
+    if (e) mo.observe(e, { attributes: true, attributeFilter: ['class', 'hidden'] });
+  });
+  document.querySelectorAll('.screen').forEach(e => mo.observe(e, { attributes: true, attributeFilter: ['class'] }));
+  navSync();
+}
+
 // Empty-state for the archive view when there are no past programs yet
 function renderArchiveEmpty() {
   const banner = document.getElementById('archive-banner');
@@ -13566,6 +13640,9 @@ function esc(str) {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   }
+  // Back closes the top layer instead of leaving the app (NAV-01).
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initBackNav);
+  else initBackNav();
 
   // Offer Add-to-Home-Screen once the athlete has FINISHED A SESSION, never on first open
   // (HOME-03, 2026-09-26): the toast used to land 2.5 s after the first sign-in, on top of

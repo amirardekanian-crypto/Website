@@ -90,7 +90,9 @@
 //      card shows "In progress · Resume" for a session started today.
 // v47: program.html changed (2026-09-26, A11Y-01): dark mode text reads (--green-ink/--clay-ink), the rest
 //      timer is dark in dark mode, the tab bar and labels are 11 px, and the session rating is 44 px.
-const CACHE = 'aap-v47';
+// v48: program.html and shared.js changed (2026-09-26, NAV-01): the phone's Back button closes the top
+//      layer (a sheet, the rest timer, Guided, a screen, the day) instead of leaving the app.
+const CACHE = 'aap-v48';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
