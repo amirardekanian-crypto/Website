@@ -169,10 +169,9 @@ reads that row. Email and WhatsApp live in `public.hab_contacts` behind coach-on
 raise `coach only` from the plain SQL editor.
 
 - **`add_contact()`** — a signup in one call: records the contact row (name, email,
-  WhatsApp, source, tier). ⚠️ Nothing calls it now, because it still inserts an
-  `athlete_keys` row as a side effect, and `get_program()` and the board RPCs still honour
-  a matching key — it would quietly re-open the retired link path for that id.
-  `/proof-signup` does the two inserts directly instead.
+  WhatsApp, source, tier). Until stage41 (2026-09-26) it also minted an `athlete_keys` row,
+  which would have re-opened the retired link path for that id; it no longer does (`akey`
+  comes back null). Nothing calls it: `/proof-signup` does the two inserts directly.
 - **`contact_list()`** — who signed up, whether they are on the board, and **how many
   days they have actually logged**: adherence is the qualifying signal, and a better one
   than an email address. coach.html → **Proof** → *The funnel* reads it.
@@ -327,7 +326,9 @@ and only that unlocks the perfect-day takeover.
 uses the whole-roster denominator (so an unearned locked session counts *against* the
 athlete) and it skips the gate's second door (*at most one thing undone*). Anything that
 labels a day on-target/missed, counts on-target days, or colours a cell by it must call
-`dayQualifies()`.
+`dayQualifies()`. Its percentage door goes through `gatePasses()`, which **rounds** the day's
+percentage before comparing, exactly like the server's `qualday` (a day at 79.5% counts; since
+2026-09-26, when the two were found to disagree on 79.5–79.9%).
 
 It was written the wrong way in the month share card — both the ON TARGET cell shading and
 the "DAYS ON TARGET" figure — until 2026-08-02. Replayed across the eleven athletes on the

@@ -23,8 +23,8 @@ The form at [`proof.html`](../../proof.html) collects exactly three things:
 > `forget_contact()` are all guarded by `is_coach()`, which reads the caller's JWT
 > email. A plain SQL connection has no coach JWT, so every one of them raises
 > `coach only`. They work from coach.html, where Amir is signed in — not from a
-> pipeline run. Use the direct statements below instead. (`add_contact()` is doubly
-> wrong now: it still mints a dead `athlete_keys` row as a side effect.)
+> pipeline run. Use the direct statements below instead. (`add_contact()` stopped minting
+> a dead `athlete_keys` row in stage41, 2026-09-26.)
 
 ---
 

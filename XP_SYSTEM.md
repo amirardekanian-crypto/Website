@@ -1008,7 +1008,10 @@ Three more mirrors live in **SQL function bodies**, not on the row:
 
 The scoring **logic** is written twice too: `bonusEvents()` / `questEvents()` /
 `comebackRuns()` against `hab_bonus_xp()`, `xpFor()` / `habitXp()` against `hab_xp()`, and
-`dayQualifies()` against the `qualday` CTE. The latest definition of `hab_bonus_xp()` and
+`dayQualifies()` against the `qualday` CTE. **Both round the day's percentage to a whole number
+before comparing it with `streakQualifyPct`** (`gatePasses()` on the phone, `round(… * 100)` on
+the server), so a day at 79.5% counts on both. Until 2026-09-26 the phone compared the raw number
+and a day at 79.5–79.9% counted on the board only. The latest definition of `hab_bonus_xp()` and
 `hab_xp()` is currently `supabase/stage24_marks_quests_customcap.sql` (see the foot of this
 section). Changing how a badge or milestone is *counted* — not just what it pays — means
 editing both.

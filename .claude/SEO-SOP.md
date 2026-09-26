@@ -27,7 +27,7 @@ described in `CLAUDE.md` → *Article pages & SEO*, and the per-article steps li
   cannot watch the video: it reads the **caption**, alt text and location tag. Because Instagram is
   a site Google already trusts, a good reel can appear within days; a new website page takes months.
   That is why reels show up for «بدنسازی پدل» today and the website does not yet.
-- **Cookies play no part in ranking.** The site uses Plausible, which sets none (see `privacy.html` §2.5).
+- **Cookies play no part in ranking.** The site uses Plausible, which sets none (see `privacy.html` §2.6).
 
 ## 2. What is in place
 
