@@ -162,6 +162,7 @@ so did the rest except where noted.
 - **XP wording** (found by the new guard): the app's wording won (Amir). The `xp_rules` row now
   carries the four "I / II" milestone names and the three "this week" quest notes, and the
   snapshot is refreshed; the guard reads 0 FAIL, 0 NOTE.
+- **ytVideoId()** in program.html has the site modal's host check (sw `aap-v39`).
 - **5.5** The six AA Proof bugs and the two stale habits.html comments are fixed.
 
 ### 5.1 Needs Amir
@@ -177,8 +178,6 @@ so did the rest except where noted.
 
 ### 5.2 Recommended, no decision needed
 
-- `ytVideoId()` in program.html has no host check (found in 5.2.5): a non-YouTube link with an
-  11-character `v=` would embed. The site modal has the guard now; give the app the same one.
 - Teach the checker to compare message 2 and the handoff against the obligations list (today only
   the self-check line does).
 

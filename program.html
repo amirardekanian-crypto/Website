@@ -7377,8 +7377,12 @@ function toggleExpand(item) {
 // youtube.com/shorts/ID, youtube.com/embed/ID (and /live/, /v/). All of them play
 // inline through the same www.youtube.com/embed player. Keep this in step with
 // ytId() in tennis/app/app.js and the parser in assets/js/shared.js.
+// Only a YouTube address embeds (2026-09-26, the same host check as the site modal's
+// extractId() in shared.js): a Vimeo or other link with an 11-character v= opens as a link.
 function ytVideoId(url) {
-  const m = String(url || '').match(/(?:[?&]v=|youtu\.be\/|\/shorts\/|\/embed\/|\/live\/|\/v\/)([A-Za-z0-9_-]{11})/);
+  const s = String(url || '');
+  if (!/^\s*(?:(?:https?:)?\/\/)?(?:[a-z0-9-]+\.)*(?:youtube\.com|youtube-nocookie\.com|youtu\.be)(?:[/?#:]|$)/i.test(s)) return '';
+  const m = s.match(/(?:[?&]v=|youtu\.be\/|\/shorts\/|\/embed\/|\/live\/|\/v\/)([A-Za-z0-9_-]{11})/);
   return m ? m[1] : '';
 }
 function ytIsShort(url) { return /\/shorts\//.test(String(url || '')); }

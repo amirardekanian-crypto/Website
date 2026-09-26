@@ -71,7 +71,9 @@
 //      AA Proof bugs (ecb459a).
 // v38: program.html changed (2026-09-26, stage42): the About sheet's "Body parts involved" pills
 //      became the muscle map, a front-and-back body with the worked muscles lit.
-const CACHE = 'aap-v38';
+// v39: program.html changed (2026-09-26): ytVideoId() embeds only a YouTube address, the same
+//      host check as the site modal; any other link opens as a link.
+const CACHE = 'aap-v39';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
