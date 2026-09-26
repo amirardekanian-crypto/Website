@@ -1501,10 +1501,10 @@
   #app .msrow, #app .rankrow, #app .prow { margin: 0 16px 8px; border-radius: 18px; background: var(--card); box-shadow: var(--shadow); border-bottom: 0; width: auto; }
   #app .prow { width: calc(100% - 32px); }
   #app .msrow .code { border: 0; border-radius: 16px; background: var(--surface); font-family: 'Outfit', sans-serif; font-weight: 800; }
-  #app .msrow.got .code { background: #FDF1DA; color: #B98A2E; }
-  body[data-dark] #app .msrow.got .code { background: rgba(242,178,60,0.2); color: #F2B23C; }
+  #app .msrow.got .code { background: rgba(53,208,186,0.14); color: var(--teal-deep); }
+  body[data-dark] #app .msrow.got .code { background: rgba(53,208,186,0.2); color: #35D0BA; }
   #app .msrow .ms-name, #app .rankrow .nm, #app .prow .nm { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14.5px; letter-spacing: 0; }
-  #app .msrow .ms-bar > span { background: var(--gold, #F2B23C); }
+  #app .msrow .ms-bar > span { background: var(--accent); }  /* was gold until 2026-09-26; now matches the event goals' bars in the same section */
   #app .msrow .ms-xp, #app .msrow .ms-cnt { font-family: 'Outfit', sans-serif; font-weight: 600; }
   #app .msrow.got .ms-xp, #app .msrow.got .ms-cnt { color: var(--teal-deep); }
   #app .msrow .ms-note .g.got { color: var(--teal-deep); }
@@ -1741,7 +1741,7 @@
   .lvcoins { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
   .lvcoins i {
     position: absolute; top: 50%; left: 50%; width: 26px; height: 26px; margin: -13px 0 0 -13px;
-    border-radius: 999px; background: linear-gradient(145deg,#FFE29A,#F2B23C 55%,#B87A14);
+    border-radius: 999px; background: linear-gradient(145deg,#C9F7EE,#35D0BA 55%,#1FA791);
     box-shadow: 0 0 0 2px rgba(23,20,43,.35);
     animation: lvCoin 1.15s cubic-bezier(.2,.7,.3,1) both;
   }
@@ -1775,16 +1775,16 @@
   #app .lvwrap.badge { background: #1B1735; }
   #app .lvwrap .lvrays { background: repeating-conic-gradient(#6C5CE7 0deg 7deg, transparent 7deg 22deg); }
   #app .lvwrap.rank .lvrays { background: repeating-conic-gradient(#FFFFFF 0deg 6deg, transparent 6deg 20deg); }
-  #app .lvwrap.badge .lvrays { background: repeating-conic-gradient(#F2B23C 0deg 7deg, transparent 7deg 22deg); }
+  #app .lvwrap.badge .lvrays { background: repeating-conic-gradient(#8FE9D6 0deg 7deg, transparent 7deg 22deg); }
   #app .lvwrap.streak { background: #241326; }
   #app .lvwrap.streak .lvrays { background: repeating-conic-gradient(#FF8A5B 0deg 7deg, transparent 7deg 22deg); }
   #app .lvwrap.streak .lvshock { border-color: #FF8A5B; }
-  #app .lvwrap.streak .lvkicker { color: #FFD9A0; }
+  #app .lvwrap.streak .lvkicker { color: #FFD2BD; }
   #app .lvwrap.streak .lvgo { color: #C2451F; }
   #app .lvwrap.streak .lvshards i { background: #FF8A5B; }
   .lvflame { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; }
   .lvflame .fl { font-size: 74px; line-height: 1; }
-  .lvflame .n { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 76px; line-height: .9; letter-spacing: -.03em; color: #FFD9A0; }
+  .lvflame .n { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 76px; line-height: .9; letter-spacing: -.03em; color: #FFD2BD; }
 
   /* Roll call */
   #app .rcprompt .rcq { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; line-height: 1.25; }
@@ -1820,9 +1820,9 @@
   .lvwrap.badge { background: #14806E; }
   .lvrays { background: repeating-conic-gradient(#6C5CE7 0deg 7deg, transparent 7deg 22deg); }
   .lvwrap.rank .lvrays { background: repeating-conic-gradient(#FFFFFF 0deg 6deg, transparent 6deg 20deg); }
-  .lvwrap.badge .lvrays { background: repeating-conic-gradient(#F2B23C 0deg 7deg, transparent 7deg 22deg); }
+  .lvwrap.badge .lvrays { background: repeating-conic-gradient(#8FE9D6 0deg 7deg, transparent 7deg 22deg); }
   .lvshock { border-radius: 999px; border-color: #8F7BF0; }
-  .lvwrap.badge .lvshock { border-color: #F2B23C; }
+  .lvwrap.badge .lvshock { border-color: #8FE9D6; }
   .lvbadge { border-radius: 999px; background: #6C5CE7; color: #fff; border: 0; box-shadow: 0 0 0 10px rgba(108,92,231,0.22), 0 24px 50px -18px rgba(108,92,231,0.7); }
   .lvwrap.rank .lvbadge { background: #fff; color: #6C5CE7; border: 0; }
   .lvwrap.badge .lvbadge { background: #fff; color: #14806E; border: 0; }
@@ -1831,10 +1831,10 @@
   .lvwrap.rank .lvbadge .l, .lvwrap.badge .lvbadge .l { color: rgba(35,31,53,0.5); }
   .lvshards i { border-radius: 3px; background: #8F7BF0; }
   .lvwrap.rank .lvshards i { background: #fff; }
-  .lvwrap.badge .lvshards i { background: #F2B23C; }
+  .lvwrap.badge .lvshards i { background: #8FE9D6; }
   .lvkicker { font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: 0.28em; color: #B7AFEF; }
   .lvwrap.rank .lvkicker { color: rgba(255,255,255,0.85); }
-  .lvwrap.badge .lvkicker { color: #FFD9A0; }
+  .lvwrap.badge .lvkicker { color: #CFF7EC; }
   .lvrank { font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.01em; }
   .lvgo { border-radius: 999px; background: #35D0BA; color: #0C4B43; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 14px; letter-spacing: 0.02em; text-transform: none; box-shadow: 0 4px 0 #1FA791; }
   .lvwrap.rank .lvgo { background: #fff; color: #6C5CE7; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
@@ -2283,7 +2283,7 @@ const HABIT_HUES = {
   strength: ['#6C5CE7', '#EFECFB'],
   steps:    ['#FF8A5B', '#FFE9DF'],
   sleep:    ['#5B8DEF', '#E3ECFD'],
-  fuel:     ['#F2B23C', '#FDF1DA'],
+  fuel:     ['#2FAE66', '#DDF3E6'],   // gold until 2026-09-26; the brand has no yellow or gold
   water:    ['#3EC6E0', '#DFF4FA'],
   mobility: ['#C77DE0', '#F6E8FA'],
   breathe:  ['#F27DA8', '#FCE7EF'],
@@ -2669,18 +2669,21 @@ function rankIcon(rank, size, extra) {
 }
 // ── Tier metals ── two ranks per metal, CoD/League-style, shared by the DOM
 // crests, the title plates, the medals and the canvas share card.
+// bronze → silver → emerald → amethyst → prismatic. The third tier was GOLD
+// until 2026-09-26 (Amir: the brand's "no yellow or gold, ever" has no Proof
+// exception). Purely a drawing key: nothing stored, scored or sent names it.
 const METALS = {
   bronze:   { label:'Bronze',    rim:'linear-gradient(145deg,#E2A377,#B06A3B 55%,#8A4E28)',  ink:'#E2A377', flat:['#E2A377','#8A4E28'] },
   silver:   { label:'Silver',    rim:'linear-gradient(145deg,#E8ECF5,#AEB6C9 55%,#7C8499)',  ink:'#C9CEDC', flat:['#E8ECF5','#7C8499'] },
-  gold:     { label:'Gold',      rim:'linear-gradient(145deg,#FFE29A,#F2B23C 50%,#B87A14)',  ink:'#F2B23C', flat:['#FFE29A','#B87A14'] },
+  emerald:  { label:'Emerald',   rim:'linear-gradient(145deg,#B5F2D2,#2FB67A 50%,#137A4F)',  ink:'#8BE8BC', flat:['#B5F2D2','#137A4F'] },
   amethyst: { label:'Amethyst',  rim:'linear-gradient(145deg,#C9B8FF,#8F7BF0 50%,#5A48C9)',  ink:'#C9B8FF', flat:['#C9B8FF','#5A48C9'] },
-  prisma:   { label:'Prismatic', rim:'conic-gradient(from 210deg,#6C5CE7,#3EC6E0,#35D0BA,#F2B23C,#F27DA8,#6C5CE7)', ink:'#F6F4FF', flat:['#8F7BF0','#3EC6E0'] }
+  prisma:   { label:'Prismatic', rim:'conic-gradient(from 210deg,#6C5CE7,#3EC6E0,#35D0BA,#FF8A5B,#F27DA8,#6C5CE7)', ink:'#F6F4FF', flat:['#8F7BF0','#3EC6E0'] }
 };
-const TIER_KEYS = ['bronze','bronze','silver','silver','gold','gold','amethyst','amethyst','prisma','prisma'];
+const TIER_KEYS = ['bronze','bronze','silver','silver','emerald','emerald','amethyst','amethyst','prisma','prisma'];
 const CREST_CLIPS = {
   bronze:   'polygon(50% 0,100% 12%,100% 62%,50% 100%,0 62%,0 12%)',
   silver:   'polygon(50% 0,93% 14%,100% 55%,50% 100%,0 55%,7% 14%)',
-  gold:     'polygon(50% 0,93% 14%,100% 55%,50% 100%,0 55%,7% 14%)',
+  emerald:  'polygon(50% 0,93% 14%,100% 55%,50% 100%,0 55%,7% 14%)',
   amethyst: 'polygon(50% 0,100% 18%,88% 68%,50% 100%,12% 68%,0 18%)',
   prisma:   'polygon(50% 0,100% 18%,88% 68%,50% 100%,12% 68%,0 18%)'
 };
@@ -2699,7 +2702,7 @@ function rankCrest(rank, w, core) {
   const name = (rank && rank.name) || rank || RANKS[0];
   const key = rankMetalKey(name), m = METALS[key], clip = CREST_CLIPS[key];
   const h = Math.round(w * 1.12), bw = Math.max(3, Math.round(w * 0.09));
-  const glow = key === 'gold' ? 'box-shadow:inset 0 0 0 1.5px rgba(242,178,60,.4);'
+  const glow = key === 'emerald' ? 'box-shadow:inset 0 0 0 1.5px rgba(47,182,122,.45);'
              : key === 'amethyst' ? 'box-shadow:inset 0 0 ' + Math.round(w * 0.24) + 'px rgba(143,123,240,.5);' : '';
   return '<span style="flex:none;width:' + w + 'px;height:' + h + 'px;clip-path:' + clip + ';background:' + m.rim + ';display:flex;align-items:center;justify-content:center">'
        + '<span style="width:' + (w - bw * 2) + 'px;height:' + (h - bw * 2) + 'px;clip-path:' + clip + ';background:' + (core || 'radial-gradient(90% 70% at 50% 22%,#3A2F6B,#231F35)') + ';' + glow + 'display:flex;align-items:center;justify-content:center">'
@@ -2718,7 +2721,7 @@ function crestPath(x, cx, cy, w, h, key) {
 function metalFill(x, px, py, w, h, key) {
   const g = x.createLinearGradient(px, py, px + w, py + h);
   if (key === 'prisma') {
-    ['#6C5CE7', '#3EC6E0', '#35D0BA', '#F2B23C', '#F27DA8'].forEach((c, i) => g.addColorStop(i / 4, c));
+    ['#6C5CE7', '#3EC6E0', '#35D0BA', '#FF8A5B', '#F27DA8'].forEach((c, i) => g.addColorStop(i / 4, c));
   } else {
     const m = METALS[key] || METALS.bronze;
     g.addColorStop(0, m.flat[0]); g.addColorStop(1, m.flat[1]);
@@ -2726,12 +2729,12 @@ function metalFill(x, px, py, w, h, key) {
   return g;
 }
 // ── Title plates ── a nameplate you wear. Rarity: bronze → silver (lv 13+) →
-// gold (lv 21+); event titles and PROOF ITSELF are prismatic.
+// emerald (lv 21+); event titles and PROOF ITSELF are prismatic.
 function titleMetalKey(p) {
   if (!p) return 'bronze';
   if (p.event || p.id === 't_proof') return 'prisma';
   const lv = p.lv || 0;
-  return lv >= 21 ? 'gold' : lv >= 13 ? 'silver' : 'bronze';
+  return lv >= 21 ? 'emerald' : lv >= 13 ? 'silver' : 'bronze';
 }
 function titlePlate(p, small) {
   const m = METALS[titleMetalKey(p)];
@@ -2748,7 +2751,7 @@ const EV_EMOJI = { ev_foundry:'☀️', ev_bedrock:'🪨', ev_coldblood:'❄️'
 // what a thing is called. See the `mark` note on ACHIEVEMENTS.
 function achName(a) { return a.name + (a.mark ? ' ' + a.mark : ''); }
 function achMedal(a, got) {
-  const key = a.tier === 'rare' ? 'gold' : a.tier === 'long' ? 'silver' : 'bronze';
+  const key = a.tier === 'rare' ? 'emerald' : a.tier === 'long' ? 'silver' : 'bronze';
   const part = String(a.measure || '').split(':');
   const h = part[1] ? habitById(part[1]) : null;
   const emo = h ? (splitEmoji(h.name)[0] || '✨') : (MEASURE_EMOJI[part[0]] || '✨');
@@ -6306,7 +6309,7 @@ function flyXp(amount, rect) {
 // hero pulse above, so the next render cannot strip it mid-move. Fires only on
 // the tap that COMPLETES a habit — not every counter increment — or it would
 // be wallpaper by Wednesday.
-const TICK_CONF = ['#6C5CE7', '#35D0BA', '#F2B23C', '#FF8A5B', '#F27DA8', '#8F7BF0'];
+const TICK_CONF = ['#6C5CE7', '#35D0BA', '#3EC6E0', '#FF8A5B', '#F27DA8', '#8F7BF0'];
 function tickJuice(h, rect) {
   if (reduced()) return;
   const row = document.querySelector('[data-k="row:' + h.id + '"]');
@@ -7090,7 +7093,7 @@ function shardHtml() {
 }
 // Confetti and coins — the two things every game does on a win and this app did
 // not. Deterministic per celebration so a re-render never re-scrambles mid-fall.
-const CONF_COLOURS = ['#6C5CE7', '#35D0BA', '#F2B23C', '#FF8A5B', '#F27DA8', '#F6F4FF'];
+const CONF_COLOURS = ['#6C5CE7', '#35D0BA', '#3EC6E0', '#FF8A5B', '#F27DA8', '#F6F4FF'];
 function confettiHtml(n) {
   let seed = 11;
   const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
@@ -7187,7 +7190,7 @@ function renderBadgeCelebration(ev) {
               + ', so it pays nothing this season.');
     // The medal, in the habit's own colour, instead of a number in a box.
     const h0 = ev.habits[0];
-    art = `<div class="lvmedal" style="background:${METALS[ev.tierIndex >= 3 ? 'gold' : ev.tierIndex >= 1 ? 'silver' : 'bronze'].rim}">
+    art = `<div class="lvmedal" style="background:${METALS[ev.tierIndex >= 3 ? 'emerald' : ev.tierIndex >= 1 ? 'silver' : 'bronze'].rim}">
         <span class="disc" style="background:${habitHue(h0)[1]}">${splitEmoji(h0.name)[0] || '✨'}
           <span class="stars">${'★'.repeat(Math.min(3, ev.tierIndex + 1))}</span></span>
         <span class="sheen"></span>
@@ -7235,7 +7238,7 @@ function renderBadgeCelebration(ev) {
           + ev.ach.xp.toLocaleString() + ' XP lands when you do it again inside ' + seasonName() + '.');
     const part = String(ev.ach.measure || '').split(':');
     const hh = part[1] ? habitById(part[1]) : null;
-    const mk = ev.ach.tier === 'rare' ? 'gold' : ev.ach.tier === 'long' ? 'silver' : 'bronze';
+    const mk = ev.ach.tier === 'rare' ? 'emerald' : ev.ach.tier === 'long' ? 'silver' : 'bronze';
     art = `<div class="lvmedal" style="background:${METALS[mk].rim}">
         <span class="disc" style="background:${hh ? habitHue(hh)[1] : '#EFECFB'}">${hh ? (splitEmoji(hh.name)[0] || '✨') : (MEASURE_EMOJI[part[0]] || '✨')}
           <span class="stars">${'★'.repeat(ev.ach.tier === 'rare' ? 3 : ev.ach.tier === 'long' ? 2 : 1)}</span></span>
@@ -7266,7 +7269,7 @@ function renderBadgeCelebration(ev) {
       ? 'That is the first perfect day on your record. It has been done once now, which makes it repeatable.'
       : 'Perfect day number ' + perfectCount + ' — you appear to be collecting them.');
     share = 'receipt';
-    art = `<div class="lvmedal" style="background:${METALS.gold.rim}">
+    art = `<div class="lvmedal" style="background:${METALS.emerald.rim}">
         <span class="disc" style="background:#E6F7F4">🏆<span class="stars">${n} / ${n}</span></span>
         <span class="sheen"></span>
       </div>`;
@@ -8615,7 +8618,7 @@ function renderManual() {
         p(`Once you're on the leaderboard you get <strong style="color:var(--ink)">one sentence a day</strong>. Write it at the top of the <strong style="color:var(--ink)">CREW</strong> tab. Everyone else on the board sees it, next to your name, your rank and how much of that day you finished.`) +
         p(`Change it as many times as you like until midnight. After that it stands — you can fix an old day's <em>log</em>, but not what you said about it.`) +
         p(`It is worth <strong style="color:var(--ink)">no points at all</strong>, deliberately. It is not another box to tick; it is the one place in here where you get to say something. Everyone else's lines are right underneath yours.`) +
-        p(`Keep it to things you don't mind other athletes reading — this is a shared wall, not a message to your coach.${isFree() ? '' : ' Use Settings to message me privately.'}`))}
+        p(`Keep it to things you don't mind other athletes reading — this is a shared wall, not a message to your coach.${isFree() ? '' : ' Anything private goes to me on WhatsApp: the button is at the top of the programme app&rsquo;s Coach tab.'}`))}
 
       ${block(h2('What each habit is worth') +
         p(`Points are weighted by how much the habit actually moves your health. Your training session pays the most, then daily steps.`) +
@@ -9042,9 +9045,10 @@ function renderPass() {
 // 1080×1080, drawn on a canvas so it can be shared straight out of the app. The
 // insignia is the SAME path data the app draws, run through Path2D — one source
 // of truth, so a rank can never look different on the card than it does in here.
-// Brand rules apply: ink ground, grape glow, gold for the earned things,
-// Outfit type, round caps — the same MEADOW the app wears.
-const CARD = { ink:'#17142B', card:'#231F35', paper:'#F6F4FF', gold:'#F2B23C', grape:'#6C5CE7', teal:'#35D0BA', orange:'#FF8A5B' };
+// Brand rules apply: ink ground, grape glow, mint for the earned things (it
+// was gold until 2026-09-26; the brand has no yellow or gold), Outfit type,
+// round caps — the same MEADOW the app wears.
+const CARD = { ink:'#17142B', card:'#231F35', paper:'#F6F4FF', mint:'#8FE9D6', grape:'#6C5CE7', teal:'#35D0BA', orange:'#FF8A5B' };
 // The five card grounds, painted rather than imported so the export needs no
 // assets and stays offline-safe. Every one of them is green, clay, paper or
 // near-black — a card treatment is a change of structure, not of palette.
@@ -9316,7 +9320,7 @@ function scPlate(x, cx, y, text, metalKey) {
 }
 function scEyebrow(x, cx, y, text, colour) {
   x.textAlign = 'center';
-  x.fillStyle = colour || CARD.gold;
+  x.fillStyle = colour || CARD.mint;
   x.font = '700 25px "Outfit", sans-serif';
   x.letterSpacing = '9px';
   x.fillText(text, cx + 4, y);
@@ -9374,7 +9378,7 @@ function scFooter(x, W, H, ink) {
   x.font = '600 22px "Outfit", sans-serif';
   x.fillText('The habit tracker that keeps score', PAD + mark + 24, baseline + 8);
   x.textAlign = 'right';
-  x.fillStyle = ink ? CARD.gold : CARD.grape;
+  x.fillStyle = ink ? CARD.mint : CARD.grape;
   x.font = '700 22px "Outfit", sans-serif';
   x.letterSpacing = '2px';
   x.fillText('AMIRARDEKANI.COM', W - PAD, baseline - 8);
@@ -9389,17 +9393,17 @@ function latestMedal() {
     const a = ACHIEVEMENTS.filter(z => codes.indexOf(z.code) !== -1).slice(-1)[0];
     const part = String(a.measure || '').split(':');
     const h = part[1] ? habitById(part[1]) : null;
-    return { metal: a.tier === 'rare' ? 'gold' : a.tier === 'long' ? 'silver' : 'bronze',
+    return { metal: a.tier === 'rare' ? 'emerald' : a.tier === 'long' ? 'silver' : 'bronze',
              tint: h ? habitHue(h)[1] : '#EFECFB',
              emoji: h ? (splitEmoji(h.name)[0] || '✨') : (MEASURE_EMOJI[part[0]] || '✨'),
              name: achName(a), note: a.note, xp: a.xp,
              stars: a.tier === 'rare' ? 3 : a.tier === 'long' ? 2 : 1,
-             tierName: a.tier === 'rare' ? 'GOLD · RARE' : a.tier === 'long' ? 'SILVER · THE LONG HAUL' : 'BRONZE · A GOOD WEEK' };
+             tierName: a.tier === 'rare' ? 'EMERALD · RARE' : a.tier === 'long' ? 'SILVER · THE LONG HAUL' : 'BRONZE · A GOOD WEEK' };
   }
   const best = live().slice().sort((a, b) => habitStreak(b) - habitStreak(a))[0];
   if (!best || habitStreak(best) < 2) return null;
   const c = consistencyFor(best), st = habitStreak(best);
-  return { metal: c.tier >= 4 ? 'gold' : c.tier >= 2 ? 'silver' : 'bronze',
+  return { metal: c.tier >= 4 ? 'emerald' : c.tier >= 2 ? 'silver' : 'bronze',
            tint: habitHue(best)[1], emoji: splitEmoji(best.name)[0] || '✨',
            name: (c.name || 'ON A RUN'), note: st + ' days of ' + splitEmoji(best.name)[1].toLowerCase() + ' in a row',
            xp: 0, stars: Math.max(1, Math.min(3, c.tier)), tierName: 'CONSISTENCY' };
@@ -9545,7 +9549,7 @@ const SHARE_PAINT = {
       x.font = '150px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
       x.fillText('🔥', a.cx, a.cy - 120);
       const g = x.createLinearGradient(0, a.cy - 60, 0, a.cy + 110);
-      g.addColorStop(0, '#FFD9A0'); g.addColorStop(1, CARD.orange);
+      g.addColorStop(0, '#FFD2BD'); g.addColorStop(1, CARD.orange);
       x.fillStyle = g;
       const n = String(now);
       const sz = scFit(x, n, W - 200, 400, 180);
@@ -9572,7 +9576,7 @@ const SHARE_PAINT = {
   },
   // THE UNLOCK — a single medal, big.
   medal: {
-    ground: (x, W, H) => { scInk(x, W, H, 'rgba(242,178,60,0.34)'); return true; },
+    ground: (x, W, H) => { scInk(x, W, H, 'rgba(47,182,122,0.34)'); return true; },
     body: (x, W, H, a) => {
       const m = latestMedal();
       x.textAlign = 'center';
@@ -9583,8 +9587,8 @@ const SHARE_PAINT = {
         x.fillText('Log a day and the first one lands.', a.cx, a.cy + 52);
         return;
       }
-      scConfetti(x, W, H, a.top, [CARD.gold, CARD.grape, CARD.teal, CARD.orange, '#F27DA8']);
-      scEyebrow(x, a.cx, a.cy - 250, 'MEDAL UNLOCKED · ' + m.tierName, CARD.gold);
+      scConfetti(x, W, H, a.top, [CARD.mint, CARD.grape, CARD.teal, CARD.orange, '#F27DA8']);
+      scEyebrow(x, a.cx, a.cy - 250, 'MEDAL UNLOCKED · ' + m.tierName, CARD.mint);
       scMedal(x, a.cx, a.cy - 60, 150, m.metal, m.tint, m.emoji);
       x.fillStyle = 'rgba(35,31,53,0.5)';
       x.font = '30px "Outfit", sans-serif';
@@ -9729,7 +9733,7 @@ const SHARE_PAINT = {
         x.font = '700 32px "Outfit", sans-serif';
         x.fillText(ep[1], PAD + 104, sy + 88);
         x.textAlign = 'right';
-        x.fillStyle = '#FFD9A0';
+        x.fillStyle = '#FFD2BD';
         x.font = '800 30px "Outfit", sans-serif';
         x.fillText('🔥' + habitStreak(top), W - PAD - 30, sy + 72);
         x.textAlign = 'left';

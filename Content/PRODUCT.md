@@ -49,14 +49,14 @@ Programme (~6 months)
 
 - A programme is a **chain of ~5–6 linked cycles**, each building on the last. Example cycle library: *Foundation Forge → Strength Engine → Structural Build → Durability Build → Armour Build* (also Load Build, Rebuild & Reset, Strength Reclaim…). Cycle/day/workout banner images live in `../assets/cycles/` and `../assets/days/`.
 
-**The app's four tabs (bottom nav):** **Home** (current cycle + progress) · **My Plan** (the training days, exercises, per-set logging) · **Coach** (two-way messaging + the personal notes + the in-app how-to guide) · **Library** (a **"two doors"** landing → **Sessions** = free on-demand workouts, drills & resets to run on your own; **Playbook** = the coach-published tennis article library — *"everything you need to know to play better tennis, in one place"* — across Pre-Competition, Recovery, Mental, Nutrition, Supplements, For Coaches). A finished cycle's "Done" card opens a read-only **Archive** of past programmes.
+**The app's four tabs (bottom nav):** **Home** (current cycle + progress) · **My Plan** (the training days, exercises, per-set logging) · **Coach** (a *Message me on WhatsApp* button + the personal notes + the in-app how-to guide) · **Library** (a **"two doors"** landing → **Sessions** = free on-demand workouts, drills & resets to run on your own; **Playbook** = the coach-published tennis article library — *"everything you need to know to play better tennis, in one place"* — across Pre-Competition, Recovery, Mental, Nutrition, Supplements, For Coaches). A finished cycle's "Done" card opens a read-only **Archive** of past programmes.
 
 **What the athlete can do:**
 - See **today's day**; tap an **exercise card** → demo video, stats (sets / reps / target / tempo / rest), **coaching cues** (do / don't), and a per-set **log** (weight + RPE 1–10 + tick).
 - **Readiness check** before a session (sleep · energy · soreness · stress · overall, each 1–5, 5 = best) → auto-regulation; the coach sees the scores.
 - **Session timer** + a full-screen **rest timer** between sets.
 - **Finish session** → rate session RPE, leave a note, **send data to coach**.
-- **Two-way messaging** with the coach; coach-authored **personal notes** + an in-app **guide**.
+- **Direct WhatsApp line** to the coach (a button in the Coach tab; the in-app chat was removed 2026-09-26, WhatsApp first); coach-authored **personal notes** + an in-app **guide**.
 - **Library — Playbook** articles (coach-published; deep-link `?article=<id>` gives each article its own shareable URL) + **Sessions** on-demand workouts (deep-link `?workout=<id>`), **archive** of past cycles, **dark mode**, add-to-home-screen.
 
 > A visual catalog of every card the app uses lives in **`card-preview.html`** (in this folder) — handy when you want content to mirror the real UI.
@@ -71,7 +71,7 @@ in four tabs:
 
 - **Today** — the day's play. How many of the crew have logged today, the
   roll-call wall (where he writes the day's coach line and can hide a post),
-  a single **needs-you** queue (notes awaiting a reply, unread messages, quiet
+  a single **needs-you** queue (notes awaiting a reply, quiet
   athletes, new signups), the **quest-week lever** (start or cancel a 7-day
   quest run), and a **Proof pulse** showing every athlete's last 7 days as
   presence dots, most silent first.
@@ -102,7 +102,7 @@ This is the human half of *"the coach actually watches you"* — the live app da
 
 ## Backend & plumbing (no server to run)
 
-- **Supabase** (hosted Postgres): stores every programme, backs up each athlete's progress to the cloud, powers the dashboard + two-way messaging, stores the weekly **call logs** and **cycle reports**, and handles **athlete sign-in** (username + password, one account per athlete).
+- **Supabase** (hosted Postgres): stores every programme, backs up each athlete's progress to the cloud, powers the dashboard, stores the weekly **call logs** and **cycle reports**, and handles **athlete sign-in** (username + password, one account per athlete).
 - **Notion sync** (`sync_notion.py`): the exercise → demo-video library is generated from a Notion database, not hand-edited.
 
 ---

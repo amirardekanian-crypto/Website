@@ -151,7 +151,7 @@ Four counters across the hero, each one a link to the panel that explains it:
 | **On court today** | Proof athletes with a log entry for today ÷ everyone on Proof |
 | **Wall lines today** | Roll-call posts today, hidden ones excluded |
 | **Sessions this week** | Finished training sessions in the last 7 days, whole roster |
-| **Waiting on you** | Session notes needing a reply + unread chat messages |
+| **Waiting on you** | Session notes needing a reply |
 
 Beside them: the current season and how many days into it you are.
 
@@ -181,12 +181,12 @@ One list, most urgent first, everything that's actually waiting on a human:
 | Row | Trigger |
 |---|---|
 | **Day N note: "…"** | A finished session carries an athlete note and `coach_status` is still `new` |
-| **N unread messages** | Athlete messages with `read_by_coach = false` |
 | **No session for N days** | A coached athlete with history and no session for > 7 days |
 | **Silent on Proof — N days** | A Proof athlete with no log for ≥ 3 days |
 | **New signup** | A contact created in the last 7 days |
 
-Tap any row to open that person's file. Opening a file marks their chat read.
+Tap any row to open that person's file. (An *N unread messages* row sat here until 2026-09-26,
+when the in-app chat was removed from both apps: athletes message you on WhatsApp now.)
 
 ### Quest week
 
@@ -215,7 +215,7 @@ Each row carries a tier chip — **Coached**, **Free**, **Proof only** (they log
 habits but have no program file) or **No file** — their level, an ACWR pill *only when it's amber
 or red*, their session count, their Proof week (`n/7`) and seven presence dots.
 
-**A flagged row says why, in words:** *1 note to reply* · *2 unread messages* · *no session for 9
+**A flagged row says why, in words:** *1 note to reply* · *no session for 9
 days* · *silent on Proof — 4 days* · *ready to upgrade?*. The reasons are the same triggers as the
 Needs-you list on Today; before, they were folded into one dot-separated line and a row that needed
 a reply looked like a row that didn't.
@@ -229,11 +229,12 @@ a reply looked like a row that didn't.
 **Rebuilt 2026-08-22.** It used to be eight sections on one scroll, three of which drew the same
 program days three different ways — *Prescribed program*, *Training logs by day* and *Live activity* —
 hundreds of pixels apart. Answering "did she do what I asked?" meant reading the chips in one section,
-scrolling to another, and holding the numbers in your head. Now it's **five sub-tabs**, and the first
+scrolling to another, and holding the numbers in your head. Now it's **four sub-tabs** (five until
+Chat went, 2026-09-26), and the first
 one answers that question directly.
 
-The sub-tab lives in the URL (`#a/<id>/work`, `/proof`, `/chat`, `/calls`, `/file`), so any screen
-can be bookmarked. Plain `#a/<id>` opens **The work**.
+The sub-tab lives in the URL (`#a/<id>/work`, `/proof`, `/calls`, `/file`), so any screen
+can be bookmarked. An old `/chat` bookmark opens The work. Plain `#a/<id>` opens **The work**.
 
 ### The work — prescribed vs done, on one line
 
@@ -270,7 +271,9 @@ for the athlete's own history, so a change to the log line moves three places to
 (`buildSessionData()`, `parseSetLine()`, `parseSetText()`).
 
 Other things on this tab: the **day's session picker** when a day has been trained more than once
-(tap a date to compare against that run instead), the athlete's note with **Reply** / **Mark read**,
+(tap a date to compare against that run instead), the athlete's note with **Reply on WhatsApp** / **Mark read** (the reply opens their WhatsApp with
+the note quoted, or with no number on file opens WhatsApp with the reply typed so you pick their chat,
+and marks the note replied),
 the **raw log exactly as sent** behind a toggle on every day, **+ Add past session from email**, and
 a collapsed **live app snapshot** — what is on their phone right now, which is a different question
 from what they finished.
@@ -303,11 +306,13 @@ Read-only. The athlete owns the record: they log a max from **Personal Records �
 their app, and they can delete any entry. A lift they have renamed between cycles reads as one lift
 here and one lift there — both sides run the same name matcher, on purpose.
 
-### Proof · Chat · Calls · File
+### Proof · Calls · File
 
 - **Proof** (only for people who log habits) — server-scored level, 14 presence dots, their week,
   board name and worn title, WhatsApp and email, and their wall lines with hide/show on each.
-- **Chat** — the full message thread and a composer. Opening the file marks their chat read.
+- ~~**Chat**~~ — **removed 2026-09-26** (Amir: *"whatsapp first, remove in app chat from app and
+  coach.html"*). The `messages` table and its three functions stay on the server untouched, so no
+  past thread is lost; nothing reads or writes them now.
 - **Calls** — every `call_logs` row, **+ New call log**, and **Copy cycle prompt** (bundles a cycle's
   check-ins and sessions into a ready-to-paste report prompt).
 - **File** — the program and Proof links with **Rotate key**, what the data file says (id, tier,
@@ -397,7 +402,7 @@ it in this file.
 | `programs` | **The roster** — every athlete, their name, tier and prescribed plan |
 | `athlete_identities` | Who has a username/password login, and the passwords still to send |
 | ~~`athlete_keys`~~ | ⚠️ Empty since the secret links were retired — reads nothing useful |
-| `messages` | Chat threads and unread counts |
+| ~~`messages`~~ | ⚠️ Nothing reads it since the in-app chat was removed (2026-09-26). Kept, not dropped |
 | `hab_notes` | The wall, the coach line, moderation |
 | `hab_contacts` via `contact_list()` | The funnel, contact buttons, days logged |
 | `leaderboard_optin` | Who's on the board, their display name and worn title |

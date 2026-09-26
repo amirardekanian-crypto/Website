@@ -147,8 +147,9 @@ genuinely right for you. At the end of each cycle, all of that week-by-week
 information is read together to decide what the next cycle should do. You're never
 running a stale plan.
 
-**Two-way messaging is always open.** Your coach is a message away inside the app,
-alongside personal notes written for you and an in-app guide if you need it.
+**Your coach is one WhatsApp message away.** The button is at the top of the app's Coach tab,
+alongside personal notes written for you and an in-app guide if you need it. Send questions,
+swaps, anything that hurts, and form-check videos there.
 
 ---
 
@@ -187,7 +188,7 @@ sharpening your own craft, it's all in one place — and it grows over time.
 - **Nothing is random.** Every choice has a reason, and you'll always know what it is.
 - **A coach actually watches.** Live data plus a real weekly conversation means someone is paying attention to *you*, every week.
 - **It adapts.** Your plan changes as you change — that's the whole point.
-- **It's a real app, not a document.** Video, cues, logging, timers, messaging — a genuine coaching experience in your pocket.
+- **It's a real app, not a document.** Video, cues, logging, timers, a direct line to your coach — a genuine coaching experience in your pocket.
 - **It's evidence-based.** The methods come from sport science, applied by a coach with an MSc in Strength & Conditioning, an MSc in Applied Exercise Physiology, and 1000+ tennis and padel players coached.
 
 ---

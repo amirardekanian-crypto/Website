@@ -317,6 +317,35 @@ costs more than one tap.
   *under target RPE* pill is steel blue (it was ochre, the colour of "extra set"). The average still
   flags only past `RPE_OVER`/`RPE_UNDER` (1.5); the per-set colours are exact, like the athlete's.
 
+## 💬 No in-app chat: the Coach tab is WhatsApp-first (2026-09-26)
+
+Amir: *"whatsapp first, remove in app chat from app and coach.html"*. The chat was a second inbox he
+had to remember to open (one athlete's three messages of 9 Sep sat unread for 17 days), and every athlete
+already talks to him on WhatsApp.
+
+- **The Coach tab opens on *Message me on WhatsApp*** (`coachContactHtml()`): a `wa.me` link to
+  `COACH_WHATSAPP`, pre-filled with the athlete's first name, cycle and week so Amir knows who is
+  writing and where they are; the demo says it is the demo. The number is printed under the button
+  for a phone that will not open the link. **`COACH_WHATSAPP` must stay the number the site's own
+  buy buttons use.**
+- **Gone:** the thread, the composer, the unread dot on the Coach tab, the boot-time fetch of messages
+  and the hero's *"Online · usually replies in a few hours"*, which was hard-coded and never true or
+  false on purpose. The welcome sheet and the guide now point at WhatsApp.
+- **coach.html** has no Chat sub-tab (an old `#a/<id>/chat` bookmark opens The work), no unread
+  counts in *Waiting on you* or the roster reasons, and no `messages` query. A session note's
+  **Reply on WhatsApp** (`replyOnWhatsApp()`) opens the athlete's WhatsApp from `hab_contacts` with the
+  note quoted (or, with no number on file, WhatsApp's own *pick a chat* link with the reply already
+  typed: on 2026-09-26 only 1 of 17 active coached athletes had a number in `hab_contacts`), then marks
+  the note `replied`.
+- **The server is untouched**: `messages`, `get_messages()`, `send_athlete_message()` and
+  `mark_athlete_read()` stay, so no past thread is lost. The shell is stale-while-revalidate, so a
+  phone may run the old copy for a launch or two and could still post into the table; check it once.
+- **Do not bring a chat back** without Amir asking for it.
+
+**Home order (same day).** This Week and the day cards come first; the Daily Habits card follows.
+It sat above them from 2026-09-12, and in the fortnight after, 5 of 40 athletes logged a habit in a
+week while 16 trained. The training is why the app is opened, so it leads.
+
 ## 🏋️ Personal Records (The Ceiling) — two write doors, and three things written twice
 
 Full account in `CODEBASE.md` → *The Ceiling*. The three duplications to keep in step:
