@@ -181,12 +181,20 @@ One list, most urgent first, everything that's actually waiting on a human:
 | Row | Trigger |
 |---|---|
 | **Day N note: "…"** | A finished session carries an athlete note and `coach_status` is still `new` |
+| **Run of low days: …** | A coached athlete's last 5 check-ins (within 3 weeks) hold 3 lower or short days, or stress 2 or lower on 3 of them (REC-2: the run is your call, never the app's). Also a *run of low days* reason on the roster |
 | **No session for N days** | A coached athlete with history and no session for > 7 days |
 | **Silent on Proof — N days** | A Proof athlete with no log for ≥ 3 days |
 | **New signup** | A contact created in the last 7 days |
 
 Tap any row to open that person's file. (An *N unread messages* row sat here until 2026-09-26,
 when the in-app chat was removed from both apps: athletes message you on WhatsApp now.)
+
+**Today's targets on a session (2026-09-26).** When an athlete's check-in eased the day (REC-2), the
+session line on The work says *lower day*, *short day* or *sore* (and *trained as written* if they
+chose to), the prescribed column prints `RPE 7 → 6 that day`, and the sets are judged against that
+number. Work the day left optional or skipped reads *optional today* / *skipped today: sore*, in grey,
+and is not counted as *not done*. The athlete's app decided the day and stored it with the
+check-in; nothing here recomputes it. `dayTargetC()` is the twin of `dayRpe()` in program.html.
 
 ### Quest week
 

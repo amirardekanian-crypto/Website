@@ -126,6 +126,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   New bests only: every screen leads with the latest entry. "The Ceiling" is retired from the screens.
 - **Weight boxes open empty** (2026-09-26): last time's weight is `lw` on the set, shown under a LAST caption,
   and `w` is only ever today's. A tick on an empty box records no weight; **Same as last** fills the boxes.
+- **The check-in sets today's targets, never the programme** (REC-2, 2026-09-26): the level is worked out once
+  at the check-in and stored with it (`level`, `sore`, `drop`, `asWritten`); `paintToday()` only paints. The
+  target rule exists twice, `dayRpe()` here and `dayTargetC()` in coach.html: change both.
 - **Body weight lives in `program.html`** under the key `<id>_hab_wt`; AA Proof must never write it, and it
   is never scored.
 - **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`.

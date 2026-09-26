@@ -56,7 +56,9 @@
 // v32: program.html changed (2026-09-26): the "My Plan" tab is now "Game Plan", with a route icon.
 // v33: program.html changed (2026-09-26): weight boxes open empty with last time's weight as a hint
 //      and a "Same as last" button; Personal Records fill themselves with each new best.
-const CACHE = 'aap-v33';
+// v34: program.html changed (2026-09-26): the readiness check sets today's targets (REC-2),
+//      and a running session's Guided button is visible again.
+const CACHE = 'aap-v34';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

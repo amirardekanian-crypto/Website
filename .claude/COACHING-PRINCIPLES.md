@@ -531,7 +531,9 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
     intensity: Bosquet 2007, Spiering 2021; stopping further from failure costs little strength:
     Robinson 2024, Grgic 2022; soreness lowers jump output: Byrne & Eston 2002, Cheung 2003; sleep
     loss: Craven 2022). Every threshold is judgement: review them at the PRC-25 eight-cycle review.
-  - Until the app applies it, the athlete applies it from the notes card tagged `low-readiness`.
+  - The app applies it since 2026-09-26 (program.html → *Today's targets*: the day's level is set at
+    the check-in and the cards show today's numbers); the notes card tagged `low-readiness` says the
+    same thing in the athlete's words, and stays.
 - `REC-3` **Separate training fatigue from life load** in every review — a readiness dip from
   poor sleep/stress is not the same as training fatigue (Athlete D's end-cycle dip was
   life, not load). *(2026-06-15)*

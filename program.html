@@ -2445,6 +2445,45 @@
     .ex-set-rpe-q { display: none; }
   }
 
+  /* ── Today's targets (Fork 2A, 2026-09-26) — see paintToday() ──
+     Clay for a lower or short day, like every other "off the written plan" mark in the
+     app; steel blue for a sore-only day. Never a yellow: no amber here, whatever the
+     rule calls the level. */
+  .rd-banner { margin: 12px 0 4px; }
+  .rd-in { border-radius: 12px; padding: 12px 14px; display: grid; gap: 6px;
+    background: rgba(199,85,47,0.08); box-shadow: inset 3px 0 0 var(--ice); }
+  .rd-in.rd-sore { background: rgba(62,106,146,0.09); box-shadow: inset 3px 0 0 #3E6A92; }
+  .rd-in.rd-plain { background: var(--grey-card); box-shadow: none; }
+  .rd-k { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--ice); }
+  .rd-in.rd-sore .rd-k { color: #3E6A92; }
+  .rd-in.rd-plain .rd-k { color: var(--grey-text); }
+  .rd-t { font-family: 'Barlow', sans-serif; font-size: 14px; line-height: 1.45; color: var(--grey-dark); }
+  .rd-btn { justify-self: start; margin-top: 2px; min-height: 34px; padding: 0 14px; border-radius: 99px;
+    border: 0; background: transparent; box-shadow: inset 0 0 0 1.5px var(--grey-mid); color: var(--grey-dark);
+    font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 13px; cursor: pointer; }
+  body[data-dark] .rd-in { background: rgba(224,107,67,0.12); }
+  body[data-dark] .rd-in.rd-sore { background: rgba(141,179,214,0.12); box-shadow: inset 3px 0 0 #8DB3D6; }
+  body[data-dark] .rd-in.rd-sore .rd-k { color: #8DB3D6; }
+  body[data-dark] .rd-in.rd-plain { background: #252525; }
+  body[data-dark] .rd-k { color: #E06B43; }
+  body[data-dark] .rd-t { color: #ddd; }
+  body[data-dark] .rd-btn { color: #ddd; box-shadow: inset 0 0 0 1.5px #444; }
+  /* "RPE 8 → 7 today": the written number stays, struck, beside today's. */
+  .rd-val { display: inline-flex; align-items: baseline; gap: 6px; }
+  .rd-was { text-decoration: line-through; opacity: 0.45; font-size: 0.8em; }
+  .rd-now { color: var(--ice); }
+  body[data-dark] .rd-now { color: #E06B43; }
+  .ex-summary-pill.rd-pill { background: transparent; color: var(--ice); box-shadow: inset 0 0 0 1.5px var(--ice); }
+  /* Neutral, not clay: a filled clay pill already means the Coach's Note. */
+  .ex-summary-pill.rd-tag { background: var(--grey-dark); color: var(--white); }
+  .rd-tag.rd-item { margin-left: 6px; padding: 2px 7px; border-radius: 99px; background: var(--grey-dark); color: var(--white);
+    font-family: 'Space Mono', monospace; font-size: 9.5px; white-space: nowrap; }
+  .checklist-item.rd-optional .item-name, .checklist-item.rd-skip .item-name { opacity: 0.6; }
+  .ex-set-row.rd-extra { opacity: 0.45; }
+  body[data-dark] .ex-summary-pill.rd-pill { color: #E06B43; box-shadow: inset 0 0 0 1.5px #E06B43; }
+  .ceil-due-wait { margin: 6px 0 4px; font-family: 'Barlow', sans-serif; font-size: 13.5px; color: var(--grey-dark); }
+
   /* ── Last time's weight (Fork 3B, 2026-09-26) — see paintSets()/carrySet() ──
      The number in an empty box is history, not something a tick records, so it
      wears a LAST caption and sits smaller and paler than the prescribed reps beside
@@ -3696,6 +3735,9 @@
   .session-timer-actions { display: flex; gap: 8px; flex-shrink: 0; }
   .session-timer-btn.guided { background: transparent; color: var(--ice); border: 1.5px solid var(--ice); }
   body[data-dark] .session-timer-btn.guided { background: transparent; }
+  /* `.session-timer.running .session-timer-btn` fills every timer button with clay, which
+     left Guided as clay text on clay, a blank block, for the whole of a running session. */
+  .session-timer.running .session-timer-btn.guided { background: transparent; }
 
   /* ── Guided Mode — walks the day's standard exercises one set at a time. See
      openStepMode() in the script: it relocates the REAL .ex-detail node (video, stats,
@@ -4398,7 +4440,7 @@
   <div class="readiness-modal" role="dialog" aria-modal="true" aria-label="Readiness check">
     <div class="readiness-eyebrow">Before you start</div>
     <h2 class="readiness-title">Readiness check</h2>
-    <p class="readiness-sub">A quick gut-check so your coach knows how you're walking in today. This doesn't change your plan — just train as written.</p>
+    <p class="readiness-sub">Ten seconds, and honest answers. On a lower day the app eases today's targets for you, and you can still train as written.</p>
     <div class="readiness-questions" id="readiness-questions"></div>
     <div class="readiness-actions">
       <button type="button" class="readiness-begin" id="readiness-begin" disabled onclick="beginSession()">Begin session ▶</button>
@@ -5848,15 +5890,22 @@ function homeWeekLabel(cycle) {
 // scripts/check_program.py, and nothing here changes a prescription. A cycle without weekNotes (every programme
 // written before this) shows nothing, never an invented back-off. Nothing after endDate
 // either: an athlete still training past the end is not in a back-off week for ever.
-function weekNoteHTML(cycle) {
+// The week note in force today, with its `key` ('first' | 'last'), or null.
+// weekNoteHTML() draws it; dayRpe() reads its numbers so a lower day and a back-off
+// week never stack (REC-2).
+function weekNoteNow(cycle) {
   const notes = cycle && cycle.weekNotes;
   const w = (notes && typeof notes === 'object') ? cycleWeekInfo(cycle) : null;
-  if (!w || w.after) return '';
+  if (!w || w.after) return null;
   const key = (w.total > 1 && w.wk === w.total && !w.before) ? 'last' : (w.wk === 1 ? 'first' : null);
   const n = key && notes[key];
-  if (!n || !n.text) return '';
-  const label = n.title || (key === 'last' ? 'Back-off week' : 'Week 1');
-  return `<div class="week-note week-note-${key}"><span class="week-note-label">${esc(label)}</span>${esc(n.text)}</div>`;
+  return (n && n.text) ? Object.assign({ key: key }, n) : null;
+}
+function weekNoteHTML(cycle) {
+  const n = weekNoteNow(cycle);
+  if (!n) return '';
+  const label = n.title || (n.key === 'last' ? 'Back-off week' : 'Week 1');
+  return `<div class="week-note week-note-${n.key}"><span class="week-note-label">${esc(label)}</span>${esc(n.text)}</div>`;
 }
 
 // Map a day to ONE of eight category pictures. Eight files cover every day of
@@ -6270,6 +6319,8 @@ function renderHome() {
         ${hasStandard ? `<button type="button" class="session-timer-btn guided" onclick="openGuided('${day.id}')">Guided ▶</button>` : ''}
       </div>
     </div>`;
+    // Today's targets: filled by paintToday() after a lower-day check-in (REC-2).
+    html += `<div class="rd-banner" hidden></div>`;
 
     // Continuous numbering across the whole day (1 → total exercises)
     let exerciseNum = 1;
@@ -7149,7 +7200,7 @@ const APP_GUIDE = [
   { icon: 'activity', title: 'RPE & Tempo',
     body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
   { icon: 'mindset', title: 'The readiness check',
-    body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. It doesn't change today's session (train as written), but it tells me how you're walking in, so I can spot when you're run-down and adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
+    body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>Tap an exercise to expand it. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number or tap <strong>Same as last</strong>, which puts last time's weights into every empty set. A weight you type also fills the empty sets below it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
@@ -7774,9 +7825,25 @@ function agoLabel(days) {
 // The retest strip. Silent unless the coach flagged a lift AND the cycle is in
 // its closing week AND the lift has gone long enough without a number — three
 // conditions, because a nudge that shows every time is one nobody reads.
+// The worst level any of today's check-ins came back at, unless the athlete chose to
+// train as written: 'red' | 'amber' | ''.
+function todayLowLevel() {
+  let worst = '';
+  ((DATA && DATA.workouts && DATA.workouts.days) || []).forEach(d => {
+    const r = todayPlan(d.id);
+    if (!r || r.asWritten) return;
+    if (r.level === 'red') worst = 'red';
+    else if (r.level === 'amber' && !worst) worst = 'amber';
+  });
+  return worst;
+}
+
 function dueHtml() {
   const due = ceilingDue();
   if (!due.length) return '';
+  // A flagged retest waits for a green day (REC-2): the strip stays, and says why not today.
+  const wait = todayLowLevel()
+    ? `<div class="ceil-due-wait">Not today: your check-in says a lower day. A retest waits for a green one.</div>` : '';
   const cands = ceilingCandidates();
   const rows = due.map(d => {
     const i = cands.findIndex(c => c.name === d.name);
@@ -7790,7 +7857,7 @@ function dueHtml() {
     </button>`;
   }).join('');
   return `<div class="ceil-due">
-    <div class="ceil-due-t">— Due for a retest</div>
+    <div class="ceil-due-t">— Due for a retest</div>${wait}
     <div class="ceil-due-d">You are at the end of a block. Retest ${due.length === 1
       ? 'this lift' : 'these lifts'} and the next one starts from a real number.
       Warm up properly, then one hard set — stop when the last rep is a true grind.</div>
@@ -8838,17 +8905,26 @@ function switchDay(n) {
 // Returns { done, total, missing[] } where each missing entry describes an
 // unfinished exercise (with a short label like "2/4 sets" or "skipped").
 function getDayCompletion(day) {
-  const total = dayTotals[day] || 0;
+  let total = dayTotals[day] || 0;
   const items = document.querySelectorAll(`[data-day="${day}"]`);
   let done = 0;
   const missing = [];
+  // Today's targets (paintToday()): work the day did not ask for is never "missing".
+  // Optional (a red day) or skipped (sore) counts only what was actually done; a halved
+  // exercise asks for its halved sets. `excused` names what was left, for the report.
+  const excused = [];
   items.forEach(item => {
     const name = (item.querySelector('.item-name')?.textContent || '').trim();
+    const off = item.classList.contains('rd-optional') ? 'optional today'
+              : item.classList.contains('rd-skip') ? 'skipped today: sore' : '';
     if (item.classList.contains('round-group') || !item.dataset.sets) {
       // Circuit or simple — 1 unit, counted iff .checked
       const isDone = item.classList.contains('checked');
       if (isDone) {
         done += 1;
+      } else if (off && name) {
+        total -= 1;
+        excused.push({ name, label: off });
       } else if (name) {
         missing.push({ name, type: 'simple', doneSets: 0, totalSets: 1, label: 'skipped' });
       }
@@ -8858,15 +8934,22 @@ function getDayCompletion(day) {
       const log = loadSetLog(name, totalSets);
       const doneSets = log.filter(s => s.d).length;
       done += doneSets;
-      if (doneSets < totalSets && name) {
+      if (off) {
+        total -= totalSets - doneSets;
+        if (doneSets < totalSets && name) excused.push({ name, label: off });
+        return;
+      }
+      const need = item.dataset.rdSets ? Math.min(parseInt(item.dataset.rdSets, 10) || totalSets, totalSets) : totalSets;
+      if (need < totalSets) total -= totalSets - Math.max(need, doneSets);
+      if (doneSets < need && name) {
         missing.push({
-          name, type: 'standard', doneSets, totalSets,
-          label: doneSets === 0 ? 'skipped' : `${doneSets}/${totalSets} sets`
+          name, type: 'standard', doneSets, totalSets: need,
+          label: doneSets === 0 ? 'skipped' : `${doneSets}/${need} sets`
         });
       }
     }
   });
-  return { done, total, missing };
+  return { done, total, missing, excused };
 }
 
 // Repaint the bottom confirm card based on the day's current completion state.
@@ -9090,6 +9173,53 @@ function loadReadiness(day) {
   try { return JSON.parse(localStorage.getItem(readinessKey(day))) || null; } catch (e) { return null; }
 }
 
+// ── Today's targets (Fork 2A, Amir, 2026-09-26) — the rule is REC-2 ─────────────
+// The check-in changes the DAY, never the programme (PRG-4): a card keeps its written
+// numbers and shows today's beside them. The level is worked out ONCE, when the check-in
+// is answered, and stored with it ({ level, sore, drop, score, base, asWritten }), so the
+// session record, coach.html and a reload all read the same answer and nothing
+// recomputes it later with different history.
+//   score (S): the mean of sleep, energy, stress and overall. Soreness barely tracks
+//     them (r .12 to .28 across 348 check-ins), so it only ever moves impact work.
+//   base (B): the athlete's own mean S over their last 10 answered check-ins, once there
+//     are 5 (get_my_history's `ready`, stage40).
+//   amber: S 2.5 or lower, or at least 0.75 under B. Every RPE 1 lower (drop), never below 6.
+//   red: S 2.0 or lower, or any of the four at 1. Amber, and the session is the warm-up,
+//     the first power move and the first primary lift; the rest is optional (redDayCore()).
+//   sore: soreness 2 or lower, on any level: jumps and landings at half the sets, at least
+//     one; at 1, skipped. Lifts are unchanged: RPE already regulates a sore muscle.
+// The athlete can always train as written (asWritten), and that choice is kept and sent.
+const READY_AMBER_S = 2.5, READY_RED_S = 2.0, READY_BASE_GAP = 0.75;
+const READY_BASE_N = 10, READY_BASE_MIN = 5, RPE_FLOOR = 6;
+const READY_FOUR = ['sleep', 'energy', 'stress', 'overall'];
+function readinessS(r) {
+  if (!r || r.skipped) return null;
+  const v = READY_FOUR.map(k => Number(r[k]));
+  return v.every(x => x >= 1 && x <= 5) ? v.reduce((a, b) => a + b, 0) / 4 : null;
+}
+// Newest first, from the phone's copy of the server history; today's own check-in is not
+// in it yet. Null until there are READY_BASE_MIN answered check-ins to go on.
+function readinessBase() {
+  const ss = [];
+  (HIST || []).forEach(h => { const x = readinessS(h.ready); if (x != null) ss.push(x); });
+  const last = ss.slice(0, READY_BASE_N);
+  return last.length >= READY_BASE_MIN ? last.reduce((a, b) => a + b, 0) / last.length : null;
+}
+function readinessPlan(r, base) {
+  const S = readinessS(r);
+  if (S == null) return null;
+  const red = S <= READY_RED_S || READY_FOUR.some(k => Number(r[k]) === 1);
+  const amber = S <= READY_AMBER_S || (base != null && S <= base - READY_BASE_GAP + 1e-9);
+  const so = Number(r.soreness);
+  return {
+    level: red ? 'red' : amber ? 'amber' : 'green',
+    sore: so === 1 ? 'skip' : so === 2 ? 'half' : '',
+    drop: (red || amber) ? 1 : 0,
+    score: Math.round(S * 100) / 100,
+    base: base == null ? null : Math.round(base * 100) / 100,
+  };
+}
+
 let _readinessDay = null;     // which day the open modal belongs to
 let _readinessSel = {};       // key → 1..5 selections for the open modal
 
@@ -9152,11 +9282,14 @@ function beginSession() {
     composite,
     skipped: false,
   };
+  const plan = readinessPlan(readiness, readinessBase());
+  if (plan) Object.assign(readiness, plan, { asWritten: false });
   localStorage.setItem(readinessKey(day), JSON.stringify(readiness));
   closeReadinessModal();
   startTimerNow(day);
   _readinessDay = null;
   _readinessSel = {};
+  paintToday(day);
 }
 
 function skipReadiness() {
@@ -9173,6 +9306,229 @@ function skipReadiness() {
   _readinessDay = null;
   _readinessSel = {};
 }
+
+// ── Today's targets on the day's cards (Fork 2A) ─────────────────────────────────
+// Display only. Nothing here writes a set, a log or the programme: each card keeps its
+// written numbers and gains today's beside them, and "Train as written" puts it all back.
+// Blocks are known by their titles, the way the warm-up always has been (isPrepBlockTitle()).
+const POWER_BLOCK_RE   = /power|plyo|jump|throw|landing|stops|med.?ball|spring|reactive|reaction|first step|speed|sprint|bound/i;
+const PRIMARY_BLOCK_RE = /primary|strength/i;
+// Only when the Spine has no entry for an exercise yet: a sore day must never leave a box
+// jump at full sets just because its entry is missing.
+const IMPACT_NAME_RE   = /jump|hop|bound|pogo|landing|snap.?down|depth drop/i;
+
+// A check-in answered TODAY that carries a level, or null (none yet, skipped, one left
+// from an earlier day, or one answered before this shipped).
+function todayPlan(day) {
+  const r = loadReadiness(day);
+  if (!r || r.skipped || !r.level || !r.timestamp) return null;
+  return new Date(r.timestamp).toDateString() === new Date().toDateString() ? r : null;
+}
+function currentCycleData() {
+  return DATA && (DATA.cycles || [])[DATA.currentCycleIndex || 0];
+}
+
+// A written RPE ("8", "7-8") as today's target, or '' when today changes nothing. One off
+// each end, never below 6, never above what was written; and a lower day does not stack
+// with the week note (week 1, the back-off week): the lower of the two targets wins.
+// ⚠ coach.html's dayTargetC() is the same rule without the week note. Change both.
+function dayRpe(written, drop, note) {
+  const m = String(written == null ? '' : written).match(/(\d+(?:\.\d+)?)(?:\s*[-–]\s*(\d+(?:\.\d+)?))?/);
+  if (!m || !drop) return '';
+  const lo = Number(m[1]), hi = m[2] ? Number(m[2]) : lo;
+  const week = v => (note && Number(note.rpeCap) > 0) ? Math.min(v, Number(note.rpeCap))
+                  : (note && Number(note.rpeDrop) > 0) ? v - Number(note.rpeDrop) : v;
+  const one = v => Math.min(v, week(v), Math.max(RPE_FLOOR, v - drop));
+  const a = one(lo), b = one(hi);
+  if (a === lo && b === hi) return '';
+  return a === b ? String(a) : a + '–' + b;
+}
+
+// A red day's session (REC-2): the warm-up, the first power move and the first primary
+// lift (all its sets), as positions in the day's card order. A day with no Primary block:
+// the warm-up and the first working block. { keep: Set, power, primary } (names).
+function redDayCore(day) {
+  const keep = new Set();
+  let i = 0, power = null, primary = null, first = null;
+  (day.blocks || []).forEach(b => {
+    const t = b.title || '';
+    (b.exercises || []).forEach(ex => {
+      if (isPrepBlockTitle(t)) keep.add(i);
+      else {
+        if (!first) first = { start: i, n: (b.exercises || []).length, name: ex.name };
+        if (!power && POWER_BLOCK_RE.test(t)) power = { i: i, name: ex.name };
+        if (!primary && PRIMARY_BLOCK_RE.test(t)) primary = { i: i, name: ex.name };
+      }
+      i++;
+    });
+  });
+  if (primary) {
+    keep.add(primary.i);
+    if (power) keep.add(power.i);
+  } else if (first) {
+    for (let k = 0; k < first.n; k++) keep.add(first.start + k);
+  }
+  return { keep: keep, power: primary && power ? power.name : null, primary: primary ? primary.name : null,
+           block: !primary && first ? first.name : null };
+}
+
+// A jump or a landing: the Spine entry's impact, or the name when there is no entry yet.
+function isImpactWork(ex) {
+  const e = spineFor(ex && ex.name, ex && ex.exId);
+  if (e) return e.impact === 'plyometric' || e.impact === 'landing';
+  return IMPACT_NAME_RE.test(String((ex && ex.name) || ''));
+}
+
+// "Today:" line for the session report and the email, or ''.
+function readinessPlanLine(r) {
+  if (!r || !r.level) return '';
+  const low = r.level === 'amber' || r.level === 'red';
+  if (!low && !r.sore) return '';
+  const bits = [];
+  if (r.level === 'red') bits.push('short day (warm-up, first power move and first primary lift; the rest optional)');
+  else if (low) bits.push('lower day (every RPE 1 lower, never below 6)');
+  if (r.sore === 'half') bits.push('sore: jumps and landings halved');
+  if (r.sore === 'skip') bits.push('sore: jumps and landings skipped');
+  return 'Today: ' + bits.join(' · ') + (r.asWritten ? ' — trained as written by choice' : '');
+}
+
+function readinessBannerHtml(day, r, dayData) {
+  const low = r.level === 'amber' || r.level === 'red';
+  if (!low && !r.sore) return '';
+  const title = r.level === 'red' ? 'Short day' : low ? 'Lower day' : 'Sore today';
+  const d = esc(String(day));
+  if (r.asWritten) {
+    return `<div class="rd-in rd-plain"><div class="rd-k">Training as written</div>
+      <div class="rd-t">Your check-in suggested a ${esc(title.toLowerCase())}. Your call, and I'll see it with the session.</div>
+      <button type="button" class="rd-btn" onclick="setAsWritten('${d}', false)">Use today's targets</button></div>`;
+  }
+  const lines = [];
+  if (low) lines.push('Every RPE is 1 lower today, never below 6. Same sets and reps.');
+  if (r.level === 'red' && dayData) {
+    const c = redDayCore(dayData);
+    const what = c.primary
+      ? 'the warm-up, ' + (c.power ? c.power + ' and ' : '') + c.primary
+      : 'the warm-up and the ' + (c.block ? 'block that starts with ' + c.block : 'first block');
+    lines.push('The session is ' + what + '. The rest is optional: drop it from the end.');
+  }
+  if (r.sore === 'half') lines.push('Sore: jumps and landings at half the sets. Lifts unchanged.');
+  if (r.sore === 'skip') lines.push('Sore: no jumps or landings today. Lifts unchanged.');
+  return `<div class="rd-in rd-${r.level === 'red' ? 'short' : low ? 'lower' : 'sore'}">
+    <div class="rd-k">${esc(title)} · today's targets</div>
+    <div class="rd-t">${lines.map(esc).join(' ')}</div>
+    <button type="button" class="rd-btn" onclick="setAsWritten('${d}', true)">Train as written</button></div>`;
+}
+
+// Everything the painter changed carries data-rd-orig (the element's own HTML before) or
+// an rd-* class, so a repaint or "Train as written" always starts from the card as drawn.
+function rdKeep(el) { if (el && el.dataset.rdOrig == null) el.dataset.rdOrig = el.innerHTML; }
+function rdTag(card, text) {
+  let sum = card.querySelector('.ex-summary');
+  if (!sum) {
+    sum = document.createElement('div');
+    sum.className = 'ex-summary rd-made';
+    const body = card.querySelector('.item-body');
+    if (!body) return;
+    body.appendChild(sum);
+  }
+  const t = document.createElement('span');
+  t.className = 'ex-summary-pill rd-tag';
+  t.textContent = text;
+  sum.insertBefore(t, sum.firstChild);
+}
+function rdTarget(card, ex, drop, note) {
+  const written = rxOf(ex).rpe;
+  const t = written ? dayRpe(written, drop, note) : '';
+  if (t) {
+    if (ex.type !== 'circuit') card.dataset.targetToday = t;
+    const cell = card.querySelector('.ex-stat.target');
+    if (cell) {
+      rdKeep(cell);
+      cell.innerHTML = `<div class="ex-stat-label">RPE today</div><div class="ex-stat-value rd-val"><span class="rd-was">${esc(written)}</span><span class="rd-now">${esc(t)}</span></div>`;
+    }
+    const pill = [...card.querySelectorAll('.ex-summary-pill.stat')].find(p => p.textContent === written + '/10');
+    if (pill) { rdKeep(pill); pill.textContent = `RPE ${written} → ${t} today`; pill.classList.add('rd-pill'); }
+  }
+  if (ex.type === 'circuit') {
+    const rows = card.querySelectorAll('.round-row');
+    (ex.items || []).forEach((item, k) => {
+      const ir = rxOf(item).rpe, it = ir ? dayRpe(ir, drop, note) : '';
+      const det = it && rows[k] && rows[k].querySelector('.round-detail');
+      if (!det) return;
+      rdKeep(det);
+      det.textContent = det.textContent.replace('RPE ' + ir, `RPE ${ir} → ${it} today`);
+    });
+  }
+}
+
+function paintToday(day) {
+  const panel = document.getElementById('day' + day);
+  if (!panel || !DATA || !DATA.workouts) return;
+  const r = todayPlan(day);
+  const dayData = (DATA.workouts.days || []).find(d => String(d.id) === String(day));
+  // Undo the last paint.
+  panel.querySelectorAll('[data-rd-orig]').forEach(el => { el.innerHTML = el.dataset.rdOrig; el.removeAttribute('data-rd-orig'); });
+  panel.querySelectorAll('.rd-tag').forEach(el => el.remove());
+  panel.querySelectorAll('.rd-made').forEach(el => el.remove());
+  panel.querySelectorAll('.rd-pill').forEach(el => el.classList.remove('rd-pill'));
+  const cards = [...panel.querySelectorAll('.checklist-item')];
+  cards.forEach(c => {
+    c.classList.remove('rd-optional', 'rd-skip');
+    delete c.dataset.targetToday;
+    delete c.dataset.rdSets;
+  });
+  const banner = panel.querySelector('.rd-banner');
+  if (banner) {
+    const h = r ? readinessBannerHtml(day, r, dayData) : '';
+    banner.innerHTML = h;
+    banner.hidden = !h;
+  }
+  if (r && !r.asWritten && dayData) {
+    const flat = [];
+    (dayData.blocks || []).forEach(b => (b.exercises || []).forEach(ex => flat.push(ex)));
+    const core = r.level === 'red' ? redDayCore(dayData).keep : null;
+    const note = weekNoteNow(currentCycleData());
+    cards.forEach((card, i) => {
+      const ex = flat[i];
+      if (!ex) return;
+      if (r.drop) rdTarget(card, ex, r.drop, note);
+      let skip = false;
+      if (r.sore && isImpactWork(ex) && ex.type !== 'circuit') {
+        const sets = parseInt(card.dataset.sets, 10) || 1;
+        if (r.sore === 'skip') { skip = true; card.classList.add('rd-skip'); rdTag(card, 'Skip today · sore'); }
+        else {
+          const n = Math.max(1, Math.floor(sets / 2));
+          if (n < sets) { card.dataset.rdSets = String(n); rdTag(card, `${n} of ${sets} sets today`); }
+        }
+      }
+      if (r.sore && ex.type === 'circuit') {
+        const rows = card.querySelectorAll('.round-row');
+        (ex.items || []).forEach((item, k) => {
+          const main = rows[k] && rows[k].querySelector('.round-row-main');
+          if (!main || !isImpactWork(item)) return;
+          const t = document.createElement('span');
+          t.className = 'rd-tag rd-item';
+          t.textContent = r.sore === 'skip' ? 'Skip today' : 'Every other round';
+          main.appendChild(t);
+        });
+      }
+      if (core && !core.has(i) && !skip) { card.classList.add('rd-optional'); rdTag(card, 'Optional today'); }
+    });
+  }
+  cards.forEach(c => { if (c._paintSets) c._paintSets(); });
+  updateProgress(day);
+}
+
+function setAsWritten(day, on) {
+  const r = loadReadiness(day);
+  if (!r) return;
+  r.asWritten = !!on;
+  r.asWrittenAt = new Date().toISOString();
+  localStorage.setItem(readinessKey(day), JSON.stringify(r));
+  paintToday(day);
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+window.setAsWritten = setAsWritten;
 
 function confirmSession(day) {
   const card = document.getElementById('confirm-' + day);
@@ -9645,6 +10001,9 @@ function restoreState() {
     syncExerciseCheck(card, log);
   });
 
+  // A lower-day check-in answered earlier today stays painted through a reload.
+  Object.keys(dayTotals).forEach(d => paintToday(d));
+
   // After RPE buttons are wired up, collapse any card that's checked AND has a
   // saved RPE (or is a simple-type item with no RPE picker). Mirrors the live
   // behavior so the page picks up where they left off.
@@ -9766,6 +10125,13 @@ function buildSessionData(day) {
         `Composite ${readiness.composite}/5 · Sleep ${readiness.sleep} · ` +
         `Energy ${readiness.energy} · Soreness ${readiness.soreness} · ` +
         `Stress ${readiness.stress} · Overall ${readiness.overall}`;
+      // What the check-in changed today (REC-2). AFTER the answers: coach.html's email
+      // import reads the first "sore…: n" it meets, which must stay the soreness answer.
+      const planLine = readinessPlanLine(readiness);
+      if (planLine) {
+        readinessSummary += '\n' + planLine;
+        readinessField += ' · ' + planLine.replace(/^Today: /, '');
+      }
     }
     summary += `\n${readinessSummary}\n`;
   }
@@ -9774,6 +10140,7 @@ function buildSessionData(day) {
   summary += `\nExercise log:\n`;
 
   const missingByName = new Map(dayStatus.missing.map(m => [m.name, m]));
+  const excusedByName = new Map((dayStatus.excused || []).map(m => [m.name, m]));
   // The same sets as DATA, saved beside the text summary (session_history.log).
   // It is what The Card Remembers reads back; the summary stays for the email
   // and the coach dashboard. One entry per exercise:
@@ -9811,7 +10178,7 @@ function buildSessionData(day) {
     (block.exercises || []).forEach(ex => {
       const isCircuit = ex.type === 'circuit';
       const data = collectFor(ex, isCircuit);
-      const m = missingByName.get(ex.name);
+      const m = missingByName.get(ex.name) || excusedByName.get(ex.name);
       const tag = m ? ` (${m.label})` : ' (✓)';
       summary += `• ${ex.name}${tag}\n`;
       const planned = data.kind === 'sets' ? plannedReps(ex) : null;
@@ -10184,6 +10551,8 @@ function attachSetLog(card) {
       row.classList.toggle('done', !!s.d);
       row.classList.toggle('live', i === liveIdx);
       row.classList.toggle('rpe-open', !!s.d && open.has(i));
+      // A sore day's halved sets (paintToday()): the rest stay, dimmed, in case they are done.
+      row.classList.toggle('rd-extra', !!card.dataset.rdSets && i >= parseInt(card.dataset.rdSets, 10));
       // Last time's weight (carrySet), shown in the empty box under a small LAST caption.
       // The caption is the point: the reps box beside it shows a grey number too, the
       // prescription, and a tick DOES record that one. A bare grey 80 next to a grey 5
@@ -10200,8 +10569,10 @@ function attachSetLog(card) {
       const tag = row.querySelector('.ex-set-rpetag');
       tag.textContent = (s.d && s.r) ? 'RPE ' + s.r : (s.d ? 'RPE' : '');
       tag.classList.toggle('empty', !s.r);
-      // Off target: clay when harder than prescribed, steel blue when easier.
-      const vs = s.r ? rpeVs(s.r, card.dataset.target) : '';
+      // Off target: clay when harder than prescribed, steel blue when easier. Against
+      // TODAY's target when a lower day moved it (paintToday()), or a set done exactly as
+      // asked would read "over".
+      const vs = s.r ? rpeVs(s.r, card.dataset.targetToday || card.dataset.target) : '';
       tag.classList.toggle('over', vs === 'over');
       tag.classList.toggle('under', vs === 'under');
       tag.setAttribute('aria-label', s.r ? `RPE ${s.r}${vs ? (vs === 'over' ? ', above' : ', below') + ' target' : ''}. Tap to change` : `Rate set ${i + 1}`);
@@ -11579,7 +11950,7 @@ function paintTimerLog(row, item) {
       </div>` : ''}
       <div class="tl-line tl-rpe">
         <span class="tl-lab">RPE</span>
-        ${[6,7,8,9,10].map(v => { const on = selRpe() === String(v), vs = on ? rpeVs(v, item.card.dataset.target) : '';
+        ${[6,7,8,9,10].map(v => { const on = selRpe() === String(v), vs = on ? rpeVs(v, item.card.dataset.targetToday || item.card.dataset.target) : '';
           return `<button type="button" class="tl-rpe-btn${on ? ' selected' : ''}${vs ? ' ' + vs : ''}" data-rpe="${v}">${v}</button>`; }).join('')}
       </div>`;
     tl.querySelectorAll('.tl-step').forEach(b => b.addEventListener('click', () => {
@@ -11693,6 +12064,8 @@ function histFromRows(rows) {
     date: String(r.completed_on || ''),
     day: r.day,
     readiness: (typeof r.readiness === 'number') ? r.readiness : null,
+    // The whole check-in (stage40), for the athlete's own usual in readinessBase().
+    ready: (r.ready && typeof r.ready === 'object') ? r.ready : null,
     entries: Array.isArray(r.log) ? r.log : parseSummaryLog(r.summary)
   })).filter(s => s.date);
 }
