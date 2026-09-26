@@ -100,7 +100,9 @@
 //      the chart and the list; the weight and Records trend lines read in dark mode.
 // v52: program.html changed (2026-09-26, DATA-02): a session is filed under the local day it was finished
 //      (one date for every save of it), and a session running past midnight keeps its clock and check-in.
-const CACHE = 'aap-v52';
+// v53: program.html changed (2026-09-26, SHEET-01): the info sheet keeps a trail, with a ‹ Back and the
+//      phone's Back stepping back a page before it closes.
+const CACHE = 'aap-v53';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
