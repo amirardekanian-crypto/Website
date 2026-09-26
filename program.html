@@ -3158,6 +3158,9 @@
   .wt-del { flex: none; width: 26px; height: 26px; border-radius: 7px; border: none;
     background: transparent; color: var(--grey-text); cursor: pointer; font-size: 13px; }
   .wt-del:active { background: var(--ice-dim); color: var(--ice); }
+  /* Armed by the first tap (armedTap): the ✕ becomes a word, so the second tap is a decision. */
+  .wt-del.armed { width: auto; padding: 0 10px; background: var(--ice-dim); color: #C7552F;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: .5px; }
 
   .wt-entry { margin-top: 20px; background: var(--white); border: 1px solid var(--grey-mid);
     border-radius: 12px; padding: 15px; }
@@ -3573,7 +3576,9 @@
   .send-session-status.error   { color: #E74C3C; }
   .complete-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 36px; color: var(--yellow); text-transform: uppercase; line-height: 1; margin-bottom: 6px; }
   .complete-sub { font-size: 13px; color: var(--grey-text); font-weight: 300; margin-bottom: 20px; }
-  .reset-session-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; background: transparent; color: var(--grey-text); border: 1px solid var(--grey-mid); padding: 12px 24px; border-radius: 4px; cursor: pointer; }
+  .reset-session-btn.armed { color: #C7552F; border-color: #C7552F; }
+  /* Away from Send (LOG-02): it used to sit 10 px under it, one tap from wiping the session. */
+  .reset-session-btn { margin-top: 26px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; background: transparent; color: var(--grey-text); border: 1px solid var(--grey-mid); padding: 12px 24px; border-radius: 4px; cursor: pointer; }
 
 
   /* ── Notes ── */
@@ -6730,8 +6735,8 @@ function renderHome() {
       </div>
       <div class="complete-actions">
         <button class="send-session-btn" onclick="sendSession('${day.id}')">Send Session Info to Coach</button>
-        <button class="reset-session-btn" onclick="resetDay('${day.id}')">Reset Session</button>
         <div class="send-session-status" id="send-status-${day.id}"></div>
+        <button class="reset-session-btn" onclick="armedTap(this, 'Tap again to reset', () => resetDay('${day.id}'))">Reset Session</button>
       </div>
     </div>`;
     html += `</div>`;
@@ -8508,7 +8513,7 @@ function renderCeilingLift(lift) {
       <span class="ceil-row-s">${fmtCeilDate(e.d)} · ${e.w} kg × ${e.r} @ RPE ${e.rpe}${
         e.test ? ' · tested' : e.auto ? ' · from your sets' : ''}</span>
       <b>${e.kg} kg</b>
-      <button type="button" class="wt-del" onclick="removeCeilingEntry(${i})"
+      <button type="button" class="wt-del" onclick="armedTap(this, 'Delete?', () => removeCeilingEntry(${i}))"
         aria-label="Delete this entry">✕</button>
     </div>`).join('');
 
@@ -8536,9 +8541,8 @@ function renderCeilingLift(lift) {
 // buttons index into.
 let _ceilRows = [];
 
-// One tap deletes, exactly like a body-weight reading: the entry names the set
-// it came from, so putting it back is retyping three numbers. What it writes is
-// a TOMBSTONE, never a removal — see the note on deleteCeilingEntry().
+// Two taps delete (armedTap, LOG-02), exactly like a body-weight reading. What it
+// writes is a TOMBSTONE, never a removal — see the note on deleteCeilingEntry().
 function removeCeilingEntry(i) {
   const e = _ceilRows[i];
   if (!e) return;
@@ -11667,7 +11671,7 @@ function renderWeightScreen() {
       <div class="wt-row">
         <span class="wt-row-d">${esc(fmtCeilDate(e.d))}</span>
         <b>${e.kg} kg</b>
-        <button type="button" class="wt-del" onclick="deleteWeight('${e.d}')" aria-label="Delete this reading">✕</button>
+        <button type="button" class="wt-del" onclick="armedTap(this, 'Delete?', () => deleteWeight('${e.d}'))" aria-label="Delete this reading">✕</button>
       </div>`).join('')}
     ${wtEntryHtml()}
     <div class="ceil-note">The line is a 7-day average, the dots are what you actually weighed.<br>
@@ -11719,6 +11723,30 @@ window.logWeightToday = logWeightToday;
 
 function deleteWeight(day) { saveWeight(day, null); renderWeightScreen(); }
 window.deleteWeight = deleteWeight;
+
+// ⚠️ ONE RULE FOR ANYTHING THAT DELETES (LOG-02, 2026-09-26): a second tap. The first tap arms
+// the button (its label says what the next tap does, class `armed`), the second within 4 s acts,
+// and it disarms by itself. Reset Session, a weight reading and a Personal Record used to go on
+// one tap; Finish Anyway and "Delete all" already asked twice. A new delete button uses this.
+function armedTap(btn, armedLabel, run) {
+  if (btn.dataset.armed === '1') {
+    clearTimeout(btn._armT);
+    btn.dataset.armed = ''; btn.classList.remove('armed');
+    if (btn.dataset.label != null) btn.textContent = btn.dataset.label;
+    run();
+    return;
+  }
+  btn.dataset.label = btn.textContent;
+  btn.dataset.armed = '1'; btn.classList.add('armed');
+  btn.textContent = armedLabel;
+  if (navigator.vibrate) navigator.vibrate(8);
+  btn._armT = setTimeout(() => {
+    if (btn.dataset.armed !== '1') return;
+    btn.dataset.armed = ''; btn.classList.remove('armed');
+    btn.textContent = btn.dataset.label;
+  }, 4000);
+}
+window.armedTap = armedTap;
 
 // Two taps, like Reset Session — this erases everything and cannot be undone.
 function confirmClearWeight(btn) {

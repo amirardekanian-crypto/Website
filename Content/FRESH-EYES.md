@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**7 done · 7 partly done · 30 open**, of 44. Each was checked against the code on `main`.
+**8 done · 7 partly done · 29 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -46,8 +46,9 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#238](https://github.com/amirardekanian-crypto/Website/pull/238) | Proof tells a coached athlete, by name, that they go on the board after their first session, and offers **Keep me off the board** before it happens (`boardState()`, `keepOffBoard()`) | PRIV-01 |
 | [#239](https://github.com/amirardekanian-crypto/Website/pull/239) | The guide's finish, report and rest-timer cards name the real buttons; the Library promises a habit tick only when that habit is on (`_wsHabitOn()`); the guide joins CLAUDE.md's keep-in-sync rules | CNT-01 |
 | [#240](https://github.com/amirardekanian-crypto/Website/pull/240) | Guided never pauses a running clock, reopens at the first unfinished set, and its last button (Finish Session ✓) really finishes, or lands on "Wrap up early?" when a circuit is open | WK-01 |
+| [#241](https://github.com/amirardekanian-crypto/Website/pull/241) | Anything that deletes takes two taps (`armedTap()`): Reset Session, a weight reading, a Personal Record; Reset moved away from Send | LOG-02 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02.
 
 **Partly done, and what is still open on each:**
 - **WK-01.** The quick part is done. Still open: kg on the rest screen beside reps and RPE, the live row
@@ -63,7 +64,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **PLAN-01.** Game Plan still opens on the finished cycle with every card expanded, and the welcome
   still sends a new athlete to the plan instead of Day 1.
 
-**Open.** P1: WK-02, CARD-01, HOME-01, NAV-01, A11Y-01, LOG-02. P2: PROG-01,
+**Open.** P1: WK-02, CARD-01, HOME-01, NAV-01, A11Y-01. P2: PROG-01,
 PRF-01, PRF-02, PRF-03, PRF-04, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03, BW-01,
 HOME-03, DATA-02. P3: DS-03, CONS-01, SHEET-01, PRF-05, WK-05, LIB-01, POL-01, POL-02, DOC-01.
 
@@ -76,7 +77,7 @@ account is `PROGRAM-APP.md` → *No signal*.
 (`'on' | 'coming' | 'off'`); a coached athlete who has not trained yet is told the name they will appear
 under, can change it, and can keep off in advance. Full account: `HABITS.md` → *Who is on it*.
 
-1. **The rest of "stop the bleeding":** A11Y-01, LOG-02, WK-03, PRF-04, HOME-03.
+1. **The rest of "stop the bleeding":** A11Y-01, WK-03, PRF-04, HOME-03.
 2. **Foundations:** NAV-01 (Back closes the top layer), then HOME-01 (the week built from session
    history) with HOME-02's Today block.
 3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.

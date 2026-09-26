@@ -150,6 +150,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Home leads with the training** (This Week, then the day cards), then the Daily Habits card, and under it
   **today's habits, ticked in place**: AA Proof itself, embedded (`habits.html?embed=1`, `mountProofStrip()`).
   program.html still holds no habit state and writes no `<id>_hab_*` key but body weight; Proof does every write.
+- **Anything that deletes takes two taps** (LOG-02, 2026-09-26): `armedTap(btn, label, run)` arms on the first
+  tap (the label says what the next tap does) and acts on a second within 4 s. Reset Session, a weight reading and
+  a Personal Record go through it; Finish Anyway and "Delete all" already did. A new delete button uses it.
 - **The in-app guide (`APP_GUIDE`, the Coach tab's "Using the app" cards) names real controls.** Rename a
   button, move a control or change when a card appears, and change its guide card in the same PR (CNT-01,
   2026-09-26: it had said "Send Data to Coach" and "tap the timer icon" for weeks). The Library's "ticks your
@@ -210,7 +213,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v42` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v43` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

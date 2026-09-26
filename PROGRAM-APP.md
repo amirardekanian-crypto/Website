@@ -521,6 +521,15 @@ sits in front of the whole site).
   Waiting less when a copy exists would open slow-but-working connections on the copy more often; it is
   a separate call.
 
+## 🗑️ Anything that deletes takes two taps (LOG-02, 2026-09-26)
+
+`armedTap(btn, armedLabel, run)` in `program.html`: the first tap arms the button (its label becomes what the
+next tap does, class `armed`, a short vibration), a second tap within 4 s runs the delete, and it disarms by
+itself. **Reset Session** (now under the send status line, 26 px clear of Send, where it used to sit 10 px
+under it), a **body-weight reading** and a **Personal Record** go through it. Finish Anyway and "Delete all my
+weight history" already asked twice with their own code. A delete is still a tombstone underneath
+(`deleteCeilingEntry()`, `saveWeight(d, null)`); only the door changed.
+
 ## 📖 The in-app guide names real controls (CNT-01, 2026-09-26)
 
 The Coach tab's **Using the app** cards are `APP_GUIDE` in `program.html`. Nothing checks them against
