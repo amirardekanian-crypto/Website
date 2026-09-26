@@ -197,6 +197,8 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   that names the number; a quest note never spells it out.
 - **Roll call pays no XP** and no scorer reads `hab_notes`. The client shows 7 days and the server
   keeps 9, on purpose.
+- **Back closes the top layer here too** (NAV-01): `topLayer()` reads `UI`, `render()` ends with `navSync()`.
+  **Never in the embed**: the iframe's history is the training app's, so it would steal that app's Back.
 - **Embedded (`?embed=1`, on the training app's Home) Proof only logs today** through its own doors;
   `checkLevelUps()`, the reward baseline, the tour, the install offer and the board sweep all stand down there,
   so every level-up and reward still gets its takeover in the full app (`HABITS.md` → *Embedded…*).
@@ -220,7 +222,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v48` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v49` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

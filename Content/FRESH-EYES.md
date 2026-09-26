@@ -52,6 +52,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#244](https://github.com/amirardekanian-crypto/Website/pull/244) | The session bar never clips the clock or wraps its label (two rows under 480 px); a day started today shows "In progress · Resume" on Home | WK-03 |
 | [#245](https://github.com/amirardekanian-crypto/Website/pull/245) | Dark mode readable (`--green-ink`/`--clay-ink` text tokens, a dark rest timer, the habits card), grey tab bar at 11 px, no label under 11 px, 44 px session rating and ⓘ | A11Y-01 |
 | [#246](https://github.com/amirardekanian-crypto/Website/pull/246) | The phone's Back closes the top layer in the training app (one guard entry, `topLayer()` reads the page) instead of leaving the app | NAV-01 |
+| [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03.
 
@@ -66,7 +67,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **A11Y-01.** The training app is done on the screens measured. Still open: AA Proof's small type and
   its accent buttons in dark mode (3.35:1), which go with PRF-02 / DS-03; pinch-zoom in program.html
   (`user-scalable=no`, a card change); and following the phone's dark setting (*Open calls*).
-- **NAV-01.** Done in the training app. Still open: AA Proof, and one close grammar for the buttons
+- **NAV-01.** Back closes the top layer in both apps. Still open: one close grammar for the buttons
   (← for screens, ✕ top-right for overlays, drag or tap outside for sheets).
 - **HOME-02.** Training leads Home. Still open: the Today block (next session with Start or Resume),
   compact rows for habits, records and weight, and quiet empty states.
@@ -92,7 +93,7 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 
 1. **"Stop the bleeding" is done** (2026-09-26): REL-01, PRIV-01, CNT-01, WK-01's quick part, LOG-02, PRF-04,
    HOME-03, WK-03's quick parts, A11Y-01 in the training app.
-2. **Foundations:** NAV-01 in AA Proof, then HOME-01 (the week built from session
+2. **Foundations:** HOME-01 (the week built from session
    history) with HOME-02's Today block.
 3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
    Confirm the card freeze with Amir first (below).
