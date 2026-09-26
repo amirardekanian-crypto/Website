@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**5 done · 8 partly done · 31 open**, of 44. Each was checked against the code on `main`.
+**6 done · 7 partly done · 31 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -43,14 +43,11 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#234](https://github.com/amirardekanian-crypto/Website/pull/234) | The check-in sets today's targets (amber, red, sore); coach.html shows the plan and a run of low days | READY-01, WK-03 |
 | [#235](https://github.com/amirardekanian-crypto/Website/pull/235) | Today's habits ticked on Home: AA Proof's own page, embedded (`habits.html?embed=1`) | SEAM-01 |
 | [#237](https://github.com/amirardekanian-crypto/Website/pull/237) | No signal: both apps open from the plan saved on the phone (`plancache`); uploads wait for a pull; the error screens name the cause | REL-01, CNT-01 |
+| PRIV-01 PR | Proof tells a coached athlete, by name, that they go on the board after their first session, and offers **Keep me off the board** before it happens (`boardState()`, `keepOffBoard()`) | PRIV-01 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01.
 
 **Partly done, and what is still open on each:**
-- **PRIV-01 (P0).** Proof's tour still tells a coached athlete who is not on the board yet "Nobody can
-  see you until you join" (the `'The board is off until you join'` step in `tourSteps()`), while
-  `autoJoinBoard()` puts them on the board after their first finished session. The manual line and
-  the "no password" lines are already gone.
 - **CNT-01.** program.html's guide still says "Finish Workout → Send Data to Coach", "when every
   exercise is checked off" and "tap the timer icon"; the Library still promises to tick a habit most
   athletes don't have; the guide is not yet in CLAUDE.md's keep-in-sync rule. (Proof's error screen
@@ -75,21 +72,21 @@ HOME-03, DATA-02. P3: DS-03, CONS-01, SHEET-01, PRF-05, WK-05, LIB-01, POL-01, P
 **REL-01 is done** (#237, 2026-09-26): both apps open with no signal from `plancache`; the full
 account is `PROGRAM-APP.md` → *No signal*.
 
-1. **PRIV-01 (P0), the rest.** For a coached athlete, say what really happens (the audit's line:
-   "Finish one session and you appear on the Crew board as <name>. Leave any time in Settings.").
-   A free athlete joins from Crew by hand, so their line can stay. This is habits.html copy, so the
-   six-doc rule applies (HABITS.md, XP_SYSTEM.md, QUESTS.md, the manual, privacy.html, the tour).
-2. **The rest of "stop the bleeding":** CNT-01, WK-01's quick part (never pause a running clock, the
+**PRIV-01 is done** (2026-09-26, Amir's call B): every line about the board reads `boardState()`
+(`'on' | 'coming' | 'off'`); a coached athlete who has not trained yet is told the name they will appear
+under, can change it, and can keep off in advance. Full account: `HABITS.md` → *Who is on it*.
+
+1. **The rest of "stop the bleeding":** CNT-01, WK-01's quick part (never pause a running clock, the
    last button opens Finish, resume at the first unfinished set), A11Y-01, LOG-02, WK-03, PRF-04,
    HOME-03.
-3. **Foundations:** NAV-01 (Back closes the top layer), then HOME-01 (the week built from session
+2. **Foundations:** NAV-01 (Back closes the top layer), then HOME-01 (the week built from session
    history) with HOME-02's Today block.
-4. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
+3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
    Confirm the card freeze with Amir first (below).
-5. **Home and progress:** REC-01 (the estimate off the card), PROG-01, PLAN-01, BW-01, DATA-02.
-6. **Coach and Proof:** COACH-02, NAV-02, SEAM-01 (after the habit count below), PRF-01, PRF-02,
+4. **Home and progress:** REC-01 (the estimate off the card), PROG-01, PLAN-01, BW-01, DATA-02.
+5. **Coach and Proof:** COACH-02, NAV-02, SEAM-01 (after the habit count below), PRF-01, PRF-02,
    PRF-03.
-7. **System and polish:** DS-01, DS-03, CONS-01, SHEET-01, PRF-05, LIB-01, POL-01, POL-02, DOC-01.
+6. **System and polish:** DS-01, DS-03, CONS-01, SHEET-01, PRF-05, LIB-01, POL-01, POL-02, DOC-01.
 
 ## Open calls and things to watch (put these to Amir)
 
@@ -174,8 +171,8 @@ The app cannot reach Supabase from here, so stub it and feed it a local programm
 
 ## Paste this to start the next chat
 
-> Continue the Fresh Eyes work. Read `Content/FRESH-EYES.md` first, then PRIV-01's entry on the Fresh
-> Eyes page (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). Start with PRIV-01 (Proof's tour says
-> nobody can see you until you join) using the same loop as before: restate the problem, give two or
-> three directions with trade-offs and your recommendation, name the architectural consequences, and
-> wait for my yes before building. CNT-01 comes after it.
+> Continue the Fresh Eyes work. Read `Content/FRESH-EYES.md` first, then CNT-01's entry on the Fresh
+> Eyes page (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). Start with CNT-01 (the copy that still
+> describes an older app) using the same loop as before: restate the problem, give two or three
+> directions with trade-offs and your recommendation, name the architectural consequences, and wait for
+> my yes before building. WK-01's quick part comes after it.

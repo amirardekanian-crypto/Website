@@ -69,7 +69,10 @@
 //      links as the app (a Short plays in a tall box; a non-YouTube link opens as a link), and
 //      a weight typed as "2×20" reads back as a weight, not as 20 reps. habits.html: the six July
 //      AA Proof bugs (ecb459a).
-const CACHE = 'aap-v37';
+// v38: habits.html changed (2026-09-26, PRIV-01): the tour, the Crew card and Settings tell a
+//      coached athlete they go on the board after their first session, by name, and offer
+//      "Keep me off the board" before it happens.
+const CACHE = 'aap-v38';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

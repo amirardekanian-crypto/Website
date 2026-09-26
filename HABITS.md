@@ -1174,7 +1174,7 @@ each row a door with an icon tile, a name, a line of explanation and its current
 | — | **Profile** — name, `Day N · rank · coached/free`. Tapping it opens the **Locker**, because that is where the rank lives. |
 | Tracking | **Habits & targets** (`N of M add-ons on`) · **Appearance** (`Dark`/`Light`) · **Install on your phone** (only while `installable()`) |
 | How this works | **The tour** · **The manual — how XP works** · **The long game** (Locker) · **Open your programme** / **See about coaching** |
-| Crew & data | **Crew board** (your board name, or `Not joined`) · **Sync** (live `syncLabel()`, tap to sync now) · **Reset today's log** (destructive, still two-tap armed; it wipes the day the backfill strip is showing, `AKEY()`, and names it: *Reset yesterday's log* when yesterday is picked. It used to wipe today whatever the strip showed.) |
+| Crew & data | **Crew board** (your board name; `Not yet` for a coached athlete the sweep will list after their first session; `Not joined` otherwise) · **Sync** (live `syncLabel()`, tap to sync now) · **Reset today's log** (destructive, still two-tap armed; it wipes the day the backfill strip is showing, `AKEY()`, and names it: *Reset yesterday's log* when yesterday is picked. It used to wipe today whatever the strip showed.) |
 
 Two rows open **sub-screens** rather than navigating: `UI.sub` is `'habits'` or
 `'appearance'`, nothing else reads it, and `go()` clears it on the way out so leaving
@@ -2176,7 +2176,8 @@ on once.
 `autoJoinBoard()` runs on every boot, after the first render, and never in demo or coach
 preview:
 
-1. `CFG.boardSwept` already set → nothing to do.
+1. `CFG.boardSwept` already set → nothing to do. That includes an athlete who tapped
+   **Keep me off the board** before their first session (below).
 2. Already on the board (`CFG.onBoard`) → stamp `boardSwept` and stop.
 3. **No finished workout yet → stop, and look again next boot.** `hasFinishedAWorkout()`
    asks whether the locked WORKOUT habit is ticked on any logged day — which only the
@@ -2188,6 +2189,19 @@ preview:
    own errors and sets `onBoard` only on success, so only a join that actually worked
    stamps `boardSwept` — and sets `boardNoticed` false, which arms the Today banner. A
    first boot on a train with no signal is retried, not marked done.
+
+**They are told before it happens, by name, and can say no first** (PRIV-01, Amir,
+2026-09-26). Until then the tour told a new coached athlete "Nobody can see you until you
+join", days before the sweep listed them. `boardState()` sorts every athlete into `'on'`,
+`'coming'` (coached, not on, sweep not settled: exactly the athletes `autoJoinBoard()` will
+list) or `'off'` (free, left, or kept off), and all three places that talk about the board
+read it: the tour's Crew step, the Crew card and the Settings → Crew board row. In
+`'coming'` they say "Finish your first session and you appear here as <name>", the Crew card
+takes a different name (**Use this name** stores `CFG.boardName`, which the sweep joins
+under; the server cleans a name rather than refusing it, so this cannot make the sweep fail)
+and offers **Keep me off the board**: `keepOffBoard()` stamps `boardSwept` with no server
+call, exactly what *Leave* settles after a join, and a Join from Crew still works any time.
+⚠️ `boardState()` mirrors the sweep's gate: change one, change the other.
 
 **`CFG.boardSwept` makes it a ONE-TIME sweep — do not remove it.** Re-joining on every boot
 would mean an athlete could tap *Leave the leaderboard*, watch it succeed, and be back on
