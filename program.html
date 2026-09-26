@@ -7569,14 +7569,14 @@ const APP_GUIDE = [
   { icon: 'activity', title: 'Personal Records — the most you could lift once',
     body: `<p>Open <strong>Home</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
-  { icon: 'check-circle', title: 'Finish Workout → Send Data to Coach',
-    body: `<p>When every exercise of a session is checked off, a <strong>Finish Workout</strong> card appears at the bottom. Add your overall session RPE and a session note, then tap <strong>Send Data to Coach</strong>.</p><p><strong>Don't skip this step.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
+  { icon: 'check-circle', title: 'Finishing a session',
+    body: `<p>As soon as you log your first set, a card appears at the bottom of the session. Until every set is done it reads <strong>Wrap up early?</strong> and lists what's left; once everything is done it reads <strong>All done?</strong>. Tap <strong>Finish Session ✓</strong>, or <strong>Finish Anyway</strong> to stop early (it asks for a second tap, so a stray one can't end your session).</p><p>Then rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Send Session Info to Coach</strong>.</p><p><strong>Don't skip this step.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
-    body: `<p><strong>Every session</strong> → use the Send Data to Coach button (above).</p><p><strong>Every Sunday</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
+    body: `<p><strong>Every session</strong> → finish it and tap <strong>Send Session Info to Coach</strong> (above).</p><p><strong>Every Sunday</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app — full-screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong> — tap the timer icon on an exercise to start a countdown between sets.</li><li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li><li><strong>Dark mode</strong> — tap the moon button (top-right) to switch themes for low-light gym sessions.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong> — open an exercise and tap the <strong>Rest ⏱</strong> button under its sets to start a countdown between sets. It shows the rest I wrote for you, when I wrote one.</li><li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li><li><strong>Dark mode</strong> — tap the moon button (top-right) to switch themes for low-light gym sessions.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab, in every exercise's ⓘ, and at the end of every session, where your message already says which day or exercise it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days; quick check-ins beat long waits.</p>` },
 ];
@@ -9221,6 +9221,17 @@ function _wsSaveChecks() {
 // Keys must match the server's whitelist in log_library_session() and the habit
 // ids in habits.html. Values are the habit's athlete-facing short name.
 const WS_COUNTS_AS_LABEL = { strength: 'Session', mobility: 'Mobility', breathe: 'Breathe' };
+// Does AA Proof count this habit for this athlete? READ ONLY: this app never writes a
+// <id>_hab_* key but body weight. `strength` is core in Proof, always on. Mobility and
+// Breathe are add-ons that start OFF and count only when switched on (habits.html
+// defaultCfg(): on[id] === true). No config on this phone → treat an add-on as off.
+function _wsHabitOn(id) {
+  if (id === 'strength') return true;
+  try {
+    const cfg = JSON.parse(localStorage.getItem(ATHLETE_ID + '_hab_cfg') || 'null');
+    return !!(cfg && cfg.on && cfg.on[id] === true);
+  } catch (e) { return false; }
+}
 
 // Same daily-reset rule as the exercise ticks above: a Done belongs to the day
 // it was pressed on. Device-local, so a Done pressed on a phone shows as
@@ -9253,14 +9264,17 @@ function renderLibraryDone() {
   btn.classList.toggle('is-done', done);
   btn.textContent = done ? 'Done today ✓' : 'Mark as done';
 
+  // Promise a habit tick only when AA Proof will give one (CNT-01): an add-on habit counts only
+  // once the athlete has switched it on there. Otherwise the Done still reaches the coach.
+  const ticks = label && _wsHabitOn(_wsCurrent.countsAs);
   if (done) {
-    note.textContent = label
+    note.textContent = ticks
       ? 'Done today. This ticks your ' + label + ' habit next time you open AA Proof.'
-      : 'Done today. A warm-up does not tick a habit, but your coach can see you did it.';
+      : 'Done today. Your coach can see you did it.';
   } else {
-    note.textContent = label
+    note.textContent = ticks
       ? 'Tap when you finish. It ticks your ' + label + ' habit in AA Proof.'
-      : 'Tap when you finish. A warm-up does not tick a habit, but your coach can see you did it.';
+      : 'Tap when you finish. Your coach can see you did it.';
   }
 }
 

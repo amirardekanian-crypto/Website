@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-26)
 
-**6 done · 7 partly done · 31 open**, of 44. Each was checked against the code on `main`.
+**7 done · 6 partly done · 31 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -44,14 +44,11 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#235](https://github.com/amirardekanian-crypto/Website/pull/235) | Today's habits ticked on Home: AA Proof's own page, embedded (`habits.html?embed=1`) | SEAM-01 |
 | [#237](https://github.com/amirardekanian-crypto/Website/pull/237) | No signal: both apps open from the plan saved on the phone (`plancache`); uploads wait for a pull; the error screens name the cause | REL-01, CNT-01 |
 | [#238](https://github.com/amirardekanian-crypto/Website/pull/238) | Proof tells a coached athlete, by name, that they go on the board after their first session, and offers **Keep me off the board** before it happens (`boardState()`, `keepOffBoard()`) | PRIV-01 |
+| CNT-01 PR | The guide's finish, report and rest-timer cards name the real buttons; the Library promises a habit tick only when that habit is on (`_wsHabitOn()`); the guide joins CLAUDE.md's keep-in-sync rules | CNT-01 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01.
 
 **Partly done, and what is still open on each:**
-- **CNT-01.** program.html's guide still says "Finish Workout → Send Data to Coach", "when every
-  exercise is checked off" and "tap the timer icon"; the Library still promises to tick a habit most
-  athletes don't have; the guide is not yet in CLAUDE.md's keep-in-sync rule. (Proof's error screen
-  lost its `?client=` hint in #237.)
 - **WK-03.** Only the Guided button's label colour is fixed. Still open: a slim session bar, hiding
   the tab bar mid-session, "In progress · Resume" on the day card, the clock clipped under 405 px.
 - **HOME-02.** Training leads Home. Still open: the Today block (next session with Start or Resume),
@@ -76,7 +73,7 @@ account is `PROGRAM-APP.md` → *No signal*.
 (`'on' | 'coming' | 'off'`); a coached athlete who has not trained yet is told the name they will appear
 under, can change it, and can keep off in advance. Full account: `HABITS.md` → *Who is on it*.
 
-1. **The rest of "stop the bleeding":** CNT-01, WK-01's quick part (never pause a running clock, the
+1. **The rest of "stop the bleeding":** WK-01's quick part (Guided's last button is still called "Finish Workout ✓"; rename it to Finish Session there, where it starts opening Finish) (never pause a running clock, the
    last button opens Finish, resume at the first unfinished set), A11Y-01, LOG-02, WK-03, PRF-04,
    HOME-03.
 2. **Foundations:** NAV-01 (Back closes the top layer), then HOME-01 (the week built from session

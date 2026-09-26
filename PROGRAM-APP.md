@@ -520,6 +520,22 @@ sits in front of the whole site).
   Waiting less when a copy exists would open slow-but-working connections on the copy more often; it is
   a separate call.
 
+## 📖 The in-app guide names real controls (CNT-01, 2026-09-26)
+
+The Coach tab's **Using the app** cards are `APP_GUIDE` in `program.html`. Nothing checks them against
+the app, so they drifted: for weeks they said "Finish Workout → Send Data to Coach", that the finish card
+appears "when every exercise is checked off", and "tap the timer icon". What is true on 2026-09-26:
+
+- The finish card appears at the **first logged set**: "Wrap up Day N early?" with what is left and
+  **Finish Anyway** (two taps), or "All done with Day N?" with **Finish Session ✓** (`refreshConfirmCard()`).
+- Then the session RPE (1–10), an optional note, and **Send Session Info to Coach** (`sendSession()`).
+- The rest timer is the **Rest ⏱** text button under an exercise's sets (`openTimer()`).
+
+**Rule:** a PR that renames a button, moves a control or changes when a card appears updates its guide card
+too (CLAUDE.md says the same). The Library's *Mark as done* note promises a habit tick only when AA Proof
+will give one: `_wsHabitOn()` reads `<id>_hab_cfg` (never writes it); WORKOUT is core and always counts,
+Mobility and Breathe are add-ons that count only when switched on, and no config on the phone reads as off.
+
 ## 🏋️ Personal Records — three write doors, and three things written twice
 
 One name on every screen since 2026-09-26 (it was also called **The Ceiling**; the code keeps
