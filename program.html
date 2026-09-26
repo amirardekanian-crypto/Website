@@ -1608,6 +1608,21 @@
   .session-timer-btn:active { transform: scale(0.96); }
   .session-timer.running .session-timer-btn { background: var(--ice); }
   .session-timer.finished .session-timer-btn { display: none; }
+  .session-timer-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* The clock never shrinks: at any width, the buttons wrap under it before it is cut. */
+  .session-timer { flex-wrap: wrap; }
+  .session-timer-body { flex: 1 0 auto; }
+  /* Under 480 px the clock was cut to "00:" and the label broke over 3–4 lines (WK-03,
+     2026-09-26): the body and the buttons could not share one row. Two rows instead, about
+     the same height: label and clock on one line, the buttons full width under it. */
+  @media (max-width: 479px) {
+    .session-timer { flex-wrap: wrap; align-items: center; gap: 10px 8px; padding: 12px 14px; }
+    .session-timer-body { flex: 1 1 100%; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .session-timer-label { margin-bottom: 0; }
+    .session-timer-time { font-size: 26px; flex: none; }
+    .session-timer-actions { flex: 1 1 100%; }
+    .session-timer-actions .session-timer-btn { flex: 1; padding: 11px 10px; }
+  }
   body[data-dark] .session-timer { background: #202020; border-color: #333; }
   body[data-dark] .session-timer-time { color: #f0f0f0; }
 
@@ -6322,17 +6337,15 @@ function dayCardHTML(day, dayNum, total, opts) {
   const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
   const sub = `${plural(blockCount, 'block')} · ${plural(moveCount, 'movement')}`;
 
-  // Completed days (the Finish-Session flow sets this key) get a brown Done pill.
-  const isDone = !opts.static && completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id));
 
   const cls = 'current-message day-ov-card' + (opts.static ? '' : ' is-clickable');
   const attrs = opts.static ? '' : ` role="button" tabindex="0" onclick="openDayView('${idStr}')"`;
-  let h = `<div class="${cls}"${attrs}>`;
+  let h = `<div class="${cls}"${attrs}${opts.static ? '' : ` data-dc="${idStr}"`}>`;
   h += `<div class="cm-banner">`;
   h += `<img class="cm-banner-img" alt="${esc(name)}" ` +
        `src="${catImg}" onerror="dayImgError(this)">`;
   h += `<div class="cm-banner-scrim"></div>`;
-  if (isDone) h += `<div class="cm-pill cm-pill-done">Done</div>`;
+  if (!opts.static) h += dayCardPill(id);
   h += `<div class="cm-banner-caption">`;
   h += `<div class="cm-name day-card-num">Day ${dayNum}</div>`;
   h += `<div class="day-card-name">${esc(name)}</div>`;
@@ -6342,6 +6355,32 @@ function dayCardHTML(day, dayNum, total, opts) {
   h += `<div class="dq-row" data-dq="${idStr}"></div>`;
   h += `</div></div></div>`;
   return h;
+}
+
+// The pill on a Home day card: Done (brown), or In progress · Resume (clay) for a day
+// started today and not finished (WK-03, 2026-09-26): a clock running or paused today,
+// or a set already ticked. Before this, leaving a session for another tab left no trace
+// on Home of where the athlete was. Repainted in place by paintDayCardPills() whenever
+// the day view closes, because Home's cards are built once.
+function dayInProgress(id) {
+  if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) return false;
+  const t = loadTimer(id);
+  if (t && !t.finished && t.sessionStart && new Date(t.sessionStart).toDateString() === new Date().toDateString()) return true;
+  try { return getDayCompletion(id).done > 0; } catch (e) { return false; }
+}
+function dayCardPill(id) {
+  if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) return `<div class="cm-pill cm-pill-done">Done</div>`;
+  if (dayInProgress(id)) return `<div class="cm-pill cm-pill-live">In progress · Resume</div>`;
+  return '';
+}
+function paintDayCardPills() {
+  document.querySelectorAll('[data-dc]').forEach(card => {
+    const banner = card.querySelector('.cm-banner');
+    if (!banner) return;
+    banner.querySelectorAll('.cm-pill').forEach(e => e.remove());
+    const html = dayCardPill(card.dataset.dc);
+    if (html) banner.querySelector('.cm-banner-scrim').insertAdjacentHTML('afterend', html);
+  });
 }
 
 // Show a single day's workout (the day panels + program header) and hide the
@@ -6381,6 +6420,7 @@ function closeDayView() {
   const dv = document.getElementById('day-view');
   if (dv) dv.hidden = true;
   if (ov) ov.hidden = false;
+  paintDayCardPills();
   // Back on a nav screen — bring the global dark-mode toggle back.
   const gToggle = document.getElementById('global-dark-toggle');
   if (gToggle) gToggle.classList.remove('is-hidden');
@@ -6669,7 +6709,7 @@ function renderHome() {
     html += weekNoteHTML(cur);
     html += `<div class="session-timer" id="timer-${day.id}" data-day="${day.id}">
       <div class="session-timer-body">
-        <div class="session-timer-label">Click Start to begin</div>
+        <div class="session-timer-label">Ready when you are</div>
         <div class="session-timer-time">00:00</div>
       </div>
       <div class="session-timer-actions">
@@ -9563,13 +9603,13 @@ function renderTimer(day) {
     labelEl.textContent = 'Session duration';
   } else if (running) {
     btn.textContent = 'Pause ⏸';
-    labelEl.textContent = 'Session in progress';
+    labelEl.textContent = 'In progress';
   } else if (t && (t.acc || 0) > 0) {
     btn.textContent = 'Resume ▶';
     labelEl.textContent = 'Paused';
   } else {
     btn.textContent = 'Start ▶';
-    labelEl.textContent = 'Click Start to begin';
+    labelEl.textContent = 'Ready when you are';
   }
 }
 // Single shared 1s tick updates every running timer's display.

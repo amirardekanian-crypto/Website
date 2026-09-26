@@ -49,6 +49,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#241](https://github.com/amirardekanian-crypto/Website/pull/241) | Anything that deletes takes two taps (`armedTap()`): Reset Session, a weight reading, a Personal Record; Reset moved away from Send | LOG-02 |
 | [#242](https://github.com/amirardekanian-crypto/Website/pull/242) | Proof's nudge never asks for the session it cannot tick (`sessionLeft` / `freeDone`), OPEN YOUR PROGRAMME opens the programme, "logged nothing" means nothing | PRF-04 |
 | [#243](https://github.com/amirardekanian-crypto/Website/pull/243) | The install ask waits for a finished session, says what works on that phone (no dead Install button), and Proof stops asking coached athletes for a second install | HOME-03 |
+| [#244](https://github.com/amirardekanian-crypto/Website/pull/244) | The session bar never clips the clock or wraps its label (two rows under 480 px); a day started today shows "In progress · Resume" on Home | WK-03 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03.
 
@@ -57,8 +58,9 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
   pinned above the footer (it sits under it at 390 px), and circuits as one step per round.
 - **PRF-04.** The three misfires are fixed (display only). Still open: a rest day that *credits* the
   other habits, which changes scoring (see *Open calls*).
-- **WK-03.** Only the Guided button's label colour is fixed. Still open: a slim session bar, hiding
-  the tab bar mid-session, "In progress · Resume" on the day card, the clock clipped under 405 px.
+- **WK-03.** Done: the Guided label colour (#234), the clock never clipped and the label on one line at
+  any width, and "In progress · Resume" on the day card (#244). Still open, with the session project:
+  a slim session bar, and hiding the tab bar mid-session with a clear "Leave session" (needs NAV-01).
 - **HOME-02.** Training leads Home. Still open: the Today block (next session with Start or Resume),
   compact rows for habits, records and weight, and quiet empty states.
 - **SEAM-01.** Habits are ticked on Home. The full Proof app still has no way back to training,
@@ -81,7 +83,7 @@ account is `PROGRAM-APP.md` → *No signal*.
 (`'on' | 'coming' | 'off'`); a coached athlete who has not trained yet is told the name they will appear
 under, can change it, and can keep off in advance. Full account: `HABITS.md` → *Who is on it*.
 
-1. **The rest of "stop the bleeding":** A11Y-01, WK-03.
+1. **The rest of "stop the bleeding":** A11Y-01.
 2. **Foundations:** NAV-01 (Back closes the top layer), then HOME-01 (the week built from session
    history) with HOME-02's Today block.
 3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
