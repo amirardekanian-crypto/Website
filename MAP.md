@@ -28,7 +28,7 @@ This is the **index**; the deep guides it points to (`CODEBASE.md`, `SCHEMA.md`,
 | **How XP, levels and ranks work** (and how to retune them) | [`XP_SYSTEM.md`](XP_SYSTEM.md) |
 | How to run the coaching skills (intake → ship) | [`.claude/COACHING-HOWTO.md`](.claude/COACHING-HOWTO.md) |
 | The home page / hero | [`index.html`](index.html) (EN) · [`index-fa.html`](index-fa.html) (FA) |
-| The athlete training app | [`program.html`](program.html) |
+| The athlete training app | [`program.html`](program.html) · how its features work: [`PROGRAM-APP.md`](PROGRAM-APP.md) |
 | The coach dashboard ("The Coach's Box") | [`coach.html`](coach.html) · manual: [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | Where one athlete's program lives | `data/<athlete-id>.json` → [`SCHEMA.md`](SCHEMA.md) |
 | Brand images / icons / photos | [Assets ↓](#-assets--every-image-icon--photo) |

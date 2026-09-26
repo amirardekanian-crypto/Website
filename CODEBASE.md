@@ -39,7 +39,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Don't touch:** The Web3Forms `access_key` value (breaks submissions). The `<script>` at the bottom that runs the progress bar, unless you're ready to test it carefully.
 
 #### `program.html` — The athlete app
-- **What it does:** The private training app. Four tabs: **Home** (current cycle + progress), **My Plan** (daily workouts, videos, timers, weight logs, RPE scoring, and **The Ceiling** — estimated 1RM per lift), **Coach** (messaging + notes), **Library** (a [Read | Train] split — Read shows coach-published articles; Train shows on-demand workout sessions). Loads an athlete's programme from `/data/`. Each article and workout has its own shareable deep-link URL (`?article=<id>` / `?workout=<id>`). Demo mode (`?client=demo`) shows a read-only preview without a key.
+- **What it does:** The private training app. Four tabs: **Home** (current cycle + progress), **My Plan** (daily workouts, videos, timers, weight logs, RPE scoring, and **The Ceiling** — estimated 1RM per lift), **Coach** (messaging + notes), **Library** (a [Read | Train] split — Read shows coach-published articles; Train shows on-demand workout sessions). Loads the signed-in athlete's programme row from the server through `get_program()` (the old `/data/` files are gone from the site since 2026-09-07). Each article and workout has its own shareable deep-link URL (`?article=<id>` / `?workout=<id>`). Demo mode (`?client=demo`) shows a read-only preview without a key.
 - **Guided Mode — a second way through a session, not a second copy of it.** My Plan's default is
   the list: every exercise a collapsible card, sets logged by hand, Rest tapped when wanted. **Guided**
   (next to Start on the session timer) instead walks the day's "standard" exercises one set at a time,
@@ -353,12 +353,10 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 
 ### Data
 
-#### `data/*.json` — Athlete programmes
-- **What it does:** Each file is one athlete's full training programme. `program.html` reads the right file based on the `?client=...` part of the URL.
-- **If deleted:** That athlete loses access to their programme.
-- **Depends on:** `program.html` reads them.
-- **Edit this when:** You're updating an athlete's weekly workouts, adding video links, changing their focus, or creating a new client.
-- **See also:** `SCHEMA.md` — the cheat-sheet for what fields each JSON can contain.
+#### `data/*.json` — local working copies only (since 2026-09-07)
+- **What it is now:** Each athlete's programme is a **row in `public.programs`**, read by `program.html` through `get_program()` after the athlete signs in. `data/*.json` is gitignored, 404 on the live site, and never read by the app: the pipeline may write one as scratch before publishing, and Amir keeps a local copy as a fallback.
+- **Edit this when:** never on the site. Day-to-day changes go through coach.html's inline editor; a new cycle goes through `/program-assemble`.
+- **See also:** `SCHEMA.md` — the fields a programme can contain; `PROGRAM-APP.md` — how the app's programme features work.
 
 #### `content/index.json` — Read library manifest
 - **What it does:** The table of contents for the Library → Read tab. Lists categories (For Coaches, Pre-Competition, Recovery, Mental, Nutrition, Supplements) and which articles belong to each. The app reads this file to build the Read list instantly, then fetches individual articles on demand.

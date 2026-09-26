@@ -15,6 +15,7 @@ exclude:
   - IMPORTING_SESSION_REPORTS.md
   - MAP.md
   - NOTION_SYNC.md
+  - PROGRAM-APP.md
   - QUESTS.md
   - SCHEMA.md
   - XP_SYSTEM.md
