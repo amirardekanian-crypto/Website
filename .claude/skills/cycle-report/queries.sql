@@ -91,7 +91,8 @@ select
           jsonb_each((ap.data->>(params.id || '_hab_wt'))::jsonb) j(k, v)
    where ap.athlete_id = params.id and k::date between params.s and params.e
      and v->>'kg' is not null)                                              weigh_ins,
-  -- Personal Records (The Ceiling): [{lift, d, kg, reps, rpe, est | del}]
+  -- Personal Records ("The Ceiling" until 2026-09-26): [{lift, kg, w, r, rpe, d, t, test?, auto?}];
+  -- auto = a new best the app wrote from a session's best set (t 0), test = a rep-max test
   (select jsonb_agg(c) from public.athlete_progress ap,
           jsonb_array_elements((ap.data->>(params.id || '_1rm'))::jsonb) c
    where ap.athlete_id = params.id and not coalesce((c->>'del')::boolean, false))  ceiling,

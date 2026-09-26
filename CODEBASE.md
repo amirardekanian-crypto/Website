@@ -39,7 +39,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Don't touch:** The Web3Forms `access_key` value (breaks submissions). The `<script>` at the bottom that runs the progress bar, unless you're ready to test it carefully.
 
 #### `program.html` — The athlete app
-- **What it does:** The private training app. Four tabs: **Home** (current cycle + progress), **Game Plan** (the whole plan, cycle by cycle — "My Plan" until 2026-09-26 — plus **The Ceiling** — estimated 1RM per lift), **Coach** (a *Message me on WhatsApp* button, the coach's notes and the guide; the in-app chat was removed 2026-09-26), **Library** (a [Read | Train] split — Read shows coach-published articles; Train shows on-demand workout sessions). Loads the signed-in athlete's programme row from the server through `get_program()` (the old `/data/` files are gone from the site since 2026-09-07). Each article and workout has its own shareable deep-link URL (`?article=<id>` / `?workout=<id>`). Demo mode (`?client=demo`) shows a read-only preview without a key.
+- **What it does:** The private training app. Four tabs: **Home** (current cycle + progress), **Game Plan** (the whole plan, cycle by cycle — "My Plan" until 2026-09-26), **Coach** (a *Message me on WhatsApp* button, the coach's notes and the guide; the in-app chat was removed 2026-09-26), **Library** (a [Read | Train] split — Read shows coach-published articles; Train shows on-demand workout sessions). Loads the signed-in athlete's programme row from the server through `get_program()` (the old `/data/` files are gone from the site since 2026-09-07). Each article and workout has its own shareable deep-link URL (`?article=<id>` / `?workout=<id>`). Demo mode (`?client=demo`) shows a read-only preview without a key.
 - **Guided Mode — a second way through a session, not a second copy of it.** A session's default is
   the list: every exercise a collapsible card, sets logged by hand, Rest tapped when wanted. **Guided**
   (next to Start on the session timer) instead walks the day's "standard" exercises one set at a time,
@@ -68,19 +68,28 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   next), `<id>_ceil_best` (the pending new-best record, shown for 7 days), `<id>_welcomed`,
   and the global `aa_fresh_signin`. Specs and prompts: `IMAGES.md` §0.
 - **Links to the habit tracker — and nothing more.** A **Daily Habits** shortcut card on Home and at the end of Game Plan opens [`habits.html`](habits.html), handing over the client id and resolved key. Same origin and PWA scope, so from an installed app this stays inside the app shell instead of bouncing to the browser. The card is deliberately plain: **this app holds no habit state, no XP maths and no level formula** — duplicating those would be a third copy to keep in sync and weight it doesn't need.
-- **The two apps stay out of each other's *writes*.** `_snapshot()` skips `<id>_hab_*` (Proof owns and syncs those), so this app can never push habit data back. It does **read** two of them, both read-only, both degrading gracefully when absent. The Ceiling takes the latest body weight out of `<id>_hab_wt` to show relative strength (see the bullet below). And the **Daily Habits card reads `<id>_hab_card`** — a snapshot habits.html *publishes* at the end of every render (`publishCardSnapshot()` there) holding the level, rank, day streak, today's done/total and the week's seven qualifying flags. ⚠️ **That key exists precisely so this app never re-derives any of it.** The XP curve, rank ladder and weighted day gate already live in two places (habits.html and the `xp_rules` row); computing them here would be a third copy, the exact failure this repo warns about where two screens disagree and nothing errors. Proof exports its *answers*, not its rules. The key is deliberately device-local — habits.html builds its sync payload explicitly from cfg/log/wt, so this never travels — and a phone that has never opened Proof simply gets a card with no numbers. Finishing a session writes nothing into Proof; it records to `session_history` as it always has, and Proof reads the dates back through the read-only `get_workout_days` RPC ([`supabase/stage10_workout_days.sql`](supabase/stage10_workout_days.sql)) to tick its WORKOUT habit. The completion card just says so and offers a shortcut across.
+- **The two apps stay out of each other's *writes*.** `_snapshot()` skips `<id>_hab_*` (Proof owns and syncs those), so this app can never push habit data back. It does **read** two of them, both read-only, both degrading gracefully when absent. Personal Records takes the latest body weight out of `<id>_hab_wt` to show relative strength (see the bullet below). And the **Daily Habits card reads `<id>_hab_card`** — a snapshot habits.html *publishes* at the end of every render (`publishCardSnapshot()` there) holding the level, rank, day streak, today's done/total and the week's seven qualifying flags. ⚠️ **That key exists precisely so this app never re-derives any of it.** The XP curve, rank ladder and weighted day gate already live in two places (habits.html and the `xp_rules` row); computing them here would be a third copy, the exact failure this repo warns about where two screens disagree and nothing errors. Proof exports its *answers*, not its rules. The key is deliberately device-local — habits.html builds its sync payload explicitly from cfg/log/wt, so this never travels — and a phone that has never opened Proof simply gets a card with no numbers. Finishing a session writes nothing into Proof; it records to `session_history` as it always has, and Proof reads the dates back through the read-only `get_workout_days` RPC ([`supabase/stage10_workout_days.sql`](supabase/stage10_workout_days.sql)) to tick its WORKOUT habit. The completion card just says so and offers a shortcut across.
 - **The set log is countersigned (2026-09-24).** `attachSetLog()` draws SET · KG · REPS · RPE tag · tick;
   the RPE strip opens under a row once it is ticked, and `card._paintSets()` is the one painter for
   row state (`.live`, `.done`, `.rpe-open`). Guided Mode's rest screen logs reps and RPE through the
   same row nodes (`paintTimerLog()`). The exercise note is per session: `<id>_snote_<Name>` =
   `{ d, v }`, valid only on day `d` (`loadSessionNote()`); `<id>_note_` is no longer read. Design:
-  `Content/SET-LOGGING-DESIGN.md`.
-- **⚠️ The Ceiling (estimated 1RM) — one storage key with a hand-written merge rule.**
-  The line at the bottom of an exercise's set log is **pure derivation** — nothing stored, no
-  payload, no merge. Writes come from two doors, both landing in **`<id>_1rm`**: *Save to The
-  Ceiling* on the exercise card, and **+ Log a max** on the Records screen itself. The value
-  is an array of `{ lift, kg, w, r, rpe, d, t, test? }`, one entry per lift per day, where
-  `test: true` marks a deliberate rep-max test rather than a number lifted out of a working set.
+  `Content/SET-LOGGING-DESIGN.md`. **Since 2026-09-26 a set is `{ w, n, r, d, lw? }`**: `lw` is last
+  time's weight, shown under a LAST caption in an empty box, and `w` is only ever today's. A
+  session's set is ended by ONE function, `carrySet()` (the midnight sweep, the cloud copy and a
+  rename all call it), the setlog merge carries `lw`, and **Same as last** / typing a weight fills
+  the empty sets below. A tick on an empty box records no weight. Details: `PROGRAM-APP.md`.
+- **⚠️ Personal Records (estimated 1RM; "The Ceiling" on screen until 2026-09-26) — one storage
+  key with a hand-written merge rule.** The line at the bottom of an exercise's set log is **pure
+  derivation** — nothing stored, no payload, no merge. Writes come from three doors, all landing in
+  **`<id>_1rm`**: **automatic new bests** (`fillRecordsFrom()`, from a finished session and from
+  history, written only when a session's best set beats every earlier number for the lift),
+  *Save to Personal Records* on the exercise card (shown only once the athlete types their own
+  numbers into its panel), and **+ Log a max** on the Records screen itself. The Records card
+  sits on **Home**. The value is an array of `{ lift, kg, w, r, rpe, d, t, test?, auto? }`, one
+  entry per lift per day, where `test: true` marks a deliberate rep-max test and `auto: true` a
+  new best the app wrote by itself. ⚠️ **Automatic entries carry `t: 0`** so any write the athlete
+  makes to that day, a hand entry or a delete, wins the merge on every phone.
   - **That key has its own branch in `mergeStoredValue()` — union by `lift|date`, newest `t`
     wins.** Do not remove it. Without it the key falls through to the scalar rule, which takes
     one side of the merge wholesale, and a phone that had not synced would silently delete every
@@ -134,9 +143,9 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
     from the same progress blob. It flags a stale lift at the same 28 days but **ignores the
     closing-week window** — the athlete's strip waits so it does not nag, and Amir is the one
     deciding when to ask.
-  - Athlete-facing explanation is the **"Your estimated max (The Ceiling)"** card in `APP_GUIDE`
-    plus `CEILING_HELP` (the same prose, shown in place on the Records screen); the data
-    handling is `privacy.html` §2.2. Keep all of them in step.
+  - Athlete-facing explanation is the **"Personal Records — the most you could lift once"** card
+    in `APP_GUIDE` plus `CEILING_HELP` (the same prose, shown in place on the Records screen); the
+    data handling is `privacy.html` §2.2. Keep all of them in step.
 - **The "Done" pill and the suggested-day highlight — the rules, in one place.** Both read one
   localStorage key, `<id>_completed_d<N>`, holding **`"<toDateString()>|c<currentCycleIndex>"`**.
   - **Done** (`isDone`, brown pill) shows only when the stamp's cycle matches the cycle on screen

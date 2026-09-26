@@ -29,7 +29,7 @@ Durable context for working in this repo. Read the linked docs before diving in.
 - `FARSI-PRODUCTS.md` — the paid course app (`/tennis/app/`), the testing app's page and the Farsi
   product pages: how they are built, deployed and introduced.
 - `PROGRAM-APP.md` — the athlete app's programme features in full (rx, week notes, the Spine, the Quality
-  Map, Because, the set log, The Ceiling, body weight): read it before changing `program.html`.
+  Map, Because, the set log, Personal Records, body weight): read it before changing `program.html`.
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy. **It opens with the RULE INDEX**
   (2026-09-26): one numbered line per rule (`VOL-8`, `SEL-4` …), the stage that applies it and whether
   the checker enforces it; the dated bullets below it are the stories. **The index line is the rule**:
@@ -96,7 +96,7 @@ off the machine.
 ## The athlete app (`program.html`) — read `PROGRAM-APP.md` before changing it
 
 The full account of the programme app's features (the `rx` prescription, week notes, The Card
-Remembers, the Spine, the Quality Map, Because, the countersigned set log, The Ceiling, body weight)
+Remembers, the Spine, the Quality Map, Because, the countersigned set log, Personal Records, body weight)
 is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data shapes are in
 `SCHEMA.md` and the coaching rules in the principles' rule index. What must never break:
 
@@ -106,8 +106,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   `/program-design`, `check_program.py`) · the Spine resolver (`spineFor()` / `spineForC()`) · the body-part
   region and impact lists (four copies) · the muscle list of the Spine's volume credits (four copies:
   `spine_credits_ok()`, coach.html, `check_program.py`, `draft_sql.py`) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
-  `parseSetText()`) · the Ceiling rename matcher (`matchRenamed()` / `ceilAliasMapC()`) and its two write
-  doors (`paintCeilingForm()` mirrors `paintFromFields()`).
+  `parseSetText()`) · the records rename matcher (`matchRenamed()` / `ceilAliasMapC()`) and its hand-entry
+  doors (`paintCeilingForm()` mirrors `paintFromFields()`) · how a session's set ends (`carrySet()`, called by
+  the midnight sweep, the cloud copy and a rename).
 - **`rxOf()` returns a VIEW** (strings, the dose as `dose: {kind, value, side, label}`), not the `rx` object:
   test app code against real `rxOf()` output.
 - **A prescription is `rx`**; legacy `chips[]` is read, never written; **rest is never invented**; reps are
@@ -118,8 +119,13 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   in coach.html → Exercises; `exercise_library.json` and its Notion sync were retired 2026-09-26);
   two entries never share a name or alias; rungs are gone for good; Library has three doors (Sessions,
   Playbook, Exercises) and **no Qualities door**.
-- **A delete is a tombstone** (The Ceiling `{del: true}`, body weight `kg: null` with a fresh `t`), and every
-  Ceiling write rebuilds from `loadCeilingRaw()`, or a device that missed the delete brings it back.
+- **A delete is a tombstone** (Personal Records `{del: true}`, body weight `kg: null` with a fresh `t`), and every
+  records write rebuilds from `loadCeilingRaw()`, or a device that missed the delete brings it back.
+- **Personal Records fill themselves** (2026-09-26): a finished session's best set goes on when it beats every
+  earlier number for the lift, marked `auto` and written with `t: 0` so anything the athlete does to that day wins.
+  New bests only: every screen leads with the latest entry. "The Ceiling" is retired from the screens.
+- **Weight boxes open empty** (2026-09-26): last time's weight is `lw` on the set, shown under a LAST caption,
+  and `w` is only ever today's. A tick on an empty box records no weight; **Same as last** fills the boxes.
 - **Body weight lives in `program.html`** under the key `<id>_hab_wt`; AA Proof must never write it, and it
   is never scored.
 - **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`.
