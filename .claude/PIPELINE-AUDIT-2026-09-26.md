@@ -170,16 +170,13 @@ so did the rest except where noted.
 1. **Rotate the Supabase keys from May** (Amir, 26 September: not sure they were). Project Settings →
    API → roll the secret key; Account → Access Tokens → revoke the old token; then update the MCP
    config with the new one.
-2. **A recovery-band table** (REC-1): recovery band → starting sets per muscle and an RPE ceiling.
-   It needs his numbers.
-3. **Optional rule-index line**, proposed by the 5.2.8 work, for after the freeze (PRC-25): COM-9
-   extended so WhatsApp message 2 and the handoff follow the obligations list in order.
-4. **Git history still holds the names that were scrubbed.** Recommendation: leave it.
+
+Amir, 26 September: *"do as recomended"*. The recovery-band table and the COM-9 line wait for
+the end of the freeze (5.3), and the names stay in git history (5.6).
 
 ### 5.2 Recommended, no decision needed
 
-- Teach the checker to compare message 2 and the handoff against the obligations list (today only
-  the self-check line does).
+Nothing open: every item shipped (5.0) or waits for the freeze (5.3).
 
 ### 5.3 At the end of the rule freeze (PRC-25: after 5 to 8 cycles through the new pipeline)
 
@@ -190,7 +187,11 @@ so did the rest except where noted.
   watching the result.
 - **Decide which unchecked rules the checker should enforce**, starting with VOL-12 (biceps and
   triceps 6 to 12 sets in a foundation cycle): the one with a real effect that nothing checks.
-- The recovery-band table from 5.1, if the numbers are in.
+- **The recovery-band table** (REC-1): recovery band → starting sets per muscle and an RPE ceiling.
+  Amir gives the bands and numbers; then the rule, /program-design's starting row and a checker
+  test that flags a programme past its band.
+- **COM-9 extended** so WhatsApp message 2 and the handoff follow the obligations list in order,
+  and teach the checker to compare them against the list (today only the self-check line does).
 
 ### 5.4 Happens by itself: just watch
 
@@ -206,6 +207,8 @@ are the real test of this whole audit: watch for friction between Part A, engage
 
 ### 5.6 Deliberately left as they are
 
+- **Git history still holds the names that were scrubbed.** Rewriting it would break every clone
+  and open branch (Amir, 26 September: leave it).
 - From the redundancy table: "new or returning" is detected twice (harmless between sessions); the
   Quality line is worked out twice in one run (the handoff copies the checker's); the RPE floor sits
   in three layers (two scripts guard different things); the mid-cycle and end-of-cycle reads of the
