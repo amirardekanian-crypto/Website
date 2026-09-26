@@ -342,7 +342,7 @@ for changes before building, and ask the day the athlete starts (see STEP 1A's c
 
 ## STEP 2 — SESSION ARCHITECTURE
 Day count + type of each day; one line of rationale per day citing Step 1.
-- **Adaptation → prescription contract** (the cycle name drives the numbers): Strength →
+- **Adaptation → prescription contract** (PRG-10; the cycle name drives the numbers): Strength →
   3–6 reps, RPE 7–9, rest 2–4′ · Hypertrophy → 6–12, RPE 7–9, 1–2′ · Power → 1–5
   explosive, RPE 6–8, full rest · Endurance/conditioning → 15+ / time. Don't let a Power
   cycle get programmed like hypertrophy.
@@ -351,7 +351,7 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   day, not four flat days. Raw set count lies, so read each day by cost (the spine lines' `cost`:
   heavy ×1.5, moderate ×1, isolation ×0.5). The build check prints every day's load from the same
   numbers and warns on a flat week. Also: no two high-load days for the same pattern back-to-back,
-  and no grind (7 or more working exercises). For poor-recovery clients this distribution is the
+  and no grind (7 or more working exercises, SES-15). For poor-recovery clients this distribution is the
   primary lever.
 - **Warm-up + prep** on every day: 10–15 minutes (SES-3), its contents by SES-4, and its shape
   by SES-6 (lifting days may repeat rounds; cardio and running days build through distinct
@@ -460,7 +460,7 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   (prep circuits get `warmup: true` in assembly). RPE on a warm-up is noise.
 - `intent` is ONE coaching intention in plain words (`max intent`, `stick the landing`,
   `right leg first`) — it ships as the exercise's `intent` field and draws the single green
-  pill. Leave blank if none. **Never restate the tempo here**: `3s eccentric` beside a tempo of
+  pill. Leave blank if none. **Never restate the tempo here** (CHP-6): `3s eccentric` beside a tempo of
   `3-1-1-0` is the same instruction twice, and the card already shows the tempo with its key
   digits highlighted.
   **A GRIP is written here too, as the pill** (`neutral grip`, `wide grip`; with an intention,
@@ -474,7 +474,7 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   **`intent` is never a structural pairing like `superset`** — a superset is a circuit-role
   decision (see above), not an `intent` on a standard exercise.
 - Tempo = Eccentric–Pause–Concentric–Reset (e.g. 3-0-1-0). RPE 1–10.
-- `test_flag` (optional, standard lifts only): `test_flag: 5RM` marks a lift as one this
+- `test_flag` (optional, standard lifts only; TST-5): `test_flag: 5RM` marks a lift as one this
   cycle is genuinely **about** — the Personal Records screen then tracks how long it has been
   since the athlete put a number on it and asks for a retest in the cycle's closing week.
   **Flag two or three lifts per cycle, no more.** Almost always the cycle's primaries, and
@@ -504,7 +504,7 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   appear (in engage's copy, never in the dose). Program-wide guidance goes to engage's notes
   cards instead (COM-6).
 
-**FALLBACK:** for each primary, note one same-pattern swap (if pain or the station's busy).
+**FALLBACK** (SEL-20): for each primary, note one same-pattern swap (if pain or the station's busy).
 
 **OBLIGATIONS (required output, 2026-09-26): name every note this cycle MUST carry.** Engage writes
 each one, tags the card that carries it, and the checker fails a missing one, so a rule that
@@ -546,7 +546,7 @@ carries `qualities` (first = primary) from the ten: `strength · muscle · power
 brakes · rotation · engine · armour · movement`. The cycle's `art` word is its headline
 (`iron`→strength, `build`→muscle, `voltage`→power, `spring`, `brakes`, `engine`, `armour`,
 `bedrock`, `peak` and `reset` are phases, a foundation, sharpening or recovery block that trains a mix on purpose, so no headline). Count the designed week's
-working sets per quality: primary 1, secondary ½, prep blocks skipped, and an exercise dosed by
+working sets per quality (PRC-26): primary 1, secondary ½, prep blocks skipped, and an exercise dosed by
 time with no sets (a 30-min ride) counts one set per 10 minutes, never less than 1 (the same rule
 as the athlete's day cards and coach.html → Exercises → *Quality check*; 2026-09-26). **The headline
 should be in the top two.** When it isn't, report it with your recommendation (Amir, 2026-09-26:
@@ -563,7 +563,7 @@ it should be in coach's notes. thats why its there"*).** The spec carries **no c
 has one set of three cues, on its Spine entry, and every athlete's card shows those.
 - **Something only THIS athlete needs** (an injury limit, a range to stop at, a side, a setup for
   their home kit, a fault you saw on video) goes in that exercise's **`note:`**, the Coach's Note.
-  It is one sentence and is never written as a cue. Examples: *"Hands on a bench, not the floor:
+  It is one to three short sentences (COM-14) and is never written as a cue. Examples: *"Hands on a bench, not the floor:
   your wrists take too much at your bodyweight."* or *"Stop at about 90 degrees of knee bend."*
 - **A general coaching point is not a note.** If it would help anyone doing the lift, it belongs on
   the Spine entry. Say so in the spec (`spine_cue:` + the entry id + the wording) and Amir changes
@@ -728,7 +728,7 @@ kilos say much less about a player than kilos per kilo of them.
 **Every estimate is graded, and the grade is the instruction:**
 - **Sharp** (≤3 effective reps) — trust it. Usable as a starting-load reference.
 - **Good** (4–6) — trust the direction and roughly the number.
-- **Rough** (7–10) — a trend line only. Never set a load off a single Rough estimate.
+- **Rough** (7–10) — a trend line only. Never set a load off a single Rough estimate (TST-6).
 
 **How it may and may not be used:**
 - ✅ As the basis for a **starting-load suggestion on an exercise's `note`** — the one place

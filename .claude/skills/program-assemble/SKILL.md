@@ -98,7 +98,7 @@ fields map one-to-one; there is nothing to convert:
 | rest | `"rest": 120` |
 | `intent` | `"intent": "max intent"` or a grip, `"intent": "neutral grip"`, at exercise level — the one green pill |
 
-**Rest belongs to the BLOCK when a section shares one.** Write `"rest": 120` on the block and
+**Rest belongs to the BLOCK when a section shares one (CHP-7).** Write `"rest": 120` on the block and
 leave `rx.rest` off its exercises — the section header states it once and every timer in the
 block uses it. Put `rx.rest` only on the exercises that genuinely differ; it overrides the
 block and draws its own cell. Eight cards each repeating "REST 2m" is the same fact eight times.
@@ -113,7 +113,7 @@ app draws no cell for it — that is the entire contract. Never write a placehol
 string, or a zero. In particular: **no `rpe` on warm-up/prep, no `tempo` on ballistic work
 or carries, and no `rest` unless the spec named one** (the app stopped inventing 120s).
 
-**Never restate the tempo in `intent`.** `"3s eccentric"` beside `"tempo": "3-1-1-0"` is the
+**Never restate the tempo in `intent` (CHP-6).** `"3s eccentric"` beside `"tempo": "3-1-1-0"` is the
 same instruction twice; the card already shows the tempo with its key digits highlighted.
 
 **Never write `chips[]`.** It is legacy-read-only.
@@ -138,7 +138,7 @@ SCHEMA.md → "Circuit logging".
 Activation & Prep 🔥 → [power/explosive: free-named by content] → **Primary** 🎯 →
 **Accessory** 💪 → **Core** → [conditioning: free-named, last]. Use the role from the spec
 (primary→Primary block, accessory→Accessory block). Never collapse Primary+Accessory into a
-single "Strength" block.
+single "Strength" block (SES-9).
 
 **2d — Finalize the `focusTag`** (design only gave a plain working title). Make it VIVID —
 sports-headline energy that makes the athlete want to train. E.g. "Lower — squat/quad" →

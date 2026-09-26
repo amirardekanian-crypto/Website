@@ -168,7 +168,7 @@ with `<strong>`. A note that reads as one dense paragraph when opened is a forma
 just a style nit — rewrite it before shipping.
 
 **Exercise-scoped Coach's Notes (from design's `note_flag`s).** For every exercise design
-flagged with a `note_flag`, write the actual athlete-facing note text — 1–3 short sentences,
+flagged with a `note_flag`, write the actual athlete-facing note text — 1–3 short sentences (COM-14),
 **plain text, no HTML** (it renders as a short callout on the exercise card, not a notes
 card). This is the one place a specific starting weight may appear, when the flag calls for
 it — draw the number from the athlete's own logs, never invent one. Tie it directly to the
@@ -183,7 +183,7 @@ name can differ between the spec and the built card, an id cannot. Skip an exerc
 **PART 3b — Because (from design's `why_flag`s, 2026-09-24).** For every exercise design
 flagged with a `why_flag`, write `{ src, part?, text }`: why THIS athlete has THIS exercise. It
 opens the About sheet under **Why you**, and the cycle's Why page groups them by `src`.
-- **One sentence, 140 characters at most, plain text**, in Amir's voice (short words, no
+- **One sentence, 140 characters at most, plain text** (COM-15), in Amir's voice (short words, no
   em-dashes or semicolons). *"Stepping back is kinder to your knee than a forward lunge."*
 - **Name the body part, never the diagnosis**, and say what we do next, never the failure. The
   ledger's "torn lateral retinaculum" becomes `src: body, part: knee`. "RPE drifted to 9–10" or
@@ -202,7 +202,7 @@ opens the About sheet under **Why you**, and the cycle's Why page groups them by
 write the words the app shows the athlete during that week (`cycles[n].weekNotes`, SCHEMA.md),
 under This Week on Home and at the top of every session. Amir: *"update the app in a way that it
 can show first week or last week"*.
-- **One or two short sentences, under ~260 characters, in Amir's voice.** Start with the
+- **One or two short sentences, under ~260 characters, in Amir's voice** (COM-16). Start with the
   instruction, never with the label: the app already prints **Week 1** or **Back-off week** above it.
 - **The numbers exactly as design decided, in words:** "one set fewer on every exercise",
   "every RPE at 6". An RPE going down names the floor in the same sentence ("never below 6").

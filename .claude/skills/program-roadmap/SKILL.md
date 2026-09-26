@@ -67,7 +67,7 @@ never drift from the plan.
   roadmap focus lines the same way — describe how he trains *normally*, not how week 1 runs.
 - **Cycle 1 of a new athlete is never a heavy, low-rep block.** Their first cycle has no weighted
   lift under 8 reps and no supersets (VOL-11, SES-11), so give it a
-  foundation job (`bedrock`, `armour`, `build`), not `iron` or `voltage`.
+  foundation job (`bedrock`, `armour`, `build`), not `iron` or `voltage` (PRC-27).
 - **Name each cycle to be COOL and evocative** — a punchy 1–2 word power-name that *sells*
   the phase, not a dry label ("Lower Body Block" ✗). Lean on build / material / machine /
   combat imagery, and still hint at the phase's job. House library to draw on or extend:

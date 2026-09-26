@@ -77,6 +77,7 @@ places, and a stale copy reached athletes.)*
 | SEL-17 | An exercise removed for dislike, inability or pain stays out until re-earned with evidence; the Exercise Ledger records why. | design | ✓ (ledger) |
 | SEL-18 | No Assault Bike warm-up for a flexion-sensitive back: an incline treadmill walk, or an upright bike with hips above knees. | design | |
 | SEL-19 | While the free hinge is deferred, a loaded carry is picked up from a bench or rack at hip height, never the floor. | design · engage | |
+| SEL-20 | Name one same-pattern fallback for each primary lift in the spec, for pain or a busy station. | design | |
 
 ### Naming (exercises, cycles, days)
 | ID | Rule | Stage | Check |
@@ -114,12 +115,14 @@ places, and a stale copy reached athletes.)*
 | SES-6 | Lifting-day prep may repeat rounds; a cardio or running day's prep builds through distinct movements in one pass. | design | |
 | SES-7 | Design to the real minutes the logs show; a new athlete gets the form's minutes plus 15. A cap binds only on a hard stop. | design | warn |
 | SES-8 | No competition calendar unless Amir names one: the arc runs straight through. | roadmap · design | |
-| SES-9 | Order within a session: power, then primary, accessories, core; blocks use the standard section names (SCHEMA.md). | design · assemble | |
+| SES-9 | Order within a session: power, then primary, accessories, core; blocks use the standard section names (SCHEMA.md), never one "Strength" block. | design · assemble | |
 | SES-10 | Superset non-competing pairs to save time, except a unilateral Primary lift, which always runs as straight sets. | design | |
 | SES-11 | No supersets in a first cycle, or on a movement new to the athlete (a variant of a logged one isn't new), mid-cycle included. | design · edit | part (first cycle) |
 | SES-12 | A superset is ONE circuit entry with a descriptive name, never two standard cards carrying a pill. | assemble | ✓ |
 | SES-13 | A circuit in a working block logs a weight per exercise and one RPE per round; a prep block's circuit logs nothing. | assemble | |
 | SES-14 | A library session is as hard as its adaptation needs: no weekly hard-session count, only tissue-cost spacing (48 hours, not before a match). | workout | |
+| SES-15 | Seven or more working exercises make a day a grind: check its load identity before it ships. | design · edit | warn |
+| SES-16 | A low-load brace primer (a dead bug or bird dog before a heavy hinge) may stay in prep; costly core work goes to Core. | design · edit | |
 
 ### Progression
 | ID | Rule | Stage | Check |
@@ -133,6 +136,8 @@ places, and a stale copy reached athletes.)*
 | PRG-7 | Never tell the athlete the coach sets their weight: progression is the programme changing, driven by what they log. | engage | |
 | PRG-8 | The progress-and-regress explainer is mandatory for a new athlete; for a returning one only when the review flags a reason. | engage | oblig `explainer` |
 | PRG-9 | Before a logged RPE drives a decision, check the athlete's share of sets logged at RPE 10: new athletes tap the button matching their reps. | report · design | |
+| PRG-10 | Outside a first cycle, dose follows the adaptation: strength 3–6 reps RPE 7–9; hypertrophy 6–12 RPE 7–9; power 1–5 explosive RPE 6–8; endurance 15+. | design | |
+| PRG-11 | Over 30% of sets at RPE 10 in the first ten sessions means that RPE is not effort: write no load note from it. | report · design | |
 
 ### Volume & dosing
 | ID | Rule | Stage | Check |
@@ -148,6 +153,8 @@ places, and a stale copy reached athletes.)*
 | VOL-9 | A rounded-shoulder or forward-head client keeps chest volume low, as a stated exception, never loaded to reach a range. | design | |
 | VOL-10 | Count every exercise that loads a muscle (1, 0.5 or 0) from its Spine credits; warm-ups count only core. Both tables go in the log. | design · assemble | ✓ (counted from the Spine) |
 | VOL-11 | A new athlete's first cycle has no weighted exercise under 8 reps. | design | ✓ |
+| VOL-12 | Small muscles (biceps, triceps) take 6–12 sets a week in a foundation cycle, more in later cycles. | design · edit | |
+| VOL-13 | A missing machine never bends the programme: clear the 10-set floor with what the gym has. | design · edit | |
 
 ### Testing
 | ID | Rule | Stage | Check |
@@ -156,6 +163,8 @@ places, and a stale copy reached athletes.)*
 | TST-2 | No test goes to a grind: it stops at the first rep that slows, shortens or breaks position. Never a true 1RM. | design · engage | |
 | TST-3 | A new athlete's baseline is a filmed AMRAP to technical failure; a flagged 5RM retest is one set of 3–5 at about RPE 9. | design | |
 | TST-4 | A test that goes past the cycle's RPE ceiling is written as a stated exception to it. | design · engage | |
+| TST-5 | Flag two or three lifts a cycle for a retest (`test_flag`), never in a first cycle, in pain or with poor technique under load. | design | |
+| TST-6 | An e1RM graded Rough is a trend only: never set a starting load from a single Rough estimate. | design · report | |
 
 ### Communication & in-app text
 | ID | Rule | Stage | Check |
@@ -173,6 +182,9 @@ places, and a stale copy reached athletes.)*
 | COM-11 | Celebrate a genuine win each cycle on its own card; never invent one. | engage | oblig `win` |
 | COM-12 | A notes card and the matching Coach's Note never repeat: the card holds the protocol, the note the point-of-action detail. | engage | |
 | COM-13 | When a cycle turns on body mass, a card sends the athlete to Home → Body Weight in the programme app, never AA Proof. | engage | oblig `weigh-in` |
+| COM-14 | A Coach's Note is one to three short sentences of plain text about this athlete only; never a cue. | engage | |
+| COM-15 | A Because is one sentence of 140 characters at most, written fresh each cycle, never carried over. | engage | ✓ (140 characters) |
+| COM-16 | A week note is one or two short sentences under about 260 characters, starting with the instruction; no notes card repeats it. | engage | warn (length, label) |
 
 ### Coaching cues & the library
 | ID | Rule | Stage | Check |
@@ -191,6 +203,8 @@ places, and a stale copy reached athletes.)*
 | CHP-3 | A hold is `rx.tempo: "iso"` with the hold as `rx.time`. | assemble | part (format) |
 | CHP-4 | No RPE below 6 anywhere; a note that lowers RPE names the floor of 6 in the same sentence. | design · engage | ✓ |
 | CHP-5 | A prescription is the `rx` object: write what is prescribed and omit the rest (absent means not prescribed). Never write `chips[]`. | assemble | part (`chips[]`, two doses) |
+| CHP-6 | Say the tempo once, in its cell: never restate it in `intent`, a note or a cue. | design · assemble | |
+| CHP-7 | A section's shared rest sits once on its block; an exercise carries its own rest only when it differs. | assemble | |
 
 ### Process
 | ID | Rule | Stage | Check |
@@ -220,6 +234,8 @@ places, and a stale copy reached athletes.)*
 | PRC-23 | Skills cite rule IDs and never restate a rule; a checker message names the rule it enforces. | every stage | |
 | PRC-24 | The cycle's `art` headline should be in the week's top two qualities; if not, tell Amir with a recommendation, never add volume for a label. | design · assemble | warn |
 | PRC-25 | Rule freeze from 2026-09-26 until eight cycles have run on this pipeline: a new rule only when something breaks, through the index. | every stage | |
+| PRC-26 | The Quality mix counts working sets (primary 1, secondary ½), skips prep, and shows nothing under 70% tagged; bedrock, peak and reset have no headline. | design · assemble | |
+| PRC-27 | A new athlete's first cycle gets a foundation picture word (bedrock, armour or build), never iron or voltage. | roadmap | |
 
 ---
 
@@ -428,6 +444,7 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   thing off the floor. Extends "audit the restriction against every exercise, including warm-up
   and fallbacks" (2026-08-17) to the parts of an exercise nobody thinks to write down.
   *(2026-09-07, Athlete H C1)*
+- `SEL-20` **One same-pattern fallback per primary, named in the spec.** For pain or a busy station, so the athlete never improvises a swap. It lived in /program-design (STEP 3, *FALLBACK*) with no number. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills). A fallback is also where a banned movement hides, which is why the checker scans every `fallback:` line (SEL-12).
 
 ## Exercise naming
 *(This is the single source of truth for exercise names — `/program-design`,
@@ -689,6 +706,10 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   library file**. What stays is spacing that comes from **tissue cost**: 48 hours clear of another hard
   session, and not the day before a match. *(2026-09-20, the twenty new Train-library sessions — the
   planning panel had ruled a shared weekly ceiling across shelves; overruled.)*
+- `SES-4` *(2026-09-26)* /program-edit's Rules 1–1c are this rule's worked list: what leaves gym prep (skips, shuffles, agility and sprint work, a box step-up used as a drill), what stays (bodyweight squats, lunges and bridges in a prep circuit; a box step-up as a loaded, logged lift) and what replaces a joint-isolation drill (a movement that primes the day's pattern).
+- `SES-9` *(2026-09-26)* Never collapse Primary and Accessory into one "Strength" block. It lived in /program-assemble and /program-edit without a number and joined this line when the skill-only rules were registered (Amir: yes).
+- `SES-15` **Seven or more working exercises make a day a grind.** A long session spikes fatigue even at low RPE, which matters most for poor-recovery clients (VOL-2, 2026-06-19). The number lived in /program-design and /program-edit, and the checker already warned at 7. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+- `SES-16` **A low-load brace primer may stay in prep.** A dead bug or bird dog before a heavy hinge primes the brace; costly core work (planks for time, Pallof presses, hollow holds) goes to the Core block (SES-9). The primer still counts toward core volume wherever it sits (VOL-10). It lived only in /program-edit's Rule 2. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
 
 ## Progression (coach-driven)
 - `PRG-1` **Progression is coach-driven from the weekly logs** — the app shows one prescription
@@ -777,6 +798,8 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   effort: write no starting-load note from it, and settle the question with a filmed set, never by
   asking. /cycle-report reports the rate. *(2026-09-05; into the rules 2026-09-26, when the audit
   found it living only in memory)*
+- `PRG-10` **The dose follows the cycle's adaptation.** Strength 3–6 reps at RPE 7–9 with 2–4 minutes' rest; hypertrophy 6–12 at RPE 7–9 with 1–2 minutes; power 1–5 explosive reps at RPE 6–8 with full rest; endurance and conditioning 15+ reps or time. Don't let a power cycle be programmed like hypertrophy. A first cycle keeps VOL-11 (nothing weighted under 8 reps), which is why its picture word is a foundation one (PRC-27). It lived in /program-design STEP 2 as the "adaptation → prescription contract". Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+- `PRG-11` **Over 30% of sets at RPE 10 means the RPE is a rep counter, not effort.** Measured over the first ten sessions; above that share, no starting-load note is written from the logged RPE and the cycle report teaches the scale instead (PRG-9, 2026-09-05). The threshold lived in /cycle-report's checklist. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
 
 ## Volume & dosing
 - `VOL-1` **Volume is a report, not a rule, for a sport-performance athlete.** Show programmed
@@ -901,6 +924,8 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   athlete can really do. *(2026-09-24, Amir, verbatim: "i dont want to start with anything less
   that 8 reps in first cycle, because i dont know how good of athlete or how strong she really
   is". Saved as a principle 2026-09-25.)*
+- `VOL-12` **Small muscles: 6–12 sets a week in a foundation cycle, more later.** Biceps and triceps sit below the major muscles' 10–20 (VOL-3) because the big pulls and presses already reach them at half a set (VOL-10). It lived only in /program-edit's Rule 4a, so no other stage saw it. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills). Whether the checker should report it is Amir's call at the end of the rule freeze (PRC-25).
+- `VOL-13` **A missing machine never bends the programme.** Clear the 10-set floor with what the gym has and move on (the VOL-10 story, 2026-09-08: *"when the machine is not there, just being able to hit the minimum of 10 sets a week is good"*). It sat in that story and in /program-edit's Rule 4a without a line of its own. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
 
 ## Testing
 - `TST-1` **Light testing only:** derive an estimated 1RM from the heaviest logged set each cycle
@@ -917,6 +942,8 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   estimate) and safe for an athlete training with nobody next to them. A new athlete's baseline is
   the AMRAP above. Never a true 1RM. *(2026-09-26: Amir left the test effort to the
   recommendation; this settles the design skill's old "genuine RPE 9–10" against the rule above.)*
+- `TST-5` **Two or three flagged retests a cycle, no more.** `test_flag: 5RM` makes the app chase a retest in the cycle's closing week, so it goes only on lifts the cycle is about, usually the primaries: a grinding bilateral or loaded unilateral lift, never a jump, a carry, a warm-up or anything timed. Never in a first cycle, in pain, or with poor technique under load. The nudge works by being rare. It lived in /program-design (the `test_flag` line and *The Ceiling*). Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+- `TST-6` **A Rough e1RM is a trend, never a load.** The Ceiling grades each estimate Sharp, Good or Rough (long sets, low RPE), and a single Rough estimate never sets a starting load. It lived in /program-design (*The Ceiling*) and /cycle-report. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
 
 ## Communication & in-app text
 - `COM-1` **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.** *(2026-06-15)*
@@ -1016,6 +1043,9 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   weight, add a note in their app and point it to them so they start using it". Moved 2026-09-12;
   this bullet still said Proof until 2026-09-26, and two programmes written that week sent athletes
   to a Proof button that no longer existed.)*
+- `COM-14` **A Coach's Note is one to three short sentences.** Plain text, about this athlete only, never a cue (CUE-2). Three copies said one sentence (design, edit and the cue story) and two said one to three (engage, SCHEMA); Amir chose one to three on 2026-09-26, because a note sometimes carries a starting weight and a caveat.
+- `COM-15` **A Because is one sentence of 140 characters at most, written fresh each cycle.** A reason from Cycle 1 is stale by Cycle 3, so it is never carried over. The checker has failed a long one since 2026-09-24; the limits lived in /program-engage PART 3b and SCHEMA. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+- `COM-16` **A week note is short and says it once.** One or two short sentences under about 260 characters, starting with the instruction (the app already prints *Week 1* or *Back-off week* above it), and no notes card repeats it. It lived in /program-engage PART 3c, and the checker already warned on the length and the label. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
 
 ## Coaching cues
 - `CUE-1` **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an
@@ -1030,7 +1060,7 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   on its Spine entry (`public.exercises`, edited in coach.html → Exercises), and every athlete's
   card shows them. A programme carries **no cues**. Something only this athlete needs (an injury
   limit, a range, a side, a home-kit setup, a fault seen on video) is the exercise's **Coach's
-  Note**, one sentence, never a cue. A point that would help anyone is a change to the Spine entry.
+  Note**, one to three short sentences (COM-14), never a cue. A point that would help anyone is a change to the Spine entry.
   Spine cues are written for anyone: no athlete, no side, no home furniture, no tempo, no dose.
   *(Amir, 2026-09-24: "the aim is to use these cues for all the exercises that everyone has from
   now on … if there is a cue for someone specific, it should be in coach's notes. thats why its
@@ -1106,6 +1136,8 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   Legacy `chips[]` is still read by the app and never written. Full spec: SCHEMA.md → `rx`.
   *(2026-09-20, Amir: "sometimes we have to write the time, in the reps chart … and sometimes the
   pills get mixed up.")*
+- `CHP-6` **Say the tempo once, in its cell.** Never restate it in `intent`, a note or a cue: *3s eccentric* beside a tempo of 3-1-1-0 is the same instruction twice, and the card already highlights the digit that carries the instruction (2026-09-20). It lived in /program-design, /program-assemble, the workout skill, SCHEMA and PROGRAM-APP.md without a number. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+- `CHP-7` **A section's shared rest is written once, on its block.** The section header states it and every timer in the block uses it; an exercise carries its own `rx.rest` only when it differs (2026-09-20: eight cards each repeating REST 2m is one fact eight times). It lived in /program-assemble, the workout skill, SCHEMA and PROGRAM-APP.md. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
 
 ## Naming
 - `NAM-10` **Cycle names are cool & evocative** — punchy 1–2 word power-names (Foundation Forge,
@@ -1360,3 +1392,5 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   (count the `Checks:` lines in the coaching logs), a new rule goes in only when something
   actually broke: through the index, with its stage and, where possible, a check. At eight
   cycles, read the `Checks:` lines and prune what never fired or never mattered.
+- `PRC-26` **How the Quality mix counts.** Working sets, the primary quality 1 and a secondary ½, prep blocks skipped, an exercise dosed by time counting one set per 10 minutes (never less than 1), nothing shown under 70% tagged coverage, and a 12% cut; bedrock, peak and reset are phases with no headline (2026-09-24). The method exists four times (program.html, coach.html, /program-design, the checker) and they must match. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+- `PRC-27` **A first cycle's picture word is a foundation one.** bedrock, armour or build, never iron or voltage: a new athlete's first cycle has no weighted lift under 8 reps and no supersets (VOL-11, SES-11), so it is never a heavy, low-rep block. It lived in /program-roadmap. Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).

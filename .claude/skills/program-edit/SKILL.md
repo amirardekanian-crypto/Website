@@ -139,7 +139,7 @@ The replacement should prime the patterns trained later that session. (Name it p
 
 If the athlete trains in a gym, the Warm-Up block uses a cardio machine — Bike, Treadmill, or Rower (easy pace). **Never** "Walk", "March in Place", "Arm Swings", or other equipment-free filler for a gym-based client. Equipment-free warm-ups are only for home/bodyweight programs.
 
-### Rule 1d — No corrective/postural drills without an indication
+### Rule 1d — No corrective/postural drills without an indication (SEL-14)
 
 Postural or scap-control correctives (scapular wall slides, postural-specific work) only belong in when the athlete has a **noted** posture issue or restriction. For a general client with none, remove them — prep is mobilisation + activation of the day's patterns, not corrective theatre. General shoulder mobility/activation before pressing (band pull-apart, pass-through, cat-cow) is fine; it preps the lift, it doesn't "fix posture."
 
@@ -147,7 +147,7 @@ Postural or scap-control correctives (scapular wall slides, postural-specific wo
 
 Core work that costs something (plank variations for time, Pallof press, hollow body, ab work) belongs in the **Core block, after Primary/Accessory** (before any conditioning), never in the warm-up or prep circuit.
 
-A low-load drill that primes the brace (a dead bug or bird dog before a heavy hinge) may stay in prep. It still counts toward core volume wherever it sits (VOL-10), so leave it where it is and count it.
+A low-load drill that primes the brace (a dead bug or bird dog before a heavy hinge) may stay in prep (SES-16). It still counts toward core volume wherever it sits (VOL-10), so leave it where it is and count it.
 
 ### Rule 3 — Gym session block order
 
@@ -160,7 +160,7 @@ Correct structure for a gym-based session — standard section names + order per
 5. **Core** — if prescribed, after Primary/Accessory
 6. **[Conditioning]** — if present, always last; free-named by content
 
-Never collapse Primary + Accessory into one "Strength" block.
+Never collapse Primary + Accessory into one "Strength" block (SES-9).
 
 ### Rule 4 — Set / muscle review AND per-day load before changing load
 
@@ -175,13 +175,13 @@ before and after.
 
 **4a. Weekly sets per muscle.** Flag anything very low (chest at 3 sets) **or over the ceiling**
 (VOL-3); shoulder is one group (VOL-7). Small muscles (biceps, triceps): 6–12 sets/week in a
-foundation cycle, higher later. A missing machine is never a reason to bend the programme:
-clear the 10-set floor with what the gym has (VOL-4, when the aim is strength and muscle).
+foundation cycle, higher later (VOL-12). A missing machine is never a reason to bend the programme:
+clear the 10-set floor with what the gym has (VOL-13; the floor is VOL-4, when the aim is strength and muscle).
 
 **4b. Per-day load distribution** (VOL-2). Read the day loads:
 - Does each day have a deliberate **load identity**, and does the week **undulate** (one peak / one–two moderate / one low day) — or is it four flat "RPE 6, everything matters" days? The checker warns on a flat week.
 - Do two high-load days for the **same pattern** sit back-to-back (e.g. heavy hinge on consecutive days)?
-- Is any day a **grind** (7 or more working exercises)? The checker warns on it.
+- Is any day a **grind** (7 or more working exercises, SES-15)? The checker warns on it.
 
 For low-sleep / high-stress athletes, **distribution is the primary lever — not total volume.** Present the day loads and a recommended undulation before proposing changes.
 
@@ -226,7 +226,7 @@ outside the programme is adding a newly prescribed exercise to the library, in f
 **Cues are not edited on a card any more** (2026-09-24). Each exercise's cues are its Spine entry's
 and every athlete sees the same three. A cue change that would help anyone is an edit to the entry
 (coach.html → Exercises). A point about this athlete only is the exercise's `note` (Coach's Note),
-one sentence. Never add or change `cues` on a programme card.
+one to three short sentences (COM-14). Never add or change `cues` on a programme card.
 
 Edit the programme JSON using precise string matches, block by block — never rewrite the whole thing. Then write it yourself, path by path (Step 0b: one `jsonb_set` per path you changed, never a whole-object `update`), and list every path you wrote in the report, so it can be read against what Amir asked for (PRC-2).
 
