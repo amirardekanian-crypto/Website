@@ -71,7 +71,9 @@
   })();
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- onerror (REL-01, 2026-09-26): with no signal this CDN download fails (the service
+     worker keeps only this site's own files); the flag stops _sbReady() polling for it. -->
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.SB_FAILED=true"></script>
 <style>
   /* ── Tokens ────────────────────────────────────────────────────────────
      PROOF's modernist structure on the AA Performance palette (the "green
@@ -171,8 +173,9 @@
   }
   .loading.hidden { opacity: 0; pointer-events: none; }
   .errmark { font-size: 15px; letter-spacing: .22em; color: var(--accent); margin-bottom: 22px; }
-  .errhint { margin-top: 22px; font-size: 11px; line-height: 1.6; color: var(--muted-soft); }
-  .errhint code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; }
+  .erracts { margin-top: 24px; width: 100%; max-width: 300px; }
+  .erracts:empty { display: none; }
+  .erracts .btn { justify-content: center; min-height: 46px; }
   .spinner { width: 38px; height: 38px; border: 3px solid var(--track); border-top-color: var(--accent); animation: spin .8s linear infinite; }
   .errscreen { display: none; z-index: 9998; }
   .errscreen.on { display: flex; }
@@ -2189,11 +2192,13 @@
 <!-- Branded on purpose. Unbranded, a bad link reads as "this app is broken";
      with the wordmark it reads as "the app is fine, my link is wrong" — which
      is both true and the thing that gets the athlete to ask for a new one. -->
-<div class="errscreen" id="error">
+<!-- Filled by showError() with the real cause and a way forward (REL-01). The old
+     hint here showed a ?client= link, and those have been dead since 2026-09-07. -->
+<div class="errscreen" id="error" role="alert">
   <div class="errmark hd">PROOF</div>
-  <h2 class="hd">Can't load</h2>
+  <h2 class="hd" id="error-title">Can't load</h2>
   <p id="error-msg"></p>
-  <p class="errhint">Your link should look like<br><code>amirardekani.com/habits.html?client=…</code></p>
+  <div class="erracts" id="error-actions"></div>
 </div>
 
 <div class="app" id="app"></div>
@@ -3944,10 +3949,73 @@ function _withTimeout(p, ms) {
 // to ~3s, then hand back the client (or null if it never arrived — every caller
 // must degrade rather than throw).
 async function _sbReady() {
-  for (let i = 0; i < 30 && !(window.supabase && window.supabase.createClient); i++) {
+  // SB_FAILED: the download failed (no signal), so there is nothing to wait for (REL-01).
+  for (let i = 0; i < 30 && !(window.supabase && window.supabase.createClient) && !window.SB_FAILED; i++) {
     await new Promise(r => setTimeout(r, 100));
   }
   return _sb();
+}
+// The library, fetched again if its first download failed (REL-01): the <script> tag
+// only ever tries once, and an app opened with no signal needs it when the signal is
+// back. Same URL as that tag, read from it. The client, or null while still offline.
+// ⚠️ A copy of _sbLoad() in program.html: change both.
+function _sbLoad() {
+  if (window.supabase && window.supabase.createClient) return Promise.resolve(_sb());
+  if (!window.SB_FAILED) return _sbReady();
+  const tag = document.querySelector('script[src*="supabase-js"]');
+  if (!tag) return Promise.resolve(null);
+  return new Promise(res => {
+    const s = document.createElement('script');
+    s.src = tag.src;
+    s.onload  = () => { window.SB_FAILED = false; res(_sb()); };
+    s.onerror = () => { s.remove(); res(null); };
+    document.head.appendChild(s);
+  });
+}
+// Did the server answer at all? supabase-js returns a fetch that never got through
+// as an error with status 0; a 5xx is the server not coping, the same thing to the
+// athlete. A 4xx is a real answer (a refusal). null = _withTimeout() ran out.
+// ⚠️ A copy of _noAnswer() in program.html: change both.
+function _noAnswer(res) {
+  if (!res) return true;
+  if (!res.error) return false;
+  const s = Number(res.status) || 0;
+  return !(s >= 400 && s < 500);
+}
+
+// ── The plan saved on this phone (REL-01, 2026-09-26) ─────────────────────────
+// Boot needs get_program only for the athlete block (id, name, tier), and with no
+// signal it had nothing: the full app fell back to the sign-in card for someone
+// already signed in, and the strip on the training app's Home hid itself.
+// `plancache` is the SAME one-slot copy program.html keeps: { id, at, data }, the last
+// plan the server gave this phone. Written only from a real answer, never in the
+// demo, the coach preview or the strip on Home (the training app has just saved it,
+// and a guest does not write its host's copy). Opened only when the server could not
+// be reached, never when it answered no; a refusal deletes it. A cache: no athlete
+// prefix, so this app's `<id>_hab_*` sync never sends it.
+// ⚠️ program.html reads and writes the same key in the same shape: change both.
+const PLAN_COPY_KEY = 'plancache';
+function readPlanCopy(id) {
+  if (!id || window.IS_DEMO || window.IS_PREVIEW) return null;
+  try {
+    const c = JSON.parse(localStorage.getItem(PLAN_COPY_KEY) || 'null');
+    if (c && c.id === id && c.data && typeof c.data === 'object' && c.data.athlete) return c;
+  } catch (e) { /* unreadable: as good as none */ }
+  return null;
+}
+function savePlanCopy(id, data) {
+  if (!id || window.IS_DEMO || window.IS_PREVIEW || window.IS_EMBED || !data || typeof data !== 'object') return;
+  try { localStorage.setItem(PLAN_COPY_KEY, JSON.stringify({ id: id, at: new Date().toISOString(), data: data })); }
+  catch (e) { /* storage full: it still opens with signal, just not without */ }
+}
+function dropPlanCopy() {
+  if (window.IS_DEMO || window.IS_PREVIEW || window.IS_EMBED) return;
+  try { localStorage.removeItem(PLAN_COPY_KEY); } catch (e) {}
+}
+// 'ok' (a plan), 'no' (a refusal, or no plan on the server) or 'unreachable'.
+function planAnswerOf(res) {
+  if (_noAnswer(res)) return 'unreachable';
+  return (!res.error && res.data && typeof res.data === 'object') ? 'ok' : 'no';
 }
 
 /* ═══ SIGN IN ══════════════════════════════════════════════════════════════
@@ -4069,6 +4137,10 @@ function showSignIn() {
       });
       if (error) throw error;
 
+      // A fresh sign-in starts from the server (REL-01): the plan saved on this phone
+      // goes, so a different athlete can never open the previous one's offline.
+      dropPlanCopy();
+
       // One field fewer next time, here and in the other app.
       try { localStorage.setItem(LAST_USER_KEY, user); } catch (e) { /* storage blocked */ }
 
@@ -4109,6 +4181,9 @@ function showSignIn() {
 }
 
 async function signOutAthlete() {
+  // The remembered athlete and the plan saved on this phone go with them (REL-01).
+  try { localStorage.removeItem('aa_athlete_id'); } catch (e) {}
+  dropPlanCopy();
   try {
     const sb = await _sbReady();
     if (sb) await sb.auth.signOut();
@@ -4116,19 +4191,28 @@ async function signOutAthlete() {
   location.replace('habits.html');
 }
 
-// The athlete_id behind the current session, or '' if nobody is signed in.
-// athlete_identities is limited by RLS to the caller's own row.
+// The athlete_id behind the current session, '' if nobody is signed in, or null if
+// it could not ASK (no library, no signal: REL-01), which is not the same answer:
+// boot then falls back to the athlete this phone remembers instead of the sign-in
+// card. athlete_identities is limited by RLS to the caller's own row.
 async function athleteFromSession() {
   try {
     const sb = await _sbReady();
-    if (!sb) return '';
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session) return '';
-    const { data, error } = await sb.from('athlete_identities')
+    if (!sb) return null;
+    const { data: { session }, error: sessErr } = await sb.auth.getSession();
+    // A session that needed a refresh the network could not deliver comes back empty
+    // WITH an error. That is "could not ask", not "signed out".
+    if (!session) return sessErr ? null : '';
+    const res = await sb.from('athlete_identities')
       .select('athlete_id').eq('user_id', session.user.id).maybeSingle();
-    if (error || !data) return '';
-    return data.athlete_id || '';
-  } catch (e) { return ''; }
+    if (_noAnswer(res)) return null;
+    if (res.error || !res.data) return '';
+    // Remembered for the next open with no signal, the same key program.html keeps
+    // (and its sign-out clears). A convenience, never an authority: the server checks
+    // every plan it hands out.
+    try { if (res.data.athlete_id) localStorage.setItem('aa_athlete_id', res.data.athlete_id); } catch (e) {}
+    return res.data.athlete_id || '';
+  } catch (e) { return null; }
 }
 function markDirty() {
   if (window.IS_DEMO || window.IS_PREVIEW) return;
@@ -4237,9 +4321,11 @@ function refreshSyncBadge() {
 
 async function syncFromCloud() {
   if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
-  for (let i = 0; i < 30 && !(window.supabase && window.supabase.createClient); i++) await new Promise(r => setTimeout(r, 100));
   try {
-    const sb = _sb();
+    // _sbLoad(), not a poll of its own (REL-01): after an open with no signal the
+    // library never arrived, and this pull (on reconnect or foreground) is what fetches
+    // it again, so the rest of the session can sync.
+    const sb = await _sbLoad();
     if (!sb) return;
     const { data, error } = await sb.rpc('get_progress', { p_athlete_id: ATHLETE_ID, p_key: KEY });
     if (error || !data || typeof data !== 'object') return;
@@ -10185,10 +10271,17 @@ function renderSheet() {
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────
-function showError(msg) {
+// opts (REL-01): { title, actions: html }. The two causes boot can tell apart get
+// their own words and a way forward. The strip on Home just hides (embedPost).
+function showError(msg, opts) {
+  opts = opts || {};
   embedPost('error');
   document.getElementById('loading').classList.add('hidden');
+  const t = document.getElementById('error-title');
+  if (t && opts.title) t.textContent = opts.title;
   document.getElementById('error-msg').textContent = msg;
+  const a = document.getElementById('error-actions');
+  if (a) a.innerHTML = opts.actions || '';
   document.getElementById('error').classList.add('on');
 }
 (async function boot() {
@@ -10209,12 +10302,24 @@ function showError(msg) {
   }
 
   // A signed-in athlete needs no ?client= — their session says who they are.
+  let signedInAs;
   if (!window.IS_DEMO) {
-    const signedInAs = await athleteFromSession();
+    // Capped (REL-01): on a stalled connection the lookup held the loading screen for
+    // as long as the stall lasted. Out of time counts as "could not ask" (null).
+    signedInAs = await _withTimeout(athleteFromSession(), 6000);
     if (signedInAs) clientId = signedInAs;
+    // Could not ask (no signal): the athlete this phone last signed in as, the same
+    // remembered id the training app opens with, and only with a session on the
+    // device. The plan saved on this phone opens only for that id (below).
+    else if (signedInAs === null && !clientId && hasStoredSession()) {
+      try { clientId = localStorage.getItem('aa_athlete_id') || null; } catch (e) {}
+    }
   }
 
   if (!clientId) {
+    // The server answered that this session is nobody's athlete (REL-01): a plan saved
+    // for whoever used to be signed in here goes, as it does when get_program refuses.
+    if (signedInAs === '') dropPlanCopy();
     // No session, no link — ask them to sign in rather than showing a URL error.
     // This is the front door now, the same as program.html.
     showSignIn();
@@ -10230,6 +10335,9 @@ function showError(msg) {
   }
 
   ATHLETE = null;
+  // How the server answered (REL-01): 'ok', 'no' (a refusal, or no plan) or
+  // 'unreachable'. Only 'unreachable' may open the plan saved on this phone.
+  let planAnswer = 'unreachable', fromCopy = false;
   try {
     const sb = await _sbReady();
     if (sb) {
@@ -10237,19 +10345,44 @@ function showError(msg) {
       // warning further down forbids holding open indefinitely.
       const res = await _withTimeout(
         sb.rpc('get_program', { p_athlete_id: clientId, p_key: preKey || null }), 6000);
-      if (res && !res.error && res.data && typeof res.data === 'object') ATHLETE = res.data.athlete || {};
+      planAnswer = planAnswerOf(res);
+      if (planAnswer === 'ok') {
+        ATHLETE = res.data.athlete || {};
+        savePlanCopy(clientId, res.data);    // not from the strip, the demo or the preview
+      }
     }
-  } catch (e) { /* offline or rejected — the fallback below covers it */ }
+  } catch (e) { /* offline or rejected — the fallbacks below cover it */ }
+  // The server said no. Its word is final, and a copy it would refuse goes too.
+  if (planAnswer === 'no') dropPlanCopy();
 
-  if (!ATHLETE) {
+  if (!ATHLETE && planAnswer !== 'no') {
     try {
-      const res = await fetch('data/' + encodeURIComponent(clientId) + '.json', { cache: 'no-cache' });
-      if (res.ok) ATHLETE = (await res.json()).athlete || {};
+      // A 404 on the live site since 2026-09-07; kept for the headless render checks,
+      // which serve a local file. Timed, so a stall cannot hold the phone's copy back.
+      const res = await _withTimeout(fetch('data/' + encodeURIComponent(clientId) + '.json', { cache: 'no-cache' }), 4000);
+      if (res && res.ok) ATHLETE = (await res.json()).athlete || {};
     } catch (e) { /* fall through */ }
   }
 
+  // No answer from the server: the plan saved on this phone (REL-01).
+  if (!ATHLETE && planAnswer === 'unreachable') {
+    const copy = readPlanCopy(clientId);
+    if (copy) { ATHLETE = copy.data.athlete || {}; fromCopy = true; }
+  }
+
+  // Two real causes, each with its own words (REL-01). It used to blame a link for both.
   if (!ATHLETE) {
-    showError('Could not load your data.\n\nIf you opened this from an old link, ask Amir for a fresh one.');
+    if (planAnswer === 'no') {
+      showError('This sign-in or link isn\'t accepted any more. Sign in again, or message Amir on WhatsApp if it keeps happening.', {
+        title: 'Not available',
+        actions: '<button type="button" class="btn btn-primary btn-block" onclick="signOutAthlete()">Sign in again</button>'
+      });
+    } else {
+      showError('AA Proof couldn\'t reach the server, and this phone hasn\'t saved your details yet. Try again when you have signal. Once it has opened with a connection, it opens without one too.', {
+        title: 'No connection',
+        actions: '<button type="button" class="btn btn-primary btn-block" onclick="location.reload()">Try again</button>'
+      });
+    }
     return;
   }
   ATHLETE_ID = ATHLETE.id || clientId;
@@ -10278,31 +10411,42 @@ function showError(msg) {
     Promise.resolve(p).catch(() => fallback),
     new Promise(res => setTimeout(() => res(fallback), ms))
   ]);
-  await within(syncFromCloud(), 6000, null);
-  // The pull has had its turn — uploads may start. Everything above this line
-  // runs against a phone that may never have seen the cloud copy, so nothing
-  // above it is allowed to overwrite one. See pushNow().
-  SYNC.ready = true;
-  _lastPull = Date.now();          // boot counts as the first pull — see pullFresh()
-  // Which season we are in decides what scores, so settle that before anything
-  // reads XP — including the workout import, which must not reach back further.
-  await within(fetchSeason(), 4000, null);
-  await within(fetchQuests(), 4000, null);
-  // The archive of seasons already finished. Cheap, cached, and empty for
-  // everyone until the first season actually closes — see seasonRecords().
-  await within(fetchSeasonRecord(), 4000, null);
-  // Sessions finished in the training app tick the WORKOUT habit here. The
-  // dates come from the server, not from the other app's storage. Library
-  // workouts do the same through their own RPC, and land on WORKOUT or
-  // MOBILITY depending on what the workout actually is. Both are fetched
-  // together so the second one costs boot no extra wait, and both are imported
-  // before stampRoster() below, same as the workout import always was.
-  const [_wDays, _lDays] = await Promise.all([
-    within(fetchWorkoutDays(), 4000, null),
-    within(fetchLibraryDays(), 4000, null),
-  ]);
-  importWorkoutDays(_wDays);
-  importLibraryDays(_lDays);
+  if (fromCopy) {
+    // Opened from the plan saved on this phone (REL-01). The server has just had its
+    // 6s and said nothing, so the app paints from the phone now instead of stacking
+    // the ceilings below in front of it (22s on a stalled connection). The pull still
+    // gets its turn, behind the screen, and the upload latch lifts only once that turn
+    // is over: the same rule as a boot pull that fails (see pushNow()). The season,
+    // quests and workout days are fetched again next launch.
+    _lastPull = 0;
+    within(pullFresh(), 6000, null).then(() => { SYNC.ready = true; });
+  } else {
+    await within(syncFromCloud(), 6000, null);
+    // The pull has had its turn — uploads may start. Everything above this line
+    // runs against a phone that may never have seen the cloud copy, so nothing
+    // above it is allowed to overwrite one. See pushNow().
+    SYNC.ready = true;
+    _lastPull = Date.now();          // boot counts as the first pull — see pullFresh()
+    // Which season we are in decides what scores, so settle that before anything
+    // reads XP — including the workout import, which must not reach back further.
+    await within(fetchSeason(), 4000, null);
+    await within(fetchQuests(), 4000, null);
+    // The archive of seasons already finished. Cheap, cached, and empty for
+    // everyone until the first season actually closes — see seasonRecords().
+    await within(fetchSeasonRecord(), 4000, null);
+    // Sessions finished in the training app tick the WORKOUT habit here. The
+    // dates come from the server, not from the other app's storage. Library
+    // workouts do the same through their own RPC, and land on WORKOUT or
+    // MOBILITY depending on what the workout actually is. Both are fetched
+    // together so the second one costs boot no extra wait, and both are imported
+    // before stampRoster() below, same as the workout import always was.
+    const [_wDays, _lDays] = await Promise.all([
+      within(fetchWorkoutDays(), 4000, null),
+      within(fetchLibraryDays(), 4000, null),
+    ]);
+    importWorkoutDays(_wDays);
+    importLibraryDays(_lDays);
+  }
   // Every source of logged days has now reported — local, cloud, and the
   // training app. Settle the roster timeline against the full log before
   // anything scores off it.
