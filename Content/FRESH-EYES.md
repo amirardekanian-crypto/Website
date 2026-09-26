@@ -49,7 +49,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#241](https://github.com/amirardekanian-crypto/Website/pull/241) | Anything that deletes takes two taps (`armedTap()`): Reset Session, a weight reading, a Personal Record; Reset moved away from Send | LOG-02 |
 | [#242](https://github.com/amirardekanian-crypto/Website/pull/242) | Proof's nudge never asks for the session it cannot tick (`sessionLeft` / `freeDone`), OPEN YOUR PROGRAMME opens the programme, "logged nothing" means nothing | PRF-04 |
 | [#243](https://github.com/amirardekanian-crypto/Website/pull/243) | The install ask waits for a finished session, says what works on that phone (no dead Install button), and Proof stops asking coached athletes for a second install | HOME-03 |
-| WK-03 PR | The session bar never clips the clock or wraps its label (two rows under 480 px); a day started today shows "In progress · Resume" on Home | WK-03 |
+| [#244](https://github.com/amirardekanian-crypto/Website/pull/244) | The session bar never clips the clock or wraps its label (two rows under 480 px); a day started today shows "In progress · Resume" on Home | WK-03 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03.
 
@@ -59,7 +59,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **PRF-04.** The three misfires are fixed (display only). Still open: a rest day that *credits* the
   other habits, which changes scoring (see *Open calls*).
 - **WK-03.** Done: the Guided label colour (#234), the clock never clipped and the label on one line at
-  any width, and "In progress · Resume" on the day card (WK-03 PR). Still open, with the session project:
+  any width, and "In progress · Resume" on the day card (#244). Still open, with the session project:
   a slim session bar, and hiding the tab bar mid-session with a clear "Leave session" (needs NAV-01).
 - **HOME-02.** Training leads Home. Still open: the Today block (next session with Start or Resume),
   compact rows for habits, records and weight, and quiet empty states.
