@@ -70,13 +70,16 @@ why we changed something. It's **coach-only**, never shown in the athlete's app.
 When you make a coaching call that should apply to *all* clients, I'll ask
 **"save this as a principle?"** Say yes and it's remembered (stored in
 `.claude/COACHING-PRINCIPLES.md`). One-off, client-specific calls aren't saved —
-you decide what's learned.
+you decide what's learned. **During the rule freeze** (PRC-25, from 2026-09-26 for 5–8 cycles)
+I only ask when your call fixes something that actually broke; the rest waits for the review
+at the end of the freeze.
 
 ## How to change how it works
 
-Just tell me: *"in program design, cap tennis sessions at 40 minutes"* or *"add
-hamstring curls to the default."* Or open the files yourself in
-`.claude/skills/` (they're plain text). To edit your saved philosophy, open
+Just tell me the rule, e.g. *"gym warm-ups always open on a bike"*. It goes on its own numbered
+line in `.claude/COACHING-PRINCIPLES.md` and every stage cites the number, so please don't write a
+rule into one skill file: the other stages would never see it (PRC-23). The skills in
+`.claude/skills/` are plain text if you want to read them. To edit your saved philosophy, open
 `.claude/COACHING-PRINCIPLES.md`. It starts with the **rule index**: every rule on one numbered
 line (like `VOL-8`, the 4-set cap), what stage uses it, and whether the checker enforces it. The
 dated stories below it say why each rule exists. Change a rule on its line; the skills point to

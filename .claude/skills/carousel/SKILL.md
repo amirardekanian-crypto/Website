@@ -1,11 +1,11 @@
 ---
 name: carousel
-description: Build a ready-to-post Instagram carousel (1080×1350, English by default) from Amir's script, story, or topic. Use whenever Amir provides content for an Instagram post or asks for a carousel — a personal story, a coaching tip, a myth-bust, something about his app/method/programming, proof/results, pricing, or a Q&A. Also use when he says "make a carousel about…" or pastes a script.
+description: Build a ready-to-post Instagram carousel (1080×1350, Farsi by default) from Amir's script, story, or topic. Use whenever Amir provides content for an Instagram post or asks for a carousel — a personal story, a coaching tip, a myth-bust, something about his app/method/programming, proof/results, pricing, or a Q&A. Also use when he says "make a carousel about…" or pastes a script.
 ---
 
 # Instagram carousel generator — AA Performance
 
-Turn Amir's raw script/topic into a finished, self-contained carousel HTML file with per-slide PNG download buttons, plus an Instagram caption. Content is **English by default** (content-language directive, 2026-07-02 — see `CLAUDE.md`); the goal of content is to **justify the premium price and retain clients** (show depth) — never cheap lead-gen.
+Turn Amir's raw script/topic into a finished, self-contained carousel HTML file with per-slide PNG download buttons, plus an Instagram caption. Content is **Farsi by default** (Amir, 2026-09-21: all new social content is Farsi again, because the business sells in Iran; the 2026-07-02 English directive is retired, see `.claude/skills/ad/BRAND.md` §6). English only when he asks; the goal of content is to **justify the premium price and retain clients** (show depth) — never cheap lead-gen.
 
 ## Step 0 — Required reading (EVERY run, before designing anything)
 
@@ -13,7 +13,7 @@ Turn Amir's raw script/topic into a finished, self-contained carousel HTML file 
 2. **`Content/DESIGN_SYSTEM.md`** — palette, type, layout, photo treatment, and **§10 voice & canonical Farsi word choices** (these are hard rules).
 3. **`Content/Carousel-Kit.html`** — the 23-template visual library (`tpl-cover, tpl-myth, tpl-big, tpl-heatmap, tpl-rules, tpl-stat, tpl-quote, tpl-compare, tpl-list, tpl-cta, tpl-feature, tpl-journey, tpl-result, tpl-checklist, tpl-index, tpl-step, tpl-split, tpl-define, tpl-qa, tpl-diagram, tpl-formula, tpl-schedule, tpl-bio`) — Amir likes this kit; it's the toolbox for chrome, mechanics, and a starting set of layouts, not a locked catalog. Reuse its brand mechanics (frame, pagination, grain, palette, type scale) so new work stays visually consistent — but **you're not confined to the 23 named templates.** When a story needs a layout none of them cover, design a new one using the same underlying system (same tokens, same chrome, same html2canvas-safe techniques). **Base64 hot-spots — do not Read straight through them:** the `:root` image vars (`--seal`/`--og`/`--coach`, ~lines 46–49), the pagination ball PNGs (in the `.progress-bar` rules), and the `#tennis-ball` symbol near `<body>`. Read around them with offsets/Grep, and transplant them into the output **mechanically** (python/PowerShell string extraction) — never retype base64 through generation; silent corruption only fails visually.
 4. **`Content/carousel-recovery-run.html`** — reference for the OUTPUT shell **only**: the `.topbar`, the `.deck` of `.shot`s with `.dl` buttons, and the html2canvas export script (gated on `document.fonts.ready`). **Its slide chrome is stale — do not copy it:** it predates the current kit (visible «۰۱/۰۹» counters → retired; thin segmented progress bars → replaced by tennis balls; no rally arc/court/ball symbol; images via relative paths → must be base64 now).
-5. **`Content/carousel-period-training.html`** — **the current best/newest English chrome reference (2026-07-06) — look at this one first.** Self-contained base64, `.30` frame, LTR chrome conventions, and every chrome evolution from this doc: plain scattered tennis-ball markers (no dashed arc), huge background page-numbers (no pagination dots), white/paper "stamp-tag" eyebrow boxes, clay-default highlight boxes, the manifesto/protocol layout, bold-clay coaching-cue text, darker court-photo overlays. `carousel-warmup-tennis.html` is still fine as a *template-variety* reference (its list/stat/rules-with-player-photo templates), but its chrome (dashed arc, pagination dots, thin chip-B eyebrow) is now the *previous* generation — don't copy that part of it.
+5. **`Content/carousel-period-training.html`** — **the current best/newest chrome reference (2026-07-06) — look at this one first.** Its copy is English; the chrome is the same in Farsi (the `.fa` rules in Step 5). Self-contained base64, `.30` frame, LTR chrome conventions, and every chrome evolution from this doc: plain scattered tennis-ball markers (no dashed arc), huge background page-numbers (no pagination dots), white/paper "stamp-tag" eyebrow boxes, clay-default highlight boxes, the manifesto/protocol layout, bold-clay coaching-cue text, darker court-photo overlays. The older template-variety deck (`carousel-warmup-tennis.html` was deleted on 2026-07-31; `Content/build_warmup_en.py` rebuilds it if its templates are ever needed) has the previous generation's chrome (dashed arc, pagination dots, thin chip-B eyebrow): never copy that part.
 
 **Precedence rule:** for chrome, `carousel-period-training.html` is the source of truth (see Step 0.5 above); for template variety/mechanics not covered there, `Carousel-Kit.html`'s current CSS is next. Where DESIGN_SYSTEM §4 (which still describes a page counter + segmented bar) or recovery-run's chrome disagree with either, **the newer file wins**: the page counter is retired, and pagination is a background page-number per slide, not tennis-ball dots.
 
@@ -43,10 +43,10 @@ Classify the content: **story** · **coaching tip / how-to** · **myth-bust** ·
 
 **Photo-led decks:** if Amir's script references real photos, follow the photo-story pattern in DESIGN_SYSTEM §5 (full-bleed 4:5, green scrim, per-photo `object-position`, cinematic grade). Ask him for the photo files if they're not in the repo.
 
-## Step 3 — Write the copy (English default — content-language directive, 2026-07-02)
+## Step 3 — Write the copy (Farsi by default — Amir, 2026-09-21)
 
-- Output is **English/LTR** (Barlow Condensed + Barlow, not Vazirmatn) by default, sharp/uppercase per the EN site voice — `<html lang="en" dir="ltr">`, standard punctuation, no Persian numerals. Reference build: `Content/carousel-warmup-tennis.html`. Use a **Python build script** (`Content/build_<slug>_en.py`) that mechanically extracts base64 assets from the kit (grey/orange ball PNGs, tennis-ball `<symbol>`, court photo) via regex and outputs a self-contained HTML — never retype base64 through generation; silent corruption only shows up visually.
-- **If Amir explicitly asks for Farsi**, switch to Farsi/RTL (Vazirmatn), colloquial Tehrani voice, warm/direct/confident, no fluff — `<html lang="fa" dir="rtl">`, Persian numerals, the two hard Farsi rules and canonical word choices below.
+- Output is **Farsi/RTL** (Vazirmatn) by default: colloquial Tehrani voice, warm/direct/confident, no fluff — `<html lang="fa" dir="rtl">`, Persian numerals, the two hard Farsi rules and canonical word choices below. Use a **Python build script** (`Content/build_<slug>.py`) that mechanically extracts base64 assets from the kit (grey/orange ball PNGs, tennis-ball `<symbol>`, court photo) via regex and outputs a self-contained HTML — never retype base64 through generation; silent corruption only shows up visually.
+- **If Amir asks for English**, switch to English/LTR (Barlow Condensed + Barlow, not Vazirmatn), sharp/uppercase per the EN site voice — `<html lang="en" dir="ltr">`, standard punctuation, no Persian numerals. Reference: `Content/carousel-period-training.html`.
 - Treat his script as **raw material**: tighten the hook, split into slide-sized beats (headline ≤ 9 words; one idea per slide), rewrite lines in brand voice. Keep his meaning and any specific numbers/names.
 - **Two hard Farsi rules:** never apply `letter-spacing` (breaks cursive joining), and no UPPERCASE; use Persian numerals (۰۱/۰۶). Mixed/numeric counters and KPI values get `direction:ltr`.
 - **Canonical word choices (DESIGN_SYSTEM §10):** «مربیِ بدنسازیِ حرفه‌ای» (his title) · «ارشد» never "MSc" · «یه برنامه / یه برنامه‌ی آماده» never «فایل/PDF» · «شدت» not «سختی» · «شروع کن» not «درخواست» · «تجربه» not «پشتوانه».
@@ -56,7 +56,7 @@ Classify the content: **story** · **coaching tip / how-to** · **myth-bust** ·
 
 The CTA slide must connect **this post's theme** to **a real app capability** (from PRODUCT.md), then close on the mantra. Mapping:
 
-| Post theme | App feature to invoke | CTA angle (English) | CTA angle (Farsi, if asked) |
+| Post theme | App feature to invoke | CTA angle (English, if asked) | CTA angle (Farsi) |
 |---|---|---|---|
 | Injury / overtraining / load | ACWR + dashboard alerts | "Before you get hurt, I'm watching." | «قبل از آسیب، حواسم بهت هست» |
 | Tiredness / bad days / motivation | Readiness check + auto-regulation | "Your plan adjusts to how you actually feel." | «برنامه با حالِ امروزت تنظیم می‌شه» |
@@ -69,9 +69,9 @@ CTA slide structure (top → bottom): eyebrow `chip-B`/`stamp-tag` → setup lin
 
 ## Step 5 — Build the file
 
-Create **`Content/carousel-<slug>.html`** (kebab-case English slug). Self-contained: **default English** — `<html lang="en" dir="ltr">`, Google Fonts **Barlow Condensed + Barlow**, **html2canvas CDN** in the head. A `.topbar` (deck title + posting notes for Amir), then a `.deck` of stacked `.shot`s: `<div class="shot"><button class="dl">⬇ PNG</button><div class="post-canvas tpl-X" id="sN">…</div></div>` — fixed `width:1080px; height:1350px` canvases, `max-width:100%` on `.shot`. See `carousel-warmup-tennis.html` for the current EN shell.
+Create **`Content/carousel-<slug>.html`** (kebab-case English slug). Self-contained: **Farsi by default** (next paragraph), **html2canvas CDN** in the head. A `.topbar` (deck title + posting notes for Amir), then a `.deck` of stacked `.shot`s: `<div class="shot"><button class="dl">⬇ PNG</button><div class="post-canvas tpl-X" id="sN">…</div></div>` — fixed `width:1080px; height:1350px` canvases, `max-width:100%` on `.shot`. See `carousel-period-training.html` for the current shell (its copy is English).
 
-**If building in Farsi** (only on explicit request): `<html lang="fa" dir="rtl">`, Google Fonts **Vazirmatn only** (the Latin header handle intentionally renders in Vazirmatn's Latin glyphs — see recovery-run; add Barlow Condensed only for an element you explicitly exempt from the `.fa` font override, e.g. a big LTR KPI numeral), and add `fa` to each `.post-canvas` class (`tpl-X fa`) to trigger the FARSI/RTL base block below.
+**Farsi (the default):** `<html lang="fa" dir="rtl">`, Google Fonts **Vazirmatn only** (the Latin header handle intentionally renders in Vazirmatn's Latin glyphs — see recovery-run; add Barlow Condensed only for an element you explicitly exempt from the `.fa` font override, e.g. a big LTR KPI numeral), and add `fa` to each `.post-canvas` class (`tpl-X fa`) to trigger the FARSI/RTL base block below. **English (only when Amir asks):** `<html lang="en" dir="ltr">`, Google Fonts **Barlow Condensed + Barlow**, and no `fa` class.
 
 **Copy list from `Carousel-Kit.html` (current state):**
 - `:root` tokens — **EXCEPT** `--seal` (retired monogram, unused) and the dead lamp tokens (`--lx/--ly/--lx-sign/--accent-glow`; nothing consumes them — also skip the `.fa` rule's `--lx` re-set and the opt-in `data-bg="glow"` variant). Take `--coach`/`--og` (large base64) **only when the deck uses `tpl-bio`**.
@@ -134,13 +134,13 @@ Serve via the project's static server (`.claude/launch.json` → python http.ser
 2. No console errors; all base64 images decode (load each data URI into an `Image` and check naturalWidth).
 3. Geometry scan via `preview_eval`: every arc ball inside its canvas and not on top of a text block (`elementFromPoint` on headline centers must return the text, not a graphic).
 4. Pagination count = slide count on every slide; correct `.on` index; the bar fills left→right (computed `direction` on `.progress-bar` must be `ltr`).
-5. Language enforcement: EN builds — computed `font-family` on a headline starts with Barlow Condensed. Farsi builds only — computed `font-family` starts with Vazirmatn and computed `letter-spacing` is `0` (or `normal`).
+5. Language enforcement: Farsi builds (the default) — computed `font-family` on a headline starts with Vazirmatn and computed `letter-spacing` is `0` (or `normal`). English builds — it starts with Barlow Condensed.
 6. Note: the screenshot preview tool is broken in this environment — verify by geometry/computed styles, and tell Amir to eyeball the file.
 
 ## Step 7 — Deliver
 
 1. The file path, with a one-line-per-slide summary (template + headline) so Amir can review fast.
-2. **The Instagram caption** (English by default; Farsi only if the deck is Farsi): hook line ≈ the cover headline, 2–4 short value lines, a question to drive comments, CTA line + «@amirardekanian», then 5–10 hashtags. Also embed it at the top of the HTML as `<!-- IG CAPTION … -->` so it travels with the file.
+2. **The Instagram caption** (in the deck's language: Farsi by default): hook line ≈ the cover headline, 2–4 short value lines, a question to drive comments, CTA line + «@amirardekanian», then 5–10 hashtags. Also embed it at the top of the HTML as `<!-- IG CAPTION … -->` so it travels with the file.
 3. Remind him: open the file → each slide has a «⬇ PNG» button (images are base64, so direct file-open works).
 
 ## Don'ts
@@ -148,7 +148,7 @@ Serve via the project's static server (`.claude/launch.json` → python http.ser
 - No gold/yellow — clay `#C7552F` is the only accent (clay-2 `#E06B43` on dark). Solid clay blocks always use white text.
 - No monogram/seal chips in headers or sign-offs (Amir removed them as "messy"). The Bio template's photo + brand card are the only logo carriers.
 - No small page counters/dots as the primary position indicator (2026-07-06: tennis-ball pagination dots are themselves now retired in favor of a huge background page-number per slide — see the atlas). Never both at once.
-- If building Farsi: no letter-spacing ever, no UPPERCASE, no Latin digits in Farsi lines. (English builds use uppercase Barlow Condensed per the EN site voice — that's normal, not a violation.)
+- Farsi (the default): no letter-spacing ever, no UPPERCASE, no Latin digits in Farsi lines. (An English deck, built only when Amir asks, uses uppercase Barlow Condensed per the EN site voice: that's normal, not a violation.)
 - Don't invent results, client names, or numbers. Real proof only, or clearly generic phrasing.
 - Don't exceed ~9 words in a headline or stack more than one idea per slide.
 - Don't undersize or mute supporting/instructional copy just because it's "secondary" text. Sub-copy under a headline needs a real size + contrast floor (~44–56px, ~.75–.80 opacity, not 34–46px/.55–.60), and a literal coaching cue/instruction line (e.g. under a protocol-row title) should read like a small headline in **clay**, weight 800, ~32–34px — never a muted grey caption. (Confirmed 2026-07-06 — see the atlas's carousel recipe for the full legibility rules.)

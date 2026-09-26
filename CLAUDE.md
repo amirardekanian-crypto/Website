@@ -26,6 +26,8 @@ Durable context for working in this repo. Read the linked docs before diving in.
   habit-tracker related: the three tabs, the eight habits, how progression works, the
   leaderboard, and how it links both ways with `program.html`.
 - `XP_SYSTEM.md` — every tunable in the XP/level/rank system and what changes when you move it.
+- `FARSI-PRODUCTS.md` — the paid course app (`/tennis/app/`), the testing app's page and the Farsi
+  product pages: how they are built, deployed and introduced.
 - `PROGRAM-APP.md` — the athlete app's programme features in full (rx, week notes, the Spine, the Quality
   Map, Because, the set log, The Ceiling, body weight): read it before changing `program.html`.
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy. **It opens with the RULE INDEX**
@@ -35,7 +37,7 @@ Durable context for working in this repo. Read the linked docs before diving in.
   restating (PRC-23). `scripts/check_rule_index.py` (pre-commit) keeps the index, its stories, the
   checker and every cited ID in agreement. Design reads the whole file; engage and the reviewers read
   the index and their own sections.
-- **`scripts/check_program.py`** — the house rules as a script (2026-09-25). `/program-assemble` runs it on every built programme before any review: floors, set cap, the new-athlete 8-rep rule, bans, RPE floors in every note, session length, the Spine gate, the Quality Map, and the publish fingerprint. Every FAIL and WARN it prints names its rule ID. A new athlete then gets ONE reviewer; a returning athlete none unless Amir asks (PRC-4).
+- **`scripts/check_program.py`** — the house rules as a script (2026-09-25). `/program-assemble` runs it on every built programme before any review: the volume count (both log tables and the day loads, counted from each exercise's Spine credits since 2026-09-26), floors, set cap, the new-athlete 8-rep rule, bans, RPE floors in every note, session length, the Spine gate, the Quality Map, and the publish fingerprint. Every FAIL and WARN it prints names its rule ID. A new athlete then gets ONE reviewer; a returning athlete none unless Amir asks (PRC-4).
 - `.claude/skills/*` + `.claude/agents/athlete-brief.md` (data prep only since 2026-09-26: the new athlete's intake form, and the Gmail session import /cycle-report runs first) — the coaching pipeline (intake → roadmap → design → assemble **Part A** (build + every programming check) → engage → assemble **Part B** (words, full check, publish) → **`/cycle-report`** at the end of every cycle: the athlete's WhatsApp report plus a coach-only `## Debrief` section in their coaching log, which `/program-design` reads before the next cycle). the coach-only per-athlete rationale log now lives in `public.coaching_logs`, read and
   written from coach.html (it used to be `.claude/coaching-log/*.md`, in this public repo).
 
@@ -65,42 +67,22 @@ Execute is revoked from anon and authenticated. Day-to-day changes (sets, reps, 
 tempo, rest, the coach's note) are made in the dashboard's inline editor, which writes
 straight to `programs` and keeps the previous version in `program_versions`.
 
-**✅ Every programme write ends the same way** (Amir, 2026-09-24: *"every time i update, write a new
-program, if an exercise comes up, add it, if it can be updated, or linked better to anything, be
-done when the program is done"*). Whether it is `/program-assemble` (a new cycle), `/program-edit`
-(a change) or `/workout` (a library session), the run is not finished until (CUE-4, CUE-3, PRC-24, COM-4, PRC-12):
-1. **Spine upkeep** (`/spine` → Upkeep): every exercise has an entry; empty fields filled; aliases
-   added for new spellings; `exId` stamped on every card; a new exercise linked to its
-   regressions, progressions and alternatives from both sides; **body parts** (`loads` + `impact`)
-   filled on any entry that lacks them; general cues from the design pass applied to drafts, proposed for approved.
-2. **Qualities**: every exercise tagged, **from the ten only** (drafts directly, approved entries as
-   `suggested_qualities` for Amir to accept), so no day card goes blank.
-3. **Quality check**: each day's top three (what its Home day card will say), and the cycle's
-   `art` headline in the week's top two unless it is bedrock/peak/reset.
-4. **Because**: on a new cycle, 5–10 fresh `why`s on the exercises chosen for this athlete,
-   audited. On an edit, only the exercises the edit changes: a removed exercise takes its `why`
-   with it, and a swap made for this athlete gets one (a correction changes only what Amir named).
-5. **One report block** in the handoff: `SPINE …` and `QUALITY …` lines, plus anything that
-   needs Amir (drafts to approve, proposals on approved entries).
-Never approve anything without Amir's word, and never put athlete-specific detail on a Spine entry.
-Details live in `/spine` → Upkeep and `/program-assemble` Step 8.
+**✅ Every programme write ends the same way** (Amir, 2026-09-24): `/program-assemble`, `/program-edit`
+and `/workout` are not finished until (1) Spine upkeep has run (`/spine` → Upkeep: a full entry for
+every exercise, `exId` on every card, links both ways, body parts and the count filled; CUE-4),
+(2) every exercise carries qualities from the ten only (CUE-3), (3) the Quality check is reported
+(PRC-24), (4) the Becauses are fresh (COM-4: 5–10 on a new cycle; on an edit, only the exercises it
+changes), and (5) the handoff has one `SPINE …` / `QUALITY …` block (PRC-12). Never approve anything
+without Amir's word, and never put athlete-specific detail on a Spine entry.
 
-**⛔ Three rules for every programme run** (Amir, 2026-09-25, after a correction went wrong; PRC-1,
-NAM-9 with CUE-5, PRC-2):
-- **Never touch the app while writing, correcting or delivering a programme.** No edit to any
-  `.html` page or `assets/js/*`; an idea or a bug seen on the way goes in the handoff (*"this is a
-  strict rule … dont touch the html file, if you see anything or want to prescribe better in a way ,
-  or have a new idea, share it with me"*). The one change outside the programme is the library.
-- **A newly prescribed exercise goes INTO the library, in full, and stays in the programme** (*"it
-  should be added to our library, with all the cues and other details like the ones already
-  there"*): every field the other entries carry, links both ways, **qualities from his ten and a
-  pattern from his list, never a new pill of either kind** (*"remember to never create new pills"*).
-  A variant that changes the exercise (Short-Lever Copenhagen Plank) is its own exercise with its own
-  entry and cues. Only an approved entry reaches a phone, so the new ones are one approval question
-  in the handoff.
-- **A correction changes only what Amir named.** A grip fix once came back with Day 3 rebuilt,
-  notes rewritten and seven exercises gone (*"why did you changed her program and removed some of
-  the exercises?"*); it was restored from `program_versions`.
+**⛔ Three rules for every programme run** (Amir, 2026-09-25, after a correction went wrong):
+- **Never touch the app while writing, correcting or delivering a programme** (PRC-1): no edit to any
+  `.html` page or `assets/js/*`; ideas and bugs go in the handoff. The one change outside the
+  programme is the library.
+- **A newly prescribed exercise goes into the library in full and stays in the programme** (NAM-9,
+  CUE-5): every field the other entries carry, links both ways, qualities and a pattern from his lists,
+  never a new pill. A variant that changes the exercise is its own entry.
+- **A correction changes only what Amir named** (PRC-2); `program_versions` holds what it replaced.
 
 **Coaching logs are on the server too.** `.claude/coaching-log/*.md` were tracked in this
 PUBLIC repo — world-readable, despite each opening with "Never published". They now live
@@ -119,10 +101,11 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 `SCHEMA.md` and the coaching rules in the principles' rule index. What must never break:
 
 - **Things that exist more than once: change every copy, or the coach and the athlete see different
-  numbers and nothing errors.** `rxOf()`/`repCount()`/`tempoWords()` (program.html + `assets/js/chips.js`,
+  numbers and nothing errors.** `rxOf()`/`repCount()`/`tempoDisplay()` (program.html + `assets/js/chips.js`,
   guarded by `scripts/check_rx.js`) · the Quality mix and its minutes rule (`qualityMix()`, `qualityCheckC()`,
   `/program-design`, `check_program.py`) · the Spine resolver (`spineFor()` / `spineForC()`) · the body-part
-  region and impact lists (four copies) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
+  region and impact lists (four copies) · the muscle list of the Spine's volume credits (four copies:
+  `spine_credits_ok()`, coach.html, `check_program.py`, `draft_sql.py`) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
   `parseSetText()`) · the Ceiling rename matcher (`matchRenamed()` / `ceilAliasMapC()`) and its two write
   doors (`paintCeilingForm()` mirrors `paintFromFields()`).
 - **`rxOf()` returns a VIEW** (strings, the dose as `dose: {kind, value, side, label}`), not the `rx` object:
@@ -525,109 +508,35 @@ weeks to copy-paste, and an idea bank. Mechanics in `XP_SYSTEM.md` §8.5.
 - Shared **nav/footer** are injected by `assets/js/shared.js` from `partials/nav.html` + `partials/footer.html`.
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
-- **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (v7, 2026-09-13).
-  It must keep leaving `/reach/` (the Iran reachability probe) and `/tennis/` (the paid course,
-  whose app at `/tennis/app/` ships its own worker and `tps-shell-*` caches) untouched. Otherwise the probe reports a cached pass
+- **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
+  the cache is `aap-v29` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
+  `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
+  caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
   Storage is shared by the origin, and the old `k !== CACHE` filter would have wiped any other
   app's offline copy on every bump.
-- **`/tennis/app/` is the paid course app** (Tennis Performance System, Level 2; Farsi). Its source
-  and content live in the private `tps-content` repo: only the shell (index.html, app.js, app.css,
-  sw.js, the self-hosted font and Supabase library) is copied here by
-  `tps-content/app/_dev/deploy_to_website.py`, so **never edit those files here**. The handbook itself
-  is in Supabase (`tps_content`, readable only by an active buyer); logins come from coach.html →
-  **Course**. Backend: `supabase/tps_01_accounts_content.sql` + `supabase/functions/tps-login`.
-  ⚠️ **One exception, 2026-09-15: the demo was built directly in this folder**, because `tps-content`
-  was not reachable from Amir's PC (not in its folders, and his stored GitHub login sees neither it
-  nor `assess-content`, which another session deployed from that same day). **So the next deploy from
-  `tps-content` erases the demo** unless `app.js`, `app.css`, `index.html` and `sw.js` are first
-  copied from here into it. Whenever this folder is edited here, run `python scripts/stamp_tps_app.py`
-  (the pre-commit hook blocks a stale stamp): the app's worker answers from its cache first, so a change
-  shipped under an unchanged `sw.js` VERSION never reaches a phone that already has the app.
-  **The demo is `/tennis/app/?demo=1`** (Amir, 2026-09-15): no sign-in; week 1, the broad jump test and
-  three lessons open, everything else locked behind a WhatsApp buy button. The lock is server-side:
-  `tps_demo()` (`supabase/tps_02_demo.sql`, where the picks live) sends each locked item as its card
-  only, so nothing locked ever reaches the phone. Never "lock" something in app.js alone. It is the one
-  mode that loads Plausible (goals `Demo opened`, `Demo failed`, `Demo locked`, `Demo buy`). It is linked
-  publicly (Amir, 2026-09-15, before his Iran test): from `/tennis/` (menu, hero link, the phone
-  screenshot, the inside section, the price card, an FAQ), the course card on `index-fa.html`, and
-  `links.html`. If it will not open in Iran without a VPN, move the free parts to static files on the website.
-- **The course app has a TOUR and a GUIDE** (2026-09-21, Amir: *"i want the TPS course, and the demo,
-  to have a tutorial made for it, showing the different sections and where to find where, in farsi"*).
-  Both are in `tennis/app/app.js` under *The tour and the guide*, and they run for a **buyer and a demo
-  visitor alike** — the demo's copy names what is locked and its last card carries the buy button.
-  - **The tour** is habits.html's, ported: a clay ring around a real control, a card beside it, four
-    mask panes with a **real hole** so a step marked `act` is finished by doing the thing. 15 steps
-    across all five tabs, and it **opens step-by-step mode for real** (three steps: the warm-up card
-    and its timer, a real set, the ✕) because the green button at the foot of a session is the part
-    nobody finds alone. It runs **once** on a first open — not on a deep link, which is somebody who
-    came for a page — and `?tour=1` always replays it. Whether it has run is `localStorage` key
-    **`tps.toured`**, deliberately NOT inside `tps.prefs`: a prefs object existing before a version is
-    chosen reads as "already chosen" in every `!prefs` test in that file.
-  - **The guide** is `#/guide`, reached from the **؟** beside the gear on all five tab banners. It is
-    a map, not an essay: the five sections and the controls that hide (version gear, step mode, the
-    warm-up timer, exercise search, the one-rep-max calculator, the Yo-Yo beeps, printing the results
-    sheet), **every row a real link** — and in the demo it links at `#/tests` rather than into a
-    locked test. It also replays the tour.
-  - ⚠️ **Move a control, rename a tab, or change what a tap does and the tour is actively lying**, on
-    the first screen a new buyer or a demo visitor sees. The same rule habits.html's `tourSteps()`
-    carries. Its targets are resolved out of the live DOM per step, so a renamed class silently rings
-    nothing rather than erroring: `.block-card .weeks`, `.session-card`, `.ex`, `.cta-bar .btn.primary`,
-    `.step-body .rest`, `.step-foot .btn.primary`, `.step-top`, `.search`, `.card.tap`, `#tabs`,
-    `.bhelp` and `[data-tour="version"]`.
-  - ⚠️ **`sel` is lazy; `when` is EAGER — never let a `when` test the DOM.** A step's `sel` runs each
-    time that step opens, so it sees the right screen. A step's `when` runs when the list is *built*,
-    which is wherever the tour was started from — the guide screen, on a replay. The safety step's
-    `when` read `#safety` at first and so dropped itself on every replay (14 steps, not 15), losing
-    the one step that names the red flags, on the one path somebody chose deliberately. A `when` asks
-    the **content** (`C.start.safety`) whether the view will draw the thing.
-  - Two new Plausible goals to create, demo only: **`Tour opened`** and **`Tour finished`** (plus
-    `Tour skipped`).
+- **The Farsi products are in `FARSI-PRODUCTS.md`** (moved 2026-09-26): the paid course app
+  `/tennis/app/`, its product page `/tennis/`, the testing app's page `/tennis-testing/`, and where they
+  are introduced on the Farsi site. What must never break:
+  - The two app shells are copied from private repos (`tps-content`, `assess-content`): never edit
+    `tennis/app/` or `tennis-testing/app/` here, **except the course demo**, which was built in this
+    folder (2026-09-15). Copy its `app.js`, `app.css`, `index.html` and `sw.js` into `tps-content` before
+    that repo's next deploy, and after any edit here run `python scripts/stamp_tps_app.py` (pre-commit
+    blocks a stale stamp; the app's worker answers from its cache first).
+  - The demo's lock is server-side (`tps_demo()`): never "lock" anything in `app.js` alone.
+  - The course app's tour finds real controls by CSS selector: move a control or rename a class and it
+    lies, silently, on a new buyer's first screen.
+  - A new lesson or test needs its cover in `ART` by id, and a regraded picture needs `ART_V` raised.
+  - The product pages share `assets/css/fa-product.css` (bump its `?v=` after any change) and
+    `assets/js/fa-nav.js`. The English site deliberately does not mention the Farsi products.
 - **Videos play from `www.youtube.com/embed` in BOTH apps, never `youtube-nocookie.com`** (2026-09-23; Iranian
   athletes could not watch the course videos). The nocookie player hits YouTube's sign-in wall in Iran, and many VPN apps
   there route only the `youtube.com` names. Both apps read watch, `youtu.be`, `shorts/`, `embed/` and `live/` links, give a
   Shorts link a tall 9:16 box, and play every video inside the app. An "open in the YouTube app" link was tried and
   removed the same day (Amir): do not add it back.
   The three parsers must agree: `ytId()` in `tennis/app/app.js`, `ytVideoId()` in `program.html`, the modal in
-  `assets/js/shared.js`. ⚠️ This was edited here, so copy `app.js` and `app.css` into `tps-content` before its next deploy.
-- **The course app's pictures (Amir, 2026-09-19).** AI-made (GPT Image 2 and Higgsfield), one look: shadows lean deep green,
-  highlights lean warm cream, clay orange the only loud colour. They live in `assets/tps/` as WebP, made from masters by
-  **`scripts/grade_tps_art.py`**, which applies ONE shared colour grade (prompts drift off-colour, the grade does not) and
-  exports 1080 px, 16:9, about 40 KB each. They show in the **demo** (`/tennis/app/?demo=1`) and to every paying buyer alike: `ART` and
-  `ART_V` in `app.js` decide where each goes (block covers by block number, lessons and tests by id, one tarp picture for
-  every locked page, one room per session card, one for the session-complete screen). ⚠️ **Everyone sees everything (2026-09-20).** The gate that kept lessons, tests and the locked pages demo-only (`ART_KINDS`) is gone, because all 22 lessons and all 7 tests now have a cover. **A new lesson or test needs its cover added to `ART` by its id, or its card stays a plain green banner** (the ids are in `public.tps_content`: `learn`…`learn-5` and `tests`), so never ship half a list of pictures. `tennis/app/sw.js` keeps each picture for offline use, in its own `tps-art` cache, the first time it is shown. Rules every picture follows: no text or logos in
-  the image, subject on the LEFT and the right and bottom calm (the app is right-to-left, so titles sit there), no yellow
-  or gold, no faces, never teach exercise form. After regrading a file raise `ART_V`: the root `sw.js` keeps `/assets/`
-  files cache-first by full URL. **All 40 pictures exist** (2026-09-20: 4 block covers, 3 session rooms, the test-day card, the session-complete picture, the locked-page tarp, the sign-in walk-on, and 22 lesson and 7 test covers). The last 12 covers were generated on 2026-09-20 with the Higgsfield connector (`/image` skill; `gpt_image_2_5`, medium, 1 credit each, 3 candidates per slot, best of three) and graded through the same script, except `tennis-fitness`, which came from the program.html session's set. ⚠️ **Before generating anything, run `git status --short` and look at `assets/tps/` and the other sessions' scratchpads**: on 2026-09-20 two sessions were asked for the same 12 covers and both generated them, which cost credits twice. The sign-in walk-on is not gated at all: it replaces `court-sessions.jpg` for everyone, because it swaps a picture rather than adding one. Nine of the covers are program.html stills (its art is composed with the subject on the RIGHT, the opposite of this RTL app), reused by mirroring them: `FLIPPED` in `scripts/grade_tps_art.py`. Like the rest of the demo it was built in this
-  folder, so the next deploy from `tps-content` erases the `app.js`, `app.css` and `index.html` changes unless they are
-  copied there first.
-- **`/tennis/` is the course's product page** (Farsi, indexable; 2026-09-15). Amir: every product gets
-  its own page, on one shared layout (hero → who → inside → how → price → FAQ → buy):
-  `assets/css/fa-product.css`, with Vazirmatn self-hosted in `assets/fonts/`. **Bump the `?v=` on that
-  link after any change**, because `sw.js` serves `/assets/` cache-first to anyone who has opened
-  program.html. The **«تو کدوم سطحی؟» level test** is `tennis/level-test.js`. Amir's rules (aiming at
-  ~70% Level 2, 15% Level 1, 15% Level 3) are in its header: change them there, and nowhere else. It stores
-  nothing and sends only a Plausible custom event `Level test 1|2|3` (each needs a goal in Plausible).
-  The page reaches `sitemap.xml` through `FOLDER_PAGES` in `scripts/build_article_pages.py`.
-  `index-fa.html` links it from the menu («دوره») and the «محصولات» strip.
-- **`/tennis-testing/` is the testing app's product page** (Farsi, indexable, for coaches and academies;
-  full sale at $17 once, 2026-09-15) on the same `fa-product.css` layout. **The app itself moved to
-  `/tennis-testing/app/`** that day, while no login existed. Its shell is copied there by
-  `assess-content/app/_dev/deploy_to_website.py`, so never edit `tennis-testing/app/` by hand; logins come
-  from coach.html → **Testing app** (`ASSESS_URL`). The page's phone screens are real, taken with made-up
-  sample players (`?sample=1`). Like the course app, it self-hosts Vazirmatn and supabase-js 2.116.0
-  (`fonts/`, `lib/`), so nothing waits on Google Fonts or jsDelivr. `index-fa.html` links it from the menu («برای مربی‌ها») and the third
-  «محصولات» card.
-- **Where the Farsi products are introduced (Amir, 2026-09-15):**
-  - `index-fa.html` has a clay top banner («تازه: دوره‌ی تنیس و اپِ آزمون ←», not sticky) that jumps to the «محصولات» strip.
-  - That strip sits right under the hero and the stats bars.
-  - The menu keeps only links that go to another page: «دوره», «برای مربی‌ها», «مقاله‌ها» (Amir,
-    2026-09-15: the seven links that jumped down the page are gone). On phones they drop down from a ☰
-    panel under the bar, with English as its last row. `/tennis/` and `/tennis-testing/` have the same
-    phone menu but keep their section links. One script opens and closes all three:
-    `assets/js/fa-nav.js`; the look is in `index-fa.html`'s CSS and `fa-product.css`, so change both.
-  - `links.html` has a button for each product, plus the course demo («هفته‌ی ۱ رو رایگان امتحان کن»).
-  - **The English site deliberately does not mention them** (Amir's choice): it stays about coaching for international players.
+  `assets/js/shared.js`. (The site modal in `shared.js` reads fewer link shapes and draws no tall Shorts box: flagged
+  2026-09-26.) The course app's copy: `FARSI-PRODUCTS.md`.
 - **Edge Function source is in `supabase/functions/`** (since 2026-09-13; before that it existed
   only as deployments). Edit there, deploy with the Supabase MCP, never in the dashboard. See its README.
 - The Farsi site is the **aesthetic reference Amir likes**: green radial-gradient hero, white text +
@@ -680,116 +589,23 @@ search in Iran). The routine (Search Console, the monthly checklist, how titles 
   Strength"). Put the literal description in a tag/subtitle. When unsure, offer 3–4 options and let him pick.
 
 ## Design work (Claude is Amir's visual designer)
-Standing role: Amir asks for carousels, reels, posts, result cards, web/app redesigns,
-animations. **Always start at `Content/DESIGN-ATLAS.md`** — the designer's working file
-(asset shelf, format recipes, current-vs-retired rulings, app-look cheat sheet, his taste),
-with `Content/DESIGN_SYSTEM.md` as the brand bible. For reels specifically, use the
-**`/reel` skill** (`.claude/skills/reel/SKILL.md`) — it has the full build process, the
-continuous-motion technique library, known stillmode gotchas, and the MP4 export pipeline.
-Newest-taste references:
-`Content/carousel-warmup-tennis.html` (carousel), `Content/reel-6-system.html` (reel, EN),
-`index-fa.html` (web — visual style only, see note below). Non-negotiables in one line: clay
-`#C7552F` is the ONLY accent (clay-2 `#E06B43` on dark) — **no yellow/gold, ever**; green
-`#0E4A36` / paper `#FAF7F2`; Barlow Condensed (display, uppercase) + Barlow (body/app-UI);
-canvases 1080×1350 / 1080×1920; real assets over stock; outputs self-contained (base64);
-html2canvas drops SVG `<use>` and CSS transforms — inline images, hard px. Instagram handle
-in new designs = **@amirardekanian** (site: AMIRARDEKANI.COM); never retro-edit
-already-shipped designs.
-
-**The athlete app's pictures (2026-09-19).** Every image inside `program.html` is
-generated art in `assets/art/`, made in Higgsfield (GPT Image 2.5 Flare) from a shot
-list, all graded through one pass so separate runs read as one set. Rules every picture
-follows: **no people, no logos, no text or numbers, no yellow or gold**; green-black
-shadows, warm cream highlights, clay the only saturated colour. **Cycle cards use 10
-FAMILY images, never one per cycle name** — 161 live cycles share ten pictures and the
-pipeline invents new names every block. The family comes from the `art` word on the
-cycle, with keyword rules on the NAME as fallback (`cycleArt()`); when two cards in a
-row share a family the second is mirrored with a clay scrim, so no image may carry text
-or a handed subject. Moments: session complete (3, rotating), new best on The Ceiling
-(3), welcome (1, once per athlete). ⚠️ **A replacement ships as `-v2`, never over the
-same path** — `sw.js` serves `/assets/` cache-first by URL. Full specs `IMAGES.md` §0;
-asset shelf row in `Content/DESIGN-ATLAS.md`.
-
-**Generating pictures is the `/image` skill** (`.claude/skills/image/SKILL.md`) — Higgsfield is
-connected, so Claude writes the prompt, generates, downloads, judges, grades and ships without
-Amir touching the tool. Read it before writing a prompt. **Its Step 0 is "look at what we already
-have"** (Amir, 2026-09-20: *"have a look at what we already have, so we can reuse and we don't have
-to regenerate"*): run `tools/shelf.py` for a contact sheet of every shipped picture, search
-`LEDGER.md` for what each one shows, and walk the reuse ladder (as it is, mirror, re-crop, `bench/`,
-unused candidates) before generating anything. The skill also carries the settings that work
-(medium/1k, **1 credit per image**, a shared rate limit that rejects part of a big batch, so submit
-6 at a time), the prompt formula, the subjects that have failed, `tools/crop.py` (what the 2.9:1
-course card really shows) and `tools/gate.py`, which judges a candidate through the destination's
-**own scrim** rather than on the raw file. ⚠️ **It spends
-real credits from a pot shared with Amir's own generations, so never generate unless he asked for
-that run** (Amir, 2026-09-20: *"wait untill i say to generate more"*). Its *Learned the hard way*
-log is where each round's lessons go.
-
-**Generating video clips is the `/video` skill** (`.claude/skills/video/SKILL.md`), which starts from
-a picture, so read `/image` first. It opens with **Amir's spend protocol** (2026-09-20, after the first
-two test clips cost 23.5 credits and the same tests done lean cost 9.5: *"the credit is expensive, but
-you did some things without letting me know, or asking for me"*): **show a plan block and wait for his
-yes before ANY generation, even a test; reuse a picture that exists before making one; sound OFF (the
-default is ON, so always pass `sound: "off"`); 3-second clips, never 5; the cheapest settings that show
-the thing; report the cost in numbers after.** The same rules hold for pictures. It also has the price
-list, the prompt craft for a locked camera, `tools/clip_check.py` and a ledger of every picture and clip
-already in the Higgsfield account.
-
-**Selling something is the `/ad` skill** (`.claude/skills/ad/SKILL.md`), built 2026-09-21 from a
-five-round interview with Amir — so it is the first design doc here that records *his* answers
-rather than a reading of his past work. It runs **Amir's own 17-stage pipeline** (his structure, 2026-09-21, with three moves and one
-addition he approved): objective → audience → problem in their words → **the objection it kills** →
-core message → **CTA** → creative idea → emotional direction → *his yes* → storyboard → script →
-shot list → look lock → image prompts → selection → video prompts → edit plan → final review.
-⚠️ **The CTA sits at stage 6, not 14** — the ask decides the film's length, hook and last ten
-seconds, so deciding it late means discovering the ad leads nowhere after it is cut. Reference files:
-`BRAND.md` (who the audience is, the refusals), `STRATEGY.md` (ten angles, thirteen hooks, five
-visual concepts, three CTAs), `SHOTS.md`, `PROMPTS.md`, `WHATSAPP.md` (the reply set, anchored on
-Iran prices — $100 for the same 16 weeks against $17), `LEDGER.md`. **Every ad gets its own brief
-file** in `Content/tps-ads/`, from `BRIEF-TEMPLATE.md`. `/image` and `/video` stay as the craft files it
-calls; `/reel` builds a fully-generated ad.
-⚠️ **Four things it settled that contradict older notes here.** (1) **Amir goes on camera** — face
-and voice, filming himself; every reel before this was animation with no human in it. (2) **Editing
-is his bottleneck**, and he edits in Instagram's own editor, so the deliverable is a **finished
-MP4**, never parts to assemble — he films one take, Claude cuts it. (3) **Parents are not in his
-audience**, so a parent-facing ad can only travel second-hand. (4) The refusal list is now hard:
-**attack the method never the person** (the coaches watching are also who share his work),
-**promise the retest never the result**, **teach soreness-vs-pain never fear**, and no hype editing.
-
-**Reel delivery process (Amir, 2026-07-02 — was too slow first time, fix this):** For a reel,
-the deliverable is **the HTML file itself**, sent via SendUserFile so he can open/preview and
-screen-record it himself. **Do NOT render an MP4 unless he explicitly asks for one** — skip
-the whole Playwright/ffmpeg pipeline by default. **Do NOT send static per-beat screenshots**
-as the review artifact — the interactive file *is* the review. Keep the iteration loop fast:
-no multi-agent audit workflow, no video pipeline, for a routine draft/revision — save those
-for when he asks to finalize/export. Design direction: he wants reels **"fully animational,
-lots of moving things, being cool"** — not a slideshow of static cards with an entrance fade.
-**This is a feeling, not a fixed effect list — don't lower creativity to a recipe.** He said
-explicitly: keep inventing, don't reuse the same set of animations every reel. The `/reel`
-skill has a toolbox (ambient drift, drawn lines, Ken Burns, typing dots, etc.) as inspiration
-only — treat it as a floor to riff past, not a checklist to satisfy.
-
-⚠️ **REVERSED 2026-09-21 — Farsi for everything now.** Amir, asked directly while building the
-`/ad` skill: all new social content is **Farsi** again. The business is Iran-only where it sells
-(the course is priced in Toman and bought over WhatsApp), so English social reached people who
-could not buy. **Farsi typography is back in force everywhere:** Vazirmatn, `dir="rtl"`, **no
-uppercase, no letter-spacing**, Persian numerals, mirrored layouts, wipes running right to left.
-Reel 7 (2026-09-20) already broke the English rule for the course with his say-so; this generalises
-it. The superseded directive is kept below because the shipped English work was built to it.
-
-~~**2026-07-02 — content language directive (Amir, verbatim): "we changed everything to
-english, im not creating content in farsi anymore."**~~ *(superseded 2026-09-21.)* It made all NEW
-social content (carousels, reels, posts, result cards) **English**, sharp/uppercase Barlow
-Condensed per the EN site voice. English work shipped under it (`reel-6-system`,
-`carousel-warmup-tennis`, the EN carousels) stays as built — **never retro-edit a shipped design**. Older Farsi social
-files (`reel-1..3`, `reel-5-system`, the `carousel-*` Farsi decks) are left as shipped —
-reference for mechanics only, not for language/voice.
-**Scope confirmed (Amir, same day): social content only** — the live Farsi **website**
-(`index-fa.html`, `form-fa.html`, `terms-fa.html`) is unaffected and stays exactly as-is
-for the Tehran general-fitness audience. Don't touch those pages over this directive.
-⚠️ **Superseded for `index-fa.html` on 2026-09-13:** Amir moved the Farsi homepage to **tennis &
-padel** and had its body rewritten (see *Article pages & SEO*). `form-fa.html` and
-`terms-fa.html` are unchanged.
+Carousels, reels, posts, result cards, ads, web and app redesigns. **Start at
+`Content/DESIGN-ATLAS.md`** (non-negotiables, current vs retired, the asset shelf, each format's
+recipe) with `Content/DESIGN_SYSTEM.md` as the brand bible; build with `/carousel`, `/reel` or `/ad`,
+pictures with `/image`, clips with `/video`, and read the skill before starting. The full notes that
+sat here until 2026-09-26 live in those files and in `IMAGES.md` §0. What must never slip:
+- **All new social content is Farsi** (Amir, 2026-09-21): Vazirmatn, RTL, no uppercase or
+  letter-spacing, Persian numerals. English only when he asks. Barlow is for app screens and Latin numerals.
+- **Clay `#C7552F` is the only accent. No yellow or gold, ever**: not in UI, prompts, props or wardrobe.
+- **Never generate a picture or a clip before Amir says yes to a plan with the credit numbers in it**:
+  the credits come from a pot shared with his own work. Reuse first (`/image` Step 0). Clips: `sound:
+  "off"` (the default is ON), 3 seconds, the cheapest settings, and report the cost after (`/video`).
+- **A replacement image ships as `-v2`** (or with `ART_V` raised in the course app), never over the
+  same path: the root `sw.js` serves `/assets/` cache-first by URL.
+- **Never retro-edit a shipped design**: start a new numbered file.
+- **A reel draft is the HTML file** (an MP4 only when he asks); **an ad is one finished MP4**: Amir
+  films himself and edits in Instagram, so Claude cuts the whole thing (`/ad`).
+- Handle in new work: **@amirardekanian** · site AMIRARDEKANI.COM.
 
 ## Verifying the live site (important gotchas)
 - **Try the live fetch first — when it works it is the real proof — but it DEPENDS ON THE

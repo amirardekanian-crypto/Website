@@ -174,7 +174,7 @@ the thing.
   which cannot do what these ads need.
 - ⚠️ **Therefore the pipeline is: Claude scripts → Amir films one take on his phone → he sends the
   clip → Claude assembles → he posts.** Never hand him parts to assemble. Generated footage exists
-  to make that final cut, not to become his homework. `SKILL.md` step 8 is the assembly.
+  to make that final cut, not to become his homework. `SKILL.md` stage 16 (the editing plan) is the assembly.
 - **[GAP] His story — why he does this.** Asked 2026-09-21, not yet answered. Now that he is the
   face of it, this is the missing piece of the trust layer, and the whole of angle A7.
 
@@ -251,7 +251,7 @@ Who Amir says he is standing next to — he did **not** say "nobody":
   better produced, not in Farsi, and not reachable for coaching.
 
 **[GAP] No competitive research has actually been done** — no accounts named, no ads collected,
-nothing pulled apart. `SKILL.md` step 1b is where it goes when it exists. Until then, treat this
+nothing pulled apart. `SKILL.md` has no research step yet: add one before stage 1 when it exists. Until then, treat this
 section as three sentences from Amir, not as market research.
 
 ---

@@ -222,7 +222,7 @@ belongs only to A11, as what his time is worth.
 ## 7. Competitive research — **[GAP]**
 
 Amir named three kinds of competitor (`BRAND.md` §7) and no accounts. Nothing has been collected.
-Until it has, do not claim to know what the market is doing. `SKILL.md` step 1b.
+Until it has, do not claim to know what the market is doing (`SKILL.md` has no research step yet).
 
 ---
 

@@ -36,7 +36,7 @@ function slice(startMark, endMark, what) {
   return html.slice(i, j);
 }
 // One contiguous region: parseDurationToSec → parseChips → isPureDuration →
-// DOSE_LABEL → tempoWords → rxOf → repCount, stopping at the first renderer.
+// DOSE_LABEL → tempoDisplay → rxOf → repCount, stopping at the first renderer.
 const inlineSrc = slice('function parseDurationToSec(', 'function renderStatsGrid(rx) {',
                         'the parse + rx region');
 

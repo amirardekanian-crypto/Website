@@ -12,11 +12,11 @@ description: Wrap the engagement layer around a designed program — current-cyc
 > A `data/<id>.json` on this PC is a local scratch copy and may be stale the moment
 > Amir edits anything in the dashboard. Never trust it over the table.
 >
-> **To write one:** small changes (sets, reps, RPE, tempo, rest, an exercise note)
-> are Amir's job in the dashboard's inline editor, which versions every save. For a
-> whole new cycle, write the JSON locally and have him publish it with
-> coach.html → Athletes → **↑ Publish programme file**, or apply it directly with
-> `update programs set data = '<json>'::jsonb where athlete_id = '<id>';`
+> **To write one:** a whole new cycle is published by **/program-assemble Step 7** in one call
+> (`public.publish_cycle()`: the programme, the roadmap patch and the coaching log together),
+> never handed to Amir as a file. A change inside the live cycle is /program-edit's (it writes
+> the changed paths). Amir's own small changes go through the dashboard's inline editor, which
+> versions every save.
 >
 > **The coaching log is on the server too** — `public.coaching_logs`, coach-only.
 > It is no longer `.claude/coaching-log/<id>.md`, which was tracked in a public repo.

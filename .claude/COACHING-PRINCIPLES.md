@@ -137,15 +137,15 @@ places, and a stale copy reached athletes.)*
 | ID | Rule | Stage | Check |
 |---|---|---|---|
 | VOL-1 | A sport athlete's volume is a report (sets, range, verdict); an under-dose on a time-limited client is maintenance, not failure. | design | |
-| VOL-2 | Manage load per day: weight sets by cost (heavy compound ×1.5, moderate ×1, isolation ×0.5), undulate the week, avoid back-to-back hard days. | design | warn |
-| VOL-3 | Hypertrophy runs on about 10–20 hard sets per muscle a week, most of the gain by 10; about 10 direct sets per session at most. | design | warn (over 20) |
+| VOL-2 | Manage load per day: weight sets by cost (heavy compound ×1.5, moderate ×1, isolation ×0.5), undulate the week, avoid back-to-back hard days. | design | warn (flat week, grind, back-to-back) |
+| VOL-3 | Hypertrophy runs on about 10–20 hard sets per muscle a week, most of the gain by 10; about 10 direct sets per session at most. | design | warn (over 20; over 10 in a session) |
 | VOL-4 | When the aim is strength and muscle, every major muscle clears 10 working sets a week; an exception goes on `floor-except:` with its reason. | design | ✓ |
 | VOL-5 | A session with real headroom (15 minutes or more) gets low-cost work before the day is called done. | design | |
 | VOL-6 | The pattern is deferred, the effort never: a restricted cycle still carries a real strength benchmark. | design | |
 | VOL-7 | The shoulder is one group on 10–20 sets: press, side and rear delt together. Scapular retraction counts as back. | design | warn (under 10) |
 | VOL-8 | Never more than 4 working sets on one exercise until our own logs prove more; add an exercise instead. | design | ✓ |
 | VOL-9 | A rounded-shoulder or forward-head client keeps chest volume low, as a stated exception, never loaded to reach a range. | design | |
-| VOL-10 | Count every exercise that loads a muscle (1, 0.5 or 0); warm-ups don't count, core counts anywhere. Both volume tables go in the log. | design · assemble | ✓ (tables vs programme) |
+| VOL-10 | Count every exercise that loads a muscle (1, 0.5 or 0) from its Spine credits; warm-ups count only core. Both tables go in the log. | design · assemble | ✓ (counted from the Spine) |
 | VOL-11 | A new athlete's first cycle has no weighted exercise under 8 reps. | design | ✓ |
 
 ### Testing
@@ -847,6 +847,15 @@ words and what went wrong, which is why the rules exist. Read a rule's story bef
   table (day · exercise · sets · what it counts toward, fractions shown) and the per-muscle total
   against its goal range. Amir reads the working, not just the verdict — a bare "hamstrings 11"
   hides which exercises produced it and whether the number is real.
+
+  **The weights live on the exercise, not in each log** *(2026-09-26, Amir: yes to "muscle credits
+  + cost tier on each Spine entry so the checker computes volume tables and per-day load")*. Each
+  Spine entry carries its `credits` (muscle → 1 or 0.5) and its VOL-2 `cost` (coach-only, stage39),
+  and `scripts/check_program.py --tables` writes both tables and the per-day load from them. They
+  had been typed by hand every cycle, and the logs disagreed with each other: an RDL's glutes at 1
+  in one and 0.5 in another, a face pull under back, shoulder or both. The 220 entries started from
+  the counts the logs already used, one answer per movement whatever the kit. A count that looks
+  wrong is changed on the entry, for every athlete at once.
 
   **Why this is a rule and not a preference:** scored isolation-only, a muscle can read as
   under-dosed when the athlete is training it hard through compounds, and the programme then gets

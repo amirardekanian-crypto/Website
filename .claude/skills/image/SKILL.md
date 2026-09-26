@@ -72,7 +72,7 @@ parallel session) instead of generated.
 | House | Folder | Spec to read first | The look |
 |---|---|---|---|
 | **program.html** (athlete app) | `assets/art/` | `IMAGES.md` §0 | Green-black shadows, cream highlights, clay the only saturated colour. **No people at all** (hands and feet at most). Subject on the **RIGHT** — English UI text sits left. |
-| **Course app** (`/tennis/app/`) | `assets/tps/` | `[[tps-art-direction]]` memory + `CLAUDE.md` | Same grade. Faces **turned away** allowed. Subject on the **LEFT** — the app is RTL, so Farsi titles sit right and bottom. No generated children. |
+| **Course app** (`/tennis/app/`) | `assets/tps/` | `[[tps-art-direction]]` memory + `FARSI-PRODUCTS.md` | Same grade. Faces **turned away** allowed. Subject on the **LEFT** — the app is RTL, so Farsi titles sit right and bottom. No generated children. |
 | **AA Proof** (`habits.html`) | Proof's own art | `[[proof-image-generation]]` memory | **Lavender/violet, NOT green/clay.** Do not apply the brand grade here. |
 
 Rules that hold in all three: **no text, no numbers, no logos, no yellow, no gold.** Tennis balls
@@ -262,7 +262,7 @@ Write one before the next round there rather than re-deriving the numbers; the c
   (`.ph img` with `naturalWidth > 0`: 22 lessons, 7 tests), check the console, and take one screenshot. ⚠️ A
   phone that already has the app gets the new build on its **second** open: the new worker installs in the
   background first. That is the design, not a failed deploy.
-- **Update the record:** the `CLAUDE.md` pictures bullet, `LEDGER.md` (what the new pictures show, their job
+- **Update the record:** the pictures section of `FARSI-PRODUCTS.md` (course app) or `IMAGES.md` §0 (program.html), `LEDGER.md` (what the new pictures show, their job
   ids, their prompts), the board artifact, and the memory notes.
 
 ---

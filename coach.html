@@ -4212,6 +4212,27 @@ const SPINE_REGIONS = [['ankle-foot', 'Ankle & foot'], ['calf-achilles', 'Calf &
   ['hip-groin', 'Hip & groin'], ['hamstring', 'Hamstring'], ['low-back', 'Low back'], ['trunk', 'Trunk'],
   ['shoulder', 'Shoulder'], ['elbow-forearm-wrist', 'Elbow, forearm & wrist'], ['neck', 'Neck']];
 const SPINE_IMPACTS = [['none', 'No impact'], ['running', 'Running'], ['plyometric', 'Jumping'], ['landing', 'Landing']];
+// What each working set counts toward, and what it costs (stage39, 2026-09-26): coach-only, on
+// exercise_coach. scripts/check_program.py counts every programme's volume tables (VOL-10) and day
+// loads (VOL-2) from these. The muscle list must match public.spine_credits_ok(), MUSCLES in
+// scripts/check_program.py and in .claude/skills/spine/draft_sql.py.
+const SPINE_MUSCLES = ['quads','hamstrings','glutes','adductors','calves','shins','peroneals','back','chest',
+  'shoulder','biceps','triceps','forearm','core','neck'];
+const SPINE_MUSCLE_ALIAS = { quad: 'quads', hamstring: 'hamstrings', glute: 'glutes', adductor: 'adductors', calf: 'calves',
+  shoulders: 'shoulder', bicep: 'biceps', tricep: 'triceps', forearms: 'forearm', lats: 'back' };
+const SPINE_COSTS = [['heavy', 'Heavy ×1.5'], ['moderate', 'Moderate ×1'], ['isolation', 'Isolation ×0.5'], ['none', 'None ×0']];
+function spineCreditsText(c) {
+  return c ? Object.entries(c).sort((a, b) => b[1] - a[1]).map(([m, w]) => m + ' ' + w).join(', ') : '';
+}
+function spineParseCredits(s) {   // "quads 1, glutes 0.5" → { quads: 1, glutes: 0.5 }
+  const out = {}, bad = [];
+  String(s || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => {
+    const m = x.match(/^([a-z]+)\s*[:\s]\s*(1(?:\.0)?|0?\.5)$/i);
+    const k = m && (SPINE_MUSCLE_ALIAS[m[1].toLowerCase()] || m[1].toLowerCase());
+    if (!m || !SPINE_MUSCLES.includes(k)) bad.push(x); else out[k] = parseFloat(m[2]);
+  });
+  return { out, bad };
+}
 // The Quality Map (2026-09-24): the ten ids, and which cycle-picture family
 // word names each one. A cycle's headline quality is read from its `art` word.
 const QM_IDS = ['strength','muscle','power','spring','speed','brakes','rotation','engine','armour','movement'];
@@ -4314,9 +4335,16 @@ async function spineSave(id, approve) {
   };
   const flags = [...c.querySelectorAll('[data-sflag]:checked')].map(x => x.dataset.sflag);
   const sfr = parseInt(f('sfr'), 10);
+  // Counts toward: blank means "counts toward nothing" ({}), except on an entry never given a
+  // count, which stays unset (null) so the checker still asks for one.
+  const cr = spineParseCredits(f('credits'));
+  if (cr.bad.length) { alert('Counts toward: write each one as a muscle and 1 or 0.5, e.g. "quads 1, glutes 0.5".\n\nMuscles: ' + SPINE_MUSCLES.join(', ') + '\n\nNot understood: ' + cr.bad.join(', ')); return; }
+  const k0 = S.spine.coach[id] || {};
+  const credits = Object.keys(cr.out).length ? cr.out : (k0.credits == null && !f('credits').trim() ? null : {});
   const a = await sb.from('exercises').upsert(row, { onConflict: 'id' });
   if (a.error) { alert('Could not save: ' + a.error.message); return; }
-  const b = await sb.from('exercise_coach').upsert({ id, sfr: sfr > 0 ? sfr : null, flags, notes: f('notes').trim() || null }, { onConflict: 'id' });
+  const b = await sb.from('exercise_coach').upsert({ id, sfr: sfr > 0 ? sfr : null, flags, notes: f('notes').trim() || null,
+    credits, cost: f('cost') || null }, { onConflict: 'id' });
   if (b.error) { alert('Saved the entry, but not the coach notes: ' + b.error.message); }
   toast(row.status === 'approved' ? (approve ? 'Approved — athletes see it on their next open' : 'Saved') : 'Saved as draft');
   if (approve === true) _spineOpen = null;
@@ -4495,6 +4523,12 @@ function renderExercises() {
           <label>SFR rank <input data-sf="sfr" value="${esc(k.sfr == null ? '' : String(k.sfr))}" style="width:60px;${field.replace('width:100%;', '')}"></label>
           ${SPINE_FLAGS.map(fl => `<label style="font-size:14px"><input type="checkbox" data-sflag="${fl}"${(k.flags || []).includes(fl) ? ' checked' : ''}> ${fl}</label>`).join('')}
         </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-top:8px">
+          <div style="flex:1 1 300px">${lbl('Counts toward, per working set (1 = prime mover, 0.5 = helper)')}<input data-sf="credits" value="${esc(spineCreditsText(k.credits))}"
+            placeholder="${k.credits == null ? 'not set yet, e.g. quads 1, glutes 0.5' : 'counts toward nothing'}" style="${field}"></div>
+          <div>${lbl('Cost of a set (day load)')}<select data-sf="cost" style="${field.replace('width:100%;', '')};width:auto"><option value="">— cost —</option>${
+            SPINE_COSTS.map(([id, nm]) => `<option value="${id}"${k.cost === id ? ' selected' : ''}>${nm}</option>`).join('')}</select></div>
+        </div>
         <input data-sf="notes" placeholder="notes" value="${esc(k.notes || '')}" style="${field};margin-top:8px">
       </div>
       <p class="psub" style="margin:10px 0">${names ? 'Doing it now: ' + names : 'Nobody has this in their programme right now.'}</p>
@@ -4507,7 +4541,7 @@ function renderExercises() {
   };
   const row = e => `<div class="credrow" style="cursor:pointer" data-open="${esc(e.id)}">
       <span class="credname">${esc(e.name)} <span class="muted">· ${esc(e.pattern || 'no pattern')} · ${nAth(e.id)} athlete${nAth(e.id) === 1 ? '' : 's'}</span></span>
-      <span class="muted">${e.cues ? 'cues ✓' : 'no cues'}${e.video ? ' · video ✓' : ''}${(e.qualities || []).length ? ' · ' + esc(e.qualities.join(', ')) : ' · <b style="color:var(--clay)">no qualities</b>'}</span>
+      <span class="muted">${e.cues ? 'cues ✓' : 'no cues'}${e.video ? ' · video ✓' : ''}${(e.qualities || []).length ? ' · ' + esc(e.qualities.join(', ')) : ' · <b style="color:var(--clay)">no qualities</b>'}${(S.spine.coach[e.id] || {}).credits == null ? ' · <b style="color:var(--clay)">no count</b>' : ''}</span>
       <span class="acts"><button class="btn sm" data-open="${esc(e.id)}">${_spineOpen === e.id ? 'Close' : 'Open'}</button></span>
     </div>` + (_spineOpen === e.id ? editor(e) : '');
 

@@ -7,11 +7,11 @@ description: Build a ready-to-preview Instagram reel (1080×1920, animated HTML)
 
 Turn a topic into a self-contained, self-playing 1080×1920 HTML file: a looping sequence of
 scenes with **continuous motion throughout**, not a slideshow of static cards with an entrance
-fade. Content is **English** by default (content language directive, 2026-07-02 — see
-`CLAUDE.md`); **Farsi when Amir asks, or when the thing the reel sells is Farsi-only** (reel-7,
-his explicit choice on 2026-09-20). Newest references: `Content/reel-7-course.html` (an **ad**:
-Farsi, real product screens, one visual idea carried through) and `Content/reel-6-system.html`
-(English scene-swap explainer).
+fade. Content is **Farsi** by default (Amir, 2026-09-21: all new social content is Farsi again,
+because the business sells in Iran; `.claude/skills/ad/BRAND.md` §6). English only when he asks.
+Newest references: `Content/reel-8-course.html` and `Content/reel-7-course.html` (**ads**: Farsi, real
+product screens, one visual idea carried through) and `Content/reel-6-system.html` (an English
+scene-swap explainer: copy its motion, not its language).
 
 ## Step 0 — Required reading (every run)
 
@@ -137,12 +137,13 @@ scene map and the rebuild steps. What it teaches:
 
 ## Step 3 — Write the copy
 
-English, sharp/uppercase Barlow Condensed per the EN site voice — not a translation of an old
-Farsi deck. One idea per scene. The **canonical outro** (always the last scene): mid line "A map
-to your goal." → big line "A **coach** in your pocket." (coach in clay/clay-2) → brand row
-(white circle "A" + "Amir Ardekani") → CTA "Send a DM to start →". If Amir asks for Farsi:
-switch to Vazirmatn, `dir="rtl"`, no letter-spacing, no uppercase, Persian numerals, and use the
-Farsi canonical outro from `DESIGN_SYSTEM.md` §0 instead — see `reel-5-system.html`.
+Farsi by default: Vazirmatn, `dir="rtl"`, no letter-spacing, no uppercase, Persian numerals, and the
+Farsi rules under *Ad copy rules* below, which hold for every Farsi reel (`reel-7-course.html` is the
+reference). One idea per scene. The **canonical outro** (always the last scene, unless an ad rule
+below says otherwise) is the Farsi mantra in `DESIGN_SYSTEM.md` §0. **If Amir asks for English:**
+sharp/uppercase Barlow Condensed per the EN site voice, not a translation of a Farsi deck, and the
+English outro: mid line "A path to your target." → big line "A **coach** in your pocket." (coach in
+clay/clay-2) → brand row (white circle "A" + "Amir Ardekani") → CTA "Send a DM to start →".
 
 **Ad copy rules (reel-7):**
 - Every claim is copied from the product page or the app, then shortened. Keep the nuance ("offline
@@ -266,6 +267,10 @@ change. **Do not**:
 
 Keep the loop fast: topic → build → one quick self-check → send the file. Minutes, not an
 infrastructure project. (An ad that will really be posted gets the full check first.)
+
+**An ad made with the `/ad` skill ends differently:** Amir films himself and edits in Instagram's own
+editor, so its deliverable is **one finished MP4** (`/ad` rule 2). The HTML is the review step for the
+cut; Step 9 runs once he approves it, and his take's sound is the ad's audio.
 
 ## Step 9 — MP4 export (only when Amir explicitly asks)
 

@@ -77,7 +77,7 @@ cards in the demo claimed "REST 2m" while every `restSec` in it was `null` — a
 back squat shown as identical, and a Pallof press told to sit for two minutes. Omit `rest` and
 there is no rest cell; the timer button stays, labelled *Rest timer*.
 
-⚠ **`rxOf()` / `repCount()` / `tempoWords()` EXIST TWICE** — inline in `program.html` (the offline
+⚠ **`rxOf()` / `repCount()` / `tempoDisplay()` EXIST TWICE** — inline in `program.html` (the offline
 PWA, deliberately self-contained) and in `assets/js/chips.js` (which `coach.html` loads). Drift
 means the coach's dashboard and the athlete's phone show different prescriptions for the same
 exercise and **nothing errors**. `scripts/check_rx.js` runs fixtures through both copies and is in
@@ -152,7 +152,8 @@ Idea #1 of `/ideas` round 1 (brief: claude.ai/artifact/WymDKxk58nkCy5eSgodSrU). 
 the exercise database … I just dont want to make my exercise cards busier … the cues should be
 there so we dont write the cues for each exercise everytime."* Server: `supabase/stage31_spine.sql`.
 - **Two tables.** `exercises` (athlete-readable when approved: purpose, pattern, cues, regressions/
-  progressions/alternatives as ids, loads, video) and `exercise_coach` (coach-only: SFR rank, restriction flags). A separate
+  progressions/alternatives as ids, loads, video) and `exercise_coach` (coach-only: SFR rank, restriction flags, and since
+  stage39 the muscle `credits` and `cost` tier that `scripts/check_program.py` counts volume from). A separate
   TABLE so no athlete query can ever touch the flags. `get_exercises()` serves **approved rows only**.
 - **Nothing reaches a phone until Amir approves it** in coach.html → **Exercises**. Claude drafts
   (`status 'draft'`) and never approves. The first 75 drafts (2026-09-24) cover the most-used names;

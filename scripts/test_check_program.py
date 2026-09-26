@@ -19,12 +19,10 @@ CHECK = os.path.join(REPO, 'scripts', 'check_program.py')
 TMP = tempfile.mkdtemp(prefix='check_program_tests_')
 HAVE_NODE = shutil.which('node') is not None
 
-def run(data, *flags, log=None, spec=None, ctx=None):
-    """Run the checker on `data`; log/spec are text, ctx a --spine-sql result. stdout + stderr."""
+def run(data, *flags, spec=None, ctx=None):
+    """Run the checker on `data`; spec is text, ctx a --spine-sql result. stdout + stderr."""
     p = os.path.join(TMP, 'prog.json'); json.dump(data, open(p, 'w', encoding='utf-8'))
     args = [sys.executable, CHECK, p]
-    if log is not None:
-        f = os.path.join(TMP, 'log.md'); open(f, 'w', encoding='utf-8').write(log); args += ['--log', f]
     if spec is not None:
         f = os.path.join(TMP, 'spec.md'); open(f, 'w', encoding='utf-8').write(spec); args += ['--spec', f]
     if ctx is not None:
@@ -60,53 +58,61 @@ BASE = {
   ]},
   "notes": {"cards": [{"title": "Hi", "body": "<p>Hello.</p>"}]}
 }
-LOG = """| Day | Exercise | Sets | Counts toward |
-|---|---|---|---|
-| D1 | Barbell Back Squat | 4 | Quads 4 · Glutes 2 (×0.5) |
-| D1 | Machine Seated Leg Curl | 3 | Hamstrings 3 |
-| D2 | Lat Pulldown | 4 | Back 4 · Biceps 2 (×0.5) |
-"""
+# The made-up Spine the checker reads (the --spine-sql shape): id|status|cues|qualities|pattern|
+# impact|equipment|name|aliases|credits|cost. The volume count comes from the last two fields.
+SB = "\n".join([
+  "stationary-bike|approved|true|engine|conditioning|none|bike|Stationary Bike||none|moderate",
+  "barbell-back-squat|approved|true|strength,muscle|squat|none|barbell;rack|Barbell Back Squat|Back Squat|glutes:0.5,quads:1|heavy",
+  "machine-seated-leg-curl|approved|true|muscle|isolation|none|leg curl machine|Machine Seated Leg Curl||hamstrings:1|isolation",
+  "lat-pulldown|approved|true|muscle,strength|pull-vertical|none|cable;lat bar|Lat Pulldown||back:1,biceps:0.5|moderate",
+  "kettlebell-swing|approved|true|power|hinge|none|kettlebell|Kettlebell Swing||glutes:1,hamstrings:0.5|moderate",
+  "dead-bug|approved|true|armour|anti-extension|none|floor|Dead Bug||core:1|isolation",
+  "glute-bridge|approved|true|muscle|hinge|none|floor|Glute Bridge||glutes:1,hamstrings:0.5|isolation",
+  "goblet-squat|approved|true|muscle|squat|none|dumbbell|Goblet Squat||glutes:0.5,quads:1|moderate",
+  "machine-leg-extension|approved|true|muscle|isolation|none|leg extension machine|Machine Leg Extension||quads:1|isolation",
+  "chest-supported-dumbbell-row|approved|true|muscle|pull-horizontal|none|dumbbells|Chest-Supported Dumbbell Row||back:1,biceps:0.5|moderate",
+  "dumbbell-bench-press|approved|true|muscle|push-horizontal|none|dumbbells;bench|Dumbbell Bench Press||chest:1,shoulder:0.5,triceps:0.5|moderate"])
+CTX = [{"spine": SB, "prev": None, "ledger": None}]
 
 # ── 1. weekNotes, the set cap, the floors, the headline ──────────────────────
-out = run(BASE, log=LOG)
+out = run(BASE, ctx=CTX)
 expect('valid weekNotes pass', not has(out, 'FAIL', 'weekNotes'), out)
 d = copy.deepcopy(BASE); del d['cycles'][1]['weekNotes']
-out = run(d, log=LOG)
+out = run(d, ctx=CTX)
 expect('missing last week fails', has(out, 'FAIL', 'no weekNotes.last'), out)
-out = run(d, '--no-backoff', log=LOG)
+out = run(d, '--no-backoff', ctx=CTX)
 expect('--no-backoff excuses it', not has(out, 'FAIL', 'weekNotes.last') and has(out, 'INFO', 'no back-off week'), out)
 d = copy.deepcopy(BASE); d['cycles'][1]['weekNotes']['last'] = {"text": "An easier week."}
-expect('back-off needs numbers', has(run(d, log=LOG), 'FAIL', 'name the back-off dose'))
+expect('back-off needs numbers', has(run(d, ctx=CTX), 'FAIL', 'name the back-off dose'))
 d = copy.deepcopy(BASE); d['cycles'][1]['weekNotes']['last'] = {"rpeCap": 5, "rpeDrop": 1, "text": "Take 1 off every RPE this week."}
-out = run(d, log=LOG)
+out = run(d, ctx=CTX)
 expect('rpeCap under 6 fails', has(out, 'FAIL', 'rpeCap must be 6 to 9'), out)
 expect('an RPE drop must name the floor', has(out, 'FAIL', 'lowers the RPE without naming the floor'), out)
 d = copy.deepcopy(BASE); d['cycles'][1]['weekNotes']['last']['text'] = "Back-off week. One set fewer, never below 6."
-expect('a text repeating its label warns', has(run(d, log=LOG), 'WARN', 'repeating its label'))
+expect('a text repeating its label warns', has(run(d, ctx=CTX), 'WARN', 'repeating its label'))
 d = copy.deepcopy(BASE); d['currentCycleIndex'] = 0; d['cycles'][0]['weekNotes'] = {"last": {"setsDrop": 1, "text": "One set fewer on everything."}}
-out = run(d, log=LOG)
+out = run(d, ctx=CTX)
 expect('cci 0 turns on the new-athlete rules', has(out, 'INFO', 'new-athlete rules apply'), out)
 expect('a new athlete needs the first week', has(out, 'FAIL', 'needs weekNotes.first'), out)
 expect('cci 0: a 6-rep weighted squat fails the 8-rep rule', has(out, 'FAIL', 'no weighted exercise under 8 reps'), out)
 d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['rx']['sets'] = 5
-LOG5 = LOG.replace('| D1 | Barbell Back Squat | 4 | Quads 4 · Glutes 2 (×0.5) |', '| D1 | Barbell Back Squat | 5 | Quads 5 · Glutes 2.5 (×0.5) |')
-expect('5 sets fail without --proven', has(run(d, log=LOG5), 'FAIL', 'never more than 4'))
-out = run(d, '--proven', log=LOG5)
+expect('5 sets fail without --proven', has(run(d, ctx=CTX), 'FAIL', 'never more than 4'))
+out = run(d, '--proven', ctx=CTX)
 expect('5 sets pass with --proven', not has(out, 'FAIL', 'never more than 4') and has(out, 'INFO', 'proven'), out)
-expect('no floor without --floor', not has(run(BASE, log=LOG), 'FAIL', 'under the floor'))
-out = run(BASE, '--floor', log=LOG)
+expect('no floor without --floor', not has(run(BASE, ctx=CTX), 'FAIL', 'under the floor'))
+out = run(BASE, '--floor', ctx=CTX)
 expect('--floor fails quads under 10', has(out, 'FAIL', 'quads 4 sets/week: under the floor'), out)
 expect('--floor fails a missing chest', has(out, 'FAIL', 'chest: 0 sets/week'), out)
-out = run(BASE, '--floor', log=LOG, spec='floor-except: chest (posture), shoulder\n')
+out = run(BASE, '--floor', ctx=CTX, spec='floor-except: chest (posture), shoulder\n')
 expect('floor-except from the spec', not has(out, 'FAIL', 'chest: 0') and not has(out, 'FAIL', 'shoulder: 0'), out)
-out = run(BASE, '--female', log=LOG)
+out = run(BASE, '--female', ctx=CTX)
 expect('--female warns and floors nothing', has(out, 'WARN', '--female is retired') and not has(out, 'FAIL', 'under the floor'), out)
-out = run(BASE, log=LOG, ctx=[{"spine": "\n".join([
+out = run(BASE, ctx=[{"spine": "\n".join([
     'stationary-bike|approved|true|engine', 'barbell-back-squat|approved|true|muscle,strength',
     'machine-seated-leg-curl|approved|true|armour', 'lat-pulldown|approved|true|engine']), "prev": None, "ledger": None}])
 expect('a headline miss is a WARN', has(out, 'WARN', 'not in the week') and not has(out, 'FAIL', 'headline'), out)
 expect('every FAIL and WARN names its rule', all(l.startswith(('FAIL  [', 'WARN  [')) or 'no --' in l or '--female' in l
-       for l in run(d, log=LOG5).splitlines() if l.startswith(('FAIL', 'WARN'))))
+       for l in run(d, ctx=CTX).splitlines() if l.startswith(('FAIL', 'WARN'))))
 
 # ── 2. the athlete profile ────────────────────────────────────────────────────
 PROFILE = """```profile
@@ -118,8 +124,8 @@ floor-except: chest (posture), shoulder (posture)
 cap: 75
 injuries: elbow → no hanging, managed
 ```"""
-def prof_ctx(profile): return [{"spine": "", "prev": None, "ledger": None, "profile": profile}]
-out = run(BASE, log=LOG, spec=PROFILE + "\n\nbans: goblet\n")
+def prof_ctx(profile): return [{"spine": SB, "prev": None, "ledger": None, "profile": profile}]
+out = run(BASE, ctx=CTX, spec=PROFILE + "\n\nbans: goblet\n")
 expect('profile: no traceback', 'Traceback' not in out, out)
 expect('profile read from the spec', has(out, 'INFO', 'athlete profile from the spec'), out)
 expect('aim strength-muscle turns on the floor', has(out, 'FAIL', 'quads 4 sets/week: under the floor'), out)
@@ -128,16 +134,16 @@ expect('a profile ban is enforced', has(out, 'FAIL', "Lat Pulldown: banned for t
 expect('cap 75 from the profile', has(out, 'INFO', '--cap 75') and not has(out, 'WARN', 'past the 60-min cap'), out)
 expect('an arrow inside the profile is not a fallback', not has(out, 'FAIL', 'a fallback or swap gives a banned'), out)
 d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'][0]['exercises'][0]['name'] = 'Goblet Squat'
-expect("the spec's bans line merges with the profile's", has(run(d, log=LOG, spec=PROFILE + "\n\nbans: goblet\n"), 'FAIL', "Goblet Squat: banned for this athlete ('goblet'"))
+expect("the spec's bans line merges with the profile's", has(run(d, ctx=CTX, spec=PROFILE + "\n\nbans: goblet\n"), 'FAIL', "Goblet Squat: banned for this athlete ('goblet'"))
 d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['rx']['sets'] = 5
-out = run(d, log=LOG, spec=PROFILE.replace('proven: -', 'proven: C2 logged 5x6 at RPE 8, every rep made'))
+out = run(d, ctx=CTX, spec=PROFILE.replace('proven: -', 'proven: C2 logged 5x6 at RPE 8, every rep made'))
 expect('proven in the profile allows 5 sets', not has(out, 'FAIL', 'never more than 4') and has(out, 'INFO', '--proven'), out)
-expect("proven '-' keeps the cap", has(run(d, log=LOG, spec=PROFILE), 'FAIL', 'never more than 4'))
-expect('aim sport: no floor', not has(run(BASE, log=LOG, spec=PROFILE.replace('aim: strength-muscle', 'aim: sport')), 'FAIL', 'under the floor'))
-expect('the coaching log profile when the spec has none', has(run(BASE, log=LOG, spec="bans: goblet\n", ctx=prof_ctx(PROFILE)), 'INFO', 'athlete profile from the coaching log'))
-expect('no profile anywhere warns', has(run(BASE, log=LOG, spec="bans: goblet\n"), 'WARN', 'no athlete profile'))
-expect('a command-line --cap wins', not has(run(BASE, '--cap', '50', log=LOG, spec=PROFILE), 'INFO', '--cap 75'))
-expect("bans '-' bans nothing", not has(run(BASE, log=LOG, spec=PROFILE.replace('bans: lat pulldown', 'bans: -')), 'FAIL', 'banned for this athlete'))
+expect("proven '-' keeps the cap", has(run(d, ctx=CTX, spec=PROFILE), 'FAIL', 'never more than 4'))
+expect('aim sport: no floor', not has(run(BASE, ctx=CTX, spec=PROFILE.replace('aim: strength-muscle', 'aim: sport')), 'FAIL', 'under the floor'))
+expect('the coaching log profile when the spec has none', has(run(BASE, spec="bans: goblet\n", ctx=prof_ctx(PROFILE)), 'INFO', 'athlete profile from the coaching log'))
+expect('no profile anywhere warns', has(run(BASE, ctx=CTX, spec="bans: goblet\n"), 'WARN', 'no athlete profile'))
+expect('a command-line --cap wins', not has(run(BASE, '--cap', '50', ctx=CTX, spec=PROFILE), 'INFO', '--cap 75'))
+expect("bans '-' bans nothing", not has(run(BASE, ctx=CTX, spec=PROFILE.replace('bans: lat pulldown', 'bans: -')), 'FAIL', 'banned for this athlete'))
 
 # ── 3. the notes obligations list ─────────────────────────────────────────────
 OB = copy.deepcopy(BASE)
@@ -202,13 +208,13 @@ LEDGER = ("| Exercise | Status | Last cycle | Note |\n|---|---|---|---|\n"
           "| Lat Pulldown | Pain-flagged | C1 | shoulder pinch at the top |\n"
           "| Cable Face Pull | Available | C1 | Do not reintroduce without checking the rope attachment |\n")
 SPINE = "\n".join([
-  "barbell-back-squat|approved|true|strength,muscle|squat|none|barbell;rack|Barbell Back Squat|Back Squat",
-  "chest-supported-dumbbell-row|approved|true|muscle|pull-horizontal|none|dumbbells;incline bench|Chest-Supported Dumbbell Row|",
-  "cable-face-pull|approved|true|armour|pull-horizontal|none|cable;rope|Cable Face Pull|Face Pull",
-  "dead-bug|approved|true|armour|anti-extension|none|floor|Dead Bug|",
-  "lat-pulldown|approved|true|muscle|pull-vertical|none|cable;lat bar|Lat Pulldown|",
-  "kettlebell-swing|approved|true|power|hinge|none|kettlebell|Kettlebell Swing|",
-  "medicine-ball-rotational-throw|approved|true|rotation|throw|none|medicine ball;wall|Medicine Ball Rotational Throw|"])
+  "barbell-back-squat|approved|true|strength,muscle|squat|none|barbell;rack|Barbell Back Squat|Back Squat|glutes:0.5,quads:1|heavy",
+  "chest-supported-dumbbell-row|approved|true|muscle|pull-horizontal|none|dumbbells;incline bench|Chest-Supported Dumbbell Row||back:1,biceps:0.5|moderate",
+  "cable-face-pull|approved|true|armour|pull-horizontal|none|cable;rope|Cable Face Pull|Face Pull|back:1,shoulder:0.5|isolation",
+  "dead-bug|approved|true|armour|anti-extension|none|floor|Dead Bug||core:1|isolation",
+  "lat-pulldown|approved|true|muscle|pull-vertical|none|cable;lat bar|Lat Pulldown||back:1,biceps:0.5|moderate",
+  "kettlebell-swing|approved|true|power|hinge|none|kettlebell|Kettlebell Swing||glutes:1,hamstrings:0.5|moderate",
+  "medicine-ball-rotational-throw|approved|true|rotation|throw|none|medicine ball;wall|Medicine Ball Rotational Throw||core:0.5|moderate"])
 def cont(data, *flags, spec=None, prev=PREV, ledger=LEDGER):
     return run(data, *flags, spec=spec, ctx=[{"spine": SPINE, "prev": prev, "ledger": ledger}])
 out = cont(NEW)
@@ -263,8 +269,8 @@ if HAVE_NODE:
     expect("a Because the Coach's Note repeats fails", has(run(d), 'FAIL', "Coach's Note says the same thing"))
 d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['rx'] = {}
 expect('an empty rx fails', has(run(d), 'FAIL', 'an empty rx'))
-expect("the spec's week: line runs the back-to-back check", has(run(BASE, log=LOG, spec="week: Mon:1, Tue:1\n"), 'WARN', 'two hard lower-body days back to back'))
-expect('no week: line, no back-to-back check', not has(run(BASE, log=LOG, spec="bans: -\n"), 'WARN', 'back to back'))
+expect("the spec's week: line runs the back-to-back check", has(run(BASE, ctx=CTX, spec="week: Mon:1, Tue:1\n"), 'WARN', 'two hard lower-body days back to back'))
+expect('no week: line, no back-to-back check', not has(run(BASE, ctx=CTX, spec="bans: -\n"), 'WARN', 'back to back'))
 out = run(BASE, spec="bans: box jump\nroadmap_amend: cycle 3: art → voltage (box jump returns once the knee settles)\n")
 expect('a roadmap_amend: line is not a fallback', not has(out, 'FAIL', 'a fallback or swap gives a banned'), out)
 expect('a real fallback to a banned word still fails', has(run(BASE, spec="bans: box jump\nFallback: step-up → box jump\n"), 'FAIL', 'a fallback or swap gives a banned'))
@@ -282,12 +288,62 @@ d = copy.deepcopy(BASE); d['notes'] = {"cards": [{"title": f"Card {i}", "body": 
 expect('nine notes cards warn (soft cap 8)', has(run(d), 'WARN', 'over the soft cap of 8'))
 d['notes']['cards'] = d['notes']['cards'][:8]
 expect('eight notes cards pass', not has(run(d), 'WARN', 'soft cap'))
+# ── 7. the volume count from the Spine's credits (stage39, 2026-09-26) ──────
+TAB = os.path.join(TMP, 'volume.md')
+def tables(data, *flags, spec=None, ctx=CTX):
+    if os.path.exists(TAB): os.remove(TAB)
+    out = run(data, '--tables', TAB, *flags, spec=spec, ctx=ctx)
+    return out, (open(TAB, encoding='utf-8').read() if os.path.exists(TAB) else '')
+out, tab = tables(BASE)
+expect('volume: no traceback', 'Traceback' not in out, out)
+expect('volume: the squat row, fractions shown', '| D1 | Barbell Back Squat | 4 | Quads 4 · Glutes 2 (×0.5) |' in tab, tab)
+expect('volume: the pulldown row', '| D2 | Lat Pulldown | 4 | Back 4 · Biceps 2 (×0.5) |' in tab, tab)
+expect('volume: a ride in the warm-up counts toward nothing', 'Stationary Bike' not in tab, tab)
+expect('volume: the muscle total and its verdict', '| Quads | 4 | 10–20 | under 10 |' in tab, tab)
+expect('volume: a major muscle with nothing on it is listed', '| Chest | 0 | 10–20 | under 10 |' in tab, tab)
+expect('volume: day load = working sets x cost', '| D1 | 7 | 7.5 |' in tab and '| D2 | 4 | 4 |' in tab, tab)
+d = copy.deepcopy(BASE)
+d['workouts']['days'][0]['blocks'][0]['exercises'] += [ex("Dead Bug", "dead-bug", sets=2, reps=8, side=True),
+                                                       ex("Glute Bridge", "glute-bridge", sets=2, reps=10)]
+out, tab = tables(d)
+expect('volume: core in the warm-up counts', '| D1 prep | Dead Bug | 2 | Core 2 |' in tab, tab)
+expect('volume: anything else in the warm-up does not', 'Glute Bridge' not in tab and '| D1 | 7 | 7.5 |' in tab, tab)
 d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'].append({"title": "Conditioning", "exercises": [
     {"type": "circuit", "name": "Old Engine", "rounds": "×3 Rounds", "items": [{"name": "Kettlebell Swing", "exId": "kettlebell-swing", "detail": "×12"}]}]})
-out = run(d, log=LOG + "| D2 | Kettlebell Swing | 3 | Glutes 1.5 (×0.5) |\n")
-expect('a legacy "×3 Rounds" circuit counts three rounds', not has(out, 'FAIL', "volume table: 'Kettlebell Swing'"), out)
-expect('...and the same log at 1 set would disagree', has(
-    run(d, log=LOG + "| D2 | Kettlebell Swing | 1 | Glutes 0.5 (×0.5) |\n"), 'FAIL', "volume table: 'Kettlebell Swing' at 1 sets"))
+out, tab = tables(d)
+expect('volume: a legacy "×3 Rounds" circuit counts three rounds', '| D2 | Kettlebell Swing | 3 | Glutes 3 · Hamstrings 1.5 (×0.5) |' in tab, tab)
+nocred = [{"spine": SB.replace('|back:1,biceps:0.5|moderate', '||'), "prev": None, "ledger": None}]
+out = run(BASE, ctx=nocred)
+expect('volume: an entry with no credits fails', has(out, 'FAIL', '[VOL-10] no muscle credits on the Spine entry lat-pulldown'), out)
+expect('volume: an entry with no cost warns', has(out, 'WARN', '[VOL-2] no cost tier on lat-pulldown'), out)
+expect('volume: a Spine file from before credits fails too', has(run(BASE, ctx=[{"spine": "\n".join(
+    l.rsplit('|', 2)[0] for l in SB.splitlines()), "prev": None, "ledger": None}]), 'FAIL', 'no muscle credits'))
+d = copy.deepcopy(BASE)
+d['workouts']['days'][0]['blocks'][2]['exercises'] = [ex("Goblet Squat", "goblet-squat", sets=4, reps=10, rpe=8),
+                                                      ex("Machine Leg Extension", "machine-leg-extension", sets=3, reps=12, rpe=8)]
+expect('volume: over 10 direct sets on one muscle in a session warns', has(run(d, ctx=CTX), 'WARN', 'Day 1: 11 direct sets on quads'))
+FLAT = copy.deepcopy(BASE); FLAT['workouts']['days'] = [
+    {"id": 1, "blocks": [{"title": "Primary", "exercises": [ex("Lat Pulldown", "lat-pulldown", sets=4, reps=8, rpe=8)]}]},
+    {"id": 2, "blocks": [{"title": "Primary", "exercises": [ex("Chest-Supported Dumbbell Row", "chest-supported-dumbbell-row", sets=4, reps=8, rpe=8)]}]},
+    {"id": 3, "blocks": [{"title": "Primary", "exercises": [ex("Dumbbell Bench Press", "dumbbell-bench-press", sets=4, reps=8, rpe=8)]}]}]
+expect('volume: a flat week warns', has(run(FLAT, ctx=CTX), 'WARN', '[VOL-2] a flat week'))
+FLAT['workouts']['days'][2]['blocks'][0]['exercises'][0]['rx']['sets'] = 2
+expect('volume: an undulating week does not', not has(run(FLAT, ctx=CTX), 'WARN', 'a flat week'))
+expect('volume: --log is retired, and says so', has(run(BASE, '--log', 'x.md', ctx=CTX), 'WARN', '--log is retired'))
+
+# ── 8. added 2026-09-26: legacy rounds in the session length, the fingerprint's number text ──
+def day2_minutes(circuit):
+    d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'].append({"title": "Conditioning", "exercises": [circuit]})
+    return next((l for l in run(d, ctx=CTX).splitlines() if 'Day 2 ≈' in l), '')
+legacy = day2_minutes({"type": "circuit", "name": "E", "rounds": "×3 Rounds", "items": [{"name": "Kettlebell Swing", "exId": "kettlebell-swing", "rx": {"reps": 12}}]})
+modern = day2_minutes({"type": "circuit", "name": "E", "rx": {"rounds": 3}, "items": [{"name": "Kettlebell Swing", "exId": "kettlebell-swing", "rx": {"reps": 12}}]})
+expect('session length: a legacy "×3 Rounds" circuit times like rx.rounds 3', legacy and legacy.split('min')[0] == modern.split('min')[0], legacy + ' | ' + modern)
+p = os.path.join(TMP, 'fp.json')
+open(p, 'w', encoding='utf-8').write('{"athlete": {"id": "t"}, "currentCycleIndex": 1, "cycles": [{"rpe": 7.0, "load": 7.50}]}')
+fp = subprocess.run([sys.executable, CHECK, p, '--fingerprint'], capture_output=True, text=True, encoding='utf-8', cwd=REPO).stdout
+# leaves: "t", "1", "7.50", "7.0" = 9 characters (printed as "7.5" and "7" it was 6, a false mismatch)
+expect('fingerprint keeps "7.0" and "7.50" as written, like the server', '4 leaves  9 chars' in fp, fp)
+expect('volume: no --spine, no count', has(run(BASE), 'WARN', 'the volume count'))
 
 # ── 6. the rule index guard (scripts/check_rule_index.py) ────────────────────
 spec_ri = importlib.util.spec_from_file_location('cri', os.path.join(REPO, 'scripts', 'check_rule_index.py'))

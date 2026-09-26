@@ -51,8 +51,8 @@ prescription as DATA (`rx`), and design's dose fields already ARE that data — 
 copies them, it does not render them. There is no chip formatting left to get wrong.
 
 **2a — Structure.** `workouts.label` = `Program 0N · <Cycle Name>`; `workouts.days[]` from
-the spec. Each exercise → `type` + `rx` (+ `setup`/`intent`/`note` where the spec has them);
-circuits → `rounds` + `items[]`. **Write NO `cues`, on any exercise or circuit item** (Amir,
+the spec. Each exercise → `type` + `rx` (+ `intent`/`note` where the spec has them; never `setup`, CHP-1);
+circuits → `rx.rounds` + `items[]`. **Write NO `cues`, on any exercise or circuit item** (Amir,
 2026-09-24: *"the aim is to use these cues for all the exercises that everyone has from now on"*).
 The app draws every card's cues from its Spine entry, circuit items included (SCHEMA "`exId` and
 the Spine"). Something only this athlete needs arrives as engage's Coach's Note (`note`), never
@@ -64,8 +64,9 @@ Leave `videoUrl` out: the app plays the card's Spine entry's video (found by `ex
   / ballistic / loaded carry → `"standard"`; working or prep circuit → `"circuit"`; warm-up
   `simple` item (bike, mobility drill) → `"simple"`.
   **A superset/complex is always `"circuit"`** — if the spec pairs two (or more) exercises as
-  a superset, the whole pair becomes ONE circuit block: shared `name` + `rounds` + `restSec`,
-  each paired exercise its own `items[]` entry (`detail: "×N · RPE N"` — no per-item tempo).
+  a superset, the whole pair becomes ONE circuit block: one `name` and `rx: {rounds, rest, rpe}` (one RPE for
+  the whole round, SES-13), each paired exercise its own `items[]` entry with its own `rx`
+  (`{"reps": N}`), no per-item tempo or RPE.
   **Never** render a superset pair as two separate `"standard"` exercises each carrying a
   `superset` chip — that shipped once (all 4 days of one cycle): it broke the shared rest (each
   exercise got its own independent rest timer instead of alternating) and left no visual
@@ -226,15 +227,19 @@ count and what landed on the cards differ, which is how a dropped or invented on
 ## Step 3 — Check: `--stage build` in Part A, the full run in Part B (do not skip)
 - **`scripts/check_program.py`: the house rules, as a script** (2026-09-25; Python, plus node for
   the app's own rx and Because rules, so it runs on Amir's PC too). It reads the built file, the
-  design's volume table and the spec:
+  spec and the Spine file, whose lines carry each exercise's muscle credits and cost, so it
+  **counts the volume itself** (2026-09-26: the hand-typed table and `--log` are retired):
   ```
   python3 scripts/check_program.py data/<id>.json --spine-sql      # prints ONE query: run it
   # save the query's raw result as-is (the JSON the tool returns loads directly), then:
-  python3 scripts/check_program.py data/<id>.json --stage build --log <scratch>/log_entry.md --spec <scratch>/spec.md \
-      --spine <scratch>/spine_<id>.json
+  python3 scripts/check_program.py data/<id>.json --stage build --spec <scratch>/spec.md \
+      --spine <scratch>/spine_<id>.json --tables <scratch>/volume_<id>.md
   # Part B: the same command without --stage build (the default is the full run). Re-run
   # --spine-sql only if Part B added an exercise; the saved result is still good otherwise.
   ```
+  `--tables` writes the log's Volume & Dose tables (per exercise, per muscle, per-day load); Step 5
+  pastes the file from the LAST run. A count that looks wrong is its Spine entry's (fix it via /spine
+  Upkeep, a proposal on an approved entry), never a hand edit of the table.
   **The spec sets the flags**: its athlete profile turns on `--floor` (aim: strength-muscle),
   `--proven`, the bans, `floor-except` and the cap; its `week:` line turns on the back-to-back
   check; a first cycle switches the new-athlete rules on by itself. Type a flag only to override
@@ -364,12 +369,11 @@ The athlete app never reads the log. The entry template is /program-design's COA
 - Verify after writing: one section per cycle designed so far, newest last, no prior section altered.
   A `## Debrief — Cycle NN …` section (the end-of-cycle review) may sit between two cycle sections:
   it is not a cycle section, never edit or move it, and append the new cycle after it.
-- **⚖️ The Volume & Dose section must carry BOTH set-count tables** — the per-exercise
-  contribution table (day · exercise · sets · what it counts toward, fractions shown) *and* the
-  per-muscle total against its goal range. Standing order from Amir (2026-09-08): *"whenever you
-  calculate the sets, add that table to the athlete coaching log so i can see."* If /program-design
-  handed over only the summary table, build the per-exercise one here rather than shipping without
-  it. Counting convention: VOL-10.
+- **⚖️ The Volume & Dose section carries BOTH set-count tables and the day loads** — standing
+  order from Amir (2026-09-08): *"whenever you calculate the sets, add that table to the athlete
+  coaching log so i can see."* They are the file Step 3's last run wrote with `--tables`: replace
+  the design's `<the checker's tables>` line with it, as written, above the design's framing lines.
+  Counting convention: VOL-10.
 - **⚖️ The athlete profile — write this cycle's, in place (2026-09-26).** The spec opens with
   the current ```` ```profile ```` block; it goes into the log as the `## Athlete profile` section,
   right after the header and before the Exercise Ledger, **replacing** the old one (like the

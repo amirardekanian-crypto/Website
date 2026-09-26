@@ -734,7 +734,7 @@ through the same four matching tiers Personal Records uses). Names in stored pro
   About sheet: purpose, on court (tennis/padel only), Body parts involved, Regressions · Progressions · Alternatives,
   where it sits in the programme, History.
 - Drafts are invisible to athletes: `get_exercises()` serves approved entries only, and never
-  the coach half (`exercise_coach`: SFR rank, restriction flags).
+  the coach half (`exercise_coach`: SFR rank, restriction flags, the muscle credits and cost tier).
 
 #### The TEMPO cell, and the digit that carries the instruction
 
@@ -831,7 +831,7 @@ Nothing needs migrating by hand:
 
 #### Where the code lives
 
-`rxOf()` / `repCount()` / `tempoWords()` exist **twice**: inline in `program.html` (the
+`rxOf()` / `repCount()` / `tempoDisplay()` exist **twice**: inline in `program.html` (the
 offline PWA, deliberately self-contained) and in `assets/js/chips.js` (loaded by
 `coach.html`). ⚠ **Change both.** `scripts/check_rx.js` runs fixtures through both copies
 and fails on any difference; it is in `.githooks/pre-commit`. `assets/js/chips.js` also
