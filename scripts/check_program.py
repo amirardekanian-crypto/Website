@@ -35,13 +35,21 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
                   without it, the spec's "bans: ..." line is used
   --spec FILE     the design spec: its fallback lines are scanned for banned words too
   --week DAYS     the example week, e.g. "Sat:1,Sun:2,Mon:3,Wed:4" (back-to-back check)
-  --spine FILE    the saved result of --spine-sql: the Spine gate and the Quality Map
+  --spine FILE    the saved result of --spine-sql: the Spine gate, the Quality Map, "weighted"
+                  for the 8-rep rule, and (from last cycle and the Exercise Ledger in the same
+                  result) the continuity checks: kept accessories, a kept dose that didn't move,
+                  a Disliked / Pain-flagged / Banned exercise back. The spec's "keep:" and
+                  "reintroduce:" lines name the ones kept or brought back on purpose, with reasons
   --spine-sql     print the one query whose result is the --spine file, then stop
+  --stage S       build = straight after design, before engage writes any text: every
+                  programming check, none of the text ones. final (default) = everything
   --fingerprint   print the content fingerprint and the SQL that computes the server's, then stop
 
 Exit code 1 if anything FAILs. FAIL = a house rule is broken. WARN = look at it.
 """
-import argparse, hashlib, json, re, sys
+import argparse, hashlib, json, os, re, subprocess, sys
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Windows prints through cp1252, which has no ≈ or → (both in this script's report) and
 # crashed the run on Amir's PC; the report is UTF-8 everywhere (2026-09-26).
@@ -133,8 +141,24 @@ def text_fields(data):
 def sentences(s):
     return [x.strip() for x in re.split(r'(?<=[.!?])\s+|\n', s) if x.strip()]
 
+# What makes an exercise "weighted" for the new-athlete 8-rep rule, read off its Spine entry.
+LOAD_KIT = re.compile(r'barbell|dumbbell|kettlebell|cable|machine|trap bar|landmine|ez bar|'
+                      r'leg press|hack squat|sled|plate|weighted', re.I)
+UNLOADED_PATTERNS = {'jump-land', 'throw', 'sprint-cod', 'conditioning', 'mobility', 'carry'}
+
+def is_weighted(o, spine):
+    """True/False from the Spine entry, or None when the Spine doesn't know the exercise."""
+    e = (spine or {}).get(o.get('exId') or '')
+    if not e or e.get('pattern') is None: return None
+    if e['pattern'] in UNLOADED_PATTERNS or (e.get('impact') or 'none') != 'none': return False
+    kit = ' '.join(k for k in e.get('equipment') or [] if not k.lower().startswith('optional'))
+    return bool(LOAD_KIT.search(kit))
+
+def norm_name(s):
+    return re.sub(r'\s+', ' ', re.sub(r"[^a-z0-9]+", ' ', str(s or '').lower().replace("'", ''))).strip()
+
 # ── the rule checks ───────────────────────────────────────────────────────────
-def check_structure(data, args):
+def check_structure(data, args, spine=None):
     seen = {}
     for d, b, ex, it in exercises(data):
         o = it or ex
@@ -177,14 +201,33 @@ def check_structure(data, args):
         if not prep and not it and ex.get('type') == 'standard':
             reps = num(rx.get('reps'))
             if args.new and reps is not None and reps < 8:
-                if rx.get('tempo'):
-                    fail(f"{where}: {int(reps)} reps. A new athlete's first cycle has no weighted exercise under 8 reps")
+                # "Weighted" comes from the Spine entry when there is one (2026-09-26): a loaded
+                # implement, no impact, and not a jump, throw, sprint, carry or conditioning
+                # pattern. Only an exercise the Spine doesn't know falls back to the old proxy
+                # (a tempo = a grinding lift), which a spec without a tempo used to slip past.
+                w = is_weighted(o, spine)
+                if w is None: w, why = bool(rx.get('tempo')), 'no Spine entry, so read from the tempo'
+                else: why = 'from its Spine entry'
+                if w:
+                    fail(f"{where}: {int(reps)} reps. A new athlete's first cycle has no weighted exercise under 8 reps ({why})")
                 else:
-                    info(f"{where}: {int(reps)} reps, no tempo, so read as a jump, landing or sprint drill (exempt from the 8-rep rule)")
+                    info(f"{where}: {int(reps)} reps, not a weighted lift ({why}), so exempt from the 8-rep rule")
+        # Each working exercise once per cycle, circuit items included (a conditioning finisher
+        # repeated across days reads as the programme repeating itself). Prep may repeat.
+        if not prep and (it or ex.get('type') == 'standard'):
             key = (o.get('exId') or o.get('name', '')).lower()
             seen.setdefault(key, []).append(f"Day {d.get('id')}")
     for key, days in seen.items():
         if len(days) > 1: fail(f"{key}: in {len(days)} working blocks ({', '.join(days)}): each working exercise once per cycle")
+    # A grind: a day with 7 or more working exercises spikes fatigue even at low RPE
+    # (COACHING-PRINCIPLES → Volume & dosing → manage load per DAY).
+    for d in (data.get('workouts') or {}).get('days') or []:
+        n = 0
+        for b in d.get('blocks') or []:
+            if PREP.search(b.get('title') or ''): continue
+            for ex in b.get('exercises') or []:
+                n += len(ex.get('items') or []) if ex.get('type') == 'circuit' else 1
+        if n >= 7: warn(f"Day {d.get('id')}: {n} working exercises, a grind (7 or more): check the day's load identity")
 
 def check_text(data):
     for where, s in text_fields(data):
@@ -245,16 +288,20 @@ def check_week_notes(data, args):
         n = wn.get(key)
         if n is None: continue
         where = f"cycle {cyc.get('num')} weekNotes.{key}"
-        if not isinstance(n, dict) or not str(n.get('text') or '').strip():
-            fail(f"{where}: needs a text, the words the athlete reads"); continue
+        if not isinstance(n, dict):
+            fail(f"{where}: must be an object {{text, setsDrop?, rpeDrop?, rpeCap?}}"); continue
+        text = str(n.get('text') or '').strip()
+        # At --stage build only design's numbers exist; engage writes the words after the checks.
+        if not text and args.stage == 'final':
+            fail(f"{where}: needs a text, the words the athlete reads")
         for f in ('setsDrop', 'rpeDrop'):
             if f in n and not (isinstance(n[f], int) and 1 <= n[f] <= 3):
                 fail(f"{where}: {f} is how many fewer (a whole number, 1 to 3), got {n[f]!r}")
         if 'rpeCap' in n and not (isinstance(n['rpeCap'], (int, float)) and 6 <= n['rpeCap'] <= 9):
             fail(f"{where}: rpeCap must be 6 to 9 (the app's floor is 6), got {n['rpeCap']!r}")
-        if len(n['text']) > 260: warn(f"{where}: {len(n['text'])} characters; it's a note, keep it under ~260")
+        if len(text) > 260: warn(f"{where}: {len(text)} characters; it's a note, keep it under ~260")
         label = (n.get('title') or ('Back-off week' if key == 'last' else 'Week 1')).lower()
-        if n['text'].strip().lower().startswith(label):
+        if text and text.lower().startswith(label):
             warn(f"{where}: the text starts by repeating its label ('{label}'); start with the instruction")
     last = wn.get('last')
     if args.no_backoff:
@@ -461,24 +508,173 @@ def check_week(data, args, per_day):
             warn(f"example week: Day {a} ({kind(a)}) on {WEEKDAYS[i].title()} is right before Day {b} ({kind(b)}): two hard lower-body days back to back")
     info('example week: ' + ', '.join(f"{WEEKDAYS[i].title()} Day {plan[i]}" for i in sorted(plan)))
 
-# ── the Spine gate and the Quality Map ────────────────────────────────────────
-def load_spine(path):
+# ── the saved --spine-sql result: the Spine, last cycle, the ledger ───────────
+def load_context(path):
+    """The saved result of --spine-sql. Since 2026-09-26 the one query returns three things: the
+    Spine lines for this programme's exercises (with pattern, impact, equipment, name, aliases),
+    the athlete's live programme BEFORE this build (`prev`: the cycle just trained), and the
+    Exercise Ledger table from their coaching log. So continuity costs no extra lookup."""
     raw = open(path, encoding='utf-8').read().strip()
-    lines = []
-    if raw.startswith('['):
-        for o in json.loads(raw):
-            if isinstance(o, dict) and 'spine' in o: lines += str(o['spine']).splitlines()
-            elif isinstance(o, dict) and 'id' in o:
+    lines, prev, ledger = [], None, None
+    if raw[:1] in '[{':
+        rows = json.loads(raw)
+        for o in (rows if isinstance(rows, list) else [rows]):
+            if not isinstance(o, dict): continue
+            if 'spine' in o: lines += str(o['spine'] or '').splitlines()
+            elif 'id' in o:
                 lines.append('|'.join([o['id'], o.get('status', ''), str(o.get('has_cues', '')).lower(),
                                        ','.join(o.get('qualities') or [])]))
+            if o.get('prev') is not None: prev = o['prev'] if isinstance(o['prev'], dict) else json.loads(o['prev'])
+            if o.get('ledger'): ledger = str(o['ledger'])
     else:
         lines = raw.splitlines()
     spine = {}
     for l in lines:
         p = l.strip().split('|')
-        if len(p) >= 3:
-            spine[p[0]] = {'status': p[1], 'cues': p[2].lower() in ('true', 't'), 'q': [x for x in (p[3] if len(p) > 3 else '').split(',') if x]}
-    return spine
+        if len(p) < 3: continue
+        e = {'status': p[1], 'cues': p[2].lower() in ('true', 't'), 'q': [x for x in (p[3] if len(p) > 3 else '').split(',') if x]}
+        if len(p) >= 9:
+            e.update(pattern=p[4] or None, impact=p[5] or None, equipment=[x for x in p[6].split(';') if x],
+                     name=p[7], aliases=[x for x in p[8].split(';') if x])
+        spine[p[0]] = e
+    return {'spine': spine, 'prev': prev, 'ledger': ledger}
+
+def load_spine(path):
+    return load_context(path)['spine']
+
+# ── continuity: this cycle against the one just trained (2026-09-26) ──────────
+# A returning athlete gets no reviewer, and every rotation and re-ship failure on record was a
+# returning cycle (the 2026-09-26 audit). The previous cycle is `prev` from --spine-sql, so these
+# checks are deterministic: kept accessories, a kept dose that didn't move, the Exercise Ledger.
+BLOCKED = ('disliked', 'pain-flagged', 'banned')
+RETIRED = ('retired-equipment', 'retired-space')
+
+def prev_programme(prev):
+    """--spine-sql's compact `prev` back into days → blocks → exercises (+ circuit items)."""
+    days = []
+    for d in (prev or {}).get('days') or []:
+        blocks = []
+        for b in d.get('blocks') or []:
+            exs = []
+            for x in b.get('x') or []:
+                e = {'name': x.get('n'), 'exId': x.get('id'), 'type': x.get('type'), 'rx': x.get('rx'),
+                     'chips': x.get('chips'), 'rounds': x.get('rounds'),
+                     'items': [{k: v for k, v in {'name': i.get('n'), 'exId': i.get('id'), 'rx': i.get('rx'),
+                                                  'detail': i.get('detail')}.items() if v is not None}
+                               for i in (x.get('items') or [])]}
+                exs.append({k: v for k, v in e.items() if v not in (None, [])})
+            blocks.append({'title': b.get('t') or '', 'exercises': exs})
+        days.append({'id': d.get('id'), 'blocks': blocks})
+    return {'workouts': {'days': days}}
+
+def working(data):
+    """(exercise-or-item, is_primary, is_item, parent) for every working exercise; prep skipped."""
+    for d, b, ex, it in exercises(data):
+        t = b.get('title') or ''
+        if PREP.search(t) or (not it and ex.get('type') == 'circuit'): continue
+        yield (it or ex), t.lower().startswith('primary'), bool(it), ex
+
+def rx_views(exs):
+    """rxOf() views from assets/js/chips.js, the ONE parser of rx and legacy chips, run in node,
+    so a legacy chips cycle compares with an rx one without a third copy of the parsing rules."""
+    js = ("require('./assets/js/chips.js');const C=globalThis.Chips;let s='';"
+          "process.stdin.on('data',d=>s+=d).on('end',()=>{const a=JSON.parse(s);"
+          "process.stdout.write(JSON.stringify(a.map(e=>{try{return C.rxOf(e)}catch(x){return null}})))})")
+    try:
+        r = subprocess.run(['node', '-e', js], input=json.dumps(exs), capture_output=True, text=True,
+                           encoding='utf-8', cwd=REPO, timeout=60)
+        return json.loads(r.stdout) if r.returncode == 0 else None
+    except Exception:
+        return None
+
+def dose_sig(v):
+    if not v: return None
+    d = v.get('dose') or {}
+    rounds = re.sub(r'\D', '', str(v.get('rounds') or ''))
+    return '|'.join(str(x) for x in (v.get('sets'), d.get('kind'), d.get('value'), d.get('side'), v.get('rpe'),
+                                      v.get('tempo'), rounds))
+
+def spec_list(args, key):
+    """Names on a spec line like 'keep: Face Pull (only cable row the gym has), Dead Bug (...)'."""
+    if not args.spec: return set()
+    m = re.search(rf'^\s*{key}\s*:\s*(.+)$', open(args.spec, encoding='utf-8').read(), re.I | re.M)
+    return {norm_name(re.sub(r'\(.*?\)', '', w)) for w in (m.group(1) if m else '').split(',') if w.strip()}
+
+def names_of(o, spine):
+    e = (spine or {}).get(o.get('exId') or '') or {}
+    return {n for n in [norm_name(o.get('name')), norm_name(e.get('name'))] + [norm_name(a) for a in e.get('aliases') or []] if n}
+
+def check_continuity(data, args, ctx):
+    spine, prev = ctx.get('spine') or {}, ctx.get('prev')
+    old = prev_programme(prev) if prev and (prev.get('days') or []) else None
+    if old and (data.get('currentCycleIndex') or 0) > (prev.get('cci') or 0):
+        before = {}
+        for o, prim, is_item, parent in working(old):
+            for n in [norm_name(o.get('name'))] + ([o['exId']] if o.get('exId') else []):
+                before.setdefault(n, (o, parent if is_item else None))
+        keep = spec_list(args, 'keep')
+        kept, total, pairs = [], 0, []
+        for o, prim, is_item, parent in working(data):
+            hit = next((before[k] for k in [o.get('exId')] + sorted(names_of(o, spine)) if k and k in before), None)
+            if not prim: total += 1
+            if not hit: continue
+            if not prim: kept.append(o)
+            pairs.append((o, prim, parent if is_item else None, hit))
+        if total:
+            share = len(kept) / total
+            names = ', '.join(o.get('name', '') for o in kept)
+            msg = f"{len(kept)} of {total} non-primary working exercises carried over unchanged from last cycle ({share:.0%})"
+            if share >= 0.7: fail(f"{msg}: rotate by variant; 70% or more is the old 83% failure ({names})")
+            else: info(msg + (f": {names}" if kept else ''))
+        for o in kept:
+            if not (names_of(o, spine) & keep):
+                warn(f"{o.get('name')}: kept from last cycle. Rotate it by variant, or name it on the spec's keep: line with the reason")
+        # A kept exercise must still move: sets, reps or time, RPE, tempo, rounds, or a harder variant.
+        # Compared only where BOTH sides' doses can be read (a legacy circuit item's free text often
+        # can't), so an unreadable dose is never called identical.
+        flat = []
+        for o, prim, parent, (po, pparent) in pairs: flat += [o, po]
+        views = rx_views(flat) if flat else []
+        rounds_of = lambda c: re.sub(r'\D', '', str(((c or {}).get('rx') or {}).get('rounds') or (c or {}).get('rounds') or ''))
+        if views is None:
+            warn('node could not run assets/js/chips.js, so kept doses were not compared with last cycle')
+        else:
+            for k, (o, prim, parent, (po, pparent)) in enumerate(pairs):
+                va, vb = views[2 * k], views[2 * k + 1]
+                if not va or not vb or not (va.get('dose') and vb.get('dose')): continue
+                a, b = dose_sig(va), dose_sig(vb)
+                if parent: a, b = a + '|r' + rounds_of(parent), b + '|r' + rounds_of(pparent)
+                if a != b: continue
+                what = f"{o.get('name')}" + (f" (in {parent.get('name')})" if parent else '')
+                if prim: warn(f"{what}: the same sets, reps and RPE as last cycle. Say how it progresses (load at the same RPE counts)")
+                else: fail(f"{what}: kept with the same dose as last cycle. Move it (sets, reps, RPE, tempo, rounds or a harder variant) or rotate it by variant")
+    elif old:
+        info("currentCycleIndex is the live programme's own, so this is the live cycle, not a new one: continuity not compared "
+             "(a new cycle's build must advance currentCycleIndex)")
+    else:
+        info('no previous cycle on the server: continuity checks skipped (a new athlete)')
+    # The Exercise Ledger: an exercise marked Disliked, Pain-flagged or Banned never comes back
+    # without a stated reason (spec line 'reintroduce: X (reason)').
+    rows = []
+    for line in (ctx.get('ledger') or '').splitlines():
+        cells = [c.strip() for c in line.strip().strip('|').split('|')]
+        if len(cells) < 2 or cells[0].lower() in ('exercise', '') or set(cells[0]) <= set('-: '): continue
+        rows.append((norm_name(re.sub(r'\*', '', cells[0])), cells[1].lower(), cells[3] if len(cells) > 3 else ''))
+    back = spec_list(args, 'reintroduce')
+    if rows:
+        for d, b, ex, it in exercises(data):
+            o = it or ex
+            if not it and ex.get('type') == 'circuit': continue
+            mine = names_of(o, spine)
+            for name, status, note in rows:
+                if name not in mine: continue
+                where = f"Day {d.get('id')} {o.get('name')}"
+                if any(s in status for s in BLOCKED) and name not in back:
+                    fail(f"{where}: the Exercise Ledger says {status}. It comes back only with a reason on the spec's reintroduce: line")
+                elif any(s in status for s in RETIRED):
+                    warn(f"{where}: the Exercise Ledger says {status}: check the kit or space is there now")
+                elif re.search(r"(do not|don't|never) re-?introduce", note, re.I) and name not in back:
+                    warn(f"{where}: its ledger note says not to reintroduce it without a check: \"{note[:90]}\"")
 
 def qm_sets(rx):
     """How many sets one working exercise counts for in the Quality Map. An exercise dosed by
@@ -513,8 +709,7 @@ def top3(score, coverage):
     keep = [q for q in score if score[q] >= max(1.5, s * 0.12)]
     return sorted(keep, key=lambda q: (-score[q], QUALITIES.index(q) if q in QUALITIES else 99))[:3]
 
-def check_spine(data, args):
-    spine = load_spine(args.spine)
+def check_spine(data, args, spine):
     ids = {(it or ex).get('exId') for d, b, ex, it in exercises(data)
            if not (not it and ex.get('type') == 'circuit') and (it or ex).get('exId')}
     drafts = sorted(i for i in ids if i in spine and spine[i]['status'] != 'approved')
@@ -565,10 +760,31 @@ def check_spine(data, args):
 # ── the two printouts ─────────────────────────────────────────────────────────
 def spine_sql(data):
     ids = sorted({(it or ex).get('exId') for d, b, ex, it in exercises(data) if (it or ex).get('exId')})
-    print("-- Run once, save the result to the scratchpad, pass it as --spine. Missing ids = no entry.")
-    print("select string_agg(e.id || '|' || e.status || '|' || (e.cues is not null)::text || '|' || "
-          "array_to_string(e.qualities, ','), E'\\n' order by e.id) as spine")
-    print("from public.exercises e where e.id in (" + ', '.join(f"'{i}'" for i in ids) + ");")
+    aid = re.sub(r"[^A-Za-z0-9_.-]", '', (data.get('athlete') or {}).get('id') or '')
+    idlist = ', '.join(f"'{i}'" for i in ids) or "''"
+    print(f"""-- Run once, save the raw result to the scratchpad, pass it as --spine. Missing ids = no entry.
+-- It also returns the athlete's live programme BEFORE this build (prev: the cycle just trained)
+-- and their Exercise Ledger, for the continuity checks (2026-09-26). Read-only, one call.
+select
+ (select string_agg(e.id || '|' || e.status || '|' || (e.cues is not null)::text || '|' || array_to_string(e.qualities, ',')
+     || '|' || coalesce(e.pattern, '') || '|' || coalesce(e.impact, '') || '|' || array_to_string(e.equipment, ';')
+     || '|' || e.name || '|' || array_to_string(e.aliases, ';'), E'\\n' order by e.id)
+  from public.exercises e where e.id in ({idlist})) as spine,
+ (select jsonb_build_object('cci', coalesce((p.data->>'currentCycleIndex')::int, 0), 'days',
+    (select jsonb_agg(jsonb_build_object('id', d->'id', 'blocks',
+       (select jsonb_agg(jsonb_build_object('t', b->>'title', 'x',
+          (select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('n', e->>'name', 'id', e->>'exId', 'type', e->>'type',
+               'rx', e->'rx', 'chips', e->'chips', 'rounds', e->'rounds',
+               'items', (select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('n', i->>'name', 'id', i->>'exId',
+                                                                               'rx', i->'rx', 'detail', i->'detail')))
+                         from jsonb_array_elements(case when jsonb_typeof(e->'items') = 'array' then e->'items' else '[]'::jsonb end) i))))
+           from jsonb_array_elements(b->'exercises') e)))
+        from jsonb_array_elements(d->'blocks') b)))
+     from jsonb_array_elements(case when jsonb_typeof(p.data->'workouts'->'days') = 'array'
+                                    then p.data->'workouts'->'days' else '[]'::jsonb end) d))
+  from public.programs p where p.athlete_id = '{aid}') as prev,
+ (select substring(body from '(\\| *Exercise *\\| *Status[^\\n]*\\n(?:\\|[^\\n]*\\n?)*)')
+  from public.coaching_logs where athlete_id = '{aid}') as ledger;""")
 
 KEYS = ['athlete', 'sport', 'currentCycleIndex', 'cycles', 'workouts', 'notes']
 def fingerprint(data, athlete_id):
@@ -609,6 +825,7 @@ def main():
     ap.add_argument('--cap', type=float, default=60); ap.add_argument('--ban'); ap.add_argument('--spec')
     ap.add_argument('--week'); ap.add_argument('--spine'); ap.add_argument('--art')
     ap.add_argument('--spine-sql', action='store_true'); ap.add_argument('--fingerprint', action='store_true')
+    ap.add_argument('--stage', choices=['build', 'final'], default='final')
     args = ap.parse_args()
     data = json.load(open(args.program, encoding='utf-8'))
     athlete_id = (data.get('athlete') or {}).get('id', '<id>')
@@ -621,13 +838,22 @@ def main():
     if not args.new and (data.get('currentCycleIndex') or 0) == 0:
         args.new = True
         info('currentCycleIndex is 0, so the new-athlete rules apply (no weighted lift under 8 reps, no working circuits, a first-week note)')
-    check_structure(data, args); check_text(data); check_cards(data); check_whys(data); check_week_notes(data, args)
+    ctx = load_context(args.spine) if args.spine else {'spine': {}, 'prev': None, 'ledger': None}
+    check_structure(data, args, ctx['spine'])
+    # --stage build runs straight after design, BEFORE engage writes a word (2026-09-26): a FAIL
+    # there changes the programme while no note, Because or message has been written around it.
+    if args.stage == 'final':
+        check_text(data); check_cards(data); check_whys(data)
+    else:
+        info('--stage build: the text checks (notes, Becauses, week-note words, RPE in text) run in the final pass')
+    check_week_notes(data, args)
     check_bans(data, args); check_time(data, args)
     per_day = check_volume(data, args) if args.log else {}
     if not args.log: warn('no --log: the volume floors and back-to-back days were not checked')
     check_week(data, args, per_day)
-    if args.spine: check_spine(data, args)
-    else: warn('no --spine: the Spine gate and the Quality Map were not checked (run --spine-sql)')
+    if args.spine:
+        check_spine(data, args, ctx['spine']); check_continuity(data, args, ctx)
+    else: warn('no --spine: the Spine gate, the Quality Map and the continuity checks were not run (run --spine-sql)')
     for level in ('FAIL', 'WARN', 'INFO'):
         for m in out[level]: print(f"{level:4}  {m}")
     print(f"\n{athlete_id}: {len(out['FAIL'])} FAIL · {len(out['WARN'])} WARN")

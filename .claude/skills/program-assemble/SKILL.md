@@ -218,7 +218,13 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   than 10 of them, a notes card that isn't HTML, any `setup` (floating text: a grip is the pill,
   anything else the Coach's Note),
   an exercise with no library entry or no cues, a quality outside the ten, and a cycle with no
-  back-off `weekNotes.last` (or a new athlete with no `weekNotes.first`). Two things are only
+  back-off `weekNotes.last` (or a new athlete with no `weekNotes.first`). Since 2026-09-26 the saved
+  `--spine` result also carries the cycle just trained and the Exercise Ledger, so it also fails
+  70%+ of the accessories carried over, a kept exercise whose dose didn't move, a ledger
+  Disliked / Pain-flagged / Banned exercise brought back without a `reintroduce:` reason, and a
+  circuit item used on two days; it warns on each kept accessory not on `keep:`, a kept primary
+  on the same numbers, and a day of 7+ working exercises. "Weighted" for the 8-rep rule comes from
+  the Spine entry (loaded kit, no impact, not a jump, throw, sprint, carry or conditioning). Two things are only
   WARNs: a Quality headline outside the week's top two (report it with your recommendation), and a
   day past `--cap` (Amir,
   2026-09-26: the form's session length is a guess, athletes who write 60 train 75 and never

@@ -865,13 +865,17 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   and every FAIL is fixed: the 10-set floor (strength-and-muscle aims only, `--floor`), the
   4-set cap (`--proven` once our logs show more), the new-athlete rules (automatic on a first
   cycle), a banned movement in any exercise or fallback, RPE floors in every note, the week-1
-  and back-off notes (`weekNotes`), back-to-back days and the Spine gate. A day past the time
+  and back-off notes (`weekNotes`), back-to-back days, the Spine gate, and (since 2026-09-26) the
+  continuity checks against the cycle just trained: accessories carried over, a kept dose that
+  didn't move, a Disliked / Pain-flagged / Banned ledger exercise brought back. A day past the time
   cap is only a warning (the cap is soft, 2026-09-26), and so is a Quality headline outside the
   week's top two, which is reported with a recommendation (Amir, 2026-09-26: *"report it, but
   recommend what you think should happen"*). Then a **new athlete** gets ONE
   reviewer, files only, for what a script cannot judge (injury logic, exercise choice,
   transfer, whether the notes cover every exercise they should), and every surviving
-  must-fix/should-fix is applied. A **returning athlete** gets no reviewer unless Amir asks.
+  must-fix/should-fix is applied. A **returning athlete** gets no reviewer unless Amir asks: the
+  mechanical failures on record for returning cycles (rotation, re-shipped doses, a banned or
+  disliked exercise back, the same exercise twice, floors, the set cap) are all script checks now.
   The original three-auditor panel caught real issues (Athlete I C1: a deep-flexion warm-up
   leak on a locking-history knee, a 60-min cap breach, an unwritten run ladder). The script
   now catches the mechanical half of that kind of miss, and the reviewer keeps the judgment

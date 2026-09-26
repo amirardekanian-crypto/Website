@@ -238,6 +238,13 @@ rehab/corrective reason) must still carry a visible dose progression — more se
 rounds, more load, or a harder variant. Never re-ship an identical prescription cycle to
 cycle on a power or conditioning item just because the exercise name stayed the same.
 
+**The checker now holds you to this** (2026-09-26; its `--spine` result carries the cycle just
+trained and the Exercise Ledger): 70% or more of the non-primary working exercises carried over
+FAILs; each kept one WARNs unless the spec's `keep:` line names it with a reason; a kept exercise
+whose dose didn't move (sets, reps or time, RPE, tempo, rounds) FAILs, and a kept primary WARNs; a
+ledger `Disliked`, `Pain-flagged` or `Banned` exercise FAILs unless the spec's `reintroduce:` line
+gives the reason. Write those two lines as you decide, not after the checker complains.
+
 **Check every REPLACE pick against the athlete's whole exposure history, not just the
 immediately-prior cycle.** The **Exercise Ledger** (read at STEP 0) lists every exercise they
 have had. `Disliked`, `Pain-flagged` and `Banned` never come back without a stated reason. A
@@ -560,6 +567,8 @@ week1: [rpeCap 7 / rpeDrop 1 on what, and what moves them back to the card] (or 
 lastweek: [setsDrop 1 · rpeCap 6, plus anything else that changes] (every cycle)
 bans: [one line, if any]
 floor-except: [muscle (reason), only when --floor applies and a muscle is excused]
+keep: [exercise (why it stays), … — returning athletes, anything carried over on purpose]
+reintroduce: [exercise (what earned it back), … — only for a Disliked / Pain-flagged / Banned ledger row]
 
 ---
 DAY [N] — [plain working title: what it trains] | load identity: [peak/moderate/low]
