@@ -5737,11 +5737,40 @@ function hasFinishedAWorkout() {
   return loggedDays().some(k => isDone(h, k));
 }
 
+// Where this athlete stands with the board, for every line of copy that talks about it
+// (PRIV-01, 2026-09-26: the tour told a coached athlete "Nobody can see you until you
+// join" while the sweep below was about to list them).
+//   'on'     — on the board.
+//   'coming' — coached, never on, never decided: the sweep lists them after their first
+//              finished session. Copy must say so, by name, BEFORE it happens.
+//   'off'    — free (joins by hand), or has decided (left, or kept off): only a Join lists them.
+// ⚠️ Mirrors autoJoinBoard()'s gate. Change one, change the other, or the copy lies again.
+function boardState() {
+  if (CFG.onBoard) return 'on';
+  if (window.IS_DEMO || window.IS_PREVIEW || isFree() || CFG.boardSwept) return 'off';
+  return 'coming';
+}
+
+// "Keep me off the board", before the sweep has listed them (Amir, 2026-09-26, PRIV-01 B).
+// Settles the one-time sweep exactly as Leave does after a join, so autoJoinBoard() never
+// runs for them; a Join from Crew still works whenever they change their mind. No server
+// call: there is no row to remove, and boardSwept travels with the rest of CFG.
+function keepOffBoard() {
+  if (window.IS_DEMO) { toast('Demo mode — the board is live only for real athletes.'); return; }
+  if (window.IS_PREVIEW) { toast('Coach preview — nothing is saved.'); return; }
+  CFG.boardSwept = true;
+  saveCfg();
+  toast('You stay off the board. Join from Crew whenever you like.');
+  render();
+}
+
 async function autoJoinBoard() {
   // Coach preview: runs unconditionally on every boot, and CFG/LOG here are
   // whatever this browser has stored locally under the athlete's key — not a
   // reliable signal that the real athlete never trained. Never let the sweep
   // fire against their real board row.
+  // ⚠️ boardState() mirrors this gate: every line of board copy reads it (PRIV-01).
+  // keepOffBoard() settles the sweep in advance by setting boardSwept.
   if (window.IS_DEMO || window.IS_PREVIEW) return;
   if (CFG.boardSwept) return;
   if (CFG.onBoard) { CFG.boardSwept = true; saveCfg(); return; }  // already on
@@ -6869,12 +6898,22 @@ function tourSteps() {
     screen: 'progress', sel: () => $t('.statgrid')
   });
 
+  // ⚠️ Three states, from boardState(). The 'coming' one is the first thing a new coached
+  // athlete reads about the board, days before the sweep lists them: it must say so.
+  const bs = boardState();
   S.push({
-    title: CFG.onBoard ? 'The board, and the wall' : 'The board is off until you join',
-    body: CFG.onBoard
+    title: bs === 'on' ? 'The board, and the wall'
+         : bs === 'coming' ? 'You go on the board after your first session'
+         : 'The board is off until you join',
+    body: bs === 'on'
       ? `You are on it. Everyone else here is racing the same season, and each of you gets
          <strong>one sentence a day</strong> on the wall — worth no points at all, which is exactly why
          people write something true on it.`
+      : bs === 'coming'
+      ? `Everyone training with me is on it. Finish your first session in the programme app and you
+         appear here as <strong>${esc(CFG.boardName || defaultDisplayName())}</strong>. Other athletes see
+         <strong>that name, your points, your rank and your title</strong>, nothing else. Pick another name
+         here, or keep yourself off before it happens; rename or leave any time after.`
       : `Nobody can see you until you join, and joining takes a name you pick yourself. Other
          athletes see <strong>that name, your points, your rank and your title</strong>, nothing else. Join and you also get
          <strong>one sentence a day</strong> on the wall. Leave whenever you like.`,
@@ -8804,11 +8843,35 @@ function boardRow(r, ahead, i) {
     </span>
   </div>`;
 }
-// Joining is explicit and reversible, and the handle is theirs to choose —
-// nobody's name is published to other clients without them asking for it.
+// Three states, from boardState(). A free athlete, or one who left or kept off, joins by
+// hand. A coached athlete who has not trained yet is TOLD they are about to be listed, by
+// name, with the name editable and a way to stay off before it happens (PRIV-01).
 function renderBoardJoin() {
   if (window.IS_DEMO) return '';
   const joined = !!CFG.onBoard;
+  if (boardState() === 'coming') {
+    const nm = CFG.boardName || defaultDisplayName();
+    return `
+      <div class="block" data-k="join" data-tour="join" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
+        <div class="hd" style="font-size:20px;line-height:1">You go on after your first session</div>
+        <div style="font-size:13px;line-height:1.5;color:var(--muted)">
+          Everyone training with me is on the board. Finish your first session in the programme app and you appear here as <b style="color:var(--ink)">${esc(nm)}</b>, with your points, your rank and the title you wear. No habits, no logs, no real name unless you use it. Rename or leave any time after.
+        </div>
+        <div style="display:flex;gap:8px">
+          <input class="input" id="boardname" maxlength="24" placeholder="${esc(nm)}" value="${esc(LB.nameDraft)}" style="flex:1">
+          <button class="btn btn-secondary" style="padding:0 14px" ${on(() => {
+            const v = LB.nameDraft.trim();
+            if (!v) { toast('Type the name you want first.'); return; }
+            if (window.IS_PREVIEW) { toast('Coach preview — nothing is saved.'); return; }
+            // Only stored: autoJoinBoard() lists them under it. The server trims and cleans
+            // any name rather than refusing it, so this cannot make the sweep fail.
+            CFG.boardName = v; LB.nameDraft = ''; saveCfg();
+            toast(`You will appear as ${v}.`); render();
+          })}>Use this name</button>
+        </div>
+        <button class="btn btn-secondary btn-block" ${on(keepOffBoard)}>Keep me off the board</button>
+      </div>`;
+  }
   if (!joined) {
     return `
       <div class="block" data-k="join" data-tour="join" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
@@ -10125,8 +10188,12 @@ function renderSettings() {
 
       <div class="cardgrp">
         ${navRow('👥', 'Crew board',
-                 CFG.onBoard ? 'Tap to rename or leave' : 'Other athletes only see you if you join',
-                 navVal(CFG.onBoard ? (CFG.boardName || defaultDisplayName()) : 'Not joined'),
+                 // Three states, from boardState() (PRIV-01).
+                 boardState() === 'on' ? 'Tap to rename or leave'
+                   : boardState() === 'coming' ? 'You go on after your first session · tap to rename or keep off'
+                   : 'Other athletes only see you if you join',
+                 navVal(boardState() === 'on' ? (CFG.boardName || defaultDisplayName())
+                   : boardState() === 'coming' ? 'Not yet' : 'Not joined'),
                  () => go('crew'))}
         ${navRow('☁️', 'Sync', 'Everything is saved here first, then sent up',
                  `<span class="navval" data-sync>${esc(syncLabel())}</span>`,

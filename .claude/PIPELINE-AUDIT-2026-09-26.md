@@ -162,7 +162,7 @@ so did the rest except where noted.
 - **XP wording** (found by the new guard): the app's wording won (Amir). The `xp_rules` row now
   carries the four "I / II" milestone names and the three "this week" quest notes, and the
   snapshot is refreshed; the guard reads 0 FAIL, 0 NOTE.
-- **ytVideoId()** in program.html has the site modal's host check (sw `aap-v39`).
+- **ytVideoId()** in program.html has the site modal's host check (sw `aap-v40`).
 - **5.5** The six AA Proof bugs and the two stale habits.html comments are fixed.
 
 ### 5.1 Needs Amir
