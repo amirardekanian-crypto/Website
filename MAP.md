@@ -256,6 +256,7 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
 | [`SCHEMA.md`](SCHEMA.md) | Every JSON field (program / article / workout) |
 | [`Content/PRODUCT.md`](Content/PRODUCT.md) | The business/product brief |
 | [`Content/HOW-IT-WORKS.md`](Content/HOW-IT-WORKS.md) | Customer-facing process explainer |
+| [`Content/FRESH-EYES.md`](Content/FRESH-EYES.md) | **The app audit** (2026-09-24) — what has shipped, what is next in order, the open calls, and how to continue |
 | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) | `coach.html` manual |
 | [`CALL_LOG.md`](CALL_LOG.md) | `call-log.html` manual |
 | [`supabase/stage29_affiliates.sql`](supabase/stage29_affiliates.sql) | **Affiliate coaches** — the referral-code roster moved out of the public `AFFILIATES.md` into the coach-only `public.affiliates` table (2026-09-13). Manage it in `coach.html` → Affiliates; the deal and how-to are in [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) §2 |

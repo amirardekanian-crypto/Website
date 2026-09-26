@@ -30,6 +30,8 @@ Durable context for working in this repo. Read the linked docs before diving in.
   product pages: how they are built, deployed and introduced.
 - `PROGRAM-APP.md` — the athlete app's programme features in full (rx, week notes, the Spine, the Quality
   Map, Because, the set log, Personal Records, body weight): read it before changing `program.html`.
+- `Content/FRESH-EYES.md` — the app audit (2026-09-24): what has shipped, what is next and in what order,
+  the open calls, and how to continue it. Read it before picking up an audit item (`REL-01`, `CARD-01` …).
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy. **It opens with the RULE INDEX**
   (2026-09-26): one numbered line per rule (`VOL-8`, `SEL-4` …), the stage that applies it and whether
   the checker enforces it; the dated bullets below it are the stories. **The index line is the rule**:
@@ -199,7 +201,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v32` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v35` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
