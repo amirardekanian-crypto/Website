@@ -1245,6 +1245,11 @@
     font-size: 22px; letter-spacing: 0.5px; text-transform: uppercase;
     color: var(--grey-dark);
   }
+  /* "2 of 3 sessions done this week" (HOME-01), from paintWeek(). */
+  .home-week-sum { font-family: 'Barlow', sans-serif; font-size: 14px; color: var(--grey-text);
+    margin: -6px 24px 12px; }
+  .home-week-sum:empty { display: none; }
+  .home-week-sum.all { color: var(--green-ink); font-weight: 600; }
   .home-week-chip {
     font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
     letter-spacing: 1.2px; text-transform: uppercase; color: #C7552F;
@@ -5693,7 +5698,7 @@ const ERROR_ICONS = {
   if (!_spineFresh) refreshSpine();   // boot may already have fetched it (a first-ever open)
   refreshQualities();
   isLoading = false;
-  markSuggestedDay();
+  paintWeek();   // pills, suggested day and the week's count (HOME-01)
   // restoreState() ran updateProgress() while isLoading was still true, which
   // suppresses the Finish Session card. Re-run it now so users who closed the
   // page after checking the last set still see the prompt when they return.
@@ -6387,12 +6392,64 @@ function dayCardHTML(day, dayNum, total, opts) {
 // the day view closes, because Home's cards are built once.
 function dayInProgress(id) {
   if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) return false;
+  // Done earlier this week and not touched today → Done, not in progress.
   const t = loadTimer(id);
   if (t && !t.finished && t.sessionStart && new Date(t.sessionStart).toDateString() === new Date().toDateString()) return true;
   try { return getDayCompletion(id).done > 0; } catch (e) { return false; }
 }
+// ── THIS WEEK, FROM HISTORY (HOME-01, 2026-09-26) ──────────────────────────
+// Home's week used to know only TODAY: a Done pill lasted until midnight (the
+// <id>_completed_d<N> stamp), and every morning the suggestion went back to Day 1, while
+// the sessions themselves sat in session_history. The week is now the cycle's own
+// training week (cycleWeekInfo(): 7 days from startDate + (wk-1)×7), or Monday–Sunday for
+// a cycle with no dates, and a day is done this week when a session of it is in HIST
+// (get_my_history, or its phone copy) inside that window, or finished on this phone today.
+// ⚠️ completed_on is a UTC date (DATA-02): a session finished between 00:00 and 03:30 in
+// Iran is filed under the day before, which can only move it across a week boundary.
+function ymdLocal(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function weekWindow() {
+  const cur = (DATA.cycles || [])[Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0];
+  const w = cycleWeekInfo(cur);
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  if (w && !w.before && !w.after) {
+    const s0 = new Date(cur.startDate); s0.setHours(0, 0, 0, 0);
+    start.setTime(s0.getTime()); start.setDate(start.getDate() + (w.wk - 1) * 7);
+  } else {
+    start.setDate(start.getDate() - ((start.getDay() + 6) % 7));   // Monday
+  }
+  const end = new Date(start); end.setDate(end.getDate() + 6);
+  return { from: ymdLocal(start), to: ymdLocal(end) };
+}
+function weekDoneDays() {
+  const ids = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
+  const done = new Set();
+  const win = weekWindow();
+  (HIST || []).forEach(s => {
+    if (s.date >= win.from && s.date <= win.to && ids.indexOf(String(s.day)) >= 0) done.add(String(s.day));
+  });
+  ids.forEach(id => { if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) done.add(id); });
+  return done;
+}
+// Repaint everything the week drives: the pills, the suggested day, the count line.
+// Called when the day view closes and whenever the history arrives.
+function paintWeek() {
+  paintDayCardPills();
+  markSuggestedDay();
+  const el = document.getElementById('home-week-sum');
+  if (!el) return;
+  const ids = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
+  if (!ids.length) { el.textContent = ''; return; }
+  const n = ids.filter(id => weekDoneDays().has(id)).length;
+  el.textContent = n >= ids.length
+    ? `All ${ids.length} sessions done this week`
+    : `${n} of ${ids.length} sessions done this week`;
+  el.classList.toggle('all', n >= ids.length);
+}
+
 function dayCardPill(id) {
-  if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) return `<div class="cm-pill cm-pill-done">Done</div>`;
+  if (weekDoneDays().has(String(id))) return `<div class="cm-pill cm-pill-done">Done</div>`;
   if (dayInProgress(id)) return `<div class="cm-pill cm-pill-live">In progress · Resume</div>`;
   return '';
 }
@@ -6443,7 +6500,7 @@ function closeDayView() {
   const dv = document.getElementById('day-view');
   if (dv) dv.hidden = true;
   if (ov) ov.hidden = false;
-  paintDayCardPills();
+  paintWeek();
   // Back on a nav screen — bring the global dark-mode toggle back.
   const gToggle = document.getElementById('global-dark-toggle');
   if (gToggle) gToggle.classList.remove('is-hidden');
@@ -6689,7 +6746,8 @@ function renderHome() {
       <div class="home-section-head">
         <div class="home-section-title">This Week</div>
         ${weekLabel ? `<div class="home-week-chip">${esc(weekLabel)}</div>` : ''}
-      </div>${weekNoteHTML(cur)}`;
+      </div>
+      <div class="home-week-sum" id="home-week-sum"></div>${weekNoteHTML(cur)}`;
   }
 
   const days = w.days || [];
@@ -10169,12 +10227,15 @@ function markSuggestedDay() {
   const tabs = document.querySelectorAll('.day-tab');
   const cards = document.querySelectorAll('.day-ov-card');
   const dayIds = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
-  for (let i = 0; i < dayIds.length; i++) {
-    if (!completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + dayIds[i]))) {
-      tabs[i]?.classList.add('suggested');
-      cards[i]?.classList.add('suggested');
-      break;
-    }
+  // A session under way today first; otherwise the first day not done THIS WEEK (HOME-01:
+  // it used to be the first day without today's stamp, so every morning said Day 1).
+  // Every day done this week → nothing suggested.
+  const done = weekDoneDays();
+  let i = dayIds.findIndex(id => dayInProgress(id));
+  if (i < 0) i = dayIds.findIndex(id => !done.has(id));
+  if (i >= 0) {
+    tabs[i]?.classList.add('suggested');
+    cards[i]?.classList.add('suggested');
   }
 }
 
@@ -12948,7 +13009,7 @@ async function loadHistory() {
   }
   try {
     const cached = JSON.parse(localStorage.getItem(histKey()) || 'null');
-    if (Array.isArray(cached)) { HIST = histFromRows(cached); buildHistAlias(); paintAllLastTime(); fillRecordsFrom(HIST); }
+    if (Array.isArray(cached)) { HIST = histFromRows(cached); buildHistAlias(); paintAllLastTime(); fillRecordsFrom(HIST); paintWeek(); }
   } catch (e) { /* no copy yet */ }
   try {
     const sb = await _sbReady();
@@ -12956,7 +13017,7 @@ async function loadHistory() {
     const res = await _withTimeout(sb.rpc('get_my_history', { p_athlete_id: ATHLETE_ID }), 8000);
     if (!res || res.error || !Array.isArray(res.data)) return;
     try { _lsRawSet(histKey(), JSON.stringify(res.data)); } catch (e) { /* storage full — still shown this visit */ }
-    HIST = histFromRows(res.data); buildHistAlias(); paintAllLastTime(); fillRecordsFrom(HIST);
+    HIST = histFromRows(res.data); buildHistAlias(); paintAllLastTime(); fillRecordsFrom(HIST); paintWeek();
   } catch (e) { /* offline — the cached copy above stays */ }
 }
 

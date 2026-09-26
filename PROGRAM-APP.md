@@ -521,6 +521,18 @@ sits in front of the whole site).
   Waiting less when a copy exists would open slow-but-working connections on the copy more often; it is
   a separate call.
 
+## 📅 This Week is built from the session history (HOME-01, 2026-09-26)
+
+Home's week used to know only today: a Done pill lasted until midnight (the `<id>_completed_d<N>` stamp) and
+every morning the suggestion went back to Day 1. Now `weekDoneDays()` counts a day as done this week when a
+session of it is in `HIST` (`get_my_history()` or its phone copy) inside `weekWindow()`, or was finished on this
+phone today. The window is the **cycle's own training week** (`cycleWeekInfo()`: seven days from `startDate +
+(wk − 1) × 7`), or Monday–Sunday for a cycle with no dates. `paintWeek()` draws the day cards' Done pills, the
+suggested day (a session in progress first, then the first day not done this week, none when all are done) and
+the line under **This Week**, "2 of 3 sessions done this week"; it runs at boot, when the history arrives, and
+whenever the day view closes, so a finished session shows on Home without a reload. ⚠️ `completed_on` is a UTC
+date (DATA-02): a session finished between 00:00 and 03:30 in Iran is filed under the day before.
+
 ## ↩️ Back closes the top layer (NAV-01, 2026-09-26)
 
 Screens, sheets and overlays are shown and hidden in place, so until now the phone's Back button (or an Android
