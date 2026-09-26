@@ -84,7 +84,9 @@
 //      Record take two taps (armedTap()), and Reset moved away from Send.
 // v44: habits.html changed (2026-09-26, PRF-04): the nudge stops asking for the session Proof cannot
 //      tick, its OPEN YOUR PROGRAMME button opens the programme, and "logged nothing" means nothing.
-const CACHE = 'aap-v44';
+// v45: program.html, shared.js and habits.html changed (2026-09-26, HOME-03): the install ask waits
+//      for a finished session, its words match the phone, and Proof stops asking coached athletes.
+const CACHE = 'aap-v45';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

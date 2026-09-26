@@ -270,26 +270,40 @@
       return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     }
 
+    // Inside WhatsApp, Instagram and the like nothing can be installed; say how to get out
+    // (same markers as AA Proof's inAppBrowser()).
+    function inApp() {
+      return /FBAN|FBAV|FB_IAB|Instagram|WhatsApp|Line\/|Snapchat|LinkedInApp|MicroMessenger|Twitter/i.test(navigator.userAgent || '');
+    }
+
     function show() {
       if (isStandalone()) return;
       if (localStorage.getItem(DISMISS_KEY)) return;
+      if (document.querySelector('.a2hs-toast')) return;   // once per page, whatever calls it
 
       const el = document.createElement('div');
       el.className = 'a2hs-toast';
       el.setAttribute('role', 'dialog');
       el.setAttribute('aria-label', 'Install app');
 
-      const ios = isIOS();
+      // Three honest answers (HOME-03, 2026-09-26). The Install button used to show on every
+      // non-iOS phone and did nothing when the browser had not offered an install.
+      const ios = isIOS(), canPrompt = !!deferredPrompt, inapp = inApp();
+      const how = inapp
+        ? 'This is another app\'s browser, which cannot install. Open the menu (⋮ or …) and choose "Open in ' + (ios ? 'Safari' : 'browser') + '", then add it from there.'
+        : ios
+          ? 'Tap the Share button, then "Add to Home Screen".'
+          : canPrompt
+            ? 'Put it on your home screen: one tap to today, and it opens with no signal.'
+            : 'Open your browser menu (⋮) and choose "Install app" or "Add to Home screen".';
       el.innerHTML = `
         <div class="a2hs-toast-icon" aria-hidden="true">AA</div>
         <div class="a2hs-toast-body">
           <strong>Install app</strong>
-          <span>${ios
-            ? 'Tap the Share button, then "Add to Home Screen".'
-            : 'Add this program to your home screen for a quicker training experience.'}</span>
+          <span>${how}</span>
         </div>
         <div class="a2hs-toast-actions">
-          ${ios ? '' : '<button type="button" class="primary" data-a2hs-install>Install</button>'}
+          ${canPrompt && !inapp ? '<button type="button" class="primary" data-a2hs-install>Install</button>' : ''}
           <button type="button" data-a2hs-dismiss>Dismiss</button>
         </div>`;
       document.body.appendChild(el);
