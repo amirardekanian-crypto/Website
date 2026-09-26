@@ -298,6 +298,41 @@ Each cycle describes one training phase.
 | `focuses` | string[] | optional | Unlimited list of focus statements |
 | `message` | object | optional | Only used when this is the current cycle (see below) |
 | `teaser` | object | optional | Only used when this is the next cycle (see below) |
+| `weekNotes` | object | **required on every new cycle** | The first and the last week of the cycle, shown by the app while that week is on (see below). ⚠️ Not `weeks`, which is the "Weeks 1–5" label. |
+
+#### `weekNotes` — the first week and the back-off week (2026-09-26)
+
+Amir: *"update the app in a way that it can show first week or last week."* Every cycle is four
+loading weeks plus a back-off week, and the exercise cards never change mid-cycle, so until now the
+back-off existed only if a notes card said so. In the audit that day, 16 of 34 live programmes had
+no such card, and in 12 finished cycles week-5 session RPE (6.71) matched weeks 1–4 (6.74).
+
+```json
+"weekNotes": {
+  "first": { "rpeCap": 7,
+             "text": "Start lighter than you think on the new exercises and keep every set at RPE 7 or under. From week 2 the card is your target." },
+  "last":  { "setsDrop": 1, "rpeCap": 6,
+             "text": "One set fewer on every exercise and every RPE at 6. You get stronger in the easy week, not only in the hard ones." }
+}
+```
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `first` | object | Shown in week 1, from the moment the cycle is published until day 7. **Required for a new athlete's first cycle**; for a returning athlete only when week 1 really differs (new exercises, a layoff, a return from injury). |
+| `last` | object | Shown in the cycle's last week (week 5 of 5). **Required on every cycle**; the one exception is a cycle Amir said has no back-off, checked with `--no-backoff`. |
+| `.text` | string | What the athlete reads, in Amir's voice: plain, short, under ~260 characters, the numbers in words. Starts with the instruction, never with its own label. An RPE going down names the floor in the same sentence ("never below 6"). |
+| `.title` | string | Optional label. Defaults to **Week 1** and **Back-off week**. |
+| `.setsDrop` | number | Optional, 1–3: how many sets fewer on every exercise. |
+| `.rpeDrop` | number | Optional, 1–3: how many points off every RPE, never below 6. |
+| `.rpeCap` | number | Optional, 6–9: no set above this RPE this week. |
+
+`last` must carry at least one of the three numbers, so the dose is a decision and not only a
+feeling. The numbers never change a card: the app shows `text` only (`weekNoteHTML()` in
+`program.html`, under **This Week** on Home and at the top of every session that week), and
+`scripts/check_program.py` reads the numbers. Nothing shows after `endDate`, and a cycle without
+`weekNotes` (every programme written before 2026-09-26) shows nothing: the app never invents a
+back-off. `/program-design` decides the dose, `/program-engage` writes the text, `/program-assemble`
+writes the object on `cycles[currentCycleIndex]`.
 
 #### `message` (only rendered on the current cycle)
 

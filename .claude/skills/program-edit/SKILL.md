@@ -99,6 +99,9 @@ reasoning stays in her log on the server; only the transferable process is here.
 
 Go through every day's blocks in order and flag any violation of the rules below. Present a summary to Amir before changing anything.
 
+*Rules 1–1c are COACHING-PRINCIPLES.md → Session structure → "What goes in a warm-up" (moved there
+2026-09-26 so the design pass applies them too). If the two ever differ, the principles win.*
+
 ### Rule 1 — No movement drills in gym sessions
 
 Athletic movement patterns do **not** belong in a gym-based fitness or strength session. Remove them entirely:

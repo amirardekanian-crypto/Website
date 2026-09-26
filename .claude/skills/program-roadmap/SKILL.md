@@ -20,42 +20,51 @@ never drift from the plan.
   asking again. The roadmap needs its `cycle_names_in_use`.
 
 ## Rules
-- **Multi-lens panel is MANDATORY (Amir's standing order, 2026-07-24; reshaped 2026-09-25).**
-  Read `.claude/COACHING-PRINCIPLES.md` → Process → "Every design pass is checked" and run
-  that shape via the Workflow tool: **exactly three lens agents** in parallel, each writing
-  one independent proposal (lenses picked to fit the athlete, e.g. sport-transfer
-  periodization · durability/return-to-play · recovery-constrained pragmatist). **You are the
-  judge:** score the three against the brief + principles yourself and synthesize the final
-  roadmap from the winner + best grafts. There is no separate judge agent any more.
-  - **No literature search unless Amir asks for one.** The lenses work from the brief, the
-    principles and what they know; the 2026-09-24 panel ran 15 PubMed searches and took 44
-    minutes. Three lenses with no search should take about 20.
-  - **Files only.** Write the brief (and the context pull's `cycle_names_in_use`) into a
-    scratchpad file before launching, pass its real path, and tell each lens not to call the
-    database or any MCP tool (COACHING-PRINCIPLES.md → Process → "Background agents work from
-    files"). Never launch with placeholder arguments.
-  Never skip the panel to save time; Amir asked for it on every program.
+- **One coherent pass, then one independent reviewer** (reshaped 2026-09-26 on Amir's *"you
+  decide what gets the highest quality program"*; COACHING-PRINCIPLES.md → Process → "Every
+  design pass is checked"). It replaces the three-lens panel, whose grafting produced the
+  recorded roadmap errors.
+  1. **Read the athlete first**, before any arc: the recovery ceiling (sleep, stress, life
+     load), every restriction and what it rules out, the goal order (primary, secondary), and
+     the bottleneck, the one thing that would move the goal most. /program-design STEP 1B builds
+     on this read instead of redoing it.
+  2. **Weigh two or three arcs in one place** (say strength-first, durability-first, a
+     power-leaning one) and write the one you would defend. Never graft cycles from different
+     arcs: a cycle only makes sense in the sequence around it.
+  3. **One reviewer agent** (the Agent tool, files only) critiques the finished arc against the
+     brief, the read and the principles: does each cycle set up the next, does anything break a
+     restriction, does Cycle 1 respect the first-cycle rules (no weighted lift under 8 reps, no
+     supersets). Write the brief, the read and the arc to scratchpad files first, pass their real
+     paths, and tell it in so many words not to call the database or any MCP tool
+     (COACHING-PRINCIPLES.md → Process → "Background agents work from files"). Apply every
+     must-fix.
+  4. **It locks without Amir's sign-off** (Amir, 2026-09-26: *"no doesnt need me"*): show it in
+     chat and carry on to /program-design.
+  - **No literature search unless Amir asks for one.**
 - **THE HOUSE SHAPE IS 5 CYCLES OF 5 WEEKS — 25 weeks.** *(Amir, 2026-08-17: "the rule is
   5 cycles of 5 weeks and you need to remember that.")* This is the default and you do not
   re-derive it from the goal each time. Cycle 1's length must match the first program
   /program-design will build, so it is 5 weeks too.
 - Deviate from 5×5 only when Amir says so for that athlete — and say plainly that you are
-  deviating and why. Do not quietly return a 4/5/5/4/6/5-style arc because a panel argued
-  for one; the panel proposes the CONTENT of the cycles, never their number or length.
-  ⚠️ A panel *will* argue for one: on Alireza N.'s roadmap the head-coach judge issued
-  "do not add a fifth cycle" as a binding directive. It is overruled. Fit the arc to 5×5 and
+  deviating and why. Do not quietly return a 4/5/5/4/6/5-style arc because the science seems to
+  argue for one; the arc decides the CONTENT of the cycles, never their number or length.
+  ⚠️ It will seem to: on one roadmap (2026-08-17) the old panel's judge issued "do not add a
+  fifth cycle" as a binding directive. It is overruled. Fit the arc to 5×5 and
   make the extra block do real work rather than padding it with a retest or a maintenance phase.
 - **Each cycle is 4 loading weeks + 1 back-off week.** The back-off is the 5th week of every
   cycle, which is what satisfies "never program past a fatigue wall" without a mid-cycle
-  deload. ⚠️ The back-off week is **NOT authored into the exercise cards** — see the rule
-  below.
-- ⚠️ **The cards carry the athlete's NORMAL prescription; temporary weeks live in the NOTES.**
-  A week-1 calibration week, a week-5 back-off, a low-readiness stretch — none of these are
-  ever written as a lower RPE/volume on the exercise itself. Amir does not change a program
-  mid-cycle, so the card is a stable reference all cycle and the temporary instruction is a
-  notes card written by /program-engage. Full rule: `.claude/COACHING-PRINCIPLES.md` →
+  deload. ⚠️ The back-off week is **NOT authored into the exercise cards**: /program-design sets
+  its dose as numbers and it ships as the cycle's `weekNotes.last`, which the app shows during
+  the last week (2026-09-26; SCHEMA.md → `weekNotes`).
+- ⚠️ **The cards carry the athlete's NORMAL prescription.** Week 1 and the back-off week live in
+  the cycle's `weekNotes`; a low-readiness stretch lives in a notes card. None of these is ever
+  written as a lower RPE/volume on the exercise itself. Amir does not change a program
+  mid-cycle, so the card is a stable reference all cycle. Full rule: `.claude/COACHING-PRINCIPLES.md` →
   Progression → "The RPE printed on a card is the athlete's NORMAL working target". Write
   roadmap focus lines the same way — describe how he trains *normally*, not how week 1 runs.
+- **Cycle 1 of a new athlete is never a heavy, low-rep block.** Their first cycle has no weighted
+  lift under 8 reps and no supersets (COACHING-PRINCIPLES.md → Volume & dosing), so give it a
+  foundation job (`bedrock`, `armour`, `build`), not `iron` or `voltage`.
 - **Name each cycle to be COOL and evocative** — a punchy 1–2 word power-name that *sells*
   the phase, not a dry label ("Lower Body Block" ✗). Lean on build / material / machine /
   combat imagery, and still hint at the phase's job. House library to draw on or extend:
@@ -68,15 +77,25 @@ never drift from the plan.
   the given start date).
 - Concise. This is a roadmap, not a program — no exercises.
 
-## Output (becomes `cycles[]` — names / taglines / weeks / dates / focuses / art only)
+## Output (becomes `cycles[]` — names / taglines / weeks / dates / focuses / art — plus the rationale)
 ```
 CYCLE 1 — [Name] · Weeks 1–[X] ([start] – [end])
 Tagline: …
 Art: [one of the ten families]
 Primary: …
 Secondary: …
+Exit test: [what should be true by the end of it, so the next cycle's job makes sense]
 [repeat for every cycle]
+
+ROADMAP RATIONALE (coach-only, 5–10 lines)
+The read: recovery ceiling · restrictions · goal order · the bottleneck.
+Why this order, and what each cycle sets up for the next.
+The arc you weighed and rejected, and why.
 ```
+The `cycles[]` fields go to the app. The **exit tests and the rationale go to the coaching log
+only**: /program-assemble writes them above the first cycle's entry, so every later
+/program-design can see what the arc was for instead of two focus lines. (Until 2026-09-26 the
+reasoning behind a roadmap was saved nowhere.)
 
 **Art** is the picture the athlete's cycle card shows. Pick the family that matches what
 the block actually trains, not what the name sounds like:

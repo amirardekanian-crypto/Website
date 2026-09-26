@@ -18,7 +18,7 @@ chat in this folder already has them** — nothing to install.
 | "build the json" (or "ship it") | Writes/updates their `data/[id].json` file |
 | "commit and push" | Puts it live on the site |
 
-You can talk normally — "design Mehraneh's next cycle," "write her notes,"
+You can talk normally — "design [name]'s next cycle," "write her notes,"
 "ship it." The slash names (`/program-design`) also work if you prefer.
 
 ---

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Four guards. Each runs only when its own files are staged, so a commit that
+# Six guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -77,7 +77,7 @@ fi
 # RPE row per round, and getting it wrong is silent BOTH ways — a prep circuit
 # demanding kilograms for a mobility drill (live on 13 circuits across 4
 # athletes until this was fixed), or a superset recording nothing, which cost
-# amir_ardekani C1 the per-set baseline on 5 of 16 exercises. The specific trap
+# one athlete's Cycle 1 the per-set baseline on 5 of 16 exercises. The specific trap
 # the check guards: deciding prep-ness from blockCategory(), whose positional
 # fallback makes "Core" at index 3 read as the warm-up block.
 if git diff --cached --name-only --diff-filter=ACM | grep -qx "program.html"; then
@@ -122,6 +122,32 @@ if git diff --cached --name-only --diff-filter=ACM      | grep -qE '^(program\.h
     echo "pre-commit: BLOCKED — the rx check failed (details above)."
     echo "If program.html and assets/js/chips.js disagree, fix BOTH — they are one model in two files."
     failed=1
+  fi
+fi
+
+# ── 6. no athlete ids in the public coaching docs (added 2026-09-26) ─────────
+# Why: this repo is PUBLIC. The coaching logs left it on 2026-09-07 for exactly that
+# reason, but the pipeline's own skill files kept naming athletes, two of them with
+# wrist and shoulder details, until the 2026-09-26 audit scrubbed them. The ids live
+# in .claude/athlete-ids.local, which is gitignored because a committed list would be
+# the leak itself (one id per line; /athlete-intake appends each new one). Only lines
+# being ADDED are checked, so an old mention elsewhere never blocks a commit. A clone
+# without the list skips this guard.
+ids_file=".claude/athlete-ids.local"
+if [ -f "$ids_file" ]; then
+  staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(\.claude/|\.githooks/)' | grep -vx "$ids_file")
+  if [ -n "$staged" ]; then
+    pats=$(mktemp)
+    tr -d '\r' < "$ids_file" | grep -v '^[[:space:]]*$' > "$pats"
+    hits=$(git diff --cached -U0 -- $staged | grep -E '^\+[^+]' | grep -ioFf "$pats" | sort -u)
+    rm -f "$pats"
+    if [ -n "$hits" ]; then
+      echo ""
+      echo "pre-commit: BLOCKED — athlete ids in lines being added to public coaching files:"
+      echo "$hits" | sed 's/^/  /'
+      echo "Write 'one athlete' or the next 'Athlete <letter>' instead; their record lives in public.coaching_logs."
+      failed=1
+    fi
   fi
 fi
 

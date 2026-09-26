@@ -92,8 +92,9 @@ only what isn't. **Never manufacture one that isn't real** — an invented win r
 and undercuts the genuinely earned ones around it. Some cycles won't have a big one; that's
 fine, don't force it.
 
-**Progression/regression explainer — mandatory for a NEW athlete (it's the week-1 calibration
-note, no separate one needed), conditional after that.** It teaches how the weight-selection
+**Progression/regression explainer — mandatory for a NEW athlete, conditional after that.** It
+teaches the mechanism; week 1's actual number (the RPE cap or drop) is the week note in PART 3c,
+not a line in this card. It teaches how the weight-selection
 system actually works, because the app never assigns a weight — the athlete finds it every
 time against the RPE target (see COACHING-PRINCIPLES.md → Progression). When it fires, cover:
 (1) calibrating a **new movement** — pick conservative, let the first set's RPE say go up or
@@ -181,6 +182,20 @@ opens the About sheet under **Why you**, and the cycle's Why page groups them by
   kg, so it stays and gets heavier"*); the numbers come from the athlete's own logs.
 - List them with the exercise name, like the Coach's Notes. Amir reviews them with the rest.
 
+**PART 3c — The two special weeks (2026-09-26).** From design's `week1:` and `lastweek:` lines,
+write the words the app shows the athlete during that week (`cycles[n].weekNotes`, SCHEMA.md),
+under This Week on Home and at the top of every session. Amir: *"update the app in a way that it
+can show first week or last week"*.
+- **One or two short sentences, under ~260 characters, in Amir's voice.** Start with the
+  instruction, never with the label: the app already prints **Week 1** or **Back-off week** above it.
+- **The numbers exactly as design decided, in words:** "one set fewer on every exercise",
+  "every RPE at 6". An RPE going down names the floor in the same sentence ("never below 6").
+- A few words of why, when it helps: *"You get stronger in the easy week, not only the hard ones."*
+- **Say it once.** No notes card repeats it. A longer protocol (a staged return) can still have a
+  card, and the week note can point to it.
+- The last week: every cycle. Week 1: whenever design wrote one (always for a new athlete).
+List them as `WEEK 1:` and `LAST WEEK:`, each with design's numbers, so assemble can store both.
+
 ## PART 4 — DAY COMPLETION MESSAGES
 For each training day in the program spec (Day 1…N), tied to that day's focus and how
 it serves the goal. Triumphant, not cheesy; one breath of recovery guidance is fine.
@@ -205,7 +220,9 @@ second message is coming and matters.
 **MESSAGE 2 — what to watch for.** The *actionable* half, mirroring the notes cards but as
 instructions: what to film and what it unlocks · any dated appointment or referral, with the
 escalation triggers · the weekly measurements and why they're numbers not feelings · fuelling ·
-the rest-day / load rule · and the **modification menu** (reporting buys a change, never a ban),
+the rest-day / load rule · **the back-off week with its dates** (and week 1, if it differs) ·
+where to weigh in, when the cycle needs it (the programme app's Home → Body Weight, never AA
+Proof) · and the **modification menu** (reporting buys a change, never a ban),
 which for a pain-hiding athlete is the single most important paragraph in either message. Fold
 any outstanding question (unquantified swim volume, missing history) in here so the answer comes
 back without a separate ask.
@@ -233,3 +250,5 @@ Hand off to **/program-assemble** to write everything into `data/<id>.json`.
 - Don't write an exercise Coach's Note as HTML — it's a short plain-text callout, not a
   notes card. Don't invent one for an exercise design didn't flag, and don't have it
   re-explain a protocol its matching notes card already covers.
+- Don't put week 1 or the back-off week in a notes card. They are the week notes (PART 3c), which
+  the app shows in that week; a card would say it twice.

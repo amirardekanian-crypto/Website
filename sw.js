@@ -36,7 +36,11 @@
 // v18: program.html changed (Library → Exercises, the third door, 2026-09-24).
 // v20: program.html changed (2026-09-24): exercises inside a circuit show their Spine entry's cues
 // when they carry none of their own, the same as a standalone card.
-const CACHE = 'aap-v25';
+// v26: program.html changed (2026-09-26): the first and last week of a cycle show the
+// coach's note for that week (cycles[n].weekNotes) under This Week and at the top of a session.
+// Also: Personal Records' "Add your body weight" now opens this app's own weight screen (its
+// "Open AA Proof" button led to a Proof that has had no weight screen since 2026-09-12).
+const CACHE = 'aap-v26';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

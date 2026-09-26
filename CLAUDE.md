@@ -66,8 +66,9 @@ done when the program is done"*). Whether it is `/program-assemble` (a new cycle
    `suggested_qualities` for Amir to accept), so no day card goes blank.
 3. **Quality check**: each day's top three (what its Home day card will say), and the cycle's
    `art` headline in the week's top two unless it is bedrock/peak/reset.
-4. **Because**: 5–10 fresh `why`s on the exercises chosen for this athlete, audited; a removed
-   exercise takes its `why` with it.
+4. **Because**: on a new cycle, 5–10 fresh `why`s on the exercises chosen for this athlete,
+   audited. On an edit, only the exercises the edit changes: a removed exercise takes its `why`
+   with it, and a swap made for this athlete gets one (a correction changes only what Amir named).
 5. **One report block** in the handoff: `SPINE …` and `QUALITY …` lines, plus anything that
    needs Amir (drafts to approve, proposals on approved entries).
 Never approve anything without Amir's word, and never put athlete-specific detail on a Spine entry.
@@ -360,6 +361,29 @@ prescribed number and a tick means "done as written", so a range leaves the app 
 `auditRx()` flags one as `rep-range`. Thirteen legacy `chips[]` ranges still sit in three live
 programmes (amirabbas_esh1, bardia_ahmadi, lem_cass1); the app shows them as a range and records
 reps only when the athlete types them, rather than inventing the low end.
+
+### 🗓️ Week 1 and the back-off week are DATA — `cycles[n].weekNotes` (2026-09-26)
+
+Every cycle is 4 loading weeks + 1 back-off, and the cards never change mid-cycle, so the back-off
+used to exist only if a notes card said so. The pipeline audit that day found 16 of 34 live
+programmes with no back-off wording and no drop in week-5 session RPE across 12 finished cycles.
+Amir: *"update the app in a way that it can show first week or last week"*.
+- **`cycles[n].weekNotes = { first?, last }`**, each `{ text, title?, setsDrop?, rpeDrop?, rpeCap? }`
+  (SCHEMA.md → `weekNotes`). ⚠️ **Not `weeks`**, which is the "Weeks 1–5" label string; the first
+  build used that name and would have broken every cycle card.
+- **program.html `weekNoteHTML()`** shows the text (in the Coach's Note look) under **This Week** on
+  Home and at the top of every session, only in week 1 and in the last week, from the same
+  `cycleWeekInfo()` that draws "Week X of Y". Nothing after `endDate`, and nothing for a cycle
+  without the field: the app never invents a back-off. The numbers never change a card.
+- **The pipeline owns it:** /program-design decides both doses as numbers (`week1:` / `lastweek:`),
+  /program-engage writes the words (PART 3c), /program-assemble stores them, and
+  `scripts/check_program.py` FAILs a cycle with no `weekNotes.last` (and a first cycle with no
+  `weekNotes.first`). The 32 older programmes gain it with their next cycle, not by a bulk write.
+- The same day `check_program.py` took Amir's answers from the audit: the 10-set floor is `--floor`
+  (strength-and-muscle aims only, every major muscle, any sex; `floor-except:` names an excused
+  muscle), more than 4 sets needs `--proven`, a first cycle switches the new-athlete rules on by
+  itself (`--female` is retired), and the Quality headline is a WARN reported with a recommendation.
+  All of it is in COACHING-PRINCIPLES.md, with the dates.
 
 ### 🕘 The Card Remembers — last time on every exercise (2026-09-24)
 

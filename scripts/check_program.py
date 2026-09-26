@@ -15,9 +15,19 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
 
   --log FILE      the coaching-log entry with the per-exercise volume table (| Day | Exercise |
                   Sets | Counts toward |). Needed for the floors and the back-to-back check.
-  --female        the women's lower-body floor: quads, hamstrings, glutes each >= 10 sets/week
-  --new           a new athlete's first cycle: no weighted exercise under 8 reps, and no
-                  working circuits (supersets) at all
+  --floor         the programme's aim is to get strong and build muscle (Amir, 2026-09-26:
+                  "that rule is based on science of hypertrophy, for athletes, do what is best
+                  for them"): every major muscle (quads, hamstrings, glutes, back, chest,
+                  shoulder) >= 10 sets/week. Not for a sport-performance athlete. Replaces
+                  --female, which only floored women's lower body.
+  --floor-except  comma list of major muscles excused from the floor, each for a reason the
+                  spec states (chest, posture). Without it, the spec's "floor-except: ..." line
+  --proven        the athlete has PROVEN the volume in our own logs, so an exercise may carry
+                  more than 4 sets (Amir, 2026-09-26: a self-described "pro" is not proof)
+  --no-backoff    this cycle has no back-off week, ONLY because Amir said so for this athlete
+  --new           a new athlete's first cycle: no weighted exercise under 8 reps, no working
+                  circuits (supersets) at all, and a first-week note. Also switched on by
+                  itself when currentCycleIndex is 0
   --cap MIN       the session cap in minutes (default 60). SOFT: a day past it is a WARN, never a
                   FAIL (Amir, 2026-09-26: the form's session length is a guess). Pass the
                   athlete's real logged minutes when you have them.
@@ -49,6 +59,8 @@ MUSCLE_ALIAS = {'quad': 'quads', 'quadriceps': 'quads', 'hams': 'hamstrings', 'h
                 'glute': 'glutes', 'shoulders': 'shoulder', 'calf': 'calves', 'adductor': 'adductors',
                 'forearms': 'forearm', 'bicep': 'biceps', 'tricep': 'triceps', 'lats': 'back'}
 LOWER = ('quads', 'hamstrings', 'glutes')
+# The major muscles a strength-and-muscle programme floors at 10 sets a week (--floor).
+MAJOR = ('quads', 'hamstrings', 'glutes', 'back', 'chest', 'shoulder')
 NEGATION = re.compile(r"\b(no|not|never|nothing|without|avoid|avoids|banned|ban|instead of|skip|don't|do not|"
                       r"are out|is out|ruled out|off the table)\b", re.I)
 
@@ -99,6 +111,12 @@ def text_fields(data):
         for part in ('message', 'teaser'):
             for p in (c.get(part) or {}).get('paragraphs') or []: yield f"cycle {c.get('num')} {part}", p
             for o in (c.get(part) or {}).get('outcomes') or []: yield f"cycle {c.get('num')} outcome", o
+        wn = c.get('weekNotes')
+        for k in ('first', 'last'):
+            n = wn.get(k) if isinstance(wn, dict) else None
+            if isinstance(n, dict):
+                for f in ('title', 'text'):
+                    if n.get(f): yield f"cycle {c.get('num')} weekNotes.{k} {f}", n[f]
     for d in (data.get('workouts') or {}).get('days') or []:
         for k in ('focusTag', 'completionTitle', 'completionMessage'):
             if d.get(k): yield f"Day {d.get('id')} {k}", d[k]
@@ -145,7 +163,12 @@ def check_structure(data, args):
         if isinstance(rx.get('reps'), str) and re.search(r'\d\s*[-–]\s*\d', rx['reps']):
             fail(f"{where}: a rep range ({rx['reps']}): one number, never a range")
         sets = num(rx.get('sets'))
-        if sets and sets > 4: fail(f"{where}: {int(sets)} sets (never more than 4 on one exercise: add an exercise)")
+        # 4 is the cap for everyone who hasn't proven more in OUR logs (Amir, 2026-09-26: people
+        # who call themselves pro can be very weak in practice, "but if we have an athlete who
+        # proved himself, in the logs, and in our cycles, why not go over").
+        if sets and sets > 4:
+            if args.proven: info(f"{where}: {int(sets)} sets, over the usual 4, allowed because the athlete has proven the volume in our logs (--proven)")
+            else: fail(f"{where}: {int(sets)} sets (never more than 4 on one exercise until the athlete has proven more in our logs: add an exercise, or pass --proven and name the evidence)")
         rpe = num(str(rx.get('rpe', '')).split('-')[0]) if rx.get('rpe') not in (None, '') else None
         if rpe is not None and rpe < 6: fail(f"{where}: RPE {rx.get('rpe')} is under the floor of 6")
         if prep and rx.get('rpe') not in (None, ''): warn(f"{where}: RPE on a warm-up item")
@@ -203,6 +226,48 @@ def check_whys(data):
         text = (w.get('text') or '').strip()
         if len(text) > 140: fail(f"{where}: {len(text)} characters (140 max)")
         if re.search(r'[—;]', text): fail(f"{where}: an em-dash or semicolon")
+
+def check_week_notes(data, args):
+    """The first and last week of the cycle being built (cycles[currentCycleIndex].weekNotes).
+    Every cycle is 4 loading weeks + 1 back-off week, and the card never changes mid-cycle, so
+    the back-off only happens if something tells the athlete. Before 2026-09-26 that was a
+    notes card nobody was required to write: 16 of 34 live programmes had none. The app now
+    shows weekNotes.first in week 1 and weekNotes.last in the last week (program.html
+    weekNoteHTML), so both are data, and required."""
+    cycles = data.get('cycles') or []
+    i = data.get('currentCycleIndex') or 0
+    cyc = cycles[i] if 0 <= i < len(cycles) else {}
+    wn = cyc.get('weekNotes')
+    if wn is not None and not isinstance(wn, dict):
+        fail(f"cycle {cyc.get('num')}: weekNotes must be an object {{first, last}}"); return
+    wn = wn or {}
+    for key in ('first', 'last'):
+        n = wn.get(key)
+        if n is None: continue
+        where = f"cycle {cyc.get('num')} weekNotes.{key}"
+        if not isinstance(n, dict) or not str(n.get('text') or '').strip():
+            fail(f"{where}: needs a text, the words the athlete reads"); continue
+        for f in ('setsDrop', 'rpeDrop'):
+            if f in n and not (isinstance(n[f], int) and 1 <= n[f] <= 3):
+                fail(f"{where}: {f} is how many fewer (a whole number, 1 to 3), got {n[f]!r}")
+        if 'rpeCap' in n and not (isinstance(n['rpeCap'], (int, float)) and 6 <= n['rpeCap'] <= 9):
+            fail(f"{where}: rpeCap must be 6 to 9 (the app's floor is 6), got {n['rpeCap']!r}")
+        if len(n['text']) > 260: warn(f"{where}: {len(n['text'])} characters; it's a note, keep it under ~260")
+        label = (n.get('title') or ('Back-off week' if key == 'last' else 'Week 1')).lower()
+        if n['text'].strip().lower().startswith(label):
+            warn(f"{where}: the text starts by repeating its label ('{label}'); start with the instruction")
+    last = wn.get('last')
+    if args.no_backoff:
+        info('no back-off week this cycle (--no-backoff: only on Amir\'s word)')
+    elif not isinstance(last, dict):
+        fail(f"cycle {cyc.get('num')}: no weekNotes.last. Every cycle ends with a back-off week: "
+             "design sets the dose (setsDrop / rpeDrop / rpeCap) and engage writes the text")
+    elif not any(k in last for k in ('setsDrop', 'rpeDrop', 'rpeCap')):
+        fail(f"cycle {cyc.get('num')} weekNotes.last: name the back-off dose as numbers (setsDrop, rpeDrop or rpeCap), not only words")
+    if args.new and not isinstance(wn.get('first'), dict):
+        fail(f"cycle {cyc.get('num')}: a new athlete's first cycle needs weekNotes.first (how week 1 finds their weights, with the number)")
+    elif not isinstance(wn.get('first'), dict):
+        info(f"cycle {cyc.get('num')}: no weekNotes.first (fine when nothing in week 1 is different)")
 
 def ban_hit(word, s):
     return re.search(r'(?<![a-z])' + re.escape(word.lower()) + r'(e?s)?(?![a-z])', s.lower())
@@ -348,15 +413,29 @@ def check_volume(data, args):
             if dm: per_day.setdefault(dm.group(1), {}).setdefault(mm, 0); per_day[dm.group(1)][mm] += n
     for key, (day, name) in loaded.items():
         if key not in listed: fail(f"Day {day} {name}: a loaded exercise missing from the volume table (count every exercise that loads a muscle)")
+    # The 10-set floor is hypertrophy science, so it binds a programme whose aim is strength and
+    # muscle, man or woman; a sport-performance athlete gets what is best for them (Amir,
+    # 2026-09-26). --floor switches it on; floor-except names a muscle excused for a stated reason.
+    excused = floor_excused(args)
     for mm in sorted(total, key=lambda k: -total[k]):
         v = total[mm]
-        if args.female and mm in LOWER and v < 10: fail(f"{mm} {v:g} sets/week: under the women's floor of 10")
-        elif mm == 'shoulder' and not (10 <= v <= 20): warn(f"shoulder {v:g} sets/week: the range is 10-20")
+        if args.floor and mm in MAJOR and v < 10:
+            if mm in excused: info(f"{mm} {v:g} sets/week: under 10, excused (floor-except)")
+            else: fail(f"{mm} {v:g} sets/week: under the floor of 10 for a strength-and-muscle programme (or floor-except it, with the reason in the spec)")
         elif v > 20: warn(f"{mm} {v:g} sets/week: over 20")
+        elif mm == 'shoulder' and v < 10: warn(f"shoulder {v:g} sets/week: under the usual 10-20")
         else: info(f"{mm} {v:g} sets/week")
-    for mm in LOWER:
-        if args.female and mm not in total: fail(f"{mm}: 0 sets/week (not in the volume table)")
+    for mm in MAJOR:
+        if args.floor and mm not in total and mm not in excused: fail(f"{mm}: 0 sets/week (not in the volume table)")
     return per_day
+
+def floor_excused(args):
+    """Major muscles excused from --floor: --floor-except, else the spec's 'floor-except:' line."""
+    s = args.floor_except
+    if not s and args.spec:
+        m = re.search(r'^\s*floor[- ]except\s*:\s*(.+)$', open(args.spec, encoding='utf-8').read(), re.I | re.M)
+        s = m.group(1) if m else ''
+    return {norm_muscle(re.sub(r'\(.*?\)', '', w)) for w in (s or '').split(',') if w.strip()}
 
 def check_week(data, args, per_day):
     if not args.week: return
@@ -472,7 +551,16 @@ def check_spine(data, args):
     if not art: warn('no cycle art word, so no headline check')
     elif not head: info(f"headline: '{art}' is a phase (bedrock, peak or reset), no headline check. Week: {top}")
     elif head in ranked[:2]: info(f"headline {art} → {head}: in the week's top two ✓ ({top})")
-    else: fail(f"headline {art} → {head} is not in the week's top two ({top}): fix the week or the art word")
+    else:
+        # Reported, never failed (Amir, 2026-09-26: "report it, but recommend what you think should
+        # happen"). Counting sets under-weights qualities trained in few sets, so a real power block
+        # can put Power third; adding volume only to move this line would bend the programme to a label.
+        hint = ("normal for a quality trained in few, fast sets: keep the week if that work comes first "
+                "in the day, otherwise add one exercise for it or change the art word"
+                if head in ('power', 'speed', 'spring') else
+                "add work for it, or change the art word if the block really trains something else")
+        warn(f"headline {art} → {head} is not in the week's top two ({top}). Tell Amir in the handoff with "
+             f"your recommendation (suggested: {hint}). Never add volume only to satisfy this line")
 
 # ── the two printouts ─────────────────────────────────────────────────────────
 def spine_sql(data):
@@ -514,7 +602,10 @@ from walk where jsonb_typeof(val) not in ('object', 'array');""")
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('program')
-    ap.add_argument('--log'); ap.add_argument('--female', action='store_true'); ap.add_argument('--new', action='store_true')
+    ap.add_argument('--log'); ap.add_argument('--new', action='store_true')
+    ap.add_argument('--floor', action='store_true'); ap.add_argument('--floor-except')
+    ap.add_argument('--proven', action='store_true'); ap.add_argument('--no-backoff', action='store_true')
+    ap.add_argument('--female', action='store_true', help=argparse.SUPPRESS)  # retired 2026-09-26
     ap.add_argument('--cap', type=float, default=60); ap.add_argument('--ban'); ap.add_argument('--spec')
     ap.add_argument('--week'); ap.add_argument('--spine'); ap.add_argument('--art')
     ap.add_argument('--spine-sql', action='store_true'); ap.add_argument('--fingerprint', action='store_true')
@@ -523,7 +614,14 @@ def main():
     athlete_id = (data.get('athlete') or {}).get('id', '<id>')
     if args.spine_sql: spine_sql(data); return 0
     if args.fingerprint: fingerprint(data, athlete_id); return 0
-    check_structure(data, args); check_text(data); check_cards(data); check_whys(data)
+    if args.female:
+        warn('--female is retired and did nothing: pass --floor only when the aim is strength and muscle (any athlete, any sex)')
+    # A first cycle is a new athlete's, whatever the command line remembered (2026-09-26: a
+    # forgotten flag used to skip the new-athlete rules without a word).
+    if not args.new and (data.get('currentCycleIndex') or 0) == 0:
+        args.new = True
+        info('currentCycleIndex is 0, so the new-athlete rules apply (no weighted lift under 8 reps, no working circuits, a first-week note)')
+    check_structure(data, args); check_text(data); check_cards(data); check_whys(data); check_week_notes(data, args)
     check_bans(data, args); check_time(data, args)
     per_day = check_volume(data, args) if args.log else {}
     if not args.log: warn('no --log: the volume floors and back-to-back days were not checked')

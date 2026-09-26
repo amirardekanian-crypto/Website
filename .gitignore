@@ -26,6 +26,11 @@ data/*.json
 # if you like; they must never be committed again.
 .claude/coaching-log/
 
+# Every athlete id, one per line, for the pre-commit guard that keeps them out of the
+# public coaching docs (.githooks/pre-commit, guard 6). Committing the list would be
+# the very leak it guards against. /athlete-intake appends each new id.
+.claude/athlete-ids.local
+
 # Local database backups (backup_supabase.py). Dated copies of every athlete's
 # programme, training history and coaching log — the whole point is that they live
 # on Amir's PC and nowhere else. The script writes to ~/AA-Backups by default, well

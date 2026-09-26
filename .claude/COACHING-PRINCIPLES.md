@@ -87,6 +87,14 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
 - **Hypertrophy-accumulation blocks: machine/SFR primaries are acceptable even for sport
   athletes** — transfer isn't lost, it's deferred to the later power/translation cycle
   (e.g. Leg Press over Back Squat for a tennis player in a mass block). *(2026-07-12)*
+- **Accessories rotate every cycle, BY VARIANT.** *(Amir, 2026-09-26, asked how to square rotation
+  with "no supersets on a new exercise": "rotate by variant".)* The new pick is the same movement
+  pattern on a different implement, stance, angle or grip (the Spine entry's **Alternatives**), or its
+  **Progression** when the athlete has earned it: a DB row becomes a chest-supported or cable row, a
+  goblet squat a heels-elevated goblet squat. It reads as new to the athlete, keeps the movement skill
+  and keeps what their logs already know. **A variant of a movement the athlete has logged is not "new
+  to the client"**, so it may be supersetted from Cycle 2 (Session structure & time). A genuinely new
+  pattern is still fine when the athlete needs it; it just runs as straight sets its first cycle.
 - **Accessories rotate every cycle** for variety — always to a *safe* alternative. **The goal is
   perceived novelty, not physiological necessity** — the athlete should feel the program changed,
   even when a new superset/format pairing is the bigger stimulus change that cycle. Don't skip
@@ -182,8 +190,8 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   not your worry, you always prescribe what is best for the athlete, and the ill add videos
   manually.")* Prescribe the best movement for the athlete, always; don't downgrade a choice,
   substitute a lesser exercise, or hedge because a name isn't in `exercise_library.json` yet.
-  Off-library picks are normal and expected — just follow the naming convention and note them for
-  Amir. Extends "the library is a video-join key, not a whitelist" (Exercise naming) from
+  Off-library picks are normal and expected — follow the naming convention, and since 2026-09-25
+  the new exercise joins the Spine in full in the same run (Exercise naming, below). Extends "the library is a video-join key, not a whitelist" (Exercise naming) from
   permission into a standing instruction.
 - **A removed exercise stays removed unless re-earned.** When something is dropped for dislike,
   inability, or pain, record *why* in the coaching log — and don't reintroduce it next cycle
@@ -223,11 +231,12 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   Lateral Lunge, Glute Bridge — not "Bodyweight Reverse Lunge"). *(2026-06-19)*
 - **Defining setups DO belong in the name** (Chest-Supported, Heels-Elevated,
   Half-Kneeling, Incline, B-Stance, Bottoms-Up, Single-Arm, Single-Leg). *(2026-06-15)*
-- **Never in the name → these are chips, not the name:** grip · focus/intent · range
-  qualifier · tempo emphasis · holds/durations · bare digits · parentheses · colons ·
-  commas. (A dose like a 30s plank → the `×`-prefixed reps chip; a pause/hold emphasis →
-  a modifier chip.) **Exception — digits in an established/canonical name stay** (45° Back
-  Extension, 90/90, B-Stance); don't mangle them. *(2026-06-19)*
+- **Never in the name → these go in the prescription, the pill or the Coach's Note:** grip ·
+  focus/intent · range qualifier · tempo emphasis · holds/durations · bare digits · parentheses ·
+  colons · commas. (A 30s plank → `rx.time: "30s"`; a hold → `rx.tempo: "iso"`; a grip or one
+  intention → the `intent` pill; anything else for this athlete → the Coach's Note. `chips[]` is
+  legacy and never written: SCHEMA.md → `rx`.) **Exception — digits in an established/canonical name stay** (45° Back
+  Extension, 90/90, B-Stance); don't mangle them. *(2026-06-19; rx wording 2026-09-26)*
 - **Grip / intent / execution tweak is a chip, never the name** (e.g. Lat Pulldown +
   `wide grip`; Chin-Up). Keeps card titles clean and stable. *(2026-06-15)*
   **And never free text either:** on an `rx` card the chip is `intent` (`"intent": "neutral grip"`),
@@ -279,14 +288,19 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
 ## Recovery & autoregulation
 - **Recovery capacity gates everything** — set the weekly volume ceiling *before*
   choosing session count. *(2026-06-15)*
-- **High-/chronic-stress clients:** embed an autoregulation rule (drop every RPE by 1 on
-  low-readiness days, **never below 6**) + a minimum effective dose (first power move +
-  first primary lift) + flexible session order. *(2026-06-15, floor added 2026-08-21)*
+- **Every athlete gets the low-readiness rule; high-stress and concurrent athletes get the full
+  kit.** Everyone has rough days and the app already asks about readiness, so every programme
+  carries one line: on a low-readiness day, take 1 off every RPE, **never below 6** (anything at 6
+  stays at 6). High- or chronic-stress clients and concurrent athletes also get a minimum effective
+  dose (first power move + first primary lift) and a flexible session order. *(2026-06-15, floor
+  added 2026-08-21, the one line made universal 2026-09-26: Amir left the scope to the
+  recommendation)*
 - **Separate training fatigue from life load** in every review — a readiness dip from
   poor sleep/stress is not the same as training fatigue (Athlete D's end-cycle dip was
   life, not load). *(2026-06-15)*
 - **Never program past a fatigue wall** — build a deload/back-off after dense weeks
-  (Athlete D ran 4 sessions in 5 days in C2 and hit a wall). *(2026-06-15)*
+  (Athlete D ran 4 sessions in 5 days in C2 and hit a wall). *(2026-06-15)* Every cycle's
+  last week is that back-off, written as `weekNotes.last` (Process → 5 cycles of 5 weeks).
 - **Concurrent athletes (heavy sport schedule alongside the gym) always get a double-day
   rule in autoregulation.** When most gym days will also be sport days, the program must say
   what to do on one: gym after the sport session, or at least 4–6 h apart; if the gap is
@@ -322,6 +336,17 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   The full prep (cardio raise + mobilisation/activation circuit) should occupy 10 min
   minimum, up to 15. This is programmed time, not filler: it primes the patterns trained
   that session and is part of the dose. *(2026-06-19)*
+- **What goes in a warm-up.** *(Amir's rules from 2026-06/07, kept until 2026-09-26 only in
+  /program-edit's checklist and memory, where the design pass never saw them.)*
+  - **A gym client warms up on a machine** (bike, treadmill or rower, easy pace), never a walk, a
+    march on the spot or arm swings. Equipment-free warm-ups are for home and bodyweight programmes.
+  - **No joint-isolation drills in a STRENGTH session's prep**: no CARs, hip or leg circles, or
+    anything cued "isolate the joint". Use a movement that mobilises, activates and rehearses the
+    day's pattern (reverse or lateral lunge, Cossack squat, World's Greatest Stretch, band
+    pass-through, band pull-apart; Cat-Cow only where the back allows flexion). Running, speed and
+    change-of-direction warm-ups are different: leg swings, skips and running drills belong there.
+  - **Movement drills (skips, shuffles, cone work, sprints) are not gym-session filler.** They belong
+    on the outside or court day, or in its warm-up, not in a strength day's prep.
 - **Warm-up / prep logs nothing — and carries no RPE.** Prep circuits use `warmup: true`
   (no weight, no RPE field); warm-up `simple` items (bike, treadmill, mobility drills) carry
   only their dose chip (duration or reps) — **no RPE chip**. An RPE on a warm-up is noise;
@@ -346,6 +371,11 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   move on. *(2026-09-26, Amir, verbatim: "sometimes an athlete when filling the form say i only
   have 60 minute, but then eveytime they go to the gym, they spend 75 minutes, and they NEVER
   complain, it means they could do more 😃 so days time cap, is usually not very important")*
+  **A new athlete has no logs yet: design to the form's minutes plus 15** (Amir, same day,
+  "form + 15"), unless they said plainly that the time is a hard stop.
+- **No competition calendar unless Amir names one.** Design the 5×5 arc straight through; if an
+  athlete has tournaments or a season that should bend it, Amir says so. *(Amir, 2026-09-26: "if
+  there is, i would tell you so, otherwise assume no")*
 - **Sequencing:** power/CNS → primary strength → accessories → corrective/core. *(2026-06-15)*
 - **Standard section (block) names** — Activation & Prep → [power] → Primary → Accessory →
   Core → [conditioning]; use these so the app's section headers stay consistent across
@@ -368,7 +398,9 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   Front-Foot-Elevated Split Squat, the only such instance across every multi-primary day in
   this athlete's entire file; tag removed.)*
 - **No supersets in an athlete's first cycle, or on any exercise new to that client** (even in
-  a later cycle). Pairing two not-yet-calibrated loads/movements adds logistics friction
+  a later cycle). **A variant of a movement they have already logged is not new** (accessories
+  rotate by variant, see Exercise selection, 2026-09-26), so from Cycle 2 a rotated accessory can be
+  paired. Pairing two not-yet-calibrated loads/movements adds logistics friction
   exactly when you need clean baseline data — run straight sets with independent rest until
   each movement has at least one cycle of logged working weights, then superset from there.
   ⚠️ **The friction is concrete: a circuit logs ONE weight per exercise for the whole block and
@@ -378,7 +410,7 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   which of the two lifts is the one running hot. **This applies to a mid-cycle restructure too,
   not just the original build** — merging two already-running straight-set exercises into a pair
   destroys the resolution they were already giving you. *(2026-07-05, Athlete M C1; again
-  amir_ardekani C1, caught 2026-09-15 on Amir's review — three supersets had been merged in
+  Athlete Q C1, caught 2026-09-15 on Amir's review — three supersets had been merged in
   mid-cycle, leaving 5 of 16 working exercises with no baseline going into "Forge — Earn the
   Load", while the Delt pair logged an identical `R1 9 · R2 9 · R3 9` against a prescribed RPE
   7/8 for two sessions running. The same two lifts had logged cleanly per set, with RPE, before
@@ -431,9 +463,11 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   — every temporary reduction is explained in the notes, never baked into the prescription.**
   *(Amir, 2026-08-07: "i wont change the program RPE in middle of the cycle … in their program
   you must write their normal effort target, but explain in the notes to reduce rpe for those
-  reasons.")* Week-1 calibration, a deload/back-off week, a low-readiness day, a medication
-  change, a period week — all of these are **notes-card instructions to the athlete**, not a
-  lower number authored onto the exercise. The card is a stable reference she reads all cycle;
+  reasons.")* Week-1 calibration and the back-off week are the cycle's **`weekNotes`**, which the
+  app shows during that week (2026-09-26, Amir: *"update the app in a way that it can show first
+  week or last week"*); a low-readiness day, a medication change, a period week are
+  **notes-card instructions to the athlete**. None of them is a lower number authored onto the
+  exercise. The card is a stable reference she reads all cycle;
   rewriting it for a temporary condition breaks the week-to-week progression read (a logged
   RPE 6 then means two different things) and forces a mid-cycle edit the program is not
   supposed to need. A genuinely light day in the design — an undulation choice, a low-CNS
@@ -446,7 +480,9 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   mode, and a card that merely teaches load-finding ("start under what you think and let the
   first set tell you") is NOT that instruction — it explains *how* to pick a weight, never
   that this week's effort ceiling is lower. Whenever the design read says start lower, write
-  a notes card that names: **the reduced RPE as an actual number** (≥6 — see the RPE-floor
+  it where she will meet it: week 1 is `weekNotes.first` (with `rpeCap` or `rpeDrop`), and a
+  longer start-lower, like a staged return, is a notes card. Either way it names: **the reduced
+  RPE as an actual number** (≥6 — see the RPE-floor
   rules in "Chips & modifiers"), **which exercises it applies to**, and **what moves her back
   to the number on the card**. Triggers: a layoff or detraining, week-1 recalibration, a
   deload/back-off week, a movement new to the client, a staged return from injury, a period
@@ -455,8 +491,8 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   with only a load-finding card and no stated week-1 ceiling.)*
 - **Never prescribe a rep range — always a single rep number.** The app has no rep-range
   field; it prescribes exactly one number per exercise (e.g. `×10 Reps`, never `×8–10 Reps`).
-  When translating a design intent that's naturally a range (hypertrophy 8–10, etc.), pick one
-  number — by convention, the top of the intended range — and write that. This applies to
+  When the design intent is naturally a zone (hypertrophy 8–10, etc.), /program-design writes the
+  one number it means; nobody downstream picks an end for it. This applies to
   every exercise on every day, including circuit items and unilateral (`Each Side`) reps.
   *(2026-07-08, Athlete O C1 — caught 15 rep-range chips across the program and converted them.)*
   **Reconfirmed 2026-09-24** (Amir: *"I don't prescribe rep ranges"*), after a 2026-09-20 schema
@@ -487,9 +523,10 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   cycle. *(2026-07-08, made conditional 2026-07-12)*
 
 ## Volume & dosing
-- **Volume is a report, not a rule.** Show programmed sets/muscle vs the goal range vs a
-  verdict; frame an under-dose as "maintenance" for time-limited clients (not failure),
-  and say where to invest if/when time allows. *(2026-06-15)*
+- **Volume is a report, not a rule, for a sport-performance athlete.** Show programmed
+  sets/muscle vs the goal range vs a verdict; frame an under-dose as "maintenance" for
+  time-limited clients (not failure), and say where to invest if/when time allows. *(2026-06-15)*
+  When the programme's aim is strength and muscle, the 10-set floor below is a rule instead.
 - **Manage load per DAY, not just per week — weight by systemic cost, then undulate.**
   Raw set count lies: 21 isolation sets ≠ 13 heavy-compound sets. Weight each working set
   by neural/systemic cost (heavy compound ≈ ×1.5, moderate compound ≈ ×1.0, isolation ≈
@@ -507,8 +544,16 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   Use this as the working ceiling when sizing weekly/per-day muscle volume, not just intuition.
   *(2026-07-08, sc-research brief — Schoenfeld 2017, Iversen 2022 umbrella review, Pelland 2025
   meta-regression, Barbalho 2019, Krause Neto 2025 for glute-specific)*
-- **Women's lower body: quads, hamstrings and glutes each clear ≥10 working sets/week — a hard
-  floor, not a target.** The 10–20 range above is a rule to satisfy, not a band to approach from
+- **When the programme's aim is to get strong and build muscle, every major muscle clears ≥10
+  working sets/week — a hard floor, not a target** (quads, hamstrings, glutes, back, chest,
+  shoulder; any athlete, any sex). *(Amir, 2026-09-26, verbatim: "its a floor for when the program
+  aim is to get strong and build muscles, that rule is based on science of hyper trophy, for
+  athletes, do what is best for them and their condition.")* It began as the women's lower-body
+  rule below and now covers the aim, not the sex. A sport-performance athlete (tennis, padel)
+  gets what is best for them and their condition, and their volume is a report. The checker
+  applies it with `--floor`; a muscle excused for a stated reason (chest on a rounded-shoulder
+  client, below) goes on the spec's `floor-except:` line. Where it began: **women's lower body,
+  quads, hamstrings and glutes each ≥10.** The 10–20 range above is a rule to satisfy, not a band to approach from
   below. Never sign a major lower-body muscle off as "maintenance by design" just because it isn't
   the athlete's headline goal — under 10 needs a stated, genuinely good reason, and "it's
   secondary to her physique goal" is not one. Where the sets go: the day with the lowest
@@ -539,9 +584,15 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   load should be 10 sets total. So if she is doing rear delt, it counts" and, when the rewrite
   landed at exactly 10, "10 is not a cap, 10-20 is good." Athlete G C3 first drafted at 26 shoulder
   sets/week by scoring each head against its own 10-20 range.)*
-- **Never more than 4 working sets on one exercise for an intermediate athlete. If a muscle needs
-  more volume, ADD AN EXERCISE.** *(2026-09-05, Amir, verbatim: "For an intermediate athele, never
-  go for more than 4 sets in an exercise. Always add a new exercise. This is a rule.")* This is the
+- **Never more than 4 working sets on one exercise, until the athlete has PROVEN more in our own
+  logs. If a muscle needs more volume, ADD AN EXERCISE.** *(2026-09-05, Amir, verbatim: "For an
+  intermediate athele, never go for more than 4 sets in an exercise. Always add a new exercise. This
+  is a rule." Scope set 2026-09-26: "some people call them selves pro, or they say that they have a
+  long experience of gym training, but practically, they are very week, so doing 5 sets of
+  something, will hurt them, but if we have an athlete , who proved him self, in the logs, and in
+  our cycles, why not go over than that.")* What the athlete says about their experience never
+  lifts the cap; a full cycle of our logs at the prescribed volume, with RPE on target and reps
+  made, can. Say the evidence in the spec and run the checker with `--proven`. This is the
   hard-cap version of the 2026-07-27 movement-variety correction ("padding sets onto an existing
   movement instead of adding a new one is itself a corner-cut") — that one banned set-padding as a
   way to reach a number, this one caps the set count outright. Athlete G C3 had a leg curl at 6 sets to
@@ -595,6 +646,12 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   explicit, stated exception to it — two lines of a program must never give opposite
   instructions for the same set. *(2026-08-02, Athlete J C1 — all three audit lenses
   independently caught the unstated contradiction)*
+- **No test goes to a grind: every max-effort set stops at the first rep that slows, shortens or
+  breaks position.** A flagged rep-max retest (`test: 5RM`) is one set of 3–5 reps at about
+  **RPE 9**, one rep left, never RPE 10. That is accurate enough for The Ceiling (a *Good*
+  estimate) and safe for an athlete training with nobody next to them. A new athlete's baseline is
+  the AMRAP above. Never a true 1RM. *(2026-09-26: Amir left the test effort to the
+  recommendation; this settles the design skill's old "genuine RPE 9–10" against the rule above.)*
 
 ## Communication & in-app text
 - **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.** *(2026-06-15)*
@@ -606,8 +663,8 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   what to film and what it unlocks, dated appointments + escalation triggers, the weekly measures,
   fuelling, the rest rule, and the modification menu. Farsi for Iran-based athletes, English
   otherwise. In Farsi use Persian numerals and put the **Persian calendar date first** with the
-  Gregorian in brackets. These never enter `data/<id>.json` — the in-app text stays English.
-  Owned by /program-engage PART 5. *(2026-08-08)*
+  Gregorian in brackets. These never enter the programme — the in-app text stays English.
+  Message 2 names the back-off week with its dates. Owned by /program-engage PART 5. *(2026-08-08)*
 - **⚠️ EVERY word an athlete reads must sound like AMIR wrote it — not like AI wrote it.**
   *(Amir, 2026-07-30, verbatim: "write in a friendly human voice, dont let them think ai wrote
   these, let them think i wrote them, and my english is not very high level.")* This governs
@@ -641,9 +698,12 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   app renders as a highlighted clay "Coach's Note" (pill on the collapsed row + callout in
   the expanded card) so the athlete pays attention. The cycle notes cards carry only
   program-wide guidance. See SCHEMA.md → "Exercise coach's note". *(2026-07-12)*
-- **Coach-facing reports** (volume, progression sheet, e1RM) print in chat for Amir —
-  never in the athlete app or the athlete JSON. They are also archived per-athlete to the
-  coach-only `.claude/coaching-log/<id>.md` (append-only, git-tracked but unpublished). *(2026-06-15, archive added 2026-06-28)*
+- **Coach-facing reports** (the two volume tables) print in chat for Amir — never in the
+  athlete app or the programme. They are also archived per athlete in the coach-only
+  `public.coaching_logs` row, append-only (it was `.claude/coaching-log/<id>.md` until 2026-09-07,
+  in a public repo; that folder is gitignored now and never comes back). *(2026-06-15, archive
+  added 2026-06-28. The progression-sheet and e1RM sections were dropped 2026-09-26: Amir doesn't
+  read them.)*
 - **Personal note bodies (`notes.cards[].body`) render as real HTML, not one paragraph.**
   The app used to escape this field to plain text — it now renders `<p>`, `<ul><li>`,
   `<strong>`, `<em>` (fixed `2026-07-08`, see `program.html` "note-body" CSS + `renderNotes()`).
@@ -667,29 +727,30 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   protocol/stop-rule ladder once; the exercise note gives only the point-of-action specifics
   for that exercise (starting depth, load, cue) — it never re-explains the ladder. *(2026-07-12)*
 
-- **Body weight is logged in Proof now — when an athlete's goal actually turns on the scale,
-  point them at it in a notes card.** `habits.html` carries a weight tracker (added
-  2026-09-03, **on by default for everyone** since 2026-09-05, kilograms, and deliberately
-  worth **no XP either way**): a card on **Today** under the habit list (the *Weigh in* button
-  logs, tapping the card body opens the history), a **Body weight** row on **Progress**, and a
-  history screen whose chart is a **7-day rolling average** with the raw readings as dots — so
-  it reads a trend, never one morning. It never reaches the leaderboard, the wall or
-  `data/<id>.json`, and Amir reads it in **`coach.html` → athlete → Proof**. Any athlete whose
-  cycle genuinely depends on body mass (a fat-loss phase, a deficit, a medication-driven
-  change) gets a notes card telling them to weigh in and exactly where — it is the only route
-  to a real number, and it is what pulls a *coached* athlete into the habit tracker at all.
-  Two things the card must say: that nobody else sees it, and — for anyone previously told not
-  to trust the scale — why the rolling average is a different instrument from the number under
-  their feet. *(2026-09-05, Amir: "i have added weight logging in my habit tracker … if some
-  one like Athlete K need to monitor her weight, add a note in their app and point it to them so
-  they start using it")*
+- **Body weight is logged in the programme app — when an athlete's goal actually turns on the
+  scale, point them at it in a notes card.** It lives on **Home → Body Weight** in `program.html`:
+  tap the card, then **Weigh in**. ⚠️ **Not in AA Proof:** the weight screen moved out of Proof on
+  2026-09-12 and Proof has none now. Kilograms, worth no XP, and the chart is a 7-day rolling
+  average with the raw readings as dots, so it reads a trend, never one morning. It never reaches
+  the leaderboard or the wall, and Amir reads it in `coach.html` → athlete → Proof (the readings
+  still live under the Proof key). Any athlete whose cycle genuinely depends on body mass (a
+  fat-loss phase, a deficit, a medication-driven change) gets a notes card telling them to weigh
+  in and exactly where. Two things the card must say: that nobody else sees it, and — for anyone
+  previously told not to trust the scale — why the rolling average is a different instrument from
+  the number under their feet. *(2026-09-05, Amir: "if some one like Athlete K need to monitor her
+  weight, add a note in their app and point it to them so they start using it". Moved 2026-09-12;
+  this bullet still said Proof until 2026-09-26, and two programmes written that week sent athletes
+  to a Proof button that no longer existed.)*
 
 ## Coaching cues
 - **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an
   action/focus *outside* the body — where to push, what to move toward), one **internal**
   cue (what to *feel* — the target muscle/sensation), and one **avoid** cue (the single
-  mistake that most risks injury). Calibrate the wording to training age. In the JSON the
-  external + internal go in `cues.good[]`, the avoid cue in `cues.bad[]`. *(2026-06-17)*
+  mistake that most risks injury). They are written once, for anyone (next bullet), so a point
+  about one athlete's training age or history goes in their Coach's Note, not in the wording. On
+  the Spine entry the external + internal go in `cues.good[]`, the avoid cue in `cues.bad[]`.
+  *(2026-06-17; "calibrate to training age" retired 2026-09-26, it contradicted one set of cues
+  for everyone)*
 - **The cues live on the exercise, not the athlete.** Each exercise's three cues are written once,
   on its Spine entry (`public.exercises`, edited in coach.html → Exercises), and every athlete's
   card shows them. A programme carries **no cues**. Something only this athlete needs (an injury
@@ -734,28 +795,26 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   structure & time.")*
 - **Hold exercises write `Iso` in the Tempo — Amir's rule, verbatim (2026-07-24): "if
   it's a hold exercise, in the Tempo write Iso."** Every isometric/hold prescription
-  (iso holds on a machine, planks, wall sits…) carries a `"Tempo Iso"` chip in place of
-  a numeric tempo, so the card's TEMPO cell reads **Iso** and the athlete knows it's one
-  continuous hold, not reps. The parser routes any `Tempo <text>` label to the TEMPO
-  cell (`program.html` chip parsing), so this renders correctly today. Pairs with the
-  canonical-name ruling in "Exercise naming" — name stays library-canonical, the Tempo
-  cell + note carry the execution. *(2026-07-24, Athlete I C1 — applied to the leg-extension holds
-  and Side Plank.)*
+  (iso holds on a machine, planks, wall sits…) is `rx.tempo: "iso"` with the hold as
+  `rx.time`, so the card's TEMPO cell reads **Hold** and the athlete knows it's one
+  continuous hold, not reps. Pairs with the canonical-name ruling in "Exercise naming" — name
+  stays library-canonical, the tempo cell + note carry the execution. *(2026-07-24, Athlete I
+  C1 — applied to the leg-extension holds and Side Plank. rx wording 2026-09-26.)*
 - **The app's RPE selector runs 6–10 — never prescribe an RPE below 6, anywhere.** Any
   sub-6 intent (easy run, recovery walk, low-effort control drill) is authored as **RPE 6**
-  (the scale's floor = easy/conversational), or the RPE chip is omitted entirely on a
+  (the scale's floor = easy/conversational), or `rx.rpe` is left out entirely on a
   `simple` item that doesn't need grading. A prescribed RPE the athlete literally cannot
   select in the logger is a mismatch, not a nuance. *(2026-07-24, Athlete I C1 — shipped with
   RPE 4/5 on the walk-run, a step-down, and a recovery walk; Amir caught the selector
   mismatch and all three were raised to 6.)*
-- **The 6 floor binds INSTRUCTIONS as well as chips — any note telling the athlete to take
-  RPE off must name the floor in the same sentence.** Auditing only the RPE chips passes a
+- **The 6 floor binds INSTRUCTIONS as well as the card — any note telling the athlete to take
+  RPE off must name the floor in the same sentence** (the cycle's `weekNotes` too). Auditing only the RPE chips passes a
   program that still sends her below 6, because the autoregulation card does the subtracting
   at runtime: "drop every RPE by 1 on a low-readiness day" lands on **RPE 5** for every
   exercise authored at 6, and she cannot log it. Write it as *"take 1 off every RPE, but
   never go below 6 — anything already at 6 stays at 6."* Same for a period-week card, a
   deload note, a double-day rule, or a Coach's Note. Sweep every athlete-facing string for
-  sub-6 RPE, not just `chips[]`. *(2026-08-21, Amir, on Athlete N C2: "Again you prescribed rpe
+  sub-6 RPE, not just `rx` (`scripts/check_program.py` does). *(2026-08-21, Amir, on Athlete N C2: "Again you prescribed rpe
   5 but my app minumum is 6. That is a hard rule." The chip lint was clean; the notes card
   was the leak.)*
 
@@ -765,8 +824,8 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
 - **Day names (`focusTag`) have sports-headline energy** — vivid, write them like a sports
   writer trying to make the athlete *want* to train ("Built From The Legs Up", "Press, Pull,
   Repeat", "Whole-Body Workhorse"), never spreadsheet labels ("Upper Body & Press" ✗). The
-  catch: the name must still embed the keyword that lands the right banner image, and avoid
-  cool words that hijack it ("engine"→conditioning, "power"→power). Map in SCHEMA.md. *(2026-06-15)*
+  picture comes from the day's own `art` word now, so the name is free; the keyword scan is
+  only the fallback for days without one (SCHEMA.md). *(2026-06-15; art word 2026-09-19)*
 
 ## Process
 - **Writing a programme never touches the app. Ideas go to Amir; they are not built.** No edit to
@@ -790,18 +849,26 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   single program you want to write for me." Reshaped 2026-09-25, when a new athlete's first
   programme took about 2 h 40 min of work, 70% of it two multi-agent panels, and about 50
   approval prompts. Amir, on the five fixes: "yes, do all five".)* Two shapes:
-  **(1) Roadmaps** (/program-roadmap): exactly three lens agents in parallel via the Workflow
-  tool, each an independent proposal from a genuinely different lens (e.g. sport-transfer
-  periodization · durability/return-to-play · recovery-constrained pragmatist — pick lenses
-  that fit the athlete). Claude is the judge: scores them against the brief + this file and
-  synthesizes the roadmap from the winner + best grafts. No separate judge agent, and no
-  literature search unless Amir asks for one.
+  **(1) Roadmaps** (/program-roadmap): ONE coherent pass, then ONE independent reviewer.
+  Claude reads the athlete first (recovery ceiling, restrictions, goal order, the bottleneck),
+  weighs two or three arcs in one place, and writes the one it would defend, with a short
+  rationale and an exit test for each cycle. One reviewer agent (files only) then critiques the
+  finished arc against the brief and this file, and every must-fix is applied. It locks without
+  Amir's sign-off (Amir, 2026-09-26: *"no doesnt need me"*). No literature search unless Amir
+  asks for one. *(Reshaped 2026-09-26 on Amir's "you decide what gets the highest quality
+  program". The old shape, three independent arcs merged by grafting, produced the recorded
+  roadmap errors (a 6-cycle arc; "do not add a fifth cycle"), and a grafted cycle loses the
+  sequence logic that made it fit its own arc. A critic of ONE finished arc keeps the second
+  opinion without the grafting.)*
   **(2) Cycle designs**: Claude drafts the spec with full context (the STEP 1 checkpoint with
   Amir still comes first). The built programme then goes through `scripts/check_program.py`
-  and every FAIL is fixed: the 10-set floors, the 4-set cap, the new-athlete 8-rep rule, a
-  banned movement in any exercise or fallback, RPE floors in every note, back-to-back days,
-  the Spine gate and the Quality Map (a day past the time cap is only a warning since
-  2026-09-26: the cap is soft). Then a **new athlete** gets ONE
+  and every FAIL is fixed: the 10-set floor (strength-and-muscle aims only, `--floor`), the
+  4-set cap (`--proven` once our logs show more), the new-athlete rules (automatic on a first
+  cycle), a banned movement in any exercise or fallback, RPE floors in every note, the week-1
+  and back-off notes (`weekNotes`), back-to-back days and the Spine gate. A day past the time
+  cap is only a warning (the cap is soft, 2026-09-26), and so is a Quality headline outside the
+  week's top two, which is reported with a recommendation (Amir, 2026-09-26: *"report it, but
+  recommend what you think should happen"*). Then a **new athlete** gets ONE
   reviewer, files only, for what a script cannot judge (injury logic, exercise choice,
   transfer, whether the notes cover every exercise they should), and every surviving
   must-fix/should-fix is applied. A **returning athlete** gets no reviewer unless Amir asks.
@@ -901,12 +968,26 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   arc to 5×5 and make the extra block do real work rather than padding it with a retest or a
   maintenance phase. Each cycle runs **4 loading weeks + 1 back-off week**, which is what
   satisfies "never program past a fatigue wall" without a mid-cycle deload.
+  **The back-off week has an owner (2026-09-26).** /program-design decides its dose as numbers
+  (how many sets fewer, how many RPE points off, or an RPE cap, never below 6), /program-engage
+  writes the athlete's words, and /program-assemble stores both as the cycle's `weekNotes.last`,
+  which the app shows in the last week, under This Week on Home and at the top of every session.
+  Week 1 works the same way through `weekNotes.first`. `scripts/check_program.py` fails a cycle
+  without them. *(The audit that day found 16 of 34 live programmes with no back-off at all, and
+  no drop in week-5 session RPE across 12 finished cycles. Amir: "update the app in a way that it
+  can show first week or last week".)*
 - **Roadmap is created once and locked** — design/engage read it, never rewrite it. *(2026-06-15)*
 - **Every cycle's design rationale is archived.** /program-assemble appends the design read +
-  locked decisions + coach reports (volume, progression, e1RM) to the coach-only
-  `.claude/coaching-log/<id>.md` as its last step — append-only, git-tracked but unpublished,
-  never the athlete JSON. Prior cycles are never overwritten, so months later you can see how a
-  cycle was thought through and why something changed. (Convention: `.claude/coaching-log/README.md`.) *(2026-06-28)*
+  locked decisions + ledger changes + the two volume tables to the coach-only
+  `public.coaching_logs` row as its last step: append-only, never the programme. Prior cycles are
+  never overwritten, so months later you can see how a cycle was thought through and why
+  something changed. *(2026-06-28. On the server since 2026-09-07: the old
+  `.claude/coaching-log/` files sat in this public repo. Progression levers and e1RM left the
+  entry 2026-09-26, Amir: he doesn't read them.)*
+- **An athlete whose cycle ends without a renewal keeps the app, and gets no coaching.** They can
+  keep training the programme they have; no new cycle, report or edit is written for them until
+  Amir says so. *(Amir, 2026-09-26: "let them, they can have access to their programs, they wont
+  get any coaching")*
 - **Cycles continue; they don't reset.** Each cycle reads the prior rationale (the coaching
   log) alongside the data, then **progresses or edits the same logic** — it does not invent a
   new program each month. Change the underlying logic only when a data point forces it (pain,
@@ -937,8 +1018,9 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   section names, chips and styling are a mechanical layer applied *after* that, and must
   **never bend the programming logic or burn design energy**. Right training first; correct
   labels and styling fall out afterward. *(2026-06-17)* Two concrete applications: **reps** —
-  design writes `8-10` if that's the natural hypertrophy zone, never spends budget
-  pre-picking one number; assemble mechanically takes the top of the range. **Exercise
+  design writes the one number it means, even when it thinks in a zone, because the number is
+  the prescription and the app records it (Progression → never a rep range; assemble never picks
+  an end). **Exercise
   Coach's Notes** — design only flags which exercise needs one + why (a `note_flag`, one
   domain-language line); engage drafts the athlete-facing sentence; assemble places it.
   Design's job is *deciding* what needs a note, never *writing* it. *(2026-07-12)*

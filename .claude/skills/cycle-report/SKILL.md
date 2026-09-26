@@ -5,7 +5,7 @@ description: End-of-cycle report for one coached athlete. Reads the five weeks t
 
 # /cycle-report: the end of a cycle, and the start of the next design
 
-Built 2026-09-24 from the first one, Alireza's Cycle 1 (idea #12, The Debrief). Amir:
+Built 2026-09-24 from the first one, an athlete's Cycle 1 (idea #12, The Debrief). Amir:
 
 > *"i just want the message which is like a cycle report … tell him what he did well, what we are
 > gonna do next, what we want more work from him, and celebrate his wins. then we want to update
@@ -99,7 +99,7 @@ Work through this list. Each line is a finding only if the data says so.
 | **RPE coverage** | sessions with RPE on the main lift | No RPE = no Personal Records estimate and no way to judge "working weight" |
 | **Units** | compare barbell and dumbbell loads at similar RPE | An empty-bar squat at RPE 8 next to 2 × 20 kg dumbbells = whole bar vs per side unknown |
 | **Typos** | a jump ×10 (250 after 20) | Never quote it; note it for Amir |
-| **Back-off week** | the closing week's `n_sets` and `top` vs weeks 1–4 | Full sets and a new top = the back-off didn't happen |
+| **Back-off week** | the closing week's `n_sets` and `top` vs weeks 1–4, against the cycle's `weekNotes.last` (what it prescribed, since 2026-09-26) | Full sets and a new top = the back-off didn't happen |
 | **Weigh-ins** | Q4 `weigh_ins` | Body weight promised in a notes card and never logged |
 | **Personal Records** | Q4 `ceiling` | Empty after a whole cycle = no strength baseline |
 | **Promises and gates** | each note card and each `message.outcomes` line against the evidence | Done / partly / not yet, with its number |
@@ -163,7 +163,7 @@ what's next, and what I need from you.>
 امیر
 ```
 
-**Worked example:** Alireza's Cycle 1 report (2026-09-24) is the model: 5 wins, 3 things he
+**Worked example:** the first report (2026-09-24, its athlete's coaching log holds it) is the model: 5 wins, 3 things he
 said on a call (heart rate and fatigue → cardio base; left arm on backhands → medicine-ball
 throws; speed → cycle 3), the Force Bank plan with a broad-jump baseline, 4 asks (tick + RPE,
 working sets only with the whole bar, weekly weigh-in, a real back-off week), 3 questions.

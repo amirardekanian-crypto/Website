@@ -1207,6 +1207,21 @@
     background: var(--ice-dim); border: 1px solid var(--ice-mid);
     padding: 4px 11px; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
   }
+  /* The first and last week of a cycle (weekNoteHTML + cycles[n].weekNotes, 2026-09-26). Deliberately the
+     Coach's Note callout (.ex-coach-note): it IS the coach's instruction for the week,
+     and athletes already read clay callouts that way. Under "This Week" on Home, and
+     at the top of every session in that week. */
+  .week-note {
+    margin: -4px 24px 18px; padding: 10px 12px 11px;
+    background: rgba(199,85,47,0.08); border-left: 3px solid #C7552F; border-radius: 8px;
+    font-family: 'Barlow', sans-serif; font-size: 14px; line-height: 1.55; color: var(--grey-dark);
+  }
+  .week-note-label {
+    display: block; font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+    font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: #C7552F; margin-bottom: 3px;
+  }
+  .day-content .week-note { margin: 0 0 16px; }
+  body[data-dark] .week-note { background: rgba(199,85,47,0.16); color: #e8e8e8; }
   /* Daily-habits card on Home — the entry point into habits.html (Proof).
      Deliberately plainer than the cycle cards so it reads as a companion
      tool rather than competing with the programme itself. */
@@ -4239,7 +4254,7 @@
 
     <!-- Personal Records stays below the week: it is about the training just
          above it, and it only changes when a lift moves. Body weight sits
-         under it — the other number an athlete watches, read from AA Proof. -->
+         under it — the other number an athlete watches, logged in this app. -->
     <div id="home-ceiling-wrap"></div>
     <div id="home-weight-wrap"></div>
   </div>
@@ -5756,21 +5771,49 @@ function toggleCycleCard(btn, ev) {
 //  HOME OVERVIEW HELPERS (landing page on #screen-home)
 // ═══════════════════════════════════════════════════════════════════════
 
-// "Week X of Y" for the current cycle — ONLY when it has both start and end
-// dates; returns '' otherwise so the chip is hidden. Week is derived from
-// today's position between the dates, clamped to the cycle's length.
-function homeWeekLabel(cycle) {
-  if (!cycle || !cycle.startDate || !cycle.endDate) return '';
+// Where today sits in a cycle — ONLY when it has both start and end dates; null
+// otherwise. Week is derived from today's position between the dates, clamped to
+// the cycle's length. The ONE place the week is worked out: the "Week X of Y" chip
+// and the first/last-week note both read it, so they can never disagree.
+function cycleWeekInfo(cycle) {
+  if (!cycle || !cycle.startDate || !cycle.endDate) return null;
   const s = new Date(cycle.startDate);
   const e = new Date(cycle.endDate);
-  if (isNaN(s) || isNaN(e)) return '';
+  if (isNaN(s) || isNaN(e)) return null;
   const today = new Date();
   today.setHours(0, 0, 0, 0); s.setHours(0, 0, 0, 0); e.setHours(0, 0, 0, 0);
   const WEEK = 7 * 86400000;
-  const totalWeeks = Math.max(1, Math.round((e - s) / WEEK));
-  let wk = Math.floor((today - s) / WEEK) + 1;
-  wk = Math.min(Math.max(wk, 1), totalWeeks);
-  return `Week ${wk} of ${totalWeeks}`;
+  const total = Math.max(1, Math.round((e - s) / WEEK));
+  const wk = Math.min(Math.max(Math.floor((today - s) / WEEK) + 1, 1), total);
+  return { wk, total, before: today < s, after: today > e };
+}
+
+// "Week X of Y" for the current cycle; '' hides the chip.
+function homeWeekLabel(cycle) {
+  const w = cycleWeekInfo(cycle);
+  return w ? `Week ${w.wk} of ${w.total}` : '';
+}
+
+// The first and last week of a cycle (Amir, 2026-09-26: "update the app in a way that
+// it can show first week or last week"). Every cycle is four loading weeks and a
+// back-off week, and the card deliberately never changes mid-cycle, so week 1's
+// calibration and the back-off used to exist only if a notes card happened to say so,
+// and in practice the back-off mostly didn't happen. They are data on the cycle now:
+// cycles[n].weekNotes.first / .last = { text, title?, setsDrop?, rpeDrop?, rpeCap? }
+// (SCHEMA.md), written by the pipeline. ⚠️ Not `weeks`: that is the cycle's "Weeks 1–5"
+// label string. The text says the change in words; the numbers are the same change for
+// scripts/check_program.py, and nothing here changes a prescription. A cycle without weekNotes (every programme
+// written before this) shows nothing, never an invented back-off. Nothing after endDate
+// either: an athlete still training past the end is not in a back-off week for ever.
+function weekNoteHTML(cycle) {
+  const notes = cycle && cycle.weekNotes;
+  const w = (notes && typeof notes === 'object') ? cycleWeekInfo(cycle) : null;
+  if (!w || w.after) return '';
+  const key = (w.total > 1 && w.wk === w.total && !w.before) ? 'last' : (w.wk === 1 ? 'first' : null);
+  const n = key && notes[key];
+  if (!n || !n.text) return '';
+  const label = n.title || (key === 'last' ? 'Back-off week' : 'Week 1');
+  return `<div class="week-note week-note-${key}"><span class="week-note-label">${esc(label)}</span>${esc(n.text)}</div>`;
 }
 
 // Map a day to ONE of eight category pictures. Eight files cover every day of
@@ -6133,7 +6176,7 @@ function renderHome() {
       <div class="home-section-head">
         <div class="home-section-title">This Week</div>
         ${weekLabel ? `<div class="home-week-chip">${esc(weekLabel)}</div>` : ''}
-      </div>`;
+      </div>${weekNoteHTML(cur)}`;
   }
 
   const days = w.days || [];
@@ -6172,6 +6215,8 @@ function renderHome() {
     const hasStandard = (day.blocks || []).some(b => (b.exercises || []).some(ex => ex.type === 'standard'));
     let html = `<div id="day${day.id}" class="day-content${i === 0 ? ' active' : ''}">`;
     html += `<div class="day-focus-tag">${esc(day.focusTag)}</div>`;
+    // Week 1 / the back-off week: the same note as Home, where the athlete trains.
+    html += weekNoteHTML(cur);
     html += `<div class="session-timer" id="timer-${day.id}" data-day="${day.id}">
       <div class="session-timer-body">
         <div class="session-timer-label">Click Start to begin</div>
@@ -7055,7 +7100,7 @@ const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
     body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your current cycle, your progress, and what's coming next.</li><li><strong>My Plan</strong> — your actual training. The tabs at the top (D1, D2, D3…) switch between days; tap any exercise to open it.</li><li><strong>Coach</strong> — message me directly, read the personal notes I write you, and find this "Using the app" guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout ticks the matching habit in AA Proof.</li></ul>` },
   { icon: 'cycle', title: 'How your program is structured',
-    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
+    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
   { icon: 'activity', title: 'RPE & Tempo',
     body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
   { icon: 'mindset', title: 'The readiness check',
@@ -7622,8 +7667,9 @@ function renderCeiling() {
   }
 
   // Relative strength leads — kilos per kilo of the athlete beats absolute
-  // kilos for a racket-sport player. Body weight is borrowed from AA Proof; if
-  // there is none, ask for it rather than quietly dropping the headline.
+  // kilos for a racket-sport player. Body weight comes from this app's own Body
+  // Weight screen (it left AA Proof on 2026-09-12); if there is none, ask for it
+  // rather than quietly dropping the headline.
   const bw  = latestBodyWeight();
   const best = lifts.reduce((a, b) => (b.latest.kg > a.latest.kg ? b : a));
   let hero;
@@ -7636,7 +7682,7 @@ function renderCeiling() {
         <div class="ceil-hero-p">You can lift ${ratio} times your own body weight
           on the ${esc(best.lift)}. On court that counts for more than the raw kilos.</div>
         <div class="ceil-hero-s">${best.latest.kg} kg lifted &middot; ${bw.kg} kg of you
-          &middot; weighed ${fmtCeilDate(bw.d)} in AA Proof</div>
+          &middot; weighed ${fmtCeilDate(bw.d)}</div>
       </div>`;
   } else {
     hero = `
@@ -7644,8 +7690,8 @@ function renderCeiling() {
         <div class="ceil-ask-t">Add your body weight</div>
         <div class="ceil-ask-d">Lifting ${best.latest.kg} kg means one thing at 65 kg and
           something else at 95 kg. What counts on court is how strong you are for your size.
-          Add your weight in AA Proof and it shows up here.</div>
-        <button type="button" class="ceil-ask-b" onclick="goHabits()">Open AA Proof →</button>
+          Add your weight and it shows up here.</div>
+        <button type="button" class="ceil-ask-b" onclick="goWeight()">Add your weight →</button>
       </div>`;
   }
 
@@ -10383,11 +10429,11 @@ function daysSince(iso) {
   return Math.max(0, Math.round((today - then) / 86400000));
 }
 
-// The athlete's most recent body weight — read from AA Proof, never written
-// here. habits.html owns "<id>_hab_wt" ({ 'YYYY-MM-DD': { kg, t } }, where a
-// null kg is a tombstone for a deleted reading); syncFromCloud pulls it down
-// with every other key on the shared blob, and _snapshot() deliberately never
-// pushes it back. So this app gets the number for free and cannot corrupt it.
+// The athlete's most recent body weight, from "<id>_hab_wt" ({ 'YYYY-MM-DD': { kg, t } },
+// where a null kg is a tombstone for a deleted reading). ⚠️ This app OWNS that key since
+// 2026-09-12 (it writes, pushes and merges it; see "moved here from AA Proof" above and
+// wtKey() below). This comment used to say AA Proof owned it and this app never wrote it,
+// which stopped being true that day.
 // Every real reading, oldest first, for the Home card's trend. Tombstones
 // (kg: null, a deleted reading) are skipped, same as latestBodyWeight().
 function bodyWeightSeries() {
@@ -10416,7 +10462,7 @@ function weightCardHtml() {
       <button type="button" class="nc" onclick="goWeight()">
         <div class="nc-k"><span>Body weight</span></div>
         <div class="nc-big">Not tracked yet</div>
-        <div class="nc-f">Add today's weight in AA Proof<span class="nc-a">→</span></div>
+        <div class="nc-f">Tap to add today's weight<span class="nc-a">→</span></div>
       </button>`;
   }
 

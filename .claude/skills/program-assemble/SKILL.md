@@ -50,11 +50,11 @@ card follows the id even if the name is edited later. `sport.badge` ← design's
   a superset, the whole pair becomes ONE circuit block: shared `name` + `rounds` + `restSec`,
   each paired exercise its own `items[]` entry (`detail: "×N · RPE N"` — no per-item tempo).
   **Never** render a superset pair as two separate `"standard"` exercises each carrying a
-  `superset` chip — that shipped once (Pooya C3, all 4 days): it broke the shared rest (each
+  `superset` chip — that shipped once (all 4 days of one cycle): it broke the shared rest (each
   exercise got its own independent rest timer instead of alternating) and left no visual
   grouping showing which exercises were paired. Name the circuit descriptively
-  (`"Push-Pull Superset"`, `"Arm Superset"` — see `amir_ardekani.json` / `Mhrnz_khdm2.json`
-  for precedent), never a generic `"Superset A/B"` — the name itself carries the pairing.
+  (`"Push-Pull Superset"`, `"Arm Superset"`), never a generic `"Superset A/B"` — the name
+  itself carries the pairing.
 - **Carry `test_flag` straight through** to `"test": "<n>RM"` on that exercise (design emits
   `test_flag: 5RM`; see SCHEMA "test"). Verbatim, standard lifts only, and never invent one —
   which lifts get retested is a coaching decision the design pass already made. An exercise
@@ -65,6 +65,11 @@ card follows the id even if the name is edited later. `sport.badge` ← design's
   design's `note_flag`), not from design directly. Copy verbatim, plain text — never wrap it
   in HTML (that's the cycle notes cards' convention, not this field's). Never move
   exercise-scoped guidance into the notes cards, and never invent a note nothing flagged.
+- **Write the two special weeks on the cycle** (2026-09-26): `cycles[currentCycleIndex].weekNotes
+  = { "first": {…}, "last": {…} }`, each with engage's PART 3c text and design's numbers
+  (`setsDrop`, `rpeDrop`, `rpeCap`) copied from its `week1:` / `lastweek:` lines. Leave `first` out
+  only when design wrote "same as the card". ⚠️ The field is `weekNotes`, never `weeks` (that is
+  the "Weeks 1–5" label). The app shows each in its week; see SCHEMA.md → `weekNotes`.
 - **Place engage's Becauses** (PART 3b), matched by exercise name, as `"why": { "src", "part"?,
   "text" }` on that exercise (standard or simple, never a circuit). Verbatim, and never invent one.
   **Write `why` fresh every cycle: never carry a previous cycle's `why` over**, because a reason
@@ -197,10 +202,14 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   python3 scripts/check_program.py data/<id>.json --spine-sql      # prints ONE query: run it
   # save the query's raw result as-is (the JSON the tool returns loads directly), then:
   python3 scripts/check_program.py data/<id>.json --log <scratch>/log_entry.md --spec <scratch>/spec.md \
-      --spine <scratch>/spine_<id>.json [--female] [--new] [--cap <real minutes>] [--week "Sat:1,Sun:2,Mon:3,Wed:4"]
+      --spine <scratch>/spine_<id>.json [--floor] [--proven] [--cap <real minutes>] [--week "Sat:1,Sun:2,Mon:3,Wed:4"]
   ```
-  `--new` for a new athlete's first cycle, `--female` for the women's lower-body floor; the bans
-  come from the spec's `bans:` line (or `--ban "goblet,hanging"`). **Fix every FAIL and re-run
+  `--floor` only when the programme's aim is strength and muscle (the 10-set floor on every major
+  muscle; a sport-performance athlete gets what is best for them, Amir 2026-09-26), with any
+  excused muscle on the spec's `floor-except:` line. `--proven` only when design named the evidence
+  that the athlete handles more than 4 sets on an exercise. The new-athlete rules switch on by
+  themselves in a first cycle. `--no-backoff` only on Amir's word. The bans come from the spec's
+  `bans:` line (or `--ban "goblet,hanging"`). **Fix every FAIL and re-run
   until 0 FAIL; read every WARN.** It fails a muscle under its floor, a volume table that
   disagrees with the programme, more than 4 sets, a weighted lift under 8 reps (new athlete), a
   superset in a first cycle, a banned movement in any exercise, setup or fallback, an RPE under
@@ -208,8 +217,10 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   a card, a missing `exId`, a Because over 140 characters or more
   than 10 of them, a notes card that isn't HTML, any `setup` (floating text: a grip is the pill,
   anything else the Coach's Note),
-  an exercise with no library entry or no cues, a quality outside the ten,
-  and a headline quality outside the week's top two. A day past `--cap` is only a WARN (Amir,
+  an exercise with no library entry or no cues, a quality outside the ten, and a cycle with no
+  back-off `weekNotes.last` (or a new athlete with no `weekNotes.first`). Two things are only
+  WARNs: a Quality headline outside the week's top two (report it with your recommendation), and a
+  day past `--cap` (Amir,
   2026-09-26: the form's session length is a guess, athletes who write 60 train 75 and never
   complain), so pass the athlete's real minutes when the logs have them. It prints what the handoff needs: minutes
   per day, sets per muscle and the **QUALITY** line. The first programme it was run on (a new
@@ -265,14 +276,14 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   `"superset"` (or any structural-pairing wording) — if found, that pair was never
   converted to the required `"circuit"` block per 2a. Hard reject: rebuild it as one circuit
   entry (shared `name`/`rounds`/`restSec`, both exercises as `items[]`) before shipping — see
-  SCHEMA.md → `"circuit"` type, "Common mistake." (Shipped once, Pooya C3 — this check exists
+  SCHEMA.md → `"circuit"` type, "Common mistake." (Shipped once — this check exists
   because of it.)
 - **RPE floor 6 — sweep EVERY athlete-facing string, not just `rx.rpe`.** Grep the whole
   JSON for `RPE [1-5]`, and separately for any note/card that tells the athlete to subtract
   from an RPE without naming the floor ("take 1 off every RPE", "drop the RPE by one") — that
   instruction lands on RPE 5 for every exercise authored at 6 and the app's selector cannot
   record it. Hard reject: rewrite to "…but never go below 6." An rx-only pass is what let
-  this ship once (Ghazal C2). See COACHING-PRINCIPLES.md → "Chips & modifiers".
+  this ship once. See COACHING-PRINCIPLES.md → "Chips & modifiers".
 - **Notes cards are HTML** — every `notes.cards[].body` must be real HTML (`<p>` paragraphs,
   `<ul><li>` for enumerable content, `<strong>` on the key phrase) per /program-engage PART 3
   and SCHEMA "notes". A body that is one plain-text paragraph is a hard reject: rewrite it
@@ -350,7 +361,8 @@ their cards show cues?"* Approve only on his word (he said *"Approve them"* for 
 
 ## Step 5 — Archive the cycle rationale (coach-only, append-only) + update the Exercise Ledger
 Persist the **COACHING LOG ENTRY** from /program-design — the coach-only record of WHY this
-cycle looks the way it does (the read, decisions, volume, progression levers, e1RM).
+cycle looks the way it does (the read, decisions, ledger changes, the volume tables, the special
+weeks).
 ⚠️ **The record is the `public.coaching_logs` row, not a file.** Coach-only, read from
 coach.html → athlete → File; Step 7 (*The coaching log goes to the server too*) has the
 splice. Read it with `select body from coaching_logs where athlete_id = '<id>'`. The old
@@ -359,7 +371,8 @@ PUBLIC repo, world-readable, which is exactly why the log moved; never re-create
 The athlete app never reads the log. The entry template is /program-design's COACHING LOG ENTRY.
 - **No row (new athlete):** insert one with the header (`# Coaching Log — <First Last> (<id>)`
   + the coach-only note), an empty **Exercise Ledger** table (header row only:
-  `| Exercise | Status | Last cycle | Note |`), then the entry.
+  `| Exercise | Status | Last cycle | Note |`), then `## Roadmap — <date>` with /program-roadmap's
+  exit tests and ROADMAP RATIONALE, then the entry.
 - **Row exists (returning):** **append** the new `## Cycle NN — …` section to the end.
   **Never edit, reorder, or delete any existing cycle section** — this archive is append-only, so
   a cycle's original reasoning survives even after the program is later changed. (It grows in
@@ -397,6 +410,10 @@ COACH HANDOFF BRIEF". Cover, one line each, each with its reason:
 - **FILM** — every filmed set he must review, by when, and what is blocked until he clears it.
 - **DATES** — every date-stamped escalation: referrals, appointments, checkpoints, expiries.
 - **WATCH** — trigger conditions that fire a deload, a stop, or a referral.
+- **WEEKS** — the week-1 and back-off notes exactly as the athlete will read them, with their
+  dates. The app shows them on their own in that week, so he should know what they say.
+- **QUALITY** — the day-card words, and if the headline is outside the week's top two, your
+  recommendation (Amir, 2026-09-26: *"report it, but recommend what you think should happen"*).
 - **SPINE** — the Step 8 upkeep report: drafts added, gaps filled, proposals for him, and the
   entries this programme uses that still need his approval.
 - **⚠️ MY CALLS** — every decision made on his behalf: anything that **overrides** something he
@@ -437,7 +454,7 @@ localise a mistake. Publish in stages, one top-level key per statement, verifyin
    is then provably what the athlete actually had, not what your file says they had.
 2. **`jsonb_set(data,'{workouts}', $W$…$W$::jsonb)`** — the new cycle's days.
 3. **`jsonb_set(data,'{notes}', …)`**, plus `{cycles,N}` for the current cycle's
-   `message`/`focuses` and `{cycles,N+1,teaser}`. These three fit comfortably in one call.
+   `message`/`focuses`/`weekNotes` and `{cycles,N+1,teaser}`. These fit comfortably in one call.
 
 **New athlete (no `workouts` on the row yet).** Skip 7.1: there is nothing to archive and the
 index stays 0. The row may hold only `athlete` and `sport` from intake, or not exist at all, and
@@ -516,7 +533,8 @@ Never approve an entry, and never put anything about this athlete on one.
 **Then the two checks that read the finished programme** (both 2026-09-24):
 - **Quality Map.** Per day, the top three qualities (working sets × primary 1 / secondary ½, prep
   blocks skipped): that is what each day card on Home will say. And the cycle's headline (`art`
-  word) must be in the week's top two unless it is `bedrock`, `peak` or `reset`. Report both as one
+  word) should be in the week's top two unless it is `bedrock`, `peak` or `reset`; when it isn't,
+  it is a WARN, reported with your recommendation, and never a reason to add volume. Report both as one
   **QUALITY** line: `Day 1 Strength · Brakes · Spring | Day 2 … | headline iron ✓`. A day under
   70% tagged shows nothing on the phone, so it is a gap to fix in the upkeep above.
   Step 3's `check_program.py --spine` run already printed both, on phones now and once the

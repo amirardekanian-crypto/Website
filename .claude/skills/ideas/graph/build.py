@@ -193,7 +193,7 @@ IDEAS = [
   stages=["Execution","Programming","Adaptation"], needs=[], cost="None. The week is worked out from the cycle's dates.",
   chain=["Cycle start date","Week number","Closing week","Primary blocks","Set rows"],
   what="The last week of every cycle draws itself as the back-off week: one line on the Home day card (<em>Back-off week: same weight, half the sets</em>) and the extra set rows on each Primary card greyed out as <em>not this week</em>.",
-  problem="Four loading weeks plus one back-off is the house rule, and the back-off lives only in a notes card. Alireza's Cycle 1 debrief found it: in week 5 he did every set, with his heaviest squat and RDL of the cycle.",
+  problem="Four loading weeks plus one back-off is the house rule, and the back-off lives only in a notes card. The first cycle debrief found it: in week 5 the athlete did every set, with his heaviest squat and RDL of the cycle.",
   how="Nothing to set up. From the cycle's <code>startDate</code> the app knows it is the closing week; Home says so, and Primary cards show half their set rows, the rest greyed.",
   athlete="The one easy week is actually easy, so the four hard ones land.",
   coach="Your back-off rule, applied on every athlete's phone without a message from you.",

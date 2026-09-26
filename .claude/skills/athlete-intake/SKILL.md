@@ -67,7 +67,7 @@ Grouped into one round of questions, the genuine gaps to close:
 
   **1. The roster row — `public.programs`.** `loadPrograms()` in `coach.html` states
   *"The programs table IS the roster now"*, so this row is the thing that puts them on
-  the Athletes list. The minimum viable row, as created for `mahla_banaei` on 2026-09-12:
+  the Athletes list. The minimum viable row, as first created on 2026-09-12:
   ```sql
   insert into public.programs (athlete_id, data, updated_by) values (
     '<id>',
@@ -98,6 +98,8 @@ Grouped into one round of questions, the genuine gaps to close:
   `is_coach()`, which reads the caller's JWT email, so from a plain SQL connection it only
   raises `coach only`. Insert directly.
 
+- **Add the id to `.claude/athlete-ids.local`** (one per line, gitignored), so the pre-commit
+  guard keeps it out of the public skill files: `printf '%s\n' '<id>' >> .claude/athlete-ids.local`.
 - **Do NOT create the login here.** Amir issues it from **coach.html → Athletes → the
   athlete → Create login** when he is ready to let them in (normally after payment). That
   calls the `athlete-login` Edge Function — it needs the service-role key, so it cannot be

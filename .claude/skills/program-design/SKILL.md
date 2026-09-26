@@ -170,7 +170,7 @@ change before I build?"* before writing exercises.
    current program), and the entry written for THIS cycle becomes the baseline the next cycle
    continues. The logic is captured the first time you design their next cycle.
    **A `## Debrief — Cycle NN …` section after the last cycle is the end-of-cycle review**, written
-   by **`/cycle-report`** in the closing week (since 2026-09-24, first for alireza_nikkhah): film verdicts, the athlete's own words from calls, data
+   by **`/cycle-report`** in the closing week (since 2026-09-24): film verdicts, the athlete's own words from calls, data
    problems in the log (units, warm-ups typed into working rows, missing RPE), decisions already
    promised to the athlete, and an **Open** list. Read it in full: it is STEP 1A's evidence and the
    "check-in chat" STEP 1A says never to ignore. Every **Open** item gets an answer at the STEP 1
@@ -219,10 +219,17 @@ cycle's log entry).
 - **ROADMAP CHECK** — confirm the locked plan fits, or name the data point forcing a
   deviation + the adjustment.
 
+**Rotate accessories BY VARIANT** (Amir, 2026-09-26: *"rotate by variant"*). The REPLACE pick is
+the same movement pattern on a different implement, stance, angle or grip (the Spine entry's
+`alts`), or its progression (`harder`) when the athlete has earned it. It reads as new, keeps the
+movement skill and what the logs know, and it is not "new to the client", so from Cycle 2 it may be
+supersetted. A genuinely new pattern is still fine when the athlete needs one; it runs as straight
+sets its first cycle.
+
 **Check the rotation rate before finalizing REPLACE** (see COACHING-PRINCIPLES.md →
 Exercise selection). Roughly tally how many non-primary, non-warm-up exercises from the
 prior cycle would carry over unchanged into this one. North of ~70% is a signal, not a
-detail — it happened for Mehrnaz C2 (83%, caught only on review, not at design time). The
+detail — it happened once at 83%, caught only on review, not at design time. The
 "keep best-in-class" exception is for rehab/corrective work only; don't stretch it to
 accessories just because their load is progressing well on paper — that kind of progress
 is invisible to the athlete, new movements are what read as forward motion, and she pays
@@ -231,14 +238,14 @@ rehab/corrective reason) must still carry a visible dose progression — more se
 rounds, more load, or a harder variant. Never re-ship an identical prescription cycle to
 cycle on a power or conditioning item just because the exercise name stayed the same.
 
-**A "fresh" REPLACE pick must be checked against the athlete's whole exposure history, not
-just the immediately-prior cycle.** Diffing only against the last cycle can pass something
-that isn't actually new — it happened for Pegah C3: two first-pass rotation picks (Cable
-Pallof Press, Farmer's Carry) had to be rejected because she'd already done both, just not
-in Cycle 2. The **Exercise Ledger** (read at STEP 0) is the fast way to check this — any
-exercise already listed `Available`/`Disliked`/`Pain-flagged`/`Banned` has been used
-before, whichever cycle it was. If the ledger predates this athlete (not yet backfilled),
-fall back to scanning prior `programHistory` entries further back than just the last one.
+**Check every REPLACE pick against the athlete's whole exposure history, not just the
+immediately-prior cycle.** The **Exercise Ledger** (read at STEP 0) lists every exercise they
+have had. `Disliked`, `Pain-flagged` and `Banned` never come back without a stated reason. A
+variant they did two cycles ago is allowed (it is still a variant), but prefer one they haven't
+done recently, so the cycle reads as new: diffing only against the last cycle once passed two
+"fresh" picks the athlete had already done in the cycle before. If the ledger predates this
+athlete (not yet backfilled), fall back to scanning prior `programHistory` entries further back
+than just the last one.
 
 Close with three **LOCKED LISTS** (Step 3 executes exactly), then classify retained items
 (primary / accessory / activation-corrective):
@@ -257,6 +264,9 @@ some questions, go with your stated recommendation on the rest and list each und
 ---
 
 ## STEP 1B — ATHLETE ANALYSIS (NEW)
+/program-roadmap already wrote a read of this athlete (recovery ceiling, restrictions, goal order,
+the bottleneck) before it chose the arc. Start from it: confirm or correct it with the brief, and
+say what changed. Don't redo it from scratch.
 - **RECOVERY CAPACITY — assess first; it gates everything.** Sleep quality + hours +
   stress → real recovery capacity. State the weekly **volume ceiling** before any session
   count — anchor it to the evidence-based range (~10–20 hard sets/muscle/week, most benefit
@@ -317,17 +327,21 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   PER-DAY LOAD DISTRIBUTION above), not leftover time.
   **RETURNING athlete: calibrate against reality first.** Put the last cycle's days through the
   script's own timing (`day_minutes()` in `scripts/check_program.py`) and compare them with
-  `ctx.sessions.minutes_by_day`. Alireza's Cycle 1 modelled ~48 min and ran 69 (×1.44), so a
+  `ctx.sessions.minutes_by_day`. One athlete's Cycle 1 modelled ~48 min and ran 69 (×1.44), so a
   55-minute design meant ~75 real. Tell Amir the expected real length at the checkpoint, not
   only the model's number, and note the ratio in the log for the next cycle.
+  **NEW athlete: no logs yet, so design to the form's minutes plus 15** (Amir, 2026-09-26:
+  *"form + 15"*), unless they said plainly that the time is a hard stop.
 - **Sequencing within a day:** power/CNS → Primary → Accessory → corrective/Core →
   conditioning. (These are the section blocks — see STEP 3 CLASSIFICATION.)
 - **Superset** non-competing pairs to fit the time ceiling — **except** an athlete's first
   cycle, or any exercise new to that client: straight sets until each has a cycle of logged
-  working weights (see COACHING-PRINCIPLES.md → "Session structure & time"). **A superset is
+  working weights (see COACHING-PRINCIPLES.md → "Session structure & time"). A rotated
+  accessory that is a **variant** of a movement they have logged is not new, so from Cycle 2 it
+  can be paired. **A superset is
   a structural decision, not a per-exercise tag** — spec the whole pair as ONE circuit-role
   entry (see the STEP 3 template below), never as two accessory-role entries each carrying
-  `intent: superset`. That exact mistake shipped once (Pooya C3, all 4 days): two independent
+  `intent: superset`. That exact mistake shipped once (all 4 days of one cycle): two independent
   standard exercises with a decorative pill, no visible pairing, and a stray rest after the
   first lift instead of one shared rest per round.
 - **Never superset a unilateral Primary lift** (Split Squat, Single-Leg Hip Thrust, Single-Leg
@@ -337,6 +351,18 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   rest. Straight sets, independent rest, same as any other Primary. Unilateral **Accessory**
   work is unaffected — it can still superset per the rule above (see COACHING-PRINCIPLES.md →
   "Session structure & time").
+- **WEEK 1 AND THE LAST WEEK (required output, 2026-09-26).** Every cycle is four loading weeks
+  plus a back-off week, and the cards never change, so decide both special weeks here, as
+  numbers. The app shows them to the athlete during that week (`cycles[n].weekNotes`, SCHEMA.md).
+  - **Last week, every cycle:** the back-off dose. Pick from `setsDrop` (sets fewer on every
+    exercise), `rpeDrop` (RPE points off, never below 6) and `rpeCap` (no set above it, 6–9), and
+    say what else changes: retests on flagged lifts only, no new top sets, a shorter outside day.
+    The usual shape is one set fewer and every RPE at 6 or 7. The one exception is a cycle Amir
+    said has no back-off, and then say so at the checkpoint.
+  - **Week 1, when it differs:** always for a new athlete, and for a returning one after a
+    layoff, a return from injury, or a cycle full of new patterns. Usually an `rpeCap` of 7 on
+    what's new, or `rpeDrop` 1 across the board, and what moves them back to the card from week 2.
+  Engage writes the athlete's words for both; you write the decision.
 - **DAY NAMING:** just note *what each day trains* in a plain working title (e.g. "Lower —
   squat/quad", "Upper push & pull"). The **vivid, banner-correct `focusTag` is finalized in
   /program-assemble** (it owns the keyword→image matching per SCHEMA) — don't do
@@ -352,16 +378,20 @@ still checked before Amir sees the finished programme, but the three-agent panel
 the BUILT programme, so it runs in /program-assemble (Step 3 checks, Step 3b review), not here:
 1. **`scripts/check_program.py`** on the built file, with this spec's volume table (`--log`)
    and the athlete's bans (`--ban`, from your contraindication read). Every FAIL is fixed. It
-   covers what the old panel mostly found: the 10-set floors, the 4-set cap, the new-athlete
-   8-rep rule, a banned movement in any exercise or fallback, RPE floors in every note,
-   back-to-back days, the Spine gate and the Quality Map. Session length is only a warning
-   (the cap is soft); pass `--cap` the athlete's real minutes when they are known.
+   covers what the old panel mostly found: the 10-set floor (only with `--floor`, when the
+   programme's aim is strength and muscle; a sport-performance athlete gets what is best for
+   them, Amir 2026-09-26), the 4-set cap (`--proven` once our own logs show the athlete handles
+   more), the new-athlete rules (on by themselves in a first cycle), a banned movement in any
+   exercise or fallback, RPE floors in every note, the week-1 and back-off notes, back-to-back
+   days and the Spine gate. Session length and the Quality headline are only warnings; pass
+   `--cap` the athlete's real minutes when they are known.
 2. **NEW athlete: ONE reviewer** (one agent, files only) for what a script cannot judge:
    injury logic, exercise choice, transfer, and whether the notes cover every exercise they
    should. **RETURNING athlete: no reviewer** unless Amir asks for one.
 So write the spec for a script to read: every loaded exercise in the volume table, each
 banned movement named in one line (`bans: goblet, hanging, …`), every fallback on a line that
-starts `fallback:`. A ban word is matched anywhere on a line holding `fallback`, `→`, `instead`
+starts `fallback:`, a muscle excused from the floor on `floor-except: chest (posture)`, and the
+two special weeks on `week1:` and `lastweek:` lines. A ban word is matched anywhere on a line holding `fallback`, `→`, `instead`
 or `swap`, so never reuse it in another sense there (`two sessions running` failed with
 `running` banned).
 
@@ -401,8 +431,8 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   each with its own `rest:` and an `intent: superset` tag — see the "Superset" bullet in STEP 2.
 - **warm-up / prep (simple or circuit)** → dose only (reps/duration); **no RPE, logs nothing**
   (prep circuits get `warmup: true` in assembly). RPE on a warm-up is noise.
-- `intent` is ONE coaching intention in plain words (`max intent`, `glute focus`,
-  `stick the landing`) — it ships as the exercise's `intent` field and draws the single green
+- `intent` is ONE coaching intention in plain words (`max intent`, `stick the landing`,
+  `right leg first`) — it ships as the exercise's `intent` field and draws the single green
   pill. Leave blank if none. **Never restate the tempo here**: `3s eccentric` beside a tempo of
   `3-1-1-0` is the same instruction twice, and the card already shows the tempo with its key
   digits highlighted.
@@ -471,9 +501,12 @@ brakes · rotation · engine · armour · movement`. The cycle's `art` word is i
 `bedrock`, `peak` and `reset` are phases, a foundation, sharpening or recovery block that trains a mix on purpose, so no headline). Count the designed week's
 working sets per quality: primary 1, secondary ½, prep blocks skipped, and an exercise dosed by
 time with no sets (a 30-min ride) counts one set per 10 minutes, never less than 1 (the same rule
-as the athlete's day cards and coach.html → Exercises → *Quality check*; 2026-09-26). **The headline must be in the
-top two.** If it isn't, either the week is wrong or the `art` word is, so fix one and say which in
-the report. Report the per-day top three too: it is exactly what each day card on Home will say
+as the athlete's day cards and coach.html → Exercises → *Quality check*; 2026-09-26). **The headline
+should be in the top two.** When it isn't, report it with your recommendation (Amir, 2026-09-26:
+*"report it, but recommend what you think should happen"*); it is a warning, never a fail. Counting
+sets under-weights a quality trained in few, fast sets, so a real power block can put Power third,
+and that is fine when the power work comes first each day. Never add volume only to move this
+line. Report the per-day top three too: it is exactly what each day card on Home will say
 it builds, so a day card that reads "Movement · Armour" on a day you meant as the power day is a
 design bug.
 
@@ -491,10 +524,9 @@ has one set of three cues, on its Spine entry, and every athlete's card shows th
 - **RETURNING athlete whose last cycle's cards carry their own `cues`** (every programme before
   2026-09-24 does): read each card's cues against its Spine entry's. Anything that is about THIS
   athlete becomes a `note_flag` on the same exercise in the new cycle, so it is not lost when the
-  card stops carrying cues. The rest is dropped. As of 2026-09-24 that is: amir_teflisi (Scapular
-  Push-Up on a bench for the wrists, Quadruped Thoracic Rotation with the hand across the chest
-  for the shoulder, Assault Bike with the arms off the handles) and lem_cass1 (the right shoulder
-  on Dumbbell Bench Press and Farmer's Carry, stop any Standing DB Overhead Press set at a pinch).
+  card stops carrying cues. The rest is dropped. Two athletes had such cues moved into their
+  Coach's Notes on 2026-09-24; their coaching logs say which. (This file is in a public repo:
+  never name an athlete or their health here.)
 - **An exercise with no Spine entry** is `new_exercise:` with three cues written for ANYONE
   (ext · int · avoid, no athlete, no home kit, no tempo, no dose). They go on the new entry via
   `/spine`, with every other field the existing entries carry, never on the card.
@@ -503,13 +535,14 @@ has one set of three cues, on its Spine entry, and every athlete's card shows th
 matter picked out in clay. A cue reading "three seconds down, one second pause, drive up" is
 the same instruction a third time (the pill was the second), and it costs one of only three
 cues. Say something the numbers cannot: what to feel, where to brace, what usually goes wrong.
-Calibrate to training age.
+Write it for anyone; a point about this athlete's training age goes in their `note:`.
 
-**AUTOREGULATION (required output):** include the standard note — drop every RPE by 1 on
+**AUTOREGULATION (required output):** every athlete gets the one line — drop every RPE by 1 on
 low-readiness days **but never below 6** (the app's selector floor — state the floor in the
 same sentence, or the note prescribes an RPE 5 she cannot log on every exercise authored at
-6); minimum effective dose = first power move + first primary; sessions may be reordered.
-Leans on the app's readiness check + ACWR.
+6). High-stress and concurrent athletes also get the minimum effective dose (first power move +
+first primary) and a flexible session order. Leans on the app's readiness check + ACWR.
+*(Made universal 2026-09-26; COACHING-PRINCIPLES → Recovery & autoregulation.)*
 
 **Do NOT output:** videoUrl · completionTitle/Message · currentCycleIndex · cycles[] ·
 programHistory. /program-engage and /program-assemble own those.
@@ -523,6 +556,10 @@ vivid `focusTag`, and canonical names.
 ATHLETE_ID: [id]
 SPORT_BADGE: [emoji] [label]
 PROGRAM: [number] | [N] days | [one-line focus]
+week1: [rpeCap 7 / rpeDrop 1 on what, and what moves them back to the card] (or "same as the card")
+lastweek: [setsDrop 1 · rpeCap 6, plus anything else that changes] (every cycle)
+bans: [one line, if any]
+floor-except: [muscle (reason), only when --floor applies and a muscle is excused]
 
 ---
 DAY [N] — [plain working title: what it trains] | load identity: [peak/moderate/low]
@@ -609,11 +646,10 @@ sits. Frame a time-limited under-dose as "maintenance," and say where to invest 
 Flag an **over** as loudly as an under — the fractional count surfaces over-dosing the direct-only
 count used to hide.
 
-**Progression levers** — per primary: lever · add-trigger · increment · deload call. How
-Amir drives week-to-week progression from the logs.
-
-**e1RM** — estimated 1RM per key primary (from logs) + change vs last cycle.
+**Special weeks** — the week-1 and back-off doses as decided (one line each).
 ```
+*(Progression levers and an e1RM section used to close the entry. Amir doesn't read them, so they
+went on 2026-09-26. An e1RM that drove a decision belongs in "The read", with its grade.)*
 
 Then hand off: **/program-engage** (Prompt 2 — messages, notes, completion) →
 **/program-assemble** (write + validate JSON, then archive this entry to the coaching log).
@@ -627,10 +663,10 @@ strength section on My Plan. Nobody has to test a true max for this to exist.
 
 **Read it before you set loads.** For a RETURNING athlete the brief's *"e1RM from heaviest
 logged sets"* is the same idea; The Ceiling is the tidier, dated version of it, and it also
-carries **relative strength** (estimated 1RM ÷ body weight, taken from the athlete's latest
-Proof weigh-in). **Body weight has two front doors now** — the *Body Weight* card on the
-programme app's Home, and AA Proof itself — so when a note needs to send someone off to
-weigh in, either is fine and the Home card is usually the closer one. For tennis and padel that ratio is the number that matters — absolute
+carries **relative strength** (estimated 1RM ÷ body weight, from the athlete's latest
+weigh-in). **Body weight is logged on the programme app's Home → Body Weight card** (tap it, then
+Weigh in). ⚠️ Never send anyone to AA Proof to weigh in: the weight screen left Proof on
+2026-09-12, and two programmes written that week still pointed there. For tennis and padel that ratio is the number that matters — absolute
 kilos say much less about a player than kilos per kilo of them.
 
 **Every estimate is graded, and the grade is the instruction:**
@@ -655,11 +691,13 @@ kilos say much less about a player than kilos per kilo of them.
   device from their own log.
 
 **Refreshing the number — the under-5RM test.** Where an athlete's estimates have all gone
-Rough (long sets, low RPE) and you want a real number, prescribe **one set of 3–5 reps
-taken to a genuine RPE 9–10** on a main lift, about **once a month**. That is the condition
-where both halves of the estimate are at their most accurate: the equation holds under
-about 10 reps, and an athlete's own sense of reps in reserve is roughly 2 reps out at
-RPE 9 against 5 reps out at RPE 5 (Zourdos 2021). **Never prescribe a true 1RM** — it buys
+Rough (long sets, low RPE) and you want a real number, prescribe **one set of 3–5 reps at
+about RPE 9, stopping at the first rep that slows or breaks position** on a main lift, about
+**once a month**. That is close to the condition where both halves of the estimate are at their
+most accurate: the equation holds under about 10 reps, and an athlete's own sense of reps in
+reserve is roughly 2 reps out at RPE 9 against 5 reps out at RPE 5 (Zourdos 2021). RPE 9, not
+10: the estimate comes out *Good* rather than *Sharp*, and an athlete training alone never grinds
+a rep (COACHING-PRINCIPLES → Testing, 2026-09-26). **Never prescribe a true 1RM** — it buys
 almost nothing over a hard triple and costs warm-up time, fatigue and risk.
 
 **The app now asks for it, so you do not have to remember to.** Put `test_flag: 5RM` on the
