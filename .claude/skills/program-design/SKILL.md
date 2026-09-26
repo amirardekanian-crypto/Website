@@ -418,8 +418,9 @@ carries `qualities` (first = primary) from the ten: `strength · muscle · power
 brakes · rotation · engine · armour · movement`. The cycle's `art` word is its headline
 (`iron`→strength, `build`→muscle, `voltage`→power, `spring`, `brakes`, `engine`, `armour`,
 `bedrock`, `peak` and `reset` are phases, a foundation, sharpening or recovery block that trains a mix on purpose, so no headline). Count the designed week's
-working sets per quality: primary 1, secondary ½, prep blocks skipped (the same rule as the
-athlete's day cards and coach.html → Exercises → *Quality check*). **The headline must be in the
+working sets per quality: primary 1, secondary ½, prep blocks skipped, and an exercise dosed by
+time with no sets (a 30-min ride) counts one set per 10 minutes, never less than 1 (the same rule
+as the athlete's day cards and coach.html → Exercises → *Quality check*; 2026-09-26). **The headline must be in the
 top two.** If it isn't, either the week is wrong or the `art` word is, so fix one and say which in
 the report. Report the per-day top three too: it is exactly what each day card on Home will say
 it builds, so a day card that reads "Movement · Armour" on a day you meant as the power day is a

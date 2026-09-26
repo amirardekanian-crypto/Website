@@ -31,6 +31,11 @@ Exit code 1 if anything FAILs. FAIL = a house rule is broken. WARN = look at it.
 """
 import argparse, hashlib, json, re, sys
 
+# Windows prints through cp1252, which has no ≈ or → (both in this script's report) and
+# crashed the run on Amir's PC; the report is UTF-8 everywhere (2026-09-26).
+for _stream in (sys.stdout, sys.stderr):
+    _stream.reconfigure(encoding='utf-8')
+
 # The ten qualities, in the app's sort order (tie-break), and each cycle art word's headline.
 QUALITIES = ['strength', 'muscle', 'power', 'spring', 'speed', 'brakes', 'rotation', 'engine', 'armour', 'movement']
 ART_HEADLINE = {'iron': 'strength', 'build': 'muscle', 'voltage': 'power', 'spring': 'spring',
@@ -392,6 +397,15 @@ def load_spine(path):
             spine[p[0]] = {'status': p[1], 'cues': p[2].lower() in ('true', 't'), 'q': [x for x in (p[3] if len(p) > 3 else '').split(',') if x]}
     return spine
 
+def qm_sets(rx):
+    """How many sets one working exercise counts for in the Quality Map. An exercise dosed by
+    TIME with no sets is one continuous effort (a 30-min ride): one set per 10 minutes, never
+    less than 1. Same rule as program.html qmSets() and coach.html qmSetsC() (2026-09-26)."""
+    n = num(rx.get('sets'))
+    if n: return int(n)
+    t = secs(rx.get('time'))
+    return max(1.0, t / 600) if t else 1
+
 def mix(day, spine, drafts):
     score, total, covered = {}, 0.0, 0.0
     def add(exid, sets):
@@ -407,7 +421,7 @@ def mix(day, spine, drafts):
             rx = ex.get('rx') or {}
             if ex.get('type') == 'circuit':
                 for it in ex.get('items') or []: add(it.get('exId'), int(num(rx.get('rounds')) or 1))
-            else: add(ex.get('exId'), int(num(rx.get('sets')) or 1))
+            else: add(ex.get('exId'), qm_sets(rx))
     return score, (covered / total if total else 0)
 
 def top3(score, coverage):

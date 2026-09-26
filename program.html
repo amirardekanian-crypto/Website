@@ -12022,6 +12022,23 @@ function isRacketSport() {
 // skipped. Returns [] unless ~70% of the day's working sets resolve to a tagged,
 // approved entry: a half-tagged day would show a wrong mix, so it shows none.
 const QM_COVERAGE = 0.7;
+// How many "sets" one working exercise counts for. An exercise dosed by TIME with no
+// sets is one continuous effort (a 30-min ride, a 20-min run): it counts one set per 10
+// minutes, never less than 1. Counted as 1 set, an easy aerobic day scored under the
+// 1.5 floor below and its card showed no chip at all (Amir, 2026-09-26: "fix those").
+// ⚠️ Same rule in coach.html qmSetsC() and scripts/check_program.py qm_sets().
+function qmSets(rx) {
+  const n = parseInt(rx && rx.sets, 10);
+  if (n) return n;
+  // rxOf() hands the dose back as { kind, value }; a raw rx object carries `time` itself.
+  const d = rx && rx.dose;
+  const t = String((d && d.kind === 'time' ? d.value : rx && rx.time) || '').trim().toLowerCase();
+  let sec = 0, m;
+  if ((m = t.match(/^(\d+):(\d{2})$/))) sec = +m[1] * 60 + +m[2];
+  else if ((m = t.match(/^(\d+(?:\.\d+)?)\s*(s|sec|secs|second|seconds|m|min|mins|minute|minutes)?$/)))
+    sec = +m[1] * ((m[2] || 's')[0] === 'm' ? 60 : 1);
+  return sec ? Math.max(1, sec / 600) : 1;
+}
 function qualityMix(day) {
   if (!SPINE || !QUALS || !QUALS.length || !day) return [];
   const score = {};
@@ -12041,7 +12058,7 @@ function qualityMix(day) {
         const rounds = parseInt(rxOf(ex).rounds || ex.rounds, 10) || 1;
         (ex.items || []).forEach(it => add(it.name, it.exId, rounds));
       } else {
-        add(ex.name, ex.exId, parseInt(rxOf(ex).sets, 10) || 1);
+        add(ex.name, ex.exId, qmSets(rxOf(ex)));
       }
     });
   });

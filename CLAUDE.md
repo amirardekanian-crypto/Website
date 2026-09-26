@@ -467,7 +467,10 @@ you recommend."* Server: `supabase/stage32_qualities.sql`.
   sits in `exercise_coach.suggested_qualities` and pre-fills his editor.
 - **The day card on Home shows up to three chips** (`paintDayQualities()` → `qualityMix(day)`):
   working sets × (primary 1, secondary ½), **prep blocks skipped** (`isPrepBlockTitle()`), and
-  **nothing at all below 70% tagged coverage**, rather than a wrong mix. Tapping a chip opens the
+  **nothing at all below 70% tagged coverage**, rather than a wrong mix. **An exercise dosed by time
+  with no sets counts one set per 10 minutes, never less than 1** (`qmSets()`, 2026-09-26): counted
+  as 1 set, a 30-min easy ride scored under the 1.5 floor and an aerobic day's card showed no chip at
+  all, and a run day with core work read "Armour" instead of "Engine". Tapping a chip opens the
   quality page (`openQualitySheet()`: line, court line, how we measure it); the About
   sheet's quality chips open it too. ⚠ **The explanation is the page** (Amir, 2026-09-24: *"the
   explanation is enough"*): the list of exercises that train it (*In your plan*) shows only when the
@@ -475,8 +478,8 @@ you recommend."* Server: `supabase/stage32_qualities.sql`.
   a card's ⓘ. **Words only: athletes never see set counts.**
 - ⚠ **The mix rule exists four times**: `qualityMix()` (program.html), `qualityCheckC()` (coach.html),
   the quality check in `/program-design` and `mix()`/`top3()` in `scripts/check_program.py` (2026-09-25).
-  Same weights, same prep test, same 70% coverage and 12% cut, or the coach's check, the pipeline's
-  check and the athlete's card disagree.
+  Same weights, same prep test, same minutes rule (`qmSets()` / `qmSetsC()` / `qm_sets()`), same 70%
+  coverage and 12% cut, or the coach's check, the pipeline's check and the athlete's card disagree.
 - **A cycle's headline quality is its `art` word** (`QM_ART` in coach.html). `bedrock`, `peak` and `reset` are
   phases, not qualities: they have no headline and are never flagged (bedrock→movement flagged almost
   every foundation block, 2026-09-24). coach.html → Exercises →

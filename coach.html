@@ -4397,6 +4397,21 @@ async function qualSave(id, approve) {
   toast(row.status === 'approved' ? 'Approved — it shows on day cards once exercises carry it' : 'Saved as draft');
   await loadSpine(); renderExercises();
 }
+// A working exercise dosed by TIME with no sets counts one set per 10 minutes, never
+// less than 1 (a 30-min ride = 3). ⚠️ Same rule as program.html qmSets() and
+// scripts/check_program.py qm_sets() (2026-09-26).
+function qmSetsC(rx) {
+  const n = parseInt(rx && rx.sets, 10);
+  if (n) return n;
+  // Chips.rxOf() hands the dose back as { kind, value }; a raw rx object carries `time` itself.
+  const d = rx && rx.dose;
+  const t = String((d && d.kind === 'time' ? d.value : rx && rx.time) || '').trim().toLowerCase();
+  let sec = 0, m;
+  if ((m = t.match(/^(\d+):(\d{2})$/))) sec = +m[1] * 60 + +m[2];
+  else if ((m = t.match(/^(\d+(?:\.\d+)?)\s*(s|sec|secs|second|seconds|m|min|mins|minute|minutes)?$/)))
+    sec = +m[1] * ((m[2] || 's')[0] === 'm' ? 60 : 1);
+  return sec ? Math.max(1, sec / 600) : 1;
+}
 // One programme's current week: working sets per quality (primary 1, secondary
 // half, prep blocks skipped — program.html's qualityMix() rule, drafts included
 // here because this is the coach's view), plus the cycle's headline from `art`.
@@ -4416,7 +4431,7 @@ function qualityCheckC(data, idx, byId) {
       if (ex.type === 'circuit') {
         const r = parseInt(Chips.rxOf(ex).rounds || ex.rounds, 10) || 1;
         (ex.items || []).forEach(it => add(it.name, it.exId, r));
-      } else add(ex.name, ex.exId, parseInt(Chips.rxOf(ex).sets, 10) || 1);
+      } else add(ex.name, ex.exId, qmSetsC(Chips.rxOf(ex)));
     });
   }));
   const cyc = (data.cycles || [])[Number.isInteger(data.currentCycleIndex) ? data.currentCycleIndex : 0] || {};

@@ -15,11 +15,18 @@
 # Cues are not written here: the UPDATE at the end copies Amir's own wording from the most
 # recently updated live programme that uses each name, and only fills an entry with no cues yet.
 import json, re, sys
+from pathlib import Path
 
-ROOT = __file__.rsplit('/.claude/', 1)[0]
-batch = json.load(open(sys.argv[1]))
-existing = {l.strip() for l in open(sys.argv[2]) if l.strip()}
-lib = json.load(open(ROOT + '/exercise_library.json'))
+# Windows (Amir's PC, 2026-09-26): __file__ has backslashes there, so the old
+# __file__.rsplit('/.claude/') never split and the library path broke. The files are read and
+# the SQL written as UTF-8 explicitly, because the Windows default (cp1252) cannot hold every
+# character a cue or purpose may carry, and a redirected stdout would crash on one.
+ROOT = Path(__file__).resolve().parents[3]          # <repo>/.claude/skills/spine/draft_sql.py
+for stream in (sys.stdout, sys.stderr):
+    stream.reconfigure(encoding='utf-8')
+batch = json.load(open(sys.argv[1], encoding='utf-8'))
+existing = {l.strip() for l in open(sys.argv[2], encoding='utf-8') if l.strip()}
+lib = json.load(open(ROOT / 'exercise_library.json', encoding='utf-8'))
 def yt(v):  # exercise_library.json holds a few non-video links (a Notion page) and bare 'youtube.com/...' ones
     if not isinstance(v, str) or not re.search(r'(youtube\.com|youtu\.be)/', v): return None
     return v if v.startswith('http') else 'https://' + v.lstrip('/')
