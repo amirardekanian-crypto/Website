@@ -177,8 +177,11 @@
 <link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap"></noscript>
 <!-- Supabase: cloud backup of progress for the coach dashboard (Stage 1).
-     Deliberately ABOVE analytics — see the ordering note above. -->
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+     Deliberately ABOVE analytics — see the ordering note above.
+     onerror (REL-01, 2026-09-26): the service worker keeps only this site's own files, so
+     with no signal this download simply fails. The flag lets _sbReady() stop at once
+     instead of polling ~3s for a library that is not coming, before every server call. -->
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.SB_FAILED=true"></script>
 <!-- `async`, not `defer`: analytics has no ordering dependency on anything, and
      on `defer` it shares one ordered execution queue with the SDK above. -->
 <script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
@@ -346,13 +349,24 @@
   .signin-foot { margin: auto 0 0; padding-top: 22px; text-align: center;
     font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
     letter-spacing: .16em; text-transform: uppercase; color: #bdb5a8; }
-  .error-icon { font-size: 48px; margin-bottom: 16px; }
+  .error-icon { margin-bottom: 16px; color: var(--ice); }
+  .error-icon svg { width: 46px; height: 46px; display: block; }
   .error-title {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
     font-size: 28px; color: var(--yellow); text-transform: uppercase;
     margin-bottom: 8px; text-align: center;
   }
-  .error-msg { font-size: 14px; color: var(--grey-text); text-align: center; line-height: 1.6; }
+  .error-msg { font-size: 14px; color: var(--grey-text); text-align: center; line-height: 1.6; max-width: 340px; }
+  .error-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; width: 100%; max-width: 300px; }
+  .error-actions:empty { display: none; }
+  .error-btn {
+    display: block; min-height: 46px; padding: 13px 18px; border-radius: 10px;
+    border: 1.5px solid var(--yellow); background: var(--yellow); color: var(--on-accent);
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px;
+    letter-spacing: 1px; text-transform: uppercase; text-align: center; text-decoration: none;
+    cursor: pointer;
+  }
+  .error-btn.ghost { background: transparent; color: var(--yellow); border-color: var(--yellow-mid); }
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -1176,6 +1190,28 @@
     animation: fadeInUp 0.6s ease 0.1s forwards;
   }
   .home-greet span { color: var(--grey-dark); display: block; }
+  /* The plan saved on this phone (REL-01, 2026-09-26): one quiet line under the
+     greeting while this run shows the phone's copy. Card grey and ink, no alarm
+     colour, and the tokens carry it into dark mode. */
+  .plan-offline {
+    display: flex; align-items: center; gap: 9px;
+    margin: -8px 24px 20px; padding: 9px 12px;
+    border: 1px solid var(--grey-mid); border-radius: 10px;
+    background: var(--grey-card); color: var(--grey-text);
+    font-size: 13px; line-height: 1.35;
+  }
+  .plan-offline[hidden] { display: none; }
+  .plan-offline b { color: var(--grey-dark); font-weight: 600; }
+  .po-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--grey-text); opacity: .6; }
+  .po-dot.on { background: var(--yellow); opacity: 1; }
+  .po-txt { flex: 1; min-width: 0; }
+  .po-when { white-space: nowrap; }   /* "yesterday 19:50" never splits across lines */
+  .po-btn {
+    flex: none; min-height: 34px; padding: 7px 14px; border: 0; border-radius: 8px;
+    background: var(--yellow); color: var(--on-accent); cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
   /* Small "Good morning/afternoon/evening" eyebrow above the big first name */
   .home-greet .home-greet-hi {
     display: block; color: #C7552F;
@@ -4048,10 +4084,12 @@
   <div class="loading-text">Loading Program</div>
 </div>
 
-<div class="error-screen" id="error-screen">
-  <div class="error-icon">⚠️</div>
-  <div class="error-title">Program Not Found</div>
-  <div class="error-msg" id="error-msg">Could not load athlete data. Check the URL parameter.</div>
+<!-- Filled by showError(): its title, icon and buttons name the real cause (REL-01). -->
+<div class="error-screen" id="error-screen" role="alert">
+  <div class="error-icon" id="error-icon" aria-hidden="true"></div>
+  <div class="error-title" id="error-title">Plan not available</div>
+  <div class="error-msg" id="error-msg"></div>
+  <div class="error-actions" id="error-actions"></div>
 </div>
 
 <!-- ═══ SIGN IN ═══
@@ -4330,6 +4368,11 @@
     <!-- "Hi Alex" — same scale as the My Plan name (first name only) -->
     <div id="home-greeting-wrap"></div>
 
+    <!-- Opened from the plan saved on this phone (REL-01): one quiet line, painted by
+         paintPlanOffline(), gone once the server has confirmed the plan. Under the
+         greeting, not above it: the fixed dark-mode button owns the top right corner. -->
+    <div id="home-offline" class="plan-offline" role="status" hidden></div>
+
     <!-- Current cycle card (View Plan pill → My Plan, no Read more) -->
     <div id="home-cycle-wrap"></div>
 
@@ -4588,6 +4631,12 @@ let ATHLETE_ID = '';
 const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
 const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
 let _sbClient = null, _sbTimer = null, _sbId = '', _sbName = '', _sbKey = null;
+// Uploads wait while this run has not pulled the cloud copy (REL-01, 2026-09-26): an
+// app opened from the plan saved on the phone, or whose boot pull timed out, has
+// never merged the cloud's progress, so a push from it would be a blind overwrite.
+// Every edit is still saved and stamped (the setItem hook runs as usual); only the
+// sending waits. _resumeSync() pulls, then clears this and pushes.
+let _sbHold = false;
 // Keys this device has DELETED, waiting to be forgotten server-side. The row is
 // merged with `data = old || new`, which can add and overwrite but never remove,
 // so without an explicit list a deleted key lives in the cloud for ever and is
@@ -4627,10 +4676,29 @@ async function _sbReady() {
   // the SDK arriving and this noticing. That slack is dead time on the two calls
   // a person actually waits through — the first programme fetch, and the tap on
   // "Sign in" — for a handful of no-op timer wakeups.
-  for (let i = 0; i < 120 && !(window.supabase && window.supabase.createClient); i++) {
+  // SB_FAILED: the <script> tag's onerror said the download failed (no signal), so
+  // there is nothing to wait for (REL-01). _sbLoad() tries again when it matters.
+  for (let i = 0; i < 120 && !(window.supabase && window.supabase.createClient) && !window.SB_FAILED; i++) {
     await new Promise(r => setTimeout(r, 25));
   }
   return _sb();
+}
+// The library, fetched again if its first download failed: an app opened with no
+// signal (REL-01) needs it once the connection comes back, and the <script> tag in
+// the head only ever tries once. Same URL as that tag, read from it so the two can
+// never drift. Resolves to the client, or null while there is still no signal.
+function _sbLoad() {
+  if (window.supabase && window.supabase.createClient) return Promise.resolve(_sb());
+  if (!window.SB_FAILED) return _sbReady();
+  const tag = document.querySelector('script[src*="supabase-js"]');
+  if (!tag) return Promise.resolve(null);
+  return new Promise(res => {
+    const s = document.createElement('script');
+    s.src = tag.src;
+    s.onload  = () => { window.SB_FAILED = false; res(_sb()); };
+    s.onerror = () => { s.remove(); res(null); };
+    document.head.appendChild(s);
+  });
 }
 function _snapshot() {
   const out = {}, prefix = _sbId + '_';
@@ -4678,6 +4746,9 @@ function _snapshot() {
 // the connection just came back after offline pushes were dropped.
 function _pushSnapshot(immediate) {
   clearTimeout(_sbTimer);
+  // Not pulled yet this run: the edit is on the phone and stamped; it goes up after
+  // the pull (_resumeSync()). The pending deletes stay queued for the same push.
+  if (_sbHold) return;
   const send = async () => {
     try {
       const sb = _sb();
@@ -4716,13 +4787,27 @@ function _pushSnapshot(immediate) {
 // pull (never blind-push) first, so a stale device can never overwrite the
 // cloud's good data. Must run BEFORE setupCloudBackup (raw writes, no push
 // storm) and BEFORE the UI renders, so the merged data shows immediately.
-async function syncFromCloud(athleteId, key) {
-  if (window.IS_DEMO || !athleteId) return;
+// Returns how it went (REL-01, 2026-09-26), because uploads wait for a pull that got
+// through: 'pulled' (merged, or the cloud had nothing yet), 'rejected' (the server
+// answered with an error; uploads go ahead, as they always have), 'unreachable'
+// (no answer; uploads keep waiting) or 'late'. `isLive` is the caller's ceiling: a
+// pull that outlived it must not merge underneath an app that has already painted.
+async function syncFromCloud(athleteId, key, isLive) {
+  if (window.IS_DEMO || !athleteId) return 'skipped';
+  let res;
   try {
     const sb = await _sbReady();
-    if (!sb) return;
-    const { data, error } = await sb.rpc('get_progress', { p_athlete_id: athleteId, p_key: key || null });
-    if (error || !data || typeof data !== 'object') return;   // offline / rejected → keep local
+    if (!sb) return 'unreachable';
+    res = await sb.rpc('get_progress', { p_athlete_id: athleteId, p_key: key || null });
+  } catch (e) { return 'unreachable'; }                              // offline
+  if (isLive && !isLive()) return 'late';
+  if (_noAnswer(res)) return 'unreachable';
+  const { data, error } = res;
+  if (error) return 'rejected';                                       // rejected → keep local
+  if (!data || typeof data !== 'object') return 'pulled';             // nothing in the cloud yet
+  // Only NOT reaching the server may hold uploads back. A merge that throws has had
+  // its answer, so it reports 'rejected' and uploads carry on, as they always did.
+  try {
     const prefix = athleteId + '_';
     // Freshness check: the cloud snapshot carries the timestamp of its last
     // edit ('snapAt'); this device stamps 'lastEditAt' on every progress write.
@@ -4750,11 +4835,25 @@ async function syncFromCloud(athleteId, key) {
       const cloudVal = plan.weightsOnly.has(k) ? stripSetLogSession(data[k]) : data[k];
       const localVal = localStorage.getItem(k);
       const merged   = mergeStoredValue(k, localVal, cloudVal, preferLocal);
+      // Raw: a merge is not an edit. At boot the hook is not installed yet, so this
+      // is what it always did; a pull that runs later (_resumeSync(), REL-01) must
+      // not stamp lastEditAt or queue a push for every key it merges.
       if (merged != null && merged !== localVal) {
-        try { localStorage.setItem(k, merged); } catch (e) { /* storage full — skip */ }
+        try { _lsRawSet(k, merged); } catch (e) { /* storage full — skip */ }
       }
     });
-  } catch (e) { /* offline / function not deployed — app still works from local */ }
+    return 'pulled';
+  } catch (e) { return 'rejected'; }   // the app still works from local
+}
+// Did the server answer at all? supabase-js hands a fetch that never got through
+// back as an error with status 0, and a 5xx is the server not coping, which for the
+// athlete is the same thing. A 4xx is a real answer (a refusal). `null` is what
+// _withTimeout() gives when the answer did not come in time.
+function _noAnswer(res) {
+  if (!res) return true;
+  if (!res.error) return false;
+  const s = Number(res.status) || 0;
+  return !(s >= 400 && s < 500);
 }
 
 // ── Never let the cloud resurrect a finished day ───────────────────────────────
@@ -5025,10 +5124,15 @@ function setupCloudBackup(athleteId, data, key) {
   _pushSnapshot();                                       // back up what's already stored
   // Hidden/killed → flush NOW: a debounced timer never fires once iOS suspends
   // the page, and a backgrounded PWA is routinely killed without warning.
-  document.addEventListener('visibilitychange', () => { if (document.hidden) _pushSnapshot(true); });
+  // Back in the foreground with uploads still held (REL-01): try the pull again.
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) _pushSnapshot(true);
+    else if (_sbHold) _resumeSync();
+  });
   window.addEventListener('pagehide', () => _pushSnapshot(true));
-  // Connection back after offline logging → push what the gym couldn't send.
-  window.addEventListener('online', () => _pushSnapshot(true));
+  // Connection back after offline logging → push what the gym couldn't send. A run
+  // that has not pulled yet (REL-01) pulls first and pushes after: _resumeSync().
+  window.addEventListener('online', () => { if (_sbHold) _resumeSync(); else _pushSnapshot(true); });
 }
 
 // ── Cloud-session retry queue ──────────────────────────────────────────
@@ -5113,6 +5217,151 @@ function getVideoUrl(ex) {
   const e = spineFor(ex.name, ex.exId);
   return (e && e.video) || '';
 }
+
+// ── Opening without signal (REL-01, 2026-09-26) ─────────────────────────────
+// Since 2026-09-07 the plan comes only from the server (get_program), and nothing
+// kept a copy on the phone. iOS closes a backgrounded PWA freely, so an athlete who
+// checked WhatsApp between sets in a gym with no signal came back to "Program Not
+// Found", their logged sets safe on the phone and no way to see or finish them.
+//
+// `plancache` is the last plan the server gave THIS phone. One slot, so a shared
+// phone never holds two athletes' plans: { id, at, data } = the athlete id it was
+// asked for, when it arrived, and the plan exactly as the server sent it.
+//   · Written only from a real server answer, and never in the demo (the public demo
+//     opened on an athlete's own phone would replace their plan) or coach preview.
+//     AA Proof's full app writes it too, for free athletes who never open this app;
+//     its strip on Home only reads it.
+//   · Opened only when the server could not be reached (no library, a timeout, a
+//     failed fetch, a 5xx), NEVER when it answered no: a refusal or an empty answer
+//     deletes it, so a removed login cannot keep opening from the phone.
+//   · Also deleted by signOutAthlete(), and replaced when another athlete loads here.
+//   · A CACHE: no athlete prefix, so _snapshot() can never send it. Caches never sync.
+// ⚠️ habits.html reads and writes the same key in the same shape: change both.
+const PLAN_COPY_KEY = 'plancache';
+let PLAN_OFFLINE = null;      // this run opened from the copy: { id, at, raw, checked }
+let _holdTimer = null, _resuming = false;
+
+function readPlanCopy(id) {
+  if (!id || window.IS_DEMO || window.IS_PREVIEW) return null;
+  try {
+    const c = JSON.parse(localStorage.getItem(PLAN_COPY_KEY) || 'null');
+    if (c && c.id === id && c.data && typeof c.data === 'object' && c.data.athlete) return c;
+  } catch (e) { /* unreadable: as good as none */ }
+  return null;
+}
+function savePlanCopy(id, data) {
+  if (!id || window.IS_DEMO || window.IS_PREVIEW || !data || typeof data !== 'object') return;
+  // Raw write: a cache, never an edit (no lastEditAt stamp, no push).
+  try { _lsRawSet(PLAN_COPY_KEY, JSON.stringify({ id: id, at: new Date().toISOString(), data: data })); }
+  catch (e) { /* storage full: the app still opens with signal, just not without */ }
+}
+function dropPlanCopy() {
+  if (window.IS_DEMO || window.IS_PREVIEW) return;   // never touched from either
+  try { _lsRawRemove(PLAN_COPY_KEY); } catch (e) {}
+}
+
+// What a get_program answer means here: 'ok' (a plan), 'no' (a refusal, or no plan
+// on the server) or 'unreachable' (no answer at all, see _noAnswer()).
+function planAnswerOf(res) {
+  if (_noAnswer(res)) return 'unreachable';
+  return (!res.error && res.data && typeof res.data === 'object') ? 'ok' : 'no';
+}
+
+// When the copy was saved: "today 18:40", "yesterday 18:40", "Tue 18:40", "12 Sep".
+function fmtSavedAt(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return '';
+  const hm = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  const day0 = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const days = Math.round((day0(new Date()) - day0(d)) / 86400000);
+  if (days <= 0) return 'today ' + hm;
+  if (days === 1) return 'yesterday ' + hm;
+  if (days < 7) return d.toLocaleDateString('en-GB', { weekday: 'short' }) + ' ' + hm;
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+// The one quiet line at the top of Home while this run shows the phone's copy.
+// Paper and ink, no alarm colour: no signal in a gym is normal, not an error.
+function paintPlanOffline(state) {
+  const el = document.getElementById('home-offline');
+  if (!el) return;
+  if (state === 'hide') { el.hidden = true; el.innerHTML = ''; return; }
+  let html;
+  if (state === 'changed') {
+    html = '<span class="po-dot on"></span><span class="po-txt">Your plan was updated</span>' +
+           '<button type="button" class="po-btn" onclick="location.reload()">Refresh</button>';
+  } else if (state === 'refused') {
+    html = '<span class="po-dot"></span><span class="po-txt">The server didn\'t confirm your plan. ' +
+           'Your sets are saved on this phone.</span>';
+  } else {
+    const when = PLAN_OFFLINE ? fmtSavedAt(PLAN_OFFLINE.at) : '';
+    html = '<span class="po-dot"></span><span class="po-txt"><b>Offline</b> · your plan as saved on this phone' +
+           (when ? ', <span class="po-when">' + esc(when) + '</span>' : '') + '</span>';
+  }
+  el.innerHTML = html;
+  el.hidden = false;
+}
+
+// One capped pull. If the cap wins, the answer is thrown away when it lands.
+async function _pullOnce(key) {
+  let live = true;
+  const r = await _withTimeout(syncFromCloud(ATHLETE_ID, key, () => live), 6000);
+  if (r === null) live = false;
+  return r;
+}
+function _startHoldTimer() { if (!_holdTimer) _holdTimer = setInterval(_resumeSync, 60000); }
+function _stopHoldTimer()  { clearInterval(_holdTimer); _holdTimer = null; }
+
+// Uploads are held (_sbHold) because this run has not pulled. Called when the
+// connection comes back, when the app returns to the foreground, and once a minute
+// (the `online` event never fires on a connection that is up but not working).
+// In order: the library, if it never arrived; the plan, if this run opened from the
+// copy (unchanged → the line goes; changed → "Your plan was updated · Refresh",
+// never swapped under a running session); the pull; then the held uploads and any
+// unsent sessions. A failed step just waits for the next nudge.
+async function _resumeSync() {
+  if (!_sbHold || _resuming || window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
+  if (PLAN_OFFLINE && PLAN_OFFLINE.refused) return;
+  _resuming = true;
+  try {
+    const sb = await _sbLoad();
+    if (!sb) return;
+    if (PLAN_OFFLINE && !PLAN_OFFLINE.checked) {
+      const res = await _withTimeout(
+        sb.rpc('get_program', { p_athlete_id: PLAN_OFFLINE.id, p_key: _sbKey || null }), 6000);
+      const ans = planAnswerOf(res);
+      if (ans === 'unreachable') return;
+      PLAN_OFFLINE.checked = true;
+      if (ans === 'no') {
+        // The server no longer lets this sign-in read the plan. Keep the screen (they
+        // may be mid-set, and every set is on the phone) but stop: nothing sent from
+        // here would be accepted, and the next open shows the way back in.
+        PLAN_OFFLINE.refused = true;
+        dropPlanCopy();
+        paintPlanOffline('refused');
+        _stopHoldTimer();
+        return;
+      }
+      savePlanCopy(PLAN_OFFLINE.id, res.data);
+      paintPlanOffline(JSON.stringify(res.data) === PLAN_OFFLINE.raw ? 'hide' : 'changed');
+    }
+    const pulled = await _pullOnce(_sbKey);
+    if (pulled === 'pulled' || pulled === 'rejected') {
+      _sbHold = false;
+      _stopHoldTimer();
+      _pushSnapshot(true);
+      _replayQueue();
+    }
+  } catch (e) { /* the next nudge tries again */ }
+  finally { _resuming = false; }
+}
+
+// The error screen's icons, drawn rather than emoji (⚠️ renders yellow, and neither
+// app shows yellow anywhere).
+const ERROR_ICONS = {
+  offline: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><path d="M12 20h.01"/></svg>',
+  locked:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
+};
 
 // ── 1. BOOT ──
 (async function boot() {
@@ -5200,6 +5449,9 @@ function getVideoUrl(ex) {
   }
 
   DATA = null;
+  // How the server answered (REL-01): 'ok', 'no' (a refusal, or no plan) or
+  // 'unreachable'. Only 'unreachable' may open the plan saved on this phone.
+  let planAnswer = 'unreachable';
   try {
     const sb = await _sbReady();
     if (sb) {
@@ -5207,17 +5459,37 @@ function getVideoUrl(ex) {
       // before the first paint turns the loading screen into the whole app.
       const res = await _withTimeout(
         sb.rpc('get_program', { p_athlete_id: clientId, p_key: preKey || null }), 6000);
-      if (res && !res.error && res.data && typeof res.data === 'object') DATA = res.data;
+      planAnswer = planAnswerOf(res);
+      if (planAnswer === 'ok') {
+        DATA = res.data;
+        // Saved before anything below touches DATA, so the copy is the server's own.
+        savePlanCopy(clientId, DATA);
+      }
     }
-  } catch (e) { /* offline or rejected — the file fallback below covers it */ }
+  } catch (e) { /* offline or rejected — the fallbacks below cover it */ }
+  // The server said no. Its word is final, and a copy it would refuse goes too.
+  if (planAnswer === 'no') dropPlanCopy();
 
-  if (!DATA) {
+  if (!DATA && planAnswer !== 'no') {
     try {
       // no-cache: always revalidate so an updated program (e.g. a newly embedded
       // athlete key) reaches the athlete immediately instead of a stale cached copy.
-      const res = await fetch(`data/${clientId}.json`, { cache: 'no-cache' });
-      if (res.ok) DATA = await res.json();
-    } catch (e) { /* fall through to the error below */ }
+      // A 404 on the live site since 2026-09-07; kept because the headless render
+      // checks (Content/FRESH-EYES.md) stub the server and serve a local data file.
+      // Timed, so a stalled connection cannot hold the phone's copy back.
+      const res = await _withTimeout(fetch(`data/${clientId}.json`, { cache: 'no-cache' }), 4000);
+      if (res && res.ok) DATA = await res.json();
+    } catch (e) { /* fall through to the phone's copy, then the error below */ }
+  }
+
+  // No answer from the server: open the plan saved on this phone (REL-01).
+  if (!DATA && planAnswer === 'unreachable') {
+    const copy = readPlanCopy(clientId);
+    if (copy) {
+      DATA = copy.data;
+      // `raw` is compared with the server's plan when the connection comes back.
+      PLAN_OFFLINE = { id: copy.id, at: copy.at, raw: JSON.stringify(copy.data) };
+    }
   }
 
   // The remembered id was an optimisation; this is where it answers for itself.
@@ -5226,8 +5498,14 @@ function getVideoUrl(ex) {
   // DIFFERENT athlete is signed in on this device than the one we optimistically
   // loaded — so throw the fetch away and start again with the server's answer
   // rather than showing one athlete another's programme.
-  if (identityCheck) {
-    const realId = await identityCheck;
+  // Not when opened from the phone's copy (REL-01): with no signal the check cannot
+  // answer, and on a stalled connection awaiting it would hold the screen for as long
+  // as the stall lasts. The copy only ever opens for the remembered id it was saved
+  // under, and the server checks again when the connection comes back.
+  // Capped like every other wait before the first paint: past 6s it is skipped, which
+  // is safe because a plan the server did send was one this sign-in may read.
+  if (identityCheck && !PLAN_OFFLINE) {
+    const realId = await _withTimeout(identityCheck, 6000);
     if (realId && realId !== clientId) {
       try { localStorage.setItem('aa_athlete_id', realId); } catch (e) {}
       // One reload only: the corrected id is on disk now, so the retry takes the
@@ -5240,8 +5518,23 @@ function getVideoUrl(ex) {
     }
   }
 
+  // Two real causes, each with its own words (REL-01). It used to blame a link for both.
   if (!DATA) {
-    showError(`Could not load your program.\n\nIf you opened this from an old link, ask Amir for a fresh one.`);
+    if (planAnswer === 'no') {
+      const wa = 'https://wa.me/' + COACH_WHATSAPP + '?text=' +
+                 encodeURIComponent("Hi Amir, the app won't open my plan. ");
+      showError('This sign-in or link isn\'t accepted any more. Sign in again, or message Amir on WhatsApp if it keeps happening.', {
+        title: 'Plan not available', icon: 'locked',
+        actions: '<button type="button" class="error-btn" onclick="signOutAthlete()">Sign in again</button>' +
+                 `<a class="error-btn ghost" href="${wa}" target="_blank" rel="noopener">Message Amir on WhatsApp</a>`
+      });
+    } else {
+      showError('The app couldn\'t reach the server, and this phone hasn\'t saved your plan yet. ' +
+                'Try again when you have signal. Once it has opened with a connection, it opens without one too.', {
+        title: 'No connection', icon: 'offline',
+        actions: '<button type="button" class="error-btn" onclick="location.reload()">Try again</button>'
+      });
+    }
     return;
   }
 
@@ -5278,7 +5571,14 @@ function getVideoUrl(ex) {
   // Stage 4: pull the athlete's saved progress from the cloud and merge it in on
   // EVERY load (not just a fresh device), BEFORE wiring up backup or rendering —
   // so any returning device shows the latest data instead of a stale local copy.
-  if (!window.IS_DEMO && !window.IS_PREVIEW) await syncFromCloud(ATHLETE_ID, effectiveKey);
+  // Capped at 6s, like AA Proof's (REL-01): it had no ceiling, so a stalled pull
+  // was a loading screen for as long as the stall lasted. A run that has not pulled
+  // (opened from the phone's copy, or out of time) holds its uploads until a pull
+  // gets through: _resumeSync(), nudged by the connection, the foreground, a timer.
+  if (!window.IS_DEMO && !window.IS_PREVIEW) {
+    const pulled = PLAN_OFFLINE ? 'unreachable' : await _pullOnce(effectiveKey);
+    if (pulled === 'unreachable' || pulled === null) { _sbHold = true; _startHoldTimer(); }
+  }
 
   // Stage 1: start mirroring progress to the cloud (skips the public demo).
   // Stage 2: pass the per-athlete key so keyed athletes can write.
@@ -5309,6 +5609,7 @@ function getVideoUrl(ex) {
   renderPlan();
   renderHome();
   renderNotes();
+  if (PLAN_OFFLINE) paintPlanOffline('offline');
   _proofCardSig = proofCardSig();
   mountProofStrip();
 
@@ -5362,9 +5663,18 @@ function getVideoUrl(ex) {
   }, 0);
 })();
 
-function showError(msg) {
+// opts (REL-01): { title, icon: 'offline' | 'locked', actions: html }. The two causes
+// the app can tell apart get their own words and a way forward.
+function showError(msg, opts) {
+  opts = opts || {};
   document.getElementById('loading').classList.add('hidden');
+  const t = document.getElementById('error-title');
+  if (t && opts.title) t.textContent = opts.title;
+  const ic = document.getElementById('error-icon');
+  if (ic) ic.innerHTML = ERROR_ICONS[opts.icon] || ERROR_ICONS.locked;
   document.getElementById('error-msg').textContent = msg;
+  const a = document.getElementById('error-actions');
+  if (a) a.innerHTML = opts.actions || '';
   document.getElementById('error-screen').classList.add('visible');
 }
 
@@ -5483,6 +5793,11 @@ function showSignIn() {
       });
       if (error) throw error;
 
+      // A fresh sign-in starts from the server (REL-01). The plan saved on this phone
+      // goes now: if the signal dropped before the reload's first load, the phone must
+      // not open whoever was signed in before. The reload saves the new one at once.
+      dropPlanCopy();
+
       // One field fewer next time, here and in habits.html (same origin, same key).
       try { localStorage.setItem('aa_last_user', user); } catch (e) { /* storage blocked */ }
 
@@ -5532,6 +5847,8 @@ async function signOutAthlete() {
   // Drop the remembered athlete id FIRST, so the reload below cannot optimistically
   // load the athlete who just signed out while the sign-out is still in flight.
   try { localStorage.removeItem('aa_athlete_id'); sessionStorage.removeItem('aa_id_fixed'); } catch (e) {}
+  // The plan saved on this phone goes with them (REL-01).
+  dropPlanCopy();
   try {
     const sb = await _sbReady();
     if (sb) await sb.auth.signOut();

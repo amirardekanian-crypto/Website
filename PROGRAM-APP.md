@@ -445,6 +445,58 @@ preview. Details: `HABITS.md` → *Embedded on the training app's Home*.
 It sat above them from 2026-09-12, and in the fortnight after, 5 of 40 athletes logged a habit in a
 week while 16 trained. The training is why the app is opened, so it leads.
 
+## 📶 No signal — the plan saved on the phone (REL-01, 2026-09-26)
+
+Fresh Eyes REL-01; Amir picked *"A with Proof"*. Since 2026-09-07 the plan came only from
+`get_program`, and nothing kept a copy on the phone. iOS closes a backgrounded PWA freely, so an
+athlete who checked WhatsApp between sets in a no-signal gym reopened on *"Program Not Found … ask
+Amir for a fresh one"*, their logged sets safe on the phone and no way to see or finish them. The
+service worker keeps the app's own files; its old offline path for the plan, `data/<id>.json`, has
+been a 404 since 2026-09-07. Rejected: opening from the phone on every launch (a stale plan first,
+swapped under a running session) and letting `sw.js` keep the plan (it cannot cache a POST, and it
+sits in front of the whole site).
+
+- **`plancache`** (localStorage, no athlete prefix, so it never syncs): ONE slot, `{ id, at, data }`
+  = the athlete id it was asked for, when, and the plan exactly as the server sent it. A shared phone
+  never holds two athletes' plans.
+- **Written** (`savePlanCopy()`) only from a real `get_program` answer, before anything touches `DATA`;
+  never in the demo (the marketing demo opened on an athlete's own phone would replace their plan), the
+  coach preview or Proof's strip on Home. AA Proof's full app writes it too.
+- **Opened** only when the server could not be reached: no library, the 6 s timeout, a failed fetch
+  (status 0) or a 5xx (`_noAnswer()`, `planAnswerOf()`). **Never when it answered no**: a 4xx
+  (`get_program` raises `invalid athlete key`) or an empty answer deletes the copy (`dropPlanCopy()`)
+  and shows *Plan not available* with *Sign in again* and a WhatsApp button.
+- **Deleted** too by `signOutAthlete()` (which the error screen now calls; no other button does yet,
+  that is NAV-02) and by every successful sign-in in either app, so a new athlete whose signal drops
+  before the first load can never open the previous one's plan. The reload saves theirs at once.
+- **What the athlete sees:** the app opens from the copy with one quiet line above the greeting,
+  *Offline · your plan as saved on this phone, Tue 18:40* (`paintPlanOffline()`, `#home-offline`).
+  With no copy: *No connection*, with *Try again*. The error screen's ⚠️ emoji (yellow) is now an
+  icon in clay.
+- **The library** (`supabase-js` from jsDelivr, which the worker does not keep) marks a failed download
+  (`onerror` → `window.SB_FAILED`), so `_sbReady()` stops at once instead of polling ~3 s before
+  every call; `_sbLoad()` fetches it again once the connection is back.
+- **Uploads wait for a pull (`_sbHold`).** A run opened from the copy, or whose boot pull ran out of
+  its new 6 s cap, has not merged the cloud's progress, so `_pushSnapshot()` sends nothing; every edit
+  is still saved and stamped (`lastEditAt`), which is what lets this device's offline session win the
+  merge later. `_resumeSync()` runs on `online`, on return to the foreground and once a minute: the
+  library, then the plan (unchanged: the line goes; changed: *Your plan was updated · Refresh*, never
+  swapped under a running session; refused: *The server didn't confirm your plan*, and it stops), then
+  the pull, then the held push and the unsent sessions (`_replayQueue()`).
+- **`syncFromCloud()` reports** `'pulled'`, `'rejected'` (answered with an error: uploads go ahead,
+  as they always did), `'unreachable'` or `'late'`; a pull that outlives its cap is thrown away when it
+  lands, and it merges with `_lsRawSet`, because a merge is not an edit.
+- **Not awaited on the copy path:** the identity check (it cannot answer offline; the copy only opens
+  for the remembered id it was saved under, and the server checks again on reconnect). Elsewhere it is
+  capped at 6 s. The legacy `data/<id>.json` fetch stays, capped at 4 s, because the headless render
+  checks serve one.
+- ⚠️ **Exists twice**, in this file and `habits.html`: `_noAnswer()`, `_sbLoad()`, `readPlanCopy()` /
+  `savePlanCopy()` / `dropPlanCopy()` / `planAnswerOf()` and the `plancache` shape. Change both. Proof's
+  side: `HABITS.md` → *No signal*.
+- **Left as is:** one bar of signal still costs up to the 6 s `get_program` wait before the copy opens.
+  Waiting less when a copy exists would open slow-but-working connections on the copy more often; it is
+  a separate call.
+
 ## 🏋️ Personal Records — three write doors, and three things written twice
 
 One name on every screen since 2026-09-26 (it was also called **The Ceiling**; the code keeps

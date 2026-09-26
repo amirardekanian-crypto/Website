@@ -60,10 +60,16 @@
 //      and a running session's Guided button is visible again.
 // v35: program.html and habits.html changed (2026-09-26): today's habits are ticked on Home,
 //      in AA Proof's embedded strip (habits.html?embed=1).
-// v36: shared.js and program.html changed (2026-09-26): the video pop-up reads the same YouTube
+// v36: program.html and habits.html changed (2026-09-26, REL-01): both open with no signal from
+//      the last plan the phone loaded (localStorage `plancache`), stop waiting at once when the
+//      Supabase library could not download, and say what really went wrong when they cannot open.
+//      It also carries habits.html's rounded day gate (gatePasses(), b821468), which shipped without
+//      a bump of its own.
+// v37: shared.js and program.html changed (2026-09-26): the video pop-up reads the same YouTube
 //      links as the app (a Short plays in a tall box; a non-YouTube link opens as a link), and
-//      a weight typed as "2×20" reads back as a weight, not as 20 reps.
-const CACHE = 'aap-v36';
+//      a weight typed as "2×20" reads back as a weight, not as 20 reps. habits.html: the six July
+//      AA Proof bugs (ecb459a).
+const CACHE = 'aap-v37';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
@@ -161,6 +167,8 @@ self.addEventListener('fetch', e => {
   // each boot, so a one-launch-old shell still shows today's training. The only
   // thing that lags a deploy is the app's own code, and it lands on the next
   // open — which is why the background refresh below is not optional.
+  // (With no signal, the page itself opens the last plan it loaded from
+  // localStorage `plancache` — REL-01. This worker never stores a plan.)
   //
   // Keyed on the PATHNAME, not the full URL: a legacy ?client=&key= link and a
   // plain /program.html are the same shell, and caching them separately would
@@ -170,12 +178,13 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // JSON (athlete data, articles, workouts) — network-first so updates land
-  // immediately, but keep the last good copy as an offline fallback. Without
-  // this, a PWA relaunch with no signal dies on the "Could not load data"
-  // screen mid-workout: the OS killing the backgrounded app forces a full
-  // reload, and data/<id>.json was the one thing that had to come from the
-  // network.
+  // JSON (articles, workouts) — network-first so updates land immediately, but
+  // keep the last good copy as an offline fallback.
+  // ⚠️ This used to be how a PWA relaunched with no signal still found its
+  // programme: data/<id>.json. Those files have been a 404 since 2026-09-07 (a
+  // 404 is never cached here), so from then until REL-01 (2026-09-26) an offline
+  // relaunch showed "Program Not Found". The programme now opens offline from
+  // the page's own localStorage copy (`plancache`), not from this cache.
   if (url.pathname.endsWith('.json')) {
     e.respondWith(
       fetch(request)

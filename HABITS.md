@@ -66,6 +66,33 @@ app stays inside the app shell — no browser bounce, no second install. The han
 needs nothing in the URL any more: the Supabase session says who the athlete is on both
 sides, and `athleteFromSession()` resolves the id on arrival.
 
+### No signal — it opens anyway (REL-01, 2026-09-26)
+
+Boot needs `get_program()` only for the athlete block (id, name, tier), and with no
+signal it had nothing: the full app, opened from its own icon, showed the **sign-in
+card** to an athlete who was already signed in, and the strip on the training app's
+Home hid itself. The manual's *"Nothing here needs a signal"* was untrue at launch.
+Now (Amir's pick, "A with Proof"; the full account is `PROGRAM-APP.md` → *No signal*):
+- **`athleteFromSession()` says `null` for "could not ask"** (no library, no answer, out
+  of its new 6 s cap), which is not `''` (nobody signed in). Then boot takes
+  `aa_athlete_id`, the athlete this phone last signed in as, only with a session on the
+  device. Proof now writes that key too, and its `signOutAthlete()` clears it.
+- **The athlete block comes from `plancache`** when the server cannot be reached: the
+  one-slot copy of the last plan this phone loaded, **the same key and shape
+  `program.html` keeps**. The full app writes it from a real answer (so free athletes,
+  who never open the training app, get it too); the strip, the demo and the coach
+  preview never write it. A refusal, an empty answer, a session the server says is nobody's
+  and every successful sign-in delete it.
+- **Opened from the copy, the app paints at once.** The pull still gets its 6 s turn,
+  behind the screen, and `SYNC.ready` lifts only when that turn is over, the same rule as a
+  boot pull that fails (never upload before the first download has had its turn). The
+  season, quests and workout days wait for the next launch; `pullFresh()` runs on the next
+  foreground or reconnect, and `syncFromCloud()` fetches the library again (`_sbLoad()`)
+  if it never arrived.
+- **The error screen names the cause**: *No connection* (no copy yet) or *Not available*
+  (the server refused), each with a button. Its old hint showed a `?client=` link.
+- ⚠️ `_noAnswer()`, `_sbLoad()` and the copy's helpers exist in both apps: change both.
+
 ### Putting it on the home screen
 
 Proof carries its own manifest — the static `/manifest-proof.json`, which everyone
