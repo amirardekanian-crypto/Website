@@ -43,7 +43,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#234](https://github.com/amirardekanian-crypto/Website/pull/234) | The check-in sets today's targets (amber, red, sore); coach.html shows the plan and a run of low days | READY-01, WK-03 |
 | [#235](https://github.com/amirardekanian-crypto/Website/pull/235) | Today's habits ticked on Home: AA Proof's own page, embedded (`habits.html?embed=1`) | SEAM-01 |
 | [#237](https://github.com/amirardekanian-crypto/Website/pull/237) | No signal: both apps open from the plan saved on the phone (`plancache`); uploads wait for a pull; the error screens name the cause | REL-01, CNT-01 |
-| PRIV-01 PR | Proof tells a coached athlete, by name, that they go on the board after their first session, and offers **Keep me off the board** before it happens (`boardState()`, `keepOffBoard()`) | PRIV-01 |
+| [#238](https://github.com/amirardekanian-crypto/Website/pull/238) | Proof tells a coached athlete, by name, that they go on the board after their first session, and offers **Keep me off the board** before it happens (`boardState()`, `keepOffBoard()`) | PRIV-01 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01.
 
@@ -72,7 +72,7 @@ HOME-03, DATA-02. P3: DS-03, CONS-01, SHEET-01, PRF-05, WK-05, LIB-01, POL-01, P
 **REL-01 is done** (#237, 2026-09-26): both apps open with no signal from `plancache`; the full
 account is `PROGRAM-APP.md` → *No signal*.
 
-**PRIV-01 is done** (2026-09-26, Amir's call B): every line about the board reads `boardState()`
+**PRIV-01 is done** (#238, 2026-09-26, Amir's call B): every line about the board reads `boardState()`
 (`'on' | 'coming' | 'off'`); a coached athlete who has not trained yet is told the name they will appear
 under, can change it, and can keep off in advance. Full account: `HABITS.md` → *Who is on it*.
 
