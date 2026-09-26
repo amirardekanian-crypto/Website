@@ -101,8 +101,11 @@ account is `PROGRAM-APP.md` → *No signal*.
 under, can change it, and can keep off in advance. Full account: `HABITS.md` → *Who is on it*.
 
 1. **"Stop the bleeding" is done** (2026-09-26): REL-01, PRIV-01, CNT-01, WK-01's quick part, LOG-02, PRF-04,
-   HOME-03, WK-03's quick parts, A11Y-01 in the training app.
-2. **Foundations:** HOME-02's Today block (HOME-01, the week from history, is done).
+   HOME-03, WK-03's quick parts, A11Y-01 in the training app. So are NAV-01 (both apps), HOME-01, BW-01,
+   DATA-02's safe part, SHEET-01 and POL-01 (#239–#252, Amir: "keep going, only pause if you want me to choose").
+   **Six calls wait for Amir** (the first six under *Open calls*): the Today block, Game Plan folding,
+   the estimate on the card, a rest day in Proof, the unfinished day, following the phone's dark setting.
+2. **Foundations:** HOME-02's Today block, once he answers.
 3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
    Confirm the card freeze with Amir first (below).
 4. **Home and progress:** REC-01 (the estimate off the card), PROG-01, PLAN-01, DATA-02 (the unfinished day, after his call).
@@ -111,6 +114,15 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 6. **System and polish:** DS-01, DS-03, CONS-01, PRF-05, LIB-01, POL-01, POL-02, DOC-01.
 
 ## Open calls and things to watch (put these to Amir)
+
+- **Home's Today block (HOME-02).** The next session (or "Rest day" with one suggestion) with Start or
+  Resume, then one-line rows for habits, records and weight, empty states a single quiet line. A visible
+  redesign of Home: build as described, or mockup first?
+- **Game Plan opening (PLAN-01).** On 2026-09-12 Amir asked for every cycle card open. Folding the past and
+  future cycles to one line (the current one open) reaches this cycle's reasoning without scrolling past
+  last month. Reverses his rule, so his call. Also: the welcome's "See my game plan" → Day 1?
+- **The estimate on the working card (REC-01).** The estimated max still sits on the card mid-set. Take it off
+  the card (it stays in Records) or keep it?
 
 - **The demo breaks two of his rules.** It has a "Week 4 — Deload" notes card instead of
   `weekNotes.last` (REC-4; the demo has no week notes at all), and "Use 2–3 kg" in a notes card
@@ -206,8 +218,8 @@ The app cannot reach Supabase from here, so stub it and feed it a local programm
 
 ## Paste this to start the next chat
 
-> Continue the Fresh Eyes work. Read `Content/FRESH-EYES.md` first, then CNT-01's entry on the Fresh
-> Eyes page (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). Start with CNT-01 (the copy that still
-> describes an older app) using the same loop as before: restate the problem, give two or three
-> directions with trade-offs and your recommendation, name the architectural consequences, and wait for
-> my yes before building. WK-01's quick part comes after it.
+> Continue the Fresh Eyes work. Read `Content/FRESH-EYES.md` first, then the "Watch and decide" panel on
+> the Fresh Eyes page (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). Put the six open calls to me
+> first, then build HOME-02's Today block the way I answer, using the same loop as before: restate the
+> problem, give two or three directions with trade-offs and your recommendation, name the architectural
+> consequences, and wait for my yes before building.
