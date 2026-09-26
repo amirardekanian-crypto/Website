@@ -293,7 +293,9 @@ node .claude/skills/reel/tools/render_mp4.js Content/<reel>.html Content/<reel>/
 - Needs `playwright-core` on `NODE_PATH`, Edge, and ffmpeg (`python -m pip install --user imageio-ffmpeg`).
 - Keep the frames folder **out of the repo** (OneDrive would sync 900 files). `export/` is git-ignored.
 - Pull two or three frames back out of the MP4 with ffmpeg and look at them before sending. Also send a
-  cover frame (about 3–4 s, everything in place). The MP4 has **no audio**: Amir adds it in Instagram.
+  cover frame (about 3–4 s, everything in place). The MP4 has **no audio**: Amir adds music in Instagram.
+- **An ad (or any reel with his voice) is not finished until it has sound**: run `tools/mux_audio.py` on the render
+  and his take, exactly as `/ad` stage 16 says, and send only a file it printed `PASS` for.
 - The old real-time route (`recordVideo` + a MutationObserver on the loop) is worse: a low-bitrate VP8
   stream whose smoothness depends on the machine. Do not use it.
 - Deliver the `.mp4` via `SendUserFile` with `display: "attach"`.

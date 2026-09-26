@@ -233,18 +233,36 @@ them to add it to their home screen · **why their programme looks the way it do
 and which day is non-negotiable · what they should have by the end · and a pointer that the
 second message is coming and matters.
 
-**MESSAGE 2 — what to watch for.** The *actionable* half, mirroring the notes cards but as
-instructions, one line for every obligation that asks the athlete to do something: what to film and what it unlocks · any dated appointment or referral, with the
-escalation triggers · the weekly measurements and why they're numbers not feelings · fuelling ·
-the rest-day / load rule · **the back-off week with its dates** (and week 1, if it differs) ·
-where to weigh in, when the cycle needs it (the programme app's Home → Body Weight, never AA
-Proof) · and the **modification menu** (reporting buys a change, never a ban),
-which for a pain-hiding athlete is the single most important paragraph in either message. Fold
-any outstanding question (unquantified swim volume, missing history) in here so the answer comes
-back without a separate ask.
+**MESSAGE 2 — what to watch for. Built from design's `obligations:` list, not written freehand**
+(2026-09-26; COM-9). The cards are driven by that list and checked; this message now is too. **One
+short line per key, the same keys in the same order as the list**, each saying what the athlete does
+and where it sits in the app (the card's title as the app shows it, or *Week 1* / *the back-off week*
+on Home). What each key covers:
 
-Voice: same rules as all athlete-facing text — it must sound like Amir wrote it. Warm, direct,
-simple words, short sentences. When writing Farsi, use natural colloquial Farsi with **Persian
+| key | the line |
+|---|---|
+| `backoff` | the back-off week with its dates (COM-2's calendar rule) and what gets lighter |
+| `week1` | what is different in week 1, and when it goes back to the card |
+| `explainer` | where the How-it-works card is, and read it before Day 1 |
+| `pain-ladder: <part>` | the stop rule in one line, and message Amir the same day |
+| `modification-menu` | tell Amir and he changes it, nothing gets banned (INT-10; for a pain-hiding athlete this is the line that matters most, so give it two sentences) |
+| `film: <what, weeks>` | what to film, which weeks, send it on WhatsApp, what it unlocks (PRC-8) |
+| `weigh-in` | how often, and where (COM-13) |
+| `double-day` | the order on a day with both sport and gym |
+| `low-readiness` | answer the check-in honestly, the app lowers that day's targets (REC-2) |
+| `period` | only if design listed it: what changes that week |
+| `start-lower: <what, number>` | the number to start at, and what moves it up |
+| `close-loop`, `win` | the good news, one line, with its number |
+
+**Then, after the list and never between its lines,** what the list does not carry: a dated
+appointment or referral with its trigger, fuelling, and any outstanding question (unquantified swim
+volume, missing history), folded in so the answer comes back without a separate ask.
+**Self-check, one line, coach-only, under the message (never pasted to the athlete):**
+`MSG2 CHECK — obligations N · lines N · same order ✓`. Assemble copies the count into its
+OBLIGATIONS CHECK (Step 6).
+
+Voice: COM-3, for both messages and for every line built from the list: the table above says
+what a line covers, never how to word it. Warm, direct, simple words, short sentences. When writing Farsi, use natural colloquial Farsi with **Persian
 numerals**, and give any date in the **Persian calendar first** with the Gregorian in brackets —
 that's the calendar the athlete actually lives by.
 

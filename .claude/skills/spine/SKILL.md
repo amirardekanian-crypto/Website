@@ -229,7 +229,7 @@ no SFR. Answer them once and they stop mattering.
 | **Body parts** (`loads` + `impact`; `impact` null means never checked) | Fill both | Fill both, on Amir's standing word (2026-09-24: *"remember if we add a exercise … to add these details"*). Since stage37 every entry has both, so a gap here is a new exercise or one somebody cleared |
 | **No qualities** (the Quality Map) | Fill `qualities` (first = primary, max 3) | **Don't write them.** Put them in `exercise_coach.suggested_qualities`: coach.html pre-fills his editor with them, and they reach phones only when he saves |
 | **No count** (`credits` + `cost`, coach-only) | Fill both | Fill both: no phone reads them, and without them the checker FAILs every programme that uses the entry. **Changing** a count already there is a proposal: it changes every athlete's volume tables |
-| **A field that has content** (cues, purpose, tennis) | Improve it | **Don't change it. Propose it** to Amir in the handoff, with the old and the new wording |
+| **A field that has content** (cues, purpose, tennis) | Improve it | **Don't change it. Propose it**: write it to the pending list (below) and name it in the handoff, old → new |
 - **Video:** the card's `videoUrl` wins when the entry has none (YouTube only, as `draft_sql.py`).
 - **Alias:** the programme's spelling goes on the entry (rule 4). Never rename the card.
 - **exId on the card:** a programme exercise that resolves to an entry but has no `exId` gets one
@@ -249,15 +249,67 @@ no SFR. Answer them once and they stop mattering.
 - **What this programme taught us counts as "can be updated":** a better general cue Amir wrote
   or approved while designing (design's `spine_cue:` lines), a new restriction flag the athlete's
   picture showed was missing, an SFR order Amir overruled at the checkpoint. On a draft, apply
-  it. On an approved entry, propose it.
+  it. On an approved entry, propose it (the pending list).
 - **Never approve, never move anything athlete-specific onto an entry.** Athlete detail is the
   Coach's Note.
 - Every write sets `updated_by = 'claude-pipeline'` and `updated_at = now()`.
 
 **3. Report it in one block at the end of the handoff** (`/program-assemble` Step 6):
 `SPINE — added 2 drafts (names) · filled 5 gaps (what) · body parts on 4 · counts on 2 · tagged qualities on 3 (2 as suggestions on
-approved entries) · linked 2 (regressions/progressions/alternatives) · 3 proposals for you (entry: old → new) ·
-N entries this programme uses are still drafts, approve them in coach.html → Exercises.`
+approved entries) · linked 2 (regressions/progressions/alternatives) · 3 new proposals on the pending list (entry: field old → new) ·
+7 waiting in all, yes or no on each? · N entries this programme uses are still drafts, approve them in coach.html → Exercises.`
+The proposals in that line are read back from the pending list, not retyped, so the handoff and the
+list cannot disagree.
+
+## The pending list: proposals on approved entries (stage43, 2026-09-26)
+
+A proposed change to a field that already has content on an **approved** entry (cues, purpose,
+tennis, equipment, a link, a count, SFR, flags) is never written on the entry (rule 1) and never
+only printed in a handoff (it was lost if nobody acted that day: pipeline audit 5.2 item 7). It
+goes on the entry's coach-only half, `exercise_coach.suggested_changes`, beside
+`suggested_qualities`. The shape is in `supabase/stage43_spine_proposals.sql`. ⚠ That file is
+**not applied yet**: until it is, the write below fails with *column "suggested_changes" does not
+exist*. Then print the proposals in the handoff as before and say "stage43 not applied".
+
+**Write** (Upkeep step 2, one statement for all of the run's proposals; `why` is general, never an
+athlete's name or detail; `from` is the skill and the date):
+```sql
+insert into public.exercise_coach (id, suggested_changes)
+values ('<id>', jsonb_build_array(jsonb_build_object('field', '<field>', 'old', <old as jsonb>,
+        'new', <new as jsonb>, 'why', '<one line>', 'from', '<skill> <date>', 'at', now())))
+on conflict (id) do update
+   set suggested_changes = public.exercise_coach.suggested_changes || excluded.suggested_changes
+ where not exists (select 1 from jsonb_array_elements(public.exercise_coach.suggested_changes) s
+                    where s->>'field' = '<field>' and s->'new' = <new as jsonb>);
+```
+The same field with the same new value is never listed twice. A second, different proposal for the
+same field sits beside the first: Amir picks one.
+
+**Read** (at the start of every `/spine` run and every Upkeep, one query, PRC-6):
+```sql
+select c.id, x.name, s->>'field' field, s->'old' old, s->'new' new, s->>'why' why, s->>'from' src,
+       coalesce(to_jsonb(x) -> (s->>'field'), to_jsonb(c) -> (s->>'field')) is distinct from s->'old' stale
+from public.exercise_coach c join public.exercises x on x.id = c.id,
+     jsonb_array_elements(c.suggested_changes) s
+order by s->>'at';
+```
+Put every waiting item in the handoff (entry: field old → new, why) with one question: yes or no on
+each? An item whose `old` no longer matches the entry (Amir edited it in coach.html since) is
+**stale**: say so and drop it, the entry moved on without it.
+
+**Clear, only after Amir's word** (never on a guess, CUE-5):
+- **Yes**: back the old value up in `links_history` (tag `claude-proposal-<date>`, the stage34
+  pattern), write the new value on `public.exercises` (`updated_by = 'claude-pipeline'`,
+  `updated_at = now()`; a count, SFR or flag goes on `exercise_coach`), then remove the item.
+- **No**: remove the item. Nothing else changes.
+- **Not answered**: leave it. It comes back in the next run's handoff.
+```sql
+update public.exercise_coach
+   set suggested_changes = (select coalesce(jsonb_agg(s order by s->>'at'), '[]'::jsonb)
+                              from jsonb_array_elements(suggested_changes) s
+                             where not (s->>'field' = '<field>' and s->'new' = <new as jsonb>))
+ where id = '<id>';
+```
 
 ## Batch size and order
 

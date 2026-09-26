@@ -66,6 +66,7 @@ When his files are in `Content/tps-ads/takes/`:
    Vazirmatn, RTL, Persian numerals, clay the only accent, count-ups, clay-line wipes running right
    to left, the button at the end.
 5. **His voice is the only audio.** Generated clips are silent by design; he adds music in Instagram.
+   The render is silent too, so his take's sound goes back on at stage 16's audio step.
 
 ⚠️ **Route B still passes the stage 17 review.** A script he wrote himself has not been through the
 refusal list — check it for a named coach, a promised result on a timeline, fear, and any price that
@@ -150,6 +151,38 @@ or across the frame, never toward or away from the lens. The clip must survive b
 where the on-screen words land, where the grain and grade go. **Includes what Amir films and when**:
 one take of the whole script, leave two seconds at each end. He sends it, Claude cuts it.
 
+**16b · AUDIO** ← **added 2026-09-26.** `/reel`'s export (`render_mp4.js`) writes **no audio**, so an
+ad straight out of it is a silent film. His take's sound goes back on here, every time:
+
+- In the HTML the take is a `<video muted>` plate like any clip; the renderer seeks it with the
+  others. Write two numbers into the edit plan: **`IN`** (seconds into the take where the cut starts,
+  usually about 2, after his silence) and **`AT`** (seconds into the ad where his voice starts, usually 0).
+- **One continuous stretch of the take** (the normal case: cutaways hide a stumble, the sound runs on):
+  ```
+  python .claude/skills/reel/tools/mux_audio.py Content/tps-ads/export/ad-NN.mp4 Content/tps-ads/takes/<take>.mov --in IN --at AT --out Content/tps-ads/export/ad-NN-final.mp4
+  ```
+  It measures the take, normalises his voice to **-14 LUFS integrated, -1.5 dBTP true peak** (where
+  Instagram plays reels; a louder file gets turned down, a quieter one sounds weak next to the feed),
+  high-passes at 80 Hz, copies the video untouched, pads silence to the render's length, then checks
+  the result and prints `PASS` or `FAIL`.
+- **A jump cut in his voice** (a sentence dropped): cut the take first, then mux the cut take with
+  `--in 0`. Every kept stretch in order, same numbers as the edit plan:
+  ```
+  ffmpeg -nostdin -i take.mov -filter_complex "[0:v]trim=2.0:9.4,setpts=PTS-STARTPTS[v0];[0:a]atrim=2.0:9.4,asetpts=PTS-STARTPTS[a0];[0:v]trim=11.2:38.0,setpts=PTS-STARTPTS[v1];[0:a]atrim=11.2:38.0,asetpts=PTS-STARTPTS[a1];[v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" -c:v libx264 -crf 14 -c:a pcm_s16le takes/<take>-cut.mov
+  ```
+  The HTML plays that same cut file, so picture and voice cannot drift apart.
+- **Music**: none by default, he adds it in Instagram (keep it well under his voice there). Only if he
+  asks for it in the file: add `--music <bed> --music-under 20`. The bed sits 20 LU under his voice and
+  a sidechain compressor keyed on his voice ducks it further while he talks. Only a track he has the right to use.
+- **ffmpeg on his PC** is not on `PATH`: the script finds imageio-ffmpeg's copy,
+  `%APPDATA%\Python\Python314\site-packages\imageio_ffmpeg\binaries\ffmpeg-win-x86_64-v7.1.exe` (7.1,
+  has `loudnorm`, `ebur128`, `sidechaincompress`). There is **no ffprobe**; the script checks with
+  ffmpeg itself. By hand, the proof that a file has sound is
+  `ffmpeg -nostdin -hide_banner -i final.mp4 -map 0:a:0 -af ebur128=peak=true -f null -`: an error
+  ("matches no streams") means silent; otherwise the Summary's `I:` should read -14 ±1 LUFS.
+- **Listen to it** before sending: pull 5 s around the hook and around a cutaway, and check the lips
+  still match (a fixed offset means `IN` or `AT` is off by that much).
+
 ## PART E · SHIP
 
 **17 · FINAL AD REVIEW** — against the refusal list, out loud, before it goes anywhere:
@@ -162,6 +195,7 @@ one take of the whole script, leave two seconds at each end. He sends it, Claude
 - Nothing in frame carries a logo, a brand name or yellow
 - Everything readable sits between y≈250 and y≈1600
 - **The WhatsApp reply ships with it** when the ask is C2
+- **It has sound**: `mux_audio.py` printed `PASS` for this exact file (stage 16b). Never send the silent render
 
 Then deliver: the MP4 by `SendUserFile`, the caption, the reply. Then a row in `LEDGER.md` — and once
 he has posted it, **what it actually did**. That last column is the only thing that makes the next ad

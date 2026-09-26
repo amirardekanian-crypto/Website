@@ -424,21 +424,45 @@ The athlete app never reads the log. The entry template is /program-design's COA
 **Amir's standing order (2026-08-08).** Before shipping, print a clearly-headed section in chat
 telling him everything the program now requires of *him*. This is a to-do list he can act on, not
 a recap of the programming — he must never have to reverse-engineer his own responsibilities out
-of the design write-up (PRC-12). Cover, one line each, each with its reason:
-*Build these lines from the spec's `obligations:` list (2026-09-26): every film, weigh-in,
-pain-ladder, double-day and period obligation is a line below, so nothing the athlete was told to
-do is missing from what Amir is told to watch.*
+of the design write-up (PRC-12).
+
+**It opens with the OBLIGATIONS block, built from the spec's `obligations:` list, not written from
+memory** (2026-09-26; COM-9). One line per key, **the same keys in the same order as the list**, each
+saying what it asks of Amir and where the athlete reads it:
+`<key> → <what Amir does, by when> · athlete reads: <card TITLE | Week 1 note | Back-off note>`.
+What each key asks of him:
+
+| key | Amir's line |
+|---|---|
+| `backoff`, `week1` | the week's dates and the week note exactly as the athlete reads it (this was WEEKS) |
+| `film` | what to film, which weeks, when he reviews it, what stays blocked until he clears it |
+| `weigh-in` | how often, what number moves what, where it shows in coach.html |
+| `pain-ladder`, `modification-menu` | the step that makes him act (a stop, a swap, a referral) |
+| `low-readiness`, `double-day` | the pattern that should make him check in (e.g. three low days in a week) |
+| `period` | the dates it applies and what changes |
+| `start-lower` | the number, and the test that moves it back to the card |
+| `explainer`, `close-loop`, `win` | nothing to do: say so (`nothing to do, card "<title>"`), so the count still matches |
+
+Then the self-check, one line, printed under the block:
+`OBLIGATIONS CHECK — spec lists N · handoff lines N · same order ✓ · every key but backoff/week1 is a
+tagged card ✓ · WhatsApp message 2 lines N ✓`. Any mismatch is fixed before Step 7, never explained.
+
+**Then the rest, for what the obligations list does not already cover**, one line each with its
+reason (an obligation is never repeated here):
 - **MEASURE** — every number he or the athlete must collect, how often, and what it feeds.
 - **GATE** — every progression gate, and *exactly* what clears it (never the athlete's word).
 - **FILM** — every filmed set he must review, by when, and what is blocked until he clears it.
 - **DATES** — every date-stamped escalation: referrals, appointments, checkpoints, expiries.
 - **WATCH** — trigger conditions that fire a deload, a stop, or a referral.
-- **WEEKS** — the week-1 and back-off notes exactly as the athlete will read them, with their
-  dates. The app shows them on their own in that week, so he should know what they say.
+- **WEEKS** — now the `backoff` and `week1` lines of the OBLIGATIONS block (the app shows each on
+  its own in that week, so he should know what it says).
 - **QUALITY** — the day-card words, and if the headline is outside the week's top two, your
   recommendation (Amir, 2026-09-26: *"report it, but recommend what you think should happen"*).
-- **SPINE** — the Step 8 upkeep report: drafts added, gaps filled, proposals for him, and the
-  entries this programme uses that still need his approval.
+- **SPINE** — the Step 8 upkeep report: drafts added, gaps filled, and the entries this programme
+  uses that still need his approval. **Proposals** on approved entries are read back from `/spine`'s
+  pending list (`exercise_coach.suggested_changes`): this run's new ones and every older one still
+  waiting, each `entry: field old → new`, with one question, yes or no on each? Never retype them
+  from memory: the list is the record, and an unanswered one comes back next run.
 - **⚠️ MY CALLS** — every decision made on his behalf: anything that **overrides** something he
   said, **extends** it past what he actually approved, or **fills a gap** he never ruled on.
   State it plainly and offer to reverse it. This section is the whole point; put it last so it
@@ -538,7 +562,8 @@ athlete's programme: draft every exercise with no entry, fill every empty field 
 equipment, regressions/progressions/alternatives, SFR, flags, **qualities**, **body parts**: `loads` +
 `impact`, which the athlete sees as *Body parts involved*), stamp `exId` on every card that resolves,
 link a new exercise to its regressions, progressions and alternatives from both sides, apply design's `spine_cue:` lines to drafts
-and propose them for approved entries, and put the one-line **SPINE** report in the handoff brief.
+and propose them for approved entries **on the pending list** (`/spine` → *The pending list*, so a
+proposal outlives this handoff), and put the one-line **SPINE** report in the handoff brief.
 Never approve an entry, and never put anything about this athlete on one.
 
 **Then the two checks that read the finished programme** (both 2026-09-24):

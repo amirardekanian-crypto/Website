@@ -137,68 +137,52 @@ so did the rest except where noted.
 
 ## 5. What's left
 
-### 5.1 Needs Amir's word
+### 5.0 Done in the second pass (26 September, evening)
 
-1. **Four more live programmes still send athletes to Proof to weigh in.** Found while writing this
-   file. The audit only searched notes cards and found two, fixed on his yes (Q12). A search of
-   every text field finds nine more lines in four current programmes: a notes card that walks the
-   athlete to "Proof → Today → the weight card → Weigh in", another that implies the weight goes
-   into Proof, two card titles, two Game Plan focus lines and three outcome lines in the cycle's
-   app message. Proof has had no weight screen since 12 September. **Recommendation:** fix just those sentences to point at Home → Body Weight
-   in the programme app, with an in-cycle edit line in each coaching log, exactly as for Q12 (PRC-2:
-   nothing else changes). This query lists every line (a line about sleep or protein in Proof is
-   fine; only weighing in is wrong):
+- **Weigh-in lines (was 5.1.1):** on Amir's yes, ten lines in four current programmes now point at
+  Home → Body Weight; the lines that mention Proof for sleep or protein were left alone. Each
+  programme's previous version is in `program_versions` (note "before weigh-in pointer fix"), and
+  each coaching log has an in-cycle edit line. The query that found them still returns only
+  correct lines.
+- **Ochre (was 5.1.2):** Amir said swap. coach.html's `--ochre`, its chart `C.amber` and
+  call-log.html's `--amber` are now muted plum `#7A4E6E` (legacy names kept). The course apps keep
+  theirs until the private repos change.
+- **5.2.1** COM-13 is in `check_program.py` (clause by clause; 17 tests).
+- **5.2.2** `scripts/check_xp_rules.py` against `supabase/xp_rules_snapshot.json` (pre-commit guard 10).
+- **5.2.3** `scripts/check_parity.py` against `supabase/word_lists_snapshot.json` (guard 11). Every
+  list agrees today.
+- **5.2.4** `scripts/check_setlog.js` (guard 9). A "2×20" weight no longer reads as 20 reps, in both
+  readers; `parseLoggedKg()` reads a pair as one implement.
+- **5.2.5** The site video modal uses the app's YouTube rules and never invents an id.
+- **5.2.6** /ad stage 16b AUDIO and `.claude/skills/reel/tools/mux_audio.py` (-14 LUFS, checks sound).
+- **5.2.7** /spine has a pending list for wording proposals, in
+  `exercise_coach.suggested_changes`. **The column is not on the server yet**: see 5.1.
+- **5.2.8** WhatsApp message 2 and the handoff's OBLIGATIONS block are built from the spec's
+  obligations list, with a count-and-order self-check.
+- **5.5** The six AA Proof bugs and the two stale habits.html comments are fixed.
 
-   ```sql
-   with recursive walk(athlete_id, path, v) as (
-     select athlete_id, '', data from public.programs
-     where data::text ~* 'weigh[^"]{0,80}proof|proof[^"]{0,80}weigh'
-     union all
-     select w.athlete_id, w.path || '/' || coalesce(e.key, (a.ord - 1)::text), coalesce(e.value, a.value)
-     from walk w
-     left join lateral jsonb_each(case when jsonb_typeof(w.v) = 'object' then w.v else '{}' end) e on true
-     left join lateral jsonb_array_elements(case when jsonb_typeof(w.v) = 'array' then w.v else '[]' end)
-          with ordinality a(value, ord) on true
-     where jsonb_typeof(w.v) in ('object', 'array') and (e.key is not null or a.ord is not null))
-   select athlete_id, path, left(v #>> '{}', 300) as text from walk
-   where jsonb_typeof(v) = 'string' and (v #>> '{}') ~* 'proof' and (v #>> '{}') ~* 'weigh|body ?weight'
-   order by athlete_id, path;
-   ```
+### 5.1 Needs Amir
 
-2. **The app's "purple" token is ochre (#A8741C), close to gold.** Keep it or swap it? The atlas
-   flags it, and the no-gold rule says gold never returns.
-3. **Were the Supabase keys from May rotated?** A secret key and an access token were pasted into a
-   chat during setup, and nothing records that they were rotated. If not, rotate both in the
-   Supabase dashboard.
-4. **A recovery-band table.** "Recovery capacity gates everything" (REC-1) is still philosophy. A
-   small table (recovery band → starting sets per muscle and an RPE ceiling) would make it a
-   decision. It needs his numbers.
-5. **Git history still holds the names that were scrubbed.** Rewriting history is possible but
-   breaks every clone and open branch. Recommendation: leave it.
+1. **Rotate the Supabase keys from May** (Amir, 26 September: not sure they were). Project Settings →
+   API → roll the secret key; Account → Access Tokens → revoke the old token; then update the MCP
+   config with the new one.
+2. **Apply `supabase/stage43_spine_proposals.sql`** (one new coach-only column, additive). Until it
+   is applied, /spine and /program-assemble print proposals in the handoff as before.
+3. **XP display wording drifts** (found by the new guard; scoring agrees): four milestone names
+   (the server row has the old names, habits.html the "I / II" names) and three quest notes ("across
+   the week" vs "this week"). Which wording wins? Then update the row with `jsonb_set`.
+4. **A recovery-band table** (REC-1): recovery band → starting sets per muscle and an RPE ceiling.
+   It needs his numbers.
+5. **Optional rule-index line**, proposed by the 5.2.8 work, for after the freeze (PRC-25): COM-9
+   extended so WhatsApp message 2 and the handoff follow the obligations list in order.
+6. **Git history still holds the names that were scrubbed.** Recommendation: leave it.
 
 ### 5.2 Recommended, no decision needed
 
-Ranked by how much silent disagreement each would catch for the effort. None is urgent.
-
-1. **The checker fails athlete text that pairs weighing in with Proof** (COM-13). Small. It is
-   what let the lines in 5.1 reach six athletes.
-2. **A snapshot check for the XP rules**: habits.html's constants against the live `xp_rules` row.
-   Small. It is the highest-risk pair in the system (the board and the phone disagree in silence),
-   and nothing tests it.
-3. **One parity test for the Quality mix and the word lists** (qualities, muscles, patterns, body
-   parts, cost tiers, art words) across program.html, coach.html, check_program.py, draft_sql.py and
-   the database constraints. Medium. The muscle list alone is in four places.
-4. **A round trip for the set log**: the writer in program.html to both readers (coach.html and
-   program.html), including a weight typed with × ("2×20"), which breaks both readers today. Small.
-5. **The site's video modal (`assets/js/shared.js`) uses the app's YouTube parser.** Small, an app
-   change. Today it makes up an id from an Instagram or Vimeo link, and gives a Short no tall box.
-6. **An audio step for ads (/ad).** /reel's MP4 export is silent, and nothing says how Amir's filmed
-   take keeps its sound in the final cut.
-7. **A pending list for Spine wording proposals.** Quality suggestions are stored
-   (`suggested_qualities`); a proposed cue or purpose change on an approved entry is only printed in
-   one handoff, and lost if nobody acts on it that day. Low.
-8. **WhatsApp message 2 and the handoff built from the obligations list.** The cards are driven by
-   it and checked; those two are still written by hand. Low.
+- `ytVideoId()` in program.html has no host check (found in 5.2.5): a non-YouTube link with an
+  11-character `v=` would embed. The site modal has the guard now; give the app the same one.
+- Teach the checker to compare message 2 and the handoff against the obligations list (today only
+  the self-check line does).
 
 ### 5.3 At the end of the rule freeze (PRC-25: after 5 to 8 cycles through the new pipeline)
 
@@ -220,18 +204,8 @@ are the real test of this whole audit: watch for friction between Part A, engage
 
 ### 5.5 Outside the pipeline, still open
 
-Listed so they aren't lost; neither audit set out to fix them.
-
-- **AA Proof, six bugs from the July review:** a custom habit picked as the nudge target prints the
-  wrong copy; the habit detail's last-five-days XP ignores the season; `LB.joined` is never read, so
-  an athlete the coach removed still sees "You are on the board"; dead CSS (`.selrow .desc`,
-  `.selrow .mark`, `.grid35 .c.future`); "Reset today's log" resets today while the backfill strip
-  shows another day; `user-scalable=no` blocks pinch-zoom.
-- **Stale comments in habits.html:** `renderBoardNotice()` still compares itself to a body-weight
-  banner that left Proof on 12 September, and the comment above the two-door gate still says 75%
-  (it is 80).
-- **The course app** still carries a comment about a removed "open in YouTube" link. Its source is
-  the private `tps-content` repo, so fix it there.
+- **The course app** still carries a comment about a removed "open in YouTube" link, and its
+  `--ochre`. Its source is the private `tps-content` repo, so fix both there.
 
 ### 5.6 Deliberately left as they are
 
@@ -256,5 +230,5 @@ Listed so they aren't lost; neither audit set out to fix them.
 - **The pipeline order and the magic words:** `.claude/COACHING-HOWTO.md`.
 - **Server functions from this work:** `supabase/stage38_publish_cycle.sql`,
   `stage39_spine_credits.sql`, `stage41_add_contact_no_key.sql`.
-- **Pre-commit:** eight guards in `.githooks/`; run `git config core.hooksPath .githooks` once per
+- **Pre-commit:** eleven guards in `.githooks/`; run `git config core.hooksPath .githooks` once per
   clone.

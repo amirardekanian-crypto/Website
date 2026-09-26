@@ -10,6 +10,7 @@ Small, tested helpers for building, checking and exporting reels on Amir's Windo
 | `sample_frames.js` | Plays the reel in real time and saves timed frames (`--loop2` proves the second pass, `--default` shows the black dip at the loop end). |
 | `capture_app_screens.js` | Screenshots real app screens at phone size from a JSON config, for a phone mock-up. |
 | `contact_sheet.py` | Tiles images into one labelled sheet. |
+| `mux_audio.py` | **Sound for an ad.** Lays Amir's filmed take under a silent render (video copied, not re-encoded): two-pass loudnorm to -14 LUFS / -1.5 dBTP, 48 kHz stereo AAC, optional music bed ducked under his voice, then proves the file has an audio stream at the right loudness and length. Exits 1 on a failed check. `/ad` stage 16, `/reel` Step 9. |
 
 ## One-time setup on this PC
 
