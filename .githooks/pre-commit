@@ -137,9 +137,11 @@ ids_file=".claude/athlete-ids.local"
 if [ -f "$ids_file" ]; then
   staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(\.claude/|\.githooks/)' | grep -vx "$ids_file")
   if [ -n "$staged" ]; then
+    # Lower-case both sides instead of `grep -i`: Git for Windows' grep aborts on -i with
+    # -F -f (found testing this guard, 2026-09-26), and an aborted grep reads as "no hits".
     pats=$(mktemp)
-    tr -d '\r' < "$ids_file" | grep -v '^[[:space:]]*$' > "$pats"
-    hits=$(git diff --cached -U0 -- $staged | grep -E '^\+[^+]' | grep -ioFf "$pats" | sort -u)
+    tr -d '\r' < "$ids_file" | grep -v '^[[:space:]]*$' | tr 'A-Z' 'a-z' > "$pats"
+    hits=$(git diff --cached -U0 -- $staged | grep -E '^\+[^+]' | tr 'A-Z' 'a-z' | grep -oFf "$pats" | sort -u)
     rm -f "$pats"
     if [ -n "$hits" ]; then
       echo ""
