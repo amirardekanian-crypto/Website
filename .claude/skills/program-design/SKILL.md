@@ -64,8 +64,9 @@ change before I build?"* before writing exercises.
    (on 2026-09-26 a checkout 101 commits behind still allowed rep ranges and the retired panel). But
    this folder is shared by several sessions: `git pull` refuses when one has work in progress, and
    when it runs it moves the one HEAD they all share. So never pull here. Run
-   `git fetch -q origin && git diff --name-only HEAD origin/main -- .claude SCHEMA.md scripts assets/js/chips.js`.
-   An empty list means the local files are current. Every file on it is newer on `origin/main`:
+   `git fetch -q origin && git diff --name-only HEAD...origin/main -- .claude SCHEMA.md scripts assets/js/chips.js`
+   (three dots: only what `origin/main` has that this checkout doesn't). An empty list means the
+   local files are current. Every file on it is newer on `origin/main`:
    read it from there with `MSYS_NO_PATHCONV=1 git show origin/main:<path>` (Git Bash otherwise
    rewrites the path), **this skill included**, since the Skill tool loaded the local copy. If
    `scripts/check_program.py` or `assets/js/chips.js` is on the list, write both from `origin/main`
