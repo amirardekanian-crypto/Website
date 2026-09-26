@@ -9489,7 +9489,9 @@ function autoResetStaleDays() {
           if (liveNames.has(k)) return;             // same name also sits in a day that isn't over
           // Circuit RPE: round 1 uses the legacy (no-suffix) key, later rounds
           // use _r<round>. Clear every round this exercise has.
-          const rounds = ex.type === 'circuit' ? parseRoundCount(ex.rounds) : 1;
+          // rx.rounds (a number) on every programme written since 2026-09-20, ex.rounds on older
+          // ones. Reading only ex.rounds cleared round 1 alone on the new ones (2026-09-26 fix).
+          const rounds = ex.type === 'circuit' ? parseRoundCount((ex.rx && ex.rx.rounds) || ex.rounds) : 1;
           localStorage.removeItem(ATHLETE_ID + '_rpe_' + k);
           for (let round = 2; round <= rounds; round++) {
             localStorage.removeItem(circuitRpeKey(ex.name, round));
@@ -12101,7 +12103,7 @@ function qualityMix(day) {
     if (isPrepBlockTitle(b.title)) return;
     (b.exercises || []).forEach(ex => {
       if (ex.type === 'circuit') {
-        const rounds = parseInt(rxOf(ex).rounds || ex.rounds, 10) || 1;
+        const rounds = parseRoundCount(rxOf(ex).rounds || ex.rounds);  // "×3 Rounds" too (2026-09-26)
         (ex.items || []).forEach(it => add(it.name, it.exId, rounds));
       } else {
         add(ex.name, ex.exId, qmSets(rxOf(ex)));

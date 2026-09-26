@@ -282,6 +282,12 @@ d = copy.deepcopy(BASE); d['notes'] = {"cards": [{"title": f"Card {i}", "body": 
 expect('nine notes cards warn (soft cap 8)', has(run(d), 'WARN', 'over the soft cap of 8'))
 d['notes']['cards'] = d['notes']['cards'][:8]
 expect('eight notes cards pass', not has(run(d), 'WARN', 'soft cap'))
+d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'].append({"title": "Conditioning", "exercises": [
+    {"type": "circuit", "name": "Old Engine", "rounds": "×3 Rounds", "items": [{"name": "Kettlebell Swing", "exId": "kettlebell-swing", "detail": "×12"}]}]})
+out = run(d, log=LOG + "| D2 | Kettlebell Swing | 3 | Glutes 1.5 (×0.5) |\n")
+expect('a legacy "×3 Rounds" circuit counts three rounds', not has(out, 'FAIL', "volume table: 'Kettlebell Swing'"), out)
+expect('...and the same log at 1 set would disagree', has(
+    run(d, log=LOG + "| D2 | Kettlebell Swing | 1 | Glutes 0.5 (×0.5) |\n"), 'FAIL', "volume table: 'Kettlebell Swing' at 1 sets"))
 
 # ── 6. the rule index guard (scripts/check_rule_index.py) ────────────────────
 spec_ri = importlib.util.spec_from_file_location('cri', os.path.join(REPO, 'scripts', 'check_rule_index.py'))

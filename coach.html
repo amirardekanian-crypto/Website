@@ -4429,7 +4429,8 @@ function qualityCheckC(data, idx, byId) {
     if (QM_PREP.test(b.title || '')) return;
     (b.exercises || []).forEach(ex => {
       if (ex.type === 'circuit') {
-        const r = parseInt(Chips.rxOf(ex).rounds || ex.rounds, 10) || 1;
+        // Digits out of rx.rounds or a legacy "×3 Rounds", like program.html's parseRoundCount() (2026-09-26).
+        const r = parseInt((String(Chips.rxOf(ex).rounds || ex.rounds || '').match(/\d+/) || ['1'])[0], 10) || 1;
         (ex.items || []).forEach(it => add(it.name, it.exId, r));
       } else add(ex.name, ex.exId, qmSetsC(Chips.rxOf(ex)));
     });

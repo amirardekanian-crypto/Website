@@ -40,7 +40,10 @@
 // coach's note for that week (cycles[n].weekNotes) under This Week and at the top of a session.
 // Also: Personal Records' "Add your body weight" now opens this app's own weight screen (its
 // "Open AA Proof" button led to a Proof that has had no weight screen since 2026-09-12).
-const CACHE = 'aap-v26';
+// v27: program.html changed (2026-09-26): a day's reset clears every circuit round's RPE on
+// programmes written with rx.rounds (it cleared round 1 only), and the Quality mix counts a legacy
+// "×3 Rounds" circuit as three rounds, not one. coach.html's Quality check reads rounds the same way.
+const CACHE = 'aap-v27';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

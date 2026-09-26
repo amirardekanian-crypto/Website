@@ -561,7 +561,7 @@ def check_volume(data, args):
         o = it or ex
         if not it and ex.get('type') == 'circuit': continue
         rx = o.get('rx') or {}
-        sets = num(((ex.get('rx') or {}).get('rounds')) if it else rx.get('sets')) or 1
+        sets = round_count(ex) if it else (num(rx.get('sets')) or 1)
         prog.setdefault(o.get('name', '').lower(), []).append((d.get('id'), sets, bool(PREP.search(b.get('title') or ''))))
         if (not it and ex.get('type') == 'standard' and not PREP.search(b.get('title') or '')
                 and rx.get('tempo') and dose_of(rx) in ('reps', 'time')):
@@ -836,6 +836,12 @@ def qm_sets(rx):
     t = secs(rx.get('time'))
     return max(1.0, t / 600) if t else 1
 
+def round_count(ex):
+    """A circuit's rounds: rx.rounds (a number) or a legacy "×3 Rounds" string, min 1. The same
+    reading as program.html's parseRoundCount() and coach.html's Quality check (2026-09-26)."""
+    m = re.search(r'\d+', str(((ex.get('rx') or {}).get('rounds')) or ex.get('rounds') or ''))
+    return int(m.group()) if m and int(m.group()) > 0 else 1
+
 def mix(day, spine, drafts):
     score, total, covered = {}, 0.0, 0.0
     def add(exid, sets):
@@ -850,7 +856,7 @@ def mix(day, spine, drafts):
         for ex in b.get('exercises') or []:
             rx = ex.get('rx') or {}
             if ex.get('type') == 'circuit':
-                for it in ex.get('items') or []: add(it.get('exId'), int(num(rx.get('rounds')) or 1))
+                for it in ex.get('items') or []: add(it.get('exId'), round_count(ex))
             else: add(ex.get('exId'), qm_sets(rx))
     return score, (covered / total if total else 0)
 
