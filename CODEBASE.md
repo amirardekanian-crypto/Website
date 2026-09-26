@@ -54,6 +54,12 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   finishes those from the list, same as always; `getDayCompletion()`'s "unfinished" list already
   handles that gracefully. `openTimer()`'s rest overlay grew an optional auto-start/auto-advance path
   (`openTimerAuto()`) and a `+15s` button, used only from Guided Mode — the manual Rest button is unchanged.
+  **Entering and leaving (WK-01, 2026-09-26):** `openGuided()` never pauses a running clock (it only
+  toggles a session that has not started, a leftover from an earlier day, or a paused one, which
+  resumes); `openStepMode()` starts at the first unticked set; and the last button, **Finish Session ✓**,
+  runs `stepFinish()`: close Guided, then the list's own `confirmSession()` when every set in the day is
+  done, or scroll to the "Wrap up early?" card when a circuit or warm-up is still open. Guided never
+  finishes a partial session on the athlete's behalf.
 - **If deleted:** All athletes lose access to their programme.
 - **Depends on:** `data/*.json` (one per athlete), `content/index.json` + `content/**/*.json` (Read article library), `workouts/index.json` + `workouts/**/*.json` (Train workout library), the Spine (`get_exercises()`: cues, videos), `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json`, icon files, and **Supabase** (it backs up each athlete's progress to the cloud and reads/sends messages).
 - **Every picture in the app comes from `assets/art/`** (2026-09-19), including the 13 Library shelf pictures (7 Sessions + 6 Playbook) — whose paths live in `public.library_categories.banner`, with the index JSONs as the offline fallback, and which also fill each workout card's thumbnail and the header of each workout's own screen (`libBannerFor()`). Ten cycle-card

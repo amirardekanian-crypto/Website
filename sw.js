@@ -78,7 +78,9 @@
 //      host check as the site modal; any other link opens as a link.
 // v41: program.html changed (2026-09-26, CNT-01): the guide's finish, report and rest-timer cards
 //      name the real buttons, and the Library promises a habit tick only when that habit is on.
-const CACHE = 'aap-v41';
+// v42: program.html changed (2026-09-26, WK-01): opening Guided never pauses a running clock, it
+//      resumes at the first unfinished set, and its last button (Finish Session ✓) really finishes.
+const CACHE = 'aap-v42';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
