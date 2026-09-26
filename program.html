@@ -3203,7 +3203,7 @@
   .wt-del.armed { width: auto; padding: 0 10px; background: var(--ice-dim); color: #C7552F;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: .5px; }
 
-  .wt-entry { margin-top: 20px; background: var(--white); border: 1px solid var(--grey-mid);
+  .wt-entry { margin: 16px 0 18px; background: var(--white); border: 1px solid var(--grey-mid);
     border-radius: 12px; padding: 15px; }
   body[data-dark] .wt-entry { background: #1e1e1e; border-color: #333; }
   .wt-entry-l { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
@@ -8696,7 +8696,7 @@ function renderCeilingLift(lift) {
   const y = n => H - 10 - ((n - lo) / span) * (H - 24);
   const line = v.length > 1
     ? `<polyline points="${v.map((n, i) => `${x(i)},${y(n)}`).join(' ')}" fill="none"
-        stroke="#0E4A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` : '';
+        style="stroke:var(--green-ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` : '';
   const dots = v.map((n, i) => `<circle cx="${x(i)}" cy="${y(n)}" r="4" fill="#C7552F"/>`).join('');
 
   // Rows address their entry by the lift name AS STORED plus its date, which is
@@ -11836,12 +11836,12 @@ function renderWeightScreen() {
   if (!all.length) {
     body.innerHTML = `
       <div class="ceil-intro">Your weight over time. Weigh yourself at the same time of day,
-      ideally first thing, and the line means something.</div>
+      ideally first thing, and the line means something.</div>` + wtEntryHtml() + `
       <div class="ceil-empty ceil-empty-l">
         <p><strong>Nothing logged yet.</strong></p>
-        <p style="margin-top:10px">Add today's weight below. One reading is just a number —
+        <p style="margin-top:10px">One reading is just a number —
         a few over a few weeks is the trend, and the trend is the part worth having.</p>
-      </div>` + wtEntryHtml();
+      </div>`;
     return;
   }
 
@@ -11865,6 +11865,7 @@ function renderWeightScreen() {
       ${since && since.delta !== 0 ? `<div class="ceil-hero-s">${since.delta > 0 ? '▲' : '▼'}
         ${Math.abs(since.delta)} kg since you started · ${all.length} readings</div>` : ''}
     </div>
+    ${wtEntryHtml()}
     <div class="wt-chips">${chips}</div>
     ${wtChartHtml(use)}
     <div class="ceil-label">Every reading</div>
@@ -11874,12 +11875,14 @@ function renderWeightScreen() {
         <b>${e.kg} kg</b>
         <button type="button" class="wt-del" onclick="armedTap(this, 'Delete?', () => deleteWeight('${e.d}'))" aria-label="Delete this reading">✕</button>
       </div>`).join('')}
-    ${wtEntryHtml()}
     <div class="ceil-note">The line is a 7-day average, the dots are what you actually weighed.<br>
       Day to day a kilo is water. The line is the real answer.</div>
     <button type="button" class="wt-clear" onclick="confirmClearWeight(this)">Delete all my weight history</button>`;
 }
 
+// The weigh-in box sits under the headline number (BW-01, 2026-09-26): it used to come after
+// the chart and EVERY reading, 949 px down with 8 readings and further each week, so the
+// screen's one action got harder to reach the more it was used.
 // Line = rolling average, dots = the raw readings. Never the other way round:
 // a line through raw readings implies a precision the bathroom scale does not have.
 function wtChartHtml(series) {
@@ -11894,7 +11897,7 @@ function wtChartHtml(series) {
   const y = v => H - 12 - ((v - lo) / span) * (H - 26);
   return `<svg class="ceil-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
     <polyline points="${avg.map(e => `${x(e.d)},${y(e.kg)}`).join(' ')}" fill="none"
-      stroke="#0E4A36" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      style="stroke:var(--green-ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
     ${series.map(e => `<circle cx="${x(e.d)}" cy="${y(e.kg)}" r="3" fill="#C7552F"/>`).join('')}
   </svg>`;
 }
