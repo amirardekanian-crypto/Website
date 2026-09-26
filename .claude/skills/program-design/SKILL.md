@@ -1,6 +1,6 @@
 ---
 name: program-design
-description: Design one athlete's training program for a cycle — the core S&C design pass, run as an assistant-coach who consults Amir on genuine forks and learns his style over time. Use when Amir says "design <name>'s program", "do prompt 1", "write her next cycle", or after /athlete-intake + /program-roadmap for a new client. Auto-detects NEW (athlete analysis, SFR selection) vs RETURNING (cycle review, progress/replace/add). Reads the locked roadmap, a clean Athlete Brief, and COACHING-PRINCIPLES.md; outputs the program SPEC + coach-facing reports. /program-engage (Prompt 2) writes the messages; /program-assemble writes the JSON.
+description: Design one athlete's training program for a cycle — the core S&C design pass, run as an assistant-coach who consults Amir on genuine forks and learns his style over time. Use when Amir says "design <name>'s program", "do prompt 1", "write her next cycle", or after /athlete-intake + /program-roadmap for a new client. Auto-detects NEW (athlete analysis, SFR selection) vs RETURNING (cycle review, progress/replace/add). Reads the locked roadmap, a clean Athlete Brief, and COACHING-PRINCIPLES.md; outputs the program SPEC + coach-facing reports. Then /program-assemble Part A builds and checks it, /program-engage (Prompt 2) writes the words, and /program-assemble Part B publishes.
 ---
 
 > ## ⚠️ Programmes live on the SERVER, not in files
@@ -380,7 +380,8 @@ Day count + type of each day; one line of rationale per day citing Step 1.
 **CHECKS, THEN ONE REVIEW (Amir's standing order, reshaped 2026-09-25).** Every spec is
 still checked before Amir sees the finished programme, but the three-agent panel is gone
 (COACHING-PRINCIPLES.md → Process → "Every design pass is checked"). The review happens on
-the BUILT programme, so it runs in /program-assemble (Step 3 checks, Step 3b review), not here:
+the BUILT programme, in /program-assemble **Part A**, straight after this spec and BEFORE engage
+writes anything (so a fix never leaves notes describing the old programme):
 1. **`scripts/check_program.py`** on the built file, with this spec's volume table (`--log`)
    and the athlete's bans (`--ban`, from your contraindication read). Every FAIL is fixed. It
    covers what the old panel mostly found: the 10-set floor (only with `--floor`, when the
@@ -658,8 +659,11 @@ count used to hide.
 *(Progression levers and an e1RM section used to close the entry. Amir doesn't read them, so they
 went on 2026-09-26. An e1RM that drove a decision belongs in "The read", with its grade.)*
 
-Then hand off: **/program-engage** (Prompt 2 — messages, notes, completion) →
-**/program-assemble** (write + validate JSON, then archive this entry to the coaching log).
+Then **build and check before any words are written** (2026-09-26): **/program-assemble Part A**
+builds the workouts, drafts any new exercise into the Spine, runs `check_program.py --stage build`
+and, for a new athlete, the one review. Every FAIL there is yours: change this spec and the log
+entry together, and rebuild. Only then **/program-engage** (Prompt 2) writes the words, and
+**/program-assemble Part B** places them, runs the full check, writes the log and publishes.
 
 ## THE CEILING — the athlete's 1RM tracker (a design input, not a prescription)
 

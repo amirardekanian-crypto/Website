@@ -1,6 +1,6 @@
 ---
 name: program-engage
-description: Wrap the engagement layer around a designed program — current-cycle message + outcomes, next-cycle teaser, coaching notes, and per-day completion messages. Use after /program-design, or when Amir says "do prompt 2", "write her notes/message". Reads the locked roadmap, the program spec, and COACHING-PRINCIPLES.md; changes no programming. All in-app text is ENGLISH.
+description: Wrap the engagement layer around a designed program — current-cycle message + outcomes, next-cycle teaser, coaching notes, and per-day completion messages. Use after /program-design and /program-assemble Part A (the programme is built and checked before any words are written), or when Amir says "do prompt 2", "write her notes/message". Reads the locked roadmap, the program spec, and COACHING-PRINCIPLES.md; changes no programming. All in-app text is ENGLISH.
 ---
 
 > ## ⚠️ Programmes live on the SERVER, not in files
@@ -31,9 +31,10 @@ programming.** Read the roadmap — never rewrite it (that's /program-roadmap, l
 
 First, read **`.claude/COACHING-PRINCIPLES.md`** for voice and communication preferences.
 
-This is the right place for the **NOTES** work: it runs *after* /program-design, so it
-never competes with the design pass's budget, and *before* /program-assemble builds the
-JSON. Notes draw on the **full athlete picture** — the program spec + the brief that's in
+This is the right place for the **NOTES** work: it runs *after* /program-design and after
+/program-assemble **Part A** has built and checked the programme (2026-09-26), so it never
+competes with the design pass's budget and it writes about the programme that passed, and
+*before* Part B places the words and publishes. Notes draw on the **full athlete picture** — the program spec + the brief that's in
 the conversation from design (data, loads, readiness, injuries, the check-in chat). If
 engage is run standalone without that context, read the spec and the athlete's coaching log
 (the latest Debrief and cycle entry) first; there is no separate brief to pull any more.
@@ -232,7 +233,7 @@ simple words, short sentences. When writing Farsi, use natural colloquial Farsi 
 numerals**, and give any date in the **Persian calendar first** with the Gregorian in brackets —
 that's the calendar the athlete actually lives by.
 
-Hand off to **/program-assemble** to write everything into `data/<id>.json`.
+Hand off to **/program-assemble Part B**, which places the words, runs the full check and publishes.
 
 ## Don'ts
 - Don't alter exercises, sets, reps, tempo, or RPE.

@@ -861,8 +861,9 @@ free letter, or no label at all. The athlete's own record belongs in `public.coa
   sequence logic that made it fit its own arc. A critic of ONE finished arc keeps the second
   opinion without the grafting.)*
   **(2) Cycle designs**: Claude drafts the spec with full context (the STEP 1 checkpoint with
-  Amir still comes first). The built programme then goes through `scripts/check_program.py`
-  and every FAIL is fixed: the 10-set floor (strength-and-muscle aims only, `--floor`), the
+  Amir still comes first). The built programme then goes through `scripts/check_program.py`,
+  **straight after design and BEFORE engage writes a word** (/program-assemble Part A, since
+  2026-09-26), and every FAIL is fixed in the spec: the 10-set floor (strength-and-muscle aims only, `--floor`), the
   4-set cap (`--proven` once our logs show more), the new-athlete rules (automatic on a first
   cycle), a banned movement in any exercise or fallback, RPE floors in every note, the week-1
   and back-off notes (`weekNotes`), back-to-back days, the Spine gate, and (since 2026-09-26) the

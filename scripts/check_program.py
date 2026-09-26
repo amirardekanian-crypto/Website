@@ -181,6 +181,10 @@ def check_structure(data, args, spine=None):
             fail(f"{where}: a grip written as free text ('{o['setup']}'): make it the chip, the exercise's intent (e.g. \"neutral grip\")")
         elif o.get('setup'):
             fail(f"{where}: floating text on the card ('{o['setup']}'): put it in the Coach's Note")
+        # A superset is a circuit, never a pill on two standard cards (it shipped once: each card got
+        # its own rest timer and nothing showed they were paired). Was a manual grep in assemble.
+        if not it and re.search(r'super-?set|paired with|pair with|complex with', o.get('intent') or '', re.I):
+            fail(f"{where}: a pairing written as a pill ('{o['intent']}'): make the pair ONE circuit (SCHEMA → circuit)")
         rx = o.get('rx') or {}
         doses = [k for k in ('reps', 'time', 'distance', 'work') if rx.get(k) not in (None, '')]
         if len(doses) > 1: fail(f"{where}: two doses ({' + '.join(doses)})")

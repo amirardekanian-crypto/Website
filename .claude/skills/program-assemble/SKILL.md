@@ -1,15 +1,34 @@
 ---
 name: program-assemble
-description: Mechanically assemble a designed program + engagement text + roadmap into the athlete's programme in public.programs (the server is the only copy that counts), then validate it. Use after /program-design and /program-engage, or when Amir says "build the json", "assemble", "write her file", "ship it". Handles cycle advancement (archive prior cycle, bump currentCycleIndex) for returning athletes and fresh-file creation for new ones. This is the mechanical step — it keeps formatting/JSON work out of the design pass.
+description: Mechanically build a designed programme and publish it to public.programs (the server is the only copy that counts), in TWO parts. Part A, straight after /program-design and before /program-engage, builds the workouts and runs every programming check. Part B, after /program-engage, places the words, runs the full checks, writes the coaching log and publishes. Use when Amir says "build the json", "assemble", "write her file", "ship it", or when design hands over a spec. Handles cycle advancement (archive prior cycle, bump currentCycleIndex) for returning athletes and fresh-file creation for new ones. This is the mechanical step — it keeps formatting/JSON work out of the design pass.
 ---
 
-# Assembler — write + validate (mechanical)
+# Assembler — build, check, publish (mechanical)
 
 Turn the **program spec** (/program-design) and the **engagement text** (/program-engage)
 into the athlete's programme in `public.programs`, matching `SCHEMA.md`. This stage is
 deterministic plumbing — it makes no coaching decisions. Read `SCHEMA.md` first if unsure of a
 field. A local `data/<id>.json` may be built as a scratch copy to lint and diff; it is never
 the source of truth and never committed.
+
+## The two parts (2026-09-26)
+Until 2026-09-26 everything below ran after engage, so a FAIL that changed an exercise left the
+notes, Becauses and WhatsApp text describing the old programme, and the Spine gate (Step 3) could
+not pass until the drafting (Step 8) had run. Now:
+
+**Part A — build and check. Straight after /program-design, BEFORE /program-engage.**
+Step 1 · Step 2a–2e (the workouts; `weekNotes` carries design's numbers, no words yet) · Step 4
+(names, and new exercises drafted into the Spine now, so every card has an `exId`) · Step 3 with
+`--stage build` · Step 3b (a new athlete's one review). A FAIL here is a design decision to
+revise: change the spec and the log entry together, rebuild, re-check. If a FAIL overturns
+something Amir settled at the checkpoint, it goes in the handoff under MY CALLS.
+Then engage writes against the programme that passed.
+
+**Part B — finish and publish. After /program-engage.**
+Step 2f (place the words) · Step 3 in full (`--stage final`) · Step 5 (the coaching log) · Step 6
+(the handoff, where the new Spine entries are an approval question BEFORE publishing) · Step 7
+(publish) · Step 8 (what's left of the Spine upkeep). A programming FAIL in Part B means the
+programme changed after Part A: go back to Part A, not to the text.
 
 ## Step 1 — Detect new vs returning — FROM THE SERVER
 `data/*.json` is deleted and gitignored, so a file test calls every athlete NEW in a cloud
@@ -39,10 +58,8 @@ The app draws every card's cues from its Spine entry, circuit items included (SC
 the Spine"). Something only this athlete needs arrives as engage's Coach's Note (`note`), never
 as a cue. **Stamp `exId`**
 on every exercise whose name resolves to a `public.exercises` entry (approved or draft), so the
-card follows the id even if the name is edited later. `sport.badge` ← design's `SPORT_BADGE` line. `completionTitle`/
-`completionMessage` per day from /program-engage PART 4; `cycles[currentCycleIndex].message`
-= PART 1 message + outcomes; next cycle's `teaser` = PART 2. Leave `videoUrl: null`
-(auto-resolved by name downstream).
+card follows the id even if the name is edited later. `sport.badge` ← design's `SPORT_BADGE` line.
+Leave `videoUrl: null` (auto-resolved by name downstream). The words come in Part B (2f).
 - **Set `type` from the design category** (the spec never emits it): standard grinding lift
   / ballistic / loaded carry → `"standard"`; working or prep circuit → `"circuit"`; warm-up
   `simple` item (bike, mobility drill) → `"simple"`.
@@ -59,21 +76,11 @@ card follows the id even if the name is edited later. `sport.badge` ← design's
   `test_flag: 5RM`; see SCHEMA "test"). Verbatim, standard lifts only, and never invent one —
   which lifts get retested is a coaching decision the design pass already made. An exercise
   with no flag simply has no `test` field.
-- **Place engage's exercise Coach's Notes**, matched by exercise name, into that exercise's
-  `note` field (any type) — the app renders it as the clay "Coach's Note" (per SCHEMA
-  "Exercise coach's note"). The text comes from /program-engage (which wrote it from
-  design's `note_flag`), not from design directly. Copy verbatim, plain text — never wrap it
-  in HTML (that's the cycle notes cards' convention, not this field's). Never move
-  exercise-scoped guidance into the notes cards, and never invent a note nothing flagged.
-- **Write the two special weeks on the cycle** (2026-09-26): `cycles[currentCycleIndex].weekNotes
-  = { "first": {…}, "last": {…} }`, each with engage's PART 3c text and design's numbers
-  (`setsDrop`, `rpeDrop`, `rpeCap`) copied from its `week1:` / `lastweek:` lines. Leave `first` out
-  only when design wrote "same as the card". ⚠️ The field is `weekNotes`, never `weeks` (that is
-  the "Weeks 1–5" label). The app shows each in its week; see SCHEMA.md → `weekNotes`.
-- **Place engage's Becauses** (PART 3b), matched by exercise name, as `"why": { "src", "part"?,
-  "text" }` on that exercise (standard or simple, never a circuit). Verbatim, and never invent one.
-  **Write `why` fresh every cycle: never carry a previous cycle's `why` over**, because a reason
-  from Cycle 1 is stale by Cycle 3. Then run the audit (Step 3) and fix everything it flags.
+- **Write the two special weeks' NUMBERS on the cycle** (2026-09-26): `cycles[currentCycleIndex]
+  .weekNotes = { "first": {…}, "last": {…} }` with design's `setsDrop` / `rpeDrop` / `rpeCap` from its
+  `week1:` / `lastweek:` lines; engage's words join them in 2f. Leave `first` out only when design
+  wrote "same as the card". ⚠️ The field is `weekNotes`, never `weeks` (that is the "Weeks 1–5"
+  label). The app shows each in its week; see SCHEMA.md → `weekNotes`.
 
 **2b — Copy the dose into `rx`** (per SCHEMA → "`rx` — the prescription"). Design's dose
 fields map one-to-one; there is nothing to convert:
@@ -195,14 +202,33 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   it, and it is what puts them on the roster). Publishing then updates that row rather
   than inventing a second identity for the same person.
 
-## Step 3 — Validate (do not skip)
+**2f — Part B: place engage's words** (after /program-engage; matched by exercise name, or better
+by `exId`, since Part A stamped one on every card).
+- `completionTitle` / `completionMessage` per day from engage PART 4;
+  `cycles[currentCycleIndex].message` = PART 1 message + outcomes; next cycle's `teaser` = PART 2;
+  `notes.cards` from PART 3.
+- **Coach's Notes** into that exercise's `note` field (any type) — the app renders it as the clay
+  "Coach's Note" (per SCHEMA "Exercise coach's note"). The text comes from /program-engage (which
+  wrote it from design's `note_flag`), not from design directly. Copy verbatim, plain text — never
+  wrap it in HTML (that's the cycle notes cards' convention, not this field's). Never move
+  exercise-scoped guidance into the notes cards, and never invent a note nothing flagged.
+- **The week notes' words:** engage's PART 3c `WEEK 1:` / `LAST WEEK:` text into `weekNotes.first.text`
+  and `weekNotes.last.text`, beside the numbers Part A wrote.
+- **Becauses** (PART 3b) as `"why": { "src", "part"?, "text" }` on that exercise (standard or
+  simple, never a circuit). Verbatim, and never invent one. **Write `why` fresh every cycle:
+  never carry a previous cycle's `why` over**, because a reason from Cycle 1 is stale by Cycle 3.
+  Then run the full check (Step 3) and fix everything it flags.
+
+## Step 3 — Check: `--stage build` in Part A, the full run in Part B (do not skip)
 - **`scripts/check_program.py` first: the house rules, as a script** (2026-09-25; plain Python,
   so it runs on Amir's PC too). It reads the built file, the design's volume table and the spec:
   ```
   python3 scripts/check_program.py data/<id>.json --spine-sql      # prints ONE query: run it
   # save the query's raw result as-is (the JSON the tool returns loads directly), then:
-  python3 scripts/check_program.py data/<id>.json --log <scratch>/log_entry.md --spec <scratch>/spec.md \
+  python3 scripts/check_program.py data/<id>.json --stage build --log <scratch>/log_entry.md --spec <scratch>/spec.md \
       --spine <scratch>/spine_<id>.json [--floor] [--proven] [--cap <real minutes>] [--week "Sat:1,Sun:2,Mon:3,Wed:4"]
+  # Part B: the same command without --stage build (the default is the full run). Re-run
+  # --spine-sql only if Part B added an exercise; the saved result is still good otherwise.
   ```
   `--floor` only when the programme's aim is strength and muscle (the 10-set floor on every major
   muscle; a sport-performance athlete gets what is best for them, Amir 2026-09-26), with any
@@ -239,8 +265,9 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   (two doses on one exercise, `chips` left beside `rx`, an empty `rx`, a malformed tempo, an
   RPE under the selector floor) and proves program.html and assets/js/chips.js still agree.
   It also runs in `.githooks/pre-commit`.
-- **Coaching lint** (still yours): every `standard` has sets·reps·tempo·RPE·rest unless the
-  movement says otherwise; ballistic/carry correctly OMIT tempo and carry an `intent`;
+- **Coaching lint** (still yours): every `standard` has sets, one dose and an RPE unless the
+  movement says otherwise; rest sits on the block when the section shares one, on the exercise
+  only when it differs; a tempo only where the spec gave one; ballistic/carry correctly OMIT tempo and carry an `intent`;
   warm-up/prep carry NO `rpe`; **no exercise or circuit item carries `cues`** (each shows its
   Spine entry's three); section titles use the standard names (Primary/Accessory/etc, never "Strength").
   **Reps are one number, never a range** (Amir, 2026-09-24). If the spec carries a range,
@@ -256,60 +283,32 @@ Ten pictures and eight pictures cover everyone; the full set is `IMAGES.md` §0.
   C.auditWhyProgram(d).forEach(p=>out.push(p.code+': '+p.msg));
   console.log(out.length?out.join('\n'):'ok — Because clean')"
   ```
-- **⛔ No working circuit in a FIRST cycle — hard reject.** If `currentCycleIndex` is `0`,
-  every `"circuit"` must sit in a prep block. A superset or complex in Primary/Accessory/Core
-  on cycle 1 violates COACHING-PRINCIPLES.md → Session structure ("no supersets in an
-  athlete's first cycle"), and the cost is concrete: a circuit records one weight per exercise
-  for the whole block and one RPE per round, so the cycle whose entire job is to establish
-  baselines produces none for those exercises. Rebuild them as separate `"standard"` entries
-  with independent `restSec`.
-  ```
-  node -e "const d=JSON.parse(require('fs').readFileSync('data/<id>.json','utf8'));
-  if(d.currentCycleIndex!==0){console.log('not a first cycle — check skipped');process.exit(0)}
-  const prep=t=>/warm|mobility|activation|cool|prime|prep/i.test(t||'');
-  const bad=[];(d.workouts.days||[]).forEach(dy=>(dy.blocks||[]).forEach(b=>
-    (b.exercises||[]).forEach(e=>{if(e.type==='circuit'&&!prep(b.title)&&e.warmup!==true)
-      bad.push('Day '+dy.id+' ['+b.title+'] '+e.name)})));
-  console.log(bad.length?'REJECT — working circuits in cycle 1:\n  '+bad.join('\n  '):'ok — no working circuits in cycle 1')"
-  ```
-- **⚠️ Later cycles: every exercise inside a circuit needs a logged working weight already.**
-  The same principle covers "any exercise new to that client, even in a later cycle." For each
-  item in a working circuit, confirm the athlete has a prior per-set number for it (session
-  history / The Ceiling / the coaching log's Exercise Ledger). Any item without one comes out
-  of the circuit and runs as straight sets this cycle — pair it next cycle, once it has a
-  baseline. Flag to Amir rather than silently rebuilding.
-- **No superset shipped as a pill.** Grep every `"standard"` exercise's `intent`/`setup` for
-  `"superset"` (or any structural-pairing wording) — if found, that pair was never
-  converted to the required `"circuit"` block per 2a. Hard reject: rebuild it as one circuit
-  entry (shared `name`/`rounds`/`restSec`, both exercises as `items[]`) before shipping — see
-  SCHEMA.md → `"circuit"` type, "Common mistake." (Shipped once — this check exists
-  because of it.)
-- **RPE floor 6 — sweep EVERY athlete-facing string, not just `rx.rpe`.** Grep the whole
-  JSON for `RPE [1-5]`, and separately for any note/card that tells the athlete to subtract
-  from an RPE without naming the floor ("take 1 off every RPE", "drop the RPE by one") — that
-  instruction lands on RPE 5 for every exercise authored at 6 and the app's selector cannot
-  record it. Hard reject: rewrite to "…but never go below 6." An rx-only pass is what let
-  this ship once. See COACHING-PRINCIPLES.md → "Chips & modifiers".
-- **Notes cards are HTML** — every `notes.cards[].body` must be real HTML (`<p>` paragraphs,
-  `<ul><li>` for enumerable content, `<strong>` on the key phrase) per /program-engage PART 3
-  and SCHEMA "notes". A body that is one plain-text paragraph is a hard reject: rewrite it
-  before shipping.
-- Report any structural violation and fix before finishing. (Exercise-name normalization is
-  the next step — a required pass, not optional.)
+- **Already in the script, so no manual pass** (these were separate greps and node snippets until
+  2026-09-26): a working circuit in a first cycle, a superset written as a pill, an RPE under 6
+  or an RPE drop that doesn't name the floor anywhere in the text, a notes card that isn't HTML.
+- **⚠️ Later cycles: every exercise inside a working circuit needs a logged working weight
+  already** ("any exercise new to that client, even in a later cycle"). A **variant** of a
+  movement the athlete has logged counts as known (rotation by variant, 2026-09-26); a genuinely
+  new pattern does not. Check the item against session history, The Ceiling and the Exercise
+  Ledger; one without a number comes out of the circuit and runs as straight sets this cycle.
+  Flag it to Amir rather than silently rebuilding.
+- Report any structural violation and fix before finishing. (In Part A, Step 4's names and Spine
+  drafts run BEFORE this check, so every card already has its `exId`.)
 
-## Step 3b — ONE review, new athletes only (2026-09-25)
-Once the checks pass, a **NEW athlete's** programme gets ONE reviewer: one agent (the Agent
+## Step 3b — ONE review, new athletes only (Part A; 2026-09-25, moved before engage 2026-09-26)
+Once the build checks pass, a **NEW athlete's** programme gets ONE reviewer: one agent (the Agent
 tool), working from files only. Give it the paths to the brief, the spec, the built
 `data/<id>.json` and the check output, and say in so many words: *do not call the database or
 any MCP tool* (COACHING-PRINCIPLES.md → Process → "Background agents work from files"). Its job
 is only what a script cannot judge: the injury logic against the brief, exercise choice and
-transfer, whether each notes card covers every exercise it should (the period card, an arm or
-knee menu), whether a fallback is safe for THIS athlete, whether week 1 and the outside days
-are dosed sensibly. Apply every must-fix, re-run Step 3, then ship.
+transfer, whether a fallback is safe for THIS athlete, whether week 1, the back-off and the
+outside days are dosed sensibly, and what the notes must cover (the period card, an arm or knee
+menu), as a list engage then writes to. Apply every must-fix, re-run the build check, then hand
+to engage.
 **A RETURNING athlete gets no reviewer** unless Amir asks for one. The coaching log, the
 checks and his checkpoint already cover a cycle that continues a known logic.
 
-## Step 4 — Normalize exercise names (required, blocking)
+## Step 4 — Normalize exercise names and draft new Spine entries (Part A, before the check)
 Names from /program-design are rough by design — **this is the correction pass.** It enforces
 COACHING-PRINCIPLES "Exercise naming" + the `exercise_library.json` canonical spelling. Run
 the scan, FIX every mechanical issue in the JSON, then surface only the judgment calls.
@@ -359,8 +358,9 @@ their cards show cues?"* Approve only on his word (he said *"Approve them"* for 
   is the Coach's Note); snap spelling/
   casing to the library's canonical key whenever `MISS -> canonical:` shows one. Edit the JSON,
   then **re-run until clean** (every line `OK`/`GAP`, no `[FIX]`, no fixable `MISS`).
-- **Judgment → SURFACE to Amir, never silently invent:** a true `MISS (not in library)` (new
-  movement → add to Notion when the video is added), an exercise that looks like the *wrong*
+- **Judgment → SURFACE to Amir, never silently invent:** a true `MISS (not in library)` is a new
+  movement: draft it into the Spine NOW with `/spine` (in full, so its card gets an `exId` before
+  the check; its video comes when Amir films it), an exercise that looks like the *wrong*
   movement, or a corrective/postural drill with no noted indication (per COACHING-PRINCIPLES).
 
 `GAP` = in library, no video yet (fine, ship it). Validate JSON again after any name edit.
@@ -426,6 +426,11 @@ COACH HANDOFF BRIEF". Cover, one line each, each with its reason:
   said, **extends** it past what he actually approved, or **fills a gap** he never ruled on.
   State it plainly and offer to reverse it. This section is the whole point; put it last so it
   lands, and never let it be implied rather than written.
+
+**New Spine entries are asked about HERE, before Step 7** (2026-09-26): a draft entry's card shows
+no cues until Amir approves it, so a returning athlete (who already has a login) would open blank
+cards. Put *"approve these N so their cards show cues?"* at the top of the handoff and publish once
+he answers, or publish now only if he says the cards can wait.
 
 Cross-check before writing it: anything the athlete must do *repeatedly* to keep a gate alive
 (filming, weekly measures, booking an appointment) must ALSO appear in the plan he can see — a
@@ -525,7 +530,9 @@ are both plain text, so a straight `md5(body)` comparison IS valid — use it.
 - Commit + push **only if Amir asks**. `data/` and `.claude/coaching-log/` are both
   gitignored; there is normally nothing to commit at all.
 
-## Step 8 — Spine upkeep (every programme, the last thing you do)
+## Step 8 — Spine upkeep, what's left (every programme, the last thing you do)
+Part A already drafted every new exercise (Step 4), so this is the rest: links, body parts,
+qualities on approved entries as suggestions, better cues as proposals.
 Amir, 2026-09-24: *"when i write or update a program, and there are movements that are not there,
 or missing some info, or can be updated, it should be updated there at the end … so everytime i
 write a program for an athlete, this gets more complete."* Run **`/spine` → Upkeep** on this
