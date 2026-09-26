@@ -152,6 +152,10 @@ carries an obligation lists its key under `TAGS:` (`pain-ladder`, `film`, `weigh
 `low-readiness`, …; one card can carry two). `backoff` and `week1` are the week notes (PART 3c), not
 cards. The checker fails an obligation no card is tagged with, and the app never shows the tags.
 The mandatory notes described below are exactly those obligations, written well.
+**The `low-readiness` card** gives REC-2's three kinds of day in the athlete's words, using the
+check-in's own labels (Poor · Tired · Stressed · Bit off for a low day; Very poor · Exhausted ·
+Very stressed · Not ready for a rough one; Sore · Very sore), with the RPE 6 floor in the same
+sentence as the RPE drop (CHP-4). REC-6's flexible order goes on the same card when design lists it.
 Per note: `ICON:` (emoji) · `TITLE:` (≤6 words) · `TAGS:` (obligation keys, if any) · `BODY:` (prescriptive; format per the HTML
 rule below).
 

@@ -153,7 +153,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
       {
         "icon": "🔋",
         "title": "Rough Days",
-        "body": "<p>On a low-readiness day, take 1 off every RPE, but never go below 6.</p>",
+        "body": "<p>A low day (mostly Poor, Tired, Stressed or Bit off): take 1 off every RPE, but never go below 6. Same sets, same order.</p><p>A rough day (any Very poor, Exhausted, Very stressed or Not ready): the warm-up, the first power move and the first main lift are the session. The rest is optional.</p><p>Sore: half the jump and landing sets. Very sore: skip them.</p>",
         "tags": ["low-readiness"]
       }
     ]
