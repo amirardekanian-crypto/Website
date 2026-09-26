@@ -71,7 +71,10 @@
 //      AA Proof bugs (ecb459a).
 // v38: program.html changed (2026-09-26, stage42): the About sheet's "Body parts involved" pills
 //      became the muscle map, a front-and-back body with the worked muscles lit.
-const CACHE = 'aap-v38';
+// v39: habits.html changed (2026-09-26, PRIV-01): the tour, the Crew card and Settings tell a
+//      coached athlete they go on the board after their first session, by name, and offer
+//      "Keep me off the board" before it happens.
+const CACHE = 'aap-v39';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
