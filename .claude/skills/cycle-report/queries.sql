@@ -102,5 +102,15 @@ select
                                        'done', c.sessions_done, 'planned', c.sessions_planned) order by c.call_date)
    from public.call_logs c where c.athlete_id = params.id
      and c.call_date between params.s and params.e)                          calls,
-  (select body from public.coaching_logs cl where cl.athlete_id = params.id) coaching_log
+  -- the log's head (profile, ledger, roadmap) + the latest cycle's sections; the same slice as
+  -- /program-design STEP 0's 'log' (2026-09-26). A log whose cycles share one number comes back whole.
+  (select case when k > 1
+      then substring(body from '^(.*?)\n## Cycle')
+        || E'\n\n[Older cycle sections left out.]\n'
+        || substring(body from ('\n## Cycle 0*' || n || '\M.*'))
+      else body end
+   from (select cl.body,
+           (select max(m[1]::int) from regexp_matches(cl.body, '\n## Cycle 0*(\d+)', 'g') m) n,
+           (select count(distinct m[1]::int) from regexp_matches(cl.body, '\n## Cycle 0*(\d+)', 'g') m) k
+         from public.coaching_logs cl where cl.athlete_id = params.id) lg)                coaching_log
 from params;

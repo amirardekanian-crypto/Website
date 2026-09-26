@@ -34,7 +34,7 @@ Review a program JSON against Amir's coaching principles, flag issues, then appl
 ## Step 0 — Read principles, then the file
 
 1. Read **`.claude/COACHING-PRINCIPLES.md`** first: its **rule index** is the single source of truth for naming, exercise selection, structure, dosing, etc. (the line is the rule; the stories below it are why). The rules below are the *editing audit checklist* (the lens for reviewing an existing program); where a rule here overlaps the index, **the index wins**, and a finding cites the rule's ID. A correction still changes only what Amir named (PRC-2).
-2. Read the programme from the server (`select data from programs where athlete_id = '<athlete_id>';`). Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts. Also skim the coaching log (`select body from coaching_logs where athlete_id = '<athlete_id>';`) for this cycle's rationale, so edits respect *why* each piece was chosen.
+2. Read the programme from the server (`select data from programs where athlete_id = '<athlete_id>';`). Identify which cycle is active (`currentCycleIndex`) and focus on that cycle's workouts. Also read this cycle's part of the coaching log for its rationale, so edits respect *why* each piece was chosen: the `'log'` slice in /program-design STEP 0 (the head plus everything from the latest `## Cycle` on) returns just that.
 
 ## Step 0b — Mid-cycle adjustment: the process
 

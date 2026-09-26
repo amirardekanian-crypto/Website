@@ -116,7 +116,19 @@ change before I build?"* before writing exercises.
                        from public.session_history where athlete_id = '<id>' and duration_min > 10
                         and completed_on >= current_date - 42 group by day) x))
                   from public.session_history where athlete_id = '<id>'),
-     'log', (select body from public.coaching_logs where athlete_id = '<id>'),
+     -- The log's head (profile, ledger, roadmap) + everything from the latest cycle's first
+     -- section on (its edits, its Debrief). Older cycle sections stay on the server (2026-09-26).
+     'log', (select case when k > 1
+                then substring(body from '^(.*?)\n## Cycle')
+                  || E'\n\n[Older cycle sections left out: ctx.log_index lists every heading.]\n'
+                  || substring(body from ('\n## Cycle 0*' || n || '\M.*'))
+                else body end
+             from (select body,
+                     (select max(m[1]::int) from regexp_matches(body, '\n## Cycle 0*(\d+)', 'g') m) as n,
+                     (select count(distinct m[1]::int) from regexp_matches(body, '\n## Cycle 0*(\d+)', 'g') m) as k
+                   from public.coaching_logs where athlete_id = '<id>') lg),
+     'log_index', (select jsonb_agg(m[1]) from public.coaching_logs l,
+                     regexp_matches(l.body, '\n(## [^\n]+)', 'g') m where l.athlete_id = '<id>'),
      'cycle_names_in_use', (select jsonb_agg(distinct c->>'name') from public.programs p,
                             jsonb_array_elements(coalesce(p.data->'cycles', '[]'::jsonb)) c),
      'qualities', (select jsonb_agg(id order by sort) from public.qualities where status = 'approved')
@@ -135,7 +147,14 @@ change before I build?"* before writing exercises.
      row holding only intake's `athlete`/`sport` → **NEW**. Workouts but **no** sessions → the
      athlete never trained the last cycle (no login yet? check `athlete_identities`): stop and
      ask Amir before designing.
-   - `ctx.log` is the coaching log (step 5). `ctx.cycle_names_in_use` stops a roadmap reusing a
+   - `ctx.log` is the coaching log's **head** (header, athlete profile, Exercise Ledger, roadmap
+     rationale) plus **everything from the latest cycle on** (its entry, its in-cycle edits, its
+     Debrief). Older cycle sections are left out on purpose: they cost 5–20k characters a run and
+     rarely change a decision (the audit, 2026-09-26). `ctx.log_index` lists every `##` heading;
+     when the latest entry points back to an older one, fetch just that section:
+     `select substring(body from position('<heading>' in body) for 15000) from public.coaching_logs
+     where athlete_id = '<id>'` and read it up to the next `## `. A log whose cycle headings all
+     share one number comes back whole. `ctx.cycle_names_in_use` stops a roadmap reusing a
      cycle name. `ctx.qualities` are the Quality Map words.
    - `ctx.row.programme` is the cycle being reviewed as prescribed: every day, block and exercise
      with its `rx` (or legacy `chips`), Coach's Note and test flag. STEP 1A needs no other read of
@@ -167,13 +186,14 @@ change before I build?"* before writing exercises.
    top of `ctx.log` says who the athlete is today: aim (sport / strength-muscle / general), goals in
    order, the bottleneck, days and real minutes, kit, standing bans, injuries with status,
    recovery. Apply the Debrief's **Profile changes** to it. **No profile yet** (every athlete before
-   2026-09-26): build it this cycle from the log, the latest Debrief, the roadmap and the intake
-   form, and show the whole block at the checkpoint. A NEW athlete's comes from /athlete-intake's
+   2026-09-26): build it this cycle from the WHOLE log (`select body from public.coaching_logs where
+   athlete_id = '<id>'`, once: the old injuries and bans may sit in an early cycle's section), the
+   latest Debrief, the roadmap and the intake form, and show the whole block at the checkpoint. A NEW athlete's comes from /athlete-intake's
    brief plus the roadmap's read. The format is in /program-assemble Step 5. It opens the spec,
    and the checker takes `aim`, `proven`, `bans`, `floor-except` and `cap` from it.
 5. **RETURNING — read the prior rationale:** `ctx.log` from the context pull (step 3).
-   This is the *why* behind the last cycle(s) — why each primary was chosen, what changed
-   mid-cycle and why, the progression levers — and it is the thread you continue. The next
+   This is the *why* behind the last cycle — why each primary was chosen, what changed
+   mid-cycle and why — and it is the thread you continue. The next
    cycle progresses/edits the SAME logic from the data; it does NOT re-derive a fresh program.
    Read the most recent entry in full, skim older ones for context, and never reintroduce
    something a prior entry flagged as causing pain/regression without a stated reason. If the
@@ -579,6 +599,7 @@ vivid `focusTag`, and canonical names.
 ATHLETE_ID: [id]
 SPORT_BADGE: [emoji] [label]
 PROGRAM: [number] | [N] days | [one-line focus]
+week: [the usual training week, e.g. Sat:1, Mon:2, Wed:3 — turns on the back-to-back check]
 week1: [rpeCap 7 / rpeDrop 1 on what, and what moves them back to the card] (or "same as the card")
 lastweek: [setsDrop 1 · rpeCap 6, plus anything else that changes] (every cycle)
 bans: [one line, if any]

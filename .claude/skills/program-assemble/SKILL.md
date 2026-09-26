@@ -222,80 +222,42 @@ by `exId`, since Part A stamped one on every card).
   Then run the full check (Step 3) and fix everything it flags.
 
 ## Step 3 — Check: `--stage build` in Part A, the full run in Part B (do not skip)
-- **`scripts/check_program.py` first: the house rules, as a script** (2026-09-25; plain Python,
-  so it runs on Amir's PC too). It reads the built file, the design's volume table and the spec:
+- **`scripts/check_program.py`: the house rules, as a script** (2026-09-25; Python, plus node for
+  the app's own rx and Because rules, so it runs on Amir's PC too). It reads the built file, the
+  design's volume table and the spec:
   ```
   python3 scripts/check_program.py data/<id>.json --spine-sql      # prints ONE query: run it
   # save the query's raw result as-is (the JSON the tool returns loads directly), then:
   python3 scripts/check_program.py data/<id>.json --stage build --log <scratch>/log_entry.md --spec <scratch>/spec.md \
-      --spine <scratch>/spine_<id>.json [--floor] [--proven] [--cap <real minutes>] [--week "Sat:1,Sun:2,Mon:3,Wed:4"]
+      --spine <scratch>/spine_<id>.json
   # Part B: the same command without --stage build (the default is the full run). Re-run
   # --spine-sql only if Part B added an exercise; the saved result is still good otherwise.
   ```
-  **The athlete profile at the top of the spec sets the flags** (2026-09-26): `aim: strength-muscle`
-  turns on `--floor` (the 10-set floor on every major muscle; a sport-performance athlete gets what
-  is best for them, Amir 2026-09-26), `proven:` turns on `--proven`, and its `bans`,
-  `floor-except` and `cap` join the spec's own lines. Type a flag only to override it. The
-  new-athlete rules switch on by themselves in a first cycle. `--no-backoff` only on Amir's word.
-  A run with no profile anywhere gets a WARN, and the flags come from the command line only. **Fix every FAIL and re-run
-  until 0 FAIL; read every WARN.** It fails a muscle under its floor, a volume table that
-  disagrees with the programme, more than 4 sets, a weighted lift under 8 reps (new athlete), a
-  superset in a first cycle, a banned movement in any exercise, setup or fallback, an RPE under
-  6 anywhere in the text, a note that lowers the RPE without naming the floor, chips or cues on
-  a card, a missing `exId`, a Because over 140 characters or more
-  than 10 of them, a notes card that isn't HTML, any `setup` (floating text: a grip is the pill,
-  anything else the Coach's Note),
-  an exercise with no library entry or no cues, a quality outside the ten, and a cycle with no
-  back-off `weekNotes.last` (or a new athlete with no `weekNotes.first`). Since 2026-09-26 the saved
-  `--spine` result also carries the cycle just trained and the Exercise Ledger, so it also fails
-  70%+ of the accessories carried over, a kept exercise whose dose didn't move, a ledger
-  Disliked / Pain-flagged / Banned exercise brought back without a `reintroduce:` reason, and a
-  circuit item used on two days; it warns on each kept accessory not on `keep:`, a kept primary
-  on the same numbers, and a day of 7+ working exercises. "Weighted" for the 8-rep rule comes from
-  the Spine entry (loaded kit, no impact, not a jump, throw, sprint, carry or conditioning). Two things are only
-  WARNs: a Quality headline outside the week's top two (report it with your recommendation), and a
-  day past `--cap` (Amir,
-  2026-09-26: the form's session length is a guess, athletes who write 60 train 75 and never
-  complain), so pass the athlete's real minutes when the logs have them. It prints what the handoff needs: minutes
-  per day, sets per muscle and the **QUALITY** line. The first programme it was run on (a new
-  athlete's live Cycle 1) passes it with 0 FAIL; a copy with twelve faults planted in it fails on
-  all twelve.
-- `node -e "JSON.parse(require('fs').readFileSync('data/<id>.json','utf8')); console.log('valid')"`
-- Confirm `athlete.id`, the `athlete` names, `currentCycleIndex`, day count, and
-  exercise count print as expected.
-- **`node scripts/check_rx.js`** — the format lint is a script now. It audits every `rx`
-  (two doses on one exercise, `chips` left beside `rx`, an empty `rx`, a malformed tempo, an
-  RPE under the selector floor) and proves program.html and assets/js/chips.js still agree.
-  It also runs in `.githooks/pre-commit`.
-- **Coaching lint** (still yours): every `standard` has sets, one dose and an RPE unless the
-  movement says otherwise; rest sits on the block when the section shares one, on the exercise
-  only when it differs; a tempo only where the spec gave one; ballistic/carry correctly OMIT tempo and carry an `intent`;
-  warm-up/prep carry NO `rpe`; **no exercise or circuit item carries `cues`** (each shows its
-  Spine entry's three); section titles use the standard names (Primary/Accessory/etc, never "Strength").
-  **Reps are one number, never a range** (Amir, 2026-09-24). If the spec carries a range,
-  stop and ask — do not pick an end yourself. `auditRx()` flags one as `rep-range`.
-- **Because audit** (`why`): fix every line it prints. It flags a bad `src`, a missing `part`,
-  text over 140 characters, coach-log words (a diagnosis, "stalled", "hated"), em-dashes or
-  semicolons, a reason the Coach's Note repeats, and more than 10 in the cycle.
-  ```
-  node -e "require('./assets/js/chips.js');const C=globalThis.Chips;
-  const d=JSON.parse(require('fs').readFileSync('data/<id>.json','utf8'));const out=[];
-  (d.workouts.days||[]).forEach(dy=>(dy.blocks||[]).forEach(b=>(b.exercises||[]).forEach(e=>
-    C.auditWhy(e).forEach(p=>out.push('Day '+dy.id+' '+e.name+': '+p.code+' '+p.label+' — '+p.msg)))));
-  C.auditWhyProgram(d).forEach(p=>out.push(p.code+': '+p.msg));
-  console.log(out.length?out.join('\n'):'ok — Because clean')"
-  ```
-- **Already in the script, so no manual pass** (these were separate greps and node snippets until
-  2026-09-26): a working circuit in a first cycle, a superset written as a pill, an RPE under 6
-  or an RPE drop that doesn't name the floor anywhere in the text, a notes card that isn't HTML.
+  **The spec sets the flags**: its athlete profile turns on `--floor` (aim: strength-muscle),
+  `--proven`, the bans, `floor-except` and the cap; its `week:` line turns on the back-to-back
+  check; a first cycle switches the new-athlete rules on by itself. Type a flag only to override
+  one, and `--no-backoff` only on Amir's word. **Fix every FAIL and re-run until 0 FAIL; read every
+  WARN.** Every message starts with the rule it enforces (`[VOL-8]`), and the rule index's Check
+  column is the list of what the script covers, so it isn't repeated here. Two WARNs are soft by
+  design: a Quality headline outside the week's top two (PRC-24: report it with your
+  recommendation) and a day past the cap (SES-7). It prints what the handoff needs: minutes per
+  day, sets per muscle and the **QUALITY** line. The JSON parse, the rx shape checks and the
+  Because audit (`Chips.auditWhy`) run inside it, so there is no separate node step any more.
+- **Coaching lint** (still yours: the script can't judge these): every `standard` has sets, a dose
+  and an RPE unless the movement says otherwise; rest sits on the block when the section shares
+  one, on the exercise only when it differs; a tempo only where the spec gave one; ballistic work
+  and carries omit tempo and carry an `intent`; section titles use the standard names
+  (Primary/Accessory/etc, never "Strength"). A rep range in the spec means stop and ask (PRG-6):
+  never pick an end yourself.
 - **⚠️ Later cycles: every exercise inside a working circuit needs a logged working weight
-  already** ("any exercise new to that client, even in a later cycle"). A **variant** of a
-  movement the athlete has logged counts as known (rotation by variant, 2026-09-26); a genuinely
-  new pattern does not. Check the item against session history, The Ceiling and the Exercise
-  Ledger; one without a number comes out of the circuit and runs as straight sets this cycle.
-  Flag it to Amir rather than silently rebuilding.
+  already** (SES-11). A **variant** of a movement the athlete has logged counts as known (rotation
+  by variant, 2026-09-26); a genuinely new pattern does not. Check the item against session
+  history, The Ceiling and the Exercise Ledger; one without a number comes out of the circuit and
+  runs as straight sets this cycle. Flag it to Amir rather than silently rebuilding.
 - Report any structural violation and fix before finishing. (In Part A, Step 4's names and Spine
   drafts run BEFORE this check, so every card already has its `exId`.)
+- **Keep the output**: the rule IDs that failed (and were fixed) and the WARNs left standing go on
+  the log entry's `Checks:` line (Step 5).
 
 ## Step 3b — ONE review, new athletes only (Part A; 2026-09-25, moved before engage 2026-09-26)
 Once the build checks pass, a **NEW athlete's** programme gets ONE reviewer: one agent (the Agent
@@ -388,6 +350,10 @@ The athlete app never reads the log. The entry template is /program-design's COA
   a cycle's original reasoning survives even after the program is later changed. (It grows in
   lockstep with `programHistory` / `currentCycleIndex`.)
 - Heading: use the cycle number + name from `cycles[currentCycleIndex]` and today's date.
+- **`Checks:` — one line in the entry** (2026-09-26, from the audit): the rule IDs the check runs
+  failed on and were fixed, and the WARNs left standing, e.g. `Checks: fixed VOL-8, SEL-7 · left
+  PRC-24 (reported), SES-7 (72 min, soft cap)`. After eight cycles it shows which checks earn
+  their place.
 - Verify after writing: one section per cycle designed so far, newest last, no prior section altered.
   A `## Debrief — Cycle NN …` section (the end-of-cycle review) may sit between two cycle sections:
   it is not a cycle section, never edit or move it, and append the new cycle after it.
@@ -568,8 +534,8 @@ are both plain text, so a straight `md5(body)` comparison IS valid — use it.
   and the coaching-log row verified.
 - **Node 24 and npm ARE on this machine** (`C:\Program Files\nodejs`, on the Bash PATH;
   `node --version` gave v24.14.1 on 2026-09-26). They arrived around 2026-09-20 with the reel
-  tools, after a 2026-09-19 check had rightly found neither. So the `node -e` snippets above
-  (Steps 3 and 4) run as they are, and so does the pre-commit hook's `node scripts/check_rx.js`.
+  tools, after a 2026-09-19 check had rightly found neither. So Step 4's `node -e` name scan and
+  the checker's own node calls run as they are, and so does the pre-commit hook's `node scripts/check_rx.js`.
   Python 3.14 is here too. `gh` is still NOT installed, so ship by local merge.
 - Commit + push **only if Amir asks**. `data/` and `.claude/coaching-log/` are both
   gitignored; there is normally nothing to commit at all.
@@ -597,7 +563,7 @@ Never approve an entry, and never put anything about this athlete on one.
   Step 3's `check_program.py --spine` run already printed both, on phones now and once the
   drafts are approved: copy its lines rather than counting by hand.
 - **Because.** The cycle carries 5–10 `why`s, each on an exercise that is in this programme, none
-  carried over from last cycle. `Chips.auditWhy()` / `auditWhyProgram()` clean (Step 3).
+  carried over from last cycle, and Step 3's check ran `Chips.auditWhy()` on every one (COM-4).
 
 ## Don'ts
 - Don't change any prescription — you assemble, you don't design.

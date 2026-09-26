@@ -34,7 +34,8 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
   --ban WORDS     comma list of words this athlete must not be given (goblet,hanging,...);
                   without it, the spec's "bans: ..." line is used
   --spec FILE     the design spec: its fallback lines are scanned for banned words too
-  --week DAYS     the example week, e.g. "Sat:1,Sun:2,Mon:3,Wed:4" (back-to-back check)
+  --week DAYS     the example week, e.g. "Sat:1,Sun:2,Mon:3,Wed:4" (back-to-back check); without it,
+                  the spec's "week: ..." line is used
   --spine FILE    the saved result of --spine-sql: the Spine gate, the Quality Map, "weighted"
                   for the 8-rep rule, and (from last cycle and the Exercise Ledger in the same
                   result) the continuity checks: kept accessories, a kept dose that didn't move,
@@ -196,6 +197,8 @@ def check_structure(data, args, spine=None):
         # its own rest timer and nothing showed they were paired). Was a manual grep in assemble.
         if not it and re.search(r'super-?set|paired with|pair with|complex with', o.get('intent') or '', re.I):
             fail(f"{where}: a pairing written as a pill ('{o['intent']}'): make the pair ONE circuit (SCHEMA → circuit)", 'SES-12', 'CHP-2')
+        if isinstance(o.get('rx'), dict) and not o['rx']:
+            fail(f"{where}: an empty rx (leave rx out when nothing is prescribed)", 'CHP-5')
         rx = o.get('rx') or {}
         doses = [k for k in ('reps', 'time', 'distance', 'work') if rx.get(k) not in (None, '')]
         if len(doses) > 1: fail(f"{where}: two doses ({' + '.join(doses)})", 'CHP-5')
@@ -270,20 +273,51 @@ def check_cards(data):
             if stack: fail(f"card '{t}': unclosed <{'>, <'.join(stack)}>", 'COM-8')
         if '<ol' in body: warn(f"card '{t}': <ol> has no styling in .note-body, use <ul>", 'COM-8')
 
+def run_chips(expr, payload):
+    """Evaluate `expr` in node, with C = the app's Chips module (assets/js/chips.js) and a = the
+    payload, so the checker uses the app's own copy of a rule instead of keeping a third one.
+    None when node can't run (it is installed on Amir's PC; a WARN says what was skipped)."""
+    js = ("require('./assets/js/chips.js');const C=globalThis.Chips;let s='';"
+          "process.stdin.on('data',d=>s+=d).on('end',()=>{const a=JSON.parse(s);"
+          "process.stdout.write(JSON.stringify(" + expr + "))})")
+    try:
+        r = subprocess.run(['node', '-e', js], input=json.dumps(payload), capture_output=True, text=True,
+                           encoding='utf-8', cwd=REPO, timeout=60)
+        return json.loads(r.stdout) if r.returncode == 0 else None
+    except Exception:
+        return None
+
 def check_whys(data):
     whys = [(d, ex) for d, b, ex, it in exercises(data) if not it and ex.get('why') is not None]
     n = len(whys)
     if n > 10: fail(f"{n} Becauses: keep the 5-10 real personal decisions", 'COM-4')
     elif n < 5: warn(f"{n} Becauses: a cycle carries 5-10 (fewer than 3 hides the Why-your-plan button)", 'COM-4')
-    for d, ex in whys:
-        w, where = ex['why'], f"Day {d.get('id')} {ex.get('name')} why"
-        if not isinstance(w, dict): fail(f"{where}: must be {{src, text}}", 'COM-4'); continue
-        if w.get('src') not in ('goal', 'body', 'test', 'cycle', 'you', 'court'): fail(f"{where}: src {w.get('src')!r}", 'COM-4')
-        if w.get('src') == 'body' and not w.get('part'): fail(f"{where}: src body needs a part", 'COM-4')
-        if w.get('part') and w.get('src') != 'body': fail(f"{where}: part only goes with src body", 'COM-4')
-        text = (w.get('text') or '').strip()
-        if len(text) > 140: fail(f"{where}: {len(text)} characters (140 max)", 'COM-4')
-        if re.search(r'[—;]', text): fail(f"{where}: an em-dash or semicolon", 'COM-4')
+    if not whys: return
+    # The app's own audit, Chips.auditWhy(): shape, source, part, length, the voice, diagnosis
+    # words and a reason the Coach's Note repeats. It was a separate node snippet in
+    # /program-assemble until 2026-09-26, beside a partial Python copy of it here.
+    probs = run_chips("a.map(e=>{try{return C.auditWhy(e)}catch(x){return null}})", [ex for _, ex in whys])
+    if probs is None:
+        warn("node could not run assets/js/chips.js, so only the basic Because checks ran "
+             "(not the diagnosis words or a repeat of the Coach's Note)", 'COM-4')
+        for d, ex in whys: why_basics(d, ex)
+        return
+    for (d, ex), ps in zip(whys, probs):
+        where = f"Day {d.get('id')} {ex.get('name')} why"
+        if ps is None: why_basics(d, ex); continue
+        for p in ps:
+            fail(f"{where}: {p.get('msg')}" + (f" ({p['label']})" if p.get('label') else ''), 'COM-4')
+
+def why_basics(d, ex):
+    """The fallback when node is missing: the shape, source, part, length and voice checks."""
+    w, where = ex['why'], f"Day {d.get('id')} {ex.get('name')} why"
+    if not isinstance(w, dict): fail(f"{where}: must be {{src, text}}", 'COM-4'); return
+    if w.get('src') not in ('goal', 'body', 'test', 'cycle', 'you', 'court'): fail(f"{where}: src {w.get('src')!r}", 'COM-4')
+    if w.get('src') == 'body' and not w.get('part'): fail(f"{where}: src body needs a part", 'COM-4')
+    if w.get('part') and w.get('src') != 'body': fail(f"{where}: part only goes with src body", 'COM-4')
+    text = (w.get('text') or '').strip()
+    if len(text) > 140: fail(f"{where}: {len(text)} characters (140 max)", 'COM-4')
+    if re.search(r'[—;]', text): fail(f"{where}: an em-dash or semicolon", 'COM-4')
 
 def check_week_notes(data, args):
     """The first and last week of the cycle being built (cycles[currentCycleIndex].weekNotes).
@@ -679,17 +713,9 @@ def working(data):
         yield (it or ex), t.lower().startswith('primary'), bool(it), ex
 
 def rx_views(exs):
-    """rxOf() views from assets/js/chips.js, the ONE parser of rx and legacy chips, run in node,
-    so a legacy chips cycle compares with an rx one without a third copy of the parsing rules."""
-    js = ("require('./assets/js/chips.js');const C=globalThis.Chips;let s='';"
-          "process.stdin.on('data',d=>s+=d).on('end',()=>{const a=JSON.parse(s);"
-          "process.stdout.write(JSON.stringify(a.map(e=>{try{return C.rxOf(e)}catch(x){return null}})))})")
-    try:
-        r = subprocess.run(['node', '-e', js], input=json.dumps(exs), capture_output=True, text=True,
-                           encoding='utf-8', cwd=REPO, timeout=60)
-        return json.loads(r.stdout) if r.returncode == 0 else None
-    except Exception:
-        return None
+    """rxOf() views from assets/js/chips.js, the ONE parser of rx and legacy chips, so a legacy
+    chips cycle compares with an rx one without a third copy of the parsing rules."""
+    return run_chips("a.map(e=>{try{return C.rxOf(e)}catch(x){return null}})", exs)
 
 def dose_sig(v):
     if not v: return None
@@ -949,6 +975,8 @@ def main():
     prof = parse_profile(open(args.spec, encoding='utf-8').read()) if args.spec else None
     if prof: apply_profile(args, prof, 'spec')
     else: apply_profile(args, parse_profile(ctx.get('profile')), 'coaching log')
+    if not args.week and spec_lines(args, 'week'):
+        args.week = spec_lines(args, 'week')[0]  # the spec's example week (2026-09-26)
     check_structure(data, args, ctx['spine'])
     # --stage build runs straight after design, BEFORE engage writes a word (2026-09-26): a FAIL
     # there changes the programme while no note, Because or message has been written around it.

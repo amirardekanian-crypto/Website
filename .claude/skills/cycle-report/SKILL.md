@@ -89,8 +89,8 @@ because athletes often start a day or two before the date) and run them:
   `ticked` is not evidence of ticking on those rows. Use the progress blob's `_setlog_` `d`
   flags, or leave it out.
 - **Q4** weigh-ins in the window, Personal Records entries, in-app messages, call logs, and the
-  coaching log body. (It returns the whole coaching log; skim it for the last cycle's design read,
-  its progression levers and the Exercise Ledger.)
+  coaching log. (It returns the log's head, profile, Exercise Ledger and roadmap, plus the cycle
+  just trained: its design read, its in-cycle edits. Older cycles are left out on purpose.)
 
 ## Step 2 · The read (for Amir first, then the athlete)
 

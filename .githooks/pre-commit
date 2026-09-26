@@ -1,5 +1,5 @@
 #!/bin/sh
-# Seven guards. Each runs only when its own files are staged, so a commit that
+# Eight guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -165,6 +165,21 @@ if git diff --cached --name-only --diff-filter=ACMD \
   if ! "$PY" scripts/check_rule_index.py; then
     echo ""
     echo "pre-commit: BLOCKED — the rule index and its citations disagree (details above)."
+    failed=1
+  fi
+fi
+
+# ── 8. the checker's own tests (added 2026-09-26) ────────────────────────────
+# Why: scripts/check_program.py is what holds every programme to the house rules before engage
+# writes a word, and until the audit its tests lived in one session's scratchpad. A change to the
+# checker, the rule guard, the app's shared rules (chips.js) or the principles runs all of them on
+# a made-up athlete, so a check that silently stops working is caught before it ships.
+if git diff --cached --name-only --diff-filter=ACMD \
+     | grep -qE '^(scripts/(check_program|check_rule_index|test_check_program)\.py|assets/js/chips\.js|\.claude/COACHING-PRINCIPLES\.md)$'; then
+  echo "pre-commit: the programme checker or its rules changed — running its tests..."
+  if ! "$PY" scripts/test_check_program.py; then
+    echo ""
+    echo "pre-commit: BLOCKED — the checker's tests failed (details above)."
     failed=1
   fi
 fi
