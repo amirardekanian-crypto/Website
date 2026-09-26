@@ -201,7 +201,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v35` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v36` on 2026-09-26). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
@@ -227,8 +227,8 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   Shorts link a tall 9:16 box, and play every video inside the app. An "open in the YouTube app" link was tried and
   removed the same day (Amir): do not add it back.
   The three parsers must agree: `ytId()` in `tennis/app/app.js`, `ytVideoId()` in `program.html`, the modal in
-  `assets/js/shared.js`. (The site modal in `shared.js` reads fewer link shapes and draws no tall Shorts box: flagged
-  2026-09-26.) The course app's copy: `FARSI-PRODUCTS.md`.
+  `assets/js/shared.js`. (Since 2026-09-26 the site modal in `shared.js` matches: the same link shapes, a tall
+  9:16 box for a Short, and only a YouTube address embeds; any other link opens as a link.) The course app's copy: `FARSI-PRODUCTS.md`.
 - **Edge Function source is in `supabase/functions/`** (since 2026-09-13; before that it existed
   only as deployments). Edit there, deploy with the Supabase MCP, never in the dashboard. See its README.
 - The Farsi site is the **aesthetic reference Amir likes**: green radial-gradient hero, white text +

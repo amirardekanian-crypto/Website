@@ -36,7 +36,10 @@
     --paper: #FAF7F2; --card: #FFFFFF; --ink: #1A1A1A;
     --court: #0E4A36; --court-deep: #0B3B2B; --court-100: rgba(14,74,54,0.08);
     --clay: #C7552F; --clay-100: rgba(199,85,47,0.10);
-    --ochre: #A8741C; --ochre-100: rgba(168,116,28,0.12);
+    /* The "warn" middle between court green (good) and clay (bad). It was ochre
+       until 2026-09-26, retired with the rest of the gold: it is a muted plum now.
+       The name --ochre is legacy, kept so no reference needs renaming. */
+    --ochre: #7A4E6E; --ochre-100: rgba(122,78,110,0.12);
     /* RPE UNDER target (2026-09-24). Same steel blue as program.html's --rpe-under,
        so a set reads the same colour on the athlete's phone and here: clay over,
        blue under. Used only for an RPE against its target. */
@@ -2046,7 +2049,8 @@ function pulsePanelHtml(habAthletes) {
 // All derived from session_history. Load uses Foster's session-RPE method
 // (load = session RPE × duration in minutes). ACWR = acute (7-day) ÷ chronic
 // (28-day weekly average). Hex colours because var() is unreliable in SVG attrs.
-const C = { green: '#0E4A36', red: '#C7552F', amber: '#A8741C', grey: '#5C5C5C' };
+// `amber` is a legacy name: the warn colour is plum (--ochre) since 2026-09-26.
+const C = { green: '#0E4A36', red: '#C7552F', amber: '#7A4E6E', grey: '#5C5C5C' };
 function dailyLoad(sessions) {
   const m = {};
   sessions.forEach(s => {
@@ -2442,8 +2446,10 @@ function parseSetLine(rest) {
   // Reps, "×5" — logged from 2026-09-24 (The Card Remembers). Older lines have
   // none, and get no `reps` key at all. ⚠ program.html's parseSetText() reads
   // the same grammar for the athlete's history; change the two together.
-  const mr = t.match(/×\s*(\d+)/);
-  if (mr) { s.reps = parseInt(mr[1], 10); t = t.replace(mr[0], ' '); }
+  // The reps are the LAST word and stand alone: "2×20 ×8" is two 20 kg dumbbells
+  // for 8, never 20 reps (fixed 2026-09-26; scripts/check_setlog.js).
+  const mr = t.match(/(^|\s)×(\d+)\s*$/);
+  if (mr) { s.reps = parseInt(mr[2], 10); t = t.slice(0, mr.index) + ' '; }
   s.w = t.trim();                       // free text: "24", "24kg", "red band"
   if (!s.done && !s.w && !s.rpe) s.skipped = true;
   return s;
@@ -2584,7 +2590,10 @@ function lowRunOf(sessions) {
 function loadSummary(sets) {
   const raw = sets.map(s => s.w).filter(Boolean);
   if (!raw.length) return '';
-  const nums = raw.map(w => parseFloat(String(w).replace(',', '.')));
+  // A whole number only: parseFloat("2×20") is 2, which showed two 20 kg dumbbells
+  // as a 2 kg load. "2×20", "BW+10", "red band" now print as typed (2026-09-26).
+  const nums = raw.map(w => { const t = String(w).replace(',', '.').trim();
+    return /^\d+(?:\.\d+)?\s*(?:kg)?$/i.test(t) ? parseFloat(t) : NaN; });
   if (nums.some(n => isNaN(n))) return raw.join(' · ');
   // Bodyweight work gets logged as a row of zeros; "0 kg" is not a load.
   if (nums.every(n => n === 0)) return '';

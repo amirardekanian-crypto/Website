@@ -192,7 +192,17 @@ day, across cycles via `matchRenamed()`), and **History ›** opens the History 
 - **Reps are an override.** The reps box shows the prescribed number as a placeholder; `n` is
   stored only when the athlete did something else. Amir prescribes **one number, never a range**.
 - **The log-line grammar exists three times** — `buildSessionData()` writes `Set 1: 80 ×5 @8 ✓`,
-  `parseSetLine()` (coach.html) and `parseSetText()` (program.html) read it. Change all three.
+  `parseSetLine()` (coach.html) and `parseSetText()` (program.html) read it. Change all three;
+  `scripts/check_setlog.js` (pre-commit) runs the real writer through both readers.
+  **The reps are the last word and stand alone** (`×8` after a space, at the end once the RPE and the
+  tick are off), so a weight typed with a times sign survives: `Set 2: 2×20 ×8 @7 ✓` reads back as
+  weight `2×20`, 8 reps. Until 2026-09-26 both readers took the first `×` and read it as 20 reps.
+  The weight text is always kept exactly as typed.
+- **A pair of implements as a number** (2026-09-26): where a load has to be a number,
+  `parseLoggedKg()` (records, estimates, History) reads `2×20`, `2x20`, `2 x 20kg` as **20**, one
+  implement, so a dumbbell lift logged as `20` one day and `2×20` the next is the same lift. Only a
+  count of 1 to 4 before the sign counts as a pair (`20x2` stays 20). coach.html's `loadSummary()`
+  does no maths on any weight that is not a plain number (`24` or `24kg`): it prints `2×20` as typed.
 - **`<id>_histcache` is a cache and never syncs** (`_snapshot()` skips it; written with
   `_lsRawSet` so it never stamps `lastEditAt`). The source is `get_my_history()`, stage30.
 

@@ -208,28 +208,30 @@
       });
       return root;
     }
+    // The same id rules as ytVideoId() in program.html and ytId() in tennis/app/app.js:
+    // watch?v=, youtu.be/, shorts/, embed/, live/ and v/ links, an 11-character id.
+    // Only a YouTube address counts: an Instagram or Vimeo link used to have an id made
+    // up out of its path and opened a broken YouTube player. Anything else opens as a
+    // normal link (2026-09-26).
     function extractId(url) {
-      if (!url) return null;
-      try {
-        const u = new URL(url);
-        if (u.hostname.includes('youtu.be')) return u.pathname.slice(1).split('/')[0];
-        if (u.hostname.includes('youtube.com')) {
-          if (u.pathname === '/watch') return u.searchParams.get('v');
-          const m = u.pathname.match(/^\/(embed|shorts|v)\/([^/?#]+)/);
-          if (m) return m[2];
-        }
-      } catch (e) {
-        // fall through
-      }
-      // Last-ditch: look for 11-char token
-      const m = String(url).match(/[?&]v=([^&]+)/) || String(url).match(/\/([a-zA-Z0-9_-]{11})(?:$|[?&/])/);
+      const s = String(url || '');
+      if (!/^\s*(?:(?:https?:)?\/\/)?(?:[a-z0-9-]+\.)*(?:youtube\.com|youtube-nocookie\.com|youtu\.be)(?:[/?#:]|$)/i.test(s)) return null;
+      const m = s.match(/(?:[?&]v=|youtu\.be\/|\/shorts\/|\/embed\/|\/live\/|\/v\/)([A-Za-z0-9_-]{11})/);
       return m ? m[1] : null;
     }
+    function isShort(url) { return /\/shorts\//.test(String(url || '')); }
     function open(url) {
-      const el = ensure();
       const id = extractId(url);
-      if (!id) { window.open(url, '_blank', 'noopener'); return; }
+      if (!id) { if (url) window.open(url, '_blank', 'noopener'); return; }
+      const el = ensure();
+      // A Short is filmed upright: a tall 9:16 box, as in the app's inline player. Set
+      // here, not in CSS, because the modal is styled twice (components.css, program.html).
+      const inner = el.querySelector('.video-modal-inner');
+      const tall = isShort(url);
+      inner.style.aspectRatio = tall ? '9 / 16' : '';
+      inner.style.maxWidth = tall ? 'min(420px, calc((100vh - 80px) * 9 / 16))' : '';
       const frame = el.querySelector('.video-modal-frame');
+      frame.style.height = '100%';
       // ⚠️ www.youtube.com, NOT youtube-nocookie.com, and it must match program.html's
       // loadInlineVideo() exactly. In Iran YouTube puts a "sign in to confirm you're not a
       // bot" wall in front of the cookieless nocookie player, while the same video plays

@@ -60,7 +60,10 @@
 //      and a running session's Guided button is visible again.
 // v35: program.html and habits.html changed (2026-09-26): today's habits are ticked on Home,
 //      in AA Proof's embedded strip (habits.html?embed=1).
-const CACHE = 'aap-v35';
+// v36: shared.js and program.html changed (2026-09-26): the video pop-up reads the same YouTube
+//      links as the app (a Short plays in a tall box; a non-YouTube link opens as a link), and
+//      a weight typed as "2×20" reads back as a weight, not as 20 reps.
+const CACHE = 'aap-v36';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
