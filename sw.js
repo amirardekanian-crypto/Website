@@ -147,7 +147,9 @@
 //      and both apps drop only the double-tap zoom (touch-action: manipulation).
 // v76: habits.html changed (2026-09-27, PRF-01): the circle is the tick, + is 44 px in the habit's tint,
 //      the programme's session is one slim line at the end of Today.
-const CACHE = 'aap-v76';
+// v77: habits.html and program.html changed (2026-09-27, PRF-03): Today leads with the verdict ("2 to go",
+//      On target, Perfect) instead of the day's percentage, and the training app's habits row says the same.
+const CACHE = 'aap-v77';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

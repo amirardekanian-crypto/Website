@@ -1299,17 +1299,9 @@
   #app .apphd { border-bottom: 0; padding-bottom: 8px; }
   #app .apphd .title { font-weight: 700; letter-spacing: -0.01em; }
   #app .apphd .right { color: var(--muted-soft); font-weight: 700; letter-spacing: 0.04em; }
-  /* No padding here — Today's inline style adds its own 3px along with the
-     ring; every other screen gets no `style` attribute at all, so this stays a
-     true no-op and `.hdme` sits exactly where it always has. */
+  /* The day's ring round the initials went with PRF-03 (2026-09-27): it said today's percentage again.
+     The verdict tile in the hero answers the question instead. */
   #app .hdmewrap { flex: none; display: flex; border-radius: 999px; }
-  /* The day's ring sweeps in when Today arrives, and glides when a tick moves
-     it. --avp is registered so the conic edge can animate at all — a bare CSS
-     custom property cannot interpolate inside a conic-gradient() argument
-     without @property declaring its syntax. */
-  @property --avp { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
-  @keyframes avpArrive { from { --avp: 0% } }
-  #app .hdright .hdmewrap[style] { animation: avpArrive .9s cubic-bezier(.2,.8,.2,1); transition: --avp .5s cubic-bezier(.2,.8,.2,1); }
   /* The level ring draws itself on arrival — the same sweep, one object down.
      `from` only: it lands on whatever offset the render already set inline, so
      a tick's new value is not overwritten by the arrival keyframe. Today's hero
@@ -1920,6 +1912,21 @@
      lets it, and nowrap is what stops it stacking into two lines. */
   #app .wk-l.now { color: var(--accent); font-weight: 800; font-size: 9.5px; letter-spacing: -.01em; }
   #app .wk-d { overflow: visible; }
+  /* The verdict (PRF-03) leads the week: "2 TO GO" on the dark card, then ON TARGET or PERFECT in the
+     accent. The rule above the row moves from the week to the row, and the "7 DAYS" caption gives the
+     tile its room. Dark mode fills with --accent-700: white on the dark accent is 3.35:1. */
+  #app .wkrow { display: flex; align-items: center; gap: 12px; padding-top: 13px; border-top: 1px solid var(--rule); }
+  #app .wkrow .weekrep { flex: 1; min-width: 0; padding-top: 0; border-top: 0; }
+  #app .wkrow .weekrep .wk-cap { display: none; }
+  #app .vd {
+    flex: none; width: 68px; height: 48px; border-radius: 14px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 4px; background: var(--ink-card); color: #FFFFFF;
+  }
+  #app .vd b { display: flex; font-size: 22px; font-weight: 800; line-height: 1; letter-spacing: -.02em; }
+  #app .vd b svg.tick { width: 20px; height: 20px; }
+  #app .vd span { font-size: 10px; font-weight: 800; letter-spacing: .05em; line-height: 1; white-space: nowrap; }
+  #app .vd.on, #app .vd.perfect { background: var(--accent); }
+  body[data-dark] #app .vd.on, body[data-dark] #app .vd.perfect { background: var(--accent-700); }
 
   /* ── 2. Settings as grouped cards ── */
   #app .hdleft { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -4980,29 +4987,48 @@ function armIdle() {
 function atRisk() {
   return new Date().getHours() >= 20 && !dayQualifies(TKEY()) && currentDayStreak() > 0;
 }
-// How many more habits would rescue the day. Not a headcount any more: the day
-// is scored by weight, so the answer is the FEWEST remaining habits that close
-// the gap — which is simply the heaviest ones first. Greedy is exactly right
-// here, not an approximation: to reach a total in the fewest picks you always
-// take the biggest available.
-//
-// Locked habits are skipped because the athlete cannot tick them, which is the
-// same rule the gate itself uses — and it is why this can never run out of
-// road. Doing every unlocked habit leaves only unearned locks, and those are
-// not in the denominator, so the day lands on 100%.
+// How many more habits would rescue the day, for the at-risk bar: dayToGo() below since PRF-03 (this used
+// to count each habit's whole weight, so it could say 1 when 2 were needed). Locked habits are skipped because the athlete cannot tick them, the same rule the gate
+// uses, so this never runs out of road: every unlocked habit done lands the day on 100%.
 function shortOfQualifying() {
   const p = dayParts(TKEY(), 'gate');
   if (!p.total) return 0;
-  const left = rosterOn(TKEY()).filter(h => !isDone(h) && !h.locked)
-                               .sort((a, b) => baseXp(b) - baseXp(a));
-  let have = p.done, n = 0;
-  while (!gatePasses(have, p.total) && n < left.length) { have += baseXp(left[n]); n++; }
-  // The gate has a second door — at most one thing left undone — so the honest
-  // answer to "what saves today" is whichever route is fewer taps. Without this
-  // the nudge kept quoting the heaviest-first number while the athlete was
-  // actually one tick from qualifying by the count rule. See dayQualifies().
-  const byCount = Math.max(0, left.length - 1);
-  return Math.max(1, Math.min(n, byCount));
+  return Math.max(1, dayToGo(TKEY()));
+}
+
+// ── The verdict (PRF-03, 2026-09-27) ─────────────────────────────────────
+// Today leads with the answer to the question the day streak asks, does this day count, and never with
+// dayPct(), which is what the day was WORTH over the whole roster: a rest day with everything else done
+// read 68% and counted, and a free athlete could never pass about 64%. DISPLAY ONLY: dayQualifies()
+// decides, and neither scorer moves (the phone's XP_RULES and the server's xp_rules).
+// How many habits still stand between a day and on target. EXACT: finishing a habit adds only what it
+// still lacks (dayParts() already counts a half-done counter as half), and either door counts: the gate's
+// percentage (streakQualifyPct), or one thing left undone. The old shortOfQualifying() added each habit's
+// whole weight on top of its partial credit, so at midday it said 1 to go when 2 were needed.
+// Greedy is exact here: to reach a total in the fewest picks, take the biggest lack first.
+function lackOf(h, k) { return baseXp(h) * (1 - (h.target > 0 ? Math.min(1, valOf(k, h.id) / h.target) : 0)); }
+function dayToGo(k) {
+  if (dayQualifies(k)) return 0;
+  const p = dayParts(k, 'gate');
+  const lack = rosterOn(k).filter(h => !h.locked && !isDone(h, k)).map(h => lackOf(h, k)).sort((a, b) => b - a);
+  let have = p.done, missing = p.missing;
+  for (let n = 1; n <= lack.length; n++) {
+    have += lack[n - 1]; missing--;
+    if (gatePasses(have, p.total) || (missing <= 1 && have > 0)) return n;
+  }
+  return Math.max(1, lack.length);
+}
+// 'perfect' (every habit done), 'on' (on target: the streak counts it) or 'togo' with n.
+function verdictOf(k) {
+  if (dayQualifies(k)) return { state: isPerfect(k) ? 'perfect' : 'on', n: 0 };
+  return { state: 'togo', n: dayToGo(k) };
+}
+function verdictTile(k) {
+  const v = verdictOf(k);
+  const say = k === TKEY() ? 'today' : dayLong(k);
+  return v.state === 'togo'
+    ? `<div class="vd" data-k="vd" role="status" aria-label="${v.n} to go before ${esc(say)} counts"><b>${v.n}</b><span>TO GO</span></div>`
+    : `<div class="vd ${v.state}" data-k="vd" role="status" aria-label="${esc(say.replace(/^./, c => c.toUpperCase()))} ${v.state === 'perfect' ? 'is perfect: every habit done' : 'is on target'}"><b>${TICK}</b><span>${v.state === 'perfect' ? 'PERFECT' : 'ON TARGET'}</span></div>`;
 }
 
 // ── The nudge (one a day, driven by what is actually missing) ─────────────
@@ -5017,8 +5043,9 @@ function nudge() {
 
   // Loss beats gain: a real streak on the line tonight outranks everything.
   if (atRisk()) {
-    const st = currentDayStreak(), short = shortOfQualifying();
-    const t = missing.filter(h => !h.locked).sort((a, b) => baseXp(b) - baseXp(a))[0];
+    const st = currentDayStreak(), short = shortOfQualifying(), tk = TKEY();
+    // The habit that closes the most of the gap, the one the count above starts with (PRF-03).
+    const t = open.slice().sort((a, b) => lackOf(b, tk) - lackOf(a, tk))[0];
     return { risk: true, key: 'risk',
              line: pickLine('risk', 'risk', { st: st, n: short }),
              cta: t ? 'SAVE IT · ' + t.name : 'SEE WHERE YOU STAND',
@@ -6308,9 +6335,10 @@ function renderEmbed() {
   if (!CFG.onboarded) return '';            // never set up: the training app keeps its card
   UI.day = null;
   const t = TKEY(), rows = rosterOn(t);
-  const done = rows.filter(h => isDone(h, t)).length;
+  // The same verdict as Today's tile and the training app's row above this strip (PRF-03).
+  const v = verdictOf(t), said = v.state === 'togo' ? v.n + ' to go' : v.state === 'perfect' ? 'Perfect' : 'On target';
   return `<div class="e-wrap">
-    <div class="e-head"><span class="e-k">Today</span><span class="e-n">${done} of ${rows.length} done</span>
+    <div class="e-head"><span class="e-k">Today</span><span class="e-n">${said}</span>
       <a class="e-open" href="${esc(proofUrl())}" target="_top">Open AA Proof →</a></div>
     ${rows.map(h => embedRow(h, t)).join('')}
     ${UI.toast ? `<div class="e-toast">${esc(UI.toast)}</div>` : ''}
@@ -6388,6 +6416,10 @@ function publishCardSnapshot() {
       // The same gate a day streak uses, so the card and the streak can never
       // disagree about whether today counts.
       qualified: dayQualifies(t),
+      // The verdict Today leads with (PRF-03): 'togo' with n, 'on' or 'perfect'. The training app's
+      // habits row prints it, so both apps say "2 to go" rather than "day complete" and "1 of 5 done".
+      verdict: verdictOf(t).state,
+      togo:    dayToGo(t),
       week:   week,
       days:   days,
       // What the Today hero shows around the level: how far through it you are,
@@ -7332,7 +7364,7 @@ function placeTour() {
 // ── App shell ─────────────────────────────────────────────────────────────
 function renderApp() {
   const LI = overallLevel();
-  const hs = live(), doneCount = hs.filter(h => isDone(h, AKEY())).length, pct = dayPct(AKEY());
+  const hs = live(), doneCount = hs.filter(h => isDone(h, AKEY())).length;
   const openH = habitById(UI.open || (hs[0] || HABITS[0]).id);
   const earnedMilestones = ACHIEVEMENTS.filter(a => measureAch(a) >= a.need).length;
   const earnedTiers = allHabits().reduce((s, h) => s + consistencyFor(h).tier, 0);
@@ -7367,8 +7399,7 @@ function renderApp() {
             : ['Day ' + dayNumber() + ' · ' + LI.label, 'You']
   };
   const rights = {
-    // The "68% DONE" text label moved onto the avatar itself — see .hdmewrap
-    // below — so it is not said twice in the same header.
+    // Today's header says nothing on the right: the verdict tile in the hero answers (PRF-03).
     today: '', progress: '',   // the stat grid states the badge count
     detail: (() => { const s = habitStreak(openH);       // not the level — the hero says it
                      return s > 0 ? s + '-DAY STREAK' : ''; })(),
@@ -7385,7 +7416,7 @@ function renderApp() {
   const head = heads[UI.screen] || heads.today;
 
   let screenHtml = '';
-  if (UI.screen === 'today') screenHtml = renderToday(LI, doneCount, pct);
+  if (UI.screen === 'today') screenHtml = renderToday(LI, doneCount);
   else if (UI.screen === 'progress') screenHtml = renderProgress(LI, earned, totalAch);
   else if (UI.screen === 'detail') screenHtml = renderDetail(openH);
   else if (UI.screen === 'crew') screenHtml = renderCrew();
@@ -7432,16 +7463,9 @@ function renderApp() {
         <!-- One control, two states, always in the same place: your initials
              open Settings from anywhere, and become the way out of Settings,
              the manual and the ladder — none of which is a tab any more, so
-             none of them has a tab to press to leave.
-             ON TODAY, the avatar also wears the day's completion as a ring —
-             replaces the separate "68% DONE" text label the header used to
-             carry next to it, so the same fact is not said twice. Everywhere
-             else there is no style attribute at all, so .hdmewrap[style]'s
-             arrival animation never fires and the wrapper is a true no-op.
-             --avp (not a bare percentage) is what lets the ring both sweep in
-             on arrival and glide to a new value on a tick — see @property
-             --avp above. -->
-        <span class="hdmewrap" data-k="hdmewrap" ${UI.screen === 'today' ? `style="padding:3px;--avp:${pct}%;background:conic-gradient(var(--accent) var(--avp),var(--track) 0)" aria-label="${pct}% of today done"` : ''}>
+             none of them has a tab to press to leave. (On Today it also wore the
+             day's percentage as a ring until PRF-03: the verdict tile says it now.) -->
+        <span class="hdmewrap" data-k="hdmewrap">
           <button class="hdme ${OVERLAY ? 'closing' : ''}" data-k="hdme"
             aria-label="${OVERLAY ? 'Close' : 'Settings'}"
             ${on(() => (OVERLAY ? go(UI.backTo || 'today') : (UI.backTo = UI.screen, go('settings'))))}>
@@ -7944,7 +7968,7 @@ function renderNoteBox() {
   </div>`;
 }
 
-function renderToday(LI, doneCount, pct) {
+function renderToday(LI, doneCount) {
   // hs (live habits) drives "your week" — the heat map and the strongest/
   // weakest ranking are about what you track NOW, regardless of which day
   // you happen to be filling in. rows is what the day itself was actually
@@ -8041,7 +8065,10 @@ function renderToday(LI, doneCount, pct) {
                one, because neither is a report worth a tile. -->
           ${streakFlame(currentDayStreak(), bestDayStreak())}
         </div>
-        ${weekReport()}
+        <!-- THE VERDICT LEADS THE WEEK (PRF-03): "2 to go", then On target, then Perfect, for the day
+             being logged. It replaced the percentage, which was what the day was worth, not whether it
+             counts. -->
+        <div class="wkrow" data-k="wkrow">${verdictTile(AKEY())}${weekReport()}</div>
       </div>
 
       <!-- Day strip then habits, directly under the hero. The list is what the
@@ -9026,6 +9053,7 @@ function renderManual() {
 
       ${block(h2('The daily loop') +
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game — they build your level, your rank in each habit, and your place on the leaderboard.`) +
+        p(`The tile beside your week answers the one question that matters: <strong style="color:var(--ink)">does today count?</strong> It says how many habits are still to go, then <strong style="color:var(--ink)">On target</strong> once the day keeps your streak, then <strong style="color:var(--ink)">Perfect</strong> when the list is clear.`) +
         p(`Clear the whole list and that is a <strong style="color:var(--ink)">perfect day</strong>, and the app will stop what it is doing to say so. It does the same for a new level, a rank promotion, a consistency tier and a milestone. Anything smaller than that just flashes in the row and gets out of your way.`) +
         p(`Nothing here needs a signal. Whatever you tick is saved on your phone straight away and sent up on its own when you're back online.`) +
         (isFree() ? '' : p(`<strong style="color:var(--ink)">You can tick today's list from your training app too</strong>, on its Home under Daily Habits. It is this same list, saved the same way, for the same points. A new level or a reward waits for you here, so the moment is never spent on a small strip.`)) +
@@ -9123,7 +9151,7 @@ function renderManual() {
         // now the only thing doing it. Every label says which one it means:
         // habit rows and the detail header carry the habit's own, the band at
         // the top of Today and Progress is always "DAY STREAK".
-        p(`Two streaks, and it is worth knowing which is which. Every habit has <strong style="color:var(--ink)">its own streak</strong> — consecutive days you did that one thing, so 24 days of water is a 24-day streak, and it is the number on the habit's row. Your <strong style="color:var(--ink)">day streak</strong> is different: consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of <strong style="color:var(--ink)">what you could actually do that day</strong> — <strong style="color:var(--ink)">or left no more than one thing undone</strong>, whichever is kinder. That is deliberately not the same number as the percentage on the day itself: the day's own score counts your whole roster, and this one leaves out a locked session you had no way to tick, which is why a rest day can read low and still keep the streak. Miss one habit and the day still counts, every time, whatever you track. That is the one at the top of Today. They move at different speeds, and a bad day breaks the second long before it breaks the first.`) +
+        p(`Two streaks, and it is worth knowing which is which. Every habit has <strong style="color:var(--ink)">its own streak</strong> — consecutive days you did that one thing, so 24 days of water is a 24-day streak, and it is the number on the habit's row. Your <strong style="color:var(--ink)">day streak</strong> is different: consecutive days where you cleared ${XP_RULES.streakQualifyPct}% of <strong style="color:var(--ink)">what you could actually do that day</strong> — <strong style="color:var(--ink)">or left no more than one thing undone</strong>, whichever is kinder. It is exactly what the tile beside your week reads out: <strong style="color:var(--ink)">2 to go</strong> is how many more habits stand between you and a day that counts, and it turns to <strong style="color:var(--ink)">On target</strong> the moment the day would keep the streak. The day's own percentage, on the leaderboard and in your history, counts your whole roster, while this one leaves out a locked session you had no way to tick, which is why a rest day can read low and still keep the streak. Miss one habit and the day still counts, every time, whatever you track. The day streak is the flame at the top of Today. They move at different speeds, and a bad day breaks the second long before it breaks the first.`) +
         p(`Part of a counter counts toward it, too. Nine thousand of your ten thousand steps is not nothing, and the day streak no longer pretends it is — it reads that as nearly all of your steps rather than none of them.`) +
         p(`<strong style="color:var(--ink)">And if you disappear, coming back pays.</strong> Miss ${LAPSE_DAYS} days or more, then have a day that counts, and that is a comeback: <strong style="color:var(--ink)">${COMEBACK_XP} XP</strong> on the spot, every time it happens, and the app will say so. Hold it for a week and there is a medal in it; do that ${3} times and there is another. Nobody gets a clean run, and the days behind you do not have to be paid off before today counts.`) +
         // The athlete-facing half of the weighted day score. Without this, a rest

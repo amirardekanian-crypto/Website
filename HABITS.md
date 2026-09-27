@@ -249,9 +249,23 @@ The screen they actually live on. **In this order, and the order is the point:**
 1. **The hero card** — a floating white card (Amir, 2026-08-01: *"i like the design of the
    hero that looks like a card"*) carrying, on one row: the **level ring**, the **rank**
    (a link into the Locker), **distance to the next level** and its bar, and the **streak
-   tile** hard right. Today's own completion is *not* repeated here; the header and the
-   day strip both already carry it.
-   **Underneath, inside the same card, is the week** — `weekReport()`: seven cells,
+   tile** hard right.
+   **Underneath, inside the same card, the verdict leads the week** (PRF-03, 2026-09-27):
+   `verdictTile(AKEY())` answers the one question the day streak asks, *does this day count*:
+   **"2 TO GO"** on the dark card, then **ON TARGET** or **PERFECT** with a tick in the accent
+   (`--accent-700` in dark, where white on the accent was 3.35:1). It replaced the day's
+   **percentage**, which was `dayPct()`, what the day was *worth*: a rest day with everything
+   else done read 68% and counted, and a free athlete could never pass about 64%. The ring
+   round the initials in the header (`.hdmewrap`, `--avp`), which said the same percentage
+   again, went with it. **Display only**: `dayQualifies()` decides, and neither
+   scorer moved. The count is `dayToGo()`, exact: finishing a habit adds only what it still
+   lacks (a half-done counter already counts half), either door counts (the gate's percentage,
+   or one thing left undone), and the biggest lack goes first. The old count added each habit's whole
+   weight on top of its partial credit, so at midday it said *1 to go* when 2 were needed. The
+   at-risk bar (`shortOfQualifying()`), the nudge's *SAVE IT* habit (`lackOf()`), the strip's
+   head on the training app's Home and that app's Daily habits row all read the same count and
+   the same words (*2 to go*, *On target*, *Perfect*).
+   **Beside it is the week** — `weekReport()`: seven cells,
    oldest on the left, each shaded by that day's `dayPct` with today outlined. The height
    is constant on purpose — a bar chart of seven days invites reading the tallest as a
    win, and these are percentages of different-sized days, not a race. Days before the
@@ -374,8 +388,9 @@ for — so `dayPct()` and `gatePct()` finally agree on what a partial counter is
 read 91% without being *perfect*, because perfect still means every box actually ticked,
 and only that unlocks the perfect-day takeover.
 
-- **`dayPct()`** — what the day was *worth*, over the whole roster. The header, the day
-  strip, the roll call wall. On a rest day it reads ~71%, and that is the honest number.
+- **`dayPct()`** — what the day was *worth*, over the whole roster. The day strip, the
+  week's shading, the roll call wall (the header's ring went with PRF-03, and Today leads
+  with the verdict instead). On a rest day it reads ~71%, and that is the honest number.
 - **`gatePct()`** — what the athlete could *do*. A **locked** habit they did not earn that
   day leaves the denominator. Day streaks read this and nothing else.
 
@@ -1718,15 +1733,17 @@ habit has to do the same.
 
 `publishCardSnapshot()` runs at the end of every `render()` and writes
 **`<id>_hab_card`**:
-`{ lv, rank, streak, done, total, qualified, week[7], days[7], pct, toNext, crest, t }`.
+`{ lv, rank, streak, done, total, qualified, verdict, togo, week[7], days[7], pct, toNext, crest, t }`.
 
-`program.html` uses it to draw **this file's own Today hero, rebuilt on that app's
-palette** (Amir, 2026-09-12 — he asked for the card he already has here rather than a
-second design to learn): the XP ring around the level, the rank crest, `toNext` as
-*"168 XP to level 2"*, the level bar, and the seven-day strip. `days[]` is that strip
-exactly as `weekReport()` draws it — a **percentage** per day plus its letter, not a
-yes/no. `week[]` (booleans) is kept only so a programme app that has not been updated
-alongside this one still renders something.
+`program.html` draws one row from it on Home (HOME-02, 2026-09-26; it drew this file's
+whole Today hero until then): **Daily habits · 2 to go · 4 days in a row**. `verdict`
+(`'togo'`, `'on'` or `'perfect'`) and `togo` are Today's verdict tile (PRF-03), so the row
+and the strip under it say the same thing; they replaced *"Daily habits · day complete"*
+beside the strip's *"1 of 5 done"*. A snapshot whose `t` is not today shows the level
+instead, until the strip boots Proof and writes today's, and `done of total` is only for a
+Proof that has not been updated alongside. The redraw signature includes the day, the
+verdict and the count. `days[]`, `week[]`, `pct`, `toNext` and `crest` are still written
+for a programme app that has not been updated alongside this one.
 
 ⚠️ **`crest` is rendered HERE, as markup.** `rankCrest()` gained an optional third
 argument for the crest's inner fill; every call in this file omits it, and the snapshot
