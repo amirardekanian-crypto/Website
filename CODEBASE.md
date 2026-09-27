@@ -87,7 +87,10 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   session's set is ended by ONE function, `carrySet()` (the midnight sweep, the cloud copy and a
   rename all call it), the setlog merge carries `lw`, and typing a weight fills the empty sets
   below (the card's **Same as last** button went on 2026-09-27; Guided's rest screen keeps one).
-  A tick on an empty box records no weight. Details: `PROGRAM-APP.md`.
+  A tick on an empty box records no weight. **One RPE control everywhere (CONS-01, 2026-09-27)**:
+  the set strip, a circuit's rounds (`selectRPE()`), Guided, the session rating and Log a max
+  (a hidden `#cf-rpe` behind five buttons) share one 44 px look, and a second tap clears a pick.
+  Details: `PROGRAM-APP.md`.
 - **⚠️ Personal Records (estimated 1RM; "The Ceiling" on screen until 2026-09-26) — one storage
   key with a hand-written merge rule.** The line at the bottom of an exercise's set log is **pure
   derivation** — nothing stored, no payload, no merge. Writes come from three doors, all landing in
