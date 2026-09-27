@@ -736,9 +736,10 @@ went wrong" and kept nothing, and every extra tap sent another email. Now:
   the coach preview send nothing and say so.
 - **Guided's Finish Session ✓** closes Guided on this card (`stepFinish()`); it never finishes for the athlete.
 - **Reset in the session bar** (Amir, 2026-09-27: *"when you start, its locked in and you cant cancle or
-  reset"*): `.session-timer-reset`, two taps (`armedTap()`), shown once the day has started (its clock inside
-  the 6 h grace, or a logged set) and until it is finished (`paintResetBtn()`); the finished card keeps its own
-  **Reset Session**. Both run `resetDay()`: the clock, the check-in, the ticks, reps and RPEs go; the typed
+  reset"*): `.session-timer-reset`, two taps (`armedTap()`, armed label *Reset?*), shown once the day has started
+  (its clock inside the 6 h grace, or a logged set) and until it is finished (`paintResetBtn()`); the finished card
+  keeps its own **Reset Session**. Under 480 px the bar's three buttons tighten while Reset shows (`.has-reset` on
+  the bar), so every state, armed included, fits one row down to 320 px; the row wraps rather than clips. Both run `resetDay()`: the clock, the check-in, the ticks, reps and RPEs go; the typed
   weights, `lw` and the note stay. A report still waiting for the reset session is dropped (an earlier week's
   still goes), and so is the Rest offer. Done hides the Rest offer too.
 - `confirmSession()` stays for older callers: it finishes when the card is ready, and otherwise asks to finish
