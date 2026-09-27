@@ -337,7 +337,8 @@ you recommend."* Server: `supabase/stage32_qualities.sql`.
   with no sets counts one set per 10 minutes, never less than 1** (`qmSets()`, 2026-09-26): counted
   as 1 set, a 30-min easy ride scored under the 1.5 floor and an aerobic day's card showed no chip at
   all, and a run day with core work read "Armour" instead of "Engine". Tapping a chip opens the
-  quality page (`openQualitySheet()`: line, court line, how we measure it); the About
+  quality page (`openQualitySheet()`: the line and the court line; since 2026-09-27 no *How we measure it*, which
+  named tests an athlete never meets, POL-01, Amir's A: the words stay in `qualities.tests` for coach.html); the About
   sheet's quality chips open it too. ⚠ **The explanation is the page** (Amir, 2026-09-24: *"the
   explanation is enough"*): the list of exercises that train it (*In your plan*) shows only when the
   page is reached from Library → Exercises (`openQualitySheet(q, fromLib)`), never from a day card or

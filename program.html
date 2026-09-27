@@ -8565,7 +8565,7 @@ const APP_GUIDE = [
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
     body: `<p>The small <strong>i</strong> at the right end of every exercise tells you what it does, which qualities it builds, where it shows up on court, which parts of your body it works (and whether it jumps, lands or runs), and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
-    body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means and how we test it. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
+    body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Last time — your history on every exercise',
     body: `<p>Each exercise shows what you did <strong>the last time you did it</strong>, on any day: the weight, your reps, your RPE, and the note you left. Open the card and it's the <strong>Last time</strong> box, under the Coach's Note: it shows the last set you did, like <strong>70 kg × 5 @ 8</strong>, and a tap opens every set, your RPEs and your note. It stays open or closed the way you left it. A closed card shows no history.</p><p>An RPE in orange ran <strong>over</strong> the target, and that set also shows a faint "last" line under today's row.</p><p>Tap <strong>History ›</strong> to see every time you've done it, with how your best set has moved.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'Personal Records — the most you could lift once',
@@ -14925,6 +14925,8 @@ function qualityUses(qid) {
 // The explanation is the page (Amir, 2026-09-24: "the explanation is enough").
 // The list of exercises that train it shows only when the page is reached from
 // Library → Exercises, never from a day card or a card's ⓘ.
+// No "How we measure it" here (POL-01, Amir's A, 2026-09-27): it named tests an athlete never meets (a 505
+// test, a Yo-Yo test). The words stay on the quality's row (`tests`) for coach.html; this sheet just does not show them.
 function openQualitySheet(qid, fromLib) {
   const q = QUALS_BY_ID[qid];
   const ov = document.getElementById('hist-overlay');
@@ -14938,7 +14940,6 @@ function openQualitySheet(qid, fromLib) {
     ${uses.length ? `<div class="sp-sec"><div class="sp-lbl">In your plan</div>${
       uses.map(u => `<button type="button" class="wp-row qm-use" data-id="${esc(u.entry.id)}"><b>${esc(u.entry.name)}<small>Day ${
         esc(u.days.join(' · '))}</small></b></button>`).join('')}</div>` : ''}
-    ${(q.tests || []).length ? `<div class="sp-sec"><div class="sp-lbl">How we measure it</div><p class="sp-court">${esc(q.tests.join(' · '))}</p></div>` : ''}
     <div class="hs-actions">
       <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
     </div>`;

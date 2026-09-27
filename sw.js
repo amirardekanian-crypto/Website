@@ -165,7 +165,8 @@
 // v85: program.html changed (2026-09-27, DS-03 part 2): one primary button (eleven looks were one green one).
 // v86: program.html changed (2026-09-27, LIB-01): the Sessions shelves are a list (a photo band, three rows,
 //      All N ›), and a session at the right moment: sore → the finished card, the week done → Home.
-const CACHE = 'aap-v86';
+// v87: program.html changed (2026-09-27, POL-01): the Quality sheet shows no "How we measure it".
+const CACHE = 'aap-v87';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
