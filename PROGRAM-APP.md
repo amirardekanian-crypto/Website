@@ -728,8 +728,16 @@ size is a token in `:root`, picked by its job:
   ⓘ (which sits beside the name), and a part that still does not fit starts the next line. The dot ends a
   part (`span:not(:last-child)::after`), so a new line starts clean. On a 390 px iPhone the open squat card's
   four parts take two lines; before, they fitted only by running into the card's padding.
-- **Not in DS-03 yet:** one primary button (eleven styles today) waits for DS-01's answer on what clay is for.
-  AA Proof's type (Outfit, its own sizes) goes with SEAM-01.
+- **One primary button** (part 2, 2026-09-27, after DS-01 settled that buttons are green): every filled action
+  (Sign in, the welcome's Open Day 1, Begin session, Start/Pause, Rest, the rest timer's Pause, Guided's Done,
+  Send it, Done · send to coach, + Log a max, Weigh in) wears one look, set once at the end of the stylesheet:
+  green, white Barlow Condensed 700 in capitals, 1 px tracking, an 8 px corner, 44 px at the least. There were
+  eleven (corners from 4 to 13 px, two fonts, tracking from 0.02 em to 1.5 px, weights 700 and 900, and Sign in
+  and Open Day 1 in clay). Each rule keeps only its place and size: full-width actions at `--fs-body` (the
+  welcome and Done at `--fs-lead`), compact ones in a card or the session bar smaller, where WK-02 and WK-03
+  measured their widths (the slim bar's Pause keeps its 0.5 px tracking under 480 px). **A new primary action
+  joins that list; a secondary one is outlined** (Guided, Reset, Clear it).
+- AA Proof's type (Outfit, its own sizes) goes with SEAM-01; its labels are 11 px at the least since #286.
 
 ## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26 and 2026-09-27)
 
