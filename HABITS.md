@@ -312,7 +312,9 @@ The screen they actually live on. **In this order, and the order is the point:**
    tick (`open`). When the session is the only thing left, a coached athlete gets `sessionLeft`
    ("Your part is done… a rest day is part of it") with **OPEN YOUR PROGRAMME**, which really opens
    the programme app (`target: 'program'` → `goProgram()`; it used to open Progress), and a free
-   athlete gets `freeDone`. "Nothing logged yet" needs **nothing logged**: 3,000 steps is not done
+   athlete gets `freeDone`. **A rest day is not scored differently** (Amir, 2026-09-27: *"We dont know a rest
+   day"*): athletes move their days, so the session habit counts on every day and the one-miss door is
+   what a rest day uses. "Nothing logged yet" needs **nothing logged**: 3,000 steps is not done
    but it is logged, and used to be greeted with "You have logged nothing". Display only: no scorer
    moved, and a rest day still counts against the day exactly as before (see *Open calls* in
    `Content/FRESH-EYES.md`).
