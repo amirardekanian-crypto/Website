@@ -1475,7 +1475,7 @@
   #app .msrow .ms-xp, #app .msrow .ms-cnt { font-family: 'Outfit', sans-serif; font-weight: 600; }
   #app .msrow.got .ms-xp, #app .msrow.got .ms-cnt { color: var(--teal-deep); }
   #app .msrow .ms-note .g.got { color: var(--teal-deep); }
-  #app .msrow.evrow .ms-xp { font-size: 10px; letter-spacing: 0.04em; }
+  #app .msrow.evrow .ms-xp { font-size: 11px; letter-spacing: 0.02em; }
   /* The folds (PRF-02): one row that opens everything, and the medals already earned on one row. */
   #app .msall { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: calc(100% - 32px); box-sizing: border-box;
     margin: 0 16px 12px; min-height: 48px; padding: 0 18px; border: 0; border-radius: 18px; background: var(--card);
@@ -1582,7 +1582,6 @@
     flex-direction: column; align-items: center; justify-content: center; gap: 4px;
     box-shadow: 0 8px 18px -10px rgba(35,31,53,.85);
   }
-  #app .lo-card b { font-weight: 800; font-size: 7.5px; letter-spacing: .05em; color: #F6F4FF; text-shadow: 0 1px 2px rgba(0,0,0,.45); }
   #app .lo-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
   #app .lo-line { font-size: 11.5px; line-height: 1.45; color: var(--muted); }
   #app .lo-rail { margin-top: 11px; display: flex; flex-direction: column; gap: 7px; }
@@ -1788,6 +1787,8 @@
   #app .ranklink .go { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--accent); }
   #app .ranklink.tight { gap: 6px; }
   #app .ranklink.tight .go { display: none; }   /* fitRankName(): a long rank on a narrow phone */
+  #app .ranklink.tight > span:first-child { zoom: .75; }
+  #app .ranklink.tighter > span:first-child { display: none; }
 
   /* Sheet & stepper & toast */
   #app .sheet { border-top: 0; border-radius: 26px 26px 0 0; box-shadow: 0 -18px 44px -20px rgba(35,31,53,0.4); }
@@ -1923,7 +1924,7 @@
   #app .wk2 .c.sel:not(.today) .sq { outline: 2.5px solid var(--ink); outline-offset: 2px; }
   #app .wk2 .l { font-size: 11px; font-weight: 600; color: var(--muted-soft); line-height: 1; white-space: nowrap; }
   /* "Today" is five letters in a cell sized for one: it may sit over its neighbours' spare room. */
-  #app .wk2 .c.today .l { color: var(--accent); font-weight: 800; font-size: 10px; letter-spacing: -.01em; }
+  #app .wk2 .c.today .l { color: var(--accent); font-weight: 800; font-size: 11px; letter-spacing: -.01em; }
   #app .wk2 .c.sel:not(.today) .l { color: var(--ink); font-weight: 800; }
   /* THE WINS CARD (PRF-02): what used to take the whole screen for a medal, a tier, a habit's rank,
      a perfect day, a comeback or the 3-day streak, under the hero until it is tapped. The inverted
@@ -1954,6 +1955,36 @@
   body[data-dark] #app .prow.on, body[data-dark] #app .youtag, body[data-dark] #app .hdme:not(.closing) { background: var(--accent-fill); }
   /* POL-02: a toast fired while a sheet is open sits at the top, above it; it rendered under the sheet's scrim. */
   #app .toast.over { z-index: 95; top: calc(16px + env(safe-area-inset-top)); bottom: auto; }
+
+  /* ── NO LABEL UNDER 11 PX (A11Y-01, AA Proof's half, 2026-09-27) ─────────────────────────────────
+     Measured on every screen: 52 styles, 534 labels, set from 7 to 10.5 px (the training app's floor has
+     been 11 px since #275). Each is raised to 11 here, after everything that set it; letter-spacing comes
+     down where a wider word would crowd its box. Don't set a label under 11 px again: the census in the
+     session's scratchpad (proof-census.js) is how this was found. */
+  #app .eyebrow, #app .eyebrow span, #app .hlv, #app .hlv .ember, #app .ember, #app .hrow .body .status .ember,
+  #app .ember .u, #app .hrow .body .status .ember .u, #app .hlv .ember .u,
+  #app .heat .hl, #app .heat .hd-lbl, #app .ms-cnt, #app .ms-xp, #app .msth-r span, #app .gridkey span, #app .gridkey .gk,
+  #app .mono, #app .boardday, #app .hslock, #app .scard-nm, #app .tourn, #app .tourskip, #app .lvbadge .l,
+  #app .tn-kind, #app .tb-meta, #app .tb-meta strong, #app .tb-right, #app .tn-flag, #app .lo-rl, #app .youtag, #app .tn-xp,
+  #app .ph-kept, #app .ph-kept i, #app .ph-nk, #app .ph-nx, #app .hdright .right,
+  #app .lvring .lbl, #app .wk2 .l, #app .vd span, #app .lvqueue,
+  #app .evgoal .g-sub, #app .evgoal .g-cnt, #app .evgoal .g-cnt span, #app .evhd .evtag, #app .evhd .evstate, #app .evfoot,
+  #app .evfoot span { font-size: 11px; }
+  #app .evhd .evtag { letter-spacing: .05em; }
+  .tourlay .tourn, .tourlay .tourskip { font-size: 11px; }
+  #app .lvring .lbl { letter-spacing: .08em; }
+  #app .heat .hd-lbl { letter-spacing: 0; }
+  #app .tn-kind, #app .tn-flag, #app .tb-right, #app .lo-rl, #app .ph-nk, #app .youtag { letter-spacing: .06em; }
+  #app .vd span { letter-spacing: .03em; }
+  /* The flame tile's caption and the word "LEVEL" in the Locker's ring: 11 px, and the boxes make room. */
+  #app .hero-top .dayflame .u, #app .dayflame .u { font-size: 11px; letter-spacing: .02em; }
+  #app .ph-lvl { font-size: 11px; letter-spacing: .06em; }
+  /* The 35-day grid's key ("Five weeks ago · the legend · Today") no longer fits one line on a narrow phone
+     at 11 px: the legend takes a line of its own under the two ends. */
+  @media (max-width: 379px) {
+    #app .gridkey { flex-wrap: wrap; row-gap: 6px; }
+    #app .gridkey .gk { order: 3; flex-basis: 100%; justify-content: center; flex-wrap: wrap; }
+  }
   #app .wins-share { flex: none; min-height: 44px; padding: 0 18px; border-radius: 999px; background: none;
     border: 1.5px solid rgba(246,244,255,.35); color: #F6F4FF; font-weight: 700; font-size: 13.5px; }
 
@@ -2007,7 +2038,7 @@
   /* Habit rows inside the Habits & targets sub-screen. */
   #app .hsrow { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-bottom: 1px solid var(--rule); }
   #app .hstile { flex: none; width: 38px; height: 38px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 18px; line-height: 1; }
-  #app .hslock { flex: none; border-radius: 999px; background: var(--surface); color: var(--muted-soft); padding: 5px 10px; font-size: 9.5px; font-weight: 700; letter-spacing: .06em; }
+  #app .hslock { flex: none; border-radius: 999px; background: var(--surface); color: var(--muted-soft); padding: 5px 10px; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
 
   /* ── 3. Roll call: the dark composer, one card per voice ── */
   #app .rccomp {
@@ -2147,7 +2178,7 @@
   html.embed #app.emb, html.embed #app.emb * { font-family: 'Barlow', system-ui, sans-serif; }
   html.embed #app.emb .e-wrap { background: #FFFFFF; border: 1px solid #EDE8E0; border-radius: 14px; overflow: hidden; }
   html.embed #app.emb .e-head { display: flex; align-items: baseline; gap: 8px; padding: 11px 14px 9px; border-bottom: 1px solid #EDE8E0; }
-  html.embed #app.emb .e-k { font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: #5C5C5C; }
+  html.embed #app.emb .e-k { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #5C5C5C; }
   html.embed #app.emb .e-n { font-size: 13px; font-weight: 600; color: #1A1A1A; }
   html.embed #app.emb .e-open { margin-left: auto; font-size: 13px; font-weight: 600; color: #C7552F; text-decoration: none; white-space: nowrap; }
   html.embed #app.emb .e-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 12px; border-bottom: 1px solid #EDE8E0; }
@@ -2856,7 +2887,7 @@ function titleMetalKey(p) {
 function titlePlate(p, small) {
   const m = METALS[titleMetalKey(p)];
   return '<span style="display:inline-flex;vertical-align:middle;padding:' + (small ? 1.5 : 2.5) + 'px;border-radius:999px;background:' + m.rim + '">'
-       + '<span style="border-radius:999px;background:#231F35;color:' + (titleMetalKey(p) === 'prisma' ? '#CBC6E4' : m.ink) + ';font-weight:800;font-size:' + (small ? 8 : 11) + 'px;letter-spacing:.13em;padding:' + (small ? '3px 8px' : '8px 13px') + ';white-space:nowrap;text-transform:uppercase">' + esc(p.name) + '</span></span>';
+       + '<span style="border-radius:999px;background:#231F35;color:' + (titleMetalKey(p) === 'prisma' ? '#CBC6E4' : m.ink) + ';font-weight:800;font-size:11px;letter-spacing:' + (small ? '.08em' : '.13em') + ';padding:' + (small ? '3px 8px' : '8px 13px') + ';white-space:nowrap;text-transform:uppercase">' + esc(p.name) + '</span></span>';
 }
 // ── Medals ── milestones as emblems: metal rim by tier, habit-tint disc, the
 // habit's own emoji in the middle. Events wear the prismatic rim.
@@ -5533,7 +5564,7 @@ function renderInstall() {
              style="width:54px;height:54px;flex:none;display:block;border:1px solid var(--rule)">
         <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
           <span class="hd" style="font-size:23px;line-height:1">AA Proof</span>
-          <span class="mono" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">On your home screen</span>
+          <span class="mono" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">On your home screen</span>
         </span>
       </div>
       <div style="font-size:13.5px;line-height:1.55">
@@ -6907,7 +6938,7 @@ function renderOnboarding() {
                 ? 'Locked — this is the one that comes with a programme. It stays on your list, and it stays a padlock.'
                 : 'Locked — you cannot tick this one. Finishing a session in your programme ticks it for you.'}</span>` : ''}
             </span>
-            <span class="mono" style="flex:none;font-size:8.5px;letter-spacing:.09em;color:var(--muted-soft);border:1px solid var(--rule);padding:4px 7px">ALWAYS ON</span>
+            <span class="mono" style="flex:none;font-size:11px;letter-spacing:.06em;color:var(--muted-soft);border:1px solid var(--rule);padding:4px 7px">ALWAYS ON</span>
           </div>`).join('')}
 
           <div class="eyebrow" style="display:flex;justify-content:space-between;gap:12px;padding:22px 0 8px;border-bottom:2px solid var(--divider)">
@@ -7781,18 +7812,20 @@ function streakFlame(now, best) {
 
 // The rank's name never runs under the streak tile (PRF-05). On a 320-360 px phone a long rank
 // ("CONTENDER", "UNTOUCHABLE") was wider than the room between the ring and the flame and was drawn
-// across it. It now steps down a pixel at a time; below 13 px the → goes first (the name and the
-// ring still open the Locker), and 11 px is the floor, which only UNTOUCHABLE on a 320 px phone needs.
+// across it. It now steps down a pixel at a time; below 13 px the → goes and the crest drops a size (the
+// name and the ring still open the Locker); 11 px is the floor (A11Y-01), and a name that still does not
+// fit there (UNTOUCHABLE on a 320 px phone) loses the crest too: the ring beside it says the level.
 function fitRankName(root) {
   const hd = root.querySelector('.hero-lv .ranklink .hd');
   if (!hd) return;
   const link = hd.closest('.ranklink'), over = () => link.scrollWidth > link.clientWidth + 0.5;
   let px = 17;
-  link.classList.remove('tight');
+  link.classList.remove('tight', 'tighter');
   hd.style.fontSize = px + 'px';
   while (px > 13 && over()) hd.style.fontSize = (--px) + 'px';
   if (over()) link.classList.add('tight');
   while (px > 11 && over()) hd.style.fontSize = (--px) + 'px';
+  if (over()) link.classList.add('tighter');
 }
 window.addEventListener('resize', () => { const app = document.getElementById('app'); if (app) fitRankName(app); });
 
@@ -8647,8 +8680,8 @@ function renderDetail(h) {
             <span style="font-size:11px;line-height:1;color:var(--muted)">${esc(l.note)}</span>
           </span>
           <span style="text-align:right">
-            <span class="mono" style="display:block;font-size:10px;font-weight:700;color:${l.hit ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${l.val}</span>
-            <span class="mono" style="display:block;font-size:9px;color:var(--muted-soft);margin-top:3px">${l.pre ? 'BEFORE THE SEASON' : '+' + l.xp + ' XP'}</span>
+            <span class="mono" style="display:block;font-size:11px;font-weight:700;color:${l.hit ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${l.val}</span>
+            <span class="mono" style="display:block;font-size:11px;color:var(--muted-soft);margin-top:3px">${l.pre ? 'BEFORE THE SEASON' : '+' + l.xp + ' XP'}</span>
           </span>
         </div>`).join('')
         // On day one every one of these rows would be a day from before the
@@ -9103,7 +9136,7 @@ function renderManual() {
               <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
               <span style="font-size:11px;color:var(--muted)">${esc(h.goal || h.source)}</span>
             </span>
-            <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap">${baseXp(h)} <span style="font-size:9px;color:var(--muted-soft)">XP</span></span>
+            <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap">${baseXp(h)} <span style="font-size:11px;color:var(--muted-soft)">XP</span></span>
           </div>`).join('')}
         </div>` +
         `<div style="height:12px"></div>` +
@@ -9128,7 +9161,7 @@ function renderManual() {
         p(`There are <strong style="color:var(--ink)">${RANKS.length} ranks with ${SUBS_PER_RANK} levels each</strong>. Level ${SUBS_PER_RANK + 1} makes you ${esc(rankFor(SUBS_PER_RANK + 1).label)}, level 20 is ${esc(rankFor(20).label)}. Every rank has its own insignia — <strong style="color:var(--ink)">tap your rank anywhere in the app</strong> to see the whole ladder and what each one costs.`) +
         `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
           ${RANKS.map(r => `<span style="display:flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid var(--rule);color:var(--muted)">
-            ${rankIcon(r, 14, 'stroke-width:2.4')}<span class="mono" style="font-size:9px;letter-spacing:.06em">${esc(r)}</span>
+            ${rankIcon(r, 14, 'stroke-width:2.4')}<span class="mono" style="font-size:11px;letter-spacing:.04em">${esc(r)}</span>
           </span>`).join('')}
         </div>` +
         p(`Past level ${RANKS.length * SUBS_PER_RANK} you start again carrying a star — ${esc(rankFor(RANKS.length * SUBS_PER_RANK + 1).label)} — and there is no ceiling after that.`) +
@@ -9343,7 +9376,7 @@ function renderPass() {
     const isOn = eqC.id === p.id;
     return `<button data-k="rw:${p.id}" style="flex:none;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;padding:0;cursor:pointer;font-family:inherit" ${on(() => wear(p))}>
       <span style="width:48px;height:60px;border-radius:12px;${CARD_LOOK[p.id] || CARD_LOOK.c_paper};${isOn ? 'box-shadow:0 0 0 2.5px var(--accent),0 6px 14px -6px rgba(108,92,231,.8);' : ''}"></span>
-      <span style="font-size:9px;font-weight:${isOn ? 800 : 700};letter-spacing:.04em;color:${isOn ? 'var(--accent)' : 'var(--muted)'}">${esc(p.name)}${isOn ? ' ✓' : ''}</span></button>`;
+      <span style="font-size:11px;font-weight:${isOn ? 800 : 700};letter-spacing:.02em;color:${isOn ? 'var(--accent)' : 'var(--muted)'}">${esc(p.name)}${isOn ? ' ✓' : ''}</span></button>`;
   };
 
   // ── The track ───────────────────────────────────────────────────────────
@@ -9475,9 +9508,10 @@ function renderPass() {
 
       ${sectionLabel('What you have', owned + ' of ' + PASS_TRACK.length + ' kept')}
       <div class="loadout">
-        <span class="lo-card" style="${CARD_LOOK[eqC.id] || CARD_LOOK.c_paper}">
-          ${rankCrest(LI.rank, 24)}
-          <b>${esc(LI.label.toUpperCase())}</b>
+        <!-- A thumbnail of the share card in the equipped skin: the skin and the crest. Its 7.5 px rank name
+             never read and could not be raised to 11 px inside 66 px (A11Y-01); the hero above names the rank. -->
+        <span class="lo-card" aria-hidden="true" style="${CARD_LOOK[eqC.id] || CARD_LOOK.c_paper}">
+          ${rankCrest(LI.rank, 32)}
         </span>
         <span class="lo-body">
           <span class="lo-line">${eqT ? 'Wearing ' + titlePlate(eqT, true) : 'No title'} on the <strong style="color:var(--ink)">${esc(eqC.name)}</strong> skin. The crew sees your title; the skin is yours alone.</span>
