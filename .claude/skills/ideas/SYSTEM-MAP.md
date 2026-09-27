@@ -45,8 +45,9 @@ that keeps time from a timestamp; one finish that sends itself) · Personal Reco
 
 **Built since the map:** #1 The Spine, #2 The Quality Map, #4 Because, #5 The Card Remembers, #12 as
 the `/cycle-report` skill, and the Fresh Eyes work (PROGRAM-APP.md has each). **Gaps still open:** cycle
-outcomes are never checked in the app; court and match load are invisible; Library and programme do
-not link each other (LIB-01); a flagged pain is never asked about again.
+outcomes are never checked in the app; court and match load are invisible; the Library meets the
+programme at only two moments (LIB-01, 2026-09-27: a sore check-in offers The Morning After, a finished
+week offers Green Light); a flagged pain is never asked about again.
 
 ## coach.html
 
