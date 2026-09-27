@@ -4,7 +4,8 @@
 // picks it up; window.__STUB can be changed live. Config: mode ('online' | 'offline' | 'nostatus' |
 // '5xx' | 'refuse' | 'empty'), program (what get_program answers), demo, progress, session
 // ({ user: { id } } = signed in), identity (the athlete id athlete_identities answers), stall
-// ({ rpcName: true } never answers), refuse ([rpcNames]), expired, signInOk, noLib (no library at all).
+// ({ rpcName: true } never answers), refuse ([rpcNames]), expired, signInOk, noLib (no library at all),
+// library (what get_library answers: lib.js library() builds it from workouts/; without it the app reads the files).
 // Every call is recorded in window.__STUB.calls ("rpc:get_program") and its params in .params.
 (function () {
   var cfg = {};
@@ -27,6 +28,7 @@
       return res({ data: JSON.parse(JSON.stringify(prog)), error: null, status: 200 });
     }
     if (name === 'get_progress') return res({ data: S.progress || null, error: null, status: 200 });
+    if (name === 'get_library') return res({ data: S.library || null, error: null, status: 200 });
     if (name === 'athlete_identities') return res({ data: S.identity ? { athlete_id: S.identity } : null, error: null, status: 200 });
     return res({ data: null, error: null, status: 200 });
   }
