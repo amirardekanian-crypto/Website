@@ -151,7 +151,9 @@
 //      On target, Perfect) instead of the day's percentage, and the training app's habits row says the same.
 // v78: habits.html changed (2026-09-27, PRF-05): one week strip on Today's card, ticked when on target, is
 //      also the day picker (the four day chips went); the card a size smaller; the rank's name is fitted.
-const CACHE = 'aap-v78';
+// v79: habits.html changed (2026-09-27, PRF-02 part 1): only a level, a rank and a 7+ day streak take the
+//      whole screen (a level's reward on it); medals, tiers, a perfect day, a comeback: the wins card on Today.
+const CACHE = 'aap-v79';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

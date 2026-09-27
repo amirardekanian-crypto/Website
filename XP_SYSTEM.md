@@ -480,18 +480,26 @@ has to climb in a new season — which is part of what §12.2 was about.
 
 ## 5. Celebrations
 
-A full-screen, game-style takeover fires for these:
+**Since PRF-02 (2026-09-27, Amir's 1A) only four things take the whole screen**; the rest land on
+**the wins card** at the top of Today (`winsCard()`), with the XP they paid, until it is tapped. A
+made-up athlete's first 22 days went from 30 takeovers to 9 (a free athlete 24 → 7), nothing lost.
 
-| Trigger | Detected in | Ground |
+| Trigger | Detected in | Where |
 |---|---|---|
-| **Any overall level** | `checkLevelUps()` | grape rays |
-| **A rank promotion** on any habit (water crossing GRINDER 5 → OPERATOR 1) | `checkLevelUps()` | full grape |
-| **A consistency tier** cleared on any habit | `checkUnlocks()` | badge ground, metal medal |
-| **A milestone** unlocked | `checkUnlocks()` | badge ground, metal medal |
-| **A perfect day** — every tracked habit done | `checkUnlocks()` | badge ground, emerald medal (gold until 2026-09-26) |
-| **A day streak crossing a mark** — 3/7/14/21/30/50/75/100/150/200/300/365 days | `checkUnlocks()` | ember ground, a drawn flame |
-| **A weekly quest** completed (this week only) | `checkUnlocks()` | badge ground, metal medal |
-| **A reward** (title or card) unlocked | `claimRewards()` | badge ground, the plate/skin itself |
+| **Any overall level** (a new overall rank is the clay ground) | `checkLevelUps()` | the whole screen, grape rays |
+| **A reward** (title or card) the level unlocked | `claimRewards()` | **on that level's screen** (`ev.rewards`); its own takeover only with no level in the same pass |
+| **A day streak crossing a mark** of `STREAK_TAKEOVER` (7) days or more | `checkUnlocks()` | the whole screen, ember ground, a drawn flame |
+| **A weekly quest** completed (this week only) | `checkUnlocks()` | the whole screen, badge ground |
+| **A rank promotion on one habit** (water crossing GRINDER 5 → OPERATOR 1) | `checkLevelUps()` | the wins card |
+| **A consistency tier** cleared on any habit | `checkUnlocks()` | the wins card |
+| **A milestone** unlocked | `checkUnlocks()` | the wins card |
+| **A perfect day** — every tracked habit done | `checkUnlocks()` | the wins card |
+| **A comeback** | `checkUnlocks()` | the wins card |
+| **The 3-day streak mark** | `checkUnlocks()` | the wins card |
+
+`CFG.wins` stores only *which* win (`{k, id, …}`), never its XP: `winLine()` asks the ledger
+(`milestonePaid()`, `tierPaid()`, `dayXp()`) when it draws, the rule below. It syncs with the
+config, so a card tapped on one phone is gone on the other.
 
 **Ticked from the training app's Home** (the embedded strip, `?embed=1`, 2026-09-26): the XP
 is identical, because the tap goes through the same `toggleHabit()`/`bump()`/`setVal()`, but
@@ -501,13 +509,13 @@ table is still waiting when Proof itself next opens. Nothing is detected twice o
 Routine habit levels flash a small chip in that habit's row instead. This split is
 deliberate: an athlete completing eight habits on day one would otherwise get nine
 full-screen takeovers back to back. If several big ones land together they queue and
-show a "2 more to go" counter.
+show a "2 more to go" counter; the card lists three and counts the rest.
 
 The ground is the point — an athlete can tell which *kind* of win landed before
 reading a word of it. Grape is never a badge, and ember is only ever the day streak.
 Confetti and a scatter of coins play once per takeover (`confettiHtml()`/`coinHtml()`
 in `habits.html`), deterministic per event so a re-render never re-scrambles it
-mid-fall. Every takeover but a habit-level chip carries a **Share it** button
+mid-fall. Every takeover but a habit-level chip, and the wins card, carries a **Share it** button
 (`lvActions()`) straight into the share picker below, pre-selecting the card that
 matches what was just earned.
 
@@ -545,7 +553,7 @@ rules keep it from becoming noise:
   gets it recorded, not replayed at them. `seedUnlocks()` is called from
   `seedSeenLevels()`, so the two baselines can never drift apart.
 
-Since stage 12 the tier and milestone takeovers **quote the XP they actually pay**,
+Since stage 12 the tier and milestone celebrations (on the wins card since PRF-02) **quote the XP they actually pay**,
 because they actually pay it — a tier takeover sums the payout across every habit
 that cleared it in the same pass. A perfect-day takeover quotes `dayXp(today)`, which
 includes any bonus crossed that day, so the figure always matches what the athlete's
@@ -562,10 +570,9 @@ total just moved by. See §4.5.
 > takeovers now say so plainly: the badge is still awarded, the points are named as
 > pending. Anything added here that mentions an XP figure must do the same.
 
-**If it feels like too much,** the cheapest change is in `checkLevelUps()` — set
-`big: overall` instead of `big: overall || rankChanged` and only the overall level
-takes over the screen. To silence the new ones, return early from `checkUnlocks()`
-after its baseline block.
+**If it feels like too much** (it did: PRF-02 set `big: overall` and moved the rest to the
+card), the next lever is `STREAK_TAKEOVER`. To silence the card entirely, stop `checkUnlocks()`
+calling `addWin()`; the seen-lists still move, so nothing is replayed later.
 
 ---
 

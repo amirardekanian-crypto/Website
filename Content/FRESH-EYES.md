@@ -32,7 +32,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-27)
 
-**34 done · 5 partly done · 5 open**, of 44. Each was checked against the code on `main`.
+**34 done · 6 partly done · 4 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -84,6 +84,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#278](https://github.com/amirardekanian-crypto/Website/pull/278) | Pinch-zoom in the training app (it was locked at 1×; now 5×, as AA Proof); both apps drop only the double-tap zoom (`touch-action: manipulation`) | A11Y-01 |
 | [#279](https://github.com/amirardekanian-crypto/Website/pull/279) | AA Proof: the circle is the tick (a 48 px circle that fills with a white tick, the emoji inside it), + is 44 px in the habit's tint, the programme's session is one slim line at the end of Today: the first habit you can tick moved up the screen (Amir's pick A of the mockup) | PRF-01 |
 | [#280](https://github.com/amirardekanian-crypto/Website/pull/280) | AA Proof's Today leads with the verdict, **2 to go**, then On target, then Perfect, instead of the day's percentage (68% on a rest day that counted); the count is exact (it said 1 when 2 were needed); the ring round the initials is gone; the training app's habits row and the strip's head say the same words (no more "day complete" beside "1 of 5 done"). Display only | PRF-03 |
+| [#282](https://github.com/amirardekanian-crypto/Website/pull/282) | AA Proof's celebrations (PRF-02 part 1, Amir's 1A): the whole screen only for a new level (its reward on the same screen), a new rank and a day streak from 7 days; a medal, a tier, a habit's rank, a perfect day, a comeback and the 3-day mark land on a card under Today's hero, with their XP, until tapped. A made-up athlete's first 22 days: 30 takeovers → 9, nothing lost | PRF-02 (part) |
 | [#281](https://github.com/amirardekanian-crypto/Website/pull/281) | AA Proof's week is drawn once on the card and is the day picker: seven days ticked when on target, the last four tapped to fill in a day (the four chips with a percentage each went); the card a size smaller; a long rank's name no longer runs under the streak tile at 320–360 px. The first habit you can tick: 360 → 261 px at 390 × 844 | PRF-05 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276), PRF-01 (#279), PRF-03 (#280), PRF-05 (#281). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
@@ -99,9 +100,11 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **DS-03.** The type scale is in (#275). Still open: one primary button (eleven styles today), which waits for
   DS-01's answer on what clay is for; AA Proof's type goes with SEAM-01.
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
+- **PRF-02.** The celebrations are in (#282). Still open: the five-step tour, Progress's next three,
+  quests hidden when idle, the Locker's next three rewards, Crew on the board, and the POL-02 sweep.
 
 **Open.** P2:
-PRF-02, DS-01. P3: LIB-01, POL-02, DOC-01.
+DS-01. P3: LIB-01, POL-02, DOC-01.
 
 ## Next, in order
 
@@ -208,7 +211,7 @@ the working card folds How to do it if Amir wants that too.
 - Once per clone: `git config core.hooksPath .githooks`.
 - Use the branch the session names. After each merged PR, restart it from main:
   `git fetch origin main && git checkout -B <branch> origin/main`.
-- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v78` on
+- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v79` on
   2026-09-27) whenever a cached app file changes, log the version in its comment list, and change the
   name in CLAUDE.md too.
 - Test in a headless browser before every PR (below): the harness is in the repo, the checks you write
