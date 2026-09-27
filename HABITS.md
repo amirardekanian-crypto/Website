@@ -391,7 +391,7 @@ gate-only until today — the day streak forgave a near-miss the header still re
 for — so `dayPct()` and `gatePct()` finally agree on what a partial counter is worth.
 `isPerfect()` is untouched and does the job the old binary rule was protecting: a day can
 read 91% without being *perfect*, because perfect still means every box actually ticked,
-and only that unlocks the perfect-day takeover.
+and only that unlocks the perfect-day card (a full-screen takeover until PRF-02).
 
 - **`dayPct()`** — what the day was *worth*, over the whole roster. The roll call wall and
   the share cards (Today dropped it: the header's ring and the week's shading went with PRF-03 and
@@ -1415,8 +1415,10 @@ they do now, and what you already unlocked does not. *"A new season resets your 
 not your rewards."*
 
 `claimRewards()` records anything the current level has reached and returns only what is
-**new**, so the caller can celebrate it — pushed onto the queue *behind* the level-up that
-earned it, so the takeovers read as cause then effect. It runs silently once at boot,
+**new**, so the caller can celebrate it — **on the level-up's own screen** since PRF-02
+(2026-09-27): *Unlocked · yours for good* and the plate or card under the level, cause and
+effect on one screen. It had a takeover of its own queued behind the level; only a reward with
+no level in the same pass (a rules change, a sync) still gets one. It runs silently once at boot,
 which baselines an athlete arriving with history instead of firing fourteen takeovers at
 them. The highest title they own is equipped for them; earning a name and then having to
 go and switch it on is a step nobody asks for.
@@ -1932,12 +1934,17 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   habit's level measures *how often they do it*, not how hard it is.
 - **Consistency ladders**: five tiers per habit (5/10/20/30/60 consecutive days),
   earned on the best run ever so breaking a streak never revokes a badge.
-- **Celebrations**: full-screen takeover for an overall level, a rank promotion, a
-  consistency tier, a milestone, or a perfect day. Three grounds — near-black for a
-  level, clay for a rank, deep green for the rest — so the *kind* of win is legible
-  before the words are. Routine habit levels flash inline instead, so day one isn't
-  nine takeovers, and same-day tier clears across several habits coalesce into one.
-  Full rules in [`XP_SYSTEM.md`](XP_SYSTEM.md) §5.
+- **Celebrations** (PRF-02, Amir's 1A, 2026-09-27): the whole screen only for a **new overall
+  level** (its reward on the same screen), a **new rank**, a **day streak from 7 days**
+  (`STREAK_TAKEOVER`) and a quest completed during a run. A medal, a consistency tier, a habit's
+  new rank, a perfect day, a comeback and the 3-day streak mark land on **the wins card** under
+  Today's hero (`winsCard()`), with the XP the ledger paid, until it is tapped (*Got it*, or
+  *Share it*). A made-up athlete's first 22 days: **30 takeovers → 9** (a free athlete 24 → 7),
+  on 15 of the days before, up to 4 in one evening. `CFG.wins` holds only *which* win
+  (`{k, id, …}`), never its XP (points are recomputed, never stored), and it syncs, so a card
+  tapped on one phone is gone on the other. A habit's own level still flashes inline, and
+  same-day tier clears across several habits coalesce into one. Full rules in
+  [`XP_SYSTEM.md`](XP_SYSTEM.md) §5.
 
 - **The badges pay** (since stage 12). Clearing a consistency tier or unlocking a
   milestone is worth real XP, on the **overall** ladder only — never on a habit's own,
@@ -2006,7 +2013,8 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
 
 - **Coming back pays** (2026-08-02, Amir: *"make the economy pays for comeback"*). Miss
   `LAPSE_DAYS` (3) or more in a row, then have a day that counts, and that is a comeback:
-  **50 XP**, dated on the day, repeatable, with a full-screen takeover. It cannot be
+  **50 XP**, dated on the day, repeatable, on the wins card at the top of Today (a full-screen
+  takeover until PRF-02). It cannot be
   farmed — three dark days forfeit ~750 XP to collect 50 (measured: four straight days pays
   1,400; lapsing three and logging two pays 432). The badges deliberately reward the **week
   after** rather than the reappearance: BACK IN THE FIGHT (hold 7 days), THE LONG ROAD BACK

@@ -1729,6 +1729,14 @@
     font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13px; color: #B7F0E4;
     animation: lvUp .45s ease .85s both;
   }
+  /* The reward a level unlocked, on that level's own screen (PRF-02). */
+  .lvunlock { margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px;
+    animation: lvUp .45s ease .85s both; }
+  .lvunlock .lvu-k { flex-basis: 100%; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: .12em;
+    text-transform: uppercase; color: #B7F0E4; }
+  .lvunlock .lvu-card { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 5px; border-radius: 999px;
+    background: rgba(246,244,255,.12); color: #F6F4FF; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13px; }
+  .lvunlock .lvu-card i { width: 22px; height: 28px; border-radius: 6px; flex: none; }
   .lvactions { display: flex; align-items: center; gap: 9px; margin-top: 26px; animation: lvUp .45s ease .9s both; }
   .lvactions .lvgo { margin-top: 0; }
   .lvshare {
@@ -1905,6 +1913,28 @@
   /* "Today" is five letters in a cell sized for one: it may sit over its neighbours' spare room. */
   #app .wk2 .c.today .l { color: var(--accent); font-weight: 800; font-size: 10px; letter-spacing: -.01em; }
   #app .wk2 .c.sel:not(.today) .l { color: var(--ink); font-weight: 800; }
+  /* THE WINS CARD (PRF-02): what used to take the whole screen for a medal, a tier, a habit's rank,
+     a perfect day, a comeback or the 3-day streak, under the hero until it is tapped. The inverted
+     card, so it reads as news rather than one more row. */
+  @keyframes winIn { from { opacity: 0; transform: translateY(-6px) scale(.98); } }
+  #app .wins { margin: 0 16px 12px; padding: 14px 16px; border-radius: 22px; background: var(--ink-card); color: #F6F4FF;
+    box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; animation: winIn .4s cubic-bezier(.2,.8,.2,1); }
+  #app .wins-hd { display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+    font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(246,244,255,.72); }
+  #app .wins-hd b { font-size: 13px; letter-spacing: .02em; color: #B7F0E4; }
+  #app .win { display: flex; align-items: center; gap: 12px; }
+  #app .win .we { flex: none; width: 40px; height: 40px; border-radius: 999px; background: rgba(246,244,255,.1);
+    display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  #app .win .wt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  #app .win .wt b { font-size: 15px; font-weight: 800; line-height: 1.2; }
+  #app .win .wt span { font-size: 12.5px; color: rgba(246,244,255,.72); line-height: 1.3; }
+  #app .win .wx { flex: none; font-size: 13px; font-weight: 800; color: #B7F0E4; }
+  #app .wins-more { font-size: 12.5px; color: rgba(246,244,255,.72); padding-left: 52px; }
+  #app .wins-ft { display: flex; align-items: center; gap: 10px; padding-top: 2px; }
+  #app .wins-ok { flex: 1; min-height: 44px; justify-content: center; }
+  body[data-dark] #app .wins-ok { background: var(--accent-700); }   /* white on the dark accent is 3.35:1 */
+  #app .wins-share { flex: none; min-height: 44px; padding: 0 18px; border-radius: 999px; background: none;
+    border: 1.5px solid rgba(246,244,255,.35); color: #F6F4FF; font-weight: 700; font-size: 13.5px; }
 
   /* ── 2. Settings as grouped cards ── */
   #app .hdleft { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -2859,6 +2889,8 @@ const MAX_LEVEL_SCAN = 5000;                             // loop guard
 // The day-streak marks worth stopping the screen for. Tight early (the first
 // week is where people quit), spread out later so it stays an event.
 const DAY_STREAK_MARKS = [3, 7, 14, 21, 30, 50, 75, 100, 150, 200, 300, 365];
+// From this mark up a day streak takes the whole screen; the 3-day mark is a card on Today (PRF-02).
+const STREAK_TAKEOVER = 7;
 
 // ── THE COMEBACK ──────────────────────────────────────────────────────────
 // (Amir, 2026-08-02: "make the economy pays for comeback".)
@@ -5154,24 +5186,29 @@ function checkLevelUps() {
     const overall = id === '_overall';
     const a = rankFor(now[id]), b = rankFor(from);
     const rankChanged = a.name !== b.name || a.star !== b.star;
-    // Full-screen takeover for an overall level or a real rank promotion.
-    // Routine habit levels flash in their row, so day one is not nine takeovers.
+    // Full-screen takeover for the OVERALL level (a new rank included) and nothing else (PRF-02,
+    // Amir's 1A, 2026-09-27: 30 takeovers in a new athlete's first 22 days, more than one a day). A
+    // habit's own level flashes in its row, and a habit's new RANK is a card on Today (addWin()).
     events.push({ id, overall, from, to: now[id], rankChanged,
                   name: overall ? 'OVERALL' : habitById(id).name,
-                  big: overall || rankChanged });
+                  big: overall });
   });
   CFG.seen = now;
   saveCfg();
   events.forEach(e => {
     if (e.big) { UI.celebrate.push(e); haptic(e.rankChanged ? 'rank' : 'level'); }
-    else UI.flash[e.id] = e.to;
+    else {
+      UI.flash[e.id] = e.to;
+      if (e.rankChanged) addWin({ k: 'hrank', id: e.id, to: e.to });
+    }
   });
-  // Rewards ride behind the level that earned them, so the order reads as cause
-  // then effect rather than a prize arriving before the reason for it.
-  claimRewards(false).forEach(r => {
-    UI.celebrate.push({ kind: 'reward', id: r.id, reward: r });
-    haptic('rank');
-  });
+  // A reward is shown ON the level that earned it (PRF-02): one screen, cause and effect together.
+  // It had a takeover of its own queued behind the level. Only a reward with no level in this pass
+  // (a rules change, a sync) still gets its own.
+  const rewards = claimRewards(false), host = events.filter(e => e.big).pop();
+  if (rewards.length && host) host.rewards = rewards;
+  else rewards.forEach(r => UI.celebrate.push({ kind: 'reward', id: r.id, reward: r }));
+  if (rewards.length) haptic('rank');
   // Finishing an event is the biggest single thing in the app that is not a
   // level, so it takes over the screen like one.
   claimEventTitles(false).forEach(r => {
@@ -5308,8 +5345,73 @@ function checkUnlocks() {
   if (isPerfect(TKEY())) CFG.seenPerfect = TKEY();
   saveCfg();
   if (!events.length) return;
-  events.forEach(e => UI.celebrate.push(e));
-  haptic('rank');
+  // The whole screen for a day streak from STREAK_TAKEOVER days and a quest; the rest land on the
+  // wins card on Today, which stays until it is tapped (PRF-02).
+  const full = e => e.kind === 'quest' || (e.kind === 'streak' && e.days >= STREAK_TAKEOVER);
+  events.filter(full).forEach(e => UI.celebrate.push(e));
+  events.filter(e => !full(e)).forEach(e => addWin(
+      e.kind === 'tier'      ? { k: 'tier', id: e.id, ti: e.tierIndex, h: e.habits.map(h => h.id) }
+    : e.kind === 'milestone' ? { k: 'milestone', id: e.id }
+    : e.kind === 'streak'    ? { k: 'streak', id: e.id, days: e.days }
+    : e.kind === 'comeback'  ? { k: 'comeback', id: e.id, gone: e.gone }
+    :                          { k: 'perfect', id: e.id }));
+  haptic(events.some(full) ? 'rank' : 'level');
+}
+
+// ── The wins card (PRF-02, 2026-09-27) ────────────────────────────────────
+// A medal, a consistency tier, a habit's new rank, a perfect day, a comeback and the 3-day streak
+// mark land here, at the top of Today, instead of taking the whole screen: 30 takeovers in a new
+// athlete's first 22 days became 9. It stays until it is tapped, on every phone (it is in CFG, which
+// syncs). What is stored is WHICH win, never its XP: points are recomputed, never stored (privacy.html
+// §2.3), so winLine() asks the ledger when it draws, exactly as the takeovers did.
+function addWin(w) {
+  CFG.wins = (CFG.wins || []).filter(x => !(x.k === w.k && x.id === w.id)).concat([w]).slice(-12);
+  saveCfg();
+}
+function dismissWins() {
+  CFG.wins = [];
+  saveCfg();
+  haptic('tick');
+  render();
+}
+function winLine(w) {
+  const emo = h => splitEmoji(h.name)[0] || '✨';
+  if (w.k === 'milestone') {
+    const a = ACHIEVEMENTS.find(x => x.code === w.id);
+    if (!a) return null;
+    const part = String(a.measure || '').split(':'), hh = part[1] ? habitById(part[1]) : null;
+    return { emo: hh ? emo(hh) : (MEASURE_EMOJI[part[0]] || '🏅'), title: achName(a),
+             sub: (a.mark && a.mark !== 'I') ? 'Medal upgraded' : 'Medal unlocked', xp: milestonePaid(a.code), share: 'medal' };
+  }
+  if (w.k === 'tier') {
+    const t = CONSISTENCY_TIERS[w.ti], hs = (w.h || []).map(habitById);
+    if (!t || !hs.length) return null;
+    return { emo: emo(hs[0]), title: t.name, sub: t.days + ' days of ' + nameList(hs.map(h => ({ name: shortName(h) }))) + ' in a row',
+             xp: hs.reduce((n, h) => n + tierPaid(h, w.ti), 0), share: 'medal' };
+  }
+  if (w.k === 'hrank') {
+    const h = habitById(w.id);
+    return { emo: emo(h), title: rankFor(w.to).label, sub: 'Your new ' + shortName(h).toLowerCase() + ' rank', xp: 0, share: null };
+  }
+  if (w.k === 'perfect') return { emo: '🏆', title: 'Perfect day', sub: 'Every habit you track, done', xp: dayXp(w.id), share: 'receipt' };
+  if (w.k === 'comeback') return { emo: '🔄', title: 'Second wind', sub: w.gone + ' days off, and back', xp: COMEBACK_XP, share: 'rank' };
+  if (w.k === 'streak') return { emo: '🔥', title: w.days + '-day streak', sub: w.days + ' days in a row that counted', xp: 0, share: 'streak' };
+  return null;
+}
+function winsCard() {
+  const lines = (CFG.wins || []).map(winLine).filter(Boolean).reverse();   // newest first
+  if (!lines.length) return '';
+  const xp = lines.reduce((n, l) => n + l.xp, 0), shown = lines.slice(0, 3), share = (lines.find(l => l.share) || {}).share;
+  return `<div class="wins" data-k="wins" role="status">
+    <div class="wins-hd"><span>New on your record</span>${xp > 0 ? `<b>+${xp.toLocaleString()} XP</b>` : ''}</div>
+    ${shown.map(l => `<div class="win"><span class="we" aria-hidden="true">${l.emo}</span>
+      <span class="wt"><b>${esc(l.title)}</b><span>${esc(l.sub)}</span></span>${l.xp > 0 ? `<span class="wx">+${l.xp.toLocaleString()}</span>` : ''}</div>`).join('')}
+    ${lines.length > 3 ? `<div class="wins-more">and ${lines.length - 3} more</div>` : ''}
+    <div class="wins-ft">
+      <button class="btn btn-primary wins-ok" ${on(dismissWins)}>Got it</button>
+      ${share ? `<button class="wins-share" ${on(() => { dismissWins(); openShare(share); })}>Share it</button>` : ''}
+    </div>
+  </div>`;
 }
 function dismissCelebration() { UI.celebrate.shift(); haptic('tick'); render(); }
 
@@ -7551,6 +7653,11 @@ function renderCelebration(ev) {
       ${isHabit ? `<div class="lvsub">${esc(r.label)} · your ${esc(h.name.toLowerCase())} rank</div>`
                 : promoted ? `<div class="lvsub">A season can take the rank back. It cannot take back the ${seasonDaysLogged()} days that earned it.</div>`
                 : `<div class="lvsub">Overall level ${ev.to} · ${seasonDaysLogged()} days logged this season. Levels are just days wearing a number.</div>`}
+      ${ev.rewards && ev.rewards.length ? `<div class="lvunlock">
+        <span class="lvu-k">Unlocked · yours for good</span>
+        ${ev.rewards.map(rw => rw.kind === 'title' ? titlePlate(rw, true)
+          : `<span class="lvu-card"><i style="${CARD_LOOK[rw.id] || CARD_LOOK.c_paper}"></i>${esc(rw.name)}</span>`).join('')}
+      </div>` : ''}
       <div class="lvbar"><span style="--w:${info.pct}%"></span></div>
       ${lvActions(isHabit ? null : 'rank')}
       ${UI.celebrate.length > 1 ? `<div class="lvqueue">${UI.celebrate.length - 1} more to go</div>` : ''}
@@ -8036,6 +8143,10 @@ function renderToday(LI, doneCount) {
              the card went, so the list starts a chip-row higher. -->
         <div class="wkrow" data-k="wkrow">${verdictTile(AKEY())}${weekStrip()}</div>
       </div>
+
+      <!-- What was just won (PRF-02): a medal, a tier, a perfect day... under the card that carries the
+           level, until it is tapped. Only a level, a rank and a 7-day streak still take the screen. -->
+      ${past ? '' : winsCard()}
 
       <!-- The habits come directly under the hero. The list is what the screen is FOR; it used to
            start ~1,400px down, behind the nudge and the quest block, so opening the app to log meant
@@ -9019,7 +9130,7 @@ function renderManual() {
       ${block(h2('The daily loop') +
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game — they build your level, your rank in each habit, and your place on the leaderboard.`) +
         p(`The tile beside your week answers the one question that matters: <strong style="color:var(--ink)">does today count?</strong> It says how many habits are still to go, then <strong style="color:var(--ink)">On target</strong> once the day keeps your streak, then <strong style="color:var(--ink)">Perfect</strong> when the list is clear.`) +
-        p(`Clear the whole list and that is a <strong style="color:var(--ink)">perfect day</strong>, and the app will stop what it is doing to say so. It does the same for a new level, a rank promotion, a consistency tier and a milestone. Anything smaller than that just flashes in the row and gets out of your way.`) +
+        p(`A <strong style="color:var(--ink)">new level</strong>, a <strong style="color:var(--ink)">new rank</strong> and a day streak of <strong style="color:var(--ink)">${STREAK_TAKEOVER} days or more</strong> stop the app to say so, with any reward the level unlocked on the same screen. A medal, a consistency tier, a habit's new rank, a <strong style="color:var(--ink)">perfect day</strong> (the whole list cleared) and a comeback land in a card at the top of Today instead, with the XP they paid, and it stays there until you tap it. A habit's own level just flashes in its row and gets out of your way.`) +
         p(`Nothing here needs a signal. Whatever you tick is saved on your phone straight away and sent up on its own when you're back online.`) +
         (isFree() ? '' : p(`<strong style="color:var(--ink)">You can tick today's list from your training app too</strong>, on its Home under Daily Habits. It is this same list, saved the same way, for the same points. A new level or a reward waits for you here, so the moment is never spent on a small strip.`)) +
         p(`<strong style="color:var(--ink)">Put it on your home screen</strong> and it opens in one tap, looks like any other app and keeps working with no signal. ${isIOS() ? 'Tap Share in the browser bar, then Add to Home Screen.' : 'There is a row for it in Settings.'} There is nothing to download — it is this page, kept somewhere you can reach it.`))}
