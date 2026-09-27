@@ -168,6 +168,8 @@ off in their notes.
   *Every other round* / *Skip today*.
 - **`dayRpe()`** is the one place a target moves: 1 off each end, never below 6, never above the
   written number, and it does not stack with the week note (`weekNoteNow()`): the lower target wins.
+  The week note's own number is floored at 6 too (CHP-4; until 2026-09-27 a written 6 in a week with
+  `rpeDrop: 1` read *6 → 5 today* on a lower day, a target no RPE button can log).
   ⚠️ **coach.html's `dayTargetC()` is its twin** (without the week note): change both.
 - **Completion follows the day.** `getDayCompletion()` does not count optional or skipped work as
   missing, and a halved exercise asks for its halved sets, so a red day with its core done is
