@@ -1055,7 +1055,7 @@ duration, equipment) so the Train list renders instantly without opening every f
     {
       "id": "strength",
       "title": "Strength",                              // banner heading
-      "banner": "assets/img/workouts/strength.webp",    // 2:1 image (≈1600x800)
+      "banner": "assets/art/library/sessions-strength-v1.webp",   // 2:1 image (1600x800), IMAGES.md §0
       "workouts": [
         { "id": "full-body-power", "title": "Full-Body Power",
           "duration": "45 min", "equipment": "Barbell",
@@ -1254,7 +1254,7 @@ Lists the categories (with their icon and banner image) and, per category, the a
       "id": "for-coaches",
       "title": "For Coaches",
       "icon": "book",                              // key from window.__ICONS
-      "banner": "assets/img/workouts/strength.webp",
+      "banner": "assets/art/library/read-for-coaches-v1.webp",
       "articles": [
         {
           "id": "pre-session-warm-up",

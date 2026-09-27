@@ -15,7 +15,7 @@ path, so **every device loads the exact same file** — nothing can get lost or
 | What | Folder | Aspect | Recommended size | Format | Target file size |
 |------|--------|--------|------------------|--------|------------------|
 | **Cycle banners** | `assets/cycles/` | 16:9 | 1200×675 | JPG/WebP | < 120 KB |
-| **Workout banners** | `assets/img/workouts/` | 2:1 | 1600×800 | WebP | < 80 KB |
+| **Library shelves** | `assets/art/library/` (§0) | 2:1 | 1600×800 | WebP | < 60 KB |
 | **Landing photos** | `assets/img/athletes/` | portrait ~4:5 | ~1080×1350 | JPG | < 150 KB |
 | **Social share (OG)** | `assets/img/og-image.jpg` | 1.91:1 | 1200×630 | JPG | < 100 KB |
 | **App icons** | `assets/img/` + root | 1:1 | see icons section | PNG/SVG/ICO | tiny |
@@ -62,8 +62,10 @@ text safe zone for every image — is the artifact at
 - ⚠️ **A Library banner's path lives in the DATABASE, not in a file.** `public.library_categories.banner`
   is what the app reads (through `get_library()`); `workouts/index.json` and `articles/index.json`
   are only the offline fallback. Change a shelf picture in **both**, or the app and the fallback
-  disagree. The same picture is used three ways: the shelf banner, the thumbnail on every workout
-  card in that shelf's rail, and the header of each workout's own screen.
+  disagree. The same picture is used twice: the shelf's band on Library → Sessions and the header of
+  each session's own screen (LIB-01, 2026-09-27, took away the rail and its thumbnails). The band is
+  84 px tall, so it shows about the middle half of the picture's height: keep the subject in the
+  middle, and the left side dark enough for the shelf's number and name.
 - **Day pictures** are the eight categories: lower · upper · power · conditioning · core ·
   recovery · fullbody · default. A day's `art` word wins; otherwise the app takes the
   keyword that appears **earliest in the day's name** (`SCHEMA.md` → *How a day finds its
@@ -114,21 +116,14 @@ overlay cleanly. No text, no logos, no watermark. 16:9 landscape.
 
 ---
 
-## 2. Workout category banners — `assets/img/workouts/`
+## 2. Workout category banners — `assets/img/workouts/` (retired for the app)
 
-The wide banner at the top of each category in the **Workouts** tab
-(Strength, Conditioning, Mobility, On-Court, Recovery).
-
-- **Aspect ratio:** 2:1 (the `.wl-banner` box is locked to `aspect-ratio: 2/1`).
-- **Recommended size:** **1600×800** WebP (current files are 41–63 KB).
-- **Filename:** matches the category id — `strength.webp`, `conditioning.webp`,
-  `mobility.webp`, `on-court.webp`, `recovery.webp`.
-- **Where it's wired:** the path is set per category in `workouts/index.json`
-  under `"banner"`; displayed as a CSS `background-image` (cover + dark scrim).
-- **Composition:** the title sits bottom-left over a left-to-right dark gradient,
-  so keep the left side usable for text; subject can sit center/right.
-- To add a new category banner: drop the WebP here and point its `"banner"`
-  field in `workouts/index.json` at it.
+The five older category banners (`strength`, `conditioning`, `mobility`, `on-court`,
+`recovery`, 1600×800 WebP). **The app no longer shows them**: every shelf reads its picture
+from `assets/art/library/` (§0), whose path lives in `public.library_categories.banner`.
+Nothing in `program.html` points here; the `.wl-banner` box that once did was removed as dead
+code on 2026-09-27. The files stay as the grade reference the design atlas names for the dark
+gym series. A new shelf picture goes in §0, never here.
 
 ---
 

@@ -171,7 +171,8 @@
 // v90: program.html changed (2026-09-27, DOC-01 follow-ups): Log a max's form without clay, the guide's Rest
 //      line, an article link opens the published row.
 // v91: habits.html changed (2026-09-27): EXTRA MILESTONES in Settings, ON A STREAK on the share cards.
-const CACHE = 'aap-v91';
+// v92: program.html changed (2026-09-27): dead code the DOC-01 pass found, removed (316 lines, no behaviour).
+const CACHE = 'aap-v92';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
