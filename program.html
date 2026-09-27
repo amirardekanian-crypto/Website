@@ -2418,7 +2418,7 @@
     border-color: var(--yellow);
     color: var(--on-accent);
   }
-  body[data-dark] .ex-set-rpe .rpe-btn { border-color: #444; color: #888; }
+  body[data-dark] .ex-set-rpe .rpe-btn { border-color: #444; color: #9a9a9a; }
   body[data-dark] .ex-set-rpe .rpe-btn.selected { color: var(--on-accent); }
 
   /* Per-set check circle */
@@ -2532,7 +2532,7 @@
     background: none; border: 0; padding: 0 2px; min-height: 40px; cursor: pointer;
     text-decoration: underline dotted; text-underline-offset: 3px;
   }
-  .ex-set-rpe .rpe-btn { flex: 1 1 0; max-width: none; height: 40px; font-size: 16px; border-radius: 8px; }
+  .ex-set-rpe .rpe-btn { flex: 1 1 0; max-width: none; height: 44px; font-size: 18px; border-radius: 10px; }
   /* RPE against target (rpeVs): clay over, steel blue under, green on target. */
   .ex-set-rpetag.over  { color: var(--clay-ink); }
   .ex-set-rpetag.under { color: var(--rpe-under); }
@@ -3471,8 +3471,11 @@
   /* The entry form. Card chrome from .ceil-card, innards from .ex-1rm-*, so an
      athlete meets the exact control they already know from the exercise card. */
   .ceil-form .ex-1rm-field { background: var(--grey-card); border-color: transparent; }
+  .ceil-form .ex-1rm-inputs { grid-template-columns: 1fr 1fr; }
+  .ceil-form .ex-1rm-field span { font-size: 11px; }
+  .ceil-form .cf-rpe { display: flex; border-top: 0; padding: 10px 0 0; }
   body[data-dark] .ceil-form .ex-1rm-field { background: #2a2a2a; }
-  .ceil-form-h { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+  .ceil-form-h { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
     letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-text);
     margin-bottom: 11px; }
   .ceil-when { display: flex; align-items: center; gap: 10px; margin-top: 12px;
@@ -3722,11 +3725,11 @@
   .complete-rpe-btn {
     min-width: 0;
     height: 44px;
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid var(--grey-mid);
     background: transparent;
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700; font-size: 14px;
+    font-weight: 700; font-size: 18px;
     color: var(--grey-text);
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
@@ -4208,9 +4211,20 @@
   /* ── RPE Selector ── */
   .rpe-row { display: none; border-top: 1px solid var(--grey-card); padding: 9px 16px; align-items: center; gap: 6px; }
   .rpe-row.visible { display: flex; animation: fadeUp 0.2s ease both; }
-  .rpe-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); margin-right: 2px; flex-shrink: 0; }
-  .rpe-btn { width: 30px; height: 30px; border-radius: 4px; border: 1px solid var(--grey-mid); background: transparent; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; color: var(--grey-text); transition: background 0.15s, border-color 0.15s; flex-shrink: 0; }
+  /* ONE RPE CONTROL (CONS-01, 2026-09-27). A set's strip, a circuit's rounds, Guided's rest
+     screen, the session rating and Log a max are the same buttons: 44 px, the number in
+     Barlow Condensed, green when picked, and a second tap on the picked one clears it. The
+     word before them ("How hard?") opens what RPE means, as it does on a set (COACH-02). */
+  .rpe-label { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--grey-text); white-space: nowrap; margin-right: 2px; flex-shrink: 0;
+    background: none; border: 0; padding: 0 2px; min-height: 44px; cursor: pointer;
+    text-decoration: underline dotted; text-underline-offset: 3px; }
+  .rpe-btn { flex: 1 1 0; min-width: 0; height: 44px; padding: 0; border-radius: 10px; border: 1px solid var(--grey-mid); background: transparent; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; cursor: pointer; color: var(--grey-text); transition: background 0.15s, border-color 0.15s; }
   .rpe-btn.selected { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
+  /* A circuit's round: the words on their own line, so the five numbers get the whole width
+     (inline, "R2 · How hard?" left them 11 px wide at 320). */
+  .checklist-item .rpe-row { flex-wrap: wrap; row-gap: 0; }
+  .checklist-item .rpe-row .rpe-label { flex: 0 0 100%; min-height: 32px; text-align: left; }
 
   /* ── Dark Toggle ── */
   .dark-toggle { background: transparent; border: 1px solid #444; border-radius: 4px; padding: 5px 9px; cursor: pointer; font-size: 14px; margin-left: auto; line-height: 1; }
@@ -4226,7 +4240,8 @@
   body[data-dark] .section-header-prog::after { background: #333; }
   body[data-dark] .weight-input { background: #2a2a2a; color: #ddd; }
   body[data-dark] .weight-input::placeholder { color: #555; }
-  body[data-dark] .rpe-btn { border-color: #444; color: #666; }
+  body[data-dark] .rpe-btn { border-color: #444; color: #9a9a9a; }
+  body[data-dark] .rpe-label { color: #9a9a9a; }
   body[data-dark] .chip { background: #2a2a2a; color: #aaa; }
   body[data-dark] .day-focus-tag { opacity: 0.9; }
   body[data-dark] .round-row { border-color: #333; color: #777; }
@@ -8459,7 +8474,7 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video and the cues, open the first time you meet an exercise, folded after that), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its cues, ▶ plays its video, and the circle ticks the whole warm-up.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video and the cues, open the first time you meet an exercise, folded after that), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its cues, ▶ plays its video, and the circle ticks the whole warm-up.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. When the rest is over it moves you to the next set. Supersets and circuits come round by round; warm-ups stay in the list.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
@@ -9262,7 +9277,11 @@ function openCeilingForm(i, asTest) {
       <div class="ex-1rm-inputs">
         <div class="ex-1rm-field"><input id="cf-kg" type="text" inputmode="decimal" aria-label="Weight in kilograms"><span>kg</span></div>
         <div class="ex-1rm-field"><input id="cf-rp" type="text" inputmode="numeric" aria-label="Reps" value="${esc(String(reps))}"><span>reps</span></div>
-        <div class="ex-1rm-field"><input id="cf-rpe" type="text" inputmode="numeric" aria-label="RPE"><span>rpe</span></div>
+      </div>
+      <input id="cf-rpe" type="hidden" value="">
+      <div class="rpe-row cf-rpe" role="group" aria-label="How hard it felt, RPE">
+        <button type="button" class="rpe-label" onclick="openHelp('rpe')" aria-label="How hard? What RPE means">How hard?</button>
+        ${[6, 7, 8, 9, 10].map(n => `<button type="button" class="rpe-btn" data-rpe="${n}" aria-label="RPE ${n}" aria-pressed="false">${n}</button>`).join('')}
       </div>
       <div class="ex-1rm-out" id="cf-out"></div>
       <div class="ex-1rm-grade" id="cf-grade"></div>
@@ -9276,8 +9295,17 @@ function openCeilingForm(i, asTest) {
     <div class="ceil-note">A date in the past is fine — log the day you lifted it,<br>
       not the day you got round to typing it in.</div>`;
 
-  ['cf-kg', 'cf-rp', 'cf-rpe'].forEach(id =>
+  ['cf-kg', 'cf-rp'].forEach(id =>
     document.getElementById(id).addEventListener('input', paintCeilingForm));
+  // The RPE: the same buttons as a set (CONS-01). A second tap clears it.
+  document.querySelectorAll('.cf-rpe .rpe-btn').forEach(b => b.addEventListener('click', () => {
+    const inp = document.getElementById('cf-rpe');
+    const was = b.classList.contains('selected');
+    document.querySelectorAll('.cf-rpe .rpe-btn').forEach(x => { x.classList.remove('selected'); x.setAttribute('aria-pressed', 'false'); });
+    if (!was) { b.classList.add('selected'); b.setAttribute('aria-pressed', 'true'); }
+    inp.value = was ? '' : b.dataset.rpe;
+    paintCeilingForm();
+  }));
   paintCeilingForm();
   document.getElementById('cf-kg').focus();
   window.scrollTo(0, 0);
@@ -12890,10 +12918,10 @@ function attachCircuitLog(card) {
       const saved  = localStorage.getItem(rpeKey);
       const div    = document.createElement('div');
       div.className = 'rpe-row';
-      const label = rounds > 1 ? `RPE · R${round}` : 'RPE';
-      div.innerHTML = `<span class="rpe-label">${label}</span>` +
+      const label = rounds > 1 ? `R${round} · How hard?` : 'How hard?';
+      div.innerHTML = `<button type="button" class="rpe-label" onclick="event.stopPropagation(); openHelp('rpe')" aria-label="${rounds > 1 ? 'Round ' + round + ': how hard' : 'How hard'}? What RPE means">${label}</button>` +
         [6,7,8,9,10].map(n =>
-          `<button class="rpe-btn${saved === String(n) ? ' selected' : ''}" onclick="selectRPE(this,'${rpeKey}',event)">${n}</button>`
+          `<button type="button" class="rpe-btn${saved === String(n) ? ' selected' : ''}" data-rpe="${n}" aria-label="RPE ${n}" onclick="selectRPE(this,'${rpeKey}',event)">${n}</button>`
         ).join('');
       div.addEventListener('click', e => e.stopPropagation());
       slot.appendChild(div);
@@ -12973,7 +13001,11 @@ function initRPE() { initSetOrRPE(); }
 
 function selectRPE(btn, key, e) {
   e.stopPropagation();
+  // Tap the picked number again to clear it, as on a set (CONS-01). removeItem is hooked:
+  // the delete goes up as a drop, so the cloud does not hand the rating back.
+  const was = btn.classList.contains('selected');
   btn.closest('.rpe-row').querySelectorAll('.rpe-btn').forEach(b => b.classList.remove('selected'));
+  if (was) { localStorage.removeItem(key); return; }
   btn.classList.add('selected');
   localStorage.setItem(key, btn.textContent.trim());
 

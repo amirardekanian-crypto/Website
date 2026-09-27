@@ -135,7 +135,9 @@
 //      done, and effort-matched wins), replacing the small cycle line.
 // v70: program.html changed (2026-09-27): the working card's "Same as last" button is gone (the open
 //      card's Last time box already shows last time); Guided's rest screen keeps its own.
-const CACHE = 'aap-v70';
+// v71: program.html changed (2026-09-27, CONS-01): one RPE control everywhere (a set, a circuit's rounds,
+//      Guided, the session rating and Log a max): 44 px, and a second tap clears it.
+const CACHE = 'aap-v71';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -432,6 +432,21 @@ costs more than one tap.
   **coach.html matches it:** each set in *per set:* is coloured the same way, and the average's
   *under target RPE* pill is steel blue (it was ochre, the colour of "extra set"). The average still
   flags only past `RPE_OVER`/`RPE_UNDER` (1.5); the per-set colours are exact, like the athlete's.
+- **One RPE control everywhere (CONS-01, 2026-09-27).** A set's strip, a circuit's rounds, Guided's
+  rest screen, the session rating and Personal Records' **Log a max** are the same buttons: 44 px
+  tall, the number in Barlow Condensed 18 px, 10 px corners, green when picked, and **a second tap on
+  the picked number clears it**. Before, a circuit's round buttons were 30 px and could not be
+  cleared (`selectRPE()`), the set strip was 40 px, the session rating 14 px type, and Log a max took
+  any number in a free text box.
+  - **A circuit asks once a round**: `R2 · How hard?` sits on its own line above the five numbers
+    (inline it left them 11 px wide at 320 px), and like a set's **How hard?** it opens RPE & Tempo.
+    A cleared round is a `removeItem`, which the hook sends up as a drop, so the cloud does not hand
+    the rating back. Circuits still colour no RPE against a target: they carry none.
+  - **Log a max** asks **How hard?** with 6–10 under the kg and reps boxes; the chosen number sits in
+    a hidden `#cf-rpe`, so `paintCeilingForm()` and `saveCeilingForm()` read it as before. Half points
+    (9.5) are gone with the text box, the same scale as a set.
+  - The session rating keeps its own scale, 1–10 (Foster's session RPE), in the same buttons.
+  - The readiness check is not RPE and keeps its large labelled 1–5 answers (they work: 90%).
 
 ## 💬 No in-app chat: Amir answers only on WhatsApp (2026-09-26)
 

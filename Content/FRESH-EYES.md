@@ -32,7 +32,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-27)
 
-**29 done · 5 partly done · 10 open**, of 44. Each was checked against the code on `main`.
+**30 done · 5 partly done · 9 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -77,8 +77,9 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#271](https://github.com/amirardekanian-crypto/Website/pull/271) | The This cycle card at the top of Home (Amir's pick: it replaces the small cycle line and opens Game Plan): the week, sessions done against planned, and up to three effort-matched wins ("+2.5 kg, same reps, same RPE", "+3 reps at 16 kg", "felt easier: RPE 8 → 7"), for any reps, bodyweight moves and holds | PROG-01 |
 | [#272](https://github.com/amirardekanian-crypto/Website/pull/272) | The working card's **Same as last** button is gone (Amir: *"its a duplicate of what can be seen in history"*): the open card's Last time box shows last time, and a weight typed in set 1 fills the sets below; Guided's rest screen keeps its own | CARD-01, LOG-01 |
 | [#273](https://github.com/amirardekanian-crypto/Website/pull/273) | The headless harness joins the repo (`scripts/headless/`: the Supabase stub, a made-up athlete and programme, `smoke.js` for both apps), and this hand-off | — |
+| [#274](https://github.com/amirardekanian-crypto/Website/pull/274) | One RPE control everywhere: a set, a circuit's rounds ("R2 · How hard?", on its own line), Guided, the session rating and Log a max (6–10 buttons, not a text box) are the same 44 px buttons, and a second tap clears a pick | CONS-01 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
 
 **Partly done, and what is still open on each:**
 - **A11Y-01.** The training app is done on the screens measured. Still open: AA Proof's small type and
@@ -94,9 +95,20 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
 
 **Open.** P2:
-PRF-01, PRF-02, PRF-03, DS-01. P3: DS-03, CONS-01, PRF-05, LIB-01, POL-02, DOC-01.
+PRF-01, PRF-02, PRF-03, DS-01. P3: DS-03, PRF-05, LIB-01, POL-02, DOC-01.
 
 ## Next, in order
+
+**Waiting on Amir (2026-09-27), three calls, each on its own page:**
+- **Proof's Today (PRF-01, PRF-03, PRF-05)**: https://claude.ai/artifact/TwHpG4EXEv4hj1FcPejG7y. A tighter card
+  (recommended), the day leads, or the list leads; all three share the circle tick, the session last, the exact
+  "N to go" and one week strip. The prototypes are CSS/JS laid over the real app in a headless page (the
+  session's scratchpad `proto.js`), so the pick ports straight into `renderToday()`.
+- **PRF-02's six calls**: https://claude.ai/artifact/6hB61EMUJPjCQ6hF7LH9Fe (celebrations 30 → 9 in 22 days,
+  a five-step tour, Progress's next three, quests hidden when idle, the Locker's road to the next three rewards,
+  Crew on the board). "Your picks" takes all six As.
+- **DS-01, clay's jobs**: https://claude.ai/artifact/RkWgSFd4SR4NX1XyRdVZTN. A "look here" (recommended), B also
+  the main button of each screen, C as now.
 
 **The training app's list is done**: stop-the-bleeding, foundations, the whole session (#260–#269), Home and
 progress (#258, #271), the account and the guide (#268, #270), each told in full in `PROGRAM-APP.md`. What
@@ -182,7 +194,7 @@ the working card folds How to do it if Amir wants that too.
 - Once per clone: `git config core.hooksPath .githooks`.
 - Use the branch the session names. After each merged PR, restart it from main:
   `git fetch origin main && git checkout -B <branch> origin/main`.
-- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v70` on
+- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v71` on
   2026-09-27) whenever a cached app file changes, log the version in its comment list, and change the
   name in CLAUDE.md too.
 - Test in a headless browser before every PR (below): the harness is in the repo, the checks you write
