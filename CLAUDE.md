@@ -183,7 +183,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   day, saves the record and sends the report once. The report waits in `<id>_outbox` (one entry per session: the day
   and its finish stamp) until it goes, and **never syncs**, or another phone sends it again. A second email only when
   the rating or note changed after the first went. Done needs the rating.
-- **The in-app guide (`APP_GUIDE`, the Coach tab's "Using the app" cards) and the first-session hints (`ONB_TEXT`,
+- **The in-app guide (`APP_GUIDE`, *How the app works* in the sheet: `openHelp()` from your initials, the Coach tab's row,
+  "How hard?", "tempo" and Guided's ?; COACH-02) and the first-session hints (`ONB_TEXT`,
   ONB-01) name real controls.** Rename a button, move a control or change when a card appears, and change its guide
   card and hint in the same PR (CNT-01, 2026-09-26: it had said "Send Data to Coach" and "tap the timer icon" for
   weeks). The Library's "ticks your habit" line reads AA Proof's config through `_wsHabitOn()`, read only.
@@ -247,7 +248,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v67` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v68` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

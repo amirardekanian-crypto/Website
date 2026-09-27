@@ -822,6 +822,24 @@ athlete's initials; hidden in a day view, whose banner keeps its own moon for mi
 AA Proof has the same in Settings (HABITS.md → *Sign out*); the two apps share the sign-in, so either signs
 out of both.
 
+## ❓ The guide in the sheet, and the jargon is the link (COACH-02, 2026-09-27)
+
+The guide (`APP_GUIDE`, fifteen cards) sat at the bottom of the Coach tab, under the personal notes, and nothing
+in a workout led to it. `openHelp(key)` now draws it in the one sheet (`#hist-overlay`), every card folded or the
+one asked for open and scrolled to. Four doors:
+
+- **Your initials → How the app works** (NAV-02), with ‹ Back to the account page (`openAccount` and `openHelp`
+  are wrapped by `wrapSheetOpeners()`).
+- **One row on the Coach tab**, *How the app works*: the tab is Amir's voice now (WhatsApp, his notes).
+- **The jargon itself**: **How hard?** on a set's RPE strip (`.ex-set-rpe-q`, a button now) and **tempo** in an
+  open card (`.nl-help`; the word shows only when the card is open, and `numLineText()` still drops it) open
+  *RPE & Tempo*; each is marked by a dotted underline, nothing added to the card. Under 360 px the strip hides
+  its label, as before.
+- **? in Guided's top bar** (`.step-help`) opens *Guided mode*, a new card that names Guided's real buttons.
+
+A card's `key` (`rpe`, `guided`) is what a door asks for; `tempo` shares `rpe`. The sheet sits above Guided,
+and closing it leaves Guided where it was.
+
 ## 📲 The install ask waits for a finished session (HOME-03, 2026-09-26)
 
 The "Install app" toast (`A2HS` in `assets/js/shared.js`) used to fire 2.5 s after the first sign-in, on
@@ -844,7 +862,7 @@ itself. **Reset Session** (on the finished card, under the send status line), a 
 
 ## 📖 The in-app guide names real controls (CNT-01, 2026-09-26)
 
-The Coach tab's **Using the app** cards are `APP_GUIDE` in `program.html`. Nothing checks them against
+The **How the app works** cards (on the Coach tab until COACH-02, below) are `APP_GUIDE` in `program.html`. Nothing checks them against
 the app, so they drifted: for weeks they said "Finish Workout → Send Data to Coach", that the finish card
 appears "when every exercise is checked off", and "tap the timer icon". What is true on 2026-09-27:
 
