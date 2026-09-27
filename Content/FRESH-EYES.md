@@ -32,7 +32,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-27)
 
-**41 done · 2 partly done · 1 open**, of 44. Each was checked against the code on `main`.
+**42 done · 2 partly done · 0 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -84,6 +84,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#278](https://github.com/amirardekanian-crypto/Website/pull/278) | Pinch-zoom in the training app (it was locked at 1×; now 5×, as AA Proof); both apps drop only the double-tap zoom (`touch-action: manipulation`) | A11Y-01 |
 | [#279](https://github.com/amirardekanian-crypto/Website/pull/279) | AA Proof: the circle is the tick (a 48 px circle that fills with a white tick, the emoji inside it), + is 44 px in the habit's tint, the programme's session is one slim line at the end of Today: the first habit you can tick moved up the screen (Amir's pick A of the mockup) | PRF-01 |
 | [#280](https://github.com/amirardekanian-crypto/Website/pull/280) | AA Proof's Today leads with the verdict, **2 to go**, then On target, then Perfect, instead of the day's percentage (68% on a rest day that counted); the count is exact (it said 1 when 2 were needed); the ring round the initials is gone; the training app's habits row and the strip's head say the same words (no more "day complete" beside "1 of 5 done"). Display only | PRF-03 |
+| [#292](https://github.com/amirardekanian-crypto/Website/pull/292) | The docs pass: CODEBASE.md, PROGRAM-APP.md, HABITS.md, MAP.md and program.html's comments checked claim by claim against the code, and corrected where they described an older app (the reports behind it found 96 stale claims in the four training-app files) | DOC-01 |
 | [#291](https://github.com/amirardekanian-crypto/Website/pull/291) | A bug DOC-01's check found: on a lower day in a week whose note lowers RPE (`rpeDrop`), a written RPE 6 showed "6 → 5 today", under the floor (CHP-4) and a number no RPE button can log; the week's term is floored at 6 now, and nothing else moves | DOC-01 (a code bug) |
 | [#290](https://github.com/amirardekanian-crypto/Website/pull/290) | The Quality sheet shows no "How we measure it" (Amir's A): it named tests an athlete never meets (a 505 test, a Yo-Yo test); the words stay on the server for coach.html, and the guide no longer promises "how we test it" | POL-01 |
 | [#289](https://github.com/amirardekanian-crypto/Website/pull/289) | The Library's Sessions as a list (Amir's A): each shelf's photo once, as a band with **All N ›** (the dead › now shows the rest), then three rows saying what each session is for, its minutes and kit, and ✓ the AA Proof habit it ticks (only when Proof will give one); and a session at the right moment (C): a sore check-in's finished card offers *The Morning After*, a finished week's Home offers *Green Light*, each gone once opened, its ← back to where it was offered | LIB-01 |
@@ -96,16 +97,21 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#282](https://github.com/amirardekanian-crypto/Website/pull/282) | AA Proof's celebrations (PRF-02 part 1, Amir's 1A): the whole screen only for a new level (its reward on the same screen), a new rank and a day streak from 7 days; a medal, a tier, a habit's rank, a perfect day, a comeback and the 3-day mark land on a card under Today's hero, with their XP, until tapped. A made-up athlete's first 22 days: 30 takeovers → 9, nothing lost | PRF-02 (part) |
 | [#281](https://github.com/amirardekanian-crypto/Website/pull/281) | AA Proof's week is drawn once on the card and is the day picker: seven days ticked when on target, the last four tapped to fill in a day (the four chips with a percentage each went); the card a size smaller; a long rank's name no longer runs under the streak tile at 320–360 px. The first habit you can tick: 360 → 261 px at 390 × 844 | PRF-05 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276), PRF-01 (#279), PRF-03 (#280), PRF-05 (#281), POL-02 (#285), DS-01 (#287), DS-03 (#275, #288), PRF-02 (#282–#286), LIB-01 (#289), POL-01 (#252, #277, #290), A11Y-01 (#245, #275, #278, #285, #286; following the phone's dark setting is not wanted: the athlete chooses). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276), PRF-01 (#279), PRF-03 (#280), PRF-05 (#281), POL-02 (#285), DS-01 (#287), DS-03 (#275, #288), PRF-02 (#282–#286), LIB-01 (#289), POL-01 (#252, #277, #290), DOC-01 (#291, #292), A11Y-01 (#245, #275, #278, #285, #286; following the phone's dark setting is not wanted: the athlete chooses). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
 
 **Partly done, and what is still open on each:**
 - **SEAM-01.** Habits are ticked on Home. The full Proof app still has no way back to training,
   offers a second install, keeps its own dark-mode switch, and reads workout ticks only at launch.
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
 
-**Open.** P3: DOC-01.
+**Open.** Nothing: the backlog is worked through (2026-09-27, evening). SEAM-01 and DATA-01 wait on
+evidence, not on building (below).
 
 ## Next, in order
+
+**The list is done (2026-09-27, evening).** What is left waits on evidence: the habit count around
+2026-10-17 for SEAM-01 (item 5 below), each athlete's next cycle for DATA-01, and `library_sessions` in two
+weeks for LIB-01's two suggestions (did *Mark as done* move from once in 60 days?).
 
 **Amir's answers (2026-09-27): "Your picks on all five, go ahead."** Each page has the detail.
 - **Proof's Today (PRF-01, PRF-03, PRF-05)**: A, a tighter card
@@ -158,7 +164,7 @@ is left is mostly AA Proof, then design-system polish. Work it in this order:
 4. **P3 and the partly-done leftovers**, in this order: ~~CONS-01~~ (#274), DS-03 (the type scale is #275;
    one primary button goes with DS-01), ~~LIB-01~~ (#289, A and C), ~~NAV-01's close grammar~~
    (#276), ~~POL-01's leftovers~~ (#277; the
-   Quality sheet's line, A, #290), ~~A11Y-01's pinch-zoom~~ (#278), and DOC-01 last.
+   Quality sheet's line, A, #290), ~~A11Y-01's pinch-zoom~~ (#278), and ~~DOC-01~~ last (#291, #292).
 5. **SEAM-01 waits for the count** around 2026-10-17 (below). If habit logging has not moved, fork 1 A
    (Proof in the training app's look, "← Training", one install, one theme) is next, and it takes DS-03's
    Proof half with it.
@@ -245,6 +251,8 @@ The apps cannot reach Supabase from a cloud container, so **`scripts/headless/`*
      `'refuse'`, `'empty'`, `stall: { get_program: true }`; the list is at the top of `stub.js`).
    - `fixture()` dates the cycles (week 2 of 5, as most live programmes are); `fixture({ dated: false })`
      is one of the undated few. `card(name)` finds an exercise card; `checker()` prints PASS / FAIL.
+   - `stub: { library: library() }` answers `get_library` from `workouts/` (the database's copy, with
+     `focusTag` and `countsAs`); without it the app falls back to `workouts/index.json`, which has neither.
    - Drive the app through its own functions (`openDayView('1')`, `toggleExpand(card)`,
      `startTimerNow('1')`, `openGuided('1')`, Proof's `UI` and `render()`), then assert on the DOM and on
      `localStorage`.
@@ -259,10 +267,12 @@ The apps cannot reach Supabase from a cloud container, so **`scripts/headless/`*
 ## Paste this to start the next chat
 
 > Continue the Fresh Eyes work. Read `Content/FRESH-EYES.md` first, then the Fresh Eyes page
-> (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). The training app's list is done (#228–#272). Next is
-> AA Proof's Today screen: PRF-01, PRF-03 and PRF-05. Show me one mockup of that screen first, then build
-> one PR per item. After that, PRF-02 (bring me its calls), DS-01, then the P3 items in the file's order;
-> SEAM-01 waits for the habit count around 17 October. Test every change headless with
-> `scripts/headless/` before the PR, merge to main and confirm the deploy the same day, and keep going
-> down the list. Pause only for a call that is mine: restate the problem, give two or three directions
-> with trade-offs and your recommendation, then wait for my answer on that one.
+> (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). The backlog is worked through (#228–#292); two items
+> wait on evidence. First, count habit logging the way the audit did (athletes who logged a habit in the
+> last 7 days against those who trained in the last 14: 5 of 40 against 16 at the audit), and read
+> `library_sessions` since 27 September for the Library's two suggestions. Bring me the numbers. If habit
+> logging has not moved, SEAM-01's fork 1 A is next (AA Proof in the training app's look, "← Training", one
+> install, one theme): show me one mockup first. Test every change headless with `scripts/headless/` before
+> the PR, merge to main and confirm the deploy the same day. Pause only for a call that is mine: restate the
+> problem, give two or three directions with trade-offs and your recommendation, then wait for my answer on
+> that one.
