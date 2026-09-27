@@ -10302,6 +10302,24 @@ function renderSettings() {
                    LOG[k] = {}; saveLog(); go('today'); toast('Clean slate' + tag + '. Try not to waste it.');
                  },
                  'danger' + (UI.confirmReset ? ' armed' : ''))}
+        <!-- Sign out (NAV-02, 2026-09-27): signOutAthlete() existed and nothing called it.
+             Two taps like Reset; the log is sent up first (capped, so no signal never traps
+             anyone) and stays on this phone either way. Never in the demo or a preview. -->
+        ${(window.IS_DEMO || window.IS_PREVIEW) ? '' : navRow('👋', 'Sign out',
+                 'Your log stays saved. Sign in again with your username and password.',
+                 `<span class="navpill">${UI.confirmSignOut ? 'Sure?' : 'Sign out'}</span>`,
+                 async () => {
+                   if (!UI.confirmSignOut) {
+                     UI.confirmSignOut = true; render();
+                     setTimeout(() => { if (UI.confirmSignOut) { UI.confirmSignOut = false; render(); } }, 2600);
+                     return;
+                   }
+                   UI.confirmSignOut = false;
+                   toast('Saving, then signing out…');
+                   try { markDirty(); await Promise.race([pushNow(), new Promise(r => setTimeout(r, 6000))]); } catch (e) {}
+                   signOutAthlete();
+                 },
+                 UI.confirmSignOut ? 'armed' : '')}
       </div>
 
       <!-- Athletes sign in with a username and password since 2026-09-07; this note

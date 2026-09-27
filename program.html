@@ -1409,20 +1409,25 @@
   .day-view-dark { right: 14px; font-size: 16px; }
   .day-view-dark svg { width: 18px; height: 18px; }
   .day-view-back:active, .day-view-dark:active { transform: scale(0.9); }
-  /* Global floating dark-mode toggle — reachable from Home / Coach / Workouts /
-     My Plan (the day view keeps its own .day-view-dark, so this hides there). */
-  .global-dark-toggle {
+  /* The account button (NAV-02, 2026-09-27), where the floating dark-mode toggle sat: top
+     right on Home / Coach / Library / Game Plan, the athlete's initials. It opens Theme,
+     Install, Help, Privacy and Sign out (openAccount()). The day view keeps its own
+     .day-view-dark on the banner, one tap mid-session, so this hides there. */
+  .global-account {
     position: fixed; top: 14px; right: 14px; z-index: 65;
-    width: 38px; height: 38px; border-radius: 50%;
-    background: rgba(0,0,0,0.30); border: none; cursor: pointer;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--yellow); border: 2px solid rgba(255,255,255,0.92); cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
     display: flex; align-items: center; justify-content: center;
-    font-size: 17px; line-height: 1; color: #fff; -webkit-tap-highlight-color: transparent;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: 0.5px;
+    line-height: 1; color: #fff; -webkit-tap-highlight-color: transparent;
     transition: transform 0.08s, background 0.2s;
   }
-  .global-dark-toggle svg { width: 19px; height: 19px; }
-  .global-dark-toggle:active { transform: scale(0.9); }
-  .global-dark-toggle.is-hidden { display: none; }
-  body[data-dark] .global-dark-toggle { background: rgba(255,255,255,0.14); }
+  .global-account::after { content: ''; position: absolute; inset: -3px; }   /* a 46 px target */
+  .global-account svg { width: 19px; height: 19px; }
+  .global-account:active { transform: scale(0.9); }
+  .global-account.is-hidden { display: none; }
+  body[data-dark] .global-account { background: var(--yellow); border-color: rgba(255,255,255,0.35); }
   /* Day cards: stacked image-banner cards. Fade them in like the cycle cards. */
   #day-cards-wrap .current-message {
     opacity: 0; transform: translateY(12px);
@@ -1645,7 +1650,7 @@
   body.is-demo { padding-top: 44px; }
   body.is-demo .session-timer { top: 52px; }
   /* The fixed demo banner (44 px, z 120) sat on the dark-mode button and on Guided's ✕ (POL-01). */
-  body.is-demo .global-dark-toggle { top: 58px; }
+  body.is-demo .global-account { top: 58px; }
   body.is-demo .step-overlay { top: 44px; }
   @media (max-width: 460px) {
     .demo-banner { gap: 8px; padding: 7px 10px; font-size: 11px; }
@@ -3043,6 +3048,31 @@
   .ex-set-log .onb-hint { margin: 6px 8px 10px; }
   body[data-dark] .onb-hint { box-shadow: 0 0 0 1px rgba(255,255,255,0.10), 0 6px 18px rgba(0,0,0,0.4); }
   @keyframes onbIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  /* Your account (NAV-02): drawn into the one sheet (#hist-overlay) by openAccount(). */
+  .acct-list { display: flex; flex-direction: column; margin-top: 14px; border-top: 1px solid var(--grey-mid); }
+  .acct-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px;
+    padding: 0 2px; border: 0; border-bottom: 1px solid var(--grey-mid); background: transparent; width: 100%;
+    font-family: 'Barlow', sans-serif; font-size: 16px; font-weight: 500; color: var(--grey-dark);
+    text-align: left; text-decoration: none; cursor: pointer; }
+  .acct-theme { cursor: default; }
+  .acct-go { color: var(--grey-text); font-size: 20px; line-height: 1; }
+  .acct-seg { display: inline-flex; border: 1px solid var(--grey-mid); border-radius: 10px; overflow: hidden; }
+  .acct-seg button { min-width: 64px; min-height: 40px; padding: 0 12px; border: 0; background: transparent; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.8px; text-transform: uppercase;
+    color: var(--grey-text); }
+  .acct-seg button[aria-pressed="true"] { background: var(--yellow); color: var(--on-accent); }
+  .acct-out { margin-top: 22px; display: flex; flex-direction: column; gap: 8px; }
+  .acct-signout { min-height: 48px; border-radius: 10px; border: 1px solid var(--grey-mid); background: transparent; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--clay-ink); }
+  .acct-signout.armed { background: #C7552F; border-color: #C7552F; color: #fff; }
+  .acct-signout:disabled { opacity: 0.7; cursor: default; }
+  .acct-wait { margin: 0; padding: 10px 12px; border-radius: 10px; background: rgba(199,85,47,0.10); color: var(--grey-dark); font-size: 13.5px; line-height: 1.45; }
+  .acct-foot { margin: 0; color: var(--grey-text); font-size: 12.5px; text-align: center; }
+  body[data-dark] .acct-row { color: #eaeaea; border-color: #333; }
+  body[data-dark] .acct-list { border-color: #333; }
+  body[data-dark] .acct-seg, body[data-dark] .acct-signout:not(.armed) { border-color: #444; }
+  body[data-dark] .acct-wait { color: #eaeaea; background: rgba(224,107,67,0.14); }
   .ceil-kick { font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
     letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.78); }
   .ceil-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 44px;
@@ -4273,7 +4303,7 @@
   .timer-overlay, .readiness-overlay, .video-modal {
     left: var(--app-gutter); right: var(--app-gutter);
   }
-  .global-dark-toggle { right: calc(var(--app-gutter) + 14px); }
+  .global-account { right: calc(var(--app-gutter) + 14px); }
   .v-progress { right: var(--app-gutter); }
   /* .a2hs-toast already centres itself on the viewport at max-width 380px,
      so it lands inside the column without help. */
@@ -4589,7 +4619,7 @@
 
     <!-- Opened from the plan saved on this phone (REL-01): one quiet line, painted by
          paintPlanOffline(), gone once the server has confirmed the plan. Under the
-         greeting, not above it: the fixed dark-mode button owns the top right corner. -->
+         greeting, not above it: the fixed account button owns the top right corner. -->
     <div id="home-offline" class="plan-offline" role="status" hidden></div>
 
     <!-- Current cycle card (View Plan pill → My Plan, no Read more) -->
@@ -4680,11 +4710,11 @@
   </button>
 </div>
 
-<!-- Global dark-mode toggle — floats top-right on every nav screen so the theme
-     can be switched (and persisted) without opening a day view. Hidden inside the
-     day view, which carries its own .day-view-dark button. -->
-<button class="global-dark-toggle is-hidden" id="global-dark-toggle"
-  onclick="toggleDark(event)" aria-label="Toggle dark mode" title="Toggle dark mode"></button>
+<!-- The account button (NAV-02) — floats top-right on every nav screen, where the dark-mode
+     toggle was: Theme, Install, How the app works, Privacy, Sign out (openAccount()). Hidden
+     inside the day view, which carries its own .day-view-dark button. -->
+<button class="global-account is-hidden" id="global-account"
+  onclick="openAccount(event)" aria-label="Your account: theme, install, help, privacy, sign out" title="Account"></button>
 
 <!-- ═══ TIMER ═══ -->
 <div class="timer-overlay" id="timerOverlay">
@@ -4974,11 +5004,12 @@ function _snapshot() {
 // the app is being hidden/killed (iOS suspends timers the moment the page is
 // hidden, so a debounced push scheduled from visibilitychange never runs) or
 // the connection just came back after offline pushes were dropped.
+var _signingOut = false;   // set by signOutSafely() after its last push: nothing goes up after it
 function _pushSnapshot(immediate) {
   clearTimeout(_sbTimer);
   // Not pulled yet this run: the edit is on the phone and stamped; it goes up after
   // the pull (_resumeSync()). The pending deletes stay queued for the same push.
-  if (_sbHold) return;
+  if (_sbHold || _signingOut) return;
   const send = async () => {
     try {
       const sb = _sb();
@@ -5002,7 +5033,8 @@ function _pushSnapshot(immediate) {
       }
     } catch (e) { /* offline / blocked — localStorage already has it, ignore */ }
   };
-  if (immediate) { send(); } else { _sbTimer = setTimeout(send, 1500); }
+  if (immediate) return send();   // awaitable: signing out waits for it (NAV-02)
+  _sbTimer = setTimeout(send, 1500);
 }
 // Pull this athlete's saved progress from the cloud on EVERY load and merge it
 // into whatever is on this device, so a returning device (the coach's PC, a
@@ -5878,8 +5910,8 @@ const ERROR_ICONS = {
         n.classList.toggle('active', n.dataset.tab === 'home');
       });
     }
-    // Reveal the global dark-mode toggle and point its icon at the saved theme.
-    const darkToggle = document.getElementById('global-dark-toggle');
+    // Reveal the account button (NAV-02) with the athlete's initials.
+    const darkToggle = document.getElementById('global-account');
     if (darkToggle) darkToggle.classList.remove('is-hidden');
     syncDarkToggle();
     { const _dv = document.getElementById('day-view'); if (_dv && !_dv.hidden) document.getElementById('v-progress').classList.add('active'); }
@@ -6087,6 +6119,88 @@ async function signOutAthlete() {
   } catch (e) { /* signing out locally is enough */ }
   location.replace('program.html');
 }
+
+// ── Your account (NAV-02, 2026-09-27) ──
+// signOutAthlete() existed and nothing called it: a shared family phone, a lent phone or
+// a second account meant clearing the browser. The initials button (top right, where the
+// floating dark-mode toggle was) opens this page in the one sheet: Theme, Install, How the
+// app works, Privacy, and Sign out. Nothing is lost by signing out: what this phone holds
+// stays on it, and before it goes, the progress, a waiting report and a queued session
+// record are sent up (signOutSafely()). Never offered in the demo or the coach preview.
+function _isStandalone() {
+  try { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }
+  catch (e) { return false; }
+}
+function openAccount(e) {
+  if (e) e.stopPropagation();
+  const ov = document.getElementById('hist-overlay');
+  if (!ov || !DATA) return;
+  const a = DATA.athlete || {};
+  const name = [a.firstName, a.lastName].filter(Boolean).join(' ') || 'Your account';
+  const dark = document.body.hasAttribute('data-dark');
+  const waiting = (window.IS_DEMO || window.IS_PREVIEW) ? 0 : loadOutbox().length;
+  const sub = window.IS_DEMO ? 'The demo: nobody is signed in, and nothing is saved.'
+    : window.IS_PREVIEW ? 'Coach preview: you are looking at this athlete\'s app as your coach sign-in.'
+    : 'Signed in on this phone.';
+  const install = (!_isStandalone() && window.A2HS)
+    ? `<button type="button" class="acct-row" id="acct-install"><span>Install the app</span><span class="acct-go">›</span></button>` : '';
+  const out = (window.IS_DEMO || window.IS_PREVIEW) ? '' : `
+    <div class="acct-out">
+      ${waiting ? `<p class="acct-wait">${waiting === 1 ? 'A session report is' : waiting + ' session reports are'} still waiting for signal. It stays on this phone and goes when you sign in here again.</p>` : ''}
+      <button type="button" class="acct-signout" id="acct-signout">Sign out</button>
+      <p class="acct-foot">Your training stays saved. Sign in again with your username and password.</p>
+    </div>`;
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Your account</div>
+    <h2 class="readiness-title">${esc(name)}</h2>
+    <p class="readiness-sub">${sub}</p>
+    <div class="acct-list">
+      <div class="acct-row acct-theme"><span>Theme</span>
+        <span class="acct-seg" role="group" aria-label="Theme">
+          <button type="button" data-theme="light" aria-pressed="${!dark}">Light</button>
+          <button type="button" data-theme="dark" aria-pressed="${dark}">Dark</button>
+        </span></div>
+      ${install}
+      <button type="button" class="acct-row" id="acct-help"><span>How the app works</span><span class="acct-go">›</span></button>
+      <a class="acct-row" href="/privacy.html" target="_blank" rel="noopener"><span>Privacy</span><span class="acct-go">›</span></a>
+    </div>
+    ${out}
+    <div class="hs-actions"><button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button></div>`;
+  ov.querySelectorAll('.acct-seg button').forEach(b => b.addEventListener('click', () => {
+    if ((b.dataset.theme === 'dark') !== document.body.hasAttribute('data-dark')) toggleDark();
+  }));
+  const ins = document.getElementById('acct-install');
+  if (ins) ins.addEventListener('click', () => {
+    closeHistorySheet();
+    try { localStorage.removeItem('a2hs_dismissed_v1'); } catch (err) {}   // asked for: always answer
+    window.A2HS.show();
+  });
+  document.getElementById('acct-help').addEventListener('click', () => {
+    closeHistorySheet();
+    goTo('notes');   // the Coach tab's screen is #screen-notes
+    const lbl = [...document.querySelectorAll('#notes-container .notes-section-label')].find(l => /Using the app/.test(l.textContent));
+    if (lbl) setTimeout(() => lbl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+  });
+  const so = document.getElementById('acct-signout');
+  if (so) so.addEventListener('click', () => armedTap(so, 'Tap again to sign out', () => signOutSafely(so)));
+  ov.classList.add('visible');
+}
+window.openAccount = openAccount;
+// Send what this phone holds, then sign out. The report and the session queue first, the
+// progress last (it carries what they stamped), then nothing more goes up: the page's own
+// pagehide push would run after the sign-out. Each step is capped, so no signal never traps
+// anyone: whatever did not go stays on the phone, under this athlete's id.
+async function signOutSafely(btn) {
+  if (window.IS_DEMO || window.IS_PREVIEW) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving, then signing out…'; }
+  const cap = (p, ms) => Promise.race([Promise.resolve(p).catch(() => {}), new Promise(r => setTimeout(r, ms))]);
+  try { await cap(flushOutbox(), 8000); } catch (e) {}
+  try { await cap(_replayQueue(), 6000); } catch (e) {}
+  try { if (!_sbHold) await cap(_pushSnapshot(true), 6000); } catch (e) {}
+  _signingOut = true;
+  await signOutAthlete();
+}
+window.signOutSafely = signOutSafely;
 
 // ═══════════════════════════════════════════════════════════════════════
 //  2. RENDER: HOME (V5 DESIGN, GRACEFUL FALLBACK)
@@ -6813,8 +6927,8 @@ function openDayView(dayId) {
   if (ov) ov.hidden = true;
   if (dv) dv.hidden = false;
   document.getElementById('v-progress').classList.add('active');
-  // The day view carries its own .day-view-dark button — hide the global one.
-  const gToggle = document.getElementById('global-dark-toggle');
+  // The day view carries its own .day-view-dark button — hide the account button.
+  const gToggle = document.getElementById('global-account');
   if (gToggle) gToggle.classList.add('is-hidden');
 
   // Repeat the tapped day's card at the top (non-clickable), with a back arrow
@@ -6847,8 +6961,8 @@ function closeDayView() {
   hideRestOffer();
   dropHint();
   paintWeek();
-  // Back on a nav screen — bring the global dark-mode toggle back.
-  const gToggle = document.getElementById('global-dark-toggle');
+  // Back on a nav screen — bring the account button back.
+  const gToggle = document.getElementById('global-account');
   if (gToggle) gToggle.classList.remove('is-hidden');
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
@@ -8106,7 +8220,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training. This week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you, the button to message me on WhatsApp, and this guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there.</li></ul>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training. This week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you, the button to message me on WhatsApp, and this guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
   { icon: 'activity', title: 'RPE & Tempo',
@@ -8131,7 +8245,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app — full-screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong> — tick a set and a <strong>Rest</strong> button comes up above the tabs: tap it and the countdown starts. The <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets does the same. It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li><li><strong>Dark mode</strong> — tap the moon button (top-right) to switch themes for low-light gym sessions.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong> — tick a set and a <strong>Rest</strong> button comes up above the tabs: tap it and the countdown starts. The <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets does the same. It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab, in every exercise's ⓘ, and at the end of every session, where your message already says which day or exercise it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days; quick check-ins beat long waits.</p>` },
 ];
@@ -8269,10 +8383,10 @@ function goTo(screen, historyId, keepContent) {
     n.classList.toggle('active', n.dataset.tab === litTab);
   });
 
-  // Every nav screen shows the global tab bar + dark-mode toggle (the Home tab
+  // Every nav screen shows the global tab bar + the account button (the Home tab
   // may return from a day view, which had hidden them).
   document.getElementById('global-tabs').classList.remove('is-hidden');
-  document.getElementById('global-dark-toggle').classList.remove('is-hidden');
+  document.getElementById('global-account').classList.remove('is-hidden');
 
   window.scrollTo(0, 0);
 }
@@ -12654,11 +12768,18 @@ function toggleDark(e) {
   proofStripTheme();
 }
 
-// Reflect the active theme on the floating toggle: sun = tap to go light (dark
-// is on), moon = tap to go dark (light is on). Called on load and every toggle.
+// The account button's face (the athlete's initials, NAV-02) and, when the account sheet
+// is open, its Light / Dark buttons. Called on load and on every theme change.
 function syncDarkToggle() {
-  const btn = document.getElementById('global-dark-toggle');
-  if (btn) btn.innerHTML = window.ICON(document.body.hasAttribute('data-dark') ? 'sun' : 'moon', 1.6);
+  const btn = document.getElementById('global-account');
+  if (btn) {
+    const a = (DATA && DATA.athlete) || {};
+    const ini = ((a.firstName || '').trim().charAt(0) + (a.lastName || '').trim().charAt(0)).toUpperCase();
+    btn.textContent = ini || (ATHLETE_ID || 'A').charAt(0).toUpperCase();
+  }
+  const dark = document.body.hasAttribute('data-dark');
+  document.querySelectorAll('#hist-overlay .acct-seg button').forEach(b =>
+    b.setAttribute('aria-pressed', String((b.dataset.theme === 'dark') === dark)));
 }
 
 // ── Timer ──
