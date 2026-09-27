@@ -237,6 +237,12 @@ as a **segmented meter**. It is the `MEADOW · panels` layer in the CSS: the sam
 skin, tokens and type (see *Voice*), with no new palette — its only additions are
 `--ink-card` (the inverted surface) and `--danger`.
 
+**Sign out** (NAV-02, 2026-09-27) is the last row in Settings: `signOutAthlete()` existed in
+both apps and nothing called it, so a shared or lent phone meant clearing the browser. Two taps
+(*Sure?*, like Reset), then the log is pushed (`pushNow()`, capped at 6 s so no signal never
+traps anyone) and the athlete is signed out of both apps (they share the sign-in). The log stays
+on the phone either way. Never in the demo or a coach preview; the embed has no Settings.
+
 ### 01 · TODAY — the daily loop
 The screen they actually live on. **In this order, and the order is the point:**
 

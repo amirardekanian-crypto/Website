@@ -171,6 +171,10 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Anything that deletes takes two taps** (LOG-02, 2026-09-26): `armedTap(btn, label, run)` arms on the first
   tap (the label says what the next tap does) and acts on a second within 4 s. Reset Session, the session bar's Reset,
   Finish early, a weight reading and a Personal Record go through it. A new delete button uses it.
+- **Signing out never loses training** (NAV-02, 2026-09-27; `PROGRAM-APP.md` → *Your account*): the initials
+  button (top right, where the floating dark toggle was) → Sign out runs `signOutSafely()`: the waiting report, the
+  session queue and the progress go up first, then nothing more is pushed, then `signOutAthlete()`. The athlete's
+  keys stay on the phone. Never offered in the demo or the coach preview. AA Proof's Settings has the same.
 - **One finish, one email** (WK-04, 2026-09-27; `PROGRAM-APP.md` → *One finish*): rate, then **Done** finishes the
   day, saves the record and sends the report once. The report waits in `<id>_outbox` (one entry per session: the day
   and its finish stamp) until it goes, and **never syncs**, or another phone sends it again. A second email only when
@@ -239,7 +243,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v65` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v66` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

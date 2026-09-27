@@ -125,7 +125,9 @@
 //      (Start or Guided, the set circle, How hard?), each gone once the athlete does the thing.
 // v65: program.html changed (2026-09-27, WK-05): a warm-up circuit is a list (cues on a tap), and a
 //      circuit's rest is never invented (it fell back to 60 s).
-const CACHE = 'aap-v65';
+// v66: program.html and habits.html changed (2026-09-27, NAV-02): the initials button opens Theme,
+//      Install, Help, Privacy and Sign out (which sends everything first); Proof's Settings signs out.
+const CACHE = 'aap-v66';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
