@@ -230,12 +230,6 @@
     flex: none; width: 64px; border-right: 2px solid var(--divider);
     display: flex; align-items: center; justify-content: center;
   }
-  .boxmark { width: 28px; height: 28px; border: 2px solid var(--box); display: block; transition: border-color .18s ease, background-color .18s ease; }
-  .boxmark.on {
-    border-color: var(--accent); background: var(--accent); color: var(--bg);
-    display: flex; align-items: center; justify-content: center;
-    animation: pop .28s ease;
-  }
   /* The tick DRAWS rather than appearing — 300ms of stroke is the difference
      between "the state changed" and "you just did that". Scoped to .tick on
      purpose: the same cell also holds the lock glyph on a locked habit, and
@@ -249,8 +243,7 @@
     fill: none; stroke: currentColor; stroke-width: 3.4;
     stroke-linecap: square; stroke-linejoin: miter;
   }
-  .boxmark svg.tick { width: 20px; height: 20px; }
-  .boxmark svg.tick path {
+  .htile .tk svg.tick path {
     stroke-dasharray: 24; stroke-dashoffset: 24;
     animation: drawTick .3s cubic-bezier(.5,0,.3,1) .04s forwards;
   }
@@ -296,11 +289,6 @@
   /* A locked habit is owned by another system — it reads as unavailable rather
      than merely unticked, so nobody taps it expecting a tick. */
   .hrow.locked .checkcell { cursor: default; }
-  .boxmark.lock {
-    border-style: dashed; border-color: var(--muted-soft); color: var(--muted-soft);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .boxmark.lock svg { width: 15px; height: 15px; }
   .hrow.locked .nm, .hrow.locked .status { color: var(--muted); }
 
   /* ── Coach card ── */
@@ -1147,13 +1135,13 @@
   .evfoot strong { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 14px; letter-spacing: .02em; color: var(--clay-deep); }
   .evcard.done .evfoot strong { color: var(--accent); }
 
-  /* The app noticing you have stalled. Breathes the box of the most valuable
+  /* The app noticing you have stalled. Breathes the circle of the most valuable
      habit still undone, ~20s after you last touched anything. */
   @keyframes idleBreathe {
     0%, 100% { transform: scale(1);    border-color: var(--box) }
     50%      { transform: scale(1.14); border-color: var(--clay) }
   }
-  .boxmark.nudge { animation: idleBreathe 2.6s ease-in-out infinite; }
+  .htile.nudge { animation: idleBreathe 2.6s ease-in-out infinite; }
 
   /* A day that is about to break a real streak. The coach's card goes darker,
      and the day bar stops being green about it. */
@@ -1367,42 +1355,46 @@
 
   /* Habit rows → cards */
   #app .hrow { margin: 0 16px 10px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); border-bottom: 0; }
-  /* A subtle teal ring so "done" reads at a glance, not just from the small
-     checkmark badge in the corner. */
-  #app .hrow.done { background: var(--card); box-shadow: var(--shadow), 0 0 0 1.5px rgba(53,208,186,.4); }
-  #app .hrow .checkcell { width: 64px; border-right: 0; padding-left: 10px; }
+  /* THE CIRCLE IS THE TICK (PRF-01, 2026-09-27): a 48 px circle ringed in the habit's colour, filled with
+     it and a white tick once done. The fill says done at a glance, so the teal ring round a done row went. */
+  #app .hrow { --hring: color-mix(in srgb, var(--hcol, var(--accent)) 70%, #231F35); }
+  body[data-dark] #app .hrow { --hring: var(--hcol, var(--accent)); }
+  #app .hrow.done { background: var(--card); }
+  #app .hrow .checkcell { width: 70px; border-right: 0; padding-left: 12px; justify-content: flex-start; }
   #app .htile {
-    position: relative; width: 44px; height: 44px; border-radius: 15px;
-    background: var(--hbg, var(--surface));
+    position: relative; width: 48px; height: 48px; border-radius: 999px;
+    background: var(--card); box-shadow: inset 0 0 0 2.5px var(--hring);
     display: flex; align-items: center; justify-content: center;
-    font-size: 21px; line-height: 1;
+    font-size: 21px; line-height: 1; transition: background-color .18s ease;
   }
   #app .htile[data-code] { font-size: 12px; font-weight: 800; color: var(--muted); letter-spacing: 0.03em; }
-  #app .htile .boxmark {
-    position: absolute; right: -6px; bottom: -6px; width: 22px; height: 22px;
-    border-radius: 999px; border: 2px solid var(--card); background: var(--card);
-    box-shadow: inset 0 0 0 2px var(--box); color: #fff;
-    display: flex; align-items: center; justify-content: center;
-  }
-  #app .htile .boxmark.on { background: var(--hcol, var(--accent)); box-shadow: none; }
-  #app .htile .boxmark svg.tick { width: 12px; height: 12px; }
-  #app .htile .boxmark.lock { width: 20px; height: 20px; background: var(--surface); box-shadow: none; color: var(--muted-soft); border-style: solid; }
-  #app .htile .boxmark.lock svg { width: 10px; height: 10px; }
-  #app .htile.lockt { filter: grayscale(1); opacity: 0.65; }
+  #app .hrow.done .htile { background: var(--hring); box-shadow: none; animation: pop .28s ease; }
+  #app .hrow.done .htile .emo { display: none; }
+  #app .htile .tk { display: flex; width: 24px; height: 24px; color: #fff; }
+  body[data-dark] #app .hrow.done .htile .tk { color: #17142B; }
+  #app .htile .tk svg.tick path { stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+  /* The programme's session: one slim line, last, greyed until the programme ticks it. */
+  #app .hrow.slim .body { padding-top: 10px; padding-bottom: 10px; }
+  #app .htile.lockt { box-shadow: inset 0 0 0 2px var(--box); filter: grayscale(1); opacity: 0.7; }
+  #app .htile .lockb { position: absolute; right: -4px; bottom: -4px; width: 20px; height: 20px; border-radius: 999px;
+    background: var(--surface); color: var(--muted-soft); border: 2px solid var(--card);
+    display: flex; align-items: center; justify-content: center; }
+  #app .htile .lockb svg { width: 10px; height: 10px; }
   #app svg.tick path { stroke-linecap: round; stroke-linejoin: round; }
   #app .hrow .body { padding: 13px 12px 13px 6px; }
   #app .hrow .body .nm { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 15px; line-height: 1.25; letter-spacing: 0; text-transform: none; }
   #app .hrow .body .status { font-size: 11.5px; line-height: 1.3; }
+  /* + : 44 px, in the habit's own tint (it was the row's loudest thing, a solid grape button). */
   #app .hrow .pluscell {
-    flex: none; align-self: center; width: 36px; height: 36px; margin: 0 12px 0 2px;
-    border-radius: 999px; background: var(--accent); color: #fff;
+    flex: none; align-self: center; width: 44px; height: 44px; margin: 0 12px 0 2px;
+    border-radius: 999px; background: var(--hbg, var(--surface)); color: var(--ink);
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 19px;
-    box-shadow: 0 3px 0 var(--accent-700);
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 22px;
   }
-  #app .hrow .pluscell:hover { background: var(--accent-600); }
-  #app .hrow .pluscell:active { transform: translateY(1px); box-shadow: 0 2px 0 var(--accent-700); }
-  #app .hrow.locked .pluscell { background: var(--surface); color: var(--accent); box-shadow: none; }
+  body[data-dark] #app .hrow .pluscell { background: color-mix(in srgb, var(--hcol, var(--accent)) 22%, var(--card)); }
+  #app .hrow .pluscell:hover { filter: brightness(.97); }
+  #app .hrow .pluscell:active { transform: scale(.96); }
+  #app .hrow.locked .pluscell, #app .hrow.slim .pluscell { background: var(--surface); color: var(--accent); }
   #app .hrow + .rowhint { border-bottom: 0; padding: 4px 24px 14px; }
   #app .statnote { border-bottom: 0; padding: 8px 24px 14px; }
   #app .hlv { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 10px; letter-spacing: 0.05em; color: var(--muted-soft); }
@@ -6911,9 +6903,9 @@ function tourSteps() {
   });
 
   S.push({
-    title: 'Tap the box to log it',
+    title: 'Tap the circle to log it',
     body: `That is the daily job, and most days it is the only thing you will touch.
-           On a habit you <strong>count</strong> — steps, sleep, water, meals — the box means
+           On a habit you <strong>count</strong> — steps, sleep, water, meals — the circle means
            <strong>all of it, done</strong>, so it fills the target in one go. Tap it again to clear the day.`,
     screen: 'today', sel: () => $t('.hrow:not(.locked) .checkcell'),
     // Live, so the athlete can finish the step by actually doing it. The hint
@@ -7822,7 +7814,7 @@ function habitRow(h, from, lead, pausedThen) {
   // the job, and it is the half an athlete acts on.
   const left = h.kind === 'count' && !done && !locked ? h.target - v : 0;
   const status = locked
-    ? ((isFree() && h.freeHint) || h.lockedHint || 'Earned elsewhere.')
+    ? ((isFree() && h.freeHint) || h.source || h.lockedHint || 'Earned elsewhere.')
     : (h.kind === 'count'
         ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit
           + (left > 0 ? ' · ' + fmtVal(h, left) + ' to go' : '')
@@ -7830,13 +7822,14 @@ function habitRow(h, from, lead, pausedThen) {
       + (pausedThen ? ' · paused now, but counted this day' : '');
   const nudged = UI.idle === h.id && !done && !locked;
   const hue = habitHue(h), emoParts = splitEmoji(h.name), hEmo = emoParts[0], hLabel = emoParts[1];
-  return `<div class="hrow ${done ? 'done' : ''} ${locked ? 'locked' : ''}" data-k="row:${h.id}" style="--hcol:${hue[0]};--hbg:${hue[1]}">
-    <button class="checkcell" ${on(() => toggleHabit(h))} aria-label="${locked ? esc(h.name) + ' is earned in your programme' : 'Toggle ' + esc(h.name)}">
-      ${locked
-        ? `<span class="htile lockt" aria-hidden="true">${hEmo || esc(h.code)}<span class="boxmark lock">
-             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-           </span></span>`
-        : `<span class="htile"${hEmo ? '' : ' data-code'}>${hEmo || esc(h.code)}<span class="boxmark ${done ? 'on' : ''}${nudged ? ' nudge' : ''}">${done ? TICK : ''}</span></span>`}
+  // THE CIRCLE IS THE TICK (PRF-01, 2026-09-27). The emoji sits in a 48 px circle in the habit's colour and
+  // a tap fills it with a white tick; it used to be a 22 px ring on the tile's corner while + was the loudest
+  // thing on the row. + stays, 44 px, in the habit's own tint: athletes use both (since 15 Aug, 98 of 109
+  // sleep days were the full 7.5 h, a tick; most water, protein and step days stopped part-way, the +).
+  // The programme's session (h.locked) is one slim line at the END of the list: it cannot be ticked here.
+  return `<div class="hrow ${done ? 'done' : ''} ${locked ? 'locked' : ''} ${h.locked ? 'slim' : ''}" data-k="row:${h.id}" style="--hcol:${hue[0]};--hbg:${hue[1]}">
+    <button class="checkcell" ${on(() => toggleHabit(h))} aria-label="${locked ? esc(hLabel) + ' is earned in your programme' : (done ? 'Clear ' : 'Tick ') + esc(hLabel)}"${locked ? '' : ` aria-pressed="${done}"`}>
+      <span class="htile${locked ? ' lockt' : ''}${nudged ? ' nudge' : ''}"${hEmo ? '' : ' data-code'} aria-hidden="true"><span class="emo">${hEmo || esc(h.code)}</span>${done ? `<span class="tk">${TICK}</span>` : ''}${locked ? `<span class="lockb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>` : ''}</span>
     </button>
     <button class="body" ${on(() => openHabit(h.id, from))}>
       <span class="line1">
@@ -8067,7 +8060,10 @@ function renderToday(LI, doneCount, pct) {
            number, and the smaller one is the true one. -->
       ${risk ? `<div class="riskbar" data-k="riskbar">Streak at risk · ${shortOfQualifying()} to go before midnight</div>` : ''}
 
-      ${(() => { const lead = leadStreak(); return rows.map(h => habitRow(h, 'today', lead, past && CFG.on[h.id] === false)).join(''); })()}
+      <!-- What you can tick first; the programme's session last, as one slim line (PRF-01). It led the
+           list, so the first habit an athlete could tick started 466 px down. -->
+      ${(() => { const lead = leadStreak(); return rows.filter(h => !h.locked).concat(rows.filter(h => h.locked))
+          .map(h => habitRow(h, 'today', lead, past && CFG.on[h.id] === false)).join(''); })()}
 
       <!-- DIRECTLY UNDER THE LIST IT DESCRIBES. This line used to be the very
            last element on the screen — measured 580px below the fold, at the
@@ -8077,8 +8073,8 @@ function renderToday(LI, doneCount, pct) {
            still goes BELOW the list (the list is what the screen is for), just
            immediately below rather than after everything else. -->
       <div class="rowhint" data-k="rowhint">
-        Three taps per row: the <strong>box</strong> logs it, the <strong>name</strong> opens its
-        history, <strong>+</strong> adds one${live().some(h => h.kind === 'count' && !h.locked) ? ' (hold it to go faster)' : ''}.
+        Tap the <strong>circle</strong> when it is done${live().some(h => h.kind === 'count' && !h.locked) ? ', <strong>+</strong> to add one (hold it to go faster)' : ''},
+        the <strong>name</strong> for its history.
       </div>
 
       <!-- BELOW the list, and below the hint that explains the list — the hint
@@ -9018,7 +9014,7 @@ function renderManual() {
         p(`Four things and you have the whole app.`) +
         `<div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.55;color:var(--muted);margin-bottom:14px">
           <div>▸ <strong style="color:var(--ink)">Every habit row takes three different taps.</strong> The
-            <strong style="color:var(--ink)">box</strong> logs it. The <strong style="color:var(--ink)">name</strong>
+            <strong style="color:var(--ink)">circle</strong> logs it. The <strong style="color:var(--ink)">name</strong>
             opens that habit's history. <strong style="color:var(--ink)">+</strong> adds one unit at a time, and holding it goes faster.</div>
           <div>▸ <strong style="color:var(--ink)">Four tabs.</strong> Today is where you log, Progress is where you stand, Crew is everyone else, and Locker holds what you have earned.</div>
           <div>▸ <strong style="color:var(--ink)">Your initials, top right,</strong> open Settings from any screen — and close it again. Everything not on a tab is behind them, including this page.</div>

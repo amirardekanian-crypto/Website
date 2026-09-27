@@ -145,7 +145,9 @@
 //      Library returns to where it was, the rest screen is solid, a superset's rows fit 320 px, "Session habit".
 // v75: program.html and habits.html changed (2026-09-27, A11Y-01): pinch-zoom is on in the training app (5x),
 //      and both apps drop only the double-tap zoom (touch-action: manipulation).
-const CACHE = 'aap-v75';
+// v76: habits.html changed (2026-09-27, PRF-01): the circle is the tick, + is 44 px in the habit's tint,
+//      the programme's session is one slim line at the end of Today.
+const CACHE = 'aap-v76';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
