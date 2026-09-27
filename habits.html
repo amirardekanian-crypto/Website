@@ -3459,10 +3459,10 @@ function defaultCfg() {
            // themselves, in EITHER direction — see migrateOld(), which uses it
            // to tell "never decided" from "decided", so a future default flip
            // can only ever move a stale default, never overwrite a real choice.
-           // `seenNotice` gates the one-time disclosure banner on Today — see
-           // renderWtNotice(). Being on by default means most athletes never
-           // chose this, so they are TOLD, once, in a banner that cannot
-           // vanish after a single tap the way the old sub-line copy could.
+           // `seenNotice` gated the one-time disclosure banner on Today
+           // (renderWtNotice()). The banner went with the rest of body weight on
+           // 2026-09-12 and did not come across to program.html; the field stays
+           // because every athlete's synced config carries it.
            wt:{ on:true, range:'30', allReads:false, touched:false, seenNotice:false },
            // Milestone tier open/closed, keyed by tier — missing key reads as
            // open. See msTierHeader().
@@ -3683,9 +3683,10 @@ function isDone(h, dayKey) { return valOf(dayKey || TKEY(), h.id) >= h.target; }
 function fmtVal(h, v) { return h.dec ? Number(v).toFixed(h.dec) : Math.round(v).toLocaleString(); }
 
 // ── Body weight lived here until 2026-09-12 ──────────────────────────────
-// The whole feature (card, history screen, chart, weigh-in sheet, settings
-// sub-screen, disclosure banner) moved to program.html, which now owns
-// <id>_hab_wt outright. ~430 lines of it were deleted from this file once every
+// The card, the history screen, the chart and the weigh-in moved to program.html,
+// which now owns <id>_hab_wt outright. The settings sub-screen and the disclosure
+// banner did not come across: nothing is recorded there until a reading is entered,
+// and every reading deletes in one action (privacy.html section 2.3). ~430 lines of it were deleted from this file once every
 // reference was gone and the closure was verified empty.
 //
 // ⚠️ A handful of small readers (wtKg, wtDays, wtSeries, wtAvgAt, wtAvgSeries,
