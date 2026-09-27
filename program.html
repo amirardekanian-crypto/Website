@@ -538,7 +538,7 @@
   @media (prefers-reduced-motion: reduce) { .cm-pill-active { animation: none; } }
   /* "Up next!" pill on the next cycle — soft tinted clay, quieter than the
      solid Done/Active pills so it reads as upcoming, not current. */
-  .cm-pill-next { background: rgba(255,255,255,0.92); color: #C7552F; box-shadow: 0 1px 4px rgba(0,0,0,0.18); }
+  .cm-pill-next { background: rgba(255,255,255,0.92); color: var(--yellow); box-shadow: 0 1px 4px rgba(0,0,0,0.18); }   /* green on white in both themes (DS-01) */
   /* "Locked" pill on cycles further out — quiet grey. */
   .cm-pill-locked { background: var(--grey-mid); color: var(--grey-dark); }
 
@@ -706,11 +706,11 @@
   /* Square C-badge (C1/C2/…) shown on every cycle card */
   .planlike .cm-num {
     width: 40px; height: 40px; flex-shrink: 0;
-    border: 1.5px solid #C7552F;
+    border: 1.5px solid var(--yellow);
     border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900; font-size: var(--fs-body); color: #C7552F;
+    font-weight: 900; font-size: var(--fs-body); color: var(--green-ink);
   }
 
   /* Strip the original top accent line + radial glow */
@@ -761,7 +761,7 @@
     border-radius: 0;
     box-shadow: none;
   }
-  .planlike .cm-body-label { color: #C7552F; }
+  .planlike .cm-body-label { color: var(--green-ink); }
 
   /* Focus list → numbered list with thin grey separators (no tint background) */
   .planlike .focus-list {
@@ -789,7 +789,7 @@
     font-family: 'Space Mono', monospace;
     font-size: var(--fs-label); font-weight: 700;
     letter-spacing: 1px;
-    color: #C7552F;
+    color: var(--green-ink);   /* the aim numbers are labels: green (DS-01) */
     flex-shrink: 0;
     min-width: 24px;
     line-height: 1.5;
@@ -873,9 +873,8 @@
   .cm-body-label {
     font-family: 'Space Mono', monospace;
     font-size: var(--fs-label); letter-spacing: 1.6px; text-transform: uppercase;
-    color: #C7552F; margin-bottom: 10px;
+    color: var(--green-ink); margin-bottom: 10px;   /* a label, so green (DS-01) */
   }
-  body[data-dark] .cm-body-label, body[data-dark] .outcomes-label { color: #E06B43; }
 
   .cm-body {
     font-family: 'Barlow', sans-serif;
@@ -890,7 +889,7 @@
   .outcomes-label {
     font-family: 'Space Mono', monospace;
     font-size: var(--fs-label); letter-spacing: 1.6px; text-transform: uppercase;
-    color: #C7552F; margin-bottom: 10px;
+    color: var(--green-ink); margin-bottom: 10px;
   }
   .outcome-item {
     display: flex; align-items: flex-start; gap: 10px;
@@ -1283,7 +1282,7 @@
   }
   /* Small "Good morning/afternoon/evening" eyebrow above the big first name */
   .home-greet .home-greet-hi {
-    display: block; color: #C7552F;
+    display: block; color: var(--grey-text);   /* grey (DS-01): a greeting is not "look here" */
     font-family: 'Space Mono', monospace;
     font-size: var(--fs-small); font-weight: 700; letter-spacing: 2px;
     text-transform: uppercase; line-height: 1; margin-bottom: 8px;
@@ -1716,7 +1715,10 @@
     position: sticky; top: 8px; z-index: 40;
     box-shadow: 0 4px 16px rgba(0,0,0,0.10);
   }
-  .session-timer.running { border-color: var(--ice); box-shadow: 0 0 0 3px var(--ice-dim); }
+  /* Green while it runs (DS-01): the running bar was the loudest clay on screen, and the one thing the
+     athlete is not looking at. */
+  .session-timer.running { border-color: var(--yellow); box-shadow: 0 0 0 3px var(--yellow-dim); }
+  body[data-dark] .session-timer.running { border-color: var(--green-ink); box-shadow: 0 0 0 3px rgba(109,190,149,0.14); }
   .session-timer.finished { opacity: 0.85; }
   .session-timer-body { flex: 1; min-width: 0; }
   .session-timer-label {
@@ -1730,7 +1732,7 @@
     color: var(--grey-dark);
     font-variant-numeric: tabular-nums;
   }
-  .session-timer.running .session-timer-time { color: var(--clay-ink); }
+  .session-timer.running .session-timer-time { color: var(--green-ink); }
   .session-timer-btn {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
     font-size: var(--fs-body); letter-spacing: 1px; text-transform: uppercase;
@@ -1740,7 +1742,7 @@
     transition: background 0.15s, transform 0.1s;
   }
   .session-timer-btn:active { transform: scale(0.96); }
-  .session-timer.running .session-timer-btn { background: var(--ice); }
+  .session-timer.running .session-timer-btn { background: var(--yellow); }
   .session-timer.finished .session-timer-btn { display: none; }
   .session-timer-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   /* The clock never shrinks: at any width, the buttons wrap under it before it is cut. */
@@ -2048,14 +2050,13 @@
   }
   body[data-dark] .section-rest { color: #888; }
 
-  /* Per-block section colours — full neon, matching the rest of the design system.
-     Title and line use the same bright variant for a strong, on-brand section break. */
-  .section-header-prog.block-warmup   .section-title { color: var(--clay-ink); }
-  .section-header-prog.block-warmup::after           { background: var(--ice); }
-  .section-header-prog.block-strength .section-title { color: var(--green-ink); }
-  .section-header-prog.block-strength::after         { background: var(--yellow); }
-  .section-header-prog.block-power    .section-title { color: var(--clay-ink); }
-  .section-header-prog.block-power::after            { background: var(--ice); }
+  /* ONE COLOUR FOR EVERY BLOCK (DS-01, Amir's A, 2026-09-27: clay means "look here"). Warm-up and power
+     were clay and strength green, and a block the app did not recognise took its colour from its position
+     ("Core" was clay because it was third), so a block's colour meant nothing an athlete could learn, and
+     it drowned the clay that does: the Coach's note, a Because, an RPE over target, the tempo digit. Every
+     block's title is green, the rule under it grey; blockClass() still names the type for the code. */
+  .section-header-prog[class*="block-"] .section-title { color: var(--green-ink); }
+  .section-header-prog[class*="block-"]::after         { background: var(--grey-mid); height: 2px; }
 
   /* ── Checklist Items ── */
   /* ── Exercise card (refreshed: softer shadow, larger radius, premium feel) ── */
@@ -2073,35 +2074,18 @@
   }
   /* Press feedback — small scale on tap for tactile feel */
   .checklist-item:active { transform: scale(0.99); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
-  /* Checked state — base styling. The actual tint colour is overridden below
-     per block type (warm-up = ice, strength = yellow, power = purple) so the
-     "done" colour matches the section colour the client already sees. */
+  /* Checked state — base styling; the done tint below is green for every block (DS-01). */
   .checklist-item.checked .item-name { text-decoration: line-through; color: #888; }
   .checklist-item.checked .check-box::after { opacity: 1; transform: scale(1); }
 
-  /* Per-block "done" tints — match the left-edge accent stripe colour */
-  .checklist-item.block-warmup.checked {
-    background: rgba(199,85,47,0.12);
-    border-color: rgba(199,85,47,0.40);
-  }
-  .checklist-item.block-warmup.checked .check-box { background: var(--ice); border-color: var(--ice); }
-
-  .checklist-item.block-strength.checked {
-    background: rgba(14,74,54,0.08);
+  /* The "done" tint, the same green for every block (DS-01): a finished warm-up turned clay where a
+     finished strength card turned green. */
+  .checklist-item.checked[class*="block-"] {
+    background: var(--yellow-dim);
     border-color: rgba(14,74,54,0.40);
   }
-  .checklist-item.block-strength.checked .check-box { background: var(--yellow); border-color: var(--yellow); }
-
-  .checklist-item.block-power.checked {
-    background: rgba(199,85,47,0.12);
-    border-color: rgba(199,85,47,0.40);
-  }
-  .checklist-item.block-power.checked .check-box { background: var(--ice); border-color: var(--ice); }
-
-  /* Dark-mode variants — slightly brighter tints so the colour reads on a black bg */
-  body[data-dark] .checklist-item.block-warmup.checked   { background: rgba(199,85,47,0.10); border-color: rgba(199,85,47,0.30); }
-  body[data-dark] .checklist-item.block-strength.checked { background: rgba(14,74,54,0.07);   border-color: rgba(14,74,54,0.30); }
-  body[data-dark] .checklist-item.block-power.checked    { background: rgba(199,85,47,0.10); border-color: rgba(199,85,47,0.30); }
+  .checklist-item.checked[class*="block-"] .check-box { background: var(--yellow); border-color: var(--yellow); }
+  body[data-dark] .checklist-item.checked[class*="block-"] { background: rgba(109,190,149,0.08); border-color: rgba(109,190,149,0.30); }
 
   /* Left-edge accent stripe — color matches block type, same palette as the home page */
   .checklist-item::before {
@@ -2112,9 +2096,8 @@
     background: transparent;
     transition: opacity 0.25s, background 0.25s;
   }
-  .checklist-item.block-warmup::before   { background: var(--ice); }
-  .checklist-item.block-strength::before { background: var(--yellow); }
-  .checklist-item.block-power::before    { background: var(--ice); }
+  .checklist-item[class*="block-"]::before { background: var(--yellow); }   /* one colour (DS-01) */
+  body[data-dark] .checklist-item[class*="block-"]::before { background: var(--green-ink); }
   .checklist-item.checked::before        { opacity: 0.45; }
 
   .item-main { display: flex; align-items: center; padding: 16px 18px; gap: 14px; }
@@ -3449,7 +3432,7 @@
   body[data-dark] .ceil-help { background: #1e1e1e; border-color: #333; }
   .ceil-help summary { list-style: none; cursor: pointer; padding: 15px 16px;
     font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700;
-    letter-spacing: 1.3px; text-transform: uppercase; color: var(--clay-ink); }
+    letter-spacing: 1.3px; text-transform: uppercase; color: var(--green-ink); }
   .ceil-help summary::-webkit-details-marker { display: none; }
   .ceil-help summary::after { content: '＋'; float: right; font-size: var(--fs-small); line-height: 1; }
   .ceil-help[open] summary::after { content: '−'; }
@@ -3475,7 +3458,7 @@
   .ceil-add {
     display: flex; align-items: center; justify-content: center; gap: 8px;
     width: 100%; margin-top: 18px; padding: 14px;
-    background: var(--ice); color: var(--on-accent);
+    background: var(--yellow); color: var(--on-accent);   /* a button, so green (DS-01) */
     border: none; border-radius: 10px; cursor: pointer;
     font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700;
     letter-spacing: 1.2px; text-transform: uppercase;
@@ -4143,10 +4126,10 @@
 
   /* ── Guided Mode entry point (session-timer bar) ── */
   .session-timer-actions { display: flex; gap: 8px; flex-shrink: 0; }
-  .session-timer-btn.guided { background: transparent; color: var(--clay-ink); border: 1.5px solid var(--ice); }
-  body[data-dark] .session-timer-btn.guided { background: transparent; }
-  /* `.session-timer.running .session-timer-btn` fills every timer button with clay, which
-     left Guided as clay text on clay, a blank block, for the whole of a running session. */
+  .session-timer-btn.guided { background: transparent; color: var(--green-ink); border: 1.5px solid var(--yellow); }
+  body[data-dark] .session-timer-btn.guided { background: transparent; border-color: var(--green-ink); }
+  /* `.session-timer.running .session-timer-btn` fills every timer button, which would leave Guided as
+     green text on green, a blank block, for the whole of a running session. */
   .session-timer.running .session-timer-btn.guided { background: transparent; }
 
   /* ── Guided Mode — walks the day's standard exercises one set at a time. See

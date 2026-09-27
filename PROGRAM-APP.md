@@ -674,6 +674,28 @@ opened from it (`_libScrollY` in `goTo()`; the Library tab, or any other way in,
   keeps pinch and scroll and drops only the double-tap zoom, which on an iPhone could fire on two quick taps of
   +15s or an RPE button. Every field is 16 px (DS-03, below), so tapping one does not zoom the page either.
 
+## 🎨 Clay means "look here" (DS-01, 2026-09-27)
+
+Amir's pick A (*"Clay's Jobs"* page): the brand's one accent marked almost everything, block headers, done
+tints, the running bar, labels, and so it marked nothing. Now:
+
+- **Clay stays on what asks the athlete to look**: the Coach's note (the box, its label, *More*, and the dot
+  after the name), a Because (the solid clay ⓘ), an RPE over its target (the set's RPE tag, the selected
+  button, the Last time box and the ghost line under a set that ran over), the tempo digit, a banner that asks
+  for something (a day never sent, a report waiting), and the one number on a dark Home card (*Week 2*, the
+  habits row's *2 to go*). The Library's Playbook door keeps its clay: it is a brand tile, not a signal.
+- **Green or grey for everything else**: every block's title, stripe and done tint are the same green (warm-up
+  and power were clay and strength green, and a block the app did not recognise took its colour from its
+  position, so *Core* was clay because it was third; `blockClass()` still names the type for the code); the
+  rule under a block title is grey; the running session bar, its clock and Pause; Guided; *Good afternoon*
+  (grey); Game Plan's labels, aim numbers and *Up next!*; *+ Log a max* and *How this works* on Records.
+- **Buttons stay green**, as the design bible says (B, clay buttons, was not picked).
+- Every clay colour code touched became its token (`--ice` / `--clay-ink`): 87 written out on main, 78 now.
+
+⚠️ **Before you colour something clay, ask whether it asks the athlete to look.** A header, a label, a
+state or a button is green or grey. `ds01-test.js` in the session's scratchpad renders the day, a session,
+Home, Game Plan and Records in both themes and fails on any clay outside the list above.
+
 ## 🔠 One type scale (DS-03, 2026-09-27)
 
 Before: 46 font sizes, 22 of them between 6 and 20 px, 34 pairs within a pixel, text down to 7.5 px (the
