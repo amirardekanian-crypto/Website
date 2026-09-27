@@ -106,8 +106,8 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
    phone's dark setting.
 2. **Foundations:** done. HOME-02 shipped from Amir's notes on the mockup (#258): no separate Today card, no
    rest-day design ("we don't know their rest days"); done days small, undone days big, the in-progress card.
-3. **The session:** CARD-01, WK-02, WK-01's layout part, CARD-02, CARD-03, WK-04, ONB-01, WK-05.
-   Confirm the card freeze with Amir first (below).
+3. **The session** (the card freeze is lifted): WK-02 first (clear direction, built directly), then CARD-01 with
+   CARD-02 and CARD-03 as one mockup for Amir, then WK-01's layout part, WK-04, ONB-01, WK-05.
 4. **Home and progress:** PROG-01.
 5. **Coach and Proof:** COACH-02, NAV-02, SEAM-01 (after the habit count below), PRF-01, PRF-02,
    PRF-03.
@@ -122,8 +122,7 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
   rather than in that exercise's Coach's Note (PRG-2). The words were left as written when the demo
   was converted (#232). Fixing them is a programme write, so the programme-run rules in CLAUDE.md
   apply.
-- **The card freeze** (fork 4 B): no new exercise-card features until most athletes are on the new
-  format. CARD-01 to CARD-03 re-lay the card rather than add to it; confirm that before designing.
+- **The card freeze is lifted** (Amir, 2026-09-27: "dont freeze anything").
 - **Habit logging after the Home strip.** At the audit, 5 of 40 coached athletes had logged a habit
   in a week while 16 had trained in two. Count again around 2026-10-17. If it hasn't moved, fork 1 A
   (Proof in the training app's look, "← Training", one install, one theme) is the next step.
@@ -139,10 +138,10 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
   for the day to count. Proof does not know the training week. Options: leave it (the door exists for
   exactly this); let the athlete mark a rest day (a new tap, and scoring on both sides: `dayQualifies()`
   and the server's copy); or read the programme's days per week and excuse that many non-training days.
-  Nudge copy already treats it kindly. Amir's call; it changes both scorers.
+  **Answered: leave it** (2026-09-27, "We dont know a rest day"). No scorer changes.
 - **Follow the phone's dark setting (A11Y-01).** Both apps start light and switch only on a tap. Following the
   phone by default means athletes whose phones go dark at night see the app dark without choosing it; the
-  dark theme reads properly since A11Y-01. Amir's call: it changes how the app looks for many athletes.
+  dark theme reads properly since A11Y-01. **Answered: the athlete chooses** (2026-09-27); nothing follows the phone.
 - **An unfinished day (DATA-02).** Sets ticked on a day that was never finished carry into next week and never
   reach Amir. Options: record it automatically as a partial session on the day it was logged (Amir sees
   it in coach.html like a Finish Anyway), ask the athlete on their next open ("You didn't finish Tuesday:

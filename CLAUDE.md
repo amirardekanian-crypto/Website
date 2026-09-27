@@ -169,11 +169,12 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   button, move a control or change when a card appears, and change its guide card in the same PR (CNT-01,
   2026-09-26: it had said "Send Data to Coach" and "tap the timer icon" for weeks). The Library's "ticks your
   habit" line reads AA Proof's config through `_wsHabitOn()`, read only.
+- **Dark mode is the athlete's choice** (Amir, 2026-09-27: *"Let the client choose dark mode"*): both apps start
+  light and switch only on the athlete's tap; neither follows the phone's setting.
 - **No yellow, gold, ochre or amber in either app**, AA Proof's metals included (its gold tier became
   emerald on 2026-09-26; Amir, asked whether Proof was an exception: *"fix"*).
-- **No new exercise-card features until most athletes are on the new format** (Amir, 2026-09-26, Five
-  Forks fork 4 B). The demo was converted that day; everyone else changes over at their next cycle.
-  The tab that holds the whole plan is **Game Plan** (it was My Plan). Only the current cycle opens expanded;
+- **The exercise card is not frozen** (Amir, 2026-09-27: *"dont freeze anything"*, lifting Five Forks fork 4 B).
+  Athletes still change to the new card format at their next cycle; the demo is already on it. The tab that holds the whole plan is **Game Plan** (it was My Plan). Only the current cycle opens expanded;
   past and future cycles are folded (Amir, 2026-09-26, PLAN-01), and the welcome's button opens Day 1.
 
 ## The habit app (`habits.html`, AA Proof) — read `HABITS.md` before changing it
