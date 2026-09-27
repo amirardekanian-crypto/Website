@@ -32,7 +32,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-27)
 
-**40 done · 3 partly done · 1 open**, of 44. Each was checked against the code on `main`.
+**41 done · 2 partly done · 1 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -84,6 +84,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#278](https://github.com/amirardekanian-crypto/Website/pull/278) | Pinch-zoom in the training app (it was locked at 1×; now 5×, as AA Proof); both apps drop only the double-tap zoom (`touch-action: manipulation`) | A11Y-01 |
 | [#279](https://github.com/amirardekanian-crypto/Website/pull/279) | AA Proof: the circle is the tick (a 48 px circle that fills with a white tick, the emoji inside it), + is 44 px in the habit's tint, the programme's session is one slim line at the end of Today: the first habit you can tick moved up the screen (Amir's pick A of the mockup) | PRF-01 |
 | [#280](https://github.com/amirardekanian-crypto/Website/pull/280) | AA Proof's Today leads with the verdict, **2 to go**, then On target, then Perfect, instead of the day's percentage (68% on a rest day that counted); the count is exact (it said 1 when 2 were needed); the ring round the initials is gone; the training app's habits row and the strip's head say the same words (no more "day complete" beside "1 of 5 done"). Display only | PRF-03 |
+| [#290](https://github.com/amirardekanian-crypto/Website/pull/290) | The Quality sheet shows no "How we measure it" (Amir's A): it named tests an athlete never meets (a 505 test, a Yo-Yo test); the words stay on the server for coach.html, and the guide no longer promises "how we test it" | POL-01 |
 | [#289](https://github.com/amirardekanian-crypto/Website/pull/289) | The Library's Sessions as a list (Amir's A): each shelf's photo once, as a band with **All N ›** (the dead › now shows the rest), then three rows saying what each session is for, its minutes and kit, and ✓ the AA Proof habit it ticks (only when Proof will give one); and a session at the right moment (C): a sore check-in's finished card offers *The Morning After*, a finished week's Home offers *Green Light*, each gone once opened, its ← back to where it was offered | LIB-01 |
 | [#288](https://github.com/amirardekanian-crypto/Website/pull/288) | One primary button in the training app: Sign in, Open Day 1, Begin session, Start, Rest, Guided's Done, Send it, Done · send to coach, + Log a max, Weigh in and the rest timer's Pause wear one green look (there were eleven, two of them clay) | DS-03 |
 | [#287](https://github.com/amirardekanian-crypto/Website/pull/287) | Clay means "look here" in the training app (Amir's A): it stays on the Coach's note, a Because, an RPE over target, the tempo digit and the dark Home card's number; every block is one green (a block's colour came from its position), and the running bar, Guided, labels and + Log a max went green or grey | DS-01 |
@@ -94,11 +95,9 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#282](https://github.com/amirardekanian-crypto/Website/pull/282) | AA Proof's celebrations (PRF-02 part 1, Amir's 1A): the whole screen only for a new level (its reward on the same screen), a new rank and a day streak from 7 days; a medal, a tier, a habit's rank, a perfect day, a comeback and the 3-day mark land on a card under Today's hero, with their XP, until tapped. A made-up athlete's first 22 days: 30 takeovers → 9, nothing lost | PRF-02 (part) |
 | [#281](https://github.com/amirardekanian-crypto/Website/pull/281) | AA Proof's week is drawn once on the card and is the day picker: seven days ticked when on target, the last four tapped to fill in a day (the four chips with a percentage each went); the card a size smaller; a long rank's name no longer runs under the streak tile at 320–360 px. The first habit you can tick: 360 → 261 px at 390 × 844 | PRF-05 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276), PRF-01 (#279), PRF-03 (#280), PRF-05 (#281), POL-02 (#285), DS-01 (#287), DS-03 (#275, #288), PRF-02 (#282–#286), LIB-01 (#289), A11Y-01 (#245, #275, #278, #285, #286; following the phone's dark setting is not wanted: the athlete chooses). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276), PRF-01 (#279), PRF-03 (#280), PRF-05 (#281), POL-02 (#285), DS-01 (#287), DS-03 (#275, #288), PRF-02 (#282–#286), LIB-01 (#289), POL-01 (#252, #277, #290), A11Y-01 (#245, #275, #278, #285, #286; following the phone's dark setting is not wanted: the athlete chooses). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
 
 **Partly done, and what is still open on each:**
-- **POL-01.** Swept (#252, #277). Still open: the Quality sheet's "How we measure it" names tests athletes
-  never meet; Amir's answer is A, hide it on the athlete's sheet (display only; the server data stays).
 - **SEAM-01.** Habits are ticked on Home. The full Proof app still has no way back to training,
   offers a second install, keeps its own dark-mode switch, and reads workout ticks only at launch.
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
@@ -127,7 +126,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
   per shelf with All N › (the dead › fixed); and both moments, a sore check-in's finish card offers *The Morning
   After* and a finished week's Home offers *Green Light*, each once. Built (#289); the prototypes were `lib01-proto.js`.
 - **The Quality sheet's "How we measure it"**: A, hidden on the athlete's sheet (display only; the words stay on
-  the server for coach.html).
+  the server for coach.html). Built (#290).
 
 **The training app's list is done**: stop-the-bleeding, foundations, the whole session (#260–#269), Home and
 progress (#258, #271), the account and the guide (#268, #270), each told in full in `PROGRAM-APP.md`. What
@@ -158,7 +157,7 @@ is left is mostly AA Proof, then design-system polish. Work it in this order:
 4. **P3 and the partly-done leftovers**, in this order: ~~CONS-01~~ (#274), DS-03 (the type scale is #275;
    one primary button goes with DS-01), ~~LIB-01~~ (#289, A and C), ~~NAV-01's close grammar~~
    (#276), ~~POL-01's leftovers~~ (#277; the
-   Quality sheet's line is hidden on the athlete's sheet, A), ~~A11Y-01's pinch-zoom~~ (#278), and DOC-01 last.
+   Quality sheet's line, A, #290), ~~A11Y-01's pinch-zoom~~ (#278), and DOC-01 last.
 5. **SEAM-01 waits for the count** around 2026-10-17 (below). If habit logging has not moved, fork 1 A
    (Proof in the training app's look, "← Training", one install, one theme) is next, and it takes DS-03's
    Proof half with it.
@@ -210,7 +209,7 @@ the working card folds How to do it if Amir wants that too.
 - Once per clone: `git config core.hooksPath .githooks`.
 - Use the branch the session names. After each merged PR, restart it from main:
   `git fetch origin main && git checkout -B <branch> origin/main`.
-- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v86` on
+- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v87` on
   2026-09-27) whenever a cached app file changes, log the version in its comment list, and change the
   name in CLAUDE.md too.
 - Test in a headless browser before every PR (below): the harness is in the repo, the checks you write
