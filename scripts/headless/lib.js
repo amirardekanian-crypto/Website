@@ -78,6 +78,17 @@ const HISTORY = [
   ] },
 ];
 
+// What get_library() answers, built from the repo's workouts/ files (the database's copy of the Library, same
+// fields): { workout: [{ id, title, banner, icon, items: [each session's JSON] }], article: [] }. Pass it as
+// stub: { library: library() }; without it get_library answers nothing and the app falls back to workouts/index.json,
+// which has no focusTag or countsAs.
+function library() {
+  const root = path.join(__dirname, '..', '..');
+  const idx = JSON.parse(fs.readFileSync(path.join(root, 'workouts', 'index.json'), 'utf8'));
+  return { workout: idx.categories.map(c => ({ id: c.id, title: c.title, banner: c.banner, icon: c.icon,
+    items: (c.workouts || []).map(w => JSON.parse(fs.readFileSync(path.join(root, w.file), 'utf8'))) })), article: [] };
+}
+
 async function context(browser, opts) {
   const ctx = await browser.newContext({ viewport: { width: opts.w || 390, height: opts.h || 844 },
     isMobile: true, hasTouch: !!opts.touch, serviceWorkers: 'block' });
@@ -154,4 +165,4 @@ function outDir() {
   return dir;
 }
 
-module.exports = { BASE, ID, STUB, launch, fixture, SPINE, HISTORY, openProgram, openProof, card, checker, outDir, past };
+module.exports = { BASE, ID, STUB, launch, fixture, SPINE, HISTORY, library, openProgram, openProof, card, checker, outDir, past };

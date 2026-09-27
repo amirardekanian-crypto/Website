@@ -1146,20 +1146,34 @@
   .w-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-display); line-height: 1; letter-spacing: -0.5px; text-transform: uppercase; color: #fff; margin-top: 7px; }
   .w-sub { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-top: 8px; }
   .w-scroll { padding: 0 0 110px; }
-  .w-shelf { margin-bottom: 2px; }
-  .shelf-head { display: flex; align-items: baseline; gap: 11px; padding: 22px 20px 12px; }
-  .shelf-n { font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-small); color: var(--clay-ink); }
-  .shelf-t { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title); letter-spacing: 0.4px; text-transform: uppercase; color: var(--ink); }
-  .shelf-more { margin-left: auto; color: var(--clay-ink); font-size: var(--fs-lead); }
-  .w-rail { display: flex; gap: 14px; overflow-x: auto; padding: 0 18px 6px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-  .w-rail::-webkit-scrollbar { height: 0; }
-  .vcard { flex-shrink: 0; width: 176px; cursor: pointer; }
-  .vcard:active { transform: scale(0.99); }
-  .vthumb { position: relative; height: 118px; border-radius: 16px; overflow: hidden; background-color: #0E4A36; background-size: cover; background-position: center; }
-  .veq { position: absolute; bottom: 9px; left: 9px; font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.85); }
-  .vt { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-lead); line-height: 1.05; text-transform: uppercase; color: var(--ink); margin: 10px 2px 0; }
-  .vm { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); margin: 3px 2px 0; }
-  .w-rail .wl-coming { flex-shrink: 0; width: 240px; margin: 0; }
+  /* The shelves as a list (LIB-01, Amir 2026-09-27, pick A): the shelf's photo once, as a band holding its
+     number, name and All N ›, then three sessions as rows. No clay here: a row is not a "look here" (DS-01). */
+  .w-shelf { margin: 0 0 6px; }
+  .shelf-band { position: relative; display: flex; align-items: flex-end; gap: 10px; box-sizing: border-box;
+    width: calc(100% - 36px); height: 84px; margin: 18px 18px 0; padding: 12px 14px; border: 0; border-radius: 16px; overflow: hidden;
+    background-color: #0E4A36; background-size: cover; background-position: center; color: #fff; text-align: left; font: inherit; }
+  button.shelf-band { cursor: pointer; }
+  .shelf-band::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(8,18,13,0.86) 0%, rgba(8,18,13,0.45) 70%, rgba(8,18,13,0.25) 100%); }
+  .shelf-band > * { position: relative; }
+  .shelf-n { font: 700 var(--fs-small)/1 'Space Mono', monospace; color: rgba(255,255,255,0.8); }
+  .shelf-t { font: 900 var(--fs-title)/1 'Barlow Condensed', sans-serif; letter-spacing: 0.4px; text-transform: uppercase; color: #fff;
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .shelf-all { margin-left: auto; flex: none; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #fff; background: rgba(255,255,255,0.16); border-radius: 99px; padding: 8px 11px; white-space: nowrap; }
+  .shelf-list { margin: 2px 18px 0; }
+  .shelf-row { display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; padding: 13px 4px; border: 0; background: none;
+    text-align: left; cursor: pointer; font: inherit; color: var(--grey-dark); }
+  .shelf-row + .shelf-row { border-top: 1px solid var(--grey-card); }
+  .w-shelf:not(.open) .shelf-row.more { display: none; }
+  .shelf-row:active { background: rgba(0,0,0,0.03); }
+  .sr-b { display: grid; gap: 3px; min-width: 0; }
+  .sr-name { font: 900 var(--fs-lead)/1.05 'Barlow Condensed', sans-serif; text-transform: uppercase; color: var(--grey-dark); }
+  .sr-for { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey-text); }
+  .sr-meta { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); }
+  .sr-meta:empty { display: none; }
+  .sr-tick { color: var(--green-ink); white-space: nowrap; }
+  .sr-go { margin-left: auto; flex: none; color: var(--grey-text); font-size: var(--fs-title); }
+  .shelf-list .wl-coming { margin: 10px 0 0; }
 
   /* Playbook world — clay hero + paper body */
   .lib-pane-dark { background: var(--grey-bg); min-height: 100vh; padding-bottom: 90px; }
@@ -1334,6 +1348,19 @@
   .hrow-q { font: 400 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--grey-dark); }
   .hrow.quiet .hrow-a { color: var(--grey-text); }
   #home-habits-wrap { margin-top: 24px; }
+  /* A session at the right moment (LIB-01, Amir 2026-09-27, pick C): Home offers one when the week is done, the
+     finished card one after a sore check-in. Its kicker is clay because it asks the athlete to look (DS-01's
+     "a banner that asks for something"); the rest is the row's grey. paintWeekSugg() / paintSoreSugg(). */
+  .lib-sugg { display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; padding: 12px 14px; cursor: pointer;
+    border: 1px solid var(--grey-mid); border-radius: 12px; background: var(--white); color: var(--grey-dark); text-align: left; font: inherit; }
+  .lib-sugg-b { display: grid; gap: 5px; min-width: 0; }
+  .lib-sugg-k { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--clay-ink); }
+  .lib-sugg-q { font: 400 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--grey-dark); }
+  .lib-sugg-q b { font-weight: 600; }
+  .lib-sugg-a { margin-left: auto; flex: none; color: var(--grey-text); font-size: var(--fs-title); }
+  #home-sugg-wrap:not(:empty) { margin: 14px 24px 0; }
+  .complete-sugg-slot:not(:empty) { margin: 0 0 4px; }
+  .session-complete .lib-sugg { background: var(--grey-bg); }
   /* "2 of 3 sessions done this week" (HOME-01), from paintWeek(). */
   /* An unfinished day (DATA-02): one card above This Week, clay edge like a Coach's Note. */
   .uf-card { margin: 0 24px 16px; padding: 14px 16px; border-radius: 12px; display: grid; gap: 6px;
@@ -4705,7 +4732,7 @@
      Proof habits and the coach's report. See supabase/stage28_library_sessions.sql. -->
 <div id="screen-workout" class="screen">
   <div class="ws-header">
-    <button class="nav-back" onclick="goTo('workouts')" aria-label="Back to workouts">←</button>
+    <button class="nav-back" onclick="wsBack()" aria-label="Back">←</button>
     <div class="ws-eyebrow" id="ws-eyebrow"></div>
     <div class="ws-title" id="ws-title"></div>
     <div class="ws-meta" id="ws-meta"></div>
@@ -4782,6 +4809,8 @@
 
     <!-- Day cards — each opens that day's workout -->
     <div id="day-cards-wrap"></div>
+    <!-- The week is done: one short extra from the Library, until it has been opened (LIB-01, paintWeekSugg()) -->
+    <div id="home-sugg-wrap"></div>
 
     <!-- Daily Habits — Proof's own Today hero. Training comes first (2026-09-26:
          Amir left the order to the audit's call). It sat ABOVE the week from
@@ -7184,6 +7213,7 @@ function paintWeek() {
     ? `All ${ids.length} sessions done this week`
     : `${n} of ${ids.length} sessions done this week`;
   el.classList.toggle('all', n >= ids.length);
+  paintWeekSugg();   // the week is done: one short extra (LIB-01)
 }
 
 // The in-progress card's clock ticks while Home is on screen.
@@ -7241,6 +7271,7 @@ function openDayView(dayId) {
   // so coerce numeric strings back to Number before handing it over.
   const n = (typeof dayId === 'string' && /^\d+$/.test(dayId)) ? Number(dayId) : dayId;
   switchDay(n);
+  paintSoreSugg(String(dayId));
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -7612,6 +7643,8 @@ function renderHome() {
       <div class="complete-emoji">✓</div>
       <div class="complete-title">${esc(day.completionTitle)}</div>
       <div class="complete-sub">${esc(day.completionMessage)}</div>
+      <!-- After a sore check-in: the day-after session, until it has been opened (LIB-01, paintSoreSugg()) -->
+      <div class="complete-sugg-slot" id="sugg-${day.id}"></div>
       <!-- Confirms the WORKOUT habit was ticked in Proof, so the athlete can
            see the two apps agreed without leaving this screen. -->
       <button type="button" class="complete-habit" id="habit-tick-${day.id}" hidden onclick="goHabits()">
@@ -8518,7 +8551,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -8627,8 +8660,10 @@ function coachContactHtml() {
 // Where the Library was scrolled when a session or an article opened from it (POL-01): coming back
 // returns there, not to the top of the shelves. Any other route to the Library forgets it.
 let _libScrollY = null;
+let _wsReturn = null;   // where a suggested Library session's ← goes (LIB-01): wsBack()
 function goTo(screen, historyId, keepContent) {
   hideRestOffer();
+  if (screen !== 'workout') _wsReturn = null;
   const was = (document.querySelector('.screen.active') || {}).id || '';
   if (was === 'screen-workouts' && (screen === 'workout' || screen === 'article')) _libScrollY = window.scrollY;
   const libBack = screen === 'workouts' && (was === 'screen-workout' || was === 'screen-article') && _libScrollY != null;
@@ -8669,6 +8704,7 @@ function goTo(screen, historyId, keepContent) {
     if (hh) hh.innerHTML = habitCardHtml();
     const hw = document.getElementById('home-weight-wrap');
     if (hw) hw.innerHTML = weightCardHtml();
+    paintWeekSugg();   // gone once its session has been opened (LIB-01)
   }
 
   // Leaving The Ceiling by any route other than its own back chevron drops the
@@ -9701,7 +9737,13 @@ async function ensureLibManifests() {
   }
 }
 
-// ── SESSIONS world — numbered category shelves (rails). No tabs, no filters. ──
+// ── SESSIONS world — the shelves as a list (LIB-01, Amir 2026-09-27, pick A) ─────────────────
+// Each shelf's photo once, as a band holding its number and name; under it, the first three sessions as rows
+// that say what each is for, its minutes and kit, and ✓ the AA Proof habit it ticks (only when Proof will give
+// one: libTickLabel()). A longer shelf wears "All N ›" on its band, which shows the rest in place. Before, every
+// card wore its shelf's one photo, two showed per shelf, the other 28 sat behind a sideways swipe, and the ›
+// beside each name did nothing. The shelves, their order and every session page are as they were.
+const SHELF_SHOWN = 3;
 async function renderSessionsWorld() {
   if (_sessionsRendered) return;
   const scroll = document.getElementById('wl-scroll-train');
@@ -9713,21 +9755,143 @@ async function renderSessionsWorld() {
   scroll.innerHTML = cats.map((cat, i) => {
     const list = Array.isArray(cat.workouts) ? cat.workouts : [];
     const num = String(i + 1).padStart(2, '0');
-    const banner = esc(cat.banner || '');
-    const cards = list.length
-      ? list.map(w => `
-          <div class="vcard" role="button" tabindex="0" data-file="${esc(w.file || '')}" onclick="openWorkout(this.dataset.file)">
-            <div class="vthumb" style="background-image:url('${banner}')">
-              ${w.equipment ? `<span class="veq">${esc(w.equipment)}</span>` : ''}
-            </div>
-            <div class="vt">${esc(w.title || '')}</div>
-            ${w.duration ? `<div class="vm">${esc(w.duration)}</div>` : ''}
-          </div>`).join('')
+    const more = list.length > SHELF_SHOWN;
+    const bg = cat.banner ? ` style="background-image:url('${esc(cat.banner)}')"` : '';
+    const band = `<span class="shelf-n">${num}</span><span class="shelf-t">${esc(cat.title || '')}</span>`
+      + (more ? `<span class="shelf-all">All ${list.length} ›</span>` : '');
+    const head = more
+      ? `<button type="button" class="shelf-band" aria-expanded="false" aria-label="${esc(cat.title || '')}: all ${list.length} sessions" data-n="${list.length}" onclick="toggleShelf(this)"${bg}>${band}</button>`
+      : `<div class="shelf-band"${bg}>${band}</div>`;
+    const rows = list.length
+      ? list.map((w, j) => shelfRowHtml(w, j >= SHELF_SHOWN)).join('')
       : `<div class="wl-coming">Your coach is adding ${esc((cat.title || '').toLowerCase())} sessions — check back soon.</div>`;
-    return `<div class="w-shelf"><div class="shelf-head"><span class="shelf-n">${num}</span><span class="shelf-t">${esc(cat.title || '')}</span><span class="shelf-more" aria-hidden="true">›</span></div><div class="w-rail">${cards}</div></div>`;
+    return `<div class="w-shelf">${head}<div class="shelf-list">${rows}</div></div>`;
   }).join('');
   _sessionsRendered = true;
 }
+function shelfRowHtml(w, more) {
+  const tick = libTickLabel(w.countsAs);
+  const meta = [w.duration, w.equipment].filter(Boolean).map(esc).join(' · ');
+  return `<button type="button" class="shelf-row${more ? ' more' : ''}" data-file="${esc(w.file || '')}" onclick="openWorkout(this.dataset.file)">
+      <span class="sr-b"><span class="sr-name">${esc(w.title || '')}</span>${w.focusTag ? `<span class="sr-for">${esc(w.focusTag)}</span>` : ''}<span class="sr-meta">${meta}${
+        tick ? `${meta ? ' · ' : ''}<span class="sr-tick">✓ ${esc(tick)}</span>` : ''}</span></span>
+      <span class="sr-go" aria-hidden="true">›</span></button>`;
+}
+function toggleShelf(btn) {
+  const shelf = btn.closest('.w-shelf');
+  const open = !shelf.classList.contains('open');
+  shelf.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', String(open));
+  const all = btn.querySelector('.shelf-all');
+  if (all) all.textContent = open ? 'Show fewer ‹' : 'All ' + btn.dataset.n + ' ›';
+}
+window.toggleShelf = toggleShelf;
+
+// ── A SESSION AT THE RIGHT MOMENT (LIB-01, Amir 2026-09-27, pick C) ──────────────────────────────
+// Two moments the app actually knows, and never a rest day (Home never names one):
+//   sore      the check-in's soreness answer was 1 or 2: the finished card offers a day-after session;
+//   weekDone  every session of this week is done: Home offers one short extra under This Week.
+// The picks are one line each: `id` is the Library session's id, `kick` the small line above, `say` the words after
+// its name. Its minutes, "no kit" and the AA Proof habit it ticks are read off the session itself.
+const LIB_PICKS = {
+  sore:     { id: 'day-after',         kick: 'Sore today',                     say: 'keep moving, tonight or tomorrow' },
+  weekDone: { id: 'everyday-mobility', kick: 'Week done ✓ · something extra', say: 'a daily whole-body flow' },
+};
+// A line goes once its session has been opened after the moment began. The phone keeps only when each pick was
+// last opened (<id>_libseen, {id: ms}): never synced, never sent, and no other session is noted.
+function libSeenKey() { return ATHLETE_ID + '_libseen'; }
+function libSeen() {
+  try { const o = JSON.parse(localStorage.getItem(libSeenKey()) || '{}'); return (o && typeof o === 'object') ? o : {}; }
+  catch (e) { return {}; }
+}
+function markLibSeen(id) {
+  if (!ATHLETE_ID || window.IS_PREVIEW || !Object.values(LIB_PICKS).some(p => p.id === id)) return;
+  const o = libSeen(); o[id] = Date.now();
+  try { localStorage.setItem(libSeenKey(), JSON.stringify(o)); } catch (e) {}
+}
+function libPickItem(id) {
+  for (const c of ((_trainManifest && _trainManifest.categories) || [])) {
+    const w = (c.workouts || []).find(x => x.id === id);
+    if (w) return w;
+  }
+  return null;
+}
+function libSuggHtml(which, w) {
+  const p = LIB_PICKS[which];
+  const kit = /^(bodyweight|none|no kit)$/i.test(w.equipment || '') ? 'no kit' : String(w.equipment || '').toLowerCase();
+  const tick = libTickLabel(w.countsAs);
+  const tail = [w.duration, kit, tick && 'ticks ' + tick].filter(Boolean).join(', ');
+  return `<button type="button" class="lib-sugg" data-sugg="${which}" data-file="${esc(w.file || '')}" onclick="openLibSugg(this)">
+      <span class="lib-sugg-b"><span class="lib-sugg-k">${esc(p.kick)}</span>
+        <span class="lib-sugg-q"><b>${esc(w.title || '')}</b>: ${esc(p.say)}.${tail ? ' ' + esc(tail) + '.' : ''}</span></span>
+      <span class="lib-sugg-a" aria-hidden="true">›</span></button>`;
+}
+// The finished card after a sore check-in, until the pick has been opened since that check-in.
+function soreSuggWanted(day) {
+  if (window.IS_PREVIEW) return false;
+  const r = loadReadiness(day);
+  const so = r && !r.skipped ? Number(r.soreness) : 0;
+  const at = r ? Date.parse(r.timestamp) : NaN;
+  return (so === 1 || so === 2) && !isNaN(at) && !((libSeen()[LIB_PICKS.sore.id] || 0) >= at);
+}
+async function paintSoreSugg(day) {
+  const slot = document.getElementById('sugg-' + day);
+  if (!slot) return;
+  if (!soreSuggWanted(day)) { slot.innerHTML = ''; return; }
+  await ensureLibManifests();
+  const w = soreSuggWanted(day) && libPickItem(LIB_PICKS.sore.id);
+  slot.innerHTML = w ? libSuggHtml('sore', w) : '';
+}
+// The local day this week's last session was done (each day's first time this week), or null while it is not
+// done. The same sources as weekDoneDays(), so the row shows exactly when This Week says "All N sessions done".
+function weekDoneOn() {
+  const ids = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
+  if (!ids.length) return null;
+  const win = weekWindow(), first = {};
+  (HIST || []).forEach(s => {
+    const id = String(s.day);
+    if (s.date >= win.from && s.date <= win.to && ids.indexOf(id) >= 0 && (!first[id] || s.date < first[id])) first[id] = s.date;
+  });
+  const today = ymdLocal(new Date());
+  ids.forEach(id => { if (!first[id] && completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) first[id] = today; });
+  return ids.every(id => first[id]) ? ids.map(id => first[id]).sort().pop() : null;
+}
+// Home's row once the week is done, until the pick has been opened since; it goes when the week turns.
+function weekSuggWanted() {
+  if (window.IS_PREVIEW) return false;
+  const on = weekDoneOn();
+  if (!on) return false;
+  return !((libSeen()[LIB_PICKS.weekDone.id] || 0) >= new Date(on + 'T00:00:00').getTime());
+}
+async function paintWeekSugg() {
+  const wrap = document.getElementById('home-sugg-wrap');
+  if (!wrap) return;
+  if (!weekSuggWanted()) { wrap.innerHTML = ''; return; }
+  await ensureLibManifests();
+  const w = weekSuggWanted() && libPickItem(LIB_PICKS.weekDone.id);
+  wrap.innerHTML = w ? libSuggHtml('weekDone', w) : '';
+}
+// A suggested session's ← comes back to where it was offered (Home, or the day's finished card), not to the
+// Library it was never opened from. goTo() forgets the way back (_wsReturn) on any other route.
+function openLibSugg(btn) {
+  const card = btn.closest('.session-complete');
+  _wsReturn = { day: card ? card.id.replace('complete-', '') : null, y: window.scrollY };
+  openWorkout(btn.dataset.file);
+}
+window.openLibSugg = openLibSugg;
+function wsBack() {
+  const r = _wsReturn;
+  _wsReturn = null;
+  if (!r) { goTo('workouts'); return; }
+  goTo('home');
+  if (r.day) {
+    openDayView(r.day);
+    requestAnimationFrame(() => { const c = document.getElementById('complete-' + r.day); if (c) c.scrollIntoView({ block: 'start' }); });
+  } else {
+    window.scrollTo(0, r.y);
+  }
+}
+window.wsBack = wsBack;
 
 // ── PLAYBOOK world — latest-article card + per-category numbered sections. ──
 async function renderPlaybook() {
@@ -10065,6 +10229,7 @@ async function openWorkout(file) {
 
   const id = wk.id || file;
   _wsCurrent = { id, checkKey: 'wkout_' + id, slug: _wsSlug(wk, file), countsAs: wk.countsAs || '' };
+  markLibSeen(wk.id);   // a suggestion for this session has done its job (LIB-01)
 
   // Header — on the shelf's picture when there is one, flat green when there is not.
   const wsHead = document.querySelector('#screen-workout .ws-header');
@@ -10184,6 +10349,14 @@ function _wsHabitOn(id) {
     return !!(cfg && cfg.on && cfg.on[id] === true);
   } catch (e) { return false; }
 }
+// The habit a Library session ticks in AA Proof, in Proof's words, or '' when it will not tick one: no record to
+// write to (the demo, the coach's preview), a session that counts as nothing, or an add-on not switched on. The
+// shelf rows, the suggestions and the session's own Done note all ask this (LIB-01).
+function libTickLabel(countsAs) {
+  if (!ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) return '';
+  const label = WS_COUNTS_AS_LABEL[countsAs] || '';
+  return label && _wsHabitOn(countsAs) ? label : '';
+}
 
 // Same daily-reset rule as the exercise ticks above: a Done belongs to the day
 // it was pressed on. Device-local, so a Done pressed on a phone shows as
@@ -10209,22 +10382,21 @@ function renderLibraryDone() {
   if (!ATHLETE_ID || window.IS_DEMO || window.IS_PREVIEW) { wrap.hidden = true; return; }
   wrap.hidden = false;
 
-  const label = WS_COUNTS_AS_LABEL[_wsCurrent.countsAs] || '';
+  const label = libTickLabel(_wsCurrent.countsAs);
   const done  = _wsIsDoneToday(_wsCurrent.id);
 
   btn.disabled = false;
   btn.classList.toggle('is-done', done);
   btn.textContent = done ? 'Done today ✓' : 'Mark as done';
 
-  // Promise a habit tick only when AA Proof will give one (CNT-01): an add-on habit counts only
-  // once the athlete has switched it on there. Otherwise the Done still reaches the coach.
-  const ticks = label && _wsHabitOn(_wsCurrent.countsAs);
+  // Promise a habit tick only when AA Proof will give one (CNT-01, libTickLabel()): an add-on habit counts
+  // only once the athlete has switched it on there. Otherwise the Done still reaches the coach.
   if (done) {
-    note.textContent = ticks
+    note.textContent = label
       ? 'Done today. This ticks your ' + label + ' habit next time you open AA Proof.'
       : 'Done today. Your coach can see you did it.';
   } else {
-    note.textContent = ticks
+    note.textContent = label
       ? 'Tap when you finish. It ticks your ' + label + ' habit in AA Proof.'
       : 'Tap when you finish. Your coach can see you did it.';
   }
@@ -11093,6 +11265,7 @@ function finishDay(day) {
       }
     }
   }
+  paintSoreSugg(day);   // a sore check-in: the day-after session (LIB-01)
   paintResetBtn(day);
   markSuggestedDay();
 }
@@ -11712,6 +11885,7 @@ function restoreState() {
     if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + day))) {
       const el = document.getElementById('complete-' + day);
       if (el) el.classList.add('visible');
+      paintSoreSugg(day);
     }
     updateProgress(day);
   });

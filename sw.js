@@ -163,7 +163,9 @@
 // v84: program.html changed (2026-09-27, DS-01): clay means "look here"; every block is one green, the running
 //      bar, Guided, labels and + Log a max green or grey.
 // v85: program.html changed (2026-09-27, DS-03 part 2): one primary button (eleven looks were one green one).
-const CACHE = 'aap-v85';
+// v86: program.html changed (2026-09-27, LIB-01): the Sessions shelves are a list (a photo band, three rows,
+//      All N ›), and a session at the right moment: sore → the finished card, the week done → Home.
+const CACHE = 'aap-v86';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

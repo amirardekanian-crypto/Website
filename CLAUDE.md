@@ -203,6 +203,11 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Clay means "look here"** (DS-01, Amir 2026-09-27; `PROGRAM-APP.md` → *Clay means look here*): the Coach's note,
   a Because, an RPE over target, the tempo digit, a banner that asks for something, the one number on a dark Home card.
   Block titles, stripes and done tints, the running bar, labels and buttons are green or grey.
+- **The Library offers a session at two moments only** (LIB-01, Amir 2026-09-27; `PROGRAM-APP.md` → *The Library's
+  Sessions*): a sore check-in (soreness 1 or 2, on the finished card) and a finished week (Home, under This Week), never
+  a rest day. The picks are `LIB_PICKS`, one line each; a line goes once its session has been opened (`<id>_libseen`,
+  never synced). Every ✓ in the Library asks `libTickLabel()`. The Sessions shelves are a list: a photo band, three
+  rows, **All N ›** for the rest.
 - **No yellow, gold, ochre or amber in either app**, AA Proof's metals included (its gold tier became
   emerald on 2026-09-26; Amir, asked whether Proof was an exception: *"fix"*).
 - **The exercise card is not frozen** (Amir, 2026-09-27: *"dont freeze anything"*, lifting Five Forks fork 4 B).
@@ -261,7 +266,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v85` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v86` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
