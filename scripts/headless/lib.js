@@ -78,15 +78,17 @@ const HISTORY = [
   ] },
 ];
 
-// What get_library() answers, built from the repo's workouts/ files (the database's copy of the Library, same
-// fields): { workout: [{ id, title, banner, icon, items: [each session's JSON] }], article: [] }. Pass it as
+// What get_library() answers, built from the repo's workouts/ and articles/ files (the database's copy of the
+// Library, same fields): { workout: [{ id, title, banner, icon, items: [each session's JSON] }], article: [the
+// same, each article's JSON] }. Pass it as
 // stub: { library: library() }; without it get_library answers nothing and the app falls back to workouts/index.json,
 // which has no focusTag or countsAs.
 function library() {
   const root = path.join(__dirname, '..', '..');
-  const idx = JSON.parse(fs.readFileSync(path.join(root, 'workouts', 'index.json'), 'utf8'));
-  return { workout: idx.categories.map(c => ({ id: c.id, title: c.title, banner: c.banner, icon: c.icon,
-    items: (c.workouts || []).map(w => JSON.parse(fs.readFileSync(path.join(root, w.file), 'utf8'))) })), article: [] };
+  const shelf = (dir, key) => JSON.parse(fs.readFileSync(path.join(root, dir, 'index.json'), 'utf8')).categories
+    .map(c => ({ id: c.id, title: c.title, banner: c.banner, icon: c.icon,
+      items: (c[key] || []).map(w => JSON.parse(fs.readFileSync(path.join(root, w.file), 'utf8'))) }));
+  return { workout: shelf('workouts', 'workouts'), article: shelf('articles', 'articles') };
 }
 
 async function context(browser, opts) {

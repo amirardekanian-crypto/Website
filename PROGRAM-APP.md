@@ -695,7 +695,9 @@ tints, the running bar, labels, and so it marked nothing. Now:
   and power were clay and strength green, and a block the app did not recognise took its colour from its
   position, so *Core* was clay because it was third; `blockClass()` still names the type for the code); the
   rule under a block title is grey; the running session bar, its clock and Pause; Guided; *Good afternoon*
-  (grey); Game Plan's labels, aim numbers and *Up next!*; *+ Log a max* and *How this works* on Records.
+  (grey); Game Plan's labels, aim numbers and *Up next!*; *+ Log a max* and *How this works* on Records; and the
+  Log a max form (2026-09-27, found by DOC-01): its estimate green like Records' own number, its unit and a *good*
+  grade grey, the picker's chevrons grey, its inputs' borders neutral in dark mode, and Save the primary button.
 - **Buttons stay green**, as the design bible says (B, clay buttons, was not picked).
 - Every clay colour code touched became its token (`--ice` / `--clay-ink`): 87 written out on main, 78 now.
 
@@ -737,7 +739,7 @@ size is a token in `:root`, picked by its job:
   four parts take two lines; before, they fitted only by running into the card's padding.
 - **One primary button** (part 2, 2026-09-27, after DS-01 settled that buttons are green): every filled action
   (Sign in, the welcome's Open Day 1, Begin session, Start/Pause, Rest, the rest timer's Pause, Guided's Done,
-  Send it, Done · send to coach, + Log a max, Weigh in) wears one look, set once at the end of the stylesheet:
+  Send it, Done · send to coach, + Log a max, Log a max's Save to Personal Records, Weigh in) wears one look, set once at the end of the stylesheet:
   green, white Barlow Condensed 700 in capitals, 1 px tracking, an 8 px corner, 44 px at the least. There were
   eleven (corners from 4 to 13 px, two fonts, tracking from 0.02 em to 1.5 px, weights 700 and 900, and Sign in
   and Open Day 1 in clay). Each rule keeps only its place and size: full-width actions at `--fs-body` (the

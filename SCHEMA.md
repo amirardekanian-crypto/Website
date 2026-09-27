@@ -1328,7 +1328,7 @@ Use the `/article` skill (`.claude/skills/article/SKILL.md`), which does the who
 2. The Farsi translation, read and approved by Amir, then `scripts/build_article_pages.py` for the web pages.
 3. Commit + push, then coach.html → Links → **+ Publish article**. The Playbook shows it once it is published.
 
-**Deep-link:** `program.html?article=pre-session-warm-up` opens the article directly — usable as a shareable public URL.
+**Deep-link:** `program.html?article=pre-session-warm-up` opens the article directly — usable as a shareable public URL. It opens the published row (`get_library()`), so an unpublished article's link opens nothing; the file is read only when the server cannot answer.
 
 ### Embedding a workout inside an article
 
