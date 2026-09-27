@@ -32,7 +32,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-27)
 
-**30 done · 5 partly done · 9 open**, of 44. Each was checked against the code on `main`.
+**30 done · 6 partly done · 8 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -78,6 +78,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#272](https://github.com/amirardekanian-crypto/Website/pull/272) | The working card's **Same as last** button is gone (Amir: *"its a duplicate of what can be seen in history"*): the open card's Last time box shows last time, and a weight typed in set 1 fills the sets below; Guided's rest screen keeps its own | CARD-01, LOG-01 |
 | [#273](https://github.com/amirardekanian-crypto/Website/pull/273) | The headless harness joins the repo (`scripts/headless/`: the Supabase stub, a made-up athlete and programme, `smoke.js` for both apps), and this hand-off | — |
 | [#274](https://github.com/amirardekanian-crypto/Website/pull/274) | One RPE control everywhere: a set, a circuit's rounds ("R2 · How hard?", on its own line), Guided, the session rating and Log a max (6–10 buttons, not a text box) are the same 44 px buttons, and a second tap clears a pick | CONS-01 |
+| [#275](https://github.com/amirardekanian-crypto/Website/pull/275) | One type scale in the training app: seven sizes and a field size (`--fs-` tokens), nothing under 11 px, buttons in the app's font, only weights that load, every field 16 px, a pre-commit guard; the line of numbers is never cut (the rest time ran off the card at 360 px) | DS-03 (part) |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
 
@@ -92,10 +93,12 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
   returning from a Library session resets the scroll.
 - **SEAM-01.** Habits are ticked on Home. The full Proof app still has no way back to training,
   offers a second install, keeps its own dark-mode switch, and reads workout ticks only at launch.
+- **DS-03.** The type scale is in (#275). Still open: one primary button (eleven styles today), which waits for
+  DS-01's answer on what clay is for; AA Proof's type goes with SEAM-01.
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
 
 **Open.** P2:
-PRF-01, PRF-02, PRF-03, DS-01. P3: DS-03, PRF-05, LIB-01, POL-02, DOC-01.
+PRF-01, PRF-02, PRF-03, DS-01. P3: PRF-05, LIB-01, POL-02, DOC-01.
 
 ## Next, in order
 
@@ -138,10 +141,10 @@ is left is mostly AA Proof, then design-system polish. Work it in this order:
 3. **DS-01, clay has three jobs**: the primary action, "needs you", and the tempo digit; status (done, past,
    block type) moves to green and neutrals. A design call, so a mockup first. Text reads `--clay-ink` /
    `--green-ink`, never the fill tokens (A11Y-01).
-4. **P3 and the partly-done leftovers**, in this order: CONS-01 (one RPE control everywhere; check first
-   what WK-04 and A11Y-01 already changed), DS-03 (a type scale and one primary button, `button { font:
-   inherit }`), LIB-01, NAV-01's close grammar, POL-01's three leftovers (the Quality sheet's words are
-   Amir's to give), A11Y-01's pinch-zoom (`user-scalable=no`), and DOC-01 last.
+4. **P3 and the partly-done leftovers**, in this order: ~~CONS-01~~ (#274), DS-03 (the type scale is #275;
+   one primary button waits for DS-01), LIB-01, NAV-01's close grammar, POL-01's three leftovers (the
+   Quality sheet's words are Amir's to give), A11Y-01's pinch-zoom (`user-scalable=no`; every field is 16 px
+   since #275, so an iPhone will not zoom on a tap), and DOC-01 last.
 5. **SEAM-01 waits for the count** around 2026-10-17 (below). If habit logging has not moved, fork 1 A
    (Proof in the training app's look, "← Training", one install, one theme) is next, and it takes DS-03's
    Proof half with it.
@@ -194,11 +197,14 @@ the working card folds How to do it if Amir wants that too.
 - Once per clone: `git config core.hooksPath .githooks`.
 - Use the branch the session names. After each merged PR, restart it from main:
   `git fetch origin main && git checkout -B <branch> origin/main`.
-- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v71` on
+- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v72` on
   2026-09-27) whenever a cached app file changes, log the version in its comment list, and change the
   name in CLAUDE.md too.
 - Test in a headless browser before every PR (below): the harness is in the repo, the checks you write
   for one item stay in the session's scratchpad.
+- A font size in program.html is a `--fs-` token (`PROGRAM-APP.md` → *One type scale*); the pre-commit
+  guard blocks any other. For screenshots that look like a phone, serve the harness only the font weights
+  the page asks for: a route that serves every weight hides a missing face (DS-03 found four that way).
 - Ship: commit, push, open the PR with the GitHub MCP, merge with `merge_pull_request` (it wants the
   full 40-character head SHA), then confirm the deploy with
   `https://api.github.com/repos/amirardekanian-crypto/Website/deployments?environment=github-pages&sha=<merge sha>`
