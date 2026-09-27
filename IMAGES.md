@@ -70,8 +70,8 @@ text safe zone for every image — is the artifact at
   picture*). The caption covers the left ~60% at nearly full height, so the subject sits
   on the right.
 - `assets/cycles/` and `assets/days/` (below) are **retired for the app** but not deleted:
-  `index.html` and `index-fa.html` still load `strength-engine.jpg`, and `index-fa.html`
-  loads `days/lower.webp` inside its phone mock-up.
+  `index.html` and `index-fa.html` both load `days/lower.webp` inside their phone mock-ups
+  (no page loads a cycle cover any more; checked 2026-09-27), and the studio reuses both.
 
 ---
 

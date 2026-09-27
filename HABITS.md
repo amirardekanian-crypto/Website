@@ -361,8 +361,10 @@ The screen they actually live on. **In this order, and the order is the point:**
 > **Why the list sits above the commentary.** It used to be hero → nudge → quests →
 > habits, which put the first tickable row about **1,400px down**: you opened the app to
 > log and had to scroll before you could log. The nudge alone was over half a phone
-> screen. Now **six of the eight habits are tickable without scrolling at 390px, five at
-> 320px**, and the nudge keeps every word of its voice — it just reads as a reply to the
+> screen. Now **six of the seven habits you can tick are in view without scrolling at
+> 390 × 844** (the first circle 252 px down), four at 375 × 667 and two on a 320 × 568 phone
+> (measured 2026-09-27 with all eight on; the eighth row is the programme's session, ticked
+> by finishing it), and the nudge keeps every word of its voice — it just reads as a reply to the
 > list rather than a wall in front of it. If you add anything to this screen, it goes
 > *below* the habit list unless it is something the athlete must act on first.
 

@@ -945,7 +945,7 @@
      costs no vertical space: it sits on the level hero on Today and inside the
      stat grid on Progress.
 
-     Heat comes off emberLevel() — the same 0/5/15/30-day scale the habit rows
+     Heat comes off emberLevel() — the same 3/14/30-day scale the habit rows
      use — so a long streak visibly burns harder than a new one. */
   @keyframes flameLick {
     0%, 100% { transform: scaleY(1)    translateY(0);     opacity: 1 }
@@ -1957,7 +1957,7 @@
   #app .toast.over { z-index: 95; top: calc(16px + env(safe-area-inset-top)); bottom: auto; }
 
   /* ── NO LABEL UNDER 11 PX (A11Y-01, AA Proof's half, 2026-09-27) ─────────────────────────────────
-     Measured on every screen: 52 styles, 534 labels, set from 7 to 10.5 px (the training app's floor has
+     Measured on every screen and state: 60 styles, 904 labels, set from 7 to 10.5 px (the training app's floor has
      been 11 px since #275). Each is raised to 11 here, after everything that set it; letter-spacing comes
      down where a wider word would crowd its box. Don't set a label under 11 px again: the census in the
      session's scratchpad (proof-census.js) is how this was found. */
@@ -5017,7 +5017,7 @@ function dayNumber() {
   return Math.max(1, Math.round((today() - parseKey(days[0])) / 86400000) + 1);
 }
 
-// How hot a streak reads: 0 none · 1 warm from 5 days · 2 burning from 15 · 3 from 30.
+// How hot a streak reads: 0 none · 1 warm from 3 days · 2 burning from 14 · 3 from 30.
 // Thresholds sit ON day-streak marks (3 · 14 · 30), not beside them. At 5/15/30
 // the app fired a full-screen takeover for the 3-day and 7-day marks while the
 // flame on the hero stayed at its coldest until day 5 and then did not move
@@ -6051,8 +6051,10 @@ async function syncTitles() {
 //     wait on a round trip to feel like it worked;
 //   · the push only happens once they are ON the board, because that is the
 //     only place the title is published to anyone else;
-//   · a refusal takes the title OFF, and never out of `owned`. Wearing is
-//     revocable, owning is not — that is the whole promise of the track.
+//   · a refusal to publish leaves the title ON (it still shows on their own
+//     card) and never touches `owned` (below: it used to take the title off,
+//     until 2026-07-30). Owning is never revoked — that is the whole promise of
+//     the track.
 async function pushTitle() {
   // Called from joinBoard() and from wear() in the Locker (equipping a title
   // is a real tap in preview). The equip already happened locally and
@@ -6113,9 +6115,10 @@ let _notePctTimer = null;
 //   1. `rollFloor()`      — what the client will draw, whatever the RPC returns.
 //   2. `setMyNote()`      — the local mirror of your own lines (was 14 days).
 //   3. `supabase/stage21_roll_call_retention.sql` — the SERVER's copy, which is
-//      the only one that makes "shouldn't be saved" literally true. ⚠️ NOT YET
-//      APPLIED — it deletes rows, so Amir runs it in the SQL editor himself.
-//      Until he does, the wall SHOWS seven days and the server still HOLDS more.
+//      the only one that makes "shouldn't be saved" literally true. Applied: a
+//      trigger deletes lines older than 9 days (two days of timezone slack) on
+//      every write to the wall, so a quiet wall keeps its last lines until the
+//      next post, and purge_old_notes() does the same on demand.
 const ROLL_DAYS = 7;
 function rollFloor() { return fmtKey(addDays(today(), -(ROLL_DAYS - 1))); }
 
@@ -6517,7 +6520,7 @@ function embedPost(state) {
 // them.
 //
 // Deliberately DEVICE-LOCAL. It is not added to the sync payload (built
-// explicitly from cfg/log/wt above), because this is a cache of a derived
+// explicitly from cfg and log above), because this is a cache of a derived
 // value, not data: re-deriving it on the next device costs one render. A phone
 // that has never opened Proof simply has no snapshot, and the programme app
 // falls back to a card with no numbers rather than showing wrong ones.
