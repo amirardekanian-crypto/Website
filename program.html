@@ -8912,7 +8912,7 @@ function mountProofStrip() {
 }
 function proofCardSig() {
   const s = habCardSnapshot();
-  return s ? [s.lv, s.streak, s.done, s.total, s.qualified, s.pct, JSON.stringify(s.days || s.week || [])].join('|') : '';
+  return s ? [s.t ? new Date(s.t).toDateString() : '', s.lv, s.streak, s.done, s.total, s.qualified, s.verdict, s.togo, s.pct, JSON.stringify(s.days || s.week || [])].join('|') : '';
 }
 window.addEventListener('message', e => {
   if (e.origin !== location.origin || !e.data || e.data.type !== 'aa-proof-embed') return;
@@ -8961,9 +8961,19 @@ function habitCardHtml() {
     return `<button type="button" class="hrow quiet" onclick="goHabits()">
       <span class="hrow-b"><span class="hrow-l">Daily habits</span><span class="hrow-q">Sleep, steps, water, protein: tick them in AA Proof.</span></span><span class="hrow-a">›</span></button>`;
   }
+  // PRF-03: the verdict AA Proof leads with, the same words in both apps ("2 to go", On target,
+  // Perfect), never "day complete" beside the strip's "1 of 5 done". It is about the day Proof wrote it:
+  // a snapshot from an earlier day says the level until the strip below boots Proof and writes today's.
+  // `done of total` is only for a Proof that has not been updated alongside.
+  const fresh = s.t && new Date(s.t).toDateString() === new Date().toDateString();
+  const said = !fresh ? `Level ${s.lv}`
+    : s.verdict === 'togo' ? `${s.togo} to go`
+    : s.verdict === 'on' ? 'On target'
+    : s.verdict === 'perfect' ? 'Perfect'
+    : (s.done != null && s.total ? `${s.done} of ${s.total}` : `Level ${s.lv}`);
   return `<button type="button" class="hrow" onclick="goHabits()">
-    <span class="hrow-b"><span class="hrow-l">${s.qualified ? 'Daily habits · day complete' : 'Daily habits'}</span>
-      <span class="hrow-v">${s.done != null && s.total ? `${s.done} of ${s.total}` : `Level ${s.lv}`}<small>${s.streak} day${s.streak === 1 ? '' : 's'} in a row</small></span></span>
+    <span class="hrow-b"><span class="hrow-l">Daily habits</span>
+      <span class="hrow-v">${said}<small>${s.streak} day${s.streak === 1 ? '' : 's'} in a row</small></span></span>
     <span class="hrow-a">›</span></button>`;
 
 }

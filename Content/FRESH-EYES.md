@@ -32,7 +32,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-27)
 
-**31 done · 5 partly done · 8 open**, of 44. Each was checked against the code on `main`.
+**33 done · 5 partly done · 6 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -82,8 +82,10 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#276](https://github.com/amirardekanian-crypto/Website/pull/276) | One close grammar: ← top left for a screen, ✕ top right for a full-screen overlay (Guided's moved there), a sheet slides down (a handle, a swipe, a tap above it); the sheets' Close and Skip for today are 44 px targets | NAV-01 |
 | [#277](https://github.com/amirardekanian-crypto/Website/pull/277) | Back keeps your place (Back from a sheet, the rest timer or Guided threw a scrolled day to the top: manual scroll restoration); the Library returns to where it was after a session; the rest screen is solid; a superset's rows fit 320 px; the finish card says Session habit | POL-01, NAV-01 |
 | [#278](https://github.com/amirardekanian-crypto/Website/pull/278) | Pinch-zoom in the training app (it was locked at 1×; now 5×, as AA Proof); both apps drop only the double-tap zoom (`touch-action: manipulation`) | A11Y-01 |
+| [#279](https://github.com/amirardekanian-crypto/Website/pull/279) | AA Proof: the circle is the tick (a 48 px circle that fills with a white tick, the emoji inside it), + is 44 px in the habit's tint, the programme's session is one slim line at the end of Today: the first habit you can tick moved up the screen (Amir's pick A of the mockup) | PRF-01 |
+| [#280](https://github.com/amirardekanian-crypto/Website/pull/280) | AA Proof's Today leads with the verdict, **2 to go**, then On target, then Perfect, instead of the day's percentage (68% on a rest day that counted); the count is exact (it said 1 when 2 were needed); the ring round the initials is gone; the training app's habits row and the strip's head say the same words (no more "day complete" beside "1 of 5 done"). Display only | PRF-03 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276), PRF-01 (#279), PRF-03 (#280). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
 
 **Partly done, and what is still open on each:**
 - **A11Y-01.** The training app is done: 11 px is the floor everywhere (#275) and pinch-zoom is on (#278).
@@ -98,38 +100,38 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
 
 **Open.** P2:
-PRF-01, PRF-02, PRF-03, DS-01. P3: PRF-05, LIB-01, POL-02, DOC-01.
+PRF-02, DS-01. P3: PRF-05, LIB-01, POL-02, DOC-01.
 
 ## Next, in order
 
-**Waiting on Amir (2026-09-27), five calls (four on their own page):**
-- **Proof's Today (PRF-01, PRF-03, PRF-05)**: https://claude.ai/artifact/TwHpG4EXEv4hj1FcPejG7y. A tighter card
-  (recommended), the day leads, or the list leads; all three share the circle tick, the session last, the exact
-  "N to go" and one week strip. The prototypes are CSS/JS laid over the real app in a headless page (the
-  session's scratchpad `proto.js`), so the pick ports straight into `renderToday()`.
-- **PRF-02's six calls**: https://claude.ai/artifact/6hB61EMUJPjCQ6hF7LH9Fe (celebrations 30 → 9 in 22 days,
-  a five-step tour, Progress's next three, quests hidden when idle, the Locker's road to the next three rewards,
-  Crew on the board). "Your picks" takes all six As.
-- **DS-01, clay's jobs**: https://claude.ai/artifact/RkWgSFd4SR4NX1XyRdVZTN. A "look here" (recommended), B also
-  the main button of each screen, C as now.
-- **LIB-01, the Library's sessions**: https://claude.ai/artifact/PGrum2Hc4hy475QPxuDPNM. Two calls. The cards: A a
-  list, one photo per shelf as a band with All N › (recommended), B text tiles on the rail, C a picture each
-  (about 130 credits). When the app offers one: A a sore check-in (the finish card), B a finished week (Home),
-  C both (recommended), D neither. The prototypes are in the scratchpad's `lib01-proto.js`. (Mark as done has one
-  row ever; 25 of 302 check-ins in 90 days said sore.)
-- **POL-01, the Quality sheet's "How we measure it"** (asked in chat, no page): it lists Strength check (5 rep
-  max) and Your Personal Records, Body measures, Vertical jump, Broad jump, Med-ball throw, Lateral hop, 20 m
-  sprint, 505 test and Spider drill, Cooper run, Yo-Yo test and Repeat sprints, Body check, Your filmed sets.
-  An athlete meets few of them. A: hide the line on the athlete's sheet until tests are part of the plan
-  (display only, recommended); B: Amir rewrites each quality's line in words the athlete meets (a coach.html
-  edit of `qualities.tests`); C: keep it.
+**Amir's answers (2026-09-27): "Your picks on all five, go ahead."** Each page has the detail.
+- **Proof's Today (PRF-01, PRF-03, PRF-05)**: A, a tighter card
+  (https://claude.ai/artifact/TwHpG4EXEv4hj1FcPejG7y): the circle tick and the session last (#279), the verdict
+  tile beside the week (#280), then one week strip that is also the day picker, with the hero a size smaller
+  (PRF-05). The prototypes are the scratchpad's `proto.js`, laid over the real app in a headless page.
+- **PRF-02**: all six As (https://claude.ai/artifact/6hB61EMUJPjCQ6hF7LH9Fe): (1) the whole screen only for a new
+  level (its reward on the same screen), a new rank and a day streak from 7 days up; milestones, tiers, habit
+  ranks, a perfect day and a comeback become a card on Today that stays until tapped, with its XP (30 → 9 in 22
+  days); (2) a five-step tour: the row, the week, your level and the Locker, the board (PRIV-01), your initials;
+  (3) Progress shows the next three milestones, then "All 37 milestones", earned ones on their own row; (4) quests
+  hidden until one runs; (5) the Locker's road to the next three rewards, then "The whole road to level 50";
+  (6) Crew opens on the board. Built with it, no call: the tab bar lights nothing in Settings and the manual; one
+  word each (Milestones, Locker); "Day N" only for your day; "Off" for an add-on never on; the lock notice out of
+  error red; a toast above an open sheet; dark buttons at 5:1; no label under 11 px. Nothing is revoked.
+- **DS-01**: A, clay is "look here" (https://claude.ai/artifact/RkWgSFd4SR4NX1XyRdVZTN); with it DS-03's one
+  primary button.
+- **LIB-01**: A and C (https://claude.ai/artifact/PGrum2Hc4hy475QPxuDPNM): the shelves as a list, one photo band
+  per shelf with All N › (the dead › fixed); and both moments, a sore check-in's finish card offers *The Morning
+  After* and a finished week's Home offers *Green Light*, each once. The prototypes are `lib01-proto.js`.
+- **The Quality sheet's "How we measure it"**: A, hidden on the athlete's sheet (display only; the words stay on
+  the server for coach.html).
 
 **The training app's list is done**: stop-the-bleeding, foundations, the whole session (#260–#269), Home and
 progress (#258, #271), the account and the guide (#268, #270), each told in full in `PROGRAM-APP.md`. What
 is left is mostly AA Proof, then design-system polish. Work it in this order:
 
-1. **Proof's Today screen: PRF-01, PRF-03 and PRF-05.** One screen, so **one mockup for Amir first** (the
-   current screen beside two or three directions, at 390 px, with real numbers), then one PR per item.
+1. **Proof's Today screen: ~~PRF-01~~ (#279), ~~PRF-03~~ (#280) and PRF-05.** One screen, one mockup (Amir
+   picked A), one PR per item.
    - **PRF-01**, the main action is the quietest control: the tick is a 22 px pale ring on the emoji tile
      while "+" is a 36 px solid button, and the locked *Finish your session* row leads the list, so the
      first row you can tick starts 466 px down (the audit; about 440 px in the harness's `proof-390.png`).
@@ -145,17 +147,15 @@ is left is mostly AA Proof, then design-system polish. Work it in this order:
    `renderManual()`, privacy.html, `tourSteps()`) in the same PR, and the tour points at real controls, so a
    moved button moves its tour step. The pre-commit guard runs on every habits.html commit.
 2. **PRF-02, progressive disclosure in Proof**, with POL-02's sweep and A11Y-01's Proof leftovers (small
-   type; the accent buttons in dark at 3.35:1). **Amir's calls first**: which celebrations stay full-screen
-   (levels and ranks only?), a five-step tour, Progress folded to the next three milestones, Quests and
-   Seasons hidden until they run, the far end of the Locker folded. Nothing is removed or revoked: rewards
-   are never taken back (CLAUDE.md).
+   type; the accent buttons in dark at 3.35:1). Amir's answer is all six As (above). Nothing is removed or
+   revoked: rewards are never taken back (CLAUDE.md).
 3. **DS-01, clay has three jobs**: the primary action, "needs you", and the tempo digit; status (done, past,
-   block type) moves to green and neutrals. A design call, so a mockup first. Text reads `--clay-ink` /
+   block type) moves to green and neutrals. Amir's answer: A, clay is "look here". Text reads `--clay-ink` /
    `--green-ink`, never the fill tokens (A11Y-01).
 4. **P3 and the partly-done leftovers**, in this order: ~~CONS-01~~ (#274), DS-03 (the type scale is #275;
-   one primary button waits for DS-01), LIB-01 (its two calls are Amir's, above), ~~NAV-01's close grammar~~
+   one primary button goes with DS-01), LIB-01 (A and C, above), ~~NAV-01's close grammar~~
    (#276), ~~POL-01's leftovers~~ (#277; the
-   Quality sheet's words are Amir's to give), ~~A11Y-01's pinch-zoom~~ (#278), and DOC-01 last.
+   Quality sheet's line is hidden on the athlete's sheet, A), ~~A11Y-01's pinch-zoom~~ (#278), and DOC-01 last.
 5. **SEAM-01 waits for the count** around 2026-10-17 (below). If habit logging has not moved, fork 1 A
    (Proof in the training app's look, "← Training", one install, one theme) is next, and it takes DS-03's
    Proof half with it.
@@ -178,9 +178,8 @@ the working card folds How to do it if Amir wants that too.
 - **Habit logging after the Home strip.** At the audit, 5 of 40 coached athletes had logged a habit
   in a week while 16 had trained in two. Count again around 2026-10-17. If it hasn't moved, fork 1 A
   (Proof in the training app's look, "← Training", one install, one theme) is the next step.
-- **Proof shows twice on Home.** The card's hero says "Day complete" when the day is on target
-  (`dayQualifies()`); the strip counts ticks ("1 of 5 done"). Settle it with PRF-03, which leads Proof
-  with the same verdict.
+- ~~**Proof shows twice on Home.**~~ Settled by PRF-03 (#280): the row and the strip's head both say the
+  verdict (*2 to go*, *On target*, *Perfect*).
 - **Records start slowly** for athletes who only tick: an untouched box records no weight, so their
   records fill once they type a weight (or tap Same as last on Guided's rest screen; the card's
   button went on 2026-09-27). That is the intended cost of LOG-01.
@@ -208,7 +207,7 @@ the working card folds How to do it if Amir wants that too.
 - Once per clone: `git config core.hooksPath .githooks`.
 - Use the branch the session names. After each merged PR, restart it from main:
   `git fetch origin main && git checkout -B <branch> origin/main`.
-- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v75` on
+- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v77` on
   2026-09-27) whenever a cached app file changes, log the version in its comment list, and change the
   name in CLAUDE.md too.
 - Test in a headless browser before every PR (below): the harness is in the repo, the checks you write

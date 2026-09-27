@@ -579,6 +579,11 @@ their rest days, athlete can move the days". So:
   where there is a trend). Where there is nothing yet, a quiet dashed row with one line replaces the old giant
   clay "NO RECORDS YET" / "NOT TRACKED YET". The habits row is still followed by AA Proof's strip, so habits
   are ticked on Home (fork 1B), and it shows Proof's count once instead of a hero card and a strip.
+- **The habits row says AA Proof's verdict** (PRF-03, 2026-09-27): *Daily habits · 2 to go · 4 days in a row*,
+  then *On target*, then *Perfect*, the words Proof's Today tile and the strip's head use. It read "Daily
+  habits · day complete" beside the strip's "1 of 5 done", two answers to one question. `habitCardHtml()` reads
+  `verdict` and `togo` from Proof's snapshot and never works them out (`HABITS.md` → *card snapshot*). A
+  snapshot from an earlier day shows the level until the strip writes today's.
 - A week where every day is done says "All 3 sessions done this week", with every day a row. Nothing more.
 
 ## 🏆 This cycle: where it is, and the wins (PROG-01, 2026-09-27)

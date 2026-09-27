@@ -594,8 +594,14 @@ counter down to nothing was the less honest of the two numbers.
 
 | | Denominator | Used by |
 |---|---|---|
-| **`dayPct()`** — what the day was *worth* | every habit on that day's roster, session included | the header, the day strip, the roll call wall |
+| **`dayPct()`** — what the day was *worth* | every habit on that day's roster, session included | the day strip, the week's shading, the roll call wall |
 | **`gatePct()`** — what the athlete could *do* | same, minus any **locked** habit they did not earn that day | day streaks, and nothing else |
+
+**Today leads with the verdict, not a percentage** (PRF-03, 2026-09-27; display only). The tile
+beside the week says *2 to go*, *On target* or *Perfect* from `dayQualifies()` and `dayToGo()`,
+the fewest habits that would make the day count (each adds only what it still lacks; either
+door). No constant and no server rule moved: `xp_rules` is untouched, and `dayToGo()` reads
+only `dayParts()`, `gatePasses()` and `baseXp()`, so it follows any change to them.
 
 ⚠️ **`dayPct()` needed no server migration.** It is computed client-side and sent up as a
 pre-computed number (`p_pct`) when posting a roll call — nothing recomputes it
