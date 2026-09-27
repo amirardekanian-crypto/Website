@@ -119,7 +119,9 @@
 //      and takes circuits round by round.
 // v62: program.html changed (2026-09-27, WK-04): one finish (rate, then Done sends the report once, from an
 //      outbox that waits for signal), and Reset in the session bar.
-const CACHE = 'aap-v62';
+// v63: program.html changed (2026-09-27, WK-04): the session bar's three buttons fit one row on a narrow
+//      phone (they ran 22 px past the bar at 360 px), and the armed Reset reads "Reset?".
+const CACHE = 'aap-v63';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -1891,6 +1891,25 @@
   .session-timer-reset[hidden] { display: none; }
   .session-timer-reset.armed { background: #C7552F; border-color: #C7552F; color: #fff; }
   body[data-dark] .session-timer-reset:not(.armed) { border-color: #444; color: #aaa; }
+  /* Three buttons on a narrow phone: at 360 px Resume + Guided + Reset ran 22 px past the bar,
+     at 320 px 44 px. While Reset shows (.has-reset, paintResetBtn()), the row tightens so
+     every state fits in one row down to 320 px, its armed "Reset?" included, and the width is
+     held so arming does not shove its neighbours. It wraps rather than clips if it ever can't
+     (large text settings). */
+  .session-timer-actions { flex-wrap: wrap; }
+  @media (max-width: 479px) {
+    .session-timer.has-reset .session-timer-actions { gap: 6px; }
+    .session-timer.has-reset .session-timer-actions .session-timer-btn,
+    .session-timer.has-reset .session-timer-reset { font-size: 13px; letter-spacing: 0.5px; }
+    .session-timer.has-reset .session-timer-actions .session-timer-btn { padding: 11px 6px; }
+    .session-timer.has-reset .session-timer-reset { padding: 0 10px; min-width: 76px; }
+  }
+  @media (max-width: 359px) {
+    .session-timer.has-reset .session-timer-actions .session-timer-btn,
+    .session-timer.has-reset .session-timer-reset { letter-spacing: 0; }
+    .session-timer.has-reset .session-timer-actions .session-timer-btn { padding: 11px 4px; }
+    .session-timer.has-reset .session-timer-reset { padding: 0 8px; min-width: 69px; }
+  }
   @keyframes armPulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(199,85,47,0.55); }
     50%      { box-shadow: 0 0 0 8px rgba(199,85,47,0); }
@@ -7008,7 +7027,7 @@ function renderHome() {
       <div class="session-timer-actions">
         <button type="button" class="session-timer-btn" onclick="toggleSessionTimer('${day.id}')">Start ▶</button>
         ${hasStandard ? `<button type="button" class="session-timer-btn guided" onclick="openGuided('${day.id}')">Guided ▶</button>` : ''}
-        <button type="button" class="session-timer-reset" hidden onclick="armedTap(this, 'Tap again', () => resetDay('${day.id}'))">Reset</button>
+        <button type="button" class="session-timer-reset" hidden onclick="armedTap(this, 'Reset?', () => resetDay('${day.id}'))">Reset</button>
       </div>
     </div>`;
     // Today's targets: filled by paintToday() after a lower-day check-in (REC-2).
@@ -10577,6 +10596,8 @@ function paintResetBtn(day) {
   const finished = !!(t && t.finished) || completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + day));
   const started = !!(t && t.sessionStart && !sessionIsStale(t.sessionStart)) || getDayCompletion(day).done > 0;
   b.hidden = finished || !started;
+  const bar = document.getElementById('timer-' + day);
+  if (bar) bar.classList.toggle('has-reset', !b.hidden);   // the tighter row on a narrow phone
 }
 
 function markSuggestedDay() {
