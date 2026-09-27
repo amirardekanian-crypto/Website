@@ -3557,6 +3557,21 @@
   .round-group.checked .round-row { opacity: 0.5; }
   /* Round cues (inside a circuit) reuse the same details.cues styling as the
      main exercise cues — single source of truth so they look identical. */
+  /* A warm-up is a list (WK-05): one line per movement, its cues folded under a chevron. */
+  .round-row.prep { padding: 4px 0; }
+  .round-row.prep .round-row-main { min-height: 44px; gap: 10px; }
+  .round-row.prep.has-cues .round-row-main { cursor: pointer; }
+  .round-row.prep .round-cues,
+  .round-row.prep .round-cues-slot { display: none; }
+  .round-row.prep.cues-open .round-cues-slot { display: block; }
+  .round-row.prep.cues-open .round-cues { display: block; padding: 0 0 6px 26px; }
+  .round-cue-tog { display: none; order: 10; flex: none; width: 44px; height: 44px; margin: -8px -10px -8px -6px;
+    align-items: center; justify-content: center; background: transparent; border: 0; padding: 0;
+    color: var(--grey-text); cursor: pointer; }
+  .round-cue-tog svg { width: 18px; height: 18px; transition: transform 0.15s; }
+  .round-row.prep.has-cues .round-cue-tog { display: inline-flex; }
+  .round-row.prep.cues-open .round-cue-tog svg { transform: rotate(90deg); }
+  .round-row-main .rd-item { order: 5; }
 
   /* ── Session Complete ── */
   .session-complete { display: none; background: var(--white); border-radius: 12px; padding: 36px 24px; text-align: center; margin-top: 20px; border: 1px solid var(--grey-mid); }
@@ -7740,6 +7755,10 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   const logRPE    = isWarmup ? false
                   : (ex.logRPE   !== undefined ? ex.logRPE   !== false : logsByDefault);
   const showLog   = logRPE; // the Log section holds the per-round RPE rows
+  // A circuit that logs nothing is a warm-up: a list (WK-05, 2026-09-27). One line per
+  // movement (letter, name, dose, ▶), its cues on a tap. It used to open to about 960 px:
+  // every item's cues always open, twelve lines for a four-movement primer.
+  const isPrep = !logWeight && !logRPE;
 
   // The circuit itself takes ONE number from the day's running counter.
   // Each item inside is labelled A, B, C…
@@ -7757,7 +7776,8 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
     const letter = String.fromCharCode(65 + i); // 65 = 'A'
     // THE SPINE: an item without its own cues gets a slot that paintSpine() fills
     // from its entry, exactly like a standalone card's .ex-cues-slot.
-    const itemCues = renderRoundCues(item.cues)
+    const ownCues = renderRoundCues(item.cues);
+    const itemCues = ownCues
       || `<div class="round-cues-slot" data-name="${esc(item.name || '')}" data-exid="${esc(item.exId || '')}"></div>`;
     // Per-item play button — only renders if this sub-exercise has a video
     // (either an explicit videoUrl, or one resolved via the exercise library).
@@ -7767,13 +7787,19 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
          </button>`
       : '';
-    return `<div class="round-row">
-      <div class="round-row-main">
+    // A warm-up row: the cues fold under a chevron (shown once the row has cues: its own,
+    // or its Spine entry's when paintSpine() fills the slot). A tap on the row opens them too.
+    const cueTog = isPrep
+      ? `<button class="round-cue-tog" type="button" aria-expanded="false" aria-label="Cues for ${esc(item.name || '')}" onclick="togglePrepCues(event, this.closest('.round-row'))"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`
+      : '';
+    return `<div class="round-row${isPrep ? ' prep' : ''}${isPrep && ownCues ? ' has-cues' : ''}">
+      <div class="round-row-main"${isPrep ? ` onclick="togglePrepCues(event, this.closest('.round-row'))"` : ''}>
         <span class="round-letter">${letter}</span>
         <span class="round-name">${esc(item.name)}</span>
         <span class="round-detail">${esc(itemDose(item))}</span>
         ${logWeight ? `<input class="round-wt" type="text" inputmode="decimal" placeholder="kg" data-item="${i}">` : ''}
         ${itemPlay}
+        ${cueTog}
       </div>
       ${itemCues}
     </div>`;
@@ -7789,9 +7815,12 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // string, which is why the cell read "Rounds: ×2 Rounds"); `ex.rounds` is still
   // read for anything not yet converted.
   const _rxC = rxOf(ex);
-  // A circuit's rest IS prescribed in practice (it paces the round), so unlike a
-  // standard exercise it keeps a fallback rather than dropping the cell.
-  const circuitRestSec = _rxC.rest || blockRest || 60;
+  // REST IS NEVER INVENTED, for a circuit too (WK-05, 2026-09-27). It fell back to 60 s, so
+  // 19 of the 135 live circuits (7 athletes, 18 of them warm-ups) showed "rest 1:00" that
+  // nobody wrote. The circuit's own rest (rx.rest, or legacy restSec via rxOf) → the
+  // block's → none. Only its own earns a place in the line of numbers; a block rest is
+  // already on the section header.
+  const circuitRestSec = _rxC.rest || blockRest || 0;
   // A converted circuit stores a NUMBER and gets the × added here; a legacy one
   // still holds the whole display string ("×2 Rounds") and must be printed as-is,
   // or it renders "××2 Rounds".
@@ -7804,7 +7833,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   if (roundsLabel)    nlBits.push(`<span class="nl-dose"><b>${esc(roundsLabel)}</b></span>`);
   if (_rxC.dose)      nlBits.push(`<span>${esc(_rxC.dose.value + (_rxC.dose.side ? ' / side' : ''))}</span>`);
   if (_rxC.rpe)       nlBits.push(`<span class="nl-rpe">RPE ${esc(_rxC.rpe)}</span>`);
-  if (circuitRestSec) nlBits.push(`<span class="nl-rest"><span class="nl-lab">rest </span>${esc(formatRestLabel(circuitRestSec))}</span>`);
+  if (_rxC.rest)      nlBits.push(`<span class="nl-rest"><span class="nl-lab">rest </span>${esc(formatRestLabel(_rxC.rest))}</span>`);
   const numLine = nlBits.length ? `<div class="ex-numline">${nlBits.join('')}</div>` : '';
 
   const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
@@ -7815,8 +7844,13 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // and the Quality mix now.)
   const roundCount = parseRoundCount(_rxC.rounds || ex.rounds);
 
-  // Rest button at the bottom of the detail
-  const restBottom = `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${circuitRestSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(circuitRestSec)}</button></div>`;
+  // Rest button at the bottom of the detail. A written rest names itself; a working circuit
+  // with none opens the timer at a neutral minute and says so ("Rest timer"), like a single
+  // exercise; a warm-up with none has no rest button at all (it flows).
+  const restBottom = circuitRestSec
+    ? `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${circuitRestSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(circuitRestSec)}</button></div>`
+    : isPrep ? ''
+    : `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="60" onclick="openTimer(event)">Rest timer ⏱</button></div>`;
 
   return `<div class="checklist-item round-group collapsed ${blockClass}" data-day="${dayId}" data-rounds="${roundCount}" data-log-weight="${logWeight ? '1' : '0'}" data-log-rpe="${logRPE ? '1' : '0'}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
@@ -7950,6 +7984,18 @@ function handlePlayVideo(url) {
 
 // Round cues — same yellow/red accent-line design as standard exercise cues.
 // Always visible inside the expanded circuit (no collapse).
+// A warm-up row's cues, on a tap (WK-05). The row itself or its chevron; the ▶ plays and
+// never toggles. A row with no cues (none written, no Spine entry yet) does nothing.
+function togglePrepCues(ev, row) {
+  if (ev) ev.stopPropagation();
+  if (!row || !row.classList.contains('has-cues')) return;
+  if (ev && ev.target.closest && ev.target.closest('.round-play-btn, input, .rd-tag')) return;
+  const open = row.classList.toggle('cues-open');
+  const b = row.querySelector('.round-cue-tog');
+  if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+window.togglePrepCues = togglePrepCues;
+
 function renderRoundCues(cues) {
   if (!cues || (!cues.good?.length && !cues.bad?.length)) return '';
   let body = '';
@@ -8068,7 +8114,7 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video and the cues, open the first time you meet an exercise, folded after that), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number or tap <strong>Same as last</strong>, which puts last time's weights into every empty set. A weight you type also fills the empty sets below it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video and the cues, open the first time you meet an exercise, folded after that), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number or tap <strong>Same as last</strong>, which puts last time's weights into every empty set. A weight you type also fills the empty sets below it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its cues, ▶ plays its video, and the circle ticks the whole warm-up.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
     body: `<p>The small <strong>i</strong> at the right end of every exercise tells you what it does, which qualities it builds, where it shows up on court, which parts of your body it works (and whether it jumps, lands or runs), and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
@@ -12439,7 +12485,9 @@ function setAllSetsDone(card, done) {
 // Public init that decides per-card whether to use per-set log or legacy single-RPE
 function initSetOrRPE() {
   document.querySelectorAll('#screen-home .checklist-item').forEach(card => {
-    if (!card.querySelector('.rest-btn')) return; // simple exercise — skip
+    // A simple exercise has no rest button. A circuit may have none either (a warm-up with no
+    // written rest, WK-05), and is still a circuit.
+    if (!card.classList.contains('round-group') && !card.querySelector('.rest-btn')) return; // simple exercise — skip
     if (card.classList.contains('round-group')) {
       // Circuit logging — weight grid and/or per-round RPE, per the JSON flags.
       attachCircuitLog(card);
@@ -12551,7 +12599,7 @@ function saveSessionNote(name, v) {
 
 function initNotes() {
   document.querySelectorAll('#screen-home .checklist-item').forEach(card => {
-    if (!card.querySelector('.rest-btn')) return;
+    if (!card.classList.contains('round-group') && !card.querySelector('.rest-btn')) return;   // simple items (WK-05: a circuit keeps its note)
     const name  = card.querySelector('.item-name').textContent.trim();
     const saved = loadSessionNote(name);
     const det = document.createElement('details');
@@ -13889,6 +13937,7 @@ function paintSpine() {
     if (slot.childElementCount) return;
     const entry = spineFor(slot.dataset.name, slot.dataset.exid);
     if (entry && entry.cues) slot.innerHTML = renderRoundCues(entry.cues);
+    if (slot.querySelector('.ex-cue')) { const r = slot.closest('.round-row'); if (r) r.classList.add('has-cues'); }
   });
   document.querySelectorAll('.checklist-item').forEach(card => {
     if (card.classList.contains('round-group')) return;
