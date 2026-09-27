@@ -149,7 +149,9 @@
 //      the programme's session is one slim line at the end of Today.
 // v77: habits.html and program.html changed (2026-09-27, PRF-03): Today leads with the verdict ("2 to go",
 //      On target, Perfect) instead of the day's percentage, and the training app's habits row says the same.
-const CACHE = 'aap-v77';
+// v78: habits.html changed (2026-09-27, PRF-05): one week strip on Today's card, ticked when on target, is
+//      also the day picker (the four day chips went); the card a size smaller; the rank's name is fitted.
+const CACHE = 'aap-v78';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

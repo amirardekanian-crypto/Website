@@ -594,7 +594,7 @@ counter down to nothing was the less honest of the two numbers.
 
 | | Denominator | Used by |
 |---|---|---|
-| **`dayPct()`** — what the day was *worth* | every habit on that day's roster, session included | the day strip, the week's shading, the roll call wall |
+| **`dayPct()`** — what the day was *worth* | every habit on that day's roster, session included | the roll call wall and the share cards (not Today since PRF-03 and PRF-05) |
 | **`gatePct()`** — what the athlete could *do* | same, minus any **locked** habit they did not earn that day | day streaks, and nothing else |
 
 **Today leads with the verdict, not a percentage** (PRF-03, 2026-09-27; display only). The tile

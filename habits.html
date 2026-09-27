@@ -888,28 +888,6 @@
              font-size: 9px; font-weight: 700; letter-spacing: .07em; color: var(--muted-soft); }
   .rc-say { font-size: 14px; line-height: 1.45; color: var(--ink); }
 
-  /* ── The backfill day strip ──────────────────────────────────────────────
-     Four days, today on the right. Each carries its own completion so you can see at
-     a glance which one you forgot — the whole reason the strip exists. */
-  .daystrip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
-              gap: 6px; padding: 14px 20px 16px; }
-  .daychip { display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
-             border: 2px solid var(--divider); padding: 8px 8px 7px; background: none;
-             color: var(--ink); text-align: left; min-width: 0; }
-  .daychip .dl { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-                 font-size: 12px; letter-spacing: .05em; line-height: 1;
-                 white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-  .daychip .dp { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-                 font-size: 9px; font-weight: 700; color: var(--muted-soft); line-height: 1; }
-  .daychip .dbar { display: block; width: 100%; height: 3px; background: var(--divider); }
-  .daychip .dbar > span { display: block; height: 100%; background: var(--muted-soft); }
-  .daychip.on { background: var(--accent); border-color: var(--accent); color: var(--bg); }
-  .daychip.on .dp { color: rgba(255,255,255,.7); }
-  .daychip.on .dbar { background: rgba(255,255,255,.25); }
-  .daychip.on .dbar > span { background: var(--bg); }
-  .daychip.full .dbar > span { background: var(--accent); }
-  .daychip.on.full .dbar > span { background: var(--bg); }
-
   /* Editing a day that is not today is a state you must never be in by
      accident, so it is announced in clay rather than implied by a highlight. */
   .backfill { display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -1329,21 +1307,13 @@
 
   /* Bars & tracks */
   #app .bar, #app .bar > span, #app .hrow .body .track, #app .hrow .body .track > span,
-  #app .daychip .dbar, #app .daychip .dbar > span, #app .msrow .ms-bar, #app .msrow .ms-bar > span,
+  #app .msrow .ms-bar, #app .msrow .ms-bar > span,
   #app .evgoal .g-bar, #app .evgoal .g-bar > span, #app .lvbar, #app .lvbar > span {
     border-radius: 999px;
   }
   #app .bar { height: 9px; }
   #app .hrow .body .track { height: 6px; }
   #app .hrow .body .track > span { background: var(--hcol, var(--accent)); }
-
-  /* Day strip */
-  #app .daychip { border: 0; border-radius: 16px; background: var(--card); box-shadow: var(--shadow); padding: 9px 10px 8px; }
-  #app .daychip .dl { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.02em; }
-  #app .daychip .dp { font-family: 'Outfit', sans-serif; font-weight: 600; }
-  #app .daychip.on { background: var(--accent); color: #fff; }
-  #app .daychip.on .dp { color: rgba(255,255,255,0.75); }
-  #app .daychip .dbar { background: var(--track); height: 4px; }
 
   /* Habit rows → cards */
   #app .hrow { margin: 0 16px 10px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); border-bottom: 0; }
@@ -1796,6 +1766,8 @@
   #app .crosslink-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 15px; text-transform: none; letter-spacing: 0; }
   #app .crosslink-go { font-family: 'Outfit', sans-serif; color: var(--accent); }
   #app .ranklink .go { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--accent); }
+  #app .ranklink.tight { gap: 6px; }
+  #app .ranklink.tight .go { display: none; }   /* fitRankName(): a long rank on a narrow phone */
 
   /* Sheet & stepper & toast */
   #app .sheet { border-top: 0; border-radius: 26px 26px 0 0; box-shadow: 0 -18px 44px -20px rgba(35,31,53,0.4); }
@@ -1874,13 +1846,14 @@
 
   /* ── 1. The hero card, and the week under it ── */
   #app .hero-lv {
-    margin: 4px 16px 12px; padding: 16px; gap: 14px;
+    margin: 4px 16px 12px; padding: 14px 16px; gap: 12px;
     border-radius: 24px; background: var(--card); box-shadow: var(--shadow); border-bottom: 0;
   }
-  #app .hero-top { display: flex; align-items: center; gap: 13px; }
-  #app .hero-lv .lvring { width: 74px; height: 74px; }
+  #app .hero-top { display: flex; align-items: center; gap: 12px; }
+  /* A size smaller since PRF-05 (74 → 62 px), so the week and the list come up the screen. */
+  #app .hero-lv .lvring { width: 62px; height: 62px; }
   #app .hero-lv .lvring circle { stroke-width: 4; }
-  #app .hero-lv .lvring .figure { font-size: 26px !important; }
+  #app .hero-lv .lvring .figure { font-size: 22px !important; }
   #app .herobody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
   #app .heroxp { font-size: 12.5px; line-height: 1.25; color: var(--muted); }
   #app .heroxp b { color: var(--accent); font-weight: 800; }
@@ -1893,31 +1866,15 @@
   /* The streak tile keeps its own colour and sits on the right of the row, so
      the level and the streak are two objects rather than one crowded lockup. It
      renders only when there IS a streak — see streakFlame(). */
-  #app .hero-top .dayflame { flex-direction: column; gap: 1px; padding: 9px 13px; border-radius: 18px; text-align: center; }
-  #app .hero-top .dayflame .flame { width: 20px; height: 25px; }
-  #app .hero-top .dayflame .n { font-size: 26px; }
+  #app .hero-top .dayflame { flex-direction: column; gap: 1px; padding: 7px 10px; border-radius: 16px; text-align: center; }
+  #app .hero-top .dayflame .flame { width: 17px; height: 21px; }
+  #app .hero-top .dayflame .n { font-size: 22px; }
   #app .hero-top .dayflame .u { line-height: 1.1; }
 
-  #app .weekrep { display: flex; align-items: center; gap: 12px; padding-top: 13px; border-top: 1px solid var(--rule); }
-  #app .weekrep .wk-cap { flex: none; width: 46px; font-size: 9.5px; font-weight: 700; letter-spacing: .08em; color: var(--muted-soft); }
-  #app .weekrep .wk-days { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
-  #app .wk-d { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
-  #app .wk-bar { position: relative; width: 100%; height: 30px; border-radius: 11px; background: var(--track); overflow: hidden; }
-  #app .wk-bar > i { position: absolute; inset: 0; border-radius: 11px; background: var(--accent); }
-  #app .wk-bar.now { background: none; box-shadow: inset 0 0 0 2px var(--accent); }
-  #app .wk-l { font-size: 11px; font-weight: 600; color: var(--muted-soft); line-height: 1; white-space: nowrap; }
-  /* "Today" is five characters in a cell sized for one, so it drops a step and
-     is allowed to sit over its neighbours' whitespace — they are single letters
-     with room to spare either side. `overflow: visible` on the column is what
-     lets it, and nowrap is what stops it stacking into two lines. */
-  #app .wk-l.now { color: var(--accent); font-weight: 800; font-size: 9.5px; letter-spacing: -.01em; }
-  #app .wk-d { overflow: visible; }
   /* The verdict (PRF-03) leads the week: "2 TO GO" on the dark card, then ON TARGET or PERFECT in the
      accent. The rule above the row moves from the week to the row, and the "7 DAYS" caption gives the
      tile its room. Dark mode fills with --accent-700: white on the dark accent is 3.35:1. */
-  #app .wkrow { display: flex; align-items: center; gap: 12px; padding-top: 13px; border-top: 1px solid var(--rule); }
-  #app .wkrow .weekrep { flex: 1; min-width: 0; padding-top: 0; border-top: 0; }
-  #app .wkrow .weekrep .wk-cap { display: none; }
+  #app .wkrow { display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid var(--rule); }
   #app .vd {
     flex: none; width: 68px; height: 48px; border-radius: 14px; display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 4px; background: var(--ink-card); color: #FFFFFF;
@@ -1927,6 +1884,27 @@
   #app .vd span { font-size: 10px; font-weight: 800; letter-spacing: .05em; line-height: 1; white-space: nowrap; }
   #app .vd.on, #app .vd.perfect { background: var(--accent); }
   body[data-dark] #app .vd.on, body[data-dark] #app .vd.perfect { background: var(--accent-700); }
+  /* ONE WEEK (PRF-05): seven days, ticked when on target, and the last four are the day picker (they
+     were four chips of their own under the card, each with its percentage). A pale day was started, a
+     grey one has nothing in it, an outlined one is before you started; today is outlined in the accent
+     until it counts. The picked day, when it is not today, is ringed in ink and the screen turns clay. */
+  #app .wk2 { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+  #app .wk2 .c { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; padding: 0; background: none;
+    border: 0; color: inherit; overflow: visible; }
+  /* A day you can pick reaches into the gaps and above and below, so the target is a finger, not a square. */
+  #app .wk2 button.c { cursor: pointer; margin: -6px -3px; padding: 6px 3px; border-radius: 12px; }
+  #app .wk2 .sq { width: 100%; max-width: 40px; aspect-ratio: 1 / 1; border-radius: 32%; display: flex; align-items: center;
+    justify-content: center; background: var(--track); color: #FFFFFF; }
+  #app .wk2 .sq svg.tick { width: 15px; height: 15px; }
+  #app .wk2 .sq.hit { background: var(--accent); }
+  #app .wk2 .sq.part { background: var(--accent-100); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 35%, transparent); }
+  #app .wk2 .sq.pre { background: none; box-shadow: inset 0 0 0 1.5px var(--rule); }
+  #app .wk2 .sq.open { background: none; box-shadow: inset 0 0 0 2px var(--accent); }
+  #app .wk2 .c.sel:not(.today) .sq { outline: 2.5px solid var(--ink); outline-offset: 2px; }
+  #app .wk2 .l { font-size: 11px; font-weight: 600; color: var(--muted-soft); line-height: 1; white-space: nowrap; }
+  /* "Today" is five letters in a cell sized for one: it may sit over its neighbours' spare room. */
+  #app .wk2 .c.today .l { color: var(--accent); font-weight: 800; font-size: 10px; letter-spacing: -.01em; }
+  #app .wk2 .c.sel:not(.today) .l { color: var(--ink); font-weight: 800; }
 
   /* ── 2. Settings as grouped cards ── */
   #app .hdleft { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -2387,7 +2365,7 @@ function previewXp(h, val) {
   // on a day never logged planted one: no tap, no save. Nothing prunes them,
   // the next real save writes them to localStorage and the next push syncs them
   // for good, and loggedDays() counts them — so a brand-new athlete who browsed
-  // the day strip once reads "Day 4" on their first day, on the header and on
+  // the earlier days once reads "Day 4" on their first day, on the header and on
   // the card they share, and the coach's days-logged signal counts a day the
   // app was never used.
   if (had) LOG[k][h.id] = prev;
@@ -3448,7 +3426,7 @@ function dayLong(k) {
   return parseKey(k).toLocaleDateString('en-GB', { weekday:'long' });
 }
 // Appended to the toast when the tap did not land on today, so a mis-tap on the
-// day strip announces itself instead of quietly filing Tuesday under Saturday.
+// week's days announces itself instead of quietly filing Tuesday under Saturday.
 function dayTag() { return editingPast() ? ' for ' + dayLong(AKEY()) : ''; }
 function setDay(k) {
   UI.day = (k === TKEY() ? null : k);
@@ -4482,7 +4460,7 @@ function loggedDays() { return Object.keys(LOG).sort(); }
 // actually ticked, and only that unlocks the perfect-day takeover and badge.
 //
 //   'score' — what the day was WORTH. Everything on that day's roster counts,
-//             the session included. The header, the day strip, the wall.
+//             the session included. The roll call wall and the share cards.
 //   'gate'  — what the athlete could actually DO. A LOCKED habit they did not
 //             earn that day leaves the denominator entirely. Streaks only.
 //
@@ -6251,6 +6229,7 @@ function render() {
   syncNumbers(app);
   fillBars(app);
   typeLines(app);
+  fitRankName(app);
   bindGestures(app);
   // The tour rings a live element measured in viewport coordinates, so every
   // repaint can move it. Re-measuring here is what keeps the box on its target
@@ -6394,9 +6373,9 @@ function publishCardSnapshot() {
     const roster = rosterOn(t);
     const week = [];
     for (let i = 6; i >= 0; i--) week.push(dayQualifies(fmtKey(addDays(parseKey(t), -i))));
-    // The seven-day strip exactly as the Today hero draws it: a PERCENTAGE per
-    // day, not a yes/no, plus the letter under each. `days` is the new shape;
-    // `week` stays for a programme app that has not been updated alongside.
+    // The seven days: `week` is yes/no by the day streak's own gate (what Today's strip ticks since
+    // PRF-05), `days` a percentage per day plus its letter. The training app draws neither since HOME-02;
+    // both stay for a programme app that has not been updated alongside.
     const first = firstLoggedDay();
     const days = [];
     for (let i = 6; i >= 0; i--) {
@@ -6966,10 +6945,11 @@ function tourSteps() {
 
   S.push({
     title: 'Forgot yesterday?',
-    body: `Today, and the ${BACKFILL_DAYS} days behind it. Tap one and everything you tick lands on
-           <strong>that</strong> day instead — the screen turns clay so you cannot forget you are back there.
-           Older than that and the log is shut: a record you can rewrite whenever you like is a diary, not proof.`,
-    screen: 'today', sel: () => $t('.daystrip')
+    body: `Your week is ticked on the days that counted. Today and the ${BACKFILL_DAYS} days behind it can be tapped:
+           everything you tick then lands on <strong>that</strong> day instead, and the screen turns clay so you
+           cannot forget you are back there. Older than that and the log is shut: a record you can rewrite
+           whenever you like is a diary, not proof.`,
+    screen: 'today', sel: () => $t('.wk2')
   });
 
   S.push({
@@ -7719,8 +7699,8 @@ function renderBadgeCelebration(ev) {
 //
 // Hidden entirely until there is a first logged day. A zero over an empty trail
 // is the loudest possible way to open an app on day one, and these screens
-// already go to some trouble not to do that — see the `pre` day chips and the
-// statgrid's day-one note.
+// already go to some trouble not to do that — see the `pre` days on the week and
+// the statgrid's day-one note.
 //
 // Hidden on a ZERO too (Amir, 2026-07-30: "if there is no streak its better not
 // to show it, and only show it if there are streak days"). Same rule the habit
@@ -7754,39 +7734,51 @@ function streakFlame(now, best) {
   </div>`;
 }
 
-// ── The week, under the hero ──────────────────────────────────────────────
-// Seven cells, oldest on the left, shaded by what the day was WORTH (dayPct —
-// the whole roster, the same number the day strip and the wall print). Height
-// is constant on purpose: a bar chart of seven days invites reading the tallest
-// as a win, and these are percentages of different-sized days, not a race.
-// Today keeps its outline whether or not it has anything in it yet, so the row
-// always says which end is now.
-//
-// Days before the athlete's first log are drawn empty rather than at 0% — the
-// same rule the day strip and the heat map follow. A week of grey on day one is
-// three days already lost, and they never had the app.
-function weekReport() {
-  const first = firstLoggedDay();
+// The rank's name never runs under the streak tile (PRF-05). On a 320-360 px phone a long rank
+// ("CONTENDER", "UNTOUCHABLE") was wider than the room between the ring and the flame and was drawn
+// across it. It now steps down a pixel at a time; below 13 px the → goes first (the name and the
+// ring still open the Locker), and 11 px is the floor, which only UNTOUCHABLE on a 320 px phone needs.
+function fitRankName(root) {
+  const hd = root.querySelector('.hero-lv .ranklink .hd');
+  if (!hd) return;
+  const link = hd.closest('.ranklink'), over = () => link.scrollWidth > link.clientWidth + 0.5;
+  let px = 17;
+  link.classList.remove('tight');
+  hd.style.fontSize = px + 'px';
+  while (px > 13 && over()) hd.style.fontSize = (--px) + 'px';
+  if (over()) link.classList.add('tight');
+  while (px > 11 && over()) hd.style.fontSize = (--px) + 'px';
+}
+window.addEventListener('resize', () => { const app = document.getElementById('app'); if (app) fitRankName(app); });
+
+// ── The week, under the hero: one strip, and the day picker (PRF-05, 2026-09-27) ──
+// Seven days, oldest on the left, TICKED WHEN ON TARGET (dayQualifies(), the day streak's own rule and
+// the verdict tile's). The last four, today and the BACKFILL_DAYS behind it, are buttons: tap one and
+// everything you tick lands on that day (setDay()). It replaced two drawings of the same week, bars
+// shaded by dayPct() here and four chips with a percentage each under the card, so the week is drawn
+// once on the card and once in the heat map at the foot of the screen, which says which habit carried it.
+// A day before the athlete's first log is outlined and empty, not a miss: a week of grey on day one is
+// three days already lost, and they never had the app. Today is named, not lettered (Amir,
+// 2026-08-01): it is the one cell read rather than scanned.
+function weekStrip() {
+  const first = firstLoggedDay(), active = AKEY();
   let out = '';
   for (let i = 6; i >= 0; i--) {
     const d = addDays(today(), -i), k = fmtKey(d), now = i === 0;
-    const pre = first ? k < first : true;
-    const p = pre ? 0 : dayPct(k);
-    // 0.22 keeps a barely-started day visible; full days land on solid accent.
-    const fill = p > 0 ? (0.22 + 0.78 * p / 100).toFixed(2) : '0';
-    out += `<div class="wk-d">
-      <span class="wk-bar ${now ? 'now' : ''}" title="${esc(dayLong(k))}${pre ? '' : ' · ' + p + '%'}"><i style="opacity:${fill}"></i></span>
-      <!-- Today is named, not lettered (Amir, 2026-08-01). A single "S" under
-           the outlined cell made the athlete decode which end was now from the
-           outline alone; the word says it outright, and it is the only cell that
-           needs to be read rather than scanned. -->
-      <span class="wk-l ${now ? 'now' : ''}">${now ? 'Today' : esc(d.toLocaleDateString('en-GB', { weekday: 'narrow' }))}</span>
-    </div>`;
+    const pre = first ? k < first : !now;
+    const v = pre ? null : verdictOf(k), logged = !pre && Object.values(LOG[k] || {}).some(x => x > 0);
+    const cls = pre ? 'pre' : v.state !== 'togo' ? 'hit' : now ? 'open' : logged ? 'part' : 'miss';
+    const say = dayLong(k).replace(/^./, c => c.toUpperCase()) + ': ' + (pre ? 'before you started'
+      : v.state === 'perfect' ? 'perfect' : v.state === 'on' ? 'on target'
+      : now ? v.n + ' to go' : logged ? 'started, not on target' : 'nothing logged');
+    const inner = `<span class="sq ${cls}" aria-hidden="true">${cls === 'hit' ? TICK : ''}</span>`
+      + `<span class="l" aria-hidden="true">${now ? 'Today' : esc(d.toLocaleDateString('en-GB', { weekday: 'narrow' }))}</span>`;
+    out += canLog(k)
+      ? `<button class="c ${now ? 'today' : ''} ${k === active ? 'sel' : ''}" data-k="wd:${k}" ${on(() => setDay(k))}
+           aria-pressed="${k === active}" aria-label="${esc(say)}. ${k === active ? 'Logging this day' : 'Tap to log this day'}">${inner}</button>`
+      : `<div class="c" role="img" aria-label="${esc(say)}">${inner}</div>`;
   }
-  return `<div class="weekrep" data-k="weekrep">
-    <span class="wk-cap">7 DAYS</span>
-    <div class="wk-days">${out}</div>
-  </div>`;
+  return `<div class="wk2" data-k="wk2">${out}</div>`;
 }
 
 // ── The segmented meter ───────────────────────────────────────────────────
@@ -7880,33 +7872,6 @@ function habitRow(h, from, lead, pausedThen) {
     </button>
     ${h.kind === 'count' && !h.locked ? `<button class="pluscell" ${on(() => bump(h))} aria-label="Add to ${esc(h.name)}">+</button>` : ''}
     ${locked ? `<button class="pluscell" ${on(() => (isFree() ? (window.location.href = '/form.html') : goProgram()))} aria-label="${isFree() ? 'See about coaching' : 'Open your programme'}">→</button>` : ''}
-  </div>`;
-}
-
-// ── Today ─────────────────────────────────────────────────────────────────
-// Four days, today on the RIGHT. The nudge and the at-risk warning are statements
-// about now, so they stand down while you are filling in an earlier day —
-// "drink three more glasses" is nonsense advice about last Saturday.
-function dayStrip() {
-  const active = AKEY();
-  // A day before the athlete's first logged one is not a 0% day, it is a day
-  // they did not have the app. Three chips reading 0% were the first thing a
-  // brand-new athlete saw, which reads as three days already lost.
-  // `|| TKEY()` matters: firstLoggedDay() is null until something is logged, so
-  // without it the case this exists for — day one, nothing logged — is the one
-  // case it would miss.
-  const first = firstLoggedDay() || TKEY();
-  return `<div class="daystrip" data-k="daystrip">
-    ${editableDays().map(k => {
-      const pre = k < first, p = dayPct(k), sel = k === active;
-      return `<button class="daychip ${sel ? 'on' : ''} ${!pre && p >= 100 ? 'full' : ''}" data-k="dc:${k}"
-        ${on(() => setDay(k))} aria-pressed="${sel}"
-        aria-label="Log ${esc(dayLong(k))}, ${pre ? 'before you started' : p + '% done'}">
-        <span class="dl">${dayShort(k)}</span>
-        <span class="dp">${pre ? '—' : p + '%'}</span>
-        <span class="dbar"><span data-fill style="width:${pre ? 0 : p}%"></span></span>
-      </button>`;
-    }).join('')}
   </div>`;
 }
 
@@ -8037,7 +8002,7 @@ function renderToday(LI, doneCount) {
                progress are one object. r=15.5 in a 36 viewBox → C≈97.4. -->
           <button class="lvring" data-k="lvring" ${on(() => go('pass'))} aria-label="Open the Locker — the ladder and the rewards">
             <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rail" cx="18" cy="18" r="15.5"></circle><circle class="run" cx="18" cy="18" r="15.5" style="stroke-dashoffset:${(97.4 * (1 - LI.pct / 100)).toFixed(1)}"></circle></svg>
-            <span class="in"><span class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:${LI.lv > 99 ? 24 : 30}px;line-height:1">${LI.lv}</span><span class="lbl">LEVEL</span></span>
+            <span class="in"><span class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:${LI.lv > 99 ? 18 : 22}px;line-height:1">${LI.lv}</span><span class="lbl">LEVEL</span></span>
           </button>
           <div class="herobody">
             <button class="ranklink" ${on(() => go('pass'))} aria-label="Open the Locker — the ladder and the rewards">
@@ -8067,14 +8032,14 @@ function renderToday(LI, doneCount) {
         </div>
         <!-- THE VERDICT LEADS THE WEEK (PRF-03): "2 to go", then On target, then Perfect, for the day
              being logged. It replaced the percentage, which was what the day was worth, not whether it
-             counts. -->
-        <div class="wkrow" data-k="wkrow">${verdictTile(AKEY())}${weekReport()}</div>
+             counts. The week beside it is the day picker (PRF-05): the four day chips that sat under
+             the card went, so the list starts a chip-row higher. -->
+        <div class="wkrow" data-k="wkrow">${verdictTile(AKEY())}${weekStrip()}</div>
       </div>
 
-      <!-- Day strip then habits, directly under the hero. The list is what the
-           screen is FOR; it used to start ~1,400px down, behind the nudge and
-           the quest block, so opening the app to log meant scrolling to log. -->
-      ${dayStrip()}
+      <!-- The habits come directly under the hero. The list is what the screen is FOR; it used to
+           start ~1,400px down, behind the nudge and the quest block, so opening the app to log meant
+           scrolling to log. -->
       ${past ? `<div class="backfill" data-k="backfill">
         <div>
           <div class="eyebrow">Filling in</div>
@@ -9060,7 +9025,7 @@ function renderManual() {
         p(`<strong style="color:var(--ink)">Put it on your home screen</strong> and it opens in one tap, looks like any other app and keeps working with no signal. ${isIOS() ? 'Tap Share in the browser bar, then Add to Home Screen.' : 'There is a row for it in Settings.'} There is nothing to download — it is this page, kept somewhere you can reach it.`))}
 
       ${block(h2('Forgot to log a day?') +
-        p(`Use the row of days at the top of Today. You can go back <strong style="color:var(--ink)">${BACKFILL_DAYS} days</strong> and fill in or correct anything you missed — each day shows how much of it you completed, so it is easy to spot the one you forgot.`) +
+        p(`Tap the day on your week, in the card at the top of Today. You can go back <strong style="color:var(--ink)">${BACKFILL_DAYS} days</strong> and fill in or correct anything you missed. A ticked day was on target, a pale one was started and a grey one has nothing in it, so the one you forgot is easy to spot.`) +
         p(`While you are on an earlier day the screen turns clay and says so, and everything you tap lands on <em>that</em> day. Tap <strong style="color:var(--ink)">Back to today</strong> when you're done.`) +
         p(`Older than ${BACKFILL_DAYS} days and the log is closed. That is on purpose: a record you can rewrite whenever you like is a diary, not proof. Filling a day in still counts for everything — points, streaks, badges, quests.`))}
 
