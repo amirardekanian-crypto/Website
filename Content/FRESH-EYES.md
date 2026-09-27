@@ -63,13 +63,12 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#256](https://github.com/amirardekanian-crypto/Website/pull/256) | An unfinished day is asked about on a later open: "Tuesday's Day 2 was never sent", Send it (filed under Tuesday) or Clear it (Amir: "Ask the athlete next open") | DATA-02 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
 | [#260](https://github.com/amirardekanian-crypto/Website/pull/260) | The rest timer keeps time in a pocket: counts from a timestamp, opens running, beeps (Sound on/off) and buzzes at zero, keeps the screen awake; ticking a set offers **Rest 2:00** above the tab bar; the card's Rest button is 44 px | WK-02 |
+| [#263](https://github.com/amirardekanian-crypto/Website/pull/263) | Guided's layout: the current set is pinned on screen above the footer on every step (it hid on 8 of 14 at 320×568); the rest screen asks the weight beside reps and RPE (Same as last); supersets and circuits come in round by round, the last round ticking the circuit; the rest screen scrolls on a short phone | WK-01 |
 | [#262](https://github.com/amirardekanian-crypto/Website/pull/262) | The working card, from Amir's notes on two mockups: one line of numbers, his pills kept, a note dot, the ⓘ at the right end (clay for a Because), no history on a closed card; open, the note in two lines, Last time as a box (last set, tap for all), How to do it folded after the first time; a small done row, fold after the last RPE and the next card opens; the kg box follows the Spine's equipment | CARD-01, CARD-02, CARD-03 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263).
 
 **Partly done, and what is still open on each:**
-- **WK-01.** The quick part is done. Still open: kg on the rest screen beside reps and RPE, the live row
-  pinned above the footer (it sits under it at 390 px), and circuits as one step per round.
 - **WK-03.** Done: the Guided label colour (#234), the clock never clipped and the label on one line at
   any width, and "In progress · Resume" on the day card (#244). Still open, with the session project:
   a slim session bar, and hiding the tab bar mid-session with a clear "Leave session" (needs NAV-01).
@@ -84,9 +83,6 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **SEAM-01.** Habits are ticked on Home. The full Proof app still has no way back to training,
   offers a second install, keeps its own dark-mode switch, and reads workout ticks only at launch.
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
-- **CARD-03.** The kg box follows the work (#262). Still open: typing the seconds a hold lasted. The log line has
-  no place for it (only a reps dose writes `×n`, read back by `parseSetText()` and coach.html's `parseSetLine()`),
-  so it is a grammar change in three places; put to Amir before building.
 
 **Open.** P2: PROG-01,
 PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01. P3: DS-03, CONS-01, PRF-05, WK-05, LIB-01, POL-02, DOC-01.
@@ -109,11 +105,13 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
    leave it; the phone's dark setting → the athlete chooses.
 2. **Foundations:** done. HOME-02 shipped from Amir's notes on the mockup (#258): no separate Today card, no
    rest-day design ("we don't know their rest days"); done days small, undone days big, the in-progress card.
-3. **The session** (the card freeze is lifted): WK-02 (#260) and the working card (#262, CARD-01/02 and
-   CARD-03's kg part) are done, from two mockups (https://claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8rz) and
-   Amir's notes: keep the ⓘ and his pills, Last time a box that shows the last set, no history on a
-   closed card. Full account: `PROGRAM-APP.md` → *The working card*. Next: WK-01's layout part (kg on the
-   rest screen, the live row above the footer), WK-04, ONB-01, WK-05.
+3. **The session** (the card freeze is lifted): WK-02 (#260), the working card (#262, CARD-01/02/03) and
+   Guided's layout (#263, WK-01) are done. Full accounts: `PROGRAM-APP.md` → *The working card* and *Guided
+   Mode's layout*. Next: **WK-04** (one finish: rate, then done, which records and tells Amir in one step;
+   show whether the session reached him; progress, not "skipped", until the athlete finishes early), then
+   **ONB-01** (three one-time hints in the first session, each dismissed by doing the thing), **WK-05**
+   (a compact prep list for warm-up circuits, no invented rest), and WK-03's last parts (a slim session bar,
+   the tab bar hidden mid-session with a clear "Leave session").
 4. **Home and progress:** PROG-01.
 5. **Coach and Proof:** COACH-02, NAV-02, SEAM-01 (after the habit count below), PRF-01, PRF-02,
    PRF-03.

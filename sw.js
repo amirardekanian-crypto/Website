@@ -112,7 +112,7 @@
 //      later open ("Tuesday's Day 2 was never sent": Send it / Clear it).
 // v58: program.html changed (2026-09-26, HOME-02): Home is led by the training: a small cycle line, done days
 //      as small rows, the in-progress card with Resume, and habits / records / weight as one row each.
-const CACHE = 'aap-v60';
+const CACHE = 'aap-v61';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
