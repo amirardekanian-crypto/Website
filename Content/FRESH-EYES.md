@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-27)
 
-**27 done · 5 partly done · 12 open**, of 44. Each was checked against the code on `main`.
+**28 done · 5 partly done · 11 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -71,8 +71,9 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#267](https://github.com/amirardekanian-crypto/Website/pull/267) | A warm-up circuit is a list: one line per movement (letter, name, dose, ▶), its cues on a tap (a real four-movement primer opened to 1001 px, now 452 px); a circuit's rest is never invented (19 of 135 live circuits showed a 60 s nobody wrote) | WK-05 |
 | [#268](https://github.com/amirardekanian-crypto/Website/pull/268) | An athlete can sign out: the initials button top right (where the floating dark toggle was) opens Theme, Install, How the app works, Privacy and Sign out; signing out sends the waiting report, the session queue and the progress first, then nothing more; AA Proof's Settings has Sign out too | NAV-02 |
 | [#269](https://github.com/amirardekanian-crypto/Website/pull/269) | From Start until Done the session bar is one slim line (← Home, the clock, Pause, ⋯ for Guided and Reset) and the tab bar hides: mid-session chrome goes from 26% of an iPhone SE screen to 9% (Amir's option C of the mockup); the clock is never cut, past an hour included | WK-03 |
+| [#270](https://github.com/amirardekanian-crypto/Website/pull/270) | The guide opens in the sheet, from your initials, one row on the Coach tab, and the jargon itself ("How hard?" on the RPE strip, "tempo" in an open card, a ? in Guided's top bar), each opening its own card; a Guided mode card; the Coach tab is Amir's voice | COACH-02 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269).
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270).
 
 **Partly done, and what is still open on each:**
 - **A11Y-01.** The training app is done on the screens measured. Still open: AA Proof's small type and
@@ -88,7 +89,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
 
 **Open.** P2: PROG-01,
-PRF-01, PRF-02, PRF-03, COACH-02, DS-01. P3: DS-03, CONS-01, PRF-05, LIB-01, POL-02, DOC-01.
+PRF-01, PRF-02, PRF-03, DS-01. P3: DS-03, CONS-01, PRF-05, LIB-01, POL-02, DOC-01.
 
 ## Next, in order
 
@@ -117,8 +118,8 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
    session project is finished.** Left as it was on purpose: a working circuit's cues stay open (WK-05 was the
    warm-ups); fold them the way the working card folds How to do it if Amir wants that too.
 4. **Home and progress:** PROG-01 (a new panel on Home and Game Plan: show Amir a mockup first, as HOME-02 did).
-5. **Coach and Proof:** NAV-02 is done (#268, `PROGRAM-APP.md` → *Your account*), so COACH-02 is unblocked
-   (the guide into the account sheet, and "?" where the jargon is). Then SEAM-01 (after the habit count below), PRF-01, PRF-02,
+5. **Coach and Proof:** NAV-02 (#268) and COACH-02 (#270) are done (`PROGRAM-APP.md` → *Your account* and *The
+   guide in the sheet*). Then SEAM-01 (after the habit count below), PRF-01, PRF-02,
    PRF-03.
 6. **System and polish:** DS-01, DS-03, CONS-01, PRF-05, LIB-01, POL-01, POL-02, DOC-01.
 
@@ -223,6 +224,6 @@ The app cannot reach Supabase from here, so stub it and feed it a local programm
 
 > Continue the Fresh Eyes work. Read `Content/FRESH-EYES.md` first, then the Fresh Eyes page
 > (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). Stages one and two are done, and the card freeze is
-> lifted ("dont freeze anything"). Keep going down *Next, in order* (COACH-02 is next; PROG-01 needs a mockup first), one PR per item, merged
+> lifted ("dont freeze anything"). Keep going down *Next, in order* (PROG-01 needs a mockup first; then SEAM-01 and PRF-01), one PR per item, merged
 > and confirmed live the same day. Pause only for a call that is mine: restate the problem, give two or three
 > directions with trade-offs and your recommendation, and wait for my answer on that one.

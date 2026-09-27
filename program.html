@@ -2504,6 +2504,9 @@
   .ex-set-rpe-q {
     font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.8px;
     text-transform: uppercase; color: var(--grey-text); white-space: nowrap; margin-right: 2px;
+    /* A button (COACH-02): the word is the way to what RPE means. */
+    background: none; border: 0; padding: 0 2px; min-height: 40px; cursor: pointer;
+    text-decoration: underline dotted; text-underline-offset: 3px;
   }
   .ex-set-rpe .rpe-btn { flex: 1 1 0; max-width: none; height: 40px; font-size: 16px; border-radius: 8px; }
   /* RPE against target (rpeVs): clay over, steel blue under, green on target. */
@@ -3833,7 +3836,7 @@
      ════════════════════════════════════════════════════════════════════ */
 
   /* ── Coach hero (avatar + name + online status) ── */
-  .coach-hero { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 28px 24px 20px; }
+  .coach-hero { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 28px 64px 20px 24px; }   /* clear of the account button (NAV-02) */
   .coach-avatar {
     position: relative;
     width: 64px; height: 64px; flex-shrink: 0; border-radius: 50%; overflow: hidden;
@@ -3966,6 +3969,16 @@
      These are constant app-UI icons, so they always use the brand green tile
      (the per-note clay/paper rotation only applies to personal notes above). */
   .app-card .note-card-title { color: var(--grey-dark); }
+  /* The guide in the sheet (COACH-02), and its one row on the Coach tab. */
+  .help-list { margin-top: 12px; }
+  .help-list .note-card { margin: 0 0 10px; }
+  .app-help-row { display: flex; align-items: center; gap: 12px; width: calc(100% - 40px); padding: 12px 16px; text-align: left; cursor: pointer; font: inherit; }
+  .app-help-row .note-card-title { flex: 1; color: var(--grey-dark); }
+  .app-help-go { color: var(--grey-text); font-size: 20px; line-height: 1; }
+  body[data-dark] .app-help-row .note-card-title { color: #f0f0f0; }
+  .nl-lab.nl-help { background: none; border: 0; padding: 0; margin: 0; font-family: inherit; font-size: inherit;
+    letter-spacing: inherit; line-height: inherit; font-weight: 400; color: var(--grey-text); cursor: pointer;
+    text-decoration: underline dotted; text-underline-offset: 3px; }
   body[data-dark] .app-card .note-card-title { color: #f0f0f0; }
   .app-card-icon {
     width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; overflow: hidden;
@@ -4075,6 +4088,12 @@
   body[data-dark] .step-overlay { background: #141414; }
   .step-topbar { display: flex; align-items: center; gap: 12px; padding: calc(env(safe-area-inset-top, 0px) + 14px) 16px 12px; flex-shrink: 0; }
   .step-exit { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--grey-mid); background: var(--white); color: var(--grey-dark); font-size: 15px; line-height: 1; cursor: pointer; flex-shrink: 0; }
+  /* ? — how Guided works (COACH-02), at the far end of the top bar. */
+  .step-help { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--grey-mid); background: var(--white); color: var(--grey-text);
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 17px; line-height: 1; cursor: pointer; flex-shrink: 0; position: relative; }
+  .step-help::after, .step-exit::after { content: ''; position: absolute; inset: -5px; }   /* 44 px targets */
+  .step-exit { position: relative; }
+  body[data-dark] .step-help { background: #202020; border-color: #333; color: #bbb; }
   body[data-dark] .step-exit { background: #202020; border-color: #333; color: #eee; }
   .step-topbar-text { flex: 1; min-width: 0; }
   .step-eyebrow { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); }
@@ -4826,6 +4845,7 @@
       <div class="step-eyebrow" id="step-eyebrow"></div>
       <div class="step-pill" id="step-pill"></div>
     </div>
+    <button type="button" class="step-help" onclick="openHelp('guided')" aria-label="How Guided works">?</button>
   </div>
   <div class="step-scroll" id="step-scroll"></div>
   <div class="step-footer" id="step-footer"></div>
@@ -6227,17 +6247,30 @@ function openAccount(e) {
     try { localStorage.removeItem('a2hs_dismissed_v1'); } catch (err) {}   // asked for: always answer
     window.A2HS.show();
   });
-  document.getElementById('acct-help').addEventListener('click', () => {
-    closeHistorySheet();
-    goTo('notes');   // the Coach tab's screen is #screen-notes
-    const lbl = [...document.querySelectorAll('#notes-container .notes-section-label')].find(l => /Using the app/.test(l.textContent));
-    if (lbl) setTimeout(() => lbl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
-  });
+  document.getElementById('acct-help').addEventListener('click', () => openHelp());   // ‹ Back returns here
   const so = document.getElementById('acct-signout');
   if (so) so.addEventListener('click', () => armedTap(so, 'Tap again to sign out', () => signOutSafely(so)));
   ov.classList.add('visible');
 }
 window.openAccount = openAccount;
+// The guide in the one sheet (COACH-02, 2026-09-27). It sat at the bottom of the Coach tab, under
+// the personal notes; now it opens from your initials (How the app works), from one row on the
+// Coach tab, and from the jargon itself: "How hard?" on the RPE strip, "tempo" in an open card,
+// and the ? in Guided's top bar, each opening its own card. The Coach tab is Amir's voice.
+function openHelp(key) {
+  const ov = document.getElementById('hist-overlay');
+  if (!ov) return;
+  const k = key === 'tempo' ? 'rpe' : key;
+  ov.querySelector('.readiness-modal').innerHTML = `
+    <div class="readiness-eyebrow">Help</div>
+    <h2 class="readiness-title">How the app works</h2>
+    <div class="help-list">${buildAppGuideCards(k)}</div>
+    <div class="hs-actions"><button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button></div>`;
+  ov.classList.add('visible');
+  const open = ov.querySelector('.help-list .note-card.open');
+  if (open) setTimeout(() => open.scrollIntoView({ block: 'start' }), 30);
+}
+window.openHelp = openHelp;
 // Send what this phone holds, then sign out. The report and the session queue first, the
 // progress last (it carries what they stamped), then nothing more goes up: the page's own
 // pagehide push would run after the sign-out. Each step is capped, so no signal never traps
@@ -7702,7 +7735,8 @@ function renderNumLine(rx, rest) {
   else if (dose)       bits.push(`<span class="nl-dose"><b>${esc(dose)}</b></span>`);
   if (rx.rpe) bits.push(`<span class="nl-rpe">RPE ${esc(rx.rpe)}</span>`);
   const tempo = tempoDisplay(rx.tempo);
-  if (tempo) bits.push(`<span class="nl-tempo"><span class="nl-lab">tempo </span>${tempo.html}</span>`);
+  // "tempo" shows in an open card only, and is the way to what the numbers mean (COACH-02).
+  if (tempo) bits.push(`<span class="nl-tempo"><button type="button" class="nl-lab nl-help" onclick="event.stopPropagation(); openHelp('tempo')" aria-label="Tempo: what the numbers mean">tempo </button>${tempo.html}</span>`);
   if (rest)  bits.push(`<span class="nl-rest"><span class="nl-lab">rest </span>${esc(formatRestLabel(rest))}</span>`);
   return bits.length ? `<div class="ex-numline">${bits.join('')}</div>` : '';
 }
@@ -8221,14 +8255,18 @@ function renderNotes() {
       <div class="note-body">${card.body}</div>
     </div>`).join('');
 
-  // ── "Using the app" — general cards, same for everyone (from the APP_GUIDE
-  //    data array; this is the only place the how-to content lives now).
-  const appCards = buildAppGuideCards();
+  // ── "Using the app": the guide (APP_GUIDE) opens in the one sheet now (COACH-02); the
+  //    Coach tab keeps one row for it, and stays Amir's voice.
+  const appRow = `<button type="button" class="note-card app-help-row" onclick="openHelp()">
+      <span class="app-card-icon">${window.ICON('help')}</span>
+      <span class="note-card-title">How the app works</span>
+      <span class="app-help-go" aria-hidden="true">›</span>
+    </button>`;
 
   document.getElementById('notes-container').innerHTML =
     coachContactHtml() +
     (personalCards ? `<div class="notes-section-label">Personal notes</div>${personalCards}` : '') +
-    (appCards ? `<div class="notes-section-label">Using the app</div>${appCards}` : '');
+    `<div class="notes-section-label">Using the app</div>${appRow}`;
 }
 
 // "Using the app" — the general how-to content shown to every athlete in the
@@ -8240,6 +8278,7 @@ function renderNotes() {
 // never heard of a one-rep max. ONE copy, used in two places: the "Using the app"
 // card in the Coach tab, and the "How this works" panel on the records screen
 // itself. Two copies of the same prose would drift the first time either is edited.
+// (The guide opens in the one sheet since COACH-02: openHelp().)
 const CEILING_HELP = `
   <p><strong>What it is.</strong> Your one rep max is the heaviest you could lift one single time.
   It is the normal way to measure how strong you are.</p>
@@ -8276,15 +8315,17 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training. This week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you, the button to message me on WhatsApp, and this guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training. This week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
-  { icon: 'activity', title: 'RPE & Tempo',
+  { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
     body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video and the cues, open the first time you meet an exercise, folded after that), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number or tap <strong>Same as last</strong>, which puts last time's weights into every empty set. A weight you type also fills the empty sets below it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its cues, ▶ plays its video, and the circle ticks the whole warm-up.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
+  { icon: 'tracking', key: 'guided', title: 'Guided mode',
+    body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. When the rest is over it moves you to the next set. Supersets and circuits come round by round; warm-ups stay in the list.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
     body: `<p>The small <strong>i</strong> at the right end of every exercise tells you what it does, which qualities it builds, where it shows up on court, which parts of your body it works (and whether it jumps, lands or runs), and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
@@ -8306,9 +8347,9 @@ const APP_GUIDE = [
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab, in every exercise's ⓘ, and at the end of every session, where your message already says which day or exercise it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days; quick check-ins beat long waits.</p>` },
 ];
 
-function buildAppGuideCards() {
+function buildAppGuideCards(openKey) {
   return APP_GUIDE.map(card => `
-    <div class="note-card app-card" onclick="toggleNote(this)">
+    <div class="note-card app-card${openKey && card.key === openKey ? ' open' : ''}" onclick="toggleNote(this)">
       <div class="note-card-header">
         <div class="app-card-icon">${window.ICON(card.icon)}</div>
         <div class="note-card-title">${esc(card.title)}</div>
@@ -11029,7 +11070,7 @@ function resetDay(day) {
 // Accordion: opening a note closes any other open note on the Coach page.
 function toggleNote(card) {
   const wasOpen = card.classList.contains('open');
-  const scope = card.closest('#notes-container') || document;
+  const scope = card.closest('#notes-container, .help-list') || document;
   scope.querySelectorAll('.note-card.open').forEach(c => c.classList.remove('open'));
   if (!wasOpen) card.classList.add('open');
 }
@@ -11805,7 +11846,7 @@ function attachSetLog(card) {
       ${repsBox}
       <button class="ex-set-rpetag" type="button" aria-label="Rate set ${i+1}"></button>
       <button class="ex-set-check" type="button" aria-label="Mark set ${i+1} done as written"></button>
-      <div class="ex-set-rpe"><span class="ex-set-rpe-q">How hard?</span>${rpeBtns}</div>
+      <div class="ex-set-rpe"><button type="button" class="ex-set-rpe-q" onclick="event.stopPropagation(); openHelp('rpe')" aria-label="How hard? What RPE means">How hard?</button>${rpeBtns}</div>
     </div>`;
   });
   wrap.innerHTML = html;
@@ -13954,6 +13995,8 @@ function wrapSheetOpeners() {
   openExerciseSheet = sheetWrap(openExerciseSheet);
   openWhyPlan = sheetWrap(openWhyPlan);
   openQualitySheet = sheetWrap(openQualitySheet);
+  openAccount = sheetWrap(openAccount); openHelp = sheetWrap(openHelp);   // Help from the account: ‹ Back
+  window.openAccount = openAccount; window.openHelp = openHelp;
   window.openHistorySheet = openHistorySheet; window.openExerciseSheet = openExerciseSheet;
   window.openWhyPlan = openWhyPlan; window.openQualitySheet = openQualitySheet;
   const close0 = closeHistorySheet;

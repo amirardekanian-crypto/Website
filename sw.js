@@ -129,7 +129,9 @@
 //      Install, Help, Privacy and Sign out (which sends everything first); Proof's Settings signs out.
 // v67: program.html changed (2026-09-27, WK-03): from Start until Done the session bar is one slim line
 //      (← Home, clock, Pause, ⋯) and the tab bar hides (Amir's option C).
-const CACHE = 'aap-v67';
+// v68: program.html changed (2026-09-27, COACH-02): the guide opens in the sheet (your initials, one row on
+//      the Coach tab, "How hard?", "tempo", Guided's ?); a Guided mode card.
+const CACHE = 'aap-v68';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
