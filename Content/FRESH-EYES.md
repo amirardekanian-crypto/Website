@@ -62,20 +62,19 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#258](https://github.com/amirardekanian-crypto/Website/pull/258) | Home led by the training: a small cycle line, done days as small rows, the in-progress card with Resume, habits / records / weight as one row each, quiet empty states, never a rest day (Amir's notes on the mockup) | HOME-02 |
 | [#256](https://github.com/amirardekanian-crypto/Website/pull/256) | An unfinished day is asked about on a later open: "Tuesday's Day 2 was never sent", Send it (filed under Tuesday) or Clear it (Amir: "Ask the athlete next open") | DATA-02 |
 | [#247](https://github.com/amirardekanian-crypto/Website/pull/247) | The same in AA Proof: Back closes a sheet, Settings a step at a time, a tab; never in the embedded strip | NAV-01 |
+| [#260](https://github.com/amirardekanian-crypto/Website/pull/260) | The rest timer keeps time in a pocket: counts from a timestamp, opens running, beeps (Sound on/off) and buzzes at zero, keeps the screen awake; ticking a set offers **Rest 2:00** above the tab bar; the card's Rest button is 44 px | WK-02 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27).
 
 **Partly done, and what is still open on each:**
 - **WK-01.** The quick part is done. Still open: kg on the rest screen beside reps and RPE, the live row
   pinned above the footer (it sits under it at 390 px), and circuits as one step per round.
-- **PRF-04.** The three misfires are fixed (display only). Still open: a rest day that *credits* the
-  other habits, which changes scoring (see *Open calls*).
 - **WK-03.** Done: the Guided label colour (#234), the clock never clipped and the label on one line at
   any width, and "In progress · Resume" on the day card (#244). Still open, with the session project:
   a slim session bar, and hiding the tab bar mid-session with a clear "Leave session" (needs NAV-01).
 - **A11Y-01.** The training app is done on the screens measured. Still open: AA Proof's small type and
-  its accent buttons in dark mode (3.35:1), which go with PRF-02 / DS-03; pinch-zoom in program.html
-  (`user-scalable=no`, a card change); and following the phone's dark setting (*Open calls*).
+  its accent buttons in dark mode (3.35:1), which go with PRF-02 / DS-03; and pinch-zoom in program.html
+  (`user-scalable=no`). Following the phone's dark setting is not wanted: the athlete chooses (Amir, 2026-09-27).
 - **NAV-01.** Back closes the top layer in both apps. Still open: one close grammar for the buttons
   (← for screens, ✕ top-right for overlays, drag or tap outside for sheets).
 - **POL-01.** Swept. Still open: the rest screen still lets the card show through faintly (97%), the
@@ -85,7 +84,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
   offers a second install, keeps its own dark-mode switch, and reads workout ticks only at launch.
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
 
-**Open.** P1: WK-02, CARD-01. P2: PROG-01,
+**Open.** P1: CARD-01. P2: PROG-01,
 PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, WK-04, ONB-01, DS-01, CARD-02, CARD-03. P3: DS-03, CONS-01, PRF-05, WK-05, LIB-01, POL-02, DOC-01.
 
 ## Next, in order
@@ -102,11 +101,11 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
    DATA-02's safe part, SHEET-01 and POL-01 (#239–#252, Amir: "keep going, only pause if you want me to choose").
    **Amir answered four of the six calls** (2026-09-26, each his recommended option): the Today block →
    a mockup first; Game Plan → fold past and future (#254); the estimate → off the card (#255); the
-   unfinished day → ask the athlete on their next open. Two remain: a rest day in Proof, following the
-   phone's dark setting.
+   unfinished day → ask the athlete on their next open. The last two on 2026-09-27: a rest day in Proof →
+   leave it; the phone's dark setting → the athlete chooses.
 2. **Foundations:** done. HOME-02 shipped from Amir's notes on the mockup (#258): no separate Today card, no
    rest-day design ("we don't know their rest days"); done days small, undone days big, the in-progress card.
-3. **The session** (the card freeze is lifted): WK-02 first (clear direction, built directly), then CARD-01 with
+3. **The session** (the card freeze is lifted): WK-02 is done (#260); next CARD-01 with
    CARD-02 and CARD-03 as one mockup for Amir, then WK-01's layout part, WK-04, ONB-01, WK-05.
 4. **Home and progress:** PROG-01.
 5. **Coach and Proof:** COACH-02, NAV-02, SEAM-01 (after the habit count below), PRF-01, PRF-02,
@@ -116,7 +115,7 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 ## Open calls and things to watch (put these to Amir)
 
 - **Answered 2026-09-26:** Today block → mockup first, then built from his notes (#258) · Game Plan → fold (#254) ·
-  estimate → off the card (#255) · unfinished day → ask the athlete (#256). Still his: a rest day in Proof, following the phone's dark setting (below).
+  estimate → off the card (#255) · unfinished day → ask the athlete (#256). **Answered 2026-09-27:** a rest day in Proof → leave it · dark mode → the athlete's choice.
 - **The demo breaks two of his rules.** It has a "Week 4 — Deload" notes card instead of
   `weekNotes.last` (REC-4; the demo has no week notes at all), and "Use 2–3 kg" in a notes card
   rather than in that exercise's Coach's Note (PRG-2). The words were left as written when the demo

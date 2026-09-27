@@ -3405,6 +3405,8 @@
     display: flex; justify-content: flex-end;
     margin-top: 14px;
   }
+  /* 44 px to tap with a chalky thumb (it was 28). */
+  .ex-rest-bottom .rest-btn { font-size: 13px; min-height: 44px; padding: 0 18px; }
 
   /* Filled-yellow play button — clear, tappable, on-brand */
   .play-btn {
@@ -3865,7 +3867,24 @@
   /* ── Timer ── */
   .timer-overlay { position: fixed; inset: 0; background: rgba(250,247,242,0.97); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
   .timer-overlay.visible { display: flex; }
-  .timer-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--grey-text); margin-bottom: 16px; }
+  .timer-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--grey-text); margin-bottom: 10px; }
+  /* Sound on/off for the tones at zero (WK-02); the buzz stays either way. */
+  .timer-sound { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+    min-height: 32px; padding: 6px 14px; margin-bottom: 12px; border-radius: 999px; cursor: pointer;
+    background: transparent; border: 1px solid var(--grey-mid); color: var(--green-ink); }
+  .timer-sound.off { color: var(--grey-text); text-decoration: line-through; }
+  body[data-dark] .timer-sound { border-color: #444; }
+  /* The rest offer after a tick: one button above the tab bar, by the thumb. */
+  .rest-offer { position: fixed; left: 50%; transform: translateX(-50%); z-index: 70; display: flex; align-items: stretch;
+    border-radius: 999px; background: var(--yellow); color: var(--on-accent); box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+    animation: restOfferIn 0.2s ease; }
+  .rest-offer[hidden] { display: none; }
+  @keyframes restOfferIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  .rest-offer-go { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 1.2px; text-transform: uppercase;
+    background: transparent; border: none; color: inherit; cursor: pointer; min-height: 48px; padding: 0 10px 0 24px; white-space: nowrap; }
+  .rest-offer-go b { font-weight: 800; font-variant-numeric: tabular-nums; margin-left: 4px; }
+  .rest-offer-x { background: transparent; border: none; border-left: 1px solid rgba(255,255,255,0.28); color: inherit; cursor: pointer;
+    min-width: 48px; min-height: 48px; font-size: 22px; line-height: 1; padding: 0 16px 0 12px; }
   .timer-ring { width: 220px; height: 220px; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
   .timer-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
   .timer-ring circle { fill: none; stroke-width: 4; }
@@ -4608,6 +4627,7 @@
 <div class="timer-overlay" id="timerOverlay">
   <div class="timer-exercise-name" id="timer-exercise-name"></div>
   <div class="timer-label">Rest Timer</div>
+  <button type="button" class="timer-sound" id="timerSoundBtn" onclick="toggleRestSound()" aria-pressed="true">Sound on</button>
   <div class="timer-ring">
     <svg viewBox="0 0 220 220">
       <circle class="ring-bg" cx="110" cy="110" r="100"/>
@@ -4623,6 +4643,12 @@
   </div>
   <!-- Guided Mode only: describe the set just done while resting (stepAfterDone). -->
   <div class="timer-log" id="timerLog" hidden></div>
+</div>
+
+<!-- The rest offer: shown after a set is ticked in list mode (offerRest, WK-02). -->
+<div class="rest-offer" id="restOffer" hidden>
+  <button type="button" class="rest-offer-go" onclick="takeRestOffer()">Rest <b id="restOfferTime">2:00</b></button>
+  <button type="button" class="rest-offer-x" onclick="hideRestOffer()" aria-label="No rest now">×</button>
 </div>
 
 <!-- Readiness check — shown on Start, before the timer runs. Records only. -->
@@ -6674,6 +6700,7 @@ function closeDayView() {
   if (dv) dv.hidden = true;
   if (ov) ov.hidden = false;
   document.getElementById('v-progress').classList.remove('active');
+  hideRestOffer();
   paintWeek();
   // Back on a nav screen — bring the global dark-mode toggle back.
   const gToggle = document.getElementById('global-dark-toggle');
@@ -7874,7 +7901,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app — full-screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong> — open an exercise and tap the <strong>Rest ⏱</strong> button under its sets to start a countdown between sets. It shows the rest I wrote for you, when I wrote one.</li><li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li><li><strong>Dark mode</strong> — tap the moon button (top-right) to switch themes for low-light gym sessions.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong> — tick a set and a <strong>Rest</strong> button comes up above the tabs: tap it and the countdown starts. The <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets does the same. It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li><li><strong>Dark mode</strong> — tap the moon button (top-right) to switch themes for low-light gym sessions.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab, in every exercise's ⓘ, and at the end of every session, where your message already says which day or exercise it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days; quick check-ins beat long waits.</p>` },
 ];
@@ -7954,6 +7981,7 @@ function coachContactHtml() {
 }
 
 function goTo(screen, historyId, keepContent) {
+  hideRestOffer();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + screen).classList.add('active');
   // The rail is the open day's progress: only in a day view (POL-01; it sat on the overview too).
@@ -11331,6 +11359,9 @@ function attachSetLog(card) {
       paintSets();
       // Sync the exercise-level check: all sets done = exercise checked.
       syncExerciseCheck(card, cur);
+      // A set just done with more to come: offer the rest (WK-02). Unticking takes it back.
+      if (cur[idx].d && cur.some(x => !x.d)) offerRest(card);
+      else if (_restOffer && _restOffer.card === card) hideRestOffer();
       if (navigator.vibrate) navigator.vibrate(12);
     });
   });
@@ -12215,7 +12246,13 @@ function syncDarkToggle() {
 // ── Timer ──
 // Rest duration comes from the clicked exercise's `data-rest` attribute (set from
 // the JSON's `restSec` field), or falls back to 120s if not provided.
+// The countdown runs from a timestamp (timerEndsAt), not from ticks counted by an
+// interval: a phone that sleeps or throttles the page still ends the rest on time, and
+// the next tick (or coming back to the app) catches up at once (WK-02). While it runs
+// the screen is kept awake; at zero it sounds (unless the athlete turned the sound off)
+// and buzzes where the phone can (iPhone has no vibration API).
 let timerDuration = 120, timerRemaining = 120, timerInterval = null, timerRunning = false;
+let timerEndsAt = 0, timerGoTimeout = null;
 let timerOnComplete = null;   // set only by openTimerAuto (Guided Mode) — see closeTimer()
 const circumference = 2 * Math.PI * 100;
 
@@ -12228,12 +12265,18 @@ function openTimer(e) {
   // Read rest duration from the button's data-rest, default to 120s
   const parsed = btn ? parseInt(btn.getAttribute('data-rest'), 10) : NaN;
   const secs = (Number.isFinite(parsed) && parsed > 0) ? parsed : 120;
-  showTimer(secs, name, null);
+  openRest(secs, name);
 }
 
-// Guided Mode's rest: same overlay, but it starts itself and calls onComplete when the
-// rest ends — naturally, or via Skip. Never used from the manual Rest button, so list-mode
-// (tap Rest, tap Start yourself) is unchanged.
+// Every list-mode door (the card's Rest button, the offer after a tick) opens the rest
+// already running: tapping Rest means the set is over (WK-02; it used to wait for Start).
+function openRest(secs, name) {
+  showTimer(secs, name, null);
+  startTimer();
+}
+
+// Guided Mode's rest: same overlay, same running start, but it calls onComplete when
+// the rest ends — naturally, or via Skip.
 function openTimerAuto(secs, name, onComplete) {
   showTimer(secs, name, onComplete);
   startTimer();
@@ -12241,6 +12284,8 @@ function openTimerAuto(secs, name, onComplete) {
 
 // Shared setup for both entry points above.
 function showTimer(secs, name, onComplete) {
+  hideRestOffer();
+  clearTimeout(timerGoTimeout); timerGoTimeout = null;   // a "GO!" still closing the last rest
   timerDuration = secs;
   timerRemaining = secs;
   timerOnComplete = onComplete;
@@ -12251,11 +12296,13 @@ function showTimer(secs, name, onComplete) {
   if (tl) { tl.hidden = !(onComplete && tl.dataset.ready === '1'); tl.dataset.ready = ''; }
   document.getElementById('timerOverlay').classList.toggle('has-log', !!(tl && !tl.hidden));
   document.getElementById('timerOverlay').classList.add('visible');
+  paintRestSound();
   // resetTimer() refreshes display + ring using the new timerDuration
   resetTimer();
 }
 
 function closeTimer() {
+  clearTimeout(timerGoTimeout); timerGoTimeout = null;
   document.getElementById('timerOverlay').classList.remove('visible');
   pauseTimer();
   // Fires once, whether the rest ran out on its own or Skip/Close ended it early. Only
@@ -12266,7 +12313,8 @@ function closeTimer() {
 // +15s while resting. Bumps the duration up to match so the ring never shows more than
 // full, rather than reporting a fraction over 1.
 function addTimerSeconds(n) {
-  timerRemaining = Math.max(0, timerRemaining + n);
+  if (timerRunning) { timerEndsAt += n * 1000; timerRemaining = timerLeft(); }
+  else timerRemaining = Math.max(0, timerRemaining + n);
   timerDuration = Math.max(timerDuration, timerRemaining);
   updateTimerDisplay();
   updateRing(timerDuration ? timerRemaining / timerDuration : 1);
@@ -12275,30 +12323,158 @@ function addTimerSeconds(n) {
 
 function toggleTimer() { timerRunning ? pauseTimer() : startTimer(); }
 
+// Whole seconds left on a running rest, read from the clock.
+function timerLeft() { return Math.max(0, Math.ceil((timerEndsAt - Date.now()) / 1000)); }
+
 function startTimer() {
   if (timerRemaining <= 0) timerRemaining = timerDuration;
+  timerEndsAt = Date.now() + timerRemaining * 1000;
   timerRunning = true;
   document.getElementById('startStopBtn').textContent = 'Pause';
-  timerInterval = setInterval(() => {
-    timerRemaining--;
-    updateTimerDisplay();
-    updateRing(timerRemaining / timerDuration);
-    if (timerRemaining <= 0) {
-      pauseTimer();
-      document.getElementById('timerDisplay').textContent = 'GO!';
-      document.getElementById('timerDisplay').classList.add('warning');
-      setTimeout(() => { document.getElementById('timerDisplay').classList.remove('warning'); closeTimer(); }, 1200);
-    }
-  }, 1000);
+  restAudioPrime();   // inside the tap that started it, so the sound at zero is allowed to play
+  restWake(true);
+  clearInterval(timerInterval);
+  timerInterval = setInterval(timerTick, 250);
 }
 
-function pauseTimer() { timerRunning = false; clearInterval(timerInterval); document.getElementById('startStopBtn').textContent = 'Start'; }
+// Paints only when the whole second changes, so the ring's 1 s transition stays smooth.
+function timerTick() {
+  if (!timerRunning) return;
+  const left = timerLeft();
+  if (left !== timerRemaining) {
+    timerRemaining = left;
+    updateTimerDisplay();
+    updateRing(timerDuration ? timerRemaining / timerDuration : 0);
+  }
+  if (left <= 0) timerDone();
+}
+
+function timerDone() {
+  // Back in the app long after the end (the phone was locked): no alarm then, just close.
+  const late = Date.now() - timerEndsAt > 30000;
+  pauseTimer();
+  if (!late) restAlert();
+  const d = document.getElementById('timerDisplay');
+  d.textContent = 'GO!';
+  d.classList.add('warning');
+  timerGoTimeout = setTimeout(() => { timerGoTimeout = null; d.classList.remove('warning'); closeTimer(); }, 1200);
+}
+
+function pauseTimer() {
+  if (timerRunning) timerRemaining = timerLeft();
+  timerRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('startStopBtn').textContent = 'Start';
+  restWake(false);
+}
 
 function resetTimer() {
   pauseTimer(); timerRemaining = timerDuration;
   updateTimerDisplay(); updateRing(1);
   document.getElementById('timerDisplay').classList.remove('warning');
 }
+
+// A hidden page gets no ticks and loses its wake lock; coming back catches the clock up
+// (ending the rest if it ran out) and asks for the lock again.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && timerRunning) { restWake(true); timerTick(); }
+});
+
+// ── Rest: sound, buzz, screen awake ──
+// The sound is two short tones made with Web Audio, so nothing is downloaded. The audio
+// context is created (or resumed) in the tap that starts a rest; a phone on silent keeps
+// it quiet. `rest_sound` = '0' turns it off on this phone; the buzz stays.
+let _restAC = null, _restLock = null;
+function restSoundOn() { try { return localStorage.getItem('rest_sound') !== '0'; } catch (e) { return true; } }
+function toggleRestSound() {
+  const on = !restSoundOn();
+  try { localStorage.setItem('rest_sound', on ? '1' : '0'); } catch (e) {}
+  paintRestSound();
+  if (on) { restAudioPrime(); restBeep(); }
+}
+function paintRestSound() {
+  const b = document.getElementById('timerSoundBtn');
+  if (!b) return;
+  const on = restSoundOn();
+  b.textContent = on ? 'Sound on' : 'Sound off';
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  b.classList.toggle('off', !on);
+}
+function restAudioPrime() {
+  try {
+    if (!_restAC) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; _restAC = new C(); }
+    if (_restAC.state === 'suspended') _restAC.resume();
+  } catch (e) {}
+}
+function restBeep() {
+  if (!_restAC || !restSoundOn()) return;
+  try {
+    const t = _restAC.currentTime;
+    [[0, 880], [0.24, 1320]].forEach(([d, f]) => {
+      const o = _restAC.createOscillator(), g = _restAC.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t + d);
+      g.gain.exponentialRampToValueAtTime(0.4, t + d + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.2);
+      o.connect(g); g.connect(_restAC.destination);
+      o.start(t + d); o.stop(t + d + 0.22);
+    });
+  } catch (e) {}
+}
+function restAlert() {
+  restBeep();
+  if (navigator.vibrate) navigator.vibrate([280, 120, 280]);
+}
+// Asked for on start, let go on pause and close. A request still pending when the rest
+// stops is released the moment it arrives.
+async function restWake(on) {
+  try {
+    if (!on) { const l = _restLock; _restLock = null; if (l) await l.release(); return; }
+    if (_restLock || !('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
+    const l = await navigator.wakeLock.request('screen');
+    if (!timerRunning) { l.release(); return; }
+    _restLock = l;
+    l.addEventListener('release', () => { if (_restLock === l) _restLock = null; });
+  } catch (e) { _restLock = null; }
+}
+
+// ── The rest offer ──
+// Ticking a set in list mode, with sets still to go on that exercise, slides up one
+// button above the tab bar: "Rest 2:00". It sits by the thumb, where the old Rest button
+// sat at the very bottom of the card. It never starts on its own, because athletes also
+// tick sets after the fact. Guided Mode rests itself and never shows it.
+let _restOffer = null, _restOfferT = null;
+function offerRest(card) {
+  if (typeof STEP !== 'undefined' && STEP) return;
+  if (timerRunning || !card) return;
+  const btn = card.querySelector('.rest-btn');
+  if (!btn) return;
+  const parsed = parseInt(btn.getAttribute('data-rest'), 10);
+  const secs = (Number.isFinite(parsed) && parsed > 0) ? parsed : 120;
+  const nm = card.querySelector('.item-name');
+  _restOffer = { secs, name: nm ? nm.textContent.trim() : '', card };
+  const el = document.getElementById('restOffer');
+  if (!el) return;
+  const tabs = document.querySelector('.global-tabs');
+  el.style.bottom = ((tabs && tabs.offsetHeight) || 0) + 12 + 'px';
+  document.getElementById('restOfferTime').textContent = formatClock(secs);
+  el.hidden = false;
+  clearTimeout(_restOfferT);
+  _restOfferT = setTimeout(hideRestOffer, 90000);
+}
+function hideRestOffer() {
+  clearTimeout(_restOfferT); _restOfferT = null;
+  _restOffer = null;
+  const el = document.getElementById('restOffer');
+  if (el) el.hidden = true;
+}
+function takeRestOffer() {
+  const o = _restOffer;
+  if (!o) return hideRestOffer();
+  openRest(o.secs, o.name);
+}
+// 90 → "1:30", 45 → "0:45".
+function formatClock(secs) { return Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0'); }
 
 function updateTimerDisplay() {
   const el = document.getElementById('timerDisplay');
