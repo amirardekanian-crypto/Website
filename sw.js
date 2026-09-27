@@ -155,7 +155,9 @@
 //      whole screen (a level's reward on it); medals, tiers, a perfect day, a comeback: the wins card on Today.
 // v80: habits.html changed (2026-09-27, PRF-02 part 2): the tour is five steps (the row, the week, the level
 //      and the Locker, the board, your initials).
-const CACHE = 'aap-v80';
+// v81: habits.html changed (2026-09-27, PRF-02 part 3): Progress shows the next three milestones, quests only
+//      while a run is on, the Locker's road to the next three rewards, Crew opens on the board.
+const CACHE = 'aap-v81';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

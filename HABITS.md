@@ -501,9 +501,10 @@ less time left is the one to act on, and a live card is clay while a finished on
 
 **They are no longer on Today.** Today is for logging; a block of week-long targets there
 was commentary sitting above the list and pushed the habits down for something nobody acts
-on mid-tap. Between runs the section stays visible with one muted line — the block
-vanishing entirely kept *"seeing quests means something is on"* true but made the whole
-feature invisible, so an athlete who joined between runs never learned quests existed.
+on mid-tap. **Between runs the section is not drawn** (PRF-02, Amir's 4A, 2026-09-27). It
+used to stay visible with one muted line, so that an athlete who joined between runs learned
+quests existed; after 17 August that line was all anyone had seen of them. A run arrives with
+its card and its takeover, and the manual's *Quests* section explains them in between.
 
 Quest rows carry a name **and** a description, so each goal splits across two lines
 (`.g-lbl` / `.g-sub`) rather than wrapping under the bar.
@@ -561,6 +562,13 @@ two-year athlete nothing left to want. Nothing but the Progress screen reads `ti
 machinery on either side, just more rows in `ACHIEVEMENTS` **and** in the
 `milestones` array on the `xp_rules` row. ⚠️ Both, or the board pays a different
 number to the phone.
+
+**Progress shows the next three** (PRF-02, Amir's 3A, 2026-09-27): day one was 4,595 px
+of Progress with 37 milestone rows open and none earned. Folded, the section is the three
+you are closest to (furthest along; at zero, the fewest to go), with their bars; what you
+have earned on **one row of medals**; and one row, **All 37 milestones**, that opens the
+four groups below as they were (*Show the next three only* folds them again). The choice is
+`CFG.msOpen.all`, remembered like the groups'. Measured: 4,523 → 1,538 px three weeks in.
 
 **Every tier group — including "A few weeks" — collapses from its own header**
 (`msTierHeader()`: the label, the count and a chevron, always shown). Groups are
@@ -790,10 +798,11 @@ Opens straight on **four season stats**: days logged, badges, **day streak** (as
 flame) and perfect days → a one-line **key explaining the consistency pips**, which had
 no legend anywhere in the app and are empty for the first five days → **one row per
 habit** (its level in a ring, its streak and five pips, tapping through to full
-history) → paused habits with their banked XP → **quests** → the 32 one-off
-**milestones** and the five "A few weeks" events, in four groups — *A good week*, *A few
-weeks*, *The long haul*, *Rare* — each collapsible from its own header and **open by
-default** (see *Milestones come in three tiers*, above), with one line above them
+history) → paused habits with their banked XP → **quests**, only while a run is on → the
+**milestones**: the next three, the earned ones on one row of medals, and **All 37
+milestones**, which opens the 32 one-off milestones and the five "A few weeks" events in
+four groups — *A good week*, *A few weeks*, *The long haul*, *Rare* — each collapsible from
+its own header (see *Milestones come in three tiers*, above), with one line above them
 explaining what completing one is worth.
 
 There used to be a level/rank strip up top too — the same information as Today's hero,
@@ -889,18 +898,20 @@ announce themselves the moment they change, through the flash chip — which is 
 actually matter — and both Progress and the detail screen carry the level permanently.
 
 ### 03 · CREW — everyone else
-It holds the **whole** social layer. Two views, switched at the top: **Roll call** (the
-default) and **Leaderboard**. Who is on the board, and how they got there, is under *The
-leaderboard* below.
+It holds the **whole** social layer. Two views, switched at the top: **Leaderboard** (the
+default since PRF-02, Amir's 6A, 2026-09-27) and **Roll call**. Who is on the board, and how
+they got there, is under *The leaderboard* below.
 
 **Roll call** is the composer *and* the wall, in that order — you write at the top of the
 feed you are posting to. Behind it: the last seven days of one-sentence entries grouped
 by day, newest first, each line carrying the writer's display name, season rank and that
 day's completion. **Amir's own line leads its day** (clay left border, `YOUR COACH`).
 
-Roll call is the default because conversation rewards coming back and a ranking is a
-once-a-day glance. Today carries a **one-line pointer** into this tab that disappears
-once the athlete has written — a doorway, not a second composer.
+The board is the default: where you stand first, Roll call one tap away. (Roll call led
+until 2026-09-27, on the argument that conversation rewards coming back; the wall held 2
+lines in 9 days across 19 athletes.) Today carries a **one-line pointer** that opens
+Roll call itself (`LB.view = 'roll'`) and disappears once the athlete has written — a
+doorway, not a second composer.
 
 **Leaderboard** has two scopes: **this season** (the default) and **past week** (a rolling
 seven days, not a calendar week). Joining by hand, renaming and leaving live at its foot
@@ -974,6 +985,11 @@ the top of Settings; and Settings → *The long game*. Top to bottom it draws:
 3. **Seasons** — the shelf of finished seasons, drawn only once one has closed.
 4. **The pass** — the road: the 10 ranks as gates with the 14 rewards threaded between
    them, the *YOU ARE HERE* marker at the athlete's exact level, and the star past 50.
+   **Folded to the next three rewards** (PRF-02, Amir's 5A, 2026-09-27): the rank you are in,
+   the marker and the next three rewards with any rank they cross into, then **The whole road
+   to level 50**, which opens the rest (`CFG.msOpen.road`, remembered). At level 9 the road
+   ran to level 50, about 300 days away: 2,954 → 1,447 px. The road is built as a list of
+   rows (`items`) so the fold is a slice of the same markup.
 
 *How rewards work* at the foot opens the manual. The design, and the three shapes it went
 through, are in *The long game* below.
