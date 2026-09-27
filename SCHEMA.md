@@ -676,13 +676,13 @@ piece of equipment, an intent cue, and occasionally a real dose. Each now has it
 
 | Field | What it is | How it draws |
 |---|---|---|
-| `rx` | the numbers | the stats grid |
+| `rx` | the numbers | one line of numbers under the name, `4 × 6 · RPE 7 · 3-1-1 · 2:30` (the stats grid until 2026-09-27, Fresh Eyes CARD-02) |
 | `setup` | equipment / position / conditions — `"45° bench"`, `"In 4 · out 8"`. **Not used any more** (no floating text, Amir 2026-09-25: the detail goes in the `note`). Programmes, the library files and the coach editor carry none; the app still draws one if an old file has it | quiet grey line under the name |
 | `intent` | **the ONE pill:** a **grip** (`"neutral grip"`, `"wide grip"`, `"neutral grip · straps"`) or ONE coaching intention (`"max intent"`, `"stick the landing"`). A card that needs both joins them in the one pill: `"neutral grip · max intent"` | the green pill (the only pill), the same pill Amir's older cards draw for a grip chip |
-| `note` | the coach's note to this athlete. **Anything about THIS athlete that used to be a custom cue goes here** (2026-09-24) | clay "Coach's Note" callout |
+| `note` | the coach's note to this athlete. **Anything about THIS athlete that used to be a custom cue goes here** (2026-09-24) | a clay dot after the name on the closed card; open, a clay callout cut to two lines with More › |
 | `cues` | **Do not write (2026-09-24).** Every card, circuit items included, shows its approved Spine entry's cues. Legacy cards still carry `cues`, which the app shows instead of the entry's until the next cycle drops them | the cues list |
 | `exId` | the exercise's id in the Spine (`public.exercises`), e.g. `"trap-bar-deadlift"` | nothing directly: it ties the card to its entry |
-| `why` | **Because:** why THIS athlete has this exercise — `{ "src", "part"?, "text" }` | a clay dot on the ⓘ; the reason opens the About sheet, and the cycle's Why page lists them all |
+| `why` | **Because:** why THIS athlete has this exercise — `{ "src", "part"?, "text" }` | a clay ⓘ (a dot on its corner until 2026-09-27); the reason opens the About sheet, and the cycle's Why page lists them all |
 
 **A grip is a chip, never free text** (Amir, 2026-09-25: *"grips should be a chip on the card not a
 free text"*). The rx redesign of 2026-09-20 had moved `neutral grip` into the grey `setup` line,

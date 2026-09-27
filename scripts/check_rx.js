@@ -37,7 +37,7 @@ function slice(startMark, endMark, what) {
 }
 // One contiguous region: parseDurationToSec → parseChips → isPureDuration →
 // DOSE_LABEL → tempoDisplay → rxOf → repCount, stopping at the first renderer.
-const inlineSrc = slice('function parseDurationToSec(', 'function renderStatsGrid(rx) {',
+const inlineSrc = slice('function parseDurationToSec(', 'function renderNumLine(rx, rest) {',
                         'the parse + rx region');
 
 const inline = {};

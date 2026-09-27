@@ -41,7 +41,7 @@ doing the same, and a duration filed under a cell labelled **REPS**.
 **Four fields beside it, four meanings, four looks** — this is the fix for "pills get mixed up",
 where one green pill stood for 121 different labels (a tempo said in words, equipment, an intent
 cue, and occasionally a real dose):
-`rx` → the grid · `setup` → quiet grey line (kit/position) · `intent` → **the** green pill (a grip
+`rx` → the line of numbers (the grid until 2026-09-27, *The working card*) · `setup` → quiet grey line (kit/position) · `intent` → **the** green pill (a grip
 or ONE intention) · `note` → clay callout · `cues` → the cues list.
 ⚠ **A GRIP IS THE PILL, never the grey line** (Amir, 2026-09-25: *"grips should be a chip on the card
 not a free text"*): `"intent": "neutral grip"`, the same pill his older cards draw for a grip chip.
@@ -203,6 +203,8 @@ day, across cycles via `matchRenamed()`), and **History ›** opens the History 
   implement, so a dumbbell lift logged as `20` one day and `2×20` the next is the same lift. Only a
   count of 1 to 4 before the sign counts as a pair (`20x2` stays 20). coach.html's `loadSummary()`
   does no maths on any weight that is not a plain number (`24` or `24kg`): it prints `2×20` as typed.
+- **Only in the open card** (2026-09-27, *The working card*): the **Last time** box under the Coach's Note. The closed
+  card's clay *Last* pill is gone (Amir: *"no history on the exercise card when not opened"*).
 - **`<id>_histcache` is a cache and never syncs** (`_snapshot()` skips it; written with
   `_lsRawSet` so it never stamps `lastEditAt`). The source is `get_my_history()`, stage30.
 
@@ -226,7 +228,7 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   **The next batch is the `/spine` skill** (`.claude/skills/spine/`): the what's-missing query, the
   alias/new/skip sort, and `draft_sql.py`, which checks every link. The batch file with SFR and
   flags stays in the scratchpad, never in this public repo.
-- **The card gains ONE thing:** a small ⓘ after the name, only for an approved entry. Everything
+- **The card gains ONE thing:** a small ⓘ, only for an approved entry, at the right end of the row (after the name until 2026-09-27, *The working card*). Everything
   else is in the About sheet (`openExerciseSheet()`), which reuses the History sheet's frame.
   ⚠ **Opened from a CARD** (Amir, 2026-09-24): Why you, what it does, pattern and quality chips,
   On court, the three lists, History. *In your programme* shows **only when it is opened from
@@ -357,7 +359,7 @@ you recommend."* Server: `supabase/stage32_qualities.sql`.
 
 Idea #4 of `/ideas` round 1 (brief: claude.ai/artifact/WtZ4xfq38dV7zZwRu926jw; Amir: *"go"*, on the
 recommended picks). `ex.why = { src, part?, text }`, spec in `SCHEMA.md` → *`why` — Because*.
-- **The card gains only a clay dot on the ⓘ** (`.ex-about.has-why`). The sentence opens the About
+- **The card gains only a clay ⓘ** (`.ex-about.has-why`; a clay dot on its corner until 2026-09-27, when the clay dot after the name became the Coach's Note). The sentence opens the About
   sheet under **Why you** (`whyBlock()`), and **Why your plan looks like this**, a button under the
   current cycle card (three or more reasons), groups them by source (`openWhyPlan()`). A card with a
   `why` gets the ⓘ even before its Spine entry is approved.
@@ -405,7 +407,7 @@ costs more than one tap.
     paler than the prescribed reps beside it, because a tick records the reps and not this. A bare
     `last 80` placeholder was tried first: at 375px the box holds about 38px of text, so `last 22.5`
     was cut off. A ticked set shows no hint.
-  - **Same as last** (`.ex-same-last`, clay outline like the *Last* pill) fills every empty, unticked
+  - **Same as last** (`.ex-same-last`, a clay outline) fills every empty, unticked
     set with its own last weight, or the nearest one above when last time had fewer sets
     (`sameAsLastFills()`); the label names the load or the range, `80–90 kg`, and no number at all
     when a weight is not a plain number (`2x20`).
@@ -603,9 +605,9 @@ the sheet. Closing forgets the trail. A new sheet opener gets wrapped in `wrapSh
 - **Tab bar:** inactive tabs grey at full strength (they were 55%-faded green), labels 11 px, 48 px tall.
 - **Sizes:** no label under 11 px on Home, the day, the finish card, the rest timer, Coach and Game Plan
   (glyphs, the Level ring and the day letters excepted, at 9–10.5 px). Session notes 16 px. The session rating
-  is two rows of five at 44 px (ten in a row were ~24 px); the ⓘ keeps its 20 px look with a 44 px hit area.
+  is two rows of five at 44 px (ten in a row were ~24 px); the ⓘ is 26 px at the row's right end (20 px before the working card) with a 44 px hit area.
 - **Not done:** program.html still sets `maximum-scale=1, user-scalable=no`, so pinch-zoom is off (AA Proof
-  allowed it on 2026-09-26). Allowing it means 16 px set-log boxes on iOS, a card change (the freeze).
+  allowed it on 2026-09-26). The set-log boxes are 16 px already, so it is a small change, still to be decided.
 
 ## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26)
 
@@ -633,6 +635,57 @@ and not finished (`dayInProgress()`: a clock started today, or a ticked set), an
   also tick sets after the fact; it goes on ×, an untick, leaving the day or 90 s. Guided never shows it.
   Circuits keep their Rest button only. The card's **Rest ⏱** button is 44 px tall (it was 28).
 - The overlay's dark palette came with A11Y-01 (#245).
+
+## 🧾 The working card (CARD-01/02/03, 2026-09-27)
+
+Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8rz). Opened, the card was
+1,306 px and the first set sat 953 px down; now about 700 px with the first set about 400 px down.
+**Closed** (`renderExercise()`):
+- **One line of numbers** (`renderNumLine()`, `.ex-numline`): `4 × 6 · RPE 7 · 3-1-1 · 2:30`, only what was
+  prescribed, the exercise's own rest only. It replaced the stats grid AND the grey number pills. The words
+  *tempo* and *rest* (`.nl-lab`) show once the card is open. `numLineText()` reads it as text.
+- **A pill that says something stays a pill** (Amir: *"we need to find a way for them"*): the green `intent`
+  pill and a legacy card's chips (`renderExSummary()`), and the check-in's pills. On a lower day `rdTarget()`
+  takes `RPE 7` out of the line and adds the clay **RPE 7 → 6 today** pill, so the number is said once;
+  `paintToday()`'s undo puts it back.
+- **The Coach's Note is a clay dot after the name** (`NOTE_DOT`, an empty span inside `.item-name`, so the
+  name's text is unchanged); open, the note is cut to two lines with **More ›** (`fitNotes()` measures it
+  when the card opens: `toggleExpand()`, Guided's `renderStep()`).
+- **The ⓘ sits at the right end** (`.ex-side`, `paintSpine()`), 26 px, and a Because fills it clay.
+- **No history on a closed card** (Amir: *"no history on the exercise card when not opened"*): the *Last*
+  pill is gone.
+- **A long name wraps beside its number** (`.item-name-row` no longer wraps), never under it.
+
+**Open**, in this order: the note, **Last time**, **How to do it**, the sets, Rest. There is no *Log Sets* label.
+- **Last time is a box** (`paintLastTime()` into `.lt-slot`): closed it shows last session's **last set**,
+  `70 kg × 5 @ 8` (the RPE clay over target, steel blue under; `ltLastSetHtml()`); tapped, every set, the
+  RPEs against the target, the note and **History ›**. Open or closed is ONE setting for the phone,
+  `lt_open` (`ltToggle()`: every box follows the one tapped; unprefixed, so it never syncs). A first
+  meeting shows the **First time** box. A circuit keeps its old strip, always open.
+- **How to do it** (`renderHowTo()`, a `<details class="ex-how">`): the video and the cues in one row that
+  names what it holds, *Video & 4 cues* (`paintHowTo()`, which also hides it while it holds nothing, since the
+  Spine's cues arrive late). It opens by itself only when the athlete has **no history** for the lift
+  (`openHowFirstTime()`, run by `paintLastTime()`), and on a Library session; once tapped it stays as left.
+
+**Done**: a finished exercise's closed row is small and says what was done, *72.5 kg × 6 · 6 · 6 · 6 ·
+RPE 7 7 7 8* (`paintDoneLines()` from `updateProgress()`, one line with an ellipsis; `.is-done`). After
+the last set's RPE (or a tick-all on an open card) the card folds and the **next unfinished card opens in
+view** (`foldWhenDone()`, 700 ms): a set still waiting for its RPE keeps it open, Guided never folds,
+a tick-all on a closed card opens nothing. Library cards never become done rows.
+
+**The kg box follows the work** (CARD-03, Amir: *"By the work"*; `kgWanted()` / `paintKgCol()`): shown
+when the Spine entry's `equipment` is loaded (`KG_LOADED`: barbell, dumbbell, kettlebell, cable, a
+machine that is not cardio, landmine, sled, medicine ball…), and kept when that is unknown (no approved
+entry, no equipment) or when the athlete has **ever logged a weight** on it (this session or history),
+so a weighted plank keeps its box. Hidden (`.ex-set-log.no-kg`), never removed, so Guided, *Same as last*
+and the carry-down never meet a missing node. A row with no box at all says its dose, `30 s / side`
+(`.ex-set-dose`, from `data-dose`). **Not built: typing the seconds a hold lasted.** The log line has no
+place for it: `n` is reps and only a reps dose writes `×n` (`buildSessionData()`, read back by
+`parseSetText()` and coach.html's `parseSetLine()`), so it needs a grammar change in all three, asked
+of Amir separately.
+
+Guided copies the line of numbers and the pills under its name (`renderStep()`), because they live in the
+header now. Circuits got the same header (line of numbers, note dot) and lost their Rounds/Rest grid.
 
 ## 📲 The install ask waits for a finished session (HOME-03, 2026-09-26)
 
