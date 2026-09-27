@@ -383,8 +383,10 @@ costs more than one tap.
   row before a rep is lifted: **How hard?** opens full width under a row the moment it is ticked,
   then folds into an `RPE 8` tag that reopens it. `.live` tints the next set to do. All row state
   is drawn by one painter, `card._paintSets()`; "tick all" and Reset call it too.
-- **Guided Mode asks on the REST screen** (`paintTimerLog()`): a reps − / + and the RPE strip for
-  the set just done. It holds no state — every tap goes through the row's own input and buttons.
+- **Guided Mode asks on the REST screen** (`paintTimerLog()`): the weight (since 2026-09-27, the set's
+  own kg box, so typing saves and fills the empty sets below; last time as its hint and **Same as last**;
+  none for work with no kg box), a reps − / + and the RPE strip for the set just done. It holds no
+  state — every tap goes through the row's own input and buttons.
 - **The note is per SESSION**: `<id>_snote_<Name>` = `{ d: local date, v }`, shown and sent only on
   day `d`. The old `<id>_note_` was never cleared, so half the notes Amir received were re-runs
   (522 sent, 259 distinct). A date stamp, not a clear, because the cloud merge prefers text over a
@@ -679,13 +681,30 @@ machine that is not cardio, landmine, sled, medicine ball…), and kept when tha
 entry, no equipment) or when the athlete has **ever logged a weight** on it (this session or history),
 so a weighted plank keeps its box. Hidden (`.ex-set-log.no-kg`), never removed, so Guided, *Same as last*
 and the carry-down never meet a missing node. A row with no box at all says its dose, `30 s / side`
-(`.ex-set-dose`, from `data-dose`). **Not built: typing the seconds a hold lasted.** The log line has no
-place for it: `n` is reps and only a reps dose writes `×n` (`buildSessionData()`, read back by
-`parseSetText()` and coach.html's `parseSetLine()`), so it needs a grammar change in all three, asked
-of Amir separately.
+(`.ex-set-dose`, from `data-dose`). **No box for the seconds a hold lasted** (Amir, 2026-09-27: *"Leave
+the tick"*): the tick means the time as written, and a shorter hold goes in the Note. (It would have
+needed a new field in the log line, which only writes `×n` for a reps dose.)
 
 Guided copies the line of numbers and the pills under its name (`renderStep()`), because they live in the
 header now. Circuits got the same header (line of numbers, note dot) and lost their Rounds/Rest grid.
+
+## 🧭 Guided Mode's layout (WK-01, second part, 2026-09-27)
+
+- **The current row is pinned** (CSS `position: sticky` on `.step-current` inside `.step-scroll`, whose
+  `.ex-log` lets it out with `overflow: visible`): in place when it is on screen, held just above the footer
+  (or under the top bar) otherwise, with a solid tint because it passes over the rows above. Sticky cannot
+  lift a row above its own table, so `renderStep()` also scrolls just far enough when the whole table starts
+  below the fold (a first-time lift, its video and cues open). Measured before: the row was under the
+  footer on 4 of 14 steps at 375×667 and 8 of 14 at 320×568; after: on screen on every step at all three sizes.
+- **Kg on the rest screen**, beside reps and RPE (`paintTimerLog()`, above).
+- **Circuits join Guided, one step per round** (`buildStepSeq()`): a circuit that logs something (a superset,
+  a complex, conditioning); a prep circuit logs nothing and stays out, like the warm-up items. A round has
+  no tick of its own, so `stepDone()` reads its RPE (the same `<id>_rpe_<Name>[_rN]` key the list writes),
+  this Guided session's finished rounds, or the circuit's tick; the last round ticks the circuit
+  (`finishRound()` → `toggleCheckOnly()`), the one unit the day counts it as. The round's rest screen asks
+  its RPE through the row's own buttons (`paintRoundLog()`). The pill reads *Round 2 of 3*.
+- **The rest screen scrolls** on a short phone instead of cutting the panel off (`.timer-overlay.has-log`),
+  and its ring shrinks under 720 px tall.
 
 ## 📲 The install ask waits for a finished session (HOME-03, 2026-09-26)
 

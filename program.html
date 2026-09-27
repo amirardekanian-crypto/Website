@@ -3867,6 +3867,24 @@
   .tl-rpe-btn { flex: 1 1 0; height: 44px; border-radius: 10px; border: 1px solid var(--grey-mid); background: transparent;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: var(--grey-text); cursor: pointer; }
   .tl-rpe-btn.selected { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
+  /* The weight on the rest screen (WK-01): 16 px or more, or iOS zooms the page on focus. */
+  .tl-kg { flex: 1; min-width: 0; height: 44px; border-radius: 10px; border: 1px solid var(--grey-mid); background: var(--grey-card);
+    text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; color: var(--grey-dark);
+    outline: none; box-sizing: border-box; padding: 0 8px; }
+  .tl-kg::placeholder { font-size: 17px; font-weight: 600; color: var(--grey-text); opacity: 0.8; }
+  .tl-kg:focus { border-color: var(--yellow); }
+  .tl-same { flex: none; height: 44px; padding: 0 12px; border-radius: 10px; border: 0; background: transparent; cursor: pointer;
+    box-shadow: inset 0 0 0 1.5px var(--ice); color: var(--clay-ink); font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 13px; }
+  .tl-same[hidden] { display: none; }
+  body[data-dark] .tl-kg { background: #2a2a2a; border-color: #444; color: #eee; }
+  /* A rest screen with the log panel can outgrow a short phone: it scrolls, and the ring
+     gives up more height, rather than cutting the panel off. */
+  .timer-overlay.has-log { justify-content: flex-start; overflow-y: auto; padding: 18px 0 calc(env(safe-area-inset-bottom, 0px) + 18px); }
+  @media (max-height: 720px) {
+    .timer-overlay.has-log .timer-ring { width: 140px; height: 140px; }
+    .timer-overlay.has-log .timer-display { font-size: 58px; }
+    .timer-overlay.has-log .timer-sound { margin-bottom: 6px; }
+  }
   body[data-dark] .timer-log { background: #202020; border-color: #383838; }
   body[data-dark] .tl-step, body[data-dark] .tl-rpe-btn { border-color: #444; color: #ccc; }
   body[data-dark] .tl-val { color: #eee; }
@@ -3906,6 +3924,20 @@
   .step-scroll .ex-rest-bottom { display: none; }   /* Guided rests itself — see stepAfterDone() */
   .ex-set-row.step-current { background: var(--yellow-dim); border-radius: 10px; margin: 0 -8px; padding-left: 18px; padding-right: 18px; }
   body[data-dark] .ex-set-row.step-current { background: rgba(14,74,54,0.28); }
+  /* The current row is PINNED (WK-01, 2026-09-27): in place when it is on screen, and held
+     just above the footer (or under the top bar) when the card above it is long, so the
+     set Done records is always the one in view. It sat under the footer on 4 of 14 steps
+     at 375×667 and 8 of 14 at 320×568. Sticky needs every box up to the scroll area to let
+     it out, hence the log's visible overflow; the tint is solid, because the pinned row
+     passes over the rows above it. A circuit round pins its RPE row the same way. */
+  .step-scroll .ex-log { overflow: visible; }
+  .step-scroll .ex-set-row.step-current,
+  .step-scroll .rpe-row.step-current { position: sticky; top: 0; bottom: 0; z-index: 3;
+    background: #EDF1EE; box-shadow: 0 -6px 14px rgba(0,0,0,0.07), 0 6px 14px rgba(0,0,0,0.05); }
+  .step-scroll .rpe-row.step-current { border-radius: 10px; }
+  .step-scroll .rpe-row.dim { opacity: 0.55; }
+  body[data-dark] .step-scroll .ex-set-row.step-current,
+  body[data-dark] .step-scroll .rpe-row.step-current { background: #173328; }
   .step-footer { display: flex; gap: 10px; padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 14px); border-top: 1px solid var(--grey-mid); background: var(--grey-bg); flex-shrink: 0; }
   body[data-dark] .step-footer { background: #141414; border-top-color: #333; }
   .step-nav-btn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; padding: 0 14px; border-radius: 8px; border: 1px solid var(--grey-mid); background: transparent; color: var(--grey-text); cursor: pointer; }
@@ -7871,7 +7903,7 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video and the cues, open the first time you meet an exercise, folded after that), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number or tap <strong>Same as last</strong>, which puts last time's weights into every empty set. A weight you type also fills the empty sets below it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video and the cues, open the first time you meet an exercise, folded after that), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number or tap <strong>Same as last</strong>, which puts last time's weights into every empty set. A weight you type also fills the empty sets below it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
     body: `<p>The small <strong>i</strong> at the right end of every exercise tells you what it does, which qualities it builds, where it shows up on court, which parts of your body it works (and whether it jumps, lands or runs), and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
@@ -12601,18 +12633,40 @@ function openGuided(day) {
   }
 }
 
-// One entry per (exercise, set) in on-screen order — exactly the cards initSetOrRPE()
-// attached a set-log table to (a .rest-btn present, and not a circuit's round-group).
+// One entry per (exercise, set) in on-screen order — the cards initSetOrRPE() attached a
+// set-log table to (a .rest-btn present) — and, since WK-01's second part (2026-09-27), one
+// per ROUND of a circuit that logs something (a superset, a complex, conditioning). A prep
+// circuit logs nothing and stays out, like the other warm-up items.
 function buildStepSeq(day) {
   const cards = Array.from(document.querySelectorAll(`.checklist-item[data-day="${day}"]`))
-    .filter(c => c.querySelector('.rest-btn') && !c.classList.contains('round-group'));
+    .filter(c => c.querySelector('.rest-btn') && (!c.classList.contains('round-group')
+      || c.dataset.logRpe === '1' || c.dataset.logWeight === '1'));
   const seq = [];
   cards.forEach((card, exI) => {
-    const total = parseInt(card.dataset.sets, 10) || 1;
+    const circuit = card.classList.contains('round-group');
+    const total = parseInt(circuit ? card.dataset.rounds : card.dataset.sets, 10) || 1;
     const name = card.querySelector('.item-name').textContent.trim();
-    for (let setI = 0; setI < total; setI++) seq.push({ card, exI, exCount: cards.length, total, setI, name });
+    for (let setI = 0; setI < total; setI++) seq.push({ card, exI, exCount: cards.length, total, setI, name, circuit });
   });
   return seq;
+}
+
+// Is this step done? A set when it is ticked. A circuit has no tick per round, so a round
+// is done when its RPE is in, when it was finished in this Guided session, or when the
+// whole circuit is ticked (its last round ticks it: finishRound()).
+function stepDone(it) {
+  if (!it.circuit) {
+    const d = cardDetail(it.card);
+    return !!(d && d.querySelector(`.ex-set-row[data-set-idx="${it.setI}"].done`));
+  }
+  if (it.card.classList.contains('checked')) return true;
+  if (STEP && STEP.doneRounds && STEP.doneRounds.has(it.name + '#' + it.setI)) return true;
+  return !!localStorage.getItem(circuitRpeKey(it.name, it.setI + 1));
+}
+function finishRound(it) {
+  (STEP.doneRounds = STEP.doneRounds || new Set()).add(it.name + '#' + it.setI);
+  // The last round ticks the circuit, the one unit the day counts it as.
+  if (it.setI === it.total - 1 && !it.card.classList.contains('checked')) toggleCheckOnly(it.card, it.card.dataset.day);
 }
 
 function openStepMode(day) {
@@ -12620,8 +12674,7 @@ function openStepMode(day) {
   if (!seq.length) return;   // nothing loggable today (e.g. a circuit-only day)
   // Reopened mid-session: start at the first set not yet ticked, not at set 1 (WK-01).
   // All ticked → the last set, whose button is Finish Session.
-  const isDone = it => !!it.card.querySelector(`.ex-set-row[data-set-idx="${it.setI}"].done`);
-  let pos = seq.findIndex(it => !isDone(it));
+  let pos = seq.findIndex(it => !stepDone(it));
   if (pos < 0) pos = seq.length - 1;
   STEP = { day, seq, pos, homeCard: null, homeDetail: null };
   document.getElementById('stepOverlay').classList.add('visible');
@@ -12670,29 +12723,44 @@ function renderStep() {
 
   // Draw the eye to the set this step is on; .dim is existing CSS (ex-set-row.dim),
   // defined for this exact purpose but never wired up until now. Queried off
-  // homeDetail, not item.card — the rows moved out of the card along with it.
-  STEP.homeDetail.querySelectorAll('.ex-set-row').forEach(row => {
-    const i = parseInt(row.dataset.setIdx, 10);
+  // homeDetail, not item.card — the rows moved out of the card along with it. A circuit's
+  // step is a round: its RPE row is the current one.
+  const rowSel = item.circuit ? '.rpe-row' : '.ex-set-row';
+  STEP.homeDetail.querySelectorAll(rowSel).forEach((row, k) => {
+    const i = item.circuit ? k : parseInt(row.dataset.setIdx, 10);
     row.classList.toggle('step-current', i === item.setI);
     row.classList.toggle('dim', i !== item.setI);
   });
 
   document.getElementById('step-eyebrow').textContent = `Exercise ${item.exI + 1} of ${item.exCount}`;
-  document.getElementById('step-pill').textContent = `Set ${item.setI + 1} of ${item.total}`;
+  document.getElementById('step-pill').textContent = `${item.circuit ? 'Round' : 'Set'} ${item.setI + 1} of ${item.total}`;
   renderStepFooter();
+  // The top of the exercise first (its name, note, Last time); the current row is sticky
+  // (CSS), so it stays on screen above the footer however long the card above it is. It
+  // sat under the footer on 4 of 14 steps at 375×667, 8 of 14 at 320×568 (WK-01). Sticky
+  // cannot lift a row above the top of its own table, so when the whole table starts below
+  // the fold (a first-time lift, its video and cues open) the scroll moves just far enough
+  // to show the row, and keeps as much of the video and cues as fits.
   scroll.scrollTop = 0;
+  const row = currentStepRow();
+  if (row) {
+    const rr = row.getBoundingClientRect(), sr = scroll.getBoundingClientRect();
+    if (rr.bottom > sr.bottom - 8) scroll.scrollTop += Math.ceil(rr.bottom - sr.bottom + 12);
+  }
 }
 
 // The relocated .ex-detail for the current exercise is STEP.homeDetail, not something
-// still living under item.card — see renderStep().
+// still living under item.card — see renderStep(). A circuit round's row is its RPE row,
+// or null when the circuit logs weights only.
 function currentStepRow() {
   const item = STEP.seq[STEP.pos];
+  if (item.circuit) return STEP.homeDetail.querySelectorAll('.rpe-row')[item.setI] || null;
   return STEP.homeDetail.querySelector(`.ex-set-row[data-set-idx="${item.setI}"]`);
 }
 
 function renderStepFooter() {
   const isLast = STEP.pos === STEP.seq.length - 1;
-  const done = currentStepRow().classList.contains('done');
+  const done = stepDone(STEP.seq[STEP.pos]);
   const label = done ? (isLast ? 'Finish Session ✓' : 'Next →') : 'Done — Start Rest ✓';
   document.getElementById('step-footer').innerHTML = `
     <button type="button" class="step-nav-btn" onclick="stepPrev()"${STEP.pos === 0 ? ' disabled' : ''}>‹ Prev</button>
@@ -12703,9 +12771,10 @@ function renderStepFooter() {
 // the exact listener attachSetLog() wired up (saves the log, refreshes Ceiling, updates
 // the day's progress pill) — this function never touches that data itself.
 function stepPrimary() {
-  const row = currentStepRow();
-  if (!row.classList.contains('done')) {
-    row.querySelector('.ex-set-check').click();
+  const item = STEP.seq[STEP.pos];
+  if (!stepDone(item)) {
+    if (item.circuit) finishRound(item);
+    else currentStepRow().querySelector('.ex-set-check').click();
     stepAfterDone();
   } else if (STEP.pos === STEP.seq.length - 1) {
     stepFinish();
@@ -12732,7 +12801,8 @@ function stepFinish() {
 function stepAfterDone() {
   if (STEP.pos === STEP.seq.length - 1) { showStepComplete(); return; }
   const item = STEP.seq[STEP.pos];
-  paintTimerLog(currentStepRow(), item);
+  if (item.circuit) paintRoundLog(currentStepRow(), item);
+  else paintTimerLog(currentStepRow(), item);
   const restBtn = STEP.homeDetail.querySelector('.rest-btn');   // hidden by CSS, but still real
   const secs = parseInt(restBtn && restBtn.getAttribute('data-rest'), 10) || 120;
   openTimerAuto(secs, item.name, stepAdvance);
@@ -12747,6 +12817,11 @@ function paintTimerLog(row, item) {
   const tl = document.getElementById('timerLog');
   if (!tl || !row) return;
   const repsIn = row.querySelector('.ex-set-reps');
+  // The weight (WK-01, 2026-09-27): the set's OWN weight box, so typing here saves and fills
+  // the empty sets below exactly as the card does. Not for work with no kg box (paintKgCol()).
+  const wIn = row.querySelector('.ex-set-weight');
+  const kgOn = !!(wIn && !row.closest('.ex-set-log.no-kg'));
+  const lastKg = () => { const s = loadSetLog(item.name, item.total)[item.setI] || {}; return s.lw || ''; };
   const planned = repsIn ? parseInt(repsIn.getAttribute('placeholder'), 10) || null : null;
   const isRange = !!(repsIn && /–/.test(repsIn.getAttribute('placeholder') || ''));
   const repsNow = () => parseInt(repsIn.value, 10) || (isRange ? null : planned);
@@ -12754,8 +12829,14 @@ function paintTimerLog(row, item) {
   function draw() {
     const n = repsIn ? repsNow() : null;
     const off = repsIn && repsIn.value !== '';
+    const lw = kgOn && !wIn.value ? lastKg() : '';
     tl.innerHTML = `
       <div class="tl-head">Set ${item.setI + 1} of ${item.total} · how did it go?</div>
+      ${kgOn ? `<div class="tl-line tl-kgline">
+        <span class="tl-lab">Kg</span>
+        <input class="tl-kg" type="text" inputmode="decimal" autocomplete="off" value="${esc(wIn.value)}" placeholder="${lw ? 'last ' + esc(lw) : 'kg'}" aria-label="Weight on set ${item.setI + 1}">
+        ${lw ? `<button type="button" class="tl-same">Same as last</button>` : ''}
+      </div>` : ''}
       ${repsIn ? `<div class="tl-line">
         <span class="tl-lab">Reps</span>
         <button type="button" class="tl-step" data-d="-1" aria-label="One rep fewer">−</button>
@@ -12767,6 +12848,22 @@ function paintTimerLog(row, item) {
         ${[6,7,8,9,10].map(v => { const on = selRpe() === String(v), vs = on ? rpeVs(v, item.card.dataset.targetToday || item.card.dataset.target) : '';
           return `<button type="button" class="tl-rpe-btn${on ? ' selected' : ''}${vs ? ' ' + vs : ''}" data-rpe="${v}">${v}</button>`; }).join('')}
       </div>`;
+    const kgBox = tl.querySelector('.tl-kg');
+    if (kgBox) kgBox.addEventListener('input', () => {
+      const v = normDigits(kgBox.value);
+      if (v !== kgBox.value) kgBox.value = v;
+      wIn.value = v;
+      wIn.dispatchEvent(new Event('input'));
+      const same = tl.querySelector('.tl-same');
+      if (same) same.hidden = !!v;
+    });
+    const sameBtn = tl.querySelector('.tl-same');
+    if (sameBtn) sameBtn.addEventListener('click', () => {
+      wIn.value = lastKg();
+      wIn.dispatchEvent(new Event('input'));
+      if (navigator.vibrate) navigator.vibrate(8);
+      draw();
+    });
     tl.querySelectorAll('.tl-step').forEach(b => b.addEventListener('click', () => {
       const base = repsNow() || (isRange ? parseInt(repsIn.getAttribute('placeholder'), 10) || 1 : 1);
       const next = Math.max(0, Math.min(999, base + Number(b.dataset.d)));
@@ -12776,6 +12873,32 @@ function paintTimerLog(row, item) {
     }));
     tl.querySelectorAll('.tl-rpe-btn').forEach(b => b.addEventListener('click', () => {
       const rb = row.querySelector(`.rpe-btn[data-rpe="${b.dataset.rpe}"]`);
+      if (rb) rb.click();
+      if (navigator.vibrate) navigator.vibrate(8);
+      draw();
+    }));
+  }
+  draw();
+  tl.dataset.ready = '1';
+}
+
+// A circuit round's rest screen: that round's RPE, through its own RPE row's buttons
+// (selectRPE()), so the list and Guided can never disagree. A circuit that logs weights
+// only has no RPE row and gets no panel.
+function paintRoundLog(row, item) {
+  const tl = document.getElementById('timerLog');
+  if (!tl) return;
+  if (!row) { tl.dataset.ready = ''; return; }
+  function draw() {
+    const sel = row.querySelector('.rpe-btn.selected');
+    tl.innerHTML = `
+      <div class="tl-head">Round ${item.setI + 1} of ${item.total} · how hard?</div>
+      <div class="tl-line tl-rpe">
+        <span class="tl-lab">RPE</span>
+        ${[6,7,8,9,10].map(v => `<button type="button" class="tl-rpe-btn${sel && sel.textContent.trim() === String(v) ? ' selected' : ''}" data-rpe="${v}">${v}</button>`).join('')}
+      </div>`;
+    tl.querySelectorAll('.tl-rpe-btn').forEach(b => b.addEventListener('click', () => {
+      const rb = [...row.querySelectorAll('.rpe-btn')].find(x => x.textContent.trim() === b.dataset.rpe);
       if (rb) rb.click();
       if (navigator.vibrate) navigator.vibrate(8);
       draw();
