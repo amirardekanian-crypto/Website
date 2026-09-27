@@ -253,7 +253,7 @@ The screen they actually live on. **In this order, and the order is the point:**
    **Underneath, inside the same card, the verdict leads the week** (PRF-03, 2026-09-27):
    `verdictTile(AKEY())` answers the one question the day streak asks, *does this day count*:
    **"2 TO GO"** on the dark card, then **ON TARGET** or **PERFECT** with a tick in the accent
-   (`--accent-700` in dark, where white on the accent was 3.35:1). It replaced the day's
+   (`--accent-fill` in dark, where white on the accent was 3.35:1). It replaced the day's
    **percentage**, which was `dayPct()`, what the day was *worth*: a rest day with everything
    else done read 68% and counted, and a free athlete could never pass about 64%. The ring
    round the initials in the header (`.hdmewrap`, `--avp`), which said the same percentage
@@ -794,7 +794,8 @@ the hero tile and the wall chip can never disagree about the same integer.
 ### 02 · PROGRESS — where do I stand
 Habits and achievements merged, because they were two views of one question.
 
-Opens straight on **four season stats**: days logged, badges, **day streak** (as the
+Opens straight on **four season stats**: days logged, **milestones** (the same count as the
+section at the foot, since POL-02; the tile said *Badges 8/72*, tiers included), **day streak** (as the
 flame) and perfect days → a one-line **key explaining the consistency pips**, which had
 no legend anywhere in the app and are empty for the first five days → **one row per
 habit** (its level in a ring, its streak and five pips, tapping through to full
@@ -973,12 +974,12 @@ per-athlete streak is the whole change needed for everyone's cards to carry one.
 The reward track, as a tab of its own (screen id `pass`, drawn by `renderPass()`). Four ways
 in: the tab bar; the **level ring** or the **rank** on Today's hero, both `go('pass')` — the
 rank lives here and nowhere else now that Progress dropped its strip; the profile card at
-the top of Settings; and Settings → *The long game*. Top to bottom it draws:
+the top of Settings; and Settings → *Locker*. Top to bottom it draws:
 
 1. **The pass hero** — level ring, rank crest and name, its metal tier with the XP into this
-   level, *N of 14 rewards kept*, and a **NEXT ON THE PASS** button that scrolls the track
-   to that reward (*THE PASS IS CLEARED* once there is none).
-2. **Your loadout** — a preview of the rank card in the equipped skin with the equipped
+   level, *N of 14 rewards kept*, and a **NEXT ON THE ROAD** button that scrolls the track
+   to that reward (*THE ROAD IS CLEARED* once there is none).
+2. **What you have** (it was *Your loadout*) — a preview of the rank card in the equipped skin with the equipped
    title and **Share it →** into the share picker, then two horizontal rails of what the
    athlete **owns**: *Titles* (level, event and season titles, as metal plates — tap to
    wear, tap again to show none) and *Card skins*.
@@ -993,6 +994,27 @@ the top of Settings; and Settings → *The long game*. Top to bottom it draws:
 
 *How rewards work* at the foot opens the manual. The design, and the three shapes it went
 through, are in *The long game* below.
+
+### One word each, and the small things (POL-02, 2026-09-27)
+
+Swept with PRF-02 (the *built with it* list on its page):
+- **One word for one thing.** *Milestones* (never badge, medal or challenge; a habit's five squares
+  are its *consistency tiers*) and *Locker* (never the long game, the pass or loadout; inside it, *What
+  you have* and *The road*). The Progress tile counts milestones (`milestonesEarned()`, one-offs plus
+  the *A few weeks* events), the same number as the section, and so does the rank share card.
+- **The tab bar lights where you are.** Settings, the manual and body weight light no tab (the slab sat
+  under TODAY), and a habit's page lights the tab it was opened from (`UI.from`; it lit PROGRESS from
+  Today too).
+- **"Day N" is your day with AA Proof** (Today, Settings). Progress names the season only (it said
+  *Pre-Season · day 22*, which read as the season's day), and Crew says *SEASON DAY 64*.
+- **An add-on never switched on says Off** on Progress, not *Paused · 0 XP banked*.
+- **The onboarding lock notice is grey**, not error red: a padlock is not a mistake.
+- **A toast fired while a sheet is open shows above it** (`.toast.over`, at the top); it rendered under
+  the sheet's scrim.
+- **Dark mode's filled buttons read** (A11Y-01, Proof's half): white text on the dark accent was 3.35:1,
+  so every fill that carries white text (the primary button, the nudge's button, the chips, the tab slab,
+  the initials, the verdict tile, the wins card) takes `--accent-fill`, #6857E3, 5.17:1. Bars, pips and
+  cells keep the bright accent.
 
 ### The phone's Back button (NAV-01, 2026-09-26)
 
@@ -1251,7 +1273,7 @@ each row a door with an icon tile, a name, a line of explanation and its current
 |---|---|
 | — | **Profile** — name, `Day N · rank · coached/free`. Tapping it opens the **Locker**, because that is where the rank lives. |
 | Tracking | **Habits & targets** (`N of M add-ons on`) · **Appearance** (`Dark`/`Light`) · **Install on your phone** (only while `installable()`) |
-| How this works | **The tour** · **The manual — how XP works** · **The long game** (Locker) · **Open your programme** / **See about coaching** |
+| How this works | **The tour** · **The manual — how XP works** · **Locker** · **Open your programme** / **See about coaching** |
 | Crew & data | **Crew board** (your board name; `Not yet` for a coached athlete the sweep will list after their first session; `Not joined` otherwise) · **Sync** (live `syncLabel()`, tap to sync now) · **Reset today's log** (destructive, still two-tap armed; it wipes the day picked on Today's week, `AKEY()`, and names it: *Reset yesterday's log* when yesterday is picked. It used to wipe today whatever the strip showed.) |
 
 Two rows open **sub-screens** rather than navigating: `UI.sub` is `'habits'` or

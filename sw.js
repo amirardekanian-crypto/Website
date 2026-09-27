@@ -157,7 +157,9 @@
 //      and the Locker, the board, your initials).
 // v81: habits.html changed (2026-09-27, PRF-02 part 3): Progress shows the next three milestones, quests only
 //      while a run is on, the Locker's road to the next three rewards, Crew opens on the board.
-const CACHE = 'aap-v81';
+// v82: habits.html changed (2026-09-27, POL-02): one word each (Milestones, Locker), the tab bar lights where
+//      you are, Day N is your day, "Off", a grey lock notice, a toast above a sheet, dark buttons at 5:1.
+const CACHE = 'aap-v82';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
