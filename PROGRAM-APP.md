@@ -53,10 +53,10 @@ to move an old card's leftover chips ("neutral grip") into Setup, and the editor
 then deleted them on the first save. Now every leftover chip stays in the pill. **The editor has no
 Setup box** (removed the same day, *"yes remove the setup box"*): an old grey line opens at the start
 of "Your note to them" and moves there on save. The library files' 54 grey lines became notes too.
-⚠ **THE TEMPO IS ONE CELL, with the digit that carries the instruction in CLAY.**
-`TEMPO 3-1-1-0`, notation intact, and `tempoDisplay()` colours **the slowest phase when it is 2s
-or more, plus any non-zero pause** — so `3-0-1-0` colours the 3, `2-1-1-0` the 2 and the 1, and
-`1-0-1-0` nothing at all. `iso` reads `Hold`.
+⚠ **THE TEMPO IS ONE PART of the line of numbers, with the digit that carries the instruction in CLAY.**
+`3-1-1-0`, notation intact (the word *tempo* shows only on an open card, and opens the guide), and
+`tempoDisplay()` colours **the slowest phase when it is 2s or more, plus any non-zero pause** — so
+`3-0-1-0` colours the 3, `2-1-1-0` the 2 and the 1, and `1-0-1-0` nothing at all. `iso` reads `Hold`.
 **Four shapes were tried; do not re-litigate:** a plain cell (undecoded notation — hence 153
 hand-written `3s eccentric` pills), a grey line under the grid (a footnote — *"it doesnt capture
 the eye and it doesnt look professional"*), phase cells on a second row (*"i dont like the new
@@ -67,7 +67,7 @@ three; still true of 39 of 506 live exercises with a tempo).
 
 **`block.rest` states a section's rest ONCE** — on the section header (`PRIMARY ——— Rest 2m`),
 feeding every timer in the block, drawing no per-card cell. An exercise's own `rx.rest` overrides
-it and keeps its cell. **Circuits carry `rx` too**: `rounds` is a NUMBER now (it was the display
+it and keeps its place in the line of numbers. **Circuits carry `rx` too**: `rounds` is a NUMBER now (it was the display
 string `"×2 Rounds"`, which is why the cell read *Rounds: ×2 Rounds*), and an item takes its own
 `rx` when its dose is plain, keeping free-text `detail` when the wording carries more than a
 number (*"15 sec, switch legs each round"*).
@@ -82,8 +82,8 @@ PWA, deliberately self-contained) and in `assets/js/chips.js` (which `coach.html
 means the coach's dashboard and the athlete's phone show different prescriptions for the same
 exercise and **nothing errors**. `scripts/check_rx.js` runs fixtures through both copies and is in
 `.githooks/pre-commit`. `chips.js` also owns the write side: `applyRx()`, `toRx()`, `auditRx()`.
-⚠ **`rxOf()` returns a normalised VIEW, not the `rx` object**: `sets`, `rpe`, `tempo`, `rest`,
-`rounds` as strings, and the dose as `dose: { kind, value, side, label }`. So `rxOf(ex).time` is
+⚠ **`rxOf()` returns a normalised VIEW, not the `rx` object**: `sets`, `rpe`, `tempo`, `rounds` as
+strings, `rest` as seconds (a number, or null), and the dose as `dose: { kind, value, side, label }`. So `rxOf(ex).time` is
 always undefined; read a duration from `dose.value` when `dose.kind === 'time'`. The Quality Map
 minutes rule first shipped reading `.time`, passed a unit test fed raw `rx` objects, and was
 caught only in the real page (2026-09-26). Test app code against real `rxOf()` output.
@@ -128,7 +128,8 @@ Amir: *"update the app in a way that it can show first week or last week"*.
 - **program.html `weekNoteHTML()`** shows the text (in the Coach's Note look) under **This Week** on
   Home and at the top of every session, only in week 1 and in the last week, from the same
   `cycleWeekInfo()` that draws "Week X of Y". Nothing after `endDate`, and nothing for a cycle
-  without the field: the app never invents a back-off. The numbers never change a card.
+  without the field: the app never invents a back-off. The numbers never change a card on their
+  own: only a lower day's target reads them, and the lower of the two wins (`dayRpe()`, below).
 - **The pipeline owns it:** /program-design decides both doses as numbers (`week1:` / `lastweek:`),
   /program-engage writes the words (PART 3c), /program-assemble stores them, and
   `scripts/check_program.py` FAILs a cycle with no `weekNotes.last` (and a first cycle with no
@@ -158,13 +159,14 @@ off in their notes.
   (**`supabase/stage40_history_readiness.sql`**). The old `composite` is untouched.
 - **`paintToday(day)` paints it; nothing is written but the check-in.** A banner under the timer
   says what changed and offers **Train as written** (`setAsWritten()`, kept as `asWritten` and sent
-  with the session). Every card with an RPE shows `RPE 8 → 7 today` (the stats cell and the closed
-  pill); `data-target-today` makes the set-log and Guided colours compare against today's number.
+  with the session). Every card with an RPE shows `RPE 8 → 7 today` (one clay pill: `rdTarget()`
+  takes the RPE out of the line of numbers); `data-target-today` makes the set-log and Guided
+  colours compare against today's number.
   Red: `redDayCore()` keeps the warm-up (`isPrepBlockTitle()`), the first exercise of the first
   power block and of the first Primary/Strength block; the rest is tagged *Optional today*. A day
   with no Primary block keeps the warm-up and the whole first working block. Sore: exercises whose
   Spine entry has `impact` plyometric or landing (a name match when there is no entry) show
-  *2 of 4 sets today* with the extra rows dimmed, or *Skip today* at soreness 1; circuit items get
+  *2 of 4 sets today* with the extra rows dimmed, or *Skip today · sore* at soreness 1; circuit items get
   *Every other round* / *Skip today*.
 - **`dayRpe()`** is the one place a target moves: 1 off each end, never below 6, never above the
   written number, and it does not stack with the week note (`weekNoteNow()`): the lower target wins.
@@ -224,9 +226,9 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   their cues are Amir's own wording, copied from the most recent live programme using each one. Batch 2 (80 more, the same day) took the exercises inside circuits, which
   batch 1's query could not see. Batch 3 (57 + aliases) closed the list the same day: **212 entries,
   every exercise name in every live programme resolves, and all approved on Amir's word** (*"approve
-  all when youre done"*). 61 still had no video then. **Since 2026-09-26 the entry's `video` is the only
-  video source** (the app's `getVideoUrl()` reads it; `exercise_library.json` and its Notion sync were
-  retired), and 64 of 220 entries have none yet. New names come in through Upkeep, below.
+  all when youre done"*). 61 still had no video then. **Since 2026-09-26 the entry's `video` replaces the old
+  catalogue** (`getVideoUrl()`: a card's own `videoUrl` first, else the entry's; `exercise_library.json`
+  and its Notion sync were retired), and 64 of 220 entries have none yet. New names come in through Upkeep, below.
   **The next batch is the `/spine` skill** (`.claude/skills/spine/`): the what's-missing query, the
   alias/new/skip sort, and `draft_sql.py`, which checks every link. The batch file with SFR and
   flags stays in the scratchpad, never in this public repo.
@@ -262,8 +264,9 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   `supabase/stage36_body_parts.sql`). `loads` = the course's region ids (`ankle-foot · calf-achilles ·
   knee · hip-groin · hamstring · low-back · trunk · shoulder · elbow-forearm-wrist`, plus `neck`),
   `impact` = `none · running · plyometric · landing` (shown as No impact, Running, Jumping, Landing).
-  The About sheet draws them as *Body parts involved* (`bodyPartsHtml()`), regions as soft pills and
-  impact in clay; coach.html edits them as tick boxes and a menu; the database refuses any other
+  The About sheet draws them as *Body parts involved* (`bodyPartsHtml()`), regions as soft pills, only
+  for an entry with no muscles (one with muscles gets the muscle map, below); the impact pill is clay
+  under either (*No impact* quiet). coach.html edits them as tick boxes and a menu; the database refuses any other
   word. **All 209 entries were set by hand** (stage36 the 100 most-used, stage37 the other 109, on
   Amir's *"do all 109 now"*), 56 of them copied exactly from the course where it has the same
   exercise. ⚠ **`impact` null means never checked**, and **every programme write fills both** for a
@@ -393,8 +396,8 @@ costs more than one tap.
 - **The note is per SESSION**: `<id>_snote_<Name>` = `{ d: local date, v }`, shown and sent only on
   day `d`. The old `<id>_note_` was never cleared, so half the notes Amir received were re-runs
   (522 sent, 259 distinct). A date stamp, not a clear, because the cloud merge prefers text over a
-  blank and would hand a cleared note back. Last session's note shows in the Last time strip.
-  coach.html reads `snote_` ahead of `note_`.
+  blank and would hand a cleared note back. Last session's note shows in the Last time box once it
+  is tapped open (a circuit's strip shows it always). coach.html reads `snote_` ahead of `note_`.
 - **Leftover rep ranges are never guessed.** `cardReps()`/`plannedReps()` return null for one, so the
   box shows `8–10` and reps are recorded only when typed. `repCount()` still takes the low end,
   for Personal Records only.
@@ -514,10 +517,10 @@ sits in front of the whole site).
   (status 0) or a 5xx (`_noAnswer()`, `planAnswerOf()`). **Never when it answered no**: a 4xx
   (`get_program` raises `invalid athlete key`) or an empty answer deletes the copy (`dropPlanCopy()`)
   and shows *Plan not available* with *Sign in again* and a WhatsApp button.
-- **Deleted** too by `signOutAthlete()` (which the error screen now calls; no other button does yet,
-  that is NAV-02) and by every successful sign-in in either app, so a new athlete whose signal drops
-  before the first load can never open the previous one's plan. The reload saves theirs at once.
-- **What the athlete sees:** the app opens from the copy with one quiet line above the greeting,
+- **Deleted** too by `signOutAthlete()` (the error screen's *Sign in again*, and **Sign out** under your
+  initials through `signOutSafely()`, NAV-02) and by every successful sign-in in either app, so a new
+  athlete whose signal drops before the first load can never open the previous one's plan. The reload saves theirs at once.
+- **What the athlete sees:** the app opens from the copy with one quiet line under the greeting,
   *Offline · your plan as saved on this phone, Tue 18:40* (`paintPlanOffline()`, `#home-offline`).
   With no copy: *No connection*, with *Try again*. The error screen's ⚠️ emoji (yellow) is now an
   icon in clay.
@@ -618,11 +621,12 @@ Home's week used to know only today: a Done pill lasted until midnight (the `<id
 every morning the suggestion went back to Day 1. Now `weekDoneDays()` counts a day as done this week when a
 session of it is in `HIST` (`get_my_history()` or its phone copy) inside `weekWindow()`, or was finished on this
 phone today. The window is the **cycle's own training week** (`cycleWeekInfo()`: seven days from `startDate +
-(wk − 1) × 7`), or Monday–Sunday for a cycle with no dates. `paintWeek()` draws the day cards' Done pills, the
-suggested day (a session in progress first, then the first day not done this week, none when all are done) and
-the line under **This Week**, "2 of 3 sessions done this week"; it runs at boot, when the history arrives, and
-whenever the day view closes, so a finished session shows on Home without a reload. `completed_on` is the local
-day the session was finished since DATA-02 (rows before it carry a UTC date).
+(wk − 1) × 7`), or Monday–Sunday for a cycle with no dates. `paintWeek()` redraws the day cards (a day
+done this week is a `.dc-row` since HOME-02), the suggested day (a session in progress first, then the
+first day not done this week, none when all are done) and the line under **This Week**, "2 of 3 sessions
+done this week"; it runs at boot, when the history arrives, and whenever the day view closes, so a
+finished session shows on Home without a reload. `completed_on` is the local day the session was
+finished since DATA-02 (rows before it carry a UTC date).
 
 ## ↩️ Back closes the top layer (NAV-01, 2026-09-26)
 
@@ -746,9 +750,10 @@ size is a token in `:root`, picked by its job:
 
 **Before Start** the session bar (`.session-timer`) is the full bar: under 480 px two rows (label and clock on
 one line, Start and Guided full width under it), and at any width the buttons wrap before the clock shrinks. The
-label is one line ("Ready when you are", "In progress", "Paused", "Session duration"). A Home day card shows
-**In progress · Resume** for a day started today and not finished (`dayInProgress()`), and **Done** once
-finished; `paintDayCardPills()` repaints them whenever the day view closes.
+label is one line ("Ready when you are", "In progress", "Paused", "Session duration"). A Home day card
+started today and not finished (`dayInProgress()`) shows *In progress* on its banner and **Resume ▶** under
+it (`.dc-live`); a day done this week is a small `.dc-row` (HOME-02). `paintWeek()` redraws them whenever
+the day view closes (`paintDayCardPills()` is no longer called).
 
 **From Start until Done it is the slim bar** (Amir, 2026-09-27, option C of the mockup at
 https://claude.ai/artifact/CiUjm5sF3cz4YhGzJCR1WY). `renderTimer()` sets `.slim` when the day's clock has
@@ -781,9 +786,10 @@ two bars covered 26% of the screen mid-session; now 9%.
 - **The screen stays awake** while a rest runs (`restWake()`, the Screen Wake Lock API), released on pause
   and close and asked for again on return.
 - **The rest offer** (`offerRest()`): ticking a set in list mode, with sets still to go on that exercise,
-  brings up one 48 px **Rest 2:00** button above the tab bar. It never starts by itself, because athletes
-  also tick sets after the fact; it goes on ×, an untick, leaving the day or 90 s. Guided never shows it.
-  Circuits keep their Rest button only. The card's **Rest ⏱** button is 44 px tall (it was 28).
+  brings up one 48 px **Rest 2:00** button at the foot of the screen (above the tab bar when the tabs
+  show). It never starts by itself, because athletes also tick sets after the fact; it goes on ×, an
+  untick, leaving the day or 90 s. Guided never shows it. Circuits keep their Rest button only. The
+  card's **Rest ⏱** button is 44 px tall (it was 28).
 - The overlay's dark palette came with A11Y-01 (#245). It is solid since 2026-09-27 (POL-01): at 97% the day's
   cards showed through behind the clock.
 
@@ -947,7 +953,7 @@ athlete's initials; hidden in a day view, whose banner keeps its own moon for mi
 - **Theme** — Light / Dark, the athlete's choice as before (`toggleDark()`, `dark_mode`).
 - **Install the app** — only when not already installed; it clears an earlier dismissal first, because
   here it was asked for (`A2HS.show()`).
-- **How the app works** — the Coach tab, scrolled to *Using the app*.
+- **How the app works** — the guide in the same sheet (`openHelp()`), with ‹ Back to this page (COACH-02, below).
 - **Privacy** — `/privacy.html`.
 - **Sign out** — two taps (`armedTap()`), then `signOutSafely()`: the waiting report (`flushOutbox()`), the
   session queue (`_replayQueue()`) and the progress (`_pushSnapshot(true)`, now awaitable) go up, in that order
@@ -998,7 +1004,7 @@ itself. **Reset Session** (on the finished card, under the send status line), a 
 
 ## 📖 The in-app guide names real controls (CNT-01, 2026-09-26)
 
-The **How the app works** cards (on the Coach tab until COACH-02, below) are `APP_GUIDE` in `program.html`. Nothing checks them against
+The **How the app works** cards (on the Coach tab until COACH-02, above) are `APP_GUIDE` in `program.html`. Nothing checks them against
 the app, so they drifted: for weeks they said "Finish Workout → Send Data to Coach", that the finish card
 appears "when every exercise is checked off", and "tap the timer icon". What is true on 2026-09-27:
 
@@ -1006,7 +1012,7 @@ appears "when every exercise is checked off", and "tap the timer icon". What is 
   taps), or *All done with Day N* (`refreshConfirmCard()`).
 - The session RPE (1–10), an optional note, and **Done · send to coach ✓**, which finishes and sends (WK-04,
   above). **Reset** sits in the session bar once a day has started.
-- The rest timer opens from the **Rest** offer after a tick, or the **Rest ⏱** button under an exercise's sets (WK-02, below).
+- The rest timer opens from the **Rest** offer after a tick, or the **Rest ⏱** button under an exercise's sets (WK-02, above).
 
 **Rule:** a PR that renames a button, moves a control or changes when a card appears updates its guide card
 too (CLAUDE.md says the same). The Library's *Mark as done* note promises a habit tick only when AA Proof
@@ -1053,7 +1059,7 @@ the minutes, "no kit" (equipment *Bodyweight*) and "ticks Mobility" are read off
 the week was done, ← and the phone's Back, and a reload. The harness answers `get_library` from `workouts/`
 (`library()` in `scripts/headless/lib.js`).
 
-## 🏋️ Personal Records — three write doors, and three things written twice
+## 🏋️ Personal Records — two write doors (a finished session, + Log a max), and what to keep in step
 
 One name on every screen since 2026-09-26 (it was also called **The Ceiling**; the code keeps
 `ceiling*` names and the `<id>_1rm` key). Full account in `CODEBASE.md` → *Personal Records*.
@@ -1073,10 +1079,10 @@ number for that lift**, marked `auto: true`:
   later days; a deleted day (tombstone) holds no record and sets no bar. ⚠️ Automatic entries carry
   `t: 0`, the oldest write there can be, so any write the athlete makes to that day wins every merge
   on either phone. coach.html reads them unchanged (*from a set*).
-- The card's estimate panel no longer asks for Save on numbers read off the set log: it says a new
-  best goes on by itself. *Save to Personal Records* appears only once the athlete types their own
-  numbers into the panel. (`.ex-1rm-save[hidden]` was also fixed: `display: block` had been
-  overriding every `save.hidden = true`.)
+- The card has no estimate panel since REC-01 (below). *Save to Personal Records* is on + Log a
+  max's form only, shown once its numbers give an estimate (`paintCeilingForm()`).
+  (`.ex-1rm-save[hidden]` was also fixed: `display: block` had been overriding every
+  `save.hidden = true`.)
 
 What to keep in step:
 
@@ -1103,7 +1109,9 @@ the coach's is the floor alone. Two or three flagged lifts a cycle — the nudge
 > The screens below (`renderWtRow()`, `renderWeight()`, `renderSettingsWeight()`, `renderWtNotice()`)
 > lived in `habits.html` until the move of 2026-09-12 (see *Body weight lives in `program.html`* above).
 > The data rules still hold where the feature lives now: the `<id>_hab_wt` key, union by date with the
-> newest `t` winning, a delete as a tombstone, never scored, and the disclosure an athlete must see.
+> newest `t` winning, a delete as a tombstone, never scored. The on/off switch and the disclosure
+> banner did not come across: nothing is recorded until a reading is entered, and every reading
+> deletes in one action (`privacy.html` §2.3 rests on that).
 
 Added 2026-09-03 (Amir: *"add a weight tracker, with history … push my clients to open the
 habit tracker"*). Kilograms, **on by default for everyone, toggled off** in

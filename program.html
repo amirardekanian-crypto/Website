@@ -2,11 +2,11 @@
 <!--
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║  S&C PROGRAM PLATFORM — Dynamic Template                                    ║
-║  Loads athlete data from JSON via URL parameter: ?client=athlete_id         ║
+║  Loads the signed-in athlete's plan from public.programs via get_program().  ║
+║  ?client= is only for the demo and the coach preview.                        ║
 ║                                                                              ║
 ║  DEPLOYMENT: GitHub Pages                                                    ║
-║  USAGE:      amirardekani.com/program.html?client=john_doe                  ║
-║  DATA:       /data/john_doe.json                                            ║
+║  USAGE:      amirardekani.com/program.html (the athlete signs in)            ║
 ║  SCHEMA:     see SCHEMA.md for the full JSON shape                          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 -->
@@ -108,7 +108,7 @@
     catch (e) { window.LAST_USER = ''; }
     // IMPORTANT: keep the &key= in the installed-app start_url. Without it, an
     // athlete who "Add to Home Screen" opens the app with no key, so every
-    // key-checked cloud write (save_session / save_progress / messages) is
+    // key-checked cloud write (save_session / save_progress) is
     // rejected server-side and silently dropped — the coach never sees their
     // finished logs even though the (key-less) Web3Forms email still arrives.
     // A blob: manifest is invisible to iOS Safari and unreliable for Chrome's
@@ -332,7 +332,7 @@
   .signin-title em { font-style: normal; color: #E06B43; }
   /* The other half of the mantra, and it belongs WITH the first half rather than
      opening the form (Amir, 2026-09-12). Barlow, not Condensed: a second line of
-     condensed caps under a 40px condensed caps headline competes with it instead
+     condensed caps under a 44px condensed caps headline competes with it instead
      of answering it. Sized generously on purpose — supporting copy here is a line
      of the brand, not a caption, and Amir has called this kind of line out for
      being too quiet before. */
@@ -406,7 +406,7 @@
   .screen.active { display: flex; }
 
   /* ═══════════════════════════════════════════════════════════════════════
-     HOME SCREEN — NEW V5 DESIGN
+     GAME PLAN SCREEN — NEW V5 DESIGN
      ═══════════════════════════════════════════════════════════════════════ */
   #screen-plan {
     background: var(--grey-bg);
@@ -421,7 +421,7 @@
   @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
   /* The big athlete name (used inside the athlete card). The first name is
-     white; the last name is wrapped in <span> to drop to its own line in yellow. */
+     dark; the last name is wrapped in <span> to drop to its own line in green. */
   .home-name {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: clamp(42px, 12vw, 64px);
@@ -511,10 +511,10 @@
   body[data-dark] .planlike .focus-list-item { color: #cfcfcf; }             /* #444 on #202020 was 1.7:1 */
   .cycle-meter-label.current { color: var(--clay-ink); font-weight: 700; }
 
-  /* ─── Cycle cards (home) — ONE shared design for past, current & future ───
+  /* ─── Cycle cards (Game Plan) — ONE shared design for past, current & future ───
      All three render through cycleCardHTML() and reuse the .current-message /
      .cm-* / .focus-list / .outcomes-* / .cm-body classes (defined further down).
-     Restyle those once and every card on the home page changes together.
+     Restyle those once and every card on Game Plan changes together.
      The rules here are only the bits unique to the shared header + the
      clickable "past" variant. */
   .planlike .cm-headtext { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -535,7 +535,7 @@
     50%      { box-shadow: 0 0 0 4px rgba(14,74,54,0), 0 0 14px rgba(14,74,54,0.9); }
   }
   @media (prefers-reduced-motion: reduce) { .cm-pill-active { animation: none; } }
-  /* "Up next!" pill on the next cycle — soft tinted clay, quieter than the
+  /* "Up next!" pill on the next cycle — green text on white, quieter than the
      solid Done/Active pills so it reads as upcoming, not current. */
   .cm-pill-next { background: rgba(255,255,255,0.92); color: var(--yellow); box-shadow: 0 1px 4px rgba(0,0,0,0.18); }   /* green on white in both themes (DS-01) */
   /* "Locked" pill on cycles further out — quiet grey. */
@@ -628,7 +628,7 @@
   /* Padded body that holds the collapsible detail below the banner */
   .planlike .cm-cardbody { padding: 16px 24px 22px; }
 
-  /* ─── Global bottom tab bar (always visible across all screens) ── */
+  /* ─── Global bottom tab bar (every nav screen; hidden while loading and during a session) ── */
   .global-tabs {
     position: fixed; left: 0; right: 0; bottom: 0;
     background: var(--white);
@@ -668,10 +668,10 @@
   /* Hidden during loading (revealed once the first screen renders) */
   .global-tabs.is-hidden { display: none; }
 
-  /* ─── HOME-ONLY: yellow-only palette ─────────────────────────────
-     Remap the ice tokens to yellow ONLY inside #screen-plan,
-     so the home page reads as a single-accent design without affecting
-     Program / Notes / Archive / Guide. */
+  /* ─── GAME PLAN ONLY: single accent ──────────────────────────────
+     Remap the clay tokens (--ice*, --clay-ink) to green ONLY inside #screen-plan,
+     so Game Plan reads as a single-accent design without affecting
+     Home / Coach / Library / Archive, which keep clay. */
   #screen-plan {
     --clay-ink:  var(--green-ink);   /* same single-accent remap, for text (A11Y-01) */
     --ice:       var(--yellow);
@@ -689,11 +689,10 @@
     animation: cycleSegGlow 2.6s ease-in-out infinite;
   }
 
-  /* ─── HOME-ONLY: scale yellow back so it spotlights, doesn't shout ───
-     The new design uses lime as a single accent, not as a wash. These
-     overrides strip the yellow tint backgrounds, pills, and gradients
-     from the home page and replace them with quiet grey mono labels and
-     thin separator lines. */
+  /* ─── .planlike card overrides (Game Plan, Home's overview, the day-view card) ───
+     The accent spotlights, it doesn't wash. These overrides strip the tinted
+     backgrounds, pills, and gradients from the cards and replace them with
+     quiet grey mono labels and thin separator lines. */
 
   /* Shared cycle-card header — C-badge sits left of the name/weeks/tagline. */
   .planlike .cm-head {
@@ -715,7 +714,7 @@
   /* Strip the original top accent line + radial glow */
   .planlike .current-message::before { display: none; }
   .planlike .current-message::after  { display: none; }
-  /* Highlighted frame — soft yellow-tinted border + subtle outer glow so the
+  /* Highlighted frame — soft green-tinted border + subtle outer glow so the
      current cycle card visually stands out from the future cycle cards. */
   .planlike .current-message {
     background: var(--white);
@@ -845,8 +844,9 @@
     flex-shrink: 0;
   }
 
-  /* Collapsible detail: aims (focus list) stay visible; the why/outcomes hide
-     behind this toggle. Closed by default; .is-open on the card reveals it. */
+  /* Collapsible detail: the aims (focus list), the why and the outcomes sit behind
+     this toggle on the banner. The current cycle opens expanded; past and future
+     start folded (PLAN-01). .is-open on the card reveals it. */
   .cm-toggle {
     display: flex; align-items: center; gap: 8px;
     width: 100%; margin-top: 6px; padding: 4px 0 0;
@@ -1090,13 +1090,13 @@
   .wl-card-eyebrow { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-text); }
   .wl-card-cta { font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 0.1em; text-transform: uppercase; color: var(--clay-ink); margin-top: 6px; }
 
-  /* ════ LIBRARY — Two Doors landing + Sessions / Playbook worlds ════ */
+  /* ════ LIBRARY — Three Doors landing + Sessions / Playbook / Exercises worlds ════ */
   .lib-pane { position: relative; }
   .lib-pane[hidden] { display: none; }
   .lib-back { position: absolute; top: 16px; left: 18px; z-index: 6; background: none; border: none; color: rgba(255,255,255,0.82); font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; padding: 4px 0; }
   .lib-back:active { opacity: 0.65; }
 
-  /* Landing — two doors */
+  /* Landing — three doors */
   .lib-head { padding: 48px 24px 18px; }
   .lib-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-display); line-height: 1; letter-spacing: -0.6px; text-transform: uppercase; color: var(--ink); }
   .lib-sub { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); margin-top: 9px; }
@@ -1254,13 +1254,13 @@
   body[data-dark] #ar-body .ar-callout { background: rgba(199,85,47,0.10); }
 
   /* ═══ HOME OVERVIEW (the landing page on #screen-home) ═══
-     Site nav · "Hi name" · current-cycle card · "This Week" + week · day cards.
-     The cards reuse the .planlike .cm-* / .current-message styling. */
+     Greeting · This cycle card · "This Week" · day cards · habits, records and weight rows.
+     The day cards reuse the .planlike .cm-* / .current-message styling. */
   #home-overview { padding-bottom: 96px; }
   #home-overview[hidden], #day-view[hidden] { display: none; }
   /* Give the overview a little top breathing room now that the nav bar is gone */
   #home-overview { padding-top: 8px; }
-  /* "Hi Alex" — same scale/weight as the My Plan athlete name */
+  /* "Good morning/afternoon/evening" + first name — same scale/weight as Game Plan's athlete name (.home-name) */
   .home-greet {
     margin: 18px 24px 24px;
     font-family: 'Barlow Condensed', sans-serif;
@@ -1300,7 +1300,7 @@
     font-size: var(--fs-small); font-weight: 700; letter-spacing: 2px;
     text-transform: uppercase; line-height: 1; margin-bottom: 8px;
   }
-  /* Section header ("This Week") + right-aligned week indicator chip */
+  /* Section header ("This Week") */
   .home-section-head {
     display: flex; align-items: baseline; justify-content: space-between;
     gap: 12px; margin: 28px 24px 14px;
@@ -1507,8 +1507,8 @@
   }
   /* Optimized day-card proportion: a calm 5:2 banner, clamped so the card stays
      comfortable on narrow phones and wide screens without going letterbox-thin.
-     Stripes are layered directly here (over the green gradient) so the texture is
-     guaranteed on the designed, photo-less day cards. */
+     Stripes are layered directly here (over the green gradient) so the texture
+     shows while the photo loads or if it fails. */
   #day-cards-wrap .cm-banner,
   #day-view-card .cm-banner {
     background-color: #0E4A36;   /* solid green base — never let card white show */
@@ -1568,12 +1568,12 @@
   #screen-home { background: var(--grey-bg); }
   .prog-header { background: var(--yellow); padding: 48px 24px 0; position: relative; overflow: hidden; }
   .prog-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
-  /* Shared back-to-home button in nav-page headers (Program, Notes) — matches
-     the archive/guide back buttons. Sits in the header's top padding band. */
+  /* Back arrow in sub-screen headers (Personal Records, Body Weight, the Library
+     worlds, a workout, an article). Sits in the header's top padding band. */
   .nav-back { position: absolute; top: 14px; left: 18px; z-index: 2; background: transparent; border: none; color: var(--on-accent); font-size: var(--fs-title); line-height: 1; cursor: pointer; padding: 6px 8px; }
   .nav-back:active { transform: scale(0.9); }
-  /* Cycle hero on the program page header (mirrors the home cycle-hero, but
-     with a small yellow C-badge to the left of the cycle name). */
+  /* Cycle hero in the day view, kept but hidden (renderHome() still fills it):
+     a small clay C-badge to the left of the cycle name. */
   .prog-cycle-hero { margin-bottom: 22px; }
   .prog-cycle-row {
     display: flex; align-items: center; gap: 12px;
@@ -1721,7 +1721,7 @@
   /* Push everything below the fixed banner; park the sticky timer beneath it. */
   body.is-demo { padding-top: 44px; }
   body.is-demo .session-timer { top: 52px; }
-  /* The fixed demo banner (44 px, z 120) sat on the dark-mode button and on Guided's ✕ (POL-01). */
+  /* The fixed demo banner (44 px, z 120) sat on the top-right button (the account button since NAV-02) and on Guided's ✕ (POL-01). */
   body.is-demo .global-account { top: 58px; }
   body.is-demo .step-overlay { top: 44px; }
   @media (max-width: 460px) {
@@ -1791,8 +1791,8 @@
   /* ── Readiness Check ──
      Modal shown when the athlete taps Start, BEFORE the timer begins. Records a
      1–5 self-report (5 = best/freshest, direction consistent) so the coach sees
-     how the athlete walked in. The app only surfaces this — it never modifies
-     the program or blocks training. The timer does NOT run while this is open,
+     how the athlete walked in. It never modifies the program or blocks training;
+     a lower day only eases today's targets (REC-2, paintToday()). The timer does NOT run while this is open,
      so modal time is excluded from session duration. */
   .readiness-overlay {
     display: none;
@@ -2064,9 +2064,9 @@
   /* ── Section Headers ── */
   .section-header-prog { display: flex; align-items: center; gap: 14px; margin: 38px 0 14px; }
   .section-icon { display: none; }
-  /* Bigger, bolder title — coloured per block (warm-up = ice, strength = yellow, power = purple) */
+  /* Bigger, bolder title — green for every block (DS-01, below) */
   .section-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title); letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); flex-shrink: 0; line-height: 1; transition: color 0.2s; }
-  /* Thicker trailing line — colour matches the block accent for a strong section break */
+  /* Trailing line for a strong section break — grey under every block (DS-01, below) */
   .section-header-prog::after { content: ''; flex: 1; height: 3px; border-radius: 2px; background: var(--grey-mid); transition: background 0.2s; }
   /* Block rest — said ONCE for the whole section instead of repeated on every
      card in it. Sits at the end of the section rule, quiet but findable. */
@@ -2080,7 +2080,7 @@
      were clay and strength green, and a block the app did not recognise took its colour from its position
      ("Core" was clay because it was third), so a block's colour meant nothing an athlete could learn, and
      it drowned the clay that does: the Coach's note, a Because, an RPE over target, the tempo digit. Every
-     block's title is green, the rule under it grey; blockClass() still names the type for the code. */
+     block's title is green, the rule under it grey; blockCategory() still names the type for the code. */
   .section-header-prog[class*="block-"] .section-title { color: var(--green-ink); }
   .section-header-prog[class*="block-"]::after         { background: var(--grey-mid); height: 2px; }
 
@@ -2113,7 +2113,7 @@
   .checklist-item.checked[class*="block-"] .check-box { background: var(--yellow); border-color: var(--yellow); }
   body[data-dark] .checklist-item.checked[class*="block-"] { background: rgba(109,190,149,0.08); border-color: rgba(109,190,149,0.30); }
 
-  /* Left-edge accent stripe — color matches block type, same palette as the home page */
+  /* Left-edge accent stripe — one colour for every block (DS-01) */
   .checklist-item::before {
     content: '';
     position: absolute;
@@ -2224,7 +2224,7 @@
   .ex-section-label:first-child { margin-top: 14px; }
   body[data-dark] .ex-section-label { color: var(--grey-text); }
 
-  /* Video placeholder — dark block with diagonal stripes + big yellow play */
+  /* Video placeholder — dark block with diagonal stripes + big green play */
   .ex-video {
     position: relative;
     height: 180px;
@@ -2283,7 +2283,7 @@
   }
   body[data-dark] .ex-setup { color: #999; }
 
-  /* Coaching cues — yellow accent for "good", red accent for "bad". No icons. */
+  /* Coaching cues — green accent for "good", red accent for "bad". No icons. */
   .ex-cue {
     display: flex;
     gap: 12px;
@@ -2310,9 +2310,9 @@
   /* ── Coach's note on an exercise (JSON "note") ─────────────────────
      Exercise-scoped guidance the athlete must see — an injury caveat, how
      to pick the starting load, a staged-return rule. Renders as a clay
-     callout at the top of the expanded detail plus a clay pill on the
-     collapsed row so it can't be missed. Program-wide guidance stays in
-     the Notes tab. */
+     callout at the top of the expanded detail plus a clay dot after the name
+     on the collapsed row so it can't be missed. Program-wide guidance stays in
+     the Coach tab. */
   .ex-coach-note {
     margin: 10px 0 4px;
     padding: 10px 12px 11px;
@@ -2375,7 +2375,7 @@
        44px   tick, a 36px circle inside a thumb-sized track
      The RPE strip is NOT a column any more. It was five ~20px buttons on every
      row, visible before a single rep; it now opens full width under a row once
-     that row is ticked (.rpe-open), with 40px buttons. */
+     that row is ticked (.rpe-open), with 44px buttons. */
   .ex-set-header {
     display: grid;
     grid-template-columns: 26px minmax(0, 1fr) 54px 44px;
@@ -2435,7 +2435,7 @@
   }
   /* Base look of the per-set RPE buttons. Since 2026-09-24 the strip sits under its
      row once the set is ticked and the countersign block further down sizes them to
-     40px; these rules are only the starting style it overrides. */
+     44px; these rules are only the starting style it overrides. */
   .ex-set-rpe .rpe-btn {
     flex: 1 1 0;
     min-width: 0;
@@ -2888,7 +2888,7 @@
   }
   .sp-part.impact { color: var(--clay-ink); background: var(--ice-dim); }
   body[data-dark] .sp-part.impact { color: #E06B43; }
-  /* The muscle map (stage42) — see muscleMapHtml(). The body sits on the sheet itself (Amir:
+  /* The muscle map (stage42) — see bodyMapSvg() / bodyPartsHtml(). The body sits on the sheet itself (Amir:
      "the body should be on a light background, whatever it is in that page"): warm greys on paper,
      dark greys in dark mode. Main muscle = full clay, helper = soft clay. */
   .bmap { --skin: #ECE6DC; --mus: #CBC1B2; --line: #A89D8C; --main: #C7552F; --help: #E8A68B; --cap: #9A9184; }
@@ -2945,7 +2945,7 @@
   .dq-chip:focus-visible { outline: 2px solid #E06B43; outline-offset: 2px; }
   .sp-q { border: 0; cursor: pointer; font: inherit; font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 0.3px; }
 
-  /* ── Because (2026-09-24) — see whyOf() / whyBlock() / openWhyPlan() ──
+  /* ── Because (2026-09-24) — see whyOfCard() / whyBlock() / openWhyPlan() ──
      The card gains nothing but a clay ⓘ; the reason itself lives in the About sheet and
      on the cycle's Why page. It was a clay dot on the ⓘ's corner until CARD-01
      (2026-09-27): a clay dot after the name means a Coach's Note now. */
@@ -2992,11 +2992,10 @@
   .wp-row span { font-family: 'Barlow', sans-serif; font-size: var(--fs-small); line-height: 1.4; color: var(--grey-text); }
   body[data-dark] .wp-row { background: #1e1e1e; border-color: #2a2a2a; color: #eee; }
 
-  /* ── THE CEILING — estimated 1RM, folded into the bottom of the set log ──
-     One clay line while closed, a small panel when tapped. Everything here is
-     DERIVED from the set log that is already on the card: no storage key, no
-     payload, no merge rule, nothing to sync. The saved history and the
-     free-entry calculator live in The Ceiling section on My Plan. */
+  /* ── .ex-1rm-* — the fields of Records → Log a max (openCeilingForm(), paintCeilingForm()) ──
+     They began as the estimate folded into the bottom of the set log, which REC-01
+     took off the card (2026-09-26). The form uses -inputs, -field, -out, -grade,
+     -from and -save; .ex-1rm, -line, -arr, -panel, -auto and -go have no markup left. */
   .ex-1rm { border-top: 1px dashed var(--ice-mid); }
   body[data-dark] .ex-1rm { border-top-color: rgba(199,85,47,0.35); }
   /* Hidden until a set has actually been logged. This is also what keeps a max
@@ -3105,11 +3104,11 @@
   .ex-1rm-go-a { margin-left: auto; font-size: var(--fs-small); }
   body[data-dark] .ex-1rm-go { border-color: rgba(199,85,47,0.4); }
 
-  /* ── THE CEILING (screen) ─────────────────────────────────────── */
+  /* ── PERSONAL RECORDS (screen) ─────────────────────────────────── */
   .ceil-head { position: relative; padding: 46px 18px 18px; background: var(--yellow); color: var(--on-accent); }
   /* New best. The header band carries a photo, but only on the lift that just
      beat its own record, and only here: #screen-weight reuses .ceil-head, so
-     every rule below is scoped to The Ceiling. The lift name sits over the left,
+     every rule below is scoped to Personal Records. The lift name sits over the left,
      which is why the art has its subject on the right. */
   #screen-ceiling .ceil-head.is-pr { background-size: cover; background-position: 72% 50%; }
   #screen-ceiling .ceil-head.is-pr::before { content: ''; position: absolute; inset: 0;
@@ -3207,7 +3206,7 @@
   .ceil-hero-s { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.07em;
     text-transform: uppercase; color: rgba(255,255,255,0.6); margin-top: 6px; line-height: 1.6; }
 
-  /* Prompt shown when AA Proof has no body weight to borrow */
+  /* Prompt shown when there is no body weight yet (→ the Body Weight screen) */
   .ceil-ask { background: var(--ice-dim); border: 1px dashed var(--ice-mid); border-radius: 12px;
     padding: 16px; margin-top: 16px; }
   .ceil-ask-t { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-lead);
@@ -3280,8 +3279,8 @@
      rank crest, distance to the next level, and the seven-day strip. The crest
      markup and every number arrive from Proof; nothing here re-derives them. ── */
   /* Today's habits, embedded from AA Proof (mountProofStrip()). The frame draws its own
-     card; it only needs to sit flush under the Daily Habits card. */
-  .proof-strip { margin: -2px 24px 14px; }       /* in line with the .nc cards */
+     card; it only needs to sit flush under the Daily habits row. */
+  .proof-strip { margin: -2px 24px 14px; }       /* in line with the Home rows (.hrow) */
   /* Collapsed, NOT display:none, while Proof loads: a frame that is not laid out
      measures its page at 0px, and the strip would wait for ever for a height. */
   .proof-strip.off { height: 0; margin: 0; overflow: hidden; visibility: hidden; }
@@ -3389,8 +3388,8 @@
   .ceil-row-s { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.06em;
     text-transform: uppercase; }
 
-  /* Plain-English line under the header. "The Ceiling" is a name, not an
-     explanation, and this is where a first-timer lands. */
+  /* Plain-English line under the header, for someone who has never heard of a
+     one-rep max: this is where a first-timer lands. */
   .ceil-intro { font-size: var(--fs-body); line-height: 1.6; color: var(--grey-text);
     margin-top: 16px; }
   body[data-dark] .ceil-intro { color: #9a9a9a; }
@@ -3473,12 +3472,11 @@
     margin-top: 18px; text-align: center; }
 
   /* ── Logging a max FROM this page ─────────────────────────────────────
-     The exercise card can only offer an estimate off the set in front of it.
-     This is the other door: pick a lift from the current cycle and enter what
-     you actually lifted, which is what makes a planned rep-max test possible
-     at all. Same three fields, same estimator, same wording as the card —
-     borrowing .ex-1rm-* wholesale rather than inventing a second calculator,
-     because two of those is how the numbers start disagreeing. */
+     The one hand-entry door since REC-01 took the estimate off the exercise
+     card (2026-09-26): pick a lift from the current cycle and enter what you
+     actually lifted, which is what makes a planned rep-max test possible at
+     all. Its fields are .ex-1rm-*, one calculator for the whole app, because
+     two of those is how the numbers start disagreeing. */
   .ceil-add {
     display: flex; align-items: center; justify-content: center; gap: 8px;
     width: 100%; margin-top: 18px; padding: 14px;
@@ -3518,8 +3516,8 @@
     font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700;
     letter-spacing: 0.1em; }
 
-  /* The entry form. Card chrome from .ceil-card, innards from .ex-1rm-*, so an
-     athlete meets the exact control they already know from the exercise card. */
+  /* The entry form. Card chrome from .ceil-card, innards from .ex-1rm-*, and the
+     RPE row a set uses (CONS-01), so an athlete meets a control they already know. */
   .ceil-form .ex-1rm-field { background: var(--grey-card); border-color: transparent; }
   .ceil-form .ex-1rm-inputs { grid-template-columns: 1fr 1fr; }
   .ceil-form .ex-1rm-field span { font-size: var(--fs-label); }
@@ -3567,7 +3565,7 @@
   /* 44 px to tap with a chalky thumb (it was 28). */
   .ex-rest-bottom .rest-btn { font-size: var(--fs-small); min-height: 44px; padding: 0 18px; }
 
-  /* Filled-yellow play button — clear, tappable, on-brand */
+  /* Filled-green play button — clear, tappable, on-brand */
   .play-btn {
     width: 36px; height: 36px;
     border-radius: 50%;
@@ -3753,7 +3751,7 @@
   /* --yellow is the brand green, which all but disappears on the dark card. */
   body[data-dark] .complete-emoji { color: #4e9d7e; border-color: #4e9d7e; }
   body[data-dark] .complete-title { color: #4e9d7e; }
-  /* Refined completion medallion — circular yellow ring with a check, scales in with a glow */
+  /* Refined completion medallion — circular green ring with a check, scales in with a glow */
   .complete-emoji {
     width: 64px; height: 64px;
     margin: 0 auto 18px;
@@ -3898,7 +3896,7 @@
   .note-card.open .note-body { display: block; }
   /* Note bodies render real HTML (paragraphs/lists/bold) — the global `* { margin:0; padding:0 }`
      reset strips default browser spacing, so restore it explicitly here. Applies to both
-     personal notes (data/<id>.json) and the "Using the app" guide cards. */
+     personal notes (DATA.notes) and the "Using the app" guide cards. */
   .note-body p { margin: 0 0 10px; }
   .note-body p:last-child { margin-bottom: 0; }
   .note-body ul { margin: 4px 0 10px; padding-left: 20px; }
@@ -3909,10 +3907,10 @@
   body[data-dark] .note-body strong { color: #f0f0f0; }
 
   /* ════════════════════════════════════════════════════════════════════
-     COACH PAGE REDESIGN — hero header · chat composer · banner note cards
+     COACH TAB — hero header · WhatsApp door · note cards
      ════════════════════════════════════════════════════════════════════ */
 
-  /* ── Coach hero (avatar + name + online status) ── */
+  /* ── Coach hero (avatar + name + role line) ── */
   .coach-hero { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 28px 64px 20px 24px; }   /* clear of the account button (NAV-02) */
   .coach-avatar {
     position: relative;
@@ -3925,7 +3923,7 @@
   .coach-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .coach-avatar-initials { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title); letter-spacing: 0.5px; color: #fff; }
   .coach-hero-main { flex: 1; min-width: 0; }
-  /* Same scale/weight as the athlete name on the home/plan pages (.home-name) */
+  /* Same weight as the athlete name on Game Plan (.home-name), one step smaller */
   .coach-name {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: clamp(38px, 11vw, 60px);
@@ -3989,8 +3987,8 @@
 
   /* Personal note card — category-banner thumbnail + dark title + green CTA */
   .note-card-row { display: flex; align-items: center; gap: 14px; padding: 14px; cursor: pointer; user-select: none; }
-  /* Brand-colour tile (green / clay / paper) with the day-card diagonal-stripe
-     texture and the note's icon centred — no photos, fully on-palette. The third
+  /* Brand-colour tile with the note's icon centred: green over the court-sessions
+     photo, clay over court-playbook, or striped paper. The third
      tone was ochre until 2026-09-26; the brand has no yellow or gold. */
   .note-tile {
     width: 64px; height: 64px; flex-shrink: 0; border-radius: 10px; overflow: hidden;
@@ -4157,8 +4155,8 @@
   .session-timer.running .session-timer-btn.guided { background: transparent; }
 
   /* ── Guided Mode — walks the day's standard exercises one set at a time. See
-     openStepMode() in the script: it relocates the REAL .ex-detail node (video, stats,
-     cues, the set-log table, Ceiling) from the card below into .step-scroll, so nothing
+     openStepMode() in the script: it relocates the REAL .ex-detail node (the note, Last
+     time, video, cues, the set-log table) from the card below into .step-scroll, so nothing
      about logging a set is reimplemented here — this is layout and navigation only. ── */
   .step-overlay { display: none; position: fixed; inset: 0; z-index: 90; background: var(--grey-bg); flex-direction: column; }
   .step-overlay.visible { display: flex; }
@@ -4599,7 +4597,7 @@
   }
 </script>
 
-<!-- ═══ HOME ═══ -->
+<!-- ═══ GAME PLAN ═══ -->
 <div id="screen-plan" class="screen planlike">
 
 
@@ -4630,11 +4628,11 @@
 
 </div>
 
-<!-- ═══ THE CEILING ═══ the athlete's estimated 1RM per lift, built from the
-     sets they already log. A sub-screen of My Plan (reached from the card
-     above, never from the tab bar), with its own per-lift history view.
-     Everything here reads from "<id>_1rm"; body weight is borrowed read-only
-     from AA Proof so relative strength can be shown. -->
+<!-- ═══ PERSONAL RECORDS ═══ the athlete's estimated 1RM per lift, built from the
+     sets they already log. A sub-screen of Home (reached from its row under the
+     week or an exercise's History sheet, never from the tab bar), with its own
+     per-lift history view. Everything here reads from "<id>_1rm"; body weight
+     comes from this app's own <id>_hab_wt so relative strength can be shown. -->
 <div id="screen-ceiling" class="screen">
   <div class="ceil-head">
     <button class="nav-back" onclick="ceilingBack()" aria-label="Back">←</button>
@@ -4656,12 +4654,12 @@
   <div id="wt-body" style="padding: 0 18px 110px;"></div>
 </div>
 
-<!-- ═══ LIBRARY ═══ shared, app-wide content. A "two doors" landing — Sessions
-     (free workouts) and Playbook (blog articles) — each opening into its own
-     world. data-tab stays 'workouts' so all goTo() routing is untouched. -->
+<!-- ═══ LIBRARY ═══ shared, app-wide content. A three-door landing — Sessions
+     (free workouts), Playbook (blog articles) and Exercises (the Spine) — each
+     opening into its own world. data-tab stays 'workouts' so all goTo() routing is untouched. -->
 <div id="screen-workouts" class="screen">
 
-  <!-- Landing: the two doors -->
+  <!-- Landing: the three doors -->
   <div id="lib-doors" class="lib-pane">
     <div class="lib-head">
       <div class="lib-title">Library</div>
@@ -4723,8 +4721,8 @@
   </div>
 </div>
 
-<!-- ═══ WORKOUT SESSION ═══ a single library workout opened from a card in the
-     Workouts tab. Reuses the exercise-card visuals, but with its OWN local-only
+<!-- ═══ WORKOUT SESSION ═══ a single library workout opened from a row in
+     Library → Sessions (or a LIB-01 suggestion). Reuses the exercise-card visuals, but with its OWN local-only
      check-off (keyed by workout id) — no athlete data, no cloud, no set-logs.
 
      The one thing here that DOES reach the server is the Done button below:
@@ -4760,7 +4758,7 @@
   </div>
 </div>
 
-<!-- ═══ ARTICLE ═══ a single blog/read article opened from the Library Read tab
+<!-- ═══ ARTICLE ═══ a single blog/read article opened from Library → Playbook
      or via ?article= deep-link. Mirrors #screen-workout. -->
 <div id="screen-article" class="screen">
   <div class="ar-hero">
@@ -4774,7 +4772,7 @@
 </div>
 
 <!-- ═══ ARCHIVE ═══ a single completed past program. Not a bottom-nav tab —
-     opened only by the "Done" card on the My Plan screen. -->
+     opened only by the "Done" card on the Game Plan screen. -->
 <div id="screen-archive" class="screen">
   <div class="archive-banner" id="archive-banner" data-watermark="">
     <button class="archive-back" onclick="goTo('plan')" aria-label="Back to Game Plan">←</button>
@@ -4784,15 +4782,15 @@
   <div class="archive-scroll" id="archive-scroll"></div>
 </div>
 
-<!-- ═══ CURRENT PROGRAM ═══ -->
+<!-- ═══ HOME ═══ -->
 <div id="screen-home" class="screen">
 
-  <!-- ── OVERVIEW (the landing page): site nav · "Hi name" · current-cycle card ·
-       "This Week" + week indicator · day cards. .planlike reuses the My Plan
-       cycle-card styling so the cards here look identical. ── -->
+  <!-- ── OVERVIEW (the landing page): greeting · This cycle card · "This Week" ·
+       day cards · habits, records and weight rows. .planlike reuses Game Plan's
+       cycle-card styling so the day cards match its cards. ── -->
   <div id="home-overview" class="planlike">
 
-    <!-- "Hi Alex" — same scale as the My Plan name (first name only) -->
+    <!-- "Good morning/afternoon/evening" + first name — same scale as Game Plan's name (.home-name) -->
     <div id="home-greeting-wrap"></div>
 
     <!-- Opened from the plan saved on this phone (REL-01): one quiet line, painted by
@@ -4800,10 +4798,11 @@
          greeting, not above it: the fixed account button owns the top right corner. -->
     <div id="home-offline" class="plan-offline" role="status" hidden></div>
 
-    <!-- Current cycle card (View Plan pill → My Plan, no Read more) -->
+    <!-- This cycle card (PROG-01, paintCycleCard()) → Game Plan -->
     <div id="home-cycle-wrap"></div>
 
-    <!-- "This Week" header + current-week indicator (only when dates exist) -->
+    <!-- An unfinished day's card (DATA-02), then "This Week": its header, the week's
+         session count (paintWeek()) and the first/last-week note -->
     <div id="home-unfinished-wrap"></div>
     <div id="home-week-wrap"></div>
 
@@ -4812,7 +4811,7 @@
     <!-- The week is done: one short extra from the Library, until it has been opened (LIB-01, paintWeekSugg()) -->
     <div id="home-sugg-wrap"></div>
 
-    <!-- Daily Habits — Proof's own Today hero. Training comes first (2026-09-26:
+    <!-- Daily habits — one row, AA Proof's verdict for today and the streak (HOME-02). Training comes first (2026-09-26:
          Amir left the order to the audit's call). It sat ABOVE the week from
          2026-09-12, and in the fortnight after, 5 of 40 athletes logged a habit
          in a week while 16 trained, so the session leads and habits follow. -->
@@ -4846,9 +4845,8 @@
 
 <!-- ═══ NOTES ═══ -->
 <div id="screen-notes" class="screen">
-  <!-- Coach hero — replaces the old green "Coach" header band. Avatar is a
-       placeholder (brand initials) until a real photo is dropped in; set
-       #coach-avatar's background-image or inject an <img> to swap it. -->
+  <!-- Coach hero — replaces the old green "Coach" header band. The avatar is
+       assets/img/coach.jpg over the brand initials, which show if the photo fails. -->
   <div class="coach-hero">
     <div class="coach-avatar" id="coach-avatar">
       <img src="assets/img/coach.jpg" alt="Coach Amir" onerror="this.remove()">
@@ -4864,10 +4862,10 @@
   <div id="notes-container" style="padding: 4px 0 100px;"></div>
 </div>
 
-<!-- ═══ GLOBAL BOTTOM TAB BAR ═══ Always visible across the nav screens.
-     Order: Program · Coach · Workouts · My Plan. data-tab values are unchanged
-     (home/program/notes/archive) so all goTo() routing still works — only the
-     labels, icons, and order changed.
+<!-- ═══ GLOBAL BOTTOM TAB BAR ═══ Shown on every nav screen; hidden while loading
+     and during a session (WK-03).
+     Order: Home · Coach · Library · Game Plan (data-tab home / notes / workouts / plan,
+     the screen names goTo() routes by).
      Icons are inline SVGs (line-art) so they inherit currentColor and look crisp at any size. -->
 <div class="global-tabs is-hidden" id="global-tabs">
   <button class="nav-item" data-tab="home" onclick="goTo('home')">
@@ -4924,7 +4922,8 @@
   <button type="button" class="rest-offer-x" onclick="hideRestOffer()" aria-label="No rest now">×</button>
 </div>
 
-<!-- Readiness check — shown on Start, before the timer runs. Records only. -->
+<!-- Readiness check — shown on Start, before the timer runs. Records the answers and,
+     on a lower day, eases today's targets (REC-2; never the programme). -->
 <div class="readiness-overlay" id="readiness-overlay" onclick="if(event.target===this)cancelReadiness()">
   <div class="readiness-modal" role="dialog" aria-modal="true" aria-label="Readiness check">
     <div class="readiness-eyebrow">Before you start</div>
@@ -5878,10 +5877,8 @@ const ERROR_ICONS = {
 
   // ── Where the programme comes from ────────────────────────────────────────
   // The database first: get_program() checks the key server-side, so a programme
-  // is no longer a world-readable file. data/<id>.json stays as a fallback until
-  // every athlete has opened the app once — 30 of 48 files carry the athlete's
-  // key inside them, and that copy is what a key-less PWA relies on, so deleting
-  // the files before those keys are cached locally would lock people out.
+  // is no longer a world-readable file. data/<id>.json is only a fallback for the
+  // headless render checks (a 404 on the live site since 2026-09-07).
   //
   // The key has to be resolved BEFORE the fetch now, not after: the call that
   // returns the programme is the same call that needs authenticating. URL first,
@@ -6100,7 +6097,7 @@ const ERROR_ICONS = {
 
     // Deep-link: ?workout=<id|category/slug|path.json> opens that library
     // workout immediately, while the full app stays loaded behind it. Tapping
-    // Back lands on the Workouts tab, so a visitor can browse the rest of the
+    // Back lands on the Library tab, so a visitor can browse the rest of the
     // sample — the "get your own program" hook. No param → normal home load.
     const wParam = params.get('workout');
     if (wParam) openWorkoutDeepLink(wParam);
@@ -6398,10 +6395,10 @@ async function signOutSafely(btn) {
 window.signOutSafely = signOutSafely;
 
 // ═══════════════════════════════════════════════════════════════════════
-//  2. RENDER: HOME (V5 DESIGN, GRACEFUL FALLBACK)
+//  2. RENDER: GAME PLAN (V5 DESIGN, GRACEFUL FALLBACK)
 // ═══════════════════════════════════════════════════════════════════════
 
-// Single source of truth for EVERY cycle card on the home page (past, current
+// Single source of truth for EVERY cycle card on Game Plan (past, current
 // and future). Edit this builder (and the .current-message / .cm-* / .focus-list
 // / .outcomes-* CSS it uses) once and all three card types change together.
 //   cycle = a cycles[] entry ({ num, name, weeks, tagline, focuses })
@@ -6503,7 +6500,7 @@ function paintFinishArt(day) {
   el.hidden = false;
 }
 
-// ── New best on The Ceiling ────────────────────────────────────────────
+// ── New best in Personal Records ───────────────────────────────────────
 // A new best is an estimate that beats this lift's best from ANY OTHER DAY.
 // Same-day saves replace each other, so comparing against today would make
 // every correction a "new best". A first-ever estimate is never celebrated:
@@ -6662,7 +6659,7 @@ function cycleSlug(name) {
 
 function cycleCardHTML(cycle, opts) {
   opts = opts || {};
-  // Cycle cards open EXPANDED (Amir, 2026-09-12). The whole point of My Plan is
+  // Cycle cards open EXPANDED (Amir, 2026-09-12). The whole point of Game Plan is
   // the reasoning behind each block, and hiding it behind "Read more" meant most
   // athletes never read a word of it. They can still collapse any card, and
   // toggleCycleCard() below flips it back the other way.
@@ -6706,8 +6703,8 @@ function cycleCardHTML(cycle, opts) {
   h += `</div>`;
 
   // ── Collapsible detail. Everything below the caption — the aims (focus list),
-  // the "why this cycle matters" paragraphs and the outcomes — is hidden by
-  // default and revealed by the toggle that sits on the banner. Built into its
+  // the "why this cycle matters" paragraphs and the outcomes — sits behind the
+  // toggle on the banner (open on the current cycle, folded on the rest). Built into its
   // own string first so the toggle only renders when there's something to show.
   let detail = '';
 
@@ -6763,9 +6760,10 @@ function cycleCardHTML(cycle, opts) {
   return h;
 }
 
-// Cycle banner image fallback. Walks the data-exts list (jpg→jpeg→png→webp);
-// once every extension 404s, hides the broken <img> and flags the banner
-// `.no-img` so the green gradient fallback shows.
+// Cycle banner image failed: hides the broken <img> and flags the banner
+// `.no-img` so the green court fallback shows. (The data-exts walk and the
+// data-fallback step below date from the old name-matched .jpg files; nothing
+// sets either attribute now.)
 function cycleImgError(img) {
   const exts = (img.dataset.exts || '').split(',').filter(Boolean);
   const next = parseInt(img.dataset.extIdx || '0', 10) + 1;
@@ -6814,8 +6812,9 @@ function toggleCycleCard(btn, ev) {
 
 // Where today sits in a cycle — ONLY when it has both start and end dates; null
 // otherwise. Week is derived from today's position between the dates, clamped to
-// the cycle's length. The ONE place the week is worked out: the "Week X of Y" chip
-// and the first/last-week note both read it, so they can never disagree.
+// the cycle's length. The ONE place the week is worked out: the This cycle card,
+// the week's window (weekWindow()) and the first/last-week note all read it, so
+// they can never disagree.
 function cycleWeekInfo(cycle) {
   if (!cycle || !cycle.startDate || !cycle.endDate) return null;
   const s = new Date(cycle.startDate);
@@ -6899,7 +6898,8 @@ function dayImageCategory(day) {
 
 // One day card for the home overview — image-banner look matching the cycle
 // cards (.planlike .cm-*). The banner image comes from the shared CATEGORY POOL
-// (assets/days/<category>.jpg, chosen by dayImageCategory). Missing files fall
+// (assets/art/days/<category>-v1.webp through APP_ART.days, the category chosen
+// by dayImageCategory). Missing files fall
 // back to the green gradient via dayImgError(). Tapping opens openDayView().
 // opts.static → a non-clickable repeat of the card (top of a day view).
 function dayCardHTML(day, dayNum, total, opts) {
@@ -6962,11 +6962,11 @@ function dayCardHTML(day, dayNum, total, opts) {
   return h;
 }
 
-// The pill on a Home day card: Done (brown), or In progress · Resume (clay) for a day
-// started today and not finished (WK-03, 2026-09-26): a clock running or paused today,
-// or a set already ticked. Before this, leaving a session for another tab left no trace
-// on Home of where the athlete was. Repainted in place by paintDayCardPills() whenever
-// the day view closes, because Home's cards are built once.
+// A Home day card: a small Done row once the day is done this week (HOME-02), or an
+// In progress pill and a Resume button for a day started today and not finished (WK-03,
+// 2026-09-26): a clock running or paused today, or a set already ticked. Before this,
+// leaving a session for another tab left no trace on Home of where the athlete was.
+// paintWeek() rebuilds the cards whenever the day view closes.
 function dayInProgress(id) {
   if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) return false;
   // Done earlier this week and not touched today → Done, not in progress.
@@ -7425,9 +7425,9 @@ function renderPlan() {
   }
 
   // ── Current cycle message card (renders if the current cycle has any rich content)
-  // The card header shows the C-badge next to the current cycle's name + weeks +
-  // tagline (these used to live in a separate hero above the meter), then
-  // focuses + paragraphs + outcomes.
+  // The banner caption shows "Cycle n of N", the name, weeks and tagline (these
+  // used to live in a separate hero above the meter), then the aims + paragraphs
+  // + outcomes.
   if (current && (current.message || (current.focuses && current.focuses.length))) {
     const msg = current.message || {};
     document.getElementById('current-message-wrap').innerHTML = cycleCardHTML(current, {
@@ -7450,7 +7450,7 @@ function renderPlan() {
   }
 
   // ── All future cycles — rendered through the SAME shared card builder as the
-  // past and current cards, so every card on the home page matches.
+  // past and current cards, so every card on Game Plan matches.
   const future = cycles.slice(idx + 1);
   if (future.length) {
     let html = '';
@@ -7476,13 +7476,13 @@ function renderPlan() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-//  3. RENDER: CURRENT PROGRAM (unchanged)
+//  3. RENDER: HOME
 // ═══════════════════════════════════════════════════════════════════════
 function renderHome() {
   const w = DATA.workouts || { days: [] };
 
-  // Cycle hero in the program header — same content as the home page hero.
-  // Format: "C2 · STRENGTH ENGINE" + italic purple tagline below.
+  // Cycle hero in the day view, kept hidden (#prog-cycle-hero) so these writes land.
+  // Format: "C2 · STRENGTH ENGINE" + italic clay tagline below.
   const cycles = Array.isArray(DATA.cycles) ? DATA.cycles : [];
   const cIdx   = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
   const cur    = cycles[cIdx];
@@ -7503,7 +7503,7 @@ function renderHome() {
   }
 
   // ── HOME OVERVIEW (landing) ──────────────────────────────────────
-  // "Hi <firstName>" — first name only, same scale as the My Plan name.
+  // "Good morning/afternoon/evening" + first name, same scale as Game Plan's .home-name.
   const greetEl = document.getElementById('home-greeting-wrap');
   if (greetEl) {
     const hr = new Date().getHours();
@@ -7511,15 +7511,13 @@ function renderHome() {
     greetEl.innerHTML = `<div class="home-greet"><span class="home-greet-hi">${greetWord}</span><span>${esc(DATA.athlete.firstName || '')}</span></div>`;
   }
 
-  // Current-cycle card — the same builder as My Plan, but with a "View Plan"
-  // pill that opens My Plan, and no Read-more (noDetail).
   // The cycle is one small line under the greeting (HOME-02, Amir 2026-09-26: "I like the small
   // cycle details"). It was a full photo card; the photos now belong to the day cards below.
   // Since PROG-01 (Amir, 2026-09-27: "a card on home, but remove the line on the top … replace
   // it with this, when you click, it goes to gameplan") it is the This cycle card: paintCycleCard().
   paintCycleCard();
 
-  // "This Week" header + week indicator (only when the cycle has both dates).
+  // "This Week" header, the week's session count (paintWeek()) and the first/last-week note.
   const weekWrap = document.getElementById('home-week-wrap');
   if (weekWrap) {
     const weekLabel = homeWeekLabel(cur);
@@ -7539,8 +7537,8 @@ function renderHome() {
     cardsWrap.innerHTML = days.map((d, i) => dayCardHTML(d, i + 1, days.length)).join('');
   }
 
-  // The two companion cards, under the week. Personal Records first (it is about
-  // the training just above it), then Daily Habits. Both are also refreshed on
+  // The three companion rows under the week: Daily habits (AA Proof's strip under it),
+  // Personal records, Body weight. All three are also refreshed on
   // every goTo('home') — renderHome() runs once at boot, so a max saved during
   // today's session would otherwise not show until the app was reloaded.
   const homeCeil = document.getElementById('home-ceiling-wrap');
@@ -7705,10 +7703,10 @@ function isPrepBlockTitle(title) {
          t.includes('cool')  || t.includes('prime')    || t.includes('prep');
 }
 
-// Map a block.title (e.g. "Strength", "Warm-Up", "Plyometrics") to a stripe color class.
+// Map a block.title (e.g. "Strength", "Warm-Up", "Plyometrics") to a block type class.
 // If the title doesn't match any known keyword, fall back to cycling through the three
-// colors by block index so ANY new block type still gets a stripe and the design stays
-// consistent. blockIndex is the 0-based position of the block within its day.
+// types by block index so ANY new block type still gets a class, and with it the stripe
+// (one green for every type since DS-01, 2026-09-27). blockIndex is the 0-based position of the block within its day.
 // ⚠️ COSMETIC ONLY — that index fallback makes this unsafe for any behavioural
 // decision; use isPrepBlockTitle() above for those.
 function blockCategory(title, blockIndex) {
@@ -7716,7 +7714,7 @@ function blockCategory(title, blockIndex) {
   if (isPrepBlockTitle(title)) return 'block-warmup';
   if (t.includes('plyo') || t.includes('power') || t.includes('jump') || t.includes('med ball') || t.includes('rotational') || t.includes('explosive')) return 'block-power';
   if (t.includes('strength')) return 'block-strength';
-  // Fallback for unknown / future block types — cycles ice → yellow → purple → ice …
+  // Fallback for unknown / future block types — cycles warmup → strength → power → warmup …
   const fallback = ['block-warmup', 'block-strength', 'block-power'];
   return fallback[(blockIndex || 0) % fallback.length];
 }
@@ -8004,7 +8002,7 @@ function renderExSummary(rx) {
 // rule. Clay callout at the top of the open card, cut to two lines with More ›
 // when it runs longer (CARD-01, Amir 2026-09-27: the dot on the row "then they
 // become 2 lines"). On the closed row the note is a clay dot after the name.
-// Program-wide guidance belongs in the Notes tab, not here.
+// Program-wide guidance belongs in the Coach tab, not here.
 function renderCoachNote(note) {
   if (!note) return '';
   return `<div class="ex-coach-note"><div class="ex-note-text"><span class="ex-coach-note-label">Coach's note.</span> ${esc(note)}</div>`
@@ -8028,7 +8026,7 @@ function fitNotes(root) {
   });
 }
 
-// Cues — yellow line for good, red line for bad, no icons. Clean.
+// Cues — green line for good, red line for bad, no icons. Clean.
 function renderInlineCues(cues) {
   if (!cues || (!cues.good?.length && !cues.bad?.length)) return '';
   let body = '';
@@ -8139,9 +8137,9 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
   // Sets count drives how many rows the per-set log will render.
   const setsCount = parseInt(rx.sets, 10) || 1;
-  // The prescribed reps ride along on the card so The Ceiling can pre-fill its
-  // estimate. Only a real rep count is passed — a hold or a carry sends nothing,
-  // which is what stops the Ceiling offering an estimate it cannot honour.
+  // The prescribed reps ride along on the card for the set log's pre-filled reps
+  // (cardReps(), repRangeText()). Only a real rep count is passed — a hold or a
+  // carry sends nothing.
   const repsData = (rx.dose && rx.dose.kind === 'reps') ? rx.dose.value : '';
   // The dose as words, for a set row with no box to type in (a hold: "30 s / side").
   const doseData = rx.dose ? rx.dose.value + (rx.dose.side ? ' / side' : '') : '';
@@ -8220,7 +8218,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
     const itemCues = ownCues
       || `<div class="round-cues-slot" data-name="${esc(item.name || '')}" data-exid="${esc(item.exId || '')}"></div>`;
     // Per-item play button — only renders if this sub-exercise has a video
-    // (either an explicit videoUrl, or one resolved via the exercise library).
+    // (either an explicit videoUrl, or its Spine entry's video: getVideoUrl()).
     const itemVid = getVideoUrl(item);
     const itemPlay = itemVid
       ? `<button class="round-play-btn" type="button" onclick="event.stopPropagation(); handlePlayVideo('${itemVid}');" aria-label="Play ${esc(item.name)} video">
@@ -8422,7 +8420,7 @@ function handlePlayVideo(url) {
   window.open(url, '_blank');
 }
 
-// Round cues — same yellow/red accent-line design as standard exercise cues.
+// Round cues — same green/red accent-line design as standard exercise cues.
 // Always visible inside the expanded circuit (no collapse).
 // A warm-up row's cues, on a tap (WK-05). The row itself or its chevron; the ▶ plays and
 // never toggles. A row with no cues (none written, no Spine entry yet) does nothing.
@@ -8446,7 +8444,7 @@ function renderRoundCues(cues) {
 
 // ═══════════════════════════════════════════════════════════════════════
 //  4. RENDER: ARCHIVE — a single completed past program (opened from the
-//     "Done" card on My Plan; not a bottom-nav tab).
+//     "Done" card on Game Plan; not a bottom-nav tab).
 // ═══════════════════════════════════════════════════════════════════════
 function renderArchive(programId) {
   const program = (DATA.programHistory || []).find(p => p.id === programId);
@@ -8506,13 +8504,13 @@ function renderNotes() {
 }
 
 // "Using the app" — the general how-to content shown to every athlete in the
-// Coach tab. This is now the single source of truth: the old standalone App
+// help sheet (openHelp(), COACH-02), opened from the Coach tab's row, the account
+// sheet and the jargon links. This is now the single source of truth: the old standalone App
 // Guide screen (#screen-guide) was removed, so the content lives here directly.
-// Each entry renders as a collapsible note-style card. (`icon` is kept per card
-// so the rows can be given line-icon tiles later without re-deriving them.)
+// Each entry renders as a collapsible note-style card with its line-icon tile.
 // Personal Records (The Ceiling until 2026-09-26), explained for someone who has
-// never heard of a one-rep max. ONE copy, used in two places: the "Using the app"
-// card in the Coach tab, and the "How this works" panel on the records screen
+// never heard of a one-rep max. ONE copy, used in two places: the Personal Records
+// card in the help sheet, and the "How this works" panel on the records screen
 // itself. Two copies of the same prose would drift the first time either is edited.
 // (The guide opens in the one sheet since COACH-02: openHelp().)
 const CEILING_HELP = `
@@ -8677,7 +8675,7 @@ function goTo(screen, historyId, keepContent) {
   // Home tab always lands on the overview (not a previously opened day view).
   if (screen === 'home') closeDayView();
 
-  // Archive view (opened from the My Plan "Done" card) — show the requested
+  // Archive view (opened from the Game Plan "Done" card) — show the requested
   // past program, or the most recent one if none specified.
   if (screen === 'archive') {
     const list = (DATA.programHistory && DATA.programHistory.length) ? DATA.programHistory : [];
@@ -8686,16 +8684,13 @@ function goTo(screen, historyId, keepContent) {
     else renderArchiveEmpty();
   }
 
-  // Library tab — Read + Train sections. Both built lazily on first visit.
+  // Library tab — the doors, or the world last open. Each world is built lazily on first visit.
   if (screen === 'workouts') renderLibrary();
 
-  // Home — refresh the Personal Records card. renderHome() only runs at boot,
-  // so without this an estimate saved during today's session would not appear
-  // on the card until the app was reloaded.
-  // Home — rebuild BOTH companion cards. renderHome() only runs at boot, so
+  // Home — rebuild all three companion rows. renderHome() only runs at boot, so
   // without this a max saved during today's session, or habits ticked in AA
   // Proof and navigated back from, would show stale numbers until a reload.
-  // The habit card is the one that matters most: leaving to Proof and coming
+  // The habit row is the one that matters most: leaving to Proof and coming
   // back is its single most common journey.
   if (screen === 'home') {
     const hc = document.getElementById('home-ceiling-wrap');
@@ -8707,18 +8702,18 @@ function goTo(screen, historyId, keepContent) {
     paintWeekSugg();   // gone once its session has been opened (LIB-01)
   }
 
-  // Leaving The Ceiling by any route other than its own back chevron drops the
+  // Leaving Personal Records by any route other than its own back chevron drops the
   // saved return point, so a later visit can never teleport the athlete into a
   // day view they did not come from.
   if (screen !== 'ceiling') _ceilReturn = null;
 
-  // The Ceiling — rebuilt on every visit so a max saved mid-session shows.
+  // Personal Records — rebuilt on every visit so a max saved mid-session shows.
   // `keepContent` is set when renderCeilingLift() routes here itself; it has
   // already painted the per-lift view and must not be overwritten.
   if (screen === 'ceiling' && !keepContent) renderCeiling();
   if (screen === 'weight') renderWeightScreen();
 
-  // Update the global tab bar's active button. The Ceiling is reached from
+  // Update the global tab bar's active button. Personal Records is reached from
   // Home, so that tab stays lit while you are inside it.
   // Every screen lights the tab it belongs to (POL-01: Workout, Article and Archive lit none).
   const litTab = ({ ceiling: 'home', weight: 'home', workout: 'workouts', article: 'workouts', archive: 'plan' })[screen] || screen;
@@ -8873,12 +8868,13 @@ function renderArchiveEmpty() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-//  LIBRARY — Read (blog articles) + Train (extra workouts), grouped by
-//  category. Both sections are built lazily from their own index.json
-//  manifests. Same for every user — not tied to the athlete's data.
+//  LIBRARY — three doors: Sessions (extra workouts) and Playbook (blog
+//  articles), grouped by category and built lazily from get_library() (the
+//  index.json manifests are only a fallback), and Exercises (the Spine).
+//  Same for every user — not tied to the athlete's data.
 // ═══════════════════════════════════════════════════════════════════════
 
-// Which Library pane is showing: 'doors' | 'sessions' | 'playbook'. Remembered
+// Which Library pane is showing: 'doors' | 'sessions' | 'playbook' | 'exercises'. Remembered
 // so returning from an opened session/article lands back in the right world.
 let _libPane = 'doors';
 let _trainManifest = null, _readManifest = null;
@@ -8892,7 +8888,7 @@ function renderLibrary() {
   loadLibCounts();
 }
 
-// Bottom-nav "Library" tap → always open on the two doors.
+// Bottom-nav "Library" tap → always open on the three doors.
 function goLibrary() {
   _libPane = 'doors';
   _libScrollY = null;   // the tab opens on the doors, at the top
@@ -8967,7 +8963,7 @@ function proofStripTheme() {
 }
 
 
-// The one card, used on Home and at the end of My Plan. Deliberately a plain
+// The one row, on Home. Deliberately a plain
 // shortcut: this app knows nothing about levels, XP or what is ticked. Proof
 // owns all of that, and duplicating the scoring here would be a third copy of
 // the formula to keep in sync — and weight this app does not need to carry.
@@ -9009,10 +9005,9 @@ function habitCardHtml() {
 
 }
 
-// ── THE CEILING — the My Plan card + its own screen ────────────────────
-// Same grammar as the habit card above: a section head, one tappable card, and
-// the depth one tap in. The three numbers show on the card so it is never an
-// empty promise.
+// ── PERSONAL RECORDS — the Home row + its own screen ───────────────────
+// Same grammar as the habit row above: one tappable row (the best lift, its
+// change and a sparkline), and the depth one tap in.
 function ceilingCardHtml() {
   const lifts = ceilingLifts();
 
@@ -9030,7 +9025,7 @@ function ceilingCardHtml() {
 
   // Idea 3 — count to the new number. The figure animates ONLY when this lift's
   // best has moved since the athlete last saw this card; an unchanged number
-  // just sits there. countUpSeen() below owns that comparison.
+  // just sits there. ceilingSeen() below owns that comparison.
   const seen = ceilingSeen();
   const from = (seen != null && seen !== best.latest.kg) ? seen : null;
 
@@ -9080,7 +9075,7 @@ function ncSpark(entries) {
     <polyline points="${pts}" fill="none" stroke="#FAF7F2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="${last[0]}" cy="${last[1]}" r="3.2" fill="#E06B43"/></svg>`;
 }
-// "Barbell Back Squat" → "Back Squat" for the tight three-up on the card.
+// "Barbell Back Squat" → "Back Squat" for the short name on the Home row.
 function shortLift(name) {
   const t = String(name || '').replace(/^(barbell|dumbbell|machine|cable|smith machine)\s+/i, '');
   return t.length > 13 ? t.slice(0, 12).trim() + '…' : t;
@@ -9105,7 +9100,7 @@ function fmtCeilDate(iso) {
 
 // Which lift's history is open, or null on the all-lifts view. Drives the back
 // chevron, which goes exactly ONE step — out of a lift to the list, and only
-// from the list back to My Plan.
+// from the list back to Home (or to the exercise it was opened from: _ceilReturn).
 let _ceilLift = null;
 
 // Where the athlete is inside "log a max": null on every other view, {} on the
@@ -9153,8 +9148,8 @@ function ceilingDue() {
   }).filter(d => d.age == null || d.age >= RETEST_MIN_DAYS);
 }
 
-// Where to land when the athlete leaves The Ceiling. Set only when they arrived
-// from inside an exercise mid-session, so the back chevron puts them back in
+// Where to land when the athlete leaves Personal Records. Set only when they arrived
+// from inside an exercise mid-session (its History sheet), so the back chevron puts them back in
 // that exercise rather than dumping them on Home with their place lost.
 // Cleared by goTo() the moment they leave by any other route.
 let _ceilReturn = null;
@@ -9168,7 +9163,7 @@ function ceilingBack() {
 }
 window.ceilingBack = ceilingBack;
 
-// Open The Ceiling from an exercise card, remembering exactly where we were.
+// Open Personal Records from an exercise card, remembering exactly where we were.
 function openCeilingFrom(card) {
   _ceilReturn = {
     dayId: card.dataset.day,
@@ -9178,8 +9173,8 @@ function openCeilingFrom(card) {
 }
 window.openCeilingFrom = openCeilingFrom;
 
-// Back to the exercise they came from: same day, same card open, same panel
-// open, scrolled to it. openDayView() rebuilds the day and scrolls to the top,
+// Back to the exercise they came from: same day, same card open, scrolled to it
+// (the .ex-1rm panel it also looks for left the card with REC-01). openDayView() rebuilds the day and scrolls to the top,
 // so the card has to be re-found and re-opened afterwards rather than held on to.
 function returnFromCeiling() {
   const r = _ceilReturn;
@@ -9224,9 +9219,8 @@ function renderCeiling() {
   const lifts = ceilingLifts();
   const body  = document.getElementById('ceil-body');
 
-  // Always-on plain-English line. "The Ceiling" is a name, not an explanation,
-  // and this is the first screen someone who has never heard of a one-rep max
-  // will land on.
+  // Always-on plain-English line under the title: this is the first screen
+  // someone who has never heard of a one-rep max will land on.
   const intro = `<div class="ceil-intro">The most you could lift for one rep, on each exercise.
     Worked out from your normal sets, so you never have to test it.</div>`;
 
@@ -9403,8 +9397,8 @@ function openCeilingAdd() {
 window.openCeilingAdd = openCeilingAdd;
 
 // ── Log a max, step 2: the numbers ────────────────────────────────────────
-// The same three fields, the same estimator and the same Sharp/Good/Rough as
-// the exercise card. `asTest` opens it as a deliberate rep-max test: reps
+// Three fields (kg, reps, RPE), the estimator and the Sharp/Good/Rough grade.
+// `asTest` opens it as a deliberate rep-max test: reps
 // prefilled to whatever the coach asked for, and the copy stops nagging the
 // athlete to go heavier when going heavier is exactly what they just did.
 function openCeilingForm(i, asTest) {
@@ -9550,7 +9544,7 @@ window.saveCeilingForm = saveCeilingForm;
 
 // The full explainer, in place. Folded away by default so it does not clutter
 // the screen for someone who has read it once, and open on the empty state
-// where it is the only thing worth reading. Same prose as the Coach tab card.
+// where it is the only thing worth reading. Same prose as the help sheet's card.
 function ceilingHelpHtml(open) {
   return `
     <details class="ceil-help"${open ? ' open' : ''}>
@@ -12464,11 +12458,10 @@ function normDigits(v) {
     .replace(/[٫،]/g, '.');
 }
 
-// ── THE CEILING — estimated 1RM from a set the athlete just logged ─────
-// Everything here is DERIVED from the set log already on the card. Nothing is
+// ── Estimated 1RM maths ────────────────────────────────────────────────
+// Read by Records → Log a max (paintCeilingForm()) and by histBestSet(), which
+// feeds the History sheet's trend and fillRecordsFrom(). Nothing here is
 // written, so this adds no storage key, no cloud payload and no merge rule.
-// The saved history (and a calculator for lifts that aren't in the programme)
-// lives in The Ceiling section on My Plan.
 //
 // RPE is the reason this beats a normal 1RM calculator. RPE 8 on a set of 5
 // means the athlete stopped 2 reps short, so the set they COULD have done is 7.
@@ -12512,8 +12505,8 @@ function estimateOneRM(kg, reps, rpe) {
 }
 
 // Pull a rep count out of a reps chip. Ranges ("10-12") take the LOW end — the
-// conservative read, and the panel is editable anyway. Time-based work ("30s",
-// "1:30") has no rep count at all, so it gets no Ceiling line.
+// conservative read, and Log a max's reps field is editable anyway. Time-based work ("30s",
+// "1:30") has no rep count at all, so it gets no estimate.
 function prescribedReps(repsChip) {
   const t = String(repsChip || '').trim();
   if (!t || isPureDuration(t)) return null;
@@ -12641,7 +12634,7 @@ function deleteCeilingEntry(lift, day) {
 // throw, a sprint, a carry or a trunk drill is left out even with a weight and an RPE
 // logged on it: a 6 kg med ball slammed five times at RPE 7 is not "a 7.5 kg max". An
 // exercise the Spine does not know yet is left out until its entry exists. The athlete can
-// still put any lift on by hand (+ Log a max, or Save on the card's own numbers).
+// still put any lift on by hand (+ Log a max).
 const RECORD_PATTERNS = { squat: 1, hinge: 1, 'single-leg': 1, 'push-horizontal': 1,
   'push-vertical': 1, 'pull-horizontal': 1, 'pull-vertical': 1, isolation: 1 };
 function recordsItself(name, exId) {
@@ -12853,11 +12846,9 @@ function bodyWeightSeries() {
 }
 
 // ── Body weight, on Home ───────────────────────────────────────────────────
-// AA Proof owns this number — it is written, synced and deleted there, and
-// _snapshot() never pushes `hab_` keys, so writing it here would strand the
-// reading on one device. This card READS it and hands the athlete across to
-// log one. Amir, 2026-09-12: there are two front doors to body weight now, this
-// card and the tracker itself, and either is a fine place to point someone.
+// This app owns <id>_hab_wt (it writes, pushes and merges it; see "Writing body
+// weight" below). The row reads the series; a tap opens the Body Weight screen
+// (goWeight()), the one place a reading is logged.
 function weightCardHtml() {
   const series = bodyWeightSeries();
 
@@ -13701,8 +13692,8 @@ function renderStep() {
     STEP.homeCard = item.card;
     STEP.homeDetail = item.card.querySelector('.ex-detail');
     // The exercise name lives in .item-main, not the relocated .ex-detail, so it's
-    // repainted here — everything below it (video, stats, cues, the set-log table,
-    // Ceiling) is the real node, moved in whole.
+    // repainted here — everything below it (the note, Last time, video, cues, the
+    // set-log table) is the real node, moved in whole.
     // The numbers and the pills live in the header now (CARD-02), so they are copied too.
     const nl = item.card.querySelector('.ex-numline'), pl = item.card.querySelector('.ex-summary');
     scroll.innerHTML = `<div class="step-ex-name">${item.card.querySelector('.item-name').innerHTML}</div>`
@@ -13759,8 +13750,8 @@ function renderStepFooter() {
 }
 
 // The one big button. Marking a set done goes through the row's OWN check-circle click —
-// the exact listener attachSetLog() wired up (saves the log, refreshes Ceiling, updates
-// the day's progress pill) — this function never touches that data itself.
+// the exact listener attachSetLog() wired up (saves the log, updates the day's
+// progress) — this function never touches that data itself.
 function stepPrimary() {
   const item = STEP.seq[STEP.pos];
   if (!stepDone(item)) {
@@ -14436,7 +14427,7 @@ function wrapSheetOpeners() {
 // busier … maybe add something clickable and then you can see more", and "the
 // cues should be there so we dont write the cues for each exercise everytime".
 //
-//   · the card gains ONE thing: a small ⓘ after the name, only when the exercise
+//   · the card gains ONE thing: a small ⓘ at the right end of the row (CARD-01), only when the exercise
 //     has an APPROVED entry. It opens the About sheet.
 //   · cues come from the entry whenever the programme has none of its own.
 //   · the About sheet: why it's here, what it does, its qualities, where it shows
@@ -14571,7 +14562,7 @@ function spineFor(name, exId) {
 // Idea #4: why THIS athlete has this exercise, written by the pipeline as
 // ex.why = { src, part?, text } on the 5–10 exercises per cycle that were decided
 // for them (SCHEMA.md → "why"). Absent means no personal reason, and nothing shows.
-// The card gains only a clay dot on the ⓘ; the sentence is in the About sheet and
+// The card gains only a solid-clay ⓘ (has-why); the sentence is in the About sheet and
 // on the cycle's Why page. The general "what it does" stays the Spine's purpose.
 const WHY_SRC = { goal: 'Your goal', body: 'Your body', test: 'Your test', cycle: 'Last cycle', you: 'You said', court: 'Your game' };
 const WHY_ORDER = ['goal', 'body', 'test', 'court', 'cycle', 'you'];
@@ -14611,9 +14602,9 @@ function whyList() {
   return out;
 }
 
-// Cues into empty slots, and the ⓘ after the name. Safe to call again: it only
+// Cues into empty slots, and the ⓘ at the right end of the row. Safe to call again: it only
 // fills what is still empty and never adds a second button. A card with a reason
-// (ex.why) gets the ⓘ even before its Spine entry is approved, marked with a dot.
+// (ex.why) gets the ⓘ even before its Spine entry is approved, solid clay (has-why).
 function paintSpine() {
   // Exercises inside a circuit: cues only (a circuit row has no ⓘ).
   if (SPINE) document.querySelectorAll('.round-cues-slot').forEach(slot => {

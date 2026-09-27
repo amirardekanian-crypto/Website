@@ -480,7 +480,7 @@ has to climb in a new season — which is part of what §12.2 was about.
 
 ## 5. Celebrations
 
-**Since PRF-02 (2026-09-27, Amir's 1A) only four things take the whole screen**; the rest land on
+**Since PRF-02 (2026-09-27, Amir's 1A) only five things take the whole screen**; the rest land on
 **the wins card** at the top of Today (`winsCard()`), with the XP they paid, until it is tapped. A
 made-up athlete's first 22 days went from 30 takeovers to 9 (a free athlete 24 → 7), nothing lost.
 
@@ -490,6 +490,7 @@ made-up athlete's first 22 days went from 30 takeovers to 9 (a free athlete 24 �
 | **A reward** (title or card) the level unlocked | `claimRewards()` | **on that level's screen** (`ev.rewards`); its own takeover only with no level in the same pass |
 | **A day streak crossing a mark** of `STREAK_TAKEOVER` (7) days or more | `checkUnlocks()` | the whole screen, ember ground, a drawn flame |
 | **A weekly quest** completed (this week only) | `checkUnlocks()` | the whole screen, badge ground |
+| **A finished *A few weeks* event** (its title, `claimEventTitles()`) | `checkLevelUps()` | the whole screen, as a reward: the biggest single thing that is not a level |
 | **A rank promotion on one habit** (water crossing GRINDER 5 → OPERATOR 1) | `checkLevelUps()` | the wins card |
 | **A consistency tier** cleared on any habit | `checkUnlocks()` | the wins card |
 | **A milestone** unlocked | `checkUnlocks()` | the wins card |
@@ -811,10 +812,10 @@ matters as much as the first — and no anti-abuse machinery is needed.
 | | | |
 |---|---|---|
 | **The return** | dated bonus, `comeback` kind | 50 XP, every time |
-| **BACK IN THE FIGHT** | `comebackRun` ≥ 7 | 200 XP |
-| **THE LONG ROAD BACK** | `comebackRun` ≥ 21 | 400 XP |
-| **HARD TO KILL** | `comebacksStuck` ≥ 3 | 300 XP |
-| **UNSINKABLE** | `comebacksStuck` ≥ 5 | 600 XP |
+| **BACK IN THE FIGHT I** | `comebackRun` ≥ 7 | 200 XP |
+| **BACK IN THE FIGHT II** (it was *THE LONG ROAD BACK*) | `comebackRun` ≥ 21 | 400 XP |
+| **HARD TO KILL I** | `comebacksStuck` ≥ 3 | 300 XP |
+| **HARD TO KILL II** (it was *UNSINKABLE*) | `comebacksStuck` ≥ 5 | 600 XP |
 | **BACKBONE** (event) | 2 stuck · 14-day run · 30 days on target | the **UNBOWED** title |
 
 The badges deliberately reward the **week after**, not the reappearance: returning is easy,

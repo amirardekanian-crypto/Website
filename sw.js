@@ -167,7 +167,8 @@
 //      All N ›), and a session at the right moment: sore → the finished card, the week done → Home.
 // v87: program.html changed (2026-09-27, POL-01): the Quality sheet shows no "How we measure it".
 // v88: program.html changed (2026-09-27): a week note's rpeDrop never takes a lower day's target under RPE 6.
-const CACHE = 'aap-v88';
+// v89: program.html and habits.html changed (2026-09-27, DOC-01): comments only, checked against the code.
+const CACHE = 'aap-v89';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
