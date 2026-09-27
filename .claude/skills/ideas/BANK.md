@@ -30,6 +30,30 @@ Brief: product strategy across assessment → … → adaptation; connected info
 Quick win noted in the same round: the TPS course app's `easier`/`harder` are free text; making them
 real links to exercise ids is the course-app half of #1.
 
+## Round 2 · 2026-09-27 · "Five Futures" (five product directions for the athlete app)
+
+Full write-up (five concepts × 15 sections with wireframes, the comparison matrix, A to H, the ten below):
+https://claude.ai/artifact/U8q6mrLHwJxK3YJeYQDCar
+
+Brief: Amir's pasted design brief (five radically different directions: premium coach, performance lab,
+simplest app, fitness OS, next generation), with "the existing architecture is not a constraint". The five
+concepts: 1 The Corner · 2 Readout · 3 Next · 4 The Loop · 5 Body Weather. Round-1 ideas that reappear as
+parts of the concepts (#8 Body Check, #10 Pinned, #11 Right Read, #13 Patterns) were not pitched again. The
+ten below are the prototype list, ranked by what a prototype would teach per hour.
+
+| # | Name | What | Needs | Status |
+|---|---|---|---|---|
+| 19 | The Brief | Home opens with 2–3 lines in Amir's words (week notes, Coach's Notes, Becauses, plus ~20 templates filled with facts: missed day, week 1/5, low check-in, first time, retest, match tomorrow) and one button | — | pitched |
+| 20 | The Corner | The rest screen as the coach's moment: next set, one cue or the Coach's Note, last time, Ask. Guided's rest screen already logs the set just done | — | pitched |
+| 21 | Court Counts | Two-tap court/match log (minutes × how hard = the session load coach.html already computes), feeding load, REC-5, SES-14 and coach.html | — | pitched |
+| 22 | The Follow-Up | A flag (pain, too hard, short on time) comes back as one question at the next check-in; the answer reaches coach.html | — | pitched |
+| 23 | Same Effort, More Weight | Lift pages lead with effort-matched rows ("6 reps at RPE 7: Jul 60, Aug 67.5, now 72.5") and a scrubber that rewinds the season; extends PROG-01's This cycle card | — | pitched |
+| 24 | Drag the Week | Sessions as blocks the athlete moves, with live consequences from REC-5, SES-14 and match days | 21 | pitched |
+| 25 | Ask, Anywhere | Press and hold any element: answered first from Amir's written words (Because, note, cue, rule), else WhatsApp with the context written; every question logged | 1, 4 | pitched |
+| 26 | The Sunday Five | The weekly check-in as five questions in the app, in the athlete's language, landing in call-log.html | — | pitched |
+| 27 | The One Button | A whole session driven by one full-width button; drag up to change a set | — | pitched |
+| 28 | Body Weather | The body lit by the week's load (Spine credits × sets × effort), cooling over 2–3 days; tap a region to see why or to report pain | 1 | pitched |
+
 ## Grown out of deep-dives
 
 | # | Name | What | Needs | Status |
