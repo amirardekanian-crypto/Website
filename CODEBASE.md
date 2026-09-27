@@ -52,8 +52,9 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   about for `coach.html`'s `parseSessionLog()`. Circuits and simple check-off exercises (warm-ups, and
   a few conditioning finishers with no per-set log) are **not** in the sequence yet — the athlete
   finishes those from the list, same as always; `getDayCompletion()`'s "unfinished" list already
-  handles that gracefully. `openTimer()`'s rest overlay grew an optional auto-start/auto-advance path
-  (`openTimerAuto()`) and a `+15s` button, used only from Guided Mode — the manual Rest button is unchanged.
+  handles that gracefully. `openTimer()`'s rest overlay grew an auto-advance path (`openTimerAuto()`) and a
+  `+15s` button for Guided Mode; since WK-02 (2026-09-27) every rest opens running, counts from a timestamp,
+  sounds and buzzes at zero and keeps the screen awake (PROGRAM-APP.md → *The rest timer*).
   **Entering and leaving (WK-01, 2026-09-26):** `openGuided()` never pauses a running clock (it only
   toggles a session that has not started, a leftover from an earlier day, or a paused one, which
   resumes); `openStepMode()` starts at the first unticked set; and the last button, **Finish Session ✓**,

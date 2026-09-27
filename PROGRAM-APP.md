@@ -616,6 +616,24 @@ Start to begin" was a desktop phrase). A Home day card shows **In progress · Re
 and not finished (`dayInProgress()`: a clock started today, or a ticked set), and **Done** once finished;
 `paintDayCardPills()` repaints them whenever the day view closes, because Home's cards are built once.
 
+## ⏲️ The rest timer keeps time in a pocket (WK-02, 2026-09-27)
+
+- **It counts from a timestamp** (`timerEndsAt`): `timerTick()` reads the clock every 250 ms and paints only
+  when the whole second changes, so a phone that sleeps or throttles the page still ends the rest on time, and
+  `visibilitychange` catches it up on return. Back more than 30 s after the end: it closes with no alarm.
+- **Every door opens it running** (`openRest()`); Pause, +15s, Reset and Close are unchanged. Guided's rest
+  (`openTimerAuto()`) is the same engine.
+- **At zero:** two short Web Audio tones (`restBeep()`, nothing downloaded; the audio context is started in the
+  tap that opened the rest, and a phone on silent stays quiet) plus a buzz where the phone has one (not iPhone).
+  **Sound on/off** on the overlay is `rest_sound` (`'0'` = off) on this phone only.
+- **The screen stays awake** while a rest runs (`restWake()`, the Screen Wake Lock API), released on pause
+  and close and asked for again on return.
+- **The rest offer** (`offerRest()`): ticking a set in list mode, with sets still to go on that exercise,
+  brings up one 48 px **Rest 2:00** button above the tab bar. It never starts by itself, because athletes
+  also tick sets after the fact; it goes on ×, an untick, leaving the day or 90 s. Guided never shows it.
+  Circuits keep their Rest button only. The card's **Rest ⏱** button is 44 px tall (it was 28).
+- The overlay's dark palette came with A11Y-01 (#245).
+
 ## 📲 The install ask waits for a finished session (HOME-03, 2026-09-26)
 
 The "Install app" toast (`A2HS` in `assets/js/shared.js`) used to fire 2.5 s after the first sign-in, on
@@ -645,7 +663,7 @@ appears "when every exercise is checked off", and "tap the timer icon". What is 
 - The finish card appears at the **first logged set**: "Wrap up Day N early?" with what is left and
   **Finish Anyway** (two taps), or "All done with Day N?" with **Finish Session ✓** (`refreshConfirmCard()`).
 - Then the session RPE (1–10), an optional note, and **Send Session Info to Coach** (`sendSession()`).
-- The rest timer is the **Rest ⏱** text button under an exercise's sets (`openTimer()`).
+- The rest timer opens from the **Rest** offer after a tick, or the **Rest ⏱** button under an exercise's sets (WK-02, below).
 
 **Rule:** a PR that renames a button, moves a control or changes when a card appears updates its guide card
 too (CLAUDE.md says the same). The Library's *Mark as done* note promises a habit tick only when AA Proof
