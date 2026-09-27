@@ -160,7 +160,9 @@
 // v82: habits.html changed (2026-09-27, POL-02): one word each (Milestones, Locker), the tab bar lights where
 //      you are, Day N is your day, "Off", a grey lock notice, a toast above a sheet, dark buttons at 5:1.
 // v83: habits.html changed (2026-09-27, A11Y-01): no label under 11 px anywhere in AA Proof (904 were).
-const CACHE = 'aap-v83';
+// v84: program.html changed (2026-09-27, DS-01): clay means "look here"; every block is one green, the running
+//      bar, Guided, labels and + Log a max green or grey.
+const CACHE = 'aap-v84';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

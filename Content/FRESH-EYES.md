@@ -32,7 +32,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-27)
 
-**37 done · 4 partly done · 3 open**, of 44. Each was checked against the code on `main`.
+**38 done · 4 partly done · 2 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -84,6 +84,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#278](https://github.com/amirardekanian-crypto/Website/pull/278) | Pinch-zoom in the training app (it was locked at 1×; now 5×, as AA Proof); both apps drop only the double-tap zoom (`touch-action: manipulation`) | A11Y-01 |
 | [#279](https://github.com/amirardekanian-crypto/Website/pull/279) | AA Proof: the circle is the tick (a 48 px circle that fills with a white tick, the emoji inside it), + is 44 px in the habit's tint, the programme's session is one slim line at the end of Today: the first habit you can tick moved up the screen (Amir's pick A of the mockup) | PRF-01 |
 | [#280](https://github.com/amirardekanian-crypto/Website/pull/280) | AA Proof's Today leads with the verdict, **2 to go**, then On target, then Perfect, instead of the day's percentage (68% on a rest day that counted); the count is exact (it said 1 when 2 were needed); the ring round the initials is gone; the training app's habits row and the strip's head say the same words (no more "day complete" beside "1 of 5 done"). Display only | PRF-03 |
+| [#287](https://github.com/amirardekanian-crypto/Website/pull/287) | Clay means "look here" in the training app (Amir's A): it stays on the Coach's note, a Because, an RPE over target, the tempo digit and the dark Home card's number; every block is one green (a block's colour came from its position), and the running bar, Guided, labels and + Log a max went green or grey | DS-01 |
 | [#286](https://github.com/amirardekanian-crypto/Website/pull/286) | No label under 11 px anywhere in AA Proof: 904 labels in 60 styles, from 7 to 10.5 px, measured on every screen and state, now 0; the 35-day grid's key wraps under 380 px, the Locker's share-card thumbnail is the skin and crest only | A11Y-01, PRF-02 |
 | [#285](https://github.com/amirardekanian-crypto/Website/pull/285) | AA Proof's small things (POL-02, with PRF-02): one word each (Milestones, Locker), the tab bar lights where you are (nothing in Settings, a habit's page its own tab), "Day N" is your day, "Off" for an add-on never on, a grey lock notice, a toast above an open sheet; dark mode's filled buttons at 5.17:1 (they were 3.35:1) | POL-02, PRF-02, A11Y-01 (part) |
 | [#284](https://github.com/amirardekanian-crypto/Website/pull/284) | AA Proof folded to what is next (PRF-02 part 3, Amir's 3A–6A): Progress shows the three milestones you are closest to, your medals on one row and "All 37 milestones" (4,523 → 1,538 px); quests only while a run is on; the Locker's road to the next three rewards, then "The whole road to level 50" (2,954 → 1,447 px); Crew opens on the board. Nothing revoked, every fold one tap | PRF-02 (part) |
@@ -91,19 +92,18 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#282](https://github.com/amirardekanian-crypto/Website/pull/282) | AA Proof's celebrations (PRF-02 part 1, Amir's 1A): the whole screen only for a new level (its reward on the same screen), a new rank and a day streak from 7 days; a medal, a tier, a habit's rank, a perfect day, a comeback and the 3-day mark land on a card under Today's hero, with their XP, until tapped. A made-up athlete's first 22 days: 30 takeovers → 9, nothing lost | PRF-02 (part) |
 | [#281](https://github.com/amirardekanian-crypto/Website/pull/281) | AA Proof's week is drawn once on the card and is the day picker: seven days ticked when on target, the last four tapped to fill in a day (the four chips with a percentage each went); the card a size smaller; a long rank's name no longer runs under the streak tile at 320–360 px. The first habit you can tick: 360 → 261 px at 390 × 844 | PRF-05 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276), PRF-01 (#279), PRF-03 (#280), PRF-05 (#281), POL-02 (#285), PRF-02 (#282–#286), A11Y-01 (#245, #275, #278, #285, #286; following the phone's dark setting is not wanted: the athlete chooses). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276), PRF-01 (#279), PRF-03 (#280), PRF-05 (#281), POL-02 (#285), DS-01 (#287), PRF-02 (#282–#286), A11Y-01 (#245, #275, #278, #285, #286; following the phone's dark setting is not wanted: the athlete chooses). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
 
 **Partly done, and what is still open on each:**
 - **POL-01.** Swept (#252, #277). Still open: the Quality sheet's "How we measure it" names tests athletes
   never meet; Amir's answer is A, hide it on the athlete's sheet (display only; the server data stays).
 - **SEAM-01.** Habits are ticked on Home. The full Proof app still has no way back to training,
   offers a second install, keeps its own dark-mode switch, and reads workout ticks only at launch.
-- **DS-03.** The type scale is in (#275). Still open: one primary button (eleven styles today), which waits for
-  DS-01's answer on what clay is for; AA Proof's type goes with SEAM-01.
+- **DS-03.** The type scale is in (#275). Still open: one primary button (eleven styles today), green now that
+  DS-01 (#287) settled what clay is for; AA Proof's type goes with SEAM-01.
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
 
-**Open.** P2:
-DS-01. P3: LIB-01, DOC-01.
+**Open.** P3: LIB-01, DOC-01.
 
 ## Next, in order
 
@@ -210,7 +210,7 @@ the working card folds How to do it if Amir wants that too.
 - Once per clone: `git config core.hooksPath .githooks`.
 - Use the branch the session names. After each merged PR, restart it from main:
   `git fetch origin main && git checkout -B <branch> origin/main`.
-- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v83` on
+- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v84` on
   2026-09-27) whenever a cached app file changes, log the version in its comment list, and change the
   name in CLAUDE.md too.
 - Test in a headless browser before every PR (below): the harness is in the repo, the checks you write
