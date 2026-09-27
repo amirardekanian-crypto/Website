@@ -265,21 +265,27 @@ The screen they actually live on. **In this order, and the order is the point:**
    at-risk bar (`shortOfQualifying()`), the nudge's *SAVE IT* habit (`lackOf()`), the strip's
    head on the training app's Home and that app's Daily habits row all read the same count and
    the same words (*2 to go*, *On target*, *Perfect*).
-   **Beside it is the week** — `weekReport()`: seven cells,
-   oldest on the left, each shaded by that day's `dayPct` with today outlined. The height
-   is constant on purpose — a bar chart of seven days invites reading the tallest as a
-   win, and these are percentages of different-sized days, not a race. Days before the
-   athlete's first log are drawn empty rather than at 0%, the same rule the day strip and
-   the heat map follow. Six cells are captioned with a **narrow weekday letter** and the
-   seventh reads **"Today"** in full (Amir, 2026-08-01) — a single `S` under the outlined
-   cell made the athlete decode which end was now from the outline alone. It is the one
-   caption meant to be *read* rather than scanned, so it drops to 9.5px and is allowed to
-   bleed into its neighbours' whitespace (`overflow: visible` on `.wk-d`, `nowrap` on the
-   label). Measured: 26.8px in a 23.1px cell at **320px**, no wrap, well inside the card.
+   **Beside it is the week, and the week is the day picker** (PRF-05, 2026-09-27) — `weekStrip()`:
+   seven days, oldest on the left, **ticked when on target** (`dayQualifies()`, the verdict's own
+   rule). A pale day was started but did not count, a grey one has nothing in it, a day before the
+   athlete's first log is outlined and empty (not a miss), and today is outlined in the accent until
+   it counts. **The last four, today and the `BACKFILL_DAYS` behind it, are buttons**: tap one and
+   every tick lands on that day (`setDay()`), the day is ringed in ink and the screen turns clay. It
+   replaced two drawings of the same week: bars shaded by `dayPct()` here, and four chips with a
+   percentage each under the card (the day strip, item 3 until then). The first habit you can tick
+   moved from 360 px to 261 px at 390 × 844 (it was 466 px at the audit, before PRF-01). Six days are captioned with a
+   **narrow weekday letter** and the seventh reads **"Today"** in full (Amir, 2026-08-01): the one
+   caption meant to be *read* rather than scanned, so it drops to 10 px and may sit over its
+   neighbours' spare room. A day you can pick reaches into the gaps and above and below, so its target
+   is 36 × 58 px at 390 and 26 × 48 px at 320. **The card is a size smaller** with it: the level ring
+   74 → 62 px, the streak tile tighter. **The rank's name is fitted** (`fitRankName()`): on a 320–360 px
+   phone *CONTENDER* or *UNTOUCHABLE* ran under the streak tile; the name now steps down a pixel at a
+   time, the → goes below 13 px (the name and the ring still open the Locker), and 11 px is the floor.
    ⚠️ The block at the bottom of Today is no longer headed *"The last seven days"* — with
    the hero opening on a seven-day row, two headings naming the same span read as one
-   section printed twice. It is **"Your week, habit by habit"**: the hero answers *how
-   complete was each day*, that block answers *which habit is carrying me*.
+   section printed twice. It is **"Your week, habit by habit"**: the hero answers *did each
+   day count*, that block answers *which habit is carrying me*. With the day picker on the
+   card, the week is drawn twice on Today, not three times.
 2. **The streak flame** — sits *on* the hero card, hard right of the rank block: a drawn flame
    (never an emoji — nothing here should change shape between an iPhone and a Pixel) and the
    day-streak number in clay, licking faster the longer the streak runs, on the same
@@ -300,12 +306,10 @@ The screen they actually live on. **In this order, and the order is the point:**
    on the screen whose own layout note says anything added goes below the habit list. The
    flame costs no vertical space at all. Progress carries the same flame inside its stat
    grid, so the day streak is one of its four facts again.
-3. **The day strip** — four chips (`THU · FRI · SAT · TODAY`), each showing that day's
-   completion, that choose **which day you are logging**. See *The backfill window* below.
-   ⚠️ **Oldest on the left, today on the RIGHT** (Amir, 2026-08-01). It ran today-first,
-   which put the day you are almost always logging at the far left and made the strip read
-   backwards against every other week in the app — the hero's seven-day row, the heat map
-   and the 35-day grid all run left-to-right *into* now. `editableDays()` owns the order.
+3. ~~**The day strip**~~ — four chips (`THU · FRI · SAT · TODAY`) with a percentage each, until
+   PRF-05 (2026-09-27) folded them into the week on the card (above). What they taught still holds
+   there: **oldest on the left, today on the RIGHT** (Amir, 2026-08-01; it ran today-first, which put
+   the day you are almost always logging at the far left), and `editableDays()` owns the window.
 4. **The habit list** — tap the **circle** to tick, tap the name for that habit's history, tap
    `+` on counter habits. Each row shows that habit's own level and current streak.
    **The circle is the tick** (PRF-01, 2026-09-27): the emoji sits in a 48 px circle ringed in the
@@ -374,7 +378,8 @@ run once.)
 
 #### The day score is weighted — and it is two numbers
 Full detail in [`XP_SYSTEM.md`](XP_SYSTEM.md) §6; the shape of it matters here because it
-is what the day strip and the header show. Both come from `dayParts(day, mode)`, which
+is what the roll call wall and the share cards show (Today leads with the verdict since PRF-03).
+Both come from `dayParts(day, mode)`, which
 sums `baseXp()` over `rosterOn(day)` instead of counting heads — a headcount said a
 supplement and a training session were the same day's work, and the percentage was the
 last number in the app that still believed that.
@@ -388,9 +393,9 @@ for — so `dayPct()` and `gatePct()` finally agree on what a partial counter is
 read 91% without being *perfect*, because perfect still means every box actually ticked,
 and only that unlocks the perfect-day takeover.
 
-- **`dayPct()`** — what the day was *worth*, over the whole roster. The day strip, the
-  week's shading, the roll call wall (the header's ring went with PRF-03, and Today leads
-  with the verdict instead). On a rest day it reads ~71%, and that is the honest number.
+- **`dayPct()`** — what the day was *worth*, over the whole roster. The roll call wall and
+  the share cards (Today dropped it: the header's ring and the week's shading went with PRF-03 and
+  PRF-05, the day strip with PRF-05). On a rest day it reads ~71%, and that is the honest number.
 - **`gatePct()`** — what the athlete could *do*. A **locked** habit they did not earn that
   day leaves the denominator. Day streaks read this and nothing else.
 
@@ -644,7 +649,8 @@ on Monday, and drawing it as three misses is the app inventing failures. Those c
 
 #### The backfill window
 Nobody logs perfectly on the day, every day, so **the last `BACKFILL_DAYS` (3) days plus
-today are editable**. The day strip switches which day the taps land on; past that the
+today are editable**. Tapping one of those days on the week (the card at the top of Today) switches
+which day the taps land on; past that the
 log is closed. The limit is the feature — a record you can rewrite whenever you like is
 a diary, not evidence.
 
@@ -863,8 +869,8 @@ the row printed raw `xpFor()` and disagreed with `dayXp()`).
 
 **Missed and not-yet-started are different, everywhere a day is drawn.** Days before
 `firstLoggedDay()` render as `.c.pre` in the 35-day grid (dotted, with its own key entry),
-are dropped from the last-five list, and read `—` rather than `0%` on Today's day strip.
-A day-one athlete was being shown three failed days on the day strip and five weeks of
+are dropped from the last-five list, and are outlined and empty on Today's week (they read
+`—` on the old day strip). A day-one athlete was being shown three failed days on the day strip and five weeks of
 MISS on every habit, for a period during which they did not have the app. Note
 `firstLoggedDay() || TKEY()` at both call sites — it returns `null` until something is
 logged, which is precisely the case this exists for.
@@ -1230,7 +1236,7 @@ each row a door with an icon tile, a name, a line of explanation and its current
 | — | **Profile** — name, `Day N · rank · coached/free`. Tapping it opens the **Locker**, because that is where the rank lives. |
 | Tracking | **Habits & targets** (`N of M add-ons on`) · **Appearance** (`Dark`/`Light`) · **Install on your phone** (only while `installable()`) |
 | How this works | **The tour** · **The manual — how XP works** · **The long game** (Locker) · **Open your programme** / **See about coaching** |
-| Crew & data | **Crew board** (your board name; `Not yet` for a coached athlete the sweep will list after their first session; `Not joined` otherwise) · **Sync** (live `syncLabel()`, tap to sync now) · **Reset today's log** (destructive, still two-tap armed; it wipes the day the backfill strip is showing, `AKEY()`, and names it: *Reset yesterday's log* when yesterday is picked. It used to wipe today whatever the strip showed.) |
+| Crew & data | **Crew board** (your board name; `Not yet` for a coached athlete the sweep will list after their first session; `Not joined` otherwise) · **Sync** (live `syncLabel()`, tap to sync now) · **Reset today's log** (destructive, still two-tap armed; it wipes the day picked on Today's week, `AKEY()`, and names it: *Reset yesterday's log* when yesterday is picked. It used to wipe today whatever the strip showed.) |
 
 Two rows open **sub-screens** rather than navigating: `UI.sub` is `'habits'` or
 `'appearance'`, nothing else reads it, and `go()` clears it on the way out so leaving

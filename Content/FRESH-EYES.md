@@ -32,7 +32,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-27)
 
-**33 done · 5 partly done · 6 open**, of 44. Each was checked against the code on `main`.
+**34 done · 5 partly done · 5 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -84,8 +84,9 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#278](https://github.com/amirardekanian-crypto/Website/pull/278) | Pinch-zoom in the training app (it was locked at 1×; now 5×, as AA Proof); both apps drop only the double-tap zoom (`touch-action: manipulation`) | A11Y-01 |
 | [#279](https://github.com/amirardekanian-crypto/Website/pull/279) | AA Proof: the circle is the tick (a 48 px circle that fills with a white tick, the emoji inside it), + is 44 px in the habit's tint, the programme's session is one slim line at the end of Today: the first habit you can tick moved up the screen (Amir's pick A of the mockup) | PRF-01 |
 | [#280](https://github.com/amirardekanian-crypto/Website/pull/280) | AA Proof's Today leads with the verdict, **2 to go**, then On target, then Perfect, instead of the day's percentage (68% on a rest day that counted); the count is exact (it said 1 when 2 were needed); the ring round the initials is gone; the training app's habits row and the strip's head say the same words (no more "day complete" beside "1 of 5 done"). Display only | PRF-03 |
+| [#281](https://github.com/amirardekanian-crypto/Website/pull/281) | AA Proof's week is drawn once on the card and is the day picker: seven days ticked when on target, the last four tapped to fill in a day (the four chips with a percentage each went); the card a size smaller; a long rank's name no longer runs under the streak tile at 320–360 px. The first habit you can tick: 360 → 261 px at 390 × 844 | PRF-05 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276), PRF-01 (#279), PRF-03 (#280). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276), PRF-01 (#279), PRF-03 (#280), PRF-05 (#281). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
 
 **Partly done, and what is still open on each:**
 - **A11Y-01.** The training app is done: 11 px is the floor everywhere (#275) and pinch-zoom is on (#278).
@@ -100,15 +101,15 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
 
 **Open.** P2:
-PRF-02, DS-01. P3: PRF-05, LIB-01, POL-02, DOC-01.
+PRF-02, DS-01. P3: LIB-01, POL-02, DOC-01.
 
 ## Next, in order
 
 **Amir's answers (2026-09-27): "Your picks on all five, go ahead."** Each page has the detail.
 - **Proof's Today (PRF-01, PRF-03, PRF-05)**: A, a tighter card
   (https://claude.ai/artifact/TwHpG4EXEv4hj1FcPejG7y): the circle tick and the session last (#279), the verdict
-  tile beside the week (#280), then one week strip that is also the day picker, with the hero a size smaller
-  (PRF-05). The prototypes are the scratchpad's `proto.js`, laid over the real app in a headless page.
+  tile beside the week (#280), one week strip that is also the day picker, with the card a size smaller (#281).
+  All three are built.
 - **PRF-02**: all six As (https://claude.ai/artifact/6hB61EMUJPjCQ6hF7LH9Fe): (1) the whole screen only for a new
   level (its reward on the same screen), a new rank and a day streak from 7 days up; milestones, tiers, habit
   ranks, a perfect day and a comeback become a card on Today that stays until tapped, with its XP (30 → 9 in 22
@@ -130,8 +131,8 @@ PRF-02, DS-01. P3: PRF-05, LIB-01, POL-02, DOC-01.
 progress (#258, #271), the account and the guide (#268, #270), each told in full in `PROGRAM-APP.md`. What
 is left is mostly AA Proof, then design-system polish. Work it in this order:
 
-1. **Proof's Today screen: ~~PRF-01~~ (#279), ~~PRF-03~~ (#280) and PRF-05.** One screen, one mockup (Amir
-   picked A), one PR per item.
+1. ~~**Proof's Today screen: PRF-01 (#279), PRF-03 (#280) and PRF-05 (#281).**~~ One screen, one mockup (Amir
+   picked A), one PR per item. Done.
    - **PRF-01**, the main action is the quietest control: the tick is a 22 px pale ring on the emoji tile
      while "+" is a 36 px solid button, and the locked *Finish your session* row leads the list, so the
      first row you can tick starts 466 px down (the audit; about 440 px in the harness's `proof-390.png`).
@@ -207,7 +208,7 @@ the working card folds How to do it if Amir wants that too.
 - Once per clone: `git config core.hooksPath .githooks`.
 - Use the branch the session names. After each merged PR, restart it from main:
   `git fetch origin main && git checkout -B <branch> origin/main`.
-- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v77` on
+- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v78` on
   2026-09-27) whenever a cached app file changes, log the version in its comment list, and change the
   name in CLAUDE.md too.
 - Test in a headless browser before every PR (below): the harness is in the repo, the checks you write
