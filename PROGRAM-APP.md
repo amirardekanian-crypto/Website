@@ -409,10 +409,12 @@ costs more than one tap.
     paler than the prescribed reps beside it, because a tick records the reps and not this. A bare
     `last 80` placeholder was tried first: at 375px the box holds about 38px of text, so `last 22.5`
     was cut off. A ticked set shows no hint.
-  - **Same as last** (`.ex-same-last`, a clay outline) fills every empty, unticked
-    set with its own last weight, or the nearest one above when last time had fewer sets
-    (`sameAsLastFills()`); the label names the load or the range, `80–90 kg`, and no number at all
-    when a weight is not a plain number (`2x20`).
+  - **No Same as last on the card** (removed 2026-09-27, Amir: *"its a duplicate of what can be seen
+    in history"*). It sat above the table as `Same as last · 80 kg` and filled every empty set; the open
+    card's Last time box already shows last time, and one number typed in set 1 fills the sets below.
+    `sameAsLastFills()` / `sameAsLastLabel()` went with it. **Guided's rest screen keeps its own**
+    (`.tl-same`, in `paintTimerLog()`): that screen has no Last time box, and the button types last
+    time's weight into that set's box, which then fills the sets below like any typed number.
   - **A number typed in a set fills the empty sets below it**, and keeps them in step while it is
     typed (`8` then `80` leaves 80). It stops at the first set holding a number the athlete put there
     and skips ticked sets. Which rows were filled this way is kept in memory only.
@@ -720,8 +722,8 @@ a tick-all on a closed card opens nothing. Library cards never become done rows.
 when the Spine entry's `equipment` is loaded (`KG_LOADED`: barbell, dumbbell, kettlebell, cable, a
 machine that is not cardio, landmine, sled, medicine ball…), and kept when that is unknown (no approved
 entry, no equipment) or when the athlete has **ever logged a weight** on it (this session or history),
-so a weighted plank keeps its box. Hidden (`.ex-set-log.no-kg`), never removed, so Guided, *Same as last*
-and the carry-down never meet a missing node. A row with no box at all says its dose, `30 s / side`
+so a weighted plank keeps its box. Hidden (`.ex-set-log.no-kg`), never removed, so Guided and the
+carry-down never meet a missing node. A row with no box at all says its dose, `30 s / side`
 (`.ex-set-dose`, from `data-dose`). **No box for the seconds a hold lasted** (Amir, 2026-09-27: *"Leave
 the tick"*): the tick means the time as written, and a shorter hold goes in the Note. (It would have
 needed a new field in the log line, which only writes `×n` for a reps dose.)

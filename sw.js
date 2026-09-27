@@ -133,7 +133,9 @@
 //      the Coach tab, "How hard?", "tempo", Guided's ?); a Guided mode card.
 // v69: program.html changed (2026-09-27, PROG-01): the This cycle card at the top of Home (the week, sessions
 //      done, and effort-matched wins), replacing the small cycle line.
-const CACHE = 'aap-v69';
+// v70: program.html changed (2026-09-27): the working card's "Same as last" button is gone (the open
+//      card's Last time box already shows last time); Guided's rest screen keeps its own.
+const CACHE = 'aap-v70';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
