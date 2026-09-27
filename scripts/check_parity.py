@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """One word list, many copies: the shared vocab of the Spine and the Quality Map, checked for agreement.
 
-Why this exists (2026-09-26, pipeline audit 5.2.3): the same lists are typed out in program.html,
+Why this exists (2026-09-26, the pipeline audit): the same lists are typed out in program.html,
 coach.html, scripts/check_program.py, .claude/skills/spine/draft_sql.py, the supabase/stage*.sql
 source and the live database's constraints. The muscle list alone is in four places, and when one
 copy drifts nothing errors: coach.html offers a word the database refuses, or the checker counts a

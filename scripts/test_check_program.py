@@ -345,7 +345,7 @@ fp = subprocess.run([sys.executable, CHECK, p, '--fingerprint'], capture_output=
 expect('fingerprint keeps "7.0" and "7.50" as written, like the server', '4 leaves  9 chars' in fp, fp)
 expect('volume: no --spine, no count', has(run(BASE), 'WARN', 'the volume count'))
 
-# ── 9. COM-13: weighing in is Home → Body Weight, never Proof (2026-09-26, audit 5.2.1) ──
+# ── 9. COM-13: weighing in is Home → Body Weight, never Proof (2026-09-26) ──
 def with_card(title, body, **extra):
     d = copy.deepcopy(BASE); d['notes'] = {"cards": [{"title": title, "body": body}]}
     for k, v in extra.items(): d['cycles'][1][k] = v

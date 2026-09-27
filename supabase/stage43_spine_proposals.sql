@@ -1,6 +1,6 @@
--- stage43 — a pending list for Spine wording proposals (2026-09-26). NOT APPLIED YET.
+-- stage43 — a pending list for Spine wording proposals (2026-09-26). Applied on Amir's word the same day.
 --
--- The pipeline audit (.claude/PIPELINE-AUDIT-2026-09-26.md, 5.2 item 7): Spine Upkeep may not change a
+-- The pipeline audit (2026-09-26): Spine Upkeep may not change a
 -- field that already has content on an APPROVED entry (cues, purpose, tennis, a link, a count, SFR,
 -- flags). It proposes the change to Amir instead (CUE-4, /spine Upkeep step 2). Quality suggestions
 -- already had a durable home (exercise_coach.suggested_qualities, stage32b); every other proposal was

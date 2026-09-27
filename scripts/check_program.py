@@ -338,7 +338,7 @@ def check_blocks(data):
 
 # COM-13: weighing in happens on Home → Body Weight in program.html. AA Proof has had no weight
 # screen since 2026-09-12, yet eleven live lines in six programmes still sent athletes there (the
-# 2026-09-26 audit, 5.1). A sentence that names Proof AND weighing in fails; a sleep or protein
+# 2026-09-26 pipeline audit). A sentence that names Proof AND weighing in fails; a sleep or protein
 # line about Proof is fine, and so is "bodyweight squat" (bodyweight as the load, not a reading).
 PROOF = re.compile(r'\bproof\b', re.I)
 PROOF_NEGATED = re.compile(r"\b(?:not|never|no longer|isn't|is not|no)\b[^.!?]{0,25}\bproof\b", re.I)

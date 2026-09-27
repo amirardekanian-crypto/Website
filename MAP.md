@@ -108,8 +108,6 @@ The brain behind every program. Read the principles before touching sets/reps.
 - **How to run the pipeline:** [`.claude/COACHING-HOWTO.md`](.claude/COACHING-HOWTO.md)
 - **The brief agent:** [`.claude/agents/athlete-brief.md`](.claude/agents/athlete-brief.md) — data prep only: a new athlete's intake form from Gmail, and the Gmail session-report import /cycle-report runs first.
 - **Per-athlete rationale log:** coach-only *why* notes in `public.coaching_logs` on the server, read and written from coach.html → the athlete → File (it used to be `.claude/coaching-log/`, in this public repo).
-- **The 26 Sept 2026 pipeline audit:** [`.claude/PIPELINE-AUDIT-2026-09-26.md`](.claude/PIPELINE-AUDIT-2026-09-26.md) — what it found, what shipped, and what is still open.
-- **The second audit (26–27 Sept 2026):** [`.claude/PIPELINE-AUDIT-2026-09-27.md`](.claude/PIPELINE-AUDIT-2026-09-27.md) — speed, token cost, contradictions; Amir's nine answers and what shipped.
 
 **The skill pipeline** (`.claude/skills/` — run as `/name`):
 

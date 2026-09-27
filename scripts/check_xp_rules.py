@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The XP rules, scored twice: habits.html's constants against the leaderboard's row.
 
-Why this exists (2026-09-26, pipeline audit 5.2.2): the leaderboard scores on the server from
+Why this exists (2026-09-26, the pipeline audit): the leaderboard scores on the server from
 public.xp_rules (id 1) and each phone scores from constants in habits.html. When the two drift,
 the board and the athlete's own screen disagree and nothing errors (XP_SYSTEM.md §8). Nothing
 tested the pair until now.

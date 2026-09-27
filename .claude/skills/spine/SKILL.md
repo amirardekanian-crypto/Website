@@ -281,7 +281,7 @@ list cannot disagree.
 
 A proposed change to a field that already has content on an **approved** entry (cues, purpose,
 tennis, equipment, a link, a count, SFR, flags) is never written on the entry (rule 1) and never
-only printed in a handoff (it was lost if nobody acted that day: pipeline audit 5.2 item 7). It
+only printed in a handoff (it was lost if nobody acted that day). It
 goes on the entry's coach-only half, `exercise_coach.suggested_changes`, beside
 `suggested_qualities`. The shape is in `supabase/stage43_spine_proposals.sql` (applied 2026-09-26:
 the column is live).
