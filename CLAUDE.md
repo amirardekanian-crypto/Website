@@ -128,6 +128,12 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   records write rebuilds from `loadCeilingRaw()`, or a device that missed the delete brings it back.
 - **No estimate on the working card** (Fresh Eyes, Amir 2026-09-26: "Off the card, keep in Records"): nothing on
   the card suggests a weight mid-set. Records → "+ Log a max" (`paintCeilingForm()`) is the one hand-entry door.
+- **The working card** (Fresh Eyes, Amir 2026-09-27; `PROGRAM-APP.md` → *The working card*): a closed card shows
+  **no history** (*"no history on the exercise card when not opened"*); its numbers are one line and a pill that says
+  something stays a pill (the green `intent` pill, the check-in's pills); the ⓘ sits at the right end, clay for a
+  Because, and a clay dot after the name is a Coach's Note. Last time is a box in the open card (the last set; a tap
+  shows every set; `lt_open` is one setting per phone). The kg box follows the Spine's equipment (`kgWanted()`): hidden,
+  never removed.
 - **Personal Records fill themselves** (2026-09-26): a finished session's best set goes on when it beats every
   earlier number for the lift, marked `auto` and written with `t: 0` so anything the athlete does to that day wins.
   New bests only: every screen leads with the latest entry. "The Ceiling" is retired from the screens.
@@ -229,7 +235,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v59` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v60` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

@@ -1975,8 +1975,10 @@
   .check-box::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--on-accent); opacity: 0; transform: scale(0.5); transition: opacity 0.2s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
   .item-body { flex: 1; min-width: 0; }
   /* Number + name now share one line so the number reads as part of the title */
-  .item-name-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-  .item-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.1; letter-spacing: 0.3px; color: var(--grey-dark); transition: color 0.2s; }
+  /* The number stays beside the name; a long name wraps inside its own box (it used to
+     wrap under the number, leaving the number alone on a line). */
+  .item-name-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: nowrap; }
+  .item-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.1; letter-spacing: 0.3px; color: var(--grey-dark); transition: color 0.2s; min-width: 0; }
 
   /* Exercise number (1, 2, 3 within a block) — paired in-line with the name,
      bigger and bolder so it reads as "1. Glute Bridge Hold" at a glance. */
@@ -2007,22 +2009,11 @@
   .checklist-item.collapsed .item-actions { display: none !important; }
   .checklist-item.collapsed .item-name { font-size: 17px; font-weight: 700; }
   .checklist-item.collapsed .ex-num { font-size: 22px; }
-  /* Stat pills (sets×reps · RPE · rest) show only when collapsed. The green
-     "modifier" pills persist when expanded, anchored under the exercise name.
-     When an exercise has no modifier pills, hide the whole summary on expand so
-     no empty gap is left. */
-  .checklist-item:not(.collapsed) .ex-summary-pill.stat { display: none; }
-  .checklist-item:not(.collapsed):not(.has-mods) .ex-summary { display: none; }
-  .checklist-item:not(.collapsed) .ex-chevron { transform: rotate(180deg); }
 
-  /* ── REDESIGNED EXERCISE CARD ──────────────────────────────────────
-     Tap-to-expand list view. The collapsed row shows just name + summary
-     (sets×reps · target · rest). The expanded view shows a video placeholder,
-     a 5-cell stats grid, extra chips (HOLD / Priority / etc.), coaching cues
-     with yellow/red accent lines, the log section (weight + RPE + note),
-     and a rest button. */
-
-  /* Stat pills shown on the collapsed row — flex of small rounded pills. */
+  /* ── THE EXERCISE CARD ─────────────────────────────────────────────
+     Tap-to-expand list view; its layout since 2026-09-27 is "The working card"
+     further down (CARD-01/02/03). The pills under the numbers: the coach's green
+     intent pill, a legacy card's chips, and the check-in's pills. */
   .ex-summary {
     display: flex;
     flex-wrap: wrap;
@@ -2052,17 +2043,6 @@
   .ex-summary-pill.modifier.priority { box-shadow: 0 0 0 1.5px rgba(14,74,54,0.30); }
   .checklist-item.checked .ex-summary { opacity: 0.5; }
 
-  /* Chevron at the right edge of the row, rotates when expanded */
-  .ex-chevron {
-    flex-shrink: 0;
-    margin-left: auto;
-    color: var(--grey-text);
-    font-size: 11px;
-    line-height: 1;
-    transition: transform 0.22s ease;
-    padding: 4px 6px;
-  }
-  body[data-dark] .ex-chevron { color: #777; }
 
   /* The expandable detail block — sits below .item-main */
   .ex-detail {
@@ -2135,22 +2115,6 @@
   /* A Shorts clip is vertical: a tall 9:16 box, centred, instead of the wide one */
   .ex-video.short { height: auto; aspect-ratio: 9 / 16; width: min(100%, 300px); margin-inline: auto; }
 
-  /* 5-cell stats grid: SETS · REPS · TARGET · TEMPO · REST */
-  /* The grid is as wide as the prescription, not a fixed five. An exercise that
-     was given two facts draws two cells — it never draws an em-dash standing in
-     for a decision the coach did not make. Column count is set inline by
-     renderStatsGrid(). (Before 2026-09-20 this was repeat(5,1fr) and the free
-     library alone rendered 1,151 dashes.) */
-  .ex-stats-grid {
-    display: grid;
-    grid-auto-columns: 1fr;
-    grid-auto-flow: column;
-    border: 1px solid var(--grey-mid);
-    border-radius: 8px;
-    margin-top: 4px;
-    background: var(--white);
-  }
-
   /* Setup line — equipment / position ("neutral grip", "45° bench"). Sits under
      the name as quiet text, because it is a condition of the exercise, not a
      number. It used to be a green pill indistinguishable from a tempo. */
@@ -2161,115 +2125,6 @@
     margin-top: 3px;
   }
   body[data-dark] .ex-setup { color: #999; }
-
-  /* A prep item is a name and a dose. No grid, because there is nothing else to
-     say: a 5-minute row has one number and four blanks under the old layout. */
-  .ex-doseline {
-    display: flex; align-items: baseline; justify-content: space-between;
-    gap: 12px; margin-top: 6px;
-  }
-  .ex-doseline .ex-dose {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 20px; font-weight: 700; color: var(--green-ink);
-    white-space: nowrap; line-height: 1;
-  }
-  body[data-dark] .ex-doseline .ex-dose { color: var(--green-ink); }
-  body[data-dark] .ex-stats-grid {
-    background: rgba(255,255,255,0.02);
-    border-color: #333;
-  }
-  .ex-stat {
-    padding: 12px 4px;
-    text-align: center;
-    border-left: 1px solid var(--grey-mid);
-  }
-  .ex-stat:first-child { border-left: none; }
-  body[data-dark] .ex-stat { border-left-color: #333; }
-  .ex-stat-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: 0.6px;
-    color: var(--grey-text);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    line-height: 1.25;
-    min-height: 2.4em;  /* reserve space so 1- and 2-line labels still align */
-    display: flex; align-items: center; justify-content: center;
-  }
-  body[data-dark] .ex-stat-label { color: var(--grey-text); }
-  .ex-stat-value {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--grey-dark);
-    line-height: 1;
-    word-break: break-word;
-  }
-  body[data-dark] .ex-stat-value { color: #f0f0f0; }
-  .ex-stat-value.dim { color: #bbb; font-weight: 500; }
-  body[data-dark] .ex-stat-value.dim { color: #555; }
-  /* Target stat (RPE target) is always yellow */
-  .ex-stat.target .ex-stat-value { color: var(--green-ink); }
-  body[data-dark] .ex-stat.target .ex-stat-value { color: var(--green-ink); }
-  /* Tempo can get long — shrink slightly */
-  .ex-stat.tempo .ex-stat-value { font-size: 14px; letter-spacing: 0.5px; }
-  /* THE DIGIT THAT CARRIES THE INSTRUCTION. A tempo is four numbers and usually
-     only one or two of them are the point; clay picks those out so the athlete
-     reads "3" and not "3-0-1-0". Which digits are hot is decided by
-     tempoDisplay(): the slowest phase when it is 2s or more, plus any non-zero
-     pause. This is what replaced writing "3s eccentric" a second time beside it. */
-  .ex-stat.tempo .t-hot { color: var(--clay-ink); font-weight: 800; }
-  body[data-dark] .ex-stat.tempo .t-hot { color: var(--clay-ink); }
-
-  /* Circuit meta — 2-cell mini grid (Rounds + Rest) shown at the top of an
-     expanded circuit so the round count and rest time stay visible. */
-  .ex-circuit-meta {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border: 1px solid var(--grey-mid);
-    border-radius: 8px;
-    margin-top: 14px;
-    background: var(--white);
-  }
-  body[data-dark] .ex-circuit-meta {
-    background: rgba(255,255,255,0.02);
-    border-color: #333;
-  }
-
-  /* Stats block — wraps extras + grid */
-  .ex-stats-block { margin-top: 14px; }
-
-  /* Big pills for "extras" (HOLD, Priority, Max Intent, etc.). Solid yellow
-     background, fully rounded, bold uppercase — designed to grab attention. */
-  .ex-extra-chips {
-    display: flex; flex-wrap: wrap; gap: 8px;
-    margin-bottom: 10px;
-  }
-  .ex-extra-chip {
-    display: inline-flex;
-    align-items: center;
-    padding: 8px 16px;
-    background: var(--yellow);
-    color: var(--on-accent);
-    border: none;
-    border-radius: 99px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    line-height: 1;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-  }
-  body[data-dark] .ex-extra-chip {
-    box-shadow: 0 1px 4px rgba(14,74,54,0.18);
-  }
-  /* "yellow"-styled chips (high-priority ones from JSON) — already yellow,
-     just give them a slightly stronger glow so they read as the highest
-     priority among the extras. */
-  .ex-extra-chip.yellow {
-    box-shadow: 0 0 0 2px rgba(14,74,54,0.25), 0 1px 2px rgba(0,0,0,0.08);
-  }
 
   /* Coaching cues — yellow accent for "good", red accent for "bad". No icons. */
   .ex-cue {
@@ -2301,8 +2156,6 @@
      callout at the top of the expanded detail plus a clay pill on the
      collapsed row so it can't be missed. Program-wide guidance stays in
      the Notes tab. */
-  .ex-summary-pill.coach-note-pill { background: var(--accent-2, #C7552F); color: #fff; }
-  body[data-dark] .ex-summary-pill.coach-note-pill { background: #C7552F; color: #fff; }
   .ex-coach-note {
     margin: 10px 0 4px;
     padding: 10px 12px 11px;
@@ -2607,11 +2460,6 @@
   body[data-dark] .rd-k { color: #E06B43; }
   body[data-dark] .rd-t { color: #ddd; }
   body[data-dark] .rd-btn { color: #ddd; box-shadow: inset 0 0 0 1.5px #444; }
-  /* "RPE 8 → 7 today": the written number stays, struck, beside today's. */
-  .rd-val { display: inline-flex; align-items: baseline; gap: 6px; }
-  .rd-was { text-decoration: line-through; opacity: 0.45; font-size: 0.8em; }
-  .rd-now { color: var(--clay-ink); }
-  body[data-dark] .rd-now { color: #E06B43; }
   .ex-summary-pill.rd-pill { background: transparent; color: var(--clay-ink); box-shadow: inset 0 0 0 1.5px var(--ice); }
   /* Neutral, not clay: a filled clay pill already means the Coach's Note. */
   .ex-summary-pill.rd-tag { background: var(--grey-dark); color: var(--white); }
@@ -2625,8 +2473,7 @@
   /* ── Last time's weight (Fork 3B, 2026-09-26) — see paintSets()/carrySet() ──
      The number in an empty box is history, not something a tick records, so it
      wears a LAST caption and sits smaller and paler than the prescribed reps beside
-     it. "Same as last" wears the clay outline of the Last pill: both are last time,
-     and neither is the coach. */
+     it. "Same as last" wears a clay outline: it is last time, never the coach. */
   .ex-set-wbox { position: relative; min-width: 0; }
   .ex-set-wlast {
     display: none; position: absolute; left: 10px; top: 3px; pointer-events: none;
@@ -2652,16 +2499,9 @@
   body[data-dark] .ex-same-last { color: #E06B43; box-shadow: inset 0 0 0 1.5px #E06B43; }
 
   /* ── The Card Remembers (2026-09-24) — see paintLastTime() ──
-     Direction B from the build brief: a clay-OUTLINED pill on the closed card
-     (outlined, not filled, so it never reads as the coach's note pill), one strip
-     above Log Sets, and a faint line under the one set that ran over target.
-     Clay marks only what ran over target — everything else stays quiet. */
-  .ex-summary-pill.lt-pill {
-    background: transparent;
-    box-shadow: inset 0 0 0 1.5px var(--ice);
-    color: var(--clay-ink);
-  }
-  body[data-dark] .ex-summary-pill.lt-pill { background: transparent; color: #E06B43; box-shadow: inset 0 0 0 1.5px #E06B43; }
+     Last time is a box in the OPEN card (CARD-01, 2026-09-27: its closed-card pill is
+     gone, "no history on the exercise card when not opened"), and a faint line under the
+     one set that ran over target. Clay marks only what ran over target. */
   .lt-strip {
     background: var(--white);
     border: 1px solid var(--grey-card);
@@ -2736,9 +2576,9 @@
   }
 
   /* ── The Spine (2026-09-24) — see paintSpine() / openExerciseSheet() ──
-     The card gains ONE small thing: an outlined "i" after the name (Amir: "I just
-     dont want to make my exercise cards busier"). Everything else is in the sheet,
-     which reuses the History sheet's frame. */
+     The card gains ONE small thing: an outlined "i" (Amir: "I just dont want to make my
+     exercise cards busier"), at the right end of the row since CARD-01 (2026-09-27).
+     Everything else is in the sheet, which reuses the History sheet's frame. */
   .ex-about {
     width: 20px; height: 20px; border-radius: 50%; flex: none; align-self: center;
     border: 1.5px solid var(--grey-mid); background: transparent; color: var(--grey-text);
@@ -2750,6 +2590,119 @@
   .ex-about::after { content: ''; position: absolute; inset: -12px; }
   .ex-about:hover, .ex-about:focus-visible { border-color: var(--ice); color: var(--clay-ink); outline: none; }
   body[data-dark] .ex-about { border-color: #555; color: #aaa; }
+
+  /* ── The working card (CARD-01/02/03, Amir 2026-09-27) — see renderExercise() ──
+     Closed: the name (a clay dot for a Coach's Note), one line of numbers, the pills,
+     the ⓘ at the right end, and no history. Open: the note in two lines, Last time as
+     a box, How to do it folded, the sets, Rest. A finished card is a small done row. */
+  .ex-side { flex: none; align-self: flex-start; display: flex; justify-content: flex-end; padding-top: 1px; }
+  .ex-side:empty { display: none; }
+  .ex-side .ex-about { width: 26px; height: 26px; font-size: 14px; }
+  .ex-side .ex-about::after { inset: -9px; }   /* 26 to see, 44 to hit */
+  .ex-note-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ice);
+    margin-left: 7px; vertical-align: 0.18em; }
+  .checklist-item:not(.collapsed) .ex-note-dot, .step-ex-name .ex-note-dot { display: none; }
+  .ex-numline { margin-top: 5px; font-family: 'Space Mono', monospace; font-size: 11.5px; font-weight: 700;
+    line-height: 1.45; letter-spacing: 0.2px; color: var(--grey-dark); }
+  .ex-numline > span + span::before { content: '·'; margin: 0 6px; color: var(--grey-text); font-weight: 400; }
+  .ex-numline > span { white-space: nowrap; }   /* a part never breaks inside ("3-1-" / "1") */
+  .ex-numline b { color: var(--green-ink); }
+  /* THE DIGIT THAT CARRIES THE INSTRUCTION. A tempo is four numbers and usually only one or
+     two of them are the point; clay picks those out so the athlete reads "3" and not
+     "3-0-1-0". Which digits are hot is decided by tempoDisplay(): the slowest phase when it
+     is 2s or more, plus any non-zero pause. This is what replaced writing "3s eccentric" a
+     second time beside it (the tempo has had four shapes: do not re-litigate it). */
+  .ex-numline .t-hot { color: var(--clay-ink); font-weight: 800; }
+  .checklist-item.collapsed .nl-lab { display: none; }
+  .nl-lab { font-weight: 400; color: var(--grey-text); }
+  body[data-dark] .ex-numline { color: #ddd; }
+  .ex-summary { margin-top: 7px; }
+  .step-ex-nums { margin: 2px 0 0; }
+  .step-ex-pills { margin: 8px 0 2px; }
+
+  /* The done row: small, and it says what was done (paintDoneLines()). */
+  .ex-doneline { display: none; }
+  .checklist-item.is-done.collapsed .ex-doneline { display: block; margin-top: 3px; font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 700; line-height: 1.4; color: var(--grey-text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }   /* one line: the open card has the rest */
+  .checklist-item.is-done.collapsed .ex-numline,
+  .checklist-item.is-done.collapsed .ex-setup,
+  .checklist-item.is-done.collapsed .ex-summary { display: none; }
+  .checklist-item.is-done.collapsed .item-main { padding-top: 10px; padding-bottom: 10px; }
+  .checklist-item.is-done.collapsed .check-box { width: 30px; height: 30px; }
+  .checklist-item.is-done.collapsed .check-box::after { font-size: 15px; }
+  .checklist-item.is-done.collapsed .ex-num { font-size: 18px; }
+  .checklist-item.is-done.collapsed .item-name { font-size: 16px; color: var(--grey-text); }
+  .checklist-item.is-done.collapsed .ex-about { opacity: 0.7; }
+  /* The next card opens under the sticky session bar, not behind it (foldWhenDone()). */
+  #day-view .checklist-item { scroll-margin-top: 150px; }
+  body.is-demo #day-view .checklist-item { scroll-margin-top: 196px; }
+
+  /* The Coach's Note: two lines, then More › (fitNotes()). */
+  .ex-coach-note .ex-coach-note-label { display: inline; font-family: 'Barlow', sans-serif; font-weight: 700;
+    font-size: inherit; letter-spacing: 0; text-transform: none; margin: 0; color: var(--clay-ink); }
+  .ex-note-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ex-coach-note.open .ex-note-text { display: block; overflow: visible; }
+  .ex-note-more { display: block; margin-top: 2px; padding: 6px 0 0; background: none; border: 0; cursor: pointer;
+    font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10.5px; letter-spacing: 0.8px;
+    text-transform: uppercase; color: var(--clay-ink); }
+  .ex-note-more[hidden] { display: none; }
+
+  /* How to do it: the video and the cues, folded to one row after the first time. */
+  .ex-how { margin: 10px 0 4px; border: 1px solid var(--grey-card); border-radius: 10px; background: var(--white); }
+  .ex-how[hidden] { display: none; }
+  .ex-how-sum { list-style: none; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px;
+    cursor: pointer; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 11.5px; letter-spacing: 0.6px;
+    text-transform: uppercase; color: var(--green-ink); }
+  .ex-how-sum::-webkit-details-marker { display: none; }
+  .ex-how-play { width: 24px; height: 24px; flex: none; border-radius: 50%; background: var(--yellow); color: var(--on-accent);
+    display: flex; align-items: center; justify-content: center; font-size: 9px; padding-left: 2px; box-sizing: border-box; }
+  .ex-how-sum i { margin-left: auto; font-style: normal; color: var(--grey-text); transition: transform 0.2s; }
+  .ex-how[open] .ex-how-sum i { transform: rotate(90deg); }
+  .ex-how-body { padding: 0 12px 8px; }
+  .ex-how .ex-video { margin-top: 2px; }
+  .ex-how .ex-section-label { display: none; }
+  body[data-dark] .ex-how { background: #1e1e1e; border-color: #2a2a2a; }
+
+  /* Last time as a box: closed, the last set; open, every set (paintLastTime()). */
+  .lt-slot:empty { display: none; }
+  .lt-strip.lt-box { display: block; padding: 0; }
+  .lt-head { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 8px 12px;
+    background: none; border: 0; cursor: pointer; text-align: left; color: inherit; font: inherit; box-sizing: border-box; }
+  .lt-head .lt-when { flex: 1; min-width: 0; line-height: 1.35; }
+  .lt-w-l { display: none; }
+  .lt-box.open .lt-w-l { display: inline; }
+  .lt-box.open .lt-w-s { display: none; }
+  .lt-one { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 19px; line-height: 1;
+    color: var(--grey-dark); white-space: nowrap; }
+  .lt-box.open .lt-one { display: none; }
+  .lt-one .lt-r { font-family: 'Space Mono', monospace; font-style: normal; font-weight: 700; font-size: 11.5px;
+    margin-left: 3px; color: var(--grey-text); }
+  .lt-one .lt-r.over { color: var(--clay-ink); }
+  .lt-one .lt-r.under { color: var(--rpe-under); }
+  .lt-cv { color: var(--grey-text); font-size: 11px; transition: transform 0.2s; }
+  .lt-box.open .lt-cv { transform: rotate(180deg); }
+  .lt-more { display: none; padding: 0 12px 10px; }
+  .lt-box.open .lt-more { display: grid; gap: 5px; }
+  .lt-foot { display: flex; justify-content: flex-end; }
+  body[data-dark] .lt-one { color: #eee; }
+
+  /* The kg box follows the work (paintKgCol()). Hidden, never removed. A row with no
+     box to type in says its dose instead ("30 s / side"). */
+  .ex-set-dose { display: none; }
+  .ex-set-log.no-kg .ex-set-wbox,
+  .ex-set-log.no-kg .ex-set-header > div:nth-child(2) { display: none; }
+  .ex-set-log.no-kg .ex-set-dose { display: block; font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 15px;
+    color: var(--grey-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body[data-dark] .ex-set-log.no-kg .ex-set-dose { color: #ddd; }
+  .ex-set-log.no-kg.has-reps .ex-set-header,
+  .ex-set-log.no-kg.has-reps .ex-set-row { grid-template-columns: 26px minmax(0, 96px) minmax(0, 1fr) 54px 44px; }
+  .ex-set-log.no-kg.has-reps .ex-set-rpetag { grid-column: 4; }
+  .ex-set-log.no-kg.has-reps .ex-set-check { grid-column: 5; }
+  @media (max-width: 360px) {
+    .ex-set-log.no-kg.has-reps .ex-set-header,
+    .ex-set-log.no-kg.has-reps .ex-set-row { grid-template-columns: 20px minmax(0, 80px) minmax(0, 1fr) 46px 40px; }
+  }
   .sp-purpose { font-family: 'Barlow', sans-serif; font-size: 15px; line-height: 1.45; color: var(--grey-dark); margin: 2px 0 10px; }
   body[data-dark] .sp-purpose { color: #e8e8e8; }
   .sp-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
@@ -2831,14 +2784,11 @@
   .sp-q { border: 0; cursor: pointer; font: inherit; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 10.5px; letter-spacing: 0.3px; }
 
   /* ── Because (2026-09-24) — see whyOf() / whyBlock() / openWhyPlan() ──
-     The card gains nothing but a clay dot on the ⓘ; the reason itself lives in
-     the About sheet and on the cycle's Why page. */
-  .ex-about.has-why { position: relative; }
-  .ex-about.has-why::after {
-    content: ''; position: absolute; top: -3px; right: -3px; width: 8px; height: 8px;
-    border-radius: 50%; background: var(--ice); border: 2px solid var(--white);
-  }
-  body[data-dark] .ex-about.has-why::after { background: #E06B43; border-color: #1e1e1e; }
+     The card gains nothing but a clay ⓘ; the reason itself lives in the About sheet and
+     on the cycle's Why page. It was a clay dot on the ⓘ's corner until CARD-01
+     (2026-09-27): a clay dot after the name means a Coach's Note now. */
+  .ex-about.has-why { background: var(--ice); border-color: var(--ice); color: #fff; }
+  body[data-dark] .ex-about.has-why { background: #C7552F; border-color: #C7552F; color: #fff; }
   .sp-why {
     display: grid; gap: 7px; background: var(--grey-bg); border: 1px solid var(--grey-card);
     border-left: 3px solid var(--ice); border-radius: 10px; padding: 11px 12px; margin-bottom: 4px;
@@ -7356,63 +7306,75 @@ function repCount(ex) {
   return n > 0 ? n : null;
 }
 
-// Renders the stats grid — ONE CELL PER PRESCRIBED FACT, in a fixed order, and
-// nothing for anything that was not prescribed. The dose cell's label names what
-// the number actually is (REPS / TIME / DISTANCE / WORK) instead of calling a
-// 30-second hold "REPS", and carries "/ SIDE" on the label line rather than
-// crowding the value.
-function renderStatsGrid(rx) {
-  const cells = [];
-  if (rx.sets) cells.push({ label: 'SETS', value: rx.sets, cls: '' });
-  if (rx.dose) cells.push({
-    label: rx.dose.label.toUpperCase() + (rx.dose.side ? ' / SIDE' : ''),
-    value: rx.dose.value, cls: ''
-  });
-  if (rx.rpe)   cells.push({ label: 'RPE',   value: rx.rpe + '/10', cls: 'target' });
+// ONE LINE OF NUMBERS (CARD-02, Amir 2026-09-27). What the stats grid and the grey
+// stat pills both said, said once, under the name: "4 × 6 · RPE 7 · 3-1-1 · 2:30",
+// on the closed row and the open card alike. Only what was prescribed is written (a
+// rest is the exercise's own, never the block's and never invented), and the words
+// "tempo" and "rest" show once the card is open (.nl-lab). A lower day's check-in takes
+// the RPE out of this line and puts "RPE 7 → 6 today" among the pills (rdTarget()), so
+// the number is still said once. The separators are CSS, so a span can go on its own.
+function renderNumLine(rx, rest) {
+  const bits = [];
+  const dose = rx.dose ? rx.dose.value + (rx.dose.side ? ' / side' : '') : '';
+  if (rx.sets && dose) bits.push(`<span class="nl-dose"><b>${esc(rx.sets)} × ${esc(dose)}</b></span>`);
+  else if (rx.sets)    bits.push(`<span class="nl-dose"><b>${esc(rx.sets)} sets</b></span>`);
+  else if (dose)       bits.push(`<span class="nl-dose"><b>${esc(dose)}</b></span>`);
+  if (rx.rpe) bits.push(`<span class="nl-rpe">RPE ${esc(rx.rpe)}</span>`);
   const tempo = tempoDisplay(rx.tempo);
-  if (tempo)    cells.push({ label: 'TEMPO', html: tempo.html, cls: 'tempo' });
-  if (rx.rest)  cells.push({ label: 'REST',  value: formatRestLabel(rx.rest), cls: '' });
-
-  if (!cells.length) return '';
-  return `<div class="ex-stats-grid">${cells.map(c => `
-    <div class="ex-stat ${c.cls || ''}">
-      <div class="ex-stat-label">${esc(c.label)}</div>
-      <div class="ex-stat-value">${c.html || esc(c.value)}</div>
-    </div>`).join('')}</div>`;
+  if (tempo) bits.push(`<span class="nl-tempo"><span class="nl-lab">tempo </span>${tempo.html}</span>`);
+  if (rest)  bits.push(`<span class="nl-rest"><span class="nl-lab">rest </span>${esc(formatRestLabel(rest))}</span>`);
+  return bits.length ? `<div class="ex-numline">${bits.join('')}</div>` : '';
+}
+// The line as plain text, " · " between its parts and without the open-card words.
+function numLineText(nl) {
+  if (!nl) return '';
+  return [...nl.children].map(x => {
+    const c = x.cloneNode(true);
+    c.querySelectorAll('.nl-lab').forEach(l => l.remove());
+    return c.textContent.replace(/\s+/g, ' ').trim();
+  }).filter(Boolean).join(' · ');
 }
 
-// Stat pills for the collapsed row — each stat is its own small rounded pill.
-// "4×6"  ·  "7/10"  ·  "⏱ 2m" — sized to be glanceable but not loud.
-function renderExSummary(rx, hasNote, hideDose) {
-  // A coach's note adds a clay pill up front so the athlete spots it before
-  // expanding. Legacy green "modifier" pills follow — only exercises that still
-  // carry chips[] have any; under rx that information is the `setup` line or a
-  // coaching cue, both of which have a proper home. Grey stat pills (sets×dose ·
-  // RPE · rest) come last and show only on the collapsed row.
-  const notePill = hasNote
-    ? `<span class="ex-summary-pill modifier coach-note-pill">Coach's Note</span>`
-    : '';
+// The pills under the numbers (CARD-02, Amir 2026-09-27: "we need to find a way for
+// them"). A pill that says something stays a pill: the coach's green `intent` pill,
+// and a legacy card's leftover chips, drawn here; the check-in's "RPE 7 → 6 today" and
+// "Optional today" join them from paintToday(). The grey number pills are the line
+// above now, the Coach's Note is a clay dot after the name, and last time is never on
+// a closed card (Amir: "no history on the exercise card when not opened").
+function renderExSummary(rx) {
   const mods = (rx.intent ? [`<span class="ex-summary-pill modifier">${esc(rx.intent)}</span>`] : [])
     .concat((rx.extras || []).map(e =>
       `<span class="ex-summary-pill modifier${e.style === 'yellow' ? ' priority' : ''}">${esc(e.label)}</span>`));
-  const stats = [];
-  const dose = (rx.dose && !hideDose) ? rx.dose.value + (rx.dose.side ? '/side' : '') : '';
-  if (rx.sets && dose) stats.push(`${rx.sets}×${dose}`);
-  else if (dose)       stats.push(dose);
-  if (rx.rpe)          stats.push(rx.rpe + '/10');
-  if (rx.rest)         stats.push(`⏱ ${formatRestLabel(rx.rest)}`);
-  const statPills = stats.map(p => `<span class="ex-summary-pill stat">${esc(p)}</span>`);
-  if (!notePill && !mods.length && !statPills.length) return '';
-  return `<div class="ex-summary">${notePill}${mods.join('')}${statPills.join('')}</div>`;
+  return mods.length ? `<div class="ex-summary">${mods.join('')}</div>` : '';
 }
 
 // Coach's note — exercise-scoped guidance from the JSON ("note" on any
 // exercise): an injury caveat, how to pick the starting load, a staged-return
-// rule. Clay callout at the top of the expanded detail; program-wide guidance
-// belongs in the Notes tab, not here.
+// rule. Clay callout at the top of the open card, cut to two lines with More ›
+// when it runs longer (CARD-01, Amir 2026-09-27: the dot on the row "then they
+// become 2 lines"). On the closed row the note is a clay dot after the name.
+// Program-wide guidance belongs in the Notes tab, not here.
 function renderCoachNote(note) {
   if (!note) return '';
-  return `<div class="ex-coach-note"><span class="ex-coach-note-label">Coach's Note</span>${esc(note)}</div>`;
+  return `<div class="ex-coach-note"><div class="ex-note-text"><span class="ex-coach-note-label">Coach's note.</span> ${esc(note)}</div>`
+    + `<button type="button" class="ex-note-more" onclick="toggleNoteMore(this, event)">More ›</button></div>`;
+}
+const NOTE_DOT = `<span class="ex-note-dot" role="img" aria-label="Has a coach's note"></span>`;
+function toggleNoteMore(btn, ev) {
+  if (ev) ev.stopPropagation();
+  const n = btn.closest('.ex-coach-note');
+  btn.textContent = n.classList.toggle('open') ? 'Less' : 'More ›';
+}
+// "More ›" stays only on a note the two-line cut really shortens. Measured, not guessed
+// from its length: that depends on the phone's width. A note inside a closed card has no
+// size yet, so it is measured when the card opens (toggleExpand(), renderStep() and the
+// other doors). It starts shown, so a door that forgets to measure can never trap a note.
+function fitNotes(root) {
+  (root || document).querySelectorAll('.ex-coach-note').forEach(n => {
+    const t = n.querySelector('.ex-note-text'), b = n.querySelector('.ex-note-more');
+    if (!t || !b || !t.offsetParent || n.classList.contains('open')) return;
+    b.hidden = t.scrollHeight <= t.clientHeight + 1;
+  });
 }
 
 // Cues — yellow line for good, red line for bad, no icons. Clean.
@@ -7434,6 +7396,42 @@ function renderVideoBlock(url) {
   </div>`;
 }
 
+// How to do it (CARD-01, Amir 2026-09-27): the video and the cues in one folded row,
+// "▶ Video & 4 cues". It opens by itself only when the athlete has no history for the
+// lift (paintLastTime() → openHowFirstTime()), and on a Library session, which is read
+// more than it is logged. Once the athlete opens or closes it, it stays as they left it.
+function renderHowTo(videoBlock, cuesHtml, open) {
+  return `<details class="ex-how"${open ? ' open' : ''}>
+    <summary class="ex-how-sum" onclick="this.parentElement.dataset.user = '1'"><span class="ex-how-play" aria-hidden="true">▶</span><span class="ex-how-t">How to do it</span><i aria-hidden="true">›</i></summary>
+    <div class="ex-how-body">${videoBlock}${cuesHtml}</div>
+  </details>`;
+}
+// The row names what it holds ("Video & 4 cues", "Video", "3 cues") and hides while it
+// holds nothing: the Spine's cues can arrive after the card is drawn (paintSpine()).
+function paintHowTo(card) {
+  const d = cardDetail(card);
+  const how = d && d.querySelector('.ex-how');
+  if (!how) return;
+  const hasVid = !!how.querySelector('.ex-video');
+  const n = how.querySelectorAll('.ex-cue').length;
+  how.hidden = !hasVid && !n;
+  const cues = n + (n === 1 ? ' cue' : ' cues');
+  const t = how.querySelector('.ex-how-t');
+  if (t) t.textContent = hasVid && n ? 'Video & ' + cues : hasVid ? 'Video' : cues;
+}
+function openHowFirstTime(card, first) {
+  const d = cardDetail(card);
+  const how = d && d.querySelector('.ex-how');
+  if (how && !how.dataset.user) how.open = !!first;
+}
+// A card's open part. Guided Mode moves it into its own overlay while it is on that
+// exercise, so it is not always inside the card.
+function cardDetail(card) {
+  if (!card) return null;
+  return card.querySelector('.ex-detail')
+    || ((typeof STEP !== 'undefined' && STEP && STEP.homeCard === card) ? STEP.homeDetail : null);
+}
+
 function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   if (ex.type === 'circuit') return renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest);
 
@@ -7452,34 +7450,28 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   const restCell = rx.rest || 0;
   const _vid = getVideoUrl(ex);
 
-  // A PREP ITEM IS A NAME AND A DOSE. When the only thing prescribed is the dose
-  // — no sets, no RPE, no tempo, no rest — a five-cell grid was four em-dashes
-  // and one number, 237 times in the free library alone. Draw the line instead.
-  const doseOnly = !!rx.dose && !rx.sets && !rx.rpe && !rx.tempo && !restCell;
-
-  // The dose line already states the dose, so the summary must not repeat it.
-  const summary    = renderExSummary(Object.assign({}, rx, { rest: restCell }), !!ex.note, doseOnly);
+  // A PREP ITEM IS A NAME AND A DOSE: its line of numbers is just "5 minutes".
+  // The working card (CARD-01/02, Amir 2026-09-27). Closed: the name (a clay dot when
+  // there is a Coach's Note), one line of numbers, the pills, the ⓘ at the right end.
+  // Open: the note in two lines, Last time as a box, How to do it folded, the sets, Rest.
+  const summary    = renderExSummary(rx);
+  const numLine    = renderNumLine(rx, restCell);
   const noteHtml   = renderCoachNote(ex.note);
   const videoBlock = renderVideoBlock(_vid);
   const setupHtml  = rx.setup ? `<div class="ex-setup">${esc(rx.setup)}</div>` : '';
-  const doseLine = doseOnly
-    ? `<div class="ex-doseline">${setupHtml || '<span></span>'}<span class="ex-dose">${
-        esc(rx.dose.value + (rx.dose.side ? ' / side' : ''))}</span></div>`
-    : '';
-
-  const statsGrid = doseOnly ? '' : renderStatsGrid(Object.assign({}, rx, { rest: restCell }));
   // THE SPINE (2026-09-24): cues are written ONCE, on the exercise's entry. A
   // programme only carries cues when the coach wants different ones for this
   // athlete, so an exercise without its own gets a slot that paintSpine() fills.
   const cuesHtml  = (ex.cues && (ex.cues.good?.length || ex.cues.bad?.length))
     ? renderInlineCues(ex.cues) : '<div class="ex-cues-slot"></div>';
-  const statsBlock = statsGrid ? `<div class="ex-stats-block">${statsGrid}</div>` : '';
+  const howHtml = (_vid || cuesHtml) ? renderHowTo(videoBlock, cuesHtml, dayId === 'ws') : '';
 
   // The log section is only meaningful for "standard" exercises (the ones that
-  // get rest, weight, RPE). Simple warm-ups skip it.
+  // get rest, weight, RPE). Simple warm-ups skip it. Its header (SET · KG · REPS)
+  // says what it is, so it has no "Log Sets" label above it any more.
   let logBlock = '';
   if (isStandard) {
-    logBlock = `<div class="ex-section-label">Log Sets</div><div class="ex-log"></div>`;
+    logBlock = `<div class="ex-log"></div>`;
   }
 
   // Rest button — bottom of the detail, standard exercises only. It stays put
@@ -7500,22 +7492,28 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // estimate. Only a real rep count is passed — a hold or a carry sends nothing,
   // which is what stops the Ceiling offering an estimate it cannot honour.
   const repsData = (rx.dose && rx.dose.kind === 'reps') ? rx.dose.value : '';
+  // The dose as words, for a set row with no box to type in (a hold: "30 s / side").
+  const doseData = rx.dose ? rx.dose.value + (rx.dose.side ? ' / side' : '') : '';
 
-  return `<div class="checklist-item collapsed ${blockClass}${(rx.extras.length || rx.intent || ex.note) ? ' has-mods' : ''}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}" data-target="${esc(rx.rpe || '')}" data-exid="${esc(ex.exId || '')}">
+  // .ex-side holds the ⓘ (paintSpine()); .ex-doneline is the finished row's summary
+  // (paintDoneLines()). The dot is an empty span inside .item-name, so the name's text
+  // (which every lookup reads) is unchanged.
+  return `<div class="checklist-item collapsed ${blockClass}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}" data-dose="${esc(doseData)}" data-target="${esc(rx.rpe || '')}" data-exid="${esc(ex.exId || '')}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
-        <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}</div></div>
-        ${doseOnly ? doseLine : setupHtml}
+        <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}${ex.note ? NOTE_DOT : ''}</div></div>
+        <div class="ex-doneline"></div>
+        ${numLine}
+        ${setupHtml}
         ${summary}
       </div>
-      <div class="ex-chevron">▾</div>
+      <div class="ex-side"></div>
     </div>
     <div class="ex-detail">
       ${noteHtml}
-      ${videoBlock}
-      ${statsBlock}
-      ${cuesHtml}
+      <div class="lt-slot"></div>
+      ${howHtml}
       ${logBlock}
       ${restBottom}
     </div>
@@ -7604,19 +7602,14 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   const roundsLabel = /^\d+$/.test(String(_rxC.rounds || ''))
     ? '×' + _rxC.rounds + ' Rounds'
     : (_rxC.rounds || ex.rounds || '');
-  // Render the same .ex-summary-pill style used on standard exercises so the
-  // collapsed circuit row reads consistently.
-  const summaryPills = [];
-  if (roundsLabel)       summaryPills.push(roundsLabel);
-  if (_rxC.dose)         summaryPills.push(_rxC.dose.value + (_rxC.dose.side ? '/side' : ''));
-  if (_rxC.rpe)          summaryPills.push(_rxC.rpe + '/10');
-  if (circuitRestSec)    summaryPills.push(`⏱ ${formatRestLabel(circuitRestSec)}`);
-  const circuitNotePill = ex.note
-    ? `<span class="ex-summary-pill modifier coach-note-pill">Coach's Note</span>`
-    : '';
-  const summary = (summaryPills.length || circuitNotePill)
-    ? `<div class="ex-summary">${circuitNotePill}${summaryPills.map(p => `<span class="ex-summary-pill stat">${esc(p)}</span>`).join('')}</div>`
-    : '';
+  // The same line of numbers as a single exercise (CARD-02): rounds, the dose, RPE and
+  // the rest that paces the round. The Coach's Note is the clay dot after the name.
+  const nlBits = [];
+  if (roundsLabel)    nlBits.push(`<span class="nl-dose"><b>${esc(roundsLabel)}</b></span>`);
+  if (_rxC.dose)      nlBits.push(`<span>${esc(_rxC.dose.value + (_rxC.dose.side ? ' / side' : ''))}</span>`);
+  if (_rxC.rpe)       nlBits.push(`<span class="nl-rpe">RPE ${esc(_rxC.rpe)}</span>`);
+  if (circuitRestSec) nlBits.push(`<span class="nl-rest"><span class="nl-lab">rest </span>${esc(formatRestLabel(circuitRestSec))}</span>`);
+  const numLine = nlBits.length ? `<div class="ex-numline">${nlBits.join('')}</div>` : '';
 
   const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
 
@@ -7633,23 +7626,13 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
       <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
-        <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}</div></div>
-        ${summary}
+        <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}${ex.note ? NOTE_DOT : ''}</div></div>
+        <div class="ex-doneline"></div>
+        ${numLine}
       </div>
-      <div class="ex-chevron">▾</div>
     </div>
     <div class="ex-detail">
       ${renderCoachNote(ex.note)}
-      <div class="ex-circuit-meta">
-        <div class="ex-stat">
-          <div class="ex-stat-label">Rounds</div>
-          <div class="ex-stat-value">${esc(roundsLabel || '—')}</div>
-        </div>
-        <div class="ex-stat">
-          <div class="ex-stat-label">Rest</div>
-          <div class="ex-stat-value">${esc(formatRestLabel(circuitRestSec) || '—')}</div>
-        </div>
-      </div>
       <div class="ex-section-label">Rounds</div>
       <div class="round-list">${roundsHtml}</div>
       ${showLog ? `<div class="ex-section-label">Log</div>
@@ -7682,13 +7665,14 @@ function toggleCheckOnly(item, day) {
     const willBeChecked = !item.classList.contains('checked');
     setAllSetsDone(item, willBeChecked);
     item.classList.toggle('checked', willBeChecked);
+    if (willBeChecked) foldWhenDone(item, null);
   } else {
     item.classList.toggle('checked');
     const rpeRows = item.querySelectorAll('.rpe-row');
     rpeRows.forEach(r => r.classList.toggle('visible', item.classList.contains('checked')));
     // Simple items (no RPE): auto-collapse on check, expand on uncheck.
     if (item.classList.contains('checked') && !rpeRows.length) item.classList.add('collapsed');
-    if (!item.classList.contains('checked'))           item.classList.remove('collapsed');
+    if (!item.classList.contains('checked'))         { item.classList.remove('collapsed'); fitNotes(item); }
   }
   saveState();
   markTouched(day);
@@ -7704,9 +7688,12 @@ function markTouched(day) {
   localStorage.setItem(ATHLETE_ID + '_touched_d' + day, new Date().toDateString());
 }
 
-// Toggle the .collapsed class (expand/collapse)
+// Toggle the .collapsed class (expand/collapse). An opened card's note is measured
+// now that it has a size (fitNotes()).
 function toggleExpand(item) {
   item.classList.toggle('collapsed');
+  if (!item.classList.contains('collapsed')) fitNotes(item);
+  else if (item.dataset.day) paintDoneLines(item.dataset.day);   // what changed while it was open
 }
 
 // YouTube links come in several shapes: youtube.com/watch?v=ID, youtu.be/ID,
@@ -7884,13 +7871,13 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>Tap an exercise to expand it. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number or tap <strong>Same as last</strong>, which puts last time's weights into every empty set. A weight you type also fills the empty sets below it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video and the cues, open the first time you meet an exercise, folded after that), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number or tap <strong>Same as last</strong>, which puts last time's weights into every empty set. A weight you type also fills the empty sets below it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>In <strong>Guided</strong> mode you do all of this on the rest screen, while you rest.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
-    body: `<p>A small <strong>i</strong> after an exercise's name tells you what it does, which qualities it builds, where it shows up on court, which parts of your body it works (and whether it jumps, lands or runs), and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> has an orange dot, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
+    body: `<p>The small <strong>i</strong> at the right end of every exercise tells you what it does, which qualities it builds, where it shows up on court, which parts of your body it works (and whether it jumps, lands or runs), and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
     body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means and how we test it. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Last time — your history on every exercise',
-    body: `<p>Each exercise shows what you did <strong>the last time you did it</strong>, on any day: the weight, your reps, your RPE, and the note you left. On the closed card it's the orange-outlined <strong>Last</strong> pill; open the card and it sits above your sets.</p><p>An RPE in orange ran <strong>over</strong> the target, and that set also shows a faint "last" line under today's row.</p><p>Tap <strong>History ›</strong> to see every time you've done it, with how your best set has moved.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
+    body: `<p>Each exercise shows what you did <strong>the last time you did it</strong>, on any day: the weight, your reps, your RPE, and the note you left. Open the card and it's the <strong>Last time</strong> box, under the Coach's Note: it shows the last set you did, like <strong>70 kg × 5 @ 8</strong>, and a tap opens every set, your RPEs and your note. It stays open or closed the way you left it. A closed card shows no history.</p><p>An RPE in orange ran <strong>over</strong> the target, and that set also shows a faint "last" line under today's row.</p><p>Tap <strong>History ›</strong> to see every time you've done it, with how your best set has moved.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'Personal Records — the most you could lift once',
     body: `<p>Open <strong>Home</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
@@ -8443,6 +8430,7 @@ function returnFromCeiling() {
                  c.querySelector('.item-name').textContent.trim() === r.exName);
     if (!card) return;                       // exercise gone (cycle changed) — leave them on the day
     card.classList.remove('collapsed');
+    fitNotes(card);
     const box = card.querySelector('.ex-1rm');
     if (box) { box.classList.add('open'); box.scrollIntoView({ block: 'center' }); }
     else card.scrollIntoView({ block: 'center' });
@@ -9394,6 +9382,7 @@ async function openWorkout(file) {
     if (main) main.addEventListener('click', (ev) => {
       if (ev.target.closest('.check-box, button, .ex-video, a, input, textarea')) return;
       item.classList.toggle('collapsed');
+      fitNotes(item);
     });
     // Tapping the check box toggles done — local only
     if (box) box.addEventListener('click', (ev) => {
@@ -9648,8 +9637,58 @@ function refreshConfirmCard(day, status) {
 // Set-aware progress: drives the day-tab pill, the side rail v-fill, and the
 // bottom confirm card. The confirm card now shows whenever ANY work is logged
 // (done > 0) so athletes can finish early; getDayCompletion drives the copy.
+// A finished exercise's closed row is small and says what was done (CARD-01, Amir
+// 2026-09-27: "I like how small the cards will be after they are done"): "70 · 72.5 kg
+// × 6 · 6 · 6 · 5 · RPE 6 7 7 8". Painted with the day's progress, so a tick, tick-all,
+// Reset and a reload all land on it. Library sessions never get one (no progress there).
+function paintDoneLines(day) {
+  document.querySelectorAll(`.checklist-item[data-day="${day}"]`).forEach(card => {
+    const el = card.querySelector('.ex-doneline');
+    if (!el) return;
+    const txt = card.classList.contains('checked') ? doneLineText(card) : '';
+    if (el.textContent !== txt) el.textContent = txt;
+    card.classList.toggle('is-done', !!txt);
+  });
+}
+function doneLineText(card) {
+  const d = cardDetail(card);
+  if (card.classList.contains('round-group') || !(d && d.querySelector('.ex-set-log'))) {
+    const base = numLineText(card.querySelector('.ex-numline'));
+    return (base ? base + ' · ' : '') + 'done';
+  }
+  const name = card.querySelector('.item-name').textContent.trim();
+  const done = loadSetLog(name, parseInt(card.dataset.sets, 10) || 1).filter(s => s.d);
+  if (!done.length) return 'done';
+  const rs = done.map(s => s.r).filter(Boolean);
+  return (histSetsText(done, cardReps(card)) || done.length + ' sets') + (rs.length ? ' · RPE ' + rs.join(' ') : '');
+}
+
+// After the last set's RPE the card folds to its done row and the next unfinished one
+// opens in view (CARD-01, Amir 2026-09-27: "After the last RPE"). A set still waiting for
+// its RPE keeps the card open; never in Guided Mode, which moves on by itself.
+function foldWhenDone(card, openStrips) {
+  if (isLoading || card.classList.contains('collapsed') || (typeof STEP !== 'undefined' && STEP)) return;
+  if (openStrips && openStrips.size) return;
+  if (!card.classList.contains('checked')) return;
+  clearTimeout(card._foldT);
+  card._foldT = setTimeout(() => {
+    if ((typeof STEP !== 'undefined' && STEP) || card.classList.contains('collapsed') || !card.classList.contains('checked')) return;
+    card.classList.add('collapsed');
+    paintDoneLines(card.dataset.day);
+    const cards = [...document.querySelectorAll(`.checklist-item[data-day="${card.dataset.day}"]`)];
+    const next = cards.slice(cards.indexOf(card) + 1)
+      .find(c => !c.classList.contains('checked') && !c.classList.contains('rd-skip'));
+    if (next) {
+      next.classList.remove('collapsed');
+      fitNotes(next);
+      next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 700);
+}
+
 function updateProgress(day) {
   const status = getDayCompletion(day);
+  paintDoneLines(day);
   const { done, total } = status;
   if (!total) return;
 
@@ -10090,13 +10129,24 @@ function rdTarget(card, ex, drop, note) {
   const t = written ? dayRpe(written, drop, note) : '';
   if (t) {
     if (ex.type !== 'circuit') card.dataset.targetToday = t;
-    const cell = card.querySelector('.ex-stat.target');
-    if (cell) {
-      rdKeep(cell);
-      cell.innerHTML = `<div class="ex-stat-label">RPE today</div><div class="ex-stat-value rd-val"><span class="rd-was">${esc(written)}</span><span class="rd-now">${esc(t)}</span></div>`;
+    // The RPE leaves the line of numbers and comes back as a pill, "RPE 7 → 6 today",
+    // so it is still said once (CARD-02). Both are undone by paintToday()'s first lines.
+    const span = card.querySelector('.ex-numline .nl-rpe');
+    if (span) {
+      rdKeep(span.parentElement);
+      span.remove();
+      let sum = card.querySelector('.ex-summary');
+      if (!sum) {
+        sum = document.createElement('div');
+        sum.className = 'ex-summary rd-made';
+        const body = card.querySelector('.item-body');
+        if (body) body.appendChild(sum);
+      }
+      const p = document.createElement('span');
+      p.className = 'ex-summary-pill rd-pill rd-made';
+      p.textContent = `RPE ${written} → ${t} today`;
+      sum.insertBefore(p, sum.firstChild);
     }
-    const pill = [...card.querySelectorAll('.ex-summary-pill.stat')].find(p => p.textContent === written + '/10');
-    if (pill) { rdKeep(pill); pill.textContent = `RPE ${written} → ${t} today`; pill.classList.add('rd-pill'); }
   }
   if (ex.type === 'circuit') {
     const rows = card.querySelectorAll('.round-row');
@@ -11201,9 +11251,11 @@ function attachSetLog(card) {
     const rpeBtns = [6,7,8,9,10].map(n =>
       `<button class="rpe-btn${String(s.r) === String(n) ? ' selected' : ''}" data-rpe="${n}" type="button" aria-label="RPE ${n}">${n}</button>`
     ).join('');
+    // A hold or a carry has no reps box: the row says its dose ("30 s / side") where the
+    // box would be, shown only when there is no kg box either (paintKgCol()).
     const repsBox = repsCol
       ? `<input class="ex-set-reps" type="text" inputmode="numeric" maxlength="3" placeholder="${planned || range}" value="${esc(s.n || '')}" aria-label="Reps done on set ${i+1}${planned ? ', if not ' + planned : ''}">`
-      : '';
+      : `<div class="ex-set-dose">${esc(card.dataset.dose || '')}</div>`;
     html += `<div class="ex-set-row${s.d ? ' done' : ''}" data-set-idx="${i}">
       <div class="ex-set-num">${i+1}</div>
       <div class="ex-set-wbox"><input class="ex-set-weight" type="text" inputmode="decimal" placeholder="kg" value="${esc(s.w)}" aria-label="Weight on set ${i+1}"><span class="ex-set-wlast" aria-hidden="true">last</span></div>
@@ -11215,6 +11267,7 @@ function attachSetLog(card) {
   });
   wrap.innerHTML = html;
   slot.appendChild(wrap);
+  paintKgCol(card);
 
   const rows = Array.from(wrap.querySelectorAll('.ex-set-row'));
   const sameBtn = wrap.querySelector('.ex-same-last');
@@ -11339,6 +11392,8 @@ function attachSetLog(card) {
         edit(s => { s.r = was ? '' : b.dataset.rpe; });
         if (!was) open.delete(idx);
         paintSets();
+        paintDoneLines(card.dataset.day);          // the done row names every RPE
+        if (!was) foldWhenDone(card, open);
         if (navigator.vibrate) navigator.vibrate(8);
       });
     });
@@ -11362,6 +11417,7 @@ function attachSetLog(card) {
       // A set just done with more to come: offer the rest (WK-02). Unticking takes it back.
       if (cur[idx].d && cur.some(x => !x.d)) offerRest(card);
       else if (_restOffer && _restOffer.card === card) hideRestOffer();
+      if (cur[idx].d) foldWhenDone(card, open);
       if (navigator.vibrate) navigator.vibrate(12);
     });
   });
@@ -12043,6 +12099,30 @@ function latestBodyWeight() {
 // prescription). Personal Records fill themselves from a finished session, and Records →
 // "+ Log a max" (paintCeilingForm()) is the one hand-entry door now.
 
+// ── The kg box follows the work (CARD-03, Amir 2026-09-27: "By the work") ──
+// A box jump, a plank or a band Pallof press asked for kilograms on every set. The kg
+// box now shows when the exercise is loaded, going by its Spine entry's equipment
+// (barbell, dumbbells, cable, a machine…), and stays when that is unknown (no approved
+// entry, no equipment listed) or when the athlete has ever logged a weight on it, so a
+// weighted plank keeps its box. Hidden, not removed: every row keeps its weight input,
+// so Guided Mode, "Same as last" and the carry-down never meet a missing node.
+const KG_LOADED = /barbell|dumbbell|kettlebell|cable|machine|landmine|trap bar|ez bar|leg press|sled|hack squat|medicine ball|med ball|plate|weight|lat bar|smith|vest|rack/i;
+const KG_NOT    = /treadmill|bike|rower|row machine|ski ?erg|assault/i;
+function kgWanted(card) {
+  const name = card.querySelector('.item-name').textContent.trim();
+  if (loadSetLog(name, parseInt(card.dataset.sets, 10) || 1).some(s => s.w || s.lw)) return true;
+  if (HIST && historyFor(name).some(h => !h.entry.circuit && (h.entry.sets || []).some(s => histKg(s.w) != null))) return true;
+  const entry = SPINE ? spineFor(name, card.dataset.exid) : null;
+  const eq = (entry && Array.isArray(entry.equipment)) ? entry.equipment : [];
+  if (!eq.length) return true;
+  return eq.some(x => KG_LOADED.test(x) && !KG_NOT.test(x));
+}
+function paintKgCol(card) {
+  const d = cardDetail(card);
+  const wrap = d && d.querySelector('.ex-set-log');
+  if (wrap) wrap.classList.toggle('no-kg', !kgWanted(card));
+}
+
 // Reflect "all sets done?" on the exercise-level check and the day progress.
 function syncExerciseCheck(card, log) {
   const allDone = log.length > 0 && log.every(s => s.d);
@@ -12579,8 +12659,13 @@ function renderStep() {
     // The exercise name lives in .item-main, not the relocated .ex-detail, so it's
     // repainted here — everything below it (video, stats, cues, the set-log table,
     // Ceiling) is the real node, moved in whole.
-    scroll.innerHTML = `<div class="step-ex-name">${item.card.querySelector('.item-name').innerHTML}</div>`;
+    // The numbers and the pills live in the header now (CARD-02), so they are copied too.
+    const nl = item.card.querySelector('.ex-numline'), pl = item.card.querySelector('.ex-summary');
+    scroll.innerHTML = `<div class="step-ex-name">${item.card.querySelector('.item-name').innerHTML}</div>`
+      + (nl ? `<div class="ex-numline step-ex-nums">${nl.innerHTML}</div>` : '')
+      + (pl ? `<div class="ex-summary step-ex-pills">${pl.innerHTML}</div>` : '');
     scroll.appendChild(STEP.homeDetail);
+    fitNotes(STEP.homeDetail);
   }
 
   // Draw the eye to the set this step is on; .dim is existing CSS (ex-set-row.dim),
@@ -12728,9 +12813,9 @@ function showStepComplete() {
 // Idea #5 of "The Coaching Graph": every exercise card shows what the athlete did
 // the LAST time they did that exercise, on any day and across cycles.
 //
-//   · a clay-outlined "Last 80×5" pill on the closed card
-//   · a strip above Log Sets: when, weight × reps, RPE against today's target,
-//     the note they left, and whether it was a low-readiness day
+//   · a box in the OPEN card (CARD-01, 2026-09-27; the closed card shows no history):
+//     closed, last session's last set; tapped, when, weight × reps, RPE against
+//     today's target, the note they left, and whether it was a low-readiness day
 //   · a faint "last · 80 × 4 @ 9" line under the ONE set that ran over target
 //   · History › — every time they did it, with a trend (the History sheet)
 //
@@ -12893,34 +12978,68 @@ function histTopSet(sets, planned) {
   return best;
 }
 
+// LAST TIME IS A BOX (CARD-01, Amir 2026-09-27: "the history of an exercise shouldn't be
+// text, they should have a box … show only last set, and it can be toggled"). Closed it
+// shows last session's LAST set, "70 kg × 5 @ 8"; tapped it opens to every set, the RPEs
+// against the target, the note and History ›. Open or closed is one setting for the phone
+// (lt_open, never synced), so every box follows the one the athlete tapped. It sits under
+// the Coach's Note in the open card only: a closed card shows no history ("no history on
+// the exercise card when not opened"). A circuit keeps its strip, always open.
+function ltOpen() { try { return localStorage.getItem('lt_open') === '1'; } catch (e) { return false; } }
+function ltToggle(box) {
+  const open = !box.classList.contains('open');
+  try { localStorage.setItem('lt_open', open ? '1' : '0'); } catch (e) { /* the box still opens */ }
+  document.querySelectorAll('.lt-box').forEach(b => {
+    b.classList.toggle('open', open);
+    const h = b.querySelector('.lt-head');
+    if (h) h.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+}
+// Last session's last logged set: "70 kg × 5", "× 4", or for a hold "3 sets"; its RPE
+// against the target, clay over and steel blue under (rpeVs()).
+function ltLastSetHtml(e, target) {
+  const ls = [...(e.sets || [])].reverse().find(histSetLogged);
+  if (!ls) return '';
+  const w = histKg(ls.w);
+  const n = (ls.n != null && ls.n !== '') ? ls.n : (e.reps || null);
+  let txt = w ? w + ' kg' : '';
+  if (n) txt += (txt ? ' × ' : '× ') + n;
+  if (!txt) txt = histSetsText(e.sets, e.reps || null);
+  const vs = ls.r ? rpeVs(ls.r, target) : '';
+  return esc(txt) + (ls.r ? ` <i class="lt-r${vs ? ' ' + vs : ''}">@ ${esc(String(ls.r))}</i>` : '');
+}
 function paintLastTime(card) {
   if (!card || !card.querySelector('.item-name')) return;
-  card.querySelectorAll('.lt-pill, .lt-strip, .lt-ghost').forEach(el => el.remove());
+  const detail = cardDetail(card);
+  if (detail) detail.querySelectorAll('.lt-strip, .lt-ghost').forEach(el => el.remove());
   if (HIST == null) return;                       // not loaded yet — draw nothing rather than "first time"
   const name = card.querySelector('.item-name').textContent.trim();
   const isCircuit = card.classList.contains('round-group');
   const hist = historyFor(name);
-  const detail = card.querySelector('.ex-detail');
-  const logLabel = detail && [...detail.querySelectorAll('.ex-section-label')].find(l => /log/i.test(l.textContent));
-  const anchor = logLabel || (detail && detail.querySelector('.ex-log, .ex-rest-bottom'));
   if (!detail) return;
+  const slot = detail.querySelector('.lt-slot');
+  const logLabel = [...detail.querySelectorAll('.ex-section-label')].find(l => /log/i.test(l.textContent));
+  const anchor = logLabel || detail.querySelector('.ex-log, .ex-rest-bottom');
+  const place = el => { if (slot) slot.appendChild(el); else detail.insertBefore(el, anchor || null); };
+  if (!isCircuit) {
+    paintKgCol(card);                             // a weight logged before keeps the kg box
+    openHowFirstTime(card, !hist.length);          // video and cues open the first time only
+  }
 
   if (!hist.length) {
     // First meeting with this lift. Only said on a standard (logged) exercise,
     // and only once history has genuinely loaded (HIST != null above).
-    if (isCircuit || !card.querySelector('.ex-set-log')) return;
+    if (isCircuit || !detail.querySelector('.ex-set-log')) return;
     const first = document.createElement('div');
     first.className = 'lt-strip lt-first';
     first.innerHTML = `<span class="lt-when">First time</span><span class="lt-first-txt">Today sets your baseline.</span>`;
-    detail.insertBefore(first, anchor || null);
+    place(first);
     return;
   }
 
   const last = hist[0], e = last.entry, dl = histDateLabel(last.date);
   const target = card.dataset.target || null;
-  const planned = cardReps(card);
   const strip = document.createElement('div');
-  strip.className = 'lt-strip';
   strip.addEventListener('click', ev => ev.stopPropagation());
 
   let big = '', rpeLine = '';
@@ -12936,36 +13055,40 @@ function paintLastTime(card) {
     }
   }
   const low = last.readiness != null && last.readiness <= 2.5;
-  strip.innerHTML = `
-    <div class="lt-top"><span class="lt-when">Last time · ${esc(dl.when)} · ${esc(dl.ago)}</span>
-      <button type="button" class="lt-hist">History ›</button></div>
+  const rest = `
     <div class="lt-big">${big}</div>
     ${rpeLine || low ? `<div class="lt-rpe">${rpeLine}${low ? `${rpeLine ? ' · ' : ''}<span class="lt-low">low-readiness day</span>` : ''}</div>` : ''}
     ${e.note ? `<div class="lt-note">“${esc(e.note)}”</div>` : ''}`;
-  strip.querySelector('.lt-hist').addEventListener('click', ev => { ev.stopPropagation(); openHistorySheet(card); });
-  detail.insertBefore(strip, anchor || null);
-
-  // The closed-card pill. Hidden once the card opens (the strip takes over).
-  const top = e.circuit ? null : histTopSet(e.sets, e.reps || null);
-  const pillTxt = top ? (top.w ? `Last ${histKg(top.w)}${top.n ? '×' + top.n : ' kg'}` : (top.n ? `Last ×${top.n}` : ''))
-                      : '';                      // circuits: the strip is enough, no pill
-  if (pillTxt) {
-    let sum = card.querySelector('.ex-summary');
-    if (!sum) {
-      sum = document.createElement('div');
-      sum.className = 'ex-summary';
-      card.querySelector('.item-body, .item-main').appendChild(sum);
-    }
-    const p = document.createElement('span');
-    p.className = 'ex-summary-pill stat lt-pill';
-    p.textContent = pillTxt;
-    sum.appendChild(p);
+  if (e.circuit) {
+    strip.className = 'lt-strip';
+    strip.innerHTML = `
+      <div class="lt-top"><span class="lt-when">Last time · ${esc(dl.when)} · ${esc(dl.ago)}</span>
+        <button type="button" class="lt-hist">History ›</button></div>${rest}`;
+  } else {
+    // Closed, the label is short: the weekday inside a week, the date after that.
+    const days = Math.round((new Date(ymdLocal(new Date()) + 'T12:00:00') - new Date(last.date + 'T12:00:00')) / 86400000);
+    const w = String(dl.when || '').split(' ');
+    const short = days < 7 ? w[0] : w.slice(1).join(' ');
+    const open = ltOpen();
+    strip.className = 'lt-strip lt-box' + (open ? ' open' : '');
+    strip.innerHTML = `
+      <button type="button" class="lt-head" aria-expanded="${open ? 'true' : 'false'}">
+        <span class="lt-when"><span class="lt-w-s">Last time · ${esc(short)}</span><span class="lt-w-l">Last time · ${esc(dl.when)} · ${esc(dl.ago)}</span></span>
+        <span class="lt-one">${ltLastSetHtml(e, target)}</span>
+        <span class="lt-cv" aria-hidden="true">▾</span>
+      </button>
+      <div class="lt-more">${rest}
+        <div class="lt-foot"><button type="button" class="lt-hist">History ›</button></div>
+      </div>`;
+    strip.querySelector('.lt-head').addEventListener('click', ev => { ev.stopPropagation(); ltToggle(strip); });
   }
+  strip.querySelector('.lt-hist').addEventListener('click', ev => { ev.stopPropagation(); openHistorySheet(card); });
+  place(strip);
 
   // The ghost line: only under the set(s) that ran OVER target last time.
   if (!e.circuit && target) {
     const lastSets = e.sets || [];
-    card.querySelectorAll('.ex-set-row').forEach(row => {
+    detail.querySelectorAll('.ex-set-row').forEach(row => {
       const i = parseInt(row.dataset.setIdx, 10);
       const s = lastSets[i];
       if (!histSetLogged(s) || rpeVs(s.r, target) !== 'over') return;
@@ -12979,7 +13102,8 @@ function paintLastTime(card) {
 }
 function paintAllLastTime() {
   document.querySelectorAll('.checklist-item').forEach(card => {
-    if (card.querySelector('.ex-set-log') || card.classList.contains('round-group')) paintLastTime(card);
+    const d = cardDetail(card);
+    if ((d && d.querySelector('.ex-set-log')) || card.classList.contains('round-group')) paintLastTime(card);
   });
 }
 
@@ -13388,8 +13512,12 @@ function paintSpine() {
     const why = whyOfCard(card);
     const slot = card.querySelector('.ex-cues-slot');
     if (slot && !slot.childElementCount && entry && entry.cues) slot.innerHTML = renderInlineCues(entry.cues);
-    const row = card.querySelector('.item-name-row');
-    const btn = row && row.querySelector('.ex-about');
+    paintHowTo(card);
+    if (entry) paintKgCol(card);
+    // The ⓘ sits at the right end of the row and of the open card's header (CARD-01, Amir
+    // 2026-09-27), so a long name never pushes it onto a line of its own.
+    const row = card.querySelector('.ex-side') || card.querySelector('.item-name-row');
+    const btn = card.querySelector('.ex-about');
     if ((entry || why) && row && !btn) {
       const b = document.createElement('button');
       b.type = 'button'; b.className = 'ex-about' + (why ? ' has-why' : ''); b.textContent = 'i';

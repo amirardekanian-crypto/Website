@@ -48,7 +48,7 @@ Object.assign(P, {
   circuitWKey: n => 'test_cwlog_' + n, circuitRpeKey: n => 'test_rpe_' + n,
 });
 vm.runInContext([
-  slice(prog, 'program.html', 'function parseDurationToSec(', 'function renderStatsGrid(rx) {'),   // rxOf, plannedReps
+  slice(prog, 'program.html', 'function parseDurationToSec(', 'function renderNumLine(rx, rest) {'),   // rxOf, plannedReps
   slice(prog, 'program.html', 'function setReps(s, planned) {', 'function saveSetLogValue('),
   slice(prog, 'program.html', 'function normDigits(v) {', '// The sets "Same as last" would fill'),
   slice(prog, 'program.html', 'function parseLoggedKg(v) {', '// The set that produces the HIGHEST'),
