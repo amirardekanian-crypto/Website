@@ -3022,6 +3022,27 @@
     font-size: 17px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
   .wel-skip { display: block; width: 100%; margin-top: 10px; padding: 12px; border: 0; background: none;
     color: var(--grey-text); font-size: 14px; cursor: pointer; }
+  /* First-session hints (ONB-01, 2026-09-27): one at a time, in the flow right under the thing
+     it explains (the session bar, the set to tick, the RPE strip that just opened), its arrow
+     pointing up at it. paintHints() places it; nothing here is positioned over the work. */
+  .onb-hint { position: relative; display: flex; align-items: flex-start; gap: 4px;
+    margin: 10px 0 12px; padding: 12px 6px 6px 14px; border-radius: 12px;
+    background: var(--yellow); color: var(--on-accent); box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+    animation: onbIn 0.22s ease both; cursor: default; text-align: left; }
+  .onb-hint::before { content: ''; position: absolute; top: -6px; left: 30px; width: 12px; height: 12px;
+    background: inherit; border-radius: 2px; transform: rotate(45deg); }
+  .onb-hint[data-k="set"]::before { left: auto; right: 24px; }       /* at the set's circle */
+  .onb-hint[data-k="rpe"]::before { left: 58%; }                      /* at the 6–10 buttons */
+  .onb-hint p { flex: 1; margin: 0; padding-bottom: 6px; font-family: 'Barlow', sans-serif;
+    font-size: 14px; line-height: 1.45; letter-spacing: 0; text-transform: none; }
+  .onb-hint b { font-weight: 700; }
+  .onb-hint-ok { flex: none; min-width: 44px; min-height: 44px; margin-top: -10px; padding: 0 10px;
+    background: transparent; border: 0; color: inherit; cursor: pointer; opacity: 0.9;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px;
+    letter-spacing: 1px; text-transform: uppercase; }
+  .ex-set-log .onb-hint { margin: 6px 8px 10px; }
+  body[data-dark] .onb-hint { box-shadow: 0 0 0 1px rgba(255,255,255,0.10), 0 6px 18px rgba(0,0,0,0.4); }
+  @keyframes onbIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
   .ceil-kick { font-family: 'Space Mono', monospace; font-size: 9.5px; font-weight: 700;
     letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.78); }
   .ceil-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 44px;
@@ -6231,6 +6252,83 @@ function maybeWelcome() {
   el.querySelector('.wel-skip').addEventListener('click', function () { el.remove(); });
 }
 
+// ── First-session hints (ONB-01, 2026-09-27) ──
+// AA Proof runs a tour; the training app had nothing, and the rules that make logging fast
+// lived two tabs away in the guide. Three hints instead, each shown where it applies, one at a
+// time, and gone for good once the athlete does the thing (or taps Got it): Start or Guided on
+// the session bar, a tick, an RPE. Not a tour, nothing over the work. <id>_onb holds which
+// are done and syncs, so a second phone does not teach them again. An athlete who has trained
+// before (a finished session, last time's weights, a later cycle) never sees them. The words
+// name real controls, like the guide (CNT-01): rename one and change ONB_TEXT with it.
+const ONB_TEXT = {
+  bar: () => 'Tap <b>Start</b> as you begin, so I know how long the session took. Or <b>Guided</b>: one set at a time, with your rest timed.',
+  // Worded for the row it sits under: no weight for a bodyweight move, no reps for a hold.
+  set: row => (row.querySelector('.ex-set-wbox') && row.querySelector('.ex-set-wbox').offsetParent
+      ? 'Weight in, set done: tap the <b>circle</b>.' : 'Set done? Tap the <b>circle</b>.')
+    + ' One tap means done as written.' + (row.querySelector('.ex-set-reps') ? ' Different reps? Type them first.' : ''),
+  rpe: () => 'How hard was that set? <b>10</b>: not one more rep. <b>8</b>: two left. I set your weights from it.'
+};
+function onbKey() { return ATHLETE_ID + '_onb'; }
+function onbState() {
+  try { const o = JSON.parse(localStorage.getItem(onbKey()) || '{}'); return (o && typeof o === 'object') ? o : {}; }
+  catch (e) { return {}; }
+}
+function onbSeen(k) {
+  const o = onbState();
+  if (o[k]) return;
+  o[k] = 1;
+  try { localStorage.setItem(onbKey(), JSON.stringify(o)); } catch (e) { /* storage full: it shows again */ }
+}
+// Trained before? Then there is nothing to teach. The demo is always someone new.
+function onbVeteran() {
+  if (window.IS_DEMO) return false;
+  if ((DATA && DATA.currentCycleIndex || 0) > 0 || hasFinishedASession()) return true;
+  try {
+    return Object.keys(localStorage).some(k => k.indexOf(ATHLETE_ID + '_setlog_') === 0
+      && /"lw":"[^"]/.test(localStorage.getItem(k) || ''));
+  } catch (e) { return false; }
+}
+function dropHint() { const el = document.getElementById('onbHint'); if (el) el.remove(); }
+// Called whenever the day's state moves: progress, the clock, a card opened or closed, an
+// RPE, Guided opened or closed. Cheap, and it only moves the one element when it must.
+function paintHints(day) {
+  if (window.IS_PREVIEW || !ATHLETE_ID || !DATA || day == null) return;
+  day = String(day);
+  let o = onbState();
+  if (o.bar && o.set && o.rpe) { dropHint(); return; }
+  if (onbVeteran()) { ['bar', 'set', 'rpe'].forEach(onbSeen); dropHint(); return; }
+  const content = document.getElementById('day' + day);
+  if (!content) return;
+  // Done the thing? Then its hint has done its job, shown or not (Guided counts too).
+  const t = loadTimer(day);
+  if (!o.bar && t && t.sessionStart) onbSeen('bar');
+  if (!o.set && content.querySelector('.ex-set-row.done')) onbSeen('set');   // a set, not a warm-up tick
+  if (!o.rpe && content.querySelector('.rpe-btn.selected')) onbSeen('rpe');
+  o = onbState();
+  const dv = document.getElementById('day-view');
+  if (!dv || dv.hidden || !content.classList.contains('active') || (typeof STEP !== 'undefined' && STEP)) { dropHint(); return; }
+  // The one that applies where the athlete is, the most immediate first.
+  const openCard = '.checklist-item:not(.collapsed) ';
+  let want = null, row;
+  if (!o.rpe && (row = content.querySelector(openCard + '.ex-set-row.rpe-open'))) want = { k: 'rpe', at: row };
+  else if (!o.set && (row = content.querySelector(openCard + '.ex-set-row.live'))) want = { k: 'set', at: row };
+  else if (!o.bar && !(t && t.finished) && (row = document.getElementById('timer-' + day))) want = { k: 'bar', at: row };
+  if (!want) { dropHint(); return; }
+  let el = document.getElementById('onbHint');
+  if (el && el.dataset.k === want.k && el.previousElementSibling === want.at) return;   // already there
+  dropHint();
+  el = document.createElement('div');
+  el.id = 'onbHint';
+  el.className = 'onb-hint';
+  el.dataset.k = want.k;
+  el.setAttribute('role', 'note');
+  el.innerHTML = `<p>${ONB_TEXT[want.k](want.at)}</p><button type="button" class="onb-hint-ok">Got it</button>`;
+  el.addEventListener('click', e => e.stopPropagation());   // a tap on it never folds the card under it
+  el.querySelector('.onb-hint-ok').addEventListener('click', () => { onbSeen(want.k); dropHint(); paintHints(day); });
+  want.at.after(el);
+}
+window.paintHints = paintHints;
+
 function cycleSlug(name) {
   return String(name || '')
     .toLowerCase()
@@ -6732,6 +6830,7 @@ function closeDayView() {
   if (ov) ov.hidden = false;
   document.getElementById('v-progress').classList.remove('active');
   hideRestOffer();
+  dropHint();
   paintWeek();
   // Back on a nav screen — bring the global dark-mode toggle back.
   const gToggle = document.getElementById('global-dark-toggle');
@@ -7791,6 +7890,7 @@ function toggleExpand(item) {
   item.classList.toggle('collapsed');
   if (!item.classList.contains('collapsed')) fitNotes(item);
   else if (item.dataset.day) paintDoneLines(item.dataset.day);   // what changed while it was open
+  if (item.dataset.day) paintHints(item.dataset.day);
 }
 
 // YouTube links come in several shapes: youtube.com/watch?v=ID, youtu.be/ID,
@@ -9795,6 +9895,7 @@ function foldWhenDone(card, openStrips) {
       fitNotes(next);
       next.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+    paintHints(card.dataset.day);
   }, 700);
 }
 
@@ -9802,6 +9903,7 @@ function updateProgress(day) {
   const status = getDayCompletion(day);
   paintDoneLines(day);
   paintResetBtn(day);
+  paintHints(day);
   const { done, total } = status;
   if (!total) return;
 
@@ -9944,6 +10046,7 @@ function renderTimer(day) {
     labelEl.textContent = 'Ready when you are';
   }
   paintResetBtn(day);
+  paintHints(day);
 }
 // Single shared 1s tick updates every running timer's display.
 let _timerTick = null;
@@ -11578,6 +11681,7 @@ function attachSetLog(card) {
         if (!was) open.delete(idx);
         paintSets();
         paintDoneLines(card.dataset.day);          // the done row names every RPE
+        paintHints(card.dataset.day);
         if (!was) foldWhenDone(card, open);
         if (navigator.vibrate) navigator.vibrate(8);
       });
@@ -12831,8 +12935,10 @@ function openStepMode(day) {
   let pos = seq.findIndex(it => !stepDone(it));
   if (pos < 0) pos = seq.length - 1;
   STEP = { day, seq, pos, homeCard: null, homeDetail: null };
+  onbSeen('bar');                  // Guided is one of the two things the bar's hint asks for
   document.getElementById('stepOverlay').classList.add('visible');
   document.body.style.overflow = 'hidden';
+  paintHints(day);                 // no hints inside Guided
   renderStep();
 }
 
@@ -12851,7 +12957,9 @@ function closeStepMode() {
   restoreStepHome();
   document.getElementById('stepOverlay').classList.remove('visible');
   document.body.style.overflow = '';
+  const day = STEP.day;
   STEP = null;
+  paintHints(day);
 }
 
 function renderStep() {

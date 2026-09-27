@@ -30,7 +30,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-27)
 
-**23 done · 6 partly done · 15 open**, of 44. Each was checked against the code on `main`.
+**24 done · 6 partly done · 14 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -66,8 +66,10 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#263](https://github.com/amirardekanian-crypto/Website/pull/263) | Guided's layout: the current set is pinned on screen above the footer on every step (it hid on 8 of 14 at 320×568); the rest screen asks the weight beside reps and RPE (Same as last); supersets and circuits come in round by round, the last round ticking the circuit; the rest screen scrolls on a short phone | WK-01 |
 | [#262](https://github.com/amirardekanian-crypto/Website/pull/262) | The working card, from Amir's notes on two mockups: one line of numbers, his pills kept, a note dot, the ⓘ at the right end (clay for a Because), no history on a closed card; open, the note in two lines, Last time as a box (last set, tap for all), How to do it folded after the first time; a small done row, fold after the last RPE and the next card opens; the kg box follows the Spine's equipment | CARD-01, CARD-02, CARD-03 |
 | [#264](https://github.com/amirardekanian-crypto/Website/pull/264) | One finish: the card shows progress (never "skipped") until the athlete taps Finish early twice; rate, then **Done · send to coach ✓** finishes, saves the record and sends ONE email, from an outbox on the phone that waits for signal; the finished card says where the report is (with your coach, waiting for signal, Try again); **Send the update** only after a change; **Reset** in the session bar once a day has started (Amir: "you cant cancle or reset") | WK-04 |
+| [#265](https://github.com/amirardekanian-crypto/Website/pull/265) | The session bar's three buttons fit one row on a narrow phone (with Reset they ran 22 px past the bar at 360 px, 44 px at 320 px); the armed Reset reads "Reset?" | WK-04 |
+| [#266](https://github.com/amirardekanian-crypto/Website/pull/266) | Three one-time hints in a new athlete's first session, one at a time and in the flow: Start or Guided under the session bar, "tap the circle" under the first set, "How hard?" under the strip that opens; each gone once the athlete does the thing (or Got it); never for anyone who has trained, synced per athlete | ONB-01 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264, with the session bar's Reset Amir asked for).
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266).
 
 **Partly done, and what is still open on each:**
 - **WK-03.** Done: the Guided label colour (#234), the clock never clipped and the label on one line at
@@ -86,7 +88,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 - **DATA-01.** Each athlete changes format when their next cycle is written. Nothing to build.
 
 **Open.** P2: PROG-01,
-PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, ONB-01, DS-01. P3: DS-03, CONS-01, PRF-05, WK-05, LIB-01, POL-02, DOC-01.
+PRF-01, PRF-02, PRF-03, COACH-02, NAV-02, DS-01. P3: DS-03, CONS-01, PRF-05, WK-05, LIB-01, POL-02, DOC-01.
 
 ## Next, in order
 
@@ -107,9 +109,9 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 2. **Foundations:** done. HOME-02 shipped from Amir's notes on the mockup (#258): no separate Today card, no
    rest-day design ("we don't know their rest days"); done days small, undone days big, the in-progress card.
 3. **The session** (the card freeze is lifted): WK-02 (#260), the working card (#262, CARD-01/02/03),
-   Guided's layout (#263, WK-01) and one finish with the session bar's Reset (#264, WK-04) are done. Full
-   accounts: `PROGRAM-APP.md` → *The working card*, *Guided Mode's layout* and *One finish*. Next:
-   **ONB-01** (three one-time hints in the first session, each dismissed by doing the thing), **WK-05**
+   Guided's layout (#263, WK-01), one finish with the session bar's Reset (#264–#265, WK-04) and the
+   first-session hints (#266, ONB-01) are done. Full accounts: `PROGRAM-APP.md` → *The working card*, *Guided
+   Mode's layout*, *One finish* and *First-session hints*. Next: **WK-05**
    (a compact prep list for warm-up circuits, no invented rest), and WK-03's last parts (a slim session bar,
    the tab bar hidden mid-session with a clear "Leave session").
 4. **Home and progress:** PROG-01.
@@ -218,6 +220,6 @@ The app cannot reach Supabase from here, so stub it and feed it a local programm
 
 > Continue the Fresh Eyes work. Read `Content/FRESH-EYES.md` first, then the Fresh Eyes page
 > (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). Stages one and two are done, and the card freeze is
-> lifted ("dont freeze anything"). Keep going down *Next, in order* (ONB-01 is next), one PR per item, merged
+> lifted ("dont freeze anything"). Keep going down *Next, in order* (WK-05 is next), one PR per item, merged
 > and confirmed live the same day. Pause only for a call that is mine: restate the problem, give two or three
 > directions with trade-offs and your recommendation, and wait for my answer on that one.

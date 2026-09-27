@@ -121,7 +121,9 @@
 //      outbox that waits for signal), and Reset in the session bar.
 // v63: program.html changed (2026-09-27, WK-04): the session bar's three buttons fit one row on a narrow
 //      phone (they ran 22 px past the bar at 360 px), and the armed Reset reads "Reset?".
-const CACHE = 'aap-v63';
+// v64: program.html changed (2026-09-27, ONB-01): three one-time hints in a new athlete's first session
+//      (Start or Guided, the set circle, How hard?), each gone once the athlete does the thing.
+const CACHE = 'aap-v64';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
