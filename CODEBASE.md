@@ -32,41 +32,42 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Don't touch:** The `<script type="application/ld+json">` block near the top (Google reads this) unless you know what it does. The `<meta>` tags at the top (these are SEO).
 
 #### `form.html` — Application form
-- **What it does:** The intake questionnaire new athletes fill in. Seven sections, a progress bar, and a success screen. On submit it writes **straight to Supabase** (the `submit_intake` RPC → the `hab_intake` table, read in `coach.html` → Intake) **and** fires Web3Forms for the email — in parallel, counting as sent if *either* succeeds, so a Web3Forms outage no longer loses the submission. `form-fa.html` is the Farsi twin and does the same. Backend: [`supabase/stage27_intake.sql`](supabase/stage27_intake.sql).
+- **What it does:** The intake questionnaire new athletes fill in. Eight sections (00 Your Programme to 07 Equipment), a progress bar, and a success screen. On submit it writes **straight to Supabase** (the `submit_intake` RPC → the `hab_intake` table, read in `coach.html` → Intake) **and** fires Web3Forms for the email — in parallel, counting as sent if *either* succeeds, so a Web3Forms outage no longer loses the submission. `form-fa.html` is the Farsi twin and does the same. Backend: [`supabase/stage27_intake.sql`](supabase/stage27_intake.sql).
 - **If deleted:** No one can apply. Every "Apply Now" button on the site breaks.
 - **Depends on:** `assets/css/*.css`, `assets/js/shared.js`, `partials/nav.html`, `partials/footer.html`, **Supabase** (`submit_intake` RPC, via a plain `fetch` — no library), and Web3Forms (external, for the email).
 - **Edit this when:** Adding, removing, or rewording form questions. Changing which options appear in dropdowns.
 - **Don't touch:** The Web3Forms `access_key` value (breaks submissions). The `<script>` at the bottom that runs the progress bar, unless you're ready to test it carefully.
 
 #### `program.html` — The athlete app
-- **What it does:** The private training app. Four tabs: **Home** (current cycle + progress), **Game Plan** (the whole plan, cycle by cycle — "My Plan" until 2026-09-26), **Coach** (a *Message me on WhatsApp* button, the coach's notes and the guide; the in-app chat was removed 2026-09-26), **Library** (a [Read | Train] split — Read shows coach-published articles; Train shows on-demand workout sessions). Loads the signed-in athlete's programme row from the server through `get_program()` (the old `/data/` files are gone from the site since 2026-09-07). With no signal it opens the last plan this phone loaded, kept in localStorage as `plancache` (REL-01, 2026-09-26; `PROGRAM-APP.md` → *No signal*). Each article and workout has its own shareable deep-link URL (`?article=<id>` / `?workout=<id>`). Demo mode (`?client=demo`) shows a read-only preview without a key.
+- **What it does:** The private training app. Four tabs: **Home** (current cycle + progress), **Game Plan** (the whole plan, cycle by cycle — "My Plan" until 2026-09-26), **Coach** (a *Message me on WhatsApp* button, the coach's notes and the guide; the in-app chat was removed 2026-09-26), **Library** (three doors: **Sessions**, on-demand workouts; **Playbook**, coach-published articles; **Exercises**, the Spine as a library. Since LIB-01, 2026-09-27, Sessions is a list of shelves and the app offers a session at two moments: `PROGRAM-APP.md` → *The Library's Sessions*). Loads the signed-in athlete's programme row from the server through `get_program()` (the old `/data/` files are gone from the site since 2026-09-07). With no signal it opens the last plan this phone loaded, kept in localStorage as `plancache` (REL-01, 2026-09-26; `PROGRAM-APP.md` → *No signal*). Each article and workout has its own shareable deep-link URL (`?article=<id>` / `?workout=<id>`). Demo mode (`?client=demo`) shows a read-only preview without a key.
 - **Guided Mode — a second way through a session, not a second copy of it.** A session's default is
   the list: every exercise a collapsible card, sets logged by hand, Rest tapped when wanted. **Guided**
-  (next to Start on the session timer) instead walks the day's "standard" exercises one set at a time,
+  (next to Start on the session timer) instead walks the day's "standard" exercises one set at a time
+  (and, since WK-01 part 2, 2026-09-27, a circuit that logs something one round at a time),
   with rest auto-starting and auto-advancing between them (`openStepMode()`/`STEP` state, near the end
   of the script). It relocates the REAL `.ex-detail` node — video, cues, the set-log table —
   out of the card and into the overlay while a step is showing (`renderStep()`), then puts it back on
   exit. **Nothing about logging, saving or estimating a set is reimplemented**: the weight input, RPE
   buttons and check circle are the exact nodes `attachSetLog()` already wired up (the card estimate, `attachCeiling()`, went with REC-01), so
   Guided Mode can never disagree with the list view about what happened — the same trap this doc warns
-  about for `coach.html`'s `parseSessionLog()`. Circuits and simple check-off exercises (warm-ups, and
-  a few conditioning finishers with no per-set log) are **not** in the sequence yet — the athlete
-  finishes those from the list, same as always; `getDayCompletion()`'s "unfinished" list already
+  about for `coach.html`'s `parseSessionLog()`. A circuit's last round ticks it (`finishRound()`).
+  Warm-ups, prep circuits and simple check-off items log nothing and are **not** in the sequence — the
+  athlete finishes those from the list, same as always; `getDayCompletion()`'s "unfinished" list already
   handles that gracefully. `openTimer()`'s rest overlay grew an auto-advance path (`openTimerAuto()`) and a
   `+15s` button for Guided Mode; since WK-02 (2026-09-27) every rest opens running, counts from a timestamp,
   sounds and buzzes at zero and keeps the screen awake (PROGRAM-APP.md → *The rest timer*).
   **Entering and leaving (WK-01, 2026-09-26):** `openGuided()` never pauses a running clock (it only
   toggles a session that has not started, a leftover from an earlier day, or a paused one, which
   resumes); `openStepMode()` starts at the first unticked set; and the last button, **Finish Session ✓**,
-  runs `stepFinish()`: close Guided, then the list's own `confirmSession()` when every set in the day is
-  done, or scroll to the "Wrap up early?" card when a circuit or warm-up is still open. Guided never
-  finishes a partial session on the athlete's behalf.
+  runs `stepFinish()`: close Guided, refresh the day's finish card (`refreshConfirmCard()`) and scroll to
+  it. There the athlete rates and taps Done when every set is done, or gets **Finish early** when a
+  circuit or warm-up is still open (WK-04). Guided never finishes a partial session on the athlete's behalf.
 - **If deleted:** All athletes lose access to their programme.
-- **Depends on:** `data/*.json` (one per athlete), `content/index.json` + `content/**/*.json` (Read article library), `workouts/index.json` + `workouts/**/*.json` (Train workout library), the Spine (`get_exercises()`: cues, videos), `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json`, icon files, and **Supabase** (it backs up each athlete's progress to the cloud and reads/sends messages).
-- **Every picture in the app comes from `assets/art/`** (2026-09-19), including the 13 Library shelf pictures (7 Sessions + 6 Playbook) — whose paths live in `public.library_categories.banner`, with the index JSONs as the offline fallback, and which also fill each workout card's thumbnail and the header of each workout's own screen (`libBannerFor()`). Ten cycle-card
+- **Depends on:** **Supabase**: `get_program()` (the plan; `plancache` with no signal), `get_library()` (the Library; `articles/index.json`, `workouts/index.json` and their files are the offline fallback), `get_exercises()` (the Spine: cues, videos), `get_qualities()` (the Quality Map), `get_my_history()`, and the progress and session saves. Also `assets/js/shared.js` (for the video pop-up and "install app" prompt), `manifest.json` and icon files.
+- **Almost every picture in the app comes from `assets/art/`** (2026-09-19); the exceptions are the root `court-sessions.jpg` / `court-playbook.jpg` (the sign-in hero, the Sessions and Playbook doors and their headers) and `assets/img/coach.jpg` (the Coach tab). That includes the 13 Library shelf pictures (7 Sessions + 6 Playbook), whose paths live in `public.library_categories.banner`, with the index JSONs as the offline fallback. Only the Sessions ones are drawn: once per shelf, as its band (LIB-01, 2026-09-27; every session card used to wear it), and as the header of each workout's own screen (`libBannerFor()`). Ten cycle-card
   images keyed by FAMILY, not by cycle name (`APP_ART` + `cycleArt()`), plus seven
-  moment images: three for the session-complete card, three for a new best on The
-  Ceiling, one welcome screen. A cycle's family comes from the `art` word on the cycle
+  moment images: three for the session-complete card, three for a new best on Personal
+  Records, one welcome screen. A cycle's family comes from the `art` word on the cycle
   (`SCHEMA.md`), falling back to keyword rules on the cycle NAME only — widening that
   to the tagline or the focus list was tried and is wrong, because a focus list names
   every quality a block touches. Two cards in a row from the same family: the second is
@@ -75,8 +76,8 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   next), `<id>_ceil_best` (the pending new-best record, shown for 7 days), `<id>_welcomed`,
   and the global `aa_fresh_signin`. Specs and prompts: `IMAGES.md` §0.
 - **Today's habits on Home — AA Proof, embedded (2026-09-26).** Under the Daily Habits card, `mountProofStrip()` loads `habits.html?client=<id>&embed=1` in a frame once the card nears the screen, and shows it when Proof posts `ready` with its height (`setup`/`error` keep the card alone). Proof draws the rows (`renderEmbed()`) and makes every write; this app redraws its card from the snapshot Proof republishes, passes its dark mode across, and never embeds in the coach's preview. `HABITS.md` → *Embedded on the training app's Home*.
-- **Links to the habit tracker — and nothing more.** A **Daily Habits** shortcut card on Home and at the end of Game Plan opens [`habits.html`](habits.html), handing over the client id and resolved key. Same origin and PWA scope, so from an installed app this stays inside the app shell instead of bouncing to the browser. The card is deliberately plain: **this app holds no habit state, no XP maths and no level formula** — duplicating those would be a third copy to keep in sync and weight it doesn't need.
-- **The two apps stay out of each other's *writes*.** `_snapshot()` skips `<id>_hab_*` (Proof owns and syncs those), so this app can never push habit data back. It does **read** two of them, both read-only, both degrading gracefully when absent. Personal Records takes the latest body weight out of `<id>_hab_wt` to show relative strength (see the bullet below). And the **Daily Habits card reads `<id>_hab_card`** — a snapshot habits.html *publishes* at the end of every render (`publishCardSnapshot()` there) holding the level, rank, day streak, today's done/total and the week's seven qualifying flags. ⚠️ **That key exists precisely so this app never re-derives any of it.** The XP curve, rank ladder and weighted day gate already live in two places (habits.html and the `xp_rules` row); computing them here would be a third copy, the exact failure this repo warns about where two screens disagree and nothing errors. Proof exports its *answers*, not its rules. The key is deliberately device-local — habits.html builds its sync payload explicitly from cfg/log/wt, so this never travels — and a phone that has never opened Proof simply gets a card with no numbers. Finishing a session writes nothing into Proof; it records to `session_history` as it always has, and Proof reads the dates back through the read-only `get_workout_days` RPC ([`supabase/stage10_workout_days.sql`](supabase/stage10_workout_days.sql)) to tick its WORKOUT habit. The completion card just says so and offers a shortcut across.
+- **Links to the habit tracker — and nothing more.** A **Daily Habits** card on Home, under the week's day cards (and a shortcut on the session-complete card), opens [`habits.html`](habits.html), handing over the client id and resolved key. Same origin and PWA scope, so from an installed app this stays inside the app shell instead of bouncing to the browser. The card is deliberately plain: **this app holds no habit state, no XP maths and no level formula** — duplicating those would be a third copy to keep in sync and weight it doesn't need.
+- **The two apps stay out of each other's *writes*.** `_snapshot()` skips `<id>_hab_*` (Proof owns and syncs those), so this app can never push habit data back. The one exception is `<id>_hab_wt`, body weight, which this app has owned since 2026-09-12: the Body Weight card on Home writes it, `_snapshot()` pushes it, and `mergeStoredValue()` merges it by date, with tombstones. Personal Records takes the latest reading out of it to show relative strength (see the bullet below). The one Proof key this app only **reads** is `<id>_hab_card`, and it degrades gracefully when absent: the **Daily Habits card reads it** — a snapshot habits.html *publishes* at the end of every render (`publishCardSnapshot()` there) holding the level, rank, day streak, today's done/total and the week's seven qualifying flags. ⚠️ **That key exists precisely so this app never re-derives any of it.** The XP curve, rank ladder and weighted day gate already live in two places (habits.html and the `xp_rules` row); computing them here would be a third copy, the exact failure this repo warns about where two screens disagree and nothing errors. Proof exports its *answers*, not its rules. The key is deliberately device-local — habits.html builds its sync payload explicitly from cfg/log only, so this never travels — and a phone that has never opened Proof simply gets a card with no numbers. Finishing a session writes nothing into Proof; it records to `session_history` as it always has, and Proof reads the dates back through the read-only `get_workout_days` RPC ([`supabase/stage10_workout_days.sql`](supabase/stage10_workout_days.sql)) to tick its WORKOUT habit. The completion card just says so and offers a shortcut across.
 - **The set log is countersigned (2026-09-24).** `attachSetLog()` draws SET · KG · REPS · RPE tag · tick;
   the RPE strip opens under a row once it is ticked, and `card._paintSets()` is the one painter for
   row state (`.live`, `.done`, `.rpe-open`). Guided Mode's rest screen logs reps and RPE through the
@@ -92,12 +93,11 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   (a hidden `#cf-rpe` behind five buttons) share one 44 px look, and a second tap clears a pick.
   Details: `PROGRAM-APP.md`.
 - **⚠️ Personal Records (estimated 1RM; "The Ceiling" on screen until 2026-09-26) — one storage
-  key with a hand-written merge rule.** The line at the bottom of an exercise's set log is **pure
-  derivation** — nothing stored, no payload, no merge. Writes come from three doors, all landing in
+  key with a hand-written merge rule.** Nothing about the max shows on the exercise card (REC-01,
+  2026-09-26). Writes come from two doors, both landing in
   **`<id>_1rm`**: **automatic new bests** (`fillRecordsFrom()`, from a finished session and from
   history, written only when a session's best set beats every earlier number for the lift),
-  *Save to Personal Records* on the exercise card (shown only once the athlete types their own
-  numbers into its panel), and **+ Log a max** on the Records screen itself. The Records card
+  and **+ Log a max** on the Records screen itself. The Records card
   sits on **Home**. The value is an array of `{ lift, kg, w, r, rpe, d, t, test?, auto? }`, one
   entry per lift per day, where `test: true` marks a deliberate rep-max test and `auto: true` a
   new best the app wrote by itself. ⚠️ **Automatic entries carry `t: 0`** so any write the athlete
@@ -105,7 +105,8 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   - **That key has its own branch in `mergeStoredValue()` — union by `lift|date`, newest `t`
     wins.** Do not remove it. Without it the key falls through to the scalar rule, which takes
     one side of the merge wholesale, and a phone that had not synced would silently delete every
-    estimate saved on the other. Same class of bug as the body-weight tombstone in Proof.
+    estimate saved on the other. Same class of bug as the body-weight tombstone (now in this app's
+    `mergeStoredValue()`).
   - **⚠️ A DELETE IS A TOMBSTONE** — `{ lift, d, del: true, t }` with a fresh `t`, never a row
     dropped from the array. The union only walks the entries it can see on both sides, so a row
     simply removed is handed straight back by the other phone on its next push and the deletion
@@ -118,19 +119,14 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
     than Epley's +3%. Refuses above `ONE_RM_MAX_EFFECTIVE` (10) and rounds to 2.5 kg.
     Both constants are tunable at the top of that block; the *why* behind each is in
     `.claude/skills/program-design/SKILL.md` → **The Ceiling**, which is also where the
-    coach-side rules live (no %1RM prescription; the monthly under-5RM refresh).
-    **Both doors run the same estimator** — `paintCeilingForm()` on the Records screen mirrors
-    `paintFromFields()` on the card, field for field and message for message. A second copy of
+    coach-side rules live (no %1RM prescription; closing-week 5RM retests on two or three flagged lifts).
+    **Both doors run the same estimator** — the automatic bests (`histBestSet()`, read by
+    `fillRecordsFrom()`) and `paintCeilingForm()` on the Records screen both call `estimateOneRM()`;
+    the card's `paintFromFields()` went with REC-01. A second copy of
     the maths is how the two screens would start disagreeing.
-  - **On the exercise card it only appears where it can be honest:** no rep count (holds,
-    carries, intervals) → no line; nothing logged yet → hidden entirely, which is also what
-    keeps a max estimate off unloaded work like a box jump without needing a flag in the JSON.
-  - **⚠️ The Records screen's own list is a DIFFERENT gate, deliberately.** `ceilingCandidates()`
-    offers every `standard` exercise in the current cycle whose reps chip is a rep count — and
-    does **not** apply the reps-to-failure ceiling the card uses. The card's gate is about
-    estimating off the set in front of it (a 3×12 leg press cannot produce an honest single);
-    that says nothing about whether a 5RM test on the leg press is worth having. What was
-    *prescribed* stops mattering once the athlete enters what they actually lifted.
+  - **The Records screen's list is `ceilingCandidates()`:** every `standard` exercise in the
+    current cycle whose reps chip is a rep count (no holds, carries or intervals). What was
+    *prescribed* stops mattering once the athlete enters what they actually lifted, and
     `estimateOneRM()` still refuses anything past the ceiling on save.
   - **Never free text.** An entry is filed under its display name, so a typed "Squat" beside a
     prescribed "Barbell Back Squat" splits the athlete's history in two with no way back. The
@@ -158,12 +154,15 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   - Athlete-facing explanation is the **"Personal Records — the most you could lift once"** card
     in `APP_GUIDE` plus `CEILING_HELP` (the same prose, shown in place on the Records screen); the
     data handling is `privacy.html` §2.2. Keep all of them in step.
-- **The "Done" pill and the suggested-day highlight — the rules, in one place.** Both read one
-  localStorage key, `<id>_completed_d<N>`, holding **`"<toDateString()>|c<currentCycleIndex>"`**.
-  - **Done** (`isDone`, brown pill) shows only when the stamp's cycle matches the cycle on screen
-    (`completedHere`). **Suggested** (`markSuggestedDay`) highlights the *first day in `days[]`
-    order* with no such stamp — which is why day order in `workouts.days[]` is load-bearing, not
-    cosmetic.
+- **The "Done" pill and the suggested-day highlight — the rules, in one place.** Both read
+  `weekDoneDays()` (HOME-01, 2026-09-26): a day is done when `session_history` (HIST, via
+  `get_my_history()` or its phone copy) has it inside the cycle's training week (`weekWindow()`), or
+  its localStorage stamp, `<id>_completed_d<N>` holding **`"<toDateString()>|c<currentCycleIndex>"`**,
+  says it was finished on this phone today.
+  - **Done** (`dayCardPill()`, brown pill) counts a stamp only when its cycle matches the cycle on
+    screen (`completedHere()`). **Suggested** (`markSuggestedDay()`) highlights the day under way
+    today, else the *first day in `days[]` order* not done this week — which is why day order in
+    `workouts.days[]` is load-bearing, not cosmetic.
   - **The cycle half exists because day ids restart at 1-2-3 every cycle** and nothing clears these
     on a cycle advance. Publishing a new cycle on a day the athlete had already trained used to
     leave the new cycle's day wearing a Done pill it never earned (an athlete's report, 2026-09-05). Only
@@ -171,9 +170,10 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
     **date alone** (`completedDate`), so a mismatch never destroys data that has not aged out.
   - **Legacy bare-date stamps are adopted into the current cycle on boot**, not treated as foreign
     — otherwise a session finished today but not yet sent loses its Send panel (`restoreState`).
-  - ⚠️ **It is a today-scoped flag, not history.** Every stamp is wiped at midnight, so the app
-    cannot answer "what did I do this week" and `markSuggestedDay()` points back at Day 1 every
-    morning. Real weekly history needs `session_history`, which the app writes but never reads.
+  - ⚠️ **The stamp is today-scoped; the week is not.** A stamp is swept after midnight (six hours'
+    grace for a late finish, `sessionIsStale()`, DATA-02). What was done this week comes from
+    `session_history` through `get_my_history()`, so the suggestion no longer goes back to Day 1
+    every morning (`PROGRAM-APP.md` → *This Week is built from the session history*).
 - **A finished session is recorded TWICE, over two independent calls** — `save_session` (the
   `session_history` row the coach dashboard is built from) and a Web3Forms email. Either can fail
   alone. A failed `save_session` queues in `<id>_csq` and retries on a later app open, which may
@@ -191,9 +191,9 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   fails while a replay is still waiting on the network is not erased.
 - **Coach preview (`?preview=1`) must never write.** It runs under Amir's own sign-in, and every
   athlete RPC accepts `is_coach()` — so a write that is not gated on `IS_PREVIEW` lands in that
-  athlete's real record. Boot skips the backup mirror, the pull, the queue replay and the message
-  fetch; `recordSessionToCloud()`, `sendReport()` / `flushOutbox()` (the email), `_replayQueue()` and
-  `sendCoachReply()` each return early too. Until 2026-09-13 those four did not, and tapping
+  athlete's real record. Boot skips the backup mirror, the pull and the queue replay;
+  `recordSessionToCloud()`, `sendReport()` / `flushOutbox()` (the email) and `_replayQueue()` each
+  return early too. Until 2026-09-13 they did not, and tapping
   Finish, an RPE or Send while previewing wrote a `session_history` row for the athlete.
   `markLibraryDone()` already checked `IS_PREVIEW` from the start.
 - **Coach preview must trust the URL, not the remembered athlete** (fixed 2026-09-20). `boot()` starts
@@ -220,7 +220,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   would have uploaded whatever CFG/LOG this browser held under their key over their real cloud
   row — the same class of bug, just triggered by leftover local state instead of a tap.
 - **Edit this when:** You want to change how the training app looks or behaves, add new features to the training screens, or tweak the styling.
-- **Don't touch:** This file is large and self-contained. Most day-to-day changes happen in `data/*.json`, `content/`, and `workouts/`, not here. Ask an AI assistant to guide you before structural edits.
+- **Don't touch:** This file is large and self-contained. Most day-to-day changes happen on the server (programmes through coach.html and `/program-assemble`; the Library through `articles/`, `workouts/` and coach.html → Links), not here. Ask an AI assistant to guide you before structural edits.
 
 #### `habits.html` — AA Proof, the habit tracker (private)
 - **What it does:** A standalone gamified habit tracker for coaching clients. A one-screen onboarding suggests a habit set (the athlete switches off whatever they want), then three tabs: **Today** (level hero, day strip, habit list, the daily nudge, quests, seven-day recap), **Progress** (overall level, four season stats, every habit's own rank and consistency → tap for full history, milestones) and **Crew** (the whole social layer). **Settings is not a tab** — it sits behind the athlete's initials in the header, and that button doubles as the way out of Settings, the manual and the ladder. Eight suggested habits — STRENGTH, STEPS, SLEEP, FUEL, WATER, MOBILITY, BREATHE, SUPPS (vitamin D · creatine · omega-3) — plus custom habits. Check-off habits toggle; counter habits (steps, sleep, water, meals) take a number via `+` or the log sheet. Athletes open it the **same way as the program**: they go to `habits.html` and sign in with their username and password (⚠️ the old `?client=<id>&key=<key>` links are retired and refused — `athlete_keys` is empty). Demo mode: `?client=demo` (local-only, no cloud).
@@ -241,7 +241,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Nothing is ever lost.** Every change is written to localStorage first and flagged dirty; the flag is itself persisted, so an app killed while offline still knows there is unsent work. Retries back off (5s → 15s → 45s → 2m → 5m) and fire again on reconnect, on foreground, on `pagehide` and at every launch. Each push sends the complete snapshot so a newer push supersedes an older one, and the cloud merge keeps the **larger** logged value per habit so a stale device can never erase real data. Settings shows a live sync line and a **Sync now** button.
 - **If deleted:** Athletes lose the habit tracker. The program app and dashboard are unaffected.
 - **Depends on:** `get_program()` for the athlete block (name, tier), or with no signal the plan saved on the phone (`plancache`, shared with the program app; REL-01), and **Supabase** — only the *existing* `save_progress` / `get_progress` functions, under localStorage keys `<id>_hab_cfg`, `<id>_hab_log` and `<id>_hab_meta`, merging into the same `athlete_progress` row the program app uses. **No new tables or functions.**
-- **Leaderboard (opt-in, server-scored).** Fourth tab. Two boards: *this week* (Monday to today, the default, so a new client can win in week one) and *all time*. An athlete appears **only after joining** and picks their own display name (defaults to first name + last initial); they can rename or leave any time. XP is recomputed **in Postgres** from the log already in `athlete_progress`, so editing localStorage cannot buy a place. The RPC deliberately returns **no athlete ids** — an id alone would let one client fetch `/data/<id>.json` and read another athlete's whole programme — and reading the board is key-checked so names are never exposed to the open internet. SQL: [`supabase/stage9_leaderboard.sql`](supabase/stage9_leaderboard.sql) (**must be run once** — until then the tab explains itself instead of erroring).
+- **Leaderboard (opt-in, server-scored).** Fourth tab. Two boards: *this week* (Monday to today, the default, so a new client can win in week one) and *all time*. An athlete appears **only after joining** and picks their own display name (defaults to first name + last initial); they can rename or leave any time. XP is recomputed **in Postgres** from the log already in `athlete_progress`, so editing localStorage cannot buy a place. The RPC deliberately returns **no athlete ids**, and reading the board is key-checked so names are never exposed to the open internet. SQL: [`supabase/stage9_leaderboard.sql`](supabase/stage9_leaderboard.sql) (**must be run once** — until then the tab explains itself instead of erroring).
 - **Roll call — one sentence a day, on the same opt-in.** Lives entirely in the **Crew** tab: the composer sits above the feed it posts to, and Crew opens on it. Today carries a one-line pointer that vanishes once the athlete has written — a doorway, not a second composer. Posting requires a `leaderboard_optin` row, which already means "other athletes may see me under this handle" — so there is no second consent and no second display name, and **leaving the board hides every line** without deleting it. Not a chat by construction: the primary key is `(athlete_id, day)`, so the schema *is* the rate limit. **Today only**, even though the log is editable for `BACKFILL_DAYS` — fixing Saturday's steps is admin, rewriting what you said about Saturday is not. **It pays no XP**, deliberately, and no scoring function reads `hab_notes`. The day percentage beside a line is client-computed and self-reported, which is safe precisely *because* it buys nothing; mirroring `dayPct()` into plpgsql would add a third place the scoring rules must agree. Coach-only `set_coach_note()` pins a line at the top of its day and `hide_note()` takes one down (hide, not delete, so the evidence survives the decision). SQL: [`supabase/stage15_roll_call.sql`](supabase/stage15_roll_call.sql). See [`XP_SYSTEM.md`](XP_SYSTEM.md) §11.
 - **The log is editable for three days (`BACKFILL_DAYS`).** A day strip at the top of Today picks which day taps land on; `setVal()` refuses anything outside the window and `AKEY()` self-heals when the app is left open past midnight. Nudges, streak-at-risk, the perfect-day celebration and the roll call box all stay anchored to the real today and stand down while an earlier day is selected — they are statements about *now*. Backfilling does recompute XP, streaks, badges and quests. ⚠️ It is a **UI affordance, not a lock**: the app pushes its whole log blob, so devtools could always write further back. See [`XP_SYSTEM.md`](XP_SYSTEM.md) §6.5.
 - **Today leads with the habit list, not with commentary.** The order is hero → day strip → habits → nudge → quests → roll call → recap. It used to be hero → nudge → quests → habits, which put the first tickable row ~1,400px down: you opened the app to log and had to scroll to log. Six of eight habits are now tickable without scrolling at 390px, five at 320px. Anything added to this screen belongs *below* the list unless the athlete must act on it first. Related cleanups in the same pass: one bar in the hero instead of two identical green ones; a progress track only on counter habits (on a check-off habit it could only read 0% or 100%); no `border-left` on `.pluscell`, which had made the right-hand rule appear on counter rows and vanish on the others; streaks read `3 DAYS` rather than `3D`.
@@ -254,14 +254,14 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Quests say so when there is no run.** `renderQuestsIdle()` prints one muted line rather than nothing. Between runs the block used to vanish entirely, which kept "seeing quests means something is on" true but made the feature invisible — an athlete who joined between runs never learned quests existed, so the next run read as random instead of as an event. The idle line is a fraction of a live block's height on purpose.
 - **The error screen is branded.** Unbranded, a stale link reads as "this app is broken"; with the wordmark and the expected link shape it reads as "the app is fine, my link is wrong", which is both true and the thing that gets the athlete to ask for a new one.
 - **The long game — the only thing in the app that is kept rather than derived.** A 14-reward track up the level ladder (`PASS_TRACK`), reached by levelling and nothing else. Two kinds, both free to mint: **titles** (a name worn under your rank and printed on the shared card) and **cards** (five canvas-painted grounds for that shared card). `claimRewards()` records what the level has reached into `CFG.pass.owned` and returns only what is new, so it can be celebrated behind the level-up that earned it; it runs silently once at boot to baseline an athlete who arrives with history. **Nothing ever revokes a reward** — not a new season, not a retune, not switching a habit off — which is what lets levels keep resetting with the season without the athlete losing anything: *"a new season resets your points, not your rewards."* Free to mint is the load-bearing constraint: a coach cannot owe forty people a call because forty people were consistent. Reached from **Progress → The long game**, the one line on that screen that points forward. Titles are **not on the leaderboard yet** — that needs the server to validate the unlock, or devtools could award anyone anything.
-- **It also runs for people with no programme (`"tier": "free"`).** One field in `data/<id>.json` switches the app into free mode; `isFree()` is the only test, and everything not-`"free"` is treated as coached, so existing athlete files need no edit. In free mode WORKOUT stays locked and explains *why* ("Coached athletes earn this from their programme"), every route that would have opened `program.html` goes to `/form.html` instead, and the cross-link reads *"Want the training too?"* rather than *"Your training programme"*. **Nothing about scoring changes** — a free user earns XP, levels, runs and board position on exactly the same rules, which is what makes the upgrade path free: flip the field, the pipeline writes the programme, and their whole history survives. Free users sign up at [`proof.html`](proof.html) and are set up with the [`/proof-signup`](.claude/skills/proof-signup/SKILL.md) skill.
+- **It also runs for people with no programme (`"tier": "free"`).** One field, `athlete.tier` in their `public.programs` row, switches the app into free mode; `isFree()` is the only test, and everything not-`"free"` is treated as coached, so existing athlete files need no edit. In free mode WORKOUT stays locked and explains *why* ("Coached athletes earn this from their programme"), every route that would have opened `program.html` goes to `/form.html` instead, and the cross-link reads *"Want the training too?"* rather than *"Your training programme"*. **Nothing about scoring changes** — a free user earns XP, levels, runs and board position on exactly the same rules, which is what makes the upgrade path free: flip the field, the pipeline writes the programme, and their whole history survives. Free users sign up at [`proof.html`](proof.html) and are set up with the [`/proof-signup`](.claude/skills/proof-signup/SKILL.md) skill.
 - **It installs as its own app, called AA Proof.** It installs from the static `/manifest-proof.json` now that the signed-in session carries identity — a generated blob manifest with the key in `start_url` is still produced for anyone arriving on a legacy link, and that block can go once every athlete has a login. The name lives in three places that must move together: `manifest.name`, `manifest.short_name` and the `apple-mobile-web-app-title` meta (iOS labels a home-screen icon from the meta and ignores the manifest). The offer is a sheet fired **once, ~1.5s after the first habit is logged** — hooked into `setVal()`, the one door into the log — never on arrival, never over a celebration or the log sheet, never in demo or when already standalone. *Not now* sets `CFG.installAsked` and it never asks again; a permanent Settings row is the way back, and the only route for someone on a new phone. `beforeinstallprompt` is Chromium-only, so iOS gets the *Share → Add to Home Screen* instruction instead of a button that could not work — and because the link arrives by WhatsApp, `inAppBrowser()` catches the very common case of the app being opened inside another app's browser, where nothing can be installed at all, and says *"open this in Safari first"*.
 - **One departure from the original design handoff:** STEPS and SLEEP are entered manually rather than synced from HealthKit, which a web app cannot read.
 - **Edit this when:** Changing the suggested habits or their XP weights, rank names, pacing, consistency tiers, milestones, or the nudge copy — all covered in [`XP_SYSTEM.md`](XP_SYSTEM.md).
 - **Don't touch:** The Supabase URL/key and the key-resolution block. The `migrateOld()` fold-forward (it rescues data from earlier shipped versions). The sync/dirty-flag logic. `noindex` on purpose.
 
 #### `coach.html` — The Coach's Box (private)
-- **What it does:** Your private mission control, covering **both** the coached athletes (`program.html` / `session_history`) and the free Proof crew (`habits.html`). Sign in with Google (locked to your coach email). Four tabs, routed on the URL hash so any screen can be bookmarked: **Today** (`#today`) — on-court count, the roll-call wall with the coach-line composer and hide/show moderation, a needs-you queue, the quest-week lever, and a 7-day Proof pulse; **Athletes** (`#athletes`, `#a/<id>`, `#a/<id>/<sub>`) — one roster across both systems, grouped into *needs you* / *all quiet* with each row stating its reason, plus a per-athlete file split into four sub-tabs: **The work** (one card per program day, prescribed and done side by side), **Proof**, **Calls**, **File** (links, key rotation, danger zone). A session note is read and marked read, never answered there: Amir answers only on WhatsApp; **Intake** (`#intake`) — coaching applications from the apply form, landed in `hab_intake` (new/handled/archived, the whole questionnaire per card); **Proof** (`#proof`) — the server-scored board, the season, the signup funnel with upgrade flags, and titles minted; **Links** (`#links`) — copyable article/workout deep links.
+- **What it does:** Your private mission control, covering **both** the coached athletes (`program.html` / `session_history`) and the free Proof crew (`habits.html`). Sign in with Google (locked to your coach email). Nine tabs, routed on the URL hash so any screen can be bookmarked: **Today** (`#today`) — on-court count, the roll-call wall with the coach-line composer and hide/show moderation, a needs-you queue, the quest-week lever, and a 7-day Proof pulse; **Athletes** (`#athletes`, `#a/<id>`, `#a/<id>/<sub>`) — one roster across both systems, grouped into *needs you* / *all quiet* with each row stating its reason, plus a per-athlete file split into four sub-tabs: **The work** (one card per program day, prescribed and done side by side), **Proof**, **Calls**, **File** (view their app, their login, the programme file with version history and coaching log, danger zone). A session note is read and marked read, never answered there: Amir answers only on WhatsApp; **Intake** (`#intake`) — coaching applications from the apply form, landed in `hab_intake` (new/handled/archived, the whole questionnaire per card); **Proof** (`#proof`) — the server-scored board, the season, the signup funnel with upgrade flags, and titles minted; **Links** (`#links`) — copyable article/workout deep links, and **+ Publish workout** / **+ Publish article**, which put a Library item on the server; **Exercises** (`#exercises`) — the Spine (`renderExercises()`); **Affiliates** (`#affiliates`) — the codes both apply forms accept; **Testing app** (`#assess`) and **Course** (`#course`) — buyer logins for the two Farsi apps.
 - **The athlete file is a comparison, not an archive.** Its centrepiece is `compareDay()`: for each
   prescribed exercise it puts the plan (`parseChips()` — the same chip grammar `program.html` renders
   from) next to what was logged (`parseSessionLog()` — the plain-text summary `buildSessionData()`
@@ -270,14 +270,14 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   reader of a grammar `program.html` owns** — add a line shape there and it has to be read here too or
   it silently vanishes. `scripts/test_coach_compare.js` pins both halves against real logs; run
   `node scripts/test_coach_compare.js` after touching either.
-- **Reps are never compared, on purpose.** The athlete logs weight, RPE and a tick per set — not reps
-  (see `ex-set-weight` / `loadSetLog` in `program.html`). The dashboard shows sets, load and RPE
-  against the plan and says nothing about reps, because inventing a rep count would be a lie in a
-  tool used to make training decisions.
+- **Reps are compared only where they were logged.** Sets carry reps (`n`) since 2026-09-24;
+  `compareExercise()` shows them and flags sets under the prescribed reps. Older sessions have none,
+  and the dashboard never claims a rep count that was not recorded, because inventing one would be a
+  lie in a tool used to make training decisions.
 - **⚠ It never scores Proof itself.** XP/levels/streaks/day scores are already computed twice (the client in `habits.html` and plpgsql in Supabase) and those two must agree — a third scorer here would be the first to drift. Every Proof number on this page is either a **presence fact** (a day's `hab_log` entry is a non-empty object — the same test `contact_list()` uses) or a value the server returned (`hab_season_level`, `leaderboard_top`, `contact_list`). To show a new Proof number, teach the server to return it.
 - **Preview mode:** `coach.html?demo=1` renders the whole layout against synthetic fixtures — no network, every write a no-op. Use it for design work and screenshots.
-- **If deleted:** You lose the dashboard. Athletes are unaffected — their apps keep working — but you can no longer view progress, mint links, message anyone, post the day's coach line, moderate the wall, or start a quest week from a UI (the SQL editor still does all of the last three).
-- **Depends on:** Supabase (`supabase-js` from a CDN, plus the tables/RPCs in the `supabase/` folder), Google sign-in, `data/<id>.json`, the Spine (`exercises`), `articles/index.json`, `workouts/index.json`, `favicon.ico`. It does **not** use the shared CSS/JS partials — it's self-contained.
+- **If deleted:** You lose the dashboard. Athletes are unaffected — their apps keep working — but you can no longer view progress, create or reset athlete logins, post the day's coach line, moderate the wall, or start a quest week from a UI (the SQL editor still does all of the last three).
+- **Depends on:** Supabase (`supabase-js` from a CDN, plus the tables/RPCs in the `supabase/` folder, `programs` and `library` among them), Google sign-in, the Spine (`exercises`), `assets/js/chips.js` (the chip and `rx` grammar `program.html` mirrors), `favicon.ico`; `data/<id>.json` only as a leftover fallback for an athlete with no `programs` row. It does **not** use the shared CSS or partials.
 - **Edit this when:** You want to change what the dashboard shows, add a panel, or change a coach workflow.
 - **Don't touch:** The Supabase URL/key and the sign-in email check unless you know what they do. `AMIR_ATHLETE_ID` — the board is fetched through Amir's own athlete identity, so `leaderboard_top()` gets a valid key. This page is `noindex` on purpose — keep it that way.
 - **Watch for:** Plan-vs-log matching is by **exercise name**, so a session logged before the program was rewritten shows every prescribed row as *not logged* and the real work under *Logged, not prescribed*. That is honest, and the card says so in as many words when a whole day comes back empty — don't "fix" it by fuzzy-matching names. CSS class collisions. The topbar's `.who` (white, nowrap) once painted the wall's athlete names white-on-white; grid children need `min-width: 0` or one nowrap label scrolls the page sideways on a phone.
@@ -294,17 +294,17 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 #### `proof.html` — The free habit-tracker landing page (public)
 - **What it does:** The page you send people who are not clients. It explains what Proof is, what they'd track, that they'd be on one board with real coaching athletes, and then asks for three things — **display name, email, WhatsApp** — which arrive in your inbox via Web3Forms, same as the apply form. It ends on a soft coaching CTA rather than a hard sell: the tracker *is* the pitch.
 - **It is deliberately not in the nav.** It's the Instagram bio link and the thing you paste in DMs. Adding it to the site menu would put a free product next to the paid one on the front door.
-- **Signing someone up is a skill, not a chore:** paste the signup email at Claude and run [`/proof-signup`](.claude/skills/proof-signup/SKILL.md) — it picks an id, mints the key, records the contact, writes `data/<id>.json` with `"tier": "free"`, ships it, and hands you back a WhatsApp message with the link in it.
-- **If deleted:** No one new can sign up for the free tracker; existing free users are unaffected (their links keep working).
+- **Signing someone up is a skill, not a chore:** paste the signup email at Claude and run [`/proof-signup`](.claude/skills/proof-signup/SKILL.md) — it picks an id, writes their `public.programs` identity row with `athlete.tier: "free"`, records the contact, and has you create their login in coach.html, which copies the WhatsApp message with their username and password.
+- **If deleted:** No one new can sign up for the free tracker; existing free users are unaffected (their logins keep working).
 - **Depends on:** `assets/css/*.css`, `assets/js/shared.js`, partials, Web3Forms (external), and — after signup — `supabase/stage16_contacts.sql`.
-- **Edit this when:** You want to change the pitch, the habits shown, or which fields you ask for. If you change the fields, change the `/proof-signup` skill and `privacy.html` §2.4 with them.
+- **Edit this when:** You want to change the pitch, the habits shown, or which fields you ask for. If you change the fields, change the `/proof-signup` skill and `privacy.html` §2.5 with them.
 - **Don't touch:** The Web3Forms `access_key` (breaks submissions). Never add a field that collects anything you would not want sitting in an email inbox.
 
 #### `privacy.html` — Privacy Notice
 - **What it does:** Your GDPR-compliant privacy statement covering the form, the two apps, the habit tracker and its board, free-tracker signups, analytics, and embedded YouTube.
 - **If deleted:** You break UK/EU law and the link in the footer 404s.
 - **Depends on:** `assets/css/*.css`, `assets/js/shared.js`, partials.
-- **Edit this when:** You change what services you use, change retention periods, or update your contact details. **Any new collection of personal data needs a section here with a lawful basis** — that is what §2.4 is for the `proof.html` signups.
+- **Edit this when:** You change what services you use, change retention periods, or update your contact details. **Any new collection of personal data needs a section here with a lawful basis** — that is what §2.5 is for the `proof.html` signups.
 - **Don't touch:** The structure — the numbered sections are there for legal reasons. If you insert a section, renumber the ones after it (a duplicate `2.5` once shipped this way).
 
 #### `terms.html` — Terms of Use
@@ -322,7 +322,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **What it does:** The single place where colours, fonts, spacing, and sizes are defined. Change a colour here and it updates across every page.
 - **If deleted:** Every page loses its colours, fonts, and spacing. Everything looks broken.
 - **Depends on:** Nothing. It's the foundation.
-- **Edit this when:** You want to change a brand colour (like the yellow accent), swap fonts, or adjust the site's base spacing.
+- **Edit this when:** You want to change a brand colour (like the green accent or the clay second accent), swap fonts, or adjust the site's base spacing.
 - **Don't touch:** The variable names (the part before the colon). Only change the values after the colon.
 
 #### `assets/css/base.css` — Basic styling rules
@@ -381,21 +381,21 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Edit this when:** never on the site. Day-to-day changes go through coach.html's inline editor; a new cycle goes through `/program-assemble`.
 - **See also:** `SCHEMA.md` — the fields a programme can contain; `PROGRAM-APP.md` — how the app's programme features work.
 
-#### `content/index.json` — Read library manifest
-- **What it does:** The table of contents for the Library → Read tab. Lists categories (For Coaches, Pre-Competition, Recovery, Mental, Nutrition, Supplements) and which articles belong to each. The app reads this file to build the Read list instantly, then fetches individual articles on demand.
-- **If deleted:** The Read tab shows nothing.
-- **Depends on:** `program.html` reads it; individual article files in `content/<category>/` are fetched lazily.
+#### `articles/index.json` — Playbook manifest (fallback)
+- **What it does:** Lists categories (For Coaches, Pre-Competition, Recovery, Mental, Nutrition, Supplements) and which articles belong to each. The live Playbook comes from the `library` table (`get_library()`, published from coach.html → Links → + Publish article); this file is the offline fallback and resolves `?article=<id>` links.
+- **If deleted:** `?article=<id>` links stop resolving, and an offline Playbook shows nothing.
+- **Depends on:** `program.html` reads it; individual article files in `articles/<category>/` are fetched lazily.
 - **Edit this when:** You add a new article or create a new category. Always add an entry here alongside the article JSON.
 - **See also:** `SCHEMA.md → "Library tab — Read section"` for the exact format.
 
-#### `content/<category>/*.json` — Article files
+#### `articles/<category>/*.json` — Article files
 - **What it does:** One file per article. Contains the title, read time, and an array of `blocks` (paragraphs, headings, lists, callout boxes, images, and embedded workout cards). Each article is reachable at `program.html?article=<id>` — a shareable public URL.
-- **If deleted:** That article 404s when opened; the card still shows in the list until you also remove it from `content/index.json`.
+- **If deleted:** Its `?article=<id>` link and its offline copy break; the Playbook keeps showing the article until its `library` row is unpublished (`published = false`; coach.html's `toggleLibraryItem()` does it, but no button calls it).
 - **Edit this when:** You're writing a new article or updating an existing one.
 - **See also:** `SCHEMA.md → "Article block types"` for all supported block formats.
 
 #### `workouts/index.json` + `workouts/<category>/*.json` — Train library
-- **What it does:** The manifest and individual session files for the Library → Train tab. Works exactly like the Read library but for on-demand workout sessions. Each workout is reachable at `program.html?workout=<id>`.
+- **What it does:** The manifest and individual session files behind Library → Sessions (the offline fallback for the `library` table). Works exactly like the Playbook's article files but for on-demand workout sessions. Each workout is reachable at `program.html?workout=<id>`.
 - **⚠️ These files are the FALLBACK now, not the source.** The live library is the `library` table, published from coach.html; `ensureLibManifests()` only reads these if that call fails. Keep them in step, but publish through the dashboard.
 - **A session's safety wording lives in its `before` field** (rows of `{label, text}`), drawn by `renderBefore()` in `program.html` as an always-visible **Before you start** card above the collapsible *Why this session* intro. `ws_why_off` (that toggle's memory) is shared by every workout and is three-state since 2026-09-20: a long intro starts closed **only if the session has a `before` card**. `?workout=<id>` links resolve through the database first (`openWorkoutDeepLink()`), so a shared link gets the shelf picture and shows the published copy. Rollout order matters: see `SCHEMA.md` → *Adding a workout*, step 6.
 - **⚠️ Every workout needs a `countsAs`** — `"strength"`, `"mobility"` or `"none"`. It decides which habit **Mark as done** ticks in AA Proof: a real session ticks WORKOUT, a mobility flow or recovery session ticks MOBILITY, a warm-up ticks nothing. Omit it and the workout counts for nothing — safe, but silent. The `/workout` skill covers how to choose; the reasoning is in `supabase/stage28_library_sessions.sql` and `HABITS.md`.
