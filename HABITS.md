@@ -20,7 +20,7 @@ Start here if you're picking this up in a fresh chat.
 >    constants, so retuning XP never breaks them; its **prose** does not, so a change of
 >    *behaviour* means rewriting it by hand;
 > 5. **`privacy.html`** — if you changed what data is stored or shared;
-> 6. **`tourSteps()`** — the five-step tour points a clay box at real controls and says out
+> 6. **`tourSteps()`** — the five-step tour points a box at real controls and says out
 >    loud what each one does. Move a button, rename a tab or change what a tap does and it
 >    is actively lying, on the first screen a new athlete sees.
 
@@ -38,8 +38,8 @@ race each other (see *The leaderboard* for who is on it and how they got there).
 tone is dry and a bit rude — a coach who notices, not a wellness app that congratulates
 you for existing.
 
-It is **not** a messaging channel. There is no chat; coaching conversation stays in
-`program.html`.
+It is **not** a messaging channel. There is no chat; coaching conversation happens on
+WhatsApp, which `program.html` opens.
 
 ---
 
@@ -223,7 +223,7 @@ the reward track from a row inside Progress to the fourth tab. **Settings is not
 it lives behind the athlete's initials at the top-right of the header, and the same button
 becomes the `✕` out of the two overlay screens, **Settings and the manual** (neither is a
 tab, so neither has a tab to press to leave; a habit's detail screen is not an overlay and
-keeps PROGRESS lit). The standalone rank-ladder screen that used to share that exit is
+lights the tab it was opened from). The standalone rank-ladder screen that used to share that exit is
 gone — the ladder is the Locker's road now. The tab bar used to give Settings a quarter of
 the primary navigation for a screen an athlete opens three or four times ever, while the
 social layer — the thing that brings people back daily — was a chip inside a tab named
@@ -235,7 +235,8 @@ after only half of what it held.
 voice** under an inverted composer, **the board as a standings panel**, and counted habits
 as a **segmented meter**. It is the `MEADOW · panels` layer in the CSS: the same MEADOW
 skin, tokens and type (see *Voice*), with no new palette — its only additions are
-`--ink-card` (the inverted surface) and `--danger`.
+`--ink-card` (the inverted surface), `--danger` and `--accent-fill` (the fill under white
+text, darker in dark mode; 2026-09-27).
 
 **Sign out** (NAV-02, 2026-09-27) is the last row in Settings: `signOutAthlete()` existed in
 both apps and nothing called it, so a shared or lent phone meant clearing the browser. Two taps
@@ -275,8 +276,8 @@ The screen they actually live on. **In this order, and the order is the point:**
    percentage each under the card (the day strip, item 3 until then). The first habit you can tick
    moved from 360 px to 261 px at 390 × 844 (it was 466 px at the audit, before PRF-01). Six days are captioned with a
    **narrow weekday letter** and the seventh reads **"Today"** in full (Amir, 2026-08-01): the one
-   caption meant to be *read* rather than scanned, so it drops to 10 px and may sit over its
-   neighbours' spare room. A day you can pick reaches into the gaps and above and below, so its target
+   caption meant to be *read* rather than scanned, so it is bolder, at the letters' 11 px (it was
+   10 px until A11Y-01), and may sit over its neighbours' spare room. A day you can pick reaches into the gaps and above and below, so its target
    is 36 × 58 px at 390 and 26 × 48 px at 320. **The card is a size smaller** with it: the level ring
    74 → 62 px, the streak tile tighter. **The rank's name is fitted** (`fitRankName()`): on a 320–360 px
    phone *CONTENDER* or *UNTOUCHABLE* ran under the streak tile; the name now steps down a pixel at a
@@ -310,7 +311,8 @@ The screen they actually live on. **In this order, and the order is the point:**
 3. ~~**The day strip**~~ — four chips (`THU · FRI · SAT · TODAY`) with a percentage each, until
    PRF-05 (2026-09-27) folded them into the week on the card (above). What they taught still holds
    there: **oldest on the left, today on the RIGHT** (Amir, 2026-08-01; it ran today-first, which put
-   the day you are almost always logging at the far left), and `editableDays()` owns the window.
+   the day you are almost always logging at the far left), and `canLog()` owns the window
+   (`editableDays()` drew the chips and has no caller now).
 4. **The habit list** — tap the **circle** to tick, tap the name for that habit's history, tap
    `+` on counter habits. Each row shows that habit's own level and current streak.
    **The circle is the tick** (PRF-01, 2026-09-27): the emoji sits in a 48 px circle ringed in the
@@ -331,7 +333,7 @@ The screen they actually live on. **In this order, and the order is the point:**
    still visible at any cap. The status line gained the other half of the same fact: a
    counter habit you have not finished reads `5 of 8 glasses · 3 to go` — the position
    *and* the job.
-5. **The nudge** — one clay card whose copy reacts to what is actually missing, drawn at
+5. **The nudge** — one dark card (clay when a streak is at risk) whose copy reacts to what is actually missing, drawn at
    random from a library of **94 lines across 16 situations** (`NUDGES`): one bucket per
    habit, one shared `custom` bucket for habits the athlete added (their ids are made up
    when added, so they have no bucket of their own; until 2026-09-26 they fell through to
@@ -352,8 +354,8 @@ The screen they actually live on. **In this order, and the order is the point:**
    `Content/FRESH-EYES.md`).
 6. **Roll call pointer** — a single row into the CREW tab, shown only while today's
    sentence is unwritten. The composer itself lives in CREW with its feed.
-7. **The recap** — a rolling seven-day block: days on target, XP earned, strongest and
-   weakest habit. The "recap" half.
+7. **The recap** — a rolling seven-day block: days on target, XP earned, and the heat map
+   (see *The seven-day heat map*). The "recap" half.
 8. **The cross-link** back to the training programme.
 
 > **Why the list sits above the commentary.** It used to be hero → nudge → quests →
@@ -366,6 +368,10 @@ The screen they actually live on. **In this order, and the order is the point:**
 
 **Streak at risk** gets one clay strip immediately above the list, rather than being
 said three ways at once (card, day-bar and header flag) as it was before.
+
+**The wins card** (`winsCard()`, PRF-02) sits between the hero and the list while it holds
+anything, until it is tapped, and stands down while a past day is being filled in. What lands
+on it is under *Celebrations* in *How progression works*.
 
 **One-line offers ride between the list and the nudge**, each drawn only when it has
 something to say: the library offer (`renderLibOffer()`, see *Library workouts feed a
@@ -488,7 +494,8 @@ have changed what is measured rather than what is displayed:
   points at protein (*🍗 3 protein meals*) without claiming to measure it. A real
   protein habit is a new tracked thing, not a rename.
 
-Emoji are the one place the app breaks its own rule — there are none anywhere else,
+Emoji were the one place the app broke its own rule (they have since spread to the
+medals, the Settings rows, the board's top three and a habit's 🔥),
 and glyph coverage genuinely varies by platform (🌬 rendered as a mangled box and
 was swapped for 💨). They stay because a list of eight tasks scans faster with them.
 Removing them is one edit to `HABITS[].name`.
@@ -497,8 +504,10 @@ Removing them is one edit to `HABITS[].name`.
 Amir picked the event card out by name and asked for quests to use it — which is right
 beyond the aesthetics: **a quest run and an event are the same object at two lengths** (a
 set of goals, a clock, a reward), and they were drawn as two unrelated things. One card,
-two spans: seven days and twenty-eight. Quests sit *above* events, because the one with
-less time left is the one to act on, and a live card is clay while a finished one is green.
+two spans: seven days and twenty-eight (events have since moved to the milestone row, so the
+card is quests-only: see *"A few weeks"* below). Quests sit *above* events, because the one with
+less time left is the one to act on, and a live card is ringed in the accent while a finished
+one is teal.
 
 **They are no longer on Today.** Today is for logging; a block of week-long targets there
 was commentary sitting above the list and pushed the habits down for something nobody acts
@@ -558,8 +567,8 @@ since the marks — see *How progression works*):
 | `rare` | most people never will | 5 |
 
 One flat list gave a new athlete a single reachable row above nine walls, and gave a
-two-year athlete nothing left to want. Nothing but the Progress screen reads `tier`
-— it is presentation only, which is why adding six milestones needed no new
+two-year athlete nothing left to want. Nothing that scores reads `tier`
+— it is presentation only (Progress's groups, a medal's metal), which is why adding six milestones needed no new
 machinery on either side, just more rows in `ACHIEVEMENTS` **and** in the
 `milestones` array on the `xp_rules` row. ⚠️ Both, or the board pays a different
 number to the phone.
@@ -575,10 +584,10 @@ four groups below as they were (*Show the next three only* folds them again). Th
 (`msTierHeader()`: the label, the count and a chevron, always shown). Groups are
 **open by nature** — closing one is the athlete's choice, not the default — and the
 choice is stored in **`CFG.msOpen`**, keyed by tier, so it survives a reload and a new
-device; a key missing from it reads as open. Collapsed, the whole section is four
-one-line headers plus one line explaining what they're for — **"Complete these
-challenges for rewards — XP, medals and titles, yours for good once you cross the
-line"** — sitting right under the section's own count. (An earlier version started
+device; a key missing from it reads as open. Collapsed (under *All 37 milestones*), the whole
+section is four one-line headers plus one line explaining what they're for — **"Each one pays
+XP, and some a title, yours for good once you cross the line"** (POL-02; it said *challenges*
+and *medals*) — sitting right under the section's own count. (An earlier version started
 closed and kept the state in `UI.msOpen`, forgotten every visit; this file described that
 version until 2026-09-26.)
 
@@ -721,7 +730,7 @@ yet" rather than "this is dead".
 - **Leaving the board hides your lines** immediately, without deleting them. Re-joining
   brings them back.
 
-Written and read in the **CREW** tab, which opens on it.
+Written and read in the **CREW** tab, under *Roll call* (Crew opens on the board since PRF-02).
 
 **The composer is the dark card; every line is its own card** (Amir, 2026-08-01: *"each
 comment has its own card … and i like how your message has a card like the dark blue
@@ -840,7 +849,7 @@ PERSONAL BEST vs ON A RUN and printed a `Best: N.` footer; both were fixed toget
 square, with the rank name in the meta line and the level's progress as a bar under the
 row — three elements for the one fact Today draws as a single object, and none of them
 that object. `habitRing()` renders `.hring`: the same geometry as `.lvring` (r=15.5 in a
-36 viewBox → C≈97.4, so the arc arithmetic is written once), 46px instead of 86, and the
+36 viewBox → C≈97.4, so the arc arithmetic is written once), 46px instead of the hero's 62, and the
 **number only** — no LEVEL caption, no rank name. The bar is not lost information, it is
 the ring: bent around the number it describes.
 
@@ -862,7 +871,8 @@ the streak off the name's line is the split Today already uses: the level anchor
 name, next to nothing that duplicates it. Names fit on one line at 375px.
 
 **Nothing-logged-yet is taught, not reported.** On a log with no days in it the stat grid
-carries one line (`statnote`) defining *badge*, a habit's *own streak*, the *day streak*
+carries one line (`statnote`) defining *milestone* (and a habit's five squares, its
+*consistency tiers*; it said *badge* until POL-02), a habit's *own streak*, the *day streak*
 and *perfect day* — words that were used nowhere else an athlete had been — and it
 disappears at the first logged day. It separates the two streaks by **scope**, not by
 noun: *its own streak* (consecutive days of that one thing) against the *day streak*
@@ -888,15 +898,16 @@ logged, which is precisely the case this exists for.
 
 Its header eyebrow is the habit's **goal**, not `h.source` — most habits are sourced
 `Manual`, so the screen used to announce itself as "MANUAL", which reads as *the manual*
-in Settings. The header's right slot carries the **current run**, not the level, because
+in Settings. The header's right slot carries the habit's **current streak** (*N-DAY STREAK*), not the level, because
 the hero directly beneath it is a 76px level. The **35-day grid marks today** and carries
 a key; without either it was 35 identical squares with no anchor, and the empty leading
 row read as broken rather than as "before you started".
 
-**A note on the habit-row badge.** A row shows the **run** when there is one and the
-level only when there isn't. `LV 10` sat on five of eight rows at once and told you
-nothing at a glance, while the run is the number nobody wants to lose. Levels still
-announce themselves the moment they change, through the flash chip — which is when they
+**A note on the habit-row badge.** A row on Today shows **both**: the level (`LV n`) always
+on the right, and the streak, when there is one, on the status line under the name. They
+used to share one slot (the streak when there was one, the level otherwise), so a habit's
+level vanished the moment it started going well. Levels still
+announce themselves the moment they change, through the flash chip in the level's place — which is when they
 actually matter — and both Progress and the detail screen carry the level permanently.
 
 ### 03 · CREW — everyone else
@@ -907,7 +918,7 @@ they got there, is under *The leaderboard* below.
 **Roll call** is the composer *and* the wall, in that order — you write at the top of the
 feed you are posting to. Behind it: the last seven days of one-sentence entries grouped
 by day, newest first, each line carrying the writer's display name, season rank and that
-day's completion. **Amir's own line leads its day** (clay left border, `YOUR COACH`).
+day's completion. **Amir's own line leads its day** (the dark card, `YOUR COACH`).
 
 The board is the default: where you stand first, Roll call one tap away. (Roll call led
 until 2026-09-27, on the argument that conversation rewards coming back; the wall held 2
@@ -980,12 +991,12 @@ the top of Settings; and Settings → *Locker*. Top to bottom it draws:
 1. **The pass hero** — level ring, rank crest and name, its metal tier with the XP into this
    level, *N of 14 rewards kept*, and a **NEXT ON THE ROAD** button that scrolls the track
    to that reward (*THE ROAD IS CLEARED* once there is none).
-2. **What you have** (it was *Your loadout*) — a preview of the rank card in the equipped skin with the equipped
-   title and **Share it →** into the share picker, then two horizontal rails of what the
+2. **What you have** (it was *Your loadout*) — a preview of the rank card in the equipped skin, the equipped
+   title beside it and **Share it →** into the share picker, then two horizontal rails of what the
    athlete **owns**: *Titles* (level, event and season titles, as metal plates — tap to
    wear, tap again to show none) and *Card skins*.
 3. **Seasons** — the shelf of finished seasons, drawn only once one has closed.
-4. **The pass** — the road: the 10 ranks as gates with the 14 rewards threaded between
+4. **The road** (it was *The pass*) — the 10 ranks as gates with the 14 rewards threaded between
    them, the *YOU ARE HERE* marker at the athlete's exact level, and the star past 50.
    **Folded to the next three rewards** (PRF-02, Amir's 5A, 2026-09-27): the rank you are in,
    the marker and the next three rewards with any rank they cross into, then **The whole road
@@ -1030,7 +1041,7 @@ Swept with PRF-02 (the *built with it* list on its page):
 
 Back used to leave AA Proof from any screen or sheet. Now, while anything is open over Today, there is one
 guard history entry (same URL); Back pops it and `topLayer()` closes what is on top, read straight from `UI`:
-a celebration, the tour (ended, as its own ✕ does), the share card, the install sheet, a log sheet, then
+a celebration, the tour (ended, as its *Skip the tour* does), the share card, the install sheet, a log sheet, then
 Settings or the manual one step at a time (`overlayBack()`, exactly like its ←), a habit's detail back to where
 it was opened, any other tab back to Today, and a past day being filled in back to today. `render()` ends with
 `navSync()`, which arms the guard when something is open and quietly takes it back off when the last thing
@@ -1284,7 +1295,7 @@ each row a door with an icon tile, a name, a line of explanation and its current
 | — | **Profile** — name, `Day N · rank · coached/free`. Tapping it opens the **Locker**, because that is where the rank lives. |
 | Tracking | **Habits & targets** (`N of M add-ons on`) · **Appearance** (`Dark`/`Light`) · **Install on your phone** (only while `installable()`) |
 | How this works | **The tour** · **The manual — how XP works** · **Locker** · **Open your programme** / **See about coaching** |
-| Crew & data | **Crew board** (your board name; `Not yet` for a coached athlete the sweep will list after their first session; `Not joined` otherwise) · **Sync** (live `syncLabel()`, tap to sync now) · **Reset today's log** (destructive, still two-tap armed; it wipes the day picked on Today's week, `AKEY()`, and names it: *Reset yesterday's log* when yesterday is picked. It used to wipe today whatever the strip showed.) |
+| Crew & data | **Crew board** (your board name; `Not yet` for a coached athlete the sweep will list after their first session; `Not joined` otherwise) · **Sync** (live `syncLabel()`, tap to sync now) · **Reset today's log** (destructive, still two-tap armed; it wipes the day picked on Today's week, `AKEY()`, and names it: *Reset yesterday's log* when yesterday is picked. It used to wipe today whatever the strip showed.) · **Sign out** (two-tap, never in the demo or a coach preview; see *The four tabs*) |
 
 Two rows open **sub-screens** rather than navigating: `UI.sub` is `'habits'` or
 `'appearance'`, nothing else reads it, and `go()` clears it on the way out so leaving
@@ -1324,7 +1335,8 @@ two: each of the 10 ranks is a header (crest, tier
 label, level range, XP cost or "CLEARED", and — for the rank you're standing in — a pip
 row showing which of its sub-levels you've cleared), and the reward rows for that level
 range sit right under it. One scroll now shows the ranks ahead, their crests, and every
-title or skin each one hands you, instead of two screens telling the same story twice.
+title or skin each one hands you (folded to the next three rewards since PRF-02; *The whole
+road to level 50* opens the rest), instead of two screens telling the same story twice.
 `TAB_ORDER` (the array that decides which way a tab transition slides) gained `'pass'`
 in the same pass — it had been missing since Locker became a tab, which meant the app
 picked the wrong slide direction into and out of it.
@@ -1352,8 +1364,8 @@ the same rank was the duplication this app keeps finding and removing.
 
 #### Inside the Crew tab
 
-Rows show **movement, not just standing**: a ▲/▼ chip against each name, and a green
-banner when the athlete has overtaken someone — *"You passed Bo and Cy since you last
+Rows show **movement, not just standing**: a ▲/▼ chip against each name, and a banner in
+the accent when the athlete has overtaken someone — *"You passed Bo and Cy since you last
 looked."* The server returns no history, so the last standing is remembered per scope
 on the device (`CFG.lbSeen`) and the next fetch is diffed against it.
 
@@ -1387,7 +1399,7 @@ no signal that there was more than one** — and left to guess. The only real ex
 `renderManual()`, is excellent and sat three taps deep behind an unlabelled monogram with
 nothing anywhere pointing at it.
 
-The tour is a clay box drawn around the thing being named, a card beside it saying what
+The tour is a box in the accent drawn around the thing being named, a card beside it saying what
 that thing does, and everything else dimmed. **Five steps** (PRF-02, Amir's 2A, 2026-09-27; it
 was fifteen, straight after onboarding): **the row** (the circle, `+` and the name, in one sealed
 step), **the week** (fill in a day you missed), **your level and the Locker**, **the board** (the
@@ -1408,21 +1420,22 @@ step names. It runs straight off *Start tracking*, and it is replayable for ever
 - **The dimmer is four mask panes with a real hole, not one lid with a transparent
   window.** A lid still swallows the tap. The hole is what lets a step marked `act` be
   finished by *actually doing the thing* — tapping the real checkbox, opening real
-  Settings. A step you only read gets `.tourblock` dropped into the hole to seal it.
+  Settings. A step you only read gets `.tourblock` dropped into the hole to seal it. Since
+  PRF-02 all five steps are read and sealed; no step is marked `act`.
 - **Targets are resolved live and measured with `getBoundingClientRect()`,** never
-  hard-coded, so the ring cannot drift out of step with a retuned screen. Steps that
-  cannot apply (the `+` step when nothing counter-ish is tracked) are dropped when the
+  hard-coded, so the ring cannot drift out of step with a retuned screen. What cannot
+  apply (the row step's `+` sentence when nothing counter-ish is tracked) is left out when the
   list is built rather than discovered missing halfway through.
 
 **Placement is solved for the ring and the card together**, because the card is up to
 56vh and a 320×568 phone has no arrangement where a naive "draw ring, then fit card"
-does not cover the thing being pointed at. `paintTour()` measures the card first, then
+does not cover the thing being pointed at. `placeTour()` (which `paintTour()` calls) measures the card first, then
 either trims the ring's height to leave room below it, or puts the card above, or — for a
 tall block low on a short screen, like the join box at the foot of Crew — pins the card
 to an edge and trims the ring from the far side. Verified with no overlap and no
 off-viewport card across coached / free / dark / reduced-motion / 320px.
 
-⚠️ **The tour names controls, so it is now a fifth thing that goes out of date.** If you
+⚠️ **The tour names controls, so it is the sixth thing that goes out of date.** If you
 move a control, rename a tab, or change what a tap does, fix `tourSteps()` in the same
 pass — see the sync list at the top of this file.
 
@@ -1445,8 +1458,8 @@ Two kinds, both free to mint, which is the constraint that shapes the whole feat
 coach cannot owe forty people a phone call because forty people were consistent, so
 nothing on this track costs Amir anything to hand over:
 
-- **Titles** — a name the athlete wears. It sits under their rank on Progress and is
-  printed on the rank card they share.
+- **Titles** — a name the athlete wears. It sits beside their rank on the board and the
+  wall, and is printed on the rank card they share.
 - **Cards** — the look of that shareable card. Five grounds (`HOUSE`, `EMBER`,
   `BLUEPRINT`, `NIGHTFALL`, `FLARE`), all painted on the canvas, all inside the palette:
   a treatment changes *structure*, never colour.
@@ -1522,7 +1535,7 @@ function nextReward() { const lv = overallLevel().lv; return PASS_TRACK.find(p =
 ```
 A season reset drops levels to 1 and keeps the shelf, so an athlete rebuilding from level 3
 who already owns everything through level 14 must not have the pass hero announce "NEXT ON
-THE PASS: SIGNED ON" for a title they have worn for months. Both call sites get this for
+THE ROAD: SIGNED ON" for a title they have worn for months. Both call sites get this for
 free from the one function.
 
 **Reward art is the real thing, not a placeholder.** `art()` draws the actual card ground
@@ -1532,7 +1545,7 @@ you the exact thing you have not got, not a generic lock icon standing in for it
 
 **The hero's progress bar measures the current LEG, not the whole climb** — from the last
 reward collected to the next one, so it resets to a fresh 4% the moment a reward is picked
-up rather than crawling from a number that means less every level. `Your loadout` holds only
+up rather than crawling from a number that means less every level. *What you have* holds only
 what is **owned** (titles and skins both), so the road below stays the only place a locked
 thing is ever listed — nothing appears twice.
 
@@ -1555,12 +1568,12 @@ it is presentation over the same `PASS_TRACK`/`ACHIEVEMENTS`/`EVENTS` data.
 
 ### The share picker — five cards, one painter
 
-"Share it" (the Locker's card preview, and the button on every celebration takeover)
+"Share it" (the Locker's card preview, the wins card, and the button on every celebration takeover)
 opens a **sheet**, not a single fixed image. `SHARE_CARDS` in `habits.html` lists five:
 **Rank** (crest, level, title, season stats), **The day** (today's habits ticked — "the
-one that explains itself"), **Streak** (the day streak, poster-loud), **Medal**
-(`latestMedal()` — the newest thing worth showing off: a milestone if one exists,
-otherwise the habit carrying the longest run), and **Month** (the calendar as a grid,
+one that explains itself"), **Streak** (the day streak, poster-loud), **Milestone** (it was
+*Medal* until POL-02; `latestMedal()` — the newest thing worth showing off: a milestone if one exists,
+otherwise the habit on the longest current streak), and **Month** (the calendar as a grid,
 Wrapped-style). Each renders in three formats — Post 4:5, Story 9:16, Square 1:1
 (`SHARE_SIZES`) — and **the preview IS the export**: `paintSharePreview()` calls the
 exact same `buildShareCard()` the Save/Share buttons use, so there is no separate
@@ -1632,7 +1645,7 @@ actually owned; it silently stripped their choice on every single tap, which rea
 switch being broken. Turning a title **off** was never affected — `set_title(null)`
 skips validation entirely, so only the ON direction could ever fail this way, which is
 exactly why it looked one-directional. The toast still fires so the gap is honest
-("the board hasn't seen that unlock yet — it still shows on your own card"); it just no
+("The board has not seen that unlock yet. It still shows on your own card."); it just no
 longer reaches back and un-does the athlete's own choice to make its point.
 
 `syncTitles()` reconciles the server's record back into `owned` on boot and **only ever
@@ -1685,8 +1698,8 @@ check, which no file in `supabase/` holds.
 | BREATHE | 10 min | 20 | Tick |
 | SUPPS | 1 dose | 20 | Vitamin D · creatine · omega-3 |
 
-The **first five are `core`** — always tracked, no off switch (see *CORE vs ADD-ON*
-above). Athletes can switch any of the **add-ons** off and add their own (worth
+The **first five are `core`** — always tracked, no off switch (see *Five core habits, and
+opt-in add-ons* above). Athletes can switch any of the **add-ons** off and add their own (worth
 `customXp`, 25).
 
 ⚠️ **Add-ons default to OFF** (`defaultCfg()`: `on[h.id] = !!h.core`) — they are opt-in,
@@ -1756,7 +1769,7 @@ off today *and* tomorrow; after onboarding, with a logged day, switching one off
 holds it on today and drops it tomorrow, and a returning athlete's old roster entries
 do not move.
 
-**The locked habit says so on that screen**, in clay, under its name: it used to be sold
+**The locked habit says so on that screen**, in grey (POL-02; it was clay), under its name: it used to be sold
 there as the highest-value habit on the list with its switch on and no mention of the
 padlock waiting on the very next screen. The free wording states the lock and stops —
 it does **not** suggest switching it off to reach 100%, because `proof.html` promises the
@@ -1817,7 +1830,7 @@ the formulas and exports only the numbers it has already worked out for that ren
 `qualified` is `dayQualifies(today)`, the same gate a day streak uses, so the card and the
 streak can never disagree about whether today counts.
 
-It is **device-local on purpose**: the sync payload is built explicitly from `cfg`/`log`/`wt`,
+It is **device-local on purpose**: the sync payload is built explicitly from `cfg` and `log`,
 so this never travels, and re-deriving it on another device costs exactly one render. A
 phone that has never opened Proof simply has no snapshot, and the programme app falls back
 to a card with no numbers rather than showing wrong ones. The write is wrapped in a
@@ -1842,8 +1855,8 @@ it only when this app says it is ready. The card stays either way.
   or synced twice, and `program.html` still writes no `<id>_hab_*` key (body weight, which
   it owns, aside). It redraws its card from the snapshot `publishCardSnapshot()` republishes.
 - **What waits for the full app:** `checkLevelUps()` stands down in the strip, so `CFG.seen`
-  does not move and every level-up, reward, perfect day and quest medal is still waiting for
-  its takeover the next time Proof opens. So are the tour, the install offer, the XP flights,
+  does not move and every level-up, reward and quest is still waiting for its takeover, and a
+  medal or a perfect day for the wins card, the next time Proof opens. So are the tour, the install offer, the XP flights,
   the board sweep (`autoJoinBoard()`), the silent reward baseline, title minting, and
   Progress, Crew and the Locker. The toast shows inline under the rows.
 - The strip follows the training app's dark mode (`dark_mode`, then a message on each
@@ -1874,7 +1887,8 @@ since the labels went; it said *Workout* until 2026-09-27).
 Why it's built this way:
 
 - **`program.html` writes nothing into Proof.** It has no habit log, no XP maths, no
-  level formula. Its entire habit footprint is two shortcut cards and a link.
+  level formula. Its entire habit footprint is two shortcut cards, a link, and the strip on
+  its Home, which is Proof itself in a frame (see *Embedded on the training app's Home*).
 - **Proof reads nothing from `program.html`'s storage.** It asks the server.
 - **`program.html` never syncs `<id>_hab_*`.** Those keys share an origin but belong to
   Proof, which merges them conflict-safely; a stale programme app would otherwise
@@ -1985,7 +1999,9 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   earned on the best run ever so breaking a streak never revokes a badge.
 - **Celebrations** (PRF-02, Amir's 1A, 2026-09-27): the whole screen only for a **new overall
   level** (its reward on the same screen), a **new rank**, a **day streak from 7 days**
-  (`STREAK_TAKEOVER`) and a quest completed during a run. A medal, a consistency tier, a habit's
+  (`STREAK_TAKEOVER`), a quest completed during a run and a finished *A few weeks* event (its
+  title); a reward that arrives with no level in the same pass (a rules change, a sync) gets
+  its own too. A medal, a consistency tier, a habit's
   new rank, a perfect day, a comeback and the 3-day streak mark land on **the wins card** under
   Today's hero (`winsCard()`), with the XP the ledger paid, until it is tapped (*Got it*, or
   *Share it*). A made-up athlete's first 22 days: **30 takeovers → 9** (a free athlete 24 → 7),
@@ -2052,7 +2068,8 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
 
 - **`dayPct()` also went pro-rata** (2026-08-02, later the same day, Amir: *"for all the
   habits that have bars to fill... i want that to be added toward their day completion
-  percentage"*). The score half — the header, the day strip, the roll call wall — now gives
+  percentage"*). The score half — the roll call wall and the share cards (the header and the
+  day strip too, until PRF-03 and PRF-05) — now gives
   the same partial credit on a counter that the gate already gave, so the two numbers agree
   on what a near-miss is worth. `isPerfect()` is the backstop for the reason it was binary
   in the first place: a day can read 91% on partial credit without being *perfect*, because
@@ -2066,8 +2083,8 @@ Full detail and every tunable is in **[`XP_SYSTEM.md`](XP_SYSTEM.md)**. The shap
   takeover until PRF-02). It cannot be
   farmed — three dark days forfeit ~750 XP to collect 50 (measured: four straight days pays
   1,400; lapsing three and logging two pays 432). The badges deliberately reward the **week
-  after** rather than the reappearance: BACK IN THE FIGHT (hold 7 days), THE LONG ROAD BACK
-  (21), HARD TO KILL (3 comebacks that stuck), UNSINKABLE (5), plus the **BACKBONE** event
+  after** rather than the reappearance: BACK IN THE FIGHT I (hold 7 days) and II (21), HARD
+  TO KILL I (3 comebacks that stuck) and II (5), plus the **BACKBONE** event
   paying the **UNBOWED** title — the only thing in the app you cannot earn by never
   slipping. ⚠️ The walk reads the **calendar, not the log**, because a lapse is mostly days
   with nothing in them; and a comeback needs a *previous* qualifying day, since you cannot
@@ -2183,7 +2200,7 @@ tap. Two attributes steer the patch:
 **The tick.** Figures marked `data-num` are animated by `syncNumbers()` rather than
 printed (the template only says where the number should *end up*, via `data-to`);
 bars marked `data-fill` grow from zero on first paint and tween on every change
-after; ticking a habit sends a clay `+XP` chip arcing from the row to the level hero
+after; ticking a habit sends a teal `+XP` chip arcing from the row to the level hero
 via `flyXp()`, which then takes the hit; the checkmark is a stroked SVG that draws
 rather than a glyph that appears; and `haptic()` fires on tick, completion, level and
 rank — a no-op on iPhone, since Safari still exposes no vibration at all.
@@ -2198,12 +2215,12 @@ rather than a background that teleports between buttons.
 
 | Thing | What it does |
 |---|---|
-| **Streak ember** | `emberLevel()` — a clay square that breathes from 5 days, faster from 15, and genuinely flickers past 30. The streak stops being a fact and starts being something you don't want to lose. |
+| **Streak ember** | `emberLevel()` — the 🔥 beside a habit's streak (a clay square under the old skin). On the longest streak on the screen it breathes from 3 days, faster from 14, and genuinely flickers from 30: the day-streak marks, since 2026-08-02 (it was 5/15/30). The streak stops being a fact and starts being something you don't want to lose. |
 | **Idle attention** | `armIdle()` — 20s after the last tap, the circle of the most valuable *unlocked* habit still undone starts breathing. Only on Today, never over a sheet or a celebration. |
-| **Streak at risk** | `atRisk()` — after 20:00, if the day doesn't qualify **and there is a real streak on the line**, the day bar goes clay and the nudge changes tone and copy. Gated on `currentDayStreak() > 0` so it threatens something real instead of nagging. |
-| **Typing nudge** | `typeLines()` — the clay card types itself out. |
+| **Streak at risk** | `atRisk()` — after 20:00, if the day doesn't qualify **and there is a real streak on the line**, a clay strip appears above the habit list and the nudge card turns clay and changes its copy. Gated on `currentDayStreak() > 0` so it threatens something real instead of nagging. |
+| **Typing nudge** | `typeLines()` — the nudge card types itself out. |
 | **Grid cascade** | The 35-day grid arrives row by row on an 11ms stagger. |
-| **Board race** | Leaderboard rows stagger in, each with a bar drawn against the leader's score, so the gap is visible rather than arithmetic. |
+| **Board race** | Leaderboard rows stagger in. (Each drew a bar against the leader's score until the board became a panel on 2026-08-01; see *03 · CREW*.) |
 
 > ⚠️ **The typing nudge is a layout trap.** It keeps the untyped remainder in the DOM
 > (invisible) and uses a **zero-width caret**, so the card occupies its final height
@@ -2211,7 +2228,7 @@ rather than a background that teleports between buttons.
 > which shoves everything below it and drags the scroll position with it — that
 > regression cost 25px of scroll drift per tick before it was caught. The element is
 > `data-static` (the renderer must not fight the typer for its text) and keyed by the
-> *line*, so a new nudge replaces the node and retypes while an unchanged one is left
+> *situation* (`nudge().key`), so a new nudge replaces the node and retypes while an unchanged one is left
 > alone.
 
 **Phone manners.** `bindGestures()` binds once per node (the renderer keeps nodes
@@ -2230,7 +2247,7 @@ sheet.
 > forever, clicking a control nobody was touching: the number drained 500 at a time
 > while the athlete watched it.
 
-**Sound** is off unless the athlete turns it on (Settings → Sound). It is *synthesised*,
+**Sound** is off unless the athlete turns it on (Settings → Appearance → Sound). It is *synthesised*,
 not loaded — a short square blip through WebAudio, so it costs no bytes and cannot fail
 to download. It rides inside `haptic()`, so every existing call site gets it for free.
 This is also the only feedback an iPhone actually gets, since Safari exposes no
@@ -2424,7 +2441,7 @@ The athlete's phone is the record; the server is the mirror.
   the cloud had not been told about: un-tick a mis-tap offline, get killed by iOS, and the
   tick came back at the next launch and was re-uploaded as the truth. Nothing in the app
   could remove a wrong tick. The unsent day keys are persisted beside the dirty flag.
-- Settings shows live sync state and a *Sync now* button.
+- Settings shows live sync state on its *Sync* row, and tapping the row syncs now.
 
 **Four sync bugs fixed 2026-08-02, all of them silent:**
 
@@ -2460,9 +2477,10 @@ sides only ever append, so the union is the truth. What they were *wearing* is a
 preference, so the newer config still wins — but never into an empty slot.
 
 Storage keys, all owned solely by Proof: `<id>_hab_cfg` (settings), `<id>_hab_log`
-(the daily log), `<id>_hab_meta` (sync state). They ride the existing `save_progress` /
+(the daily log), `<id>_hab_meta` (sync state, which stays on the phone). The first two ride the existing `save_progress` /
 `get_progress` functions into the same `athlete_progress` row the programme app uses —
-**no tables of its own** except the leaderboard's two. `program.html` explicitly skips
+**no table of its own for the log** (the board, roll call, titles, contacts and seasons have
+theirs: the stages under *The leaderboard*). `program.html` explicitly skips
 these keys when it syncs.
 
 ---
