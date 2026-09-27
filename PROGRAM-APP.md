@@ -706,12 +706,50 @@ header now. Circuits got the same header (line of numbers, note dot) and lost th
 - **The rest screen scrolls** on a short phone instead of cutting the panel off (`.timer-overlay.has-log`),
   and its ring shrinks under 720 px tall.
 
+## ✅ One finish: rate, then Done (WK-04, 2026-09-27)
+
+Before, finishing was two steps on two buttons: **Finish Session ✓** (or **Finish Anyway**) stamped the day,
+then the athlete rated it and had to tap **Send Session Info to Coach**. With no signal that said "Something
+went wrong" and kept nothing, and every extra tap sent another email. Now:
+
+- **The finish card** (`refreshConfirmCard()`) shows from the first logged set, in three states: *In progress ·
+  4 of 11 sets* with a bar and **Finish early**; *All done with Day N* once every set is done; and *Finishing
+  Day N early* after two taps on Finish early (`finishTap()` → `armedTap()`), which lists what is not done and
+  offers **Keep going** (`keepGoing()`). Nothing says "skipped" until the athlete chooses to stop.
+- **Ready or early, the rating and the note sit in that card** (`.finish-rate`, moved between the finish card
+  and the finished card by `moveRatePanel()`) and the button is **Done · send to coach ✓** (`finishDay()`).
+  Done needs the rating (session RPE × minutes is the load coach.html reads): without one it shows a hint and
+  a nudge and finishes nothing. Done locks the clock, stamps `<id>_completed_d<N>`, saves the record
+  (`recordSessionToCloud()`) and sends ONE report (`sendReport()`).
+- **The report waits in an outbox on the phone** (`<id>_outbox`, written raw and skipped by `_snapshot()`, so
+  it never syncs: another phone must never send it again). One entry per session, the day and its finish
+  stamp (`sessOf()`, `isSess()`): an update replaces the session's own entry, and next week's Day 1 never
+  replaces last week's report if it is still waiting. `flushOutbox()` sends it at once, on the `online` event
+  and 2.5 s after boot; a success writes `<id>_sent_d<N>` (when), `<id>_sentsig_d<N>` (the rating and note it
+  carried) and `<id>_senton_d<N>` (the date the session is filed under, which coach.html's `syncGapsOf()`
+  matches against `session_history`: a report can now go days after its session). A rating or note changed while it still waits goes into the waiting report
+  (`refreshPendingReport()`), not a second email.
+- **The finished card says where it is** (`paintSendStatus()`): *Sending to your coach…*; *Saved on your
+  phone. It goes to your coach when you have signal.*; *…It didn't reach your coach yet.* with **Try again**
+  when the service refused it; *✓ With your coach · 10:12 AM*. **Send the update to your coach** shows only
+  when the rating or note changed after the report went (`reportSig()` against `_sentsig_d`). The demo and
+  the coach preview send nothing and say so.
+- **Guided's Finish Session ✓** closes Guided on this card (`stepFinish()`); it never finishes for the athlete.
+- **Reset in the session bar** (Amir, 2026-09-27: *"when you start, its locked in and you cant cancle or
+  reset"*): `.session-timer-reset`, two taps (`armedTap()`), shown once the day has started (its clock inside
+  the 6 h grace, or a logged set) and until it is finished (`paintResetBtn()`); the finished card keeps its own
+  **Reset Session**. Both run `resetDay()`: the clock, the check-in, the ticks, reps and RPEs go; the typed
+  weights, `lw` and the note stay. A report still waiting for the reset session is dropped (an earlier week's
+  still goes), and so is the Rest offer. Done hides the Rest offer too.
+- `confirmSession()` stays for older callers: it finishes when the card is ready, and otherwise asks to finish
+  early, as the button does.
+
 ## 📲 The install ask waits for a finished session (HOME-03, 2026-09-26)
 
 The "Install app" toast (`A2HS` in `assets/js/shared.js`) used to fire 2.5 s after the first sign-in, on
 top of the welcome and over Day 1. `maybeOfferInstall()` in `program.html` now asks only once the athlete
 has finished a session (`hasFinishedASession()`: the history cache, or a finish or send on this phone): on
-a later open, or 1.8 s after a successful **Send Session Info to Coach**. A dismissal is remembered
+a later open, or 1.8 s after the session report reaches the coach (`flushOutbox()`, WK-04). A dismissal is remembered
 (`a2hs_dismissed_v1`), and the toast shows once per page. Its words match the phone: **Install** only when
 the browser offered an install (`beforeinstallprompt`), the menu route when it did not, Share → Add to Home
 Screen on iOS, and "open in Safari/browser" inside WhatsApp, Instagram and the like. AA Proof no longer asks
@@ -721,20 +759,21 @@ a coached athlete to install a second app (HABITS.md → the install offer).
 
 `armedTap(btn, armedLabel, run)` in `program.html`: the first tap arms the button (its label becomes what the
 next tap does, class `armed`, a short vibration), a second tap within 4 s runs the delete, and it disarms by
-itself. **Reset Session** (now under the send status line, 26 px clear of Send, where it used to sit 10 px
-under it), a **body-weight reading** and a **Personal Record** go through it. Finish Anyway and "Delete all my
-weight history" already asked twice with their own code. A delete is still a tombstone underneath
+itself. **Reset Session** (on the finished card, under the send status line), a **body-weight reading** and a
+**Personal Record** go through it, and since WK-04 so do **Finish early** and the session bar's **Reset**.
+"Delete all my weight history" already asked twice with its own code. A delete is still a tombstone underneath
 (`deleteCeilingEntry()`, `saveWeight(d, null)`); only the door changed.
 
 ## 📖 The in-app guide names real controls (CNT-01, 2026-09-26)
 
 The Coach tab's **Using the app** cards are `APP_GUIDE` in `program.html`. Nothing checks them against
 the app, so they drifted: for weeks they said "Finish Workout → Send Data to Coach", that the finish card
-appears "when every exercise is checked off", and "tap the timer icon". What is true on 2026-09-26:
+appears "when every exercise is checked off", and "tap the timer icon". What is true on 2026-09-27:
 
-- The finish card appears at the **first logged set**: "Wrap up Day N early?" with what is left and
-  **Finish Anyway** (two taps), or "All done with Day N?" with **Finish Session ✓** (`refreshConfirmCard()`).
-- Then the session RPE (1–10), an optional note, and **Send Session Info to Coach** (`sendSession()`).
+- The finish card appears at the **first logged set**: *In progress* with the count and **Finish early** (two
+  taps), or *All done with Day N* (`refreshConfirmCard()`).
+- The session RPE (1–10), an optional note, and **Done · send to coach ✓**, which finishes and sends (WK-04,
+  above). **Reset** sits in the session bar once a day has started.
 - The rest timer opens from the **Rest** offer after a tick, or the **Rest ⏱** button under an exercise's sets (WK-02, below).
 
 **Rule:** a PR that renames a button, moves a control or changes when a card appears updates its guide card

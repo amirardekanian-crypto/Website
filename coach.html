@@ -1565,7 +1565,10 @@ function habDaysOf(blob, id) {
 // written, found only because a "Done" pill looked wrong to Amir. Every athlete
 // carries `<id>_sent_d<N>` (an ISO timestamp of the last send for that day), so
 // a send with no matching history row is a session the dashboard is missing.
-// It is the athlete's own record, not a guess.
+// It is the athlete's own record, not a guess. Since WK-04 (2026-09-27) the report
+// can go hours or days after the session (it waits on the phone for signal), so the
+// app also writes `<id>_senton_d<N>`, the date the session is filed under, and that
+// is the date matched; the send's own UTC date is only the fallback for older sends.
 function syncGapsOf(blob, id, sessions) {
   const gaps = [];
   if (!blob) return gaps;
@@ -1582,7 +1585,8 @@ function syncGapsOf(blob, id, sessions) {
     if (k.indexOf(pre) !== 0) return;
     const day = k.slice(pre.length);
     if (!/^\d+$/.test(day)) return;
-    const on = String(blob[k] || '').slice(0, 10);
+    const filed = String(blob[id + '_senton_d' + day] || '');
+    const on = /^\d{4}-\d{2}-\d{2}$/.test(filed) ? filed : String(blob[k] || '').slice(0, 10);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(on)) return;
     if (!have.has(Number(day) + '|' + on)) gaps.push({ day: Number(day), on });
   });

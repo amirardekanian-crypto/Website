@@ -966,7 +966,7 @@
   body[data-dark] .ws-before p b { color: #fff; }
 
   /* Finish bar for a LIBRARY workout. Deliberately not the programme's
-     .send-session-btn: that one emails the coach and closes a programme day.
+     finish card: that one closes a programme day and emails the coach (WK-04).
      This one writes a single row and says what it counted as. */
   .ws-finish { padding: 8px 24px 40px; text-align: center; }
   .ws-done-btn {
@@ -1808,51 +1808,62 @@
      the accent background never lands and a tapped choice looks unselected. */
   body[data-dark] .readiness-opt.selected { background: var(--ice); border-color: var(--ice); }
 
-  /* ── Session Confirm ── */
+  /* ── The finish card (WK-04, 2026-09-27) — see refreshConfirmCard() / finishDay() ──
+     In progress: the day's progress and a quiet "Finish early" (two taps). Ready (every set
+     done, or finishing early): the rating and the note in place, and one Done. Finishing
+     early turns it clay and lists what is left, the one place "not done" is said. */
   .session-confirm {
-    display: none; background: var(--white); border-radius: 8px;
-    padding: 16px 20px; margin-top: 16px; border: 1px solid var(--grey-mid);
-    flex-direction: row; align-items: center; justify-content: space-between;
-    gap: 14px;
+    display: none; background: var(--white); border-radius: 12px;
+    padding: 16px 18px; margin-top: 16px; border: 1px solid var(--grey-mid);
+    flex-direction: column; align-items: stretch; gap: 12px;
   }
   .session-confirm.visible { display: flex; animation: fadeUp 0.3s ease both; }
-  .confirm-body { flex: 1; min-width: 0; }
+  .confirm-body { min-width: 0; }
+  .confirm-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
   .confirm-text {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
-    font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: var(--grey-text);
+    font-size: 15px; letter-spacing: 1px; text-transform: uppercase; color: var(--green-ink);
   }
+  .confirm-count { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 11px; color: var(--grey-text); white-space: nowrap; }
+  .confirm-bar { height: 6px; border-radius: 3px; background: var(--grey-card); overflow: hidden; margin-top: 8px; }
+  .confirm-bar i { display: block; height: 100%; width: 0; background: var(--yellow); border-radius: 3px; transition: width 0.3s ease; }
+  .session-confirm.ready .confirm-bar { display: none; }
+  .finish-rate { display: none; }
+  .session-confirm.ready .finish-rate { display: block; }
+  .session-confirm .complete-rpe { margin-top: 4px; }
+  .finish-hint { font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 14px; color: var(--clay-ink); text-align: center; }
+  .finish-hint:empty { display: none; }
+  .complete-rpe-buttons.nudge { animation: rpeNudge 0.4s ease; }
+  @keyframes rpeNudge { 0%, 100% { transform: none; } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .confirm-foot { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
   .confirm-btn {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
-    font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
-    background: var(--yellow); color: var(--on-accent);
-    border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; white-space: nowrap;
+    font-size: 14px; letter-spacing: 1px; text-transform: uppercase;
+    background: transparent; color: var(--grey-text); border: 1px solid var(--grey-mid);
+    min-height: 44px; padding: 0 18px; border-radius: 8px; cursor: pointer; white-space: nowrap;
     transition: background 0.15s ease, color 0.15s ease;
   }
-
-  /* Partial state — a soft clay wash so it reads as "heads up", not "go".
-     (It was amber until 2026-09-26; the brand has no yellow or gold.) The text
-     is a deeper clay (#A8431F, 6:1 on white) because plain clay is 4.4:1. */
-  .session-confirm.partial {
-    flex-direction: column; align-items: stretch;
+  .confirm-btn.armed { background: #C7552F; color: #fff; border-color: #C7552F; animation: armPulse 1s ease infinite; }
+  .session-confirm.ready .confirm-foot { flex-direction: column-reverse; align-items: stretch; }
+  .session-confirm.ready .confirm-btn {
+    width: 100%; min-height: 52px; font-size: 17px; letter-spacing: 1.2px;
+    background: var(--yellow); color: var(--on-accent); border-color: var(--yellow);
+  }
+  .confirm-back { background: none; border: 0; min-height: 44px; padding: 0 8px; cursor: pointer;
+    font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 14px; color: var(--grey-text); text-decoration: underline; }
+  .confirm-back[hidden] { display: none; }
+  /* Finishing early — a soft clay wash so it reads as "heads up", not "go". (It was amber
+     until 2026-09-26; the brand has no yellow or gold.) Deeper clay text, #A8431F, 6:1. */
+  .session-confirm.early {
     border-color: rgba(199,85,47,0.45);
     background: linear-gradient(180deg, rgba(199,85,47,0.07), var(--white));
   }
-  .session-confirm.partial .confirm-text { color: #A8431F; }
-  .session-confirm.partial .confirm-btn {
-    background: transparent; color: #A8431F;
-    border: 1px solid rgba(168,67,31,0.5);
-  }
-  .session-confirm.partial .confirm-btn.arming {
-    background: #C7552F; color: #fff; border-color: #C7552F;
-    animation: armPulse 1s ease infinite;
-  }
-  body[data-dark] .session-confirm.partial .confirm-text,
-  body[data-dark] .session-confirm.partial .confirm-btn,
-  body[data-dark] .session-confirm.partial .confirm-missing-tag { color: #E06B43; }
-  body[data-dark] .session-confirm.partial .confirm-btn { border-color: rgba(224,107,67,0.5); }
-  body[data-dark] .session-confirm.partial .confirm-btn.arming { color: #fff; background: #C7552F; border-color: #C7552F; }
+  .session-confirm.early .confirm-text { color: #A8431F; }
+  body[data-dark] .session-confirm.early .confirm-text,
+  body[data-dark] .session-confirm.early .confirm-missing-tag { color: #E06B43; }
+  body[data-dark] .confirm-bar { background: #2a2a2a; }
   .confirm-missing { display: none; margin-top: 10px; }
-  .session-confirm.partial .confirm-missing { display: block; }
+  .session-confirm.early .confirm-missing { display: block; }
   .confirm-missing-label {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
     font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
@@ -1873,6 +1884,13 @@
     font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
     color: #A8431F; white-space: nowrap;
   }
+  /* The session bar's Reset (Amir, 2026-09-27): once the day has started, until it is finished. */
+  .session-timer-reset { flex: none; min-height: 44px; padding: 0 14px; border-radius: 8px; cursor: pointer;
+    background: transparent; border: 1px solid var(--grey-mid); color: var(--grey-text);
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+  .session-timer-reset[hidden] { display: none; }
+  .session-timer-reset.armed { background: #C7552F; border-color: #C7552F; color: #fff; }
+  body[data-dark] .session-timer-reset:not(.armed) { border-color: #444; color: #aaa; }
   @keyframes armPulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(199,85,47,0.55); }
     50%      { box-shadow: 0 0 0 8px rgba(199,85,47,0); }
@@ -3507,7 +3525,7 @@
      overlapping its bottom edge. Decorative only: alt="" and aria-hidden, no
      text over it, and the card's own padding is cancelled so it runs edge to
      edge. scroll-margin-top keeps the sticky session timer off the band when
-     confirmSession() scrolls the card into view. */
+     finishDay() scrolls the card into view. */
   .session-complete { overflow: hidden; scroll-margin-top: 84px; }
   body.is-demo .session-complete { scroll-margin-top: 128px; }
   .complete-art { position: relative; margin: -36px -24px 0; aspect-ratio: 5 / 2; max-height: 150px; background: #122A22; overflow: hidden; }
@@ -3630,6 +3648,14 @@
   }
   .send-session-status.success { color: var(--green-ink); }
   .send-session-status.error   { color: #E74C3C; }
+  /* Where the report is (paintSendStatus(), WK-04): with the coach, sending, or waiting on
+     the phone for signal. Big enough to read at a glance: it is the answer to "did it go?". */
+  .complete-actions .send-session-status { font-size: 15px; font-weight: 600; }
+  .send-session-status.pending { color: var(--clay-ink); }
+  .send-retry { margin-left: 6px; min-height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--ice); background: transparent;
+    color: var(--clay-ink); font-family: 'Barlow', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .send-session-btn[hidden] { display: none; }
+  .complete-rate-slot .finish-rate { display: block; margin-top: 8px; }
   .complete-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 36px; color: var(--green-ink); text-transform: uppercase; line-height: 1; margin-bottom: 6px; }
   .complete-sub { font-size: 13px; color: var(--grey-text); font-weight: 300; margin-bottom: 20px; }
   .reset-session-btn.armed { color: #C7552F; border-color: #C7552F; }
@@ -4878,6 +4904,9 @@ function _snapshot() {
     if (k === 'spinecache' || k === prefix + 'spinecache') continue;
     // The Quality Map's offline copy of get_qualities(): a cache too.
     if (k === 'qualcache' || k === prefix + 'qualcache') continue;
+    // The report outbox (WK-04): a report waiting to be emailed from THIS phone. Synced,
+    // another phone would send it a second time.
+    if (k === prefix + 'outbox') continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
   // When this snapshot's data was last edited on this device. syncFromCloud
@@ -5066,7 +5095,7 @@ function staleCloudPlan(data, prefix) {
     if (k.indexOf(prefix) !== 0) return;
     const rel = k.slice(prefix.length);
     // Exactly the per-day keys autoResetStaleDays() owns.
-    const dm = rel.match(/^(?:completed_d|daynote_|srpe_|sent_d|timer_|readiness_|touched_d)(\d+)$/);
+    const dm = rel.match(/^(?:completed_d|daynote_|srpe_|sent_d|sentsig_d|senton_d|timer_|readiness_|touched_d)(\d+)$/);
     if (dm && over[dm[1]]) { plan.skip.add(k); return; }
     // A timer/readiness for a day with no completed stamp at all still carries its
     // own date — a session abandoned last week must not come back running.
@@ -5278,7 +5307,7 @@ function setupCloudBackup(athleteId, data, key) {
   window.addEventListener('pagehide', () => _pushSnapshot(true));
   // Connection back after offline logging → push what the gym couldn't send. A run
   // that has not pulled yet (REL-01) pulls first and pushes after: _resumeSync().
-  window.addEventListener('online', () => { if (_sbHold) _resumeSync(); else _pushSnapshot(true); });
+  window.addEventListener('online', () => { if (_sbHold) _resumeSync(); else _pushSnapshot(true); flushOutbox(); });
 }
 
 // ── Cloud-session retry queue ──────────────────────────────────────────
@@ -5305,7 +5334,7 @@ function _enqueueSession(base) {
   } catch (e) {}
 }
 async function _replayQueue() {
-  // IS_PREVIEW is checked here and not only at boot: sendSession() drains the
+  // IS_PREVIEW is checked here and not only at boot: flushOutbox() drains the
   // queue too, and coach preview runs under Amir's own sign-in, which
   // save_session accepts — a replay there would write into the athlete's record.
   if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
@@ -5773,8 +5802,9 @@ const ERROR_ICONS = {
   isLoading = false;
   paintWeek();   // pills, suggested day and the week's count (HOME-01)
   paintUnfinished();   // "Tuesday's Day 2 was never sent" (DATA-02)
+  setTimeout(flushOutbox, 2500);   // a report left waiting for signal goes now (WK-04)
   // restoreState() ran updateProgress() while isLoading was still true, which
-  // suppresses the Finish Session card. Re-run it now so users who closed the
+  // suppresses the finish card. Re-run it now so users who closed the
   // page after checking the last set still see the prompt when they return.
   Object.keys(dayTotals).forEach(d => updateProgress(d));
 
@@ -6978,6 +7008,7 @@ function renderHome() {
       <div class="session-timer-actions">
         <button type="button" class="session-timer-btn" onclick="toggleSessionTimer('${day.id}')">Start ▶</button>
         ${hasStandard ? `<button type="button" class="session-timer-btn guided" onclick="openGuided('${day.id}')">Guided ▶</button>` : ''}
+        <button type="button" class="session-timer-reset" hidden onclick="armedTap(this, 'Tap again', () => resetDay('${day.id}'))">Reset</button>
       </div>
     </div>`;
     // Today's targets: filled by paintToday() after a lower-day check-in (REC-2).
@@ -6999,17 +7030,43 @@ function renderHome() {
       });
     });
 
-    // RPE + coach note both live INSIDE the completion card (revealed after Finish)
+    // The rating and the note live in the finish card until Done, then in the finished card
     const noteKey   = ATHLETE_ID + '_daynote_' + day.id;
     const sRpeKey   = ATHLETE_ID + '_srpe_'    + day.id;
     const savedNote = localStorage.getItem(noteKey) || '';
 
+    // ONE FINISH (WK-04, 2026-09-27): from the first logged set this card shows the day's
+    // progress; when every set is done (or "Finish early" is confirmed) it asks the rating
+    // and the note in place, and ONE button, Done, locks the clock, saves the session and
+    // sends it to the coach. It used to be Finish, then a separate Send that emailed again
+    // on every tap. The rating panel (.finish-rate) moves into the finished card on Done.
     html += `<div class="session-confirm" id="confirm-${day.id}">
       <div class="confirm-body">
-        <span class="confirm-text">All done with Day ${day.id}?</span>
+        <div class="confirm-top"><span class="confirm-text">In progress</span><span class="confirm-count"></span></div>
+        <div class="confirm-bar" aria-hidden="true"><i></i></div>
         <div class="confirm-missing"></div>
       </div>
-      <button class="confirm-btn" onclick="confirmSession('${day.id}')">Finish Session ✓</button>
+      <div class="finish-rate">
+        <div class="complete-rpe">
+          <div class="complete-rpe-label">How hard was this session?</div>
+          <div class="complete-rpe-hint">1 = very easy · 10 = maximum effort</div>
+          <div class="complete-rpe-buttons" data-key="${sRpeKey}">
+            ${[1,2,3,4,5,6,7,8,9,10].map(n =>
+              `<button type="button" class="complete-rpe-btn" data-rpe="${n}">${n}</button>`
+            ).join('')}
+          </div>
+        </div>
+        <div class="complete-note">
+          <div class="complete-note-label">Notes for Coach (optional)</div>
+          <textarea class="complete-note-input" data-key="${noteKey}" placeholder="How it went, anything that felt off…">${esc(savedNote)}</textarea>
+          ${waInlineHtml(coachWhatsAppUrl('About Day ' + day.id + ': '), 'Ask me on WhatsApp', 'Pain, a swap, a question: I answer there, not in the app. Your note comes along.', 'this.href=sessionWaUrl(\'' + day.id + '\')')}
+        </div>
+      </div>
+      <div class="finish-hint" aria-live="polite"></div>
+      <div class="confirm-foot">
+        <button type="button" class="confirm-btn" onclick="finishTap('${day.id}', this)">Finish early</button>
+        <button type="button" class="confirm-back" hidden onclick="keepGoing('${day.id}')">Keep going</button>
+      </div>
     </div>`;
     html += `<div class="session-complete" id="complete-${day.id}">
       <div class="complete-art" id="complete-art-${day.id}" hidden aria-hidden="true"></div>
@@ -7022,23 +7079,12 @@ function renderHome() {
         <span class="complete-habit-mark">✓</span>
         <span class="complete-habit-text">Counts as your Workout habit <b>·&nbsp;open tracker</b></span>
       </button>
-      <div class="complete-rpe">
-        <div class="complete-rpe-label">How hard was this session?</div>
-        <div class="complete-rpe-hint">1 = very easy · 10 = maximum effort</div>
-        <div class="complete-rpe-buttons" data-key="${sRpeKey}">
-          ${[1,2,3,4,5,6,7,8,9,10].map(n =>
-            `<button type="button" class="complete-rpe-btn" data-rpe="${n}">${n}</button>`
-          ).join('')}
-        </div>
-      </div>
-      <div class="complete-note">
-        <div class="complete-note-label">Notes for Coach (optional)</div>
-        <textarea class="complete-note-input" data-key="${noteKey}" placeholder="How it went, anything that felt off…">${esc(savedNote)}</textarea>
-        ${waInlineHtml(coachWhatsAppUrl('About Day ' + day.id + ': '), 'Ask me on WhatsApp', 'Pain, a swap, a question: I answer there, not in the app. Your note comes along.', 'this.href=sessionWaUrl(\'' + day.id + '\')')}
-      </div>
       <div class="complete-actions">
-        <button class="send-session-btn" onclick="sendSession('${day.id}')">Send Session Info to Coach</button>
-        <div class="send-session-status" id="send-status-${day.id}"></div>
+        <div class="send-session-status" id="send-status-${day.id}" aria-live="polite"></div>
+      </div>
+      <div class="complete-rate-slot"></div>
+      <div class="complete-actions">
+        <button class="send-session-btn" hidden onclick="sendReport('${day.id}')">Send the update to your coach</button>
         <button class="reset-session-btn" onclick="armedTap(this, 'Tap again to reset', () => resetDay('${day.id}'))">Reset Session</button>
       </div>
     </div>`;
@@ -7914,9 +7960,9 @@ const APP_GUIDE = [
     body: `<p>Open <strong>Home</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
-    body: `<p>As soon as you log your first set, a card appears at the bottom of the session. Until every set is done it reads <strong>Wrap up early?</strong> and lists what's left; once everything is done it reads <strong>All done?</strong>. Tap <strong>Finish Session ✓</strong>, or <strong>Finish Anyway</strong> to stop early (it asks for a second tap, so a stray one can't end your session).</p><p>Then rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Send Session Info to Coach</strong>.</p><p><strong>Don't skip this step.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
+    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal; the card says where it is. In <strong>Guided</strong> mode, <strong>Finish Session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. The card lists what's not done; rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Change the rating or the note after Done and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> in the bar at the top of the session (tap it twice) clears the clock, the check-in, your ticks and your RPEs. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
-    body: `<p><strong>Every session</strong> → finish it and tap <strong>Send Session Info to Coach</strong> (above).</p><p><strong>Every Sunday</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
+    body: `<p><strong>Every session</strong> → rate it and tap <strong>Done</strong> (above).</p><p><strong>Every Sunday</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app — full-screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
@@ -9622,49 +9668,64 @@ function getDayCompletion(day) {
   return { done, total, missing, excused };
 }
 
-// Repaint the bottom confirm card based on the day's current completion state.
-// Two visual states:
-//   - full: "All done with Day X?" + "Finish Session ✓"
-//   - partial: "Wrap up Day X early?" + list of unfinished items + "Finish Anyway"
-// Also stores done/total on the card's dataset so confirmSession() can read
-// them on tap (instead of recomputing).
+// Repaint the finish card from the day's completion (WK-04). Three states:
+//   - in progress: "In progress", the count and the bar, and "Finish early"
+//   - ready (every set done): "All done with Day X", the rating, the note and Done
+//   - early (two taps on Finish early): the same, plus the list of what is not done
+// Also stores done/total on the card's dataset.
 function refreshConfirmCard(day, status) {
   const card = document.getElementById('confirm-' + day);
   if (!card) return;
   status = status || getDayCompletion(day);
   const { done, total, missing } = status;
   const isFull = total > 0 && done === total;
+  // Progress, never "skipped", until the athlete chooses to finish early (WK-04).
+  const early = !isFull && card.dataset.early === '1';
+  const ready = isFull || early;
 
-  card.classList.toggle('partial', !isFull);
+  card.classList.toggle('partial', !ready);
+  card.classList.toggle('ready', ready);
+  card.classList.toggle('early', early);
   card.dataset.done  = done;
   card.dataset.total = total;
 
-  const text   = card.querySelector('.confirm-text');
+  card.querySelector('.confirm-text').textContent =
+    isFull ? `All done with Day ${day}` : early ? `Finishing Day ${day} early` : 'In progress';
+  card.querySelector('.confirm-count').textContent = `${done} of ${total} sets`;
+  card.querySelector('.confirm-bar i').style.width = (total ? Math.round(done / total * 100) : 0) + '%';
   const missEl = card.querySelector('.confirm-missing');
-  const btn    = card.querySelector('.confirm-btn');
-
-  if (isFull) {
-    text.textContent = `All done with Day ${day}?`;
-    missEl.innerHTML = '';
-    btn.textContent = 'Finish Session ✓';
-  } else {
-    text.textContent = `Wrap up Day ${day} early?`;
-    const lis = missing.map(m =>
-      `<li><span class="confirm-missing-name">${esc(m.name)}</span>` +
-      `<span class="confirm-missing-tag">${esc(m.label)}</span></li>`
-    ).join('');
-    const label = `${missing.length} unfinished · ${done}/${total} sets done`;
-    missEl.innerHTML =
-      `<div class="confirm-missing-label">${esc(label)}</div><ul>${lis}</ul>`;
-    btn.textContent = 'Finish Anyway';
-  }
-  // Always reset any previous "armed" state when we repaint.
-  btn.classList.remove('arming');
-  if (window['_armT_' + day]) {
-    clearTimeout(window['_armT_' + day]);
-    delete window['_armT_' + day];
-  }
+  missEl.innerHTML = early
+    ? `<div class="confirm-missing-label">Not done</div><ul>${missing.map(m =>
+        `<li><span class="confirm-missing-name">${esc(m.name)}</span><span class="confirm-missing-tag">${esc(m.label)}</span></li>`).join('')}</ul>`
+    : '';
+  const btn = card.querySelector('.confirm-btn');
+  if (btn.dataset.armed !== '1') btn.textContent = ready ? 'Done · send to coach ✓' : 'Finish early';
+  const back = card.querySelector('.confirm-back');
+  if (back) back.hidden = !early;
+  if (!ready) { const h = card.querySelector('.finish-hint'); if (h) h.textContent = ''; }
 }
+
+// The card's one button. Ready: Done (finishDay()). In progress: "Finish early", which
+// takes two taps (armedTap(), LOG-02) and then asks the rating, showing what is left.
+function finishTap(day, btn) {
+  const card = document.getElementById('confirm-' + day);
+  if (!card) return;
+  if (card.classList.contains('ready')) { finishDay(day); return; }
+  armedTap(btn, 'Tap again to finish early', () => {
+    card.dataset.early = '1';
+    refreshConfirmCard(day);
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+}
+// Changed their mind about finishing early: back to the session.
+function keepGoing(day) {
+  const card = document.getElementById('confirm-' + day);
+  if (!card) return;
+  delete card.dataset.early;
+  refreshConfirmCard(day);
+}
+window.finishTap = finishTap;
+window.keepGoing = keepGoing;
 
 // Set-aware progress: drives the day-tab pill, the side rail v-fill, and the
 // bottom confirm card. The confirm card now shows whenever ANY work is logged
@@ -9721,6 +9782,7 @@ function foldWhenDone(card, openStrips) {
 function updateProgress(day) {
   const status = getDayCompletion(day);
   paintDoneLines(day);
+  paintResetBtn(day);
   const { done, total } = status;
   if (!total) return;
 
@@ -9825,7 +9887,7 @@ function startTimerNow(day) {
   // open the guided view it was waiting to show.
   if (window._pendingGuidedDay === day) { window._pendingGuidedDay = null; openStepMode(day); }
 }
-// Called when the athlete hits "Finish Session" — locks the duration in.
+// Called by Done (finishDay()) — locks the duration in.
 function finishTimer(day) {
   let t = loadTimer(day);
   if (!t || t.finished) return;
@@ -9862,6 +9924,7 @@ function renderTimer(day) {
     btn.textContent = 'Start ▶';
     labelEl.textContent = 'Ready when you are';
   }
+  paintResetBtn(day);
 }
 // Single shared 1s tick updates every running timer's display.
 let _timerTick = null;
@@ -10261,48 +10324,50 @@ function setAsWritten(day, on) {
 }
 window.setAsWritten = setAsWritten;
 
+// Kept for its callers (older code, tests): finishes when the card is ready, otherwise
+// asks to finish early, exactly as the button does.
 function confirmSession(day) {
   const card = document.getElementById('confirm-' + day);
-  const btn  = card.querySelector('.confirm-btn');
-  const isPartial = card.classList.contains('partial');
+  if (!card) return;
+  if (card.classList.contains('ready')) { finishDay(day); return; }
+  card.dataset.early = '1';
+  refreshConfirmCard(day);
+}
 
-  // Partial finishes get a two-tap pattern: first tap arms the button, second
-  // tap (within 4s) commits. This is gentler than a modal but still avoids
-  // accidental "Finish Anyway" taps when the athlete only meant to scroll.
-  if (isPartial && !btn.classList.contains('arming')) {
-    btn.classList.add('arming');
-    btn.dataset.originalText = btn.textContent;
-    btn.textContent = 'Tap again to confirm';
-    if (window['_armT_' + day]) clearTimeout(window['_armT_' + day]);
-    window['_armT_' + day] = setTimeout(() => {
-      btn.classList.remove('arming');
-      btn.textContent = btn.dataset.originalText || 'Finish Anyway';
-      delete window['_armT_' + day];
-    }, 4000);
+// Done (WK-04): rate, then done. Locks the session clock, stamps the day finished,
+// saves the session record and sends the report to the coach, once. The rating is the
+// one thing it needs (session RPE × minutes is the training load coach.html reads).
+function finishDay(day) {
+  const card = document.getElementById('confirm-' + day);
+  if (!card) return;
+  const hint = card.querySelector('.finish-hint');
+  if (!(localStorage.getItem(ATHLETE_ID + '_srpe_' + day) || '')) {
+    if (hint) hint.textContent = 'Rate the session first: 1 to 10.';
+    const g = card.querySelector('.complete-rpe-buttons');
+    if (g) { g.classList.remove('nudge'); void g.offsetWidth; g.classList.add('nudge'); }
+    if (navigator.vibrate) navigator.vibrate([10, 40, 10]);
     return;
   }
-
-  if (window['_armT_' + day]) {
-    clearTimeout(window['_armT_' + day]);
-    delete window['_armT_' + day];
-  }
-  btn.classList.remove('arming');
-
+  if (hint) hint.textContent = '';
+  const st = getDayCompletion(day);
+  const isPartial = st.done < st.total;
+  delete card.dataset.early;
   card.classList.remove('visible');
+  hideRestOffer();                       // no rest offer left over a finished day
   // Lock in the session duration the moment they finish.
   finishTimer(day);
-  // Reveal the completion card (now contains the RPE prompt + coach note + Send button).
+  localStorage.setItem(ATHLETE_ID + '_completed_d' + day, stampCompleted());
+  moveRatePanel(day, true);
   const completeEl = document.getElementById('complete-' + day);
   // The picture is the reward for finishing the session, so a partial finish
   // keeps the plain card (Amir, 2026-09-19).
   if (!isPartial) paintFinishArt(day);
   completeEl.classList.add('visible');
   completeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  localStorage.setItem(ATHLETE_ID + '_completed_d' + day, stampCompleted());
-  // Record a permanent session to the coach dashboard the moment the day is
-  // finished (full OR partial) — no "send to coach" tap required. Send/email is
-  // unchanged; this just also captures completions the athlete doesn't send.
+  // The record for the coach dashboard, and the report, once (the outbox keeps it
+  // until it goes: sendReport()).
   recordSessionToCloud(day);
+  sendReport(day);
   // recordSessionToCloud() above already told the server this session happened.
   // The habit tracker reads that record itself — this app writes nothing into
   // Proof's space — so all we do here is say so.
@@ -10325,7 +10390,193 @@ function confirmSession(day) {
       }
     }
   }
+  paintResetBtn(day);
   markSuggestedDay();
+}
+window.finishDay = finishDay;
+
+// The rating and the note sit in the finish card until Done, then in the finished card,
+// where they can still be changed (a change updates the record; "Send the update"
+// appears only when something changed after the report went).
+function moveRatePanel(day, toFinished) {
+  const panel = document.querySelector(`#confirm-${day} .finish-rate, #complete-${day} .finish-rate`);
+  if (!panel) return;
+  if (toFinished) {
+    const slot = document.querySelector(`#complete-${day} .complete-rate-slot`);
+    if (slot && panel.parentElement !== slot) slot.appendChild(panel);
+  } else {
+    const card = document.getElementById('confirm-' + day);
+    const foot = card && card.querySelector('.finish-hint');
+    if (foot && panel.parentElement !== card) card.insertBefore(panel, foot);
+  }
+}
+
+// ── The report's way to the coach: an outbox on this phone (WK-04) ──
+// The report used to be one fetch from the Send button: no signal meant "Something
+// went wrong" and nothing kept it, and every extra tap sent another email. Now Done puts
+// it in an outbox (<id>_outbox, never synced, so another phone can never send it again)
+// and flushOutbox() sends it, now, when the signal comes back, and at the next open. One
+// entry per session (the day and its finish stamp, sessOf()): "Send the update" replaces
+// the session's own entry, and next week's Day 1 never replaces last week's. The finished
+// card says where it is (paintSendStatus()).
+const WEB3FORMS_KEY = 'efc57e0c-997d-4d71-b07a-71c8268ec668';   // the same key form.html uses
+function outboxKey() { return ATHLETE_ID + '_outbox'; }
+function loadOutbox() {
+  try { const q = JSON.parse(localStorage.getItem(outboxKey()) || '[]'); return Array.isArray(q) ? q : []; }
+  catch (e) { return []; }
+}
+function saveOutbox(q) {
+  try { if (q.length) _lsRawSet(outboxKey(), JSON.stringify(q)); else _lsRawRemove(outboxKey()); }
+  catch (e) { /* storage full: the report still goes now if it can */ }
+}
+// Which session a report belongs to: the day's finish stamp (a date and the programme).
+function sessOf(day) { return localStorage.getItem(ATHLETE_ID + '_completed_d' + day) || ''; }
+function isSess(x, day, sess) { return String(x.day) === String(day) && (x.sess || '') === sess; }
+// What the athlete can still change after Done: the rating and the note.
+function reportSig(day) {
+  return (localStorage.getItem(ATHLETE_ID + '_srpe_' + day) || '') + '|' + (localStorage.getItem(ATHLETE_ID + '_daynote_' + day) || '');
+}
+// The report's fields, the same summary the coach has always had by email.
+function reportFields(day) {
+  const D = buildSessionData(day);
+  if (!D) return null;
+  const { dayData, dayNote, isPartial, statusLabel, durMin, hasDur, auLoad, readinessField, summary } = D;
+  const sRpe = localStorage.getItem(ATHLETE_ID + '_srpe_' + day) || '';
+  const who = `${DATA.athlete.firstName} ${DATA.athlete.lastName}`;
+  const f = {
+    from_name: `${who} — Session Report`,
+    // Tagged, so a partial session is obvious in the inbox list before it is opened.
+    subject: `Session Report${isPartial ? ' [Partial]' : ''} · ${who} · Day ${day}`,
+    'Athlete': who,
+    'Day': `Day ${day}${dayData.focusTag ? ' — ' + dayData.focusTag : ''}`,
+    'Status': statusLabel,
+    'Session RPE': sRpe ? sRpe + '/10' : '(not rated)'
+  };
+  if (hasDur) { f['Duration'] = durMin + ' min'; f['Session Load (AU)'] = String(auLoad); }
+  if (readinessField) f['Readiness'] = readinessField;
+  f['Notes from athlete'] = dayNote || '(none)';
+  f['Full summary'] = summary;
+  return f;
+}
+async function sendReport(day) {
+  if (window.IS_DEMO || window.IS_PREVIEW) { paintSendStatus(day); return; }
+  const fields = reportFields(day);
+  if (!fields) return;
+  const sess = sessOf(day);
+  const q = loadOutbox().filter(x => !isSess(x, day, sess));   // one report per session
+  // `on`: the date the session is filed under (sessionDateFor()), written with the send so
+  // coach.html matches the report to its session_history row even when it went days later.
+  q.push({ day: String(day), sess, on: sessionDateFor(day), at: Date.now(), sig: reportSig(day), fields });
+  saveOutbox(q);
+  paintSendStatus(day);
+  await flushOutbox();
+}
+// The rating or the note changed while the report still waits on this phone: the waiting
+// report takes the change (it has not gone, so there is no "update" to send).
+function refreshPendingReport(day) {
+  const sess = sessOf(day);
+  if (!sess) return;
+  const q = loadOutbox(), it = q.find(x => isSess(x, day, sess));
+  if (!it || it.sig === reportSig(day)) return;
+  const fields = reportFields(day);
+  if (!fields) return;
+  it.fields = fields; it.sig = reportSig(day);
+  saveOutbox(q);
+}
+let _flushing = false;
+async function flushOutbox() {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || _flushing) return;
+  const q = loadOutbox();
+  if (!q.length) return;
+  _flushing = true;
+  q.forEach(it => paintSendStatus(it.day));
+  try {
+    for (const it of q) {
+      let ok = false, err = 'net';
+      try {
+        const fd = new FormData();
+        fd.append('access_key', WEB3FORMS_KEY);
+        Object.keys(it.fields || {}).forEach(k => fd.append(k, it.fields[k]));
+        const res = await _withTimeout(fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd }), 15000);
+        ok = !!(res && res.ok);
+        if (res && !res.ok) err = 'http';
+      } catch (e) { err = 'net'; }
+      // Re-read before writing: Done on another day may have added to it meanwhile.
+      const now = loadOutbox();
+      const i = now.findIndex(x => x.day === it.day && x.at === it.at);
+      if (ok) {
+        localStorage.setItem(ATHLETE_ID + '_sent_d' + it.day, new Date().toISOString());
+        localStorage.setItem(ATHLETE_ID + '_sentsig_d' + it.day, it.sig || '');
+        if (it.on) localStorage.setItem(ATHLETE_ID + '_senton_d' + it.day, it.on);   // coach.html's syncGapsOf()
+        if (i >= 0) now.splice(i, 1);
+        if (window.plausible) window.plausible('Session Sent');
+        // The session is done and nothing is left to tap: the one moment an install ask
+        // interrupts nothing (HOME-03). Once only; A2HS remembers a dismissal.
+        setTimeout(maybeOfferInstall, 1800);
+      } else if (i >= 0) {
+        now[i].err = err;
+      }
+      saveOutbox(now);
+    }
+  } finally {
+    _flushing = false;
+    q.forEach(it => paintSendStatus(it.day));
+  }
+  // The email went, so the network is up: the best moment to heal a session record that
+  // failed to save earlier (see recordSessionToCloud()).
+  try { await _replayQueue(); } catch (e) { /* queued for the next open */ }
+}
+window.flushOutbox = flushOutbox;
+window.sendReport = sendReport;
+
+// Where the report is, said plainly on the finished card: sending, with the coach, or
+// waiting on this phone for signal (with Try again when the service refused it).
+function paintSendStatus(day) {
+  const el = document.getElementById('send-status-' + day);
+  if (!el) return;
+  const upd = document.querySelector(`#complete-${day} .send-session-btn`);
+  if (upd) upd.hidden = true;
+  if (window.IS_DEMO) {
+    el.className = 'send-session-status';
+    el.innerHTML = 'Demo only: in the real app this goes straight to your coach. <a href="/form.html">Apply to get yours →</a>';
+    return;
+  }
+  if (window.IS_PREVIEW) { el.className = 'send-session-status'; el.textContent = 'Coach preview: nothing is sent or saved.'; return; }
+  const pend = loadOutbox().find(x => isSess(x, day, sessOf(day)));
+  const sent = localStorage.getItem(ATHLETE_ID + '_sent_d' + day);
+  // Recent enough to belong to this session (a session can end past midnight, DATA-02).
+  const sentAt = sent ? new Date(sent) : null;
+  const sentNow = !!(sentAt && !isNaN(sentAt) && Date.now() - sentAt.getTime() < 18 * 3600 * 1000);
+  if (pend && _flushing) {
+    el.className = 'send-session-status';
+    el.textContent = 'Sending to your coach…';
+  } else if (pend) {
+    el.className = 'send-session-status pending';
+    el.innerHTML = pend.err === 'http'
+      ? 'Saved on your phone. It didn’t reach your coach yet. <button type="button" class="send-retry" onclick="flushOutbox()">Try again</button>'
+      : 'Saved on your phone. It goes to your coach when you have signal.';
+  } else if (sentNow) {
+    el.className = 'send-session-status success';
+    el.textContent = '✓ With your coach · ' + formatSentTime(sentAt);
+    // A second email only when there is something new to say.
+    if (upd) upd.hidden = (localStorage.getItem(ATHLETE_ID + '_sentsig_d' + day) || '') === reportSig(day);
+  } else {
+    el.className = 'send-session-status';
+    el.textContent = '';
+  }
+}
+
+// The session bar's Reset (Amir, 2026-09-27: "when you start, its locked in and you cant
+// cancel or reset"): shown once a day has started (its clock, or anything logged) and until
+// it is finished; the finished card keeps its own Reset. Two taps (armedTap(), LOG-02).
+function paintResetBtn(day) {
+  const b = document.querySelector(`#timer-${day} .session-timer-reset`);
+  if (!b) return;
+  if (window.IS_PREVIEW) { b.hidden = true; return; }
+  const t = loadTimer(day);
+  const finished = !!(t && t.finished) || completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + day));
+  const started = !!(t && t.sessionStart && !sessionIsStale(t.sessionStart)) || getDayCompletion(day).done > 0;
+  b.hidden = finished || !started;
 }
 
 function markSuggestedDay() {
@@ -10349,6 +10600,14 @@ function markSuggestedDay() {
 
 function resetDay(day) {
   localStorage.removeItem(ATHLETE_ID + '_touched_d' + day);   // nothing left to call unfinished (DATA-02)
+  // A report still waiting in the outbox for the session being reset never goes (an
+  // earlier week's, for the same day, still does).
+  const sess = sessOf(day);
+  saveOutbox(loadOutbox().filter(x => !isSess(x, day, sess)));
+  const conf = document.getElementById('confirm-' + day);
+  if (conf) delete conf.dataset.early;
+  moveRatePanel(day, false);
+  hideRestOffer();
   // Clear UI state for every exercise in this day
   document.querySelectorAll(`[data-day="${day}"]`).forEach(card => {
     card.classList.remove('checked');
@@ -10383,6 +10642,7 @@ function resetDay(day) {
   renderTimer(day);
   saveState();
   updateProgress(day);
+  paintSendStatus(day);
   markSuggestedDay();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -10646,6 +10906,8 @@ function autoResetStaleDays() {
       localStorage.removeItem(ATHLETE_ID + '_daynote_' + day.id);
       localStorage.removeItem(ATHLETE_ID + '_srpe_'    + day.id);
       localStorage.removeItem(ATHLETE_ID + '_sent_d'   + day.id);
+      localStorage.removeItem(ATHLETE_ID + '_sentsig_d' + day.id);
+      localStorage.removeItem(ATHLETE_ID + '_senton_d' + day.id);
       localStorage.removeItem(ATHLETE_ID + '_timer_'   + day.id);
       localStorage.removeItem(ATHLETE_ID + '_readiness_' + day.id);
       localStorage.removeItem(ATHLETE_ID + '_touched_d' + day.id);
@@ -10794,7 +11056,7 @@ function initDayWrapup() {
       localStorage.setItem(key, e.target.value);
       // Debounced: refresh the cloud record so a late-added note reaches the coach.
       clearTimeout(_noteT);
-      _noteT = setTimeout(() => recordSessionToCloud(dayOf(key)), 1200);
+      _noteT = setTimeout(() => { recordSessionToCloud(dayOf(key)); refreshPendingReport(dayOf(key)); paintSendStatus(dayOf(key)); }, 1200);
     });
     ta.addEventListener('click', e => e.stopPropagation());
   });
@@ -10816,22 +11078,21 @@ function initDayWrapup() {
         }
         // Update the cloud record so the dashboard shows the session RPE.
         recordSessionToCloud(dayOf(key));
+        // Rated: the finish card's hint goes; after Done, a change offers "Send the update".
+        const h = document.querySelector('#confirm-' + dayOf(key) + ' .finish-hint');
+        if (h && !wasSelected) h.textContent = '';
+        refreshPendingReport(dayOf(key));
+        paintSendStatus(dayOf(key));
       });
     });
   });
 
-  // If the client already sent today (then reloaded the page), restore the
-  // "Last sent: HH:MM" status and rename the Send button to "Update info to Coach".
+  // A finished day (a reload after Done): its rating sits in the finished card, and the
+  // status says where the report is.
   document.querySelectorAll('.send-session-status').forEach(statusEl => {
     const day = statusEl.id.replace('send-status-', '');
-    const sentISO = localStorage.getItem(ATHLETE_ID + '_sent_d' + day);
-    if (!sentISO) return;
-    const sentAt = new Date(sentISO);
-    if (sentAt.toDateString() !== new Date().toDateString()) return; // stale → skip
-    statusEl.className = 'send-session-status success';
-    statusEl.textContent = '✓ Last sent: ' + formatSentTime(sentAt);
-    const btn = document.querySelector('#complete-' + day + ' .send-session-btn');
-    if (btn) btn.textContent = 'Update info to Coach';
+    if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + day))) moveRatePanel(day, true);
+    paintSendStatus(day);
   });
 }
 
@@ -11031,135 +11292,6 @@ async function recordSessionToCloud(day) {
     const { error } = await sb.rpc('save_session', { ...base, p_key: _sbKey });
     if (error) _enqueueSession(base);
   } catch (e) { _enqueueSession(base); }
-}
-
-// Bundles all data for a given day and submits it to Web3Forms (same service
-// as form.html). Builds a clean, readable summary the coach gets via email.
-async function sendSession(day) {
-  const completeEl = document.getElementById('complete-' + day);
-  const btn        = completeEl.querySelector('.send-session-btn');
-  const status     = document.getElementById('send-status-' + day);
-
-  // Demo mode never emails the coach. Show what *would* happen and point the
-  // visitor at the application form instead.
-  if (window.IS_DEMO) {
-    status.className = 'send-session-status';
-    status.innerHTML = 'Demo only — in the real app this instantly emails your coach. <a href="/form.html">Apply to get yours →</a>';
-    btn.disabled = true;
-    btn.textContent = 'Demo — not sent';
-    return;
-  }
-
-  // Coach preview: nothing leaves the page. Sending would email a session report
-  // in the athlete's name and write their session record (see recordSessionToCloud).
-  if (window.IS_PREVIEW) {
-    status.className = 'send-session-status';
-    status.textContent = 'Coach preview — nothing is sent or saved.';
-    btn.disabled = true;
-    btn.textContent = 'Preview — not sent';
-    return;
-  }
-
-  // Belt-and-braces: refuse zero-effort sends. The UI shouldn't surface the
-  // Send button before any work is logged (the confirm card only appears once
-  // done > 0), but enforce it here too in case state was tampered with.
-  const dayStatus = getDayCompletion(day);
-  if (dayStatus.done === 0) {
-    status.className = 'send-session-status error';
-    status.textContent = 'Log at least one set before sending the session.';
-    return;
-  }
-
-  // Require RPE before sending — that's the whole point of the rating.
-  const sRpe = localStorage.getItem(ATHLETE_ID + '_srpe_' + day) || '';
-  if (!sRpe) {
-    status.className = 'send-session-status error';
-    status.textContent = 'Please rate the session difficulty first (1–10).';
-    return;
-  }
-
-  btn.disabled = true;
-  const originalText = btn.textContent;
-  btn.textContent = 'Sending…';
-  status.className = 'send-session-status';
-  status.textContent = '';
-
-  try {
-    // Build the same summary + fields used for the email and the cloud record.
-    const D = buildSessionData(day);
-    const { dayData, dayNote, isPartial, statusLabel, durMin, hasDur, auLoad, readiness, readinessField, summary } = D;
-
-    // POST to Web3Forms — same access key used by form.html
-    const fd = new FormData();
-    fd.append('access_key', 'efc57e0c-997d-4d71-b07a-71c8268ec668');
-    fd.append('from_name', `${DATA.athlete.firstName} ${DATA.athlete.lastName} — Session Report`);
-    // Subject is also tagged so a partial session is obvious in the inbox list,
-    // before the coach even opens the email.
-    const subjectTag = isPartial ? ' [Partial]' : '';
-    fd.append('subject', `Session Report${subjectTag} · ${DATA.athlete.firstName} ${DATA.athlete.lastName} · Day ${day}`);
-    fd.append('Athlete', `${DATA.athlete.firstName} ${DATA.athlete.lastName}`);
-    fd.append('Day', `Day ${day}${dayData.focusTag ? ' — ' + dayData.focusTag : ''}`);
-    fd.append('Status', statusLabel);
-    fd.append('Session RPE', sRpe + '/10');
-    if (hasDur) {
-      fd.append('Duration', durMin + ' min');
-      fd.append('Session Load (AU)', String(auLoad));
-    }
-    if (readinessField) fd.append('Readiness', readinessField);
-    fd.append('Notes from athlete', dayNote || '(none)');
-    fd.append('Full summary', summary);
-
-    const res = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      body: fd
-    });
-
-    if (!res.ok) throw new Error('Submit failed');
-
-    const sentAt = new Date();
-    localStorage.setItem(ATHLETE_ID + '_sent_d' + day, sentAt.toISOString());
-
-    // Also refresh the permanent cloud record (coach dashboard). It was already
-    // saved on finish; this re-saves with the final RPE/note at send time.
-    //
-    // The email just went through, so the network is definitively up — which
-    // makes this the best moment in the whole app to heal a save_session that
-    // failed earlier. Without it a session can reach the coach's inbox while
-    // session_history never gets the row, and NOTHING surfaces that: the payload
-    // sits in a localStorage queue waiting for a future app open that may not
-    // come before the next cycle. That is exactly what happened to Behnam on
-    // 2026-09-05 — report emailed, dashboard row missing, found only because a
-    // "Done" pill looked wrong. Await both so a still-failing save re-queues
-    // before the button reports success — but never let a cloud hiccup surface
-    // as a failed SEND, because the email has already landed. Both swallow their
-    // own errors; this is belt-and-braces so the athlete's success message and
-    // the coach's record can never disagree about what happened.
-    try {
-      await recordSessionToCloud(day);
-      await _replayQueue();
-    } catch (e) { /* queued for the next load — the email is already out */ }
-
-    status.className = 'send-session-status success';
-    status.textContent = '✓ Sent — your coach will see it shortly.';
-    // The session is done and nothing is left to tap: the one moment an install ask
-    // interrupts nothing (HOME-03). Once only; A2HS remembers a dismissal.
-    setTimeout(maybeOfferInstall, 1800);
-    btn.textContent = 'Sent ✓';
-    if (window.plausible) window.plausible('Session Sent');
-
-    // Re-enable after 3s so the client can edit (add a weight, change RPE, tweak the note)
-    // and resend as many times as needed. Each tap sends a fresh email.
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.textContent = 'Update info to Coach';
-      status.textContent = '✓ Last sent: ' + formatSentTime(sentAt);
-    }, 3000);
-  } catch (err) {
-    status.className = 'send-session-status error';
-    status.textContent = 'Something went wrong. Please try again.';
-    btn.disabled = false;
-    btn.textContent = originalText;
-  }
 }
 
 // Tiny helper: HH:MM in the user's locale (e.g. "2:14 PM")
@@ -12079,7 +12211,8 @@ window.maybeOfferInstall = maybeOfferInstall;
 // ⚠️ ONE RULE FOR ANYTHING THAT DELETES (LOG-02, 2026-09-26): a second tap. The first tap arms
 // the button (its label says what the next tap does, class `armed`), the second within 4 s acts,
 // and it disarms by itself. Reset Session, a weight reading and a Personal Record used to go on
-// one tap; Finish Anyway and "Delete all" already asked twice. A new delete button uses this.
+// one tap; "Delete all" already asked twice. The session bar's Reset and Finish early (WK-04)
+// use it too. A new delete button uses this.
 function armedTap(btn, armedLabel, run) {
   if (btn.dataset.armed === '1') {
     clearTimeout(btn._armT);
@@ -12783,18 +12916,19 @@ function stepPrimary() {
   }
 }
 
-// The last button FINISHES (WK-01): it used to say "Finish Workout ✓" and only close Guided.
-// It goes through the list's own Finish card, the one path that locks the clock, records
-// the session and opens the rating. Guided skips circuits and warm-ups, so when anything
-// else in the day is unticked the athlete lands on "Wrap up early?" and decides there;
-// Guided never finishes a partial session for them.
+// The last button closes Guided on the list's own finish card (WK-04: rate, then Done, the
+// one path that locks the clock, records the session and sends the report). Guided skips
+// warm-ups and circuits that log nothing, so when anything else in the day is unticked the
+// card offers "Finish early" and the athlete decides there; Guided never finishes for them.
 function stepFinish() {
   if (!STEP) return;
   const day = STEP.day;
   closeStepMode();
   const card = document.getElementById('confirm-' + day);
   if (!card) return;
-  if (card.classList.contains('visible') && !card.classList.contains('partial')) { confirmSession(day); return; }
+  // Rate, then Done (WK-04): the card asks the rating when every set is done, or offers
+  // "Finish early" when a circuit or a warm-up is still open.
+  refreshConfirmCard(day);
   card.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
@@ -14041,7 +14175,7 @@ function esc(str) {
   // Offer Add-to-Home-Screen once the athlete has FINISHED A SESSION, never on first open
   // (HOME-03, 2026-09-26): the toast used to land 2.5 s after the first sign-in, on top of
   // the welcome and over Day 1. Now it waits for a later open, or comes right after a Send
-  // (maybeOfferInstall() in sendSession()). A2HS.show() itself stands down when installed
+  // (maybeOfferInstall() in flushOutbox()). A2HS.show() itself stands down when installed
   // or once dismissed. Not in the demo, a coach preview, or over the sign-in screen.
   if (!window.IS_DEMO && !window.IS_PREVIEW) {
     window.addEventListener('load', () => setTimeout(maybeOfferInstall, 2500));
