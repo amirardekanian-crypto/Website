@@ -280,7 +280,8 @@ The screen they actually live on. **In this order, and the order is the point:**
    is 36 × 58 px at 390 and 26 × 48 px at 320. **The card is a size smaller** with it: the level ring
    74 → 62 px, the streak tile tighter. **The rank's name is fitted** (`fitRankName()`): on a 320–360 px
    phone *CONTENDER* or *UNTOUCHABLE* ran under the streak tile; the name now steps down a pixel at a
-   time, the → goes below 13 px (the name and the ring still open the Locker), and 11 px is the floor.
+   time, below 13 px the → goes and the crest drops a size (the name and the ring still open the Locker),
+   11 px is the floor, and a name that still does not fit there loses the crest (only *UNTOUCHABLE* at 320 px).
    ⚠️ The block at the bottom of Today is no longer headed *"The last seven days"* — with
    the hero opening on a seven-day row, two headings naming the same span read as one
    section printed twice. It is **"Your week, habit by habit"**: the hero answers *did each
@@ -1015,6 +1016,15 @@ Swept with PRF-02 (the *built with it* list on its page):
   so every fill that carries white text (the primary button, the nudge's button, the chips, the tab slab,
   the initials, the verdict tile, the wins card) takes `--accent-fill`, #6857E3, 5.17:1. Bars, pips and
   cells keep the bright accent.
+- **No label under 11 px** (A11Y-01, Proof's half; the training app's floor since #275). Measured on
+  every screen and state (Today with a card and on an earlier day, a log sheet, a habit, Progress folded
+  and open, Crew, the Locker folded and open, Settings, the manual, the tour, five takeovers, the share
+  picker, a quest run, onboarding, the embedded strip, a free athlete): **904 labels in 60 styles, from
+  7 to 10.5 px, now 0**. One CSS block at the end of the panels raises each to 11 px (letter-spacing
+  down where a word would crowd its box), and seven inline sizes in the markup moved with it. Two
+  layouts made room: the 35-day grid's key puts its legend on a line of its own under 380 px, and the
+  Locker's thumbnail of the share card is the skin and the crest only (its 7.5 px rank name could not
+  fit 66 px at 11; the hero above names the rank). Checked at 320, 360 and 390: no text spills its box.
 
 ### The phone's Back button (NAV-01, 2026-09-26)
 
