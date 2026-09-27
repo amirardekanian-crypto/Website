@@ -112,7 +112,14 @@
 //      later open ("Tuesday's Day 2 was never sent": Send it / Clear it).
 // v58: program.html changed (2026-09-26, HOME-02): Home is led by the training: a small cycle line, done days
 //      as small rows, the in-progress card with Resume, and habits / records / weight as one row each.
-const CACHE = 'aap-v61';
+// v59: program.html changed (2026-09-27, WK-02): the rest timer keeps time in a pocket, and a tick offers Rest.
+// v60: program.html changed (2026-09-27, CARD-01/02/03): the working card (one number line, the Last time box,
+//      the how-to folded after the first time, small done rows).
+// v61: program.html changed (2026-09-27, WK-01): Guided pins the current set, logs the kg on the rest screen,
+//      and takes circuits round by round.
+// v62: program.html changed (2026-09-27, WK-04): one finish (rate, then Done sends the report once, from an
+//      outbox that waits for signal), and Reset in the session bar.
+const CACHE = 'aap-v62';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

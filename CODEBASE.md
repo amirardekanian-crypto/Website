@@ -174,10 +174,12 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   `session_history` row the coach dashboard is built from) and a Web3Forms email. Either can fail
   alone. A failed `save_session` queues in `<id>_csq` and retries on a later app open, which may
   never come before the next cycle — so the coach's inbox can hold a session the dashboard has no
-  row for, silently (the same athlete's report, 2026-09-05). Two guards now: `sendSession()` re-runs the cloud save
-  **and drains the queue** right after the email succeeds (proof the network is up), and
+  row for, silently (the same athlete's report, 2026-09-05). Two guards now: `flushOutbox()` **drains the
+  queue** (`_replayQueue()`) right after an email succeeds (proof the network is up), and
   `coach.html`'s `syncGapsOf()` flags any athlete whose `<id>_sent_d<N>` has no matching
-  `session_history` row, as a *needs you* reason on the roster.
+  `session_history` row, as a *needs you* reason on the roster. Since WK-04 (2026-09-27) the email waits in an
+  outbox on the phone (`<id>_outbox`, never synced) and can go days after the session, so each send also writes
+  `<id>_senton_d<N>`, the date the session is filed under, and `syncGapsOf()` matches on that.
   ⚠️ **Until 2026-09-13 `_replayQueue()` also demanded a secret key**, so for every athlete who
   signs in with a password — none of them has one — neither drain ever ran and a failed save
   stayed queued for good. It runs on the signed-in session now (`save_session` accepts
@@ -186,7 +188,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Coach preview (`?preview=1`) must never write.** It runs under Amir's own sign-in, and every
   athlete RPC accepts `is_coach()` — so a write that is not gated on `IS_PREVIEW` lands in that
   athlete's real record. Boot skips the backup mirror, the pull, the queue replay and the message
-  fetch; `recordSessionToCloud()`, `sendSession()` (email + record), `_replayQueue()` and
+  fetch; `recordSessionToCloud()`, `sendReport()` / `flushOutbox()` (the email), `_replayQueue()` and
   `sendCoachReply()` each return early too. Until 2026-09-13 those four did not, and tapping
   Finish, an RPE or Send while previewing wrote a `session_history` row for the athlete.
   `markLibraryDone()` already checked `IS_PREVIEW` from the start.
