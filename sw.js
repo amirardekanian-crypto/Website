@@ -162,7 +162,8 @@
 // v83: habits.html changed (2026-09-27, A11Y-01): no label under 11 px anywhere in AA Proof (904 were).
 // v84: program.html changed (2026-09-27, DS-01): clay means "look here"; every block is one green, the running
 //      bar, Guided, labels and + Log a max green or grey.
-const CACHE = 'aap-v84';
+// v85: program.html changed (2026-09-27, DS-03 part 2): one primary button (eleven looks were one green one).
+const CACHE = 'aap-v85';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
