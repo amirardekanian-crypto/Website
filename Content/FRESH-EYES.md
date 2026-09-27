@@ -81,13 +81,14 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#275](https://github.com/amirardekanian-crypto/Website/pull/275) | One type scale in the training app: seven sizes and a field size (`--fs-` tokens), nothing under 11 px, buttons in the app's font, only weights that load, every field 16 px, a pre-commit guard; the line of numbers is never cut (the rest time ran off the card at 360 px) | DS-03 (part) |
 | [#276](https://github.com/amirardekanian-crypto/Website/pull/276) | One close grammar: ← top left for a screen, ✕ top right for a full-screen overlay (Guided's moved there), a sheet slides down (a handle, a swipe, a tap above it); the sheets' Close and Skip for today are 44 px targets | NAV-01 |
 | [#277](https://github.com/amirardekanian-crypto/Website/pull/277) | Back keeps your place (Back from a sheet, the rest timer or Guided threw a scrolled day to the top: manual scroll restoration); the Library returns to where it was after a session; the rest screen is solid; a superset's rows fit 320 px; the finish card says Session habit | POL-01, NAV-01 |
+| [#278](https://github.com/amirardekanian-crypto/Website/pull/278) | Pinch-zoom in the training app (it was locked at 1×; now 5×, as AA Proof); both apps drop only the double-tap zoom (`touch-action: manipulation`) | A11Y-01 |
 
 **Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
 
 **Partly done, and what is still open on each:**
-- **A11Y-01.** The training app is done on the screens measured. Still open: AA Proof's small type and
-  its accent buttons in dark mode (3.35:1), which go with PRF-02 / DS-03; and pinch-zoom in program.html
-  (`user-scalable=no`). Following the phone's dark setting is not wanted: the athlete chooses (Amir, 2026-09-27).
+- **A11Y-01.** The training app is done: 11 px is the floor everywhere (#275) and pinch-zoom is on (#278).
+  Still open: AA Proof's small type and its accent buttons in dark mode (3.35:1), which go with PRF-02.
+  Following the phone's dark setting is not wanted: the athlete chooses (Amir, 2026-09-27).
 - **POL-01.** Swept (#252, #277). Still open: the Quality sheet's "How we measure it" names tests athletes
   never meet. Those words are approved server data (`public.qualities.tests`), so they are Amir's (below).
 - **SEAM-01.** Habits are ticked on Home. The full Proof app still has no way back to training,
@@ -154,8 +155,7 @@ is left is mostly AA Proof, then design-system polish. Work it in this order:
 4. **P3 and the partly-done leftovers**, in this order: ~~CONS-01~~ (#274), DS-03 (the type scale is #275;
    one primary button waits for DS-01), LIB-01 (its two calls are Amir's, above), ~~NAV-01's close grammar~~
    (#276), ~~POL-01's leftovers~~ (#277; the
-   Quality sheet's words are Amir's to give), A11Y-01's pinch-zoom (`user-scalable=no`; every field is 16 px
-   since #275, so an iPhone will not zoom on a tap), and DOC-01 last.
+   Quality sheet's words are Amir's to give), ~~A11Y-01's pinch-zoom~~ (#278), and DOC-01 last.
 5. **SEAM-01 waits for the count** around 2026-10-17 (below). If habit logging has not moved, fork 1 A
    (Proof in the training app's look, "← Training", one install, one theme) is next, and it takes DS-03's
    Proof half with it.
@@ -208,7 +208,7 @@ the working card folds How to do it if Amir wants that too.
 - Once per clone: `git config core.hooksPath .githooks`.
 - Use the branch the session names. After each merged PR, restart it from main:
   `git fetch origin main && git checkout -B <branch> origin/main`.
-- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v74` on
+- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v75` on
   2026-09-27) whenever a cached app file changes, log the version in its comment list, and change the
   name in CLAUDE.md too.
 - Test in a headless browser before every PR (below): the harness is in the repo, the checks you write

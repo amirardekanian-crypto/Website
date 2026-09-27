@@ -961,6 +961,9 @@ it was opened, any other tab back to Today, and a past day being filled in back 
 closes by its own button, so Back on Today still leaves the app. ⚠️ **Never in the embedded strip**
 (`?embed=1`): an iframe's history entries belong to the training app's page, so it would steal that app's Back.
 Not in the coach preview, or before onboarding. A new sheet or screen goes into `topLayer()`.
+**Zoom:** a pinch enlarges AA Proof up to 5x (`maximum-scale=5`, since 2026-09-26), and `touch-action:
+manipulation` on `html` (2026-09-27) turns off only the double-tap zoom, which on an iPhone could fire on two
+quick taps of **+**. The training app has the same since the same day (A11Y-01).
 
 ## Body weight — MOVED OUT, 2026-09-12
 

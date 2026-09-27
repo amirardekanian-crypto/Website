@@ -13,7 +13,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
 <title>AA Performance</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#FAF7F2">
@@ -244,6 +244,11 @@
   /* A button or a field takes the page's font (DS-03): the browser's default is Arial at 13.3 px,
      which the Sign in button, the ← back arrows, ⋯ and ▶ were wearing. Any rule with a class wins. */
   button, input, select, textarea { font: inherit; }
+  /* Pinch-zoom is on (A11Y-01, 2026-09-27: the viewport said user-scalable=no, so nobody could enlarge a
+     cue or a number), up to 5x as in AA Proof. manipulation keeps pinch and scroll and drops the
+     double-tap zoom, which on an iPhone could fire on two quick taps of +15s or an RPE button. Every
+     field is 16 px (DS-03), so tapping one does not zoom the page either. */
+  html { touch-action: manipulation; }
 
   body {
     font-family: 'Barlow', sans-serif;

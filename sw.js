@@ -143,7 +143,9 @@
 //      slide down (a handle, a swipe), their Close is a 44 px target.
 // v74: program.html changed (2026-09-27, POL-01): Back keeps your place (manual scroll restoration), the
 //      Library returns to where it was, the rest screen is solid, a superset's rows fit 320 px, "Session habit".
-const CACHE = 'aap-v74';
+// v75: program.html and habits.html changed (2026-09-27, A11Y-01): pinch-zoom is on in the training app (5x),
+//      and both apps drop only the double-tap zoom (touch-action: manipulation).
+const CACHE = 'aap-v75';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
