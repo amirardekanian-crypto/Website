@@ -611,14 +611,31 @@ the sheet. Closing forgets the trail. A new sheet opener gets wrapped in `wrapSh
 - **Not done:** program.html still sets `maximum-scale=1, user-scalable=no`, so pinch-zoom is off (AA Proof
   allowed it on 2026-09-26). The set-log boxes are 16 px already, so it is a small change, still to be decided.
 
-## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26)
+## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26 and 2026-09-27)
 
-The session bar (`.session-timer`) never cuts the clock: under 480 px it is two rows (label and clock on one
-line, Start/Pause and Guided full width under it), and at any width the buttons wrap before the clock
-shrinks. The label is one line ("Ready when you are", "In progress", "Paused", "Session duration"; "Click
-Start to begin" was a desktop phrase). A Home day card shows **In progress · Resume** for a day started today
-and not finished (`dayInProgress()`: a clock started today, or a ticked set), and **Done** once finished;
-`paintDayCardPills()` repaints them whenever the day view closes, because Home's cards are built once.
+**Before Start** the session bar (`.session-timer`) is the full bar: under 480 px two rows (label and clock on
+one line, Start and Guided full width under it), and at any width the buttons wrap before the clock shrinks. The
+label is one line ("Ready when you are", "In progress", "Paused", "Session duration"). A Home day card shows
+**In progress · Resume** for a day started today and not finished (`dayInProgress()`), and **Done** once
+finished; `paintDayCardPills()` repaints them whenever the day view closes.
+
+**From Start until Done it is the slim bar** (Amir, 2026-09-27, option C of the mockup at
+https://claude.ai/artifact/CiUjm5sF3cz4YhGzJCR1WY). `renderTimer()` sets `.slim` when the day's clock has
+started, is not finished and is inside the 6 h grace. One line, 54 px: **← Home** · the clock · **Pause** (or
+Resume) · **⋯**. The label goes (the clay clock and Pause / Resume say it). **⋯** (`toggleBarMore()`) opens
+Pause, Guided and Reset on a second row; `foldBarMore()` folds it (and resets `aria-expanded`) when Guided opens,
+the day closes or the bar stops being slim. **The tab bar hides** while a slim day is open (`body.session-on`,
+`paintSessionChrome()`, called from `renderTimer()`, `switchDay()` and `closeDayView()`): ← Home or the
+phone's Back closes the day, the clock keeps running and Home shows In progress · Resume. On an iPhone SE the
+two bars covered 26% of the screen mid-session; now 9%.
+
+- **It never cuts the clock.** Past an hour the clock is seven characters (`.long`, set by `renderTimer()` and
+  the 1 s tick): under 420 px "Home" becomes the arrow alone and the clock steps to 22 px. Under 360 px the
+  arrow is always alone and Pause / Resume shows its symbol only, drawn in CSS (`data-sym`; the ⏸ glyph alone
+  renders as a square, which reads as stop), with the word as its aria-label. Measured in every state (before,
+  running, past an hour, paused, ⋯ open) at 320, 360, 375 and 390 px in both themes: nothing overlaps, every
+  button is 44 px.
+- A control added to the session bar goes on the slim line or under ⋯, and is measured the same way.
 
 ## ⏲️ The rest timer keeps time in a pocket (WK-02, 2026-09-27)
 
