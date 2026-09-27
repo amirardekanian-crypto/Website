@@ -1783,7 +1783,8 @@ When an athlete hits **Finish Session** in `program.html` — full session or pa
 because they showed up either way — that app records the session to `session_history`
 exactly as it always has. Proof then reads the *dates* back through a small read-only
 RPC, `get_workout_days`, and ticks its WORKOUT habit for those days. The completion
-card in the programme app says *"Counts as your Workout habit"* with a shortcut across.
+card in the programme app says *"Counts as your Session habit · open AA Proof"* (Proof's own name for it
+since the labels went; it said *Workout* until 2026-09-27).
 
 Why it's built this way:
 
