@@ -84,6 +84,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#278](https://github.com/amirardekanian-crypto/Website/pull/278) | Pinch-zoom in the training app (it was locked at 1×; now 5×, as AA Proof); both apps drop only the double-tap zoom (`touch-action: manipulation`) | A11Y-01 |
 | [#279](https://github.com/amirardekanian-crypto/Website/pull/279) | AA Proof: the circle is the tick (a 48 px circle that fills with a white tick, the emoji inside it), + is 44 px in the habit's tint, the programme's session is one slim line at the end of Today: the first habit you can tick moved up the screen (Amir's pick A of the mockup) | PRF-01 |
 | [#280](https://github.com/amirardekanian-crypto/Website/pull/280) | AA Proof's Today leads with the verdict, **2 to go**, then On target, then Perfect, instead of the day's percentage (68% on a rest day that counted); the count is exact (it said 1 when 2 were needed); the ring round the initials is gone; the training app's habits row and the strip's head say the same words (no more "day complete" beside "1 of 5 done"). Display only | PRF-03 |
+| [#294](https://github.com/amirardekanian-crypto/Website/pull/294) | Two words POL-02's sweep missed in AA Proof: Settings' Add-ons label says *EXTRA MILESTONES* (it said badges), and the share cards say *ON A STREAK* (they said ON A RUN, against the one-word rule) | POL-02 (follow-up) |
 | [#293](https://github.com/amirardekanian-crypto/Website/pull/293) | What the docs pass found in the training app: the Log a max form wears DS-01's rule (Save to Personal Records is the green primary button, the estimate green like Records' own number, no clay left on the form or its picker), the guide's Rest line says the bottom of the screen (mid-session the tabs are hidden), and an article link opens the published row: an edit on the server reaches a link shared earlier and unpublishing stops it (it served the repo's file) | DOC-01 (follow-ups) |
 | [#292](https://github.com/amirardekanian-crypto/Website/pull/292) | The docs pass: CODEBASE.md, PROGRAM-APP.md, HABITS.md, MAP.md and program.html's comments checked claim by claim against the code, and corrected where they described an older app (the reports behind it found 96 stale claims in the four training-app files) | DOC-01 |
 | [#291](https://github.com/amirardekanian-crypto/Website/pull/291) | A bug DOC-01's check found: on a lower day in a week whose note lowers RPE (`rpeDrop`), a written RPE 6 showed "6 → 5 today", under the floor (CHP-4) and a number no RPE button can log; the week's term is floored at 6 now, and nothing else moves | DOC-01 (a code bug) |
@@ -217,7 +218,7 @@ the working card folds How to do it if Amir wants that too.
 - Once per clone: `git config core.hooksPath .githooks`.
 - Use the branch the session names. After each merged PR, restart it from main:
   `git fetch origin main && git checkout -B <branch> origin/main`.
-- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v90` on
+- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v91` on
   2026-09-27) whenever a cached app file changes, log the version in its comment list, and change the
   name in CLAUDE.md too.
 - Test in a headless browser before every PR (below): the harness is in the repo, the checks you write

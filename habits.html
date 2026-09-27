@@ -9942,7 +9942,7 @@ function latestMedal() {
   const c = consistencyFor(best), st = habitStreak(best);
   return { metal: c.tier >= 4 ? 'emerald' : c.tier >= 2 ? 'silver' : 'bronze',
            tint: habitHue(best)[1], emoji: splitEmoji(best.name)[0] || '✨',
-           name: (c.name || 'ON A RUN'), note: st + ' days of ' + splitEmoji(best.name)[1].toLowerCase() + ' in a row',
+           name: (c.name || 'ON A STREAK'), note: st + ' days of ' + splitEmoji(best.name)[1].toLowerCase() + ' in a row',
            xp: 0, stars: Math.max(1, Math.min(3, c.tier)), tierName: 'CONSISTENCY' };
 }
 
@@ -10082,7 +10082,7 @@ const SHARE_PAINT = {
       // the athlete cannot find anywhere else in the app.
       const now = currentDayStreak(), best = bestDayStreak();
       x.textAlign = 'center';
-      scEyebrow(x, a.cx, a.cy - 260, now >= best ? 'PERSONAL BEST' : 'ON A RUN', CARD.orange);
+      scEyebrow(x, a.cx, a.cy - 260, now >= best ? 'PERSONAL BEST' : 'ON A STREAK', CARD.orange);   // one word, streak (it said ON A RUN)
       x.font = '150px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
       x.fillText('🔥', a.cx, a.cy - 120);
       const g = x.createLinearGradient(0, a.cy - 60, 0, a.cy + 110);
@@ -10502,7 +10502,7 @@ function renderSettingsHabits() {
         }).join('')}
       </div>
 
-      <div class="eyebrow sectlbl"><span>Add-ons</span><span>EXTRA POINTS, EXTRA BADGES</span></div>
+      <div class="eyebrow sectlbl"><span>Add-ons</span><span>EXTRA POINTS, EXTRA MILESTONES</span></div>
       <!-- The warning is permanent, not a one-off toast. It is the rule the whole
            thing turns on, and an athlete who switched something on three weeks
            ago should still be able to find out why it is counting against them. -->

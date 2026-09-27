@@ -845,7 +845,8 @@ noun, `streak`, so **the label is the only thing keeping the scopes apart** — 
 streak always sits *on that habit*,
 and anything captioned DAY STREAK must be computed by a `*DayStreak()` function. The same
 bug sat in the shareable **streak card** (`SHARE_CARDS.streak`), where it decided
-PERSONAL BEST vs ON A RUN and printed a `Best: N.` footer; both were fixed together.
+PERSONAL BEST vs ON A RUN and printed a `Best: N.` footer; both were fixed together. (The eyebrow
+reads ON A STREAK since 2026-09-27, as does the milestone card's fallback name: "run" does not come back.)
 
 **A habit's level is the hero's ring, at row size** (Amir, 2026-07-30). It was a filled
 square, with the rank name in the meta line and the level's progress as a bar under the
