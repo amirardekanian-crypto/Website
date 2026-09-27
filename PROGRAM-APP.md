@@ -766,6 +766,23 @@ lived only in the guide, two tabs away. Now three hints, `paintHints(day)` in `p
 - The words name real controls, like the guide (CNT-01): rename Start, Guided or the circle and change
   `ONB_TEXT` in the same PR.
 
+## 🔥 Warm-ups are a list, and a circuit's rest is never invented (WK-05, 2026-09-27)
+
+- **A circuit that logs nothing is a warm-up list** (`isPrep` in `renderCircuit()`: no `logWeight`, no
+  `logRPE`, which is what a prep block gives by default). One line per movement: letter, name, dose and ▶ when
+  it has a video, with its cues folded under a chevron (`.round-row.prep`, `togglePrepCues()`). A tap on the
+  row or the chevron opens that movement's cues; ▶ plays and never toggles. The chevron shows only once the row
+  has cues (`has-cues`: its own, or its Spine entry's, which `paintSpine()` fills in). A real four-movement
+  primer opened to 1001 px with twelve cue lines always open; it opens to 452 px now, on one screen.
+- **Rest is never invented, for a circuit either.** It fell back to 60 s, so 19 of the 135 live circuits
+  (7 athletes, 18 of them warm-ups) showed "rest 1:00" that nobody wrote. Now: the circuit's own rest
+  (`rx.rest`, or legacy `restSec`) → the block's → none. Only its own shows in the line of numbers. None
+  written: a working circuit's button says **Rest timer ⏱** and opens at a minute; a warm-up has no rest
+  button.
+- A warm-up with no rest button is still a circuit: `initSetOrRPE()` and `initNotes()` used "has a rest
+  button" to tell a circuit from a simple item, and now test the circuit itself, so it keeps its Note row.
+  Guided still leaves warm-ups out (WK-01). Working circuits keep their cues open, as before.
+
 ## 📲 The install ask waits for a finished session (HOME-03, 2026-09-26)
 
 The "Install app" toast (`A2HS` in `assets/js/shared.js`) used to fire 2.5 s after the first sign-in, on

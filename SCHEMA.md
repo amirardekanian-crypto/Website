@@ -28,10 +28,12 @@
 - The `type` field decides what tools an exercise gets — no separate flags needed:
   - `"simple"` → just the row. No rest, no weight, no RPE, no note.
   - `"standard"` → always has rest timer + weight log + RPE selector + personal note.
-  - `"circuit"` → rest timer at the end + personal note, and **the block decides whether it logs**: a circuit in a **prep/activation block logs nothing**; a circuit in any **working block** gets an inline **weight field per item** plus **one RPE per round** (supersets, complexes, conditioning). Override either way with `logWeight` / `logRPE`. See "Circuit logging" below.
-- Rest is **`rx.rest`** (seconds), or **`block.rest`** once for a whole section. A `standard` exercise
-  invents none: omit it and the card draws no rest cell (its timer still opens at 2 minutes). A
-  circuit's rest paces the round, so it falls back to 60s. `restSec` is the old spelling, still read.
+  - `"circuit"` → rest timer at the end (when a rest is written, or for a working circuit) + personal note, and **the block decides whether it logs**: a circuit in a **prep/activation block logs nothing**; a circuit in any **working block** gets an inline **weight field per item** plus **one RPE per round** (supersets, complexes, conditioning). Override either way with `logWeight` / `logRPE`. See "Circuit logging" below.
+- Rest is **`rx.rest`** (seconds), or **`block.rest`** once for a whole section. **Nothing invents
+  one** (WK-05, 2026-09-27: circuits used to fall back to 60 s): omit it and the card draws no rest in
+  its line. A `standard` exercise's timer still opens at 2 minutes and says "Rest timer"; a working
+  circuit's opens at 1 minute, the same way; a warm-up circuit with none has no rest button. `restSec`
+  is the old spelling, still read.
 - A `"circuit"` carries `items[]` and its rounds as **`rx.rounds`, a number**. The old
   `"rounds": "×3 Rounds"` string is still read, never written.
 - The legacy `"hasRest"` field is no longer used and can be removed. Old files that still contain it will keep working — the field is simply ignored.
@@ -500,8 +502,8 @@ Best for: mobility circuits, activation circuits, conditioning circuits, combina
 ```
 
 Every circuit gets, automatically:
-- A **Rest** button at the bottom (rests once, after the whole round of sub-items is done — `rx.rest`, else the block's `rest`, else **60s**).
-- In a working block, a weight field on each item and **one RPE per round**. A circuit in a prep block logs nothing (see "Circuit logging").
+- A **Rest** button at the bottom (rests once, after the whole round of sub-items is done — `rx.rest`, else the block's `rest`). None written: a working circuit's button says **Rest timer** and opens at 1 minute; a warm-up circuit has no rest button (WK-05).
+- In a working block, a weight field on each item and **one RPE per round**. A circuit in a prep block logs nothing (see "Circuit logging") and shows as a **list**: one line per item (letter, name, dose, ▶), its cues folded under a chevron (WK-05).
 - A free-form **Note** row where the client can log weights, equipment, and how it felt (e.g. *"KB 16, slam 6, box 50, third round felt heavy"*).
 
 ##### Circuit logging (`warmup`, and optional `logWeight` / `logRPE`)

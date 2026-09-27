@@ -123,7 +123,9 @@
 //      phone (they ran 22 px past the bar at 360 px), and the armed Reset reads "Reset?".
 // v64: program.html changed (2026-09-27, ONB-01): three one-time hints in a new athlete's first session
 //      (Start or Guided, the set circle, How hard?), each gone once the athlete does the thing.
-const CACHE = 'aap-v64';
+// v65: program.html changed (2026-09-27, WK-05): a warm-up circuit is a list (cues on a tap), and a
+//      circuit's rest is never invented (it fell back to 60 s).
+const CACHE = 'aap-v65';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
