@@ -131,7 +131,9 @@
 //      (← Home, clock, Pause, ⋯) and the tab bar hides (Amir's option C).
 // v68: program.html changed (2026-09-27, COACH-02): the guide opens in the sheet (your initials, one row on
 //      the Coach tab, "How hard?", "tempo", Guided's ?); a Guided mode card.
-const CACHE = 'aap-v68';
+// v69: program.html changed (2026-09-27, PROG-01): the This cycle card at the top of Home (the week, sessions
+//      done, and effort-matched wins), replacing the small cycle line.
+const CACHE = 'aap-v69';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

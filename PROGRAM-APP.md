@@ -552,7 +552,8 @@ are · I like the in progress day card · I like the small cycle details · If t
 card into that small one, if not, still big". And one refusal: **no rest-day design**, "because we don't know
 their rest days, athlete can move the days". So:
 
-- The cycle is one line under the greeting (`.home-cyc`, → Game Plan), with the week when the cycle has dates.
+- The cycle was one line under the greeting (`.home-cyc`, → Game Plan). Since PROG-01 it is the **This cycle**
+  card (below); the line stays only for a cycle with no dates, or before or after its dates.
 - `dayCardHTML()`: a day done this week (`weekDoneDays()`) is a `.dc-row` (✓, name, DONE); a day not done is the
   big photo card; a day in progress (`dayInProgress()`) gets `.dc-live` under its banner (sets done of total, the
   clock ticking via `paintLiveClocks()`, **Resume**). `paintWeek()` redraws the cards, so a card changes shape
@@ -562,6 +563,29 @@ their rest days, athlete can move the days". So:
   clay "NO RECORDS YET" / "NOT TRACKED YET". The habits row is still followed by AA Proof's strip, so habits
   are ticked on Home (fork 1B), and it shows Proof's count once instead of a hero card and a strip.
 - A week where every day is done says "All 3 sessions done this week", with every day a row. Nothing more.
+
+## 🏆 This cycle: where it is, and the wins (PROG-01, 2026-09-27)
+
+"Is this working?" had no answer in the paid app: progress was one exercise at a time. Amir's calls on the
+mockup (https://claude.ai/artifact/JhzKhBvP54ERS3AMiwTcrW): *"a card on home, but remove the card (line) on the
+top of the home page, and replace it with this, when you click, it goes to gameplan"*, and for the lifts, *"not
+every one do under 10 reps, so we need to find a way to celebrate wins for every one, when they lift heavier
+with same rpe"*.
+
+- **The card** (`paintCycleCard()`, `#home-cycle-wrap`, a tap → Game Plan): *Cycle 2 of 3 · Load & Build*, **Week
+  3 of 5** with a bar, **6 of 10 sessions** with a bar (finished sessions since the cycle's `startDate`, from the
+  history plus today's finishes on this phone, against days × weeks), and up to three **wins**. Painted at boot and
+  again by `paintWeek()` whenever the history arrives. A cycle with no dates (5 of 35 live programmes), or before or
+  after its dates, keeps the small line. No wins yet: one quiet line says where they will show.
+- **Wins are effort-matched** (`cycleWins()`, `winText()`): for each lift, its first session of the cycle against
+  its best one since (so a back-off week never takes a win away), each session's best set by an effort-adjusted
+  index (`cycleSetOf()`: Epley on reps to failure, `w × (1 + (reps + 10 − RPE) / 30)`; bodyweight: reps to failure).
+  The words are the plainest that are true: *+2.5 kg, same reps, same RPE* · *+3 reps at 16 kg, same RPE* · *80 kg
+  × 6 felt easier: RPE 8 → 7* · *+4 reps, same RPE* (bodyweight). Only when two things moved at once is it *heavier
+  and harder: about 7% stronger* (the index as a percentage only, so the formula's bias at high reps cancels out).
+  A hold logs a tick and an RPE, no seconds, so its win is *felt easier: RPE 8 → 7*. Under 2% is no win; a lift
+  that went down, a lift trained once, or a loaded set against an unloaded one says nothing. The top three by gain.
+- Checked on crafted history for every kind of win and non-win, and on the demo's (`prog01` suite).
 
 ## 📅 This Week is built from the session history (HOME-01, 2026-09-26)
 

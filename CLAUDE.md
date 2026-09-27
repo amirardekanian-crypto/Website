@@ -156,7 +156,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   sheet open WhatsApp pre-filled (`coachWhatsAppUrl(about)`, `COACH_WHATSAPP` = the site's buy-button
   number). coach.html only marks session notes read. The `messages` table stays on the server and
   nothing reads it. Do not bring a chat back unasked. Details in `PROGRAM-APP.md`.
-- **Home leads with the training** (HOME-02, Amir 2026-09-26): the small cycle line, This Week, then one row each
+- **Home leads with the training** (HOME-02, Amir 2026-09-26): the This cycle card (PROG-01, below; the small cycle
+  line only when the cycle has no dates), This Week, then one row each
   for habits, records and weight. A day done this week is a small row; a day not done stays a big card; a
   session in progress shows sets, the clock and Resume on its card. **Home never names a rest day**: athletes
   move their days. Under the habits row, **today's habits, ticked in place**: AA Proof itself, embedded (`habits.html?embed=1`, `mountProofStrip()`).
@@ -171,6 +172,11 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Anything that deletes takes two taps** (LOG-02, 2026-09-26): `armedTap(btn, label, run)` arms on the first
   tap (the label says what the next tap does) and acts on a second within 4 s. Reset Session, the session bar's Reset,
   Finish early, a weight reading and a Personal Record go through it. A new delete button uses it.
+- **A win is effort-matched, and never claimed beyond what the sets show** (PROG-01, Amir 2026-09-27: "celebrate wins
+  for every one, when they lift heavier with same rpe"; `PROGRAM-APP.md` → *This cycle*). The Home card compares each
+  lift's first session of the cycle with its best since and names the plainest true win (heavier at the same reps and
+  RPE, more reps at the same weight, the same set at a lower RPE); only when two things moved at once is it "about X%
+  stronger", from the effort-adjusted index, as a percentage only. Holds log no seconds, so a hold's win is an easier RPE.
 - **Mid-session the tab bar hides** (WK-03, Amir 2026-09-27, option C; `PROGRAM-APP.md` → *The session bar*): from
   Start until Done the session bar is one slim line (← Home · clock · Pause · ⋯, with Guided and Reset under ⋯) and
   `body.session-on` hides the tabs; ← Home or Back is the way out and the clock keeps running. A new session-bar
@@ -248,7 +254,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v68` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v69` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
