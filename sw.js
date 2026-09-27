@@ -172,7 +172,8 @@
 //      line, an article link opens the published row.
 // v91: habits.html changed (2026-09-27): EXTRA MILESTONES in Settings, ON A STREAK on the share cards.
 // v92: program.html changed (2026-09-27): dead code the DOC-01 pass found, removed (316 lines, no behaviour).
-const CACHE = 'aap-v92';
+// v93: habits.html changed (2026-09-27): the same for AA Proof (105 lines, no behaviour).
+const CACHE = 'aap-v93';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

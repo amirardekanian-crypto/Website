@@ -312,7 +312,7 @@ The screen they actually live on. **In this order, and the order is the point:**
    PRF-05 (2026-09-27) folded them into the week on the card (above). What they taught still holds
    there: **oldest on the left, today on the RIGHT** (Amir, 2026-08-01; it ran today-first, which put
    the day you are almost always logging at the far left), and `canLog()` owns the window
-   (`editableDays()` drew the chips and has no caller now).
+   (the chips' `editableDays()` was removed with the rest of the dead code on 2026-09-27).
 4. **The habit list** — tap the **circle** to tick, tap the name for that habit's history, tap
    `+` on counter habits. Each row shows that habit's own level and current streak.
    **The circle is the tick** (PRF-01, 2026-09-27): the emoji sits in a 48 px circle ringed in the
@@ -334,11 +334,13 @@ The screen they actually live on. **In this order, and the order is the point:**
    counter habit you have not finished reads `5 of 8 glasses · 3 to go` — the position
    *and* the job.
 5. **The nudge** — one dark card (clay when a streak is at risk) whose copy reacts to what is actually missing, drawn at
-   random from a library of **94 lines across 16 situations** (`NUDGES`): one bucket per
-   habit, one shared `custom` bucket for habits the athlete added (their ids are made up
-   when added, so they have no bucket of their own; until 2026-09-26 they fell through to
-   nothing-logged-yet and a day with six things done opened with "Nothing logged yet"),
-   plus nothing-logged-yet, one-habit-left, all-done, streak-at-risk and streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
+   random from a library of **88 lines across 15 situations** (`NUDGES`, counted 2026-09-27; its
+   20-line `prompt` bucket is roll call's): one bucket per habit the athlete can tick (the session
+   has none: it is `locked`, below), one shared `custom` bucket for habits the athlete added (their
+   ids are made up when added, so they have no bucket of their own; until 2026-09-26 they fell
+   through to nothing-logged-yet and a day with six things done opened with "Nothing logged yet"),
+   plus nothing-logged-yet, one-habit-left, only-the-session-left (`sessionLeft`, `freeDone`),
+   all-done, streak-at-risk and streak-rolling. The pick is seeded on the date, so it is **stable all day and rotates
    tomorrow** — over 21 days a bucket of 10 uses all 10 lines with no back-to-back
    repeats. Its button opens the habit in question. The "nudge" half of *nudge and recap*.
    **The session is never asked for by name** (PRF-04, 2026-09-26): it is `locked`, ticked only by
@@ -1017,7 +1019,7 @@ Swept with PRF-02 (the *built with it* list on its page):
   are its *consistency tiers*) and *Locker* (never the long game, the pass or loadout; inside it, *What
   you have* and *The road*). The Progress tile counts milestones (`milestonesEarned()`, one-offs plus
   the *A few weeks* events), the same number as the section, and so does the rank share card.
-- **The tab bar lights where you are.** Settings, the manual and body weight light no tab (the slab sat
+- **The tab bar lights where you are.** Settings and the manual light no tab (the slab sat
   under TODAY), and a habit's page lights the tab it was opened from (`UI.from`; it lit PROGRESS from
   Today too).
 - **"Day N" is your day with AA Proof** (Today, Settings). Progress names the season only (it said
@@ -2491,7 +2493,7 @@ these keys when it syncs.
 ## Voice
 
 Dry, blunt, a little rude — the same coach who says *"your hamstrings have filed a
-complaint with HR"*. The whole nudge library (`NUDGES`, 94 lines) is written in it, and
+complaint with HR"*. The whole nudge library (`NUDGES`: 88 nudge lines and roll call's 20 prompts) is written in it, and
 anything added to it has to be: never chirpy, never therapeutic, funny because it is
 true. Tokens available in a line are `{n}` (how many are left), `{name}`, `{unit}` and
 `{st}` (streak days). Never chirpy, never therapeutic. It notices what you skipped and
