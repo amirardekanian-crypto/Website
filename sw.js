@@ -168,7 +168,9 @@
 // v87: program.html changed (2026-09-27, POL-01): the Quality sheet shows no "How we measure it".
 // v88: program.html changed (2026-09-27): a week note's rpeDrop never takes a lower day's target under RPE 6.
 // v89: program.html and habits.html changed (2026-09-27, DOC-01): comments only, checked against the code.
-const CACHE = 'aap-v89';
+// v90: program.html changed (2026-09-27, DOC-01 follow-ups): Log a max's form without clay, the guide's Rest
+//      line, an article link opens the published row.
+const CACHE = 'aap-v90';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

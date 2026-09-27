@@ -3021,10 +3021,10 @@
   .ex-1rm.open .ex-1rm-panel { display: block; }
   .ex-1rm-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   .ex-1rm-field {
-    background: var(--white); border: 1px solid var(--ice-mid);
+    background: var(--white); border: 1px solid var(--grey-mid);
     border-radius: 7px; padding: 7px 4px; text-align: center;
   }
-  body[data-dark] .ex-1rm-field { background: #222; border-color: rgba(199,85,47,0.35); }
+  body[data-dark] .ex-1rm-field { background: #222; border-color: #333; }
   .ex-1rm-field input {
     width: 100%; padding: 0; background: transparent; border: none; outline: none;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title);
@@ -3037,16 +3037,17 @@
     text-transform: uppercase; color: var(--grey-text);
   }
   .ex-1rm-out { text-align: center; padding: 13px 0 0; line-height: 0.9; }
+  /* The estimate is green like Records' own number (.ceil-big); it was clay until DS-01's rule reached this form. */
   .ex-1rm-out b {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 40px;
-    letter-spacing: -1.2px; color: var(--clay-ink);
+    letter-spacing: -1.2px; color: var(--green-ink);
   }
   .ex-1rm-out i {
     font-family: 'Space Mono', monospace; font-style: normal;
-    font-size: var(--fs-label); font-weight: 700; letter-spacing: 1.5px; color: var(--clay-ink); margin-left: 5px;
+    font-size: var(--fs-label); font-weight: 700; letter-spacing: 1.5px; color: var(--grey-text); margin-left: 5px;
   }
   /* How much to trust the number — one word, coloured by how close the set was
-     to a true single. Green = sharp, clay = good, grey = rough. */
+     to a true single. Green = sharp, ink = good, grey = rough. */
   .ex-1rm-grade {
     margin-top: 9px; text-align: center;
     font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700;
@@ -3056,7 +3057,7 @@
   .ex-1rm-grade em { font-style: normal; font-weight: 400; letter-spacing: 0.8px;
     color: var(--grey-text); }
   .ex-1rm-grade.g1 { color: var(--green-ink); }
-  .ex-1rm-grade.g2 { color: var(--clay-ink); }
+  .ex-1rm-grade.g2 { color: var(--grey-dark); }
   .ex-1rm-grade.g3 { color: var(--grey-text); }
   body[data-dark] .ex-1rm-grade.g1 { color: #4e9d7e; }
   body[data-dark] .ex-1rm-grade.g3 { color: #8a8a8a; }
@@ -3077,15 +3078,10 @@
   .ex-1rm-auto[hidden] { display: none; }
   body[data-dark] .ex-1rm-auto { background: rgba(14,74,54,0.28); color: #ddd; }
 
-  .ex-1rm-save {
-    display: block; width: 100%; margin-top: 12px; padding: 11px;
-    background: var(--ice); color: var(--on-accent);
-    border: none; border-radius: 7px; cursor: pointer;
-    font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700;
-    letter-spacing: 1.2px; text-transform: uppercase;
-    transition: opacity 0.15s;
-  }
-  .ex-1rm-save:disabled { background: var(--yellow); cursor: default; }
+  /* Save to Personal Records, on Log a max's form. Its look is the one primary button (DS-03's list at the
+     end of these styles); it was a clay fill in Space Mono until 2026-09-27 (DS-01: buttons stay green). */
+  .ex-1rm-save { display: block; width: 100%; margin-top: 12px; }
+  .ex-1rm-save:disabled { opacity: 0.4; cursor: default; }
   /* `display: block` above outranks the browser's own [hidden] rule, so every
      `save.hidden = true` in the app did nothing until this line (found 2026-09-26). */
   .ex-1rm-save[hidden] { display: none; }
@@ -3510,7 +3506,7 @@
   /* The picker — one row per lift in the current cycle that can carry a best */
   .ceil-pick-s { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.07em;
     text-transform: uppercase; color: var(--grey-text); margin-top: 4px; }
-  .ceil-go { flex: none; color: var(--clay-ink); font-size: var(--fs-lead); line-height: 1; }
+  .ceil-go { flex: none; color: var(--grey-text); font-size: var(--fs-lead); line-height: 1; }
   .ceil-tag { display: inline-block; margin-left: 6px; padding: 2px 6px; border-radius: 4px;
     background: var(--ice); color: var(--on-accent); vertical-align: 1px;
     font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700;
@@ -3522,7 +3518,7 @@
   .ceil-form .ex-1rm-inputs { grid-template-columns: 1fr 1fr; }
   .ceil-form .ex-1rm-field span { font-size: var(--fs-label); }
   .ceil-form .cf-rpe { display: flex; border-top: 0; padding: 10px 0 0; }
-  body[data-dark] .ceil-form .ex-1rm-field { background: #2a2a2a; }
+  body[data-dark] .ceil-form .ex-1rm-field { background: #2a2a2a; border-color: transparent; }
   .ceil-form-h { font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700;
     letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey-text);
     margin-bottom: 11px; }
@@ -4484,12 +4480,12 @@
      compact ones in a card or the session bar smaller, where their widths were measured (WK-02, WK-03).
      A new primary action joins this list; a secondary one is outlined (Guided, Reset, Clear it). */
   .signin-go, .wel-go, .readiness-begin, .session-timer-btn:not(.guided), .step-primary-btn, .uf-send,
-  .session-confirm.ready .confirm-btn, .timer-ctrl-btn.btn-start, .ceil-add, .wt-save, .rest-btn {
+  .session-confirm.ready .confirm-btn, .timer-ctrl-btn.btn-start, .ceil-add, .wt-save, .rest-btn, .ex-1rm-save {
     background: var(--yellow); color: var(--on-accent); border: 0; border-radius: 8px; min-height: 44px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
     cursor: pointer;
   }
-  .ceil-add, .wt-save { font-size: var(--fs-body); }   /* they were Space Mono at the label size */
+  .ceil-add, .wt-save, .ex-1rm-save { font-size: var(--fs-body); }   /* they were Space Mono at the label size */
 </style>
 </head>
 <body>
@@ -8576,7 +8572,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app — full-screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong> — tick a set and a <strong>Rest</strong> button comes up above the tabs: tap it and the countdown starts. The <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets does the same. It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong> — tick a set and a <strong>Rest</strong> button comes up at the bottom of the screen: tap it and the countdown starts. The <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets does the same. It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab, in every exercise's ⓘ, and at the end of every session, where your message already says which day or exercise it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days; quick check-ins beat long waits.</p>` },
 ];
@@ -10002,17 +9998,38 @@ function renderArticleBlocks(blocks) {
   }).join('');
 }
 
-// ?article= deep-link: resolves an article id via the manifest, then opens it.
+// ?article= deep-link: resolves an article id through the published Library, then opens it.
 async function openArticleDeepLink(idOrPath) {
   if (!idOrPath) return;
-  // Direct file path (contains a slash or .json)
+  // The published row first, through the same get_library() the Playbook reads (2026-09-27, found by
+  // DOC-01): the link used to resolve only through articles/index.json and open the repo's file, so an
+  // edit on the server never reached a shared link and unpublishing an article did not stop it. The
+  // workouts' links had the same fix on 2026-09-20 (openWorkoutDeepLink()).
+  const raw = String(idOrPath).trim().replace(/^\/+/, '').replace(/^articles\//, '').replace(/\.json$/i, '');
+  try {
+    await ensureLibManifests();
+    let key = null;
+    if (_libItems[raw]) key = raw;                                    // "category/id"
+    else {
+      const id = raw.split('/').pop();
+      for (const c of ((_readManifest && _readManifest.categories) || [])) {
+        const hit = (c.articles || []).find(a => a.id === id);
+        if (hit && hit.file) { key = hit.file; break; }
+      }
+    }
+    if (key) { openArticle(key); return; }
+    // The database answered and does not have it (unpublished, or a typo): do not go and
+    // dig the same article out of the files, or unpublishing would not actually unpublish.
+    if (Object.keys(_libItems).length) { console.warn('Deep-link article not found:', idOrPath); return; }
+  } catch (e) { /* fall through to the files */ }
+
+  // Fallback: the library never loaded from the database, so use the file copy.
   if (idOrPath.includes('/') || /\.json$/i.test(idOrPath)) {
     openArticle(idOrPath.includes('/') && !/\.json$/i.test(idOrPath)
       ? `articles/${idOrPath}.json`
       : idOrPath);
     return;
   }
-  // Resolve by id via the manifest
   try {
     const res = await fetch('articles/index.json', { cache: 'no-cache' });
     if (res.ok) {

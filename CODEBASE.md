@@ -382,8 +382,8 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **See also:** `SCHEMA.md` — the fields a programme can contain; `PROGRAM-APP.md` — how the app's programme features work.
 
 #### `articles/index.json` — Playbook manifest (fallback)
-- **What it does:** Lists categories (For Coaches, Pre-Competition, Recovery, Mental, Nutrition, Supplements) and which articles belong to each. The live Playbook comes from the `library` table (`get_library()`, published from coach.html → Links → + Publish article); this file is the offline fallback and resolves `?article=<id>` links.
-- **If deleted:** `?article=<id>` links stop resolving, and an offline Playbook shows nothing.
+- **What it does:** Lists categories (For Coaches, Pre-Competition, Recovery, Mental, Nutrition, Supplements) and which articles belong to each. The live Playbook comes from the `library` table (`get_library()`, published from coach.html → Links → + Publish article); this file is the offline fallback. A `?article=<id>` link resolves through `get_library()` first (`openArticleDeepLink()`, 2026-09-27, as workout links have since 2026-09-20), so an edit on the server reaches a link shared earlier and an unpublished article's link opens nothing; the file is read only when the server cannot answer.
+- **If deleted:** an offline Playbook, and a `?article=<id>` link opened with no signal, show nothing.
 - **Depends on:** `program.html` reads it; individual article files in `articles/<category>/` are fetched lazily.
 - **Edit this when:** You add a new article or create a new category. Always add an entry here alongside the article JSON.
 - **See also:** `SCHEMA.md → "Library tab — Read section"` for the exact format.
