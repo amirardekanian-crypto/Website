@@ -1,5 +1,5 @@
 #!/bin/sh
-# Eleven guards. Each runs only when its own files are staged, so a commit that
+# Twelve guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -232,6 +232,19 @@ if git diff --cached --name-only --diff-filter=ACM \
     failed=1
   else
     echo "pre-commit: word lists OK."
+  fi
+fi
+
+# ── 12. the training app's type scale (added 2026-09-27) ─────────────────────
+# Why: program.html had 46 font sizes and text down to 7.5 px, because every new screen picked
+# the pixel that looked right that day (Fresh Eyes DS-03). Every size is now one of seven steps
+# and a field size, the --fs- tokens in its :root; a display numeral says so in a comment.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|scripts/check_type_scale\.py)$'; then
+  echo "pre-commit: program.html changed — checking its font sizes are on the type scale..."
+  if ! "$PY" scripts/check_type_scale.py; then
+    echo ""
+    echo "pre-commit: BLOCKED — a font size is off the type scale (details above). Use a --fs- token."
+    failed=1
   fi
 fi
 

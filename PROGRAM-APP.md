@@ -647,10 +647,46 @@ the sheet. Closing forgets the trail. A new sheet opener gets wrapped in `wrapSh
   dark, on a card that is always dark green.
 - **Tab bar:** inactive tabs grey at full strength (they were 55%-faded green), labels 11 px, 48 px tall.
 - **Sizes:** no label under 11 px on Home, the day, the finish card, the rest timer, Coach and Game Plan
-  (glyphs, the Level ring and the day letters excepted, at 9–10.5 px). Session notes 16 px. The session rating
+  (glyphs, the Level ring and the day letters excepted, at 9–10.5 px); DS-03 (below) made 11 px the floor everywhere. Session notes 16 px. The session rating
   is two rows of five at 44 px (ten in a row were ~24 px); the ⓘ is 26 px at the row's right end (20 px before the working card) with a 44 px hit area.
 - **Not done:** program.html still sets `maximum-scale=1, user-scalable=no`, so pinch-zoom is off (AA Proof
   allowed it on 2026-09-26). The set-log boxes are 16 px already, so it is a small change, still to be decided.
+  Every field is 16 px since DS-03 (below), so an iPhone would not zoom on a tap once pinch-zoom is on.
+
+## 🔠 One type scale (DS-03, 2026-09-27)
+
+Before: 46 font sizes, 22 of them between 6 and 20 px, 34 pairs within a pixel, text down to 7.5 px (the
+records, weight, Log a max, readiness, sign-in and Library screens, which A11Y-01 had not measured). Now every
+size is a token in `:root`, picked by its job:
+
+| Token | px | For |
+|---|---|---|
+| `--fs-label` | 11 | Space Mono labels, eyebrows, pills, the tab bar, meta lines, the line of numbers. **The floor.** |
+| `--fs-small` | 13 | a secondary line, a helper sentence, a small button |
+| `--fs-body` | 15 | notes, cues, sheet text, rows, buttons |
+| `--fs-field` | 16 | what the athlete types (an iPhone zooms the page on a tap under 16) |
+| `--fs-lead` | 18 | a card's or sheet's title, a closed card's name, the digits on a control (RPE buttons) |
+| `--fs-title` | 22 | a section title, the open card's name, a number in a row |
+| `--fs-head` | 28 | a heading inside a screen, a day's number |
+| `--fs-display` | 44 | the title at the top of a screen |
+
+- **Display pieces keep their own size**: 32 px and up (the rest timer's 96, record numbers, the clamp()
+  heroes), and a smaller numeral whose line says `/* display: … */` (the session clock, Guided's steppers).
+- **`scripts/check_type_scale.py`** (pre-commit guard 12) blocks any other px size, anything under 11 px, and a
+  token that stops being the scale. A new rule picks the step by its job; it does not invent a size.
+- **Buttons and fields take the app's font** (`button, input, select, textarea { font: inherit }`): the Sign in
+  button, the ← backs, ⋯ and ▶ were in Arial at 13.3 px. Every box kept its size (measured on 11 screens).
+- **Only weights that load**: the font request is Barlow 300–700, Barlow Condensed 400/600/700/900 and Space
+  Mono 400/700. Barlow Condensed 800 (33 rules) was never loaded and drew as 900, so the rules say 900; Space
+  Mono 500/600 said 400/700; Barlow's bold (`<strong>`, 600 labels) had been a faked bold of 500.
+- **The line of numbers is never cut** (found while measuring): its parts sat in one unbreakable run, so on a
+  360 px Android the closed card's `… · 2:30` ran past the card, and the open card's (with *tempo* and *rest*
+  written out) at 360 and 375 too. It is a wrapping flex row now: tighter dots under 381 px, it runs under the
+  ⓘ (which sits beside the name), and a part that still does not fit starts the next line. The dot ends a
+  part (`span:not(:last-child)::after`), so a new line starts clean. On a 390 px iPhone the open squat card's
+  four parts take two lines; before, they fitted only by running into the card's padding.
+- **Not in DS-03 yet:** one primary button (eleven styles today) waits for DS-01's answer on what clay is for.
+  AA Proof's type (Outfit, its own sizes) goes with SEAM-01.
 
 ## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26 and 2026-09-27)
 
@@ -703,7 +739,8 @@ Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8r
 **Closed** (`renderExercise()`):
 - **One line of numbers** (`renderNumLine()`, `.ex-numline`): `4 × 6 · RPE 7 · 3-1-1 · 2:30`, only what was
   prescribed, the exercise's own rest only. It replaced the stats grid AND the grey number pills. The words
-  *tempo* and *rest* (`.nl-lab`) show once the card is open. `numLineText()` reads it as text.
+  *tempo* and *rest* (`.nl-lab`) show once the card is open. `numLineText()` reads it as text. Where it cannot
+  fit (a narrow phone, an open card) a part starts the next line rather than running off the card (DS-03).
 - **A pill that says something stays a pill** (Amir: *"we need to find a way for them"*): the green `intent`
   pill and a legacy card's chips (`renderExSummary()`), and the check-in's pills. On a lower day `rdTarget()`
   takes `RPE 7` out of the line and adds the clay **RPE 7 → 6 today** pill, so the number is said once;

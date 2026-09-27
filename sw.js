@@ -137,7 +137,9 @@
 //      card's Last time box already shows last time); Guided's rest screen keeps its own.
 // v71: program.html changed (2026-09-27, CONS-01): one RPE control everywhere (a set, a circuit's rounds,
 //      Guided, the session rating and Log a max): 44 px, and a second tap clears it.
-const CACHE = 'aap-v71';
+// v72: program.html changed (2026-09-27, DS-03): one type scale (seven sizes and a field size, nothing
+//      under 11 px), buttons in the app's font, only weights that are loaded; the line of numbers is never cut.
+const CACHE = 'aap-v72';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
