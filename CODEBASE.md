@@ -85,8 +85,9 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   `Content/SET-LOGGING-DESIGN.md`. **Since 2026-09-26 a set is `{ w, n, r, d, lw? }`**: `lw` is last
   time's weight, shown under a LAST caption in an empty box, and `w` is only ever today's. A
   session's set is ended by ONE function, `carrySet()` (the midnight sweep, the cloud copy and a
-  rename all call it), the setlog merge carries `lw`, and **Same as last** / typing a weight fills
-  the empty sets below. A tick on an empty box records no weight. Details: `PROGRAM-APP.md`.
+  rename all call it), the setlog merge carries `lw`, and typing a weight fills the empty sets
+  below (the card's **Same as last** button went on 2026-09-27; Guided's rest screen keeps one).
+  A tick on an empty box records no weight. Details: `PROGRAM-APP.md`.
 - **⚠️ Personal Records (estimated 1RM; "The Ceiling" on screen until 2026-09-26) — one storage
   key with a hand-written merge rule.** The line at the bottom of an exercise's set log is **pure
   derivation** — nothing stored, no payload, no merge. Writes come from three doors, all landing in

@@ -138,7 +138,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   earlier number for the lift, marked `auto` and written with `t: 0` so anything the athlete does to that day wins.
   New bests only: every screen leads with the latest entry. "The Ceiling" is retired from the screens.
 - **Weight boxes open empty** (2026-09-26): last time's weight is `lw` on the set, shown under a LAST caption,
-  and `w` is only ever today's. A tick on an empty box records no weight; **Same as last** fills the boxes.
+  and `w` is only ever today's. A tick on an empty box records no weight; a weight typed in a set fills the
+  empty sets below. **No Same as last on the card** (Amir, 2026-09-27: *"its a duplicate of what can be seen in
+  history"*); Guided's rest screen keeps its own.
 - **The check-in sets today's targets, never the programme** (REC-2, 2026-09-26): the level is worked out once
   at the check-in and stored with it (`level`, `sore`, `drop`, `asWritten`); `paintToday()` only paints. The
   target rule exists twice, `dayRpe()` here and `dayTargetC()` in coach.html: change both.
@@ -254,7 +256,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v69` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v70` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

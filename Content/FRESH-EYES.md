@@ -143,7 +143,8 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 - **Proof shows twice on Home.** The card's hero says "Day complete" when the day is on target
   (`dayQualifies()`); the strip counts ticks ("1 of 5 done"). Settle it in the Today block.
 - **Records start slowly** for athletes who only tick: an untouched box records no weight, so their
-  records fill once they type a weight or tap Same as last. That is the intended cost of LOG-01.
+  records fill once they type a weight (or tap Same as last on Guided's rest screen; the card's
+  button went on 2026-09-27). That is the intended cost of LOG-01.
 - **One bar of signal (REL-01).** With a saved plan on the phone, a stalled connection still costs
   the 6 s `get_program` wait before the copy opens. Waiting less when a copy exists is a separate call
   (slow-but-working connections would then open on the copy more often). Raise it if athletes notice.

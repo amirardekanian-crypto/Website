@@ -50,7 +50,7 @@ Object.assign(P, {
 vm.runInContext([
   slice(prog, 'program.html', 'function parseDurationToSec(', 'function renderNumLine(rx, rest) {'),   // rxOf, plannedReps
   slice(prog, 'program.html', 'function setReps(s, planned) {', 'function saveSetLogValue('),
-  slice(prog, 'program.html', 'function normDigits(v) {', '// The sets "Same as last" would fill'),
+  slice(prog, 'program.html', 'function normDigits(v) {', '// ── THE CEILING — estimated 1RM from a set'),
   slice(prog, 'program.html', 'function parseLoggedKg(v) {', '// The set that produces the HIGHEST'),
   slice(prog, 'program.html', 'function buildSessionData(day) {', '// Saves a permanent session record'),
   slice(prog, 'program.html', 'function parseSetText(t) {', 'function histFromRows('),
