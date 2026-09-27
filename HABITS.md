@@ -292,8 +292,15 @@ The screen they actually live on. **In this order, and the order is the point:**
    which put the day you are almost always logging at the far left and made the strip read
    backwards against every other week in the app — the hero's seven-day row, the heat map
    and the 35-day grid all run left-to-right *into* now. `editableDays()` owns the order.
-4. **The habit list** — tap the box to tick, tap the name for that habit's history, tap
+4. **The habit list** — tap the **circle** to tick, tap the name for that habit's history, tap
    `+` on counter habits. Each row shows that habit's own level and current streak.
+   **The circle is the tick** (PRF-01, 2026-09-27): the emoji sits in a 48 px circle ringed in the
+   habit's colour, and a tap fills it with that colour and a white tick. It used to be a 22 px ring
+   on the tile's corner while `+` was a 36 px solid grape button, so the main action was the quietest
+   control on the row. `+` stays, 44 px, in the habit's own tint: athletes use both (since 15 Aug, 98
+   of 109 logged sleep days were the full 7.5 h, a tick, while most water, protein and step days
+   stopped part-way, the `+`). **The programme's session goes last**, as one slim line ("From your
+   programme →"); it led the list, so the first habit you could tick started 466 px down.
    Only counter habits carry a meter; on a check-off habit it could only ever read 0% or
    100%, which was noise on half the list.
    **The meter is SEGMENTED, not a straight bar** (Amir, 2026-08-01: *"water and fuel
@@ -1773,8 +1780,9 @@ it only when this app says it is ready. The card stays either way.
 ### The WORKOUT habit is LOCKED and fed by the training programme — through the server
 
 **Athletes cannot tick it by hand.** The row shows a padlock and the line *"Complete any
-day of your Workout in your Program to gain XP for this."*, with an arrow across to the
-programme; tapping the box explains rather than doing nothing. The habit-detail screen
+day of your Workout in your Program to gain XP for this."* (since 2026-09-27 the row itself says
+*From your programme* and sits last on Today; the full line is the toast), with an arrow across to the
+programme; tapping the circle explains rather than doing nothing. The habit-detail screen
 replaces its log button with *Open your programme*. Once earned, the padlock becomes a
 normal tick.
 
@@ -2111,7 +2119,7 @@ rather than a background that teleports between buttons.
 | Thing | What it does |
 |---|---|
 | **Streak ember** | `emberLevel()` — a clay square that breathes from 5 days, faster from 15, and genuinely flickers past 30. The streak stops being a fact and starts being something you don't want to lose. |
-| **Idle attention** | `armIdle()` — 20s after the last tap, the box of the most valuable *unlocked* habit still undone starts breathing. Only on Today, never over a sheet or a celebration. |
+| **Idle attention** | `armIdle()` — 20s after the last tap, the circle of the most valuable *unlocked* habit still undone starts breathing. Only on Today, never over a sheet or a celebration. |
 | **Streak at risk** | `atRisk()` — after 20:00, if the day doesn't qualify **and there is a real streak on the line**, the day bar goes clay and the nudge changes tone and copy. Gated on `currentDayStreak() > 0` so it threatens something real instead of nagging. |
 | **Typing nudge** | `typeLines()` — the clay card types itself out. |
 | **Grid cascade** | The 35-day grid arrives row by row on an 11ms stagger. |
