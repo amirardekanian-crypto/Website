@@ -7000,49 +7000,19 @@ function $t(sel) { return document.querySelector('#app ' + sel); }
 function tourSteps() {
   const counter = live().some(h => h.kind === 'count' && !h.locked);
   const S = [];
+  // FIVE STEPS (PRF-02, Amir's 2A, 2026-09-27): the row, the week, your level and the Locker, the board,
+  // your initials. It was fifteen, straight after onboarding; the other ten (the nudge, the tabs,
+  // Progress, the habit list, the manual itself) live in the manual, and the last step says where.
+  // ⚠️ Every step names a real control, so a moved button moves its step here (CLAUDE.md).
 
-  S.push({
-    title: 'This is the whole app',
-    body: `About a minute. It names every button worth knowing and gets out of the way.
-           You can stop whenever you like — it lives in Settings afterwards.`,
-    screen: 'today', cta: 'Show me'
-  });
-
+  // The row's three taps in one step, the whole row ringed and sealed: a live row would let a tap on
+  // the name open its history in the middle of the tour.
   S.push({
     title: 'One row, three taps',
-    body: `Every habit on this list answers to three different taps, and they do three
-           different things. Here they are, one at a time.`,
+    body: `Tap the <strong>circle</strong> when it is done: on a habit you count it fills the whole target in one
+           go, and a second tap clears it.${counter ? ` Tap <strong>+</strong> to add one at a time, and hold it to go faster.` : ''}
+           Tap the <strong>name</strong> for its history: it logs nothing, so reading about a habit never costs you a day.`,
     screen: 'today', sel: () => $t('.hrow:not(.locked)'), pad: 0
-  });
-
-  S.push({
-    title: 'Tap the circle to log it',
-    body: `That is the daily job, and most days it is the only thing you will touch.
-           On a habit you <strong>count</strong> — steps, sleep, water, meals — the circle means
-           <strong>all of it, done</strong>, so it fills the target in one go. Tap it again to clear the day.`,
-    screen: 'today', sel: () => $t('.hrow:not(.locked) .checkcell'),
-    // Live, so the athlete can finish the step by actually doing it. The hint
-    // deliberately does not push: this app's whole argument is that the log is
-    // evidence rather than a diary, and a tutorial that talks someone into
-    // ticking a box they did not earn undermines it on the first screen.
-    act: true, hint: 'Tap it for real if you have already done it — the tour moves on either way.'
-  });
-
-  S.push({
-    title: 'Tap the name for its history',
-    body: `Its rank, its longest streak, the last 35 days and what it pays. It is the biggest
-           part of the row and the only part that logs nothing — so tapping a habit to read
-           about it never costs you a day.`,
-    screen: 'today', sel: () => $t('.hrow:not(.locked) .body')
-  });
-
-  if (counter) S.push({
-    title: 'Tap + to add one',
-    body: `One glass, one meal, half an hour of sleep, 500 steps. <strong>Hold it down</strong>
-           and it keeps going, so ten thousand steps is not twenty taps.`,
-    // NOT live. A held + repeats ~9 times a second, and a tutorial is the one
-    // moment nobody is watching the number they are putting into their own log.
-    screen: 'today', sel: () => $t('.hrow:not(.locked) .pluscell')
   });
 
   S.push({
@@ -7055,33 +7025,11 @@ function tourSteps() {
   });
 
   S.push({
-    title: 'Everything pays XP',
-    body: `XP builds levels, levels carry ranks — ${esc(RANKS[0])} up to ${esc(RANKS[RANKS.length - 1])},
-           ${SUBS_PER_RANK} levels each. The ring around the number is how far you are through this one.
-           <strong>Tap the rank</strong> to open the Locker — the whole road, every rank, every reward.`,
-    screen: 'today', sel: () => $t('.hero-lv')
-  });
-
-  S.push({
-    title: 'One nudge a day',
-    body: `It reads what you have actually skipped and says so. Its button opens whatever it
-           is complaining about. It changes tomorrow, so there is no point arguing with it.`,
-    screen: 'today', sel: () => $t('.coachcard')
-  });
-
-  S.push({
-    title: 'Four tabs',
-    body: `<strong>Today</strong> is where you log. <strong>Progress</strong> is where you stand.
-           <strong>Crew</strong> is everyone else. <strong>Locker</strong> is what you have earned: your titles, your card looks and the road ahead.`,
-    screen: 'today', sel: () => $t('.tabs'), pad: 0
-  });
-
-  S.push({
-    title: 'Where you stand',
-    body: `Days logged leads on purpose — it is the one that earns the other three.
-           <strong>Badges</strong> are the ${CONSISTENCY_TIERS.length} consistency tiers on each habit plus the
-           ${ACHIEVEMENTS.length} one-off milestones. All of it starts at zero and none of it stays there.`,
-    screen: 'progress', sel: () => $t('.statgrid')
+    title: 'Your level, and the Locker',
+    body: `Everything you log pays XP. XP builds levels, levels carry ranks, ${esc(RANKS[0])} up to
+           ${esc(RANKS[RANKS.length - 1])}, ${SUBS_PER_RANK} levels each, and the ring is how far through this one you are.
+           <strong>Tap the rank</strong> for the Locker: your titles, your card looks and the next rewards on the road.`,
+    screen: 'today', sel: () => $t('.hero-top')
   });
 
   // ⚠️ Three states, from boardState(). The 'coming' one is the first thing a new coached
@@ -7109,44 +7057,9 @@ function tourSteps() {
 
   S.push({
     title: 'Your initials are the door',
-    body: `Top right, on every screen. Settings, your habit list, dark mode and the manual are
-           all behind it — and the same button closes them again. It is the only way in and the
-           only way out, so it is worth knowing.`,
-    screen: 'crew', sel: () => document.querySelector('.hdme'), act: true, cta: 'Open it'
-  });
-
-  // ⚠️ Names both halves of this section, because it points at a list where the
-  // top five say ALWAYS ON. It used to say "switch off what you will not do"
-  // flat out — true of the add-ons, a lie about the five, and told on the first
-  // run to an athlete who cannot yet tell the two groups apart.
-  // ⚠️ The roster moved behind a door (Settings → Habits & targets), so this
-  // step has to OPEN it before the ring is measured. `before` runs ahead of the
-  // repaint in tourShow(); without it the selector matches nothing and the tour
-  // rings empty space on the fourteenth step of a new athlete's first minute.
-  S.push({
-    title: 'The five, and what you add',
-    body: `The five at the top are the job — everyone on the board tracks them, and they have
-           no off switch. Everything under them is yours: switch off an add-on you will not do
-           and it keeps every point it has already banked, or add up to ${MAX_CUSTOM} of your own
-           at the bottom of the list, worth ${XP_RULES.customXp} XP a day each.`,
-    screen: 'settings', before: () => { UI.sub = 'habits'; }, sel: () => $t('[data-tour="tracked"]')
-  });
-
-  // …and this one has to shut it again, because the manual row is on the list
-  // the door opens off, not inside it.
-  S.push({
-    title: 'Everything else is in here',
-    body: `Points, levels, ranks, consistency, seasons, quests, the board and what happens to
-           your data — properly explained, in order. When something on a screen does not make
-           sense, the answer is in there.`,
-    screen: 'settings', before: () => { UI.sub = null; }, sel: () => $t('[data-tour="manual"]')
-  });
-
-  S.push({
-    title: 'That is it',
-    body: `One tap a day and the rest looks after itself. If you want this again it is in
-           Settings, under <strong>The tour</strong>.`,
-    screen: 'settings', cta: 'Start logging', last: true
+    body: `Top right, on every screen: Settings, your habit list, dark mode, <strong>the manual</strong> (everything
+           this tour left out, in order) and <strong>this tour again</strong>. The same button closes them.`,
+    screen: 'today', sel: () => document.querySelector('.hdme'), cta: 'Start logging', last: true
   });
 
   return S;
@@ -8211,8 +8124,8 @@ function renderToday(LI, doneCount) {
                  greeting someone on day 240 as a newcomer is the app not knowing
                  who it is talking to. They are not new; the tour is. -->
             <span class="rcq">${loggedDays().length
-              ? 'New: a minute on what every button in here actually does.'
-              : 'Want the one-minute tour of what everything does?'}</span>
+              ? 'New: five steps on what the buttons in here do.'
+              : 'Want the five-step tour of what everything does?'}</span>
           </span>
           <!-- Purple, not clay: clay/orange is reserved for streak & urgency
                (embers, risk banners) elsewhere in the app; purple is the
@@ -9125,7 +9038,7 @@ function renderManual() {
         </div>` +
         `<button class="btn btn-primary btn-block" ${on(() => { UI.backTo = 'settings'; startTour('settings'); })}>Show me around instead</button>` +
         `<div style="height:12px"></div>` +
-        p(`A minute, and it points at each of those on the real screen. It is also in Settings under <strong style="color:var(--ink)">The tour</strong>, any time.`))}
+        p(`Five steps on the real screen: the row, the week, your level, the board and your initials. It is also in Settings under <strong style="color:var(--ink)">The tour</strong>, any time.`))}
 
       ${block(h2('The daily loop') +
         p(`Tick off what you did today. Every habit is worth points, and points are the whole game — they build your level, your rank in each habit, and your place on the leaderboard.`) +
@@ -10298,9 +10211,9 @@ function perfectDayXp() {
 //
 // ⚠️ `UI.sub` is the open door and NOTHING else reads it. go() clears it on the
 // way out, so leaving Settings and coming back always lands on the list.
-// `attrs` exists for exactly one caller: the tour rings the manual row by
-// `[data-tour="manual"]`, and a tour target has to be an attribute the step can
-// select rather than a class the skin might restyle.
+// `attrs` exists for exactly one caller: the manual row carries `[data-tour="manual"]`, which the
+// fifteen-step tour rang (the five-step one since PRF-02 names the manual from the initials instead).
+// A tour target has to be an attribute a step can select rather than a class the skin might restyle.
 function navRow(icon, name, sub, right, handler, cls, attrs) {
   return `<button class="navrow ${cls || ''}" ${attrs || ''} ${on(handler)}>
     <span class="navtile" aria-hidden="true">${icon}</span>
@@ -10353,7 +10266,7 @@ function renderSettings() {
         <!-- First in the group, because it is the one an athlete who is lost
              needs. The tour is not a settings screen, it is the only explanation
              of what the controls do, and a one-shot explanation is worth little. -->
-        ${navRow('🧭', 'The tour', 'A minute, every button named', '',
+        ${navRow('🧭', 'The tour', 'Five steps on the real screen', '',
                  () => { UI.backTo = 'settings'; startTour('settings'); })}
         ${navRow('📖', 'The manual — how XP works',
                  'Points, levels, ranks, consistency and the board', '',
@@ -10465,11 +10378,9 @@ function renderSettingsAppearance() {
 }
 
 // ── Settings → Habits & targets ───────────────────────────────────────────
-// The roster, on its own screen (Amir, 2026-08-01). ⚠️ `data-tour="tracked"`
-// stays on the wrapper — the tour's fourteenth step rings this list, and its
-// `before` hook is what opens this door before the ring is measured. Move the
-// attribute and the tour points at nothing on the first screen a new athlete
-// sees. Everything below is the same behaviour it has always had: the five have
+// The roster, on its own screen (Amir, 2026-08-01). `data-tour="tracked"` stays on the wrapper for a
+// tour step that rings this list; the fifteen-step tour had one (its `before` hook opened this door),
+// the five-step one (PRF-02) leaves the list to the manual. Everything below is the same behaviour it has always had: the five have
 // no off switch, an add-on arms on the first tap and commits on the second, and
 // removal is always dated tomorrow.
 function renderSettingsHabits() {
