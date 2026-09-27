@@ -127,7 +127,9 @@
 //      circuit's rest is never invented (it fell back to 60 s).
 // v66: program.html and habits.html changed (2026-09-27, NAV-02): the initials button opens Theme,
 //      Install, Help, Privacy and Sign out (which sends everything first); Proof's Settings signs out.
-const CACHE = 'aap-v66';
+// v67: program.html changed (2026-09-27, WK-03): from Start until Done the session bar is one slim line
+//      (← Home, clock, Pause, ⋯) and the tab bar hides (Amir's option C).
+const CACHE = 'aap-v67';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

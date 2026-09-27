@@ -1915,6 +1915,58 @@
     .session-timer.has-reset .session-timer-actions .session-timer-btn { padding: 11px 4px; }
     .session-timer.has-reset .session-timer-reset { padding: 0 8px; min-width: 69px; }
   }
+  /* The slim bar (WK-03, Amir 2026-09-27, option C of the mockup): from Start until Done the
+     bar is one line, ← Home · the clock · Pause · ⋯, and ⋯ opens Pause, Guided and Reset on a
+     second row. The label goes (the clay clock and Pause / Resume say it); the tab bar hides
+     (body.session-on, paintSessionChrome()). Before Start and after Done it is the full bar. */
+  .session-timer-leave, .session-timer-more { display: none; }
+  .session-timer.slim { flex-wrap: nowrap; align-items: center; gap: 6px; padding: 4px 4px 4px 2px; }
+  .session-timer.slim .session-timer-leave { display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex: none;
+    min-height: 44px; min-width: 44px; padding: 0 8px; border: 0; background: transparent; cursor: pointer; color: var(--green-ink);
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+  .session-timer.slim .session-timer-leave span[aria-hidden] { font-size: 18px; letter-spacing: 0; }
+  .session-timer.slim .session-timer-body { flex: 1 0 auto; display: flex; align-items: center; justify-content: flex-start; }   /* the clock never shrinks */
+  .session-timer.slim .session-timer-label { display: none; }
+  .session-timer.slim .session-timer-time { font-size: 24px; }
+  .session-timer.slim .session-timer-actions { flex: none; flex-wrap: nowrap; gap: 6px; }
+  .session-timer.slim .session-timer-actions .session-timer-btn { flex: none; min-height: 44px; padding: 0 14px; }
+  .session-timer.slim .session-timer-btn.guided,
+  .session-timer.slim .session-timer-reset { display: none; }
+  .session-timer.slim .session-timer-more { display: inline-flex; align-items: center; justify-content: center; flex: none;
+    width: 44px; height: 44px; border: 0; border-radius: 8px; background: transparent; cursor: pointer;
+    color: var(--grey-text); font-size: 22px; line-height: 1; }
+  .session-timer.slim.open { flex-wrap: wrap; }
+  .session-timer.slim.open .session-timer-more { order: 2; color: var(--grey-dark); background: var(--grey-card); }
+  .session-timer.slim.open .session-timer-actions { order: 3; flex: 1 1 100%; flex-wrap: wrap; padding: 0 0 2px 6px; }
+  .session-timer.slim.open .session-timer-actions > * { flex: 1 1 0; }
+  .session-timer.slim.open .session-timer-btn.guided { display: inline-flex; align-items: center; justify-content: center; }
+  .session-timer.slim.open .session-timer-reset:not([hidden]) { display: inline-flex; align-items: center; justify-content: center; }
+  body.session-on .global-tabs { display: none !important; }
+  body[data-dark] .session-timer.slim.open .session-timer-more { background: #2a2a2a; color: #eee; }
+  /* The narrowest phones: the arrow alone ("Home" is its label for a screen reader). */
+  /* Past an hour the clock is seven characters ("1:05:12"): "Home" gives it the room. */
+  @media (max-width: 419px) {
+    .session-timer.slim.long .stl-txt { display: none; }
+    .session-timer.slim.long .session-timer-time { font-size: 22px; }
+    .session-timer.slim.long:not(.open) .session-timer-actions .session-timer-btn { padding: 0 10px; }
+  }
+  @media (max-width: 359px) {
+    .session-timer.slim .stl-txt { display: none; }
+    .session-timer.slim .session-timer-time { font-size: 22px; }
+    /* The symbol alone, drawn (the ⏸ glyph on its own renders as a square, which reads as stop);
+       the button's aria-label names it. */
+    .session-timer.slim:not(.open) .session-timer-actions .session-timer-btn:not(.guided) { padding: 0; min-width: 44px;
+      display: inline-flex; align-items: center; justify-content: center; }
+    .session-timer.slim:not(.open) .session-timer-btn .stb-w,
+    .session-timer.slim:not(.open) .session-timer-btn .stb-g { display: none; }
+    .session-timer.slim:not(.open) .session-timer-btn[data-sym="pause"]::before { content: ''; width: 4px; height: 15px;
+      margin-right: 7px; border-radius: 1px; background: currentColor; box-shadow: 7px 0 0 currentColor; }
+    .session-timer.slim:not(.open) .session-timer-btn[data-sym="play"]::before { content: ''; width: 0; height: 0; margin-left: 3px;
+      border-style: solid; border-width: 8px 0 8px 13px; border-color: transparent transparent transparent currentColor; }
+    .session-timer.slim.open .session-timer-actions .session-timer-btn { padding: 0 6px; }
+  }
+  /* Every button on the bar is a 44 px target, before Start too (they were 41). */
+  .session-timer-actions .session-timer-btn { min-height: 44px; }
   @keyframes armPulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(199,85,47,0.55); }
     50%      { box-shadow: 0 0 0 8px rgba(199,85,47,0); }
@@ -6960,6 +7012,8 @@ function closeDayView() {
   document.getElementById('v-progress').classList.remove('active');
   hideRestOffer();
   dropHint();
+  paintSessionChrome();   // the tabs come back
+  document.querySelectorAll('.session-timer.open').forEach(foldBarMore);
   paintWeek();
   // Back on a nav screen — bring the account button back.
   const gToggle = document.getElementById('global-account');
@@ -7248,6 +7302,7 @@ function renderHome() {
     // Week 1 / the back-off week: the same note as Home, where the athlete trains.
     html += weekNoteHTML(cur);
     html += `<div class="session-timer" id="timer-${day.id}" data-day="${day.id}">
+      <button type="button" class="session-timer-leave" onclick="closeDayView()" aria-label="Home (the session keeps running)"><span aria-hidden="true">←</span><span class="stl-txt">Home</span></button>
       <div class="session-timer-body">
         <div class="session-timer-label">Ready when you are</div>
         <div class="session-timer-time">00:00</div>
@@ -7257,6 +7312,7 @@ function renderHome() {
         ${hasStandard ? `<button type="button" class="session-timer-btn guided" onclick="openGuided('${day.id}')">Guided ▶</button>` : ''}
         <button type="button" class="session-timer-reset" hidden onclick="armedTap(this, 'Reset?', () => resetDay('${day.id}'))">Reset</button>
       </div>
+      <button type="button" class="session-timer-more" aria-expanded="false" aria-label="More: Guided and Reset" onclick="toggleBarMore('${day.id}')">⋯</button>
     </div>`;
     // Today's targets: filled by paintToday() after a lower-day check-in (REC-2).
     html += `<div class="rd-banner" hidden></div>`;
@@ -8220,7 +8276,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training. This week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you, the button to message me on WhatsApp, and this guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training. This week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you, the button to message me on WhatsApp, and this guide.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
   { icon: 'activity', title: 'RPE & Tempo',
@@ -8239,7 +8295,7 @@ const APP_GUIDE = [
     body: `<p>Open <strong>Home</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
-    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal; the card says where it is. In <strong>Guided</strong> mode, <strong>Finish Session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. The card lists what's not done; rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Change the rating or the note after Done and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> in the bar at the top of the session (tap it twice) clears the clock, the check-in, your ticks and your RPEs. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
+    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal; the card says where it is. In <strong>Guided</strong> mode, <strong>Finish Session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. The card lists what's not done; rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Change the rating or the note after Done and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> (in the bar at the top, under <strong>⋯</strong> once the clock is going; tap it twice) clears the clock, the check-in, your ticks and your RPEs. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
     body: `<p><strong>Every session</strong> → rate it and tap <strong>Done</strong> (above).</p><p><strong>Every Sunday</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
@@ -9888,6 +9944,7 @@ function switchDay(n) {
     t.classList.toggle('active', dayIds[i] === n));
   document.querySelectorAll('.day-content').forEach((d, i) =>
     d.classList.toggle('active', dayIds[i] === n));
+  paintSessionChrome();
   updateProgress(String(n));
   window.scrollTo(0, 0);
 }
@@ -10196,17 +10253,54 @@ function renderTimer(day) {
   if (finished) {
     labelEl.textContent = 'Session duration';
   } else if (running) {
-    btn.textContent = 'Pause ⏸';
+    setTimerBtn(btn, 'Pause', '⏸');
     labelEl.textContent = 'In progress';
   } else if (t && (t.acc || 0) > 0) {
-    btn.textContent = 'Resume ▶';
+    setTimerBtn(btn, 'Resume', '▶');
     labelEl.textContent = 'Paused';
   } else {
-    btn.textContent = 'Start ▶';
+    setTimerBtn(btn, 'Start', '▶');
     labelEl.textContent = 'Ready when you are';
   }
+  el.classList.toggle('long', timeEl.textContent.length > 5);
   paintResetBtn(day);
+  // The slim bar (WK-03, Amir 2026-09-27: "C"): from Start until Done, one line.
+  const slim = !!(t && t.sessionStart && !finished && !sessionIsStale(t.sessionStart));
+  el.classList.toggle('slim', slim);
+  if (!slim) foldBarMore(el);
+  paintSessionChrome();
   paintHints(day);
+}
+// "Pause ⏸": the word in its own span, so the narrowest slim bar can show the symbol alone.
+function setTimerBtn(btn, word, sym) {
+  if (!btn) return;
+  btn.innerHTML = `<span class="stb-w">${word}</span><span class="stb-g"> ${sym}</span>`;
+  btn.dataset.sym = word === 'Pause' ? 'pause' : 'play';
+  btn.setAttribute('aria-label', word);
+}
+// ⋯ on the slim bar: Pause, Guided and Reset on a second row, and back.
+function foldBarMore(bar) {
+  if (!bar) return;
+  bar.classList.remove('open');
+  const m = bar.querySelector('.session-timer-more');
+  if (m) m.setAttribute('aria-expanded', 'false');
+}
+function toggleBarMore(day) {
+  const bar = document.getElementById('timer-' + day);
+  if (!bar) return;
+  const open = bar.classList.toggle('open');
+  const m = bar.querySelector('.session-timer-more');
+  if (m) m.setAttribute('aria-expanded', String(open));
+}
+window.toggleBarMore = toggleBarMore;
+// While a session is on in the open day, the tab bar hides (body.session-on): ← Home in the
+// bar, or the phone's Back, is the way out, and the clock keeps running. Mid-session the two
+// bars covered 26% of an iPhone SE screen; the slim bar alone makes it 9%.
+function paintSessionChrome() {
+  const dv = document.getElementById('day-view');
+  const act = document.querySelector('.day-content.active');
+  const bar = act && act.querySelector('.session-timer');
+  document.body.classList.toggle('session-on', !!(dv && !dv.hidden && bar && bar.classList.contains('slim')));
 }
 // Single shared 1s tick updates every running timer's display.
 let _timerTick = null;
@@ -10217,6 +10311,7 @@ function initTimers() {
     document.querySelectorAll('.session-timer.running').forEach(el => {
       const timeEl = el.querySelector('.session-timer-time');
       timeEl.textContent = fmtClock(timerElapsedMs(el.dataset.day));
+      el.classList.toggle('long', timeEl.textContent.length > 5);   // past an hour
     });
   }, 1000);
 }
@@ -13045,6 +13140,7 @@ let STEP = null;   // { day, seq, pos, homeCard, homeDetail } — null while clo
 // finished) has no modal to wait for, so the guided view opens immediately.
 function openGuided(day) {
   window._pendingGuidedDay = day;
+  foldBarMore(document.getElementById('timer-' + day));   // opened from ⋯ on the slim bar
   // ⚠️ Never PAUSE a running clock (WK-01, 2026-09-26). toggleSessionTimer() is the Start/Pause
   // button, so calling it on a running session paused it, and the session's minutes (and the
   // training load coach.html reads, session RPE × minutes) came out short. Only a session that
