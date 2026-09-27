@@ -645,6 +645,12 @@ or one that starts mid-scroll is a scroll). A tap above it still closes it, and 
 *Skip for today*) is a 44 px target now (it was 15 px). From 560 px wide the sheet is a centred dialog with no
 handle and no drag. The rest timer keeps the button in its row: it is **Close** on its own and **Skip →** in
 Guided, where it ends the rest. The guide's first card says all this in one paragraph.
+**Back keeps your place (POL-01, 2026-09-27).** `history.scrollRestoration` is `manual`: the browser used to
+put back the scroll it remembered for the guard entry *after* our handler, so the phone's Back from a sheet,
+the rest timer or Guided threw a day scrolled to its fifth exercise back to the top, and a session opened from
+the Library came back to the top of the shelves. Now the layer's own button places the page, as its ← does:
+the day stays where it was, and **the Library returns to where it was scrolled** when a session or an article
+opened from it (`_libScrollY` in `goTo()`; the Library tab, or any other way in, starts at the top).
 
 ## 🔍 Readable in both themes (A11Y-01, 2026-09-26)
 
@@ -739,7 +745,8 @@ two bars covered 26% of the screen mid-session; now 9%.
   brings up one 48 px **Rest 2:00** button above the tab bar. It never starts by itself, because athletes
   also tick sets after the fact; it goes on ×, an untick, leaving the day or 90 s. Guided never shows it.
   Circuits keep their Rest button only. The card's **Rest ⏱** button is 44 px tall (it was 28).
-- The overlay's dark palette came with A11Y-01 (#245).
+- The overlay's dark palette came with A11Y-01 (#245). It is solid since 2026-09-27 (POL-01): at 97% the day's
+  cards showed through behind the clock.
 
 ## 🧾 The working card (CARD-01/02/03, 2026-09-27)
 
@@ -885,6 +892,9 @@ lived only in the guide, two tabs away. Now three hints, `paintHints(day)` in `p
   button.
 - A warm-up with no rest button is still a circuit: `initSetOrRPE()` and `initNotes()` used "has a rest
   button" to tell a circuit from a simple item, and now test the circuit itself, so it keeps its Note row.
+- **Under 360 px a row with a kg box puts the dose under the name** (POL-01, 2026-09-27): a superset's row
+  (letter, name, dose, kg) ran 34–42 px wide of a 320 px phone and cut the kg box off the card. A warm-up's
+  rows have no box and stay one line.
   Guided still leaves warm-ups out (WK-01). Working circuits keep their cues open, as before.
 
 ## 👤 Your account, and Sign out (NAV-02, 2026-09-27)

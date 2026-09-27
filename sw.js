@@ -141,7 +141,9 @@
 //      under 11 px), buttons in the app's font, only weights that are loaded; the line of numbers is never cut.
 // v73: program.html changed (2026-09-27, NAV-01): one close grammar: Guided's ✕ at the top right, sheets
 //      slide down (a handle, a swipe), their Close is a 44 px target.
-const CACHE = 'aap-v73';
+// v74: program.html changed (2026-09-27, POL-01): Back keeps your place (manual scroll restoration), the
+//      Library returns to where it was, the rest screen is solid, a superset's rows fit 320 px, "Session habit".
+const CACHE = 'aap-v74';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

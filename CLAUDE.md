@@ -169,6 +169,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   A new overlay, sheet or screen goes into `topLayer()` (and `initBackNav()`'s observer if a class shows it),
   or Back closes whatever sits under it. **One close grammar** (2026-09-27): ← top left for a screen, ✕ top right
   for a full-screen overlay, a sheet slides down (`initSheetSwipe()`, its handle, a tap above it).
+  `history.scrollRestoration` is `manual`: the layer's own button places the page, never the browser.
 - **Green or clay TEXT reads `--green-ink` / `--clay-ink`, never the fill tokens** (A11Y-01, 2026-09-26). In light
   mode they are the brand colours; in dark mode they are tints that read on #202020. `--yellow` (green) and
   `--ice` (clay) stay for fills and borders. Before this, green text sat on near-black at 1.4–1.7:1.
@@ -257,7 +258,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v73` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v74` on 2026-09-27). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

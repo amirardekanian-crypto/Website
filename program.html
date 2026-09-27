@@ -3675,6 +3675,17 @@
     flex-shrink: 0;
   }
   body[data-dark] .round-detail { color: #999; }
+  /* Under 360 px a row with a kg box puts the dose under the name (POL-01, 2026-09-27): on one line with
+     the name and the box, a superset's row ran 34-42 px wide of a 320 px phone and cut the box off the
+     card. A warm-up's rows have no box and stay one line (WK-05). */
+  @media (max-width: 359px) {
+    .round-row-main:has(> .round-wt) { display: grid; grid-template-columns: 16px minmax(0, 1fr); grid-auto-columns: auto;
+      column-gap: 10px; row-gap: 2px; align-items: center; }
+    .round-row-main:has(> .round-wt) > .round-letter { grid-row: 1 / span 2; }
+    .round-row-main:has(> .round-wt) > .round-name { grid-column: 2; grid-row: 1; }
+    .round-row-main:has(> .round-wt) > .round-detail { grid-column: 2; grid-row: 2; margin-left: 0; }
+    .round-row-main:has(> .round-wt) > :not(.round-letter):not(.round-name):not(.round-detail) { grid-row: 1 / span 2; }
+  }
   /* Small play button next to each round item — only shown if that item has a video */
   .round-play-btn {
     width: 28px; height: 28px;
@@ -4045,7 +4056,7 @@
   .app-card-icon svg { width: 24px; height: 24px; }
 
   /* ── Timer ── */
-  .timer-overlay { position: fixed; inset: 0; background: rgba(250,247,242,0.97); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
+  .timer-overlay { position: fixed; inset: 0; background: var(--grey-bg);   /* solid: at 97% the card showed through (POL-01) */ z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
   .timer-overlay.visible { display: flex; }
   .timer-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-label); letter-spacing: 3px; text-transform: uppercase; color: var(--grey-text); margin-bottom: 10px; }
   /* Sound on/off for the tones at zero (WK-02); the buzz stays either way. */
@@ -4274,7 +4285,7 @@
   body[data-dark] { --grey-bg: #181818; --grey-card: #252525; --grey-mid: #383838; --grey-text: #8f8f8f; --white: #202020; --grey-dark: #e8e8e8; --rpe-under: #8DB3D6;
     --green-ink: #6DBE95; --clay-ink: #E06B43; }
   /* The rest timer stayed a light sheet in dark mode while its digits turned light: "2:00" at 1.08:1. */
-  body[data-dark] .timer-overlay { background: rgba(22,22,22,0.97); }
+  body[data-dark] .timer-overlay { background: #161616; }
   body[data-dark] .checklist-item { border-color: #333; }
   body[data-dark] .item-name { color: #ddd; }
   body[data-dark] .section-title { color: #666; }
@@ -7605,7 +7616,7 @@ function renderHome() {
            see the two apps agreed without leaving this screen. -->
       <button type="button" class="complete-habit" id="habit-tick-${day.id}" hidden onclick="goHabits()">
         <span class="complete-habit-mark">✓</span>
-        <span class="complete-habit-text">Counts as your Workout habit <b>·&nbsp;open tracker</b></span>
+        <span class="complete-habit-text">Counts as your Session habit <b>·&nbsp;open AA Proof</b></span>
       </button>
       <div class="complete-actions">
         <div class="send-session-status" id="send-status-${day.id}" aria-live="polite"></div>
@@ -8613,8 +8624,15 @@ function coachContactHtml() {
     <div class="coach-wa-num">${COACH_WHATSAPP_SHOWN}</div>`;
 }
 
+// Where the Library was scrolled when a session or an article opened from it (POL-01): coming back
+// returns there, not to the top of the shelves. Any other route to the Library forgets it.
+let _libScrollY = null;
 function goTo(screen, historyId, keepContent) {
   hideRestOffer();
+  const was = (document.querySelector('.screen.active') || {}).id || '';
+  if (was === 'screen-workouts' && (screen === 'workout' || screen === 'article')) _libScrollY = window.scrollY;
+  const libBack = screen === 'workouts' && (was === 'screen-workout' || was === 'screen-article') && _libScrollY != null;
+  if (screen !== 'workout' && screen !== 'article') { if (!libBack) _libScrollY = null; }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + screen).classList.add('active');
   // The rail is the open day's progress: only in a day view (POL-01; it sat on the overview too).
@@ -8677,7 +8695,8 @@ function goTo(screen, historyId, keepContent) {
   document.getElementById('global-tabs').classList.remove('is-hidden');
   document.getElementById('global-account').classList.remove('is-hidden');
 
-  window.scrollTo(0, 0);
+  if (libBack) { const y = _libScrollY; _libScrollY = null; window.scrollTo(0, y); }
+  else window.scrollTo(0, 0);
 }
 
 // ── BACK CLOSES THE TOP LAYER (NAV-01, 2026-09-26) ────────────────────────
@@ -8732,6 +8751,10 @@ function navSync() {
 window.navSync = navSync;
 function initBackNav() {
   if (window.IS_PREVIEW) return;
+  // Back presses the top layer's own button, and that button places the page (POL-01: the Library
+  // returns to where it was). The browser must not then move it again to the scroll it remembered
+  // for the guard entry, which it did, after our handler, sending the shelves back to the top.
+  try { history.scrollRestoration = 'manual'; } catch (e) {}
   window.addEventListener('popstate', () => {
     if (BACKNAV.ignore) { BACKNAV.ignore = false; return; }
     BACKNAV.armed = false;
@@ -8836,6 +8859,7 @@ function renderLibrary() {
 // Bottom-nav "Library" tap → always open on the two doors.
 function goLibrary() {
   _libPane = 'doors';
+  _libScrollY = null;   // the tab opens on the doors, at the top
   goTo('workouts');
 }
 window.goLibrary = goLibrary;
