@@ -1731,9 +1731,6 @@
     background: linear-gradient(105deg, transparent, rgba(255,255,255,.7), transparent);
     animation: lvSheen 2.6s ease-in-out 1s infinite;
   }
-  .lvmedal { position: relative; width: 168px; height: 168px; border-radius: 999px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-  .lvmedal .disc { width: 136px; height: 136px; border-radius: 999px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 56px; line-height: 1; }
-  .lvmedal .stars { font-size: 11px; letter-spacing: .1em; color: rgba(35,31,53,.5); }
   .lvxp {
     margin-top: 14px; display: inline-flex; align-items: center; gap: 7px;
     background: rgba(246,244,255,.12); border-radius: 999px; padding: 7px 15px;
@@ -2657,14 +2654,6 @@ const NUDGES = {
     'Easiest points in the app and you are leaving them on the table.',
     'Twelve seconds. You have spent longer reading this nudge.'
   ],
-  strength: [
-    'No session logged. Your programme is open in the other app, sulking.',
-    'Picking heavy things up and putting them down. Sisyphus with better shoulders. Go.',
-    'The session is worth more than everything else here combined. That is not an accident.',
-    'Your programme is one tap away and it already has a plan for you.',
-    'Nothing in this app pays like training does. Go and take it.',
-    'Show up and do the thing. Partial credit is still credit.'
-  ],
   // A habit the athlete added themselves. It has no bucket of its own (its id is
   // made up when they add it), and it used to fall through to `empty`, so a day
   // with six things done opened with "Nothing logged yet". {name} is theirs.
@@ -3492,15 +3481,6 @@ function oldestLoggable() { return fmtKey(addDays(today(), -BACKFILL_DAYS)); }
 function canLog(dayKey) { return !!dayKey && dayKey <= TKEY() && dayKey >= oldestLoggable(); }
 const AKEY = () => (canLog(UI.day) ? UI.day : TKEY());   // the day being edited
 function editingPast() { return AKEY() !== TKEY(); }
-// OLDEST FIRST, TODAY ON THE RIGHT (Amir, 2026-08-01). It ran today-first, which
-// put the day you are almost always logging at the far left and made the strip
-// read backwards against every other week in the app — the hero's seven-day row,
-// the heat map and the 35-day grid all run left-to-right into now.
-function editableDays() {
-  const out = [];
-  for (let i = BACKFILL_DAYS; i >= 0; i--) out.push(fmtKey(addDays(today(), -i)));
-  return out;
-}
 function dayShort(k) {
   return k === TKEY() ? 'TODAY' : parseKey(k).toLocaleDateString('en-GB', { weekday:'short' }).toUpperCase();
 }
@@ -3766,7 +3746,7 @@ function migrateOld() {
   // everyone this needs to reach.
   //
   // `touched` — set the instant an athlete taps the Settings switch themselves,
-  // in EITHER direction (see renderSettingsWeight()) — is what tells "never
+  // in EITHER direction (the switch this app had until 2026-09-12) — is what tells "never
   // decided" from "decided", so this can flip a stale default but can never
   // clobber a real choice, including one made in the few hours this shipped
   // with the opposite default.
@@ -5744,8 +5724,8 @@ const TAB_ORDER = ['today', 'progress', 'crew', 'pass'];
 function navDir(from, to) {
   // Settings joins the list of screens that push in from the right and pop
   // back out to the left — it is no longer a tab you slide sideways into.
-  if (to === 'detail' || to === 'manual' || to === 'settings' || to === 'weight') return 1;
-  if (from === 'detail' || from === 'manual' || from === 'settings' || from === 'weight') return -1;
+  if (to === 'detail' || to === 'manual' || to === 'settings') return 1;
+  if (from === 'detail' || from === 'manual' || from === 'settings') return -1;
   const a = TAB_ORDER.indexOf(from), b = TAB_ORDER.indexOf(to);
   if (a < 0 || b < 0 || a === b) return 0;
   return b > a ? 1 : -1;
@@ -7447,7 +7427,6 @@ function renderApp() {
     // Settings is a list of doors, so its header names the door you are behind.
     settings: UI.sub === 'habits'     ? ['Settings', 'Habits & targets']
             : UI.sub === 'appearance' ? ['Settings', 'Appearance']
-            : UI.sub === 'weight'     ? ['Settings', 'Body weight']
             : ['Day ' + dayNumber() + ' · ' + LI.label, 'You']
   };
   const rights = {
@@ -7485,11 +7464,9 @@ function renderApp() {
   // bar, so no tab lights up while you are in them and the initials button
   // becomes the way out. The Locker IS a tab now — it is the battle pass, and
   // battle passes live on the main bar.
-  // Weight joins these: it is not a tab, so no tab may light up while it is
-  // open, and it needs the same back chevron every other overlay screen has.
-  const OVERLAY = (UI.screen === 'settings' || UI.screen === 'manual' || UI.screen === 'weight');
+  const OVERLAY = (UI.screen === 'settings' || UI.screen === 'manual');
   // POL-02: a habit's page lights the tab it was opened from (it lit PROGRESS from Today too), and
-  // Settings, the manual and body weight light nothing: the slab used to sit under TODAY there.
+  // Settings and the manual light nothing: the slab used to sit under TODAY there.
   const activeTab = UI.screen === 'detail' ? (tabDefs.some(t => t[1] === UI.from) ? UI.from : 'today') : (OVERLAY ? '' : UI.screen);
   const tabAt = tabDefs.findIndex(t => t[1] === activeTab);
   const initials = (ATHLETE_NAME || 'Athlete').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -7637,37 +7614,19 @@ function renderCelebration(ev) {
     </div>`;
 }
 // "steps, sleep and water" — and past four, it stops listing and starts counting,
-// because a takeover is not the place to read eight habit names.
+// because a win's one line is not the place to read eight habit names.
 function nameList(hs) {
   const n = hs.map(h => h.name.toLowerCase());
   if (n.length === 1) return n[0];
   if (n.length > 4) return n.slice(0, 3).join(', ') + ' and ' + (n.length - 3) + ' more';
   return n.slice(0, -1).join(', ') + ' and ' + n[n.length - 1];
 }
-// Tiers, milestones and perfect days borrow the same machinery but land on the
-// green ground, so the KIND of win is readable before a word of it is.
+// A quest, a day streak from STREAK_TAKEOVER days and a reward borrow the same machinery but land
+// on the green ground, so the KIND of win is readable before a word of it is. A tier, a milestone, a
+// perfect day and a comeback have no takeover: they land on the wins card on Today (PRF-02).
 function renderBadgeCelebration(ev) {
   let badge, badgeLabel, kicker, title, sub, codeClass = '', art = null, ground = 'badge', share = 'medal', xpLine = 0;
-  if (ev.kind === 'tier') {
-    const paid = ev.habits.reduce((s, h) => s + tierPaid(h, ev.tierIndex), 0);
-    badge = String(ev.tier.days); badgeLabel = 'DAYS';
-    kicker = 'Consistency';
-    title = ev.tier.name;
-    xpLine = paid;
-    sub = ev.tier.days + ' days of ' + nameList(ev.habits) + ' in a row. '
-        + 'The habit did not get easier. You got harder to stop. '
-        + (paid > 0
-            ? 'The tier is yours for good.'
-            : 'The tier is yours for good. The streak started before ' + seasonName()
-              + ', so it pays nothing this season.');
-    // The medal, in the habit's own colour, instead of a number in a box.
-    const h0 = ev.habits[0];
-    art = `<div class="lvmedal" style="background:${METALS[ev.tierIndex >= 3 ? 'emerald' : ev.tierIndex >= 1 ? 'silver' : 'bronze'].rim}">
-        <span class="disc" style="background:${habitHue(h0)[1]}">${splitEmoji(h0.name)[0] || '✨'}
-          <span class="stars">${'★'.repeat(Math.min(3, ev.tierIndex + 1))}</span></span>
-        <span class="sheen"></span>
-      </div>`;
-  } else if (ev.kind === 'streak') {
+  if (ev.kind === 'streak') {
     // The day streak crossing a mark — the single strongest signal that somebody
     // is going to keep going, and the app used to say nothing at all about it.
     ground = 'streak'; share = 'streak';
@@ -7681,17 +7640,6 @@ function renderBadgeCelebration(ev) {
         : 'One day is a decision. ' + ev.days + ' is a character reference. Keep it lit.';
     sub = ev.days + ' days in a row at ' + XP_RULES.streakQualifyPct + '% or better. ' + verdict;
     art = `<div class="lvflame"><span class="fl">🔥</span><span class="n">${ev.days}</span></div>`;
-  } else if (ev.kind === 'comeback') {
-    // Deliberately warm, and deliberately NOT congratulatory about the gap. The
-    // athlete knows they were gone; the app's job here is to say the days
-    // behind them do not have to be paid off before today counts.
-    ground = 'streak'; share = 'rank';
-    kicker = 'Back on it';
-    title = 'SECOND WIND';
-    xpLine = COMEBACK_XP;
-    sub = ev.gone + ' days off, and you opened it anyway. That is the hard part — '
-        + 'the streak starts again from today, not from where it broke.';
-    art = `<div class="lvflame"><span class="fl">🔄</span><span class="n">${ev.gone}</span></div>`;
   } else if (ev.kind === 'quest') {
     badge = 'Q'; badgeLabel = 'QUEST'; codeClass = ' code';
     kicker = 'Quest complete';
@@ -7699,23 +7647,6 @@ function renderBadgeCelebration(ev) {
     xpLine = ev.quest.xp;
     sub = ev.quest.note + '.';
     share = 'rank';
-  } else if (ev.kind === 'milestone') {
-    const paid = milestonePaid(ev.ach.code);
-    // "Medal upgraded" on anything past the first rung — earning HUMAN
-    // SPRINKLER III should not read like a badge you have already had twice.
-    kicker = (ev.ach.mark && ev.ach.mark !== 'I') ? 'Milestone, next rung' : 'Milestone';
-    title = achName(ev.ach);
-    xpLine = paid;
-    sub = ev.ach.note + '.' + (paid > 0 ? '' : ' Yours on your all-time record — the '
-          + ev.ach.xp.toLocaleString() + ' XP lands when you do it again inside ' + seasonName() + '.');
-    const part = String(ev.ach.measure || '').split(':');
-    const hh = part[1] ? habitById(part[1]) : null;
-    const mk = ev.ach.tier === 'rare' ? 'emerald' : ev.ach.tier === 'long' ? 'silver' : 'bronze';
-    art = `<div class="lvmedal" style="background:${METALS[mk].rim}">
-        <span class="disc" style="background:${hh ? habitHue(hh)[1] : '#EFECFB'}">${hh ? (splitEmoji(hh.name)[0] || '✨') : (MEASURE_EMOJI[part[0]] || '✨')}
-          <span class="stars">${'★'.repeat(ev.ach.tier === 'rare' ? 3 : ev.ach.tier === 'long' ? 2 : 1)}</span></span>
-        <span class="sheen"></span>
-      </div>`;
   } else if (ev.kind === 'reward') {
     kicker = 'Unlocked';
     title = ev.reward.name;
@@ -7726,29 +7657,10 @@ function renderBadgeCelebration(ev) {
     art = ev.reward.kind === 'title'
       ? `<div style="position:relative">${titlePlate(ev.reward)}<span class="sheen"></span></div>`
       : `<div style="position:relative;width:132px;height:166px;border-radius:20px;${CARD_LOOK[ev.reward.id] || CARD_LOOK.c_paper};box-shadow:0 18px 40px -18px rgba(0,0,0,.8)"><span class="sheen"></span></div>`;
-  } else {
-    // A perfect day. The one every consistency system is really built around.
-    const n = live().length;
-    // Judged on this season, same denominator as the Progress stat grid and
-    // the month wrap card — today's LOG is already saved by the time this
-    // fires, so isPerfect(TKEY()) is already counted in it.
-    const perfectCount = seasonDays().filter(isPerfect).length;
-    badge = String(n); badgeLabel = n === 1 ? 'HABIT' : 'HABITS';
-    kicker = 'Clean sweep';
-    title = 'Perfect day';
-    xpLine = dayXp(ev.id);
-    sub = 'Every habit you track, done. ' + (perfectCount <= 1
-      ? 'That is the first perfect day on your record. It has been done once now, which makes it repeatable.'
-      : 'Perfect day number ' + perfectCount + ' — you appear to be collecting them.');
-    share = 'receipt';
-    art = `<div class="lvmedal" style="background:${METALS.emerald.rim}">
-        <span class="disc" style="background:#E6F7F4">🏆<span class="stars">${n} / ${n}</span></span>
-        <span class="sheen"></span>
-      </div>`;
   }
   return `
-    <div class="lvwrap ${ground}" data-k="cel:${esc(ev.kind || 'perfect')}:${esc(String(ev.id))}" ${on(dismissCelebration)}>
-      ${confettiHtml(ev.kind === 'milestone' || !ev.kind ? 34 : 26)}
+    <div class="lvwrap ${ground}" data-k="cel:${esc(ev.kind)}:${esc(String(ev.id))}" ${on(dismissCelebration)}>
+      ${confettiHtml(26)}
       <div class="lvstage">
         <div class="lvrays"></div>
         <div class="lvshock"></div>
@@ -8701,23 +8613,6 @@ function renderDetail(h) {
     </div>`;
 }
 
-// ⚠️ THE DISCLOSURE, and it has to actually be SEEN — not just true somewhere
-// in a privacy policy nobody opens. Being on by default (2026-09-05) means
-// most athletes never chose this; the app owes every one of them a real,
-// standalone "this is here, here is how to stop it" moment, not a clause
-// buried in wtCardLine()'s empty-state copy that a fast tap on "Weigh in"
-// could skip past before it was ever read.
-//
-// Reuses `.rcprompt` unchanged — the exact component the tour prompt and the
-// roll-call pointer already use for "explain once, then get out of the way
-// for good" — rather than inventing a dismiss control this app has never had.
-// Tapping it opens Settings → Body weight DIRECTLY — the screen with the
-// explanation AND the off switch on it, not the read-only history a level
-// removed from either. wtMarkSeen() also fires from goWeight() and the
-// weigh-in sheet's Save button, so opening the history or logging a reading
-// ends this banner too — seeing the feature in use is as much "informed" as
-// reading a sentence about it, and nobody should have to dismiss a banner
-// they have already acted past.
 // "You did the work. Want it to count?"
 //
 // A library workout ticks the habit it maps to, but the two it most often maps
