@@ -20,7 +20,7 @@ Start here if you're picking this up in a fresh chat.
 >    constants, so retuning XP never breaks them; its **prose** does not, so a change of
 >    *behaviour* means rewriting it by hand;
 > 5. **`privacy.html`** — if you changed what data is stored or shared;
-> 6. **`tourSteps()`** — the 15-step tour points a clay box at real controls and says out
+> 6. **`tourSteps()`** — the five-step tour points a clay box at real controls and says out
 >    loud what each one does. Move a button, rename a tab or change what a tap does and it
 >    is actively lying, on the first screen a new athlete sees.
 
@@ -1248,15 +1248,12 @@ control and that is the point: `overlayBack()` goes exactly **one** step (sub-sc
 the list → wherever you came from) while `✕` still leaves the whole overlay in one tap.
 Before this, from behind a door the only way out was all the way out.
 
-⚠️ **The tour walks through here**, and two of its steps had to learn about the door.
-Step 13 rings `[data-tour="tracked"]` — now inside *Habits & targets* — so it carries
-`before: () => { UI.sub = 'habits' }`; step 14 rings `[data-tour="manual"]`, which is on
-the list the door opens off, so it carries `before: () => { UI.sub = null }`; step 15 is the
-closing card. `before` runs ahead of the repaint in `tourShow()`. Without them the tour
-rings empty space on the thirteenth step of a new athlete's first minute. (The count is
-fixed at 15: the only conditional step, *Tap + to add one*, needs an unlocked counter
-habit, and four of the five core habits are counters.) Proven: walked end to end, all 15
-steps find their target.
+The fifteen-step tour walked through here (it rang `[data-tour="tracked"]` inside *Habits &
+targets*, with `before: () => { UI.sub = 'habits' }`, then `[data-tour="manual"]`). The five-step
+tour (PRF-02) stays on Today and Crew and names Settings and the manual from the initials, so both
+attributes are unused anchors now; `before` still runs ahead of the repaint in `tourShow()` for a
+step that needs a door opened. Proven: walked end to end, all five steps find their target, for a
+coached athlete before and after the board, and a free one, at 390 and 320 px.
 
 Deliberately *not* here: coach volume, motivation display, and — since the 2026-07-30
 redesign — **the ladder**, which used to be its own row. Tapping your rank goes straight
@@ -1343,10 +1340,14 @@ no signal that there was more than one** — and left to guess. The only real ex
 nothing anywhere pointing at it.
 
 The tour is a clay box drawn around the thing being named, a card beside it saying what
-that thing does, and everything else dimmed. **15 steps**, about a minute, across Today,
-Progress, Crew and Settings. It runs straight off *Start tracking*, and it is replayable
-for ever from **Settings → The tour** and from the manual's new
-**Start here** section.
+that thing does, and everything else dimmed. **Five steps** (PRF-02, Amir's 2A, 2026-09-27; it
+was fifteen, straight after onboarding): **the row** (the circle, `+` and the name, in one sealed
+step), **the week** (fill in a day you missed), **your level and the Locker**, **the board** (the
+PRIV-01 step, unchanged: when you appear on it, under which name, and how to keep off), and **your
+initials** (Settings, the manual, this tour again), which ends it with *Start logging*. The other ten
+(the nudge, the four tabs, Progress, the habit list, the manual) live in the manual, which the last
+step names. It runs straight off *Start tracking*, and it is replayable for ever from
+**Settings → The tour** and from the manual's **Start here** section.
 
 `TOUR`, `tourSteps()`, `startTour()`, `tourShow()`, `tourTap()` and `paintTour()` in
 `habits.html`. Three things about it are load-bearing:
