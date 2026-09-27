@@ -105,8 +105,14 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
    leave it; the phone's dark setting → the athlete chooses.
 2. **Foundations:** done. HOME-02 shipped from Amir's notes on the mockup (#258): no separate Today card, no
    rest-day design ("we don't know their rest days"); done days small, undone days big, the in-progress card.
-3. **The session** (the card freeze is lifted): WK-02 is done (#260); next CARD-01 with
-   CARD-02 and CARD-03 as one mockup for Amir, then WK-01's layout part, WK-04, ONB-01, WK-05.
+3. **The session** (the card freeze is lifted): WK-02 is done (#260). CARD-01, CARD-02 and CARD-03 are one
+   mockup (https://claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8rz, 2026-09-27). Amir answered its three calls, each
+   the recommended option: **how to do it** (video and cues) is one folded row that opens by itself only when
+   the athlete has no history for the lift; **a finished card folds** after the last set's RPE and the next
+   one opens in view; **the log columns follow the work** (kg for loaded, reps only for bodyweight, seconds
+   for a timed hold; an athlete who has logged a weight on that exercise keeps the kg box). On the rest of
+   the layout he has notes first: get them, adjust the mockup, then build. After it: WK-01's layout part,
+   WK-04, ONB-01, WK-05.
 4. **Home and progress:** PROG-01.
 5. **Coach and Proof:** COACH-02, NAV-02, SEAM-01 (after the habit count below), PRF-01, PRF-02,
    PRF-03.
@@ -115,7 +121,9 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 ## Open calls and things to watch (put these to Amir)
 
 - **Answered 2026-09-26:** Today block → mockup first, then built from his notes (#258) · Game Plan → fold (#254) ·
-  estimate → off the card (#255) · unfinished day → ask the athlete (#256). **Answered 2026-09-27:** a rest day in Proof → leave it · dark mode → the athlete's choice.
+  estimate → off the card (#255) · unfinished day → ask the athlete (#256). **Answered 2026-09-27:** a rest day in Proof → leave it · dark mode → the athlete's choice · the working
+  card → how-to folded (open the first time), fold after the last RPE, columns by the work; his layout notes
+  come before the build.
 - **The demo breaks two of his rules.** It has a "Week 4 — Deload" notes card instead of
   `weekNotes.last` (REC-4; the demo has no week notes at all), and "Use 2–3 kg" in a notes card
   rather than in that exercise's Coach's Note (PRG-2). The words were left as written when the demo
