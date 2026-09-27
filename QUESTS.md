@@ -8,7 +8,8 @@ The mechanics — how they're scored, why they're safe, how the app and the serv
 
 > **Quests are a lever, not a feature.** There are **none** unless a run is started, and
 > a run lasts **7 days from its start date**. When it ends the block disappears from the
-> athlete's Today screen until the next one. That's the point — seeing quests means
+> athlete's Progress screen until the next one (since PRF-02, 2026-09-27, with no "none running"
+> line in between; the manual explains quests meanwhile). That's the point — seeing quests means
 > *something is on this week*.
 
 ---

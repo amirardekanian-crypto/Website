@@ -1476,6 +1476,18 @@
   #app .msrow.got .ms-xp, #app .msrow.got .ms-cnt { color: var(--teal-deep); }
   #app .msrow .ms-note .g.got { color: var(--teal-deep); }
   #app .msrow.evrow .ms-xp { font-size: 10px; letter-spacing: 0.04em; }
+  /* The folds (PRF-02): one row that opens everything, and the medals already earned on one row. */
+  #app .msall { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: calc(100% - 32px); box-sizing: border-box;
+    margin: 0 16px 12px; min-height: 48px; padding: 0 18px; border: 0; border-radius: 18px; background: var(--card);
+    box-shadow: var(--shadow); color: var(--accent); font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14.5px; text-align: left; cursor: pointer; }
+  #app .msall .go { font-size: 20px; line-height: 1; }
+  #app .msearned { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; width: calc(100% - 32px); box-sizing: border-box; margin: 0 16px 8px;
+    padding: 12px 16px 14px; border: 0; border-radius: 18px; background: var(--card); box-shadow: var(--shadow);
+    color: inherit; font-family: 'Outfit', sans-serif; text-align: left; cursor: pointer; }
+  #app .msearned .mse-l { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  #app .msearned .mse-m { display: flex; flex-wrap: wrap; gap: 6px; }
+  #app .msearned .medal { width: 34px; height: 34px; }
+  #app .msearned .medal-in { width: 27px; height: 27px; font-size: 13px; }
   #app .msnext { background: var(--surface); border-bottom: 0; margin: 0 16px 10px; border-radius: 16px; }
   #app .rankrow .badge { border: 0; border-radius: 999px; background: var(--surface); }
   #app .rankrow.passed .badge { background: var(--accent-100); color: var(--accent); }
@@ -5743,7 +5755,7 @@ function overlayBack() {
 // That means a tampered localStorage cannot buy a place on the board. The RPC
 // deliberately returns no athlete ids — an id alone would let one client fetch
 // /data/<id>.json and read another athlete's whole programme.
-const LB = { scope:'season', view:'roll', rows:[], joined:false, loading:false, error:null, loaded:false,
+const LB = { scope:'season', view:'board', rows:[], joined:false, loading:false, error:null, loaded:false,
              nameDraft:'', deltas:{}, passed:[] };
 // ── Position deltas ───────────────────────────────────────────────────────
 // The board only ever showed a standing. What actually lands is MOVEMENT — that
@@ -8138,7 +8150,7 @@ function renderToday(LI, doneCount) {
            ever opens Today still discovers there is a conversation. It shows
            only while today's line is unwritten, so it disappears once done. -->
       ${past || window.IS_DEMO || myNote(TKEY()) ? '' : `
-        <button class="rcprompt" data-k="rcprompt" ${on(() => go('crew'))}>
+        <button class="rcprompt" data-k="rcprompt" ${on(() => { LB.view = 'roll'; go('crew'); })}>
           <span>
             <span class="eyebrow">Roll call</span>
             <span class="rcq">${esc(pickLine('prompt', 'rollcall'))}</span>
@@ -8207,22 +8219,10 @@ function renderToday(LI, doneCount) {
 }
 
 // ── This week's quests ────────────────────────────────────────────────────
-// Three targets that give the week a shape. Shown on Today under the nudge,
-// because a quest only means anything while there is still week left to do it in.
-// Between runs the block used to vanish completely, which kept "seeing quests
-// means something is on" true but made the whole feature invisible: an athlete
-// who joined between runs never learned quests existed, so the next one read as
-// random rather than as an event they had been waiting for. One quiet line
-// instead — a fraction of the height of a live block, so a real run still lands.
-// Between runs this stays visible rather than vanishing. The block disappearing
-// entirely kept "seeing quests means something is on" true, but made the whole
-// feature invisible — an athlete who joined between runs never learned quests
-// existed, and the next one read as random rather than as an event.
-function renderQuestsIdle() {
-  return `<div class="questidle" data-k="questidle">
-    <span>None running right now. Your coach sets these a week at a time — when one is on it appears here, worth real points on top of your habits.</span>
-  </div>`;
-}
+// Three targets that give the week a shape, on Progress while a run is on.
+// Between runs the Quests block is not drawn at all (PRF-02, Amir's 4A, 2026-09-27). It said "None
+// running right now" so that a new athlete learned quests existed; after 17 August that line was all
+// anyone had seen of them. The manual's Quests section explains them in between.
 // Quests wear the EVENT card. Amir picked that design out by name and asked for
 // it here — which is right beyond the aesthetics: a quest run and an event are
 // the same object at two lengths (a set of goals, a clock, a reward), and they
@@ -8234,9 +8234,9 @@ function renderQuestsIdle() {
 // list, and it pushed the habits down for something nobody acts on mid-tap.
 function renderQuestBlock() {
   const run = activeQuestRun();
-  if (!run) return renderQuestsIdle();
+  if (!run) return '';
   const qs = runQuests(run);
-  if (!qs.length) return renderQuestsIdle();
+  if (!qs.length) return '';
   const prog = qs.map(q => ({ q, p: questProgress(q, run) }));
   const doneN = prog.filter(x => x.p.done).length, allDone = doneN === qs.length;
   const left = runDaysLeft(run);
@@ -8405,8 +8405,10 @@ function renderProgress(LI, earned, totalAch) {
            than with the game half. Not a habit row — no ring, no level, no pips,
            because it has none of those things. -->
 
-      ${sectionLabel('Quests', 'Seven days')}
-      ${renderQuestBlock()}
+      <!-- Only while a run is on (PRF-02, Amir's 4A): a run arrives with its card and its takeover, and
+           the manual explains quests in between. The idle line was all anyone had seen of quests since
+           17 August. -->
+      ${(run => run && runQuests(run).length ? sectionLabel('Quests', 'Seven days') + renderQuestBlock() : '')(activeQuestRun())}
 
       <!-- Milestones, in three tiers. One flat list gave a new athlete a single
            reachable row above nine walls, and gave a two-year athlete nothing
@@ -8474,12 +8476,31 @@ function renderProgress(LI, earned, totalAch) {
           return msTierHeader(key, t.label, inTier.filter(r => r.got).length + '/' + inTier.length)
                + (open ? inTier.map(row).join('') : '');
         };
-        return sectionLabel('Milestones', (rows.filter(r => r.got).length + evDone) + ' of ' + (ACHIEVEMENTS.length + EVENTS.length))
-          + `<div style="padding:0 20px 14px;font-size:12px;line-height:1.5;color:var(--muted)">Complete these challenges for rewards — XP, medals and titles, yours for good once you cross the line.</div>`
-          + (near ? `<div class="msnext" data-k="msnext">
-              <strong>${esc(achName(near.a))}</strong> is the closest — ${near.a.need - near.have} to go, worth +${near.a.xp} XP.
-            </div>` : '')
-          + tierBlock('week') + evCards + tierBlock('long') + tierBlock('rare');
+        // FOLDED TO THE NEXT THREE (PRF-02, Amir's 3A, 2026-09-27). Day one was 4,595 px of Progress with
+        // 37 rows open and none earned (6 of 37 three weeks in). The three you are closest to (furthest
+        // along; at zero, the fewest to go), what you have earned on one row of medals, and one row that
+        // opens everything, the four groups with their own fold switches, as it was. Remembered.
+        const total = ACHIEVEMENTS.length + EVENTS.length, gotN = rows.filter(r => r.got).length + evDone;
+        const allOpen = (CFG.msOpen || {}).all === true;
+        const flip = () => { (CFG.msOpen || (CFG.msOpen = {})).all = !allOpen; saveCfg(); render(); };
+        const head = sectionLabel('Milestones', gotN + ' of ' + total)
+          + `<div style="padding:0 20px 14px;font-size:12px;line-height:1.5;color:var(--muted)">Complete these challenges for rewards — XP, medals and titles, yours for good once you cross the line.</div>`;
+        if (allOpen) {
+          return head
+            + (near ? `<div class="msnext" data-k="msnext">
+                <strong>${esc(achName(near.a))}</strong> is the closest — ${near.a.need - near.have} to go, worth +${near.a.xp} XP.
+              </div>` : '')
+            + tierBlock('week') + evCards + tierBlock('long') + tierBlock('rare')
+            + `<button class="msall" data-k="msall" ${on(flip)}><span>Show the next three only</span><span class="go">‹</span></button>`;
+        }
+        const earned = rows.filter(r => r.got);
+        const next3 = rows.filter(r => !r.got).sort((x, y) => (y.pct - x.pct) || ((x.a.need - x.have) - (y.a.need - y.have))).slice(0, 3);
+        return head
+          + (earned.length ? `<button class="msearned" data-k="msearned" ${on(flip)} aria-label="${earned.length} earned: open every milestone">
+              <span class="mse-l">Earned · ${earned.length}</span>
+              <span class="mse-m">${earned.map(r => achMedal(r.a, true)).join('')}</span></button>` : '')
+          + next3.map(row).join('')
+          + `<button class="msall" data-k="msall" ${on(flip)}><span>All ${total} milestones</span><span class="go">›</span></button>`;
       })()}
 
       <div style="padding:18px 20px 12px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
@@ -8775,9 +8796,10 @@ function renderCrew() {
            board itself started ~470px down. Both switches now sit on one row
            and the explanation is one line under them. -->
       <div class="boardbar">
-        <!-- Roll call leads because it is the default and because conversation
-             rewards coming back; a ranking is a once-a-day glance. -->
-        <div class="chips">${viewBtn('roll', 'Roll call')}${viewBtn('board', 'Leaderboard')}</div>
+        <!-- The board leads (PRF-02, Amir's 6A, 2026-09-27): where you stand first, Roll call one tap
+             away. It led the other way while the wall was the default, and the wall held 2 lines in
+             9 days across 19 athletes. Today's Roll call row still opens the wall. -->
+        <div class="chips">${viewBtn('board', 'Leaderboard')}${viewBtn('roll', 'Roll call')}</div>
         <div class="mono boardday">DAY ${dayOfSeason}</div>
       </div>
       ${LB.view === 'roll' ? renderNoteBox() + renderRollCall() : `
@@ -9054,7 +9076,7 @@ function renderManual() {
         p(`Older than ${BACKFILL_DAYS} days and the log is closed. That is on purpose: a record you can rewrite whenever you like is a diary, not proof. Filling a day in still counts for everything — points, streaks, badges, quests.`))}
 
       ${block(h2('Roll call') +
-        p(`Once you're on the leaderboard you get <strong style="color:var(--ink)">one sentence a day</strong>. Write it at the top of the <strong style="color:var(--ink)">CREW</strong> tab. Everyone else on the board sees it, next to your name, your rank and how much of that day you finished.`) +
+        p(`Once you're on the leaderboard you get <strong style="color:var(--ink)">one sentence a day</strong>. Write it on the <strong style="color:var(--ink)">CREW</strong> tab, under <strong style="color:var(--ink)">Roll call</strong> (Crew opens on the leaderboard; the Roll call row on Today takes you straight there). Everyone else on the board sees it, next to your name, your rank and how much of that day you finished.`) +
         p(`Change it as many times as you like until midnight. After that it stands — you can fix an old day's <em>log</em>, but not what you said about it.`) +
         p(`It is worth <strong style="color:var(--ink)">no points at all</strong>, deliberately. It is not another box to tick; it is the one place in here where you get to say something. Everyone else's lines are right underneath yours.`) +
         p(`Keep it to things you don't mind other athletes reading — this is a shared wall, not a message to your coach.${isFree() ? '' : ' Anything private goes to me on WhatsApp: the button is at the top of the programme app&rsquo;s Coach tab.'}`))}
@@ -9107,7 +9129,7 @@ function renderManual() {
           p(got
             ? `You have <strong style="color:var(--ink)">${got} of ${PASS_TRACK.length}</strong>${eq ? `, and you are showing <strong style="color:var(--ink)">${esc(eq.name)}</strong>` : ''}. ${nx ? `Next is <strong style="color:var(--ink)">${esc(nx.name)}</strong> at level ${nx.lv}.` : 'There is nothing left to unlock.'}`
             : `Your first is <strong style="color:var(--ink)">${esc(PASS_TRACK[0].name)}</strong> at level ${PASS_TRACK[0].lv}, which is one full day of habits away.`) +
-          p(`It has its own tab now — <strong style="color:var(--ink)">Locker</strong>, last on the bar. It reads like a pass: what you are wearing up top, what you own in a loadout, and below that <strong style="color:var(--ink)">the pass</strong> — one track with every rank and reward threaded on it, and a marker showing exactly where you stand.`));
+          p(`It has its own tab now — <strong style="color:var(--ink)">Locker</strong>, last on the bar. It reads like a pass: what you are wearing up top, what you own in a loadout, and below that <strong style="color:var(--ink)">the pass</strong> — one track with every rank and reward threaded on it, and a marker showing exactly where you stand. It opens on the rank you are in and the next three rewards; <strong style="color:var(--ink)">The whole road</strong> under them shows the rest.`));
       })()}
 
       ${(() => {
@@ -9341,14 +9363,17 @@ function renderPass() {
       </div>`;
   };
 
-  const road = RANKS.map((name, i) => {
+  // The road is built as a LIST of rows (a rank band, a reward, the marker, the star) so the folded view
+  // below can take a slice of it (PRF-02, Amir's 5A). A band or a reward row is the same markup either way.
+  const items = [];
+  RANKS.forEach((name, i) => {
     const first = i * SUBS_PER_RANK + 1, last = (i + 1) * SUBS_PER_RANK;
     const here = curIdx === i;
     const passed = cur.star > 0 || curIdx > i;
     const subsOn = here ? cur.sub : (passed ? SUBS_PER_RANK : 0);
     const cost = cumXpTo(first + cur.star * LEVELS_PER_CYCLE);
     const st = here ? 'now' : (passed ? 'done' : 'lockd');
-    return `
+    items.push({ k: 'band', here, html: `
       <div class="trow band ${st}" data-k="road-rank:${name}">
         <span class="tn-rail"><b class="tn-gate"></b></span>
         <span class="tn-wrap">
@@ -9362,20 +9387,23 @@ function renderPass() {
             <span class="tb-right">${here ? 'IN<br>PROGRESS' : (passed ? 'CLEARED' : cost.toLocaleString() + ' XP')}</span>
           </div>
         </span>
-      </div>` + (() => {
-        const rw = PASS_TRACK.filter(p => p.lv >= first && p.lv <= last);
-        if (!here) return rw.map(rewardRow).join('');
-        // The marker goes where the athlete actually stands: after every reward
-        // this rank has already paid out, before the ones it has not.
-        const cut = rw.findIndex(p => p.lv > lv);
-        const at = cut < 0 ? rw.length : cut;
-        return rw.slice(0, at).map(rewardRow).join('') + `
+      </div>` });
+    const rw = PASS_TRACK.filter(p => p.lv >= first && p.lv <= last);
+    const addRw = p => items.push({ k: 'reward', p, html: rewardRow(p) });
+    if (!here) { rw.forEach(addRw); return; }
+    // The marker goes where the athlete actually stands: after every reward
+    // this rank has already paid out, before the ones it has not.
+    const cut = rw.findIndex(p => p.lv > lv);
+    const at = cut < 0 ? rw.length : cut;
+    rw.slice(0, at).forEach(addRw);
+    items.push({ k: 'you', html: `
       <div class="trow mark" data-k="road-you">
         <span class="tn-rail"><b class="tn-you"></b></span>
         <span class="tn-wrap"><span class="youtag">YOU ARE HERE · LEVEL ${lv}</span></span>
-      </div>` + rw.slice(at).map(rewardRow).join('');
-      })();
-  }).join('') + `
+      </div>` });
+    rw.slice(at).forEach(addRw);
+  });
+  items.push({ k: 'star', html: `
     <div class="trow band lockd">
       <span class="tn-rail"><b class="tn-gate"></b></span>
       <span class="tn-wrap">
@@ -9384,7 +9412,18 @@ function renderPass() {
           <span class="tb-meta">Clear ${esc(RANKS[RANKS.length - 1])} ${SUBS_PER_RANK} and the road starts again carrying a star — <strong style="color:var(--ink)">${esc(rankFor(LEVELS_PER_CYCLE + 1).label)}</strong>, then <strong style="color:var(--ink)">${esc(rankFor(LEVELS_PER_CYCLE * 2 + 1).label)}</strong>, and on forever. The star is the real flex.</span>
         </div>
       </span>
-    </div>`;
+    </div>` });
+  const road = items.map(x => x.html).join('');
+  // FOLDED TO THE NEXT THREE REWARDS (PRF-02, Amir's 5A, 2026-09-27). At level 9 the road drew every rank
+  // and reward to level 50, about 300 days away at a good pace: 2,954 px. Now the rank you are in, the
+  // marker and the next three rewards (with any rank they cross into), then "The whole road". What you
+  // have is the loadout above; where you are is the hero. Remembered in CFG.msOpen, like the other folds.
+  const roadOpen = (CFG.msOpen || {}).road === true;
+  const hereAt = Math.max(0, items.findIndex(x => x.k === 'band' && x.here));
+  const ahead = items.map((x, j) => (j > hereAt && x.k === 'reward' && !passHas(x.p.id)) ? j : -1).filter(j => j >= 0);
+  const shortRoad = items.slice(hereAt, (ahead.length >= 3 ? ahead[2] : items.length - 1) + 1)
+    .filter(x => !(x.k === 'reward' && passHas(x.p.id))).map(x => x.html).join('');
+  const flipRoad = () => { (CFG.msOpen || (CFG.msOpen = {})).road = !roadOpen; saveCfg(); render(); };
 
   return `
     <div data-k="screen:pass" style="${screenAnim()}">
@@ -9473,7 +9512,10 @@ function renderPass() {
       })()}
 
       ${sectionLabel('The pass', RANKS.length + ' ranks · ' + PASS_TRACK.length + ' rewards')}
-      <div class="track">${road}</div>
+      <div class="track">${roadOpen ? road : shortRoad}</div>
+      <button class="msall" data-k="roadall" ${on(flipRoad)}>${roadOpen
+        ? '<span>Show the next three only</span><span class="go">‹</span>'
+        : `<span>The whole road to level ${RANKS.length * SUBS_PER_RANK}</span><span class="go">›</span>`}</button>
       <div style="margin:10px 16px 14px;border-radius:16px;background:var(--surface);padding:11px 14px;font-size:11.5px;line-height:1.5;color:var(--accent);font-weight:600">A new season resets your points, never this shelf. Everything here is kept for good.</div>
 
       <div style="padding:0 20px 34px">
