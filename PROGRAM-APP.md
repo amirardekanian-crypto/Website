@@ -664,9 +664,10 @@ opened from it (`_libScrollY` in `goTo()`; the Library tab, or any other way in,
 - **Sizes:** no label under 11 px on Home, the day, the finish card, the rest timer, Coach and Game Plan
   (glyphs, the Level ring and the day letters excepted, at 9–10.5 px); DS-03 (below) made 11 px the floor everywhere. Session notes 16 px. The session rating
   is two rows of five at 44 px (ten in a row were ~24 px); the ⓘ is 26 px at the row's right end (20 px before the working card) with a 44 px hit area.
-- **Not done:** program.html still sets `maximum-scale=1, user-scalable=no`, so pinch-zoom is off (AA Proof
-  allowed it on 2026-09-26). The set-log boxes are 16 px already, so it is a small change, still to be decided.
-  Every field is 16 px since DS-03 (below), so an iPhone would not zoom on a tap once pinch-zoom is on.
+- **Pinch-zoom is on (2026-09-27).** The viewport said `maximum-scale=1, user-scalable=no`, so nobody could
+  enlarge a cue or a number; it is `maximum-scale=5` now, as in AA Proof. `html { touch-action: manipulation }`
+  keeps pinch and scroll and drops only the double-tap zoom, which on an iPhone could fire on two quick taps of
+  +15s or an RPE button. Every field is 16 px (DS-03, below), so tapping one does not zoom the page either.
 
 ## 🔠 One type scale (DS-03, 2026-09-27)
 
