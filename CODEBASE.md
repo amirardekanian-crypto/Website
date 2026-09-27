@@ -476,6 +476,18 @@ of one still picks its video up. `.notion_token` is no longer needed.
 
 ---
 
+### Headless checks (`scripts/headless/`, 2026-09-27)
+
+A harness for looking at the two athlete apps in a headless browser with no server behind them:
+`stub.js` stands in for supabase-js, `fixture.json` is a made-up athlete and programme (nothing real:
+this repo is public), `lib.js` opens `program.html` or `habits.html` signed in, and `smoke.js` walks both
+apps' main screens at 390 and 320 px, light and dark, with a screenshot of each. Serve the repo on
+127.0.0.1:8765 first. It is not a pre-commit check (it needs a browser): run it before a change to either
+app ships. Excluded from the site with the rest of `scripts/`. How to use it: `Content/FRESH-EYES.md` →
+*Render checks, headless*.
+
+---
+
 ### Support Files (Hosting & Search Engines)
 
 #### `CNAME`

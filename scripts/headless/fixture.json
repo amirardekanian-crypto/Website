@@ -1,0 +1,42 @@
+{
+  "notes": {
+    "cards": [
+      {"body": "<p>RPE 7 means the weight is challenging but you could do 3 more reps if you had to.</p>", "icon": "📊", "title": "Understanding RPE"}
+    ],
+    "greeting": "For You, Alex"
+  },
+  "sport": {"badge": "🎾 Tennis Performance"},
+  "cycles": [
+    {"art": "bedrock", "num": 1, "name": "Foundation Forge", "weeks": "Weeks 1–5", "focuses": ["Build foundational movement quality."], "tagline": "Build the Platform"},
+    {"art": "iron", "num": 2, "name": "Load & Build", "weeks": "Weeks 6–10", "focuses": ["Progress the squat and hinge with real, trackable load."],
+     "message": {"outcomes": ["Measurable strength gains in the back squat"], "paragraphs": ["This is where the body starts genuinely changing."]},
+     "tagline": "Earn the adaptation"},
+    {"art": "voltage", "num": 3, "name": "Power Translation", "weeks": "Weeks 11–15",
+     "teaser": {"subtitle": "Strength becomes court speed.", "paragraphs": ["Cycle 3 is where the weights get lighter and the movements get faster."]},
+     "focuses": ["Convert strength into usable court speed."], "tagline": "Turn strength into speed"}
+  ],
+  "athlete": {"id": "rel01_athlete", "lastName": "Rivera", "firstName": "Alex"},
+  "workouts": {
+    "days": [
+      {"id": 1, "focusTag": "Acceleration & Squat Strength", "completionTitle": "Day 1 Done", "completionMessage": "Rest up.",
+       "blocks": [
+         {"icon": "🚣", "title": "Warm-Up", "exercises": [{"rx": {"time": "5 minutes"}, "exId": "rowing", "name": "Rowing", "type": "simple"}]},
+         {"icon": "💪", "title": "Strength", "exercises": [
+           {"rx": {"rpe": 7, "reps": 6, "sets": 4, "tempo": "3-1-1"}, "exId": "barbell-back-squat", "name": "Barbell Back Squat", "type": "standard"},
+           {"rx": {"rpe": 7, "reps": 8, "sets": 3, "side": true}, "exId": "dumbbell-bulgarian-split-squat", "name": "Dumbbell Bulgarian Split Squat", "type": "standard"}
+         ]},
+         {"icon": "🧱", "title": "Core", "exercises": [{"rx": {"reps": 10, "sets": 3, "side": true}, "exId": "half-kneeling-pallof-press", "name": "Half Kneeling Pallof Press", "type": "standard"}]}
+       ]},
+      {"id": 2, "focusTag": "Upper Body & Shoulder Armour", "completionTitle": "Day 2 Done", "completionMessage": "Shoulder work is the long game.",
+       "blocks": [
+         {"icon": "🚣", "title": "Warm-Up", "exercises": [{"rx": {"time": "5 minutes"}, "exId": "rowing", "name": "Rowing", "type": "simple"}]},
+         {"icon": "💪", "title": "Strength", "exercises": [
+           {"rx": {"rpe": 7, "reps": 8, "sets": 4, "tempo": "3-0-1"}, "exId": "incline-dumbbell-press", "name": "Incline Dumbbell Press", "type": "standard"},
+           {"rx": {"rpe": 7, "reps": 8, "sets": 4, "side": true}, "exId": "single-arm-dumbbell-row", "name": "Single-Arm Dumbbell Row", "type": "standard"}
+         ]}
+       ]}
+    ],
+    "label": "Cycle 2 of 3 · Load & Build"
+  },
+  "currentCycleIndex": 1
+}
