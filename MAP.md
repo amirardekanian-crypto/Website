@@ -202,7 +202,7 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
 | [`assets/art/`](assets/art/) | The training app's pictures, each a versioned `-v1.webp`: `cycles/` (one per cycle family), `days/` (one per day type) and `moments/` (finish, new best, welcome), named in `APP_ART` in `program.html`; `library/` (the Library's category banners, set by each category's `banner`) |
 | [`assets/cycles/`](assets/cycles/) | The old name-matched cycle covers (Foundation Forge, Strength Engine, …), retired for the app (it uses `assets/art/cycles/`); kept for studio reuse → see [`README`](assets/cycles/README.md) |
 | [`assets/days/`](assets/days/) | Per-day-type thumbnails (upper, lower, power, core, recovery…), retired for the app (it uses `assets/art/days/`); the homepages and the studio still load `lower.webp` → [`README`](assets/days/README.md) |
-| [`assets/img/workouts/`](assets/img/workouts/) | Train-library thumbnails (conditioning, mobility, on-court) |
+| [`assets/img/workouts/`](assets/img/workouts/) | The five older Library category banners, retired for the app (it uses `assets/art/library/`); kept as the design atlas's grade reference → [`IMAGES.md`](IMAGES.md) §2 |
 | root `*.jpg` | Marketing/preview shots (court-sessions, court-playbook, library-doors, library-playbook, library-sessions…) — see [`IMAGES.md`](IMAGES.md) |
 
 ---
