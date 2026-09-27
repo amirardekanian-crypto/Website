@@ -5,7 +5,7 @@ made on 2026-09-24, and the work that followed it. **A new chat picking this wor
 first.** Amir's two pages are private claude.ai artifacts; read them with the Artifact tool's `read`:
 
 - **Fresh Eyes**: the audit and its 44-item backlog, each item marked done, partly done or open
-  (updated 2026-09-26). https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb
+  (updated 2026-09-27). https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb
 - **Five Forks**: his five follow-up decisions, all decided and live.
   https://claude.ai/artifact/8XWzfgpJzzkyXXWBmWG7Yd
 
@@ -15,16 +15,18 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 ## How Amir wants it done
 
 1. One item at a time: the next one in the order below, or the one he names.
-2. Before any code: restate the problem, give two or three genuinely different directions with their
-   trade-offs, recommend one, and say what each changes in the architecture.
+2. Before any code: restate the problem, weigh two or three genuinely different directions with their
+   trade-offs and what each changes in the architecture, and pick one (put them to him when the call is
+   his, rule 4).
 3. Check the chosen direction against the rest of the app before building: the things that exist
    twice (CLAUDE.md lists them), the two scorers, sync, and the tour and manual.
-4. **Build only after his yes.** His "approve yourself" covered Five Forks 1 to 3 only.
+4. **Build only after his yes on a call that is his** (a design direction, a change he would see
+   differently). Everything else, build and ship without stopping: *"keep going down the list and only
+   pause if you want me to choose, but keep going"* (2026-09-26).
 5. Keep what works. Never remove a feature without saying so. No duplicate systems. Make the
    smallest architectural change that solves it.
 6. After each item, report WHAT CHANGED · WHY · WHAT PROBLEM IT SOLVES · FILES · PRESERVED · NEW
-   INTERACTIONS · SIDE EFFECTS · WHAT TO TEST, then ask: *"Do you want to continue to the next
-   prioritized improvement, or review this one further?"*
+   INTERACTIONS · SIDE EFFECTS · WHAT TO TEST, briefly, then go on to the next item.
 7. *"I do NOT want you to be agreeable."* Push back, with evidence.
 8. Ship it live: one PR per item, merged to `main`, and the deploy confirmed (recipe below).
 
@@ -73,8 +75,10 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#269](https://github.com/amirardekanian-crypto/Website/pull/269) | From Start until Done the session bar is one slim line (← Home, the clock, Pause, ⋯ for Guided and Reset) and the tab bar hides: mid-session chrome goes from 26% of an iPhone SE screen to 9% (Amir's option C of the mockup); the clock is never cut, past an hour included | WK-03 |
 | [#270](https://github.com/amirardekanian-crypto/Website/pull/270) | The guide opens in the sheet, from your initials, one row on the Coach tab, and the jargon itself ("How hard?" on the RPE strip, "tempo" in an open card, a ? in Guided's top bar), each opening its own card; a Guided mode card; the Coach tab is Amir's voice | COACH-02 |
 | [#271](https://github.com/amirardekanian-crypto/Website/pull/271) | The This cycle card at the top of Home (Amir's pick: it replaces the small cycle line and opens Game Plan): the week, sessions done against planned, and up to three effort-matched wins ("+2.5 kg, same reps, same RPE", "+3 reps at 16 kg", "felt easier: RPE 8 → 7"), for any reps, bodyweight moves and holds | PROG-01 |
+| [#272](https://github.com/amirardekanian-crypto/Website/pull/272) | The working card's **Same as last** button is gone (Amir: *"its a duplicate of what can be seen in history"*): the open card's Last time box shows last time, and a weight typed in set 1 fills the sets below; Guided's rest screen keeps its own | CARD-01, LOG-01 |
+| [#273](https://github.com/amirardekanian-crypto/Website/pull/273) | The headless harness joins the repo (`scripts/headless/`: the Supabase stub, a made-up athlete and programme, `smoke.js` for both apps), and this hand-off | — |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271).
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
 
 **Partly done, and what is still open on each:**
 - **A11Y-01.** The training app is done on the screens measured. Still open: AA Proof's small type and
@@ -94,36 +98,44 @@ PRF-01, PRF-02, PRF-03, DS-01. P3: DS-03, CONS-01, PRF-05, LIB-01, POL-02, DOC-0
 
 ## Next, in order
 
-**REL-01 is done** (#237, 2026-09-26): both apps open with no signal from `plancache`; the full
-account is `PROGRAM-APP.md` → *No signal*.
+**The training app's list is done**: stop-the-bleeding, foundations, the whole session (#260–#269), Home and
+progress (#258, #271), the account and the guide (#268, #270), each told in full in `PROGRAM-APP.md`. What
+is left is mostly AA Proof, then design-system polish. Work it in this order:
 
-**PRIV-01 is done** (#238, 2026-09-26, Amir's call B): every line about the board reads `boardState()`
-(`'on' | 'coming' | 'off'`); a coached athlete who has not trained yet is told the name they will appear
-under, can change it, and can keep off in advance. Full account: `HABITS.md` → *Who is on it*.
+1. **Proof's Today screen: PRF-01, PRF-03 and PRF-05.** One screen, so **one mockup for Amir first** (the
+   current screen beside two or three directions, at 390 px, with real numbers), then one PR per item.
+   - **PRF-01**, the main action is the quietest control: the tick is a 22 px pale ring on the emoji tile
+     while "+" is a 36 px solid button, and the locked *Finish your session* row leads the list, so the
+     first row you can tick starts 466 px down (the audit; about 440 px in the harness's `proof-390.png`).
+     Directions: a large, obvious tick; the locked row at the end, or in the hero as a status; a shorter hero.
+   - **PRF-03**, the headline disagrees with what counts: the big percentage is `dayPct`, what the day was
+     worth, while the streak asks `dayQualifies()`. A rest day with everything else done shows 68% and
+     counts; a free athlete can never pass about 64%. Lead with the verdict ("On target ✓", "1 to go").
+     **Display only**: neither scorer changes (the phone's constants and the server's `xp_rules`). Settle
+     *Proof shows twice on Home* (below) with it.
+   - **PRF-05**, the week is drawn three times (the hero's 7 days, the day picker, the heat map): one strip
+     that is also the day picker. It depends on PRF-01's layout.
+   Proof's rules hold for all three (CLAUDE.md): update the six (HABITS.md, XP_SYSTEM.md, QUESTS.md,
+   `renderManual()`, privacy.html, `tourSteps()`) in the same PR, and the tour points at real controls, so a
+   moved button moves its tour step. The pre-commit guard runs on every habits.html commit.
+2. **PRF-02, progressive disclosure in Proof**, with POL-02's sweep and A11Y-01's Proof leftovers (small
+   type; the accent buttons in dark at 3.35:1). **Amir's calls first**: which celebrations stay full-screen
+   (levels and ranks only?), a five-step tour, Progress folded to the next three milestones, Quests and
+   Seasons hidden until they run, the far end of the Locker folded. Nothing is removed or revoked: rewards
+   are never taken back (CLAUDE.md).
+3. **DS-01, clay has three jobs**: the primary action, "needs you", and the tempo digit; status (done, past,
+   block type) moves to green and neutrals. A design call, so a mockup first. Text reads `--clay-ink` /
+   `--green-ink`, never the fill tokens (A11Y-01).
+4. **P3 and the partly-done leftovers**, in this order: CONS-01 (one RPE control everywhere; check first
+   what WK-04 and A11Y-01 already changed), DS-03 (a type scale and one primary button, `button { font:
+   inherit }`), LIB-01, NAV-01's close grammar, POL-01's three leftovers (the Quality sheet's words are
+   Amir's to give), A11Y-01's pinch-zoom (`user-scalable=no`), and DOC-01 last.
+5. **SEAM-01 waits for the count** around 2026-10-17 (below). If habit logging has not moved, fork 1 A
+   (Proof in the training app's look, "← Training", one install, one theme) is next, and it takes DS-03's
+   Proof half with it.
 
-1. **"Stop the bleeding" is done** (2026-09-26): REL-01, PRIV-01, CNT-01, WK-01's quick part, LOG-02, PRF-04,
-   HOME-03, WK-03's quick parts, A11Y-01 in the training app. So are NAV-01 (both apps), HOME-01, BW-01,
-   DATA-02's safe part, SHEET-01 and POL-01 (#239–#252, Amir: "keep going, only pause if you want me to choose").
-   **Amir answered four of the six calls** (2026-09-26, each his recommended option): the Today block →
-   a mockup first; Game Plan → fold past and future (#254); the estimate → off the card (#255); the
-   unfinished day → ask the athlete on their next open. The last two on 2026-09-27: a rest day in Proof →
-   leave it; the phone's dark setting → the athlete chooses.
-2. **Foundations:** done. HOME-02 shipped from Amir's notes on the mockup (#258): no separate Today card, no
-   rest-day design ("we don't know their rest days"); done days small, undone days big, the in-progress card.
-3. **The session** (the card freeze is lifted): WK-02 (#260), the working card (#262, CARD-01/02/03),
-   Guided's layout (#263, WK-01), one finish with the session bar's Reset (#264–#265, WK-04) and the
-   first-session hints (#266, ONB-01) and the warm-up list (#267, WK-05) are done. Full accounts:
-   `PROGRAM-APP.md` → *The working card*, *Guided Mode's layout*, *One finish*, *First-session hints* and
-   *Warm-ups are a list*. WK-03 is done too (#269, Amir picked option C of the mockup at
-   https://claude.ai/artifact/CiUjm5sF3cz4YhGzJCR1WY: the slim bar, and the tabs hidden mid-session). **The
-   session project is finished.** Left as it was on purpose: a working circuit's cues stay open (WK-05 was the
-   warm-ups); fold them the way the working card folds How to do it if Amir wants that too.
-4. **Home and progress:** PROG-01 is done (#271, `PROGRAM-APP.md` → *This cycle*; Amir picked a card on Home in
-   place of the cycle line, and effort-matched wins).
-5. **Coach and Proof:** NAV-02 (#268) and COACH-02 (#270) are done (`PROGRAM-APP.md` → *Your account* and *The
-   guide in the sheet*). Then SEAM-01 (after the habit count below), PRF-01, PRF-02,
-   PRF-03.
-6. **System and polish:** DS-01, DS-03, CONS-01, PRF-05, LIB-01, POL-01, POL-02, DOC-01.
+Left as it was on purpose: a working circuit's cues stay open (WK-05 was the warm-ups); fold them the way
+the working card folds How to do it if Amir wants that too.
 
 ## Open calls and things to watch (put these to Amir)
 
@@ -141,7 +153,8 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
   in a week while 16 had trained in two. Count again around 2026-10-17. If it hasn't moved, fork 1 A
   (Proof in the training app's look, "← Training", one install, one theme) is the next step.
 - **Proof shows twice on Home.** The card's hero says "Day complete" when the day is on target
-  (`dayQualifies()`); the strip counts ticks ("1 of 5 done"). Settle it in the Today block.
+  (`dayQualifies()`); the strip counts ticks ("1 of 5 done"). Settle it with PRF-03, which leads Proof
+  with the same verdict.
 - **Records start slowly** for athletes who only tick: an untouched box records no weight, so their
   records fill once they type a weight (or tap Same as last on Guided's rest screen; the card's
   button went on 2026-09-27). That is the intended cost of LOG-01.
@@ -169,8 +182,11 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 - Once per clone: `git config core.hooksPath .githooks`.
 - Use the branch the session names. After each merged PR, restart it from main:
   `git fetch origin main && git checkout -B <branch> origin/main`.
-- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v37`
-  now) whenever a cached app file changes.
+- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v70` on
+  2026-09-27) whenever a cached app file changes, log the version in its comment list, and change the
+  name in CLAUDE.md too.
+- Test in a headless browser before every PR (below): the harness is in the repo, the checks you write
+  for one item stay in the session's scratchpad.
 - Ship: commit, push, open the PR with the GitHub MCP, merge with `merge_pull_request` (it wants the
   full 40-character head SHA), then confirm the deploy with
   `https://api.github.com/repos/amirardekanian-crypto/Website/deployments?environment=github-pages&sha=<merge sha>`
@@ -182,51 +198,40 @@ under, can change it, and can keep off in advance. Full account: `HABITS.md` →
 
 ### Render checks, headless
 
-The app cannot reach Supabase from here, so stub it and feed it a local programme.
+The apps cannot reach Supabase from a cloud container, so **`scripts/headless/`** (2026-09-27) stubs it:
+`stub.js` stands in for supabase-js, `fixture.json` is a made-up athlete and programme (Alex Rivera,
+`rel01_athlete`; nothing real, the repo is public), and `lib.js` opens either app signed in.
 
-1. **Fixture.** Run `select data from programs where athlete_id='demo'` with the Supabase MCP and
-   save the result as `data/demo.json`. Everything in `data/` is gitignored: never commit it. For a
-   signed-in look, copy it to `data/audit_athlete.json` with `athlete.id` set to `audit_athlete`,
-   cycle `startDate`/`endDate` that put today inside cycle 2, and a few made-up Coach's Notes. With
-   the server stubbed, `boot()` falls back to `data/<id>.json`.
-2. **Serve** the repo: `python3 -m http.server 8765 --bind 127.0.0.1`.
-3. **Browser.** Playwright is installed globally (`require('/opt/node22/lib/node_modules/playwright')`)
-   and Chromium is at `/opt/pw-browsers/chromium-*/chrome-linux/chrome`; launch it with
-   `--no-proxy-server`. Use a 390×844 context with `isMobile`, `hasTouch` and
-   `serviceWorkers: 'block'`, and abort every request that isn't to localhost. Fonts then fall back;
-   for exact screenshots, curl the Google Fonts CSS and its woff2 files into a folder and fulfil the
-   font requests from it.
-4. **Stub the SDK** before any app script runs (`addInitScript`), so every call fails fast, as if
-   offline:
-   ```js
-   const mk = () => {
-     const res = { data: null, error: { message: 'offline (stub)' } };
-     const fn = function () { return p; };
-     const p = new Proxy(fn, {
-       get(t, k) {
-         if (k === 'then') return (ok, bad) => Promise.resolve(res).then(ok, bad);
-         if (k === 'data') return { session: null, subscription: { unsubscribe() {} } };
-         return p;
-       },
-       apply() { return p; }
-     });
-     return p;
-   };
-   window.supabase = { createClient: () => mk() };
-   Object.defineProperty(window, 'supabase', { value: window.supabase, writable: false });
-   ```
-5. **Seed and open** `program.html?client=audit_athlete`. For an engaged athlete, set
-   `<id>_welcomed`, `a2hs_dismissed_v1`, `<id>_histcache` (the app's own `demoHistory()` returns one
-   in the real format), `<id>_hab_wt`, `<id>_1rm` and `<id>_hab_card`. Take `spinecache` and
-   `qualcache` from `public.get_exercises()` (221 entries on 2026-09-26; keep only the fixture's
-   `exId`s) and `public.get_qualities()` (10).
-6. **Check** for `pageerror`, then screenshot at 390 px in light and dark. CLAUDE.md covers the
-   headless quirks (scroll-reveal, the 100vh hero).
+1. **Serve** the repo from its root, as a background task: `python3 -m http.server 8765 --bind 127.0.0.1`.
+2. **Smoke test:** `node scripts/headless/smoke.js --out <scratchpad>/shots`. Both apps, light and dark,
+   390 and 320 px: 27 checks and a screenshot per screen. Look at the screenshots, not just the count.
+3. **A check for one item** is its own script in the scratchpad that requires `scripts/headless/lib.js`
+   (`smoke.js` is the pattern):
+   - `openProgram(browser, { w, h, dark, seed, stub, prog })` and `openProof(browser, { url, dark, cfg })`
+     return `{ ctx, p }` past the loading screen; `p.errs` collects page errors.
+   - `seed` writes athlete keys by suffix, e.g. `{ _setlog_Barbell_Back_Squat: [{ w: '', n: '', r: '',
+     d: false, lw: '70' }] }`; `stub` switches the server's answer (`{ mode: 'offline' }`, `'5xx'`,
+     `'refuse'`, `'empty'`, `stall: { get_program: true }`; the list is at the top of `stub.js`).
+   - `fixture()` dates the cycles (week 2 of 5, as most live programmes are); `fixture({ dated: false })`
+     is one of the undated few. `card(name)` finds an exercise card; `checker()` prints PASS / FAIL.
+   - Drive the app through its own functions (`openDayView('1')`, `toggleExpand(card)`,
+     `startTimerNow('1')`, `openGuided('1')`, Proof's `UI` and `render()`), then assert on the DOM and on
+     `localStorage`.
+4. **Real shapes** (a live programme, Spine entries, session history) come read-only from the Supabase MCP
+   (project `bvipfipbdcyqnbczjmaq`) into the scratchpad. Never commit them, and never write to the database
+   from a test.
+5. **Headless quirks:** every request off the local server is aborted, so fonts fall back and Plausible is
+   silent; Chromium's overlay scrollbar shows as a grey bar at the right edge; sheets slide in over about
+   0.2 s, so wait before measuring one; a screenshot of a 100vh screen shows only the viewport (scroll, or
+   set a taller viewport).
 
 ## Paste this to start the next chat
 
 > Continue the Fresh Eyes work. Read `Content/FRESH-EYES.md` first, then the Fresh Eyes page
-> (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). Stages one and two are done, and the card freeze is
-> lifted ("dont freeze anything"). Keep going down *Next, in order* (SEAM-01 and PRF-01 are next), one PR per item, merged
-> and confirmed live the same day. Pause only for a call that is mine: restate the problem, give two or three
-> directions with trade-offs and your recommendation, and wait for my answer on that one.
+> (https://claude.ai/artifact/4LwKCKqWd4DU2qVRxB7PEb). The training app's list is done (#228–#272). Next is
+> AA Proof's Today screen: PRF-01, PRF-03 and PRF-05. Show me one mockup of that screen first, then build
+> one PR per item. After that, PRF-02 (bring me its calls), DS-01, then the P3 items in the file's order;
+> SEAM-01 waits for the habit count around 17 October. Test every change headless with
+> `scripts/headless/` before the PR, merge to main and confirm the deploy the same day, and keep going
+> down the list. Pause only for a call that is mine: restate the problem, give two or three directions
+> with trade-offs and your recommendation, then wait for my answer on that one.
