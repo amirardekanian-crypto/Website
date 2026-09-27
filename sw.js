@@ -139,7 +139,9 @@
 //      Guided, the session rating and Log a max): 44 px, and a second tap clears it.
 // v72: program.html changed (2026-09-27, DS-03): one type scale (seven sizes and a field size, nothing
 //      under 11 px), buttons in the app's font, only weights that are loaded; the line of numbers is never cut.
-const CACHE = 'aap-v72';
+// v73: program.html changed (2026-09-27, NAV-01): one close grammar: Guided's ✕ at the top right, sheets
+//      slide down (a handle, a swipe), their Close is a 44 px target.
+const CACHE = 'aap-v73';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

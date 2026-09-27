@@ -32,7 +32,7 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 
 ## Where it stands (2026-09-27)
 
-**30 done · 6 partly done · 8 open**, of 44. Each was checked against the code on `main`.
+**31 done · 5 partly done · 8 open**, of 44. Each was checked against the code on `main`.
 
 | PR | What shipped | Items |
 |---|---|---|
@@ -79,15 +79,14 @@ Each item's full problem, evidence, root cause and dependencies are on the Fresh
 | [#273](https://github.com/amirardekanian-crypto/Website/pull/273) | The headless harness joins the repo (`scripts/headless/`: the Supabase stub, a made-up athlete and programme, `smoke.js` for both apps), and this hand-off | — |
 | [#274](https://github.com/amirardekanian-crypto/Website/pull/274) | One RPE control everywhere: a set, a circuit's rounds ("R2 · How hard?", on its own line), Guided, the session rating and Log a max (6–10 buttons, not a text box) are the same 44 px buttons, and a second tap clears a pick | CONS-01 |
 | [#275](https://github.com/amirardekanian-crypto/Website/pull/275) | One type scale in the training app: seven sizes and a field size (`--fs-` tokens), nothing under 11 px, buttons in the app's font, only weights that load, every field 16 px, a pre-commit guard; the line of numbers is never cut (the rest time ran off the card at 360 px) | DS-03 (part) |
+| [#276](https://github.com/amirardekanian-crypto/Website/pull/276) | One close grammar: ← top left for a screen, ✕ top right for a full-screen overlay (Guided's moved there), a sheet slides down (a handle, a swipe, a tap above it); the sheets' Close and Skip for today are 44 px targets | NAV-01 |
 
-**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
+**Done:** COACH-01, DS-02, READY-01, LOG-01, REL-01, PRIV-01, CNT-01, LOG-02, HOME-03, HOME-01, BW-01, SHEET-01, PLAN-01, REC-01, DATA-02, HOME-02, WK-02, PRF-04 (Amir left rest days as they are, 2026-09-27), CARD-01, CARD-02, CARD-03 (no box for a hold's seconds: Amir, "Leave the tick"), WK-01 (#240 and #263), WK-04 (#264 and #265, with the session bar's Reset Amir asked for), ONB-01 (#266), WK-05 (#267), NAV-02 (#268), WK-03 (#234, #244 and #269), COACH-02 (#270), PROG-01 (#271), CONS-01 (#274), NAV-01 (#246, #247 and #276). #272 took the working card's Same as last off, a follow-up to LOG-01 and CARD-01.
 
 **Partly done, and what is still open on each:**
 - **A11Y-01.** The training app is done on the screens measured. Still open: AA Proof's small type and
   its accent buttons in dark mode (3.35:1), which go with PRF-02 / DS-03; and pinch-zoom in program.html
   (`user-scalable=no`). Following the phone's dark setting is not wanted: the athlete chooses (Amir, 2026-09-27).
-- **NAV-01.** Back closes the top layer in both apps. Still open: one close grammar for the buttons
-  (← for screens, ✕ top-right for overlays, drag or tap outside for sheets).
 - **POL-01.** Swept. Still open: the rest screen still lets the card show through faintly (97%), the
   Quality sheet's "How we measure it" names tests athletes never meet (Amir's words to change), and
   returning from a Library session resets the scroll.
@@ -102,7 +101,7 @@ PRF-01, PRF-02, PRF-03, DS-01. P3: PRF-05, LIB-01, POL-02, DOC-01.
 
 ## Next, in order
 
-**Waiting on Amir (2026-09-27), three calls, each on its own page:**
+**Waiting on Amir (2026-09-27), four calls, each on its own page:**
 - **Proof's Today (PRF-01, PRF-03, PRF-05)**: https://claude.ai/artifact/TwHpG4EXEv4hj1FcPejG7y. A tighter card
   (recommended), the day leads, or the list leads; all three share the circle tick, the session last, the exact
   "N to go" and one week strip. The prototypes are CSS/JS laid over the real app in a headless page (the
@@ -112,6 +111,11 @@ PRF-01, PRF-02, PRF-03, DS-01. P3: PRF-05, LIB-01, POL-02, DOC-01.
   Crew on the board). "Your picks" takes all six As.
 - **DS-01, clay's jobs**: https://claude.ai/artifact/RkWgSFd4SR4NX1XyRdVZTN. A "look here" (recommended), B also
   the main button of each screen, C as now.
+- **LIB-01, the Library's sessions**: https://claude.ai/artifact/PGrum2Hc4hy475QPxuDPNM. Two calls. The cards: A a
+  list, one photo per shelf as a band with All N › (recommended), B text tiles on the rail, C a picture each
+  (about 130 credits). When the app offers one: A a sore check-in (the finish card), B a finished week (Home),
+  C both (recommended), D neither. The prototypes are in the scratchpad's `lib01-proto.js`. (Mark as done has one
+  row ever; 25 of 302 check-ins in 90 days said sore.)
 
 **The training app's list is done**: stop-the-bleeding, foundations, the whole session (#260–#269), Home and
 progress (#258, #271), the account and the guide (#268, #270), each told in full in `PROGRAM-APP.md`. What
@@ -142,7 +146,8 @@ is left is mostly AA Proof, then design-system polish. Work it in this order:
    block type) moves to green and neutrals. A design call, so a mockup first. Text reads `--clay-ink` /
    `--green-ink`, never the fill tokens (A11Y-01).
 4. **P3 and the partly-done leftovers**, in this order: ~~CONS-01~~ (#274), DS-03 (the type scale is #275;
-   one primary button waits for DS-01), LIB-01, NAV-01's close grammar, POL-01's three leftovers (the
+   one primary button waits for DS-01), LIB-01 (its two calls are Amir's, above), ~~NAV-01's close grammar~~
+   (#276), POL-01's three leftovers (the
    Quality sheet's words are Amir's to give), A11Y-01's pinch-zoom (`user-scalable=no`; every field is 16 px
    since #275, so an iPhone will not zoom on a tap), and DOC-01 last.
 5. **SEAM-01 waits for the count** around 2026-10-17 (below). If habit logging has not moved, fork 1 A
@@ -197,7 +202,7 @@ the working card folds How to do it if Amir wants that too.
 - Once per clone: `git config core.hooksPath .githooks`.
 - Use the branch the session names. After each merged PR, restart it from main:
   `git fetch origin main && git checkout -B <branch> origin/main`.
-- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v72` on
+- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v73` on
   2026-09-27) whenever a cached app file changes, log the version in its comment list, and change the
   name in CLAUDE.md too.
 - Test in a headless browser before every PR (below): the harness is in the repo, the checks you write

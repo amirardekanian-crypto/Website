@@ -1777,15 +1777,22 @@
   .readiness-modal {
     background: var(--grey-bg);
     width: 100%; max-width: 520px;
-    max-height: 96vh; overflow-y: auto;
+    max-height: 96vh; overflow-y: auto; overscroll-behavior: contain;
     border-radius: 18px 18px 0 0;
     padding: 18px 18px 16px;
     box-shadow: 0 -8px 40px rgba(0,0,0,0.25);
     border-top: 3px solid var(--ice);
   }
+  /* The handle says "this slides down" (NAV-01's close grammar): initSheetSwipe() closes the sheet on a
+     swipe down from here, or from anywhere while the sheet is scrolled to its top. It stays in view as the
+     sheet scrolls. A wide screen shows a centred dialog instead, with no handle. */
+  .readiness-modal::before { content: ''; display: block; position: sticky; top: -12px; z-index: 1;
+    width: 40px; height: 5px; border-radius: 3px; background: var(--grey-mid); margin: -10px auto 12px; }
+  body[data-dark] .readiness-modal::before { background: #444; }
   @media (min-width: 560px) {
     .readiness-overlay { align-items: center; }
     .readiness-modal { border-radius: 18px; border-top: 3px solid var(--ice); padding: 26px 24px 22px; }
+    .readiness-modal::before { display: none; }
   }
   .readiness-eyebrow {
     font-family: 'Space Mono', monospace;
@@ -1841,7 +1848,7 @@
   .readiness-begin:active { transform: scale(0.98); }
   .readiness-begin:disabled { opacity: 0.4; cursor: not-allowed; }
   .readiness-skip {
-    display: block; width: 100%; margin-top: 9px;
+    display: block; width: 100%; margin-top: 0; min-height: 44px;   /* a 44 px target: it was 15 px tall (NAV-01) */
     background: none; border: none; cursor: pointer;
     font-family: 'Barlow', sans-serif; font-size: var(--fs-small);
     color: var(--grey-text); text-decoration: underline; text-underline-offset: 3px;
@@ -4135,7 +4142,10 @@
   body[data-dark] .step-overlay { background: #141414; }
   .step-topbar { display: flex; align-items: center; gap: 12px; padding: calc(env(safe-area-inset-top, 0px) + 14px) 16px 12px; flex-shrink: 0; }
   .step-exit { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--grey-mid); background: var(--white); color: var(--grey-dark); font-size: var(--fs-body); line-height: 1; cursor: pointer; flex-shrink: 0; }
-  /* ? — how Guided works (COACH-02), at the far end of the top bar. */
+  /* ONE CLOSE GRAMMAR (NAV-01, 2026-09-27): a screen goes back with ← at the top left, an overlay
+     that fills the screen closes with ✕ at the top right (Guided, the video), and a sheet slides
+     down (its handle, a swipe, a tap above it). The phone's Back closes whatever is on top. */
+  /* ? — how Guided works (COACH-02), beside the ✕. */
   .step-help { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--grey-mid); background: var(--white); color: var(--grey-text);
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-lead); line-height: 1; cursor: pointer; flex-shrink: 0; position: relative; }
   .step-help::after, .step-exit::after { content: ''; position: absolute; inset: -5px; }   /* 44 px targets */
@@ -4899,12 +4909,12 @@
      below): nothing here is a second copy of the logging or Ceiling logic. -->
 <div class="step-overlay" id="stepOverlay">
   <div class="step-topbar">
-    <button type="button" class="step-exit" onclick="closeStepMode()" aria-label="Exit guided mode">✕</button>
     <div class="step-topbar-text">
       <div class="step-eyebrow" id="step-eyebrow"></div>
       <div class="step-pill" id="step-pill"></div>
     </div>
     <button type="button" class="step-help" onclick="openHelp('guided')" aria-label="How Guided works">?</button>
+    <button type="button" class="step-exit" onclick="closeStepMode()" aria-label="Exit guided mode">✕</button>
   </div>
   <div class="step-scroll" id="step-scroll"></div>
   <div class="step-footer" id="step-footer"></div>
@@ -8497,7 +8507,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -8742,6 +8752,52 @@ function initBackNav() {
   });
   document.querySelectorAll('.screen').forEach(e => mo.observe(e, { attributes: true, attributeFilter: ['class'] }));
   navSync();
+}
+
+// A sheet slides down to close (NAV-01's close grammar, 2026-09-27). A swipe down from the handle, or from
+// anywhere while the sheet is scrolled to its top, drags it; let go past 90 px, or flick, and the whole sheet
+// closes, as a tap above it does. A move up, or one that starts mid-scroll away from the handle, scrolls the
+// sheet as ever. From 560 px wide the sheet is a centred dialog with no handle, so nothing drags there.
+function initSheetSwipe(overlayId, close) {
+  const ov = document.getElementById(overlayId);
+  const m = ov && ov.querySelector('.readiness-modal');
+  if (!m) return;
+  let y0 = null, dy = 0, t0 = 0, drag = false;
+  const settle = () => { m.style.transform = ''; m.style.transition = ''; };
+  m.addEventListener('touchstart', e => {
+    y0 = null;
+    if (e.touches.length !== 1 || window.matchMedia('(min-width: 560px)').matches) return;
+    const t = e.touches[0];
+    if (m.scrollTop > 0 && t.clientY - m.getBoundingClientRect().top > 32) return;   // mid-scroll, off the handle
+    y0 = t.clientY; dy = 0; t0 = Date.now(); drag = false;
+  }, { passive: true });
+  m.addEventListener('touchmove', e => {
+    if (y0 == null) return;
+    dy = e.touches[0].clientY - y0;
+    if (!drag && dy < -4) { y0 = null; return; }        // up: a scroll
+    if (dy > 3 && e.cancelable) e.preventDefault();      // down from the top: the sheet, not the page
+    if (!drag && dy < 8) return;                         // a tap's jitter is not a drag
+    drag = true;
+    m.style.transition = 'none';
+    m.style.transform = 'translateY(' + Math.max(0, dy) + 'px)';
+  }, { passive: false });
+  const end = () => {
+    if (y0 == null) return;
+    y0 = null;
+    if (!drag) return;
+    drag = false;
+    const flick = dy > 30 && dy / Math.max(1, Date.now() - t0) > 0.6;
+    m.style.transition = 'transform .18s ease';
+    if (dy > 90 || flick) {
+      m.style.transform = 'translateY(100%)';
+      setTimeout(() => { close(); settle(); }, 170);
+    } else {
+      m.style.transform = '';
+      setTimeout(settle, 200);
+    }
+  };
+  m.addEventListener('touchend', end);
+  m.addEventListener('touchcancel', end);
 }
 
 // Empty-state for the archive view when there are no past programs yet
@@ -14765,6 +14821,9 @@ function esc(str) {
   // Back closes the top layer instead of leaving the app (NAV-01).
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initBackNav);
   else initBackNav();
+  // A sheet slides down to close (NAV-01's close grammar).
+  initSheetSwipe('hist-overlay', () => closeHistorySheet());
+  initSheetSwipe('readiness-overlay', () => cancelReadiness());
 
   // Offer Add-to-Home-Screen once the athlete has FINISHED A SESSION, never on first open
   // (HOME-03, 2026-09-26): the toast used to land 2.5 s after the first sign-in, on top of
