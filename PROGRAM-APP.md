@@ -635,7 +635,16 @@ while the sheet is up remembers the page before it (`sheetWrap()` around each op
 nothing adds no step), a **‹ Back** sits at the top, and the phone's Back steps back a page before it closes
 the sheet. Closing forgets the trail. A new sheet opener gets wrapped in `wrapSheetOpeners()`.
 **AA Proof does the same** (HABITS.md → *The phone's Back button*), and never from the embedded strip on Home.
-**Still open:** one close grammar for the buttons (←, ✕, Close).
+**One close grammar (2026-09-27).** A **screen** goes back with **←** at the top left (the day view, Records,
+body weight, the Library's panes and sessions, an article, the archive). An **overlay** that fills the screen
+closes with **✕** at the top right: the video pop-up, and Guided, whose ✕ moved there from the top left (its ?
+sits beside it). A **sheet** (`.readiness-modal`: History, About, Why, Quality, the guide, your account, the
+readiness check) has a **handle** and slides down: `initSheetSwipe()` closes it on a swipe down from the handle,
+or from anywhere while it is scrolled to its top (past 90 px, or a flick; a short drag springs back; a move up
+or one that starts mid-scroll is a scroll). A tap above it still closes it, and its **Close** (and the check-in's
+*Skip for today*) is a 44 px target now (it was 15 px). From 560 px wide the sheet is a centred dialog with no
+handle and no drag. The rest timer keeps the button in its row: it is **Close** on its own and **Skip →** in
+Guided, where it ends the rest. The guide's first card says all this in one paragraph.
 
 ## 🔍 Readable in both themes (A11Y-01, 2026-09-26)
 
