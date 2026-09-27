@@ -707,6 +707,30 @@
      — drop the side margin, rounding and frame so the banner image covers the
      full screen width instead of sitting inset like the My Plan cards. Keeps the
      bottom margin for spacing before the "This Week" section. */
+  /* This cycle (PROG-01): where the small cycle line was, the top of Home. */
+  .cyc-card { display: block; width: calc(100% - 48px); margin: 0 24px 22px; padding: 16px 16px 10px; border: 0; border-radius: 16px;
+    background: #122A22; color: #fff; text-align: left; cursor: pointer; font: inherit; box-shadow: 0 8px 24px rgba(14,74,54,0.16); }   /* the Home rows' green */
+  .cyc-card > span { display: block; }
+  .cyc-top { display: flex !important; align-items: center; justify-content: space-between; gap: 10px;
+    font: 700 11px/1.35 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.78); }
+  .cyc-top b { color: #fff; font-weight: 700; }
+  .cyc-top i { font-style: normal; font-size: 20px; line-height: 1; color: #FAF7F2; }
+  .cyc-row { display: grid !important; grid-template-columns: minmax(96px, auto) 1fr; align-items: center; gap: 14px; margin-top: 12px; }
+  .cyc-k { font: 900 24px/1 'Barlow Condensed', sans-serif; color: #E06B43; white-space: nowrap; }
+  .cyc-k small { font: 700 11px 'Space Mono', monospace; color: rgba(255,255,255,.82); margin-left: 6px; letter-spacing: .02em; }
+  .cyc-bar { display: flex; gap: 3px; } .cyc-bar i { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); }
+  .cyc-bar i.on { background: #E06B43; }
+  .cyc-bar-solid { height: 6px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; } .cyc-bar-solid i { display: block; height: 100%; background: #E06B43; }
+  .cyc-wins-h { margin: 16px 0 2px; font: 700 11px 'Space Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.66); }
+  .cyc-win { display: flex !important; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0;
+    border-top: 1px solid rgba(255,255,255,.12); font: 600 15px/1.3 'Barlow', sans-serif; }
+  .cyc-win b { font: 600 14px/1.3 'Barlow', sans-serif; color: #A9E2C8; text-align: right; }
+  .cyc-none { margin: 14px 0 4px; font: 400 13.5px/1.45 'Barlow', sans-serif; color: rgba(255,255,255,.74); }
+  @media (max-width: 380px) {   /* a narrow phone: the lift, and its win under it */
+    .cyc-win { display: block !important; }
+    .cyc-win b { display: block; text-align: left; margin-top: 2px; }
+  }
+  body[data-dark] .cyc-card { box-shadow: 0 0 0 1px rgba(255,255,255,.08); }
   #home-cycle-wrap .current-message {
     margin-left: 0;
     margin-right: 0;
@@ -6956,6 +6980,132 @@ function clearUnfinished(id) {
 window.sendUnfinished = sendUnfinished;
 window.clearUnfinished = clearUnfinished;
 
+// ── THIS CYCLE (PROG-01, 2026-09-27) ──────────────────────────────────────────
+// "Is this working?" had no answer in the paid app: progress was one exercise at a time.
+// The card at the top of Home (it replaced the small cycle line; a tap opens Game Plan) says
+// where the cycle is (week N of M), how many sessions are done against planned, and up to
+// three WINS. A win is effort-matched (Amir: "celebrate wins for every one, when they lift
+// heavier with same rpe"): each lift's first session of the cycle against its best one since,
+// named in the plainest words that are true: heavier at the same reps and RPE, more reps at
+// the same weight, the same set at a lower RPE, or, when two things moved at once, "about X%
+// stronger" from an effort-adjusted index (Epley on reps to failure, reps + 10 − RPE; shown as
+// a percentage only, so the formula's bias at high reps cancels out). Works at any reps, for
+// bodyweight moves (reps to failure), and for holds (a lower RPE: holds log a tick, not seconds).
+function cycleSetOf(e, s) {
+  const w = parseLoggedKg(s.w);
+  const n = (s.n != null && s.n !== '') ? Number(s.n) : (e.reps ? Number(e.reps) : null);
+  const r = s.r ? Number(s.r) : null;
+  const rir = (r >= 6 && r <= 10) ? 10 - r : 0;
+  const idx = n ? (w ? w * (1 + (n + rir) / 30) : n + rir) : null;
+  return { w, n, r, idx };
+}
+function cycleBestSet(e) {
+  let best = null;
+  (e.sets || []).filter(histSetLogged).forEach(s => {
+    const x = cycleSetOf(e, s);
+    if (!best || (x.idx != null && (best.idx == null || x.idx > best.idx))
+              || (x.idx == null && best.idx == null && x.r != null && (best.r == null || x.r < best.r))) best = x;
+  });
+  return best;
+}
+function winText(a, b) {
+  const kg = v => String(Math.round(v * 2) / 2).replace(/\.0$/, '');
+  const reps = k => '+' + k + ' rep' + (k === 1 ? '' : 's');
+  const rpeKnown = a.r != null && b.r != null;
+  const dr = rpeKnown ? b.r - a.r : 0;
+  if (a.n == null || b.n == null) {                       // a hold: the dose is fixed, the effort tells
+    return (rpeKnown && dr < 0) ? { txt: `felt easier: RPE ${a.r} → ${b.r}`, gain: -dr * 0.03 } : null;
+  }
+  const gain = (a.idx && b.idx) ? b.idx / a.idx - 1 : 0;
+  if (gain < 0.02) return null;
+  const pct = Math.max(2, Math.round(gain * 100));
+  const loaded = a.w != null && b.w != null;
+  if (!loaded && (a.w != null || b.w != null)) return null;   // one set loaded, one not: nothing honest to say
+  const dw = loaded ? Math.round((b.w - a.w) * 2) / 2 : 0, dn = b.n - a.n;
+  let txt;
+  if (!loaded) {
+    txt = dn > 0 && dr <= 0 ? `${reps(dn)}${rpeKnown && dr === 0 ? ', same RPE' : ''}`
+        : dn === 0 && dr < 0 ? `${b.n} reps felt easier: RPE ${a.r} → ${b.r}`
+        : `about ${pct}% stronger`;
+  } else if (dw > 0 && dn === 0 && dr === 0) txt = `+${kg(dw)} kg, same reps${rpeKnown ? ', same RPE' : ''}`;
+  else if (dw > 0 && dn === 0 && dr < 0)     txt = `+${kg(dw)} kg, and it felt easier`;
+  else if (dw > 0 && dn > 0 && dr <= 0)      txt = `+${kg(dw)} kg and ${reps(dn)}`;
+  else if (dw === 0 && dn > 0 && dr <= 0)    txt = `${reps(dn)} at ${kg(b.w)} kg${rpeKnown && dr === 0 ? ', same RPE' : ''}`;
+  else if (dw === 0 && dn === 0 && dr < 0)   txt = `${kg(b.w)} kg × ${b.n} felt easier: RPE ${a.r} → ${b.r}`;
+  else if (dw > 0 && dr > 0)                 txt = `heavier and harder: about ${pct}% stronger`;
+  else if (dw > 0 && dn < 0)                 txt = `heavier for fewer reps: about ${pct}% stronger`;
+  else if (dw < 0 && dn > 0)                 txt = `more reps with less: about ${pct}% stronger`;
+  else                                       txt = `about ${pct}% stronger at the same effort`;
+  return { txt, gain };
+}
+function cycleWins(rows) {
+  const lifts = {};
+  rows.slice().sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0)).forEach(sess => (sess.entries || []).forEach(e => {
+    if (!e || e.circuit) return;
+    const name = HIST_ALIAS[e.ex] || e.ex;
+    const best = cycleBestSet(e);
+    if (!name || !best) return;
+    const k = histNorm(name);
+    (lifts[k] = lifts[k] || { name, sets: [] }).sets.push(best);
+  }));
+  const wins = [];
+  Object.keys(lifts).forEach(k => {
+    const L = lifts[k];
+    if (L.sets.length < 2) return;
+    const a = L.sets[0];
+    let b = null;   // the best since the first session: a back-off week never takes a win away
+    L.sets.slice(1).forEach(x => {
+      if (!b) { b = x; return; }
+      if (x.idx != null && (b.idx == null || x.idx > b.idx)) b = x;
+      else if (x.idx == null && b.idx == null && x.r != null && (b.r == null || x.r < b.r)) b = x;
+    });
+    const w = b && winText(a, b);
+    if (w) wins.push({ name: L.name, txt: w.txt, gain: w.gain });
+  });
+  return wins.sort((x, y) => y.gain - x.gain).slice(0, 3);
+}
+function cycleProgress() {
+  const cycles = (DATA && DATA.cycles) || [];
+  const cIdx = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
+  const cur = cycles[cIdx];
+  const wk = cycleWeekInfo(cur);
+  if (!cur || !wk || wk.before || wk.after) return null;
+  const from = String(cur.startDate).slice(0, 10), today = ymdLocal(new Date());
+  const ids = ((DATA.workouts && DATA.workouts.days) || []).map(d => String(d.id));
+  const rows = (HIST || []).filter(x => x.date >= from && x.date <= today && ids.indexOf(String(x.day)) >= 0);
+  const seen = new Set(rows.map(x => x.date + '|' + x.day));
+  ids.forEach(id => { if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) seen.add(today + '|' + id); });
+  return { cur, cIdx, count: cycles.length, wk, done: seen.size, planned: ids.length * wk.total, wins: cycleWins(rows) };
+}
+function paintCycleCard() {
+  const wrap = document.getElementById('home-cycle-wrap');
+  if (!wrap || !DATA) return;
+  const cycles = DATA.cycles || [];
+  const cIdx = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
+  const cur = cycles[cIdx];
+  if (!cur) { wrap.innerHTML = ''; return; }
+  const p = cycleProgress();
+  if (!p) {   // no dates (5 of 35 live programmes), or before / after the cycle: the small line
+    const wk = cycleWeekInfo(cur);
+    wrap.innerHTML = `<button type="button" class="home-cyc" onclick="goTo('plan')"><span class="ct">Cycle ${cIdx + 1} of ${cycles.length} · <b>${esc(cur.name || '')}</b>${
+      wk && !wk.before && !wk.after ? ` · Week ${wk.wk} of ${wk.total}` : (cur.weeks ? ' · ' + esc(cur.weeks) : '')}</span><i aria-hidden="true">›</i></button>`;
+    return;
+  }
+  const bar = (n, on) => n > 24
+    ? `<span class="cyc-bar cyc-bar-solid"><i style="width:${Math.min(100, Math.round(on / n * 100))}%"></i></span>`
+    : `<span class="cyc-bar">${Array.from({ length: n }, (_, i) => `<i${i < on ? ' class="on"' : ''}></i>`).join('')}</span>`;
+  const wins = p.wins.length
+    ? `<span class="cyc-wins-h">Wins this cycle</span>` + p.wins.map(w => `<span class="cyc-win"><span>${esc(w.name)}</span><b>${esc(w.txt)}</b></span>`).join('')
+    : `<span class="cyc-none">Your wins show here: heavier, more reps or easier than your first session of the cycle.</span>`;
+  wrap.innerHTML = `<button type="button" class="cyc-card" onclick="goTo('plan')" aria-label="This cycle: open Game Plan">
+      <span class="cyc-top"><span>Cycle ${p.cIdx + 1} of ${p.count} · <b>${esc(p.cur.name || '')}</b></span><i aria-hidden="true">›</i></span>
+      <span class="cyc-row"><span class="cyc-k">Week ${p.wk.wk}<small>of ${p.wk.total}</small></span>${bar(p.wk.total, p.wk.wk)}</span>
+      <span class="cyc-row"><span class="cyc-k">${p.done}<small>of ${p.planned} sessions</small></span>${bar(p.planned, p.done)}</span>
+      ${wins}
+    </button>`;
+}
+window.paintCycleCard = paintCycleCard;
+
 // Repaint everything the week drives: the pills, the suggested day, the count line.
 // Called when the day view closes and whenever the history arrives.
 function paintWeek() {
@@ -6967,6 +7117,7 @@ function paintWeek() {
   }
   paintLiveClocks();
   markSuggestedDay();
+  paintCycleCard();   // the history may just have arrived
   const el = document.getElementById('home-week-sum');
   if (!el) return;
   const ids = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
@@ -7276,14 +7427,9 @@ function renderHome() {
   // pill that opens My Plan, and no Read-more (noDetail).
   // The cycle is one small line under the greeting (HOME-02, Amir 2026-09-26: "I like the small
   // cycle details"). It was a full photo card; the photos now belong to the day cards below.
-  const cycleWrap = document.getElementById('home-cycle-wrap');
-  if (cycleWrap) {
-    const wk = cycleWeekInfo(cur);
-    cycleWrap.innerHTML = cur
-      ? `<button type="button" class="home-cyc" onclick="goTo('plan')"><span class="ct">Cycle ${cIdx + 1} of ${cycles.length} · <b>${esc(cur.name || '')}</b>${
-          wk && !wk.before && !wk.after ? ` · Week ${wk.wk} of ${wk.total}` : (cur.weeks ? ' · ' + esc(cur.weeks) : '')}</span><i aria-hidden="true">›</i></button>`
-      : '';
-  }
+  // Since PROG-01 (Amir, 2026-09-27: "a card on home, but remove the line on the top … replace
+  // it with this, when you click, it goes to gameplan") it is the This cycle card: paintCycleCard().
+  paintCycleCard();
 
   // "This Week" header + week indicator (only when the cycle has both dates).
   const weekWrap = document.getElementById('home-week-wrap');
@@ -8315,7 +8461,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training. This week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
