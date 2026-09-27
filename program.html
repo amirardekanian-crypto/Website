@@ -10988,15 +10988,18 @@ function currentCycleData() {
 
 // A written RPE ("8", "7-8") as today's target, or '' when today changes nothing. One off
 // each end, never below 6, never above what was written; and a lower day does not stack
-// with the week note (week 1, the back-off week): the lower of the two targets wins.
+// with the week note (week 1, the back-off week): the lower of the two targets wins, and
+// the week's own number is floored at 6 too (CHP-4: "No RPE below 6 anywhere"; a written 6
+// in a week with rpeDrop 1 read "6 → 5 today" until 2026-09-27, a target no button can log).
 // ⚠ coach.html's dayTargetC() is the same rule without the week note. Change both.
 function dayRpe(written, drop, note) {
   const m = String(written == null ? '' : written).match(/(\d+(?:\.\d+)?)(?:\s*[-–]\s*(\d+(?:\.\d+)?))?/);
   if (!m || !drop) return '';
   const lo = Number(m[1]), hi = m[2] ? Number(m[2]) : lo;
-  const week = v => (note && Number(note.rpeCap) > 0) ? Math.min(v, Number(note.rpeCap))
-                  : (note && Number(note.rpeDrop) > 0) ? v - Number(note.rpeDrop) : v;
-  const one = v => Math.min(v, week(v), Math.max(RPE_FLOOR, v - drop));
+  const floored = (v, t) => Math.min(v, Math.max(RPE_FLOOR, t));   // never under 6, never over what was written
+  const week = v => (note && Number(note.rpeCap) > 0) ? floored(v, Number(note.rpeCap))
+                  : (note && Number(note.rpeDrop) > 0) ? floored(v, v - Number(note.rpeDrop)) : v;
+  const one = v => Math.min(v, week(v), floored(v, v - drop));
   const a = one(lo), b = one(hi);
   if (a === lo && b === hi) return '';
   return a === b ? String(a) : a + '–' + b;
