@@ -2,7 +2,7 @@
 
 Amir's list, sent in chat on 2026-10-01 after he saw the Motion Menu. His note on it: **these are the ingredients, not the recipe.**
 A recipe is one video's plan: for each sentence, which ingredient, which sound, which colour. Amir approves the plan before anything is built.
-Nothing here is built yet. The numbers are his, as sent (his list skipped 3, 7, 8, 11 and 14).
+Built on 2026-10-01 as pieces of the kit and shown in the Menu's **Reels** tab (see *What is built* below). The numbers are his, as sent (his list skipped 3, 7, 8, 11 and 14).
 
 ## His list, shortened
 
@@ -82,9 +82,37 @@ Nothing here is built yet. The numbers are his, as sent (his list skipped 3, 7, 
 - New, not built: court and distance diagrams, force-time curve and RFD slope, force arrows, athlete figure and poses, concept chain with connectors,
   muscle light-up on the app's body drawing, highlight bar, word-timed text, camera moves on footage, a 9:16 mode, footstep, ball-hit and gym sounds.
 
+## What is built (2026-10-01)
+
+Every piece below has a Menu number, a tall (9:16) sample, and a Farsi draft where it has words. **Nothing is used in a video until Amir marks it Keep.**
+
+| His idea | Built as (Menu number) | Notes |
+|---|---|---|
+| 1 Key words appear when he says them | **On Cue** (147) | Takes `{ t, text }` for every word. `tools/srt_words.py` makes the list from a caption export by spreading each caption's words by length: close, never exact |
+| 1 Numbers that count up | **Tally** (144), **Span** (145: 2 to 13 m) | Digits keep a fixed pitch so nothing jitters; Persian numerals in Farsi |
+| 1 Highlighted terms | **Highlighter** (149: bar, underline, box, loop), On Cue's marker bar | |
+| 1 Headline, explanation, detail | **Three Tiers** (146) | |
+| 1 Arrows and lines that connect | **Arrow** (150), **Chain Reaction** (153), **Callout** (152) | A Callout's point can be a function of time, so it can follow something that moves |
+| 1 0 to 5 m, 0 to 10 m, 0 to 15 m | **Stretch** (157) | The bar stretches while the first 5 m stays lit |
+| 2 Athlete, poses, split step, first step, acceleration | **Silhouette** (161), **Phases** (162) | Simple geometric figure; five poses (ready, split step, first step, drive, plant). Amir approves each pose |
+| 2 Force arrows, GRF, horizontal force | **Push** (163), **Ground Push** (164) | One arrow for the whole push, two for its up part and forward part |
+| 2 Foot contact, sprint trajectory, distance markers, COD angle | **Tread** (160), **Streak** (158), **Calipers** (151), **Metre Flags** (156), **Pivot** (159) | Pivot measures the turn, not the angle between the lines |
+| 2 Force-time curve, RFD | **Force Curve** (165), **Slope** (166) | Teaching shapes, not measured data. A number on screen is Amir's or sourced |
+| 4 Animated anatomy | **Light Up** (168) | The app's own muscle drawing, front and back, same muscle names as the Spine. Main muscle in full clay, helper in soft clay |
+| 5 STRENGTH, FORCE x TIME, RFD, PERFORMANCE | **Chain Reaction** (153) | A column (or a row, right to left in Farsi); the last idea is the answer, in clay |
+| 6 2 m, 5 m, 8 m, 13 m over a court | **Blueprint** (155) + **Metre Flags** (156) | Real court sizes, tennis and padel, upright for a reel |
+| 9 Camera moves | **Push In** (169), **Pull Out** (170), **Drift** (171), **There and Back** (172) | Shown on a stand-in picture: no footage yet. Drift never slides past the edge of the picture |
+| 12 Highlight and annotation colours | **Signal Colours** (175), **Cross Out** (148) | Bone is normal, clay is the key word, green is the fix, grey is detail, a clay strike-through is the mistake. No yellow (Amir's own rule). A red is still Amir's call |
+| 13 Visual metaphors | **Rev Dial** (173: ENGINE, POWER, SPEED), **Not Equal** (174), **Same Peak** (167: big force but slow) | One per video, after the mechanism has been shown |
+| 15 Progress bar and chapters | **Chapter Rail** (154) | At the top, below Instagram's header; runs right to left in Farsi |
+| 10 Sound design | New sounds in the Menu's Sounds tab (footsteps, ball hit, bounce, gym clank and more) | Callable by name from any piece's cues |
+
+**Still not built:** text that follows his movement (needs real tracking on real footage); real footage under the camera moves (the first proof is 10 seconds of his own clip); exact
+word-by-word timing (needs a speech tool he trusts); a composer page that builds a whole video from a plan (Step 5 of the Menu plan).
+
 ## Order Claude would build in
 
-1. Step 2 of the Menu plan first: make every item callable by name. Each new ingredient then plugs in as a reusable piece instead of a one-off.
+1. Step 2 of the Menu plan first: make every item callable by name. Each new ingredient then plugs in as a reusable piece instead of a one-off. (Done 2026-10-01.)
 2. A new Menu group, built from the safest items: the court and distances, the concept chain, the highlight bar and arrow, the muscle light-up.
 3. Force-time curve, RFD slope and force arrows, then the simple athlete figure with his approval of each pose.
 4. A 9:16 mode and a 10 second test over his real footage, with two or three camera moves.

@@ -10,6 +10,14 @@ Two layers:
     bar 1 point · 2 drop · 3 form · 4 depth · 5 flow (breakdown) · 6 interface · 7 rhythm (rising stabs) · 8 lockup
   · the SOUND DESIGN is read from the cue sheet, so every slam, landing, click, cut and whoosh sits on its frame
 Pure numpy/scipy: no samples, nothing to license.
+
+Also for other videos (Content/motion):
+  · a cue {"t": 3.2, "kind": "sound", "id": "whoosh"} plays any sound of the Motion Menu by name, on these same voices and buses
+    (the table is Content/motion/tools/sound_recipes.py; optional props "gain", "pan", "seed"; see sound_cue)
+  · --voice VOICE.wav [--duck-db 9] [--duck-release 0.25] lays a voice on top and ducks the track under it: the music, bass and
+    reverb by --duck-db, the drums, percussion and fx by half as much, the voice added at unity before the limiter
+    (see prep_voice, speech_envelope, duck_gains). Without --voice the track is exactly what it was.
+  The track is 15 s and carries the reel's own 8-bar music unless told otherwise: --dur SECONDS sets the length, --no-music leaves the music out.
 """
 import json, math, sys, argparse
 import numpy as np
@@ -17,7 +25,10 @@ from scipy import signal
 from scipy.io import wavfile
 
 SR = 48000
-DUR = 15.0
+DUR = 15.0                                                   # the reel is 15 s. Another video: --dur 42 on the command line, or REEL_AUDIO_DUR=42 in the environment
+if __import__('os').environ.get('REEL_AUDIO_DUR'): DUR = float(__import__('os').environ['REEL_AUDIO_DUR'])
+for _i, _a in enumerate(sys.argv[:-1]):                      # read before the buses are sized (they are made when this file is loaded)
+    if _a == '--dur': DUR = float(sys.argv[_i + 1])
 N = int(round(DUR * SR))
 BPM = 128
 BEAT = 60.0 / BPM
@@ -266,6 +277,58 @@ LANDS = [50, 53, 55, 57, 60, 62]                            # M O T I O N  ->  D
 UI_N = [74, 77, 79, 81, 84, 86, 89]
 CUT_FX = {}
 
+# ───────────────────────────── the Motion Menu's sounds, called by name ─────────────────────────────
+def _menu_recipes():
+    """Content/motion/tools/sound_recipes.py, imported on first use, so rendering the reel never needs it"""
+    mod = sys.modules.get('sound_recipes')
+    if mod is None:
+        import os
+        tools = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'motion', 'tools'))
+        if tools not in sys.path: sys.path.append(tools)
+        keep, sys.dont_write_bytecode = sys.dont_write_bytecode, True              # leave no __pycache__ in the repo
+        try:
+            import sound_recipes as mod
+        finally:
+            sys.dont_write_bytecode = keep
+    return mod
+
+def sound_cue(c):
+    """{"t": 3.2, "kind": "sound", "id": "whoosh"}  plays the Motion Menu's recipe `whoosh` at t on these same voices and buses.
+    Optional props: gain (linear, default 1), pan (-1 left .. 1 right: balances the sound's own stereo image, constant power),
+    seed (another take of the sound's noise; 0 is the take you hear in the Menu, so a cue sounds like its sample).
+    The recipe's own options (sound_recipes.RECIPES[id].opts) are honoured like this:
+      pump    ignored: the master below already pumps the music and bass on every kick a recipe logs (kick_at)
+      vacuum  its (start, hit) offsets, shifted by t, join VACUUM
+      origin  the recipe was written inside a later bar of the reel's grid. The stab lives in bar 1, the Dm bar, because the
+              'stab' cue reads its chord from t // BAR. So it is played at the start of that bar and then slid onto t:
+              the same notes as the Menu sample wherever the cue sits. (A 'stab' cue itself still follows the bar it lands in.)"""
+    R, me, t, sid = _menu_recipes(), sys.modules[__name__], c['t'], c.get('id')
+    if sid not in R.RECIPES:
+        import difflib
+        raise ValueError(f"sound cue at t={t}: there is no Menu sound called {sid!r}; closest: {difflib.get_close_matches(str(sid), list(R.RECIPES), 3) or 'none'} "
+                         f"(the table is Content/motion/tools/sound_recipes.py)")
+    opts = R.RECIPES[sid].opts
+    t0 = opts.get('origin', t)                          # where the recipe plays; it is heard at t
+    names, g, n_kicks = ('drums', 'perc', 'bass_b', 'music', 'fx', 'rev'), globals(), len(kicks)
+    real = [g[n] for n in names]
+    mine = [Bus() for _ in names]                       # the recipe plays onto fresh buses, so gain, pan and the slide touch only this sound
+    for n, b in zip(names, mine): g[n] = b              # the voices and the cue player look the buses up by name, at call time
+    try:
+        R.play(sid, t0, me, c.get('seed', 0))
+    finally:
+        for n, b in zip(names, real): g[n] = b
+    d = int(round(t * SR)) - int(round(t0 * SR))        # samples between where the recipe played and where it is heard (0 without an origin)
+    gl = gr = c.get('gain', 1.0)
+    if 'pan' in c:
+        pl, pr = pan_gain(c['pan']); gl, gr = gl * pl, gr * pr
+    lo, hi = max(0, -d), min(N, N - d)
+    for dst, src in zip(real, mine):
+        if hi > lo:
+            dst.L[lo + d:hi + d] += src.L[lo:hi] * gl; dst.R[lo + d:hi + d] += src.R[lo:hi] * gr
+    kicks[n_kicks:] = [k_ + d / SR for k_ in kicks[n_kicks:] if 0 <= k_ + d / SR < N / SR]      # a kick outside the track would index from the end in master()'s sidechain
+    for a, b in opts.get('vacuum', ()):
+        if t + a >= 0 and int((t + a) * SR) + int(.012 * SR) <= N: VACUUM.append((t + a, t + b))      # master() ramps over 12 ms: it must fit
+
 def play_cue(c):
     t, k = c['t'], c['kind']
     if k == 'pulse':
@@ -371,6 +434,8 @@ def play_cue(c):
         for j, nn in enumerate((74, 81, 86)): x = bell(nn, 2.6, .9); fx.add(x, t + .01 * j, .3, -.4 + j * .4); rev.add(x, t + .01 * j, .5, -.4 + j * .4)
     elif k == 'ping':
         n = (81, 86)[c['i']]; x = bell(n, 1.6, .8); fx.add(x, t, .22, (-.3, .35)[c['i']]); rev.add(x, t, .5)
+    elif k == 'sound':
+        sound_cue(c)
 
 # ───────────────────────────── reverb + master ─────────────────────────────
 def make_ir(seed, rt=2.4, pre=.018):
@@ -401,13 +466,51 @@ def band_report(name, L, R):
         y = signal.sosfilt(sos('band', [lo, hi], 2), m); rows.append(20 * math.log10(max(1e-9, math.sqrt(np.mean(y ** 2)))))
     print(f'  {name:6s} ' + '  '.join(f'{v:6.1f}' for v in rows) + f'   | total {20 * math.log10(max(1e-9, math.sqrt(np.mean(m ** 2)))):6.1f}')
 
-def master(sidechain_depth=.62, diag=False):
-    duck = np.ones(N)
-    for tk in kicks:
-        i = int(tk * SR); n = int(.4 * SR); env = 1 - sidechain_depth * np.exp(-np.arange(n) / SR / .11) * (1 - np.exp(-np.arange(n) / SR / .004))
-        j = min(N, i + n); duck[i:j] = np.minimum(duck[i:j], env[:j - i])
-    wetL = signal.fftconvolve(rev.L * duck ** .5, make_ir(1))[:N]; wetR = signal.fftconvolve(rev.R * duck ** .5, make_ir(2))[:N]
-    g = GAINS
+# ───────────────────────────── a voice over the track: the music ducks while it speaks ─────────────────────────────
+VOICE_PEAK = .8                                          # a voice is peak-normalised to the limiter's ceiling, then mixed in at unity
+
+def prep_voice(x, sr):
+    """samples (n,) or (n, channels) at any rate -> float (N, 2) at 48 kHz, cut or padded to the track, peak-normalised to VOICE_PEAK.
+    Mono goes to both sides; a stereo voice keeps its sides (a third channel and up are ignored)."""
+    x = np.asarray(x)
+    x = x.astype(np.float64) - (128.0 if x.dtype == np.uint8 else 0.0)                      # 8-bit WAV is unsigned
+    x = np.repeat(x[:, None], 2, 1) if x.ndim == 1 else (np.repeat(x, 2, 1) if x.shape[1] == 1 else x[:, :2])
+    if int(sr) != SR:
+        g = math.gcd(int(sr), SR); x = signal.resample_poly(x, SR // g, int(sr) // g, axis=0)
+    x = x[:N]
+    peak = float(np.max(np.abs(x))) if len(x) else 0.0
+    if not peak > 0: raise ValueError('the voice file is silent')
+    out = np.zeros((N, 2)); out[:len(x)] = x * (VOICE_PEAK / peak)
+    return out
+
+def load_voice(path):
+    sr, x = wavfile.read(path)
+    return prep_voice(x, sr)
+
+def speech_envelope(voice, release=.25, attack=.015, thresh_db=-45.0):
+    """0..1 per sample (length N): 1 while the voice speaks, 0 when it does not. The voice's power is measured over 20 ms every millisecond
+    and gated at thresh_db (dBFS of the voice as mixed, i.e. after prep_voice, so breaths and room noise stay under it); a one-pole
+    follower then smooths the gate: `attack` and `release` are its time constants in seconds."""
+    p = np.mean(np.square(voice), axis=1) if voice.ndim == 2 else np.square(voice)
+    c = np.concatenate([[0.0], np.cumsum(p)]); win = int(.020 * SR)
+    mid = np.arange(0, N, SR // 1000)                                                       # control points, 1 kHz
+    lo, hi = np.clip(mid - win // 2, 0, len(p)), np.clip(mid + win // 2, 0, len(p))
+    gate = (10 * np.log10(np.maximum((c[hi] - c[lo]) / np.maximum(hi - lo, 1), 1e-20)) > thresh_db).astype(float)
+    ka, kr = 1 - math.exp(-1 / (max(attack, 1e-3) * 1000)), 1 - math.exp(-1 / (max(release, 1e-3) * 1000))
+    env, y = np.empty(len(gate)), 0.0
+    for i, gt in enumerate(gate):
+        y += (ka if gt > y else kr) * (gt - y); env[i] = y
+    return np.interp(np.arange(N) / SR, mid / SR, env)
+
+def duck_gains(env, duck_db=9.0):
+    """GAINS with the ducks in. The music (pads too), the bass and the reverb go down by the full duck_db while the voice speaks; the drums,
+    the percussion and the fx go down by half of it, so hits stay punchy and the voice still sits on top."""
+    full, half = 10 ** (-duck_db * env / 20), 10 ** (-duck_db / 2 * env / 20)
+    return dict(GAINS, music=GAINS['music'] * full, bass=GAINS['bass'] * full, wet=GAINS['wet'] * full,
+                drums=GAINS['drums'] * half, perc=GAINS['perc'] * half, fx=GAINS['fx'] * half)
+
+def _bed(g, duck, wetL, wetR, diag=False):
+    """the buses summed at gains g (numbers, or per-sample curves for a ducked bed), the vacuum ducks, a 32 Hz high-pass and a 16.5 kHz low-pass"""
     L = drums.L * g['drums'] + perc.L * g['perc'] + bass_b.L * duck * g['bass'] + music.L * duck * g['music'] + fx.L * g['fx'] + wetL * g['wet']
     Rr = drums.R * g['drums'] + perc.R * g['perc'] + bass_b.R * duck * g['bass'] + music.R * duck * g['music'] + fx.R * g['fx'] + wetR * g['wet']
     if diag:
@@ -422,9 +525,23 @@ def master(sidechain_depth=.62, diag=False):
     L = L * vac; Rr = Rr * vac
     out = np.stack([L, Rr], 1)
     out = signal.sosfilt(sos('high', 32, 2), out, axis=0)
-    out = np.stack([lp(out[:, 0], 16500, 2), lp(out[:, 1], 16500, 2)], 1)
+    return np.stack([lp(out[:, 0], 16500, 2), lp(out[:, 1], 16500, 2)], 1)
+
+def master(sidechain_depth=.62, diag=False, voice=None, duck_db=9.0, duck_release=.25):
+    """voice: a voice made by prep_voice/load_voice. Given, the bed ducks by duck_db under it (see duck_gains; duck_release is the follower's
+    release in seconds) and the voice is added at unity before the limiter. Without it nothing here changes."""
+    duck = np.ones(N)
+    for tk in kicks:
+        i = int(tk * SR); n = int(.4 * SR); env = 1 - sidechain_depth * np.exp(-np.arange(n) / SR / .11) * (1 - np.exp(-np.arange(n) / SR / .004))
+        j = min(N, i + n); duck[i:j] = np.minimum(duck[i:j], env[:j - i])
+    wetL = signal.fftconvolve(rev.L * duck ** .5, make_ir(1))[:N]; wetR = signal.fftconvolve(rev.R * duck ** .5, make_ir(2))[:N]
+    out = _bed(GAINS, duck, wetL, wetR, diag)
     # bring the 99.9th-percentile peak to 0.8, then let the limiter catch only the true outliers
-    out *= .8 / np.percentile(np.abs(out), 99.9)
+    scale = .8 / np.percentile(np.abs(out), 99.9)
+    if voice is not None:       # the same bed again with the ducks in, at the gain-staging it had on its own: the duck changes nothing else
+        out = _bed(duck_gains(speech_envelope(voice, duck_release), duck_db), duck, wetL, wetR)
+    out *= scale
+    if voice is not None: out += voice
     out = limiter(out)
     fo = int(.55 * SR); out[-fo:] *= (np.linspace(1, 0, fo) ** 1.5)[:, None]          # tail fades with the picture
     out[:int(.004 * SR)] *= np.linspace(0, 1, int(.004 * SR))[:, None]
@@ -432,16 +549,26 @@ def master(sidechain_depth=.62, diag=False):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('cues'); ap.add_argument('out'); ap.add_argument('--plot'); ap.add_argument('--diag', action='store_true'); ap.add_argument('--gains', default=''); ap.add_argument('--offset', type=float, default=.012, help='seconds the whole track is delayed so sound lands just after picture, never before it')
+    ap.add_argument('--voice', help='a WAV with the voice (mono or stereo, any rate): the music, bass and reverb duck under it, the drums, percussion and fx by half as much')
+    ap.add_argument('--duck-db', type=float, default=9.0, help='how far the music ducks while the voice speaks (default 9)')
+    ap.add_argument('--duck-release', type=float, default=.25, help='seconds the music takes to come back after the voice stops (default 0.25)')
+    ap.add_argument('--dur', type=float, help='length of the track in seconds (default 15, the reel). Read before anything else is set up')
+    ap.add_argument('--no-music', action='store_true', help="leave out the reel's own 8-bar music, bass, kicks and its two silences: only the sounds the cues ask for")
     a = ap.parse_args()
     sheet = json.load(open(a.cues))
     for kv in filter(None, a.gains.split(',')): k_, v_ = kv.split('='); GAINS[k_] = float(v_)
-    arrange_music()
+    if a.no_music: VACUUM.clear()                                           # those two holes belong to the reel's own drop and finale
+    else: arrange_music()
     for c in sheet['cues']: play_cue(c)
-    y = master(diag=a.diag)
+    voice = load_voice(a.voice) if a.voice else None
+    y = master(diag=a.diag, voice=voice, duck_db=a.duck_db, duck_release=a.duck_release)
     off = int(round(a.offset * SR))
     if off > 0: y = np.concatenate([np.zeros((off, 2)), y[:-off]])        # frames show a hit up to one frame (33 ms) after it happens
     wavfile.write(a.out, SR, (y * 32767).astype(np.int16))
     print(f'{a.out}: {len(y) / SR:.3f}s, peak {20 * math.log10(np.max(np.abs(y))):.2f} dBFS, rms {20 * math.log10(np.sqrt(np.mean(y ** 2))):.1f} dBFS, {len(kicks)} kicks, {len(sheet["cues"])} cues')
+    if voice is not None:
+        env = speech_envelope(voice, a.duck_release)
+        print(f'  voice {a.voice}: speaking {100 * np.mean(env > .5):.0f}% of the track; music, bass and reverb down {a.duck_db:g} dB while it does, drums, percussion and fx {a.duck_db / 2:g} dB')
     if a.plot:
         import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
         fig, ax = plt.subplots(2, 1, figsize=(18, 7), sharex=True, gridspec_kw={'height_ratios': [1, 2]})

@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""sounds.py - the Motion Menu's 48 sound samples, played on the reel's own synth.
+"""sounds.py - the Motion Menu's sound samples (56: the reel's 48, then footsteps and friends, then the duck), played on the reel's own synth.
 
-    python3 Content/motion/tools/sounds.py                          render all 48
+    python3 Content/motion/tools/sounds.py                          render all 56
     python3 Content/motion/tools/sounds.py --only kick,zip          render a subset (ids, comma separated)
     python3 Content/motion/tools/sounds.py --zip /tmp/sounds.zip    also zip every WAV that is on disk
     python3 Content/motion/tools/sounds.py --no-sheet               skip the waveform contact sheet
 
-Every sample is its own little mix. The voices, buses, cue player and house levels come from
-Content/showreel/tools/audio.py, which is imported and never edited (and never byte-compiled next to
-itself). For each sound: zero the buses, clear the kick list, reseed the noise from the sound's id, play
-the recipe, then mixdown():
+The sounds themselves are RECIPES, in sound_recipes.py: fn(t0, A), one per id. The same table is what a video's cue sheet calls
+({"kind": "sound", "id": "whoosh", "t": 3.2}, see audio.py), so a sound is the same in the Menu and in a video.
+This file renders each recipe as a sample. The voices, buses, cue player and house levels come from
+Content/showreel/tools/audio.py, which is imported here (and never byte-compiled next to itself). For each sound: zero the
+buses, clear the kick list, reseed the noise from the sound's id, play the recipe at LEAD, then mixdown():
 
     bus sum with A.GAINS  +  reverb send (A.make_ir(1) / (2) convolved, at GAINS["wet"])
     +  sidechain pump on bass + music (only the recipes that say "pump")  +  vacuum duck (only the recipes that say so)
@@ -21,11 +22,15 @@ the recipe, then mixdown():
 Samples start 0.10 s in. "-60 dBFS" is measured on the finished sample, i.e. 57 dB under its peak.
 Because each sound reseeds from its own id (crc32), a subset renders byte-identical to a full run.
 
+`duck` is the one sample that is not a recipe: it shows --voice (the music ducking under a voice) with a stand-in voice, first without
+the duck, then with it, through audio.py's own duck code (speech_envelope, duck_gains, prep_voice). It is 6.2 s long, so it is the one
+sample allowed more than MAX_LEN (5.0 s): its own limit is DUCK_MAX_LEN, 7.0 s.
+
 Writes (repo-relative):
     Content/motion/menu/sounds/<id>.mp3      MP3 160 kbps, 48 kHz stereo (artifacts serve .mp3 / .wav / .ogg, not .m4a)
     Content/motion/export/wav/<id>.wav       48 kHz 16-bit stereo (export/ is git-ignored on purpose)
     Content/motion/menu/sounds.json          {id: {dur, peaks[48], peak_db, rms_db}}
-    Content/motion/export/sound-sheet.png    8 x 6 waveform contact sheet
+    Content/motion/export/sound-sheet.png    8-wide waveform contact sheet (7 rows for 56 sounds)
 """
 import sys
 sys.dont_write_bytecode = True           # importing audio.py must not leave a __pycache__ inside Content/showreel/
@@ -36,13 +41,15 @@ import json
 import math
 import subprocess
 import zipfile
-import zlib
 from pathlib import Path
 
 import numpy as np
 from scipy import signal
 from scipy.io import wavfile
 from scipy.ndimage import maximum_filter1d
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import sound_recipes as R                # the recipes: fn(t0, A) per sound, shared with the video mix (audio.py's 'sound' cue)
 
 ROOT = Path(__file__).resolve().parents[3]
 AUDIO_PY = ROOT / "Content" / "showreel" / "tools" / "audio.py"
@@ -56,6 +63,7 @@ FILE_SHEET = MOTION / "export" / "sound-sheet.png"
 def _load_reel_audio():
     spec = importlib.util.spec_from_file_location("showreel_audio", AUDIO_PY)
     mod = importlib.util.module_from_spec(spec)
+    sys.modules["showreel_audio"] = mod  # audio.py's 'sound' cue finds its own module here (sys.modules[__name__])
     spec.loader.exec_module(mod)         # audio.py guards main(), so this only defines voices and buses
     return mod
 
@@ -72,40 +80,72 @@ BUSES = (A.drums, A.perc, A.bass_b, A.music, A.fx, A.rev)
 # ───────────────────────────── registry and per-sound state ─────────────────────────────
 class Sound:
     def __init__(self, sid, group, build):
-        self.id, self.group, self.build = sid, group, build
+        self.id, self.group, self.build = sid, group, build      # build() plays the sound onto the buses, returns mixdown() options
 
 
-SOUNDS = []
-_state = {"seed": 0}
+def _recipe_sound(sid):
+    """A Menu sample is the recipe played at LEAD. The recipe's own options (pump, vacuum, origin) become mixdown's."""
+    def build():
+        o = dict(R.RECIPES[sid].opts)
+        origin = o.pop("origin", 0.0)
+        t0 = LEAD + origin                           # a recipe written inside bar 1 starts that far into the buffer; mixdown drops the bars before it
+        R.play(sid, t0, A)                           # seeds the noise from the sound's id (R.seed_of), so a subset renders byte-identical to a full run
+        if origin:
+            o["origin"] = origin
+        if "vacuum" in o:
+            o["vacuum"] = [(t0 + a, t0 + b) for a, b in o["vacuum"]]
+        return o
+    return build
 
 
-def sound(sid, group):
-    def register(fn):
-        SOUNDS.append(Sound(sid, group, fn))
-        return fn
-    return register
+# `duck` is not a recipe a video can place: in a video the duck comes from --voice. It is the demonstration of it, so it has a builder of its own.
+DUCK_MAX_LEN = 7.0                                   # the one sample longer than MAX_LEN (5.0 s): two phrases of speech with a groove under them
+DUCK_DB = 9.0                                        # audio.py's default --duck-db
+DUCK_PHRASES = [(0.35, 2.75), (3.55, 5.95)]          # the stand-in voice speaks twice, 2.4 s each
+DUCK_FROM = 3.15                                     # nothing ducks before this (the gap between the phrases): without, then with
 
 
-def seed_of(sid):
-    return 0x6D6F7469 ^ zlib.crc32(sid.encode())          # stable across runs, machines and Python versions
+def _duck_bed(t0):
+    """A steady groove for six seconds with every bus family in it (kick, claps and hats; bass; a held pad and a pluck line),
+    so the duck is heard on all of them. The bar is the reel's own 'form' bar, three times over."""
+    for b in range(13):
+        A.drums.add(A.kick(), t0 + b * BEAT, 1.0)
+    for b in range(1, 13, 2):
+        A.perc.add(A.clap(), t0 + b * BEAT, .5, -.05)
+    for k in range(48):
+        A.perc.add(A.hat(open_=(k % 8 == 6), vel=.3 + (.12 if k % 2 else 0)), t0 + k * BEAT / 4, .3, -.3 if k % 2 else .3)
+    for bar in range(3):
+        for off, ln, semi in [(0, .5, 0), (.5, .25, 0), (.75, .25, 12), (1, .5, 0), (2, .5, 0), (2.5, .25, 0), (2.75, .25, 12), (3, .5, 0), (3.5, .5, 7)]:
+            A.bass_b.add(A.bass_note(34 + semi, ln * BEAT * .92), t0 + (bar * 4 + off) * BEAT, .8)
+    L, R = A.pad(A.CH["Bb"], 5.3, .3, .5, 1600)
+    A.music.add(L, t0, .3, y=R)
+    for k in range(24):
+        A.music.add(A.pluck([62, 69, 65, 74, 69, 65, 72, 67][k % 8], .22, .5), t0 + k * BEAT / 2, .22, -.4 if k % 2 else .4)
 
 
-def reseed(salt=0):
-    """A.rng is the module global that A.noise() reads; the voices pick it up at call time."""
-    A.rng = np.random.default_rng(_state["seed"] + salt)
+def _build_duck():
+    """The groove with the stand-in voice over it, first without the duck, then with it (the code path of --voice:
+    A.speech_envelope, A.duck_gains, and the voice added at unity). The groove keeps the gain-staging it has on its own."""
+    A.rng = np.random.default_rng(R.seed_of("duck"))
+    _duck_bed(LEAD)
+    alone = {}
+    mixdown(info=alone, max_len=DUCK_MAX_LEN)        # the groove alone, only to learn its scale
+    voice = A.prep_voice(R.standin_voice(A, DUCK_PHRASES, DUCK_MAX_LEN + .5), SR)
+    env = A.speech_envelope(voice)
+    env[:int(DUCK_FROM * SR)] = 0.0
+    return dict(max_len=DUCK_MAX_LEN, gains=A.duck_gains(env, DUCK_DB), voice=voice, scale=alone["scale"])
 
 
-def prepare(sid):
+SOUNDS = [Sound(sid, info.group, _recipe_sound(sid)) for sid, info in R.RECIPES.items()]
+SOUNDS.insert(max(i for i, x in enumerate(SOUNDS) if x.group == "Mix tricks") + 1, Sound("duck", "Mix tricks", _build_duck))
+assert len({x.id for x in SOUNDS}) == len(SOUNDS), "two sounds share an id"
+
+
+def prepare():
     for b in BUSES:
         b.L[:] = 0.0
         b.R[:] = 0.0
     del A.kicks[:]
-    _state["seed"] = seed_of(sid)
-    reseed()
-
-
-def cue(kind, t, **kw):
-    A.play_cue(dict(t=t, kind=kind, **kw))
 
 
 # ───────────────────────────── the mixdown ─────────────────────────────
@@ -118,16 +158,22 @@ def reverb_irs():
     return _irs
 
 
-def mixdown(pump=False, depth=0.62, vacuum=(), origin=0.0, info=None):
+def mixdown(pump=False, depth=0.62, vacuum=(), origin=0.0, info=None, max_len=MAX_LEN, gains=None, voice=None, scale=None):
     """Sum the buses into one finished stereo sample (float64, shape (n, 2), peak exactly PEAK_DB).
 
     pump    sidechain-duck bass_b and music from A.kicks (the master()'s curve, `depth` deep)
     vacuum  [(start, hit_time), ...] everything ducks to 5 % (12 ms ramp), then the hit lands at full level
     origin  seconds of the buffer to drop from the front (the stab recipe plays inside bar 1)
-    info    optional dict that receives diagnostics (raw peak, limiter gain reduction, ...)
+    info    optional dict that receives diagnostics (raw peak, limiter gain reduction, gain-staging scale, ...)
+    max_len the longest the finished sample may be, seconds (MAX_LEN; only `duck` needs more)
+    gains   bus gains to use instead of A.GAINS: numbers, or per-sample curves (the duck code path hands in A.duck_gains(...))
+    voice   a voice made by A.prep_voice, added on top at unity after the gain-staging and before the limiter, as the video master does
+    scale   the gain-staging scale to use instead of measuring one: a sample with a voice in it keeps the scale its bed has on its own
     """
     g = A.GAINS
-    M = int(round((origin + MAX_LEN + 0.5) * SR))         # nothing later than this can reach the sample
+    M = int(round((origin + max_len + 0.5) * SR))         # nothing later than this can reach the sample
+    if gains is not None:
+        g = {k: (v[:M] if np.ndim(v) else v) for k, v in gains.items()}
     duck = np.ones(M)
     if pump:
         k = np.arange(int(.4 * SR)) / SR
@@ -147,6 +193,9 @@ def mixdown(pump=False, depth=0.62, vacuum=(), origin=0.0, info=None):
     # where the sound really stops: the last non-zero sample of the sum (a hard stop, or the end of the reverb tail)
     mag = np.maximum(np.abs(L), np.abs(R))
     stop = int(np.nonzero(mag > mag.max() * 1e-9)[0][-1]) + 1
+    if voice is not None:
+        vmag = np.max(np.abs(voice[:M]), axis=1)
+        stop = max(stop, int(np.nonzero(vmag > 1e-9)[0][-1]) + 1)
     vac = np.ones(M)
     fd = int(.012 * SR)
     for v0, v1 in vacuum:
@@ -161,9 +210,15 @@ def mixdown(pump=False, depth=0.62, vacuum=(), origin=0.0, info=None):
     a = np.max(np.abs(out), axis=1)
     if not a.max() > 1e-9:
         raise ValueError("the mix is silent")
-    span = np.nonzero(a > a.max() * 10 ** ((TAIL_DB - PEAK_DB) / 20))[0]
-    out = out * (.8 / np.percentile(np.abs(out[span[0]:span[-1] + 1]), 99.9))
+    if scale is None:
+        span = np.nonzero(a > a.max() * 10 ** ((TAIL_DB - PEAK_DB) / 20))[0]
+        scale = .8 / np.percentile(np.abs(out[span[0]:span[-1] + 1]), 99.9)
+    out = out * scale
+    if voice is not None:
+        out = out + voice[:M][:len(out)]
     raw = out
+    if info is not None:
+        info["scale"] = scale
     out = A.limiter(out)
     if info is not None:
         before, after = np.max(np.abs(raw), axis=1), np.max(np.abs(out), axis=1)
@@ -179,7 +234,7 @@ def mixdown(pump=False, depth=0.62, vacuum=(), origin=0.0, info=None):
     end = int(live[-1]) + 1 if len(live) else 0
     if info is not None:
         info["natural_end_s"] = end / SR
-    n = int(np.clip(end, MIN_LEN * SR, MAX_LEN * SR))
+    n = int(np.clip(end, MIN_LEN * SR, max_len * SR))
     out = out[:n].copy()
     if len(out) < n:                                                      # shorter than the minimum: pad with silence
         out = np.pad(out, ((0, n - len(out)), (0, 0)))
@@ -192,340 +247,11 @@ def mixdown(pump=False, depth=0.62, vacuum=(), origin=0.0, info=None):
     return out * (target / float(np.max(np.abs(out))))
 
 
-# ───────────────────────────── the 48 recipes ─────────────────────────────
-# A recipe plays onto the buses and returns mixdown() options (or nothing).
-
-# DRUMS
-@sound("kick", "Drums")
-def _():
-    for t in (LEAD, LEAD + BEAT):
-        A.drums.add(A.kick(), t, 1.0)
-
-
-@sound("clap", "Drums")
-def _():
-    for t in (LEAD, LEAD + BEAT):
-        A.perc.add(A.clap(), t, 0.5, 0.05)
-
-
-@sound("snap", "Drums")
-def _():
-    for t in (LEAD, LEAD + BEAT):
-        A.perc.add(A.tick(1.2, 1800, 5200), t, 0.8, 0.1)
-        A.perc.add(A.clap(), t, 0.22, 0.1)
-
-
-@sound("hat", "Drums")
-def _():
-    for k in range(4):
-        A.perc.add(A.hat(vel=0.5), LEAD + k * BEAT / 2, 0.3, 0.3 if k % 2 == 0 else -0.3)
-
-
-@sound("sizzle", "Drums")
-def _():
-    A.perc.add(A.hat(open_=True, vel=0.8), LEAD, 0.3, 0.3)
-    A.perc.add(A.hat(vel=0.8), LEAD + BEAT, 0.3, -0.3)
-
-
-@sound("snare-roll", "Drums")
-def _():
-    slot = BEAT / 8
-    for k in range(16):
-        A.perc.add(A.snare(180 + 6 * k, 0.22), LEAD + k * slot, 0.12 + 0.5 * (k / 15) ** 1.6, 0)
-    A.perc.add(A.snare(180 + 6 * 16, 0.3), LEAD + 16 * slot, 0.95, 0)       # the final, louder one, a slot after the last
-
-
-@sound("thump", "Drums")
-def _():
-    for t in (LEAD, LEAD + BEAT):
-        A.drums.add(A.thump(95, 46, 0.4, 0.13), t, 0.55)
-        A.perc.add(A.tick(1.0, 1500, 6000), t, 0.3)
-
-
-# LOW END
-@sound("groove", "Low end")
-def _():
-    for b in range(4):
-        A.kick_at(LEAD + b * BEAT)                                           # kick_at also logs the time for the pump
-    for off, ln, semi in [(0, .5, 0), (.75, .25, 12), (1, .5, 0), (1.75, .25, 12), (2, .5, 0),
-                          (2.5, .5, 3), (3, .5, 0), (3.5, .25, 7), (3.75, .25, 5)]:
-        A.bass_b.add(A.bass_note(38 + semi, ln * BEAT * 0.92), LEAD + off * BEAT, 0.8)
-    return dict(pump=True)
-
-
-@sound("undertow", "Low end")
-def _():
-    t = A.T(BAR + .4)
-    drone = np.sin(2 * np.pi * A.midi(26) * t) * np.minimum(1, t / 1.6) ** 2 * .55
-    A.bass_b.add(A.lp(drone, 120), LEAD, .45)
-
-
-@sound("wobble", "Low end")
-def _():
-    t = A.T(BAR)
-    lfo = .55 + .45 * np.sin(2 * np.pi * (A.BPM / 60 * 2) * t)
-    wob = A.lp(np.sin(2 * np.pi * A.midi(29) * t) + .35 * np.sin(2 * np.pi * A.midi(41) * t), 220, 2) * lfo * np.minimum(1, t / .5)
-    A.bass_b.add(wob, LEAD, .4)
-
-
-# CHORDS AND PADS
-@sound("cushion", "Chords and pads")
-def _():
-    L, R = A.pad(A.CH["Dm"], 2.0, .35, .5, 1400)
-    A.music.add(L, LEAD, .3, y=R)
-
-
-@sound("stab", "Chords and pads")
-def _():
-    # chord_for(t) reads the chord from t // BAR: play inside bar index 1 (the Dm bar), then drop that bar from the front
-    for t in (BAR + LEAD, BAR + LEAD + BEAT):
-        cue("stab", t, i=0, amp=0.6)
-    return dict(origin=BAR)
-
-
-@sound("staircase", "Chords and pads")
-def _():
-    for k in range(8):
-        cue("stab", LEAD + k * BEAT / 2, i=k, rise=1)
-
-
-@sound("last-word", "Chords and pads")
-def _():
-    # NB audio.py's 'chord' branch has its pad's music.add / rev.add inside a trailing '#' comment, so as the
-    # reel stands this cue is the three bells only. Rendered through play_cue as specified: fix audio.py and a re-run picks the pad up.
-    cue("chord", LEAD, dur=1.4)
-
-
-# NOTES AND BELLS
-@sound("pluck", "Notes and bells")
-def _():
-    for n, t, pan in zip((74, 77, 81), (LEAD, LEAD + .30, LEAD + .60), (-.3, 0, .3)):
-        x = A.pluck(n, .3, 1.0)
-        A.music.add(x, t, .5, pan)
-        A.rev.add(x, t, .15, pan)                                            # "a small reverb send"
-
-
-@sound("run", "Notes and bells")
-def _():
-    for start in (LEAD, LEAD + .9):
-        for k in range(8):
-            cue("arp", start + k * .035, k=k)
-
-
-@sound("bell", "Notes and bells")
-def _():
-    x = A.bell(81, 2.0, 0.9)
-    A.fx.add(x, LEAD, .3)
-    A.rev.add(x, LEAD, .4)
-
-
-@sound("chime", "Notes and bells")
-def _():
-    cue("chime", LEAD)
-
-
-@sound("ping", "Notes and bells")
-def _():
-    cue("ping", LEAD, i=0)
-    cue("ping", 0.60, i=1)
-
-
-@sound("knock", "Notes and bells")
-def _():
-    cue("land", LEAD, i=2)
-    cue("land", 0.55, i=2)
-
-
-@sound("roll-call", "Notes and bells")
-def _():
-    cue("slam", LEAD, n=6)
-
-
-@sound("bubble", "Notes and bells")
-def _():
-    for k in range(7):
-        cue("ui", LEAD + k * .04, i=k)
-    cue("ui", 0.9, i=3)
-
-
-@sound("boop", "Notes and bells")
-def _():
-    cue("blip", LEAD, pitch=0, dur=0.18)
-    cue("blip", 0.55, pitch=2, dur=0.3)
-
-
-@sound("plink", "Notes and bells")
-def _():
-    for k in range(3):
-        cue("tick", LEAD + k * .08, i=k)
-
-
-# SWEEPS AND BUILDS
-@sound("riser", "Sweeps and builds")
-def _():
-    x = A.riser(1.2, 300, 10000, 0.9, (A.midi(62), A.midi(86)))             # it ends abruptly, on purpose
-    A.fx.add(x, LEAD, .4)
-    A.rev.add(x, LEAD, .12)
-
-
-@sound("rush", "Sweeps and builds")
-def _():
-    cue("sweep", LEAD, dur=0.4775)
-
-
-@sound("whoosh", "Sweeps and builds")
-def _():
-    cue("whoosh", LEAD, dir="in", dur=0.5)
-
-
-@sound("swish", "Sweeps and builds")
-def _():
-    cue("whoosh", LEAD, dir="pan", dur=0.35)
-
-
-@sound("zip", "Sweeps and builds")
-def _():
-    cue("zip", LEAD, dur=0.5)
-
-
-@sound("inhale", "Sweeps and builds")
-def _():
-    # the 'zoom' transition: the voice call from play_cue's 'cut' branch, made directly so the sample does not depend
-    # on how the cue sheet keys the cut type (that key has changed once already)
-    A.fx.add(A.riser(.17, 500, 7000, 1.0), LEAD, .3)
-
-
-@sound("scanner", "Sweeps and builds")
-def _():
-    cue("scan", LEAD, dur=0.42)
-
-
-@sound("glassline", "Sweeps and builds")
-def _():
-    cue("draw", LEAD, dur=0.5)
-
-
-@sound("slide", "Sweeps and builds")
-def _():
-    cue("slide", LEAD, dur=0.26)
-
-
-# HITS AND EXPLOSIONS
-@sound("boom", "Hits and explosions")
-def _():
-    A.fx.add(A.boom(1.5), LEAD, .42)
-
-
-@sound("crash", "Hits and explosions")
-def _():
-    x = A.crash(2.4)
-    A.fx.add(x, LEAD, .35)
-    A.rev.add(x, LEAD, .25)
-
-
-@sound("blast", "Hits and explosions")
-def _():
-    cue("burst", LEAD, dur=0.6)
-
-
-@sound("lub-dub", "Hits and explosions")
-def _():
-    cue("pulse", LEAD)
-    cue("pulse", 1.0)
-
-
-def _drop(hit, vacuum_ms=None):
-    """riser, (vacuum,) then the hit at `hit` seconds: kick + boom + crash, exactly as the reel's drop does it."""
-    cue("riser", hit - .75, dur=0.6)
-    A.kick_at(hit)                                   # on the kick, so the 'hit' cue adds only boom + crash (has_kick), as in the reel
-    cue("hit", hit, amp=1.0, drop=1)
-    return [(hit - vacuum_ms / 1000, hit)] if vacuum_ms else []
-
-
-@sound("drop", "Hits and explosions")
-def _():
-    return dict(vacuum=_drop(0.95, vacuum_ms=75))
-
-
-# CLICKS AND GLITCHES  (the transition family: voice calls, see 'inhale')
-@sound("click", "Clicks and glitches")
-def _():
-    cue("click", LEAD, i=0)
-    cue("click", 0.50, i=0)
-
-
-@sound("ticks", "Clicks and glitches")
-def _():
-    cue("ticks", LEAD, dur=0.45)
-
-
-@sound("clatter", "Clicks and glitches")
-def _():
-    for t in (LEAD, LEAD + .7):
-        for j in range(8):
-            A.fx.add(A.tick(.8, 2500, 8000), t + j * .018, .3, -.6 + j * .17)
-
-
-@sound("pixels", "Clicks and glitches")
-def _():
-    for t in (LEAD, LEAD + .6):
-        for j in range(6):
-            A.fx.add(A.blip(A.midi(A.PENT[int(A.hash_(j, 5) * 8)] + 12), .03, 1.0, .5), t + j * .026, .22, -.5 + j * .2)
-
-
-@sound("peep", "Clicks and glitches")
-def _():
-    for t in (LEAD, LEAD + .5):
-        x = A.blip(500, .16, 3.2, .7)
-        A.fx.add(x, t, .25)
-        A.rev.add(x, t, .2)
-
-
-@sound("stutter", "Clicks and glitches")
-def _():
-    for n, t in enumerate((LEAD, LEAD + .6)):
-        reseed(n)                                    # a different burst each time
-        A.fx.add(A.glitch(.16), t, .4)
-
-
-@sound("flup", "Clicks and glitches")
-def _():
-    for t in (LEAD, LEAD + .5):
-        A.fx.add(A.blip(700, .12, .3, .8), t, .3)
-
-
-# MIX TRICKS
-@sound("vacuum", "Mix tricks")
-def _():
-    # the same riser + big hit twice, 2.1 s apart: first without the vacuum (hit at 1.1 s), then with it (hit at 3.2 s)
-    _drop(1.1)
-    return dict(vacuum=_drop(1.1 + 2.1, vacuum_ms=75))
-
-
-@sound("pump", "Mix tricks")
-def _():
-    L, R = A.pad(A.CH["Dm"], 2.2, .1, .5, 2400)
-    A.music.add(L, LEAD, .3, y=R)
-    A.bass_b.add(A.bass_note(38, 2.0), LEAD, .8)
-    for b in range(5):                               # a kick on every beat while the pad is held
-        A.kick_at(LEAD + b * BEAT)
-    return dict(pump=True, depth=.62)
-
-
-@sound("space", "Mix tricks")
-def _():
-    x = A.pluck(74, .3, 1.0)
-    A.music.add(x, LEAD, .5)                         # dry
-    A.music.add(x, 1.4, .5)                          # the same note, wet
-    A.rev.add(x, 1.4, .9)
-
-
-assert len(SOUNDS) == 48 and len({s.id for s in SOUNDS}) == 48, "the menu has exactly 48 sounds"
-
+# (the recipes themselves live in sound_recipes.py; SOUNDS is built from its table above)
 
 # ───────────────────────────── render, measure, write ─────────────────────────────
 def render(snd, info=None):
-    prepare(snd.id)
+    prepare()
     opts = snd.build() or {}
     return mixdown(info=info, **opts)
 
@@ -590,18 +316,22 @@ def write_zip(path):
 
 # ───────────────────────────── the contact sheet ─────────────────────────────
 def make_sheet(path):
-    """8 x 6 waveform thumbnails, id as the title. One hue (brand green) on warm paper; each thumbnail is on its
+    """8-wide waveform thumbnails (7 rows for 56 sounds), id as the title. One hue (brand green) on warm paper; each thumbnail is on its
     own time axis, so its length is printed in the corner."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     paper, card, hair, ink, muted, green = "#FAF7F2", "#FFFFFF", "#E7E2D9", "#1A1A1A", "#5C5C5C", "#0E4A36"
-    cols, rows, bins = 8, 6, 220
-    fig, axes = plt.subplots(rows, cols, figsize=(20, 11.8), dpi=100, facecolor=paper)
-    fig.subplots_adjust(left=.012, right=.988, top=.925, bottom=.015, wspace=.07, hspace=.52)
-    fig.text(.012, .962, "Motion Menu · 48 sounds", fontsize=15, fontweight="bold", color=ink, va="center")
-    fig.text(.988, .962, "each thumbnail is on its own time axis (length top right) · amplitude normalised to −3 dBFS peak",
+    cols, bins = 8, 220
+    rows = -(-len(SOUNDS) // cols)
+    h = 1.97 * rows                                          # the height of one row stays what it was (11.8 in for six)
+    fig, axes = plt.subplots(rows, cols, figsize=(20, h), dpi=100, facecolor=paper)
+    fig.subplots_adjust(left=.012, right=.988, top=1 - .885 / h, bottom=.015, wspace=.07, hspace=.52)
+    fig.text(.012, 1 - .447 / h, f"Motion Menu · {len(SOUNDS)} sounds", fontsize=15, fontweight="bold", color=ink, va="center")
+    fig.text(.988, 1 - .447 / h, "each thumbnail is on its own time axis (length top right) · amplitude normalised to −3 dBFS peak",
              fontsize=9.5, color=muted, ha="right", va="center")
+    for ax in axes.flat[len(SOUNDS):]:
+        ax.axis("off")
     for ax, s in zip(axes.flat, SOUNDS):
         ax.set_facecolor(card)
         ax.set_xticks([])

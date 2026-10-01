@@ -20,9 +20,11 @@
   KIT.sample('figure', {
     dur: 5.6, langs: ['en'], fx: FX,
     build(c) {
+      /* the athlete holds a ready stance, takes a split step, then runs: the poses alternate and the body travels, leaving afterimages */
+      const run = t => 240 + L.clamp((t - 2.5) / 3.0) * 380;
       scene(c, [{ piece: 'figure', params: {
-        poses: [{ pose: 'ready', at: 0 }, { pose: 'split-step', at: 1.2 }, { pose: 'ready', at: 1.75 }, { pose: 'first-step', at: 2.5 }, { pose: 'drive', at: 3.2 }, { pose: 'first-step', at: 3.9 }, { pose: 'drive', at: 4.6 }],
-        blend: .32, x: 470, groundY: 1250, height: 760, ghosts: 0,
+        poses: [{ pose: 'ready', at: 0 }, { pose: 'split-step', at: 1.2 }, { pose: 'ready', at: 1.75 }, { pose: 'first-step', at: 2.5 }, { pose: 'drive', at: 3.1 }, { pose: 'first-step', at: 3.7 }, { pose: 'drive', at: 4.3 }, { pose: 'first-step', at: 4.9 }],
+        blend: .3, x: run, groundY: 1250, height: 760, ghosts: 3, ghostStep: .1,
       } }]);
     },
   });
