@@ -38,11 +38,16 @@ portal · glitch cut on a flash · split-open · whip pan · flash cut.
   turns yellow), radial chromatic aberration, vignette, film grain (also dithers the 8-bit gradients).
 - **`src/hud.js`** — crop marks, SMPTE timecode, section label, 8-segment progress; drawn after post so it stays sharp.
 - **`src/lib.js`** — easing, `bezier()`, `spring()`, seeded noise/PRNG, palette, text helpers.
-- **`src/shotN-*.js`, `src/transitions.js`** — the choreography. Each shot registers its own **cues**
-  (`R.hit`, `R.cue`) next to the animation that causes them.
+- **`src/shotN-*.js`, `src/transitions.js`** — the choreography, now written as **scenes made of named kit pieces**
+  ([`../motion/kit/`](../motion/kit/README.md): Ruler, Thud, Bento, Punch In, Full Stop ... every one has a Menu number). Each scene registers its own **cues**
+  (`R.hit`, `R.cue`) next to the animation that causes them. `reel.html` loads the kit from `../motion/kit/`, so a server must start in `Content/`, not here.
+  `Content/motion/tools/verify.js` proves the rebuilt reel renders the same 450 frames and the same cue sheet as before.
 - **`tools/audio.py`** — reads the cue sheet the picture exports and synthesizes the track with numpy/scipy (D minor,
   F-major pentatonic over Dm / B♭ / F / C): kick, sidechained bass and pads, claps, hats, plucks, bells, risers, whooshes,
   UI clicks, a rising stab per plate, a final Dm chord with the 9th. Picture and sound share one source of timing.
+  It also plays any sound of the Motion Menu by name (a cue `{ "t": 3.2, "kind": "sound", "id": "whoosh" }`; recipes in `../motion/tools/sound_recipes.py`),
+  lays a voice file over the track and ducks the music under it (`--voice`), and makes a track of any length without the reel's music
+  (`--dur 42 --no-music`). With none of those options the reel's soundtrack is byte for byte what it was.
 - **`tools/render.js` + `tools/encode.py`** — Playwright drives `reel.html` frame by frame (4 pages in parallel,
   ~2.5 min for all 450 frames), `encode.py` loudness-normalises (two-pass, −14 LUFS / −1.5 dBTP) and writes H.264 + AAC.
 
@@ -50,9 +55,10 @@ portal · glitch cut on a flash · split-open · whip pan · flash cut.
 
 ```
 # once: node + Playwright with a Chromium, and  pip install numpy scipy imageio-ffmpeg pillow matplotlib
-cd Content/showreel
-python3 -m http.server 8000                     # live, lighter-blur preview at http://localhost:8000/reel.html
+cd Content
+python3 -m http.server 8000                     # live, lighter-blur preview at http://localhost:8000/showreel/reel.html
                                                 # (Space pause · ←/→ frame · Shift+←/→ beat · R restart · ?t=7.5 freeze)
+cd showreel
 node tools/render.js --cues export/cues.json                                   # 1  the cue sheet the picture makes
 python3 tools/audio.py export/cues.json $TMP/soundtrack.wav --diag --plot $TMP/audio.png   # 2  the soundtrack (+ band report)
 node tools/render.js --out $TMP/frames --workers 4                             # 3  450 PNG frames

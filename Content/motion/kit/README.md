@@ -16,7 +16,7 @@ Read `PIECES.md` for every piece, how to call it and what each knob does (genera
 | `finish.js` | the look in force (`KIT.use`, `KIT.role`, `KIT.face`) and the finish settings: Shutter, Jolt, Halo, Prism, Film, Vignette |
 | **The showreel's pieces** | |
 | `furniture.js`, `weight.js` | backdrop, dot grid, crosshair, caption · shock ring (Tremor), Ruler, Thud (Dust), Ball (Squash, Hop), Heartbeat |
-| `type.js`, `cells.js`, `panels.js` | the type moves · the cell grid (Bullseye, Quarter Turn, Pills, Gravity) and Paper · Curve Lab, Keyframes, Spring Lab |
+| `type.js`, `cells.js`, `panels.js` | the type moves (Rise, Tumble, Pop, Swing, Heavyweight, Monolith) · the cell grid, one piece called `cells` whose four phases are Bullseye, Quarter Turn, Pills and Gravity, and Paper · Curve Lab, Keyframes, Spring Lab |
 | `depth.js`, `particles.js` | the 3D knot (Trefoil, Spin Kick, X-Ray, Dive), Orbit, Ghost Word · the particle field (Big Bang, Current, Assembly, Supernova) |
 | `screens.js`, `lockup.js`, `slate.js` | the bento cards and their graphics · Punch In and Afterglow · the Slate |
 | `plates.js`, `joins.js` | the eight plates and the Ghost Numeral · every scene change (Full Stop ... Flipcard) |

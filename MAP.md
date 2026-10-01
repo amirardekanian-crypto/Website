@@ -238,12 +238,16 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   Claude's own procedural motion-design reel, **not an Amir brand piece and not site content**. Eight shots on a 128 BPM bar
   grid (point · type · form · depth · flow · interface · rhythm · lockup), seven designed transitions, a soundtrack synthesized
   from the picture's own cue sheet. Canvas engine + Playwright renderer + numpy audio, **no generation credits**.
-  Live page [`reel.html`](Content/showreel/reel.html) · the file [`claude-motion-reel.mp4`](Content/showreel/claude-motion-reel.mp4) (+ `poster.jpg`) · rebuild steps in its README.
-- **Motion Menu** (2026-10-01) — [`motion/`](Content/motion/README.md): every move, look and sound in the showreel with a **number**,
-  a name and a playable sample (73 moves · 26 design items · 48 sounds), so a later video can be built from a list: *"use 14, 22 and the Kick"*.
+  Since 2026-10-01 every shot and scene change is built from **named kit pieces** ([`motion/kit/`](Content/motion/kit/README.md)) and a tool proves it renders the same 450 frames.
+  Live page [`reel.html`](Content/showreel/reel.html) (serve `Content/`, not this folder) · the file [`claude-motion-reel.mp4`](Content/showreel/claude-motion-reel.mp4) (+ `poster.jpg`) · rebuild steps in its README.
+- **Motion Menu** (2026-10-01) — [`motion/`](Content/motion/README.md): every move, look and sound in the showreel, and the ingredients for Amir's reels, each with a **number**,
+  a name and a playable sample (**183 items**: 69 moves · 31 reel ingredients · 27 design items · 56 sounds), so a later video can be built from a list: *"use 14, 22 and the Kick"*.
+  The **Reels** tab holds 31 ingredients for talking-head reels (numbers that count up, word-timed text, a court to scale with distances, an athlete and force arrows,
+  force-time graphs, the app's muscle map lit muscle by muscle, chapters, camera moves, two metaphors): tall 9:16 samples with a **Farsi draft** to read. Amir's ideas and what became of them: [`INGREDIENTS.md`](Content/motion/INGREDIENTS.md).
+  Every item is **callable by name** from the kit ([`motion/kit/`](Content/motion/kit/README.md); every piece and knob in [`PIECES.md`](Content/motion/kit/PIECES.md)), and any Menu sound can be named in a cue and played in a soundtrack.
   Claude's own kit, **not Amir's brand system** (a switch to the brand look is step 3 of its plan). One source, [`catalog.json`](Content/motion/catalog.json);
-  numbers are written once in [`numbers.json`](Content/motion/numbers.json) and never change. Samples are cut from the real reel through the real engine.
-  Published page (private; Amir marks Keep / Maybe / Drop there and Claude reads the marks): <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA> · rebuild steps in its README. Amir's ideas for later videos (S&C graphics, anatomy, colour language, chapters): [`INGREDIENTS.md`](Content/motion/INGREDIENTS.md).
+  numbers are written once in [`numbers.json`](Content/motion/numbers.json) and never change. Moves are cut from the real reel; Reels are drawn in the lab ([`lab.html`](Content/motion/lab.html)).
+  Published page (private; Amir marks Keep / Maybe / Drop there and Claude reads the marks): <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA> · rebuild steps in its README.
 - **Result cards / app mockups:** [`card-preview.html`](Content/card-preview.html)
   (rebuilds every app card with real class names) → exports in
   [`instagram-cards/`](Content/instagram-cards/) (legacy style, off-palette).

@@ -53,14 +53,20 @@
   });
 
   KIT.sample('label-line', {
-    dur: 3.4, langs: ['en', 'fa'], fx: FX,
+    dur: 5, langs: ['en', 'fa'], fx: FX,
     build(c) {
-      const { W, fa } = c;
+      const { fa } = c;
       const names = fa ? ['قدم اول', 'قدم دوم', 'قدم سوم'] : ['First step', 'Second step', 'Third step'];
-      const pts = [[300, 760], [440, 980], [580, 1200]];
+      const pts = [[360, 700], [500, 900], [620, 1100]];
+      /* a moving point (a tracked ball) and a callout that follows it */
+      const ball = t => [560 - 260 * L.clamp((t - 2.6) / 1.9), 1380 - 90 * Math.sin(L.clamp((t - 2.6) / 1.9) * Math.PI)];
       scene(c, [
-        { fn(ctx) { ctx.strokeStyle = 'rgba(242,238,229,.18)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(300, 700); ctx.lineTo(760, 1260); ctx.stroke(); } },
-      ].concat(pts.map((p, i) => ({ piece: 'label-line', params: { point: p, to: [p[0] + (i % 2 ? -110 : 150), p[1] - 70], text: names[i], at: .4 + i * .6, size: 52, color: i === 2 ? 'keyText' : 'normal', lineColor: i === 2 ? 'key' : 'soft' } }))));
+        { fn(ctx) { ctx.strokeStyle = 'rgba(242,238,229,.18)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(320, 640); ctx.lineTo(660, 1160); ctx.stroke(); } },
+      ].concat(pts.map((p, i) => ({ piece: 'label-line', params: { point: p, to: [p[0] + (i % 2 ? -110 : 150), p[1] - 70], text: names[i], at: .4 + i * .6, size: 52, color: i === 2 ? 'keyText' : 'normal', lineColor: i === 2 ? 'key' : 'soft' } })),
+      [
+        { fn(ctx, t) { if (t < 2.4) return; const b = ball(t); ctx.globalAlpha = L.clamp((t - 2.4) / .2); ctx.fillStyle = '#F2EEE5'; ctx.beginPath(); ctx.arc(b[0], b[1], 22, 0, Math.PI * 2); ctx.fill(); } },
+        { piece: 'label-line', params: { point: ball, to: t => { const b = ball(t); return [b[0] + 110, b[1] - 120]; }, text: fa ? 'دنبال توپ' : 'Follows the ball', at: 2.6, size: 50, color: 'normal', lineColor: 'keyText' } },
+      ]));
     },
   });
 

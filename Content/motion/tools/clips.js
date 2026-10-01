@@ -58,11 +58,14 @@ const manifestPath = path.join(outDir, 'clips.manifest.json');
 const manifest = fs.existsSync(manifestPath) ? JSON.parse(fs.readFileSync(manifestPath, 'utf8')) : {};
 const only = A.only ? new Set(String(A.only).split(',')) : null, groups = A.group ? new Set(String(A.group).split(',')) : null;
 const todo = [];
-/* a fingerprint of the code a lab sample is drawn by: change any kit or lab file and every lab clip is stale */
+/* a fingerprint of the code a lab sample is drawn by: change any of these files and every lab clip is stale.
+   (The reel's own pieces are left out on purpose: the Moves clips are cut from the reel itself and no lab sample draws them.) */
+const LAB_KIT = ['core', 'data', 'finish', 'furniture', 'weight', 'numbers', 'annotate', 'chapters', 'court', 'figure', 'graphs', 'anatomy', 'bodymap', 'camera', 'metaphor'];
 const labSrcHash = (() => {
   const h = crypto.createHash('sha1');
-  for (const d of [path.join(MOTION, 'kit'), path.join(MOTION, 'lab'), path.join(CONTENT, 'showreel', 'src')])
-    for (const f of fs.readdirSync(d).filter(x => x.endsWith('.js')).sort()) h.update(f).update(fs.readFileSync(path.join(d, f)));
+  for (const f of LAB_KIT) h.update(f).update(fs.readFileSync(path.join(MOTION, 'kit', f + '.js')));
+  for (const f of fs.readdirSync(path.join(MOTION, 'lab')).filter(x => x.endsWith('.js')).sort()) h.update(f).update(fs.readFileSync(path.join(MOTION, 'lab', f)));
+  for (const f of ['lib', 'engine', 'post']) h.update(f).update(fs.readFileSync(path.join(CONTENT, 'showreel', 'src', f + '.js')));
   return h.digest('hex').slice(0, 12);
 })();
 for (const it of catalog.items) {
@@ -74,7 +77,7 @@ for (const it of catalog.items) {
   for (const v of variants) {
     const spec = Object.assign({ speed: 1, hold: .35, crop: [960, 540, 1920], poster: .85 }, it.clip);
     const even = x => Math.floor(x / 2) * 2, outW = lab ? even(spec.h > spec.w ? OUT_H_PORTRAIT * (spec.w || 1080) / (spec.h || 1920) : OUT_W) : OUT_W, outH = lab ? (spec.h > spec.w ? OUT_H_PORTRAIT : even(OUT_W * spec.h / spec.w)) : OUT_H;
-    const h = hashOf([spec, outW, outH, CRF, lab ? labSrcHash : '', v.lang || '']);
+    const h = lab ? hashOf([spec, outW, outH, CRF, labSrcHash, v.lang]) : hashOf([spec, OUT_W, CRF]);       // a reel clip keeps the fingerprint it always had
     const still = spec.t1 == null;
     const outFile = path.join(outDir, still ? 'posters' : 'clips', v.key + (still ? '.jpg' : '.mp4'));
     if (!A.force && manifest[v.key] && manifest[v.key].hash === h && fs.existsSync(outFile)) continue;
