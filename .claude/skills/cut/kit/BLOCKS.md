@@ -1,20 +1,45 @@
-# The kit's blocks (stage 1, plus stage 2: the depth family, the broadcast court and the statement cards)
+# The kit's blocks (stage 1, plus stage 2: the depth family, the broadcast court and the statement cards, plus stage 3: diagrams, the force-time curve, chapter labels, the body map)
 
 Ingredients, not recipes. Read the clip, find its idea, choose the concept, THEN reach for these for the plumbing.
 Every block: `K.name(content, options)` in a reel's `BLOCKS_JS`; times are seconds on the EDITED clock (wrap speech-tied
 times in `E(sourceSeconds)`); it returns its elements so a reel can add bespoke tweens on top. See the showreel
-(`showreel/`) for every block and variant running on his footage: 01-17 in showreel 1, 18-26 in showreel 2 (the depth family and the broadcast court), 27-38 in showreel 3 (the statement cards and the new wipes), 39-40 in showreel 4 (the drum on his video, a clay-studio number).
+(`showreel/`) for every block and variant running on his footage: 01-17 in showreel 1, 18-26 in showreel 2 (the depth family and the broadcast court), 27-38 in showreel 3 (the statement cards and the new wipes), 39-40 in showreel 4 (the drum on his video, a clay-studio number), 41-49 in showreel 5 (the diagram builder, the force-time curve, chapter labels, the body map: the three families he asked for), 50-52 in showreel 6 (the diagram on his own video picks a layout that fits, the chapter band).
 
 Brand defaults baked in (breakable on purpose, say so in the plan): clay is the one accent, hard-corner stamps, paper and
 dark plates, green = done, Vazirmatn, RTL, whole-word animation, Persian digits (`K.fa(12)` gives ۱۲).
 
 **Start from his favourites (verdicts in the Status column and in `USAGE.md`):** 12 the word behind him, 19 hollow giant word,
 20 drifting rows, 25-26 the broadcast court, **29 the number behind him on a studio with him smaller (his best)**, 30-31 versus,
-32 the drum, **39 the drum on his video (loved)**, 07 ghost numeral, 08-10 question cards. **Benched:** 04 (mask stamps), 21 (halo, ring, disc, sweep
+32 the drum, **39 the drum on his video (loved)**, **47 the chapter band on his video (preferred), 48-49 the body map ("amazing")**, 43 the diagram on his video (preferred over the cards), 44-45 the force-time curves, 07 ghost numeral, 08-10 question cards. **Benched:** 04 (mask stamps), 21 (halo, ring, disc, sweep
 on the wall), 33 (the quote page), 35 (the whip wipe).
 
 **His verdict on showreel 1 (2026-10-01)** is in the Status column and in `USAGE.md`. The family he calls "premium" and
 wants MORE of: 07 (ghost numeral + tag), 08-10 (question cards), 12 (the word behind him).
+
+## The cue table: what he says, what the viewer needs to see, the block (the creative director's lookup)
+Amir, 2026-10-01: *"you are my creative director, based on the content of reels, you need to think what visual is best and whats needed, then have a look at the list,
+maybe something can be used, so use it. if you need anything, create it, and add it to the list."* So for every beat of a real reel: what does the viewer have to SEE? Look it up
+here, use what fits (his favourites first), put it in the plan (`SKILL.md` step 6) and mark anything new as NEW. **Suggest by content, unasked.** Also look at his own list, the Motion Menu artifact, which `/cut` is connected to (`MENU.md`; every block in use has a card there with a When and a How, grouped by the job it does, and `python tools\menu_find.py <word>` finds one with its call; the blocks he dropped (mask stamp, `K.halo`, `K.sweep`, `K.quote`, the whip wipe) are no longer on the menu).
+
+| He says, or the content is | The viewer needs to see | Use | Notes |
+|---|---|---|---|
+| **Something that changes over time or has a shape**: force over time, speed, fatigue, adaptation, readiness, "the same peak sooner", "the rate" | the curve itself | **`K.curve`** (44 one curve and its slope, 45 two curves and the time saved) | **Suggest it whenever the content has a curve like this.** A drawn idea, never his data. Good (his verdict) |
+| **A place in the body**: a muscle, a joint, hips-knees-ankles, the back, the calves | the body, with that place lit | **`K.bodymap`** (48 muscles, it turns round to the back; 49 a joints chain) | **Use it whenever he talks about a place in the body.** It lights only what he says. "Amazing" (his verdict) |
+| **Steps, a sequence, a cause chain, a cycle** ("this leads to that", "train, rest, adapt, repeat") | the chain, built as he says each step | **`K.diagram` ON HIS OWN VIDEO** (43 a row, 50 a stack of long phrases, 51 a loop in a grid); the full card (41 chain, 42 cycle) only when the text cannot fit | He prefers it on his video "if the spacing and the size of the text allows it". It picks the layout that fits and says when none does |
+| **The reel is in parts** ("first... second... third...") | a label at each part | **`K.chapter` band** (47, the default); the full card (46) for a bigger break | He prefers 47. Two or three chapters at most |
+| **A number**: a time, a distance, a count, a percent | the number, big | `K.number` (27-28 card); **the number BEHIND him on a studio colour** (`K.backdrop` + `K.slamBehind` + `K.tag`, 29 and 40: his best); a distance on the court: `K.courtMeasure3d` (26) | It is HIS number |
+| **A list of 3-5 short items** | the items, one at a time | `K.list` the drum (32), **on his own video (39, loved)**; `K.checklist` (11) when the points are ticked later | One short phrase per item |
+| **Two things against each other** (a myth and a fact, wrong and right, A or B) | the split | `K.versus` (30-31, "amazing") | With `win` for a verdict |
+| **A question, or a hinge in the argument** | a breather | `K.question` (08-10: clay + iris) | |
+| **The one word the reel turns on** | the word, behind him | `K.behind` (12), `K.outline` (19), `K.drift` (20), `K.stack` (18); with a studio colour `K.backdrop` (22-23) | Needs the cut-out. His room stays when possible |
+| **Court movement**: a few steps, a ball, a distance | the court in 3D | `K.courtSteps3d` (25), `K.courtMeasure3d` (26) | "Really creative" |
+| **A hook word, a name, a short stressed phrase** | a stamp | `K.stamps` (01-03 pop or slide), `K.tag` and `K.ghost` (07) | Never a caption (he adds those) |
+| **The ask** (comment, follow, link) | the ask | `K.cta` the bubble (17) | |
+| **A jump cut to hide** | | `K.whip` (37-38) | One flash (`K.flash`) for the one moment that matters |
+| **Nothing here fits** | | **Create it**: write the block in `kit.js` and `kit.css`, try it on his footage (a showreel demo), add a row to the table below and a line to this one, say NEW in the plan | The kit is about 50 blocks; the rule is 15-20 in use, so a new block should earn its place |
+
+How to choose between two that fit: his favourites first (the loved list in `USAGE.md`); **on his own video before a full card** whenever the text fits (his face on screen is worth more than a
+bigger graphic); one spine and two or three devices a reel, not a tour of the shelf; rotate (rule 3); the top band y 230-470 stays free for his captions.
 
 | # | Block | What it is | Options and variants | Use it when | Do NOT use it when | Status |
 |---|---|---|---|---|---|---|
@@ -42,6 +67,11 @@ wants MORE of: 07 (ghost numeral + tag), 08-10 (question cards), 12 (the word be
 | 32 | `K.list(items, o)` | A 3D drum that turns to each item as he says it (the active one lights clay), then unrolls into the whole list | `at`, `itemAt[]`, `flatAt`, `out`, `look`, `wipeVariant` | 3-5 short items, one phrase each (about 22 characters at most) | Items that are sentences; when the checklist (11) says it better | **Amazing. He wants it ON his video too: `mode:"video"` (39)** |
 | 39 | `K.list(items, { mode:"video" })` | The drum ON his own footage: no card, no wipe, a smaller drum in the chest zone that rises in, turns to each item (the active one lights clay), unrolls into a paper list and sinks out. His face stays on screen | the same options as 32 plus `y` (the drum's centre, default 1360) | The list should not take over the screen; he wants to stay visible | His hands gesture in the chest zone (the drum covers y 1180-1560) | **Loved: "i loved 39"** |
 | 40 | `K.backdrop` + `K.slamBehind` + `K.tag` | The best idea of showreel 3 as a recipe: a studio colour drops in (he sinks), a two-digit number rolls behind his head and lands with a ring, a unit tag stamps on his chest | `tone` clay/ink/green, `variant` drop/iris/wipe, `size` 470-560, `top` 500 | A number is the hinge of the reel | A long number (3+ digits at 400 px) | **Good** |
+| 41-42 | `K.diagram(nodes, { mode:"card" })` | The diagram as a full-screen card: plates land one by one as he says them, joined by arrows, and a glowing pulse runs along each arrow (the node being said is clay, earlier ones cool to paper). `chain` is a staircase of plates; `cycle` is four plates in a loop, the last arrow runs back to the first, every plate lights and a mark turns in the middle | `mode:"card"`, `layout` chain/cycle, `at`, `nodeAt[]`, `out`, `look` ink/clay, `travel`, `loopAt`, `wipeVariant` | The words cannot fit on his video at a readable size, or it is a big statement moment | Anything that fits on his video (he prefers that, 43). Four nodes at most; a cycle needs exactly four | **Good** |
+| 43, 50, 51 | `K.diagram(nodes, o)` ON HIS OWN VIDEO (`mode:"video"` is the default) | The same chain over his chest zone, his face stays: plates in the drum's dark-plate look, a pulse along the arrows. It picks a layout that fits: **row** (43: short words, up to three steps), **grid** (51: 2 x 2, three or four steps, words up to about ten letters; `loop:true` runs the last arrow back to the first and lights everything), **stack** (50: up to three long phrases, one under the other; his own 23-letter phrases fit). The text shrinks to fit (never under 42 px) and a label that still does not fit is reported (`console.warn`, `window.__kitWarnings`) | `layout` auto/row/grid/stack, `loop`, `loopAt`, `at`, `nodeAt[]`, `out`, `y` (the block's centre, 1350), `travel` | Any sequence or cause chain of 2-4 steps. **His preferred way** | His hands gesture in the chest zone (the block covers about y 1160-1560); a phrase too long even for the stack (then a card) | **43 good, and the way he prefers it ("if the spacing and the size of the text allows it"); 50-51 liked ("very nice", showreel 6)** |
+| 44-45 | `K.curve(o)` | The force-time curve: two axes draw themselves, a curve draws with a glowing head, a tangent marks the slope with its rise and run, and two curves show the time each takes to reach a share of the peak (lit on the time axis) | `at`, `out`, `yLabel`, `xLabel`, `curves[{at, dur, tone, x0, k, label}]`, `slope{at, curve, label}`, `gap{at, level, label}` | He talks about force over time, the rate of force development, "faster to the same peak" | The curves are a drawn IDEA (a logistic climb), never his data: no numbers on them unless he gives them. Made for the ink card | **Good. Suggest it whenever the content has a curve like these** |
+| 46-47 | `K.chapter(n, title, o)` | A chapter label on the clay wipe: a ghost odometer rolls from the last chapter's number to this one, the title is slammed in, a row of chips shows done, here and to come. **`band` (the default, 47) is a clay band across the chest zone and his face stays**; `card` (46) takes the whole screen while his voice runs on. A long title shrinks to fit | `at`, `landAt`, `titleAt`, `out`, `total`, `from`, `variant` band/card, `look`, `wipeVariant` (clay by default), `size`, `y` (band), `roll` | A reel built in 2-3 parts, each starting with a label | A one-idea reel, more than three chapters, or the top band (his captions). Not a persistent bar: Instagram's own progress line sits at the bottom | **46 very good; 47 preferred; 52 (long titles shrink to fit) liked** |
+| 48-49 | `K.bodymap(steps, o)` | The app's own traced body (the drawing behind the muscle map in program.html): a scan line reveals it, the muscle he says lights clay with a glow and a label on a leader line, earlier ones stay in soft clay, and the body turns round (a 3D flip) when a step asks for the back view. With `chain:true` and the joint rings (hip, knee, ankle) a pulse runs down the leg | steps `{m, label, at, view, side, dy}` where `m` is a muscle group or `"ring:hip"/"ring:knee"/"ring:ankle"` (or a list), `at`, `out`, `chain`, `travel`, `height`, `y` | He names muscles or joints in order (hips, knees, ankles for triple extension) | A claim ("this only trains X"): it lights what he SAYS and nothing else. Made for the ink card; too small to read on his own video | **Amazing. Use it whenever he talks about a place in the body** |
 | 33 | `K.quote(lines, o)` | A page falls onto a dark table, the lines are written in, a clay highlighter sweeps the key line, then the page zooms onto it and the rest fades | `at`, `lineAt[]`, `hlAt`, `zoomAt`, `zoom` (default fits the key line), `out`, `look`, `tag`, `top`; a line is a string or `{t, hl:true}` | He reads or cites a sentence and one phrase must land | A sentence he has not said or read | **BENCHED: "i dont like"** |
 | 34-36 | wipes `slice`, `whip`, `zoom` | Three more wipes for full-screen cards: six bars stepping in from the right, a fast slanted slide with blur, a circle that opens while the card rushes in | `wipeVariant` on `K.question`, `K.number`, `K.versus`, `K.list`, `K.quote`, the courts | | Every card: keep to two or three kinds per reel (iris and push are still his favourites) | 34 slice and 36 zoom good; **35 whip wipe BENCHED** |
 | 37-38 | `K.whip(t, o)` | Hides a jump cut between two footage segments: the old picture blurs and slides (or zooms) away, the new one settles from the other side | `out`, `in` (segment indexes), `style` whip/zoom, `dir`, `d1`, `d2` | A jump cut inside one thought | In a segment that already uses `K.focus` or a backdrop `lower` (they move the same videos) | **Good** |
@@ -105,6 +135,26 @@ They share the card looks (clay, ink, paper) and the wipes. Every word and numbe
   two outline echoes of the numeral rippling outwards on the landing, and the versus card flashes when the halves meet.
 - **Never drive styles from `onUpdate`:** Hyperframes seeks the timeline, and seeks do not fire callbacks. Tween properties or CSS variables.
 - **A whip moves the footage videos**, so scale them up while they slide (110 px needs about 1.22) or the edge of the frame shows.
+
+## Diagrams, the force-time curve, chapter labels, the body map (2026-10-01, "go" after he named the three families)
+All four are full-screen cards (or sit on the footage), so none needs the cut-out. Every word and number is HIS; the showreel's are placeholders.
+- **Diagram:** each arrow is a line that grows (`scaleX`/`scaleY` from its start end) plus a glowing dot moving with the SAME ease, so the dot is always at
+  the head of the line; the arrowhead pops when it arrives and the plate slides in from where the pulse came. The node's time `nodeAt[i]` is the moment the
+  pulse ARRIVES (the pulse leaves `travel` s earlier). Plates are the checklist's vocabulary (a numeral tab on the right, hard shadow). A card gets a faint dot grid.
+- **Curve:** the stroke draws with the dash trick (`strokeDasharray = length`, tween `strokeDashoffset` to 0). The glowing head cannot follow with a callback
+  (seeks fire none), so it runs along the SAME polyline as one short linear leg per three samples, timed through the inverse of the stroke's ease (`easeAt`).
+  The shape is a normalised logistic climb (`x0` where it climbs, `k` how fast): two curves reach the same peak, one sooner. The slope is a tangent at the
+  steepest point; the gap solves each curve for a share of the peak (`level`) and lights the time between on the axis.
+- **Chapter:** the number is a ghost odometer (one column from the last chapter's digit through a full turn to this one, blur while it rolls); the title is the
+  question card's slam; the chips are done / here / to come. The `band` reveals with a `clip-path` wipe and a white edge riding it, right to left.
+- **Body map:** `assets/data/bodymap.js` (`window.BODYMAP`) is the app's traced drawing made by `assets/data/make_bodymap.py` from
+  `.claude/skills/image/bodymap/bodymap.json` (rerun it only if that drawing changes). Muscle groups are the app's ids; the joint rings are the app's knee
+  and ankle plus the kit's own hip ring (placed by eye), and need the `ring:` prefix because hip and ankle are also muscle groups. The figure has two SVG faces
+  (`backface-visibility: hidden`, the back one pre-rotated 180 degrees) on a `preserve-3d` element that the flip turns.
+  **Trap: `clip-path`, `opacity` or `filter` on an element with `transform-style: preserve-3d` flattens it, so the reveal clip lives on a wrapper, not on the figure.**
+  Labels sit against the screen edge (right edge at x 960: Instagram's buttons own the far right) and the leader line ends at a LOW estimate of the plate's width,
+  so it tucks under the plate: nothing is measured, because a font that has not loaded yet would give a wrong width.
+- **Looks:** the curve and the body map are made for the ink card. `look: "paper"` exists in the code but is not designed (the curve's paper tone would vanish).
 
 ## Gotchas already solved (do not re-learn them)
 - The timeline is created with `immediateRender: false` (`K.timeline()`): without it a later wipe-out paints its layer at frame 0.

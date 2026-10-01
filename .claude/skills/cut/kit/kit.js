@@ -1223,6 +1223,559 @@
     }
   };
 
+  /* ================= stage 3 (showreel 5, 2026-10-01): diagrams, the force-time curve, chapter labels, the body map =================
+   *   K.diagram(["نیرو", "سرعت", "توان"], { at, nodeAt:[t,t,t], out, layout:"chain"|"cycle"|"row", mode:"card"|"video" })   a chain that builds itself
+   *   K.curve({ at, out, curves:[{ at, dur, tone, x0, k, label }], slope:{ at, curve, label }, gap:{ at, level, label } })    the force-time curve
+   *   K.chapter(2, "سرعت", { at, titleAt, out, total:3, variant:"card"|"band" })                                             a chapter label on the clay wipe
+   *   K.bodymap([{ m:"quads", label:"ران", at, view:"front", side:"r" }, ...], { at, out })                                 the app's traced body, lit as he says it
+   * Every word and every number on them is HIS; the showreel's are placeholders. The curves are a drawn idea (the same peak, reached sooner),
+   * never his data. All four are full-screen cards or sit on the footage, so none of them needs the cut-out.
+   */
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const sv = (tag, attrs, parent) => {
+    const e = document.createElementNS(SVGNS, tag);
+    Object.keys(attrs || {}).forEach((k) => e.setAttribute(k, attrs[k]));
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+  // a stroke that draws itself: hide it with the dash trick, then tween the offset to 0 (the same trick as the checklist's tick)
+  const svgPrep = (el) => {
+    const L = el.getTotalLength();
+    el.style.strokeDasharray = L;
+    el.style.strokeDashoffset = L;
+    return L;
+  };
+  const svgDraw = (el, t, d, ease) => {
+    const L = svgPrep(el);
+    tl.fromTo(el, { strokeDashoffset: L }, { strokeDashoffset: 0, duration: d, ease: ease || "power3.out" }, t);
+    return L;
+  };
+  const gridTex = (card) => mk("div", "k-gridtex", "", card); // a faint dot grid: graph paper behind a diagram or a plot
+  // a ring that bursts out of a point: the kit's landing mark (as in K.tag)
+  const burst = (parent, x, y, t, size, grow) => {
+    const s = size ?? 200;
+    const r = mk("div", "k-ring k-hid", "", parent);
+    Object.assign(r.style, { left: x - s / 2 + "px", top: y - s / 2 + "px", width: s + "px", height: s + "px" });
+    tl.fromTo(r, { scale: 0.3, autoAlpha: 0.95 }, { scale: grow ?? 2.6, autoAlpha: 0, duration: 0.7, ease: "power2.out" }, t);
+    return r;
+  };
+
+  // How wide a Farsi phrase is in Vazirmatn Black, in ems. Measured on 39 real labels (2026-10-01): this is never under and usually 10-25 percent over, so
+  // a label that fits by this estimate fits. It is an estimate on purpose: measuring in the page would give a wrong width if the font has not loaded yet.
+  const emW = (s) => {
+    const n = Array.from(String(s)).length;
+    return Math.min(0.62 * n + 0.2, 0.52 * n + 0.9);
+  };
+  // the biggest font size (at most fs) that a phrase takes in maxW px, and whether that is still at least minFs
+  const fitFs = (text, maxW, fs, minFs) => {
+    const need = Math.floor(maxW / emW(text));
+    return { fs: Math.max(minFs, Math.min(fs, need)), fits: need >= minFs };
+  };
+  const warnFit = (what, text, extra) => {
+    const msg = "kit: " + what + " '" + text + "' does not fit at a readable size" + (extra ? " (" + extra + ")" : "") + ": shorten it, or use a card";
+    (global.__kitWarnings = global.__kitWarnings || []).push(msg);
+    if (global.console) global.console.warn(msg);
+  };
+
+  /* ---------- diagram: a chain that builds itself ----------
+   * K.diagram(["نیرو", "سرعت", "توان", "برد"], { at:t (it comes in), nodeAt:[t,t,t,t] (a node lands when the pulse reaches it: say the word there), out:t,
+   *   mode:"video" (the default: plates over his own picture, over the chest zone, his face stays) | "card" (a full-screen card),
+   *   layout (video): "auto" (the default: the first of row, grid and stack whose text fits at a readable size) | "row" (a line of plates: short words) |
+   *                   "grid" (2 x 2: three or four nodes, words up to about ten letters) | "stack" (up to three long phrases, one under the other)
+   *   layout (card):  "chain" (the default: a staircase of plates) | "cycle" (exactly four, the last arrow runs back to the first, a mark turns in the middle),
+   *   loop:true (video grid, four nodes: the last arrow runs back to the first and every plate lights; loopAt:t),
+   *   look:"ink" | "clay" (card), travel:0.55 (one pulse's trip), y:1350 (video: the block's centre), wipeVariant })
+   * He prefers it ON HIS OWN VIDEO when the spacing and the size of the text allow it (43), so that is the default and the layout adapts: the text is shrunk to fit
+   * (never below 42 px on the video, 56 on a card) and a label that still does not fit is reported (console warning, window.__kitWarnings): shorten it or use a card.
+   * The node being said is clay, earlier ones cool (to paper on a card, to a dark plate on the video, like the drum). It reads right to left, top to bottom. */
+  K.diagram = (nodes, o = {}) => {
+    const g = global.gsap;
+    const n = nodes.length, texts = nodes.map((x) => (typeof x === "string" ? x : x.t)), vid = (o.mode || "video") === "video";
+    const look = o.look || "ink", wv = o.wipeVariant || "iris", trav = o.travel ?? 0.55, TH = 12, MINF = vid ? 42 : 56, yc = o.y ?? 1350;
+    let want = o.layout || (vid ? "auto" : "chain");
+    if (vid && want === "cycle") want = "grid";
+    if (vid && want === "chain") want = "auto";
+    const loop = o.loop ?? want === "cycle";
+    if (want === "cycle" && n !== 4) throw new Error("K.diagram cycle needs exactly four nodes");
+    // geometry of one layout: the plates [left, top, width, height] and the arrows between them (axis-aligned, edge of one plate to the next)
+    const plan = (name) => {
+      const P = [], A = [];
+      let tabW, fs, pad = 24;
+      const side = (i, j, y) => (P[j][0] < P[i][0] ? [[P[i][0], y], [P[j][0] + P[j][2], y]] : [[P[i][0] + P[i][2], y], [P[j][0], y]]);
+      const vert = (i, j, x) => (P[j][1] > P[i][1] ? [[x, P[i][1] + P[i][3]], [x, P[j][1]]] : [[x, P[i][1]], [x, P[j][1] + P[j][3]]]);
+      // video blocks end at x 960: Instagram puts its buttons down the right edge, so the first node stays clear of them
+      if (name === "row") {
+        const gap = n > 3 ? 48 : 84, R = 960, Lm = 40, w = Math.floor((R - Lm - (n - 1) * gap) / n), h = n > 3 ? 112 : 124;
+        tabW = n > 3 ? 60 : 76;
+        fs = n > 3 ? 40 : 48;
+        pad = 14;
+        for (let i = 0; i < n; i++) P.push([R - (i + 1) * w - i * gap, yc - h / 2, w, h]);
+        for (let i = 0; i < n - 1; i++) A.push(side(i, i + 1, yc));
+      } else if (name === "grid") {
+        const w = 410, h = 116, R = 960, gx = 100, gy = 76, top = yc - (2 * h + gy) / 2;
+        const X = [R - w, R - 2 * w - gx], Y = [top, top + h + gy];
+        tabW = 84;
+        fs = 58;
+        pad = 16;
+        [[X[0], Y[0]], [X[1], Y[0]], [X[1], Y[1]], [X[0], Y[1]]].slice(0, n).forEach((q) => P.push([q[0], q[1], w, h]));
+        const tx = (i) => P[i][0] + P[i][2] - tabW / 2;
+        if (n > 1) A.push(side(0, 1, Y[0] + h / 2));
+        if (n > 2) A.push(vert(1, 2, tx(1)));
+        if (n > 3) A.push(side(2, 3, Y[1] + h / 2));
+        if (loop && n === 4) A.push(vert(3, 0, tx(3)));
+      } else if (name === "stack") {
+        const w = 760, h = 92, gap = 56, left = 200, top0 = Math.round(yc - (n * h + (n - 1) * gap) / 2);
+        tabW = 92;
+        fs = 54;
+        pad = 16;
+        for (let i = 0; i < n; i++) P.push([left, top0 + i * (h + gap), w, h]);
+        for (let i = 0; i < n - 1; i++) A.push(vert(i, i + 1, left + w - tabW / 2));
+      } else if (name === "cycle") {
+        tabW = 130;
+        fs = 66;
+        P.push([590, 690, 440, 200], [50, 690, 440, 200], [50, 1130, 440, 200], [590, 1130, 440, 200]);
+        A.push([[590, 790], [490, 790]], [[270, 890], [270, 1130]], [[490, 1230], [590, 1230]], [[810, 1130], [810, 890]]);
+      } else {
+        const h = 156, pitch = n > 3 ? 270 : 300, top0 = 1040 - ((n - 1) * pitch + h) / 2;
+        tabW = 156;
+        fs = 80;
+        for (let i = 0; i < n; i++) P.push([i % 2 ? 80 : 400, Math.round(top0 + i * pitch), 600, h]);
+        for (let i = 0; i < n - 1; i++) A.push([[600, P[i][1] + h], [600, P[i + 1][1]]]);
+      }
+      // the biggest font each label takes in its plate
+      const fits = texts.map((t, i) => fitFs(t, P[i][2] - tabW - 2 * pad, fs, MINF));
+      return { name, P, A, tabW, fs, pad, fits, ok: fits.every((f) => f.fits), low: Math.min.apply(null, fits.map((f) => f.fs)) };
+    };
+    let pl;
+    if (want === "auto") {
+      // the first layout whose text fits (a row only while its text stays at 44 px or more); if none does, the one that keeps the text biggest
+      const tries = ["row", "grid"].concat(n <= 3 ? ["stack"] : []).map(plan);
+      pl = tries.find((t) => t.ok && (t.name !== "row" || t.low >= 44)) || tries.slice().sort((a, b) => b.low - a.low)[0];
+    } else pl = plan(want);
+    if (!pl.ok) texts.forEach((t, i) => (pl.fits[i].fits ? 0 : warnFit("diagram label", t, pl.name + " layout, " + MINF + " px")));
+    const { P, A, tabW, fs, pad } = pl;
+    const c = vid ? mk("div", "k-ovl") : mk("div", "k-full k-" + look);
+    if (!vid) gridTex(c);
+    const st = mk("div", "k-nstage", "", c);
+    // colours as [plate, text, tab]
+    const COL = vid
+      ? { act: ["#c7552f", "#ffffff", "#16161a"], done: ["rgba(24,24,29,0.88)", "#e9e4da", "rgba(51,51,60,0.95)"] }
+      : look === "clay"
+      ? { act: ["#16161a", "#ffffff", "#c7552f"], done: ["#faf7f2", "#1a1a1a", "#c7552f"] }
+      : { act: ["#c7552f", "#ffffff", "#16161a"], done: ["#faf7f2", "#1a1a1a", "#c7552f"] };
+    // arrows first, so the plates sit on top of their ends
+    const arrows = A.map((e) => {
+      const a = e[0], b = e[1], horiz = a[1] === b[1], dx = Math.sign(b[0] - a[0]), dy = Math.sign(b[1] - a[1]);
+      const len = Math.abs(horiz ? b[0] - a[0] : b[1] - a[1]);
+      const line = mk("div", "k-dline", "", st);
+      Object.assign(line.style, horiz
+        ? { left: Math.min(a[0], b[0]) + "px", top: a[1] - TH / 2 + "px", width: len + "px", height: TH + "px" }
+        : { left: a[0] - TH / 2 + "px", top: Math.min(a[1], b[1]) + "px", width: TH + "px", height: len + "px" });
+      g.set(line, { transformOrigin: horiz ? (dx < 0 ? "100% 50%" : "0% 50%") : dy < 0 ? "50% 100%" : "50% 0%" });
+      const head = mk("div", "k-dhead", "", st);
+      Object.assign(head.style, { left: b[0] - dx * 22 + "px", top: b[1] - dy * 22 + "px" });
+      g.set(head, { rotation: (Math.atan2(dy, dx) * 180) / Math.PI });
+      const dot = mk("div", "k-dpulse", "", st);
+      g.set(dot, { x: a[0], y: a[1] });
+      return { line, head, dot, a, b, horiz, dx, dy };
+    });
+    const plates = nodes.map((nd, i) => {
+      const L = typeof nd === "string" ? { t: nd } : nd, b = P[i];
+      const p = mk("div", "k-dp", "", st);
+      Object.assign(p.style, { left: b[0] + "px", top: b[1] + "px", width: b[2] + "px", height: b[3] + "px", backgroundColor: COL.act[0], color: COL.act[1] });
+      const tab = mk("div", "k-dpn", K.fa(i + 1), p);
+      Object.assign(tab.style, { width: tabW + "px", backgroundColor: COL.act[2], fontSize: Math.min(fs * 1.12, tabW * 0.78) + "px" });
+      const lab = mk("div", "k-dpl", L.t, p);
+      Object.assign(lab.style, { fontSize: pl.fits[i].fs + "px", padding: "0 " + pad + "px" });
+      return { p, tab, cx: b[0] + b[2] - tabW / 2, cy: b[1] + b[3] / 2 };
+    });
+    // one pulse along one arrow: the line grows behind it, the head pops when it arrives
+    const run = (ar, t, d) => {
+      const prop = ar.horiz ? "scaleX" : "scaleY";
+      tl.fromTo(ar.line, { autoAlpha: 1, [prop]: 0 }, { [prop]: 1, duration: d, ease: "power2.inOut" }, t);
+      tl.set(ar.dot, { autoAlpha: 1 }, t);
+      tl.fromTo(ar.dot, { x: ar.a[0], y: ar.a[1] }, { x: ar.b[0], y: ar.b[1], duration: d, ease: "power2.inOut" }, t);
+      tl.to(ar.dot, { autoAlpha: 0, scale: 0.4, duration: 0.2 }, t + d);
+      tl.fromTo(ar.head, { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.2, ease: "back.out(3)" }, t + d - 0.08);
+    };
+    const tint = (i, t, k) => {
+      tl.to(plates[i].p, { backgroundColor: COL[k][0], color: COL[k][1], duration: 0.3 }, t);
+      tl.to(plates[i].tab, { backgroundColor: COL[k][2], duration: 0.3 }, t);
+    };
+    if (vid) tl.fromTo(c, { y: 260, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.65, ease: "expo.out" }, o.at);
+    else K.wipeIn(c, o.at, o.wipe ?? 0.5, wv);
+    nodes.forEach((_, i) => {
+      const t = o.nodeAt[i], ar = i > 0 ? arrows[i - 1] : null;
+      const off = ar ? [-ar.dx * 150, -ar.dy * 150] : [170, 0]; // the plate slides in from where the pulse came
+      if (ar) run(ar, t - trav, trav);
+      tl.fromTo(plates[i].p, { autoAlpha: 0, x: off[0], y: off[1] }, { autoAlpha: 1, x: 0, y: 0, duration: 0.5, ease: "expo.out" }, t - 0.06);
+      burst(st, plates[i].cx, plates[i].cy, t, 200, 2.4);
+      if (i > 0) tint(i - 1, t, "done");
+    });
+    if (loop && arrows.length === n) {
+      // the last arrow runs back to the first node: the loop closes and every plate lights (on a card, a turning mark sits in the middle)
+      const t0 = o.loopAt ?? o.nodeAt[n - 1] + 1.3, ta = t0 + trav;
+      run(arrows[n - 1], t0, trav);
+      burst(st, plates[0].cx, plates[0].cy, ta, 200, 2.4);
+      plates.forEach((_, i) => tint(i, ta + i * 0.07, "act"));
+      if (pl.name === "cycle") {
+        const mark = mk("div", "k-dloop k-hid",
+          '<svg viewBox="0 0 100 100"><path d="M66 22.3 A32 32 0 1 1 25.5 29.4" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>' +
+          '<path d="M34.5 18.7 L31.6 34.5 L19.4 24.3 Z" fill="currentColor"/></svg>', st);
+        tl.fromTo(mark, { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: "back.out(2)" }, ta);
+        tl.to(mark, { rotation: 120 * Math.max(1, o.out - ta), duration: Math.max(1, o.out - ta), ease: "none" }, ta);
+      }
+    }
+    if (!vid) push(st, o.nodeAt[0], o.out, 0.03);
+    if (vid) tl.to(c, { y: 260, autoAlpha: 0, duration: 0.45, ease: "power3.in" }, o.out);
+    else K.wipeOut(c, o.out, o.wipe ?? 0.5, wv);
+    return { card: c, plates, arrows, layout: pl.name, fits: pl.ok };
+  };
+
+  /* ---------- the force-time curve ----------
+   * K.curve({ at:t (card in), out:t, look:"ink"|"paper", yLabel:"نیرو", xLabel:"زمان", labelsAt:t,
+   *   curves:[{ at:t (it starts to draw), dur:1.4, tone:"paper"|"clay", x0:0.62 (where it climbs, 0-1), k:5.2 (how fast it climbs),
+   *            label:"قبل", labelAt:t, labelU:0.8 }, ...],                    the last curve is the clay one
+   *   slope:{ at:t, curve:1, label:"شیب", labelAt:t }                          a tangent at the steepest point, drawn with its rise and run
+   *   gap:{ at:t, level:0.8, label:"زمان کمتر", labelAt:t } })                  two curves: the time each takes to reach a share of the peak
+   * A graph is a claim. The curves are a drawn IDEA (the same peak, reached sooner), never his data; the words are his. */
+  K.curve = (o = {}) => {
+    const g = global.gsap, wv = o.wipeVariant || "iris", look = o.look || "ink";
+    const X0 = 150, X1 = 940, YB = o.yb ?? 1400, YT = o.yt ?? 640, W = X1 - X0, H = YB - YT;
+    const c = mk("div", "k-full k-" + look);
+    gridTex(c);
+    const st = mk("div", "k-nstage", "", c);
+    const svg = sv("svg", { viewBox: "0 0 1080 1920", class: "k-csvg" }, st);
+    // a logistic climb normalised to start at 0 and end at 1
+    const fn = (u, x0, k) => {
+      const s = (v) => 1 / (1 + Math.exp(-k * (v - x0)));
+      return (s(u) - s(0)) / (s(1) - s(0));
+    };
+    const PX = (u) => X0 + W * u, PY = (v) => YB - H * v;
+    const pt = (x, y) => x.toFixed(1) + " " + y.toFixed(1);
+    const lab = (txt, cls, x, y, align) => {
+      const e = mk("div", "k-clab k-hid " + cls, txt, st);
+      Object.assign(e.style, { left: x + "px", top: y + "px" });
+      g.set(e, { xPercent: align === "r" ? -100 : 0 }); // "r": the right edge sits on x (Farsi ends there)
+      return e;
+    };
+    const rise = (e, t) => tl.fromTo(e, { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: "expo.out" }, t);
+    K.wipeIn(c, o.at, o.wipe ?? 0.5, wv);
+    // the frame: faint grid, the peak line, two axes that draw themselves, their arrowheads, the two words
+    const grid = [0.25, 0.5, 0.75].map((v) => sv("path", { d: "M" + pt(X0, PY(v)) + "L" + pt(X1, PY(v)), class: "k-cgrid" }, svg));
+    const peak = sv("path", { d: "M" + pt(X0, YT) + "L" + pt(X1 + 12, YT), class: "k-cpeak" }, svg);
+    const axY = sv("path", { d: "M" + pt(X0, YB + 14) + "L" + pt(X0, YT - 84), class: "k-cax" }, svg);
+    const axX = sv("path", { d: "M" + pt(X0 - 14, YB) + "L" + pt(X1 + 56, YB), class: "k-cax" }, svg);
+    const headY = sv("path", { d: "M" + pt(X0 - 17, YT - 78) + "L" + pt(X0, YT - 112) + "L" + pt(X0 + 17, YT - 78) + "Z", class: "k-chead" }, svg);
+    const headX = sv("path", { d: "M" + pt(X1 + 50, YB - 17) + "L" + pt(X1 + 84, YB) + "L" + pt(X1 + 50, YB + 17) + "Z", class: "k-chead" }, svg);
+    const ta = o.at + 0.5;
+    svgDraw(axX, ta, 0.7);
+    svgDraw(axY, ta + 0.1, 0.7);
+    tl.to([headX, headY], { autoAlpha: 1, duration: 0.2 }, ta + 0.62);
+    tl.fromTo(grid.concat([peak]), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5, stagger: 0.08 }, ta + 0.5);
+    if (o.yLabel) rise(lab(o.yLabel, "k-caxl", X0 + 44, YT - 150, "l"), o.labelsAt ?? ta + 0.9);
+    if (o.xLabel) rise(lab(o.xLabel, "k-caxl", X1 + 70, YB + 34, "r"), o.labelsAt ?? ta + 1.0);
+    // the curves: the stroke draws, a glowing head runs along it (one short linear leg per sample, timed through the same ease)
+    const curves = (o.curves || []).map((cv, i, all) => {
+      const tone = cv.tone || (i === all.length - 1 ? "clay" : "paper");
+      const N = 120, pts = [];
+      for (let j = 0; j <= N; j++) {
+        const u = j / N;
+        pts.push([PX(u), PY(fn(u, cv.x0, cv.k))]);
+      }
+      const path = sv("path", { d: "M" + pts.map((p) => pt(p[0], p[1])).join("L"), class: "k-cv k-cv-" + tone }, svg);
+      const dur = cv.dur ?? 1.4, ease = cv.ease || "power2.inOut", t0 = cv.at;
+      const L = svgPrep(path);
+      tl.fromTo(path, { strokeDashoffset: L }, { strokeDashoffset: 0, duration: dur, ease }, t0);
+      const dot = mk("div", "k-cdot k-cdot-" + tone, "", st);
+      g.set(dot, { x: pts[0][0], y: pts[0][1] });
+      tl.set(dot, { autoAlpha: 1 }, t0);
+      const cum = [0];
+      for (let j = 1; j <= N; j++) cum.push(cum[j - 1] + Math.hypot(pts[j][0] - pts[j - 1][0], pts[j][1] - pts[j - 1][1]));
+      let prev = 0;
+      for (let j = 3; j <= N; j += 3) {
+        const tj = dur * easeAt(ease, cum[j] / cum[N]);
+        tl.to(dot, { x: pts[j][0], y: pts[j][1], duration: Math.max(0.001, tj - prev), ease: "none" }, t0 + prev);
+        prev = tj;
+      }
+      if (tone === "clay") burst(st, pts[N][0], pts[N][1], t0 + dur, 190, 2.8);
+      else tl.to(dot, { autoAlpha: 0, duration: 0.3 }, t0 + dur + 0.1);
+      if (cv.label) {
+        const lu = cv.labelU ?? (tone === "clay" ? 0.26 : 0.8), lx = PX(lu), ly = PY(fn(lu, cv.x0, cv.k));
+        const e = tone === "clay" ? lab(cv.label, "k-clab-clay", lx - 40, ly - 36, "r") : lab(cv.label, "k-clab-paper", lx + 34, ly + 22, "l");
+        rise(e, cv.labelAt ?? t0 + dur * 0.55);
+      }
+      return { path, pts, tone, cv, dur, t0 };
+    });
+    // the slope: a tangent at the steepest point, with its rise and run as a dashed triangle
+    if (o.slope && curves.length) {
+      const sc = curves[o.slope.curve ?? curves.length - 1], cv = sc.cv, u = o.slope.u ?? cv.x0;
+      const P0 = [PX(u), PY(fn(u, cv.x0, cv.k))];
+      const d = (fn(u + 0.002, cv.x0, cv.k) - fn(u - 0.002, cv.x0, cv.k)) / 0.004; // climb per unit of u
+      const ang = Math.atan(-(H * d) / W), ux = Math.cos(ang), uy = Math.sin(ang), hl = o.slope.half ?? 170;
+      const a = [P0[0] - ux * hl, P0[1] - uy * hl], b = [P0[0] + ux * hl, P0[1] + uy * hl];
+      const tan = sv("path", { d: "M" + pt(a[0], a[1]) + "L" + pt(b[0], b[1]), class: "k-ctan" }, svg);
+      const legs = sv("path", { d: "M" + pt(a[0], a[1]) + "L" + pt(b[0], a[1]) + "L" + pt(b[0], b[1]), class: "k-cleg" }, svg);
+      const ts = o.slope.at;
+      svgDraw(tan, ts, 0.5);
+      tl.fromTo(legs, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.35 }, ts + 0.35);
+      if (o.slope.label) {
+        const e = mk("div", "k-stamp k-paper k-sm k-hid", o.slope.label, st);
+        Object.assign(e.style, { position: "absolute", left: P0[0] + 120 + "px", top: P0[1] - 64 + "px", zIndex: 6 });
+        tl.fromTo(e, { autoAlpha: 0, scale: 0.4, rotate: -8 }, { autoAlpha: 1, scale: 1, rotate: -2, duration: 0.45, ease: "back.out(2.2)" }, o.slope.labelAt ?? ts + 0.4);
+      }
+    }
+    // the gap: the time each curve takes to reach a share of the peak, lit on the time axis
+    if (o.gap && curves.length > 1) {
+      const v = o.gap.level ?? 0.8, ys = PY(v), tg = o.gap.at;
+      const solve = (cv) => {
+        let lo = 0, hi = 1;
+        for (let i = 0; i < 30; i++) {
+          const m = (lo + hi) / 2;
+          if (fn(m, cv.x0, cv.k) < v) lo = m;
+          else hi = m;
+        }
+        return (lo + hi) / 2;
+      };
+      const xA = PX(solve(curves[curves.length - 1].cv)), xB = PX(solve(curves[0].cv));
+      const hz = sv("path", { d: "M" + pt(X0, ys) + "L" + pt(xB + 36, ys), class: "k-cleg" }, svg);
+      const dA = sv("path", { d: "M" + pt(xA, ys) + "L" + pt(xA, YB), class: "k-cdrop k-cdrop-clay" }, svg);
+      const dB = sv("path", { d: "M" + pt(xB, ys) + "L" + pt(xB, YB), class: "k-cdrop k-cdrop-paper" }, svg);
+      const bar = sv("path", { d: "M" + pt(xA, YB) + "L" + pt(xB, YB), class: "k-cbar" }, svg);
+      const dots = [sv("circle", { cx: xA, cy: ys, r: 13, class: "k-cpt k-cpt-clay" }, svg), sv("circle", { cx: xB, cy: ys, r: 13, class: "k-cpt k-cpt-paper" }, svg)];
+      tl.fromTo(hz, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.35 }, tg);
+      tl.fromTo([dA, dB], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.35, stagger: 0.18 }, tg + 0.2);
+      tl.fromTo(dots, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25, stagger: 0.18 }, tg + 0.2);
+      tl.set(bar, { autoAlpha: 1 }, tg + 0.7);
+      svgDraw(bar, tg + 0.7, 0.5, "power3.out");
+      if (o.gap.label) {
+        const e = mk("div", "k-stamp k-sm k-hid", o.gap.label, st);
+        Object.assign(e.style, { position: "absolute", left: (xA + xB) / 2 + "px", top: YB + 62 + "px", zIndex: 6 });
+        g.set(e, { xPercent: -50 });
+        tl.fromTo(e, { autoAlpha: 0, scale: 0.4, rotate: 6 }, { autoAlpha: 1, scale: 1, rotate: -2, duration: 0.45, ease: "back.out(2.2)" }, o.gap.labelAt ?? tg + 1.0);
+      }
+    }
+    push(st, (curves[0] && curves[0].t0) || o.at + 1, o.out, 0.03);
+    K.wipeOut(c, o.out, o.wipe ?? 0.5, wv);
+    return { card: c, svg, curves };
+  };
+
+  /* ---------- chapter label: a section marker that rides the clay wipe ----------
+   * K.chapter(2, "سرعت", { at:t (the wipe starts), landAt:t (the number settles), titleAt:t (the title is slammed), out:t, total:3, from:1 (the number it rolls from),
+   *   variant:"band" (the default: a clay band across the chest zone, his face stays: he prefers it, 47) | "card" (full screen, his voice runs on, 46),
+   *   look:"clay"|"ink"|"paper" (card), wipeVariant:"clay" (default) | "iris" | "push" ..., size:176 (card title), y:1180 (band top), roll })
+   * The number is a ghost odometer that rolls one step per chapter; the title is slammed in; a row of chips says where you are (done, here, to come).
+   * Three chapters in a reel at most. The top band stays free: nothing sits above y 500. Title and number are HIS words. */
+  K.chapter = (num, title, o = {}) => {
+    const g = global.gsap, band = (o.variant || "band") === "band", total = o.total ?? 3, from = o.from ?? Math.max(0, num - 1);
+    const at = o.at, landAt = o.landAt ?? at + (band ? 0.8 : 1.0), titleAt = o.titleAt ?? landAt, roll = o.roll ?? (band ? 0.85 : 1.15);
+    // the roll: one column of digits from the last chapter's number, through a full turn, to this one
+    let digits = "";
+    for (let k = from; k <= num + 10; k++) digits += "<i>" + PD[k % 10] + "</i>";
+    const steps = num + 10 - from;
+    if (!band) {
+      const look = o.look || "clay", wv = o.wipeVariant || "clay";
+      const c = mk("div", "k-full k-" + look);
+      const st = mk("div", "k-nstage", "", c);
+      const glow = mk("div", "k-qglow", "", st);
+      const ring = mk("div", "k-qring k-hid", "", st);
+      ring.style.top = "760px";
+      const size = o.numSize ?? 980;
+      const win = mk("div", "k-chn", "", st);
+      Object.assign(win.style, { fontSize: size + "px", left: (1080 - 0.66 * size) / 2 + "px", top: 1000 - 0.56 * size + "px" });
+      const col = mk("div", "k-chncol", digits, win);
+      tl.fromTo(col, { y: 0 }, { y: -steps * size * 1.12, duration: roll, ease: "power3.out" }, landAt - roll);
+      tl.fromTo(col, { filter: "blur(16px)" }, { filter: "blur(0px)", duration: roll, ease: "power2.out" }, landAt - roll);
+      const tw = mk("div", "k-chtitle", "", st);
+      tw.style.top = (o.titleY ?? 790) + "px";
+      const stamp = mk("div", "k-stamp k-hid", title, tw);
+      const tf = fitFs(title, 860, o.size ?? 176, 110); // a long title shrinks to fit the screen instead of running off it
+      if (!tf.fits) warnFit("chapter title", title, "card");
+      Object.assign(stamp.style, { fontSize: tf.fs + "px", padding: "4px 64px" });
+      const row = mk("div", "k-chrow", "", st);
+      row.style.top = (o.rowY ?? 1200) + "px";
+      const chips = [];
+      for (let i = 1; i <= total; i++) chips.push(mk("div", "k-chchip k-hid " + (i < num ? "k-done" : i === num ? "k-here" : "k-next"), K.fa(i), row));
+      K.wipeIn(c, at, o.wipe ?? 0.5, wv);
+      tl.fromTo(chips, { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: "back.out(2.4)", stagger: 0.09 }, at + 0.7);
+      tl.fromTo(stamp, { scale: 2.4, autoAlpha: 0, rotate: -5 }, { scale: 1, autoAlpha: 1, rotate: -2, duration: 0.5, ease: "expo.out" }, titleAt);
+      tl.fromTo(ring, { scale: 0.3, autoAlpha: 0.95 }, { scale: 3.6, autoAlpha: 0, duration: 0.85, ease: "power2.out" }, titleAt);
+      tl.fromTo(glow, { scale: 0.6, opacity: 0.2 }, { scale: 1.25, opacity: 1, duration: 0.9, ease: "power2.out" }, titleAt);
+      tl.to(chips[num - 1], { scale: 1.2, duration: 0.14, ease: "power2.out", yoyo: true, repeat: 1 }, titleAt + 0.1);
+      shake(st, titleAt, o.shake ?? 10);
+      push(st, titleAt + 0.5, o.out, 0.03);
+      K.wipeOut(c, o.out, o.wipe ?? 0.5, wv);
+      return { card: c, stamp, chips };
+    }
+    // the band: a clay slab across the chest zone (his face stays on screen), numeral tab on the right, the title beside it
+    const b = mk("div", "k-chband", "", stage);
+    b.style.top = (o.y ?? 1180) + "px";
+    const nb = mk("div", "k-chbn", "", b);
+    const col = mk("div", "k-chncol", digits, nb);
+    const tt = mk("div", "k-chbt", "", b);
+    const tf = fitFs(title, 640, 150, 96); // the band leaves 640 px beside the numeral: a longer title shrinks to fit
+    if (!tf.fits) warnFit("chapter title", title, "band");
+    tt.style.fontSize = tf.fs + "px";
+    const words = K.words(title).map((w) => mk("span", "k-hid", w, tt));
+    const bars = mk("div", "k-chbp", "", b);
+    for (let i = 1; i <= total; i++) mk("i", i < num ? "k-done" : i === num ? "k-here" : "k-next", "", bars);
+    const edge = mk("div", "k-chbedge", "", stage);
+    edge.style.top = (o.y ?? 1180) + "px";
+    tl.fromTo(b, { clipPath: "inset(0px 0px 0px 100%)" }, { clipPath: "inset(0px 0px 0px 0%)", duration: 0.55, ease: "power3.inOut" }, at);
+    tl.fromTo(edge, { autoAlpha: 1, x: 1080 }, { x: -6, duration: 0.55, ease: "power3.inOut" }, at);
+    tl.set(edge, { autoAlpha: 0 }, at + 0.57);
+    tl.fromTo(col, { y: 0 }, { y: -steps * 340, duration: roll, ease: "power3.out" }, landAt - roll);
+    tl.fromTo(col, { filter: "blur(10px)" }, { filter: "blur(0px)", duration: roll, ease: "power2.out" }, landAt - roll);
+    tl.fromTo(words, { autoAlpha: 0, x: 160 }, { autoAlpha: 1, x: 0, duration: 0.5, ease: "expo.out", stagger: 0.09 }, titleAt);
+    tl.to(b, { clipPath: "inset(0px 1080px 0px 0px)", duration: 0.5, ease: "power3.inOut" }, o.out);
+    tl.fromTo(edge, { autoAlpha: 1, x: 1074 }, { x: -6, duration: 0.5, ease: "power3.inOut" }, o.out);
+    tl.set(edge, { autoAlpha: 0 }, o.out + 0.52);
+    return { band: b, words };
+  };
+
+  /* ---------- the body map: the app's traced body, muscles lit as he says them ----------
+   * K.bodymap([{ m:"quads", label:"ران", at:t, view:"front"|"back", side:"r"|"l" }, { m:["glutes","hamstrings"], label:"زنجیره پشتی", at:t, view:"back" }, ...],
+   *   { at:t (card in), out:t, chain:true (a glowing line and a pulse run from one step to the next: the joints chain), travel:0.55, height:1040, y:490 })
+   * `m` is a muscle group of the app's drawing (front: neck back shoulder chest triceps core biceps forearm hip adductors quads calves shins peroneals
+   * ankle; back: neck back shoulder triceps lowback forearm glutes quads adductors hamstrings calves peroneals) or a joint ring ("ring:hip", "ring:knee",
+   * "ring:ankle": the prefix is needed because hip and ankle are also muscle groups; the hip ring is the kit's own, the app has none). Made for the ink card: the drawing is the app's dark-mode body.
+   * The body turns round (a 3D flip) when a step asks for the other view. The muscle being said is full clay with a glow and a label on a leader
+   * line; earlier ones stay in soft clay, so the body fills up. HIGHLIGHT ONLY WHAT HE SAYS: no "this only trains X" claim. Same drawing as the app. */
+  K.bodymap = (steps, o = {}) => {
+    const BM = global.BODYMAP;
+    if (!BM) throw new Error("data/bodymap.js is not loaded (the template includes it, kit.scaffold copies it)");
+    const g = global.gsap, wv = o.wipeVariant || "iris", look = o.look || "ink";
+    const c = mk("div", "k-full k-" + look);
+    const st = mk("div", "k-nstage", "", c);
+    const glow = mk("div", "k-qglow", "", st);
+    const VBW = 800, VBH = 1652, FH = o.height ?? 1040, S = FH / VBH, FW = VBW * S;
+    const FX = 540 - FW / 2 + (o.dx ?? 0), FY = o.y ?? 490;
+    glow.style.top = FY + FH / 2 - 400 + "px";
+    // the reveal (a clip) lives on a wrapper: the figure itself must stay preserve-3d for the flip
+    const wrap = mk("div", "k-bmwrap", "", st);
+    const stage3 = mk("div", "k-bmstage", "", wrap);
+    const body = mk("div", "k-bmfig", "", stage3);
+    Object.assign(body.style, { left: FX + "px", top: FY + "px", width: FW + "px", height: FH + "px" });
+    const PAL = look === "paper"
+      ? { sf: "#ece6dc", mus: "#cbc1b2", ln: "#a89d8c", on: "#c7552f", soft: "#e8a68b", hot: "#f3c2ac" }
+      : { sf: "#34343c", mus: "#4b4b56", ln: "#7b7b88", on: "#e06b43", soft: "#94553f", hot: "#ffcfba" };
+    const faces = {};
+    ["front", "back"].forEach((view) => {
+      const pl = BM.place[view], vbx = pl.x + (pl.w - VBW) / 2;
+      const svg = sv("svg", { viewBox: vbx + " 0 " + VBW + " " + VBH, class: "k-bmsvg", preserveAspectRatio: "xMidYMid meet" }, body);
+      sv("path", { d: BM.sil[view], fill: PAL.sf }, svg);
+      const gs = {};
+      Object.keys(BM.groups[view]).forEach((k) => (gs[k] = sv("path", { d: BM.groups[view][k], fill: PAL.mus }, svg)));
+      sv("path", { d: BM.line[view], "fill-rule": "evenodd", fill: PAL.ln, stroke: PAL.ln, "stroke-width": 1.2, "stroke-linejoin": "round" }, svg);
+      sv("path", { d: BM.sil[view], fill: "none", stroke: PAL.ln, "stroke-width": 3, "stroke-linejoin": "round" }, svg);
+      const rg = {}, R = (BM.rings && BM.rings[view]) || {};
+      Object.keys(R).forEach((name) => {
+        rg[name] = R[name].map((e) => sv("ellipse", { cx: e[0], cy: e[1], rx: e[2], ry: e[3], fill: "none", stroke: PAL.on, "stroke-width": 9, opacity: 0 }, svg));
+      });
+      faces[view] = { svg, gs, rg, vbx };
+    });
+    g.set(faces.back.svg, { rotationY: 180 });
+    // a muscle group of the drawing, or a joint ring: "ring:hip", "ring:knee", "ring:ankle" (a bare "knee" works too; "hip" and "ankle" are
+    // muscle groups of the drawing, so the ring needs its prefix)
+    const pick = (view, id) => {
+      const f = faces[view], isRing = id.indexOf("ring:") === 0, rn = isRing ? id.slice(5) : id;
+      if (!isRing && f.gs[id]) return { path: f.gs[id] };
+      if (f.rg[rn]) return { rings: f.rg[rn] };
+      throw new Error("K.bodymap: no muscle or ring called '" + id + "' in the " + view + " view");
+    };
+    // where a muscle sits on the screen (the centre of its biggest piece on the chosen side), for the leader line
+    const anchorOf = (view, id, side) => {
+      const f = faces[view], mid = f.vbx + VBW / 2, r = pick(view, id);
+      let best = null;
+      const consider = (bb) => {
+        const cx = bb.x + bb.width / 2, cy = bb.y + bb.height / 2;
+        const score = ((side === "l" ? cx < mid : cx > mid) ? 1e9 : 0) + bb.width * bb.height;
+        if (!best || score > best.score) best = { cx, cy, score };
+      };
+      if (r.path) {
+        r.path.getAttribute("d").split(/(?=M)/).forEach((d) => {
+          const tmp = sv("path", { d }, f.svg);
+          consider(tmp.getBBox());
+          f.svg.removeChild(tmp);
+        });
+      } else r.rings.forEach((e) => consider(e.getBBox()));
+      return [FX + (best.cx - f.vbx) * S, FY + best.cy * S];
+    };
+    const lsvg = sv("svg", { viewBox: "0 0 1080 1920", class: "k-csvg" }, st);
+    const scan = mk("div", "k-bmscan", "", st);
+    K.wipeIn(c, o.at, o.wipe ?? 0.5, wv);
+    // the body is revealed top to bottom behind a scan line
+    g.set(wrap, { clipPath: "inset(0px 0px 100% 0px)" });
+    tl.fromTo(wrap, { clipPath: "inset(0px 0px 100% 0px)" }, { clipPath: "inset(0px 0px 0% 0px)", duration: 1.0, ease: "power2.inOut" }, o.at + 0.55);
+    tl.fromTo(scan, { autoAlpha: 1, y: FY - 10 }, { y: FY + FH, duration: 1.0, ease: "power2.inOut" }, o.at + 0.55);
+    tl.set(scan, { autoAlpha: 0 }, o.at + 1.58);
+    let cur = steps[0].view || o.view || "front";
+    g.set(body, { rotationY: cur === "back" ? 180 : 0 });
+    const FLIP = 0.95;
+    // which steps turn the body, and when: a step that asks for the other view starts its turn FLIP + 0.1 s before it speaks
+    const views = [], flipAt = [];
+    steps.forEach((s, i) => {
+      const v = s.view || (i ? views[i - 1] : cur);
+      views.push(v);
+      flipAt.push(i && v !== views[i - 1] ? s.at - FLIP - 0.1 : null);
+    });
+    const NEXT = steps.map((s, i) => (i + 1 < steps.length ? steps[i + 1].at : o.out));
+    const GLOW0 = "drop-shadow(0px 0px 0px rgba(224,107,67,0))", GLOW1 = "drop-shadow(0px 0px 24px rgba(224,107,67,0.9))";
+    const anchors = [];
+    steps.forEach((s, i) => {
+      const view = views[i], f = faces[view], t = s.at, ids = [].concat(s.m);
+      if (flipAt[i] != null) {
+        tl.to(body, { rotationY: view === "back" ? 180 : 0, duration: FLIP, ease: "power3.inOut" }, flipAt[i]);
+        tl.fromTo(body, { scale: 1 }, { scale: 0.9, duration: FLIP / 2, ease: "power2.inOut", yoyo: true, repeat: 1 }, flipAt[i]);
+      }
+      ids.forEach((id) => {
+        const r = pick(view, id);
+        if (r.path) {
+          tl.fromTo(r.path, { fill: PAL.hot, filter: GLOW0 }, { fill: PAL.on, filter: GLOW1, duration: 0.5, ease: "power2.out" }, t);
+          tl.to(r.path, { fill: PAL.soft, filter: GLOW0, duration: 0.4 }, NEXT[i] - 0.05);
+        } else {
+          // a joint ring: lit like a muscle (glow, soft fill). In a chain the rings are the nodes, so they all stay lit
+          tl.fromTo(r.rings, { opacity: 0, filter: GLOW0, fill: "rgba(224,107,67,0)" }, { opacity: 1, filter: GLOW1, fill: "rgba(224,107,67,0.22)", duration: 0.4, stagger: 0.06 }, t);
+          tl.to(r.rings, { opacity: o.chain ? 1 : 0.6, filter: GLOW0, duration: 0.4 }, NEXT[i] - 0.05);
+        }
+      });
+      // the label on a leader line, on the side of the screen it was asked for. The plate sits against the edge (right edge at x 960:
+      // Instagram's buttons own the far right) and the line ends at a LOW estimate of its width, so it tucks under the plate: no font measuring
+      const side = s.side || (i % 2 ? "l" : "r");
+      const [mx, my] = anchorOf(view, ids[0], side);
+      const estW = Math.round(40 + 32 * Array.from(s.label).length);
+      const innerX = side === "r" ? 960 - estW : 40 + estW, ly = Math.min(1480, Math.max(560, my + (s.dy ?? 0)));
+      const lab = mk("div", "k-stamp k-paper k-hid k-bml", s.label, st);
+      if (side === "r") lab.style.right = "120px";
+      else lab.style.left = "40px";
+      lab.style.top = ly - 46 + "px";
+      // chain: a glowing line runs from the last step's spot to this one, with a pulse that arrives as he says it (hip -> knee -> ankle)
+      anchors.push([mx, my]);
+      if (o.chain && i > 0 && views[i] === views[i - 1]) {
+        const tt = o.travel ?? 0.55, pa = anchors[i - 1];
+        const seg = sv("path", { d: "M" + pa[0].toFixed(1) + " " + pa[1].toFixed(1) + "L" + mx.toFixed(1) + " " + my.toFixed(1), class: "k-bmchain" }, lsvg);
+        tl.set(seg, { opacity: 1 }, t - tt);
+        svgDraw(seg, t - tt, tt, "power2.inOut");
+        const pulse = mk("div", "k-dpulse", "", st);
+        g.set(pulse, { x: pa[0], y: pa[1] });
+        tl.set(pulse, { autoAlpha: 1 }, t - tt);
+        tl.fromTo(pulse, { x: pa[0], y: pa[1] }, { x: mx, y: my, duration: tt, ease: "power2.inOut" }, t - tt);
+        tl.to(pulse, { autoAlpha: 0, scale: 0.4, duration: 0.2 }, t);
+      }
+      const ln = sv("path", { d: "M" + mx.toFixed(1) + " " + my.toFixed(1) + "L" + innerX + " " + ly.toFixed(1), class: "k-bmln" }, lsvg);
+      const dt = sv("circle", { cx: mx.toFixed(1), cy: my.toFixed(1), r: 11, class: "k-bmdot" }, lsvg);
+      const tOut = flipAt[i + 1] != null ? flipAt[i + 1] - 0.05 : NEXT[i] - 0.15;
+      tl.set(ln, { opacity: 1 }, t);
+      svgDraw(ln, t, 0.4, "power2.out");
+      tl.fromTo(dt, { opacity: 0 }, { opacity: 1, duration: 0.2 }, t);
+      tl.fromTo(lab, { autoAlpha: 0, x: side === "r" ? 140 : -140 }, { autoAlpha: 1, x: 0, duration: 0.5, ease: "expo.out" }, t + 0.22);
+      tl.to([lab, ln, dt], { autoAlpha: 0, duration: 0.25 }, tOut);
+    });
+    push(st, o.at + 1.4, o.out, 0.03);
+    K.wipeOut(c, o.out, o.wipe ?? 0.5, wv);
+    return { card: c, body, faces };
+  };
+
   /* ---------- catalogue label: for the showreel only, never in a real reel ---------- */
   K.label = (text, t0, t1) => {
     const l = mk("div", "k-label", text);

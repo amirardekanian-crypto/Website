@@ -25,6 +25,14 @@ creative").** The look below is the default and the safe choice. Break it on pur
 and say so in the plan. What does not bend: no captions, the top band stays free for his captions, graphics restate
 only his words, and nothing is uploaded or paid for without a yes.
 
+- **You are his creative director** (Amir, 2026-10-01 evening: "based on the content of reels, you need to think what visual is best and whats needed, then have a look at the
+  list, maybe something can be used, so use it. if you need anything, create it, and add it to the list"). **First read his list, the Motion Menu artifact, which this skill is connected to** (`kit/MENU.md` section 1: `Artifact read`, `ArtifactData list` on `marks` and `adds`, then
+  `python tools/menu_read.py ...`): Keep = use first, Maybe = ask, Drop = never, his rename is the name, his note is an instruction, an idea he added is a request. Say "menu 41" vs "showreel 41": the numbers clash.
+  For every beat ask what the viewer has to SEE, look it up in the **cue table at the top of `kit/BLOCKS.md`** (what he says, which block) and in the menu (78 cards, each with a When and a How), and use what fits (`python tools/menu_find.py <word>` finds a card fast).
+  Suggest unasked: something with a curve (force over time, fatigue, adaptation)
+  gets `K.curve`; a place in the body gets `K.bodymap`. Put a diagram, chapter label or list ON his own video when the text fits (he prefers 43 and 47 to the cards). Nothing
+  on the list fits? Build it, test it on his footage, **add it to his Motion Menu** (`kit/MENU.md` section 2: a card in `menu/menu.json` in the group that does the same job, a sample clip, the next number, patch and publish the page; plus a `BLOCKS.md` row, a cue-table line and a showreel demo)
+  and mark it NEW in the plan. `kit/USAGE.md` rules 7-9.
 - **No captions, subtitles or spoken words as text.** Keep the top band y 230-470 clear for his captions (his
   own sit near y 300: a pill that follows the spoken word).
 - **Graphics only restate what he says.** No new numbers, claims or results. Whisper mishears Farsi (on his own
@@ -56,8 +64,8 @@ only his words, and nothing is uploaded or paid for without a yes.
 | Hyperframes 0.8.104 | `npm i -g hyperframes` and the Claude plugin `hyperframes@hyperframes` (user scope) | HTML to MP4 through headless Chrome and ffmpeg. Telemetry is **off** (`hyperframes telemetry disable`), keep it off. Plugin skills (namespace `hyperframes:`): `hyperframes` (router), `talking-head-recut`, `hyperframes-core` (its `references/creator-editing-recipes.md` has the trim, split, speed, zoom and audio recipes), `hyperframes-animation`, `hyperframes-registry`, `hyperframes-audio`, `media-use`. A session started before they were installed will not list them: read the files in `C:\Users\Amir\.claude\plugins\cache\hyperframes\hyperframes\0.8.104\skills\<name>\` instead. |
 | ffmpeg + ffprobe 9.0.2 (Gyan full build) | winget package, on the user PATH | A session started before 2026-10-01 lacks the PATH entry: prepend `C:\Users\Amir\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-9.0.2-full_build\bin`. |
 | whisper.cpp b5130 (BLAS, CPU) | `C:\Users\Amir\tools\whisper.cpp\Release` (user PATH) | `hyperframes transcribe` finds `whisper-cli` on PATH. Model `ggml-large-v3.bin` (3.1 GB, sha256 checked) in `~/.cache/hyperframes/whisper/models/`. Large-v3 is the only multilingual model Hyperframes offers. No NVIDIA GPU (AMD RX 9070 XT), so it runs on the CPU: 105 s for a 79 s clip. |
-| `tools/` | next to this file | `plan_to_clips.py` (`propose` finds the silences worth cutting; `build` writes the cuts, speed changes and cut-ins as native Hyperframes clips and re-times the transcript; step 5), `new_reel.py <slug>` (starts a reel from the kit), `shots.sh` + `sheet.py` (build, lint, snapshot, labelled contact sheets), `loud.py` (two-pass -14 LUFS finish), `sync2.py` (voice vs the original take at every speed), `cutout.py` (the whole-clip cut-out of the speaker for the depth family: run detached, see "The kit"), `framesheet.py` (frames of a FINISHED mp4 into a labelled contact sheet), `edgecheck.py` (cut-out edges over flat backdrops), `sync_to_repo.py` (mirror this folder into the website repo, see "The kit"). |
-| `kit/` | next to this file | The motion-graphics kit (built 2026-10-01 in four showreel rounds): about 40 blocks as functions, eleven sounds, four showreel build scripts, `HANDOFF.md`. See "The kit" below. |
+| `tools/` | next to this file | `plan_to_clips.py` (`propose` finds the silences worth cutting; `build` writes the cuts, speed changes and cut-ins as native Hyperframes clips and re-times the transcript; step 5), `new_reel.py <slug>` (starts a reel from the kit), `shots.sh` + `sheet.py` (build, lint, snapshot, labelled contact sheets), `loud.py` (two-pass -14 LUFS finish), `sync2.py` (voice vs the original take at every speed), `cutout.py` (the whole-clip cut-out of the speaker for the depth family: run detached, see "The kit"), `framesheet.py` (frames of a FINISHED mp4 into a labelled contact sheet), `edgecheck.py` (cut-out edges over flat backdrops), `sync_to_repo.py` (mirror this folder into the website repo, see "The kit"). **The Motion Menu set** (his own list, an artifact; `kit/MENU.md`): `menu_read.py` (digest of his marks, notes and added ideas, run it before planning), `menu_find.py <word>` (find an ingredient and its call), `menu_samples.py` (the sample clips), `menu_patch.py` (add or refresh ingredients in the page, and the marks his verdicts imply), `menu_test_site.py` (a local test copy before anything is published). |
+| `kit/` | next to this file | The motion-graphics kit (built 2026-10-01 in six showreel rounds): about 50 blocks as functions, thirty-four sounds (eleven old ones plus the Motion Menu's), six showreel build scripts, `HANDOFF.md`, and `MENU.md` + `menu/menu.json`: the whole Motion Menu (78 cards, each with a When and a How). See "The kit" below. |
 | Chrome | puppeteer's headless shell in `~/.cache/puppeteer` | `hyperframes doctor` shows a tick. |
 | His clips | `C:\Users\Amir\Videos\Reels\raw` | Not synced by OneDrive. Work folders: `C:\Users\Amir\Videos\Reels\<slug>\`. Never in the repo or OneDrive. |
 
@@ -98,7 +106,7 @@ reels. `/cut` uses Hyperframes.
    place graphics and transitions from `transcript.edited.json`, and put a transition on a cut at that
    segment's `start` in `timemap.json`. Tell him in plain words what you did: how many pauses and how many
    seconds went, and which lines you sped up or slowed.
-6. **Write the beat plan** in plain words, one table: time, what he says, what appears, where, plus the list of
+6. **Write the beat plan** in plain words, one table: time, what he says, what the viewer needs to SEE, the block you use for it (from the cue table; mark a new one NEW), where, plus the list of
    numbers and terms for him to confirm. Pace for a reel under 60 s: a new graphic or cut-in every 3-5 s,
    graphics on screen for about half the runtime, the same 2-3 transition types all the way through. Decide it
    yourself, show it with a few suggestions (my pick marked), and wait for his "go" (skip only if he says "just build
@@ -132,8 +140,8 @@ reels. `/cut` uses Hyperframes.
     `_config.yml`'s exclude list first), commit, push `main` by itself.
 
 ## The kit (built 2026-10-01 in rounds; each round was shown to Amir as a showreel on his own footage)
-Motion-graphics ingredients: blocks as JS functions (`kit/kit.js`), styles (`kit/kit.css`), a Python assembler (`kit/kit.py`), eleven synthesised
-sounds. **Ingredients, not recipes** (his worry was losing creativity): concept first, then the kit for plumbing; every reel gets a signature
+Motion-graphics ingredients: blocks as JS functions (`kit/kit.js`), styles (`kit/kit.css`), a Python assembler (`kit/kit.py`), thirty-four sounds (eleven synthesised
+ones plus the Motion Menu's: `sfx=[(E(t), "thump")]`). **Ingredients, not recipes** (his worry was losing creativity): concept first, then the kit for plumbing; every reel gets a signature
 moment built for that clip; log real reels in `kit/USAGE.md` and rotate; his veto goes on the bench (the code stays). Read `kit/HANDOFF.md`
 (state, paths, commands, traps, next steps), `kit/BLOCKS.md` (every block, options, when NOT to use it, his verdict per block) and `kit/USAGE.md`
 (his taste, the bench).
@@ -144,6 +152,8 @@ moment built for that clip; log real reels in `kit/USAGE.md` and rotate; his vet
 | 2 | 18-26 | the depth family (poster, hollow giant word, drifting rows, halo, studio swap, focus) and the broadcast court | loved 19, 20, 25, 26; good 18, 22; benched 21 |
 | 3 | 27-38 | number slam, the number behind him, versus, the drum list, quote, wipes (slice, whip, zoom), cut whip and zoom | **29 best**; 30-31 and 32 amazing; 27-28, 34, 36-38 good; benched 33, 35 |
 | 4 | 39-40 | the drum ON his own video, a clay-studio number behind him | **loved 39**; 40 good |
+| 5 | 41-49 | the diagram builder (chain, cycle, on his video), the force-time curve, chapter labels (card, band), the body map (turns round, joints chain): the three families he named | 41-45 good (he prefers 43, on his own video, when the text fits), 46 very good, **47 preferred**, **48-49 amazing** |
+| 6 | 50-52 | the fit check: the diagram on his own video picks a layout that fits (row, grid, stack) and shrinks its text; the chapter band as the default | liked, "very nice" |
 
 - **His house style:** big confident type; depth (type BEHIND him); him smaller and lower with type above; his own room kept when possible, a
   studio colour as the occasional hinge; full-screen statement cards with strong, creative animation; very few elements; strong easing.
@@ -158,7 +168,12 @@ moment built for that clip; log real reels in `kit/USAGE.md` and rotate; his vet
 - **The repo mirror (his "go live", 2026-10-01):** the website repo holds a copy of this folder at `.claude/skills/cut/` (versioned on GitHub, available to
   cloud sessions and other machines). THIS user-level folder stays the one you edit, because every path in the docs and scripts points here. After a change run
   `python tools/sync_to_repo.py`, then commit and push (`main`, by itself) ONLY when he says "go live". The mirror leaves out the contact-sheet PNGs (10 MB).
-- **Too many blocks:** about 40 against a rule of 15-20 in use. `kit/USAGE.md` "Retire next" lists what to drop once he confirms.
+- **The Motion Menu is connected (his words, 2026-10-01: "your /cut skill should actually be connected to this ... these are all ingredients, the simplest form to exist, so you
+  understand and be able to find them quickly and use them quickly to edit videos ... update and edit as you think is best"), and he then asked for a tidy-up (same job in one place, remove
+  what will not be used on his talking videos or for his business, fix duplicates, know when and how to use each).** The menu is now 78 cards (224 before): every card has a When and a How, the kit's
+  blocks, its sounds and his own ideas are in it, `menu/menu.json` is the source of all of it. Before a reel read his marks and added ideas; after building a block add its card; when it fills up, tidy it again
+  (`kit/MENU.md` section 3: his Drop leaves, his Keep stays). Everything is in `kit/MENU.md`. Never overwrite a live mark of his, never reuse a number, and say what you changed.
+- **Too many blocks:** about 50 against a rule of 15-20 in use. The menu is tidy (78 cards), the CODE is not: `kit/USAGE.md` "Retire next" lists the blocks he dropped whose code is still in `kit.js` (so the old showreels rebuild). Cut it only when he says so.
 - **Idea rounds:** when he says "go" for a family, build it, render a showreel, send it, ask which numbers he loved and which to bench, and record
   it. He is not editing those videos. My next picks are in `IDEAS.md` and `kit/HANDOFF.md`.
 
@@ -218,5 +233,9 @@ colour language) and the order to build them: `IDEAS.md`.
 - Sound effects stay well under the voice (`data-volume` 0.28-0.50): at 0.75 the reveal hit measured 16 dB above the
   quiet beat and louder than his speech.
 - Persian digits render correctly in Vazirmatn (۱۲۳). At heavy weights ۱ ۲ ۳ look a lot like Latin 1 2 3.
+- **A `transform-style: preserve-3d` element must not carry `clip-path`, `opacity` or `filter`**: each flattens it and the flip dies (the body map keeps
+  its reveal clip on a wrapper). A stroke draws with the dash trick (`strokeDasharray = length`, tween the offset); a glowing head that follows it is
+  keyframed along the same polyline through the inverse of the ease (`easeAt`), never from a callback. Do not measure text at build time to place things
+  (a font that has not loaded gives a wrong width): anchor to an edge and let the line end under the plate.
 - Proven on a real reel: custom wipes, ticks, cutaways, the behind-you cut-out, synthesised sound effects. Still
   unproven: the catalog's shader transitions and `hyperframes add`.

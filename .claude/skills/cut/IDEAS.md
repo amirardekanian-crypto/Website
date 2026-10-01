@@ -12,10 +12,11 @@ item becomes a reusable block in the reel template, so every later reel is faste
 steps and measure, behind, cta, wipes, flash. Stage 2 so far (his "go for 1 and 2", showreel 2): the depth family (stack,
 outline, drift, halo, sweep, backdrop swap, focus) and the broadcast court (`courtSteps3d`, `courtMeasure3d`), awaiting his verdict.
 Showreel 3 (statement cards: number slam, number behind him, versus, drum, quote, wipes) and showreel 4 (the drum on his video,
-a clay-studio number) followed; his verdicts are in `kit/USAGE.md`. The items below are the rest: build ONE at a time (or in a
+a clay-studio number) followed; his verdicts are in `kit/USAGE.md`. Showreel 5 (the three families he named himself after showreel 4: the
+diagram builder and force-time curve, chapter labels, the body map; blocks 41-49) was built the same day (his verdict: good, 47 and the on-video diagram preferred, the body map amazing); showreel 6 then made the diagram fit his own video. The items below are the rest: build ONE at a time (or in a
 showreel round he says "go" to), so each is tested on real footage.
 
-## My picks for the next round (after showreel 4: he loved 39, 40 was good)
+## My picks for the next round (after showreel 5; he had loved 39 and found 40 good)
 1. **A versus poster:** the skewed split (30-31) as the STUDIO behind him, two colours, one word in each half beside his head, him
    sunk and in front. Joins his two favourites (29 and 30-31): the words sit exactly in the free wall beside the head.
 2. **The drum as a footage roll between jump cuts** (the other reading of "32 ... on the video itself"; he loved the overlay reading, so only if he asks): the outgoing and incoming
@@ -24,17 +25,21 @@ showreel round he says "go" to), so each is tested on real footage.
 3. **A poster convenience block** (`K.poster`): studio colour + him sunk + ONE hero (a number, a word echo, a versus pair) in one call,
    since that composition is his favourite.
 4. **Count-up variant of the number slam** (numbers counting while he runs), and a number slam with a unit that flips.
-5. Then the rest of the list below (diagram builder and force-time curve, chapter labels, body map, his own movement with force arrows).
+5. Then the rest of the list below (his own movement with force arrows, a side panel, B-roll). The diagram builder, force-time curve, chapter
+   labels and body map are BUILT (showreel 5, awaiting his verdict). Ideas that came up while building them, only if he likes the families:
+   the curve with a shaded area between the curves; the diagram's nodes as a force-time chain on the court; the body map's muscles lit while the
+   drum or the checklist names the same words; chapter labels that reuse the checklist's rule numbers.
 
 ## Build order
 1. **Distance court:** BUILT as `K.courtMeasure3d` (numbers stand up at each tick as the runner passes, a big answer at
    the end). A count-up variant (numbers counting while he runs) can still be added. Numbers come only from him. Run them
    through `/sc-research` first and keep the source in the reel's folder.
 2. **Step-by-step diagram builder** (A, B, C, D: four nodes at most, each appearing as he says it) and the
-   **force-time / RFD curve** (draw the curve, mark the slope). Flat vector, quick to make.
+   **force-time / RFD curve** (draw the curve, mark the slope). Flat vector, quick to make. **BUILT 2026-10-01 as `K.diagram` (41-43) and `K.curve`
+   (44-45), showreel 5, awaiting his verdict.**
 3. **Chapter labels at the clay wipes** (۰۱ · ۰۲ · ۰۳). Not a persistent bar: the bottom of a Reel is Instagram's own UI
-   (and its progress line) and the top band is his captions.
-4. **Body map highlighter:** reuse the app's traced drawing (`.claude/skills/image/bodymap/bodymap.json`: front and
+   (and its progress line) and the top band is his captions. **BUILT as `K.chapter` (46 card, 47 band), awaiting.**
+4. **Body map highlighter:** **BUILT as `K.bodymap` (48 muscles and the turn, 49 a joints chain), awaiting.** Reuse the app's traced drawing (`.claude/skills/image/bodymap/bodymap.json`: front and
    back, 15 muscles plus lowback, hip, ankle, silhouette, line art). Light the muscles in the order he says them
    (hips, knees, ankles for triple extension). Highlight what he says only: no "this only trains X" claims. It also
    makes the reel and the app one visual system.

@@ -1266,3 +1266,461 @@ body {
   visibility: hidden;
   opacity: 0;
 }
+
+/* ---- stage 3 (showreel 5): diagrams, the force-time curve, chapter labels, the body map ---- */
+.k-gridtex {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 2.4px, transparent 3.2px);
+  background-size: 60px 60px;
+  background-position: 30px 30px;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 52%, #000 28%, transparent 78%);
+  mask-image: radial-gradient(ellipse at 50% 52%, #000 28%, transparent 78%);
+}
+.k-full.k-clay .k-ring {
+  border-color: #fff;
+}
+/* diagram: plates joined by arrows, a pulse runs along each arrow */
+.k-dp {
+  position: absolute;
+  display: flex;
+  direction: rtl;
+  align-items: stretch;
+  background: #c7552f;
+  color: #fff;
+  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.38);
+  visibility: hidden;
+  opacity: 0;
+  z-index: 2;
+}
+.k-ovl .k-dp {
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+}
+.k-dpn {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #16161a;
+  color: #fff;
+  font-weight: 900;
+  line-height: 1;
+}
+.k-dpl {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  font-weight: 900;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.k-dline {
+  position: absolute;
+  background: #faf7f2;
+  box-shadow: 0 0 22px rgba(250, 247, 242, 0.3);
+  visibility: hidden;
+  opacity: 0;
+  z-index: 1;
+}
+.k-ovl .k-dline {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.22);
+}
+.k-dhead {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  background: #faf7f2;
+  clip-path: polygon(12% 6%, 100% 50%, 12% 94%);
+  visibility: hidden;
+  opacity: 0;
+  z-index: 1;
+}
+.k-dpulse {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 8px rgba(224, 107, 67, 0.6), 0 0 38px 12px rgba(224, 107, 67, 0.85);
+  visibility: hidden;
+  opacity: 0;
+  z-index: 3;
+}
+.k-dloop {
+  position: absolute;
+  left: 440px;
+  top: 910px;
+  width: 200px;
+  height: 200px;
+  color: #e06b43;
+  z-index: 2;
+}
+.k-dloop svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 16px rgba(224, 107, 67, 0.6));
+}
+/* the force-time curve */
+.k-csvg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  overflow: visible;
+  pointer-events: none;
+}
+.k-cax {
+  fill: none;
+  stroke: rgba(250, 247, 242, 0.92);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+.k-cgrid {
+  fill: none;
+  stroke: rgba(250, 247, 242, 0.1);
+  stroke-width: 2;
+  opacity: 0;
+}
+.k-cpeak {
+  fill: none;
+  stroke: rgba(250, 247, 242, 0.36);
+  stroke-width: 3;
+  stroke-dasharray: 3 15;
+  stroke-linecap: round;
+  opacity: 0;
+}
+.k-chead {
+  fill: #faf7f2;
+  opacity: 0;
+}
+.k-cv {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.k-cv-paper {
+  stroke: rgba(250, 247, 242, 0.82);
+  stroke-width: 11;
+}
+.k-cv-clay {
+  stroke: #e06b43;
+  stroke-width: 15;
+  filter: drop-shadow(0 0 16px rgba(224, 107, 67, 0.7));
+}
+.k-ctan {
+  fill: none;
+  stroke: #faf7f2;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+.k-cleg {
+  fill: none;
+  stroke: rgba(250, 247, 242, 0.6);
+  stroke-width: 4;
+  stroke-dasharray: 10 12;
+  stroke-linecap: round;
+  opacity: 0;
+}
+.k-cdrop {
+  fill: none;
+  stroke-width: 4;
+  stroke-dasharray: 8 12;
+  stroke-linecap: round;
+  opacity: 0;
+}
+.k-cdrop-clay {
+  stroke: #e06b43;
+}
+.k-cdrop-paper {
+  stroke: rgba(250, 247, 242, 0.8);
+}
+.k-cbar {
+  fill: none;
+  stroke: #e06b43;
+  stroke-width: 18;
+  stroke-linecap: butt;
+  opacity: 0;
+  filter: drop-shadow(0 0 14px rgba(224, 107, 67, 0.7));
+}
+.k-cpt {
+  opacity: 0;
+}
+.k-cpt-clay {
+  fill: #e06b43;
+}
+.k-cpt-paper {
+  fill: #faf7f2;
+}
+.k-cdot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  background: #fff;
+  z-index: 3;
+  visibility: hidden;
+  opacity: 0;
+}
+.k-cdot-clay {
+  box-shadow: 0 0 0 8px rgba(224, 107, 67, 0.6), 0 0 34px 12px rgba(224, 107, 67, 0.85);
+}
+.k-cdot-paper {
+  box-shadow: 0 0 0 7px rgba(250, 247, 242, 0.35), 0 0 26px 8px rgba(250, 247, 242, 0.55);
+}
+.k-clab {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 900;
+  font-size: 60px;
+  line-height: 1.1;
+  direction: rtl;
+  white-space: nowrap;
+}
+.k-caxl {
+  color: rgba(250, 247, 242, 0.9);
+  font-weight: 800;
+}
+.k-clab-paper {
+  color: #faf7f2;
+}
+.k-clab-clay {
+  color: #e06b43;
+}
+.k-full.k-paper .k-cax,
+.k-full.k-paper .k-ctan {
+  stroke: #1a1a1a;
+}
+/* chapter label */
+.k-chn {
+  position: absolute;
+  width: 0.66em;
+  height: 1.12em;
+  overflow: hidden;
+  font-weight: 900;
+  line-height: 1.12em;
+  direction: ltr;
+  color: rgba(255, 255, 255, 0.2);
+}
+.k-full.k-ink .k-chn {
+  color: rgba(224, 107, 67, 0.22);
+}
+.k-full.k-paper .k-chn {
+  color: rgba(199, 85, 47, 0.18);
+}
+.k-chncol {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+.k-chncol i {
+  display: block;
+  height: 1.12em;
+  line-height: 1.12em;
+  text-align: center;
+  font-style: normal;
+}
+.k-chtitle {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  display: flex;
+  justify-content: center;
+  direction: rtl;
+}
+.k-full.k-clay .k-chtitle .k-stamp {
+  background: var(--k-dark);
+}
+.k-chrow {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  direction: rtl;
+}
+.k-chchip {
+  width: 104px;
+  height: 104px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 60px;
+  line-height: 1;
+  border: 6px solid rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.62);
+}
+.k-chchip.k-done {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: transparent;
+  color: #fff;
+}
+.k-chchip.k-here {
+  background: #faf7f2;
+  border-color: transparent;
+  color: #1a1a1a;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+}
+.k-chband {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  height: 340px;
+  z-index: 22;
+  overflow: hidden;
+  clip-path: inset(0 0 0 100%);
+  background: linear-gradient(90deg, #b94a26 0%, #c7552f 40%, #d4623b 100%);
+}
+.k-chbn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 340px;
+  height: 340px;
+  overflow: hidden;
+  background: #16161a;
+  color: #fff;
+  font-weight: 900;
+  font-size: 250px;
+  direction: ltr;
+}
+.k-chbn .k-chncol i {
+  height: 340px;
+  line-height: 340px;
+}
+.k-chbt {
+  position: absolute;
+  right: 380px;
+  left: 30px;
+  top: 0;
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  direction: rtl;
+  font-weight: 900;
+  font-size: 150px;
+  line-height: 1.1;
+  color: #fff;
+  white-space: nowrap;
+}
+.k-chbt span {
+  display: inline-block;
+  margin-left: 0.2em;
+}
+.k-chbp {
+  position: absolute;
+  right: 384px;
+  bottom: 30px;
+  display: flex;
+  gap: 12px;
+  direction: rtl;
+}
+.k-chbp i {
+  display: block;
+  width: 120px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.34);
+}
+.k-chbp i.k-done {
+  background: rgba(255, 255, 255, 0.7);
+}
+.k-chbp i.k-here {
+  background: #fff;
+}
+.k-chbedge {
+  position: absolute;
+  left: 0;
+  width: 6px;
+  height: 340px;
+  background: #fff;
+  z-index: 23;
+  visibility: hidden;
+  opacity: 0;
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.7);
+}
+/* the body map */
+.k-bmwrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+}
+.k-bmstage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  perspective: 2400px;
+  perspective-origin: 50% 50%;
+}
+.k-bmfig {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+.k-bmsvg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  backface-visibility: hidden;
+}
+.k-bmscan {
+  position: absolute;
+  left: 60px;
+  top: 0;
+  width: 960px;
+  height: 10px;
+  margin-top: -5px;
+  background: #fff;
+  box-shadow: 0 0 40px 12px rgba(224, 107, 67, 0.85);
+  visibility: hidden;
+  opacity: 0;
+  z-index: 4;
+}
+.k-bml {
+  position: absolute;
+  font-size: 64px;
+  padding: 6px 28px;
+  line-height: 1.25;
+  z-index: 6;
+}
+.k-bmln {
+  fill: none;
+  stroke: #faf7f2;
+  stroke-width: 5;
+  stroke-linecap: round;
+  opacity: 0;
+}
+.k-bmdot {
+  fill: #faf7f2;
+  opacity: 0;
+}
+.k-bmchain {
+  fill: none;
+  stroke: #e06b43;
+  stroke-width: 9;
+  stroke-linecap: round;
+  opacity: 0;
+  filter: drop-shadow(0 0 12px rgba(224, 107, 67, 0.85));
+}

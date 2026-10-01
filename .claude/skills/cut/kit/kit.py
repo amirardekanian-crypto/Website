@@ -21,7 +21,7 @@ if TOOLS not in sys.path:
     sys.path.insert(0, TOOLS)
 import plan_to_clips as P  # noqa: E402
 
-SFX = {  # the eleven synthesised sounds (kit/sfx), kept well under the voice: he adds music in Instagram afterwards
+SFX = {  # the eleven synthesised sounds (kit/sfx), kept well under the voice: he adds music in Instagram afterwards. The menu's sounds are added below.
     "pop": dict(file="pop.wav", dur=0.25, vol=0.30, track=11),
     "whoosh": dict(file="whoosh.wav", dur=0.75, vol=0.28, track=12),
     "ding": dict(file="ding.wav", dur=0.8, vol=0.40, track=13),
@@ -36,14 +36,29 @@ SFX = {  # the eleven synthesised sounds (kit/sfx), kept well under the voice: h
 }
 
 
+def _menu_sounds():
+    """Every sound in his Motion Menu (menu/menu.json, kind "sound") can be cued by its menu id: file, length, level and track come from the manifest.
+    The eleven names above stay as they are, so old builds still play the same files; an id that is already above (whoosh) keeps the file above."""
+    try:
+        man = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "menu", "menu.json"), encoding="utf-8"))
+    except Exception:
+        return {}
+    return {i["id"]: dict(file=i["file"], dur=i["dur"], vol=i["vol"], track=i["track"])
+            for i in man.get("items", []) if i.get("kind") == "sound" and i.get("file") and i["id"] not in SFX}
+
+
+SFX.update(_menu_sounds())
+
+
 def scaffold(public):
     """Copy the kit's runtime files and assets into a reel's public/ folder. Each reel keeps its own frozen copy."""
     src = {"fonts": os.path.join(KIT, "assets", "fonts"), "img": os.path.join(KIT, "assets", "img"),
-           "vendor": os.path.join(KIT, "assets", "vendor"), "sfx": os.path.join(KIT, "sfx")}
+           "vendor": os.path.join(KIT, "assets", "vendor"), "sfx": os.path.join(KIT, "sfx"),
+           "data": os.path.join(KIT, "assets", "data")}  # data/bodymap.js: the app's traced body, for K.bodymap
     for sub, d in src.items():
         os.makedirs(os.path.join(public, sub), exist_ok=True)
         for f in os.listdir(d):
-            if f.endswith((".woff2", ".jpg", ".webp", ".js", ".wav")):
+            if f.endswith((".woff2", ".jpg", ".webp", ".js", ".wav", ".mp3")):
                 shutil.copy2(os.path.join(d, f), os.path.join(public, sub, f))
     for f in ("kit.css", "kit.js"):
         shutil.copy2(os.path.join(KIT, f), os.path.join(public, f))

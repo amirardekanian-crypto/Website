@@ -45,8 +45,21 @@ if os.path.isdir(DST):
             full = os.path.join(root, f)
             have[os.path.relpath(full, DST)] = full
 
+TEXT = (".md", ".py", ".js", ".css", ".html", ".sh", ".ps1", ".txt", ".json")
+
+
+def same(a, b):
+    """Equal bytes, or equal text once line endings are ignored (git on Windows turns the repo copy into CRLF; the source is LF)."""
+    if filecmp.cmp(a, b, shallow=False):
+        return True
+    if a.lower().endswith(TEXT):
+        crlf, lf = b"\r\n", b"\n"
+        return open(a, "rb").read().replace(crlf, lf) == open(b, "rb").read().replace(crlf, lf)
+    return False
+
+
 new = [r for r in want if r not in have]
-changed = [r for r in want if r in have and not filecmp.cmp(want[r], have[r], shallow=False)]
+changed = [r for r in want if r in have and not same(want[r], have[r])]
 gone = [r for r in have if r not in want]
 print("to add: %d, to update: %d, to remove: %d, unchanged: %d" % (len(new), len(changed), len(gone), len(want) - len(new) - len(changed)))
 if DRY:
