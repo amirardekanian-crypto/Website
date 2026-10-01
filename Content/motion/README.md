@@ -84,12 +84,14 @@ It gets the next free number. **A clip that looks wrong:** change the piece or i
 
 ## What the build found in the reel
 
-Two bugs in the delivered video's soundtrack turned up while the sounds were being made, and are fixed:
+The first draft of the soundtrack (commit `41cb247`) had two bugs, and the finished video (`f414e57`) already has both fixed:
 
 1. The seven plate-cut sounds in the rhythm shot never played (a cue prop named `kind` replaced the cue's own kind).
 2. The final Dm chord pad was never added to the mix (its line sat inside a comment). The finale was three bells.
 
-Rebuilding the reel from pieces found two more: a transition could leave stale pixels where it left a gap (so a frame could depend on which frames a worker had drawn before it; now every frame is a pure function of its number),
+On 2026-10-01 the video's own audio was compared with the soundtrack the tools make today, window by window (the plate cuts and the finale included): they match, so the delivered video has the cut sounds and the chord and nothing needs re-making.
+
+Rebuilding the reel from pieces found two things in the picture side, both fixed: a transition could leave stale pixels where it left a gap (so a frame could depend on which frames a worker had drawn before it; now every frame is a pure function of its number),
 and the live preview could ask for a frame before frame zero and stop playing.
 
 Ideas Amir sent for later videos (S&C graphics, animated anatomy, numbers on a court, a colour language, chapters, sound), with Claude's verdict, what was built and what is still open: [`INGREDIENTS.md`](INGREDIENTS.md).
