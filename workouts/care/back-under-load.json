@@ -150,6 +150,7 @@
     {
       "title": "Load It",
       "icon": "💪",
+      "rest": 45,
       "exercises": [
         {
           "type": "standard",
@@ -170,8 +171,7 @@
             "reps": 8,
             "side": true,
             "rpe": 7,
-            "tempo": "3-0-1-0",
-            "rest": 45
+            "tempo": "3-0-1-0"
           }
         },
         {
@@ -192,7 +192,6 @@
             "reps": 10,
             "side": true,
             "rpe": 7,
-            "rest": 45,
             "tempo": "1-0-1-2"
           }
         },
@@ -213,8 +212,7 @@
             "sets": 3,
             "distance": "30 m",
             "side": true,
-            "rpe": 7,
-            "rest": 45
+            "rpe": 7
           }
         }
       ]

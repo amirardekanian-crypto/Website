@@ -178,6 +178,7 @@
     {
       "title": "Land It",
       "icon": "🪂",
+      "rest": 45,
       "exercises": [
         {
           "type": "standard",
@@ -194,8 +195,7 @@
           },
           "rx": {
             "sets": 3,
-            "reps": 5,
-            "rest": 45
+            "reps": 5
           }
         },
         {
@@ -214,8 +214,7 @@
           "rx": {
             "sets": 2,
             "reps": 3,
-            "side": true,
-            "rest": 45
+            "side": true
           }
         }
       ]
@@ -270,6 +269,7 @@
     {
       "title": "Springs",
       "icon": "⚡",
+      "rest": 45,
       "exercises": [
         {
           "type": "standard",
@@ -286,8 +286,7 @@
           },
           "rx": {
             "sets": 3,
-            "reps": 10,
-            "rest": 45
+            "reps": 10
           },
           "intent": "fast turnover"
         },
@@ -306,8 +305,7 @@
           },
           "rx": {
             "sets": 2,
-            "reps": 10,
-            "rest": 45
+            "reps": 10
           },
           "intent": "fast turnover"
         }

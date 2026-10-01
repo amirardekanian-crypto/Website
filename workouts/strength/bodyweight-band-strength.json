@@ -140,6 +140,7 @@
     {
       "title": "Primary",
       "icon": "🎯",
+      "rest": 90,
       "exercises": [
         {
           "type": "standard",
@@ -159,7 +160,6 @@
             "sets": 3,
             "reps": 8,
             "side": true,
-            "rest": 90,
             "rpe": "7-8",
             "tempo": "3-0-1-0"
           }
@@ -182,7 +182,6 @@
             "sets": 3,
             "reps": 8,
             "side": true,
-            "rest": 90,
             "rpe": 7,
             "tempo": "3-0-1-0"
           }

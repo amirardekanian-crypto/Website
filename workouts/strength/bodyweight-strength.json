@@ -173,6 +173,7 @@
     {
       "title": "Accessory",
       "icon": "💪",
+      "rest": 60,
       "exercises": [
         {
           "type": "standard",
@@ -190,8 +191,7 @@
           "note": "Hands on a step or a wall if you cannot hold the line for all eight.",
           "rx": {
             "sets": 3,
-            "reps": 8,
-            "rest": 60
+            "reps": 8
           }
         },
         {
@@ -209,8 +209,7 @@
           },
           "rx": {
             "sets": 3,
-            "reps": "8 each shape",
-            "rest": 60
+            "reps": "8 each shape"
           }
         }
       ]

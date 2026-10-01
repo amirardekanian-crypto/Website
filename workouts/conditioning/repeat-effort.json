@@ -156,6 +156,7 @@
     {
       "title": "Games & Changeovers",
       "icon": "🫀",
+      "rest": 25,
       "exercises": [
         {
           "type": "standard",
@@ -174,8 +175,7 @@
           "rx": {
             "sets": 6,
             "distance": "20 m",
-            "rpe": 9,
-            "rest": 25
+            "rpe": 9
           },
           "intent": "max speed"
         },
@@ -196,8 +196,7 @@
           "rx": {
             "sets": 6,
             "distance": "20 m",
-            "rpe": 9,
-            "rest": 25
+            "rpe": 9
           },
           "intent": "max speed"
         },
@@ -218,8 +217,7 @@
           "rx": {
             "sets": 6,
             "distance": "20 m",
-            "rpe": 9,
-            "rest": 25
+            "rpe": 9
           },
           "intent": "max speed"
         },
@@ -240,8 +238,7 @@
           "rx": {
             "sets": 6,
             "distance": "20 m",
-            "rpe": 9,
-            "rest": 25
+            "rpe": 9
           },
           "intent": "max speed"
         }

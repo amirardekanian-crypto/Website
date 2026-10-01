@@ -173,6 +173,7 @@
     {
       "title": "Load It",
       "icon": "💪",
+      "rest": 45,
       "exercises": [
         {
           "type": "standard",
@@ -192,7 +193,6 @@
             "sets": 3,
             "reps": 12,
             "rpe": 7,
-            "rest": 45,
             "tempo": "3-0-1-0"
           }
         },
@@ -214,7 +214,6 @@
             "sets": 3,
             "reps": 10,
             "rpe": 6,
-            "rest": 45,
             "tempo": "1-0-1-2"
           }
         },
@@ -234,8 +233,7 @@
           "rx": {
             "sets": 3,
             "reps": 12,
-            "rpe": 7,
-            "rest": 45
+            "rpe": 7
           }
         }
       ]

@@ -162,6 +162,7 @@
     {
       "title": "First Step",
       "icon": "🎾",
+      "rest": 75,
       "exercises": [
         {
           "type": "standard",
@@ -200,8 +201,7 @@
           },
           "rx": {
             "sets": 4,
-            "distance": "6 m",
-            "rest": 75
+            "distance": "6 m"
           },
           "intent": "max speed",
           "note": "Alternate sides."
@@ -222,8 +222,7 @@
           },
           "rx": {
             "sets": 4,
-            "distance": "6 m",
-            "rest": 75
+            "distance": "6 m"
           },
           "intent": "max speed",
           "note": "Alternate sides."

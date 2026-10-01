@@ -149,6 +149,7 @@
     {
       "title": "Build the Brace",
       "icon": "🧱",
+      "rest": 30,
       "exercises": [
         {
           "type": "standard",
@@ -167,7 +168,6 @@
           "rx": {
             "sets": 3,
             "reps": "6 / 4 / 2",
-            "rest": 30,
             "tempo": "1-0-1-10"
           }
         },
@@ -189,7 +189,6 @@
             "sets": 3,
             "reps": "6 / 4 / 2",
             "side": true,
-            "rest": 30,
             "tempo": "1-0-1-10"
           }
         },
@@ -211,7 +210,6 @@
             "sets": 3,
             "reps": "6 / 4 / 2",
             "side": true,
-            "rest": 30,
             "tempo": "1-0-1-10"
           }
         }
