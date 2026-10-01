@@ -782,6 +782,11 @@ rest deliberately draws **no** per-card cell, because eight cards each repeating
 is the same fact eight times. Use it whenever a section shares one rest, and put `rx.rest`
 only on the exercises that genuinely differ.
 
+A Library session reads it too (since 2026-10-01: `openWorkout()` in `program.html`, the same header and
+the same timers as the training day). Write it only when every `standard` exercise and circuit in the
+section has a rest of its own and one value is shared by most of them: a card with no rest would
+inherit the block's, and a rest nobody prescribed is the thing `rx.rest` never invents.
+
 ### Circuits carry `rx` too
 
 ```json

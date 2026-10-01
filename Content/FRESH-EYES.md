@@ -220,8 +220,8 @@ the working card folds How to do it if Amir wants that too.
 - Once per clone: `git config core.hooksPath .githooks`.
 - Use the branch the session names. After each merged PR, restart it from main:
   `git fetch origin main && git checkout -B <branch> origin/main`.
-- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v93` on
-  2026-09-27) whenever a cached app file changes, log the version in its comment list, and change the
+- Read `PROGRAM-APP.md` or `HABITS.md` before touching an app. Bump `CACHE` in `sw.js` (`aap-v94` on
+  2026-10-01) whenever a cached app file changes, log the version in its comment list, and change the
   name in CLAUDE.md too.
 - Test in a headless browser before every PR (below): the harness is in the repo, the checks you write
   for one item stay in the session's scratchpad.

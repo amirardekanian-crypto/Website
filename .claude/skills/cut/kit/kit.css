@@ -1,0 +1,1268 @@
+/* The reel kit: styles. A "mood" is just a different set of these variables (Stamp is the default mood).
+   Everything is 1080x1920. Farsi rules are built in: RTL where text is, no letter-spacing, no per-letter effects. */
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("fonts/Vazirmatn-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: block;
+}
+:root {
+  --k-accent: #c7552f; /* clay: look here */
+  --k-accent2: #e06b43; /* clay on dark */
+  --k-paper: #faf7f2;
+  --k-ink: #1a1a1a;
+  --k-dark: #16161a;
+  --k-green: #1f7a4d; /* the solution, or done */
+  --k-bad: #c0392b; /* a mistake (rare) */
+  --k-shadow: 12px 12px 0 rgba(0, 0, 0, 0.38);
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  background: #000;
+  font-family: "Vazirmatn", sans-serif;
+}
+#stage {
+  position: relative;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+}
+.k-hid {
+  visibility: hidden;
+  opacity: 0;
+}
+.k-vig {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 46%, rgba(0, 0, 0, 0) 52%, rgba(0, 0, 0, 0.3) 100%);
+}
+
+/* ---- stamp tags ---- */
+.k-layer {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  direction: rtl;
+  gap: 16px;
+}
+.k-stamp {
+  background: var(--k-accent);
+  color: #fff;
+  font-weight: 900;
+  line-height: 1.22;
+  padding: 10px 40px;
+  box-shadow: var(--k-shadow);
+  display: inline-block;
+  white-space: nowrap;
+  direction: rtl;
+  text-align: center;
+}
+.k-stamp.k-big {
+  font-size: 100px;
+}
+.k-stamp.k-chip {
+  font-size: 68px;
+}
+.k-stamp.k-huge {
+  font-size: 176px;
+  padding: 4px 64px;
+}
+.k-stamp.k-mega {
+  font-size: 236px;
+  padding: 2px 84px;
+}
+.k-stamp.k-sm {
+  font-size: 80px;
+  padding: 8px 34px;
+}
+.k-stamp.k-paper {
+  background: var(--k-paper);
+  color: var(--k-ink);
+  box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.3);
+}
+.k-stamp.k-ink {
+  background: var(--k-dark);
+  color: #fff;
+}
+.k-stamp.k-green {
+  background: var(--k-green);
+}
+.k-stamp.k-bad {
+  background: var(--k-bad);
+}
+.k-ghost {
+  position: absolute;
+  z-index: 9;
+  font-weight: 900;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.22);
+  direction: ltr;
+}
+.k-ring {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 8px solid var(--k-accent2);
+  z-index: 10;
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* ---- option chips ---- */
+.k-chips {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  z-index: 10;
+  direction: rtl;
+}
+.k-chips.k-grid2 {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 24px;
+  justify-content: center;
+}
+.k-chips.k-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* ---- the checklist ---- */
+.k-list {
+  position: absolute;
+  left: 70px;
+  width: 940px;
+  z-index: 10;
+  direction: rtl;
+}
+.k-item {
+  display: flex;
+  height: 108px;
+  margin-bottom: 18px;
+  background: var(--k-paper);
+  box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.32);
+}
+.k-item .k-num {
+  width: 108px;
+  background: var(--k-accent);
+  color: #fff;
+  font-size: 76px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.k-item .k-lab {
+  flex: 1;
+  color: var(--k-ink);
+  font-size: 50px;
+  font-weight: 800;
+  padding: 0 30px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.k-item .k-lab span {
+  display: block;
+  white-space: nowrap;
+}
+.k-item .k-chk {
+  width: 108px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.k-item .k-chk svg {
+  width: 76px;
+  height: 76px;
+  overflow: visible;
+}
+.k-list.k-dark .k-item {
+  background: var(--k-dark);
+  box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.45);
+}
+.k-list.k-dark .k-lab {
+  color: #fff;
+}
+.k-list.k-dark .k-ringc {
+  stroke: #fff;
+  stroke-opacity: 0.4;
+}
+.k-ringc {
+  fill: none;
+  stroke: #1a1a1a;
+  stroke-opacity: 0.3;
+  stroke-width: 4;
+}
+.k-fill {
+  fill: var(--k-green);
+}
+.k-tick {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 5.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+}
+
+/* ---- full-screen layers: cards and cutaways ---- */
+.k-full {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  z-index: 20;
+  overflow: hidden;
+  clip-path: inset(0 0 0 100%);
+}
+.k-full.k-ink {
+  background: radial-gradient(circle at 50% 46%, #26262c 0%, #101013 62%, #0a0a0c 100%);
+}
+.k-full.k-clay {
+  background: radial-gradient(circle at 50% 46%, #d4623b 0%, var(--k-accent) 60%, #a8431f 100%);
+}
+.k-qglow {
+  position: absolute;
+  left: 140px;
+  top: 640px;
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(199, 85, 47, 0.55) 0%, rgba(199, 85, 47, 0) 68%);
+}
+.k-full.k-clay .k-qglow {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 68%);
+}
+.k-qline {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  text-align: center;
+  direction: rtl;
+  color: #fff;
+  font-weight: 900;
+  font-size: 124px;
+  line-height: 1.2;
+}
+.k-qem {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  display: flex;
+  justify-content: center;
+}
+.k-qem .k-stamp {
+  font-size: 214px;
+  padding: 4px 70px;
+}
+.k-full.k-clay .k-qem .k-stamp {
+  background: var(--k-dark);
+}
+.k-qring {
+  position: absolute;
+  left: 340px;
+  top: 780px;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  border: 10px solid var(--k-accent2);
+}
+.k-full.k-clay .k-qring {
+  border-color: #fff;
+}
+.k-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  object-fit: cover;
+  transform-origin: 50% 55%;
+}
+.k-scrim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  background: linear-gradient(to bottom, rgba(10, 10, 10, 0.3), rgba(10, 10, 10, 0.88));
+}
+.k-ctext {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  text-align: center;
+  direction: rtl;
+  color: #fff;
+  font-weight: 900;
+  font-size: 196px;
+  line-height: 1.15;
+}
+.k-cstamp {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  display: flex;
+  justify-content: center;
+}
+.k-ball {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 190px;
+  height: 190px;
+  visibility: hidden;
+  opacity: 0;
+}
+.k-mk {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 7px rgba(199, 85, 47, 0.75);
+  visibility: hidden;
+  opacity: 0;
+}
+.k-run {
+  position: absolute;
+  left: 110px;
+  top: 1660px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--k-accent2);
+  box-shadow: 0 0 0 9px rgba(255, 255, 255, 0.92);
+  visibility: hidden;
+  opacity: 0;
+}
+.k-dist {
+  position: absolute;
+  left: 130px;
+  top: 1290px;
+  width: 820px;
+  height: 10px;
+  background: #fff;
+  transform-origin: 100% 50%;
+  visibility: hidden;
+  opacity: 0;
+}
+.k-cap {
+  position: absolute;
+  top: 1262px;
+  width: 10px;
+  height: 66px;
+  background: #fff;
+  visibility: hidden;
+  opacity: 0;
+}
+.k-streak {
+  position: absolute;
+  left: 300px;
+  top: 1050px;
+  width: 560px;
+  height: 12px;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
+  transform-origin: 100% 50%;
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* ---- the word behind him (lives inside a footage wrapper, so it shares the zoom) ---- */
+.inner .k-dim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  background: #000;
+  opacity: 0;
+  z-index: 2;
+}
+.inner .k-deep {
+  position: absolute;
+  left: 0;
+  top: 440px;
+  width: 1080px;
+  text-align: center;
+  direction: rtl;
+  font-weight: 900;
+  font-size: 270px;
+  line-height: 1;
+  color: var(--k-accent2);
+  text-shadow: 0 0 90px rgba(224, 107, 67, 0.55);
+  z-index: 3;
+  visibility: hidden;
+  opacity: 0;
+}
+.inner .k-deep.k-paper {
+  color: var(--k-paper);
+  text-shadow: 0 0 90px rgba(250, 247, 242, 0.35);
+}
+.inner video.k-cut {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  object-fit: cover;
+  z-index: 4;
+  opacity: 0;
+}
+
+/* ---- call to action ---- */
+.k-bubble {
+  position: relative;
+  background: var(--k-accent);
+  color: #fff;
+  font-weight: 900;
+  font-size: 200px;
+  line-height: 1.15;
+  padding: 10px 90px 20px;
+  border-radius: 74px;
+  box-shadow: var(--k-shadow);
+  white-space: nowrap;
+  direction: rtl;
+}
+.k-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -40px;
+  right: 110px;
+  width: 70px;
+  height: 70px;
+  background: var(--k-accent);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+/* ---- transitions ---- */
+.k-bar {
+  position: absolute;
+  left: 1080px;
+  top: 0;
+  width: 36px;
+  height: 1920px;
+  background: var(--k-accent);
+  z-index: 35;
+  visibility: hidden;
+}
+.k-flash {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  background: #fff;
+  z-index: 40;
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* ---- the depth family: layers that live INSIDE a footage wrapper, between the wall and him ----
+   z-order inside a wrapper: footage < backdrop, dim (2) < words, rows, halo, disc, sweep (3) < the cut-out video (4) < floor fade (5)
+   His framing at zoom 1.0: free wall from y 470 (his captions own 230-470), head about y 610-900, shoulders from y 930. */
+.inner .k-backdrop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+}
+.inner .k-bd-clay {
+  background: radial-gradient(circle at 50% 42%, #d4623b 0%, #c7552f 55%, #8f3a1a 100%);
+}
+.inner .k-bd-ink {
+  background: radial-gradient(circle at 50% 42%, #2c2c34 0%, #131317 62%, #08080a 100%);
+}
+.inner .k-bd-green {
+  background: radial-gradient(circle at 50% 42%, #156a4d 0%, #0e4a36 58%, #082b20 100%);
+}
+.inner .k-bd-paper {
+  background: radial-gradient(circle at 50% 42%, #ffffff 0%, #faf7f2 55%, #e4dccf 100%);
+}
+/* in front of him: hides the slanted cut where the cut-out ends at the table, and sits him in the studio */
+.inner .k-floorfade {
+  position: absolute;
+  left: 0;
+  top: 1560px;
+  width: 1080px;
+  height: 360px;
+  z-index: 5;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.inner .k-ff-clay {
+  background: linear-gradient(to bottom, rgba(143, 58, 26, 0), rgba(143, 58, 26, 0.9) 70%, #8f3a1a);
+}
+.inner .k-ff-ink {
+  background: linear-gradient(to bottom, rgba(8, 8, 10, 0), rgba(8, 8, 10, 0.9) 70%, #08080a);
+}
+.inner .k-ff-green {
+  background: linear-gradient(to bottom, rgba(8, 43, 32, 0), rgba(8, 43, 32, 0.9) 70%, #082b20);
+}
+.inner .k-ff-paper {
+  background: linear-gradient(to bottom, rgba(228, 220, 207, 0), rgba(228, 220, 207, 0.9) 70%, #e4dccf);
+}
+.inner .k-deep.k-ink {
+  color: var(--k-dark);
+  text-shadow: none;
+}
+.inner .k-deep.k-green {
+  color: var(--k-green);
+  text-shadow: 0 0 80px rgba(31, 122, 77, 0.45);
+}
+.inner .k-deep.k-outline,
+.inner .k-deep.k-outline-clay {
+  color: #fff;
+  text-shadow: none;
+}
+.inner .k-deep.k-outline span,
+.inner .k-deep.k-outline-clay span,
+.inner .k-dri b.k-outline {
+  display: inline-block;
+}
+/* the SVG filters are made by K.init: a clean ring around the letters (cursive joins stay clean) */
+.inner .k-deep.k-outline span {
+  filter: url(#k-ol5);
+}
+.inner .k-deep.k-outline-clay span {
+  filter: url(#k-oc5);
+}
+.inner .k-dri b.k-outline {
+  filter: url(#k-ol3);
+  color: #fff;
+}
+.inner .k-dri b.k-outline.k-oc {
+  filter: url(#k-oc3);
+}
+.inner .k-deep.k-ghostfill {
+  color: rgba(250, 247, 242, 0.11);
+  text-shadow: none;
+}
+/* drifting rows */
+.inner .k-drow {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  display: flex;
+  justify-content: center;
+  z-index: 3;
+  direction: rtl;
+  white-space: nowrap;
+  font-weight: 900;
+  line-height: 1;
+  visibility: hidden;
+  opacity: 0;
+}
+.inner .k-dri {
+  display: flex;
+  flex: none;
+}
+.inner .k-dri b {
+  display: block;
+  flex: none;
+  font-weight: 900;
+  margin: 0 0.3em;
+}
+.inner .k-dri b.k-clay {
+  color: var(--k-accent2);
+  text-shadow: 0 0 60px rgba(224, 107, 67, 0.4);
+}
+.inner .k-dri b.k-paper {
+  color: var(--k-paper);
+}
+.inner .k-dri b.k-ink {
+  color: var(--k-dark);
+}
+.inner .k-dri b.k-ghostfill {
+  color: rgba(250, 247, 242, 0.12); /* tone on tone: a texture, not a message */
+}
+/* halo, disc, ring behind his head, and the light sweep */
+.inner .k-halo,
+.inner .k-disc {
+  position: absolute;
+  border-radius: 50%;
+  z-index: 3;
+  visibility: hidden;
+  opacity: 0;
+}
+.inner .k-halo.k-t-clay {
+  background: radial-gradient(circle, rgba(224, 107, 67, 0.92) 0%, rgba(199, 85, 47, 0.5) 38%, rgba(199, 85, 47, 0) 70%);
+}
+.inner .k-halo.k-t-paper {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(250, 247, 242, 0.45) 38%, rgba(250, 247, 242, 0) 70%);
+}
+.inner .k-halo.k-t-green {
+  background: radial-gradient(circle, rgba(31, 122, 77, 0.9) 0%, rgba(14, 74, 54, 0.5) 38%, rgba(14, 74, 54, 0) 70%);
+}
+.inner .k-disc.k-t-clay {
+  background: radial-gradient(circle at 50% 36%, #e06b43 0%, #c7552f 60%, #a8431f 100%);
+}
+.inner .k-disc.k-t-paper {
+  background: radial-gradient(circle at 50% 36%, #ffffff 0%, #faf7f2 60%, #e4dccf 100%);
+}
+.inner .k-disc.k-t-ink {
+  background: radial-gradient(circle at 50% 36%, #2e2e36 0%, #16161a 70%, #0b0b0d 100%);
+}
+.inner .k-disc.k-t-green {
+  background: radial-gradient(circle at 50% 36%, #1f7a4d 0%, #0e4a36 70%, #082b20 100%);
+}
+.inner .k-disc.k-ring {
+  background: transparent;
+  border: 12px solid;
+}
+.inner .k-disc.k-ring.k-t-clay {
+  border-color: #e06b43;
+}
+.inner .k-disc.k-ring.k-t-paper {
+  border-color: #faf7f2;
+}
+.inner .k-disc.k-ring.k-t-green {
+  border-color: #1f7a4d;
+}
+.inner .k-disc.k-ring.k-t-ink {
+  border-color: #16161a;
+}
+.inner .k-sweep {
+  position: absolute;
+  left: 0;
+  top: -260px;
+  width: 460px;
+  height: 2440px;
+  z-index: 3;
+  visibility: hidden;
+  opacity: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0));
+}
+.inner .k-sweep.k-t-clay {
+  background: linear-gradient(90deg, rgba(224, 107, 67, 0), rgba(224, 107, 67, 0.65), rgba(224, 107, 67, 0));
+}
+
+/* ---- the broadcast court: a clean court in perspective (plane coordinates: 100 px = 1 m, plane 1240 x 2600) ---- */
+.k-full.k-c3d {
+  background: radial-gradient(ellipse at 50% 62%, rgba(199, 85, 47, 0.34) 0%, rgba(199, 85, 47, 0) 60%),
+    linear-gradient(#07070a 0%, #110a0b 40%, #1c0e09 100%);
+}
+.k-stage3d {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  perspective: 1100px;
+  perspective-origin: 50% 30%;
+}
+.k-plane {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1240px;
+  height: 2600px;
+  margin-left: -620px;
+  transform-origin: 50% 100%;
+  transform-style: preserve-3d;
+}
+.k-floor {
+  position: absolute;
+  left: -700px;
+  top: -1400px;
+  width: 2640px;
+  height: 4200px;
+  background: #1f100a;
+}
+.k-inc {
+  position: absolute;
+  background: linear-gradient(to bottom, #6e2f16 0%, #a2421f 42%, #cf5a31 100%);
+}
+.k-rake {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 0 5px, rgba(0, 0, 0, 0.05) 5px 12px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0) 14%, rgba(0, 0, 0, 0) 86%, rgba(0, 0, 0, 0.16));
+}
+.k-cl {
+  position: absolute;
+  background: #fff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+  visibility: hidden;
+  opacity: 0;
+}
+.k-scan {
+  position: absolute;
+  height: 8px;
+  margin-top: -4px;
+  background: #fff;
+  box-shadow: 0 0 40px 10px rgba(255, 205, 180, 0.8);
+  visibility: hidden;
+  opacity: 0;
+}
+.k-net3 {
+  position: absolute;
+  left: -20px;
+  top: 0;
+  width: 1280px;
+  height: 107px;
+  margin-top: -107px;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0 2px, rgba(255, 255, 255, 0) 2px 13px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.4) 0 2px, rgba(255, 255, 255, 0.04) 2px 13px);
+  border-top: 9px solid #fff;
+  box-shadow: 0 -4px 26px rgba(255, 255, 255, 0.45);
+  visibility: hidden;
+  opacity: 0;
+}
+.k-fog {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  background: linear-gradient(to bottom, #07070a 0%, rgba(7, 7, 10, 0.88) 16%, rgba(7, 7, 10, 0) 44%);
+  pointer-events: none;
+}
+.k-b3 {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 150px;
+  height: 150px;
+  margin: -150px 0 0 -75px;
+  visibility: hidden;
+  opacity: 0;
+}
+.k-b3 img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.55));
+}
+.k-sh {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 150px;
+  height: 80px;
+  margin: -40px 0 0 -75px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0) 70%);
+  visibility: hidden;
+  opacity: 0;
+}
+.k-run3,
+.k-gh3 {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 130px;
+  height: 260px;
+  margin: -260px 0 0 -65px;
+  visibility: hidden;
+  opacity: 0;
+}
+.k-run3 svg,
+.k-gh3 svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 0 14px rgba(255, 196, 165, 0.9));
+}
+.k-ring3 {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border-radius: 50%;
+  border: 6px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 30px rgba(255, 190, 160, 0.8), inset 0 0 30px rgba(255, 190, 160, 0.5);
+  visibility: hidden;
+  opacity: 0;
+}
+.k-fp {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 34px;
+  height: 66px;
+  margin: -33px 0 0 -17px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 24px rgba(255, 255, 255, 0.8);
+  visibility: hidden;
+  opacity: 0;
+}
+.k-rip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border-radius: 50%;
+  border: 6px solid rgba(255, 255, 255, 0.9);
+  visibility: hidden;
+  opacity: 0;
+}
+.k-path {
+  position: absolute;
+  left: -7px;
+  top: 0;
+  width: 14px;
+  background: linear-gradient(to bottom, rgba(255, 215, 195, 0.95), rgba(224, 107, 67, 0.55));
+  box-shadow: 0 0 26px rgba(255, 190, 160, 0.85);
+  transform-origin: 50% 0%;
+  visibility: hidden;
+  opacity: 0;
+}
+.k-tk {
+  position: absolute;
+  height: 9px;
+  background: #fff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.75);
+  visibility: hidden;
+  opacity: 0;
+}
+.k-num3 {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 280px;
+  height: 250px;
+  margin: -250px 0 0 -140px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  visibility: hidden;
+  opacity: 0;
+}
+.k-nm {
+  text-align: center;
+  font-weight: 900;
+  font-size: 150px;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 6px 40px rgba(0, 0, 0, 0.6);
+  direction: ltr;
+  white-space: nowrap;
+}
+.k-nm small {
+  display: block;
+  font-size: 54px;
+  color: var(--k-accent2);
+  font-weight: 800;
+  margin-top: 4px;
+  direction: rtl;
+}
+.k-num3.k-big {
+  width: 420px;
+  height: 330px;
+  margin: -330px 0 0 -210px;
+}
+.k-num3.k-big .k-nm {
+  font-size: 230px;
+}
+.k-num3.k-big .k-nm small {
+  font-size: 76px;
+}
+.k-num3.k-sm {
+  width: 200px;
+  height: 150px;
+  margin: -150px 0 0 -100px;
+}
+.k-num3.k-sm .k-nm {
+  font-size: 96px;
+}
+
+
+/* ---- the statement cards ---- */
+.k-full {
+  --p: 0;
+}
+.k-full.k-paper {
+  background: radial-gradient(circle at 50% 46%, #ffffff 0%, #faf7f2 58%, #e8e0d3 100%);
+}
+.k-nstage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+}
+/* number slam */
+.k-num {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  direction: ltr;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+  filter: drop-shadow(0.022em 0.022em 0 rgba(0, 0, 0, 0.26));
+}
+.k-full.k-ink .k-num {
+  color: var(--k-accent2);
+}
+.k-full.k-paper .k-num {
+  color: var(--k-ink);
+}
+.k-full .k-num.k-necho {
+  filter: none;
+  color: transparent;
+  -webkit-text-stroke: 6px var(--ec, rgba(255, 255, 255, 0.8));
+}
+.k-full .k-num.k-necho .k-ndot {
+  background: transparent;
+  border: 5px solid var(--ec, rgba(255, 255, 255, 0.8));
+}
+.k-full.k-ink {
+  --ec: rgba(224, 107, 67, 0.85);
+}
+.k-full.k-paper {
+  --ec: rgba(199, 85, 47, 0.8);
+}
+.k-reel {
+  position: relative;
+  width: 0.66em;
+  height: 1.12em;
+  overflow: hidden;
+}
+.k-rcol {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+.k-rcol i {
+  display: block;
+  height: 1.12em;
+  line-height: 1.12em;
+  font-style: normal;
+  text-align: center;
+}
+.k-nsep {
+  align-self: flex-end;
+  font-size: 0.5em;
+  line-height: 1;
+  padding: 0 0.06em 0.22em;
+}
+.k-ndot {
+  align-self: flex-end;
+  flex: none;
+  width: 0.15em;
+  height: 0.15em;
+  margin: 0 0.07em 0.2em;
+  background: currentColor;
+}
+.k-npre {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  text-align: center;
+  direction: rtl;
+  font-weight: 900;
+  font-size: 100px;
+  line-height: 1.1;
+  color: #fff;
+}
+.k-full.k-ink .k-npre {
+  color: var(--k-paper);
+}
+.k-full.k-paper .k-npre {
+  color: var(--k-ink);
+}
+.k-nunit {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  display: flex;
+  justify-content: center;
+  direction: rtl;
+}
+.k-full.k-clay .k-nunit .k-stamp {
+  background: var(--k-dark);
+}
+.inner .k-num.k-numd {
+  filter: none;
+  z-index: 3;
+  color: var(--k-paper);
+}
+.inner .k-num.k-numd.k-numc {
+  color: var(--k-accent2);
+}
+.inner .k-dring {
+  position: absolute;
+  left: 290px;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  border: 10px solid var(--k-paper);
+  z-index: 3;
+  visibility: hidden;
+  opacity: 0;
+}
+/* versus */
+.k-vp {
+  position: absolute;
+  top: -140px;
+  height: 2200px;
+  width: 1400px;
+  overflow: hidden;
+}
+.k-vpa {
+  left: 0;
+  transform-origin: 0 50%;
+}
+.k-vpb {
+  left: -1400px;
+  transform-origin: 100% 50%;
+}
+.k-vc-clay {
+  background: #c7552f;
+  color: #fff;
+}
+.k-vc-ink2 {
+  background: #1f1f25;
+  color: #faf7f2;
+}
+.k-vc-paper {
+  background: #faf7f2;
+  color: #1a1a1a;
+}
+.k-vc-green {
+  background: #0e4a36;
+  color: #fff;
+}
+.k-vin {
+  position: absolute;
+  top: 1200px;
+  width: 520px;
+  text-align: center;
+  direction: rtl;
+}
+.k-vw {
+  position: relative;
+  display: inline-block;
+  font-weight: 900;
+  font-size: 150px;
+  line-height: 1.15;
+}
+.k-vs {
+  font-weight: 700;
+  font-size: 50px;
+  line-height: 1.3;
+  margin-top: 16px;
+}
+.k-strike {
+  position: absolute;
+  right: -5%;
+  top: 56%;
+  width: 110%;
+  height: 13px;
+  background: #c0392b;
+  transform-origin: 100% 50%;
+}
+.k-vtick {
+  position: absolute;
+  left: 170px;
+  top: -190px;
+  width: 180px;
+  height: 180px;
+  visibility: hidden;
+  opacity: 0;
+}
+.k-vseam {
+  position: absolute;
+  left: 537px;
+  top: -140px;
+  width: 6px;
+  height: 2200px;
+  background: #fff;
+  box-shadow: 0 0 34px rgba(255, 255, 255, 0.85);
+  visibility: hidden;
+  opacity: 0;
+}
+/* the drum */
+.k-dstage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  perspective: 1500px;
+  perspective-origin: 50% 47%;
+}
+.k-drum {
+  position: absolute;
+  left: 540px;
+  top: 900px;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+.k-pv {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+.k-it {
+  position: absolute;
+  left: -450px;
+  top: -95px;
+  width: 900px;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  direction: rtl;
+  background: #24242b;
+  color: #e9e4da;
+  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.35);
+  backface-visibility: hidden;
+}
+.k-itn {
+  flex: none;
+  width: 190px;
+  height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #33333c;
+  color: #fff;
+  font-weight: 900;
+  font-size: 110px;
+}
+.k-itl {
+  flex: 1;
+  padding: 0 36px;
+  font-weight: 800;
+  font-size: 56px;
+  line-height: 1.25;
+}
+/* the drum on the footage itself */
+.k-ovl {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  z-index: 12;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+}
+.k-dstage.k-vid .k-it {
+  left: -430px;
+  top: -65px;
+  width: 860px;
+  height: 130px;
+  background: rgba(24, 24, 29, 0.84);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+}
+.k-dstage.k-vid .k-itn {
+  width: 130px;
+  height: 130px;
+  font-size: 76px;
+  background: rgba(51, 51, 60, 0.92);
+}
+.k-dstage.k-vid .k-itl {
+  padding: 0 30px;
+  font-size: 44px;
+}
+/* the page */
+.k-qpage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1080px;
+  height: 1920px;
+  perspective: 1700px;
+}
+.k-sheet {
+  position: absolute;
+  left: 90px;
+  width: 900px;
+  padding: 84px 70px 90px;
+  background: #faf7f2;
+  color: #1a1a1a;
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55), 0 0 0 2px rgba(0, 0, 0, 0.05);
+  direction: rtl;
+}
+.k-ql {
+  font-weight: 800;
+  font-size: 62px;
+  line-height: 112px;
+  height: 112px;
+  white-space: nowrap;
+  text-align: center;
+}
+.k-ql span {
+  position: relative;
+  display: inline-block;
+}
+.k-ql b {
+  position: relative;
+  z-index: 1;
+  font-weight: inherit;
+}
+.k-ql .k-hlb {
+  position: absolute;
+  left: -16px;
+  right: -16px;
+  top: 14%;
+  bottom: 10%;
+  background: rgba(199, 85, 47, 0.62);
+  z-index: 0;
+  transform-origin: 100% 50%;
+  transform: scaleX(0);
+}
+
+/* ---- catalogue label (showreel only, never in a real reel) ---- */
+.k-label {
+  position: absolute;
+  left: 40px;
+  top: 100px;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-family: "Vazirmatn", sans-serif;
+  font-size: 38px;
+  font-weight: 600;
+  padding: 8px 22px;
+  border-left: 8px solid var(--k-accent2);
+  direction: ltr;
+  visibility: hidden;
+  opacity: 0;
+}

@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="fa">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: "Vazirmatn";
+        src: url("fonts/Vazirmatn-Variable.woff2") format("woff2");
+        font-weight: 100 900;
+        font-display: block;
+      }
+      :root {
+        --clay: #c7552f;
+        --clay2: #e06b43;
+        --paper: #faf7f2;
+        --ink: #1a1a1a;
+        --green: #1f7a4d;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #000;
+        font-family: "Vazirmatn", sans-serif;
+      }
+      #stage {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+      }
+      .hid {
+        visibility: hidden;
+        opacity: 0;
+      }
+
+      /* ---- footage wrappers (generated) share these ---- */
+      .inner .dim {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        background: #000;
+        opacity: 0;
+        z-index: 2;
+      }
+      .inner .deep {
+        position: absolute;
+        left: 0;
+        top: 440px;
+        width: 1080px;
+        text-align: center;
+        direction: rtl;
+        font-weight: 900;
+        font-size: 270px;
+        line-height: 1;
+        color: var(--clay2);
+        text-shadow: 0 0 90px rgba(224, 107, 67, 0.55);
+        z-index: 3;
+        visibility: hidden;
+        opacity: 0;
+      }
+      .inner .deep.w2 {
+        color: var(--paper);
+        text-shadow: 0 0 90px rgba(250, 247, 242, 0.35);
+      }
+      .inner #cut0 {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        object-fit: cover;
+        z-index: 4;
+        opacity: 0;
+      }
+      .vig {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        z-index: 3;
+        pointer-events: none;
+        background: radial-gradient(ellipse at 50% 46%, rgba(0, 0, 0, 0) 52%, rgba(0, 0, 0, 0.3) 100%);
+      }
+
+      /* ---- stamp tags ---- */
+      .layer {
+        position: absolute;
+        left: 0;
+        width: 1080px;
+        z-index: 10;
+        display: flex;
+        justify-content: center;
+        direction: rtl;
+        gap: 16px;
+      }
+      .stamp {
+        background: var(--clay);
+        color: #fff;
+        font-weight: 900;
+        line-height: 1.22;
+        padding: 10px 40px;
+        box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.38);
+        display: inline-block;
+        white-space: nowrap;
+        direction: rtl;
+        text-align: center;
+      }
+      .stamp.big {
+        font-size: 100px;
+      }
+      .stamp.chip {
+        font-size: 68px;
+      }
+      .stamp.huge {
+        font-size: 176px;
+        padding: 4px 64px;
+      }
+      .stamp.mega {
+        font-size: 236px;
+        padding: 2px 84px;
+      }
+      .stamp.sm {
+        font-size: 80px;
+        padding: 8px 34px;
+      }
+      .stamp.paper {
+        background: var(--paper);
+        color: var(--ink);
+        box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.3);
+      }
+      #g1 {
+        top: 1250px;
+      }
+      #ghost1 {
+        position: absolute;
+        left: 40px;
+        top: 520px;
+        z-index: 9;
+        font-size: 640px;
+        font-weight: 900;
+        line-height: 1;
+        color: rgba(255, 255, 255, 0.22);
+        direction: ltr;
+      }
+      #chips {
+        position: absolute;
+        left: 0;
+        top: 1210px;
+        width: 1080px;
+        z-index: 10;
+        display: grid;
+        grid-template-columns: auto auto;
+        gap: 24px;
+        justify-content: center;
+        direction: rtl;
+      }
+
+      /* ---- the three checks ---- */
+      #rows {
+        position: absolute;
+        left: 70px;
+        top: 1205px;
+        width: 940px;
+        z-index: 10;
+        direction: rtl;
+      }
+      .row {
+        display: flex;
+        height: 108px;
+        margin-bottom: 18px;
+        background: var(--paper);
+        box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.32);
+      }
+      .row .num {
+        width: 108px;
+        background: var(--clay);
+        color: #fff;
+        font-size: 76px;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .row .lab {
+        flex: 1;
+        color: var(--ink);
+        font-size: 50px;
+        font-weight: 800;
+        padding: 0 30px;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+      }
+      .row .lab span {
+        display: block;
+        white-space: nowrap;
+      }
+      .row .chk {
+        width: 108px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .row .chk svg {
+        width: 76px;
+        height: 76px;
+        overflow: visible;
+      }
+      .ring {
+        fill: none;
+        stroke: #1a1a1a;
+        stroke-opacity: 0.3;
+        stroke-width: 4;
+      }
+      .fill {
+        fill: var(--green);
+      }
+      .tick {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 5.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 40;
+        stroke-dashoffset: 40;
+      }
+
+      /* ---- full-screen cutaways ---- */
+      .full {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        z-index: 20;
+        overflow: hidden;
+        clip-path: inset(0 0 0 100%);
+      }
+      #qcard {
+        background: radial-gradient(circle at 50% 46%, #26262c 0%, #101013 62%, #0a0a0c 100%);
+      }
+      #qglow {
+        position: absolute;
+        left: 140px;
+        top: 640px;
+        width: 800px;
+        height: 800px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(199, 85, 47, 0.55) 0%, rgba(199, 85, 47, 0) 68%);
+      }
+      #q1,
+      #q3 {
+        position: absolute;
+        left: 0;
+        width: 1080px;
+        text-align: center;
+        direction: rtl;
+        color: #fff;
+        font-weight: 900;
+        font-size: 124px;
+        line-height: 1.2;
+      }
+      #q1 {
+        top: 560px;
+      }
+      #q3 {
+        top: 1070px;
+      }
+      #q2 {
+        position: absolute;
+        left: 0;
+        top: 770px;
+        width: 1080px;
+        display: flex;
+        justify-content: center;
+      }
+      #q2 .stamp {
+        font-size: 214px;
+        padding: 4px 70px;
+      }
+      #ring {
+        position: absolute;
+        left: 340px;
+        top: 780px;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        border: 10px solid var(--clay2);
+      }
+      .full .bg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        object-fit: cover;
+        transform-origin: 50% 55%;
+      }
+      .scrim {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        background: linear-gradient(to bottom, rgba(10, 10, 10, 0.3), rgba(10, 10, 10, 0.88));
+      }
+      #ct1 {
+        position: absolute;
+        left: 0;
+        top: 520px;
+        width: 1080px;
+        text-align: center;
+        direction: rtl;
+        color: #fff;
+        font-weight: 900;
+        font-size: 196px;
+        line-height: 1.15;
+      }
+      #ct2 {
+        position: absolute;
+        left: 0;
+        top: 770px;
+        width: 1080px;
+        display: flex;
+        justify-content: center;
+      }
+      #ct3 {
+        position: absolute;
+        left: 0;
+        top: 640px;
+        width: 1080px;
+        display: flex;
+        justify-content: center;
+      }
+      #ball1,
+      #ball2 {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 190px;
+        height: 190px;
+        visibility: hidden;
+        opacity: 0;
+      }
+      .mk {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 0 7px rgba(199, 85, 47, 0.75);
+        visibility: hidden;
+        opacity: 0;
+      }
+      #run1 {
+        position: absolute;
+        left: 110px;
+        top: 1660px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: var(--clay2);
+        box-shadow: 0 0 0 9px rgba(255, 255, 255, 0.92);
+        visibility: hidden;
+        opacity: 0;
+      }
+      #dist {
+        position: absolute;
+        left: 130px;
+        top: 1290px;
+        width: 820px;
+        height: 10px;
+        background: #fff;
+        transform-origin: 100% 50%;
+        visibility: hidden;
+        opacity: 0;
+      }
+      .cap {
+        position: absolute;
+        top: 1262px;
+        width: 10px;
+        height: 66px;
+        background: #fff;
+        visibility: hidden;
+        opacity: 0;
+      }
+      #streak {
+        position: absolute;
+        left: 300px;
+        top: 1050px;
+        width: 560px;
+        height: 12px;
+        background: linear-gradient(to left, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
+        transform-origin: 100% 50%;
+        visibility: hidden;
+        opacity: 0;
+      }
+
+      /* ---- side tags, closing tag, call to action ---- */
+      #tag1 {
+        position: absolute;
+        left: 28px;
+        top: 860px;
+        z-index: 10;
+      }
+      #tring {
+        position: absolute;
+        left: 20px;
+        top: 840px;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        border: 8px solid var(--clay2);
+        z-index: 10;
+        visibility: hidden;
+        opacity: 0;
+      }
+      #tag2 {
+        top: 1240px;
+      }
+      #cta1w {
+        top: 1160px;
+      }
+      #cta2w {
+        top: 1470px;
+      }
+      #handle {
+        position: absolute;
+        left: 0;
+        top: 1585px;
+        width: 1080px;
+        text-align: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 46px;
+        direction: ltr;
+        text-shadow: 0 2px 14px rgba(0, 0, 0, 0.65);
+        z-index: 10;
+      }
+
+      /* ---- transitions ---- */
+      #bar {
+        position: absolute;
+        left: 1080px;
+        top: 0;
+        width: 36px;
+        height: 1920px;
+        background: var(--clay);
+        z-index: 35;
+        visibility: hidden;
+      }
+      #flash {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        background: #fff;
+        z-index: 40;
+        visibility: hidden;
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="stage"
+      data-composition-id="hctv"
+      data-start="0"
+      data-duration="%%TOTAL%%"
+      data-fps="30"
+      data-width="1080"
+      data-height="1920"
+    >
+      %%CLIPS%%
+      <div class="vig"></div>
+
+      <!-- 1. the hook -->
+      <div id="ghost1" class="hid">۱</div>
+      <div id="g1" class="layer">
+        <div class="stamp big hid">فقط</div>
+        <div class="stamp big hid">یه</div>
+        <div class="stamp big hid">تمرین</div>
+      </div>
+
+      <!-- 2. the four options -->
+      <div id="chips">
+        <div id="c1" class="stamp chip hid">پرش</div>
+        <div id="c2" class="stamp chip hid">اسکات سنگین</div>
+        <div id="c3" class="stamp chip hid">باکس جامپ</div>
+        <div id="c4" class="stamp chip hid">حرکت با کش</div>
+      </div>
+
+      <!-- 4. the three checks -->
+      <div id="rows">
+        <div class="row hid" id="r1">
+          <div class="num">۱</div>
+          <div class="lab"><span>نیروی زیاد · زمان کوتاه</span></div>
+          <div class="chk"><svg viewBox="0 0 48 48"><circle class="ring" cx="24" cy="24" r="20" /><circle class="fill" cx="24" cy="24" r="22" /><path class="tick" d="M13.5 25.5 L21 33 L35 16" /></svg></div>
+        </div>
+        <div class="row hid" id="r2">
+          <div class="num">۲</div>
+          <div class="lab"><span>سرعت بالا · تماس کوتاه</span></div>
+          <div class="chk"><svg viewBox="0 0 48 48"><circle class="ring" cx="24" cy="24" r="20" /><circle class="fill" cx="24" cy="24" r="22" /><path class="tick" d="M13.5 25.5 L21 33 L35 16" /></svg></div>
+        </div>
+        <div class="row hid" id="r3">
+          <div class="num">۳</div>
+          <div class="lab"><span>هماهنگی عصبی&zwnj;عضلانی</span></div>
+          <div class="chk"><svg viewBox="0 0 48 48"><circle class="ring" cx="24" cy="24" r="20" /><circle class="fill" cx="24" cy="24" r="22" /><path class="tick" d="M13.5 25.5 L21 33 L35 16" /></svg></div>
+        </div>
+      </div>
+
+      <!-- tags -->
+      <div id="tring"></div>
+      <div id="tag1" class="stamp sm hid">تک&zwnj;پا</div>
+      <div id="tag2" class="layer"><div class="stamp big hid" id="tag2s" style="font-size: 78px">یکی از قوی&zwnj;ترین ابزارها</div></div>
+
+      <!-- the call to action -->
+      <div id="cta1w" class="layer"><div id="cta1" class="stamp mega hid">شتاب</div></div>
+      <div id="cta2w" class="layer"><div id="cta2" class="stamp paper sm hid">کامنت کنید</div></div>
+
+      <!-- 3. the question card -->
+      <div id="qcard" class="full">
+        <div id="qglow"></div>
+        <div id="ring" class="hid"></div>
+        <div id="q1" class="hid">از یه تمرین</div>
+        <div id="q2"><div class="stamp hid" id="q2s">انفجاری</div></div>
+        <div id="q3" class="hid">چی می&zwnj;خواید؟</div>
+      </div>
+
+      <!-- 5. the court: a few seconds, a few steps -->
+      <div id="court1" class="full">
+        <img class="bg" src="img/court-clay.jpg" />
+        <div class="scrim"></div>
+        <div id="ct1" class="hid">چند ثانیه</div>
+        <div id="ct2"><div class="stamp huge hid" id="ct2s">چند قدم</div></div>
+        <div class="mk" id="m0" style="left: 135px; top: 1625px"></div>
+        <div class="mk" id="m1" style="left: 270px; top: 1563px"></div>
+        <div class="mk" id="m2" style="left: 405px; top: 1500px"></div>
+        <div class="mk" id="m3" style="left: 540px; top: 1438px"></div>
+        <div class="mk" id="m4" style="left: 675px; top: 1375px"></div>
+        <div id="run1"></div>
+        <img id="ball1" src="img/ball.webp" />
+      </div>
+
+      <!-- 9. the court again: a few metres -->
+      <div id="court2" class="full">
+        <img class="bg" src="img/court-green.jpg" />
+        <div class="scrim"></div>
+        <div id="ct3"><div class="stamp huge hid" id="ct3s">چند متر</div></div>
+        <div class="cap" id="capL" style="left: 125px"></div>
+        <div class="cap" id="capR" style="left: 945px"></div>
+        <div id="dist"></div>
+        <div id="streak"></div>
+        <img id="ball2" src="img/ball.webp" />
+      </div>
+
+      <div id="bar"></div>
+      <div id="flash"></div>
+
+      %%SFX%%
+
+      <script src="vendor/gsap.min.js"></script>
+      <script>
+        (function () {
+          const SEGS = %%SEGS%%;
+          const TOTAL = %%TOTAL%%;
+          // source seconds -> seconds on the edited clock
+          const E = (t) => {
+            for (const s of SEGS) if (t >= s.in && t <= s.out) return s.start + (t - s.in) / s.rate;
+            for (const s of SEGS) if (t < s.in) return s.start;
+            return TOTAL;
+          };
+          // from/fromTo tweens must not paint their start state at frame 0: later wipe-outs would show their layer immediately
+          const tl = window.gsap.timeline({ paused: true, defaults: { immediateRender: false } });
+          %%ZOOM%%
+          // the green tick discs grow from the centre of their ring (SVG user space, not the page)
+          window.gsap.set(".fill", { svgOrigin: "24 24", scale: 0.3, opacity: 0 });
+
+          const pop =(el, t, o = {}) =>
+            tl.fromTo(el, { autoAlpha: 0, scale: o.s0 || 0.55, y: o.y0 || 28 },
+              { autoAlpha: 1, scale: 1, y: 0, duration: o.d || 0.42, ease: o.ease || "back.out(1.8)" }, t);
+          const gone = (el, t, o = {}) =>
+            tl.to(el, { autoAlpha: 0, y: o.y || 18, scale: o.s || 0.92, duration: o.d || 0.22, ease: "power2.in" }, t);
+          // a clay line sweeps right to left (the Farsi reading direction) and the layer follows it
+          const wipeIn = (layer, t, d) => {
+            tl.set("#bar", { autoAlpha: 1 }, t);
+            tl.fromTo(layer, { clipPath: "inset(0px 0px 0px 1080px)" }, { clipPath: "inset(0px 0px 0px 0px)", duration: d, ease: "power3.inOut" }, t);
+            tl.fromTo("#bar", { x: 0 }, { x: -1116, duration: d, ease: "power3.inOut" }, t);
+            tl.set("#bar", { autoAlpha: 0 }, t + d);
+          };
+          const wipeOut = (layer, t, d) => {
+            tl.set("#bar", { autoAlpha: 1 }, t);
+            tl.fromTo(layer, { clipPath: "inset(0px 0px 0px 0px)" }, { clipPath: "inset(0px 1080px 0px 0px)", duration: d, ease: "power3.inOut" }, t);
+            tl.fromTo("#bar", { x: 0 }, { x: -1116, duration: d, ease: "power3.inOut" }, t);
+            tl.set("#bar", { autoAlpha: 0 }, t + d);
+          };
+
+          /* 1. "only one exercise" */
+          [0.72, 0.94, 1.08].forEach((s, i) => pop("#g1 .stamp:nth-child(" + (i + 1) + ")", E(s), { s0: 0.6, y0: 40 }));
+          tl.fromTo("#ghost1", { autoAlpha: 0, x: -90, scale: 0.9 }, { autoAlpha: 1, x: 0, scale: 1, duration: 0.8, ease: "expo.out" }, E(0.9));
+          tl.to("#g1 .stamp", { autoAlpha: 0, y: 20, duration: 0.25, ease: "power2.in", stagger: 0.04 }, E(5.3));
+          tl.to("#ghost1", { autoAlpha: 0, duration: 0.3 }, E(5.3));
+
+          /* 2. the four options, one per spoken word */
+          [6.3, 7.73, 9.46, 10.7].forEach((s, i) => pop("#c" + (i + 1), E(s - 0.03), { s0: 0.5, y0: 40 }));
+          tl.to("#chips .stamp", { autoAlpha: 0, y: 20, scale: 0.9, duration: 0.22, ease: "power2.in", stagger: 0.04 }, E(11.95));
+
+          /* 3. "what do you want from an explosive exercise?" */
+          wipeIn("#qcard", E(13.5), 0.5);
+          tl.fromTo("#q1", { x: 420, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.55, ease: "expo.out" }, E(13.8));
+          tl.fromTo("#q2s", { scale: 2.4, autoAlpha: 0, rotate: -5 }, { scale: 1, autoAlpha: 1, rotate: -2, duration: 0.5, ease: "expo.out" }, E(14.5));
+          tl.fromTo("#ring", { scale: 0.3, autoAlpha: 0.95 }, { scale: 3.6, autoAlpha: 0, duration: 0.85, ease: "power2.out" }, E(14.5));
+          tl.fromTo("#qglow", { scale: 0.6, opacity: 0.2 }, { scale: 1.2, opacity: 1, duration: 0.9, ease: "power2.out" }, E(14.5));
+          tl.fromTo("#q3", { x: 420, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.55, ease: "expo.out" }, E(15.1));
+          wipeOut("#qcard", E(15.8), 0.5);
+
+          /* 4. the three checks arrive as he names them */
+          const rowIn = (id, t) => {
+            tl.fromTo(id, { x: 760, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.6, ease: "expo.out" }, t);
+            tl.fromTo(id + " .lab span", { clipPath: "inset(0px 0px 0px 100%)" }, { clipPath: "inset(0px 0px 0px 0%)", duration: 0.5, ease: "power2.out" }, t + 0.18);
+          };
+          rowIn("#r1", E(17.3));
+          rowIn("#r2", E(22.55));
+          rowIn("#r3", E(29.15));
+          // while he asks the question, the three rules pulse one after another
+          [42.5, 42.85, 43.2].forEach((s, i) => {
+            const r = "#r" + (i + 1);
+            tl.to(r, { scale: 1.05, duration: 0.14, ease: "power2.out" }, E(s));
+            tl.to(r, { scale: 1, duration: 0.3, ease: "power2.inOut" }, E(s) + 0.14);
+          });
+          // make room for the word behind him, then bring them back
+          tl.to("#r1,#r2,#r3", { y: 140, autoAlpha: 0, duration: 0.3, ease: "power2.in", stagger: 0.05 }, E(44.65));
+          tl.fromTo("#r1,#r2,#r3", { y: 140, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: "expo.out", stagger: 0.08 }, E(47.45));
+          const tick = (n, t) => {
+            const r = "#r" + n;
+            tl.to(r + " .fill", { opacity: 1, scale: 1, svgOrigin: "24 24", duration: 0.3, ease: "back.out(2.4)" }, t);
+            tl.to(r + " .tick", { strokeDashoffset: 0, duration: 0.28, ease: "power2.out" }, t + 0.08);
+            tl.to(r + " .num", { backgroundColor: "#1f7a4d", duration: 0.25 }, t);
+            tl.to(r, { scale: 1.045, duration: 0.12, ease: "power2.out" }, t);
+            tl.to(r, { scale: 1, duration: 0.3, ease: "power2.inOut" }, t + 0.12);
+          };
+          tick(1, E(54.25));
+          tick(2, E(57.7));
+          tick(3, E(67.2));
+          tl.to("#r1,#r2,#r3", { x: -900, autoAlpha: 0, duration: 0.5, ease: "power3.in", stagger: 0.07 }, E(68.75));
+
+          /* 5. the court: "a few seconds, a few steps" */
+          wipeIn("#court1", E(35.4), 0.45);
+          tl.fromTo("#court1 .bg", { scale: 1 }, { scale: 1.14, duration: 4.2, ease: "none" }, E(35.4));
+          const hit = E(35.77);
+          tl.fromTo("#ball1", { x: -170, y: 150, rotate: 0, autoAlpha: 1 }, { x: 700, y: 1290, rotate: 540, duration: 0.85, ease: "power1.in" }, hit);
+          tl.to("#ball1", { x: 770, y: 1200, duration: 0.22, ease: "power2.out" }, hit + 0.85);
+          tl.to("#ball1", { x: 830, y: 1290, duration: 0.22, ease: "power2.in" }, hit + 1.07);
+          tl.fromTo("#ct1", { x: 520, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.55, ease: "expo.out" }, E(36.55));
+          tl.fromTo("#ct2s", { scale: 0.4, autoAlpha: 0, y: 50 }, { scale: 1, autoAlpha: 1, y: 0, duration: 0.5, ease: "back.out(2)" }, E(38.0));
+          const stepsT = [37.95, 38.2, 38.45, 38.7, 38.95];
+          const mx = [135, 270, 405, 540, 675], my = [1625, 1563, 1500, 1438, 1375];
+          tl.set("#run1", { autoAlpha: 1 }, E(37.9));
+          stepsT.forEach((s, k) => {
+            tl.fromTo("#m" + k, { scale: 0, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.18, ease: "back.out(3)" }, E(s));
+            tl.to("#run1", { x: mx[k] - 110 + 12, y: my[k] - 1660 + 12, duration: 0.22, ease: "power2.out" }, E(s));
+          });
+          tl.to("#run1", { x: 735, y: 1300 - 1660 + 10, duration: 0.2, ease: "power2.out" }, E(39.0));
+          tl.fromTo("#ball1", { scale: 1 }, { scale: 1.18, duration: 0.2, yoyo: true, repeat: 1, ease: "power2.out" }, E(39.0));
+          wipeOut("#court1", E(39.25), 0.45);
+
+          /* 6. the reveal: the word sits BEHIND him */
+          const REV = "#v%%REVSEG%%";
+          tl.fromTo("#flash", { autoAlpha: 0 }, { autoAlpha: 0.95, duration: 0.07, ease: "power1.in" }, E(44.88));
+          tl.to("#flash", { autoAlpha: 0, duration: 0.34, ease: "power2.out" }, E(44.95));
+          tl.to(REV + " .dim", { opacity: 0.45, duration: 0.25 }, E(44.9));
+          tl.to(REV + " #cut0", { opacity: 1, duration: 0.05 }, E(44.86));
+          tl.fromTo("#deep1", { autoAlpha: 0, scale: 1.6, filter: "blur(22px)" }, { autoAlpha: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, E(44.94));
+          tl.to("#deep1", { x: -360, autoAlpha: 0, duration: 0.35, ease: "power3.in" }, E(46.02));
+          tl.fromTo("#deep2", { autoAlpha: 0, x: 360, scale: 1.1 }, { autoAlpha: 1, x: 0, scale: 1, duration: 0.45, ease: "expo.out" }, E(46.1));
+          tl.to("#deep2", { autoAlpha: 0, scale: 1.3, duration: 0.3, ease: "power2.in" }, E(47.05));
+          tl.to(REV + " .dim", { opacity: 0, duration: 0.35 }, E(47.05));
+          tl.to(REV + " #cut0", { opacity: 0, duration: 0.05 }, E(47.45));
+
+          /* 7. the key line: each step is a single-leg explosion */
+          tl.fromTo("#tag1", { autoAlpha: 0, scale: 0.4, rotate: -10 }, { autoAlpha: 1, scale: 1, rotate: -3, duration: 0.45, ease: "back.out(2.2)" }, E(60.2));
+          tl.fromTo("#tring", { scale: 0.3, autoAlpha: 0.95 }, { scale: 2.6, autoAlpha: 0, duration: 0.7, ease: "power2.out" }, E(60.2));
+          gone("#tag1", E(61.5));
+
+          /* 8. the close */
+          tl.fromTo("#tag2s", { x: 640, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.6, ease: "expo.out" }, E(69.05));
+          gone("#tag2s", E(72.4));
+
+          /* 9. the court again: a few metres */
+          wipeIn("#court2", E(76.3), 0.45);
+          tl.fromTo("#court2 .bg", { scale: 1.12 }, { scale: 1, duration: 3.0, ease: "none" }, E(76.3));
+          tl.fromTo("#ct3s", { scale: 0.4, autoAlpha: 0, y: 50 }, { scale: 1, autoAlpha: 1, y: 0, duration: 0.5, ease: "back.out(2)" }, E(76.95));
+          tl.fromTo("#capR", { autoAlpha: 0, scaleY: 0 }, { autoAlpha: 1, scaleY: 1, duration: 0.25, ease: "power2.out" }, E(77.0));
+          tl.fromTo("#dist", { autoAlpha: 1, scaleX: 0 }, { autoAlpha: 1, scaleX: 1, duration: 0.5, ease: "power3.out" }, E(77.1));
+          tl.fromTo("#capL", { autoAlpha: 0, scaleY: 0 }, { autoAlpha: 1, scaleY: 1, duration: 0.25, ease: "power2.out" }, E(77.45));
+          tl.fromTo("#ball2", { x: 905, y: 1190, rotate: 0, autoAlpha: 1 }, { x: 70, y: 1190, rotate: -900, duration: 1.0, ease: "power3.out" }, E(77.65));
+          tl.fromTo("#streak", { scaleX: 0, autoAlpha: 0, y: 0 }, { scaleX: 1, autoAlpha: 0.9, y: 235, duration: 0.5, ease: "power2.out" }, E(77.7));
+          tl.to("#streak", { autoAlpha: 0, duration: 0.3 }, E(78.35));
+          wipeOut("#court2", E(79.05), 0.45);
+
+          /* 10. the call to action */
+          tl.fromTo("#cta1", { autoAlpha: 0, scale: 0.3, rotate: 7 }, { autoAlpha: 1, scale: 1, rotate: -2, duration: 0.5, ease: "back.out(2)" }, E(82.05));
+          tl.fromTo("#cta2", { autoAlpha: 0, y: 50 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: "expo.out" }, E(82.5));
+          tl.to("#cta1", { scale: 1.07, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" }, E(83.4));
+
+          window.__timelines = window.__timelines || {};
+          window.__timelines["hctv"] = tl;
+        })();
+      </script>
+    </div>
+  </body>
+</html>

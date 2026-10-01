@@ -44,6 +44,7 @@
         {
           "type": "simple",
           "name": "Easy Jog",
+          "exId": "easy-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -61,6 +62,7 @@
         {
           "type": "simple",
           "name": "Leg Swings",
+          "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -79,6 +81,7 @@
         {
           "type": "simple",
           "name": "Lateral Lunge",
+          "exId": "lateral-lunge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -97,6 +100,7 @@
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
+          "exId": "worlds-greatest-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -115,6 +119,7 @@
         {
           "type": "standard",
           "name": "A-Skip",
+          "exId": "a-skip",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -134,6 +139,7 @@
         {
           "type": "standard",
           "name": "Build-Up Run",
+          "exId": "build-up-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -156,10 +162,12 @@
     {
       "title": "First Step",
       "icon": "🎾",
+      "rest": 75,
       "exercises": [
         {
           "type": "standard",
           "name": "Split-Step to Sprint",
+          "exId": "split-step-to-sprint",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -180,6 +188,7 @@
         {
           "type": "standard",
           "name": "Crossover Start",
+          "exId": "crossover-start",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -192,8 +201,7 @@
           },
           "rx": {
             "sets": 4,
-            "distance": "6 m",
-            "rest": 75
+            "distance": "6 m"
           },
           "intent": "max speed",
           "note": "Alternate sides."
@@ -201,6 +209,7 @@
         {
           "type": "standard",
           "name": "Drop-Step and Drive",
+          "exId": "drop-step-and-drive",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -213,8 +222,7 @@
           },
           "rx": {
             "sets": 4,
-            "distance": "6 m",
-            "rest": 75
+            "distance": "6 m"
           },
           "intent": "max speed",
           "note": "Alternate sides."
@@ -228,6 +236,7 @@
         {
           "type": "standard",
           "name": "Diagonal Closing Step",
+          "exId": "diagonal-closing-step",
           "videoUrl": null,
           "cues": {
             "good": [

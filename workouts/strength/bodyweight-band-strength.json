@@ -105,7 +105,7 @@
           "videoUrl": null,
           "cues": {
             "good": [
-              "Three seconds down, chest tall",
+              "Chest tall",
               "Find today's depth before you load one leg"
             ],
             "bad": [
@@ -113,9 +113,9 @@
             ]
           },
           "rx": {
-            "reps": 10
-          },
-          "note": "3s down."
+            "reps": 10,
+            "tempo": "3-0-1-0"
+          }
         },
         {
           "type": "simple",
@@ -140,6 +140,7 @@
     {
       "title": "Primary",
       "icon": "🎯",
+      "rest": 90,
       "exercises": [
         {
           "type": "standard",
@@ -147,19 +148,20 @@
           "videoUrl": null,
           "cues": {
             "good": [
-              "Back foot on a chair, drop straight down over three seconds",
+              "Back foot on a chair, drop straight down",
               "The front heel drives you back up"
             ],
             "bad": [
               "Leaning forward onto the front knee"
             ]
           },
-          "note": "3s down, RPE 7-8. Straight sets with full rest — finish one leg, rest, then do the other.",
+          "note": "Straight sets with full rest: finish one leg, rest, then do the other.",
           "rx": {
             "sets": 3,
             "reps": 8,
             "side": true,
-            "rest": 90
+            "rpe": "7-8",
+            "tempo": "3-0-1-0"
           }
         },
         {
@@ -175,12 +177,13 @@
               "Twisting open at the hip"
             ]
           },
-          "note": "3s down, RPE 7. Fingertips on a wall if balance is the limiter rather than the hamstring.",
+          "note": "Fingertips on a wall if balance is the limiter rather than the hamstring.",
           "rx": {
             "sets": 3,
             "reps": 8,
             "side": true,
-            "rest": 90
+            "rpe": 7,
+            "tempo": "3-0-1-0"
           }
         }
       ]

@@ -133,6 +133,7 @@
     {
       "title": "Own Overhead",
       "icon": "💪",
+      "rest": 45,
       "exercises": [
         {
           "type": "standard",
@@ -153,8 +154,7 @@
             "time": "25s",
             "side": true,
             "rpe": 7,
-            "tempo": "Iso",
-            "rest": 45
+            "tempo": "Iso"
           }
         },
         {
@@ -175,8 +175,7 @@
             "sets": 3,
             "reps": 8,
             "side": true,
-            "rpe": 7,
-            "rest": 45
+            "rpe": 7
           }
         }
       ]

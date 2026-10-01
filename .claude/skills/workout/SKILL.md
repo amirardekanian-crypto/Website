@@ -115,9 +115,10 @@ range** (Amir, 2026-09-24).
 button is still there, labelled *Rest timer*. It used to fall back to 120s, which is how the
 demo ended up claiming "REST 2m" on all 26 cards while every rest in it was actually unset.
 
-**When a whole block shares one rest, put it on the block** — `{"title":"Strength","rest":120}`.
-It renders once on the section header and feeds every timer in it; `rx.rest` on an exercise
-overrides it. **The tempo is one cell** — `TEMPO 3-1-1-0`, with the digits that carry the
+**When a whole block shares one rest, put it on the block** — `{"title":"Strength","rest":120}` (CHP-7;
+the Library screen reads it since 2026-10-01, SCHEMA.md → `block.rest`). It renders once on the section
+header and feeds every timer in it; `rx.rest` on an exercise overrides it. Only when every `standard`
+exercise and circuit in the block has a rest written, so none inherits a rest nobody prescribed. **The tempo is one cell** — `TEMPO 3-1-1-0`, with the digits that carry the
 instruction drawn in clay (the slowest phase when it is 2s or more, plus any non-zero pause).
 `"iso"` reads `Hold`. Nothing to author beyond `rx.tempo` itself.
 
@@ -372,6 +373,7 @@ Before committing:
 - No `chips[]` anywhere, and no `chips` left beside an `rx`
 - Circuits use `rx.rounds` (a NUMBER) and `rx.rest`; items take their own `rx` when the dose is
   plain and keep free-text `detail` only when the wording says more than a number
+- A rest shared by a block sits once on the block, and `rx.rest` stays only on a card that differs (CHP-7)
 - **`node scripts/check_rx.js` passes** — it audits every `rx` in the library and is in the
   pre-commit hook anyway
 - Every exercise resolves to an approved Spine entry (no `cues` on a new session), every `note` one

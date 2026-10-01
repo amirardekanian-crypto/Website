@@ -226,6 +226,7 @@
     {
       "title": "Potentiate",
       "icon": "⚡",
+      "rest": 30,
       "exercises": [
         {
           "type": "standard",
@@ -266,8 +267,7 @@
           },
           "rx": {
             "sets": 2,
-            "reps": 3,
-            "rest": 30
+            "reps": 3
           },
           "intent": "max intent"
         },
@@ -287,8 +287,7 @@
             ]
           },
           "rx": {
-            "sets": 3,
-            "rest": 30
+            "sets": 3
           },
           "intent": "max speed"
         }
