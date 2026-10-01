@@ -178,7 +178,7 @@
           "type": "standard",
           "name": "Side Lying Dumbbell External Rotation",
           "videoUrl": null,
-          "note": "Sore side, 3s eccentric. If your shoulder feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
+          "note": "Sore side. If your shoulder feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
           "cues": {
             "good": [
               "Lie on your side with the working arm on top, elbow at your ribs, and turn the dumbbell up toward the ceiling",
@@ -192,14 +192,15 @@
             "sets": 3,
             "reps": 12,
             "rpe": 7,
-            "rest": 45
+            "rest": 45,
+            "tempo": "3-0-1-0"
           }
         },
         {
           "type": "standard",
           "name": "Prone Y Raise",
           "videoUrl": null,
-          "note": "2s top hold. If a Y pinches, set your arms in a wide V instead.",
+          "note": "If a Y pinches, set your arms in a wide V instead.",
           "cues": {
             "good": [
               "Lie face down with your arms in a Y and your thumbs up, then lift them off the floor with nothing in your hands",
@@ -213,7 +214,8 @@
             "sets": 3,
             "reps": 10,
             "rpe": 6,
-            "rest": 45
+            "rest": 45,
+            "tempo": "1-0-1-2"
           }
         },
         {

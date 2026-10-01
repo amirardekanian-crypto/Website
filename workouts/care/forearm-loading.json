@@ -155,7 +155,7 @@
           "type": "standard",
           "name": "Single-Arm Eccentric Wrist Extension",
           "videoUrl": null,
-          "note": "Sore side, 4s eccentric. If your elbow feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
+          "note": "Sore side. If your elbow feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
           "cues": {
             "good": [
               "Lift the weight up with your free hand, then lower it over four seconds with the wrist you're training",
@@ -169,7 +169,8 @@
             "sets": 3,
             "reps": 12,
             "rpe": 7,
-            "rest": 40
+            "rest": 40,
+            "tempo": "4-0-1-0"
           }
         },
         {
@@ -189,9 +190,10 @@
             "sets": 2,
             "reps": 12,
             "rpe": 7,
-            "rest": 30
+            "rest": 30,
+            "tempo": "3-0-1-0"
           },
-          "note": "Sore side, 3s eccentric."
+          "note": "Sore side."
         },
         {
           "type": "standard",
