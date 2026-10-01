@@ -1,0 +1,275 @@
+{
+ "_note": "Measured by tools/sfx_lead.py (ms from the start of each file). kit.sfx_html(..., align=True) starts a sound early by the number named in `align` (onset | peak | end) so that moment lands on its event. Edit `align` by hand if a sound needs another sync point; a re-run keeps it.",
+ "ball-bounce.mp3": {
+  "dur_ms": 1344,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 125,
+  "end_ms": 815,
+  "align": "onset"
+ },
+ "ball-hit.mp3": {
+  "dur_ms": 2136,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 125,
+  "end_ms": 925,
+  "align": "onset"
+ },
+ "boom.mp3": {
+  "dur_ms": 1632,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 165,
+  "end_ms": 1350,
+  "align": "onset"
+ },
+ "boop.mp3": {
+  "dur_ms": 2712,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 125,
+  "end_ms": 1005,
+  "align": "onset"
+ },
+ "chime.mp3": {
+  "dur_ms": 4464,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 150,
+  "end_ms": 2660,
+  "align": "onset"
+ },
+ "clank.mp3": {
+  "dur_ms": 2280,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 130,
+  "end_ms": 935,
+  "align": "onset"
+ },
+ "click.mp3": {
+  "dur_ms": 624,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 120,
+  "end_ms": 595,
+  "align": "onset"
+ },
+ "crash.mp3": {
+  "dur_ms": 3408,
+  "first40_ms": 115,
+  "onset_ms": 120,
+  "peak_ms": 400,
+  "end_ms": 2135,
+  "align": "onset"
+ },
+ "ding.wav": {
+  "dur_ms": 800,
+  "first40_ms": 0,
+  "onset_ms": 0,
+  "peak_ms": 5,
+  "end_ms": 315,
+  "align": "onset"
+ },
+ "drop.mp3": {
+  "dur_ms": 2976,
+  "first40_ms": 350,
+  "onset_ms": 525,
+  "peak_ms": 1025,
+  "end_ms": 1835,
+  "align": "peak"
+ },
+ "footsteps.mp3": {
+  "dur_ms": 1872,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 405,
+  "end_ms": 1000,
+  "align": "onset"
+ },
+ "glassline.mp3": {
+  "dur_ms": 2760,
+  "first40_ms": 125,
+  "onset_ms": 135,
+  "peak_ms": 350,
+  "end_ms": 1100,
+  "align": "onset"
+ },
+ "groove.mp3": {
+  "dur_ms": 2088,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 645,
+  "end_ms": 2030,
+  "align": "onset"
+ },
+ "hit.wav": {
+  "dur_ms": 1000,
+  "first40_ms": 0,
+  "onset_ms": 0,
+  "peak_ms": 5,
+  "end_ms": 420,
+  "align": "onset"
+ },
+ "inhale.mp3": {
+  "dur_ms": 384,
+  "first40_ms": 150,
+  "onset_ms": 195,
+  "peak_ms": 285,
+  "end_ms": 290,
+  "align": "peak"
+ },
+ "knock.mp3": {
+  "dur_ms": 2472,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 575,
+  "end_ms": 925,
+  "align": "onset"
+ },
+ "lub-dub.mp3": {
+  "dur_ms": 1464,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 130,
+  "end_ms": 1375,
+  "align": "onset"
+ },
+ "ping.mp3": {
+  "dur_ms": 4080,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 630,
+  "end_ms": 2470,
+  "align": "onset"
+ },
+ "plink.mp3": {
+  "dur_ms": 2496,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 125,
+  "end_ms": 910,
+  "align": "onset"
+ },
+ "pop.wav": {
+  "dur_ms": 250,
+  "first40_ms": 0,
+  "onset_ms": 0,
+  "peak_ms": 5,
+  "end_ms": 85,
+  "align": "onset"
+ },
+ "rise.wav": {
+  "dur_ms": 550,
+  "first40_ms": 20,
+  "onset_ms": 55,
+  "peak_ms": 275,
+  "end_ms": 490,
+  "align": "peak"
+ },
+ "riser.mp3": {
+  "dur_ms": 2976,
+  "first40_ms": 320,
+  "onset_ms": 615,
+  "peak_ms": 1265,
+  "end_ms": 1320,
+  "align": "peak"
+ },
+ "roll.wav": {
+  "dur_ms": 968,
+  "first40_ms": 0,
+  "onset_ms": 0,
+  "peak_ms": 185,
+  "end_ms": 915,
+  "align": "end"
+ },
+ "snare-roll.mp3": {
+  "dur_ms": 1368,
+  "first40_ms": 120,
+  "onset_ms": 125,
+  "peak_ms": 1065,
+  "end_ms": 1310,
+  "align": "peak"
+ },
+ "stamp.wav": {
+  "dur_ms": 500,
+  "first40_ms": 0,
+  "onset_ms": 0,
+  "peak_ms": 5,
+  "end_ms": 255,
+  "align": "onset"
+ },
+ "step.wav": {
+  "dur_ms": 200,
+  "first40_ms": 0,
+  "onset_ms": 0,
+  "peak_ms": 0,
+  "end_ms": 95,
+  "align": "onset"
+ },
+ "swipe.wav": {
+  "dur_ms": 450,
+  "first40_ms": 0,
+  "onset_ms": 15,
+  "peak_ms": 155,
+  "end_ms": 415,
+  "align": "onset"
+ },
+ "swish.mp3": {
+  "dur_ms": 480,
+  "first40_ms": 135,
+  "onset_ms": 155,
+  "peak_ms": 305,
+  "end_ms": 445,
+  "align": "peak"
+ },
+ "thock.wav": {
+  "dur_ms": 300,
+  "first40_ms": 0,
+  "onset_ms": 0,
+  "peak_ms": 0,
+  "end_ms": 60,
+  "align": "onset"
+ },
+ "thud-drop.mp3": {
+  "dur_ms": 912,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 130,
+  "end_ms": 330,
+  "align": "onset"
+ },
+ "thump.mp3": {
+  "dur_ms": 1008,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 590,
+  "end_ms": 905,
+  "align": "onset"
+ },
+ "tick.wav": {
+  "dur_ms": 70,
+  "first40_ms": 0,
+  "onset_ms": 0,
+  "peak_ms": 0,
+  "end_ms": 20,
+  "align": "onset"
+ },
+ "ticks.mp3": {
+  "dur_ms": 600,
+  "first40_ms": 120,
+  "onset_ms": 120,
+  "peak_ms": 235,
+  "end_ms": 580,
+  "align": "onset"
+ },
+ "whoosh.wav": {
+  "dur_ms": 750,
+  "first40_ms": 5,
+  "onset_ms": 35,
+  "peak_ms": 265,
+  "end_ms": 700,
+  "align": "peak"
+ }
+}

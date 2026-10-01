@@ -82,8 +82,8 @@ bigger graphic); one spine and two or three devices a reel, not a tour of the sh
 | - | `K.label(text, t0, t1)` | A catalogue label | | The showreel only | A real reel | |
 
 Python side (`kit.py`): `kit.scaffold(public)` copies the runtime and assets into a reel; `kit.build(...)` assembles the
-page; `kit.sfx_html(events, E)` makes the sound cues (six sounds, auto track assignment); `kit.behind_video(...)` is the
-static cut-out video that `K.behind` needs.
+page and prints `audit:` notes (below); `kit.sfx_html(events, E, align=True)` makes the sound cues (34 sounds, auto track assignment; **see "Sounds" below for what the
+time of a cue means**); `kit.behind_video(...)` is the static cut-out video that `K.behind` needs.
 
 ## The depth family and the cut-out (2026-10-01)
 Every block from 12 to 24 needs the speaker cut out of the footage, so that something can sit between the wall and him.
@@ -122,7 +122,7 @@ Full-screen cards like the question card, for the moments he says a number, sets
 They share the card looks (clay, ink, paper) and the wipes. Every word and number on them is HIS; the showreel's are placeholders.
 - **Number slam:** each digit is a column (`.k-rcol`) inside a clipped window (`.k-reel`); the columns roll `cycles` times round and stop
   on the digit, the last one exactly at `landAt` and the others a little before it. The shadow is a CSS `drop-shadow` on the whole row,
-  because a shadow inside a reel would be clipped. Put the `roll` sound so it ENDS on `landAt` (about 0.98 s before it).
+  because a shadow inside a reel would be clipped. The `roll` sound ENDS on `landAt`: in a new reel (`sfx_align=True`) cue it AT `landAt`; the old showreel builds cue the file's start, so they put it about 0.98 s before.
 - **Versus:** two parallelograms (`skewX -7`) whose inner text is counter-skewed (`skewX 7`); the seam passes through (540, 960). A is on
   the right because Farsi reads right to left. The verdict moves the seam and both texts by half the shift so they stay centred.
 - **Drum:** pivots on the drum's axis (`rotationX = -i x 36`), each card pushed out by `z = R` where R = (card + gap) / (2 tan 18 degrees);
@@ -152,9 +152,30 @@ All four are full-screen cards (or sit on the footage), so none needs the cut-ou
   and ankle plus the kit's own hip ring (placed by eye), and need the `ring:` prefix because hip and ankle are also muscle groups. The figure has two SVG faces
   (`backface-visibility: hidden`, the back one pre-rotated 180 degrees) on a `preserve-3d` element that the flip turns.
   **Trap: `clip-path`, `opacity` or `filter` on an element with `transform-style: preserve-3d` flattens it, so the reveal clip lives on a wrapper, not on the figure.**
-  Labels sit against the screen edge (right edge at x 960: Instagram's buttons own the far right) and the leader line ends at a LOW estimate of the plate's width,
+  Labels sit against the screen edge (right edge at x 960; on his phone the buttons start at x 920 between y 1171 and 1770, so a label that low overlaps them by up to 40 px) and the leader line ends at a LOW estimate of the plate's width,
   so it tucks under the plate: nothing is measured, because a font that has not loaded yet would give a wrong width.
 - **Looks:** the curve and the body map are made for the ink card. `look: "paper"` exists in the code but is not designed (the curve's paper tone would vanish).
+
+## Sounds, the gate and the audit (2026-10-01, from the research: `../RESEARCH-2026-10-01.md`)
+**Sounds: the time of a cue is where the HIT lands** (new reels: `kit.build(..., sfx_align=True)`, which `tools/new_reel.py` writes). Each sound starts early by its own lead
+(`kit/sfx/timing.json`, made by `tools/sfx_lead.py`): a sharp hit (`onset`: click, stamp, thud, ball hit, ding, pop...) lands on the cue, a whoosh, rise, riser, drop, snare roll, swish or
+inhale (`peak`) PEAKS on it, and the odometer `roll` (`end`) ENDS on it. So `ev(landAt, "hit")`, `ev(cutTime, "whoosh")` and `ev(slamTime, "riser")` are all you write; a riser needs 1.3 s of run-up
+and gets it. Why: the menu's mp3 files start 0.12 s in (the lab's `sounds.py` has `LEAD = 0.10`), the swells peak 155-275 ms in and the build-ups 1.0-1.3 s in, so a file placed on its cue landed
+4 frames late (a swell 5-8 frames, a riser a whole second). A cue too close to the start of the reel to fit its run-up plays from the middle of the file. **The old showreel builds do not pass
+`sfx_align`: they cue the file's start and must not change** (`python tools\sfx_proof.py` proves both: old pages identical, new reel within 20 ms of its flashes; run it after any change to `sfx_html`
+or a sound file). Rules of thumb from the repos: a sound every 3-5 s at most, none on a low impact under a key word, at least 2.5 s between big ones.
+
+**The gate: `python tools\check_gate.py <reel>\public`** (or `GATE=1 bash tools\shots.sh ...`) runs `hyperframes check` with his caption band y 230-470 guarded at a moment every 0.5 s,
+`--bottom 1248` adds a warning for anything below Meta's line. A block that layers or bleeds on purpose carries `data-layout-allow-*` marks, so only an accident fails. **Where a mark goes matters**
+(tested): `caption-zone` and `overflow` work from a container; `occlusion` and `overlap` count ONLY on the text element itself (an ancestor's does not), which is why the odometer digits, the court's
+number labels and the behind-him words carry `LEAF` in `kit.js`. `text_not_painted` (blurred odometer digits) and `frame_out_of_frame` on zoomed footage have no mark: the gate sets them aside and
+says how many. **A new block must mark what it layers on purpose** (`allow(el, "overlap")` on the text, `allow(container, "overflow")` on a stage) and be run through the gate once on a showreel demo.
+Two limits: `check` takes ONE caption zone per run, and its collisions are about element BOXES (a 270 px word's box starts 30 px before its ink).
+
+**The audit** (`kit.audit`, printed as `audit:` lines when a reel is built) says in plain words when a reel uses a block more often than he likes (the caps below), a tour of the shelf (more than 6
+kinds of block), more than 3 kinds of wipe (his rule: two or three, the same ones all the way), full-screen cards up for more than half the reel (his face off screen), or more than 20 sound cues a
+minute. They are prompts, never errors: HCTV3230 (loved) used 4 wipes and 17 cues a minute. Caps a reel usually stays under (his own "do not use it when" plus the repos' per-reel caps):
+number 3, slamBehind 2, versus 2, list 2, quote 1, question 3, chapter 3, whip 2, behind 3, backdrop 2, one court of each kind, diagram 3, curve 2, bodymap 2, checklist 2, cta 1, flash 2.
 
 ## Gotchas already solved (do not re-learn them)
 - The timeline is created with `immediateRender: false` (`K.timeline()`): without it a later wipe-out paints its layer at frame 0.
@@ -163,7 +184,10 @@ All four are full-screen cards (or sit on the footage), so none needs the cut-ou
 - Never put `dir="rtl"` on `<html>`: it is on the elements that hold text.
 - Tween `x`/`y`/`scale`, never `top`/`left`.
 - Media (the cut-out video, the sounds) must be static HTML: that is what `kit.py` is for. Everything else can be created by JS.
-- Chest-zone blocks sit at y 1180-1560 so they clear his chin even at a 1.2 zoom.
+- Chest-zone blocks sit at y 1180-1560 so they clear his chin even at a 1.2 zoom. **That zone is clear of Instagram's profile row (it starts at y 1587) but NOT of the right-hand buttons**
+  (measured on his phone 2026-10-01: like, comment, repost and share cover x 920-993, y 1171-1770, and the picture is cropped 52-54 px a side). The stamps and chips, the checklist, the diagram on his
+  video, the drum on his video and the chapter band run edge to edge, so their numeral tab and the first word of each Farsi line (the right end) sit UNDER the buttons. Review any real reel with
+  `qa_reel.py --tour --phone`; narrowing these blocks by about 165 px is his decision (`../RESEARCH-2026-10-01.md` 14.9).
 
 ## What "premium" means to him (from his notes on the showreel), and so what to build next
 He said 07, 08-10 and 12 "feel like premium videos" and wants to see more of them. Reading what they share: big

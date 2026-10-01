@@ -44,10 +44,14 @@ only his words, and nothing is uploaded or paid for without a yes.
 - **Farsi on screen:** Vazirmatn (copy `assets/fonts/Vazirmatn-Variable.woff2` from the repo into the project's
   `fonts/`), RTL, no uppercase, no letter-spacing, Persian digits, `&zwnj;` for the half-space, counters
   `direction:ltr`. **Animate by word, never by letter** (cursive letters do not type). Latin only for
-  @amirardekanian (Barlow). Show him any Farsi on screen before it ships.
+  @amirardekanian (Barlow). Show him any Farsi on screen before it ships. **Silent-failure guards** (research 2026-10-01): never `dir` on `<html>` (previews fine, renders a blank video; keep
+  `lang="fa"` there and `direction:rtl` on a wrapper); `letter-spacing:0` and `text-transform:none` always; a Latin word or a number between Persian words goes in one `unicode-bidi:isolate` unit; Vazirmatn
+  stays a local `@font-face` (the Google Fonts fallback fails on cloud renders). **Hyperframes registry blocks that split by letter are banned for Farsi:** `bottom-up-letters`, `top-down-letters`,
+  `char-slam-explode`, `scramble-reveal`, `variable-font-flex`, `weight-wave`, `typewriter`, `matrix-decode`, `kinetic-chars`, `tracking-in` and `per-word-rise` in `char` mode. Word-level and fine:
+  `headline-slam`, `per-word-rise` (`split=word`), `staggered-fade-up`, `blur-in`.
 - **Default: keep his face clear** (the behind-you reveal is the deliberate exception). Overlays go on the chest and desk zone (about y 1100-1500) or beside him. For something
   big, cut away to a full-screen graphic with his voice running underneath. Look at a frame every time.
-- Anything he must read sits between y 250 and y 1600 (Instagram covers the rest).
+- **Safe zone, MEASURED on his phone (2026-10-01; `RESEARCH-2026-10-01.md` section 14.9).** He opened `tools/safezone_card.py`'s test card on his iPhone (a 19.5:9 screen) and sent a screenshot; `tools/phone_measure.py` aligned it to the card (correlation 0.98) and listed every pixel Instagram's interface changed. In 1080x1920 card px: **nothing is covered from y 195 to y 1165 anywhere across the width**; the status bar, back arrow and camera cover y 0-190; **the like, comment, repost and share buttons, the menu and the audio thumbnail cover x 920-993, y 1171-1770**; the profile picture, name and caption cover **everything below y 1587** on the left; and the picture is scaled to FILL the screen, so **52-54 px are cropped off EACH side**. His caption band y 230-470 is clear. Meta's ad figures (14% top, 35% bottom, 6% sides: free box x 65-1015, y 269-1248) are far more cautious than a normal reel needs: **our old "read zone y 250-1600" was right.** What we had missed is **the right-hand rail: between y 1165 and y 1775 nothing that matters sits right of x 915, and for Farsi that matters double, because every line STARTS at the right.** Look at frames with the zones drawn on them (`PHONE=1 bash tools/shots.sh ...`, `python tools/qa_reel.py <mp4> --tour --phone`) and run the gate with `GATE_ARGS="--bottom 1585 --rail"`. **The kit's chest-zone blocks** (stamps and chips, the checklist, the diagram on his video, the drum on his video, the chapter band) **were built edge to edge, so their numeral tab and the first word of each line sit under the buttons** (seen on HCTV3230 and showreels 4-6). Pulling them in about 165 px is HIS call (asked the same night): until he decides, a real reel that uses one of them says so in the plan. One phone, one view (a reel opened from his profile): a 16:9 phone crops less and shows the buttons further right, and the Reels tab has a navigation bar at the bottom: these are the worst-case-left numbers.
 - Talk to him in plain words: short sentences, no jargon, no em-dashes. Concrete questions only, never a choice
   between abstract styles. Decide the concept yourself, then show it. Default (Amir, 2026-10-01, revised the same day): read the clip, get the
   script, then give him the PLAN with a few suggestions (my pick marked: he takes, swaps or ignores them; "you always
@@ -61,16 +65,23 @@ only his words, and nothing is uploaded or paid for without a yes.
 ## Toolchain (installed and proven 2026-10-01)
 | What | Where | Notes |
 |---|---|---|
-| Hyperframes 0.8.104 | `npm i -g hyperframes` and the Claude plugin `hyperframes@hyperframes` (user scope) | HTML to MP4 through headless Chrome and ffmpeg. Telemetry is **off** (`hyperframes telemetry disable`), keep it off. Plugin skills (namespace `hyperframes:`): `hyperframes` (router), `talking-head-recut`, `hyperframes-core` (its `references/creator-editing-recipes.md` has the trim, split, speed, zoom and audio recipes), `hyperframes-animation`, `hyperframes-registry`, `hyperframes-audio`, `media-use`. A session started before they were installed will not list them: read the files in `C:\Users\Amir\.claude\plugins\cache\hyperframes\hyperframes\0.8.104\skills\<name>\` instead. |
+| Hyperframes 0.8.104 | `npm i -g hyperframes` and the Claude plugin `hyperframes@hyperframes` (user scope) | HTML to MP4 through headless Chrome and ffmpeg. Telemetry is **off** (`hyperframes telemetry disable`), keep it off. Plugin skills (namespace `hyperframes:`): **21 are installed** and a new session lists them all. We have used 7: `hyperframes` (router), `talking-head-recut`, `hyperframes-core` (its `references/creator-editing-recipes.md` has the trim, split, speed, zoom and audio recipes), `hyperframes-animation`, `hyperframes-registry`, `hyperframes-audio`, `media-use`. **Two unused ones matter: `hyperframes-cli` (the `check` gate, `snapshot --zoom/--angle/--against`, `timeline --json`) and `hyperframes-keyframes` (punch-ins and speed ramps in one render).** `RESEARCH-2026-10-01.md` section 3 ranks all 21. If a session does not list them, read the files in `C:\Users\Amir\.claude\plugins\cache\hyperframes\hyperframes\0.8.104\skills\<name>\` instead. Latest on npm is 0.8.106 (Studio-only changes): stay on 0.8.104. |
 | ffmpeg + ffprobe 9.0.2 (Gyan full build) | winget package, on the user PATH | A session started before 2026-10-01 lacks the PATH entry: prepend `C:\Users\Amir\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-9.0.2-full_build\bin`. |
-| whisper.cpp b5130 (BLAS, CPU) | `C:\Users\Amir\tools\whisper.cpp\Release` (user PATH) | `hyperframes transcribe` finds `whisper-cli` on PATH. Model `ggml-large-v3.bin` (3.1 GB, sha256 checked) in `~/.cache/hyperframes/whisper/models/`. Large-v3 is the only multilingual model Hyperframes offers. No NVIDIA GPU (AMD RX 9070 XT), so it runs on the CPU: 105 s for a 79 s clip. |
-| `tools/` | next to this file | `plan_to_clips.py` (`propose` finds the silences worth cutting; `build` writes the cuts, speed changes and cut-ins as native Hyperframes clips and re-times the transcript; step 5), `new_reel.py <slug>` (starts a reel from the kit), `shots.sh` + `sheet.py` (build, lint, snapshot, labelled contact sheets), `loud.py` (two-pass -14 LUFS finish), `sync2.py` (voice vs the original take at every speed), `cutout.py` (the whole-clip cut-out of the speaker for the depth family: run detached, see "The kit"), `framesheet.py` (frames of a FINISHED mp4 into a labelled contact sheet), `edgecheck.py` (cut-out edges over flat backdrops), `sync_to_repo.py` (mirror this folder into the website repo, see "The kit"). **The Motion Menu set** (his own list, an artifact; `kit/MENU.md`): `menu_read.py` (digest of his marks, notes and added ideas, run it before planning), `menu_find.py <word>` (find an ingredient and its call), `menu_samples.py` (the sample clips), `menu_patch.py` (add or refresh ingredients in the page, and the marks his verdicts imply), `menu_test_site.py` (a local test copy before anything is published). |
+| whisper.cpp b5130 (BLAS, CPU) | `C:\Users\Amir\tools\whisper.cpp\Release` (user PATH) | `hyperframes transcribe` finds `whisper-cli` on PATH. Model `ggml-large-v3.bin` (3.1 GB, sha256 checked) in `~/.cache/hyperframes/whisper/models/`. Large-v3 is the model we use for Farsi (Hyperframes swaps its `.en` models for the multilingual ones on non-English audio and `media-use` lists `small` and `medium`, but nothing smaller than large-v3 has been tried on Farsi; Parakeet has no Farsi). This `whisper-cli` has `--vad`/`--vad-model` (the Silero model is downloaded: `C:\Users\Amir\tools\whisper.cpp\models\ggml-silero-v5.1.2.bin`, sha256 checked; measured WORSE than no VAD on HCTV3230, so unused) and `--dtw` (which only works with `--no-flash-attn`: `tools/word_times.py` does that). No NVIDIA GPU (AMD RX 9070 XT), so it runs on the CPU: 105 s for a 79 s clip. |
+| `tools/` | next to this file | `plan_to_clips.py` (`propose` finds the silences worth cutting; `build` writes the cuts, speed changes and cut-ins as native Hyperframes clips and re-times the transcript; step 5), `new_reel.py <slug>` (starts a reel from the kit), `shots.sh` + `sheet.py` (build, lint, snapshot, labelled contact sheets), `loud.py` (two-pass -14 LUFS finish), `sync2.py` (voice vs the original take at every speed), `cutout.py` (the whole-clip cut-out of the speaker for the depth family: run detached, see "The kit"), `framesheet.py` (frames of a FINISHED mp4 into a labelled contact sheet), `edgecheck.py` (cut-out edges over flat backdrops), `sync_to_repo.py` (mirror this folder into the website repo, see "The kit"). **Added 2026-10-01 from the research:** `check_gate.py` (step 8: `hyperframes check` with his caption band guarded), `qa_reel.py` + `tween_times.js` (step 10: the render gate on a finished mp4), `word_times.py` (step 4: measure, clamp or redo Whisper's word times), `sfx_lead.py` (measures every sound's lead, writes `kit/sfx/timing.json`), `sfx_proof.py` (proves the sound placement: run it after a change to `sfx_html` or a sound), `safezone_card.py` (the phone test card). **The Motion Menu set** (his own list, an artifact; `kit/MENU.md`): `menu_read.py` (digest of his marks, notes and added ideas, run it before planning), `menu_find.py <word>` (find an ingredient and its call), `menu_samples.py` (the sample clips), `menu_patch.py` (add or refresh ingredients in the page, and the marks his verdicts imply), `menu_test_site.py` (a local test copy before anything is published). |
 | `kit/` | next to this file | The motion-graphics kit (built 2026-10-01 in six showreel rounds): about 50 blocks as functions, thirty-four sounds (eleven old ones plus the Motion Menu's), six showreel build scripts, `HANDOFF.md`, and `MENU.md` + `menu/menu.json`: the whole Motion Menu (78 cards, each with a When and a How). See "The kit" below. |
 | Chrome | puppeteer's headless shell in `~/.cache/puppeteer` | `hyperframes doctor` shows a tick. |
 | His clips | `C:\Users\Amir\Videos\Reels\raw` | Not synced by OneDrive. Work folders: `C:\Users\Amir\Videos\Reels\<slug>\`. Never in the repo or OneDrive. |
 
 The repo's older reel tools (`.claude/skills/reel/tools/`: `render_mp4.js`, `mux_audio.py`) still serve HTML
 reels. `/cut` uses Hyperframes.
+
+**Research (2026-10-01): `RESEARCH-2026-10-01.md`** (what to adopt, learn from and skip among about 35 repos and the 21 Hyperframes skills; the five full agent reports are in
+`research-2026-10-01/`). **Amir said "yes, apply the free fixes" that night, and they are applied and proven** (section 14 of that file has the numbers): sounds land on their frame
+(`sfx_align`), the gate guards his caption band, the render gate and the audit exist, the planner has `--noise auto`, `--graded` and `retakes`, and `word_times.py` clamps Whisper's pause smear.
+The phone safe-zone test is DONE too (he sent the screenshot: section 14.9, and the rule above). Not done, and waiting for him: pulling the chest-zone blocks in from the right-hand buttons (a question about his loved blocks),
+the WhisperX Persian-alignment trial (about 3-4 GB of downloads, probably unnecessary now) and the faster cut-out trial.
+Do not install any third-party skill from GitHub: copy the ideas.
 
 ## Workflow
 1. **Environment.** `hyperframes doctor`: FFmpeg, FFprobe, Chrome and whisper-cpp must be ticked (Docker, TTS and
@@ -87,13 +98,20 @@ reels. `/cut` uses Hyperframes.
    source, same timeline (`-vn -af "highpass=f=80,afftdn=nr=10"`, light compression, about -16 LUFS).
    **If the plan uses depth** (type behind him, a studio swap, the number behind him), start the whole-clip cut-out NOW, detached:
    `python <skill>/tools/cutout.py <input> <work>/cutout` (about 7 s per source second, so 12 minutes for an 85 s clip).
-4. **Transcribe for timing only:** `hyperframes transcribe RAW -d <work> --engine whisper --model large-v3 --language fa --json`.
-   The result is a flat word array `{text,start,end}`. Fix the Farsi where meaning depends on it and keep the
-   timestamps. It places graphics and finds pauses. It is never shown as captions.
-5. **Assembly edit: silences and pace.** `python <skill>/tools/plan_to_clips.py propose public/input-video.mp4 transcript.json --out plan.json`
-   (`--noise -35` is the silence floor in dB: raise it to -30 in a noisy room; `--min 0.40` shortest pause;
-   `--keep 0.18` pause left behind). It cuts only inside real silences and never across a word. Then edit
-   `plan.json` by hand, with judgment:
+4. **Transcribe for timing only:** `python <skill>/tools/word_times.py transcribe RAW --out-dir <work> --noise auto` (about 3 minutes for an 85 s clip on the CPU).
+   It runs whisper.cpp large-v3 on Farsi with flash attention OFF so the DTW word times exist, then clamps every word out of the silences, and writes `<work>/transcript.json` (the same flat
+   `{text,start,end}` list that `hyperframes transcribe` made) and the raw `whisper.json`. **Why not `hyperframes transcribe`:** whisper.cpp silently turns `--dtw` off while flash attention is on
+   (its default: "dtw_token_timestamps is not supported with flash_attn - disabling") and Hyperframes' parser reads the plain token times anyway, so Whisper's smear around pauses came through, and the
+   planner's "never across a word" veto then killed the pauses: on HCTV3230 the planner found 1 pause from the old transcript and finds 7 from this one (`RESEARCH-2026-10-01.md` section 14).
+   `python <skill>/tools/word_times.py eval RAW transcript.json` scores any transcript against the audio. Fix the Farsi where meaning depends on it and keep the
+   timestamps. It places graphics and finds pauses. It is never shown as captions. (`hyperframes transcribe RAW -d <work> --engine whisper --model large-v3 --language fa --json` still works, with the smear.)
+5. **Assembly edit: silences and pace.** `python <skill>/tools/plan_to_clips.py propose public/input-video.mp4 transcript.json --out plan.json --noise auto`
+   (`--noise auto` reads the silence threshold from the room itself, the recording's quiet floor plus 6 dB: HCTV3230's floor is -41 dB so it chose -35; `--noise -35` is the old fixed default, -30 for a
+   noisy room; `--min 0.40` shortest pause; `--keep 0.18` pause left behind; `--graded` keeps 0.30 s of a 1-3 s pause and 0.50 s of a longer one). It cuts only inside real silences and never
+   across a word, and it **prints its stats** (median cut, how much of the speech stretch went, cuts a minute). **It needs the step-4 transcript** (DTW times, clamped): Whisper's smeared and phantom words
+   veto pauses ("never across a word"); on HCTV3230 the old transcript gave 1 pause at `--min 0.40` and the new one 7 (and 2 against 10 at `--min 0.30`) on the same audio.
+   **Then `python <skill>/tools/plan_to_clips.py retakes transcript.json`** lists a line he said twice (the same opening words again within 45 s): a *restart* means cut the first try and keep the LAST take,
+   a *repeat* may be on purpose. It never cuts anything: show him the list. Then edit `plan.json` by hand, with judgment:
    - **Cut:** pauses over about 0.4 s down to about 0.18 s, false starts, repeats, filler. Keep a 0.3-0.4 s beat
      before a punchline or a number. "Sometimes" means not every pause: breath is rhythm.
    - **Faster:** rambling or explaining stretches at 1.08-1.15x. **Slower:** the one line he wants remembered,
@@ -117,24 +135,33 @@ reels. `/cut` uses Hyperframes.
    transcribe a video or give timestamps (it only reads his notes and recorded meetings): Whisper does the timing.
 7. **Build** by filling in the reel's `build.py` (made by `new_reel.py`): `SEGMENTS` (the edit plan), `BLOCKS` (kit calls,
    plus anything bespoke) and `SFX`; `python build.py` writes `public/index.html` (`kit.build`: plan, clips on one clock,
-   page assembly). Times in `BLOCKS` are source seconds wrapped in `E(...)`. **Look at the shelf first** (`kit/BLOCKS.md`
+   page assembly; it prints `audit:` notes: a block used more often than he likes, too many kinds of wipe, his face off screen for more than half the reel).
+   Times in `BLOCKS` are source seconds wrapped in `E(...)`. **A time in `SFX` is where the HIT lands** (the skeleton passes `sfx_align=True`): the kit starts each sound early by its own lead
+   (`kit/sfx/timing.json`), so a click lands on its second, a whoosh PEAKS on it, a riser's climax is on it and the odometer roll ENDS on it. Without it the menu's mp3 files land 0.12 s late and a riser a second late. **Look at the shelf first** (`kit/BLOCKS.md`
    and the two contact sheets in `kit/showreel/`) so you know what exists, but the idea comes from the clip, and
    `kit/USAGE.md` holds the rules (a signature moment in every reel, rotation, his veto). Anything the kit does not
    have is written as bespoke CSS, HTML and JS in the same build. Local assets only: no CDN, no remote fonts. Every
    `<video>` and `<audio>` needs an `id` (`kit.py` does it). The Hyperframes catalog is another shelf (transitions via
    `hyperframes catalog --tag transition` and `hyperframes add <name>`; read `hyperframes:hyperframes-registry`
    first): it is Latin-first, so adapt it for Farsi.
-8. **Check.** `bash <skill>/tools/shots.sh <reel dir> "t1,t2,..." build.py` rebuilds, lints (must be 0 errors; kit
-   pages usually give 0 warnings), snapshots at the times you give and writes labelled contact sheets: **look at every
-   sheet**: face clear, top band clear, nothing cut off, Farsi letters joined. `hyperframes check public` runs the page
-   in headless Chrome (JS errors, missing assets, contrast). **Never put `dir="rtl"` on `<html>`** (the linter calls it a
+8. **Check.** `GATE=1 bash <skill>/tools/shots.sh <reel dir> "t1,t2,..." build.py` rebuilds, lints (must be 0 errors; kit
+   pages give 0 warnings), snapshots at the times you give (`--describe false`: nothing is sent to Gemini) and writes labelled contact sheets: **look at every
+   sheet**: face clear, top band clear, nothing cut off, Farsi letters joined. **Then the gate** (`GATE=1`, or `python <skill>/tools/check_gate.py <reel>/public` on its own):
+   `hyperframes check` with his caption band y 230-470 guarded at a moment every 0.5 s, plus overlap, occlusion, text outside the frame and contrast, printed as PASS, WARN or FAIL.
+   Dense sampling matters: on HCTV3230 the 9 default sample points saw nothing, 79 points saw two behind-him words whose BOXES dip 30-110 px into the band while they scale in. A finding that is
+   deliberate gets a `data-layout-allow-*` mark ON the element (the kit's blocks carry theirs: `kit/BLOCKS.md` "Sounds, the gate and the audit"); an accident gets fixed.
+   `GATE=deep` also samples every tween start and end (3x slower); `GATE_ARGS="--bottom 1585 --rail"` also lists what sits where Instagram's profile row and right-hand buttons cover (measured on his phone: the rule above); `PHONE=1` makes the contact sheets draw those zones. `hyperframes check` is also the answer to "does this
+   page run": lint, runtime, layout, motion and contrast in one browser session (`validate`, `inspect` and `layout` are old names for it). **Never put `dir="rtl"` on `<html>`** (the linter calls it a
    silent blank-video bug).
 9. **Render.** `hyperframes render public -o out.mp4 --fps 30` (default quality `looks`, CRF 16; `-q draft` for a
    quick look). Measured: 44 s of video in 38 s, so a reel takes about a minute or two.
 10. **Finish the sound.** `python <skill>/tools/loud.py raw.mp4 final.mp4`: two-pass loudnorm to -14 LUFS / -1.5 dBTP,
     48 kHz stereo AAC, picture copied, re-measured (PASS or CHECK). `python <skill>/tools/sync2.py RAW final.mp4
     out/timemap.json` checks the voice against the original take at every speed (lag 20 ms or less, correlation 0.85+).
-    Pull frames out of the final file and look at them, mid-wipe too.
+    **Then the render gate: `python <skill>/tools/qa_reel.py final.mp4 --tour`**: 1080x1920 / 30 fps / yuv420p / AAC, picture and sound the same length, -14 LUFS and -1 dBTP, no silence of 0.8 s in the mix,
+    no picture frozen for 1 s, no click at a cut (the planner puts a 20 ms fade on every cut: checked, the largest step is 0.5x its surroundings, and the scan catches an unfaded cut at 8x), and
+    **blips**: the picture jumps away and is back within 4 frames at a place with no cut or tween (a stray layer: `pop_sheet.png` shows the frames). `--tour` also writes a contact sheet with a frame every second
+    (`qa_tour_N.png`): look at the pace of the whole reel. Pull frames out of the final file and look at them, mid-wipe too.
 11. **Deliver** the MP4 with `SendUserFile` (`display: "attach"`). Name the zone left free for his captions and
     say what changed in two lines. Save only when he says so: sources (not footage) into the repo (check
     `_config.yml`'s exclude list first), commit, push `main` by itself.

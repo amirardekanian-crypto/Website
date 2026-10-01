@@ -81,6 +81,14 @@ The depth blocks (12, 18-24, 29, 40) need the speaker cut out of the clip once: 
 - ffmpeg is on the user PATH only for sessions started after the install; otherwise prepend `C:\Users\Amir\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-9.0.2-full_build\bin`.
 - Never drive styles from `onUpdate` (Hyperframes seeks do not fire callbacks): tween CSS properties or CSS variables. More in SKILL.md "Known gotchas".
 - Whisper mishears Farsi key words: confirm any number or term with him before it goes on screen.
+- **`hyperframes check` marks (tested 2026-10-01):** a `data-layout-allow-caption-zone` or `-overflow` on a container covers what is inside it, but `-occlusion` and `-overlap` count only on the TEXT element itself;
+  `text_not_painted` has no mark; and `check` takes ONE `--caption-zone` per run (a second flag silently replaces the first). Its collisions are about element BOXES, not ink.
+- **A variable named like a parameter breaks silently.** In `sfx_html` a local `base` shadowed the `base="sfx/"` path prefix and every sound became `0.75whoosh.wav`; only the gate's lint caught it. After ANY edit
+  to `kit.py` run `python tools\sfx_proof.py` and `hyperframes lint` on a rebuilt page.
+- **`silencedetect` compares single samples, not an average**, so a threshold is about the loudest sample of the room's noise (`--noise auto` measures it: the lowest dense cluster of 50 ms peak levels plus 6 dB).
+  And the planner's "never across a word" veto kills pauses when Whisper's words smear into them: clamp first (`tools\word_times.py clamp`).
+- **whisper.cpp silently turns `--dtw` off while flash attention is on** (it is by default): `dtw_token_timestamps is not supported with flash_attn - disabling`. `hyperframes transcribe` passes `--dtw` and gets no DTW time
+  (every `t_dtw` is -1), and its parser builds words from the plain token `offsets` anyway. `word_times.py transcribe --source dtw` runs with `--no-flash-attn`.
 
 ## Open items, in order
 1. **No verdict is pending** (he liked 50-52). Next is a real clip, planned with the creative-director lookup (`SKILL.md` steps 1-11, the Motion Menu digest, the cue table in `BLOCKS.md`), or another idea
@@ -97,7 +105,16 @@ The depth blocks (12, 18-24, 29, 40) need the speaker cut out of the clip once: 
 4. **The kit is too big** (about 50 blocks; the rule is 15-20 in use). Once he confirms, retire the photo courts, `K.halo`/`K.sweep` on the wall,
    `K.quote` and the whip wipe (list in `kit\USAGE.md` "Retire next"). Do not delete without his word.
 5. **A real clip.** The workflow is `SKILL.md` steps 1-11. Start the reel with `python tools\new_reel.py <slug>`.
-6. **Keep the repo mirror in step.** After changing this folder run `python tools\sync_to_repo.py`, then commit and push the mirror (`main`, by itself, one push at a
+6. **The research (2026-10-01): its free fixes are APPLIED and proven** (he said "yes, apply the free fixes and get the VAD file"). `..\RESEARCH-2026-10-01.md` has the verdicts and section 14 the numbers; the five
+   agent reports are in `..\research-2026-10-01\`. What now exists: **sounds land on their frame** (`sfx_align=True` in new reels, `tools\sfx_lead.py`, `kit\sfx\timing.json`, proof `tools\sfx_proof.py`: all 9 test
+   sounds within 0 ms of their flash; old builds are byte-identical); **the gate** (`tools\check_gate.py`, `GATE=1 shots.sh`, `data-layout-allow-*` marks in `kit.js`: the six showreels went from 5-21 errors each to
+   the genuine warnings); **the render gate** (`tools\qa_reel.py`: format, loudness, dead air, freeze, seam clicks, blips); **the audit** (`kit.audit`, printed at build); **the planner** (`--noise auto`,
+   `--graded`, `retakes`, stats); **word times** (`tools\word_times.py`: clamp Whisper's pause smear). **The phone safe-zone test is DONE** (he sent the screenshot the same night; `tools\phone_measure.py`, `tools\phone_zones.py`, section 14.9 of the research file): nothing is covered from y 195 to y 1165;
+   the right-hand buttons cover x 920-993, y 1171-1770; the profile row everything below y 1587; 52-54 px are cropped off each side. Meta's ad figures were far too cautious and our old y 250-1600 was right, but
+   **the chest-zone blocks put their numeral tab and the first word of each Farsi line under the buttons**. **OPEN QUESTION FOR HIM:** pull the stamps and chips, the checklist, the diagram on his video, the drum on
+   his video and the chapter band in by about 165 px from the right (they get ~15% narrower)? Do not do it unasked: they are his loved blocks. **Still waiting for him:** that answer, the WhisperX Persian-alignment
+   trial (a second Python, about 2 GB of packages and a 1.26 GB model: ask first; probably unnecessary now) and a faster cut-out trial (RobustVideoMatting, 14 MB model: ask first).
+7. **Keep the repo mirror in step.** After changing this folder run `python tools\sync_to_repo.py`, then commit and push the mirror (`main`, by itself, one push at a
    time) only when he says "go live" (his word for pushing to main). Never edit the mirror directly. **`git fetch` first and bring the checkout up to date (`git merge --ff-only origin/main`)**:
    other sessions push to the same repo (on 2026-10-01 night it was 19 commits ahead, the Motion Menu's first builder among them), so read what came in before you push.
 

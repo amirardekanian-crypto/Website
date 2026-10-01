@@ -22,6 +22,18 @@
     return e;
   };
 
+  // `hyperframes check` (tools/check_gate.py) reads these marks. A block that layers or bleeds on purpose says so, so the gate fails only on an
+  // accident. overlap: text boxes touch (the boxes, not the ink). occlusion: type behind him, or in a clipped window. overflow: bigger than its
+  // frame. caption-zone: its BOX dips into his caption band y 230-470 (the ink does not).
+  // WHERE the mark goes matters (tested 2026-10-01): caption-zone and overflow marks on a container cover what is inside it, but an occlusion or an
+  // overlap mark counts only on the TEXT element itself (an ancestor's does not), so digits and words carry LEAF. text_not_painted has no mark.
+  const allow = (e, ...kinds) => {
+    kinds.forEach((k) => e.setAttribute("data-layout-allow-" + k, ""));
+    return e;
+  };
+  const LEAF = " data-layout-allow-occlusion data-layout-allow-overlap data-layout-allow-overflow";
+  const DI = "<i" + LEAF + ">"; // one digit of an odometer column
+
   // The master timeline. from/fromTo must NOT paint their start state at frame 0 (a later wipe-out would show its layer at once).
   K.timeline = () => global.gsap.timeline({ paused: true, defaults: { immediateRender: false } });
   K.init = (o) => {
@@ -388,7 +400,8 @@
   };
   const deepWord = (d, text, o = {}) => {
     const ol = o.tone === "outline" || o.tone === "outline-clay";
-    const e = mk("div", "k-deep" + (o.tone ? " k-" + o.tone : ""), ol ? "<span>" + text + "</span>" : text, d.wrap);
+    const e = mk("div", "k-deep" + (o.tone ? " k-" + o.tone : ""), ol ? "<span" + LEAF + ">" + text + "</span>" : text, d.wrap);
+    allow(e, "caption-zone", "occlusion", "overflow", "overlap"); // type behind him: his head hides part of it, a giant word bleeds, echoes stack
     if (o.size) e.style.fontSize = o.size + "px";
     if (o.top != null) e.style.top = o.top + "px";
     if (o.x) e.style.left = o.x + "px";
@@ -496,11 +509,12 @@
     const dur = o.out - o.at + 1.2;
     const els = rows.map((r, i) => {
       const row = mk("div", "k-drow", "", d.wrap);
+      allow(row, "caption-zone", "occlusion", "overflow", "overlap"); // rows of one word sliding behind him: texture
       row.style.top = r.top + "px";
       row.style.fontSize = r.size + "px";
       const inner = mk("div", "k-dri", "", row);
       const cls = r.tone === "outline" ? "k-outline" : r.tone === "outline-clay" ? "k-outline k-oc" : "k-" + (r.tone || "clay");
-      inner.innerHTML = new Array(9).fill('<b class="' + cls + '">' + word + "</b>").join("");
+      inner.innerHTML = new Array(9).fill('<b class="' + cls + '"' + LEAF + ">" + word + "</b>").join("");
       const travel = r.speed * dur;
       tl.fromTo(inner, { x: (-r.dir * travel) / 2 }, { x: (r.dir * travel) / 2, duration: dur, ease: "none" }, o.at - 0.6);
       tl.fromTo(row, { autoAlpha: 0, clipPath: "inset(-90px -90px -90px 1080px)" }, { autoAlpha: r.a ?? 1, clipPath: "inset(-90px -90px -90px -90px)", duration: 0.9, ease: "power3.out" }, o.at + i * 0.12);
@@ -611,9 +625,10 @@
     const w1 = mk("div", "k-layer");
     w1.style.top = y + "px";
     const big = mk("div", (o.variant === "stamp" ? "k-stamp k-mega" : "k-bubble") + " k-hid", word, w1); // the bubble is his favourite
+    allow(big, "overlap"); // the big stamp's box runs about 30 px over its sub-line (the ink does not)
     const w2 = mk("div", "k-layer");
     w2.style.top = y + 310 + "px";
-    const sub = o.sub ? mk("div", "k-stamp k-paper k-sm k-hid", o.sub, w2) : null;
+    const sub = o.sub ? allow(mk("div", "k-stamp k-paper k-sm k-hid", o.sub, w2), "overlap") : null;
     tl.fromTo(big, { autoAlpha: 0, scale: 0.3, rotate: 7 }, { autoAlpha: 1, scale: 1, rotate: -2, duration: 0.5, ease: "back.out(2)" }, o.at);
     if (sub) tl.fromTo(sub, { autoAlpha: 0, y: 50 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: "expo.out" }, o.subAt ?? o.at + 0.45);
     if (o.pulse != null) tl.to(big, { scale: 1.07, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" }, o.pulse);
@@ -682,7 +697,7 @@
     const t0 = o.at, swing = o.swing !== false, W = 0.45, wv = o.wipeVariant || "iris";
     const layer = mk("div", "k-full k-c3d");
     const stage3 = mk("div", "k-stage3d", "", layer);
-    const plane = mk("div", "k-plane", "", stage3);
+    const plane = allow(mk("div", "k-plane", "", stage3), "overflow", "occlusion", "overlap"); // the court lies in 3D: lines run off the frame, the runner's ghosts and the numbers stack
     mk("div", "k-floor", "", plane);
     const inc = mk("div", "k-inc", "", plane);
     Object.assign(inc.style, { left: CT.L + "px", top: CT.T + "px", width: CT.R - CT.L + "px", height: CT.B - CT.T + "px" });
@@ -724,7 +739,7 @@
       const size = o2.size ?? 150, lift = o2.lift ?? 0, H = lift + size * 1.3 + (o2.unit ? size * 0.42 : 0);
       const e = add("k-num3");
       Object.assign(e.style, { width: "340px", height: H + "px", margin: -H + "px 0 0 -170px" });
-      const inner = mk("div", "k-nm", text + (o2.unit ? "<small>" + o2.unit + "</small>" : ""), e);
+      const inner = allow(mk("div", "k-nm", text + (o2.unit ? "<small" + LEAF + ">" + o2.unit + "</small>" : ""), e), "occlusion", "overlap", "overflow");
       inner.style.fontSize = size + "px";
       if (o2.unit) inner.querySelector("small").style.fontSize = size * 0.36 + "px";
       stand(e, x, y);
@@ -754,12 +769,12 @@
     const A = M3.apply(null, o.ballFrom || [-2.4, 22.4]), B1 = M3.apply(null, o.bounce1 || [3.4, 8.2]), B2 = M3.apply(null, o.bounce2 || [3.2, 3.4]);
     const P0 = M3.apply(null, o.from || [-1.9, 1.4]), R = B2;
     // top lines, in front of the court
-    const c1 = mk("div", "k-ctext k-hid", o.line1 || "", layer);
+    const c1 = allow(mk("div", "k-ctext k-hid", o.line1 || "", layer), "overlap"); // its box runs about 30 px into the stamp's box below (the ink does not)
     c1.style.top = "480px";
     c1.style.fontSize = "165px";
     const w2 = mk("div", "k-cstamp", "", layer);
     w2.style.top = "672px";
-    const c2 = mk("div", "k-stamp k-huge k-hid", o.line2 || "", w2);
+    const c2 = allow(mk("div", "k-stamp k-huge k-hid", o.line2 || "", w2), "overlap");
     if (o.line1At != null) tl.fromTo(c1, { x: 520, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.55, ease: "expo.out" }, o.line1At);
     if (o.line2At != null) tl.fromTo(c2, { scale: 0.4, autoAlpha: 0, y: 50 }, { scale: 1, autoAlpha: 1, y: 0, duration: 0.5, ease: "back.out(2)" }, o.line2At);
 
@@ -941,11 +956,11 @@
     const items = Array.from(String(value)).map((ch) => {
       const d = digitOf(ch);
       if (d < 0) return { sep: ch === "٫" || ch === "." ? mk("div", "k-ndot k-hid", "", row) : mk("div", "k-nsep k-hid", ch, row) };
-      const reel = mk("div", "k-reel", "", row);
+      const reel = allow(mk("div", "k-reel", "", row), "caption-zone", "occlusion", "overflow", "overlap"); // the odometer: a column of digits behind a clipped window
       const col = mk("div", "k-rcol", "", reel);
       let h = "";
-      for (let c = 0; c < cycles; c++) for (let k = 0; k < 10; k++) h += "<i>" + PD[k] + "</i>";
-      for (let k = 0; k <= d; k++) h += "<i>" + PD[k] + "</i>";
+      for (let c = 0; c < cycles; c++) for (let k = 0; k < 10; k++) h += DI + PD[k] + "</i>";
+      for (let k = 0; k <= d; k++) h += DI + PD[k] + "</i>";
       col.innerHTML = h;
       return { reel, col, dist: (cycles * 10 + d) * size * 1.12 };
     });
@@ -978,7 +993,7 @@
     const g = global.gsap;
     const look = o.look || "clay", wv = o.wipeVariant || "iris", cy = o.y ?? 980;
     const c = mk("div", "k-full k-" + look);
-    const st = mk("div", "k-nstage", "", c);
+    const st = allow(mk("div", "k-nstage", "", c), "overflow"); // panels, plates and the card's own parts slide in from beyond the frame
     const glow = mk("div", "k-qglow", "", st);
     glow.style.top = cy - 400 + "px";
     const ring = mk("div", "k-qring k-hid", "", st);
@@ -989,7 +1004,7 @@
     K.wipeIn(c, o.at, o.wipe ?? 0.5, wv);
     const t1 = rollReels(R, o.landAt, o);
     if (o.pre) {
-      const pre = mk("div", "k-npre k-hid", o.pre, st);
+      const pre = allow(mk("div", "k-npre k-hid", o.pre, st), "caption-zone"); // its box starts at y 442, 28 px into the band; the ink does not
       pre.style.top = cy - size * 0.56 - 60 + "px";
       tl.fromTo(pre, { autoAlpha: 0, y: 50 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "expo.out" }, o.preAt ?? Math.max(o.at + 0.3, t1 - 0.4));
     }
@@ -1047,7 +1062,7 @@
     const g = global.gsap;
     const wv = o.wipeVariant || "iris";
     const c = mk("div", "k-full k-" + (o.look || "ink"));
-    const st = mk("div", "k-nstage", "", c);
+    const st = allow(mk("div", "k-nstage", "", c), "overflow"); // panels, plates and the card's own parts slide in from beyond the frame
     const cols = o.colors || ["clay", "ink2"];
     const side = (cls, col, word, sub, left) => {
       const p = mk("div", "k-vp " + cls + " k-vc-" + col, "", st);
@@ -1356,7 +1371,7 @@
     const { P, A, tabW, fs, pad } = pl;
     const c = vid ? mk("div", "k-ovl") : mk("div", "k-full k-" + look);
     if (!vid) gridTex(c);
-    const st = mk("div", "k-nstage", "", c);
+    const st = allow(mk("div", "k-nstage", "", c), "overflow"); // panels, plates and the card's own parts slide in from beyond the frame
     // colours as [plate, text, tab]
     const COL = vid
       ? { act: ["#c7552f", "#ffffff", "#16161a"], done: ["rgba(24,24,29,0.88)", "#e9e4da", "rgba(51,51,60,0.95)"] }
@@ -1444,7 +1459,7 @@
     const X0 = 150, X1 = 940, YB = o.yb ?? 1400, YT = o.yt ?? 640, W = X1 - X0, H = YB - YT;
     const c = mk("div", "k-full k-" + look);
     gridTex(c);
-    const st = mk("div", "k-nstage", "", c);
+    const st = allow(mk("div", "k-nstage", "", c), "overflow"); // panels, plates and the card's own parts slide in from beyond the frame
     const svg = sv("svg", { viewBox: "0 0 1080 1920", class: "k-csvg" }, st);
     // a logistic climb normalised to start at 0 and end at 1
     const fn = (u, x0, k) => {
@@ -1571,17 +1586,17 @@
     const at = o.at, landAt = o.landAt ?? at + (band ? 0.8 : 1.0), titleAt = o.titleAt ?? landAt, roll = o.roll ?? (band ? 0.85 : 1.15);
     // the roll: one column of digits from the last chapter's number, through a full turn, to this one
     let digits = "";
-    for (let k = from; k <= num + 10; k++) digits += "<i>" + PD[k % 10] + "</i>";
+    for (let k = from; k <= num + 10; k++) digits += DI + PD[k % 10] + "</i>";
     const steps = num + 10 - from;
     if (!band) {
       const look = o.look || "clay", wv = o.wipeVariant || "clay";
       const c = mk("div", "k-full k-" + look);
-      const st = mk("div", "k-nstage", "", c);
+      const st = allow(mk("div", "k-nstage", "", c), "overflow"); // panels, plates and the card's own parts slide in from beyond the frame
       const glow = mk("div", "k-qglow", "", st);
       const ring = mk("div", "k-qring k-hid", "", st);
       ring.style.top = "760px";
       const size = o.numSize ?? 980;
-      const win = mk("div", "k-chn", "", st);
+      const win = allow(mk("div", "k-chn", "", st), "caption-zone", "occlusion", "overflow", "overlap"); // the chapter's ghost odometer
       Object.assign(win.style, { fontSize: size + "px", left: (1080 - 0.66 * size) / 2 + "px", top: 1000 - 0.56 * size + "px" });
       const col = mk("div", "k-chncol", digits, win);
       tl.fromTo(col, { y: 0 }, { y: -steps * size * 1.12, duration: roll, ease: "power3.out" }, landAt - roll);
@@ -1610,7 +1625,7 @@
     // the band: a clay slab across the chest zone (his face stays on screen), numeral tab on the right, the title beside it
     const b = mk("div", "k-chband", "", stage);
     b.style.top = (o.y ?? 1180) + "px";
-    const nb = mk("div", "k-chbn", "", b);
+    const nb = allow(mk("div", "k-chbn", "", b), "caption-zone", "occlusion", "overflow", "overlap"); // the chapter band's number window
     const col = mk("div", "k-chncol", digits, nb);
     const tt = mk("div", "k-chbt", "", b);
     const tf = fitFs(title, 640, 150, 96); // the band leaves 640 px beside the numeral: a longer title shrinks to fit
@@ -1646,7 +1661,7 @@
     if (!BM) throw new Error("data/bodymap.js is not loaded (the template includes it, kit.scaffold copies it)");
     const g = global.gsap, wv = o.wipeVariant || "iris", look = o.look || "ink";
     const c = mk("div", "k-full k-" + look);
-    const st = mk("div", "k-nstage", "", c);
+    const st = allow(mk("div", "k-nstage", "", c), "overflow"); // panels, plates and the card's own parts slide in from beyond the frame
     const glow = mk("div", "k-qglow", "", st);
     const VBW = 800, VBH = 1652, FH = o.height ?? 1040, S = FH / VBH, FW = VBW * S;
     const FX = 540 - FW / 2 + (o.dx ?? 0), FY = o.y ?? 490;
@@ -1778,7 +1793,7 @@
 
   /* ---------- catalogue label: for the showreel only, never in a real reel ---------- */
   K.label = (text, t0, t1) => {
-    const l = mk("div", "k-label", text);
+    const l = allow(mk("div", "k-label", text), "caption-zone", "overflow"); // the showreel's catalogue label (never in a real reel)
     tl.fromTo(l, { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: 0.25, ease: "power2.out" }, t0);
     tl.to(l, { autoAlpha: 0, duration: 0.2 }, t1);
     return l;

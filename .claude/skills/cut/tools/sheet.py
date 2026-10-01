@@ -6,6 +6,11 @@ import sys
 
 from PIL import Image, ImageDraw
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import phone_zones  # noqa: E402
+
+PHONE = bool(os.environ.get("PHONE"))  # PHONE=1 bash shots.sh ...: draw the parts of the picture Instagram's interface covers on his phone
+
 d = sys.argv[1]
 files = sorted(glob.glob(os.path.join(d, "frame-*.png")))
 W, H, PER, ROWS = 324, 576, 5, 2
@@ -16,6 +21,8 @@ for n in range(0, len(files), PER * ROWS):
     dr = ImageDraw.Draw(sheet)
     for k, f in enumerate(chunk):
         im = Image.open(f).convert("RGB").resize((W, H), Image.LANCZOS)
+        if PHONE:
+            im = phone_zones.overlay(im)
         x, y = (k % PER) * W, (k // PER) * H
         sheet.paste(im, (x, y))
         t = re.search(r"at-([0-9.]+)s", f).group(1)

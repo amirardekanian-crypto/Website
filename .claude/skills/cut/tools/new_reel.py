@@ -27,7 +27,7 @@ sys.path.insert(0, r"C:\\Users\\Amir\\.claude\\skills\\cut\\kit")
 import kit
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-TR = os.path.join(ROOT, "..", "transcript.json")  # from: hyperframes transcribe RAW -d <slug folder> --engine whisper --model large-v3 --language fa --json
+TR = os.path.join(ROOT, "..", "transcript.json")  # from: python C:/Users/Amir/.claude/skills/cut/tools/word_times.py transcribe RAW --out-dir <slug folder> --noise auto
 
 # Source seconds. rate: 1.0 as spoken. zoom: 1.0 wide, 1.12-1.22 cut-in. punch: settle on the cut. drift: slow push-in.
 # Cut inside real silences; change speed on sentence or pause boundaries.
@@ -39,9 +39,12 @@ BLOCKS = """
 K.stamps(["..."], { at: [E(1.0)], variant: "pop", out: E(4.0) });
 """
 
-SFX = [(1.0, "pop")]  # (source seconds, sound): pop whoosh ding thock hit stamp
+# (source seconds, sound). The time is where the HIT lands: with sfx_align=True the kit starts each sound early by its own lead, so a click, a
+# stamp, a whoosh (its peak) and a riser (its climax) all land on that second, and the roll ENDS on it. Sounds: pop whoosh ding thock hit stamp
+# step rise tick roll swipe, plus every sound in the Motion Menu by its id (tools/menu_find.py <word>).
+SFX = [(1.0, "pop")]
 
-kit.build(ROOT, "%%SLUG%%", SEGMENTS, BLOCKS, sfx=SFX, transcript=TR)
+kit.build(ROOT, "%%SLUG%%", SEGMENTS, BLOCKS, sfx=SFX, transcript=TR, sfx_align=True)
 '''
 
 slug = sys.argv[1]

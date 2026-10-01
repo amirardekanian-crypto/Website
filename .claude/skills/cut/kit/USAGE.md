@@ -29,6 +29,16 @@ Amir's taste is collected here, newest verdicts included. `HANDOFF.md` says wher
 - **33** `K.quote` (the page with the highlighter): "33 and 35 i dont like" (2026-10-01).
 - **35** the whip WIPE (`wipeVariant: "whip"` on a full-screen card). The cut transition `K.whip` (37) is fine.
 
+## His banned moves and his exemplar (the "MOTION.md" idea from the research: a short list per brand that a new reel is held against, so the check is HIS taste, not a generic one)
+1. **Light effects on the wall:** a glow, ring, disc or sweep behind his head (21: "i dont like 21"). The soft glow inside a studio swap stays.
+2. **Yellow, gold, ochre or amber, anywhere.** Several Hyperframes themes and registry blocks are yellow (`craft`, "Biennale Yellow", `ai-tracking-box`): recolour them.
+3. **Letters one by one in Farsi** (typewriter, scramble, per-letter slam, tracking-in): cursive letters do not type, and the joins break. Words animate whole.
+4. **The whip wipe on a full-screen card (35) and the quote page (33)**: benched by him.
+5. **Anything that lives on his caption band y 230-470, or a bar that stays on screen at the bottom** (Instagram's own interface lives there).
+**The exemplar every new reel is held against: 29**, the number behind him on a dark studio, he sinks, a unit tag on his chest. If a new reel has nothing that feels as sure as that, it is not done.
+The repos' own bans that do NOT apply to him: glow and bounce (his loved stamps overshoot: `back.out` 1.7-3 stays; for NEW blocks keep a stamp pop to 2-4% over 5-9 frames and a slam to `back.out` 1.7 or
+less), "never restate the voiceover" (his rule is one load-bearing word or number per graphic), "no naked cuts" (his jump cuts are deliberate), "nothing static over 1 s" (a hold is right for reading).
+
 ## His taste, all verdicts (the house style first)
 **House style, in one paragraph:** big confident type; depth (type BEHIND him on a cut-out); him smaller and lower in frame with
 type above ("i liked the text and how i was smalled"); things ON his own video rather than a full card whenever the text fits (39, 43, 47: he
