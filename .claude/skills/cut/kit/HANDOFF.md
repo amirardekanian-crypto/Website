@@ -1,9 +1,9 @@
 # HANDOFF: where the /cut reel kit stands, and how to continue in a new chat
 
-Written 2026-10-01 at the end of a long session. Read this first when you pick the work up. Everything below is on Amir's PC. On his "go live"
-(2026-10-01) a mirror of this folder was committed to the website repo at `.claude/skills/cut/` (see the table); nothing else was uploaded.
-**Since then (evening of 2026-10-01) the mirror is behind**: the Motion Menu connection (`kit\MENU.md`, `kit\menu\`, `tools\menu_*.py`, showreels 5-6, stage 3 of the kit)
-is only here. Run `python tools\sync_to_repo.py` and commit it when he says "go live". The one thing published outside this PC is his own Motion Menu artifact (version 7 on 2026-10-01, after the tidy-up).
+Written 2026-10-01 at the end of a long session. Read this first when you pick the work up. This folder is on Amir's PC and is the one you edit. On his "go live"
+(2026-10-01, twice: morning and night) a mirror of it was committed to the website repo at `.claude/skills/cut/` (see the table; the night one is commit 69011f8: the Motion Menu connection and its
+tidy-up, stage 3 of the kit, showreels 5-6). After any later change run `python tools\sync_to_repo.py` and commit it only when he says "go live". The other thing published outside this PC is his own
+Motion Menu artifact (version 7 on 2026-10-01, after the tidy-up). **The repo also holds the page's first builder, `Content/motion/`: read `kit\MENU.md` "Two pipelines, one page" before you publish the page.**
 
 ## What this is
 Amir (online S&C coach, Farsi Instagram reels) is **not an editor**. He gave Claude the job of creative director and editor for his
@@ -98,7 +98,8 @@ The depth blocks (12, 18-24, 29, 40) need the speaker cut out of the clip once: 
    `K.quote` and the whip wipe (list in `kit\USAGE.md` "Retire next"). Do not delete without his word.
 5. **A real clip.** The workflow is `SKILL.md` steps 1-11. Start the reel with `python tools\new_reel.py <slug>`.
 6. **Keep the repo mirror in step.** After changing this folder run `python tools\sync_to_repo.py`, then commit and push the mirror (`main`, by itself, one push at a
-   time) only when he says "go live" (his word for pushing to main). Never edit the mirror directly.
+   time) only when he says "go live" (his word for pushing to main). Never edit the mirror directly. **`git fetch` first and bring the checkout up to date (`git merge --ff-only origin/main`)**:
+   other sessions push to the same repo (on 2026-10-01 night it was 19 commits ahead, the Motion Menu's first builder among them), so read what came in before you push.
 
 ## What to say in a new chat
 Open a new chat in the Website project (the project memory then loads by itself), or in any folder (the skill `/cut` is user-level, so it loads
