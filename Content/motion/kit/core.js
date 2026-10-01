@@ -47,7 +47,7 @@
     while (def.kind === 'alias') { presets.unshift(def.preset); def = KIT.defs[def.base]; if (!def) throw new Error(`kit: alias "${id}" points at a missing piece`); }
     const p = Object.assign({}, def.defaults);
     for (const pr of presets) Object.assign(p, pr);
-    if (params) Object.assign(p, params);
+    if (params) for (const k of Object.keys(params)) if (params[k] !== undefined) p[k] = params[k];      // an undefined param means "not given"
     return { def, p };
   }
   KIT.resolve = resolve;
@@ -66,9 +66,10 @@
   KIT.transition = function (id, params) {
     const { def, p } = resolve(id, params);
     if (def.kind !== 'join') throw new Error(`kit: "${id}" is not a scene change`);
+    const sp = p.speed > 0 && p.speed !== 1 ? p.speed : 1;                       // speed 2 = a scene change twice as quick: its run-up and run-out shrink
     const tr = {
-      pre: p.pre != null ? p.pre : (def.pre != null ? def.pre : .3),
-      post: p.post != null ? p.post : (def.post != null ? def.post : .3),
+      pre: (p.pre != null ? p.pre : (def.pre != null ? def.pre : .3)) / sp,
+      post: (p.post != null ? p.post : (def.post != null ? def.post : .3)) / sp,
       draw: (ctx, A, B, pr, t, env) => def.draw(ctx, A, B, pr, t, p, env || SPEC()),
     };
     if (def.fx) tr.fx = pr => def.fx(pr, p);
@@ -226,9 +227,9 @@
 
   /* what a piece is and how to call it, for Claude and for the docs */
   KIT.describe = function (id) {
-    const { def, p } = resolve(id, {});
-    const base = def.kind === 'alias' ? KIT.defs[id] : def, params = {};
+    const { def, p } = resolve(id, {});              // def is the real piece an alias points at; p has the alias's preset applied
+    const top = KIT.defs[id], params = {};          // top is what was asked for (the alias, if it is one): its own doc and kind
     for (const k of Object.keys(def.defaults)) params[k] = { default: p[k], doc: def.params[k] || '' };
-    return { id, kind: base.kind, base: def.id, doc: base.doc || def.doc || '', group: def.group || '', params, cues: !!def.cues };
+    return { id, kind: top.kind, base: def.id, doc: top.doc || def.doc || '', group: def.group || '', params, cues: !!def.cues };
   };
 })(window);

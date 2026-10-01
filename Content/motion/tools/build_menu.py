@@ -45,13 +45,13 @@ def main():
         o = dict(it); o['no'] = nums[it['id']]
         items.append(o)
         if it['kind'] in ('visual', 'look'):
-            m = manifest.get(it['id'])
             c = it['clip']
-            if not m:
-                problems.append(f'{it["id"]}: no rendered clip or poster yet'); continue
-            files.append(f'posters/{it["id"]}.jpg')
-            if c.get('t1') is not None:
-                files.append(f'clips/{it["id"]}.mp4')
+            for key in [it['id']] + ([it['id'] + '.fa'] if c.get('fa') else []):
+                if not manifest.get(key):
+                    problems.append(f'{key}: no rendered clip or poster yet'); continue
+                files.append(f'posters/{key}.jpg')
+                if c.get('t1') is not None:
+                    files.append(f'clips/{key}.mp4')
         if it['kind'] == 'sound':
             if it['id'] not in sounds:
                 problems.append(f'{it["id"]}: no rendered sound yet'); continue
@@ -64,7 +64,8 @@ def main():
         print(f'{len(problems)} problem(s). Fix them, then build again.')
         return 1
 
-    clips = {k: {'dur': v.get('dur', 0), 'bytes': v.get('bytes', 0)} for k, v in manifest.items() if k in {i['id'] for i in items}}
+    ids = {i['id'] for i in items}
+    clips = {k: {'dur': v.get('dur', 0), 'bytes': v.get('bytes', 0)} for k, v in manifest.items() if k.split('.')[0] in ids}
     snd = {}
     for k, v in sounds.items():
         s = {'dur': v['dur'], 'peaks': v['peaks'], 'file': f'sounds/{k}.mp3'}

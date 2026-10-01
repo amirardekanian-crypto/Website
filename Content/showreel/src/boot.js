@@ -21,7 +21,7 @@
     const draw = () => R.renderFrame(live.frame, { samples: q.has('t') ? 6 : 2 });
     function loop(now) {
       if (live.playing) {
-        live.frame = Math.floor(((now - live.t0) / 1000 * R.FPS + live.base) % (R.DUR * R.FPS));
+        live.frame = Math.floor((Math.max(0, now - live.t0) / 1000 * R.FPS + live.base) % (R.DUR * R.FPS));
         draw();
       }
       requestAnimationFrame(loop);

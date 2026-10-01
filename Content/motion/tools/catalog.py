@@ -20,7 +20,7 @@ CATALOG, LEDGER = HERE / 'catalog.json', HERE / 'numbers.json'
 
 KINDS = {'visual', 'look', 'pair', 'feel', 'rule', 'sound'}
 FARSI = {'none', 'yes', 'words'}            # none = no text, yes = text works as it is, words = the words change, the move stays
-TABS = {'visual', 'design', 'sound'}
+TABS = {'visual', 'reels', 'design', 'sound'}
 NEEDS_CLIP = {'visual', 'look'}
 ID_RE = re.compile(r'^[a-z0-9]+(-[a-z0-9]+)*$')
 BAD_CHARS = ('—', '–')            # em and en dashes: Amir's house style is short sentences and plain stops

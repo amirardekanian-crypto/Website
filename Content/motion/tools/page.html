@@ -50,7 +50,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 
 /* sticky tabs + group chips */
 .sticky{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin-inline:-16px;padding:8px 16px 0;background:var(--bg);border-bottom:1px solid var(--line)}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding-bottom:8px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding-bottom:8px}
 .tab{min-height:42px;border:1px solid var(--line2);background:var(--card);border-radius:10px;color:var(--ink2);font:600 19px/1 'Barlow Condensed',system-ui,sans-serif;display:flex;align-items:baseline;justify-content:center;gap:6px;padding:0 4px}
 .tab small{font:500 12px/1 'DM Sans',system-ui,sans-serif;opacity:.75}
 .tab{align-items:center}
@@ -73,6 +73,12 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
 @keyframes flash{0%{box-shadow:0 0 0 4px var(--clay)}100%{box-shadow:0 0 0 0 transparent}}
 .media{position:relative;aspect-ratio:16/9;max-width:100%;background:var(--stage);overflow:hidden}
 .media video,.media img{display:block;width:100%;height:100%;object-fit:cover}
+.media.tall{aspect-ratio:9/16;width:min(100%,calc(72vh * 9 / 16));margin-inline:auto}
+.media .langs{position:absolute;right:8px;top:8px;display:flex;gap:4px;z-index:2}
+.media .lang{min-width:40px;min-height:30px;padding:0 9px;border-radius:999px;border:1px solid rgba(242,238,229,.35);background:rgba(11,11,16,.72);color:#F2EEE5;font:700 12px/1 'DM Sans',system-ui,sans-serif}
+.media .lang[aria-pressed="true"]{background:#F2EEE5;color:#0B0B10;border-color:#F2EEE5}
+.fanote{padding:7px 10px;border-radius:8px;background:var(--clay-soft);color:var(--ink);font-size:13px}
+.tabnote{margin:14px 0 0;padding:10px 12px;border-radius:10px;background:var(--bg2);color:var(--ink2);font-size:13.5px}
 .media .speed{position:absolute;left:8px;top:8px;padding:3px 8px;border-radius:6px;background:rgba(11,11,16,.72);color:#F2EEE5;font:700 11px/1.3 'JetBrains Mono',ui-monospace,monospace}
 .media .pp{position:absolute;inset:0;display:grid;place-items:center;background:transparent;border:0;color:#fff}
 .media .pp span{display:none;width:56px;height:56px;border-radius:50%;background:rgba(11,11,16,.62);place-items:center;font-size:22px}
@@ -157,7 +163,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
       <h1>Motion Menu</h1>
       <button class="btn primary" id="picksBtn" type="button">My picks</button>
     </div>
-    <p class="lede">Everything the showreel was made from. Each move, look and sound has a number. Play it, mark it, then tell me the numbers to build with.</p>
+    <p class="lede">Everything the showreel was made from, and the ingredients for your reels. Each move, look and sound has a number. Play it, mark it, then tell me the numbers to build with.</p>
     <p class="legend"><b>Keep</b> use it &middot; <b>Maybe</b> ask me first &middot; <b>Drop</b> never use it &middot; <b>&#9998;</b> rename it or leave a note</p>
     <div class="status" id="status"><span class="tally" id="tally">Nothing marked yet</span><span class="where" id="where"></span></div>
   </header>
@@ -179,6 +185,7 @@ button{cursor:pointer;-webkit-tap-highlight-color:transparent}
     <span id="footnote"></span>
     <b>What the Farsi tags mean</b>
     <span><i>Works as it is</i>: the text part can carry Farsi with no change. <i>Whole words</i>: Farsi letters join up, so each word moves as one piece instead of letter by letter. No tag: there is no text, so nothing to translate.</span>
+    <span>On the Reels tab a Farsi button switches a sample to its Farsi draft. Nothing Farsi is used until you have read it.</span>
     <span>Numbers never change. If something is renamed or removed, its number stays with it, so "keep 14" always means the same thing.</span>
   </div>
 </div>
@@ -207,6 +214,7 @@ ITEMS.forEach(function (i) { byId[i.id] = i; });
 GROUPS.forEach(function (g) { gById[g.id] = g; });
 var TABS = [
   { id: 'visual', name: 'Moves' },
+  { id: 'reels', name: 'Reels', note: 'These are for reels, so every sample is tall (9:16). The numbers on them are placeholders, not findings. Where a sample has a Farsi button, the Farsi is my draft: please read every word before it is used.' },
   { id: 'design', name: 'Design' },
   { id: 'sound', name: 'Sounds' }
 ];
@@ -449,13 +457,24 @@ function farsiTag(it) {
 }
 function mediaHtml(it) {
   var c = CLIPS[it.id];
+  var tall = it.clip && it.clip.h > it.clip.w, fa = it.clip && it.clip.fa && CLIPS[it.id + '.fa'];
   if (c && c.dur > 0) {
     var sp = speedLabel(it.clip);
-    return '<div class="media" data-media="' + it.id + '"><video muted loop playsinline preload="none" poster="posters/' + it.id + '.jpg" data-src="clips/' + it.id + '.mp4" aria-label="' + esc(it.name) + ' sample"></video>' +
-      (sp ? '<span class="speed">' + sp + '</span>' : '') + '<button class="pp" type="button" aria-label="Play or pause"><span>▶</span></button></div>';
+    return '<div class="media' + (tall ? ' tall' : '') + '" data-media="' + it.id + '"><video muted loop playsinline preload="none" poster="posters/' + it.id + '.jpg" data-src="clips/' + it.id + '.mp4" aria-label="' + esc(it.name) + ' sample"></video>' +
+      (sp ? '<span class="speed">' + sp + '</span>' : '') + '<button class="pp" type="button" aria-label="Play or pause"><span>&#9654;</span></button>' +
+      (fa ? '<div class="langs"><button class="lang" type="button" data-act="lang" data-l="en" aria-pressed="true">EN</button><button class="lang" type="button" data-act="lang" data-l="fa" aria-pressed="false" lang="fa">&#1601;&#1575;&#1585;&#1587;&#1740;</button></div>' : '') + '</div>' +
+      (fa ? '<div class="fanote" hidden>Farsi draft. Please read every word before it is used.</div>' : '');
   }
   if (c) return '<div class="media"><img src="posters/' + it.id + '.jpg" alt="' + esc(it.name) + ' sample" loading="lazy"></div>';
   return '';
+}
+function setLang(card, id, l) {
+  var m = $('.media', card), v = $('video', m); if (!v) return;
+  var key = l === 'fa' ? id + '.fa' : id;
+  $$('.lang', m).forEach(function (x) { x.setAttribute('aria-pressed', String(x.dataset.l === l)); });
+  v.poster = 'posters/' + key + '.jpg'; v.dataset.src = 'clips/' + key + '.mp4'; v.setAttribute('src', v.dataset.src); v.load();
+  var p = v.play(); if (p && p.catch) p.catch(function () {});
+  var note = $('.fanote', card); if (note) note.hidden = (l !== 'fa');
 }
 function seenAt(u) { var m = /^Reel ([\d.]+) s$/.exec(u || ''); return m ? 'at ' + m[1] + ' s' : (u || ''); }
 function reverseUse(id) { return ITEMS.filter(function (x) { return (x.pairs || []).indexOf(id) >= 0; }); }
@@ -520,7 +539,7 @@ function cardHtml(it) {
       '<div class="line"><span class="k">Applies to</span>' + esc(it.used || '') + '</div>' + tail + '</div>';
   } else {
     inner = mediaHtml(it) + '<div class="body">' + head + '<p class="label">' + esc(it.label) + '</p><div class="line">' + farsiTag(it) +
-      (it.used ? '<span><span class="k">In the reel</span>' + esc(seenAt(it.used)) + '</span>' : '') + '</div>' + takesHtml(it) + pairsHtml(it) + tail + '</div>';
+      (it.used ? '<span><span class="k">' + (/^Reel/.test(it.used) || it.used === 'Every frame' ? 'In the reel' : 'Made for') + '</span>' + esc(seenAt(it.used)) + '</span>' : '') + '</div>' + takesHtml(it) + pairsHtml(it) + tail + '</div>';
   }
   return '<article class="card" data-card="' + it.id + '" data-v="">' + inner + '</article>';
 }
@@ -604,6 +623,8 @@ function render() {
     if (!its.length) return; total += its.length;
     html += '<section class="group"><h2>' + esc(g.name) + '</h2><p>' + esc(g.blurb || '') + '</p><div class="grid">' + its.map(cardHtml).join('') + '</div></section>';
   });
+  var tn = TABS.filter(function (t) { return t.id === state.tab; })[0];
+  if (html && tn && tn.note) html = '<div class="tabnote">' + esc(tn.note) + '</div>' + html;
   $('#list').innerHTML = html || '<div class="empty">Nothing matches. Try another word, or clear the filters.</div>';
   feels = feels.filter(function (w) { return w.box.isConnected; });
   $$('[data-media]').forEach(wireVideo);
@@ -620,6 +641,7 @@ document.addEventListener('click', function (e) {
   var act = b.dataset.act, card = b.closest('[data-card]'), id = card && card.dataset.card;
   if (act === 'mark') { var cur = Marks.get(id).v; Marks.set(id, { v: cur === b.dataset.v ? '' : b.dataset.v }); }
   else if (act === 'edit') { openEditors[id] = !openEditors[id]; paintMarks(id); if (openEditors[id]) { var f = $('[data-f="alias"]', card); if (f) f.focus(); } }
+  else if (act === 'lang') setLang(card, id, b.dataset.l);
   else if (act === 'snd') Snd.toggle(b.dataset.snd);
   else if (act === 'goto') goTo(b.dataset.id);
   else if (b.id === 'picksBtn') openPicks();

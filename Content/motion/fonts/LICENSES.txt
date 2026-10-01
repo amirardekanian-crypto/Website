@@ -1,0 +1,4 @@
+Barlow Condensed, Barlow and Space Mono, Latin subsets from Google Fonts. SIL Open Font License 1.1
+(https://openfontlicense.org). Barlow: Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow).
+Space Mono: Copyright 2016 The Space Mono Project Authors (https://github.com/googlefonts/spacemono).
+Vazirmatn (Farsi) is used from assets/fonts/Vazirmatn-Variable.woff2 in this repository; its licence is next to it.

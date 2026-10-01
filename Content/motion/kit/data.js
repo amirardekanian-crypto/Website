@@ -31,10 +31,16 @@
      no yellow, ever. Text on dark uses the tinted inks the apps use (--clay-ink, --green-ink in dark mode). */
   KIT.defData('look', 'brand', {
     colors: { clay: '#C7552F', clayInk: '#F29A78', green: '#0E4A36', greenInk: '#7FD6B0', greenFill: '#1F7A4D', paper: '#FAF7F2', ink: '#1A1A1A', night: '#141414', bone: '#F2EEE5', grey: '#8A8A8A' },
-    normal: '#F2EEE5', key: '#C7552F', keyText: '#F29A78', fix: '#1F7A4D', fixText: '#7FD6B0', soft: 'rgba(242,238,229,.6)', problem: '#C7552F',
-    bg: '#141414', paper: '#FAF7F2', ink: '#1A1A1A',
-    display: '"Barlow Condensed"', accent: '"Barlow Condensed"', mono: '"JetBrains Mono"', ui: '"DM Sans"', rtl: false,
+    normal: '#F2EEE5', key: '#C7552F', keyText: '#E06B43', fix: '#1F7A4D', fixText: '#7FD6B0', soft: 'rgba(242,238,229,.62)', problem: '#C7552F',
+    bg: '#141414', paper: '#FAF7F2', ink: '#1A1A1A', clayWhite: '#FFFFFF',
+    display: '"Barlow Condensed"', accent: '"Barlow Condensed"', mono: '"Space Mono"', ui: '"Barlow"', rtl: false,
   }, 'Amir\'s brand on a dark stage: clay is the one accent, green is the fix, bone is normal, grey is detail. No yellow.');
+
+  /* the colour language as a Menu look: five colours, five jobs */
+  KIT.defData('look', 'signal-colours', {
+    colors: { bone: '#F2EEE5', clay: '#C7552F', green: '#7FD6B0', grey: '#8A8A8A' },
+    jobs: { normal: 'bone', key: 'clay', fix: 'green', detail: 'grey', mistake: 'a clay line through the word' },
+  }, 'Five colours, five jobs. Bone is normal, clay is the key word, green is the fix, grey is detail, a clay line is a mistake.');
 
   KIT.defData('look', 'brand-fa', Object.assign({}, KIT.look('brand'), {
     display: '"Vazirmatn"', accent: '"Vazirmatn"', ui: '"Vazirmatn"', rtl: true,

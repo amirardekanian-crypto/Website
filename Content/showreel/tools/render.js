@@ -15,7 +15,8 @@ const fs = require('fs'), path = require('path'), http = require('http');
 let chromium;
 try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = require('/opt/node22/lib/node_modules/playwright')); }
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = path.resolve(__dirname, '..');                 // Content/showreel
+const CONTENT = path.resolve(ROOT, '..');                   // Content: reel.html loads the kit from ../motion/kit, so the server starts one level up
 const A = {};
 for (let i = 2; i < process.argv.length; i++) { const a = process.argv[i]; if (a.startsWith('--')) { const k = a.slice(2), v = process.argv[i + 1]; if (v === undefined || v.startsWith('--')) A[k] = true; else { A[k] = v; i++; } } }
 
@@ -29,8 +30,8 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.woff2': 'font/w
 function serve() {
   return new Promise(res => {
     const srv = http.createServer((req, rsp) => {
-      const p = path.join(ROOT, decodeURIComponent(req.url.split('?')[0]));
-      if (!p.startsWith(ROOT) || !fs.existsSync(p) || fs.statSync(p).isDirectory()) { rsp.writeHead(404); return rsp.end('404'); }
+      const p = path.join(CONTENT, decodeURIComponent(req.url.split('?')[0]));
+      if (!p.startsWith(CONTENT) || !fs.existsSync(p) || fs.statSync(p).isDirectory()) { rsp.writeHead(404); return rsp.end('404'); }
       rsp.writeHead(200, { 'Content-Type': MIME[path.extname(p)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
       fs.createReadStream(p).pipe(rsp);
     }).listen(0, '127.0.0.1', () => res(srv));
@@ -38,7 +39,7 @@ function serve() {
 }
 
 (async () => {
-  const srv = await serve(), port = srv.address().port, url = `http://127.0.0.1:${port}/reel.html?render=1`;
+  const srv = await serve(), port = srv.address().port, url = `http://127.0.0.1:${port}/showreel/reel.html?render=1`;
   const exe = process.env.CHROMIUM || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
   const browser = await chromium.launch({ executablePath: fs.existsSync(exe) ? exe : undefined, args: ['--no-sandbox', '--disable-dev-shm-usage', '--force-color-profile=srgb', '--font-render-hinting=none'] });
   let errors = 0;
