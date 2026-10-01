@@ -27,6 +27,7 @@ MANIFEST = os.path.join(KIT, "menu", "menu.json")
 SAMPLES = r"C:\Users\Amir\Videos\Reels\menu-samples\out"
 FFPROBE = r"C:\Users\Amir\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-9.0.2-full_build\bin\ffprobe.exe"
 FFMPEG = FFPROBE.replace("ffprobe.exe", "ffmpeg.exe")
+LEDGER = r"C:\Users\Amir\OneDrive\Документы\GitHub\Website\Content\motion\numbers.json"   # the repo's ONE ledger of menu numbers (id -> number, never reused)
 MARKER = "cut-menu:1"
 
 CSS = r"""
@@ -324,6 +325,16 @@ def main():
     taken = {r["no"] for r in retired} & set(nos)
     if taken:
         problems.append("numbers of removed items are used again: %s" % sorted(taken))
+    if os.path.exists(LEDGER):        # one ledger (Content/motion/numbers.json): every card must be in it with the same number, and its `next` must be above the highest card
+        led = json.load(open(LEDGER, encoding="utf-8"))
+        for it in items:
+            n = led["numbers"].get(it["id"])
+            if n is None:
+                problems.append("%s: #%s is not in the number ledger (add it to Content/motion/numbers.json; its next is %s)" % (it["id"], it["no"], led["next"]))
+            elif n != it["no"]:
+                problems.append("%s: the manifest says #%s but the ledger says #%s" % (it["id"], it["no"], n))
+        if led["next"] <= max(nos):
+            problems.append("the ledger's next number (%s) is not above the highest card (%s)" % (led["next"], max(nos)))
     gids = {g["id"] for g in man["groups"]}
     sound_ids = {i["id"] for i in items if i["kind"] == "sound"}
     for it in items:

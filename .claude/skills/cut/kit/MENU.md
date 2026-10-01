@@ -6,7 +6,7 @@ form to exist, so you understand and find them quickly and use them quickly to e
 talking videos or for his business; fix duplicates; know when and how to use each one. The menu went from 224 items to **78 cards** (version 7).
 
 **The numbers clash with the showreels** (menu 41 was Spring Lab, showreel 41 is the diagram chain): always say "menu N" or "showreel N". A removed number is never used again;
-the next new card is **226**.
+the next new card is **226** (the ledger is `Content/motion/numbers.json`, see "One source").
 
 ## How it is built
 | Where | What |
@@ -15,6 +15,7 @@ the next new card is **226**.
 | the page (artifact) | Generated from the manifest by `tools/menu_patch.py`. Never edit its data by hand. |
 | the page's database | `marks` (his Keep / Maybe / Drop, his rename and note: one doc per card id) and `adds` (ideas he adds with + Add). Only he writes marks. |
 | `kit/sfx/` + `kit.py` | Every sound card is a file here. `kit.py` reads the sound cards of `menu.json` into the `SFX` table, so `sfx=[(E(t), "thump")]` plays the card called Thump. The 11 old names (pop, ding, thock, hit, stamp, step, rise, tick, roll, swipe, whoosh) still work. |
+| `Content/motion/` (in the website repo) | The **lab**: canvas pieces, samples, sounds and the showreel. It does NOT publish the page. Its `numbers.json` is the one ledger of menu numbers. |
 | `menu/archive/` | The /cut-only manifest this started from and the page as it was before the tidy (version 6). |
 | `menu/tidy_2026-10-01.py` | The record of the tidy: every one of the 224 old items, what was decided and why. Do not run it again. |
 
@@ -25,16 +26,18 @@ the next new card is **226**.
 `sample` (`{showreel, t0, t1, poster}`: where its clip comes from). A sound card also has `file`, `dur`, `vol` and `track` (what `kit.py` plays) and `page_audio` when the page
 must play a different file from the kit's (the Whoosh). The page shows "Ready in /cut" for every card with a `cut`.
 
-## Two pipelines, one page (found on 2026-10-01, when the repo was pulled before "go live")
-The website repo holds the page's FIRST builder: **`Content/motion/`** (its README, `catalog.json` = the source of the original 183 items, `numbers.json` = the number ledger, `kit/` = the canvas
-pieces behind the showreel and the Reels-tab ideas such as Tally, Span, Chain Reaction and Highlighter, `lab.html`, and `tools/build_menu.py` that writes `menu/index.html`). It made items 1-183 and
-their samples earlier the same day. The tidy and the /cut cards were done by this skill straight on the live page, so:
-- **The live page (version 7) is built from `kit/menu/menu.json` by `tools/menu_patch.py`. Never publish `Content/motion/menu/index.html` over it**: that is the old 183-item page, without the /cut cards,
-  the When and How lines, the tidy or the + Add button. Read the live page first (`Artifact read` refuses a publish otherwise) and merge, never force.
-- **One number space.** The ledger `Content/motion/numbers.json` now reserves 184-225 for the /cut cards and its `next` is 226; a number that left is never reused in either place.
+## One source (decided by Amir on 2026-10-01: "one source")
+The website repo holds the page's FIRST builder, **`Content/motion/`** (found when the repo was pulled before "go live"): `catalog.json` (183 pieces), `kit/` (the canvas pieces behind the showreel and
+the Reels-tab ideas such as Tally, Span, Chain Reaction and Highlighter), `lab.html` and `lab/` (samples), `tools/clips.js`, `tools/sounds.py` and `tools/build_menu.py`. It made items 1-183 and their
+samples earlier the same day. It was settled the same night:
+- **The live page is built ONLY from `kit/menu/menu.json` by `tools/menu_patch.py`.** `Content/motion/` no longer publishes it: `build_menu.py` makes a local preview only and the old
+  `menu/index.html` is deleted, so there is nothing to publish over the live page. That folder is the **lab**: pieces, samples, sounds, the showreel and its proof. Its README says so at the top.
+- **One ledger of numbers: `Content/motion/numbers.json`** (id to number, never reused; 1 to 225 are taken, `next` is 226). A card's `no` in `menu.json` must be the ledger's number for its id, and `menu_patch.py`
+  stops with a PROBLEM if it is not. A new card: take `next` from the ledger, add the id and number there, use the same number in `menu.json`, raise `next`. A piece drawn in the lab gets its number the
+  same way (`catalog.py` does it), so a lab piece and a menu card can never disagree.
 - **"Not built." on a card means not built as a /cut block** (Hyperframes). Several of those ideas (Range, Stat Chart, Cross Out, Pivot, Heartbeat, Dial) exist as canvas pieces in `Content/motion/kit`;
-  port the idea to a /cut block when a reel needs it. The cards that left the menu still have their pieces there and their lines in `catalog.json`.
-- **Still to settle (his call):** fold the tidy into `catalog.json` and make `build_menu.py` write the version-7 page, or retire that publish step. Until then the skill's `menu.json` is the one that matches the live page.
+  port the idea to a /cut block when a reel needs it. A lab sample can be used for its card: render it there (`clips.js`, 404 x 720) and build the page with `--samples <repo>\Content\motion\menu`.
+  The cards that left the menu still have their pieces there and their lines in `catalog.json`: that is fine, the lab keeps what was drawn.
 
 ## 1. Before a reel: read the menu (creative director, step one)
 ```
@@ -52,7 +55,7 @@ The digest prints Keep (use first), Maybe (ask him), Drop (see below), his names
 
 ## 2. Something is missing: build it, then add the card
 1. **Build the block** in the kit as always (`kit.js` / `kit.css`, a demo in a showreel build script, a `BLOCKS.md` row with "do NOT use it when", the cue table). `USAGE.md` rules stand.
-2. **Add a card to `menu.json`**: the group it belongs to (same job, same place: look at the group before you make a new one), the next free `no`, `label`, `when`, `how` (a real call),
+2. **Add a card to `menu.json`**: the group it belongs to (same job, same place: look at the group before you make a new one), the next free `no` from the ledger (`Content/motion/numbers.json`: add the id there too and raise its `next`), `label`, `when`, `how` (a real call),
    `takes`, `farsi`, `pairs` (sound ids that exist), `like`, `cut`. If it is only a new form of an existing card, add an `alts` entry instead of a new card.
 3. **Make its sample** from the showreel: `python tools\menu_samples.py prepare` (once per showreel), `render <N>`, then `cut <id>` (a form's key works too). 450x800, no sound, no burned-in label.
 4. **A new sound**: put the file in `kit/sfx/`, add a sound card with `file`, `dur` (the audible part), `vol` (set against the old sounds: effective peak around -9 for a hit, -14 for a tick, -20 for a bed), `track` (the next free number). The patch tool builds its page audio and waveform.
