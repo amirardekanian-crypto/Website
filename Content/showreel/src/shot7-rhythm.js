@@ -31,7 +31,7 @@
   PLATES.forEach((p, k) => {
     R.cue(T0 + k * S8, 'stab', { i: k, rise: 1 });
     R.hit(T0 + k * S8, .16 + k * .035, { plate: k });
-    if (k < 7) R.cue(T0 + (k + 1) * S8 - PRE, 'cut', { kind: CUTS[k], dur: DUR });
+    if (k < 7) R.cue(T0 + (k + 1) * S8 - PRE, 'cut', { type: CUTS[k], dur: DUR });   // 'type', not 'kind': props are merged over the cue and 'kind' would replace 'cut'
   });
   R.cue(T0 + BAR - .5, 'riser', { dur: .5 });                          // into the lockup
 

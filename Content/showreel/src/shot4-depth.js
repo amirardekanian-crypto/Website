@@ -1,6 +1,6 @@
 /* SHOT 4 — DEPTH  (bar 4, 5.625–7.500 s)
  *
- * A trefoil torus knot (3,360 quads) rendered by a tiny software 3D pipeline: rotate, project, cull, painter's sort,
+ * A trefoil torus knot (8,320 quads) rendered by a tiny software 3D pipeline: rotate, project, cull, painter's sort,
  * shade (key light + specular + Fresnel + a normal-driven iridescent ramp). It draws itself on along its path,
  * takes a spin kick on beat 2, and on beat 3 a scan line sweeps across turning solid into X-ray wireframe.
  * On the last beat the camera dives through the knot's hole (into the glitch cut). Behind it: a giant outlined word,
@@ -11,7 +11,7 @@
   const L = g.L, R = g.REEL, { PAL, E, clamp, lerp, prog, hash, hex, ramp, rgbaHex } = L;
   const BEAT = R.BEAT, BAR = R.BAR, W = R.W, H = R.H;
   const T0 = BAR * 3;
-  const NU = 240, NV = 14;
+  const NU = 320, NV = 26;
   const M = {};                      // mesh buffers, built in init
   const IRI = [[0, '#2430B8'], [.25, '#6C7DFF'], [.45, '#B7A4FF'], [.62, '#FFB0C8'], [.8, '#FFD3BE'], [1, '#8CF7D8']];
   const LUT = [];

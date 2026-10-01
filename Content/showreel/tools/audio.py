@@ -250,7 +250,8 @@ def arrange_music():
     L_, R_ = pad(CH['Gm'], BAR, .2, .4, 1500); music.add(L_, bar(6), .2, y=R_)
     # ---- bar 7: LOCKUP (the cues play the hits; here the drone and the tail)
     t = T(BAR); sub = np.sin(2 * np.pi * midi(26) * t) * np.exp(-t / 1.4)
-    bass_b.add(lp(sub, 140), bar(7), .5)
+    bass_b.add(lp(sub, 140), bar(7), .6)
+    kick_at(bar(7), 1.0)                                  # the final downbeat gets a real kick too
     L_, R_ = pad(CH['Dm9'], BAR - .1, .08, 1.0, 2800); music.add(L_, bar(7), .38, y=R_); rev.add(L_, bar(7), .5, y=R_)
 
 def hash_(a, b):
@@ -289,8 +290,11 @@ def play_cue(c):
             perc.add(tick(1.0, 1500, 6000), t, .35 * amp)
         if big:
             fx.add(boom(1.5 if c.get('final') or c.get('drop') else 1.0), t, .42 * min(1, amp))
+        if c.get('final'):
+            fx.add(boom(1.8, 70, 30), t, .4); L_, R_ = stab([38, 50, 57, 62, 65, 69, 74], .75, 1.4, .95); music.add(L_, t, .5, y=R_); rev.add(L_, t, .3, y=R_)
+            x = bell(86, 2.2, .8); fx.add(x, t, .2, .1); rev.add(x, t, .4)
         if c.get('drop') or c.get('glitch') or c.get('final') or c.get('portal') or c.get('big'):
-            x = crash(2.2 if c.get('final') else 1.4); fx.add(x, t, .3 * min(1.1, amp)); rev.add(x, t, .2)
+            x = crash(2.4 if c.get('final') else 1.4); fx.add(x, t, (.5 if c.get('final') else .3) * min(1.1, amp)); rev.add(x, t, .25)
         if c.get('sub') and not big:
             fx.add(boom(.7, 58, 34), t, .25)
     elif k == 'stab':
@@ -347,7 +351,7 @@ def play_cue(c):
     elif k == 'tick':
         n = (74, 77, 81)[c['i']]; x = pluck(n, .16, .9, 1.4); fx.add(x, t, .3, .5); rev.add(x, t, .25, .5)
     elif k == 'cut':
-        kind = c.get('kind'); d = c.get('dur', .15)
+        kind = c.get('type'); d = c.get('dur', .15)
         if kind == 'whip': x = whoosh(.2, True, 700, 6000, 1.0); fx.add(x, t - .03, .32)
         elif kind == 'iris': x = blip(500, .16, 3.2, .7); fx.add(x, t, .25); rev.add(x, t, .2)
         elif kind == 'blinds':
@@ -362,7 +366,8 @@ def play_cue(c):
         for i in range(n):
             x = logdrum(LANDS[i] + 12, .9, .3); fx.add(x, t + i * .0352 * 1.0, .45, -.6 + i * .24); rev.add(x, t + i * .0352, .25, -.6 + i * .24)
     elif k == 'chord':
-        L_, R_ = pad([50, 57, 62, 65, 69, 76], c.get('dur', 1.4), .02, 1.7, 3000)      # Dm with the 9th on top; music.add(L_, t, .55, y=R_); rev.add(L_, t, .55, y=R_)
+        L_, R_ = pad([50, 57, 62, 65, 69, 76], c.get('dur', 1.4), .02, 1.7, 3000)      # Dm with the 9th on top
+        music.add(L_, t, .55, y=R_); rev.add(L_, t, .55, y=R_)
         for j, nn in enumerate((74, 81, 86)): x = bell(nn, 2.6, .9); fx.add(x, t + .01 * j, .3, -.4 + j * .4); rev.add(x, t + .01 * j, .5, -.4 + j * .4)
     elif k == 'ping':
         n = (81, 86)[c['i']]; x = bell(n, 1.6, .8); fx.add(x, t, .22, (-.3, .35)[c['i']]); rev.add(x, t, .5)
@@ -373,9 +378,11 @@ def make_ir(seed, rt=2.4, pre=.018):
     ir = r.standard_normal(n) * np.exp(-t / (rt / 6.9)); ir = lp(ir, 6500, 2)
     ir *= (1 - np.exp(-t / .02)); ir = np.concatenate([np.zeros(int(pre * SR)), ir]); return ir / np.sqrt(np.sum(ir ** 2)) * .45
 
+VACUUM = [(1.800, 1.875), (13.050, 13.125)]            # (start, end) just before the drop and before the final hit: everything ducks, then the hit lands on the silence
+
 GAINS = dict(drums=.6, perc=1.5, bass=.4, music=1.35, fx=.8, wet=.6)          # bus levels, balanced from the band report (--diag)
 
-def limiter(x, thresh=.89, look_ms=4.0, rel_ms=90.0):
+def limiter(x, thresh=.80, look_ms=4.0, rel_ms=90.0):
     """stereo-linked look-ahead peak limiter: gain is pulled down BEFORE the peak arrives, then released slowly"""
     from scipy.ndimage import minimum_filter1d, uniform_filter1d
     peak = np.max(np.abs(x), axis=1)
@@ -408,6 +415,11 @@ def master(sidechain_depth=.62, diag=False):
         for nm, (a_, b_) in dict(drums=(drums.L * g['drums'], drums.R * g['drums']), perc=(perc.L * g['perc'], perc.R * g['perc']), bass=(bass_b.L * duck * g['bass'], bass_b.R * duck * g['bass']),
                                  music=(music.L * duck * g['music'], music.R * duck * g['music']), fx=(fx.L * g['fx'], fx.R * g['fx']), wet=(wetL * g['wet'], wetR * g['wet']), MIX=(L, Rr)).items():
             band_report(nm, a_, b_)
+    vac = np.ones(N)
+    for v0, v1 in VACUUM:
+        i0, i1 = int(v0 * SR), int(v1 * SR); fd = int(.012 * SR)
+        vac[i0:i0 + fd] = np.linspace(1, .05, fd); vac[i0 + fd:i1] = .05                  # quick duck, hold, then the hit returns at full level
+    L = L * vac; Rr = Rr * vac
     out = np.stack([L, Rr], 1)
     out = signal.sosfilt(sos('high', 32, 2), out, axis=0)
     out = np.stack([lp(out[:, 0], 16500, 2), lp(out[:, 1], 16500, 2)], 1)

@@ -63,7 +63,7 @@
     id: 'shot8-lockup', label: 'CLAUDE',
     hud: { color: PAL.bone, tl: 0, bl: 1, alphaAt: t => 1 - E.inQuad(prog(t, 1.5, .34)) },
     samples: 14,
-    fx: { bloom: .5, ca: .5, grain: .05, vig: .38 },
+    fx: { bloom: .2, ca: .5, grain: .05, vig: .38 },
     draw(ctx, t, e) {
       const tt = Math.max(0, t);
       const bg = ctx.createRadialGradient(W / 2, 520, 80, W / 2, 520, 1150);

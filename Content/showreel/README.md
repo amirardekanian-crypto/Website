@@ -7,7 +7,8 @@ generation credits spent**. It is Claude's own piece (the lockup says so), so it
 Amir's brand rules (Farsi, clay-only accent, phone mock-ups); it is not one of his ads and not site content
 (`Content/` is excluded from the Pages build, so nothing here is served).
 
-`export/claude-motion-reel.mp4` is the finished file · `export/poster.jpg` is its title card.
+[`claude-motion-reel.mp4`](claude-motion-reel.mp4) is the finished video (≈19 MB) · [`poster.jpg`](poster.jpg) is its title card.
+The repo ignores `Content/*/export/`, so scratch output such as `export/cues.json` stays local and the finished files sit beside this README.
 
 ## The eight bars
 
@@ -18,7 +19,7 @@ Amir's brand rules (Farsi, clay-only accent, phone mock-ups); it is not one of h
 | 1 | 0.0 | **POINT** | a dot arcs, lands, a ruler shoots out; M-O-T-I-O-N drops in a 32nd-note roll; the dot hops over and becomes the full stop | squash & stretch, ball physics, rebound, dust |
 | 2 | 1.875 | **TYPE** | *EVERY FRAME IS a DECISION*, one word per 8th, each with its own move; a live cubic-bezier **graph editor** and a **spring** card re-tune on every word | mask rise, staggered drop + overshoot, elastic pop, **weight sweep 200→900**, 3D extrusion |
 | 3 | 3.75 | **FORM** | 144 cells morph target → quarter-tiles → pill bars → one disc | one rounded-rect per cell, corner radii/rotation/colour interpolated, radial / sweep / outside-in staggers |
-| 4 | 5.625 | **DEPTH** | trefoil knot draws itself, takes a spin kick, a scan line flips it to X-ray, camera dives through it | 3,360-quad software 3D: rotate, project, cull, painter's sort, Fresnel + specular + iridescent shader |
+| 4 | 5.625 | **DEPTH** | trefoil knot draws itself, takes a spin kick, a scan line flips it to X-ray, camera dives through it | 8,320-quad software 3D: rotate, project, cull, painter's sort, Fresnel + specular + iridescent shader |
 | 5 | 7.5 | **FLOW** | 5,200 particles burst, ride a curl-noise field, then lock onto the glyphs of *FLOW* on the beat and detonate | pre-simulated at 1/120 s, additive light trails, targets sampled from real outlines, spectrum sorted left→right |
 | 6 | 9.375 | **INTERFACE** | bento dashboard: chart draws, donut counts, a cursor flips a toggle, drags a slider, ticks a checklist | springs (`L.spring`), cursor path with press + ripple, count-ups, ECG strip |
 | 7 | 11.25 | **RHYTHM** | DOT · LINE · RING · SQUARE · TRIANGLE · CROSS · ARC · POINT, eight plates on eight-notes | seven cuts, each a different technique: whip, iris, blinds, glitch, zoom, pixelate, flip |
@@ -55,7 +56,7 @@ python3 -m http.server 8000                     # live, lighter-blur preview at 
 node tools/render.js --cues export/cues.json                                   # 1  the cue sheet the picture makes
 python3 tools/audio.py export/cues.json $TMP/soundtrack.wav --diag --plot $TMP/audio.png   # 2  the soundtrack (+ band report)
 node tools/render.js --out $TMP/frames --workers 4                             # 3  450 PNG frames
-python3 tools/encode.py $TMP/frames $TMP/soundtrack.wav export/claude-motion-reel.mp4 --crf 19   # 4  the MP4, verified
+python3 tools/encode.py $TMP/frames $TMP/soundtrack.wav claude-motion-reel.mp4 --crf 19   # 4  the MP4, verified
 ```
 
 Quick looks: `node tools/render.js --out $TMP/s --at 2.2,7.5,13.9 --w 960` (stills at those seconds) ·
@@ -71,4 +72,4 @@ Quick looks: `node tools/render.js --out $TMP/s --at 2.2,7.5,13.9 --w 960` (stil
 - A transition's `pre`/`post` set its window around the bar line; `fx(p)` adds chromatic aberration or flash;
   `fxMix` decides when the post settings cross over (light scenes switch early, or the bloom washes them out).
 - Fonts: Unbounded (display), Instrument Serif (italic accent), JetBrains Mono (HUD), Inter Tight (UI); all SIL OFL 1.1, licences in `fonts/LICENSES.txt`.
-- The MP4 is ~20 MB. Re-encode with a higher `--crf` for smaller; don't commit a second copy of it each time.
+- The MP4 is ~19 MB. Re-encode with a higher `--crf` for smaller, and don't commit a second copy each time you tweak: it stays in history.

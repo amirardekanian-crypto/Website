@@ -166,7 +166,7 @@
   R.shot({
     id: 'shot1-point', label: 'POINT', hud: { color: PAL.bone },
     samples: 16,
-    fx: { bloom: .28, ca: .5, grain: .05, vig: .38 },
+    fx: { bloom: .18, ca: .5, grain: .05, vig: .38 },
     draw(ctx, t, e) {
       /* ground */
       const bg = ctx.createRadialGradient(W / 2, 560, 80, W / 2, 560, 1150);
