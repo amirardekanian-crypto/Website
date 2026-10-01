@@ -32,7 +32,7 @@
           "type": "simple",
           "name": "Easy Walk",
           "videoUrl": null,
-          "note": "An ache you can breathe through is fine, a sharp pain is not — stop that exercise and tell me.",
+          "note": "An ache you can breathe through is fine, but if it turns sharp, stop that exercise and tell me.",
           "cues": {
             "good": [
               "Easy pace, tall through the spine, let the arms swing",
@@ -197,7 +197,7 @@
           "type": "standard",
           "name": "Bird Dog",
           "videoUrl": null,
-          "note": "Six reps, then four, then two, so it gets easier as you tire — never to failure.",
+          "note": "Six reps, then four, then two, so it gets easier as you tire, and never to failure.",
           "cues": {
             "good": [
               "Reach the opposite arm and leg long, not high",
@@ -225,7 +225,7 @@
           "type": "simple",
           "name": "Supine Rest, Calves Elevated",
           "videoUrl": "https://www.youtube.com/watch?v=0SqnP9ol5GA",
-          "note": "No rolling and no back stretch here on purpose — a sore back wants unloading, not pressure.",
+          "note": "No rolling and no back stretch here on purpose, because a sore back wants unloading, not pressure.",
           "cues": {
             "good": [
               "Calves on a chair, knees at ninety, arms out wide",

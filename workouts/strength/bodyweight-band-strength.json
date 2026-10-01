@@ -105,7 +105,7 @@
           "videoUrl": null,
           "cues": {
             "good": [
-              "Three seconds down, chest tall",
+              "Chest tall",
               "Find today's depth before you load one leg"
             ],
             "bad": [
@@ -147,14 +147,14 @@
           "videoUrl": null,
           "cues": {
             "good": [
-              "Back foot on a chair, drop straight down over three seconds",
+              "Back foot on a chair, drop straight down",
               "The front heel drives you back up"
             ],
             "bad": [
               "Leaning forward onto the front knee"
             ]
           },
-          "note": "Straight sets with full rest — finish one leg, rest, then do the other.",
+          "note": "Straight sets with full rest: finish one leg, rest, then do the other.",
           "rx": {
             "sets": 3,
             "reps": 8,
