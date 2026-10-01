@@ -173,7 +173,9 @@
 // v91: habits.html changed (2026-09-27): EXTRA MILESTONES in Settings, ON A STREAK on the share cards.
 // v92: program.html changed (2026-09-27): dead code the DOC-01 pass found, removed (316 lines, no behaviour).
 // v93: habits.html changed (2026-09-27): the same for AA Proof (105 lines, no behaviour).
-const CACHE = 'aap-v93';
+// v94: program.html changed (2026-10-01, CHP-7): a Library session reads `block.rest` like the training day does,
+//      so a section's shared rest sits once on its header ("Rest 45s") and every timer in it uses it.
+const CACHE = 'aap-v94';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

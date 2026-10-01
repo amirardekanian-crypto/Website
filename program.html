@@ -9961,9 +9961,14 @@ async function openWorkout(file) {
   let html = '';
   (wk.blocks || []).forEach((block, bIdx) => {
     const blockClass = blockCategory(block.title, bIdx);
-    html += `<div class="section-header-prog ${blockClass}"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span></div>`;
+    // A section can prescribe ONE rest for everything in it (`block.rest`, seconds; CHP-7), exactly as on
+    // the training day: the header says it once, every timer in the section uses it, and an exercise's own
+    // rx.rest overrides it. The training-day header (search section-rest) is the other copy: change both.
+    const blockRest = (typeof block.rest === 'number' && block.rest > 0) ? block.rest : 0;
+    html += `<div class="section-header-prog ${blockClass}"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span>${
+      blockRest ? `<span class="section-rest">Rest ${esc(formatRestLabel(blockRest))}</span>` : ''}</div>`;
     (block.exercises || []).forEach(ex => {
-      html += renderExercise(ex, 'ws', num++, blockClass, block.title);
+      html += renderExercise(ex, 'ws', num++, blockClass, block.title, blockRest);
     });
   });
   body.innerHTML = html || `<div class="wl-empty">This workout has no exercises yet.</div>`;

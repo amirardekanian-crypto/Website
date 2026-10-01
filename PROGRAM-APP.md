@@ -67,7 +67,10 @@ three; still true of 39 of 506 live exercises with a tempo).
 
 **`block.rest` states a section's rest ONCE** — on the section header (`PRIMARY ——— Rest 2m`),
 feeding every timer in the block, drawing no per-card cell. An exercise's own `rx.rest` overrides
-it and keeps its place in the line of numbers. **Circuits carry `rx` too**: `rounds` is a NUMBER now (it was the display
+it and keeps its place in the line of numbers. A Library session reads it the same way since
+2026-10-01 (`openWorkout()` draws the same header; the training day's header is the other copy, so
+change both). Before that the Library ignored it, which would have left a card with no rest cell and a
+timer with no time. **Circuits carry `rx` too**: `rounds` is a NUMBER now (it was the display
 string `"×2 Rounds"`, which is why the cell read *Rounds: ×2 Rounds*), and an item takes its own
 `rx` when its dose is plain, keeping free-text `detail` when the wording carries more than a
 number (*"15 sec, switch legs each round"*).
