@@ -243,7 +243,7 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   a name and a playable sample (73 moves · 26 design items · 48 sounds), so a later video can be built from a list: *"use 14, 22 and the Kick"*.
   Claude's own kit, **not Amir's brand system** (a switch to the brand look is step 3 of its plan). One source, [`catalog.json`](Content/motion/catalog.json);
   numbers are written once in [`numbers.json`](Content/motion/numbers.json) and never change. Samples are cut from the real reel through the real engine.
-  Published page (private; Amir marks Keep / Maybe / Drop there and Claude reads the marks): <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA> · rebuild steps in its README.
+  Published page (private; Amir marks Keep / Maybe / Drop there and Claude reads the marks): <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA> · rebuild steps in its README. Amir's ideas for later videos (S&C graphics, anatomy, colour language, chapters): [`INGREDIENTS.md`](Content/motion/INGREDIENTS.md).
 - **Result cards / app mockups:** [`card-preview.html`](Content/card-preview.html)
   (rebuilds every app card with real class names) → exports in
   [`instagram-cards/`](Content/instagram-cards/) (legacy style, off-palette).

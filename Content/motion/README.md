@@ -75,6 +75,9 @@ Two bugs in the delivered video's soundtrack turned up while the sounds were bei
 1. The seven plate-cut sounds in the rhythm shot never played (a cue prop named `kind` replaced the cue's own kind).
 2. The final Dm chord pad was never added to the mix (its line sat inside a comment). The finale was three bells.
 
+Ideas Amir sent for later videos (S&C graphics, animated anatomy, numbers on a court, a colour language, chapters, sound), with Claude's
+verdict and the rules that apply to all of them: [`INGREDIENTS.md`](INGREDIENTS.md).
+
 ## The plan this belongs to
 
 1. **The menu** (this folder). Names, numbers, samples, marks.
