@@ -234,6 +234,11 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   [`reel-1-dashboard`](Content/reel-1-dashboard.html) ·
   [`reel-2-roadmap`](Content/reel-2-roadmap.html) ·
   [`reel-3-pocket`](Content/reel-3-pocket.html) (pre-date the no-gold rule).
+- **Motion showreel** (1920×1080, 15 s, **English**, with sound; 2026-10-01) — [`showreel/`](Content/showreel/README.md):
+  Claude's own procedural motion-design reel, **not an Amir brand piece and not site content**. Eight shots on a 128 BPM bar
+  grid (point · type · form · depth · flow · interface · rhythm · lockup), seven designed transitions, a soundtrack synthesized
+  from the picture's own cue sheet. Canvas engine + Playwright renderer + numpy audio, **no generation credits**.
+  Live page [`reel.html`](Content/showreel/reel.html) · the file `showreel/export/claude-motion-reel.mp4` · rebuild steps in its README.
 - **Result cards / app mockups:** [`card-preview.html`](Content/card-preview.html)
   (rebuilds every app card with real class names) → exports in
   [`instagram-cards/`](Content/instagram-cards/) (legacy style, off-palette).
