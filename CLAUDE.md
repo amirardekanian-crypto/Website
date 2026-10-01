@@ -350,7 +350,7 @@ search in Iran). The routine (Search Console, the monthly checklist, how titles 
 Carousels, reels, posts, result cards, ads, web and app redesigns. **Start at
 `Content/DESIGN-ATLAS.md`** (non-negotiables, current vs retired, the asset shelf, each format's
 recipe) with `Content/DESIGN_SYSTEM.md` as the brand bible; build with `/carousel`, `/reel` or `/ad`,
-pictures with `/image`, clips with `/video`, and read the skill before starting. The full notes that
+pictures with `/image`, clips with `/video`, his own talking-head footage with `/cut` (start at `.claude/skills/cut/kit/HANDOFF.md`; no captions, he adds them), and read the skill before starting. The full notes that
 sat here until 2026-09-26 live in those files and in `IMAGES.md` §0. What must never slip:
 - **All new social content is Farsi** (Amir, 2026-09-21): Vazirmatn, RTL, no uppercase or
   letter-spacing, Persian numerals. English only when he asks. Barlow is for app screens and Latin numerals.

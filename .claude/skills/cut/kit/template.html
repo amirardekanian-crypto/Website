@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fa">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="kit.css" />
+    <style>
+      /* this reel's own styles (bespoke elements) */
+      %%BESPOKE_CSS%%
+    </style>
+  </head>
+  <body>
+    <div
+      id="stage"
+      data-composition-id="%%ID%%"
+      data-start="0"
+      data-duration="%%TOTAL%%"
+      data-fps="30"
+      data-width="1080"
+      data-height="1920"
+    >
+      %%CLIPS%%
+      <div class="k-vig"></div>
+      <!-- this reel's own elements (bespoke) -->
+      %%BESPOKE_HTML%%
+      %%SFX%%
+
+      <script src="vendor/gsap.min.js"></script>
+      <script src="kit.js"></script>
+      <script>
+        (function () {
+          const SEGS = %%SEGS%%;
+          const TOTAL = %%TOTAL%%;
+          // source seconds -> seconds on the edited clock
+          const E = (t) => {
+            for (const s of SEGS) if (t >= s.in && t <= s.out) return s.start + (t - s.in) / s.rate;
+            for (const s of SEGS) if (t < s.in) return s.start;
+            return TOTAL;
+          };
+          const tl = K.timeline();
+          K.init({ tl });
+          %%ZOOM%%
+
+          /* ---- this reel: the kit's blocks, plus anything bespoke ---- */
+          %%BLOCKS_JS%%
+
+          window.__timelines = window.__timelines || {};
+          window.__timelines["%%ID%%"] = tl;
+        })();
+      </script>
+    </div>
+  </body>
+</html>
