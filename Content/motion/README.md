@@ -1,5 +1,12 @@
 # Motion Menu
 
+> **Read this before you publish the page (2026-10-01).** The live artifact is no longer built from this folder. Right after this menu went up, the page was tidied and connected to the `/cut`
+> skill: 224 items became 78 cards, each with a When and a How, the `/cut` blocks and sounds were added, and a "+ Add" button was added for Amir's own ideas. That page (version 7) is built from
+> [`.claude/skills/cut/kit/menu/menu.json`](../../.claude/skills/cut/kit/menu/menu.json) by `.claude/skills/cut/tools/menu_patch.py` (how: [`.claude/skills/cut/kit/MENU.md`](../../.claude/skills/cut/kit/MENU.md)).
+> `build_menu.py` here still writes the old 183-item page, so **do not publish its `menu/index.html` over the live one.** Read the live page first and merge, never force.
+> This catalogue still lists the cards that were removed, and the pieces behind them are still in `kit/`. Numbers 184 to 225 now belong to the `/cut` cards (`numbers.json` reserves them, the next free one is 226).
+> What to do about the two builders is Amir's call: fold the tidy into `catalog.json` and make `build_menu.py` write the version 7 page, or stop publishing from here.
+
 Every move, look and sound in Claude's showreel ([`../showreel/`](../showreel/README.md)), and the ingredients for Amir's own reels, has a **number** and a **name**,
 with a sample you can play. Mark the ones you like. On a later video, ask for them by number: *"use 14, 22 and the Kick"*.
 
