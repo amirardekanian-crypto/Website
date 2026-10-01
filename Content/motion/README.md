@@ -9,11 +9,19 @@ fonts that are not Amir's. Step 3 of the plan adds a switch to the brand look (c
 
 ## How to use it
 
-1. Open the published page (link in `MAP.md`, *Motion showreel* bullet). Play things. Tap **Keep**, **Maybe** or **Drop**.
+1. Open the published page: <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA> (private; only its owner can open it). Play things. Tap **Keep**, **Maybe** or **Drop**.
    The pencil gives an item your own name or leaves a note. Marks are saved on the page.
 2. Tell Claude you are done. Claude reads the marks straight from the page, so nothing has to be copied.
    (If the page says "Kept on this phone only", tap **My picks**, copy the list and paste it to Claude.)
 3. Numbers never change and are never reused (`numbers.json`). Names and wording can change at any time.
+
+## Publishing
+
+The page is an Artifact. `build_menu.py` writes `menu/index.html` and `menu/files.json` (every clip, poster and sound the page needs,
+by published path). Publish `menu/index.html` with `root: Content/motion/menu`, that file list and `capabilities: {db: {}}`; republish to the
+same URL to update it. Artifacts serve `.mp4`, `.mp3`, `.wav`, `.ogg` and `.jpg`, **not `.m4a`**, which is why the sounds are MP3.
+Marks live in the page's own database (collection `marks`, one document per item id: `v` keep / maybe / drop, `alias`, `note`).
+Claude reads them with the `ArtifactData` tool: `list` on `marks`.
 
 ## What is in here
 
@@ -24,7 +32,7 @@ numbers.json        id -> number. Written once, never changed, never reused
 menu/index.html     the page, built from the catalogue (publish this)
 menu/clips/*.mp4    68 sample clips, cut from the real reel through the real engine (640x360, 3.9 MB)
 menu/posters/*.jpg  80 stills (a poster for every clip, plus the looks and frame furniture)
-menu/sounds/*.m4a   48 sound samples (1.8 MB); menu/sounds.json holds each one's length and waveform
+menu/sounds/*.mp3   48 sound samples (2.2 MB); menu/sounds.json holds each one's length and waveform
 menu/clips.manifest.json   what was rendered, and a hash of the spec it came from
 tools/              catalog.py · clips.js · sounds.py · build_menu.py · page.html (the page template)
 export/             git-ignored: WAV copies of the sounds (48 kHz, 16-bit) and a waveform contact sheet

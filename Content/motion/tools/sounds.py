@@ -22,7 +22,7 @@ Samples start 0.10 s in. "-60 dBFS" is measured on the finished sample, i.e. 57 
 Because each sound reseeds from its own id (crc32), a subset renders byte-identical to a full run.
 
 Writes (repo-relative):
-    Content/motion/menu/sounds/<id>.m4a      AAC-LC 128 kbps, 48 kHz stereo, +faststart
+    Content/motion/menu/sounds/<id>.mp3      MP3 160 kbps, 48 kHz stereo (artifacts serve .mp3 / .wav / .ogg, not .m4a)
     Content/motion/export/wav/<id>.wav       48 kHz 16-bit stereo (export/ is git-ignored on purpose)
     Content/motion/menu/sounds.json          {id: {dur, peaks[48], peak_db, rms_db}}
     Content/motion/export/sound-sheet.png    8 x 6 waveform contact sheet
@@ -47,7 +47,7 @@ from scipy.ndimage import maximum_filter1d
 ROOT = Path(__file__).resolve().parents[3]
 AUDIO_PY = ROOT / "Content" / "showreel" / "tools" / "audio.py"
 MOTION = ROOT / "Content" / "motion"
-DIR_M4A = MOTION / "menu" / "sounds"
+DIR_SND = MOTION / "menu" / "sounds"
 DIR_WAV = MOTION / "export" / "wav"
 FILE_JSON = MOTION / "menu" / "sounds.json"
 FILE_SHEET = MOTION / "export" / "sound-sheet.png"
@@ -556,11 +556,11 @@ def ffmpeg_exe():
     return _ffmpeg[0]
 
 
-def encode_m4a(wav_path, m4a_path):
+def encode_mp3(wav_path, mp3_path):
     subprocess.run([ffmpeg_exe(), "-y", "-hide_banner", "-loglevel", "error", "-i", str(wav_path),
-                    "-vn", "-map_metadata", "-1", "-c:a", "aac", "-profile:a", "aac_low", "-b:a", "128k",
-                    "-ar", str(SR), "-ac", "2", "-fflags", "+bitexact", "-flags:a", "+bitexact",
-                    "-movflags", "+faststart", str(m4a_path)], check=True)
+                    "-vn", "-map_metadata", "-1", "-c:a", "libmp3lame", "-b:a", "160k",
+                    "-ar", str(SR), "-ac", "2", "-fflags", "+bitexact", "-flags:a", "+bitexact", "-write_xing", "0",
+                    str(mp3_path)], check=True)
 
 
 def write_json(fresh):
@@ -643,7 +643,7 @@ def main():
         if bad:
             ap.error(f"unknown id(s): {', '.join(bad)}  (valid: {', '.join(by_id)})")
         todo = [by_id[i] for i in ids]
-    for d in (DIR_M4A, DIR_WAV, FILE_JSON.parent, FILE_SHEET.parent):
+    for d in (DIR_SND, DIR_WAV, FILE_JSON.parent, FILE_SHEET.parent):
         d.mkdir(parents=True, exist_ok=True)
     fresh, group = {}, None
     for snd in todo:
@@ -654,12 +654,12 @@ def main():
         pcm = to_pcm(render(snd, info))
         wav = DIR_WAV / f"{snd.id}.wav"
         wavfile.write(wav, SR, pcm)
-        encode_m4a(wav, DIR_M4A / f"{snd.id}.m4a")
+        encode_mp3(wav, DIR_SND / f"{snd.id}.mp3")
         fresh[snd.id] = m = measure(pcm)
         print(f"  {snd.id:11s} {m['dur']:5.2f} s   peak {m['peak_db']:6.2f} dB   rms {m['rms_db']:6.1f} dB"
               f"   (limiter {info['limiter_gr_db']:5.1f} dB)")
     write_json(fresh)
-    print(f"{len(todo)} sample(s) -> {DIR_M4A.relative_to(ROOT)}/*.m4a, {DIR_WAV.relative_to(ROOT)}/*.wav, {FILE_JSON.relative_to(ROOT)}")
+    print(f"{len(todo)} sample(s) -> {DIR_SND.relative_to(ROOT)}/*.mp3, {DIR_WAV.relative_to(ROOT)}/*.wav, {FILE_JSON.relative_to(ROOT)}")
     if args.zip:
         print(f"{write_zip(args.zip)} WAV(s) -> {args.zip}")
     if not args.no_sheet:

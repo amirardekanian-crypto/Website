@@ -55,7 +55,7 @@ def main():
         if it['kind'] == 'sound':
             if it['id'] not in sounds:
                 problems.append(f'{it["id"]}: no rendered sound yet'); continue
-            files.append(f'sounds/{it["id"]}.m4a')
+            files.append(f'sounds/{it["id"]}.mp3')
     for f in files:
         if not (MENU / f).exists():
             problems.append(f'missing file {f}')
@@ -67,7 +67,7 @@ def main():
     clips = {k: {'dur': v.get('dur', 0), 'bytes': v.get('bytes', 0)} for k, v in manifest.items() if k in {i['id'] for i in items}}
     snd = {}
     for k, v in sounds.items():
-        s = {'dur': v['dur'], 'peaks': v['peaks'], 'file': f'sounds/{k}.m4a'}
+        s = {'dur': v['dur'], 'peaks': v['peaks'], 'file': f'sounds/{k}.mp3'}
         if v.get('note'):
             s['note'] = v['note']
         snd[k] = s
