@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-"""build_menu.py — builds the Motion Menu page from the catalogue and the rendered media.
+"""build_menu.py — makes a LOCAL PREVIEW of the lab's catalogue (183 pieces) and checks that every clip, poster and sound it names has been rendered.
 
     python3 Content/motion/tools/catalog.py        (first: check + number the catalogue)
     node    Content/motion/tools/clips.js          (renders menu/clips + menu/posters through the reel engine)
     python3 Content/motion/tools/sounds.py         (renders menu/sounds + menu/sounds.json)
-    python3 Content/motion/tools/build_menu.py     (this: menu/index.html, ready to publish as an Artifact)
+    python3 Content/motion/tools/build_menu.py     (this: menu/_preview.html, for looking at the lab's pieces)
 
-Outputs
-    menu/index.html       the page as the Artifact tool wants it (no doctype / html / head / body tags)
-    menu/_preview.html    the same page wrapped as a full document, for opening locally (git-ignored)
-    menu/files.json       every media file the page needs, by published path (the list handed to the Artifact tool)
+THIS IS NOT THE LIVE PAGE (retired as a publisher on 2026-10-01, Amir: "one source"). The live Motion Menu is built from ONE place, the /cut skill's
+.claude/skills/cut/kit/menu/menu.json, by .claude/skills/cut/tools/menu_patch.py (see .claude/skills/cut/kit/MENU.md and the note at the top of Content/motion/README.md).
+It used to write menu/index.html and menu/files.json for the Artifact tool; it no longer does, so there is nothing here to publish over the live page.
+
+Output
+    menu/_preview.html    the preview page wrapped as a full document, for opening locally (git-ignored)
 
 The page is data driven: the catalogue is embedded as JSON and the page draws every card from it.
 """
@@ -79,15 +81,14 @@ def main():
     if '/*__DATA__*/' not in page:
         print('page.html has lost its data marker'); return 1
     page = page.replace('/*__DATA__*/', blob)
-    (MENU / 'index.html').write_text(page, encoding='utf-8')
     (MENU / '_preview.html').write_text(WRAP.replace('{body}', page), encoding='utf-8')
 
     files = sorted(set(files))
     total = sum((MENU / f).stat().st_size for f in files)
-    (MENU / 'files.json').write_text(json.dumps(files, indent=0) + '\n', encoding='utf-8')
-    print(f'menu/index.html  {len(page) / 1024:.0f} KB   {len(items)} items')
+    print(f'menu/_preview.html  {len(page) / 1024:.0f} KB   {len(items)} items')
     print(f'{len(files)} media files, {total / 1e6:.1f} MB   (clips {sum(f.startswith("clips/") for f in files)}, '
           f'posters {sum(f.startswith("posters/") for f in files)}, sounds {sum(f.startswith("sounds/") for f in files)})')
+    print('A LOCAL PREVIEW of the lab catalogue. NOT the live Motion Menu: that is built from .claude/skills/cut/kit/menu/menu.json. Do not publish this.')
     return 0
 
 

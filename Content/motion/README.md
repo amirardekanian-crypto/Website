@@ -1,11 +1,14 @@
 # Motion Menu
 
-> **Read this before you publish the page (2026-10-01).** The live artifact is no longer built from this folder. Right after this menu went up, the page was tidied and connected to the `/cut`
-> skill: 224 items became 78 cards, each with a When and a How, the `/cut` blocks and sounds were added, and a "+ Add" button was added for Amir's own ideas. That page (version 7) is built from
-> [`.claude/skills/cut/kit/menu/menu.json`](../../.claude/skills/cut/kit/menu/menu.json) by `.claude/skills/cut/tools/menu_patch.py` (how: [`.claude/skills/cut/kit/MENU.md`](../../.claude/skills/cut/kit/MENU.md)).
-> `build_menu.py` here still writes the old 183-item page, so **do not publish its `menu/index.html` over the live one.** Read the live page first and merge, never force.
-> This catalogue still lists the cards that were removed, and the pieces behind them are still in `kit/`. Numbers 184 to 225 now belong to the `/cut` cards (`numbers.json` reserves them, the next free one is 226).
-> What to do about the two builders is Amir's call: fold the tidy into `catalog.json` and make `build_menu.py` write the version 7 page, or stop publishing from here.
+> **One source (Amir, 2026-10-01: "one source").** The live Motion Menu page is built from ONE place:
+> [`.claude/skills/cut/kit/menu/menu.json`](../../.claude/skills/cut/kit/menu/menu.json), by `.claude/skills/cut/tools/menu_patch.py`
+> (how: [`.claude/skills/cut/kit/MENU.md`](../../.claude/skills/cut/kit/MENU.md)). That is the tidied menu: 78 cards, each with a When and a How, holding this lab's best pieces,
+> the `/cut` blocks, the sounds and a "+ Add" button for Amir's own ideas. **This folder no longer publishes the page.** It is the **lab**: the pieces (`kit/`), the samples
+> (`lab/`, `tools/clips.js`), the sounds (`tools/sounds.py`), the showreel and the proof that it still renders the same frames.
+> `catalog.json` is the lab's list of 183 pieces (including ones that have left the menu) and `build_menu.py` only makes a local preview. Menu numbers have one ledger, `numbers.json`:
+> 1 to 225 are taken, the next free one is 226, and a number is never reused.
+
+*Everything below describes the lab's catalogue of 183 pieces, as it was built on 2026-10-01.*
 
 Every move, look and sound in Claude's showreel ([`../showreel/`](../showreel/README.md)), and the ingredients for Amir's own reels, has a **number** and a **name**,
 with a sample you can play. Mark the ones you like. On a later video, ask for them by number: *"use 14, 22 and the Kick"*.
@@ -20,37 +23,38 @@ Every item is **callable by name** from the kit ([`kit/`](kit/README.md)): `KIT.
 
 ## How to use it
 
-1. Open the published page: <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA> (private; only its owner can open it). Play things. Tap **Keep**, **Maybe** or **Drop**.
+1. Open the published page: <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA> (private; only its owner can open it; it shows the tidied menu, 78 cards). Play things. Tap **Keep**, **Maybe** or **Drop**.
    The pencil gives an item your own name or leaves a note. Marks are saved on the page. On the Reels tab, the Farsi button switches a sample to its Farsi draft.
 2. Tell Claude you are done. Claude reads the marks straight from the page, so nothing has to be copied.
    (If the page says "Kept on this phone only", tap **My picks**, copy the list and paste it to Claude.)
 3. Numbers never change and are never reused (`numbers.json`). Names and wording can change at any time.
 
-## Publishing
+## Publishing (retired on 2026-10-01: one source)
 
-The page is an Artifact. `build_menu.py` writes `menu/index.html` and `menu/files.json` (every clip, poster and sound the page needs,
-by published path). Publish `menu/index.html` with `root: Content/motion/menu`, that file list and `capabilities: {db: {}}`; republish to the
-same URL to update it. One publish takes at most 255 files, and the Menu has more, so send the files in two or three publishes to the same URL (each adds to the files already there).
+**This folder does not publish the page any more.** The page is an Artifact built from the `/cut` skill's `menu.json` (see the note at the top). `build_menu.py` used to write
+`menu/index.html` and `menu/files.json` for the Artifact tool; it now writes only a local preview, and `menu/index.html` is gone. Do not rebuild the old publish step.
+Marks live in the page's own database (collection `marks`, one document per item id: `v` keep / maybe / drop, `alias`, `note`) and Claude reads them with the `ArtifactData` tool: `list` on `marks`.
 Artifacts serve `.mp4`, `.mp3`, `.wav`, `.ogg` and `.jpg`, **not `.m4a`**, which is why the sounds are MP3.
-Marks live in the page's own database (collection `marks`, one document per item id: `v` keep / maybe / drop, `alias`, `note`).
-Claude reads them with the `ArtifactData` tool: `list` on `marks`.
+
+**To put a new lab piece on the menu:** draw it here (below), render its sample (`clips.js`, or `sounds.py` for a sound), then add a card to `menu.json` with the number from `numbers.json`
+and build the page with `menu_patch.py --samples Content/motion/menu` (it takes `clips/<id>.mp4` and `posters/<id>.jpg` from there). The steps are in `MENU.md`, section 2.
 
 ## What is in here
 
 ```
-catalog.json        the single source of truth: one line per item (name, plain label, what you can change, where it was used,
-                    which sounds go with it, how its sample clip is made)
-numbers.json        id -> number. Written once, never changed, never reused
+catalog.json        the lab's list of pieces: one line per item (name, plain label, what you can change, where it was used,
+                    which sounds go with it, how its sample clip is made). Not the live menu (see the note at the top)
+numbers.json        the ONE ledger of menu numbers: id -> number. Written once, never changed, never reused. The /cut cards' numbers (184 to 225) are in it too
 kit/                the code behind every item (pieces, scene changes, looks, feel, rules): see kit/README.md and kit/PIECES.md
 lab.html, lab/      the lab: any ingredient played alone on a small stage (lab.html?item=court, &lang=fa), and the sample for each one
 baseline/reel.json  the SHA-256 of all 450 frames of the showreel and its cue sheet: the proof the rebuilt reel is unchanged
 fonts/              Barlow Condensed, Barlow and Space Mono (Latin subsets, SIL OFL); Farsi uses assets/fonts/Vazirmatn-Variable.woff2
-menu/index.html     the page, built from the catalogue (publish this)
 menu/clips/*.mp4    sample clips: 640 x 360 cut from the real reel, 404 x 720 for the reel ingredients (plus a Farsi .fa.mp4 where there are words)
 menu/posters/*.jpg  a still for every clip, plus the looks and frame furniture
 menu/sounds/*.mp3   56 sound samples; menu/sounds.json holds each one's length and waveform
 menu/clips.manifest.json   what was rendered, and a hash of what it came from
-tools/              catalog.py · clips.js · sounds.py · sound_recipes.py · build_menu.py · page.html (the page template)
+menu/_preview.html  a local preview of this catalogue (git-ignored, made by build_menu.py). It is NOT the live page
+tools/              catalog.py · clips.js · sounds.py · sound_recipes.py · build_menu.py (preview only) · page.html (the preview's template)
                     verify.js · kit_check.js · kit_docs.js (the proofs and the docs) · still.js · serve.js (looking at a piece) · fonts.py · bodymap.py · srt_words.py
 export/             git-ignored: WAV copies of the sounds (48 kHz, 16-bit) and a waveform contact sheet
 ```
@@ -63,15 +67,16 @@ node    Content/motion/tools/clips.js          # render only the clips that are 
 python3 Content/motion/tools/sounds.py         # every sound, byte-identical every run
 node    Content/motion/tools/kit_check.js      # every item callable, every piece documented and drawn alone, the body map current
 node    Content/motion/tools/kit_docs.js       # kit/PIECES.md
-python3 Content/motion/tools/build_menu.py     # menu/index.html + a local preview (menu/_preview.html)
+python3 Content/motion/tools/build_menu.py     # a local preview only (menu/_preview.html). Not the live page
 ```
 
 On Amir's PC the Python command is `python`. Needs node + Playwright with a Chromium, and
 `pip install numpy scipy imageio-ffmpeg pillow`. The proof that the reel is unchanged:
 `node Content/motion/tools/verify.js check --page showreel/reel.html --baseline Content/motion/baseline/reel.json` (all 450 frames, about 4 minutes).
 
-**A new item:** write the piece in the kit, add a sample in `lab/`, look at it with `tools/still.js`, add one line to `catalog.json` (its `clip.sample` names the sample), run the commands above.
-It gets the next free number. **A clip that looks wrong:** change the piece or its sample and run `clips.js` again; the changed clips are redone.
+**A new piece:** write it in the kit, add a sample in `lab/`, look at it with `tools/still.js`, add one line to `catalog.json` (its `clip.sample` names the sample), run the commands above.
+It gets the next free number from `numbers.json`. To get it onto the live menu, add its card as described under *Publishing*. **A clip that looks wrong:** change the piece or its sample
+and run `clips.js` again; the changed clips are redone.
 
 ## How the samples are made (and what that means)
 

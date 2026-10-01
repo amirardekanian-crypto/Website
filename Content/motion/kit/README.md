@@ -119,7 +119,8 @@ with `KIT.sample(...)` in `lab/samples-*.js`. `tools/still.js court --t 0.5,1.5,
 clip (404 x 720 for a reel sample, plus the Farsi version). Samples named `dev-*` are drawing aids and are not Menu items.
 
 **To add an ingredient:** write the piece in a kit file (doc, params, cues), add a sample, look at it with `still.js`, add one line to `catalog.json` (its `clip.sample` names the sample),
-then run `catalog.py`, `clips.js`, `kit_docs.js`, `kit_check.js`, `build_menu.py`.
+then run `catalog.py`, `clips.js`, `kit_docs.js`, `kit_check.js` (and `build_menu.py` for a local preview). It gets the next free number from `numbers.json`. **The live Motion Menu is not built from
+this folder** (one source, 2026-10-01): to put the piece on it, add a card to the /cut skill's `menu.json` with that number (see `Content/motion/README.md`, *Publishing*).
 
 ## Not built yet
 

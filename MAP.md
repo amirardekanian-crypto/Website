@@ -245,10 +245,11 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   The **Reels** tab holds 31 ingredients for talking-head reels (numbers that count up, word-timed text, a court to scale with distances, an athlete and force arrows,
   force-time graphs, the app's muscle map lit muscle by muscle, chapters, camera moves, two metaphors): tall 9:16 samples with a **Farsi draft** to read. Amir's ideas and what became of them: [`INGREDIENTS.md`](Content/motion/INGREDIENTS.md).
   Every item is **callable by name** from the kit ([`motion/kit/`](Content/motion/kit/README.md); every piece and knob in [`PIECES.md`](Content/motion/kit/PIECES.md)), and any Menu sound can be named in a cue and played in a soundtrack.
-  Claude's own kit, **not Amir's brand system** (a switch to the brand look is step 3 of its plan). One source, [`catalog.json`](Content/motion/catalog.json);
-  numbers are written once in [`numbers.json`](Content/motion/numbers.json) and never change. Moves are cut from the real reel; Reels are drawn in the lab ([`lab.html`](Content/motion/lab.html)).
-  Published page (private; Amir marks Keep / Maybe / Drop there and Claude reads the marks): <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA> · rebuild steps in its README.
-  **Since 2026-10-01 the live page is tidied (78 cards, each with a When and a How) and built from the `/cut` skill's [`menu.json`](.claude/skills/cut/kit/menu/menu.json), not from this folder:** read the note at the top of the README before publishing anything.
+  Claude's own kit, **not Amir's brand system** (a switch to the brand look is step 3 of its plan). This folder is the **lab**: the lab's list is [`catalog.json`](Content/motion/catalog.json) (183 pieces).
+  Moves are cut from the real reel; Reels are drawn in the lab ([`lab.html`](Content/motion/lab.html)).
+  **One source (Amir, 2026-10-01):** the published page (private; Amir marks Keep / Maybe / Drop there and Claude reads the marks): <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA> is the **tidied menu, 78 cards
+  each with a When and a How**, and it is built ONLY from the `/cut` skill's [`menu.json`](.claude/skills/cut/kit/menu/menu.json) (how: [`MENU.md`](.claude/skills/cut/kit/MENU.md)). This folder no longer publishes it.
+  Menu numbers have one ledger, [`numbers.json`](Content/motion/numbers.json): never changed, never reused.
 - **Result cards / app mockups:** [`card-preview.html`](Content/card-preview.html)
   (rebuilds every app card with real class names) → exports in
   [`instagram-cards/`](Content/instagram-cards/) (legacy style, off-palette).

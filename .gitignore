@@ -46,6 +46,6 @@ Content/*/export/
 Content/video-archive/reels/
 Content/video-archive/private/
 
-# Motion Menu: local preview wrapper (the real page is menu/index.html)
+# Motion Menu lab: local preview (not the live page: that comes from .claude/skills/cut/kit/menu/menu.json, see Content/motion/README.md)
 Content/motion/menu/_preview.html
 Content/motion/menu/files.json
