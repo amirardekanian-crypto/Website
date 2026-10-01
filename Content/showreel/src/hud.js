@@ -3,16 +3,19 @@
  */
 (function (g) {
   'use strict';
-  const L = g.L, R = g.REEL, { W, H, FPS } = R, { clamp, prog, E, hex, rgb, mixC, smoothstep } = L;
+  const L = g.L, R = g.REEL, { clamp, prog, E, hex, rgb, mixC, smoothstep } = L;
   const MX = 64, MY = 54;
 
   const pad = (n, w = 2) => String(n).padStart(w, '0');
   function timecode(t) {
-    const fr = Math.floor(t * FPS + 1e-6);
+    const FPS = R.FPS, fr = Math.floor(t * FPS + 1e-6);
     return `${pad(0)}:${pad(0)}:${pad(Math.floor(fr / FPS))}:${pad(fr % FPS)}`;
   }
 
+  R.hudText = { title: 'CLAUDE', sub: '— MOTION REEL ’26' };            // the two strings in the top-left corner
+
   R.hud = function (ctx, t) {
+    const W = R.W, H = R.H;
     const a = R.active(t);
     let cur, nxt = null, k = 0;
     if (a.tr) { cur = R.shots[a.tr.to - 1]; nxt = R.shots[a.tr.to]; k = smoothstep(.35, .65, a.p); } else cur = R.shots[a.i];
@@ -43,9 +46,9 @@
     const tl = vis('tl');
     if (tl > .01) {
       ctx.fillStyle = rgb(col, .9 * tl); ctx.textAlign = 'left';
-      ctx.fillText('CLAUDE', MX, MY);
-      const w = ctx.measureText('CLAUDE ').width;
-      ctx.fillStyle = rgb(col, .5 * tl); ctx.fillText('— MOTION REEL ’26', MX + w, MY);
+      ctx.fillText(R.hudText.title, MX, MY);
+      const w = ctx.measureText(R.hudText.title + ' ').width;
+      ctx.fillStyle = rgb(col, .5 * tl); ctx.fillText(R.hudText.sub, MX + w, MY);
     }
 
     /* top-right: timecode */

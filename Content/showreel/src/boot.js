@@ -9,8 +9,9 @@
     '500 20px "JetBrains Mono"', '700 20px "JetBrains Mono"', '600 20px "Inter Tight"', '400 20px "Inter Tight"',
   ];
 
-  Promise.all(FONTS.map(f => document.fonts.load(f, 'ABCxyz0123 ’—'))).then(() => document.fonts.ready).then(() => {
-    R.fontsOk = FONTS.every(f => document.fonts.check(f));
+  const ALL = () => FONTS.concat(R.fonts || []);                  // a recipe adds its own faces with REEL.configure({ fonts: [...] })
+  Promise.all(ALL().map(f => document.fonts.load(f, 'ABCxyz0123 ’—'))).then(() => document.fonts.ready).then(() => {
+    R.fontsOk = ALL().every(f => document.fonts.check(f));
     if (R.init) R.init();                       // shots that pre-compute (particles, glyph targets) do it here
     g.REEL_READY = true;
 

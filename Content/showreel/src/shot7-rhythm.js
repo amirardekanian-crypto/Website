@@ -139,6 +139,7 @@
       }
       case 'glitch': {
         const bands = 14, bh = Math.ceil(H / bands);
+        ctx.drawImage(p < .5 ? A : B, 0, 0);                  // a base under the slices, so the gaps they open show the scene, not leftovers
         for (let j = 0; j < bands; j++) {
           const src = (p + hash(j, 3) * .5 > .5) ? B : A, dx = (hash(j, 9) - .5) * 520 * bell;
           ctx.drawImage(src, 0, j * bh, W, bh, dx, j * bh, W, bh);
