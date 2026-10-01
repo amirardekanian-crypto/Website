@@ -1,0 +1,482 @@
+{
+ "full-stop": {
+  "hash": "6e041f6be96f",
+  "frames": 38,
+  "dur": 1.77,
+  "bytes": 33977
+ },
+ "slab": {
+  "hash": "2c92fde5ebf4",
+  "frames": 33,
+  "dur": 1.6,
+  "bytes": 98219
+ },
+ "portal": {
+  "hash": "3808a44a8df5",
+  "frames": 28,
+  "dur": 1.43,
+  "bytes": 64761
+ },
+ "static": {
+  "hash": "bbe3d5e60e27",
+  "frames": 20,
+  "dur": 1.17,
+  "bytes": 73785
+ },
+ "whiplash": {
+  "hash": "5b027dc1aa21",
+  "frames": 25,
+  "dur": 1.33,
+  "bytes": 58855
+ },
+ "clamshell": {
+  "hash": "eefe1dcfb542",
+  "frames": 29,
+  "dur": 1.47,
+  "bytes": 149857
+ },
+ "strobe": {
+  "hash": "67875124c52e",
+  "frames": 27,
+  "dur": 1.4,
+  "bytes": 27230
+ },
+ "venetian": {
+  "hash": "2e9016cd04c5",
+  "frames": 25,
+  "dur": 1.33,
+  "bytes": 40190
+ },
+ "pinhole": {
+  "hash": "3f1ee30f3000",
+  "frames": 25,
+  "dur": 1.33,
+  "bytes": 42276
+ },
+ "shatter": {
+  "hash": "663eaffd05f8",
+  "frames": 25,
+  "dur": 1.33,
+  "bytes": 32530
+ },
+ "tunnel": {
+  "hash": "11cb03481c88",
+  "frames": 25,
+  "dur": 1.33,
+  "bytes": 43874
+ },
+ "mosaic": {
+  "hash": "cca127dafa87",
+  "frames": 25,
+  "dur": 1.33,
+  "bytes": 43352
+ },
+ "flipcard": {
+  "hash": "e92cc4794ec7",
+  "frames": 25,
+  "dur": 1.33,
+  "bytes": 37865
+ },
+ "rise": {
+  "hash": "0c0f8e747f90",
+  "frames": 22,
+  "dur": 1.08,
+  "bytes": 34140
+ },
+ "pop": {
+  "hash": "4879a27611f0",
+  "frames": 13,
+  "dur": 0.78,
+  "bytes": 34572
+ },
+ "tumble": {
+  "hash": "923ea6e8bef3",
+  "frames": 29,
+  "dur": 1.32,
+  "bytes": 48909
+ },
+ "heavyweight": {
+  "hash": "53916417a689",
+  "frames": 25,
+  "dur": 1.18,
+  "bytes": 60709
+ },
+ "swing": {
+  "hash": "f6ff383b3d8b",
+  "frames": 35,
+  "dur": 1.52,
+  "bytes": 86154
+ },
+ "monolith": {
+  "hash": "1c4f6a9bf4e3",
+  "frames": 32,
+  "dur": 1.42,
+  "bytes": 73307
+ },
+ "punch-in": {
+  "hash": "92a02b4a077f",
+  "frames": 28,
+  "dur": 1.28,
+  "bytes": 33597
+ },
+ "thud": {
+  "hash": "7aa3c9832738",
+  "frames": 34,
+  "dur": 1.48,
+  "bytes": 46591
+ },
+ "bullseye": {
+  "hash": "a8f70538892b",
+  "frames": 29,
+  "dur": 1.32,
+  "bytes": 113137
+ },
+ "quarter-turn": {
+  "hash": "b4e99d07b628",
+  "frames": 29,
+  "dur": 1.32,
+  "bytes": 175721
+ },
+ "pills": {
+  "hash": "a285e8ff1513",
+  "frames": 26,
+  "dur": 1.22,
+  "bytes": 112493
+ },
+ "gravity": {
+  "hash": "b810810d9977",
+  "frames": 29,
+  "dur": 1.32,
+  "bytes": 52365
+ },
+ "dot-pop": {
+  "hash": "d3866170bb72",
+  "frames": 21,
+  "dur": 1.05,
+  "bytes": 24191
+ },
+ "slash": {
+  "hash": "ab75d300cab1",
+  "frames": 17,
+  "dur": 0.92,
+  "bytes": 26711
+ },
+ "ripple": {
+  "hash": "989a45c19748",
+  "frames": 16,
+  "dur": 0.88,
+  "bytes": 24693
+ },
+ "twist": {
+  "hash": "d3d38d3f7ef1",
+  "frames": 17,
+  "dur": 0.92,
+  "bytes": 21897
+ },
+ "tip-over": {
+  "hash": "6084014dfece",
+  "frames": 16,
+  "dur": 0.88,
+  "bytes": 13129
+ },
+ "spinner": {
+  "hash": "ec05a9aa0f8e",
+  "frames": 17,
+  "dur": 0.92,
+  "bytes": 24783
+ },
+ "sweep": {
+  "hash": "4b86e7cd4262",
+  "frames": 17,
+  "dur": 0.92,
+  "bytes": 29057
+ },
+ "pinpoint": {
+  "hash": "96bddd0e4d6c",
+  "frames": 16,
+  "dur": 0.88,
+  "bytes": 15818
+ },
+ "squash": {
+  "hash": "27d65f727226",
+  "frames": 17,
+  "dur": 0.92,
+  "bytes": 14511
+ },
+ "dust": {
+  "hash": "12b46e0fba65",
+  "frames": 26,
+  "dur": 1.22,
+  "bytes": 39307
+ },
+ "tremor": {
+  "hash": "2469516011a8",
+  "frames": 14,
+  "dur": 0.82,
+  "bytes": 12921
+ },
+ "ruler": {
+  "hash": "fc957410b422",
+  "frames": 26,
+  "dur": 1.22,
+  "bytes": 23099
+ },
+ "hop": {
+  "hash": "6df5acc205da",
+  "frames": 25,
+  "dur": 1.18,
+  "bytes": 37756
+ },
+ "heartbeat": {
+  "hash": "9c07977cce15",
+  "frames": 37,
+  "dur": 1.58,
+  "bytes": 18068
+ },
+ "afterglow": {
+  "hash": "e9878d8a1575",
+  "frames": 34,
+  "dur": 1.48,
+  "bytes": 37393
+ },
+ "spring-lab": {
+  "hash": "3135b11d0ed1",
+  "frames": 61,
+  "dur": 2.38,
+  "bytes": 66005
+ },
+ "trefoil": {
+  "hash": "45f9eaa3cd26",
+  "frames": 40,
+  "dur": 1.68,
+  "bytes": 112025
+ },
+ "x-ray": {
+  "hash": "8112e6c07344",
+  "frames": 34,
+  "dur": 1.48,
+  "bytes": 100053
+ },
+ "dive": {
+  "hash": "eab79fc1f636",
+  "frames": 22,
+  "dur": 1.08,
+  "bytes": 87420
+ },
+ "spin-kick": {
+  "hash": "1f9626e2b0cc",
+  "frames": 43,
+  "dur": 1.78,
+  "bytes": 115571
+ },
+ "big-bang": {
+  "hash": "9be47bffae2f",
+  "frames": 30,
+  "dur": 1.35,
+  "bytes": 94347
+ },
+ "orbit": {
+  "hash": "5ea3a6e415ff",
+  "frames": 52,
+  "dur": 2.08,
+  "bytes": 118210
+ },
+ "ghost-word": {
+  "hash": "db7ef472d030",
+  "frames": 37,
+  "dur": 1.58,
+  "bytes": 78646
+ },
+ "supernova": {
+  "hash": "a82b40988d98",
+  "frames": 17,
+  "dur": 0.92,
+  "bytes": 143520
+ },
+ "current": {
+  "hash": "4bebaea7856c",
+  "frames": 34,
+  "dur": 1.48,
+  "bytes": 235435
+ },
+ "assembly": {
+  "hash": "1899937f2708",
+  "frames": 34,
+  "dur": 1.48,
+  "bytes": 238896
+ },
+ "pulse-line": {
+  "hash": "79843fc54744",
+  "frames": 43,
+  "dur": 1.78,
+  "bytes": 24333
+ },
+ "bento": {
+  "hash": "6da0b7714c04",
+  "frames": 41,
+  "dur": 1.72,
+  "bytes": 54947
+ },
+ "ring-counter": {
+  "hash": "63566587ee77",
+  "frames": 46,
+  "dur": 1.88,
+  "bytes": 47130
+ },
+ "scrub": {
+  "hash": "59f085ec304e",
+  "frames": 37,
+  "dur": 1.58,
+  "bytes": 26185
+ },
+ "switch": {
+  "hash": "3dc733908ccf",
+  "frames": 43,
+  "dur": 1.78,
+  "bytes": 23326
+ },
+ "skyline": {
+  "hash": "1df7e950700f",
+  "frames": 41,
+  "dur": 1.72,
+  "bytes": 18244
+ },
+ "tick-list": {
+  "hash": "e8977fde28db",
+  "frames": 22,
+  "dur": 1.08,
+  "bytes": 30231
+ },
+ "lifeline": {
+  "hash": "b4ca39b86250",
+  "frames": 36,
+  "dur": 1.55,
+  "bytes": 44958
+ },
+ "odometer": {
+  "hash": "3d4d1976869c",
+  "frames": 41,
+  "dur": 1.72,
+  "bytes": 64481
+ },
+ "pointer": {
+  "hash": "d42632516954",
+  "frames": 47,
+  "dur": 1.92,
+  "bytes": 37676
+ },
+ "keyframes": {
+  "hash": "ddfc1e0239c4",
+  "frames": 44,
+  "dur": 1.82,
+  "bytes": 69315
+ },
+ "curve-lab": {
+  "hash": "df79ebe9e70b",
+  "frames": 42,
+  "dur": 1.75,
+  "bytes": 83137
+ },
+ "shutter": {
+  "hash": "05d126020ce7",
+  "frames": 17,
+  "dur": 0.92,
+  "bytes": 55890
+ },
+ "halo": {
+  "hash": "e4d3017346e2",
+  "frames": 16,
+  "dur": 0.88,
+  "bytes": 24646
+ },
+ "jolt": {
+  "hash": "db144a1c6872",
+  "frames": 26,
+  "dur": 1.22,
+  "bytes": 62780
+ },
+ "film": {
+  "hash": "162065c68da3",
+  "frames": 1,
+  "dur": 0,
+  "bytes": 8890
+ },
+ "prism": {
+  "hash": "832356e12091",
+  "frames": 19,
+  "dur": 0.98,
+  "bytes": 52621
+ },
+ "dot-grid": {
+  "hash": "6d5c4dce4040",
+  "frames": 1,
+  "dur": 0,
+  "bytes": 6399
+ },
+ "ghost-numeral": {
+  "hash": "ac1e76f6697b",
+  "frames": 1,
+  "dur": 0,
+  "bytes": 12787
+ },
+ "vignette": {
+  "hash": "64fd72072446",
+  "frames": 1,
+  "dur": 0,
+  "bytes": 44100
+ },
+ "paper": {
+  "hash": "dddb2a6c0ae7",
+  "frames": 1,
+  "dur": 0,
+  "bytes": 14544
+ },
+ "ink-coral": {
+  "hash": "830519373d0c",
+  "frames": 1,
+  "dur": 0,
+  "bytes": 15641
+ },
+ "slate": {
+  "hash": "64b30bb6ab94",
+  "frames": 16,
+  "dur": 0.88,
+  "bytes": 15886
+ },
+ "coral-block": {
+  "hash": "3be60454af72",
+  "frames": 1,
+  "dur": 0,
+  "bytes": 40670
+ },
+ "primary-paper": {
+  "hash": "53969455ec23",
+  "frames": 1,
+  "dur": 0,
+  "bytes": 69993
+ },
+ "cobalt-deep": {
+  "hash": "200035be9b65",
+  "frames": 1,
+  "dur": 0,
+  "bytes": 27610
+ },
+ "night-spectrum": {
+  "hash": "aec81cede684",
+  "frames": 1,
+  "dur": 0,
+  "bytes": 36162
+ },
+ "daylight-ui": {
+  "hash": "eefd2589adf0",
+  "frames": 1,
+  "dur": 0,
+  "bytes": 29065
+ },
+ "colour-plates": {
+  "hash": "af605ccc2627",
+  "frames": 1,
+  "dur": 0,
+  "bytes": 11758
+ }
+}

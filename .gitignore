@@ -45,3 +45,7 @@ Content/*/export/
 # Both stay OneDrive-only. The catalogue, posters, generated clips and app clips ARE tracked. See Content/video-archive/README.md.
 Content/video-archive/reels/
 Content/video-archive/private/
+
+# Motion Menu: local preview wrapper (the real page is menu/index.html)
+Content/motion/menu/_preview.html
+Content/motion/menu/files.json

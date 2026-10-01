@@ -66,6 +66,7 @@ function serve() {
   /* what to render */
   let jobs;
   if (A.at) jobs = String(A.at).split(',').map(s => ({ f: parseFloat(s) * FPS, name: `at_${parseFloat(s).toFixed(3)}.png` }));
+  else if (A.frames) jobs = String(A.frames).split(',').map(s => ({ f: +s, name: `f_${String(+s).padStart(4, '0')}.png` }));
   else {
     let [a, b] = A.range ? String(A.range).split('-').map(Number) : [0, TOTAL - 1];
     if (b == null || isNaN(b)) b = a;

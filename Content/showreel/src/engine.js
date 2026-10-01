@@ -127,7 +127,7 @@
     for (let k = 0; k < N; k++) {
       const tk = N === 1 ? t : t + ((k + .5) / N - .5) * shutter / FPS;
       drawWorld(sceneX, tk);
-      const c = camera(tk);
+      const c = o.noCamera ? { e: 0 } : camera(tk);               // o.noCamera: the Motion Menu's "Jolt off" demo
       accX.setTransform(1, 0, 0, 1, 0, 0);
       accX.globalAlpha = 1 / (k + 1);
       if (c.e > .002) {
@@ -137,8 +137,9 @@
     }
     accX.setTransform(1, 0, 0, 1, 0, 0); accX.globalAlpha = 1;
     reset(outCtx);
-    R.post(outCtx, accC, t, f, fxAt(t));
-    R.hud(outCtx, t);
+    const fx = fxAt(t); if (o.fx) Object.assign(fx, o.fx);        // o.fx: override bloom / ca / grain / vig / flash (before-and-after demos)
+    R.post(outCtx, accC, t, f, fx);
+    if (!o.noHud) R.hud(outCtx, t);
     return out;
   };
 
