@@ -457,7 +457,7 @@ function mediaHtml(it) {
   if (c) return '<div class="media"><img src="posters/' + it.id + '.jpg" alt="' + esc(it.name) + ' sample" loading="lazy"></div>';
   return '';
 }
-function seenAt(u) { var m = /^Reel ([\d.]+) s$/.exec(u || ''); return m ? m[1] + ' s in' : (u || ''); }
+function seenAt(u) { var m = /^Reel ([\d.]+) s$/.exec(u || ''); return m ? 'at ' + m[1] + ' s' : (u || ''); }
 function reverseUse(id) { return ITEMS.filter(function (x) { return (x.pairs || []).indexOf(id) >= 0; }); }
 function pairsHtml(it) {
   if (!it.pairs || !it.pairs.length) return '';
@@ -507,7 +507,7 @@ function cardHtml(it) {
       '<div style="display:grid;align-items:center"><div class="rail"><b></b></div></div>' +
       '<svg viewBox="0 0 100 60" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><line class="g0" x1="6" x2="94" stroke="rgba(242,238,229,.25)" stroke-dasharray="2 2" stroke-width=".6"/><line class="g1" x1="6" x2="94" stroke="rgba(242,238,229,.25)" stroke-dasharray="2 2" stroke-width=".6"/><path class="cp" fill="none" stroke="#F2EEE5" stroke-width="1.4"/><circle class="cm" r="2.4" fill="#FF5530"/></svg>') + '</div>' +
       '<div class="body">' + head + '<p class="label">' + esc(it.label) + '</p><div class="tech">' + esc(it.tech || '') + '</div>' +
-      '<div class="line"><span class="k">Seen at</span>' + esc(seenAt(it.used)) + '</div>' + tail + '</div>';
+      '<div class="line"><span class="k">Used in</span>' + esc(it.used || '') + '</div>' + tail + '</div>';
   } else if (k === 'pair') {
     inner = '<div class="specimen">' + (SPECIMENS[it.id] || '') + '</div><div class="body">' + head + '<p class="label">' + esc(it.label) + '</p>' +
       '<div class="line"><span class="k">Fonts</span>' + esc((it.faces || []).join(' + ')) + '</div><div class="line"><span class="k">Used in</span>' + esc(it.used || '') + '</div>' + tail + '</div>';
@@ -520,7 +520,7 @@ function cardHtml(it) {
       '<div class="line"><span class="k">Applies to</span>' + esc(it.used || '') + '</div>' + tail + '</div>';
   } else {
     inner = mediaHtml(it) + '<div class="body">' + head + '<p class="label">' + esc(it.label) + '</p><div class="line">' + farsiTag(it) +
-      (it.used ? '<span><span class="k">Seen at</span>' + esc(seenAt(it.used)) + '</span>' : '') + '</div>' + takesHtml(it) + pairsHtml(it) + tail + '</div>';
+      (it.used ? '<span><span class="k">In the reel</span>' + esc(seenAt(it.used)) + '</span>' : '') + '</div>' + takesHtml(it) + pairsHtml(it) + tail + '</div>';
   }
   return '<article class="card" data-card="' + it.id + '" data-v="">' + inner + '</article>';
 }
