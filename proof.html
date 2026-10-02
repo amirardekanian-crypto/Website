@@ -22,9 +22,9 @@
 
 <link rel="preload" href="/assets/fonts/BarlowCondensed-900.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/fonts.css?v=20261002e">
-<link rel="stylesheet" href="/assets/css/tokens.css?v=20261002d">
-<link rel="stylesheet" href="/assets/css/base.css?v=20261002d">
-<link rel="stylesheet" href="/assets/css/components.css?v=20261002d">
+<link rel="stylesheet" href="/assets/css/tokens.css?v=20261002f">
+<link rel="stylesheet" href="/assets/css/base.css?v=20261002f">
+<link rel="stylesheet" href="/assets/css/components.css?v=20261002f">
 
 <script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
 <script defer src="/assets/js/track.js?v=1"></script>
@@ -116,7 +116,7 @@
   .p-hint { font-size: 12.5px; line-height: 1.5; color: rgba(250,247,242,.72); margin-top: 6px; }
   .p-submit {
     width: 100%; padding: 17px 20px; margin-top: 8px; cursor: pointer;
-    background: #C7552F; color: #FAF7F2; border: 0;
+    background: #C2512C; color: #fff; border: 0;   /* the deeper fill under white text: 4.66:1 */
     font-family: var(--font-display); font-weight: 900; font-size: 17px;
     letter-spacing: .06em; text-transform: uppercase;
   }
@@ -130,7 +130,7 @@
   .p-form-sec .p-error a { color: inherit; font-weight: 700; }
   .p-done h2:focus { outline: none; }
   /* The shared .btn-primary is green, the same green as this panel, so the button needs its own fill (as .p-submit has). */
-  .p-done .p-wa { display: inline-block; padding: 16px 24px; background: #C7552F; color: #FAF7F2; text-decoration: none;
+  .p-done .p-wa { display: inline-block; padding: 16px 24px; background: #C2512C; color: #fff; text-decoration: none;
     font-family: var(--font-display); font-weight: 900; font-size: 16px; letter-spacing: .06em; text-transform: uppercase; }
   .p-done .p-wa:hover { background: #E06B43; }
   .p-done .p-wa:focus-visible { outline: 3px solid #FAF7F2; outline-offset: 3px; }
@@ -324,7 +324,7 @@
 
 <footer class="site-footer" id="site-footer"></footer>
 
-<script defer src="/assets/js/shared.js?v=20261002d"></script>
+<script defer src="/assets/js/shared.js?v=20261002f"></script>
 <script>
   // Post in the background so the visitor stays on the page and sees a confirmation, not Web3Forms' own page.
   // The old fallback (form.submit() when fetch failed) is gone: it threw the visitor onto a foreign page with the

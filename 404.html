@@ -25,7 +25,7 @@
   @font-face{font-family:'Barlow Condensed Fallback';font-weight:700;font-style:normal;src:local('Arial Bold'), local('Arial-BoldMT'), local('Helvetica Bold'), local('Roboto Bold'), local('Roboto-Bold'), local('Liberation Sans Bold');size-adjust:67.9%;ascent-override:147%;descent-override:29.5%;line-gap-override:0%;}
   @font-face{font-family:'Vazirmatn';src:url('/assets/fonts/Vazirmatn-Variable.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap;}
   :root{
-    --green:#0E4A36; --green-dk:#0a3527; --clay:#C7552F; --clay-2:#E06B43; --paper:#FAF7F2;
+    --green:#0E4A36; --green-dk:#0a3527; --clay:#C7552F; --clay-fill:#C2512C; --clay-2:#E06B43; --paper:#FAF7F2;
     --en:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
     --disp:'Barlow Condensed','Barlow Condensed Fallback','Arial Narrow',Impact,sans-serif;
     --fa:'Vazirmatn',Tahoma,'Segoe UI',sans-serif;
@@ -56,7 +56,7 @@
   .go{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:16px;}
   .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:6px;text-decoration:none;
        font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:1.5px;text-transform:uppercase;}
-  .btn.p{background:var(--clay);color:#fff;}
+  .btn.p{background:var(--clay-fill);color:#fff;}
   .btn.s{color:#fff;border:1.5px solid rgba(255,255,255,.55);}
   .btn:hover{filter:brightness(1.08);}
   .more{font-size:16px;color:rgba(255,255,255,.88);}

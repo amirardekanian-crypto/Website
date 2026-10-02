@@ -32,6 +32,7 @@
   --accent-2:      #C7552F;
   --accent-2-dim:  rgba(199, 85, 47, 0.10);
   --accent-2-mid:  rgba(199, 85, 47, 0.20);
+  --accent-2-fill: #C2512C;  /* the fill under WHITE text (buttons, badges): 4.66:1, where #C7552F is 4.40. Amir 2026-10-02. Everything else clay stays --accent-2 */
   --accent-2-ink:  #FFFFFF;
   --accent-2-text: #B64826;  /* small clay TEXT on light surfaces: 5.0 / 4.5 / 5.3:1 on paper / paper-2 / white. The fill stays #C7552F */
 
