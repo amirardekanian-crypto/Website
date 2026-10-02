@@ -38,6 +38,11 @@ Durable context for working in this repo. Read the linked docs before diving in.
   changed everywhere. Read it before adding or changing any lesson or article.
 - `Content/FRESH-EYES.md` — the app audit (2026-09-24): what has shipped, what is next and in what order,
   the open calls, and how to continue it. Read it before picking up an audit item (`REL-01`, `CARD-01` …).
+- `Content/SITE-AUDIT.md` — the **website** audit (2026-10-02): 25 numbered packages (fix now / his call /
+  foundations), the baseline scoreboard, the open questions and how to continue. **Read it before changing any
+  public page's design or copy.** It is generated from `scripts/site_audit/backlog.py` (edit that, then run
+  `python scripts/site_audit/build_report.py`); the measuring tools, `shot.js` for checking a defect in a real
+  viewport and the lessons are in `scripts/site_audit/README.md`; the seven page reviews are in `Content/site-audit/`.
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy. **It opens with the RULE INDEX**
   (2026-09-26): one numbered line per rule (`VOL-8`, `SEL-4` …), the stage that applies it and whether
   the checker enforces it; the bullets below it are the stories. **The index line is the rule**:

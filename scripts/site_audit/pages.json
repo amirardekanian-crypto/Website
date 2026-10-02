@@ -1,0 +1,22 @@
+[
+  {"key": "home-en",     "path": "/",                                         "lang": "en"},
+  {"key": "home-fa",     "path": "/index-fa.html",                            "lang": "fa"},
+  {"key": "links",       "path": "/links.html",                               "lang": "fa"},
+  {"key": "proof",       "path": "/proof.html",                               "lang": "en"},
+  {"key": "form-en",     "path": "/form.html",                                "lang": "en"},
+  {"key": "form-fa",     "path": "/form-fa.html",                             "lang": "fa"},
+  {"key": "tennis",      "path": "/tennis/",                                  "lang": "fa"},
+  {"key": "testing",     "path": "/tennis-testing/",                          "lang": "fa"},
+  {"key": "partner-fa",  "path": "/partner-fa.html",                          "lang": "fa"},
+  {"key": "articles-en", "path": "/en/articles/",                             "lang": "en"},
+  {"key": "article-en",  "path": "/en/articles/match-day-nutrition.html",     "lang": "en"},
+  {"key": "articles-fa", "path": "/fa/articles/",                             "lang": "fa"},
+  {"key": "article-fa",  "path": "/fa/articles/match-day-nutrition.html",     "lang": "fa"},
+  {"key": "terms-en",    "path": "/terms.html",                               "lang": "en"},
+  {"key": "terms-fa",    "path": "/terms-fa.html",                            "lang": "fa"},
+  {"key": "privacy",     "path": "/privacy.html",                             "lang": "en"},
+  {"key": "uts",         "path": "/uts-padel.html",                           "lang": "en"},
+  {"key": "etminan-en",  "path": "/etminan-en.html",                          "lang": "en"},
+  {"key": "etminan-fa",  "path": "/etminan.html",                             "lang": "fa"},
+  {"key": "notfound",    "path": "/this-page-does-not-exist",                 "lang": "en"}
+]
