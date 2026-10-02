@@ -686,7 +686,9 @@
     </div>
 
     <div class="f-field">
-      <label for="age">Age</label>
+      <label for="age">Athlete's age
+        <span class="hint">Under 18? A parent or guardian fills in this form.</span>
+      </label>
       <input type="number" id="age" name="Age" min="10" max="80" required placeholder="e.g. 28">
     </div>
   </section>
@@ -1092,6 +1094,14 @@
     </div>
   </details>
 
+  <!-- ─── ADULT OR GUARDIAN: programmes are bought by someone 18 or over ─── -->
+  <div class="f-field consent-field">
+    <label class="consent" for="adult">
+      <input type="checkbox" id="adult" name="Applicant is 18 or over, or the athlete's parent or guardian" value="Yes" required>
+      <span>I am 18 or over. If the athlete is under 18, I am their parent or guardian.</span>
+    </label>
+  </div>
+
   <!-- ─── CONSENT (health information and the AI assistant) ─── -->
   <div class="f-field consent-field">
     <label class="consent" for="consent">
@@ -1367,7 +1377,7 @@
       const t = (el.type || '').toLowerCase();
       if (t === 'email') return (el.value || '').trim() ? 'Please enter a valid email address, like name@example.com.' : 'Please enter your email address.';
       if (t === 'radio') return 'Please choose one option.';
-      if (el.id === 'consent') return 'Please tick the box to continue.';
+      if (el.id === 'consent' || el.id === 'adult') return 'Please tick the box to continue.';
       if (t === 'checkbox') return 'Please choose at least one.';
       if (el.tagName === 'SELECT') return 'Please choose an option from the list.';
       if (t === 'hidden') return 'Please move the slider to give your answer.';
