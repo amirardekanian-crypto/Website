@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>%%TITLE%%</title>
+<!--
+  %%TITLE%% — a timeline reel (1080x1920, Farsi, started from .claude/skills/reel/timeline/).
+  THE PAGE IS A PURE FUNCTION OF TIME: window.__render(t) paints the frame for t seconds, nothing runs on timers. So ?t=5.2 shows any instant,
+  the preview loops in real time, and tools/render_timeline.js can take 20 sub-frames per frame for real motion blur.
+  Modes: default = autoplay + loop + scrub bar | ?t=SECONDS = frozen frame | ?capture=1 = exact size, no chrome (the renderer).
+  Files: engine.js (maths, easing, ball, effects) · driver.js (the modes) · scenes.js (YOUR scenes) · this file (DOM + CSS).
+  Brand tokens below are AMIR'S (green + clay, Vazirmatn). For a client, replace the :root colours and the TINTS in scenes.js, and take type from the client's own site.
+-->
+<style>
+@font-face{font-family:Vazirmatn;font-weight:100 900;font-display:block;src:url(../assets/fonts/Vazirmatn-Variable.woff2) format('woff2')}
+:root{
+  --green:#0E4A36; --green-2:#156A4D; --green-deep:#0a3527; --clay:#C7552F; --clay-2:#E06B43;
+  --paper:#FAF7F2; --paper-2:#F1ECE3; --ink:#1A1A1A;
+  --v:Vazirmatn,Tahoma,"Segoe UI",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+body{font-family:var(--v)}
+#viewport{position:fixed;inset:0;background:#000;overflow:hidden}
+#fit{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0}
+#stage{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden;background:var(--green-deep);direction:rtl;color:#fff;
+  -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+#cam{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:540px 960px}
+.sc{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden}
+.ctr{position:absolute;left:0;width:1080px;text-align:center}
+/* word masks: a headline rises word by word. Persian letters JOIN, so the unit is the WORD, never the letter (engine.js wordify / riseTo) */
+.wm{display:inline-block;overflow:hidden;padding:.2em .08em .3em;margin:-.2em -.08em -.3em;vertical-align:top}
+.wi{display:inline-block;will-change:transform}
+.ln{fill:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---- scene 1: the hook ---- */
+#s1{background:radial-gradient(120% 70% at 50% 34%,#155b43,#0E4A36 55%,#0a3527)}
+#s1 .court{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#s1 .court .ln{stroke:#fff;opacity:.16}
+#s1 .k{top:430px;font:700 54px/1 var(--v);color:var(--clay-2)}
+#s1 .h{top:560px;font:900 168px/1.1 var(--v);color:#fff}
+#s1 .pill{position:absolute;left:380px;top:1220px;width:320px;height:104px;border-radius:52px;background:var(--clay);color:#fff;font:800 46px/1 var(--v);
+  display:flex;align-items:center;justify-content:center;box-shadow:0 24px 50px -18px rgba(199,85,47,.8)}
+
+/* ---- scene 2: one number ---- */
+#s2{background:var(--paper)}
+#s2 .glow{position:absolute;left:-300px;top:1000px;width:1000px;height:1000px;border-radius:50%;background:radial-gradient(circle,rgba(21,106,77,.18),transparent 62%)}
+#s2 .k{top:430px;font:700 54px/1 var(--v);color:var(--green-2)}
+#s2 .num{top:520px;font:900 380px/1 var(--v);color:var(--green);direction:ltr}
+#s2 .lab{top:940px;font:800 72px/1 var(--v);color:var(--ink)}
+#s2 .bar{position:absolute;left:190px;top:1340px;width:700px;height:18px;border-radius:9px;background:var(--clay);transform-origin:100% 50%}
+
+/* ---- scene 3: the link ---- */
+#s3{background:radial-gradient(110% 70% at 50% 40%,#155b43,#0E4A36 55%,#0a3527)}
+#s3 .q{top:430px;font:900 112px/1.2 var(--v);color:#fff}
+#s3 .q .hi{color:var(--clay-2)}
+#urlpill{position:absolute;left:110px;top:900px;width:860px;height:160px;border-radius:80px;background:#fff;color:var(--green);display:flex;align-items:center;justify-content:center;
+  font:700 60px/1 var(--v);direction:ltr;box-shadow:0 34px 80px -26px rgba(0,0,0,.7)}
+#s3 .bio{top:1110px;font:800 64px/1 var(--v);color:#fff;display:flex;justify-content:center;align-items:center;gap:20px}
+#s3 .bio svg{width:58px;height:58px;stroke:var(--clay-2);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+#s3 .sig{top:1290px;font:900 84px/1 var(--v);color:#fff}
+#s3 .sig span{display:block;margin-top:14px;font:600 42px/1 var(--v);color:rgba(255,255,255,.78)}
+
+/* ---- the wipes' travelling line, fx, finish ---- */
+.wipe{position:absolute;top:0;width:16px;height:1920px;margin-left:-8px;left:1080px;background:var(--clay);box-shadow:0 0 40px 10px rgba(199,85,47,.5);display:none}
+#fx{position:absolute;left:0;top:0;width:1080px;height:1920px;pointer-events:none}
+#vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(130% 90% at 50% 50%,transparent 62%,rgba(0,0,0,.30))}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+
+/* ---- preview chrome (hidden in ?capture=1) ---- */
+#ui{position:fixed;left:0;right:0;bottom:0;height:46px;display:flex;align-items:center;gap:12px;padding:0 14px;color:#fff;font:600 13px var(--v);
+  background:linear-gradient(transparent,rgba(0,0,0,.7));direction:ltr;user-select:none}
+#ui button{all:unset;cursor:pointer;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.14)}
+#bar{flex:1;height:6px;background:rgba(255,255,255,.18);border-radius:3px;position:relative;cursor:pointer}
+#bar i{position:absolute;left:0;top:0;bottom:0;width:0;background:#E06B43;border-radius:3px}
+body.capture #ui{display:none}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="fit"><div id="stage"><div id="cam">
+
+  <!-- scene 3 (bottom): the link -->
+  <div class="sc" id="s3">
+    <div class="ctr q" id="q3" data-safe>آماده‌ای شروع کنیم؟</div>
+    <div id="urlpill" data-safe><span>your-link.com</span></div>
+    <div class="ctr bio" id="bio" data-safe><span>لینک توی بیو</span><svg viewBox="0 0 24 24"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></div>
+    <div class="ctr sig" id="sig" data-safe>نام شما<span>یک خط توضیح</span></div>
+  </div>
+
+  <!-- scene 2: one number -->
+  <div class="sc" id="s2">
+    <div class="glow" id="g2"></div>
+    <div class="ctr k" id="k2" data-safe>یک عدد که می‌گه</div>
+    <div class="ctr num" id="num" data-safe>۰</div>
+    <div class="ctr lab" id="lab" data-safe>برچسب اینجا</div>
+    <div class="bar" id="bar2"></div>
+  </div>
+
+  <!-- scene 1 (top): the hook -->
+  <div class="sc" id="s1">
+    <svg class="court" viewBox="0 0 1080 1920"><g id="court1"></g></svg>
+    <div class="ctr k" id="k1" data-safe>متن کوتاه اینجا</div>
+    <div class="ctr h" id="h1a" data-safe>تیتر قوی</div>
+    <div class="ctr h" id="h1b" data-safe style="top:735px">اینجا میاد</div>
+    <div class="pill" id="pill1" data-safe>دکمه</div>
+  </div>
+
+  <div class="wipe" id="wipe2"></div><div class="wipe" id="wipe3"></div>
+
+  <canvas id="fx" width="1080" height="1920"></canvas>
+</div>
+<div id="vig"></div><div id="flash"></div>
+</div></div></div>
+
+<div id="ui"><button id="pp">⏸</button><span id="tt">0.00</span><div id="bar"><i id="bari"></i></div><span id="hint">space = play/pause · ← → = ±0.1 s</span></div>
+
+<script src="engine.js"></script>
+<script src="scenes.js"></script>
+<script src="driver.js"></script>
+</body>
+</html>

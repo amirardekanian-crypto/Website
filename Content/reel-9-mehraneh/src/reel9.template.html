@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مهرانه ظهوریان — معرفی سایت (ریل)</title>
+<!--
+  Reel 9 — Mehraneh Zohourian's website, 26 s (v2.1: the slower, readable cut), Farsi, 1080x1920.
+  Her brand, not Amir's: spruce #003320 + pink #EC99AF (tennis), elite blue #0250B0 + volt lime #D0FF41 (padel); Lalezar + Vazirmatn.
+  The page is a PURE FUNCTION OF TIME: window.__render(t) paints the frame for t seconds. Nothing runs on timers, so a still at
+  any instant (?t=5.2), the real-time preview and the frame-accurate MP4 render (tools/render_timeline.js) all agree.
+  Modes:  default = autoplay + loop, scaled to the window, with a scrub bar   ?t=SECONDS = frozen frame, native size
+          ?capture=1 = exact 1080x1920, no chrome (what the renderer drives)
+  Source files: engine.js (maths, easing, ball + particles), scenes.js (the five scenes), reel9.template.html (this file).
+-->
+<style>
+@font-face{font-family:Lalezar;font-weight:400;font-display:block;src:url(../assets/fonts/Lalezar-arabic.woff2) format('woff2');unicode-range:U+0600-06FF,U+0750-077F,U+200C-200E,U+2010-2011,U+FB50-FDFF,U+FE70-FEFC}
+@font-face{font-family:Lalezar;font-weight:400;font-display:block;src:url(../assets/fonts/Lalezar-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122}
+@font-face{font-family:Vazirmatn;font-weight:100 900;font-display:block;src:url(../assets/fonts/Vazirmatn-Variable.woff2) format('woff2')}
+
+:root{
+  /* tennis skin ("spruce") */
+  --spruce:#003320; --spruce-2:#2B5646; --spruce-3:#4C7063; --spruce-deep:#002115; --night:#07130E;
+  --pink:#EC99AF; --pink-soft:#FFE9E8; --pink-deep:#CD83A8; --court:#53885E; --paper:#FFFBFA;
+  /* padel skin ("court") */
+  --blue:#0250B0; --blue-2:#023E8C; --blue-3:#2E86F0; --blue-deep:#013C86; --lime:#D0FF41; --lime-soft:#E9FF9E; --silver:#C6D0DD;
+  --d:Lalezar,Vazirmatn,Tahoma,sans-serif; --v:Vazirmatn,Tahoma,"Segoe UI",sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+body{font-family:var(--v)}
+#viewport{position:fixed;inset:0;background:#000;overflow:hidden}
+#fit{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0}
+#stage{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden;background:var(--night);direction:rtl;color:#fff;
+  -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;font-kerning:normal}
+#cam{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:540px 960px}
+.sc,.g{position:absolute;left:0;top:0;width:1080px;height:1920px}
+.d{font-family:var(--d);font-weight:400;line-height:1}
+.v{font-family:var(--v)}
+.abs{position:absolute}
+.ctr{position:absolute;left:0;width:1080px;text-align:center}
+.nw{white-space:nowrap}
+/* word masks: a headline rises word by word. Persian letters JOIN, so the unit is the WORD, never the letter */
+.wm{display:inline-block;overflow:hidden;padding:.2em .08em .3em;margin:-.2em -.08em -.3em;vertical-align:top}
+.wi{display:inline-block;will-change:transform}
+
+/* ============ persistent split background (S3D, S4, S5) ============ */
+#bgsplit{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden}
+#bgsplit .A{position:absolute;inset:0;background:var(--spruce)}
+#bgsplit .A::after,#bgsplit .B::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 80% at 50% 100%,rgba(0,0,0,.36),transparent 70%)}
+#bgsplit .B{position:absolute;inset:0;background:var(--blue)}
+#bgsplit svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#bgsplit .A .ln{stroke:var(--pink)}
+#bgsplit .B .ln{stroke:var(--lime)}
+.ln{fill:none;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;opacity:.22}
+#seam{position:absolute;left:540px;top:960px;width:4400px;height:5px;margin:-2.5px 0 0 -2200px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55) 20%,rgba(255,255,255,.55) 80%,transparent);box-shadow:0 0 28px 6px rgba(255,255,255,.22);opacity:.55}
+
+/* ============ S1 — the gate ============ */
+#s1{overflow:hidden}
+#s1 .half{position:absolute;left:0;width:1080px;height:960px;overflow:hidden;will-change:transform}
+#s1 .top{top:0;background:var(--spruce)}
+#s1 .bot{top:960px;background:var(--blue)}
+#s1 .half::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 80% at 50% 100%,rgba(0,0,0,.42),transparent 70%)}
+#s1 .half svg.crt{position:absolute;left:0;top:0;width:1080px;height:960px}
+#s1 .top .ln{stroke:var(--pink)} #s1 .bot .ln{stroke:var(--lime)}
+#s1 .blk{position:absolute;left:0;width:1080px;text-align:center;z-index:2}
+#s1 .kick{position:absolute;left:0;width:1080px;text-align:center;font:600 46px/1 var(--v);color:rgba(255,255,255,.86);z-index:2}
+#s1 .word{position:absolute;left:0;width:1080px;text-align:center;font:400 350px/1 var(--d);color:#fff;z-index:2}
+#s1 .pill{position:absolute;left:375px;width:330px;height:100px;border-radius:50px;display:flex;align-items:center;justify-content:center;gap:12px;
+  font:800 44px/1 var(--v);z-index:2;direction:rtl}
+#s1 .top .pill{background:var(--pink);color:var(--spruce)} #s1 .bot .pill{background:var(--lime);color:var(--blue)}
+#s1 .pill svg{width:40px;height:40px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+#badge{position:absolute;left:330px;top:845px;width:420px;height:230px;z-index:5;perspective:900px}
+#badge .bi{position:absolute;inset:0;transform-style:preserve-3d}
+#badge .face{position:absolute;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;color:var(--spruce);background:#fff;
+  box-shadow:0 18px 50px -10px rgba(0,0,0,.55)}
+#badge .f1{left:95px;top:0;width:230px;height:230px;border-radius:115px;font:400 128px/1 var(--d)}
+#badge .f2{left:0;top:0;width:420px;height:230px;border-radius:115px;font:400 138px/1 var(--d);transform:rotateX(180deg);background:var(--pink)}
+
+/* ============ S2 — the name ============ */
+#s2{background:var(--pink-soft);overflow:hidden}
+#s2 .glow{position:absolute;border-radius:50%}
+#s2 .g1{left:420px;top:-260px;width:900px;height:900px;background:radial-gradient(circle,rgba(236,153,175,.55),transparent 62%)}
+#s2 .g2{left:-420px;top:1050px;width:1000px;height:1000px;background:radial-gradient(circle,rgba(83,136,94,.30),transparent 62%)}
+#s2 svg{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#s2 .cl{fill:none;stroke:var(--spruce);stroke-width:6;opacity:.10;stroke-linecap:round}
+#s2 .floor{stroke:var(--spruce);stroke-width:7;opacity:.85}
+.mark{position:absolute;display:grid;place-content:center;background:var(--pink);color:var(--spruce);font-family:var(--d);line-height:1;
+  box-shadow:0 22px 50px -18px rgba(236,153,175,.9)}
+#mark2{left:440px;top:270px;width:200px;height:200px;border-radius:64px;font-size:128px;padding-top:6px}
+#s2 .kick2{top:505px;font:700 62px/1 var(--v);color:var(--spruce-2)}
+#s2 .name{position:absolute;left:0;width:1080px;text-align:center;font:400 280px/1 var(--d);color:var(--spruce)}
+#s2 .n1{top:545px} #s2 .n2{top:790px}
+#s2 .hlbar{position:absolute;left:150px;top:980px;width:780px;height:60px;background:var(--pink);border-radius:40px;transform-origin:100% 50%}
+#s2 .role{position:absolute;left:0;width:1080px;top:1090px;display:flex;justify-content:center}
+#s2 .role span{display:inline-flex;align-items:center;gap:20px;padding:20px 40px;border-radius:999px;background:rgba(0,51,32,.07);border:2px solid rgba(0,51,32,.18);
+  font:700 52px/1 var(--v);color:var(--spruce);direction:rtl}
+#s2 .role i{display:block;width:20px;height:20px;border-radius:50%;background:var(--spruce)}
+/* ============ S3 — the record (spruce, shares the split background) ============ */
+.lab{position:absolute;left:0;width:1080px;text-align:center;font:800 60px/1 var(--v);color:var(--pink)}
+.sub{position:absolute;left:0;width:1080px;text-align:center;font:800 84px/1 var(--v);color:#fff}
+#medal{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:540px 150px}
+#medal .strap{position:absolute;left:480px;top:-260px;width:120px;height:760px;transform-origin:60px 410px}
+#medal .sL{background:linear-gradient(90deg,#FFE9E8 0 70%,#EC99AF 70% 100%);transform:rotate(24deg);border-radius:0 0 8px 8px}
+#medal .sR{background:linear-gradient(90deg,#EC99AF 0 30%,#FFE9E8 30% 100%);transform:rotate(-24deg);border-radius:0 0 8px 8px}
+#disc{position:absolute;left:230px;top:500px;width:620px;height:620px;border-radius:50%;overflow:hidden;
+  background:radial-gradient(circle at 34% 28%,#FFC7D6 0,#EC99AF 48%,#CD83A8 100%);border:16px solid #FFE9E8;
+  box-shadow:0 50px 100px -30px rgba(0,0,0,.7),inset 0 0 0 6px rgba(0,51,32,.12)}
+#disc::before{content:"";position:absolute;inset:26px;border-radius:50%;border:5px dashed rgba(0,51,32,.28)}
+#disc .lab{position:absolute;left:0;width:100%;top:76px;text-align:center;font:800 56px/1 var(--v);color:var(--spruce)}
+#rankReel{position:absolute;left:60px;top:150px;width:460px;height:380px;overflow:hidden}
+#rankReel .col{position:absolute;left:0;top:0;width:460px}
+#rankReel .cell{width:460px;height:380px;display:flex;align-items:center;justify-content:center;font:400 600px/1 var(--d);color:var(--spruce);padding-bottom:20px}
+#disc .shine{position:absolute;top:-40px;bottom:-40px;width:120px;left:-200px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-18deg)}
+#gA .sub{top:1190px}
+.ico{fill:none;stroke:var(--pink);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ico path{stroke-dasharray:1;}
+#gB .card{position:absolute;left:160px;top:380px;width:760px;height:950px;border-radius:50px;overflow:hidden;background:var(--spruce-2);
+  box-shadow:0 50px 110px -30px rgba(0,0,0,.75);border:10px solid #fff}
+#gB .card img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;transform-origin:62% 55%}
+#gB .ring{position:absolute;left:440px;top:600px;width:210px;height:210px;border-radius:50%;border:7px solid var(--pink);margin:-105px 0 0 -105px;box-shadow:0 0 30px 4px rgba(236,153,175,.55)}
+#gB .ribbon{position:absolute;left:150px;top:340px;padding:18px 34px;border-radius:999px;background:var(--pink);color:var(--spruce);font:800 48px/1 var(--v);
+  box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
+#gB .cap{position:absolute;left:0;width:1080px;top:1410px;text-align:center;font:400 88px/1 var(--d);color:#fff}
+#gB .cap2{position:absolute;left:0;width:1080px;top:1500px;text-align:center;font:600 48px/1 var(--v);color:var(--pink)}
+#teamBadge{position:absolute;left:170px;top:840px;width:740px;height:140px;border-radius:70px;background:#fff;color:var(--spruce);display:flex;align-items:center;justify-content:center;gap:26px;
+  font:400 78px/1 var(--d);box-shadow:0 26px 60px -20px rgba(0,0,0,.65);z-index:3}
+#teamBadge .shield{position:static;width:86px;height:86px;stroke:var(--spruce);stroke-width:1.7}
+.yrs{position:absolute;left:0;width:1080px;text-align:center}
+.yrs .num{font:400 480px/1 var(--d);direction:ltr}
+.yrs .lbl{font:800 84px/1 var(--v);margin-top:-6px}
+#gD .t{top:250px;color:#fff} #gD .t .lbl{color:var(--pink)}
+#gD .b{top:1000px;color:#fff} #gD .b .lbl{color:var(--lime)}
+
+/* ============ S4 — the site, in two phones ============ */
+#s4 .ttl4{position:absolute;left:0;width:1080px;top:268px;text-align:center;font:400 120px/1 var(--d);color:#fff}
+.phoneWrap{position:absolute;left:0;top:0;width:466px;height:966px;perspective:2600px}
+.phone{position:absolute;left:0;top:0;width:466px;height:966px;border-radius:84px;padding:18px;transform-style:preserve-3d;
+  background:linear-gradient(150deg,#3a3f45,#0b0c0d 60%,#24272b);
+  box-shadow:0 80px 140px -34px rgba(0,0,0,.72),inset 0 0 0 2px #5a6068,inset 0 0 0 7px #0a0b0c}
+.phone .scr{position:relative;width:430px;height:930px;border-radius:66px;overflow:hidden;background:#0b0f0d}
+.phone .strip{position:absolute;left:0;top:0;width:430px;will-change:transform}
+.phone .strip img{position:absolute;left:0;width:430px;display:block}
+.phone .navs{position:absolute;left:0;top:0;width:430px;height:96px;will-change:transform,opacity}
+.phone .bars{position:absolute;left:0;bottom:0;width:430px;height:85px;will-change:transform}
+.phone .tbar{position:absolute;left:0;top:0;height:4px;width:0;background:var(--pink);box-shadow:0 0 12px 2px rgba(236,153,175,.6)}
+.phone.pad .tbar{background:var(--lime);box-shadow:0 0 12px 2px rgba(208,255,65,.6)}
+.phone .glare{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,0) 30%,rgba(255,255,255,0) 70%,rgba(255,255,255,.07) 100%)}
+.phone .btnL,.phone .btnR{position:absolute;width:6px;background:#1b1d20;border-radius:3px}
+.phone .btnR{right:-5px;top:230px;height:110px} .phone .btnL{left:-5px;top:190px;height:60px}
+#slot{position:absolute;left:260px;top:1468px;width:560px;height:112px;border-radius:56px;background:#fff;color:var(--spruce);overflow:hidden;
+  box-shadow:0 24px 54px -18px rgba(0,0,0,.65)}
+#slot .col{position:absolute;left:0;top:0;width:560px}
+#slot .it{height:112px;display:flex;align-items:center;justify-content:center;gap:18px;font:800 54px/1 var(--v);white-space:nowrap;direction:rtl}
+#slot .tk{width:50px;height:50px;border-radius:50%;background:var(--pink);display:grid;place-content:center;flex:none}
+#slot .tk svg{width:28px;height:28px;stroke:var(--spruce);stroke-width:3.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* ============ S5 — the end card ============ */
+#mark5{left:445px;top:250px;width:190px;height:190px;border-radius:60px;font-size:120px;padding-top:6px}
+#s5 .q{position:absolute;left:0;width:1080px;top:452px;text-align:center;font:400 106px/1.2 var(--d);color:#fff}
+#s5 .q .hi{color:var(--pink)}
+#urlpill{position:absolute;left:100px;top:875px;width:880px;height:170px;border-radius:85px;background:#fff;color:var(--spruce);display:flex;align-items:center;justify-content:center;
+  font:700 62px/1 var(--v);direction:ltr;letter-spacing:0;box-shadow:0 34px 80px -26px rgba(0,0,0,.7);overflow:hidden}
+#urlpill .shine{position:absolute;top:0;bottom:0;width:140px;left:-200px;background:linear-gradient(100deg,transparent,rgba(236,153,175,.55),transparent);transform:skewX(-18deg)}
+#s5 .bio{position:absolute;left:0;width:1080px;top:1110px;text-align:center;font:800 66px/1 var(--v);color:#fff;display:flex;justify-content:center;align-items:center;gap:22px;direction:rtl}
+#s5 .bio svg{width:60px;height:60px;stroke:var(--lime);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+#s5 .sig{position:absolute;left:0;width:1080px;top:1330px;text-align:center}
+#s5 .sig b{display:block;font:400 92px/1 var(--d);color:#fff}
+#s5 .sig span{display:block;margin-top:14px;font:600 44px/1 var(--v);color:rgba(255,255,255,.78)}
+
+/* ============ fx + finish ============ */
+#fx{position:absolute;left:0;top:0;width:1080px;height:1920px;pointer-events:none}
+#vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(130% 90% at 50% 50%,transparent 62%,rgba(0,0,0,.34))}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+
+/* ============ preview chrome (not in ?capture=1) ============ */
+#ui{position:fixed;left:0;right:0;bottom:0;height:46px;display:flex;align-items:center;gap:12px;padding:0 14px;color:#fff;font:600 13px var(--v);
+  background:linear-gradient(transparent,rgba(0,0,0,.7));direction:ltr;user-select:none}
+#ui button{all:unset;cursor:pointer;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,.14)}
+#bar{flex:1;height:6px;background:rgba(255,255,255,.18);border-radius:3px;position:relative;cursor:pointer}
+#bar i{position:absolute;left:0;top:0;bottom:0;width:0;background:#EC99AF;border-radius:3px}
+body.capture #ui{display:none}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="fit"><div id="stage"><div id="cam">
+
+  <!-- persistent split background: spruce (tennis) + blue (padel); the seam turns -->
+  <div id="bgsplit">
+    <div class="A"><svg viewBox="0 0 1080 1920"><g class="court" id="courtA"></g></svg></div>
+    <div class="B" id="splitB"><svg viewBox="0 0 1080 1920"><g class="court" id="courtB"></g></svg></div>
+    <div id="seam"></div>
+  </div>
+
+  <!-- S3: the record -->
+  <div class="sc" id="s3">
+    <div class="g" id="gA">
+      <div id="medal"><div class="strap sL"></div><div class="strap sR"></div>
+        <div id="disc"><div class="lab" id="rankLab">رنکینگ</div><div id="rankReel"><div class="col" id="rankCol"></div></div><div class="shine" id="discShine"></div></div>
+      </div>
+      <div class="sub" id="rankSub">بانوان کشور</div>
+    </div>
+    <div class="g" id="gB">
+      <div class="card" id="rCard"><img id="rImg" src="../assets/photos/runnerup-card.jpg" alt=""><div class="ring" id="ring"></div></div>
+      <div class="ribbon" id="ribbon">زیر ۱۸ سال</div>
+      <div class="cap" id="rCap">نایب&zwnj;قهرمانی تور جهانی</div>
+      <div class="cap2" id="rCap2">تنیس ITF</div>
+    </div>
+    <div class="g" id="gD">
+      <div class="yrs t" id="yT"><div class="num" id="n13">۱۳</div><div class="lbl">سال تنیس</div></div>
+      <div class="yrs b" id="yB"><div class="num" id="n2">۲</div><div class="lbl">سال پدل</div></div>
+      <div id="teamBadge"><svg class="shield ico" id="shield" viewBox="0 0 24 24"><path pathLength="1" d="M12 3.2 19 5.6v5.9c0 4.2-2.9 7.6-7 9.4-4.1-1.8-7-5.2-7-9.4V5.6Z"/><path pathLength="1" d="m9.2 12 2 2 3.6-3.9"/></svg><span>بازیکن تیم ملی</span></div>
+    </div>
+  </div>
+
+  <!-- S4: the site -->
+  <div class="sc" id="s4">
+    <div class="ttl4" id="ttl4">سایتم راه افتاد</div>
+    <div class="phoneWrap" id="phT"><div class="phone tn">
+      <div class="btnL"></div><div class="btnR"></div>
+      <div class="scr"><div class="strip" id="stT"></div><img class="navs" id="nvT" src="../assets/site/tennis-nav-stuck.webp" alt=""><img class="bars" id="brT" src="../assets/site/tennis-bar.webp" alt=""><div class="tbar" id="tbT"></div><div class="glare"></div></div>
+    </div></div>
+    <div class="phoneWrap" id="phP"><div class="phone pad">
+      <div class="btnL"></div><div class="btnR"></div>
+      <div class="scr"><div class="strip" id="stP"></div><img class="navs" id="nvP" src="../assets/site/padel-nav-stuck.webp" alt=""><img class="bars" id="brP" src="../assets/site/padel-bar.webp" alt=""><div class="tbar" id="tbP"></div><div class="glare"></div></div>
+    </div></div>
+    <div id="slot"><div class="col" id="slotCol"></div></div>
+  </div>
+
+  <!-- S5: end card -->
+  <div class="sc" id="s5">
+    <div class="mark" id="mark5">م</div>
+    <div class="q" id="q5"></div>
+    <div id="urlpill"><span id="urltxt">mehranehzohourian.com</span><i class="shine" id="shine"></i></div>
+    <div class="bio" id="bio"><span>لینک توی بیو</span><svg viewBox="0 0 24 24"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg></div>
+    <div class="sig" id="sig"><b>مهرانه ظهوریان</b><span>مربی تنیس و پدل · مشهد</span></div>
+  </div>
+
+  <!-- S2: the name -->
+  <div class="sc" id="s2">
+    <div class="glow g1" id="g1"></div><div class="glow g2" id="g2"></div>
+    <svg viewBox="0 0 1080 1920" id="s2svg"></svg>
+    <div class="mark" id="mark2">م</div>
+    <div class="ctr kick2" id="kick2">سلام، من</div>
+    <div class="name n1" id="nm1"><span class="wm"><span class="wi">مهرانه</span></span></div>
+    <div class="hlbar" id="hlbar"></div>
+    <div class="name n2" id="nm2"><span class="wm"><span class="wi">ظهوریان</span></span></div>
+    <div class="role" id="role"><span><i></i>مربی تنیس و پدل · مشهد</span></div>
+  </div>
+
+  <div id="wipe"></div>
+
+  <!-- S1: the gate -->
+  <div class="sc" id="s1">
+    <div class="half top" id="hTop">
+      <svg class="crt" viewBox="0 0 1080 960"><g class="court" id="court1T"></g></svg>
+      <div class="kick" style="top:290px">از تازه&zwnj;کار تا مسابقه</div>
+      <div class="word" style="top:330px" id="wTennis">تنیس</div>
+      <div class="pill" style="top:690px"><span>وارد شو</span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div>
+    </div>
+    <div class="half bot" id="hBot">
+      <svg class="crt" viewBox="0 0 1080 960"><g class="court" id="court1B"></g></svg>
+      <div class="kick" style="top:168px">از صفر تا بازی توی زمین</div>
+      <div class="word" style="top:205px" id="wPadel">پدل</div>
+      <div class="pill" style="top:520px"><span>وارد شو</span><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></div>
+    </div>
+    <div id="badge"><div class="bi" id="badgeI"><div class="face f1" id="bf1">یا</div><div class="face f2" id="bf2">هر دو</div></div></div>
+  </div>
+
+  <canvas id="fx" width="1080" height="1920"></canvas>
+</div>
+<div id="vig"></div><div id="flash"></div>
+</div></div></div>
+
+<div id="ui"><button id="pp">⏸</button><span id="tt">0.00</span><div id="bar"><i id="bari"></i></div><span id="hint">space = play/pause · ← → = ±0.1 s</span></div>
+
+<script src="engine.js"></script>
+<script src="scenes.js"></script>
+</body>
+</html>

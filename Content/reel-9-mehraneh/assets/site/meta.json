@@ -1,0 +1,72 @@
+{
+ "tennis": {
+  "total": 14552,
+  "sections": {
+   "#home": 0,
+   ".stats": 1215,
+   "#about": 1456,
+   "#record": 2899,
+   "#photos": 4091,
+   ".ticker": 4759,
+   "#classes": 4834,
+   "#venues": 8055,
+   "#how": 8960,
+   "#why": 10240,
+   "#faq": 11764,
+   "#contact": 12995
+  },
+  "nav": [
+   0,
+   800,
+   390,
+   86
+  ],
+  "bar": [
+   0,
+   1568,
+   390,
+   76
+  ],
+  "skin": "spruce",
+  "tiles": {
+   "tiles": 3,
+   "TH": 4900,
+   "total": 14552
+  }
+ },
+ "padel": {
+  "total": 13527,
+  "sections": {
+   "#home": 0,
+   ".stats": 1215,
+   "#about": 1456,
+   "#record": 2931,
+   "#photos": 4376,
+   ".ticker": 5044,
+   "#classes": 5119,
+   "#venues": 7031,
+   "#how": 7936,
+   "#why": 9216,
+   "#faq": 10739,
+   "#contact": 11970
+  },
+  "nav": [
+   0,
+   800,
+   390,
+   86
+  ],
+  "bar": [
+   0,
+   1568,
+   390,
+   76
+  ],
+  "skin": "court",
+  "tiles": {
+   "tiles": 3,
+   "TH": 4900,
+   "total": 13527
+  }
+ }
+}

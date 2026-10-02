@@ -1,6 +1,6 @@
 ---
 name: reel
-description: Build a ready-to-preview Instagram reel (1080×1920, animated HTML) from Amir's topic or script, including AD reels that sell a product (reel-7, the tennis course, on stills; reel-8, the same course on generated video clips). Use whenever Amir asks for a reel, an Instagram ad, or a moving version of a carousel/story. Delivers an openable, self-playing HTML file. Exports a frame-accurate MP4 and saves the sources only when Amir asks.
+description: Build an Instagram reel or ad for Amir (1080×1920, Farsi, animated) and export the finished MP4. Two engines: the scene-swap HTML engine (reel-6/7/8: stills, generated clips) and the TIMELINE KIT (reel-9, 2026-10-02, "amazing": a pure-function-of-time page with real motion blur, a physics ball, real UI captures, synthesized sound, and three audits: safe zones, READABILITY and copy-to-source). Use whenever Amir asks for a reel, an Instagram ad, a promo or launch video for a site or app (his own or a client's), or a moving version of a carousel/story. For a polished animated ad start at timeline/README.md. Delivers an openable, self-playing HTML file and, for an ad he will post, the finished MP4 with a cover frame; saves the sources when he approves.
 ---
 
 # Instagram reel generator — AA Performance
@@ -12,6 +12,8 @@ because the business sells in Iran; `.claude/skills/ad/BRAND.md` §6). English o
 Newest references: `Content/reel-8-course.html` and `Content/reel-7-course.html` (**ads**: Farsi, real
 product screens, one visual idea carried through) and `Content/reel-6-system.html` (an English
 scene-swap explainer: copy its motion, not its language).
+**Newest and the route for a polished animated ad: reel 9 and the timeline kit** (`Content/reel-9-mehraneh.html`, Mehraneh's website ad, Farsi, 26 s; kit in
+`.claude/skills/reel/timeline/`). When the reel is mostly motion graphics + real captures + stills, **start at Step 2d and `timeline/README.md`**, not at the scene-swap build below.
 
 ## Step 0 — Required reading (every run)
 
@@ -28,6 +30,8 @@ scene-swap explainer: copy its motion, not its language).
    for the checking and export tools.
 6. **Only if the reel uses generated footage:** `.claude/skills/video/SKILL.md` (making the clips;
    its Step 8 is the plan for playing a `<video>` inside this engine and mixing the clips' sound).
+7. **Only for a timeline-kit reel (Step 2d):** `.claude/skills/reel/timeline/README.md` (the playbook: pacing rule, audits, what made reel 9 feel premium, gotchas) and
+   `Content/reel-9-mehraneh/README.md` (a finished example: scene map, copy-to-source table, rebuild commands).
 
 ## Step 0b — Briefing an AD reel (something that sells)
 
@@ -70,9 +74,10 @@ performance"). Keep a **copy-to-source table** in the reel's README (reel-7 has 
 | **Scene-swap** — full-screen `.scene`s cross-fade via a `data-dur`-driven JS timer, looping forever | Numbered narrative, multi-topic explainer | `reel-6-system.html` |
 | **Persistent-subject** ("App-as-Product") — one phone stays on screen, only its inner screens swap | The reel *is* a tour of the app | `reel-4-app.html` |
 | **World layer** — two graded photos crossfade behind everything, a line measured in the photo carries registered marks and a hero object, scenes on top, a phone with real screens, ends on the button | An **ad** for a product with a real app and a real page | `reel-7-course.html` |
+| **Timeline** (2026-10-02) — the page is a pure function of time, one hero object with physics, real motion blur, the sound plan from the same table, three audits | A **polished animated ad** that is mostly motion graphics, real page captures and stills (no footage needed) | `reel-9-mehraneh.html` + `timeline/README.md` |
 
 This skill documents the scene-swap build in full; for persistent-subject, read `reel-4-app.html`
-directly and follow its `BEATS` array + `.phonewrap` structure; for the world layer see 2b.
+directly and follow its `BEATS` array + `.phonewrap` structure; for the world layer see 2b, and for the timeline kit see 2d.
 
 ### Step 2b — The world-layer recipe (reel-7)
 
@@ -134,6 +139,31 @@ scene map and the rebuild steps. What it teaches:
 5. **24 fps clips in a 30 fps MP4** show every fourth source frame twice. Nobody sees it; exporting at 24 would make the
    interface motion coarse.
 6. **Keep the top ~40% of each clip calm** (the start picture was composed for it, per `/video` Step 2): all the type sits there.
+
+### Step 2d — The timeline engine (reel 9): the route for a polished animated ad
+
+`Content/reel-9-mehraneh.html` (Farsi, 2026-10-02, a client's website ad; Amir: "this was amazing") is built on **`.claude/skills/reel/timeline/`**, a kit that replaces the
+CSS-timer scene-swap for any reel that is mostly motion graphics, real captures and stills. **Read `timeline/README.md` before you start.** In short:
+
+1. **The page is a pure function of time**: `window.__render(t)` paints the frame for `t` seconds; no timers, no CSS animations. One file gives a still at any instant (`?t=5.2`),
+   the real-time preview, and the render.
+2. `python .claude/skills/reel/timeline/new_reel.py <slug>` scaffolds `Content/reel-<N>-<slug>/` with a working 9 s starter **in Amir's brand** (green/clay, Vazirmatn, no yellow).
+   For a client, swap the tokens for the client's own, taken from their live site (reel 9: spruce/pink + blue/lime, Lalezar). One-time PC setup: `tools/setup_tools.py`.
+3. **One hero object carries the whole reel** (reel 9: a ball; its arcs are *solved* from apex height + arrival time; it squashes, presses buttons, swings a medal, lands on the link;
+   every hit is a beat). **Every time lives in one table, `T`**: scenes, ball and sound plan all read it. Transitions are events (doors, a wipe line with streaks, a seam that turns), never fades.
+4. **The render takes 20 sub-frames per frame and averages them = real motion blur**, then film grain (`tools/render_timeline.js`; 4-6 min for 20-26 s; `--draft` is about a minute).
+   Fewer sub-frames show ghost copies on fast moves (5 failed on a door, 10 on a digit roll).
+5. **Three audits gate the render** (all in `tools/`, headers explain them): `safe_audit.js` (text vs Instagram's covered zones, incl. the right-hand button rail),
+   **`read_audit.js` (can a person read it? a word the hero is sitting on counts as unread)**, `copy_audit.py` (every line traced to its source; the new lines are listed for Amir to read). `ball_audit.js` lists every place the hero covers a word, so you know what to move.
+6. **Sound from the same plan**: `export_sound.js` → `make_sfx.py` (synthesized, nothing downloaded) → `mux_sfx.py` (PASS). Say it was never auditioned by ear. Music still goes on in Instagram.
+7. **Real UI**: `tools/capture_tiles.js` shoots any page (his sites, the apps' demos, a client's site) as phone tiles. **His own footage**: `tools/extract_plate.py` + `plateDraw` (a plate, not a `<video>`).
+
+**The reading rule (Amir, 2026-10-02, on the first 17 s cut: "the changes are too fast, there is no time to read").** A block of text needs **0.8 s + 0.25 s per word** fully visible
+(max 2.4 s). Plan the length from that budget, not from "10-20 s": hook 3-4 s, one fact per beat at 2.5-3 s, the link 4 s. If it gets long, **cut facts, never speed up**, and tell Amir the length
+and the trade. The beat grid is **100 BPM (0.6 s)**; the hero rests or hops slowly while the viewer reads and never crosses a word or a face. `read_audit.js` must report
+**0 too fast before anything is rendered or sent** (reel 9: the 17 s cut had 14 of 33 blocks too fast, shortest 0.2 s; the 26 s cut has 0, shortest clean hold 1.5 s).
+**The hero counts as an obstacle** (found the same day): the first 26 s render still had two blocks the ball sat on, the phone title for 4 s of its 4.7 and a label for 2 s of 2.7, and no contact sheet had shown it.
+Only the ball-aware audit did. The cure was geometry, not time: it now dribbles at the end of the badge, away from the label and the number, and volleys under the title.
 
 ## Step 3 — Write the copy
 
@@ -256,6 +286,9 @@ saw it. Tools are in `.claude/skills/reel/tools/` (setup in its README):
    the loop end (the dip to black).
 4. Check the on-screen words against the copy-to-source table once more.
 
+**A timeline-kit reel (Step 2d):** `safe_audit.js`, `read_audit.js` and `copy_audit.py` replace most of 1-4 and must all be clean; then pull **frames from the MP4 every 0.5 s** around each
+transition and look at them (ghosting only shows in real frames, never in stills) and one 1:1 crop for grain and banding. A claim is checked word for word against its source page.
+
 ## Step 8 — Deliver
 
 **The deliverable is the HTML file itself**, sent via `SendUserFile` with `display: "render"` so
@@ -273,6 +306,11 @@ editor, so its deliverable is **one finished MP4** (`/ad` rule 2). The HTML is t
 cut; Step 9 runs once he approves it, and his take's sound is the ad's audio.
 
 ## Step 9 — MP4 export (only when Amir explicitly asks)
+
+> **An ad that will be posted is delivered as the finished MP4** (CLAUDE.md: "an ad is one finished MP4"), and reel 9 was; a quick draft stays HTML. A **timeline-kit reel** exports with `tools/render_timeline.js`, not `render_mp4.js`:
+> `node .claude/skills/reel/tools/render_timeline.js Content/reel-N-slug.html Content/reel-N-slug/export/reel.mp4` (defaults: 20 sub-frames, crf 18, grain 4; BT.709 tags are written into the stream;
+> run it as a tracked background task). Then `mux_sfx.py` for the sound version, a cover frame (`still.js ... --query noball=1`), a storyboard sheet; deliver them with `SendUserFile`.
+> When a slower or shorter cut replaces one Amir has seen, keep the old files as `-v1-fast` instead of overwriting them.
 
 Use **`tools/render_mp4.js`**. It renders the reel **frame by frame** instead of recording the screen:
 Playwright's fake clock is installed and paused before the page loads, then stepped 1/30 s at a time
@@ -323,3 +361,7 @@ node .claude/skills/reel/tools/render_mp4.js Content/<reel>.html Content/<reel>/
 - Don't quiz Amir on abstract creative options. Ask concrete questions, decide, show a plan.
 - Don't ship a scene with only an entrance fade and nothing else moving — see Step 4.
 - Never retro-edit an already-shipped/posted reel; start a new numbered file instead.
+- **Don't ship text the reading rule fails** (`read_audit.js`), and don't fix a long reel by speeding it up: cut facts (Step 2d).
+- **A client's reel wears the client's brand**: Amir's clay-only/no-yellow rules, his handle and his mantra belong to HIS reels. Reel 9 is Mehraneh's: her colours, her fonts, her handle.
+- **Don't let the hero object cross a word being read, or a face** (`read_audit.js` measures it: the ball hiding 12% of a word's ink box makes that word unread; `ball_audit.js` lists the crossings). Don't put text in the right-hand button rail (x 920-993 below y 1171); `safe_audit.js` knows the zones.
+- **Don't invent a claim.** Every line is traced to the page it came from, and the lines you wrote yourself are listed for Amir (`copy_audit.py`), so Farsi ships only after he has read it.

@@ -383,6 +383,10 @@ sat here until 2026-09-26 live in those files and in `IMAGES.md` §0. What must 
 - **Never retro-edit a shipped design**: start a new numbered file.
 - **A reel draft is the HTML file** (an MP4 only when he asks); **an ad is one finished MP4**: Amir
   films himself and edits in Instagram, so Claude cuts the whole thing (`/ad`).
+- **A polished animated ad with no footage of him is built on the timeline kit** (2026-10-02, reel 9, Mehraneh's website ad, which he called "amazing";
+  `.claude/skills/reel/timeline/README.md`, `/reel` Step 2d, `/ad` Route C). **The reading rule** (Amir on its first 17 s cut: *"the changes are too fast, there is no time to be able to read"*):
+  a block of text is fully visible for `0.8 s + 0.25 s per word` and not under the ball; `read_audit.js` must say 0 too fast before any render, and a long reel is fixed by
+  cutting facts, never by speeding up. A **client's** reel wears the client's brand, not Amir's.
 - Handle in new work: **@amirardekanian** · site AMIRARDEKANI.COM.
 
 ## Verifying the live site (important gotchas)

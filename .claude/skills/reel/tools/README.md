@@ -1,7 +1,7 @@
 # Reel tools
 
 Small, tested helpers for building, checking and exporting reels on Amir's Windows PC. They were written for
-`Content/reel-7-course.html` (2026-09-20) and work for any reel built on the `/reel` skill's driver.
+`Content/reel-7-course.html` (2026-09-20) and work for any reel built on the `/reel` skill's driver. **The timeline-kit tools (reel 9, 2026-10-02) are in the second table at the end.**
 
 | Tool | What it does |
 |---|---|
@@ -53,3 +53,22 @@ the reel-6/7/8 driver). `--query hook=b` adds URL parameters after `?capture=1` 
 folder OUT of the repo (OneDrive would sync 900 files). `crf 15` gave 26 MB for reel-7 (about 7 Mbps); `crf 18` gave 14 MB;
 reel-8 at `crf 16` gave 16 MB for 20 s, and 600 frames took 35 s (the clips add a seek and 45 ms on the 220 steps where a
 video frame changes). The MP4 has no audio: Amir adds it in Instagram.
+
+## Timeline-kit tools (2026-10-02, reel 9)
+
+For a reel built on `../timeline/` (the page is a pure function of time, `window.__render(t)`; playbook: `../timeline/README.md`, `/reel` Step 2d).
+They find `playwright-core` through `_pw.js`, so **no `NODE_PATH` is needed**. Run `python setup_tools.py` once per PC.
+
+| Tool | What it does |
+|---|---|
+| `setup_tools.py` | Checks node, ffmpeg, Edge, numpy / scipy / Pillow and installs `playwright-core` into `%TEMP%\reel-tools` when it is missing. Safe to run any time. |
+| `still.js` + `sheet.py` | A frozen frame at any exact second (`still.js reel.html OUT 0.5 3.5 6.5`; `--query noball=1` for a cover without the hero), then a labelled contact sheet. Look at the sheet, then at single frames. |
+| `render_timeline.js` | **The MP4.** 20 sub-frames per frame across a 180 degree shutter, averaged by ffmpeg = real motion blur, then film grain, H.264 High, BT.709 tags in the stream. `--draft` is half size and 4 sub-frames (about a minute). A 17-26 s final takes 4-6 min: run it as a background task. |
+| `safe_audit.js` | Every piece of text against what Instagram covers (y 250-1580, x 60-1020, never in the right-hand button rail x 915-1000 below y 1165). Exit 1 on a finding. |
+| **`read_audit.js`** | **Can a person read it?** Each text block must be fully visible for `0.8 s + 0.25 s per word` (cap 2.4 s) **and not under the ball** (the hero hiding 12% of a word's ink box counts as unread; one quick flash per hold is forgiven, a second one or a longer cover breaks the hold; `--no-ball` turns that off). Exit 1 when a block is more than 0.2 s short. **Zero "TOO FAST" before any render** (reel 9's first cut had 14 of 33). |
+| `ball_audit.js` | Lists every text block the hero covers, with the longest cover and when (`--max-run 0.3` fails the longer ones). Use it to see what to move once `read_audit.js` says "ball: -x s". |
+| `copy_audit.py` | Traces every on-screen line to a source file (his page, a brief) and lists the NEW lines for Amir to read before Farsi ships. |
+| `capture_tiles.js` | A real page (his site, an app screen, a client's site) as tall phone-width tiles: reduced motion, lazy images forced, a scroll pass, `--css`, `--storage`, `--mark`, `--el`. |
+| `extract_plate.py` | Footage to numbered frames the page draws by time (`plateDraw`): a plate, never a `<video>`. |
+| `export_sound.js` -> `make_sfx.py` -> `mux_sfx.py` | The page's own cue list becomes **synthesized** effects (nothing downloaded) placed on the exact frames, then laid under the silent render with a PASS check (peak at most -1 dBTP, lengths within 0.1 s). Never auditioned by ear: say so. `spectro.py` draws the track as a picture. |
+| `preview_check.js` | Opens the reel with no parameters, the way Amir does: it must autoplay, loop, fit the window and show no errors. |

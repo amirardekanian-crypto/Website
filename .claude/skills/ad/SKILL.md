@@ -72,6 +72,15 @@ When his files are in `Content/tps-ads/takes/`:
 refusal list — check it for a named coach, a promised result on a timeline, fear, and any price that
 is not the Iran price.
 
+**Route C · a polished animated ad with no footage of him** (2026-10-02: Mehraneh Zohourian's website ad, reel 9, which Amir called "amazing"). A site, an app or a launch that is
+told with motion graphics, real page captures and stills, not his face. Build it on the **timeline kit** (`.claude/skills/reel/timeline/README.md`, `/reel` Step 2d), not the scene-swap engine.
+
+1. **Part A's brief still comes first**, but you decide the concept yourself from the thing being sold (reel 9 was built on her site's tennis | padel gate). Ask only concrete questions: the language, what the viewer does next, whether a voice goes on it.
+2. **The length comes from the reading budget** (`0.8 s + 0.25 s per word` per block; `read_audit.js` says "0 too fast" before anything is rendered). Reel 9's first cut was 17 s and Amir said *"the changes are too fast, there is no time to be able to read"*: it had 14 of 33 blocks under what a viewer needs, and the cure was 26 s and fewer facts per beat, not more speed.
+3. **No voice means no `mux_audio.py`**: the sound is synthesized from the page's own cue list (`mux_sfx.py`, said plainly to be un-auditioned) and he adds music in Instagram. A voice ad stays Route A or B.
+4. **It still passes the stage 17 review** (the refusal list and the price rule apply to what it says), every claim is traced to its source (`copy_audit.py`), and the new Farsi lines are listed for Amir to read before anything ships. For Amir's own ad: DESIGN-ATLAS tokens (green, clay the only accent, no yellow, Vazirmatn, @amirardekanian). For a client: the client's own brand.
+5. The deliverable is the finished MP4 plus a cover frame and a storyboard sheet (`/reel` Step 9). Keep the earlier cut when a new one replaces it.
+
 ## PART A · THE BRIEF — settle all six before a single creative thought
 
 If any of these six cannot be filled in, there is no ad yet. Ask Amir rather than inventing one.
