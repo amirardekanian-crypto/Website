@@ -99,6 +99,9 @@ def build_md():
                 for k, name, text in d['options']:
                     a(f'- **{k}. {name}.** {text}' + ('  ← my pick' if k == d['pick'] else '') + ('  ← **YOUR CHOICE (2026-10-02)**' if k == d.get('chosen') else ''))
             a('')
+    a('## Facts you have given me\n')
+    for q in B.FACTS: a(f'- {q}')
+    a('')
     a('## Questions only Amir can answer\n')
     for i, q in enumerate(B.QUESTIONS, 1): a(f'{i}. {q}')
     a('\n## Tools: what we used, what we skip\n')
@@ -315,6 +318,7 @@ def build_html(images):
         for p in pks: a(pk_html(p))
         a('</section>')
 
+    a('<h2>Facts you have given me</h2><ul class="q">' + ''.join(f'<li>{e(q)}</li>' for q in B.FACTS) + '</ul>')
     a('<h2>Questions only you can answer</h2><ol class="q">' + ''.join(f'<li>{e(q)}</li>' for q in B.QUESTIONS) + '</ol>')
 
     a('<h2>The tools</h2><p>Your five, and what is actually popular and useful on GitHub. Stars measure fame, not audit ability, so I checked what each one really does.</p><div class="tbl"><table><thead><tr><th>Tool</th><th>Source</th><th>What it does</th><th>Verdict</th><th>How we use it</th></tr></thead><tbody>')

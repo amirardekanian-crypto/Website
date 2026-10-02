@@ -72,6 +72,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 2026-10-02 | 2, 5, 6 | Thumb-sized links on the shared header, footer and course pages; the 404 headline stops jumping; Persian-digit footer years. | 516efa8 |
 | 2026-10-02 | 6 | The English pages and the Farsi pages’ Latin numerals load Barlow, Barlow Condensed, JetBrains Mono and DM Sans from your own site: 14 pages make no request to Google, layout shift unchanged. The privacy notice now says which pages still use Google Fonts. | f3e27cb |
 | 2026-10-02 | 1 | Every white-on-clay button, badge and chip is the deeper #C2512C (4.66:1, was 4.40:1): 25 of 25 measured; lines, glows and clay text keep the brand colour. | 07e0118 |
+| 2026-10-02 | 5, 13, 20 | Your answers acted on: the Farsi home says WhatsApp (not “in the app”) and has an “is the app English?” FAQ; both confirmation screens say what happens next (we talk, you pay, I write your programme); the privacy notice says you use Claude to write programmes and that Supabase is in London, UK. | 4945846 |
 | 2026-10-02 | 22 | The style guard: a commit that adds yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white-on-pale-clay is stopped. It also found and fixed: 10 to 11 px labels on the apply form and proof page, the pale grey on the Farsi form, partner and terms pages, and a slider value hanging off a 320 px screen. | 943a92c |
 
 ### Words I wrote, for you to read
@@ -115,6 +116,14 @@ Short functional lines, written to your voice rules, but they are your words on 
 **English home**
 
 - “Application takes about 5 minutes · No commitment until we speak” (it said 2 minutes).
+
+**What happens after the form (from your answers of 2026-10-02)**
+
+- Apply form, English, under the confirmation: “I reply by WhatsApp or email. After we talk, you message me to pay and I write your programme. Got a question while you wait? Message me.”
+- Apply form, Farsi: «بعد از صحبتِ ما، توی واتساپ یا اینستاگرام بهم پیام می‌دی تا پرداخت رو هماهنگ کنیم و من برنامه‌ت رو شروع کنم. تا اون موقع سؤالی داشتی، همین‌جا بهم پیام بده.»
+- Farsi home, the feature card: «هر جا سؤال داشتی، از توی اپ یه‌راست توی واتساپ بهم پیام بده و جواب بگیر.» and the FAQ line «هر جا سؤال داشتی، توی واتساپ پیام می‌دی.»
+- Farsi home, a new FAQ «اپ انگلیسیه؟»: «فعلاً بله. متنِ اپ و برنامه انگلیسیه و ساده نوشته می‌شه. هر سؤالی داشتی، به فارسی توی واتساپ بهم بگو.»
+- Privacy notice, new section 2.9 “Writing your programme with an AI assistant” (Claude, by Anthropic; you approve every programme; Anthropic is a processor; outside the UK possible; lawful basis as 2.1). A legal text in your name: read it.
 
 **Privacy notice, the Fonts paragraph (section on third parties)**
 
@@ -231,7 +240,7 @@ The three Apply buttons in the pricing cards do not open the form: they scroll t
 
 The phone picture in the Farsi hero shows a greeting and exercise names in white on white. Phone numbers typed in the Farsi form show backwards. Several small right-to-left details are off.
 
-**Still open.** Waiting for you: 5d, Farsi pages that send visitors into English (the demo banner, the privacy link, "message me in the app").
+**Still open.** 5d is half done on 2026-10-02, after you said the app is English with no chat: the Farsi home now says you message me on WhatsApp (not in the app) and has a new FAQ “اپ انگلیسیه؟”. Not done: the demo banner’s Apply and Exit still go to the English pages (that is in program.html, which is its own session) and the footer privacy link is still the English notice (package 20c).
 
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
@@ -340,6 +349,8 @@ A design, copy or business choice. I mark my pick, you say yes, no or change it.
 
 The form is the one step every sale goes through. It asks 27 to 30 questions (18 required) over 7.8 phone screens, and the home says 2 minutes. Sleep, stress, nutrition, equipment and lifts are only needed after the call.
 
+**Still open.** Your answer on 2026-10-02: the form is for athletes of all kinds, so the football, cricket and other sport options STAY (13a no longer asks to remove them). The confirmation now says what happens next: we talk, you message me to pay, I write your programme (English and Farsi).
+
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
 | 13a |  | P1 | Apply EN and FA | 27 questions (29 for tennis or padel, 30 with an injury), 18 required, about 5 minutes; my estimate 2.5 min required-only. The season the hero promises is never asked. Football, cricket, weight-loss and “tone & shape” options remain though the site is for tennis and padel. | Stopgap now: “About 5 minutes” (package 10). Then the option you pick below. | M-L | Y | form-en-01, form-fa-03 |
@@ -436,6 +447,8 @@ Your own rule says an athlete should read plain words that sound like you typed 
 
 The privacy notice is detailed, but it lags what the site and your tools actually do. This is a list of differences to confirm, not legal advice.
 
+**Still open.** Done on 2026-10-02 from your answers: 20b is half done. The notice now says you use Claude (Anthropic) to write programmes (section 2.9, and Anthropic is in section 5), Supabase is “London, UK” and the date is 2 October. Still open: the coaching agreement, whether names go into AI chats, call-log.html, the Gmail copies, backups against “delete on request”. 20e (the UTS page) can wait: it has not been sent to anyone yet.
+
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
 | 20a |  | P1 | privacy.html | 15,000 px (17.8 screens), 3,790 words, no summary or contents; analytics and fonts start 13 screens down. | A 7-line “Short version”, a jump list, ids on headings, <details> for the long sections; 16 px text and a 680 px column. | M | Y | privacy-01 |
@@ -496,18 +509,23 @@ program.html (athletes), habits.html (AA Proof) and coach.html (your dashboard) 
 |---|---|---|---|---|---|---|---|---|
 | 25a |  | P3 | Apps | Not reviewed yet. They have their own audit (Fresh Eyes) and rules; this pass would only add what the website tools can measure. | Start with the athlete app’s first-run and Home on a phone. | L |  |  |
 
+## Facts you have given me
+
+- How a client joins and pays: they fill in the form, you contact them with more questions, they pay (by messaging you on WhatsApp or Instagram), then you write their programme. The Farsi price is the equivalent of 25 dollars a month, in Toman at the day’s rate.
+- The apply form is for athletes of all kinds, not only tennis and padel: the football, cricket and other options stay.
+- The app is English for now. It has no chat: everything goes through WhatsApp.
+- The UTS page has not been sent to anyone yet (the course has not started).
+- You write the programmes with Claude. The privacy notice now says so (a new section 2.9 and Anthropic in the list of processors).
+- First screen and Library pictures: go with my recommendation. That is your photo and the athletes already shown in the testimonials (they have agreed), and the Library’s category pictures reused as article thumbnails and share cards.
+
 ## Questions only Amir can answer
 
-1. How and when does a client pay, and does the 60-day promise mean a rebuilt plan only, or money back? The home, the form and the terms must say the same thing.
-2. Has anyone in Iran opened the demo, the apply form and Plausible with the VPN off? I cannot test from here. (package 23)
-3. Is the apply form now only for tennis and padel players? If yes, I remove football, cricket, weight-loss and “tone & shape” and ask the next event date.
-4. Is the app staying English-only? The Farsi copy says “message me in the app”. (package 5)
-5. Is the UTS page ever sent to people who have not booked? (package 20)
-6. Facts for the privacy notice: do you paste athlete names into AI chats, and is there a written coaching agreement (terms section 7)? (package 20)
-7. May the first screen show your photo and three athletes, and may the Library’s category pictures be reused as article thumbnails and share cards?
-8. Where did you see “claude-design-skills”? Several repos use the name; a link would pin it down.
-9. Your part, 5 minutes: in Plausible add Custom-event goals named Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application and 404, then add the properties plan, where, page, which, to, step and lang (Site settings, Custom properties). Until then the counts exist but are not shown.
-10. Your part, when you can: ask two or three Iranian athletes to open amirardekani.com/reach/ once with the VPN off and once on, and send you the line it prints. It now also tests the apply-form endpoint (W3) and Plausible (PL). (package 23)
+1. Does the 60-day promise mean a rebuilt plan only, or money back? The home, the form and the terms must say the same thing.
+2. Is there a written coaching agreement (terms section 7 cites one I could not find)? And do you paste athlete names into AI chats, or use the athlete’s id?
+3. Has anyone in Iran opened the demo, the apply form and Plausible with the VPN off? You will tell me later. (package 23)
+4. Ask two or three Iranian athletes to open amirardekani.com/reach/ once with the VPN off and once on and send you the line it prints. You will let me know. (package 23)
+5. Your part: the Plausible goals (Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application, 404, and the properties plan, where, page, which, to, step, lang). You asked me to walk you through it later.
+6. Walk-through of the first-screen photo and the three athletes (package 12): you asked for it later, not now.
 
 ## Tools: what we used, what we skip
 
