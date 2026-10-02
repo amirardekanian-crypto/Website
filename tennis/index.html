@@ -34,11 +34,9 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
-<!-- Vazirmatn is self-hosted (fa-product.css). Barlow Condensed only draws the Latin price, so it
-     loads without blocking: if Google Fonts is unreachable the page still renders at once. -->
+<!-- Vazirmatn (fa-product.css) and Barlow Condensed (the Latin price; assets/css/fonts.css) are both our own files: no request to Google. -->
 <link rel="preload" href="/assets/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="stylesheet" href="/assets/css/fonts.css?v=20261002e">
 <link rel="stylesheet" href="/assets/css/fa-product.css?v=7">
 <style>
   /* The demo links (2026-09-15). Page-only, so fa-product.css and its ?v stay as they are. */
