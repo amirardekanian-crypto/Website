@@ -1,0 +1,114 @@
+{
+  "id": "tennis-demands",
+  "icon": "🎾",
+  "group": "Physical qualities",
+  "order": 10,
+  "title": "What tennis asks of your body",
+  "summary": "What a tennis point looks like, what your body does in each one, where problems usually show up, and where your programme trains each quality.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "What does a tennis point look like?",
+      "p": [
+        "The average tennis point lasts about 5 to 10 seconds. In competitive play, the ratio of effort to rest is roughly 1:1 to 1:4. So between points you get about 10 to 20 seconds of walking, breathing and getting ready.",
+        "A match can last an hour or more. So tennis is lots of short, fast efforts with short rests in between, one after another."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Tennis means short, explosive efforts with short rests, kept going for a long time."
+    },
+    {
+      "h": "What do you do in each point?",
+      "p": [
+        "In a normal point you take a few quick steps, brake, hit and get back to the middle. You move in every direction: sideways, forwards, backwards and on a diagonal.",
+        "Most running in tennis is short. That's why your programme works on the first step, acceleration over a few metres and braking, rather than top speed over long distances. This is a coaching conclusion, not the ranking of a study."
+      ],
+      "ol": [],
+      "list": [
+        "A fast first step, straight after the split step.",
+        "Acceleration over a few short metres.",
+        "Braking and changing direction, again and again, to any side.",
+        "Soft, solid landings, for example after a split step or a jump for a smash.",
+        "Reacting to the ball and your opponent: see it, decide, go.",
+        "Getting back to the middle fast, ready for the next shot."
+      ],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "Your aerobic base: recovering between points",
+      "p": [
+        "Each point is short, but your body has to recover between points so the next one is fast too. That recovery is mostly down to your aerobic fitness. It's how well your heart, lungs and muscles handle long work at low to moderate effort.",
+        "In one study, fitter players spent more of the match at low intensity. Aerobic fitness sits next to speed and strength. It doesn't replace them."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Points are short, but recovering between them is the job of your aerobic base."
+    },
+    {
+      "h": "Your shots come from your legs and trunk",
+      "p": [
+        "The serve and groundstrokes aren't just arm work. Force starts at the ground. Your legs push into the ground, your hips and trunk turn, and then your shoulder, arm and racket pass it on to the ball.",
+        "That's why your programme trains leg strength, jumps, rotational med ball throws and trunk control, not just your arms.",
+        "To be honest, small studies show strength and power training, as part of a full programme, can make your serve a little faster. The quality of this evidence is low to moderate, and in some studies the programmes did not change serve speed. We don't promise any number."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "Where do problems usually show up in tennis?",
+      "p": [
+        "Studies that looked at physical problems in tennis players found these areas come up most. Most of that data is on adults and pros, so for juniors it's only a rough guide:"
+      ],
+      "ol": [],
+      "list": [
+        "Legs: problems here tend to start suddenly.",
+        "Shoulder, elbow and wrist: problems in the arm tend to build up slowly, from lots of repeated shots.",
+        "Trunk: lower back, abs and the sides of your trunk.",
+        "Groin and hips: according to reviews, a problem in the groin, hip or abdomen can raise the risk of a shoulder or arm problem.",
+        "Toes and sole of the foot: in one study of adult pro women at the Australian Open, the foot was one of the most affected areas, after the shoulder.",
+        "Calf and Achilles tendon: this programme includes them too, because every step, jump and landing goes through them."
+      ],
+      "warn": "Pain you can point to with one finger, joint pain, swelling or limping isn't normal soreness. Don't train that area, go and see a doctor or physio, and tell Amir in the Coach tab. The warning signs are in the lesson “Pain or soreness? And red flags”.",
+      "callout": "Your programme trains these areas. This list only shows where problems are more common. It isn't a promise to prevent injury."
+    },
+    {
+      "h": "Where does your programme train each quality?",
+      "p": [
+        "Your programme is written for you, so your week won't look exactly like anyone else's. But each quality has its usual home:"
+      ],
+      "ol": [],
+      "list": [
+        "Strength: your gym sessions, built around a main lift like the Trap Bar Deadlift or Barbell Back Squat.",
+        "Jumps, landings and med ball throws: your gym sessions.",
+        "Speed, braking and change of direction: your court or speed sessions.",
+        "Agility and reaction: your court or speed sessions.",
+        "Endurance: a few short repeated sprints, plus more conditioning if you need it.",
+        "Robustness and trunk: calves, Achilles and feet, groin and hamstrings, shoulder and forearm, and trunk work in your gym sessions.",
+        "Mobility: the warm-up at the start of every session."
+      ],
+      "warn": "",
+      "callout": "How many extra sessions you can handle depends on how many days you play tennis. Amir sets that for you, so tell him in the Coach tab if your tennis week changes. This is the course's own rule, not a study result."
+    },
+    {
+      "h": "How your training builds",
+      "p": [
+        "Your programme starts from a base and moves closer to the tennis court over time. Blocks usually end with a lighter week: fewer sets, same RPE.",
+        "This structure is the course's own rule, not a study result."
+      ],
+      "ol": [],
+      "list": [
+        "Foundation: learning the lifts, building base strength, and learning to land and brake.",
+        "Build: heavier strength, real jumps, faster approaches and your first reactions with two options.",
+        "Explosive: short runs of back-to-back jumps, sprints up to 20 m and reactions with three options.",
+        "Court transfer: tennis movement patterns, reacting on court and conditioning that looks like real points."
+      ],
+      "warn": "",
+      "callout": "Each quality has its own lesson: “Strength for tennis”, “Jumps, landings and power”, “Speed, braking and change of direction” and “Agility and reaction”."
+    }
+  ]
+}

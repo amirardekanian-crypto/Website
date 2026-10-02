@@ -1,0 +1,169 @@
+{
+  "id": "hydration-heat",
+  "icon": "💧",
+  "group": "Fuel, water & heat",
+  "order": 42,
+  "title": "Water, sweat and playing in the heat",
+  "summary": "Why losing water matters, how much sweat differs between players, how to learn what you need, how to train more safely in the heat, and how to spot heat illness.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "Why does water matter?",
+      "p": [
+        "Your body cools down by sweating. In tennis, especially in hot weather, that means losing a lot of water and salt.",
+        "If you don't replace the water you lose, your body gets hotter and has to work harder. Losing more than about 2% of your body weight in water can reduce endurance, focus and coordination, though the effects are small. For a 50 kg player that's about 1 kg, and for a 70 kg player about 1.4 kg.",
+        "In tennis the effects aren't always clear, and 2% is a sports medicine guideline, not a cutoff proven for tennis. In one small study of 11 men, losing about 2.7% of their weight over 2 hours of exercise slowed short sprints but didn't change shot tests.",
+        "Sweat also varies a lot between players. In tennis studies, some sweated about half a litre an hour and some more than 2.5 litres. In one small study, 5 boys aged 14 who played a doubles match of about 1 hour 47 minutes in the heat sweated close to 2 litres on average."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Every player sweats differently. It depends on heat, humidity, how hard the match is, body size and how used to the heat you are. One number doesn't work for everyone."
+    },
+    {
+      "h": "Two simple tests to learn your own body",
+      "p": [
+        "These two tests are for your own learning. The app doesn't save any of these numbers. If it helps, write them down on paper or your phone, and send them to me in the Coach tab if you'd like me to look.",
+        "Urine colour: pale, light yellow means you probably have enough water. Dark yellow, like apple juice, or very little urine over a few hours, means drink more. It's a rough guide, not a lab test.",
+        "Weighing yourself before and after training shows how much you sweat in a session:"
+      ],
+      "ol": [
+        "Before training, after using the toilet, weigh yourself in light, dry clothes.",
+        "During training, keep track of how much you drink. For example, count the bottles.",
+        "After training, dry off your sweat, swap wet clothes for similar dry ones and weigh yourself again.",
+        "Sweat in this session = weight before minus weight after, plus what you drank. Every 1 kg is about 1 litre. Example: 60 kg before, 59 kg after and 1 litre drunk in the session means about 2 litres of sweat.",
+        "If you lost more than 2% of your weight, drink more in the breaks next time. If you're heavier, you drank more than you needed.",
+        "Do the test once on a hot day and once on a mild day. The numbers are usually different."
+      ],
+      "list": [],
+      "warn": "",
+      "callout": "Pale urine, and losing less than 2% of your weight after training, mean your drinking plan is probably about right."
+    },
+    {
+      "h": "Your drinking plan",
+      "p": [
+        "Use your test results to set up this plan for yourself:"
+      ],
+      "ol": [],
+      "list": [
+        "Through the day: drink water with every meal and keep a bottle with you, so you arrive at training well hydrated.",
+        "Before training or a match: drink water with your pre-training meal and keep sipping until you start. Drinking a lot right before you start just means more trips to the toilet.",
+        "In breaks and changeovers: a few big sips each time, about a glass. More in hot weather or if you sweat a lot. Use your sweat test as a guide, and never force fluid beyond what you lose.",
+        "After training or a match: for every kilo you lost, drink 1.25 to 1.5 litres over the next few hours, with food. That's 125 to 150% of what you lost. A little salty food or a glass of salty yoghurt drink like ayran helps your body hold on to the water.",
+        "Don't overdo it either. Don't drink so much that you're heavier after playing than before. In marathon runners, gaining weight during the race was linked to dangerously low blood sodium. That study wasn't on tennis players.",
+        "Days with both gym and tennis: replace water and food between the two sessions. The lesson \"Eating before, during and after training\" tells you what to eat, and \"Training around tennis and matches\" covers the order of the day.",
+        "What to drink: water is enough for most sessions. For training or matches longer than about an hour and a half, a little carbohydrate with your water helps. The lesson \"Eating before and on match day\" tells you what to eat."
+      ],
+      "warn": "",
+      "callout": "Drink to your own plan in the breaks. Not so little that you lose more than 2% of your weight, and not so much that you get heavier."
+    },
+    {
+      "h": "Salt, and players who sweat a lot",
+      "p": [
+        "Sweat isn't just water. It has salt in it too. Some players lose a lot of salt in their sweat, especially when they play several matches or several days in a row in the heat.",
+        "White salt marks on your cap or clothes can mean you lose a lot of salt. Cramps in hot matches have more than one suspected cause: a sodium shortfall is one, a very tired muscle is another. Experts still argue about which matters most."
+      ],
+      "ol": [],
+      "list": [
+        "On hot days, don't cut the salt in your normal food.",
+        "Salty snacks like bread and cheese or pretzels, before a match or between two matches.",
+        "After playing in the heat: a glass of salty yoghurt drink like ayran, or salty food, with water.",
+        "No salt tablets. Get your salt from food."
+      ],
+      "warn": "Cramp in the heat: stop playing or training, get into the shade, gently stretch the muscle, and have water and a little salty food. If you see confusion, severe weakness or vomiting along with the cramp, follow the \"Heat exhaustion\" and \"Heat stroke\" sections right now.",
+      "callout": "If a doctor has told you to cut down on salt, for example because of blood pressure or kidney disease, check with them before adding more salt."
+    },
+    {
+      "h": "Getting your body used to the heat",
+      "p": [
+        "Your body can get used to heat. With regular training in hot weather, over about 1 to 2 weeks you sweat better, your body temperature rises less and your heart works more easily.",
+        "The risk is highest in the first hot days of the year, and when you go from somewhere cooler to a hot city or tournament. On those days the session is still what's on your card. Take the time and place you train, your drink and cool-down breaks, and your clothing more seriously. If a trip somewhere hot is coming up, tell me in the Coach tab.",
+        "Getting used to the heat doesn't replace enough water and rest in the shade."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "In the first 1 to 2 weeks of hot weather, or after travelling somewhere hot, watch more closely for signs of heat illness."
+    },
+    {
+      "h": "In the heat: time, place, breaks and clothing",
+      "p": [
+        "In hot weather you don't cut the session short. You change these things:"
+      ],
+      "ol": [],
+      "list": [
+        "Time: move outdoor court sessions to early morning or evening, not the hottest hours of the day.",
+        "Place: do gym sessions in a cool indoor gym. If an indoor court is available, use it on very hot days.",
+        "Shade: spend every break and changeover in the shade. If the court has none, bring an umbrella or sunshade.",
+        "Cooling: in the breaks, put a cold wet towel or a towel with ice on your neck and shoulders. In very hot, dry weather, a fan only helps if you wet your skin too.",
+        "Clothing: light, loose, thin and light-coloured, with a peaked cap or visor in the sun.",
+        "Illness and medication: don't play or train in the heat with a fever, diarrhoea or vomiting. If you take any medication, ask your doctor whether it's a problem in the heat."
+      ],
+      "warn": "",
+      "callout": "In the heat the session stays as written. Change the time, the place, the shade, the water and the cooling."
+    },
+    {
+      "h": "Teenagers in the heat",
+      "p": [
+        "Newer research shows that teenagers who are well hydrated handle heat about as well as adults. The bigger risk comes from low water, pushing too hard, too little rest between sessions or between matches on the same day, and clothing that holds in heat.",
+        "In one small study of 14-year-old boys, those who started a match less hydrated finished with a higher core temperature. Several matches on one hot day also add strain, because the water and food lost can't be fully replaced in a short break.",
+        "The adult's job:"
+      ],
+      "ol": [],
+      "list": [
+        "The player goes on court with pale urine and a full water bottle.",
+        "They drink in every break, stay in the shade and eat between matches. See the lesson \"Eating before and on match day\".",
+        "The adult knows the signs in the next two sections and stops play or training right away when they see them. A teenager may not want to stop a match halfway.",
+        "For players under 16, an adult should be there for the whole session. See the lesson \"A guide for parents\"."
+      ],
+      "warn": "",
+      "callout": "In the heat, the adult's job is simple: water, shade, food, and stopping play at the first sign of heat illness."
+    },
+    {
+      "h": "Heat exhaustion: stop now",
+      "p": [
+        "Sometimes in the heat the body can't cope with the strain of playing anymore. Doctors call the common form of this \"heat exhaustion\". With the right care it usually gets better quickly.",
+        "Common signs:"
+      ],
+      "ol": [
+        "Stop playing or training right now.",
+        "Go to the shade or somewhere cool, lie down and raise the legs a little.",
+        "Take off extra clothing and cool down with cold water, a wet towel or ice.",
+        "If they're fully alert and not vomiting, they sip water.",
+        "Stay with them. No more playing or training that day."
+      ],
+      "list": [
+        "Sudden, severe tiredness and weakness, or feeling faint",
+        "Dizziness or a headache",
+        "Feeling sick or vomiting",
+        "Heavy sweating, pale skin and a fast heartbeat",
+        "Collapsing from tiredness while still alert and knowing where they are"
+      ],
+      "warn": "If they don't get better quickly, get worse, or you see fainting, confusion or strange behaviour: call your local emergency number right now (for example 999 in the UK, 112 in Europe, 911 in the US) and keep cooling.",
+      "callout": "Severe heat exhaustion and heat stroke can look alike at first. At any sign of confusion, follow the next section."
+    },
+    {
+      "h": "Heat stroke: an emergency",
+      "p": [
+        "Heat stroke means body temperature has gone so high that the brain and body stop working properly. It's a real emergency, and it can happen even when the weather doesn't seem very hot.",
+        "The most important sign is a change in alertness and behaviour. Cooling the whole body fast, right there and before the ambulance arrives, is the most important thing you can do."
+      ],
+      "ol": [
+        "Call your local emergency number right now, or ask someone to call.",
+        "Stop play and move them to the shade or somewhere cool.",
+        "Start cooling the whole body straight away. The best way is the body up to the neck in cold water or ice water, with someone holding their head above the water.",
+        "If that's not possible: keep pouring cold water over the whole body, lay cold wet towels on them and fan them.",
+        "Don't give anything to eat or drink to someone who is confused or unconscious.",
+        "Keep cooling until help arrives, stay with them and follow what the emergency operator tells you on the phone."
+      ],
+      "list": [
+        "Confusion, not making sense, or strange behaviour",
+        "Staggering or falling over",
+        "A seizure or losing consciousness",
+        "A very hot body. The skin may still be wet with sweat."
+      ],
+      "warn": "Confusion, strange behaviour, collapsing or losing consciousness in the heat is an emergency. Call your emergency number right now, and cool the whole body with cold water right there.",
+      "callout": "In heat stroke, don't wait for the ambulance to start cooling. Call and cool at the same time."
+    }
+  ]
+}

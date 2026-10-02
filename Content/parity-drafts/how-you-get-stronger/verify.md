@@ -1,0 +1,81 @@
+# verify.md: how-you-get-stronger (lesson learn-3 / recovery-adaptation)
+
+Checked 2026-10-02. Every PMID below was fetched from PubMed this session and its abstract read, unless marked otherwise.
+
+## (a) Target phrase
+«ریکاوری و سازگاری: بدن چطور قوی‌تر می‌شه». In the Farsi `title`, `seoTitle` (first), `description`, first paragraph and the first `h` («بدن چطور قوی‌تر می‌شه؟»). Tennis and padel are named in passing. Padel is never claimed as studied (the article says no padel-specific study was found). The title and description name no sport.
+
+## (b) Claims table
+
+| # | Claim (as in the article) | Verdict | Honest wording used | Source |
+|---|---|---|---|---|
+| 1 | Training stress, then fatigue, then recovery, then adaptation. The balance of total stress (training, competition, other life demands) and recovery matters | Supported (consensus statement, a framework, not a trial) | "An expert consensus says the balance ... is what matters" | Kellmann 2018, PMID 29345524 |
+| 2 | A short drop in performance that improves after recovery is "functional overreaching". Too little recovery for too long can give a longer drop and mood changes | Supported | Consensus statement. The abstract itself says there is no evidence to confirm or refute that OTS symptoms are more severe than NFOR, so the article does not say how long "weeks" must be | Meeusen 2013, PMID 23247672 |
+| 3 | The fitness-fatigue picture (fitness fades slowly, fatigue fast, performance ≈ fitness minus fatigue) | Practice-based / model. The Banister model is standard but the abstract below does not describe the numbers | Called "a model, not a law". No numbers given | Vermeire 2022, PMID 35320776 (commentary on the model) |
+| 4 | General model constants don't fit everyone, people respond at different speeds | Supported (commentary) | "A paper on the model warns..." | Vermeire 2022, PMID 35320776 |
+| 5 | (Cut for length) Kiely 2018 questioned the stress theory behind periodisation | Supported (opinion paper). NOT in the final article, kept here as background for the model-not-law point | none in article | Kiely 2018, PMID 29189930 |
+| 6 | "Supercompensation: you bounce back higher than before" | Not supported as a law. The lesson already says it is a picture, not a law | Described as a model. No direct study of it was found, and none is claimed | (none) |
+| 7 | After hard lifting sessions in trained men, strength dipped and soreness showed up for roughly 1 to 3 days | Supported but narrow (16 and 27 men, elbow flexors and chest press, men only) | "In studies of trained men after hard lifting ... roughly 1 to 3 days". (The detail that single-joint arm work left more soreness than multi-joint pulling is true in Soares 2015 but was cut from the article.) | Soares 2015, PMID 25807025. Ferreira 2017, PMID 27100318 |
+| 8 | Sets to failure slowed recovery by up to 24 to 48 hours (10 trained men) | Supported (small, men, bench and squat) | "In one study of 10 trained men ..." | Morán-Navarro 2017, PMID 28965198 |
+| 9 | Failure not needed for strength or size, and doesn't seem to hurt either (15 studies, young adults) | Supported, with a limit | The abstract also notes a small hypertrophy advantage of failure in resistance-trained subgroups (ES 0.15) and a strength edge for non-failure when volume was NOT equated. The article only says "not needed, doesn't seem to hurt". Young adults only | Grgic 2022, PMID 33497853 |
+| 10 | "That's why I usually stop a set a couple of reps short" | Practice-based (Amir's coaching principle, COACHING-PRINCIPLES), no direct study | Written as the author's own habit | (none) |
+| 11 | 7 well-trained men, 4-h matches on 4 days in a row: sprint and jump worse, serve accuracy down | Supported. Jump decline was measured before the match (days 2 to 4), sprint after the match. Soreness and fatigue also rose and serve speed held (not stated in the article after the cut) | "Small group, very long matches, so no rule for normal practice" | Gescheit 2015, PMID 25710259 |
+| 12 | Soreness is not a reliable sign the session worked. Muscle damage isn't what drives hypertrophy, and low-damage protocols gave similar growth and strength | Supported (a narrative review, hypertrophy focus, not tennis) | "A review ... concluded" | Damas 2018, PMID 29282529 |
+| 13 | Sleep: 7 to 9 h adults, 8 to 10 h teenagers | Supported (expert panel). Walsh says one-size-fits-all numbers are not ideal for athletes | "Expert panels suggest" | Hirshkowitz 2015, PMID 29073412 |
+| 14 | Elite athletes often sleep less than 7 h | Supported | "Elite athletes often sleep less than 7" | Walsh 2021, PMID 33144349 |
+| 15 | ITF/WTA/ATP statement puts food first | Supported. The record's abstract (via Europe PMC) names a "food first" philosophy. I could NOT read the full text, so no recovery numbers are credited to it by me | "says food first" | Vicente-Salar 2025, PMID 40840558, DOI 10.1123/ijsnem.2025-0001 |
+| 16 | Add carbohydrate and protein after hard sessions; total daily protein matters most | Supported (position stand) | "Add carbohydrate and protein after hard sessions" | Kerksick 2017 (ISSN), PMID 28919842 |
+| 17 | (Cut for length) Extra protein stopped adding muscle past about 1.6 g/kg/day total intake | Supported with a limit (protein SUPPLEMENTATION, healthy adults, 6+ week lifting). NOT in the final article, so no protein g/kg/day figure is given to juniors | none in article | Morton 2018, PMID 28698222 |
+| 18 | Playing again within 8 h: 1 to 1.2 g/kg/h carbohydrate for the first 4 h, plus 20 to 40 g protein | Supported but split. The 1.2 g/kg/h carbohydrate for under 4 h recovery and the 20 to 40 g protein dose are in the ISSN abstract. The "within 8 hours" framing and the 1 to 1.2 range are carried over from articles/nutrition/match-day-nutrition.json (ITF statement), which I did not re-read in full text | Matches the match-day article exactly | Kerksick 2017, PMID 28919842. Vicente-Salar 2025 (via match-day-nutrition.json) |
+| 19 | One full rest day a week | Practice-based (no study) | Labelled "my suggestion. No study sets that number." | (none) |
+| 20 | Cold-water immersion eases soreness, based on 17 small, low-quality trials | Supported | "seem to ease soreness, based on 17 small, low-quality trials" | Bleakley 2012, Cochrane, PMID 22336838 |
+| 21 | 12 weeks, 21 men, 10 min cold water after each session: smaller strength and muscle gains than active recovery | Supported | As worded | Roberts 2015, PMID 26174323 |
+| 22 | Meta-analysis of 8 studies: regular CWI harms resistance-training adaptations, no effect on endurance | Supported | As worded | Malta 2021, PMID 33146851 |
+| 23 | Massage: 29 studies, no evidence for strength, jump, sprint, endurance or fatigue, small gains in flexibility and soreness | Supported. The article lists strength, sprints and fatigue and the soreness gain, a shortened but accurate list | "no gain in strength, sprints or fatigue across 29 studies, only small gains in soreness" | Davis 2020, PMID 32426160 |
+| 24 | (Cut for length) Massage rated best tool for soreness and perceived fatigue | Supported (99 studies, soreness and perception markers). NOT in the final article. The article keeps only Davis 2020's "no gain in strength, sprints or fatigue, small gains in soreness" | none in article | Dupuy 2018, PMID 29755363 |
+| 25 | "Keep cold water for the day before you must play again" | Practice-based (lesson's general guidance, no study) | Labelled "my suggestion", and the article says the studies were on training, not tournaments | (none) |
+| 26 | Deloads: about a week of reduced training every 4 to 6 weeks, fewer sets, same exercises | Practice-based. Interviews with 18 coaches, a survey of 246 athletes and a Delphi. All in strength and physique sports (powerlifting, weightlifting, bodybuilding). No outcome trial | "The evidence is mostly practice ... in strength and physique sports". Interviews: 5 to 7 days every 4 to 6 weeks. Survey: 6.4 days every 5.6 weeks | Bell 2022, PMID 36619355. Rogerson 2024, PMID 38499934. Delphi: Bell 2023, PMID 37730925 (not cited in the text) |
+| 27 | Taper meta-analysis: best was about 2 weeks, volume down 41 to 60%, intensity and frequency kept | Supported, but about peaking for competition | "That's about peaking for an event. Using it for a lighter week mid-season is a coaching choice. The studies didn't test it." | Bosquet 2007, PMID 17762369 |
+| 28 | 39 resistance-trained adults, one full week off in the middle of 9: smaller lower-body strength gains, same muscle growth | Supported (one RCT, total rest, not a lighter week) | As worded. "My read is to cut the volume and keep training" is flagged as an inference | Coleman 2024, PMID 38274324 |
+| 29 | Low energy availability affects bones, immunity, periods in girls, and boys too | Supported (consensus) | As worded. Qualitative only | Mountjoy 2014, PMID 24620037. Mountjoy 2023, PMID 37752011 |
+| 30 | Signs of overreaching can have other causes (illness, infection, low intake, low iron, too little sleep) and only a doctor can tell | Supported (Meeusen lists exclusion of disease, infection, caloric restriction, low carbohydrate or protein, iron deficiency). Short sleep and respiratory infection: Walsh 2021 | Qualitative, with "only a doctor can sort out which" | Meeusen 2013, PMID 23247672 |
+| 31 | "If several signs last around two weeks, see a doctor" | Practice-based (the course's C1 rule, no study) | Labelled "my rule of thumb, not a studied cut-off" | (none) |
+
+## (c) LESSON FIXES (TPS lesson `recovery-adaptation` and its English twin)
+
+1. **The lighter-week rule "RPE stays the same" is a design choice, not what the deload literature says.** Coach surveys describe fewer sets and often LOWER effort and load (higher reps in reserve). Only the taper meta-analysis keeps intensity. The lesson says "the RPE stays the same", which is fine as the programme's rule, but it should not read as the research finding. The lesson already says the taper idea is "our practical rule", so just keep that sentence and never add "research shows" to the RPE part.
+2. **The Coleman 2024 sentence ("stopped training completely ... gained less leg strength ... That's why a lighter week doesn't stop training. It only cuts the volume") draws a conclusion the study did not test.** The trial compared one week of NO training with training straight through. It says nothing about a lighter week. Reword to "my read" or "this study is a reason not to stop completely". Also name that it was 39 adults and muscle growth did not differ.
+3. **"Fitness minus fatigue ... fitness comes back a bit higher" should keep the "model, not law" wording** (it does). Do not add numbers (the lesson has none). The English twin matches.
+4. **"Getting ill a lot, like one cold after another" as an overtraining sign** has no direct source in the abstracts read. Walsh 2021 links sleeping under 7 h with respiratory infection in the general population. Meeusen lists infection as something to rule out. Keep it only as a "see a doctor" item, never as a sign of overtraining.
+5. **The course-specific lines are correctly removed from the public article** (Club A, Court B, "+ Strength and mobility", Coach tab, "the card", RPE 7 for under-16s, links to other lessons). Nothing to fix in the lesson for these.
+6. **The failure section's "Under 16: RPE 7 means always about 3 good reps in reserve"** is a programme rule with no study. It stays in the lesson, but the public article only says "stop a set a couple of reps short" as the author's habit.
+
+## (d) Could not verify
+- The full text of the ITF/WTA/ATP statement (Vicente-Salar 2025, PMID 40840558): only the abstract ("food first") was readable. The "within 8 hours, 1 to 1.2 g/kg/h, 20 to 40 g protein" numbers come from match-day-nutrition.json and are supported by the ISSN position stand (1.2 g/kg/h under 4 h, 20 to 40 g protein per dose), but I could not confirm the exact "8 hours" wording in the statement.
+- The ACSM/AND/DC position (Thomas 2016, PMID 26920240) abstract has no numbers. It is not cited as a source of any number.
+- A direct study of "supercompensation" as a time course in athletes: none found. The article makes no claim that it happens on a schedule.
+- Any padel-specific study on recovery time course, deloads or cold-water use: none found, and the article says so.
+- Teen-athlete data for deloads, cold-water immersion or recovery times: all the studies read are in adults. The article says "most research is in adults".
+- The Banister fitness-fatigue model's own original paper was not read. The model is described qualitatively, with no numbers.
+- Whether the deload survey figures apply to tennis or padel: they come from strength and physique sports only.
+
+## (e) Doctor / dietitian to check
+- **Doctor to check:** the overreaching signs list and the "see a doctor if several signs last around two weeks" line. The cold-water caution for heart or blood pressure problems. The parents' callout (a player eating less, worried about weight, or with missed periods).
+- **Dietitian to check:** the "playing again within 8 hours" carbohydrate and protein numbers, the 1.6 g/kg/day protein line, and the "growing player needs enough food, no weight-loss diets without a doctor" line. No supplement advice is given anywhere.
+- The article gives no advice on supplements, max tests or medication.
+
+## (f) Sources (14 groups, every PMID read on PubMed 2026-10-02 unless marked)
+1. Meeusen R et al. ECSS/ACSM consensus on the overtraining syndrome. Med Sci Sports Exerc 2013;45(1):186-205. PMID 23247672, doi 10.1249/MSS.0b013e318279a10a
+2. Kellmann M et al. Recovery and performance in sport: consensus statement. Int J Sports Physiol Perform 2018;13(2):240-245. PMID 29345524, doi 10.1123/ijspp.2017-0759
+3. Vermeire K et al. The fitness-fatigue model: what's in the numbers? IJSPP 2022;17(5):810-813. PMID 35320776. Background only (not cited in the text): Kiely J. Periodization theory: confronting an inconvenient truth. Sports Med 2018;48(4):753-764. PMID 29189930
+4. Soares S et al. J Strength Cond Res 2015;29(9):2594-9, PMID 25807025. And Ferreira DV et al. J Strength Cond Res 2017;31(1):71-79, PMID 27100318 (time course of recovery in trained men)
+5. Morán-Navarro R et al. Time course of recovery following resistance training leading or not to failure. Eur J Appl Physiol 2017;117(12):2387-2399. PMID 28965198
+6. Grgic J et al. Training to failure or non-failure, meta-analysis. J Sport Health Sci 2022;11(2):202-211. PMID 33497853
+7. Gescheit DT et al. Consecutive days of prolonged tennis match play. IJSPP 2015;10(7):913-20. PMID 25710259
+8. Damas F et al. Muscle damage and muscle protein synthesis in hypertrophy. Eur J Appl Physiol 2018;118(3):485-500. PMID 29282529
+9. Hirshkowitz M et al. NSF sleep duration recommendations. Sleep Health 2015;1(1):40-43, PMID 29073412. And Walsh NP et al. Sleep and the athlete. Br J Sports Med 2021, PMID 33144349
+10. Vicente-Salar N et al. ITF/WTA/ATP Expert Group Statement on Nutrition in High-Performance Tennis. Int J Sport Nutr Exerc Metab 2025;35(6):557-594. PMID 40840558, doi 10.1123/ijsnem.2025-0001 (abstract only). Kerksick CM et al. ISSN position stand: nutrient timing. J Int Soc Sports Nutr 2017;14:33, PMID 28919842. Background only (not cited in the text): Morton RW et al. Br J Sports Med 2018;52(6):376-384, PMID 28698222
+11. Roberts LA et al. J Physiol 2015;593(18):4285-301, PMID 26174323. Malta ES et al. Sports Med 2021;51(1):161-174, PMID 33146851. Bleakley C et al. Cochrane 2012;CD008262, PMID 22336838
+12. Davis HL et al. BMJ Open Sport Exerc Med 2020;6(1):e000614, PMID 32426160. Background only (not cited in the text): Dupuy O et al. Front Physiol 2018;9:403, PMID 29755363
+13. Bell L et al. Front Sports Act Living 2022;4:1073223, PMID 36619355. Rogerson D et al. Sports Med Open 2024;10(1):26, PMID 38499934. Bosquet L et al. Tapering meta-analysis. Med Sci Sports Exerc 2007;39(8):1358-65, PMID 17762369. Coleman M et al. PeerJ 2024;12:e16777, PMID 38274324
+14. Mountjoy M et al. IOC consensus on RED-S. Br J Sports Med 2014;48(7):491-7, PMID 24620037. Mountjoy M et al. 2023 IOC REDs consensus. Br J Sports Med 2023;57(17):1073-1097, PMID 37752011

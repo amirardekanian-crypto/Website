@@ -1,0 +1,114 @@
+{
+  "id": "why-strength",
+  "icon": "💪",
+  "group": "Physical qualities",
+  "order": 10.5,
+  "title": "Why strength training matters for tennis",
+  "summary": "What strength training changes in your body, how it helps on court and keeps your body robust, what it means for teenagers, and which common beliefs don't match the research.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "What is strength training?",
+      "p": [
+        "Strength training means making your muscles work against a resistance, and adding a little more of that resistance slowly, week by week. The resistance can be weights, bands or your own body weight.",
+        "In your programme, strength is built mostly in your gym sessions. The goal is to move faster and hold up better on court. Bigger muscles aren't the goal.",
+        "This lesson is about why. Which main lifts you do, how you set the weight with RPE and how you progress are covered in the lesson \"Strength for tennis\", and your programme sets them for you."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Strength training for tennis means slow, steady progress with clean technique. It isn't bodybuilding and it isn't lifting the heaviest weight you can."
+    },
+    {
+      "h": "How does your body respond to strength training?",
+      "p": [
+        "Your body gets used to what you regularly ask of it, and gets a bit more ready for next time. That change is built between sessions, with enough sleep and food. The lesson \"Recovery and adaptation: how the body gets stronger\" explains it fully.",
+        "Strength training changes four things in your body:"
+      ],
+      "ol": [],
+      "list": [
+        "Nervous system: in the first weeks, a big part of getting stronger comes from your brain and nerves. Your body learns to use more muscle fibres at once and to make your muscles work together better. In children, most strength gains come this way.",
+        "Muscle: muscle fibres slowly get stronger and a bit thicker. This starts in the first weeks, but it's slow.",
+        "Tendon: tendons connect muscle to bone. In studies on adults, heavy, controlled loading made them stiffer.",
+        "Bone: bone responds to load too. During the growing years, activities that load the bones helped build bone, but the effect was small. Enough calcium in food mattered too."
+      ],
+      "warn": "",
+      "callout": "Getting stronger isn't only about bigger muscles. Your nerves, tendons and bones change with training too."
+    },
+    {
+      "h": "What gets better on court?",
+      "p": [
+        "Tennis is short, quick steps, sudden stops, changes of direction and powerful shots. The lesson \"What tennis asks of your body\" covers this in more detail. Strength sits behind all of these movements:"
+      ],
+      "ol": [],
+      "list": [
+        "First step and acceleration: stronger legs push the ground harder. In research, stronger legs went with faster short sprints. In children and teenagers, strength training even improved sprint speed more than jump training did.",
+        "Braking and changing direction: to stop fast, your muscles have to handle a lot of force while they're braking. Players who are stronger at this tend to change direction faster. That is a link seen in comparison studies, not proof. The lesson \"Speed, braking and change of direction\" explains it.",
+        "Reaction: reacting to the ball and your opponent doesn't seem to come from strength alone. It has its own training. See the lesson \"Agility and reaction\".",
+        "Serve and shots: a 2026 review of 20 tennis studies with 606 players found that resistance training raised serve speed. Jump, core and mixed programmes did too. Not every study found faster shots, accuracy didn't improve, and one programme even made it worse. Strength doesn't replace technique.",
+        "The end of long matches: in runners, strength training often meant each step used less energy. It makes sense that a stronger body holds its movement better in the second hour of a match too, but direct research in tennis is still thin. You need aerobic fitness as well (see the lesson \"Aerobic fitness for tennis\")."
+      ],
+      "warn": "",
+      "callout": "Strength doesn't replace tennis or technique. It helps your body do what you've learned in tennis with more force."
+    },
+    {
+      "h": "A body that can handle the load of tennis",
+      "p": [
+        "Every week of tennis means thousands of steps, stops, small jumps and serves. Your muscles, tendons and bones have to handle that repeated load.",
+        "Strength training raises what your body can handle, slowly. It adds load in a controlled way, step by step, so your tissues have time to adapt. That's why your programme has robustness work alongside the strength work (the lesson \"Building a robust body\" explains it).",
+        "Researchers put together 25 trials with more than 26,000 people. Programmes that included strength training went with fewer sports injuries. Programmes that were only stretching didn't show that.",
+        "This is a research finding, not a promise. I couldn't find a tennis or padel trial that tests it, and no programme can say someone won't get injured."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "Pain that isn't muscle burn, like sharp pain or joint pain: stop that exercise right there, read the lesson \"Pain or soreness? And the red flags\", and message me in the Coach tab.",
+      "callout": "Strength training raises what your body can handle, but it can't promise you won't get hurt. Always take pain seriously."
+    },
+    {
+      "h": "Teenagers: safe and useful when it's done right",
+      "p": [
+        "A Canadian position paper says strength training for children and teenagers is relatively safe when it's done properly. The conditions are gradual progress and teaching and supervision by qualified people. A 2014 international consensus, endorsed by sports medicine and paediatric groups, sets out how to do it well.",
+        "For players under 16, these are sensible limits: weighted strength lifts at RPE 7 at most (you still have 3 good reps left), at least 6 reps, no max testing, and an adult present for the whole session. These are the course's own practical rules, not numbers from an international guideline, and they are cautious because an adult being there isn't the same as a qualified coach watching. Your programme is written for your age, so follow what's on your cards (the lesson \"A guide for parents\" explains the adult's role).",
+        "A few more important points for teenagers:"
+      ],
+      "ol": [],
+      "list": [
+        "Strength and muscular endurance: both improve well with the right training and gradual progress.",
+        "Balance and coordination: good strength training improves how well you control your movement too.",
+        "Bone: during the growing years, bones respond to sports loading. The effect is small, but together with enough calcium it helps build bone. The lesson \"Eating before, during and after training\" tells you which foods give you calcium.",
+        "Growth spurt: strength training keeps going. Only jumps, sprints and hard braking are cut back. See the lesson \"Growth spurt: a guide for players and parents\", and tell me in the Coach tab if you're growing fast so I can adjust your programme."
+      ],
+      "warn": "",
+      "callout": "The decision is yours and your family's. If you're unsure about strength training, ask a doctor or physio, or message me."
+    },
+    {
+      "h": "Common beliefs, and what the research says",
+      "p": [
+        "You'll hear these a lot. The research shows a different picture:"
+      ],
+      "ol": [],
+      "list": [
+        "\"It makes you bulky and heavy.\" In a 9-month study of 24 female college tennis players, body weight didn't change in any of the three groups. The group on a multi-set, periodised programme gained strength and serve speed. In children, most strength gains come from the nerves, not from bigger muscles.",
+        "\"It makes you slow.\" The opposite. In research, stronger legs went with faster short sprints. In your programme, strength is trained alongside speed and jumping, not instead of them.",
+        "\"It makes you stiff.\" In a review of 11 trials, strength training improved range of motion about as much as stretching did. The trials differed a lot, so take it as a guide.",
+        "\"It stunts your growth.\" Supervised weight training programmes showed no negative effect on the height or weight gain of children and early teens. The studies were on children before and early in puberty.",
+        "\"It's only for professional athletes.\" Expert guidelines say it suits children and teenagers too, with proper coaching and slow progress. Expert reviews say a stronger teenager is better ready to learn complex movements and to handle training and matches.",
+        "\"Tennis and running are enough.\" Tennis builds tennis fitness. It doesn't seem to load all your tissues a bit more each time, step by step, but that is reasoning, not a study result. Expert reviews say that training only one sport too early may build less general fitness."
+      ],
+      "warn": "",
+      "callout": "In research, strength training done right hasn't made players slow or stiff, and it hasn't stunted growth."
+    },
+    {
+      "h": "Strength in your programme",
+      "p": [
+        "Your programme builds strength cycle by cycle, around your tennis and your match calendar. Some weeks are lighter on purpose, and some lifts get retested at the end of a cycle.",
+        "The numbers for each session are on that session's card. The lessons \"How to read a session card\" and \"RPE and choosing your weight\" explain how to read them.",
+        "Strength you don't train slowly fades. Don't drop it in match weeks either. The lesson \"Training around tennis and matches\" shows how to fit sessions around matches, and if a busy match week is coming, message me in the Coach tab and I'll adjust it."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Consistency beats intensity. Regular sessions over months build more than a few very hard ones. This is a coaching view, not a study result."
+    }
+  ]
+}

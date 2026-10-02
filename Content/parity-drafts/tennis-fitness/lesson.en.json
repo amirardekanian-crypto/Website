@@ -1,0 +1,118 @@
+{
+  "id": "tennis-fitness",
+  "icon": "❤️",
+  "group": "Physical qualities",
+  "order": 15,
+  "title": "Tennis fitness",
+  "summary": "What kind of fitness tennis needs, how your programme builds it, and how to measure your progress.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "What kind of fitness does tennis need?",
+      "p": [
+        "Tennis isn't steady running. Most points last under 10 seconds, and a short rest comes after each one.",
+        "In competitive matches, work to rest is usually about 1 to 3 up to 1 to 5. For every second of hard work, 3 to 5 seconds of rest. These numbers change with the level, the player's style, sex, the court surface and the ball.",
+        "A match often lasts more than an hour and sometimes several hours. The quick, explosive efforts sit inside longer stretches of light and moderate activity."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Tennis fitness means two things together. Repeating short, fast efforts, and an aerobic base that helps you recover between them. The bigger picture is in the lesson on what tennis asks of your body."
+    },
+    {
+      "h": "Why the aerobic base matters",
+      "p": [
+        "The aerobic system is the part of your body that makes energy using oxygen and lets you keep working for a long time. Between points, it helps you get ready for the next one. Reviews of repeated sprinting name energy supply, including the oxygen system, as one of the main limits.",
+        "In one study on 20 advanced and elite male players, the ones with better aerobic fitness played a set of tennis at a lower relative intensity. The same tennis was easier for them.",
+        "Research has shown that fatigue can clearly reduce shot accuracy. A good aerobic base probably helps you reach that point later. Studies linking aerobic fitness to repeated sprinting have mixed results, so this is a likely benefit, not a promise."
+      ],
+      "ol": [],
+      "list": [
+        "Tennis itself builds aerobic fitness too. Your programme adds to it, it doesn't replace it.",
+        "An aerobic base isn't built overnight. It takes a few weeks of regular training.",
+        "If you get tired at the end of matches or in long rallies, court conditioning is where you'll gain the most."
+      ],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "Court work or general HIIT?",
+      "p": [
+        "HIIT means high intensity interval training. Short, hard efforts with short rests, like fast runs on a track. VO2max is the most oxygen your body can use in a minute, a number for your aerobic capacity.",
+        "In one study on 29 boys aged 13 to 14, 6 weeks of on-court tennis training raised VO2max about as much as running HIIT, both by about 5%. The court group got better at agility and hitting skill, and the HIIT group got better at the 400 m run.",
+        "In another study on 24 boys aged 13 to 14, court training plus repeated sprints improved 5 m speed, repeated sprints and agility more than court training plus HIIT. The players also found it less hard and enjoyed it more.",
+        "In a study on 31 competitive male players, HIIT gave a bigger gain in tennis-specific endurance than repeated-sprint training. So no method won on everything."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "To be honest, these studies are small and only looked at boys and men. The results are promising, not final. Still, they're a good reason to build your conditioning on court, with tennis movements."
+    },
+    {
+      "h": "How your programme builds it",
+      "p": [
+        "Your aerobic fitness is built in two places. Speed and court days often include a short set of repeated sprints, and if you get tired at the end of matches or in long rallies, Amir adds court conditioning sessions. A typical build looks like this:"
+      ],
+      "ol": [],
+      "list": [
+        "Base: Shuttle Run and Baseline Shuffle at a steady effort (RPE 7). About 10 reps each, with work going from 15 to 25 seconds and rest coming down from 45 to 35 seconds.",
+        "Build: Court Intervals, short efforts like points. 8 to 10 seconds with 24 to 32 seconds of walking, 12 to 15 reps at RPE 8. Steady Baseline Shuffle carries on alongside.",
+        "Games: Court Intervals set out as games. Each game is 6 points of 8 or 9 seconds with 24 to 27 seconds of rest, 9 or 10 games, and 75 to 90 seconds of easy walking between games.",
+        "Onto the court: the same games with Shadow Point Intervals. Each rep is a point without a ball, with a split step and shadow shots.",
+        "Repeated Sprint: short sets, first over 10 m, then 15 m, and later Wide-Ball Repeated Sprint.",
+        "Lighter weeks: fewer reps and games, but the same effort."
+      ],
+      "warn": "",
+      "callout": "What goes up week by week is first the amount of work, then how much it looks like a real point. From steady running, to short efforts, then to games. This build is the course's own plan, and nobody has tested it as one package. It is a practical rule of the course, not a study result."
+    },
+    {
+      "h": "A game on the card",
+      "p": [
+        "When your coach writes intervals as games, the card might say 10 games x 6 x 8 s, RPE 8, rest 24 s and 1m 15s between games. That means 10 games, each game is 6 points, and each point is 8 seconds."
+      ],
+      "ol": [],
+      "list": [
+        "Each point: 8 seconds of hard work. Split step, 2 to 4 quick changes of direction and back to the middle.",
+        "Between points: walk slowly for 24 seconds.",
+        "After the 6th point: walk slowly for 1 minute 15 seconds.",
+        "RPE 8: quick and serious, but not all-out. The points in the last game should be just as clean.",
+        "RPE 7 in the base phase: a steady effort. Harder than a warm-up, but a pace you can hold to the end.",
+        "These plain-words descriptions of RPE 7 and RPE 8 are the course's own, not from a study."
+      ],
+      "warn": "",
+      "callout": "How to read the whole card is in the lesson \"How to read your session\"."
+    },
+    {
+      "h": "During a growth spurt: ease off a bit",
+      "p": [
+        "In a growth spurt, bones grow fast and tendons pull hard where they attach to growth areas, like just below the kneecap and the back of the heel. The running, braking and turning in conditioning put a lot of load on exactly those spots.",
+        "So during this time, cut your running conditioning to about half, or do about half of it on a stationary bike. Same work time, same rest and same effort. This is the course's own rule, not a study result."
+      ],
+      "ol": [],
+      "list": [
+        "No bike? A cross trainer or a rowing machine works with the same times.",
+        "Don't move sprints, braking and reaction drills to the bike. They're movement skills, and how much to cut them is in the growth spurt lesson.",
+        "Strength, upper body and trunk work carry on as written.",
+        "A teenager in a growth spurt with knee or heel pain should not do the Yo-Yo test."
+      ],
+      "warn": "A growing player with pain right below the kneecap or at the back of the heel, even mild: no sprints, jumps, braking or running conditioning until a doctor or physio has seen it. Upper body and trunk work is fine. Tell Amir in the Coach tab.",
+      "callout": "Signs of a growth spurt and how to cut training back are in the lesson on growth spurts for players and parents."
+    },
+    {
+      "h": "The Yo-Yo test: see your progress",
+      "p": [
+        "The Yo-Yo test (Yo-Yo IR1) is a general test of repeated short, fast runs with short rests, a pattern similar to tennis. It repeats well from day to day, but that research is mostly in football, and there is no tennis check of it that we know of. Each shuttle is 2 x 20 m, then 10 seconds of recovery, and the speed goes up bit by bit until you can't make it in time.",
+        "If your coach sets it, it's always the last test of the day, because it leaves you tired. Amir tells you when to run it."
+      ],
+      "ol": [],
+      "list": [
+        "The number to compare with yourself is distance. As the course's own rule of thumb, a gain of about 160 m (4 shuttles) or more above your starting score is probably real progress. That number is not from a published study. Results also vary from one test to the next, so a small gain means little.",
+        "You can estimate VO2max from the result too. It is only an estimate and it can be off for one person, so go by distance.",
+        "Same floor, same shoes and same time of day every time. A different floor can change the result.",
+        "One weaker result doesn't change your plan on its own."
+      ],
+      "warn": "This test goes to full exhaustion. Dizziness, pain or pressure in the chest, unusual shortness of breath or a strange heartbeat? Stop straight away and talk to a doctor again before you train. Under 16: an adult is there the whole time.",
+      "callout": ""
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "id": "missed-sessions",
+  "icon": "📅",
+  "group": "Body & health",
+  "order": 32,
+  "title": "Missed sessions and coming back after a break",
+  "summary": "Missed a session or had time off? See where to pick up, which sessions count, and how to come back after illness or injury.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "Everyone misses sessions sometimes",
+      "p": [
+        "School, exams, tournaments, illness. Everyone misses sessions sometimes, and that's normal.",
+        "Never squeeze missed sessions into one week. Push your programme back instead. It waits for you.",
+        "Tell Amir in the Coach tab when you miss sessions or have time off. He sees your logs and he'll adjust your programme if it needs it.",
+        "To be honest, we found no study of coming back after a break in tennis or padel players, or in junior players. General research suggests a short break costs little strength: in 12 power athletes, 14 days off lifting did not significantly change bench press, squat or vertical jump. The numbers in this lesson are the course's own practical guide, not a study result."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Do a missed session later, one at a time. Nothing gets squeezed in or skipped to “catch up”."
+    },
+    {
+      "h": "How many days has it been? Where to pick up",
+      "p": [
+        "Count the days since your last main session that counts as done. Tournament weeks and taper weeks before a big match aren't missed days, because you were training in them. These day bands are the course's own rule, not a study result."
+      ],
+      "ol": [],
+      "list": [
+        "Up to 7 days (about one session): carry on with the next session. Your programme just shifts back and nothing else changes.",
+        "8 to 14 days (about a week): carry on from where you stopped.",
+        "15 to 28 days (2 to 4 weeks): repeat the last week you finished. Haven't finished a week yet? Start from week 1.",
+        "29 to 56 days (1 to 2 months): go back to week 1 of the cycle you were in.",
+        "57 to 84 days (2 to 3 months): same as above. Before you compare test numbers, redo your tests like you did at the start, so you have a fresh starting number.",
+        "More than 84 days (over 3 months): go back to week 1 of your previous cycle (week 1 of this one if it's your first), and redo your tests too."
+      ],
+      "warn": "Was the break because of illness or injury? Read “Coming back after illness” and “Coming back after injury” too.",
+      "callout": "Whichever week you repeat or cycle you restart, do it as written on the cards. No week gets skipped to catch up. After any break of more than a week, message Amir in the Coach tab and he'll move your programme to the right place."
+    },
+    {
+      "h": "Which sessions count as done?",
+      "p": [
+        "Only the main sessions in your programme move you forward. In a lighter test week, the test day counts as one of them."
+      ],
+      "ol": [],
+      "list": [
+        "A main session you did as written: counts. Next time, do the next session.",
+        "A session you finished, but changed or dropped one exercise because of the pain ladder: counts.",
+        "A session you stopped halfway because of pain: doesn't count. Next time, do the same session again.",
+        "A skipped session: doesn't count.",
+        "An extra session: doesn't replace a main session and doesn't count towards the week.",
+        "Tournament week routines and taper sessions before a big match: your place in the programme waits. They don't count, but they aren't missed either."
+      ],
+      "warn": "",
+      "callout": "Log every session in the app. That's how you and Amir both know where you are."
+    },
+    {
+      "h": "The week rules",
+      "p": [
+        "A programme week runs Monday to Sunday. These rules come from the course's own practice, not from a study. They stop falling behind from turning into cramming:"
+      ],
+      "ol": [],
+      "list": [
+        "No more than one S&C session a day, main or extra.",
+        "Never more main sessions in a week than your programme lists. Being behind never means extra sessions.",
+        "A new programme week only starts on a Monday. You can fall behind, but you never jump ahead.",
+        "Closing the week on Sunday, in a 3-session week: done 2 or 3 main sessions? The week is complete, so let the missed one go. Done 0 or 1? The week isn't complete and the rest move to next week.",
+        "Lighter weeks (deload and test weeks) are never skipped.",
+        "Don't repeat a week more than twice. The third time, move on to the next week. At that point, training more regularly is the main thing to fix.",
+        "A missed session never goes on match day, the day before a match, a tournament week or taper weeks. A taper starts on time, even if you're behind.",
+        "The spacing rules around tennis (in the lesson “Training around tennis and matches”) apply to moved sessions too."
+      ],
+      "warn": "",
+      "callout": "Example: in week 6 you only did your first session. Next week is still week 6. Do the other two, and week 7 starts the Monday after."
+    },
+    {
+      "h": "Coming back after illness",
+      "p": [
+        "Don't train with a fever, or with an illness below the neck (chest cough, body aches, stomach pain or diarrhoea). If a fever drags on or you're getting worse, see a doctor.",
+        "Start coming back when you feel well and you've had no fever for at least 24 hours, without medicine to bring the fever down. If a doctor saw you for this illness, start when they say training is OK. If you're not sure, see a doctor first.",
+        "Two common rules are used in this section: 24 hours without fever, and the above-or-below-the-neck check. They are practical rules, not study results."
+      ],
+      "ol": [],
+      "list": [
+        "A cold only above the neck (runny or blocked nose, mild sore throat) and no fever: you can usually train. Stop if you feel worse as you go.",
+        "Once the conditions above are met, carry on with the next session and do it as written.",
+        "Away for more than 7 days? The table in “How many days has it been?” tells you which week to pick up from."
+      ],
+      "warn": "After an illness with fever: if you get chest pain, feel faint, your heart races or beats irregularly, or you're much more breathless than usual, stop and see a doctor.",
+      "callout": "After illness, sessions are done as written. Only your starting point comes from the missed-days table."
+    },
+    {
+      "h": "Coming back after injury",
+      "p": [
+        "Your programme isn't a treatment or rehab plan. Only come back when a doctor or physio says you can train fully with no limits. The missed-days table still applies. For example, 5 weeks away means going back to week 1 of that cycle.",
+        "If they say “yes, but with limits”, follow their plan for that area and don't use your programme for that area yet. The rest of your body can train. Send Amir what they said in the Coach tab and he'll build your programme around it.",
+        "Once you're fully cleared, do the sessions as written. If pain comes back, follow the pain ladder in the lesson “Pain or soreness? And the red flags”.",
+        "Under 16, all the under-16 limits in your programme still apply when you come back.",
+        "What to ask your doctor or physio, and how a comeback is staged, is in the lesson “Training with an injury and coming back from it”."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "Same problem back after your doctor or physio cleared you? Stop and get it checked again.",
+      "callout": "Pain back? Follow the pain ladder. If the same pain comes back, stop training that area and book a check."
+    },
+    {
+      "h": "Coming back after a serious red flag",
+      "p": [
+        "After a level 1 red flag (chest pain, fainting, an irregular heartbeat, unusual breathlessness, a blow to the head, or numbness and weakness in both legs), only come back once a doctor clears you. After that, sessions are done as written."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "After a blow to the head, finish the return plan the doctor gave you first. If any symptom comes back, stop that day and see a doctor.",
+      "callout": ""
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "id": "recovery-adaptation",
+  "icon": "📈",
+  "group": "Body & health",
+  "order": 34,
+  "title": "Recovery and adaptation: how your body gets stronger",
+  "summary": "How training stress turns into getting stronger through recovery, why your programme has lighter weeks, and the signs you're overdoing it.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "From training stress to getting stronger",
+      "p": [
+        "Every training session puts stress on your body. Straight after it you're a bit more tired and weaker than before, not stronger.",
+        "Over the next days, if your body gets enough time, the fatigue goes and your body adjusts itself a little to that stress. We call this adaptation."
+      ],
+      "ol": [
+        "Training stress: a session that asks a bit more than you can do right now.",
+        "Fatigue: a short drop in fitness, soreness and feeling tired.",
+        "Recovery: sleep, food and easy days.",
+        "Adaptation: muscles, tendons, heart and nervous system end up a bit better prepared than before."
+      ],
+      "list": [],
+      "warn": "",
+      "callout": "You don't get stronger in the session itself. It's built in the gaps between sessions, while your body recovers."
+    },
+    {
+      "h": "A simple picture: fitness and fatigue",
+      "p": [
+        "A simple picture helps. Every session has two effects. It raises your fitness a little, which fades slowly, and it raises your fatigue more, which fades faster.",
+        "What shows on any given day is roughly fitness minus fatigue. That's why after a few hard days you can seem weaker, and after a few easier days, better than ever.",
+        "Some books show this as a graph where fitness comes back a bit higher than before after recovery. The picture is good for understanding, but it's not an exact law of the body. Everyone responds at their own speed and in their own way."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Feeling tired after a few hard days isn't a sign of failure. It's part of the process, as long as recovery comes after it."
+    },
+    {
+      "h": "Why do you have lighter weeks?",
+      "p": [
+        "Your programme has lighter weeks built in, and your coach sets when they fall. There are fewer sets but the RPE stays the same, which is the course's own rule, not a study result. The aim is to clear the fatigue of the last few weeks and keep the fitness.",
+        "In studies on cutting training before competition, the best results came when training volume dropped by about 40 to 60% but intensity stayed the same. Those studies were about the 2 weeks before a competition. Using the same idea for one lighter week in the middle of a programme is our practical rule.",
+        "In one study of 39 resistance-trained adults, those who stopped training completely for one week in the middle of 9 weeks of weights gained less leg strength than a group who carried on without a break, though muscle growth was the same. That study tested a week of no training, not a lighter week. Our read is that it's a reason not to stop completely, so a lighter week only cuts the volume."
+      ],
+      "ol": [],
+      "list": [
+        "Same sessions and same moves. Nothing new comes in.",
+        "Fewer jumps, sprints and stops, but still full effort.",
+        "Don't add sets, even if you feel great.",
+        "If Amir has a retest planned, it often falls near a lighter week, when your body is fresher."
+      ],
+      "warn": "",
+      "callout": "A lighter week isn't being lazy. It's the part of the plan that lets the fitness you've built actually show."
+    },
+    {
+      "h": "Why do sets stop before failure?",
+      "p": [
+        "In your programme every set ends at an RPE, which means you still have a few good reps left. Apart from a max test your coach has planned, no set goes to the point where the weight won't come up.",
+        "A review of 15 studies on young adults showed that going to failure isn't needed to get stronger. Strength went up about the same both ways. In another small study of 10 trained men, sets to failure delayed recovery by as much as 24 to 48 hours."
+      ],
+      "ol": [],
+      "list": [
+        "Faster recovery means a fresher body for tennis and for your next session.",
+        "Your technique stays clean, because you're not doing tired, ugly reps.",
+        "Under 16: RPE 7 means always about 3 good reps in reserve. This is the course's own rule, not a study result."
+      ],
+      "warn": "",
+      "callout": "How to set up each set is in the lesson \"RPE and choosing your weights\"."
+    },
+    {
+      "h": "Tennis is training too",
+      "p": [
+        "Your body doesn't care where the stress comes from. Tennis practice, matches and strength training all go on the same account, and school, exams and stress affect recovery too.",
+        "In a small study on 7 male tennis players, 4 days in a row of 4 hour matches made their jumps and sprints weaker, their soreness and fatigue higher and their serves less accurate."
+      ],
+      "ol": [],
+      "list": [
+        "A week with more tennis is a heavier week. Tell Amir in the Coach tab when a big tennis week or a tournament is coming.",
+        "Tell your tennis coach which days you do strength training.",
+        "Tennis and strength on the same day is fine, and the session is done as written. How to order the day and handle match days is in the lesson on training around tennis and matches."
+      ],
+      "warn": "",
+      "callout": "Keep Amir up to date on how many days a week you're playing. He fits your sessions around your tennis, so a big tennis week is a reason to tell him, not to add or skip sessions on your own."
+    },
+    {
+      "h": "Being consistent, not heroic",
+      "p": [
+        "Your body adapts to regular, sensible stress. Three good sessions a week, week after week, usually gives you more than one all-out session that leaves you sore for days."
+      ],
+      "ol": [],
+      "list": [
+        "Don't cram to make up for a missed session, and don't put two sessions in one day.",
+        "Don't add sets or reps to your cards, even on a good day.",
+        "Don't train when you have a fever. Do the session on another day, as written."
+      ],
+      "warn": "",
+      "callout": "Missed a session? The lesson on missed sessions and coming back after a break tells you how to carry on without cramming."
+    },
+    {
+      "h": "Signs you're overdoing it",
+      "p": [
+        "A bit of tiredness and soreness after hard sessions is normal and gets better in a day or two. But when the fatigue sticks around for weeks, it means the stress and the recovery don't match any more."
+      ],
+      "ol": [],
+      "list": [
+        "Tiredness that doesn't go away even with enough sleep and easy days.",
+        "Performance dropping for a few weeks. For example your usual weights feel heavier, or you've got slower on court.",
+        "Worse sleep, low mood, getting irritated easily or not wanting to train.",
+        "In girls: periods coming late or stopping."
+      ],
+      "warn": "None of these signs is a diagnosis on its own. They have lots of possible causes, like illness, low iron, too little sleep or too little food. Only a doctor can find the cause. If you get ill a lot, like one cold after another, tell a doctor about that too. It isn't necessarily a sign of overdoing it.",
+      "callout": "One or two signs for a few days is usually just a hard week. If several signs together last more than about 2 weeks, see a doctor, and tell Amir. This is the course's rule of thumb, not a studied cut-off."
+    },
+    {
+      "h": "Too little food for too much training",
+      "p": [
+        "Your body needs energy for training, growing and everyday life. If you eat too little for the training you do, your body runs short of energy. Experts call this low energy availability.",
+        "It happens in both girls and boys and can affect health and performance, including bones, the immune system, periods in girls and building muscle."
+      ],
+      "ol": [],
+      "list": [
+        "A teenager who is growing and training needs enough food. No weight loss diets without a doctor's advice.",
+        "Eating less to get \"lighter and faster\" can do the opposite.",
+        "Parents: if your player has cut back on food, worries a lot about their weight or their periods have changed, talk to a doctor."
+      ],
+      "warn": "This lesson doesn't diagnose anything. If these signs sound familiar, don't draw your own conclusions. See a doctor.",
+      "callout": "What to eat and when is in the lesson on eating before, during and after training."
+    },
+    {
+      "h": "What to do when you're tired",
+      "p": [
+        "Your programme already has room for recovery. Don't make sessions lighter or shorter on your own. Use these instead, and know that rules like one rest day a week and the 2 weeks are the course's own practical rules, not study results."
+      ],
+      "ol": [
+        "Make your rest days real rest: at least one full day a week.",
+        "Keep a day between hard sessions where you can.",
+        "In a heavy tennis week, tell Amir in the Coach tab so he can adjust your week.",
+        "In a lighter week, don't add anything to your cards.",
+        "Missed a session? Don't cram. Away for 2 weeks or more? Tell Amir, and repeat the last week you finished in full until he says otherwise. More in the lesson on missed sessions and coming back after a break.",
+        "Fix your sleep first. The guide is in the lesson \"Sleep, recovery and performance\"."
+      ],
+      "list": [],
+      "warn": "Chest pain or pressure, fainting, or an unusual heartbeat during training: stop straight away and read the lesson on pain, soreness and warning signs.",
+      "callout": "Fatigue that lasts more than about 2 weeks even with all this is a reason to see a doctor, not a reason to make your sessions lighter."
+    }
+  ]
+}

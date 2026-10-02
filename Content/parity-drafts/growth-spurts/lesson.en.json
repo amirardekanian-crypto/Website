@@ -1,0 +1,127 @@
+{
+  "id": "growth",
+  "icon": "📏",
+  "group": "Body & health",
+  "order": 33,
+  "title": "Growth spurts: a guide for players and parents",
+  "summary": "What a growth spurt is, the signs to look for, and how to adjust training while it's happening.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "What is a growth spurt?",
+      "p": [
+        "A growth spurt is a period when a teenager grows much faster than usual. Scientists call the fastest point of it peak height velocity.",
+        "During this time, bones usually grow first and muscles and tendons catch up a little later. So the body can feel a bit uncoordinated and clumsy for a while, with tighter muscles. That's the usual explanation: research on it is mixed, but it matches what coaches see.",
+        "Age alone doesn't tell you where a player is. Two 14-year-olds can be at very different stages. Lots of players, especially boys, are still growing at 16 and 17."
+      ],
+      "list": [],
+      "callout": "Growing fast is healthy and isn't a warning sign. Changing training for a few weeks is just being careful. This phase passes."
+    },
+    {
+      "h": "Signs of fast growth",
+      "p": [
+        "Any of these can mean a player is in a fast growth phase:"
+      ],
+      "list": [
+        "Shoe size has gone up in the last 6 months. “New shoes again?”",
+        "Trousers or sleeves are suddenly too short.",
+        "Family, school or the tennis coach say they've shot up this year.",
+        "Movement looks less smooth for a while, for example footwork or the serve has gone off.",
+        "Jump or sprint scores have stalled or dropped, with nothing else in training changing.",
+        "Pain just below the kneecap or at the back of the heel. This one always needs a doctor or physio to see it."
+      ],
+      "callout": "Seeing these signs but not measuring height? Be careful and follow the section “What to cut back during fast growth” until the signs settle. Tell Amir in the Coach tab too, so he can adjust your programme."
+    },
+    {
+      "h": "Why do knees and heels hurt?",
+      "p": [
+        "Tendons attach to bone at growth areas. In a growth spurt, the tendon pulls hard on bone that's still soft and growing.",
+        "Just below the kneecap, the patellar tendon pulls on the bony bump at the top of the shin, and this spot can hurt, swell or feel tender to touch. Doctors call the common form Osgood-Schlatter. It's a common growth-area problem, and in one older study it interfered with full training for about 7 months on average.",
+        "At the back or bottom of the heel, the Achilles tendon pulls on the growth area of the heel bone. Doctors call the common form Sever's disease. It's one of the common causes of heel pain in active children.",
+        "Both usually get worse with running and jumping and better with rest. Both usually settle as growth finishes, but that's no reason to play through pain."
+      ],
+      "list": [],
+      "callout": "The app will never tell you which one you have. Only a doctor or physio can tell you that."
+    },
+    {
+      "h": "What to cut back during fast growth",
+      "p": [
+        "The rule in one sentence: cut back jumps, sprints and high-impact brakes, and keep strength and technique.",
+        "Cutting back means fewer sets or reps, not lower quality: every rep is still fast and clean, and rest times stay the same. Round the numbers, and if you're not sure, round down.",
+        "These sizes, and the ban on depth jumps, drop jumps and max tests while the spurt lasts, are the course's own cautious rules. They are not a study result, and no trial has tested them."
+      ],
+      "list": [
+        "Jumps: about half. Your session says 3 x 10? Do 3 x 5. Warm-up pogos go from 20 to 10.",
+        "Sprints: about 60% of the reps. Your session says 6 reps? Do 4.",
+        "Brakes, changes of direction and reaction drills: about half. Your session says 8 reps? Do 4.",
+        "Running-based conditioning: cut the running and turns the same way, or do about half of it on a bike.",
+        "Don't make anything harder during this time. No harder jumps, longer sprints, faster approaches or sharper angles. Strength carries on as planned.",
+        "Depth jumps, drop jumps and max tests: none of them while fast growth lasts."
+      ],
+      "callout": "Never cut twice. Always start from that week's number in your session and cut once. Your session says 3 x 10 jumps? Do 3 x 5 and don't take anything else off."
+    },
+    {
+      "h": "What to keep",
+      "p": [
+        "In this phase, muscles and tendons usually catch up with bone a little later. Strength is the lowest-impact thing you can keep, because lifting hits the body far less than jumps and sprints do; that is reasoning, not a trial result. In trials on people aged 12 to 40, strength training cut sports injuries by about two thirds, though few of those people were growing players."
+      ],
+      "list": [
+        "Strength work (the weights): all of it, progressing week by week as planned.",
+        "Med ball throws, and your calf, groin, hamstring, shoulder, forearm and trunk work: all of it.",
+        "Warm-up and mobility: all of it. Only the warm-up pogos get halved.",
+        "Landing drills with no jump, like the Snap Down: keep them. They're technique work, not jumps.",
+        "Under 16: the under-16 rules come first. That means an adult present, weights no higher than RPE 7, at least 6 reps and no more than 60 jumps a session. Then cut back the jumps, sprints and brakes that are left. These are the course's own rules, not a study result.",
+        "Jump and sprint scores may stall or drop in this phase. That can be the effect of growth, not failure. Write “growth phase” next to the test result."
+      ],
+      "callout": "This doesn't change tennis. Tell the tennis coach the player is growing fast. Tennis decisions are theirs to make."
+    },
+    {
+      "h": "How long? And how to come back",
+      "p": [
+        "Follow the growth guide for at least 8 weeks. One quiet month is often a measuring error or just a pause. A real growth spurt usually lasts several months, and that's normal.",
+        "After those 8 weeks, growth has slowed if you measure height and it has grown less than about 0.5 cm a month for at least 2 months (less than 1 cm in 2 months, or less than 1.5 cm in 3 months). If you don't measure, it has slowed if the signs have been gone for about 2 to 3 months.",
+        "To be honest, the growth numbers come from football research on boys. We have no study on tennis, padel or girls. The 0.6 cm a month figure comes from one study of 101 football boys, and about 7 cm a year from a study of 49 academy boys; the 2 and 3 month figures are just multiples of it.",
+        "The slow-down rule of less than about 0.5 cm a month, the size of the cuts and the 8 weeks are our practical numbers, and no study has tested them. We're not sure they're perfect. They're the best guide we have, and a few careful weeks cost very little.",
+        "In one small expert consensus (9 football practitioners), injury risk stays higher for about a year after the peak. So “full” means back to plan, not ignoring pain."
+      ],
+      "list": [
+        "Weeks 1 and 2 after growth slows: jumps about three quarters, sprints about 80%, brakes about three quarters. Pick up progress from where you left off. Still no depth jumps or drop jumps.",
+        "From week 3: everything back to full, as planned, but keep watching for pain."
+      ],
+      "callout": "If fast growth starts again, go back to “What to cut back during fast growth”. The 8 weeks start again."
+    },
+    {
+      "h": "Optional: measuring height at home",
+      "p": [
+        "This is optional. Nobody collects these numbers. It just helps you spot fast growth.",
+        "Do it about once a month, in the morning, within 2 hours of waking up and before training or tennis. Use the same wall, the same book and the same metal tape measure every time, and the same adult if you can.",
+        "A home reading can be off by about half a cm; even a doctor with a proper stadiometer is off by about 0.2 to 0.3 cm. So don't over-read one month. The average or middle-of-three method and the 1.5 cm rule are the course's own practical methods."
+      ],
+      "list": [
+        "Take off shoes and socks. Take out hair ties and clips and flatten the hair on top.",
+        "Stand with your back to the wall on a hard floor. Heels together and touching the wall, bum and shoulder blades against the wall too. Look straight ahead.",
+        "Breathe in and stand tall, without going up on your toes.",
+        "The adult puts a hardback book flat on your head, back edge against the wall, and presses gently.",
+        "Draw a pencil line under the book on a paper strip on the wall and write the date. Measure from the floor to the line, to the nearest millimetre.",
+        "Measure once more. If the two numbers are 0.5 cm or less apart, take the average. If they're further apart, measure a third time and take the middle number.",
+        "Fast growth here means 0.6 cm or more in 1 month, 1.2 cm or more in 2 months, 1.8 cm or more in 3 months, or about 7 cm or more in a year. 0.6 a month and about 7 a year are one threshold, from football studies on boys, and the 2 and 3 month figures are just multiples."
+      ],
+      "callout": "One big month is enough to be careful. But to say growth has slowed, look at at least 2 months. More than 1.5 cm in one month, or a line lower than the last one, is probably a measuring error. Measure again."
+    },
+    {
+      "h": "When should you see a doctor or physio?",
+      "p": [
+        "In a growing player, where it hurts matters more than how much it hurts.",
+        "General warning signs, like chest pain, fainting or a blow to the head, are in the lesson “Pain or soreness? And red flags”."
+      ],
+      "list": [
+        "Pain just below the kneecap, or at the back or bottom of the heel, at any level, even 1 or 2 out of 10.",
+        "Limping.",
+        "Swelling.",
+        "Pain at night or at rest.",
+        "Pain that gets worse with jumping or running."
+      ],
+      "callout": "Until a doctor or physio has seen it: no jumps, sprints, brakes or running-based conditioning. Upper-body and trunk work is fine."
+    }
+  ]
+}

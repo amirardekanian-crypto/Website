@@ -1,0 +1,137 @@
+{
+  "id": "training-with-injury",
+  "icon": "🩹",
+  "group": "Body & health",
+  "order": 36,
+  "title": "Training with an injury and coming back from it",
+  "summary": "If you're injured or coming back from an injury, see what your doctor or physio decides, which signs need a doctor the same day, and what players and parents each do.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "See a doctor or physio first",
+      "p": [
+        "This lesson is for anyone who is injured or coming back from an injury. This course doesn't diagnose an injury and doesn't decide what is allowed for you. A doctor or physio decides that.",
+        "Until a doctor or physio has seen the injured area, don't train it. The rest of your body only trains if they've said that's fine.",
+        "Before your first session, ask them these questions and write down the answers:"
+      ],
+      "ol": [],
+      "list": [
+        "Which movements and which areas are allowed, and which aren't.",
+        "What pain is acceptable during training and after it.",
+        "How long these limits last and when they'll be checked again.",
+        "Whether tennis, running, jumping and gym training are each allowed.",
+        "Which signs mean you must come back right away and be checked again.",
+        "When, and on what condition, they'll clear you to return fully."
+      ],
+      "warn": "",
+      "callout": "Until a doctor or physio says it's allowed, don't train the injured area."
+    },
+    {
+      "h": "Signs that need a doctor the same day",
+      "p": [
+        "If you have any of these, see a doctor the same day or go to emergency care. The full list of red flags is in the lesson \"Pain or soreness? And the red flags\"."
+      ],
+      "ol": [],
+      "list": [
+        "You can't put weight on the injured leg or arm.",
+        "The area looks out of shape.",
+        "A joint locks or gives way.",
+        "You have numbness, tingling or weakness.",
+        "A swollen joint comes with a fever.",
+        "You have pain at rest or at night.",
+        "The pain is getting worse over days.",
+        "It swelled up after a fall or a hit."
+      ],
+      "warn": "Any of these signs: stop training that area right now, tell a parent or another adult and your coach, and get medical help. If it looks urgent, the emergency number is 115.",
+      "callout": "This list doesn't diagnose anything. Only a doctor can say what the problem is."
+    },
+    {
+      "h": "What the doctor allows, as written",
+      "p": [
+        "If your doctor or physio says the rest of your body can train, do the sessions as written on the cards. This course doesn't shorten or lighten a session.",
+        "For the injured area, do only what your doctor or physio has allowed. If they gave you their own plan, follow it and don't use this course's plan for that area yet."
+      ],
+      "ol": [],
+      "list": [
+        "A movement your doctor or physio has banned isn't done.",
+        "Use the easier version on the card only where your doctor or physio has allowed it.",
+        "If you're not sure whether a movement is allowed, don't do it and ask.",
+        "The rest of your body trains as the card says, only if your doctor or physio has said so."
+      ],
+      "warn": "",
+      "callout": "The decision about an injury belongs to your doctor or physio, not to this course."
+    },
+    {
+      "h": "Pain: only with the rule your doctor or physio gives you",
+      "p": [
+        "The pain rules that have been tested come from two problems, the Achilles tendon and pain around the kneecap, and in adults and young adults. For other injuries and for teenagers, we don't have a tested rule.",
+        "So you don't make your own pain rule. If your doctor or physio gives you a number, follow exactly that.",
+        "For the difference between soreness and pain, see the lesson \"Pain or soreness? And the red flags\"."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "Sharp pain, pain that's getting worse and pain that hasn't settled by the next morning: stop, and tell an adult and your coach.",
+      "callout": "If you haven't been given a rule by a doctor or physio, get one before you train that area."
+    },
+    {
+      "h": "Tell your coach and parents about all your load",
+      "p": [
+        "Tennis and matches are load on your body too. A sudden rise in load is a major cause of injury, and a plan that can't see your matches stacks on top of them."
+      ],
+      "ol": [],
+      "list": [
+        "Tell your coach about every match and every tennis session, not just the gym days.",
+        "Say how it went: a grinding match is different from a friendly game.",
+        "Mention school sport and extra sessions too.",
+        "Mention any soreness or pain that showed up after playing."
+      ],
+      "warn": "",
+      "callout": "Report pain and effort as they really were, even on bad days."
+    },
+    {
+      "h": "Growing players",
+      "p": [
+        "A teenage player isn't a small adult. Growth plates are weak spots in a growing body, and pain at the heel, knee or elbow and stress fractures can follow a lot of playing load.",
+        "Sports medicine bodies say youth overuse needs adult supervision. So a teenager shouldn't run a pain rule alone: tell a parent and your coach the same day, and let a doctor decide what's allowed.",
+        "Parents, your part is this:"
+      ],
+      "ol": [],
+      "list": [
+        "Take pain that lasts or keeps coming back to a doctor or physio.",
+        "Ask what's allowed and for how long, and write the answer down.",
+        "Tell the tennis coach about all the load, school sport and extra matches too.",
+        "Ask your child how they feel before and after sessions."
+      ],
+      "warn": "",
+      "callout": "Under 18: don't manage any injury without a parent and a doctor."
+    },
+    {
+      "h": "A scan is read by a doctor",
+      "p": [
+        "A scan report is full of unfamiliar terms and doesn't mean much on its own. Many people with no pain also have \"findings\" on a scan.",
+        "A doctor reads the scan alongside your symptoms and an exam. For a teenager, a parent should be in that conversation too."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Ask your doctor or physio: does this heal over weeks to months, or do we manage it long term? Don't guess from the report yourself."
+    },
+    {
+      "h": "The comeback is gradual",
+      "p": [
+        "There's no moment when you go from injured to fine. Returning to sport is a continuum, and the doctor or physio, the athlete and the coach make the call together. Rushing has a cost.",
+        "This is one common way to stage a comeback, and it doesn't replace your doctor's or physio's plan. They decide when you move to the next stage."
+      ],
+      "ol": [
+        "Rebuild basic capacity, in ranges that don't provoke anything.",
+        "Bring back your sport's movement patterns, at low intensity.",
+        "Bring real strength back into those same patterns.",
+        "Add power and reactive work once strength holds up when you're tired.",
+        "Return to full sport speed last."
+      ],
+      "list": [],
+      "warn": "",
+      "callout": "Return to full training only when your doctor or physio has cleared you. Where to restart after a break is in the lesson \"Missed sessions and coming back after a break\"."
+    }
+  ]
+}

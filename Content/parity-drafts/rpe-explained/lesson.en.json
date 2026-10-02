@@ -1,0 +1,123 @@
+{
+  "id": "rpe-weights",
+  "icon": "🏋️",
+  "group": "Start here",
+  "order": 2,
+  "title": "RPE and choosing your weights",
+  "summary": "What RPE is, how to pick your starting weight, and when to go heavier or lighter.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "What does RPE mean?",
+      "p": [
+        "There's never a weight on your cards. You get an RPE instead. RPE is a number that tells you how hard a set should be.",
+        "In your programme we measure how hard a set is by reps in reserve. After the last rep of the set, how many more good reps do you have left?"
+      ],
+      "ol": [],
+      "list": [
+        "RPE 10: no good reps left. The next rep would be very slow or your form would break.",
+        "RPE 9: 1 more good rep left.",
+        "RPE 8: 2 more good reps left.",
+        "RPE 7: 3 more good reps left. The weight still moves fast.",
+        "RPE 6: 4 or more good reps left. Easy, like a warm-up."
+      ],
+      "warn": "",
+      "callout": "One line to remember: pick a weight where, after your last rep, you could still do about 3 more good reps. That's RPE 7. We stop short of your limit because you don't need to reach failure to get stronger, and 7 is just a point on the scale, not a magic number."
+    },
+    {
+      "h": "What counts as a good rep, and where RPE is used",
+      "p": [
+        "A good rep has the same technique and the same range of motion as the first one. Count your reps left up to the first rep that would be much slower, shorter or out of shape. Never go to the point where the weight won't come up.",
+        "RPE is always a whole number, like 7 or 8. You log it with each set, next to the weight and the reps. It helps you pick the next weight, and it shows Amir how your sets really felt."
+      ],
+      "ol": [],
+      "list": [
+        "Weights: RPE tells you how heavy the weight should be.",
+        "Jumps, sprints, braking and reaction drills: no RPE. Every rep is full effort and clean.",
+        "Conditioning: the RPE on the card tells you how hard to work each rep, not what weight to use.",
+        "Warm-up: no RPE."
+      ],
+      "warn": "",
+      "callout": "Guessing is hard at first. On average people guess about 1 rep too few left, and it varies a lot from person to person. The guess gets a bit more accurate when the set is closer to their limit."
+    },
+    {
+      "h": "The weight for each set: step by step",
+      "p": [
+        "Follow these steps in every session, for every loaded exercise. The order of the steps and the warm-up sets are the course's own practical rule, not a study result."
+      ],
+      "ol": [
+        "Warm up the lift: 2 or 3 lighter sets. 8 very light reps, 5 reps at about half the weight you're guessing, and 3 reps close to your guess. These should feel easy (RPE 6 or less) and they don't count as your sets.",
+        "First working set: pick the weight you think matches the card. Stuck between two weights? Take the lighter one. The table below fixes the next set.",
+        "Do the reps on the card and straight away ask yourself \"how many more good reps could I have done?\" The answer is the RPE for that set. Log it.",
+        "Pick the weight for the next set using the table below.",
+        "Next week, start from the weight of your last working set this week and use the table again. The app keeps your log, so just look back at last week."
+      ],
+      "list": [],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "The weight change table",
+      "p": [
+        "After each working set, compare the RPE you felt with the number on the card. This table and the step sizes are our practical rules, not numbers from a study."
+      ],
+      "ol": [],
+      "list": [
+        "2 or more below the card (or RPE 6 with 5 or more good reps left): go 2 steps heavier.",
+        "1 below the card: go 1 step heavier.",
+        "Exactly on the card: keep the same weight.",
+        "1 above the card: go 1 step lighter.",
+        "2 or more above, or even one rep out of shape: go 2 steps lighter."
+      ],
+      "warn": "Any pain that isn't muscle burn? Stop that exercise, tell Amir in the Coach tab and read the lesson on pain, soreness and warning signs.",
+      "callout": "1 step is the smallest jump your kit allows. Barbell or trap bar: 2.5 kg in total (5 kg if your smallest plates are 2.5 kg). Dumbbell or kettlebell: the next size up. Machine: the next pin."
+    },
+    {
+      "h": "A few more rules",
+      "p": [
+        "These are the course's own practical rules too, not study results."
+      ],
+      "ol": [],
+      "list": [
+        "If 1 step is more than about 10% of the weight, like with light dumbbells, keep the weight. Let the set get easier over a week or two, then take the step.",
+        "Never add reps to make up for a light weight. The reps are the number on the card.",
+        "Your first week is often written at RPE 6, so you can learn the moves and find the right weights.",
+        "In a lighter week there are fewer sets but the RPE is the same. Don't make the weight lighter.",
+        "Apart from a max test your coach has planned, no set goes to the last rep you can do."
+      ],
+      "warn": "",
+      "callout": "Away for 2 weeks or more? Tell Amir before you start again. Until he says otherwise, repeat the last week you finished in full, with the same cards."
+    },
+    {
+      "h": "Under 16: RPE 7 or below",
+      "p": [
+        "If you're under 16, your loaded strength work is written at RPE 7 or below and no set has fewer than 6 reps. Those numbers are already on your cards, so there's nothing to work out. These rules, including no RM tests and no max tests, are the course's own practical decision, not a study result.",
+        "If the table says heavier but the set already feels like a 7, keep the same weight. Not sure if it's a 6 or a 7? Pick the lighter weight."
+      ],
+      "ol": [],
+      "list": [
+        "At RPE 7 you still have 3 good reps left. You get stronger and your technique stays clean.",
+        "No RM tests and no max tests. Save a normal set to The Ceiling and it estimates your strength from that.",
+        "In every session an adult is there from the start of the warm-up to the end, watching the training.",
+        "Turning 16 during your programme? Amir moves you over at the start of a new cycle, not in the middle of one."
+      ],
+      "warn": "",
+      "callout": "RPE 7 means hard but clean, not easy. Even at this number the weight goes up bit by bit as you get stronger."
+    },
+    {
+      "h": "The Ceiling: only for seeing progress",
+      "p": [
+        "Save to The Ceiling on an exercise card takes a normal set and estimates the most you could lift once. That number is only there so you can see your progress over time.",
+        "Never work out a percentage of your Ceiling and load it on the bar. The weight for each set is always picked with RPE and the weight change table."
+      ],
+      "ol": [],
+      "list": [
+        "16 and over: now and then Amir flags a lift for a retest, like a 5RM. That's the heaviest weight you can do for that many reps. Use the same RM each time so the numbers compare.",
+        "Under 16: no RM tests. Save a normal set to The Ceiling instead.",
+        "The Ceiling is an estimate. Never try a real 1 rep max. That is the course's own safety rule, not a study result."
+      ],
+      "warn": "",
+      "callout": "The Ceiling is a fixed number from one day. RPE measures the set in front of you right now. That's why the weight is always picked with RPE."
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "id": "sleep-recovery",
+  "icon": "😴",
+  "group": "Body & health",
+  "order": 31,
+  "title": "Sleep, recovery and performance",
+  "summary": "How much sleep and how, what short sleep does to your game, and which recovery methods are really worth it.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "How much sleep do you need?",
+      "p": [
+        "Sleep is essential for your body and mind, and for an athlete it counts as part of training.",
+        "Sleep experts' guidance for healthy people: teenagers aged 13 to 18 about 8 to 10 hours a night. For adults, the National Sleep Foundation says 7 to 9 hours and the American Academy of Sleep Medicine says 7 or more. These are averages, and your own need can sit a bit higher or lower.",
+        "In studies of elite athletes, many sleep less than 7 hours a night, or their sleep keeps getting broken. Those studies were not on teenagers, but a teenager juggling school, tennis and training can run short too, and needs to watch this."
+      ],
+      "ol": [],
+      "list": [
+        "Work out your bedtime from your wake up time. A teenager who needs 9 hours and wakes at 6:30 should be asleep by about 21:30, so lights out a little earlier.",
+        "If you can hardly get up without an alarm and you're sleepy in the middle of the day, you're probably not sleeping enough.",
+        "Enough sleep on most nights of the week is what matters, not just the night before a match."
+      ],
+      "warn": "If you're still very sleepy in the day even with enough sleep, or you snore loudly and stop breathing in your sleep, tell a doctor.",
+      "callout": "Put sleep in your day like a training session, not something you get to if there's time left."
+    },
+    {
+      "h": "What does short sleep do to your game?",
+      "p": [
+        "Studies on short sleep don't always agree, but the overall picture is clear. After too little sleep, anything that needs thinking, reactions and accuracy gets worse, and sports performance drops too."
+      ],
+      "ol": [],
+      "list": [
+        "Accuracy: in a small study on semi-pro tennis players, one short night (about 5 hours) made serves less accurate, and a bit of caffeine didn't fix it.",
+        "Thinking and reactions: in many studies, mental tasks were slower and had more mistakes after short sleep.",
+        "Physical performance: across studies, sports performance was lower on average after 6 hours of sleep or less. Mostly when someone hadn't slept all night or woke up much earlier than usual.",
+        "Mood and energy: in a study where players slept more for a few weeks, they felt fresher and less tired.",
+        "Health: in the general population, people who usually sleep less than 7 hours catch respiratory infections like colds more easily.",
+        "Injury: in one survey of 112 teen athletes, those who slept under 8 hours on average were about 1.7 times as likely to have been injured, which is a link and does not prove sleep was the cause."
+      ],
+      "warn": "",
+      "callout": "One short night can cost you some accuracy, but it won't wreck your season. What matters most is enough sleep on most nights. That is a practical judgement, not a study result."
+    },
+    {
+      "h": "More sleep, better tennis?",
+      "p": [
+        "A few small studies have looked at what happens when athletes sleep more for a few weeks. The results are promising, but the studies were small and had no separate comparison group."
+      ],
+      "ol": [],
+      "list": [
+        "Tennis: 12 college players tried to sleep at least 9 hours a night for a week, naps included, and slept about 1.7 hours more on average. Their serve accuracy got better and they were less sleepy in the day.",
+        "Basketball: 11 college players tried to stay in bed at least 10 hours every night for 5 to 7 weeks, and slept about 110 minutes more a night on average. Their sprints got faster, their shooting more accurate, their reactions quicker and their mood better.",
+        "Before a big match or a heavy week, go to bed a bit earlier for a few nights in a row. It's easy to do, although experts still want more research on how much it helps."
+      ],
+      "warn": "",
+      "callout": "More sleep is probably the cheapest performance boost there is, especially if you're sleeping too little now."
+    },
+    {
+      "h": "Daytime naps",
+      "p": [
+        "If you slept badly or have a busy day, a nap can help. Research reviews on athletes show naps often improved physical performance, reactions and how tired people felt, although the quality of the evidence is moderate."
+      ],
+      "ol": [],
+      "list": [
+        "When: roughly between 1 and 4 in the afternoon.",
+        "How long: between 20 and 90 minutes. In most studies longer naps helped more, but you might feel groggy straight after them.",
+        "After a nap, wait at least 30 minutes for the grogginess to go before you train or play.",
+        "If a nap makes it harder to fall asleep at night, make it shorter or drop it. This is a cautious practical rule, not a study result."
+      ],
+      "warn": "",
+      "callout": "A nap helps, but it doesn't replace night sleep. Sort out your night sleep first."
+    },
+    {
+      "h": "The night before a match, and tournament travel",
+      "p": [
+        "Sleeping badly the night before a big match is very common. In a study of 283 elite athletes, about two thirds said they'd slept worse before a big match at least once in the past year. Most of them took a long time to fall asleep, because of thinking about the match or stress.",
+        "So if you fall asleep late the night before a match, don't worry. It's normal. That's why good sleep in the few nights before a match is worth taking seriously."
+      ],
+      "ol": [],
+      "list": [
+        "The night before a match, stick to your normal sleep routine. Don't try anything new.",
+        "Can't sleep for thinking about the match? Turn the light off and breathe slowly, or read a paper book for a bit.",
+        "Travel itself is tiring, even with no time change. If you can, get to the tournament a day early.",
+        "On a long car or bus trip, walk around for a few minutes every hour or two.",
+        "Once you're there, keep your sleep and wake times the same as at home. If the local time is different, fit your sleep, meals and time outside in daylight to the local time.",
+        "In the hotel, keep your phone away from the bed, and bring an eye mask and earplugs in case the room is bright or noisy."
+      ],
+      "warn": "",
+      "callout": "Experts say there's still little evidence on the best way to deal with travel fatigue. These are simple practical rules, not hard rules."
+    },
+    {
+      "h": "Screens, caffeine and a simple routine",
+      "p": [
+        "Screen light at night pushes back your bedtime. In one study, the same people took longer to fall asleep and were less alert in the morning after reading on a lit e-reader before bed than after reading a paper book.",
+        "In most studies on children and teenagers, more screen use went with shorter and later sleep, although it hasn't been proven that the screens themselves are the cause.",
+        "Caffeine is in coffee, strong tea, cola and energy drinks. In one study on adults, a large dose of caffeine even 6 hours before bed disturbed sleep."
+      ],
+      "ol": [
+        "Go to bed and get up at about the same time every day, weekends too.",
+        "From about 6 hours before bed, no coffee, strong tea, cola or energy drinks.",
+        "An hour before bed, put your phone, tablet and games away, and charge your phone away from the bed.",
+        "Keep your room dark, quiet and cool.",
+        "Do something calm: a warm shower, a paper book or some light stretching."
+      ],
+      "list": [],
+      "warn": "",
+      "callout": "A simple routine you do every night beats a perfect one you do now and then. Try these five steps for two weeks. Only the caffeine effect has a study behind it, in adults, and the other steps and the 6 hour cut-off are common habits and a cautious practical rule, not a study result."
+    },
+    {
+      "h": "Recovery: the basics first",
+      "p": [
+        "Recovery means your body getting ready again after the stress of training and matches. The basics are simple: enough sleep, enough food and easy days between hard days. The rules in the list below are this course's own practical rules, not a study result.",
+        "Stress doesn't only come from training. Matches, school, exams and life stress all affect recovery too. How recovery makes you stronger is in the lesson on recovery and adaptation."
+      ],
+      "ol": [],
+      "list": [
+        "Don't put hard sessions back to back. Your programme spaces them out, so keep a day between them where you can.",
+        "Take at least one full rest day every week.",
+        "Never do more than one strength session in a day. Tennis and strength on the same day is fine. How to order the day is in the lesson on training around tennis and matches.",
+        "Light mobility and robustness work fits on a tennis day or an easy day.",
+        "Your programme has lighter weeks built in, and they give your body time to catch up."
+      ],
+      "warn": "",
+      "callout": "Food is the other half of recovery, and the details are in the lesson on eating before, during and after training. Fitting sessions around matches is in the lesson on training around tennis and matches."
+    },
+    {
+      "h": "Massage and cold water: what does the evidence say?",
+      "p": [
+        "Massage may reduce muscle soreness a little, and studies disagree on whether it eases how tired you feel. But in a review of 29 studies, massage didn't improve strength, jumping, sprinting or endurance.",
+        "Cold water or ice baths reduced soreness a little in the days after, in studies, although those studies were low quality.",
+        "But regular cold water straight after strength sessions may reduce your strength gains. In a 12 week study, a group who sat in cold water for 10 minutes after every weights session gained less strength and muscle, and a research review showed the same. These studies were on adults, and no study on teenagers was found."
+      ],
+      "ol": [],
+      "list": [
+        "Don't make cold water a habit after your strength sessions.",
+        "If you like cold water for soreness, save it for match days, not after strength sessions. This is a practical suggestion, not a study result.",
+        "Massage, a foam roller or compression clothing are fine if they make you feel better. They just don't replace sleep, food and easy days."
+      ],
+      "warn": "Very cold water isn't right for everyone. If you have a heart condition or blood pressure problems, talk to a doctor first. Teenagers only with an adult's OK and an adult there.",
+      "callout": "No gadget replaces enough sleep, enough food and easy days."
+    }
+  ]
+}

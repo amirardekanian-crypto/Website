@@ -1,0 +1,146 @@
+{
+  "id": "pain-red-flags",
+  "icon": "🚦",
+  "group": "Body & health",
+  "order": 30,
+  "title": "Pain or soreness? And the red flags",
+  "summary": "Tell normal soreness apart from pain, know what to do with pain during a session and before the next one, and when to stop and see a doctor or physio.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "Muscle soreness or pain?",
+      "p": [
+        "After training, sore muscles are normal. It's a spread-out ache in the muscle, usually on both sides of the body, that starts about a day later, peaks around 2 to 3 days after the session and fades over a few days. Soreness is not pain.",
+        "Pain is something else. It sits in one spot you can point to with one finger, or only on one side of the body, or in a joint, bone or tendon.",
+        "This guide can't see you and Amir isn't there mid-session, so in the moment you decide when to stop. Rate your pain from 0 to 10 (the groups below are the course's own rule of thumb, not a study result):"
+      ],
+      "ol": [],
+      "list": [
+        "0: no pain.",
+        "1 to 3, mild: I can feel it, but I can do every movement.",
+        "4 to 6, moderate: it changes what I can do.",
+        "7 to 10, severe: moving is hard and I can't think about anything else."
+      ],
+      "warn": "",
+      "callout": "The red flags, like chest pain or fainting, are at the bottom of this lesson. If you have one of them, read that part right now."
+    },
+    {
+      "h": "What's normal and what isn't?",
+      "p": [
+        "Normal, keep training: normal tiredness, a muscle burn during a set, and stiffness or a spread-out ache on both sides that starts the next day, peaks around 2 to 3 days after the session, then fades over a few days.",
+        "Period pain and cramps are covered in the lesson \"Periods and training: what's normal\".",
+        "Not normal, go to the pain ladder if you have any of these:"
+      ],
+      "ol": [],
+      "list": [
+        "Sharp or stabbing pain.",
+        "Pain that spreads or shoots somewhere else.",
+        "Numbness, or tingling and pins and needles.",
+        "Pain that gets worse during a set, instead of staying the same or easing.",
+        "Pain in one spot, on one side of the body, or in a joint, bone or tendon."
+      ],
+      "warn": "",
+      "callout": "It's your call. If you're not sure, pick the easier option and ask a doctor or physio. Tell Amir in the Coach tab too."
+    },
+    {
+      "h": "During a session: the pain ladder",
+      "p": [
+        "These four steps tell you what to do with an exercise that hurts, or with that part of your body. Start at step 1 and move to the next step whenever your symptoms change.",
+        "The ladder and its numbers are the course's own rule of thumb, not a study result. The studies that tested a pain-monitoring rule were only on the Achilles tendon and pain around the kneecap, in adults and young adults, and the steps here are stricter than those.",
+        "If a doctor or physio has already seen this injury, their rule counts more than the numbers in this lesson. Read the lesson \"Training with an injury and coming back from it\".",
+        "Under 18: from step 2 onwards, tell your mum or dad the same day."
+      ],
+      "ol": [
+        "Keep going: pain is 3 or less, it eases during the set and you move normally. Finish the set and keep an eye on it. If it comes back the same or worse in the next set, go to step 2.",
+        "Change the exercise: pain gets worse during the set, it's 4 or 5 out of 10, it's changed how you move, or it hasn't eased for 2 sets in a row. Stop that exercise now. Only do an easier version if the pain stays at 2 or less and doesn't climb. Not sure what the easier version is? Ask Amir in the Coach tab.",
+        "Drop the exercise: the easier version brings the pain back too. Today, skip that exercise and any other one that brings back the same pain. If the pain is in your leg, no jumps, sprints or braking today either. If this happens with 2 different exercises, end the session.",
+        "Stop and get it checked: the pain is sharp, it's 6 or more, it spreads or shoots, you have numbness or tingling, or it's a pain you don't recognise. End the session now and book a doctor or physio. If it's a red flag, follow the red flags part of this lesson."
+      ],
+      "list": [],
+      "warn": "",
+      "callout": "Pain usually means you change or drop the exercise that hurts. It doesn't mean you give up training altogether. Be honest with yourself and you'll stay on court."
+    },
+    {
+      "h": "Before your next session",
+      "p": [
+        "These rows are for new, mild pain, not for soreness and not for an injury a doctor or physio has already seen, where their rule comes first. These rows are also the course's own rule of thumb, not a study result. Find the row that fits you:"
+      ],
+      "ol": [],
+      "list": [
+        "Mild (1 to 3), first time or getting better, and no warning signs: train. Pick the easier version of exercises that load that area. If the pain is in your leg, do the easier version of jumps, sprints and braking too. Pain should stay at 3 or less while you train and not be worse the next morning.",
+        "Mild (1 to 3), but the same as last time or worse: drop every exercise that loads that area. Do the rest of the session as written.",
+        "Moderate (4 to 6), or sharp: leave that area out completely. If it's your leg, no jumps, sprints, braking or conditioning runs either. If it isn't clearly better within 3 days, book a physio or doctor.",
+        "Severe (7 or more): don't train today. A doctor or physio has to see it before you train that area again. Once the pain is 6 or less, the rest of your body can train without that area.",
+        "An ache spread through all your muscles, like after training: that's soreness, not pain, and you do the session as written. If it's 5 out of 10 or more, ask yourself “am I getting ill?” With a fever or feeling unwell, don't train today."
+      ],
+      "warn": "",
+      "callout": "Leaving out one area means the rest of your body can still train. With a sore leg, for example, you can still train your upper body and trunk. Tell Amir in the Coach tab and he'll adjust your programme around it."
+    },
+    {
+      "h": "Pain that won't go away",
+      "p": [
+        "Write down the day the pain started, on paper or in your phone. Then check these rows against that date. The numbers here (7 days, 14 days, up 2 points) are the course's own rules of thumb, not a study result:"
+      ],
+      "ol": [],
+      "list": [
+        "The same pain is still there after 7 days, or keeps coming back (4 or more days in a week, or less than 4 weeks after it settled): book a physio or doctor this week. Don't train that area until you've had 3 pain-free days in a row.",
+        "The same pain is still there after 14 days, at any number: get it checked. Don't train that area until a doctor or physio says you can, however it feels.",
+        "The pain is getting worse, meaning it's gone up 2 or more from day 1 or it starts earlier in every session: follow the next, more careful row in “Before your next session” and book a check.",
+        "3 pain-free days in a row: build that area back up step by step."
+      ],
+      "warn": "",
+      "callout": "When in doubt, pick the easier option. You won't lose much, but training through a warning sign can keep you off court for weeks."
+    },
+    {
+      "h": "Level 1 red flags: get medical help now",
+      "p": [
+        "If any of these happens, stop. Show this page to your mum, dad or another adult right now."
+      ],
+      "ol": [],
+      "list": [
+        "Chest pain or pressure, during or after training: stop. If it's happening now, get medical help straight away. No training until a doctor clears you.",
+        "Fainting or nearly fainting, during or after training: sit or lie down and tell an adult. See a doctor before you do any more training.",
+        "A heart that races or beats irregularly, and not from normal effort: see a doctor and don't train until then.",
+        "Much more breathless than usual for the same effort: see a doctor and don't train until then.",
+        "A blow to the head, then headache, dizziness, feeling sick or confusion: no training and no tennis. A doctor has to see you. Follow the return plan the doctor gives you.",
+        "Numbness or weakness in both legs, or a new problem controlling your bladder or bowels: get medical help the same day."
+      ],
+      "warn": "Chest pain, fainting, a racing or irregular heartbeat, unusual breathlessness, a blow to the head with symptoms, or numbness and weakness in both legs: stop training now, tell an adult and get medical help. Call your local emergency number (115 in Iran, 999 in the UK, 112 in most of Europe, 911 in the US).",
+      "callout": ""
+    },
+    {
+      "h": "Level 2 red flags: stop training that area",
+      "p": [
+        "These signs mean don't train that area and go and see a doctor or physio. The rest of your body can train as written, without that area. Each row says what to do until a doctor or physio has seen it:",
+        "The first time a pain gets worse with jumping or running, leave that area out and book a check. If it happens again or gets worse, it's a level 2 red flag. The \"at any number\" rule for a growing player is the course's own caution, not a study result."
+      ],
+      "ol": [],
+      "list": [
+        "A growing player with pain just below the kneecap or in the heel, at any number, even 1 or 2: no jumps, sprints, braking or conditioning runs. Upper body and trunk are fine. Read the lesson “Growth spurt: a guide for players and parents” too.",
+        "Pain that gets worse with jumping or running every time (worse than before, or 2 days in a row): same as the row above.",
+        "Limping: no leg training. Upper body and trunk are fine.",
+        "Pain that wakes you at night, or hurts even at rest: see a doctor within a few days. Leave out that area and all jumps, sprints and braking.",
+        "Swelling: leave that area out. If it's in your leg, no jumps, sprints or braking either.",
+        "Numbness, tingling, or pain that shoots somewhere else: leave that area out. If it's in your back or neck, no weight training at all.",
+        "A joint that gives way or locks, an injury with a “pop”, or you can't put your weight on it: leave that area out. If it's in your leg, no jumps, sprints or braking either."
+      ],
+      "warn": "Limping, swelling, pain at night, a joint that gives way or locks, or in a growing player, pain below the kneecap or in the heel: don't train that area and see a doctor or physio. This guide can't diagnose anything. Only a doctor or physio can tell you what's wrong.",
+      "callout": "Only come back once a doctor or physio clears you (see the lesson “Missed sessions and coming back after a break”). If the same problem comes back within 4 weeks, stop and get it checked again."
+    },
+    {
+      "h": "Tennis counts as training too",
+      "p": [
+        "Tennis loads your body too, and your programme is written to sit alongside your normal tennis.",
+        "Tell your tennis coach which days you do S&C. Your programme doesn't change your tennis. Decisions about tennis are your tennis coach's."
+      ],
+      "ol": [],
+      "list": [
+        "Tennis and an S&C session on the same day is fine, even after hard tennis. Do the session as written. How to order the day is in the lesson “Training around tennis and matches”.",
+        "A week with clearly more tennis than any week in the last month (about a third more, and at least 1 to 2 extra hours): keep your main sessions and cut that week's extra sessions. Let Amir know in the Coach tab.",
+        "Tournament week, or the 2 weeks before a big match: follow the lesson “Training around tennis and matches”."
+      ],
+      "warn": "",
+      "callout": "Pain that started after a few days of heavy tennis goes through the same pain ladder. Tell your tennis coach and Amir too."
+    }
+  ]
+}

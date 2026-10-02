@@ -232,3 +232,20 @@ suggestions when he sends screenshots, or after 3–4 weeks of Search Console da
 | `training-with-injury` | تمرین با آسیب‌دیدگی | guess | 2026-09 |
 | `training-on-your-period` | تمرین در دورانِ قاعدگی | guess | 2026-09 |
 | `match-day-nutrition` | تغذیه‌ی روز مسابقه تنیس (and پدل) | guess. The body now covers padel honestly (tennis numbers, no padel studies) | 2026-10-02 |
+| `training-nutrition` | تغذیه قبل و بعد از تمرین تنیس | guess | 2026-10-02 |
+| `hydration-and-heat` | آب و گرما در تنیس (چقدر بنوشیم) | guess | 2026-10-02 |
+| `sleep-and-recovery` | خواب و ریکاوری ورزشکار تنیس | guess | 2026-10-02 |
+| `how-you-get-stronger` | ریکاوری و سازگاری (بدن چطور قوی‌تر می‌شه) | guess | 2026-10-02 |
+| `missed-sessions` | برگشت به تمرین بعد از غیبت | guess | 2026-10-02 |
+| `growth-spurts` | رشد جهشی نوجوان ورزشکار | guess | 2026-10-02 |
+| `pain-or-soreness` | کوفتگی عضله یا درد، علامت‌های خطر در تمرین | guess | 2026-10-02 |
+| `what-tennis-demands` | آمادگی بدنی تنیس (تنیس از بدن چی می‌خواد) | guess | 2026-10-02 |
+| `why-strength-training` | چرا تمرین قدرتی برای تنیس‌باز | guess | 2026-10-02 |
+| `strength-for-tennis` | تمرین قدرتی تنیس | guess | 2026-10-02 |
+| `jumps-landing-power` | پرش و توان برای تنیس | guess | 2026-10-02 |
+| `speed-braking-direction` | سرعت، ترمز و تغییر جهت در تنیس | guess | 2026-10-02 |
+| `agility-and-reaction` | چابکی و واکنش در تنیس | guess | 2026-10-02 |
+| `tennis-fitness` | آمادگی هوازی تنیس | guess | 2026-10-02 |
+| `robust-body` | مقاوم‌سازی بدن برای تنیس (پیشگیری از آسیب) | guess | 2026-10-02 |
+| `rpe-explained` | RPE چیه و وزنه رو چطور انتخاب کنیم | guess | 2026-10-02 |
+| `training-around-matches` | بدنسازی در هفته‌ی مسابقه تنیس | guess | 2026-10-02 |

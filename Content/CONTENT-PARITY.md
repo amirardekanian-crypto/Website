@@ -36,39 +36,47 @@ age rules differ on purpose (CLAUDE.md: the two audiences are deliberately diffe
 5. **Publish to every surface in the same sitting** (or list what is still missing here), then update the table below.
 6. **When a fact changes on one surface, change it on all of them**, and list them in the handoff.
 
-## The matrix (2026-10-02)
+## The matrix (updated 2026-10-02, end of the port)
 
-✅ done and consistent · ◐ exists, needs the check or an update · ✗ missing · n/a product-specific
+✅ done and consistent on every surface · n/a product-specific
 
-| Topic | TPS lesson | Blog + Playbook | Status / next step |
-|---|---|---|---|
-| Warm-up | `warmup-ramp` ✅ | `tennis-warm-up` ◐ (merged with `pre-session-warm-up`, 2026-10-02) | Claims verified. The lesson already matched the evidence (static holds under about 30 s are fine, 2 to 10 min to play, re-warm after 15). The merged article is drafted; the isometric shoulder push is **not** in the lesson (one small study, and a junior audience) |
-| Match-day nutrition | `fuel-competition` ✅ updated 2026-10-02 | `match-day-nutrition` ✅ (padel section drafted) | ITF 2025 numbers. Padel lives in the blog only: the course is the tennis course |
-| Eating around training | `fuel-training` ◐ | ✗ | Port to an article after re-verifying (see problem 4) |
-| Water, sweat and heat | `hydration-heat` ◐ | ✗ | Port after re-verifying. The heat-illness first-aid steps carry a "doctor to check" flag in the lesson notes |
-| Sleep and recovery | `sleep-recovery` ◐ | ✗ | Port |
-| Recovery and adaptation | `recovery-adaptation` ◐ | ✗ | Port |
-| Pain, soreness, red flags | `pain-red-flags` ◐ | `training-with-injury` ◐ (a different topic) | Both need the corrections below before anything is copied |
-| Missed sessions, coming back | `missed-sessions` ◐ | ✗ | Port |
-| Growth spurts | `growth` ◐ | ✗ | Port. The lesson itself says its numbers come from football research: keep that sentence |
-| Training on your period | ✗ | `training-on-your-period` ◐ | Needs the corrections and a juniors and parents lesson with red flags (see *Safe additions*) |
-| Training with an injury | ✗ (`pain-red-flags` covers part) | `training-with-injury` ◐ | Same |
-| What tennis asks of the body | `tennis-demands` ◐ | ✗ | Port |
-| Why strength / Strength for tennis | `why-strength`, `strength` ◐ | ✗ | Port as two articles |
-| Jumps and power | `jumps-power` ◐ | ✗ | Port |
-| Speed, braking, change of direction | `speed-braking` ◐ | ✗ | Port |
-| Agility and reaction | `agility-reaction` ◐ | ✗ | Port |
-| Tennis fitness (aerobic) | `tennis-fitness` ◐ | ✗ | Port |
-| Robustness | `robustness` ◐ | ✗ | Port |
-| RPE and choosing a weight | `rpe-weights` ◐ | ✗ (the athletes' app has its own guide, `APP_GUIDE`) | Port to an article; keep the app guide as it is |
-| Training alongside tennis and tournaments | `tennis-tournaments` ◐ | ✗ | Port; the lesson names course sessions, so rewrite the examples |
-| How to read the card · parents' guide · ready for level 3 | n/a | n/a | Product-specific: stay in the course |
+Every topic below now has a TPS lesson (Farsi + `course_en` twin), a blog article (Farsi + English) and a Playbook row.
+The research for each is in `Content/parity-drafts/<slug>/verify.md` (claims table, PMIDs, doctor-to-check items); the
+lesson changes are in `Content/parity-drafts/<slug>/lesson-changes.md`. The Farsi is **not yet read by Amir**.
 
-17 lessons wait to become articles; 2 articles wait to become lessons. Each lesson's sources are listed in the
-`_notes` of its `tps_content` row (`learn-5` has them for the four nutrition and strength lessons): start from
-those, then re-verify.
+| Topic | TPS lesson (`id`, key) | Blog + Playbook slug |
+|---|---|---|
+| Warm-up | `warmup-ramp` (learn-4) | `tennis-warm-up` (merged with `pre-session-warm-up`) |
+| Match-day nutrition | `fuel-competition` (learn-5) | `match-day-nutrition` (padel section in the blog only) |
+| Eating around training | `fuel-training` (learn-5) | `training-nutrition` |
+| Water, sweat and heat | `hydration-heat` (learn-5) | `hydration-and-heat` |
+| Sleep and recovery | `sleep-recovery` (learn-3) | `sleep-and-recovery` |
+| Recovery and adaptation | `recovery-adaptation` (learn-3) | `how-you-get-stronger` |
+| Pain, soreness, red flags | `pain-red-flags` (learn-4) | `pain-or-soreness` |
+| Missed sessions, coming back | `missed-sessions` (learn-4) | `missed-sessions` |
+| Growth spurts | `growth` (learn) | `growth-spurts` |
+| Training on your period | `training-on-period` (learn, **new**) | `training-on-your-period` (corrected) |
+| Training with an injury | `training-with-injury` (learn, **new**) | `training-with-injury` (corrected) |
+| What tennis asks of the body | `tennis-demands` (learn-2) | `what-tennis-demands` |
+| Why strength | `why-strength` (learn-5) | `why-strength-training` |
+| Strength for tennis | `strength` (learn-2) | `strength-for-tennis` |
+| Jumps and power | `jumps-power` (learn-2) | `jumps-landing-power` |
+| Speed, braking, change of direction | `speed-braking` (learn-2) | `speed-braking-direction` |
+| Agility and reaction | `agility-reaction` (learn-2) | `agility-and-reaction` |
+| Tennis fitness (aerobic) | `tennis-fitness` (learn-3) | `tennis-fitness` |
+| Robustness | `robustness` (learn-3) | `robust-body` |
+| RPE and choosing a weight | `rpe-weights` (learn-3) | `rpe-explained` (the app keeps its own `APP_GUIDE`) |
+| Training alongside tennis and tournaments | `tennis-tournaments` (learn-4) | `training-around-matches` |
+| How to read the card · parents' guide · ready for level 3 | n/a | n/a (stay in the course) |
 
-## Known problems found on 2026-10-02 (fix before reusing the text)
+The 17 course lessons became athlete-voiced articles under a new **Training** shelf (`articles/training/`), plus
+Recovery, Nutrition and Pre-Competition. The `for-coaches` shelf is now empty (the pre-session warm-up merged away) and still
+listed in `articles/index.json`; decide whether to keep it.
+
+**New lessons have no cover art.** The course app shows a plain green banner until an `ART` entry (by lesson id) is
+added in the private `tps-content` repo: `training-on-period` and `training-with-injury`.
+
+## Known problems found on 2026-10-02 (all fixed in the articles and the lessons, except where noted)
 
 1. **Both warm-up articles overstated.** "Research is very clear" that static stretching slows you (the real
    threshold is about 60 s per muscle; under 30 s is trivial); the **4.6 km/h serve gain came from two 5-second isometric
@@ -86,7 +94,7 @@ those, then re-verify.
    some meniscus tears do not heal on a clock); "permanent strength work for a structural trait" and "the weak side
    becomes the next injury" are practice, not evidence; "none of this depends on your coach, that part isn't yours to
    carry" is risky for juniors. **Missing:** when to go to a doctor today, growing-athlete cautions, a parent in the loop.
-4. **A wrong citation in `learn-5` `_notes`:** PMID 36771479 (Huang 2023) is *Nutrition Recommendations for Table
+4. **A wrong citation in `learn-5` `_notes` (still NOT corrected, private build notes):** PMID 36771479 (Huang 2023) is *Nutrition Recommendations for Table
    Tennis Players*, listed there as racket-sport meal timing. The windows in `fuel-competition` now rest on the ITF 2025
    statement (1 to 4 g/kg, 1 to 4 h) instead. The note is not corrected yet (it is in the private build notes).
 5. **Padel has almost no nutrition research.** No padel study of carbohydrate, glycogen, sweat sodium or caffeine
@@ -119,4 +127,22 @@ those, then re-verify.
 
 ## Open decisions (Amir)
 
-See the end of the 2026-10-02 session summary; once decided, record each answer here.
+Still open after the port (2026-10-02). Record each answer here once decided.
+
+1. **Read the Farsi.** Nothing Farsi has been read by Amir: the 19 blog articles, the merged warm-up, the padel section,
+   the two new lessons and every lesson change. Spellings to settle: «اسگود-شلاتر» and «سیور».
+2. **Sprint distances** in `speed-braking`: the course rule (10 to 20 m) was left alone, but the verified braking study
+   used a 20 m run-up. Keep the course rule?
+3. **Yo-Yo test for juniors** in `tennis-fitness`: kept as is, with the existing growth-spurt warning. Do juniors run it?
+4. **Depth jumps and max tests** in `growth`: the ban wording is the course's own; the lesson now says so.
+5. **Doctor to check** before this is relied on: the period red-flag numbers (secondary summaries of ACOG CO 651), the
+   heat-illness first aid in `hydration-heat`, and the injury red-flag list.
+6. **English twin paragraphs** longer than 3 sentences in a few untouched lessons (pre-existing).
+7. **The SEO phrases are all guesses.** One title, `robust-body`, says "پیشگیری از آسیب" (prevention) because that is the
+   search phrase, while the body says no trial proves it. Keep the phrase or soften the title?
+8. **`course_en` pre-existing mismatches** the port did not touch: `rpe-weights` (EN says RPE is logged, FA says it is
+   not stored) and `strength` / `rpe-weights` (both still teach "The Ceiling", which is retired from the app screens).
+9. **`learn-5` `_notes`** (private tps-content repo) still cite Huang 2023 (table tennis) as racket-sport meal timing and
+   credit Canós and Bohm wrongly. Correct them there.
+10. The **English course screen** (Playbook + Tests door in `program.html`) is still parked on `claude/course-lessons-en`;
+    the Playbook articles above now cover the same topics in the athletes' voice, so decide whether that branch is still wanted.

@@ -1,0 +1,116 @@
+{
+  "id": "speed-braking",
+  "icon": "⚡",
+  "group": "Physical qualities",
+  "order": 13,
+  "title": "Speed, braking and change of direction",
+  "summary": "Your first step and acceleration, braking from a few steps out, how angle and approach speed make a cut harder, why hard brakes have a cap and where the ladder fits.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "First step and acceleration",
+      "p": [
+        "Most running in tennis is short, so what matters is how fast you get going. Speed starts at the split step: a ready landing and then your first explosive step.",
+        "That's why the sprints in your programme are short and start from tennis positions. Think 5 to 10 m early on, up to 20 m later, and court-length distances once the work moves onto the court. These distances are the course's own rule, not a study result.",
+        "Slower running, like the Build-Up Runs in your warm-up, doesn't count as sprinting. Repeated sprints at the end of a court session have short rests because they're endurance work, not pure speed. Under-16s do the same sprints flat out and only get timed on test days."
+      ],
+      "ol": [],
+      "list": [
+        "Land your split step ready and take the first step straight away.",
+        "Stay low for the first two steps and don't stand up too early.",
+        "Lean forward from your ankles, not your waist.",
+        "In a Crossover Start Sprint, open your hips first, then bring your back leg across in front of you."
+      ],
+      "warn": "",
+      "callout": "Every sprint is flat out and has no RPE. Take the full rest in your session so the next rep is just as fast."
+    },
+    {
+      "h": "Braking starts a few steps out",
+      "p": [
+        "Braking isn't just the last step. Good players slow down from a few steps out. Their steps get shorter and lower, then the braking leg grips the ground hard.",
+        "In one lab study of 180 degree turns (the 505 test, 20 male soccer players), the biggest braking force came on the third-last step, more than on the next two. Peak force in the first 50 ms of a hard stop can be up to 2.7 times the force of the first steps of a maximal sprint.",
+        "Braking needs leg strength and technique, and leg strength is one of the reasons you train strength in the gym. These studies were done in football and similar sports, and we're applying them to tennis."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Start braking a few steps out, not with one long straight step at the end."
+    },
+    {
+      "h": "A good brake and change of direction",
+      "p": [
+        "Use these points in Turn and Go, Wide-Ball Brake and Recover and any other braking drill. If your phone has slow motion, film a rep now and then and check it against this list.",
+        "Lab studies back some of these points: the load on the knee in sport cuts falls when the knee bends more and caves in less. But no study has tested this exact list in tennis."
+      ],
+      "ol": [],
+      "list": [
+        "A few shorter steps before the braking leg, not one long last step.",
+        "Get low. Your hips and knees clearly bend over the last two steps.",
+        "The knee of your braking leg stays over your toes, not caving in.",
+        "No slipping, stumbling, hand on the ground or extra steps after the brake.",
+        "Your first step goes the new way without standing up first.",
+        "In Wide-Ball Brake and Recover, you stop inside the 1 m zone."
+      ],
+      "warn": "Pain in your knee, ankle or groin when braking isn't normal soreness. Stop and read the lesson “Pain or soreness? And red flags”.",
+      "callout": ""
+    },
+    {
+      "h": "Angle and speed: how a change of direction gets harder",
+      "p": [
+        "How hard a cut is depends on two things: the angle of the turn and how fast you come in. A 180 degree turn is harder than a 45 degree one, and a fast approach is harder than a slow one.",
+        "So your programme raises the speed at each angle a bit at a time, then makes the angle sharper. Every faster, sharper rep puts more load through your legs, so the number of reps doesn't go up as they get harder. This order, the fixed rep count and the one-week delay for under-16s are the course's own rules, not study results."
+      ],
+      "ol": [],
+      "list": [
+        "Foundation: stops, 45 and 90 degrees. Walking first, then jogging.",
+        "Build: 45 and 90 degrees at speed, and 180 degree turns, walking first, then jogging.",
+        "Explosive: 180 degree turns at speed with a longer run-up, and braking for a wide ball.",
+        "Court transfer: court patterns with three brakes in each rep, each one after a short run."
+      ],
+      "warn": "Under 16: every fast approach starts one week later than it would for an adult. If you're under 16, your programme already does this.",
+      "callout": "The approach speed is written in your session. Don't go faster than that and don't make the angle sharper."
+    },
+    {
+      "h": "Why hard brakes have a weekly cap",
+      "p": [
+        "Every hard brake puts a lot of force through your legs, and tennis itself has plenty of brakes. So your programme doesn't just count sprints. It keeps the number of hard brakes in your week under a cap too.",
+        "This cap, the 48 hour gap and the one-session-a-day limit are practical rules of this programme, not numbers from research."
+      ],
+      "ol": [],
+      "list": [
+        "Don't add brakes or changes of direction to your sessions.",
+        "If you have two speed sessions in a week, keep them at least 48 hours apart.",
+        "Don't do more than one S&C session a day."
+      ],
+      "warn": "",
+      "callout": ""
+    },
+    {
+      "h": "The ladder: foot rhythm, not agility",
+      "p": [
+        "A training ladder, also called an agility ladder, makes your feet light and rhythmic. But the pattern is set in advance and there's nothing to react to, so it isn't agility training.",
+        "If you like the ladder, use it in your warm-up for foot rhythm. It doesn't replace the reaction drills in your court sessions, and it doesn't count as jumps or sprints.",
+        "In one 4 week study of 64 male college basketball players, a computer-based reaction program improved foot speed by 7.0% and a rope ladder by 2.4%. Choice reaction got 6.9% faster against 0.7%. It's one short study in one sport."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Agility means reacting to a cue. The lesson “Agility and reaction” explains the difference."
+    },
+    {
+      "h": "Where are speed and braking in your programme?",
+      "p": [
+        "In court sessions, sprints and brakes come first after the warm-up, while your legs are fresh."
+      ],
+      "ol": [],
+      "list": [
+        "Court sessions: acceleration, braking and change of direction, reaction, and a few short repeated sprints at the end.",
+        "Extra speed and agility sessions, if you have them: more sprints and reaction work, for when you get to wide or short balls late.",
+        "Gym sessions: leg strength, which braking depends on.",
+        "Test days: the 20 m sprint and the spider test, if Amir includes them."
+      ],
+      "warn": "",
+      "callout": ""
+    }
+  ]
+}

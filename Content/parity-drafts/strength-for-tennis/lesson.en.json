@@ -1,0 +1,134 @@
+{
+  "id": "strength",
+  "icon": "🏋️",
+  "group": "Physical qualities",
+  "order": 11,
+  "title": "Strength for tennis",
+  "summary": "Why strength matters for tennis and why it isn't bodybuilding, your main lift, picking and progressing the weight with RPE, and the rules for under-16s.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "Why strength?",
+      "p": [
+        "Every fast start, every brake and every serve starts with force from your legs. Stronger legs can push the ground harder.",
+        "Braking needs strength too. You need it to stop your body, to hold a low position and to get back quickly. Young players here build strength first and then make the jumps harder, and that order is the course's own rule, not a study result.",
+        "In small studies, progressive strength training, as part of a full programme, can make your serve a little faster."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Strength is the base that speed, jumping and braking are built on."
+    },
+    {
+      "h": "Strength for tennis, not bodybuilding",
+      "p": [
+        "The goal is more force and faster movement on court. Bigger muscles, or lots of fatigue and soreness, aren't the point. So the training looks different:"
+      ],
+      "ol": [],
+      "list": [
+        "Low to moderate reps, with enough rest between sets.",
+        "No working set goes to failure. You always keep at least 2 good reps in the tank.",
+        "Lower the weight under control and lift it fast, on purpose.",
+        "Two-leg and single-leg lifts that use your legs, hips and trunk together.",
+        "More upper-body pulling than pushing.",
+        "Work for the areas tennis loads a lot: calves, groin, hamstrings, shoulder and forearm."
+      ],
+      "warn": "",
+      "callout": "These are the course's own rules, not study results. However, studies in young adults do find that you don't need to train to failure to get stronger."
+    },
+    {
+      "h": "Your main lift: pick one and stick with it",
+      "p": [
+        "Your main lift is usually the Trap Bar Deadlift or the Barbell Back Squat. Both make your whole leg strong.",
+        "Once your main lift is set, keep it for the whole block. With one lift that doesn't change, your progress is one clear line and your tests can be compared."
+      ],
+      "ol": [],
+      "list": [
+        "Not sure which? The Trap Bar Deadlift is the default. That's the course's suggestion, not a research finding.",
+        "Only choose the Barbell Back Squat if you know the technique well and you train inside a rack with safety bars.",
+        "Use the same bar every time, and the same handles on the trap bar or the same depth on the squat."
+      ],
+      "warn": "The Barbell Back Squat always goes inside a rack, with the safety bars set a little below the lowest point of your squat.",
+      "callout": "Don't switch your main lift halfway through a block, or your earlier tests won't compare with your later ones. If you want to change, ask Amir in the Coach tab."
+    },
+    {
+      "h": "Pick the weight with RPE",
+      "p": [
+        "Your session gives you reps and an RPE, not a weight. You pick a weight that gets you to that RPE.",
+        "Here, RPE means how many good reps you still had left after your last rep. RPE is only for picking the weight."
+      ],
+      "ol": [],
+      "list": [
+        "RPE 10: no more good reps possible.",
+        "RPE 9: 1 more good rep left.",
+        "RPE 8: 2 more good reps left.",
+        "RPE 7: 3 more good reps left. The bar still moves fast.",
+        "RPE 6: 4 or more reps left. Light, like a warm-up."
+      ],
+      "warn": "Honestly: people tend to guess about 1 rep too few left, on average, and results vary a lot from person to person. Guesses are better close to failure and with heavier weights. We found no data on under-16s.",
+      "callout": "A good rep means the same technique and the same range. A rep that gets very slow, gets shorter or loses its form isn't a good rep."
+    },
+    {
+      "h": "Adjust the weight set by set",
+      "p": [
+        "One step means the smallest jump your kit allows. That's 2.5 kg in total on a trap bar or barbell (5 kg if your smallest plates are 2.5 kg each), or the next size up for dumbbells. If one step is more than about 10% of the weight, for example with light dumbbells, keep the same weight until the set feels easier in a week or two."
+      ],
+      "ol": [
+        "Warm up the lift with 2 or 3 light sets. For example 8 very light reps, 5 reps at about half your guessed weight and 3 reps close to it. These aren't working sets.",
+        "First working set: pick a weight you think matches your session. Stuck between two weights? Take the lighter one.",
+        "Do the reps and ask yourself straight away: “How many more good reps could I have done?” The answer is your RPE.",
+        "Adjust the next set. RPE 2 or more below your session's number? 2 steps heavier. 1 below? 1 step heavier. On it? Same weight. 1 above? 1 step lighter. 2 above, or your form broke? 2 steps lighter. The step sizes and these adjustments are the course's own method, not a study result.",
+        "Start next week from this week's last working weight. Log it in the app or write it down so you know where to start."
+      ],
+      "list": [],
+      "warn": "Pain that isn't muscle burn: stop that exercise there and then, and read the lesson “Pain or soreness? And red flags”.",
+      "callout": "Never add extra reps to make up for a weight that's too light."
+    },
+    {
+      "h": "How it progresses",
+      "p": [
+        "Across a block, reps usually go down and RPE goes up, so the weight should go up week by week. In one small 8-week study of young tennis players, gains by week 4 didn't continue to week 8. The authors pointed to little variety and little load management.",
+        "Here's the course's own example of how the main lift can build for players 16 and over. It's a plan, not a research result:"
+      ],
+      "ol": [],
+      "list": [
+        "Foundation: from 3 x 8 at RPE 6 to 3 x 6 at RPE 8.",
+        "Build: from 3 x 5 at RPE 7 to 4 x 4 at RPE 8.",
+        "Explosive: from 3 x 4 at RPE 7 to 3 x 3 at RPE 8. Now power and speed get the fresh part of the session.",
+        "Court transfer: from 3 x 4 at RPE 7 to 2 x 3 at RPE 8. The weight stays heavy and the sets drop, so your legs stay fresh for court work.",
+        "Lighter weeks: fewer sets, same RPE. For players 16 and over, the main lift in a test week can be an RM test."
+      ],
+      "warn": "",
+      "callout": "You don't need to work anything out. Each week's numbers are in that week's sessions."
+    },
+    {
+      "h": "The RM test and The Ceiling",
+      "p": [
+        "In test weeks, players 16 and over may do an RM test on the main lift: the heaviest weight for 3, 5 or 8 clean reps. Under-16s don't do RM tests, which is the course's own rule, and they just do their normal set.",
+        "The Ceiling in the app uses that set to estimate the most you could lift once, without you ever trying it. Amir tells you which RM to do and how to warm up for it."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Your Ceiling is an estimate to track progress, not a weight to lift. Training still runs on RPE."
+    },
+    {
+      "h": "Under 16",
+      "p": [
+        "If you're under 16, Amir writes these rules into your programme. You don't have to work anything out.",
+        "These rules are the course's own, not a research threshold, and they are stricter than the scientific position statements. Those accept supervised max testing and, for experienced teenagers, fewer than 6 reps."
+      ],
+      "ol": [],
+      "list": [
+        "Weighted strength lifts go up to RPE 7, no higher.",
+        "Never fewer than 6 reps. Where an adult would do 3, 4 or 5 reps, you do 6 at RPE 7.",
+        "No RM tests and no max tests of any kind. Your Ceiling is estimated from a normal set of 6 at RPE 7.",
+        "Chin-Ups with a band for help, so 6 reps lands at RPE 7.",
+        "An adult is there for every session, from the start of the warm-up to the end.",
+        "Turn 16 during your programme? You move to the adult rules at the start of your next block, not in the middle of one."
+      ],
+      "warn": "Honestly, for parents: research sees youth strength training as safe and effective when the programme is well designed and qualified people supervise it. Having an adult there isn't the same as a qualified coach watching. Use the videos and coaching points, and if in doubt, pick the lighter weight.",
+      "callout": "Why RPE 7? At RPE 7 you still have 3 good reps left. You still get stronger, and your technique stays clean through the growing years. We found no data on how accurately teenagers judge their reps left."
+    }
+  ]
+}

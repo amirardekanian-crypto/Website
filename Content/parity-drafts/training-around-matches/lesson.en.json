@@ -1,0 +1,189 @@
+{
+  "id": "tennis-tournaments",
+  "icon": "🎾",
+  "group": "Tennis & competition",
+  "order": 50,
+  "title": "Training around tennis and matches",
+  "summary": "Where to put your sessions in the week, what to do on match day and the days around it, and how to handle your programme in a tournament week and before a big match.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "S&C first, then tennis",
+      "p": [
+        "The jumps, sprints, braking and heavy lifts in your programme are skills that need fresh legs. In a very small study of 10 tennis players aged 14 to 18, one moderate session of strength training and med ball throws before hitting didn't lower stroke speed or accuracy, not that day and not 1 or 2 days later. The study says nothing about a long, heavy leg day.",
+        "To be honest, the “S&C first” order rests on that very small study and on expert advice.",
+        "Tell your tennis coach which days you do S&C. Decisions about tennis are theirs."
+      ],
+      "ol": [],
+      "list": [
+        "Best: S&C on a day with no tennis.",
+        "Same day as tennis: S&C first, then tennis. If you can, leave a gap, at least enough to eat. In studies of lifting next to running and cycling (not tennis), a gap of 3 hours or more blunted explosive-strength gains less.",
+        "If the tennis after is long and hard (more than 2 hours, or practice matches), still do both that day. Eat and drink in between.",
+        "S&C after tennis is fine too, even if the tennis was hard or long. Do both on the same day.",
+        "After hard tennis (a practice match, or 60 minutes or more at 6 out of 10 effort or higher): eat and drink between tennis and the session, leave an hour or more if you can, and do the full warm-up.",
+        "Match day: no S&C session."
+      ],
+      "warn": "",
+      "callout": "Always do the session as written, even on a day you also play tennis. Never cut it short."
+    },
+    {
+      "h": "Where your sessions go in the week",
+      "p": [
+        "Most programmes have 3 main sessions a week. Here we call them Gym A (strength and power), Court B (speed, braking and agility) and Gym C (strength, power and resilience). Gym days and court days are separate, and Gym A and Gym C both have jumps and heavy leg work. If your programme is laid out differently, use the same rules on your own days, or ask Amir in the Coach tab.",
+        "An extra session never replaces a main one. With 1 or 2 tennis days a week you can add up to 3 extra sessions, with 3 days up to 2, and with 4 days or more only 1, and resilience & mobility comes first. Ask Amir which extra sessions fit your programme.",
+        "The timed rules in this section, like 48 hours before a match and no main session the day before, are the course's own rules, not a study result."
+      ],
+      "ol": [
+        "2 tennis days, 3 extras: Mon Gym A · Tue tennis and resilience & mobility · Wed Court B · Thu court conditioning · Fri Gym C · Sat tennis and speed & agility · Sun rest.",
+        "3 tennis days, 2 extras: Mon Gym A · Tue tennis · Wed Court B · Thu tennis and resilience & mobility · Fri Gym C · Sat tennis and speed & agility or court conditioning · Sun rest.",
+        "4 tennis days, 1 extra: Mon tennis · Tue Gym A · Wed tennis · Thu Court B then tennis · Fri Gym C · Sat tennis and resilience & mobility · Sun rest."
+      ],
+      "list": [
+        "No more than one S&C session a day, main or extra.",
+        "Order across the week: A, then B, then C, with a day between them if you can.",
+        "Never Gym A and Gym C on back-to-back days.",
+        "Gym A on a day with no tennis whenever you can, and at least 48 hours before a match.",
+        "The day before a match: no main session. Rest, or if you want, the short pre-match routine.",
+        "Match day: no S&C session.",
+        "One full rest day a week: no tennis, no S&C.",
+        "Extra sessions: resilience & mobility fits on any day, even a tennis day. Speed & agility at least 48 hours away from Court B. Court conditioning not on the day before Gym A or Court B, if you can."
+      ],
+      "warn": "",
+      "callout": "These weeks are examples. Fit the pattern around your own tennis days and keep the rules. With 4 or more tennis days, one day has both S&C and tennis. Do S&C first, ideally on your lightest tennis day. Send Amir your tennis days in the Coach tab and he'll lay out your week."
+    },
+    {
+      "h": "Match day, the day before and the day after",
+      "p": [
+        "A single club or league match isn't a tournament. This section is all you need for it."
+      ],
+      "ol": [],
+      "list": [
+        "2 days or more before a match: any session, following the rules above.",
+        "The day before a match: no main session. Rest, or if you want, the short pre-match routine (further down this lesson).",
+        "Match day, before the match: do the routine from the lesson “Warming up for tennis: the RAMP method”, timed to finish a few minutes before you walk on court. No other S&C.",
+        "Match day, between matches: stay warm, eat and drink. About 5 minutes before the next match, repeat a few minutes of easy jogging, Pogo Jump and Build-Up Run.",
+        "Match day, after the match: 5 to 10 minutes of easy walking, a few gentle stretches, and food and water. This is for comfort. No study has shown a recovery benefit.",
+        "The day after a match: rest, or resilience & mobility. Main sessions at least 48 hours after your last match.",
+        "After a long match (90 minutes or more), or 2 or more match days in a row: 2 days of rest or resilience & mobility, then main sessions."
+      ],
+      "warn": "",
+      "callout": "In a small study of 7 trained men, 4-hour tennis matches were played on 4 days in a row. From day 2 the jump before the match got shorter, the 20 m sprint after the match got slower, and soreness and fatigue rose each day. Serve speed held, but serve accuracy after the match dropped. That is an extreme case, so keep the days after a match light. No study has tested an exact number of hours in tennis. The numbers in this section, like 48 hours, are the course's own rules, not a study result."
+    },
+    {
+      "h": "Tournament week: your programme waits",
+      "p": [
+        "A tournament period runs from 2 days before your first match to the day of your last match. During it your programme pauses, and those days don't count as programme weeks. After it, carry on from the week you were in. Tell Amir your tournament dates in the Coach tab so he can plan around them.",
+        "Matches already train your speed, braking, reactions and endurance. Heavy leg work and exercises that make you sore leave you with sore legs for the next match. That is coaching logic, not the result of a study of S&C in a tournament week.",
+        "Sleep matters too. In one small study of 12 college tennis players, with no control group, a week of more sleep (from about 7.1 to 8.9 hours a night) raised serve accuracy from 35.7% to 41.8%, which is no promise, just a reason to take sleep seriously in match week.",
+        "Research reviews list a rapid jump in training load and a crowded match calendar as risk factors for injury. So don't add anything new to your programme in a tournament week."
+      ],
+      "ol": [],
+      "list": [
+        "A non-match day, even the day before a match: the short pre-match routine, up to 2 times a week.",
+        "Other non-match days: rest, or an easy walk and stretching.",
+        "From the second week of back-to-back tournaments: the short strength top-up routine once a week.",
+        "What stays: warm-up, a few jumps with a stuck landing, a few short sprints, a few med ball throws, band work for your racket shoulder, and mobility and stretching.",
+        "What goes: heavy leg work, braking and agility, Nordic Hamstring Curl and Copenhagen Plank, loaded calf and trunk work, and conditioning. In the first tournament week, upper-body weights go too."
+      ],
+      "warn": "",
+      "callout": "A tournament week isn't a missed week, and no missed session goes into it. Studies of time off training (not in tennis) show that strength losses stay limited when the break is under 4 weeks."
+    },
+    {
+      "h": "Short pre-match routine (about 24 minutes)",
+      "p": [
+        "This routine is optional. The day before a match you can do it or just rest. In a tournament period it's also for non-match days, up to 2 times a week.",
+        "Stuck landings only, no back-to-back jumps and no weights. Under 16: box 30 cm max, med ball 1 to 2 kg, and an adult there."
+      ],
+      "ol": [
+        "The 10-minute warm-up from your sessions, with Pogo Jump only 1 x 10 and Build-Up Run 2 x 20 m.",
+        "One jump with a stuck landing that you've done in your programme, like Snap Down, or Box Jump stepping down off the box. 2 x 3, rest 60 seconds.",
+        "Split-Step to Sprint, full effort: 3 reps, 5 m while you're new to sprinting in your programme and 10 m after that, rest 60 seconds.",
+        "Medicine Ball Side Throw, full effort: 2 x 3 each side, rest 45 seconds.",
+        "Band External Rotation: 1 x 15 each side, RPE 6.",
+        "5-minute cool-down: easy walking and gentle stretches for your thighs, calves, chest and forearms, 30 seconds each side for each one."
+      ],
+      "list": [],
+      "warn": "",
+      "callout": "Short and sharp, not tiring. Treat this routine as the course's own choice, not a study result: no study has shown it improves match performance."
+    },
+    {
+      "h": "Back-to-back tournaments and the strength top-up routine",
+      "p": [
+        "After a tournament, carry on from the same programme week. But several tournament weeks in a row pause more training, so you come back a bit further back.",
+        "The strength top-up routine (about 27 minutes) starts from the second week of back-to-back tournaments, once a week. Low volume, same effort. Put it on a non-match day at least 48 hours before your next match. If there's no such day, skip it.",
+        "The support for this routine comes from non-tennis data. In 14 professional footballers, one maintenance session a week for the first 12 weeks of the season kept strength, sprint speed and jumping, but one session every second week did not. “From the second week”, “2 sets” and “48 hours” are the course's own choices, not a study result."
+      ],
+      "ol": [
+        "The 10-minute warm-up from your sessions, with Pogo Jump 1 x 10.",
+        "The same stuck-landing jump from the pre-match routine: 2 x 3, rest 60 seconds.",
+        "Your main leg lift, Trap Bar Deadlift or Barbell Back Squat (whichever your programme uses): 2 sets at the reps and RPE of the last normal week you finished, rest 2 minutes. Under 16: at least 6 reps and RPE 7 max.",
+        "The upper-body pull from your current gym session: 2 sets at that week's reps and RPE, rest 90 seconds. Under 16: at least 6 reps and RPE 7 max.",
+        "Band External Rotation: 1 x 15 each side, RPE 6.",
+        "Short cool-down: easy walking and a few gentle stretches."
+      ],
+      "list": [
+        "One tournament period (up to about 7 days): carry on from the programme week you were in.",
+        "2 tournament weeks in a row: one top-up routine in the second week. Come back as in the row above.",
+        "3 or 4 tournament weeks in a row: one top-up routine a week from the second week. After, repeat the last programme week you finished.",
+        "5 weeks or more in a row: one top-up routine a week from the second week. After, go back to week 1 of that cycle.",
+        "Taper then tournament: taper weeks are training in themselves and don't count as weeks “in a row”."
+      ],
+      "warn": "",
+      "callout": "In every case, main sessions start at least 48 hours after your last match. After a long run of tournaments, tell Amir in the Coach tab and he'll set your programme back to the right place."
+    },
+    {
+      "h": "Tapering before a big match: when and why",
+      "p": [
+        "Before the biggest matches of your season, cut volume for about 2 weeks and keep the intensity. Same exercises, same load, same speed, same number of sessions. Just fewer sets and reps.",
+        "Most of the research is on swimmers, cyclists and runners. In a meta-analysis of 27 studies, a 2-week taper that cut volume gradually by 41 to 60%, with no change in intensity or sessions, seemed to be the most efficient. Another review gives a wider range: volume cut by 60 to 90%, sessions cut by 20% at most, tapers of 4 to over 28 days, and about 3% better performance on average.",
+        "In team sports, the evidence for a moderate gain in repeated sprints was limited, and for moderate gains in peak power, change-of-direction speed and VO2max it was moderate. We found no tennis study, so using this for tennis is our own reading."
+      ],
+      "ol": [],
+      "list": [
+        "For 2 or 3 big matches a season, not every tournament. Most tournaments only need the tournament week rules.",
+        "Not within 4 weeks of finishing another taper.",
+        "Less than 2 weeks to the match: only the second taper week. Less than 1 week: only the match day and tournament week rules.",
+        "Taper weeks don't count as programme weeks. After the match, carry on from the week you were in.",
+        "One exception: if your next programme week is a lighter week (a deload or test week), use it as written, test day included, as taper week 1. That week counts. Taper week 2 comes after it and doesn't count."
+      ],
+      "warn": "",
+      "callout": "A taper starts on time, even if you're behind in your programme. How many matches it's for, and how far apart, are the course's own rules, not a study result. Tell Amir the date of your big match in the Coach tab and he'll write the taper into your programme."
+    },
+    {
+      "h": "Tapering: how to do it",
+      "p": [
+        "Both weeks are based on the card of the last normal week (not a lighter week) that you finished. Same exercises, in the same order.",
+        "The numbers in this section, about 40% less and then about 60% less, and skipping sore-making exercises like Nordic Hamstring Curl, are the course's own rules, not a study result. Studies looked at a gradual cut. These two steps are a simple version of it."
+      ],
+      "ol": [],
+      "list": [
+        "Week 1 (14 to 8 days before your first match): sets or reps x 0.6. Week 2 (7 to 1 days before): x 0.4.",
+        "Round to the nearest whole number, never below 1. Example: 3 sets becomes 2, then 1. 5 reps becomes 3, then 2. 10 reps becomes 6, then 4.",
+        "Jumps, sprints, braking, agility and throws: same distance, same approach speed, full rest, full effort.",
+        "Strength exercises: fewer sets, same reps, same RPE as the card (under 16: the same under-16 RPE).",
+        "Nordic Hamstring Curl: 1 set in week 1 and none in week 2, because it can leave your hamstrings sore for a few days. Copenhagen Plank: x 0.6, then 1 set.",
+        "Repeated sprints and extra sessions get cut by the same numbers. Last conditioning session at least 48 hours before your first match.",
+        "Week 2: Gym A and Gym C at least 4 days before your first match, Court B at least 2 days before, and the last 2 days rest or the short pre-match routine."
+      ],
+      "warn": "",
+      "callout": "A taper means less, not slower. Every rep is still fast and clean, and the weights stay at the same RPE."
+    },
+    {
+      "h": "Test weeks",
+      "p": [
+        "If your programme has a test week, it's a lighter week: fewer sets, same RPE. The test day takes the place of Court B, and the strength check is in Gym A that week (16 and over an RM test, under 16 an estimate from your working set)."
+      ],
+      "ol": [],
+      "list": [
+        "Put test day at the end of the lighter week, at least 24 hours after Gym A and Gym C.",
+        "Not after tennis on the same day. Tennis after testing is fine.",
+        "At least 48 hours after a match, not in a tournament period, and not in the last 3 days before a match.",
+        "No good day, for example because of a tournament? Skip the tests that time and let Amir know. Your programme carries on.",
+        "If you've made the lighter week your first taper week, test day stays in that week.",
+        "Under 16: an adult is there for the whole test day."
+      ],
+      "warn": "",
+      "callout": "The details of each test, their order and the test day warm-up are in “Test day: rules, order and warm-up”."
+    }
+  ]
+}

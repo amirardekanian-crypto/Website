@@ -1,0 +1,127 @@
+{
+  "id": "training-on-period",
+  "icon": "🌿",
+  "group": "Body & health",
+  "order": 35,
+  "title": "Periods and training: what's normal",
+  "summary": "Know what's normal during a period, what often helps, when to see a doctor and who to talk to.",
+  "audience": "Players and parents",
+  "sections": [
+    {
+      "h": "Periods are normal",
+      "p": [
+        "A period is a normal part of growing up, and tennis players at every level train and play with one. Most players do their sessions as usual.",
+        "In large studies of women who exercise, these symptoms were very common, and how strong they are changes from person to person:"
+      ],
+      "ol": [],
+      "list": [
+        "Cramps and pain in the lower belly.",
+        "Tiredness.",
+        "Changes in mood and motivation.",
+        "Tender or sore breasts."
+      ],
+      "warn": "",
+      "callout": "A period on its own isn't a reason to hide it or drop training. Tell an adult about any symptom that worries you."
+    },
+    {
+      "h": "Symptoms and your session",
+      "p": [
+        "Sessions are done as written. If pain stops you doing a move, follow the pain ladder in the lesson \"Pain or soreness? And the red flags\", which tells you what to do with that move.",
+        "No study has found core work harmful during a period.",
+        "If any of these happen mid-session, stop and tell an adult:"
+      ],
+      "ol": [],
+      "list": [
+        "Dizziness or feeling close to fainting.",
+        "More breathless than usual for the same effort.",
+        "Pain that doubles you over."
+      ],
+      "warn": "",
+      "callout": "The pain ladder is for a move that hurts. If you start a session feeling flat or unwell, talk to a parent and your coach."
+    },
+    {
+      "h": "What usually helps",
+      "p": [
+        "In research reviews, heat and regular exercise reduced period pain. The evidence is low quality, and for exercise the result comes from weeks of regular training and not from a single session."
+      ],
+      "ol": [],
+      "list": [
+        "Heat: a hot water bottle or heat pack on the lower belly. In one review, heat worked about as well as painkillers, or better.",
+        "Regular training through the month, which is already part of this programme.",
+        "Walking and easy movement: some athletes feel it helps, though we have no direct research on a single day."
+      ],
+      "warn": "Painkillers, tablets or any supplement only with a parent's knowledge and a doctor's advice.",
+      "callout": "If none of this helps, show a doctor any pain that keeps you away from school, training or matches."
+    },
+    {
+      "h": "When to see a doctor",
+      "p": [
+        "A period is normal, but a doctor should look at some patterns. The numbers below are rough guides, and the doctor decides."
+      ],
+      "ol": [],
+      "list": [
+        "No first period by about age 15, or about 3 years after breast development started.",
+        "Periods that stop for 3 months or more after being regular.",
+        "Cycles that are often shorter than about 21 days or longer than about 45 days.",
+        "Very heavy bleeding: soaking a pad or tampon every 1 to 2 hours, bleeding for longer than about 7 days, or new dizziness, breathlessness or tiredness.",
+        "Pain that doubles you over, makes you miss school or sport, or doesn't ease with heat and easy movement."
+      ],
+      "warn": "Very heavy bleeding with dizziness, breathlessness or new weakness: tell a parent or another adult the same day and get medical help. Emergency number: 115 in Iran.",
+      "callout": "Under 18: tell a parent or an adult you trust, and book a doctor."
+    },
+    {
+      "h": "Heavy bleeding and iron",
+      "p": [
+        "Heavy bleeding is common in athletes. In surveys of women who exercise, 36% to 54% reported it, about a third had a past diagnosis of anaemia, and only 22% had sought medical advice.",
+        "If your bleeding is heavy or you're tired all the time, ask a doctor to check your iron. Don't start iron tablets on your own."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "",
+      "callout": "Iron tablets only after a blood test and a doctor's advice."
+    },
+    {
+      "h": "A missed period isn't a fitness sign",
+      "p": [
+        "Periods that stop or turn irregular aren't a sign of high fitness. They can show that your body isn't getting enough energy for the training you do, which is called low energy availability.",
+        "This can lead to missed periods, stress fractures and constant tiredness. Some researchers say the evidence shows links more than proof of cause, and that's why a doctor needs to see the whole picture."
+      ],
+      "ol": [],
+      "list": [],
+      "warn": "If your periods stop or are irregular, tell a parent and see a doctor. Never praise a player for how her body looks.",
+      "callout": "A period that stops in an athlete is a sign for a doctor to look at."
+    },
+    {
+      "h": "Who to talk to",
+      "p": [
+        "Talk to a parent or an adult you trust. For some players a female coach is the easiest choice, and for others it's their mother.",
+        "Painkillers, iron tablets and hormonal contraception, including the pill, are for you, a parent and a doctor to decide, and a coach doesn't suggest them. If you track your cycle, the record is for your doctor and it isn't a performance tool."
+      ],
+      "ol": [],
+      "list": [
+        "A parent.",
+        "A female coach or another adult you trust.",
+        "A doctor or family doctor."
+      ],
+      "warn": "",
+      "callout": "You don't have to say everything at once. Start with one sentence: \"My period hurts and I'd like to talk about it.\""
+    },
+    {
+      "h": "What coaches and parents should and shouldn't say",
+      "p": [
+        "This part is for coaches and parents. A period is a private matter, so talk about it with respect and never in front of others."
+      ],
+      "ol": [],
+      "list": [
+        "Ask how she feels and listen.",
+        "Let her say what she needs.",
+        "If you're worried, talk with her and her parents about seeing a doctor.",
+        "Don't say \"you're making excuses\" or \"you've gone soft because of your period\".",
+        "Don't talk about her weight or how her body looks.",
+        "Don't suggest painkillers, tablets or supplements. That decision belongs to the family and a doctor."
+      ],
+      "warn": "",
+      "callout": "Ask, listen, and leave medical decisions to the family and a doctor."
+    }
+  ]
+}
