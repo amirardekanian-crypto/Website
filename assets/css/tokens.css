@@ -4,6 +4,22 @@
    `.theme-light` is kept in sync with it for training-screen pages.
    ═══════════════════════════════════════════════════════════════════════ */
 
+/* A stand-in for Barlow Condensed while it loads (font-display: swap shows the next font in the stack straight away).
+   The system font used to be about 1.4 times wider, so the home headline wrapped to six lines, then to three when the web font
+   arrived: the whole hero jumped. This face is the system's bold sans scaled to the MEASURED width of Barlow Condensed
+   (900 is 0.705 of Arial Bold, 700 is 0.679), with the vertical metrics of Barlow Condensed divided by that scale. If a phone has none
+   of these fonts the face is simply skipped and nothing changes. Remeasure if the web font is ever changed. */
+@font-face {
+  font-family: 'Barlow Condensed Fallback'; font-weight: 900; font-style: normal;
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Helvetica Bold'), local('Roboto Bold'), local('Roboto-Bold'), local('Liberation Sans Bold');
+  size-adjust: 70.5%; ascent-override: 142%; descent-override: 28.4%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Barlow Condensed Fallback'; font-weight: 700; font-style: normal;
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Helvetica Bold'), local('Roboto Bold'), local('Roboto-Bold'), local('Liberation Sans Bold');
+  size-adjust: 67.9%; ascent-override: 147%; descent-override: 29.5%; line-gap-override: 0%;
+}
+
 :root {
   /* ── Accent (brand) — Roland Garros green (primary) ── */
   --accent:        #0E4A36;
@@ -35,7 +51,7 @@
   --text-dim:      #6B6B6B;  /* was #B0A99E (2.0:1). As text it now equals muted */
 
   /* ── Typography ── */
-  --font-display:  'Barlow Condensed', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display:  'Barlow Condensed', 'Barlow Condensed Fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body:     'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono:     'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 

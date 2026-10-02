@@ -42,9 +42,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
 <!-- Shared design system -->
-<link rel="stylesheet" href="/assets/css/tokens.css?v=20261002b">
-<link rel="stylesheet" href="/assets/css/base.css?v=20261002b">
-<link rel="stylesheet" href="/assets/css/components.css?v=20261002b">
+<link rel="stylesheet" href="/assets/css/tokens.css?v=20261002c">
+<link rel="stylesheet" href="/assets/css/base.css?v=20261002c">
+<link rel="stylesheet" href="/assets/css/components.css?v=20261002c">
 
 <!-- Structured data: Person + Service -->
 <script type="application/ld+json">
@@ -929,8 +929,12 @@
   }
   @media (max-width: 480px) {
     .hero-h1 { font-size: clamp(44px, 14vw, 60px); }   /* at 360 px the headline wrapped to five lines */
-    .hero-ball--main { width: 72px; top: auto; bottom: 17%; right: 8%; }   /* beside the Apply button: clear of the kicker and the header */
+    /* in the empty gutter to the right of the headline (the hero content is centred, so the headline sits about 65 px above the
+       middle). Checked against the headline lines, the kicker, the sub, both buttons and the header at 375 to 480 px wide and
+       568 to 915 px tall: it touches nothing. Narrower than that there is no gutter, so it is left out. */
+    .hero-ball--main { width: 52px; top: calc(50% - 90px); bottom: auto; right: 3%; }
   }
+  @media (max-width: 374px) { .hero-ball--main { display: none; } }
   /* Endless ambient motion only runs while its section is on screen (58 animations at once drain a phone). */
   .is-off .orb, .is-off .hero-grid-bg, .is-off .hero-ball, .is-off .hero-ball img, .is-off .marquee-track, .is-off .cta-ball,
   .is-off .cta-ball img, .is-off .pricing-card--featured, .is-off .pricing-badge, .is-off .method-loop span, .is-off .cta-heading em,
@@ -1885,6 +1889,6 @@
 })();
 </script>
 
-<script defer src="/assets/js/shared.js?v=20261002b"></script>
+<script defer src="/assets/js/shared.js?v=20261002c"></script>
 </body>
 </html>
