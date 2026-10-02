@@ -9,6 +9,16 @@ too, stays in CLAUDE.md → *Site layout*.
 
 ## The course app (`/tennis/app/`)
 
+> ⚠️ **2026-10-02: `tps-content` is unreachable and out of date.** The `amirardekanian-crypto` GitHub login that pushes to
+> this repo gets "Repository not found" for `tps-content` and `assess-content`, and neither is on this PC. Three things
+> must therefore never be done from that repo until it is found and brought up to date: (1) **its deploy script** copies
+> an old shell over `/tennis/app/`, erasing the demo, the covers and the `ART` lines added here (the latest are
+> `training-on-period` and `training-with-injury`, 2026-10-02); (2) **its lesson build scripts** (`build_learn*.py` and
+> `l5_*.py` modules) still hold the OLD lesson text, and publishing from them with `tps_publish()` **overwrites the
+> 19 lessons corrected and added on 2026-10-02** (`Content/CONTENT-PARITY.md`); (3) a lesson edited in the database and
+> not in those scripts is silently lost on the next publish. **The `tps_content` and `course_en` rows are the source of
+> truth for the lessons; this folder is the source of truth for the shell.**
+
 **`/tennis/app/` is the paid course app** (Tennis Performance System, Level 2; Farsi). Its source
 and content live in the private `tps-content` repo: only the shell (index.html, app.js, app.css,
 sw.js, the self-hosted font and Supabase library) is copied here by
