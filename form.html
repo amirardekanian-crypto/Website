@@ -606,7 +606,7 @@
     <p class="section-desc">Select the programme that best fits your goals.</p>
 
     <div class="f-field">
-      <div class="radio-cards">
+      <div class="radio-cards" role="radiogroup" aria-labelledby="s0">
         <div class="radio-card">
           <input type="radio" id="prog_game" name="Programme" value="Game — $70 / 1 month" required>
           <label for="prog_game"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i></i><i></i></span>Game — $70 / 1 month</label>
@@ -720,8 +720,8 @@
     </div>
 
     <div class="f-field conditional" id="levelWrap">
-      <label>Competitive Level</label>
-      <div class="radio-cards">
+      <label id="qg1">Competitive Level</label>
+      <div class="radio-cards" role="radiogroup" aria-labelledby="qg1">
         <div class="radio-card">
           <input type="radio" id="lvl_rec" name="Competitive Level" value="Recreational">
           <label for="lvl_rec"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></span>Recreational</label>
@@ -757,8 +757,8 @@
     </div>
 
     <div class="f-field conditional" id="activityLevelWrap">
-      <label>How active are you currently?</label>
-      <div class="radio-cards">
+      <label id="qg2">How active are you currently?</label>
+      <div class="radio-cards" role="radiogroup" aria-labelledby="qg2">
         <div class="radio-card">
           <input type="radio" id="act_sed" name="Activity Level" value="Sedentary">
           <label for="act_sed"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></span>Sedentary</label>
@@ -786,8 +786,8 @@
     <p class="section-desc">Where you've been helps me plan where you're going.</p>
 
     <div class="f-field">
-      <label>How long have you been doing gym / strength training?</label>
-      <div class="radio-cards">
+      <label id="qg3">How long have you been doing gym / strength training?</label>
+      <div class="radio-cards" role="radiogroup" aria-labelledby="qg3">
         <div class="radio-card">
           <input type="radio" id="exp_none" name="Gym Experience" value="Never" required>
           <label for="exp_none"><span class="rc-icon" aria-hidden="true">🆕</span>Never</label>
@@ -819,10 +819,10 @@
     </div>
 
     <div class="f-field">
-      <label>Which types of training are you currently doing?
+      <label id="qg4">Which types of training are you currently doing?
         <span class="hint">Select all that apply</span>
       </label>
-      <div class="pill-group">
+      <div class="pill-group" role="group" aria-labelledby="qg4">
         <label class="pill"><input type="checkbox" name="Training Types" value="Free Weights"><span>Free Weights</span></label>
         <label class="pill"><input type="checkbox" name="Training Types" value="Machines"><span>Machines</span></label>
         <label class="pill"><input type="checkbox" name="Training Types" value="Bodyweight"><span>Bodyweight</span></label>
@@ -849,10 +849,10 @@
     <p class="section-desc">Pick the goals that matter most to you right now.</p>
 
     <div class="f-field">
-      <label>Primary Goals
+      <label id="qg5">Primary Goals
         <span class="hint">Select up to 3</span>
       </label>
-      <div class="pill-group" id="goalsGroup">
+      <div class="pill-group" role="group" aria-labelledby="qg5" id="goalsGroup">
         <label class="pill"><input type="checkbox" name="Goals" value="Sport Performance"><span>Sport Performance</span></label>
         <label class="pill"><input type="checkbox" name="Goals" value="Get Stronger"><span>Get Stronger</span></label>
         <label class="pill"><input type="checkbox" name="Goals" value="Power & Speed"><span>Power &amp; Speed</span></label>
@@ -882,8 +882,8 @@
     <p class="section-desc">This keeps you safe and lets me programme around any limitations.</p>
 
     <div class="f-field">
-      <label>Do you currently have any pain or injury?</label>
-      <div class="radio-cards" style="grid-template-columns: 1fr 1fr;">
+      <label id="qg6">Do you currently have any pain or injury?</label>
+      <div class="radio-cards" role="radiogroup" aria-labelledby="qg6" style="grid-template-columns: 1fr 1fr;">
         <div class="radio-card">
           <input type="radio" id="inj_no" name="Current Injury" value="No" required>
           <label for="inj_no"><span class="rc-icon" aria-hidden="true"><svg class="mk" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke-width="1.6"/><path d="M7.6 12.4l3 3 5.8-6.2" stroke-width="1.9"/></svg></span>No</label>
@@ -903,10 +903,10 @@
     </div>
 
     <div class="f-field">
-      <label>Any past injuries or surgeries that still affect you?
+      <label id="qg7">Any past injuries or surgeries that still affect you?
         <span class="hint">Select all that apply</span>
       </label>
-      <div class="pill-group">
+      <div class="pill-group" role="group" aria-labelledby="qg7">
         <label class="pill"><input type="checkbox" name="Past Injuries" value="Shoulder"><span>Shoulder</span></label>
         <label class="pill"><input type="checkbox" name="Past Injuries" value="Elbow / Wrist"><span>Elbow / Wrist</span></label>
         <label class="pill"><input type="checkbox" name="Past Injuries" value="Lower Back"><span>Lower Back</span></label>
@@ -1020,8 +1020,8 @@
     <p class="section-desc">So I only prescribe exercises you can actually do.</p>
 
     <div class="f-field">
-      <label>Training environment</label>
-      <div class="radio-cards" style="grid-template-columns: repeat(3, 1fr);">
+      <label id="qg8">Training environment</label>
+      <div class="radio-cards" role="radiogroup" aria-labelledby="qg8" style="grid-template-columns: repeat(3, 1fr);">
         <div class="radio-card">
           <input type="radio" id="env_gym" name="Environment" value="Full Gym" required>
           <label for="env_gym"><span class="rc-icon" aria-hidden="true">🏢</span>Full Gym</label>
@@ -1038,10 +1038,10 @@
     </div>
 
     <div class="f-field">
-      <label>What equipment do you have access to?
+      <label id="qg9">What equipment do you have access to?
         <span class="hint">Select all that apply</span>
       </label>
-      <div class="pill-group">
+      <div class="pill-group" role="group" aria-labelledby="qg9">
         <label class="pill"><input type="checkbox" name="Equipment" value="Barbell & Rack"><span>Barbell &amp; Rack</span></label>
         <label class="pill"><input type="checkbox" name="Equipment" value="Dumbbells"><span>Dumbbells</span></label>
         <label class="pill"><input type="checkbox" name="Equipment" value="Kettlebells"><span>Kettlebells</span></label>
@@ -1273,10 +1273,12 @@
         clearError(hidden);
         updateProgress();
       }
-      // pointerdown/keydown so picking the value it already sits on still counts
+      // pointerdown/keydown so picking the value it already sits on still counts. Only the keys that move or confirm
+      // the thumb do: Tab and Shift just pass through (they used to record the default, 7 or 5, as the answer).
+      const SET_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown', 'Enter', ' '];
       s.addEventListener('input', commit);
       s.addEventListener('pointerdown', commit);
-      s.addEventListener('keydown', commit);
+      s.addEventListener('keydown', e => { if (SET_KEYS.indexOf(e.key) !== -1) commit(); });
     }
     wireSlider('sleepSlider', 'sleepVal', 'sleepWrap', 'sleepValue');
     wireSlider('stressSlider', 'stressVal', 'stressWrap', 'stressValue');
@@ -1314,6 +1316,18 @@
         msg.textContent = text;
         field.appendChild(msg);
       }
+    }
+
+    // What to do, by the kind of question (it used to say "Please answer this question" for all of them).
+    function messageFor(el) {
+      const t = (el.type || '').toLowerCase();
+      if (t === 'email') return (el.value || '').trim() ? 'Please enter a valid email address, like name@example.com.' : 'Please enter your email address.';
+      if (t === 'radio') return 'Please choose one option.';
+      if (t === 'checkbox') return 'Please choose at least one.';
+      if (el.tagName === 'SELECT') return 'Please choose an option from the list.';
+      if (t === 'hidden') return 'Please move the slider to give your answer.';
+      if (t === 'number') return el.min !== '' && el.max !== '' ? 'Please enter a number from ' + el.min + ' to ' + el.max + '.' : 'Please enter a number.';
+      return 'Please fill this in.';
     }
 
     function firstUnanswered() {
@@ -1401,10 +1415,7 @@
 
       const missing = firstUnanswered();
       if (missing) {
-        const isBadEmail = missing.type === 'email' && (missing.value || '').trim();
-        showError(missing, isBadEmail
-          ? 'Please enter a valid email address.'
-          : 'Please answer this question.');
+        showError(missing, messageFor(missing));
         const field = fieldOf(missing);
         if (field) field.scrollIntoView({ behavior: 'smooth', block: 'center' });
         if (missing.offsetParent !== null) {

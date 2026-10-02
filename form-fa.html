@@ -231,9 +231,9 @@
   <!-- 0 · LOCATION / PRICING -->
   <section class="fsec">
     <div class="sbadge">۰۰ — هزینه</div>
-    <h2>کجا زندگی می‌کنی؟</h2>
+    <h2 id="s0">کجا زندگی می‌کنی؟</h2>
     <p class="sdesc">فقط برای تعیینِ هزینه — ساکنِ ایران: معادلِ ۲۵ دلار در ماه (به تومان، با نرخِ روز).</p>
-    <div class="f"><div class="rcards" style="grid-template-columns:1fr 1fr;">
+    <div class="f"><div class="rcards" role="radiogroup" aria-labelledby="s0" style="grid-template-columns:1fr 1fr;">
       <div class="rcard"><input type="radio" id="loc_ir" name="Location" value="Iran resident" required><label for="loc_ir"><span class="ic">🇮🇷</span>ساکنِ ایران</label></div>
       <div class="rcard"><input type="radio" id="loc_ab" name="Location" value="Abroad"><label for="loc_ab"><span class="ic">🌍</span>خارج از ایران</label></div>
     </div></div>
@@ -284,8 +284,8 @@
       </select>
     </div>
     <div class="f cond" id="otherWrap"><label for="other">ورزشتو بنویس</label><input type="text" id="other" name="Sport (Other)" placeholder="ورزشِ تو"></div>
-    <div class="f cond" id="lvlWrap"><label>سطحِ رقابتی</label>
-      <div class="rcards">
+    <div class="f cond" id="lvlWrap"><label id="qg1">سطحِ رقابتی</label>
+      <div class="rcards" role="radiogroup" aria-labelledby="qg1">
         <div class="rcard"><input type="radio" id="l1" name="Competitive Level" value="Recreational"><label for="l1"><span class="ic pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></span>تفریحی</label></div>
         <div class="rcard"><input type="radio" id="l2" name="Competitive Level" value="Club / League"><label for="l2"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>باشگاهی / لیگ</label></div>
         <div class="rcard"><input type="radio" id="l3" name="Competitive Level" value="University"><label for="l3"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>دانشگاهی</label></div>
@@ -296,8 +296,8 @@
     <div class="f cond" id="freqWrap"><label for="freq">هفته‌ای چند روز بازی یا تمرین می‌کنی؟</label>
       <select id="freq" name="Sport Frequency"><option value="" disabled selected>انتخاب</option>
         <option value="1-2 days">۱–۲ روز</option><option value="3-4 days">۳–۴ روز</option><option value="5-6 days">۵–۶ روز</option><option value="Daily">هر روز</option></select></div>
-    <div class="f cond" id="actLvlWrap"><label>الان چقدر فعالی؟</label>
-      <div class="rcards">
+    <div class="f cond" id="actLvlWrap"><label id="qg2">الان چقدر فعالی؟</label>
+      <div class="rcards" role="radiogroup" aria-labelledby="qg2">
         <div class="rcard"><input type="radio" id="a1" name="Activity Level" value="Sedentary"><label for="a1"><span class="ic pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></span>کم‌تحرک</label></div>
         <div class="rcard"><input type="radio" id="a2" name="Activity Level" value="Lightly Active"><label for="a2"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i></span>کمی فعال</label></div>
         <div class="rcard"><input type="radio" id="a3" name="Activity Level" value="Moderately Active"><label for="a3"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>نسبتاً فعال</label></div>
@@ -311,8 +311,8 @@
     <div class="sbadge">۰۳ — سابقه‌ی تمرین</div>
     <h2>پیشینه‌ی تمرینت</h2>
     <p class="sdesc">جایی که بودی کمک می‌کنه بفهمم کجا باید بریم.</p>
-    <div class="f"><label>چند وقته باشگاه یا تمرینِ قدرتی می‌ری؟</label>
-      <div class="rcards">
+    <div class="f"><label id="qg3">چند وقته باشگاه یا تمرینِ قدرتی می‌ری؟</label>
+      <div class="rcards" role="radiogroup" aria-labelledby="qg3">
         <div class="rcard"><input type="radio" id="g1" name="Gym Experience" value="Never" required><label for="g1"><span class="ic">🆕</span>هیچ‌وقت</label></div>
         <div class="rcard"><input type="radio" id="g2" name="Gym Experience" value="Under 1 year"><label for="g2"><span class="ic">📅</span>زیرِ ۱ سال</label></div>
         <div class="rcard"><input type="radio" id="g3" name="Gym Experience" value="1-3 years"><label for="g3"><span class="ic">💪</span>۱–۳ سال</label></div>
@@ -322,8 +322,8 @@
     <div class="f"><label for="curr">الان هفته‌ای چند روز تمرینِ قدرتی می‌کنی؟</label>
       <select id="curr" name="Current Training Days" required><option value="" disabled selected>انتخاب</option>
         <option value="0">۰ — فعلاً نمی‌کنم</option><option value="1-2 days">۱–۲ روز</option><option value="3-4 days">۳–۴ روز</option><option value="5+ days">۵+ روز</option></select></div>
-    <div class="f"><label>الان چه نوع تمریناتی انجام می‌دی؟ <span class="hint">هر چی هست انتخاب کن</span></label>
-      <div class="pills">
+    <div class="f"><label id="qg4">الان چه نوع تمریناتی انجام می‌دی؟ <span class="hint">هر چی هست انتخاب کن</span></label>
+      <div class="pills" role="group" aria-labelledby="qg4">
         <label class="pill"><input type="checkbox" name="Training Types" value="Free Weights"><span>وزنه‌ی آزاد</span></label>
         <label class="pill"><input type="checkbox" name="Training Types" value="Machines"><span>دستگاه</span></label>
         <label class="pill"><input type="checkbox" name="Training Types" value="Bodyweight"><span>وزنِ بدن</span></label>
@@ -343,8 +343,8 @@
     <div class="sbadge">۰۴ — هدف‌ها</div>
     <h2>دنبالِ چی هستی؟</h2>
     <p class="sdesc">هدف‌هایی که الان بیش‌تر برات مهمن رو انتخاب کن.</p>
-    <div class="f"><label>هدف‌های اصلی <span class="hint">تا ۳ تا انتخاب کن</span></label>
-      <div class="pills" id="goals">
+    <div class="f"><label id="qg5">هدف‌های اصلی <span class="hint">تا ۳ تا انتخاب کن</span></label>
+      <div class="pills" role="group" aria-labelledby="qg5" id="goals">
         <label class="pill"><input type="checkbox" name="Goals" value="Sport Performance"><span>عملکردِ ورزشی</span></label>
         <label class="pill"><input type="checkbox" name="Goals" value="Get Stronger"><span>قوی‌تر شدن</span></label>
         <label class="pill"><input type="checkbox" name="Goals" value="Power & Speed"><span>توان و سرعت</span></label>
@@ -367,16 +367,16 @@
     <div class="sbadge">۰۵ — آسیب و سلامت</div>
     <h2>وضعیتِ بدن</h2>
     <p class="sdesc">این، امنیتتو حفظ می‌کنه و کمک می‌کنه برنامه رو دورِ محدودیت‌هات بچینم.</p>
-    <div class="f"><label>الان درد یا آسیبی داری؟</label>
-      <div class="rcards" style="grid-template-columns:1fr 1fr;">
+    <div class="f"><label id="qg6">الان درد یا آسیبی داری؟</label>
+      <div class="rcards" role="radiogroup" aria-labelledby="qg6" style="grid-template-columns:1fr 1fr;">
         <div class="rcard"><input type="radio" id="inj_no" name="Current Injury" value="No" required><label for="inj_no"><span class="ic" aria-hidden="true"><svg class="mk" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke-width="1.6"/><path d="M7.6 12.4l3 3 5.8-6.2" stroke-width="1.9"/></svg></span>نه</label></div>
         <div class="rcard"><input type="radio" id="inj_yes" name="Current Injury" value="Yes"><label for="inj_yes"><span class="ic" aria-hidden="true"><svg class="mk mk-warn" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke-width="1.6"/><path d="M12 7.2v6.1M12 16.6v.2" stroke-width="2.2"/></svg></span>آره</label></div>
       </div>
     </div>
     <div class="f cond" id="injWrap"><label for="injd">کوتاه توضیح بده <span class="hint">عضو، چند وقته، شدت ۱–۱۰</span></label>
       <textarea id="injd" name="Injury Details" rows="2" placeholder="مثلاً زانوی راست — ۳ هفته دردِ خفیف — ۴ از ۱۰"></textarea></div>
-    <div class="f"><label>آسیب یا جراحیِ قبلی که هنوز اذیتت می‌کنه؟ <span class="hint">هر چی هست انتخاب کن</span></label>
-      <div class="pills">
+    <div class="f"><label id="qg7">آسیب یا جراحیِ قبلی که هنوز اذیتت می‌کنه؟ <span class="hint">هر چی هست انتخاب کن</span></label>
+      <div class="pills" role="group" aria-labelledby="qg7">
         <label class="pill"><input type="checkbox" name="Past Injuries" value="Shoulder"><span>شونه</span></label>
         <label class="pill"><input type="checkbox" name="Past Injuries" value="Elbow / Wrist"><span>آرنج / مچِ دست</span></label>
         <label class="pill"><input type="checkbox" name="Past Injuries" value="Lower Back"><span>کمر</span></label>
@@ -425,15 +425,15 @@
     <div class="sbadge">۰۷ — تجهیزات</div>
     <h2>کجا تمرین می‌کنی؟</h2>
     <p class="sdesc">تا فقط حرکاتی بنویسم که واقعاً می‌تونی انجام بدی.</p>
-    <div class="f"><label>محیطِ تمرین</label>
-      <div class="rcards" style="grid-template-columns:repeat(3,1fr);">
+    <div class="f"><label id="qg8">محیطِ تمرین</label>
+      <div class="rcards" role="radiogroup" aria-labelledby="qg8" style="grid-template-columns:repeat(3,1fr);">
         <div class="rcard"><input type="radio" id="e1" name="Environment" value="Full Gym" required><label for="e1"><span class="ic">🏢</span>باشگاهِ کامل</label></div>
         <div class="rcard"><input type="radio" id="e2" name="Environment" value="Home Gym"><label for="e2"><span class="ic">🏠</span>باشگاهِ خانگی</label></div>
         <div class="rcard"><input type="radio" id="e3" name="Environment" value="Minimal / Travel"><label for="e3"><span class="ic">🎒</span>کم‌امکانات / سفر</label></div>
       </div>
     </div>
-    <div class="f"><label>به چه تجهیزاتی دسترسی داری؟ <span class="hint">هر چی هست انتخاب کن</span></label>
-      <div class="pills">
+    <div class="f"><label id="qg9">به چه تجهیزاتی دسترسی داری؟ <span class="hint">هر چی هست انتخاب کن</span></label>
+      <div class="pills" role="group" aria-labelledby="qg9">
         <label class="pill"><input type="checkbox" name="Equipment" value="Barbell & Rack"><span>هالتر و رک</span></label>
         <label class="pill"><input type="checkbox" name="Equipment" value="Dumbbells"><span>دمبل</span></label>
         <label class="pill"><input type="checkbox" name="Equipment" value="Kettlebells"><span>کتل‌بل</span></label>
@@ -509,10 +509,12 @@
         wrap=document.getElementById(p[2]),hid=document.getElementById(p[3]);
     if(!s||!v||!wrap||!hid)return;
     function commit(){hid.value=s.value;v.textContent=fa(s.value);wrap.classList.remove('is-unset');clearErr(hid);upd();}
-    // pointerdown/keydown تا انتخابِ همون عددی که روش هست هم حساب بشه
+    // pointerdown/keydown تا انتخابِ همون عددی که روش هست هم حساب بشه. فقط کلیدهایی که اسلایدر رو جابه‌جا یا تأیید می‌کنن
+    // حساب می‌شن: Tab فقط رد می‌شه (قبلاً عددِ پیش‌فرض، ۷ یا ۵، رو به‌عنوانِ جواب ثبت می‌کرد)
+    var SET_KEYS=['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','PageUp','PageDown','Enter',' '];
     s.addEventListener('input',commit);
     s.addEventListener('pointerdown',commit);
-    s.addEventListener('keydown',commit);
+    s.addEventListener('keydown',function(e){if(SET_KEYS.indexOf(e.key)!==-1)commit();});
   });
 
   // ── اعتبارسنجی ──
@@ -528,6 +530,17 @@
   function showErr(el,txt){var f=fieldOf(el);if(!f)return;f.classList.add('has-error');
     if(!f.querySelector('.ferr')){var m=document.createElement('p');m.className='ferr';
       m.setAttribute('role','alert');m.textContent=txt;f.appendChild(m);}}
+  // چی‌کار کنه، بر اساسِ نوعِ سؤال (قبلاً برای همه می‌گفت «این سؤال رو جواب بده»)
+  function messageFor(el){
+    var t=(el.type||'').toLowerCase();
+    if(t==='email')return (el.value||'').trim()?'ایمیلِ معتبر وارد کن.':'ایمیلت رو بنویس.';
+    if(t==='radio')return 'یکی رو انتخاب کن.';
+    if(t==='checkbox')return 'دست‌کم یکی رو انتخاب کن.';
+    if(el.tagName==='SELECT')return 'یکی از گزینه‌ها رو انتخاب کن.';
+    if(t==='hidden')return 'اسلایدر رو جابه‌جا کن تا جوابت ثبت بشه.';
+    if(el.id==='age')return 'سنت رو با عدد بنویس.';
+    return 'این بخش رو پر کن.';
+  }
   function firstMissing(){
     var seen={},req=form.querySelectorAll('[required]');
     for(var i=0;i<req.length;i++){var el=req[i];
@@ -656,8 +669,7 @@
 
     var miss=firstMissing();
     if(miss){
-      var badEmail=miss.type==='email'&&(miss.value||'').trim();
-      showErr(miss,badEmail?'ایمیلِ معتبر وارد کن.':'این سؤال رو جواب بده.');
+      showErr(miss,messageFor(miss));
       var f=fieldOf(miss);
       if(f)f.scrollIntoView({behavior:'smooth',block:'center'});
       if(miss.offsetParent!==null){try{miss.focus({preventScroll:true});}catch(err){}}
