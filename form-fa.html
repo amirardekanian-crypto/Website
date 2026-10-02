@@ -95,6 +95,12 @@
   .rcard input{position:absolute;opacity:0;pointer-events:none;}
   .rcard label{display:flex;flex-direction:column;align-items:center;text-align:center;padding:16px 12px;border:1px solid var(--line-2);border-radius:var(--r);cursor:pointer;transition:.2s;font-size:14px;color:var(--ink-2);background:var(--paper);margin:0;font-weight:500;}
   .rcard label .ic{font-size:24px;margin-bottom:7px;}
+  /* علامت‌های سطح، به رنگِ خودِ برند (قبلاً ایموجیِ چراغ‌راهنما بود: این‌جا زرد و نارنجی نمی‌خوایم). رنگِ متنِ کارت رو می‌گیرن: خاکستری تا انتخاب بشه، بعدش سبز. */
+  .rcard label .ic.pips{display:inline-flex;align-items:center;gap:5px;height:24px;}
+  .ic.pips i{width:9px;height:9px;border-radius:50%;border:1.6px solid currentColor;}
+  .ic.pips i.on{background:currentColor;}
+  .ic .mk{display:block;}
+  .ic .mk-warn{color:var(--clay);}
   .rcard label:hover{border-color:var(--green);}
   .rcard input:checked+label{border-color:var(--green);background:var(--accent-dim);color:var(--green);font-weight:700;}
 
@@ -275,11 +281,11 @@
     <div class="f cond" id="otherWrap"><label for="other">ورزشتو بنویس</label><input type="text" id="other" name="Sport (Other)" placeholder="ورزشِ تو"></div>
     <div class="f cond" id="lvlWrap"><label>سطحِ رقابتی</label>
       <div class="rcards">
-        <div class="rcard"><input type="radio" id="l1" name="Competitive Level" value="Recreational"><label for="l1"><span class="ic">🟢</span>تفریحی</label></div>
-        <div class="rcard"><input type="radio" id="l2" name="Competitive Level" value="Club / League"><label for="l2"><span class="ic">🔵</span>باشگاهی / لیگ</label></div>
-        <div class="rcard"><input type="radio" id="l3" name="Competitive Level" value="University"><label for="l3"><span class="ic">🟡</span>دانشگاهی</label></div>
-        <div class="rcard"><input type="radio" id="l4" name="Competitive Level" value="Semi-Pro"><label for="l4"><span class="ic">🟠</span>نیمه‌حرفه‌ای</label></div>
-        <div class="rcard"><input type="radio" id="l5" name="Competitive Level" value="Professional"><label for="l5"><span class="ic">🔴</span>حرفه‌ای</label></div>
+        <div class="rcard"><input type="radio" id="l1" name="Competitive Level" value="Recreational"><label for="l1"><span class="ic pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></span>تفریحی</label></div>
+        <div class="rcard"><input type="radio" id="l2" name="Competitive Level" value="Club / League"><label for="l2"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>باشگاهی / لیگ</label></div>
+        <div class="rcard"><input type="radio" id="l3" name="Competitive Level" value="University"><label for="l3"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>دانشگاهی</label></div>
+        <div class="rcard"><input type="radio" id="l4" name="Competitive Level" value="Semi-Pro"><label for="l4"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>نیمه‌حرفه‌ای</label></div>
+        <div class="rcard"><input type="radio" id="l5" name="Competitive Level" value="Professional"><label for="l5"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>حرفه‌ای</label></div>
       </div>
     </div>
     <div class="f cond" id="freqWrap"><label for="freq">هفته‌ای چند روز بازی یا تمرین می‌کنی؟</label>
@@ -287,10 +293,10 @@
         <option value="1-2 days">۱–۲ روز</option><option value="3-4 days">۳–۴ روز</option><option value="5-6 days">۵–۶ روز</option><option value="Daily">هر روز</option></select></div>
     <div class="f cond" id="actLvlWrap"><label>الان چقدر فعالی؟</label>
       <div class="rcards">
-        <div class="rcard"><input type="radio" id="a1" name="Activity Level" value="Sedentary"><label for="a1"><span class="ic">🪑</span>کم‌تحرک</label></div>
-        <div class="rcard"><input type="radio" id="a2" name="Activity Level" value="Lightly Active"><label for="a2"><span class="ic">🚶</span>کمی فعال</label></div>
-        <div class="rcard"><input type="radio" id="a3" name="Activity Level" value="Moderately Active"><label for="a3"><span class="ic">🏃</span>نسبتاً فعال</label></div>
-        <div class="rcard"><input type="radio" id="a4" name="Activity Level" value="Very Active"><label for="a4"><span class="ic">⚡</span>خیلی فعال</label></div>
+        <div class="rcard"><input type="radio" id="a1" name="Activity Level" value="Sedentary"><label for="a1"><span class="ic pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></span>کم‌تحرک</label></div>
+        <div class="rcard"><input type="radio" id="a2" name="Activity Level" value="Lightly Active"><label for="a2"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i></span>کمی فعال</label></div>
+        <div class="rcard"><input type="radio" id="a3" name="Activity Level" value="Moderately Active"><label for="a3"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>نسبتاً فعال</label></div>
+        <div class="rcard"><input type="radio" id="a4" name="Activity Level" value="Very Active"><label for="a4"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>خیلی فعال</label></div>
       </div>
     </div>
   </section>
@@ -358,8 +364,8 @@
     <p class="sdesc">این، امنیتتو حفظ می‌کنه و کمک می‌کنه برنامه رو دورِ محدودیت‌هات بچینم.</p>
     <div class="f"><label>الان درد یا آسیبی داری؟</label>
       <div class="rcards" style="grid-template-columns:1fr 1fr;">
-        <div class="rcard"><input type="radio" id="inj_no" name="Current Injury" value="No" required><label for="inj_no"><span class="ic">✅</span>نه</label></div>
-        <div class="rcard"><input type="radio" id="inj_yes" name="Current Injury" value="Yes"><label for="inj_yes"><span class="ic">⚠️</span>آره</label></div>
+        <div class="rcard"><input type="radio" id="inj_no" name="Current Injury" value="No" required><label for="inj_no"><span class="ic" aria-hidden="true"><svg class="mk" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke-width="1.6"/><path d="M7.6 12.4l3 3 5.8-6.2" stroke-width="1.9"/></svg></span>نه</label></div>
+        <div class="rcard"><input type="radio" id="inj_yes" name="Current Injury" value="Yes"><label for="inj_yes"><span class="ic" aria-hidden="true"><svg class="mk mk-warn" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke-width="1.6"/><path d="M12 7.2v6.1M12 16.6v.2" stroke-width="2.2"/></svg></span>آره</label></div>
       </div>
     </div>
     <div class="f cond" id="injWrap"><label for="injd">کوتاه توضیح بده <span class="hint">عضو، چند وقته، شدت ۱–۱۰</span></label>

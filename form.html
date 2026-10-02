@@ -320,6 +320,13 @@
     margin-bottom: 0;
   }
   .radio-card label .rc-icon { font-size: 22px; margin-bottom: 6px; }
+  /* Level marks, in the brand's own colours (they used to be traffic-light emoji: no yellow or orange here). They take the
+     card's text colour: grey until chosen, green when chosen. */
+  .radio-card label .rc-icon.pips { display: inline-flex; align-items: center; gap: 5px; height: 22px; }
+  .rc-icon.pips i { width: 9px; height: 9px; border-radius: 50%; border: 1.6px solid currentColor; }
+  .rc-icon.pips i.on { background: currentColor; }
+  .rc-icon .mk { display: block; }
+  .rc-icon .mk-warn { color: var(--accent-2-text); }
   .radio-card label:hover {
     border-color: var(--border-light);
     background: var(--bg-raised);
@@ -601,15 +608,15 @@
       <div class="radio-cards">
         <div class="radio-card">
           <input type="radio" id="prog_game" name="Programme" value="Game — $70 / 1 month" required>
-          <label for="prog_game"><span class="rc-icon" aria-hidden="true">🟢</span>Game — $70 / 1 month</label>
+          <label for="prog_game"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i></i><i></i></span>Game — $70 / 1 month</label>
         </div>
         <div class="radio-card">
           <input type="radio" id="prog_set" name="Programme" value="Set — $180 / 3 months">
-          <label for="prog_set"><span class="rc-icon" aria-hidden="true">🟡</span>Set — $180 / 3 months</label>
+          <label for="prog_set"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i></span>Set — $180 / 3 months</label>
         </div>
         <div class="radio-card">
           <input type="radio" id="prog_match" name="Programme" value="Match — $300 / 6 months">
-          <label for="prog_match"><span class="rc-icon" aria-hidden="true">🔴</span>Match — $300 / 6 months</label>
+          <label for="prog_match"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span>Match — $300 / 6 months</label>
         </div>
       </div>
     </div>
@@ -716,23 +723,23 @@
       <div class="radio-cards">
         <div class="radio-card">
           <input type="radio" id="lvl_rec" name="Competitive Level" value="Recreational">
-          <label for="lvl_rec"><span class="rc-icon" aria-hidden="true">🟢</span>Recreational</label>
+          <label for="lvl_rec"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i></span>Recreational</label>
         </div>
         <div class="radio-card">
           <input type="radio" id="lvl_club" name="Competitive Level" value="Club / League">
-          <label for="lvl_club"><span class="rc-icon" aria-hidden="true">🔵</span>Club / League</label>
+          <label for="lvl_club"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span>Club / League</label>
         </div>
         <div class="radio-card">
           <input type="radio" id="lvl_uni" name="Competitive Level" value="University">
-          <label for="lvl_uni"><span class="rc-icon" aria-hidden="true">🟡</span>University</label>
+          <label for="lvl_uni"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span>University</label>
         </div>
         <div class="radio-card">
           <input type="radio" id="lvl_semi" name="Competitive Level" value="Semi-Pro">
-          <label for="lvl_semi"><span class="rc-icon" aria-hidden="true">🟠</span>Semi-Pro</label>
+          <label for="lvl_semi"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>Semi-Pro</label>
         </div>
         <div class="radio-card">
           <input type="radio" id="lvl_pro" name="Competitive Level" value="Professional">
-          <label for="lvl_pro"><span class="rc-icon" aria-hidden="true">🔴</span>Professional</label>
+          <label for="lvl_pro"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>Professional</label>
         </div>
       </div>
     </div>
@@ -753,19 +760,19 @@
       <div class="radio-cards">
         <div class="radio-card">
           <input type="radio" id="act_sed" name="Activity Level" value="Sedentary">
-          <label for="act_sed"><span class="rc-icon" aria-hidden="true">🪑</span>Sedentary</label>
+          <label for="act_sed"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></span>Sedentary</label>
         </div>
         <div class="radio-card">
           <input type="radio" id="act_light" name="Activity Level" value="Lightly Active">
-          <label for="act_light"><span class="rc-icon" aria-hidden="true">🚶</span>Lightly Active</label>
+          <label for="act_light"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i></span>Lightly Active</label>
         </div>
         <div class="radio-card">
           <input type="radio" id="act_mod" name="Activity Level" value="Moderately Active">
-          <label for="act_mod"><span class="rc-icon" aria-hidden="true">🏃</span>Moderately Active</label>
+          <label for="act_mod"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>Moderately Active</label>
         </div>
         <div class="radio-card">
           <input type="radio" id="act_very" name="Activity Level" value="Very Active">
-          <label for="act_very"><span class="rc-icon" aria-hidden="true">⚡</span>Very Active</label>
+          <label for="act_very"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>Very Active</label>
         </div>
       </div>
     </div>
@@ -878,11 +885,11 @@
       <div class="radio-cards" style="grid-template-columns: 1fr 1fr;">
         <div class="radio-card">
           <input type="radio" id="inj_no" name="Current Injury" value="No" required>
-          <label for="inj_no"><span class="rc-icon" aria-hidden="true">✅</span>No</label>
+          <label for="inj_no"><span class="rc-icon" aria-hidden="true"><svg class="mk" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke-width="1.6"/><path d="M7.6 12.4l3 3 5.8-6.2" stroke-width="1.9"/></svg></span>No</label>
         </div>
         <div class="radio-card">
           <input type="radio" id="inj_yes" name="Current Injury" value="Yes">
-          <label for="inj_yes"><span class="rc-icon" aria-hidden="true">⚠️</span>Yes</label>
+          <label for="inj_yes"><span class="rc-icon" aria-hidden="true"><svg class="mk mk-warn" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke-width="1.6"/><path d="M12 7.2v6.1M12 16.6v.2" stroke-width="2.2"/></svg></span>Yes</label>
         </div>
       </div>
     </div>
