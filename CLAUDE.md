@@ -268,6 +268,9 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
 ## Site layout (GitHub Pages → amirardekani.com)
 - **English is the default**: `/` = `index.html`. **Farsi** = `/index-fa.html`. `index-en.html` is a
   permanent redirect to `/`. Language toggles + `hreflang`/canonical are set accordingly.
+- **Mehraneh Zohourian's coach site is NOT here any more** (2026-10-02): it lives at `mehranehzohourian.com`, repo
+  `amirardekanian-crypto/mehraneh-site` (GitHub Pages, `CNAME`, HTTPS enforced). Edit it in that repo. `coach-site/` keeps
+  two redirect pages and the photos (not served; `Content/video-archive` points at `coach-site/media/court.mp4`), so never delete it.
 - Shared **nav/footer** are injected by `assets/js/shared.js` from `partials/nav.html` + `partials/footer.html`.
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.

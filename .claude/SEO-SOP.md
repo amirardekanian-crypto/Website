@@ -188,7 +188,7 @@ After 3–4 weeks, **Search Console → Performance → Queries** replaces guess
 5. **Search your own top 3 phrases on your phone.** Which of your reels or pages appear? Which
    competitor reels appear, and what do their captions say?
 6. **Publish 1–2 new articles, each with its reel,** on phrases from section 6.
-7. **Earn one link from another real site:** the Etminan Academy page, Mehraneh's coach site,
+7. **Earn one link from another real site:** the Etminan Academy page, Mehraneh's coach site (now `mehranehzohourian.com`, its own repo `mehraneh-site`: a link to amirardekani.com goes in there),
    a padel club, a federation page, a podcast or interview, a guest article. A link from a real
    Iranian tennis or padel site is the strongest signal you can earn.
 
