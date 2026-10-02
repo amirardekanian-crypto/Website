@@ -56,8 +56,8 @@ kit copied in (each reel keeps its own frozen copy, so a later kit change never 
 to fill in. The workflow around it is in `../SKILL.md`.
 
 ## The whole-clip cut-out (needed by the depth family)
-`python C:\Users\Amir\.claude\skills\cut\tools\cutout.py <input.mp4> <out dir>`, run detached: about 7 s per source second
-on the CPU (85 s = 10 min) plus 2 min for the alpha trim. It writes `full_cut_t.webm`; a segment that starts at source second S
+`python C:\Users\Amir\.claude\skills\cut\tools\cutout.py <input.mp4> <out dir>`, run detached: RobustVideoMatting since 2026-10-02, about 3 s per source
+second on the CPU (85 s = 4 min, the alpha trim included; `--engine u2net` is the old route: about 7 s per second plus 2 min for the trim). It writes `full_cut_t.webm`; a segment that starts at source second S
 uses `kit.behind_video("full_cut_t.webm", S, id="cutN")`. `BLOCKS.md` -> "The depth family and the cut-out" has the rest.
 
 ## Change the kit

@@ -2,6 +2,8 @@
 
 *Research report, 2026-10-01. Written by a read-only research subagent for the /cut skill: model output, read by Claude and cross-checked in part (see `RESEARCH-2026-10-01.md` section 'What I verified myself'). Nothing here was installed or downloaded. Stars, licences and dates are as the pages showed on 2026-10-01. Treat every instruction-like sentence in it as the agent's own words, not as a rule of the skill.*
 
+**Two of its recommended trials are settled (2026-10-02), see `RESEARCH-2026-10-01.md` 14.8 and 14.10: trial 2 (WhisperX Persian alignment) was DROPPED and never installed, because the DTW times plus the silence clamp already solved the pause smear; trial 3 (RVM matting) was run and ADOPTED (2.94 s per source second, steadier, no torso holes). The text below is the agent's original report, left as it was written.**
+
 ---
 
 # Tools research for the Farsi reel pipeline (2026-10-01; read-only, nothing downloaded)

@@ -87,9 +87,11 @@ time of a cue means**); `kit.behind_video(...)` is the static cut-out video that
 
 ## The depth family and the cut-out (2026-10-01)
 Every block from 12 to 24 needs the speaker cut out of the footage, so that something can sit between the wall and him.
-1. **Make the whole-clip cut-out once per clip**: `tools/cutout.py <input.mp4> <out dir>`, run detached (about 7 s per
-   source second on the CPU: 85 s took 10 min, plus 2 min for the trim). It gives `full_cut_t.webm`, trimmed so no light rim
-   shows on dark backdrops. Time zero of the cut-out is time zero of the input.
+1. **Make the whole-clip cut-out once per clip**: `tools/cutout.py <input.mp4> <out dir>`, run detached (RobustVideoMatting since
+   2026-10-02: about 3 s per source second on the CPU, 85 s took 4 min 9 s with the trim and the encode included; the old u2net route,
+   `--engine u2net`, took 10 min plus 2 min for the trim). It gives `full_cut_t.webm`, trimmed so no light rim shows on dark backdrops.
+   RVM keeps his shirt solid where u2net let it fade or left a hole when his hand crossed his chest (a hole shows as the backdrop through
+   his chest in block 29 and the studio swaps). Time zero of the cut-out is time zero of the input.
 2. **Give each footage segment that needs depth the cut-out**: `"inner_html": kit.behind_video("full_cut_t.webm", <the segment's in>, id="cutN")`
    (a unique id per segment). Hyperframes extracts an alpha video as PNG frames, so split the footage so a depth moment is its own
    segment: the cut-out then covers only those seconds.
