@@ -25,7 +25,7 @@ a = ap.parse_args()
 
 ROOT = pathlib.Path(__file__).resolve().parents[4]  # tools -> video -> skills -> .claude -> repo
 files = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8").stdout.splitlines()
-PEOPLE = ("athletes/", "recovery-run/", "coach-site/")
+PEOPLE = ("athletes/", "recovery-run/", "mehraneh-site/")
 SCREEN = ("screens/", "tennis-testing/", "app-session", "uts-padel", "baseline-check", "library-playbook")
 DERIVED = ("bg-",)  # graded, grained copies of a master: animate the master instead
 

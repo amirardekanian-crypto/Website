@@ -62,7 +62,7 @@ WebP. `python archive.py check` proves every catalogued file is where the catalo
   is not an archive: a copy here is the copy that counts.
 - The three reel exports (Reel 7, Reel 8 hooks A and B). An identical copy of Reel 7 also sits on Amir's Desktop.
 - The eight app clips and two FAST FEET overlays from his Downloads folder.
-- Own camera footage: a selfie (private); a 10.8 s indoor-court clip that is the same file as `coach-site/media/court.mp4`, so it is
+- Own camera footage: a selfie (private); a 10.8 s indoor-court clip that is the same file as `mehraneh-site/media/court.mp4` (her own repo, a sibling folder of Website), so it is
   listed, not copied; and the two big files below.
 
 ## Not archived, and why

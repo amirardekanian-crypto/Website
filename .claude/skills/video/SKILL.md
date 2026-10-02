@@ -33,7 +33,7 @@ the next time."* Each thing I had done is now a rule:
    Animate a picture that exists, and say in the plan why a new one is needed. (2026-09-20: the repo
    holds exactly two vertical art pictures, the Reel 7 dawn and night courts. Everything else is a
    16:9 banner.) **Never feed in a photograph of a real person** (Amir, a client, a player):
-   `assets/img/athletes/`, `Content/recovery-run/` and `coach-site/media/` are off limits.
+   `assets/img/athletes/`, `Content/recovery-run/` and `../mehraneh-site/media/` (Mehraneh's own site, a separate repo) are off limits.
 3. **Sound is OFF unless he asks for it.** *"You generated videos with sound, that costs more, and
    we might not use it."* ⚠️ **`sound` defaults to `"on"` on both models** (read from
    `models_explore get`), so any call that leaves it out pays for audio: **always pass

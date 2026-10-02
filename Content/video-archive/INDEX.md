@@ -297,11 +297,11 @@ Where files live: `clips/` and `app-clips/` are in git; `reels/` and `private/` 
 
 ### `court-indoor-player-from-behind`: Indoor court: a player from behind
 - **Shows:** A woman in a blue top and dark shorts, seen from behind, on an indoor tennis court under a steel-arched roof. A real player.
-- **File:** `../../coach-site/media/court.mp4` · 2026-08-30 · 10.8 s 464x848 +audio
+- **File:** `../../../mehraneh-site/media/court.mp4` · 2026-08-30 · 10.8 s 464x848 +audio
 - **Usable:** All 10.8 s.
 - **Tags:** footage, indoor-court, from-behind, woman
 - **Source:** Downloads/IMG_4203.MP4 is identical (same bytes)
-- **Notes:** Already public: it is served on the coach-site draft (coach-site/media/court.mp4, tracked in git). Not copied again.
+- **Notes:** Already public: it is served on Mehraneh's site (mehraneh-site/media/court.mp4, her own repo, a sibling folder of Website). Not copied again.
 
 ### `selfie-outdoor-2026-08-07`: Selfie video outdoors
 - **Shows:** Amir in sunglasses and a backpack, filming himself outdoors on a sunny day. A real person's face: private.

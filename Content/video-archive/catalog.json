@@ -962,10 +962,10 @@
     "from-behind",
     "woman"
    ],
-   "file": "../../coach-site/media/court.mp4",
+   "file": "../../../mehraneh-site/media/court.mp4",
    "usable": "All 10.8 s.",
    "source": "Downloads/IMG_4203.MP4 is identical (same bytes)",
-   "notes": "Already public: it is served on the coach-site draft (coach-site/media/court.mp4, tracked in git). Not copied again.",
+   "notes": "Already public: it is served on Mehraneh's site (mehraneh-site/media/court.mp4, her own repo, a sibling folder of Website). Not copied again.",
    "used_in": [],
    "seconds": 10.83,
    "width": 464,

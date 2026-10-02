@@ -28,7 +28,3 @@ exclude:
   - scripts/           # pre-commit guards + node test
   - assets/img/generate_icons.py
   - chips-selftest.html   # dev harness — embeds athlete ids, and reads data/*.json; run it locally
-  # Mehraneh's site moved to mehranehzohourian.com (2026-10-02, repo amirardekanian-crypto/mehraneh-site).
-  # coach-site/index.html and form.html stay served as redirects to it; the media is no longer served,
-  # but stays tracked here because the video archive catalogues coach-site/media/court.mp4.
-  - coach-site/media/
