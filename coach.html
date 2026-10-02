@@ -4132,8 +4132,7 @@ function renderAssess() {
 }
 
 // --- COURSE (buyer logins) --------------------------------------------------
-// The Tennis Performance System course app at /tennis/app/ (its source is the private tps-content
-// repo). Same pattern as the testing app above: the tps-login Edge Function makes the auth user on
+// The Tennis Performance System course app at /tennis/app/ (its source is tennis/app/ in this repo). Same pattern as the testing app above: the tps-login Edge Function makes the auth user on
 // an internal address, tps.<username>@amirardekani.com, and hands back a password to send. Revoke
 // bans the login, and the app deletes the handbook from the buyer's phone the next time it opens
 // online; Restore brings the login back with a new password. The course stores nothing about buyers.

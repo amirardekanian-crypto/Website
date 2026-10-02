@@ -15,10 +15,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <!--
   Tennis Performance System, Level 2: the paid Farsi handbook app, served at amirardekani.com/tennis/app/.
-  The shell is copied here from the private tps-content repo (app/_dev/deploy_to_website.py). The demo
-  (?demo=1) was then built here directly on 2026-09-15, because that repo was not reachable from Amir's
-  PC: copy these files into it before its next deploy, or the deploy erases the demo. After any edit
-  here run python scripts/stamp_tps_app.py. The handbook itself comes from Supabase (tps_content,
+  This folder is the app's permanent home (since 2026-10-02; the old private tps-content repo is retired
+  and must never deploy over it). After any edit here run python scripts/stamp_tps_app.py. The handbook itself comes from Supabase (tps_content,
   readable only by an active buyer account) and
   is kept on the phone in IndexedDB, so after the first sign-in the app opens with no connection.
   Nothing about the buyer is stored or sent. Two things are kept in localStorage: the age version
@@ -164,6 +162,6 @@
 <div id="tour" class="tour" hidden></div>
 
 <script defer src="lib/supabase.js"></script>
-<script src="app.js?v=9b620d38" defer></script>
+<script src="app.js?v=962af6d5" defer></script>
 </body>
 </html>

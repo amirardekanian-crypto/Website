@@ -9,27 +9,21 @@ too, stays in CLAUDE.md → *Site layout*.
 
 ## The course app (`/tennis/app/`)
 
-> ⚠️ **2026-10-02: `tps-content` is unreachable and out of date.** The `amirardekanian-crypto` GitHub login that pushes to
-> this repo gets "Repository not found" for `tps-content` and `assess-content`, and neither is on this PC. Three things
-> must therefore never be done from that repo until it is found and brought up to date: (1) **its deploy script** copies
-> an old shell over `/tennis/app/`, erasing the demo, the covers and the `ART` lines added here (the latest are
-> `training-on-period` and `training-with-injury`, 2026-10-02); (2) **its lesson build scripts** (`build_learn*.py` and
-> `l5_*.py` modules) still hold the OLD lesson text, and publishing from them with `tps_publish()` **overwrites the
-> 19 lessons corrected and added on 2026-10-02** (`Content/CONTENT-PARITY.md`); (3) a lesson edited in the database and
-> not in those scripts is silently lost on the next publish. **The `tps_content` and `course_en` rows are the source of
-> truth for the lessons; this folder is the source of truth for the shell.**
+> ✅ **2026-10-02, Amir: this repo is the permanent home of the course app.** The private `tps-content` repo (built on his
+> laptop) is unreachable and out of date, and the course is meant to be open only to people who pay, with the data living
+> in Supabase. So: the **app shell** is edited here (`tennis/app/`, then `python scripts/stamp_tps_app.py`); the **lessons
+> and tests** live only in the `tps_content` and `course_en` rows (edit with SQL, re-hash `version`; see
+> `Content/CONTENT-PARITY.md`). **Never deploy or publish from `tps-content`**: its deploy script erases the demo, the
+> covers and the `ART` lines, and its lesson build scripts (`build_learn*.py`, `l5_*.py`) hold the OLD text and would
+> overwrite the 19 lessons corrected and added on 2026-10-02. Anything useful still in that repo (its `_dev` tools) gets
+> copied here when found.
 
-**`/tennis/app/` is the paid course app** (Tennis Performance System, Level 2; Farsi). Its source
-and content live in the private `tps-content` repo: only the shell (index.html, app.js, app.css,
-sw.js, the self-hosted font and Supabase library) is copied here by
-`tps-content/app/_dev/deploy_to_website.py`, so **never edit those files here**. The handbook itself
-is in Supabase (`tps_content`, readable only by an active buyer); logins come from coach.html →
+**`/tennis/app/` is the paid course app** (Tennis Performance System, Level 2; Farsi). Its shell
+(index.html, app.js, app.css, sw.js, the self-hosted font and Supabase library) is edited in `tennis/app/` in this repo.
+The handbook itself is in Supabase (`tps_content`, readable only by an active buyer); logins come from coach.html →
 **Course**. Backend: `supabase/tps_01_accounts_content.sql` + `supabase/functions/tps-login`.
-⚠️ **One exception, 2026-09-15: the demo was built directly in this folder**, because `tps-content`
-was not reachable from Amir's PC (not in its folders, and his stored GitHub login sees neither it
-nor `assess-content`, which another session deployed from that same day). **So the next deploy from
-`tps-content` erases the demo** unless `app.js`, `app.css`, `index.html` and `sw.js` are first
-copied from here into it. Whenever this folder is edited here, run `python scripts/stamp_tps_app.py`
+(History: the demo was built here on 2026-09-15 because `tps-content` could not be reached; on 2026-10-02 this folder
+became the permanent home.) Whenever this folder is edited, run `python scripts/stamp_tps_app.py`
 (the pre-commit hook blocks a stale stamp): the app's worker answers from its cache first, so a change
 shipped under an unchanged `sw.js` VERSION never reaches a phone that already has the app.
 **The demo is `/tennis/app/?demo=1`** (Amir, 2026-09-15): no sign-in; week 1, the broad jump test and
@@ -79,10 +73,9 @@ visitor alike** — the demo's copy names what is locked and its last card carri
 
 `ytId()` in `tennis/app/app.js` is one of the three YouTube parsers (with `ytVideoId()` in
 `program.html` and the modal in `assets/js/shared.js`), and it plays from `www.youtube.com/embed`
-like the others. ⚠️ It was edited here on 2026-09-23, so copy `app.js` and `app.css` into
-`tps-content` before its next deploy. *Checked 2026-09-26:* the comment above `videoBlock()` still
+like the others. *Checked 2026-09-26:* the comment above `videoBlock()` still
 says a link hands the clip to the phone's YouTube app; that link was removed the same day and the
-code has none, so the comment is stale (fix it in `tps-content`).
+code has none, so the comment is stale (fix it here).
 
 ## The course app's pictures
 
@@ -94,9 +87,7 @@ exports 1080 px, 16:9 WebP, about 30 KB each on average (9 to 83 KB). They show 
 every locked page, one room per session card, one for the session-complete screen). ⚠️ **Everyone sees everything (2026-09-20).** The gate that kept lessons, tests and the locked pages demo-only (`ART_KINDS`) is gone, because all 22 lessons and all 7 tests now have a cover. **A new lesson or test needs its cover added to `ART` by its id, or its card stays a plain green banner** (the ids are in `public.tps_content`: `learn`…`learn-5` and `tests`), so never ship half a list of pictures. `tennis/app/sw.js` keeps each picture for offline use, in its own `tps-art` cache, the first time it is shown. Rules every picture follows: no text or logos in
 the image, subject on the LEFT and the right and bottom calm (the app is right-to-left, so titles sit there), no yellow
 or gold, no faces, never teach exercise form. After regrading a file raise `ART_V`: the root `sw.js` keeps `/assets/`
-files cache-first by full URL. **All 42 pictures exist** (40 on 2026-09-20; `warm-seat` and `long-way-back` were added on 2026-10-02 for the lessons `training-on-period` and `training-with-injury`, 3 credits; 2026-09-20: 4 block covers, 3 session rooms, the test-day card, the session-complete picture, the locked-page tarp, the sign-in walk-on, and 22 lesson and 7 test covers). The last 12 covers were generated on 2026-09-20 with the Higgsfield connector (`/image` skill; `gpt_image_2_5`, medium, 1 credit each, 3 candidates per slot, best of three) and graded through the same script, except `tennis-fitness`, which came from the program.html session's set. ⚠️ **Before generating anything, run `git status --short` and look at `assets/tps/` and the other sessions' scratchpads**: on 2026-09-20 two sessions were asked for the same 12 covers and both generated them, which cost credits twice. The sign-in walk-on is not gated at all: it replaces `court-sessions.jpg` for everyone, because it swaps a picture rather than adding one. Nine of the covers are program.html stills (its art is composed with the subject on the RIGHT, the opposite of this RTL app), reused by mirroring them: `FLIPPED` in `scripts/grade_tps_art.py`. Like the rest of the demo it was built in this
-folder, so the next deploy from `tps-content` erases the `app.js`, `app.css` and `index.html` changes unless they are
-copied there first.
+files cache-first by full URL. **All 42 pictures exist** (40 on 2026-09-20; `warm-seat` and `long-way-back` were added on 2026-10-02 for the lessons `training-on-period` and `training-with-injury`, 3 credits; 2026-09-20: 4 block covers, 3 session rooms, the test-day card, the session-complete picture, the locked-page tarp, the sign-in walk-on, and 22 lesson and 7 test covers). The last 12 covers were generated on 2026-09-20 with the Higgsfield connector (`/image` skill; `gpt_image_2_5`, medium, 1 credit each, 3 candidates per slot, best of three) and graded through the same script, except `tennis-fitness`, which came from the program.html session's set. ⚠️ **Before generating anything, run `git status --short` and look at `assets/tps/` and the other sessions' scratchpads**: on 2026-09-20 two sessions were asked for the same 12 covers and both generated them, which cost credits twice. The sign-in walk-on is not gated at all: it replaces `court-sessions.jpg` for everyone, because it swaps a picture rather than adding one. Nine of the covers are program.html stills (its art is composed with the subject on the RIGHT, the opposite of this RTL app), reused by mirroring them: `FLIPPED` in `scripts/grade_tps_art.py`. Like the rest of the demo it was built in this folder.
 *Checked 2026-09-26:* `assets/tps/` holds exactly 40 WebP files; `ART` maps 39 of them and the 40th
 is the sign-in walk-on (`tennis/app/index.html`).
 

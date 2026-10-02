@@ -1,8 +1,7 @@
 """Stamp the course app's cache-busters after editing tennis/app/ in this repo.
 
-The Tennis Performance System app is normally deployed from the private tps-content repo, whose
-deploy script stamps these. The demo (2026-09-15) was built here instead, because that repo was not
-reachable from Amir's PC, and any edit made here needs the same stamps:
+The Tennis Performance System app lives in this repo (its permanent home since 2026-10-02; the old
+private tps-content repo is retired), and any edit made to tennis/app/ needs these stamps:
 
   - index.html loads app.css?v=<hash> and app.js?v=<hash>, so a changed file gets a new URL and
     skips the browser's cache.
@@ -16,8 +15,7 @@ the same values the website serves. Line endings in the files themselves are lef
     python scripts/stamp_tps_app.py          # stamp
     python scripts/stamp_tps_app.py --check  # exit 1 if a stamp is stale (the pre-commit hook runs this)
 
---check accepts any new VERSION when the shell changed, so a deploy from tps-content, which works
-VERSION out its own way, passes too.
+--check accepts any new VERSION when the shell changed.
 """
 import functools
 import hashlib

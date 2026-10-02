@@ -1,7 +1,8 @@
 -- Tennis Performance System, Level 2 ("tps"): the paid Farsi handbook app at /tennis/app/.
 -- Buyer logins and the handbook content behind them. Applied to the shared Supabase project with
--- the MCP as migration tps_01_accounts_content (2026-09-14). Source of the app and the content:
--- the private tps-content repo.
+-- the MCP as migration tps_01_accounts_content (2026-09-14). The app shell lives in this
+-- repo (tennis/app/); the lessons live only in the tps_content and course_en rows (the old private tps-content repo
+-- is retired, 2026-10-02).
 --
 -- A buyer account is an auth user made by the tps-login Edge Function (coach only), keyed on
 -- tps.<username>@amirardekani.com, the same pattern as the testing app (assess_01) and

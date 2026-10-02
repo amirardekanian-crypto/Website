@@ -294,11 +294,13 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
 - **The Farsi products are in `FARSI-PRODUCTS.md`** (moved 2026-09-26): the paid course app
   `/tennis/app/`, its product page `/tennis/`, the testing app's page `/tennis-testing/`, and where they
   are introduced on the Farsi site. What must never break:
-  - The two app shells are copied from private repos (`tps-content`, `assess-content`): never edit
-    `tennis/app/` or `tennis-testing/app/` here, **except the course demo**, which was built in this
-    folder (2026-09-15). Copy its `app.js`, `app.css`, `index.html` and `sw.js` into `tps-content` before
-    that repo's next deploy, and after any edit here run `python scripts/stamp_tps_app.py` (pre-commit
-    blocks a stale stamp; the app's worker answers from its cache first).
+  - **This repo is the permanent home of the course app** (Amir, 2026-10-02): edit `tennis/app/` here, and after any
+    edit run `python scripts/stamp_tps_app.py` (pre-commit blocks a stale stamp; the app's worker answers from its cache
+    first). The private `tps-content` repo is retired: it is unreachable and out of date, so **never deploy or publish
+    from it**; its deploy script would erase the demo and its lesson scripts would overwrite the corrected lessons.
+    The lessons live ONLY in Supabase (`tps_content`, `course_en`: edit with SQL and re-hash `version`;
+    `Content/CONTENT-PARITY.md` → *How to publish each surface*), readable only by an active buyer. The testing app's
+    shell (`tennis-testing/app/`) is still copied from the private `assess-content` repo: do not edit it by hand.
   - The demo's lock is server-side (`tps_demo()`): never "lock" anything in `app.js` alone.
   - The course app's tour finds real controls by CSS selector: move a control or rename a class and it
     lies, silently, on a new buyer's first screen.

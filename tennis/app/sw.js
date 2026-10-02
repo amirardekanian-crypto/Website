@@ -5,12 +5,12 @@
    VERSION is a hash of the shell files, stamped by scripts/stamp_tps_app.py (the pre-commit hook
    checks it), so every change installs a fresh cache and deletes the old one. It MUST change with
    every change to the shell: the fetch handler below answers from this cache first, so a phone that
-   already has the app keeps the old one until sw.js itself changes. (A deploy from the private
-   tps-content repo stamps it with that repo's own deploy script instead.)
+   already has the app keeps the old one until sw.js itself changes. (scripts/stamp_tps_app.py
+   does it.)
    With VERSION 'dev' this worker caches nothing, so local edits always show.
    The site's root sw.js leaves /tennis/ alone and only ever deletes its own aap-* caches; this
    worker only ever deletes its own tps-shell-* caches. */
-const VERSION = '440ec5d65630';
+const VERSION = 'a2a5d0b12581';
 const CACHE = 'tps-shell-' + VERSION;
 const ART_CACHE = 'tps-art';   // NOT tps-shell-*: activate deletes those on every shell change, and a picture must outlive a code update
 const SHELL = ['./', 'app.js', 'app.css', 'app.webmanifest', 'lib/supabase.js',

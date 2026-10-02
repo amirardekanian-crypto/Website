@@ -247,9 +247,9 @@ Write one before the next round there rather than re-deriving the numbers; the c
   `python scripts/stamp_tps_app.py` (+ `--check`), `node --check tennis/app/app.js`, and
   `python .claude/skills/image/tools/shelf.py --audit` (missing files, **orphans that would ship**,
   one picture on two lessons, duplicate keys). Delete any file you did not wire.
-  These pictures live in `assets/tps/`, **outside** `tennis/app/`, because the `tps-content` deploy
-  overwrites that folder; changes to `app.js`/`app.css`/`index.html` must be copied into `tps-content`
-  or the next deploy erases them.
+  These pictures live in `assets/tps/`, outside `tennis/app/` (a leftover from the retired `tps-content`
+  deploy, which overwrote that folder; this repo is the course app's permanent home since 2026-10-02, so wire a
+  new cover in `ART` in `tennis/app/app.js` and run `python scripts/stamp_tps_app.py`).
 - **Commit only your own files.** `git add <paths>`, never `-A`: parallel sessions' edits (MAP.md, other
   skills) sit in the same tree, and a push of `main` also carries any other session's *local commits*.
   Push `main` **by itself**.

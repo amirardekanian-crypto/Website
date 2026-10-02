@@ -9,9 +9,8 @@
    ?content=<folder> reads the JSON files next to the app instead (needs a content folder, which the
    website does not have). ?demo=1 is the demo: no sign-in, only the free parts (see "Demo" below).
    Routes are hash-based.
-   The demo was built in the website's copy of this file on 2026-09-15, not in the private tps-content
-   repo it is deployed from (that repo was not reachable from Amir's PC): copy it into that repo before
-   its next deploy, or the deploy erases the demo. After any edit there run: python scripts/stamp_tps_app.py */
+   This file is edited in the website repo (its permanent home since 2026-10-02; the old private tps-content
+   repo is retired and must never deploy over it). After any edit run: python scripts/stamp_tps_app.py */
 (function () {
   'use strict';
 

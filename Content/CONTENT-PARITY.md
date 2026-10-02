@@ -73,8 +73,7 @@ The 17 course lessons became athlete-voiced articles under a new **Training** sh
 Recovery, Nutrition and Pre-Competition. The `for-coaches` shelf is now empty (the pre-session warm-up merged away) and still
 listed in `articles/index.json`; decide whether to keep it.
 
-**New lessons have no cover art.** The course app shows a plain green banner until an `ART` entry (by lesson id) is
-added in the private `tps-content` repo: `training-on-period` and `training-with-injury`.
+**Cover art:** done 2026-10-02 (`warm-seat`, `long-way-back`, wired in `ART` in `tennis/app/app.js`).
 
 ## Known problems found on 2026-10-02 (all fixed in the articles and the lessons, except where noted)
 
@@ -152,9 +151,7 @@ Amir said "fix everything with your own recommendation", so these were decided b
    «اسگود-شلاتر», «سیور».
 2. **Doctor to check**: the period red-flag numbers (secondary summaries of ACOG CO 651), the heat-illness first aid in
    `hydration-heat`, the injury red-flag list. A dietitian for the plain portions and timing windows (see `learn-5` `_notes`).
-3. **Cover art** for the two new lessons (a credit plan first, per the design rules; `ART` lives in the private
-   `tps-content` repo).
-4. **Search Console**: Request indexing for the new article URLs, and real search-box phrases to replace the "guess" rows
+3. **Search Console**: Request indexing for the new article URLs, and real search-box phrases to replace the "guess" rows
    in SEO-SOP section 10.
-5. **English twin paragraphs** over 3 sentences in a few lessons this port did not rewrite (pre-existing); lint and trim
+4. **English twin paragraphs** over 3 sentences in a few lessons this port did not rewrite (pre-existing); lint and trim
    when one of those lessons is next edited.
