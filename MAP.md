@@ -257,7 +257,9 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   6-Week Padel Performance Course (2026-10-02: the club asked for one). A4 portrait, the same shape as A3, so a
   print shop can run it as a poster. In **the UTS brand, not ours**: the price is a Tube roundel (£120,
   introductory, 12 sessions), then "Only 8 spots", the four benefits, "The Padel Line" (Assess, Train, Monitor,
-  Retest) and "Book at The UTS". Print the file for the A4 PDF; exports in [`uts-padel/`](Content/uts-padel/).
+  Retest) and "Book at The UTS". Print the file for the A4 PDF; exports in [`uts-padel/`](Content/uts-padel/). The Instagram story
+  version of the same design (1080×1920, text kept clear of Instagram's top and bottom bars) is
+  [`story-uts-padel.html`](Content/story-uts-padel.html), exported as `uts-padel-flyer-story.png`.
   No QR on purpose: people book and pay at the club, the form is only for booked athletes. **Superseded:**
   [`poster-uts-padel.html`](Content/poster-uts-padel.html) (the first A3 poster and two stories) say 5 places and
   carry no price, so do not send them.
