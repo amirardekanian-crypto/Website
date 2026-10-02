@@ -228,7 +228,7 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   one frame per link sticker: the Farsi lesson on the site, the lesson in the app; the app screenshot is in
   [`match-day-fuel/`](Content/match-day-fuel/)). The numbers come from the article `articles/nutrition/match-day-nutrition.json`.
 - **Reels** (1080×1920): build with the [`/reel` skill](.claude/skills/reel/SKILL.md) ·
-  **newest + the polished-ad route** = [`reel-9-mehraneh`](Content/reel-9-mehraneh.html) (**Farsi**, 2026-10-02 · a **client's** website ad in her brand · ~26 s · one ball carries it, real motion blur, synthesized sound,
+  **newest + the polished-ad route** = [`reel-9-mehraneh`](Content/reel-9-mehraneh.html) (**Farsi**, 2026-10-02 · a **client's** website ad in her brand · ~30 s, every beat · one ball carries it, real motion blur, synthesized sound,
   three audits incl. a readability rule · built on the **timeline kit** [`.claude/skills/reel/timeline/`](.claude/skills/reel/timeline/README.md) (`new_reel.py <slug>` scaffolds a new one) · sources, scene map and rebuild steps in
   [`reel-9-mehraneh/`](Content/reel-9-mehraneh/README.md)) · previous = [`reel-8-course`](Content/reel-8-course.html) (**Farsi**, 2026-09-20 · silent, 20 s · four generated
   video clips, a 16-week rail, the real demo in a phone · two hooks, `?hook=b` · sources, clips and the video-plate

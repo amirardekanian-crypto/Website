@@ -96,6 +96,9 @@ body{font-family:var(--v)}
 #s2 .role span{display:inline-flex;align-items:center;gap:20px;padding:20px 40px;border-radius:999px;background:rgba(0,51,32,.07);border:2px solid rgba(0,51,32,.18);
   font:700 52px/1 var(--v);color:var(--spruce);direction:rtl}
 #s2 .role i{display:block;width:20px;height:20px;border-radius:50%;background:var(--spruce)}
+#s2 .tag{position:absolute;left:0;width:1080px;top:1196px;text-align:center;font:400 86px/1 var(--d);color:var(--spruce)}
+#s2 .tag .hl{position:relative;display:inline-block;z-index:0}
+#s2 .tag .ul{position:absolute;left:-6px;right:-6px;bottom:6px;height:22px;border-radius:20px;background:var(--pink);z-index:-1;transform-origin:100% 50%}
 /* ============ S3 — the record (spruce, shares the split background) ============ */
 .lab{position:absolute;left:0;width:1080px;text-align:center;font:800 60px/1 var(--v);color:var(--pink)}
 .sub{position:absolute;left:0;width:1080px;text-align:center;font:800 84px/1 var(--v);color:#fff}
@@ -123,9 +126,14 @@ body{font-family:var(--v)}
   box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
 #gB .cap{position:absolute;left:0;width:1080px;top:1410px;text-align:center;font:400 88px/1 var(--d);color:#fff}
 #gB .cap2{position:absolute;left:0;width:1080px;top:1500px;text-align:center;font:600 48px/1 var(--v);color:var(--pink)}
-#teamBadge{position:absolute;left:170px;top:840px;width:740px;height:140px;border-radius:70px;background:#fff;color:var(--spruce);display:flex;align-items:center;justify-content:center;gap:26px;
-  font:400 78px/1 var(--d);box-shadow:0 26px 60px -20px rgba(0,0,0,.65);z-index:3}
-#teamBadge .shield{position:static;width:86px;height:86px;stroke:var(--spruce);stroke-width:1.7}
+#gC .shield{position:absolute;left:390px;top:340px;width:300px;height:300px}
+#gC .ttl{position:absolute;left:0;width:1080px;top:700px;text-align:center;font:400 164px/1 var(--d);color:#fff}
+#gC .lab2{position:absolute;left:0;width:1080px;top:930px;text-align:center;font:600 54px/1 var(--v);color:rgba(255,255,255,.8)}
+#gC .chip{position:absolute;top:1190px;width:180px;height:160px;border-radius:46px;background:#fff;color:var(--spruce);display:flex;align-items:center;justify-content:center;
+  font:400 96px/1 var(--d);box-shadow:0 22px 50px -20px rgba(0,0,0,.6)}
+#gC .chip.big{font-size:58px;font-family:var(--v);font-weight:800}
+#gC .chip .tk{position:absolute;right:-14px;top:-14px;width:58px;height:58px;border-radius:50%;background:var(--pink);display:grid;place-content:center}
+#gC .chip .tk svg{width:30px;height:30px;stroke:var(--spruce);stroke-width:3.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .yrs{position:absolute;left:0;width:1080px;text-align:center}
 .yrs .num{font:400 480px/1 var(--d);direction:ltr}
 .yrs .lbl{font:800 84px/1 var(--v);margin-top:-6px}
@@ -206,10 +214,15 @@ body.capture #ui{display:none}
       <div class="cap" id="rCap">نایب&zwnj;قهرمانی تور جهانی</div>
       <div class="cap2" id="rCap2">تنیس ITF</div>
     </div>
+    <div class="g" id="gC">
+      <svg class="shield ico" id="shield" viewBox="0 0 24 24"><path pathLength="1" d="M12 3.2 19 5.6v5.9c0 4.2-2.9 7.6-7 9.4-4.1-1.8-7-5.2-7-9.4V5.6Z"/><path pathLength="1" d="m9.2 12 2 2 3.6-3.9"/></svg>
+      <div class="ttl" id="tmTtl">بازیکن تیم ملی</div>
+      <div class="lab2" id="tmLab">رده&zwnj;های سنی</div>
+      <div id="chips"></div>
+    </div>
     <div class="g" id="gD">
       <div class="yrs t" id="yT"><div class="num" id="n13">۱۳</div><div class="lbl">سال تنیس</div></div>
       <div class="yrs b" id="yB"><div class="num" id="n2">۲</div><div class="lbl">سال پدل</div></div>
-      <div id="teamBadge"><svg class="shield ico" id="shield" viewBox="0 0 24 24"><path pathLength="1" d="M12 3.2 19 5.6v5.9c0 4.2-2.9 7.6-7 9.4-4.1-1.8-7-5.2-7-9.4V5.6Z"/><path pathLength="1" d="m9.2 12 2 2 3.6-3.9"/></svg><span>بازیکن تیم ملی</span></div>
     </div>
   </div>
 
@@ -246,6 +259,7 @@ body.capture #ui{display:none}
     <div class="hlbar" id="hlbar"></div>
     <div class="name n2" id="nm2"><span class="wm"><span class="wi">ظهوریان</span></span></div>
     <div class="role" id="role"><span><i></i>مربی تنیس و پدل · مشهد</span></div>
+    <div class="tag" id="tag"><span class="wm"><span class="wi">هر بازیکن،</span></span> <span class="hl"><i class="ul" id="ul"></i><span class="wm"><span class="wi">مسیر خودش</span></span></span></div>
   </div>
 
   <div id="wipe"></div>

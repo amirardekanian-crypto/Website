@@ -96,6 +96,9 @@ body{font-family:var(--v)}
 #s2 .role span{display:inline-flex;align-items:center;gap:20px;padding:20px 40px;border-radius:999px;background:rgba(0,51,32,.07);border:2px solid rgba(0,51,32,.18);
   font:700 52px/1 var(--v);color:var(--spruce);direction:rtl}
 #s2 .role i{display:block;width:20px;height:20px;border-radius:50%;background:var(--spruce)}
+#s2 .tag{position:absolute;left:0;width:1080px;top:1196px;text-align:center;font:400 86px/1 var(--d);color:var(--spruce)}
+#s2 .tag .hl{position:relative;display:inline-block;z-index:0}
+#s2 .tag .ul{position:absolute;left:-6px;right:-6px;bottom:6px;height:22px;border-radius:20px;background:var(--pink);z-index:-1;transform-origin:100% 50%}
 /* ============ S3 — the record (spruce, shares the split background) ============ */
 .lab{position:absolute;left:0;width:1080px;text-align:center;font:800 60px/1 var(--v);color:var(--pink)}
 .sub{position:absolute;left:0;width:1080px;text-align:center;font:800 84px/1 var(--v);color:#fff}
@@ -123,9 +126,14 @@ body{font-family:var(--v)}
   box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
 #gB .cap{position:absolute;left:0;width:1080px;top:1410px;text-align:center;font:400 88px/1 var(--d);color:#fff}
 #gB .cap2{position:absolute;left:0;width:1080px;top:1500px;text-align:center;font:600 48px/1 var(--v);color:var(--pink)}
-#teamBadge{position:absolute;left:170px;top:840px;width:740px;height:140px;border-radius:70px;background:#fff;color:var(--spruce);display:flex;align-items:center;justify-content:center;gap:26px;
-  font:400 78px/1 var(--d);box-shadow:0 26px 60px -20px rgba(0,0,0,.65);z-index:3}
-#teamBadge .shield{position:static;width:86px;height:86px;stroke:var(--spruce);stroke-width:1.7}
+#gC .shield{position:absolute;left:390px;top:340px;width:300px;height:300px}
+#gC .ttl{position:absolute;left:0;width:1080px;top:700px;text-align:center;font:400 164px/1 var(--d);color:#fff}
+#gC .lab2{position:absolute;left:0;width:1080px;top:930px;text-align:center;font:600 54px/1 var(--v);color:rgba(255,255,255,.8)}
+#gC .chip{position:absolute;top:1190px;width:180px;height:160px;border-radius:46px;background:#fff;color:var(--spruce);display:flex;align-items:center;justify-content:center;
+  font:400 96px/1 var(--d);box-shadow:0 22px 50px -20px rgba(0,0,0,.6)}
+#gC .chip.big{font-size:58px;font-family:var(--v);font-weight:800}
+#gC .chip .tk{position:absolute;right:-14px;top:-14px;width:58px;height:58px;border-radius:50%;background:var(--pink);display:grid;place-content:center}
+#gC .chip .tk svg{width:30px;height:30px;stroke:var(--spruce);stroke-width:3.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .yrs{position:absolute;left:0;width:1080px;text-align:center}
 .yrs .num{font:400 480px/1 var(--d);direction:ltr}
 .yrs .lbl{font:800 84px/1 var(--v);margin-top:-6px}
@@ -206,10 +214,15 @@ body.capture #ui{display:none}
       <div class="cap" id="rCap">نایب&zwnj;قهرمانی تور جهانی</div>
       <div class="cap2" id="rCap2">تنیس ITF</div>
     </div>
+    <div class="g" id="gC">
+      <svg class="shield ico" id="shield" viewBox="0 0 24 24"><path pathLength="1" d="M12 3.2 19 5.6v5.9c0 4.2-2.9 7.6-7 9.4-4.1-1.8-7-5.2-7-9.4V5.6Z"/><path pathLength="1" d="m9.2 12 2 2 3.6-3.9"/></svg>
+      <div class="ttl" id="tmTtl">بازیکن تیم ملی</div>
+      <div class="lab2" id="tmLab">رده&zwnj;های سنی</div>
+      <div id="chips"></div>
+    </div>
     <div class="g" id="gD">
       <div class="yrs t" id="yT"><div class="num" id="n13">۱۳</div><div class="lbl">سال تنیس</div></div>
       <div class="yrs b" id="yB"><div class="num" id="n2">۲</div><div class="lbl">سال پدل</div></div>
-      <div id="teamBadge"><svg class="shield ico" id="shield" viewBox="0 0 24 24"><path pathLength="1" d="M12 3.2 19 5.6v5.9c0 4.2-2.9 7.6-7 9.4-4.1-1.8-7-5.2-7-9.4V5.6Z"/><path pathLength="1" d="m9.2 12 2 2 3.6-3.9"/></svg><span>بازیکن تیم ملی</span></div>
     </div>
   </div>
 
@@ -246,6 +259,7 @@ body.capture #ui{display:none}
     <div class="hlbar" id="hlbar"></div>
     <div class="name n2" id="nm2"><span class="wm"><span class="wi">ظهوریان</span></span></div>
     <div class="role" id="role"><span><i></i>مربی تنیس و پدل · مشهد</span></div>
+    <div class="tag" id="tag"><span class="wm"><span class="wi">هر بازیکن،</span></span> <span class="hl"><i class="ul" id="ul"></i><span class="wm"><span class="wi">مسیر خودش</span></span></span></div>
   </div>
 
   <div id="wipe"></div>
@@ -615,14 +629,16 @@ function drawConfetti(ctx, t, t0, x0, y0, n, seed, spread = 1.5) {
 
 </script>
 <script>
-/* scenes.js — reel 9 v2 ("slower"): the five scenes, the ball plan, the camera, the sound plan and the driver.
+/* scenes.js — reel 9 v2.2: the five scenes, the ball plan, the camera, the sound plan and the driver.
    Every function here is pure in t (seconds since the reel started).
-   v2 (2026-10-02, Amir: "the changes are too fast, there is no time to read"): ~26 s instead of 17 s. THE TIMELINE IS ONE TABLE, T, below:
-   scenes, ball and sound all read it. The rule that set the times is tools/read_audit.js: a text block needs 0.8 s + 0.25 s per word fully visible.
-   The fast v1 (17 s) is in git (branch wip/reel-9-mehraneh, df7e1c4) and as export/mehraneh-site-reel-v1-fast.mp4. */
+   v2 (2026-10-02, Amir: "the changes are too fast, there is no time to read"): the pace was set by one rule, tools/read_audit.js: a text block needs
+   0.8 s + 0.25 s per word fully visible, and the ball may not sit on it. Amir then said "this last one speed is good" and, because v2 had folded the national team
+   into a badge and dropped the tagline, "do not remove the content, just make it longer": v2.2 keeps every beat the site gave (about 30 s).
+   THE TIMELINE IS ONE TABLE, T, below: scenes, ball and sound all read it.
+   The fast v1 (17 s) is in git (branch wip/reel-9-mehraneh, df7e1c4) and as export/mehraneh-site-reel-v1-fast.mp4; the v2.1 cut (26 s, no national-team beat) is export/*-v2.1-no-team.* */
 'use strict';
 
-const DUR = 25.95;
+const DUR = 30.35;
 const ZW = '‌';
 const SITE = {                                                // layout numbers measured on the live site at 390 px (tools/capture_site.js)
   tennis: { total: 14552, classes: 4834, contact: 12995, record: 2899 },
@@ -640,18 +656,20 @@ const TILE_H = 4900, PK = 430 / 390;                          // css px per tile
 const T = {
   // S1 · the gate
   tap1: .8, tap2: 1.4, smash: 2.0, flip: [2.0, 2.35], badgeOut: [3.7, 3.9], doors: [3.7, 4.35],
-  // S2 · the name (ball: lands on the chalk, dribbles 10 hops, then up to the medal)
-  mark2: 3.85, land2: 3.95, kick2: 4.0, nm1: 4.1, nm2: 4.3, bar: [4.5, 5.1], role: 4.7, wipe2: [7.2, 7.75], dribbleHops: 10,
+  // S2 · the name and the tagline (ball: lands on the chalk, dribbles 12 hops, then up to the medal)
+  mark2: 3.85, land2: 3.95, kick2: 4.0, nm1: 4.1, nm2: 4.3, bar: [4.5, 5.1], role: 4.7, tag: 5.0, ul: [5.5, 6.05], wipe2: [7.9, 8.45], dribbleHops: 12,
   // S3 · A the medal
-  medalDrop: [7.3, 7.85], roll: [7.35, 7.85], medalHit: 7.85, subA: [7.9, 8.35], aExit: [9.75, 10.25],
+  medalDrop: [8.0, 8.55], roll: [8.05, 8.55], medalHit: 8.55, subA: [8.6, 9.05], aExit: [10.45, 10.95],
   // S3 · B the runner-up photo
-  bIn: [9.8, 10.4], cardLand: 10.35, ribbon: 10.45, ring: [10.55, 10.9], cap: 10.4, cap2: [10.85, 11.25], bExit: [13.25, 13.75],
-  // S3 · C the years and the national team (the blue rises; the badge pops; the ball lands on it)
-  blue: [13.4, 14.0], seamLand: 13.95, yT: [13.8, 14.25], yB: [13.95, 14.4], n13: [13.8, 14.5], n2: [13.95, 14.5], badge: 14.5, badgeLand: 14.7, shield: [14.7, 15.2], cExit: [16.6, 17.0],
+  bIn: [10.5, 11.1], cardLand: 11.05, ribbon: 11.15, ring: [11.25, 11.6], cap: 11.1, cap2: [11.55, 11.95], bExit: [13.95, 14.45],
+  // S3 · C the national team: the shield draws, the title rises, four age groups pop in and the ball ticks them one by one (chip0 = the first tick, then every 0.6 s)
+  shield: [14.1, 14.7], ttl: 14.2, tmLab: [14.75, 15.15], chips: 14.55, chip0: 14.95, tmExit: [17.9, 18.3],
+  // S3 · D the years: the blue rises under, the numbers count up, the ball hops at the seam
+  blue: [17.95, 18.55], seamLand: 18.5, yT: [18.4, 18.85], yB: [18.55, 19.0], n13: [18.4, 19.1], n2: [18.55, 19.1], dExit: [21.0, 21.4],
   // S4 · the site in two phones
-  seamRot: [16.6, 17.25], phR: 16.8, phL: 16.92, t4: 17.1, phHit0: 17.5, phExit: [21.8, 22.35], seamBack: [21.9, 22.5],
+  seamRot: [21.0, 21.65], phR: 21.2, phL: 21.32, t4: 21.5, phHit0: 21.9, phExit: [26.2, 26.75], seamBack: [26.3, 26.9],
   // S5 · the link
-  mark5: 22.15, q5: 22.35, url: 22.75, pillLand: 23.2, bio: [23.7, 24.2], sig: [24.1, 24.6], launch: 25.4,
+  mark5: 26.55, markHit: 27.0, q5: 26.75, url: 27.15, pillLand: 27.6, bio: [28.1, 28.6], sig: [28.5, 29.0], launch: 29.8,
 };
 
 /* ---------- small DOM builders ---------- */
@@ -669,10 +687,13 @@ function wordify(el) {                                        // text -> word ma
 const riseTo = (wi, p) => { const v = `translateY(${(118 * (1 - p)).toFixed(2)}%)`; if (wi._r !== v) { wi.style.transform = v; wi._r = v; } };
 
 const els = {}, DR = {};
-let WI = {};
+let WI = {}, CHIPS = [];
+const CHIP_W = [180, 180, 180, 250], CHIP_GAP = 20;                // the three numbers, then the word «بزرگسال» (wider: its word is long)
+function CHIP_L(i) { const total = CHIP_W.reduce((a, b) => a + b, 0) + 3 * CHIP_GAP; let x = 540 + total / 2; for (let k = 0; k <= i; k++) x -= CHIP_W[k] + (k ? CHIP_GAP : 0); return x; }   // left edge; the first group sits on the right (RTL)
+function CHIP_X0(i) { return CHIP_L(i) + CHIP_W[i] / 2; }          // the age groups' centres
 function init() {
-  ['s1', 's2', 's3', 's4', 's5', 'hTop', 'hBot', 'badge', 'badgeI', 'cam', 'flash', 'seam', 'splitB', 'bgsplit', 'wipe', 'mark2', 'kick2', 'g1', 'g2', 'nm1', 'nm2', 'hlbar', 'role', 's2svg',
-    'gA', 'gB', 'gD', 'medal', 'disc', 'discShine', 'rankLab', 'rankCol', 'rankReel', 'rankSub', 'rCard', 'rImg', 'ring', 'ribbon', 'rCap', 'rCap2', 'shield', 'teamBadge', 'yT', 'yB', 'n13', 'n2',
+  ['s1', 's2', 's3', 's4', 's5', 'hTop', 'hBot', 'badge', 'badgeI', 'cam', 'flash', 'seam', 'splitB', 'bgsplit', 'wipe', 'mark2', 'kick2', 'g1', 'g2', 'nm1', 'nm2', 'hlbar', 'role', 'tag', 'ul', 's2svg',
+    'gA', 'gB', 'gC', 'gD', 'medal', 'disc', 'discShine', 'rankLab', 'rankCol', 'rankReel', 'rankSub', 'rCard', 'rImg', 'ring', 'ribbon', 'rCap', 'rCap2', 'shield', 'tmTtl', 'tmLab', 'chips', 'yT', 'yB', 'n13', 'n2',
     'ttl4', 'phT', 'phP', 'stT', 'stP', 'nvT', 'nvP', 'brT', 'brP', 'tbT', 'tbP', 'slot', 'slotCol', 'mark5', 'q5', 'urlpill', 'shine', 'bio', 'sig']
     .forEach(i => els[i] = document.getElementById(i));
   els.fx = document.getElementById('fx'); els.ctx = els.fx.getContext('2d');
@@ -697,8 +718,16 @@ function init() {
   DR.floor = addLine(s2, 90, FLOOR2, 990, FLOOR2, 'floor');
   // S3 digit reel: 9..1
   for (let d = 9; d >= 1; d--) { const c = document.createElement('div'); c.className = 'cell'; c.textContent = fa(d); els.rankCol.appendChild(c); }
+  // S3 C: the national team's age groups (the first sits on the right), each with a tick the ball puts on
+  ['۱۲', '۱۴', '۱۶', 'بزرگسال'].forEach((l, i) => {
+    const c = document.createElement('div'); c.className = 'chip' + (i === 3 ? ' big' : ''); c.textContent = l;
+    c.style.left = CHIP_L(i) + 'px'; c.style.width = CHIP_W[i] + 'px';
+    const tk = document.createElement('div'); tk.className = 'tk'; tk.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg>'; c.appendChild(tk);
+    els.chips.appendChild(c);
+  });
+  CHIPS = [...els.chips.children];
   // word masks for headlines typed as plain text
-  WI.cap = wordify(els.rCap); WI.t4 = wordify(els.ttl4);
+  WI.cap = wordify(els.rCap); WI.ttl = wordify(els.tmTtl); WI.t4 = wordify(els.ttl4);
   els.q5.innerHTML = ['آماده' + ZW + 'ای اولین جلسه', 'رو بذاریم؟'].map(line => '<div>' + line.split(' ').map(w => '<span class="wm"><span class="wi">' + w + '</span></span>').join(' ') + '</div>').join('');
   WI.q5 = [...els.q5.querySelectorAll('.wi')];
   // S4 rolling label: two stops
@@ -720,7 +749,7 @@ function init() {
 const R0 = 62;
 const GATE = { topPill: 690, botPill: 1480, badgeBottom: 1075 };
 const FLOOR2 = 1480;                                          // S2's chalk floor
-const L3 = { discTop: 500, cardTop: 372, seamY: 960, badgeTop: 840, ballX: 850 };   // ballX: the badge's right end, clear of the label (x 360-720) and the number (x to 772)
+const L3 = { discTop: 500, cardTop: 372, chipTop: 1190, seamY: 960, ballX: 850 };   // ballX: the seam's right end, clear of the label «سال تنیس» (x 360-720) and the number (x to 772)
 const L4 = { phTx: 905, phTy: 497, phPx: 175, phPy: 540 };    // phone top edges once settled (tuned on stills)
 const L5 = { markTop: 250, pillTop: 875, pillX: 700 };
 function planBall() {
@@ -749,7 +778,7 @@ function planBall() {
   // --- S2: drop onto the chalk floor, dribble in low quick hops (the floor is below every word), then up to the medal ---
   arc(T.land2 - .5, T.land2, [300, -170], [300, FLOOR2 - R0], -170, { w: 10 });
   hit(T.land2, 300, FLOOR2, .9, chalk);
-  const dribble = [300, 380, 470, 560, 650, 740, 800, 730, 640, 550, 460];
+  const dribble = [300, 380, 470, 560, 650, 740, 800, 730, 640, 550, 460, 380, 460];
   for (let i = 0; i < T.dribbleHops; i++) {
     const a = T.land2 + i * .3, b = a + .3, beat = i % 2 === 1;
     arc(a, b, [dribble[i], FLOOR2 - R0], [dribble[i + 1], FLOOR2 - R0], FLOOR2 - R0 - 72, { w: 14 });
@@ -764,17 +793,24 @@ function planBall() {
   // --- S3 · B: onto the photo card; hops along its top edge (never over her face) ---
   arc(aEnd, T.cardLand, [540, L3.discTop - R0], [820, L3.cardTop - R0], 110, { w: 10 });
   hit(T.cardLand, 820, L3.cardTop, .9, Object.assign({ ring: 130, shake: 8 }, pinkDust));
-  hops(T.cardLand, .6, [820, 700, 600, 700, 820], L3.cardTop, 260, .75, Object.assign({ ring: 100, shake: 3 }, pinkDust));
-  const bEnd = T.cardLand + 2.4;
-  // --- S3 · C: onto the seam as the blue arrives, then onto the team badge ---
-  arc(bEnd, T.seamLand, [820, L3.cardTop - R0], [L3.ballX, L3.seamY - R0], 150, { w: 11 });
+  hops(T.cardLand, .6, [820, 700, 600, 700, 820, 700], L3.cardTop, 260, .75, Object.assign({ ring: 100, shake: 3 }, pinkDust));
+  const bEnd = T.cardLand + 3.0;
+  // --- S3 · C: down to the first age group (the right-hand chip), one low hop per group with a tick each, a rest while the whole row is read, then off to the seam ---
+  arc(bEnd, T.chip0, [700, L3.cardTop - R0], [CHIP_X0(0), L3.chipTop - R0], 100, { w: 10 });
+  hit(T.chip0, CHIP_X0(0), L3.chipTop, .8, Object.assign({ ring: 110, snd: 'ui' }, pinkDust));
+  for (let i = 1; i < 4; i++) {
+    const a0 = T.chip0 + (i - 1) * .6;
+    arc(a0, a0 + .6, [CHIP_X0(i - 1), L3.chipTop - R0], [CHIP_X0(i), L3.chipTop - R0], L3.chipTop - R0 - 60, { w: 12 });   // low, so the label above is never covered
+    hit(a0 + .6, CHIP_X0(i), L3.chipTop, .75, Object.assign({ ring: 90, n: 8, sparks: 4, snd: 'ui' }, pinkDust));
+  }
+  legs.push({ type: 'hold', t0: T.chip0 + 1.8, t1: T.tmExit[0], p0: [CHIP_X0(3), L3.chipTop - R0], r0: R0, w: 0 });
+  // --- S3 · D: onto the seam's right end as the blue arrives, then four slow hops there while the years are read ---
+  arc(T.tmExit[0], T.seamLand, [CHIP_X0(3), L3.chipTop - R0], [L3.ballX, L3.seamY - R0], 700, { w: 12 });
   hit(T.seamLand, L3.ballX, L3.seamY, 1, Object.assign({ ring: 230, round: .45, shake: 14, n: 14, sparks: 12, ringCol: [255, 255, 255], snd: 'none' }, { dust: [255, 255, 255], sparkCol: [255, 255, 255] }));
-  arc(T.seamLand, T.badgeLand, [L3.ballX, L3.seamY - R0], [L3.ballX, L3.badgeTop - R0], 500, { w: 12 });
-  hit(T.badgeLand, L3.ballX, L3.badgeTop, .9, Object.assign({ ring: 140, shake: 6 }, pinkDust));
-  hops(T.badgeLand, .6, [L3.ballX, L3.ballX - 15, L3.ballX + 5, L3.ballX - 5], L3.badgeTop, 220, .7, Object.assign({ ring: 100 }, pinkDust));
-  const cEnd = T.badgeLand + 1.8;
+  hops(T.seamLand, .6, [L3.ballX, L3.ballX - 15, L3.ballX + 5, L3.ballX - 5, L3.ballX], L3.seamY, 140, .7, Object.assign({ ring: 100 }, pinkDust));
+  const cEnd = T.seamLand + 2.4;
   // --- S4: a rally between the two phones, every 0.6 s, low enough to stay under the title (tools/read_audit.js counts a covered word as unread) ---
-  arc(cEnd, T.phHit0, [L3.ballX - 5, L3.badgeTop - R0], [L4.phTx, L4.phTy - R0], 60, { w: 11 });
+  arc(cEnd, T.phHit0, [L3.ballX, L3.seamY - R0], [L4.phTx, L4.phTy - R0], 60, { w: 11 });
   hit(T.phHit0, L4.phTx, L4.phTy, .9, Object.assign({ ring: 140, shake: 6, phone: 'T' }, pinkDust));
   let last = [L4.phTx, L4.phTy], tH = T.phHit0;
   for (let i = 0; i < 7; i++) {
@@ -784,9 +820,9 @@ function planBall() {
     last = to; tH += .6;
   }
   // --- S5: the mark, the link, a calm rest, and out through the top (where the reel loops back in) ---
-  arc(tH, 22.6, [L4.phPx, L4.phPy - R0], [540, L5.markTop - R0], 60, { w: 11 });
-  hit(22.6, 540, L5.markTop, .9, Object.assign({ ring: 130, shake: 5 }, pinkDust));
-  arc(22.6, T.pillLand, [540, L5.markTop - R0], [L5.pillX, L5.pillTop - 50], 120, { r1: 50, w: 12 });
+  arc(tH, T.markHit, [L4.phPx, L4.phPy - R0], [540, L5.markTop - R0], 60, { w: 11 });
+  hit(T.markHit, 540, L5.markTop, .9, Object.assign({ ring: 130, shake: 5 }, pinkDust));
+  arc(T.markHit, T.pillLand, [540, L5.markTop - R0], [L5.pillX, L5.pillTop - 50], 120, { r1: 50, w: 12 });
   hit(T.pillLand, L5.pillX, L5.pillTop, 1, Object.assign({ ring: 200, round: .4, shake: 12, n: 14, sparks: 10, pill: true }, { dust: [255, 233, 232], ringCol: [236, 153, 175], sparkCol: [255, 255, 255] }));
   arc(T.pillLand, T.pillLand + .45, [L5.pillX, L5.pillTop - 50], [L5.pillX - 90, L5.pillTop - 50], L5.pillTop - 50 - 95, { r0: 50, w: 10 });
   hit(T.pillLand + .45, L5.pillX - 90, L5.pillTop, .55, Object.assign({ ring: 80, n: 6, sparks: 3, pill: true }, pinkDust));
@@ -872,7 +908,7 @@ function sceneGate(t) {
 }
 
 /* =====================================================================================================================
-   S2 — THE NAME (3.4 – 7.75 s). Each word has time to be read; then the whole page wipes upward
+   S2 — THE NAME (3.4 – 8.45 s). Each word has time to be read, the tagline too; then the whole page wipes upward
    ===================================================================================================================== */
 function sceneName(t) {
   const on = t > T.doors[0] - .3 && t < T.wipe2[1] + .1; show(els.s2, on); show(els.wipe, on && t > T.wipe2[0] - .1); if (!on) return;
@@ -885,16 +921,18 @@ function sceneName(t) {
   const pulse = 1 + .03 * bump(t, 5.0, 5.35, .2); put(els.nm1, { s: pulse }); put(els.nm2, { s: pulse });
   put(els.hlbar, { sx: E.house(prog(t, T.bar[0], T.bar[1])) });
   put(els.role, { s: spring(t - T.role, 3.4, .5), o: prog(t, T.role, T.role + .13) });
+  els.tag.querySelectorAll('.wi').forEach((wi, i) => riseTo(wi, E.house(prog(t, T.tag + i * .16, T.tag + .8 + i * .16))));   // «هر بازیکن، مسیر خودش»
+  put(els.ul, { sx: E.house(prog(t, T.ul[0], T.ul[1])) });
   const w = E.inOutCubic(prog(t, T.wipe2[0], T.wipe2[1]));
   setStyle(els.s2, 'clipPath', w > 0 ? `inset(0 0 ${(w * 1930).toFixed(1)}px 0)` : 'none');
   put(els.wipe, { y: -w * 1930 });
 }
 
 /* =====================================================================================================================
-   S3 — THE RECORD (7.2 – 17 s): rank 1, the runner-up trophy, 13 and 2 years with the national team
+   S3 — THE RECORD (7.9 – 21.4 s): rank 1, the runner-up trophy, the national team in four age groups, 13 and 2 years
    ===================================================================================================================== */
 function sceneRecord(t) {
-  const on = t > T.wipe2[0] - .1 && t < T.cExit[1] + .2; show(els.s3, on); if (!on) return;
+  const on = t > T.wipe2[0] - .1 && t < T.dExit[1] + .2; show(els.s3, on); if (!on) return;
   // --- A: رنکینگ ۱ — a medal that drops on its ribbons, rolls to 1, and swings with every tap ---
   const aOn = t < T.aExit[1] + .1; show(els.gA, aOn);
   if (aOn) {
@@ -922,22 +960,34 @@ function sceneRecord(t) {
     WI.cap.forEach((wi, i) => riseTo(wi, E.house(prog(t, T.cap + i * .15, T.cap + .75 + i * .15))));
     put(els.rCap2, { y: 24 * (1 - E.house(prog(t, T.cap2[0], T.cap2[1]))), o: prog(t, T.cap2[0], T.cap2[0] + .3) });
   }
-  // --- C: ۱۳ سال تنیس | ۲ سال پدل, and the national team ---
-  const dOn = t > T.blue[0] - .1 && t < T.cExit[1] + .1; show(els.gD, dOn);
+  // --- C: بازیکن تیم ملی — the shield, the title, and the four age groups (۱۲ · ۱۴ · ۱۶ · بزرگسال) ticked one by one as the ball lands on them ---
+  const cOn = t > T.shield[0] - .1 && t < T.tmExit[1] + .1; show(els.gC, cOn);
+  if (cOn) {
+    const exit = E.inCubic(prog(t, T.tmExit[0], T.tmExit[1]));
+    put(els.gC, { y: -520 * exit, o: 1 - exit });
+    els.shield.querySelectorAll('path').forEach((p, i) => { const v = (1 - E.outCubic(prog(t, T.shield[0] + i * .18, T.shield[1] + i * .18))).toFixed(3); if (p._v !== v) { p.style.strokeDashoffset = v; p._v = v; } });
+    put(els.shield, { s: spring(t - T.shield[0], 3.2, .5), o: prog(t, T.shield[0], T.shield[0] + .1) });
+    WI.ttl.forEach((wi, i) => riseTo(wi, E.house(prog(t, T.ttl + i * .15, T.ttl + .8 + i * .15))));
+    put(els.tmLab, { y: 20 * (1 - E.house(prog(t, T.tmLab[0], T.tmLab[1]))), o: prog(t, T.tmLab[0], T.tmLab[0] + .25) });
+    CHIPS.forEach((c, i) => {
+      const t0 = T.chips + i * .07, land = T.chip0 + i * .6;
+      put(c, { s: spring(t - t0, 3.6, .5), y: 14 * pressAt(t, im => Math.abs(im.t - land) < .001), o: prog(t, t0, t0 + .1) });
+      put(c.querySelector('.tk'), { s: Math.max(0, spring(t - land, 4.2, .42)) });
+    });
+  }
+  // --- D: ۱۳ سال تنیس | ۲ سال پدل ---
+  const dOn = t > T.blue[0] - .1 && t < T.dExit[1] + .1; show(els.gD, dOn);
   if (dOn) {
-    const exit = E.inCubic(prog(t, T.cExit[0], T.cExit[1]));
+    const exit = E.inCubic(prog(t, T.dExit[0], T.dExit[1]));
     put(els.gD, { o: 1 - exit, s: 1 + .35 * exit });
     els.n13.textContent = fa(Math.round(13 * E.outQuart(prog(t, T.n13[0], T.n13[1])))); els.n2.textContent = fa(Math.round(2 * E.outQuart(prog(t, T.n2[0], T.n2[1]))));
     put(els.yT, { y: 60 * (1 - E.house(prog(t, T.yT[0], T.yT[1]))), o: prog(t, T.yT[0], T.yT[0] + .25) });
     put(els.yB, { y: 60 * (1 - E.house(prog(t, T.yB[0], T.yB[1]))), o: prog(t, T.yB[0], T.yB[0] + .25) });
-    const bp = pressAt(t, im => im.y === L3.badgeTop), ps = spring(t - T.badge, 3.4, .5);
-    put(els.teamBadge, { sx: ps, sy: ps * (1 - .1 * bp), y: 10 * bp, o: prog(t, T.badge, T.badge + .1) });
-    els.shield.querySelectorAll('path').forEach((p, i) => { const v = (1 - E.outCubic(prog(t, T.shield[0] + i * .15, T.shield[1] + i * .15))).toFixed(3); if (p._v !== v) { p.style.strokeDashoffset = v; p._v = v; } });
   }
 }
 
 /* =====================================================================================================================
-   S4 — THE SITE, IN TWO PHONES (16.6 – 22.4 s)
+   S4 — THE SITE, IN TWO PHONES (21 – 26.8 s)
    ===================================================================================================================== */
 function keyScroll(t, keys) {
   if (t <= keys[0][0]) return keys[0][1];
@@ -949,7 +999,8 @@ function keyScroll(t, keys) {
 /* the hero is held first, then the record gets a real dwell, then the classes get one; labels follow (tennis phone leads by 0.1 s) */
 function scrollKeys(sp) {
   const S = SITE[sp], d = sp === 'tennis' ? 0 : .1;
-  return [[T.phR + .1 + d, 0], [17.8 + d, 0], [18.4 + d, S.record], [19.6 + d, S.record + 70], [20.2 + d, S.classes], [21.5 + d, S.classes + 60]];
+  const p = T.phR;                                                // the keys are offsets from the phones' arrival
+  return [[p + .1 + d, 0], [p + 1.0 + d, 0], [p + 1.6 + d, S.record], [p + 2.8 + d, S.record + 70], [p + 3.4 + d, S.classes], [p + 4.7 + d, S.classes + 60]];
 }
 function paintPhone(sp, t) {
   const S = SITE[sp], k = sp === 'tennis' ? 'T' : 'P';
@@ -974,7 +1025,7 @@ function paintPhone(sp, t) {
   tb.style.width = (clamp(sy / (S.total - 844)) * 100).toFixed(2) + '%';
   return sy;
 }
-const SLOT_STOPS = [[18.2, 0], [20.0, 1]];                     // [time, label index]: «کارنامه» as the record arrives, «کلاس‌ها و قیمت‌ها» as the classes do
+const SLOT_STOPS = [[T.phR + 1.4, 0], [T.phR + 3.2, 1]];                     // [time, label index]: «کارنامه» as the record arrives, «کلاس‌ها و قیمت‌ها» as the classes do
 function sceneSite(t) {
   const on = t > T.seamRot[0] - .1 && t < T.phExit[1] + .1; show(els.s4, on); if (!on) return;
   WI.t4.forEach((wi, i) => riseTo(wi, E.house(prog(t, T.t4 + i * .14, T.t4 + .7 + i * .14)) * (1 - E.inCubic(prog(t, T.phExit[0], T.phExit[0] + .35)))));
@@ -987,7 +1038,7 @@ function sceneSite(t) {
 }
 
 /* =====================================================================================================================
-   S5 — THE END CARD (22 – 26 s): the same question the site asks, the link, the name
+   S5 — THE END CARD (26.5 – 30.4 s): the same question the site asks, the link, the name
    ===================================================================================================================== */
 function sceneEnd(t) {
   const on = t > T.phExit[0] + .2; show(els.s5, on); if (!on) return;
@@ -1050,11 +1101,15 @@ function soundPlan() {
   // S3 · B — the photo
   add(T.cardLand, 'slap'); [0, 1, 2].forEach(i => add(T.cap + i * .15, 'swish', { pan: .1 })); add(T.ribbon, 'pop', { f: 700, pan: -.3 }); add(T.ring[0] + .15, 'ping', { f: 1760 }); add(T.cap2[0], 'swish', { pan: 0 });
   add(T.bExit[0], 'whoosh', { dur: .5, f0: 300, f1: 2600, pan: .6, pan1: -.6 });
-  // S3 · C — years and the team (a tick whenever a displayed number changes)
+  // S3 · C — the national team: the shield draws, the title words swish in, the age groups pop in and each gets a ping when the ball ticks it
+  add(T.shield[0], 'draw', { dur: .5 }); [0, 1, 2].forEach(i => add(T.ttl + i * .15, 'swish', { pan: [.3, 0, -.3][i] })); add(T.tmLab[0], 'swish', { pan: 0 });
+  [0, 1, 2, 3].forEach(i => { add(T.chips + i * .07, 'pop', { f: 500 + i * 60, vol: .4, pan: .3 - i * .2 }); add(T.chip0 + i * .6 + .05, 'ping', { f: 1320 + i * 220, vol: .5, pan: .3 - i * .2 }); });
+  add(T.tmExit[0], 'whoosh', { dur: .45, f0: 300, f1: 2400, pan: 0, pan1: 0});
+  // S3 · D — the years (a tick whenever a displayed number changes)
   add(T.blue[0], 'riser', { dur: .55 });
   for (let n = 1, last = 0; n <= 120; n++) { const tt = T.n13[0] + (T.n13[1] - T.n13[0]) * n / 120, v = Math.round(13 * E.outQuart(prog(tt, T.n13[0], T.n13[1]))); if (v !== last) { add(tt, 'tick', { f: 1900 + v * 40, pan: -.2, vol: .45 }); last = v; } }
   for (let n = 1, last = 0; n <= 120; n++) { const tt = T.n2[0] + (T.n2[1] - T.n2[0]) * n / 120, v = Math.round(2 * E.outQuart(prog(tt, T.n2[0], T.n2[1]))); if (v !== last) { add(tt, 'tick', { f: 1500 + v * 200, pan: .25, vol: .5 }); last = v; } }
-  add(T.seamLand, 'boom'); add(T.shield[0], 'draw', { dur: .5 }); add(T.badge, 'pop', { f: 560, pan: 0 });
+  add(T.seamLand, 'boom');
   // S4 — the site
   add(T.seamRot[0], 'whoosh', { dur: .65, f0: 200, f1: 1800, pan: -.5, pan1: .5 }); add(T.phR, 'whoosh', { dur: .5, f0: 250, f1: 2200, pan: .7, pan1: .1 }); add(T.phL, 'whoosh', { dur: .5, f0: 250, f1: 2200, pan: -.7, pan1: -.1 });
   add(T.phL + .5, 'thud', { vol: .5 }); [0, 1, 2].forEach(i => add(T.t4 + i * .14, 'swish', { pan: [.3, 0, -.3][i] }));

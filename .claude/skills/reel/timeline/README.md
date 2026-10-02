@@ -29,7 +29,7 @@ python .claude/skills/reel/tools/sheet.py OUT/sheet.png 4 300 OUT/t_*.png       
 node .claude/skills/reel/tools/render_timeline.js <html> OUT/draft.mp4 --draft                              # half size, 4 sub-frames: the motion in about a minute
 ```
 Edit `src/scenes.js` (the starter: hook · one number · the link) and `src/reel<N>.template.html` (DOM + CSS). Build the one-file preview with
-`PYTHONIOENCODING=utf-8 python src/build_reel.py`. Run long jobs (a final render, 4–6 min) with `run_in_background` **on the node command itself**.
+`PYTHONIOENCODING=utf-8 python src/build_reel.py`. Run long jobs (a final render: about 15 s per second of reel, so 6–8 min for 26–30 s) with `run_in_background` **on the node command itself**.
 
 ## The pacing rule (Amir, 2026-10-02: "the changes are too fast, there is no time to be able to read")
 Reel 9's first cut was 17 s and **14 of its 33 text blocks were on screen for less than a viewer needs** (the national-team title for 0.5 s, the shortest for 0.2 s).
@@ -38,14 +38,16 @@ He felt it in one watch. The cure is a rule and a gate, not taste:
 > **A block of text needs `0.8 s + 0.25 s per word` fully visible** (max 2.4 s): three big Farsi words 1.5 s, five words 2 s, a block of several lines 2.4 s.
 > "Fully visible" = opacity ≥ 0.9, not still rising through its mask, inside the frame and any clip, and its text not changing (a count-up counts once it stops).
 
-* `node .claude/skills/reel/tools/read_audit.js <reel.html> 0.1 --all` measures every block. **Zero "TOO FAST" before any render.** Reel 9 v2: 25 blocks, 0 too fast, shortest clean hold 1.5 s.
+* `node .claude/skills/reel/tools/read_audit.js <reel.html> 0.1 --all` measures every block. **Zero "TOO FAST" before any render.** Reel 9 (final, every beat): 31 blocks, 0 too fast, shortest clean hold 1.5 s.
 * **The hero is an obstacle too.** The audit also asks `ballState(t)` where the ball is and treats a word it hides 12% of as unread (`ball: -x s` on the line; one quick flash per hold is forgiven, a second one or a longer cover breaks the hold). Reel 9's first slower render passed on text timing alone
   and still failed this: the ball dribbled on the badge right under «سال تنیس» and its lobs between the phones crossed the title (clean hold 0.3 s of the 1.55 s it needs). No contact sheet showed it; the audit did.
   `ball_audit.js` lists each crossing. Fix it with geometry: let the ball rest or hop where there is no text (the end of a pill, a margin, a floor line below the words), and keep arcs that pass a title **under** it, not through it.
 * **Choose the length from the reading budget, not from the brief.** Rough budget: hook 3–4 s, one fact per beat at 2.5–3 s each, the link 4 s. Eight facts is a 28 s reel.
-  If it is too long, **cut facts, never speed up**. Say the length and the trade out loud to Amir (reel 9 went 17 s → 26 s; "10–20 s" was the first brief, readable was the real one).
+  **Never cut content to hit a length, and never speed up** (Amir, 2026-10-02: *"do not remove the content, just make it longer"*; and of the pace: *"this last one speed is good"*). Every beat the brief or the source gives stays and gets its time:
+  reel 9 went 17 s → 30 s ("10–20 s" was the first brief, readable and complete was the real one). Say the length out loud; offer a shorter version only if he asks.
 * **Beat grid: 100 BPM (0.6 s)** for a readable ad; 120 BPM (0.5 s) felt frantic. Hold the hero still or hop it slowly while the viewer reads; never dribble it over a word being read.
-* Fewer words beat more time: reel 9 v2 dropped its tagline from the name scene (it is still on both phones' hero) and merged two beats instead of cutting the holds.
+* **A cut he did not ask for is a bug.** Reel 9's slower v2 folded the national team (a shield, a title, four age groups ticked one by one) into a small badge and dropped a tagline to save seconds, and Amir noticed
+  at once. Both are back as full beats in v2.2 and the reel simply got longer. When you rework timing, list the beats before and after and check none went missing.
 * **Reveals build, they do not flash**: words rise one by one (`wordify` + `riseTo`), the last word solid → the hold starts there.
 
 ## What made it feel premium (carry these into the next ad)
@@ -83,7 +85,7 @@ Tools (all in `../tools/`, shared): `setup_tools.py` · `still.js` · `sheet.py`
 2. Write the **T table first** (times from the reading budget), then the ball plan, then the scenes. Stills at every beat → a **sheet** → single frames at full size for anything dense.
 3. Audits: `safe_audit.js`, `read_audit.js` (text timing **and** the ball), `copy_audit.py`. Fix the layout until all are clean (they found the real problems every time, and a contact sheet missed the ball covering words).
 4. `--draft` render, then **frames every 0.5 s** from the MP4 around each transition (contact sheets) — ghosting only shows in real frames. A 1:1 crop for grain and banding.
-5. Final render (`--sub 20 --crf 18 --grain 4`, about 4–6 min), tag BT.709 (done in the encode), `mux_sfx.py` for the sound version (PASS), cover frame (`still.js ... --query noball=1`), storyboard sheet.
+5. Final render (`--sub 20 --crf 18 --grain 4`, about 15 s per second of reel: 30 s is about 8 min), tag BT.709 (done in the encode), `mux_sfx.py` for the sound version (PASS), cover frame (`still.js ... --query noball=1`), storyboard sheet.
 6. Deliver with `SendUserFile`: the MP4, the sound version (say it was never auditioned by ear), the cover, the storyboard; list the new Farsi lines and anything the post depends on (a bio link, a photo credit).
 7. Save (Step 10 in `../SKILL.md`): commit the folder, add it to `MAP.md` / `DESIGN-ATLAS.md`, update this README if you learned something.
 
@@ -99,3 +101,5 @@ Tools (all in `../tools/`, shared): `setup_tools.py` · `still.js` · `sheet.py`
 * **A name that shadows a helper**: in the audits' page code a local `hidden` hid the helper of the same name ("hidden is not a function"). Name page-side helpers so a loop variable cannot shadow them.
 * **The mask `padding`/`margin`** on `.wm` must be larger than the glyph box or ascenders/dots are clipped as words rise.
 * **A footage plate is not a `<video>`** (neither clock controls it): `extract_plate.py` → `plateLoad` → `plateDraw(ctx, 'take', t - AT + IN, ...)`; his voice goes back on with `mux_audio.py` using the same IN / AT numbers.
+* **A cover frame is a clean frame**: `?noball=1` must hide the ball AND its comet trail, dust, rings and confetti (the first reel-9 cover showed the trail of a ball that was not there). Both `starter.scenes.js` and reel 9 do it; keep it when you replace the fx layer.
+* **Re-timing can silently drop a beat.** Reel 9's slower cut folded a whole section into a badge; list the previous cut's beats beside the new one's before you send it.

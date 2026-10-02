@@ -124,11 +124,11 @@ techniques, the three URL modes, known gotchas, the MP4 export pipeline) lives t
 is just the quick-reference.
 
 - **Newest reel + the polished-ad recipe = [`reel-9-mehraneh.html`](reel-9-mehraneh.html)** (Farsi, 2026-10-02, **a client's website ad in Mehraneh Zohourian's brand, not Amir's**;
-  about 26 s; a silent MP4 and a version with synthesized sound; Amir: "this was amazing"). Built on the **timeline kit**
+  about 30 s with every beat kept; a silent MP4 and a version with synthesized sound; Amir: "this was amazing"). Built on the **timeline kit**
   ([`.claude/skills/reel/timeline/`](../.claude/skills/reel/timeline/README.md), `/reel` Step 2d): the page is a pure function of time; **one ball carries the whole reel** (arcs solved from
   apex height + arrival time, squash, dust, a seam that turns, a medal swing, a button press); transitions are events (gate doors, a wipe line with speed streaks, a medal on ribbons),
   never fades; the phones show real captures of her live site; **20 sub-frame motion blur + grain**; the sound plan comes from the same time table as the picture. Three audits gate it:
-  safe zones, **readability** (`0.8 s + 0.25 s per word`, because Amir said of the first 17 s cut *"the changes are too fast, there is no time to be able to read"*; it is now 26 s with 0 blocks too fast) and copy-to-source.
+  safe zones, **readability** (`0.8 s + 0.25 s per word`, because Amir said of the first 17 s cut *"the changes are too fast, there is no time to be able to read"*; it is now about 30 s with every beat kept and 0 blocks too fast) and copy-to-source.
   Folder and scene map: [`reel-9-mehraneh/`](reel-9-mehraneh/README.md). **Use the same recipe for Amir's own ad in HIS tokens** (green `#0E4A36` / `#156A4D`, clay the only accent, paper `#FAF7F2`, Vazirmatn, no yellow, @amirardekanian).
 - **Previous reel = [`reel-8-course.html`](reel-8-course.html)** (Farsi, 2026-09-20, silent, 20 s, the same course on
   **four generated video clips** that wipe in from the right with a clay line; a **rail of 16 week-dashes** at the top fills in
