@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#FAF7F2">
 <meta name="robots" content="noindex, follow">
 <title>شروع — مربیِ بدنسازیِ حرفه‌ای · امیر اردکانی</title>
-<meta name="description" content="فرمِ شروعِ همکاری با امیر اردکانی، مربیِ بدنسازیِ حرفه‌ای. حدودِ ۵ دقیقه وقت می‌بره.">
+<meta name="description" content="فرمِ شروعِ همکاری با امیر اردکانی، مربیِ بدنسازیِ حرفه‌ای. حدودِ ۳ دقیقه وقت می‌بره.">
 <link rel="canonical" href="https://www.amirardekani.com/form-fa.html">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
@@ -171,6 +171,23 @@
   .badge{animation:soft-pulse 2.8s ease-in-out infinite;}
   @keyframes soft-pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
   .pfill{background:linear-gradient(-90deg,var(--clay),var(--clay-2));box-shadow:0 0 12px rgba(199,85,47,.45);}
+  /* اختیاری و رضایت: فرم به سؤال‌هایی که شروع رو تعیین می‌کنن کوتاه شد */
+  .opt-group{padding:0;}
+  .opt-group>summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:22px 26px;min-height:44px;border-radius:14px;}
+  .opt-group>summary::-webkit-details-marker{display:none;}
+  .opt-title{font-weight:800;font-size:20px;color:var(--green);display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .opt-title::after{content:'+';font-size:28px;line-height:1;font-weight:400;}
+  .opt-group[open]>summary .opt-title::after{content:'\2212';}
+  .opt-sub{font-size:15px;color:var(--ink-2);}
+  .opt-group>summary:focus-visible{outline:3px solid var(--green);outline-offset:3px;}
+  .opt-group[open]>summary{border-bottom:1px solid var(--line);border-radius:14px 14px 0 0;}
+  .opt-group>.f,.opt-group>.row-2{margin-right:26px;margin-left:26px;}
+  .opt-group>summary+*{margin-top:24px;}
+  .opt-group[open]>:last-child{margin-bottom:28px;}
+  .consent-field{margin:8px 4px 0;}
+  .consent{display:flex;gap:14px;align-items:flex-start;font-size:16px;line-height:1.8;color:var(--ink);cursor:pointer;}
+  .consent input{flex:none;width:24px;height:24px;margin-top:4px;accent-color:var(--green);cursor:pointer;}
+  .consent a{color:var(--green);text-decoration:underline;}
   .fsec,.submit{transition:opacity .7s var(--ease),transform .7s var(--ease),box-shadow .3s var(--ease);}
   .fsec.rv,.submit.rv{opacity:0;transform:translateY(26px);}
   .fsec.rv.visible,.submit.rv.visible{opacity:1;transform:translateY(0);}
@@ -204,7 +221,7 @@
 </nav>
 
 <header class="hero">
-  <div class="badge">⏱ حدودِ ۵ دقیقه</div>
+  <div class="badge">⏱ حدودِ ۳ دقیقه</div>
   <h1><span class="hw">بریم <span class="acc">شروع</span> کنیم</span></h1>
   <p>یه‌کم از خودت بگو. از جواب‌هات استفاده می‌کنم تا برنامه‌ای بنویسم که با بدن، برنامه‌ی روزانه و هدفِ تو جور باشه.</p>
 </header>
@@ -251,12 +268,7 @@
     <div class="f"><label for="contact">راهِ ارتباط <span class="hint">آیدیِ اینستاگرام یا شماره‌ی واتساپ</span></label>
       <input type="text" id="contact" name="Contact (Instagram/WhatsApp)" required dir="ltr" autocomplete="tel" autocapitalize="none" spellcheck="false" placeholder="@sara_tennis  /  09121234567"></div>
     <div class="f"><label for="em">ایمیل <span class="hint">اختیاری</span></label><input type="email" id="em" name="Email" dir="ltr" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="you@email.com"></div>
-    <div class="row-3">
-      <div class="f"><label for="age">سن</label><input type="text" id="age" name="Age" inputmode="numeric" pattern="(1[0-9]|[2-7][0-9]|80)" maxlength="2" autocomplete="off" required placeholder="مثلاً ۲۸"></div>
-      <div class="f"><label for="sex">جنسیت</label><select id="sex" name="Biological Sex" required>
-        <option value="" disabled selected>انتخاب کن</option><option value="Male">مرد</option><option value="Female">زن</option></select></div>
-      <div class="f"><label for="wt">وزن <span class="hint">کیلوگرم</span></label><input type="text" id="wt" name="Body Weight" placeholder="مثلاً ۷۸ کیلو"></div>
-    </div>
+    <div class="f"><label for="age">سن</label><input type="text" id="age" name="Age" inputmode="numeric" pattern="(1[0-9]|[2-7][0-9]|80)" maxlength="2" autocomplete="off" required placeholder="مثلاً ۲۸"></div>
   </section>
 
   <!-- 2 · ACTIVITY -->
@@ -289,17 +301,6 @@
         <div class="rcard"><input type="radio" id="l5" name="Competitive Level" value="Professional"><label for="l5"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>حرفه‌ای</label></div>
       </div>
     </div>
-    <div class="f cond" id="freqWrap"><label for="freq">هفته‌ای چند روز بازی یا تمرین می‌کنی؟</label>
-      <select id="freq" name="Sport Frequency"><option value="" disabled selected>انتخاب</option>
-        <option value="1-2 days">۱–۲ روز</option><option value="3-4 days">۳–۴ روز</option><option value="5-6 days">۵–۶ روز</option><option value="Daily">هر روز</option></select></div>
-    <div class="f cond" id="actLvlWrap"><label id="qg2">الان چقدر فعالی؟</label>
-      <div class="rcards" role="radiogroup" aria-labelledby="qg2">
-        <div class="rcard"><input type="radio" id="a1" name="Activity Level" value="Sedentary"><label for="a1"><span class="ic pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></span>کم‌تحرک</label></div>
-        <div class="rcard"><input type="radio" id="a2" name="Activity Level" value="Lightly Active"><label for="a2"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i></span>کمی فعال</label></div>
-        <div class="rcard"><input type="radio" id="a3" name="Activity Level" value="Moderately Active"><label for="a3"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>نسبتاً فعال</label></div>
-        <div class="rcard"><input type="radio" id="a4" name="Activity Level" value="Very Active"><label for="a4"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>خیلی فعال</label></div>
-      </div>
-    </div>
   </section>
 
   <!-- 3 · TRAINING HISTORY -->
@@ -315,23 +316,6 @@
         <div class="rcard"><input type="radio" id="g4" name="Gym Experience" value="3+ years"><label for="g4"><span class="ic">🏋️</span>۳+ سال</label></div>
       </div>
     </div>
-    <div class="f"><label for="curr">الان هفته‌ای چند روز تمرینِ قدرتی می‌کنی؟</label>
-      <select id="curr" name="Current Training Days" required><option value="" disabled selected>انتخاب</option>
-        <option value="0">۰ — فعلاً نمی‌کنم</option><option value="1-2 days">۱–۲ روز</option><option value="3-4 days">۳–۴ روز</option><option value="5+ days">۵+ روز</option></select></div>
-    <div class="f"><label id="qg4">الان چه نوع تمریناتی انجام می‌دی؟ <span class="hint">هر چی هست انتخاب کن</span></label>
-      <div class="pills" role="group" aria-labelledby="qg4">
-        <label class="pill"><input type="checkbox" name="Training Types" value="Free Weights"><span>وزنه‌ی آزاد</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="Machines"><span>دستگاه</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="Bodyweight"><span>وزنِ بدن</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="Plyometrics"><span>پلایومتریک</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="Cardio / Running"><span>هوازی / دویدن</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="Yoga / Pilates"><span>یوگا / پیلاتس</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="Group Classes"><span>کلاسِ گروهی</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="None"><span>هیچ‌کدوم</span></label>
-      </div>
-    </div>
-    <div class="f"><label for="bestLifts">رکوردهای فعلیت <span class="hint">اختیاری — چند ست سنگین کمک می‌کنه قدرتِ شروعت رو بسنجم</span></label>
-      <textarea id="bestLifts" name="Current Best Lifts" rows="2" placeholder="مثلاً اسکوات ۸۰kg×۵، پرس سینه ۶۰kg×۵، ددلیفت ۱۰۰kg×۳ — اگه مطمئن نیستی خالی بذار"></textarea></div>
   </section>
 
   <!-- 4 · GOALS -->
@@ -354,8 +338,6 @@
         <label class="pill"><input type="checkbox" name="Goals" value="Tone & Shape"><span>فرم و تناسب</span></label>
       </div>
     </div>
-    <div class="f"><label for="gnote">هدفِ خاصی داری؟ <span class="hint">اختیاری — مثلاً «دردِ شونه‌مو کم کنم»، «سرعتِ اولین قدمم بهتر شه»</span></label>
-      <textarea id="gnote" name="Specific Goal" rows="2" placeholder="تو یکی‌دو جمله بگو…"></textarea></div>
   </section>
 
   <!-- 5 · INJURY & HEALTH -->
@@ -371,19 +353,6 @@
     </div>
     <div class="f cond" id="injWrap"><label for="injd">کوتاه توضیح بده <span class="hint">عضو، چند وقته، شدت ۱–۱۰</span></label>
       <textarea id="injd" name="Injury Details" rows="2" placeholder="مثلاً زانوی راست — ۳ هفته دردِ خفیف — ۴ از ۱۰"></textarea></div>
-    <div class="f"><label id="qg7">آسیب یا جراحیِ قبلی که هنوز اذیتت می‌کنه؟ <span class="hint">هر چی هست انتخاب کن</span></label>
-      <div class="pills" role="group" aria-labelledby="qg7">
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="Shoulder"><span>شونه</span></label>
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="Elbow / Wrist"><span>آرنج / مچِ دست</span></label>
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="Lower Back"><span>کمر</span></label>
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="Hip"><span>لگن</span></label>
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="Knee"><span>زانو</span></label>
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="Ankle / Foot"><span>مچِ پا / پا</span></label>
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="None"><span>هیچ‌کدوم</span></label>
-      </div>
-    </div>
-    <div class="f"><label for="avoid">حرکتی هست که بهت گفتن انجامش نده؟ <span class="hint">اختیاری</span></label>
-      <input type="text" id="avoid" name="Avoid Movements" placeholder="مثلاً پرسِ بالای سر، اسکواتِ عمیق"></div>
   </section>
 
   <!-- 6 · RECOVERY & AVAILABILITY -->
@@ -399,21 +368,6 @@
         <select id="slen" name="Session Length" required><option value="" disabled selected>انتخاب</option>
           <option value="~30 min">حدودِ ۳۰ دقیقه</option><option value="~45 min">حدودِ ۴۵ دقیقه</option><option value="~60 min">حدودِ ۶۰ دقیقه</option><option value="75+ min">۷۵+ دقیقه</option></select></div>
     </div>
-    <div class="f"><label for="sleepS">کیفیتِ خوابت معمولاً چطوره؟</label>
-      <div class="slider is-unset" id="sleepWrap"><span class="sedge">ضعیف</span><input type="range" id="sleepS" min="1" max="10" value="7"><span class="sedge">عالی</span><span class="sval" id="sleepV">—</span></div>
-      <input type="hidden" id="sleepValue" name="Sleep Quality (1-10)" value="" data-count-progress required></div>
-    <div class="f"><label for="sleepH">میانگینِ ساعتِ خواب در شب</label>
-      <select id="sleepH" name="Sleep Hours"><option value="" disabled selected>انتخاب</option>
-        <option value="Under 5 hours">زیرِ ۵ ساعت</option><option value="5-6 hours">۵–۶ ساعت</option><option value="7-8 hours">۷–۸ ساعت</option><option value="9+ hours">۹+ ساعت</option></select></div>
-    <div class="f"><label for="stressS">سطحِ استرسِ فعلی</label>
-      <div class="slider is-unset" id="stressWrap"><span class="sedge">کم</span><input type="range" id="stressS" min="1" max="10" value="5"><span class="sedge">زیاد</span><span class="sval" id="stressV">—</span></div>
-      <input type="hidden" id="stressValue" name="Stress Level (1-10)" value="" data-count-progress required></div>
-    <div class="f"><label for="nutrition">تغذیه‌ی فعلیت رو چطور توصیف می‌کنی؟</label>
-      <select id="nutrition" name="Nutrition" required><option value="" disabled selected>انتخاب</option>
-        <option value="Dialed in — consistent & intentional">منظم — ثابت و هدفمند</option><option value="Pretty good — mostly on track">خوب — بیشترِ مواقع روی روال</option><option value="Average — inconsistent">متوسط — بی‌نظم</option><option value="Needs work — little structure">نیاز به کار داره — بدونِ ساختار</option></select></div>
-    <div class="f"><label for="lifeLoad">بیرون از تمرین، یه هفته‌ی معمولیت چقدر پرفشاره؟ <span class="hint">کار، درس، مراقبت از خانواده، سفر</span></label>
-      <select id="lifeLoad" name="Weekly Life Load" required><option value="" disabled selected>انتخاب</option>
-        <option value="Light — plenty of downtime">سبک — وقتِ آزادِ زیاد</option><option value="Moderate — busy but manageable">متوسط — شلوغ ولی قابل‌مدیریت</option><option value="Heavy — long days, little downtime">سنگین — روزهای طولانی، وقتِ کم</option><option value="Very heavy — constantly stretched">خیلی سنگین — همیشه تحتِ فشار</option></select></div>
   </section>
 
   <!-- 7 · EQUIPMENT -->
@@ -428,6 +382,88 @@
         <div class="rcard"><input type="radio" id="e3" name="Environment" value="Minimal / Travel"><label for="e3"><span class="ic">🎒</span>کم‌امکانات / سفر</label></div>
       </div>
     </div>
+  </section>
+
+  <!-- OPTIONAL: speeds up our call (never required) -->
+  <details class="fsec opt-group" id="optGroup">
+    <summary><span class="opt-title">اختیاری: تماسمون رو سریع‌تر می‌کنه</span><span class="opt-sub">حدودِ ۱۵ سؤالِ کوتاه. هر کدوم رو خواستی رد کن، توی تماس ازت می‌پرسم.</span></summary>
+
+    <div class="f"><label for="sex">جنسیت</label><select id="sex" name="Biological Sex">
+      <option value="" disabled selected>انتخاب کن</option><option value="Male">مرد</option><option value="Female">زن</option></select></div>
+
+    <div class="f"><label for="wt">وزن <span class="hint">کیلوگرم</span></label><input type="text" id="wt" name="Body Weight" placeholder="مثلاً ۷۸ کیلو"></div>
+
+    <div class="f cond" id="freqWrap"><label for="freq">هفته‌ای چند روز بازی یا تمرین می‌کنی؟</label>
+      <select id="freq" name="Sport Frequency"><option value="" disabled selected>انتخاب</option>
+        <option value="1-2 days">۱–۲ روز</option><option value="3-4 days">۳–۴ روز</option><option value="5-6 days">۵–۶ روز</option><option value="Daily">هر روز</option></select></div>
+
+    <div class="f cond" id="actLvlWrap"><label id="qg2">الان چقدر فعالی؟</label>
+      <div class="rcards" role="radiogroup" aria-labelledby="qg2">
+        <div class="rcard"><input type="radio" id="a1" name="Activity Level" value="Sedentary"><label for="a1"><span class="ic pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></span>کم‌تحرک</label></div>
+        <div class="rcard"><input type="radio" id="a2" name="Activity Level" value="Lightly Active"><label for="a2"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i></span>کمی فعال</label></div>
+        <div class="rcard"><input type="radio" id="a3" name="Activity Level" value="Moderately Active"><label for="a3"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>نسبتاً فعال</label></div>
+        <div class="rcard"><input type="radio" id="a4" name="Activity Level" value="Very Active"><label for="a4"><span class="ic pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>خیلی فعال</label></div>
+      </div>
+    </div>
+
+    <div class="f"><label for="curr">الان هفته‌ای چند روز تمرینِ قدرتی می‌کنی؟</label>
+      <select id="curr" name="Current Training Days"><option value="" disabled selected>انتخاب</option>
+        <option value="0">۰ — فعلاً نمی‌کنم</option><option value="1-2 days">۱–۲ روز</option><option value="3-4 days">۳–۴ روز</option><option value="5+ days">۵+ روز</option></select></div>
+
+    <div class="f"><label id="qg4">الان چه نوع تمریناتی انجام می‌دی؟ <span class="hint">هر چی هست انتخاب کن</span></label>
+      <div class="pills" role="group" aria-labelledby="qg4">
+        <label class="pill"><input type="checkbox" name="Training Types" value="Free Weights"><span>وزنه‌ی آزاد</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="Machines"><span>دستگاه</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="Bodyweight"><span>وزنِ بدن</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="Plyometrics"><span>پلایومتریک</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="Cardio / Running"><span>هوازی / دویدن</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="Yoga / Pilates"><span>یوگا / پیلاتس</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="Group Classes"><span>کلاسِ گروهی</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="None"><span>هیچ‌کدوم</span></label>
+      </div>
+    </div>
+
+    <div class="f"><label for="bestLifts">رکوردهای فعلیت <span class="hint">اختیاری — چند ست سنگین کمک می‌کنه قدرتِ شروعت رو بسنجم</span></label>
+      <textarea id="bestLifts" name="Current Best Lifts" rows="2" placeholder="مثلاً اسکوات ۸۰kg×۵، پرس سینه ۶۰kg×۵، ددلیفت ۱۰۰kg×۳ — اگه مطمئن نیستی خالی بذار"></textarea></div>
+
+    <div class="f"><label for="gnote">هدفِ خاصی داری؟ <span class="hint">اختیاری — مثلاً «دردِ شونه‌مو کم کنم»، «سرعتِ اولین قدمم بهتر شه»</span></label>
+      <textarea id="gnote" name="Specific Goal" rows="2" placeholder="تو یکی‌دو جمله بگو…"></textarea></div>
+
+    <div class="f"><label id="qg7">آسیب یا جراحیِ قبلی که هنوز اذیتت می‌کنه؟ <span class="hint">هر چی هست انتخاب کن</span></label>
+      <div class="pills" role="group" aria-labelledby="qg7">
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Shoulder"><span>شونه</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Elbow / Wrist"><span>آرنج / مچِ دست</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Lower Back"><span>کمر</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Hip"><span>لگن</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Knee"><span>زانو</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Ankle / Foot"><span>مچِ پا / پا</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="None"><span>هیچ‌کدوم</span></label>
+      </div>
+    </div>
+
+    <div class="f"><label for="avoid">حرکتی هست که بهت گفتن انجامش نده؟ <span class="hint">اختیاری</span></label>
+      <input type="text" id="avoid" name="Avoid Movements" placeholder="مثلاً پرسِ بالای سر، اسکواتِ عمیق"></div>
+
+    <div class="f"><label for="sleepS">کیفیتِ خوابت معمولاً چطوره؟</label>
+      <div class="slider is-unset" id="sleepWrap"><span class="sedge">ضعیف</span><input type="range" id="sleepS" min="1" max="10" value="7"><span class="sedge">عالی</span><span class="sval" id="sleepV">—</span></div>
+      <input type="hidden" id="sleepValue" name="Sleep Quality (1-10)" value=""></div>
+
+    <div class="f"><label for="sleepH">میانگینِ ساعتِ خواب در شب</label>
+      <select id="sleepH" name="Sleep Hours"><option value="" disabled selected>انتخاب</option>
+        <option value="Under 5 hours">زیرِ ۵ ساعت</option><option value="5-6 hours">۵–۶ ساعت</option><option value="7-8 hours">۷–۸ ساعت</option><option value="9+ hours">۹+ ساعت</option></select></div>
+
+    <div class="f"><label for="stressS">سطحِ استرسِ فعلی</label>
+      <div class="slider is-unset" id="stressWrap"><span class="sedge">کم</span><input type="range" id="stressS" min="1" max="10" value="5"><span class="sedge">زیاد</span><span class="sval" id="stressV">—</span></div>
+      <input type="hidden" id="stressValue" name="Stress Level (1-10)" value=""></div>
+
+    <div class="f"><label for="nutrition">تغذیه‌ی فعلیت رو چطور توصیف می‌کنی؟</label>
+      <select id="nutrition" name="Nutrition"><option value="" disabled selected>انتخاب</option>
+        <option value="Dialed in — consistent & intentional">منظم — ثابت و هدفمند</option><option value="Pretty good — mostly on track">خوب — بیشترِ مواقع روی روال</option><option value="Average — inconsistent">متوسط — بی‌نظم</option><option value="Needs work — little structure">نیاز به کار داره — بدونِ ساختار</option></select></div>
+
+    <div class="f"><label for="lifeLoad">بیرون از تمرین، یه هفته‌ی معمولیت چقدر پرفشاره؟ <span class="hint">کار، درس، مراقبت از خانواده، سفر</span></label>
+      <select id="lifeLoad" name="Weekly Life Load"><option value="" disabled selected>انتخاب</option>
+        <option value="Light — plenty of downtime">سبک — وقتِ آزادِ زیاد</option><option value="Moderate — busy but manageable">متوسط — شلوغ ولی قابل‌مدیریت</option><option value="Heavy — long days, little downtime">سنگین — روزهای طولانی، وقتِ کم</option><option value="Very heavy — constantly stretched">خیلی سنگین — همیشه تحتِ فشار</option></select></div>
+
     <div class="f"><label id="qg9">به چه تجهیزاتی دسترسی داری؟ <span class="hint">هر چی هست انتخاب کن</span></label>
       <div class="pills" role="group" aria-labelledby="qg9">
         <label class="pill"><input type="checkbox" name="Equipment" value="Barbell & Rack"><span>هالتر و رک</span></label>
@@ -442,7 +478,15 @@
         <label class="pill"><input type="checkbox" name="Equipment" value="Gym Machines"><span>دستگاه‌های باشگاه</span></label>
       </div>
     </div>
-  </section>
+  </details>
+
+  <!-- CONSENT (health information and the AI assistant) -->
+  <div class="f consent-field">
+    <label class="consent" for="consent">
+      <input type="checkbox" id="consent" name="Consent (health information and AI assistant)" value="Yes" required>
+      <span>قبول دارم که امیر از جواب‌هام برای نوشتنِ برنامه‌م استفاده کنه، از جمله اطلاعاتِ آسیب و سلامتی که می‌نویسم. امیر برای کمک از یه دستیارِ هوش مصنوعی (Claude) استفاده می‌کنه و همه‌ی برنامه‌ها رو خودش چک می‌کنه. <a href="/privacy.html#ai" target="_blank" rel="noopener">داده‌هام چطور استفاده می‌شه</a></span>
+    </label>
+  </div>
 
   <div class="submit">
     <button type="submit" id="sbtn" class="sbtn">شروع کنیم ←</button>
@@ -531,6 +575,7 @@
     var t=(el.type||'').toLowerCase();
     if(t==='email')return (el.value||'').trim()?'ایمیلِ معتبر وارد کن.':'ایمیلت رو بنویس.';
     if(t==='radio')return 'یکی رو انتخاب کن.';
+    if(el.id==='consent')return 'برای ادامه باید این کادر رو تیک بزنی.';
     if(t==='checkbox')return 'دست‌کم یکی رو انتخاب کن.';
     if(el.tagName==='SELECT')return 'یکی از گزینه‌ها رو انتخاب کن.';
     if(t==='hidden')return 'اسلایدر رو جابه‌جا کن تا جوابت ثبت بشه.';
@@ -598,6 +643,7 @@
     if(el.type==='hidden'&&!el.hasAttribute('data-count-progress'))return;
     if(el.name==='botcheck'||!el.name)return;
     if(el.hasAttribute('data-skip-progress'))return;
+    if(el.closest('.opt-group'))return;   // سؤال‌های اختیاری شمرده نمی‌شن
     var c=el.closest('.cond');if(c&&!c.classList.contains('on'))return;
     if(seen[el.name])return;seen[el.name]=1;q.push(el);});return q;}
   function upd(){var f=collect(),tot=f.length,fl=f.filter(filled).length,p=tot?Math.round(fl/tot*100):0;
