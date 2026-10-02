@@ -218,6 +218,11 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   [`method`](Content/carousel-method.html), [`recovery-run`](Content/carousel-recovery-run.html),
   [`file-vs-coach`](Content/carousel-1-file-vs-coach.html) (stale chrome — see atlas) ·
   (`carousel-warmup-tennis.html` and `instagram-carousels.html` were deleted 2026-07-31).
+  **Match-Day Fuel** (2026-10-02, **Farsi**, 8 slides): [`carousel-match-day-fuel.html`](Content/carousel-match-day-fuel.html)
+  (rebuild: [`build_match_day_fuel.py`](Content/build_match_day_fuel.py)) + its two-frame Instagram story
+  [`story-match-day-fuel.html`](Content/story-match-day-fuel.html) ([`build_story_match_day_fuel.py`](Content/build_story_match_day_fuel.py);
+  one frame per link sticker: the Farsi lesson on the site, the lesson in the app; the app screenshot is in
+  [`match-day-fuel/`](Content/match-day-fuel/)). The numbers come from the article `articles/nutrition/match-day-nutrition.json`.
 - **Reels** (1080×1920): build with the [`/reel` skill](.claude/skills/reel/SKILL.md) ·
   **newest** = [`reel-8-course`](Content/reel-8-course.html) (**Farsi**, 2026-09-20 · silent, 20 s · four generated
   video clips, a 16-week rail, the real demo in a phone · two hooks, `?hook=b` · sources, clips and the video-plate
