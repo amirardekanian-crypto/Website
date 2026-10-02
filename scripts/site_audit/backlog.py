@@ -34,6 +34,10 @@ SCORECARD = [
     ('Key clicks you can see in Plausible', 'none (only form submits and level-test results)', 'Apply (with plan and place), WhatsApp, demo, link hub, form started and each step, proof, partner, level-test start. Add the goals in Plausible to see them.', 'Apply, WhatsApp, demo, proof, partner, form steps'),
     ('A wrong web address shows', 'GitHub’s grey English page', 'your own page, English and Farsi', 'your own page, English and Farsi'),
     ('Athlete photos on the homes', '713 KB, no sizes', '433 KB, with sizes, loaded as you scroll', 'light, sized'),
+    ('Marketing pages that ask Google for fonts', '19 pages', '5 kinds left: the generated articles, the UTS page, the Divehi Etminan page and the two apps (the 14 pages that matter make no Google request; checked in a real browser)', 'none'),
+    ('White text on clay buttons, badges and chips passing AA (4.5:1)', '0 of 25 (4.40:1)', '25 of 25 (4.66:1)', 'all'),
+    ('Text under 12 px, apply form and proof page', '15 on the form, 4 on proof', '0 (the style guard now stops a new one)', '0'),
+    ('Pale grey (#8A8A8A) as text on the Farsi form, partner and terms pages', '14 uses', '0', '0'),
 ]
 
 KEEP = [
@@ -48,7 +52,7 @@ KEEP = [
 
 # n, phase, title, plain words, effort, status, items, decision (optional)
 PK = [
- dict(n=1, phase='now', status='done', done='abcde', left='White text on the clay button fills is 4.40:1 (AA wants 4.5). A hairline-deeper clay for fills (#C2512C, 4.66:1) fixes it on every button at once, but it changes your brand colour by a shade, so it is your call. The 22 labels still under 12 px on the English home are the miniature app drawn inside the phone picture.', effort='S-M', title='Make small text readable',
+ dict(n=1, phase='now', status='done', done='abcde', left='Done on 2026-10-02 with your yes: every white-on-clay fill is #C2512C (4.66:1; token --accent-2-fill, --clay-fill on the Farsi pages), 25 of 25 measured; lines, glows, dots and clay text keep #C7552F. The 22 labels still under 12 px on the English home are the miniature app drawn inside the phone picture. The apply form and proof page labels (10 to 11 px) were found by the style guard and raised to 12.', effort='S-M', title='Make small text readable',
   plain='One grey in your colour list is too pale for small text, and 65 labels on the English home are smaller than 12 px. One value change in the shared colour file fixes most pages at once.',
   items=[
    ('P1', 'All English pages, 3 Farsi pages', 'The muted grey #8A8A8A is 3.2:1 on paper and 3.45:1 on white (AA needs 4.5). The paler #B0A99E is 2.0:1.', 'tokens.css lines 33 and 80: --text-muted to #6B6B6B (about 5:1); never use --text-dim for text; same for the local greys in partner-fa, form-fa, terms-fa.', 'S', 'N', 'home-en-11, form-en-13, links-03'),
@@ -92,7 +96,7 @@ PK = [
    ('P2', 'Etminan pages', '19 Farsi labels use the mono font with letter-spacing at 9.5 to 11 px, which breaks Farsi joining; in right-to-left the lime ticker is off-screen in 7 of 12 samples.', 'One override block at the end of etminan.html: Vazirmatn, no spacing, 12 px; ticker direction ltr.', 'S', 'N', 'etminan-fa-02, etminan-en-02'),
    ('P3', 'Farsi pages', 'No <main> or skip link on the Farsi home, form, links, partner and product pages; the H1 text runs together (“پدلیه مربی،تو”).', 'Add <main>, a skip link, spaces in the H1.', 'S', 'N', 'home-fa-17, form-fa-02'),
   ]),
- dict(n=6, phase='now', status='ask', done='abd', left='Not done: 6c needs your OK to download four open-licence font families (about 600 KB) and would make the English fonts load from your own server like Vazirmatn now does; 6d is done for the athlete photos (40% lighter) and the UTS page is its own session. The Farsi article pages still load Google Fonts: they come from the page generator.', effort='S-M', title='Fonts: no blank screens, no jumps',
+ dict(n=6, phase='now', status='done', done='abcd', left='6c done on 2026-10-02 with your yes: Barlow, Barlow Condensed, JetBrains Mono and DM Sans (latin subset, 369 KB, 16 files, licences in assets/fonts/LICENSES.txt) are served from your site, 14 pages make no request to Google, and the privacy notice says which pages still do. Still on Google Fonts: the generated article pages (the page generator belongs to another session), the UTS page (its own brand and session), the Divehi Etminan page, and the athlete and coach apps. The UTS page is also why 6d (its hero photo) is still open.', effort='S-M', title='Fonts: no blank screens, no jumps',
   plain='The Farsi pages wait for Google Fonts before they paint anything. If that request hangs, which is how filtered networks often fail, the screen stays white for about 8 seconds. Your Vazirmatn file is already on your own server and is not being used on those pages.',
   items=[
    ('P1', 'Farsi home, form, links, partner, terms, Etminan, articles', 'First paint waits for the Google Fonts stylesheet: 0.58 s normally, 0.25 s if blocked outright, but 8.3 s when the request hangs.', 'Use the self-hosted /assets/fonts/Vazirmatn-Variable.woff2 (@font-face as fa-product.css line 7, plus a preload); load Barlow without blocking; add Tahoma to the stack. No download needed.', 'S', 'N', 'home-fa-01, article-12, etminan-fa-01'),
@@ -136,7 +140,7 @@ PK = [
    ('P3', 'Etminan pages', 'Amber #E08A2E in four places. The reviewer found the neon green and lime are a deliberate co-brand (CSS comment), the amber is the odd one out.', 'Amber to clay or neutral. Their palette, so your call.', 'S', 'Y', 'etminan-en-02'),
   ]),
 
- dict(n=12, phase='call', status='ask', effort='L', title='English home: shorter and clearer',
+ dict(n=12, phase='call', status='go', effort='L', title='English home: shorter and clearer',
   plain='20 screens on a phone is long, the hero has no face, number or the words “online coaching”, and the right half of the desktop hero is empty. The Farsi hero (phone mockup beside the headline) is the version you like.',
   items=[
    ('P1', 'English home', 'The hero never says “online coaching” and shows no face, athlete or number; credentials start 903 px down; on desktop the right half is empty but for a ball.', 'Sub names “online coaching with Amir (MSc S&C)”; a proof row under the buttons (three athlete faces, “1000+ players”); the phone mock beside the headline on desktop; drop the first ticker.', 'M', 'Y', 'home-en-02'),
@@ -149,8 +153,8 @@ PK = [
      ('A', 'Tighten', 'Same order. Smaller gaps, shorter lists, plan-aware buttons. About 15 screens. Lowest risk.'),
      ('B', 'Re-sequence and condense (my pick)', 'Proof right after the hero, the Farsi-style phone hero on desktop, process before price, Contact folded into the footer. About 12 to 13 screens. Reuses the Farsi design you like.'),
      ('C', 'Short home plus deep pages', 'About 8 screens; new Programmes and About pages. Best long-term for search, most work.')],
-     pick='B')),
- dict(n=13, phase='call', status='ask', effort='M-L', title='The apply form: promise vs length',
+     pick='B', chosen='B')),
+ dict(n=13, phase='call', status='go', effort='M-L', title='The apply form: promise vs length',
   plain='The form is the one step every sale goes through. It asks 27 to 30 questions (18 required) over 7.8 phone screens, and the home says 2 minutes. Sleep, stress, nutrition, equipment and lifts are only needed after the call.',
   items=[
    ('P1', 'Apply EN and FA', '27 questions (29 for tennis or padel, 30 with an injury), 18 required, about 5 minutes; my estimate 2.5 min required-only. The season the hero promises is never asked. Football, cricket, weight-loss and “tone & shape” options remain though the site is for tennis and padel.', 'Stopgap now: “About 5 minutes” (package 10). Then the option you pick below.', 'M-L', 'Y', 'form-en-01, form-fa-03'),
@@ -161,8 +165,8 @@ PK = [
      ('A', 'Short apply plus a prep form', '9 fields (plan, name, email, WhatsApp, sport and level, goal, days, pain yes/no, next event). A true 2 minutes; the rest comes after your reply in a second form (to build).'),
      ('B', 'Same questions in 5 saved steps', 'Feels shorter, recovers quitters. A rewrite.'),
      ('C', 'One page cut to about 18 (my pick)', 'Everything else under “Optional: speeds up our call”. Cheapest. Move to A if the new numbers (package 9) show people quitting.')],
-     pick='C')),
- dict(n=14, phase='call', status='ask', effort='M', title='Farsi home: price, trust and length',
+     pick='C', chosen='C')),
+ dict(n=14, phase='call', status='go', effort='M', title='Farsi home: price, trust and length',
   plain='The Farsi home sells well, but the price has no Toman figure or payment method, the first screen shows no name, face or credential, and the same pitch repeats six times over 20.8 screens.',
   items=[
    ('P2', 'Farsi home', 'The Iran price is a Latin “$25” with no Toman figure and no way to pay; the English page’s intake call, performance report, 60-day promise and 48 h reply are missing; the cost question is the last FAQ.', 'Toman rule or figure (see decision), payment FAQ, the promise if it applies, cost FAQ near the top.', 'M', 'Y', 'home-fa-06'),
@@ -173,7 +177,7 @@ PK = [
   decision=dict(title='How do we show the price in Toman?', options=[
      ('1', 'Say the rule, not a number (my pick)', '«به تومان، به نرخ همون روز. مبلغ دقیق رو تو پیام اولم می‌گم.» Nothing goes stale.'),
      ('2', 'Show a Toman figure with a date', 'More concrete, but someone must keep it current.')],
-     pick='1')),
+     pick='1', chosen='1')),
  dict(n=15, phase='call', status='ask', effort='M', title='Farsi product pages: trust at the buy button',
   plain='The course and testing pages are lean and persuasive, but near the WhatsApp buy button nothing says what happens after you send, how fast you get a reply, or what if it fails.',
   items=[
@@ -184,7 +188,7 @@ PK = [
    ('P2', 'Both pages', 'Footer lacks a privacy link on the testing page though the FAQ says children’s names are stored; the privacy notice is English-only and never mentions either app.', 'Add the link; a short Farsi paragraph per app in the notice.', 'S', 'Y', 'testing-02'),
    ('P3', 'Both pages', 'Hero kicker 2.0:1 and accent text 2.3 to 2.5:1 on the lit gradient; stat numerals 2.87:1; both share the English “AA PERFORMANCE” share card.', 'White kicker with clay border, drop the opacity, a Farsi 1200×630 card per product.', 'S-M', 'Y', 'tennis-07, shared-01'),
   ]),
- dict(n=16, phase='call', status='ask', effort='M', title='Proof page and the Instagram link hub',
+ dict(n=16, phase='call', status='go', effort='M', title='Proof page and the Instagram link hub',
   plain='The free habit tracker is the top of your funnel. On a phone its first screen has nothing to tap, the form starts 3.3 screens down, and the page never says it is for tennis and padel players.',
   items=[
    ('P1', 'proof.html', 'Nothing to tap on the first screen: “FREE · NO PAYMENT, NO CARD” looks like a button but is a span; the form starts 2,794 px down; it never says tennis or padel.', 'A button to #join under the lede; name the audience; logo-only header (the site nav has 9 exits).', 'S', 'N', 'proof-01'),
@@ -195,7 +199,7 @@ PK = [
   decision=dict(title='Who is proof.html for?', options=[
      ('1', 'English-speaking players (my pick for now)', 'Keep English, say who it is for, show the product, link the demo.'),
      ('2', 'Your Iranian followers', 'Then a Farsi proof-fa.html linked from the hub, and the tracker higher on it. A new page.')],
-     pick='1')),
+     pick='1', chosen='1')),
  dict(n=17, phase='call', status='ask', effort='M', title='Partner page: the deal on the first screen',
   plain='A coach reading the partner page does not see the actual deal until 857 px down, and is asked for card details before you have accepted anyone.',
   items=[
@@ -211,7 +215,7 @@ PK = [
    ('P2', 'All articles', 'Every page shares one English brand card as og:image, Farsi too; four unused people-free Library pictures exist. Four of five English descriptions are cut mid-sentence; “More articles” ignores topic; four older Farsi pages miss the SEO phrase; the index promises padel but no article body mentions it.', '1200×630 card per category (your OK to reuse the art); real descriptions; related by topic; retrofit the phrase; write the padel article or soften the claim.', 'M', 'Y', 'article-06 to 10'),
    ('P2', 'English articles', 'English article pages copy the Farsi pill look: four header links against the home’s seven, no WhatsApp in the footer. A third design next to the English home and the Farsi home.', 'Decide: look like the English home (shared nav) or keep this look.', 'M-L', 'Y', 'article-05'),
   ]),
- dict(n=19, phase='call', status='ask', effort='M', title='Your voice in the English copy',
+ dict(n=19, phase='call', status='go', effort='M', title='Your voice in the English copy',
   plain='Your own rule says an athlete should read plain words that sound like you typed them. The English home has 43 em-dashes, 8 “X, Y and Z” lists and 24.7-word sentences; it reads at 34 out of 100 (difficult). Forms, proof, privacy and the article closing do the same.',
   items=[
    ('P3', 'English home, forms, proof, privacy, articles', 'Em-dashes: home 43, form 26, proof 12, privacy 36; “Not a PDF. An Experience.”; “from one of the world’s leading programmes” (no university named); “Client Intake Form” is internal jargon (buttons say Apply). Farsi: 22 dashes, 6 semicolons, “X، Y و Z” lines.', 'I write two plain options for each key line; you pick or change; the rest follows the same rule. Keep what already sounds like you: “We adapt.” “Nothing without a reason.”', 'M', 'Y', 'home-en-17, form-en-14, proof-08, article-15, home-fa-16'),
@@ -220,7 +224,7 @@ PK = [
      ('Now', 'Today', '“Not a generic fitness plan repackaged for racket sports. This is strength & conditioning designed from the ground up for the movement demands of tennis and padel — the accelerations, the decelerations, the repeated sprints, the rotational force production.”'),
      ('1', 'Option 1', '“This is not a gym plan with a racket added. I build it around how you move on court: fast starts, hard stops, long rallies, big rotation.”'),
      ('2', 'Option 2', '“I write your plan for tennis and padel only. Quick starts, hard stops, long points. That is what we train.”')],
-     pick='1')),
+     pick='1', chosen='1')),
  dict(n=20, phase='call', status='ask', effort='M', title='Legal accuracy (needs facts from you)',
   plain='The privacy notice is detailed, but it lags what the site and your tools actually do. This is a list of differences to confirm, not legal advice.',
   items=[
@@ -236,7 +240,7 @@ PK = [
   items=[
    ('P3', 'Whole site', 'Two colour vocabularies for the same palette (--clay / --accent-2, --paper / --bg, --ink / --text-primary …), 48 KB of inline CSS on each home, breakpoints 480 to 1000 px in nine places.', 'A brand.css defining both vocabularies as aliases; one nav and footer for Farsi and article pages; shared type scale.', 'L', 'N', 'static scan, article-05'),
   ]),
- dict(n=22, phase='base', status='todo', effort='M', title='A style guard so it stays fixed',
+ dict(n=22, phase='base', status='done', done='a', left='Done on 2026-10-02: it stops the commit (your answer). scripts/check_site_style.py runs from .githooks/pre-commit on the public pages and their shared CSS. It is a ratchet: scripts/site_style_baseline.json holds what existed (the drawn mini app, the Etminan amber and small labels, the UTS fonts) and only an ADDED one blocks; /* style-ok */ on a line marks a deliberate exception; after removing old ones run the script with --update. Its first run found real leftovers (form and proof labels under 12 px, the Farsi form, partner and terms pages still in the pale grey, a slider hanging off a 320 px screen) and they are fixed.', effort='M', title='A style guard so it stays fixed',
   plain='A small check that runs when you commit and says no if a change brings back yellow, text under 12 px, a pale grey, or letter-spacing on Farsi.',
   items=[
    ('P3', 'Pre-commit', 'Nothing stops regressions: the no-gold rule, the 12 px floor, the grey token, Farsi letter-spacing and Google font links are checked only by people.', 'scripts/check_site_style.py in .githooks/pre-commit, same pattern as the existing guards.', 'M', 'N', 'static scan'),
@@ -287,6 +291,8 @@ NEW_WORDS = [
         'Farsi (first when the broken link was a Farsi one): «اوت شد! این صفحه پیدا نشد.» · «شاید لینک قدیمی بوده یا یه جاش اشتباه تایپ شده. از این‌جاها می‌تونی ادامه بدی.» · «برنامه‌ی تمرینی داری؟ بازش کن» · «هنوز گیر کردی؟ توی واتساپ بهم پیام بده»; buttons «صفحه‌ی اصلی», «شروع کن», «مقاله‌ها».']),
     ('English home', [
         '“Application takes about 5 minutes · No commitment until we speak” (it said 2 minutes).']),
+    ('Privacy notice, the Fonts paragraph (section on third parties)', [
+        'Now reads: “The home page, the apply and free-tracker forms, the privacy and terms pages, the Farsi pages and the Etminan pages serve their typefaces from this site, so those pages make no font request to Google. Some other pages (the articles, the training and habit apps and the UTS page) still load their typefaces from Google Fonts. To draw them, your browser asks Google’s servers …” (the rest as it was). It is a legal text and your words: say if you want it changed.']),
     ('Small helper words', [
         'Skip links for keyboard users: «رفتن به محتوا» · «رفتن به لینک‌ها» · «رفتن به متن» · «رفتن به فرم». The English ones already said “Skip to content”.',
         'Screen-reader names for the Etminan language switcher: “FA فارسی”, “EN English”, “DV ދިވެހި”.']),
@@ -302,18 +308,13 @@ SHIPPED_YOUR_CALLS = [
 
 QUESTIONS = [
     'How and when does a client pay, and does the 60-day promise mean a rebuilt plan only, or money back? The home, the form and the terms must say the same thing.',
-    'Toman: say the rule, or show a figure with a date? (package 14)',
     'Has anyone in Iran opened the demo, the apply form and Plausible with the VPN off? I cannot test from here. (package 23)',
     'Is the apply form now only for tennis and padel players? If yes, I remove football, cricket, weight-loss and “tone & shape” and ask the next event date.',
     'Is the app staying English-only? The Farsi copy says “message me in the app”. (package 5)',
-    'Who is proof.html for: English-speaking players or your Iranian followers? (package 16)',
     'Is the UTS page ever sent to people who have not booked? (package 20)',
     'Facts for the privacy notice: do you paste athlete names into AI chats, and is there a written coaching agreement (terms section 7)? (package 20)',
     'May the first screen show your photo and three athletes, and may the Library’s category pictures be reused as article thumbnails and share cards?',
     'Where did you see “claude-design-skills”? Several repos use the name; a link would pin it down.',
-    'May I download the English fonts (Barlow, Barlow Condensed, JetBrains Mono, DM Sans; about 600 KB, open licence) and serve them from your own site? It removes the last Google requests from the English pages and lets the headings arrive with the page. (package 6c) My pick: yes.',
-    'May I make the fill of the white-on-clay buttons a hair deeper, #C2512C instead of #C7552F? Every Apply button then passes the contrast rule (4.66:1 instead of 4.40:1) and nobody will see the shade. (package 1) My pick: yes.',
-    'Should the style guard (package 22) stop a commit that brings back yellow, text under 12 px, a pale grey or letter-spaced Farsi, or only warn? My pick: stop it, with a plain message saying what to change.',
     'Your part, 5 minutes: in Plausible add Custom-event goals named Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application and 404, then add the properties plan, where, page, which, to, step and lang (Site settings, Custom properties). Until then the counts exist but are not shown.',
     'Your part, when you can: ask two or three Iranian athletes to open amirardekani.com/reach/ once with the VPN off and once on, and send you the line it prints. It now also tests the apply-form endpoint (W3) and Plausible (PL). (package 23)',
 ]
@@ -371,4 +372,7 @@ SHIPPED = [
     ('2026-10-02', '5, 10', 'Skip link and main landmark on the last Farsi pages; the home no longer promises "2 minutes".', 'ff47f99'),
     ('2026-10-02', '6', 'Athlete photos on both homes 40% lighter, with sizes, loaded as you scroll.', 'ae22d81'),
     ('2026-10-02', '2, 5, 6', 'Thumb-sized links on the shared header, footer and course pages; the 404 headline stops jumping; Persian-digit footer years.', '516efa8'),
+    ('2026-10-02', '6', 'The English pages and the Farsi pages’ Latin numerals load Barlow, Barlow Condensed, JetBrains Mono and DM Sans from your own site: 14 pages make no request to Google, layout shift unchanged. The privacy notice now says which pages still use Google Fonts.', 'f3e27cb'),
+    ('2026-10-02', '1', 'Every white-on-clay button, badge and chip is the deeper #C2512C (4.66:1, was 4.40:1): 25 of 25 measured; lines, glows and clay text keep the brand colour.', '07e0118'),
+    ('2026-10-02', '22', 'The style guard: a commit that adds yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white-on-pale-clay is stopped. It also found and fixed: 10 to 11 px labels on the apply form and proof page, the pale grey on the Farsi form, partner and terms pages, and a slider value hanging off a 320 px screen.', '943a92c'),
 ]

@@ -10,7 +10,7 @@ import backlog as B
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
 sys.stdout.reconfigure(encoding='utf-8')
 
-STATUS = {'next': 'Starting now', 'todo': 'Queued', 'ask': 'Waiting for you', 'other': 'Another session', 'done': 'Done'}
+STATUS = {'next': 'Starting now', 'go': 'Decided: next to build', 'todo': 'Queued', 'ask': 'Waiting for you', 'other': 'Another session', 'done': 'Done'}
 SEV = {'P1': 'Costs you now', 'P2': 'Worth fixing', 'P3': 'Polish'}
 EFF = {'S': 'small', 'S-M': 'small to medium', 'M': 'medium', 'M-L': 'medium to large', 'L': 'large'}
 PHASE_LABEL = {k: t for k, t, _ in B.PHASES}
@@ -47,7 +47,7 @@ def build_md():
               'Keep what works (the list below). Never remove a feature without saying so. Smallest change that solves it.',
               'After each package: WHAT CHANGED · WHY · FILES · PRESERVED · SIDE EFFECTS · WHAT TO TEST, briefly, then re-run the scoreboard and report the difference.',
               'Ship live: straight to `main`, one push at a time, stage only your own files (other sessions share this working tree), then confirm the deploy.',
-              'Anything that touches `assets/css/*.css` or `assets/js/shared.js` bumps the `?v=` token on every marketing page that links it (`20261002d` now: index, form, proof, privacy, terms; `fa-product.css` has its own on the two course pages). `sw.js` serves `/assets/` cache-first by exact URL, so a new token is a fresh copy. Do NOT bump `CACHE` in `sw.js` for that: it deletes the athletes’ offline copy of the apps. A replaced image ships under a new name.',
+              'Anything that touches `assets/css/*.css` or `assets/js/shared.js` bumps the `?v=` token on every marketing page that links it (`20261002f` now: index, form, proof, privacy, terms; `fonts.css` carries `20261002e`; `fa-product.css` has its own, `v=8`, on the two course pages). `sw.js` serves `/assets/` cache-first by exact URL, so a new token is a fresh copy. Do NOT bump `CACHE` in `sw.js` for that: it deletes the athletes’ offline copy of the apps. A replaced image ships under a new name.',
               'Never edit the generated pages (`en/articles/`, `fa/articles/`, `sitemap.xml`): fix `scripts/build_article_pages.py`. Keep the Search Console tag in `index.html`.',
               '“Push back, with evidence.” Check a visual defect in a real viewport (`scripts/site_audit/shot.js`) before reporting it: a frozen full-page capture once showed empty contact icons that were fine.']:
         a('- ' + r)
@@ -97,7 +97,7 @@ def build_md():
             if d:
                 a(f'\n**Decision: {d["title"]}**\n')
                 for k, name, text in d['options']:
-                    a(f'- **{k}. {name}.** {text}' + ('  ← my pick' if k == d['pick'] else ''))
+                    a(f'- **{k}. {name}.** {text}' + ('  ← my pick' if k == d['pick'] else '') + ('  ← **YOUR CHOICE (2026-10-02)**' if k == d.get('chosen') else ''))
             a('')
     a('## Questions only Amir can answer\n')
     for i, q in enumerate(B.QUESTIONS, 1): a(f'{i}. {q}')
@@ -197,6 +197,7 @@ a{color:var(--green-2)}
 .opts{display:grid;gap:8px}
 .opt{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;display:grid;grid-template-columns:auto 1fr;gap:2px 12px}
 .opt.pick{border-color:var(--green-2)}
+.opt.chosen{border-color:var(--green);border-width:2.5px}
 .opt .k{font:900 22px/1.1 var(--fd);color:var(--clay-ink);grid-row:span 2;min-width:34px}
 .opt .nm{font-weight:600}.opt .tx{color:var(--ink-2);font-size:16px;grid-column:2}
 .opt .mine{font:600 12px var(--fm);letter-spacing:.06em;text-transform:uppercase;color:var(--good);margin-left:8px}
@@ -241,8 +242,8 @@ def pk_html(p):
     dec = ''
     if d:
         opts = ''.join(
-            f'<div class="opt{" pick" if k == d["pick"] else ""}"><span class="k">{e(k)}</span><span class="nm">{e(nm)}'
-            f'{"<span class=mine>my pick</span>" if k == d["pick"] else ""}</span><span class="tx">{e(tx)}</span></div>' for k, nm, tx in d['options'])
+            f'<div class="opt{" pick" if k == d["pick"] else ""}{" chosen" if k == d.get("chosen") else ""}"><span class="k">{e(k)}</span><span class="nm">{e(nm)}'
+            f'{"<span class=mine>my pick</span>" if k == d["pick"] else ""}{"<span class=mine>your choice</span>" if k == d.get("chosen") else ""}</span><span class="tx">{e(tx)}</span></div>' for k, nm, tx in d['options'])
         dec = f'<div class="dec"><h4>{e(d["title"])}</h4><div class="opts">{opts}</div></div>'
     tags = f'<span class="tag {"ask" if p["status"] == "ask" else "done" if p["status"] == "done" else "go"}">{e(STATUS[p["status"]])}</span><span class="tag">{e(EFF.get(p["effort"], p["effort"]))}</span>'
     if p['phase'] == 'call': tags += '<span class="tag ask">your call</span>'

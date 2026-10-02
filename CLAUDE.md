@@ -43,6 +43,10 @@ Durable context for working in this repo. Read the linked docs before diving in.
   public page's design or copy.** It is generated from `scripts/site_audit/backlog.py` (edit that, then run
   `python scripts/site_audit/build_report.py`); the measuring tools, `shot.js` for checking a defect in a real
   viewport and the lessons are in `scripts/site_audit/README.md`; the seven page reviews are in `Content/site-audit/`.
+  **Public pages have a style guard** (2026-10-02): `scripts/check_site_style.py` (pre-commit guard 13) stops a commit that adds
+  yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white text on the plain clay; it is a ratchet on
+  `scripts/site_style_baseline.json` and `/* style-ok */` marks an exception. The English fonts are our own files (`assets/css/fonts.css`,
+  made by `scripts/site_audit/fetch_fonts.py`); the fill under white text is `--accent-2-fill` / `--clay-fill` (#C2512C), never #C7552F.
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy. **It opens with the RULE INDEX**
   (2026-09-26): one numbered line per rule (`VOL-8`, `SEL-4` …), the stage that applies it and whether
   the checker enforces it; the bullets below it are the stories. **The index line is the rule**:

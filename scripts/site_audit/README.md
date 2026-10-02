@@ -22,6 +22,8 @@ visitors, and no form is ever submitted.
 | `cls.js` | Which elements cause layout shift on a slow phone |
 | `linkcheck.js` | Tests every internal link the probes found |
 | `static_scan.py` | Source scan: palette conformance, no-gold check, fonts, breakpoints, token drift |
+| `fetch_fonts.py` | Downloads the English fonts (latin subset, OFL) into `assets/fonts/` and writes `assets/css/fonts.css`. Run only to change weights |
+| `../check_site_style.py` | The style guard (pre-commit): `--list` shows every violation, `--all` checks every page, `--update` accepts the working tree as the new baseline after a clean-up |
 
 ## Running it
 
