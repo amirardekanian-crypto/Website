@@ -1,6 +1,6 @@
 /* Tennis physical testing app · clickable sample · app logic.
-   Private prototype (assess-content). Plain HTML/CSS/JS, no build step, hash routes,
-   so it runs from any static host. Built on the course app's base (tps-content/app).
+   Plain HTML/CSS/JS, no build step, hash routes, so it runs from any static host. Built on the
+   course app's base; this repo is its permanent home (the old private assess-content repo is retired).
    Content comes from content/manifest.json and the files it lists.
    Nothing is saved in this sample: players, results and notes live in memory and are
    gone after a reload. Saving to Supabase comes in a later step.

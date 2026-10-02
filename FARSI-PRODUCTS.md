@@ -15,7 +15,9 @@ too, stays in CLAUDE.md → *Site layout*.
 > and tests** live only in the `tps_content` and `course_en` rows (edit with SQL, re-hash `version`; see
 > `Content/CONTENT-PARITY.md`). **Never deploy or publish from `tps-content`**: its deploy script erases the demo, the
 > covers and the `ART` lines, and its lesson build scripts (`build_learn*.py`, `l5_*.py`) hold the OLD text and would
-> overwrite the 19 lessons corrected and added on 2026-10-02. Anything useful still in that repo (its `_dev` tools) gets
+> overwrite the 19 lessons corrected and added on 2026-10-02. **Both publish secrets (`tps_publish_keys`,
+> `assess_publish_keys`) were deleted and the two publish functions closed to `anon` and `authenticated` on 2026-10-02**
+> (`supabase/tps_03_revoke_publish_keys.sql`), so even the old repo can no longer write to the database. Anything useful still in that repo (its `_dev` tools) gets
 > copied here when found.
 
 **`/tennis/app/` is the paid course app** (Tennis Performance System, Level 2; Farsi). Its shell
@@ -107,8 +109,8 @@ The page reaches `sitemap.xml` through `FOLDER_PAGES` in `scripts/build_article_
 
 **`/tennis-testing/` is the testing app's product page** (Farsi, indexable, for coaches and academies;
 full sale at $17 once, 2026-09-15) on the same `fa-product.css` layout. **The app itself moved to
-`/tennis-testing/app/`** that day, while no login existed. Its shell is copied there by
-`assess-content/app/_dev/deploy_to_website.py`, so never edit `tennis-testing/app/` by hand; logins come
+`/tennis-testing/app/`** that day, while no login existed. Its shell is edited here in `tennis-testing/app/` (this repo is its permanent home since 2026-10-02, like the course
+app; the private `assess-content` repo is retired, and the content lives only in `assess_content`); logins come
 from coach.html → **Testing app** (`ASSESS_URL`). The page's phone screens are real, taken with made-up
 sample players (`?sample=1`). Like the course app, it self-hosts Vazirmatn and supabase-js 2.116.0
 (`fonts/`, `lib/`), so nothing waits on Google Fonts or jsDelivr. `index-fa.html` links it from the menu («برای مربی‌ها») and the third

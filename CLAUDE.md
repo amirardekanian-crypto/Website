@@ -299,8 +299,11 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
     first). The private `tps-content` repo is retired: it is unreachable and out of date, so **never deploy or publish
     from it**; its deploy script would erase the demo and its lesson scripts would overwrite the corrected lessons.
     The lessons live ONLY in Supabase (`tps_content`, `course_en`: edit with SQL and re-hash `version`;
-    `Content/CONTENT-PARITY.md` → *How to publish each surface*), readable only by an active buyer. The testing app's
-    shell (`tennis-testing/app/`) is still copied from the private `assess-content` repo: do not edit it by hand.
+    `Content/CONTENT-PARITY.md` → *How to publish each surface*), readable only by an active buyer. The testing app is the same
+    (Amir, 2026-10-02): `tennis-testing/app/` is edited here, its content lives only in `assess_content`, and the private
+    `assess-content` repo is retired. **Both publish secrets were revoked on 2026-10-02**
+    (`supabase/tps_03_revoke_publish_keys.sql`): `tps_publish()` and `assess_publish()` can no longer be called by anyone
+    without the service role, so content changes are SQL through the Supabase MCP.
   - The demo's lock is server-side (`tps_demo()`): never "lock" anything in `app.js` alone.
   - The course app's tour finds real controls by CSS selector: move a control or rename a class and it
     lies, silently, on a new buyer's first screen.
