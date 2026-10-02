@@ -20,7 +20,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 
 ## Where it stands
 
-**25 packages · 82 findings** (30 cost you now, 39 worth fixing, 13 polish). Done: 12 · Waiting for you: 5 · Decided: next to build: 4 · Another session: 1 · Queued: 3
+**25 packages · 82 findings** (30 cost you now, 39 worth fixing, 13 polish). Done: 13 · Waiting for you: 5 · Decided: next to build: 3 · Another session: 1 · Queued: 3
 
 | # | Package | Phase | Status | Effort |
 |---|---|---|---|---|
@@ -39,7 +39,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 13 | The apply form: promise vs length | Your call | Done (1 of 2 items) | medium to large |
 | 14 | Farsi home: price, trust and length | Your call | Decided: next to build | medium |
 | 15 | Farsi product pages: trust at the buy button | Your call | Waiting for you | medium |
-| 16 | Proof page and the Instagram link hub | Your call | Decided: next to build | medium |
+| 16 | Proof page and the Instagram link hub | Your call | Done (4 of 4 items) | medium |
 | 17 | Partner page: the deal on the first screen | Your call | Waiting for you | medium |
 | 18 | Articles: a next step, an author, a share card | Your call | Another session | medium to large |
 | 19 | Your voice in the English copy | Your call | Decided: next to build | medium |
@@ -76,6 +76,9 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 2026-10-02 | 10, 20 | The 60-day promise is gone from the English home (there is none); the privacy notice says names go to the AI assistant. | 295589d |
 | 2026-10-02 | 13 | The English apply form is cut to 13 required questions with about 15 optional ones folded away (8.0 to 5.7 phone screens, about 3 minutes) and a required consent tick for health details and the AI assistant. | 5fe959e |
 | 2026-10-02 | 13 | The Farsi apply form the same way: 12 required, the rest optional, the same consent tick. | 0417c8a |
+| 2026-10-02 | 13, 20 | No refunds and 18 or over: terms section 7 rewritten (English and Farsi), the old ?client= link and “coaching agreement” removed from the terms, a required adult-or-guardian tick on both forms, privacy section 8. | 6d6aeb4 |
+| 2026-10-02 | 16, 10 | Proof page: Get your free login and Try the demo on the first screen, the real app shown, the stale promises fixed, a country-code number box, its own home-screen manifest. | cea6ef8 |
+| 2026-10-02 | 16 | The Instagram link hub in the order that sells, with clearer labels (application, 48 hours, for coaches, the tracker page is English). | 56a0535 |
 | 2026-10-02 | 22 | The style guard: a commit that adds yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white-on-pale-clay is stopped. It also found and fixed: 10 to 11 px labels on the apply form and proof page, the pale grey on the Farsi form, partner and terms pages, and a slider value hanging off a 320 px screen. | 943a92c |
 
 ### Words I wrote, for you to read
@@ -139,6 +142,18 @@ Short functional lines, written to your voice rules, but they are your words on 
 - Farsi: «اختیاری: تماسمون رو سریع‌تر می‌کنه» · «حدودِ ۱۵ سؤالِ کوتاه. هر کدوم رو خواستی رد کن، توی تماس ازت می‌پرسم.» · badge «حدودِ ۳ دقیقه»
 - Farsi consent tick: «قبول دارم که امیر از جواب‌هام برای نوشتنِ برنامه‌م استفاده کنه، از جمله اطلاعاتِ آسیب و سلامتی که می‌نویسم. امیر برای کمک از یه دستیارِ هوش مصنوعی (Claude) استفاده می‌کنه و همه‌ی برنامه‌ها رو خودش چک می‌کنه.» and the error «برای ادامه باید این کادر رو تیک بزنی.»
 - Privacy notice 2.9 now says the AI assistant gets your name too. English home: “Application takes about 3 minutes”.
+
+**Terms, section 7 and the age rule (2026-10-02)**
+
+- English section 7: “You pay in advance, after we have talked, by messaging me to agree the payment. The fee is for the work I do, so I do not give refunds once I have started on your programme.” and “This does not take away rights you have by law. For example, a customer in the UK or EU can usually cancel within 14 days of paying, and if I have already started the work, I keep a fair part of the fee for the work done.”
+- English “Who can buy”: “You must be 18 or over to buy a programme. If the athlete is under 18, a parent or guardian applies, pays and agrees to these terms for them, and answers the health questions with them.” The Farsi terms say the same (and the Farsi section 7).
+- Form tick, English: “I am 18 or over. If the athlete is under 18, I am their parent or guardian.” Farsi: «من ۱۸ سال یا بیشتر دارم. اگه ورزشکار زیر ۱۸ سال باشه، من پدر یا مادرِ (یا سرپرستِ) اون هستم.» The age box: “Athlete’s age · Under 18? A parent or guardian fills in this form.” / «سنِ ورزشکار · زیر ۱۸ سال؟ پدر یا مادر باید این فرم رو پر کنه.»
+
+**Proof page and link hub (2026-10-02)**
+
+- Buttons “Get your free login” and “Try the demo”, the line “Free. No payment, no card. For any athlete.”, the heading “This is the whole app.” with “Four habits a day: steps, sleep, protein and water. Tap one when it is done. Points build levels.” and “The demo is the real thing with nothing saved. Tap around.”
+- “Four are always on: steps, sleep, food and water. The rest are optional, and you can change them whenever you like.” · “Get your free login” · “You will get a username and password on WhatsApp.” · “Send me my login” · “WhatsApp number, with country code”.
+- Farsi hub: «درخواستِ برنامه‌ی اختصاصی» / «فرمِ ۳ دقیقه‌ای · جواب تا ۴۸ ساعت», role «مربیِ بدنسازیِ تنیس و پدل», «آزمون آمادگی جسمانی · برای مربی‌ها», and «… · صفحه به انگلیسیه» on the tracker.
 
 **Small helper words**
 
@@ -404,16 +419,18 @@ The course and testing pages are lean and persuasive, but near the WhatsApp buy 
 | 15e |  | P2 | Both pages | Footer lacks a privacy link on the testing page though the FAQ says children’s names are stored; the privacy notice is English-only and never mentions either app. | Add the link; a short Farsi paragraph per app in the notice. | S | Y | testing-02 |
 | 15f |  | P3 | Both pages | Hero kicker 2.0:1 and accent text 2.3 to 2.5:1 on the lit gradient; stat numerals 2.87:1; both share the English “AA PERFORMANCE” share card. | White kicker with clay border, drop the opacity, a Farsi 1200×630 card per product. | S-M | Y | tennis-07, shared-01 |
 
-### 16. Proof page and the Instagram link hub  ·  Decided: next to build  ·  medium
+### 16. Proof page and the Instagram link hub  ·  Done  ·  medium
 
 The free habit tracker is the top of your funnel. On a phone its first screen has nothing to tap, the form starts 3.3 screens down, and the page never says it is for tennis and padel players.
 
+**Still open.** Done on 2026-10-02 (option 1, English): the proof page has “Get your free login” and “Try the demo” on the first screen, says it is for athletes, shows the real Today screen of the demo, and no longer promises a private link or eight starting habits; the number box asks for a country code; the page has its own home-screen manifest. The link hub is in the order that sells with clearer labels. Not done: email still required (the signup skill reads it), a Proof share card (needs a picture), a Farsi proof page (you chose English).
+
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
-| 16a |  | P1 | proof.html | Nothing to tap on the first screen: “FREE · NO PAYMENT, NO CARD” looks like a button but is a span; the form starts 2,794 px down; it never says tennis or padel. | A button to #join under the lede; name the audience; logo-only header (the site nav has 9 exits). | S |  | proof-01 |
-| 16b |  | P1 | proof.html | The product is never shown: about 570 words, one logo, no screenshot, no demo link, though habits.html?client=demo works. | One or two real screenshots (names hidden) and a “Try the demo” link. | M | Y | proof-02 |
-| 16c |  | P2 | proof.html | Three required fields though the login goes by WhatsApp; “+98” hint so a UK number cannot be messaged; manifest.json is the coaching app (start_url /program.html); share card is the English AA PERFORMANCE image. | “WhatsApp (with country code)”, email optional, proof’s own manifest, its own share card. | S | Y | proof-06, proof-09 |
-| 16d |  | P1 | links.html | Which button is for whom is only half clear (“professional coach”; “شروع کن” does not say it is a paid application; two near-identical product names). The coaching sample is 5th, the free tracker 6th at 876 px, below the fold in Instagram’s browser. | Role line = “tennis and padel” as on the home; sub-lines “فرمِ درخواست · جواب تا ۴۸ ساعت”; order: coaching and sample, course and demo, coaches’ test, tracker, site. | S | Y | links-01, links-02 |
+| 16a | ✓ | P1 | proof.html | Nothing to tap on the first screen: “FREE · NO PAYMENT, NO CARD” looks like a button but is a span; the form starts 2,794 px down; it never says tennis or padel. | A button to #join under the lede; name the audience; logo-only header (the site nav has 9 exits). | S |  | proof-01 |
+| 16b | ✓ | P1 | proof.html | The product is never shown: about 570 words, one logo, no screenshot, no demo link, though habits.html?client=demo works. | One or two real screenshots (names hidden) and a “Try the demo” link. | M | Y | proof-02 |
+| 16c | ✓ | P2 | proof.html | Three required fields though the login goes by WhatsApp; “+98” hint so a UK number cannot be messaged; manifest.json is the coaching app (start_url /program.html); share card is the English AA PERFORMANCE image. | “WhatsApp (with country code)”, email optional, proof’s own manifest, its own share card. | S | Y | proof-06, proof-09 |
+| 16d | ✓ | P1 | links.html | Which button is for whom is only half clear (“professional coach”; “شروع کن” does not say it is a paid application; two near-identical product names). The coaching sample is 5th, the free tracker 6th at 876 px, below the fold in Instagram’s browser. | Role line = “tennis and padel” as on the home; sub-lines “فرمِ درخواست · جواب تا ۴۸ ساعت”; order: coaching and sample, course and demo, coaches’ test, tracker, site. | S | Y | links-01, links-02 |
 
 **Decision: Who is proof.html for?**
 
@@ -459,7 +476,7 @@ Your own rule says an athlete should read plain words that sound like you typed 
 
 The privacy notice is detailed, but it lags what the site and your tools actually do. This is a list of differences to confirm, not legal advice.
 
-**Still open.** Done on 2026-10-02 from your answers: 20b is half done. The notice now says you use Claude (Anthropic) to write programmes (section 2.9, and Anthropic is in section 5), Supabase is “London, UK” and the date is 2 October. Still open: the coaching agreement, whether names go into AI chats, call-log.html, the Gmail copies, backups against “delete on request”. 20e (the UTS page) can wait: it has not been sent to anyone yet.
+**Still open.** Terms updated on 2026-10-02 (20d, half): section 7 now says no refund once work has started with the 14-day legal wrinkle, sections 3 to 5 no longer describe the retired ?client= link or a separate coaching agreement, a “Who can buy” paragraph says 18 or over, English and Farsi. Still open in 20d: the free tracker, the board, partner courses and the $17 Farsi course are not described. Done on 2026-10-02 from your answers: 20b is half done. The notice now says you use Claude (Anthropic) to write programmes (section 2.9, and Anthropic is in section 5), Supabase is “London, UK” and the date is 2 October. Still open: the coaching agreement, whether names go into AI chats, call-log.html, the Gmail copies, backups against “delete on request”. 20e (the UTS page) can wait: it has not been sent to anyone yet.
 
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
@@ -528,17 +545,16 @@ program.html (athletes), habits.html (AA Proof) and coach.html (your dashboard) 
 - The app is English for now. It has no chat: everything goes through WhatsApp.
 - The UTS page has not been sent to anyone yet (the course has not started).
 - You write the programmes with Claude, and athlete names go into those AI chats. The privacy notice says so (section 2.9: name, goals, background, injuries and logged sessions; Anthropic is in the list of processors), and both apply forms now ask for a consent tick.
-- There is no 60-day promise. It is removed from the English home.
+- There is no 60-day promise and there are no refunds. Terms section 7 now says: you pay in advance, no refund once I have started your programme, and your legal rights stay (a UK or EU customer can usually cancel within 14 days; if I have started, I keep a fair part). A flat “no refund” cannot override that law, so it is worded this way.
+- You must be 18 or over to buy a programme. If the athlete is under 18, a parent or guardian applies and pays. Both forms have a required tick for it, the age box says “Athlete’s age” and “Under 18? A parent or guardian fills in this form”, and the terms and the privacy notice say the same.
 - First screen and Library pictures: go with my recommendation. That is your photo and the athletes already shown in the testimonials (they have agreed), and the Library’s category pictures reused as article thumbnails and share cards.
 
 ## Questions only Amir can answer
 
-1. What is the refund rule, if any? Terms section 7 says refunds are in “the separate coaching agreement or invoice”. If there is no agreement, I rewrite it in one plain line from what you tell me.
-2. Minimum age on the apply forms: they accept 10 to 80, the privacy notice talks about adults. Do you coach under-18s directly (then a parent’s consent is needed), or should the minimum be 18?
-3. Has anyone in Iran opened the demo, the apply form and Plausible with the VPN off? You will tell me later. (package 23)
-4. Ask two or three Iranian athletes to open amirardekani.com/reach/ once with the VPN off and once on and send you the line it prints. You will let me know. (package 23)
-5. Your part: the Plausible goals (Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application, 404, and the properties plan, where, page, which, to, step, lang). You asked me to walk you through it later.
-6. Walk-through of the first-screen photo and the three athletes (package 12): you asked for it later, not now.
+1. Has anyone in Iran opened the demo, the apply form and Plausible with the VPN off? You will tell me later. (package 23)
+2. Ask two or three Iranian athletes to open amirardekani.com/reach/ once with the VPN off and once on and send you the line it prints. You will let me know. (package 23)
+3. Your part: the Plausible goals (Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application, 404, and the properties plan, where, page, which, to, step, lang). You asked me to walk you through it later.
+4. Walk-through of the first-screen photo and the three athletes (package 12): you asked for it later, not now.
 
 ## Tools: what we used, what we skip
 

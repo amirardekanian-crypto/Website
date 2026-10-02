@@ -189,7 +189,7 @@ PK = [
    ('P2', 'Both pages', 'Footer lacks a privacy link on the testing page though the FAQ says children’s names are stored; the privacy notice is English-only and never mentions either app.', 'Add the link; a short Farsi paragraph per app in the notice.', 'S', 'Y', 'testing-02'),
    ('P3', 'Both pages', 'Hero kicker 2.0:1 and accent text 2.3 to 2.5:1 on the lit gradient; stat numerals 2.87:1; both share the English “AA PERFORMANCE” share card.', 'White kicker with clay border, drop the opacity, a Farsi 1200×630 card per product.', 'S-M', 'Y', 'tennis-07, shared-01'),
   ]),
- dict(n=16, phase='call', status='go', effort='M', title='Proof page and the Instagram link hub',
+ dict(n=16, phase='call', status='done', done='abcd', left='Done on 2026-10-02 (option 1, English): the proof page has “Get your free login” and “Try the demo” on the first screen, says it is for athletes, shows the real Today screen of the demo, and no longer promises a private link or eight starting habits; the number box asks for a country code; the page has its own home-screen manifest. The link hub is in the order that sells with clearer labels. Not done: email still required (the signup skill reads it), a Proof share card (needs a picture), a Farsi proof page (you chose English).', effort='M', title='Proof page and the Instagram link hub',
   plain='The free habit tracker is the top of your funnel. On a phone its first screen has nothing to tap, the form starts 3.3 screens down, and the page never says it is for tennis and padel players.',
   items=[
    ('P1', 'proof.html', 'Nothing to tap on the first screen: “FREE · NO PAYMENT, NO CARD” looks like a button but is a span; the form starts 2,794 px down; it never says tennis or padel.', 'A button to #join under the lede; name the audience; logo-only header (the site nav has 9 exits).', 'S', 'N', 'proof-01'),
@@ -226,7 +226,7 @@ PK = [
      ('1', 'Option 1', '“This is not a gym plan with a racket added. I build it around how you move on court: fast starts, hard stops, long rallies, big rotation.”'),
      ('2', 'Option 2', '“I write your plan for tennis and padel only. Quick starts, hard stops, long points. That is what we train.”')],
      pick='1', chosen='1')),
- dict(n=20, phase='call', status='ask', left='Done on 2026-10-02 from your answers: 20b is half done. The notice now says you use Claude (Anthropic) to write programmes (section 2.9, and Anthropic is in section 5), Supabase is “London, UK” and the date is 2 October. Still open: the coaching agreement, whether names go into AI chats, call-log.html, the Gmail copies, backups against “delete on request”. 20e (the UTS page) can wait: it has not been sent to anyone yet.', effort='M', title='Legal accuracy (needs facts from you)',
+ dict(n=20, phase='call', status='ask', left='Terms updated on 2026-10-02 (20d, half): section 7 now says no refund once work has started with the 14-day legal wrinkle, sections 3 to 5 no longer describe the retired ?client= link or a separate coaching agreement, a “Who can buy” paragraph says 18 or over, English and Farsi. Still open in 20d: the free tracker, the board, partner courses and the $17 Farsi course are not described. Done on 2026-10-02 from your answers: 20b is half done. The notice now says you use Claude (Anthropic) to write programmes (section 2.9, and Anthropic is in section 5), Supabase is “London, UK” and the date is 2 October. Still open: the coaching agreement, whether names go into AI chats, call-log.html, the Gmail copies, backups against “delete on request”. 20e (the UTS page) can wait: it has not been sent to anyone yet.', effort='M', title='Legal accuracy (needs facts from you)',
   plain='The privacy notice is detailed, but it lags what the site and your tools actually do. This is a list of differences to confirm, not legal advice.',
   items=[
    ('P1', 'privacy.html', '15,000 px (17.8 screens), 3,790 words, no summary or contents; analytics and fonts start 13 screens down.', 'A 7-line “Short version”, a jump list, ids on headings, <details> for the long sections; 16 px text and a 680 px column.', 'M', 'Y', 'privacy-01'),
@@ -306,6 +306,14 @@ NEW_WORDS = [
         'Farsi: «اختیاری: تماسمون رو سریع‌تر می‌کنه» · «حدودِ ۱۵ سؤالِ کوتاه. هر کدوم رو خواستی رد کن، توی تماس ازت می‌پرسم.» · badge «حدودِ ۳ دقیقه»',
         'Farsi consent tick: «قبول دارم که امیر از جواب‌هام برای نوشتنِ برنامه‌م استفاده کنه، از جمله اطلاعاتِ آسیب و سلامتی که می‌نویسم. امیر برای کمک از یه دستیارِ هوش مصنوعی (Claude) استفاده می‌کنه و همه‌ی برنامه‌ها رو خودش چک می‌کنه.» and the error «برای ادامه باید این کادر رو تیک بزنی.»',
         'Privacy notice 2.9 now says the AI assistant gets your name too. English home: “Application takes about 3 minutes”.']),
+    ('Terms, section 7 and the age rule (2026-10-02)', [
+        'English section 7: “You pay in advance, after we have talked, by messaging me to agree the payment. The fee is for the work I do, so I do not give refunds once I have started on your programme.” and “This does not take away rights you have by law. For example, a customer in the UK or EU can usually cancel within 14 days of paying, and if I have already started the work, I keep a fair part of the fee for the work done.”',
+        'English “Who can buy”: “You must be 18 or over to buy a programme. If the athlete is under 18, a parent or guardian applies, pays and agrees to these terms for them, and answers the health questions with them.” The Farsi terms say the same (and the Farsi section 7).',
+        'Form tick, English: “I am 18 or over. If the athlete is under 18, I am their parent or guardian.” Farsi: «من ۱۸ سال یا بیشتر دارم. اگه ورزشکار زیر ۱۸ سال باشه، من پدر یا مادرِ (یا سرپرستِ) اون هستم.» The age box: “Athlete’s age · Under 18? A parent or guardian fills in this form.” / «سنِ ورزشکار · زیر ۱۸ سال؟ پدر یا مادر باید این فرم رو پر کنه.»']),
+    ('Proof page and link hub (2026-10-02)', [
+        'Buttons “Get your free login” and “Try the demo”, the line “Free. No payment, no card. For any athlete.”, the heading “This is the whole app.” with “Four habits a day: steps, sleep, protein and water. Tap one when it is done. Points build levels.” and “The demo is the real thing with nothing saved. Tap around.”',
+        '“Four are always on: steps, sleep, food and water. The rest are optional, and you can change them whenever you like.” · “Get your free login” · “You will get a username and password on WhatsApp.” · “Send me my login” · “WhatsApp number, with country code”.',
+        'Farsi hub: «درخواستِ برنامه‌ی اختصاصی» / «فرمِ ۳ دقیقه‌ای · جواب تا ۴۸ ساعت», role «مربیِ بدنسازیِ تنیس و پدل», «آزمون آمادگی جسمانی · برای مربی‌ها», and «… · صفحه به انگلیسیه» on the tracker.']),
     ('Small helper words', [
         'Skip links for keyboard users: «رفتن به محتوا» · «رفتن به لینک‌ها» · «رفتن به متن» · «رفتن به فرم». The English ones already said “Skip to content”.',
         'Screen-reader names for the Etminan language switcher: “FA فارسی”, “EN English”, “DV ދިވެހި”.']),
@@ -325,13 +333,12 @@ FACTS = [
     'The app is English for now. It has no chat: everything goes through WhatsApp.',
     'The UTS page has not been sent to anyone yet (the course has not started).',
     'You write the programmes with Claude, and athlete names go into those AI chats. The privacy notice says so (section 2.9: name, goals, background, injuries and logged sessions; Anthropic is in the list of processors), and both apply forms now ask for a consent tick.',
-    'There is no 60-day promise. It is removed from the English home.',
+    'There is no 60-day promise and there are no refunds. Terms section 7 now says: you pay in advance, no refund once I have started your programme, and your legal rights stay (a UK or EU customer can usually cancel within 14 days; if I have started, I keep a fair part). A flat “no refund” cannot override that law, so it is worded this way.',
+    'You must be 18 or over to buy a programme. If the athlete is under 18, a parent or guardian applies and pays. Both forms have a required tick for it, the age box says “Athlete’s age” and “Under 18? A parent or guardian fills in this form”, and the terms and the privacy notice say the same.',
     'First screen and Library pictures: go with my recommendation. That is your photo and the athletes already shown in the testimonials (they have agreed), and the Library’s category pictures reused as article thumbnails and share cards.',
 ]
 
 QUESTIONS = [
-    'What is the refund rule, if any? Terms section 7 says refunds are in “the separate coaching agreement or invoice”. If there is no agreement, I rewrite it in one plain line from what you tell me.',
-    'Minimum age on the apply forms: they accept 10 to 80, the privacy notice talks about adults. Do you coach under-18s directly (then a parent’s consent is needed), or should the minimum be 18?',
     'Has anyone in Iran opened the demo, the apply form and Plausible with the VPN off? You will tell me later. (package 23)',
     'Ask two or three Iranian athletes to open amirardekani.com/reach/ once with the VPN off and once on and send you the line it prints. You will let me know. (package 23)',
     'Your part: the Plausible goals (Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application, 404, and the properties plan, where, page, which, to, step, lang). You asked me to walk you through it later.',
@@ -397,5 +404,8 @@ SHIPPED = [
     ('2026-10-02', '10, 20', 'The 60-day promise is gone from the English home (there is none); the privacy notice says names go to the AI assistant.', '295589d'),
     ('2026-10-02', '13', 'The English apply form is cut to 13 required questions with about 15 optional ones folded away (8.0 to 5.7 phone screens, about 3 minutes) and a required consent tick for health details and the AI assistant.', '5fe959e'),
     ('2026-10-02', '13', 'The Farsi apply form the same way: 12 required, the rest optional, the same consent tick.', '0417c8a'),
+    ('2026-10-02', '13, 20', 'No refunds and 18 or over: terms section 7 rewritten (English and Farsi), the old ?client= link and “coaching agreement” removed from the terms, a required adult-or-guardian tick on both forms, privacy section 8.', '6d6aeb4'),
+    ('2026-10-02', '16, 10', 'Proof page: Get your free login and Try the demo on the first screen, the real app shown, the stale promises fixed, a country-code number box, its own home-screen manifest.', 'cea6ef8'),
+    ('2026-10-02', '16', 'The Instagram link hub in the order that sells, with clearer labels (application, 48 hours, for coaches, the tracker page is English).', '56a0535'),
     ('2026-10-02', '22', 'The style guard: a commit that adds yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white-on-pale-clay is stopped. It also found and fixed: 10 to 11 px labels on the apply form and proof page, the pale grey on the Farsi form, partner and terms pages, and a slider value hanging off a 320 px screen.', '943a92c'),
 ]
