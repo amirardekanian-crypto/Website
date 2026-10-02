@@ -104,7 +104,7 @@
   'use strict';
   if (typeof window.fetch !== 'function' || typeof window.Promise !== 'function') return;
 
-  var V = 'v1';
+  var V = 'v2';   // v2 (2026-10-02): added W3 (api.web3forms.com, where the apply forms are sent) and PL (plausible.io, the visit counter)
   var SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
   var SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';   // public; already in program.html
   var YT_ID = 'f2gbLLXVGFE';        // "Ankle Dorsiflexion Rocks", a Spine entry's video
@@ -212,6 +212,14 @@
     } },
     { id: 'GF', fa: 'فونت گوگل', run: async function () {
         return code('GF', await tfetch('https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap', { mode: 'no-cors' }));
+    } },
+    // Where the apply forms are sent (the second channel; the first is Supabase, tested above). If both fail, nobody can apply.
+    { id: 'W3', fa: 'ارسال فرمِ درخواست (Web3Forms)', run: async function () {
+        return code('W3', await tfetch(withQ('https://api.web3forms.com/'), { mode: 'no-cors' }));
+    } },
+    // The visit counter. The pages work without it, but if it is blocked the Plausible numbers undercount.
+    { id: 'PL', fa: 'شمارنده‌ی بازدید (Plausible)', run: async function () {
+        return code('PL', await tfetch(withQ('https://plausible.io/js/script.js'), { mode: 'no-cors' }));
     } }
   ];
   PEERS.forEach(function (peer, i) {
