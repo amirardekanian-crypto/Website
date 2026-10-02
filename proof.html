@@ -18,7 +18,7 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="/manifest-proof.json">
 
 <link rel="preload" href="/assets/fonts/BarlowCondensed-900.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/fonts.css?v=20261002e">
@@ -51,12 +51,23 @@
     margin: 0 0 22px;
   }
   .p-hero .lede { font-size: clamp(17px, 2.2vw, 21px); line-height: 1.55; max-width: 620px; color: rgba(250,247,242,.9); }
-  .p-free {
-    display: inline-block; margin-top: 30px; padding: 9px 14px;
-    border: 2px solid rgba(250,247,242,.4);
-    font-family: var(--font-display); font-weight: 900; font-size: 14px;
-    letter-spacing: .1em; text-transform: uppercase;
+  .p-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+  .p-btn {
+    display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 28px;
+    font-family: var(--font-display); font-weight: 900; font-size: 17px; letter-spacing: .06em; text-transform: uppercase;
+    text-decoration: none; border: 2px solid transparent;
   }
+  .p-hero a.p-btn--main, .p-btn--main { background: #C2512C; color: #fff; }   /* the deeper fill under white text: 4.66:1 */
+  .p-btn--main:hover { background: #E06B43; }
+  .p-hero a.p-btn--ghost { color: #FAF7F2; border-color: rgba(250,247,242,.55); }
+  .p-btn--ghost:hover { background: rgba(250,247,242,.12); }
+  .p-btn--dark { background: #0E4A36; color: #fff; }
+  .p-btn--dark:hover { background: #156A4D; }
+  .p-btn:focus-visible { outline: 3px solid #E06B43; outline-offset: 3px; }
+  .p-free-note { margin: 18px 0 0; font-size: 15px; color: rgba(250,247,242,.8); }
+  .p-shot { display: grid; grid-template-columns: minmax(0, 300px) 1fr; gap: 40px; align-items: center; }
+  .p-shot img { width: 100%; height: auto; display: block; border-radius: 18px; box-shadow: 0 18px 50px rgba(20,17,40,.18); }
+  @media (max-width: 720px) { .p-shot { grid-template-columns: 1fr; gap: 24px; } .p-shot img { max-width: 300px; margin: 0 auto; } }
 
   /* ── Sections ── */
   .p-wrap { max-width: 900px; margin: 0 auto; padding: 0 var(--container-pad); }
@@ -155,14 +166,31 @@
 
   <section class="p-hero">
     <div class="p-hero-in">
-      <div class="p-eyebrow">AA Proof · the habit tracker</div>
+      <div class="p-eyebrow">AA Proof · a free habit tracker for athletes</div>
       <h1>The other<br>twenty-three<br>hours</h1>
       <p class="lede">
         Your training is one hour. The rest of the day decides whether it counts.
         AA Proof tracks the part nobody watches — sleep, steps, water, food, mobility —
         and scores it like a game, so the boring things start to feel like something.
       </p>
-      <span class="p-free">Free · no payment, no card</span>
+      <div class="p-cta">
+        <a class="p-btn p-btn--main" href="#join">Get your free login</a>
+        <a class="p-btn p-btn--ghost" href="/habits.html?client=demo">Try the demo</a>
+      </div>
+      <p class="p-free-note">Free. No payment, no card. For any athlete.</p>
+    </div>
+  </section>
+
+  <section class="p-sec p-shot-sec">
+    <div class="p-wrap p-shot">
+      <img src="/assets/img/proof-today.jpg" width="560" height="983" loading="lazy"
+           alt="The Today screen of AA Proof: four habits, steps, sleep, protein and water, each with a ring and a plus button, and a level at the top.">
+      <div>
+        <h2>This is the whole app.</h2>
+        <p>Four habits a day: steps, sleep, protein and water. Tap one when it is done. Points build levels.</p>
+        <p>The demo is the real thing with nothing saved. Tap around.</p>
+        <p style="margin-top:22px"><a class="p-btn p-btn--dark" href="/habits.html?client=demo">Try the demo</a></p>
+      </div>
     </div>
   </section>
 
@@ -217,7 +245,7 @@
   <section class="p-sec">
     <div class="p-wrap">
       <h2>What you track</h2>
-      <p>Eight to start with. Switch off anything you would only lie about later — you can change all of it whenever you like.</p>
+      <p>Four are always on: steps, sleep, food and water. The rest are optional, and you can change them whenever you like.</p>
       <div class="p-habits">
         <span class="p-habit">Steps</span>
         <span class="p-habit">Sleep</span>
@@ -241,10 +269,10 @@
   <section class="p-sec p-form-sec" id="join">
     <div class="p-wrap">
       <div id="p-form-block">
-        <h2>Get your link</h2>
+        <h2>Get your free login</h2>
         <p>
           I set each person up by hand, so this is not instant — usually same day.
-          You will get a private link on WhatsApp. Open it once and it stays on your
+          You will get a username and password on WhatsApp. Sign in once and it stays on your
           phone; you can add it to your home screen and it works offline.
         </p>
 
@@ -271,19 +299,19 @@
           </div>
 
           <div class="p-field">
-            <label for="pwa">WhatsApp number</label>
+            <label for="pwa">WhatsApp number, with country code</label>
             <input type="tel" id="pwa" name="whatsapp" required
-                   autocomplete="tel" placeholder="+98 …">
-            <div class="p-hint">This is where I send your link.</div>
+                   autocomplete="tel" placeholder="+44 7… or +98 9…">
+            <div class="p-hint">This is where I send your login.</div>
           </div>
 
-          <button type="submit" class="p-submit" id="pSubmit">Send me the link</button>
+          <button type="submit" class="p-submit" id="pSubmit">Send me my login</button>
         </form>
 
         <p class="p-error" id="pError" role="alert" hidden></p>
 
         <p class="p-small">
-          I use your email and number to send your link and, occasionally, to ask how
+          I use your email and number to send your login and, occasionally, to ask how
           you are getting on. Nothing else, and no list you did not ask for — you can
           tell me to delete it at any time. See the
           <a href="/privacy.html">privacy notice</a>.
@@ -293,7 +321,7 @@
       <div class="p-done" id="pDone">
         <h2 id="pDoneTitle" tabindex="-1">Sent</h2>
         <p>
-          I will set you up and send the link to WhatsApp, usually the same day.
+          I will set you up and send your login to WhatsApp, usually the same day.
           If you have not heard in 48 hours, message me — something went wrong and
           I would rather know.
         </p>
@@ -370,7 +398,7 @@
       }).catch(function () {
         clearTimeout(timer);
         btn.disabled = false;
-        btn.textContent = 'Send me the link';
+        btn.textContent = 'Send me my login';
         var fallback = wa('Hi Amir, I tried to sign up for AA Proof on your site and it did not go through.' + (name ? " It's " + name + '.' : ''));
         err.innerHTML = 'That did not go through, but what you typed is still here. Try again in a moment, or message me on <a href="' + fallback + '" target="_blank" rel="noopener">WhatsApp</a>.';
         err.hidden = false;
