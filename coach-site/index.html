@@ -455,22 +455,34 @@ section{position:relative}
   .gal .shot:first-child{grid-column:span 2;grid-row:span 2;aspect-ratio:auto}
 }
 
-/* ============ her photos ============ */
-.moments{display:grid;gap:16px}
-.moment{position:relative;margin:0;border-radius:22px;overflow:hidden;background:var(--mist)}
-.moment img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* ============ her photos: one scrolling strip ============ */
+.moments-wrap{position:relative}
+.moments{
+  display:flex;gap:16px;overflow-x:auto;overscroll-behavior-x:contain;
+  scroll-snap-type:x mandatory;scroll-padding-inline:2px;
+  padding-block-end:14px;scrollbar-width:thin;scrollbar-color:var(--muted) transparent;
+  -webkit-overflow-scrolling:touch;
+}
+.moment{
+  position:relative;margin:0;flex:none;scroll-snap-align:start;
+  height:clamp(300px,44vw,460px);border-radius:22px;overflow:hidden;background:var(--mist);
+}
+.moment img{display:block;height:100%;width:auto}
 .moment figcaption{
   position:absolute;inset-inline:0;bottom:0;padding:34px 18px 14px;
-  background:linear-gradient(to top,rgba(0,0,0,.55),transparent);
+  background:linear-gradient(to top,rgba(0,0,0,.58),transparent);
   color:#fff;font-size:14px;font-weight:700;
 }
-.m-wide{aspect-ratio:3/2}
-.m-tall{aspect-ratio:4/5}
-.m-tall img{object-position:50% 70%}
-@media(min-width:820px){
-  .moments{grid-template-columns:1.5fr 1fr;align-items:stretch}
-  .m-tall{aspect-ratio:auto}
+.mom-btn{
+  display:none;position:absolute;top:calc(50% - 7px);transform:translateY(-50%);z-index:2;
+  width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;
+  background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.22);place-content:center;
 }
+.mom-btn svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.mom-btn:hover{transform:translateY(-50%) scale(1.07)}
+.mom-prev{right:10px}
+.mom-next{left:10px}
+@media(min-width:820px){.mom-btn{display:grid}}
 
 /* ============ faq ============ */
 .faq{max-width:780px;margin-inline:auto;display:grid;gap:12px}
@@ -1157,15 +1169,35 @@ html.gated .nav,html.gated .rail,html.gated .tbar,html.gated .bar,html.gated .dr
       <span class="eyebrow on-light"><span class="dot"></span>تو زمین</span>
       <h2 class="h-sec">لحظه‌هایی از مسیرم</h2>
     </div>
-    <div class="moments rv">
-      <figure class="moment m-wide">
+    <div class="moments-wrap rv">
+      <div class="moments" id="moments" tabindex="0" aria-label="عکس‌ها، با اسکرول افقی">
+      <figure class="moment">
+        <img src="media/runnerup-tour.jpg" width="939" height="960" loading="lazy" decoding="async" alt="نایب‌قهرمانی تور جهانی جوانان ITF، در کنار جام">
+        <figcaption>نایب‌قهرمانی تور جهانی</figcaption>
+      </figure>
+      <figure class="moment">
         <img src="media/team-iran.jpg" width="1080" height="720" loading="lazy" decoding="async" alt="با لباس تیم ملی ایران روی زمین خاک">
         <figcaption>با لباس تیم ملی</figcaption>
       </figure>
-      <figure class="moment m-tall">
+      <figure class="moment">
+        <img src="media/airport-team.jpg" width="1280" height="910" loading="lazy" decoding="async" alt="استقبال از تیم ملی در فرودگاه، با گل و لباس تیم">
+        <figcaption>بازگشت با تیم ملی</figcaption>
+      </figure>
+      <figure class="moment">
         <img src="media/practice-clay.jpg" width="719" height="1280" loading="lazy" decoding="async" alt="تمرین روی زمین خاک، آکادمی تنیس">
         <figcaption>تمرین روی خاک</figcaption>
       </figure>
+      <figure class="moment">
+        <img src="media/child-medal.jpg" width="733" height="1100" loading="lazy" decoding="async" alt="مهرانه در کودکی، با مدال و تقدیرنامه کنار تور">
+        <figcaption>از همون بچگی</figcaption>
+      </figure>
+      <figure class="moment">
+        <img src="media/child-medal-family.jpg" width="853" height="750" loading="lazy" decoding="async" alt="مهرانه در کودکی روی زمین خاک، روز اهدای مدال">
+        <figcaption>روز اهدای مدال</figcaption>
+      </figure>
+      </div>
+      <button class="mom-btn mom-next" type="button" aria-label="عکس بعدی" data-mom="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 6-6 6 6 6"/></svg></button>
+      <button class="mom-btn mom-prev" type="button" aria-label="عکس قبلی" data-mom="1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6"/></svg></button>
     </div>
   </div>
 </section>
@@ -1693,6 +1725,13 @@ function loopTrack(track){
     track.appendChild(c);
   });
 }
+/* photo strip: the arrows page it by most of a viewport (the strip is RTL, so +1 goes right) */
+document.querySelectorAll("[data-mom]").forEach(function(b){
+  b.addEventListener("click", function(){
+    var m = document.getElementById("moments");
+    if(m) m.scrollBy({left: Number(b.getAttribute("data-mom")) * m.clientWidth * 0.8, behavior:"smooth"});
+  });
+});
 /* ══════════════════════ TWO SPORTS, ONE LAYOUT ══════════════════════
    Everything structural is shared; only these strings, the media and the
    palette differ. Adding a third discipline later = one more entry here. */
