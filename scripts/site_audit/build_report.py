@@ -47,7 +47,7 @@ def build_md():
               'Keep what works (the list below). Never remove a feature without saying so. Smallest change that solves it.',
               'After each package: WHAT CHANGED · WHY · FILES · PRESERVED · SIDE EFFECTS · WHAT TO TEST, briefly, then re-run the scoreboard and report the difference.',
               'Ship live: straight to `main`, one push at a time, stage only your own files (other sessions share this working tree), then confirm the deploy.',
-              'Anything that touches `assets/css/*.css` or `assets/js/shared.js` also bumps `CACHE` in `sw.js` (they are in the service worker’s pre-cached shell, served cache-first). A replaced image ships as `-v2`.',
+              'Anything that touches `assets/css/*.css` or `assets/js/shared.js` bumps the `?v=` token on every marketing page that links it (`20261002d` now: index, form, proof, privacy, terms; `fa-product.css` has its own on the two course pages). `sw.js` serves `/assets/` cache-first by exact URL, so a new token is a fresh copy. Do NOT bump `CACHE` in `sw.js` for that: it deletes the athletes’ offline copy of the apps. A replaced image ships under a new name.',
               'Never edit the generated pages (`en/articles/`, `fa/articles/`, `sitemap.xml`): fix `scripts/build_article_pages.py`. Keep the Search Console tag in `index.html`.',
               '“Push back, with evidence.” Check a visual defect in a real viewport (`scripts/site_audit/shot.js`) before reporting it: a frozen full-page capture once showed empty contact icons that were fine.']:
         a('- ' + r)
@@ -57,18 +57,18 @@ def build_md():
     a('| # | Package | Phase | Status | Effort |')
     a('|---|---|---|---|---|')
     for p in B.PK:
-        a(f'| {p["n"]} | {cell(p["title"])} | {PHASE_LABEL[p["phase"]]} | {STATUS[p["status"]]} | {EFF.get(p["effort"], p["effort"])} |')
+        a(f'| {p["n"]} | {cell(p["title"])} | {PHASE_LABEL[p["phase"]]} | {STATUS[p["status"]]}{" (" + str(len(p.get("done", ""))) + " of " + str(len(p["items"])) + " items)" if p.get("done") else ""} | {EFF.get(p["effort"], p["effort"])} |')
     a('\n### Shipped\n')
     if getattr(B, 'SHIPPED', None):
         a('| Date | Packages | What changed | Commit |'); a('|---|---|---|---|')
         for d, pk, what, c in B.SHIPPED: a(f'| {d} | {pk} | {cell(what)} | {c} |')
     else:
         a('Nothing yet.')
-    a('\n## Scoreboard (baseline ' + B.DATE + ')\n')
-    a('Measured on the live site from this PC (UK) with `scripts/site_audit/`. Lab numbers use a simulated slow 4G phone; they say nothing about Iran.\n')
-    a('| Measure | Now | Goal |'); a('|---|---|---|')
-    for m, now, goal in B.SCORECARD: a(f'| {cell(m)} | {cell(now)} | {cell(goal)} |')
-    a('\nThe full per-page tables are in `Content/site-audit/baseline-scoreboard.txt`.\n')
+    a('\n## Scoreboard\n')
+    a('Measured on the live site from this PC (UK) with `scripts/site_audit/`: the baseline on ' + B.DATE + ' and again after the first batches (' + getattr(B, 'AFTER_NOTE', 'later') + '). Lab numbers use a simulated slow 4G phone; they say nothing about Iran.\n')
+    a('| Measure | Baseline | Now | Goal |'); a('|---|---|---|---|')
+    for m, was, now, goal in B.SCORECARD: a(f'| {cell(m)} | {cell(was)} | {cell(now)} | {cell(goal)} |')
+    a('\nThe baseline per-page tables are in `Content/site-audit/baseline-scoreboard.txt`.\n')
     a('## What works (keep)\n')
     for k in B.KEEP: a('- ' + k)
     for phase_key in ('now', 'call', 'base', 'next'):
@@ -77,11 +77,13 @@ def build_md():
         for p in sorted_by_phase(phase_key):
             a(f'### {p["n"]}. {p["title"]}  ·  {STATUS[p["status"]]}  ·  {EFF.get(p["effort"], p["effort"])}\n')
             a(p['plain'] + '\n')
-            a('| ID | Sev | Where | Problem | Fix | Effort | His call | From |')
-            a('|---|---|---|---|---|---|---|---|')
+            if p.get('left'): a('**Still open.** ' + p['left'] + '\n')
+            a('| ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |')
+            a('|---|---|---|---|---|---|---|---|---|')
             for i, it in enumerate(p['items']):
                 sv, where, what, fix, eff, call, src = it
-                a(f'| {p["n"]}{chr(97 + i)} | {sv} | {cell(where)} | {cell(what)} | {cell(fix)} | {eff} | {"Y" if call == "Y" else ""} | {cell(src)} |')
+                done = chr(97 + i) in p.get('done', '')
+                a(f'| {p["n"]}{chr(97 + i)} | {"✓" if done else ""} | {sv} | {cell(where)} | {cell(what)} | {cell(fix)} | {eff} | {"Y" if call == "Y" else ""} | {cell(src)} |')
             d = p.get('decision')
             if d:
                 a(f'\n**Decision: {d["title"]}**\n')
@@ -96,7 +98,7 @@ def build_md():
     for t in B.TOOLS: a('| ' + ' | '.join(cell(x) for x in t) + ' |')
     a('\n## Files\n')
     a('- `scripts/site_audit/` the measuring tools, `backlog.py` (this file’s source) and `build_report.py`.')
-    a('- `Content/site-audit/review-*.md` the seven page reviews with file and line references; `research-*.md` the tool research; `baseline-scoreboard.txt`.')
+    a('- `Content/site-audit/review-*.md` the seven page reviews with file and line references; `research-*.md` the tool research; `baseline-scoreboard.txt` (morning) and `after-scoreboard-2026-10-02.txt` (afternoon, after the first batches). Add a new dated after-scoreboard each time the audit is re-run.')
     a('- The private report page (claude.ai artifact “Front Door”) is the reading version with pictures; rebuild it with `--html`.')
     return '\n'.join(o) + '\n'
 
@@ -134,6 +136,17 @@ a{color:var(--green-2)}
 .tile .now{font-family:var(--fd);font-weight:800;font-size:25px;line-height:1.05;color:var(--clay-ink)}
 .tile .goal{font-size:14.5px;color:var(--ink-2)}
 .tile .goal b{color:var(--good);font-weight:600}
+.tile .was{font-size:14px;color:var(--ink-2)}
+.tile .was s{text-decoration-thickness:1.5px}
+.tile .now.better{color:var(--good)}
+.tag.done{border-color:var(--good);color:var(--good)}
+.sev.done{background:var(--good);color:#fff}
+.left{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:6px 0 4px;font-size:16px;max-width:76ch}
+.left b{color:var(--clay-ink)}
+.shipped{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.shipped li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.shipped .when{font:500 12px var(--fm);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.shipped p{margin:4px 0 0;max-width:76ch}
 .keep{padding-left:0;list-style:none;display:grid;gap:8px;margin:0}
 .keep li{padding-left:26px;position:relative;max-width:78ch}
 .keep li::before{content:'';position:absolute;left:4px;top:.55em;width:10px;height:10px;border-radius:50%;background:var(--good)}
@@ -210,8 +223,10 @@ def pk_html(p):
     d = p.get('decision'); parts = []
     for i, it in enumerate(p['items']):
         sv, where, what, fix, eff, call, src = it
+        done = chr(97 + i) in p.get('done', '')
+        badge = '<span class="sev done">Shipped</span>' if done else ''
         parts.append(
-            f'<div class="item"><div class="h"><span class="sev {sv}">{e(SEV[sv])}</span><span class="w">{p["n"]}{chr(97 + i)} · {e(where)}</span></div>'
+            f'<div class="item"><div class="h">{badge}<span class="sev {sv}">{e(SEV[sv])}</span><span class="w">{p["n"]}{chr(97 + i)} · {e(where)}</span></div>'
             f'<p>{e(what)}</p><p><b>Fix.</b> {e(fix)}</p>'
             f'<span class="m">{e(EFF.get(eff, eff))}{" · your call" if call == "Y" else ""}{" · from " + e(src) if src else ""}</span></div>')
     dec = ''
@@ -220,13 +235,13 @@ def pk_html(p):
             f'<div class="opt{" pick" if k == d["pick"] else ""}"><span class="k">{e(k)}</span><span class="nm">{e(nm)}'
             f'{"<span class=mine>my pick</span>" if k == d["pick"] else ""}</span><span class="tx">{e(tx)}</span></div>' for k, nm, tx in d['options'])
         dec = f'<div class="dec"><h4>{e(d["title"])}</h4><div class="opts">{opts}</div></div>'
-    tags = f'<span class="tag {"ask" if p["status"] == "ask" else "go"}">{e(STATUS[p["status"]])}</span><span class="tag">{e(EFF.get(p["effort"], p["effort"]))}</span>'
+    tags = f'<span class="tag {"ask" if p["status"] == "ask" else "done" if p["status"] == "done" else "go"}">{e(STATUS[p["status"]])}</span><span class="tag">{e(EFF.get(p["effort"], p["effort"]))}</span>'
     if p['phase'] == 'call': tags += '<span class="tag ask">your call</span>'
     return (f'<details class="pk" id="pk{p["n"]}" data-phase="{p["phase"]}"><summary><span class="n">{p["n"]}</span><span class="t">{e(p["title"])}</span>'
-            f'<span class="pl">{e(p["plain"])}</span><span class="tags">{tags}</span></summary><div class="pkb">{"".join(parts)}{dec}</div></details>')
+            f'<span class="pl">{e(p["plain"])}</span><span class="tags">{tags}</span></summary><div class="pkb">{"<p class=left><b>Still open.</b> " + e(p["left"]) + "</p>" if p.get("left") else ""}{"".join(parts)}{dec}</div></details>')
 
-def starting():
-    ns = [p['n'] for p in B.PK if p['status'] == 'next']
+def starting(kind='next'):
+    ns = [p['n'] for p in B.PK if p['status'] == kind]
     if not ns: return 'none'
     runs, start, prev = [], ns[0], ns[0]
     for n in ns[1:] + [None]:
@@ -247,12 +262,20 @@ def build_html(images):
     a('<h1>Front <em>Door</em></h1>')
     a('<p class="lede">The website is fast, on-brand and honest where it counts. What costs you is smaller and fixable: pale small text, a few broken buttons, forms that end in a dead end, and a Farsi hero whose phone picture is invisible. Here is what I measured, what I will fix without asking, and the calls that are yours.</p>')
     a(f'<div class="how"><b>How to answer.</b> Reply with numbers, the way you do for a showreel: <code>1-11 go</code>, <code>12 B</code>, <code>13 C</code>, <code>14 option 1</code>, <code>19 yes</code>, <code>20 later</code>. '
-      f'{len(B.PK)} packages, {sum(sev.values())} findings: {sev["P1"]} cost you now, {sev["P2"]} are worth fixing, {sev["P3"]} are polish. Starting now: {starting()}.</div>')
+      f'{len(B.PK)} packages, {sum(sev.values())} findings: {sev["P1"]} cost you now, {sev["P2"]} are worth fixing, {sev["P3"]} are polish. '
+      f'<b>Done:</b> {starting("done")}. <b>Waiting for you:</b> {starting("ask")}. <b>Not started:</b> {starting("todo")}. <b>Another session:</b> {starting("other")}.</div>')
 
-    a('<h2>The scoreboard</h2><p>Measured on the live site today. This is the baseline; every batch gets measured again.</p><div class="score">')
-    for m, now, goal in B.SCORECARD:
-        a(f'<div class="tile"><span class="m">{e(m)}</span><span class="now">{e(now)}</span><span class="goal">goal: <b>{e(goal)}</b></span></div>')
+    a('<h2>The scoreboard</h2><p>Measured on the live site: the baseline (struck through) and again after the first batches. Green means it moved.</p><div class="score">')
+    for m, was, now, goal in B.SCORECARD:
+        better = was != now
+        a(f'<div class="tile"><span class="m">{e(m)}</span>' + (f'<span class="was">was <s>{e(was)}</s></span>' if better else '') +
+          f'<span class="now{" better" if better else ""}">{e(now)}</span><span class="goal">goal: <b>{e(goal)}</b></span></div>')
     a('</div>')
+    if getattr(B, 'SHIPPED', None):
+        a('<h2>What has shipped</h2><p>Live on the site now. Each row is one commit on main.</p><ul class="shipped">')
+        for d, pk, what, c in B.SHIPPED:
+            a(f'<li><span class="when">{e(d)} · package {e(pk)} · {e(c)}</span><p>{e(what)}</p></li>')
+        a('</ul>')
 
     a('<h2>What works. Keep it.</h2><ul class="keep">' + ''.join(f'<li>{e(k)}</li>' for k in B.KEEP) + '</ul>')
 

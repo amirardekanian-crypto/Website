@@ -14,19 +14,26 @@ PHASES = [
     ('next', 'Next', 'Same method, different target.'),
 ]
 
+AFTER_NOTE = 'live site, 2026-10-02 afternoon'
+
 SCORECARD = [
-    ('Phone length, English home', '20.4 screens', '13 or fewer'),
-    ('Phone length, Farsi home', '20.8 screens', '15 or fewer'),
-    ('Text under 12 px, English home', '65 items', '0'),
-    ('Tap targets under 44 px, English home', '15', '0'),
-    ('Blank screen if Google Fonts hangs (Farsi home)', '8.3 s', 'under 1 s'),
-    ('Layout jump on a slow phone', '0.096 home, 0.209 Etminan', 'under 0.05'),
-    ('English home reading ease', '34 of 100, 43 em-dashes', '60 or more, none'),
-    ('Apply form: promise vs reality', '“2 minutes” vs about 5, 27 to 30 questions', 'true, and shorter'),
-    ('“Sent” screens that are a dead end', '4 forms', '0'),
-    ('Pricing buttons that open the form', '0 of 3 (they jump to the page bottom)', '3 of 3, plan chosen'),
-    ('Key clicks you can see in Plausible', 'none (only form submits and level-test results)', 'Apply, WhatsApp, demo, proof, partner, form steps'),
-    ('A wrong web address shows', 'GitHub’s grey English page', 'your own page, English and Farsi'),
+    # measure, baseline (2026-10-02, morning), now (same tools, after the first batches), goal
+    ('Phone length, English home', '20.4 screens', '20.5 screens (unchanged: that is package 12)', '13 or fewer'),
+    ('Phone length, Farsi home', '20.8 screens', '20.9 screens (unchanged: package 14)', '15 or fewer'),
+    ('Text under 12 px, English home', '65 items', '22 (all inside the miniature app drawn in the phone picture)', '0'),
+    ('Tap targets under 44 px, English home', '15', '1 (the drawn mini app, which is not tappable)', '0'),
+    ('Tap targets under 44 px, apply form (English)', '13', '2 (the two sliders: the thumb is the target)', '0'),
+    ('Blank screen if Google Fonts hangs (Farsi home)', '8.3 s', '0.15 s (the Farsi link page: from nothing for 6 s to under 0.3 s)', 'under 1 s'),
+    ('Layout jump on a slow phone', '0.096 home, 0.087 form, 0.209 Etminan Farsi', '0.000 home, 0.001 form, 0.028 Etminan Farsi, 0.006 on the 404 (was 0.087)', 'under 0.05'),
+    ('First paint on a slow phone, Farsi pages', 'home 1.9 s, form 1.5 s, links 1.2 s', 'home 1.1 s, form 0.9 s, links 0.7 s', 'under 1.5 s'),
+    ('Etminan pages: text under 12 px', '26 per page', '0', '0'),
+    ('English home reading ease', '34 of 100, 43 em-dashes', 'unchanged (package 19)', '60 or more, none'),
+    ('Apply form: promise vs reality', '“2 minutes” vs about 5, 27 to 30 questions', 'the home now says about 5 minutes; still 27 to 30 questions (package 13)', 'true, and shorter'),
+    ('“Sent” screens that are a dead end', '4 forms', '0 (each has a WhatsApp next step and a way back)', '0'),
+    ('Pricing buttons that open the form', '0 of 3 (they jump to the page bottom)', '3 of 3, plan chosen', '3 of 3, plan chosen'),
+    ('Key clicks you can see in Plausible', 'none (only form submits and level-test results)', 'Apply (with plan and place), WhatsApp, demo, link hub, form started and each step, proof, partner, level-test start. Add the goals in Plausible to see them.', 'Apply, WhatsApp, demo, proof, partner, form steps'),
+    ('A wrong web address shows', 'GitHub’s grey English page', 'your own page, English and Farsi', 'your own page, English and Farsi'),
+    ('Athlete photos on the homes', '713 KB, no sizes', '433 KB, with sizes, loaded as you scroll', 'light, sized'),
 ]
 
 KEEP = [
@@ -41,7 +48,7 @@ KEEP = [
 
 # n, phase, title, plain words, effort, status, items, decision (optional)
 PK = [
- dict(n=1, phase='now', status='next', effort='S-M', title='Make small text readable',
+ dict(n=1, phase='now', status='done', done='abcde', left='White text on the clay button fills is 4.40:1 (AA wants 4.5). A hairline-deeper clay for fills (#C2512C, 4.66:1) fixes it on every button at once, but it changes your brand colour by a shade, so it is your call. The 22 labels still under 12 px on the English home are the miniature app drawn inside the phone picture.', effort='S-M', title='Make small text readable',
   plain='One grey in your colour list is too pale for small text, and 65 labels on the English home are smaller than 12 px. One value change in the shared colour file fixes most pages at once.',
   items=[
    ('P1', 'All English pages, 3 Farsi pages', 'The muted grey #8A8A8A is 3.2:1 on paper and 3.45:1 on white (AA needs 4.5). The paler #B0A99E is 2.0:1.', 'tokens.css lines 33 and 80: --text-muted to #6B6B6B (about 5:1); never use --text-dim for text; same for the local greys in partner-fa, form-fa, terms-fa.', 'S', 'N', 'home-en-11, form-en-13, links-03'),
@@ -50,14 +57,14 @@ PK = [
    ('P2', 'Everywhere clay text is small', 'Small clay text on light is 4.1:1 and white-on-clay buttons are 4.4:1, both just under AA.', 'A text-only deeper clay (#B84A27, 4.9:1; the app already does this with --clay-ink) and bold 14 px or larger on buttons. A hairline colour shift, easy to revert.', 'S', 'Y', 'article-11, home-fa-10'),
    ('P1', 'English home, nav, dark sections', 'The keyboard focus ring is dark green, so it vanishes on every dark area (nav, hero buttons, demo, final CTA). The testimonial scroller is an unnamed tab stop.', 'base.css line 216: white outline inside .hero, .sec--dark, .site-nav; aria-label on the scroller.', 'S', 'N', 'home-en-06'),
   ]),
- dict(n=2, phase='now', status='next', effort='S', title='Tappable and zoom-safe on a phone',
+ dict(n=2, phase='now', status='done', done='abc', left='Left on purpose: the two sliders in the apply form (the thumb is the target, not the 6 px bar) and the drawn mini app on the home. Not done: the shorter header on the apply form and the "5 of 18 required" count.', effort='S', title='Tappable and zoom-safe on a phone',
   plain='On an iPhone, a text box smaller than 16 px makes the whole page zoom in when you tap it. Footer links are 19 px tall. Both are quick fixes.',
   items=[
    ('P1', 'Both apply forms, proof, partner, UTS, Etminan', 'Inputs are 14 to 15 px, so iPhone Safari and Instagram’s browser zoom the page at every field.', 'font-size: 16px on input, select, textarea.', 'S', 'N', 'form-en-03'),
    ('P2', 'Every page', 'Tap targets under 44 px: footer links 19 px (shared partial and Farsi footers), menu button 40 px, inline demo links about 30 px, the level test’s back link 23 px.', 'Pad them to 44 px (partials/footer.html and components.css, fa-product.css, level-test).', 'S', 'N', 'home-en-11, shared-02, home-fa-17, article-14'),
    ('P2', 'Both apply forms', 'The nav plus progress bar cover 113 px of the phone (about a quarter with the keyboard up) and nothing keeps the focused field clear of them.', 'html { scroll-padding-top: 130px }, a slimmer bar on phones, count “5 of 18 required”.', 'S', 'N', 'form-en-06'),
   ]),
- dict(n=3, phase='now', status='next', effort='M', title='Menus and sticky bars that work on every phone',
+ dict(n=3, phase='now', status='done', done='abcd', effort='M', title='Menus and sticky bars that work on every phone',
   plain='On a shorter phone the open English menu runs over the logo and hides the Apply button. The Apply bar at the bottom shows twice on the first screen and keeps pulsing.',
   items=[
    ('P1', 'English pages (shared nav)', 'On 375×667 the open menu paints “Results” over the logo, Apply is off-screen, “فارسی” hides under the bar, the panel cannot scroll, and the icon never becomes ✕. At 901 to 990 px the header Apply is cut (“APPLY NO”).', 'components.css 119 to 134: top-align, overflow-y: auto; shared.js 118: swap to ✕; hide the sticky bar while the menu is open; hamburger breakpoint 900 to 1040.', 'M', 'N', 'home-en-04'),
@@ -65,7 +72,7 @@ PK = [
    ('P2', 'English home', 'At 360 px (a common Android) the ball covers the kicker, the headline wraps to 5 lines and the hero Apply slides under the bar.', 'index.html line 273: clamp(46px, 15vw, 60px) under 480 px; move the ball.', 'S', 'N', 'home-en-12'),
    ('P3', 'English home', 'The big outlined 01–08 section numbers are clipped at the right edge and the 01–03 inside the How-it-works cards sit on top of the first line of text; two numbering systems on one page.', 'Hide the ghost numbers under 900 px; keep one numbering.', 'S', 'N', 'home-en-18'),
   ]),
- dict(n=4, phase='now', status='next', effort='M', title='Home-page bugs',
+ dict(n=4, phase='now', status='done', done='abce', left='Not done: 4d (the two "Step inside" cards, which go to the demo home; its deep links open a safety card first) and 4f (the underline and glow colours, a look decision).', effort='M', title='Home-page bugs',
   plain='The three Apply buttons in the pricing cards do not open the form: they scroll to the bottom of the page. The testimonial arrows go the wrong way. Content stays invisible if the menu file loads slowly.',
   items=[
    ('P1', 'English home', 'The three pricing “Apply Now” buttons jump to #apply (page bottom), not the form, and lose the plan: a Match tap scrolls 9,820 px and needs a second tap.', 'index.html 1229, 1243, 1261 to /form.html?plan=match (and game, set), label “Apply for Match”; form.html pre-ticks the plan and reads ?programme= and ?code=.', 'S', 'N', 'home-en-01, form-en-05'),
@@ -75,7 +82,7 @@ PK = [
    ('P3', 'English home', '22 endless animations (58 playing at once). The headline pulses every 3.2 seconds forever, which is also a WCAG 2.2.2 fail for moving content.', 'Keep the entrance; run the pulse three times then stop; pause the ambient ones off-screen. Your “alive” look stays.', 'S', 'Y', 'home-en-16'),
    ('P3', 'English home', 'The underline under “LAST LONGER.” is clay at 32% over green, which reads as a muddy olive bar; the clay glow turns brown near the hero bottom and the final CTA.', 'A clean full-colour underline or none; a darker base under the glow.', 'S', 'Y', 'home-en-07'),
   ]),
- dict(n=5, phase='now', status='next', effort='M', title='Farsi correctness',
+ dict(n=5, phase='now', status='done', done='abcef', left='Waiting for you: 5d, Farsi pages that send visitors into English (the demo banner, the privacy link, "message me in the app").', effort='M', title='Farsi correctness',
   plain='The phone picture in the Farsi hero shows a greeting and exercise names in white on white. Phone numbers typed in the Farsi form show backwards. Several small right-to-left details are off.',
   items=[
    ('P1', 'Farsi home', 'In the hero phone the greeting and both exercise names are white on white (only “۶×۴” shows); “امروز” is letter-spaced; screen readers read the mock as page text.', '.pscreen { color: var(--ink) } (index-fa.html line 159), remove the spacing, aria-hidden on .phone-wrap.', 'S', 'N', 'home-fa-04'),
@@ -85,7 +92,7 @@ PK = [
    ('P2', 'Etminan pages', '19 Farsi labels use the mono font with letter-spacing at 9.5 to 11 px, which breaks Farsi joining; in right-to-left the lime ticker is off-screen in 7 of 12 samples.', 'One override block at the end of etminan.html: Vazirmatn, no spacing, 12 px; ticker direction ltr.', 'S', 'N', 'etminan-fa-02, etminan-en-02'),
    ('P3', 'Farsi pages', 'No <main> or skip link on the Farsi home, form, links, partner and product pages; the H1 text runs together (“پدلیه مربی،تو”).', 'Add <main>, a skip link, spaces in the H1.', 'S', 'N', 'home-fa-17, form-fa-02'),
   ]),
- dict(n=6, phase='now', status='next', effort='S-M', title='Fonts: no blank screens, no jumps',
+ dict(n=6, phase='now', status='ask', done='abd', left='Not done: 6c needs your OK to download four open-licence font families (about 600 KB) and would make the English fonts load from your own server like Vazirmatn now does; 6d is done for the athlete photos (40% lighter) and the UTS page is its own session. The Farsi article pages still load Google Fonts: they come from the page generator.', effort='S-M', title='Fonts: no blank screens, no jumps',
   plain='The Farsi pages wait for Google Fonts before they paint anything. If that request hangs, which is how filtered networks often fail, the screen stays white for about 8 seconds. Your Vazirmatn file is already on your own server and is not being used on those pages.',
   items=[
    ('P1', 'Farsi home, form, links, partner, terms, Etminan, articles', 'First paint waits for the Google Fonts stylesheet: 0.58 s normally, 0.25 s if blocked outright, but 8.3 s when the request hangs.', 'Use the self-hosted /assets/fonts/Vazirmatn-Variable.woff2 (@font-face as fa-product.css line 7, plus a preload); load Barlow without blocking; add Tahoma to the stack. No download needed.', 'S', 'N', 'home-fa-01, article-12, etminan-fa-01'),
@@ -93,7 +100,7 @@ PK = [
    ('P2', 'All English pages', 'Barlow, Barlow Condensed, JetBrains Mono and DM Sans still come from Google (19 pages send the visitor’s IP there; your privacy notice admits it).', 'Self-host the four families (open-licence, about 600 KB). Needs your OK to download them.', 'M', 'N', 'secondary cross-page'),
    ('P3', 'English and Farsi homes, UTS', 'Seven photos (about 710 KB) load immediately with no width or height; the UTS hero photo is requested late (LCP 2.1 s; a test got 0.7 to 1.5 s).', 'loading="lazy", width and height, 720 px copies; preload the UTS hero (UTS page: coordinate with its session).', 'S', 'N', 'home-en-16, uts-02, home-fa-18'),
   ]),
- dict(n=7, phase='now', status='todo', effort='M', title='Forms that finish properly',
+ dict(n=7, phase='now', status='done', done='abdef', left='Waiting for you: 7c (keep a draft of the apply form in the browser, and whether to save name and WhatsApp after section 1) and 7g (a "Not sure yet" plan and a "Have a code?" link). Not done from 7f: validating on blur and marking "(optional)".', effort='M', title='Forms that finish properly',
   plain='After someone presses Send, four forms end on a screen with nothing to tap. Nothing is saved until the last tap. The partner form lets a blank form through.',
   items=[
    ('P1', 'Apply EN and FA, proof, partner', 'The success screen is a dead end: no link, no word on how or when you reply, focus stays behind it; proof does not echo the number so a typo goes unseen.', '“Message Amir on WhatsApp” (pre-filled with name and plan) and “Back to site”; say when you reply; focus the dialog; role="status".', 'M', 'N', 'form-en-04, proof-05, partner-fa-05'),
@@ -104,17 +111,17 @@ PK = [
    ('P2', 'Forms', 'Smaller faults: the last field of a pair has no bottom margin so labels touch the field above; Farsi selects show two chevrons; Farsi submit text renders in Arial; proof’s consent line renders 16.5 px with no gap (a CSS clash); 10 radio groups have no group name; errors say only “Please answer this question”.', 'Margin rule, appearance:none, font-family, .p-form-sec .p-small, fieldset and legend, validate on blur with specific messages, mark “(optional)”.', 'M', 'N', 'form-en-08, form-en-12, proof-09, partner-fa-06'),
    ('P2', 'Apply form', 'The first question is a required plan pick with no “what is included” and no “Not sure yet”; a coupon box sits above the name.', '“Not sure yet”, an “all plans include” line, the code behind “Have a code?”, show the discounted price.', 'S-M', 'Y', 'form-en-05'),
   ]),
- dict(n=8, phase='now', status='next', effort='S', title='A real 404 page',
+ dict(n=8, phase='now', status='done', done='a', effort='S', title='A real 404 page',
   plain='A wrong or old web address shows GitHub’s grey English page, cut off on a phone, written for the site owner. Two drafts exist (the brand one and a working one); I will merge them.',
   items=[
    ('P1', 'Whole site', '/apply, /about, /faq, /blog, /en/ and /fa/ all show GitHub’s default 404: English only, no brand, no way home, no viewport tag so phones shrink it to about 40%.', 'Add a root 404.html: “OUT.” line-call joke, English and Farsi blocks (Farsi first for Farsi links), Home / Apply / Articles / Free tracker / Open your programme, WhatsApp with the broken path, a Plausible “404” event. Absolute paths, noindex, no canonical.', 'S', 'Y', 'notfound-01'),
   ]),
- dict(n=9, phase='now', status='todo', effort='S-M', title='Count what matters',
+ dict(n=9, phase='now', status='done', done='a', left='Your part: add the goals in Plausible (Site settings, Goals, Custom event). The names and properties are listed at the top of assets/js/track.js. The generated article pages are not counted yet (their generator belongs to another session).', effort='S-M', title='Count what matters',
   plain='Plausible sees page views, the two apply-form submits, the level-test result and the UTS and Etminan forms. It cannot tell you which button, page or article sells. A few lines of code fix that; you then switch the goals on in Plausible.',
   items=[
    ('P2', 'Every page', 'Not measured: Apply clicks (and which plan), WhatsApp clicks, demo clicks, level-test start and result buttons, proof signup, partner submit, form started or abandoned, 404s. partner-fa and terms-fa have no Plausible at all.', 'One delegated click handler in shared.js and fa-nav.js, events on the proof and partner success, form-step events; list the goal names for you to add.', 'S-M', 'N', 'tennis-09, proof-07, form-en-02'),
   ]),
- dict(n=10, phase='now', status='todo', effort='S', title='Promises that match reality',
+ dict(n=10, phase='now', status='ask', left='Only the number is fixed (home: "about 5 minutes"). The rest needs your words: 10b the free tracker promises, 10c the Farsi form note, 10d the 60-day promise.', effort='S', title='Promises that match reality',
   plain='The home says the application takes 2 minutes. The form says about 5 and asks 27 to 30 questions. The proof page promises a private link that no longer exists.',
   items=[
    ('P1', 'English home', '“Application takes 2 minutes” is wrong (the form’s own badge says ~5 min; 8 sections), and it is the only reassurance, in 10 px at the end.', '“About 5 minutes” now (the real fix is package 13); repeat under the hero and sticky buttons. “You pay nothing until we speak” only once you confirm it.', 'S', 'Y', 'home-en-03, form-en-01'),
@@ -122,7 +129,7 @@ PK = [
    ('P2', 'Farsi home', 'Six buttons say “شروع کن” and open a 5-minute, 27-step form without saying so.', '“فرم ۵ دقیقه‌ست · تا ۴۸ ساعت جواب می‌دم” under the buttons; the abroad link points at the DM.', 'S', 'Y', 'home-fa-02'),
    ('P2', 'English home', 'The 60-day promise is the quietest box (dashed, 14 px grey) and vague: a rebuilt plan, not a refund. Nothing says how or when you pay.', 'Move it under the cards at 18 px with one plain line. Needs your facts.', 'S', 'Y', 'home-en-09'),
   ]),
- dict(n=11, phase='now', status='todo', effort='S', title='No-yellow cleanup',
+ dict(n=11, phase='now', status='done', done='a', left='Waiting for you: 11b, the amber on the Etminan pages (their co-brand look).', effort='S', title='No-yellow cleanup',
   plain='Your own rule is no yellow or gold anywhere. A few emoji break it.',
   items=[
    ('P2', 'Apply form, level test', 'The plan cards show 🟡 for Set and University and 🟢🟡🔴 radios; the level test’s ⚠️ draws a yellow triangle; emoji also differ per phone (the Iran flag shows “IR” on Windows).', 'Plain text cards or small green and clay SVG marks (form.html 596, 715, 719; level-test.js 159).', 'S', 'N', 'form-en-11, shared-03'),
@@ -262,6 +269,11 @@ QUESTIONS = [
     'Facts for the privacy notice: do you paste athlete names into AI chats, and is there a written coaching agreement (terms section 7)? (package 20)',
     'May the first screen show your photo and three athletes, and may the Library’s category pictures be reused as article thumbnails and share cards?',
     'Where did you see “claude-design-skills”? Several repos use the name; a link would pin it down.',
+    'May I download the English fonts (Barlow, Barlow Condensed, JetBrains Mono, DM Sans; about 600 KB, open licence) and serve them from your own site? It removes the last Google requests from the English pages and lets the headings arrive with the page. (package 6c) My pick: yes.',
+    'May I make the fill of the white-on-clay buttons a hair deeper, #C2512C instead of #C7552F? Every Apply button then passes the contrast rule (4.66:1 instead of 4.40:1) and nobody will see the shade. (package 1) My pick: yes.',
+    'Should the style guard (package 22) stop a commit that brings back yellow, text under 12 px, a pale grey or letter-spaced Farsi, or only warn? My pick: stop it, with a plain message saying what to change.',
+    'Your part, 5 minutes: in Plausible add Custom-event goals named Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application and 404, then add the properties plan, where, page, which, to, step and lang (Site settings, Custom properties). Until then the counts exist but are not shown.',
+    'Your part, when you can: ask two or three Iranian athletes to open amirardekani.com/reach/ once with the VPN off and once on, and send you the line it prints. It now also tests the apply-form endpoint (W3) and Plausible (PL). (package 23)',
 ]
 
 TOOLS = [
@@ -290,7 +302,31 @@ EVIDENCE = [
     ('fa-phone-field.jpg', 'Farsi form: a typed “+98 912 345 6789” shows reversed; the counter reads “۲۷ / ۳”.', 5),
     ('notfound-before-after.jpg', 'A wrong address today (left) and the draft 404 (right).', 8),
     ('form-length-phone.jpg', 'The apply form on a phone: 7.8 screens.', 13),
+    ('after-hero-phone.jpg', 'After: the English first screen on a phone. Apply is not covered, the ball sits in the empty space beside the headline, and the page no longer jumps when the font arrives.', 3),
+    ('after-form-success.jpg', 'After: the apply form’s confirmation has a WhatsApp button that opens a message already naming the applicant, and a way back.', 7),
+    ('after-proof-success.jpg', 'After: the free-tracker confirmation shows the number it has (so a typo is seen) and a WhatsApp button.', 7),
+    ('after-partner-errors.jpg', 'After: the partner form checks its fields and says what is missing, in Farsi, next to the field.', 7),
+    ('after-level-marks.jpg', 'After: level marks in green and grey instead of traffic-light emoji (no yellow or orange).', 11),
+    ('after-etminan-fa.jpg', 'After: the Etminan Farsi page. Same look; the labels are Persian letters that join and the ticker stays on screen.', 5),
+    ('after-404.jpg', 'After: a wrong address lands on your own page, Farsi first for a Farsi link.', 8),
 ]
 
 # Appended as work ships: (date, packages, what changed, commit)
-SHIPPED = []
+SHIPPED = [
+    ('2026-10-02', '1, 2', 'Readable small text and thumb-sized links: the muted grey, 12 px floors, a focus ring that shows on dark areas.', '906e1f5'),
+    ('2026-10-02', '2, 5, 7', 'Forms stop zooming on iPhone; Farsi phone numbers work (and the dashboard builds their WhatsApp link); keyboard focus on the Farsi form.', 'c6be9fd'),
+    ('2026-10-02', '4, 5, 6', 'Farsi home: no blank screen when Google Fonts hangs, a visible phone picture, a real right-to-left testimonial rail.', '7c866bf'),
+    ('2026-10-02', '3, 4', 'English home and nav: menus that fit a short phone, a sticky Apply bar that waits, pricing buttons that open the form with the plan chosen, no endless motion.', '95ccbf8'),
+    ('2026-10-02', '8', 'A real 404 page, English and Farsi, with WhatsApp carrying the broken address.', '0314b17'),
+    ('2026-10-02', '7', 'The apply forms finish properly: a WhatsApp next step, no alert box, a 15 second limit instead of a frozen button, the page behind the confirmation locked.', 'ddd4d42'),
+    ('2026-10-02', '7, 9', 'The free tracker and partner forms the same way; the partner form checks its fields in Farsi; the level test ignores a double-tap.', 'f04f97c'),
+    ('2026-10-02', '11', 'No yellow on the apply forms: level marks in green and clay instead of traffic-light emoji.', '7ce2736'),
+    ('2026-10-02', '6', 'Farsi pages (form, partner, links, terms, Etminan) load Vazirmatn from your own server: links.html used to paint nothing for 6+ seconds when Google hung, now under 0.3 s.', 'cf1683c'),
+    ('2026-10-02', '9', 'Plausible now counts Apply clicks (with the plan), WhatsApp, demo, the link hub, and how far people get in the apply form.', '1aee984'),
+    ('2026-10-02', '7', 'A Tab on a slider no longer answers it; every group of choices has a name for a screen reader; errors say what to do.', 'd7c6726'),
+    ('2026-10-02', '5, 7', 'Etminan pages: focus rings, skip link, readable greys, 44 px language switcher, the thank-you dialog takes focus; the look is unchanged.', '4e0a7d4'),
+    ('2026-10-02', '6', 'The English pages stop jumping when the headline font arrives (layout shift 0.204 to 0); the hero ball no longer sits on the demo link.', '65a48f9'),
+    ('2026-10-02', '5, 10', 'Skip link and main landmark on the last Farsi pages; the home no longer promises "2 minutes".', 'ff47f99'),
+    ('2026-10-02', '6', 'Athlete photos on both homes 40% lighter, with sizes, loaded as you scroll.', 'ae22d81'),
+    ('2026-10-02', '2, 5, 6', 'Thumb-sized links on the shared header, footer and course pages; the 404 headline stops jumping; Persian-digit footer years.', '516efa8'),
+]

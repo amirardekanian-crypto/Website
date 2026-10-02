@@ -46,3 +46,20 @@ python scripts/site_audit/scoreboard.py
 2. The site uses `scroll-behavior: smooth`: scripts that scroll must switch it off first or they measure mid-scroll.
 3. The probe's contrast check cannot see through a photo behind text (it can flag a false 1:1): confirm those visually.
 4. Lab numbers (slow 4G + 4x CPU) are simulated, from this PC in the UK. They say nothing about Iran: `/reach/` does.
+5. **Test a fix against the old file.** Serve `git show HEAD:<page>` through a Playwright route and run the same check on both:
+   a test that passes on the new file proves little unless the old one fails (the level test's double-tap, the 404's layout
+   shift, the Etminan header at 320 to 430 px all showed their regressions that way).
+6. **Focus rings need the real keyboard.** `element.focus()` from a script does not trigger `:focus-visible` on a visually hidden
+   input; press Tab until the control is reached, then read its computed outline.
+7. **Layout shift on the English pages came from the web font arriving.** The fix is a stand-in font scaled to the web font's
+   measured width (`'Barlow Condensed Fallback'` in `assets/css/tokens.css`, 900 is 0.705 and 700 is 0.679 of Arial Bold).
+   Remeasure with `canvas.measureText` if the heading font is ever changed.
+8. **Lazy images inside a sideways scroller stay unloaded until you scroll near them**: to check they work, `fetch` each `src`
+   and `createImageBitmap` it, rather than testing `naturalWidth`.
+9. **Do not run heavy tests while a throttled capture runs**: the 4x CPU numbers move with the machine's load.
+10. **In Git Bash a heredoc (<<EOF) halves backslashes**: a doubled backslash before n turns into a real newline inside a string,
+    and a backslash followed by a digit in a JS string becomes a control character. Write scripts with the Write tool, and
+    build Windows paths with path.join.
+11. **Adding width and height to an image can stretch it.** The HTML attributes win when the CSS sets no height: the home coach photo
+    went from 353 to 800 px tall until its rule got height:auto. After adding sizes, check each image rule has a height (auto, 100% or a
+    fixed number) and compare the page height before and after.

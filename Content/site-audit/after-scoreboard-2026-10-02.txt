@@ -1,0 +1,49 @@
+AFTER the first batches: live site, 2026-10-02 afternoon (same tools and method as baseline-scoreboard.txt). Taken at commit c9d574e;
+the tap-size fixes on form-fa/links/terms-fa/home-fa (e498aa0) are included for those pages only (re-measured separately).
+
+SLOW-4G + 4x CPU, phone, cache off  (lab, simulated like Lighthouse mobile)
+page           FCP    LCP    CLS   load  req    KB   DOM  tasks  lcp element
+home-en       1300   1304      0   2341   15   169   750      0  IMG https://www.amirardekani.com/assets/img/tennis-ball-sm.p
+home-fa       1100   1100  0.019   1653   10   221   487    301  P فقط یه برنامه نیست — یه مربیِ 
+links          660   1040  0.057   1190    7   143    75      0  SPAN هفته‌ی ۱ رو رایگان امتحان کن
+proof          800    800  0.011   1586   12    48   158     53  P Your training is one hour. The
+form-en        948    948  0.001   1743   12    48   567     68  P Tell me about where you're at.
+form-fa        856    856      0   1258    7   143   516    374  P یه‌کم از خودت بگو. از جواب‌هات
+tennis        1200   1200      0   1595   11   186   275      0  P برنامه‌ی کاملِ ۱۶ هفته‌ایِ بدن
+testing       1148   1148      0   1391   10   184   307    685  P آزمون‌های بدنیِ ساده و استاندا
+partner-fa     848    848      0   1230    7   143   191      0  P شاگردهات رو به یه سیستمِ تمرین
+articles-en    720    720      0   1324    5    33   166      0  P Warm-ups, recovery, injury and
+article-en     788    788      0   1500    5    33   144      0  P Most players only think about 
+articles-fa    720    720  0.021   1303    5    33   166     88  P گرم‌کردن، ریکاوری، آسیب و هر چ
+article-fa     844    844  0.005   1453    5    33   145    151  P بیشترِ بازیکن‌ها روز مسابقه فق
+terms-en       752    752  0.015   1498   11    46   117      0  P These terms govern your use of
+terms-fa       648    648      0   1105    4   141    76     63  P این قوانین بر استفاده‌ی شما از
+privacy        732    732  0.003   1525   11    46   226      0  P This notice explains what pers
+uts            840   1980  0.001   1956    5   202   832     84  SECTION 6-week padel course
+    Six we
+etminan-en     944    944  0.022   1820    5    63   592      0  P “Etminan Tennis Academy has pa
+etminan-fa     804   1368  0.028   1529    6   171   594    505  P «آکادمی تنیس اطمینان با AA Per
+notfound       612   1308  0.006   1615    7   185    56     65  IMG https://www.amirardekani.com/assets/img/tennis-ball-sm.p
+
+LAYOUT / ACCESSIBILITY SCOREBOARD (phone 390 unless noted)
+page         screens tap<44 tap<24 tiny<12 contrast noAlt noName noFocus ovf360 emdash avgSent flesch
+home-en         20.5      1      1      22       16     0      0       0  False     43    24.6     34
+home-fa         20.9      0      0       1       11     0      0       0  False     21    22.9   None
+links            1.5      0      0       0        3     0      0       0  False      3    28.8   None
+proof            5.4      0      0       1        4     0      0       3  False     12    13.9     82
+form-en            8      2      2      15        0     0      0       0  False     26    20.9     56
+form-fa            8      3      2       0        4     0      0       0  False     23    21.4   None
+tennis          11.9      0      0       0        8     0      0       0  False      0    14.8   None
+testing         14.7      0      0       0        8     0      0       0  False      0    17.9   None
+partner-fa       6.4      2      1       0        5     0      0       0  False     14    17.7   None
+articles-en      8.1      9      0       0        3     0      0       0  False      0    19.9     71
+article-en      10.8     10      0       0        4     0      0       0  False      0      11     79
+articles-fa      8.3      9      0       0        3     0      0       0  False      0    19.7   None
+article-fa      10.6     10      0       0        4     0      0       0  False      0    12.8   None
+terms-en         6.4      0      0       0        0     0      0       0  False      3    16.7     41
+terms-fa         6.2      0      0       0        1     0      0       0  False      8    17.4   None
+privacy         17.9      0      0       0        0     0      0       0  False     36    22.9     58
+uts              6.9     11      5       0        0     0      0       0  False      0    14.5     78
+etminan-en       6.4      4      1       0        2     0      0       0  False      8    21.6     44
+etminan-fa         6      4      1       0        2     0      0       0  False      8    23.4   None
+notfound         1.3      0      0       0        2     0      0       0  False      0     7.5   None
