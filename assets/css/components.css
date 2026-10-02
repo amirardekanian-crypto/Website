@@ -104,7 +104,7 @@
 }
 .nav-toggle svg { width: 22px; height: 22px; }
 
-@media (max-width: 900px) {
+@media (max-width: 1040px) {  /* the eight links plus Apply do not fit a bar narrower than this (Apply was cut off at 901-990 px) */
   /* No backdrop-filter on the bar here: a filtered bar becomes the containing
      block for the fixed menu panel below (per spec), collapsing the panel's
      box to a sliver — links then spill transparently over the page (iOS bug
@@ -120,10 +120,13 @@
     position: fixed;
     inset: var(--nav-h) 0 0 0;
     flex-direction: column;
-    justify-content: center;
-    gap: 36px;
+    justify-content: flex-start;
+    justify-content: safe center;   /* centred when it fits; top-aligned and scrollable on a short phone */
+    gap: 22px;
     background: var(--bg);
-    padding: 40px;
+    padding: 32px 40px 56px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     transform: translateX(100%);
     transition: transform var(--dur) var(--ease);
     visibility: hidden;

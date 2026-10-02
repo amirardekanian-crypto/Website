@@ -42,9 +42,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
 <!-- Shared design system -->
-<link rel="stylesheet" href="/assets/css/tokens.css?v=20261002">
-<link rel="stylesheet" href="/assets/css/base.css?v=20261002">
-<link rel="stylesheet" href="/assets/css/components.css?v=20261002">
+<link rel="stylesheet" href="/assets/css/tokens.css?v=20261002b">
+<link rel="stylesheet" href="/assets/css/base.css?v=20261002b">
+<link rel="stylesheet" href="/assets/css/components.css?v=20261002b">
 
 <!-- Structured data: Person + Service -->
 <script type="application/ld+json">
@@ -282,7 +282,7 @@
     /* heartbeat: lub-dub pulse rolling down the stack, starts after the
        entrance cascade lands */
     transform-origin: left center;
-    animation: heartbeat 3.2s ease-in-out 2s infinite;
+    animation: heartbeat 3.2s ease-in-out 2s 2;   /* two beats after the entrance, then still (an endless pulse cannot be paused) */
   }
   .hero-h1 .hw:nth-child(2) { animation-delay: 2.22s; }
   .hero-h1 .hw:nth-child(3) { animation-delay: 2.44s; }
@@ -426,7 +426,7 @@
   .testimonials-nav {
     position: absolute; top: 50%; transform: translateY(-50%);
     width: 48px; height: 48px; border-radius: 50%;
-    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
+    background: rgba(14,74,54,.88); border: 1px solid rgba(255,255,255,.4);   /* dark, so it shows on the white card as well as the photo */
     -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     color: #fff; display: flex; align-items: center; justify-content: center;
     cursor: pointer; padding: 0; z-index: 5;
@@ -904,28 +904,38 @@
   /* JS hover physics helper */
   .tilting { transition: transform .12s ease-out !important; }
 
-  /* ═══ Sticky mobile CTA ═══ */
+  /* ═══ Sticky Apply bar: only while the page's own Apply buttons are out of sight ═══ */
   .mobile-sticky-cta { display: none; }
-  @media (max-width: 768px) {
+  @media (max-width: 1040px) {
     .mobile-sticky-cta {
       display: flex; align-items: center; justify-content: center; gap: 8px;
       position: fixed; bottom: 16px; left: 16px; right: 16px; z-index: 100;
+      max-width: 520px; margin-inline: auto;   /* on a tablet it is a pill, not a full-width bar */
       background: var(--accent-2); color: #fff;
       font-family: var(--font-display); font-weight: 700;
-      font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase;
+      font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase;
       text-decoration: none; padding: 16px; border-radius: var(--radius-md);
-      animation: sticky-pulse 3.5s ease-in-out infinite;
+      box-shadow: 0 10px 30px rgba(0,0,0,.4), 0 0 22px rgba(199,85,47,.25);
+      transform: translateY(150%); visibility: hidden;
+      transition: transform .35s var(--ease), visibility 0s linear .35s;
     }
-    @keyframes sticky-pulse {
-      0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,.4), 0 0 20px rgba(199,85,47,.2); }
-      50%      { box-shadow: 0 10px 30px rgba(0,0,0,.4), 0 0 36px rgba(199,85,47,.38); }
-    }
-    body { padding-bottom: 84px; }
-    .sec { padding: 84px 0; }
-    .sec-num { font-size: 130px; top: 12px; }
-    .stack-num { font-size: 110px; }
+    .mobile-sticky-cta.is-on { transform: none; visibility: visible; transition: transform .35s var(--ease), visibility 0s; }
+    body.nav-open .mobile-sticky-cta { transform: translateY(150%); visibility: hidden; }
   }
+  @media (max-width: 768px) {
+    .sec { padding: 84px 0; }
+    .sec-num, .stack-num { display: none; }   /* the big ghost numbers were clipped at the edge and sat on the card text */
+  }
+  @media (max-width: 480px) {
+    .hero-h1 { font-size: clamp(44px, 14vw, 60px); }   /* at 360 px the headline wrapped to five lines */
+    .hero-ball--main { width: 72px; top: auto; bottom: 17%; right: 8%; }   /* beside the Apply button: clear of the kicker and the header */
+  }
+  /* Endless ambient motion only runs while its section is on screen (58 animations at once drain a phone). */
+  .is-off .orb, .is-off .hero-grid-bg, .is-off .hero-ball, .is-off .hero-ball img, .is-off .marquee-track, .is-off .cta-ball,
+  .is-off .cta-ball img, .is-off .pricing-card--featured, .is-off .pricing-badge, .is-off .method-loop span, .is-off .cta-heading em,
+  .is-off .phone-mockup, .is-off .mini-day img, .is-off .mini-checkbox { animation-play-state: paused; }
 </style>
+<noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
 <body class="is-home">
 
@@ -1052,7 +1062,7 @@
 
   <div class="testimonials-rail reveal reveal-d2">
     <button type="button" class="testimonials-nav testimonials-prev" aria-label="Previous testimonial">‹</button>
-    <div class="testimonials-viewport">
+    <div class="testimonials-viewport" role="region" aria-label="Athlete testimonials">
     <div class="testimonials-track">
 
       <!-- ──────────── Mehraneh ──────────── -->
@@ -1230,7 +1240,7 @@
           <li>Performance report</li>
           <li>WhatsApp &amp; email support</li>
         </ul>
-        <a href="#apply" class="btn btn-secondary">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
+        <a href="/form.html?plan=game" class="btn btn-secondary" aria-label="Apply Now: Game, 1 month">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
       </article>
 
       <!-- Set — 3 months -->
@@ -1244,7 +1254,7 @@
           <li>Programme updated monthly</li>
           <li>Performance report</li>
         </ul>
-        <a href="#apply" class="btn btn-secondary">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
+        <a href="/form.html?plan=set" class="btn btn-secondary" aria-label="Apply Now: Set, 3 months">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
       </article>
 
       <!-- Match — 6 months (featured) -->
@@ -1262,7 +1272,7 @@
           <li class="pricing-feature--accent">Competition-specific services — periodised to your tournament schedule, with competition warm-up programmes</li>
           <li><span class="pricing-star" aria-hidden="true">★</span> Video technique reviews <span class="pricing-included">included</span></li>
         </ul>
-        <a href="#apply" class="btn btn-primary">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
+        <a href="/form.html?plan=match" class="btn btn-primary" aria-label="Apply Now: Match, 6 months">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
       </article>
 
     </div>
@@ -1679,11 +1689,33 @@
 <footer id="site-footer" class="site-footer" role="contentinfo"></footer>
 
 <!-- Sticky mobile Apply button (visible on screens ≤ 768px) -->
-<a href="/form.html" class="mobile-sticky-cta" aria-label="Apply for the programme">
+<a href="/form.html" class="mobile-sticky-cta">
   Apply Now <span class="arrow-r" aria-hidden="true">→</span>
 </a>
 
-<!-- ═══ Testimonials carousel: auto-scroll + manual prev/next ═══ -->
+<!-- ═══ Sticky Apply bar + ambient motion that pauses off-screen ═══ -->
+<script>
+(function () {
+  if (!('IntersectionObserver' in window)) { var b0 = document.querySelector('.mobile-sticky-cta'); if (b0) b0.classList.add('is-on'); return; }
+  // The bar shows only while the hero's Apply button, the closing call to action and the footer are all out of sight.
+  var bar = document.querySelector('.mobile-sticky-cta');
+  if (bar) {
+    var seen = { hero: true, cta: false, foot: false };
+    var paint = function () { bar.classList.toggle('is-on', !seen.hero && !seen.cta && !seen.foot); };
+    var watch = function (el, key) {
+      if (!el) { seen[key] = false; return; }
+      new IntersectionObserver(function (es) { seen[key] = es[0].isIntersecting; paint(); }, { threshold: 0.2 }).observe(el);
+    };
+    watch(document.querySelector('.hero-actions .btn-primary'), 'hero');
+    watch(document.querySelector('.cta-section'), 'cta');
+    watch(document.getElementById('site-footer'), 'foot');
+  }
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { e.target.classList.toggle('is-off', !e.isIntersecting); }); }, { rootMargin: '200px 0px' });
+  document.querySelectorAll('.hero, .sec, .cta-section, .marquee').forEach(function (el) { io.observe(el); });
+})();
+</script>
+
+<!-- ═══ Testimonials carousel: arrows and swiping (no auto-scroll) ═══ -->
 <script>
 (function () {
   const viewport = document.querySelector('.testimonials-viewport');
@@ -1692,13 +1724,7 @@
   const nextBtn  = document.querySelector('.testimonials-next');
   if (!viewport || !track) return;
 
-  const SPEED = 30;          // pixels per second of auto-scroll
-  const PAUSE_AFTER_CLICK = 4500;
-
-  let isPaused   = false;
-  let isReturning = false;
-  let lastTime   = 0;
-
+  // No auto-scroll: it never moved on 90 and 120 Hz phones and nobody could pause it. The arrows and swiping do the work.
   function maxScroll() {
     return viewport.scrollWidth - viewport.clientWidth;
   }
@@ -1709,49 +1735,16 @@
     const gap = parseFloat(styles.gap || styles.columnGap || '28');
     return card.offsetWidth + gap;
   }
-  function pauseAfterClick() {
-    isPaused = true;
-    clearTimeout(viewport._resumeTimer);
-    viewport._resumeTimer = setTimeout(() => { isPaused = false; }, PAUSE_AFTER_CLICK);
-  }
-
-  function tick(now) {
-    if (lastTime === 0) lastTime = now;
-    const delta = now - lastTime;
-    lastTime = now;
-
-    if (!isPaused && !isReturning) {
-      const ms = maxScroll();
-      const next = viewport.scrollLeft + (SPEED * delta / 1000);
-      if (ms > 0 && next >= ms) {
-        isReturning = true;
-        viewport.scrollTo({ left: 0, behavior: 'smooth' });
-        setTimeout(() => { isReturning = false; }, 900);
-      } else {
-        viewport.scrollLeft = next;
-      }
-    }
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-
-  viewport.addEventListener('mouseenter', () => { isPaused = true; });
-  viewport.addEventListener('mouseleave', () => { isPaused = false; });
-  viewport.addEventListener('touchstart', () => { isPaused = true; }, { passive: true });
-  viewport.addEventListener('touchend',   () => { pauseAfterClick(); });
-
   if (prevBtn) {
     prevBtn.addEventListener('click', () => {
-      pauseAfterClick();
-      const target = viewport.scrollLeft + getCardWidth();
-      viewport.scrollTo({ left: target > maxScroll() - 10 ? 0 : target, behavior: 'smooth' });
+      const target = viewport.scrollLeft - getCardWidth();
+      viewport.scrollTo({ left: target < 0 ? maxScroll() : target, behavior: 'smooth' });
     });
   }
   if (nextBtn) {
     nextBtn.addEventListener('click', () => {
-      pauseAfterClick();
-      const target = viewport.scrollLeft - getCardWidth();
-      viewport.scrollTo({ left: target < 0 ? maxScroll() : target, behavior: 'smooth' });
+      const target = viewport.scrollLeft + getCardWidth();
+      viewport.scrollTo({ left: target > maxScroll() - 10 ? 0 : target, behavior: 'smooth' });
     });
   }
 })();
@@ -1891,6 +1884,6 @@
 })();
 </script>
 
-<script defer src="/assets/js/shared.js?v=20261002"></script>
+<script defer src="/assets/js/shared.js?v=20261002b"></script>
 </body>
 </html>

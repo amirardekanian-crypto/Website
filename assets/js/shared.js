@@ -114,29 +114,22 @@
     const nav = document.querySelector('.site-nav');
     const btn = nav && nav.querySelector('.nav-toggle');
     if (!nav || !btn) return;
+    const BARS = 'M4 7h16M4 12h16M4 17h16', CROSS = 'M6 6l12 12M18 6L6 18';
 
-    btn.addEventListener('click', () => {
-      const open = nav.classList.toggle('nav-open');
+    // One place paints open and closed: the icon becomes a cross, the label says what the next tap does, and the body
+    // knows (the home's sticky Apply bar hides while the menu is open).
+    function setOpen(open) {
+      nav.classList.toggle('nav-open', open);
       btn.setAttribute('aria-expanded', String(open));
+      btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      const p = btn.querySelector('path'); if (p) p.setAttribute('d', open ? CROSS : BARS);
+      document.body.classList.toggle('nav-open', open);
       document.body.style.overflow = open ? 'hidden' : '';
-    });
+    }
 
-    nav.addEventListener('click', e => {
-      const a = e.target.closest('a');
-      if (!a) return;
-      nav.classList.remove('nav-open');
-      btn.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-    });
-
-    // Close on Escape
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && nav.classList.contains('nav-open')) {
-        nav.classList.remove('nav-open');
-        btn.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-      }
-    });
+    btn.addEventListener('click', () => setOpen(!nav.classList.contains('nav-open')));
+    nav.addEventListener('click', e => { if (e.target.closest('a')) setOpen(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('nav-open')) setOpen(false); });
   }
 
   // ── Scroll reveal ────────────────────────────────────────────────────
@@ -334,14 +327,16 @@
 
   // ── Boot ─────────────────────────────────────────────────────────────
   async function init() {
-    await Promise.all([
+    // Reveal first: the page's content must never wait for the nav and footer files (with those stalled, every .reveal
+    // block stayed invisible). allSettled: one failed file must not stop the other from being wired.
+    wireReveal();
+    await Promise.allSettled([
       mountPartial('site-nav', 'partials/nav.html'),
       mountPartial('site-footer', 'partials/footer.html'),
     ]);
     setActiveNavLink();
     wireScrollSpy();
     wireNavToggle();
-    wireReveal();
     wireSmoothScroll();
     updateFooterYear();
 
