@@ -125,24 +125,36 @@ added in the private `tps-content` repo: `training-on-period` and `training-with
 - **Article:** the `/article` skill (SEO gate, English, Farsi for Amir to read, build, push), then the Library row.
 - Never edit `tennis/app/*` (private repo deploy).
 
-## Open decisions (Amir)
+## Decisions and what is still open (2026-10-02)
 
-Still open after the port (2026-10-02). Record each answer here once decided.
+Amir said "fix everything with your own recommendation", so these were decided by Claude and are changeable on his word.
 
-1. **Read the Farsi.** Nothing Farsi has been read by Amir: the 19 blog articles, the merged warm-up, the padel section,
-   the two new lessons and every lesson change. Spellings to settle: «اسگود-شلاتر» and «سیور».
-2. **Sprint distances** in `speed-braking`: the course rule (10 to 20 m) was left alone, but the verified braking study
-   used a 20 m run-up. Keep the course rule?
-3. **Yo-Yo test for juniors** in `tennis-fitness`: kept as is, with the existing growth-spurt warning. Do juniors run it?
-4. **Depth jumps and max tests** in `growth`: the ban wording is the course's own; the lesson now says so.
-5. **Doctor to check** before this is relied on: the period red-flag numbers (secondary summaries of ACOG CO 651), the
-   heat-illness first aid in `hydration-heat`, and the injury red-flag list.
-6. **English twin paragraphs** longer than 3 sentences in a few untouched lessons (pre-existing).
-7. **The SEO phrases are all guesses.** One title, `robust-body`, says "پیشگیری از آسیب" (prevention) because that is the
-   search phrase, while the body says no trial proves it. Keep the phrase or soften the title?
-8. **`course_en` pre-existing mismatches** the port did not touch: `rpe-weights` (EN says RPE is logged, FA says it is
-   not stored) and `strength` / `rpe-weights` (both still teach "The Ceiling", which is retired from the app screens).
-9. **`learn-5` `_notes`** (private tps-content repo) still cite Huang 2023 (table tennis) as racket-sport meal timing and
-   credit Canós and Bohm wrongly. Correct them there.
-10. The **English course screen** (Playbook + Tests door in `program.html`) is still parked on `claude/course-lessons-en`;
-    the Playbook articles above now cover the same topics in the athletes' voice, so decide whether that branch is still wanted.
+**Decided and applied**
+1. **Sprint distances** (`speed-braking`): keep the course's 5 to 10 m, 20 m and court-length distances. The 20 m run-up in
+   the braking study is a lab detail, not a conflict.
+2. **Yo-Yo test for juniors** (`tennis-fitness`): keep it. An adult is present under 16, and a growing player with knee or
+   heel pain does not run it (both are in the lesson).
+3. **Depth jumps and max tests** (`growth`): the ban stays and is labelled as the course's own cautious rule.
+4. **`robust-body` title**: now «مقاوم‌سازی بدن برای تنیس: پیشگیری از آسیب چقدر جواب می‌ده؟». The search phrase stays, the title
+   is a question, and the body already says no trial proves prevention.
+5. **`course_en` twins**: `rpe-weights` no longer says RPE is logged or that the app keeps a log, and `rpe-weights` and
+   `strength` no longer say "Save to The Ceiling in the app". They now point to the Ceiling calculator in the course's Tests
+   section, as the Farsi does. (The Ceiling is retired from `program.html` screens; the course app's own Tests page is a
+   separate app we do not edit here, so the lessons still name it.)
+6. **`learn-5` `_notes`**: the Huang 2023 citation now carries a CORRECTION line (it is a table-tennis paper) and the 1.5 L
+   per kg figure is marked as superseded by the ITF 2025 1.25 to 1.5 range, which the lesson uses.
+7. **The `for-coaches` shelf** stays, empty, like Mental and Supplements.
+8. **The parked English course screen** (`claude/course-lessons-en`): do not merge. The Playbook articles cover the same
+   topics in the athletes' voice, and the lessons stay in the course app.
+
+**Still needs Amir or someone else**
+1. **Read the Farsi** (19 articles, merged warm-up, padel section, two new lessons, every lesson change). Spellings:
+   «اسگود-شلاتر», «سیور».
+2. **Doctor to check**: the period red-flag numbers (secondary summaries of ACOG CO 651), the heat-illness first aid in
+   `hydration-heat`, the injury red-flag list. A dietitian for the plain portions and timing windows (see `learn-5` `_notes`).
+3. **Cover art** for the two new lessons (a credit plan first, per the design rules; `ART` lives in the private
+   `tps-content` repo).
+4. **Search Console**: Request indexing for the new article URLs, and real search-box phrases to replace the "guess" rows
+   in SEO-SOP section 10.
+5. **English twin paragraphs** over 3 sentences in a few lessons this port did not rewrite (pre-existing); lint and trim
+   when one of those lessons is next edited.

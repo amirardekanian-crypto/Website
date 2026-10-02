@@ -246,6 +246,6 @@ suggestions when he sends screenshots, or after 3–4 weeks of Search Console da
 | `speed-braking-direction` | سرعت، ترمز و تغییر جهت در تنیس | guess | 2026-10-02 |
 | `agility-and-reaction` | چابکی و واکنش در تنیس | guess | 2026-10-02 |
 | `tennis-fitness` | آمادگی هوازی تنیس | guess | 2026-10-02 |
-| `robust-body` | مقاوم‌سازی بدن برای تنیس (پیشگیری از آسیب) | guess | 2026-10-02 |
+| `robust-body` | مقاوم‌سازی بدن برای تنیس (پیشگیری از آسیب) | guess. Title is the question «پیشگیری از آسیب چقدر جواب می‌ده؟» because the evidence is mixed | 2026-10-02 |
 | `rpe-explained` | RPE چیه و وزنه رو چطور انتخاب کنیم | guess | 2026-10-02 |
 | `training-around-matches` | بدنسازی در هفته‌ی مسابقه تنیس | guess | 2026-10-02 |
