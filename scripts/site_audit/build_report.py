@@ -64,6 +64,15 @@ def build_md():
         for d, pk, what, c in B.SHIPPED: a(f'| {d} | {pk} | {cell(what)} | {c} |')
     else:
         a('Nothing yet.')
+    if getattr(B, 'NEW_WORDS', None):
+        a('\n### Words I wrote, for you to read\n')
+        a('Short functional lines, written to your voice rules, but they are your words on your site. Read them and tell me what to change.\n')
+        for where, lines in B.NEW_WORDS:
+            a(f'**{where}**\n')
+            for ln in lines: a('- ' + ln)
+            a('')
+        a('**Calls of yours that I shipped anyway** (small, reversible or an accessibility fix; say “revert” and it goes in one commit):\n')
+        for c in getattr(B, 'SHIPPED_YOUR_CALLS', []): a('- ' + c)
     a('\n## Scoreboard\n')
     a('Measured on the live site from this PC (UK) with `scripts/site_audit/`: the baseline on ' + B.DATE + ' and again after the first batches (' + getattr(B, 'AFTER_NOTE', 'later') + '). Lab numbers use a simulated slow 4G phone; they say nothing about Iran.\n')
     a('| Measure | Baseline | Now | Goal |'); a('|---|---|---|---|')
@@ -276,6 +285,12 @@ def build_html(images):
         for d, pk, what, c in B.SHIPPED:
             a(f'<li><span class="when">{e(d)} · package {e(pk)} · {e(c)}</span><p>{e(what)}</p></li>')
         a('</ul>')
+    if getattr(B, 'NEW_WORDS', None):
+        a('<h2>Words I wrote</h2><p>Every new sentence a visitor can now read, in one place. They are short and follow your voice rules, but they are your words on your site: tell me what to change and it goes in one commit.</p>')
+        for where, lines in B.NEW_WORDS:
+            a(f'<details class="pk"><summary><span class="n">&#9998;</span><span class="t">{e(where)}</span></summary><div class="pkb">' + ''.join(f'<p>{e(ln)}</p>' for ln in lines) + '</div></details>')
+        if getattr(B, 'SHIPPED_YOUR_CALLS', None):
+            a('<div class="left"><b>Calls of yours that I shipped anyway.</b> Small, reversible or an accessibility fix. Say “revert” and any of them goes in one commit.<ul>' + ''.join(f'<li>{e(c)}</li>' for c in B.SHIPPED_YOUR_CALLS) + '</ul></div>')
 
     a('<h2>What works. Keep it.</h2><ul class="keep">' + ''.join(f'<li>{e(k)}</li>' for k in B.KEEP) + '</ul>')
 

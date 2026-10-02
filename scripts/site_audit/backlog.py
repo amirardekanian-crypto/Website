@@ -258,6 +258,48 @@ PK = [
   ]),
 ]
 
+# Every new sentence a visitor can now read, written during the audit. They are short, functional lines in your voice rules (plain words,
+# short sentences), but they are YOUR words on YOUR site: read them, change what you do not like, and I will fix it in one commit.
+NEW_WORDS = [
+    ('Apply form, English: the confirmation and the errors', [
+        'I reply by WhatsApp or email. Got a question while you wait? Message me.',
+        'Buttons: “Message Amir on WhatsApp” and “Back to the site”.',
+        'The WhatsApp message the button opens: “Hi Amir, it’s <name>. I just sent my coaching application (<plan>).”',
+        'If sending fails: “That did not go through, but your answers are still here. Try again in a moment, or message me on WhatsApp.”',
+        'Under an unanswered question: “Please choose one option.” · “Please choose at least one.” · “Please choose an option from the list.” · “Please move the slider to give your answer.” · “Please enter a number from 10 to 80.” · “Please fill this in.” · “Please enter your email address.” · “Please enter a valid email address, like name@example.com.”']),
+    ('Free tracker page (proof.html), English', [
+        'After sending: “I have your number as <number>. If that is wrong, message me and I will fix it.” and a button “Message me on WhatsApp”.',
+        'The WhatsApp message it opens: “Hi Amir, it’s <name>. I just signed up for AA Proof.”',
+        'If sending fails: “That did not go through, but what you typed is still here. Try again in a moment, or message me on WhatsApp.”']),
+    ('Apply form, Farsi', [
+        'After sending, under the old text: «جوابت رو از همون راهی که نوشتی (واتساپ یا اینستاگرام) می‌دم. تا اون موقع سؤالی داشتی، همین‌جا بهم پیام بده.»',
+        'Buttons: «پیام توی واتساپ» و «برگرد به خانه».',
+        'The WhatsApp message it opens: «سلام امیر، من <نام> هستم. همین الان فرمِ درخواست رو فرستادم.»',
+        'If sending fails: «ارسال نشد، ولی جواب‌هات همین‌جاست. چند لحظه بعد دوباره امتحان کن، یا توی واتساپ یا اینستاگرام بهم پیام بده.»',
+        'Under an unanswered question: «یکی رو انتخاب کن.» · «دست‌کم یکی رو انتخاب کن.» · «یکی از گزینه‌ها رو انتخاب کن.» · «اسلایدر رو جابه‌جا کن تا جوابت ثبت بشه.» · «سنت رو با عدد بنویس.» · «این بخش رو پر کن.» · «ایمیلت رو بنویس.» · «ایمیلِ معتبر وارد کن.»']),
+    ('Partner page, Farsi', [
+        'Same two buttons after sending, and the same failure line as the apply form.',
+        'The WhatsApp message it opens: «سلام امیر، من <نام> هستم. همین الان فرمِ همکاریِ مربی‌ها رو فرستادم.»',
+        'Under a missing field: «این بخش لازمه.» · «برای ادامه باید شرایط رو تأیید کنی.» · «یه روش انتخاب کن.» · «ایمیلِ معتبر وارد کن.»']),
+    ('The 404 page (both languages)', [
+        'English: “That page is not on this court.” · “The link may be old, or one letter is wrong. These will get you back.” · “Already coached? Open your programme” · “Still stuck? Message me on WhatsApp”. The big word is “Out.” and the buttons are Home, Apply for coaching, Free habit tracker, Articles.',
+        'The WhatsApp message it opens, so you can fix a broken link: “Hi Amir, I hit a broken link on your site: <the address>”.',
+        'Farsi (first when the broken link was a Farsi one): «اوت شد! این صفحه پیدا نشد.» · «شاید لینک قدیمی بوده یا یه جاش اشتباه تایپ شده. از این‌جاها می‌تونی ادامه بدی.» · «برنامه‌ی تمرینی داری؟ بازش کن» · «هنوز گیر کردی؟ توی واتساپ بهم پیام بده»; buttons «صفحه‌ی اصلی», «شروع کن», «مقاله‌ها».']),
+    ('English home', [
+        '“Application takes about 5 minutes · No commitment until we speak” (it said 2 minutes).']),
+    ('Small helper words', [
+        'Skip links for keyboard users: «رفتن به محتوا» · «رفتن به لینک‌ها» · «رفتن به متن» · «رفتن به فرم». The English ones already said “Skip to content”.',
+        'Screen-reader names for the Etminan language switcher: “FA فارسی”, “EN English”, “DV ދިވެހި”.']),
+]
+
+# Calls of yours that I shipped anyway because they were small, reversible or an accessibility fix. Say “revert” and any of them goes in one commit.
+SHIPPED_YOUR_CALLS = [
+    'The 404 page and its words (package 8). It was marked as your call.',
+    'The small labels on the green hero are now cream with a clay dot, and small clay text on light is a hair deeper (package 1, items c and d).',
+    'The headline pulse on the English home stops after two beats instead of running for ever (package 4, item e).',
+    'The home’s “about 5 minutes” (package 10, item a, only the number).',
+]
+
 QUESTIONS = [
     'How and when does a client pay, and does the 60-day promise mean a rebuilt plan only, or money back? The home, the form and the terms must say the same thing.',
     'Toman: say the rule, or show a figure with a date? (package 14)',
