@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Out. Page not found | Amir Ardekani</title>
+<meta name="description" content="This page is not here. Go to the home page, apply for coaching or read the articles.">
+<!-- noindex and NO canonical on purpose: scripts/build_article_pages.py lists a root page in sitemap.xml only when it has a
+     canonical link and no noindex. GitHub Pages sends the real HTTP 404 status itself. -->
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0E4A36">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<!-- EVERY path on this page is absolute. GitHub Pages serves this file at whatever address was mistyped (for example
+     /en/articles/oops), so a relative path would break. That is also why it does not use shared.js: that script fetches
+     its nav by a relative URL. -->
+<link rel="preload" href="/assets/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
+<script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
+<style>
+  @font-face{font-family:'Vazirmatn';src:url('/assets/fonts/Vazirmatn-Variable.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap;}
+  :root{
+    --green:#0E4A36; --green-dk:#0a3527; --clay:#C7552F; --clay-2:#E06B43; --paper:#FAF7F2;
+    --en:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --disp:'Barlow Condensed','Arial Narrow',Impact,sans-serif;
+    --fa:'Vazirmatn',Tahoma,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    min-height:100vh;min-height:100dvh;color:#fff;font-family:var(--en);font-size:18px;line-height:1.6;
+    background:radial-gradient(120% 90% at 80% 0%,#155b43 0%,var(--green) 55%,var(--green-dk) 100%);
+    display:flex;flex-direction:column;align-items:center;padding:36px 20px 28px;text-align:center;
+  }
+  a{color:inherit;}
+  :focus-visible{outline:3px solid #fff;outline-offset:3px;}
+  .mark{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:#fff;margin-bottom:34px;min-height:44px;}
+  .mark .tile{width:40px;height:40px;border-radius:10px;background:#fff;display:inline-block;overflow:hidden;}
+  .mark img{width:100%;height:100%;object-fit:cover;display:block;}
+  .mark b{font-family:var(--disp);font-weight:900;font-size:18px;letter-spacing:2px;text-transform:uppercase;}
+  main{flex:1;width:100%;max-width:980px;}
+  .out{display:flex;align-items:center;justify-content:center;gap:14px;}
+  .out .big{font-family:var(--disp);font-weight:900;font-size:clamp(96px,26vw,190px);line-height:.9;text-transform:uppercase;color:var(--clay-2);}
+  .out img{width:clamp(52px,13vw,92px);height:auto;filter:drop-shadow(0 14px 20px rgba(0,0,0,.35));animation:drop .9s cubic-bezier(.16,1,.3,1) both;}
+  @keyframes drop{from{transform:translateY(-26px) rotate(-18deg);opacity:0;}to{transform:none;opacity:1;}}
+  @media (prefers-reduced-motion:reduce){.out img{animation:none;}}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:0 clamp(28px,6vw,72px);margin-top:clamp(18px,3vw,34px);text-align:start;}
+  .col{text-align:center;}
+  .lead{font-size:22px;font-weight:700;margin:6px auto 8px;max-width:30ch;}
+  .sub{max-width:40ch;margin:0 auto 22px;color:rgba(255,255,255,.88);}
+  .go{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:16px;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:6px;text-decoration:none;
+       font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:1.5px;text-transform:uppercase;}
+  .btn.p{background:var(--clay);color:#fff;}
+  .btn.s{color:#fff;border:1.5px solid rgba(255,255,255,.55);}
+  .btn:hover{filter:brightness(1.08);}
+  .more{font-size:16px;color:rgba(255,255,255,.88);}
+  .more a{font-weight:700;display:inline-block;padding:10px 2px;}
+  .fa{direction:rtl;font-family:var(--fa);line-height:1.9;}
+  .fa .lead{line-height:1.7;}
+  .fa .btn{font-family:var(--fa);font-weight:700;letter-spacing:0;text-transform:none;font-size:17px;}
+  .where{margin-top:22px;font-size:14px;color:rgba(255,255,255,.75);direction:ltr;}
+  .where code{font-family:ui-monospace,Menlo,Consolas,monospace;background:rgba(0,0,0,.25);padding:2px 8px;border-radius:4px;word-break:break-all;}
+  footer{margin-top:30px;font-size:14px;color:rgba(255,255,255,.75);}
+  @media (max-width:720px){
+    .cols{grid-template-columns:1fr;}
+    .col.fa{margin-top:34px;padding-top:30px;border-top:1px solid rgba(255,255,255,.22);}
+    /* Farsi first when the broken link was a Farsi one, or the phone is set to Farsi */
+    .fa-first .col.fa{order:-1;margin-top:0;padding-top:0;border-top:0;}
+    .fa-first .col.en{margin-top:34px;padding-top:30px;border-top:1px solid rgba(255,255,255,.22);}
+  }
+</style>
+</head>
+<body>
+<a class="mark" href="/" aria-label="Amir Ardekani, home"><span class="tile"><img src="/assets/img/icon-192.png" alt="" width="40" height="40"></span><b>Amir Ardekani</b></a>
+
+<main id="main">
+  <div class="out"><span class="big" aria-hidden="true">Out.</span><img src="/assets/img/tennis-ball-sm.png" alt="" width="92" height="92"></div>
+  <div class="cols">
+    <section class="col en" lang="en">
+      <h1 class="lead">That page is not on this court.</h1>
+      <p class="sub">The link may be old, or one letter is wrong. These will get you back.</p>
+      <div class="go">
+        <a class="btn p" href="/">Home</a>
+        <a class="btn p" href="/form.html">Apply for coaching</a>
+        <a class="btn s" href="/proof.html">Free habit tracker</a>
+        <a class="btn s" href="/en/articles/">Articles</a>
+      </div>
+      <p class="more">Already coached? <a href="/program.html">Open your programme</a><br>
+        Still stuck? <a class="wa" href="https://wa.me/447435363461" rel="noopener">Message me on WhatsApp</a></p>
+    </section>
+
+    <section class="col fa" lang="fa" dir="rtl">
+      <h2 class="lead">اوت شد! این صفحه پیدا نشد.</h2>
+      <p class="sub">شاید لینک قدیمی بوده یا یه جاش اشتباه تایپ شده. از این‌جاها می‌تونی ادامه بدی.</p>
+      <div class="go">
+        <a class="btn p" href="/index-fa.html">صفحه‌ی اصلی</a>
+        <a class="btn p" href="/form-fa.html">شروع کن</a>
+        <a class="btn s" href="/fa/articles/">مقاله‌ها</a>
+      </div>
+      <p class="more">برنامه‌ی تمرینی داری؟ <a href="/program.html">بازش کن</a><br>
+        هنوز گیر کردی؟ <a class="wa" href="https://wa.me/447435363461" rel="noopener">توی واتساپ بهم پیام بده</a></p>
+    </section>
+  </div>
+  <p class="where" id="where" hidden>You asked for <code id="path"></code></p>
+</main>
+
+<footer>© <span id="yr"></span> Amir Ardekani · amirardekani.com</footer>
+
+<script>
+(function(){
+  var p = location.pathname + location.search;
+  if (/^\/(fa\/|index-fa|form-fa|links|tennis|partner-fa|terms-fa|etminan\.html)/.test(location.pathname) || /^fa/i.test(navigator.language || '')) {
+    document.body.classList.add('fa-first');
+  }
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  // Show what was asked for, and put it into the WhatsApp message so Amir can fix the broken link.
+  document.getElementById('path').textContent = p.slice(0, 120);
+  document.getElementById('where').hidden = false;
+  var msg = encodeURIComponent('Hi Amir, I hit a broken link on your site: https://www.amirardekani.com' + p.slice(0, 120));
+  [].forEach.call(document.querySelectorAll('a.wa'), function(a){ a.href = 'https://wa.me/447435363461?text=' + msg; });
+  // Plausible: count 404s with the path, so broken inbound links show up as a number (add the custom event "404" in Plausible).
+  window.plausible = window.plausible || function(){ (window.plausible.q = window.plausible.q || []).push(arguments); };
+  window.plausible('404', { props: { path: location.pathname } });
+})();
+</script>
+</body>
+</html>
