@@ -38,7 +38,7 @@
 <link rel="preload" href="/assets/fonts/Vazirmatn-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<link rel="stylesheet" href="/assets/css/fa-product.css?v=5">
+<link rel="stylesheet" href="/assets/css/fa-product.css?v=7">
 <script defer data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
 <script defer src="/assets/js/track.js?v=1"></script>
 </head>
@@ -262,7 +262,7 @@
     a.href = 'https://wa.me/447435363461?text=' + encodeURIComponent(msg);
   });
   var yr = document.getElementById('yr');
-  if (yr) yr.textContent = new Date().getFullYear();
+  if (yr) yr.textContent = new Date().getFullYear().toLocaleString('fa-IR',{useGrouping:false});
   if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('visible'); io.unobserve(x.target); } });

@@ -835,7 +835,7 @@
 <script>
 (function(){
   'use strict';
-  document.getElementById('yr').textContent=new Date().getFullYear();
+  document.getElementById('yr').textContent=new Date().getFullYear().toLocaleString('fa-IR',{useGrouping:false});
   var fa=function(s){return String(s).replace(/[0-9]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'[d];});};
 
   var form=document.getElementById('frm'),

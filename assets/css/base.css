@@ -233,11 +233,14 @@ section { padding: 100px 0; position: relative; }
 /* ═══ Skip-to-content ═══ */
 .skip-link {
   position: absolute;
-  top: -40px;
+  top: -60px;   /* 44 px tall now, so it sits higher to stay hidden until it has focus */
   left: 8px;
   background: var(--accent);
   color: var(--accent-ink);
-  padding: 8px 16px;
+  padding: 0 16px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   border-radius: var(--radius-sm);
   font-family: var(--font-display);
   font-weight: 700;

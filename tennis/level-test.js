@@ -214,7 +214,7 @@
   });
 
   var yr = document.getElementById('yr');
-  if (yr) yr.textContent = new Date().getFullYear();
+  if (yr) yr.textContent = new Date().getFullYear().toLocaleString('fa-IR',{useGrouping:false});   // Persian digits, as on the Farsi home
 
   if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     var io = new IntersectionObserver(function (es) {

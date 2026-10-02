@@ -36,6 +36,7 @@
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
+  min-height: 44px;   /* a thumb-sized target (it was 40) */
 }
 .nav-logo .dot { color: var(--accent); }
 .nav-logo-text { white-space: nowrap; }
@@ -193,6 +194,8 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;  /* a thumb-sized target */
+  min-width: 44px;
+  justify-content: center;
 }
 .footer-link:hover { color: var(--accent); }
 
