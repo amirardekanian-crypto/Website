@@ -425,7 +425,9 @@
       'fuel-competition': { f: 'match-day-box', pos: '50% 60%' },
       'fuel-training': { f: 'before-and-after', pos: '50% 45%' },
       'hydration-heat': { f: 'steam', pos: '50% 60%' },
-      'why-strength': { f: 'iron-pair', pos: '50% 55%' }
+      'why-strength': { f: 'iron-pair', pos: '50% 55%' },
+      'training-on-period': { f: 'warm-seat', pos: '50% 35%' },
+      'training-with-injury': { f: 'long-way-back', pos: '50% 55%' }
     },
     test: {                                                                // by test id
       'broad-jump': { f: 'the-coin', pos: '50% 45%' },

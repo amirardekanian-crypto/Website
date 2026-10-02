@@ -306,3 +306,22 @@ The prompt that won (round 1):
 Flat vector anatomical muscle chart of one lean athletic human figure, drawn twice at the same size: front view on the left, back view on the right. Standing straight, arms slightly away from the body, feet slightly apart, perfectly symmetrical, straight-on, whole body visible with space around it. Every muscle is a separate flat mid-grey shape with a thin dark gap between neighbours: neck, shoulders, chest, biceps, triceps, forearms, abs, obliques, upper back, lats, lower back, glutes, inner thighs, quads, hamstrings, calves, shins. One thin pale outline around the whole body. Head, hands and feet drawn as outline only. Smooth bald head, no face, hair or ears; neutral build, neither clearly male nor female. Plain near-black background. No shading, gradients, texture, text or labels.
 ```
 Asking for "gender-neutral" did not work in any of the 11: every figure came out male.
+
+## Course covers for the two new lessons (2026-10-02)
+
+`training-on-period` → `warm-seat`, `training-with-injury` → `long-way-back` (course app, `assets/tps/`).
+`gpt_image_2_5`, medium, 1k, 16:9, **0.5 credit each** (`get_cost`), 3 candidates per slot, 3 credits in all. Two of the six
+submissions came back 429 with no charge and were resubmitted. Brightness gate (tps-banner): text zone 28 against a bar of 38.
+Shipped through `scripts/grade_tps_art.py`; card crops chosen with `crop.py` (`pos` 35% and 55% in `ART`).
+
+| Slot | Candidate (job id) | Verdict |
+|---|---|---|
+| warm-seat | A `f1417df8-9b50-4acb-ab24-ee1a375189c3` · **B `896d1439-7d84-4f3a-9de2-ebf241f4dae5` shipped** · C `c95bff8b-60f8-45c3-a0fc-55efefefd738` | the three are the same window seat; B has the best placement |
+| long-way-back | A `c70e0814-92bc-4bf6-a215-3ba181e713f5` · **B `3e7e40ee-3d98-48b4-ab00-2dad5dcff053` shipped** · C `004b9790-9f89-49ca-9dcd-9908c3da8896` | the three are the same crutch on a fence; B is darkest and best placed |
+
+Prompt, warm-seat: *Photograph of a dark wooden window seat in a quiet room at dusk. A folded grey wool blanket with one orange rubber hot-water bottle resting on it, a plain ceramic mug of tea beside it, and a pair of worn tennis shoes on the floor below. Soft low window light from the left falling across the blanket, the rest of the room in deep shadow, overall dark and moody. Subject in the left third; the right half and the bottom dark and empty. Keep the subject inside the middle band of the frame. Muted natural colour, the orange hot-water bottle the only saturated colour. No people, no text or logos on the bottle, no yellow, no gold.*
+
+Prompt, long-way-back: *Photograph of a clay tennis court at dusk. A single wooden crutch leaning against a dark courtside fence, a pair of tennis shoes dusted with red clay set neatly on the ground beside it, one orange resistance band coiled on the clay. One narrow low shaft of light across the crutch, the rest of the court in deep shadow, overall dark and moody. Subject in the left third; the right half and the bottom dark and empty. Keep the subject inside the middle band of the frame. Muted natural colour, clay orange the only saturated colour. No people, no text or logos, no yellow, no gold, no tennis balls.*
+
+The masters are on Amir's PC only, in `Content/parity-drafts/cover-art/` (all six, plus the gate sheet; not committed, the job ids above re-fetch them). The crutch is tall for the 2.9:1 list card:
+its handle is cut at `pos` 55%, which keeps the shoes and band whole; that was the right trade.
