@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════
    DESIGN TOKENS — single source of truth for the visual system.
-   Dark theme is the default (marketing, form, legal, program home).
-   Add `class="theme-light"` to the <body> for training-screen pages.
+   The warm paper (light) theme is the default: marketing, form and legal pages.
+   `.theme-light` is kept in sync with it for training-screen pages.
    ═══════════════════════════════════════════════════════════════════════ */
 
 :root {
@@ -17,6 +17,7 @@
   --accent-2-dim:  rgba(199, 85, 47, 0.10);
   --accent-2-mid:  rgba(199, 85, 47, 0.20);
   --accent-2-ink:  #FFFFFF;
+  --accent-2-text: #B64826;  /* small clay TEXT on light surfaces: 5.0 / 4.5 / 5.3:1 on paper / paper-2 / white. The fill stays #C7552F */
 
   /* ── Semantic colours ── */
   --red-soft:      #C0392B;
@@ -30,8 +31,8 @@
   --border-light:  #D8D1C5;
   --text-primary:  #1A1A1A;
   --text-secondary:#5C5C5C;
-  --text-muted:    #8A8A8A;
-  --text-dim:      #B0A99E;
+  --text-muted:    #6B6B6B;  /* AA on paper, paper-2 and white (was #8A8A8A, 3.2:1) */
+  --text-dim:      #6B6B6B;  /* was #B0A99E (2.0:1). As text it now equals muted */
 
   /* ── Typography ── */
   --font-display:  'Barlow Condensed', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -76,8 +77,8 @@
   --border-light:  #D8D1C5;
   --text-primary:  #1A1A1A;
   --text-secondary:#5C5C5C;
-  --text-muted:    #8A8A8A;
-  --text-dim:      #B0A99E;
+  --text-muted:    #6B6B6B;  /* AA on paper, paper-2 and white (was #8A8A8A, 3.2:1) */
+  --text-dim:      #6B6B6B;  /* was #B0A99E (2.0:1). As text it now equals muted */
   --accent-ink:    #FFFFFF;
 }
 
