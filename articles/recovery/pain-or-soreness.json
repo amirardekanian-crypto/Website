@@ -1,0 +1,172 @@
+{
+  "id": "pain-or-soreness",
+  "title": "Sore or Hurt",
+  "category": "Recovery",
+  "readMins": 5,
+  "date": "October 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Most players can't tell sore from hurt until it's too late. One means your muscles are adapting. The other can cost you weeks. Here's how to tell them apart, what to do mid-session and the day after, and which signs mean stop and get help."
+    },
+    {
+      "type": "p",
+      "text": "One honest note first. The 0 to 10 scale and the steps below come from coaching practice, not from a trial. I checked them against the research so they don't go further than it does."
+    },
+    {
+      "type": "h",
+      "text": "Soreness is normal"
+    },
+    {
+      "type": "p",
+      "text": "Soreness shows up after something new or hard, especially work where the muscle lengthens under load, like lowering a weight or braking hard. It builds over a day, peaks about 2 to 3 days after, then fades over a few days."
+    },
+    {
+      "type": "p",
+      "text": "It's a spread-out ache in the muscle, usually on both sides. It feels tender and stiff, and light movement often eases it for a while. Soreness isn't pain."
+    },
+    {
+      "type": "h",
+      "text": "Pain is different"
+    },
+    {
+      "type": "p",
+      "text": "Treat it as pain if you have any of these:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Sharp or stabbing pain.",
+        "Pain in one spot you can point to with one finger, on one side only, or in a joint, bone or tendon.",
+        "Pain that spreads or shoots somewhere else.",
+        "Numbness, tingling or pins and needles.",
+        "Pain that gets worse during a set or a drill instead of easing."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "Score it from 0 to 10"
+    },
+    {
+      "type": "list",
+      "items": [
+        "0: no pain.",
+        "1 to 3, mild: you feel it, but you can do every movement.",
+        "4 to 6, moderate: it changes what you can do.",
+        "7 to 10, severe: moving is hard and you can't think about anything else."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Some research lets people train with pain. In studies of Achilles tendon pain and pain around the kneecap, patients trained with pain up to about 5 out of 10. It had to settle by the next morning and not creep up week to week. Those were adults and young adults. My steps are stricter on purpose, because nobody is watching you."
+    },
+    {
+      "type": "h",
+      "text": "The pain ladder"
+    },
+    {
+      "type": "p",
+      "text": "Start at step 1 when something hurts mid-session. Move down as things change."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Step 1, keep going: pain is 3 or less, it eases as you go and you move normally. Finish the set and watch it. If it comes back the same or worse in the next set, go to step 2.",
+        "Step 2, change the move: pain climbs during the set, it's 4 or 5, it changes how you move, or it hasn't eased over 2 sets. Stop that move. Try an easier version only if the pain stays at 2 or less.",
+        "Step 3, drop it: the easier version brings the pain back. Skip that move and any other that brings it back today. If it's your leg, no jumps, sprints or hard stops. If it happens with 2 moves, end the session.",
+        "Step 4, stop and get it checked: the pain is sharp, it's 6 or more, it spreads or shoots, you have numbness or tingling, or you don't recognise it. End the session and book a doctor or physio."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Under 18",
+      "text": "From step 2 on, tell a parent or another adult the same day. Don't manage pain on your own at this age."
+    },
+    {
+      "type": "h",
+      "text": "The next day"
+    },
+    {
+      "type": "p",
+      "text": "Check the pain the next morning and again before your next session. These rows are for pain, not soreness."
+    },
+    {
+      "type": "list",
+      "items": [
+        "1 to 3, first time or getting better, no warning signs: train. Use easier versions of moves that load that area, jumps and sprints included if it's your leg. Keep it at 3 or less and not worse the next morning.",
+        "1 to 3, but the same as last time or worse: leave out every move that loads that area. Train the rest as planned.",
+        "4 to 6, or sharp: leave that area out. If it's your leg, no jumps, sprints or running. If it isn't clearly better in 3 days, see a physio or doctor.",
+        "7 or more: don't train today. A doctor or physio needs to see it before you load that area again."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Write down the day it started. Still there after 7 days, or it keeps coming back? Book a physio or doctor this week. Still there after 14 days? Get it checked at any score. After 3 pain-free days in a row, build that area back up step by step."
+    },
+    {
+      "type": "h",
+      "text": "Red flags: get help now"
+    },
+    {
+      "type": "p",
+      "text": "If any of these happens, stop. Show this page to a parent or another adult right away."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Chest pain or pressure, during or after training. If it's happening now, get medical help straight away.",
+        "Fainting or nearly fainting. Sit or lie down and tell an adult.",
+        "A heart that races or beats unevenly, or you're far more breathless than usual for the same effort.",
+        "A blow to the head, then headache, dizziness, feeling sick or confusion. No training and no tennis or padel.",
+        "Numbness or weakness in both legs.",
+        "A new problem controlling your bladder or bowels."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Don't train again until a doctor has seen you. Tell an adult and get medical help now. Call your local emergency number."
+    },
+    {
+      "type": "h",
+      "text": "Red flags: stop that area"
+    },
+    {
+      "type": "p",
+      "text": "These mean you leave that area alone and see a doctor or physio. The rest of your body can keep training."
+    },
+    {
+      "type": "list",
+      "items": [
+        "A limp: no leg training.",
+        "Swelling: leave that area out, and no jumps, sprints or hard stops if it's your leg.",
+        "Pain that wakes you at night, or hurts even at rest: see a doctor within a few days.",
+        "A joint that gives way or locks, or you can't put weight on it: leave that area out and get it seen.",
+        "Numbness, tingling, or pain that shoots somewhere else: leave that area out. If it's your back or neck, no weight training.",
+        "Pain that gets worse every time you jump or run: leave that area out and get it checked.",
+        "A growing player with pain just below the kneecap or in the heel, at any score, even 1 or 2: no jumping, sprinting or running until a clinician has seen it."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Growing players need extra care. In early adolescence the growth areas at the knee, heel and elbow are a common place for overuse pain. This guide can't tell you what's wrong. Only a doctor or physio can."
+    },
+    {
+      "type": "h",
+      "text": "Matches are load too"
+    },
+    {
+      "type": "p",
+      "text": "A week with far more tennis or padel than usual can bring pain on. The same ladder applies. Tell your coach too."
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "If you're not sure, pick the easier option and ask a doctor or physio. You lose a little training. Training through a warning sign can cost you weeks. Come back only when they clear you."
+    },
+    {
+      "type": "p",
+      "text": "Based on Silbernagel et al. (2007), Thomeé (1997), Sprague et al. (2021), Hotfiel et al. (2018), Cheung et al. (2003) and Adirim and Cheng (2003)."
+    }
+  ]
+}

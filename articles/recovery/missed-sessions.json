@@ -1,0 +1,154 @@
+{
+  "id": "missed-sessions",
+  "title": "The Clean Restart",
+  "category": "Recovery",
+  "readMins": 5,
+  "date": "October 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Missed sessions happen to everyone. Exams, travel, a cold, a busy month. The real questions are how much you lose, where to pick up again, and when to see a doctor first. Here's how I'd handle it, based on how long you've been away."
+    },
+    {
+      "type": "p",
+      "text": "One honest point up front. I couldn't find a study that tested these exact steps in tennis or padel players. The research on time off comes from lifters, runners and general exercisers. The steps below are my practical rules, built on that research."
+    },
+    {
+      "type": "h",
+      "text": "What a break really costs"
+    },
+    {
+      "type": "p",
+      "text": "Less than you'd fear, at least at first. In one study, 12 power athletes stopped lifting for 14 days. Their bench press, squat and jump height didn't change significantly. Their knee strength while lowering the weight did drop, by about 12%."
+    },
+    {
+      "type": "p",
+      "text": "Aerobic fitness goes first. In highly trained athletes, a break under 4 weeks cuts oxygen uptake and blood volume fast, while strength falls only a little. After 4 weeks, strength keeps falling slowly and usually stays above untrained levels for a long time."
+    },
+    {
+      "type": "p",
+      "text": "A review of 103 studies shows the same pattern. The longer you stop, the more strength you lose. Active people lose less than inactive people."
+    },
+    {
+      "type": "h",
+      "text": "What comes back fast"
+    },
+    {
+      "type": "p",
+      "text": "The strength you built doesn't vanish. In one small study, six women stopped training for about 30 weeks. Their strength fell but stayed above where they started. After 6 weeks of training again, their muscle fibres had grown back."
+    },
+    {
+      "type": "p",
+      "text": "Another study had 14 young men train for 6 weeks, take 3 weeks off, train 6 weeks, take 3 weeks off and train 6 weeks again. Over the 24 weeks they built about the same muscle and strength as men who trained straight through. The study was small and used the bench press only."
+    },
+    {
+      "type": "p",
+      "text": "You may hear the term muscle memory. In one study, muscle fibres kept their extra nuclei after a break. But two studies found that muscle you'd trained before didn't clearly regrow faster than muscle you hadn't. So don't count on a shortcut. Just know you lose less than you think."
+    },
+    {
+      "type": "h",
+      "text": "Where to pick up"
+    },
+    {
+      "type": "p",
+      "text": "Count the days since your last full session. Tournament weeks and the light weeks before a big match don't count as time off, because you were still training."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Up to 2 weeks off: carry on with your next session. Don't try to catch up.",
+        "2 to 4 weeks off: repeat the last full week you did.",
+        "1 to 2 months off: go back to the first week of the block you were in.",
+        "More than 2 months off: do the same, and redo your tests so you have a fresh starting number."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Do every session as planned. Don't skip weeks to catch up. If the first session feels much heavier than the numbers say, tell your coach."
+    },
+    {
+      "type": "h",
+      "text": "Don't cram"
+    },
+    {
+      "type": "p",
+      "text": "Never squeeze missed sessions into one week. The IOC says sudden jumps in training load raise the risk of injury and illness. Keep the same number of sessions you'd normally do. Being behind never means adding extra."
+    },
+    {
+      "type": "p",
+      "text": "Short on time? Do less, but keep the weights heavy. In younger exercisers, as little as 1 strength session a week with 1 set per exercise held strength and muscle size for up to 32 weeks, as long as the load stayed heavy. That review had no data on athletes. It holds what you have. It won't build more."
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Do a missed session later, one at a time. Never pack two weeks into one."
+    },
+    {
+      "type": "h",
+      "text": "After illness"
+    },
+    {
+      "type": "p",
+      "text": "Don't train with a fever. Exercise on top of an infection can make it worse, and even a simple one needs time to clear. In athletes, a respiratory illness lasts about a week. The average across 54 studies was about 7 days."
+    },
+    {
+      "type": "p",
+      "text": "You may know the neck check. Symptoms above the neck, like a runny nose, are OK to train with. Fever, body aches or a chest cough mean rest. It comes from a 1993 clinical article. It's a rule of thumb, and a 2014 review found no published data testing it."
+    },
+    {
+      "type": "list",
+      "items": [
+        "A mild cold above the neck and no fever: you can usually train. Stop if you feel worse as you go.",
+        "Fever, body aches, a chest cough or a stomach bug: rest until it clears.",
+        "Restart when you feel well and you've had no fever for 24 hours, without fever medicine."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Off for more than 2 weeks? Use the steps above to find your restart week."
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Stop and see a doctor if you get chest pain, feel faint, your heart races or beats irregularly, or you're much more out of breath than usual. See one too if a fever drags on or you're getting worse. Under 16? Check with a parent and your coach before you restart."
+    },
+    {
+      "type": "h",
+      "text": "After injury"
+    },
+    {
+      "type": "p",
+      "text": "Your doctor or physio makes this call. Expert groups call return to sport a shared decision between the clinician, the athlete and the coach. They also say the evidence on timing is thin."
+    },
+    {
+      "type": "p",
+      "text": "Ask one clear question. Can I train fully, or with limits? If it's fully, use the steps above based on how long you've been away. If it's with limits, follow their plan for that area. The rest of your body can keep training."
+    },
+    {
+      "type": "p",
+      "text": "Tell your coach exactly what they said. If the same pain comes back, stop that exercise and get it checked again. Don't push through it to stay on schedule."
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "After a blow to the head, chest pain, fainting or an irregular heartbeat, only come back when a doctor says so. Finish the return plan they give you first. If a symptom comes back, stop that day and see them."
+    },
+    {
+      "type": "h",
+      "text": "Ask your coach"
+    },
+    {
+      "type": "p",
+      "text": "If you have a coach, tell them whenever you miss sessions or take time off. They know your numbers and can move your plan to the right spot. If you don't have one, a physio or doctor is the person to ask about illness or injury."
+    },
+    {
+      "type": "callout",
+      "label": "Key",
+      "text": "Pick up at the right spot, never cram missed sessions, and let a doctor clear you after illness or injury."
+    },
+    {
+      "type": "p",
+      "text": "Based on Mujika & Padilla (2000, parts I and II), Bosquet et al. (2013), Hortobagyi et al. (1993), Ogasawara et al. (2013), Spiering et al. (2021), Snyders et al. (2021) and Ardern et al. (2016)."
+    }
+  ]
+}

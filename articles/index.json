@@ -9,6 +9,77 @@
       "articles": []
     },
     {
+      "id": "training",
+      "title": "Training",
+      "icon": "strength",
+      "banner": "assets/art/library/sessions-strength-v1.webp",
+      "articles": [
+        {
+          "id": "what-tennis-demands",
+          "title": "Built for Bursts",
+          "category": "Training",
+          "readMins": 5,
+          "file": "articles/training/what-tennis-demands.json"
+        },
+        {
+          "id": "why-strength-training",
+          "title": "The Case For Strength",
+          "category": "Training",
+          "readMins": 5,
+          "file": "articles/training/why-strength-training.json"
+        },
+        {
+          "id": "strength-for-tennis",
+          "title": "Lift for the Court",
+          "category": "Training",
+          "readMins": 5,
+          "file": "articles/training/strength-for-tennis.json"
+        },
+        {
+          "id": "jumps-landing-power",
+          "title": "Land Before You Leap",
+          "category": "Training",
+          "readMins": 6,
+          "file": "articles/training/jumps-landing-power.json"
+        },
+        {
+          "id": "speed-braking-direction",
+          "title": "Fast Start, Hard Brake",
+          "category": "Training",
+          "readMins": 5,
+          "file": "articles/training/speed-braking-direction.json"
+        },
+        {
+          "id": "agility-and-reaction",
+          "title": "Move on the Cue",
+          "category": "Training",
+          "readMins": 6,
+          "file": "articles/training/agility-and-reaction.json"
+        },
+        {
+          "id": "tennis-fitness",
+          "title": "The Quiet Engine",
+          "category": "Training",
+          "readMins": 5,
+          "file": "articles/training/tennis-fitness.json"
+        },
+        {
+          "id": "robust-body",
+          "title": "Built to Last",
+          "category": "Training",
+          "readMins": 6,
+          "file": "articles/training/robust-body.json"
+        },
+        {
+          "id": "rpe-explained",
+          "title": "Pick Your Weight",
+          "category": "Training",
+          "readMins": 6,
+          "file": "articles/training/rpe-explained.json"
+        }
+      ]
+    },
+    {
       "id": "pre-competition",
       "title": "Pre-Competition",
       "icon": "tennis",
@@ -20,6 +91,13 @@
           "category": "Pre-Competition",
           "readMins": 5,
           "file": "articles/pre-competition/tennis-warm-up.json"
+        },
+        {
+          "id": "training-around-matches",
+          "title": "Keep Your Edge",
+          "category": "Pre-Competition",
+          "readMins": 5,
+          "file": "articles/pre-competition/training-around-matches.json"
         }
       ]
     },
@@ -31,17 +109,52 @@
       "articles": [
         {
           "id": "training-with-injury",
-          "title": "Training With Injury",
+          "title": "The Comeback Rules",
           "category": "Recovery",
-          "readMins": 4,
+          "readMins": 5,
           "file": "articles/recovery/training-with-injury.json"
         },
         {
           "id": "training-on-your-period",
-          "title": "Training On Your Period",
+          "title": "Train By Feel",
           "category": "Recovery",
-          "readMins": 4,
+          "readMins": 5,
           "file": "articles/recovery/training-on-your-period.json"
+        },
+        {
+          "id": "sleep-and-recovery",
+          "title": "Sleep Is Training",
+          "category": "Recovery",
+          "readMins": 5,
+          "file": "articles/recovery/sleep-and-recovery.json"
+        },
+        {
+          "id": "how-you-get-stronger",
+          "title": "Built In The Gaps",
+          "category": "Recovery",
+          "readMins": 6,
+          "file": "articles/recovery/how-you-get-stronger.json"
+        },
+        {
+          "id": "missed-sessions",
+          "title": "The Clean Restart",
+          "category": "Recovery",
+          "readMins": 5,
+          "file": "articles/recovery/missed-sessions.json"
+        },
+        {
+          "id": "growth-spurts",
+          "title": "Spurt Season",
+          "category": "Recovery",
+          "readMins": 5,
+          "file": "articles/recovery/growth-spurts.json"
+        },
+        {
+          "id": "pain-or-soreness",
+          "title": "Sore or Hurt",
+          "category": "Recovery",
+          "readMins": 5,
+          "file": "articles/recovery/pain-or-soreness.json"
         }
       ]
     },
@@ -64,6 +177,20 @@
           "category": "Nutrition",
           "readMins": 6,
           "file": "articles/nutrition/match-day-nutrition.json"
+        },
+        {
+          "id": "training-nutrition",
+          "title": "Eat to Train",
+          "category": "Nutrition",
+          "readMins": 6,
+          "file": "articles/nutrition/training-nutrition.json"
+        },
+        {
+          "id": "hydration-and-heat",
+          "title": "The Sweat Plan",
+          "category": "Nutrition",
+          "readMins": 5,
+          "file": "articles/nutrition/hydration-and-heat.json"
         }
       ]
     },

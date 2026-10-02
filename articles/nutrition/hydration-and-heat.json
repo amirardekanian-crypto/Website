@@ -1,0 +1,196 @@
+{
+  "id": "hydration-and-heat",
+  "title": "The Sweat Plan",
+  "category": "Nutrition",
+  "readMins": 5,
+  "date": "October 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "When it's hot, tennis becomes a water problem. You sweat to cool down, so you lose water and salt. If you don't replace enough, your body heats up faster. Here's how much to drink, how to find your own number and how to spot heat illness early."
+    },
+    {
+      "type": "p",
+      "text": "A quick note on padel. I couldn't find published sweat rates or heat studies for padel players. The ideas should carry over, but every number here comes from tennis."
+    },
+    {
+      "type": "h",
+      "text": "Why water matters"
+    },
+    {
+      "type": "p",
+      "text": "Losing more than about 2% of your body weight in water can cut endurance, focus and coordination. In tennis the effect isn't always clear. In one small study of 11 men, losing about 2.7% slowed short sprints but didn't change shot tests."
+    },
+    {
+      "type": "p",
+      "text": "Sweat varies a lot. Tennis players have lost from 0.5 L an hour to over 2.5 L an hour. Heat, humidity, effort and body size all change it. One number can't fit everyone."
+    },
+    {
+      "type": "h",
+      "text": "Two tests to find your number"
+    },
+    {
+      "type": "p",
+      "text": "First, check your urine. Pale yellow means you're probably fine. Dark yellow, or very little for several hours, means drink more. It's a rough guide, not a lab test."
+    },
+    {
+      "type": "p",
+      "text": "Second, weigh yourself before and after a session."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Weigh yourself before, in light dry clothes.",
+        "Count what you drink.",
+        "Dry off and weigh yourself again.",
+        "Sweat = weight before minus weight after, plus what you drank. 1 kg is about 1 L. Example: 60 kg before, 59 kg after and 1 L drunk means about 2 L of sweat."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "If you lost more than 2% of your weight, drink more next time. If you're heavier, you drank too much. Test on a hot day and a mild day. The numbers differ."
+    },
+    {
+      "type": "h",
+      "text": "How much to drink"
+    },
+    {
+      "type": "p",
+      "text": "Start hydrated. In the hours before play, aim for about 5 to 7 ml per kg, so 350 to 490 ml for a 70 kg player. Don't gulp it all right before the first ball."
+    },
+    {
+      "type": "p",
+      "text": "During play, drink at every changeover. About 200 ml in mild weather, and up to 400 ml when it's above 27°C. Adjust it with your sweat test."
+    },
+    {
+      "type": "p",
+      "text": "After play, weigh yourself. For every kg you lost, drink 1.25 to 1.5 L over the next few hours, with food and some salt. That's 125 to 150% of what you lost. Plain water alone doesn't hold the fluid in."
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Don't drink more than you sweat. In marathon runners, weight gain during the race was linked to dangerously low blood sodium."
+    },
+    {
+      "type": "h",
+      "text": "Salt and cramps"
+    },
+    {
+      "type": "p",
+      "text": "Sweat has salt in it. In tennis, players have lost 0.5 to 1.8 g of sodium over a match, and more in the heat. White marks on your cap can mean you lose a lot."
+    },
+    {
+      "type": "list",
+      "items": [
+        "On hot days, don't cut the salt in your normal food.",
+        "Eat something salty before or between matches, like bread and cheese.",
+        "After a hot match, have salty food or ayran, a salty yoghurt drink.",
+        "Get your salt from food, not tablets."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Cramps are less clear. A sodium shortfall is one suspected cause in hot tennis. A very tired muscle is another. Experts still argue about it."
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "If a doctor told you to cut down on salt, for blood pressure or kidney disease, check with them before you add any."
+    },
+    {
+      "type": "h",
+      "text": "Getting used to the heat"
+    },
+    {
+      "type": "p",
+      "text": "Your body adapts. After about 1 to 2 weeks of regular training in the heat, you sweat better and your temperature rises less. The risk is highest on the first hot days of the year and after travelling from somewhere cooler. Adapting doesn't replace water and shade."
+    },
+    {
+      "type": "h",
+      "text": "Time, place and clothing"
+    },
+    {
+      "type": "p",
+      "text": "In the heat, change the conditions, not the session."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Time: play early in the morning or in the evening, not at the hottest hours.",
+        "Place: use an indoor court on very hot days if you can.",
+        "Shade: spend every changeover out of the sun.",
+        "Cooling: put a cold wet towel or a towel with ice on your neck. In very hot, dry air a fan only helps if your skin is wet.",
+        "Clothes: wear light, loose clothes and a cap in the sun.",
+        "Illness: don't play in the heat with a fever, diarrhoea or vomiting. If you take medication, ask your doctor about heat."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "Teenagers in the heat"
+    },
+    {
+      "type": "p",
+      "text": "Teenagers handle heat about as well as adults when they're well hydrated. The bigger risks are low water, pushing too hard, little rest between same-day matches and clothes that trap heat. In one small study of 14-year-old boys, those who started a match less hydrated finished with a higher core temperature."
+    },
+    {
+      "type": "callout",
+      "label": "Remember",
+      "text": "Adults decide when to stop. A teenager may not want to quit, so stop the match at the first sign of heat illness."
+    },
+    {
+      "type": "h",
+      "text": "Heat exhaustion: stop now"
+    },
+    {
+      "type": "p",
+      "text": "Doctors call the common form of heat collapse heat exhaustion. Signs are sudden severe tiredness, dizziness, headache, nausea, heavy sweating, pale skin and a fast heartbeat. The person is still alert."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Stop play right now.",
+        "Go to shade or somewhere cool and lie down.",
+        "Cool them with cold water, a wet towel or ice.",
+        "If they're fully alert and not vomiting, give small sips of water.",
+        "Stay with them. No more play that day."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "If they don't improve quickly, get worse, or you see fainting, confusion or strange behaviour, call your local emergency number right now (115 in Iran, 999 in the UK, 112 in Europe, 911 in the US) and keep cooling."
+    },
+    {
+      "type": "h",
+      "text": "Heat stroke: call and cool"
+    },
+    {
+      "type": "p",
+      "text": "Heat stroke means body temperature gets so high the brain stops working properly. It's an emergency and can happen even when the weather doesn't feel very hot. The key sign is a change in alertness: confusion, odd behaviour, staggering, a seizure or passing out."
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Call and cool at the same time. Don't wait for the ambulance to start cooling."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Call your local emergency number, or ask someone to.",
+        "Move them to shade.",
+        "Cool the whole body fast. Best is cold or ice water up to the neck, with someone holding their head up. If you can't, pour cold water on them and fan them.",
+        "Give nothing to eat or drink if they're confused. Stay with them until help arrives."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Someone confused in the heat is an emergency. Call and cool."
+    },
+    {
+      "type": "p",
+      "text": "Based on the ITF, WTA and ATP statement on nutrition in tennis (Vicente-Salar et al., 2025), Ranchordas et al. (2013), Kovacs (2006), the ACSM position stands (Sawka et al., 2007, Armstrong et al., 2007), Racinais et al. (2015) and the American Academy of Pediatrics statement on heat (2011)."
+    }
+  ]
+}

@@ -1,123 +1,178 @@
 {
   "id": "training-with-injury",
-  "title": "Training With Injury",
+  "title": "The Comeback Rules",
   "category": "Recovery",
-  "readMins": 4,
-  "date": "July 2026",
+  "readMins": 5,
+  "date": "October 2026",
   "blocks": [
     {
       "type": "p",
-      "text": "Every athlete coming back from an injury wants to know what the program is going to do for them. That's only half the equation — the other half is entirely yours, and it has nothing to do with sets or reps."
+      "text": "Most injured players ask what the program will do for them. That's half the picture. The other half is yours, and it has little to do with sets and reps. This is for tennis and padel players and their parents. It can't replace a doctor. The research is general sports medicine, not tennis or padel studies."
     },
     {
       "type": "p",
-      "text": "Your coach handles the programming — exercise choice, loading, how the week is built. What's actually in your control is smaller, simpler, and arguably more important: how accurately you report what's happening in your body, and how honestly you follow a handful of rules that have nothing to do with program design."
-    },
-    {
-      "type": "p",
-      "text": "Here's what's yours to own."
+      "text": "Your coach handles the programming: exercise choice, loading, how the week fits together. You handle the reporting. That means telling people what's really happening in your body and following a few simple rules honestly. A doctor or physio decides what your injury allows. Your coach works inside that."
     },
     {
       "type": "h",
-      "text": "Pain is information, not a stop sign"
+      "text": "Training with an injury starts with a doctor"
     },
     {
       "type": "p",
-      "text": "Training around an injury without ever feeling anything isn't realistic, and chasing that just means you stay under-loaded for months. The skill isn't avoiding pain — it's reading it correctly, and that reading is entirely yours to make."
+      "text": "Some problems can't wait for a training plan. See a doctor or go to emergency care if you have any of these."
+    },
+    {
+      "type": "list",
+      "items": [
+        "You can't put weight on the limb",
+        "The area looks out of shape",
+        "A joint locks or gives way",
+        "You have numbness, tingling or weakness",
+        "A swollen joint comes with a fever",
+        "You have pain at rest or at night",
+        "The pain is getting worse over days",
+        "It swelled up after a fall or a hit"
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Don't train that area until a doctor or physio has seen it. After that, do what they allow and nothing extra."
+    },
+    {
+      "type": "h",
+      "text": "Pain is information, with limits"
+    },
+    {
+      "type": "p",
+      "text": "Training around an injury without feeling anything isn't realistic. Chasing that can keep you under-loaded for months. In people with long-lasting muscle and joint pain, exercise that allowed some pain gave a small benefit in the short term and no clear difference later. It doesn't cover a fresh fracture, a complete tear, nerve symptoms or recovery from surgery."
+    },
+    {
+      "type": "p",
+      "text": "The best-tested pain rule comes from two problems, Achilles tendinopathy and pain around the kneecap. Those studies used adults and young adults, ages 15 to 28 in the knee trial. It allowed pain up to about 5 out of 10 during exercise, settled by the next morning, and not climbing week to week. I'd keep you a notch lower. For other injuries, it's practice, not proof."
     },
     {
       "type": "callout",
       "label": "Rule",
-      "text": "Discomfort that stays mild during a set and settles by the next morning is a green light — keep going. Anything sharp, anything that gets worse rep to rep, or anything still there the next day is a red flag: stop, back off, and tell your coach before you push further. Apply this every session and you stop guessing."
+      "text": "Let your clinician set your pain rule. A common one: up to about 4 out of 10 during exercise, back to usual by the next morning, not creeping up week to week. Sharp, worsening or unsettled pain means stop. Tell an adult and your coach."
     },
     {
       "type": "h",
-      "text": "Know which kind of finding you're dealing with"
+      "text": "A scan doesn't tell the whole story"
     },
     {
       "type": "p",
-      "text": "A scan report full of unfamiliar terms doesn't mean much on its own — but the distinction underneath it changes how you should think about your own body for years, not weeks."
+      "text": "A scan report full of strange words doesn't mean much on its own. In one review, 37% of pain-free 20-year-olds had disc degeneration. In another, about 4% of pain-free knees under age 40 had a meniscus tear."
     },
     {
       "type": "p",
-      "text": "A torn structure — a ligament, a tendon, a meniscus — genuinely follows a healing timeline and needs progressive load over time, not permanent avoidance. A structural trait — a shape or a laxity your body has always had — is different. It isn't damage on a clock. It's architecture, and it calls for permanent strength and control built around it, for as long as you train."
+      "text": "A doctor reads the scan alongside your symptoms and an exam. Many injured tissues heal over weeks to months and respond to loading that builds up in steps. A tendon that's irritated isn't a tear, though, and some tears, like a complete ACL tear, need a surgeon's opinion."
     },
     {
       "type": "callout",
       "label": "Key",
-      "text": "Ask directly: is this something that heals, or something I train around forever? Don't guess, and don't assume last year's answer still applies if you get new imaging. Knowing which one you have is the difference between being patient for six weeks and being consistent for years."
+      "text": "Ask your clinician: does this heal over weeks or months, or do we manage it long term? What loading suits it now? Don't guess from the report."
     },
     {
       "type": "h",
-      "text": "Your sport is training load too — say so"
+      "text": "Report everything, matches included"
     },
     {
       "type": "p",
-      "text": "If you're already back playing while you're still rehabbing in the gym, your coach can only manage that combined load if they actually know about it. A program built as if your matches don't exist will eventually stack on top of them."
+      "text": "If you're back playing while you rehab, your coach can only manage the total if they know about it. The IOC consensus calls poor load management a major injury risk, sudden jumps in match load included."
     },
     {
       "type": "list",
       "items": [
-        "Tell your coach about every match or session you play, not just the gym days",
-        "Say how it actually felt — competitive and grinding is different information than easy and social",
-        "Flag soreness that shows up after playing, not just after training"
+        "Tell your coach about every match and hit, not just gym days",
+        "Say how it felt, grinding or easy",
+        "Mention school sport and extra sessions",
+        "Flag soreness that shows up after playing"
       ]
     },
     {
       "type": "p",
-      "text": "Don't downplay a hard match because you don't want to sound like you're behind schedule. A coach working off half the picture isn't a coaching failure — it's a reporting gap, and it's yours to close."
+      "text": "Log the real weight, effort and pain score. If you're a junior, your parents should hear it all too. A coach with half the picture has a reporting gap, and only you can close it."
     },
     {
       "type": "h",
-      "text": "Let your weaker side set the pace"
+      "text": "Strength work helps, and stopping costs"
     },
     {
       "type": "p",
-      "text": "On any single-limb exercise, your job is simple: don't let your strong side run ahead of your weak one. If your injured side manages eight clean reps, stop the healthy side at eight too — even though it clearly has more in it."
+      "text": "Strength training is one of the best-supported ways to cut sports injuries. A review of 25 trials with over 26,000 people found it showed the biggest benefit, and stretching alone showed none. A 2018 review of six trials in ages 12 to 40 agreed. These were prevention trials, so they promise nothing after an injury."
     },
     {
-      "type": "callout",
-      "label": "Rule",
-      "text": "This is a discipline you practice yourself, set by set — no program can enforce it for you. Let the strong side chase extra reps and the gap between your two sides doesn't close. It widens, quietly, until it becomes the next injury."
+      "type": "p",
+      "text": "Stopping everything has a price too. In the first four weeks off, endurance fitness drops fast and strength only a little. A review of athletes found you can hold much of your fitness on less volume if the intensity stays up."
     },
     {
       "type": "h",
-      "text": "Report honestly, every time"
+      "text": "Start on your weaker side"
     },
     {
       "type": "p",
-      "text": "Every program lives or dies on the accuracy of what you report back — your readiness, your effort, your pain. A coach adjusting your training off inflated numbers is adjusting to a version of you that doesn't exist."
+      "text": "On one-leg or one-arm exercises, I like a simple habit. Start on the weaker side, then match its reps on the stronger side. It keeps the gap from growing while you rehab. That's coaching practice, not a tested rule."
     },
     {
       "type": "p",
-      "text": "Log the real weight, the real effort, the real pain score — including on the days it's unflattering. The plan you get next week is only as good as the truth you gave it this week."
+      "text": "Symmetry does matter in some cases. In one cohort after ACL surgery, players with more even quad strength between legs had fewer reinjuries."
     },
     {
       "type": "h",
-      "text": "The comeback is staged, not switched on"
+      "text": "Growing players need extra care"
     },
     {
       "type": "p",
-      "text": "There's no single moment where you go from hurt to fine. A real return moves through stages, and expecting a switch to flip is how athletes talk themselves into skipping the ones that matter."
+      "text": "Young athletes aren't small adults. Growth plates are weak spots in a growing body. Heel, knee or elbow pain, and stress fractures, can follow heavy playing loads. Sports medicine bodies say youth overuse needs adult oversight. So a junior shouldn't run a pain rule alone. Tell a parent and your coach the same day, and let a doctor decide what's allowed."
+    },
+    {
+      "type": "p",
+      "text": "Parents, here's your part."
     },
     {
       "type": "list",
       "items": [
-        "Rebuilding basic capacity in ranges that don't provoke anything",
-        "Reintroducing your sport's movement patterns, at low intensity, on purpose",
-        "Pushing real strength back into those same patterns",
-        "Adding power and reactive work once strength holds under fatigue",
-        "Returning to full sport-speed last — not first"
+        "Get pain that lasts or keeps coming back seen by a doctor or physio",
+        "Ask what's allowed and for how long, and write it down",
+        "Tell the coach about all the load, school sport included",
+        "Ask your child how it feels before and after sessions"
       ]
     },
     {
       "type": "h",
-      "text": "The rule"
+      "text": "The comeback has stages"
+    },
+    {
+      "type": "p",
+      "text": "There's no moment where you go from hurt to fine. Return to sport is a continuum, and the clinician, athlete and coach share the call. Rushing has a cost. In one ACL cohort of 106 players, each extra month of waiting before return, up to nine, cut the reinjury rate by about half."
+    },
+    {
+      "type": "p",
+      "text": "Here's a common way to stage it. Your clinician decides when you move on."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Rebuild basic capacity in ranges that don't provoke anything",
+        "Bring your sport's movement patterns back, at low intensity",
+        "Push real strength back into those patterns",
+        "Add power and reactive work once strength holds when tired",
+        "Return to full sport speed last, not first"
+      ]
+    },
+    {
+      "type": "h",
+      "text": "Who does what"
     },
     {
       "type": "callout",
       "label": "Rule",
-      "text": "None of this depends on your coach getting the programming right — that part isn't yours to carry. It depends on you doing your five jobs: read pain correctly, know what you're actually dealing with, report your full load, protect your weak side, and log the truth. Do those, and the program can finally do its job."
+      "text": "Your doctor or physio decides what's allowed. Your coach builds the plan inside that. You report the truth, and if you're a junior, your parents know the whole picture. Do your part and the plan can work."
+    },
+    {
+      "type": "p",
+      "text": "Based on Silbernagel et al. (2007), Thomeé (1997), Smith et al. (2017), Lauersen et al. (2014, 2018), Soligard et al. (2016), Grindem et al. (2016) and Ardern et al. (2016)."
     }
   ]
 }

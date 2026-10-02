@@ -1,0 +1,153 @@
+{
+  "id": "tennis-fitness",
+  "title": "The Quiet Engine",
+  "category": "Training",
+  "readMins": 5,
+  "date": "October 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Most players think tennis fitness means running a long time without getting tired. That's only half of it. Tennis aerobic fitness is the engine that gets you ready for the next point, again and again."
+    },
+    {
+      "type": "h",
+      "text": "What a match asks of you"
+    },
+    {
+      "type": "p",
+      "text": "Tennis isn't steady running. The average point lasts under 10 seconds. In competitive matches the work to rest ratio is about 1 to 3 up to 1 to 5. That's 3 to 5 seconds of rest for each second of hard work."
+    },
+    {
+      "type": "p",
+      "text": "Near-maximal bursts sit inside long stretches of easier effort. In studies of well-trained men, the ball was in play only about 20 to 26% of the time, and average heart rate came out around 140 to 155 beats a minute. It's an average of a very jumpy line, not a pace you hold."
+    },
+    {
+      "type": "callout",
+      "label": "Key",
+      "text": "Tennis fitness means two things together. You can repeat short, fast efforts, and your aerobic base brings you back to normal between them."
+    },
+    {
+      "type": "h",
+      "text": "Why the aerobic base matters"
+    },
+    {
+      "type": "p",
+      "text": "Your aerobic system makes energy with oxygen, and between points it helps you reset. Reviews of repeated sprints in racket sports name energy supply, including the oxygen system, as a main limit."
+    },
+    {
+      "type": "p",
+      "text": "In a simulated set with 20 advanced and elite men, the fitter players played at a lower relative intensity. The same tennis cost them less. That matters because fatigue costs accuracy. In a long simulated match, serve speed and groundstroke accuracy fell as the hours went on."
+    },
+    {
+      "type": "callout",
+      "label": "Honest Limit",
+      "text": "Most of these studies are on men and just watch players. They show fitter players cope better. They don't prove extra aerobic work wins matches."
+    },
+    {
+      "type": "h",
+      "text": "Short intervals or long runs?"
+    },
+    {
+      "type": "p",
+      "text": "VO2max is the most oxygen your body can use in a minute. HIIT is high intensity interval training. Small studies compared HIIT with work shaped like tennis."
+    },
+    {
+      "type": "list",
+      "items": [
+        "29 boys, about 14, 6 weeks. Court training raised VO2max by about 5%, the same as running HIIT, and was better for agility and hitting skill.",
+        "24 boys, about 14, 6 weeks. Court training plus repeated sprints beat court training plus HIIT for 5 m speed, repeated sprints and agility. The boys enjoyed it more.",
+        "31 competitive male players, 6 weeks. HIIT and repeated sprints raised VO2max by about 6% and 5%. HIIT gave the bigger gain in tennis-specific endurance."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Be Honest",
+      "text": "These studies are small and mostly about boys and men. No method won everything. They're a reason to build conditioning on court and keep some steady work in too."
+    },
+    {
+      "type": "h",
+      "text": "Build it in steps"
+    },
+    {
+      "type": "p",
+      "text": "Here's the build I use. It's my own plan from the numbers above, and nobody has tested it as one package. RPE is how hard it feels, from 1 to 10. Every fourth week, do fewer reps at the same effort."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Base. Shuttle Run and Baseline Shuffle at a steady RPE 7, about 10 reps. Start near 15 seconds of work and 45 of rest, then move toward 25 and 35.",
+        "Build. Court Intervals shaped like points, then as games (see below). 8 to 10 seconds of work, 24 to 32 seconds of walking, 12 to 15 reps at RPE 8.",
+        "Onto the court. The same games with Shadow Point Intervals. Each rep is one point without a ball.",
+        "Sprints. One short extra set of Repeated Sprint, over 10 m and then 15 m, later Wide-Ball Repeated Sprint."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Remember",
+      "text": "Add the amount of work first. Then make it look more like a real point."
+    },
+    {
+      "type": "h",
+      "text": "A game on court"
+    },
+    {
+      "type": "p",
+      "text": "A game here is six points in a row, each about 8 seconds. It's tennis-shaped, not a tested protocol. I chose 8 seconds because the average point is under 10, and 24 seconds of rest because 1 to 3 is the short end of the real range. Don't shave the rest. In one elite drill, 10 seconds of rest instead of 15 lowered running and stroke speed."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Each point: 8 seconds of hard work. Split step, two to four quick changes of direction, back to the middle.",
+        "Between points: walk slowly for 24 seconds.",
+        "After the sixth point: walk easily for 1 minute 15 seconds.",
+        "Build up to 10 games. That's about 8 minutes of hard work inside roughly 40 minutes."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "How hard should it feel?"
+    },
+    {
+      "type": "p",
+      "text": "Go by effort. RPE 7 is harder than a warm-up, but you could hold it to the end. RPE 8 is quick and serious, not all-out. Your last game should be as clean as your first. These descriptions are mine, not from a study. Heart rate climbs too slowly to guide 8 second efforts. On steady runs, if you can speak in short sentences, you're close. No single percentage of max heart rate suits everyone."
+    },
+    {
+      "type": "h",
+      "text": "What about padel?"
+    },
+    {
+      "type": "p",
+      "text": "A review of padel studies puts average match heart rate around 70 to 80% of max, and the ball is in play about 30 to 46% of the time, depending on level and study. I found no padel study on interval plans like this. My suggestion is the same build with the steady base kept in, because youth padel rests between points looked short, about 14 to 16 seconds. That's my reasoning, not a tested result."
+    },
+    {
+      "type": "h",
+      "text": "Check your progress"
+    },
+    {
+      "type": "p",
+      "text": "The Yo-Yo test (Intermittent Recovery, level 1) has a tennis-like pattern. Each shuttle is 2 x 20 m, then 10 seconds of recovery, and the speed goes up until you can't keep up. Your score is the distance. It repeats well from day to day, though that research is mostly in football. I found no tennis check of it, so treat it as a gauge."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Compare distance with your own last score. A gain of about 160 m (4 shuttles) is probably real. That's my rule of thumb, not a published figure.",
+        "Estimated VO2max can be a few units off, so go by distance.",
+        "Same floor, shoes and time of day. A different surface can change the result a lot."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "The test goes to full exhaustion. Chest pain or pressure, dizziness, unusual breathlessness or a strange heartbeat means stop and see a doctor before training again. Run it with a coach or another adult there. A growing player with pain right below the kneecap or at the back of the heel should skip running intervals until a doctor or physio has seen it."
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Build the engine in steps. Test it the same way every time. Trust the trend over one result."
+    },
+    {
+      "type": "p",
+      "text": "Based on Kovacs (2007), Fernandez et al. (2006), Baiget et al. (2015), Fernandez-Fernandez et al. (2012), Kilit and Arslan (2019), Morais et al. (2024) and Guijarro-Herencia et al. (2023)."
+    }
+  ]
+}

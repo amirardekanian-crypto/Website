@@ -64,6 +64,7 @@ REDIRECTS = {
 # says so rather than guessing a Farsi name.
 CATEGORIES = {
     'for-coaches':     {'en': 'For Coaches',     'fa': 'برای مربی‌ها'},
+    'training':        {'en': 'Training',        'fa': 'تمرین'},
     'pre-competition': {'en': 'Pre-Competition', 'fa': 'قبل از مسابقه'},
     'recovery':        {'en': 'Recovery',        'fa': 'ریکاوری'},
     'mental':          {'en': 'Mental',          'fa': 'ذهن'},

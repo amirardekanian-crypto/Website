@@ -1,0 +1,155 @@
+{
+  "id": "rpe-explained",
+  "title": "Pick Your Weight",
+  "category": "Training",
+  "readMins": 6,
+  "date": "October 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Most lifters pick a weight by guessing, then wonder why the session felt too easy or too hard. RPE gives you a better way. It's a 1 to 10 rating of how hard a set was, and you can use it to choose your weight without a max test. Here's what RPE means, how to use it and where it falls short."
+    },
+    {
+      "type": "h",
+      "text": "What RPE means"
+    },
+    {
+      "type": "p",
+      "text": "RPE stands for rating of perceived exertion. For lifting, the most useful version counts reps in reserve. Right after your last rep, ask yourself how many more good reps you could have done. That answer is your rating. Zourdos and colleagues published this scale in 2016. I use whole numbers to keep it simple."
+    },
+    {
+      "type": "list",
+      "items": [
+        "RPE 10: no good reps left. The next rep wouldn't go up, or your form would fall apart.",
+        "RPE 9: 1 good rep left.",
+        "RPE 8: 2 good reps left.",
+        "RPE 7: 3 good reps left. The bar still moves fast.",
+        "RPE 6: 4 or more reps left. It feels easy, like a warm-up."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Remember",
+      "text": "RPE 7 means you finish the set with about 3 good reps left."
+    },
+    {
+      "type": "h",
+      "text": "Why RPE 7 means 3 reps left"
+    },
+    {
+      "type": "p",
+      "text": "That's how the scale is built. It isn't a magic point in your body. In the original study, squatters rated single reps and a set of 8. The bar moved slower as their ratings went up, in experienced and novice lifters alike. So the numbers follow real effort."
+    },
+    {
+      "type": "p",
+      "text": "RPE 7 is also a handy place to train. The set is hard, your technique stays clean and you're not at failure. You don't need failure to get stronger. A review of 15 studies in young adults found no clear difference in strength or muscle size between training to failure and stopping short (Grgic 2021). Trained lifters got a small edge in muscle growth from failure."
+    },
+    {
+      "type": "h",
+      "text": "RPE and percent of your max"
+    },
+    {
+      "type": "p",
+      "text": "Coaches also use percent of your one-rep max (1RM). The two are linked. In trained lifters doing barbell squats, about 83% of 1RM is a 6-rep max. So 3 reps at RPE 7 uses about the same weight as a 6-rep set taken to RPE 10 (Helms 2016)."
+    },
+    {
+      "type": "p",
+      "text": "The link is rough, though. When trained squatters did 8 reps at 70% of 1RM, most rated it between 2 and 4 reps left, but some said 1 and some said 5. Reps at the same percent vary a lot too. In 58 trained lifters, one set at 70% of 1RM in the back squat gave anything from 6 to 26 reps (Cooke 2019). That's why RPE helps. It follows how you feel today and doesn't depend on a max from weeks ago."
+    },
+    {
+      "type": "h",
+      "text": "What counts as a good rep"
+    },
+    {
+      "type": "p",
+      "text": "A good rep looks like your first one. Same technique, same range of motion, no big slowdown. Count your reps left up to the first rep that would be much slower, shorter or out of shape. Never find out by grinding until the bar stops."
+    },
+    {
+      "type": "h",
+      "text": "How to choose your weight"
+    },
+    {
+      "type": "p",
+      "text": "Do this for each loaded lift. These steps are my own coaching rules, not the result of a study."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Warm up the lift with 2 or 3 lighter sets. For example 8 very light reps, 5 reps at about half the weight you expect to use and 3 reps close to it. They should feel easy.",
+        "Pick the weight you think fits your target RPE. If you're between two weights, take the lighter one.",
+        "Do your reps, then ask how many good reps you had left. Write that number down next to the weight and the reps.",
+        "Use the rules below to pick the weight for the next set."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "Change the next set"
+    },
+    {
+      "type": "p",
+      "text": "After each working set, compare your RPE with your target. A step is the smallest jump your equipment allows. That's often 2.5 kg in total on a barbell, the next size up on dumbbells or the next pin on a machine. Next week, start from your last working weight. This table is also my own practical rule."
+    },
+    {
+      "type": "list",
+      "items": [
+        "2 or more points under your target: go 2 steps heavier.",
+        "1 point under: go 1 step heavier.",
+        "On target: keep the weight.",
+        "1 point over: go 1 step lighter.",
+        "2 or more over, or even one rep out of shape: go 2 steps lighter."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "If one step is more than about 10% of the weight, like with light dumbbells, keep the weight for a week or two first. Don't add extra reps to make a light weight harder."
+    },
+    {
+      "type": "h",
+      "text": "How accurate is your guess?"
+    },
+    {
+      "type": "p",
+      "text": "Not perfect, especially at first. People tend to guess too few reps left. A 2022 review of 12 studies and 414 people found lifters guessed about 1 rep too low on average, with big differences between studies. Guesses were a bit better close to failure, with heavier weights and in later sets (Halperin 2022)."
+    },
+    {
+      "type": "p",
+      "text": "Does experience help? The evidence is mixed. In 141 people, accuracy tended to improve with experience (Steele 2017). The 2022 review found no clear effect of training level. Trained lifters on the bench press were fairly good at calling 1 and 3 reps left, with a small habit of guessing low (Refalo 2024)."
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "If you're new to lifting, your guess can easily be off by a rep or two. Use RPE as a rough guide, keep a log and take the lighter weight when you're not sure."
+    },
+    {
+      "type": "h",
+      "text": "Younger players"
+    },
+    {
+      "type": "p",
+      "text": "Teenagers can lift and use RPE too when it's well coached and supervised (Lloyd 2014, Faigenbaum 2009). I'd just build in more margin."
+    },
+    {
+      "type": "callout",
+      "label": "Under 16",
+      "text": "Keep sets at RPE 7 or below, use at least 6 reps and train with an adult watching. That's a practical caution I use. No study sets those numbers, and I found no study on how well teenagers guess reps left. Not sure if a set is a 6 or a 7? Take the lighter weight."
+    },
+    {
+      "type": "h",
+      "text": "Where RPE fits"
+    },
+    {
+      "type": "p",
+      "text": "RPE is for lifts where you choose the weight. Don't use it for jumps, sprints, braking or reaction drills. Those need full effort and clean reps, and guessing reps left is least accurate when you're far from failure (Helms 2016). If you train with a coach, follow your coach's targets. Pain that isn't normal muscle burn means stop the exercise and get it checked by a doctor or physio."
+    },
+    {
+      "type": "callout",
+      "label": "Key",
+      "text": "Finish every set knowing how many good reps you had left. Use that to pick the next weight. And if you have a coach, follow your coach's targets."
+    },
+    {
+      "type": "p",
+      "text": "Based on Zourdos et al. (2016), Helms et al. (2016), Cooke et al. (2019), Halperin et al. (2022), Steele et al. (2017), Refalo et al. (2024) and Grgic et al. (2021)."
+    }
+  ]
+}
