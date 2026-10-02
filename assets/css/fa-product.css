@@ -152,7 +152,9 @@ section{position:relative;}
 .lt-q:focus,.lt-title:focus{outline:none;}
 .feat .ic svg{width:27px;height:27px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 .lt-foot{display:flex;justify-content:space-between;align-items:center;margin-top:20px;min-height:24px;}
-.lt-link{font-family:var(--fa);background:none;border:none;color:var(--ink-2);font-weight:700;font-size:15px;cursor:pointer;}
+.lt-link{font-family:var(--fa);background:none;border:none;color:var(--ink-2);font-weight:700;font-size:15px;cursor:pointer;
+  /* 44 px to tap (it was 23), with negative margins so the words stay where they were */
+  min-height:44px;padding:10px 14px;margin:-10px -14px;}
 .lt-link:hover{color:var(--clay);}
 .lt-intro{text-align:center;}
 .lt-intro .lt-meta{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:14px 0 24px;}

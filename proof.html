@@ -114,7 +114,7 @@
   }
   .p-field input:focus { outline: none; border-color: #E06B43; background: rgba(250,247,242,.12); }
   .p-field input::placeholder { color: rgba(250,247,242,.45); }
-  .p-hint { font-size: 12.5px; line-height: 1.5; color: rgba(250,247,242,.62); margin-top: 6px; }
+  .p-hint { font-size: 12.5px; line-height: 1.5; color: rgba(250,247,242,.72); margin-top: 6px; }
   .p-submit {
     width: 100%; padding: 17px 20px; margin-top: 8px; cursor: pointer;
     background: #C7552F; color: #FAF7F2; border: 0;
@@ -123,8 +123,19 @@
   }
   .p-submit:hover { background: #E06B43; }
   .p-submit[disabled] { opacity: .55; cursor: default; }
-  .p-small { font-size: 12.5px; line-height: 1.6; color: rgba(250,247,242,.62); margin-top: 18px; }
-  .p-small a { color: rgba(250,247,242,.85); }
+  /* .p-sec p (0,1,1) used to beat .p-small (0,1,0): the consent line rendered at 16.5 px with no gap under the button. */
+  .p-form-sec .p-small { font-size: 12.5px; line-height: 1.6; color: rgba(250,247,242,.72); margin: 18px 0 0; }
+  .p-form-sec .p-small a { color: rgba(250,247,242,.9); }
+  .p-form-sec .p-error { margin: 16px 0 0; padding: 12px 14px; max-width: 520px; font-size: 15px; line-height: 1.5; color: #FAF7F2;
+    border: 2px solid #E06B43; background: rgba(224,107,67,.14); }
+  .p-form-sec .p-error a { color: inherit; font-weight: 700; }
+  .p-done h2:focus { outline: none; }
+  /* The shared .btn-primary is green, the same green as this panel, so the button needs its own fill (as .p-submit has). */
+  .p-done .p-wa { display: inline-block; padding: 16px 24px; background: #C7552F; color: #FAF7F2; text-decoration: none;
+    font-family: var(--font-display); font-weight: 900; font-size: 16px; letter-spacing: .06em; text-transform: uppercase; }
+  .p-done .p-wa:hover { background: #E06B43; }
+  .p-done .p-wa:focus-visible { outline: 3px solid #FAF7F2; outline-offset: 3px; }
+  .p-done .p-echo strong { color: #FAF7F2; word-break: break-all; }
 
   .p-done { display: none; }
   .p-done.on { display: block; }
@@ -270,6 +281,8 @@
           <button type="submit" class="p-submit" id="pSubmit">Send me the link</button>
         </form>
 
+        <p class="p-error" id="pError" role="alert" hidden></p>
+
         <p class="p-small">
           I use your email and number to send your link and, occasionally, to ask how
           you are getting on. Nothing else, and no list you did not ask for — you can
@@ -279,12 +292,14 @@
       </div>
 
       <div class="p-done" id="pDone">
-        <h2>Sent</h2>
+        <h2 id="pDoneTitle" tabindex="-1">Sent</h2>
         <p>
           I will set you up and send the link to WhatsApp, usually the same day.
           If you have not heard in 48 hours, message me — something went wrong and
           I would rather know.
         </p>
+        <p class="p-echo">I have your number as <strong id="pEcho" dir="ltr"></strong>. If that is wrong, message me and I will fix it.</p>
+        <p style="margin-top:24px"><a id="pWa" class="p-wa" href="https://wa.me/447435363461" target="_blank" rel="noopener">Message me on WhatsApp</a></p>
       </div>
     </div>
   </section>
@@ -312,30 +327,56 @@
 
 <script defer src="/assets/js/shared.js?v=20261002b"></script>
 <script>
-  // Progressive enhancement: post in the background so the athlete stays on the
-  // page and sees a confirmation, rather than being thrown to Web3Forms' own
-  // success page. Falls back to a normal form POST if fetch fails.
+  // Post in the background so the visitor stays on the page and sees a confirmation, not Web3Forms' own page.
+  // The old fallback (form.submit() when fetch failed) is gone: it threw the visitor onto a foreign page with the
+  // answers lost. A failure now shows a message here, with the typed answers still in place.
   (function () {
     var form = document.getElementById('proofForm');
     var btn = document.getElementById('pSubmit');
+    var err = document.getElementById('pError');
     if (!form) return;
+    var WA = '447435363461';
+    function wa(text) { return 'https://wa.me/' + WA + '?text=' + encodeURIComponent(text); }
+    // Persian and Arabic digits become 0-9, so a number typed on a Persian keyboard can be messaged.
+    function normDigits(s) {
+      return String(s).replace(/[\u06F0-\u06F9]/g, function (c) { return String(c.charCodeAt(0) - 0x06F0); })
+                      .replace(/[\u0660-\u0669]/g, function (c) { return String(c.charCodeAt(0) - 0x0660); });
+    }
     form.addEventListener('submit', function (ev) {
-      if (!form.reportValidity()) { ev.preventDefault(); return; }
       ev.preventDefault();
+      if (!form.reportValidity()) return;
+      var phone = document.getElementById('pwa');
+      phone.value = normDigits(phone.value).trim();
+      var name = document.getElementById('pname').value.trim();
+      err.hidden = true;
       btn.disabled = true;
       btn.textContent = 'Sending…';
-      fetch(form.action, { method: 'POST', body: new FormData(form) })
-        .then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
-        .then(function () {
-          document.getElementById('p-form-block').style.display = 'none';
-          document.getElementById('pDone').classList.add('on');
-          document.getElementById('join').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        })
-        .catch(function () {
-          btn.disabled = false;
-          btn.textContent = 'Send me the link';
-          form.submit();          // let the browser do it the old way
-        });
+      // A slow network must not freeze the button for ever.
+      var timer;
+      var timeout = new Promise(function (_, reject) { timer = setTimeout(function () { reject(new Error('timeout')); }, 15000); });
+      var send = fetch(form.action, { method: 'POST', body: new FormData(form) })
+        .then(function (r) { return r.ok ? r.json().catch(function () { return { success: true }; }) : Promise.reject(r); })
+        .then(function (d) { if (d && d.success === false) throw new Error('rejected'); });
+      Promise.race([send, timeout]).then(function () {
+        clearTimeout(timer);
+        document.getElementById('pEcho').textContent = phone.value;
+        document.getElementById('pWa').href = wa("Hi Amir, it's " + (name || 'a new player') + '. I just signed up for AA Proof.');
+        document.getElementById('p-form-block').style.display = 'none';
+        document.getElementById('pDone').classList.add('on');
+        // centred, because the sticky header would hide the top of the heading if the section were aligned to the top
+        document.getElementById('pDone').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        var h = document.getElementById('pDoneTitle');   // a screen reader hears the confirmation
+        if (h) h.focus({ preventScroll: true });
+        if (window.plausible) window.plausible('Proof Signup');
+      }).catch(function () {
+        clearTimeout(timer);
+        btn.disabled = false;
+        btn.textContent = 'Send me the link';
+        var fallback = wa('Hi Amir, I tried to sign up for AA Proof on your site and it did not go through.' + (name ? " It's " + name + '.' : ''));
+        err.innerHTML = 'That did not go through, but what you typed is still here. Try again in a moment, or message me on <a href="' + fallback + '" target="_blank" rel="noopener">WhatsApp</a>.';
+        err.hidden = false;
+        err.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
     });
   })();
 </script>

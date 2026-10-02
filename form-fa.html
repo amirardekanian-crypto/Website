@@ -669,7 +669,10 @@
         var nm=[document.getElementById('fn').value,document.getElementById('ln').value].map(function(x){return x.trim();}).filter(Boolean).join(' ');
         var wa=document.getElementById('okWa');
         if(wa)wa.href='https://wa.me/447435363461?text='+encodeURIComponent('سلام امیر، من '+(nm||'یه متقاضیِ جدید')+' هستم. همین الان فرمِ درخواست رو فرستادم.');
-        document.getElementById('ok').classList.add('on');document.body.style.overflow='hidden';window.scrollTo({top:0,behavior:'smooth'});
+        var okEl=document.getElementById('ok');
+        // صفحه‌ی پشتِ تأییدیه دیگه فوکوس نمی‌گیره، پس Tab نمی‌تونه بره توی فرمِ زیرش
+        [].forEach.call(document.body.children,function(n){if(n!==okEl&&n.tagName!=='SCRIPT')n.inert=true;});
+        okEl.classList.add('on');document.body.style.overflow='hidden';window.scrollTo({top:0,behavior:'smooth'});
         var okt=document.getElementById('okt');if(okt)okt.focus();
         if(window.plausible)window.plausible('Form Submitted FA');
       }

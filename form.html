@@ -1437,6 +1437,8 @@
           const wa = document.getElementById('successWa');
           if (wa) wa.href = 'https://wa.me/447435363461?text=' + encodeURIComponent(text);
           const overlay = document.getElementById('successOverlay');
+          // the page behind the confirmation stops taking focus, so Tab cannot wander into the form underneath
+          Array.from(document.body.children).forEach(n => { if (n !== overlay && n.tagName !== 'SCRIPT') n.inert = true; });
           overlay.classList.add('is-open');
           document.body.style.overflow = 'hidden';
           window.scrollTo({ top: 0, behavior: 'smooth' });

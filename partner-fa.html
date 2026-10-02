@@ -82,17 +82,17 @@
   .tt-note{margin-top:18px;background:var(--accent-dim);border:1px solid rgba(14,74,54,.18);border-radius:12px;padding:16px 18px;font-size:15px;color:var(--green);line-height:1.75;}
 
   /* form */
-  .f{margin-bottom:20px;}.f:last-child{margin-bottom:0;}
+  .f{margin-bottom:20px;}   /* every field keeps its space, the second of a pair too (it used to lose it on a phone) */
   .f label{display:block;font-weight:600;font-size:15px;margin-bottom:8px;}
   .f label .hint{display:block;margin-top:2px;font-weight:400;color:var(--muted);font-size:13px;}
   .req{color:var(--clay);}
-  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;}
   @media(max-width:560px){.row-2{grid-template-columns:1fr;}}
   input[type=text],input[type=email],input[type=tel],select,textarea{
     width:100%;background:var(--paper);border:1px solid var(--line-2);border-radius:var(--r);padding:13px 14px;
     font-family:var(--fa);font-size:16px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;}
   input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-dim);}
-  select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11.4L2.3 5.7l1.4-1.4L8 8.6l4.3-4.3 1.4 1.4z'/%3E%3C/svg%3E");
+  select{-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11.4L2.3 5.7l1.4-1.4L8 8.6l4.3-4.3 1.4 1.4z'/%3E%3C/svg%3E");
     background-repeat:no-repeat;background-position:left 14px center;padding-left:36px;}
   textarea{resize:vertical;min-height:78px;}
   ::placeholder{color:var(--muted);}
@@ -105,10 +105,20 @@
 
   /* submit */
   .submit{text-align:center;padding:22px 0 0;}
-  .sbtn{display:inline-flex;align-items:center;gap:10px;background:var(--clay);color:#fff;font-weight:800;font-size:18px;padding:17px 44px;border:none;border-radius:100px;cursor:pointer;box-shadow:0 10px 28px rgba(199,85,47,.28);transition:transform .15s;}
+  .sbtn{font-family:var(--fa);display:inline-flex;align-items:center;gap:10px;background:var(--clay);color:#fff;font-weight:800;font-size:18px;padding:17px 44px;border:none;border-radius:100px;cursor:pointer;box-shadow:0 10px 28px rgba(199,85,47,.28);transition:transform .15s;}
   .sbtn:hover{transform:translateY(-2px);}
   .sbtn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
   .snote{color:var(--muted);font-size:13px;margin-top:14px;line-height:1.6;}
+  .sbtn:focus-visible,a:focus-visible{outline:3px solid var(--green);outline-offset:3px;}
+  .agree:focus-within{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-dim);}
+  .skip{position:absolute;top:-80px;right:12px;z-index:300;background:var(--green);color:#fff;padding:10px 16px;border-radius:8px;font-weight:700;text-decoration:none;}
+  .skip:focus{top:8px;}
+  /* validation error state */
+  .f.has-error>label{color:var(--bad);}
+  .f.has-error input[type=text],.f.has-error input[type=email],.f.has-error input[type=tel],.f.has-error select,.f.has-error textarea,.f.has-error .agree{border-color:var(--bad);box-shadow:0 0 0 3px rgba(192,57,43,.10);}
+  .ferr{margin-top:9px;color:var(--bad);font-size:13px;font-weight:600;}
+  .serr{margin:18px auto 0;max-width:520px;padding:12px 16px;border-radius:12px;background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.3);color:#8f2a1f;font-size:15px;line-height:1.8;text-align:center;}
+  .serr a{color:inherit;font-weight:800;}
 
   /* success overlay */
   .ok{display:none;position:fixed;inset:0;background:rgba(250,247,242,.97);backdrop-filter:blur(12px);z-index:1000;align-items:center;justify-content:center;padding:24px;}
@@ -118,6 +128,10 @@
   .ok-card h2{font-weight:900;font-size:38px;margin-bottom:14px;}
   .ok-card p{color:var(--ink-2);font-size:16px;line-height:1.8;}
   .ok-card p+p{color:var(--muted);font-size:14px;margin-top:12px;}
+  .ok-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:24px 0 6px;}
+  .ok-btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:100px;font-family:var(--fa);font-weight:800;font-size:16px;text-decoration:none;}
+  .ok-btn.p{background:var(--clay);color:#fff;}.ok-btn.s{color:var(--green);border:1.5px solid var(--green);}
+  .ok-card h2:focus{outline:none;}
 
   .foot{background:#0a3527;color:rgba(255,255,255,.7);padding:30px 0;text-align:center;font-size:15px;}
   .foot a{color:rgba(255,255,255,.85);}
@@ -125,9 +139,10 @@
 </head>
 <body>
 
+<a class="skip" href="#main">رفتن به محتوا</a>
 <nav class="nav">
   <div class="nav-in">
-    <a class="brand" href="/index-fa.html"><span class="mk"><img src="/assets/img/icon-192.png" alt="AA"></span>امیر اردکانی</a>
+    <a class="brand" href="/index-fa.html"><span class="mk"><img src="/assets/img/icon-192.png" alt="" width="38" height="38"></span>امیر اردکانی</a>
     <a class="back" href="/index-fa.html">→ خانه</a>
   </div>
 </nav>
@@ -138,7 +153,7 @@
   <p>شاگردهات رو به یه سیستمِ تمرینِ حرفه‌ای وصل کن — و بابتِ هر کسی که معرفی می‌کنی، سهمِ همیشگی بگیر. این‌جا دقیق می‌گم چطوری کار می‌کنه و چی به تو می‌رسه.</p>
 </header>
 
-<div class="wrap">
+<main id="main" class="wrap">
 
   <!-- 00 · HOW IT WORKS -->
   <section class="fsec">
@@ -271,19 +286,24 @@
 
       <div class="submit">
         <button type="submit" id="sbtn" class="sbtn">ارسالِ درخواست ←</button>
+        <p id="serr" class="serr" role="alert" hidden></p>
         <p class="snote">درخواستت مستقیم برای من ارسال می‌شه.<br>سؤالی داشتی؟ راحت دایرکت بده <a href="https://instagram.com/amirardekanian" dir="ltr">@amirardekanian</a>.</p>
       </div>
     </form>
   </section>
 
-</div>
+</main>
 
-<div id="ok" class="ok" role="dialog" aria-modal="true">
+<div id="ok" class="ok" role="dialog" aria-modal="true" aria-labelledby="okt">
   <div class="ok-card">
     <div class="ok-check">✓</div>
-    <h2>درخواستت رسید!</h2>
+    <h2 id="okt" tabindex="-1">درخواستت رسید!</h2>
     <p>مرسی که خواستی هم‌تیمی شیم. بررسی‌ش می‌کنم و ظرفِ ۴۸ ساعت بهت پیام می‌دم تا کدِ اختصاصیت رو بسازیم و شروع کنیم.</p>
     <p>تا اون موقع، هر سؤالی داشتی راحت دایرکت بده.</p>
+    <div class="ok-actions">
+      <a id="okWa" class="ok-btn p" href="https://wa.me/447435363461" target="_blank" rel="noopener">پیام توی واتساپ</a>
+      <a class="ok-btn s" href="/index-fa.html">برگرد به خانه</a>
+    </div>
   </div>
 </div>
 
@@ -302,18 +322,70 @@
     subj.value=n?'درخواستِ همکاری (Affiliate) — '+n:'درخواستِ همکاری (Affiliate)';
   });
 
-  // submit
+  // Persian and Arabic digits become 0-9, and an Iranian mobile number written 09… / 9… / 0098… / +98… becomes +989…
+  // (the same rule as form-fa.html), so the number can be copied straight into WhatsApp.
+  function normDigits(s){return String(s).replace(/[\u06F0-\u06F9]/g,function(c){return String(c.charCodeAt(0)-0x06F0);}).replace(/[\u0660-\u0669]/g,function(c){return String(c.charCodeAt(0)-0x0660);});}
+  function normWa(){
+    var el=document.getElementById('wa');
+    var v=normDigits(el.value).trim(),d=v.replace(/[\s\-().]/g,'');
+    if(/^(\+?98|0098|0)?9\d{9}$/.test(d)){d=d.replace(/^(\+?98|0098|0)/,'');v='+98'+d;}
+    el.value=v;
+  }
+  document.getElementById('wa').addEventListener('blur',normWa);
+
+  // field errors: in Farsi, next to the field, and the form is no longer sent half empty
   var form=document.getElementById('frm');
+  function fieldOf(el){return el.closest('.f');}
+  function clearErr(el){var f=fieldOf(el);if(!f)return;f.classList.remove('has-error');el.removeAttribute('aria-invalid');var m=f.querySelector('.ferr');if(m)m.remove();}
+  function showErr(el,txt){
+    var f=fieldOf(el);if(!f)return;f.classList.add('has-error');el.setAttribute('aria-invalid','true');
+    var m=f.querySelector('.ferr');
+    if(!m){m=document.createElement('p');m.className='ferr';m.setAttribute('role','alert');f.appendChild(m);}
+    m.textContent=txt;
+  }
+  function problem(el){
+    var v=el.type==='checkbox'?(el.checked?'x':''):String(el.value||'').trim();
+    if(!v&&el.hasAttribute('required'))return el.type==='checkbox'?'برای ادامه باید شرایط رو تأیید کنی.':el.tagName==='SELECT'?'یه روش انتخاب کن.':'این بخش لازمه.';
+    if(v&&el.type==='email'&&!el.checkValidity())return 'ایمیلِ معتبر وارد کن.';
+    return '';
+  }
+  form.addEventListener('input',function(e){clearErr(e.target);});
+  form.addEventListener('change',function(e){clearErr(e.target);});
+
+  // a slow network must not freeze the button for ever
+  function within(ms,p){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},ms);})]);}
+
+  // submit
   form.addEventListener('submit',async function(e){
     e.preventDefault();
     if(form.querySelector('[name="botcheck"]').checked)return;
-    if(!document.getElementById('agree').checked){alert('لطفاً شرایطِ همکاری رو تأیید کن.');return;}
-    var b=document.getElementById('sbtn'),o=b.innerHTML;b.disabled=true;b.innerHTML='در حالِ ارسال…';
+    normWa();
+    var els=form.querySelectorAll('input:not([type=hidden]):not([name="botcheck"]),select,textarea'),first=null;
+    for(var i=0;i<els.length;i++){var m=problem(els[i]);if(m){showErr(els[i],m);if(!first)first=els[i];}}
+    if(first){first.scrollIntoView({behavior:'smooth',block:'center'});try{first.focus({preventScroll:true});}catch(err){}return;}
+
+    var b=document.getElementById('sbtn'),o=b.innerHTML,serr=document.getElementById('serr');
+    serr.hidden=true;b.disabled=true;b.innerHTML='در حالِ ارسال…';
     try{
-      var r=await fetch(this.action,{method:'POST',body:new FormData(this)});
-      if(r.ok){document.getElementById('ok').classList.add('on');document.body.style.overflow='hidden';window.scrollTo({top:0,behavior:'smooth'});}
-      else throw new Error('fail');
-    }catch(err){b.disabled=false;b.innerHTML=o;alert('یه مشکلی پیش اومد — دوباره امتحان کن یا به amirardekanian@gmail.com ایمیل بزن.');}
+      var r=await within(15000,fetch(this.action,{method:'POST',body:new FormData(this)}));
+      if(!r.ok)throw new Error('fail');
+      var d=null;try{d=await r.json();}catch(x){}
+      if(d&&d.success===false)throw new Error('rejected');
+      // the next step is WhatsApp, with a message that already names the coach
+      var nm=document.getElementById('fn').value.trim();
+      var wa=document.getElementById('okWa');
+      if(wa)wa.href='https://wa.me/447435363461?text='+encodeURIComponent('سلام امیر، من '+(nm||'یه مربی')+' هستم. همین الان فرمِ همکاریِ مربی‌ها رو فرستادم.');
+      var ok=document.getElementById('ok');
+      // the page behind the confirmation stops taking focus, so Tab cannot wander into the form underneath
+      [].forEach.call(document.body.children,function(n){if(n!==ok&&n.tagName!=='SCRIPT')n.inert=true;});
+      ok.classList.add('on');document.body.style.overflow='hidden';window.scrollTo({top:0,behavior:'smooth'});
+      var okt=document.getElementById('okt');if(okt)okt.focus();
+      if(window.plausible)window.plausible('Partner Application');
+    }catch(err){
+      b.disabled=false;b.innerHTML=o;
+      serr.innerHTML='ارسال نشد، ولی جواب‌هات همین‌جاست. چند لحظه بعد دوباره امتحان کن، یا توی <a href="https://wa.me/447435363461" rel="noopener">واتساپ</a> یا <a href="https://instagram.com/amirardekanian" rel="noopener">اینستاگرام</a> بهم پیام بده.';
+      serr.hidden=false;serr.scrollIntoView({behavior:'smooth',block:'center'});
+    }
   });
 })();
 </script>

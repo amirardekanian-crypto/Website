@@ -57,6 +57,7 @@
   var A = {};        // answers, this page view only
   var path = [];     // question ids in the order answered, for Back
   var started = false;
+  var lastAct = 0;   // when the last tap on a button was taken
   var root = document.getElementById('lt');
 
   function esc(s) {
@@ -128,6 +129,11 @@
   root.addEventListener('click', function (e) {
     var b = e.target.closest('button');
     if (!b) return;
+    // A double-tap used to answer the NEXT question unseen: the second tap landed on the new screen. Taps in the
+    // 400 ms after one are ignored (the same for Start and Back, which would skip two steps).
+    var now = Date.now();
+    if (now - lastAct < 400) return;
+    lastAct = now;
     if (b.hasAttribute('data-start')) { started = true; step(); return; }
     if (b.hasAttribute('data-back')) { delete A[path.pop()]; step(); return; }
     if (b.hasAttribute('data-again')) { A = {}; path = []; step(); return; }
