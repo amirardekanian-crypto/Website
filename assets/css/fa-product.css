@@ -261,3 +261,6 @@ section{position:relative;}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
   html{scroll-behavior:auto;}
 }
+/* keyboard users: jump past the menu (2026-10-02) */
+.skip{position:absolute;top:-80px;right:12px;z-index:300;background:var(--green);color:#fff;padding:10px 16px;border-radius:8px;font-weight:700;text-decoration:none;}
+.skip:focus{top:8px;}
