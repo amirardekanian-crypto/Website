@@ -93,6 +93,7 @@ Three layers, in the order a designer should read them:
   [`partials/footer.html`](partials/footer.html) — injected by
   [`assets/js/shared.js`](assets/js/shared.js) (nav, footer, video pop-ups, install prompt, scroll reveal).
   The Farsi homepage and product pages keep their own nav; [`assets/js/fa-nav.js`](assets/js/fa-nav.js) opens and closes their phone menu (☰).
+  [`assets/js/track.js`](assets/js/track.js) counts Apply, WhatsApp and demo clicks and the apply form's steps in Plausible (funnel pages only).
 - **Master marks:** [`icon-192.png`](assets/img/icon-192.png) (app tile; masters in
   [`assets/img/source/`](assets/img/source/)) ·
   [`og-image.jpg`](assets/img/og-image.jpg) (wordmark lockup / share image) ·

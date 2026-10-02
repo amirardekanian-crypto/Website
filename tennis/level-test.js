@@ -134,7 +134,11 @@
     var now = Date.now();
     if (now - lastAct < 400) return;
     lastAct = now;
-    if (b.hasAttribute('data-start')) { started = true; step(); return; }
+    if (b.hasAttribute('data-start')) {
+      started = true; step();
+      try { window.plausible('Level test start'); } catch (e) { /* stats are optional */ }
+      return;
+    }
     if (b.hasAttribute('data-back')) { delete A[path.pop()]; step(); return; }
     if (b.hasAttribute('data-again')) { A = {}; path = []; step(); return; }
     var id = b.getAttribute('data-q');

@@ -356,6 +356,12 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **Depends on:** The look lives in each page: `index-fa.html`'s own CSS and `assets/css/fa-product.css`.
 - **Edit this when:** You change how the phone menu opens or closes. Bump its `?v=` on all three pages, because `sw.js` serves `/assets/` cache-first.
 
+#### `assets/js/track.js` — The click and form-step counter
+- **What it does:** Sends Plausible events that say which button, page or form section leads to an application (2026-10-02, website audit package 9): **Apply Click** (plan, where on the page, which page), **WhatsApp Click**, **Demo Click** (programme, AA Proof or course), **Hub Click** (links.html only), **Form Started** and **Form Step** (the first answer in each of the apply form's sections: where people stop). Nothing personal goes out. The goal names and their props are listed at the top of the file; each shows in Plausible only after Amir adds it under Site settings > Goals.
+- **Loaded by:** `index.html`, `index-fa.html`, `form.html`, `form-fa.html`, `proof.html`, `links.html`, `partner-fa.html`, `tennis/index.html`, `tennis-testing/index.html`. Not on the generated article pages (their generator is `scripts/build_article_pages.py`).
+- **If deleted:** Nothing breaks. The counts stop. The events sent by the pages themselves (Form Submitted, Proof Signup, Partner Application, Level test N, 404) keep working.
+- **Edit this when:** A new button should be counted or a page's markup changes. `whereOf()` names a click by the nearest `.site-nav`, `.mobile-sticky-cta`, `.pricing-card`, `.hero`, `.cta-section` or `footer`. Bump its `?v=` on all nine pages, because `sw.js` serves `/assets/` cache-first.
+
 ---
 
 ### Reusable HTML Pieces (Partials)
