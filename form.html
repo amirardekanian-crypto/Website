@@ -196,8 +196,10 @@
   }
 
   /* ── FIELD GROUPS ── */
+  html { scroll-padding-top: 130px; }  /* the site nav and the progress bar are fixed: keep a focused field clear of them */
   .f-field { margin-bottom: 22px; }
   .f-field:last-child { margin-bottom: 0; }
+  @media (max-width: 560px) { .row-2 > .f-field:last-child, .row-3 > .f-field:last-child { margin-bottom: 22px; } }  /* one column: keep the gap above the next label */
 
   .f-field label {
     display: block;
@@ -233,7 +235,7 @@
     border-radius: var(--radius-md);
     padding: 12px 14px;
     font-family: var(--font-body);
-    font-size: 14px;
+    font-size: 16px;  /* under 16 px iPhone Safari and Instagram's browser zoom the page when a field is tapped */
     color: var(--text-primary);
     transition: border-color var(--dur), box-shadow var(--dur), background var(--dur);
     outline: none;

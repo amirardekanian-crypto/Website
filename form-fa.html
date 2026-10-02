@@ -64,16 +64,21 @@
   .f label .hint{display:block;margin-top:2px;font-weight:400;color:var(--muted);font-size:13px;}
   .row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
-  @media(max-width:560px){.row-2,.row-3{grid-template-columns:1fr;}}
+  @media(max-width:560px){.row-2,.row-3{grid-template-columns:1fr;}.row-2 .f:last-child,.row-3 .f:last-child{margin-bottom:20px;}}
 
   input[type=text],input[type=email],input[type=number],input[type=tel],select,textarea{
     width:100%;background:var(--paper);border:1px solid var(--line-2);border-radius:var(--r);padding:13px 14px;
-    font-family:var(--fa);font-size:15px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;}
+    font-family:var(--fa);font-size:16px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;}
   input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-dim);}
-  select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11.4L2.3 5.7l1.4-1.4L8 8.6l4.3-4.3 1.4 1.4z'/%3E%3C/svg%3E");
+  select{-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M8 11.4L2.3 5.7l1.4-1.4L8 8.6l4.3-4.3 1.4 1.4z'/%3E%3C/svg%3E");
     background-repeat:no-repeat;background-position:left 14px center;padding-left:36px;}
   textarea{resize:vertical;min-height:74px;}
   ::placeholder{color:var(--muted);}
+  html{scroll-padding-top:128px;}  /* the top bar and the progress bar are sticky */
+  .pill input:focus-visible+span,.rcard input:focus-visible+label{outline:3px solid var(--green);outline-offset:2px;}
+  .sbtn:focus-visible,a:focus-visible{outline:3px solid var(--green);outline-offset:3px;}
+  .skip{position:absolute;top:-80px;right:12px;z-index:300;background:var(--green);color:#fff;padding:10px 16px;border-radius:8px;font-weight:700;text-decoration:none;}
+  .skip:focus{top:8px;}
 
   /* pills */
   .pills{display:flex;flex-wrap:wrap;gap:8px;}
@@ -124,7 +129,7 @@
 
   /* submit */
   .submit{text-align:center;padding:22px 0 0;}
-  .sbtn{display:inline-flex;align-items:center;gap:10px;background:var(--clay);color:#fff;font-weight:800;font-size:18px;padding:17px 44px;border:none;border-radius:100px;cursor:pointer;box-shadow:0 10px 28px rgba(199,85,47,.28);transition:transform .15s;}
+  .sbtn{font-family:var(--fa);display:inline-flex;align-items:center;gap:10px;background:var(--clay);color:#fff;font-weight:800;font-size:18px;padding:17px 44px;border:none;border-radius:100px;cursor:pointer;box-shadow:0 10px 28px rgba(199,85,47,.28);transition:transform .15s;}
   .sbtn:hover{transform:translateY(-2px);}
   .sbtn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
   .snote{color:var(--muted);font-size:13px;margin-top:14px;line-height:1.6;}
@@ -176,6 +181,7 @@
 </style>
 </head>
 <body>
+<a class="skip" href="#main">رفتن به فرم</a>
 
 <nav class="nav">
   <div class="nav-in">
@@ -194,11 +200,11 @@
   <div class="progress-in">
     <div class="plabel"><strong id="pPct">۰٪</strong> تکمیل</div>
     <div class="ptrack"><div class="pfill" id="pFill"></div></div>
-    <div class="plabel" id="pCount">۰ / ۰</div>
+    <div class="plabel" id="pCount" dir="ltr">۰ / ۰</div>
   </div>
 </div>
 
-<div class="wrap">
+<main id="main" class="wrap">
 <form id="frm" action="https://api.web3forms.com/submit" method="POST" novalidate>
   <input type="hidden" name="access_key" value="efc57e0c-997d-4d71-b07a-71c8268ec668">
   <input type="hidden" name="from_name" value="درخواستِ فارسی">
@@ -230,10 +236,10 @@
       <div class="f"><label for="ln">نام‌خانوادگی</label><input type="text" id="ln" name="Last Name" required placeholder="مثلاً محمدی"></div>
     </div>
     <div class="f"><label for="contact">راهِ ارتباط <span class="hint">آیدیِ اینستاگرام یا شماره‌ی واتساپ</span></label>
-      <input type="text" id="contact" name="Contact (Instagram/WhatsApp)" required placeholder="@yourhandle یا ۰۹۱۲..."></div>
-    <div class="f"><label for="em">ایمیل <span class="hint">اختیاری</span></label><input type="email" id="em" name="Email" placeholder="you@email.com"></div>
+      <input type="text" id="contact" name="Contact (Instagram/WhatsApp)" required dir="ltr" autocomplete="tel" autocapitalize="none" spellcheck="false" placeholder="@sara_tennis  /  09121234567"></div>
+    <div class="f"><label for="em">ایمیل <span class="hint">اختیاری</span></label><input type="email" id="em" name="Email" dir="ltr" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="you@email.com"></div>
     <div class="row-3">
-      <div class="f"><label for="age">سن</label><input type="number" id="age" name="Age" min="10" max="80" required placeholder="مثلاً ۲۸"></div>
+      <div class="f"><label for="age">سن</label><input type="text" id="age" name="Age" inputmode="numeric" pattern="(1[0-9]|[2-7][0-9]|80)" maxlength="2" autocomplete="off" required placeholder="مثلاً ۲۸"></div>
       <div class="f"><label for="sex">جنسیت</label><select id="sex" name="Biological Sex" required>
         <option value="" disabled selected>انتخاب کن</option><option value="Male">مرد</option><option value="Female">زن</option></select></div>
       <div class="f"><label for="wt">وزن <span class="hint">کیلوگرم</span></label><input type="text" id="wt" name="Body Weight" placeholder="مثلاً ۷۸ کیلو"></div>
@@ -430,12 +436,12 @@
     <p class="snote">جواب‌هات مستقیم برای من ارسال می‌شه.<br>با ارسال، با <a href="privacy.html">حریمِ خصوصی</a> و <a href="terms-fa.html">قوانین</a> موافقت می‌کنی.</p>
   </div>
 </form>
-</div>
+</main>
 
-<div id="ok" class="ok" role="dialog" aria-modal="true">
+<div id="ok" class="ok" role="dialog" aria-modal="true" aria-labelledby="okt">
   <div class="ok-card">
     <div class="ok-check">✓</div>
-    <h2>ثبت شد!</h2>
+    <h2 id="okt">ثبت شد!</h2>
     <p>درخواستت رسید. بررسی‌ش می‌کنم و ظرفِ ۴۸ ساعت بهت پیام می‌دم تا ببینیم برای همکاری جوریم یا نه.</p>
     <p>تا اون موقع، هر سؤالی داشتی راحت دایرکت بده.</p>
   </div>
@@ -608,10 +614,23 @@
     return true;
   }
 
+  // Persian and Arabic digits become 0-9 (a phone number typed on a Persian keyboard, the age), and an Iranian mobile
+  // number written 09… / 9… / 0098… / +98… becomes +989…, so the dashboard's WhatsApp link works. Instagram ids are left alone.
+  function normDigits(s){return String(s).replace(/[\u06F0-\u06F9]/g,function(c){return String(c.charCodeAt(0)-0x06F0);}).replace(/[\u0660-\u0669]/g,function(c){return String(c.charCodeAt(0)-0x0660);});}
+  function normContact(){
+    var el=document.getElementById('contact');if(!el)return;
+    var v=normDigits(el.value).trim(),d=v.replace(/[\s\-().]/g,'');
+    if(/^(\+?98|0098|0)?9\d{9}$/.test(d)){d=d.replace(/^(\+?98|0098|0)/,'');v='+98'+d;}
+    el.value=v;
+  }
+  document.getElementById('contact').addEventListener('blur',normContact);
+  document.getElementById('age').addEventListener('input',function(){this.value=normDigits(this.value);});
+
   // submit
   form.addEventListener('submit',async function(e){
     e.preventDefault();
     if(form.querySelector('[name="botcheck"]').checked)return;
+    normContact();
 
     var miss=firstMissing();
     if(miss){
