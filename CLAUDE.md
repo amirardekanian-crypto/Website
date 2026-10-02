@@ -320,6 +320,11 @@ search in Iran). The routine (Search Console, the monthly checklist, how titles 
 - ⚠️ **A `.fa.json` must never carry `id` or `category`.** coach.html's *+ Publish article* upserts
   any file that has both, by slug — a Farsi file with them would overwrite the English article in
   the app for every athlete. The build refuses such a file.
+- **Every article passes the SEO gate** (Amir, 2026-10-02: *"whenever you write a blog on the website, consider
+  the SOP, so every time someone searches something my website shows better on Google"*): `/article` Step 0.5 =
+  `.claude/SEO-SOP.md` → *The SEO gate*. One Farsi search phrase per article, chosen first and checked against the
+  **phrase log** (SOP §10, add a row with every article), the phrase in title/seoTitle/description/first paragraph/a
+  heading, nothing named in the title that the body does not cover, and the Instagram caption written to SOP §5.
 - **The `/article` skill does the whole chain** (Steps 6–9): Farsi draft → **Amir's OK** →
   `--stamp` → build → commit → coach.html publish. Nothing Farsi ships unread.
 - **The sitemap lists a root page only when it has a canonical link and no `noindex`.** A new

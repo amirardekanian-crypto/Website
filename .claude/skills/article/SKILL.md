@@ -26,6 +26,25 @@ where the pages are stale or the Farsi is missing, so skipping a step fails loud
 3. **`Content/DESIGN_SYSTEM.md` §10** — the Farsi word choices (for Step 6).
 4. **`.claude/SEO-SOP.md`** — how titles and descriptions are chosen so the page can be found.
 
+## Step 0.5 — The SEO gate (every run, before writing; Amir, 2026-10-02)
+
+Amir: *"whenever you write a blog on the website, consider the SOP, so every time someone searches
+something my website shows better on Google."* The full gate is **`.claude/SEO-SOP.md` → *The SEO gate***
+and the phrase log is its **section 10**. In short, settle these before Step 3:
+
+1. **The one Farsi search phrase** this article targets. Ask Amir for his Google search-box
+   screenshots (SOP section 6) or propose a phrase and say it is a guess. Read the phrase log: if
+   another article already targets it, change the angle or extend that article.
+2. The phrase goes in the Farsi `title`, the `seoTitle` (first), the `description`, the first paragraph
+   and at least one heading. The page answers the search on its first screen.
+3. **Never name a sport or group in the title/description that the body does not cover** (the padel gap).
+4. Real numbers, with the sources named at the end of the article.
+5. The companion Instagram caption follows SOP section 5 step 3 (phrase first, 3–5 hashtags, last line points to the bio link).
+
+At Step 9, the handoff must say: the target phrase, whether it was researched or a guess, any
+near-duplicate in the log, the exact Farsi URL for Search Console → *Request indexing*, and that the
+phrase has been added to the log. Add the row to the log in the same commit as the article.
+
 ## Step 1 — Understand what you've been given
 
 Amir will either:
@@ -219,7 +238,8 @@ The app reads the Library from the database, not from the file. Amir (or you, wi
 Then tell Amir:
 - The app link: `program.html?article=<slug>` (shareable, works without login)
 - The web pages: `https://www.amirardekani.com/fa/articles/<slug>.html` and `/en/articles/<slug>.html`
-- To speed up Google: Search Console → URL inspection → paste the Farsi URL → *Request indexing*
+- The SEO handoff (Step 0.5): target phrase and whether it is researched or a guess, any near-duplicate in the phrase log, and the row you added to `.claude/SEO-SOP.md` section 10
+- To speed up Google: Search Console → URL inspection → paste the Farsi URL → *Request indexing* (Claude cannot do this one)
 - Which category it appears in, and the read time
 
 ## Block sequencing rules

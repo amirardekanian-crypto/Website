@@ -84,6 +84,34 @@ The `/article` skill runs this; it is written here so you know what happens and 
 - **`description`** (the grey text under the link): 120–160 characters, saying what the reader gets.
 - **One topic per article.** Two articles aimed at the same phrase compete with each other.
 
+### The SEO gate — runs on EVERY article, before it is written (Amir, 2026-10-02)
+Amir: *"whenever you write a blog on the website, consider the SOP, so every time someone searches
+something my website shows better on Google."* The `/article` skill runs this gate as **Step 0.5**;
+an article does not ship with a box unticked, or with the reason it was skipped said out loud.
+
+1. **One search phrase, chosen first.** The Farsi phrase a player would type. Best source: Amir's
+   Google search-box screenshots (section 6: suggestions, People also ask, Related searches). Claude
+   cannot do that step, so if Amir has not given a phrase, **ask for the screenshots or propose a phrase
+   and say it is a guess**. Check the **phrase log** (section 10): if another article already targets it,
+   write a different angle or extend that article instead of making a second one.
+2. **The phrase sits in** the Farsi `title`, the `seoTitle` (first, ≤ ~65 characters with ` | امیر اردکانیان`),
+   the `description` (120–160 characters: phrase + what the reader gets), the first paragraph, and at
+   least one `h` heading. Answer first, then explain: the page should answer the search in its first screen.
+3. **The page must match its promise.** Do not name a sport, group or topic in the title or description
+   that the body does not really cover (the padel gap, section 9: «پدل» in a title with a tennis-only body
+   is a weak match). Either cover it honestly in the body or leave it out of the title.
+4. **Evidence and names.** Real numbers with the source named at the end (the reader and Google both trust
+   a page that shows where it comes from). No invented claims.
+5. **Internal links.** The generator links the article index and "more articles". When a new article is
+   the natural next read of an older one, say so in the handoff so Amir can decide on a pointer.
+6. **The slug never changes** once published; canonical and `noindex` rules (section 8) stay as the
+   generator writes them.
+7. **The Instagram caption for the same topic follows section 5, step 3**: first line = the same phrase
+   + what they get, 3–5 lines of real explanation, last line points to the bio link
+   (`amirardekani.com/fa/articles/`), **3–5 hashtags, not 30**. One reel or carousel = one phrase = one article.
+8. **After it ships** (Claude cannot do this, so the handoff names the exact URL): Search Console →
+   URL inspection → paste the Farsi URL → *Request indexing*. Then **log the phrase** (section 10).
+
 ## 5. Instagram reels that show up on Google
 
 ### Step 1 — Account (one time)
@@ -190,3 +218,17 @@ After 3–4 weeks, **Search Console → Performance → Queries** replaces guess
   the search box method in section 6.
 - **Google Business Profile** is not available for Iran and is built for physical locations, so it
   does not apply to online coaching.
+
+## 10. Phrase log — one phrase, one article (Amir, 2026-10-02)
+
+Add a row when an article ships. Before writing, search this table for the phrase. **Phrases marked
+"guess" were chosen without Amir's search-box research** (section 6); replace them with real
+suggestions when he sends screenshots, or after 3–4 weeks of Search Console data (section 7).
+
+| Slug | Target phrase (Farsi) | Basis | Shipped |
+|---|---|---|---|
+| `tennis-warm-up` | گرم‌کردنِ قبل از تنیس | guess | 2026-09 |
+| `pre-session-warm-up` | گرم‌کردنِ قبل از جلسه‌ی تنیس | guess. ⚠️ **close to `tennis-warm-up`: the two can compete.** Differentiate (this one is for coaches) or merge | 2026-09 |
+| `training-with-injury` | تمرین با آسیب‌دیدگی | guess | 2026-09 |
+| `training-on-your-period` | تمرین در دورانِ قاعدگی | guess | 2026-09 |
+| `match-day-nutrition` | تغذیه‌ی روز مسابقه تنیس | guess. Body is tennis research; «پدل» is in the seoTitle only (see gate item 3) | 2026-10-02 |

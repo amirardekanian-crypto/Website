@@ -140,7 +140,7 @@ Serve via the project's static server (`.claude/launch.json` → python http.ser
 ## Step 7 — Deliver
 
 1. The file path, with a one-line-per-slide summary (template + headline) so Amir can review fast.
-2. **The Instagram caption** (in the deck's language: Farsi by default): hook line ≈ the cover headline, 2–4 short value lines, a question to drive comments, CTA line + «@amirardekanian», then 5–10 hashtags. Also embed it at the top of the HTML as `<!-- IG CAPTION … -->` so it travels with the file.
+2. **The Instagram caption** (in the deck's language: Farsi by default): **follows `.claude/SEO-SOP.md` §5 step 3** (Google reads the caption, Amir 2026-10-02): the FIRST line is the exact Farsi phrase people search + what they get (when the post has a matching article, the article's phrase from the SOP §10 phrase log), then 3–5 lines of real explanation, a question to drive comments, a last line that points to the site (links in captions are not clickable: «لینک توی بیو», the bio holds `amirardekani.com/fa/articles/`) + «@amirardekanian», then **3–5 hashtags, not 30**. Also embed it at the top of the HTML as `<!-- IG CAPTION … -->` so it travels with the file.
 3. Remind him: open the file → each slide has a «⬇ PNG» button (images are base64, so direct file-open works).
 
 ## Don'ts
