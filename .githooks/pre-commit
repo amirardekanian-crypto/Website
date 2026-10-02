@@ -1,5 +1,5 @@
 #!/bin/sh
-# Twelve guards. Each runs only when its own files are staged, so a commit that
+# Thirteen guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -244,6 +244,20 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|s
   if ! "$PY" scripts/check_type_scale.py; then
     echo ""
     echo "pre-commit: BLOCKED — a font size is off the type scale (details above). Use a --fs- token."
+    failed=1
+  fi
+fi
+
+# ── 13. the website's style (added 2026-10-02) ───────────────────────────────
+# Why: the website audit (Content/SITE-AUDIT.md) fixed yellow, text under 12 px, pale greys, letter-spaced
+# Farsi, Google font links and white text on the paler clay, and nothing stopped them coming back. This
+# fails a change that ADDS one to a public page or its shared CSS (it keeps a baseline of what already
+# existed: scripts/site_style_baseline.json). Amir, 2026-10-02: "stop the commit".
+if git diff --cached --name-only --diff-filter=ACM      | grep -qE '^((index|index-fa|links|proof|form|form-fa|partner-fa|terms|terms-fa|privacy|404|uts-padel|etminan|etminan-en|etminan-dv)\.html|(tennis|tennis-testing)/index\.html|partials/(nav|footer)\.html|assets/css/(tokens|base|components|fa-product|fonts)\.css|assets/js/(shared|fa-nav|track)\.js|scripts/(check_site_style\.py|site_style_baseline\.json))$'; then
+  echo "pre-commit: a public page or its shared CSS changed — checking the website style..."
+  if ! "$PY" scripts/check_site_style.py; then
+    echo ""
+    echo "pre-commit: BLOCKED — the change brings back something the website audit fixed (details above)."
     failed=1
   fi
 fi
