@@ -20,7 +20,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 
 ## Where it stands
 
-**25 packages · 82 findings** (30 cost you now, 39 worth fixing, 13 polish). Done: 11 · Waiting for you: 5 · Decided: next to build: 5 · Another session: 1 · Queued: 3
+**25 packages · 82 findings** (30 cost you now, 39 worth fixing, 13 polish). Done: 12 · Waiting for you: 5 · Decided: next to build: 4 · Another session: 1 · Queued: 3
 
 | # | Package | Phase | Status | Effort |
 |---|---|---|---|---|
@@ -33,10 +33,10 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 7 | Forms that finish properly | Fix now | Done (5 of 7 items) | medium |
 | 8 | A real 404 page | Fix now | Done (1 of 1 items) | small |
 | 9 | Count what matters | Fix now | Done (1 of 1 items) | small to medium |
-| 10 | Promises that match reality | Fix now | Waiting for you | small |
+| 10 | Promises that match reality | Fix now | Waiting for you (2 of 4 items) | small |
 | 11 | No-yellow cleanup | Fix now | Done (1 of 2 items) | small |
 | 12 | English home: shorter and clearer | Your call | Decided: next to build | large |
-| 13 | The apply form: promise vs length | Your call | Decided: next to build | medium to large |
+| 13 | The apply form: promise vs length | Your call | Done (1 of 2 items) | medium to large |
 | 14 | Farsi home: price, trust and length | Your call | Decided: next to build | medium |
 | 15 | Farsi product pages: trust at the buy button | Your call | Waiting for you | medium |
 | 16 | Proof page and the Instagram link hub | Your call | Decided: next to build | medium |
@@ -73,6 +73,9 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 2026-10-02 | 6 | The English pages and the Farsi pages’ Latin numerals load Barlow, Barlow Condensed, JetBrains Mono and DM Sans from your own site: 14 pages make no request to Google, layout shift unchanged. The privacy notice now says which pages still use Google Fonts. | f3e27cb |
 | 2026-10-02 | 1 | Every white-on-clay button, badge and chip is the deeper #C2512C (4.66:1, was 4.40:1): 25 of 25 measured; lines, glows and clay text keep the brand colour. | 07e0118 |
 | 2026-10-02 | 5, 13, 20 | Your answers acted on: the Farsi home says WhatsApp (not “in the app”) and has an “is the app English?” FAQ; both confirmation screens say what happens next (we talk, you pay, I write your programme); the privacy notice says you use Claude to write programmes and that Supabase is in London, UK. | 4945846 |
+| 2026-10-02 | 10, 20 | The 60-day promise is gone from the English home (there is none); the privacy notice says names go to the AI assistant. | 295589d |
+| 2026-10-02 | 13 | The English apply form is cut to 13 required questions with about 15 optional ones folded away (8.0 to 5.7 phone screens, about 3 minutes) and a required consent tick for health details and the AI assistant. | 5fe959e |
+| 2026-10-02 | 13 | The Farsi apply form the same way: 12 required, the rest optional, the same consent tick. | 0417c8a |
 | 2026-10-02 | 22 | The style guard: a commit that adds yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white-on-pale-clay is stopped. It also found and fixed: 10 to 11 px labels on the apply form and proof page, the pale grey on the Farsi form, partner and terms pages, and a slider value hanging off a 320 px screen. | 943a92c |
 
 ### Words I wrote, for you to read
@@ -129,6 +132,14 @@ Short functional lines, written to your voice rules, but they are your words on 
 
 - Now reads: “The home page, the apply and free-tracker forms, the privacy and terms pages, the Farsi pages and the Etminan pages serve their typefaces from this site, so those pages make no font request to Google. Some other pages (the articles, the training and habit apps and the UTS page) still load their typefaces from Google Fonts. To draw them, your browser asks Google’s servers …” (the rest as it was). It is a legal text and your words: say if you want it changed.
 
+**The apply forms, cut (2026-10-02)**
+
+- English: the group title “Optional: speeds up our call” and under it “About 15 quick questions. Skip any you like: I will ask on our call.” The time badge says “About 3 min to complete”.
+- English consent tick (required): “I agree that Amir uses my answers to write my programme, including any injury or health details I give. He uses an AI assistant (Claude) to help and checks every programme himself. How my data is used”. If it is not true that you check every programme yourself, tell me and I change it.
+- Farsi: «اختیاری: تماسمون رو سریع‌تر می‌کنه» · «حدودِ ۱۵ سؤالِ کوتاه. هر کدوم رو خواستی رد کن، توی تماس ازت می‌پرسم.» · badge «حدودِ ۳ دقیقه»
+- Farsi consent tick: «قبول دارم که امیر از جواب‌هام برای نوشتنِ برنامه‌م استفاده کنه، از جمله اطلاعاتِ آسیب و سلامتی که می‌نویسم. امیر برای کمک از یه دستیارِ هوش مصنوعی (Claude) استفاده می‌کنه و همه‌ی برنامه‌ها رو خودش چک می‌کنه.» and the error «برای ادامه باید این کادر رو تیک بزنی.»
+- Privacy notice 2.9 now says the AI assistant gets your name too. English home: “Application takes about 3 minutes”.
+
 **Small helper words**
 
 - Skip links for keyboard users: «رفتن به محتوا» · «رفتن به لینک‌ها» · «رفتن به متن» · «رفتن به فرم». The English ones already said “Skip to content”.
@@ -157,7 +168,8 @@ Measured on the live site from this PC (UK) with `scripts/site_audit/`: the base
 | First paint on a slow phone, Farsi pages | home 1.9 s, form 1.5 s, links 1.2 s | home 1.1 s, form 0.9 s, links 0.7 s | under 1.5 s |
 | Etminan pages: text under 12 px | 26 per page | 0 | 0 |
 | English home reading ease | 34 of 100, 43 em-dashes | unchanged (package 19) | 60 or more, none |
-| Apply form: promise vs reality | “2 minutes” vs about 5, 27 to 30 questions | the home now says about 5 minutes; still 27 to 30 questions (package 13) | true, and shorter |
+| Apply form: promise vs reality | “2 minutes” vs about 5, 27 to 30 questions, 18 required | English: 13 required, about 15 optional ones folded away, both say about 3 minutes; Farsi: 12 required (package 13, option C) | true, and shorter |
+| Apply form length on a phone (English) | 8.0 screens | 5.7 screens with the optional group closed | about 5 |
 | “Sent” screens that are a dead end | 4 forms | 0 (each has a WhatsApp next step and a way back) | 0 |
 | Pricing buttons that open the form | 0 of 3 (they jump to the page bottom) | 3 of 3, plan chosen | 3 of 3, plan chosen |
 | Key clicks you can see in Plausible | none (only form submits and level-test results) | Apply (with plan and place), WhatsApp, demo, link hub, form started and each step, proof, partner, level-test start. Add the goals in Plausible to see them. | Apply, WhatsApp, demo, proof, partner, form steps |
@@ -302,14 +314,14 @@ Plausible sees page views, the two apply-form submits, the level-test result and
 
 The home says the application takes 2 minutes. The form says about 5 and asks 27 to 30 questions. The proof page promises a private link that no longer exists.
 
-**Still open.** Only the number is fixed (home: "about 5 minutes"). The rest needs your words: 10b the free tracker promises, 10c the Farsi form note, 10d the 60-day promise.
+**Still open.** 10a and 10d are done: the home and the forms say about 3 minutes, and the 60-day promise is gone because there is none (2026-10-02). Still yours: 10b the free tracker promises and 10c the Farsi form note (now «فرم ۳ دقیقه‌ست · تا ۴۸ ساعت جواب می‌دم»). (Old note: Only the number is fixed (home: "about 5 minutes"). The rest needs your words: 10b the free tracker promises, 10c the Farsi form note, 10d the 60-day promise.)
 
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
-| 10a |  | P1 | English home | “Application takes 2 minutes” is wrong (the form’s own badge says ~5 min; 8 sections), and it is the only reassurance, in 10 px at the end. | “About 5 minutes” now (the real fix is package 13); repeat under the hero and sticky buttons. “You pay nothing until we speak” only once you confirm it. | S | Y | home-en-03, form-en-01 |
+| 10a | ✓ | P1 | English home | “Application takes 2 minutes” is wrong (the form’s own badge says ~5 min; 8 sections), and it is the only reassurance, in 10 px at the end. | “About 5 minutes” now (the real fix is package 13); repeat under the hero and sticky buttons. “You pay nothing until we speak” only once you confirm it. | S | Y | home-en-03, form-en-01 |
 | 10b |  | P2 | proof.html | Two stale promises: “get your link / private link” (links died on 7 Sep: it is a login now) and “eight to start with, switch off anything” (steps, sleep, food and water are always on). | “Send me my login”; “Four are always on. The rest are optional.” | S | Y | proof-04 |
 | 10c |  | P2 | Farsi home | Six buttons say “شروع کن” and open a 5-minute, 27-step form without saying so. | “فرم ۵ دقیقه‌ست · تا ۴۸ ساعت جواب می‌دم” under the buttons; the abroad link points at the DM. | S | Y | home-fa-02 |
-| 10d |  | P2 | English home | The 60-day promise is the quietest box (dashed, 14 px grey) and vague: a rebuilt plan, not a refund. Nothing says how or when you pay. | Move it under the cards at 18 px with one plain line. Needs your facts. | S | Y | home-en-09 |
+| 10d | ✓ | P2 | English home | The 60-day promise is the quietest box (dashed, 14 px grey) and vague: a rebuilt plan, not a refund. Nothing says how or when you pay. | Move it under the cards at 18 px with one plain line. Needs your facts. | S | Y | home-en-09 |
 
 ### 11. No-yellow cleanup  ·  Done  ·  small
 
@@ -345,15 +357,15 @@ A design, copy or business choice. I mark my pick, you say yes, no or change it.
 - **B. Re-sequence and condense (my pick).** Proof right after the hero, the Farsi-style phone hero on desktop, process before price, Contact folded into the footer. About 12 to 13 screens. Reuses the Farsi design you like.  ← my pick  ← **YOUR CHOICE (2026-10-02)**
 - **C. Short home plus deep pages.** About 8 screens; new Programmes and About pages. Best long-term for search, most work.
 
-### 13. The apply form: promise vs length  ·  Decided: next to build  ·  medium to large
+### 13. The apply form: promise vs length  ·  Done  ·  medium to large
 
 The form is the one step every sale goes through. It asks 27 to 30 questions (18 required) over 7.8 phone screens, and the home says 2 minutes. Sleep, stress, nutrition, equipment and lifts are only needed after the call.
 
-**Still open.** Your answer on 2026-10-02: the form is for athletes of all kinds, so the football, cricket and other sport options STAY (13a no longer asks to remove them). The confirmation now says what happens next: we talk, you message me to pay, I write your programme (English and Farsi).
+**Still open.** Done on 2026-10-02 (option C): English form 13 required questions (was 18) and about 15 optional ones folded under “Optional: speeds up our call”, closed by default: 8.0 to 5.7 phone screens, “about 3 minutes”; the Farsi form 12 required. A consent tick (health details and the AI assistant) is now required and stored with the answers: that was 13b’s tick; the age minimum and “only Amir sees my injury answers” are not done. Your answer on 2026-10-02: the form is for athletes of all kinds, so the football, cricket and other sport options STAY (13a no longer asks to remove them). The confirmation now says what happens next: we talk, you message me to pay, I write your programme (English and Farsi).
 
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
-| 13a |  | P1 | Apply EN and FA | 27 questions (29 for tennis or padel, 30 with an injury), 18 required, about 5 minutes; my estimate 2.5 min required-only. The season the hero promises is never asked. Football, cricket, weight-loss and “tone & shape” options remain though the site is for tennis and padel. | Stopgap now: “About 5 minutes” (package 10). Then the option you pick below. | M-L | Y | form-en-01, form-fa-03 |
+| 13a | ✓ | P1 | Apply EN and FA | 27 questions (29 for tennis or padel, 30 with an injury), 18 required, about 5 minutes; my estimate 2.5 min required-only. The season the hero promises is never asked. Football, cricket, weight-loss and “tone & shape” options remain though the site is for tennis and padel. | Stopgap now: “About 5 minutes” (package 10). Then the option you pick below. | M-L | Y | form-en-01, form-fa-03 |
 | 13b |  | P2 | Apply form | Health consent: privacy notice 2.1 relies on explicit consent for injury data, but the form has only a 12 px grey “By submitting, you agree”; forms accept ages 10 to 80 while the notice says adults; nothing says who sees injury answers. | A real tick like the UTS form; minimum age 18 or a guardian block; “Only Amir sees my injury answers”. Not legal advice. | S-M | Y | form-en-10, privacy-03 |
 
 **Decision: What should the form become?**
@@ -515,13 +527,14 @@ program.html (athletes), habits.html (AA Proof) and coach.html (your dashboard) 
 - The apply form is for athletes of all kinds, not only tennis and padel: the football, cricket and other options stay.
 - The app is English for now. It has no chat: everything goes through WhatsApp.
 - The UTS page has not been sent to anyone yet (the course has not started).
-- You write the programmes with Claude. The privacy notice now says so (a new section 2.9 and Anthropic in the list of processors).
+- You write the programmes with Claude, and athlete names go into those AI chats. The privacy notice says so (section 2.9: name, goals, background, injuries and logged sessions; Anthropic is in the list of processors), and both apply forms now ask for a consent tick.
+- There is no 60-day promise. It is removed from the English home.
 - First screen and Library pictures: go with my recommendation. That is your photo and the athletes already shown in the testimonials (they have agreed), and the Library’s category pictures reused as article thumbnails and share cards.
 
 ## Questions only Amir can answer
 
-1. Does the 60-day promise mean a rebuilt plan only, or money back? The home, the form and the terms must say the same thing.
-2. Is there a written coaching agreement (terms section 7 cites one I could not find)? And do you paste athlete names into AI chats, or use the athlete’s id?
+1. What is the refund rule, if any? Terms section 7 says refunds are in “the separate coaching agreement or invoice”. If there is no agreement, I rewrite it in one plain line from what you tell me.
+2. Minimum age on the apply forms: they accept 10 to 80, the privacy notice talks about adults. Do you coach under-18s directly (then a parent’s consent is needed), or should the minimum be 18?
 3. Has anyone in Iran opened the demo, the apply form and Plausible with the VPN off? You will tell me later. (package 23)
 4. Ask two or three Iranian athletes to open amirardekani.com/reach/ once with the VPN off and once on and send you the line it prints. You will let me know. (package 23)
 5. Your part: the Plausible goals (Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application, 404, and the properties plan, where, page, which, to, step, lang). You asked me to walk you through it later.
