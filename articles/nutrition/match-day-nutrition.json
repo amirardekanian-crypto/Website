@@ -1,0 +1,138 @@
+{
+  "id": "match-day-nutrition",
+  "title": "Match-Day Fuel",
+  "category": "Nutrition",
+  "readMins": 5,
+  "date": "October 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Most players only think about food on match day when they feel flat in the third set. By then it's late. What you eat and drink before, during and after play decides if the third set is a fight or a fade."
+    },
+    {
+      "type": "p",
+      "text": "Here's the plan, with numbers. I split it into before, during and after. The examples use a 70 kg player."
+    },
+    {
+      "type": "h",
+      "text": "Before play"
+    },
+    {
+      "type": "p",
+      "text": "Carbohydrate comes first. Aim for 1 to 4 g per kg of body weight, 1 to 4 hours before you play. If you eat an hour out, stay near 1 g/kg. If you have the full four hours, you can go up to 4 g/kg."
+    },
+    {
+      "type": "p",
+      "text": "For a 70 kg player eating about 3 hours before, 2 to 3 g/kg is 140 to 210 g of carbohydrate."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Rice, pasta, potatoes, bread, oats, fruit. Whatever you already know your stomach likes.",
+        "Keep fat and fibre low. They slow digestion and can sit heavy.",
+        "If the start time slips, top up with a small carbohydrate snack. Don't eat a second big meal."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Then there's fluid. Walk on court already hydrated. A good start is about 5 to 7 ml per kg in the hours before play, so 350 to 490 ml for a 70 kg player. Your urine should be pale yellow."
+    },
+    {
+      "type": "p",
+      "text": "This matters more than it sounds. Tennis players replace fluid more slowly in matches than in practice. If you start behind, you stay behind."
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Start the match hydrated. Don't plan to catch up once play starts."
+    },
+    {
+      "type": "h",
+      "text": "During play"
+    },
+    {
+      "type": "p",
+      "text": "How much carbohydrate you need depends on how long you play. In a match of 45 to 75 minutes, small amounts are enough, even just a mouth rinse. From about 90 minutes to 3 hours, aim for 30 to 60 g per hour. In a very long match, like five sets, the ITF statement goes up to 60 to 90 g per hour."
+    },
+    {
+      "type": "list",
+      "items": [
+        "A sports drink, a gel or a banana. Anything easy to digest.",
+        "Sip and eat at the changeovers, not all at once.",
+        "Above about 60 g an hour you need a mix of glucose and fructose, and a trained stomach."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "To be honest, the performance benefit in tennis studies is mixed. Some show better strokes late in a match. Some show nothing. That's why the ITF says to test it yourself."
+    },
+    {
+      "type": "p",
+      "text": "For fluid, a starting point is 400 to 800 ml per hour. In tennis the easy way to do it is to drink at every changeover. About 200 ml in mild weather. Up to 400 ml when it's above 27°C."
+    },
+    {
+      "type": "p",
+      "text": "That number isn't the same for everyone. Players sweat from about 0.5 L an hour to over 2.5 L an hour. If you sweat a lot, it's hot, or the match is long, you need more. But don't drink more than you sweat. Overdrinking is a risk too."
+    },
+    {
+      "type": "p",
+      "text": "Sweat isn't only water. You lose sodium too. In tennis, players have lost 0.5 to 1.8 g of sodium over a match, and more in the heat. A common starting point for a long match is 300 to 600 mg of sodium per hour, from a sports drink or salty food."
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "No tennis body publishes an official sodium number. Salty sweaters and hot days need more. Treat 300 to 600 mg an hour as a starting point and adjust it with a sweat test."
+    },
+    {
+      "type": "h",
+      "text": "After play"
+    },
+    {
+      "type": "p",
+      "text": "What you do next depends on when you play next."
+    },
+    {
+      "type": "callout",
+      "label": "Done for the day",
+      "text": "A normal meal with carbohydrate and protein, plus fluids and some salt, is enough. After the first few hours, your total for the day matters more than the exact timing."
+    },
+    {
+      "type": "callout",
+      "label": "Playing again within 8 hours",
+      "text": "Recovery gets a lot more important. In the first 4 hours, aim for 1 to 1.2 g of carbohydrate per kg per hour. For a 70 kg player that's 70 to 84 g an hour. Add 20 to 40 g of protein."
+    },
+    {
+      "type": "p",
+      "text": "Replace the fluid and sodium you lost too. Weigh yourself before and after the match. For every kg you lost, drink 1.25 to 1.5 L over the next hours, with some sodium. Drinking plain water alone doesn't hold the fluid in."
+    },
+    {
+      "type": "h",
+      "text": "Test it in training"
+    },
+    {
+      "type": "p",
+      "text": "Match day is not the day to try something new. If you've never used a gel or a sports drink, don't open one for the first time in a final."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Test it in training. See what your stomach tolerates.",
+        "Weigh yourself before and after a hard session. That shows how much you sweat.",
+        "Work out how much fluid feels right for you."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Your stomach can learn too. In one two-week study, runners who practised eating and drinking while they ran had about 60% fewer stomach symptoms. That was in runners, not tennis players, but the idea carries over."
+    },
+    {
+      "type": "callout",
+      "label": "Key",
+      "text": "Match-day nutrition isn't only about eating healthy. It should help you play better."
+    },
+    {
+      "type": "p",
+      "text": "Based on the ITF, WTA and ATP expert group statement on nutrition in tennis (Vicente-Salar et al., 2025), Ranchordas et al. (2013), Kovacs (2006), the ACSM/AND/DC position stand (Thomas et al., 2016) and the ISSN position stand on nutrient timing (Kerksick et al., 2017)."
+    }
+  ]
+}

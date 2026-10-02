@@ -65,7 +65,15 @@
       "title": "Nutrition",
       "icon": "nutrition",
       "banner": "assets/art/library/read-nutrition-v1.webp",
-      "articles": []
+      "articles": [
+        {
+          "id": "match-day-nutrition",
+          "title": "Match-Day Fuel",
+          "category": "Nutrition",
+          "readMins": 5,
+          "file": "articles/nutrition/match-day-nutrition.json"
+        }
+      ]
     },
     {
       "id": "supplements",
