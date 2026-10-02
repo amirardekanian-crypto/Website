@@ -794,7 +794,7 @@
     box-shadow: 0 24px 56px rgba(26,26,26,.18);
   }
   .coach-photo:hover { transform: rotate(0) scale(1.015); }
-  .coach-photo img { width: 100%; display: block; }
+  .coach-photo img { width: 100%; height: auto; display: block; }   /* height:auto because the tag now carries width and height (so it reserves its space) */
   .coach-photo::after {
     content: ''; position: absolute; inset: 0;
     background: linear-gradient(to top, rgba(8,38,27,.5), transparent 45%);
