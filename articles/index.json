@@ -6,15 +6,7 @@
       "title": "For Coaches",
       "icon": "book",
       "banner": "assets/art/library/read-for-coaches-v1.webp",
-      "articles": [
-        {
-          "id": "pre-session-warm-up",
-          "title": "The Pre-Session Warm-Up",
-          "category": "For Coaches",
-          "readMins": 7,
-          "file": "articles/for-coaches/pre-session-warm-up.json"
-        }
-      ]
+      "articles": []
     },
     {
       "id": "pre-competition",
@@ -26,7 +18,7 @@
           "id": "tennis-warm-up",
           "title": "The Tennis Warm-Up",
           "category": "Pre-Competition",
-          "readMins": 4,
+          "readMins": 5,
           "file": "articles/pre-competition/tennis-warm-up.json"
         }
       ]
@@ -70,7 +62,7 @@
           "id": "match-day-nutrition",
           "title": "Match-Day Fuel",
           "category": "Nutrition",
-          "readMins": 5,
+          "readMins": 6,
           "file": "articles/nutrition/match-day-nutrition.json"
         }
       ]

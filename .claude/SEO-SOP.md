@@ -227,8 +227,8 @@ suggestions when he sends screenshots, or after 3–4 weeks of Search Console da
 
 | Slug | Target phrase (Farsi) | Basis | Shipped |
 |---|---|---|---|
-| `tennis-warm-up` | گرم‌کردنِ قبل از تنیس | guess | 2026-09 |
-| `pre-session-warm-up` | گرم‌کردنِ قبل از جلسه‌ی تنیس | guess. ⚠️ **close to `tennis-warm-up`: the two can compete.** Differentiate (this one is for coaches) or merge | 2026-09 |
+| `tennis-warm-up` | گرم‌کردنِ قبل از تنیس (also covers «قبل از جلسه‌ی تنیس») | guess. **Merged 2026-10-02** with `pre-session-warm-up`, which now redirects here | 2026-09, rewritten 2026-10-02 |
+| ~~`pre-session-warm-up`~~ | (merged into `tennis-warm-up`) | the old address redirects (`REDIRECTS` in `scripts/build_article_pages.py`) | merged 2026-10-02 |
 | `training-with-injury` | تمرین با آسیب‌دیدگی | guess | 2026-09 |
 | `training-on-your-period` | تمرین در دورانِ قاعدگی | guess | 2026-09 |
-| `match-day-nutrition` | تغذیه‌ی روز مسابقه تنیس | guess. Body is tennis research; «پدل» is in the seoTitle only (see gate item 3) | 2026-10-02 |
+| `match-day-nutrition` | تغذیه‌ی روز مسابقه تنیس (and پدل) | guess. The body now covers padel honestly (tennis numbers, no padel studies) | 2026-10-02 |

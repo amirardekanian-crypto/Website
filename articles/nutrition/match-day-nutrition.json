@@ -2,7 +2,7 @@
   "id": "match-day-nutrition",
   "title": "Match-Day Fuel",
   "category": "Nutrition",
-  "readMins": 5,
+  "readMins": 6,
   "date": "October 2026",
   "blocks": [
     {
@@ -107,6 +107,35 @@
     },
     {
       "type": "h",
+      "text": "What about padel?"
+    },
+    {
+      "type": "p",
+      "text": "These numbers come from tennis research and general sports nutrition. I haven't found padel studies of carbohydrate or sodium needs. So for padel, treat them as starting points, not padel-tested numbers."
+    },
+    {
+      "type": "p",
+      "text": "Padel matches are usually shorter than tennis. In one study, amateur matches averaged about 57 minutes. Professional matches last about 90 minutes. Heart rate sits at about 70 to 80% of max, and lactate stays low."
+    },
+    {
+      "type": "p",
+      "text": "That changes two things. The 30 to 60 g of carbohydrate per hour is for long matches, like a hard three-setter or two matches in a day. For a typical club match, a small carbohydrate drink or a mouth rinse is plenty. And padel is best of three sets, so the five-set number doesn't apply."
+    },
+    {
+      "type": "p",
+      "text": "For fluid, think in millilitres per hour and sip at the side changes. Under professional rules you get 90 seconds at side changes after the first game, and 120 seconds between sets. In extreme heat you can drink after every game. Club rules can differ."
+    },
+    {
+      "type": "p",
+      "text": "The padel hydration data are small. Urine tests suggested high-level players started a simulated match already dehydrated. In one study of men over 65 drinking about 600 ml an hour, body weight dropped by about 0.5%. Nobody has published padel sweat rates or sweat sodium. So weigh yourself before and after a hard session and find your own numbers."
+    },
+    {
+      "type": "callout",
+      "label": "Padel",
+      "text": "Same plan, tennis numbers. Shorter matches mean less carbohydrate during play, and there is no padel number for sodium. Test it in training."
+    },
+    {
+      "type": "h",
       "text": "Test it in training"
     },
     {
@@ -132,7 +161,7 @@
     },
     {
       "type": "p",
-      "text": "Based on the ITF, WTA and ATP expert group statement on nutrition in tennis (Vicente-Salar et al., 2025), Ranchordas et al. (2013), Kovacs (2006), the ACSM/AND/DC position stand (Thomas et al., 2016) and the ISSN position stand on nutrient timing (Kerksick et al., 2017)."
+      "text": "Based on the ITF, WTA and ATP expert group statement on nutrition in tennis (Vicente-Salar et al., 2025), Ranchordas et al. (2013), Kovacs (2006), the ACSM/AND/DC position stand (Thomas et al., 2016), the ISSN position stand on nutrient timing (Kerksick et al., 2017). For padel: Lopes et al. (2024), Pradas et al. (2021), Marcos-Rivero et al. (2025) and the FIP rulebook (2026)."
     }
   ]
 }
