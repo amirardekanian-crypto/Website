@@ -30,6 +30,12 @@ Durable context for working in this repo. Read the linked docs before diving in.
   product pages: how they are built, deployed and introduced.
 - `PROGRAM-APP.md` — the athlete app's programme features in full (rx, week notes, the Spine, the Quality
   Map, Because, the set log, Personal Records, body weight): read it before changing `program.html`.
+- `Content/CONTENT-PARITY.md` — **one topic, every platform** (Amir, 2026-10-02): which topic lives on the TPS course
+  (Farsi lessons in `tps_content`, English twins in `course_en`), the blog (`/fa` and `/en` articles) and the Playbook,
+  what is missing where, the known science problems, and the rule for every port: **research and confirm the logic and
+  science first** (an agent per topic, sources with PMID/DOI), adapt for the audience, Farsi read by Amir, publish to
+  every surface, update the ledger. If a lesson exists on one platform it must exist on the others; a changed fact is
+  changed everywhere. Read it before adding or changing any lesson or article.
 - `Content/FRESH-EYES.md` — the app audit (2026-09-24): what has shipped, what is next and in what order,
   the open calls, and how to continue it. Read it before picking up an audit item (`REL-01`, `CARD-01` …).
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy. **It opens with the RULE INDEX**

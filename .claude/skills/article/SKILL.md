@@ -45,6 +45,20 @@ At Step 9, the handoff must say: the target phrase, whether it was researched or
 near-duplicate in the log, the exact Farsi URL for Search Console → *Request indexing*, and that the
 phrase has been added to the log. Add the row to the log in the same commit as the article.
 
+## Step 0.6 — The parity check (every run; Amir, 2026-10-02)
+
+*"If we have a lesson in TPS, we need to have it in our programs and blogs, and vice versa. But before adding
+anything to another platform, research and confirm the logic and science."* Open **`Content/CONTENT-PARITY.md`**:
+
+1. Is this topic already a **TPS course lesson** (`public.tps_content`)? If yes, the article must agree with it on
+   every fact (numbers, rules, age cautions are for the lesson only), and a changed fact is changed in the lesson and
+   its `course_en` twin too. If no, the handoff names the missing lesson and adds it to the ledger.
+2. Is it already on the blog or Playbook under another slug? Merge, never duplicate (SEO gate: one phrase per article).
+3. **Verify the science before it is copied anywhere**, including text that is already published: a research agent per
+   topic, sources with PMID/DOI, each claim marked supported / overstated / practice-based / not supported. Practice
+   advice that has no study behind it stays, labelled as Amir's suggestion.
+4. Update the ledger's matrix and *Known problems* in the same commit.
+
 ## Step 1 — Understand what you've been given
 
 Amir will either:

@@ -212,6 +212,8 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
 Standalone tools, **not** linked from the live site — open them directly to design social
 posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLAS.md).
 
+- **Content parity ledger** (2026-10-02): [`CONTENT-PARITY.md`](Content/CONTENT-PARITY.md): which lesson or article exists on the
+  TPS course, the blog and the Playbook, what is missing, the known science problems, and the rule for every port.
 - **Carousels** (1080×1350): kit = [`Carousel-Kit.html`](Content/Carousel-Kit.html)
   (23 slide templates) · **newest reference** =
   [`carousel-period-training.html`](Content/carousel-period-training.html) (new decks are Farsi) · older decks:
