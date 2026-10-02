@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, follow">
 
 <title>Apply — Tennis S&amp;C Coaching · Amir Ardekani</title>
-<meta name="description" content="Apply for Amir Ardekani's online tennis strength &amp; conditioning coaching. Takes ~5 minutes.">
+<meta name="description" content="Apply for Amir Ardekani's online tennis strength &amp; conditioning coaching. Takes about 3 minutes.">
 <link rel="canonical" href="https://www.amirardekani.com/form.html">
 
 <!-- Icons / PWA -->
@@ -390,6 +390,31 @@
     color: var(--accent);
   }
 
+  /* ── OPTIONAL GROUP and CONSENT (the form was cut to the questions that decide a start; the rest is optional) ── */
+  .opt-group { padding: 0; }
+  .opt-group > summary {
+    list-style: none; cursor: pointer; display: flex; flex-direction: column; gap: 4px;
+    padding: 20px 24px; min-height: 44px; border-radius: var(--radius-lg, 12px);
+  }
+  .opt-group > summary::-webkit-details-marker { display: none; }
+  .opt-group > summary .opt-title {
+    font-family: var(--font-display); font-weight: 700; font-size: 20px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--accent); display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .opt-group > summary .opt-title::after { content: '+'; font-size: 28px; line-height: 1; font-weight: 400; }
+  .opt-group[open] > summary .opt-title::after { content: '\2212'; }
+  .opt-group > summary .opt-sub { font-size: 14px; color: var(--text-muted); }
+  .opt-group > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .opt-group[open] > summary { border-bottom: 1px solid var(--border); border-radius: var(--radius-lg, 12px) var(--radius-lg, 12px) 0 0; }
+  .opt-group > .f-field, .opt-group > .row-2 { margin-left: 24px; margin-right: 24px; }
+  .opt-group > summary + * { margin-top: 24px; }
+  .opt-group[open] > :last-child { margin-bottom: 28px; }
+  .consent-field { max-width: 720px; margin: 8px auto 0; padding: 0 4px; }
+  .consent { display: flex; gap: 14px; align-items: flex-start; font-size: 15px; line-height: 1.55; color: var(--text-primary); cursor: pointer; }
+  .consent input { flex: none; width: 24px; height: 24px; margin-top: 0; accent-color: var(--accent); cursor: pointer; }
+  .consent a { color: var(--accent); text-decoration: underline; }
+  .consent-field .field-error { margin-top: 8px; }
+
   /* ── SUBMIT ── */
   .submit-section {
     text-align: center;
@@ -569,7 +594,7 @@
   <div class="container">
     <div class="time-badge">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      ~5 min to complete
+      About 3 min to complete
     </div>
     <h1>Client <em>Intake</em> Form</h1>
     <p>Tell me about where you're at. I'll use your answers to design a tennis S&amp;C programme that fits your body, your schedule, and your season.</p>
@@ -660,25 +685,9 @@
       <input type="text" id="contact" name="Contact (Instagram/WhatsApp)" required placeholder="@yourhandle or +44 7…">
     </div>
 
-    <div class="row-3">
-      <div class="f-field">
-        <label for="age">Age</label>
-        <input type="number" id="age" name="Age" min="10" max="80" required placeholder="e.g. 28">
-      </div>
-      <div class="f-field">
-        <label for="sex">Biological Sex</label>
-        <select id="sex" name="Biological Sex" required>
-          <option value="" disabled selected>Select</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
-      </div>
-      <div class="f-field">
-        <label for="weight">Body Weight
-          <span class="hint">kg or lbs</span>
-        </label>
-        <input type="text" id="weight" name="Body Weight" placeholder="e.g. 78 kg">
-      </div>
+    <div class="f-field">
+      <label for="age">Age</label>
+      <input type="number" id="age" name="Age" min="10" max="80" required placeholder="e.g. 28">
     </div>
   </section>
 
@@ -744,38 +753,6 @@
       </div>
     </div>
 
-    <div class="f-field conditional" id="sportFreqWrap">
-      <label for="sportFreq">How many days per week do you play or practice?</label>
-      <select id="sportFreq" name="Sport Frequency">
-        <option value="" disabled selected>Select</option>
-        <option value="1-2 days">1–2 days</option>
-        <option value="3-4 days">3–4 days</option>
-        <option value="5-6 days">5–6 days</option>
-        <option value="Daily">Daily</option>
-      </select>
-    </div>
-
-    <div class="f-field conditional" id="activityLevelWrap">
-      <label id="qg2">How active are you currently?</label>
-      <div class="radio-cards" role="radiogroup" aria-labelledby="qg2">
-        <div class="radio-card">
-          <input type="radio" id="act_sed" name="Activity Level" value="Sedentary">
-          <label for="act_sed"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></span>Sedentary</label>
-        </div>
-        <div class="radio-card">
-          <input type="radio" id="act_light" name="Activity Level" value="Lightly Active">
-          <label for="act_light"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i></span>Lightly Active</label>
-        </div>
-        <div class="radio-card">
-          <input type="radio" id="act_mod" name="Activity Level" value="Moderately Active">
-          <label for="act_mod"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>Moderately Active</label>
-        </div>
-        <div class="radio-card">
-          <input type="radio" id="act_very" name="Activity Level" value="Very Active">
-          <label for="act_very"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>Very Active</label>
-        </div>
-      </div>
-    </div>
   </section>
 
   <!-- ─── 3. TRAINING HISTORY ─── -->
@@ -806,39 +783,6 @@
       </div>
     </div>
 
-    <div class="f-field">
-      <label for="currentTraining">How many days per week do you currently strength train?</label>
-      <select id="currentTraining" name="Current Training Days" required>
-        <option value="" disabled selected>Select</option>
-        <option value="0">0 — I don't currently</option>
-        <option value="1-2 days">1–2 days</option>
-        <option value="3-4 days">3–4 days</option>
-        <option value="5+ days">5+ days</option>
-      </select>
-    </div>
-
-    <div class="f-field">
-      <label id="qg4">Which types of training are you currently doing?
-        <span class="hint">Select all that apply</span>
-      </label>
-      <div class="pill-group" role="group" aria-labelledby="qg4">
-        <label class="pill"><input type="checkbox" name="Training Types" value="Free Weights"><span>Free Weights</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="Machines"><span>Machines</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="Bodyweight"><span>Bodyweight</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="Plyometrics"><span>Plyometrics</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="Cardio / Running"><span>Cardio / Running</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="Yoga / Pilates"><span>Yoga / Pilates</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="Group Classes"><span>Group Classes</span></label>
-        <label class="pill"><input type="checkbox" name="Training Types" value="None"><span>None</span></label>
-      </div>
-    </div>
-
-    <div class="f-field">
-      <label for="bestLifts">Current best lifts
-        <span class="hint">Optional — a few top sets help me gauge your starting strength</span>
-      </label>
-      <textarea id="bestLifts" name="Current Best Lifts" rows="2" placeholder="e.g. Squat 80 kg × 5, Bench 60 kg × 5, Deadlift 100 kg × 3 — leave blank if unsure"></textarea>
-    </div>
   </section>
 
   <!-- ─── 4. GOALS ─── -->
@@ -866,12 +810,6 @@
       </div>
     </div>
 
-    <div class="f-field">
-      <label for="goalNote">Anything specific you want to achieve?
-        <span class="hint">Optional — e.g. "Reduce shoulder pain", "Improve first-step speed", "Hold up across a 3-set match"</span>
-      </label>
-      <textarea id="goalNote" name="Specific Goal" rows="2" placeholder="Tell me in a sentence or two…"></textarea>
-    </div>
   </section>
 
   <!-- ─── 5. INJURY & HEALTH ─── -->
@@ -901,27 +839,6 @@
       <textarea id="injuryDetail" name="Injury Details" rows="2" placeholder="e.g. Right knee — mild pain for 3 weeks — 4/10"></textarea>
     </div>
 
-    <div class="f-field">
-      <label id="qg7">Any past injuries or surgeries that still affect you?
-        <span class="hint">Select all that apply</span>
-      </label>
-      <div class="pill-group" role="group" aria-labelledby="qg7">
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="Shoulder"><span>Shoulder</span></label>
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="Elbow / Wrist"><span>Elbow / Wrist</span></label>
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="Lower Back"><span>Lower Back</span></label>
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="Hip"><span>Hip</span></label>
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="Knee"><span>Knee</span></label>
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="Ankle / Foot"><span>Ankle / Foot</span></label>
-        <label class="pill"><input type="checkbox" name="Past Injuries" value="None"><span>None</span></label>
-      </div>
-    </div>
-
-    <div class="f-field">
-      <label for="avoidMovements">Any movements you've been told to avoid?
-        <span class="hint">Optional</span>
-      </label>
-      <input type="text" id="avoidMovements" name="Avoid Movements" placeholder="e.g. Overhead pressing, deep squats">
-    </div>
   </section>
 
   <!-- ─── 6. RECOVERY & AVAILABILITY ─── -->
@@ -954,62 +871,6 @@
       </div>
     </div>
 
-    <div class="f-field">
-      <label for="sleepSlider">How would you rate your typical sleep quality?</label>
-      <div class="slider-wrap is-unset" id="sleepWrap">
-        <span class="slider-edge">Poor</span>
-        <input type="range" id="sleepSlider" min="1" max="10" value="7">
-        <span class="slider-edge">Excellent</span>
-        <span class="slider-val" id="sleepVal" aria-live="polite">—</span>
-      </div>
-      <input type="hidden" id="sleepValue" name="Sleep Quality (1-10)" value="" data-count-progress required>
-    </div>
-
-    <div class="f-field">
-      <label for="sleepHours">Average hours of sleep per night</label>
-      <select id="sleepHours" name="Sleep Hours">
-        <option value="" disabled selected>Select</option>
-        <option value="Under 5 hours">Under 5 hours</option>
-        <option value="5-6 hours">5–6 hours</option>
-        <option value="7-8 hours">7–8 hours</option>
-        <option value="9+ hours">9+ hours</option>
-      </select>
-    </div>
-
-    <div class="f-field">
-      <label for="stressSlider">Current stress level</label>
-      <div class="slider-wrap is-unset" id="stressWrap">
-        <span class="slider-edge">Low</span>
-        <input type="range" id="stressSlider" min="1" max="10" value="5">
-        <span class="slider-edge">High</span>
-        <span class="slider-val" id="stressVal" aria-live="polite">—</span>
-      </div>
-      <input type="hidden" id="stressValue" name="Stress Level (1-10)" value="" data-count-progress required>
-    </div>
-
-    <div class="f-field">
-      <label for="nutrition">How would you describe your current nutrition?</label>
-      <select id="nutrition" name="Nutrition" required>
-        <option value="" disabled selected>Select</option>
-        <option value="Dialed in — consistent & intentional">Dialed in — consistent &amp; intentional</option>
-        <option value="Pretty good — mostly on track">Pretty good — mostly on track</option>
-        <option value="Average — inconsistent">Average — inconsistent</option>
-        <option value="Needs work — little structure">Needs work — little structure</option>
-      </select>
-    </div>
-
-    <div class="f-field">
-      <label for="lifeLoad">Outside training, how demanding is a typical week?
-        <span class="hint">Work, study, caregiving, travel — your real recovery budget</span>
-      </label>
-      <select id="lifeLoad" name="Weekly Life Load" required>
-        <option value="" disabled selected>Select</option>
-        <option value="Light — plenty of downtime">Light — plenty of downtime</option>
-        <option value="Moderate — busy but manageable">Moderate — busy but manageable</option>
-        <option value="Heavy — long days, little downtime">Heavy — long days, little downtime</option>
-        <option value="Very heavy — constantly stretched">Very heavy — constantly stretched</option>
-      </select>
-    </div>
   </section>
 
   <!-- ─── 7. EQUIPMENT ─── -->
@@ -1036,6 +897,182 @@
       </div>
     </div>
 
+  </section>
+
+  <!-- ─── OPTIONAL: speeds up our call (these are never required) ─── -->
+  <details class="fsection opt-group" id="optGroup">
+    <summary><span class="opt-title">Optional: speeds up our call</span><span class="opt-sub">About 15 quick questions. Skip any you like: I will ask on our call.</span></summary>
+
+    <div class="row-2">
+      <div class="f-field">
+        <label for="sex">Biological Sex</label>
+        <select id="sex" name="Biological Sex">
+          <option value="" disabled selected>Select</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+      <div class="f-field">
+        <label for="weight">Body Weight
+          <span class="hint">kg or lbs</span>
+        </label>
+        <input type="text" id="weight" name="Body Weight" placeholder="e.g. 78 kg">
+      </div>
+    </div>
+
+    <div class="f-field conditional" id="sportFreqWrap">
+      <label for="sportFreq">How many days per week do you play or practice?</label>
+      <select id="sportFreq" name="Sport Frequency">
+        <option value="" disabled selected>Select</option>
+        <option value="1-2 days">1–2 days</option>
+        <option value="3-4 days">3–4 days</option>
+        <option value="5-6 days">5–6 days</option>
+        <option value="Daily">Daily</option>
+      </select>
+    </div>
+
+    <div class="f-field conditional" id="activityLevelWrap">
+      <label id="qg2">How active are you currently?</label>
+      <div class="radio-cards" role="radiogroup" aria-labelledby="qg2">
+        <div class="radio-card">
+          <input type="radio" id="act_sed" name="Activity Level" value="Sedentary">
+          <label for="act_sed"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></span>Sedentary</label>
+        </div>
+        <div class="radio-card">
+          <input type="radio" id="act_light" name="Activity Level" value="Lightly Active">
+          <label for="act_light"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i></span>Lightly Active</label>
+        </div>
+        <div class="radio-card">
+          <input type="radio" id="act_mod" name="Activity Level" value="Moderately Active">
+          <label for="act_mod"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span>Moderately Active</label>
+        </div>
+        <div class="radio-card">
+          <input type="radio" id="act_very" name="Activity Level" value="Very Active">
+          <label for="act_very"><span class="rc-icon pips" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span>Very Active</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="f-field">
+      <label for="currentTraining">How many days per week do you currently strength train?</label>
+      <select id="currentTraining" name="Current Training Days">
+        <option value="" disabled selected>Select</option>
+        <option value="0">0 — I don't currently</option>
+        <option value="1-2 days">1–2 days</option>
+        <option value="3-4 days">3–4 days</option>
+        <option value="5+ days">5+ days</option>
+      </select>
+    </div>
+
+    <div class="f-field">
+      <label id="qg4">Which types of training are you currently doing?
+        <span class="hint">Select all that apply</span>
+      </label>
+      <div class="pill-group" role="group" aria-labelledby="qg4">
+        <label class="pill"><input type="checkbox" name="Training Types" value="Free Weights"><span>Free Weights</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="Machines"><span>Machines</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="Bodyweight"><span>Bodyweight</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="Plyometrics"><span>Plyometrics</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="Cardio / Running"><span>Cardio / Running</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="Yoga / Pilates"><span>Yoga / Pilates</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="Group Classes"><span>Group Classes</span></label>
+        <label class="pill"><input type="checkbox" name="Training Types" value="None"><span>None</span></label>
+      </div>
+    </div>
+
+    <div class="f-field">
+      <label for="bestLifts">Current best lifts
+        <span class="hint">Optional — a few top sets help me gauge your starting strength</span>
+      </label>
+      <textarea id="bestLifts" name="Current Best Lifts" rows="2" placeholder="e.g. Squat 80 kg × 5, Bench 60 kg × 5, Deadlift 100 kg × 3 — leave blank if unsure"></textarea>
+    </div>
+
+    <div class="f-field">
+      <label for="goalNote">Anything specific you want to achieve?
+        <span class="hint">Optional — e.g. "Reduce shoulder pain", "Improve first-step speed", "Hold up across a 3-set match"</span>
+      </label>
+      <textarea id="goalNote" name="Specific Goal" rows="2" placeholder="Tell me in a sentence or two…"></textarea>
+    </div>
+
+    <div class="f-field">
+      <label id="qg7">Any past injuries or surgeries that still affect you?
+        <span class="hint">Select all that apply</span>
+      </label>
+      <div class="pill-group" role="group" aria-labelledby="qg7">
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Shoulder"><span>Shoulder</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Elbow / Wrist"><span>Elbow / Wrist</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Lower Back"><span>Lower Back</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Hip"><span>Hip</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Knee"><span>Knee</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="Ankle / Foot"><span>Ankle / Foot</span></label>
+        <label class="pill"><input type="checkbox" name="Past Injuries" value="None"><span>None</span></label>
+      </div>
+    </div>
+
+    <div class="f-field">
+      <label for="avoidMovements">Any movements you've been told to avoid?
+        <span class="hint">Optional</span>
+      </label>
+      <input type="text" id="avoidMovements" name="Avoid Movements" placeholder="e.g. Overhead pressing, deep squats">
+    </div>
+
+    <div class="f-field">
+      <label for="sleepSlider">How would you rate your typical sleep quality?</label>
+      <div class="slider-wrap is-unset" id="sleepWrap">
+        <span class="slider-edge">Poor</span>
+        <input type="range" id="sleepSlider" min="1" max="10" value="7">
+        <span class="slider-edge">Excellent</span>
+        <span class="slider-val" id="sleepVal" aria-live="polite">—</span>
+      </div>
+      <input type="hidden" id="sleepValue" name="Sleep Quality (1-10)" value="">
+    </div>
+
+    <div class="f-field">
+      <label for="sleepHours">Average hours of sleep per night</label>
+      <select id="sleepHours" name="Sleep Hours">
+        <option value="" disabled selected>Select</option>
+        <option value="Under 5 hours">Under 5 hours</option>
+        <option value="5-6 hours">5–6 hours</option>
+        <option value="7-8 hours">7–8 hours</option>
+        <option value="9+ hours">9+ hours</option>
+      </select>
+    </div>
+
+    <div class="f-field">
+      <label for="stressSlider">Current stress level</label>
+      <div class="slider-wrap is-unset" id="stressWrap">
+        <span class="slider-edge">Low</span>
+        <input type="range" id="stressSlider" min="1" max="10" value="5">
+        <span class="slider-edge">High</span>
+        <span class="slider-val" id="stressVal" aria-live="polite">—</span>
+      </div>
+      <input type="hidden" id="stressValue" name="Stress Level (1-10)" value="">
+    </div>
+
+    <div class="f-field">
+      <label for="nutrition">How would you describe your current nutrition?</label>
+      <select id="nutrition" name="Nutrition">
+        <option value="" disabled selected>Select</option>
+        <option value="Dialed in — consistent & intentional">Dialed in — consistent &amp; intentional</option>
+        <option value="Pretty good — mostly on track">Pretty good — mostly on track</option>
+        <option value="Average — inconsistent">Average — inconsistent</option>
+        <option value="Needs work — little structure">Needs work — little structure</option>
+      </select>
+    </div>
+
+    <div class="f-field">
+      <label for="lifeLoad">Outside training, how demanding is a typical week?
+        <span class="hint">Work, study, caregiving, travel — your real recovery budget</span>
+      </label>
+      <select id="lifeLoad" name="Weekly Life Load">
+        <option value="" disabled selected>Select</option>
+        <option value="Light — plenty of downtime">Light — plenty of downtime</option>
+        <option value="Moderate — busy but manageable">Moderate — busy but manageable</option>
+        <option value="Heavy — long days, little downtime">Heavy — long days, little downtime</option>
+        <option value="Very heavy — constantly stretched">Very heavy — constantly stretched</option>
+      </select>
+    </div>
+
     <div class="f-field">
       <label id="qg9">What equipment do you have access to?
         <span class="hint">Select all that apply</span>
@@ -1053,7 +1090,15 @@
         <label class="pill"><input type="checkbox" name="Equipment" value="Gym Machines"><span>Gym Machines</span></label>
       </div>
     </div>
-  </section>
+  </details>
+
+  <!-- ─── CONSENT (health information and the AI assistant) ─── -->
+  <div class="f-field consent-field">
+    <label class="consent" for="consent">
+      <input type="checkbox" id="consent" name="Consent (health information and AI assistant)" value="Yes" required>
+      <span>I agree that Amir uses my answers to write my programme, including any injury or health details I give. He uses an AI assistant (Claude) to help and checks every programme himself. <a href="/privacy.html#ai" target="_blank" rel="noopener">How my data is used</a></span>
+    </label>
+  </div>
 
   <!-- ─── SUBMIT ─── -->
   <div class="submit-section">
@@ -1322,6 +1367,7 @@
       const t = (el.type || '').toLowerCase();
       if (t === 'email') return (el.value || '').trim() ? 'Please enter a valid email address, like name@example.com.' : 'Please enter your email address.';
       if (t === 'radio') return 'Please choose one option.';
+      if (el.id === 'consent') return 'Please tick the box to continue.';
       if (t === 'checkbox') return 'Please choose at least one.';
       if (el.tagName === 'SELECT') return 'Please choose an option from the list.';
       if (t === 'hidden') return 'Please move the slider to give your answer.';
@@ -1374,6 +1420,7 @@
       const seen = new Set();
       const questions = [];
       form.querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.closest('.opt-group')) return;   // the optional questions are not counted
         if (el.type === 'hidden' && !el.hasAttribute('data-count-progress')) return;
         if (el.name === 'botcheck') return;
         if (!el.name) return;
