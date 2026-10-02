@@ -142,6 +142,12 @@
   .ok-card h2{font-weight:900;font-size:38px;margin-bottom:14px;}
   .ok-card p{color:var(--ink-2);font-size:16px;line-height:1.8;}
   .ok-card p+p{color:var(--muted);font-size:14px;margin-top:12px;}
+  .ok-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:24px 0 6px;}
+  .ok-btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:100px;font-family:var(--fa);font-weight:800;font-size:16px;text-decoration:none;}
+  .ok-btn.p{background:var(--clay);color:#fff;}.ok-btn.s{color:var(--green);border:1.5px solid var(--green);}
+  .ok-card h2:focus{outline:none;}
+  .serr{margin:18px auto 0;max-width:520px;padding:12px 16px;border-radius:12px;background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.3);color:#8f2a1f;font-size:15px;line-height:1.8;text-align:center;}
+  .serr a{color:inherit;font-weight:800;}
   .foot{background:#0a3527;color:rgba(255,255,255,.7);padding:30px 0;text-align:center;font-size:15px;}
   .foot a{color:rgba(255,255,255,.85);}
 
@@ -433,6 +439,7 @@
 
   <div class="submit">
     <button type="submit" id="sbtn" class="sbtn">شروع کنیم ←</button>
+    <p id="serr" class="serr" role="alert" hidden></p>
     <p class="snote">جواب‌هات مستقیم برای من ارسال می‌شه.<br>با ارسال، با <a href="privacy.html">حریمِ خصوصی</a> و <a href="terms-fa.html">قوانین</a> موافقت می‌کنی.</p>
   </div>
 </form>
@@ -441,9 +448,13 @@
 <div id="ok" class="ok" role="dialog" aria-modal="true" aria-labelledby="okt">
   <div class="ok-card">
     <div class="ok-check">✓</div>
-    <h2 id="okt">ثبت شد!</h2>
+    <h2 id="okt" tabindex="-1">ثبت شد!</h2>
     <p>درخواستت رسید. بررسی‌ش می‌کنم و ظرفِ ۴۸ ساعت بهت پیام می‌دم تا ببینیم برای همکاری جوریم یا نه.</p>
-    <p>تا اون موقع، هر سؤالی داشتی راحت دایرکت بده.</p>
+    <p>جوابت رو از همون راهی که نوشتی (واتساپ یا اینستاگرام) می‌دم. تا اون موقع سؤالی داشتی، همین‌جا بهم پیام بده.</p>
+    <div class="ok-actions">
+      <a id="okWa" class="ok-btn p" href="https://wa.me/447435363461" target="_blank" rel="noopener">پیام توی واتساپ</a>
+      <a class="ok-btn s" href="/index-fa.html">برگرد به خانه</a>
+    </div>
   </div>
 </div>
 
@@ -645,14 +656,29 @@
     var b=document.getElementById('sbtn'),o=b.innerHTML;b.disabled=true;b.innerHTML='در حالِ ارسال…';
     // بررسیِ کدِ تخفیف (که با blur شروع شده) رو حداکثر ۲ ثانیه صبر کن، بعد در هر حال بفرست
     await Promise.race([dCheck,new Promise(function(r){setTimeout(r,2000);})]);
+    var serr=document.getElementById('serr');serr.hidden=true;
+    // یه شبکه‌ی کند نباید دکمه رو برای همیشه قفل کنه: هر مسیر ۱۵ ثانیه وقت داره
+    function within(ms,p){return Promise.race([p,new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},ms);})]);}
     try{
       // ثبتِ پایدار در Supabase اول، و ارسال ایمیلِ Web3Forms هم‌زمان. اگر یکی
       // موفق بشه کافی‌ست — پس قطعیِ Web3Forms دیگه فرم رو گم نمی‌کنه.
-      var rs=await Promise.allSettled([sendToSupabase(this,'fa'),fetch(this.action,{method:'POST',body:new FormData(this)})]);
+      var rs=await Promise.allSettled([within(15000,sendToSupabase(this,'fa')),within(15000,fetch(this.action,{method:'POST',body:new FormData(this)}))]);
       var ok=rs[0].status==='fulfilled'||(rs[1].status==='fulfilled'&&rs[1].value&&rs[1].value.ok);
-      if(ok){document.getElementById('ok').classList.add('on');document.body.style.overflow='hidden';window.scrollTo({top:0,behavior:'smooth'});if(window.plausible)window.plausible('Form Submitted FA');}
+      if(ok){
+        // قدمِ بعدی واتساپه، با پیامی که اسمِ تو رو داره
+        var nm=[document.getElementById('fn').value,document.getElementById('ln').value].map(function(x){return x.trim();}).filter(Boolean).join(' ');
+        var wa=document.getElementById('okWa');
+        if(wa)wa.href='https://wa.me/447435363461?text='+encodeURIComponent('سلام امیر، من '+(nm||'یه متقاضیِ جدید')+' هستم. همین الان فرمِ درخواست رو فرستادم.');
+        document.getElementById('ok').classList.add('on');document.body.style.overflow='hidden';window.scrollTo({top:0,behavior:'smooth'});
+        var okt=document.getElementById('okt');if(okt)okt.focus();
+        if(window.plausible)window.plausible('Form Submitted FA');
+      }
       else throw new Error('fail');
-    }catch(err){b.disabled=false;b.innerHTML=o;alert('یه مشکلی پیش اومد — دوباره امتحان کن یا به amirardekanian@gmail.com ایمیل بزن.');}
+    }catch(err){
+      b.disabled=false;b.innerHTML=o;
+      serr.innerHTML='ارسال نشد، ولی جواب‌هات همین‌جاست. چند لحظه بعد دوباره امتحان کن، یا توی <a href="https://wa.me/447435363461" rel="noopener">واتساپ</a> یا <a href="https://instagram.com/amirardekanian" rel="noopener">اینستاگرام</a> بهم پیام بده.';
+      serr.hidden=false;serr.scrollIntoView({behavior:'smooth',block:'center'});
+    }
   });
 
   // ── لایه‌ی زنده: reveal سکشن‌ها + نوار پیشرفتِ اسکرول ──

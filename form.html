@@ -461,6 +461,15 @@
     padding: 24px;
   }
   .success-overlay.is-open { display: flex; }
+  .success-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 24px 0 8px; }
+  .success-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: var(--radius-md);
+    font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; }
+  .success-btn--p { background: var(--accent-2); color: #fff; }
+  .success-btn--s { color: var(--accent); border: 1.5px solid var(--accent); }
+  .success-card h2:focus { outline: none; }
+  .submit-error { margin: 18px auto 0; max-width: 520px; padding: 12px 16px; border-radius: var(--radius-md); background: rgba(192,57,43,.08);
+    border: 1px solid rgba(192,57,43,.3); color: #8f2a1f; font-size: 15px; line-height: 1.5; text-align: center; }
+  .submit-error a { color: inherit; font-weight: 700; }
   .success-card {
     text-align: center;
     max-width: 440px;
@@ -1045,6 +1054,7 @@
       Submit Application
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </button>
+    <p id="submitError" class="submit-error" role="alert" hidden></p>
     <p class="submit-note">
       Your responses are sent directly to me.<br>
       By submitting, you agree to the <a href="/privacy.html">privacy policy</a> and <a href="/terms.html">terms</a>.
@@ -1060,9 +1070,13 @@
 <div id="successOverlay" class="success-overlay" role="dialog" aria-modal="true" aria-labelledby="successTitle">
   <div class="success-card">
     <div class="big-check" aria-hidden="true">✓</div>
-    <h2 id="successTitle">You're All Set.</h2>
+    <h2 id="successTitle" tabindex="-1">You're All Set.</h2>
     <p>Your application has landed. I'll review it and get back to you within 48 hours to talk through whether we're a good fit.</p>
-    <p>In the meantime, feel free to reach out directly if you have any questions.</p>
+    <p>I reply by WhatsApp or email. Got a question while you wait? Message me.</p>
+    <div class="success-actions">
+      <a id="successWa" class="success-btn success-btn--p" href="https://wa.me/447435363461" target="_blank" rel="noopener">Message Amir on WhatsApp</a>
+      <a class="success-btn success-btn--s" href="/">Back to the site</a>
+    </div>
   </div>
 </div>
 
@@ -1402,21 +1416,32 @@
       // typed code is in "Discount Code" either way.
       await Promise.race([discountCheck, new Promise(function (r) { setTimeout(r, 2000); })]);
 
+      const errBox = document.getElementById('submitError');
+      errBox.hidden = true;
+      // A slow network must not freeze the button for ever: each channel gets 15 s.
+      const within = (ms, p) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
       try {
-        // Land the submission in Amir's own database first (durable — shows
-        // in coach.html → Intake), and fire the Web3Forms email in parallel.
-        // Counts as sent if EITHER succeeds, so a Web3Forms outage can no
-        // longer silently swallow a lead.
+        // Land the submission in Amir's own database first (durable — shows in coach.html → Intake), and fire the
+        // Web3Forms email in parallel. Counts as sent if EITHER succeeds, so a Web3Forms outage can no longer silently
+        // swallow a lead.
         const [supaR, webR] = await Promise.allSettled([
-          sendToSupabase(this, 'en'),
-          fetch(this.action, { method: 'POST', body: new FormData(this) })
+          within(15000, sendToSupabase(this, 'en')),
+          within(15000, fetch(this.action, { method: 'POST', body: new FormData(this) }))
         ]);
 
         if (supaR.status === 'fulfilled' || (webR.status === 'fulfilled' && webR.value && webR.value.ok)) {
+          // The next step is WhatsApp, with a message that already names the applicant and the plan.
+          const name = [document.getElementById('firstName').value, document.getElementById('lastName').value].map(x => x.trim()).filter(Boolean).join(' ');
+          const plan = (document.querySelector('input[name="Programme"]:checked') || {}).value || '';
+          const text = "Hi Amir, it's " + (name || 'a new applicant') + '. I just sent my coaching application' + (plan ? ' (' + plan.split(' — ')[0] + ')' : '') + '.';
+          const wa = document.getElementById('successWa');
+          if (wa) wa.href = 'https://wa.me/447435363461?text=' + encodeURIComponent(text);
           const overlay = document.getElementById('successOverlay');
           overlay.classList.add('is-open');
           document.body.style.overflow = 'hidden';
           window.scrollTo({ top: 0, behavior: 'smooth' });
+          const heading = document.getElementById('successTitle');
+          if (heading) heading.focus();   // a screen reader hears the confirmation
           if (window.plausible) window.plausible('Form Submitted');
         } else {
           throw new Error('Submission failed');
@@ -1424,7 +1449,9 @@
       } catch (err) {
         btn.disabled = false;
         btn.innerHTML = originalHTML;
-        alert('Something went wrong — please try again or email amirardekanian@gmail.com.');
+        errBox.innerHTML = 'That did not go through, but your answers are still here. Try again in a moment, or message me on <a href="https://wa.me/447435363461" rel="noopener">WhatsApp</a>.';
+        errBox.hidden = false;
+        errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     });
   })();
