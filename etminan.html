@@ -362,9 +362,34 @@
   .langs a:hover{background:var(--accent-dim);color:var(--ink);}
   .langs a.on{background:var(--green);color:var(--bg);font-weight:700;}
   @media(max-width:520px){.nav-in::after{display:none;}}
+
+  /* ═══ accessibility pass (website audit, 2026-10-02) ═══
+     The look stays; what a visitor could not see, reach or read is fixed. */
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  .skip{position:absolute;top:-80px;inset-inline-start:12px;z-index:500;background:var(--green);color:var(--bg);padding:10px 16px;border-radius:var(--r);font-weight:700;text-decoration:none;}
+  .skip:focus{top:8px;}
+  /* keyboard focus: choice cards, pills and buttons showed nothing */
+  a:focus-visible,button:focus-visible,.pill input:focus-visible+span,.rcard input:focus-visible+label{outline:3px solid var(--green);outline-offset:3px;}
+  .consent:focus-within{border-color:var(--green);background:rgba(59,227,139,.1);}
+  .ok-card h2:focus{outline:none;}
+  /* the two muted greys were 3.1 and 4.1 to 1 on the dark ground; now above 4.5 */
+  :root{--muted:#7A9A87;--dim:#6E8F7B;}
+  /* 12 px is the floor for a label (they were 9.5 to 11.5) */
+  .badge,.lockup .pw,.trace-hd,.eyebrow,.pnote .sig,.mtile .k,.profile-hd .s,.prow .rank,.prow .tag,.dcard .role,.scta .lbl,.sbadge,.nav-in::after,.pfoot,.sedge,.plabel,.foot,.foot .fl{font-size:12px;}
+  /* the language switcher is a 44 px tap */
+  .langs a{display:flex;align-items:center;min-height:44px;padding:0 8px;font-size:12px;}   /* 44 px to tap, no wider than before */
+  /* the tagline under the academy name: sans, so it still fits on one line at 12 px (mono + spacing needed 200 px) */
+  .lockup .pw{font-family:var(--fa);letter-spacing:.2px;}
+  /* the ticker is a left-to-right strip in every language (in right-to-left it slid off screen) */
+  .ticker{direction:ltr;}
+  /* Persian letters must join: the mono face with letter-spacing broke them and drew them in Courier New */
+  .badge,.eyebrow,.pnote .sig,.prow .tag,.pfoot,.dcard .role,.lockup .pw,.scta .lbl,.plabel,.foot,.foot .fl,.mtile .k,.trace-hd,.profile-hd .s,.sbadge,.sedge,.ferr{font-family:var(--fa);letter-spacing:0;}
+  .badge::before{font-family:var(--mono);letter-spacing:2px;}
 </style>
 </head>
 <body>
+
+<a class="skip" href="#main">رفتن به محتوا</a>
 
 <!-- ═══ THE MARK, IN PLAY ═══
      The academy logo is the ball: struck at one wall, one arc across the
@@ -389,13 +414,14 @@
       </span>
     </div>
     <div class="langs">
-      <a href="/etminan.html" class="on">FA</a>
-      <a href="/etminan-en.html">EN</a>
-      <a href="/etminan-dv.html">DV</a>
+      <a href="/etminan.html" class="on" lang="fa" hreflang="fa" aria-current="page">FA<span class="sr"> فارسی</span></a>
+      <a href="/etminan-en.html" lang="en" hreflang="en">EN<span class="sr"> English</span></a>
+      <a href="/etminan-dv.html" lang="dv" hreflang="dv">DV<span class="sr"> ދިވެހި</span></a>
     </div>
   </div>
 </nav>
 
+<main id="main">
 <header class="hero">
   <div class="badge">ویژه‌ی بازیکنانِ آکادمی</div>
   <h1><span class="hw">آمادگی جسمانی، دورِ <span class="acc">تنیسِ تو</span></span></h1>
@@ -783,11 +809,12 @@
 </form>
 </div>
 </div><!-- /#formZone -->
+</main>
 
-<div id="ok" class="ok" role="dialog" aria-modal="true">
+<div id="ok" class="ok" role="dialog" aria-modal="true" aria-labelledby="okt">
   <div class="ok-card">
     <div class="ok-check">✓</div>
-    <h2>ثبت شد!</h2>
+    <h2 id="okt" tabindex="-1">ثبت شد!</h2>
     <p>ثبت‌نامت رسید. قدمِ بعدی دستِ مربی‌ات است — در تمرینِ بعدی از بازیِ تو فیلم می‌گیرد و برای من می‌فرستد.</p>
     <p>بعد از آن، من و فراز با هم پروفایل و برنامه‌ات را می‌بندیم و از طریقِ آکادمی به دستت می‌رسد.</p>
   </div>
@@ -996,7 +1023,7 @@
     try{
       var rs=await Promise.allSettled([sendToSupabase(this,'fa'),fetch(this.action,{method:'POST',body:new FormData(this)})]);
       var ok=rs[0].status==='fulfilled'||(rs[1].status==='fulfilled'&&rs[1].value&&rs[1].value.ok);
-      if(ok){document.getElementById('ok').classList.add('on');document.body.style.overflow='hidden';window.scrollTo({top:0,behavior:'smooth'});if(window.plausible)window.plausible('Etminan Form Submitted');}
+      if(ok){var okEl=document.getElementById('ok');[].forEach.call(document.body.children,function(n){if(n!==okEl&&n.tagName!=='SCRIPT')n.inert=true;});okEl.classList.add('on');document.body.style.overflow='hidden';window.scrollTo({top:0,behavior:'smooth'});var okt=document.getElementById('okt');if(okt)okt.focus();if(window.plausible)window.plausible('Etminan Form Submitted');}
       else throw new Error('fail');
     }catch(err){b.disabled=false;b.innerHTML=o;alert('یه مشکلی پیش اومد — دوباره امتحان کن یا به amirardekanian@gmail.com ایمیل بزن.');}
   });
