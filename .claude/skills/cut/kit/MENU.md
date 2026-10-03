@@ -15,7 +15,7 @@ the next new card is **226** (the ledger is `Content/motion/numbers.json`, see "
 | the page (artifact) | Generated from the manifest by `tools/menu_patch.py`. Never edit its data by hand. |
 | the page's database | `marks` (his Keep / Maybe / Drop, his rename and note: one doc per card id) and `adds` (ideas he adds with + Add). Only he writes marks. |
 | `kit/sfx/` + `kit.py` | Every sound card is a file here. `kit.py` reads the sound cards of `menu.json` into the `SFX` table, so `sfx=[(E(t), "thump")]` plays the card called Thump. The 11 old names (pop, ding, thock, hit, stamp, step, rise, tick, roll, swipe, whoosh) still work. |
-| `Content/motion/` (in the website repo) | The **lab**: canvas pieces, samples, sounds and the showreel. It does NOT publish the page. Its `numbers.json` is the one ledger of menu numbers. |
+| `Content/motion/numbers.json` (in the website repo) | The one ledger of menu numbers. It is the only file left in `Content/motion/`: the lab that used to sit there was deleted on 2026-10-02. |
 | `menu/archive/` | The /cut-only manifest this started from and the page as it was before the tidy (version 6). |
 | `menu/tidy_2026-10-01.py` | The record of the tidy: every one of the 224 old items, what was decided and why. Do not run it again. |
 
@@ -27,17 +27,15 @@ the next new card is **226** (the ledger is `Content/motion/numbers.json`, see "
 must play a different file from the kit's (the Whoosh). The page shows "Ready in /cut" for every card with a `cut`.
 
 ## One source (decided by Amir on 2026-10-01: "one source")
-The website repo holds the page's FIRST builder, **`Content/motion/`** (found when the repo was pulled before "go live"): `catalog.json` (183 pieces), `kit/` (the canvas pieces behind the showreel and
-the Reels-tab ideas such as Tally, Span, Chain Reaction and Highlighter), `lab.html` and `lab/` (samples), `tools/clips.js`, `tools/sounds.py` and `tools/build_menu.py`. It made items 1-183 and their
-samples earlier the same day. It was settled the same night:
-- **The live page is built ONLY from `kit/menu/menu.json` by `tools/menu_patch.py`.** `Content/motion/` no longer publishes it: `build_menu.py` makes a local preview only and the old
-  `menu/index.html` is deleted, so there is nothing to publish over the live page. That folder is the **lab**: pieces, samples, sounds, the showreel and its proof. Its README says so at the top.
-- **One ledger of numbers: `Content/motion/numbers.json`** (id to number, never reused; 1 to 225 are taken, `next` is 226). A card's `no` in `menu.json` must be the ledger's number for its id, and `menu_patch.py`
-  stops with a PROBLEM if it is not. A new card: take `next` from the ledger, add the id and number there, use the same number in `menu.json`, raise `next`. A piece drawn in the lab gets its number the
-  same way (`catalog.py` does it), so a lab piece and a menu card can never disagree.
-- **"Not built." on a card means not built as a /cut block** (Hyperframes). Several of those ideas (Range, Stat Chart, Cross Out, Pivot, Heartbeat, Dial) exist as canvas pieces in `Content/motion/kit`;
-  port the idea to a /cut block when a reel needs it. A lab sample can be used for its card: render it there (`clips.js`, 404 x 720) and build the page with `--samples <repo>\Content\motion\menu`.
-  The cards that left the menu still have their pieces there and their lines in `catalog.json`: that is fine, the lab keeps what was drawn.
+The website repo's `Content/motion/` was the page's FIRST builder (the "lab": `catalog.json` with 183 pieces, canvas pieces in `kit/`, `lab.html`, `tools/clips.js`, `tools/sounds.py`,
+`tools/build_menu.py`, the menu samples). It made items 1-183 and their samples on 2026-10-01. It was settled the same night, and on **2026-10-02 Amir had the lab deleted** (the Reels folder's
+`menu-samples`, `kit-showreel`..`kit-showreel6`, `hctv3230`, `raw` and `_tests` went too). It is not committed: `git restore Content/motion` in the repo brings the lab back.
+- **The live page is built ONLY from `kit/menu/menu.json` by `tools/menu_patch.py`.** Nothing else publishes it.
+- **One ledger of numbers: `Content/motion/numbers.json`**, the only file left in that folder (id to number, never reused; 1 to 225 are taken, `next` is 226). A card's `no` in `menu.json` must be the ledger's number for its id, and `menu_patch.py`
+  stops with a PROBLEM if it is not. A new card: take `next` from the ledger, add the id and number there, use the same number in `menu.json`, raise `next`. `catalog.py`, which used to number lab pieces, is gone: nothing else writes to the ledger.
+- **"Not built." on a card means not built as a /cut block** (Hyperframes). Several of those ideas (Range, Stat Chart, Cross Out, Pivot, Heartbeat, Dial) were canvas pieces in the old lab; they are
+  gone from disk (they remain in the repo's git history). Port the idea to a /cut block when a reel needs it. A card's sample now comes only from a showreel (`tools\menu_samples.py`, step 3 below).
+  The clips already live on the page stay as they are: `menu_patch.py` only needs `--samples` for a card whose clip is new or is being republished.
 
 ## 1. Before a reel: read the menu (creative director, step one)
 ```
@@ -58,10 +56,11 @@ The digest prints Keep (use first), Maybe (ask him), Drop (see below), his names
 2. **Add a card to `menu.json`**: the group it belongs to (same job, same place: look at the group before you make a new one), the next free `no` from the ledger (`Content/motion/numbers.json`: add the id there too and raise its `next`), `label`, `when`, `how` (a real call),
    `takes`, `farsi`, `pairs` (sound ids that exist), `like`, `cut`. If it is only a new form of an existing card, add an `alts` entry instead of a new card.
 3. **Make its sample** from the showreel: `python tools\menu_samples.py prepare` (once per showreel), `render <N>`, then `cut <id>` (a form's key works too). 450x800, no sound, no burned-in label.
+   `prepare` re-creates `C:\Users\Amir\Videos\Reels\menu-samples\` (deleted on 2026-10-02, about 1.8 GB when full) and needs the showreel folders it copies from, which were deleted too: rebuild the showreel first, and delete `menu-samples` again after publishing.
 4. **A new sound**: put the file in `kit/sfx/`, add a sound card with `file`, `dur` (the audible part), `vol` (set against the old sounds: effective peak around -9 for a hit, -14 for a tick, -20 for a bed), `track` (the next free number). The patch tool builds its page audio and waveform.
    **Then measure it: `python tools\sfx_lead.py --write`** (adds the file to `kit/sfx/timing.json`: when it really starts, hits, peaks and ends). A swell, a riser or a build-up needs `"align": "peak"` in that file and the odometer roll `"end"` (the tool's `ALIGN` table has the known ones; everything else is a sharp hit, `"onset"`).
    Without it a new reel (`sfx_align=True`) places the sound on its start, late by the file's own lead (the menu's mp3 files start 0.12 s in). `python tools\sfx_proof.py` renders a test reel and proves every hit lands on its frame.
-5. **Build the page**: `python tools\menu_patch.py <saved live page> --out <scratch>\menu\patched.html --stage <scratch>\menu\stage --samples C:\Users\Amir\Videos\Reels\menu-samples\out > patch.log`.
+5. **Build the page**: `python tools\menu_patch.py <saved live page> --out <scratch>\menu\patched.html --stage <scratch>\menu\stage --samples C:\Users\Amir\Videos\Reels\menu-samples\out > patch.log` (leave `--samples` out when no card has a new clip).
    It stops (and writes nothing) when the page has a card the manifest does not know, and prints PROBLEMS for every bad reference. Fix them. It prints FILES TO PUBLISH and FILES TO REMOVE.
 6. **Test it locally**: `python tools\menu_test_site.py <patched> <scratch>\menu\site --seed-add`, `python -m http.server 8766 --bind 127.0.0.1` in that folder, look at it in Playwright (a card, a form button, search, + Add, a sound, a reload, the console for a TypeError; the 404s for posters not copied into the test folder are noise). **Stop the server afterwards.**
 7. **Publish** with `Artifact` (`url`, `file_path` = the patched page, `root` = the stage folder, `files` = a map: each file to add as `"path": "path"`, each file to remove as `"path": null`). Omit `capabilities`. Never `force`.

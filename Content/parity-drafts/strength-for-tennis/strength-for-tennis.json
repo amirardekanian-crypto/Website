@@ -1,0 +1,163 @@
+{
+  "id": "strength-for-tennis",
+  "title": "Lift for the Court",
+  "category": "Training",
+  "readMins": 5,
+  "date": "October 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Most players who start lifting copy a bodybuilding plan, or add weight until it burns and call that a session. Neither builds strength for tennis. This is how I'd start: the main lifts, reps, picking the weight, progressing and how often to train in a tennis week."
+    },
+    {
+      "type": "p",
+      "text": "Why bother? In tennis players, resistance training raises serve speed a small amount, a bit more inside a full programme with jumps and throws. Not every study finds a gain. The data is all tennis. I'd lift the same way for padel because the leg work is similar, but that's my judgement."
+    },
+    {
+      "type": "h",
+      "text": "What good strength training looks like"
+    },
+    {
+      "type": "p",
+      "text": "The goal is more force and faster movement on court. Bigger muscles and sore legs aren't the goal."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Heavy sets of 3 to 8 reps. Rest 2 to 5 minutes between heavy sets.",
+        "No set goes to failure. You don't need it to get stronger, so finish with good reps left.",
+        "Lower the bar with control and lift it fast, on purpose.",
+        "Two-leg and single-leg lifts that train your legs, hips and trunk together.",
+        "More pulling than pushing for the upper body, like the Chin-Up and rows. That's my default for shoulder balance, not a study result."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "Pick one main lift"
+    },
+    {
+      "type": "p",
+      "text": "Your main lift is the one lower-body exercise you push hardest and track every week. Two good choices are the Trap Bar Deadlift and the Barbell Back Squat. Both train the whole leg."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Not sure? Start with the Trap Bar Deadlift. You stand inside the bar, so it's easier to learn. That's my suggestion, not a research finding.",
+        "Pick the Barbell Back Squat when your technique is good and you train in a rack with safety bars.",
+        "Same bar, same handles, same squat depth every time. Stay with one main lift for a few months, or you can't tell if you got stronger."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Always squat inside a rack, with the safety bars just below your lowest squat depth."
+    },
+    {
+      "type": "h",
+      "text": "Reps, sets and RPE"
+    },
+    {
+      "type": "p",
+      "text": "For most players, 3 to 4 sets of 3 to 8 reps on the main lift is a good range. The ACSM position stand and a large meta-analysis point the same way. They suggest around 4 sets per muscle group, and heavier, lower-rep work as you gain experience."
+    },
+    {
+      "type": "p",
+      "text": "You don't need your max to pick the weight. Use RPE, which here means how many good reps you had left after your last rep."
+    },
+    {
+      "type": "list",
+      "items": [
+        "RPE 10: no good reps left.",
+        "RPE 9: 1 good rep left.",
+        "RPE 8: 2 good reps left.",
+        "RPE 7: 3 good reps left. The bar still moves fast.",
+        "RPE 6: 4 or more reps left. Light, like a warm-up."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "A good rep keeps the same technique and range as your first. One honest limit: guessing reps in reserve is hard. In a review of 12 studies, people guessed about 1 rep too few left on average, and results varied a lot. Guesses got better close to failure and with heavier weights. So use RPE as a guide and fix it set by set."
+    },
+    {
+      "type": "h",
+      "text": "Choose the weight set by set"
+    },
+    {
+      "type": "p",
+      "text": "One step is the smallest jump your kit allows. That's 2.5 kg in total on a trap bar or barbell (5 kg if your smallest plates are 2.5 kg each), or the next size up for dumbbells. If a step is more than about 10% of the weight, stay put until the set feels easier. The ACSM suggests adding 2 to 10% once you beat your target reps by one or two."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Warm up with 2 or 3 light sets that build up to your first working weight.",
+        "First working set: pick the weight you think fits. Stuck between two? Take the lighter one.",
+        "Do the reps and ask right away: how many good reps could I have done? That's your RPE.",
+        "Adjust the next set. Two or more points below your target RPE? 2 steps heavier. One below? 1 step heavier. On target? Same weight. One above? 1 step lighter. Two above, or your form broke? 2 steps lighter.",
+        "Start next week from this week's last working weight. Write it down."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Never add extra reps to make up for a weight that's too light."
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Pain that isn't normal muscle burn means you stop that exercise. Sharp pain, joint pain or lingering pain needs a proper check."
+    },
+    {
+      "type": "h",
+      "text": "How to progress"
+    },
+    {
+      "type": "p",
+      "text": "Over a few weeks the weight goes up, reps drop and RPE creeps up. For example, 3 sets of 8 at RPE 6 early, then 4 sets of 4 at RPE 8 later. That's an example, not a rule."
+    },
+    {
+      "type": "p",
+      "text": "Don't let the plan go stale. In one small 8-week study of young tennis players, gains in jumping and sprinting showed up by week 4 but didn't continue to week 8. The authors pointed to little variety and little load management."
+    },
+    {
+      "type": "h",
+      "text": "How often in a tennis week"
+    },
+    {
+      "type": "p",
+      "text": "Twice a week is a good base. The ACSM suggests 2 to 3 days a week for beginners, not back to back. Studies that match total sets find the number of sessions makes little difference to strength."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Keep your heaviest leg day away from match day and your hardest court day. That's my suggestion.",
+        "Leave a day between lifting sessions so your legs can recover.",
+        "In busy match weeks, one session can hold your strength. In general populations, 1 session a week kept strength for months if the weights stayed heavy. There's little data on athletes."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "Players under 16"
+    },
+    {
+      "type": "p",
+      "text": "The research on young lifters is positive. The NSCA position statement (2009) and an international consensus (2014) say a well-designed, supervised programme is safe and effective. The NSCA suggests 2 to 3 days a week, not back to back, 1 to 3 sets of 6 to 15 reps to start, and adding 5 to 10% when strength improves."
+    },
+    {
+      "type": "p",
+      "text": "The key word is supervised. A parent watching isn't the same as a qualified coach. If you're in doubt, go lighter."
+    },
+    {
+      "type": "p",
+      "text": "My rules for under-16s are stricter than those papers, which say supervised max testing can be safe and experienced teenagers can go below 6 reps. These rules are mine, not a research threshold."
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Under 16: RPE 7 at most, never fewer than 6 reps, no max tests, and an adult there from warm-up to the last set."
+    },
+    {
+      "type": "p",
+      "text": "Based on Faigenbaum et al. (2009), Lloyd et al. (2014), the ACSM progression models position stand (2009), Rhea et al. (2003), Zourdos et al. (2016), Halperin et al. (2022) and Deng et al. (2025)."
+    }
+  ]
+}

@@ -47,7 +47,7 @@ body, music). He marks each card **Keep** (use it), **Maybe** (ask him first) or
 - **It is "the list"** in the creative-director rule (`USAGE.md` rule 7): use Keep, ask about Maybe, Drop leaves. After building something new, add its card (`MENU.md` section 2). Republishing the
   page for this is part of finishing a block (he asked for the connection on 2026-10-01: "update and edit as you think is best"); never overwrite a mark of his, and say what you changed.
 - **Its numbers are not the showreel numbers**: menu 41 is gone (it was Spring Lab), showreel 41 is the diagram chain. Always say "menu N" or "showreel N". A removed number is never used again; the next new card is 226. The one ledger
-  of menu numbers is `Content/motion/numbers.json` in the website repo (`menu_patch.py` checks `menu.json` against it). **One source** (his word, 2026-10-01): the page is built from `menu.json` only; `Content/motion/` is the lab and no longer publishes it.
+  of menu numbers is `Content/motion/numbers.json` in the website repo (`menu_patch.py` checks `menu.json` against it). **One source** (his word, 2026-10-01): the page is built from `menu.json` only. `Content/motion/` in the repo now holds just that ledger: the lab was deleted on 2026-10-02.
 - **Sounds:** the menu's sounds are the kit's sound table (`kit.py` reads them from `menu.json`): `sfx=[(E(t), "thump")]`. The old kit names still work.
 
 ## Start a reel

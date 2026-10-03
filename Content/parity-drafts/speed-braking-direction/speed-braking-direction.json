@@ -1,0 +1,173 @@
+{
+  "id": "speed-braking-direction",
+  "title": "Fast Start, Hard Brake",
+  "category": "Training",
+  "readMins": 5,
+  "date": "October 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Most running in tennis is short. A player covers about 3 m per shot and 8 to 12 m per point. That's why speed, braking and change of direction matter more than top speed. Your first step gets you to the ball. Your brake lets you hit and go again in balance."
+    },
+    {
+      "type": "h",
+      "text": "Short bursts, again and again"
+    },
+    {
+      "type": "p",
+      "text": "These numbers come from tennis match studies. Players run an average of about 3 m per shot. About 80% of shots are played within 2.5 m of where the player stood, and about 10% need 2.5 to 4.5 m. A point has 3 to 4 changes of direction. One research group says players will most likely never reach their top sprint speed, because they keep speeding up, braking and speeding up again. That's their reading, not a measurement."
+    },
+    {
+      "type": "p",
+      "text": "Padel looks similar. Players cover about 11 m per point, and reviews describe repeated accelerations, braking and changes of direction. I haven't found padel numbers for each shot, so the per-shot figures above are tennis only."
+    },
+    {
+      "type": "p",
+      "text": "So train how fast you get going. A review in the British Journal of Sports Medicine says tennis players should sprint no further than the longest run they make for a shot, with stop-start sprints of up to 20 m. I'd start with 5 to 10 m. That part is my suggestion, not a tested dose."
+    },
+    {
+      "type": "h",
+      "text": "The first step"
+    },
+    {
+      "type": "p",
+      "text": "Speed starts at the split step. You land ready, then take an explosive first step. These cues come from coaching practice, not from a tennis study."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Land the split step ready and take the first step straight away.",
+        "Stay low for the first two steps. Don't stand up too early.",
+        "Lean forward from your ankles, not your waist.",
+        "In a Crossover Start Sprint, open your hips first, then bring your back leg across in front."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Sprint flat out and rest fully between reps. Short rests slow the next rep, and then it's endurance work, not speed. That's practice, not research."
+    },
+    {
+      "type": "h",
+      "text": "Braking starts a few steps out"
+    },
+    {
+      "type": "p",
+      "text": "Braking isn't only the last step. Good movers slow down over a few steps. Their steps get shorter and lower, then the braking leg grips the ground."
+    },
+    {
+      "type": "p",
+      "text": "A lab study of 180 degree turns measured 20 male soccer players. The biggest braking force came on the step three from the end, and it was bigger than on the next two (Dos'Santos 2021)."
+    },
+    {
+      "type": "p",
+      "text": "The forces are big. A review found the peak force in the first 50 milliseconds of a hard stop can be up to 2.7 times the force of the first steps in a maximal sprint (Harper 2022). Honest limit: this data comes from soccer and similar sports, not tennis."
+    },
+    {
+      "type": "callout",
+      "label": "Remember",
+      "text": "Start slowing down a few steps out. Don't count on one long, straight last step."
+    },
+    {
+      "type": "h",
+      "text": "What a good brake looks like"
+    },
+    {
+      "type": "p",
+      "text": "Use these points in any braking drill, like Turn and Go or Wide-Ball Brake and Recover. If your phone shoots slow motion, film a rep and compare. Lab studies back some points, like getting lower and keeping the knee from caving in (Donelon 2020). No study has tested this exact list in tennis."
+    },
+    {
+      "type": "list",
+      "items": [
+        "A few shorter steps before the braking leg, not one long last step.",
+        "Get low. Your hips and knees clearly bend in the last two steps.",
+        "The knee of your braking leg stays over your toes, not caving in.",
+        "No slipping, stumbling, hand on the ground or extra steps after the brake.",
+        "Your first step goes the new way without standing up first."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Pain in your knee, ankle or groin when you brake isn't normal soreness. Stop and get it checked."
+    },
+    {
+      "type": "h",
+      "text": "Angle and speed make a turn harder"
+    },
+    {
+      "type": "p",
+      "text": "How hard a change of direction is depends on two things. One is the angle of the turn. The other is how fast you come in. A 180 degree turn is harder than a 45 degree one. A fast approach is harder than a slow one. Faster and sharper turns also load the knee more, and they're the moves that win points (Dos'Santos 2018)."
+    },
+    {
+      "type": "p",
+      "text": "So raise one thing at a time. Faster, sharper reps cost your legs more, so don't add reps as the turns get harder. That's my suggestion, not a tested dose."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Walk through the turn first.",
+        "Then jog it.",
+        "Then add speed at the same angle.",
+        "Only then make the angle sharper."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Under 16",
+      "text": "In a growth spurt, or under 16? Keep the speed and the angle easy, keep the reps few and have a coach watch. Stop if anything hurts."
+    },
+    {
+      "type": "h",
+      "text": "Strength helps you go and stop"
+    },
+    {
+      "type": "p",
+      "text": "Leg strength helps. A meta-analysis of 15 studies found that bigger gains in squat strength went with bigger gains in sprint speed (Seitz 2014). That's an average across many sports, not a promise."
+    },
+    {
+      "type": "p",
+      "text": "For braking, eccentric strength looks important. In 12 elite female basketball players it was the only strength measure that predicted change-of-direction time (Spiteri 2014). That's a small study. A bigger review says technique and other strength types matter too (Harper 2022)."
+    },
+    {
+      "type": "h",
+      "text": "The ladder: footwork, not agility"
+    },
+    {
+      "type": "p",
+      "text": "A training ladder, also called an agility ladder, makes your feet light and rhythmic. The pattern is set in advance and there's nothing to react to. So it isn't agility training."
+    },
+    {
+      "type": "p",
+      "text": "In a 2026 study, 64 male college basketball players trained for 4 weeks. A computer-based reaction program improved foot speed by 7.0%, and the ladder by 2.4%. Choice reaction time got 6.9% faster against 0.7%. It's one short study in one sport, so don't over-read it. If you like the ladder, use it in your warm-up."
+    },
+    {
+      "type": "h",
+      "text": "Cap the hard brakes"
+    },
+    {
+      "type": "p",
+      "text": "Every hard brake puts a lot of force through your legs. In soccer, hard braking causes more fatigue and muscle damage than equally hard accelerating, and the authors say few tested guidelines exist for how much to do (Harper and Kiely 2018). Nobody has a research number for tennis."
+    },
+    {
+      "type": "p",
+      "text": "I keep a weekly limit on hard brakes. That limit is my practical rule, not a research number. So are these three."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Add braking and change-of-direction drills slowly, a few reps at a time.",
+        "If you have two speed days, keep them at least 48 hours apart.",
+        "Do one hard gym or speed session a day, not two."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Start slowing down early, add hard brakes slowly and give your legs 48 hours between speed days."
+    },
+    {
+      "type": "p",
+      "text": "Based on Reid and Duffield (2014), Kovacs (2006), Dos'Santos et al. (2018, 2021), Harper et al. (2022), Seitz et al. (2014) and Zhang et al. (2026)."
+    }
+  ]
+}

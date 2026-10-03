@@ -154,7 +154,7 @@ def page(template_path, out_path, parts):
 # "do not use it when" column in BLOCKS.md and his rules (USAGE.md: one spine and two or three devices a reel; two or three kinds of wipe), and from the
 # repos' per-reel caps (RESEARCH-2026-10-01.md section 5): slam at most 2 per piece, a flash only for the one moment that matters.
 CAPS = {"number": 3, "slamBehind": 2, "versus": 2, "list": 2, "quote": 1, "question": 3, "chapter": 3, "flash": 2, "whip": 2, "behind": 3,
-        "backdrop": 2, "courtSteps3d": 1, "courtMeasure3d": 1, "diagram": 3, "curve": 2, "bodymap": 2, "checklist": 2, "cta": 1}
+        "backdrop": 2, "courtSteps3d": 1, "courtMeasure3d": 1, "diagram": 3, "curve": 2, "bodymap": 2, "checklist": 2, "cta": 1, "range": 3}
 SMALL = {"stamps", "chips", "tag", "ghost", "cta", "fa", "words", "label", "timeline", "init", "flash"}  # small things: not counted as a "device"
 FULL = {"number", "versus", "question", "courtSteps3d", "courtMeasure3d", "curve", "bodymap", "quote"}  # always take the whole screen
 

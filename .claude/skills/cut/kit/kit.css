@@ -1724,3 +1724,34 @@ body {
   opacity: 0;
   filter: drop-shadow(0 0 12px rgba(224, 107, 67, 0.85));
 }
+
+/* range: two odometers and "تا" between them (K.range) */
+.k-rangew {
+  position: absolute;
+  left: 0;
+  width: 1080px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  direction: ltr;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+}
+.k-full.k-ink .k-rangew {
+  color: var(--k-accent2);
+}
+.k-full.k-paper .k-rangew {
+  color: var(--k-ink);
+}
+.inner .k-rangew {
+  z-index: 3;
+  color: var(--k-paper);
+}
+.inner .k-rangew.k-numc {
+  color: var(--k-accent2);
+}
+.k-rangew .k-nsep {
+  padding: 0 0.1em 0.2em;
+  direction: rtl;
+}

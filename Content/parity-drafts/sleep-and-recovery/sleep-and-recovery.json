@@ -1,0 +1,178 @@
+{
+  "id": "sleep-and-recovery",
+  "title": "Sleep Is Training",
+  "category": "Recovery",
+  "readMins": 5,
+  "date": "October 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Most players count their sets and reps and ignore what happens while they sleep. This is sleep and recovery for tennis players in plain words: how much you need, what short sleep does to your game, and which recovery tricks are worth it. Most studies are on tennis players and other athletes. I know of none on padel."
+    },
+    {
+      "type": "h",
+      "text": "Sleep for a tennis player: how much do you need?"
+    },
+    {
+      "type": "p",
+      "text": "Teenagers aged 13 to 18 need about 8 to 10 hours a night, say the National Sleep Foundation and the American Academy of Sleep Medicine. For adults the Foundation says 7 to 9 and the Academy says at least 7, and needs vary. Studies of elite athletes find many sleep under 7 hours."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Count back from your wake-up time. A teenager who needs 9 hours and wakes at 6:30 should be asleep by about 21:30.",
+        "Hard to get up without an alarm and sleepy at midday? You're probably short on sleep.",
+        "Enough sleep on most nights beats one good night before a match."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Very sleepy in the day despite enough sleep, or loud snoring with pauses in breathing at night? Tell a doctor."
+    },
+    {
+      "type": "h",
+      "text": "What short sleep does to your game"
+    },
+    {
+      "type": "p",
+      "text": "The studies don't all agree, but the picture is clear. After too little sleep, thinking gets slower and less accurate, reactions slip and sports performance drops."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Accuracy: in two small studies on semi-professional tennis players, one night of about 5 hours' sleep made serves less accurate. Caffeine didn't help.",
+        "Physical performance: a review of 69 studies found lower performance on average after 6 hours of sleep or less, mostly after no sleep or a much earlier wake-up. Most people studied were men.",
+        "Injuries: in a study of 112 school athletes aged 12 to 18, those sleeping under 8 hours a night were about 1.7 times as likely to have been injured. That's a link, not proof."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Remember",
+      "text": "One short night can cost you some accuracy but won't wreck your season."
+    },
+    {
+      "type": "h",
+      "text": "Does more sleep help?"
+    },
+    {
+      "type": "p",
+      "text": "Two small studies tried it. Both compared players with their own earlier weeks, with no control group, so they can't prove it was the sleep."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Tennis: 12 college players slept about 1.7 hours more a night for a week. Serve accuracy rose from about 36% to 42% and they felt less sleepy.",
+        "Basketball: 11 college players slept about 110 minutes more a night for 5 to 7 weeks. Sprints got faster, free throws and three-pointers each improved by about 9%.",
+        "Before a big match or heavy week, I'd try a few earlier nights."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Key",
+      "text": "More sleep is probably the cheapest boost to your game."
+    },
+    {
+      "type": "h",
+      "text": "Daytime naps"
+    },
+    {
+      "type": "p",
+      "text": "If you slept badly, a nap can help. Reviews on athletes found naps often improved physical performance, reaction time and tiredness, though the evidence is only moderate quality. A nap doesn't replace night sleep."
+    },
+    {
+      "type": "list",
+      "items": [
+        "When: roughly 1 to 4 pm.",
+        "How long: 20 to 90 minutes. Longer naps helped more in most studies, but you may feel groggy.",
+        "Wait about 30 minutes after a nap before you train or play. If a nap makes it hard to fall asleep at night, shorten it or skip it."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "The night before a match, and travel"
+    },
+    {
+      "type": "p",
+      "text": "Sleeping badly before a big match is very common. In a survey of 283 elite Australian athletes, about two thirds had slept worse before an important competition at least once in the past year, mostly from thinking about the match or nerves. It wasn't a long-term problem, so don't panic if it happens to you."
+    },
+    {
+      "type": "list",
+      "items": [
+        "The night before, keep your routine. Eat a familiar dinner that isn't too late or too heavy, and try nothing new.",
+        "Travel is tiring even with no time change. If you can, arrive a day early, and on a long trip walk around every hour or two.",
+        "Keep sleep times close to home, and fit meals and daylight to local time. In a hotel, keep your phone away from the bed and bring an eye mask and earplugs."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Honest Limit",
+      "text": "Little evidence exists on handling travel fatigue. These are practical rules, not hard rules."
+    },
+    {
+      "type": "h",
+      "text": "Screens, caffeine and one simple routine"
+    },
+    {
+      "type": "p",
+      "text": "Screen light at night pushes your bedtime back. In one lab study, adults took longer to fall asleep and were less alert next morning after reading on a light-emitting e-reader than a paper book. In young people, more screen time goes with shorter, later sleep, though nobody has proved the screens cause it."
+    },
+    {
+      "type": "p",
+      "text": "Caffeine is in coffee, strong tea, cola and energy drinks. In one study, 400 mg of caffeine disturbed sleep even 6 hours before bed. Energy drinks aren't for under-18s anyway."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Same bedtime and wake-up time every day, weekends too.",
+        "No coffee, strong tea, cola or energy drinks in the last 6 hours before bed.",
+        "Phone away an hour before bed, charged away from the bed.",
+        "Room dark, quiet and cool.",
+        "Something calm: a warm shower, a paper book or light stretching."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "A simple routine you do every night beats a perfect one you do now and then. Try these five steps for two weeks."
+    },
+    {
+      "type": "h",
+      "text": "Recovery: the basics first"
+    },
+    {
+      "type": "p",
+      "text": "Recovery means your body getting ready again after the stress of training and matches. The basics are enough sleep, enough food, easy days between hard days and one full rest day a week."
+    },
+    {
+      "type": "h",
+      "text": "Massage and cold water: the evidence"
+    },
+    {
+      "type": "p",
+      "text": "Massage may ease muscle soreness, and a review of 29 studies found it improved flexibility a little. It didn't improve strength, jumping, sprinting or endurance. Studies disagree on whether it eases tiredness."
+    },
+    {
+      "type": "p",
+      "text": "Cold water or ice baths reduced soreness a little in small, low-quality trials. But regular cold water right after strength sessions can cut your gains. In a 12-week study of 21 men, the group who sat in cold water for 10 minutes after every session gained less strength and muscle. A later review agreed. These were adults, and I know of no studies on teenagers."
+    },
+    {
+      "type": "p",
+      "text": "So skip cold water after strength sessions. If you like it for sore legs, my suggestion is to use it after matches. Massage, a foam roller or compression clothing are fine if they feel good."
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Very cold water isn't right for everyone. With a heart or blood pressure problem, ask a doctor first. Teenagers only with an adult's OK and an adult there."
+    },
+    {
+      "type": "callout",
+      "label": "Key",
+      "text": "No gadget replaces enough sleep, enough food and easy days."
+    },
+    {
+      "type": "p",
+      "text": "Based on Walsh et al. (2021), Reyner and Horne (2013), Craven et al. (2022), Milewski et al. (2014), Mah et al. (2011), Schwartz and Simon (2015) and Roberts et al. (2015)."
+    }
+  ]
+}

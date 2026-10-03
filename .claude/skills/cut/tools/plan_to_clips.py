@@ -257,7 +257,10 @@ def build(a):
     js = []
     for g in segs:
         z, d = float(g.get("zoom", 1.0)), float(g.get("drift", 0.0))
-        js.append('gsap.set("#v%d", { scale: %g, transformOrigin: "%s" });' % (g["i"], z, origin))
+        # shift: move him down (+) or up (-) by that many px inside the frame (needs zoom > 1 so no edge shows: at zoom z about origin 45% the
+        # most you can move down is 864*(z-1) px, up 1056*(z-1)). Makes room for type above or below his head. Added 2026-10-02 (Amir: "you can move me up or down")
+        sh = float(g.get("shift", 0.0))
+        js.append('gsap.set("#v%d", { scale: %g, y: %g, transformOrigin: "%s" });' % (g["i"], z, sh, origin))
         if g.get("punch"):
             js.append('tl.fromTo("#v%d", { scale: %g }, { scale: %g, duration: 0.16, ease: "power3.out" }, %.4f);'
                       % (g["i"], round(z * 0.96, 4), z, g["start"]))

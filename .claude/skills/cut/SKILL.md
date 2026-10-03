@@ -122,6 +122,7 @@ Do not install any third-party skill from GitHub: copy the ideas.
      or a pause. The voice keeps its pitch (Hyperframes time-stretches audio with ffmpeg `atempo`).
    - **Cut-ins:** alternate wide (`zoom` 1.0) and tight (1.12-1.2) on consecutive cuts: it hides the jump cut.
      `punch: true` settles the scale on the cut; `drift` is a slow push-in. One or the other on a segment.
+   - **Reframe (Amir, 2026-10-02: "you can zoom, you can move me up or down, bring me closer, this is a raw file"):** every segment may carry `zoom` (run the whole reel at about 1.10 when he sits small in the frame, 1.22 for tight cut-ins) and `shift` (px, + moves him DOWN, - up; needs zoom above 1: at origin 45% the most is 864 x (zoom-1) down and 1056 x (zoom-1) up). Down 40-50 px with a 1.22 zoom takes the face out of his caption band and opens the top for one line of type. Not in a segment that uses `K.backdrop`/`K.focus` (they move the same video). A studio swap (`K.backdrop` with `lower`) is still the way to open real headroom (about 370 px above the head).
    Then `python <skill>/tools/plan_to_clips.py build plan.json transcript.json <work>/out` writes `clips.html`,
    `zoom.js`, `timemap.json` and `transcript.edited.json`. **From here on every time is on the EDITED clock**:
    place graphics and transitions from `transcript.edited.json`, and put a transition on a cut at that
@@ -158,7 +159,7 @@ Do not install any third-party skill from GitHub: copy the ideas.
    silent blank-video bug).
 9. **Render.** `hyperframes render public -o out.mp4 --fps 30` (default quality `looks`, CRF 16; `-q draft` for a
    quick look). Measured: 44 s of video in 38 s, so a reel takes about a minute or two.
-10. **Finish the sound.** `python <skill>/tools/loud.py raw.mp4 final.mp4`: two-pass loudnorm to -14 LUFS / -1.5 dBTP,
+10. **Finish the sound.** `python <skill>/tools/loud.py raw.mp4 final.mp4`: pre-limiter on the hits, gain to -14 LUFS, final limiter (changed 2026-10-02: the old two-pass loudnorm left a reel with sound effects at -0.2 dBTP after AAC),
     48 kHz stereo AAC, picture copied, re-measured (PASS or CHECK). `python <skill>/tools/sync2.py RAW final.mp4
     out/timemap.json` checks the voice against the original take at every speed (lag 20 ms or less, correlation 0.85+).
     **Then the render gate: `python <skill>/tools/qa_reel.py final.mp4 --tour`**: 1080x1920 / 30 fps / yuv420p / AAC, picture and sound the same length, -14 LUFS and -1 dBTP, no silence of 0.8 s in the mix,

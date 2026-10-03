@@ -92,3 +92,8 @@ the benched stamp variant. They are not on the menu any more and must not be use
   chips grid, ghost numeral, question card ink with clay wipe, court steps, court measure, word behind him (clay then
   paper), tag with ring, closing stamp (slide), call to action stamp, flash once; sounds: pop, whoosh, ding, thock, hit,
   stamp. Bespoke: none (all of it became the kit).
+- **SGUW4377 v1** (2026-10-02, "match-day nutrition: before, during, after", 141 s raw to 135.2 s): spine = three chapters (band, `K.chapter` 1-3) and ranges (`K.range`, NEW). Reframed: he runs 1.10x closer all through, 1.22x tight cut-ins that
+  also move him 40-50 px DOWN (planner `shift`, new) so the face leaves the caption band; two studio swaps (clay, then green) with the carbs word and the ranges behind him; stamps (hook, bananas), tag (x3), question card (clay + iris), versus x2
+  (hydrated against catching up; healthy or diet against performance), drum on video x2, diagram on video x2 (stack: 70 kg, 3 h, 140-210 g; row: heat, sweat, need), chips x3, checklist, range card x2 (ink, clay), cta bubble. Wipes: iris and clay only.
+  53 sound cues (24 a minute: more than HCTV3230). Bespoke: none (K.range became the kit). Open: the chest-zone blocks still sit under the right-hand buttons; two pinholes in the dark shirt print in the RVM cut-out.
+

@@ -1,0 +1,167 @@
+{
+  "id": "robust-body",
+  "title": "Built to Last",
+  "category": "Training",
+  "readMins": 6,
+  "date": "October 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Tennis means thousands of serves, shots, stops and pushes every season. Building a robust body means getting the parts that take most of that load ready for it, slowly and on a schedule. Muscles and tendons get stronger when you load them step by step. The science here is less certain than most fitness content makes it sound."
+    },
+    {
+      "type": "h",
+      "text": "What the research says"
+    },
+    {
+      "type": "p",
+      "text": "Strength training does lower injury rates in sport. A 2014 review of 25 trials found strength training cut sports injuries to less than a third (relative risk 0.32). A 2018 review of six trials agreed (0.34)."
+    },
+    {
+      "type": "p",
+      "text": "But those reviews cover sport in general, not tennis. The one tennis trial I could find had 579 adult players on a 12 week online programme with nobody supervising. Injury rates matched the control group, 37% and 38%."
+    },
+    {
+      "type": "callout",
+      "label": "Remember",
+      "text": "No exercise or programme can promise you won't get hurt. Treat this work as a good bet, not a guarantee."
+    },
+    {
+      "type": "h",
+      "text": "Where players get hurt"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Tennis in general: sudden injuries in the legs, like a rolled ankle. Slow build-up problems in the arm, like outside-elbow pain in recreational players and shoulder pain in high level players.",
+        "Australian Open and US college data: the shoulder, knee, ankle, foot and trunk come up again and again.",
+        "Padel, from a review of 8 studies: the elbow came first, then the knee, shoulder and lower back."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "These studies show where problems happen. None of them show that training those areas stops the problems."
+    },
+    {
+      "type": "h",
+      "text": "Shoulder"
+    },
+    {
+      "type": "p",
+      "text": "The rotator cuff is a group of small muscles that keep the top of your arm in its socket. In serves they control the arm and help slow it after the shot. A 2025 review of three studies in handball and volleyball players found shoulder programmes cut shoulder injuries by about half. The certainty was very low and none of it was tennis, so it's a reasonable bet, not a proven fix."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Turning the arm out: Band External Rotation, Side Lying Dumbbell External Rotation and Cable External Rotation.",
+        "Incline Y Raise and Band Pull-Apart for the muscles around the shoulder blade.",
+        "More pulling sets (rows and chin-ups) than pushing sets over a week. That's my rule of thumb. No study backs it."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "Elbow, forearm and wrist"
+    },
+    {
+      "type": "p",
+      "text": "The tendons on the back of your forearm attach at the outside of the elbow and take a lot of load on every shot. That's where tennis elbow lives. The research on slowly lowering a weight is in people who already have it. In one trial of 120 people, lowering a weight eased pain faster than lifting it. A review of 12 trials on arm tendons couldn't say it beats other treatments. Nobody has shown it stops tennis elbow from starting."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Single-Arm Eccentric Wrist Extension: you lower the wrist slowly. Single-Arm Wrist Extension: you lift it and lower it.",
+        "Pulls and carries train the hand and forearm too: Chin-Up, rows and Suitcase Carry."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "Trunk, hips and groin"
+    },
+    {
+      "type": "p",
+      "text": "Tennis shots start in the legs and travel through the trunk to the arm. I found no study showing trunk work prevents tennis injuries, so that's coaching logic."
+    },
+    {
+      "type": "p",
+      "text": "The groin has better evidence, but not from tennis. In a trial of 652 semi-professional football players, a simple adductor programme built on the Copenhagen Adduction exercise cut self-reported groin problems by about 40%. Tennis has similar sideways braking and wide reaches, but that link is my own reasoning."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Trunk: Side Plank, Half-Kneeling Pallof Press, Cable Wood Chop and Dead Bug. Harder versions come later.",
+        "Groin: Copenhagen Plank, a side plank where the inside of your top leg holds your body up. Adductor Squeeze works the groin without moving."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "Hamstrings and knees"
+    },
+    {
+      "type": "p",
+      "text": "Your hamstrings control the leg when it's out in front and straight, in sprinting and braking. The Nordic Hamstring Curl has the strongest evidence in this article. A 2019 review of 15 studies and 8,459 athletes found about half as many hamstring injuries in programmes that included it (risk ratio 0.49). It wasn't a tennis study. For the knee I have no tennis evidence, so I build leg strength and landing skill slowly."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Hamstrings: Stability Ball Leg Curl early on, then Nordic Hamstring Curl once you're ready.",
+        "Leg strength: Trap Bar Deadlift, Barbell Back Squat and Dumbbell Split Squat.",
+        "Landing and braking: practise landing and holding still before harder jumps, for example with Snap Down and Box Drop. Raise approach speed and angle sharpness slowly, and cap hard stops each week."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Growing players: pain right below the kneecap or at the back of the heel needs attention, even if it's mild. Tell your coach and see a doctor."
+    },
+    {
+      "type": "h",
+      "text": "Calves, ankles and feet"
+    },
+    {
+      "type": "p",
+      "text": "Your calf and Achilles tendon work like a spring, taking the force of landing and giving it back. Balance work has decent evidence for ankles. A 2022 review of nine trials and 4,959 football players found programmes with balance exercises cut ankle injuries by about a third (risk ratio 0.64)."
+    },
+    {
+      "type": "p",
+      "text": "For the Achilles, the strong evidence is for people who are already hurt. In a trial of 58 people with Achilles tendon pain, slow heavy calf loading and eccentric loading both gave lasting improvement at one year. I found no trial showing calf work prevents Achilles problems. Tendons do respond to load, though. In healthy adults, heavier loading made tendons stiffer. Foot work goes in warm-ups because the foot is a common problem area in women's tennis. That's my reasoning."
+    },
+    {
+      "type": "list",
+      "items": [
+        "In warm-ups: Short Foot (barefoot), Ankle Dorsiflexion Rocks, Single-Leg Balance and short Pogo Jumps.",
+        "Straight leg calf work: Standing Dumbbell Single Leg Calf Raise.",
+        "Bent knee calf and shin work: Seated Dumbbell Calf Raise and Tibialis Raise."
+      ]
+    },
+    {
+      "type": "h",
+      "text": "Mobility and warm-ups"
+    },
+    {
+      "type": "p",
+      "text": "Mobility means moving through your full range with control, like the hips for open stance shots or the upper back for the serve. Stretching alone didn't reduce injuries in the 2014 review, so don't expect it to protect you by itself."
+    },
+    {
+      "type": "list",
+      "items": [
+        "In warm-ups: World's Greatest Stretch, Leg Swings, Lateral Lunge and Open Book.",
+        "An easy home session: 90/90 Hip Switch, Kneeling Hip Flexor Stretch and Quadruped Thoracic Rotation, at RPE 7 or below."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Robustness work isn't treatment. If you have pain that gets worse with training, wakes you at night or comes with swelling, don't train that area. See a doctor or physio."
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Add load slowly and keep going all year. Robustness work gets your body ready for tennis. It can't make you injury-proof."
+    },
+    {
+      "type": "p",
+      "text": "Based on Lauersen et al. (2014, 2018), Pas et al. (2020), Gescheit et al. (2017), Heming et al. (2025), van Dyk et al. (2019), Harøy et al. (2019) and Beyer et al. (2015)."
+    }
+  ]
+}

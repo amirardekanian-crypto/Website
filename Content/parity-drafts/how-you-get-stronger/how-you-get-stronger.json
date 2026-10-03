@@ -1,0 +1,153 @@
+{
+  "id": "how-you-get-stronger",
+  "title": "Built In The Gaps",
+  "category": "Recovery",
+  "readMins": 6,
+  "date": "October 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Most players think a hard session makes them stronger. It doesn't, not on the day. Right after it you're more tired and a bit weaker. The strength comes later, when your body recovers and adjusts. That's recovery and adaptation, and here's how it works. Most research is on adults in the gym or in endurance sport, and I found no padel-specific study, so treat the numbers as rough guides."
+    },
+    {
+      "type": "h",
+      "text": "How your body gets stronger"
+    },
+    {
+      "type": "p",
+      "text": "A good session asks a bit more of your body than it can do today. Straight after, you're tired, often sore and performing a little worse. Over the next days, if you sleep well, eat enough and add no more stress, the tiredness fades and your body adjusts."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Stress: a session that asks slightly more than you can do now.",
+        "Fatigue: a short drop in performance, and often soreness.",
+        "Recovery: sleep, food and easier days.",
+        "Adaptation: your muscles, tendons and nervous system end up a bit better prepared."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Your body doesn't care where the stress comes from. Tennis, padel, gym work and school all go on the same account (Kellmann 2018)."
+    },
+    {
+      "type": "callout",
+      "label": "Key",
+      "text": "You don't get stronger in the session. You get stronger in the gaps between sessions."
+    },
+    {
+      "type": "h",
+      "text": "A model, not a law"
+    },
+    {
+      "type": "p",
+      "text": "Coaches often use a simple picture. Each session adds a little fitness, which fades slowly, and more fatigue, which fades fast. What you see on a given day is roughly fitness minus fatigue. So you can feel flat after a hard week and sharp after an easy one."
+    },
+    {
+      "type": "p",
+      "text": "Some books draw a curve where you bounce back higher than before, called supercompensation. It's a useful picture, but still a model. People respond at different speeds, and a paper on the model warns against general numbers (Vermeire 2022)."
+    },
+    {
+      "type": "h",
+      "text": "How long recovery takes"
+    },
+    {
+      "type": "p",
+      "text": "It depends on the session. In studies of trained men after hard lifting, strength dipped and soreness showed up for roughly 1 to 3 days (Soares 2015, Ferreira 2017). Going to failure, where you can't do another rep, slows things down. In one study of 10 trained men, sets to failure slowed recovery by up to 24 to 48 hours (Morán-Navarro 2017)."
+    },
+    {
+      "type": "p",
+      "text": "A review of 15 studies in young adults found you don't need failure to gain strength or size, and it doesn't seem to hurt either (Grgic 2022). That's why I usually stop a set a couple of reps short."
+    },
+    {
+      "type": "p",
+      "text": "In tennis, seven well-trained men played 4-hour matches on 4 days in a row. Their sprint and jump got worse and serve accuracy dropped (Gescheit 2015). Small group, very long matches, so no rule for normal practice."
+    },
+    {
+      "type": "h",
+      "text": "Soreness isn't a score"
+    },
+    {
+      "type": "p",
+      "text": "Soreness means a movement was new or hard for that muscle. It doesn't mean the session worked. A review concluded that muscle damage isn't what drives muscle growth, since low-damage sessions gave similar growth and strength (Damas 2018)."
+    },
+    {
+      "type": "h",
+      "text": "What actually helps"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Sleep. Experts suggest 7 to 9 hours for adults and 8 to 10 for teenagers (Hirshkowitz 2015). Elite athletes often get less (Walsh 2021).",
+        "Enough food. The ITF, WTA and ATP tennis nutrition statement says food first (Vicente-Salar 2025). Add carbohydrate and protein after hard sessions (Kerksick 2017).",
+        "Easier days between hard ones. One full rest day a week is my suggestion. No study sets that number."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Playing Again Soon",
+      "text": "If you play or train hard again within 8 hours, recovery gets more urgent. In the first 4 hours, aim for 1 to 1.2 g of carbohydrate per kg per hour, plus 20 to 40 g of protein. A dietitian can tailor this."
+    },
+    {
+      "type": "h",
+      "text": "Recovery gadgets"
+    },
+    {
+      "type": "p",
+      "text": "Cold-water baths seem to ease soreness, based on 17 small, low-quality trials (Bleakley 2012). But there's a catch for strength training. In a 12-week study, 21 men who sat in cold water for 10 minutes after each session gained less strength and muscle than men who did active recovery (Roberts 2015). A meta-analysis of 8 studies agreed, with no effect on endurance (Malta 2021). Massage showed no gain in strength, sprints or fatigue across 29 studies, only small gains in soreness (Davis 2020)."
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "If your goal is strength, don't make cold baths a routine after every lifting session. Using one before a day when you must play again is a different call. That's my suggestion, since the studies looked at training, not tournaments. With a heart or blood pressure problem, ask a doctor first."
+    },
+    {
+      "type": "h",
+      "text": "The lighter week"
+    },
+    {
+      "type": "p",
+      "text": "Planned lighter weeks, called deloads, are common in strength sports, but the evidence is mostly practice. Coaches and athletes describe about a week of reduced training every 4 to 6 weeks (Bell 2022, Rogerson 2024). The closest hard data is tapering before a competition. A meta-analysis of 27 studies found the best results from about 2 weeks with volume cut by 41 to 60% and intensity and frequency kept the same (Bosquet 2007). That's about peaking for an event. Using it for a lighter week mid-season is a coaching choice the studies didn't test."
+    },
+    {
+      "type": "p",
+      "text": "There's also a warning. In a trial of 39 resistance-trained adults, one full week off in the middle of 9 weeks gave smaller lower-body strength gains than training straight through (Coleman 2024). That's one small study of complete rest, not a lighter week. My read is to cut volume, not stop."
+    },
+    {
+      "type": "h",
+      "text": "When tired is too tired"
+    },
+    {
+      "type": "p",
+      "text": "Tiredness after a hard week is normal. A short drop that improves after recovery is called functional overreaching. If training and recovery stay out of balance too long, the drop can last weeks and your mood can suffer (Meeusen 2013). Watch for these signs."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Tiredness that doesn't lift with enough sleep and easy days.",
+        "Performance dropping for weeks. Your usual weights feel heavy or you're slower on court.",
+        "Worse mood, poor sleep or no wish to train.",
+        "Eating too little for the training you do. It's called low energy availability. It can affect bones, immunity and, in girls, periods, and it happens in boys too (Mountjoy 2014, 2023)."
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "None of these signs is a diagnosis. Illness, low iron, too little sleep or too little food can all cause them, and only a doctor can sort out which (Meeusen 2013). If several signs last around two weeks, see a doctor. That timing is my rule of thumb, not a studied cut-off."
+    },
+    {
+      "type": "callout",
+      "label": "For Parents",
+      "text": "A growing player needs enough food. Talk to a doctor if your player is eating less, worries a lot about weight or has missed periods."
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Hard sessions only work if easy days follow them. Plan the rest as carefully as you plan the training."
+    },
+    {
+      "type": "p",
+      "text": "Based on Meeusen et al. (2013), Kellmann et al. (2018), Bosquet et al. (2007), Coleman et al. (2024), Grgic et al. (2022), Roberts et al. (2015) and Malta et al. (2021)."
+    }
+  ]
+}

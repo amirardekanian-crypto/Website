@@ -1053,6 +1053,69 @@
     return { row: R.row };
   };
 
+  /* ---------- range: "from X to Y" as two odometers with the word between them (NEW 2026-10-02, SGUW4377) ----------
+   * K.range("۱۴۰", "۲۱۰", { mode:"behind"|"card", seg (behind: the segment with the cut-out), at (it appears), aLand, bLand (each number's odometer stops: say the
+   *   number there; the FIRST number said is on the right, because Farsi reads right to left), sepAt, out, unit (card: a stamp drops under it), unitAt,
+   *   size (auto: it fits one line of 980 px), top (behind, 480) | y (card, centre 960), tone "paper"|"clay" (behind), look "clay"|"ink"|"paper" (card), wipeVariant })
+   * The word between them is always "تا" as one piece (cursive letters never get split). Every number is HIS: it is a range he says (8 to 12 reps, 140 to 210 g). */
+  K.range = (a, b, o = {}) => {
+    const behind = o.mode === "behind", g = global.gsap;
+    const nd = (v) => Array.from(String(v)).filter((ch) => digitOf(ch) >= 0).length;
+    const dots = (v) => Array.from(String(v)).filter((ch) => ch === "٫" || ch === ".").length;
+    const em = (nd(a) + nd(b)) * 0.66 + (dots(a) + dots(b)) * 0.3 + 0.8; // width of the whole row in em
+    const size = o.size ?? Math.min(460, Math.floor(980 / em));
+    const look = o.look || "clay", wv = o.wipeVariant || "iris";
+    let c, st, host, glow = null, d = null, cy = o.y ?? 960;
+    if (behind) {
+      d = depth(o.seg, o.at, o.out);
+      host = d.wrap;
+    } else {
+      c = mk("div", "k-full k-" + look);
+      st = allow(mk("div", "k-nstage", "", c), "overflow");
+      glow = mk("div", "k-qglow", "", st);
+      glow.style.top = cy - 400 + "px";
+      host = st;
+    }
+    const wrap = mk("div", "k-rangew" + (behind ? " k-hid" + (o.tone === "clay" ? " k-numc" : "") : ""), "", host);
+    wrap.style.fontSize = size + "px";
+    wrap.style.top = (behind ? o.top ?? 480 : cy - size * 0.56) + "px";
+    const RB = reels(wrap, b, size, 2); // left (said second)
+    const sep = allow(mk("div", "k-nsep k-hid", "تا", wrap), "occlusion", "overlap", "overflow", "caption-zone");
+    const RA = reels(wrap, a, size, 2); // right (said first)
+    [RA, RB].forEach((R) => {
+      Object.assign(R.row.style, { position: "relative", left: "auto", width: "auto" });
+      if (behind) R.row.classList.add("k-numd");
+    });
+    const landA = o.aLand, landB = o.bLand;
+    if (behind) tl.set(wrap, { autoAlpha: 1 }, Math.min(o.at, landA - 1.2));
+    else K.wipeIn(c, o.at, o.wipe ?? 0.5, wv);
+    rollReels(RA, landA, o);
+    rollReels(RB, landB, o);
+    tl.fromTo(RA.row, { scale: 1.14 }, { scale: 1, duration: 0.4, ease: "expo.out" }, landA);
+    tl.fromTo(RB.row, { scale: 1.14 }, { scale: 1, duration: 0.45, ease: "expo.out" }, landB);
+    tl.fromTo(sep, { autoAlpha: 0, scale: 0.5 }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, o.sepAt ?? landA + 0.12);
+    if (behind) {
+      const ring = mk("div", "k-dring k-hid", "", d.wrap);
+      ring.style.top = (o.top ?? 480) + size * 0.56 - 260 + "px";
+      tl.fromTo(ring, { scale: 0.3, autoAlpha: 0.9 }, { scale: 3.2, autoAlpha: 0, duration: 0.8, ease: "power2.out" }, landB);
+      tl.to(wrap, { autoAlpha: 0, y: -80, duration: 0.35, ease: "power2.in" }, o.out);
+    } else {
+      const ring = mk("div", "k-qring k-hid", "", st);
+      ring.style.top = cy - 200 + "px";
+      tl.fromTo(glow, { scale: 0.6, opacity: 0.2 }, { scale: 1.25, opacity: 1, duration: 0.9, ease: "power2.out" }, landB);
+      tl.fromTo(ring, { scale: 0.3, autoAlpha: 0.95 }, { scale: 3.6, autoAlpha: 0, duration: 0.85, ease: "power2.out" }, landB);
+      shake(st, landB, o.shake ?? 12);
+      push(st, landB + 0.5, o.out, 0.035);
+      if (o.unit) {
+        const uw = mk("div", "k-nunit", "", st);
+        uw.style.top = cy + size * 0.56 + 30 + "px";
+        ENTER.drop(mk("div", "k-stamp k-huge k-hid", o.unit, uw), o.unitAt ?? landB + 0.18);
+      }
+      K.wipeOut(c, o.out, o.wipe ?? 0.5, wv);
+    }
+    return { wrap, RA, RB, card: c };
+  };
+
   /* ---------- versus: a skewed split ----------
    * K.versus("قدرت", "سرعت", { at:t, aAt:t, bAt:t, vsAt:t, vs:"در برابر", win:"a"|"b" (optional), winAt:t, out:t, subA, subB,
    *   colors:["clay","ink2"] (a is on the right, the reading side), wipeVariant })

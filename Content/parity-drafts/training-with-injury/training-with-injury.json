@@ -1,0 +1,178 @@
+{
+  "id": "training-with-injury",
+  "title": "The Comeback Rules",
+  "category": "Recovery",
+  "readMins": 5,
+  "date": "October 2026",
+  "blocks": [
+    {
+      "type": "p",
+      "text": "Most injured players ask what the program will do for them. That's half the picture. The other half is yours, and it has little to do with sets and reps. This is for tennis and padel players and their parents. It can't replace a doctor. The research is general sports medicine, not tennis or padel studies."
+    },
+    {
+      "type": "p",
+      "text": "Your coach handles the programming: exercise choice, loading, how the week fits together. You handle the reporting. That means telling people what's really happening in your body and following a few simple rules honestly. A doctor or physio decides what your injury allows. Your coach works inside that."
+    },
+    {
+      "type": "h",
+      "text": "Training with an injury starts with a doctor"
+    },
+    {
+      "type": "p",
+      "text": "Some problems can't wait for a training plan. See a doctor or go to emergency care if you have any of these."
+    },
+    {
+      "type": "list",
+      "items": [
+        "You can't put weight on the limb",
+        "The area looks out of shape",
+        "A joint locks or gives way",
+        "You have numbness, tingling or weakness",
+        "A swollen joint comes with a fever",
+        "You have pain at rest or at night",
+        "The pain is getting worse over days",
+        "It swelled up after a fall or a hit"
+      ]
+    },
+    {
+      "type": "callout",
+      "label": "Watch Out",
+      "text": "Don't train that area until a doctor or physio has seen it. After that, do what they allow and nothing extra."
+    },
+    {
+      "type": "h",
+      "text": "Pain is information, with limits"
+    },
+    {
+      "type": "p",
+      "text": "Training around an injury without feeling anything isn't realistic. Chasing that can keep you under-loaded for months. In people with long-lasting muscle and joint pain, exercise that allowed some pain gave a small benefit in the short term and no clear difference later. It doesn't cover a fresh fracture, a complete tear, nerve symptoms or recovery from surgery."
+    },
+    {
+      "type": "p",
+      "text": "The best-tested pain rule comes from two problems, Achilles tendinopathy and pain around the kneecap. Those studies used adults and young adults, ages 15 to 28 in the knee trial. It allowed pain up to about 5 out of 10 during exercise, settled by the next morning, and not climbing week to week. I'd keep you a notch lower. For other injuries, it's practice, not proof."
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Let your clinician set your pain rule. A common one: up to about 4 out of 10 during exercise, back to usual by the next morning, not creeping up week to week. Sharp, worsening or unsettled pain means stop. Tell an adult and your coach."
+    },
+    {
+      "type": "h",
+      "text": "A scan doesn't tell the whole story"
+    },
+    {
+      "type": "p",
+      "text": "A scan report full of strange words doesn't mean much on its own. In one review, 37% of pain-free 20-year-olds had disc degeneration. In another, about 4% of pain-free knees under age 40 had a meniscus tear."
+    },
+    {
+      "type": "p",
+      "text": "A doctor reads the scan alongside your symptoms and an exam. Many injured tissues heal over weeks to months and respond to loading that builds up in steps. A tendon that's irritated isn't a tear, though, and some tears, like a complete ACL tear, need a surgeon's opinion."
+    },
+    {
+      "type": "callout",
+      "label": "Key",
+      "text": "Ask your clinician: does this heal over weeks or months, or do we manage it long term? What loading suits it now? Don't guess from the report."
+    },
+    {
+      "type": "h",
+      "text": "Report everything, matches included"
+    },
+    {
+      "type": "p",
+      "text": "If you're back playing while you rehab, your coach can only manage the total if they know about it. The IOC consensus calls poor load management a major injury risk, sudden jumps in match load included."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Tell your coach about every match and hit, not just gym days",
+        "Say how it felt, grinding or easy",
+        "Mention school sport and extra sessions",
+        "Flag soreness that shows up after playing"
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Log the real weight, effort and pain score. If you're a junior, your parents should hear it all too. A coach with half the picture has a reporting gap, and only you can close it."
+    },
+    {
+      "type": "h",
+      "text": "Strength work helps, and stopping costs"
+    },
+    {
+      "type": "p",
+      "text": "Strength training is one of the best-supported ways to cut sports injuries. A review of 25 trials with over 26,000 people found it showed the biggest benefit, and stretching alone showed none. A 2018 review of six trials in ages 12 to 40 agreed. These were prevention trials, so they promise nothing after an injury."
+    },
+    {
+      "type": "p",
+      "text": "Stopping everything has a price too. In the first four weeks off, endurance fitness drops fast and strength only a little. A review of athletes found you can hold much of your fitness on less volume if the intensity stays up."
+    },
+    {
+      "type": "h",
+      "text": "Start on your weaker side"
+    },
+    {
+      "type": "p",
+      "text": "On one-leg or one-arm exercises, I like a simple habit. Start on the weaker side, then match its reps on the stronger side. It keeps the gap from growing while you rehab. That's coaching practice, not a tested rule."
+    },
+    {
+      "type": "p",
+      "text": "Symmetry does matter in some cases. In one cohort after ACL surgery, players with more even quad strength between legs had fewer reinjuries."
+    },
+    {
+      "type": "h",
+      "text": "Growing players need extra care"
+    },
+    {
+      "type": "p",
+      "text": "Young athletes aren't small adults. Growth plates are weak spots in a growing body. Heel, knee or elbow pain, and stress fractures, can follow heavy playing loads. Sports medicine bodies say youth overuse needs adult oversight. So a junior shouldn't run a pain rule alone. Tell a parent and your coach the same day, and let a doctor decide what's allowed."
+    },
+    {
+      "type": "p",
+      "text": "Parents, here's your part."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Get pain that lasts or keeps coming back seen by a doctor or physio",
+        "Ask what's allowed and for how long, and write it down",
+        "Tell the coach about all the load, school sport included",
+        "Ask your child how it feels before and after sessions"
+      ]
+    },
+    {
+      "type": "h",
+      "text": "The comeback has stages"
+    },
+    {
+      "type": "p",
+      "text": "There's no moment where you go from hurt to fine. Return to sport is a continuum, and the clinician, athlete and coach share the call. Rushing has a cost. In one ACL cohort of 106 players, each extra month of waiting before return, up to nine, cut the reinjury rate by about half."
+    },
+    {
+      "type": "p",
+      "text": "Here's a common way to stage it. Your clinician decides when you move on."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Rebuild basic capacity in ranges that don't provoke anything",
+        "Bring your sport's movement patterns back, at low intensity",
+        "Push real strength back into those patterns",
+        "Add power and reactive work once strength holds when tired",
+        "Return to full sport speed last, not first"
+      ]
+    },
+    {
+      "type": "h",
+      "text": "Who does what"
+    },
+    {
+      "type": "callout",
+      "label": "Rule",
+      "text": "Your doctor or physio decides what's allowed. Your coach builds the plan inside that. You report the truth, and if you're a junior, your parents know the whole picture. Do your part and the plan can work."
+    },
+    {
+      "type": "p",
+      "text": "Based on Silbernagel et al. (2007), Thomeé (1997), Smith et al. (2017), Lauersen et al. (2014, 2018), Soligard et al. (2016), Grindem et al. (2016) and Ardern et al. (2016)."
+    }
+  ]
+}

@@ -8,7 +8,7 @@
 
 The kit's sfx_html() with align=True starts each sound EARLY by its lead, so the moment that matters lands on the picture event:
 `align` says which moment that is ("onset" for a sharp hit, "peak" for a swell or build-up, "end" for the roll). The numbers live in
-kit/sfx/timing.json. Why: the menu's mp3 sounds start 0.12 s in (the lab's sounds.py has LEAD = 0.10), the swells peak 155-275 ms in and the
+kit/sfx/timing.json. Why: the menu's mp3 sounds start 0.12 s in (the old lab's sounds.py (deleted 2026-10-02) had LEAD = 0.10), the swells peak 155-275 ms in and the
 build-ups 1.0-1.3 s in, so a file placed on its event lands late (RESEARCH-2026-10-01.md section 2.1).
 
   python tools\\sfx_lead.py            # the table
