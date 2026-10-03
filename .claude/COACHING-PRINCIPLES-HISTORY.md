@@ -175,6 +175,8 @@ the principles (their *How to add*).
 - `SES-16` **A low-load brace primer may stay in prep.**
   - It lived only in /program-edit's Rule 2.
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+- `SES-17` **The athlete places the days; the programme never does.**
+  - 2026-10-03. A first-cycle report asked a tennis player for his tennis days "to arrange the gym days around tennis", and the Debrief proposed moving one training day off a weekday after three short nights. Amir: "we dont write their fitness program around their tennis program. we just give instrcutions, we never say do 3nd day on thursday", then "the rule is not about tennis, its in any sport". Added during the rule freeze (PRC-25) because it fixed a real miss.
 
 ## Progression (coach-driven)
 

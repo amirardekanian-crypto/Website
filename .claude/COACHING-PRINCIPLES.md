@@ -129,6 +129,7 @@ stale copy reached athletes.
 | SES-14 | A library session is as hard as its adaptation needs: no weekly hard-session count, only tissue-cost spacing (48 hours, not before a match). | workout | |
 | SES-15 | Seven or more working exercises make a day a grind: check its load identity before it ships. | design · edit | warn |
 | SES-16 | A low-load brace primer (a dead bug or bird dog before a heavy hinge) may stay in prep; costly core work goes to Core. | design · edit | |
+| SES-17 | Never tie a training day to a weekday or build the week around the athlete's sport; give rules (REC-5, REC-6), the athlete places the days. | design · engage · report | |
 
 ### Progression
 | ID | Rule | Stage | Check |
@@ -651,6 +652,7 @@ same ID. Read a rule's story and its history before changing it.
 - `SES-9` Never collapse Primary and Accessory into one "Strength" block.
 - `SES-15` **Seven or more working exercises make a day a grind.** A long session spikes fatigue even at low RPE, which matters most for poor-recovery clients (VOL-2, 2026-06-19).
 - `SES-16` **A low-load brace primer may stay in prep.** A dead bug or bird dog before a heavy hinge primes the brace; costly core work (planks for time, Pallof presses, hollow holds) goes to the Core block (SES-9). The primer still counts toward core volume wherever it sits (VOL-10).
+- `SES-17` **The athlete places the days; the programme never does.** Day 1, 2 and 3 are an order, not dates. No card, week note, WhatsApp message or cycle report ties a training day to a weekday ("Day 3 on Thursday"), and no question asks for the athlete's sport schedule in order to fit the gym around it. That holds for every sport. What the athlete gets instead are rules he applies himself: the double-day rule (REC-5), the flexible order (REC-6) and the readiness levels (REC-2). A weekday pattern in the data, such as a short night before one session every week, is noted coach-only, and its fix is one of those rules, never a schedule.
 
 ## Progression (coach-driven)
 - `PRG-1` **Progression is coach-driven from the weekly logs** — the app shows one prescription
