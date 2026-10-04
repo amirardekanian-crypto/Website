@@ -213,6 +213,28 @@ band and mini band in clay orange. All ten checked: right.
 | 509 cable face pull | He pulls the rope toward his forehead, elbows high and out to the sides at shoulder height, splitting his hands apart beside his ears at the end, then holds there for a moment. His body stays still. |
 | 510 cat-cow | Slowly he rounds his back up toward the ceiling, tucking his chin and his tailbone, moving from the gentle arch into a gentle round in the easy middle of the range, then holds there for a moment. His hands and knees stay where they are. |
 
+**Amir's check of the start pictures:** the lat pulldown had the weight stack at his side ("should be in front": he sits
+FACING the stack) and the leg curl had the roller over his shins ("can be used for the end motion of a leg extension, but
+for leg curl should be behind his shin"). Keep `58148766-299c-4484-8846-67c382da810c` for `machine-leg-extension`'s finish.
+Redone, 2 each (2 credits): lat pulldown B `a387ba79-6b62-4e94-a255-18c46b91c398` (side, slight angle) and C
+`6f01794e-46f1-4ba5-81c0-a4167748eadb` (from behind), both facing the stack; leg curl B `1025b040-31bc-4fe9-82b9-b6f3abb81ff4`
+(roller still level with the ankles, reads as an extension) and C `c7674980-1f7d-4e95-be36-2fd15186ecf3` (legs resting
+ON the roller: right). "RESTING ON TOP of the roller pad ... so nothing is on top of his shins" is the wording that worked.
+
+**The eight clips (16 credits, balance 549; Wan allowed 5 at a time, the rest 429 then went through):** in Amir's
+Downloads as `demo-<id>-wan.mp4` for him to mark pass or fail and trim.
+
+| Clip | Job id | Claude's note (Amir decides) |
+|---|---|---|
+| 501 band pull-apart | `021333a6-6bde-455c-90aa-dc0f3118e40c` | arms sweep to a T, shoulders stay down |
+| 502 glute bridge | `4bf0e6eb-a45a-4582-8b9d-452e8c7d230c` | hips to a straight line, no big arch |
+| 503 90/90 hip switch | `ea34ba44-800f-478c-b913-2ce276c82139` | full switch, hips stay down; feet lift briefly at the midpoint |
+| 505 banded lateral walk | `87d5cfc5-e412-4872-a42e-de3b81bdd14f` | wide step, knees out, band stays; drifts right in the frame |
+| 506 chest-supported row | `43d8f0ce-820a-4f31-9d1c-f81d23078007` | rows and lowers again inside 2 s: trim at the top |
+| 507 machine leg press | `3bc76bb4-0eae-46bc-a7e0-612d9f1a456f` | platform slides on its rails to about 90° at the knee |
+| 509 cable face pull | `2ac50eb2-8bb2-4c56-bc25-5a3ad10baf2c` | elbows high, hands split by the ears, cable stays on |
+| 510 cat-cow | `1452cac0-8db3-487d-9c00-bc9927037f17` | arch to round; the round is fuller than "the easy middle" |
+
 ## Why pictures and not words alone
 
 Video models learned from clips with plain captions, so they know common exercises by name but not
