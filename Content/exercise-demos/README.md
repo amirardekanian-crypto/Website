@@ -234,6 +234,11 @@ Downloads as `demo-<id>-wan.mp4` for him to mark pass or fail and trim.
 | 507 machine leg press | `3bc76bb4-0eae-46bc-a7e0-612d9f1a456f` | platform slides on its rails to about 90° at the knee |
 | 509 cable face pull | `2ac50eb2-8bb2-4c56-bc25-5a3ad10baf2c` | elbows high, hands split by the ears, cable stays on |
 | 510 cat-cow | `1452cac0-8db3-487d-9c00-bc9927037f17` | arch to round; the round is fuller than "the easy middle" |
+| 504 lat pulldown (Amir picked picture B) | `c7bea6c4-5029-45af-b3e6-3eba59e4521c` | bar to the collarbone, elbows down, cable stays on; leans back a little more as he pulls (his "don't lean back" cue: his call); pulls and returns inside 2 s, so trim at the bottom |
+| 508 seated leg curl (Amir picked picture C) | `0fb90acb-7f6f-41ed-940b-5a2df037cd91` | heels curl under the seat, roller stays behind the lower legs, hips down; curls and extends again inside 2 s, so trim at the curl |
+
+Batch 1 spend: 5 (pictures) + 2 (redone pictures) + 16 + 4 (clips) = **27 credits** of the 35 cap; balance 545.
+All ten clips and the five test clips are in Amir's Downloads as `demo-…mp4`, waiting for his pass/fail and trims.
 
 ## Why pictures and not words alone
 
