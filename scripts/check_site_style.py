@@ -29,12 +29,12 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 
 BASELINE = os.path.join(ROOT, 'scripts', 'site_style_baseline.json')
 
 FILES = ['index.html', 'index-fa.html', 'links.html', 'proof.html', 'form.html', 'form-fa.html', 'partner-fa.html',
-         'tennis/index.html', 'tennis-testing/index.html', 'terms.html', 'terms-fa.html', 'privacy.html', '404.html',
+         'tennis/index.html', 'tennis-testing/index.html', 'terms.html', 'terms-fa.html', 'privacy.html', 'privacy-fa.html', '404.html',
          'uts-padel.html', 'etminan-en.html', 'etminan.html', 'etminan-dv.html',
          'partials/nav.html', 'partials/footer.html',
          'assets/css/tokens.css', 'assets/css/base.css', 'assets/css/components.css', 'assets/css/fa-product.css',
          'assets/css/fonts.css', 'assets/js/shared.js', 'assets/js/fa-nav.js', 'assets/js/track.js']
-FARSI = {'index-fa.html', 'links.html', 'form-fa.html', 'partner-fa.html', 'terms-fa.html', 'tennis/index.html',
+FARSI = {'index-fa.html', 'links.html', 'form-fa.html', 'partner-fa.html', 'terms-fa.html', 'privacy-fa.html', 'tennis/index.html',
          'tennis-testing/index.html', 'etminan.html', 'assets/css/fa-product.css', 'assets/js/fa-nav.js'}
 
 WHY = {

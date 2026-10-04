@@ -3,7 +3,7 @@ import re, os, sys, colorsys, collections
 sys.stdout.reconfigure(encoding='utf-8')
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 PAGES = ['index.html', 'index-fa.html', 'links.html', 'proof.html', 'form.html', 'form-fa.html', 'partner-fa.html',
-         'tennis/index.html', 'tennis-testing/index.html', 'terms.html', 'terms-fa.html', 'privacy.html',
+         'tennis/index.html', 'tennis-testing/index.html', 'terms.html', 'terms-fa.html', 'privacy.html', 'privacy-fa.html',
          'uts-padel.html', 'etminan-en.html', 'etminan.html', 'partials/nav.html', 'partials/footer.html',
          'assets/css/tokens.css', 'assets/css/base.css', 'assets/css/components.css', 'assets/css/fa-product.css',
          'assets/js/shared.js', 'assets/js/fa-nav.js']
