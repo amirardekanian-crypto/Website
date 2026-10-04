@@ -312,6 +312,13 @@ Add a dated line whenever a round teaches something. This section is the reason 
   plus words it made a clean single-leg RDL but let the torso rise in a straight-arm pulldown and the elbows bend in a pec
   deck: words hold a whole-body movement, not "this part stays still". A half rep played forward then reversed loops
   seamlessly at about 110 KB.
+- **2026-10-04 (exercise demos)** — **A clip rarely stops at the end of the movement.** Wan went past it and came back
+  (hands met at frame 43, open again by 59), and a forward-then-reversed loop of the whole clip shows that as a tick
+  (Amir: *"complete concentric, 1/4 eccentric, 1/4 concentric, and then full eccentric"*). Cut every loop with
+  **`tools/make_loop.py`**, which finds the real turnaround from the frames (distance travelled along the movement's
+  path; a plain "most different from the first frame" stops growing on a big movement and cut an RDL a third short).
+  Kling 3.0 (3 s minimum, 4.5 credits, 1280×716 at 24 fps) stopped and held instead, and kept a pulldown's torso angle
+  where Wan let it rise; both bent a pec deck's elbows into a press.
 - **2026-09-20** — A video plate reel is cheap to build once the renderer protocol exists: four clips, 2.4 MB embedded, a 20 s
   MP4 in 35 s. The cost was the 30.5 credits, and 7 of them (the lean run) delivered two of the four clips.
 

@@ -100,7 +100,7 @@ physics. The equipment keeps its shape. No text.* The middles:
 |---|---|
 | 41 pec deck | Slowly he sweeps both handles forward and together in a wide arc until his hands meet in front of his chest, then holds there for a moment. His elbows keep the same slight bend the whole time, his back stays against the pad and his feet stay flat. |
 | 42 straight-arm pulldown | Keeping his arms long and straight, he sweeps the bar down in a smooth arc until it reaches the front of his thighs. Only his arms move, swinging from the shoulders; his hips, knees and torso stay where they are, and the cable stays attached to the bar and the pulley. |
-| 43 EZ bar curl | Keeping his elbows pinned at his sides and his body still, he curls the bar up in a smooth arc until it is just below his chin, then holds it there for a moment. Only his forearms move. |
+| 43 EZ bar curl | Keeping his elbows pinned at his sides and his body still, he curls the bar up in a smooth arc until it reaches the top of his chest, then holds it there for a moment. Only his forearms move. (As run; "just below his chin" invites the elbows forward.) |
 | 44 single-leg RDL | Keeping his standing knee slightly bent, he hinges forward at the hips over his standing leg while his free leg lifts straight behind him, until his body and back leg form one straight line almost parallel to the floor. His hips stay level and the dumbbells hang straight down below his shoulders. |
 | 45 box squat | Looking straight ahead, he sits his hips back and down, knees bending, until his glutes lightly touch the top of the box, then holds there. His heels stay flat and his chest stays up. |
 
@@ -118,6 +118,28 @@ whole library would be roughly 20 MB.
 
 What it says so far: words carry a natural whole-body movement well (the RDL). They slip where one part must stay
 still while another moves (the pulldown's torso, the pec deck's elbows). That is what an end picture pins (step 3).
+
+**The tick (Amir, on the round 1 loops):** *"complete concentric, 1/4 eccentric, 1/4 concentric, and then full eccentric,
+it had a tick, it must be edited more precise."* The clips go past the end of the movement and come back (the Wan pec
+deck's hands meet at frame 43 and open again by 59), so a loop of the whole clip, forward then reversed, plays that
+return twice. **`.claude/skills/video/tools/make_loop.py`** now cuts every loop at the real turnaround, found from the
+video itself. Its picks, checked by eye: pec deck 43, pulldown 43, EZ bar curl 38, single-leg RDL 58 (he lowers to the
+end), Kling pec deck 70 and pulldown 66 (Kling stops and holds rather than coming back). Always use it.
+
+**Round 2 (2026-10-04, his go "its test", 12.5 credits, balance 578).** The preset trap again on all three clips.
+
+| What | Job id | Verdict |
+|---|---|---|
+| Box squat, AI edit to bring the box in line | `2b1811b4-3910-45ca-96f2-0bab31a59ebd` | **failed**: it slid the box sideways but left it further back (its floor line at y 621, his shoes at 680). Amir had spotted that he would sit down beside it. **Moved by hand instead** (free): the box onto his shoes' floor line, a hand's width behind the heels, about knee height, the old spot painted out. Saved as `start-pictures/box-squat-box-moved.jpg`; upload it as media for its clip |
+| Pec deck finish picture | `4683f095-d118-4584-a247-cf6dd2fd4d43` | good: hands together, arms nearly straight (edited from start 41) |
+| Pulldown finish picture | `777ea8de-98b1-40ab-995a-559e2773f7d4` | good: bar at the thighs, the same lean as the start (edited from start 42) |
+| 53 EZ bar curl, Wan | `9056007c-551f-40ce-822c-9d7b35faf3da` | good: elbows by his sides, body still; went halfway back down by the end, so cut at 38 |
+| 61 pec deck, Kling 3.0 std 3 s | `83473be4-ba48-4dce-99c5-835e889eced0` | same fault as Wan: the elbows bend into a press as the hands meet |
+| 62 pulldown, Kling 3.0 std 3 s | `dc880e2d-173c-4168-8353-ea5f3b9ebf33` | **better than Wan**: keeps most of the hinge, arms straight to the thighs |
+
+Kling clips come back 3.04 s, 1280×716, 24 fps, 1.8 MB, no audio; loops at `--speed 1.5 --width 854` are 80-85 KB.
+Waiting on Amir's check of the three pictures: then the box squat clip and the pec deck and pulldown pinned between
+start and finish, all on Wan (6 credits, already approved).
 
 Prices checked 2026-10-04 with `get_cost` (re-check, they change): picture 0.5 · Wan 3.0 480p 2 s = 2
 (words only, from a start picture, or between a start and an end picture) · Wan 3.0 3 s with a video

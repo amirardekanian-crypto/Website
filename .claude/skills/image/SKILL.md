@@ -315,6 +315,11 @@ Add a dated line whenever a round teaches something. This section is the reason 
   bar held across the body**, the EZ bar came out running front to back along his side. Anything held
   across the body needs a front view at a slight angle. Side views also turned his head to the camera
   twice: say "he looks straight ahead, not at the camera".
+- **2026-10-04 (exercise demos)** — **An edit cannot move a thing in depth.** Asked to bring a box onto the athlete's
+  floor line ("the same distance from the camera as his feet"), `gpt_image_2_5` slid it sideways and left it further
+  back; Amir caught it (he would have sat down beside it). Check depth by where things meet the floor (the box's floor
+  line against his shoes'), and when it is wrong on a plain background, move it by hand: paint the old spot out with
+  the wall and floor either side, paste the object on the right floor line at the right size. Free, and exact.
 - **2026-09-26 (the muscle map)** — A diagram, not a picture: a flat vector chart generated once and
   TRACED into an SVG (`bodymap/`), so every exercise lights its own muscles with no further credits.
   What worked: dark background + mid-grey shapes + dark gaps (clean to segment), 2k at 1 credit,
