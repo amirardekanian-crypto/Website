@@ -18,7 +18,7 @@ AFTER_NOTE = 'live site, 2026-10-02 afternoon'
 
 SCORECARD = [
     # measure, baseline (2026-10-02, morning), now (same tools, after the first batches), goal
-    ('Phone length, English home', '20.4 screens', '20.5 screens (unchanged: that is package 12)', '13 or fewer'),
+    ('Phone length, English home', '20.4 screens', '14.4 screens (desktop 14.5 to 12.9)', '13 or fewer'),
     ('Phone length, Farsi home', '20.8 screens', '20.9 screens (unchanged: package 14)', '15 or fewer'),
     ('Text under 12 px, English home', '65 items', '22 (all inside the miniature app drawn in the phone picture)', '0'),
     ('Tap targets under 44 px, English home', '15', '1 (the drawn mini app, which is not tappable)', '0'),
@@ -27,7 +27,7 @@ SCORECARD = [
     ('Layout jump on a slow phone', '0.096 home, 0.087 form, 0.209 Etminan Farsi', '0.000 home, 0.001 form, 0.028 Etminan Farsi, 0.006 on the 404 (was 0.087)', 'under 0.05'),
     ('First paint on a slow phone, Farsi pages', 'home 1.9 s, form 1.5 s, links 1.2 s', 'home 1.1 s, form 0.9 s, links 0.7 s', 'under 1.5 s'),
     ('Etminan pages: text under 12 px', '26 per page', '0', '0'),
-    ('English home reading ease', '34 of 100, 43 em-dashes', 'unchanged (package 19)', '60 or more, none'),
+    ('English home reading ease', '34 of 100, 43 em-dashes', 'rewritten in plain words: the only em-dashes left are inside the athletes’ own quotes (13); the reading-ease number is not re-measured', '60 or more, none'),
     ('Apply form: promise vs reality', '“2 minutes” vs about 5, 27 to 30 questions, 18 required', 'English: 13 required, about 15 optional ones folded away, both say about 3 minutes; Farsi: 12 required (package 13, option C)', 'true, and shorter'),
     ('Apply form length on a phone (English)', '8.0 screens', '5.7 screens with the optional group closed', 'about 5'),
     ('“Sent” screens that are a dead end', '4 forms', '0 (each has a WhatsApp next step and a way back)', '0'),
@@ -141,7 +141,7 @@ PK = [
    ('P3', 'Etminan pages', 'Amber #E08A2E in four places. The reviewer found the neon green and lime are a deliberate co-brand (CSS comment), the amber is the odd one out.', 'Amber to clay or neutral. Their palette, so your call.', 'S', 'Y', 'etminan-en-02'),
   ]),
 
- dict(n=12, phase='call', status='go', effort='L', title='English home: shorter and clearer',
+ dict(n=12, phase='call', status='done', done='abce', left='Built on 2026-10-04 (option B). Order: proof, how it works, programmes, fit check, the app, sessions and playbook, about, FAQ, apply. Not done: 12d’s bold pull-out, one result line each and dropping the weakest testimonial (your call; the quotes are untouched, a phone shows 7 lines with Read more), the new share card with your portrait (needs a picture), and the page is 14.4 phone screens, not 13. Contact moved into the apply section and the footer. The 4 about blocks became 2 (the Approach and Difference blocks and the CPD line are gone: their facts live in How it works and the FAQ).', effort='L', title='English home: shorter and clearer',
   plain='20 screens on a phone is long, the hero has no face, number or the words “online coaching”, and the right half of the desktop hero is empty. The Farsi hero (phone mockup beside the headline) is the version you like.',
   items=[
    ('P1', 'English home', 'The hero never says “online coaching” and shows no face, athlete or number; credentials start 903 px down; on desktop the right half is empty but for a ball.', 'Sub names “online coaching with Amir (MSc S&C)”; a proof row under the buttons (three athlete faces, “1000+ players”); the phone mock beside the headline on desktop; drop the first ticker.', 'M', 'Y', 'home-en-02'),
@@ -216,7 +216,7 @@ PK = [
    ('P2', 'All articles', 'Every page shares one English brand card as og:image, Farsi too; four unused people-free Library pictures exist. Four of five English descriptions are cut mid-sentence; “More articles” ignores topic; four older Farsi pages miss the SEO phrase; the index promises padel but no article body mentions it.', '1200×630 card per category (your OK to reuse the art); real descriptions; related by topic; retrofit the phrase; write the padel article or soften the claim.', 'M', 'Y', 'article-06 to 10'),
    ('P2', 'English articles', 'English article pages copy the Farsi pill look: four header links against the home’s seven, no WhatsApp in the footer. A third design next to the English home and the Farsi home.', 'Decide: look like the English home (shared nav) or keep this look.', 'M-L', 'Y', 'article-05'),
   ]),
- dict(n=19, phase='call', status='go', effort='M', title='Your voice in the English copy',
+ dict(n=19, phase='call', status='go', done='a', left='The English home is done (2026-10-04), in the plain style of your option 1. Still to do in the same style: the apply form’s and the proof page’s sentences, the privacy notice, and the article closing (the Farsi pages have 22 dashes and 6 semicolons too). Tell me which first.', effort='M', title='Your voice in the English copy',
   plain='Your own rule says an athlete should read plain words that sound like you typed them. The English home has 43 em-dashes, 8 “X, Y and Z” lists and 24.7-word sentences; it reads at 34 out of 100 (difficult). Forms, proof, privacy and the article closing do the same.',
   items=[
    ('P3', 'English home, forms, proof, privacy, articles', 'Em-dashes: home 43, form 26, proof 12, privacy 36; “Not a PDF. An Experience.”; “from one of the world’s leading programmes” (no university named); “Client Intake Form” is internal jargon (buttons say Apply). Farsi: 22 dashes, 6 semicolons, “X، Y و Z” lines.', 'I write two plain options for each key line; you pick or change; the rest follows the same rule. Keep what already sounds like you: “We adapt.” “Nothing without a reason.”', 'M', 'Y', 'home-en-17, form-en-14, proof-08, article-15, home-fa-16'),
@@ -261,7 +261,7 @@ PK = [
   items=[
    ('P3', 'Apps', 'Not reviewed yet. They have their own audit (Fresh Eyes) and rules; this pass would only add what the website tools can measure.', 'Start with the athlete app’s first-run and Home on a phone.', 'L', 'N', ''),
    ('P1', 'Athlete apps (program.html, habits.html, course app)', 'A wrong phone clock breaks sign-in. One Irancell iPhone reports its clock 89 minutes behind. The sign-in library decides a token has expired by the phone’s clock, so it keeps sending an expired token for about 1.5 hours of every cycle and the server answers “JWT expired”. Nothing in the apps retries.', 'On a 401 or “JWT expired” answer, refresh the session once and repeat the request; test with a phone clock set back. The reach test already prints the clock difference.', 'M', 'N', 'reach 2026-10-04'),
-   ('P2', 'Course and programme videos', 'Without a VPN, YouTube is blocked on both Iranian networks tested (thumbnails and the nocookie player fail or time out). With a VPN it works but slowly (up to 8 s). Aparat works on every report.', 'Your call: keep YouTube (athletes use a VPN) or also host the exercise and lesson videos on Aparat. Not built.', 'L', 'Y', 'reach 2026-10-04'),
+   ('P2', 'Course and programme videos', 'Without a VPN, YouTube is blocked on both Iranian networks tested (thumbnails and the nocookie player fail or time out). With a VPN it works but slowly (up to 8 s). Aparat works on every report.', 'Decided 2026-10-04: keep YouTube. You cannot put the videos on Aparat unless you record them yourself, and you are not planning to. So athletes in Iran need a VPN for videos.', 'L', 'N', 'reach 2026-10-04'),
    ('P3', 'Athlete apps', 'A 256 KB upload times out without a VPN; 64 KB passes. The largest athlete progress record today is 29 KB, so nothing breaks, with about a 2x margin.', 'Watch the size; trim or split the record before it nears 64 KB.', 'S', 'N', 'reach 2026-10-04'),
   ]),
 ]
@@ -317,6 +317,13 @@ NEW_WORDS = [
         'Buttons “Get your free login” and “Try the demo”, the line “Free. No payment, no card. For any athlete.”, the heading “This is the whole app.” with “Four habits a day: steps, sleep, protein and water. Tap one when it is done. Points build levels.” and “The demo is the real thing with nothing saved. Tap around.”',
         '“Four are always on: steps, sleep, food and water. The rest are optional, and you can change them whenever you like.” · “Get your free login” · “You will get a username and password on WhatsApp.” · “Send me my login” · “WhatsApp number, with country code”.',
         'Farsi hub: «درخواستِ برنامه‌ی اختصاصی» / «فرمِ ۳ دقیقه‌ای · جواب تا ۴۸ ساعت», role «مربیِ بدنسازیِ تنیس و پدل», «آزمون آمادگی جسمانی · برای مربی‌ها», and «… · صفحه به انگلیسیه» on the tracker.']),
+    ('The English home, rebuilt (2026-10-04)', [
+        'Hero: kicker “Online tennis & padel coaching”, sub “Strength and conditioning built around how you move on court. I write your programme and coach it every week.”, under the buttons your photo with “Amir Ardekani, 2× MSc. Used by 1000+ competitive tennis and padel players.”',
+        'Testimonials: “Players I’ve coached” and “From club players to internationals. The same method, built around each athlete.” (it said “Trusted by Elite Athletes”).',
+        'Fit check: “This is not a gym plan with a racket added. I build it around how you move on court: fast starts, hard stops, long rallies, big rotation.” Three yes lines and three no lines.',
+        'The app: “Your programme lives in an app.” (it said “Not a PDF. An Experience.”) and “You sign in with a username and a password. There is nothing to download and no spreadsheet.”',
+        'Prices: “Everything listed above”, “Everything in Game, plus”, “Everything in Set, plus”, “$60 a month, save 14%”, “$50 a month, save 29%”, “USD”, and “All prices are in US dollars. You pay in advance, after we have talked.”',
+        'About: two blocks, “Education” and “On Court and in the Gym”. A new first FAQ, “How does payment work?” (pay in advance, no refund once I have started, 18 or over, a parent or guardian for under-18s). The closing line “A question first? Message me on WhatsApp or email me. I usually reply within 24 hours.” The navigation is Results, How it works, Programmes, About, FAQ.']),
     ('Small helper words', [
         'Skip links for keyboard users: «رفتن به محتوا» · «رفتن به لینک‌ها» · «رفتن به متن» · «رفتن به فرم». The English ones already said “Skip to content”.',
         'Screen-reader names for the Etminan language switcher: “FA فارسی”, “EN English”, “DV ދިވެހި”.']),
@@ -331,6 +338,7 @@ SHIPPED_YOUR_CALLS = [
 ]
 
 FACTS = [
+    'Videos stay on YouTube: you cannot host them on Aparat unless you record them yourself, and you are not planning to. Athletes in Iran need a VPN for videos.',
     'Iran reach test, six reports from four phones on Hamrah-e Avval, Irancell and Shatel (2026-10-04). WITHOUT a VPN, on Hamrah-e Avval and Irancell: your site, the sign-in server, the data server, the apply-form endpoint (Web3Forms), Plausible, jsDelivr, Google Fonts and Aparat all work. YouTube does not (the thumbnails and the nocookie player fail or time out). A 256 KB upload times out, 64 KB passes. WITH a VPN everything works, only slower (YouTube up to 8 s). So the Farsi funnel, the forms and the analytics work for people with no VPN; the exercise and lesson videos do not.',
     'How a client joins and pays: they fill in the form, you contact them with more questions, they pay (by messaging you on WhatsApp or Instagram), then you write their programme. The Farsi price is the equivalent of 25 dollars a month, in Toman at the day’s rate.',
     'The apply form is for athletes of all kinds, not only tennis and padel: the football, cricket and other options stay.',
@@ -344,7 +352,8 @@ FACTS = [
 
 QUESTIONS = [
     'Your part: the Plausible goals (Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application, 404, and the properties plan, where, page, which, to, step, lang). You asked me to walk you through it later.',
-    'Walk-through of the first-screen photo and the three athletes (package 12): you asked for it later, not now.',
+    'The English home says it is for competitive tennis and padel players, but the apply form takes athletes of all kinds. Should the home say so too (a line, or a second audience), or stay tennis and padel only? I kept it as it was and removed the line that said a non-tennis player is not a fit.',
+    'Your photo is on the new first screen (the athletes’ faces were action shots and looked messy at that size, so I used your headshot). Do you want a different picture there?',
 ]
 
 TOOLS = [
@@ -411,5 +420,6 @@ SHIPPED = [
     ('2026-10-02', '16', 'The Instagram link hub in the order that sells, with clearer labels (application, 48 hours, for coaches, the tracker page is English).', '56a0535'),
     ('2026-10-04', '14', 'Farsi home: how you pay is on the price card and in the FAQ, the cost question comes first.', '48757b9'),
     ('2026-10-04', '23', 'The Iran reach test came back (six reports): forms, sign-in, data, analytics and fonts work with no VPN; YouTube does not.', '(record)'),
+    ('2026-10-04', '12, 19', 'The English home rebuilt and rewritten in plain words: proof first, process before price, price checklist and plan-by-plan upgrades, your photo and the app phone on the first screen, contact folded into the apply section and the footer, five nav items, Read more on testimonials, a payment FAQ. 20.2 to 14.4 phone screens.', '4c77349'),
     ('2026-10-02', '22', 'The style guard: a commit that adds yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white-on-pale-clay is stopped. It also found and fixed: 10 to 11 px labels on the apply form and proof page, the pale grey on the Farsi form, partner and terms pages, and a slider value hanging off a 320 px screen.', '943a92c'),
 ]
