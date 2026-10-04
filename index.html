@@ -640,8 +640,8 @@
   .stack-card:nth-child(3) .stack-num { -webkit-text-stroke: 1.5px rgba(255,255,255,.22); }
   .stack-title { font-family: var(--font-display); font-weight: 900; font-size: clamp(38px, 5vw, 60px); text-transform: uppercase; line-height: .95; margin-bottom: 14px; }
   .stack-body { font-size: 15px; font-weight: 300; line-height: 1.75; color: var(--text-secondary); max-width: 520px; }
-  .stack-card:nth-child(2) .stack-body,
-  .stack-card:nth-child(3) .stack-body { color: rgba(255,255,255,.85); }
+  .stack-card:nth-child(2) .stack-body { color: rgba(255,255,255,.85); }
+  .stack-card:nth-child(3) .stack-body { color: #fff; }   /* 85% white on the clay fill was 3.81:1; plain white is 4.66:1 */
   .stack-tag {
     display: inline-block; margin-top: 22px;
     font-family: var(--font-mono); font-size: 12px; font-weight: 500;
@@ -649,8 +649,8 @@
     padding: 6px 12px; border-radius: 3px;
     color: var(--accent); background: var(--accent-dim); border: 1px solid rgba(14,74,54,.12);
   }
-  .stack-card:nth-child(2) .stack-tag,
-  .stack-card:nth-child(3) .stack-tag { color: #fff; background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.2); }
+  .stack-card:nth-child(2) .stack-tag { color: #fff; background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.2); }
+  .stack-card:nth-child(3) .stack-tag { color: #fff; background: rgba(0,0,0,.16); border-color: rgba(255,255,255,.3); }   /* a lighter chip on the clay card made white 12 px text 3.84:1; this is 6.2:1 */
   .stack-visual { display: flex; align-items: center; justify-content: center; }
   .stack-visual .ico { width: 120px; height: 120px; opacity: .9; }
   .stack-visual .ico * { stroke-width: 1.1; }
@@ -1578,7 +1578,7 @@
         </div>
       </a>
     </div>
-    <p class="reveal" style="margin-top:28px;text-align:center"><a href="/en/articles/" style="color:#C7552F;font-weight:700;display:inline-flex;align-items:center;min-height:44px">Read the Playbook articles on the web <span class="arrow-r" aria-hidden="true">→</span></a></p>
+    <p class="reveal" style="margin-top:28px;text-align:center"><a href="/en/articles/" style="color:var(--accent-2-text);font-weight:700;display:inline-flex;align-items:center;min-height:44px">Read the Playbook articles on the web <span class="arrow-r" aria-hidden="true">→</span></a></p>
   </div>
 </section>
 

@@ -41,10 +41,12 @@
   }
   .p-hero-in { max-width: 900px; margin: 0 auto; }
   .p-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
     font-family: var(--font-mono, 'JetBrains Mono', monospace);
     font-size: 12px; letter-spacing: .2em; text-transform: uppercase;
-    color: #E06B43; margin-bottom: 20px;
+    color: #FAF7F2; margin-bottom: 20px;   /* cream with a clay dot, as on the home: clay text on this green was about 3:1 */
   }
+  .p-eyebrow::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: 50%; background: #C7552F; }
   .p-hero h1 {
     font-family: var(--font-display); font-weight: 900; text-transform: uppercase;
     font-size: clamp(44px, 9vw, 92px); line-height: .92; letter-spacing: -.02em;
@@ -90,7 +92,7 @@
   .p-card p { font-size: 14.5px; line-height: 1.55; margin: 0; color: #4A463F; }
   .p-num {
     font-family: var(--font-mono, monospace); font-size: 12px; letter-spacing: .14em;
-    color: #C7552F; display: block; margin-bottom: 12px;
+    color: #B64826; display: block; margin-bottom: 12px;   /* the deeper clay for small text on paper: 5.0:1, was 4.12:1 */
   }
 
   .p-habits { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
@@ -99,7 +101,7 @@
     font-family: var(--font-display); font-weight: 900; font-size: 14px;
     letter-spacing: .05em; text-transform: uppercase;
   }
-  .p-habit.locked { border-style: dashed; color: #8A857C; }
+  .p-habit.locked { border-style: dashed; color: #6B6B6B; }   /* was #8A857C, 3.43:1 */
 
   .p-quote {
     border-left: 4px solid #C7552F; padding: 4px 0 4px 20px; margin: 30px 0 0;
