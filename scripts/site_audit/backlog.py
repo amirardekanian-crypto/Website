@@ -216,7 +216,7 @@ PK = [
    ('P2', 'All articles', 'Every page shares one English brand card as og:image, Farsi too; four unused people-free Library pictures exist. Four of five English descriptions are cut mid-sentence; “More articles” ignores topic; four older Farsi pages miss the SEO phrase; the index promises padel but no article body mentions it.', '1200×630 card per category (your OK to reuse the art); real descriptions; related by topic; retrofit the phrase; write the padel article or soften the claim.', 'M', 'Y', 'article-06 to 10'),
    ('P2', 'English articles', 'English article pages copy the Farsi pill look: four header links against the home’s seven, no WhatsApp in the footer. A third design next to the English home and the Farsi home.', 'Decide: look like the English home (shared nav) or keep this look.', 'M-L', 'Y', 'article-05'),
   ]),
- dict(n=19, phase='call', status='go', done='a', left='The English home is done (2026-10-04), in the plain style of your option 1. Still to do in the same style: the apply form’s and the proof page’s sentences, the privacy notice, and the article closing (the Farsi pages have 22 dashes and 6 semicolons too). Tell me which first.', effort='M', title='Your voice in the English copy',
+ dict(n=19, phase='call', status='go', done='a', left='Done in the plain style of your option 1 (2026-10-04): the English home, the apply form and the proof page. The form’s stored answer values were NOT changed (only the visible labels), so the database, the WhatsApp message and the coach tools still read the same text. Still to do in the same style: the privacy notice (36 dashes; a legal text, so do it with package 20), the terms, the article closing (the page generator belongs to another session) and the Farsi pages (22 dashes, 6 semicolons). The internal email subject “New Client Intake” and the sender name “Client Intake Form” were left alone on purpose: they title each application email in Gmail, which Amir and the intake agent search by name and the word intake.', effort='M', title='Your voice in the English copy',
   plain='Your own rule says an athlete should read plain words that sound like you typed them. The English home has 43 em-dashes, 8 “X, Y and Z” lists and 24.7-word sentences; it reads at 34 out of 100 (difficult). Forms, proof, privacy and the article closing do the same.',
   items=[
    ('P3', 'English home, forms, proof, privacy, articles', 'Em-dashes: home 43, form 26, proof 12, privacy 36; “Not a PDF. An Experience.”; “from one of the world’s leading programmes” (no university named); “Client Intake Form” is internal jargon (buttons say Apply). Farsi: 22 dashes, 6 semicolons, “X، Y و Z” lines.', 'I write two plain options for each key line; you pick or change; the rest follows the same rule. Keep what already sounds like you: “We adapt.” “Nothing without a reason.”', 'M', 'Y', 'home-en-17, form-en-14, proof-08, article-15, home-fa-16'),
@@ -324,6 +324,11 @@ NEW_WORDS = [
         'The app: “Your programme lives in an app.” (it said “Not a PDF. An Experience.”) and “You sign in with a username and a password. There is nothing to download and no spreadsheet.”',
         'Prices: “Everything listed above”, “Everything in Game, plus”, “Everything in Set, plus”, “$60 a month, save 14%”, “$50 a month, save 29%”, “USD”, and “All prices are in US dollars. You pay in advance, after we have talked.”',
         'About: two blocks, “Education” and “On Court and in the Gym”. A new first FAQ, “How does payment work?” (pay in advance, no refund once I have started, 18 or over, a parent or guardian for under-18s). The closing line “A question first? Message me on WhatsApp or email me. I usually reply within 24 hours.” The navigation is Results, How it works, Programmes, About, FAQ.']),
+    ('The apply form and the proof page in plain words (2026-10-04)', [
+        'Form: the heading is “Apply for coaching” (it said “Client Intake Form”), the opening line “Tell me where you are right now. I will use your answers to build a programme around your body and your week.”, the plans read “Game: $70 for 1 month”, “Set: $180 for 3 months”, “Match: $300 for 6 months”, and the contact hint says “I reply here or by email. For WhatsApp, include your country code.”',
+        'Form: “Choose the programme that fits your goals.” · “Tell me what you play and how seriously you train. I build the programme around your sport.” · “This keeps you safe. I use it to plan around any limits you have.” · the options such as “Heavy: long days, little downtime” (they had dashes).',
+        'Form, after sending: “Application sent.” and “I will read your application and message you within 48 hours. We will talk about whether we are a good fit.” The discount messages: “✓ Code approved: 10% off”, “That code was not recognised. Check the spelling.”, “I could not check this code right now. Send the form anyway and I will apply it by hand.”',
+        'Proof page: “Streaks you won’t want to break” (it said “Runs”; the app says streak), the habit chip “Protein” (it said “Food”; the app says 3 protein meals), and every dash became a full stop or a colon.']),
     ('Small helper words', [
         'Skip links for keyboard users: «رفتن به محتوا» · «رفتن به لینک‌ها» · «رفتن به متن» · «رفتن به فرم». The English ones already said “Skip to content”.',
         'Screen-reader names for the Etminan language switcher: “FA فارسی”, “EN English”, “DV ދިވެހި”.']),
@@ -392,6 +397,16 @@ EVIDENCE = [
 ]
 
 # Appended as work ships: (date, packages, what changed, commit)
+NEXT_UP = [
+    'Re-run the measuring tools on the live site (package 24: `scripts/site_audit/README.md`) and save `Content/site-audit/after-scoreboard-2026-10-04.txt`. The numbers in the scoreboard above for the English home, forms and proof page were measured by hand during the rebuild; the full run has not been repeated since the first batches.',
+    'Package 20 (legal) with the rest of 19 on the privacy notice: a 7-line “Short version” and a jump list at the top (20a), a one-screen Farsi summary linked from the Farsi form, terms and course page (20c), the terms for the free tracker, the board, partner courses and the $17 Farsi course (20d), and the plain-words pass. Legal text in his name: show him the words first.',
+    'Farsi home 14b to 14d (credentials row, which product leads, length), Farsi product pages 15 (needs his word on refunds for the $17 course, which is not covered by the terms yet) and the partner page 17.',
+    'Package 12 leftovers: a share card with his portrait (can be composed from his headshot, no credits), the testimonial pull-outs (his call) and getting the phone page from 14.4 to about 13 screens.',
+    'Package 25, the apps. First: a wrong phone clock breaks sign-in (refresh the session once on a 401 or “JWT expired” answer). Then the first-run and Home pass on a phone.',
+    'His parts: add the Plausible goals (a walk-through he asked for), the UTS page when the course starts (20e), and the demo banner’s links in program.html (5d, another session).',
+    'Package 21 (one brand CSS file) and 18 (articles, the page generator) are big and belong to later or to another session.',
+]
+
 SHIPPED = [
     ('2026-10-02', '1, 2', 'Readable small text and thumb-sized links: the muted grey, 12 px floors, a focus ring that shows on dark areas.', '906e1f5'),
     ('2026-10-02', '2, 5, 7', 'Forms stop zooming on iPhone; Farsi phone numbers work (and the dashboard builds their WhatsApp link); keyboard focus on the Farsi form.', 'c6be9fd'),
@@ -421,5 +436,6 @@ SHIPPED = [
     ('2026-10-04', '14', 'Farsi home: how you pay is on the price card and in the FAQ, the cost question comes first.', '48757b9'),
     ('2026-10-04', '23', 'The Iran reach test came back (six reports): forms, sign-in, data, analytics and fonts work with no VPN; YouTube does not.', '(record)'),
     ('2026-10-04', '12, 19', 'The English home rebuilt and rewritten in plain words: proof first, process before price, price checklist and plan-by-plan upgrades, your photo and the app phone on the first screen, contact folded into the apply section and the footer, five nav items, Read more on testimonials, a payment FAQ. 20.2 to 14.4 phone screens.', '4c77349'),
+    ('2026-10-04', '19', 'The apply form and the proof page in plain words: “Apply for coaching”, no dashes, plain option labels (stored answers unchanged), “streak” not “run”, Protein not Food.', 'e81e64a'),
     ('2026-10-02', '22', 'The style guard: a commit that adds yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white-on-pale-clay is stopped. It also found and fixed: 10 to 11 px labels on the apply form and proof page, the pale grey on the Farsi form, partner and terms pages, and a slider value hanging off a 320 px screen.', '943a92c'),
 ]

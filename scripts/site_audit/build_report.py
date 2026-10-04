@@ -58,6 +58,9 @@ def build_md():
     a('|---|---|---|---|---|')
     for p in B.PK:
         a(f'| {p["n"]} | {cell(p["title"])} | {PHASE_LABEL[p["phase"]]} | {STATUS[p["status"]]}{" (" + str(len(p.get("done", ""))) + " of " + str(len(p["items"])) + " items)" if p.get("done") else ""} | {EFF.get(p["effort"], p["effort"])} |')
+    if getattr(B, 'NEXT_UP', None):
+        a('\n### Start here next\n')
+        for i, t in enumerate(B.NEXT_UP, 1): a(f'{i}. {t}')
     a('\n### Shipped\n')
     if getattr(B, 'SHIPPED', None):
         a('| Date | Packages | What changed | Commit |'); a('|---|---|---|---|')
