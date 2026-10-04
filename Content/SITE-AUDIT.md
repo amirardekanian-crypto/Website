@@ -20,7 +20,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 
 ## Where it stands
 
-**25 packages · 82 findings** (30 cost you now, 39 worth fixing, 13 polish). Done: 13 · Waiting for you: 5 · Decided: next to build: 3 · Another session: 1 · Queued: 3
+**25 packages · 85 findings** (31 cost you now, 40 worth fixing, 14 polish). Done: 14 · Waiting for you: 4 · Decided: next to build: 3 · Another session: 1 · Queued: 3
 
 | # | Package | Phase | Status | Effort |
 |---|---|---|---|---|
@@ -37,7 +37,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 11 | No-yellow cleanup | Fix now | Done (1 of 2 items) | small |
 | 12 | English home: shorter and clearer | Your call | Decided: next to build | large |
 | 13 | The apply form: promise vs length | Your call | Done (1 of 2 items) | medium to large |
-| 14 | Farsi home: price, trust and length | Your call | Decided: next to build | medium |
+| 14 | Farsi home: price, trust and length | Your call | Decided: next to build (1 of 4 items) | medium |
 | 15 | Farsi product pages: trust at the buy button | Your call | Waiting for you | medium |
 | 16 | Proof page and the Instagram link hub | Your call | Done (4 of 4 items) | medium |
 | 17 | Partner page: the deal on the first screen | Your call | Waiting for you | medium |
@@ -46,7 +46,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 20 | Legal accuracy (needs facts from you) | Your call | Waiting for you | medium |
 | 21 | One brand CSS file and shared chrome | Foundations | Queued | large |
 | 22 | A style guard so it stays fixed | Foundations | Done (1 of 1 items) | medium |
-| 23 | Can Iran reach the forms, Plausible and the demo? | Foundations | Waiting for you | small |
+| 23 | Can Iran reach the forms, Plausible and the demo? | Foundations | Done (1 of 1 items) | small |
 | 24 | Re-run the audit after each batch | Foundations | Queued | small |
 | 25 | The apps | Next | Queued | large |
 
@@ -79,6 +79,8 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 2026-10-02 | 13, 20 | No refunds and 18 or over: terms section 7 rewritten (English and Farsi), the old ?client= link and “coaching agreement” removed from the terms, a required adult-or-guardian tick on both forms, privacy section 8. | 6d6aeb4 |
 | 2026-10-02 | 16, 10 | Proof page: Get your free login and Try the demo on the first screen, the real app shown, the stale promises fixed, a country-code number box, its own home-screen manifest. | cea6ef8 |
 | 2026-10-02 | 16 | The Instagram link hub in the order that sells, with clearer labels (application, 48 hours, for coaches, the tracker page is English). | 56a0535 |
+| 2026-10-04 | 14 | Farsi home: how you pay is on the price card and in the FAQ, the cost question comes first. | 48757b9 |
+| 2026-10-04 | 23 | The Iran reach test came back (six reports): forms, sign-in, data, analytics and fonts work with no VPN; YouTube does not. | (record) |
 | 2026-10-02 | 22 | The style guard: a commit that adds yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white-on-pale-clay is stopped. It also found and fixed: 10 to 11 px labels on the apply form and proof page, the pale grey on the Farsi form, partner and terms pages, and a slider value hanging off a 320 px screen. | 943a92c |
 
 ### Words I wrote, for you to read
@@ -394,9 +396,11 @@ The form is the one step every sale goes through. It asks 27 to 30 questions (18
 
 The Farsi home sells well, but the price has no Toman figure or payment method, the first screen shows no name, face or credential, and the same pitch repeats six times over 20.8 screens.
 
+**Still open.** 14a is done on 2026-10-04 (option 1, the rule not a number): the price card says it is in Toman at that day’s rate with the exact amount in your first message, says how you pay (we talk, then you message me), and the FAQ opens with the cost question and has a new “how do I pay” answer (pay in advance, no refund once work starts, 18 or over). 14b, 14c and 14d (credentials row, which product leads, the length) are not built yet.
+
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
-| 14a |  | P2 | Farsi home | The Iran price is a Latin “$25” with no Toman figure and no way to pay; the English page’s intake call, performance report, 60-day promise and 48 h reply are missing; the cost question is the last FAQ. | Toman rule or figure (see decision), payment FAQ, the promise if it applies, cost FAQ near the top. | M | Y | home-fa-06 |
+| 14a | ✓ | P2 | Farsi home | The Iran price is a Latin “$25” with no Toman figure and no way to pay; the English page’s intake call, performance report, 60-day promise and 48 h reply are missing; the cost question is the last FAQ. | Toman rule or figure (see decision), payment FAQ, the promise if it applies, cost FAQ near the top. | M | Y | home-fa-06 |
 | 14b |  | P2 | Farsi home | The phone first screen shows no name, face or credential (brand name hidden under 560 px, trust bar about 1,630 px down, no photo of Amir). | A credential row under the buttons; smaller phone on narrow screens; coach photo in About. | M | Y | home-fa-05 |
 | 14c |  | P2 | Farsi home | Only the $17 course gets a primary button; coaching gets a ghost “جزئیات ←” that jumps about 10,000 px; the “ready-made program” card argues against the course card; a coaches-only app is pushed to players in the top bar. | Pick the lead product, add “کدوم برای منه؟”, give coaching “شروع کن”. | S | Y | home-fa-07 |
 | 14d |  | P2 | Farsi home | 20.8 phone screens; “personal plus weekly update” repeats six times; features, method, Library and About are 38% of the page. | Two-column feature tiles, one-line pillars, Library as a link, About merged into proof (aim about 15 screens). | M | Y | home-fa-08 |
@@ -509,13 +513,15 @@ A small check that runs when you commit and says no if a change brings back yell
 |---|---|---|---|---|---|---|---|---|
 | 22a | ✓ | P3 | Pre-commit | Nothing stops regressions: the no-gold rule, the 12 px floor, the grey token, Farsi letter-spacing and Google font links are checked only by people. | scripts/check_site_style.py in .githooks/pre-commit, same pattern as the existing guards. | M |  | static scan |
 
-### 23. Can Iran reach the forms, Plausible and the demo?  ·  Waiting for you  ·  small
+### 23. Can Iran reach the forms, Plausible and the demo?  ·  Done  ·  small
 
 Three things your Farsi funnel depends on have never been tested from Iran: sending a form, Plausible, and the demo. If they fail, a visitor there cannot apply or be counted.
 
+**Still open.** Answered on 2026-10-04 by six real reports: the Farsi funnel works with no VPN on Hamrah-e Avval and Irancell (site, sign-in, data, apply form, analytics, the app library), but YouTube is blocked, so videos need a VPN (Aparat works). One Shatel report on a 3G Android timed out on your own site once; the rest were fine. Findings for the apps are in package 25 (a wrong phone clock can break sign-in; the video choice).
+
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
-| 23a |  | P2 | Farsi funnel | /reach/ tests the fonts but not api.web3forms.com, plausible.io or the Supabase address. One Web3Forms key serves 9 pages. | Add those three to /reach/; ask two or three Iranian athletes to run it with the VPN off; record the result in this file. | S | Y | form-fa, tennis-09, funnel cross-page |
+| 23a | ✓ | P2 | Farsi funnel | /reach/ tests the fonts but not api.web3forms.com, plausible.io or the Supabase address. One Web3Forms key serves 9 pages. | Add those three to /reach/; ask two or three Iranian athletes to run it with the VPN off; record the result in this file. | S | Y | form-fa, tennis-09, funnel cross-page |
 
 ### 24. Re-run the audit after each batch  ·  Queued  ·  small
 
@@ -537,9 +543,13 @@ program.html (athletes), habits.html (AA Proof) and coach.html (your dashboard) 
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
 | 25a |  | P3 | Apps | Not reviewed yet. They have their own audit (Fresh Eyes) and rules; this pass would only add what the website tools can measure. | Start with the athlete app’s first-run and Home on a phone. | L |  |  |
+| 25b |  | P1 | Athlete apps (program.html, habits.html, course app) | A wrong phone clock breaks sign-in. One Irancell iPhone reports its clock 89 minutes behind. The sign-in library decides a token has expired by the phone’s clock, so it keeps sending an expired token for about 1.5 hours of every cycle and the server answers “JWT expired”. Nothing in the apps retries. | On a 401 or “JWT expired” answer, refresh the session once and repeat the request; test with a phone clock set back. The reach test already prints the clock difference. | M |  | reach 2026-10-04 |
+| 25c |  | P2 | Course and programme videos | Without a VPN, YouTube is blocked on both Iranian networks tested (thumbnails and the nocookie player fail or time out). With a VPN it works but slowly (up to 8 s). Aparat works on every report. | Your call: keep YouTube (athletes use a VPN) or also host the exercise and lesson videos on Aparat. Not built. | L | Y | reach 2026-10-04 |
+| 25d |  | P3 | Athlete apps | A 256 KB upload times out without a VPN; 64 KB passes. The largest athlete progress record today is 29 KB, so nothing breaks, with about a 2x margin. | Watch the size; trim or split the record before it nears 64 KB. | S |  | reach 2026-10-04 |
 
 ## Facts you have given me
 
+- Iran reach test, six reports from four phones on Hamrah-e Avval, Irancell and Shatel (2026-10-04). WITHOUT a VPN, on Hamrah-e Avval and Irancell: your site, the sign-in server, the data server, the apply-form endpoint (Web3Forms), Plausible, jsDelivr, Google Fonts and Aparat all work. YouTube does not (the thumbnails and the nocookie player fail or time out). A 256 KB upload times out, 64 KB passes. WITH a VPN everything works, only slower (YouTube up to 8 s). So the Farsi funnel, the forms and the analytics work for people with no VPN; the exercise and lesson videos do not.
 - How a client joins and pays: they fill in the form, you contact them with more questions, they pay (by messaging you on WhatsApp or Instagram), then you write their programme. The Farsi price is the equivalent of 25 dollars a month, in Toman at the day’s rate.
 - The apply form is for athletes of all kinds, not only tennis and padel: the football, cricket and other options stay.
 - The app is English for now. It has no chat: everything goes through WhatsApp.
@@ -551,10 +561,8 @@ program.html (athletes), habits.html (AA Proof) and coach.html (your dashboard) 
 
 ## Questions only Amir can answer
 
-1. Has anyone in Iran opened the demo, the apply form and Plausible with the VPN off? You will tell me later. (package 23)
-2. Ask two or three Iranian athletes to open amirardekani.com/reach/ once with the VPN off and once on and send you the line it prints. You will let me know. (package 23)
-3. Your part: the Plausible goals (Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application, 404, and the properties plan, where, page, which, to, step, lang). You asked me to walk you through it later.
-4. Walk-through of the first-screen photo and the three athletes (package 12): you asked for it later, not now.
+1. Your part: the Plausible goals (Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application, 404, and the properties plan, where, page, which, to, step, lang). You asked me to walk you through it later.
+2. Walk-through of the first-screen photo and the three athletes (package 12): you asked for it later, not now.
 
 ## Tools: what we used, what we skip
 

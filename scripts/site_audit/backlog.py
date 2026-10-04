@@ -167,7 +167,7 @@ PK = [
      ('B', 'Same questions in 5 saved steps', 'Feels shorter, recovers quitters. A rewrite.'),
      ('C', 'One page cut to about 18 (my pick)', 'Everything else under “Optional: speeds up our call”. Cheapest. Move to A if the new numbers (package 9) show people quitting.')],
      pick='C', chosen='C')),
- dict(n=14, phase='call', status='go', effort='M', title='Farsi home: price, trust and length',
+ dict(n=14, phase='call', status='go', done='a', left='14a is done on 2026-10-04 (option 1, the rule not a number): the price card says it is in Toman at that day’s rate with the exact amount in your first message, says how you pay (we talk, then you message me), and the FAQ opens with the cost question and has a new “how do I pay” answer (pay in advance, no refund once work starts, 18 or over). 14b, 14c and 14d (credentials row, which product leads, the length) are not built yet.', effort='M', title='Farsi home: price, trust and length',
   plain='The Farsi home sells well, but the price has no Toman figure or payment method, the first screen shows no name, face or credential, and the same pitch repeats six times over 20.8 screens.',
   items=[
    ('P2', 'Farsi home', 'The Iran price is a Latin “$25” with no Toman figure and no way to pay; the English page’s intake call, performance report, 60-day promise and 48 h reply are missing; the cost question is the last FAQ.', 'Toman rule or figure (see decision), payment FAQ, the promise if it applies, cost FAQ near the top.', 'M', 'Y', 'home-fa-06'),
@@ -246,7 +246,7 @@ PK = [
   items=[
    ('P3', 'Pre-commit', 'Nothing stops regressions: the no-gold rule, the 12 px floor, the grey token, Farsi letter-spacing and Google font links are checked only by people.', 'scripts/check_site_style.py in .githooks/pre-commit, same pattern as the existing guards.', 'M', 'N', 'static scan'),
   ]),
- dict(n=23, phase='base', status='ask', effort='S', title='Can Iran reach the forms, Plausible and the demo?',
+ dict(n=23, phase='base', status='done', done='a', left='Answered on 2026-10-04 by six real reports: the Farsi funnel works with no VPN on Hamrah-e Avval and Irancell (site, sign-in, data, apply form, analytics, the app library), but YouTube is blocked, so videos need a VPN (Aparat works). One Shatel report on a 3G Android timed out on your own site once; the rest were fine. Findings for the apps are in package 25 (a wrong phone clock can break sign-in; the video choice).', effort='S', title='Can Iran reach the forms, Plausible and the demo?',
   plain='Three things your Farsi funnel depends on have never been tested from Iran: sending a form, Plausible, and the demo. If they fail, a visitor there cannot apply or be counted.',
   items=[
    ('P2', 'Farsi funnel', '/reach/ tests the fonts but not api.web3forms.com, plausible.io or the Supabase address. One Web3Forms key serves 9 pages.', 'Add those three to /reach/; ask two or three Iranian athletes to run it with the VPN off; record the result in this file.', 'S', 'Y', 'form-fa, tennis-09, funnel cross-page'),
@@ -260,6 +260,9 @@ PK = [
   plain='program.html (athletes), habits.html (AA Proof) and coach.html (your dashboard) get the same pass once the website is done.',
   items=[
    ('P3', 'Apps', 'Not reviewed yet. They have their own audit (Fresh Eyes) and rules; this pass would only add what the website tools can measure.', 'Start with the athlete app’s first-run and Home on a phone.', 'L', 'N', ''),
+   ('P1', 'Athlete apps (program.html, habits.html, course app)', 'A wrong phone clock breaks sign-in. One Irancell iPhone reports its clock 89 minutes behind. The sign-in library decides a token has expired by the phone’s clock, so it keeps sending an expired token for about 1.5 hours of every cycle and the server answers “JWT expired”. Nothing in the apps retries.', 'On a 401 or “JWT expired” answer, refresh the session once and repeat the request; test with a phone clock set back. The reach test already prints the clock difference.', 'M', 'N', 'reach 2026-10-04'),
+   ('P2', 'Course and programme videos', 'Without a VPN, YouTube is blocked on both Iranian networks tested (thumbnails and the nocookie player fail or time out). With a VPN it works but slowly (up to 8 s). Aparat works on every report.', 'Your call: keep YouTube (athletes use a VPN) or also host the exercise and lesson videos on Aparat. Not built.', 'L', 'Y', 'reach 2026-10-04'),
+   ('P3', 'Athlete apps', 'A 256 KB upload times out without a VPN; 64 KB passes. The largest athlete progress record today is 29 KB, so nothing breaks, with about a 2x margin.', 'Watch the size; trim or split the record before it nears 64 KB.', 'S', 'N', 'reach 2026-10-04'),
   ]),
 ]
 
@@ -328,6 +331,7 @@ SHIPPED_YOUR_CALLS = [
 ]
 
 FACTS = [
+    'Iran reach test, six reports from four phones on Hamrah-e Avval, Irancell and Shatel (2026-10-04). WITHOUT a VPN, on Hamrah-e Avval and Irancell: your site, the sign-in server, the data server, the apply-form endpoint (Web3Forms), Plausible, jsDelivr, Google Fonts and Aparat all work. YouTube does not (the thumbnails and the nocookie player fail or time out). A 256 KB upload times out, 64 KB passes. WITH a VPN everything works, only slower (YouTube up to 8 s). So the Farsi funnel, the forms and the analytics work for people with no VPN; the exercise and lesson videos do not.',
     'How a client joins and pays: they fill in the form, you contact them with more questions, they pay (by messaging you on WhatsApp or Instagram), then you write their programme. The Farsi price is the equivalent of 25 dollars a month, in Toman at the day’s rate.',
     'The apply form is for athletes of all kinds, not only tennis and padel: the football, cricket and other options stay.',
     'The app is English for now. It has no chat: everything goes through WhatsApp.',
@@ -339,8 +343,6 @@ FACTS = [
 ]
 
 QUESTIONS = [
-    'Has anyone in Iran opened the demo, the apply form and Plausible with the VPN off? You will tell me later. (package 23)',
-    'Ask two or three Iranian athletes to open amirardekani.com/reach/ once with the VPN off and once on and send you the line it prints. You will let me know. (package 23)',
     'Your part: the Plausible goals (Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application, 404, and the properties plan, where, page, which, to, step, lang). You asked me to walk you through it later.',
     'Walk-through of the first-screen photo and the three athletes (package 12): you asked for it later, not now.',
 ]
@@ -407,5 +409,7 @@ SHIPPED = [
     ('2026-10-02', '13, 20', 'No refunds and 18 or over: terms section 7 rewritten (English and Farsi), the old ?client= link and “coaching agreement” removed from the terms, a required adult-or-guardian tick on both forms, privacy section 8.', '6d6aeb4'),
     ('2026-10-02', '16, 10', 'Proof page: Get your free login and Try the demo on the first screen, the real app shown, the stale promises fixed, a country-code number box, its own home-screen manifest.', 'cea6ef8'),
     ('2026-10-02', '16', 'The Instagram link hub in the order that sells, with clearer labels (application, 48 hours, for coaches, the tracker page is English).', '56a0535'),
+    ('2026-10-04', '14', 'Farsi home: how you pay is on the price card and in the FAQ, the cost question comes first.', '48757b9'),
+    ('2026-10-04', '23', 'The Iran reach test came back (six reports): forms, sign-in, data, analytics and fonts work with no VPN; YouTube does not.', '(record)'),
     ('2026-10-02', '22', 'The style guard: a commit that adds yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white-on-pale-clay is stopped. It also found and fixed: 10 to 11 px labels on the apply form and proof page, the pale grey on the Farsi form, partner and terms pages, and a slider value hanging off a 320 px screen.', '943a92c'),
 ]
