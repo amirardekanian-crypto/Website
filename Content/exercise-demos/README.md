@@ -80,6 +80,10 @@ Proposed redos (0.5 each, need his go), same opening and closing lines:
 - **43**: He stands tall in the middle of the room holding an EZ curl bar (a short zigzag-shaped barbell with one small black plate on each end) with an underhand grip, hands about shoulder-width apart. The bar runs across the front of his thighs from his left hand to his right hand, arms hanging straight, elbows by his sides. Seen from the front at a slight angle. He looks straight ahead, not at the camera.
 - **45**: the step 1 middle, plus: His head faces forward, the same way as his body, not toward the camera.
 
+**Redos (2026-10-04, his go, 1 credit):** 143 EZ bar curl `4a2fd27a-0b45-478e-9a82-621a5998b50d` (fixed: front
+view at a slight angle, bar across the thighs, underhand grip) · 145 box squat `e1d8b3a8-6513-478c-8606-bc377cb56573`
+(fixed: head faces forward). Both good; their clips wait for his OK.
+
 ### Step 2: the clips (needs his go)
 
 `wan3_0`, `duration: 2`, `resolution: "480p"`, `generate_audio: false` (it defaults to true),
@@ -99,6 +103,21 @@ physics. The equipment keeps its shape. No text.* The middles:
 | 43 EZ bar curl | Keeping his elbows pinned at his sides and his body still, he curls the bar up in a smooth arc until it is just below his chin, then holds it there for a moment. Only his forearms move. |
 | 44 single-leg RDL | Keeping his standing knee slightly bent, he hinges forward at the hips over his standing leg while his free leg lifts straight behind him, until his body and back leg form one straight line almost parallel to the floor. His hips stay level and the dumbbells hang straight down below his shoulders. |
 | 45 box squat | Looking straight ahead, he sits his hips back and down, knees bending, until his glutes lightly touch the top of the box, then holds there. His heels stay flat and his chest stays up. |
+
+**Round 1 results (2026-10-04, his go, 6 credits, balance 590.5).** The batch first came back with preset
+recommendations instead of jobs ("IN THE DARK" `24bae836-2c4a-48e0-89b6-49fcc0b21612`, "DROWN IN MUSIC"
+`f1821f84-945b-4cd1-9085-1f479db0028e`), no charge; resubmitted with `declined_preset_id`. Each clip: 2.00 s, 854×480,
+30 fps, about 1 MB, no audio track. The forward-plus-reversed loop (`-crf 27`, no audio) is **about 110 KB**, so the
+whole library would be roughly 20 MB.
+
+| Clip | Job id | Verdict |
+|---|---|---|
+| 51 pec deck | `183408a5-891a-43fe-8254-cefad77b3183` | partial: the machine holds together, but the elbows bend more as the hands come in (the press his cue warns about) and the hands stop short |
+| 52 straight-arm pulldown | `99a9ba65-07d6-4bc3-9278-9de3c3531b78` | partial: cable stays attached and the stack lifts, but the torso straightens up during the pull |
+| 54 single-leg RDL | `2a755cae-71af-4033-8d21-26f893538f57` | **good**: flat back, back leg in line, toes down, standing knee soft, dumbbells below the shoulders |
+
+What it says so far: words carry a natural whole-body movement well (the RDL). They slip where one part must stay
+still while another moves (the pulldown's torso, the pec deck's elbows). That is what an end picture pins (step 3).
 
 Prices checked 2026-10-04 with `get_cost` (re-check, they change): picture 0.5 · Wan 3.0 480p 2 s = 2
 (words only, from a start picture, or between a start and an end picture) · Wan 3.0 3 s with a video

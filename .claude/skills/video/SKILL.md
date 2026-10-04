@@ -305,6 +305,13 @@ Add a dated line whenever a round teaches something. This section is the reason 
   1.67 s), so reel-8 uses only its first 1.55 s. The prompt already said "no face" and "the bar stays on the floor"; the model
   completed the person anyway because the start picture showed only forearms. A prompt cannot forbid this reliably: keep the
   action tiny, cut early, and sweep the frames. It also means a 3 s clip is not always 3 usable seconds.
+- **2026-10-04 (exercise demos, `Content/exercise-demos/`)** — First use of **Wan 3.0** (`wan3_0`, 480p, 2 s,
+  `generate_audio: false` (it defaults to true), `enable_thinking: true` at no extra cost): **2 credits** a clip, 854×480,
+  30 fps, about 1 MB, no audio track, done in about 2 minutes. The preset trap is not only for dark plates: a bright grey gym
+  drew "IN THE DARK" and "DROWN IN MUSIC" on all three items; `declined_preset_id` got them through. From a start picture
+  plus words it made a clean single-leg RDL but let the torso rise in a straight-arm pulldown and the elbows bend in a pec
+  deck: words hold a whole-body movement, not "this part stays still". A half rep played forward then reversed loops
+  seamlessly at about 110 KB.
 - **2026-09-20** — A video plate reel is cheap to build once the renderer protocol exists: four clips, 2.4 MB embedded, a 20 s
   MP4 in 35 s. The cost was the 30.5 credits, and 7 of them (the lean run) delivered two of the four clips.
 
