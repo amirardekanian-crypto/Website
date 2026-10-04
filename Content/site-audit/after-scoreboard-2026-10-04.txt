@@ -139,3 +139,18 @@ Looked at in a real viewport (shot.js), not only measured: English home first sc
 All read well; the olive underline under LAST LONGER. (item 4f) is still there.
 
 NOT re-run: the Iran reach test (package 23, six real reports on 2026-10-04), the apps (package 25), real phones. Lab numbers are simulated from the UK.
+
+AFTER THE SAME-DAY FIXES (commit 48987f1, live; the four pages match the repo byte for byte; same probe, phone 390 px)
+                                          before   after
+  English home   contrast groups             16       13
+  Proof page     contrast groups              3        0
+  Farsi form     tap targets under 24 px      1        0
+  Farsi form     phone screens               5.7      5.8   (the consent text now takes its intended 16 px size beside the tick)
+  English form   phone screens               5.9      5.9
+  Fixed: the third "How it works" card (plain white text, a darker chip), the clay Playbook link (deeper clay), the proof kicker (cream with a clay dot), the proof
+  step numbers and the locked chip, and the consent tick's layout on both apply forms. Items 1f and 13c.
+  The 13 groups still listed on the English home: the testimonial triangle icons (4.4:1, a graphic, needs 3:1), the outlined and gradient headline words, white labels over photos,
+  the drawn mini app (8 px, 7 px), two icon glyphs, and one pricing line that is 4.43:1 at the lightest point of its green gradient (6.6:1 at its best).
+  Unchanged: tap targets under 44 px on both forms (3 and 4). They are the two required ticks (24 px, inside a tappable label) and the data link.
+  Not a defect: the probe's "noFocus 3" on the proof page is its three text boxes. They show focus with a clay border and a lighter fill, which the probe cannot see.
+  Still open from this re-run: 6e (the first-paint cost of the self-hosted fonts).

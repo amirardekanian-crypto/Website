@@ -24,7 +24,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 
 | # | Package | Phase | Status | Effort |
 |---|---|---|---|---|
-| 1 | Make small text readable | Fix now | Done (5 of 6 items) | small to medium |
+| 1 | Make small text readable | Fix now | Done (6 of 6 items) | small to medium |
 | 2 | Tappable and zoom-safe on a phone | Fix now | Done (3 of 3 items) | small |
 | 3 | Menus and sticky bars that work on every phone | Fix now | Done (4 of 4 items) | medium |
 | 4 | Home-page bugs | Fix now | Done (4 of 6 items) | medium |
@@ -36,7 +36,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 10 | Promises that match reality | Fix now | Waiting for you (2 of 4 items) | small |
 | 11 | No-yellow cleanup | Fix now | Done (1 of 2 items) | small |
 | 12 | English home: shorter and clearer | Your call | Done (4 of 5 items) | large |
-| 13 | The apply form: promise vs length | Your call | Done (1 of 3 items) | medium to large |
+| 13 | The apply form: promise vs length | Your call | Done (2 of 3 items) | medium to large |
 | 14 | Farsi home: price, trust and length | Your call | Decided: next to build (1 of 4 items) | medium |
 | 15 | Farsi product pages: trust at the buy button | Your call | Waiting for you | medium |
 | 16 | Proof page and the Instagram link hub | Your call | Done (4 of 4 items) | medium |
@@ -52,7 +52,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 
 ### Start here next
 
-1. The small leftovers the 2026-10-04 re-run found, none of them his call: contrast on the English home and the proof page (1f), the consent tick’s layout on both forms (13c), and the 0.1 to 0.3 s first-paint cost of the self-hosted fonts (6e). Evidence and numbers: `Content/site-audit/after-scoreboard-2026-10-04.txt`.
+1. Item 6e, the one leftover from the 2026-10-04 re-run (not his call): first paint on a slow phone is 0.1 to 0.3 s later since the fonts moved to your own server. Try folding fonts.css into tokens.css and preloading one heading weight, with the controlled four-commit test in `Content/site-audit/after-scoreboard-2026-10-04.txt` as the yardstick and the layout jump kept at 0. (1f and 13c from the same re-run are fixed, commit 48987f1.)
 2. Package 20 (legal) with the rest of 19 on the privacy notice: a 7-line “Short version” and a jump list at the top (20a), a one-screen Farsi summary linked from the Farsi form, terms and course page (20c), the terms for the free tracker, the board, partner courses and the $17 Farsi course (20d), and the plain-words pass. Legal text in his name: show him the words first.
 3. Farsi home 14b to 14d (credentials row, which product leads, length), Farsi product pages 15 (needs his word on refunds for the $17 course, which is not covered by the terms yet) and the partner page 17.
 4. Package 12 leftovers: a share card with his portrait (can be composed from his headshot, no credits), the testimonial pull-outs (his call) and getting the phone page from 14.4 to about 13 screens.
@@ -96,6 +96,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 2026-10-04 | 19 | The apply form and the proof page in plain words: “Apply for coaching”, no dashes, plain option labels (stored answers unchanged), “streak” not “run”, Protein not Food. | e81e64a |
 | 2026-10-02 | 22 | The style guard: a commit that adds yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white-on-pale-clay is stopped. It also found and fixed: 10 to 11 px labels on the apply form and proof page, the pale grey on the Farsi form, partner and terms pages, and a slider value hanging off a 320 px screen. | 943a92c |
 | 2026-10-04 | 24 | The audit re-run on the live site (commit 8af01c7): the English home is 14.5 phone screens (20.5 on 2 Oct), the apply form 5.9 (8.0), 67 of 67 links work, nothing new in yellow, and against the 2 Oct morning baseline every page paints faster on a slow phone. It also found small leftovers (items 1f, 6e, 13c): first paint is 0.1 to 0.3 s later since the fonts moved to your own server, and a few contrast and tick-box layout defects. | (record) |
+| 2026-10-04 | 1, 13 | Small text readable on the English home and the proof page (the third “How it works” card and its chip, a clay link, the proof kicker, step numbers and chip), and the consent tick sits beside its box on both apply forms. Probe: English home 16 to 13 contrast groups, proof 3 to 0. | 48987f1 |
 
 ### Words I wrote, for you to read
 
@@ -224,10 +225,12 @@ Measured on the live site from this PC (UK) with `scripts/site_audit/`: the base
 | A wrong web address shows | GitHub’s grey English page | your own page, English and Farsi | your own page, English and Farsi |
 | Athlete photos on the homes | 713 KB, no sizes | 433 KB, with sizes, loaded as you scroll | light, sized |
 | Marketing pages that ask Google for fonts | 19 pages | 5 kinds left: the generated articles, the UTS page, the Divehi Etminan page and the two apps (the 14 pages that matter make no Google request; checked in a real browser) | none |
-| White text on clay buttons, badges and chips passing AA (4.5:1) | 0 of 25 (4.40:1) | 24 of 25 (4.66:1). The re-run of 2026-10-04 found one that is only 85% white: the third “How it works” card, 3.81:1 (item 1f) | all |
+| White text on clay buttons, badges and chips passing AA (4.5:1) | 0 of 25 (4.40:1) | 25 of 25 (4.66:1). The re-run of 2026-10-04 found one that was only 85% white (the third “How it works” card, 3.81:1) and it is fixed (item 1f) | all |
 | Text under 12 px, apply form and proof page | 15 on the form, 4 on proof | 0 (the style guard now stops a new one) | 0 |
 | Pale grey (#8A8A8A) as text on the Farsi form, partner and terms pages | 14 uses | 0 | 0 |
 | Internal links that answer | 30 of 30 | 67 of 67, no redirects | all |
+| Contrast groups the probe reports, English home | 27 | 13 (text over photos, the drawn mini app, the outlined headline, icon glyphs, and one pricing line at 4.43:1 on the lightest point of its gradient; no real small text under 4.5:1 otherwise) | only false alarms |
+| Contrast groups the probe reports, proof page | 6 | 0 | 0 |
 
 The baseline per-page tables are in `Content/site-audit/baseline-scoreboard.txt`.
 
@@ -249,7 +252,7 @@ Objective problems with a known fix. I build and ship these one by one, and tell
 
 One grey in your colour list is too pale for small text, and 65 labels on the English home are smaller than 12 px. One value change in the shared colour file fixes most pages at once.
 
-**Still open.** Done on 2026-10-02 with your yes: every white-on-clay fill is #C2512C (4.66:1; token --accent-2-fill, --clay-fill on the Farsi pages), 25 of 25 measured; lines, glows, dots and clay text keep #C7552F. The 22 labels still under 12 px on the English home are the miniature app drawn inside the phone picture. The apply form and proof page labels (10 to 11 px) were found by the style guard and raised to 12. The re-run of 2026-10-04 found a few small leftovers: the third “How it works” card on the English home (85% white on clay, 3.81:1), two clay links (4.12:1) and three small things on the proof page (item 1f).
+**Still open.** Done on 2026-10-02 with your yes: every white-on-clay fill is #C2512C (4.66:1; token --accent-2-fill, --clay-fill on the Farsi pages), 25 of 25 measured; lines, glows, dots and clay text keep #C7552F. The 22 labels still under 12 px on the English home are the miniature app drawn inside the phone picture. The apply form and proof page labels (10 to 11 px) were found by the style guard and raised to 12. The re-run of 2026-10-04 found a few small leftovers on the English home and the proof page; they are fixed (item 1f, commit 48987f1). The probe still lists 13 contrast groups on the English home: text over photos, the drawn mini app, the outlined headline, icon glyphs and one pricing line that is 4.43:1 at the lightest point of its green gradient.
 
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
@@ -258,7 +261,7 @@ One grey in your colour list is too pale for small text, and 65 labels on the En
 | 1c | ✓ | P1 | English home | Clay on the green hero fails badly: kicker 1.8:1, “Elite Athletes” 2.0, “An Experience.” 1.6, the Match key line 3.2, the INCLUDED badge 2.6, the closing note about 3:1. | Small labels on green in paper or cream with a clay dot; big clay words only where the green is dark. Keeps the look, fixes the reading. | S | Y | home-en-07, home-fa-10, tennis-07 |
 | 1d | ✓ | P2 | Everywhere clay text is small | Small clay text on light is 4.1:1 and white-on-clay buttons are 4.4:1, both just under AA. | A text-only deeper clay (#B84A27, 4.9:1; the app already does this with --clay-ink) and bold 14 px or larger on buttons. A hairline colour shift, easy to revert. | S | Y | article-11, home-fa-10 |
 | 1e | ✓ | P1 | English home, nav, dark sections | The keyboard focus ring is dark green, so it vanishes on every dark area (nav, hero buttons, demo, final CTA). The testimonial scroller is an unnamed tab stop. | base.css line 216: white outline inside .hero, .sec--dark, .site-nav; aria-label on the scroller. | S |  | home-en-06 |
-| 1f |  | P2 | English home, proof page | Found by the 2026-10-04 re-run. The third “How it works” card sets its text to 85% white on the clay fill (3.81:1; plain white is 4.66:1). The clay link “Read the Playbook articles on the web” is 4.12:1 on paper (two places). On the proof page the hero kicker is small clay on green (about 3:1), the “01 02 03” step numbers are clay on paper (4.12:1) and the “Workout (coached athletes only)” chip is #8A857C (3.43:1), a grey the style guard does not catch. | Plain white in the card; --accent-2-text (#B64826) on the links and numbers; cream with a clay dot on the kicker, as on the home; #6B6B6B for the chip. The same look, readable. | S |  | re-run 2026-10-04 |
+| 1f | ✓ | P2 | English home, proof page | Found by the 2026-10-04 re-run. The third “How it works” card sets its text to 85% white on the clay fill (3.81:1; plain white is 4.66:1). The clay link “Read the Playbook articles on the web” is 4.12:1 on paper (two places). On the proof page the hero kicker is small clay on green (about 3:1), the “01 02 03” step numbers are clay on paper (4.12:1) and the “Workout (coached athletes only)” chip is #8A857C (3.43:1), a grey the style guard does not catch. | Plain white in the card; --accent-2-text (#B64826) on the links and numbers; cream with a clay dot on the kicker, as on the home; #6B6B6B for the chip. The same look, readable. | S |  | re-run 2026-10-04 |
 
 ### 2. Tappable and zoom-safe on a phone  ·  Done  ·  small
 
@@ -414,13 +417,13 @@ A design, copy or business choice. I mark my pick, you say yes, no or change it.
 
 The form is the one step every sale goes through. It asks 27 to 30 questions (18 required) over 7.8 phone screens, and the home says 2 minutes. Sleep, stress, nutrition, equipment and lifts are only needed after the call.
 
-**Still open.** Done on 2026-10-02 (option C): English form 13 required questions (was 18) and about 15 optional ones folded under “Optional: speeds up our call”, closed by default: 8.0 to 5.7 phone screens, “about 3 minutes”; the Farsi form 12 required. A consent tick (health details and the AI assistant) is now required and stored with the answers: that was 13b’s tick; the age minimum and “only Amir sees my injury answers” are not done. Your answer on 2026-10-02: the form is for athletes of all kinds, so the football, cricket and other sport options STAY (13a no longer asks to remove them). The confirmation now says what happens next: we talk, you message me to pay, I write your programme (English and Farsi).
+**Still open.** Done on 2026-10-02 (option C): English form 13 required questions (was 18) and about 15 optional ones folded under “Optional: speeds up our call”, closed by default: 8.0 to 5.7 phone screens, “about 3 minutes”; the Farsi form 12 required. A consent tick (health details and the AI assistant) is now required and stored with the answers: that was 13b’s tick; the age minimum and “only Amir sees my injury answers” are not done. Your answer on 2026-10-02: the form is for athletes of all kinds, so the football, cricket and other sport options STAY (13a no longer asks to remove them). The confirmation now says what happens next: we talk, you message me to pay, I write your programme (English and Farsi). The re-run of 2026-10-04 found the consent tick’s text wrapping under its box on both forms; fixed (13c, commit 48987f1).
 
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
 | 13a | ✓ | P1 | Apply EN and FA | 27 questions (29 for tennis or padel, 30 with an injury), 18 required, about 5 minutes; my estimate 2.5 min required-only. The season the hero promises is never asked. Football, cricket, weight-loss and “tone & shape” options remain though the site is for tennis and padel. | Stopgap now: “About 5 minutes” (package 10). Then the option you pick below. | M-L | Y | form-en-01, form-fa-03 |
 | 13b |  | P2 | Apply form | Health consent: privacy notice 2.1 relies on explicit consent for injury data, but the form has only a 12 px grey “By submitting, you agree”; forms accept ages 10 to 80 while the notice says adults; nothing says who sees injury answers. | A real tick like the UTS form; minimum age 18 or a guardian block; “Only Amir sees my injury answers”. Not legal advice. | S-M | Y | form-en-10, privacy-03 |
-| 13c |  | P3 | Both apply forms | Found by the 2026-10-04 re-run. The consent tick’s text wraps under the 24 px box instead of beside it, because the general “.f-field label { display: block }” rule beats the tick’s flex layout (seen in a real 390 px screenshot). The Farsi “How my data is used” link is only 23 px tall. | A more specific selector (.f-field label.consent; .f label.consent on the Farsi form) and a padded link. | S |  | re-run 2026-10-04 |
+| 13c | ✓ | P3 | Both apply forms | Found by the 2026-10-04 re-run. The consent tick’s text wraps under the 24 px box instead of beside it, because the general “.f-field label { display: block }” rule beats the tick’s flex layout (seen in a real 390 px screenshot). The Farsi “How my data is used” link is only 23 px tall. | A more specific selector (.f-field label.consent; .f label.consent on the Farsi form). The data link stays an inline link in the sentence. | S |  | re-run 2026-10-04 |
 
 **Decision: What should the form become?**
 
