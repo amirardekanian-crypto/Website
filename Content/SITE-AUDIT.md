@@ -20,23 +20,23 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 
 ## Where it stands
 
-**25 packages · 85 findings** (31 cost you now, 40 worth fixing, 14 polish). Done: 15 · Waiting for you: 4 · Decided: next to build: 2 · Another session: 1 · Queued: 3
+**25 packages · 88 findings** (31 cost you now, 42 worth fixing, 15 polish). Done: 16 · Waiting for you: 4 · Decided: next to build: 2 · Another session: 1 · Queued: 2
 
 | # | Package | Phase | Status | Effort |
 |---|---|---|---|---|
-| 1 | Make small text readable | Fix now | Done (5 of 5 items) | small to medium |
+| 1 | Make small text readable | Fix now | Done (5 of 6 items) | small to medium |
 | 2 | Tappable and zoom-safe on a phone | Fix now | Done (3 of 3 items) | small |
 | 3 | Menus and sticky bars that work on every phone | Fix now | Done (4 of 4 items) | medium |
 | 4 | Home-page bugs | Fix now | Done (4 of 6 items) | medium |
 | 5 | Farsi correctness | Fix now | Done (5 of 6 items) | medium |
-| 6 | Fonts: no blank screens, no jumps | Fix now | Done (4 of 4 items) | small to medium |
+| 6 | Fonts: no blank screens, no jumps | Fix now | Done (4 of 5 items) | small to medium |
 | 7 | Forms that finish properly | Fix now | Done (5 of 7 items) | medium |
 | 8 | A real 404 page | Fix now | Done (1 of 1 items) | small |
 | 9 | Count what matters | Fix now | Done (1 of 1 items) | small to medium |
 | 10 | Promises that match reality | Fix now | Waiting for you (2 of 4 items) | small |
 | 11 | No-yellow cleanup | Fix now | Done (1 of 2 items) | small |
 | 12 | English home: shorter and clearer | Your call | Done (4 of 5 items) | large |
-| 13 | The apply form: promise vs length | Your call | Done (1 of 2 items) | medium to large |
+| 13 | The apply form: promise vs length | Your call | Done (1 of 3 items) | medium to large |
 | 14 | Farsi home: price, trust and length | Your call | Decided: next to build (1 of 4 items) | medium |
 | 15 | Farsi product pages: trust at the buy button | Your call | Waiting for you | medium |
 | 16 | Proof page and the Instagram link hub | Your call | Done (4 of 4 items) | medium |
@@ -47,18 +47,19 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 21 | One brand CSS file and shared chrome | Foundations | Queued | large |
 | 22 | A style guard so it stays fixed | Foundations | Done (1 of 1 items) | medium |
 | 23 | Can Iran reach the forms, Plausible and the demo? | Foundations | Done (1 of 1 items) | small |
-| 24 | Re-run the audit after each batch | Foundations | Queued | small |
+| 24 | Re-run the audit after each batch | Foundations | Done (1 of 1 items) | small |
 | 25 | The apps | Next | Queued | large |
 
 ### Start here next
 
-1. Re-run the measuring tools on the live site (package 24: `scripts/site_audit/README.md`) and save `Content/site-audit/after-scoreboard-2026-10-04.txt`. The numbers in the scoreboard above for the English home, forms and proof page were measured by hand during the rebuild; the full run has not been repeated since the first batches.
+1. The small leftovers the 2026-10-04 re-run found, none of them his call: contrast on the English home and the proof page (1f), the consent tick’s layout on both forms (13c), and the 0.1 to 0.3 s first-paint cost of the self-hosted fonts (6e). Evidence and numbers: `Content/site-audit/after-scoreboard-2026-10-04.txt`.
 2. Package 20 (legal) with the rest of 19 on the privacy notice: a 7-line “Short version” and a jump list at the top (20a), a one-screen Farsi summary linked from the Farsi form, terms and course page (20c), the terms for the free tracker, the board, partner courses and the $17 Farsi course (20d), and the plain-words pass. Legal text in his name: show him the words first.
 3. Farsi home 14b to 14d (credentials row, which product leads, length), Farsi product pages 15 (needs his word on refunds for the $17 course, which is not covered by the terms yet) and the partner page 17.
 4. Package 12 leftovers: a share card with his portrait (can be composed from his headshot, no credits), the testimonial pull-outs (his call) and getting the phone page from 14.4 to about 13 screens.
 5. Package 25, the apps. First: a wrong phone clock breaks sign-in (refresh the session once on a 401 or “JWT expired” answer). Then the first-run and Home pass on a phone.
 6. His parts: add the Plausible goals (a walk-through he asked for), the UTS page when the course starts (20e), and the demo banner’s links in program.html (5d, another session).
 7. Package 21 (one brand CSS file) and 18 (articles, the page generator) are big and belong to later or to another session.
+8. After the next batch of site changes, re-run the measuring tools (package 24: `scripts/site_audit/README.md`) and save a new dated `Content/site-audit/after-scoreboard-<date>.txt`.
 
 ### Shipped
 
@@ -94,6 +95,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 2026-10-04 | 12, 19 | The English home rebuilt and rewritten in plain words: proof first, process before price, price checklist and plan-by-plan upgrades, your photo and the app phone on the first screen, contact folded into the apply section and the footer, five nav items, Read more on testimonials, a payment FAQ. 20.2 to 14.4 phone screens. | 4c77349 |
 | 2026-10-04 | 19 | The apply form and the proof page in plain words: “Apply for coaching”, no dashes, plain option labels (stored answers unchanged), “streak” not “run”, Protein not Food. | e81e64a |
 | 2026-10-02 | 22 | The style guard: a commit that adds yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white-on-pale-clay is stopped. It also found and fixed: 10 to 11 px labels on the apply form and proof page, the pale grey on the Farsi form, partner and terms pages, and a slider value hanging off a 320 px screen. | 943a92c |
+| 2026-10-04 | 24 | The audit re-run on the live site (commit 8af01c7): the English home is 14.5 phone screens (20.5 on 2 Oct), the apply form 5.9 (8.0), 67 of 67 links work, nothing new in yellow, and against the 2 Oct morning baseline every page paints faster on a slow phone. It also found small leftovers (items 1f, 6e, 13c): first paint is 0.1 to 0.3 s later since the fonts moved to your own server, and a few contrast and tick-box layout defects. | (record) |
 
 ### Words I wrote, for you to read
 
@@ -199,31 +201,33 @@ Short functional lines, written to your voice rules, but they are your words on 
 
 ## Scoreboard
 
-Measured on the live site from this PC (UK) with `scripts/site_audit/`: the baseline on 2026-10-02 and again after the first batches (live site, 2026-10-02 afternoon). Lab numbers use a simulated slow 4G phone; they say nothing about Iran.
+Measured on the live site from this PC (UK) with `scripts/site_audit/`: the baseline on 2026-10-02 and again after the first batches (live site, 2026-10-02 afternoon, then re-run in full on 2026-10-04 at commit 8af01c7). Lab numbers use a simulated slow 4G phone; they say nothing about Iran.
 
 | Measure | Baseline | Now | Goal |
 |---|---|---|---|
-| Phone length, English home | 20.4 screens | 14.4 screens (desktop 14.5 to 12.9) | 13 or fewer |
-| Phone length, Farsi home | 20.8 screens | 20.9 screens (unchanged: package 14) | 15 or fewer |
+| Phone length, English home | 20.4 screens | 14.5 screens on a phone (17.0 at 360 px), 12.9 on desktop, 11.0 on a tablet; 2026-10-04 | 13 or fewer |
+| Phone length, Farsi home | 20.8 screens | 21.2 screens (a little longer with the payment FAQ: package 14d) | 15 or fewer |
 | Text under 12 px, English home | 65 items | 22 (all inside the miniature app drawn in the phone picture) | 0 |
 | Tap targets under 44 px, English home | 15 | 1 (the drawn mini app, which is not tappable) | 0 |
-| Tap targets under 44 px, apply form (English) | 13 | 2 (the two sliders: the thumb is the target) | 0 |
+| Tap targets under 44 px, apply form (English) | 13 | 3 (the two required tick boxes, 24 px inside a tappable label, and the 40 px “How my data is used” link; the sliders now sit inside the folded optional group) | 0 |
 | Blank screen if Google Fonts hangs (Farsi home) | 8.3 s | 0.15 s (the Farsi link page: from nothing for 6 s to under 0.3 s) | under 1 s |
-| Layout jump on a slow phone | 0.096 home, 0.087 form, 0.209 Etminan Farsi | 0.000 home, 0.001 form, 0.028 Etminan Farsi, 0.006 on the 404 (was 0.087) | under 0.05 |
-| First paint on a slow phone, Farsi pages | home 1.9 s, form 1.5 s, links 1.2 s | home 1.1 s, form 0.9 s, links 0.7 s | under 1.5 s |
+| Layout jump on a slow phone | 0.096 home, 0.087 form, 0.209 Etminan Farsi | 0.000 home, 0.002 form, 0.028 Etminan Farsi, 0.005 on the 404 (was 0.087) | under 0.05 |
+| First paint on a slow phone, Farsi pages | home 1.9 s, form 1.5 s, links 1.2 s | home 1.2 s, form 0.9 s, links 0.9 s (0.1 to 0.2 s later than on the afternoon of 2 Oct: the self-hosted numeral fonts, item 6e) | under 1.5 s |
+| First paint on a slow phone, English pages | home 1.8 s, form 1.0 s, proof 0.9 s | home 1.4 s, form 0.9 s, proof 0.8 s (0.1 to 0.3 s later than on the afternoon of 2 Oct: the self-hosted fonts, item 6e). The whole English home loads in 2.8 s, not 5.6 s, and weighs 443 KB, not 880 | under 1.5 s |
 | Etminan pages: text under 12 px | 26 per page | 0 | 0 |
-| English home reading ease | 34 of 100, 43 em-dashes | rewritten in plain words: the only em-dashes left are inside the athletes’ own quotes (13); the reading-ease number is not re-measured | 60 or more, none |
+| English home reading ease | 34 of 100, 43 em-dashes | 49 of 100 (average sentence 24.6 to 18 words); the only em-dashes left are inside the athletes’ own quotes (13) | 60 or more, none |
 | Apply form: promise vs reality | “2 minutes” vs about 5, 27 to 30 questions, 18 required | English: 13 required, about 15 optional ones folded away, both say about 3 minutes; Farsi: 12 required (package 13, option C) | true, and shorter |
-| Apply form length on a phone (English) | 8.0 screens | 5.7 screens with the optional group closed | about 5 |
+| Apply form length on a phone (English) | 8.0 screens | 5.9 screens with the optional group closed | about 5 |
 | “Sent” screens that are a dead end | 4 forms | 0 (each has a WhatsApp next step and a way back) | 0 |
 | Pricing buttons that open the form | 0 of 3 (they jump to the page bottom) | 3 of 3, plan chosen | 3 of 3, plan chosen |
 | Key clicks you can see in Plausible | none (only form submits and level-test results) | Apply (with plan and place), WhatsApp, demo, link hub, form started and each step, proof, partner, level-test start. Add the goals in Plausible to see them. | Apply, WhatsApp, demo, proof, partner, form steps |
 | A wrong web address shows | GitHub’s grey English page | your own page, English and Farsi | your own page, English and Farsi |
 | Athlete photos on the homes | 713 KB, no sizes | 433 KB, with sizes, loaded as you scroll | light, sized |
 | Marketing pages that ask Google for fonts | 19 pages | 5 kinds left: the generated articles, the UTS page, the Divehi Etminan page and the two apps (the 14 pages that matter make no Google request; checked in a real browser) | none |
-| White text on clay buttons, badges and chips passing AA (4.5:1) | 0 of 25 (4.40:1) | 25 of 25 (4.66:1) | all |
+| White text on clay buttons, badges and chips passing AA (4.5:1) | 0 of 25 (4.40:1) | 24 of 25 (4.66:1). The re-run of 2026-10-04 found one that is only 85% white: the third “How it works” card, 3.81:1 (item 1f) | all |
 | Text under 12 px, apply form and proof page | 15 on the form, 4 on proof | 0 (the style guard now stops a new one) | 0 |
 | Pale grey (#8A8A8A) as text on the Farsi form, partner and terms pages | 14 uses | 0 | 0 |
+| Internal links that answer | 30 of 30 | 67 of 67, no redirects | all |
 
 The baseline per-page tables are in `Content/site-audit/baseline-scoreboard.txt`.
 
@@ -245,7 +249,7 @@ Objective problems with a known fix. I build and ship these one by one, and tell
 
 One grey in your colour list is too pale for small text, and 65 labels on the English home are smaller than 12 px. One value change in the shared colour file fixes most pages at once.
 
-**Still open.** Done on 2026-10-02 with your yes: every white-on-clay fill is #C2512C (4.66:1; token --accent-2-fill, --clay-fill on the Farsi pages), 25 of 25 measured; lines, glows, dots and clay text keep #C7552F. The 22 labels still under 12 px on the English home are the miniature app drawn inside the phone picture. The apply form and proof page labels (10 to 11 px) were found by the style guard and raised to 12.
+**Still open.** Done on 2026-10-02 with your yes: every white-on-clay fill is #C2512C (4.66:1; token --accent-2-fill, --clay-fill on the Farsi pages), 25 of 25 measured; lines, glows, dots and clay text keep #C7552F. The 22 labels still under 12 px on the English home are the miniature app drawn inside the phone picture. The apply form and proof page labels (10 to 11 px) were found by the style guard and raised to 12. The re-run of 2026-10-04 found a few small leftovers: the third “How it works” card on the English home (85% white on clay, 3.81:1), two clay links (4.12:1) and three small things on the proof page (item 1f).
 
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
@@ -254,6 +258,7 @@ One grey in your colour list is too pale for small text, and 65 labels on the En
 | 1c | ✓ | P1 | English home | Clay on the green hero fails badly: kicker 1.8:1, “Elite Athletes” 2.0, “An Experience.” 1.6, the Match key line 3.2, the INCLUDED badge 2.6, the closing note about 3:1. | Small labels on green in paper or cream with a clay dot; big clay words only where the green is dark. Keeps the look, fixes the reading. | S | Y | home-en-07, home-fa-10, tennis-07 |
 | 1d | ✓ | P2 | Everywhere clay text is small | Small clay text on light is 4.1:1 and white-on-clay buttons are 4.4:1, both just under AA. | A text-only deeper clay (#B84A27, 4.9:1; the app already does this with --clay-ink) and bold 14 px or larger on buttons. A hairline colour shift, easy to revert. | S | Y | article-11, home-fa-10 |
 | 1e | ✓ | P1 | English home, nav, dark sections | The keyboard focus ring is dark green, so it vanishes on every dark area (nav, hero buttons, demo, final CTA). The testimonial scroller is an unnamed tab stop. | base.css line 216: white outline inside .hero, .sec--dark, .site-nav; aria-label on the scroller. | S |  | home-en-06 |
+| 1f |  | P2 | English home, proof page | Found by the 2026-10-04 re-run. The third “How it works” card sets its text to 85% white on the clay fill (3.81:1; plain white is 4.66:1). The clay link “Read the Playbook articles on the web” is 4.12:1 on paper (two places). On the proof page the hero kicker is small clay on green (about 3:1), the “01 02 03” step numbers are clay on paper (4.12:1) and the “Workout (coached athletes only)” chip is #8A857C (3.43:1), a grey the style guard does not catch. | Plain white in the card; --accent-2-text (#B64826) on the links and numbers; cream with a clay dot on the kicker, as on the home; #6B6B6B for the chip. The same look, readable. | S |  | re-run 2026-10-04 |
 
 ### 2. Tappable and zoom-safe on a phone  ·  Done  ·  small
 
@@ -312,7 +317,7 @@ The phone picture in the Farsi hero shows a greeting and exercise names in white
 
 The Farsi pages wait for Google Fonts before they paint anything. If that request hangs, which is how filtered networks often fail, the screen stays white for about 8 seconds. Your Vazirmatn file is already on your own server and is not being used on those pages.
 
-**Still open.** 6c done on 2026-10-02 with your yes: Barlow, Barlow Condensed, JetBrains Mono and DM Sans (latin subset, 369 KB, 16 files, licences in assets/fonts/LICENSES.txt) are served from your site, 14 pages make no request to Google, and the privacy notice says which pages still do. Still on Google Fonts: the generated article pages (the page generator belongs to another session), the UTS page (its own brand and session), the Divehi Etminan page, and the athlete and coach apps. The UTS page is also why 6d (its hero photo) is still open.
+**Still open.** 6c done on 2026-10-02 with your yes: Barlow, Barlow Condensed, JetBrains Mono and DM Sans (latin subset, 369 KB, 16 files, licences in assets/fonts/LICENSES.txt) are served from your site, 14 pages make no request to Google, and the privacy notice says which pages still do. Still on Google Fonts: the generated article pages (the page generator belongs to another session), the UTS page (its own brand and session), the Divehi Etminan page, and the athlete and coach apps. The UTS page is also why 6d (its hero photo) is still open. The re-run of 2026-10-04 found that 6c made first paint 0.1 to 0.3 s later on a slow phone (item 6e).
 
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
@@ -320,6 +325,7 @@ The Farsi pages wait for Google Fonts before they paint anything. If that reques
 | 6b | ✓ | P1 | English home, form, Etminan | Late fonts make the page jump: English home 0.096 (the hero shifts 73 px), form 0.087, Etminan Farsi 0.209. In a test, self-hosting took Etminan to 0.0002. | Same fix, plus preload for the two heading faces and a metric-matched fallback. | S-M |  | etminan-fa-01, home-en-16 |
 | 6c | ✓ | P2 | All English pages | Barlow, Barlow Condensed, JetBrains Mono and DM Sans still come from Google (19 pages send the visitor’s IP there; your privacy notice admits it). | Self-host the four families (open-licence, about 600 KB). Needs your OK to download them. | M |  | secondary cross-page |
 | 6d | ✓ | P3 | English and Farsi homes, UTS | Seven photos (about 710 KB) load immediately with no width or height; the UTS hero photo is requested late (LCP 2.1 s; a test got 0.7 to 1.5 s). | loading="lazy", width and height, 720 px copies; preload the UTS hero (UTS page: coordinate with its session). | S |  | home-en-16, uts-02, home-fa-18 |
+| 6e |  | P2 | All English pages, and Farsi pages that show Latin numbers | Found by the 2026-10-04 re-run. Since 6c, first paint on a slow phone is 0.1 to 0.3 s later (a controlled test of four commits: English home 0.86 to 1.18 s, form 0.93 to 1.09 s, Farsi home 0.93 to 1.20 s). One more render-blocking stylesheet (fonts.css, 5 KB) and up to 9 font files (209 KB on the English home) share a slow line with the page. The layout jump is still 0 and every page is under the 1.5 s goal; the live English home is the closest at 1.41 s. | Fold fonts.css into tokens.css (one request fewer), preload only the heading weight the first screen shows, load the other weights after first paint; re-test with the same harness and keep the layout jump at 0. | S-M |  | re-run 2026-10-04 |
 
 ### 7. Forms that finish properly  ·  Done  ·  medium
 
@@ -414,6 +420,7 @@ The form is the one step every sale goes through. It asks 27 to 30 questions (18
 |---|---|---|---|---|---|---|---|---|
 | 13a | ✓ | P1 | Apply EN and FA | 27 questions (29 for tennis or padel, 30 with an injury), 18 required, about 5 minutes; my estimate 2.5 min required-only. The season the hero promises is never asked. Football, cricket, weight-loss and “tone & shape” options remain though the site is for tennis and padel. | Stopgap now: “About 5 minutes” (package 10). Then the option you pick below. | M-L | Y | form-en-01, form-fa-03 |
 | 13b |  | P2 | Apply form | Health consent: privacy notice 2.1 relies on explicit consent for injury data, but the form has only a 12 px grey “By submitting, you agree”; forms accept ages 10 to 80 while the notice says adults; nothing says who sees injury answers. | A real tick like the UTS form; minimum age 18 or a guardian block; “Only Amir sees my injury answers”. Not legal advice. | S-M | Y | form-en-10, privacy-03 |
+| 13c |  | P3 | Both apply forms | Found by the 2026-10-04 re-run. The consent tick’s text wraps under the 24 px box instead of beside it, because the general “.f-field label { display: block }” rule beats the tick’s flex layout (seen in a real 390 px screenshot). The Farsi “How my data is used” link is only 23 px tall. | A more specific selector (.f-field label.consent; .f label.consent on the Farsi form) and a padded link. | S |  | re-run 2026-10-04 |
 
 **Decision: What should the form become?**
 
@@ -555,13 +562,15 @@ Three things your Farsi funnel depends on have never been tested from Iran: send
 |---|---|---|---|---|---|---|---|---|
 | 23a | ✓ | P2 | Farsi funnel | /reach/ tests the fonts but not api.web3forms.com, plausible.io or the Supabase address. One Web3Forms key serves 9 pages. | Add those three to /reach/; ask two or three Iranian athletes to run it with the VPN off; record the result in this file. | S | Y | form-fa, tennis-09, funnel cross-page |
 
-### 24. Re-run the audit after each batch  ·  Queued  ·  small
+### 24. Re-run the audit after each batch  ·  Done  ·  small
 
 The scoreboard at the top is the baseline. After each batch I re-run the same measurements and report the difference.
 
+**Still open.** Re-run in full on 2026-10-04 on the live site at commit 8af01c7. Content/site-audit/after-scoreboard-2026-10-04.txt has the tables, what changed page by page since 2 October, and what it found (items 1f, 6e and 13c). Run it again after the next batch of site changes (scripts/site_audit/README.md).
+
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
-| 24a |  | P3 | Process | No before and after. | python scripts/site_audit/scoreboard.py against the baseline numbers in this file. | S |  |  |
+| 24a | ✓ | P3 | Process | No before and after. | python scripts/site_audit/scoreboard.py against the baseline numbers in this file. | S |  |  |
 
 
 ## Next
@@ -618,5 +627,5 @@ Research of 2026-10-02 (stars and dates verified on the repo pages; full notes i
 ## Files
 
 - `scripts/site_audit/` the measuring tools, `backlog.py` (this file’s source) and `build_report.py`.
-- `Content/site-audit/review-*.md` the seven page reviews with file and line references; `research-*.md` the tool research; `baseline-scoreboard.txt` (morning) and `after-scoreboard-2026-10-02.txt` (afternoon, after the first batches). Add a new dated after-scoreboard each time the audit is re-run.
+- `Content/site-audit/review-*.md` the seven page reviews with file and line references; `research-*.md` the tool research; `baseline-scoreboard.txt` (morning), `after-scoreboard-2026-10-02.txt` (afternoon, after the first batches) and `after-scoreboard-2026-10-04.txt` (the full re-run, with the slow-phone font test). Add a new dated after-scoreboard each time the audit is re-run.
 - The private report page (claude.ai artifact “Front Door”) is the reading version with pictures; rebuild it with `--html`.

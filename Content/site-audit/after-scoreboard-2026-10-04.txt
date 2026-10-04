@@ -1,0 +1,141 @@
+AFTER the English home rebuild and the plain-words pass: live site, 2026-10-04 (same tools and method as baseline-scoreboard.txt).
+Taken at commit 8af01c7. The live index, form, proof, Farsi home and form, links, privacy, terms and 404 pages matched the repo byte for byte
+(line endings aside) before the run. A commit that landed during the run (0c5352d) only adds two docs.
+From this PC (UK). Probe at 390, 360, 820 and 1440 px; the slow-4G table is the 390 px phone at 4x CPU with the cache off.
+Analytics blocked, no form submitted. Compared with after-scoreboard-2026-10-02.txt (afternoon, commit c9d574e).
+
+SLOW-4G + 4x CPU, phone, cache off  (lab, simulated like Lighthouse mobile)
+page           FCP    LCP    CLS   load  req    KB   DOM  tasks  lcp element
+home-en       1408   1444      0   2834   26   443   746    610  IMG https://www.amirardekani.com/assets/img/tennis-ball-sm.p
+home-fa       1176   1176  0.019   1724   12   264   493    748  P فقط یه برنامه نیست — یه مربیِ 
+links          920   1264  0.034   1210    8   165    72      0  SPAN آزمون آمادگی جسمانی · برای مرب
+proof          828    828      0   1803   17   217   168    196  P Your training is one hour. The
+form-en        900    900  0.002   1684   17   179   579    336  P Tell me where you are right no
+form-fa        864    864      0   1215    8   165   526    424  P یه‌کم از خودت بگو. از جواب‌هات
+tennis        1060   1060      0   1441   12   207   274    126  P برنامه‌ی کاملِ ۱۶ هفته‌ایِ بدن
+testing       1000   1000      0   1434   11   205   306    442  P آزمون‌های بدنیِ ساده و استاندا
+partner-fa     800    800      0   1221    8   165   188    379  P شاگردهات رو به یه سیستمِ تمرین
+articles-en    656    656      0   1239    5    33   166      0  P Warm-ups, recovery, injury and
+article-en     732    732  0.017   1378    5    33   144      0  P Most players only think about 
+articles-fa    676    676  0.021   1291    5    33   166     59  P گرم‌کردن، ریکاوری، آسیب و هر چ
+article-fa     784    784  0.005   1368    5    33   145     98  P بیشترِ بازیکن‌ها روز مسابقه فق
+terms-en       816    816  0.015   1338   15   156   119      0  P These terms govern your use of
+terms-fa       588    588      0   1066    4   141    80     54  P این قوانین بر استفاده‌ی شما از
+privacy        800    800  0.003   1314   15   156   230      0  P This notice explains what pers
+uts            732   1852  0.001   1836    5   202   832     53  SECTION 6-week padel course
+    Six we
+etminan-en     716    716  0.009   1665   13   247   592    223  P “Etminan Tennis Academy has pa
+etminan-fa     820   1356  0.028   1625    9   245   592    420  P «آکادمی تنیس اطمینان با AA Per
+notfound       696   1440  0.005   1763   11   272    54      0  IMG https://www.amirardekani.com/assets/img/tennis-ball-sm.p
+
+LAYOUT / ACCESSIBILITY SCOREBOARD (phone 390 unless noted)
+page         screens tap<44 tap<24 tiny<12 contrast noAlt noName noFocus ovf360 emdash avgSent flesch
+home-en         14.5      1      1      22       16     0      0       0  False     13      18     49
+home-fa         21.2      0      0       1       10     0      0       0  False     21    22.2   None
+links            1.6      0      0       0        3     0      0       0  False      3    30.8   None
+proof            6.8      0      0       0        3     0      0       3  False      0    10.6     86
+form-en          5.9      3      0       0        0     0      0       0  False      0    13.1     69
+form-fa          5.7      4      1       0        1     0      0       0  False     10      17   None
+tennis          11.9      0      0       0        7     0      0       0  False      0    14.8   None
+testing         14.7      0      0       0        7     0      0       0  False      0    17.9   None
+partner-fa       6.4      2      1       0        3     0      0       0  False     14    17.7   None
+articles-en      8.1      9      0       0        3     0      0       0  False      0    19.9     71
+article-en      10.8     10      0       0        4     0      0       0  False      0      11     79
+articles-fa      8.4      9      0       0        3     0      0       0  False      0    19.4   None
+article-fa      10.6     10      0       0        4     0      0       0  False      0    12.8   None
+terms-en         6.7      0      0       0        0     0      0       0  False      3    16.7     47
+terms-fa         6.6      0      0       0        1     0      0       0  False      8    17.7   None
+privacy         18.8      0      0       0        0     0      0       0  False     36    23.1     58
+uts              6.9     11      5       0        0     0      0       0  False      0    14.5     78
+etminan-en       6.4      4      1       0        2     0      0       0  False      8    21.6     44
+etminan-fa         6      4      1       0        2     0      0       0  False      8    23.4   None
+notfound         1.3      0      0       0        1     0      0       0  False      0     7.5   None
+
+WHAT MOVED SINCE 2026-10-02 (AFTERNOON)
+
+LAYOUT / ACCESSIBILITY: what changed
+  home-en      screens 20.5 -> 14.5 | emdash 43 -> 13 | avgSent 24.6 -> 18 | flesch 34 -> 49
+  home-fa      screens 20.9 -> 21.2 | contrast 11 -> 10 | avgSent 22.9 -> 22.2
+  links        screens 1.5 -> 1.6 | avgSent 28.8 -> 30.8
+  proof        screens 5.4 -> 6.8 | tiny<12 1 -> 0 | contrast 4 -> 3 | emdash 12 -> 0 | avgSent 13.9 -> 10.6 | flesch 82 -> 86
+  form-en      screens 8 -> 5.9 | tap<44 2 -> 3 | tap<24 2 -> 0 | tiny<12 15 -> 0 | emdash 26 -> 0 | avgSent 20.9 -> 13.1 | flesch 56 -> 69
+  form-fa      screens 8 -> 5.7 | tap<44 3 -> 4 | tap<24 2 -> 1 | contrast 4 -> 1 | emdash 23 -> 10 | avgSent 21.4 -> 17
+  tennis       contrast 8 -> 7
+  testing      contrast 8 -> 7
+  partner-fa   contrast 5 -> 3
+  articles-fa  screens 8.3 -> 8.4 | avgSent 19.7 -> 19.4
+  terms-en     screens 6.4 -> 6.7 | flesch 41 -> 47
+  terms-fa     screens 6.2 -> 6.6 | avgSent 17.4 -> 17.7
+  privacy      screens 17.9 -> 18.8 | avgSent 22.9 -> 23.1
+  notfound     contrast 2 -> 1
+  (14 of 20 pages differ)
+
+SLOW-4G PHONE: what changed (lab numbers move a little run to run)
+  home-en      FCP 1300 -> 1408 | LCP 1304 -> 1444 | load 2341 -> 2834 | req 15 -> 26 | KB 169 -> 443 | DOM 750 -> 746 | tasks 0 -> 610
+  home-fa      FCP 1100 -> 1176 | LCP 1100 -> 1176 | load 1653 -> 1724 | req 10 -> 12 | KB 221 -> 264 | DOM 487 -> 493 | tasks 301 -> 748
+  links        FCP 660 -> 920 | LCP 1040 -> 1264 | CLS 0.057 -> 0.034 | load 1190 -> 1210 | req 7 -> 8 | KB 143 -> 165 | DOM 75 -> 72
+  proof        FCP 800 -> 828 | LCP 800 -> 828 | CLS 0.011 -> 0 | load 1586 -> 1803 | req 12 -> 17 | KB 48 -> 217 | DOM 158 -> 168 | tasks 53 -> 196
+  form-en      FCP 948 -> 900 | LCP 948 -> 900 | CLS 0.001 -> 0.002 | load 1743 -> 1684 | req 12 -> 17 | KB 48 -> 179 | DOM 567 -> 579 | tasks 68 -> 336
+  form-fa      FCP 856 -> 864 | LCP 856 -> 864 | load 1258 -> 1215 | req 7 -> 8 | KB 143 -> 165 | DOM 516 -> 526 | tasks 374 -> 424
+  tennis       FCP 1200 -> 1060 | LCP 1200 -> 1060 | load 1595 -> 1441 | req 11 -> 12 | KB 186 -> 207 | DOM 275 -> 274 | tasks 0 -> 126
+  testing      FCP 1148 -> 1000 | LCP 1148 -> 1000 | load 1391 -> 1434 | req 10 -> 11 | KB 184 -> 205 | DOM 307 -> 306 | tasks 685 -> 442
+  partner-fa   FCP 848 -> 800 | LCP 848 -> 800 | load 1230 -> 1221 | req 7 -> 8 | KB 143 -> 165 | DOM 191 -> 188 | tasks 0 -> 379
+  articles-en  FCP 720 -> 656 | LCP 720 -> 656 | load 1324 -> 1239
+  article-en   FCP 788 -> 732 | LCP 788 -> 732 | CLS 0 -> 0.017 | load 1500 -> 1378
+  articles-fa  FCP 720 -> 676 | LCP 720 -> 676 | load 1303 -> 1291 | tasks 88 -> 59
+  article-fa   FCP 844 -> 784 | LCP 844 -> 784 | load 1453 -> 1368 | tasks 151 -> 98
+  terms-en     FCP 752 -> 816 | LCP 752 -> 816 | load 1498 -> 1338 | req 11 -> 15 | KB 46 -> 156 | DOM 117 -> 119
+  terms-fa     FCP 648 -> 588 | LCP 648 -> 588 | load 1105 -> 1066 | DOM 76 -> 80 | tasks 63 -> 54
+  privacy      FCP 732 -> 800 | LCP 732 -> 800 | load 1525 -> 1314 | req 11 -> 15 | KB 46 -> 156 | DOM 226 -> 230
+  uts          FCP 840 -> 732 | LCP 1980 -> 1852 | load 1956 -> 1836 | tasks 84 -> 53
+  etminan-en   FCP 944 -> 716 | LCP 944 -> 716 | CLS 0.022 -> 0.009 | load 1820 -> 1665 | req 5 -> 13 | KB 63 -> 247 | tasks 0 -> 223
+  etminan-fa   FCP 804 -> 820 | LCP 1368 -> 1356 | load 1529 -> 1625 | req 6 -> 9 | KB 171 -> 245 | DOM 594 -> 592 | tasks 505 -> 420
+  notfound     FCP 612 -> 696 | LCP 1308 -> 1440 | CLS 0.006 -> 0.005 | load 1615 -> 1763 | req 7 -> 11 | KB 185 -> 272 | DOM 56 -> 54 | tasks 65 -> 0
+  (20 of 20 pages differ)
+
+WHAT THE RE-RUN SHOWS
+
+Better
+- English home: 20.5 to 14.5 phone screens (360 px: 17.0, tablet 11.0, desktop 12.9). Em-dashes 43 to 13, all inside the athletes' own quotes.
+  Average sentence 24.6 to 18 words. Reading ease 34 to 49 (goal 60).
+- Apply form, English: 8.0 to 5.9 phone screens with the optional group folded; text under 12 px 15 to 0; em-dashes 26 to 0; reading ease 56 to 69.
+  Farsi form: 8.0 to 5.7 screens.
+- Proof page: text under 12 px 1 to 0, em-dashes 12 to 0, reading ease 82 to 86. It is 1.4 screens longer (5.4 to 6.8) because it now shows the real app.
+- Nothing scrolls sideways at 360 px. No page errors, no failed requests. 67 internal links, all answer, no redirects (the baseline had 30).
+- No yellow on any core page (the static scan finds #e08a2e only on the Etminan pages: item 11b, his call). The style guard passes: 105 old exceptions
+  (the three Etminan pages, the drawn mini app on the home, the UTS and Divehi font links), none new.
+- Slow phone, against the 2 Oct MORNING baseline (live site): English home first paint 1.76 to 1.41 s, whole page 5.6 to 2.8 s, 880 to 443 KB, layout jump 0.096 to 0;
+  Farsi home first paint 1.91 to 1.18 s; links 1.24 to 0.92 s; partner 1.18 to 0.80 s; apply form 1.01 to 0.90 s; proof 0.86 to 0.83 s.
+
+Worse than the afternoon of 2 Oct, still better than the morning
+- First paint on a slow phone is 0.1 to 0.3 s later than in the afternoon snapshot. A controlled test pins it on f3e27cb (fonts moved to your own server):
+  the site at four commits, each served from this PC and measured with the same harness, two rounds, interleaved. Mean first paint in ms:
+                 c9d574e (snapshot)  4650816 (just before)  f3e27cb (fonts)  HEAD
+    home-en            822                  858                  1176          1140
+    home-fa            964                  926                  1202          1108
+    form-en            928                  934                  1088          1082
+    partner-fa         726                  740                   856           846
+    terms-en           762                  766                   906           910
+  The cost is one more render-blocking stylesheet (fonts.css, 5 KB) and up to 9 font files (209 KB on the English home) that share a slow line with the page.
+  Layout jump stayed 0. Every page is still under the 1.5 s goal; the live English home is the closest at 1.41 s.
+- Main-thread blocking ("tasks" in the first table) is NOT a regression: the English home had 711 ms in the morning baseline, 0 ms in the afternoon snapshot, 610 ms now.
+  A Chrome trace of the live home shows one task: the scroll-progress script (index.html line 1822) reads scrollHeight in its first animation frame while the layout
+  is still dirty, so the first full layout of the 12,000 px page lands inside the script (668 of 705 ms is Layout). The layout has to happen anyway; the meter
+  counts it when a script triggers it. A local copy of the same code, served uncompressed, shows 0, so the number depends on how the files arrive
+  (my guess, not proven). Do not steer by it.
+- Lab page weight went up (home 169 to 443 KB, forms 48 to 179 KB) because the meter could not see Google-hosted fonts and now counts yours. Not an increase for visitors.
+- Still long: English home 14.5 phone screens (goal 13), Farsi home 21.2 (goal 15, package 14d), privacy notice 18.8 (package 20a), terms 6.7.
+
+Real defects the probe found (the other contrast groups on the English home are false alarms: white labels over photos, the headline over a gradient, the drawn mini app)
+- index.html line 644: the third "How it works" card sets its text to 85% white on the clay fill: 3.81:1, needs 4.5. Plain white is 4.66:1.
+- index.html: the clay link "Read the Playbook articles on the web" (inline #C7552F, two places): 4.12:1 on paper, needs 4.5. The token --accent-2-text (#B64826) is for this.
+- proof.html: the green hero's kicker is small clay text (about 3:1); the "01 02 03" step numbers are clay on paper at 4.12:1; the "Workout (coached
+  athletes only)" chip is #8A857C at 3.43:1 (a grey the style guard's check does not catch).
+- Both apply forms: the consent label's flex layout loses to the general ".f-field label {display:block}" rule, so the text wraps UNDER the 24 px tick box instead of beside it
+  (seen in a real 390 px screenshot). That is also why tap targets under 44 px went 2 to 3 (English) and 3 to 4 (Farsi): the two required ticks and the data link.
+  The Farsi "How my data is used" link is only 23 px tall.
+
+Looked at in a real viewport (shot.js), not only measured: English home first screen (phone and desktop) and pricing, apply form tick area, proof first screen.
+All read well; the olive underline under LAST LONGER. (item 4f) is still there.
+
+NOT re-run: the Iran reach test (package 23, six real reports on 2026-10-04), the apps (package 25), real phones. Lab numbers are simulated from the UK.

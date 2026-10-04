@@ -113,7 +113,7 @@ def build_md():
     for t in B.TOOLS: a('| ' + ' | '.join(cell(x) for x in t) + ' |')
     a('\n## Files\n')
     a('- `scripts/site_audit/` the measuring tools, `backlog.py` (this file’s source) and `build_report.py`.')
-    a('- `Content/site-audit/review-*.md` the seven page reviews with file and line references; `research-*.md` the tool research; `baseline-scoreboard.txt` (morning) and `after-scoreboard-2026-10-02.txt` (afternoon, after the first batches). Add a new dated after-scoreboard each time the audit is re-run.')
+    a('- `Content/site-audit/review-*.md` the seven page reviews with file and line references; `research-*.md` the tool research; `baseline-scoreboard.txt` (morning), `after-scoreboard-2026-10-02.txt` (afternoon, after the first batches) and `after-scoreboard-2026-10-04.txt` (the full re-run, with the slow-phone font test). Add a new dated after-scoreboard each time the audit is re-run.')
     a('- The private report page (claude.ai artifact “Front Door”) is the reading version with pictures; rebuild it with `--html`.')
     return '\n'.join(o) + '\n'
 
