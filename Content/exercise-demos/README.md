@@ -164,6 +164,55 @@ Prices checked 2026-10-04 with `get_cost` (re-check, they change): picture 0.5 �
 (words only, from a start picture, or between a start and an end picture) · Wan 3.0 3 s with a video
 reference = 3 · Genjutsu motion copy 480p = 12 · Kling 3.0 std 3 s = 4.5.
 
+## Batch 1: the ten most-used gym exercises (2026-10-04)
+
+**How they were chosen:** every exercise card in the programmes of the 24 athletes who logged a session in the last
+45 days (Amir's own excluded), matched to the Spine by `exId` or, on older cards, by name or alias (958 of 1,054 cards
+matched; the rest are circuit wrappers). Footwork, sprints, jumps, throws and cardio are left out (Amir films those).
+Athletes using each: band pull-apart 23, glute bridge 21, 90/90 hip switch 19, lat pulldown 16, banded lateral walk 15,
+chest-supported dumbbell row 15, machine leg press 14, machine seated leg curl 13, cable face pull 12, cat-cow 11.
+Next in line: world's greatest stretch, 45° back extension, dead bug (11 each), ankle dorsiflexion rocks, bird dog (10).
+
+**Amir's rules for the batch (2026-10-04):** Wan first for every clip. **He marks each clip pass or fail himself**, and
+for each fail Claude suggests the fix (one more Wan try, Wan with a finish picture, or Kling); nothing beyond the first
+ten clips is spent without his yes. The test Claude proposed for a fail: the clip shows what the exercise's own "don't"
+cue warns about, or turns into a different movement; small errors pass ("the videos are too small ... a little bit of
+error is ok"). He trims every loop himself in the Demo Loop Trimmer (claude.ai/artifact/EEAkZMi9MHwYMUPyd7E6i2): the
+full clips go to his Downloads as `demo-…mp4`, he pastes his start and finish frames, and `make_loop.py --near --far`
+cuts them.
+
+**Start pictures (5 credits, balance 567; four 429s on the way, no charge).** Same opening and closing lines as above,
+with "Static camera low, close to floor level" for the floor exercises (so the body reads against the wall) and the
+band and mini band in clay orange. All ten checked: right.
+
+| Index | Spine id | Job id |
+|---|---|---|
+| 401 | `band-pull-apart` | `75f85b96-3cb0-4c04-bed1-eda02a819d98` |
+| 402 | `glute-bridge` | `698b04e1-6c7f-47c3-af55-976f66f34316` |
+| 403 | `90-90-hip-switch` | `9728f919-bc27-4335-9209-da629f56f4c6` |
+| 404 | `lat-pulldown` | `e627cb4b-6174-444d-aa66-f108c5eab514` |
+| 405 | `banded-lateral-walk` | `23a0edfa-52a9-4b62-be76-89901ae561ae` |
+| 406 | `chest-supported-dumbbell-row` | `9e81888e-ba59-4224-a08b-f3930b68ea7e` |
+| 407 | `machine-leg-press` | `516dde17-2dba-41d4-bc41-8d874ab6c84a` |
+| 408 | `machine-seated-leg-curl` | `58148766-299c-4484-8846-67c382da810c` |
+| 409 | `cable-face-pull` | `bff62979-4c67-49d5-86cb-c069da3f4d3e` |
+| 410 | `cat-cow` | `7e172aea-6ab8-4933-acda-f6226f99d5ad` |
+
+**The clips (Wan, 2 s, the step 2 settings and opening/closing lines), one half rep each:**
+
+| Index | Movement |
+|---|---|
+| 501 band pull-apart | Keeping his arms straight and his shoulders down, he pulls the band apart, sweeping his hands out to the sides until the band touches his chest and his arms form a T, then holds there for a moment. |
+| 502 glute bridge | Pressing through his heels, he lifts his hips off the floor until his shoulders, hips and knees form one straight line, ribs down, then holds there for a moment. His shoulders and feet stay on the floor. |
+| 503 90/90 hip switch | Keeping his chest tall and his hips on the floor, he swings both knees over to the other side together, like windshield wipers, until his left leg is in front and his right leg is out to the side, then holds there for a moment. |
+| 504 lat pulldown | Sitting tall with only a slight lean back, he pulls the bar down in front of his face to his collarbone, elbows driving down to his sides, then holds there for a moment. His torso stays at the same angle. |
+| 505 banded lateral walk | Staying low in the quarter squat with his feet pointing forward, he takes one wide step to his right against the band, then his left foot follows half the distance, knees pushing out the whole time. |
+| 506 chest-supported dumbbell row | Keeping his chest on the pad, he rows both dumbbells up toward the bottom of his ribs, elbows travelling back close to his body, until his elbows reach his torso, then holds there for a moment. |
+| 507 machine leg press | Slowly and with control, he bends his knees and lowers the platform toward him until his knees are bent to about 90 degrees, his lower back flat against the backrest, then holds there for a moment. |
+| 508 machine seated leg curl | Keeping his hips and thighs down on the seat, he bends his knees and curls the roller pad down and back until his heels are under the seat, then holds there for a moment. |
+| 509 cable face pull | He pulls the rope toward his forehead, elbows high and out to the sides at shoulder height, splitting his hands apart beside his ears at the end, then holds there for a moment. His body stays still. |
+| 510 cat-cow | Slowly he rounds his back up toward the ceiling, tucking his chin and his tailbone, moving from the gentle arch into a gentle round in the easy middle of the range, then holds there for a moment. His hands and knees stay where they are. |
+
 ## Why pictures and not words alone
 
 Video models learned from clips with plain captions, so they know common exercises by name but not
