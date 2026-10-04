@@ -8,7 +8,7 @@
 <meta name="google-site-verification" content="fLETGOn4F6WkgXPHmk0niIsuuU1RBCVmoWT7bKhwt8g" />
 
 <title>Amir Ardekanian — Tennis Strength &amp; Conditioning Coach</title>
-<meta name="description" content="Online tennis strength &amp; conditioning coaching for competitive players. Evidence-based, individualised programmes — 1, 3 or 6 months — that transfer directly to on-court movement, stroke quality, and durability.">
+<meta name="description" content="Online tennis and padel strength and conditioning with Amir Ardekani (2× MSc). A programme built around how you move on court, coached every week.">
 <link rel="canonical" href="https://www.amirardekani.com/">
 <link rel="alternate" hreflang="fa" href="https://www.amirardekani.com/index-fa.html">
 <link rel="alternate" hreflang="en" href="https://www.amirardekani.com/">
@@ -332,6 +332,45 @@
   }
   @keyframes cue-drop { 0% { top: -40%; } 65%, 100% { top: 110%; } }
   @media (max-width: 768px) { .hero-scroll-cue { display: none; } }
+
+  /* ═══ 2026-10-02 home rebuild (website audit 12 B + 19): hero phone, proof row, price checklist, Read more ═══ */
+  .hero-grid { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center; }
+  .hero-phone { display: none; }
+  .hero-proof { display: flex; align-items: center; gap: 14px; margin-top: 36px; }
+  .hero-proof img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; flex: none; border: 2px solid rgba(255,255,255,.6); }
+  .hero-proof p { margin: 0; font-size: 15px; line-height: 1.5; color: rgba(255,255,255,.88); }
+  .hero-proof strong { color: #fff; font-weight: 600; }
+  .platform-phone { margin-top: 8px; }
+  @media (min-width: 960px) {
+    .hero-grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 56px; }
+    .hero-grid .hero-h1 { font-size: clamp(56px, 6.2vw, 104px); }
+    .hero-phone { display: flex; justify-content: center; }
+    .hero-ball--main { display: none; }
+    .platform-phone { display: none; }
+    .demo-layout { grid-template-columns: 1fr; margin-top: 44px; }
+    .demo-text-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  }
+  .incl-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px 28px; text-align: left; }
+  .incl-list li { position: relative; padding-left: 24px; font-size: 15px; line-height: 1.5; color: var(--text-secondary); }
+  .incl-list li::before { content: '✓'; position: absolute; left: 0; top: 0; color: var(--accent); font-weight: 700; }
+  .pricing-price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+  .pricing-price-row .pricing-price { margin-bottom: 0; }
+  .pricing-cur { font-family: var(--font-mono); font-size: 13px; letter-spacing: 1.5px; color: var(--text-muted); }
+  .pricing-per { font-family: var(--font-display); font-weight: 700; font-size: 24px; line-height: 1.1; color: var(--accent); margin: -10px 0 22px; }
+  .pricing-per span { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent-2-text); margin-left: 8px; }
+  .pricing-more { font-family: var(--font-mono); font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent-2-text); margin-bottom: 12px; }
+  .pricing-card--featured .pricing-cur { color: rgba(255,255,255,.7); }
+  .pricing-card--featured .pricing-per { color: #fff; }
+  .pricing-card--featured .pricing-per span, .pricing-card--featured .pricing-more { color: #F8B497; }
+  .pricing-note { text-align: center; font-size: 14px; color: var(--text-muted); margin: 0; position: relative; z-index: 1; }
+  .cta-ask { margin: 22px 0 0; font-size: 15px; color: rgba(255,255,255,.82); position: relative; z-index: 1; }
+  .cta-ask a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+  .tq-more { display: none; }
+  @media (max-width: 768px) {
+    .testimonial-quote.clamp:not(.is-open) { display: -webkit-box; -webkit-line-clamp: 7; -webkit-box-orient: vertical; overflow: hidden; }
+    .tq-more { display: inline-flex; align-items: center; min-height: 44px; margin: -12px 0 8px; padding: 0; background: none; border: 0; cursor: pointer;
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent-2-text); text-decoration: underline; text-underline-offset: 3px; }
+  }
 
   /* ═══ MARQUEE TICKERS ═══ */
   .marquee {
@@ -928,6 +967,45 @@
   .is-off .orb, .is-off .hero-grid-bg, .is-off .hero-ball, .is-off .hero-ball img, .is-off .marquee-track, .is-off .cta-ball,
   .is-off .cta-ball img, .is-off .pricing-card--featured, .is-off .pricing-badge, .is-off .method-loop span, .is-off .cta-heading em,
   .is-off .phone-mockup, .is-off .mini-day img, .is-off .mini-checkbox { animation-play-state: paused; }
+
+  /* the home on a phone: tighter, so it reads in about 13 screens (2026-10-02) */
+  @media (max-width: 768px) {
+    .sec { padding: 52px 0; }
+    .testimonials-section { padding: 52px 0 40px; }
+    .testimonials-rail { margin-top: 28px; }
+    .testimonial-card { grid-template-rows: 230px auto; }
+    .testimonial-content { padding: 22px 22px; }
+    .testimonial-achievements { margin-bottom: 16px; padding-bottom: 16px; }
+    .stack { margin-top: 32px; gap: 16px; }
+    .stack-card { padding: 26px 22px; gap: 14px; }
+    .stack-num { display: none; }
+    .pricing-includes { margin: 28px 0 22px; padding: 18px 20px; }
+    .pricing-grid { gap: 20px; }
+    .pricing-card { padding: 24px 22px; }
+    .pricing-features { margin-bottom: 22px; }
+    .for-item { padding: 10px 0; }
+    .demo-layout { gap: 28px; margin-top: 30px; }
+    .platform-phone .phone-screen { height: 400px; }
+    .platform-phone .phone-orbit { display: none; }
+    .mantra { margin-top: 48px; }
+    .doors { margin-top: 32px; gap: 16px; }
+    .door { min-height: 230px; }
+    .door-inner { padding: 24px 22px; }
+    .about-layout { margin-top: 32px; gap: 28px; }
+    .coach-frame { max-width: 240px; margin: 0 auto; position: static; }
+    .cta-section { padding: 64px 0; }
+    .hero { min-height: 0; padding: 112px 0 52px; }
+    .pricing-price { font-size: 52px; }
+    .pricing-net { display: none; }
+    .pricing-term { margin-bottom: 14px; }
+    .pricing-per { margin: -4px 0 16px; }
+    .platform-phone .phone-screen { height: 340px; }
+    .stack-title { margin-bottom: 8px; }
+    .door { min-height: 168px; }
+    .door-body { display: none; }
+    .coach-frame { max-width: 190px; }
+    .library-note { display: none; }
+  }
 </style>
 <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -947,49 +1025,87 @@
   <div class="orb orb--clay" aria-hidden="true"></div>
   <div class="hero-ball hero-ball--main" aria-hidden="true" data-plx="0.22"><img src="/assets/img/tennis-ball-sm.png" alt="" width="170" height="170"></div>
   <div class="hero-ball hero-ball--far" aria-hidden="true" data-plx="-0.1"><img src="/assets/img/tennis-ball-sm.png" alt="" width="60" height="60"></div>
-  <div class="container hero-content">
-    <span class="kicker">Tennis Strength &amp; Conditioning</span>
-    <h1 id="hero-title" class="hero-h1">
-      <span class="hw"><span>Move Better.</span></span>
-      <span class="hw"><span class="outline">Hit Harder.</span></span>
-      <span class="hw"><span class="clay">Last Longer.</span></span>
-    </h1>
-    <p class="lead hero-sub reveal reveal-d3">The S&amp;C programme used by 1000+ competitive tennis and padel players. Improving movement, stroke quality, and resilience — in one season.</p>
-    <div class="hero-actions reveal reveal-d4">
-      <a href="/form.html" class="btn btn-primary" data-magnet>Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
-      <a href="/program.html?client=demo" class="btn-ghost" target="_blank" rel="noopener">Try the Live Demo →</a>
+  <div class="container hero-content hero-grid">
+    <div class="hero-copy">
+      <span class="kicker">Online tennis &amp; padel coaching</span>
+      <h1 id="hero-title" class="hero-h1">
+        <span class="hw"><span>Move Better.</span></span>
+        <span class="hw"><span class="outline">Hit Harder.</span></span>
+        <span class="hw"><span class="clay">Last Longer.</span></span>
+      </h1>
+      <p class="lead hero-sub reveal reveal-d3">Strength and conditioning built around how you move on court. I write your programme and coach it every week.</p>
+      <div class="hero-actions reveal reveal-d4">
+        <a href="/form.html" class="btn btn-primary" data-magnet>Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
+        <a href="/program.html?client=demo" class="btn-ghost" target="_blank" rel="noopener">Try the Live Demo →</a>
+      </div>
+      <div class="hero-proof reveal reveal-d5">
+        <img src="/assets/img/coach-face.jpg" width="56" height="56" alt="Amir Ardekani">
+        <p><strong>Amir Ardekani, 2× MSc.</strong><br>Used by 1000+ competitive tennis and padel players.</p>
+      </div>
+    </div>
+    <div class="hero-phone" aria-hidden="true">
+        <div class="phone-wrap">
+          <div class="phone-orbit" aria-hidden="true"></div>
+          <div class="phone-mockup" aria-hidden="true">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="mini-header has-banner">
+                <div class="mini-eyebrow">Cycle 2 of 5 · Strength Engine</div>
+                <div class="mini-title">Training</div>
+                <div class="mini-sub">Designed for you by Amir Ardekani</div>
+                <div class="mini-tabs">
+                  <div class="mini-tab active">Day 1</div>
+                  <div class="mini-tab">Day 2</div>
+                  <div class="mini-tab">Day 3</div>
+                </div>
+              </div>
+              <div class="mini-body">
+                <div class="mini-day">
+                  <img src="/assets/days/lower.webp" alt="">
+                  <div class="mini-day-sc"></div>
+                  <div class="mini-day-cap"><span>Day 1 · Today</span><b>Lower Body &amp; Glutes</b></div>
+                </div>
+                <div class="mini-section-label">Warm-Up</div>
+                <div class="mini-exercise">
+                  <div class="mini-ex-main">
+                    <div class="mini-checkbox" data-seq="1"></div>
+                    <div><div class="mini-ex-name">Bike</div><div class="mini-chips"><span class="mini-chip" style="background:#EDE8E0;color:var(--text-muted);">5 min</span></div></div>
+                  </div>
+                </div>
+                <div class="mini-section-label">Plyometrics</div>
+                <div class="mini-exercise">
+                  <div class="mini-ex-main">
+                    <div class="mini-checkbox" data-seq="2"></div>
+                    <div><div class="mini-ex-name">Broad Jump</div><div class="mini-chips"><span class="mini-chip">3 Sets</span><span class="mini-chip">×5</span></div></div>
+                  </div>
+                </div>
+                <div class="mini-section-label">Strength</div>
+                <div class="mini-exercise">
+                  <div class="mini-ex-main">
+                    <div class="mini-checkbox" data-seq="3"></div>
+                    <div><div class="mini-ex-name">Back Squat</div><div class="mini-chips"><span class="mini-chip y">4 Sets</span><span class="mini-chip">×6</span><span class="mini-chip">3-1-1</span></div></div>
+                  </div>
+                  <div class="mini-cue-row">
+                    <div class="mini-cue good">✅ Push the floor away</div>
+                    <div class="mini-cue bad">❌ Don't let knees cave</div>
+                  </div>
+                  <div class="mini-rest"><button type="button" class="mini-rest-btn" tabindex="-1">Rest ⏱</button></div>
+                </div>
+                <div class="mini-exercise">
+                  <div class="mini-ex-main">
+                    <div class="mini-checkbox" data-seq="4"></div>
+                    <div><div class="mini-ex-name">Single-Leg Hip Lift</div><div class="mini-chips"><span class="mini-chip">3 Sets</span><span class="mini-chip">×10+10</span></div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="mini-v-bar"><div class="mini-v-fill"></div></div>
+            </div>
+          </div>
+        </div>
     </div>
   </div>
   <div class="hero-scroll-cue" aria-hidden="true"><span>Scroll</span><span class="line"></span></div>
 </section>
-
-<!-- ═══ MARQUEE ═══ -->
-<div class="marquee" aria-hidden="true">
-  <div class="marquee-track">
-    <div class="marquee-seq">
-      <span class="marquee-item">Move Better</span>
-      <span class="marquee-item">Hit Harder</span>
-      <span class="marquee-item">Last Longer</span>
-      <span class="marquee-item">1000+ Players Coached</span>
-      <span class="marquee-item">2× MSc</span>
-      <span class="marquee-item">Evidence-Based</span>
-      <span class="marquee-item">Nothing Without a Reason</span>
-      <span class="marquee-item">A Coach in Your Pocket</span>
-      <span class="marquee-item">A Path to Your Target</span>
-    </div>
-    <div class="marquee-seq">
-      <span class="marquee-item">Move Better</span>
-      <span class="marquee-item">Hit Harder</span>
-      <span class="marquee-item">Last Longer</span>
-      <span class="marquee-item">1000+ Players Coached</span>
-      <span class="marquee-item">2× MSc</span>
-      <span class="marquee-item">Evidence-Based</span>
-      <span class="marquee-item">Nothing Without a Reason</span>
-      <span class="marquee-item">A Coach in Your Pocket</span>
-      <span class="marquee-item">A Path to Your Target</span>
-    </div>
-  </div>
-</div>
 
 <!-- ═══ CREDENTIAL STRIP ═══ -->
 <div class="cred">
@@ -1015,43 +1131,14 @@
   </div>
 </div>
 
-<!-- ═══ WHO THIS IS FOR ═══ -->
-<section class="sec" aria-labelledby="for-title">
-  <div class="sec-num" aria-hidden="true">01</div>
-  <div class="container">
-    <span class="kicker reveal">Fit Check</span>
-    <h2 id="for-title" class="sec-h reveal reveal-d1">Built for<br><em>Competitive Players</em></h2>
-    <p class="sec-sub reveal reveal-d2">Not a generic fitness plan repackaged for racket sports. This is strength &amp; conditioning designed from the ground up for the movement demands of tennis and padel — the accelerations, the decelerations, the repeated sprints, the rotational force production.</p>
-
-    <div class="for-grid">
-      <div class="for-col for-col--yes reveal reveal-d3">
-        <div class="for-col-title yes">✓ Built for you if</div>
-        <div class="for-item"><span class="for-icon check">+</span>You're a competitive tennis or padel player — club, county, national, or international level</div>
-        <div class="for-item"><span class="for-icon check">+</span>You train or compete multiple times per week and need S&amp;C that integrates with your on-court schedule</div>
-        <div class="for-item"><span class="for-icon check">+</span>You want to see direct transfer from the gym to the court — in your movement, your shots, and your durability</div>
-        <div class="for-item"><span class="for-icon check">+</span>You understand that physical performance is a competitive advantage and you're ready to commit to the process</div>
-        <div class="for-item"><span class="for-icon check">+</span>You want structured, periodised training that gives you direction and progresses with you — not random workouts</div>
-      </div>
-      <div class="for-col for-col--no reveal reveal-d4">
-        <div class="for-col-title no">✗ Not the right fit if</div>
-        <div class="for-item"><span class="for-icon cross">–</span>You're looking for generic workout templates or a fitness app</div>
-        <div class="for-item"><span class="for-icon cross">–</span>You want to train based on how you feel each day without structure</div>
-        <div class="for-item"><span class="for-icon cross">–</span>You're not currently playing or competing in tennis or padel</div>
-        <div class="for-item"><span class="for-icon cross">–</span>You want a coach who will just tell you what you want to hear</div>
-        <div class="for-item"><span class="for-icon cross">–</span>You're not prepared to follow a plan with consistency, week after week</div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ═══ ATHLETE TESTIMONIALS (dark stage) ═══ -->
 <section class="sec sec--dark testimonials-section" id="testimonials" aria-labelledby="testimonials-title">
-  <div class="sec-num" aria-hidden="true">02</div>
+  <div class="sec-num" aria-hidden="true">01</div>
   <div class="orb orb--clay" aria-hidden="true" style="bottom:auto;top:-160px;left:-140px;"></div>
   <div class="container">
     <span class="kicker reveal">Athlete Voices</span>
-    <h2 id="testimonials-title" class="sec-h reveal reveal-d1" style="color:#fff;">Trusted by<br><em>Elite Athletes</em></h2>
-    <p class="lead sec-sub reveal reveal-d2">Real feedback from competitive players who trained with the system — from club level to international competition, the same evidence-based methodology, individualised for each athlete.</p>
+    <h2 id="testimonials-title" class="sec-h reveal reveal-d1" style="color:#fff;">Players I've<br><em>coached</em></h2>
+    <p class="lead sec-sub reveal reveal-d2">From club players to internationals. The same method, built around each athlete.</p>
   </div>
 
   <div class="testimonials-rail reveal reveal-d2">
@@ -1202,92 +1289,20 @@
   </div>
 </section>
 
-<!-- ═══ PRICING — GAME. SET. MATCH. ═══ -->
-<section class="sec" id="pricing" aria-labelledby="pricing-title">
-  <div class="sec-num" aria-hidden="true">03</div>
-  <div class="container">
-    <span class="kicker reveal">Programmes</span>
-    <h2 id="pricing-title" class="sec-h pricing-h reveal reveal-d1" aria-label="Game. Set. Match.">
-      <span class="pw"><span>Game.</span></span>
-      <span class="pw"><span>Set.</span></span>
-      <span class="pw"><span><em>Match.</em></span></span>
-    </h2>
-    <p class="sec-sub reveal reveal-d2">Three levels of commitment. One coaching system. Every tier gets the full experience — the longer you commit, the deeper we go.</p>
-
-    <!-- Every programme includes strip -->
-    <div class="pricing-includes reveal reveal-d2">
-      <div class="card-eyebrow">Every programme includes</div>
-      <p>Personalised training dashboard &amp; app · intake call (up to 30 min) · fully personalised programme based on your goals &amp; assessment · weekly check-ins (4 per month) · performance report · WhatsApp &amp; email support · 10% loyalty renewal discount.</p>
-    </div>
-
-    <!-- Tier cards -->
-    <div class="pricing-grid">
-
-      <!-- Game — 1 month -->
-      <article class="pricing-card reveal reveal-d2">
-        <div class="pricing-tier">Game<small>The opening exchange</small></div>
-        <div class="pricing-price" data-count="70" data-prefix="$">$70</div>
-        <div class="pricing-term">1-month programme</div>
-        <div class="pricing-net" aria-hidden="true"></div>
-        <ul class="pricing-features">
-          <li>Weekly check-ins (4 per month)</li>
-          <li>Performance report</li>
-          <li>WhatsApp &amp; email support</li>
-        </ul>
-        <a href="/form.html?plan=game" class="btn btn-secondary" aria-label="Apply Now: Game, 1 month">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
-      </article>
-
-      <!-- Set — 3 months -->
-      <article class="pricing-card reveal reveal-d3">
-        <div class="pricing-tier">Set<small>Momentum builds</small></div>
-        <div class="pricing-price" data-count="180" data-prefix="$">$180</div>
-        <div class="pricing-term">3-month programme · $60/month</div>
-        <div class="pricing-net" aria-hidden="true"></div>
-        <ul class="pricing-features">
-          <li>Weekly check-ins (4 per month)</li>
-          <li>Programme updated monthly</li>
-          <li>Performance report</li>
-        </ul>
-        <a href="/form.html?plan=set" class="btn btn-secondary" aria-label="Apply Now: Set, 3 months">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
-      </article>
-
-      <!-- Match — 6 months (featured) -->
-      <article class="pricing-card pricing-card--featured reveal reveal-d4">
-        <div class="pricing-badge">Best value</div>
-        <div class="pricing-tier">Match<small>The whole contest</small></div>
-        <div class="pricing-price" data-count="300" data-prefix="$">$300</div>
-        <div class="pricing-term">6-month programme · $50/month</div>
-        <div class="pricing-net" aria-hidden="true"></div>
-        <ul class="pricing-features">
-          <li>Weekly check-ins (4 per month)</li>
-          <li>Programme updated monthly</li>
-          <li>Performance report</li>
-          <li>Priority WhatsApp &amp; email support</li>
-          <li class="pricing-feature--accent">Competition-specific services — periodised to your tournament schedule, with competition warm-up programmes</li>
-          <li><span class="pricing-star" aria-hidden="true">★</span> Video technique reviews <span class="pricing-included">included</span></li>
-        </ul>
-        <a href="/form.html?plan=match" class="btn btn-primary" aria-label="Apply Now: Match, 6 months">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
-      </article>
-
-    </div>
-
-  </div>
-</section>
-
-<!-- ═══ METHOD — sticky stack ═══ -->
+<!-- ═══ METHOD (before the price: how it works comes first) ═══ -->
 <section class="sec sec--band" id="method" aria-labelledby="method-title">
-  <div class="sec-num" aria-hidden="true">04</div>
+  <div class="sec-num" aria-hidden="true">02</div>
   <div class="container">
     <span class="kicker reveal">The Process</span>
     <h2 id="method-title" class="sec-h reveal reveal-d1">How <em>It Works</em></h2>
-    <p class="sec-sub reveal reveal-d2">Three phases. One system. Your programme is built around your sport, your body, and your real life — then adjusted every week as you progress across your programme.</p>
+    <p class="sec-sub reveal reveal-d2">Three steps. Your programme is built around your sport and your real life. Then I adjust it every week.</p>
 
     <div class="stack">
       <article class="stack-card">
         <div class="stack-num" aria-hidden="true">01</div>
         <div>
           <h3 class="stack-title">Assess</h3>
-          <p class="stack-body">We start with a detailed intake — training history, injury profile, competition calendar, how you recover, and a movement screen. For your sport I run a needs analysis: what tennis actually demands of your body. I learn how you move and where you're limited before anything is designed.</p>
+          <p class="stack-body">We start with your application and a video call. I ask about your training, your injuries, your calendar and how you recover, and I run a movement screen. For tennis and padel I also look at what the sport asks of your body. Before I design anything, I know how you move and where you are limited.</p>
           <span class="stack-tag">Application + Video Call</span>
         </div>
         <div class="stack-visual reveal">
@@ -1298,7 +1313,7 @@
         <div class="stack-num" aria-hidden="true">02</div>
         <div>
           <h3 class="stack-title">Build</h3>
-          <p class="stack-body">Your programme is designed from scratch and mapped end to end — a chain of ~5-week cycles, each one a mission with its own focus, its reason, and a target you'll hit. Strength, power, speed and mobility, periodised to your calendar and shaped to your recovery, not someone else's ideal.</p>
+          <p class="stack-body">Your programme is built from scratch. It is a chain of cycles of about 5 weeks. Each cycle has its own focus, its reason and a target you will hit. Strength, power, speed and mobility are planned around your calendar and your recovery, not someone else's ideal.</p>
           <span class="stack-tag">Bespoke Programming</span>
         </div>
         <div class="stack-visual reveal">
@@ -1309,7 +1324,7 @@
         <div class="stack-num" aria-hidden="true">03</div>
         <div>
           <h3 class="stack-title">Evolve</h3>
-          <p class="stack-body">Your programme isn't static. Every week I review your logs and readiness, check in with you, and adjust — load, volume, exercise selection all adapt to how your body is responding and where your season takes you. Nothing without a reason.</p>
+          <p class="stack-body">Your programme does not stay still. Every week I read your logs and your readiness, check in with you and adjust the load, the volume and the exercises. Nothing without a reason.</p>
           <span class="stack-tag">Weekly Coaching Loop</span>
         </div>
         <div class="stack-visual reveal">
@@ -1317,22 +1332,120 @@
         </div>
       </article>
     </div>
-    <div class="method-loop reveal"><span>↻</span> &nbsp; Assess → Build → Evolve — a weekly loop across your whole programme</div>
+    <div class="method-loop reveal"><span>↻</span> &nbsp; Assess, Build, Evolve. A weekly loop for your whole programme.</div>
   </div>
 </section>
 
-<!-- ═══ PLATFORM (dark stage) ═══ -->
+<!-- ═══ PRICING (GAME. SET. MATCH.) ═══ -->
+<section class="sec" id="pricing" aria-labelledby="pricing-title">
+  <div class="sec-num" aria-hidden="true">03</div>
+  <div class="container">
+    <span class="kicker reveal">Programmes</span>
+    <h2 id="pricing-title" class="sec-h pricing-h reveal reveal-d1" aria-label="Game. Set. Match.">
+      <span class="pw"><span>Game.</span></span>
+      <span class="pw"><span>Set.</span></span>
+      <span class="pw"><span><em>Match.</em></span></span>
+    </h2>
+    <p class="sec-sub reveal reveal-d2">Three levels of commitment. One coaching system. Every tier gets the full experience. The longer you commit, the deeper we go.</p>
+
+    <div class="pricing-includes reveal reveal-d2">
+      <div class="card-eyebrow">Every programme includes</div>
+      <ul class="incl-list">
+        <li>Your training dashboard and app</li>
+        <li>An intake call (up to 30 min)</li>
+        <li>A programme written for your goals and assessment</li>
+        <li>Weekly check-ins (4 a month)</li>
+        <li>A performance report</li>
+        <li>WhatsApp and email support</li>
+        <li>10% loyalty discount when you renew</li>
+      </ul>
+    </div>
+
+    <div class="pricing-grid">
+
+      <article class="pricing-card reveal reveal-d2">
+        <div class="pricing-tier">Game<small>The opening exchange</small></div>
+        <div class="pricing-price-row"><div class="pricing-price" data-count="70" data-prefix="$">$70</div><span class="pricing-cur">USD</span></div>
+        <div class="pricing-term">1-month programme</div>
+        <div class="pricing-net" aria-hidden="true"></div>
+        <ul class="pricing-features">
+          <li>Everything listed above</li>
+        </ul>
+        <a href="/form.html?plan=game" class="btn btn-secondary" aria-label="Apply Now: Game, 1 month">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
+      </article>
+
+      <article class="pricing-card reveal reveal-d3">
+        <div class="pricing-tier">Set<small>Momentum builds</small></div>
+        <div class="pricing-price-row"><div class="pricing-price" data-count="180" data-prefix="$">$180</div><span class="pricing-cur">USD</span></div>
+        <div class="pricing-term">3-month programme</div>
+        <div class="pricing-per">$60 a month <span>save 14%</span></div>
+        <div class="pricing-net" aria-hidden="true"></div>
+        <div class="pricing-more">Everything in Game, plus</div>
+        <ul class="pricing-features">
+          <li>Programme updated monthly</li>
+        </ul>
+        <a href="/form.html?plan=set" class="btn btn-secondary" aria-label="Apply Now: Set, 3 months">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
+      </article>
+
+      <article class="pricing-card pricing-card--featured reveal reveal-d4">
+        <div class="pricing-badge">Best value</div>
+        <div class="pricing-tier">Match<small>The whole contest</small></div>
+        <div class="pricing-price-row"><div class="pricing-price" data-count="300" data-prefix="$">$300</div><span class="pricing-cur">USD</span></div>
+        <div class="pricing-term">6-month programme</div>
+        <div class="pricing-per">$50 a month <span>save 29%</span></div>
+        <div class="pricing-net" aria-hidden="true"></div>
+        <div class="pricing-more">Everything in Set, plus</div>
+        <ul class="pricing-features">
+          <li>Priority WhatsApp and email support</li>
+          <li class="pricing-feature--accent">Competition services: your plan follows your tournament schedule, with competition warm-up programmes</li>
+          <li><span class="pricing-star" aria-hidden="true">★</span> Video technique reviews <span class="pricing-included">included</span></li>
+        </ul>
+        <a href="/form.html?plan=match" class="btn btn-primary" aria-label="Apply Now: Match, 6 months">Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
+      </article>
+
+    </div>
+    <p class="pricing-note reveal">All prices are in US dollars. You pay in advance, after we have talked.</p>
+
+  </div>
+</section>
+
+<!-- ═══ FIT CHECK ═══ -->
+<section class="sec" aria-labelledby="for-title">
+  <div class="sec-num" aria-hidden="true">04</div>
+  <div class="container">
+    <span class="kicker reveal">Fit Check</span>
+    <h2 id="for-title" class="sec-h reveal reveal-d1">Built for<br><em>Competitive Players</em></h2>
+    <p class="sec-sub reveal reveal-d2">This is not a gym plan with a racket added. I build it around how you move on court: fast starts, hard stops, long rallies, big rotation.</p>
+
+    <div class="for-grid">
+      <div class="for-col for-col--yes reveal reveal-d3">
+        <div class="for-col-title yes">✓ Built for you if</div>
+        <div class="for-item"><span class="for-icon check">+</span>You play competitive tennis or padel, from club level to international.</div>
+        <div class="for-item"><span class="for-icon check">+</span>You train or play several times a week and need S&amp;C that fits around it.</div>
+        <div class="for-item"><span class="for-icon check">+</span>You want structure and steady progress, not random workouts.</div>
+      </div>
+      <div class="for-col for-col--no reveal reveal-d4">
+        <div class="for-col-title no">✗ Not the right fit if</div>
+        <div class="for-item"><span class="for-icon cross">–</span>You want generic workout templates or a fitness app.</div>
+        <div class="for-item"><span class="for-icon cross">–</span>You want a coach who just tells you what you want to hear.</div>
+        <div class="for-item"><span class="for-icon cross">–</span>You are not ready to follow a plan week after week.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ THE APP (dark stage) ═══ -->
 <section class="sec sec--dark" id="system" aria-labelledby="demo-title">
   <div class="sec-num" aria-hidden="true">05</div>
   <div class="orb orb--green" aria-hidden="true"></div>
   <div class="container">
     <span class="kicker reveal">Your Training System</span>
-    <h2 id="demo-title" class="sec-h reveal reveal-d1" style="color:#fff;">Not a PDF.<br><em>An Experience.</em></h2>
-    <p class="lead sec-sub reveal reveal-d2">Every athlete receives their programme through a custom-built interactive platform. No app downloads, no spreadsheets — just open the link and train. Your data feeds directly into every check-in I run.</p>
+    <h2 id="demo-title" class="sec-h reveal reveal-d1" style="color:#fff;">Your programme<br><em>lives in an app.</em></h2>
+    <p class="lead sec-sub reveal reveal-d2">You sign in with a username and a password. There is nothing to download and no spreadsheet. What you log goes straight into my weekly check-in.</p>
 
     <div class="demo-launch reveal reveal-d2">
       <a href="/program.html?client=demo" class="btn btn-primary" target="_blank" rel="noopener">Try the live demo <span class="arrow-r" aria-hidden="true">→</span></a>
-      <span class="demo-launch-note">Opens a real sample program — explore it like an athlete would. No sign-up.</span>
+      <span class="demo-launch-note">Opens a real sample programme. Explore it like an athlete would. No sign-up.</span>
     </div>
 
     <div class="demo-layout">
@@ -1342,26 +1455,17 @@
             <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" pathLength="1"/><path d="M15.5 8.5l-2.4 4.6-4.6 2.4 2.4-4.6z" pathLength="1"/></svg>
           </div>
           <div>
-            <div class="demo-feature-title">Pre-Session Readiness Check</div>
-            <div class="demo-feature-body">Before each session you rate your sleep, energy, soreness and stress. The session adapts to how you actually walked in — and your scores feed straight to me.</div>
-          </div>
-        </div>
-        <div class="demo-feature reveal reveal-d2">
-          <div class="demo-feature-icon" aria-hidden="true">
-            <svg class="ico" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" pathLength="1"/><path d="M8.5 12.5l2.5 2.5 5-5.5" pathLength="1"/></svg>
-          </div>
-          <div>
-            <div class="demo-feature-title">Session Checklist</div>
-            <div class="demo-feature-body">Tap through exercises as you complete them. Visual progress tracking keeps you locked in through every session.</div>
+            <div class="demo-feature-title">Readiness Check</div>
+            <div class="demo-feature-body">Before each session you rate your sleep, energy, soreness and stress. The session adapts to how you walked in, and your scores come straight to me.</div>
           </div>
         </div>
         <div class="demo-feature reveal reveal-d3">
           <div class="demo-feature-icon" aria-hidden="true">
-            <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8" pathLength="1"/><path d="M12 9v4l3 2M10 2h4" pathLength="1"/></svg>
+            <svg class="ico" viewBox="0 0 24 24"><path d="M3 21h18" pathLength="1"/><path d="M6 21V13M11 21V8M16 21V11M21 21V5" pathLength="1"/></svg>
           </div>
           <div>
-            <div class="demo-feature-title">Built-In Rest Timer</div>
-            <div class="demo-feature-body">Preset rest intervals per exercise. No more guessing or scrolling through your phone mid-set.</div>
+            <div class="demo-feature-title">Log As You Go</div>
+            <div class="demo-feature-body">Tick off each exercise, log your loads and your effort (RPE), and use the built-in rest timer. It all feeds my next check-in.</div>
           </div>
         </div>
         <div class="demo-feature reveal reveal-d4">
@@ -1370,21 +1474,12 @@
           </div>
           <div>
             <div class="demo-feature-title">Coaching Cues</div>
-            <div class="demo-feature-body">Every exercise includes embedded cues — what to focus on, what to avoid. Like having your coach in the room with you.</div>
-          </div>
-        </div>
-        <div class="demo-feature reveal reveal-d5">
-          <div class="demo-feature-icon" aria-hidden="true">
-            <svg class="ico" viewBox="0 0 24 24"><path d="M3 21h18" pathLength="1"/><path d="M6 21V13M11 21V8M16 21V11M21 21V5" pathLength="1"/></svg>
-          </div>
-          <div>
-            <div class="demo-feature-title">Weight &amp; RPE Logging</div>
-            <div class="demo-feature-body">Log your loads and perceived exertion directly inside the programme. Your data feeds into every check-in and adjustment I make.</div>
+            <div class="demo-feature-body">Every exercise has cues: what to focus on and what to avoid. Like having your coach in the room.</div>
           </div>
         </div>
       </div>
 
-      <div class="reveal reveal-d3">
+      <div class="platform-phone reveal reveal-d3" aria-hidden="true">
         <div class="phone-wrap">
           <div class="phone-orbit" aria-hidden="true"></div>
           <div class="phone-mockup" aria-hidden="true">
@@ -1409,21 +1504,21 @@
                 <div class="mini-section-label">Warm-Up</div>
                 <div class="mini-exercise">
                   <div class="mini-ex-main">
-                    <div class="mini-checkbox" data-seq="1"></div>
+                    <div class="mini-checkbox"></div>
                     <div><div class="mini-ex-name">Bike</div><div class="mini-chips"><span class="mini-chip" style="background:#EDE8E0;color:var(--text-muted);">5 min</span></div></div>
                   </div>
                 </div>
                 <div class="mini-section-label">Plyometrics</div>
                 <div class="mini-exercise">
                   <div class="mini-ex-main">
-                    <div class="mini-checkbox" data-seq="2"></div>
+                    <div class="mini-checkbox"></div>
                     <div><div class="mini-ex-name">Broad Jump</div><div class="mini-chips"><span class="mini-chip">3 Sets</span><span class="mini-chip">×5</span></div></div>
                   </div>
                 </div>
                 <div class="mini-section-label">Strength</div>
                 <div class="mini-exercise">
                   <div class="mini-ex-main">
-                    <div class="mini-checkbox" data-seq="3"></div>
+                    <div class="mini-checkbox"></div>
                     <div><div class="mini-ex-name">Back Squat</div><div class="mini-chips"><span class="mini-chip y">4 Sets</span><span class="mini-chip">×6</span><span class="mini-chip">3-1-1</span></div></div>
                   </div>
                   <div class="mini-cue-row">
@@ -1434,7 +1529,7 @@
                 </div>
                 <div class="mini-exercise">
                   <div class="mini-ex-main">
-                    <div class="mini-checkbox" data-seq="4"></div>
+                    <div class="mini-checkbox"></div>
                     <div><div class="mini-ex-name">Single-Leg Hip Lift</div><div class="mini-chips"><span class="mini-chip">3 Sets</span><span class="mini-chip">×10+10</span></div></div>
                   </div>
                 </div>
@@ -1455,13 +1550,13 @@
   </div>
 </section>
 
-<!-- ═══ LIBRARY — the Two Doors ═══ -->
+<!-- ═══ LIBRARY (the Two Doors) ═══ -->
 <section class="sec" id="library" aria-labelledby="library-title">
   <div class="sec-num" aria-hidden="true">06</div>
   <div class="container">
     <span class="kicker reveal">More Than Your Programme</span>
     <h2 id="library-title" class="sec-h reveal reveal-d1">Sessions &amp; the<br><em>Tennis Playbook</em></h2>
-    <p class="sec-sub reveal reveal-d2">Your programme is the core — but inside the app you also get two extras, at no extra cost: workouts to run on your own, and a growing knowledge base for your game.</p>
+    <p class="sec-sub reveal reveal-d2">Your programme is the core. Inside the app you also get two extras at no extra cost.</p>
 
     <div class="doors">
       <a class="door door--sessions reveal reveal-d2" href="/program.html?client=demo" target="_blank" rel="noopener">
@@ -1469,7 +1564,7 @@
         <div class="door-inner">
           <div class="door-kicker">On-Demand Workouts</div>
           <div class="door-title">Free Sessions</div>
-          <div class="door-body">A shelf of ready-to-run workouts, drills and resets — for a travel day, a busy week, or active recovery. Pick one, press play, and follow the same clear exercise cards with video and cues.</div>
+          <div class="door-body">A shelf of ready-to-run workouts and resets for a travel day, a busy week or active recovery. Pick one and press play.</div>
           <span class="door-cta">Step inside <span class="arrow-r" aria-hidden="true">→</span></span>
         </div>
       </a>
@@ -1478,7 +1573,7 @@
         <div class="door-inner">
           <div class="door-kicker">Knowledge Library</div>
           <div class="door-title">The Tennis Playbook</div>
-          <div class="door-body">Everything a tennis player or coach needs to improve on court — coach-published guides on pre-competition prep, recovery, the mental game, nutrition &amp; supplements, and deeper material for coaches.</div>
+          <div class="door-body">Guides for tennis players and coaches on competition prep, recovery, the mental game and nutrition.</div>
           <span class="door-cta">Step inside <span class="arrow-r" aria-hidden="true">→</span></span>
         </div>
       </a>
@@ -1521,7 +1616,7 @@
   <div class="container">
     <span class="kicker reveal">Background</span>
     <h2 id="about-title" class="sec-h reveal reveal-d1">Built on <em>Science</em><br>&amp; Court Time</h2>
-    <p class="sec-sub reveal reveal-d2">I don't just write programmes for tennis athletes — I've been one for 15 years. That lived experience shapes every decision in your training.</p>
+    <p class="sec-sub reveal reveal-d2">I do not just write programmes for tennis players. I have been one for 15 years. That shapes every decision in your training.</p>
 
     <div class="about-layout">
       <div class="coach-frame reveal reveal-d2">
@@ -1539,47 +1634,23 @@
           </div>
           <h3 class="about-block-title">Education</h3>
           <ul>
-            <li><span class="about-hl">MSc Strength &amp; Conditioning</span> — from one of the world's leading programmes in the field</li>
-            <li><span class="about-hl">MSc Applied Exercise Physiology</span> — a second master's degree deepening the science behind training adaptation</li>
+            <li><span class="about-hl">MSc Strength &amp; Conditioning</span></li>
+            <li><span class="about-hl">MSc Applied Exercise Physiology</span>, a second master's degree on the science of how training works</li>
             <li>Working toward CSCS certification</li>
-            <li>Ongoing CPD in motor learning, periodisation, and sport-specific conditioning</li>
           </ul>
         </div>
         <div class="about-block reveal reveal-d3">
           <div class="about-block-icon">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" pathLength="1"/><path d="M12 5v14M3 12h4M17 12h4" pathLength="1"/><circle cx="12" cy="12" r="2.6" pathLength="1"/></svg>
           </div>
-          <h3 class="about-block-title">Coaching Experience</h3>
+          <h3 class="about-block-title">On Court and in the Gym</h3>
           <ul>
-            <li>7+ years as a strength &amp; conditioning coach</li>
-            <li>1000+ tennis and padel players coached across competition levels</li>
+            <li>7+ years as a strength and conditioning coach</li>
+            <li>1000+ tennis and padel players coached, from club level to international</li>
             <li>Experience with Olympic-level and international athletes</li>
-            <li><span class="about-hl">Tennis coaching qualified</span> — understands the sport from both sides</li>
-            <li>15 years of competitive tennis playing experience</li>
-          </ul>
-        </div>
-        <div class="about-block reveal reveal-d3">
-          <div class="about-block-icon">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4l2-5 3 9 2.5-6 1.5 2h5" pathLength="1"/></svg>
-          </div>
-          <h3 class="about-block-title">Approach</h3>
-          <ul>
-            <li>Evidence-based programming informed by current research — not trends</li>
-            <li>Ecological dynamics and constraints-led methodology</li>
-            <li>Periodised training aligned to competitive calendars and season demands</li>
-            <li>Integration of physical conditioning with on-court skill development</li>
-          </ul>
-        </div>
-        <div class="about-block reveal reveal-d4">
-          <div class="about-block-icon">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" pathLength="1"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1" pathLength="1"/></svg>
-          </div>
-          <h3 class="about-block-title">The Difference</h3>
-          <ul>
-            <li>Every programme is built from scratch — no templates, no shortcuts</li>
-            <li>Interactive programme delivery with session tracking built in</li>
-            <li>Weekly check-ins with continuous programme adjustment</li>
-            <li>Deload weeks, load management, and competition tapering built into the structure</li>
+            <li><span class="about-hl">Tennis coaching qualified</span>, so I know the sport from both sides</li>
+            <li>15 years of competitive tennis</li>
+            <li>Programming built on current research, not trends</li>
           </ul>
         </div>
       </div>
@@ -1593,66 +1664,37 @@
   <div class="container">
     <span class="kicker reveal">Common Questions</span>
     <h2 id="faq-title" class="sec-h reveal reveal-d1">Before You <em>Apply</em></h2>
-    <p class="sec-sub reveal reveal-d2">The questions athletes ask me most — before we ever speak.</p>
+    <p class="sec-sub reveal reveal-d2">The questions athletes ask me most, before we ever speak.</p>
 
     <div class="faq-list reveal reveal-d2">
       <details class="faq-item">
-        <summary>Do I need access to a gym?</summary>
-        <p>Ideally yes, but a home-gym setup works too. During your intake call we map out exactly what equipment you have or can get, and I build the programme around that. You don't need a fully-kitted commercial gym to get real, measurable results.</p>
+        <summary>How does payment work?</summary>
+        <p>You apply and we talk. Then you message me on WhatsApp or Instagram to pay, and I write your programme. You pay in advance. The fee is for the work I do, so I do not give refunds once I have started your programme. You must be 18 or over to buy. If the athlete is under 18, a parent or guardian applies and pays.</p>
       </details>
       <details class="faq-item">
-        <summary>I travel for tournaments — how does that work?</summary>
-        <p>Travel is built into the plan from day one. Your programme includes travel-friendly sessions that can be done with minimal equipment, plus competition-week tapering so you arrive at tournaments feeling sharp — not smashed from a heavy lifting session two days earlier.</p>
+        <summary>Do I need access to a gym?</summary>
+        <p>Ideally yes, but a home gym works too. On your intake call we work out what equipment you have or can get, and I build the programme around it. You do not need a fully kitted commercial gym to get real results.</p>
+      </details>
+      <details class="faq-item">
+        <summary>I travel for tournaments. How does that work?</summary>
+        <p>Travel is part of the plan from day one. Your programme includes sessions you can do with minimal equipment. In competition weeks I taper, so you arrive sharp and not sore from a heavy session two days before.</p>
       </details>
       <details class="faq-item">
         <summary>Can I combine this with my tennis coach's programming?</summary>
-        <p>Yes — and I strongly encourage it. Strength &amp; conditioning is the layer underneath your on-court work, not a replacement for it. I'll happily coordinate load with your tennis coach if useful, so your gym and court sessions work together instead of fighting each other.</p>
+        <p>Yes, and I encourage it. S&amp;C is the layer under your on-court work, not a replacement for it. I am happy to share load with your tennis coach, so your gym and court sessions work together.</p>
       </details>
       <details class="faq-item">
         <summary>What if I get injured mid-programme?</summary>
-        <p>We adapt. I've worked through hundreds of in-season niggles and injuries with athletes. Your programme gets adjusted immediately — often maintaining or even building strength in areas that aren't affected, so you come back fitter than you left.</p>
+        <p>We adapt. I have worked through hundreds of in-season niggles and injuries with athletes. Your programme changes straight away. Often we keep building strength in the areas that are not affected, so you come back fitter.</p>
       </details>
       <details class="faq-item">
         <summary>How much time per week does it take?</summary>
-        <p>Typically 2–4 sessions per week, 45–60 minutes each. The exact volume is calibrated to your on-court hours, your season phase, and how your body is responding — not a rigid template. Most athletes find it slots neatly around their existing training.</p>
+        <p>Usually 2 to 4 sessions a week, 45 to 60 minutes each. The exact amount depends on your on-court hours, your season and how your body responds. Most athletes fit it around their existing training.</p>
       </details>
       <details class="faq-item">
         <summary>How is this different from a workout app?</summary>
-        <p>An app gives you a workout. I give you a coach. Your programme is designed for your body and your competitive calendar, reviewed and adjusted by me every month, and delivered through an interactive platform where your data feeds directly into the next block of training. There's a human being on the other end of it — that's the whole point.</p>
+        <p>An app gives you a workout. I give you a coach. Your programme is built for your body and your calendar. I check in with you every week and update your programme every month, and what you log feeds the next block of training. There is a person on the other end. That is the point.</p>
       </details>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ CONTACT ═══ -->
-<section class="sec sec--band" id="contact" aria-labelledby="contact-title">
-  <div class="container">
-    <span class="kicker reveal">Get in Touch</span>
-    <h2 id="contact-title" class="sec-h reveal reveal-d1">Reach Out <em>Directly</em></h2>
-    <p class="sec-sub reveal reveal-d2">Have a question before applying? Send me a message — I usually reply within 24 hours.</p>
-
-    <div class="contact-grid">
-      <a href="https://wa.me/447435363461" target="_blank" rel="noopener" class="contact-card reveal reveal-d2">
-        <div class="contact-icon" aria-hidden="true">
-          <svg class="ico" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3z" pathLength="1"/><path d="M8.5 9.5c.5 3 3 5.5 6 6l1.5-1.5-2-1.5-1 .7a5.4 5.4 0 0 1-2.2-2.2l.7-1-1.5-2z" pathLength="1"/></svg>
-        </div>
-        <div class="contact-label">WhatsApp</div>
-        <div class="contact-value">+44 7435 363461</div>
-      </a>
-      <a href="https://instagram.com/amirardekanian" target="_blank" rel="noopener" class="contact-card reveal reveal-d3">
-        <div class="contact-icon" aria-hidden="true">
-          <svg class="ico" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5" pathLength="1"/><circle cx="12" cy="12" r="4" pathLength="1"/><path d="M17.2 6.8h.01" pathLength="1"/></svg>
-        </div>
-        <div class="contact-label">Instagram</div>
-        <div class="contact-value">@amirardekanian</div>
-      </a>
-      <a href="https://www.linkedin.com/in/amirardekanian/" target="_blank" rel="noopener" class="contact-card reveal reveal-d4">
-        <div class="contact-icon" aria-hidden="true">
-          <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2" pathLength="1"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18" pathLength="1"/></svg>
-        </div>
-        <div class="contact-label">LinkedIn</div>
-        <div class="contact-value">Amirhossein Ardekanian</div>
-      </a>
     </div>
   </div>
 </section>
@@ -1665,9 +1707,10 @@
   <div class="container cta-inner">
     <span class="kicker reveal">Limited Availability</span>
     <h2 id="cta-title" class="cta-heading reveal reveal-d1">Ready to Train<br><em>With Intent?</em></h2>
-    <p class="cta-sub reveal reveal-d2">I work with a small number of athletes at a time to ensure quality. Fill out the application and I'll be in touch within 48 hours to discuss whether we're a good fit and which programme suits you.</p>
+    <p class="cta-sub reveal reveal-d2">I work with a small number of athletes at a time, so each one gets proper attention. Fill in the application and I will reply within 48 hours to talk about whether we are a good fit and which programme suits you.</p>
     <a href="/form.html" class="btn btn-primary reveal reveal-d3" data-magnet>Apply Now <span class="arrow-r" aria-hidden="true">→</span></a>
     <div class="cta-note reveal reveal-d4">Application takes about 3 minutes · No commitment until we speak</div>
+    <p class="cta-ask reveal reveal-d4">A question first? <a href="https://wa.me/447435363461" target="_blank" rel="noopener">Message me on WhatsApp</a> or <a href="mailto:amirardekanian@gmail.com">email me</a>. I usually reply within 24 hours.</p>
   </div>
 </section>
 
@@ -1735,6 +1778,25 @@
       viewport.scrollTo({ left: target > maxScroll() - 10 ? 0 : target, behavior: 'smooth' });
     });
   }
+})();
+</script>
+
+<!-- ═══ Testimonials: Read more on a phone ═══ -->
+<script>
+(function () {
+  document.querySelectorAll('.testimonial-card').forEach(function (card) {
+    var q = card.querySelector('.testimonial-quote');
+    if (!q) return;
+    q.classList.add('clamp');
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'tq-more'; b.textContent = 'Read more'; b.setAttribute('aria-expanded', 'false');
+    q.after(b);
+    b.addEventListener('click', function () {
+      var open = q.classList.toggle('is-open');
+      b.textContent = open ? 'Show less' : 'Read more';
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
 })();
 </script>
 
@@ -1826,7 +1888,7 @@
 
   /* ── Hover physics: card tilt + magnetic buttons (fine pointers only) ── */
   if (!reduced && finePointer) {
-    document.querySelectorAll('.pricing-card, .contact-card, .about-block, .for-col').forEach(card => {
+    document.querySelectorAll('.pricing-card, .about-block, .for-col').forEach(card => {
       card.addEventListener('pointermove', (ev) => {
         const r = card.getBoundingClientRect();
         const rx = ((ev.clientY - r.top) / r.height - 0.5) * -4;
