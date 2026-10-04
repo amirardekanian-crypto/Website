@@ -40,9 +40,9 @@ One exercise per type he named, all five with no video today:
 | 3 | Only for clips that fail: an end picture and a redo pinned between the two | 2.5 each |
 | Optional | Amir's squat recording as the motion source (`video_references`, untried) | 3 |
 
-**Status:** step 1 approved, but Higgsfield refused every submission on 2026-10-04 with *"You've reached
-the daily generation limit for your grace period"* (no charge). His plan may be in a payment grace
-period. Step 1 is the five prompts below, ready to submit as they are; steps 2 and 3 each need his go.
+**Status:** step 1 done on 2026-10-04 (after Higgsfield's *"daily generation limit for your grace
+period"* refusals lifted: the plan renewed to 600 credits). Results and the two proposed redos are
+under the prompts. Step 2 and any redo each need Amir's go.
 
 ### Step 1: the start pictures
 
@@ -66,6 +66,20 @@ with space around them. Realistic photo. No text, no logos, no other people, no 
 
 Amir checks the five pictures before any clip is made.
 
+**Results (2026-10-04, 2.5 credits, balance 597.5).** One item first came back `429` (no charge) and went through on resubmit.
+
+| Index | Job id | Verdict |
+|---|---|---|
+| 41 pec deck | `c6407857-514a-49bb-bf92-fef8e0f11600` | good: believable machine, arms open, slight elbow bend, front view |
+| 42 straight-arm pulldown | `091b888d-be66-466b-9b04-1dba912baddd` | good: the cable runs from the high pulley to a short bar; the lean is on the deep side |
+| 43 EZ bar curl | `30e122c5-7b4b-428d-b4a1-e4d1fb9f9674` | **wrong**: in side view the bar runs front to back along his side, through where his thigh is. A side view of a bar held across the body is the trap: ask for a front view at a slight angle |
+| 44 single-leg RDL | `bd7855a0-7d2a-4749-913e-f585eff8c355` | good: tall on one leg, back foot just off the floor; the far dumbbell is hidden behind him |
+| 45 box squat | `f9caa7a8-75a9-4fbf-8b4b-b0ac7dfdf08e` | good, but his head is turned to the camera, which a clip would carry |
+
+Proposed redos (0.5 each, need his go), same opening and closing lines:
+- **43**: He stands tall in the middle of the room holding an EZ curl bar (a short zigzag-shaped barbell with one small black plate on each end) with an underhand grip, hands about shoulder-width apart. The bar runs across the front of his thighs from his left hand to his right hand, arms hanging straight, elbows by his sides. Seen from the front at a slight angle. He looks straight ahead, not at the camera.
+- **45**: the step 1 middle, plus: His head faces forward, the same way as his body, not toward the camera.
+
 ### Step 2: the clips (needs his go)
 
 `wan3_0`, `duration: 2`, `resolution: "480p"`, `generate_audio: false` (it defaults to true),
@@ -73,6 +87,18 @@ Amir checks the five pictures before any clip is made.
 `start_image`. The prompt describes the movement in plain physical words, built from the entry's Spine
 cues, phrased positively ("his elbows keep the same slight bend the whole time", never "don't let the
 arms bend"). Each clip is half a rep; played forward then reversed, it loops as a full rep.
+
+Every clip prompt opens with *Static locked-off camera, no camera movement, the same man in the same
+plain room as the first frame.* and closes with *Smooth, controlled, realistic movement with natural
+physics. The equipment keeps its shape. No text.* The middles:
+
+| Clip | Movement |
+|---|---|
+| 41 pec deck | Slowly he sweeps both handles forward and together in a wide arc until his hands meet in front of his chest, then holds there for a moment. His elbows keep the same slight bend the whole time, his back stays against the pad and his feet stay flat. |
+| 42 straight-arm pulldown | Keeping his arms long and straight, he sweeps the bar down in a smooth arc until it reaches the front of his thighs. Only his arms move, swinging from the shoulders; his hips, knees and torso stay where they are, and the cable stays attached to the bar and the pulley. |
+| 43 EZ bar curl | Keeping his elbows pinned at his sides and his body still, he curls the bar up in a smooth arc until it is just below his chin, then holds it there for a moment. Only his forearms move. |
+| 44 single-leg RDL | Keeping his standing knee slightly bent, he hinges forward at the hips over his standing leg while his free leg lifts straight behind him, until his body and back leg form one straight line almost parallel to the floor. His hips stay level and the dumbbells hang straight down below his shoulders. |
+| 45 box squat | Looking straight ahead, he sits his hips back and down, knees bending, until his glutes lightly touch the top of the box, then holds there. His heels stay flat and his chest stays up. |
 
 Prices checked 2026-10-04 with `get_cost` (re-check, they change): picture 0.5 · Wan 3.0 480p 2 s = 2
 (words only, from a start picture, or between a start and an end picture) · Wan 3.0 3 s with a video

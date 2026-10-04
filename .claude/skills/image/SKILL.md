@@ -309,6 +309,12 @@ Add a dated line whenever a round teaches something. This section is the reason 
 - **2026-09-20** — Shell notes for this PC: long heredocs fail (write the script with the Write tool, then run
   it); on localhost the course worker serves its old cached shell, so clear it before testing; the preview
   server can be stopped by the app between turns.
+- **2026-10-04 (exercise demos, `Content/exercise-demos/`)** — Two reference pictures (one athlete,
+  one empty room) passed as `image_references` kept the same man and room across five exercises, and a
+  machine and a cable tower came out believable first time. The one failure: asked for a **side view of a
+  bar held across the body**, the EZ bar came out running front to back along his side. Anything held
+  across the body needs a front view at a slight angle. Side views also turned his head to the camera
+  twice: say "he looks straight ahead, not at the camera".
 - **2026-09-26 (the muscle map)** — A diagram, not a picture: a flat vector chart generated once and
   TRACED into an SVG (`bodymap/`), so every exercise lights its own muscles with no further credits.
   What worked: dark background + mid-grey shapes + dark gaps (clean to segment), 2k at 1 credit,

@@ -340,4 +340,6 @@ The other two were refused, first `429 rate_limit_reached`, then *"daily generat
 
 Prompt, athlete: *Full-body photo of one athletic man in his late twenties, standing relaxed, turned three-quarters to the camera, arms by his sides. Plain dark t-shirt, dark shorts, plain dark trainers, short dark hair, calm neutral face. Plain light-grey background, soft even light, the whole body sharp from head to feet. Realistic photo. No text, no logos, no jewellery, no yellow.*
 
+The five test start pictures made from these two (job ids, verdicts, prompts) are in `Content/exercise-demos/README.md`.
+
 Prompt, gym: *An empty, very simple training room: a plain matte warm-grey wall and a dark grey rubber floor, soft even light, nothing else. Straight-on view at hip height, the wall filling the top two-thirds of the frame and the floor the bottom third. No equipment, no windows, no mirrors, no posters, no text, no logos, no people, no yellow.*
