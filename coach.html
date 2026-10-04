@@ -1140,6 +1140,9 @@ window.bulkCreateLogins = bulkCreateLogins;
 
    Runs entirely in Amir's signed-in session — RLS decides what it can read, so
    there is no service key anywhere. Download it weekly and keep it off this PC too.
+   Keep only the LAST 12 (Amir, 2026-10-04, "rolling"): the privacy notice promises that a
+   deleted record leaves the backups within about three months, so delete older files on
+   both copies. scripts/prune_backups.py lists them.
    ═══════════════════════════════════════════════════════════════════════════ */
 // ⚠️ This list must hold EVERY table in the public schema. A backup that
 // silently misses one is worse than no backup, because you only find out on the
@@ -1204,7 +1207,8 @@ async function downloadBackup(btn) {
   alert(`Backup downloaded — ${total} rows across ${Object.keys(out.tables).length} tables.\n\n` +
         counts.join('\n') +
         (problems.length ? '\n\nCould NOT read:\n' + problems.join('\n') : '') +
-        '\n\nKeep a copy somewhere that is not this computer.');
+        '\n\nKeep a copy somewhere that is not this computer.' +
+        '\n\nKeep only the last 12 weekly backups, on both, and delete older ones: the privacy notice promises a deleted record leaves the backups within about three months.');
 }
 
 // Upload the coaching-log markdown files. Multi-select the whole folder at once;
@@ -2294,7 +2298,7 @@ function renderAthletes() {
       </select>
       <button class="btn sm" onclick="pickProgramFile()" title="Publish a data/&lt;id&gt;.json written by the coaching pipeline">↑ Publish programme file</button>
       <button class="btn sm" onclick="pickCoachingLogs()" title="Upload .claude/coaching-log/*.md — coach-only, never shown to athletes">↑ Coaching logs</button>
-      <button class="btn sm" onclick="downloadBackup(this)" title="Download the whole database as one file. The free plan takes no automatic backups.">⤓ Backup</button>
+      <button class="btn sm" onclick="downloadBackup(this)" title="Download the whole database as one file. The free plan takes no automatic backups. Keep the last 12 and delete older ones (the privacy notice promises about three months).">⤓ Backup</button>
       ${(() => {
         // Only offer the move while something is still file-backed. Once every
         // programme is in the database this control has nothing left to do.

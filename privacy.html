@@ -7,6 +7,8 @@
 <meta name="description" content="Privacy notice for amirardekani.com, explaining how intake form data, anonymous analytics, and embedded YouTube content are handled under UK &amp; EU GDPR.">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://www.amirardekani.com/privacy.html">
+<link rel="alternate" hreflang="en" href="https://www.amirardekani.com/privacy.html">
+<link rel="alternate" hreflang="fa" href="https://www.amirardekani.com/privacy-fa.html">
 
 <meta name="theme-color" content="#FAF7F2">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -90,7 +92,7 @@
   .legal .short li { margin-bottom: 10px; color: var(--text-primary); }
   .legal .short li:last-child { margin-bottom: 0; }
   .legal .toc { margin: 0 0 8px; }
-  .legal .toc summary {
+  .legal .toc summary, .legal .fold summary {
     cursor: pointer; min-height: 44px; box-sizing: border-box; padding: 12px 0;
     font-family: var(--font-mono); font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
     color: var(--accent);
@@ -99,6 +101,9 @@
   .legal .toc li { margin: 0; break-inside: avoid; }
   .legal .toc a { display: flex; align-items: center; min-height: 44px; border-bottom: 0; }
   .legal .toc a:hover { text-decoration: underline; }
+  .legal .fold { margin: 0 0 14px; }
+  .legal .fa-note { letter-spacing: 0; margin-top: 4px; }
+  .legal .fa-note a { display: inline-flex; align-items: center; min-height: 44px; }
 </style>
 <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
 </head>
@@ -115,6 +120,7 @@
 
   <div class="lead-box">
     <p>This notice explains what personal data I collect when you use <strong>amirardekani.com</strong>, how I use it, and the rights you have under the UK General Data Protection Regulation (UK GDPR) and the EU General Data Protection Regulation (EU GDPR). It is written to be readable &mdash; if anything is unclear, email me and I will explain.</p>
+    <p class="fa-note" lang="fa" dir="rtl"><a href="/privacy-fa.html" hreflang="fa">خلاصه‌ی فارسی</a></p>
   </div>
 
   <section class="lead-box short" aria-labelledby="short">
@@ -125,7 +131,7 @@
       <li>I use it to coach you and to run the apps. I do not sell it, show ads or build marketing profiles.</li>
       <li>Your records in my database can be read by you and me only. The one exception is the leaderboard: if you train with me, you join it after your first workout, and other athletes see your board name, points and rank. You can leave in one tap.</li>
       <li>Some companies handle data for me: Supabase (my database, in London), Web3Forms (form emails), Plausible (visit counts, no cookies), GitHub (hosting), jsDelivr (loads code for the apps), Anthropic (Claude helps me write programmes and I check every one) and Google (fonts on a few pages, YouTube when you press play).</li>
-      <li>I keep your application while you coach with me and for up to 24 months after. Ask me and I delete it sooner. Backup files and email copies are the exception (<a href="#retention">section 4</a>).</li>
+      <li>I keep your application while you coach with me and for up to 24 months after. Ask me and I delete it sooner. It leaves my weekly backups within about three months (<a href="#retention">section 4</a>).</li>
       <li>You can ask to see, fix, delete or move your data, or object to how I use it. I reply within a month. You can also complain to the ICO (<a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer">ico.org.uk</a>).</li>
     </ol>
   </section>
@@ -169,6 +175,8 @@
   <p>If you are a coaching client using your private training app, the app records your training progress &mdash; which sessions and exercises you complete, weights logged, effort (RPE) ratings, pre-session readiness check-ins, and any notes you add. Your check-in answers also set that day&rsquo;s targets in the app (on a lower day, for example, every effort target one lower); that is worked out on your phone, and the kind of day it chose, and whether you chose to train as written instead, is saved with the session. This information is saved on your device and also backed up to a secure database provided by <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase</a> (London, UK), so that I, as your coach, can review your progress and support your training. Only I can access it; Supabase acts as a processor on my behalf. This data is kept for as long as you are an active coaching client and removed on request.</p>
 
   <h3 id="app">2.2 Programme app data</h3>
+  <details class="fold">
+    <summary>Read the details</summary>
   <p>If I build a programme for you, you open it at <code>amirardekani.com/program.html</code> and sign in with the username and password I give you. The programme itself is kept in the same private database as your progress (below), readable only by you and me. The app also uses your browser&rsquo;s <strong>local storage</strong> on your device to remember your progress (completed sessions, weight logs, RPE scores, session notes, readiness answers, and interface preferences), so that it works without a signal. It also keeps <strong>a copy of the last version of your programme it loaded</strong>, so that the programme opens without one too (in a basement gym, for example). Only one programme is ever kept this way: yours is replaced each time the app loads it again, and it is deleted when you sign out, if someone else signs in on the same device, or if my server stops accepting your sign-in. Signing out (your initials, top right, then <strong>Sign out</strong>) first sends anything still waiting, and your progress stays on the phone for your next sign-in. The habit tracker (section 2.3) reads your name from the same copy, so it opens without signal too. Clearing your browser data deletes it.</p>
   <p><strong>This progress is also backed up to my database</strong> so that I can coach you properly: I need to see whether you finished a session, what you lifted, and what you told me about it. The backup is hosted on <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase</a> (London, UK). Your record is tied to your own sign-in (a username and password), and nobody but you and me can read it &mdash; other athletes cannot. The app no longer has a chat: you message me on WhatsApp, which keeps those conversations under <a href="https://www.whatsapp.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">its own privacy policy</a>. Messages you sent through the app&rsquo;s old chat (removed on 26 September 2026) stay in the same database until you ask me to delete them. If you clear your browser data, the local copy is deleted but the backup remains until you ask me to delete it (see section 6).</p>
   <p><strong>When you finish a session</strong> (you rate it and tap Done), the app also emails me a summary of it: the day, the exercises and what you logged, how long it took, your readiness answers, your rating and your note. It goes through <a href="https://web3forms.com/privacy" target="_blank" rel="noopener noreferrer">Web3Forms</a>, the same form-relay service as the application form. If you have no signal, the summary waits on your phone and goes by itself once you do; it is kept only on that phone, never copied to another device, and deleted from it once it has gone.</p>
@@ -177,8 +185,11 @@
   <p>That screen also shows your strength <strong>relative to your body weight</strong>, because for a racket-sport player that ratio matters more than the raw kilos. To do that it uses your <strong>most recent body-weight reading</strong> (section 2.3) &mdash; the same private record, your own data, shown only back to you on your own device. If you have never logged a weight, the app asks you to add one rather than showing anything.</p>
   <p>If you signed up through a <strong>partner tennis academy</strong> rather than directly with me, a summary of your training and recovery goes to your coach at that academy. That is part of the arrangement between me and the academy, and it is stated on the sign-up form before you join. It covers what you did and when &mdash; never your messages to me, your health answers, your body weight or your leaderboard activity.</p>
   <p><strong>Lawful basis:</strong> contract (Article 6(1)(b)) &mdash; delivering the coaching you have paid for.</p>
+  </details>
 
   <h3 id="habits">2.3 Habit tracker and leaderboard</h3>
+  <details class="fold">
+    <summary>Read the details</summary>
   <p>The habit tracker at <code>amirardekani.com/habits.html</code> (the same sign-in) works the same way: what you tick off each day is stored on your device first and backed up to the same private record. Your points and levels are calculated from that history &mdash; they are never stored, only recomputed. The one exception is the <strong>titles you unlock by levelling up</strong>: a record that you reached a level is kept, so that a reward stays yours after the scores reset each season. It is a list of title names against your athlete ID and nothing else. You can correct or fill in the last few days of your own log inside the app; older days are closed to editing.</p>
   <p><strong>Body weight is recorded in the programme app, not the habit tracker</strong> (it moved there in September 2026; readings taken before the move came with it and nothing was lost). It is a standard part of the programme app, and nothing is recorded until you enter a reading. Each reading you enter is kept as a date and a number in kilograms, in the same private record as the rest of your training history, and is used for one purpose: so that you and I can see the trend while I coach you. It is <strong>never shown to other athletes</strong> &mdash; not on the leaderboard, not in Roll Call, not in any form &mdash; and it earns no points, so it cannot appear indirectly through your score either. You can delete <strong>any single reading</strong> from its row in the history, or <strong>every reading you have ever logged</strong> in one action from the same screen. You can still ask me to delete them instead, or as part of deleting the rest of your data (see section 6).</p>
   <p><strong>Lawful basis:</strong> legitimate interests (Article 6(1)(f) UK/EU GDPR) &mdash; letting you and me see the trend behind a number you have chosen to log, as part of the coaching relationship, weighed against your right to object to this specific processing at any time: nothing is recorded unless you enter a reading yourself, and every reading can be deleted in one action from the same screen, rather than by a form or a request to me.</p>
@@ -186,6 +197,7 @@
   <p>The tracker includes a <strong>leaderboard</strong>, and <strong>everyone training with me is on it</strong>. You are added automatically once you have finished your first workout in the programme app, rather than being asked to join. The app tells you this before it happens &mdash; its tour and the Crew tab show the name you will appear under, let you change it, and let you <strong>keep yourself off the board</strong> in advance with one tap &mdash; and again afterwards: a banner on the day screen says you are on the board, shows the name other athletes see, and takes you straight to the setting &mdash; not only in this notice. <strong>You can leave at any time</strong> from inside the app (Settings &rarr; Crew board), and leaving removes your entry immediately and for good: you are not added back. While you are on it, other athletes can see the <strong>display name</strong> shown on that banner &mdash; by default your first name and the initial of your surname, for example &ldquo;Alex R.&rdquo;, which you can change to anything you like, including something that is not your name &mdash; your <strong>points and rank</strong>, and the <strong>title you have chosen to show</strong>, if any. A title is a reward you unlock by levelling up (such as &ldquo;Ironclad&rdquo;); showing one is optional, you choose which, and you can show none. Your habits, your logs, your programme, your real name and your athlete ID are never shared. Only signed-in athletes can view the board; it is not public, and it is not indexed or shared outside it. <strong>One board is shared by everyone using the tracker</strong> &mdash; both my coaching clients and people using the free tracker without coaching &mdash; so the athletes who can see your entry are not only my clients. You can rename yourself or leave at any time from inside the app, and leaving removes your entry immediately.</p>
   <p>Being on the board also lets you use <strong>Roll Call</strong>: one short sentence a day that other athletes on the board can read. This is <strong>entirely voluntary</strong> &mdash; you never have to write one, and the tracker works exactly the same if you do not. If you do write one, four things are visible to the other athletes on the board for seven days: your <strong>display name</strong>, the <strong>title you have chosen to show</strong> (if any), the <strong>sentence you wrote</strong>, and <strong>how much of that day&rsquo;s habits you had completed</strong>, as a single percentage. Habits are not all worth the same &mdash; a training session counts for more than a supplement &mdash; so that one number is weighted, and a reader who knows the weights could make a reasonable guess at which habits were behind it. It is still one number: the app never sends the list. <strong>Please do not put anything sensitive in it</strong> &mdash; in particular nothing about your health, injuries, medication or anything else you would not want another client to read. You can change or delete your sentence at any time before midnight, after which it stays as written. Leaving the leaderboard immediately hides every sentence you have written, and you can ask me to delete them outright (see section 6). I can also remove any line from the wall myself.</p>
   <p><strong>Lawful basis:</strong> legitimate interests (Article 6(1)(f) UK/EU GDPR) for the leaderboard entry itself &mdash; a shared board is part of how this coaching programme works, and the information shown is limited to a changeable display name, a score, a rank and a title you choose to show, weighed against your right to object at any time by leaving, which is a single tap inside the app rather than a request to me. It is <strong>not</strong> described as consent, because you are added without being asked and consent has to be a real choice made in advance. <strong>Roll Call remains consent</strong> (Article 6(1)(a)) &mdash; nothing is shown unless you write it, and you can delete it.</p>
+  </details>
 
   <h3 id="jump-test">2.4 Jump test</h3>
   <p>The jump test at <a href="/jump.html">amirardekani.com/jump.html</a> is different from everything else on this page: <strong>nothing you put into it ever leaves your device</strong>. There is no account, no login and no backend.</p>
@@ -231,7 +243,8 @@
   <p>Habit-tracker signups (section 2.5) are retained for as long as you use the tracker, and deleted on request &mdash; contact details, logged history, body-weight readings, board entry and unlocked titles together.</p>
   <p>Plausible&rsquo;s aggregate, anonymous analytics data is retained by Plausible per their policy and cannot be linked back to you individually.</p>
   <p>Local-storage data on your device persists until you clear it yourself.</p>
-  <p><strong>Backups and email copies.</strong> Once a week I download a backup of my database and keep the files. Each form you send also arrives as an email in my inbox (section 2.1). These are the one exception to the retention periods and deletion promises in this notice: if I delete your data from the database, copies in older backup files and in my inbox stay until I delete those files and emails myself, and I do not clear them out on a schedule.</p>
+  <p><strong>Backups.</strong> Once a week I download a backup of my database. I keep the backups from the last 12 weeks and delete older ones, so if I delete your data from the database, it leaves my backups within about three months.</p>
+  <p><strong>Email copies.</strong> Each form you send also arrives as an email in my inbox (section 2.1). I do not clear those out on a schedule, so ask me and I delete yours.</p>
 
   <h2 id="transfers">5. International transfers</h2>
   <p>Web3Forms, Plausible, GitHub, jsDelivr (the code library, section 2.8), Anthropic (the AI assistant, section 2.9) and Google (YouTube and Google Fonts) are operated by organisations that may process data in the UK, EU, or other jurisdictions (including the United States). Where data leaves the UK or the EEA, these providers rely on appropriate safeguards such as Standard Contractual Clauses or adequacy decisions. You can review each provider&rsquo;s policy via the links above.</p>
@@ -266,5 +279,11 @@
 <footer class="site-footer" id="site-footer"></footer>
 
 <script defer src="/assets/js/shared.js?v=20261002f"></script>
+<script>
+  /* a printed or saved copy of the notice should carry every paragraph, folded or not */
+  window.addEventListener('beforeprint', function () {
+    document.querySelectorAll('.legal details').forEach(function (d) { d.open = true; });
+  });
+</script>
 </body>
 </html>

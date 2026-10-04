@@ -110,7 +110,11 @@ in `public.coaching_logs`, coach-only, with no athlete arm at all.
 **⚠️ There are NO automatic backups.** The Supabase project is on the free plan. 378
 session logs and every progress blob exist in exactly one place. coach.html → Athletes →
 **⤓ Backup** downloads the whole database as one JSON file; do it weekly and keep a copy
-off the machine.
+off the machine. **Keep only the last 12 weekly files** (`aa-backup-<date>.json`), on this PC
+and on the off-machine copy, and delete older ones (Amir, 2026-10-04: "rolling"). The privacy
+notice (section 4, line 6 of its short version, and `privacy-fa.html`) promises that a deleted
+record leaves the backups within about three months, so a backup kept longer makes it false.
+`python scripts/prune_backups.py <folder>` lists what is older (add `--delete` to remove it).
 
 ## The athlete app (`program.html`) — read `PROGRAM-APP.md` before changing it
 
