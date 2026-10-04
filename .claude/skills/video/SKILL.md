@@ -319,6 +319,11 @@ Add a dated line whenever a round teaches something. This section is the reason 
   path; a plain "most different from the first frame" stops growing on a big movement and cut an RDL a third short).
   Kling 3.0 (3 s minimum, 4.5 credits, 1280×716 at 24 fps) stopped and held instead, and kept a pulldown's torso angle
   where Wan let it rise; both bent a pec deck's elbows into a press.
+- **2026-10-04 (exercise demos)** — **`end_image` (a finish picture) works when the model's own path can reach it, and
+  snaps when it cannot.** Wan pinned to a long-armed pec deck finish kept the arms long (the fix); Wan pinned to a
+  hinged pulldown finish still stood him up and then jumped onto the picture in the last two frames (hips back, the
+  cable tower moved). `make_loop.py` now detects that snap and cuts before it. Passing the expected
+  `declined_preset_id` on the first submission skips the preset round trip.
 - **2026-09-20** — A video plate reel is cheap to build once the renderer protocol exists: four clips, 2.4 MB embedded, a 20 s
   MP4 in 35 s. The cost was the 30.5 credits, and 7 of them (the lean run) delivered two of the four clips.
 

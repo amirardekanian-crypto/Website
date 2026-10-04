@@ -83,7 +83,17 @@ for i in range(n):
 for m_ in range(n):                     # shortest paths (Floyd-Warshall; n is under 200)
     G = np.minimum(G, G[:, m_:m_ + 1] + G[m_:m_ + 1, :])
 
-along = G[0]
+# A clip pinned to a finish picture often drifts away from it and then SNAPS onto it in the last frames (the
+# 2026-10-04 pulldown: hips jumped back and the cable tower moved in frames 58-59). A step in the last fifth of the
+# clip more than 2.5 times bigger than any of the five before it is a snap: the usable clip ends before it.
+speed = np.array([M[t, t + 1] for t in range(n - 1)])
+end = n - 1
+for t in range(int(n * 0.8), n - 1):
+    if speed[t] > 2.5 * speed[max(0, t - 5):t].max():
+        end = t
+        print(f"  snap at frame {t} -> {t + 1}: the clip is cut to frames 0-{t}")
+        break
+along = G[0][:end + 1]
 k = a.far if a.far is not None else int(np.argmax(along))
 s = a.near if a.near is not None else int(np.argmax(G[k, :k + 1]))
 

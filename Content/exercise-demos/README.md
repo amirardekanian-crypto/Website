@@ -138,8 +138,27 @@ end), Kling pec deck 70 and pulldown 66 (Kling stops and holds rather than comin
 | 62 pulldown, Kling 3.0 std 3 s | `dc880e2d-173c-4168-8353-ea5f3b9ebf33` | **better than Wan**: keeps most of the hinge, arms straight to the thighs |
 
 Kling clips come back 3.04 s, 1280×716, 24 fps, 1.8 MB, no audio; loops at `--speed 1.5 --width 854` are 80-85 KB.
-Waiting on Amir's check of the three pictures: then the box squat clip and the pec deck and pulldown pinned between
-start and finish, all on Wan (6 credits, already approved).
+
+**Round 3 (2026-10-04, his "yes, go" on the three pictures, 6 credits, balance 572).** The moved-box picture was uploaded
+as media `729944f0-73c0-4a99-a33b-1e1c54bff026`. Passing the `declined_preset_id`s up front avoided the preset round trip.
+
+| What | Job id | Verdict |
+|---|---|---|
+| 75 box squat, Wan, from the moved-box picture | `48f0b907-1a47-44ed-bfbe-7999337d31e0` | **good**: sits straight back onto the box; touches at frame 37-38, then slumps upright, so the loop is cut at 38 (`--far 38`): touch lightly, stand tall |
+| 71 pec deck, Wan, start + finish picture | `99f331f6-2429-4ac7-bced-75b1f3e16288` | **best pec deck**: arms stay long, hands meet; snaps onto the finish picture in frames 57-58 (cut off) |
+| 72 pulldown, Wan, start + finish picture | `f783d3a0-2f15-45da-a084-29229fec46ce` | no better than words: the torso still rises, then the last two frames SNAP to the finish picture (hips jump back, the tower moves). `make_loop.py` now cuts before a snap |
+
+**What the test showed (five exercises, 30 credits in all):**
+- Whole-body movements (single-leg RDL, box squat, EZ bar curl): **Wan, start picture + words**, 2.5 credits.
+- A limb path the words could not hold (pec deck, elbows): **Wan with a finish picture**, 3 credits.
+- Holding the torso still while the arms move (straight-arm pulldown): **Kling with words**, 5 credits. A finish picture
+  does not help when the model wants a different path; it only snaps at the end.
+- Every clip still needs its loop cut by `make_loop.py` and its frames looked at; holds and settles (the box squat)
+  need `--far` by hand.
+
+**The five finished loops** are in `loops/`, named by Spine id (74-114 KB each): `dumbbell-single-leg-romanian-deadlift`,
+`ez-bar-curl`, `box-squat`, `machine-pec-deck` (Wan pinned), `cable-straight-arm-pulldown` (Kling). Not wired into the
+app: that needs the player change and Amir's OK.
 
 Prices checked 2026-10-04 with `get_cost` (re-check, they change): picture 0.5 · Wan 3.0 480p 2 s = 2
 (words only, from a start picture, or between a start and an end picture) · Wan 3.0 3 s with a video
