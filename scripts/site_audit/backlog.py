@@ -338,6 +338,7 @@ SHIPPED_YOUR_CALLS = [
 ]
 
 FACTS = [
+    'Welcome every athlete: people from other sports arrive straight on the apply form. The English home and the form now say tennis and padel are your specialty and every athlete is welcome (2026-10-04).',
     'Videos stay on YouTube: you cannot host them on Aparat unless you record them yourself, and you are not planning to. Athletes in Iran need a VPN for videos.',
     'Iran reach test, six reports from four phones on Hamrah-e Avval, Irancell and Shatel (2026-10-04). WITHOUT a VPN, on Hamrah-e Avval and Irancell: your site, the sign-in server, the data server, the apply-form endpoint (Web3Forms), Plausible, jsDelivr, Google Fonts and Aparat all work. YouTube does not (the thumbnails and the nocookie player fail or time out). A 256 KB upload times out, 64 KB passes. WITH a VPN everything works, only slower (YouTube up to 8 s). So the Farsi funnel, the forms and the analytics work for people with no VPN; the exercise and lesson videos do not.',
     'How a client joins and pays: they fill in the form, you contact them with more questions, they pay (by messaging you on WhatsApp or Instagram), then you write their programme. The Farsi price is the equivalent of 25 dollars a month, in Toman at the day’s rate.',
@@ -352,8 +353,7 @@ FACTS = [
 
 QUESTIONS = [
     'Your part: the Plausible goals (Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application, 404, and the properties plan, where, page, which, to, step, lang). You asked me to walk you through it later.',
-    'The English home says it is for competitive tennis and padel players, but the apply form takes athletes of all kinds. Should the home say so too (a line, or a second audience), or stay tennis and padel only? I kept it as it was and removed the line that said a non-tennis player is not a fit.',
-    'Your photo is on the new first screen (the athletes’ faces were action shots and looked messy at that size, so I used your headshot). Do you want a different picture there?',
+    'The small round photo under the Apply button on the home’s first screen is your headshot (the one from the About section). Say if you want a different one.',
 ]
 
 TOOLS = [
