@@ -325,3 +325,19 @@ Prompt, long-way-back: *Photograph of a clay tennis court at dusk. A single wood
 
 The masters are on Amir's PC only, in `Content/parity-drafts/cover-art/` (all six, plus the gate sheet; not committed, the job ids above re-fetch them). The crutch is tall for the 2.9:1 list card:
 its handle is cut at `pos` 55%, which keeps the shoes and band whole; that was the right trade.
+
+## 7. Exercise demo library: the look (2026-10-04)
+
+The athlete and the room every exercise demo's start picture is made from (`Content/exercise-demos/README.md`).
+A deliberate exception to "no people" and "never depict exercise form": these are demos, and Amir judges every rep.
+`gpt_image_2_5`, flare, medium, 1k, **0.5 credit each**, 2 credits in all. Three athlete versions were planned; one was made.
+The other two were refused, first `429 rate_limit_reached`, then *"daily generation limit for your grace period"*, with no charge.
+
+| Slot | Candidate (job id) | Verdict |
+|---|---|---|
+| athlete (2:3) | **`ba2ccf47-a54c-44bb-a33a-3197e2c4e490` picked** | man, plain dark kit, light-grey background; faint tonal stripe on the shoes |
+| gym (16:9) | A `ae0919f2-42b5-4a04-aa1f-138dcb10c1aa` · **B `bde45629-61bd-49b9-a2a3-28ad24cb7045` picked** · C `d1241b62-8467-4017-abb5-1b38d0013ba9` | the three are the same empty grey room; B has a skirting line, C floor tiles (rejected: the lines can wobble in a clip) |
+
+Prompt, athlete: *Full-body photo of one athletic man in his late twenties, standing relaxed, turned three-quarters to the camera, arms by his sides. Plain dark t-shirt, dark shorts, plain dark trainers, short dark hair, calm neutral face. Plain light-grey background, soft even light, the whole body sharp from head to feet. Realistic photo. No text, no logos, no jewellery, no yellow.*
+
+Prompt, gym: *An empty, very simple training room: a plain matte warm-grey wall and a dark grey rubber floor, soft even light, nothing else. Straight-on view at hip height, the wall filling the top two-thirds of the frame and the floor the bottom third. No equipment, no windows, no mirrors, no posters, no text, no logos, no people, no yellow.*
