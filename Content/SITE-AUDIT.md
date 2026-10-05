@@ -20,7 +20,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 
 ## Where it stands
 
-**25 packages · 88 findings** (31 cost you now, 42 worth fixing, 15 polish). Done: 16 · Waiting for you: 4 · Decided: next to build: 2 · Another session: 1 · Queued: 2
+**25 packages · 90 findings** (32 cost you now, 43 worth fixing, 15 polish). Done: 16 · Waiting for you: 4 · Decided: next to build: 2 · Another session: 1 · Queued: 2
 
 | # | Package | Phase | Status | Effort |
 |---|---|---|---|---|
@@ -48,7 +48,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 22 | A style guard so it stays fixed | Foundations | Done (1 of 1 items) | medium |
 | 23 | Can Iran reach the forms, Plausible and the demo? | Foundations | Done (1 of 1 items) | small |
 | 24 | Re-run the audit after each batch | Foundations | Done (1 of 1 items) | small |
-| 25 | The apps | Next | Queued | large |
+| 25 | The apps | Next | Queued (1 of 6 items) | large |
 
 ### Start here next
 
@@ -57,7 +57,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 3. Farsi home 14b to 14d (credentials row, which product leads, length), Farsi product pages 15 (needs his word on refunds for the $17 course, which is not covered by the terms yet) and the partner page 17.
 4. Package 12 leftovers: a share card with his portrait (can be composed from his headshot, no credits), the testimonial pull-outs (his call) and getting the phone page from 14.4 to about 13 screens.
 5. Package 25, the apps. First: a wrong phone clock breaks sign-in (refresh the session once on a 401 or “JWT expired” answer). Then the first-run and Home pass on a phone.
-6. His parts: add the Plausible goals (a walk-through he asked for), delete backups older than 12 weeks each week (`python scripts/prune_backups.py <folder>`, on the off-machine copy too: the privacy notice now promises it), the UTS page when the course starts (20e), and the demo banner’s links in program.html (5d, another session).
+6. His parts: add the Plausible goals (a walk-through he asked for), delete backups older than 12 weeks each week (`python scripts/prune_backups.py <folder>`, on the off-machine copy too: the privacy notice now promises it), take a new ⤓ Backup so the eight tables added on 2026-10-05 are in a file (the 12 Sep and 5 Oct files lack them), the UTS page when the course starts (20e), and the demo banner’s links in program.html (5d, another session).
 7. Package 21 (one brand CSS file) and 18 (articles, the page generator) are big and belong to later or to another session.
 8. After the next batch of site changes, re-run the measuring tools (package 24: `scripts/site_audit/README.md`) and save a new dated `Content/site-audit/after-scoreboard-<date>.txt`.
 
@@ -100,6 +100,7 @@ Same working agreement as `Content/FRESH-EYES.md` (the app audit):
 | 2026-10-04 | 20 | Privacy notice: a 7-line short version and a jump list at the top; jsDelivr named (the two athlete apps load their database library from it); backups and email copies stated as the one exception to the retention and deletion promises (you keep backup files for ever); the AI paragraph lists check-ins and session notes; Supabase is London, UK everywhere. Last updated 4 October. | 68fcfb4 |
 | 2026-10-04 | 20 | Privacy notice: the two long app sections folded behind “Read the details” (13.7 phone screens, was 21.0 with the short version and 18.8 before it), backups made rolling (the last 12 weeks are kept and a deleted record leaves them within about three months), email copies deleted on request, and a link to the Farsi summary. A reminder after each backup in coach.html, the rule in CLAUDE.md, and scripts/prune_backups.py to list and remove backups older than 12 weeks. | 7835f6b |
 | 2026-10-04 | 20 | A Farsi privacy summary (privacy-fa.html, 2.4 phone screens) linked from the Farsi apply form, terms, home footer, course page and the Etminan form, which used to send Farsi readers to the English notice. | 23e44e8 |
+| 2026-10-05 | 25 | The weekly backup in coach.html now covers 30 tables, not 22: the course lessons, the exercise library, the testing app’s content and the course accounts were missing, and nothing said so. Four tables still cannot be read by the coach (item 25f). Your new backup was checked (21 tables, 1,057 rows, nothing smaller than 12 Sep) and the two 12 Sep backups went to the Recycle Bin at your word. | f8531b5 |
 
 ### Words I wrote, for you to read
 
@@ -598,12 +599,16 @@ Same method, different target.
 
 program.html (athletes), habits.html (AA Proof) and coach.html (your dashboard) get the same pass once the website is done.
 
+**Still open.** Found on 2026-10-05 while clearing old backups (items 25e and 25f): the weekly backup skipped 13 of the 35 database tables without saying so, among them the course lessons and the exercise library. The eight tables the coach can read are added (commit f8531b5); take a new backup so they are in a file. Four tables still cannot be read by the coach and need a database change first.
+
 | ID | Shipped | Sev | Where | Problem | Fix | Effort | His call | From |
 |---|---|---|---|---|---|---|---|---|
 | 25a |  | P3 | Apps | Not reviewed yet. They have their own audit (Fresh Eyes) and rules; this pass would only add what the website tools can measure. | Start with the athlete app’s first-run and Home on a phone. | L |  |  |
 | 25b |  | P1 | Athlete apps (program.html, habits.html, course app) | A wrong phone clock breaks sign-in. One Irancell iPhone reports its clock 89 minutes behind. The sign-in library decides a token has expired by the phone’s clock, so it keeps sending an expired token for about 1.5 hours of every cycle and the server answers “JWT expired”. Nothing in the apps retries. | On a 401 or “JWT expired” answer, refresh the session once and repeat the request; test with a phone clock set back. The reach test already prints the clock difference. | M |  | reach 2026-10-04 |
 | 25c |  | P2 | Course and programme videos | Without a VPN, YouTube is blocked on both Iranian networks tested (thumbnails and the nocookie player fail or time out). With a VPN it works but slowly (up to 8 s). Aparat works on every report. | Decided 2026-10-04: keep YouTube. You cannot put the videos on Aparat unless you record them yourself, and you are not planning to. So athletes in Iran need a VPN for videos. | L |  | reach 2026-10-04 |
 | 25d |  | P3 | Athlete apps | A 256 KB upload times out without a VPN; 64 KB passes. The largest athlete progress record today is 29 KB, so nothing breaks, with about a 2x margin. | Watch the size; trim or split the record before it nears 64 KB. | S |  | reach 2026-10-04 |
+| 25e | ✓ | P1 | coach.html backup | Found 2026-10-05 while clearing old backups: the weekly backup (⤓ Backup) skipped 13 of the 35 database tables, without saying so. Among them the course lessons (tps_content, course_en), the exercise library (exercises, exercise_coach, qualities) and the testing app’s content and accounts, which exist nowhere else. | Add the tables the coach can read to BACKUP_TABLES (8 added, commit f8531b5), leave out the two publish-key tables, write the rest above the list, and say in CLAUDE.md that a new table goes into the list the same day. Then take a new backup. | S |  | backup 2026-10-05 |
+| 25f |  | P2 | Database and coach.html backup | Four tables still cannot be backed up. assess_players, assess_notes and assess_results can be read only by the member who owns them, so the coach reads zero rows and a backup would look fine while empty (the testing app has no accounts today, so nothing is lost yet). hab_season_results has no SELECT grant for signed-in users, so every backup lists it under “Could NOT read” (it is empty until the first season closes, and then it is the one table nothing else can rebuild). | hab_season_results: one grant (select to authenticated; its policy already limits it to your email). The testing app’s three tables: your call, see the questions. | S-M | Y | backup 2026-10-05 |
 
 ## Facts you have given me
 
@@ -626,6 +631,7 @@ program.html (athletes), habits.html (AA Proof) and coach.html (your dashboard) 
 1. Your part: the Plausible goals (Apply Click, WhatsApp Click, Demo Click, Hub Click, Form Started, Form Step, Level test start, Proof Signup, Partner Application, 404, and the properties plan, where, page, which, to, step, lang). You asked me to walk you through it later.
 2. The small round photo under the Apply button on the home’s first screen is your headshot (the one from the About section). Say if you want a different one.
 3. The data/*.json copies of programmes on your PC (the rainy-day fallback) hold athlete data too, and the privacy notice’s backup promise covers only the weekly database backups. When you delete a person, do you also delete their file in data/? If not, say so and I add it to the notice (section 4).
+4. Backups and the testing app (2026-10-05): the coach cannot read the testing app’s players, results and notes, so no backup can hold them. The testing app has no accounts today, so nothing is lost yet. Before its first customer, either a read-only export function only you can call (my pick: it makes a backup possible without letting you browse their players) or no backup of their data. Separately, hab_season_results needs one grant before the first season closes; say yes and I apply it (it changes your live database).
 
 ## Tools: what we used, what we skip
 
