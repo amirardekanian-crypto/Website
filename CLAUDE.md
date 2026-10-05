@@ -115,6 +115,12 @@ and on the off-machine copy, and delete older ones (Amir, 2026-10-04: "rolling")
 notice (section 4, line 6 of its short version, and `privacy-fa.html`) promises that a deleted
 record leaves the backups within about three months, so a backup kept longer makes it false.
 `python scripts/prune_backups.py <folder>` lists what is older (add `--delete` to remove it).
+**A table added to the public schema goes into `BACKUP_TABLES` in coach.html the same day**
+(`select tablename from pg_tables where schemaname = 'public'`; on 2026-10-05 13 of 35 were missing,
+among them the course lessons and the exercise library, which exist nowhere else). A table the coach
+cannot read must be fixed in the database first: with RLS and only a member policy it backs up as
+silently EMPTY, with no SELECT grant it is listed under "Could NOT read". Still open: `assess_players`,
+`assess_notes`, `assess_results` and `hab_season_results` (see the comment above `BACKUP_TABLES`).
 
 ## The athlete app (`program.html`) — read `PROGRAM-APP.md` before changing it
 

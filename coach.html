@@ -1151,6 +1151,15 @@ window.bulkCreateLogins = bulkCreateLogins;
 // and remember that a table with RLS on and no coach policy reads back as zero
 // rows rather than an error — hab_season_results did exactly that until
 // 2026-09-12, and it is the one table nothing else could rebuild.
+// 2026-10-05: 13 of the 35 tables were missing from this list. Added: the course lessons
+// (tps_content, course_en), the exercise library (exercises, exercise_coach, qualities), the
+// testing app's content and accounts (assess_content, assess_accounts) and tps_accounts.
+// Left out on purpose: assess_publish_keys and tps_publish_keys (hashes of revoked keys).
+// STILL NOT BACKED UP, each needs a database change first: assess_players, assess_notes and
+// assess_results (only the member who owns them can read them, so the coach would read ZERO
+// rows and the backup would look fine while empty) and hab_season_results (no SELECT grant
+// for signed-in users, so it is listed under "Could NOT read" every time; it is empty until
+// the first season closes).
 const BACKUP_TABLES = [
   'programs', 'program_versions', 'coaching_logs', 'athlete_identities',
   'athlete_progress', 'session_history', 'messages', 'hab_notes', 'hab_contacts',
@@ -1158,6 +1167,8 @@ const BACKUP_TABLES = [
   'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
   'library', 'library_categories', 'library_sessions',
   'affiliates',
+  'tps_content', 'course_en', 'tps_accounts', 'assess_content', 'assess_accounts',
+  'exercises', 'exercise_coach', 'qualities',
 ];
 
 async function downloadBackup(btn) {
