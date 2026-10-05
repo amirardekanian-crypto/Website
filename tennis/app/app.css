@@ -260,6 +260,20 @@ ol.steps li::before {
 .video.none .vnote { position: static; }
 /* A Shorts clip is vertical: a tall 9:16 box, centred, instead of the wide one */
 .video.short { height: auto; aspect-ratio: 9 / 16; width: min(100%, 300px); margin-inline: auto; }
+/* The player and its YouTube bar are ONE unit (Amir, 2026-10-05): the bar hands the clip to the phone's
+   YouTube app or browser for a buyer whose embed will not play here (a VPN that covers those and not this
+   window). It sits OUTSIDE .video because the iframe fills that box and would cover a bar inside it, which
+   is exactly when the embed has failed. The mark is YouTube's own red so it never reads as the green ▶. */
+.vunit { margin-top: 14px; border-radius: 12px; overflow: hidden; background: #0a0a0c; }
+.vunit .video { margin-top: 0; border-radius: 0; }
+.vunit.short { width: min(100%, 300px); margin-inline: auto; }
+.vunit.short .video.short { width: 100%; margin: 0; }
+.vyt { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 14px; background: #111114;
+  border-top: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.92); text-decoration: none; font-size: 14px; font-weight: 700; }
+.vyt svg:first-child { flex: none; width: 18px; height: 13px; }
+.vyt svg:last-child { flex: none; width: 11px; height: 11px; margin-inline-start: auto; transform: scaleX(-1); }   /* the external-link arrow mirrors in RTL */
+.vyt:active { background: #1b1b20; }
+.vyt:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
 
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 10px; background: var(--white); margin-top: 12px; }
 .stat { padding: 10px 4px; text-align: center; border-inline-start: 1px solid var(--line); }
