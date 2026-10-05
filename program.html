@@ -2168,6 +2168,31 @@
   /* A Shorts clip is vertical: a tall 9:16 box, centred, instead of the wide one */
   .ex-video.short { height: auto; aspect-ratio: 9 / 16; width: min(100%, 300px); margin-inline: auto; }
 
+  /* The player and its YouTube bar are ONE unit (Amir, 2026-10-05: "C and red"). Some athletes in Iran
+     cannot play the embed inside the app while the YouTube app or the browser works on the same phone
+     (a VPN that covers those and not this window), so the bar under the player hands the clip over:
+     a plain youtube.com link, the phone picks the YouTube app or the browser. It sits OUTSIDE .ex-video
+     on purpose: the iframe fills that box (z-index 3), so a bar inside it would be covered the moment
+     the embed loads, which is exactly when it fails. The mark is YouTube's own red: it must not read
+     as a second green play button. */
+  .ex-vunit { margin: 14px 0 4px; border-radius: 10px; overflow: hidden; background: #0a0a0c; }
+  .ex-vunit .ex-video { margin: 0; border-radius: 0; }
+  .ex-vunit.short { width: min(100%, 300px); margin-inline: auto; }
+  .ex-vunit.short .ex-video.short { width: 100%; margin: 0; }
+  /* .video-modal-yt is the same bar under the pop-up player a circuit item's ▶ opens (shared.js builds it;
+     this page is the modal's only caller, so its look lives here with the other modal rules). */
+  .ex-yt, .video-modal-yt {
+    display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px;
+    background: #111114; border-top: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.92); text-decoration: none;
+    font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label);
+    letter-spacing: 0.6px; text-transform: uppercase;
+  }
+  .ex-yt svg:first-child, .video-modal-yt svg:first-child { flex: none; width: 18px; height: 13px; }
+  .ex-yt svg:last-child, .video-modal-yt svg:last-child { flex: none; width: 10px; height: 10px; margin-left: auto; }
+  .ex-yt:active, .video-modal-yt:active { background: #1b1b20; }
+  .ex-yt:focus-visible, .video-modal-yt:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
+
   /* Setup line — equipment / position ("neutral grip", "45° bench"). Sits under
      the name as quiet text, because it is a condition of the exercise, not a
      number. It used to be a green pill indistinguishable from a tempo. */
@@ -2718,7 +2743,7 @@
   .ex-how-sum i { margin-left: auto; font-style: normal; color: var(--grey-text); transition: transform 0.2s; }
   .ex-how[open] .ex-how-sum i { transform: rotate(90deg); }
   .ex-how-body { padding: 0 12px 8px; }
-  .ex-how .ex-video { margin-top: 2px; }
+  .ex-how .ex-vunit { margin-top: 2px; }
   .ex-how .ex-section-label { display: none; }
   body[data-dark] .ex-how { background: #1e1e1e; border-color: #2a2a2a; }
 
@@ -7739,13 +7764,30 @@ function renderInlineCues(cues) {
   return `<div class="ex-section-label">Coaching Cues</div><div class="ex-cues">${body}</div>`;
 }
 
+// The YouTube mark (YouTube's own red, white triangle) and an external-link arrow, drawn inline: no
+// request, no emoji. Sized by CSS (.ex-yt); the attributes are only the fallback.
+const YT_MARK  = '<svg width="18" height="13" viewBox="0 0 28 20" aria-hidden="true" focusable="false"><rect width="28" height="20" rx="6" fill="#FF0000"/><path d="M11.2 5.4v9.2L19.2 10z" fill="#FFFFFF"/></svg>';
+const YT_ARROW = '<svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.5 7.5l5-5M3 2.5h4.5V7"/></svg>';
+
 // Big video placeholder — only rendered if the exercise has a video.
 // Click ▶ → loadInlineVideo() replaces the placeholder with a YouTube iframe.
 // A Shorts link gets a tall 9:16 box, so the clip is not a sliver in a wide one.
+// Under it, one bar: Open in YouTube (Amir, 2026-10-05, direction C in red). The embed does not play
+// for some athletes in Iran whose YouTube app or browser works, so this hands the clip to the phone
+// (the YouTube app if it has one, else the browser). Only for a YouTube address: any other link's ▶
+// already opens it as a link. The bar is a sibling of .ex-video, never inside it (see its CSS).
+// Every in-app player is drawn here: the card's How to do it, the About sheet, the Library.
 function renderVideoBlock(url) {
   if (!url) return '';
-  return `<div class="ex-video${ytIsShort(url) ? ' short' : ''}" data-url="${esc(url)}">
-    <button type="button" class="ex-video-play" onclick="loadInlineVideo(this);event.stopPropagation();">▶</button>
+  const short = ytIsShort(url);
+  const watch = ytWatchUrl(url);
+  const bar = watch
+    ? `<a class="ex-yt" href="${esc(watch)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">${YT_MARK}<span>Open in YouTube</span>${YT_ARROW}</a>`
+    : '';
+  return `<div class="ex-vunit${short ? ' short' : ''}">
+    <div class="ex-video${short ? ' short' : ''}" data-url="${esc(url)}">
+      <button type="button" class="ex-video-play" onclick="loadInlineVideo(this);event.stopPropagation();">▶</button>
+    </div>${bar}
   </div>`;
 }
 
@@ -7929,6 +7971,9 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
          </button>`
       : '';
+    // No YouTube mark on the row (2026-10-05): beside the ▶ it pushed a superset's row 6 to 36 px past its card
+    // at 360-390 px and squeezed a warm-up's names to two or three lines. The pop-up this ▶ opens carries the
+    // "Open in YouTube" bar under its player instead (shared.js, VideoModal).
     // A warm-up row: the cues fold under a chevron (shown once the row has cues: its own,
     // or its Spine entry's when paintSpine() fills the slot). A tap on the row opens them too.
     const cueTog = isPrep
@@ -8082,6 +8127,15 @@ function ytVideoId(url) {
   return m ? m[1] : '';
 }
 function ytIsShort(url) { return /\/shorts\//.test(String(url || '')); }
+// The clip's own YouTube page, for "Open in YouTube": watch?v= (a Short keeps /shorts/), whatever shape the
+// stored link has (youtu.be, embed/, live/). '' when the link is not a YouTube address. A plain https link,
+// not an intent:// or youtube:// address, so the phone chooses the YouTube app or the browser and a phone
+// with no YouTube app still opens it. Built from the same id as the player, so the two always agree.
+function ytWatchUrl(url) {
+  const id = ytVideoId(url);
+  if (!id) return '';
+  return ytIsShort(url) ? `https://www.youtube.com/shorts/${id}` : `https://www.youtube.com/watch?v=${id}`;
+}
 
 // Replace the video placeholder with a YouTube iframe (inline playback).
 function loadInlineVideo(btn) {
@@ -8261,7 +8315,7 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video and the cues, open the first time you meet an exercise, folded after that), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its cues, ▶ plays its video, and the circle ticks the whole warm-up.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video and the cues, open the first time you meet an exercise, folded after that; if the video won't play on your phone, tap <strong>Open in YouTube</strong> under it), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and the circle ticks the whole warm-up.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. When the rest is over it moves you to the next set. Supersets and circuits come round by round; warm-ups stay in the list.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
@@ -8280,7 +8334,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app — full-screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong> — tick a set and a <strong>Rest</strong> button comes up at the bottom of the screen: tap it and the countdown starts. The <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets does the same. It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>Exercise videos</strong> — most exercises have a video link. Tap it if you're unsure of form.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong> — tick a set and a <strong>Rest</strong> button comes up at the bottom of the screen: tap it and the countdown starts. The <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets does the same. It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>Exercise videos</strong> — most exercises have a video. Tap it if you're unsure of form. If it won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab, in every exercise's ⓘ, and at the end of every session, where your message already says which day or exercise it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days; quick check-ins beat long waits.</p>` },
 ];
