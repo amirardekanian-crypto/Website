@@ -30,12 +30,15 @@ What the Spine is and why: `CLAUDE.md` → *The Spine*, `SCHEMA.md` → *`exId` 
    his words and strip only what is about one person. What you strip belongs in THAT athlete's
    Coach's Note (`note`), not lost: list it for Amir with the athlete id. If no programme has
    cues for a name, write three general ones and say so, since the entry is where cues live now.
-4. **Names are never rewritten** in an athlete's programme: a variant spelling that is really the same
-   exercise becomes an `alias` on the existing entry, not a new entry and not an edit to any programme.
-   **The Library is the exception: ONE name** (Amir, 2026-10-09: *"i dont want to have 2 names, being
-   linked ... the source of the truth should be my naming rules which is my spine"*). A Library card
-   carries its entry's name exactly, and its spelling never becomes an alias; see *The Library's own
-   exercises* below.
+4. **ONE name, the Spine's** (Amir, 2026-10-09: *"i dont want to have 2 names, being linked, i want to
+   have one name consistent in my workouts with my spine. the source of the truth should be my naming
+   rules which is my spine"*; the same day, yes for athletes' programmes too). **The Spine carries no
+   aliases.** A card that is the same exercise under another spelling is **renamed to the entry's
+   name**; a card that is a different version (other equipment or setup) gets **its own entry** under
+   its own name (NAM-1 to NAM-6). In a programme still being built, rename freely. In a LIVE programme
+   the athlete's logged history is joined to the card by NAME, so a rename that is more than a
+   spelling (the app's `matchRenamed()` tiers) moves that history too, or Last time and Records lose
+   the lift: see *One name in live programmes* below.
 
 ## The run
 
@@ -66,10 +69,10 @@ Also `select id, name, aliases, pattern from public.exercises order by pattern, 
 the existing ids for the links, and they show you which names are only variants.
 
 **2. Sort the list into three piles** before writing anything:
-- **Alias:** the same exercise under another name, e.g. `cable wood chop` →
-  `half-kneeling-cable-wood-chop`, or `Single-Leg RDL (BW)`. Add it with
-  `update public.exercises set aliases = array_append(aliases, '<Name>') where id = '<id>';`.
-  Only if it really is the same movement. If the stance or implement differs, it is a new entry.
+- **Rename:** the same exercise under another name, e.g. `cable wood chop` →
+  `half-kneeling-cable-wood-chop`. The CARD takes the entry's name and `exId` (rule 4); nothing is
+  added to the entry. Only if it really is the same movement. If the stance or implement differs,
+  it is a new entry.
 - **New entry:** its own movement, worth a record.
 - **Skip:** one-off drill names, a whole circuit's title, anything that is not an exercise. List
   these for Amir rather than silently dropping them.
@@ -186,7 +189,7 @@ select status, count(*), count(*) filter (where cues is null) no_cues,
 ```
 
 **6. Tell Amir, in numbers:**
-- how many drafts were added, how many aliases, and what you skipped and why;
+- how many drafts were added, how many cards were renamed to an entry's name, and what you skipped and why;
 - how many have no cues (he writes those) and how many have no video;
 - that he approves them in **coach.html → Exercises → Drafts**, and that the list shows which
   athletes use each one.
@@ -219,6 +222,25 @@ to have 2 names, being linked, i want to have one name consistent in my workouts
 - `scripts/check_library_spine.py` (pre-commit guard 14) fails a card whose name is not its entry's.
 Breathing drills stay out (Amir, 2026-10-09: no pattern fits and no new pill).
 
+## One name in live programmes (2026-10-09)
+
+Rule 4 applied to athletes' programmes the same day the Library was done. How a rename is made safely:
+- **Plan per athlete and old name.** Rename NOW when the athlete has nothing under the old name: no
+  `session_history` entry (or circuit item), no `<id>_setlog_ / _note_ / _wlog_<Name_with_underscores>` key in
+  `athlete_progress`, no row with that lift in `<id>_1rm`; or when the rename is a spelling the app's
+  `matchRenamed()` joins by itself (the same variant at one of its four tiers: Pec Deck (Machine) and Machine
+  Pec Deck). Anything else gets its `exId` now and keeps its name until its history moves with it.
+- **Write in one transaction**: a `jsonb_set` per field (`exId`, `name`, and a one-line `note` only where the
+  old name carried something: a pace, a direction, a choice of machine). The version trigger keeps each
+  programme's previous copy. Proof: undo exactly the planned fields and every programme's md5 must equal its
+  copy from before the write.
+- **Then the aliases go.** Check first that no card without an `exId` still needs one.
+- The 2026-10-09 run: 29 programmes, 45 cards renamed, 43 linked and waiting for their history move, 10
+  different-version entries (Leaning, Single-Arm, Half-Kneeling, Smith, Incline, Band, Dumbbell Box
+  Step-Up), 3 Spine names fixed to the rules (Inverted Row, Seated Cable Row, Standing Dumbbell Single-Leg
+  Calf Raise) and all 107 aliases removed. **Still open: the history move** for the 43 (Amir chose to move
+  the history with the rename; it needs a look at how phones sync `athlete_progress` before any app change).
+
 ## Upkeep: the end of EVERY programme write (Amir, 2026-09-24)
 
 Amir: *"when i write or update a program, and there are movements that are not there, or missing
@@ -248,8 +270,7 @@ hit as (
 select nm, id, status,
   case when id is null then 'NO ENTRY' end missing,
   array_remove(array[
-    case when id is not null and lower(nm) <> lower((select name from public.exercises where id = hit.id))
-          and not lower(nm) = any(select lower(a) from unnest(aliases) a) then 'alias' end,
+    case when id is not null and nm <> (select name from public.exercises where id = hit.id) then 'rename the card' end,
     case when video is null and vid is not null then 'video (card has one)' end,
     case when video is null and vid is null then 'video' end,
     case when cues is null then 'cues' end,
@@ -271,16 +292,17 @@ no SFR. Answer them once and they stop mattering.
 | | A **draft** entry | An **approved** entry (athletes see it) |
 |---|---|---|
 | **No entry at all** | Draft it now with `draft_sql.py` (the whole Run above, for one or a few names) | — |
-| **Empty field** (video, alias, equipment, a regression/progression/alternative, SFR, flags) | Fill it | Fill it. Adding what was missing changes nothing an athlete already reads |
+| **Empty field** (video, equipment, a regression/progression/alternative, SFR, flags) | Fill it | Fill it. Adding what was missing changes nothing an athlete already reads |
 | **Body parts** (`loads` + `impact`; `impact` null means never checked) | Fill both | Fill both, on Amir's standing word (2026-09-24: *"remember if we add a exercise … to add these details"*). Since stage37 every entry has both, so a gap here is a new exercise or one somebody cleared |
 | **No qualities** (the Quality Map) | Fill `qualities` (first = primary, max 3) | **Don't write them.** Put them in `exercise_coach.suggested_qualities`: coach.html pre-fills his editor with them, and they reach phones only when he saves |
 | **No count** (`credits` + `cost`, coach-only) | Fill both | Fill both: without them the checker FAILs every programme that uses the entry, and the body map has nothing to light. Since stage42 the phone receives the credits' muscle names and 1/0.5 (never the cost). **Changing** a count already there is a proposal: it changes every athlete's volume tables AND their body map |
 | **No muscles for the body map** (`credits` is `{}` and `muscles` is empty) | Fill `muscles` | Fill `muscles`, on Amir's standing word (2026-09-26). Changing muscles already there is a proposal |
 | **A field that has content** (cues, purpose, tennis) | Improve it | **Don't change it. Propose it**: write it to the pending list (below) and name it in the handoff, old → new |
 - **Video:** the card's `videoUrl` wins when the entry has none (YouTube only, as `draft_sql.py`).
-- **Alias:** the programme's spelling goes on the entry (rule 4). Never rename the card.
+- **Name:** a card whose name is not its entry's is renamed to the entry's name (rule 4), never
+  aliased. In a live programme, check the athlete's logged history first (rule 4).
 - **exId on the card:** a programme exercise that resolves to an entry but has no `exId` gets one
-  (on the programme row, beside the name; never rename). It is what makes the link survive a rename.
+  (on the programme row, beside the name). It is what keeps the card on its entry.
 - **Qualities:** tag what the exercise is mostly FOR, first = primary, stop at three. A new
   exercise without qualities makes its day card go blank (under 70% tagged shows nothing), so this
   is never optional.

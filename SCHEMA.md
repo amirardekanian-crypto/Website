@@ -723,9 +723,10 @@ anything else for this athlete goes in the `note`. `scripts/check_program.py` fa
 
 The Spine is one record per exercise Amir programmes (`supabase/stage31_spine.sql`): purpose,
 pattern, the cues, its regressions/progressions/alternatives (`easier`/`harder`/`alts`: an entry id, or the plain name of an exercise with no entry yet), the body parts it involves (`loads`, the course app's region ids) and its `impact` (none, running, plyometric, landing), the video. A
-card resolves to its entry by **`exId` first, then its name** (the entry's `name` and `aliases`,
-through the same four matching tiers Personal Records uses). Names in stored programmes are
-**never rewritten**; `exId` is added beside the name by `/program-assemble` from 2026-09-24 on.
+card resolves to its entry by **`exId` first, then its name** (the entry's `name`, through the same four
+matching tiers Personal Records uses). `exId` is added beside the name by `/program-assemble` from
+2026-09-24 on. **One name** (Amir, 2026-10-09): a card is named exactly as its entry and `aliases` is empty
+on every entry (the column stays, unused); a different version is its own entry.
 
 - **Cues are written once, on the entry, for everyone** (Amir, 2026-09-24). A programme writes no
   `cues`; each card and each circuit item shows its entry's. A card that still carries `cues`

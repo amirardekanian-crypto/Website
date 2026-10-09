@@ -95,7 +95,7 @@ stale copy reached athletes.
 | NAM-5 | A grip or one intention is the card's `intent` pill: the athlete's own, never free text, never on the library entry. | assemble | ✓ (grip as text) |
 | NAM-6 | A variant that changes the exercise (Short-Lever Copenhagen Plank) is its own exercise, with its own name, entry and cues. | design · spine | |
 | NAM-7 | A hold on a dynamic exercise keeps the canonical name; `rx.tempo: "iso"`, the time and a Coach's Note carry the hold. | assemble | |
-| NAM-8 | Use the Spine entry's name or an alias (word, digit and possessive differences matter); the Spine is not a whitelist: prescribe any real movement. | design · assemble | warn (a name that is another entry's) |
+| NAM-8 | Use the Spine entry's exact name, no alias; a different version is its own entry. Not a whitelist: prescribe any real movement. | design · assemble | warn (a name that is not its entry's) |
 | NAM-9 | A newly prescribed exercise joins the library in the same run, in full: cues, details, qualities, links both ways. Never swap it out instead. | assemble · spine | ✓ |
 | NAM-10 | Cycle names are punchy, evocative one- or two-word power-names, set in the roadmap. | roadmap | |
 | NAM-11 | Day names (`focusTag`) have sports-headline energy, never spreadsheet labels. | design · assemble | |
@@ -471,8 +471,12 @@ same ID. Read a rule's story and its history before changing it.
   card reads as one. Longer-term option stands: add a dedicated isometric (Wall Sit,
   Spanish Squat…) with its own video to the Spine and rotate it in.
 - `NAM-8` **The Spine is the source of truth for names and videos.** Author each exercise to its
-  entry's name or an alias; `/program-assemble` Step 4 normalizes misses, and every card carries
-  its entry's `exId`.
+  entry's name, exactly; `/program-assemble` Step 4 normalizes misses, and every card carries
+  its entry's `exId`. **One name** (Amir, 2026-10-09): the Spine carries no aliases, a card never
+  keeps a second spelling, and a card that is a different version of an entry (other equipment or
+  setup: bodyweight vs Dumbbell, Banded, Leaning, Single-Arm, Half-Kneeling, Smith) is its own entry
+  under its own name. A rename in a LIVE programme moves the athlete's logged history with it, or
+  Last time and Records lose the lift (the app joins history by name).
 - `NAM-8` `NAM-9` **The library is a video-join key, not a whitelist — programming is never restricted to what's
   already catalogued.** Pick whatever real movement is right for the athlete; a new one joins the
   Spine in the same run and ships without a demo video until Amir adds one in coach.html →
@@ -487,7 +491,7 @@ same ID. Read a rule's story and its history before changing it.
 - `NAM-8` **The app resolver normalizes case/punctuation/accents** as a safety net, so minor
   drift still finds the entry and renames don't break old programmes — but
   word/digit/possessive differences (Leg Press vs Machine Leg Press, Farmer vs Farmer's)
-  need the entry's name or an alias on it.
+  need the entry's name on the card (aliases were retired on 2026-10-09).
 
 ## Recovery & autoregulation
 - `REC-1` **Recovery capacity gates everything** — set the weekly volume ceiling *before*

@@ -21,7 +21,7 @@ not pass until the drafting (Step 8) had run. Now:
 **Part A — build and check. Straight after /program-design, BEFORE /program-engage.**
 Step 1 · Step 2a–2e (the workouts, with `exId` stamped from the design pull; `weekNotes` carries
 design's numbers, no words yet) · Step 3 with `--stage build` (it also resolves every card name) ·
-Step 4 (act on the names: stamp, snap, alias, or draft a new exercise into the Spine, then re-run
+Step 4 (act on the names: stamp, snap, rename to the entry's name, or draft a new exercise into the Spine, then re-run
 Step 3) · Step 3b (a new athlete's one review). A FAIL here is a design decision to revise: change
 the spec and the log entry together, rebuild, re-check. If a FAIL overturns something Amir settled
 at the checkpoint, it goes in the handoff under MY CALLS.
@@ -239,7 +239,7 @@ count and what landed on the cards differ, which is how a dropped or invented on
   # Part B: the same command without --stage build (the default is the full run). Re-run
   # --spine-sql only when a card's name or exId changed or an exercise was added.
   ```
-  The one query also resolves every card NAME on the server (exact name or alias, else a loose
+  The one query also resolves every card NAME on the server (exact name, else a loose
   match) for Step 4, and brings last cycle's modelled and logged minutes for the time check. Save
   only this result: never the design pull's 39,000-character catalogue (2026-09-27).
   `--tables` writes the log's Volume & Dose tables (per exercise, per muscle, per-day load); Step 5
@@ -297,11 +297,13 @@ node scan over a 39,000-character copy). Act on what it prints:
   anything else is the Coach's Note) · `no exId: the Spine has it as <id>` → stamp it ·
   `no exId: … the nearest is <Name> [<id>]` → use that name and id when it is the same movement.
 - **Judgment, surface to Amir, never silently invent:** `no exId: not in the Spine by that name` is
-  either a movement the Spine has under another name (stamp that id; the upkeep adds the alias) or a
+  either a movement the Spine has under another name (stamp that id AND rename the card to the entry's name:
+  one name, no alias, NAM-8) or a
   new movement: draft it into the Spine NOW with `/spine`, in full, so its card gets an `exId` before
   the check · a `NAM-8` WARN (the card's name is another entry's) · an exercise that looks like the
   *wrong* movement · a corrective or postural drill with no noted indication (SEL-14).
-- An INFO "add it as an alias" is the Spine upkeep's to do (Step 8).
+- A `NAM-8` WARN "the card is not named as its Spine entry" is a rename, done here before publishing (Amir,
+  2026-10-09: one name, the Spine's; a different version is its own entry, via `/spine`).
 Re-run `--spine-sql` and the check after stamping or drafting, until the names are clean.
 
 **The Spine is a publishing gate**, because the cards carry no cues of their own. Every exercise
@@ -512,7 +514,7 @@ qualities on approved entries as suggestions, better cues as proposals.
 Amir, 2026-09-24: *"when i write or update a program, and there are movements that are not there,
 or missing some info, or can be updated, it should be updated there at the end … so everytime i
 write a program for an athlete, this gets more complete."* Run **`/spine` → Upkeep** on this
-athlete's programme: draft every exercise with no entry, fill every empty field (video, alias,
+athlete's programme: draft every exercise with no entry, fill every empty field (video,
 equipment, regressions/progressions/alternatives, SFR, flags, **qualities**, **body parts**: `loads` +
 `impact`, which the athlete sees as *Body parts involved*), stamp `exId` on every card that resolves,
 link a new exercise to its regressions, progressions and alternatives from both sides, apply design's `spine_cue:` lines to drafts

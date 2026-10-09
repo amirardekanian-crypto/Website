@@ -185,7 +185,7 @@ def name_hint(name, names):
     if r['hit']: return f": the Spine has it as {r['hit']}, so stamp that exId"
     if r['near']: return f": no entry by that name or alias, and the nearest is {r['near_name']} [{r['near']}]: use its name (NAM-8), or draft a new entry with /spine if it is a different movement"
     return (": not in the Spine by that name. If it is a movement the Spine already has under another name "
-            "(Back Squat for Barbell Back Squat), stamp that id and add this name as an alias; if it is new, "
+            "(Back Squat for Barbell Back Squat), stamp that id and rename the card to that entry's name, one name and no alias (NAM-8); if it is new, "
             "draft it with /spine, in full (NAM-9)")
 
 def check_structure(data, args, spine=None, names=None):
@@ -289,7 +289,8 @@ def check_names(data, ctx):
             warn(f"{where}: its name is the Spine entry {hit}, but its exId is {o.get('exId')}: check which one is right, "
                  "since the card shows the exId's cues and video", 'NAM-8')
         else:
-            info(f"{where}: not the name or an alias of {o.get('exId')} ({e['name']}): add it as an alias in the Spine upkeep")
+            warn(f"{where}: the card is not named as its Spine entry {o.get('exId')} ({e['name']}): rename the card to the "
+                 "entry's name, one name and no alias (Amir, 2026-10-09). A different version is its own entry", 'NAM-8')
 
 def check_tests(data, args):
     """TST-5: two or three retest flags a cycle, on grinding standard lifts, and none in a first cycle

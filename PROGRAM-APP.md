@@ -263,6 +263,9 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   merged entry's whole row, are in `exercise_coach.links_history`. ⚠ **Two entries may never
   share a name or alias**: the resolver wants ONE entry per tier, so a shared name resolves to
   nothing and both cards lose their cues. A duplicate becomes an alias and its entry is deleted.
+  **Since 2026-10-09 there are no aliases** (Amir: one name, the Spine's): every card carries its entry's
+  exact name, a different version (equipment, setup) has its own entry, and all 107 aliases were removed.
+  A duplicate is now merged by renaming its cards to the kept entry's name.
 - **Body parts involved** (Amir, 2026-09-24, from the course app's «بخش‌هایی از بدن که درگیر است»;
   `supabase/stage36_body_parts.sql`). `loads` = the course's region ids (`ankle-foot · calf-achilles ·
   knee · hip-groin · hamstring · low-back · trunk · shoulder · elbow-forearm-wrist`, plus `neck`),
@@ -317,8 +320,10 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   but only *propose* changes to an approved one, and report a one-line **SPINE** block in the
   handoff. The same day, the athlete-specific cues on two athletes' cards moved
   into their Coach's Notes (previous versions in `program_versions`).
-- **Names are never rewritten.** Card → entry resolves by `exId`, then name/aliases through
-  `exNameVariants()`. ⚠ **The resolver exists twice** — `spineFor()` (program.html) and
+- **One name** (Amir, 2026-10-09). Card → entry resolves by `exId`, then name through
+  `exNameVariants()`; the Spine has no aliases, and a card is named exactly as its entry. A rename in a
+  LIVE programme loses the athlete's history for that lift unless it moves too: logged sets, `setlog_`
+  keys and Records are joined by name, through `matchRenamed()`'s spelling tiers only. ⚠ **The resolver exists twice** — `spineFor()` (program.html) and
   `spineForC()` (coach.html). Same rule: `exId` first, then the tightest tier with ONE entry.
 - `spinecache` (localStorage, no athlete prefix) is a cache of `get_exercises()` and never syncs.
 - **Library → Exercises is the third door** (Amir, 2026-09-24: *"something like the one i have in tps

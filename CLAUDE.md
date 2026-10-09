@@ -147,7 +147,10 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Week 1 and the back-off week are `cycles[n].weekNotes`**; the app never invents a back-off.
 - **The Spine**: only approved entries reach a phone; cues and **videos** live on the entry (a video is added
   in coach.html → Exercises; `exercise_library.json` and its Notion sync were retired 2026-09-26);
-  two entries never share a name or alias; rungs are gone for good; Library has three doors (Sessions,
+  **one name per exercise, the Spine's** (Amir, 2026-10-09): every card in the Library and in programmes carries
+  its entry's exact name, the Spine has NO aliases, and a different version (equipment, setup) is its own entry;
+  a rename in a live programme must move the athlete's logged history with it (`/spine` → *One name in live
+  programmes*); rungs are gone for good; Library has three doors (Sessions,
   Playbook, Exercises) and **no Qualities door**.
 - **A delete is a tombstone** (Personal Records `{del: true}`, body weight `kg: null` with a fresh `t`), and every
   records write rebuilds from `loadCeilingRaw()`, or a device that missed the delete brings it back.
