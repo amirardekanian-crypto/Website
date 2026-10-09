@@ -238,8 +238,18 @@ Rule 4 applied to athletes' programmes the same day the Library was done. How a 
 - The 2026-10-09 run: 29 programmes, 45 cards renamed, 43 linked and waiting for their history move, 10
   different-version entries (Leaning, Single-Arm, Half-Kneeling, Smith, Incline, Band, Dumbbell Box
   Step-Up), 3 Spine names fixed to the rules (Inverted Row, Seated Cable Row, Standing Dumbbell Single-Leg
-  Calf Raise) and all 107 aliases removed. **Still open: the history move** for the 43 (Amir chose to move
-  the history with the rename; it needs a look at how phones sync `athlete_progress` before any app change).
+  Calf Raise) and all 107 aliases removed.
+- **The history move** (same evening, Amir: "rename and move their history too"; no app change needed): the
+  43 waiting cards (31 names, 15 athletes) were renamed in ONE transaction that also renamed the exercise in
+  their 20 logged sessions (`session_history.log`: `ex` and circuit `items[].name`), copied 26 saved
+  `setlog_ / note_ / wlog_` keys to the new name (the old keys stay, unused) and would have added Records rows
+  under the new name (none had any). Why that is safe: a phone PULLS before it pushes, `save_progress()` merges
+  by key (`(old - drops) || new`), set logs merge field by field and Records by lift + date. Only an athlete
+  with the app OPEN through the move can push stale values back once, so it ran when none of them had synced
+  for hours, rehearsed first with `rollback`. The undo copy (each session log and progress record as it was)
+  is in `backup.onename_2026_10_09` (private schema, not in the API): **drop it after 2026-10-23**, since a
+  backup kept longer breaks the privacy notice. **Re-check** for an old name a phone pushed back:
+  `select h.athlete_id, x->>'ex' from public.session_history h, jsonb_array_elements(h.log) x join backup.onename_2026_10_09 b on b.athlete_id = h.athlete_id and b.kind = 'progress' where x->>'ex' in (<the old names>)`.
 
 ## Upkeep: the end of EVERY programme write (Amir, 2026-09-24)
 
