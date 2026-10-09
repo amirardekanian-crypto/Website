@@ -167,6 +167,7 @@
         {
           "type": "standard",
           "name": "Shuttle Sprint",
+          "exId": "shuttle-sprint",
           "videoUrl": null,
           "note": "Game 1 of 4: if your turns get sloppy, a foot slips, something twinges or your sprints slow right down, stop after this game and go to the cool-down.",
           "cues": {
@@ -188,6 +189,7 @@
         {
           "type": "standard",
           "name": "Shuttle Sprint",
+          "exId": "shuttle-sprint",
           "videoUrl": null,
           "note": "Game 2 of 4: walk and breathe for ninety seconds first, and go to the cool-down instead if the last game got sloppy, twinged or slowed right down.",
           "cues": {
@@ -209,6 +211,7 @@
         {
           "type": "standard",
           "name": "Shuttle Sprint",
+          "exId": "shuttle-sprint",
           "videoUrl": null,
           "note": "Game 3 of 4: walk and breathe for ninety seconds first, and go to the cool-down instead if the last game got sloppy, twinged or slowed right down.",
           "cues": {
@@ -230,6 +233,7 @@
         {
           "type": "standard",
           "name": "Shuttle Sprint",
+          "exId": "shuttle-sprint",
           "videoUrl": null,
           "note": "Game 4 of 4: walk and breathe for ninety seconds first, and go to the cool-down instead if the last game got sloppy, twinged or slowed right down.",
           "cues": {

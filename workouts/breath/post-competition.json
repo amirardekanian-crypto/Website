@@ -51,6 +51,7 @@
         {
           "type": "simple",
           "name": "Shoulder Cross-Body Swings",
+          "exId": "cross-body-arm-swing",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -111,6 +112,7 @@
         {
           "type": "simple",
           "name": "Child's Pose",
+          "exId": "childs-pose",
           "videoUrl": "https://www.youtube.com/watch?v=_ZX_zTOBgp8",
           "cues": {
             "good": [

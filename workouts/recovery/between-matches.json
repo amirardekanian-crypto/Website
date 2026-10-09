@@ -91,6 +91,7 @@
         {
           "type": "simple",
           "name": "Shoulder Cross-Body Swings",
+          "exId": "cross-body-arm-swing",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -128,6 +129,7 @@
         {
           "type": "simple",
           "name": "Split-Step Bounces",
+          "exId": "split-step-bounce",
           "videoUrl": null,
           "cues": {
             "good": [

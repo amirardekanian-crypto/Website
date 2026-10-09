@@ -234,6 +234,7 @@
         {
           "type": "standard",
           "name": "Countermovement Jump",
+          "exId": "countermovement-jump",
           "videoUrl": null,
           "cues": {
             "good": [

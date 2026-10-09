@@ -187,6 +187,23 @@ select status, count(*), count(*) filter (where cues is null) no_cues,
 - that he approves them in **coach.html → Exercises → Drafts**, and that the list shows which
   athletes use each one.
 
+## The Library's own exercises (2026-10-09)
+
+Amir went to add videos to the Library's sessions and found most of their cards outside the Spine:
+the 42 older sessions predate it, so a video on an entry never reached them. What is still open is
+`to_draft` in `scripts/library_spine_baseline.json` (`python scripts/check_library_spine.py --list`).
+Drafting one of those is the Run above with three differences:
+- **The cues come from the Library card** (no programme has them), cleaned to rule 3. The card keeps
+  its own cues; the entry's are for everyone else.
+- **Link the cards in the same run**, to the draft id: `exId` on the card in `workouts/` AND on the
+  live `public.library` row (guarded `jsonb_set`, md5 before and after, as in the workout skill). A
+  draft is not served, so the card falls back to its name until Amir approves, then lights up with no
+  further step. Then `python scripts/check_library_spine.py --update`.
+- **Leave plain names on approved entries' link lists** (`Couch Stretch` on the hip flexor stretch's
+  Progressions): an id whose entry is still a draft shows nothing, a name links on its own at approval.
+A card spelling that is really an existing exercise is an alias, never a rename (rule 4). Breathing
+drills stay out (Amir, 2026-10-09: no pattern fits and no new pill).
+
 ## Upkeep: the end of EVERY programme write (Amir, 2026-09-24)
 
 Amir: *"when i write or update a program, and there are movements that are not there, or missing

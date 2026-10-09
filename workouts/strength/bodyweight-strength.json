@@ -92,6 +92,7 @@
         {
           "type": "simple",
           "name": "Arm Circles",
+          "exId": "arm-circles",
           "videoUrl": null,
           "cues": {
             "good": [

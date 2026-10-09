@@ -51,6 +51,7 @@
         {
           "type": "simple",
           "name": "Figure-4 Glute Stretch",
+          "exId": "supine-figure-4-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -86,6 +87,7 @@
         {
           "type": "simple",
           "name": "Couch Stretch",
+          "exId": "couch-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -149,6 +151,7 @@
         {
           "type": "simple",
           "name": "Child's Pose with Side Reach",
+          "exId": "childs-pose",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -167,6 +170,7 @@
         {
           "type": "simple",
           "name": "Cross-Body Shoulder Stretch",
+          "exId": "cross-body-shoulder-stretch",
           "videoUrl": null,
           "note": "The back of the serving shoulder is the one nobody stretches — go gently.",
           "cues": {

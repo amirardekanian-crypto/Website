@@ -93,6 +93,7 @@
         {
           "type": "simple",
           "name": "Lat Roll",
+          "exId": "lat-roll",
           "videoUrl": null,
           "note": "Your serving side will be the worse one, so give it the extra time.",
           "cues": {
@@ -112,6 +113,7 @@
         {
           "type": "simple",
           "name": "Upper Back Roll",
+          "exId": "upper-back-roll",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -129,6 +131,7 @@
         {
           "type": "simple",
           "name": "Cross-Body Shoulder Stretch",
+          "exId": "cross-body-shoulder-stretch",
           "videoUrl": null,
           "cues": {
             "good": [

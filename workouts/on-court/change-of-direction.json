@@ -240,6 +240,7 @@
         {
           "type": "standard",
           "name": "Turn and Go",
+          "exId": "turn-and-go",
           "videoUrl": null,
           "cues": {
             "good": [

@@ -46,6 +46,7 @@
         {
           "type": "simple",
           "name": "Thread the Needle",
+          "exId": "thread-the-needle",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -113,6 +114,7 @@
         {
           "type": "simple",
           "name": "Child's Pose with Extended Exhale",
+          "exId": "childs-pose",
           "videoUrl": null,
           "note": "In 4, out 8. Box breathing steadies you; the long exhale is what drops you.",
           "cues": {

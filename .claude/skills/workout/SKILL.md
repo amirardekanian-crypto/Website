@@ -277,7 +277,8 @@ wording the coaches' panel reviewed on the 20 new sessions. *Lightheaded* was wr
 | Lightheaded | Dizzy, or pins and needles in your hands or face? Stop counting and breathe normally. Never do breath holds in water or while driving. | box breathing and any breath hold |
 
 **Check before publishing:** every exercise resolves to an approved Spine entry with cues (a new
-session writes no `cues`), every note one sentence, `intro` present and about 100–150 words, `before` present with no warning also repeated in the intro.
+session writes no `cues`) and carries its `exId` (`python scripts/check_library_spine.py --online`, pre-commit
+guard 14: a card with no `exId` blocks the commit, 2026-10-09), every note one sentence, `intro` present and about 100–150 words, `before` present with no warning also repeated in the intro.
 
 ### ⚠️ `countsAs` is required — decide it, don't omit it
 
@@ -376,7 +377,7 @@ Before committing:
 - A rest shared by a block sits once on the block, and `rx.rest` stays only on a card that differs (CHP-7)
 - **`node scripts/check_rx.js` passes** — it audits every `rx` in the library and is in the
   pre-commit hook anyway
-- Every exercise resolves to an approved Spine entry (no `cues` on a new session), every `note` one
+- Every exercise resolves to an approved Spine entry and carries its `exId` (no `cues` on a new session), every `note` one
   sentence, `intro` present (about 100–150 words)
 - `before` present on anything with load or speed, and no warning repeated between it and the intro
 - `countsAs` is set deliberately

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Thirteen guards. Each runs only when its own files are staged, so a commit that
+# Fourteen guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -258,6 +258,20 @@ if git diff --cached --name-only --diff-filter=ACM      | grep -qE '^((index|ind
   if ! "$PY" scripts/check_site_style.py; then
     echo ""
     echo "pre-commit: BLOCKED — the change brings back something the website audit fixed (details above)."
+    failed=1
+  fi
+fi
+
+# ── 14. every Library card links to its Spine entry (added 2026-10-09) ────────
+# Why: a video, the cues and the About sheet live on the exercise's Spine entry, and a card reaches
+# it through exId. The 42 older sessions predated the Spine: 10 of 371 cards had an exId and 180
+# matched no entry, so a video Amir added in coach.html never reached them. This fails a card with no
+# exId unless its name is on scripts/library_spine_baseline.json, which only shrinks.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(workouts/|scripts/(check_library_spine\.py|library_spine_baseline\.json)$)'; then
+  echo "pre-commit: a Library session changed — checking every card links to the Spine..."
+  if ! "$PY" scripts/check_library_spine.py; then
+    echo ""
+    echo "pre-commit: BLOCKED — a Library card has no exId (details above). Link it, or draft its entry with /spine."
     failed=1
   fi
 fi

@@ -87,6 +87,7 @@
         {
           "type": "simple",
           "name": "Upper Back Roll",
+          "exId": "upper-back-roll",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -104,6 +105,7 @@
         {
           "type": "simple",
           "name": "Lat Roll",
+          "exId": "lat-roll",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -128,6 +130,7 @@
         {
           "type": "simple",
           "name": "Child's Pose",
+          "exId": "childs-pose",
           "videoUrl": "https://www.youtube.com/watch?v=_ZX_zTOBgp8",
           "cues": {
             "good": [

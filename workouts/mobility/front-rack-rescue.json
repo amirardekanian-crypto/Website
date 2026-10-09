@@ -24,6 +24,7 @@
         {
           "type": "simple",
           "name": "Foam-Roll Lats",
+          "exId": "lat-roll",
           "videoUrl": null,
           "cues": {
             "good": [

@@ -50,6 +50,7 @@
         {
           "type": "simple",
           "name": "Half-Kneeling Hip Flexor with Overhead Reach",
+          "exId": "half-kneeling-hip-flexor-with-overhead-reach",
           "videoUrl": "https://www.youtube.com/watch?v=Xp-J3fRRduY",
           "cues": {
             "good": [
