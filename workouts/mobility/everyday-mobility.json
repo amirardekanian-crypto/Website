@@ -31,7 +31,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Thoracic Rotation",
+          "name": "Quadruped Thoracic Rotation",
           "exId": "quadruped-thoracic-rotation",
           "videoUrl": null,
           "cues": {

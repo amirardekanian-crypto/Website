@@ -47,7 +47,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Jog",
+          "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
           "cues": {
@@ -284,7 +284,7 @@
         },
         {
           "type": "standard",
-          "name": "Cut and Go",
+          "name": "45° Cut",
           "exId": "45-degree-cut",
           "videoUrl": null,
           "cues": {

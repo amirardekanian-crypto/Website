@@ -35,7 +35,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Jog",
+          "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
           "cues": {
@@ -128,7 +128,7 @@
         },
         {
           "type": "simple",
-          "name": "Split-Step Bounces",
+          "name": "Split-Step Bounce",
           "exId": "split-step-bounce",
           "videoUrl": null,
           "cues": {

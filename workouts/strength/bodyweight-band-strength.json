@@ -47,7 +47,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "March on the Spot",
+          "name": "March in Place",
           "exId": "march-in-place",
           "videoUrl": null,
           "cues": {
@@ -150,7 +150,7 @@
         {
           "type": "standard",
           "name": "Bulgarian Split Squat",
-          "exId": "dumbbell-bulgarian-split-squat",
+          "exId": "bulgarian-split-squat",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -173,7 +173,7 @@
         {
           "type": "standard",
           "name": "Single-Leg Romanian Deadlift",
-          "exId": "dumbbell-single-leg-romanian-deadlift",
+          "exId": "single-leg-romanian-deadlift",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -224,7 +224,7 @@
         {
           "type": "standard",
           "name": "Banded Single-Leg Glute Bridge",
-          "exId": "single-leg-glute-bridge",
+          "exId": "banded-single-leg-glute-bridge",
           "videoUrl": null,
           "cues": {
             "good": [

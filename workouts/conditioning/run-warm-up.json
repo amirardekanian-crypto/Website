@@ -35,7 +35,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Jog",
+          "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
           "cues": {
@@ -97,7 +97,7 @@
         },
         {
           "type": "simple",
-          "name": "Walking Hamstring Sweep",
+          "name": "Hamstring Scoop",
           "exId": "hamstring-scoop",
           "videoUrl": null,
           "cues": {
@@ -116,7 +116,7 @@
         },
         {
           "type": "simple",
-          "name": "Front-to-Back Leg Swing",
+          "name": "Leg Swings",
           "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
@@ -131,11 +131,12 @@
           "rx": {
             "reps": 10,
             "side": true
-          }
+          },
+          "note": "Front to back."
         },
         {
           "type": "simple",
-          "name": "Side-to-Side Leg Swing",
+          "name": "Leg Swings",
           "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
@@ -150,7 +151,8 @@
           "rx": {
             "reps": 10,
             "side": true
-          }
+          },
+          "note": "Side to side."
         }
       ]
     },
@@ -180,8 +182,8 @@
               }
             },
             {
-              "name": "Single-Leg Romanian Deadlift Reach",
-              "exId": "dumbbell-single-leg-romanian-deadlift",
+              "name": "Single-Leg Romanian Deadlift",
+              "exId": "single-leg-romanian-deadlift",
               "cues": {
                 "good": [
                   "Hinge from the hip with the back leg long behind you",
@@ -197,7 +199,7 @@
               }
             },
             {
-              "name": "Pogo Hop",
+              "name": "Pogo Jump",
               "exId": "pogo-jump",
               "cues": {
                 "good": [
@@ -242,7 +244,7 @@
       "exercises": [
         {
           "type": "standard",
-          "name": "Build-Up",
+          "name": "Build-Up Run",
           "exId": "build-up-run",
           "videoUrl": null,
           "cues": {
@@ -264,7 +266,7 @@
         },
         {
           "type": "simple",
-          "name": "Start the Run",
+          "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
           "cues": {

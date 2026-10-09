@@ -35,7 +35,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "March on the Spot",
+          "name": "March in Place",
           "exId": "march-in-place",
           "videoUrl": null,
           "cues": {
@@ -156,7 +156,7 @@
         },
         {
           "type": "standard",
-          "name": "Single-Leg Hip Bridge",
+          "name": "Single-Leg Glute Bridge",
           "exId": "single-leg-glute-bridge",
           "videoUrl": null,
           "cues": {

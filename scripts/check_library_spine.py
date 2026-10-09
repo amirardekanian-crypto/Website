@@ -1,4 +1,4 @@
-"""Every Library card links to its Spine entry (Amir, 2026-10-09).
+"""Every Library card links to its Spine entry and carries its name (Amir, 2026-10-09).
 
 Runs from .githooks/pre-commit whenever a workout file is staged. A video, the cues and the About sheet
 live on the exercise's Spine entry (public.exercises), and a card reaches its entry through `exId`
@@ -6,19 +6,23 @@ live on the exercise's Spine entry (public.exercises), and a card reaches its en
 Spine, so on 2026-10-09 only 10 of their 371 cards carried an exId and 180 matched no entry at all: a
 video Amir added in coach.html never reached them. This stops a card without an exId coming back.
 
-It is a RATCHET: scripts/library_spine_baseline.json lists the card names allowed to go without one.
+ONE NAME (Amir, 2026-10-09: "i dont want to have 2 names, being linked ... the source of the truth
+should be my naming rules which is my spine"): a card's name is its Spine entry's name, exactly. No
+alias for a card spelling and no second name on the card. A card that is a different variant (other
+equipment, other setup) gets its own entry under its own name (NAM-1 to NAM-6).
+
+It is a RATCHET: scripts/library_spine_baseline.json lists the card names allowed to go without an exId.
   not_exercises  never linked on purpose (breathing drills have no pattern in the Spine and Amir kept
                  them out, 2026-10-09; warm-up sets are not an exercise)
-  to_draft       still waiting for a Spine entry (/spine). It only shrinks: once a name is linked
-                 everywhere, run --update and it cannot come back.
-A new card (any session) must carry an exId. The id must be one the Spine has: --online checks the
-approved entries through the public get_exercises() RPC (a draft is not served, so it is listed, not
-failed).
+  to_draft       waiting for a Spine entry (/spine). It only shrinks: --update locks it in.
+
+The name check needs the approved Spine (the public get_exercises() RPC). When it cannot be reached
+the check says so and passes on the rest; a draft is not served, so its cards are listed, not failed.
 
     python scripts/check_library_spine.py            the check (the hook)
     python scripts/check_library_spine.py --list     every unlinked card, by name
     python scripts/check_library_spine.py --update   shrink to_draft to what is still unlinked
-    python scripts/check_library_spine.py --online   also check every exId against the approved Spine
+    python scripts/check_library_spine.py --online   also list every linked id that is not approved yet
 """
 import glob, json, os, re, sys, urllib.request
 
@@ -40,6 +44,20 @@ def cards():
                     yield d.get('id', os.path.basename(f)), c
 
 
+def approved_spine():
+    """{id: name} of the approved entries, or None when the Spine cannot be reached."""
+    try:
+        page = open(os.path.join(ROOT, 'program.html'), encoding='utf-8').read()
+        url = re.search(r'https://[a-z0-9]+\.supabase\.co', page).group(0)
+        key = re.search(r'sb_publishable_[A-Za-z0-9_-]+', page).group(0)
+        req = urllib.request.Request(url + '/rest/v1/rpc/get_exercises', data=b'{}', method='POST',
+                                     headers={'apikey': key, 'Content-Type': 'application/json'})
+        return {e['id']: e['name'] for e in json.load(urllib.request.urlopen(req, timeout=10))}
+    except Exception as e:  # offline, blocked, or the RPC changed
+        print(f'library-spine: the Spine could not be reached ({type(e).__name__}), so card names were not checked')
+        return None
+
+
 def main():
     base = json.load(open(BASELINE, encoding='utf-8'))
     never, to_draft = set(base['not_exercises']), set(base['to_draft'])
@@ -51,7 +69,7 @@ def main():
         elif not SLUG.fullmatch(x):
             bad_id.append(f'{sid}: {c.get("name")} has exId {x!r}, not an entry id')
         else:
-            used.setdefault(x, []).append(f'{sid}: {c.get("name")}')
+            used.setdefault(x, []).append((sid, c.get('name', '')))
 
     if '--list' in sys.argv:
         for n, s in sorted(unlinked.items()):
@@ -74,17 +92,21 @@ def main():
         if n not in never and n not in to_draft:
             problems.append(f'{n} ({", ".join(sorted(set(s)))}) has no exId. Link it to its Spine entry, '
                             'or draft one with /spine first')
-    if '--online' in sys.argv:
-        page = open(os.path.join(ROOT, 'program.html'), encoding='utf-8').read()
-        url = re.search(r'https://[a-z0-9]+\.supabase\.co', page).group(0)
-        key = re.search(r'sb_publishable_[A-Za-z0-9_-]+', page).group(0)
-        req = urllib.request.Request(url + '/rest/v1/rpc/get_exercises', data=b'{}', method='POST',
-                                     headers={'apikey': key, 'Content-Type': 'application/json'})
-        approved = {e['id'] for e in json.load(urllib.request.urlopen(req, timeout=20))}
-        waiting = {x: s for x, s in used.items() if x not in approved}
-        for x, s in sorted(waiting.items()):
-            print(f'not approved yet (a draft, or no such id): {x}  <- {"; ".join(s)}')
-        print(f'online: {len(used) - len(waiting)} of {len(used)} linked ids are approved entries')
+    spine = approved_spine()
+    if spine is not None:
+        waiting = {}
+        for x, uses in sorted(used.items()):
+            if x not in spine:
+                waiting[x] = uses
+                continue
+            for sid, name in uses:
+                if name != spine[x]:
+                    problems.append(f'{sid}: the card says {name!r} but its Spine entry ({x}) is {spine[x]!r}. '
+                                    'One name: rename the card, or give a different variant its own entry')
+        if '--online' in sys.argv or waiting:
+            for x, uses in sorted(waiting.items()):
+                print(f'not approved yet (a draft, or no such id): {x}  <- {"; ".join(f"{s}: {n}" for s, n in uses)}')
+            print(f'online: {len(used) - len(waiting)} of {len(used)} linked ids are approved entries')
 
     stale = sorted(n for n in to_draft if n not in unlinked)
     if stale:
@@ -92,7 +114,8 @@ def main():
     if problems:
         print('\n'.join(problems))
         return 1
-    print(f'library-spine: OK ({sum(len(s) for s in unlinked.values())} cards still unlinked, all on the baseline)')
+    print(f'library-spine: OK ({sum(len(s) for s in unlinked.values())} cards still unlinked, all on the baseline'
+          + ('' if spine is None else '; every linked card carries its entry\'s name') + ')')
     return 0
 
 

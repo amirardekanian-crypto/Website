@@ -31,7 +31,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Brisk Walk",
+          "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
           "cues": {
@@ -45,7 +45,8 @@
           },
           "rx": {
             "time": "3 minutes"
-          }
+          },
+          "note": "Brisk pace."
         },
         {
           "type": "simple",
@@ -143,7 +144,7 @@
         },
         {
           "type": "simple",
-          "name": "Jog-to-Run Ramp",
+          "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
           "cues": {
@@ -157,7 +158,8 @@
           },
           "rx": {
             "time": "3 minutes"
-          }
+          },
+          "note": "Start as a jog and build to your run pace."
         }
       ]
     },
@@ -193,7 +195,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Walk",
+          "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
           "cues": {

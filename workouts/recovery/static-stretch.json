@@ -31,8 +31,8 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Lying Hamstring Stretch",
-          "exId": "supine-strap-hamstring-stretch",
+          "name": "Supine Hamstring Stretch",
+          "exId": "supine-hamstring-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -50,7 +50,7 @@
         },
         {
           "type": "simple",
-          "name": "Figure-4 Glute Stretch",
+          "name": "Supine Figure-4 Stretch",
           "exId": "supine-figure-4-stretch",
           "videoUrl": null,
           "cues": {
@@ -106,7 +106,7 @@
         },
         {
           "type": "simple",
-          "name": "Wall Calf Stretch",
+          "name": "Standing Calf Stretch",
           "exId": "standing-calf-stretch",
           "videoUrl": null,
           "cues": {
@@ -151,7 +151,7 @@
         },
         {
           "type": "simple",
-          "name": "Child's Pose with Side Reach",
+          "name": "Child's Pose",
           "exId": "childs-pose",
           "videoUrl": null,
           "cues": {

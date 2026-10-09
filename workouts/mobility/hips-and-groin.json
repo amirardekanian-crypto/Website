@@ -31,7 +31,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Frog Rock",
+          "name": "Frog Stretch",
           "exId": "frog-stretch",
           "videoUrl": null,
           "cues": {
@@ -94,7 +94,7 @@
         },
         {
           "type": "simple",
-          "name": "Lateral Lunge with Reach",
+          "name": "Lateral Lunge",
           "exId": "lateral-lunge",
           "videoUrl": null,
           "cues": {

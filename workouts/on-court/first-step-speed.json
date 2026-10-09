@@ -47,7 +47,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Jog",
+          "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
           "cues": {
@@ -142,7 +142,7 @@
         },
         {
           "type": "simple",
-          "name": "Ankle Pogo",
+          "name": "Pogo Jump",
           "exId": "pogo-jump",
           "videoUrl": null,
           "cues": {
@@ -237,8 +237,9 @@
           "name": "Baseline Footwork",
           "items": [
             {
-              "name": "Split-Step to First Step",
+              "name": "Split-Step to Sprint",
               "exId": "split-step-to-sprint",
+              "note": "One hard push-off, then set.",
               "detail": "6 reps, alternating sides",
               "cues": {
                 "good": [
@@ -251,7 +252,7 @@
               }
             },
             {
-              "name": "Recovery Shuffle",
+              "name": "Lateral Shuffle",
               "exId": "lateral-shuffle",
               "cues": {
                 "good": [

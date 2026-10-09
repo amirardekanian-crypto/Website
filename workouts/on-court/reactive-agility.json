@@ -35,7 +35,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Jog",
+          "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
           "cues": {
@@ -53,7 +53,7 @@
         },
         {
           "type": "simple",
-          "name": "Side Shuffle",
+          "name": "Lateral Shuffle",
           "exId": "lateral-shuffle",
           "videoUrl": null,
           "cues": {
@@ -91,7 +91,7 @@
         },
         {
           "type": "simple",
-          "name": "Split-Step Bounces",
+          "name": "Split-Step Bounce",
           "exId": "split-step-bounce",
           "videoUrl": null,
           "cues": {
@@ -167,7 +167,7 @@
           "name": "Line Drill",
           "items": [
             {
-              "name": "Lateral Line Hops",
+              "name": "Lateral Line Hop",
               "exId": "lateral-line-hop",
               "cues": {
                 "good": [
@@ -183,7 +183,7 @@
               }
             },
             {
-              "name": "Front-Back Line Hops",
+              "name": "Front-Back Line Hop",
               "exId": "front-back-line-hop",
               "cues": {
                 "good": [

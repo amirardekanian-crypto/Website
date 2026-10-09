@@ -31,7 +31,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Walk",
+          "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
           "cues": {
@@ -118,7 +118,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Squat",
+          "name": "Bodyweight Squat",
           "exId": "bodyweight-squat",
           "videoUrl": null,
           "cues": {

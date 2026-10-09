@@ -23,7 +23,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Jog / Skip",
+          "name": "Easy Run",
           "exId": "easy-run",
           "cues": {
             "good": [
@@ -41,7 +41,7 @@
         },
         {
           "type": "simple",
-          "name": "Side Shuffles",
+          "name": "Lateral Shuffle",
           "exId": "lateral-shuffle",
           "cues": {
             "good": [
@@ -98,7 +98,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Prisoner Squats",
+          "name": "Bodyweight Squat",
           "exId": "bodyweight-squat",
           "cues": {
             "good": [
@@ -117,7 +117,7 @@
         },
         {
           "type": "simple",
-          "name": "Airplane",
+          "name": "Hip Airplane",
           "exId": "hip-airplane",
           "cues": {
             "good": [
@@ -137,7 +137,7 @@
         },
         {
           "type": "simple",
-          "name": "Hip Openers",
+          "name": "Standing Hip Circle",
           "exId": "standing-hip-circle",
           "cues": {
             "good": [
@@ -195,7 +195,7 @@
         },
         {
           "type": "simple",
-          "name": "Shoulder Cross-Body Swings",
+          "name": "Cross-Body Arm Swing",
           "exId": "cross-body-arm-swing",
           "cues": {
             "good": [
@@ -213,7 +213,7 @@
         },
         {
           "type": "simple",
-          "name": "Half Kneeling T-Spine Rotations",
+          "name": "Half-Kneeling Thoracic Rotation",
           "exId": "half-kneeling-thoracic-rotation",
           "cues": {
             "good": [
@@ -241,7 +241,7 @@
       "exercises": [
         {
           "type": "standard",
-          "name": "Ankle Pogos",
+          "name": "Pogo Jump",
           "exId": "pogo-jump",
           "videoUrl": null,
           "cues": {
@@ -264,7 +264,7 @@
         },
         {
           "type": "standard",
-          "name": "Countermovement Jumps (CMJ)",
+          "name": "Countermovement Jump",
           "exId": "countermovement-jump",
           "videoUrl": null,
           "cues": {
@@ -286,7 +286,7 @@
         },
         {
           "type": "standard",
-          "name": "10m Accelerations",
+          "name": "Split-Stance Start",
           "exId": "split-stance-start",
           "videoUrl": null,
           "cues": {
@@ -301,7 +301,8 @@
             ]
           },
           "rx": {
-            "sets": 3
+            "sets": 3,
+            "distance": "10 m"
           },
           "intent": "max speed"
         }

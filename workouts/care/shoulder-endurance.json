@@ -31,7 +31,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Walk",
+          "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
           "cues": {
@@ -184,7 +184,7 @@
       "exercises": [
         {
           "type": "standard",
-          "name": "Side Lying Dumbbell External Rotation",
+          "name": "Side-Lying Dumbbell External Rotation",
           "exId": "side-lying-dumbbell-external-rotation",
           "videoUrl": null,
           "note": "Work the sore side, and if your shoulder feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
@@ -228,7 +228,7 @@
         },
         {
           "type": "standard",
-          "name": "Band Row",
+          "name": "Seated Band Row",
           "exId": "seated-band-row",
           "videoUrl": null,
           "cues": {

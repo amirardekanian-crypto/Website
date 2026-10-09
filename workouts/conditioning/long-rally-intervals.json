@@ -43,7 +43,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Jog on the Spot",
+          "name": "Jog on the Spot",
           "exId": "jog-on-the-spot",
           "videoUrl": null,
           "cues": {
@@ -237,7 +237,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Walk",
+          "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
           "cues": {

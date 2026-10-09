@@ -43,7 +43,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Rowing Machine",
+          "name": "Rowing",
           "exId": "rowing",
           "videoUrl": null,
           "cues": {
@@ -165,7 +165,7 @@
         },
         {
           "type": "standard",
-          "name": "Half-Kneeling Single-Arm Overhead Press",
+          "name": "Half-Kneeling Single-Arm Dumbbell Press",
           "exId": "half-kneeling-single-arm-dumbbell-press",
           "videoUrl": null,
           "cues": {
@@ -215,7 +215,7 @@
         },
         {
           "type": "standard",
-          "name": "Rear Delt Fly",
+          "name": "Bent-Over Dumbbell Reverse Fly",
           "exId": "bent-over-dumbbell-reverse-fly",
           "videoUrl": null,
           "cues": {

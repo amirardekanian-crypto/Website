@@ -51,7 +51,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Bike",
+          "name": "Stationary Bike",
           "exId": "stationary-bike",
           "videoUrl": null,
           "cues": {

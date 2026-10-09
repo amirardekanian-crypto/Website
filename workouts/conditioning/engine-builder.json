@@ -31,7 +31,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Spin",
+          "name": "Stationary Bike",
           "exId": "stationary-bike",
           "videoUrl": null,
           "cues": {
@@ -95,7 +95,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Steady Ride",
+          "name": "Stationary Bike",
           "exId": "stationary-bike",
           "videoUrl": null,
           "cues": {
@@ -120,7 +120,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Spin",
+          "name": "Stationary Bike",
           "exId": "stationary-bike",
           "videoUrl": null,
           "cues": {

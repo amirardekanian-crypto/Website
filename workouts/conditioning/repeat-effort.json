@@ -43,7 +43,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Jog",
+          "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
           "cues": {
@@ -260,7 +260,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Walk",
+          "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
           "cues": {

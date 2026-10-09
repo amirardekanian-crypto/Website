@@ -39,7 +39,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Walk",
+          "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
           "cues": {
@@ -169,7 +169,7 @@
       "exercises": [
         {
           "type": "standard",
-          "name": "Calf Raise",
+          "name": "Double-Leg Calf Raise",
           "exId": "double-leg-calf-raise",
           "videoUrl": null,
           "note": "Lower until your heels are just below the step, and if the last set feels easy, wear a backpack with a couple of books in it.",

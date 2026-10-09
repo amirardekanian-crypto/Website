@@ -31,7 +31,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Walk",
+          "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
           "cues": {
@@ -208,7 +208,7 @@
         {
           "type": "standard",
           "name": "Side-Lying Hip Abduction",
-          "exId": "banded-side-lying-hip-abduction",
+          "exId": "side-lying-hip-abduction",
           "videoUrl": null,
           "cues": {
             "good": [

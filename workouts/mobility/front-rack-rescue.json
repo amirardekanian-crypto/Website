@@ -23,7 +23,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Foam-Roll Lats",
+          "name": "Lat Roll",
           "exId": "lat-roll",
           "videoUrl": null,
           "cues": {
@@ -42,7 +42,7 @@
         },
         {
           "type": "simple",
-          "name": "Foam Roller T-Spine Extensions",
+          "name": "Foam Roller Thoracic Extension",
           "exId": "foam-roller-thoracic-extension",
           "videoUrl": null,
           "cues": {
@@ -86,7 +86,7 @@
         },
         {
           "type": "simple",
-          "name": "Quadruped T-Spine Rotations",
+          "name": "Quadruped Thoracic Rotation",
           "exId": "quadruped-thoracic-rotation",
           "videoUrl": null,
           "cues": {
@@ -143,7 +143,7 @@
         },
         {
           "type": "simple",
-          "name": "Elbows-on-Bench Dowel Stretch",
+          "name": "Kneeling Thoracic Extension",
           "exId": "kneeling-thoracic-extension",
           "videoUrl": null,
           "cues": {
@@ -187,7 +187,7 @@
         },
         {
           "type": "simple",
-          "name": "Rack Hold",
+          "name": "Front Rack Hold",
           "exId": "front-rack-hold",
           "videoUrl": null,
           "cues": {

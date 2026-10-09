@@ -30,8 +30,12 @@ What the Spine is and why: `CLAUDE.md` → *The Spine*, `SCHEMA.md` → *`exId` 
    his words and strip only what is about one person. What you strip belongs in THAT athlete's
    Coach's Note (`note`), not lost: list it for Amir with the athlete id. If no programme has
    cues for a name, write three general ones and say so, since the entry is where cues live now.
-4. **Names are never rewritten.** A variant spelling that is really the same exercise becomes an
-   `alias` on the existing entry, not a new entry and not an edit to any programme.
+4. **Names are never rewritten** in an athlete's programme: a variant spelling that is really the same
+   exercise becomes an `alias` on the existing entry, not a new entry and not an edit to any programme.
+   **The Library is the exception: ONE name** (Amir, 2026-10-09: *"i dont want to have 2 names, being
+   linked ... the source of the truth should be my naming rules which is my spine"*). A Library card
+   carries its entry's name exactly, and its spelling never becomes an alias; see *The Library's own
+   exercises* below.
 
 ## The run
 
@@ -202,8 +206,18 @@ sets). A NEW Library exercise with no entry is drafted the same way, with three 
   further step. Then `python scripts/check_library_spine.py --update`.
 - **Leave plain names on approved entries' link lists** (`Couch Stretch` on the hip flexor stretch's
   Progressions): an id whose entry is still a draft shows nothing, a name links on its own at approval.
-A card spelling that is really an existing exercise is an alias, never a rename (rule 4). Breathing
-drills stay out (Amir, 2026-10-09: no pattern fits and no new pill).
+**One name** (Amir, 2026-10-09, the same day, after seeing Ankle Pogos linked to Pogo Jump: *"i dont want
+to have 2 names, being linked, i want to have one name consistent in my workouts with my spine"*):
+- A card that is the same exercise as an entry is **renamed to the entry's name**, never aliased. What
+  the old name carried goes where the rules put it: a direction or a pace in the card's `note` (one
+  short sentence), a distance in `rx.distance`. That day 108 cards were renamed and the 59 aliases the
+  linking had added were removed.
+- A card that is a **different variant** (other equipment or setup: bodyweight vs Dumbbell, Banded,
+  Strap) gets **its own entry under its own name** (NAM-1 to NAM-6), linked to the other as a
+  regression, progression or alternative. Five were drafted that day (Bulgarian Split Squat, Single-Leg
+  Romanian Deadlift, Side-Lying Hip Abduction, Banded Single-Leg Glute Bridge, Supine Hamstring Stretch).
+- `scripts/check_library_spine.py` (pre-commit guard 14) fails a card whose name is not its entry's.
+Breathing drills stay out (Amir, 2026-10-09: no pattern fits and no new pill).
 
 ## Upkeep: the end of EVERY programme write (Amir, 2026-09-24)
 

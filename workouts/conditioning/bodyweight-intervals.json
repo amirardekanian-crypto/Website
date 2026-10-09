@@ -51,7 +51,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "March on the Spot",
+          "name": "March in Place",
           "exId": "march-in-place",
           "videoUrl": null,
           "cues": {
@@ -179,7 +179,7 @@
               }
             },
             {
-              "name": "Fast Feet on the Spot",
+              "name": "Fast Feet",
               "exId": "fast-feet",
               "cues": {
                 "good": [
@@ -208,7 +208,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Walk",
+          "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
           "cues": {

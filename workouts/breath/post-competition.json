@@ -31,7 +31,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Walk",
+          "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
           "note": "Five minutes of easy movement first is what makes the rest of this land.",
@@ -50,7 +50,7 @@
         },
         {
           "type": "simple",
-          "name": "Shoulder Cross-Body Swings",
+          "name": "Cross-Body Arm Swing",
           "exId": "cross-body-arm-swing",
           "videoUrl": null,
           "cues": {

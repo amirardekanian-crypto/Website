@@ -35,7 +35,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Walk",
+          "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
           "cues": {
@@ -116,7 +116,7 @@
         },
         {
           "type": "simple",
-          "name": "Thoracic Windmill",
+          "name": "Open Book",
           "exId": "open-book",
           "videoUrl": null,
           "cues": {

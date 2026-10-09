@@ -31,7 +31,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "March on the Spot",
+          "name": "March in Place",
           "exId": "march-in-place",
           "videoUrl": null,
           "cues": {
@@ -112,7 +112,7 @@
       "exercises": [
         {
           "type": "standard",
-          "name": "Half-Kneeling Rotation",
+          "name": "Half-Kneeling Thoracic Rotation",
           "exId": "half-kneeling-thoracic-rotation",
           "videoUrl": null,
           "cues": {
@@ -160,7 +160,7 @@
       "exercises": [
         {
           "type": "standard",
-          "name": "Plank with Shoulder Tap",
+          "name": "Plank with Shoulder Taps",
           "exId": "plank-with-shoulder-taps",
           "videoUrl": null,
           "cues": {

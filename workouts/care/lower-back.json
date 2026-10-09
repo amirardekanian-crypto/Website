@@ -30,7 +30,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Easy Walk",
+          "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
           "note": "An ache you can breathe through is fine, but if it turns sharp, stop that exercise and tell me.",
@@ -177,7 +177,7 @@
         },
         {
           "type": "standard",
-          "name": "Side Bridge",
+          "name": "Side Plank",
           "exId": "side-plank",
           "videoUrl": "https://www.youtube.com/watch?v=I_drRVYlHbc",
           "note": "Start on your knees and only move to the feet when the knee version is easy on both sides.",
@@ -227,7 +227,7 @@
       "exercises": [
         {
           "type": "simple",
-          "name": "Supine Rest, Calves Elevated",
+          "name": "Supine Rest with Calves Elevated",
           "exId": "supine-rest-calves-elevated",
           "note": "No rolling and no back stretch here on purpose, because a sore back wants unloading, not pressure.",
           "cues": {
