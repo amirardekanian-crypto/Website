@@ -148,7 +148,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **The Spine**: only approved entries reach a phone; cues and **videos** live on the entry (a video is added
   in coach.html → Exercises; `exercise_library.json` and its Notion sync were retired 2026-09-26);
   **one name per exercise, the Spine's** (Amir, 2026-10-09): every card in the Library and in programmes carries
-  its entry's exact name, the Spine has NO aliases, and a different version (equipment, setup) is its own entry;
+  its entry's exact name, Claude adds NO aliases (coach.html keeps the field for Amir's own use), a different version
+  (equipment, setup) is its own entry and a name with no equipment word means bodyweight;
   a rename in a live programme must move the athlete's logged history with it (`/spine` → *One name in live
   programmes*); rungs are gone for good; Library has three doors (Sessions,
   Playbook, Exercises) and **no Qualities door**.

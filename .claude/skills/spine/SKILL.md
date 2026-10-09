@@ -32,8 +32,10 @@ What the Spine is and why: `CLAUDE.md` → *The Spine*, `SCHEMA.md` → *`exId` 
    cues for a name, write three general ones and say so, since the entry is where cues live now.
 4. **ONE name, the Spine's** (Amir, 2026-10-09: *"i dont want to have 2 names, being linked, i want to
    have one name consistent in my workouts with my spine. the source of the truth should be my naming
-   rules which is my spine"*; the same day, yes for athletes' programmes too). **The Spine carries no
-   aliases.** A card that is the same exercise under another spelling is **renamed to the entry's
+   rules which is my spine"*; the same day, yes for athletes' programmes too). **Claude adds no aliases**:
+   the field stays in coach.html for Amir's own use (*"for now, lets have a field for another name"*), and
+   a card is still named exactly as its entry. **A name with no equipment word is the bodyweight version**
+   (Amir: *"box step up means body weight, db box step-up means do it with db"*; NAM-2). A card that is the same exercise under another spelling is **renamed to the entry's
    name**; a card that is a different version (other equipment or setup) gets **its own entry** under
    its own name (NAM-1 to NAM-6). In a programme still being built, rename freely. In a LIVE programme
    the athlete's logged history is joined to the card by NAME, so a rename that is more than a

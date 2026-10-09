@@ -92,6 +92,7 @@ the principles (their *How to add*).
   - 2026-06-15
 - `NAM-2` **Bodyweight moves take the bare movement — no "Bodyweight" prefix**
   - 2026-06-19
+  - Amir, 2026-10-09, settling Box Step-Up, whose Spine entry listed dumbbells: "box step up means body weight, db box step-up means do it with db". The entry became bodyweight (box only, isolation cost) and Dumbbell Box Step-Up is its own entry.
 - `NAM-3` **Defining setups DO belong in the name**
   - 2026-06-15
 - `NAM-4` **Never in the name → these go in the prescription, the pill or the Coach's Note:**

@@ -726,7 +726,9 @@ pattern, the cues, its regressions/progressions/alternatives (`easier`/`harder`/
 card resolves to its entry by **`exId` first, then its name** (the entry's `name`, through the same four
 matching tiers Personal Records uses). `exId` is added beside the name by `/program-assemble` from
 2026-09-24 on. **One name** (Amir, 2026-10-09): a card is named exactly as its entry and `aliases` is empty
-on every entry (the column stays, unused); a different version is its own entry.
+on every entry. The column and coach.html's field stay for Amir's own use (*"for now, lets have a field for another
+name"*); Claude never adds one. A different version is its own entry, and a name with no equipment word is the
+bodyweight version (Box Step-Up vs Dumbbell Box Step-Up, NAM-2).
 
 - **Cues are written once, on the entry, for everyone** (Amir, 2026-09-24). A programme writes no
   `cues`; each card and each circuit item shows its entry's. A card that still carries `cues`
