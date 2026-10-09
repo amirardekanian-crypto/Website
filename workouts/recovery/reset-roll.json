@@ -134,7 +134,6 @@
           "type": "simple",
           "name": "Child's Pose",
           "exId": "childs-pose",
-          "videoUrl": "https://www.youtube.com/watch?v=_ZX_zTOBgp8",
           "cues": {
             "good": [
               "Knees wide, hips back to the heels, arms long",
