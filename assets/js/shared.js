@@ -187,10 +187,14 @@
       root.setAttribute('role', 'dialog');
       root.setAttribute('aria-modal', 'true');
       root.setAttribute('aria-label', 'Video player');
+      // The bar under the player (2026-10-05, program.html's "Open in YouTube"): the embed does not play for
+      // some athletes in Iran whose YouTube app or browser works, so this hands the clip to the phone. Its href is
+      // set in open(); its look is program.html's (.video-modal-yt), the only page that opens this modal.
       root.innerHTML = `
         <div class="video-modal-inner">
           <button type="button" class="video-modal-close" aria-label="Close video">✕</button>
           <div class="video-modal-frame"></div>
+          <a class="video-modal-yt" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"><svg width="18" height="13" viewBox="0 0 28 20" aria-hidden="true" focusable="false"><rect width="28" height="20" rx="6" fill="#FF0000"/><path d="M11.2 5.4v9.2L19.2 10z" fill="#FFFFFF"/></svg><span>Open in YouTube</span><svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.5 7.5l5-5M3 2.5h4.5V7"/></svg></a>
         </div>`;
       document.body.appendChild(root);
       root.addEventListener('click', e => {
@@ -219,19 +223,24 @@
       const el = ensure();
       // A Short is filmed upright: a tall 9:16 box, as in the app's inline player. Set
       // here, not in CSS, because the modal is styled twice (components.css, program.html).
+      // The FRAME holds the 16:9 or 9:16 shape (2026-10-05), not the box around it, so the YouTube bar can sit
+      // under the player inside the same rounded box; the box takes its height from frame + bar. 124 = the
+      // old 80 px of room plus the bar's 44.
       const inner = el.querySelector('.video-modal-inner');
       const tall = isShort(url);
-      inner.style.aspectRatio = tall ? '9 / 16' : '';
-      inner.style.maxWidth = tall ? 'min(420px, calc((100vh - 80px) * 9 / 16))' : '';
+      inner.style.aspectRatio = 'auto';
+      inner.style.maxWidth = tall ? 'min(420px, calc((100vh - 124px) * 9 / 16))' : '';
       const frame = el.querySelector('.video-modal-frame');
-      frame.style.height = '100%';
+      frame.style.cssText = 'position:relative;width:100%;height:auto;aspect-ratio:' + (tall ? '9 / 16' : '16 / 9');
+      // The same plain watch address as program.html's ytWatchUrl(): a Short keeps /shorts/.
+      el.querySelector('.video-modal-yt').href = (tall ? 'https://www.youtube.com/shorts/' : 'https://www.youtube.com/watch?v=') + id;
       // ⚠️ www.youtube.com, NOT youtube-nocookie.com, and it must match program.html's
       // loadInlineVideo() exactly. In Iran YouTube puts a "sign in to confirm you're not a
       // bot" wall in front of the cookieless nocookie player, while the same video plays
       // from youtube.com/embed on the same phone (an athlete in Iran, 2026-09-20: standard exercises
       // played, every circuit item behind the small play button did not — this was the
       // only difference between the two paths). privacy.html section 2.7 says the same.
-      frame.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" title="Exercise video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+      frame.innerHTML = `<iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:0" src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" title="Exercise video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
       el.classList.add('is-open');
       document.body.style.overflow = 'hidden';
       if (typeof window.navSync === 'function') window.navSync();   // program.html: Back closes it (NAV-01)

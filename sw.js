@@ -175,7 +175,12 @@
 // v93: habits.html changed (2026-09-27): the same for AA Proof (105 lines, no behaviour).
 // v94: program.html changed (2026-10-01, CHP-7): a Library session reads `block.rest` like the training day does,
 //      so a section's shared rest sits once on its header ("Rest 45s") and every timer in it uses it.
-const CACHE = 'aap-v94';
+// v95: program.html and shared.js changed (2026-10-05): every in-app video player (a card's How to do it, the
+//      About sheet, the pop-up a circuit item's ▶ opens) has an "Open in YouTube" bar under it, a plain
+//      youtube.com link the phone hands to the YouTube app or the browser, for athletes in Iran whose embed
+//      will not play while those do. shared.js is in the shell and served cache-first, so this bump is what
+//      puts the pop-up's bar on installed phones.
+const CACHE = 'aap-v95';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

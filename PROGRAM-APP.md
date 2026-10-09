@@ -829,6 +829,19 @@ Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8r
   names what it holds, *Video & 4 cues* (`paintHowTo()`, which also hides it while it holds nothing, since the
   Spine's cues arrive late). It opens by itself only when the athlete has **no history** for the lift
   (`openHowFirstTime()`, run by `paintLastTime()`), and on a Library session; once tapped it stays as left.
+- **Open in YouTube** (Amir, 2026-10-05: *"C and red"*): under every player, one 44 px bar, a red YouTube mark and
+  *Open in YouTube ↗*, attached to the video as one rounded unit (`renderVideoBlock()`: `.ex-vunit` holds `.ex-video` and
+  `a.ex-yt`). Athletes in Iran can have the YouTube app or browser working while the embedded player in the app does not
+  (a VPN that covers those and not the app's window), so the bar hands the clip to the phone: a plain
+  `https://www.youtube.com/watch?v=` link from `ytWatchUrl()` (a Short keeps `/shorts/`), `target="_blank"`,
+  `rel="noopener noreferrer"`, so the phone picks the YouTube app or the browser. It is a sibling of `.ex-video`, never
+  inside it: the iframe fills that box (z-index 3) and would cover a bar there the moment the embed loads, which is when it
+  fails. Only a YouTube address gets one. `renderVideoBlock()` draws every in-app player (the card's How to do it, the
+  About sheet, Library → Exercises, Guided), so one function covers them; the pop-up a circuit item's ▶ opens has the same
+  bar (`.video-modal-yt`, built in `shared.js`). **No mark on the circuit rows themselves**: beside the ▶ it pushed a
+  superset's row 6 px past its card at 390 px and 36 px at 360 px, and squeezed a warm-up's names to two or three lines.
+  Guide cards that name it: *Logging your sets* (the card, and the warm-up line) and *Built-in tools* (*Exercise videos*) in
+  `APP_GUIDE`. Check: `scripts/headless/youtube.js`.
 
 **Done**: a finished exercise's closed row is small and says what was done, *72.5 kg × 6 · 6 · 6 · 6 ·
 RPE 7 7 7 8* (`paintDoneLines()` from `updateProgress()`, one line with an ellipsis; `.is-done`). After

@@ -75,9 +75,17 @@ visitor alike** — the demo's copy names what is locked and its last card carri
 
 `ytId()` in `tennis/app/app.js` is one of the three YouTube parsers (with `ytVideoId()` in
 `program.html` and the modal in `assets/js/shared.js`), and it plays from `www.youtube.com/embed`
-like the others. *Checked 2026-09-26:* the comment above `videoBlock()` still
-says a link hands the clip to the phone's YouTube app; that link was removed the same day and the
-code has none, so the comment is stale (fix it here).
+like the others.
+
+**The bar under the player** (Amir, 2026-10-05: *"C and red"*): buyers in Iran whose embed will not play while the YouTube
+app or browser does get **«باز کردن در یوتیوب»** under every player (`videoBlock()`: `.vunit` holds `.video` and `a.vyt`;
+a session's exercise row, the exercise page and step mode all draw it through that one function). It is
+a plain `https://www.youtube.com/watch?v=` link (`ytWatch()`; a Short keeps `/shorts/`), opened in a new tab, so the phone picks
+the YouTube app or the browser. The red YouTube mark sits at the start edge and the external-link arrow, mirrored for RTL, at the
+end. The bar is a sibling of `.video`, never inside it: the iframe fills that box and would cover it the moment the embed loads.
+Only a YouTube address gets one (`ytWatch()` checks the host; `ytId()` itself still reads any link with a `v=`). The comment
+above `videoBlock()` now says what the code does. Check it with `scripts/headless/youtube-course.js` (demo mode against a stub).
+Re-run `python scripts/stamp_tps_app.py` after any edit here.
 
 ## The course app's pictures
 

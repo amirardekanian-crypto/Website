@@ -494,6 +494,10 @@ apps' main screens at 390 and 320 px, light and dark, with a screenshot of each.
 127.0.0.1:8765 first. It is not a pre-commit check (it needs a browser): run it before a change to either
 app ships. Excluded from the site with the rest of `scripts/`. How to use it: `Content/FRESH-EYES.md` →
 *Render checks, headless*.
+`youtube.js` (2026-10-05) is a check built on it for one feature, the **Open in YouTube** bar under every player in
+`program.html` and its pop-up (`shared.js`): the link built from the stored video link, the bar reachable once the embed has
+loaded, a Short, a non-YouTube link, the circuit pop-up on a 320 × 568 screen. `youtube-course.js` does the same for the
+course app (`tennis/app/`) in demo mode, a right-to-left page, with `tps_demo()` answered by a made-up course.
 
 ### The type scale guard (`scripts/check_type_scale.py`, 2026-09-27)
 

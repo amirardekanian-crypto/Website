@@ -295,7 +295,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v94` on 2026-10-01). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v95` on 2026-10-05). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
@@ -323,11 +323,21 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
 - **Videos play from `www.youtube.com/embed` in BOTH apps, never `youtube-nocookie.com`** (2026-09-23; Iranian
   athletes could not watch the course videos). The nocookie player hits YouTube's sign-in wall in Iran, and many VPN apps
   there route only the `youtube.com` names. Both apps read watch, `youtu.be`, `shorts/`, `embed/` and `live/` links, give a
-  Shorts link a tall 9:16 box, and play every video inside the app. An "open in the YouTube app" link was tried and
-  removed the same day (Amir): do not add it back.
+  Shorts link a tall 9:16 box, and play every video inside the app.
+  **Every player also has an "Open in YouTube" bar under it** (Amir, 2026-10-05: *"C and red"*, after athletes in Iran said
+  the embed would not play in the app while their YouTube app or browser did): a plain `https://www.youtube.com/watch?v=`
+  link (a Short keeps `/shorts/`), `target="_blank"`, so the phone picks the YouTube app or the browser. In the course app it
+  reads «باز کردن در یوتیوب». It is drawn only for a YouTube address, and it sits OUTSIDE the box the iframe fills (`.ex-vunit`
+  + `.ex-yt`, `.vunit` + `.vyt`, `.video-modal-yt`): the iframe covers anything inside that box the moment the embed loads,
+  which is exactly when it fails. The mark is YouTube's own red so it never reads as the green ▶. There is **no mark on the
+  circuit rows** (beside the ▶ it pushed a superset's row 6 to 36 px past its card at 360 to 390 px); a circuit item's pop-up
+  carries the bar instead. The earlier "open in the YouTube app" link (2026-09-23) was tried and removed the same day; this one
+  is Amir's later call. `privacy.html` §2.7 stays true (nothing leaves until the athlete taps). Guards: `scripts/headless/youtube.js`
+  (program.html, shared.js) and `youtube-course.js` (the course app).
   The three parsers must agree: `ytId()` in `tennis/app/app.js`, `ytVideoId()` in `program.html`, the modal in
   `assets/js/shared.js`. (Since 2026-09-26 the site modal in `shared.js` matches: the same link shapes, a tall
-  9:16 box for a Short, and only a YouTube address embeds; any other link opens as a link.) The course app's copy: `FARSI-PRODUCTS.md`.
+  9:16 box for a Short, and only a YouTube address embeds; any other link opens as a link.) The watch address is built from the same
+  id in each: `ytWatchUrl()`, `ytWatch()` and the modal's `open()`: change all three. The course app's copy: `FARSI-PRODUCTS.md`.
 - **Edge Function source is in `supabase/functions/`** (since 2026-09-13; before that it existed
   only as deployments). Edit there, deploy with the Supabase MCP, never in the dashboard. See its README.
 - The Farsi site is the **aesthetic reference Amir likes**: green radial-gradient hero, white text +

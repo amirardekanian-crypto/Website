@@ -491,16 +491,28 @@
   // Every YouTube shape plays here: watch?v=, youtu.be/, shorts/, embed/, live/. Kept in step
   // with ytVideoId() in program.html. The ▶ plays the clip INSIDE the app (www.youtube.com/embed,
   // never youtube-nocookie.com: in Iran the nocookie player hits YouTube's sign-in wall, and many
-  // VPN apps only route the youtube.com names). The link under it hands the clip to the phone's
-  // YouTube app, for whoever has a VPN on that app but not on the browser.
+  // VPN apps only route the youtube.com names). The bar under it, «باز کردن در یوتیوب» (Amir, 2026-10-05,
+  // red), hands the clip to the phone: a plain youtube.com link, so the phone picks the YouTube app or
+  // the browser, for whoever has a VPN on those and not on this window. It is outside .video on
+  // purpose: the iframe fills that box, so a bar inside it would be covered the moment the embed loads.
   const ytId = u => { const m = String(u || '').match(/(?:[?&]v=|youtu\.be\/|\/shorts\/|\/embed\/|\/live\/|\/v\/)([A-Za-z0-9_-]{11})/); return m ? m[1] : null; };
   const ytShort = u => /\/shorts\//.test(String(u || ''));
+  // The clip's own YouTube page: watch?v= (a Short keeps /shorts/), '' unless the link is a YouTube address.
+  // Kept in step with ytWatchUrl() in program.html and the pop-up in assets/js/shared.js.
+  const ytWatch = u => {
+    if (!/^\s*(?:(?:https?:)?\/\/)?(?:[a-z0-9-]+\.)*(?:youtube\.com|youtube-nocookie\.com|youtu\.be)(?:[/?#:]|$)/i.test(String(u || ''))) return '';
+    const id = ytId(u);
+    return !id ? '' : ytShort(u) ? 'https://www.youtube.com/shorts/' + id : 'https://www.youtube.com/watch?v=' + id;
+  };
+  const YT_MARK = '<svg width="18" height="13" viewBox="0 0 28 20" aria-hidden="true" focusable="false"><rect width="28" height="20" rx="6" fill="#FF0000"/><path d="M11.2 5.4v9.2L19.2 10z" fill="#FFFFFF"/></svg>';
+  const YT_ARROW = '<svg width="11" height="11" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.5 7.5l5-5M3 2.5h4.5V7"/></svg>';
   function videoBlock(url) {
     const id = ytId(url);
     if (!id) return '';   // no demo yet: show nothing (Amir, step 2)
-    const short = ytShort(url);
-    return `<div class="video${short ? ' short' : ''}" data-yt="${id}"><button class="play" aria-label="پخش ویدیو">▶</button>
-      <div class="vnote">ویدیو از یوتیوب · در ایران ممکن است فیلترشکن لازم باشد</div></div>`;
+    const short = ytShort(url), watch = ytWatch(url);
+    return `<div class="vunit${short ? ' short' : ''}"><div class="video${short ? ' short' : ''}" data-yt="${id}"><button class="play" aria-label="پخش ویدیو">▶</button>
+      <div class="vnote">ویدیو از یوتیوب · در ایران ممکن است فیلترشکن لازم باشد</div></div>${watch
+        ? `<a class="vyt" href="${watch}" target="_blank" rel="noopener noreferrer">${YT_MARK}<span>باز کردن در یوتیوب</span>${YT_ARROW}</a>` : ''}</div>`;
   }
 
   function statsGrid(it) {
