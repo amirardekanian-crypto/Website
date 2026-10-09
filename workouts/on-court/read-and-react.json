@@ -195,6 +195,7 @@
         {
           "type": "standard",
           "name": "Self-Drop Chase",
+          "exId": "self-drop-chase",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -221,6 +222,7 @@
         {
           "type": "standard",
           "name": "Backpedal and Turn",
+          "exId": "backpedal-and-turn",
           "videoUrl": null,
           "note": "Alternate sides. Do the first two at half speed to get the feel, then build up.",
           "cues": {

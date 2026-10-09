@@ -59,6 +59,7 @@
         {
           "type": "simple",
           "name": "High Knees",
+          "exId": "high-knees",
           "cues": {
             "good": [
               "Drive each knee up to hip height",
@@ -75,6 +76,7 @@
         {
           "type": "simple",
           "name": "Butt Kicks",
+          "exId": "butt-kicks",
           "cues": {
             "good": [
               "Quick tempo, heels flicking up behind you",
@@ -136,6 +138,7 @@
         {
           "type": "simple",
           "name": "Hip Openers",
+          "exId": "standing-hip-circle",
           "cues": {
             "good": [
               "Standing tall, drive one knee up to hip height then rotate it out to the side",
@@ -155,6 +158,7 @@
         {
           "type": "simple",
           "name": "Reverse Lunge with Knee Drive",
+          "exId": "reverse-lunge-with-knee-drive",
           "cues": {
             "good": [
               "Step back and lower until your back knee is just above the floor",
@@ -283,6 +287,7 @@
         {
           "type": "standard",
           "name": "10m Accelerations",
+          "exId": "split-stance-start",
           "videoUrl": null,
           "cues": {
             "good": [

@@ -235,6 +235,7 @@
         {
           "type": "standard",
           "name": "Lateral Run to Outside-Leg Stop",
+          "exId": "lateral-run-to-outside-leg-stop",
           "videoUrl": null,
           "note": "Alternate sides. Do the first two at about three-quarter speed, then go flat out.",
           "cues": {
@@ -284,6 +285,7 @@
         {
           "type": "standard",
           "name": "Cut and Go",
+          "exId": "45-degree-cut",
           "videoUrl": null,
           "cues": {
             "good": [

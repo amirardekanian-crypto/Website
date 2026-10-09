@@ -138,6 +138,7 @@
         {
           "type": "standard",
           "name": "Self-Drop Drop-Step",
+          "exId": "self-drop-drop-step",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -183,6 +184,7 @@
             },
             {
               "name": "Front-Back Line Hops",
+              "exId": "front-back-line-hop",
               "cues": {
                 "good": [
                   "Tiny hops over the line and back",
@@ -198,6 +200,7 @@
             },
             {
               "name": "Shadow Change of Direction",
+              "exId": "shadow-change-of-direction",
               "cues": {
                 "good": [
                   "Split-step, move to a corner, recover to the middle, repeat",

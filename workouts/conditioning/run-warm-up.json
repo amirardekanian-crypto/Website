@@ -60,6 +60,7 @@
         {
           "type": "simple",
           "name": "Walking Lunge with Overhead Reach",
+          "exId": "walking-lunge-with-overhead-reach",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -97,6 +98,7 @@
         {
           "type": "simple",
           "name": "Walking Hamstring Sweep",
+          "exId": "hamstring-scoop",
           "videoUrl": null,
           "cues": {
             "good": [

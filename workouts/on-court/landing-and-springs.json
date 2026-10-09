@@ -209,6 +209,7 @@
         {
           "type": "standard",
           "name": "Single-Leg Snap Down",
+          "exId": "single-leg-snap-down",
           "videoUrl": null,
           "cues": {
             "good": [

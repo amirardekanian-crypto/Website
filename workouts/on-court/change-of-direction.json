@@ -220,6 +220,7 @@
         {
           "type": "standard",
           "name": "Shuffle to Sprint",
+          "exId": "shuffle-to-sprint",
           "videoUrl": null,
           "cues": {
             "good": [

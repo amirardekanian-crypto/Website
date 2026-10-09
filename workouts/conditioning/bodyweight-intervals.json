@@ -150,6 +150,7 @@
             },
             {
               "name": "Mountain Climber",
+              "exId": "mountain-climber",
               "cues": {
                 "good": [
                   "Hands under the shoulders, drive the knees fast",
@@ -179,6 +180,7 @@
             },
             {
               "name": "Fast Feet on the Spot",
+              "exId": "fast-feet",
               "cues": {
                 "good": [
                   "Tiny, quick contacts on the balls of the feet",
