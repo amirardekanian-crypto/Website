@@ -48,6 +48,7 @@
         {
           "type": "simple",
           "name": "March on the Spot",
+          "exId": "march-in-place",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -65,6 +66,7 @@
         {
           "type": "simple",
           "name": "Banded Glute Bridge",
+          "exId": "banded-glute-bridge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -84,6 +86,7 @@
         {
           "type": "simple",
           "name": "Banded Lateral Walk",
+          "exId": "banded-lateral-walk",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -102,6 +105,7 @@
         {
           "type": "simple",
           "name": "Bodyweight Squat",
+          "exId": "bodyweight-squat",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -120,6 +124,7 @@
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
+          "exId": "worlds-greatest-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -145,6 +150,7 @@
         {
           "type": "standard",
           "name": "Bulgarian Split Squat",
+          "exId": "dumbbell-bulgarian-split-squat",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -167,6 +173,7 @@
         {
           "type": "standard",
           "name": "Single-Leg Romanian Deadlift",
+          "exId": "dumbbell-single-leg-romanian-deadlift",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -195,6 +202,7 @@
         {
           "type": "standard",
           "name": "Reverse Lunge",
+          "exId": "reverse-lunge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -216,6 +224,7 @@
         {
           "type": "standard",
           "name": "Banded Single-Leg Glute Bridge",
+          "exId": "single-leg-glute-bridge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -243,6 +252,7 @@
         {
           "type": "standard",
           "name": "Side Plank",
+          "exId": "side-plank",
           "videoUrl": null,
           "cues": {
             "good": [

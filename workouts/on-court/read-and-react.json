@@ -36,6 +36,7 @@
         {
           "type": "simple",
           "name": "Easy Jog",
+          "exId": "easy-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -53,6 +54,7 @@
         {
           "type": "simple",
           "name": "Leg Swings",
+          "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -71,6 +73,7 @@
         {
           "type": "simple",
           "name": "Lateral Lunge",
+          "exId": "lateral-lunge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -89,6 +92,7 @@
         {
           "type": "simple",
           "name": "Lateral Shuffle",
+          "exId": "lateral-shuffle",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -141,6 +145,7 @@
         {
           "type": "standard",
           "name": "Build-Up Run",
+          "exId": "build-up-run",
           "videoUrl": null,
           "cues": {
             "good": [

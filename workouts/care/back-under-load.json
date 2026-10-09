@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "Easy Walk",
+          "exId": "walk",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -49,6 +50,7 @@
         {
           "type": "simple",
           "name": "Dowel Hip Hinge",
+          "exId": "dowel-hip-hinge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -66,6 +68,7 @@
         {
           "type": "simple",
           "name": "Glute Bridge",
+          "exId": "glute-bridge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -83,6 +86,7 @@
         {
           "type": "simple",
           "name": "Quadruped Thoracic Rotation",
+          "exId": "quadruped-thoracic-rotation",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -101,6 +105,7 @@
         {
           "type": "simple",
           "name": "Dead Bug",
+          "exId": "dead-bug",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -155,6 +160,7 @@
         {
           "type": "standard",
           "name": "Dumbbell Split Squat",
+          "exId": "dumbbell-split-squat",
           "videoUrl": null,
           "note": "If your back feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
           "cues": {
@@ -177,6 +183,7 @@
         {
           "type": "standard",
           "name": "Single-Leg Hip Thrust",
+          "exId": "single-leg-dumbbell-hip-thrust",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -198,6 +205,7 @@
         {
           "type": "standard",
           "name": "Suitcase Carry",
+          "exId": "suitcase-carry",
           "videoUrl": null,
           "cues": {
             "good": [

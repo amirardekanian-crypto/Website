@@ -24,6 +24,7 @@
         {
           "type": "simple",
           "name": "Easy Jog / Skip",
+          "exId": "easy-run",
           "cues": {
             "good": [
               "Alternate between jogging and skipping — jog a length, skip a length",
@@ -41,6 +42,7 @@
         {
           "type": "simple",
           "name": "Side Shuffles",
+          "exId": "lateral-shuffle",
           "cues": {
             "good": [
               "Face the net, stay low through the hips",
@@ -95,6 +97,7 @@
         {
           "type": "simple",
           "name": "Prisoner Squats",
+          "exId": "bodyweight-squat",
           "cues": {
             "good": [
               "Hands laced behind your head, elbows wide — keep them there throughout",
@@ -113,6 +116,7 @@
         {
           "type": "simple",
           "name": "Airplane",
+          "exId": "hip-airplane",
           "cues": {
             "good": [
               "Stand on one leg, hinge forward until your torso and free leg are parallel to the floor",
@@ -231,6 +235,7 @@
         {
           "type": "standard",
           "name": "Ankle Pogos",
+          "exId": "pogo-jump",
           "videoUrl": null,
           "cues": {
             "good": [

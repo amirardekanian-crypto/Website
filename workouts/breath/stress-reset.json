@@ -28,6 +28,7 @@
         {
           "type": "simple",
           "name": "Cat-Cow",
+          "exId": "cat-cow",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -63,6 +64,7 @@
         {
           "type": "simple",
           "name": "Open Book",
+          "exId": "open-book",
           "videoUrl": null,
           "cues": {
             "good": [

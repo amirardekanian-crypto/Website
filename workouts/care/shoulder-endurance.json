@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "Easy Walk",
+          "exId": "walk",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -67,6 +68,7 @@
         {
           "type": "simple",
           "name": "Band Pull-Apart",
+          "exId": "band-pull-apart",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -90,6 +92,7 @@
         {
           "type": "simple",
           "name": "Quadruped Thoracic Rotation",
+          "exId": "quadruped-thoracic-rotation",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -108,6 +111,7 @@
         {
           "type": "simple",
           "name": "Open Book",
+          "exId": "open-book",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -126,6 +130,7 @@
         {
           "type": "simple",
           "name": "Scapular Wall Slide",
+          "exId": "scapular-wall-slide",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -149,6 +154,7 @@
         {
           "type": "standard",
           "name": "Band External Rotation",
+          "exId": "band-external-rotation",
           "videoUrl": null,
           "note": "Work the sore side, and on a flared-up day do just this block at an RPE of 6 and don't mark the session done.",
           "cues": {
@@ -178,6 +184,7 @@
         {
           "type": "standard",
           "name": "Side Lying Dumbbell External Rotation",
+          "exId": "side-lying-dumbbell-external-rotation",
           "videoUrl": null,
           "note": "Work the sore side, and if your shoulder feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
           "cues": {
@@ -199,6 +206,7 @@
         {
           "type": "standard",
           "name": "Prone Y Raise",
+          "exId": "prone-y-raise",
           "videoUrl": null,
           "note": "If a Y pinches, set your arms in a wide V instead.",
           "cues": {
@@ -220,6 +228,7 @@
         {
           "type": "standard",
           "name": "Band Row",
+          "exId": "seated-band-row",
           "videoUrl": null,
           "cues": {
             "good": [

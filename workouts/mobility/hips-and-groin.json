@@ -73,6 +73,7 @@
         {
           "type": "simple",
           "name": "Cossack Squat",
+          "exId": "cossack-squat",
           "videoUrl": null,
           "note": "Go only as deep as you can come back up from without a wobble.",
           "cues": {
@@ -92,6 +93,7 @@
         {
           "type": "simple",
           "name": "Lateral Lunge with Reach",
+          "exId": "lateral-lunge",
           "videoUrl": null,
           "cues": {
             "good": [

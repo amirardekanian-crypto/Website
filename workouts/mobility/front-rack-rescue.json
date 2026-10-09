@@ -42,6 +42,7 @@
         {
           "type": "simple",
           "name": "Foam Roller T-Spine Extensions",
+          "exId": "foam-roller-thoracic-extension",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -84,6 +85,7 @@
         {
           "type": "simple",
           "name": "Quadruped T-Spine Rotations",
+          "exId": "quadruped-thoracic-rotation",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -138,6 +140,7 @@
         {
           "type": "simple",
           "name": "Elbows-on-Bench Dowel Stretch",
+          "exId": "kneeling-thoracic-extension",
           "videoUrl": null,
           "cues": {
             "good": [

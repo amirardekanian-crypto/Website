@@ -136,6 +136,7 @@
         {
           "type": "simple",
           "name": "Foam Roller T-Spine Extensions",
+          "exId": "foam-roller-thoracic-extension",
           "videoUrl": null,
           "cues": {
             "good": [

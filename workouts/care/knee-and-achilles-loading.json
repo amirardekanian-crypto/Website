@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "Easy Walk",
+          "exId": "walk",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -49,6 +50,7 @@
         {
           "type": "simple",
           "name": "Ankle Dorsiflexion Rocks",
+          "exId": "ankle-dorsiflexion-rocks",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -67,6 +69,7 @@
         {
           "type": "simple",
           "name": "Tibialis Raise",
+          "exId": "tibialis-raise",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -84,6 +87,7 @@
         {
           "type": "simple",
           "name": "Glute Bridge",
+          "exId": "glute-bridge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -101,6 +105,7 @@
         {
           "type": "standard",
           "name": "Single-Leg Balance",
+          "exId": "single-leg-balance",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -127,6 +132,7 @@
         {
           "type": "standard",
           "name": "Wall Sit",
+          "exId": "wall-sit",
           "videoUrl": null,
           "note": "Let pain set the depth, and if it feels easier than a 7 at a depth that stays quiet, hold it for the full time anyway.",
           "cues": {
@@ -156,6 +162,7 @@
         {
           "type": "standard",
           "name": "Lateral Step-Down",
+          "exId": "lateral-step-down",
           "videoUrl": null,
           "note": "If your knee, Achilles or ankle feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
           "cues": {
@@ -178,6 +185,7 @@
         {
           "type": "standard",
           "name": "Single-Leg Calf Raise",
+          "exId": "single-leg-calf-raise",
           "videoUrl": null,
           "note": "Once the bodyweight version feels easier than a 7, hold something heavy in the other hand and add weight before you add reps.",
           "cues": {
@@ -200,6 +208,7 @@
         {
           "type": "standard",
           "name": "Side-Lying Hip Abduction",
+          "exId": "banded-side-lying-hip-abduction",
           "videoUrl": null,
           "cues": {
             "good": [

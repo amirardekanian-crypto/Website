@@ -61,6 +61,7 @@
         {
           "type": "simple",
           "name": "Leg Swings",
+          "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -97,6 +98,7 @@
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
+          "exId": "worlds-greatest-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -115,6 +117,7 @@
         {
           "type": "simple",
           "name": "Glute Bridge",
+          "exId": "glute-bridge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -132,6 +135,7 @@
         {
           "type": "simple",
           "name": "Lateral Lunge",
+          "exId": "lateral-lunge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -190,6 +194,7 @@
             },
             {
               "name": "Split Squat",
+              "exId": "split-squat",
               "detail": "15 sec, switch legs each round",
               "cues": {
                 "good": [
@@ -203,6 +208,7 @@
             },
             {
               "name": "Bear Crawl",
+              "exId": "bear-crawl",
               "detail": "10 sec, crawl forward and walk back",
               "cues": {
                 "good": [
@@ -229,6 +235,7 @@
         {
           "type": "simple",
           "name": "Easy Walk",
+          "exId": "walk",
           "videoUrl": null,
           "cues": {
             "good": [

@@ -44,6 +44,7 @@
         {
           "type": "simple",
           "name": "Easy Jog",
+          "exId": "easy-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -61,6 +62,7 @@
         {
           "type": "simple",
           "name": "Leg Swings",
+          "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -79,6 +81,7 @@
         {
           "type": "simple",
           "name": "Lateral Lunge",
+          "exId": "lateral-lunge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -97,6 +100,7 @@
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
+          "exId": "worlds-greatest-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -115,6 +119,7 @@
         {
           "type": "standard",
           "name": "A-Skip",
+          "exId": "a-skip",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -134,6 +139,7 @@
         {
           "type": "standard",
           "name": "Build-Up Run",
+          "exId": "build-up-run",
           "videoUrl": null,
           "note": "Easy to fast. Run the last two as ten metres out, a turn at about three quarters speed and ten metres back.",
           "cues": {
@@ -251,6 +257,7 @@
         {
           "type": "simple",
           "name": "Easy Walk",
+          "exId": "walk",
           "videoUrl": null,
           "cues": {
             "good": [

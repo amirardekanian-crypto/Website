@@ -36,6 +36,7 @@
         {
           "type": "simple",
           "name": "Easy Jog",
+          "exId": "easy-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -53,6 +54,7 @@
         {
           "type": "simple",
           "name": "Side Shuffle",
+          "exId": "lateral-shuffle",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -162,6 +164,7 @@
           "items": [
             {
               "name": "Lateral Line Hops",
+              "exId": "lateral-line-hop",
               "cues": {
                 "good": [
                   "Two feet over the line and back, as fast as you can cycle them",

@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "Lying Hamstring Stretch",
+          "exId": "supine-strap-hamstring-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -103,6 +104,7 @@
         {
           "type": "simple",
           "name": "Wall Calf Stretch",
+          "exId": "standing-calf-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -128,6 +130,7 @@
         {
           "type": "simple",
           "name": "Doorway Pec Stretch",
+          "exId": "doorway-pec-stretch",
           "videoUrl": null,
           "cues": {
             "good": [

@@ -36,6 +36,7 @@
         {
           "type": "simple",
           "name": "Easy Walk",
+          "exId": "walk",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -77,6 +78,7 @@
         {
           "type": "simple",
           "name": "Quadruped Thoracic Rotation",
+          "exId": "quadruped-thoracic-rotation",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -113,6 +115,7 @@
         {
           "type": "simple",
           "name": "Thoracic Windmill",
+          "exId": "open-book",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -160,6 +163,7 @@
         {
           "type": "standard",
           "name": "Half-Kneeling Single-Arm Dumbbell Press",
+          "exId": "half-kneeling-single-arm-dumbbell-press",
           "videoUrl": null,
           "note": "If your arm won't go all the way up without your back arching, stop the press where it starts to arch.",
           "cues": {

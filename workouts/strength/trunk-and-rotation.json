@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "March on the Spot",
+          "exId": "march-in-place",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -49,6 +50,7 @@
         {
           "type": "simple",
           "name": "Cat-Cow",
+          "exId": "cat-cow",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -66,6 +68,7 @@
         {
           "type": "simple",
           "name": "Open Book",
+          "exId": "open-book",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -84,6 +87,7 @@
         {
           "type": "simple",
           "name": "Glute Bridge",
+          "exId": "glute-bridge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -155,6 +159,7 @@
         {
           "type": "standard",
           "name": "Plank with Shoulder Tap",
+          "exId": "plank-with-shoulder-taps",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -175,6 +180,7 @@
         {
           "type": "standard",
           "name": "Side Plank",
+          "exId": "side-plank",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -194,6 +200,7 @@
         {
           "type": "standard",
           "name": "Bird Dog",
+          "exId": "bird-dog",
           "videoUrl": null,
           "cues": {
             "good": [

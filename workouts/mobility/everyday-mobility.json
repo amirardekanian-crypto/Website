@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "Thoracic Rotation",
+          "exId": "quadruped-thoracic-rotation",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -74,6 +75,7 @@
         {
           "type": "simple",
           "name": "Glute Bridge",
+          "exId": "glute-bridge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -91,6 +93,7 @@
         {
           "type": "simple",
           "name": "Leg Swings",
+          "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -109,6 +112,7 @@
         {
           "type": "simple",
           "name": "Reverse Lunge",
+          "exId": "reverse-lunge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -133,6 +137,7 @@
         {
           "type": "simple",
           "name": "Inchworm",
+          "exId": "inchworm",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -150,6 +155,7 @@
         {
           "type": "simple",
           "name": "Squat to Stand",
+          "exId": "squat-to-stand",
           "videoUrl": null,
           "cues": {
             "good": [

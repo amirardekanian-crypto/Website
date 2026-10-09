@@ -36,6 +36,7 @@
         {
           "type": "simple",
           "name": "Easy Jog",
+          "exId": "easy-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -77,6 +78,7 @@
         {
           "type": "simple",
           "name": "Lateral Lunge",
+          "exId": "lateral-lunge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -113,6 +115,7 @@
         {
           "type": "simple",
           "name": "Front-to-Back Leg Swing",
+          "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -131,6 +134,7 @@
         {
           "type": "simple",
           "name": "Side-to-Side Leg Swing",
+          "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -158,6 +162,7 @@
           "items": [
             {
               "name": "Single-Leg Calf Raise",
+              "exId": "single-leg-calf-raise",
               "cues": {
                 "good": [
                   "Up slowly on one foot, all the way to the top",
@@ -174,6 +179,7 @@
             },
             {
               "name": "Single-Leg Romanian Deadlift Reach",
+              "exId": "dumbbell-single-leg-romanian-deadlift",
               "cues": {
                 "good": [
                   "Hinge from the hip with the back leg long behind you",
@@ -190,6 +196,7 @@
             },
             {
               "name": "Pogo Hop",
+              "exId": "pogo-jump",
               "cues": {
                 "good": [
                   "Stiff ankles, off the ground as fast as you land",
@@ -205,6 +212,7 @@
             },
             {
               "name": "A-Skip",
+              "exId": "a-skip",
               "cues": {
                 "good": [
                   "Tall hips, strike the ground underneath you",
@@ -233,6 +241,7 @@
         {
           "type": "standard",
           "name": "Build-Up",
+          "exId": "build-up-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -254,6 +263,7 @@
         {
           "type": "simple",
           "name": "Start the Run",
+          "exId": "easy-run",
           "videoUrl": null,
           "cues": {
             "good": [

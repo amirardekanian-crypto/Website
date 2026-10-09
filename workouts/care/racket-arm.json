@@ -147,6 +147,7 @@
         {
           "type": "simple",
           "name": "Doorway Pec Stretch",
+          "exId": "doorway-pec-stretch",
           "videoUrl": null,
           "cues": {
             "good": [

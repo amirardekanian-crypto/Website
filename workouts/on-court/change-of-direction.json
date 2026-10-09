@@ -52,6 +52,7 @@
         {
           "type": "simple",
           "name": "Easy Jog",
+          "exId": "easy-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -69,6 +70,7 @@
         {
           "type": "simple",
           "name": "Leg Swings",
+          "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -88,6 +90,7 @@
         {
           "type": "simple",
           "name": "Lateral Lunge",
+          "exId": "lateral-lunge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -106,6 +109,7 @@
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
+          "exId": "worlds-greatest-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -124,6 +128,7 @@
         {
           "type": "simple",
           "name": "A-Skip",
+          "exId": "a-skip",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -142,6 +147,7 @@
         {
           "type": "simple",
           "name": "Ankle Pogo",
+          "exId": "pogo-jump",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -166,6 +172,7 @@
         {
           "type": "standard",
           "name": "Snap Down",
+          "exId": "snap-down",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -186,6 +193,7 @@
         {
           "type": "standard",
           "name": "Sprint to Two-Step Stop",
+          "exId": "sprint-to-two-step-stop",
           "videoUrl": null,
           "cues": {
             "good": [

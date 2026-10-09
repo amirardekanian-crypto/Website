@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "Cat-Cow",
+          "exId": "cat-cow",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -91,6 +92,7 @@
         {
           "type": "simple",
           "name": "90/90 Hip Stretch",
+          "exId": "90-90-hip-stretch",
           "videoUrl": null,
           "cues": {
             "good": [

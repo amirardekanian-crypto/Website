@@ -48,6 +48,7 @@
         {
           "type": "simple",
           "name": "Easy Jog",
+          "exId": "easy-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -65,6 +66,7 @@
         {
           "type": "simple",
           "name": "Ankle Dorsiflexion Rocks",
+          "exId": "ankle-dorsiflexion-rocks",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -83,6 +85,7 @@
         {
           "type": "simple",
           "name": "Lateral Lunge",
+          "exId": "lateral-lunge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -101,6 +104,7 @@
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
+          "exId": "worlds-greatest-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -119,6 +123,7 @@
         {
           "type": "simple",
           "name": "Lateral Shuffle",
+          "exId": "lateral-shuffle",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -136,6 +141,7 @@
         {
           "type": "standard",
           "name": "Build-Up Run",
+          "exId": "build-up-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -156,6 +162,7 @@
         {
           "type": "standard",
           "name": "Snap Down",
+          "exId": "snap-down",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -181,6 +188,7 @@
         {
           "type": "standard",
           "name": "Jog-In Two-Step Stop",
+          "exId": "jog-in-two-step-stop",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -200,6 +208,7 @@
         {
           "type": "standard",
           "name": "Sprint to Two-Step Stop",
+          "exId": "sprint-to-two-step-stop",
           "videoUrl": null,
           "cues": {
             "good": [

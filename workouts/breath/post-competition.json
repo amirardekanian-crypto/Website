@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "Easy Walk",
+          "exId": "walk",
           "videoUrl": null,
           "note": "Five minutes of easy movement first is what makes the rest of this land.",
           "cues": {
@@ -68,6 +69,7 @@
         {
           "type": "simple",
           "name": "Cat-Cow",
+          "exId": "cat-cow",
           "videoUrl": null,
           "cues": {
             "good": [

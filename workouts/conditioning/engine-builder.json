@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "Easy Spin",
+          "exId": "stationary-bike",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -50,6 +51,7 @@
         {
           "type": "simple",
           "name": "Leg Swings",
+          "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -69,6 +71,7 @@
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
+          "exId": "worlds-greatest-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -93,6 +96,7 @@
         {
           "type": "simple",
           "name": "Steady Ride",
+          "exId": "stationary-bike",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -117,6 +121,7 @@
         {
           "type": "simple",
           "name": "Easy Spin",
+          "exId": "stationary-bike",
           "videoUrl": null,
           "cues": {
             "good": [

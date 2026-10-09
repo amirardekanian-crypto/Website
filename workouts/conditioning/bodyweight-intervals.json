@@ -52,6 +52,7 @@
         {
           "type": "simple",
           "name": "March on the Spot",
+          "exId": "march-in-place",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -69,6 +70,7 @@
         {
           "type": "simple",
           "name": "Bodyweight Squat",
+          "exId": "bodyweight-squat",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -86,6 +88,7 @@
         {
           "type": "simple",
           "name": "Reverse Lunge",
+          "exId": "reverse-lunge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -104,6 +107,7 @@
         {
           "type": "simple",
           "name": "Inchworm",
+          "exId": "inchworm",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -130,6 +134,7 @@
           "items": [
             {
               "name": "Squat Jump",
+              "exId": "squat-jump",
               "cues": {
                 "good": [
                   "Land soft and go straight into the next one",
@@ -160,6 +165,7 @@
             },
             {
               "name": "Reverse Lunge",
+              "exId": "reverse-lunge",
               "detail": "20 seconds, alternating",
               "cues": {
                 "good": [
@@ -201,6 +207,7 @@
         {
           "type": "simple",
           "name": "Easy Walk",
+          "exId": "walk",
           "videoUrl": null,
           "cues": {
             "good": [

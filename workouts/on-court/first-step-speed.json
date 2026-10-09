@@ -48,6 +48,7 @@
         {
           "type": "simple",
           "name": "Easy Jog",
+          "exId": "easy-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -65,6 +66,7 @@
         {
           "type": "simple",
           "name": "Leg Swings",
+          "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -84,6 +86,7 @@
         {
           "type": "simple",
           "name": "Lateral Lunge",
+          "exId": "lateral-lunge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -102,6 +105,7 @@
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
+          "exId": "worlds-greatest-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -120,6 +124,7 @@
         {
           "type": "simple",
           "name": "A-Skip",
+          "exId": "a-skip",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -138,6 +143,7 @@
         {
           "type": "simple",
           "name": "Ankle Pogo",
+          "exId": "pogo-jump",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -156,6 +162,7 @@
         {
           "type": "simple",
           "name": "Build-Up Run",
+          "exId": "build-up-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -181,6 +188,7 @@
         {
           "type": "standard",
           "name": "Split-Step to Sprint",
+          "exId": "split-step-to-sprint",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -229,6 +237,7 @@
           "items": [
             {
               "name": "Split-Step to First Step",
+              "exId": "split-step-to-sprint",
               "detail": "6 reps, alternating sides",
               "cues": {
                 "good": [
@@ -242,6 +251,7 @@
             },
             {
               "name": "Recovery Shuffle",
+              "exId": "lateral-shuffle",
               "cues": {
                 "good": [
                   "From the tramline, shuffle back to the middle and set",

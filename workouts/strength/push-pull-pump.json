@@ -44,6 +44,7 @@
         {
           "type": "simple",
           "name": "Rowing Machine",
+          "exId": "rowing",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -79,6 +80,7 @@
         {
           "type": "simple",
           "name": "Open Book",
+          "exId": "open-book",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -140,6 +142,7 @@
         {
           "type": "standard",
           "name": "Single-Arm Dumbbell Row",
+          "exId": "single-arm-dumbbell-row",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -161,6 +164,7 @@
         {
           "type": "standard",
           "name": "Half-Kneeling Single-Arm Overhead Press",
+          "exId": "half-kneeling-single-arm-dumbbell-press",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -188,6 +192,7 @@
         {
           "type": "standard",
           "name": "Dumbbell Bench Press",
+          "exId": "dumbbell-bench-press",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -229,6 +234,7 @@
         {
           "type": "standard",
           "name": "Dumbbell Wrist Extension",
+          "exId": "dumbbell-wrist-extension",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -256,6 +262,7 @@
         {
           "type": "standard",
           "name": "Suitcase Carry",
+          "exId": "suitcase-carry",
           "videoUrl": null,
           "cues": {
             "good": [

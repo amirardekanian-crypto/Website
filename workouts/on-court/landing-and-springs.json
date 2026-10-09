@@ -52,6 +52,7 @@
         {
           "type": "simple",
           "name": "Easy Jog",
+          "exId": "easy-run",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -69,6 +70,7 @@
         {
           "type": "simple",
           "name": "Ankle Dorsiflexion Rocks",
+          "exId": "ankle-dorsiflexion-rocks",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -87,6 +89,7 @@
         {
           "type": "simple",
           "name": "Leg Swings",
+          "exId": "leg-swings",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -105,6 +108,7 @@
         {
           "type": "simple",
           "name": "Lateral Lunge",
+          "exId": "lateral-lunge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -123,6 +127,7 @@
         {
           "type": "simple",
           "name": "World's Greatest Stretch",
+          "exId": "worlds-greatest-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -141,6 +146,7 @@
         {
           "type": "simple",
           "name": "Glute Bridge",
+          "exId": "glute-bridge",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -158,6 +164,7 @@
         {
           "type": "simple",
           "name": "Single-Leg Calf Raise",
+          "exId": "single-leg-calf-raise",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -183,6 +190,7 @@
         {
           "type": "standard",
           "name": "Snap Down",
+          "exId": "snap-down",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -246,6 +254,7 @@
         {
           "type": "standard",
           "name": "Lateral Bound",
+          "exId": "lateral-bound",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -274,6 +283,7 @@
         {
           "type": "standard",
           "name": "Pogo Jump",
+          "exId": "pogo-jump",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -293,6 +303,7 @@
         {
           "type": "standard",
           "name": "Lateral Line Hop",
+          "exId": "lateral-line-hop",
           "videoUrl": null,
           "cues": {
             "good": [
