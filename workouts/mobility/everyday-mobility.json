@@ -51,6 +51,7 @@
         {
           "type": "simple",
           "name": "Alternating Overhead Reach",
+          "exId": "alternating-overhead-reach",
           "videoUrl": null,
           "cues": {
             "good": [

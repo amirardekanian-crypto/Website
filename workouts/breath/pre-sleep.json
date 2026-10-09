@@ -24,6 +24,7 @@
         {
           "type": "simple",
           "name": "Legs Up the Wall",
+          "exId": "legs-up-the-wall",
           "videoUrl": null,
           "note": "Go straight to bed after this — going back to a screen undoes it.",
           "cues": {
@@ -42,6 +43,7 @@
         {
           "type": "simple",
           "name": "Knees to Chest",
+          "exId": "knees-to-chest",
           "videoUrl": null,
           "cues": {
             "good": [

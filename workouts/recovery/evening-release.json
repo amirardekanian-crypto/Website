@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "Foot Roll",
+          "exId": "foot-roll",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -50,6 +51,7 @@
         {
           "type": "simple",
           "name": "Soleus Roll",
+          "exId": "soleus-roll",
           "videoUrl": null,
           "note": "If your calf is still sore from playing, skip this one.",
           "cues": {
@@ -75,6 +77,7 @@
         {
           "type": "simple",
           "name": "Adductor Roll",
+          "exId": "adductor-roll",
           "videoUrl": null,
           "note": "If a groin is still sore from playing, skip this one.",
           "cues": {
@@ -94,6 +97,7 @@
         {
           "type": "simple",
           "name": "Lateral Thigh Roll",
+          "exId": "lateral-thigh-roll",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -112,6 +116,7 @@
         {
           "type": "simple",
           "name": "Hamstring Roll",
+          "exId": "hamstring-roll",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -154,6 +159,7 @@
         {
           "type": "simple",
           "name": "Pec Roll",
+          "exId": "pec-roll",
           "videoUrl": null,
           "cues": {
             "good": [

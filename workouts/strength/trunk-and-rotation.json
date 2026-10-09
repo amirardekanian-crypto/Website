@@ -133,6 +133,7 @@
         {
           "type": "standard",
           "name": "Standing Chop",
+          "exId": "standing-chop",
           "videoUrl": null,
           "cues": {
             "good": [

@@ -96,6 +96,7 @@
         {
           "type": "simple",
           "name": "Toe Walk",
+          "exId": "toe-walk",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -113,6 +114,7 @@
         {
           "type": "simple",
           "name": "Downward Dog Heel Drive",
+          "exId": "downward-dog-heel-drive",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -168,6 +170,7 @@
         {
           "type": "standard",
           "name": "Calf Raise",
+          "exId": "double-leg-calf-raise",
           "videoUrl": null,
           "note": "Lower until your heels are just below the step, and if the last set feels easy, wear a backpack with a couple of books in it.",
           "cues": {
@@ -189,6 +192,7 @@
         {
           "type": "standard",
           "name": "Bent-Knee Calf Raise",
+          "exId": "bent-knee-calf-raise",
           "videoUrl": null,
           "cues": {
             "good": [

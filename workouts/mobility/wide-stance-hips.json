@@ -83,6 +83,7 @@
         {
           "type": "simple",
           "name": "Adductor Rock Back",
+          "exId": "adductor-rock-back",
           "videoUrl": null,
           "cues": {
             "good": [

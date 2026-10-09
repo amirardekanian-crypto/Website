@@ -190,9 +190,10 @@ select status, count(*), count(*) filter (where cues is null) no_cues,
 ## The Library's own exercises (2026-10-09)
 
 Amir went to add videos to the Library's sessions and found most of their cards outside the Spine:
-the 42 older sessions predate it, so a video on an entry never reached them. What is still open is
-`to_draft` in `scripts/library_spine_baseline.json` (`python scripts/check_library_spine.py --list`).
-Drafting one of those is the Run above with three differences:
+the 42 older sessions predate it, so a video on an entry never reached them. Finished the same day:
+359 of 371 cards carry an `exId`, 77 drafts went in (four batches) and `to_draft` in
+`scripts/library_spine_baseline.json` is empty; the 12 cards left are `not_exercises` (breathing, warm-up
+sets). A NEW Library exercise with no entry is drafted the same way, with three differences from the Run:
 - **The cues come from the Library card** (no programme has them), cleaned to rule 3. The card keeps
   its own cues; the entry's are for everyone else.
 - **Link the cards in the same run**, to the draft id: `exId` on the card in `workouts/` AND on the

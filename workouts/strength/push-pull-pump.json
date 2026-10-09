@@ -100,6 +100,7 @@
         {
           "type": "simple",
           "name": "Prone Y-T Raise",
+          "exId": "prone-y-t-raise",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -215,6 +216,7 @@
         {
           "type": "standard",
           "name": "Rear Delt Fly",
+          "exId": "bent-over-dumbbell-reverse-fly",
           "videoUrl": null,
           "cues": {
             "good": [

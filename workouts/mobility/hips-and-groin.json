@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "Frog Rock",
+          "exId": "frog-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -49,6 +50,7 @@
         {
           "type": "simple",
           "name": "Adductor Rock Back",
+          "exId": "adductor-rock-back",
           "videoUrl": null,
           "cues": {
             "good": [

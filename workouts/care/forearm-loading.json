@@ -69,6 +69,7 @@
         {
           "type": "simple",
           "name": "Wrist Circles",
+          "exId": "wrist-circles",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -87,6 +88,7 @@
         {
           "type": "simple",
           "name": "Wrist Flexion-Extension",
+          "exId": "wrist-flexion-extension",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -104,6 +106,7 @@
         {
           "type": "simple",
           "name": "Forearm Self-Massage",
+          "exId": "forearm-self-massage",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -180,6 +183,7 @@
         {
           "type": "standard",
           "name": "Dumbbell Wrist Flexion",
+          "exId": "dumbbell-wrist-flexion",
           "videoUrl": null,
           "cues": {
             "good": [

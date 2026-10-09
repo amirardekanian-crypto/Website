@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "Calf Roll",
+          "exId": "calf-roll",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -50,6 +51,7 @@
         {
           "type": "simple",
           "name": "Quad Roll",
+          "exId": "quad-roll",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -68,6 +70,7 @@
         {
           "type": "simple",
           "name": "Glute Roll",
+          "exId": "glute-roll",
           "videoUrl": null,
           "cues": {
             "good": [

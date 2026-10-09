@@ -68,6 +68,7 @@
         {
           "type": "simple",
           "name": "Wrist Rocks",
+          "exId": "wrist-rocks",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -105,6 +106,7 @@
         {
           "type": "simple",
           "name": "Banded Lat Stretch",
+          "exId": "banded-lat-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -123,6 +125,7 @@
         {
           "type": "simple",
           "name": "Overhead Triceps Stretch",
+          "exId": "overhead-triceps-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -166,6 +169,7 @@
         {
           "type": "simple",
           "name": "Front-Rack Elbow Punches",
+          "exId": "front-rack-elbow-punches",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -184,6 +188,7 @@
         {
           "type": "simple",
           "name": "Rack Hold",
+          "exId": "front-rack-hold",
           "videoUrl": null,
           "cues": {
             "good": [

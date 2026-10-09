@@ -98,6 +98,7 @@
         {
           "type": "simple",
           "name": "Bench Thoracic Extension",
+          "exId": "bench-thoracic-extension",
           "videoUrl": null,
           "note": "Use a bench or the arm of a heavy sofa, not a chair, because a chair can slide out from behind you.",
           "cues": {
@@ -142,6 +143,7 @@
         {
           "type": "standard",
           "name": "Half-Kneeling Single-Arm Dumbbell Overhead Hold",
+          "exId": "half-kneeling-single-arm-dumbbell-overhead-hold",
           "videoUrl": null,
           "note": "Use a lighter dumbbell than you use for the press.",
           "cues": {

@@ -32,6 +32,7 @@
         {
           "type": "simple",
           "name": "Forearm Roll",
+          "exId": "forearm-roll",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -51,6 +52,7 @@
         {
           "type": "simple",
           "name": "Wrist Extensor Stretch",
+          "exId": "wrist-extensor-stretch",
           "videoUrl": null,
           "cues": {
             "good": [
@@ -69,6 +71,7 @@
         {
           "type": "simple",
           "name": "Wrist Flexor Stretch",
+          "exId": "wrist-flexor-stretch",
           "videoUrl": null,
           "cues": {
             "good": [

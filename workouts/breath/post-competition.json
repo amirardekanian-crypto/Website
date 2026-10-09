@@ -94,6 +94,7 @@
         {
           "type": "simple",
           "name": "Legs Up the Wall",
+          "exId": "legs-up-the-wall",
           "videoUrl": null,
           "note": "Feet above the heart is what helps heavy legs drain after a long match.",
           "cues": {
