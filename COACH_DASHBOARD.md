@@ -522,14 +522,25 @@ it in this file.
 | `xp_rules` | The quest pool and the live runs |
 | `seasons` | Which season, and what day of it |
 | `call_logs` | Weekly check-ins (loaded per athlete, on open) |
-| `data/<id>.json` | Names, tier, prescribed program, sessions/week |
+| `program_versions` | Version history: the programme as it was before each save (the `programs` trigger keeps 20) |
+| `coaching_logs` | The coach-only log on the File tab (loaded on open) |
+| `library`, `library_categories` | The Library tab |
+| `exercises`, `exercise_coach`, `qualities` | The Exercises tab (the Spine) |
+| `hab_intake` via `intake_list()` | The Intake tab |
+| `affiliates` | The Affiliates tab |
+| `assess_accounts`, `tps_accounts` | The Testing app and Course tabs (loaded when opened) |
 
-The **prescribed-vs-done** comparison joins the last two: the plan comes from
-`data/<id>.json`'s chips, what happened comes from parsing the plain-text `summary`
-that `program.html` wrote into `session_history`. Both readers live in `coach.html`
-(`parseChips()` / `parseSessionLog()`) and both mirror code in `program.html` —
-change the grammar there and they have to follow. `node scripts/test_coach_compare.js`
-runs 44 assertions over real logs and catches it if they don't.
+`data/<id>.json` is no longer read at all (2026-10-10): it has not been served since 2026-09-07, and
+the dashboard used to fall back to it for any id without a programme row. Growing tables are read
+in pages (`selectAll()`), so none is cut off at the API's 1,000-row limit.
+
+The **prescribed-vs-done** comparison joins the plan in `programs` with what happened, parsed from
+the plain-text `summary` that `program.html` wrote into `session_history` (with the names taken
+from the structured `log` when it lines up). Both readers live in `coach.html` (`rxOf()` from
+`assets/js/chips.js`, `parseSessionLog()`) and both mirror code in `program.html` — change the
+grammar there and they have to follow. `node scripts/test_coach_compare.js` runs 72 assertions
+over real logs and catches it if they don't. The write paths (saves, deletes, logins, backups) are
+covered by the real-mode harness in `scripts/headless/coach/`.
 
 Coach writes go through the guarded RPCs — `set_coach_note`, `hide_note`,
 `set_quests`, `clear_quests`, `forget_contact`, `save_session` — each of which

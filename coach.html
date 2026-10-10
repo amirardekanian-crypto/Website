@@ -1180,8 +1180,11 @@ function copyLoginFor(athleteId) {
   toast('Message copied — paste it into WhatsApp');
 }
 
-let _credsOpen = null;   // null = open while anything is waiting (a collapsed list of passwords to send got forgotten)
-function toggleCreds() { _credsOpen = !(_credsOpen == null ? true : _credsOpen); render(); }
+// null = decide by length: open while 3 or fewer wait (a collapsed list got forgotten), folded when
+// longer (ten open rows pushed the roster below the fold on a phone). A tap overrides it.
+let _credsOpen = null;
+function credsOpen(n) { return _credsOpen == null ? n <= 3 : _credsOpen; }
+function toggleCreds() { const n = Object.values(S.logins || {}).filter(r => r.initial_password).length; _credsOpen = !credsOpen(n); render(); }
 
 // The list of credentials still waiting to go out. Deliberately prominent while
 // it is non-empty: a created login that never reaches the athlete is worse than
@@ -1194,9 +1197,9 @@ function pendingCredsHtml() {
   return `<section class="panel creds">
     <button class="creds-top" onclick="toggleCreds()">
       <span class="creds-t">Logins to send<span class="creds-n">${pending.length}</span></span>
-      <span class="creds-chev">${(_credsOpen == null || _credsOpen) ? '▴' : '▾'}</span>
+      <span class="creds-chev">${credsOpen(pending.length) ? '▴' : '▾'}</span>
     </button>
-    ${(_credsOpen == null || _credsOpen) ? `
+    ${credsOpen(pending.length) ? `
       <p class="empty" style="padding:6px 0 12px">
         Copy each one and send it on WhatsApp, then mark it sent. Passwords are stored
         here only until you do — after that the only way to see one again is a reset.
@@ -1921,8 +1924,11 @@ function reasonsOf(a) {
     if (ended >= -CYCLE_SOON_DAYS && ended <= 0) add('cycle', 'note', ended === 0 ? 'cycle ends today' : `cycle ends in ${-ended} day${ended === -1 ? '' : 's'}`, 45, 'work');
     else if (ended > 0 && ended <= CYCLE_RENEW_DAYS) add('renew', 'warn', `cycle ended ${ended} day${ended === 1 ? '' : 's'} ago — renew?`, 60, 'file');
   }
-  if (!a.lapsed && S.progSrc[a.id] === 'db' && !a.hasLogin && !LOAD_ERR.logins)
-    add('login', 'warn', 'no login — cannot open the app', 50, 'file');
+  const noLogin = S.progSrc[a.id] === 'db' && !a.hasLogin && !LOAD_ERR.logins;
+  if (!a.lapsed && noLogin) add('login', 'warn', 'no login — cannot open the app', 50, 'file');
+  // Someone locked out since the links were retired produces no activity, so they drift into Gone
+  // quiet; the row still says why, without putting them in Needs you.
+  a.quietFlags = a.lapsed && noLogin ? [{ tone: 'warn', text: 'no login — cannot open the app' }] : [];
   if (a.contact && a.contact.signed_up && daysSince(a.contact.signed_up) <= 7)
     add('signup', 'note', 'new signup · ' + timeAgo(a.contact.signed_up), 35, 'proof');
   if (a.lapsed) return out;
@@ -2667,7 +2673,7 @@ function renderRoster() {
     else if (a.tier === 'coached') subBits.push('no sessions yet');
     if (a.isHab) subBits.push(`Proof ${a.hab7}/7 this week`);
     if (!a.finished && !a.isHab) subBits.push('not started');
-    const reasons = rosterReasons(a);
+    const reasons = rosterReasons(a).concat(a.quietFlags || []);
     const silent = a.isHab && a.habGap >= QUIET_HABIT_DAYS;
     const gapTag = !a.isHab ? '' : a.habToday ? 'on court ✓' : a.habGap + 'd off';
     return `<button class="ath ${a.toReply ? 'flag' : ''} ${a.tier === 'free' ? 'freeath' : ''}" onclick="location.hash=${jsq('a/' + encodeURIComponent(a.id))}">
@@ -3085,7 +3091,7 @@ function cmpCell(c) {
     : 'done';
   const tone = c.state === 'done' ? 'ok' : c.state === 'part' ? 'warn' : c.state === 'excused' ? 'note' : 'miss';
   bits.push(`<span class="did-sets ${tone}">${esc(setTxt)}</span>`);
-  if (c.load) bits.push(`<span class="did-load">${esc(c.load)} kg</span>`);
+  if (c.load) bits.push(`<span class="did-load">${esc(c.load)}${/[a-z]/i.test(c.load) ? '' : ' kg'}</span>`);
   if (c.rpeMean != null) {
     const over = c.tgt && c.rpeMean - c.tgt.hi >= RPE_OVER;
     const under = c.tgt && c.tgt.lo - c.rpeMean >= RPE_UNDER;
@@ -3429,6 +3435,9 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   // session was done against an older version of the program. Say so — the
   // alternative is a screen of "not logged" rows that reads like they quit.
   const stale = !!(s && v.total && v.missing === v.total && cmp.extras > 0);
+  // Trained before the current cycle began: the plan on screen is not the one they trained.
+  const cyc0 = _D && _D.a && _D.a.cycle;
+  const before = !!(s && cyc0 && cyc0.start && s.completed_on < cyc0.start);
   const focus = (s && s.focus) || (pd && pd.focusTag) || '';
   const open = _workOpen[dayNum] !== undefined ? _workOpen[dayNum] : !!defaultOpen;
   const needsReply = sessions.some(sessionNeedsReply);
@@ -3455,7 +3464,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   const verdictBits = [];
   if (v.missing) verdictBits.push(v.missing + ' not done');
   if (v.off) verdictBits.push(v.off + ' off plan');
-  const scoreline = !s ? '' : v.total
+  const scoreline = !s ? '' : before ? `<span class="dv">previous cycle</span>` : v.total
     ? `<span class="dv ${v.missing ? 'miss' : v.off ? 'warn' : 'ok'}">${esc(verdictBits.join(' · ')) || 'all on plan'}</span>
        <span class="dv-sub">${v.clean}/${v.total} exactly as prescribed</span>`
     : '';
@@ -3497,7 +3506,8 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
     </button>
     <div class="wday-body">
       ${picker}
-      ${stale ? `<div class="stalewarn">This session was done against an <b>earlier version of the program</b> — none of the current day’s exercises appear in it. What they actually did is under <i>Logged, not prescribed</i>.</div>` : ''}
+      ${before ? `<div class="stalewarn">Trained on ${esc(prettyDate(s.completed_on))}, <b>before this cycle began</b> (${esc(prettyDate(cyc0.start))}): it is compared with the current plan, not the one they trained.</div>`
+        : stale ? `<div class="stalewarn">This session was done against an <b>earlier version of the program</b> — none of the current day’s exercises appear in it. What they actually did is under <i>Logged, not prescribed</i>.</div>` : ''}
       ${noteBox}
       ${body}
       ${s ? `<details class="rawlog"><summary>Raw log, exactly as sent</summary>
