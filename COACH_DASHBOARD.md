@@ -44,7 +44,7 @@ a second row that scrolls sideways) are opened now and then.
 | **Today** | The day's play: who's on court, who needs you (and why), the wall, the quest lever |
 | **Athletes** | The whole roster — coached and Proof-only — and each person's file, opening on prescribed-vs-done (a habit-only athlete opens on Proof) |
 | **Intake** | New coaching applications from the apply form (English & Farsi) — the whole questionnaire, per lead |
-| **Exercises** | The Spine (2026-09-24): one entry per exercise you programme. Coverage of the names in live programmes, Claude's drafts waiting for you, and an editor (purpose, cues, regressions, progressions, alternatives, video, and the coach-only SFR rank and flags) showing who is doing each exercise now. **Approve** is what puts an entry on athletes' phones |
+| **Exercises** | The Spine (2026-09-24): one entry per exercise you programme. Coverage of the names in live programmes, Claude's drafts waiting for you, a search, and an editor (purpose, cues, links, body parts and the muscle map, video, and the coach-only SFR rank, flags, counts and cost) showing who is doing each exercise now. A save sends only what you changed. **Approve** is what puts an entry on athletes' phones |
 | **Proof** | The board, the season, the signup funnel, titles minted |
 | **Library** | Publishes workouts and articles into the app's Library, and copies a link to each (the address is still `#links`; the tab was called Links until 2026-10-10) |
 | **Affiliates** | The referral-code roster: who holds which discount code, how to reach them, which intakes used it. The apply forms accept exactly the live codes listed here |
@@ -70,11 +70,36 @@ An approved entry also gives athletes a small **ⓘ** after the name, opening it
 shows up on court (tennis and padel athletes only), and three lists: **Regressions** (easier
 versions of the same movement), **Progressions** (harder versions) and **Alternatives** (the same
 movement on other equipment or a machine). Drafts are invisible to athletes until you tap
-**Approve**; *Move back to draft* takes one off the phones again. Links (regressions, progressions,
-alternatives) must be ids from the list, so a link can never point at a typo. The coach-only half (SFR rank
-and the flags `loaded-knee-flexion`, `axial-load`, `free-hinge`, `high-impact`, `overhead`) lives
-in a separate table no athlete query can read; `/program-design` filters on those flags.
-*Not in the Spine yet* lists the names still without an entry, most-used first.
+**Approve**; *Move back to draft…* takes one off the phones again, and asks first (it says how many
+athletes have it in a programme). A link is an entry id, or the plain name of an exercise with no
+entry yet; a typed name that is exactly an entry's name (or its db/bb/kb spelling) is stored as that
+entry's id, an id-shaped typo is refused, and the editor lists the links that do not point back yet
+(links go both ways, CUE-4: Claude's `/spine` Upkeep adds the way back). The editor also holds the
+**body parts** and impact pill, the **muscles shown** on the body map (only when *Counts toward* is
+empty), a live drawing of what the athlete will see, and the **video**. The coach-only half (SFR rank,
+the flags `loaded-knee-flexion`, `axial-load`, `free-hinge`, `high-impact`, `overhead`, *Counts
+toward* per working set, the *cost* of a set and notes) lives in a separate table no athlete query
+reads; the phone gets only the muscles from *Counts toward* and whether each is main or helping.
+`/program-design` filters on the flags and `check_program.py` counts volume and day load from the
+counts and cost.
+
+The tab opens on **Drafts** while there are any, else on **Approved**, and the search box finds an
+entry across both by name, other name, pattern, equipment or id. *Coverage* and *Doing it now* count
+every card in a programme with workouts, **circuit items included** (before 2026-10-10 they skipped
+circuits, a third of all cards). *Not in the Spine yet* lists the names still without an entry,
+most-used first.
+
+**Saving is safe against Claude's work (2026-10-10).** Claude's `/spine` writes the same rows by SQL
+while you review them. A save sends **only the fields you changed**, so a court line, a link, a count
+or a cost Claude wrote after you opened the tab survives your edit to a video. If Claude (or another
+tab) changed one of the *same* fields, nothing is saved and a box shows both values: Save again puts
+yours over theirs, Close keeps theirs. Typed work survives a redraw (a search, a quality save, the
+levels arriving), and opening another entry, switching the list, ↻ Refresh or leaving the tab with
+unsaved changes asks first. A **rename** of an entry live cards use is refused with the cards it would
+break: one name per exercise, and a rename has to move the cards and their logged history too, which
+is `/spine`'s *One name in live programmes* job. A name or other name that is already another entry's
+is refused (two entries with one name both stop matching). If the Spine does not load completely the
+tab says so and offers nothing to save: a save from half a copy would blank what did not arrive.
 
 **The Quality Map (2026-09-24)** adds three things to this tab:
 - **The ten qualities.** The words each athlete's Home day cards use (Strength, Brakes …): one

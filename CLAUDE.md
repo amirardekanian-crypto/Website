@@ -298,6 +298,10 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   row, refuses when `updated_at` moved since the page loaded or the exercise is not at that place any more
   (checked by name), applies the edit to the live copy and writes it `.eq('updated_at', <read>)`. Anything
   that replaces `S.programs` goes through `reloadPrograms()` (it re-assembles, so the athlete file redraws).
+- **A Spine or Quality save sends only the columns the coach changed** (`saveChangedCols()`): it reads the row
+  back, refuses when someone else changed one of THOSE columns since the page loaded (Claude's `/spine` writes
+  the same rows by SQL), and writes `.eq('updated_at', <read>)`. Never `upsert` a whole entry from the page's
+  copy. A rename of an entry live cards use is refused in coach.html: it is `/spine`'s one-name move.
 - **"Needs you" is one rule, `reasonsOf()`**: Today, the roster's reasons, its group, filter and sort all
   read it. A new reason goes there, nowhere else, and into COACH_DASHBOARD.md §3's table.
 - **A value inside an inline handler goes through `jsq()`**, never `'${esc(x)}'` (esc is HTML escaping; the
@@ -309,7 +313,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
 - **Auth events rebuild the page only when the signed-in user changes** (token refreshes and tab refocus
   used to reload everything and throw away typed work).
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (26 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (34 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - supabase-js is pinned (2.117.3); bump it only with the harness's `reallib.js` run.
 
 ## Site layout (GitHub Pages → amirardekani.com)

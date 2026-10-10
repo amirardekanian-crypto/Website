@@ -123,7 +123,9 @@
     .rail { position: static; }
     .rail-in { flex-direction: column; align-items: stretch; gap: 6px; padding: 8px 12px 6px; overflow: visible; }
     .rail-grp { gap: 4px; }
-    .rail-grp.main { justify-content: space-between; }
+    /* Scrolls in place if it is ever wider than the phone (a slow font, big counts), never the page. */
+    .rail-grp.main { justify-content: space-between; overflow-x: auto; scrollbar-width: none; }
+    .rail-grp.main::-webkit-scrollbar { display: none; }
     .rail-grp.main .tab { font-size: 14px; letter-spacing: .03em; padding: 6px 9px; gap: 5px; }
     .rail-grp.more { overflow-x: auto; scrollbar-width: none; padding-bottom: 2px;
                      -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
@@ -132,7 +134,6 @@
     .rail-sep { display: none; }
   }
   @media (max-width: 370px) {
-    .rail-grp.main { overflow-x: auto; scrollbar-width: none; }
     .rail-grp.main .tab { font-size: 12.5px; letter-spacing: 0; padding: 5px 7px; }
     .rail-grp.main .tab .n { padding: 1px 5px; min-width: 16px; }
   }
@@ -217,6 +218,12 @@
   .panel { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 18px 20px;
            box-shadow: var(--shadow); animation: riseIn .4s cubic-bezier(.16,1,.3,1) both; }
   .panel + .panel { margin-top: 0; }
+  /* A redraw of the screen already showing (a search keystroke, a save) does not replay the entrance. */
+  .no-anim .panel { animation: none; }
+  /* The Spine editor is 1300-2400 px tall: its Save stays in reach at the bottom of the screen. */
+  .spine-acts { position: sticky; bottom: 0; z-index: 2; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+                margin: 14px -20px -18px; padding: 10px 20px; background: var(--paper, #FAF7F2); border-top: 1px solid var(--line);
+                border-radius: 0 0 22px 22px; }
   .phead { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin-bottom: 12px; flex-wrap: wrap; }
   .phead .t { font-size: 21px; }
   .phead .r { font-size: 12px; color: var(--muted); }
@@ -676,6 +683,8 @@
   .meta-table td { padding: 5px 0; border: none; font-size: 13px; vertical-align: top; }
   .meta-table td.k { color: var(--muted); width: 128px; text-transform: uppercase; font-size: 10.5px; letter-spacing: .06em; padding-right: 12px; }
   .meta-table td.v { font-family: 'Space Mono', monospace; font-size: 12.5px; overflow-wrap: anywhere; }
+  /* A Farsi answer: right to left, in the page's own font (Space Mono has no Persian letters). */
+  .meta-table td.v.rtl { font-family: inherit; font-size: 14px; line-height: 1.6; }
   .empty code, .pr-n, .credname { overflow-wrap: anywhere; }
   .note { background: var(--paper); border-left: 3px solid var(--ochre); padding: 9px 12px; border-radius: 8px; margin-top: 10px; font-size: 13px; }
   .note.green { border-left-color: var(--court); }
@@ -1064,7 +1073,7 @@ async function loadAll() {
 // What failed to load, in words, under the tabs. Empty when everything came back.
 const LOAD_ERR_LABEL = {
   programs: 'programmes', logins: 'athlete logins', contacts: 'Proof contacts', intake: 'intake forms',
-  assess: 'testing-app logins', course: 'course logins',
+  assess: 'testing-app logins', course: 'course logins', spine: 'the exercise library (Spine)',
   affiliates: 'affiliate codes', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
 };
 function loadWarnHtml() {
@@ -2061,9 +2070,10 @@ function renderRail() {
   document.title = (r.view === 'detail' ? nameOf(r.id) + ' · ' : tab && r.view !== 'today' ? tab.label + ' · ' : '') + "The Coach's Box";
 }
 async function hardRefresh() {
+  if (route().view === 'exercises' && !spineMayLeave('Refresh')) return;
   $('content').innerHTML = '<div class="loading"><div class="spinner"></div>Refreshing…</div>';
   loadLevels._done = false; S.board = { season: null, week: null }; S.assess = null; S.course = null; S.spine = null;
-  LOAD_ERR.assess = LOAD_ERR.course = '';
+  LOAD_ERR.assess = LOAD_ERR.course = LOAD_ERR.spine = '';
   S.callLogs = {};   // cached per athlete for the page's life: a failed read stuck as "No call logs yet"
   try { await loadAll(); } catch (e) { $('content').innerHTML = `<p class="empty">Could not load: ${esc(e.message)}</p>`; return; }
   render();
@@ -2072,6 +2082,7 @@ async function hardRefresh() {
 let _lastViewKey = '';
 function render() {
   if (!S.ready) return;
+  $('content').classList.remove('no-anim');
   renderRail();
   const r = route();
   // A new screen starts at the top. Same-page hash links keep the scroll offset, so a long roster
@@ -2089,7 +2100,16 @@ function render() {
   else if (r.view === 'course') renderCourse();
   else if (r.view === 'exercises') renderExercises();
 }
-window.addEventListener('hashchange', render);
+window.addEventListener('hashchange', ev => {
+  // Leaving the Exercises tab with typed, unsaved work asks first, and stays put on a no.
+  if (/#exercises$/.test(ev.oldURL || '') && route().view !== 'exercises' && !spineMayLeave('Leave the Exercises tab')) {
+    history.replaceState(null, '', ev.oldURL); renderRail(); return;
+  }
+  render();
+});
+window.addEventListener('beforeunload', ev => {
+  if (route().view === 'exercises' && (spineNoteEdits(), spineHasEdits())) { ev.preventDefault(); ev.returnValue = ''; }
+});
 window.hardRefresh = hardRefresh;
 
 // --- TODAY ------------------------------------------------------------------
@@ -4885,8 +4905,9 @@ const SPINE_IMPACTS = [['none', 'No impact'], ['running', 'Running'], ['plyometr
 // scripts/check_program.py and in .claude/skills/spine/draft_sql.py.
 const SPINE_MUSCLES = ['quads','hamstrings','glutes','adductors','calves','shins','peroneals','back','chest',
   'shoulder','biceps','triceps','forearm','core','neck'];
-const SPINE_MUSCLE_ALIAS = { quad: 'quads', hamstring: 'hamstrings', glute: 'glutes', adductor: 'adductors', calf: 'calves',
-  shoulders: 'shoulder', bicep: 'biceps', tricep: 'triceps', forearms: 'forearm', lats: 'back' };
+// The same spellings scripts/check_program.py MUSCLE_ALIAS accepts.
+const SPINE_MUSCLE_ALIAS = { quad: 'quads', quadriceps: 'quads', hams: 'hamstrings', hamstring: 'hamstrings', glute: 'glutes',
+  adductor: 'adductors', calf: 'calves', shoulders: 'shoulder', bicep: 'biceps', tricep: 'triceps', forearms: 'forearm', lats: 'back' };
 const SPINE_COSTS = [['heavy', 'Heavy ×1.5'], ['moderate', 'Moderate ×1'], ['isolation', 'Isolation ×0.5'], ['none', 'None ×0']];
 function spineCreditsText(c) {
   return c ? Object.entries(c).sort((a, b) => b[1] - a[1]).map(([m, w]) => m + ' ' + w).join(', ') : '';
@@ -4940,7 +4961,9 @@ function spineParseCredits(s) {   // "quads 1, glutes 0.5" → { quads: 1, glute
   String(s || '').split(',').map(x => x.trim()).filter(Boolean).forEach(x => {
     const m = x.match(/^([a-z]+)\s*[:\s]\s*(1(?:\.0)?|0?\.5)$/i);
     const k = m && (SPINE_MUSCLE_ALIAS[m[1].toLowerCase()] || m[1].toLowerCase());
-    if (!m || !SPINE_MUSCLES.includes(k)) bad.push(x); else out[k] = parseFloat(m[2]);
+    if (!m || !SPINE_MUSCLES.includes(k)) bad.push(x);
+    else if (k in out) bad.push(x + ' (' + k + ' twice)');
+    else out[k] = parseFloat(m[2]);
   });
   return { out, bad };
 }
@@ -4955,7 +4978,11 @@ const QM_ART = { iron: 'strength', build: 'muscle', voltage: 'power', spring: 's
 const QM_PHASE = { bedrock: 'a foundation block', peak: 'a peaking block', reset: 'a recovery block' };
 const QM_PREP = /warm|mobility|activation|cool|prime|prep/i;   // same test as program.html isPrepBlockTitle()
 let _spineOpen = null;      // id of the entry whose editor is open
-let _spineFilter = 'draft';
+let _spineFilter = null;    // 'draft' | 'approved'; null = Drafts while there are any, else Approved
+let _spineQ = '';           // the search box: matches across drafts and approved
+let _spineBase = null;      // { id, state }: the open editor as it was drawn from the server copy
+let _spineDraft = null;     // { id, edits }: only the fields the coach changed, carried across redraws
+let _qualDraft = {};        // 'id:field' -> typed text in the ten qualities, carried across redraws
 
 async function loadSpine() {
   if (DEMO) {   // layout preview only
@@ -4969,15 +4996,19 @@ async function loadSpine() {
       quals: QM_IDS.map((id, i) => ({ id, name: id[0].toUpperCase() + id.slice(1), family: null, line: 'Sample line.', tennis: '', tests: [], sort: i + 1, status: i < 3 ? 'approved' : 'draft' })) };
     return;
   }
+  // All three or nothing. A failed read of the coach half used to be cached as "no counts, no SFR,
+  // no flags", and the next Save wrote those blanks over the real values.
   const [a, b, q] = await Promise.all([
-    sb.from('exercises').select('*').order('name'),
-    sb.from('exercise_coach').select('*'),
-    sb.from('qualities').select('*').order('sort'),
+    selectAll('exercises', '*', ['id']), selectAll('exercise_coach', '*', ['id']), selectAll('qualities', '*', ['id']),
   ]);
-  if (a.error) toast('Could not load exercises: ' + a.error.message);
+  const err = [['exercises', a], ['the coach-only part', b], ['qualities', q]].filter(([, r]) => r.error || r.short)
+    .map(([n, r]) => n + ': ' + (r.error ? r.error.message : `only ${r.data.length} of ${r.total} rows came back`));
+  LOAD_ERR.spine = err.join(' · ');
+  if (err.length) { S.spine = { failed: LOAD_ERR.spine, list: [], coach: {}, quals: [] }; return; }
   const coach = {};
-  (b.data || []).forEach(r => { coach[r.id] = r; });
-  S.spine = { list: a.data || [], coach, quals: q.data || [] };
+  b.data.forEach(r => { coach[r.id] = r; });
+  S.spine = { list: a.data.sort((x, y) => String(x.name).localeCompare(String(y.name))), coach,
+    quals: q.data.sort((x, y) => (x.sort || 0) - (y.sort || 0)) };
 }
 function spineIndexC(list) {
   const idx = [{}, {}, {}, {}];
@@ -4997,90 +5028,274 @@ function spineForC(idx, name, exId, byId) {
   }
   return null;
 }
-// Every standard/simple exercise name in the live programmes, with who uses it.
+// Every exercise card in the live programmes, circuit items included (a third of all cards sit
+// inside circuits, and some entries are used nowhere else), grouped by name and exId, with who uses it.
 function spineUsage() {
   const names = {};
   // S.programs (id -> programme), NOT S.prog: S.prog holds the progress blobs.
   Object.entries(S.programs || {}).forEach(([aid, data]) => {
-    if (!data || aid === 'demo') return;
+    if (!data || SYSTEM_IDS.includes(aid)) return;
     ((data.workouts && data.workouts.days) || []).forEach(d => (d.blocks || []).forEach(b =>
       (b.exercises || []).forEach(ex => {
-        if (!ex || ex.type === 'circuit' || !ex.name) return;
-        const n = names[ex.name] || (names[ex.name] = { name: ex.name, athletes: {}, slots: 0, exId: ex.exId || null });
-        n.athletes[aid] = 1; n.slots++;
+        if (!ex) return;
+        (ex.type === 'circuit' ? (ex.items || []) : [ex]).forEach(it => {
+          if (!it || !it.name) return;
+          const key = it.name + '\u0001' + (it.exId || '');
+          const n = names[key] || (names[key] = { name: it.name, athletes: {}, slots: 0, exId: it.exId || null });
+          n.athletes[aid] = 1; n.slots++;
+        });
       })));
   });
   return Object.values(names);
+}
+// The cards whose entry would change if the Spine read `next` instead of `list`: a rename or an
+// alias edit that leaves a card finding no entry (or another one) is what this catches.
+function spineResolveChanges(list, next) {
+  const mk = l => { const byId = {}; l.forEach(e => { byId[e.id] = e; }); return { idx: spineIndexC(l), byId }; };
+  const A = mk(list), B = mk(next), out = [];
+  spineUsage().forEach(u => {
+    const a = spineForC(A.idx, u.name, u.exId, A.byId), b = spineForC(B.idx, u.name, u.exId, B.byId);
+    if (a && a !== b) out.push({ name: u.name, from: a, to: b, athletes: Object.keys(u.athletes), slots: u.slots });
+  });
+  return out;
+}
+// The cards that find entry `id` today, by exId or by name.
+function spineCardsFor(id) {
+  const byId = {}; S.spine.list.forEach(e => { byId[e.id] = e; });
+  const idx = spineIndexC(S.spine.list), out = { athletes: {}, cards: 0 };
+  spineUsage().forEach(u => {
+    if (spineForC(idx, u.name, u.exId, byId) !== id) return;
+    out.cards += u.slots; Object.keys(u.athletes).forEach(a => { out.athletes[a] = 1; });
+  });
+  return out;
+}
+// A typed link resolves only at the two exact tiers (spelling and db/bb/kb). The looser tiers ignore
+// word order and brackets, which would link "Split Squat (Barbell)" to a different version's entry.
+function spineStrictId(idx, name) {
+  const vs = exNameVariantsC(name);
+  for (let t = 0; t < 2; t++) { const ids = vs[t] && idx[t][vs[t]]; if (ids && ids.length === 1) return ids[0]; }
+  return null;
+}
+// The open editor's values, flat: 'sf:<field>' for inputs, 'sload' / 'sflag' for the checkbox groups.
+function spineFormState(ed) {
+  const st = {};
+  ed.querySelectorAll('[data-sf]').forEach(el => { st['sf:' + el.dataset.sf] = el.value; });
+  st.sload = [...ed.querySelectorAll('[data-sload]:checked')].map(x => x.dataset.sload).sort().join(',');
+  st.sflag = [...ed.querySelectorAll('[data-sflag]:checked')].map(x => x.dataset.sflag).sort().join(',');
+  return st;
+}
+function spineFormSet(ed, st) {
+  Object.entries(st).forEach(([k, v]) => {
+    if (k === 'sload' || k === 'sflag') {
+      const on = v ? v.split(',') : [];
+      ed.querySelectorAll(`[data-${k}]`).forEach(el => { el.checked = on.includes(el.dataset[k]); });
+    } else { const el = ed.querySelector(`[data-sf="${k.slice(3)}"]`); if (el) el.value = v; }
+  });
+}
+// What the coach changed in the open editor, against what it showed when it was drawn.
+function spineEdits() {
+  const ed = $('spineEd');
+  if (!ed || !_spineBase || _spineBase.id !== _spineOpen) return (_spineDraft && _spineDraft.id === _spineOpen && _spineDraft.edits) || {};
+  const st = spineFormState(ed), out = {};
+  Object.keys(st).forEach(k => { if (st[k] !== _spineBase.state[k]) out[k] = st[k]; });
+  return out;
+}
+function spineNoteEdits() { if (_spineOpen) _spineDraft = { id: _spineOpen, edits: spineEdits() }; }
+function spineHasEdits() {
+  return !!(_spineDraft && _spineDraft.id === _spineOpen && Object.keys(_spineDraft.edits).length) || Object.keys(_qualDraft).length > 0;
+}
+// Before anything that would throw typed work away: true = carry on.
+function spineMayLeave(what) {
+  spineNoteEdits();
+  if (!spineHasEdits()) return true;
+  const e = _spineOpen && S.spine && S.spine.list.find(x => x.id === _spineOpen);
+  if (!confirm(`You have unsaved changes${e ? ' to ' + e.name : ''}${Object.keys(_qualDraft).length ? (e ? ' and' : ' to') + ' the quality texts' : ''}.\n\n${what || 'Leave'} and lose them?`)) return false;
+  _spineDraft = null; _qualDraft = {};
+  return true;
+}
+// Columns behind each editor field.
+const SPINE_ENTRY_COL = { 'sf:name': 'name', 'sf:aliases': 'aliases', 'sf:pattern': 'pattern', 'sf:video': 'video',
+  'sf:q1': 'qualities', 'sf:q2': 'qualities', 'sf:q3': 'qualities', 'sf:purpose': 'purpose', 'sf:tennis': 'tennis',
+  'sf:good': 'cues', 'sf:bad': 'cues', 'sf:easier': 'easier', 'sf:harder': 'harder', 'sf:alts': 'alts',
+  'sf:equipment': 'equipment', sload: 'loads', 'sf:impact': 'impact', 'sf:muscles': 'muscles' };
+const SPINE_COACH_COL = { 'sf:sfr': 'sfr', sflag: 'flags', 'sf:credits': 'credits', 'sf:cost': 'cost', 'sf:notes': 'notes' };
+function stableJson(v) {
+  return JSON.stringify(v ?? null, (k, x) => x && typeof x === 'object' && !Array.isArray(x)
+    ? Object.keys(x).sort().reduce((o, kk) => { o[kk] = x[kk]; return o; }, {}) : x);
+}
+// Write only the columns the coach changed, and only when nobody changed THOSE columns since the
+// page read the row. Claude's /spine Upkeep writes the same rows by SQL while Amir reviews them, and
+// the old save sent every column from the page's copy, so it undid that work without a word.
+// Returns { row } on success, { clash: [cols], live } when someone else changed a column the coach
+// also changed, or { error }.
+async function saveChangedCols(table, id, snap, changes, versioned) {
+  const live = await sb.from(table).select('*').eq('id', id).maybeSingle();
+  if (live.error) return { error: 'could not read it back first: ' + live.error.message };
+  if (!live.data) {
+    if (versioned) return { error: 'this entry is no longer on the server. Refresh.' };
+    const ins = await sb.from(table).insert(Object.assign({ id }, changes)).select('*');
+    const bad = writeFailed(ins);
+    return bad ? { error: bad } : { row: ins.data[0] };
+  }
+  const clash = Object.keys(changes).filter(k => k !== 'updated_at' && k !== 'updated_by' &&
+    stableJson(live.data[k]) !== stableJson(snap[k]) && stableJson(live.data[k]) !== stableJson(changes[k]));
+  if (clash.length) return { clash, live: live.data };
+  let q = sb.from(table).update(changes).eq('id', id);
+  if (versioned) q = q.eq('updated_at', live.data.updated_at);
+  const r = await q.select('*');
+  if (r.error) return { error: r.error.message };
+  if (!r.data || !r.data.length) return { error: versioned ? 'it changed on the server again while saving. Save again.' : writeFailed(r) };
+  return { row: r.data[0] };
+}
+function spineShort(v) {
+  const s = Array.isArray(v) ? v.join(', ') : v && typeof v === 'object' ? JSON.stringify(v) : String(v ?? '(empty)');
+  return s.length > 80 ? s.slice(0, 77) + '…' : (s || '(empty)');
 }
 function spineCsv(v) { return String(v || '').split(',').map(x => x.trim()).filter(Boolean); }
 function spineLines(v) { return String(v || '').split('\n').map(x => x.trim()).filter(Boolean); }
 
 async function spineSave(id, approve) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const c = $('content');
-  const f = n => (c.querySelector(`[data-sf="${n}"]`) || {}).value || '';
-  const cur = S.spine.list.find(e => e.id === id) || {};
+  if (!S.spine || S.spine.failed) { alert('The Spine did not load, so nothing can be saved. Tap ↻ Refresh first.'); return; }
+  const ed = $('spineEd');
+  if (!ed || _spineOpen !== id) return;
+  const cur = S.spine.list.find(e => e.id === id);
+  if (!cur) { alert('This entry is not in the list any more. Refresh.'); return; }
+  const k0 = S.spine.coach[id] || {};
+  const edits = spineEdits();
+  _spineDraft = { id, edits };   // a refusal below keeps what was typed, whatever redraws next
+  const st = spineFormState(ed);
+  const f = n => st['sf:' + n] || '';
   const ids = new Set(S.spine.list.map(e => e.id));
   // A link is an entry id, or the plain name of an exercise with no entry yet (Amir,
   // 2026-09-24: "if we already have it, link it, if not, just put the name"). A name that
-  // matches an entry is stored as that entry's id; an id-shaped typo is refused.
-  const byId = {}; S.spine.list.forEach(e => { byId[e.id] = e; });
+  // matches an entry exactly is stored as that entry's id; an id-shaped typo is refused.
   const idx = spineIndexC(S.spine.list);
-  const toLink = x => ids.has(x) ? x : SPINE_ID_RE.test(x) ? x : (spineForC(idx, x, null, byId) || x);
+  const toLink = x => ids.has(x) ? x : SPINE_ID_RE.test(x) ? x : (spineStrictId(idx, x) || x);
   const links = {};
   ['easier', 'harder', 'alts'].forEach(k => { links[k] = spineCsv(f(k)).map(toLink).filter((x, i, a) => x !== id && a.indexOf(x) === i); });
   const bad = [].concat(links.easier, links.harder, links.alts).filter(x => SPINE_ID_RE.test(x) && !ids.has(x));
   if (bad.length) { alert('These look like ids but are not entries:\n\n' + bad.join('\n') + '\n\nPick an id from the list, or type the exercise\'s name (e.g. Nordic Hamstring Curl).'); return; }
+  const qs = [f('q1'), f('q2'), f('q3')];
+  if (!qs[0] && (qs[1] || qs[2])) { alert('Pick the primary quality first: the first box is the one the day card names.'); return; }
+  const sfrTxt = f('sfr').trim();
+  if (sfrTxt && !/^[1-9]\d*$/.test(sfrTxt)) { alert('SFR rank is a whole number from 1 (best stimulus for its fatigue in its pattern), or blank.'); return; }
   const good = spineLines(f('good')), badCues = spineLines(f('bad'));
   const row = {
-    id, name: f('name').trim() || cur.name, aliases: spineCsv(f('aliases')), pattern: f('pattern') || null,
+    name: f('name').trim() || cur.name, aliases: spineCsv(f('aliases')), pattern: f('pattern') || null,
     purpose: f('purpose').trim() || null, tennis: f('tennis').trim() || null,
     cues: (good.length || badCues.length) ? { good, bad: badCues } : null,
-    equipment: spineCsv(f('equipment')), loads: [...c.querySelectorAll('[data-sload]:checked')].map(x => x.dataset.sload),
+    equipment: spineCsv(f('equipment')), loads: st.sload ? st.sload.split(',') : [],
     impact: f('impact') || null,
     easier: links.easier, harder: links.harder, alts: links.alts, video: f('video').trim() || null,
     // First = primary. Blank slots drop out; a repeat keeps its first position.
-    qualities: [f('q1'), f('q2'), f('q3')].filter((x, i, a) => x && a.indexOf(x) === i),
+    qualities: qs.filter((x, i, a) => x && a.indexOf(x) === i),
     status: approve === true ? 'approved' : approve === false ? 'draft' : (cur.status || 'draft'),
-    updated_at: new Date().toISOString(), updated_by: 'coach',
   };
-  const flags = [...c.querySelectorAll('[data-sflag]:checked')].map(x => x.dataset.sflag);
-  const sfr = parseInt(f('sfr'), 10);
   // Counts toward: blank means "counts toward nothing" ({}), except on an entry never given a
   // count, which stays unset (null) so the checker still asks for one.
   const cr = spineParseCredits(f('credits'));
   if (cr.bad.length) { alert('Counts toward: write each one as a muscle and 1 or 0.5, e.g. "quads 1, glutes 0.5".\n\nMuscles: ' + SPINE_MUSCLES.join(', ') + '\n\nNot understood: ' + cr.bad.join(', ')); return; }
-  const k0 = S.spine.coach[id] || {};
-  const credits = Object.keys(cr.out).length ? cr.out : (k0.credits == null && !f('credits').trim() ? null : {});
   // The muscle map (stage42): display only, for an entry that counts toward nothing. The app shows
   // the counts when they name a muscle, so this is ignored then. Same list and grammar as the counts.
   const mu = spineParseCredits(f('muscles'));
   if (mu.bad.length) { alert('Muscles shown: write each one as a muscle and 1 or 0.5, e.g. "calves 1, shins 0.5".\n\nMuscles: ' + SPINE_MUSCLES.join(', ') + '\n\nNot understood: ' + mu.bad.join(', ')); return; }
   row.muscles = Object.keys(mu.out).length ? mu.out : null;
-  const a = await sb.from('exercises').upsert(row, { onConflict: 'id' });
-  if (a.error) { alert('Could not save: ' + a.error.message); return; }
-  const b = await sb.from('exercise_coach').upsert({ id, sfr: sfr > 0 ? sfr : null, flags, notes: f('notes').trim() || null,
-    credits, cost: f('cost') || null }, { onConflict: 'id' });
-  if (b.error) { alert('Saved the entry, but not the coach notes: ' + b.error.message); }
-  toast(row.status === 'approved' ? (approve ? 'Approved — athletes see it on their next open' : 'Saved') : 'Saved as draft');
+  const coachRow = { sfr: sfrTxt ? parseInt(sfrTxt, 10) : null, flags: st.sflag ? st.sflag.split(',') : [],
+    notes: f('notes').trim() || null, cost: f('cost') || null,
+    credits: Object.keys(cr.out).length ? cr.out : (k0.credits == null && !f('credits').trim() ? null : {}) };
+  // Only what the coach changed goes up. A column nobody touched keeps whatever the server holds.
+  const entry = {}, coach = {};
+  Object.keys(edits).forEach(k => {
+    if (SPINE_ENTRY_COL[k]) entry[SPINE_ENTRY_COL[k]] = row[SPINE_ENTRY_COL[k]];
+    if (SPINE_COACH_COL[k]) coach[SPINE_COACH_COL[k]] = coachRow[SPINE_COACH_COL[k]];
+  });
+  if (row.status !== cur.status) entry.status = row.status;
+  // Claude's suggested qualities fill the boxes of an entry that has none, and go up with any save.
+  if (!(cur.qualities || []).length && row.qualities.length) entry.qualities = row.qualities;
+  if (!Object.keys(entry).length && !Object.keys(coach).length) { toast('Nothing changed, so nothing to save'); return; }
+  // Identity: a new name or alias must not take a card away from this entry or from another one.
+  if ('name' in entry || 'aliases' in entry) {
+    const next = S.spine.list.map(e => e.id === id ? Object.assign({}, e, { name: row.name, aliases: row.aliases }) : e);
+    const fresh = (row.name !== cur.name ? [row.name] : []).concat(row.aliases.filter(x => !(cur.aliases || []).includes(x)));
+    const clashWith = fresh.map(n => exNameVariantsC(n)).flatMap(vs => [0, 1].flatMap(t =>
+      (vs[t] && idx[t][vs[t]] || []).filter(x => x !== id))).filter((x, i, a) => a.indexOf(x) === i);
+    if (clashWith.length) { alert(`${fresh.map(x => '"' + x + '"').join(' or ')} is already how ${clashWith.map(x => (S.spine.list.find(e => e.id === x) || {}).name || x).join(', ')} is written. Two entries with one name both stop matching any card. Nothing was saved.`); return; }
+    if ('name' in entry && row.name !== cur.name) {
+      const used = spineCardsFor(id), who = Object.keys(used.athletes);
+      if (used.cards) { alert(`${cur.name} is on ${used.cards} card${used.cards === 1 ? '' : 's'} in ${who.length} programme${who.length === 1 ? '' : 's'} (${who.map(nameOf).join(', ')}).\n\nOne name per exercise: a rename has to change those cards too and move their logged history (Last time, Personal Records) to the new name, or the cards stop finding this entry. That is Claude's /spine "One name in live programmes" job.\n\nNothing was saved. Ask Claude to rename it; your other changes are still in the form.`); return; }
+    }
+    const lost = spineResolveChanges(S.spine.list, next);
+    if (lost.length) { alert(`That would take ${lost.length} card name${lost.length === 1 ? '' : 's'} away from ${lost.length === 1 ? 'its' : 'their'} entry:\n\n${lost.slice(0, 8).map(l => `${l.name} (${l.athletes.map(nameOf).join(', ')})`).join('\n')}\n\nNothing was saved.`); return; }
+  }
+  if (approve === false) {
+    const used = spineCardsFor(id), n = Object.keys(used.athletes).length;
+    if (!confirm(`Move ${cur.name} back to draft?\n\nA draft is off every phone: ${n ? `${n} athlete${n === 1 ? '' : 's'} with it in their programme lose its cues, its ⓘ sheet and its qualities on the day card until you approve it again` : 'nobody has it in a programme right now'}.${Object.keys(edits).length ? '\n\nYour other changes in the form are saved with it.' : ''}`)) return;
+  }
+  const label = { name: 'Name', aliases: 'Also written as', pattern: 'Pattern', video: 'Video', qualities: 'Qualities',
+    purpose: 'Why it’s here', tennis: 'On court', cues: 'Cues / Don’t', easier: 'Regressions', harder: 'Progressions',
+    alts: 'Alternatives', equipment: 'Equipment', loads: 'Body parts', impact: 'Impact', muscles: 'Muscles shown',
+    status: 'Status', sfr: 'SFR rank', flags: 'Flags', credits: 'Counts toward', cost: 'Cost', notes: 'Notes' };
+  const clashMsg = (res, snap, partial) => `Since you opened ${cur.name}, someone else (Claude's /spine, or this page in another tab) changed what you changed:\n\n${
+    res.clash.map(k => `${label[k] || k}: now "${spineShort(res.live[k])}", was "${spineShort(snap[k])}"`).join('\n')}\n\n${
+    partial ? 'The entry itself was saved; the coach-only part was NOT.' : 'Nothing was saved.'} Your typed values are still in the form: Save again to put yours over theirs, or Close to keep theirs.`;
+  let resE = null, resC = null;
+  if (Object.keys(entry).length) {
+    entry.updated_at = new Date().toISOString(); entry.updated_by = 'coach';
+    resE = await saveChangedCols('exercises', id, cur, entry, true);
+    if (resE.clash) { const was = Object.assign({}, cur); Object.assign(cur, resE.live); alert(clashMsg(resE, was, false)); renderExercises(); return; }
+    if (resE.error) { alert('Could not save ' + cur.name + ': ' + resE.error + '\n\nNothing was saved; what you typed is still in the form.'); return; }
+    Object.assign(cur, resE.row);
+    // The entry is saved: those fields are no longer unsaved edits.
+    Object.keys(edits).forEach(k => { if (SPINE_ENTRY_COL[k]) delete edits[k]; });
+  }
+  if (Object.keys(coach).length) {
+    resC = await saveChangedCols('exercise_coach', id, k0, coach, false);
+    if (resC.clash) {
+      S.spine.coach[id] = Object.assign({}, k0, resC.live);
+      alert(clashMsg(resC, k0, !!resE)); renderExercises(); return;
+    }
+    if (resC.error) {
+      alert(`${resE ? 'Saved the entry, but NOT' : 'Could not save'} the coach-only part (counts, SFR, flags, cost, notes): ${resC.error}\n\nThose values are still in the form. Save again.`);
+      renderExercises(); return;
+    }
+    S.spine.coach[id] = resC.row;
+  }
+  _spineDraft = null;
+  toast(row.status === 'approved' ? (approve ? 'Approved — athletes see it on their next open' : 'Saved') : approve === false ? 'Moved back to draft: off every phone' : 'Saved as draft');
   if (approve === true) _spineOpen = null;
-  await loadSpine(); renderExercises();
+  renderExercises();
 }
 
 // ── The Quality Map (2026-09-24) — the ten texts, and the check across athletes ──
 async function qualSave(id, approve) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (!S.spine || S.spine.failed) { alert('The Spine did not load, so nothing can be saved. Tap ↻ Refresh first.'); return; }
   const c = $('content');
-  const f = n => ((c.querySelector(`[data-qf="${id}:${n}"]`) || {}).value || '').trim();
-  const cur = (S.spine.quals || []).find(q => q.id === id) || {};
-  const row = { id, name: f('name') || cur.name, line: f('line') || cur.line, tennis: f('tennis') || null,
-    tests: f('tests').split(',').map(x => x.trim()).filter(Boolean), family: cur.family || null, sort: cur.sort || 0,
-    status: approve === true ? 'approved' : approve === false ? 'draft' : (cur.status || 'draft'),
-    updated_at: new Date().toISOString(), updated_by: 'coach' };
-  const r = await sb.from('qualities').upsert(row, { onConflict: 'id' });
-  if (r.error) { alert('Could not save: ' + r.error.message); return; }
-  toast(row.status === 'approved' ? 'Approved — it shows on day cards once exercises carry it' : 'Saved as draft');
-  await loadSpine(); renderExercises();
+  const el = n => c.querySelector(`[data-qf="${id}:${n}"]`);
+  const f = n => ((el(n) || {}).value || '').trim();
+  const cur = (S.spine.quals || []).find(q => q.id === id);
+  if (!cur) return;
+  const row = { name: f('name') || cur.name, line: f('line') || cur.line, tennis: f('tennis') || null,
+    tests: f('tests').split(',').map(x => x.trim()).filter(Boolean),
+    status: approve === true ? 'approved' : approve === false ? 'draft' : (cur.status || 'draft') };
+  const changes = {};
+  ['name', 'line', 'tennis', 'tests'].forEach(k => { if (el(k) && el(k).value !== el(k).defaultValue) changes[k] = row[k]; });
+  if (row.status !== cur.status) changes.status = row.status;
+  if (!Object.keys(changes).length) { toast('Nothing changed, so nothing to save'); return; }
+  if (approve === false && !confirm(`Move ${cur.name} back to draft?\n\nA draft quality comes off every athlete's day cards until you approve it again.`)) return;
+  changes.updated_at = new Date().toISOString(); changes.updated_by = 'coach';
+  const r = await saveChangedCols('qualities', id, cur, changes, true);
+  if (r.clash) {
+    Object.assign(cur, r.live);
+    alert(`Since the page loaded, someone else changed ${cur.name}'s ${r.clash.join(', ')}. Nothing was saved. Your text is still in the boxes: Save again to put yours over theirs.`);
+    renderExercises(); return;
+  }
+  if (r.error) { alert('Could not save ' + cur.name + ': ' + r.error); return; }
+  Object.assign(cur, r.row);
+  Object.keys(_qualDraft).forEach(k => { if (k.startsWith(id + ':')) delete _qualDraft[k]; });
+  toast(row.status === 'approved' ? (approve ? 'Approved — it shows on day cards once exercises carry it' : 'Saved') : approve === false ? 'Moved back to draft' : 'Saved as draft');
+  renderExercises();
 }
 // A working exercise dosed by TIME with no sets counts one set per 10 minutes, never
 // less than 1 (a 30-min ride = 3). ⚠️ Same rule as program.html qmSets() and
@@ -5141,7 +5356,7 @@ function qualityPanels(idx, byId) {
           <input data-qf="${q.id}:tests" value="${esc((q.tests || []).join(', '))}" placeholder="How we measure it (comma)" style="${field}">
           <div style="display:flex;gap:8px">${q.status === 'draft'
             ? `<button class="btn primary sm qm-save" data-q="${q.id}" data-ap="1">Approve</button><button class="btn sm qm-save" data-q="${q.id}">Save draft</button>`
-            : `<button class="btn primary sm qm-save" data-q="${q.id}">Save</button><button class="btn sm qm-save" data-q="${q.id}" data-ap="0">Move back to draft</button>`}</div>
+            : `<button class="btn primary sm qm-save" data-q="${q.id}">Save</button><button class="btn sm qm-save" data-q="${q.id}" data-ap="0" title="Takes it off every day card">Move back to draft…</button>`}</div>
         </div></div></div>`).join('') + `</details></section>`;
   const rows = Object.entries(S.programs || {}).filter(([k, v]) => v && k !== 'demo' && v.workouts)
     .map(([aid, data]) => Object.assign({ aid }, qualityCheckC(data, idx, byId)))
@@ -5171,9 +5386,15 @@ function renderExercises() {
   const c = $('content');
   if (!S.spine) {
     c.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
-    loadSpine().then(renderExercises);
+    loadSpine().then(() => { if (route().view === 'exercises') renderExercises(); else renderRail(); });
     return;
   }
+  if (S.spine.failed) {
+    c.innerHTML = `<section class="panel"><p class="empty" role="alert"><b>The Spine did not load</b>, so nothing here can be shown or saved (a save from half a copy would blank what did not arrive).<br><span class="muted">${esc(S.spine.failed)}</span></p>
+      <p style="text-align:center"><button class="btn primary sm" onclick="S.spine=null;renderExercises()">↻ Try again</button></p></section>`;
+    return;
+  }
+  c.classList.toggle('no-anim', !!$('spineQ'));
   const list = S.spine.list, byId = {};
   list.forEach(e => { byId[e.id] = e; });
   const idx = spineIndexC(list);
@@ -5193,45 +5414,62 @@ function renderExercises() {
   unmapped.sort((a, b) => Object.keys(b.athletes).length - Object.keys(a.athletes).length || b.slots - a.slots);
   const pct = slotsAll ? Math.round(slotsMapped / slotsAll * 100) : 0;
   const drafts = list.filter(e => e.status === 'draft'), approved = list.filter(e => e.status === 'approved');
-  const shown = _spineFilter === 'approved' ? approved : drafts;
+  const filter = _spineFilter || (drafts.length ? 'draft' : 'approved');
+  const q = normQ(_spineQ);
+  const hay = e => normQ([e.name, e.id, e.pattern].concat(e.aliases || [], e.equipment || []).join(' '));
+  const shown = q ? list.filter(e => hay(e).includes(q)) : filter === 'approved' ? approved : drafts;
   const nAth = id => Object.keys((who[id] || {}).athletes || {}).length;
+  const nLive = Object.entries(S.programs || {}).filter(([k, v]) => v && !SYSTEM_IDS.includes(k) && v.workouts && (v.workouts.days || []).length).length;
   const field = 'width:100%;font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;box-sizing:border-box';
-  const lbl = t => `<div class="muted" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin:10px 0 4px">${t}</div>`;
+  const lbl = t => `<div class="muted" style="font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin:10px 0 4px">${t}</div>`;
+  // A stored value the lists below do not know is shown and kept, never silently dropped on save.
+  const opts = (known, v, text) => (v && !known.includes(v) ? `<option value="${esc(v)}" selected>${esc(v)} (not in the list)</option>` : '') +
+    known.map(id => `<option value="${esc(id)}"${id === v ? ' selected' : ''}>${esc(text ? text(id) : id)}</option>`).join('');
+  const nm = id => (byId[id] || {}).name || id;
+  // CUE-4: links go both ways. The editor writes one entry, so it says which ones do not link back.
+  const oneWay = e => {
+    const back = { easier: 'harder', harder: 'easier', alts: 'alts' }, out = [];
+    ['easier', 'harder', 'alts'].forEach(k => (e[k] || []).forEach(x => {
+      if (byId[x] && !(byId[x][back[k]] || []).includes(e.id)) out.push(`${esc(nm(x))} <span class="muted">(${k === 'easier' ? 'regression' : k === 'harder' ? 'progression' : 'alternative'})</span>`);
+    }));
+    return out;
+  };
 
   const editor = e => {
     const k = S.spine.coach[e.id] || {};
     const names = Object.keys((who[e.id] || {}).athletes || {}).map(a => esc(nameOf(a))).join(', ');
-    return `<div class="panel" style="margin:8px 0 14px;background:var(--paper, #FAF7F2)">
+    const ow = oneWay(e);
+    return `<div class="panel spine-ed" id="spineEd" style="margin:8px 0 14px;background:var(--paper, #FAF7F2)">
+      <p class="psub" style="margin:0 0 4px">${names ? 'Doing it now: ' + names : 'Nobody has this in their programme right now.'} <span class="muted">· id ${esc(e.id)}${e.updated_by ? ' · last saved by ' + esc(e.updated_by) + (e.updated_at ? ', ' + esc(fmtLocalStamp(e.updated_at)) : '') : ''}</span></p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 14px">
         <div>${lbl('Name')}<input data-sf="name" value="${esc(e.name)}" style="${field}"></div>
         <div>${lbl('Also written as (comma)')}<input data-sf="aliases" value="${esc((e.aliases || []).join(', '))}" style="${field}"></div>
-        <div>${lbl('Pattern')}<select data-sf="pattern" style="${field}"><option value=""></option>${SPINE_PATTERNS.map(p => `<option${p === e.pattern ? ' selected' : ''}>${p}</option>`).join('')}</select></div>
+        <div>${lbl('Pattern')}<select data-sf="pattern" style="${field}"><option value=""></option>${opts(SPINE_PATTERNS, e.pattern)}</select></div>
         <div>${lbl('Video')}<input data-sf="video" value="${esc(e.video || '')}" style="${field}"></div>
       </div>
       ${(() => {
         const sug = !(e.qualities || []).length && (k.suggested_qualities || []).length;
         const cur = (e.qualities || []).length ? e.qualities : (k.suggested_qualities || []);
         const qname = id => ((S.spine.quals || []).find(q => q.id === id) || {}).name || id;
-        const sel = (n, v) => `<select data-sf="q${n}" style="${field}"><option value="">${n === 1 ? '— primary —' : '—'}</option>${
-          QM_IDS.map(id => `<option value="${id}"${id === v ? ' selected' : ''}>${esc(qname(id))}</option>`).join('')}</select>`;
+        const sel = (n, v) => `<select data-sf="q${n}" style="${field}"><option value="">${n === 1 ? '— primary —' : '—'}</option>${opts(QM_IDS, v, qname)}</select>`;
         return lbl('Qualities · first is the primary' + (sug ? ' · <b style="color:var(--clay-ink)">Claude’s suggestion, saved when you save</b>' : '')) +
           `<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">${sel(1, cur[0])}${sel(2, cur[1])}${sel(3, cur[2])}</div>`;
       })()}
-      ${lbl('Why it’s here (the athlete reads this)')}<textarea data-sf="purpose" rows="2" style="${field}">${esc(e.purpose || '')}</textarea>
-      ${lbl('On court')}<input data-sf="tennis" value="${esc(e.tennis || '')}" style="${field}">
+      ${lbl('Why it’s here (the athlete reads this)')}<textarea data-sf="purpose" rows="2" dir="auto" style="${field}">${esc(e.purpose || '')}</textarea>
+      ${lbl('On court')}<input data-sf="tennis" dir="auto" value="${esc(e.tennis || '')}" style="${field}">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 14px">
-        <div>${lbl('Cues · one per line')}<textarea data-sf="good" rows="3" style="${field}">${esc(((e.cues || {}).good || []).join('\n'))}</textarea></div>
-        <div>${lbl('Don’t · one per line')}<textarea data-sf="bad" rows="3" style="${field}">${esc(((e.cues || {}).bad || []).join('\n'))}</textarea></div>
+        <div>${lbl('Cues · one per line')}<textarea data-sf="good" rows="3" dir="auto" style="${field}">${esc(((e.cues || {}).good || []).join('\n'))}</textarea></div>
+        <div>${lbl('Don’t · one per line')}<textarea data-sf="bad" rows="3" dir="auto" style="${field}">${esc(((e.cues || {}).bad || []).join('\n'))}</textarea></div>
         <div>${lbl('Regressions: easier versions of the same movement (ids, or a name)')}<input data-sf="easier" list="spineIds" value="${esc((e.easier || []).join(', '))}" style="${field}"></div>
         <div>${lbl('Progressions: harder versions of the same movement (ids, or a name)')}<input data-sf="harder" list="spineIds" value="${esc((e.harder || []).join(', '))}" style="${field}"></div>
         <div>${lbl('Alternatives: same movement, other equipment or machine (ids, or a name)')}<input data-sf="alts" list="spineIds" value="${esc((e.alts || []).join(', '))}" style="${field}"></div>
         <div>${lbl('Equipment (comma)')}<input data-sf="equipment" value="${esc((e.equipment || []).join(', '))}" style="${field}"></div>
       </div>
+      ${ow.length ? `<p class="psub" style="margin:8px 0 0">Not linked back yet (links go both ways, CUE-4; Claude's /spine Upkeep adds the way back): ${ow.join(', ')}</p>` : ''}
       ${lbl('Body parts involved · the athlete sees these, with the impact pill after them')}
       <div style="display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center">
-        ${SPINE_REGIONS.map(([id, nm]) => `<label style="font-size:14px"><input type="checkbox" data-sload="${id}"${(e.loads || []).includes(id) ? ' checked' : ''} onchange="spineMapRefresh()"> ${nm}</label>`).join('')}
-        <select data-sf="impact" style="${field.replace('width:100%;', '')};width:auto"><option value="">— impact —</option>${
-          SPINE_IMPACTS.map(([id, nm]) => `<option value="${id}"${e.impact === id ? ' selected' : ''}>${nm}</option>`).join('')}</select>
+        ${SPINE_REGIONS.map(([id, nm2]) => `<label style="font-size:14px"><input type="checkbox" data-sload="${id}"${(e.loads || []).includes(id) ? ' checked' : ''} onchange="spineMapRefresh()"> ${nm2}</label>`).join('')}
+        <select data-sf="impact" style="${field.replace('width:100%;', '')};width:auto"><option value="">— impact —</option>${opts(SPINE_IMPACTS.map(x => x[0]), e.impact, id => (SPINE_IMPACTS.find(x => x[0] === id) || [id, id])[1])}</select>
       </div>
       ${lbl('Muscles shown on the body map · only when "Counts toward" is empty (1 = main, 0.5 = helper)')}
       <input data-sf="muscles" oninput="spineMapRefresh()" value="${esc(spineCreditsText(e.muscles))}"
@@ -5239,56 +5477,93 @@ function renderExercises() {
       ${lbl('What the athlete sees · redraws as you type, saved when you save')}
       <div id="spineMap">${spineMapHtml(k.credits, e.muscles, e.loads)}</div>
       <div style="border-top:1px dashed var(--line);margin-top:14px;padding-top:4px">
-        ${lbl('Coach only · the phone gets only the muscle names from “Counts toward”, never the rest')}
+        ${lbl('Coach only · the phone gets the muscles from “Counts toward” and whether each is main or helping, never SFR, flags, cost or notes')}
         <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center">
-          <label>SFR rank <input data-sf="sfr" value="${esc(k.sfr == null ? '' : String(k.sfr))}" style="width:60px;${field.replace('width:100%;', '')}"></label>
+          <label>SFR rank <input data-sf="sfr" inputmode="numeric" value="${esc(k.sfr == null ? '' : String(k.sfr))}" style="width:60px;${field.replace('width:100%;', '')}"></label>
           ${SPINE_FLAGS.map(fl => `<label style="font-size:14px"><input type="checkbox" data-sflag="${fl}"${(k.flags || []).includes(fl) ? ' checked' : ''}> ${fl}</label>`).join('')}
         </div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-top:8px">
           <div style="flex:1 1 300px">${lbl('Counts toward, per working set (1 = prime mover, 0.5 = helper)')}<input data-sf="credits" oninput="spineMapRefresh()" value="${esc(spineCreditsText(k.credits))}"
             placeholder="${k.credits == null ? 'not set yet, e.g. quads 1, glutes 0.5' : 'counts toward nothing'}" style="${field}"></div>
-          <div>${lbl('Cost of a set (day load)')}<select data-sf="cost" style="${field.replace('width:100%;', '')};width:auto"><option value="">— cost —</option>${
-            SPINE_COSTS.map(([id, nm]) => `<option value="${id}"${k.cost === id ? ' selected' : ''}>${nm}</option>`).join('')}</select></div>
+          <div>${lbl('Cost of a set (day load)')}<select data-sf="cost" style="${field.replace('width:100%;', '')};width:auto"><option value="">— cost —</option>${opts(SPINE_COSTS.map(x => x[0]), k.cost, id => (SPINE_COSTS.find(x => x[0] === id) || [id, id])[1])}</select></div>
         </div>
         <input data-sf="notes" placeholder="notes" value="${esc(k.notes || '')}" style="${field};margin-top:8px">
       </div>
-      <p class="psub" style="margin:10px 0">${names ? 'Doing it now: ' + names : 'Nobody has this in their programme right now.'}</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div class="spine-acts">
         ${e.status === 'draft' ? `<button class="btn primary sm sp-save" data-id="${esc(e.id)}" data-ap="1">Approve</button><button class="btn sm sp-save" data-id="${esc(e.id)}">Save draft</button>`
-          : `<button class="btn primary sm sp-save" data-id="${esc(e.id)}">Save</button><button class="btn sm sp-save" data-id="${esc(e.id)}" data-ap="0">Move back to draft</button>`}
-        <button class="btn sm sp-close">Close</button>
+          : `<button class="btn primary sm sp-save" data-id="${esc(e.id)}">Save</button><button class="btn sm sp-close">Close</button><span style="flex:1"></span><button class="btn sm sp-save" data-id="${esc(e.id)}" data-ap="0" title="Takes it off every phone">Move back to draft…</button>`}
+        ${e.status === 'draft' ? '<button class="btn sm sp-close">Close</button>' : ''}
       </div>
     </div>`;
   };
-  const row = e => `<div class="credrow" style="cursor:pointer" data-open="${esc(e.id)}">
-      <span class="credname">${esc(e.name)} <span class="muted">· ${esc(e.pattern || 'no pattern')} · ${nAth(e.id)} athlete${nAth(e.id) === 1 ? '' : 's'}</span></span>
+  const pill = e => q ? ` · ${e.status === 'approved' ? '<b style="color:var(--green-ink, #1E7A55)">approved</b>' : 'draft'}` : '';
+  const row = e => `<div class="credrow spine-row" style="cursor:pointer" data-open="${esc(e.id)}">
+      <span class="credname">${esc(e.name)} <span class="muted">· ${esc(e.pattern || 'no pattern')} · ${nAth(e.id)} athlete${nAth(e.id) === 1 ? '' : 's'}${pill(e)}</span></span>
       <span class="muted">${e.cues ? 'cues ✓' : 'no cues'}${e.video ? ' · video ✓' : ''}${(e.qualities || []).length ? ' · ' + esc(e.qualities.join(', ')) : ' · <b style="color:var(--clay-ink)">no qualities</b>'}${(S.spine.coach[e.id] || {}).credits == null ? ' · <b style="color:var(--clay-ink)">no count</b>' : ''}${
         (() => { const cc = (S.spine.coach[e.id] || {}).credits; return cc && !Object.keys(cc).length && !(e.muscles && Object.keys(e.muscles).length); })() ? ' · <b style="color:var(--clay-ink)">no muscles on the map</b>' : ''}</span>
-      <span class="acts"><button class="btn sm" data-open="${esc(e.id)}">${_spineOpen === e.id ? 'Close' : 'Open'}</button></span>
+      <span class="acts"><button class="btn sm" data-open="${esc(e.id)}" aria-expanded="${_spineOpen === e.id}">${_spineOpen === e.id ? 'Close' : 'Open'}</button></span>
     </div>` + (_spineOpen === e.id ? editor(e) : '');
 
   let html = `<div class="controls"><span class="empty" style="align-self:center">The Spine: one entry per exercise you programme. Cues written here fill every card that has none of its own, and the athlete's <b>i</b> opens the rest. Nothing shows on a phone until it is <b>Approved</b>.</span></div>`;
-  html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">Coverage</span><span class="r">${namesMapped} of ${usage.length} names · ${pct}% of exercise slots</span></div>
+  html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">Coverage</span><span class="r">${namesMapped} of ${usage.length} card names · ${pct}% of exercise slots</span></div>
     <div style="height:10px;border-radius:999px;background:var(--line);overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--clay)"></div></div>
-    <p class="psub" style="margin:10px 0 0">${approved.length} approved · ${drafts.length} drafts waiting for you. Counted across ${Object.entries(S.programs || {}).filter(([k, v]) => v && k !== 'demo').length} live programmes.</p></section>`;
+    <p class="psub" style="margin:10px 0 0">${approved.length} approved · ${drafts.length} draft${drafts.length === 1 ? '' : 's'} waiting for you. Counted across the ${nLive} programme${nLive === 1 ? '' : 's'} with workouts, circuit items included.</p></section>`;
   html += qualityPanels(idx, byId);
-  html += `<section class="panel"><div class="phead"><span class="t hd">${_spineFilter === 'approved' ? 'Approved' : 'Waiting for you'}</span>
-    <span class="r"><button class="btn sm sp-filter" data-f="draft"${_spineFilter === 'draft' ? ' disabled' : ''}>Drafts · ${drafts.length}</button> <button class="btn sm sp-filter" data-f="approved"${_spineFilter === 'approved' ? ' disabled' : ''}>Approved · ${approved.length}</button></span></div>` +
+  const fbtn = (f, t) => `<button class="btn sm sp-filter${filter === f && !q ? ' primary' : ''}" data-f="${f}" aria-pressed="${filter === f && !q}">${t}</button>`;
+  html += `<section class="panel"><div class="phead"><span class="t hd">${q ? 'Matches' : filter === 'approved' ? 'Approved' : 'Waiting for you'}</span>
+    <span class="r">${fbtn('draft', 'Drafts · ' + drafts.length)} ${fbtn('approved', 'Approved · ' + approved.length)}</span></div>
+    <input id="spineQ" type="search" value="${esc(_spineQ)}" placeholder="Find an exercise: name, other name, pattern, equipment or id" aria-label="Find an exercise" style="${field};margin:0 0 8px">` +
     (shown.length ? shown.slice().sort((a, b) => nAth(b.id) - nAth(a.id) || a.name.localeCompare(b.name)).map(row).join('')
-      : `<p class="empty">${_spineFilter === 'draft' ? 'No drafts waiting. Ask Claude to draft the next batch.' : 'Nothing approved yet: open a draft and tap Approve.'}</p>`) + `</section>`;
+      : `<p class="empty">${q ? 'No entry matches “' + esc(_spineQ) + '”.' : filter === 'draft' ? 'No drafts waiting. Ask Claude to draft the next batch.' : 'Nothing approved yet: open a draft and tap Approve.'}</p>`) + `</section>`;
   if (unmapped.length) html += `<section class="panel" style="margin-top:16px"><details><summary class="arch-toggle">Not in the Spine yet · ${unmapped.length} names</summary><div style="margin-top:12px">${
     unmapped.slice(0, 60).map(u => `<div class="credrow"><span class="credname">${esc(u.name)}</span><span class="muted">${Object.keys(u.athletes).length} athlete${Object.keys(u.athletes).length === 1 ? '' : 's'} · ${u.slots} slot${u.slots === 1 ? '' : 's'}</span></div>`).join('')
-  }</div></details></section>`;
+  }${unmapped.length > 60 ? `<p class="psub">…and ${unmapped.length - 60} more.</p>` : ''}</div></details></section>`;
   html += `<datalist id="spineIds">${list.map(e => `<option value="${esc(e.id)}">${esc(e.name)}</option>`).join('')}</datalist>`;
   c.innerHTML = html;
+
+  // The open editor: remember it as drawn, then put back what the coach had typed before this redraw.
+  const ed = $('spineEd');
+  if (ed) {
+    _spineBase = { id: _spineOpen, state: spineFormState(ed) };
+    if (_spineDraft && _spineDraft.id === _spineOpen) { spineFormSet(ed, _spineDraft.edits); spineMapRefresh(); }
+    const note = () => spineNoteEdits();
+    ed.addEventListener('input', note); ed.addEventListener('change', note);
+  } else _spineBase = null;
+  // The quality texts: the same, keyed 'id:field'.
+  c.querySelectorAll('[data-qf]').forEach(el => {
+    const k = el.dataset.qf;
+    if (k in _qualDraft) el.value = _qualDraft[k];
+    el.addEventListener('input', () => { if (el.value !== el.defaultValue) _qualDraft[k] = el.value; else delete _qualDraft[k]; });
+  });
+  const sq = $('spineQ');
+  sq.addEventListener('input', () => {
+    spineNoteEdits();
+    _spineQ = sq.value;
+    const at = sq.selectionStart;
+    renderExercises();
+    const n = $('spineQ'); n.focus(); try { n.setSelectionRange(at, at); } catch (e) { /* type=search */ }
+  });
   c.querySelectorAll('[data-open]').forEach(el => el.addEventListener('click', ev => {
-    if (ev.target.closest('.panel .panel')) return;
+    if (ev.target.closest('.spine-ed')) return;
     ev.preventDefault(); ev.stopPropagation();
-    _spineOpen = _spineOpen === el.dataset.open ? null : el.dataset.open; renderExercises();
+    const id = el.dataset.open;
+    if (!spineMayLeave(_spineOpen === id ? 'Close it' : 'Open another entry')) return;
+    _spineOpen = _spineOpen === id ? null : id; _spineDraft = null; renderExercises();
+    // Keep the row the coach tapped under their finger: an editor closing above it used to throw it
+    // a thousand pixels up the page.
+    const r = _spineOpen && c.querySelector(`.spine-row[data-open="${CSS.escape(_spineOpen)}"]`);
+    if (r) window.scrollTo({ top: r.getBoundingClientRect().top + window.scrollY - 70, behavior: 'instant' });
   }));
-  c.querySelectorAll('.sp-filter').forEach(el => el.addEventListener('click', () => { _spineFilter = el.dataset.f; _spineOpen = null; renderExercises(); }));
-  c.querySelectorAll('.sp-close').forEach(el => el.addEventListener('click', () => { _spineOpen = null; renderExercises(); }));
+  c.querySelectorAll('.sp-filter').forEach(el => el.addEventListener('click', () => {
+    if (_spineOpen && !spineMayLeave('Switch the list')) return;
+    _spineFilter = el.dataset.f; _spineQ = ''; _spineOpen = null; _spineDraft = null; renderExercises();
+  }));
+  c.querySelectorAll('.sp-close').forEach(el => el.addEventListener('click', () => {
+    if (!spineMayLeave('Close it')) return;
+    _spineOpen = null; _spineDraft = null; renderExercises();
+  }));
   c.querySelectorAll('.qm-save').forEach(el => el.addEventListener('click', () => {
+    spineNoteEdits();
     el.disabled = true;
     qualSave(el.dataset.q, el.dataset.ap === '1' ? true : el.dataset.ap === '0' ? false : undefined).finally(() => { el.disabled = false; });
   }));
@@ -5309,13 +5584,33 @@ function intakeName(i) {
   const p = i.payload || {};
   return (i.name && i.name.trim()) || [p['First Name'], p['Last Name']].filter(Boolean).join(' ').trim() || 'Unnamed';
 }
-function intakeVal(v) { return Array.isArray(v) ? v.join(', ') : String(v == null ? '' : v); }
-// Persian and Arabic digits count (a number typed on a Persian keyboard), 0098… is +98…, and an Iranian 09… becomes 989…
+function intakeVal(v, fa) { return Array.isArray(v) ? v.join(fa ? '\u060C ' : ', ') : String(v == null ? '' : v); }
+const RTL_RE = /[\u0600-\u06FF]/;
+// A wa.me link only for something that IS a phone number. The intake field is "Contact
+// (Instagram/WhatsApp)", and the old version kept whatever digits it found, so "@sara_1990" became
+// wa.me/1990 and "sara.k99@gmail.com" wa.me/99: a tap opened a stranger's chat.
+// Persian and Arabic digits count (a number typed on a Persian keyboard), 00 and + mean a country
+// code follows, an Iranian 09… (or 9… with ten digits, or +98 0…) becomes 989…, and a number that
+// still starts with a trunk 0 or is not 8-15 digits long gets no link (copy it instead).
 function waLink(num) {
-  let d = String(num || '').replace(/[\u06F0-\u06F9]/g, c => String(c.charCodeAt(0) - 0x06F0)).replace(/[\u0660-\u0669]/g, c => String(c.charCodeAt(0) - 0x0660)).replace(/[^0-9]/g, '');
-  d = d.replace(/^00/, '');
-  if (/^09\d{9}$/.test(d)) d = '98' + d.slice(1);
-  return d ? 'https://wa.me/' + d : '';
+  let t = String(num || '').replace(/[۰-۹]/g, c => String(c.charCodeAt(0) - 0x06F0))
+    .replace(/[٠-٩]/g, c => String(c.charCodeAt(0) - 0x0660)).trim();
+  if (!t) return '';
+  if (/[^0-9+\s().\-\u200c\u200e\u200f]/.test(t)) {
+    // Words around a number ("09121234567 WhatsApp") keep the number; a handle or an email never
+    // has a run of ten digits, and anything with an @ is never read as a number.
+    const run = !/@/.test(t) && t.match(/\+?\d[\d\s().\-]{8,}\d/);
+    if (!run || run[0].replace(/\D/g, '').length < 10) return '';
+    t = run[0];
+  }
+  const plus = /^\+/.test(t);
+  let d = t.replace(/[^0-9]/g, '');
+  if (!plus && /^00/.test(d)) d = d.slice(2);
+  else if (!plus && /^09\d{9}$/.test(d)) d = '98' + d.slice(1);
+  else if (!plus && /^9\d{9}$/.test(d)) d = '98' + d;
+  if (/^980\d{10}$/.test(d)) d = '98' + d.slice(3);
+  if (/^0/.test(d) || d.length < 8 || d.length > 15) return '';
+  return 'https://wa.me/' + d;
 }
 
 function intakeCard(i) {
@@ -5328,9 +5623,10 @@ function intakeCard(i) {
   const p = i.payload || {};
   Object.keys(p).forEach(k => {
     if (INTAKE_SKIP.has(k)) return;
-    const val = intakeVal(p[k]);
+    const val = intakeVal(p[k], i.lang === 'fa');
     if (!val.trim()) return;
-    rows.push(`<tr><td class="k">${esc(k)}</td><td class="v">${esc(val)}</td></tr>`);
+    const rtl = RTL_RE.test(val);
+    rows.push(`<tr><td class="k" dir="auto">${esc(k)}</td><td class="v${rtl ? ' rtl' : ''}" dir="${rtl ? 'rtl' : 'auto'}">${esc(val)}</td></tr>`);
   });
   const qa = rows.length ? `<table class="meta-table">${rows.join('')}</table>` : '<p class="empty">No further answers.</p>';
 

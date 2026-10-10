@@ -42,7 +42,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 |---|---|
 | `stub.js` | the fake supabase-js v2 client, injected by `addInitScript` before the page's scripts. In-memory DB (`window.__DB`, persisted to localStorage `__harness_db` so a reload keeps it), a chainable thenable query builder (select/eq/neq/in/gte/lte/gt/lt/is/like/order/limit/range/maybeSingle/single/insert/update/upsert/delete/match/not/or/filter, `.select()` after a write returns the rows, `{count:'exact'}`), the RPCs coach.html calls (emulated from their SQL: `set_coach_note` defaults `p_day` to the UTC date like `CURRENT_DATE` on the UTC server), `functions.invoke` for `athlete-login`, auth (`getSession` = signed-in coach; `onAuthStateChange` stores callbacks in `window.__authCbs` and fires `INITIAL_SESSION` like the real v2 client). The `programs` BEFORE UPDATE trigger is emulated (snapshot into `program_versions`, keep 20, bump `updated_at`). Every call lands in `window.__calls` with filters, modifiers and payload. |
 | `fixtures.js` | `buildSeed({today, bigHistory, stub})`: the made-up rows, column names taken from `information_schema` on 2026-10-10. |
-| `lib.js` | `openCoach(browser, {hash, tz, fixedTime, seed})`: new context, routes jsDelivr's supabase-js to an empty script and every other outside host to 204, seeds, injects the stub, opens the page, auto-accepts confirm/alert (recorded in `log.dialogs`). Helpers: `calls`, `callsSince`, `db`, `go`, `jsClick`, `loadAllCount`. |
+| `lib.js` | `openCoach(browser, {hash, tz, fixedTime, seed})`: new context, routes jsDelivr's supabase-js to an empty script and every other outside host to 204, seeds, injects the stub, opens the page, auto-accepts confirm/alert (recorded in `log.dialogs`; `dismissDialogs(page, log)` in run.js answers No to confirms instead). Helpers: `calls`, `callsSince`, `db`, `go`, `jsClick`, `loadAllCount`. |
 | `run.js` | the scenarios (below). |
 | `reallib.js` | loads the REAL supabase-js UMD (vendored, step 3) with a fake stored session and answers every Supabase request locally; counts store loads at page load and after a hidden→visible tab switch, and logs the auth events. |
 
@@ -57,7 +57,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-10: 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-10: 34 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -79,6 +79,14 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | backup-basic | every table, every row; passwords | unsent initial passwords were in the file |
 | backup-paging | 2,345 rows; 500-row cap; a write mid-backup | unordered OFFSET paging (1 row lost + 1 duplicated); a cap under 1000 truncated silently |
 | athlete-delete-all | Danger zone | the copy promised "all data"; it now says what stays |
+| spine-save-keeps-claude | Claude fills an entry by SQL, then Amir adds a video from a tab opened earlier | every column went up from the page's copy: Claude's court line, links, count and cost were reverted |
+| spine-clash | Claude and Amir change the same field | silent overwrite; now a refusal naming both values, typing kept, Save again wins |
+| spine-load-fail | the coach-only half fails to load | cached as blanks; the next save wiped SFR, flags, counts, cost |
+| spine-rename-guard | rename an entry live cards use; an alias that is another entry's name | saved silently and detached the cards |
+| spine-move-back-confirm | Move back to draft | one tap took it off every phone |
+| spine-unsaved-guard | typed work vs a redraw, another entry, leaving the tab | lost without a word |
+| spine-circuits-count | an exercise used only inside a circuit | counted as unused |
+| walink | intake / funnel WhatsApp links | "@sara_1990" opened wa.me/1990 |
 
 ## Adding a scenario
 

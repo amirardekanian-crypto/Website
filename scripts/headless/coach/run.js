@@ -174,7 +174,7 @@ S['auth-SIGNED_IN-forms'] = async (b) => {
   if (stillOpen) {
     const n0 = await L.nCalls(page);
     await page.locator('.sp-save[data-ap="1"]').click(); await L.settle(page, 700);
-    const ex = (await L.callsSince(page, n0)).filter(c => c.name === 'exercises' && c.op === 'upsert').slice(-1)[0];
+    const ex = (await L.callsSince(page, n0)).filter(c => c.name === 'exercises' && c.op === 'update').slice(-1)[0];
     r.evidence = { approvedPurpose: ex && ex.payload.purpose, approvedStatus: ex && ex.payload.status };
   }
   await page.context().close();
@@ -393,14 +393,18 @@ S['spine-approve'] = async (b) => {
   await page.locator('.sp-save[data-ap="1"]').click();
   await L.settle(page, 700);
   const cs = await L.callsSince(page, n0);
-  const ex = lastOf(cs, x => x.name === 'exercises' && x.op === 'upsert');
-  const co = lastOf(cs, x => x.name === 'exercise_coach' && x.op === 'upsert');
-  check(r, 'exercises.upsert with status approved and the edited purpose', ex && ex.payload.status === 'approved' && ex.payload.purpose === 'Harness purpose line.', ex && ex.payload);
-  check(r, 'every editor field round-trips unchanged (aliases, easier, equipment, loads)', ex && JSON.stringify(ex.payload.easier) === '["goblet-squat"]' && JSON.stringify(ex.payload.equipment) === '["machine"]' && JSON.stringify(ex.payload.loads) === '["knee"]', ex && { easier: ex.payload.easier, equipment: ex.payload.equipment, loads: ex.payload.loads });
+  // Since 2026-10-10 a save sends only what changed (here: purpose, status, and Claude's suggested
+  // qualities, which go up with the first save of an entry that has none).
+  const ex = lastOf(cs, x => x.name === 'exercises' && x.op === 'update');
+  const co = lastOf(cs, x => x.name === 'exercise_coach' && x.op !== 'select');
+  check(r, 'exercises.update with status approved and the edited purpose', ex && ex.payload.status === 'approved' && ex.payload.purpose === 'Harness purpose line.', ex && ex.payload);
+  check(r, 'only the changed columns are sent', ex && Object.keys(ex.payload).sort().join() === 'purpose,qualities,status,updated_at,updated_by', ex && Object.keys(ex.payload));
   const d = await L.db(page);
+  const e = d.exercises.find(x => x.id === 'machine-leg-press');
+  check(r, 'untouched fields are unchanged on the server (easier, equipment, loads) and the suggestion is saved', JSON.stringify(e.easier) === '["goblet-squat"]' && JSON.stringify(e.equipment) === '["machine"]' && JSON.stringify(e.loads) === '["knee"]' && JSON.stringify(e.qualities) === '["strength","muscle"]', { easier: e.easier, equipment: e.equipment, loads: e.loads, qualities: e.qualities });
   const coach = d.exercise_coach.find(x => x.id === 'machine-leg-press');
-  check(r, 'exercise_coach keeps the columns the editor does not show (suggested_changes, links_*)', coach.suggested_changes && coach.links_before && coach.links_history, { sent: co && Object.keys(co.payload), kept: Object.keys(coach) });
-  check(r, 'the entry is now in Approved and the editor closed', d.exercises.find(x => x.id === 'machine-leg-press').status === 'approved' && (await page.locator('textarea[data-sf=purpose]').count()) === 0, '');
+  check(r, 'exercise_coach is not written when nothing coach-only changed, and keeps every column', !co && coach.suggested_changes && coach.links_before && coach.links_history && coach.notes === 'fixture coach note', { sent: co && co.payload, kept: Object.keys(coach) });
+  check(r, 'the entry is now in Approved and the editor closed', e.status === 'approved' && (await page.locator('textarea[data-sf=purpose]').count()) === 0, '');
   r.evidence = { exercisesPayload: ex && ex.payload, coachPayload: co && co.payload };
   await page.context().close();
   return r;
@@ -637,6 +641,168 @@ S['athlete-delete-all'] = async (b) => {
   return r;
 };
 
+// ── 21. The Spine editor (Exercises tab) ─────────────────────────────────────
+// Claude's /spine Upkeep writes the same rows by SQL while Amir reviews them. Since 2026-10-10 a save
+// sends only the columns the coach changed, and refuses when someone else changed one of THOSE.
+async function spineOpen(page, id) {
+  await page.evaluate(() => { _spineQ = ''; });
+  await page.locator('#spineQ').fill(id.replace(/-/g, ' '));
+  await L.settle(page, 200);
+  await page.locator(`button[data-open="${id}"]`).click();
+  await page.locator('#spineEd').waitFor();
+}
+const serverSet = (page, table, id, patch) => page.evaluate(([t, i, p]) => {
+  const row = window.__DB[t].find(r => r.id === i); Object.assign(row, p);
+}, [table, id, patch]);
+function dismissDialogs(page, log) {
+  page.removeAllListeners('dialog');
+  page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await (d.type() === 'confirm' ? d.dismiss() : d.accept()).catch(() => {}); });
+}
+
+S['spine-save-keeps-claude'] = async (b) => {
+  const r = { id: 'spine-save-keeps-claude', title: 'Claude fills an entry by SQL; Amir, in a tab opened earlier, adds a video and saves', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  await spineOpen(page, 'goblet-squat');
+  // What /spine Upkeep does meanwhile: a court line, a progression, a count and a cost, updated_at moved on.
+  await serverSet(page, 'exercises', 'goblet-squat', { tennis: 'Claude court line', harder: ['machine-leg-press', 'dead-bug'], updated_at: new Date(Date.now() + 1000).toISOString(), updated_by: 'claude-pipeline' });
+  await serverSet(page, 'exercise_coach', 'goblet-squat', { credits: { quads: 1, glutes: 1 }, cost: 'heavy' });
+  await page.locator('[data-sf=video]').fill('https://www.youtube.com/watch?v=NEWVIDEO001');
+  const n0 = await L.nCalls(page);
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  const cs = await L.callsSince(page, n0);
+  const up = lastOf(cs, isUpd('exercises'));
+  const keys = up ? Object.keys(up.payload).sort() : [];
+  check(r, 'only the changed column goes up (video, plus who/when)', up && keys.join() === 'updated_at,updated_by,video', keys);
+  check(r, 'the save is guarded on the updated_at it read back', up && up.filters.some(f => /^updated_at\.eq\./.test(f)), up && up.filters);
+  check(r, 'no upsert of the whole row', !cs.some(c => c.op === 'upsert' && /exercise/.test(c.name)), cs.map(c => c.name + ':' + c.op));
+  check(r, 'the coach-only row is not written at all', !cs.some(c => c.name === 'exercise_coach' && c.op !== 'select'), cs.filter(c => c.name === 'exercise_coach').map(c => c.op));
+  const d = await L.db(page);
+  const e = d.exercises.find(x => x.id === 'goblet-squat'), k = d.exercise_coach.find(x => x.id === 'goblet-squat');
+  check(r, "Claude's court line, progression, count and cost survive", e.tennis === 'Claude court line' && e.harder.length === 2 && k.cost === 'heavy' && k.credits.glutes === 1, { tennis: e.tennis, harder: e.harder, cost: k.cost, credits: k.credits });
+  check(r, 'the video is saved', e.video === 'https://www.youtube.com/watch?v=NEWVIDEO001', e.video);
+  check(r, 'no dialog on a clean save', !log.dialogs.length, log.dialogs);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['spine-clash'] = async (b) => {
+  const r = { id: 'spine-clash', title: 'Claude and Amir change the same field: refuse, keep the typing, save again on purpose', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  await spineOpen(page, 'goblet-squat');
+  await serverSet(page, 'exercises', 'goblet-squat', { purpose: 'Claude purpose', updated_at: new Date(Date.now() + 1000).toISOString(), updated_by: 'claude-pipeline' });
+  await page.locator('[data-sf=purpose]').fill('Amir purpose');
+  let n0 = await L.nCalls(page);
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  check(r, 'nothing is written', !(await L.callsSince(page, n0)).some(c => c.name === 'exercises' && c.op !== 'select'), '');
+  check(r, 'the dialog names the field and both values', log.dialogs.length === 1 && /Why it’s here: now "Claude purpose", was "Fixture purpose\."/.test(log.dialogs[0].message), log.dialogs.map(x => x.message));
+  check(r, 'the typed text is still in the form', (await page.locator('[data-sf=purpose]').inputValue()) === 'Amir purpose', await page.locator('[data-sf=purpose]').count() ? await page.locator('[data-sf=purpose]').inputValue() : 'editor gone');
+  n0 = await L.nCalls(page);
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  const d = await L.db(page);
+  check(r, 'Save again puts his over theirs', d.exercises.find(x => x.id === 'goblet-squat').purpose === 'Amir purpose', d.exercises.find(x => x.id === 'goblet-squat').purpose);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['spine-load-fail'] = async (b) => {
+  const r = { id: 'spine-load-fail', title: 'The coach-only half fails to load: no editor, no save of blanks', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'today' });
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'from', name: 'exercise_coach', op: 'select', message: 'fixture: network down', times: 1 }); });
+  await L.go(page, 'exercises');
+  const txt = await page.locator('#content').innerText();
+  check(r, 'the tab says it did not load, with the reason', /did not load/i.test(txt) && /network down/.test(txt), txt.slice(0, 200));
+  check(r, 'no editor or Save is offered', (await page.locator('.sp-save').count()) === 0 && (await page.locator('button[data-open]').count()) === 0, '');
+  await page.locator('button', { hasText: 'Try again' }).first().click();
+  await page.waitForFunction(() => !document.querySelector('#content .loading'));
+  await L.settle(page, 300);
+  check(r, 'Try again loads it', (await page.locator('#spineQ').count()) === 1, '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['spine-rename-guard'] = async (b) => {
+  const r = { id: 'spine-rename-guard', title: 'Renaming an entry live cards find by name is stopped (one name, history moves with it)', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  await spineOpen(page, 'goblet-squat');
+  await page.locator('[data-sf=name]').fill('Dumbbell Goblet Squat');
+  const n0 = await L.nCalls(page);
+  await page.locator('.sp-save').first().click(); await L.settle(page, 600);
+  check(r, 'nothing is written', !(await L.callsSince(page, n0)).some(c => c.name === 'exercises' && c.op !== 'select'), '');
+  check(r, 'the dialog names the cards and /spine', log.dialogs.length === 1 && /card/.test(log.dialogs[0].message) && /\/spine/.test(log.dialogs[0].message), log.dialogs.map(x => x.message));
+  // An alias that is another entry's name is refused too.
+  log.dialogs.length = 0;
+  await page.locator('[data-sf=name]').fill('Goblet Squat');
+  await page.locator('[data-sf=aliases]').fill('Machine Leg Press');
+  await page.locator('.sp-save').first().click(); await L.settle(page, 600);
+  check(r, "an alias equal to another entry's name is refused", log.dialogs.length === 1 && /already how Machine Leg Press is written/.test(log.dialogs[0].message), log.dialogs.map(x => x.message));
+  await page.context().close();
+  return r;
+};
+
+S['spine-move-back-confirm'] = async (b) => {
+  const r = { id: 'spine-move-back-confirm', title: '"Move back to draft" asks first, and a no writes nothing', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  dismissDialogs(page, log);
+  await spineOpen(page, 'goblet-squat');
+  const n0 = await L.nCalls(page);
+  await page.locator('.sp-save[data-ap="0"]').click(); await L.settle(page, 500);
+  check(r, 'a confirm names what it does', log.dialogs.length === 1 && log.dialogs[0].type === 'confirm' && /off every phone/.test(log.dialogs[0].message), log.dialogs);
+  check(r, 'a no writes nothing', !(await L.callsSince(page, n0)).some(c => c.op === 'update' || c.op === 'upsert'), '');
+  check(r, 'still approved', (await L.db(page)).exercises.find(x => x.id === 'goblet-squat').status === 'approved', '');
+  await page.context().close();
+  return r;
+};
+
+S['spine-unsaved-guard'] = async (b) => {
+  const r = { id: 'spine-unsaved-guard', title: 'Typed, unsaved work: opening another entry or leaving the tab asks first; a redraw keeps it', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  dismissDialogs(page, log);
+  await spineOpen(page, 'machine-leg-press');
+  await page.locator('[data-sf=purpose]').fill('Half-typed purpose');
+  await page.locator('#spineQ').fill('');   // the search redraws the whole tab
+  await L.settle(page, 300);
+  check(r, 'a redraw (search) keeps the typing', (await page.locator('[data-sf=purpose]').inputValue()) === 'Half-typed purpose', await page.locator('[data-sf=purpose]').inputValue());
+  await page.locator('button[data-open="dead-bug"]').click(); await L.settle(page, 300);
+  check(r, 'opening another entry asks first', log.dialogs.some(x => x.type === 'confirm' && /unsaved changes to Machine Leg Press/.test(x.message)), log.dialogs);
+  check(r, 'a no keeps the editor and the text', (await page.locator('[data-sf=purpose]').inputValue()) === 'Half-typed purpose', '');
+  log.dialogs.length = 0;
+  await page.evaluate(() => { location.hash = 'today'; }); await L.settle(page, 400);
+  check(r, 'leaving the tab asks first, and a no stays', log.dialogs.some(x => x.type === 'confirm') && /#exercises$/.test(page.url()) && (await page.locator('[data-sf=purpose]').inputValue()) === 'Half-typed purpose', { url: page.url(), dialogs: log.dialogs });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['spine-circuits-count'] = async (b) => {
+  const r = { id: 'spine-circuits-count', title: 'An exercise used only inside a circuit counts as used', checks: [] };
+  const { page } = await L.openCoach(b, { hash: 'exercises' });
+  await page.evaluate(() => {
+    window.__DB.exercises.push({ id: 'glute-bridge', name: 'Glute Bridge', aliases: [], pattern: 'hinge', qualities: [], purpose: null, tennis: null, cues: null,
+      equipment: [], loads: [], easier: [], harder: [], alts: [], video: null, status: 'draft', updated_at: new Date().toISOString(), updated_by: 'claude', impact: null, muscles: null });
+    S.spine = null; renderExercises();
+  });
+  await page.waitForFunction(() => document.querySelector('#spineQ'));
+  await spineOpen(page, 'glute-bridge');
+  const txt = await page.locator('#spineEd').innerText();
+  check(r, 'the editor says who does it', /Doing it now: /.test(txt), txt.slice(0, 160));
+  await page.context().close();
+  return r;
+};
+
+S['walink'] = async (b) => {
+  const r = { id: 'walink', title: 'WhatsApp links only for real numbers', checks: [] };
+  const { page } = await L.openCoach(b, {});
+  const out = await page.evaluate(() => ['@sara_1990', 'sara.k99@gmail.com', '+98 0912 123 4567', '09121234567', '۰۹۱۲۱۲۳۴۵۶۷', '07512 345678', '+44 7512 345678'].map(x => [x, waLink(x)]));
+  const want = { '@sara_1990': '', 'sara.k99@gmail.com': '', '+98 0912 123 4567': 'https://wa.me/989121234567', '09121234567': 'https://wa.me/989121234567',
+    '۰۹۱۲۱۲۳۴۵۶۷': 'https://wa.me/989121234567', '07512 345678': '', '+44 7512 345678': 'https://wa.me/447512345678' };
+  out.forEach(([x, got]) => check(r, JSON.stringify(x) + ' -> ' + (want[x] || 'no link'), got === want[x], got));
+  await page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));
@@ -647,7 +813,7 @@ S['athlete-delete-all'] = async (b) => {
     results.push(res);
     const bad = res.checks.filter(c => !c.ok).length;
     console.log((bad ? 'FAIL ' : 'ok   ') + id + '  (' + (res.checks.length - bad) + '/' + res.checks.length + ')');
-    res.checks.filter(c => !c.ok).forEach(c => console.log('       ✗ ' + c.name + '\n         actual: ' + JSON.stringify(c.actual).slice(0, 400)));
+    res.checks.filter(c => !c.ok).forEach(c => console.log('       ✗ ' + c.name + '\n         actual: ' + String(JSON.stringify(c.actual)).slice(0, 400)));
   }
   fs.writeFileSync(path.join(L.OUT, 'results.json'), JSON.stringify(results, null, 2));
   await b.close();
