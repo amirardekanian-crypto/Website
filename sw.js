@@ -180,11 +180,15 @@
 //      youtube.com link the phone hands to the YouTube app or the browser, for athletes in Iran whose embed
 //      will not play while those do. shared.js is in the shell and served cache-first, so this bump is what
 //      puts the pop-up's bar on installed phones.
-// v96: program.html and habits.html changed (2026-10-10, coach.html audit TWIN-5): sign-in reads Persian and
+// v96: program.html changed (2026-10-10, PROG-02): the day after a cycle's end date Home says Cycle complete, shows
+//      the next cycle under Up next and folds the day cards under Repeat a session.
+// v97: program.html changed (2026-10-10, PROG-02): after a cycle Home only asks "Ready for Cycle N? Message Amir to
+//      start it." (never "Amir is building it"), and Game Plan marks the finished cycle Done.
+// v98: program.html and habits.html changed (2026-10-10, coach.html audit TWIN-5): sign-in reads Persian and
 //      Arabic-Indic digits as 0-9 in the username, and retries once with them folded (and the ends trimmed)
 //      when the password as typed fails. Every password is plain English and ends in digits, so a Farsi
-//      keyboard used to fail every sign-in.
-const CACHE = 'aap-v96';
+//      keyboard used to fail every sign-in. (Made as v96 on a branch alongside PROG-02's v96/v97.)
+const CACHE = 'aap-v98';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
