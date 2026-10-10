@@ -21,7 +21,7 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands:** of 191 findings, 113 are fixed, 54 partly fixed (the harm is gone, something named
+**Where it stands:** of 191 findings, 114 are fixed, 53 partly fixed (the harm is gone, something named
 in the finding is left), 12 wait on a decision from you, 11 are open (all low or medium) and 1 was not
 a bug. Of the 45 critical and high ones, 32 are fixed, 10 partly and 3 are your call; none is untouched.
 
@@ -165,7 +165,8 @@ programme tables; Forget guard; server half; coaching-log history), `scripts/tes
 
 **Database (applied 2026-10-10):** `save_session()` re-opens a note the athlete edits after it was
 read, and lets the coach's import really replace a session; `hab_season_results` readable by the
-backup; `coach_season_levels()` (coach only), the level helpers revoked from signed-in accounts;
+backup; `coach_season_levels()` (coach only), the level helpers revoked from signed-in accounts (the season one
+after this version went live, 14:05 UTC);
 `exercises` and `qualities` stamp `updated_at` on every update; `coach_login_use()` says which stored
 passwords have already been used; `coaching_log_versions` (stage47) keeps every earlier text of a
 coaching log. **Deployed:** athlete-login v6,
@@ -258,14 +259,14 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-191 findings. Fixed 113 · Partly 54 · Open 11 · Your call 12 · Not a bug 1.
+191 findings. Fixed 114 · Partly 53 · Open 11 · Your call 12 · Not a bug 1.
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
 | high | 20 | 10 | 0 | 3 | 0 |
 | medium | 48 | 30 | 3 | 7 | 0 |
-| low | 33 | 14 | 8 | 2 | 1 |
+| low | 34 | 13 | 8 | 2 | 1 |
 
 ### The work and the ✎ editor (WORK)
 
@@ -515,7 +516,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | SERVER-5 | medium | Forget (forget_contact) cannot deliver what the privacy notice promises, the manual says the opposite of what it does, and the screen keeps showing the forgotten person | Your call | The manual and the Forget box now say exactly what Forget deletes, the screen refreshes after it, and the page refuses Forget for coached clients. | There is still no one-step full erasure matching the privacy notice (your call), and the server-side refusal for coached clients (stage45) is not applied yet. |
 | SERVER-6 | medium | Spine and Quality saves overwrite without a freshness check and keep no history | Partly | Spine and quality saves now check freshness (only changed boxes, refused if someone else changed the same box), and the server stamps the time on every change to exercises and qualities. | There is still no version history for Spine entries (coaching logs got one, stage47), so an overwritten cue can only be restored from a backup. |
 | SERVER-7 | medium | 13 free Proof users have had no way into the app since the 2026-09-07 key cutover, yet the funnel still scores them | Your call | Each locked-out person's roster row now keeps saying 'no login — cannot open the app', even once they have gone quiet. | The 13 free Proof users still have no login; whether to create logins and re-invite them, or forget them, is your call. |
-| SERVER-8 | low | Level functions run with the owner's rights and have no access check: any signed-in athlete or buyer can read any athlete's level or mint their titles | Partly | Career level, title minting and note purging can no longer be run by athletes or buyers, and coach.html reads every level in one coach-only call. | The season-level helper is still callable by any signed-in account until it is revoked on the server after this version of coach.html is live. |
+| SERVER-8 | low | Level functions run with the owner's rights and have no access check: any signed-in athlete or buyer can read any athlete's level or mint their titles | Fixed | Career level, title minting, note purging and the season-level helper can no longer be run by athletes or buyers; the dashboard reads every level through one coach-only call (coach_season_levels). Revoked after this version went live. |  |
 | SERVER-9 | low | Five remaining direct writes cannot tell a write that changed nothing from a success; Delete training history is two separate deletes | Partly | Mark sent (athletes, course, testing app) and Library Hide/Publish now confirm a row really changed, and Delete training history says how many sessions went and warns when nothing did. | Delete training history is still two separate deletes, so a failure halfway is reported but not prevented. |
 | SERVER-10 | low | Reads that are not paged and full-table refetches: nothing is at the cap yet, but several tables are heading there | Partly | Mark read and Clear older notes update the page's own copy instead of re-downloading every session, and the Spine tables are read in pages. | The Library list is still read in one request (small today, far from the cap). |
 | SERVER-11 | low | Login edge functions ignore the error on their follow-up table write after a successful ban or password change | Fixed | All three login functions (athlete v6, course and testing app v3) report a failed account read and a failed bookkeeping write instead of ignoring it. |  |
