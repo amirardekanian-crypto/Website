@@ -499,8 +499,9 @@ app ships. Excluded from the site with the rest of `scripts/`. How to use it: `C
 loaded, a Short, a non-YouTube link, the circuit pop-up on a 320 × 568 screen. `youtube-course.js` does the same for the
 course app (`tennis/app/`) in demo mode, a right-to-left page, with `tps_demo()` answered by a made-up course.
 `cycle-end.js` (2026-10-10) checks Home between cycles (PROG-02): the card and the week while the cycle runs and on its
-end date, Cycle complete and Up next 4 days past, no "building it now" 40 days past, Roadmap complete on the last cycle
-(light, dark, 320 px), an undated cycle, the Repeat a session fold, Read more in place and a session under way unfolded.
+end date, Cycle complete, Up next and "Ready for Cycle N?" 4 and 40 days past, Roadmap complete on the last cycle (light,
+dark, 320 px), an undated cycle, the Repeat a session fold, Read more in place, a session under way unfolded, and Game
+Plan's Active or Done.
 
 ### The type scale guard (`scripts/check_type_scale.py`, 2026-09-27)
 

@@ -742,11 +742,8 @@
   .cyc-fin-meter span::before { content: ''; height: 6px; border-radius: 3px; background: #E06B43; }
   .bt-sum { margin: -6px 24px 12px; font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--grey-text); }
   .bt-next .current-message { margin-bottom: 0; }
-  .bt-status { display: flex; align-items: center; gap: 9px; margin: 14px 24px 0 28px; font: 700 var(--fs-label)/1.3 'Space Mono', monospace;
-    letter-spacing: .08em; text-transform: uppercase; color: var(--clay-ink); }
-  .bt-status i { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--ice); box-shadow: 0 0 0 4px rgba(199,85,47,.16); }
   .bt-wa { margin: 0 24px 26px; }
-  .bt-wa .coach-wa { margin: 0; }
+  .bt-next + .bt-wa .wa-inline { margin-top: 14px; }
   .bt-rep { display: flex; align-items: center; gap: 12px; width: calc(100% - 48px); margin: 0 24px 10px; padding: 12px 14px; min-height: 56px;
     border-radius: 12px; background: var(--white); border: 1px solid var(--grey-mid); cursor: pointer; text-align: left; font: inherit; }
   .bt-rep-i { width: 28px; height: 28px; border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--grey-card); color: var(--green-ink); }
@@ -6943,19 +6940,16 @@ function cycleProgress() {
 // fold into one Repeat a session row (betweenCyclesHTML(), paintBetweenFold()). Nothing on Home
 // asks for a workout. It ends when the next cycle is published: currentCycleIndex moves on.
 // A cycle with no dates cannot end, so it never shows any of this.
-// "Amir is building it now" is said for CYCLE_BUILD_DAYS after the end only: 12 of the 18 athletes
-// past their end on 2026-10-10 were 18 to 88 days past it, and for them it would not be true. After
-// that the WhatsApp door asks whether they are ready for the next cycle instead.
-const CYCLE_BUILD_DAYS = 14;
+// After any finished cycle, the roadmap's last included, Home asks one thing (Amir, 2026-10-10: "dont say amir
+// is making the other one, just say 'Ready for NextCycle ? Message Amir to start it' in all situations"):
+// Ready for Cycle N? on a WhatsApp door. Game Plan marks the finished cycle Done.
 function cycleOver() {
   if (!DATA || !Array.isArray(DATA.cycles)) return null;
   const cIdx = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
   const cur = DATA.cycles[cIdx];
   const wk = cycleWeekInfo(cur);
   if (!wk || !wk.after) return null;
-  const e = new Date(cur.endDate), t = new Date();
-  e.setHours(0, 0, 0, 0); t.setHours(0, 0, 0, 0);
-  return { cur, cIdx, count: DATA.cycles.length, next: DATA.cycles[cIdx + 1] || null, daysPast: Math.round((t - e) / 86400000) };
+  return { cur, cIdx, count: DATA.cycles.length, next: DATA.cycles[cIdx + 1] || null };
 }
 // "OCT 6": the card's caption is upper case. Read as a local date, so it never slips a day.
 function cycDate(iso) {
@@ -7007,30 +7001,19 @@ function paintCycleCard() {
 }
 window.paintCycleCard = paintCycleCard;
 
-// Home between cycles (PROG-02): where This Week was, the next cycle (Game Plan's own card, folded),
-// a WhatsApp door, and one row that unfolds the cycle's day cards for anyone who wants to keep moving.
+// Home between cycles (PROG-02): where This Week was, the next cycle (Game Plan's own card, folded) when the
+// roadmap has one, the one ask, Ready for Cycle N?, and one row that unfolds the cycle's day cards.
 function betweenCyclesHTML(o) {
   const n = o.cIdx + 1, nDays = ((DATA.workouts && DATA.workouts.days) || []).length;
-  let h;
-  if (o.next) {
-    const fresh = o.daysPast <= CYCLE_BUILD_DAYS;
-    h = `<div class="home-section-head"><div class="home-section-title">Up next</div></div>
+  const ask = `<div class="bt-wa">${waInlineHtml(coachWhatsAppUrl('About Cycle ' + (n + 1) + ': '), 'Ready for Cycle ' + (n + 1) + '?', 'Message Amir to start it.')}</div>`;
+  const h = o.next
+    ? `<div class="home-section-head"><div class="home-section-title">Up next</div></div>
       <div class="bt-next">${cycleCardHTML(o.next, { folded: true, pill: 'Up next!', pillStyle: 'next', total: o.count,
-        paragraphs: (o.next.teaser || {}).paragraphs, italicLast: true, onclick: "goTo('plan')" })}</div>
-      ${fresh ? `<div class="bt-status"><i aria-hidden="true"></i>Amir is building it now</div>` : ''}
-      <div class="bt-wa">${fresh
-        ? waInlineHtml(coachWhatsAppUrl('About Cycle ' + n + ': '), 'Tell Amir how Cycle ' + n + ' went', 'He reads it before he writes Cycle ' + (n + 1) + '. On WhatsApp.')
-        : waInlineHtml(coachWhatsAppUrl('About Cycle ' + (n + 1) + ': '), 'Ready for Cycle ' + (n + 1) + '?', 'Message Amir to start it. On WhatsApp.')}</div>`;
-  } else {   // the roadmap's last cycle: the next block starts with a message
-    h = `<div class="home-section-head"><div class="home-section-title">What's next</div></div>
-      <div class="bt-sum">You've trained the whole plan. Your next block starts with a message.</div>
-      <div class="bt-wa"><a class="coach-wa" href="${esc(coachWhatsAppUrl('About my next block: '))}" target="_blank" rel="noopener">
-        <span class="coach-wa-ico" aria-hidden="true">${WA_ICON}</span>
-        <span class="coach-wa-txt"><b>Plan my next block</b><small>Tell Amir what you want from the next one.</small></span>
-        <span class="coach-wa-go" aria-hidden="true">→</span></a></div>`;
-  }
+        paragraphs: (o.next.teaser || {}).paragraphs, italicLast: true, onclick: "goTo('plan')" })}</div>${ask}`
+    : `<div class="home-section-head"><div class="home-section-title">What's next</div></div>
+      <div class="bt-sum">You've trained the whole plan.</div>${ask}`;
   return h + `<div class="home-section-head"><div class="home-section-title">${o.next ? 'Between cycles' : 'Keep moving'}</div></div>
-    <div class="bt-sum">No new week ${o.next ? 'until Cycle ' + (n + 1) + ' lands' : 'to start'}. Want to keep moving? Any session from ${esc(o.cur.name || 'this cycle')} still works.</div>
+    <div class="bt-sum">No new week until Cycle ${n + 1} starts. Want to keep moving? Any session from ${esc(o.cur.name || 'this cycle')} still works.</div>
     <button type="button" class="bt-rep" id="bt-rep" aria-expanded="false" aria-controls="day-cards-wrap" onclick="toggleBetweenDays()">
       <span class="bt-rep-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg></span>
       <span class="dc-nm">Repeat a session<small>Cycle ${n} · ${nDays} session${nDays === 1 ? '' : 's'}</small></span>
@@ -7162,7 +7145,7 @@ function renderPlan() {
   // Helper: derive a status label from the cycle's position relative to currentCycleIndex
   const statusOf = i => {
     if (i < idx) return 'completed';
-    if (i === idx) return 'active';
+    if (i === idx) return cycleOver() ? 'completed' : 'active';   // past its end date it is done (PROG-02)
     if (i === idx + 1) return 'next';
     return 'locked';
   };
@@ -7286,10 +7269,11 @@ function renderPlan() {
   // + outcomes.
   if (current && (current.message || (current.focuses && current.focuses.length))) {
     const msg = current.message || {};
+    const done = !!cycleOver();   // past its end date (PROG-02)
     document.getElementById('current-message-wrap').innerHTML = cycleCardHTML(current, {
-      pill: 'Active',
+      pill: done ? 'Done' : 'Active',
       alt: artAlt(current),
-      pillStyle: 'active',
+      pillStyle: done ? '' : 'active',
       total: cycles.length,
       onclick: "goTo('home')",
       paragraphs: msg.paragraphs,
@@ -8439,7 +8423,7 @@ const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
     body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
-    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes. When the last week is over, Home says so: your cycle card reads <strong>Cycle complete</strong>, the next cycle shows under <strong>Up next</strong>, and there's no new week to train until it lands. Want to keep moving? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
+    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes. When the last week is over, Home says so: your cycle card reads <strong>Cycle complete</strong>, and there's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why this cycle matters" note on Home explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
     body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
   { icon: 'mindset', title: 'The readiness check',
