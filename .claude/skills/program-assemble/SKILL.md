@@ -32,8 +32,8 @@ stop and show Amir first. Engage writes against the programme that passed.
 **Part B — finish and publish. After /program-engage and Amir's "ship it".**
 Step 2f (place the words) · Step 3 in full (`--stage final`) · Step 5 (the coaching log entry) ·
 Step 6a (before publishing: OBLIGATIONS, MY CALLS and the new Spine entries' approval question) ·
-Step 7 (publish) · Step 8 (Spine upkeep, on the published row) · Step 6b (the closing SPINE and
-QUALITY lines, last). A programming FAIL in Part B means the programme changed after Part A: go
+Step 7 (publish) · Step 7b (fold the log) · Step 8 (Spine upkeep, on the published row) · Step 6b
+(the closing SPINE and QUALITY lines, last). A programming FAIL in Part B means the programme changed after Part A: go
 back to Part A, not to the text.
 
 ## Step 1 — New or returning: from design's context pull
@@ -321,10 +321,13 @@ before publishing (Step 6a): *"approve these N so their cards show cues?"* Appro
 An exercise whose Spine line in the design pull says `novideo` is fine to ship: it goes on the
 handoff's film list.
 
-## Step 5 — Archive the cycle rationale (coach-only, append-only) + update the profile and the Exercise Ledger
+## Step 5 — Write the cycle's log entry (coach-only) + update the profile and the Exercise Ledger
 Persist the **COACHING LOG ENTRY** from /program-design — the coach-only record of WHY this
-cycle looks the way it does (the read, decisions, ledger changes, the volume tables, the special
-weeks).
+cycle looks the way it does (the read, the decisions, the volume tables, the special weeks). It is
+about 4,000 characters plus the checker's tables, not more (Amir, 2026-10-10, after one athlete's
+log reached 47,000 characters: *"we dont need his past programs in his logs, only the info that is
+usefull for later"*). The log keeps **four things**: the profile, the ledger, a short
+`## Carry-forward` and the **latest** cycle. The programmes themselves are in `programHistory`.
 ⚠️ **The record is the `public.coaching_logs` row, not a file.** Coach-only, read from
 coach.html → athlete → File. Step 7's `publish_cycle()` writes it (the profile, the ledger and the
 new entry, in the same call as the programme), so there is nothing to read back first: design's
@@ -335,11 +338,12 @@ git. The athlete app never reads the log. The entry template is /program-design'
   empty Exercise Ledger and `## Roadmap — <date>` with the exit tests and rationale), so their first
   entry goes in exactly like a returning athlete's. Only a new athlete whose roadmap locked before
   2026-09-27 may have no row: then `p_log_new` carries the whole first log (Step 7).
-- **Append** the new `## Cycle NN — …` section to the end. **Never edit, reorder, or delete any
-  existing cycle section** — this archive is append-only, so a cycle's original reasoning survives
-  even after the program is later changed (it grows in lockstep with `programHistory` /
-  `currentCycleIndex`). A `## Debrief — Cycle NN …` section (the end-of-cycle review) may sit between
-  two cycle sections: it is not a cycle section, never edit or move it, and the new cycle goes after it.
+- **Append** the new `## Cycle NN — …` section to the end (`p_log_section`), then **fold** the old
+  entry away in Step 7b. The log holds one cycle entry, the latest, and its reasoning stays until the
+  next publish folds it into the `## Carry-forward`. Until then **never edit a published cycle
+  section**: a correction to it is a line appended to the entry, not a rewrite. A `## Debrief — Cycle NN …`
+  section (the end-of-cycle review, ~2,500 characters) sits beside the latest cycle until the next
+  publish; the fold removes it too, after `/program-design` has read it and written the carry-forward.
 - Heading: use the cycle number + name from `cycles[currentCycleIndex]` and today's date.
 - **`Checks:` — one line in the entry** (2026-09-26, from the audit): the rule IDs the check runs
   failed on and were fixed, and the WARNs left standing, e.g. `Checks: fixed VOL-8, SEL-7 · left
@@ -356,9 +360,9 @@ git. The athlete app never reads the log. The entry template is /program-design'
   ledger) and moving nothing else. The format, the academy tier and `status: partial` are in
   `program-design/PROFILE.md`. A log that has none yet gets one at that athlete's next cycle, never in
   a bulk write.
-- **Exercise Ledger — apply design's "Exercise Ledger Updates" deltas.** Unlike the cycle
-  sections, this table (sitting right after the file header, before the first `## Cycle`
-  section) is mutated in place every cycle — it's a current-state index, not a historical
+- **Exercise Ledger — apply design's printed "LEDGER UPDATES" deltas** (they are not stored in the
+  entry any more). Unlike the cycle section, this table (sitting right after the profile, before the
+  carry-forward) is mutated in place every cycle — it's a current-state index, not a historical
   narrative, so there's nothing to preserve by appending. Add a row for any exercise seen for
   the first time; update `Status`/`Last cycle`/`Note` for every exercise design flagged as
   changed. If the file predates the ledger (an athlete whose log started before this existed),
@@ -507,6 +511,41 @@ the RPC.
   and the coaching-log row verified.
 - Node 24 is on Amir's PC, so the checker's own node calls (the app's `chips.js`) run as they are.
 - Commit + push **only if Amir asks**. `data/` is gitignored; there is normally nothing to commit.
+
+## Step 7b — Fold the log (every returning athlete, right after Step 7 verified)
+Amir, 2026-10-10: the log keeps the profile, the ledger, a short carry-forward and the latest cycle
+only (PRC-18). Step 7 has just appended this cycle's entry; this step drops everything older and
+replaces `## Carry-forward` with the block /program-design wrote. What goes: the previous
+`## Cycle NN` entries, the `## Debrief — …` sections and the old carry-forward. It runs once per
+publish, takes the log md5 from Step 7's answer as its guard, and does nothing if the log has changed
+since (so it can never overwrite a coach edit made in between).
+
+**⚠️ The Supabase MCP hangs on a bare `UPDATE`** (60 s, then a timeout, and the row is not changed;
+found 2026-10-10). Wrap every write in a CTE that ends in a `select`, as below. This is also how
+cycle-report appends the Debrief.
+```sql
+with cur as (select body from public.coaching_logs
+              where athlete_id = '<id>' and md5(body) = '<log.md5 from publish_cycle>'),
+parts as (select regexp_replace(substring(body from '^(.*?)\n## (?:Cycle|Debrief|Carry-forward)'), '\s+$', '') as head,
+                 substring(body from '(\n## Cycle 0*<NN>\M.*)$') as newest from cur),
+fold as (update public.coaching_logs l
+            set body = p.head || E'\n\n' || $K$## Carry-forward
+<design's CARRY-FORWARD block, about 2,500 characters>
+$K$ || p.newest
+           from parts p where l.athlete_id = '<id>' and p.newest is not null
+         returning md5(l.body) as new_md5, length(l.body) as new_len)
+select * from fold;
+```
+- `head` is everything above the first `## Cycle`, `## Debrief` or `## Carry-forward` heading: the
+  header, `## Athlete profile`, `## Exercise Ledger` and a `## Roadmap — <date>` section if the log has
+  one. `newest` is the entry just appended (`<NN>` is its number, without the leading zero).
+- **No row comes back** means the guard did not match or the entry was not found: read the log
+  (`select length(body), md5(body) from public.coaching_logs where athlete_id = '<id>'`), see what
+  changed and fix the guard. Never loosen it into a bare `where athlete_id = …` rewrite.
+- **Check it**: the new body has exactly the headings `Athlete profile`, `Exercise Ledger`, [`Roadmap`],
+  `Carry-forward` and `Cycle NN`, and it is far shorter than before (the profile and the new
+  carry-forward are in it, the old Debrief is not). A new athlete's first publish has no old entry:
+  the fold only swaps in the carry-forward, and the roadmap section stays.
 
 ## Step 8 — Spine upkeep, what's left (every programme, the last thing you do)
 Part A already drafted every new exercise (Step 4), so this is the rest: links, body parts,

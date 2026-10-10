@@ -62,9 +62,12 @@ the real training decisions. Exercise names, day names and formatting are a poli
 
 Every time you ship a cycle, I save **why** that cycle looks the way it does — the read, the
 decisions and the volume tables — to that athlete's coaching log on the server. Open it in
-**coach.html → the athlete → File**. It's **append-only**: each cycle adds a new entry and old
-ones are never overwritten, so six months later you can see exactly how we were thinking and
-why we changed something. It's **coach-only**, never shown in the athlete's app.
+**coach.html → the athlete → File**. The log stays small on purpose (your call, 2026-10-10): it
+holds who the athlete is (profile), what they have been given (ledger), a short **carry-forward**
+of what is still worth knowing from older cycles, and the **latest** cycle's entry. When the next
+cycle is published, the old entry and the end-of-cycle Debrief are folded into the carry-forward and
+removed; past programmes are in the programme history, not the log. It's **coach-only**, never
+shown in the athlete's app.
 
 ## How it gets smarter
 

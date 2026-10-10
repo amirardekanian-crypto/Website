@@ -68,14 +68,17 @@ reasoning stays in her log on the server; only the transferable process is here.
    the `athlete` block is unchanged after every write. The version trigger snapshots the prior state into
    `program_versions` on its own; do not hand-roll a backup.
 
-7. **Log it — and mind what append-only means for a recommendation that is now WRONG.** The
-   Exercise Ledger is mutated in place; cycle sections are append-only. So when an existing
+7. **Log it — and mind a recommendation that is now WRONG.** The profile and the Exercise Ledger are
+   mutated in place; the latest cycle's section is only appended to (older cycles are folded into the
+   `## Carry-forward` at the next publish, `/program-assemble` Step 7b, PRC-18). So when the current
    section carries a forward plan the new information invalidates — it has happened: one athlete's
    C4 entry recommended a specific exercise for the C5 build in two separate places, and a later
    finding inverted it — you do **not** edit it out. Three moves instead: set that exercise's **ledger status** so the next
    design cannot pick it up, write an explicit **override** in the new entry naming what it
-   overrides and where, and leave the original reasoning untouched on the record. A ban that
-   lives only in prose gets missed; a ban that lives only in the ledger loses the why.
+   overrides and where, and leave the original reasoning untouched until the fold. A ban that
+   lives only in prose gets missed; a ban that lives only in the ledger loses the why. A lasting
+   preference or fact (a dislike, a new kit limit) goes in the profile too, because the carry-forward is
+   rewritten from the profile, the ledger and the notes below at the next design.
    **Heading convention:** follow whatever the athlete's log already uses — existing files carry
    both `## In-cycle edits — Cycle N` and
    `## Cycle NN — MID-CYCLE ADJUSTMENT · <date> · <reason>`.
@@ -246,14 +249,17 @@ cycle's checks run on the old facts.
 heading — what changed + why (e.g. *In-cycle edit (2026-06-28): Bulgarian Split Squat → Split
 Squat — R-knee pain on BSS*). This keeps the coaching log the complete running record (design
 rationale + in-cycle adaptations) that the next /program-design reads, so a swap-for-pain isn't
-silently reversed next cycle. **Append-only** — never edit a prior cycle's section. The one
-living exception is the **Exercise Ledger** at the top: an exercise you added or removed must
-have its row updated (status, last cycle, and *why*), or the next cycle's design reads a roster
-that no longer exists.
+silently reversed next cycle. **Append-only** — never edit the cycle section above it; the next
+publish folds it away, and /program-design reads your note before it writes the carry-forward. Keep
+the note to a few lines. The living exceptions are the **profile** and the **Exercise Ledger** at the
+top: an exercise you added or removed must have its row updated (status, last cycle, and *why*), or
+the next cycle's design reads a roster that no longer exists.
 
 ⚠️ **The log is `public.coaching_logs`, not a file** — see the banner at the top of this skill.
 Append the section to the row (`body = body || $L$…$L$`) and check `length(body)` grew by exactly
-what you added. The row is the only copy: there is no local log file to keep in step, and the old
+what you added. **Wrap the write in a CTE that ends in a `select`** (`with u as (update public.coaching_logs
+set body = body || $L$…$L$ where athlete_id = '<id>' returning length(body) as len) select * from u;`):
+the Supabase MCP hangs on a bare `UPDATE` (see `/program-assemble` Step 7b). The row is the only copy: there is no local log file to keep in step, and the old
 `.claude/coaching-log/` folder is gone for good.
 
 **⚖️ If the edit changed ANY set count, the new tables go in the log** — both of them,

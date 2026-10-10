@@ -107,12 +107,13 @@ chat until /program-assemble published the first cycle, so intake to publish had
 One `execute_sql`, both statements; dollar-quote each payload with a tag it does not contain, and
 build the call with a script written by the Write tool if it is long:
 ````sql
-update public.programs
+with u as (update public.programs
    set data = data || jsonb_build_object('cycles', $R$[ …the cycles… ]$R$::jsonb), updated_by = 'roadmap'
- where athlete_id = '<id>' and coalesce(jsonb_array_length(data->'cycles'), 0) = 0;
+ where athlete_id = '<id>' and coalesce(jsonb_array_length(data->'cycles'), 0) = 0
+ returning athlete_id) select count(*) as roadmap_rows_written from u;
 insert into public.coaching_logs (athlete_id, body) values ('<id>', $L$# Coaching Log — <First Last> (<id>)
 
-Coach-only: never shown in the app. The why behind every cycle; each cycle is appended, never edited.
+Coach-only: never shown in the app. It holds who the athlete is (profile), what they have been given (ledger), what is still worth knowing from older cycles (carry-forward) and the latest cycle. Older cycles are folded into the carry-forward; the programmes themselves are in programHistory.
 
 ## Athlete profile
 ```profile
@@ -133,10 +134,13 @@ from public.programs where athlete_id = '<id>';
 ````
 - Each `cycles[]` item is `{num, name, tagline, art, weeks, startDate, endDate, focuses}` (SCHEMA.md
   → `cycles`). Messages, teasers and week notes come later, from /program-assemble.
-- The update touches only a row with no roadmap. If it touched nothing, the athlete already has one:
-  stop, since a change to a locked roadmap is design's `roadmap_amend:` (PRC-17).
+- The update touches only a row with no roadmap. If it touched nothing (`roadmap_rows_written` is 0), the
+  athlete already has one: stop, since a change to a locked roadmap is design's `roadmap_amend:` (PRC-17).
+- **Every write here is wrapped in a CTE that ends in a `select`**: the Supabase MCP hangs on a bare
+  `UPDATE` that changes rows (found 2026-10-10; `/program-assemble` Step 7b).
 - If the athlete already had a log (the insert did nothing), append the `## Roadmap — <date>` section
-  to it instead (`body = body || …`); design adds the profile at the next cycle.
+  to it instead (`with u as (update public.coaching_logs set body = body || … where athlete_id = '<id>'
+  returning length(body) as len) select * from u;`); design adds the profile at the next cycle.
 - From here design and assemble read the roadmap from the server, and /program-assemble's publish
   sends no `p_cycles` and no `p_log_new` for this athlete.
 

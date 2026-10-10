@@ -139,7 +139,8 @@ change before I build?"* before writing exercises.
    This is the *why* behind the last cycle — why each primary was chosen, what changed
    mid-cycle and why — and it is the thread you continue. The next
    cycle progresses/edits the SAME logic from the data; it does NOT re-derive a fresh program.
-   Read the most recent entry in full, skim older ones for context, and never reintroduce
+   Read the most recent entry in full, read `## Carry-forward` (older cycles are folded into it
+   since 2026-10-10; a log from before that may still hold them, skim those), and never reintroduce
    something a prior entry flagged as causing pain/regression without a stated reason. If the
    log is **empty or missing** (an athlete from before the log existed), that's expected — no
    back-fill, no separate seeding step: just design from the info you have (brief, roadmap,
@@ -597,32 +598,38 @@ SECTION: Core
 
 ## COACH-FACING REPORTS → the COACHING LOG ENTRY (coach-only; archived, never in the athlete app/JSON)
 These reports are the durable record of WHY this cycle looks the way it does. Emit them as ONE
-self-contained **COACHING LOG ENTRY** block — this is both what you print for Amir AFTER the
-program and what /program-assemble appends verbatim to the coach-only, unpublished
-athlete's `public.coaching_logs` row (append-only; prior cycles are never touched). They go to chat +
-that log ONLY — never into the athlete app or the programme.
+**COACHING LOG ENTRY** block plus a **CARRY-FORWARD** block: this is both what you print for Amir
+AFTER the program and what /program-assemble stores in the coach-only, unpublished athlete's
+`public.coaching_logs` row. They go to chat + that log ONLY — never into the athlete app or the programme.
+
+**How big, and why** (Amir, 2026-10-10: *"arent you writing too much in people's logs? are you using
+those info's later?"* and *"we dont need his past programs in his logs, only the info that is usefull
+for later"*; PRC-18). The log is read at every design, so it holds only what the next design needs:
+`## Athlete profile`, `## Exercise Ledger`, `## Carry-forward` and the latest cycle's entry, with the
+cycle-end Debrief beside it until the next cycle is published. Then /program-assemble Step 7b drops the
+old entry and the Debrief and replaces the carry-forward. Past programmes live in `programHistory`,
+so **the log never re-lists a past programme, a load history or anything the database holds**.
+- **The entry: about 4,000 characters** without the checker's tables.
+- **The read: at most 900 characters.** It cites the Debrief instead of restating it.
+- **The carry-forward: about 2,500 characters.** You write it by taking the old one, adding what the cycle
+  just finished taught, and dropping what is superseded or no longer matters. Bullets by topic: body and
+  food, medical history, what responds and what stalls, likes and dislikes, kit, attendance and time, data
+  traps. A fact already in the profile or the ledger is not repeated here. No log yet? Start it from the
+  Debrief and the roadmap's rationale.
 
 ```
 ## Cycle <NN> — <Cycle Name> · <YYYY-MM-DD> · <NEW|RETURNING>
 
-**The read** — the Step 1 analysis that drove this cycle, condensed but complete: the key
+**The read** — at most 900 characters: the Step 1 analysis that drove this cycle, the key
 adaptation / recovery & lifestyle / injury / capacity / roadmap reads (returning), or the
-recovery-ceiling / priority-target / contraindication / structure reads (new). Keep the
-reasoning ("how we were thinking"); drop the throat-clearing.
+recovery-ceiling / priority-target / contraindication / structure reads (new). The reasoning
+only; the numbers are in the Debrief and the database.
 
-**Decisions** — the LOCKED LISTS verbatim (PROGRESS / REPLACE / ADD, or PRIMARY LIFT
-SELECTIONS), plus any fork Amir settled at the checkpoint and the call he made ("why we
-changed something").
+**Decisions** — the LOCKED LISTS, one line each with its reason (PROGRESS / REPLACE / ADD, or
+PRIMARY LIFT SELECTIONS), plus any fork Amir settled at the checkpoint and the call he made.
 
-**Profile changes** — what changed in the athlete profile this cycle and why, one line each, or
-"none". The block itself is kept current at the top of the log; this line is its history.
-
-**Exercise Ledger Updates** — deltas only, not the whole table (/program-assemble applies
-these to the persisted ledger): every REPLACE'd-out exercise → `Available` (rotated for
-freshness, safe to reuse later) unless the brief/Amir flagged it as `Disliked`,
-`Pain-flagged`, or `Banned` instead (name the reason in one clause); every PROGRESS/ADD
-exercise → `Active`. If nothing changed status this cycle beyond the normal rotate/keep,
-say so in one line rather than omitting the section.
+**Profile changes** — one line: what changed in the athlete profile this cycle and why, or "none".
+The block itself is kept current at the top of the log.
 
 **Volume & Dose** — **the checker writes the tables; nobody types them** (2026-09-26). Part A's
 build check (`check_program.py --tables`) counts every exercise from its Spine entry's credits
@@ -637,9 +644,19 @@ where to invest if time allows (VOL-1), a muscle under 10 by choice and why (VOL
 entry (a proposal to Amir, /spine), never by hand in the log.
 
 **Special weeks** — the week-1 and back-off doses as decided (one line each).
+
+**Open — answer at the C<NN+1> checkpoint** — numbered, only what the next design must ask.
 ```
 *(Progression levers and an e1RM section used to close the entry. Amir doesn't read them, so they
 went on 2026-09-26. An e1RM that drove a decision belongs in "The read", with its grade.)*
+
+**LEDGER UPDATES** — printed with the entry, **not stored in it** (the ledger table is the record, and
+/program-assemble applies these to it in place): deltas only, not the whole table. Every REPLACE'd-out
+exercise → `Available` (rotated for freshness, safe to reuse later) unless the brief/Amir flagged it as
+`Disliked`, `Pain-flagged`, or `Banned` instead (name the reason in one clause); every PROGRESS/ADD
+exercise → `Active`. If nothing changed status beyond the normal rotate/keep, say so in one line.
+
+**CARRY-FORWARD** — the new block that replaces the old one, headed `## Carry-forward` (see above).
 
 Then **build and check before any words are written** (2026-09-26): **/program-assemble Part A**
 builds the workouts, drafts any new exercise into the Spine, runs `check_program.py --stage build`

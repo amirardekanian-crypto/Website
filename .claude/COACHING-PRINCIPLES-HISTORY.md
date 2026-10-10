@@ -385,6 +385,7 @@ the principles (their *How to add*).
   - 2026-09-26, from the pipeline audit: four stages were changing the locked roadmap and none of them owned the change.
 - `PRC-18` **Every cycle's design rationale is archived.**
   - 2026-06-28. On the server since 2026-09-07: the old `.claude/coaching-log/` files sat in this public repo. Progression levers and e1RM left the entry 2026-09-26, Amir: he doesn't read them.
+  - Amir, 2026-10-10, asked why one athlete's coaching log was twice the size it had been (47,104 characters after one more cycle and its Debrief): "arent you writing too much in people's logs? are you using those info's later?" Then: "Yes fix both, and we dont need his past programs in his logs, only the info that is usefull for later". The rule changed from append-only to profile + ledger + carry-forward + latest cycle. The same day the Supabase MCP was found to hang on a bare `UPDATE`, so the fold is written as a CTE.
 - `PRC-19` **An athlete whose cycle ends without a renewal keeps the app, and gets no coaching.**
   - Amir, 2026-09-26: "let them, they can have access to their programs, they wont get any coaching"
 - `PRC-20` **Cycles continue; they don't reset.**

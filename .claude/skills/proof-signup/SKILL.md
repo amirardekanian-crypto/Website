@@ -204,10 +204,13 @@ point: upgrading costs them nothing and they keep their level and board place. R
    it to `"coached"`. This is what unlocks WORKOUT.
 3. Update the tier on their contact row:
    ```sql
-   update public.hab_contacts
-      set tier = 'coached', source = 'coaching', updated_at = now()
-    where athlete_id = 'sara_karimi';
+   with u as (update public.hab_contacts
+                 set tier = 'coached', source = 'coaching', updated_at = now()
+               where athlete_id = 'sara_karimi'
+               returning athlete_id)
+   select * from u;
    ```
+   (Wrapped in a CTE that ends in a `select`: the Supabase MCP hangs on a bare `UPDATE`, found 2026-10-10.)
 
 Their XP, levels, streaks and board position all survive, because none of it was ever
 tied to having a programme. Their login does not change either — the same username and

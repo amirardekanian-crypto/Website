@@ -385,12 +385,15 @@ each? An item whose `old` no longer matches the entry (Amir edited it in coach.h
 - **No**: remove the item. Nothing else changes.
 - **Not answered**: leave it. It comes back in the next run's handoff.
 ```sql
-update public.exercise_coach
+with u as (update public.exercise_coach
    set suggested_changes = (select coalesce(jsonb_agg(s order by s->>'at'), '[]'::jsonb)
                               from jsonb_array_elements(suggested_changes) s
                              where not (s->>'field' = '<field>' and s->'new' = <new as jsonb>))
- where id = '<id>';
+ where id = '<id>' returning id) select * from u;
 ```
+**Every write through the Supabase MCP is wrapped like this** (a CTE around the `update … returning`, ending in
+a `select`): a bare `UPDATE` that changes rows hangs for 60 s and never runs (found 2026-10-10). Inserts, selects
+and function calls are fine.
 
 ## Batch size and order
 

@@ -18,7 +18,7 @@ Built 2026-09-24 from the first one, an athlete's Cycle 1 (idea #12, The Debrief
 | Output | Who reads it | Where it goes |
 |---|---|---|
 | **The cycle report** | the athlete | **In chat, as text, ready to paste into WhatsApp.** Amir sends it himself. Never a page, never a file (*"i dont need a file, i liked the content"*). |
-| **The Debrief section** | Amir and `/program-design` | Appended to `public.coaching_logs` as `## Debrief — Cycle NN …`. Coach-only. `/program-design` reads it as STEP 1A evidence and answers its **Open** list at the checkpoint. |
+| **The Debrief section** | Amir and `/program-design` | Appended to `public.coaching_logs` as `## Debrief — Cycle NN …`, **about 2,500 characters**. Coach-only. `/program-design` reads it as STEP 1A evidence and answers its **Open** list at the checkpoint; it is folded away when the next cycle is published. |
 
 **When:** the cycle's closing week (week 5), **before** `/program-design` writes the next cycle,
 so the athlete's answers reach the design. Running it after the next cycle is already written
@@ -51,7 +51,8 @@ Files here: **`queries.sql`** (four read-only queries, tested on real rows) · *
    outside the app. **Never with switches on a page**: a page's controls don't reach Claude
    (learned 2026-09-24, when Amir answered on the page and nothing arrived).
 9. **Short lists.** At most **4** things in "what I need from you" and **3** questions.
-10. **Append, never edit.** The log's earlier sections are never touched (see Step 5).
+10. **Append your own Debrief and touch nothing else.** The rest of the log is not yours; the next
+    publish folds the Debrief away once /program-design has used it (see Step 5).
 
 ---
 
@@ -183,59 +184,76 @@ Its log section is the model for Step 5.
 
 ## Step 5 · Save the Debrief to the coaching log
 
-**Only what changes a coaching decision.** Not the message, not the wins for their own sake.
+**Only what changes a coaching decision, in about 2,500 characters.** Not the message, not the wins
+for their own sake. Amir, 2026-10-10, on a Debrief longer than a cycle entry: *"arent you writing too
+much in people's logs? are you using those info's later?"* The Debrief is read once, by the next
+design, and is folded away when that cycle is published (/program-assemble Step 7b). So it carries
+what design cannot get any other way and nothing the database already holds. **Past 3,500
+characters you are copying the database: cut.**
+- **Leave out:** a load list for every lift (design reads the session history itself; primaries only
+  here), every Personal Record, a restated cycle entry, the message you sent, anything already in the
+  profile or the ledger.
+- **Put in:** the read of tolerance and time, data that would mislead the next design, the e1RM
+  design will use, what changed in his life, his words and Amir's answers, the decisions, the open
+  questions.
+
 English, coach-only. Template:
 
 ```
 ---
 
-## Debrief — Cycle NN <Name> · <YYYY-MM-DD> · end of cycle, before C<NN+1> design
+## Debrief — Cycle NN <Name> · <YYYY-MM-DD> · before C<NN+1> design
 
-Coach-only. Only what changes a coaching decision. Sources: <n> session_history rows
-(<first>–<last>), Gmail import: <its line>, <film review / calls / messages>. Athlete message:
-<language>, <channel>.
+Sources: <n> sessions (<first>–<last>) · import: <its line> · <film / calls / messages> · message: <language>.
 
-**Adherence & tolerance** — sessions, missed days, readiness, soreness, session RPE, time (logged
-minutes against the modelled ones, and the ratio real ÷ model, which the next design's time check
-uses), sleep. End with the read ("absorbed easily, room to push" / "hold").
+**Tolerance and time** — sessions done of planned (name a gap and why), readiness, soreness, session
+RPE, real minutes against the modelled ones and the ratio real ÷ model (the next design's time check
+uses it), sleep. End with the read: "absorbed easily, room to push" or "hold".
 
-**Loads as logged (top set per week)** — one line per primary; flag typos; film gate verdict.
+**Primaries** — one line each: first → last top set, flat or climbing, a typo, a film verdict.
+No accessories.
 
-**Data quality — read before writing any starting-load note** — units, warm-ups in working
-rows, RPE coverage, the share of sets logged at RPE 10, weigh-ins, Personal Records, back-off
-week. Say what the athlete was told.
+**Data warnings** — only what would mislead the next design: units, warm-ups in working rows, the
+share of sets at one RPE or at RPE 10, weigh-ins, a phantom row, a missing back-off. Say what the
+athlete was told.
 
-**The Ceiling** — one line per flagged or primary lift: estimate, grade, date, and relative
-strength if there's a weigh-in. The next design reads its e1RM here, nowhere else.
+**The Ceiling** — flagged or primary lifts: estimate, grade, date (and relative strength when there
+is a weigh-in). Design reads its e1RM here, nowhere else.
 
-**Profile changes** — only what changed: an injury new or resolved, kit, schedule, goal. "None"
-when nothing did.
+**What changed** — an injury new or resolved, kit, schedule, goal, or "nothing".
 
-**The athlete's words** — what he said, and what Amir answered, in their words.
+**His words and Amir's answers** — in their words.
 
-**Decisions carried into C<NN+1>** — each one with its reason. A decision that goes beyond the
-locked roadmap is labelled **ROADMAP DEVIATION** with the data point that forced it. New
-baselines (what, which week). Exercises entering or staying deferred.
+**Decisions for C<NN+1>** — each with its reason. A call beyond the locked roadmap is a **ROADMAP
+DEVIATION** with the data point that forced it. New baselines (what, which week).
 
-**Open — answer at the C<NN+1> checkpoint** — numbered: the questions sent to the athlete,
-medical flags for Amir, anything the log couldn't settle.
+**Open** — numbered: the questions sent to the athlete, medical flags for Amir, what the log
+couldn't settle.
 ```
 
-Write it with an append, never a retype, and prove nothing before it moved:
+Write it with an append, never a retype, and prove nothing before it moved.
+
+⚠️ **Through the Supabase MCP a bare `UPDATE` that changes rows hangs for 60 seconds and never runs**
+(2026-10-10: five times on a coaching log, once on a throwaway temp table; inserts, selects and
+function calls were fine). Wrapped as `with u as (update … returning …) select … from u` it ran at
+once, so write it that way, guard it with the md5 you just read, and after a timeout check whether it
+applied before you retry.
 
 ```sql
 -- before: note md5(body) and length(body)
 select md5(body), length(body) from public.coaching_logs where athlete_id = '<id>';
 
-update public.coaching_logs
-   set body = body || $D$
+with u as (
+  update public.coaching_logs
+     set body = body || $D$
 ---
 
 ## Debrief — Cycle NN …
 $D$, updated_at = now()
- where athlete_id = '<id>'
-returning md5(substring(body from 1 for <old length>)) as prefix_md5, length(body);
--- prefix_md5 must equal the "before" md5
+   where athlete_id = '<id>' and md5(body) = '<the md5 above>'
+  returning md5(substring(body from 1 for <old length>)) as prefix_md5, length(body) as new_len)
+select * from u;
+-- prefix_md5 must equal the "before" md5; no row back means the log moved since you read it
 ```
 
 No row yet (a brand-new athlete whose first cycle wasn't logged)? Insert one with the log header
@@ -256,7 +274,8 @@ In this order, in chat:
 
 - Don't build a page, a file or an artifact for the report. Text in chat.
 - Don't write to `programs` (the athlete app reads it) or to `program_versions`.
-- Don't edit, reorder or delete any earlier section of the coaching log.
+- Don't touch any section but your own Debrief. Older cycle sections are folded away by
+  /program-assemble when the next cycle is published, not here.
 - Don't send the message. Amir sends it.
 - Don't let the report design the next cycle: it names decisions Amir already made, what the
   roadmap already locks and what the data forces. The exercises, sets and doses belong to

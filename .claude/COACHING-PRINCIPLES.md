@@ -233,7 +233,7 @@ stale copy reached athletes.
 | PRC-15 | Week 1 and the back-off: design sets the dose as numbers, engage writes the words, assemble stores them as `weekNotes`. | design · engage · assemble | ✓ |
 | PRC-16 | One current athlete profile heads the coaching log: intake drafts it, every run keeps it current, and the checker reads it. | intake · design · edit | warn (missing) |
 | PRC-17 | The roadmap is written once and locked. A change goes through design's `roadmap_amend:` line at the checkpoint, never a quiet rewrite. | roadmap · design | |
-| PRC-18 | Every cycle's rationale is appended to the coach-only coaching log and never overwritten. | assemble | |
+| PRC-18 | The coaching log keeps the profile, the ledger, a short carry-forward and the latest cycle only; older cycles fold into the carry-forward. | design · assemble | |
 | PRC-19 | An athlete whose cycle ends without a renewal keeps the app and gets no coaching until Amir says so. | every stage | |
 | PRC-20 | Cycles continue, they don't reset: read the log and the roadmap, progress the same logic; the latest rationale is the operative one. | design | |
 | PRC-21 | No menstrual-cycle phasing. A period-week fallback is used when confirmed with the athlete that cycle, never carried forward on its own. | design · engage | oblig `period` |
@@ -906,8 +906,9 @@ same ID. Read a rule's story and its history before changing it.
   program-wide guidance. See SCHEMA.md → "Exercise coach's note".
 - `COM-7` **Coach-facing reports** (the two volume tables) print in chat for Amir — never in the
   athlete app or the programme. They are also archived per athlete in the coach-only
-  `public.coaching_logs` row, append-only (it was `.claude/coaching-log/<id>.md` until 2026-09-07,
-  in a public repo; that folder is gitignored now and never comes back).
+  `public.coaching_logs` row, as the latest cycle's entry (PRC-18: older cycles fold into the
+  carry-forward; it was `.claude/coaching-log/<id>.md` until 2026-09-07, in a public repo; that
+  folder is gitignored now and never comes back).
 - `COM-8` **Personal note bodies (`notes.cards[].body`) render as real HTML, not one paragraph.**
   The app used to escape this field to plain text — it now renders `<p>`, `<ul><li>`,
   `<strong>`, `<em>` (fixed `2026-07-08`, see `program.html` "note-body" CSS + `renderNotes()`).
@@ -1176,11 +1177,17 @@ same ID. Read a rule's story and its history before changing it.
   shown to Amir at the checkpoint and written by assemble. Beyond that, a run touches only this
   cycle's message, `weekNotes` and a gate line in its focuses (PRC-12), and the next cycle's
   teaser.
-- `PRC-18` **Every cycle's design rationale is archived.** /program-assemble appends the design read +
-  locked decisions + ledger changes + the two volume tables to the coach-only
-  `public.coaching_logs` row as its last step: append-only, never the programme. Prior cycles are
-  never overwritten, so months later you can see how a cycle was thought through and why
-  something changed.
+- `PRC-18` **The coaching log keeps what the next design needs, and no more.** The coach-only
+  `public.coaching_logs` row holds four things: the athlete profile, the Exercise Ledger, a
+  `## Carry-forward` (about 2,500 characters: what is still worth knowing from older cycles) and the
+  latest cycle's entry (about 4,000 characters plus the checker's volume tables), with the end-of-cycle
+  Debrief (about 2,500 characters) beside it until the next publish. /program-assemble appends the new
+  entry (Step 7), then folds the old entry, the Debrief and the old carry-forward away (Step 7b),
+  guarded by the log's md5. The log never re-lists a past programme, a load history or anything
+  `programHistory` and the session log already hold. /program-design writes the new carry-forward from
+  the old one plus what the finished cycle taught, and drops what no longer matters.
+  Before 2026-10-10 every cycle was appended and none removed, and one athlete's log reached 47,000
+  characters.
 - `PRC-19` **An athlete whose cycle ends without a renewal keeps the app, and gets no coaching.** They can
   keep training the programme they have; no new cycle, report or edit is written for them until
   Amir says so.

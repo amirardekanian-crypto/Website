@@ -105,7 +105,16 @@ without Amir's word, and never put athlete-specific detail on a Spine entry.
 
 **Coaching logs are on the server too.** `.claude/coaching-log/*.md` were tracked in this
 PUBLIC repo — world-readable, despite each opening with "Never published". They now live
-in `public.coaching_logs`, coach-only, with no athlete arm at all.
+in `public.coaching_logs`, coach-only, with no athlete arm at all. **A log is small on purpose**
+(Amir, 2026-10-10, PRC-18): the profile, the Exercise Ledger, a ~2,500-character `## Carry-forward` and the
+latest cycle's entry (~4,000 characters), with the end-of-cycle Debrief beside it until the next publish;
+`/program-assemble` Step 7b folds the old entry and Debrief away. Never put a past programme or a load
+history in it: `programHistory` and `session_history` hold those.
+
+**⚠️ The Supabase MCP hangs on a bare `UPDATE`** (found 2026-10-10): an `update` that changes rows waits
+60 s and never runs, whatever the table. Wrap every write as `with u as (update … returning …) select … from u;`
+and it runs at once. Inserts, selects and function calls (`publish_cycle()`) are fine. `execute_sql` returns
+only the LAST statement's result when several are sent.
 
 **⚠️ There are NO automatic backups.** The Supabase project is on the free plan. 378
 session logs and every progress blob exist in exactly one place. coach.html → Athletes →
