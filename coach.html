@@ -426,6 +426,7 @@
   .cycbar { background: var(--court); color: #fff; border-radius: 18px; padding: 13px 18px; margin-bottom: 14px; }
   .cyc-nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase; font-size: 19px; letter-spacing: .02em; }
   .cyc-fo { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+  .cyc-dt { font-family: 'Space Mono', monospace; font-size: 12px; color: rgba(255,255,255,.82); margin-top: 3px; }
   .cyc-fo span { font-size: 11.5px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.2);
                  padding: 3px 10px; border-radius: 999px; }
 
@@ -2475,6 +2476,7 @@ function adherence(sessions, daysPerWeek, weeks, ref) {
   return { done, expected, pct: Math.min(100, raw), extra: Math.max(0, done - expected), days: effDays,
            weeks: effWeeks, perWeek: daysPerWeek };
 }
+function byRecentFirst(sessions) { return sessions.slice().sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on))); }
 function athleteMetrics(sessions, lastActive, daysPerWeek) {
   const daily = dailyLoad(sessions);
   const rser  = readinessSeries(sessions);
@@ -2484,7 +2486,9 @@ function athleteMetrics(sessions, lastActive, daysPerWeek) {
     .map(s => Number(s.session_rpe) * Number(s.duration_min));
   const byRecent = sessions.slice().sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on)));
   const lastPartial = byRecent.length ? isPartialStatus(byRecent[0].status) : false;
+  const latestRd = byRecentFirst(sessions).map(s => jparse(s.readiness)).find(x => x && !x.skipped && (x.level || x.composite != null));
   return { daily, acwr: computeAcwr(daily), cover: loadCoverage(sessions), rser, readiness: readinessStats(rser),
+           latestPlan: latestRd && latestRd.level ? latestRd : null,
            adherence: adherence(sessions, daysPerWeek), loadPts, lastPartial,
            daysIdle: daysSince(lastActive), neverActive: !lastActive && !sessions.length };
 }
@@ -3517,8 +3521,14 @@ function workTabHtml(D) {
     .concat(loggedOnly.map(d => workDayCard(athleteId, null, d, byDay[d], lib, d === freshest)));
 
   const cyc = (D.program && D.program.cycles || [])[(D.program && Number.isInteger(D.program.currentCycleIndex)) ? D.program.currentCycleIndex : 0];
+  // The dates the athlete's phone uses for its renewal banner (SCHEMA.md: endDate). They were never shown here.
+  const cd = D.a && D.a.cycle;
+  const fmtD = iso => { const p = pDate(iso); return `${p.getDate()} ${MONTHS[p.getMonth()]}`; };
+  const left = cd && cd.end ? daysBetween(todayKey(), cd.end) : null;
+  const dates = cd && (cd.start || cd.end) ? `<div class="cyc-dt">${cd.start ? esc(fmtD(cd.start)) : '?'} – ${cd.end ? esc(fmtD(cd.end)) : '?'}${
+      left == null ? '' : left > 0 ? ` · ${left} day${left === 1 ? '' : 's'} left` : left === 0 ? ' · ends today' : ` · ended ${-left} day${left === -1 ? '' : 's'} ago`}</div>` : '';
   const cycHead = cyc ? `<div class="cycbar">
-      <div class="cyc-nm">${esc(cyc.name || '')}${cyc.weeks ? ' · ' + esc(cyc.weeks) : ''}</div>
+      <div class="cyc-nm">${esc(cyc.name || '')}${cyc.weeks ? ' · ' + esc(cyc.weeks) : ''}</div>${dates}
       ${cyc.focuses && cyc.focuses.length ? `<div class="cyc-fo">${cyc.focuses.map(f => `<span>${esc(f)}</span>`).join('')}</div>` : ''}
     </div>` : '';
 
@@ -3599,6 +3609,17 @@ function maxesPanel(D) {
 function metricStripHtml(m) {
   const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
   const r = m.readiness, adh = m.adherence;
+  // The latest check-in's own verdict when it has one: since 2026-09-26 the athlete's app works out
+  // the day (REC-2: score S of sleep, energy, stress and overall, against their usual B) and stores
+  // { level, score, base } with it. Re-judging it here from the composite (which includes soreness)
+  // against an all-time mean could call green a day the app made lower, or the reverse. The twin is
+  // readinessPlan() in program.html; this only READS what it stored.
+  const lp = m.latestPlan;
+  const LV = { red: ['red', 'short day'], amber: ['amber', 'lower day'], green: ['green', 'normal day'] };
+  if (lp && LV[lp.level] && lp.score != null) {
+    const [tone, said] = LV[lp.level];
+    m._readyPill = { val: round1(lp.score) + '<small>/5</small>', sub: said + (lp.base != null ? ' · usual ' + round1(lp.base) : ' · no usual yet'), tone };
+  }
   const rTone = !r ? '' : r.delta <= -1 ? 'red' : r.delta <= -0.5 ? 'amber' : 'green';
   const aTone = !adh || adh.pct == null ? '' : adh.pct >= 85 ? 'green' : adh.pct >= 60 ? 'amber' : 'red';
   const pill = (label, val, sub, tone) =>
@@ -3606,7 +3627,8 @@ function metricStripHtml(m) {
   return `<div class="mstrip">
     ${pill('Training load', m.acwr.enough && m.acwr.ratio != null ? round1(m.acwr.ratio) : '—',
            m.acwr.enough && m.acwr.ratio != null ? 'ACWR · ' + az.label : 'building baseline', az.cls)}
-    ${pill('Readiness', r ? round1(r.latest) + '<small>/5</small>' : '—',
+    ${m._readyPill ? pill('Readiness', m._readyPill.val, m._readyPill.sub, m._readyPill.tone)
+      : pill('Readiness', r ? round1(r.latest) + '<small>/5</small>' : '—',
            r ? (r.delta >= 0 ? '+' : '') + round1(r.delta) + ' vs their usual' : 'no check-ins yet', rTone)}
     ${pill('Adherence', adh && adh.pct != null ? adh.pct + '<small>%</small>' : '—',
            adh && adh.pct != null ? 'last ' + (adh.days < 28 ? adh.days + ' days' : '4 wks') : 'needs a program + a session', aTone)}
@@ -3642,8 +3664,13 @@ function liveSnapshotHtml(D) {
   return `<details class="rawlog livesnap"><summary>Live app snapshot — what's on their phone right now</summary>
     ${touchedDays.map(pd => {
       const d = days[pd.id] || {};
+      // The cloud blob keeps keys a phone no longer has (program.html ignores a day's keys from
+      // an earlier date), so an old, unfinished day is not "in progress": it is a leftover.
+      const ts = (d.readiness && d.readiness.timestamp) || (d.completedOn && String(d.completedOn).slice(0, 10)) || null;
+      const recent = ts && (Date.now() - new Date(ts)) < 30 * 3600e3;
       return `<div class="ls-day"><b>Day ${esc(pd.id)}${pd.focusTag ? ' — ' + esc(pd.focusTag) : ''}</b>
-        ${d.completed ? '<span class="tag done">✓ completed</span>' : '<span class="tag">in progress</span>'}
+        ${d.completed ? '<span class="tag done">✓ completed</span>' : recent ? '<span class="tag">in progress</span>'
+          : `<span class="tag">started${ts ? ' ' + esc(prettyDate(dkey(new Date(ts)))) : ' earlier'}, not finished — a leftover, not live</span>`}
         ${d.completedOn ? '<span class="muted"> · ' + esc(d.completedOn) + '</span>' : ''}
         ${d.srpe ? '<span class="muted"> · sRPE ' + esc(d.srpe) + '/10</span>' : ''}
         ${d.note ? `<div class="note"><b>Athlete note:</b> ${esc(d.note)}</div>` : ''}</div>`;
@@ -3843,7 +3870,7 @@ function callsTabHtml(D) {
   }).join('') : '<p class="empty">No call logs yet.</p>';
   const cycleNums = [...new Set(callLogs.map(l => (String(l.week||'').match(/Cycle\s*(\d+)/i)||[])[1]).filter(Boolean))].sort((a,b)=>a-b);
   const cycleCtl = cycleNums.length ? `<span style="display:flex;align-items:center;gap:6px">
-      <select id="dashCycleSel" style="background:var(--card);border:1px solid var(--line);border-radius:999px;font-size:13px;padding:5px 10px">${cycleNums.map(n=>`<option value="${esc(n)}">Cycle ${esc(n)}</option>`).join('')}</select>
+      <select id="dashCycleSel" aria-label="Cycle" style="background:var(--card);border:1px solid var(--line);border-radius:999px;font-size:13px;padding:5px 10px">${cycleNums.map((n, i) => `<option value="${esc(n)}"${i === cycleNums.length - 1 ? ' selected' : ''}>Cycle ${esc(n)}</option>`).join('')}</select>
       <button class="btn sm" onclick="copyDashCyclePrompt()">📋 Copy cycle prompt</button>
     </span>` : '';
   return `<div class="sec"><span>Weekly check-in calls</span>
@@ -4106,8 +4133,8 @@ function copyDashCyclePrompt() {
     .sort((a, b) => String(a.completed_on).localeCompare(String(b.completed_on)));
   const text = CYCLE_PROMPT + '\n\n' + fmtCycleData(_detailName, cyc, weeklies, sessions);
   navigator.clipboard.writeText(text).then(
-    () => alert(`Cycle ${cyc} prompt copied — ${weeklies.length} check-in(s) + ${sessions.length} session(s).\n\nPaste it into any AI to generate the report.`),
-    () => alert('Copy failed — clipboard blocked by the browser.'),
+    () => toast(`Cycle ${cyc} prompt copied — ${weeklies.length} check-in(s) + ${sessions.length} session(s)`),
+    () => copyText(text),   // shows the text so it can be copied by hand
   );
 }
 window.copyDashCyclePrompt = copyDashCyclePrompt;
