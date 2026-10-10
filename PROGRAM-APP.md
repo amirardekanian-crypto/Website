@@ -623,6 +623,36 @@ with same rpe"*.
   that went down, a lift trained once, or a loaded set against an unloaded one says nothing. The top three by gain.
 - Checked on crafted history for every kind of win and non-win, and on the demo's (`prog01` suite).
 
+## 🏁 When the cycle is over: Home between cycles (PROG-02, 2026-10-10)
+
+Athletes kept training after their cycle ended, taking the cycle for a week. The day after the end date the This cycle
+card shrank to the small line, whose "Weeks 6–10" is the *roadmap's* count, the "days left" banner went (it shows from
+14 days down to 0), and This Week started again at "0 of 3 sessions done this week" under the big day cards: the app
+told them to train. Amir picked direction B of three mockups (https://claude.ai/artifact/Cb6wBcfLhJ48rbz5HtuYDF):
+
+- **The card says so** (`paintCycleCard()`, `p.over`): the day after the current cycle's `endDate` (the end date itself
+  is still the cycle), the same card reads **Cycle complete**, *Finished Oct 6 · 5 of 5 weeks*, the week bar full, the
+  sessions done against planned (up to the end date only: a session repeated since never counts) and the wins. On the
+  roadmap's last cycle it is **Roadmap complete**, *3 cycles · 15 weeks* (the weeks only when every cycle is dated) and
+  one filled segment per cycle. No wins: nothing, not the "your wins show here" line.
+- **Up next** (`betweenCyclesHTML()`, where This Week was): Game Plan's own card for the next cycle, folded, its Read
+  more in place and a tap to Game Plan; **Amir is building it now** in clay; and a WhatsApp door, *Tell Amir how Cycle 2
+  went · He reads it before he writes Cycle 3*, which feeds `/cycle-report`. On the last cycle: **What's next** and a
+  green **Plan my next block** door instead.
+- **"Building it now" only for `CYCLE_BUILD_DAYS` (14) after the end.** On 2026-10-10, 18 athletes were past their end
+  date and 12 of them by 18 to 88 days: for them it would not be true. After 14 days there is no status line and the
+  door reads **Ready for Cycle 3?** *Message Amir to start it.*
+- **Between cycles**: *No new week until Cycle 3 lands. Want to keep moving? Any session from Load & Build still works.*
+  and one **Repeat a session** row (`#bt-rep`) that unfolds the day cards (`paintBetweenFold()`, `.bt-folded`). They stay
+  folded unless it is open or a session is under way: that card carries Resume, so it never hides. No week count, no
+  suggested day (`markSuggestedDay()` marks only a session under way) and no week-done Library extra (LIB-01's two
+  moments stay two).
+- It ends when the next cycle is published (`currentCycleIndex` moves on). A cycle with no dates cannot end and never
+  shows any of this; the demo has none. `cycleOver()` is the one test.
+- The guide's *How your program is structured* card says it in Amir's voice. Checked by
+  `scripts/headless/cycle-end.js` (running, the end date, 4 and 40 days past, the last cycle light, dark and at 320 px,
+  undated, the fold, Read more and Resume).
+
 ## 📅 This Week is built from the session history (HOME-01, 2026-09-26)
 
 Home's week used to know only today: a Done pill lasted until midnight (the `<id>_completed_d<N>` stamp) and

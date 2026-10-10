@@ -180,7 +180,9 @@
 //      youtube.com link the phone hands to the YouTube app or the browser, for athletes in Iran whose embed
 //      will not play while those do. shared.js is in the shell and served cache-first, so this bump is what
 //      puts the pop-up's bar on installed phones.
-const CACHE = 'aap-v95';
+// v96: program.html changed (2026-10-10, PROG-02): the day after a cycle's end date Home says Cycle complete, shows
+//      the next cycle under Up next and folds the day cards under Repeat a session.
+const CACHE = 'aap-v96';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
