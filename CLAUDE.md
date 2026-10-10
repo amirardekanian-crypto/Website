@@ -80,7 +80,7 @@ public inside `get_program()` so the marketing link still opens.
 `data/<id>.json` as a working artifact, but that file is never published as a file: a new cycle
 goes up in ONE call to **`public.publish_cycle()`** (`supabase/stage38_publish_cycle.sql`, 2026-09-26:
 archive, cycle advance, workouts, notes, roadmap patch and the coaching-log splice, all or nothing,
-returning the fingerprint), or by hand through coach.html → Athletes → **↑ Publish programme file**.
+returning the fingerprint), or by hand through coach.html → Athletes → Coach tools → **↑ Publish programme file**.
 Execute is revoked from anon and authenticated. Day-to-day changes (sets, reps, RPE,
 tempo, rest, the coach's note) are made in the dashboard's inline editor, which writes
 straight to `programs` and keeps the previous version in `program_versions`.
@@ -288,6 +288,27 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   his word, with `start_season()` (`HABITS.md` → Seasons). Body weight lives in `program.html` (above);
   the backtick guard is at the end of this file.
 
+## The coach dashboard (`coach.html`) — read `COACH_DASHBOARD.md` before changing it
+
+Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is open). What must never break:
+- **A programme write from coach.html is never the page's copy written whole.** The ✎ editor reads the live
+  row, refuses when `updated_at` moved since the page loaded or the exercise is not at that place any more
+  (checked by name), applies the edit to the live copy and writes it `.eq('updated_at', <read>)`. Anything
+  that replaces `S.programs` goes through `reloadPrograms()` (it re-assembles, so the athlete file redraws).
+- **"Needs you" is one rule, `reasonsOf()`**: Today, the roster's reasons, its group, filter and sort all
+  read it. A new reason goes there, nowhere else, and into COACH_DASHBOARD.md §3's table.
+- **A value inside an inline handler goes through `jsq()`**, never `'${esc(x)}'` (esc is HTML escaping; the
+  browser decodes it back before the JS runs, so a quote in a signup email ran as code).
+- **A growing table is read with `selectAll()`** (paged in key order past PostgREST's 1000 rows), and a read
+  that may fail records it in `LOAD_ERR`, so the banner names it instead of showing an empty table.
+- **A write that must change a row asks for it back** (`.select()`) and treats zero rows as failure
+  (`writeFailed()`): a lapsed session sends writes as anonymous and RLS turns them into silent no-ops.
+- **Auth events rebuild the page only when the signed-in user changes** (token refreshes and tab refocus
+  used to reload everything and throw away typed work).
+- **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
+  (26 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+- supabase-js is pinned (2.117.3); bump it only with the harness's `reallib.js` run.
+
 ## Site layout (GitHub Pages → amirardekani.com)
 - **English is the default**: `/` = `index.html`. **Farsi** = `/index-fa.html`. `index-en.html` is a
   permanent redirect to `/`. Language toggles + `hreflang`/canonical are set accordingly.
@@ -367,7 +388,9 @@ search in Iran). The routine (Search Console, the monthly checklist, how titles 
   re-stamp with `--stamp <slug>` once the Farsi is brought back in line).
 - ⚠️ **A `.fa.json` must never carry `id` or `category`.** coach.html's *+ Publish article* upserts
   any file that has both, by slug — a Farsi file with them would overwrite the English article in
-  the app for every athlete. The build refuses such a file.
+  the app for every athlete. The build refuses such a file, and since 2026-10-10 so does coach.html
+  (a `.fa.json` name, `lang: "fa"`, `sourceHash` or `translationOf`), which also matches an article's
+  category by its title ("Pre-Competition") as well as its id.
 - **Every article passes the SEO gate** (Amir, 2026-10-02: *"whenever you write a blog on the website, consider
   the SOP, so every time someone searches something my website shows better on Google"*): `/article` Step 0.5 =
   `.claude/SEO-SOP.md` → *The SEO gate*. One Farsi search phrase per article, chosen first and checked against the

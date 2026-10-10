@@ -220,7 +220,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   would have uploaded whatever CFG/LOG this browser held under their key over their real cloud
   row — the same class of bug, just triggered by leftover local state instead of a tap.
 - **Edit this when:** You want to change how the training app looks or behaves, add new features to the training screens, or tweak the styling.
-- **Don't touch:** This file is large and self-contained. Most day-to-day changes happen on the server (programmes through coach.html and `/program-assemble`; the Library through `articles/`, `workouts/` and coach.html → Links), not here. Ask an AI assistant to guide you before structural edits.
+- **Don't touch:** This file is large and self-contained. Most day-to-day changes happen on the server (programmes through coach.html and `/program-assemble`; the Library through `articles/`, `workouts/` and coach.html → Library), not here. Ask an AI assistant to guide you before structural edits.
 
 #### `habits.html` — AA Proof, the habit tracker (private)
 - **What it does:** A standalone gamified habit tracker for coaching clients. A one-screen onboarding suggests a habit set (the athlete switches off whatever they want), then four tabs: **Today** (the level card with the day's verdict and the week, the habit list, the daily nudge, the roll-call pointer, the seven-day recap), **Progress** (overall level, four season stats, every habit's own rank and consistency → tap for full history, the three milestones you are closest to, quests while a run is on), **Crew** (the board first, roll call one tap away) and **Locker** (the rank card, titles, card skins and the road to the next rewards). **Settings is not a tab** — it sits behind the athlete's initials in the header, and that button doubles as the way out of Settings and the manual. The full account of every screen is [`HABITS.md`](HABITS.md). Eight suggested habits — STRENGTH, STEPS, SLEEP, FUEL, WATER, MOBILITY, BREATHE, SUPPS (vitamin D · creatine · omega-3) — plus custom habits. Check-off habits toggle; counter habits (steps, sleep, water, meals) take a number via `+` or the log sheet. Athletes open it the **same way as the program**: they go to `habits.html` and sign in with their username and password (⚠️ the old `?client=<id>&key=<key>` links are retired and refused — `athlete_keys` is empty). Demo mode: `?client=demo` (local-only, no cloud).
@@ -388,7 +388,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
 - **See also:** `SCHEMA.md` — the fields a programme can contain; `PROGRAM-APP.md` — how the app's programme features work.
 
 #### `articles/index.json` — Playbook manifest (fallback)
-- **What it does:** Lists categories (For Coaches, Pre-Competition, Recovery, Mental, Nutrition, Supplements) and which articles belong to each. The live Playbook comes from the `library` table (`get_library()`, published from coach.html → Links → + Publish article); this file is the offline fallback. A `?article=<id>` link resolves through `get_library()` first (`openArticleDeepLink()`, 2026-09-27, as workout links have since 2026-09-20), so an edit on the server reaches a link shared earlier and an unpublished article's link opens nothing; the file is read only when the server cannot answer.
+- **What it does:** Lists categories (For Coaches, Pre-Competition, Recovery, Mental, Nutrition, Supplements) and which articles belong to each. The live Playbook comes from the `library` table (`get_library()`, published from coach.html → Library → + Publish article); this file is the offline fallback. A `?article=<id>` link resolves through `get_library()` first (`openArticleDeepLink()`, 2026-09-27, as workout links have since 2026-09-20), so an edit on the server reaches a link shared earlier and an unpublished article's link opens nothing; the file is read only when the server cannot answer.
 - **If deleted:** an offline Playbook, and a `?article=<id>` link opened with no signal, show nothing.
 - **Depends on:** `program.html` reads it; individual article files in `articles/<category>/` are fetched lazily.
 - **Edit this when:** You add a new article or create a new category. Always add an entry here alongside the article JSON.
@@ -583,7 +583,7 @@ Think of it like a house:
 In rough order of how often you'll touch them:
 
 1. **coach.html → Athletes** (the inline editor) and `/program-assemble` — Every programme change; programmes are rows in `public.programs`. This is your daily work.
-2. **`articles/<category>/<slug>.json` + `articles/index.json`** — Every new article (`/article`), then coach.html → Links → + Publish article.
+2. **`articles/<category>/<slug>.json` + `articles/index.json`** — Every new article (`/article`), then coach.html → Library → + Publish article.
 3. **`workouts/<category>/*.json` + `workouts/index.json`** — Every time you add a shared workout session. Create the file, register it in the manifest.
 4. **`index.html`** — When you reword your pitch, update the FAQ, swap a testimonial, or change a CTA.
 5. **`form.html`** — When you want to add or tweak an application question.

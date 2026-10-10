@@ -10,6 +10,12 @@ habit crew, the wall, the board or the funnel, which is most of what happens on
 a given day. It went unused. This version opens on **what today needs**, and it
 covers **both halves of the business** in one place.
 
+**Audited 2026-10-10** (`Content/COACH-AUDIT.md`: what was wrong, what changed, what is still
+open, and the harness that tests the write paths). The short version of what changed for you:
+the inline editor can no longer overwrite a newer programme, every number that says "needs you"
+comes from one rule, the tabs fit a phone, and a failed load or save says so instead of looking
+like an empty list or a success.
+
 ---
 
 ## 1. Getting in
@@ -28,22 +34,33 @@ safe to open anywhere — handy for screenshots or design work.
 
 ---
 
-## 2. The six tabs
+## 2. The nine tabs, in two groups
+
+The first four are the daily coaching work. The other five (smaller, after a divider; on a phone
+a second row that scrolls sideways) are opened now and then.
 
 | Tab | What it's for |
 |---|---|
-| **Today** | The day's play: who's on court, what's on the wall, who needs you, the quest lever |
+| **Today** | The day's play: who's on court, who needs you (and why), the wall, the quest lever |
+| **Athletes** | The whole roster — coached and Proof-only — and each person's file, opening on prescribed-vs-done (a habit-only athlete opens on Proof) |
 | **Intake** | New coaching applications from the apply form (English & Farsi) — the whole questionnaire, per lead |
-| **Athletes** | The whole roster — coached and Proof-only — and each person's file, opening on prescribed-vs-done |
 | **Exercises** | The Spine (2026-09-24): one entry per exercise you programme. Coverage of the names in live programmes, Claude's drafts waiting for you, and an editor (purpose, cues, regressions, progressions, alternatives, video, and the coach-only SFR rank and flags) showing who is doing each exercise now. **Approve** is what puts an entry on athletes' phones |
 | **Proof** | The board, the season, the signup funnel, titles minted |
-| **Links** | Copyable deep links to every published article and workout |
+| **Library** | Publishes workouts and articles into the app's Library, and copies a link to each (the address is still `#links`; the tab was called Links until 2026-10-10) |
 | **Affiliates** | The referral-code roster: who holds which discount code, how to reach them, which intakes used it. The apply forms accept exactly the live codes listed here |
+| **Testing app** | Buyer logins for the tennis testing app (`/tennis-testing/app/`) |
+| **Course** | Buyer logins for the paid course app (`/tennis/app/`) |
 
-The URL carries the view (`#today`, `#intake`, `#athletes`, `#proof`, `#links`, `#affiliates`,
-`#a/<athlete_id>`, `#a/<athlete_id>/<sub-tab>`), so any screen can be bookmarked or
-reloaded in place.
-**↻ Refresh** re-pulls everything.
+The URL carries the view (`#today`, `#athletes`, `#intake`, `#exercises`, `#proof`, `#links`,
+`#affiliates`, `#assess`, `#course`, `#a/<athlete_id>`, `#a/<athlete_id>/<sub-tab>`), so any
+screen can be bookmarked or reloaded in place. The browser tab's title names the screen.
+**↻ Refresh** (top right) re-pulls everything.
+
+**When something does not load or save.** A red line under the tabs names anything that failed
+to load (programmes, logins, contacts, intake forms, codes, the library, coaching logs), and the
+actions that depend on it are switched off until ↻ Refresh brings it back. Before 2026-10-10 a
+failed read looked exactly like an empty table. A save that the server did not apply (a lapsed
+sign-in, a record that moved) says so; it used to report success.
 
 ### Exercises — the Spine
 
@@ -151,7 +168,7 @@ Four counters across the hero, each one a link to the panel that explains it:
 | **On court today** | Proof athletes with a log entry for today ÷ everyone on Proof |
 | **Wall lines today** | Roll-call posts today, hidden ones excluded |
 | **Sessions this week** | Finished training sessions in the last 7 days, whole roster |
-| **Waiting on you** | Session notes needing a reply |
+| **Notes to read** | Session notes from the last 14 days not yet marked read (the same number as the badge on Athletes). It was called *Waiting on you* until 2026-10-10 |
 
 Beside them: the current season and how many days into it you are.
 
@@ -163,7 +180,9 @@ The roll call, straight from `hab_notes`, newest day first. Two days by default,
 - **Your line to the crew** is the composer at the top. It writes today's coach
   line via `set_coach_note()` — the same line the crew sees pinned in their app.
   Posting again updates it; **Take it down** deletes it. 200 characters, the
-  server's own limit.
+  server's own limit. It is filed under the day on your computer's clock (`p_day`): until
+  2026-10-10 the server used its own UTC date, so a line posted between your midnight and UTC
+  midnight replaced yesterday's. What you type survives a redraw until you post it.
 - **Hide / Show** on any athlete's line calls `hide_note()`. Hidden lines stay
   visible *to you*, greyed and tagged, so moderation is reversible and you can
   still see what you hid.
@@ -174,20 +193,42 @@ This replaces running `select public.set_coach_note('…')` in the SQL editor.
 The SQL still works and is still documented — this is a second door to the same
 function, not a new mechanism.
 
-### Needs you
+### Needs you — one rule, everywhere
 
-One list, most urgent first, everything that's actually waiting on a human:
+**One row per person**, most urgent first, from `reasonsOf()` in coach.html. The roster's reason
+chips, its *Needs you* group and filter, and its default sort use the same function, so the two
+screens always agree. (Until 2026-10-10 four places counted "needs you" four different ways:
+sync gaps and upgrade leads never reached Today, signups never reached the roster, and Today cut
+off at 10 rows of notes.) The header counts **people**; the counter above counts **notes**.
 
-| Row | Trigger |
-|---|---|
-| **Day N note: "…"** | A finished session carries an athlete note and `coach_status` is still `new` |
-| **Run of low days: …** | A coached athlete's last 5 check-ins (within 3 weeks) hold 3 lower or short days, or stress 2 or lower on 3 of them (REC-2: the run is your call, never the app's). Also a *run of low days* reason on the roster |
-| **No session for N days** | A coached athlete with history and no session for > 7 days |
-| **Silent on Proof — N days** | A Proof athlete with no log for ≥ 3 days |
-| **New signup** | A contact created in the last 7 days |
+| Reason | Trigger | Weight |
+|---|---|---|
+| **N notes to read** | A session in the last 14 days carries a note (the day note, or a note on an exercise) and `coach_status` is still `new` | 100+ |
+| **Session not synced** | The phone sent a report for a day that has no `session_history` row (every number here is wrong for them until it is fixed) | 80 |
+| **Run of low days** | A coached athlete's last 5 check-ins (within 3 weeks) hold 3 lower or short days, or stress 2 or lower on 3 of them (REC-2: the run is your call, never the app's) | 70 |
+| **Cycle ended N days ago — renew?** | The current cycle's `endDate` passed in the last 14 days | 60 |
+| **No login — cannot open the app** | They have a programme row but no username and password (the old links died on 2026-09-07) | 50 |
+| **Cycle ends in N days** | The current cycle's `endDate` is within 7 days: time for `/cycle-report` and the next cycle | 45 |
+| **New signup** | A Proof contact created in the last 7 days | 35 |
+| **No session for N days** | A coached athlete with history, no session for > 7 days, inside a cycle that has not ended | 30 |
+| **Ready to upgrade?** | A free athlete with 14+ logged days | 25 |
+| **Silent on Proof — N days** | A habit-only athlete (free or Proof) with no log for ≥ 3 days. Coached athletes are not flagged for this: they tick habits on the training app's Home now and then, and their training is the signal | 20+ |
 
-Tap any row to open that person's file. (An *N unread messages* row sat here until 2026-09-26,
-when the in-app chat was removed from both apps: athletes message you on WhatsApp now.)
+**Gone quiet.** Someone with nothing at all (no session, no habit, no app activity) for 30+ days,
+or a coached athlete whose cycle ended more than 14 days ago and who has not trained since, is
+not "needs you" any more: they sit in a folded **Gone quiet** group at the bottom of the roster
+(and its filter). A coached athlete inside a dated cycle that has not ended is never folded away.
+The marketing `demo` row and your own record are never flagged.
+
+Above the people: a row for **new applications** in Intake, and a **weekly backup** row when
+this computer has not taken one for 7 days. Tap a person to open them on the right screen (a note
+opens the day the note is on; a Proof reason opens Proof). **Show all** lists everyone past the
+first 12. (An *N unread messages* row sat here until 2026-09-26, when the in-app chat was removed
+from both apps: athletes message you on WhatsApp now.)
+
+**Clear** on the *older notes* row marks exactly the notes it counted, by their key. It used to
+mark every unread session older than 14 days on the server, including notes that arrived after
+the page loaded.
 
 **Today's targets on a session (2026-09-26).** When an athlete's check-in eased the day (REC-2), the
 session line on The work says *lower day*, *short day* or *sore* (and *trained as written* if they
@@ -201,8 +242,12 @@ check-in; nothing here recomputes it. `dayTargetC()` is the twin of `dayRpe()` i
 The lever, not just the readout. If a run is live you see its quests, the XP each
 pays and which day of seven it's on, with **Cancel this run**. If none is live
 you get the pool as checkboxes — pick one to four, **Start the week**, and it
-runs seven days from today via `set_quests()`. Cancelling calls `clear_quests()`;
-quests already paid keep their XP.
+runs seven days from today via `set_quests()`. Cancelling calls `clear_quests()`.
+⚠ **Cancelling takes back the XP** everyone already earned from that run: both scorers work quest
+XP out from the run each time (`hab_bonus_xp()` and `habits.html`), so a removed run pays nothing.
+Starting the same run again (same start day, same quests) brings it back. (Until 2026-10-10 the
+dialog promised the opposite. An "end the run but keep the XP" option would change both scorers:
+Amir's call.)
 
 ### Proof pulse
 
@@ -214,21 +259,34 @@ screen — a row of grey dots is someone drifting before they churn.
 
 ## 4. ATHLETES
 
-One row per person across **both** systems, split under two headings — **Needs you** and
-**All quiet** — so the line between "waiting on me" and "fine" is drawn rather than implied.
-Filter chips across the top (Everyone · Needs you · Coached · Free · Proof only) each carry
-their count. Search by name or id; re-sort by recent activity or name.
+One row per person across **both** systems, split under three headings — **Needs you**,
+**All quiet** and **Gone quiet** — so the line between "waiting on me" and "fine" is drawn rather
+than implied. Filter chips across the top (Everyone · Needs you · Coached · Free · Proof only ·
+Gone quiet) each carry their count. Search reads the name, the id, the board name, the contact's
+name, email and WhatsApp digits (Persian ی/ک and extra spaces are normalised); the sort and the
+search survive a redraw.
 
 Each row carries a tier chip — **Coached**, **Free**, **Proof only** (they log
-habits but have no program file) or **No file** — their level, an ACWR pill *only when it's amber
-or red*, their session count, their Proof week (`n/7`) and seven presence dots.
+habits but have no programme row) or **No file** — their level, a **load** pill only for a real
+spike (`load 1.6 · high load`, `· climbing`), their session count, their Proof week (`n/7`) and
+seven presence dots.
 
-**A flagged row says why, in words:** *1 note to read* · *no session for 9
-days* · *silent on Proof — 4 days* · *ready to upgrade?*. The reasons are the same triggers as the
-Needs-you list on Today; before, they were folded into one dot-separated line and a row that needed
-a reply looked like a row that didn't.
+**A flagged row says why, in words:** the reasons in §3's table, from the same function.
 
-**+ New secure link** mints a per-athlete key and copies the program link.
+**Above the roster:** *Create N missing logins* (coached athletes who have trained and have no
+login), then **Logins to send** (open while anything waits: each unsent password with Copy
+message and Mark sent), then a folded **Coach tools** line: *↑ Publish programme file*, *↑ Add
+coaching logs* and *⤓ Backup*, with when this computer last took a backup. (The secret-link tools
+are gone: the links were retired on 2026-09-07.)
+
+- **↑ Publish programme file** checks that the file name matches its `athlete.id`, shows the live
+  programme against the file (cycle, days, last saved, by whom) and warns in capitals when the live
+  one is newer. New cycles normally go up through the pipeline (`publish_cycle()`).
+- **↑ Add coaching logs** only adds a log for an athlete who has none on the server. It never
+  replaces one: the server copy is the record (publish_cycle splices into it, `/cycle-report`
+  appends its Debrief). Until 2026-10-10 it replaced them wholesale.
+- **⤓ Backup** pages every table in key order, de-duplicates, blanks the unsent login passwords
+  (`initial_password`) and says **INCOMPLETE** when a table could not be read.
 
 ---
 
@@ -242,7 +300,11 @@ Chat went, 2026-09-26), and the first
 one answers that question directly.
 
 The sub-tab lives in the URL (`#a/<id>/work`, `/proof`, `/calls`, `/file`), so any screen
-can be bookmarked. An old `/chat` bookmark opens The work. Plain `#a/<id>` opens **The work**.
+can be bookmarked. Plain `#a/<id>` (or an old `/chat` bookmark) opens **The work**, or **Proof** for
+a habit-only athlete with no training days. Opening someone else while a file is still loading
+never paints the first person's file under the second person's address (it could until 2026-10-10).
+A save or a refresh keeps the days you had open, the session you were comparing and anything typed
+into an open editor.
 
 ### The work — prescribed vs done, on one line
 
@@ -288,7 +350,35 @@ from what they finished.
 ⚠ **Plan and log are matched by exercise name.** A session done before you rewrote the program won't
 line up with the current plan — every prescribed row reads *not logged* and their real work shows
 under *Logged, not prescribed*. When a whole day comes back that way the card says so in as many
-words. That is the honest reading, not a bug: they really did train something else.
+words. That is the honest reading, not a bug: they really did train something else. Since
+2026-10-10 the names come from the session's structured log (`session_history.log`) when it lines up
+one to one with the text, so a lift renamed in the Spine (the one-name move of 2026-10-09) still
+matches; the same exercise twice in a day keeps its own log on each row; and work touched but with
+no set ticked is flagged *0 of N sets ticked* instead of counting as exactly as prescribed.
+
+**Every note has Mark read.** A note written against one exercise counts as a note to read (it did
+before), and since 2026-10-10 it also gets the note box and Mark read (8 of 12 waiting notes had no
+way to be cleared).
+
+### Editing a prescription (✎)
+
+✎ sits at the end of the prescribed column (always visible on a touch screen). The editor names
+the exercise it is editing and takes sets, the dose (one value plus its kind: reps, time, distance
+or work), per side, RPE, tempo, rest and your note. **Save** then:
+
+1. checks the fields against the rx contract — reps one whole number (a range or a time is refused
+   with the reason), a time it can read, a distance with a unit, sets 1–99, RPE 6–10 or a 6–10 range,
+   numbers stored as numbers; a save that changes nothing writes nothing;
+2. reads the **live** programme row, and refuses if it changed after this page loaded (a new cycle
+   from the pipeline, another tab, a restore) or if the exercise is no longer at that place: the page
+   reloads the live programme and asks you to redo the change;
+3. writes the edit into that live copy, only if nobody wrote in between, and checks the server
+   really changed the row.
+
+Until 2026-10-10 Save wrote the whole programme as it was when the page opened, which could put an
+old cycle back over a newly published one, and after a publish or restore an edit could land on a
+different exercise. **Version history** (File tab) lists the last 20 saves in your own time zone;
+each line is the programme just before that save, and Restore checks it belongs to this athlete.
 
 ### The three numbers, and the charts
 
@@ -322,8 +412,17 @@ here and one lift there — both sides run the same name matcher, on purpose.
   past thread is lost; nothing reads or writes them now.
 - **Calls** — every `call_logs` row, **+ New call log**, and **Copy cycle prompt** (bundles a cycle's
   check-ins and sessions into a ready-to-paste report prompt).
-- **File** — the program and Proof links with **Rotate key**, what the data file says (id, tier,
-  days/week, which cycle of the roadmap), and the delete-everything button.
+- **File** — *View their app* / *View their Proof* (read-only previews), the **login** (create,
+  change password, remove; an unsent password shows here with Copy message, WhatsApp when the
+  number is known, and Mark sent), the programme row (tier, days/week, which cycle of the roadmap,
+  when it was last saved and by whom, Version history), the coaching log, and **Delete training
+  history**: every finished session plus what the app keeps for them on the server (habit log, body
+  weight, personal records). Their programme, login, coaching log, calls and wall lines stay, and so
+  do they on the roster. (It was called *Delete all data* until 2026-10-10, which it never was.)
+- **Backfill** (The work, bottom): *+ Add past session from email* now checks the email's Athlete
+  line against this athlete, starts with no date (it used to default to today), and warns before it
+  replaces a session logged on the same date (the server overwrites it, set-by-set log included) or
+  adds a second one within a week. It reads the whole athlete note, not just its first line.
 
 ## 6. The three metrics
 
@@ -341,7 +440,11 @@ average; **ACWR = acute ÷ chronic**.
 | **< 0.8** | Low load | Detraining / under-loading |
 
 Shows **"Building baseline"** until there are ~2 weeks of data, because the
-ratio is meaningless before that.
+ratio is meaningless before that. Between 2 and 4 weeks of history, the weekly average is taken over
+the weeks that actually have history (it was always divided by 4, which made every new athlete read
+a false *High load* of about 1.7 for a week). A session with no duration or no session RPE counts as
+zero; the load card says how many of the last 4 weeks' sessions are like that. On the roster a
+**load** pill appears only for a spike (above 1.3), in words.
 
 ### Readiness
 
@@ -352,10 +455,12 @@ against a generic cutoff.
 
 ### Adherence
 
-Planned = their program's day count × weeks; completed comes from
-`session_history` with a partial counting as half. Measured over 4 weeks, and
-the window shrinks for athletes who started more recently so nobody is punished
-for weeks before they began. Green ≥ 85%, amber 60–84%, red < 60%.
+Planned = their program's day count per week, pro-rated to the days in the window; completed comes
+from `session_history` with a partial counting as half. Measured over the last 28 days, or the days
+since their first session if that is shorter, so nobody is charged for days before they began (it
+used to charge a whole week for a week that had just started, so a perfectly adherent new athlete
+read 33%). Shown up to 100%, with "N more than planned" when they did extra. Green ≥ 85%, amber
+60–84%, red < 60%.
 
 ---
 
