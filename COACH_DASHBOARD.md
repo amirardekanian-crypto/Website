@@ -196,7 +196,7 @@ Four counters across the hero, each one a link to the panel that explains it:
 | **On court today** | Proof athletes with a log entry for today ÷ everyone on Proof |
 | **Wall lines today** | Roll-call posts today, hidden ones excluded |
 | **Sessions this week** | Finished training sessions in the last 7 days, whole roster |
-| **Notes to read** | Session notes from the last 14 days not yet marked read (the same number as the badge on Athletes). It was called *Waiting on you* until 2026-10-10 |
+| **Notes to read** | Session notes that arrived in the last 14 days and are not yet marked read (the same number as the badge on Athletes). It was called *Waiting on you* until 2026-10-10 |
 
 Beside them: the current season and how many days into it you are.
 
@@ -231,7 +231,7 @@ off at 10 rows of notes.) The header counts **people**; the counter above counts
 
 | Reason | Trigger | Weight |
 |---|---|---|
-| **N notes to read** | A session in the last 14 days carries a note (the day note, or a note on an exercise) and `coach_status` is still `new` | 100+ |
+| **N notes to read** | A session carries a note (the day note, or a note on an exercise), `coach_status` is still `new`, and the note **arrived** in the last 14 days: the day it reached the server (`updated_at`), not the day the athlete trained. A phone that syncs a fortnight late delivers a note that is new to you; filed by its training day it used to land in *older notes* and never reach this list. The newest arrival comes first | 100+ |
 | **Session not synced** | The phone sent a report for a day that has no `session_history` row (every number here is wrong for them until it is fixed) | 80 |
 | **Run of low days** | A coached athlete's last 5 check-ins (within 3 weeks) hold 3 lower or short days, or stress 2 or lower on 3 of them (REC-2: the run is your call, never the app's) | 70 |
 | **Cycle ended N days ago — renew?** | The current cycle's `endDate` passed in the last 14 days | 60 |
@@ -254,9 +254,11 @@ opens the day the note is on; a Proof reason opens Proof). **Show all** lists ev
 first 12. (An *N unread messages* row sat here until 2026-09-26, when the in-app chat was removed
 from both apps: athletes message you on WhatsApp now.)
 
-**Clear** on the *older notes* row marks exactly the notes it counted, by their key. It used to
-mark every unread session older than 14 days on the server, including notes that arrived after
-the page loaded.
+**Clear** on the *older notes* row (notes that arrived more than 14 days ago and were never marked
+read) marks exactly the notes it counted, by their key. It used to mark every unread session
+older than 14 days on the server, including notes that arrived after the page loaded. A note you
+imported yourself with *+ Add past session from email* arrives the moment you save it, so it shows
+in Needs you until you mark it read (it is not marked read for you: the preview does not show the note).
 
 **Today's targets on a session (2026-09-26).** When an athlete's check-in eased the day (REC-2), the
 session line on The work says *lower day*, *short day* or *sore* (and *trained as written* if they
@@ -459,6 +461,14 @@ here and one lift there — both sides run the same name matcher, on purpose.
   replaces a session logged on the same date (the email's session replaces it, set-by-set log
   included: since stage46 that is true, before it the old log stayed under the new text) or
   adds a second one within a week. It reads the whole athlete note, not just its first line.
+  It also reads the **check-in line** (2026-10-10): the "Today: lower day (…) · sore: jumps and landings
+  halved — trained as written by choice" that the app writes on the Readiness field and in the full
+  summary, stored as `{ level, sore, drop, asWritten, score }` exactly as the app stores it, so the
+  session is judged on the day's real targets and counts toward *run of low days*. An email with no
+  such line stores no verdict: it is either a normal day or older than 2026-09-26, and the two cannot
+  be told apart, so nothing is guessed. `parseCheckinPlan()` reads it and `scripts/check_twins.js`
+  round-trips the app's own `readinessPlanLine()` through it. Claude's Gmail import
+  (`IMPORTING_SESSION_REPORTS.md`) stores the same keys.
 
 ## 6. The three metrics
 
@@ -590,9 +600,22 @@ The **prescribed-vs-done** comparison joins the plan in `programs` with what hap
 the plain-text `summary` that `program.html` wrote into `session_history` (with the names taken
 from the structured `log` when it lines up). Both readers live in `coach.html` (`rxOf()` from
 `assets/js/chips.js`, `parseSessionLog()`) and both mirror code in `program.html` — change the
-grammar there and they have to follow. `node scripts/test_coach_compare.js` runs 72 assertions
-over real logs and catches it if they don't. The write paths (saves, deletes, logins, backups) are
+grammar there and they have to follow. `node scripts/test_coach_compare.js` runs 87 assertions
+over real logs and the email import, and catches it if they don't. The write paths (saves, deletes, logins, backups) are
 covered by the real-mode harness in `scripts/headless/coach/`.
+
+**Logic that exists in both apps is guarded** (`scripts/check_twins.js`, pre-commit guard 15, 2026-10-10).
+It cuts each twin out of both files and runs the same vectors through both: the exercise-name
+tiers (`exNameVariants` / `exNameVariantsC`), a renamed lift (`ceilAliasMap` / `ceilAliasMapC`), the
+Spine lookup (`spineFor` / `spineForC`), today's RPE target on a lower day (`dayRpe` / `dayTargetC`), what
+the Quality check counts (`qmSets`, `isPrepBlockTitle` / `qmSetsC`, `QM_PREP`), and the check-in line's
+writer and reader (`readinessPlanLine` / `parseCheckinPlan`). It also fails a change to `assets/js/chips.js`
+that keeps coach.html's hand-typed `?v=` (the service worker serves `/assets/` cache-first): bump the
+token, then `node scripts/check_twins.js --stamp`. `scripts/test_check_twins.js` breaks a copy on purpose
+to prove each kind of drift is caught. Not covered, on purpose: the week-note input to the lower-day
+target (WORK-11), the dashboard resolving cards against drafts too (TWIN-1), the 30-hour "leftover
+session" window (TWIN-6) and the loose retest flag (TWIN-7) are known differences, listed in the script's
+header. A new copy of an app rule in coach.html goes into the script the same day.
 
 Some coach writes go through RPCs that check the coach themselves (`set_coach_note`, `hide_note`,
 `set_quests`, `clear_quests`, `forget_contact`, `save_session`, `coach_season_levels`); the rest are

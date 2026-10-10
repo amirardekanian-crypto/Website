@@ -857,7 +857,8 @@ const UPGRADE_DAYS = 14;                          // free athlete with this many
 // coach acts on them, so without a window the counter silently accumulates
 // every note ever written (51 of them, back to June, on the day this shipped)
 // and the headline number stops meaning anything. Older ones become a backlog
-// row you can discharge in one tap.
+// row you can discharge in one tap. The fortnight is counted from when the note ARRIVED
+// (noteArrivedOn), not from the training day.
 const NEEDS_WINDOW_DAYS = 14;
 
 const DEMO = new URLSearchParams(location.search).has('demo');
@@ -987,6 +988,20 @@ function copyText(t, btn) {
 function isPartialStatus(s) { return String(s || '').toLowerCase().indexOf('partial') === 0; }
 function sessionHasNote(s) { return !!((s.day_note && s.day_note.trim()) || (s.summary && /\n\s+Note:/.test(s.summary))); }
 function sessionNeedsReply(s) { return sessionHasNote(s) && (s.coach_status || 'new') === 'new'; }
+// When a session's note reached the server, as a day in the coach's own time zone: the row's updated_at
+// (save_session stamps it on every save, and the coach marking a note read does not touch it). A note's age
+// is counted from here, not from the day the athlete trained: a phone that syncs a fortnight late delivers
+// a note that is new to the coach, and filing it by its training day dropped it straight into "older notes"
+// where it never reached Needs you (audit TODAY-2). The training day is the fallback for a row with no stamp.
+function noteArrivedOn(s) {
+  const t = s && s.updated_at ? new Date(s.updated_at) : null;
+  return t && !isNaN(t.getTime()) ? dkey(t) : String((s && s.completed_on) || '');
+}
+// Newest arrival first; ties fall back to the later training day, then the later Day number.
+function byArrival(a, b) {
+  return String(b.updated_at || '').localeCompare(String(a.updated_at || ''))
+    || String(b.completed_on || '').localeCompare(String(a.completed_on || '')) || (Number(b.day) || 0) - (Number(a.day) || 0);
+}
 function sessionNoteText(s) {
   if (s.day_note && s.day_note.trim()) return s.day_note.trim();
   const notes = [];
@@ -1901,10 +1916,11 @@ function assemble() {
     a.lowRun = a.tier === 'coached' ? lowRunOf(a.sessions) : '';
     // Split unanswered notes at the window: `recent` is what "waiting" means
     // anywhere a count is shown; `stale` is backlog. Every note still keeps its
-    // own reply buttons on the athlete's file regardless of age.
+    // own reply buttons on the athlete's file regardless of age. Age is the day the
+    // note ARRIVED (noteArrivedOn), newest first, so the row on Today opens the latest one.
     const cut = addDays(todayKey(), -NEEDS_WINDOW_DAYS);
-    a.needReplySessions = a.sessions.filter(sessionNeedsReply);
-    a.needReplyRecent = a.needReplySessions.filter(s => s.completed_on && s.completed_on >= cut);
+    a.needReplySessions = a.sessions.filter(sessionNeedsReply).sort(byArrival);
+    a.needReplyRecent = a.needReplySessions.filter(s => noteArrivedOn(s) >= cut);
     a.needReplyStale = a.needReplySessions.length - a.needReplyRecent.length;
     a.toReply = a.needReplyRecent.length;
     const t = todayKey();
@@ -2319,7 +2335,7 @@ function needPanelHtml() {
     <div class="need" style="border-style:dashed">
       <span class="dot" style="background:var(--muted-soft)"></span>
       <span class="b"><span class="n">${stale} older note${stale === 1 ? '' : 's'}</span>
-        <div class="s">Never marked read, older than ${NEEDS_WINDOW_DAYS} days — history, not today's work</div></span>
+        <div class="s">Never marked read, arrived more than ${NEEDS_WINDOW_DAYS} days ago — history, not today's work</div></span>
       <button class="btn sm" onclick="clearNoteBacklog()">Clear</button>
     </div>` : '';
   return `
@@ -2336,15 +2352,15 @@ function openAthlete(id, sub, day, completedOn) {
   location.hash = 'a/' + encodeURIComponent(id) + '/' + (sub || 'work');
 }
 window.openAthlete = openAthlete;
-// Discharge the backlog in one action. Only touches notes older than the
-// window that are still 'new' — nothing recent, and nothing already handled.
+// Discharge the backlog in one action. Only touches notes that arrived before the
+// window and are still 'new' — nothing recent, and nothing already handled.
 async function clearNoteBacklog() {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   // Exactly the notes the row counted, by their key. It used to mark every 'new' session older
   // than the cut on the server, including notes that arrived after the page loaded and were never shown.
   const rows = Object.values(S.ath).flatMap(a => a.needReplySessions.filter(s => a.needReplyRecent.indexOf(s) === -1));
   if (!rows.length) return;
-  if (!confirm(`Mark ${rows.length} note${rows.length === 1 ? '' : 's'} older than ${NEEDS_WINDOW_DAYS} days as read?\n\nThey stay on each athlete's file — this only clears them out of "needs you".`)) return;
+  if (!confirm(`Mark ${rows.length} note${rows.length === 1 ? '' : 's'} that arrived more than ${NEEDS_WINDOW_DAYS} days ago as read?\n\nThey stay on each athlete's file — this only clears them out of "needs you".`)) return;
   let done = 0, failed = 0;
   const marked = [];
   for (const r of rows) {
@@ -4099,7 +4115,40 @@ function parseSessionEmail(text) {
       readiness = { composite: comp ? Number(comp[1]) : null, sleep, energy, soreness, stress, overall };
     }
   }
+  // What the check-in decided for the day (REC-2), when the email says: stored the way the app stores it so
+  // the work tab judges the imported session on the day's real targets and "run of low days" counts it.
+  if (readiness && !readiness.skipped) {
+    const plan = parseCheckinPlan(t);
+    if (plan) {
+      const four = [readiness.sleep, readiness.energy, readiness.stress, readiness.overall].map(Number);
+      Object.assign(readiness, plan, four.every(x => x >= 1 && x <= 5) ? { score: Math.round(four.reduce((a, b) => a + b, 0) / 4 * 100) / 100 } : {});
+    }
+  }
   return { day, focus, status, session_rpe: rpeM ? rpeM[1] : '', duration_min: durM ? durM[1] : '', readiness, day_note: note, summary, who };
+}
+// The check-in's verdict, from the words program.html's readinessPlanLine() writes: "Today: lower day (every RPE 1
+// lower, never below 6) · sore: jumps and landings halved — trained as written by choice". The email carries it twice:
+// on the Readiness field, after "Overall n ·", and on a "Today:" line of the full summary. It is only written when the
+// day was lower or short or the athlete was sore, so no line means a normal day OR an email from before 2026-09-26:
+// the two cannot be told apart, so this returns null and the import stores no verdict (never a guessed "normal day").
+// Returns { level, sore, drop, asWritten } as the app stores it, or null. `base` (the athlete's usual) is not in the email.
+function parseCheckinPlan(text) {
+  const t = String(text || '').replace(/\r/g, '');
+  const m = /(?:Overall\s+\d+\s*[^\w\n]{0,3}\s*|^[ \t]*Today:[ \t]*)(?=short\s+day\s*\(|lower\s+day\s*\(|sore:\s*jumps\s+and\s+landings\s+(?:halved|skipped))/m.exec(t);
+  if (!m) return null;
+  // The rest of that line, plus a wrapped continuation, up to the next blank line: a mail client may break it.
+  let win = t.slice(m.index + m[0].length, m.index + m[0].length + 300);
+  const blank = win.search(/\n[ \t]*\n/);
+  if (blank >= 0) win = win.slice(0, blank);
+  win = win.replace(/\s+/g, ' ');
+  // Exactly the words the app writes (case and all): a note that happens to say "short day" must not set the
+  // level. Short/lower day are the first words after the separator, so only the head is read for them.
+  // scripts/check_twins.js runs readinessPlanLine() through this, so a reworded line fails a commit.
+  const head = win.slice(0, 12);
+  const red = /^short day/.test(head), amber = !red && /^lower day/.test(head);
+  const sore = /sore:\s*jumps and landings skipped/.test(win) ? 'skip' : /sore:\s*jumps and landings halved/.test(win) ? 'half' : '';
+  if (!red && !amber && !sore) return null;
+  return { level: red ? 'red' : amber ? 'amber' : 'green', sore, drop: red || amber ? 1 : 0, asWritten: /trained as written by choice/.test(win) };
 }
 // Does the email's "Athlete" line name this athlete? Loose on purpose (first name, either order).
 function emailNamesAthlete(who, athleteId) {
@@ -4120,7 +4169,7 @@ function parseAndFillSession() {
   _pendingImport = parseSessionEmail(ta.value);
   const p = _pendingImport;
   const r = p.readiness;
-  const rTxt = !r ? '—' : r.skipped ? 'skipped' : `${r.composite != null ? r.composite + '/5' : ''}`;
+  const rTxt = !r ? '—' : r.skipped ? 'skipped' : `${r.composite != null ? r.composite + '/5' : ''}${planLabelC(r) ? ' · ' + planLabelC(r) : ''}`;
   $('as-preview').innerHTML = !p.day
     ? '<p style="color:var(--clay-ink);margin-top:10px">Couldn\'t find a "Day N" line — paste the full email (including the Full summary block).</p>'
     : `<table class="meta-table">
@@ -5896,7 +5945,7 @@ function demoStore() {
     mkSession('demo_lena', 'Lena', 2, 3, 9, 65, 'Partial — ran out of time'),
     mkSession('demo_mina', 'Mina', 1, 1, 6, 40, 'Complete'),
     mkSession('demo_omid', 'Omid', 1, 9, 7, 50, 'Complete'),
-    // Older than NEEDS_WINDOW_DAYS, still unanswered — exercises the backlog row.
+    // Arrived more than NEEDS_WINDOW_DAYS ago (updated_at follows the training day here), still unanswered — exercises the backlog row.
     mkSession('demo_mina', 'Mina', 2, 22, 7, 45, 'Complete', 'Grip went on the last set.'),
     mkSession('demo_omid', 'Omid', 2, 30, 6, 40, 'Complete', 'Hotel gym had no kettlebells.'),
   ];

@@ -72,6 +72,16 @@ secure links to read an id from.
    - `readiness` ← from `Readiness  : Composite X/5 · Sleep a · Energy b · Soreness c · Stress d · Overall e`
      → `{"composite":X,"sleep":a,"energy":b,"soreness":c,"stress":d,"overall":e}`;
      `{"skipped":true}` if skipped; `null` if absent.
+     **Add the check-in's verdict when the report has it** (2026-10-10): after `Overall e` the Readiness
+     line carries `· lower day (every RPE 1 lower, never below 6)` or `· short day (warm-up, first power move and
+     first primary lift; the rest optional)`, then `· sore: jumps and landings halved|skipped`, then
+     `— trained as written by choice`; the full summary repeats it on a `Today: …` line. Store
+     `"level"` (`"amber"` for lower day, `"red"` for short day, `"green"` when only the sore words are there),
+     `"sore"` (`"half"`, `"skip"`, or `""`), `"drop"` (1 for amber or red, else 0), `"asWritten"` (true when
+     "trained as written by choice" is there) and `"score"` (the mean of Sleep, Energy, Stress and Overall,
+     to 2 decimals). **No such line: store none of these**, because a normal day and an email from before
+     2026-09-26 look the same, and `"level":"green"` must never be guessed. The words are read by
+     `parseCheckinPlan()` in coach.html, the same code the dashboard's *Add past session from email* uses.
    - `day_note` ← text after `Notes from athlete  :` (null if empty/`(none)`).
    - `summary` ← everything after `Full summary  :` (keep verbatim — it holds the exercise log).
    - `completed_on` ← the date part (YYYY-MM-DD) of the email's date; `updated_at` ← the full timestamp.

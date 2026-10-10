@@ -135,7 +135,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 `SCHEMA.md` and the coaching rules in the principles' rule index. What must never break:
 
 - **Things that exist more than once: change every copy, or the coach and the athlete see different
-  numbers and nothing errors.** `rxOf()`/`repCount()`/`tempoDisplay()` (program.html + `assets/js/chips.js`,
+  numbers and nothing errors** (`scripts/check_twins.js` runs the dashboard/app pairs it can; `check_rx.js`,
+  `check_setlog.js` and `check_parity.py` cover the rest). `rxOf()`/`repCount()`/`tempoDisplay()` (program.html + `assets/js/chips.js`,
   guarded by `scripts/check_rx.js`) · the Quality mix and its minutes rule (`qualityMix()`, `qualityCheckC()`,
   `/program-design`, `check_program.py`) · the Spine resolver (`spineFor()` / `spineForC()`) · the body-part
   region and impact lists (four copies) · the muscle list of the Spine's volume credits (SIX copies since the
@@ -320,6 +321,9 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   used to reload everything and throw away typed work).
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
   (38 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+- **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
+  (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
+  After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.
 - supabase-js is pinned (2.117.3); bump it only with the harness's `reallib.js` run.
 
 ## Site layout (GitHub Pages → amirardekani.com)
