@@ -370,7 +370,20 @@ console.log('12. email import: the check-in line');
   // Words in the athlete's own note must not set the level.
   r = parseSessionEmail(email('', null).replace('Short day at work, knee felt fine.', 'Today: short day at work, then a lower day (tired) and sore: jumps felt fine')).readiness;
   is(r.level, undefined, 'a note that talks about a short or lower day sets nothing');
+  // Review of 2026-10-10: these ways an athlete writes about their own day used to set a verdict. The words must
+  // follow the whole answers line or sit in the readiness block; a note is neither.
+  for (const note of ['Today: short day (only 40 min), cut the accessories', 'Overall 8 - lower day (poor sleep) but fine', 'Overall 8, short day (travel)',
+    'Composite 3/5 felt like a lower day (sleep)', 'Today: sore: jumps and landings halved, knee', 'Stress 4 \u00b7 Overall 4 \u00b7 lower day (tired)']) {
+    r = parseSessionEmail(email('', null).split('Short day at work, knee felt fine.').join(note)).readiness;
+    is([r.level, r.sore, r.drop, r.score], [undefined, undefined, undefined, undefined], 'a note cannot set a verdict: ' + note);
+  }
+  r = parseSessionEmail(email(' \u00b7 ' + LOWER, 'Today: ' + LOWER).split('Short day at work, knee felt fine.').join('Today: short day (only 40 min)')).readiness;
+  is([r.level, r.drop], ['amber', 1], '...and the real line still wins over a note that imitates it');
+  // The score only exists when all four answers are 1 to 5; a verdict without one is still stored.
+  r = parseSessionEmail(['Day 1 \u2014 T', 'Status: Complete', 'Readiness', 'Composite 3/5 \u00b7 Sleep 3 \u00b7 Energy 0 \u00b7 Soreness 2 \u00b7 Stress 4 \u00b7 Overall 3 \u00b7 ' + LOWER, '', 'Full summary', 'Day 1 \u2014 T'].join('\n')).readiness;
+  is([r.level, r.energy, r.score], ['amber', 0, undefined], 'an answer outside 1 to 5 stores the verdict but no score');
   is(parseCheckinPlan('Today: Short day at work'), null, 'the wrong case, no parenthesis: not the app\'s line');
+  is(parseCheckinPlan('Today: ' + LOWER), null, 'the bare Today line, with no readiness block or answers line around it, is not the app\'s email');
   is(parseCheckinPlan(''), null, 'empty text');
   // A skipped check-in has nothing to judge.
   const sk = parseSessionEmail(['Day 1 — Legs', 'Status: Complete', 'Readiness (at start): skipped', 'Today: ' + LOWER].join('\n')).readiness;

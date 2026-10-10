@@ -48,7 +48,7 @@ The work · Proof · Calls · File.
 `dayTargetC()` here), the Spine resolver (`spineFor()` / `spineForC()`), the name matcher
 (`ceilAliasMap()` / `ceilAliasMapC()`), the set-log grammar, the muscle list (six copies), the
 WhatsApp link builder (now one: `waLink()`), and the "needs you" rule (now one: `reasonsOf()`; it
-was four). These are guarded by `scripts/test_coach_compare.js` (72 assertions) and the word-list
+was four). These are guarded by `scripts/test_coach_compare.js` (96 assertions since the second session) and `scripts/check_twins.js` (TWIN-10), and the word-list
 checks in pre-commit.
 
 **Where data lives:** only on the server. Nothing in coach.html reads `data/<id>.json` any more (the
@@ -196,7 +196,7 @@ Proposed, in order, still within "no new features":
   (made-up athletes): every save, delete, login, backup and import path, the auth events, the Spine
   editor (Claude's work survives, a clash is refused, a failed load offers nothing to save, renames,
   unsaved work), WhatsApp links. Before the fixes: 32 failing checks. Now: 0.
-- `node scripts/test_coach_compare.js`: 72 assertions over the plan-vs-logged compare (renames,
+- `node scripts/test_coach_compare.js`: 72 assertions (96 after the second session, which added the email import) over the plan-vs-logged compare (renames,
   repeats, unticked sets, sore halving, optional work). All pass.
 - `reallib.js`: the real supabase-js 2.117.3: 1 load at page open, 0 when the tab comes back (was 3).
 - The athlete app after the merge with main: smoke 27/27, cycle-end 22/22, YouTube 68/68, AA Proof
@@ -425,7 +425,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | TWIN-7 | low | Personal records: the coach's age is off by one before noon, and the retest flag is parsed three different ways | Partly | Record ages are now counted in calendar days, so yesterday no longer reads 'today' before noon. | The retest flag is still read differently by the dashboard (any text shows as a tag) and the athlete app (only true or 1-10RM counts), and the programme checker still does not reject a bad test value. |
 | TWIN-8 | low | The checker's name matching (Python norm_name and the --spine-sql NORM/LOOSE match) is not the apps' exNameVariants | Open |  | The programme checker's Python and SQL name matching is still written separately from the apps' name rules, with no shared test cases. |
 | TWIN-9 | low | The Quality check predicts the athlete's day cards from a weekly number; docs claim the coach applies the 70% gate and 12% cut | Open |  | The dashboard's Quality check is still weekly only and never says when a day card will be blank, and PROGRAM-APP.md still says the coach applies the 70% and 12% rules. |
-| TWIN-10 | low | Most coach.html twins have no guard; only rxOf, the set-log grammar and the word lists are checked | Fixed | `scripts/check_twins.js` runs the exercise-name tiers, renamed lifts, the Spine lookup, the lower-day RPE target, the Quality check's counts and the check-in line's writer and reader through both copies (839 checks, every pair agreed on the first run), and `scripts/test_check_twins.js` proves it fails when a twin drifts. The known differences (WORK-11, TWIN-1, TWIN-6, TWIN-7) are listed in the script's header, not hidden. (2026-10-10, second session) |  |
+| TWIN-10 | low | Most coach.html twins have no guard; only rxOf, the set-log grammar and the word lists are checked | Fixed | `scripts/check_twins.js` runs the exercise-name tiers, renamed lifts, the Spine lookup, the lower-day RPE target, the Quality check's counts and the check-in line's writer and reader through both copies (923 checks, every pair agreed on the first run), and `scripts/test_check_twins.js` proves it fails when a twin drifts. The known differences (WORK-11, TWIN-1, TWIN-6, TWIN-7) are listed in the script's header, not hidden. (2026-10-10, second session) |  |
 
 ### Driven in a browser (HARNESS)
 

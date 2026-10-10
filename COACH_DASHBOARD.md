@@ -600,7 +600,7 @@ The **prescribed-vs-done** comparison joins the plan in `programs` with what hap
 the plain-text `summary` that `program.html` wrote into `session_history` (with the names taken
 from the structured `log` when it lines up). Both readers live in `coach.html` (`rxOf()` from
 `assets/js/chips.js`, `parseSessionLog()`) and both mirror code in `program.html` — change the
-grammar there and they have to follow. `node scripts/test_coach_compare.js` runs 87 assertions
+grammar there and they have to follow. `node scripts/test_coach_compare.js` runs 96 assertions
 over real logs and the email import, and catches it if they don't. The write paths (saves, deletes, logins, backups) are
 covered by the real-mode harness in `scripts/headless/coach/`.
 

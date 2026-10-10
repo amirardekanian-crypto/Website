@@ -3705,7 +3705,9 @@ function metricStripHtml(m) {
   const LV = { red: ['red', 'short day'], amber: ['amber', 'lower day'], green: ['green', 'normal day'] };
   if (lp && LV[lp.level] && lp.score != null) {
     const [tone, said] = LV[lp.level];
-    m._readyPill = { val: round1(lp.score) + '<small>/5</small>', sub: said + (lp.base != null ? ' · usual ' + round1(lp.base) : ' · no usual yet'), tone };
+    // `base: null` is the app saying "fewer than 5 check-ins so far"; no `base` key at all is an imported email,
+    // which cannot know their usual, so it says nothing about it rather than "no usual yet".
+    m._readyPill = { val: round1(lp.score) + '<small>/5</small>', sub: said + (lp.base != null ? ' · usual ' + round1(lp.base) : 'base' in lp ? ' · no usual yet' : ''), tone };
   }
   const rTone = !r ? '' : r.delta <= -1 ? 'red' : r.delta <= -0.5 ? 'amber' : 'green';
   const aTone = !adh || adh.pct == null ? '' : adh.pct >= 85 ? 'green' : adh.pct >= 60 ? 'amber' : 'red';
@@ -4128,22 +4130,27 @@ function parseSessionEmail(text) {
 }
 // The check-in's verdict, from the words program.html's readinessPlanLine() writes: "Today: lower day (every RPE 1
 // lower, never below 6) · sore: jumps and landings halved — trained as written by choice". The email carries it twice:
-// on the Readiness field, after "Overall n ·", and on a "Today:" line of the full summary. It is only written when the
-// day was lower or short or the athlete was sore, so no line means a normal day OR an email from before 2026-09-26:
-// the two cannot be told apart, so this returns null and the import stores no verdict (never a guessed "normal day").
+// on the Readiness field, after the answers ("Composite 3.5/5 · Sleep 3 · … · Overall 3 · lower day …"), and as a
+// "Today:" line at the end of the readiness block of the full summary. It is only written when the day was lower or
+// short or the athlete was sore, so no line means a normal day OR an email from before 2026-09-26: the two cannot be
+// told apart, so this returns null and the import stores no verdict (never a guessed "normal day").
 // Returns { level, sore, drop, asWritten } as the app stores it, or null. `base` (the athlete's usual) is not in the email.
+// ⚠ ANCHORED on purpose: the words must follow the whole answers line, or sit in the readiness block itself. An
+// athlete's own note ("Today: short day (only 40 min)", "Overall 8, lower day (poor sleep)") must never set a level.
 function parseCheckinPlan(text) {
   const t = String(text || '').replace(/\r/g, '');
-  const m = /(?:Overall\s+\d+\s*[^\w\n]{0,3}\s*|^[ \t]*Today:[ \t]*)(?=short\s+day\s*\(|lower\s+day\s*\(|sore:\s*jumps\s+and\s+landings\s+(?:halved|skipped))/m.exec(t);
+  const WORDS = '(?=short\\s+day\\s*\\(|lower\\s+day\\s*\\(|sore:\\s*jumps\\s+and\\s+landings\\s+(?:halved|skipped))';
+  const m = new RegExp(
+    '(?:Composite\\s+[\\d.]+/5\\s*·\\s*Sleep\\s+\\d+\\s*·\\s*Energy\\s+\\d+\\s*·\\s*Soreness\\s+\\d+\\s*·\\s*Stress\\s+\\d+\\s*·\\s*Overall\\s+\\d+\\s*·\\s*' +
+    '|Readiness \\(at start\\)[^\\n]*(?:\\n[ \\t]*\\S[^\\n]*){1,8}?\\n[ \\t]*Today:[ \\t]*)' + WORDS).exec(t);
   if (!m) return null;
   // The rest of that line, plus a wrapped continuation, up to the next blank line: a mail client may break it.
   let win = t.slice(m.index + m[0].length, m.index + m[0].length + 300);
   const blank = win.search(/\n[ \t]*\n/);
   if (blank >= 0) win = win.slice(0, blank);
   win = win.replace(/\s+/g, ' ');
-  // Exactly the words the app writes (case and all): a note that happens to say "short day" must not set the
-  // level. Short/lower day are the first words after the separator, so only the head is read for them.
-  // scripts/check_twins.js runs readinessPlanLine() through this, so a reworded line fails a commit.
+  // Exactly the words the app writes (case and all). Short/lower day are the first words after the separator, so
+  // only the head is read for them. scripts/check_twins.js runs the app's real writer through this.
   const head = win.slice(0, 12);
   const red = /^short day/.test(head), amber = !red && /^lower day/.test(head);
   const sore = /sore:\s*jumps and landings skipped/.test(win) ? 'skip' : /sore:\s*jumps and landings halved/.test(win) ? 'half' : '';

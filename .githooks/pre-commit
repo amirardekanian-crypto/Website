@@ -287,12 +287,15 @@ fi
 # when a twin drifts, and runs only when the guard itself changes.
 if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|coach\.html|assets/js/chips\.js|scripts/(check_twins|test_check_twins)\.js|scripts/twins_stamp\.json)$'; then
   echo "pre-commit: program.html, coach.html or chips.js changed — checking the rules they share still agree..."
-  if node scripts/check_twins.js >/dev/null; then
+  # CHECK_TWINS_INDEX=1: read the STAGED files, the ones that will be committed. A ?v= bumped in the working tree but
+  # left unstaged must not pass. The output is kept so a failure is printed once.
+  twins_out=$(CHECK_TWINS_INDEX=1 node scripts/check_twins.js 2>&1)
+  if [ $? -eq 0 ]; then
     echo "pre-commit: shared rules OK."
   else
-    node scripts/check_twins.js 2>&1 | grep -v '^  ok ' | head -40
+    echo "$twins_out" | grep -v '^  ok ' | head -60
     echo ""
-    echo "pre-commit: BLOCKED — coach.html and program.html disagree about a shared rule (details above). Change BOTH copies."
+    echo "pre-commit: BLOCKED — a rule shared by coach.html and program.html, or the chips.js cache stamp, is out of step (details above)."
     failed=1
   fi
   if git diff --cached --name-only --diff-filter=ACM | grep -qE '^scripts/(check_twins|test_check_twins)\.js$'; then

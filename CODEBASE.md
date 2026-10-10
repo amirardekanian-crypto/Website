@@ -537,7 +537,7 @@ import's reader `parseCheckinPlan()`, 300 random answer sets included). A functi
 rename has to come here. It also checks coach.html's hand-typed `chips.js?v=` token: an edit to chips.js under
 an unchanged token fails (the service worker serves `/assets/` cache-first); bump it, then run
 `node scripts/check_twins.js --stamp` to refresh `scripts/twins_stamp.json`. `scripts/test_check_twins.js`
-breaks a copy of the files on purpose, ten ways, and requires the guard to fail each time. The known, deliberate
+breaks a copy of the files on purpose, twenty ways, and requires the guard to fail each time. The known, deliberate
 differences (the week-note input, drafts, the leftover-session window, the retest flag) are in the script's header.
 Already guarded elsewhere: `rxOf()` (`check_rx.js`), the set-log grammar (`check_setlog.js`), the word lists
 (`check_parity.py`), the XP rules (`check_xp_rules.py`).

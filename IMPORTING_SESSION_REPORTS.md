@@ -107,6 +107,9 @@ on conflict (athlete_id, day, completed_on) do update set
 
 ## Conventions used (so imports stay consistent)
 
+- **`updated_at` is the email's timestamp, never the time of the import.** coach.html counts a note's age
+  from it (a note "arrives" when its report did), so an old report's note stays out of Needs you and a
+  recent one shows there. Left to default to `now()` it would look as if it arrived today.
 - **Dates are the email date in UTC.** A handful of late-evening sessions could be off
   by one local day — negligible for weekly consistency.
 - **`coach_status` = `read`** on import, so backfilled notes don't flood the "to reply"
