@@ -21,9 +21,10 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands:** of 191 findings, 114 are fixed, 53 partly fixed (the harm is gone, something named
-in the finding is left), 12 wait on a decision from you, 11 are open (all low or medium) and 1 was not
-a bug. Of the 45 critical and high ones, 32 are fixed, 10 partly and 3 are your call; none is untouched.
+**Where it stands** (after the second session, 2026-10-10): of 191 findings, 118 are fixed, 51 partly fixed
+(the harm is gone, something named in the finding is left), 12 wait on a decision from you, 9 are open (all
+low or medium) and 1 was not a bug. Of the 45 critical and high ones, 34 are fixed, 8 partly and 3 are your
+call; none is untouched.
 
 ## 2. The system, as it is now
 
@@ -47,7 +48,7 @@ The work · Proof · Calls · File.
 `dayTargetC()` here), the Spine resolver (`spineFor()` / `spineForC()`), the name matcher
 (`ceilAliasMap()` / `ceilAliasMapC()`), the set-log grammar, the muscle list (six copies), the
 WhatsApp link builder (now one: `waLink()`), and the "needs you" rule (now one: `reasonsOf()`; it
-was four). These are guarded by `scripts/test_coach_compare.js` (72 assertions) and the word-list
+was four). These are guarded by `scripts/test_coach_compare.js` (96 assertions since the second session) and `scripts/check_twins.js` (TWIN-10), and the word-list
 checks in pre-commit.
 
 **Where data lives:** only on the server. Nothing in coach.html reads `data/<id>.json` any more (the
@@ -195,7 +196,7 @@ Proposed, in order, still within "no new features":
   (made-up athletes): every save, delete, login, backup and import path, the auth events, the Spine
   editor (Claude's work survives, a clash is refused, a failed load offers nothing to save, renames,
   unsaved work), WhatsApp links. Before the fixes: 32 failing checks. Now: 0.
-- `node scripts/test_coach_compare.js`: 72 assertions over the plan-vs-logged compare (renames,
+- `node scripts/test_coach_compare.js`: 72 assertions (96 after the second session, which added the email import) over the plan-vs-logged compare (renames,
   repeats, unticked sets, sore halving, optional work). All pass.
 - `reallib.js`: the real supabase-js 2.117.3: 1 load at page open, 0 when the tab comes back (was 3).
 - The athlete app after the merge with main: smoke 27/27, cycle-end 22/22, YouTube 68/68, AA Proof
@@ -259,14 +260,14 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-191 findings. Fixed 114 · Partly 53 · Open 11 · Your call 12 · Not a bug 1.
+191 findings. Fixed 118 · Partly 51 · Open 9 · Your call 12 · Not a bug 1.
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
-| high | 20 | 10 | 0 | 3 | 0 |
-| medium | 48 | 30 | 3 | 7 | 0 |
-| low | 34 | 13 | 8 | 2 | 1 |
+| high | 22 | 8 | 0 | 3 | 0 |
+| medium | 49 | 30 | 2 | 7 | 0 |
+| low | 35 | 13 | 7 | 2 | 1 |
 
 ### The work and the ✎ editor (WORK)
 
@@ -309,7 +310,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | ID | Sev | Finding | Status | Now | Still |
 |---|---|---|---|---|---|
 | TODAY-1 | high | 'Cancel this run' says paid quests keep their XP; cancelling actually takes that XP back from every athlete | Your call | The Cancel this run warning now tells the truth: everyone who already completed a quest in the run loses that XP, on the board and in the app. | Your call: should cancelling a live quest week keep the XP people already earned? That needs a small change on the server and in the app. If un-awarding is what you want, nothing more is needed. |
-| TODAY-2 | high | Note backlog is defined and cleared by training date, not by what the coach saw: Clear marks unseen notes read, and late-synced notes skip 'Waiting on you' | Partly | Clear older notes now marks as read only the notes the row counted, matched one by one, and the page updates without downloading everything again. | A note is still sorted by the day the athlete trained, not the day it arrived. A note synced late about a session from more than 14 days ago goes straight to 'older notes' and never shows in Needs you. |
+| TODAY-2 | high | Note backlog is defined and cleared by training date, not by what the coach saw: Clear marks unseen notes read, and late-synced notes skip 'Waiting on you' | Fixed | Clear older notes marks as read only the notes the row counted, matched one by one, and the page updates without downloading everything again. A note's age is now counted from the day it arrived (the row's `updated_at`), not the day the athlete trained, and the unread list is newest arrival first: a note synced late about an old session is waiting for you instead of going straight to older notes. (2026-10-10, second session) |  |
 | TODAY-3 | medium | An athlete's note added or changed after Amir marked the session read never returns to 'Waiting on you' | Partly | Since stage46 (applied), when an athlete adds or edits their session note after you marked it read, the session comes back to Needs you. | This only covers the note for the whole session. A note on a single exercise, added or changed after you marked the session read, still stays read. |
 | TODAY-4 | medium | Coach line is filed on the server's UTC day but read on the browser's local day; the dashboard assumes the coach's day equals the athlete's day | Partly | Your line to the crew is now saved and read under your own date, so after midnight it no longer overwrites yesterday's line or shows the wrong one in the box. | The wall still assumes your day is the athlete's day. A line from an athlete whose clock has already moved to tomorrow just shows a plain date, not 'tomorrow, their time'. |
 | TODAY-5 | high | ACWR divides chronic load by 4 weeks even when only 2–3 weeks exist: every new athlete shows a false 'High load' or 'Climbing' spike in weeks 3–4 | Fixed | The load ratio now averages over the weeks of history the athlete actually has. A new athlete in weeks 3 and 4 no longer shows a false High load or Climbing. |  |
@@ -335,7 +336,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | FILE-5 | high | Login tools trust S.logins blindly: a failed identities read makes the bulk tool silently RESET every existing athlete's password | Fixed | If the login list fails to load, the dashboard says so, hides the bulk button and refuses to create logins, and the server now never resets an existing login on a create: bulk runs skip those athletes and name them. |  |
 | FILE-6 | high | Plaintext athlete passwords stay in athlete_identities for weeks and are copied into every weekly backup | Partly | Backups now blank every stored, unsent password (athlete, course and testing-app logins), and an athlete's File tab shows an unsent password with Copy, WhatsApp and Mark sent. | Passwords still sit in the database until you tap Mark sent, because copying the message does not count as sent and nothing expires them. Whether it should is your call. |
 | FILE-7 | high | 'Delete all data' deletes only sessions and the progress snapshot; programme, login, coaching log, calls, contacts and more survive | Partly | The button is now 'Delete training history'. It lists exactly what goes and what stays, says how many sessions were deleted, and warns you if nothing was removed. | There is still no single button that fully erases an athlete (programme, login, logs, calls, contact). Whether to build one for privacy requests is your call. |
-| FILE-8 | high | Email backfill can file a session on the wrong athlete, on today's date, twice, and drops what the app records | Partly | Adding a past session from an email now warns when the email names a different athlete, has no date filled in for you (you must pick one), warns before replacing or doubling a session for that day, and reads the athlete's whole note. | The email's 'Today: lower day / short day / sore' check-in line is still not read, so an imported session carries no readiness verdict. |
+| FILE-8 | high | Email backfill can file a session on the wrong athlete, on today's date, twice, and drops what the app records | Fixed | Adding a past session from an email now warns when the email names a different athlete, has no date filled in for you (you must pick one), warns before replacing or doubling a session for that day, and reads the athlete's whole note. It also reads the email's check-in line (lower day, short day, sore, trained as written) and stores it the way the app does, so the imported session is judged on the day's real targets and counts toward a run of low days; Claude's Gmail import stores the same keys. (2026-10-10, second session) |  |
 | FILE-9 | medium | Every render repaints the whole athlete file: typed passwords/emails are wiped, open sections close, the card being read collapses | Partly | Redrawing the same athlete no longer flashes a spinner, the day cards you had open and the session you picked stay put, and Mark read updates the page without reloading everything. | A redraw still clears a password you were typing in the login box and an email pasted into Add past session, and it closes Version history and the Coaching log. |
 | FILE-10 | medium | Call logs are cached once per page load: a failed read shows 'No call logs yet' and ↻ Refresh never refetches | Fixed | Call logs are kept only when they really loaded; if they fail, the Calls tab itself says they did not load and ↻ Refresh tries again. |  |
 | FILE-11 | medium | Deleting a session raises a false 'session not synced' warning and can be undone by the athlete's phone | Your call | Nothing has changed: deleting a session still removes it outright. | A deleted session still sets off a false 'session not synced' warning, and the athlete's phone can put it back. This waits on your call on whether a delete should hide the session and keep it recoverable. |
@@ -418,13 +419,13 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | TWIN-1 | medium | The two Spine resolvers read different catalogues, and the phone falls back to a different approved entry when a card's exId is a draft | Open |  | The athlete app still looks a card up by name when its exercise id points at a draft, and the dashboard still predicts videos and quality coverage from all entries including drafts, so the coach and the phone can show different Spine entries for the same card. |
 | TWIN-2 | medium | The coach re-derives the day's adjusted prescription (REC-2 check-in and week notes) from partial inputs, so correct sessions are flagged | Partly | On a sore check-in that halved the jumps, doing exactly half the sets now reads 'half the sets today (sore)' and counts as on plan, and partly done optional work is no longer a miss. | The week-1 and back-off week notes' RPE caps are still not applied when the dashboard judges a lower day, and the athlete app still does not store the targets it actually showed for each exercise. |
 | TWIN-3 | medium | The coach's 'Readiness vs their usual' pill uses a different score and baseline from the one that set the athlete's lower or short day | Partly | The Readiness tile now shows the athlete app's own verdict for the latest check-in (normal, lower or short day, its score and their usual) when the check-in has one. | The readiness chart still plots the old composite against all history, and the manual's Readiness section still describes the old rule. |
-| TWIN-4 | medium | chips.js is shared at runtime through a hand-bumped ?v= behind a cache-first service worker; nothing ties the bump to a change | Open |  | coach.html still loads chips.js with a hand-typed ?v= number and nothing checks that the number changes when chips.js does, so an edit can be hidden behind the cached old file. |
+| TWIN-4 | medium | chips.js is shared at runtime through a hand-bumped ?v= behind a cache-first service worker; nothing ties the bump to a change | Fixed | `scripts/check_twins.js` (pre-commit guard 15) fails a change to `assets/js/chips.js` that keeps coach.html's `?v=` token, and a token bumped without refreshing `scripts/twins_stamp.json`. (2026-10-10, second session) |  |
 | TWIN-5 | medium | Passwords are tidied (Persian or Arabic digits folded, ends trimmed) when Amir creates them, but never when the athlete signs in | Fixed | All four sign-in screens (training app, AA Proof, course app, testing app) now fold Persian and Arabic digits in the username, and retry the password once with digits folded and ends trimmed if the typed one fails. |  |
 | TWIN-6 | medium | The Live app snapshot calls any unfinished touched day 'in progress', ignoring program.html's sessionIsStale() rule | Partly | The live snapshot now labels an old unfinished day 'started <date>, not finished, a leftover' instead of 'in progress'. | It uses its own 30-hour window rather than the athlete app's rule (another day and 6 hours past the check-in), so for some hours the two can disagree, and there is no guard tying them together. |
 | TWIN-7 | low | Personal records: the coach's age is off by one before noon, and the retest flag is parsed three different ways | Partly | Record ages are now counted in calendar days, so yesterday no longer reads 'today' before noon. | The retest flag is still read differently by the dashboard (any text shows as a tag) and the athlete app (only true or 1-10RM counts), and the programme checker still does not reject a bad test value. |
 | TWIN-8 | low | The checker's name matching (Python norm_name and the --spine-sql NORM/LOOSE match) is not the apps' exNameVariants | Open |  | The programme checker's Python and SQL name matching is still written separately from the apps' name rules, with no shared test cases. |
 | TWIN-9 | low | The Quality check predicts the athlete's day cards from a weekly number; docs claim the coach applies the 70% gate and 12% cut | Open |  | The dashboard's Quality check is still weekly only and never says when a day card will be blank, and PROGRAM-APP.md still says the coach applies the 70% and 12% rules. |
-| TWIN-10 | low | Most coach.html twins have no guard; only rxOf, the set-log grammar and the word lists are checked | Open |  | There is still no twin guard script; apart from the prescription, set-log and word-list checks, the dashboard's copies of the app's rules can drift with nothing failing. |
+| TWIN-10 | low | Most coach.html twins have no guard; only rxOf, the set-log grammar and the word lists are checked | Fixed | `scripts/check_twins.js` runs the exercise-name tiers, renamed lifts, the Spine lookup, the lower-day RPE target, the Quality check's counts and the check-in line's writer and reader through both copies (923 checks, every pair agreed on the first run), and `scripts/test_check_twins.js` proves it fails when a twin drifts. The known differences (WORK-11, TWIN-1, TWIN-6, TWIN-7) are listed in the script's header, not hidden. (2026-10-10, second session) |  |
 
 ### Driven in a browser (HARNESS)
 

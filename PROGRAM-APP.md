@@ -160,6 +160,9 @@ off in their notes.
   `score` (S) is the mean of sleep, energy, stress and overall; `base` (B) is the athlete's own mean
   S over their last 10 answered check-ins, once there are 5, from `get_my_history()`'s `ready`
   (**`supabase/stage40_history_readiness.sql`**). The old `composite` is untouched.
+  The emailed report carries the verdict as a `Today: …` line (`readinessPlanLine()`), and coach.html's
+  email import and Claude's Gmail import read it back into `{ level, sore, drop, asWritten, score }`
+  (`parseCheckinPlan()`); `scripts/check_twins.js` fails a commit that rewords one side only.
 - **`paintToday(day)` paints it; nothing is written but the check-in.** A banner under the timer
   says what changed and offers **Train as written** (`setAsWritten()`, kept as `asWritten` and sent
   with the session). Every card with an RPE shows `RPE 8 → 7 today` (one clay pill: `rdTarget()`

@@ -57,7 +57,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-10: 38 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-10: 40 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -73,6 +73,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | coach-line-utc / coach-line-tehran-0130 | post + take down the coach line | no p_day; 00:00–03:30 Tehran overwrote yesterday's line |
 | wall-hide, quest-week, intake-status, affiliates, spine-approve, login-create, session-import-delete | the other writes | ok (login-create now checks the in-place password card) |
 | backlog-clear | Clear older notes | now: one update per counted note, by key |
+| backlog-late-note | a 30-day-old session whose note arrived today; a note trained 12 days ago but delivered today beside yesterday's | filed by training day: skipped Needs you and went into *older notes* (second session; failed 10 checks on the old code) |
 | calllog-delete | delete a call log | the deleted log stayed listed |
 | version-restore | Restore a version, then The work | showed the pre-restore programme |
 | program-file-publish | ↑ Publish programme file (in Coach tools), then the athlete page; a NEW athlete | showed the old cycle; a new athlete was missing until Refresh |
@@ -88,6 +89,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | spine-circuits-count | an exercise used only inside a circuit | counted as unused |
 | walink | intake / funnel WhatsApp links | "@sara_1990" opened wa.me/1990 |
 | session-import-replace | Add past session over one on the same date | the old set-by-set log stayed under the email's text |
+| session-import-checkin | Add past session from an email with the `Today: lower day … · sore: …` check-in line, and one without | the line was never read: no verdict on an imported session (second session) |
 | login-used-mark | Logins to send after the person signed in | every stored password looked unsent |
 | calls-load-fail | call logs fail to load | the Calls tab said "No call logs yet" |
 | route-unknown-sub | `#a/<id>/<unknown>` | "No athlete in the store" |

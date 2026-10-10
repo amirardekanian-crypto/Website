@@ -24,8 +24,13 @@ without reaching the database.
    ```
 2. Gmail: find the Web3Forms **session-report** emails for this athlete in the same window (first
    name + the dates). For each report with no matching row (same date and day), INSERT it,
-   mirroring the existing `summary` / `readiness` format, `coach_status='new'`,
-   `ON CONFLICT DO NOTHING`.
+   mirroring the existing `summary` / `readiness` format, `coach_status='new'`, and `updated_at` = the
+   **email's own timestamp** (coach.html counts a note's age from `updated_at`, the day it arrived: left at
+   the default `now()`, an old report's note looks as if it arrived today and floods Needs you),
+   `ON CONFLICT DO NOTHING`. `readiness` also carries the check-in's verdict when the report has it
+   (`level`, `sore`, `drop`, `asWritten`, `score`, read from the `· lower day (…)` words after `Overall n` or the
+   `Today:` line; store none of them when there is no such line): the rules are in
+   `IMPORTING_SESSION_REPORTS.md` step 2.
 3. Return only this, as plain text, no preamble:
    `IMPORTED: <n> (<dates · day>) · ALREADY THERE: <m> · UNMATCHED EMAILS: <k> (<why>)`
 

@@ -634,6 +634,47 @@ S['session-import-replace'] = async (b) => {
   return r;
 };
 
+// The email's check-in line (audit FILE-8, 2026-10-10): the import stores the day's verdict the way the app does.
+S['session-import-checkin'] = async (b) => {
+  const r = { id: 'session-import-checkin', title: 'Add past session from email: the Today: check-in line is read and stored', checks: [] };
+  const { page, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const LOWER = 'lower day (every RPE 1 lower, never below 6)', SORE = 'sore: jumps and landings halved';
+  const email = ['Athlete', 'Ava Example', '', 'Day', 'Day 3 — Pull Day (fixture)', '', 'Status', 'Complete', '', 'Session RPE', '8/10', '', 'Duration', '40 min', '',
+    'Readiness', `Composite 3.5/5 · Sleep 3 · Energy 4 · Soreness 2 · Stress 4 · Overall 3 · ${LOWER} · ${SORE} — trained as written by choice`, '',
+    'Notes from athlete', 'Fixture imported note.', '', 'Full summary',
+    'Day 3 — Pull Day (fixture)', 'Status: Complete', 'Session RPE: 8/10', 'Duration: 40 min', '',
+    'Readiness (at start) — composite 3.5/5:', '  Sleep last night: 3/5 (Okay)', '  Energy levels: 4/5 (Good)', '  How sore are you: 2/5 (Quite sore)',
+    '  Stress: 4/5 (Calm)', '  How ready do you feel overall: 3/5 (Okay)', `Today: ${LOWER} · ${SORE} — trained as written by choice`, '',
+    'Notes from athlete:', 'Fixture imported note.', '', 'Exercise log:', '', '[Primary]', '• Trap Bar Deadlift (✓)', '    Set 1: 80 ×6 @7 ✓', '    Set 2: 80 ×6 @8 ✓'].join('\n');
+  await page.locator('button', { hasText: 'Add past session from email' }).click();
+  await page.locator('#as-paste').fill(email);
+  await page.locator('button', { hasText: 'Read email' }).click();
+  const preview = await page.locator('#as-preview').innerText();
+  check(r, 'the preview shows the verdict beside the readiness number', /3\.5\/5 · lower day · sore: jumps halved \(trained as written\)/.test(preview.replace(/\s+/g, ' ')), preview.replace(/\s+/g, ' ').slice(0, 300));
+  const day = require('./fixtures').daysAgo(today, 5);
+  await page.locator('#as-date').fill(day);
+  const n0 = await L.nCalls(page);
+  await page.locator('#as-save').click(); await L.settle(page, 800);
+  const c = (await L.callsSince(page, n0)).filter(x => x.name === 'save_session').slice(-1)[0];
+  const rd = c && c.payload.p_session.readiness;
+  check(r, 'save_session carries the verdict in the shape the app stores', rd && rd.level === 'amber' && rd.sore === 'half' && rd.drop === 1 && rd.asWritten === true && rd.score === 3.5, rd);
+  check(r, 'and the answers', rd && rd.composite === 3.5 && rd.sleep === 3 && rd.soreness === 2, rd);
+  const top = await page.locator('.wday', { hasText: 'Pull Day (fixture)' }).locator('.wday-top').innerText();
+  check(r, 'the day card names it like any session the app sent', /lower day · sore: jumps halved \(trained as written\)/.test(top.replace(/\s+/g, ' ')), top.replace(/\s+/g, ' '));
+  // An email with no check-in line stores no verdict.
+  await page.locator('button', { hasText: 'Add past session from email' }).click();
+  await page.locator('#as-paste').fill(email.replace(/Today: [^\n]*\n/, '').replace(/ · lower day[^\n]*/, ''));
+  await page.locator('button', { hasText: 'Read email' }).click();
+  await page.locator('#as-date').fill(require('./fixtures').daysAgo(today, 9));
+  const n1 = await L.nCalls(page);
+  await page.locator('#as-save').click(); await L.settle(page, 800);
+  const c2 = (await L.callsSince(page, n1)).filter(x => x.name === 'save_session').slice(-1)[0];
+  const rd2 = c2 && c2.payload.p_session.readiness;
+  check(r, 'no check-in line: the answers are stored and no verdict is invented', rd2 && rd2.composite === 3.5 && rd2.level === undefined && rd2.sore === undefined, rd2);
+  await page.context().close();
+  return r;
+};
+
 S['login-used-mark'] = async (b) => {
   const r = { id: 'login-used-mark', title: 'Logins to send marks a password that has already been used to sign in', checks: [] };
   const { page } = await L.openCoach(b, { hash: 'athletes' });
@@ -682,6 +723,47 @@ S['backlog-clear'] = async (b) => {
   const d = await L.db(page);
   check(r, 'the old note is read, the recent one is not', d.session_history.find(s => s.athlete_id === 'ben_test' && s.day === 2).coach_status === 'read' && d.session_history.find(s => s.athlete_id === 'ava_test' && s.day === 1 && s.day_note).coach_status === 'new', '');
   check(r, 'the backlog row is gone', (await page.locator('#needPanel button', { hasText: 'Clear' }).count()) === 0, '');
+  await page.context().close();
+  return r;
+};
+
+// A note's age is when it ARRIVED, not the day the athlete trained (audit TODAY-2, 2026-10-10): a phone that
+// syncs a fortnight late delivers a note that is new to the coach.
+S['backlog-late-note'] = async (b) => {
+  const r = { id: 'backlog-late-note', title: 'A note synced late about an old session reaches Needs you, newest arrival first', checks: [] };
+  const { page, today } = await L.openCoach(b, {});
+  const FX = require('./fixtures');
+  await page.evaluate(([old30, old12]) => {
+    const now = new Date().toISOString();
+    const row = (id, name, day, on, note, upd) => ({ athlete_id: id, athlete_name: name, day, completed_on: on, status: 'Complete', session_rpe: 7, duration_min: 50,
+      readiness: null, day_note: note, focus: '', summary: 'Day ' + day + ' — fixture', coach_status: 'new', log: null, updated_at: upd });
+    // eli: trained 30 days ago, the phone synced it today.
+    window.__DB.session_history.push(row('eli_new', 'Eli Example', 1, old30, 'Fixture late-synced note.', now));
+    // ava: an older session (12 days ago) whose note arrived today, beside the fixture's own note from yesterday.
+    window.__DB.session_history.push(row('ava_test', 'Ava Example', 3, old12, 'Fixture newest arrival.', now));
+  }, [FX.daysAgo(today, 30), FX.daysAgo(today, 12)]);
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  const st = await page.evaluate(() => ({
+    eli: { recent: S.ath.eli_new.needReplyRecent.length, stale: S.ath.eli_new.needReplyStale },
+    ben: { recent: S.ath.ben_test.needReplyRecent.length, stale: S.ath.ben_test.needReplyStale },
+    avaOrder: S.ath.ava_test.needReplyRecent.map(s => s.day),
+    reasons: S.ath.eli_new.reasons.map(x => x.key + ':' + x.text),
+  }));
+  check(r, 'a 30-day-old session whose note arrived today is waiting, not backlog', st.eli.recent === 1 && st.eli.stale === 0, st.eli);
+  check(r, 'it shows in Needs you as a note to read', st.reasons.some(x => /^note:1 note to read/.test(x)), st.reasons);
+  check(r, 'a note that really is old (arrived 25 days ago) is still backlog', st.ben.recent === 0 && st.ben.stale === 1, st.ben);
+  check(r, 'newest arrival first: the session trained 12 days ago but delivered today comes before yesterday\'s', st.avaOrder.join() === '3,1', st.avaOrder);
+  const need = await page.locator('#needPanel .need', { hasText: 'Eli' }).first().innerText();
+  check(r, 'the Needs you row quotes the late note', /Day 1 note: “Fixture late-synced note\.”/.test(need), need.replace(/\s+/g, ' '));
+  const ava = await page.locator('#needPanel .need', { hasText: 'Ava' }).first().innerText();
+  check(r, 'Ava\'s row opens the newest arrival', /Day 3 note: “Fixture newest arrival\.”/.test(ava), ava.replace(/\s+/g, ' '));
+  const back = await page.locator('#needPanel', { hasText: 'older note' }).first().innerText();
+  check(r, 'the backlog row counts only the one that is truly old, and says "arrived"', /1 older note/.test(back) && /arrived more than 14 days ago/.test(back), back.replace(/\s+/g, ' '));
+  // Clearing the backlog leaves the late note alone.
+  await page.locator('#needPanel button', { hasText: 'Clear' }).click(); await L.settle(page, 700);
+  const d = await L.db(page);
+  check(r, 'Clear older notes marks the old one read and leaves the late one waiting',
+    d.session_history.find(x => x.athlete_id === 'ben_test' && x.day === 2).coach_status === 'read' && d.session_history.find(x => x.athlete_id === 'eli_new' && x.day === 1).coach_status === 'new', '');
   await page.context().close();
   return r;
 };

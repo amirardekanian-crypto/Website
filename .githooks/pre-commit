@@ -1,5 +1,5 @@
 #!/bin/sh
-# Fourteen guards. Each runs only when its own files are staged, so a commit that
+# Fifteen guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -273,6 +273,38 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(workouts/|scrip
     echo ""
     echo "pre-commit: BLOCKED — a Library card has no exId (details above). Link it, or draft its entry with /spine."
     failed=1
+  fi
+fi
+
+# ── 15. logic that exists in both the dashboard and the athlete app (added 2026-10-10) ────────
+# Why: coach.html re-implements some of program.html's rules (program.html is the offline PWA and stays self-contained):
+# the exercise-name tiers, a renamed lift, the Spine lookup, today's RPE target on a lower day, what the Quality check counts,
+# and the check-in line the app writes and the email import reads. When one copy changes alone the coach and the athlete
+# see different numbers and nothing errors; the coach.html audit (TWIN-10) found only rxOf, the set log and the word lists
+# were guarded. scripts/check_twins.js cuts each pair out of both files and runs the same vectors through both. It also
+# fails a change to assets/js/chips.js that keeps coach.html's hand-typed ?v= (TWIN-4): the service worker serves /assets/
+# cache-first, so the old file would stay in every browser that has it. test_check_twins.js proves the guard still fails
+# when a twin drifts, and runs only when the guard itself changes.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|coach\.html|assets/js/chips\.js|scripts/(check_twins|test_check_twins)\.js|scripts/twins_stamp\.json)$'; then
+  echo "pre-commit: program.html, coach.html or chips.js changed — checking the rules they share still agree..."
+  # CHECK_TWINS_INDEX=1: read the STAGED files, the ones that will be committed. A ?v= bumped in the working tree but
+  # left unstaged must not pass. The output is kept so a failure is printed once.
+  twins_out=$(CHECK_TWINS_INDEX=1 node scripts/check_twins.js 2>&1)
+  if [ $? -eq 0 ]; then
+    echo "pre-commit: shared rules OK."
+  else
+    echo "$twins_out" | grep -v '^  ok ' | head -60
+    echo ""
+    echo "pre-commit: BLOCKED — a rule shared by coach.html and program.html, or the chips.js cache stamp, is out of step (details above)."
+    failed=1
+  fi
+  if git diff --cached --name-only --diff-filter=ACM | grep -qE '^scripts/(check_twins|test_check_twins)\.js$'; then
+    if ! node scripts/test_check_twins.js >/dev/null; then
+      node scripts/test_check_twins.js | grep -v '^ok '
+      echo ""
+      echo "pre-commit: BLOCKED — the twin guard no longer fails when a twin drifts (details above)."
+      failed=1
+    fi
   fi
 fi
 

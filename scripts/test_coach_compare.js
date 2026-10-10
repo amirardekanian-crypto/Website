@@ -22,8 +22,12 @@ vm.runInContext(fs.readFileSync('assets/js/chips.js', 'utf8'), chipsCtx);
 // jparse is coach.html's own JSON-or-object reader (compareDay reads session.log with it).
 const jparse = v => { if (v == null) return null; if (typeof v === 'object') return v; try { return JSON.parse(v); } catch { return null; } };
 const sandbox = { round1: n => Math.round(n * 10) / 10, window: chipsCtx.window, jparse };
-new Function('ctx', 'with (ctx) {' + code + '\nObject.assign(ctx, {parseSetLine, parseSessionLog, parseChips, compareExercise, compareDay, dayVerdict, loadSummary, rpeTarget, normEx, logIndex, rxLine, dayTargetC, dayDropC});}')(sandbox);
+new Function('ctx', 'with (ctx) {' + code + '\nObject.assign(ctx, {parseSetLine, parseSessionLog, parseChips, compareExercise, compareDay, dayVerdict, loadSummary, rpeTarget, normEx, logIndex, rxLine, dayTargetC, dayDropC, planLabelC});}')(sandbox);
 const { parseSessionLog, parseChips, compareDay, compareExercise, dayVerdict, loadSummary } = sandbox;
+// The email import (the "Add past session from email" box on an athlete's work tab).
+const emailCode = grab('function parseSessionEmail(text) {', '// Does the email\'s "Athlete" line name this athlete?');
+new Function('ctx', 'with (ctx) {' + emailCode + '\nObject.assign(ctx, {parseSessionEmail, parseCheckinPlan});}')(sandbox);
+const { parseSessionEmail, parseCheckinPlan, planLabelC } = sandbox;
 
 let pass = 0, fail = 0;
 function is(got, want, what) {
@@ -323,6 +327,67 @@ console.log('11. sore halving, optional work');
   is(dayVerdict(groups), { total: 2, clean: 1, off: 1, missing: 0 }, 'the halved row counts as on plan');
   const asWritten = compareDay(plan, Object.assign({}, sess, { readiness: { level: 'green', sore: 'half', asWritten: true } }));
   is(asWritten.groups[0].rows[0].flags.map(f => f.text), ['2 sets short'], 'trained as written: half is short');
+}
+
+// ── 12. The email import reads the check-in line (2026-10-10, audit FILE-8) ────────────────────
+// program.html writes it twice: on the Readiness field after "Overall n ·", and as a "Today:" line of the full
+// summary. scripts/check_twins.js round-trips the app's real readinessPlanLine() through parseCheckinPlan().
+console.log('12. email import: the check-in line');
+{
+  const FIELD = 'Composite 3.5/5 · Sleep 3 · Energy 4 · Soreness 2 · Stress 4 · Overall 3';
+  const SUMMARY = (today) => ['Day 1 — Legs First', 'Status: Complete', 'Session RPE: 7/10', 'Duration: 55 min', '',
+    'Readiness (at start) — composite 3.5/5:', '  Sleep last night: 3/5 (Okay)', '  Energy levels: 4/5 (Good)', '  How sore are you: 2/5 (Quite sore)',
+    '  Stress: 4/5 (Calm)', '  How ready do you feel: 3/5 (Okay)'].concat(today ? [today] : [], ['', 'Notes from athlete:', 'Short day at work, knee felt fine.', '', 'Exercise log:', '', '[Primary]', '• Goblet Squat (✓)', '    Set 1: 20 ×10 @7 ✓']).join('\n');
+  const email = (fieldTail, today) => ['Athlete', 'Ava Example', '', 'Day', 'Day 1 — Legs First', '', 'Status', 'Complete', '', 'Session RPE', '7/10', '', 'Duration', '55 min', '',
+    'Readiness', FIELD + fieldTail, '', 'Notes from athlete', 'Short day at work, knee felt fine.', '', 'Full summary', SUMMARY(today)].join('\n');
+  const LOWER = 'lower day (every RPE 1 lower, never below 6)', SHORT = 'short day (warm-up, first power move and first primary lift; the rest optional)';
+
+  let r = parseSessionEmail(email(' · ' + LOWER + ' · sore: jumps and landings halved', 'Today: ' + LOWER + ' · sore: jumps and landings halved')).readiness;
+  is([r.level, r.sore, r.drop, r.asWritten], ['amber', 'half', 1, false], 'a lower and sore day, from the field and the Today line');
+  is([r.composite, r.sleep, r.soreness, r.score], [3.5, 3, 2, 3.5], 'the answers are still read, and the score is the mean of sleep, energy, stress, overall');
+  is(planLabelC(r), 'lower day · sore: jumps halved', 'the work tab names it the way the athlete\'s own record would');
+
+  r = parseSessionEmail(email(' · ' + SHORT, 'Today: ' + SHORT)).readiness;
+  is([r.level, r.sore, r.drop], ['red', '', 1], 'a short day');
+  r = parseSessionEmail(email(' · ' + LOWER + ' — trained as written by choice', 'Today: ' + LOWER + ' — trained as written by choice')).readiness;
+  is([r.level, r.asWritten], ['amber', true], 'trained as written by choice');
+  r = parseSessionEmail(email(' · sore: jumps and landings skipped', 'Today: sore: jumps and landings skipped')).readiness;
+  is([r.level, r.sore, r.drop], ['green', 'skip', 0], 'only sore: a green day with the jumps skipped');
+
+  // Only one of the two places is enough.
+  r = parseSessionEmail(email('', 'Today: ' + LOWER)).readiness;
+  is(r.level, 'amber', 'the Today line alone (the field lost its tail)');
+  r = parseSessionEmail(email(' · ' + LOWER, null)).readiness;
+  is(r.level, 'amber', 'the Readiness field alone (no Today line)');
+  // A mail client wraps long lines: the words may break anywhere.
+  r = parseSessionEmail(email(' ·\n' + LOWER.replace('every RPE', 'every\nRPE') + ' ·\nsore: jumps and\nlandings halved — trained as\nwritten by choice', null)).readiness;
+  is([r.level, r.sore, r.asWritten], ['amber', 'half', true], 'a wrapped line');
+
+  // No line: a normal day, or an email from before 2026-09-26. Never a guessed "normal day".
+  r = parseSessionEmail(email('', null)).readiness;
+  is([r.level, r.sore, r.drop, r.score], [undefined, undefined, undefined, undefined], 'no check-in line: no verdict stored');
+  is(r.composite, 3.5, '...and the answers are kept');
+  // Words in the athlete's own note must not set the level.
+  r = parseSessionEmail(email('', null).replace('Short day at work, knee felt fine.', 'Today: short day at work, then a lower day (tired) and sore: jumps felt fine')).readiness;
+  is(r.level, undefined, 'a note that talks about a short or lower day sets nothing');
+  // Review of 2026-10-10: these ways an athlete writes about their own day used to set a verdict. The words must
+  // follow the whole answers line or sit in the readiness block; a note is neither.
+  for (const note of ['Today: short day (only 40 min), cut the accessories', 'Overall 8 - lower day (poor sleep) but fine', 'Overall 8, short day (travel)',
+    'Composite 3/5 felt like a lower day (sleep)', 'Today: sore: jumps and landings halved, knee', 'Stress 4 \u00b7 Overall 4 \u00b7 lower day (tired)']) {
+    r = parseSessionEmail(email('', null).split('Short day at work, knee felt fine.').join(note)).readiness;
+    is([r.level, r.sore, r.drop, r.score], [undefined, undefined, undefined, undefined], 'a note cannot set a verdict: ' + note);
+  }
+  r = parseSessionEmail(email(' \u00b7 ' + LOWER, 'Today: ' + LOWER).split('Short day at work, knee felt fine.').join('Today: short day (only 40 min)')).readiness;
+  is([r.level, r.drop], ['amber', 1], '...and the real line still wins over a note that imitates it');
+  // The score only exists when all four answers are 1 to 5; a verdict without one is still stored.
+  r = parseSessionEmail(['Day 1 \u2014 T', 'Status: Complete', 'Readiness', 'Composite 3/5 \u00b7 Sleep 3 \u00b7 Energy 0 \u00b7 Soreness 2 \u00b7 Stress 4 \u00b7 Overall 3 \u00b7 ' + LOWER, '', 'Full summary', 'Day 1 \u2014 T'].join('\n')).readiness;
+  is([r.level, r.energy, r.score], ['amber', 0, undefined], 'an answer outside 1 to 5 stores the verdict but no score');
+  is(parseCheckinPlan('Today: Short day at work'), null, 'the wrong case, no parenthesis: not the app\'s line');
+  is(parseCheckinPlan('Today: ' + LOWER), null, 'the bare Today line, with no readiness block or answers line around it, is not the app\'s email');
+  is(parseCheckinPlan(''), null, 'empty text');
+  // A skipped check-in has nothing to judge.
+  const sk = parseSessionEmail(['Day 1 — Legs', 'Status: Complete', 'Readiness (at start): skipped', 'Today: ' + LOWER].join('\n')).readiness;
+  is(sk, { skipped: true }, 'a skipped check-in stays skipped');
 }
 
 console.log('\n' + (fail ? 'FAILED ' + fail + ' / ' + (pass + fail) : 'all ' + pass + ' assertions passed'));
