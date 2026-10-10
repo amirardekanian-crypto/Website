@@ -2940,7 +2940,7 @@ function loadSummary(sets) {
 // One prescribed exercise against its log line. Returns only what is actually
 // known. Reps are logged per set since 2026-09-24 ("×5"); older sessions have
 // none, and nothing here claims a rep count that was never recorded.
-function compareExercise(pex, logged, drop) {
+function compareExercise(pex, logged, drop, rd) {
   const rx = legacyRx(pex);
   const want = rx.sets ? parseInt(rx.sets, 10) : null;
   const tgt = dayTargetC(rpeTarget(rx.target), drop);
@@ -2971,7 +2971,20 @@ function compareExercise(pex, logged, drop) {
     c.flags.push({ tone: 'note', text: logged.label });
     return c;
   }
+  // Optional work done in part is still optional: what they did is a bonus, not a miss.
+  if (c.state === 'part' && /^optional today/.test(logged.label || '')) {
+    c.state = 'excused';
+    c.flags.push({ tone: 'note', text: 'optional today: ' + c.doneSets + (want ? ' of ' + want : '') + ' sets' });
+    return c;
+  }
+  // A sore check-in halves the jumps (REC-2, "sore: jumps halved"). Exactly half the sets on that
+  // day is the plan for the day, not a shortfall. (Which lifts are jumps is the app's call; the
+  // dashboard does not keep a second copy of that rule, so it reads the half itself.)
+  const halved = rd && rd.sore === 'half' && !rd.asWritten && want && c.doneSets &&
+                 (c.doneSets === Math.floor(want / 2) || c.doneSets === Math.ceil(want / 2));
   if (c.state === 'skip') c.flags.push({ tone: 'miss', text: 'not done' });
+  else if (halved && c.doneSets < want)
+    c.flags.push({ tone: 'note', text: 'half the sets today (sore)', onPlan: true });
   else if (want && c.doneSets && c.doneSets < want)
     c.flags.push({ tone: 'miss', text: (want - c.doneSets) + ' set' + (want - c.doneSets === 1 ? '' : 's') + ' short' });
   else if (want && c.doneSets > want)
@@ -3013,9 +3026,10 @@ function compareDay(programDay, session) {
   const take = name => { const q = queue[normEx(name)]; const e = q && q.shift(); if (e) used.add(e); return e; };
   const groups = [];
   const drop = dayDropC(session && session.readiness);
+  const rd = jparse(session && session.readiness);
   ((programDay && programDay.blocks) || []).forEach((b, bi) => {
     const rows = (b.exercises || []).map((pex, ei) => {
-      const row = compareExercise(pex, take(pex.name), drop);
+      const row = compareExercise(pex, take(pex.name), drop, rd);
       // Where this exercise lives in the programme, so the editor can write it
       // back. Index-based rather than name-based: two blocks can hold the same
       // movement, and a rename would otherwise lose the row.
@@ -3035,7 +3049,7 @@ function dayVerdict(groups) {
     if (r.extra || r.state === 'excused') return;
     total++;
     if (r.state === 'skip' || r.state === 'none') missing++;
-    else if (r.flags.length) off++;
+    else if (r.flags.some(f => !f.onPlan)) off++;   // a note that IS the day's plan (sore: halved) is not off plan
     else clean++;
   }));
   return { total, clean, off, missing };

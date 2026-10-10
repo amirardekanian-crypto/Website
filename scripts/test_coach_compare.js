@@ -290,5 +290,40 @@ console.log('10. renames, repeats, unticked');
   is(odd.extras, 1, 'a log of a different length falls back to the text');
 }
 
+// ── 11. Sore day (jumps halved) and partly done optional work (2026-10-10)
+console.log('11. sore halving, optional work');
+{
+  const c = (...l) => l.map(label => ({ label }));
+  const plan = { id: 1, blocks: [{ title: 'Power', exercises: [
+    { name: 'Box Jump', chips: c('4 Sets', '×4 Reps') },
+    { name: 'Back Squat', chips: c('4 Sets', '×5 Reps') },
+    { name: 'Calf Raise', chips: c('3 Sets', '×12 Reps') }] }] };
+  const sess = { readiness: { level: 'green', sore: 'half' }, summary: `Exercise log:
+[Power]
+• Box Jump (2/4 sets)
+    Set 1: ×4 @7 ✓
+    Set 2: ×4 @7 ✓
+    Set 3: skipped
+    Set 4: skipped
+• Back Squat (1/4 sets)
+    Set 1: 80 ×5 @7 ✓
+    Set 2: skipped
+    Set 3: skipped
+    Set 4: skipped
+• Calf Raise (optional today)
+    Set 1: 20 ×12 @6 ✓
+    Set 2: skipped
+    Set 3: skipped
+` };
+  const { groups } = compareDay(plan, sess);
+  const rows = groups.flatMap(g => g.rows);
+  is(rows[0].flags.map(f => f.text), ['half the sets today (sore)'], 'exactly half on a sore day is the day\'s plan');
+  is(rows[1].flags.map(f => f.text), ['3 sets short'], 'one of four is still short');
+  is([rows[2].state, rows[2].flags.map(f => f.text)], ['excused', ['optional today: 1 of 3 sets']], 'optional work done in part is not a miss');
+  is(dayVerdict(groups), { total: 2, clean: 1, off: 1, missing: 0 }, 'the halved row counts as on plan');
+  const asWritten = compareDay(plan, Object.assign({}, sess, { readiness: { level: 'green', sore: 'half', asWritten: true } }));
+  is(asWritten.groups[0].rows[0].flags.map(f => f.text), ['2 sets short'], 'trained as written: half is short');
+}
+
 console.log('\n' + (fail ? 'FAILED ' + fail + ' / ' + (pass + fail) : 'all ' + pass + ' assertions passed'));
 process.exit(fail ? 1 : 0);
