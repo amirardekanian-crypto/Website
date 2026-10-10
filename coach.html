@@ -454,7 +454,7 @@
   .wday.open .day-c-chev { transform: rotate(180deg); }
   /* Narrow: the verdict is nowrap and would squeeze the title down to one word
      per line, so give it its own row under the day name instead. */
-  @media (max-width: 720px) {
+  @media (max-width: 900px) {
     .wday-top { flex-wrap: wrap; row-gap: 9px; }
     .wday-n { order: 1; }
     .wday-main { order: 2; flex: 1 1 auto; min-width: 0; }
@@ -507,7 +507,12 @@
              color: var(--court); font-size: 13px; padding: 2px 5px; margin-top: 3px; border-radius: 5px; }
   .cmp-row:hover .rx-edit, .rx-edit:focus { opacity: 1; }
   /* No hover on a touch screen: the pencil is always there, with a finger-sized target. */
-  @media (hover: none) { .rx-edit { opacity: 1; padding: 8px 12px; margin-left: -12px; font-size: 15px; } }
+  @media (hover: none) { .rx-edit { opacity: 1; padding: 8px 12px; margin-left: -12px; font-size: 15px; }
+    /* iOS zooms the page into any field under 16 px when it gets focus. */
+    .exf input, .exf textarea, .exf select, .pwin, .controls input[type=search], .controls select { font-size: 16px; }
+    .sp { padding: 8px 12px; } }
+  /* On a pointer screen the hidden pencil takes no line of its own. */
+  @media (hover: hover) { .rx-edit { position: absolute; margin-top: 0; } .cmp-rx { position: relative; } }
   .rx-edit:hover { background: var(--court-100); }
   .rx-warn { font-family: 'Barlow', sans-serif; font-size: 10.5px; color: var(--clay-ink);
              margin-top: 3px; cursor: help; }
@@ -670,7 +675,8 @@
   .meta-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
   .meta-table td { padding: 5px 0; border: none; font-size: 13px; vertical-align: top; }
   .meta-table td.k { color: var(--muted); width: 128px; text-transform: uppercase; font-size: 10.5px; letter-spacing: .06em; padding-right: 12px; }
-  .meta-table td.v { font-family: 'Space Mono', monospace; font-size: 12.5px; }
+  .meta-table td.v { font-family: 'Space Mono', monospace; font-size: 12.5px; overflow-wrap: anywhere; }
+  .empty code, .pr-n, .credname { overflow-wrap: anywhere; }
   .note { background: var(--paper); border-left: 3px solid var(--ochre); padding: 9px 12px; border-radius: 8px; margin-top: 10px; font-size: 13px; }
   .note.green { border-left-color: var(--court); }
   .elog-title { font-size: 10.5px; text-transform: uppercase; color: var(--muted); letter-spacing: .06em; margin: 16px 0 6px; font-weight: 700; }
@@ -1077,9 +1083,15 @@ async function refetch(parts) {
   if (parts.includes('contacts')) jobs.push(sb.rpc('contact_list').then(r => { if (!r.error) S.contacts = r.data || []; }));
   if (parts.includes('intake')) jobs.push(sb.rpc('intake_list').then(r => { if (!r.error) S.intake = r.data || []; }));
   if (parts.includes('affiliates')) jobs.push(sb.from('affiliates').select('*').order('code').then(r => { if (!r.error) S.affiliates = r.data || []; }));
-  if (parts.includes('hist')) jobs.push(selectAll('session_history', '*').then(r => { if (!r.error) { S.hist = r.data || []; assemble(); } else toast('Saved, but the list could not refresh: ' + r.error.message); }));
-  if (parts.includes('programs')) jobs.push(loadPrograms().then(() => assemble()));
+  if (parts.includes('hist')) jobs.push(selectAll('session_history', '*').then(r => { if (!r.error) S.hist = r.data || []; else toast('Saved, but the list could not refresh: ' + r.error.message); }));
+  if (parts.includes('programs')) jobs.push(loadPrograms());
+  if (parts.includes('prog')) jobs.push(selectAll('athlete_progress', 'athlete_id, athlete_name, data, updated_at').then(r => { if (!r.error) S.prog = r.data || []; }));
+  if (parts.includes('optin')) jobs.push(sb.from('leaderboard_optin').select('athlete_id, display_name, title').then(r => { if (!r.error) { S.optin = {}; (r.data || []).forEach(x => S.optin[x.athlete_id] = x); } }));
   await Promise.all(jobs);
+  // Everything that feeds the roster and the athlete file is rebuilt in one place, after all the
+  // reads: a contact forgotten, a programme replaced, a progress blob deleted. (Only 'hist' did
+  // this before, so a forgotten contact kept their dots and board name until ↻ Refresh.)
+  if (parts.some(x => ['hist', 'programs', 'prog', 'optin', 'contacts'].includes(x))) assemble();
   render();
 }
 
@@ -1195,7 +1207,7 @@ function pendingCredsHtml() {
     .sort((a, b) => a.athlete_id.localeCompare(b.athlete_id));
   if (!pending.length) return '';
   return `<section class="panel creds">
-    <button class="creds-top" onclick="toggleCreds()">
+    <button class="creds-top" aria-expanded="${credsOpen(pending.length)}" onclick="toggleCreds()">
       <span class="creds-t">Logins to send<span class="creds-n">${pending.length}</span></span>
       <span class="creds-chev">${credsOpen(pending.length) ? '▴' : '▾'}</span>
     </button>
@@ -2613,7 +2625,7 @@ function renderAthletes() {
         <option value="recent"${_rSort === 'recent' ? ' selected' : ''}>Sort: recently active</option>
         <option value="name"${_rSort === 'name' ? ' selected' : ''}>Sort: name</option>
       </select>
-      ${needLogin.length
+      ${needLogin.length && !LOAD_ERR.logins
         ? `<button class="btn sm primary" onclick="bulkCreateLogins()" title="${esc(needLogin.join(', '))} — coached, trained, no login yet">Create ${needLogin.length} missing login${needLogin.length === 1 ? '' : 's'}</button>`
         : ''}
     </div>
@@ -3146,7 +3158,7 @@ function cmpRowHtml(c, lib, athleteId) {
       ${warn.length ? `<div class="rx-warn" title="${esc(warn.map(w => w.msg).join('\n'))}">⚠ ${esc(warn.length)} chip issue${warn.length > 1 ? 's' : ''}</div>` : ''}
     </div>
     <div class="cmp-did">${cmpCell(c)}</div>
-    <div class="cmp-flags">${c.flags.map(f => `<span class="fl ${f.tone}">${esc(f.text)}</span>`).join('')}</div>
+    <div class="cmp-flags">${c.flags.map(f => `<span class="fl ${f.tone === 'note' ? 'quiet' : f.tone}">${esc(f.text)}</span>`).join('')}</div>
     ${editable ? `<div class="rx-editor" id="exed-${eid}" style="display:none"></div>` : ''}
   </div>`;
 }
@@ -3265,7 +3277,7 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, reopen
       ${sideBox}
       ${f('exRpe',   'RPE',   st.rpe,   '6–10')}
       ${f('exTempo', 'Tempo', st.tempo, '3-0-1-0 / iso', 108)}
-      ${f('exRest',  'Rest',  st.restSec ? st.restSec + 's' : '', 'blank = none', 92)}
+      ${f('exRest',  'Rest',  st.restSec ? st.restSec + 's' : '', 'blank = none', 116)}
     </div>
     <label class="exf exf-wide"><span>Your note to them</span>
       <textarea id="exNote-${eid}" rows="2" placeholder="Optional coaching note on this exercise">${esc(st.note)}</textarea>
@@ -3642,13 +3654,14 @@ function metricStripHtml(m) {
            r ? (r.delta >= 0 ? '+' : '') + round1(r.delta) + ' vs their usual' : 'no check-ins yet', rTone)}
     ${pill('Adherence', adh && adh.pct != null ? adh.pct + '<small>%</small>' : '—',
            adh && adh.pct != null ? 'last ' + (adh.days < 28 ? adh.days + ' days' : '4 wks') : 'needs a program + a session', aTone)}
-    <button class="mp mp-more" onclick="toggleCharts()">Charts<span>▾</span></button>
+    <button class="mp mp-more" id="chartsBtn" aria-expanded="false" aria-controls="chartbox" onclick="toggleCharts()">Charts<span>▾</span></button>
   </div>
   <div id="chartbox" class="chartbox" style="display:none">${renderCharts(m)}</div>`;
 }
 function toggleCharts() {
   const b = $('chartbox');
   if (b) b.style.display = b.style.display === 'none' ? 'block' : 'none';
+  const t = $('chartsBtn'); if (t && b) t.setAttribute('aria-expanded', String(b.style.display === 'block'));
 }
 window.toggleCharts = toggleCharts;
 
@@ -3776,10 +3789,12 @@ async function renderDetail(athleteId, sub) {
     <div class="subrail">${SUBTABS.filter(t => has[t.id]).map(t => {
         const n = t.id === 'work' ? a.needReplyRecent.length
                 : t.id === 'calls' ? _D.callLogs.length : 0;
-        return `<a class="stab ${_D.sub === t.id ? 'active' : ''}" href="#a/${encodeURIComponent(athleteId)}/${t.id}">${t.label}${n ? `<span class="n ${t.id === 'calls' ? 'quiet' : ''}">${n}</span>` : ''}</a>`;
+        return `<a class="stab ${_D.sub === t.id ? 'active' : ''}"${_D.sub === t.id ? ' aria-current="page"' : ''} href="#a/${encodeURIComponent(athleteId)}/${t.id}">${t.label}${n ? `<span class="n ${t.id === 'calls' ? 'quiet' : ''}">${n}</span>` : ''}</a>`;
       }).join('')}</div>
     <div id="tabbody"></div>`;
   renderDetailBody();
+  const st = document.querySelector('.subrail .stab.active');
+  if (st && st.scrollIntoView) st.scrollIntoView({ inline: 'center', block: 'nearest' });
   if (_pendingFocus && _pendingFocus.id === athleteId) {
     const el = document.getElementById('wday-' + _pendingFocus.day);
     _pendingFocus = null;
@@ -4294,7 +4309,7 @@ async function forgetContact(athleteId) {
   const { error } = await sb.rpc('forget_contact', { p_athlete_id: athleteId });
   if (error) { alert('Could not forget: ' + error.message); return; }
   toast('Forgotten');
-  refetch(['contacts']);
+  refetch(['contacts', 'notes', 'prog', 'optin']);   // forget_contact() deletes all four
 }
 window.setBoardScope = setBoardScope;
 window.forgetContact = forgetContact;
