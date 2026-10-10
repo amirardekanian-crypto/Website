@@ -29,7 +29,7 @@
     },
     {
       "label": "Check the space",
-      "text": "A clear, non-slip floor and nothing overhead you could hit, like a fan or a low beam. No overhead room? Do the Squat Jump as a fast Bodyweight Squat instead."
+      "text": "A clear, non-slip floor and nothing overhead you could hit, like a fan or a low beam. No overhead room? Do the Squat Jump as a fast Squat instead."
     },
     {
       "label": "While you train",
@@ -69,7 +69,7 @@
         },
         {
           "type": "simple",
-          "name": "Bodyweight Squat",
+          "name": "Squat",
           "exId": "bodyweight-squat",
           "videoUrl": null,
           "cues": {
