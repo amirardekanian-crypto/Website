@@ -1299,7 +1299,10 @@ async function bulkCreateLogins() {
   render();
   // Failures are named, not left in the console where nobody looks.
   const why = f => (f && (f.athlete_id || f.id) ? (f.athlete_id || f.id) + ': ' + (f.error || f.message || 'failed') : String(f));
-  if (failed.length) alert(`${data.created} login${data.created === 1 ? '' : 's'} created. ${failed.length} failed:\n\n` + failed.map(why).join('\n'));
+  const skipped = data.skipped || [];   // already had a login: left exactly as it was
+  if (failed.length || skipped.length) alert(`${data.created} login${data.created === 1 ? '' : 's'} created.` +
+    (skipped.length ? `\n\nAlready had a login, left as it was: ${skipped.join(', ')}` : '') +
+    (failed.length ? `\n\n${failed.length} failed:\n` + failed.map(why).join('\n') : ''));
   else toast(`${data.created} login${data.created === 1 ? '' : 's'} created — copy & send from "Logins to send" below`);
 }
 window.bulkCreateLogins = bulkCreateLogins;
