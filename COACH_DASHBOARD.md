@@ -140,8 +140,11 @@ also train with you — their athlete id, which links the card to their file.
   *Retired*, so its history and the intakes that used it still add up. **Reactivate**
   brings it back.
 - A code **can't be renamed** — it is the key. Retire it and add the new one.
-- Each card counts the **intakes that used the code** (typed, or approved on the form) and
-  names them — that is the "who do I owe commission" list.
+- Each card counts the **applications that used the code** (typed, or approved on the form;
+  archived ones left out; a code typed with spaces or Persian digits still matches) and names
+  them, each marked new or handled. ⚠ These are applications, not payments: nothing in the
+  dashboard knows who became a paying client, so check that before paying commission. (Until
+  2026-10-10 this was called the "who do I owe commission" list.)
 - **Unattributed** marks a live code with no owner on file: it discounts every sale it
   touches with nobody to pay. Settle who it belongs to, or retire it.
 
@@ -480,8 +483,23 @@ button on a dashboard.
 **The funnel** — everyone from `contact_list()`, newest first, with **days
 logged** as the qualifying signal. A free athlete past **14 logged days** is
 flagged *ready to upgrade?* — they've proven the habit, so the coaching pitch is
-earned rather than cold. WhatsApp opens a chat; **forget** erases their contact
-details via `forget_contact()` (their logs and board place are untouched).
+earned rather than cold. The headline counts **free** signups; someone who became a coached
+client is listed as *coached · converted* (the tier comes from their programme). WhatsApp opens a
+chat (one link builder for the whole page: Persian digits and Iranian 09… numbers handled).
+
+**forget** (free and Proof-only people only) calls `forget_contact()`, which PERMANENTLY deletes their
+contact details, their whole progress row (habit log, body weight, records), their board place and
+their roll-call lines. Their programme, login, session history, titles and season results stay.
+It is not offered for coached clients: on them the progress row is their training app's cloud
+copy. (Until 2026-10-10 it was offered for everyone and this manual said their logs were untouched.
+`supabase/stage45_forget_contact_guard.sql` makes the server refuse a coached athlete too.) It is
+not a full erasure: their login still works, so a phone they still use can upload again.
+
+**The Library tab** (`#links`) lists every workout and article, published or hidden, with *Copy App*
+(the in-app link) and, for articles, *Copy Web · FA* and *Copy Web · EN* (the public pages). **Hide**
+takes an item off every athlete's app at once (the file and its web page stay); **Publish** puts it
+back. **Testing app** and **Course** list buyer logins; a failed load says so with *↻ Try again*
+instead of "No logins yet", and *Mark sent* asks first (it clears the only stored copy of the password).
 
 ---
 

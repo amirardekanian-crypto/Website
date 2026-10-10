@@ -772,6 +772,8 @@
   .link-row-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
   .link-row-url { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Space Mono', monospace; }
   .link-row-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .link-row.hiddenitem { opacity: .7; }
+  @media (max-width: 560px) { .link-row { flex-wrap: wrap; } .link-row .acts { flex-basis: 100%; justify-content: flex-start !important; } }
 
   /* Toast + demo banner */
   /* Hidden with visibility, not only moved: a long message used to stay half on screen. */
@@ -1062,6 +1064,7 @@ async function loadAll() {
 // What failed to load, in words, under the tabs. Empty when everything came back.
 const LOAD_ERR_LABEL = {
   programs: 'programmes', logins: 'athlete logins', contacts: 'Proof contacts', intake: 'intake forms',
+  assess: 'testing-app logins', course: 'course logins',
   affiliates: 'affiliate codes', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
 };
 function loadWarnHtml() {
@@ -1177,10 +1180,12 @@ const PW_HINT = 'Password: 8+ characters, English letters, numbers and symbols, 
 // this only drops the copy kept for distribution.
 async function markLoginSent(athleteId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const { error } = await sb.from('athlete_identities')
+  if (!confirm(`Mark ${athleteId}'s login as sent?\n\nThis clears the stored password: after this the only way to see one again is a reset. Do it once the message has reached them.`)) return;
+  const res = await sb.from('athlete_identities')
     .update({ initial_password: null, sent_at: new Date().toISOString() })
-    .eq('athlete_id', athleteId);
-  if (error) { alert('Could not update: ' + error.message); return; }
+    .eq('athlete_id', athleteId).select('athlete_id');
+  const bad = writeFailed(res, 'marked sent');
+  if (bad) { alert('Could not update: ' + bad); return; }
   await loadLogins();
   render();
 }
@@ -1553,14 +1558,6 @@ async function loadLibrary() {
   if (!c.error) S.libCats = c.data || [];
   if (!l.error) S.lib = l.data || [];
   LOAD_ERR.library = (c.error || l.error) ? (c.error || l.error).message : '';
-}
-
-async function toggleLibraryItem(slug, publish) {
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const { error } = await sb.from('library').update({ published: publish }).eq('slug', slug);
-  if (error) { alert('Could not update: ' + error.message); return; }
-  await loadLibrary();
-  render();
 }
 
 // Open an athlete's own app in a new tab, read-only.
@@ -2066,6 +2063,7 @@ function renderRail() {
 async function hardRefresh() {
   $('content').innerHTML = '<div class="loading"><div class="spinner"></div>Refreshing…</div>';
   loadLevels._done = false; S.board = { season: null, week: null }; S.assess = null; S.course = null; S.spine = null;
+  LOAD_ERR.assess = LOAD_ERR.course = '';
   S.callLogs = {};   // cached per athlete for the page's life: a failed read stuck as "No call logs yet"
   try { await loadAll(); } catch (e) { $('content').innerHTML = `<p class="empty">Could not load: ${esc(e.message)}</p>`; return; }
   render();
@@ -3835,7 +3833,7 @@ function proofTabHtml(D) {
       ${o && o.title ? `<div class="meta">Wears <b>${esc(o.title)}</b></div>` : ''}
     </div>
     ${c ? `<div class="note-actions" style="margin-top:12px">
-      ${c.whatsapp ? `<a class="abtn" target="_blank" rel="noopener" href="https://wa.me/${esc(String(c.whatsapp).replace(/[^0-9]/g, ''))}">WhatsApp ↗</a>` : ''}
+      ${waLink(c.whatsapp) ? `<a class="abtn" target="_blank" rel="noopener" href="${esc(waLink(c.whatsapp))}">WhatsApp ↗</a>` : ''}
       ${c.email ? `<button class="abtn" onclick="copyText(${jsq(c.email)}, this)">${esc(c.email)}</button>` : ''}
       <span class="chip ${c.tier === 'free' ? 'ochre' : 'court'}">${esc(c.tier || '')}</span>
     </div>` : ''}
@@ -3931,7 +3929,7 @@ function fileTabHtml(D) {
           <code class="credpass">${esc(login.initial_password)}</code>
           <span class="acts">
             <button class="btn sm primary" onclick="copyLoginFor(${jsq(athleteId)})">Copy message</button>
-            ${a.contact && a.contact.whatsapp ? `<a class="btn sm" target="_blank" rel="noopener" href="https://wa.me/${esc(String(a.contact.whatsapp).replace(/[^0-9]/g, ''))}?text=${encodeURIComponent(loginMessage(athleteId, login.initial_password))}">WhatsApp ↗</a>` : ''}
+            ${a.contact && waLink(a.contact.whatsapp) ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(waLink(a.contact.whatsapp))}?text=${encodeURIComponent(loginMessage(athleteId, login.initial_password))}">WhatsApp ↗</a>` : ''}
             <button class="btn sm" onclick="markLoginSent(${jsq(athleteId)})">Mark sent</button>
           </span>
         </div>` : ''}
@@ -4231,20 +4229,28 @@ async function renderProof() {
         </div>`).join('')
       : '<p class="empty">Nobody on the board yet.</p>';
 
+  // The tier is the programme's (S.ath), not the contact row's second copy. A coached client who
+  // signed up through Proof first is "converted": listed, but not counted as a free signup, and
+  // never offered forget (forget_contact() deletes the whole progress row: their training app's
+  // records, body weight and check-ins).
+  const tierOf = c => (S.ath[c.athlete_id] && S.ath[c.athlete_id].tier) || c.tier || 'free';
   const funnel = (S.contacts || []).slice().sort((a, b) => String(b.signed_up).localeCompare(String(a.signed_up)));
+  const freeFunnel = funnel.filter(c => tierOf(c) !== 'coached');
   // Signed up and never logged a single day is its own bucket, and the biggest
   // one — a different problem from someone logging and drifting. They need a
   // first-day nudge, not a coaching pitch.
-  const neverStarted = funnel.filter(c => !c.days_logged).length;
+  const neverStarted = freeFunnel.filter(c => !c.days_logged).length;
   const funnelHtml = funnel.length ? funnel.map(c => {
-    const hot = c.tier === 'free' && c.days_logged >= UPGRADE_DAYS;
-    const cold = !c.days_logged;
-    const wa = c.whatsapp ? `<a class="abtn" target="_blank" rel="noopener" href="https://wa.me/${esc(String(c.whatsapp).replace(/[^0-9]/g, ''))}">WhatsApp ↗</a>` : '';
+    const tier = tierOf(c), coached = tier === 'coached';
+    const hot = tier === 'free' && c.days_logged >= UPGRADE_DAYS;
+    const cold = !c.days_logged && !coached;
+    const wl = waLink(c.whatsapp);
+    const wa = wl ? `<a class="abtn" target="_blank" rel="noopener" href="${esc(wl)}">WhatsApp ↗</a>` : '';
     const mail = c.email ? `<button class="abtn" onclick="copyText(${jsq(c.email)}, this)">✉ copy email</button>` : '';
     return `<div class="fun ${hot ? 'hotlead' : ''}">
       <div class="main">
         <div class="nm">${esc(c.shown_as || nameOf(c.athlete_id))}
-          <span class="chip ${c.tier === 'free' ? 'ochre' : 'court'}">${esc(c.tier || '?')}</span>
+          <span class="chip ${coached ? 'court' : 'ochre'}">${coached ? 'coached · converted' : esc(tier)}</span>
           ${c.on_board ? '<span class="chip court">on board</span>' : ''}
           ${cold ? '<span class="chip">never started</span>' : ''}
           ${hot ? '<span class="chip clay">ready to upgrade?</span>' : ''}
@@ -4254,7 +4260,7 @@ async function renderProof() {
       <div class="days">${c.days_logged}<small>days logged</small></div>
       <div class="acts">${wa}${mail}
         <button class="abtn" onclick="location.hash=${jsq('a/' + encodeURIComponent(c.athlete_id))}">open</button>
-        <button class="abtn" style="color:var(--clay-ink)" onclick="forgetContact(${jsq(c.athlete_id)})">forget</button>
+        ${coached ? '' : `<button class="abtn" style="color:var(--clay-ink)" onclick="forgetContact(${jsq(c.athlete_id)})">forget</button>`}
       </div>
     </div>`;
   }).join('') : '<p class="empty">No signups recorded yet. /proof-signup writes them here.</p>';
@@ -4293,8 +4299,8 @@ async function renderProof() {
           : '<p class="empty">No season live.</p>'}
         </section>
         <section class="panel">
-          <div class="phead"><span class="t hd">The funnel</span><span class="r">${funnel.length} signup${funnel.length === 1 ? '' : 's'}</span></div>
-          <p class="psub">Free signups from proof.html — days logged is the qualifying signal. ${UPGRADE_DAYS}+ days on the free tier = worth a WhatsApp.${neverStarted ? ` <b>${neverStarted} of ${funnel.length} have never logged a day</b> — they need a first-day nudge, not a pitch.` : ''}</p>
+          <div class="phead"><span class="t hd">The funnel</span><span class="r">${freeFunnel.length} free signup${freeFunnel.length === 1 ? '' : 's'}${funnel.length > freeFunnel.length ? ` · ${funnel.length - freeFunnel.length} converted` : ''}</span></div>
+          <p class="psub">Free signups from proof.html — days logged is the qualifying signal. ${UPGRADE_DAYS}+ days on the free tier = worth a WhatsApp.${neverStarted ? ` <b>${neverStarted} of ${freeFunnel.length} have never logged a day</b> — they need a first-day nudge, not a pitch.` : ''}</p>
           ${funnelHtml}
         </section>
       </div>
@@ -4303,12 +4309,14 @@ async function renderProof() {
 function setBoardScope(s) { _boardScope = s; renderProof(); }
 async function forgetContact(athleteId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if ((S.ath[athleteId] || {}).tier === 'coached') { alert('This is a coached athlete. Forget would delete their training app data (records, body weight, check-ins), so it is not offered for them.'); return; }
   // Says exactly what forget_contact() deletes (checked against the live function, 2026-09-26: this
   // used to say "Their logs and board place are untouched", the opposite of what it does).
   if (!confirm(`Forget ${athleteId}?\n\nThis PERMANENTLY deletes their contact details, their whole habit log and progress, their board place and their roll-call lines. There is no undo and no automatic backup: take a ⤓ Backup first if you are not sure.\n\nTheir programme, login, session history, titles and season results stay.`)) return;
   const { error } = await sb.rpc('forget_contact', { p_athlete_id: athleteId });
   if (error) { alert('Could not forget: ' + error.message); return; }
   toast('Forgotten');
+  S.board = { season: null, week: null };             // their board place went too
   refetch(['contacts', 'notes', 'prog', 'optin']);   // forget_contact() deletes all four
 }
 window.setBoardScope = setBoardScope;
@@ -4316,60 +4324,72 @@ window.forgetContact = forgetContact;
 
 // --- LINKS (ported) ----------------------------------------------------------
 async function renderLinks() {
-  $('content').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
   const BASE = SITE + '/program.html';
-  try {
-    // Built from S.lib / S.libCats, which come from the database. The two index.json
-    // manifests this used to fetch no longer exist as the source of truth.
-    const shape = (kind, itemKey) => ({
-      categories: (S.libCats || []).filter(c => c.kind === kind).map(c => ({
-        id: c.id, title: c.title,
-        [itemKey]: (S.lib || [])
-          .filter(l => l.kind === kind && l.category_id === c.id && l.published)
-          .map(l => l.data),
-      })),
-    });
-    const artData = shape('article', 'articles');
-    const wrkData = shape('workout', 'workouts');
-    if (route().view !== 'links') return;
-    let html = `<div class="controls">
-        <button class="btn primary sm" onclick="pickLibraryFile('workout')" title="Publish a workout JSON written by the /workout skill">+ Publish workout</button>
-        <button class="btn primary sm" onclick="pickLibraryFile('article')" title="Publish an article JSON written by the /article skill">+ Publish article</button>
-        <span class="empty" style="align-self:center">The Library lives on the server now — publishing here puts it straight in front of every athlete, with no deploy.</span>
-      </div>`;
-    html += `<section class="panel"><div class="phead"><span class="t hd">Articles — Read library</span></div>`;
-    let any = false;
-    for (const cat of artData.categories) {
-      if (!cat.articles || !cat.articles.length) continue;
-      any = true;
-      html += `<div class="links-cat">${esc(cat.title)}</div>`;
-      for (const a of cat.articles) {
-        const url = `${BASE}?article=${a.id}`;
-        html += linkRow(a.title, url, `${a.readMins} min read · ${esc(a.category)}`);
-      }
-    }
-    if (!any) html += '<p class="empty">No articles published yet.</p>';
-    html += `</section><section class="panel" style="margin-top:16px"><div class="phead"><span class="t hd">Workouts — Train library</span></div>`;
-    any = false;
-    for (const cat of wrkData.categories) {
-      if (!cat.workouts || !cat.workouts.length) continue;
-      any = true;
-      html += `<div class="links-cat">${esc(cat.title)}</div>`;
-      for (const w of cat.workouts) {
-        const url = `${BASE}?workout=${w.id}`;
-        html += linkRow(w.title, url, `${esc(w.duration)} · ${esc(w.equipment)} · ${esc(cat.title)}`);
-      }
-    }
-    if (!any) html += '<p class="empty">No workouts published yet.</p>';
-    html += '</section>';
-    $('content').innerHTML = html;
-    $('content').querySelectorAll('.copy-btn-js').forEach(btn => {
-      btn.addEventListener('click', () => copyText(btn.dataset.url, btn));
-    });
-  } catch (e) {
-    $('content').innerHTML = '<p class="empty">Could not load the article/workout manifests.</p>';
-  }
+  if (route().view !== 'links') return;
+  // Every item, published or hidden, from the database (S.lib / S.libCats). Until 2026-10-10 only
+  // published items were listed and nothing could hide one again (toggleLibraryItem had no button).
+  const shelf = (kind) => (S.libCats || []).filter(c => c.kind === kind).map(c => ({
+    cat: c, items: (S.lib || []).filter(l => l.kind === kind && l.category_id === c.id) }));
+  const row = (l) => {
+    const d = l.data || {};
+    const id = encodeURIComponent(d.id || '');
+    const app = `${BASE}?${l.kind === 'article' ? 'article' : 'workout'}=${id}`;
+    const links = l.kind === 'article'
+      ? [['App', app], ['Web · FA', `${SITE}/fa/articles/${id}.html`], ['Web · EN', `${SITE}/en/articles/${id}.html`]]
+      : [['App', app]];
+    const meta = l.kind === 'article'
+      ? `${esc(d.readMins || '?')} min read`
+      : [d.duration, d.equipment].filter(Boolean).map(esc).join(' · ');
+    return `<div class="link-row ${l.published ? '' : 'hiddenitem'}">
+      <div class="link-row-info">
+        <div class="link-row-title">${esc(d.title || l.slug)}${l.published ? '' : ' <span class="chip">hidden</span>'}</div>
+        <div class="link-row-url">${esc(app)}</div>
+        <div class="link-row-meta">${meta}${l.updated_at ? ' · updated ' + esc(prettyDate(String(l.updated_at).slice(0, 10))) : ''}</div>
+      </div>
+      <span class="acts" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+        ${links.map(([lab, u]) => `<button class="btn sm ${lab === 'App' ? 'primary' : ''} copy-btn-js" data-url="${esc(u)}" title="Copy ${esc(u)}">Copy ${esc(lab)}</button>`).join('')}
+        <button class="btn sm ${l.published ? 'danger' : ''}" onclick="setLibraryPublished(${jsq(l.slug)}, ${l.published ? 'false' : 'true'})">${l.published ? 'Hide' : 'Publish'}</button>
+      </span>
+    </div>`;
+  };
+  const section = (kind, title) => {
+    const groups = shelf(kind);
+    const shown = groups.map(g => {
+      const pub = g.items.filter(l => l.published);
+      return pub.length ? `<div class="links-cat">${esc(g.cat.title)}</div>${pub.map(row).join('')}` : '';
+    }).join('');
+    const hidden = groups.flatMap(g => g.items.filter(l => !l.published));
+    return `<section class="panel" style="margin-top:16px"><div class="phead"><span class="t hd">${title}</span>
+        <span class="r">${groups.reduce((n, g) => n + g.items.filter(l => l.published).length, 0)} published</span></div>
+      ${shown || `<p class="empty">Nothing published yet.</p>`}
+      ${hidden.length ? `<details class="rawlog"><summary>Hidden · ${hidden.length}</summary>${hidden.map(row).join('')}</details>` : ''}
+    </section>`;
+  };
+  $('content').innerHTML = `<div class="controls">
+      <button class="btn primary sm" onclick="pickLibraryFile('workout')" title="Publish a workout JSON written by the /workout skill">+ Publish workout</button>
+      <button class="btn primary sm" onclick="pickLibraryFile('article')" title="Publish an article JSON written by the /article skill (the English file, never a .fa.json)">+ Publish article</button>
+      <span class="empty" style="align-self:center">The Library lives on the server: publishing or hiding here changes every athlete's app at once, with no deploy.</span>
+    </div>
+    ${LOAD_ERR.library ? `<p class="empty" style="color:var(--clay-ink)">The library did not load: ${esc(LOAD_ERR.library)}</p>` : ''}
+    ${section('article', 'Articles — the Playbook')}
+    ${section('workout', 'Workouts — Sessions')}`;
+  $('content').querySelectorAll('.copy-btn-js').forEach(btn => {
+    btn.addEventListener('click', () => copyText(btn.dataset.url, btn));
+  });
 }
+async function setLibraryPublished(slug, publish) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const item = (S.lib || []).find(l => l.slug === slug);
+  const title = (item && item.data && item.data.title) || slug;
+  if (!confirm(publish ? `Publish "${title}"? It appears in every athlete's app.` : `Hide "${title}"? It disappears from every athlete's app (the file and its web page stay).`)) return;
+  const res = await sb.from('library').update({ published: publish }).eq('slug', slug).select('slug');
+  const bad = writeFailed(res, publish ? 'published' : 'hidden');
+  if (bad) { alert('Could not update: ' + bad); return; }
+  await loadLibrary();
+  render();
+  toast(publish ? 'Published' : 'Hidden from the app');
+}
+window.setLibraryPublished = setLibraryPublished;
 function linkRow(title, url, meta) {
   return `<div class="link-row">
     <div class="link-row-info">
@@ -4397,22 +4417,27 @@ const AFF_FIELDS = [
 let _affEditing = null;   // the code whose card is in edit mode, '__new__' for the add form, or null
 
 // Iranian mobiles are typed 09…; wa.me needs the country code instead of the 0.
-function affWa(num) {
-  let d = String(num || '').replace(/[^0-9]/g, '');
-  if (/^09\d{9}$/.test(d)) d = '98' + d.slice(1);
-  return d ? 'https://wa.me/' + d : '';
-}
+function affWa(num) { return waLink(num); }   // one builder: waLink() (Intake) handles Persian digits too
 function affIg(handle) {
   const h = String(handle || '').trim().replace(/^@/, '');
   return h ? 'https://instagram.com/' + encodeURIComponent(h) : '';
 }
 // Intakes that used a code: the typed "Discount Code", or the "Discount Applied"
 // the form fills in once the code checks out (e.g. "NAME10 (10% off)").
+// A code as people type it on a phone: spaces anywhere, Persian or Arabic digits, any case.
+function normCode(v) {
+  return String(v || '').replace(/[\u06F0-\u06F9]/g, d => String(d.charCodeAt(0) - 0x06F0))
+    .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660)).replace(/\s+/g, '').toUpperCase();
+}
+// Applications that used the code (typed, or approved on the form). These are APPLICATIONS, not
+// paying clients: nothing here knows who paid, so the card says so. Archived ones (spam, not a fit)
+// are left out of the count.
 function affUses(code) {
   return (S.intake || []).filter(i => {
+    if ((i.status || 'new') === 'archived') return false;
     const p = i.payload || {};
-    const typed = intakeVal(p['Discount Code']).trim().toUpperCase();
-    const applied = intakeVal(p['Discount Applied']).trim().toUpperCase().split(' ')[0];
+    const typed = normCode(intakeVal(p['Discount Code']));
+    const applied = normCode(intakeVal(p['Discount Applied']).trim().split(' ')[0]);
     return typed === code || applied === code;
   });
 }
@@ -4442,7 +4467,7 @@ function affCard(a) {
   const who = owner ? esc(owner) : '<span style="color:var(--clay-ink)">No owner on file</span>';
   const pills = `<span class="ipill pct">${esc(a.percent)}% off</span>` +
     (owner ? '' : '<span class="ipill warn">Unattributed</span>') +
-    (uses.length ? `<span class="ipill used">${uses.length} intake${uses.length === 1 ? '' : 's'}</span>` : '');
+    (uses.length ? `<span class="ipill used" title="Applications that used this code (archived ones left out). Not payments: check who became a client before paying commission.">${uses.length} application${uses.length === 1 ? '' : 's'}</span>` : '');
   const when = a.active ? (a.applied_on ? 'since ' + esc(a.applied_on) : '') : 'retired ' + esc(a.retired_on || '');
   const editing = _affEditing === a.code;
 
@@ -4461,7 +4486,7 @@ function affCard(a) {
   const table = rows.length
     ? `<table class="meta-table">${rows.map(([k, val]) => `<tr><td class="k">${k}</td><td class="v">${val}</td></tr>`).join('')}</table>` : '';
   const usedBy = uses.length
-    ? `<div class="aff-uses">Used by: ${uses.map(i => `${esc(intakeName(i))} (${esc(String(i.created_at || '').slice(0, 10))})`).join(', ')}</div>` : '';
+    ? `<div class="aff-uses">Applications with this code (not payments): ${uses.map(i => `${esc(intakeName(i))} (${esc(String(i.created_at || '').slice(0, 10))}${(i.status || 'new') === 'handled' ? ', handled' : ', new'})`).join(', ')}</div>` : '';
   const acts = `<button class="btn sm aff-edit" data-code="${esc(a.code)}">Edit</button>` + (a.active
     ? `<button class="btn sm danger aff-retire" data-code="${esc(a.code)}">Retire code</button>`
     : `<button class="btn sm aff-reactivate" data-code="${esc(a.code)}">Reactivate</button>`);
@@ -4576,8 +4601,9 @@ async function loadAssess() {
   const r = await sb.from('assess_accounts')
     .select('username, label, created_at, initial_password, password_set_at, sent_at, revoked_at')
     .order('created_at', { ascending: false });
-  S.assess = r.error ? [] : (r.data || []);
-  if (r.error) toast('Could not load testing-app logins: ' + r.error.message);
+  // A failed read stays "unknown" (null + the error), never an empty list that reads "No logins yet".
+  LOAD_ERR.assess = r.error ? r.error.message : '';
+  S.assess = r.error ? null : (r.data || []);
 }
 
 // The WhatsApp message a buyer gets, in Farsi like the app.
@@ -4614,15 +4640,22 @@ async function assessAction(action, username, label, btn, password) {
 
 async function assessMarkSent(username) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const { error } = await sb.from('assess_accounts')
-    .update({ initial_password: null, sent_at: new Date().toISOString() }).eq('username', username);
-  if (error) { alert('Could not update: ' + error.message); return; }
+  if (!confirm(`Mark ${username}'s login as sent?\n\nThis clears the stored password: after this the only way to see one again is a reset. Do it once the message has reached them.`)) return;
+  const res = await sb.from('assess_accounts')
+    .update({ initial_password: null, sent_at: new Date().toISOString() }).eq('username', username).select('username');
+  const bad = writeFailed(res, 'marked sent');
+  if (bad) { alert('Could not update: ' + bad); return; }
   await loadAssess();
   renderAssess();
 }
 
 function renderAssess() {
   const c = $('content');
+  if (!S.assess && LOAD_ERR.assess) {
+    c.innerHTML = `<section class="panel"><p class="empty" style="color:var(--clay-ink)">The testing-app logins did not load: ${esc(LOAD_ERR.assess)}. Nothing here can be changed until they do.</p>
+      <button class="btn sm" onclick="LOAD_ERR.assess='';loadAssess().then(renderAssess)">↻ Try again</button></section>`;
+    return;
+  }
   if (!S.assess) {
     c.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
     loadAssess().then(renderAssess);
@@ -4704,8 +4737,9 @@ async function loadCourse() {
   const r = await sb.from('tps_accounts')
     .select('username, label, created_at, initial_password, password_set_at, sent_at, revoked_at')
     .order('created_at', { ascending: false });
-  S.course = r.error ? [] : (r.data || []);
-  if (r.error) toast('Could not load course logins: ' + r.error.message);
+  // A failed read stays "unknown" (null + the error), never an empty list that reads "No logins yet".
+  LOAD_ERR.course = r.error ? r.error.message : '';
+  S.course = r.error ? null : (r.data || []);
 }
 
 // The WhatsApp message a buyer gets, in Farsi like the app. iPhone installs before signing in:
@@ -4744,15 +4778,22 @@ async function courseAction(action, username, label, btn, password) {
 
 async function courseMarkSent(username) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const { error } = await sb.from('tps_accounts')
-    .update({ initial_password: null, sent_at: new Date().toISOString() }).eq('username', username);
-  if (error) { alert('Could not update: ' + error.message); return; }
+  if (!confirm(`Mark ${username}'s login as sent?\n\nThis clears the stored password: after this the only way to see one again is a reset. Do it once the message has reached them.`)) return;
+  const res = await sb.from('tps_accounts')
+    .update({ initial_password: null, sent_at: new Date().toISOString() }).eq('username', username).select('username');
+  const bad = writeFailed(res, 'marked sent');
+  if (bad) { alert('Could not update: ' + bad); return; }
   await loadCourse();
   renderCourse();
 }
 
 function renderCourse() {
   const c = $('content');
+  if (!S.course && LOAD_ERR.course) {
+    c.innerHTML = `<section class="panel"><p class="empty" style="color:var(--clay-ink)">The course logins did not load: ${esc(LOAD_ERR.course)}. Nothing here can be changed until they do.</p>
+      <button class="btn sm" onclick="LOAD_ERR.course='';loadCourse().then(renderCourse)">↻ Try again</button></section>`;
+    return;
+  }
   if (!S.course) {
     c.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
     loadCourse().then(renderCourse);
