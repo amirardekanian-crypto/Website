@@ -77,8 +77,10 @@ Deno.serve(async (req: Request) => {
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
   const now = new Date().toISOString();
-  const { data: acct } = await admin.from(TABLE)
+  const { data: acct, error: acctErr } = await admin.from(TABLE)
     .select('user_id, revoked_at').eq('username', username).maybeSingle();
+  // A failed read is not "no such login" (a create would then try to take a username in use).
+  if (acctErr) return json({ error: 'could not check the account: ' + acctErr.message }, 500);
 
   if (action === 'create') {
     if (acct?.user_id) return json({ error: 'username already taken' }, 409);
@@ -107,16 +109,21 @@ Deno.serve(async (req: Request) => {
     const password = typed || makePassword();
     const { error } = await admin.auth.admin.updateUserById(acct.user_id, { password, ban_duration: 'none' });
     if (error) return json({ error: error.message }, 400);
-    await admin.from(TABLE).update({
+    const { error: rowErr } = await admin.from(TABLE).update({
       initial_password: password, password_set_at: now, sent_at: null, revoked_at: null,
     }).eq('user_id', acct.user_id);
-    return json({ ok: true, username, password, created: false });
+    // The password IS changed, so it goes back to the coach either way; the warning says the list
+    // in coach.html (stored password, revoked mark) is behind until the next reset.
+    return json({ ok: true, username, password, created: false,
+      ...(rowErr ? { warning: 'the password works, but the account row was not updated (' + rowErr.message + '); coach.html may show the old state' } : {}) });
   }
 
   if (action === 'revoke') {
     const { error } = await admin.auth.admin.updateUserById(acct.user_id, { ban_duration: '876000h' });
     if (error) return json({ error: error.message }, 400);
-    await admin.from(TABLE).update({ revoked_at: now, initial_password: null }).eq('user_id', acct.user_id);
+    // The app's membership check reads revoked_at, so a ban without it is only half a revoke.
+    const { error: rowErr } = await admin.from(TABLE).update({ revoked_at: now, initial_password: null }).eq('user_id', acct.user_id);
+    if (rowErr) return json({ error: 'signed out for good, but not marked revoked (' + rowErr.message + '). Revoke again.' }, 500);
     return json({ ok: true, revoked: true });
   }
 

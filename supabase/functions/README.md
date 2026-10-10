@@ -7,9 +7,9 @@ now on.
 
 | Function | Deployed version when committed | `verify_jwt` | What it does |
 |---|---|---|---|
-| `athlete-login` | v4 (deployed 2026-09-15: optional typed password) | **false**, deliberately (the coach check is inside; see its header) | create / reset / create_many / revoke athlete logins; coach-only |
-| `assess-login` | v2 (deployed 2026-09-15: optional typed password) | **false**, deliberately (same coach check as athlete-login) | create / reset / revoke / restore logins for the tennis testing app (`/tennis-testing/app/`; its product page is `/tennis-testing/`); coach-only. Revoke bans, never deletes |
-| `tps-login` | v2 (deployed 2026-09-15: optional typed password) | **false**, deliberately (same coach check as athlete-login) | create / reset / revoke / restore logins for the Tennis Performance System course app (`/tennis/app/`); coach-only. Revoke bans, never deletes |
+| `athlete-login` | v6 (deployed 2026-10-10: a create never resets an existing login, `create_many` skips them, revoke reports a failed delete or a failed read; a reset whose row write fails says so) | **false**, deliberately (the coach check is inside; see its header) | create / reset / create_many / revoke athlete logins; coach-only |
+| `assess-login` | v3 (deployed 2026-10-10: a failed account read is a 500, not "no such login"; a failed row write after a ban or password change is reported) | **false**, deliberately (same coach check as athlete-login) | create / reset / revoke / restore logins for the tennis testing app (`/tennis-testing/app/`; its product page is `/tennis-testing/`); coach-only. Revoke bans, never deletes |
+| `tps-login` | v3 (deployed 2026-10-10: same fixes as assess-login v3) | **false**, deliberately (same coach check as athlete-login) | create / reset / revoke / restore logins for the Tennis Performance System course app (`/tennis/app/`); coach-only. Revoke bans, never deletes |
 
 **Typed passwords (since 2026-09-15).** A single create, reset or restore can carry a `password`
 that Amir typed in coach.html; without one, the function generates it (`athlete-login`'s

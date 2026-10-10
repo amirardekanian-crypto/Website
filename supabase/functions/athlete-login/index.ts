@@ -2,7 +2,7 @@
 //
 // The password is generated (makePassword), or typed by Amir in coach.html for a single create or
 // reset: then it must pass checkTyped() below, the same rule coach.html applies before sending it.
-// create_many always generates.
+// create_many always generates, and only creates: anyone who already has a login is skipped.
 //
 // Athletes have no email address, so an account is keyed on an internal address
 // athlete.<id>@amirardekani.com that never receives mail. The athlete types their
@@ -90,20 +90,27 @@ Deno.serve(async (req: Request) => {
 
   // Make or reset one login, with the typed password or a generated one. Returns the password so
   // the caller can show it, and stores it on the identity row so a bulk run is not lost to a closed dialog.
-  async function provision(athleteId: string, typed = '') {
+  // mode 'create' never touches an existing login (2026-10-10): a create from a stale coach.html
+  // page, or a bulk run after the login list failed to load, used to RESET the password of someone
+  // already signed in, locking them out until the new one reached them. 'reset' changes it.
+  async function provision(athleteId: string, typed = '', mode: 'create' | 'reset' = 'reset') {
     const email = `${PREFIX}${athleteId.toLowerCase()}@${LOGIN_DOMAIN}`;
     const password = typed || makePassword();
 
-    const { data: existing } = await admin
+    const { data: existing, error: readErr } = await admin
       .from('athlete_identities').select('user_id').eq('athlete_id', athleteId).maybeSingle();
+    if (readErr) return { athlete_id: athleteId, error: 'could not check for an existing login: ' + readErr.message };
 
+    if (existing?.user_id && mode === 'create') return { athlete_id: athleteId, skipped: true, error: 'already has a login (use Change password to reset it)' };
     if (existing?.user_id) {
       const { error } = await admin.auth.admin.updateUserById(existing.user_id, { password });
       if (error) return { athlete_id: athleteId, error: error.message };
-      await admin.from('athlete_identities')
+      const { error: rowErr } = await admin.from('athlete_identities')
         .update({ initial_password: password, password_set_at: new Date().toISOString(), sent_at: null })
         .eq('athlete_id', athleteId);
-      return { athlete_id: athleteId, username: athleteId, password, created: false };
+      // The password IS changed, so it goes back either way; the warning says Logins to send is behind.
+      return { athlete_id: athleteId, username: athleteId, password, created: false,
+        ...(rowErr ? { warning: 'the password works, but it was not stored for Logins to send (' + rowErr.message + '): copy it now' } : {}) };
     }
 
     const { data: made, error: mkErr } = await admin.auth.admin.createUser({
@@ -132,7 +139,7 @@ Deno.serve(async (req: Request) => {
     const typed = body.password == null ? '' : String(body.password);
     const bad = typed ? checkTyped(typed, athleteId) : '';
     if (bad) return json({ error: bad }, 400);
-    const r = await provision(athleteId, typed);
+    const r = await provision(athleteId, typed, action === 'create' ? 'create' : 'reset');
     if ('error' in r) return json({ error: r.error }, 400);
     return json({ ok: true, ...r });
   }
@@ -146,12 +153,12 @@ Deno.serve(async (req: Request) => {
     if (!ids.every(valid)) return json({ error: 'bad athlete_id in list' }, 400);
 
     const results = [];
-    for (const id of ids) results.push(await provision(id));
+    for (const id of ids) results.push(await provision(id, '', 'create'));
     return json({
       ok: true,
       created: results.filter(r => (r as any).created === true).length,
-      reset:   results.filter(r => (r as any).created === false).length,
-      failed:  results.filter(r => 'error' in r),
+      skipped: results.filter(r => (r as any).skipped).map(r => r.athlete_id),
+      failed:  results.filter(r => 'error' in r && !(r as any).skipped),
       results,
     });
   }
@@ -159,10 +166,13 @@ Deno.serve(async (req: Request) => {
   if (action === 'revoke') {
     const athleteId = String(body.athlete_id || '').trim();
     if (!valid(athleteId)) return json({ error: 'bad athlete_id' }, 400);
-    const { data: existing } = await admin
+    const { data: existing, error: readErr } = await admin
       .from('athlete_identities').select('user_id').eq('athlete_id', athleteId).maybeSingle();
+    // A failed read is not "no login": the coach would be told it was removed while it still works.
+    if (readErr) return json({ error: 'could not check the login: ' + readErr.message }, 500);
     if (!existing?.user_id) return json({ ok: true, revoked: false });
-    await admin.auth.admin.deleteUser(existing.user_id);   // cascades the identity row
+    const { error: delErr } = await admin.auth.admin.deleteUser(existing.user_id);   // cascades the identity row
+    if (delErr) return json({ error: 'could not remove the login: ' + delErr.message }, 400);
     return json({ ok: true, revoked: true });
   }
 
