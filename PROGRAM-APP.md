@@ -636,13 +636,14 @@ told them to train. Amir picked direction B of three mockups (https://claude.ai/
   roadmap's last cycle it is **Roadmap complete**, *3 cycles · 15 weeks* (the weeks only when every cycle is dated) and
   one filled segment per cycle. No wins: nothing, not the "your wins show here" line.
 - **Up next** (`betweenCyclesHTML()`, where This Week was): Game Plan's own card for the next cycle, folded, its Read
-  more in place and a tap to Game Plan; **Amir is building it now** in clay; and a WhatsApp door, *Tell Amir how Cycle 2
-  went · He reads it before he writes Cycle 3*, which feeds `/cycle-report`. On the last cycle: **What's next** and a
-  green **Plan my next block** door instead.
-- **"Building it now" only for `CYCLE_BUILD_DAYS` (14) after the end.** On 2026-10-10, 18 athletes were past their end
-  date and 12 of them by 18 to 88 days: for them it would not be true. After 14 days there is no status line and the
-  door reads **Ready for Cycle 3?** *Message Amir to start it.*
-- **Between cycles**: *No new week until Cycle 3 lands. Want to keep moving? Any session from Load & Build still works.*
+  more in place and a tap to Game Plan, then the one ask, a WhatsApp door: **Ready for Cycle 3?** *Message Amir to start
+  it.* On the last cycle: **What's next**, *You've trained the whole plan.* and the same door, **Ready for Cycle 4?**
+- **One ask, in all situations** (Amir, 2026-10-10: *"dont say amir is making the other one, just say 'Ready for
+  NextCycle ? Message Amir to start it' in all situations"*). The first version said "Amir is building it now" for 14
+  days, then this; it went the same day. Nothing on Home says the next cycle is being made.
+- **Game Plan marks it Done**: past the end date the cycle's card wears **Done** (it said Active) and its meter
+  segment is filled as done, not current.
+- **Between cycles**: *No new week until Cycle 3 starts. Want to keep moving? Any session from Load & Build still works.*
   and one **Repeat a session** row (`#bt-rep`) that unfolds the day cards (`paintBetweenFold()`, `.bt-folded`). They stay
   folded unless it is open or a session is under way: that card carries Resume, so it never hides. No week count, no
   suggested day (`markSuggestedDay()` marks only a session under way) and no week-done Library extra (LIB-01's two
@@ -651,7 +652,7 @@ told them to train. Amir picked direction B of three mockups (https://claude.ai/
   shows any of this; the demo has none. `cycleOver()` is the one test.
 - The guide's *How your program is structured* card says it in Amir's voice. Checked by
   `scripts/headless/cycle-end.js` (running, the end date, 4 and 40 days past, the last cycle light, dark and at 320 px,
-  undated, the fold, Read more and Resume).
+  undated, the fold, Read more, Resume, and Game Plan's Active or Done).
 
 ## 📅 This Week is built from the session history (HOME-01, 2026-09-26)
 

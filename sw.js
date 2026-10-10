@@ -182,7 +182,9 @@
 //      puts the pop-up's bar on installed phones.
 // v96: program.html changed (2026-10-10, PROG-02): the day after a cycle's end date Home says Cycle complete, shows
 //      the next cycle under Up next and folds the day cards under Repeat a session.
-const CACHE = 'aap-v96';
+// v97: program.html changed (2026-10-10, PROG-02): after a cycle Home only asks "Ready for Cycle N? Message Amir to
+//      start it." (never "Amir is building it"), and Game Plan marks the finished cycle Done.
+const CACHE = 'aap-v97';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

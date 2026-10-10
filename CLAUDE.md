@@ -192,8 +192,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   for habits, records and weight. A day done this week is a small row; a day not done stays a big card; a
   session in progress shows sets, the clock and Resume on its card. **Home never names a rest day**: athletes
   move their days. **The day after the cycle's end date Home is between cycles** (PROG-02, Amir 2026-10-10, option B):
-  the card says Cycle complete, Up next shows the next cycle, the day cards fold under Repeat a session, and "Amir is
-  building it now" is said for 14 days only (`cycleOver()`, `PROGRAM-APP.md` → *When the cycle is over*).
+  the card says Cycle complete, Up next shows the next cycle, the one ask is **"Ready for Cycle N? Message Amir to start
+  it."** in all situations (never "Amir is building it"), the day cards fold under Repeat a session, and Game Plan
+  marks the cycle Done (`cycleOver()`, `PROGRAM-APP.md` → *When the cycle is over*).
   Under the habits row, **today's habits, ticked in place**: AA Proof itself, embedded (`habits.html?embed=1`, `mountProofStrip()`).
   program.html still holds no habit state and writes no `<id>_hab_*` key but body weight; Proof does every write.
 - **Back closes the top layer** (NAV-01, 2026-09-26): one guard history entry while anything is open over
@@ -302,7 +303,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v96` on 2026-10-10). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v97` on 2026-10-10). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
