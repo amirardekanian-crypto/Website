@@ -157,7 +157,7 @@ Spine's Save bar stays on screen.
 | 6512744 | Small fixes from the re-check: focus ring, Calls and Library failures say so, labelled fields; athlete-login v6 |
 | 83dec62 | Coaching logs keep every earlier text (stage47); Forget is off while programmes have not loaded |
 | 5c57288, 7c10d71 ([#302](https://github.com/amirardekanian-crypto/Website/pull/302), merged) | Second session, 1 of 2: notes counted from when they arrived; the email import reads the check-in line (anchored, so an athlete's own note cannot set a verdict); `scripts/check_twins.js` (pre-commit guard 15); fixes from an independent review of the first commit |
-| second session, 2 of 2 | One transaction each for Delete training history and the Spine save (stage48), version history for the Spine (stage49), `scripts/test_spine_sql.sh`. Merge only after stage48 and stage49 are applied (§10) |
+| second session, 2 of 2 ([#303](https://github.com/amirardekanian-crypto/Website/pull/303)) | One transaction each for Delete training history and the Spine save (stage48), version history for the Spine (stage49), `scripts/test_spine_sql.sh`. Both stage files were applied to the live project and checked before this merged (§10) |
 
 **Files changed and why:** `coach.html` (all of the above), `program.html`, `habits.html`,
 `tennis/app/app.js`, `tennis-testing/app/app.js` (Farsi-keyboard sign-in only), `sw.js` (cache bump
@@ -172,7 +172,8 @@ backup; `coach_season_levels()` (coach only), the level helpers revoked from sig
 after this version went live, 14:05 UTC);
 `exercises` and `qualities` stamp `updated_at` on every update; `coach_login_use()` says which stored
 passwords have already been used; `coaching_log_versions` (stage47) keeps every earlier text of a
-coaching log. **Deployed:** athlete-login v6,
+coaching log; in the second session `coach_delete_training_history()` and `coach_save_spine()` (stage48, coach
+only, one transaction each) and `spine_versions` with its three triggers (stage49). **Deployed:** athlete-login v6,
 assess-login v3, tps-login v3.
 
 ## 5. The structure, and what to do with it next
@@ -260,7 +261,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 3. Decision 4 and 5 (passwords and erasure): what the privacy notice already promises.
 4. ~~A server function for "Delete training history" and the Spine save (one transaction each), so a
    half-finished two-table write cannot happen (SERVER-9, SPINE-5).~~ Done in the second session
-   (stage48): written and tested on a real Postgres; it waits for you to be present to apply it (§10).
+   (stage48): written, tested on a real Postgres, applied to the live project and checked on 2026-10-10 (§10).
 5. The structure items in §5, one at a time, each with its harness scenario.
 6. Run the live dashboard once after this deploy and tap through each tab on your phone.
 
@@ -537,35 +538,52 @@ Done without a decision from you (your list, in your order):
 
 | Item | Where it ended | Finding |
 |---|---|---|
-| One transaction for *Delete training history* | `coach_delete_training_history()`, stage48 | SERVER-9, HARNESS-7 |
-| One transaction for the Spine save | `coach_save_spine()`, stage48; the page sends one call | SPINE-5 |
-| Version history for Spine entries | `spine_versions` + a trigger, stage49; Exercises → an entry → History, with Undo | SERVER-6 |
+| One transaction for *Delete training history* | `coach_delete_training_history()`, stage48, applied; the page sends one call | SERVER-9, HARNESS-7 |
+| One transaction for the Spine save | `coach_save_spine()`, stage48, applied; the page sends one call | SPINE-5 |
+| Version history for Spine entries | `spine_versions` + a trigger, stage49, applied; Exercises → an entry → History, with Undo | SERVER-6 |
 | Note backlog by when a note arrived | live (#302, merged) | TODAY-2 |
 | The check-in line in imported emails | live (#302); Claude's Gmail import stores the same keys | FILE-8 |
 | A guard for logic in both apps | `scripts/check_twins.js`, pre-commit guard 15, live (#302) | TWIN-10, TWIN-4 |
 
-**What needs you: apply stage48 and stage49 (and stage45) while you are here.** The database tool asks
-for a confirmation on any SQL containing a delete, so I cannot apply these alone. The page change for
-stage48 and stage49 is a second pull request that calls those functions, so **it is merged only after the SQL is
-applied** (the order is SQL first, page second; the other way round, Delete training history and the Spine
-save would both fail until the SQL arrived). Say "apply stage45, 48 and 49". Each is checked afterwards with:
+**What still needs you: stage45, with you present** (the server refusing Forget for a coached client). stage48 and
+stage49 are applied (migrations `stage48_coach_one_transaction` and `stage49_spine_versions`), so the order was SQL
+first, page second: this page change merged only after both checks below returned `true`. The migration tool
+did not ask for a confirmation for either, although both contain the word *delete* inside function and trigger
+definitions; the SQL runner is what timed out on a test that really deleted rows. So stage45 may apply without a
+prompt too. I did not try, because you asked to be there for it. Say "apply stage45" and check it with the first query:
 
 ```sql
--- stage45
+-- stage45 (false until it is applied)
 select position('coached athlete: forget' in pg_get_functiondef('public.forget_contact'::regproc)) > 0;
--- stage48
+-- stage48 (true, checked 2026-10-10)
 select to_regprocedure('public.coach_save_spine(text,jsonb,jsonb,jsonb,jsonb)') is not null
    and to_regprocedure('public.coach_delete_training_history(text)') is not null;
--- stage49
+-- stage49 (true, checked 2026-10-10)
 select to_regclass('public.spine_versions') is not null
    and (select count(*) from pg_trigger where tgname in ('exercises_version_trg','exercise_coach_version_trg','qualities_version_trg') and not tgisinternal) = 3;
 ```
 
-All three return `true`. stage48 and stage49 were run first on a real Postgres 16 with a replica of the live tables
-(`sh scripts/test_spine_sql.sh`: 73 assertions: the coach check, grants, row-level security, atomicity, the
-trigger; and two real sessions showing a dashboard save waits for Claude's in-flight write and then sees it).
-Nothing was run against the project: the first attempt hit the confirmation and timed out, and the test block ended in a
-rollback, so nothing persisted (checked).
+**How stage48 and stage49 were proved before and after going live.**
+- Before: both files were run on a real Postgres 16 with a replica of the live tables (`sh scripts/test_spine_sql.sh`:
+  73 assertions: the coach check, grants, row-level security, atomicity, the trigger; and two real sessions showing a
+  dashboard save waits for Claude's in-flight write and then sees it).
+- After applying: the two checks above; the security advisor shows nothing new (the two coach functions sit in its
+  *signed-in users can execute* list like every other coach-only function, and each refuses anyone but you;
+  `spine_keep_version()` is executable by neither role; `spine_versions` has its policy); and two smoke tests on the live
+  tables, each inside a transaction that ended in an error so nothing persisted (re-read afterwards: no history row,
+  no stray athlete rows, the entry unchanged). The Spine save: a normal save writes one history row naming your email
+  and keeping the old value; a stale snapshot is refused with the live value and writes nothing; an unchanged save leaves
+  no history row; the coach-only half saves; a field the editor does not own and a caller who is not you are both
+  refused. (Creating a missing coach-only row is covered by the local test only.) The delete, on made-up athletes: two sessions and one progress row
+  go, a second made-up athlete's rows stay, an unknown athlete returns zeros, a blank athlete and a caller who is not
+  you are refused.
+- The first real history row appeared seconds after stage49 went in: a write with no signed-in user (Claude's `/spine`
+  or the SQL editor) changed one entry's alternatives, and the trigger recorded it as `sql`.
+
+**Found in the advisor, not fixed (outside the five items).** stage47's trigger function `coaching_logs_keep_version()`
+is still executable by `anon` and signed-in users (stage49's version revokes it). A trigger function cannot be called
+directly, so nothing is exposed; the one-line cleanup, which changes no behaviour, is
+`revoke execute on function public.coaching_logs_keep_version() from public, anon, authenticated;`.
 
 **Found while doing it, not fixed (program.html, outside the five items).** `cycleWeekInfo()` reads a cycle's
 `endDate` as a UTC midnight, so for an athlete west of Greenwich the app says the cycle is over (*Cycle complete*,

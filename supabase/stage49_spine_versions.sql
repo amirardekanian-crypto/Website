@@ -1,5 +1,6 @@
 -- stage49 — version history for the Spine (2026-10-10, coach.html audit SERVER-6 / SPINE-1).
--- Safe to re-run.
+-- Safe to re-run. Applied to the live project 2026-10-10 as migration stage49_spine_versions,
+-- after passing scripts/test_spine_sql.sh.
 --
 -- Until now an overwritten cue, a wiped count or a deleted entry could only come back from a weekly backup
 -- file. programs has had program_versions since 2026-09-07 and coaching_logs got coaching_log_versions in

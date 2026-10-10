@@ -121,7 +121,7 @@ in the list itself; if a field was changed again since, the confirm shows what i
 goes back to, and a status change warns that it takes an entry off the phones (or puts it on). A
 deleted entry is kept whole too (`op = 'delete'`): put it back with SQL (the recipe is in
 `supabase/stage49_spine_versions.sql`). The ten qualities are versioned by the same trigger but have no
-panel yet. Until stage49 is applied the panel says so and nothing else changes.
+panel yet. If `spine_versions` is missing (a project before stage49) the panel says so and nothing else changes.
 
 **The Quality Map (2026-09-24)** adds three things to this tab:
 - **The ten qualities.** The words each athlete's Home day cards use (Strength, Brakes …): one

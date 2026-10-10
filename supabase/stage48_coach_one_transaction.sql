@@ -1,5 +1,6 @@
 -- stage48 — two coach.html writes become one transaction each (2026-10-10, coach.html audit
--- SERVER-9 / HARNESS-7 and SPINE-5). Safe to re-run.
+-- SERVER-9 / HARNESS-7 and SPINE-5). Safe to re-run. Applied to the live project 2026-10-10 as
+-- migration stage48_coach_one_transaction, after passing scripts/test_spine_sql.sh.
 --
 -- 1. coach_delete_training_history(athlete)
 --    "Delete training history" was two separate deletes from the page (session_history, then
