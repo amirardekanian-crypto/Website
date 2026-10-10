@@ -264,14 +264,19 @@
       return null;
     },
     hab_season_level: function (p) { return (SEED.levels || {})[p.p_athlete_id] || null; },
+    coach_season_levels: function (p) { return (p.p_ids || []).map(function (id) { return { athlete_id: id, level: (SEED.levels || {})[id] || null }; }); },
     leaderboard_top: function () { return clone(SEED.board || []); },
     save_session: function (p) {
       var s = p.p_session || {}, t = tbl('session_history');
       var row = { athlete_id: p.p_athlete_id, athlete_name: p.p_athlete_name, day: p.p_day, completed_on: p.p_completed_on,
         status: s.status, session_rpe: s.session_rpe === '' ? null : Number(s.session_rpe), duration_min: s.duration_min === '' ? null : Number(s.duration_min),
-        readiness: s.readiness, day_note: s.day_note, focus: s.focus, summary: s.summary, updated_at: nowIso(), coach_status: 'new', log: null };
+        readiness: s.readiness, day_note: s.day_note, focus: s.focus, summary: s.summary, updated_at: nowIso(),
+        log: Array.isArray(s.log) ? s.log : null };
       var at = t.findIndex(function (r) { return r.athlete_id === row.athlete_id && Number(r.day) === Number(row.day) && r.completed_on === row.completed_on; });
-      if (at >= 0) t[at] = Object.assign(t[at], row); else t.push(row);
+      // stage46: an existing row keeps its log unless the coach says replace_log, and keeps its
+      // coach_status (the caller here is always the coach, whose saves never re-open a note).
+      if (at >= 0) { if (!s.replace_log && row.log == null) row.log = t[at].log; t[at] = Object.assign(t[at], row); }
+      else { row.coach_status = 'new'; t.push(row); }
       return null;
     },
     forget_contact: function (p) {

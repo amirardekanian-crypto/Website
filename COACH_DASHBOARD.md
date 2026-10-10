@@ -386,7 +386,9 @@ no set ticked is flagged *0 of N sets ticked* instead of counting as exactly as 
 
 **Every note has Mark read.** A note written against one exercise counts as a note to read (it did
 before), and since 2026-10-10 it also gets the note box and Mark read (8 of 12 waiting notes had no
-way to be cleared).
+way to be cleared). **A note the athlete edits after you marked it read comes back** to *needs you*
+(stage46; the server used to keep it read whatever it now said). Mark read changes that one row in
+the page's copy; it no longer re-downloads the whole session history.
 
 ### Editing a prescription (✎)
 
@@ -449,7 +451,8 @@ here and one lift there — both sides run the same name matcher, on purpose.
   do they on the roster. (It was called *Delete all data* until 2026-10-10, which it never was.)
 - **Backfill** (The work, bottom): *+ Add past session from email* now checks the email's Athlete
   line against this athlete, starts with no date (it used to default to today), and warns before it
-  replaces a session logged on the same date (the server overwrites it, set-by-set log included) or
+  replaces a session logged on the same date (the email's session replaces it, set-by-set log
+  included: since stage46 that is true, before it the old log stayed under the new text) or
   adds a second one within a week. It reads the whole athlete note, not just its first line.
 
 ## 6. The three metrics
@@ -585,6 +588,7 @@ grammar there and they have to follow. `node scripts/test_coach_compare.js` runs
 over real logs and catches it if they don't. The write paths (saves, deletes, logins, backups) are
 covered by the real-mode harness in `scripts/headless/coach/`.
 
-Coach writes go through the guarded RPCs — `set_coach_note`, `hide_note`,
-`set_quests`, `clear_quests`, `forget_contact`, `save_session` — each of which
-enforces the coach email itself.
+Some coach writes go through RPCs that check the coach themselves (`set_coach_note`, `hide_note`,
+`set_quests`, `clear_quests`, `forget_contact`, `save_session`, `coach_season_levels`); the rest are
+direct table writes that only the coach's RLS policies let through. Every one of them asks for its
+rows back, so a write RLS silently refused (a lapsed sign-in) says so instead of reporting success.

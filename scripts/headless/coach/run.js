@@ -246,6 +246,7 @@ S['note-mark-read'] = async (b) => {
   check(r, 'the note now says read', (await page.locator('.wday.open .dn-read').count()) === 1, await page.locator('.wday.open .daynote').innerText().catch(() => ''));
   const badge1 = await page.locator('#rail a.tab', { hasText: 'Athletes' }).innerText();
   check(r, 'the Athletes badge drops', badge0 !== badge1, { before: badge0, after: badge1 });
+  check(r, 'no re-read of the whole session_history afterwards', !cs.some(c => c.name === 'session_history' && c.op === 'select'), cs.map(c => c.name + ':' + c.op));
   await page.context().close();
   return r;
 };
@@ -605,6 +606,30 @@ S['session-import-delete'] = async (b) => {
   const del = (await L.callsSince(page, n0)).filter(x => x.name === 'session_history' && x.op === 'delete').slice(-1)[0];
   check(r, 'delete filtered on athlete, day and date (the primary key)', del && del.filters.length === 3, del && del.filters);
   check(r, 'Day 3 is back to not logged', /not logged yet/.test(await page.locator('.wday', { hasText: 'Pull Day (fixture)' }).locator('.wday-top').innerText()), '');
+  await page.context().close();
+  return r;
+};
+
+S['session-import-replace'] = async (b) => {
+  const r = { id: 'session-import-replace', title: 'Add past session over one already on that date: the email really replaces it', checks: [] };
+  const { page, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const day = require('./fixtures').daysAgo(today, 6);
+  await page.evaluate(d => {
+    window.__DB.session_history.push({ athlete_id: 'ava_test', athlete_name: 'Ava Example', day: 3, completed_on: d, status: 'Complete', session_rpe: 7, duration_min: 30,
+      readiness: null, day_note: '', focus: 'Pull Day (fixture)', summary: 'Day 3 — Pull Day (fixture)\nExercise log:\n• Old Lift (✓)', log: [{ ex: 'Old Lift', sets: [] }], coach_status: 'read', updated_at: new Date().toISOString() });
+  }, day);
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
+  const email = ['Full summary', 'Day 3 — Pull Day (fixture)', 'Status: Complete', 'Session RPE: 8/10', 'Duration: 40 min', '', 'Exercise log:', '[Primary]', '• Trap Bar Deadlift (✓)', '    Set 1: 80 @7 ✓'].join('\n');
+  await page.locator('button', { hasText: 'Add past session from email' }).click();
+  await page.locator('#as-paste').fill(email);
+  await page.locator('button', { hasText: 'Read email' }).click();
+  await page.locator('#as-date').fill(day);
+  const n0 = await L.nCalls(page);
+  await page.locator('#as-save').click(); await L.settle(page, 800);
+  const c = (await L.callsSince(page, n0)).filter(x => x.name === 'save_session').slice(-1)[0];
+  check(r, 'save_session asks to replace the old log', c && c.payload.p_session.replace_log === true, c && c.payload.p_session.replace_log);
+  const row = (await L.db(page)).session_history.find(x => x.athlete_id === 'ava_test' && x.day === 3 && x.completed_on === day);
+  check(r, "the old set-by-set log is gone, so coach and athlete see the email's session", row && row.log == null && /Trap Bar Deadlift/.test(row.summary), row && { log: row.log });
   await page.context().close();
   return r;
 };

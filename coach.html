@@ -1962,26 +1962,32 @@ function reasonsOf(a) {
 }
 
 // Server-scored season level per Proof athlete (cached; never computed here).
-// One call per athlete is the only way to get an authoritative level keyed by
-// athlete_id — leaderboard_top returns display names, and it only covers the
-// people who joined the board. Each call re-walks that athlete's whole log, so
-// they go out a few at a time rather than as one burst across the roster.
+// coach_season_levels() (stage46, coach only) answers for every athlete in one call. The per-athlete
+// hab_season_level is the fallback while that is missing; since stage46 athletes cannot call it.
 async function loadLevels() {
   if (DEMO || loadLevels._done) return;
   loadLevels._done = true;
   const ids = Object.values(S.ath).filter(a => a.isHab).map(a => a.id);
+  if (!ids.length) return;
+  const all = await sb.rpc('coach_season_levels', { p_ids: ids });
+  if (!all.error && Array.isArray(all.data)) {
+    all.data.forEach(r => { if (r && r.level != null) S.levels[r.athlete_id] = r.level; });
+    LOAD_ERR.levels = '';
+    return;
+  }
   const LANES = 6;
-  let next = 0;
+  let next = 0, failed = 0;
   const lane = async () => {
     while (next < ids.length) {
       const id = ids[next++];
       try {
         const r = await sb.rpc('hab_season_level', { p_athlete_id: id });
-        if (!r.error && r.data != null) S.levels[id] = r.data;
-      } catch (e) { /* a missing level just hides the chip */ }
+        if (!r.error && r.data != null) S.levels[id] = r.data; else if (r.error) failed++;
+      } catch (e) { failed++; }
     }
   };
   await Promise.all(Array.from({ length: Math.min(LANES, ids.length) }, lane));
+  LOAD_ERR.levels = failed === ids.length ? (all.error && all.error.message) || 'no level came back' : '';
 }
 
 // --- season helpers ---------------------------------------------------------
@@ -2317,13 +2323,14 @@ async function clearNoteBacklog() {
   if (!rows.length) return;
   if (!confirm(`Mark ${rows.length} note${rows.length === 1 ? '' : 's'} older than ${NEEDS_WINDOW_DAYS} days as read?\n\nThey stay on each athlete's file — this only clears them out of "needs you".`)) return;
   let done = 0, failed = 0;
+  const marked = [];
   for (const r of rows) {
     const res = await sb.from('session_history').update({ coach_status: 'read' })
-      .eq('athlete_id', r.athlete_id).eq('day', r.day).eq('completed_on', r.completed_on).select('day');
-    if (writeFailed(res)) failed++; else done++;
+      .eq('athlete_id', r.athlete_id).eq('day', r.day).eq('completed_on', r.completed_on).select('athlete_id, day, completed_on');
+    if (writeFailed(res)) failed++; else { done++; marked.push(...res.data); }
   }
   if (failed) alert(`${done} marked read, ${failed} could not be. Refresh and try again.`); else toast(`${done} older note${done === 1 ? '' : 's'} marked read`);
-  refetch(['hist']);
+  markHistRead(marked);
 }
 window.clearNoteBacklog = clearNoteBacklog;
 
@@ -4016,10 +4023,17 @@ function fileTabHtml(D) {
 async function markNoteRead(athleteId, day, completedOn) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const res = await sb.from('session_history').update({ coach_status: 'read' })
-    .eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn).select('day');
+    .eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn).select('athlete_id, day, completed_on');
   const bad = writeFailed(res, 'marked read');
   if (bad) { alert('Could not mark it read: ' + bad); return; }
-  refetch(['hist']);
+  markHistRead(res.data);
+}
+// The rows the server just marked read, patched into the copy in memory. Re-reading the whole of
+// session_history (about 800 kB, and growing) after every tap was the old way.
+function markHistRead(rows) {
+  const keys = new Set((rows || []).map(r => r.athlete_id + '|' + r.day + '|' + r.completed_on));
+  (S.hist || []).forEach(h => { if (keys.has(h.athlete_id + '|' + h.day + '|' + h.completed_on)) h.coach_status = 'read'; });
+  assemble(); render();
 }
 window.markNoteRead = markNoteRead;
 
@@ -4123,7 +4137,10 @@ async function submitPastSession(athleteId) {
       readiness: p.readiness || null,
       day_note: p.day_note || '',
       focus: p.focus || '',
-      summary: p.summary
+      summary: p.summary,
+      // Over a session already on that date: the email REPLACES it, set-by-set log included
+      // (stage46; the server used to keep the old log under the new text, coach only).
+      replace_log: !!exact
     },
     // The coach is authorised as the coach now, not by holding the athlete's
     // secret. Every key was deleted when the old links were retired.
@@ -4197,10 +4214,15 @@ async function deleteAthlete(athleteId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const name = nameOf(athleteId);
   if (!confirm(`Delete ${name}'s training history?\n\nThis permanently removes every finished session, and everything the app keeps for them on the server: habit log, body weight, personal records, the live snapshot. It cannot be undone, except from a backup file.\n\nWhat STAYS: their programme, their login, the coaching log, call logs, Proof contact and wall lines. They stay on the roster. To remove someone completely, ask Claude (it needs the database).`)) return;
-  const r1 = await sb.from('session_history').delete().eq('athlete_id', athleteId);
-  const r2 = await sb.from('athlete_progress').delete().eq('athlete_id', athleteId);
-  if (r1.error || r2.error) { alert('Could not delete everything: ' + ((r1.error || r2.error).message) + (r1.error ? '' : '\n\nThe finished sessions WERE deleted; the progress snapshot was not.')); hardRefresh(); return; }
-  toast('Training history deleted');
+  // Ask for the rows back: with a lapsed sign-in RLS deletes nothing and reports no error, and
+  // this used to say "Training history deleted" all the same.
+  const r1 = await sb.from('session_history').delete().eq('athlete_id', athleteId).select('day');
+  const r2 = await sb.from('athlete_progress').delete().eq('athlete_id', athleteId).select('athlete_id');
+  if (r1.error || r2.error) { alert('Could not delete everything: ' + ((r1.error || r2.error).message) + (r1.error ? '' : `\n\nThe finished sessions WERE deleted (${(r1.data || []).length}); the progress snapshot was not.`)); hardRefresh(); return; }
+  const nS = (r1.data || []).length, nP = (r2.data || []).length;
+  const had = (S.hist || []).some(h => h.athlete_id === athleteId) || (S.prog || []).some(p => p.athlete_id === athleteId);
+  if (!nS && !nP && had) { alert('Nothing was deleted: the server removed no rows. Your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.'); return; }
+  toast(`Deleted ${nS} session${nS === 1 ? '' : 's'}${nP ? ' and the app data' : ''}`);
   hardRefresh();
 }
 async function deleteCallLog(id, athleteId, callDate) {
@@ -4655,7 +4677,8 @@ async function assessAction(action, username, label, btn, password) {
   renderAssess();
   alert((data.created ? 'Login created' : action === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username + '\n\n' +
     'Password: ' + data.password + '\n\n' +
-    'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent.');
+    'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent.' +
+    (data.warning ? '\n\n⚠ ' + data.warning : ''));
 }
 
 async function assessMarkSent(username) {
@@ -4793,7 +4816,8 @@ async function courseAction(action, username, label, btn, password) {
   renderCourse();
   alert((data.created ? 'Login created' : action === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username + '\n\n' +
     'Password: ' + data.password + '\n\n' +
-    'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent.');
+    'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent.' +
+    (data.warning ? '\n\n⚠ ' + data.warning : ''));
 }
 
 async function courseMarkSent(username) {
