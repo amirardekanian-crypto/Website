@@ -21,6 +21,11 @@
 --         (null for a half that was not sent).
 --    Claude's /spine Upkeep writes the same rows by SQL, so the lock matters: a /spine write that lands
 --    between the page's read and its write is waited for and seen, not overwritten.
+--    Lock order: exercises first, then exercise_coach (the direction ON DELETE CASCADE already takes). A
+--    transaction that updates exercise_coach and THEN exercises can wait on this function while it waits on
+--    that transaction; Postgres then aborts one of the two with "deadlock detected" (nothing is corrupted, and
+--    this page says nothing was saved). So a /spine write that puts both tables in one call updates
+--    exercises first (.claude/skills/spine/SKILL.md, "Clear, only after Amir's word").
 --    The page sends the values it read for the columns it is changing (entry_snap / coach_snap); a
 --    missing key counts as null. Only the columns the editor owns can be written here.
 --
@@ -67,10 +72,11 @@ declare
   c_entry text[] := array['name','aliases','pattern','qualities','purpose','tennis','cues','equipment','loads',
                           'easier','harder','alts','video','status','impact','muscles'];
   c_coach text[] := array['sfr','flags','notes','credits','cost'];
-  v_entry   jsonb := case when jsonb_typeof(p_entry) = 'object' then p_entry else '{}'::jsonb end;
-  v_coach   jsonb := case when jsonb_typeof(p_coach) = 'object' then p_coach else '{}'::jsonb end;
-  v_esnap   jsonb := case when jsonb_typeof(p_entry_snap) = 'object' then p_entry_snap else '{}'::jsonb end;
-  v_csnap   jsonb := case when jsonb_typeof(p_coach_snap) = 'object' then p_coach_snap else '{}'::jsonb end;
+  -- SQL NULL and JSON null both mean "nothing for that half"; anything else that is not an object is refused below.
+  v_entry   jsonb := coalesce(nullif(p_entry, 'null'::jsonb), '{}'::jsonb);
+  v_coach   jsonb := coalesce(nullif(p_coach, 'null'::jsonb), '{}'::jsonb);
+  v_esnap   jsonb := coalesce(nullif(p_entry_snap, 'null'::jsonb), '{}'::jsonb);
+  v_csnap   jsonb := coalesce(nullif(p_coach_snap, 'null'::jsonb), '{}'::jsonb);
   v_live_e  jsonb;
   v_live_c  jsonb;
   v_clash_e text[];
@@ -84,6 +90,12 @@ declare
 begin
   if not public.is_coach() then
     raise exception 'coach only';
+  end if;
+  -- A double-encoded or otherwise malformed payload must fail loudly: read as "{}" it came back ok:true having
+  -- written nothing, and the page would have said Saved.
+  if jsonb_typeof(v_entry) <> 'object' or jsonb_typeof(v_coach) <> 'object'
+     or jsonb_typeof(v_esnap) <> 'object' or jsonb_typeof(v_csnap) <> 'object' then
+    raise exception 'the entry, the coach-only part and their two snapshots must each be a JSON object';
   end if;
 
   for v_k in select jsonb_object_keys(v_entry) loop

@@ -195,6 +195,25 @@ begin
     perform pg_temp.rec('refused: an entry that is not on the server', false, 'no error');
   exception when others then perform pg_temp.rec('refused: an entry that is not on the server', sqlerrm like 'this entry is no longer on the server (zz-gone)%', sqlerrm); end;
 
+  -- a payload that is not a JSON object is an error, never a silent "saved" (a double-encoded payload used to read as ok)
+  begin perform public.coach_save_spine('zz-test-entry', '[1,2]', '{}', '{}', '{}');
+    perform pg_temp.rec('refused: an entry payload that is an array', false, 'no error');
+  exception when others then perform pg_temp.rec('refused: an entry payload that is an array', sqlerrm like '%must each be a JSON object%', sqlerrm); end;
+  begin perform public.coach_save_spine('zz-test-entry', '{}', '{}', '"{\"notes\":\"x\"}"', '{}');
+    perform pg_temp.rec('refused: a coach payload that is a double-encoded string', false, 'no error');
+  exception when others then perform pg_temp.rec('refused: a coach payload that is a double-encoded string', sqlerrm like '%must each be a JSON object%', sqlerrm); end;
+  begin perform public.coach_save_spine('zz-test-entry', '{}', '1', '{}', '{}');
+    perform pg_temp.rec('refused: a snapshot that is a number', false, 'no error');
+  exception when others then perform pg_temp.rec('refused: a snapshot that is a number', sqlerrm like '%must each be a JSON object%', sqlerrm); end;
+  begin perform public.coach_save_spine('zz-test-entry', '{}', '{}', '{}', 'true');
+    perform pg_temp.rec('refused: a snapshot that is a boolean', false, 'no error');
+  exception when others then perform pg_temp.rec('refused: a snapshot that is a boolean', sqlerrm like '%must each be a JSON object%', sqlerrm); end;
+  -- SQL NULL and JSON null both mean "nothing for that half": an ok that wrote nothing
+  select count(*) into n from public.spine_versions where row_id = 'zz-test-entry';
+  r := public.coach_save_spine('zz-test-entry', null, null, 'null'::jsonb, null);
+  perform pg_temp.rec('null and JSON null arguments mean nothing to write', r = '{"ok":true,"entry":null,"coach":null}'::jsonb, r::text);
+  perform pg_temp.rec('...and leave no history row', (select count(*) from public.spine_versions where row_id = 'zz-test-entry') = n, '');
+
   -- atomic: a valid entry half with an invalid coach half writes neither
   select video into v from public.exercises where id = 'zz-test-entry';
   begin
@@ -223,6 +242,9 @@ begin
   begin perform public.coach_save_spine('zz-test-entry', '{"video":"x"}', '{}', '{}', '{}');
     perform pg_temp.rec('save: someone who is not the coach is refused', false, 'no error');
   exception when others then perform pg_temp.rec('save: someone who is not the coach is refused', sqlerrm = 'coach only', sqlerrm); end;
+  begin perform public.coach_save_spine('zz-test-entry', '[1]', '{}', '{}', '{}');
+    perform pg_temp.rec('save: ...and is told "coach only" before anything about the payload', false, 'no error');
+  exception when others then perform pg_temp.rec('save: ...and is told "coach only" before anything about the payload', sqlerrm = 'coach only', sqlerrm); end;
   begin
     execute 'set local role anon';
     perform public.coach_save_spine('zz-test-entry', '{"video":"x"}', '{}', '{}', '{}');
@@ -285,6 +307,17 @@ begin
   -- and can be put back from the version
   insert into public.exercises select * from jsonb_populate_record(null::public.exercises, (select data from public.spine_versions where tbl = 'exercises' and row_id = 'zz-test-entry' and op = 'delete' order by id desc limit 1));
   perform pg_temp.rec('versions: a deleted entry can be put back from its version', exists (select 1 from public.exercises where id = 'zz-test-entry' and name = 'ZZ Test Entry'), '');
+  -- the recipe in stage49's header has a second insert for the coach-only row, which is a version of its own
+  insert into public.exercise_coach select r.* from jsonb_populate_record(null::public.exercise_coach, (select data from public.spine_versions where tbl = 'exercise_coach' and row_id = 'zz-test-entry' and op = 'delete' order by id desc limit 1)) r where r.id is not null;
+  perform pg_temp.rec('versions: ...and its coach-only row comes back identical (the recipe has two inserts)',
+    (select to_jsonb(c) from public.exercise_coach c where c.id = 'zz-test-entry') = (select data from public.spine_versions where tbl = 'exercise_coach' and row_id = 'zz-test-entry' and op = 'delete' order by id desc limit 1), '');
+  -- an entry that never had a coach-only row: the second insert of the recipe adds nothing and does not fail
+  insert into public.exercises (id, name) values ('zz-nocoach', 'ZZ No Coach Row');
+  delete from public.exercises where id = 'zz-nocoach';
+  insert into public.exercises select * from jsonb_populate_record(null::public.exercises, (select data from public.spine_versions where tbl = 'exercises' and row_id = 'zz-nocoach' and op = 'delete' order by id desc limit 1));
+  insert into public.exercise_coach select r.* from jsonb_populate_record(null::public.exercise_coach, (select data from public.spine_versions where tbl = 'exercise_coach' and row_id = 'zz-nocoach' and op = 'delete' order by id desc limit 1)) r where r.id is not null;
+  perform pg_temp.rec('versions: restoring an entry that had no coach-only row adds none and does not fail',
+    exists (select 1 from public.exercises where id = 'zz-nocoach') and not exists (select 1 from public.exercise_coach where id = 'zz-nocoach'), '');
 end $t$;
 
 -- who may read the history

@@ -803,6 +803,9 @@ S['athlete-delete-fails'] = async (b) => {
     { name: 'a server error', set: () => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_delete_training_history', message: 'fixture: connection reset', times: 1 }), say: /Nothing was deleted: fixture: connection reset/ },
     { name: 'a lapsed sign-in', set: () => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_delete_training_history', message: 'permission denied for function coach_delete_training_history', times: 1 }), say: /sign-in may have lapsed/ },
     { name: 'stage48 not applied', set: () => { window.__STUB.missingRpc = ['coach_delete_training_history']; }, say: /has not been applied/ },
+    // No database code = the answer never arrived (a dropped connection): the delete may or may not have gone through,
+    // so the page must not claim "nothing was removed" (here the stub did not run it, but the page cannot know that).
+    { name: 'the answer never arrives', set: () => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_delete_training_history', message: 'TypeError: Failed to fetch', code: '', times: 1 }), say: /answer never arrived[\s\S]*cannot tell whether Ben Example's training history was deleted/, unsure: true },
   ];
   for (const c of cases) {
     log.dialogs.length = 0;
@@ -810,7 +813,7 @@ S['athlete-delete-fails'] = async (b) => {
     await page.locator('button', { hasText: /Delete training history/ }).click();
     await L.settle(page, 700);
     const alerts = log.dialogs.filter(x => x.type === 'alert').map(x => x.message);
-    check(r, c.name + ': the alert says nothing was deleted, in words that fit', alerts.length === 1 && c.say.test(alerts[0]) && /Nothing was removed/.test(alerts[0]), alerts);
+    check(r, c.name + ': the alert says what is known, in words that fit', alerts.length === 1 && c.say.test(alerts[0]) && (c.unsure ? !/Nothing was (removed|deleted)/.test(alerts[0]) : /Nothing was removed/.test(alerts[0])), alerts);
     const d = await L.db(page);
     check(r, c.name + ': the sessions and the snapshot are both still there', d.session_history.filter(x => x.athlete_id === 'ben_test').length === 2 && d.athlete_progress.some(x => x.athlete_id === 'ben_test'), '');
   }
@@ -985,6 +988,12 @@ S['spine-save-atomic'] = async (b) => {
   check(r, 'a failed save writes neither half', d.exercises.find(x => x.id === 'goblet-squat').purpose === 'Fixture purpose.' && d.exercise_coach.find(x => x.id === 'goblet-squat').sfr === 2, { purpose: d.exercises.find(x => x.id === 'goblet-squat').purpose, sfr: d.exercise_coach.find(x => x.id === 'goblet-squat').sfr });
   check(r, 'the alert says nothing was saved, to either half, and keeps the typing', log.dialogs.length === 1 && /Could not save Goblet Squat: fixture: connection reset/.test(log.dialogs[0].message) && /Nothing was saved, to either half/.test(log.dialogs[0].message)
     && (await page.locator('[data-sf=purpose]').inputValue()) === 'Typed before the failure' && (await page.locator('[data-sf=sfr]').inputValue()) === '4', log.dialogs.map(x => x.message));
+  // The answer never arrives (no database code): the save may have gone in, so the page must not say it did not.
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_save_spine', message: 'TypeError: Failed to fetch', code: '', times: 1 }));
+  log.dialogs.length = 0;
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  check(r, 'an answer that never arrived is not reported as "nothing was saved"', log.dialogs.length === 1 && /answer never arrived/.test(log.dialogs[0].message) && /cannot tell whether Goblet Squat was saved/.test(log.dialogs[0].message)
+    && !/Nothing was saved/.test(log.dialogs[0].message) && (await page.locator('[data-sf=purpose]').inputValue()) === 'Typed before the failure', log.dialogs.map(x => x.message));
   // stage48 not applied: say so, change nothing.
   log.dialogs.length = 0;
   await page.evaluate(() => { window.__STUB.missingRpc = ['coach_save_spine']; });
@@ -1053,11 +1062,134 @@ S['spine-history-unavailable'] = async (b) => {
   let txt = await page.locator('#spvlist').innerText();
   check(r, 'a missing table says stage49 is not applied', /not on the server yet/.test(txt) && /stage49/.test(txt), txt);
   await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 200);
+  // A lapsed sign-in answers 42501 "permission denied for table spine_versions": it names the table, and must not read as "stage49 is not applied".
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'from', name: 'spine_versions', op: 'select', message: 'permission denied for table spine_versions', code: '42501', times: 1 }));
+  await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 500);
+  txt = await page.locator('#spvlist').innerText();
+  check(r, 'a lapsed sign-in says so, not "stage49 is not applied"', /sign-in may have lapsed/.test(txt) && !/not on the server yet/.test(txt), txt);
+  await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 200);
   await page.evaluate(() => window.__STUB.fail.push({ kind: 'from', name: 'spine_versions', op: 'select', message: 'fixture: network down', times: 1 }));
   await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 500);
   txt = await page.locator('#spvlist').innerText();
   check(r, 'any other failure says what failed', /Could not load history: fixture: network down/.test(txt), txt);
   check(r, 'the editor and its Save are still there', (await page.locator('.sp-save').count()) > 0 && (await page.locator('[data-sf=purpose]').count()) === 1, '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// Review findings on stage49's History (2026-10-10), each pinned so it cannot come back.
+
+// History reads the table when the coach opens it, not on every redraw (the search box redraws the tab on each keystroke),
+// and again after anything that changes the entry.
+S['spine-history-reads'] = async (b) => {
+  const r = { id: 'spine-history-reads', title: 'History is read when opened and after a change, not on every redraw', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  dismissDialogs(page, log);
+  await spineOpen(page, 'goblet-squat');
+  const versionReads = cs => cs.filter(c => c.kind === 'from' && c.name === 'spine_versions' && c.op === 'select').length;
+  const n0 = await L.nCalls(page);
+  await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 500);
+  check(r, 'opening History reads it once (not once for the click and again for the redraw)', versionReads(await L.callsSince(page, n0)) === 1, versionReads(await L.callsSince(page, n0)));
+  const n1 = await L.nCalls(page);
+  await page.locator('#spineQ').click(); await page.locator('#spineQ').press('End');
+  for (let i = 0; i < 5; i++) { await page.keyboard.press('Backspace'); await L.settle(page, 60); }
+  await L.settle(page, 400);
+  check(r, 'five keystrokes in the search box redraw the tab and read History again zero times', versionReads(await L.callsSince(page, n1)) === 0, versionReads(await L.callsSince(page, n1)));
+  check(r, '...and History is still open, still filled', await page.locator('.spine-ed details.rawlog').evaluate(el => el.open) && /No earlier versions yet/.test(await page.locator('#spvlist').innerText()), await page.locator('#spvlist').innerText());
+  // A save changes the entry: History reads again, once, and shows the change.
+  const n2 = await L.nCalls(page);
+  await page.locator('[data-sf=video]').fill('https://www.youtube.com/watch?v=READS000001');
+  await page.locator('.sp-save').first().click(); await L.settle(page, 800);
+  check(r, 'after a save History is read again, once', versionReads(await L.callsSince(page, n2)) === 1, versionReads(await L.callsSince(page, n2)));
+  check(r, '...and lists the save', /Video:[\s\S]*READS000001/.test(await page.locator('#spvlist').innerText()), (await page.locator('#spvlist').innerText()).slice(0, 200));
+  // Closing and opening it again is the coach asking: read it fresh.
+  const n3 = await L.nCalls(page);
+  await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 200);
+  await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 500);
+  check(r, 'closing and re-opening History reads it fresh', versionReads(await L.callsSince(page, n3)) === 1, versionReads(await L.callsSince(page, n3)));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// A change far into a long text is still visible, in the list and in the Undo confirm.
+S['spine-history-long-text'] = async (b) => {
+  const r = { id: 'spine-history-long-text', title: 'History and the Undo confirm show an edit made past the 140th character', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  dismissDialogs(page, log); log.dialogs.length = 0;
+  await spineOpen(page, 'goblet-squat');
+  const base = 'A long purpose line that explains why this exercise is in the programme, what it trains and what the athlete should feel when it is done well, so the cue stays with them on court. ';
+  await page.evaluate(([o, n]) => { window.__sqlWrite('exercises', 'goblet-squat', { purpose: o }); window.__sqlWrite('exercises', 'goblet-squat', { purpose: n }); }, [base + 'Keep the ribs down.', base + 'Let the ribs flare.']);
+  await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 500);
+  const row = (await page.locator('#spvlist .spvrow').first().innerText()).replace(/\s+/g, ' ');
+  check(r, 'the list shows the words that changed, on both sides', /Keep the ribs down\. → .*Let the ribs flare\./.test(row), row);
+  const first = (row.match(/Why it’s here: …(\S+)/) || [])[1];
+  check(r, '...cut with an ellipsis, on the start of a word', !!first && base.indexOf(' ' + first) >= 0, row);
+  log.dialogs.length = 0;
+  page.removeAllListeners('dialog');
+  page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await d.dismiss().catch(() => {}); });
+  await page.locator('#spvlist .spvrow').first().locator('button', { hasText: 'Undo this change' }).click(); await L.settle(page, 700);
+  const conf = log.dialogs.find(x => x.type === 'confirm');
+  check(r, 'the Undo confirm shows the words it replaces and the words it brings back', conf && /now .*Let the ribs flare\./.test(conf.message) && /back to .*Keep the ribs down\./.test(conf.message), conf && conf.message);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// Undo can bring an old name, alias or link back, so it must meet the same identity rules as Save.
+S['spine-undo-guards'] = async (b) => {
+  const r = { id: 'spine-undo-guards', title: 'Undo meets the rules Save does: no rename of an entry cards use, no alias another entry owns, no link to a missing entry', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  dismissDialogs(page, log);
+  const reload = () => page.evaluate(async () => { S.spine = null; _spineOpen = null; _spineHistId = null; await loadSpine(); await reloadPrograms(); renderExercises(); });
+  const rpcCalls = async n => (await L.callsSince(page, n)).filter(c => c.kind === 'rpc' && c.name === 'coach_save_spine');
+  const undoNewest = async () => {
+    await spineOpen(page, 'goblet-squat');
+    await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 500);
+    log.dialogs.length = 0;
+    const n = await L.nCalls(page);
+    await page.locator('#spvlist .spvrow').first().locator('button', { hasText: 'Undo this change' }).click(); await L.settle(page, 800);
+    return { n, alerts: log.dialogs.filter(x => x.type === 'alert').map(x => x.message), confirms: log.dialogs.filter(x => x.type === 'confirm').map(x => x.message) };
+  };
+
+  // a. Claude renames the entry and its cards (the /spine "One name in live programmes" move); undoing the rename would
+  //    detach every one of those cards from the entry.
+  await page.evaluate(() => {
+    window.__sqlWrite('exercises', 'goblet-squat', { name: 'Dumbbell Goblet Squat' });
+    (window.__DB.programs || []).forEach(p => (p.data.workouts.days || []).forEach(dy => (dy.blocks || []).forEach(bl => (bl.exercises || []).forEach(ex => {
+      if (ex.name === 'Goblet Squat') { ex.name = 'Dumbbell Goblet Squat'; delete ex.exId; } }))));
+  });
+  await reload();
+  let u = await undoNewest();
+  check(r, 'a: undoing a rename of an entry live cards use is refused, naming the cards', u.alerts.length === 1 && /Dumbbell Goblet Squat is on 3 cards in 3 programmes/.test(u.alerts[0]) && /Nothing was changed/.test(u.alerts[0]), u.alerts);
+  check(r, 'a: no confirm was asked and nothing was sent', !u.confirms.length && !(await rpcCalls(u.n)).length, { confirms: u.confirms, rpcs: (await rpcCalls(u.n)).length });
+  check(r, 'a: the entry keeps its new name and the cards still find it', await page.evaluate(() => S.spine.list.find(e => e.id === 'goblet-squat').name === 'Dumbbell Goblet Squat' && spineCardsFor('goblet-squat').cards === 3), '');
+
+  // b. An alias another entry already owns as its name.
+  await page.evaluate(() => { window.__sqlWrite('exercises', 'goblet-squat', { aliases: ['Machine Leg Press'] }); window.__sqlWrite('exercises', 'goblet-squat', { aliases: [] }); });
+  await reload();
+  u = await undoNewest();
+  check(r, 'b: undoing a change that would bring back an alias another entry owns is refused', u.alerts.length === 1 && /already how Machine Leg Press is written/.test(u.alerts[0]) && /Nothing was changed/.test(u.alerts[0]), u.alerts);
+  check(r, 'b: nothing was sent', !(await rpcCalls(u.n)).length, '');
+
+  // c. A link to an entry that is not in the Spine any more.
+  await page.evaluate(() => {
+    window.__sqlWrite('exercises', 'goblet-squat', { easier: ['dead-bug'] }); window.__sqlWrite('exercises', 'goblet-squat', { easier: [] });
+    window.__DB.exercises = window.__DB.exercises.filter(e => e.id !== 'dead-bug'); window.__DB.exercise_coach = window.__DB.exercise_coach.filter(e => e.id !== 'dead-bug');
+  });
+  await reload();
+  u = await undoNewest();
+  check(r, 'c: undoing a change that would link to an entry that is gone is refused, naming it', u.alerts.length === 1 && /not in the Spine any more[\s\S]*dead-bug/.test(u.alerts[0]) && /Nothing was changed/.test(u.alerts[0]), u.alerts);
+  check(r, 'c: nothing was sent', !(await rpcCalls(u.n)).length, '');
+
+  // d. The rules are not in the way of an ordinary undo.
+  await page.evaluate(() => { window.__sqlWrite('exercises', 'goblet-squat', { tennis: 'Court line one' }); window.__sqlWrite('exercises', 'goblet-squat', { tennis: 'Court line two' }); });
+  await reload();
+  page.removeAllListeners('dialog');
+  page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await d.accept().catch(() => {}); });
+  u = await undoNewest();
+  check(r, 'd: an ordinary undo (a court line) still goes through, as one coach_save_spine call', (await rpcCalls(u.n)).length === 1 && !u.alerts.length && (await L.db(page)).exercises.find(x => x.id === 'goblet-squat').tennis === 'Court line one', { alerts: u.alerts, rpcs: (await rpcCalls(u.n)).length });
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

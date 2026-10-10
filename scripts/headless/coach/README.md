@@ -59,7 +59,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-10: 44 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-10: 47 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -82,12 +82,15 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | backup-basic | every table, every row; passwords | unsent initial passwords were in the file |
 | backup-paging | 2,345 rows; 500-row cap; a write mid-backup | unordered OFFSET paging (1 row lost + 1 duplicated); a cap under 1000 truncated silently |
 | athlete-delete-all | Danger zone → Delete training history | the copy promised "all data"; it now says what stays. Since stage48 it is ONE `coach_delete_training_history` call, no direct deletes |
-| athlete-delete-fails | the same, when the server refuses, the sign-in lapsed, or stage48 is not applied | (second session) two deletes from the page: a failure between them left one gone and one standing |
+| athlete-delete-fails | the same, when the server refuses, the sign-in lapsed, stage48 is not applied, or the answer never arrives (no database code: the page must not say "nothing was removed") | (second session) two deletes from the page: a failure between them left one gone and one standing |
 | spine-save-keeps-claude | Claude fills an entry by SQL, then Amir adds a video from a tab opened earlier | every column went up from the page's copy: Claude's court line, links, count and cost were reverted |
 | spine-clash | Claude and Amir change the same field | silent overwrite; now a refusal naming both values, typing kept, Save again wins |
-| spine-save-atomic | a clash in the coach-only half; a failed save; stage48 missing | (second session) the entry half was saved and only the coach half refused; now neither is written |
+| spine-save-atomic | a clash in the coach-only half; a failed save; an answer that never arrives (not reported as "nothing was saved"); stage48 missing | (second session) the entry half was saved and only the coach half refused; now neither is written |
 | spine-history | an entry's History (stage49): who changed what, newest first, Undo through `coach_save_spine`, the coach-only half | (second session) no history existed |
-| spine-history-unavailable | History when `spine_versions` is missing or the read fails | (second session) |
+| spine-history-unavailable | History when `spine_versions` is missing, the sign-in lapsed (42501 names the table too), or the read fails | (second session) a lapsed sign-in read "stage49 has not been applied" (review finding) |
+| spine-history-reads | History is read when opened and after a change, not on every redraw (five keystrokes in the search box) | (review finding) 10 reads for 5 keystrokes, 2 after a save |
+| spine-history-long-text | an edit past the 140th character shows in the list and in the Undo confirm | (review finding) both sides showed the same first 140 characters |
+| spine-undo-guards | Undo of a rename the cards use, an alias another entry owns, a link to a deleted entry: refused with Save's rules; an ordinary undo still goes through | (review finding) Undo sent them all and detached 3 cards from their entry |
 | spine-load-fail | the coach-only half fails to load | cached as blanks; the next save wiped SFR, flags, counts, cost |
 | spine-rename-guard | rename an entry live cards use; an alias that is another entry's name | saved silently and detached the cards |
 | spine-move-back-confirm | Move back to draft | one tap took it off every phone |

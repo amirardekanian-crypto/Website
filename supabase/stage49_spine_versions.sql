@@ -13,12 +13,18 @@
 --   changed     for an update: { column: the value it became }, only the columns that changed; updated_at and
 --               updated_by do not count, so a save that changes nothing leaves no version
 --   saved_by    the signed-in email when there is one (the dashboard), else 'sql' (Claude, the SQL editor)
--- Nothing is pruned: a Spine row is a few hundred bytes of text and nothing in it is about a person.
+-- Nothing is pruned: a Spine row is a few hundred bytes of text, and the Spine rules keep athlete-specific
+-- detail off every entry. That is a rule, not a guarantee: if words about a person ever have to be erased for
+-- real, erase them here too (SQL only; the page cannot), not just on the entry:
+--   delete from public.spine_versions where tbl in ('exercises', 'exercise_coach') and row_id = '<id>';
+-- (the weekly backup files that hold them age out with the 12-file rolling window, CLAUDE.md)
 -- coach.html reads this to show an entry's history and put changed fields back (through coach_save_spine, so
 -- the put-back is itself a guarded, recorded change). It is in the weekly backup (BACKUP_TABLES).
 -- To read one by hand:
 --   select saved_at, saved_by, op, jsonb_object_keys(changed) from spine_versions where tbl = 'exercises' and row_id = '<id>' order by id desc;
--- To put a deleted entry back: insert into exercises select * from jsonb_populate_record(null::exercises, (select data from spine_versions where tbl='exercises' and row_id='<id>' and op='delete' order by id desc limit 1));
+-- To put a deleted entry back (deleting an entry also deletes its coach-only row, which is a second version, so there are two inserts, in this order):
+--   insert into exercises select * from jsonb_populate_record(null::exercises, (select data from spine_versions where tbl='exercises' and row_id='<id>' and op='delete' order by id desc limit 1));
+--   insert into exercise_coach select r.* from jsonb_populate_record(null::exercise_coach, (select data from spine_versions where tbl='exercise_coach' and row_id='<id>' and op='delete' order by id desc limit 1)) r where r.id is not null;
 
 create table if not exists public.spine_versions (
   id              bigserial primary key,

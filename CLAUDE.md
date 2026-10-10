@@ -311,7 +311,9 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   same rows by SQL). The ten qualities are one table: `saveChangedCols()`, `.eq('updated_at', <read>)`. Never
   `upsert` a whole entry from the page's copy. A rename of an entry live cards use is refused in coach.html:
   it is `/spine`'s one-name move. Every change to the three Spine tables is kept in `spine_versions`
-  (stage49, a trigger); an entry's History panel undoes a change through the same guarded save.
+  (stage49, a trigger); an entry's History panel undoes a change through the same guarded save AND the same identity
+  rules Save applies (`spineIdentityProblem()`: a name or alias another entry owns, a rename of an entry live cards use,
+  a link to an entry that is gone are refused).
   `sh scripts/test_spine_sql.sh` tests both stage files on a throwaway local Postgres, before they go near the project.
 - **"Needs you" is one rule, `reasonsOf()`**: Today, the roster's reasons, its group, filter and sort all
   read it. A new reason goes there, nowhere else, and into COACH_DASHBOARD.md §3's table.
@@ -324,7 +326,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
 - **Auth events rebuild the page only when the signed-in user changes** (token refreshes and tab refocus
   used to reload everything and throw away typed work).
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (44 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (47 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.

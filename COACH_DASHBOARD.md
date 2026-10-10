@@ -115,13 +115,24 @@ their own guarded save.
 **History**. Every change to it, from this page, from Claude's `/spine` SQL or from a hand-written
 UPDATE, left the row as it was in `spine_versions` (a trigger; nothing is pruned). Each block says when,
 who (*you*, or *Claude (SQL)* for a write with no signed-in user), whether it was the coach-only part,
-and for each field the old value, then **the new one**. **Undo this change** puts the changed fields
-back to their old values through `coach_save_spine()`, so the undo is guarded the same way and appears
-in the list itself; if a field was changed again since, the confirm shows what is there now and what it
-goes back to, and a status change warns that it takes an entry off the phones (or puts it on). A
-deleted entry is kept whole too (`op = 'delete'`): put it back with SQL (the recipe is in
-`supabase/stage49_spine_versions.sql`). The ten qualities are versioned by the same trigger but have no
-panel yet. If `spine_versions` is missing (a project before stage49) the panel says so and nothing else changes.
+and for each field the old value, then **the new one** (a long text is cut to a window that starts at
+the first difference, so an edit near its end is visible). **Undo this change** puts the changed fields
+back to their old values through `coach_save_spine()`, so the server's clash rule applies and the undo appears
+in the list itself; it also meets Save's identity rules (`spineIdentityProblem()`): it will not bring back a
+name that would take cards away from an entry or rename an entry live cards use, an alias another entry owns,
+or a link to an entry that is gone. If a field was changed again since, the confirm shows what is there now
+and what it goes back to, and a status change warns that it takes an entry off the phones (or puts it on).
+History is read from the server when you open it and again after a change; a redraw (every keystroke in the
+search box) repaints the rows it already has. A deleted entry is kept whole too (`op = 'delete'`): put it back
+with SQL (the recipe, with its second insert for the coach-only row, is in `supabase/stage49_spine_versions.sql`).
+The ten qualities are versioned by the same trigger but have no panel yet. The Spine rules keep athlete detail
+off entries; if words about a person ever have to be erased for real, erase them from `spine_versions` too (SQL
+only; the stage49 header has the statement).
+
+**When the answer to a save or a delete never arrives** (a dropped connection: the error has no database code) the
+page does not say "nothing was saved" or "nothing was removed", because the server may have committed before the
+connection dropped. It says it cannot tell and to refresh and look. An error that carries a code (the server
+answered) rolled the whole call back, and says so. If `spine_versions` is missing (a project before stage49) the panel says so and nothing else changes.
 
 **The Quality Map (2026-09-24)** adds three things to this tab:
 - **The ten qualities.** The words each athlete's Home day cards use (Strength, Brakes …): one

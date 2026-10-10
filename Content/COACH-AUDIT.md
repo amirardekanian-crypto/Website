@@ -195,9 +195,9 @@ Proposed, in order, still within "no new features":
 
 ## 6. Tests
 
-- (Second session: the harness is now 44 scenarios, `test_coach_compare.js` 96 assertions, plus
-  `node scripts/check_twins.js` (923 checks) and `sh scripts/test_spine_sql.sh` (73 assertions and a
-  two-session test of the row lock, on a throwaway local Postgres). The 38-scenario list below is the first session's.)
+- (Second session: the harness is now 47 scenarios, `test_coach_compare.js` 96 assertions, plus
+  `node scripts/check_twins.js` (923 checks) and `sh scripts/test_spine_sql.sh` (82 assertions and two
+  two-session tests of the row lock, on a throwaway local Postgres). The 38-scenario list below is the first session's.)
 - `node scripts/headless/coach/run.js`: 38 scenarios in a real browser against a stand-in database
   (made-up athletes): every save, delete, login, backup and import path, the auth events, the Spine
   editor (Claude's work survives, a clash is refused, a failed load offers nothing to save, renames,
@@ -522,7 +522,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | SERVER-3 | medium | Importing a past session over an existing one keeps the old set-by-set log, so the athlete and the coach see different sessions | Fixed | Adding a past session over one already logged on the same date now really replaces it, set-by-set log included, so you and the athlete see the same session and the warning box tells the truth. |  |
 | SERVER-4 | medium | A note the athlete edits after Amir marked the session read never comes back to 'needs you' | Fixed | When an athlete edits a note after you marked the session read, it comes back to 'needs you'; re-saving the same note does not. |  |
 | SERVER-5 | medium | Forget (forget_contact) cannot deliver what the privacy notice promises, the manual says the opposite of what it does, and the screen keeps showing the forgotten person | Your call | The manual and the Forget box now say exactly what Forget deletes, the screen refreshes after it, and the page refuses Forget for coached clients. | There is still no one-step full erasure matching the privacy notice (your call), and the server-side refusal for coached clients (stage45) is not applied yet. |
-| SERVER-6 | medium | Spine and Quality saves overwrite without a freshness check and keep no history | Fixed | Spine and quality saves check freshness (only changed boxes, refused if someone else changed the same box), the server stamps the time on every change, and since stage49 every change to an exercise entry, its coach-only half or a quality is kept in `spine_versions` by a trigger, from any writer. Exercises → an entry → History lists each change (who, what, old then new) and Undo puts the fields back through the guarded save. The weekly backup includes the table. (2026-10-10, second session) |  |
+| SERVER-6 | medium | Spine and Quality saves overwrite without a freshness check and keep no history | Fixed | Spine and quality saves check freshness (only changed boxes, refused if someone else changed the same box), the server stamps the time on every change, and since stage49 every change to an exercise entry, its coach-only half or a quality is kept in `spine_versions` by a trigger, from any writer. Exercises → an entry → History lists each change (who, what, old then new) and Undo puts the fields back through the guarded save, under the same identity rules as Save (it will not bring back a name cards no longer use, an alias another entry owns, or a link to a deleted entry). The weekly backup includes the table. (2026-10-10, second session) |  |
 | SERVER-7 | medium | 13 free Proof users have had no way into the app since the 2026-09-07 key cutover, yet the funnel still scores them | Your call | Each locked-out person's roster row now keeps saying 'no login — cannot open the app', even once they have gone quiet. | The 13 free Proof users still have no login; whether to create logins and re-invite them, or forget them, is your call. |
 | SERVER-8 | low | Level functions run with the owner's rights and have no access check: any signed-in athlete or buyer can read any athlete's level or mint their titles | Fixed | Career level, title minting, note purging and the season-level helper can no longer be run by athletes or buyers; the dashboard reads every level through one coach-only call (coach_season_levels). Revoked after this version went live. |  |
 | SERVER-9 | low | Five remaining direct writes cannot tell a write that changed nothing from a success; Delete training history is two separate deletes | Fixed | Mark sent (athletes, course, testing app) and Library Hide/Publish confirm a row really changed. Delete training history is now one server call, `coach_delete_training_history()` (stage48): the sessions and the progress snapshot go together or not at all, and the counts come back. (2026-10-10, second session) |  |
@@ -579,6 +579,29 @@ select to_regclass('public.spine_versions') is not null
   you are refused.
 - The first real history row appeared seconds after stage49 went in: a write with no signed-in user (Claude's `/spine`
   or the SQL editor) changed one entry's alternatives, and the trigger recorded it as `sql`.
+
+**An independent review of the second half, and what it changed.** A reviewer who had not written the code ran it
+(the SQL on a throwaway Postgres, the page in the browser harness, the stub against the SQL) and found no critical or
+high problem; one medium and several low ones, all confirmed by running them. Each is fixed, with a test that fails on the
+earlier code (12 failing checks across 6 scenarios; the SQL tests 4 failing before the function change):
+- *Medium:* **Undo skipped Save's identity rules.** Claude renames an entry and its cards (the `/spine` one-name move);
+  Undo on that history row sent the old name back, so the entry and its 3 cards no longer matched. Undo now meets the same
+  rules as Save (`spineIdentityProblem()`, shared): a name or alias another entry owns, a rename of an entry live cards
+  use, and a link to an entry that is gone are refused. Scenario `spine-undo-guards`.
+- *Low:* a lapsed sign-in read "History is not on the server yet (stage49 has not been applied)" because its error names
+  the table; it now says the sign-in may have lapsed. A change past the 140th character of a long text showed as two
+  identical lines in History and in the Undo confirm; both sides are now cut to a window that starts at the difference.
+  History re-read 80 rows on every keystroke in the search box (10 reads for 5 keystrokes); it now reads when opened and after a
+  change. When the answer to a save or a delete never arrived (a dropped connection, no database code), the page said
+  "nothing was saved/removed" although the server might have committed; it now says it cannot tell and to refresh.
+- *Low, SQL (applied as migration `stage48b_coach_save_spine_strict_payloads`):* a payload that was not a JSON object
+  (a double-encoded string, an array) was read as empty and answered `ok: true` having written nothing, which the page would have
+  shown as Saved; it is now an error. A `/spine` call that updated `exercise_coach` before `exercises` in one transaction could
+  deadlock with the dashboard save (one of the two is aborted with "deadlock detected", nothing is corrupted); the save locks
+  `exercises` first, the `/spine` skill now says to write in that order, and `scripts/test_spine_sql.sh` proves that order cannot deadlock.
+- *Docs:* the recipe for putting a deleted entry back restored only the entry; the coach-only row is a second version and needs a
+  second insert (both are now in stage49's header and tested). The Spine rules keep athlete detail off entries, but that is a rule,
+  not a guarantee, so the header now says how to erase a text from `spine_versions` too (SQL only).
 
 **Found in the advisor, not fixed (outside the five items).** stage47's trigger function `coaching_logs_keep_version()`
 is still executable by `anon` and signed-in users (stage49's version revokes it). A trigger function cannot be called

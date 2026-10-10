@@ -14,7 +14,9 @@
 //
 // Knobs (window.__STUB, also settable before load via window.__HARNESS_SEED.stub):
 //   maxRows      PostgREST max-rows cap (default 1000)
-//   fail         [{ kind:'from'|'rpc'|'fn', name, op?, message, times? }]  one-shot or N-shot errors
+//   fail         [{ kind:'from'|'rpc'|'fn', name, op?, message, code?, times? }]  one-shot or N-shot errors. `code` is the database
+//                error code (default P0001 for an rpc, XX000 for a table); code:'' is what supabase-js returns when the answer never
+//                arrived (a dropped connection), where the write may or may not have gone in
 //   rlsDeny      { table: ['update','delete','insert'] } -> zero rows touched, NO error (PostgREST behaviour)
 //   delay        { name: ms } extra latency per table/rpc/function name
 //   missingRpc   ['coach_save_spine', ...] -> those RPCs answer "Could not find the function" (PGRST202), like a server that has not had the stage applied
@@ -191,7 +193,7 @@
     if (ST.delay[table]) await sleep(ST.delay[table]);
     await sleep(0);
     var f = takeFail('from', table, op);
-    if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code || 'XX000' }, status: f.status || 400, count: null }; }
+    if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code != null ? f.code : 'XX000' }, status: f.status || 400, count: null }; }
     var rows = tbl(table);
     var match = function (r) { return self.filters.every(function (fn) { return fn(r); }); };
     var denied = (ST.rlsDeny[table] || []).indexOf(op) >= 0;
@@ -329,7 +331,12 @@
     coach_save_spine: function (p) {
       var E = ['name', 'aliases', 'pattern', 'qualities', 'purpose', 'tennis', 'cues', 'equipment', 'loads', 'easier', 'harder', 'alts', 'video', 'status', 'impact', 'muscles'];
       var C = ['sfr', 'flags', 'notes', 'credits', 'cost'];
-      var obj = function (v) { return v && typeof v === 'object' && !Array.isArray(v) ? v : {}; };
+      // SQL NULL and JSON null mean nothing for that half; any other non-object is an error (a double-encoded payload).
+      var obj = function (v) {
+        if (v == null) return {};
+        if (typeof v !== 'object' || Array.isArray(v)) throw new Error('the entry, the coach-only part and their two snapshots must each be a JSON object');
+        return v;
+      };
       var entry = obj(p.p_entry), coach = obj(p.p_coach), es = obj(p.p_entry_snap), cs = obj(p.p_coach_snap);
       Object.keys(entry).forEach(function (k) { if (E.indexOf(k) < 0) throw new Error('exercises.' + k + ' cannot be written from the editor'); });
       Object.keys(coach).forEach(function (k) { if (C.indexOf(k) < 0) throw new Error('exercise_coach.' + k + ' cannot be written from the editor'); });
@@ -377,7 +384,7 @@
         if (ST.delay[name]) await sleep(ST.delay[name]);
         await sleep(0);
         var f = takeFail('rpc', name);
-        if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code || 'P0001' }, status: 400 }; }
+        if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code != null ? f.code : 'P0001' }, status: 400 }; }
         if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
         try { var d = RPC[name](params || {}); persist(); call.result = { ok: true }; return { data: clone(d), error: null, status: 200 }; }
         catch (e) { call.result = { error: e.message }; return { data: null, error: { message: e.message, code: 'P0001' }, status: 400 }; }

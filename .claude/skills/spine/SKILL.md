@@ -382,6 +382,10 @@ each? An item whose `old` no longer matches the entry (Amir edited it in coach.h
 - **Yes**: back the old value up in `links_history` (tag `claude-proposal-<date>`, the stage34
   pattern), write the new value on `public.exercises` (`updated_by = 'claude-pipeline'`,
   `updated_at = now()`; a count, SFR or flag goes on `exercise_coach`), then remove the item.
+  **If these go up in one call, put the `public.exercises` update first** and the `exercise_coach`
+  statements after it: coach.html's Save (`coach_save_spine()`, stage48) locks `exercises` then
+  `exercise_coach`, and the other order lets the two wait on each other until Postgres aborts one with
+  "deadlock detected". Nothing is corrupted, but the abort is avoidable.
 - **No**: remove the item. Nothing else changes.
 - **Not answered**: leave it. It comes back in the next run's handoff.
 ```sql

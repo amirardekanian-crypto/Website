@@ -3,9 +3,10 @@
 #
 # Starts a THROWAWAY Postgres cluster (a temp folder, a unix socket, nothing on the network), loads a replica of the live
 # tables (supabase/tests/replica_schema.sql), applies supabase/stage48_coach_one_transaction.sql and
-# supabase/stage49_spine_versions.sql, runs supabase/tests/stage48_49_test.sql (about 75 assertions: the coach check,
-# grants, row-level security, atomicity, the version trigger) and then a two-session test of the row lock: a dashboard save
-# must WAIT for an in-flight write by Claude's /spine and then see it, instead of overwriting it.
+# supabase/stage49_spine_versions.sql, runs supabase/tests/stage48_49_test.sql (about 80 assertions: the coach check,
+# grants, row-level security, atomicity, malformed payloads, the version trigger) and then two-session tests of the row
+# lock: a dashboard save must WAIT for an in-flight write by Claude's /spine and then see it, instead of overwriting it,
+# and a /spine call that writes exercises first (the documented order) must never deadlock with it.
 #
 # Why not the Supabase project: its database tool asks for a confirmation on any SQL containing a delete, and a test
 # that creates tables and deletes rows is exactly that. This is also safer: nothing here can touch real data.
@@ -72,5 +73,16 @@ wait
 echo "$out" | grep -q '"ok": true' && check "other column: saved" ok || check "other column: saved" no "$out"
 [ "$($P -c "select tennis || ' | ' || video from public.exercises where id='zz-conc2'")" = "Claude court line | https://example.invalid/amir" ] && check "other column: Claude's write is kept beside Amir's" ok || check "other column: Claude's write is kept beside Amir's" no "row differs"
 [ "$($P -c "select count(*) from public.spine_versions where row_id in ('zz-conc','zz-conc2')")" = "3" ] && check "all three writes are in the history" ok || check "all three writes are in the history" no "$($P -c "select count(*) from public.spine_versions where row_id in ('zz-conc','zz-conc2')")"
+
+# 3. the documented order (a /spine call that updates exercises FIRST, then exercise_coach, in one transaction) cannot
+#    deadlock with the dashboard save: the save waits for the first lock, the other transaction finishes, the save goes on
+$P -c "insert into public.exercises (id,name,status) values ('zz-conc3','ZZ Conc 3','draft')" >/dev/null
+( $P -c "begin; update public.exercises set purpose='Claude A' where id='zz-conc3'; select pg_sleep(2); insert into public.exercise_coach (id, notes) values ('zz-conc3','Claude note'); commit;" >/dev/null 2>&1 ) &
+sleep 1
+out=$($P -c "$CL" -c "select public.coach_save_spine('zz-conc3','{\"video\":\"https://example.invalid/amir\"}','{\"video\":null}','{\"cost\":\"heavy\"}','{\"cost\":null}')" 2>&1 | tail -1)
+wait
+echo "$out" | grep -q 'deadlock' && check "documented order: no deadlock" no "$out" || check "documented order: no deadlock" ok
+echo "$out" | grep -q '"ok": true' && check "documented order: the dashboard save went through after waiting" ok || check "documented order: the dashboard save went through after waiting" no "$out"
+[ "$($P -c "select (select purpose from public.exercises where id='zz-conc3') || ' | ' || (select notes || ' | ' || cost from public.exercise_coach where id='zz-conc3')")" = "Claude A | Claude note | heavy" ] && check "documented order: both writers' columns are there" ok || check "documented order: both writers' columns are there" no "row differs"
 
 [ $fail = 0 ] && echo "test_spine_sql: all passed" || { echo "test_spine_sql: FAILED"; exit 1; }
