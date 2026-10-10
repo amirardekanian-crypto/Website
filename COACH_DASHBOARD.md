@@ -101,6 +101,28 @@ is `/spine`'s *One name in live programmes* job. A name or other name that is al
 is refused (two entries with one name both stop matching). If the Spine does not load completely the
 tab says so and offers nothing to save: a save from half a copy would blank what did not arrive.
 
+**One save, one transaction (stage48, 2026-10-10).** The entry and its coach-only half used to be saved
+in two steps from this page, so a failure on the second left the entry saved and the coach-only part
+not, and the coach-only part had no lock between its read and its write. Now one call,
+`coach_save_spine()`: the server locks both rows, refuses (and writes **nothing, to either half**) when
+someone else changed a field you also changed, and otherwise writes exactly the fields you sent. A
+`/spine` write that is in flight when you press Save is waited for and seen, not overwritten
+(`scripts/test_spine_sql.sh` proves it with two real sessions). The box on a clash is the same as
+before; it now ends "Nothing was saved, to either half". The ten qualities are one table, so they keep
+their own guarded save.
+
+**History: every earlier version of an entry (stage49, 2026-10-10).** Open an entry and unfold
+**History**. Every change to it, from this page, from Claude's `/spine` SQL or from a hand-written
+UPDATE, left the row as it was in `spine_versions` (a trigger; nothing is pruned). Each block says when,
+who (*you*, or *Claude (SQL)* for a write with no signed-in user), whether it was the coach-only part,
+and for each field the old value, then **the new one**. **Undo this change** puts the changed fields
+back to their old values through `coach_save_spine()`, so the undo is guarded the same way and appears
+in the list itself; if a field was changed again since, the confirm shows what is there now and what it
+goes back to, and a status change warns that it takes an entry off the phones (or puts it on). A
+deleted entry is kept whole too (`op = 'delete'`): put it back with SQL (the recipe is in
+`supabase/stage49_spine_versions.sql`). The ten qualities are versioned by the same trigger but have no
+panel yet. Until stage49 is applied the panel says so and nothing else changes.
+
 **The Quality Map (2026-09-24)** adds three things to this tab:
 - **The ten qualities.** The words each athlete's Home day cards use (Strength, Brakes …): one
   line for everyone, a court line for tennis and padel players, and how each is measured.
@@ -455,7 +477,10 @@ here and one lift there — both sides run the same name matcher, on purpose.
   when it was last saved and by whom, Version history), the coaching log, and **Delete training
   history**: every finished session plus what the app keeps for them on the server (habit log, body
   weight, personal records). Their programme, login, coaching log, calls and wall lines stay, and so
-  do they on the roster. (It was called *Delete all data* until 2026-10-10, which it never was.)
+  do they on the roster. (It was called *Delete all data* until 2026-10-10, which it never was.) It is
+  one call, `coach_delete_training_history()` (stage48): the sessions and the progress snapshot go
+  together or not at all, and the counts come back. It used to be two deletes from this page, and a
+  failure between them left one gone and one standing.
 - **Backfill** (The work, bottom): *+ Add past session from email* now checks the email's Athlete
   line against this athlete, starts with no date (it used to default to today), and warns before it
   replaces a session logged on the same date (the email's session replaces it, set-by-set log
@@ -588,6 +613,7 @@ it in this file.
 | `coaching_log_versions` | Every earlier text of a coaching log, kept by a trigger (stage47); only the backup reads it |
 | `library`, `library_categories` | The Library tab |
 | `exercises`, `exercise_coach`, `qualities` | The Exercises tab (the Spine) |
+| `spine_versions` | An entry's History: every row of those three as it was before a change, kept by a trigger (stage49); the weekly backup reads it |
 | `hab_intake` via `intake_list()` | The Intake tab |
 | `affiliates` | The Affiliates tab |
 | `assess_accounts`, `tps_accounts` | The Testing app and Course tabs (loaded when opened) |
@@ -618,6 +644,7 @@ session" window (TWIN-6) and the loose retest flag (TWIN-7) are known difference
 header. A new copy of an app rule in coach.html goes into the script the same day.
 
 Some coach writes go through RPCs that check the coach themselves (`set_coach_note`, `hide_note`,
-`set_quests`, `clear_quests`, `forget_contact`, `save_session`, `coach_season_levels`); the rest are
+`set_quests`, `clear_quests`, `forget_contact`, `save_session`, `coach_season_levels`, and since stage48
+`coach_delete_training_history` and `coach_save_spine`, each one transaction); the rest are
 direct table writes that only the coach's RLS policies let through. Every one of them asks for its
 rows back, so a write RLS silently refused (a lapsed sign-in) says so instead of reporting success.

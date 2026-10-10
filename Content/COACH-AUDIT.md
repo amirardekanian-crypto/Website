@@ -21,7 +21,7 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands** (after the second session, 2026-10-10): of 191 findings, 118 are fixed, 51 partly fixed
+**Where it stands** (after the second session, 2026-10-10): of 191 findings, 120 are fixed, 49 partly fixed
 (the harm is gone, something named in the finding is left), 12 wait on a decision from you, 9 are open (all
 low or medium) and 1 was not a bug. Of the 45 critical and high ones, 34 are fixed, 8 partly and 3 are your
 call; none is untouched.
@@ -156,6 +156,8 @@ Spine's Save bar stays on screen.
 | 1e975bb | Logins to send marks a stored password the person has already used to sign in |
 | 6512744 | Small fixes from the re-check: focus ring, Calls and Library failures say so, labelled fields; athlete-login v6 |
 | 83dec62 | Coaching logs keep every earlier text (stage47); Forget is off while programmes have not loaded |
+| 5c57288, 7c10d71 ([#302](https://github.com/amirardekanian-crypto/Website/pull/302), merged) | Second session, 1 of 2: notes counted from when they arrived; the email import reads the check-in line (anchored, so an athlete's own note cannot set a verdict); `scripts/check_twins.js` (pre-commit guard 15); fixes from an independent review of the first commit |
+| second session, 2 of 2 | One transaction each for Delete training history and the Spine save (stage48), version history for the Spine (stage49), `scripts/test_spine_sql.sh`. Merge only after stage48 and stage49 are applied (§10) |
 
 **Files changed and why:** `coach.html` (all of the above), `program.html`, `habits.html`,
 `tennis/app/app.js`, `tennis-testing/app/app.js` (Farsi-keyboard sign-in only), `sw.js` (cache bump
@@ -192,6 +194,9 @@ Proposed, in order, still within "no new features":
 
 ## 6. Tests
 
+- (Second session: the harness is now 44 scenarios, `test_coach_compare.js` 96 assertions, plus
+  `node scripts/check_twins.js` (923 checks) and `sh scripts/test_spine_sql.sh` (73 assertions and a
+  two-session test of the row lock, on a throwaway local Postgres). The 38-scenario list below is the first session's.)
 - `node scripts/headless/coach/run.js`: 38 scenarios in a real browser against a stand-in database
   (made-up athletes): every save, delete, login, backup and import path, the auth events, the Spine
   editor (Claude's work survives, a clash is refused, a failed load offers nothing to save, renames,
@@ -253,21 +258,22 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 1. Decision 2 (apply stage45): one step, closes the last server gap behind a critical-class finding.
 2. Decision 1 (the 13 locked-out free users): the top of the funnel is closed for them today.
 3. Decision 4 and 5 (passwords and erasure): what the privacy notice already promises.
-4. A server function for "Delete training history" and the Spine save (one transaction each), so a
-   half-finished two-table write cannot happen (SERVER-9, SPINE-5).
+4. ~~A server function for "Delete training history" and the Spine save (one transaction each), so a
+   half-finished two-table write cannot happen (SERVER-9, SPINE-5).~~ Done in the second session
+   (stage48): written and tested on a real Postgres; it waits for you to be present to apply it (§10).
 5. The structure items in §5, one at a time, each with its harness scenario.
 6. Run the live dashboard once after this deploy and tap through each tab on your phone.
 
 ## 9. Appendix: every finding and where it stands
 
-191 findings. Fixed 118 · Partly 51 · Open 9 · Your call 12 · Not a bug 1.
+191 findings. Fixed 120 · Partly 49 · Open 9 · Your call 12 · Not a bug 1.
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
 | high | 22 | 8 | 0 | 3 | 0 |
-| medium | 49 | 30 | 2 | 7 | 0 |
-| low | 35 | 13 | 7 | 2 | 1 |
+| medium | 50 | 29 | 2 | 7 | 0 |
+| low | 36 | 12 | 7 | 2 | 1 |
 
 ### The work and the ✎ editor (WORK)
 
@@ -437,7 +443,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | HARNESS-4 | medium | Coach line is filed under the server's UTC date: between local midnight and UTC midnight it overwrites yesterday's line and shows up as yesterday | Fixed | Posting or clearing the coach line now sends your local date, so a line written after midnight no longer overwrites yesterday's. |  |
 | HARNESS-5 | medium | Backup pages with unordered OFFSET ranges and stops on any short page: rows lost or duplicated under concurrent writes, and silent truncation if the server page cap is not 1000 | Fixed | The backup reads every table page by page in a fixed order, removes any row read twice, notices when the server sends shorter pages, and lists a table under 'Could NOT read' when fewer rows came back than the server counted. |  |
 | HARNESS-6 | medium | The weekly backup file carries plaintext initial passwords for athlete and course logins | Fixed | The backup file now blanks unsent login passwords for athletes, course buyers and testing-app buyers, as recommended; after a restore you reset the login and send a new password. |  |
-| HARNESS-7 | medium | 'Delete all data' deletes the athlete's habit log, body weight and records but leaves programme, login and roster row, and its copy names a data file that no longer exists | Partly | The button is now 'Delete training history'. It and its confirm list exactly what goes and what stays, and it reports how many sessions were deleted or that nothing was. | The two deletes are still separate steps, so a failure between them is reported but not undone. Whether there should also be a full 'remove this athlete' option is still Amir's call (for now the copy says to ask Claude). |
+| HARNESS-7 | medium | 'Delete all data' deletes the athlete's habit log, body weight and records but leaves programme, login and roster row, and its copy names a data file that no longer exists | Partly | The button is now 'Delete training history'. It and its confirm list exactly what goes and what stays, and it reports how many sessions were deleted or that nothing was. Since stage48 the two deletes are one transaction, so a failure between them can no longer leave half done. | Whether there should also be a full 'remove this athlete' option is still Amir's call (decision 5; for now the copy says to ask Claude). |
 | HARNESS-8 | low | Saving an exercise with no change still writes a programme version and turns numeric reps/RPE into strings | Fixed | Saving an exercise with no change writes nothing and says 'No change to save'. Typed reps and RPE are stored as numbers. |  |
 | HARNESS-9 | low | Legacy data/<id>.json fallback and the 'Move programmes into the database' UI are still live code | Fixed | The fallback to old data/<id>.json files and the 'Move programmes into the database' button are gone. An athlete with no programme row now reads 'No training programme published yet'. |  |
 
@@ -494,7 +500,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | SPINE-2 | high | A failed load of the coach half (or the Spine itself) is swallowed and cached; the next save wipes SFR, restriction flags, counts, cost and notes | Fixed | If any part of the Spine fails to load, the Exercises tab says what did not arrive, offers Try again, and will not let you save, so blanks can no longer be written over real counts, SFR, flags or notes. |  |
 | SPINE-3 | high | Renaming an entry (or adding a colliding alias) is one Save with no check, and detaches every card that finds it by name | Fixed | Renaming an entry that live cards use, or giving it a name another entry already has, is refused with the list of athletes affected and sent to Claude's /spine (the safer of the two options in the open question, listed in the audit report so you can overrule it). |  |
 | SPINE-4 | high | 'Who is doing it', the athlete counts and the Coverage meter ignore every exercise inside a circuit | Fixed | Coverage, 'Doing it now', the athlete counts and 'Not in the Spine yet' now count exercises inside circuits too. |  |
-| SPINE-5 | medium | Two-table save is not atomic: on a coach-half failure the alert is followed by a success toast and the typed values are thrown away | Fixed | If the coach-only half fails to save, there is no 'Saved' message any more: it says the entry saved but the counts/SFR/flags/cost/notes did not, and keeps those typed values in the form to save again. |  |
+| SPINE-5 | medium | Two-table save is not atomic: on a coach-half failure the alert is followed by a success toast and the typed values are thrown away | Fixed | If the coach-only half fails to save, there is no 'Saved' message any more: it says the entry saved but the counts/SFR/flags/cost/notes did not, and keeps those typed values in the form to save again. Since stage48 the two halves are one transaction (`coach_save_spine()`): a clash or a failure in either writes neither, so there is no half-saved state to explain. |  |
 | SPINE-6 | medium | No unsaved-change protection: every click redraws the whole tab, losing typed edits and jumping the page | Fixed | Typed work in the editor and in the quality texts survives redraws, and opening another entry, switching the list, Refresh, leaving the tab or closing the page with unsaved changes asks first; the row you tap stays under your finger. |  |
 | SPINE-7 | medium | Finding and working an entry is slow: the tab opens on an empty Drafts list, there is no search, and the editor is 1300-2400 px with Save at the bottom | Partly | The tab opens on Approved when there are no drafts, has a search box, marks the active filter properly, shows who is doing it at the top, and keeps the Save bar on screen while you scroll. | The editor is still one long form; the body map and the coach-only part are not folded away. |
 | SPINE-8 | medium | 'Move back to draft' takes an entry (or a quality) off every phone in one tap, next to Save, and also saves the form | Fixed | 'Move back to draft…' now asks first and says how many athletes would lose it, and on an exercise it sits away from Save at the other end of the bar. |  |
@@ -515,12 +521,59 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | SERVER-3 | medium | Importing a past session over an existing one keeps the old set-by-set log, so the athlete and the coach see different sessions | Fixed | Adding a past session over one already logged on the same date now really replaces it, set-by-set log included, so you and the athlete see the same session and the warning box tells the truth. |  |
 | SERVER-4 | medium | A note the athlete edits after Amir marked the session read never comes back to 'needs you' | Fixed | When an athlete edits a note after you marked the session read, it comes back to 'needs you'; re-saving the same note does not. |  |
 | SERVER-5 | medium | Forget (forget_contact) cannot deliver what the privacy notice promises, the manual says the opposite of what it does, and the screen keeps showing the forgotten person | Your call | The manual and the Forget box now say exactly what Forget deletes, the screen refreshes after it, and the page refuses Forget for coached clients. | There is still no one-step full erasure matching the privacy notice (your call), and the server-side refusal for coached clients (stage45) is not applied yet. |
-| SERVER-6 | medium | Spine and Quality saves overwrite without a freshness check and keep no history | Partly | Spine and quality saves now check freshness (only changed boxes, refused if someone else changed the same box), and the server stamps the time on every change to exercises and qualities. | There is still no version history for Spine entries (coaching logs got one, stage47), so an overwritten cue can only be restored from a backup. |
+| SERVER-6 | medium | Spine and Quality saves overwrite without a freshness check and keep no history | Fixed | Spine and quality saves check freshness (only changed boxes, refused if someone else changed the same box), the server stamps the time on every change, and since stage49 every change to an exercise entry, its coach-only half or a quality is kept in `spine_versions` by a trigger, from any writer. Exercises → an entry → History lists each change (who, what, old then new) and Undo puts the fields back through the guarded save. The weekly backup includes the table. (2026-10-10, second session) |  |
 | SERVER-7 | medium | 13 free Proof users have had no way into the app since the 2026-09-07 key cutover, yet the funnel still scores them | Your call | Each locked-out person's roster row now keeps saying 'no login — cannot open the app', even once they have gone quiet. | The 13 free Proof users still have no login; whether to create logins and re-invite them, or forget them, is your call. |
 | SERVER-8 | low | Level functions run with the owner's rights and have no access check: any signed-in athlete or buyer can read any athlete's level or mint their titles | Fixed | Career level, title minting, note purging and the season-level helper can no longer be run by athletes or buyers; the dashboard reads every level through one coach-only call (coach_season_levels). Revoked after this version went live. |  |
-| SERVER-9 | low | Five remaining direct writes cannot tell a write that changed nothing from a success; Delete training history is two separate deletes | Partly | Mark sent (athletes, course, testing app) and Library Hide/Publish now confirm a row really changed, and Delete training history says how many sessions went and warns when nothing did. | Delete training history is still two separate deletes, so a failure halfway is reported but not prevented. |
+| SERVER-9 | low | Five remaining direct writes cannot tell a write that changed nothing from a success; Delete training history is two separate deletes | Fixed | Mark sent (athletes, course, testing app) and Library Hide/Publish confirm a row really changed. Delete training history is now one server call, `coach_delete_training_history()` (stage48): the sessions and the progress snapshot go together or not at all, and the counts come back. (2026-10-10, second session) |  |
 | SERVER-10 | low | Reads that are not paged and full-table refetches: nothing is at the cap yet, but several tables are heading there | Partly | Mark read and Clear older notes update the page's own copy instead of re-downloading every session, and the Spine tables are read in pages. | The Library list is still read in one request (small today, far from the cap). |
 | SERVER-11 | low | Login edge functions ignore the error on their follow-up table write after a successful ban or password change | Fixed | All three login functions (athlete v6, course and testing app v3) report a failed account read and a failed bookkeeping write instead of ignoring it. |  |
 | SERVER-12 | low | Version history keeps 20 entries per athlete, and an SQL writer that does not set updated_by inherits the previous author's name | Open |  | Version history still keeps only the last 20 saves per athlete (how many to keep is your call), and a database edit with no signed-in user still shows the previous author's name. |
 | SERVER-13 | low | Core server objects behind coach.html have no source in the repo; the manual describes an older contract; the coach email is hard-coded in about 25 places | Partly | The programme tables, their access rules, the coach check and the version-history trigger are now written down in the repo (stage44), and the manual was rewritten against the code. | The athlete's programme door and the 'which athlete is this' function still have no copy in the repo, and the coach email is still typed into many places. |
 | SERVER-14 | low | The coach check trusts the email claim alone; whether public sign-up is open cannot be verified from here | Open |  | The coach check still trusts the email address alone; someone needs to confirm in the Supabase dashboard that public sign-up is off, and optionally tie the check to your account id. |
+
+## 10. The second session (2026-10-10): what is done, and the one thing that needs you
+
+Done without a decision from you (your list, in your order):
+
+| Item | Where it ended | Finding |
+|---|---|---|
+| One transaction for *Delete training history* | `coach_delete_training_history()`, stage48 | SERVER-9, HARNESS-7 |
+| One transaction for the Spine save | `coach_save_spine()`, stage48; the page sends one call | SPINE-5 |
+| Version history for Spine entries | `spine_versions` + a trigger, stage49; Exercises → an entry → History, with Undo | SERVER-6 |
+| Note backlog by when a note arrived | live (#302, merged) | TODAY-2 |
+| The check-in line in imported emails | live (#302); Claude's Gmail import stores the same keys | FILE-8 |
+| A guard for logic in both apps | `scripts/check_twins.js`, pre-commit guard 15, live (#302) | TWIN-10, TWIN-4 |
+
+**What needs you: apply stage48 and stage49 (and stage45) while you are here.** The database tool asks
+for a confirmation on any SQL containing a delete, so I cannot apply these alone. The page change for
+stage48 and stage49 is a second pull request that calls those functions, so **it is merged only after the SQL is
+applied** (the order is SQL first, page second; the other way round, Delete training history and the Spine
+save would both fail until the SQL arrived). Say "apply stage45, 48 and 49". Each is checked afterwards with:
+
+```sql
+-- stage45
+select position('coached athlete: forget' in pg_get_functiondef('public.forget_contact'::regproc)) > 0;
+-- stage48
+select to_regprocedure('public.coach_save_spine(text,jsonb,jsonb,jsonb,jsonb)') is not null
+   and to_regprocedure('public.coach_delete_training_history(text)') is not null;
+-- stage49
+select to_regclass('public.spine_versions') is not null
+   and (select count(*) from pg_trigger where tgname in ('exercises_version_trg','exercise_coach_version_trg','qualities_version_trg') and not tgisinternal) = 3;
+```
+
+All three return `true`. stage48 and stage49 were run first on a real Postgres 16 with a replica of the live tables
+(`sh scripts/test_spine_sql.sh`: 73 assertions: the coach check, grants, row-level security, atomicity, the
+trigger; and two real sessions showing a dashboard save waits for Claude's in-flight write and then sees it).
+Nothing was run against the project: the first attempt hit the confirmation and timed out, and the test block ended in a
+rollback, so nothing persisted (checked).
+
+**Found while doing it, not fixed (program.html, outside the five items).** `cycleWeekInfo()` reads a cycle's
+`endDate` as a UTC midnight, so for an athlete west of Greenwich the app says the cycle is over (*Cycle complete*,
+no days-left banner) on its **last day**, one day early. Tehran and Madrid are right; New York and Los Angeles are
+not (reproduced by running the real function under each time zone). The dashboard reads the date as a local day, so
+the two disagree for those athletes. A one-line fix in the app (parse the date as a local day) when you want it.
+
+**Still waiting on your decisions** (§7, unchanged): the 13 locked-out Proof signups; cancelling a quest week and the
+XP; clearing a used password; a one-step erasure; the testing-app player tables in the backup; how many programme
+versions to keep; previous-cycle sessions; sessions with no duration; commission tracking; the buyer label; and the
+weekly call log.

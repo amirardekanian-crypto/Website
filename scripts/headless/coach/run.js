@@ -394,19 +394,22 @@ S['spine-approve'] = async (b) => {
   await page.locator('.sp-save[data-ap="1"]').click();
   await L.settle(page, 700);
   const cs = await L.callsSince(page, n0);
-  // Since 2026-10-10 a save sends only what changed (here: purpose, status, and Claude's suggested
-  // qualities, which go up with the first save of an entry that has none).
-  const ex = lastOf(cs, x => x.name === 'exercises' && x.op === 'update');
-  const co = lastOf(cs, x => x.name === 'exercise_coach' && x.op !== 'select');
-  check(r, 'exercises.update with status approved and the edited purpose', ex && ex.payload.status === 'approved' && ex.payload.purpose === 'Harness purpose line.', ex && ex.payload);
-  check(r, 'only the changed columns are sent', ex && Object.keys(ex.payload).sort().join() === 'purpose,qualities,status,updated_at,updated_by', ex && Object.keys(ex.payload));
+  // Since stage48 the save is ONE call, and it sends only what changed (here: purpose, status, and Claude's
+  // suggested qualities, which go up with the first save of an entry that has none).
+  const sv = lastOf(cs, x => x.kind === 'rpc' && x.name === 'coach_save_spine');
+  const pe = sv && sv.payload.p_entry;
+  check(r, 'one coach_save_spine call for that entry, with the approved status and the edited purpose', sv && sv.payload.p_id === 'machine-leg-press' && pe.status === 'approved' && pe.purpose === 'Harness purpose line.', sv && sv.payload);
+  check(r, 'only the changed columns are sent', pe && Object.keys(pe).sort().join() === 'purpose,qualities,status', pe && Object.keys(pe));
+  check(r, 'the snapshot carries what the page read for exactly those columns', sv && Object.keys(sv.payload.p_entry_snap).sort().join() === 'purpose,qualities,status' && sv.payload.p_entry_snap.status === 'draft', sv && sv.payload.p_entry_snap);
+  check(r, 'the coach-only half is not sent when nothing coach-only changed', sv && Object.keys(sv.payload.p_coach).length === 0, sv && sv.payload.p_coach);
+  check(r, 'no direct table writes from the page', !cs.some(x => x.kind === 'from' && x.op !== 'select'), cs.filter(x => x.kind === 'from' && x.op !== 'select').map(x => x.name + ':' + x.op));
   const d = await L.db(page);
   const e = d.exercises.find(x => x.id === 'machine-leg-press');
   check(r, 'untouched fields are unchanged on the server (easier, equipment, loads) and the suggestion is saved', JSON.stringify(e.easier) === '["goblet-squat"]' && JSON.stringify(e.equipment) === '["machine"]' && JSON.stringify(e.loads) === '["knee"]' && JSON.stringify(e.qualities) === '["strength","muscle"]', { easier: e.easier, equipment: e.equipment, loads: e.loads, qualities: e.qualities });
   const coach = d.exercise_coach.find(x => x.id === 'machine-leg-press');
-  check(r, 'exercise_coach is not written when nothing coach-only changed, and keeps every column', !co && coach.suggested_changes && coach.links_before && coach.links_history && coach.notes === 'fixture coach note', { sent: co && co.payload, kept: Object.keys(coach) });
+  check(r, 'exercise_coach keeps every column', coach.suggested_changes && coach.links_before && coach.links_history && coach.notes === 'fixture coach note', Object.keys(coach));
   check(r, 'the entry is now in Approved and the editor closed', e.status === 'approved' && (await page.locator('textarea[data-sf=purpose]').count()) === 0, '');
-  r.evidence = { exercisesPayload: ex && ex.payload, coachPayload: co && co.payload };
+  r.evidence = { savePayload: sv && sv.payload };
   await page.context().close();
   return r;
 };
@@ -770,14 +773,48 @@ S['backlog-late-note'] = async (b) => {
 
 // ── 20. Delete all data ──────────────────────────────────────────────────────
 S['athlete-delete-all'] = async (b) => {
-  const r = { id: 'athlete-delete-all', title: 'File → Danger zone → Delete all data', checks: [] };
+  const r = { id: 'athlete-delete-all', title: 'File → Danger zone → Delete training history: one call, one transaction', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'a/ben_test/file' });
+  const before = await L.db(page);
   const n0 = await L.nCalls(page);
-  await page.locator('button', { hasText: /Delete (all data|training history)/ }).click();
+  await page.locator('button', { hasText: /Delete training history/ }).click();
   await L.settle(page, 1200);
-  const dels = (await L.callsSince(page, n0)).filter(c => c.op === 'delete').map(c => c.name + ' ' + c.filters.join());
+  const cs = await L.callsSince(page, n0);
+  const rpc = cs.filter(c => c.kind === 'rpc' && c.name === 'coach_delete_training_history');
+  check(r, 'one coach_delete_training_history call for that athlete', rpc.length === 1 && rpc[0].payload.p_athlete_id === 'ben_test', rpc.map(c => c.payload));
+  check(r, 'no separate deletes from the page (the old two-step)', !cs.some(c => c.kind === 'from' && c.op === 'delete'), cs.filter(c => c.op === 'delete').map(c => c.name));
+  const d = await L.db(page);
+  check(r, 'that athlete has no sessions and no progress snapshot left', !d.session_history.some(x => x.athlete_id === 'ben_test') && !d.athlete_progress.some(x => x.athlete_id === 'ben_test'),
+    { sessions: d.session_history.filter(x => x.athlete_id === 'ben_test').length, progress: d.athlete_progress.filter(x => x.athlete_id === 'ben_test').length });
+  check(r, 'another athlete keeps theirs', d.session_history.filter(x => x.athlete_id === 'ava_test').length === before.session_history.filter(x => x.athlete_id === 'ava_test').length && d.athlete_progress.some(x => x.athlete_id === 'ava_test'), '');
+  check(r, 'the toast says how many sessions went', /Deleted 2 sessions and the app data/.test(await L.toastText(page)), await L.toastText(page));
   const onRoster = await page.evaluate(() => !!S.ath.ben_test);
-  check(r, 'after "Delete all data" the athlete is gone from the roster (or the copy says what stays)', !onRoster || /programme|login/i.test(log.dialogs.map(d => d.message).join(' ')), { deletes: dels, stillOnRoster: onRoster, confirmText: log.dialogs.map(d => d.message.replace(/\n+/g, ' ')) });
+  check(r, 'the confirm says what stays, and they are still on the roster', /programme|login/i.test(log.dialogs.map(x => x.message).join(' ')) && onRoster, { stillOnRoster: onRoster, confirmText: log.dialogs.map(x => x.message.replace(/\n+/g, ' ').slice(0, 160)) });
+  await page.context().close();
+  return r;
+};
+
+// The server refuses (or is unreachable, or the sign-in lapsed, or stage48 is not applied): nothing is removed and
+// the page says why, in words that fit the cause.
+S['athlete-delete-fails'] = async (b) => {
+  const r = { id: 'athlete-delete-fails', title: 'Delete training history when the server refuses: nothing goes, and the message fits the cause', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ben_test/file' });
+  const cases = [
+    { name: 'a server error', set: () => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_delete_training_history', message: 'fixture: connection reset', times: 1 }), say: /Nothing was deleted: fixture: connection reset/ },
+    { name: 'a lapsed sign-in', set: () => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_delete_training_history', message: 'permission denied for function coach_delete_training_history', times: 1 }), say: /sign-in may have lapsed/ },
+    { name: 'stage48 not applied', set: () => { window.__STUB.missingRpc = ['coach_delete_training_history']; }, say: /has not been applied/ },
+  ];
+  for (const c of cases) {
+    log.dialogs.length = 0;
+    await page.evaluate(c.set);
+    await page.locator('button', { hasText: /Delete training history/ }).click();
+    await L.settle(page, 700);
+    const alerts = log.dialogs.filter(x => x.type === 'alert').map(x => x.message);
+    check(r, c.name + ': the alert says nothing was deleted, in words that fit', alerts.length === 1 && c.say.test(alerts[0]) && /Nothing was removed/.test(alerts[0]), alerts);
+    const d = await L.db(page);
+    check(r, c.name + ': the sessions and the snapshot are both still there', d.session_history.filter(x => x.athlete_id === 'ben_test').length === 2 && d.athlete_progress.some(x => x.athlete_id === 'ben_test'), '');
+  }
+  check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
 };
@@ -811,12 +848,12 @@ S['spine-save-keeps-claude'] = async (b) => {
   const n0 = await L.nCalls(page);
   await page.locator('.sp-save').first().click(); await L.settle(page, 700);
   const cs = await L.callsSince(page, n0);
-  const up = lastOf(cs, isUpd('exercises'));
-  const keys = up ? Object.keys(up.payload).sort() : [];
-  check(r, 'only the changed column goes up (video, plus who/when)', up && keys.join() === 'updated_at,updated_by,video', keys);
-  check(r, 'the save is guarded on the updated_at it read back', up && up.filters.some(f => /^updated_at\.eq\./.test(f)), up && up.filters);
-  check(r, 'no upsert of the whole row', !cs.some(c => c.op === 'upsert' && /exercise/.test(c.name)), cs.map(c => c.name + ':' + c.op));
-  check(r, 'the coach-only row is not written at all', !cs.some(c => c.name === 'exercise_coach' && c.op !== 'select'), cs.filter(c => c.name === 'exercise_coach').map(c => c.op));
+  const up = lastOf(cs, c => c.kind === 'rpc' && c.name === 'coach_save_spine');
+  const keys = up ? Object.keys(up.payload.p_entry).sort() : [];
+  check(r, 'only the changed column goes up (video)', up && keys.join() === 'video', keys);
+  check(r, 'the save names the value it read, so the server can tell a clash from a change elsewhere', up && up.payload.p_entry_snap.video === 'https://www.youtube.com/watch?v=FIXTURE0001', up && up.payload.p_entry_snap);
+  check(r, 'the coach-only half is not sent at all', up && Object.keys(up.payload.p_coach).length === 0, up && up.payload.p_coach);
+  check(r, 'no upsert or other write of a whole row from the page', !cs.some(c => c.kind === 'from' && c.op !== 'select'), cs.filter(c => c.kind === 'from' && c.op !== 'select').map(c => c.name + ':' + c.op));
   const d = await L.db(page);
   const e = d.exercises.find(x => x.id === 'goblet-squat'), k = d.exercise_coach.find(x => x.id === 'goblet-squat');
   check(r, "Claude's court line, progression, count and cost survive", e.tennis === 'Claude court line' && e.harder.length === 2 && k.cost === 'heavy' && k.credits.glutes === 1, { tennis: e.tennis, harder: e.harder, cost: k.cost, credits: k.credits });
@@ -835,8 +872,9 @@ S['spine-clash'] = async (b) => {
   await page.locator('[data-sf=purpose]').fill('Amir purpose');
   let n0 = await L.nCalls(page);
   await page.locator('.sp-save').first().click(); await L.settle(page, 700);
-  check(r, 'nothing is written', !(await L.callsSince(page, n0)).some(c => c.name === 'exercises' && c.op !== 'select'), '');
+  check(r, 'nothing is written', (await L.db(page)).exercises.find(x => x.id === 'goblet-squat').purpose === 'Claude purpose', (await L.db(page)).exercises.find(x => x.id === 'goblet-squat').purpose);
   check(r, 'the dialog names the field and both values', log.dialogs.length === 1 && /Why it’s here: now "Claude purpose", was "Fixture purpose\."/.test(log.dialogs[0].message), log.dialogs.map(x => x.message));
+  check(r, '...and says both halves were held back', log.dialogs.length === 1 && /Nothing was saved, to either half/.test(log.dialogs[0].message), log.dialogs.map(x => x.message));
   check(r, 'the typed text is still in the form', (await page.locator('[data-sf=purpose]').inputValue()) === 'Amir purpose', await page.locator('[data-sf=purpose]').count() ? await page.locator('[data-sf=purpose]').inputValue() : 'editor gone');
   n0 = await L.nCalls(page);
   await page.locator('.sp-save').first().click(); await L.settle(page, 700);
@@ -912,6 +950,114 @@ S['spine-unsaved-guard'] = async (b) => {
   log.dialogs.length = 0;
   await page.evaluate(() => { location.hash = 'today'; }); await L.settle(page, 400);
   check(r, 'leaving the tab asks first, and a no stays', log.dialogs.some(x => x.type === 'confirm') && /#exercises$/.test(page.url()) && (await page.locator('[data-sf=purpose]').inputValue()) === 'Half-typed purpose', { url: page.url(), dialogs: log.dialogs });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// stage48: the entry and the coach-only half are one transaction. A clash on EITHER half holds back BOTH.
+S['spine-save-atomic'] = async (b) => {
+  const r = { id: 'spine-save-atomic', title: 'A clash in the coach-only half holds the entry half back too; a failed save writes neither', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  await spineOpen(page, 'goblet-squat');
+  // Claude changes the coach-only note by SQL after the page read; Amir changes a video (entry) AND the same note.
+  await serverSet(page, 'exercise_coach', 'goblet-squat', { notes: 'Claude coach note' });
+  await page.locator('[data-sf=video]').fill('https://www.youtube.com/watch?v=AMIRVIDEO01');
+  await page.locator('[data-sf=notes]').fill('Amir coach note');
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  let d = await L.db(page);
+  check(r, 'the clash on the coach-only note names it, with both values', log.dialogs.length === 1 && /Notes: now "Claude coach note", was "\(empty\)"/.test(log.dialogs[0].message), log.dialogs.map(x => x.message));
+  check(r, 'the entry half was NOT saved either (before stage48 it was, and only the coach half was refused)', d.exercises.find(x => x.id === 'goblet-squat').video === 'https://www.youtube.com/watch?v=FIXTURE0001', d.exercises.find(x => x.id === 'goblet-squat').video);
+  check(r, 'nothing was written to the coach-only half', d.exercise_coach.find(x => x.id === 'goblet-squat').notes === 'Claude coach note', d.exercise_coach.find(x => x.id === 'goblet-squat').notes);
+  check(r, 'the typing is still in the form', (await page.locator('[data-sf=video]').inputValue()) === 'https://www.youtube.com/watch?v=AMIRVIDEO01' && (await page.locator('[data-sf=notes]').inputValue()) === 'Amir coach note', '');
+  // Save again, on purpose: both go in together.
+  log.dialogs.length = 0;
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  d = await L.db(page);
+  check(r, 'Save again puts both halves in, together', d.exercises.find(x => x.id === 'goblet-squat').video === 'https://www.youtube.com/watch?v=AMIRVIDEO01' && d.exercise_coach.find(x => x.id === 'goblet-squat').notes === 'Amir coach note' && !log.dialogs.length, { dialogs: log.dialogs });
+  // The server fails: nothing is written, the form keeps the typing, and the alert says so.
+  await page.locator('[data-sf=purpose]').fill('Typed before the failure');
+  await page.locator('[data-sf=sfr]').fill('4');
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_save_spine', message: 'fixture: connection reset', times: 1 }));
+  log.dialogs.length = 0;
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  d = await L.db(page);
+  check(r, 'a failed save writes neither half', d.exercises.find(x => x.id === 'goblet-squat').purpose === 'Fixture purpose.' && d.exercise_coach.find(x => x.id === 'goblet-squat').sfr === 2, { purpose: d.exercises.find(x => x.id === 'goblet-squat').purpose, sfr: d.exercise_coach.find(x => x.id === 'goblet-squat').sfr });
+  check(r, 'the alert says nothing was saved, to either half, and keeps the typing', log.dialogs.length === 1 && /Could not save Goblet Squat: fixture: connection reset/.test(log.dialogs[0].message) && /Nothing was saved, to either half/.test(log.dialogs[0].message)
+    && (await page.locator('[data-sf=purpose]').inputValue()) === 'Typed before the failure' && (await page.locator('[data-sf=sfr]').inputValue()) === '4', log.dialogs.map(x => x.message));
+  // stage48 not applied: say so, change nothing.
+  log.dialogs.length = 0;
+  await page.evaluate(() => { window.__STUB.missingRpc = ['coach_save_spine']; });
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  check(r, 'a server without stage48 is named, and nothing is saved', log.dialogs.length === 1 && /has not been applied/.test(log.dialogs[0].message) && (await L.db(page)).exercises.find(x => x.id === 'goblet-squat').purpose === 'Fixture purpose.', log.dialogs.map(x => x.message));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// stage49: an entry's history, and Undo through the same guarded save.
+S['spine-history'] = async (b) => {
+  const r = { id: 'spine-history', title: 'Exercises → an entry → History: every change, who made it, and Undo', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  dismissDialogs(page, log); log.dialogs.length = 0;
+  await spineOpen(page, 'goblet-squat');
+  await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 400);
+  let txt = await page.locator('#spvlist').innerText();
+  check(r, 'a new entry has no history yet, and says so', /No earlier versions yet/.test(txt), txt.slice(0, 120));
+  // Claude (SQL, no signed-in user) writes a court line; Amir saves a new video from the page.
+  await page.evaluate(() => window.__sqlWrite('exercises', 'goblet-squat', { tennis: 'Claude court line' }));
+  await page.locator('[data-sf=video]').fill('https://www.youtube.com/watch?v=NEWVIDEO001');
+  // Claude's write landed after the page read, but on a column Amir is not changing: no clash.
+  await page.locator('.sp-save').first().click(); await L.settle(page, 800);
+  txt = await page.locator('#spvlist').innerText();
+  check(r, 'History stayed open through the redraw and lists both changes, newest first', /you[\s\S]*Video[\s\S]*Claude \(SQL\)[\s\S]*On court/.test(txt), txt.replace(/\s+/g, ' ').slice(0, 400));
+  check(r, 'it shows the old value then the new one', /Video: https:\/\/www\.youtube\.com\/watch\?v=FIXTURE0001 → https:\/\/www\.youtube\.com\/watch\?v=NEWVIDEO001/.test(txt) && /On court: \(empty\) → Claude court line/.test(txt), txt.replace(/\s+/g, ' ').slice(0, 400));
+  check(r, 'every change is labelled by who made it', (await page.locator('#spvlist .spvwho').allInnerTexts()).join('|') === 'you|Claude (SQL)', await page.locator('#spvlist .spvwho').allInnerTexts());
+  // Undo Amir's video change.
+  const n0 = await L.nCalls(page);
+  log.dialogs.length = 0;
+  page.removeAllListeners('dialog');
+  page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await d.accept().catch(() => {}); });
+  await page.locator('#spvlist .spvrow').first().locator('button', { hasText: 'Undo this change' }).click(); await L.settle(page, 900);
+  const cs = await L.callsSince(page, n0);
+  const sv = lastOf(cs, c => c.kind === 'rpc' && c.name === 'coach_save_spine');
+  check(r, 'the confirm shows the value it will put back', log.dialogs.some(x => x.type === 'confirm' && /Video: now https:\/\/www\.youtube\.com\/watch\?v=NEWVIDEO001\s+back to https:\/\/www\.youtube\.com\/watch\?v=FIXTURE0001/.test(x.message)), log.dialogs.map(x => x.message.slice(0, 200)));
+  check(r, 'Undo goes through coach_save_spine, naming what is live now as the snapshot', sv && sv.payload.p_entry.video === 'https://www.youtube.com/watch?v=FIXTURE0001' && sv.payload.p_entry_snap.video === 'https://www.youtube.com/watch?v=NEWVIDEO001' && Object.keys(sv.payload.p_entry).length === 1, sv && sv.payload);
+  const d = await L.db(page);
+  const e = d.exercises.find(x => x.id === 'goblet-squat');
+  check(r, 'the video is back, Claude\'s court line is untouched', e.video === 'https://www.youtube.com/watch?v=FIXTURE0001' && e.tennis === 'Claude court line', { video: e.video, tennis: e.tennis });
+  txt = await page.locator('#spvlist').innerText();
+  check(r, 'the undo is itself in the list', (await page.locator('#spvlist .spvrow').count()) === 3 && /Video: https:\/\/www\.youtube\.com\/watch\?v=NEWVIDEO001 → https:\/\/www\.youtube\.com\/watch\?v=FIXTURE0001/.test(txt), txt.replace(/\s+/g, ' ').slice(0, 300));
+  check(r, 'a toast says it was put back', /Put back/.test(await L.toastText(page)), await L.toastText(page));
+  // Undo something that already is as it was: nothing is sent.
+  const n1 = await L.nCalls(page);
+  await page.locator('#spvlist .spvrow').nth(1).locator('button', { hasText: 'Undo this change' }).click(); await L.settle(page, 500);
+  check(r, 'undoing a change that is already undone sends nothing', !(await L.callsSince(page, n1)).some(c => c.kind === 'rpc'), /nothing to put back/i.test(await L.toastText(page)));
+  // The coach-only half is versioned too, and labelled.
+  await page.evaluate(() => window.__sqlWrite('exercise_coach', 'goblet-squat', { cost: 'heavy' }));
+  await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 200);
+  await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 500);
+  txt = await page.locator('#spvlist').innerText();
+  check(r, 'a change to the coach-only half is listed as such', /Claude \(SQL\) · coach-only part[\s\S]*Cost: moderate → heavy/.test(txt), txt.replace(/\s+/g, ' ').slice(0, 300));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['spine-history-unavailable'] = async (b) => {
+  const r = { id: 'spine-history-unavailable', title: 'History when stage49 is not applied, or the read fails: a plain sentence, nothing else breaks', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  await spineOpen(page, 'goblet-squat');
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'from', name: 'spine_versions', op: 'select', message: "Could not find the table 'public.spine_versions' in the schema cache", code: 'PGRST205', times: 1 }));
+  await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 500);
+  let txt = await page.locator('#spvlist').innerText();
+  check(r, 'a missing table says stage49 is not applied', /not on the server yet/.test(txt) && /stage49/.test(txt), txt);
+  await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 200);
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'from', name: 'spine_versions', op: 'select', message: 'fixture: network down', times: 1 }));
+  await page.locator('.spine-ed details.rawlog summary').click(); await L.settle(page, 500);
+  txt = await page.locator('#spvlist').innerText();
+  check(r, 'any other failure says what failed', /Could not load history: fixture: network down/.test(txt), txt);
+  check(r, 'the editor and its Save are still there', (await page.locator('.sp-save').count()) > 0 && (await page.locator('[data-sf=purpose]').count()) === 1, '');
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
