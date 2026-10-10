@@ -102,3 +102,34 @@ create or replace trigger exercises_touch_updated_at before update on public.exe
   for each row execute function public.touch_updated_at();
 create or replace trigger qualities_touch_updated_at before update on public.qualities
   for each row execute function public.touch_updated_at();
+
+-- ── 5. which stored passwords have already been used (SERVER-1, added the same day) ─────
+-- "Logins to send" listed every stored password as waiting, including 8 of 13 that had already been
+-- used to sign in. coach.html marks those "signed in with it". It reads auth.users, which only a
+-- SECURITY DEFINER function can; coach only. Clearing a used password automatically is Amir's call.
+create or replace function public.coach_login_use()
+returns table(app text, key text, signed_in_since boolean)
+language plpgsql
+stable
+security definer
+set search_path to 'public'
+as $function$
+begin
+  if not public.is_coach() then
+    raise exception 'coach only';
+  end if;
+  return query
+    select 'athlete'::text, ai.athlete_id, coalesce(u.last_sign_in_at > ai.password_set_at, false)
+      from public.athlete_identities ai join auth.users u on u.id = ai.user_id
+     where ai.initial_password is not null
+    union all
+    select 'course'::text, t.username, coalesce(u.last_sign_in_at > t.password_set_at, false)
+      from public.tps_accounts t join auth.users u on u.id = t.user_id
+     where t.initial_password is not null
+    union all
+    select 'testing'::text, a.username, coalesce(u.last_sign_in_at > a.password_set_at, false)
+      from public.assess_accounts a join auth.users u on u.id = a.user_id
+     where a.initial_password is not null;
+end; $function$;
+revoke execute on function public.coach_login_use() from public, anon;
+grant execute on function public.coach_login_use() to authenticated;

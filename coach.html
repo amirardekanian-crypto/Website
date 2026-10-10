@@ -1144,6 +1144,21 @@ async function loadLogins() {
   if (r.error) return;
   S.logins = {};
   (r.data || []).forEach(row => { S.logins[row.athlete_id] = row; });
+  await loadLoginUse();
+}
+// Which stored passwords have already been used to sign in (coach_login_use(), coach only; it reads
+// the sign-in time the login functions cannot see). A used one can be marked sent with no doubt.
+// Optional: if the call fails the lists simply show no mark.
+async function loadLoginUse() {
+  if (!sb) return;
+  const u = await sb.rpc('coach_login_use');
+  if (u.error || !Array.isArray(u.data)) return;
+  S.loginUse = {};
+  u.data.forEach(x => { S.loginUse[x.app + ':' + x.key] = !!x.signed_in_since; });
+}
+function usedMark(app, key) {
+  return (S.loginUse || {})[app + ':' + key]
+    ? ' <span class="fl good" title="They have signed in since this password was set, so it reached them">signed in with it</span>' : '';
 }
 // Login actions refuse to run while the list of who has a login is unknown.
 function loginsUnknown() {
@@ -1229,11 +1244,12 @@ function pendingCredsHtml() {
       <p class="empty" style="padding:6px 0 12px">
         Copy each one and send it on WhatsApp, then mark it sent. Passwords are stored
         here only until you do — after that the only way to see one again is a reset.
+        <b>Signed in with it</b> means it already reached them: mark it sent to clear it.
       </p>
       ${pending.map(r => `
         <div class="credrow">
           <span class="credname">${esc(r.athlete_id)}</span>
-          <code class="credpass">${esc(r.initial_password)}</code>
+          <code class="credpass">${esc(r.initial_password)}</code>${usedMark('athlete', r.athlete_id)}
           <span class="acts">
             <button class="btn sm primary" onclick="copyLoginFor(${jsq(r.athlete_id)})">Copy message</button>
             <button class="btn sm" onclick="markLoginSent(${jsq(r.athlete_id)})">Mark sent</button>
@@ -3953,7 +3969,7 @@ function fileTabHtml(D) {
         </p>
         ${login.initial_password ? `<div class="credrow" style="border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px">
           <span class="credname">Not sent yet</span>
-          <code class="credpass">${esc(login.initial_password)}</code>
+          <code class="credpass">${esc(login.initial_password)}</code>${usedMark('athlete', athleteId)}
           <span class="acts">
             <button class="btn sm primary" onclick="copyLoginFor(${jsq(athleteId)})">Copy message</button>
             ${a.contact && waLink(a.contact.whatsapp) ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(waLink(a.contact.whatsapp))}?text=${encodeURIComponent(loginMessage(athleteId, login.initial_password))}">WhatsApp ↗</a>` : ''}
@@ -4710,7 +4726,7 @@ function renderAssess() {
   const day = d => esc(String(d || '').slice(0, 10));
   const row = r => `<div class="credrow">
       <span class="credname">${esc(r.username)}${r.label ? ` <span class="muted">· ${esc(r.label)}</span>` : ''}</span>
-      ${r.initial_password && !r.revoked_at ? `<code class="credpass">${esc(r.initial_password)}</code>`
+      ${r.initial_password && !r.revoked_at ? `<code class="credpass">${esc(r.initial_password)}</code>${usedMark('testing', r.username)}`
         : `<span class="muted">${r.revoked_at ? 'revoked ' + day(r.revoked_at) : r.sent_at ? 'sent ' + day(r.sent_at) : 'created ' + day(r.created_at)}</span>`}
       <span class="acts">${r.revoked_at
         ? `<button class="btn sm as-pw" data-u="${esc(r.username)}">Restore</button>`
@@ -4849,7 +4865,7 @@ function renderCourse() {
   const day = d => esc(String(d || '').slice(0, 10));
   const row = r => `<div class="credrow">
       <span class="credname">${esc(r.username)}${r.label ? ` <span class="muted">· ${esc(r.label)}</span>` : ''}</span>
-      ${r.initial_password && !r.revoked_at ? `<code class="credpass">${esc(r.initial_password)}</code>`
+      ${r.initial_password && !r.revoked_at ? `<code class="credpass">${esc(r.initial_password)}</code>${usedMark('course', r.username)}`
         : `<span class="muted">${r.revoked_at ? 'revoked ' + day(r.revoked_at) : r.sent_at ? 'sent ' + day(r.sent_at) : 'created ' + day(r.created_at)}</span>`}
       <span class="acts">${r.revoked_at
         ? `<button class="btn sm tp-pw" data-u="${esc(r.username)}">Restore</button>`

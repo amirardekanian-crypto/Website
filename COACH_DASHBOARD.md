@@ -303,7 +303,8 @@ seven presence dots.
 
 **Above the roster:** *Create N missing logins* (coached athletes who have trained and have no
 login), then **Logins to send** (open while anything waits: each unsent password with Copy
-message and Mark sent), then a folded **Coach tools** line: *↑ Publish programme file*, *↑ Add
+message and Mark sent; *signed in with it* marks one the person has already used, which is safe to
+mark sent; the Course and Testing app lists show the same mark), then a folded **Coach tools** line: *↑ Publish programme file*, *↑ Add
 coaching logs* and *⤓ Backup*, with when this computer last took a backup. (The secret-link tools
 are gone: the links were retired on 2026-09-07.)
 

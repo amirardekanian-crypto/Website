@@ -634,6 +634,18 @@ S['session-import-replace'] = async (b) => {
   return r;
 };
 
+S['login-used-mark'] = async (b) => {
+  const r = { id: 'login-used-mark', title: 'Logins to send marks a password that has already been used to sign in', checks: [] };
+  const { page } = await L.openCoach(b, { hash: 'athletes' });
+  check(r, 'an unused stored password carries no mark', (await page.locator('.creds .credrow', { hasText: 'ben_test' }).locator('.fl.good').count()) === 0, '');
+  await page.evaluate(() => { window.__DB.athlete_identities.find(x => x.athlete_id === 'ben_test').signed_in_test = true; });
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
+  const row = page.locator('.creds .credrow', { hasText: 'ben_test' });
+  check(r, 'after they sign in, the row says "signed in with it"', /signed in with it/.test(await row.innerText()), await row.innerText());
+  await page.context().close();
+  return r;
+};
+
 // ── 19. Clear the note backlog ───────────────────────────────────────────────
 S['backlog-clear'] = async (b) => {
   const r = { id: 'backlog-clear', title: 'Today → Needs you → Clear older notes', checks: [] };

@@ -264,6 +264,14 @@
       return null;
     },
     hab_season_level: function (p) { return (SEED.levels || {})[p.p_athlete_id] || null; },
+    // A fixture row marks "has signed in since the password was set" with signed_in_test: true.
+    coach_login_use: function () {
+      var out = [];
+      [['athlete', 'athlete_identities', 'athlete_id'], ['course', 'tps_accounts', 'username'], ['testing', 'assess_accounts', 'username']].forEach(function (t) {
+        tbl(t[1]).forEach(function (r) { if (r.initial_password) out.push({ app: t[0], key: r[t[2]], signed_in_since: !!r.signed_in_test }); });
+      });
+      return out;
+    },
     coach_season_levels: function (p) { return (p.p_ids || []).map(function (id) { return { athlete_id: id, level: (SEED.levels || {})[id] || null }; }); },
     leaderboard_top: function () { return clone(SEED.board || []); },
     save_session: function (p) {
