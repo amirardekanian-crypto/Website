@@ -19,7 +19,9 @@ chipsCtx.global = chipsCtx;
 vm.createContext(chipsCtx);
 vm.runInContext(fs.readFileSync('assets/js/chips.js', 'utf8'), chipsCtx);
 
-const sandbox = { round1: n => Math.round(n * 10) / 10, window: chipsCtx.window };
+// jparse is coach.html's own JSON-or-object reader (compareDay reads session.log with it).
+const jparse = v => { if (v == null) return null; if (typeof v === 'object') return v; try { return JSON.parse(v); } catch { return null; } };
+const sandbox = { round1: n => Math.round(n * 10) / 10, window: chipsCtx.window, jparse };
 new Function('ctx', 'with (ctx) {' + code + '\nObject.assign(ctx, {parseSetLine, parseSessionLog, parseChips, compareExercise, compareDay, dayVerdict, loadSummary, rpeTarget, normEx, logIndex, rxLine, dayTargetC, dayDropC});}')(sandbox);
 const { parseSessionLog, parseChips, compareDay, compareExercise, dayVerdict, loadSummary } = sandbox;
 
@@ -255,6 +257,37 @@ console.log("9. today's targets");
   is([rows[0].tgt.label, rows[0].flags.length], ['7', 0], 'squat judged against 7 that day');
   is([rows[1].state, rows[1].flags.map(f => f.text)], ['excused', ['optional today']], 'optional work is excused, not missed');
   is(dayVerdict(groups), { total: 1, clean: 1, off: 0, missing: 0 }, 'excused work is out of the count');
+}
+
+// ── 10. Renamed exercises, the same exercise twice, and untouched ticks (2026-10-10)
+console.log('10. renames, repeats, unticked');
+{
+  const c = (...l) => l.map(label => ({ label }));
+  // The summary text still says the old name; the structured log was renamed with the Spine.
+  const plan = { id: 1, blocks: [{ title: 'Primary', exercises: [
+    { name: 'Goblet Box Squat', chips: c('3 Sets', '×8 Reps', 'RPE 7') },
+    { name: 'Dead Bug', chips: c('2 Sets', '×10 Reps') },
+    { name: 'Dead Bug', chips: c('2 Sets', '×10 Reps') }] }] };
+  const sess = { log: [{ ex: 'Goblet Box Squat' }, { ex: 'Dead Bug' }, { ex: 'Dead Bug' }], summary: `Exercise log:
+[Primary]
+• Goblet Squat to Box (✓)
+    Set 1: 16 ×8 @7 ✓
+    Set 2: 16 ×8 @7 ✓
+    Set 3: 16 ×8 @7 ✓
+• Dead Bug (✓)
+    Set 1: ×10 @6 ✓
+    Set 2: ×10 @6 ✓
+• Dead Bug (partial)
+    Set 1: ×10 @8
+` };
+  const { groups, extras } = compareDay(plan, sess);
+  const rows = groups.flatMap(g => g.rows);
+  is([rows[0].name, rows[0].state, extras], ['Goblet Box Squat', 'done', 0], 'renamed lift matches through the structured log');
+  is([rows[1].rpeMean, rows[2].rpeMean], [6, 8], 'the same exercise twice keeps its own log on each row');
+  is(rows[2].flags.map(f => f.text), ['0 of 2 sets ticked'], 'touched but nothing ticked is flagged');
+  // A log that does not line up one-to-one is ignored and the text names are kept.
+  const odd = compareDay(plan, Object.assign({}, sess, { log: [{ ex: 'Goblet Box Squat' }] }));
+  is(odd.extras, 1, 'a log of a different length falls back to the text');
 }
 
 console.log('\n' + (fail ? 'FAILED ' + fail + ' / ' + (pass + fail) : 'all ' + pass + ' assertions passed'));

@@ -27,7 +27,10 @@
 <meta name="theme-color" content="#0E4A36">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Pinned (2026-10-10): "@2" let any new 2.x build change how the dashboard signs in or reads
+     with no change here. 2.117.3 is what @2 served that day and was tested against. To move on,
+     bump the number and run the coach harness (Content/COACH-AUDIT.md). -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js"></script>
 <!-- Chip semantics, shared with program.html so the editor and the athlete app
      can never disagree about what a prescription says. See chips-selftest.html. -->
 <script src="/assets/js/chips.js?v=20260925a"></script>
@@ -449,6 +452,7 @@
              margin-top: 3px; cursor: help; }
   .rx-editor { grid-column: 1 / -1; margin: 10px 0 4px; padding: 14px 16px;
                background: var(--court-100); border-radius: 10px; }
+  .exed-title { font-family: 'Barlow', sans-serif; font-size: 12.5px; color: var(--ink); margin-bottom: 10px; }
   .exed-grid { display: flex; flex-wrap: wrap; gap: 14px 18px; }
   .exf { display: flex; flex-direction: column; gap: 4px; font-family: 'Barlow', sans-serif; }
   .exf > span { font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
@@ -507,6 +511,10 @@
   .fl.warn { background: var(--clay-100); color: var(--clay); }
   .fl.miss { background: var(--clay); color: #fff; }
   .fl.note { background: var(--ochre-100); color: var(--ochre); }
+  /* Roster reason chips. They were .fl.note, which also matched the global .note callout box
+     (border, padding, margin) and drew the LEAST urgent reasons biggest and loudest. */
+  .fl.quiet { background: var(--track); color: var(--ink); font-weight: 600; }
+  .fl.good { background: var(--court-100); color: var(--court); }
   .fl.under { background: var(--rpe-under-100); color: var(--rpe-under); }
   .did-rpe.under { color: var(--rpe-under); font-weight: 700; }
   .rpe-set.over { color: var(--clay); font-weight: 700; } .rpe-set.under { color: var(--rpe-under); font-weight: 700; }
@@ -768,11 +776,75 @@ const UPGRADE_DAYS = 14;                          // free athlete with this many
 const NEEDS_WINDOW_DAYS = 14;
 
 const DEMO = new URLSearchParams(location.search).has('demo');
-const sb = DEMO ? null : supabase.createClient(SB_URL, SB_KEY);
+// supabase-js comes from a CDN. If that script failed (blocked, offline, a bad build), say so
+// instead of throwing here and leaving a blank page with nothing on it.
+const sb = DEMO ? null : (window.supabase ? supabase.createClient(SB_URL, SB_KEY) : null);
 const $ = (id) => document.getElementById(id);
+
+// ── Reading and writing safely ────────────────────────────────────────────────
+// PostgREST answers at most 1000 rows per request (the project's max_rows) with a 200 and NO
+// error, so a plain select of a growing table silently drops rows: session_history alone grows
+// by about 135 a month. selectAll() pages through in the table's primary-key order, so no row is
+// skipped or read twice between pages.
+const TABLE_KEYS = {
+  session_history: ['athlete_id', 'day', 'completed_on'], hab_notes: ['athlete_id', 'day'],
+  hab_titles: ['athlete_id', 'title'], hab_season_results: ['athlete_id', 'starts_on'],
+  library_categories: ['kind', 'id'], library_sessions: ['athlete_id', 'slug', 'completed_on'],
+  assess_results: ['player_id', 'test', 'day'], affiliates: ['code'], assess_accounts: ['user_id'],
+  assess_content: ['key'], tps_content: ['key'], tps_accounts: ['user_id'], athlete_identities: ['user_id'],
+  library: ['slug'],
+};
+function keysOf(table) {
+  return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys']
+    .includes(table) ? ['athlete_id'] : ['id']);
+}
+async function selectAll(table, cols, orderCols) {
+  const order = orderCols || keysOf(table);
+  let from = 0, rows = [], total = null, cap = 1000;
+  for (;;) {
+    let q = sb.from(table).select(cols || '*', from === 0 ? { count: 'exact' } : undefined);
+    order.forEach(c => { q = q.order(c, { ascending: true }); });
+    const { data, error, count } = await q.range(from, from + 999);
+    if (error) return { data: null, error };
+    const got = data || [];
+    if (from === 0) {
+      if (typeof count === 'number') total = count;
+      // A server set to fewer than 1000 rows a page answers short without saying so: learn its page.
+      if (total != null && got.length && got.length < 1000 && total > got.length) cap = got.length;
+    }
+    rows = rows.concat(got);
+    from += got.length;
+    if (!got.length || got.length < cap) break;
+  }
+  // A row written while paging can shift a page by one and repeat a row: keep one per key.
+  if (rows.length && order.every(k => k in rows[0])) {
+    const seen = new Set();
+    rows = rows.filter(r => { const k = order.map(c => String(r[c])).join('\u0001'); if (seen.has(k)) return false; seen.add(k); return true; });
+  }
+  return { data: rows, error: null, total, short: total != null && rows.length < total };
+}
+// A write that must change a row. With a lapsed session supabase-js sends the request as the
+// anonymous key, RLS lets nothing through, and an UPDATE or DELETE comes back as a success that
+// touched no rows. Ask for the rows back (.select()) and treat none as a failure.
+function writeFailed(res, what) {
+  if (res.error) return res.error.message;
+  if (!res.data || !res.data.length) return `Nothing was ${what || 'saved'}: the server changed no row. ` +
+    'Your sign-in may have lapsed, or the record has moved. Refresh, sign in again if asked, and redo it.';
+  return '';
+}
+// Errors from the slices that loadAll() treats as optional. Each one used to fail silently, so a
+// failed read looked exactly like an empty table: every athlete without a programme, every login
+// missing. The banner under the tabs names what did not load.
+const LOAD_ERR = {};
 
 // --- tiny helpers -----------------------------------------------------------
 function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+// A value passed as a JS string argument inside an inline handler: onclick="f(${jsq(x)})".
+// esc() alone is not enough there: the browser decodes &#39; back to ' BEFORE the handler
+// runs, so a quote in the value (a contact's email, a note) ends the string and the rest
+// runs as code in the coach's signed-in session. JSON.stringify makes a real JS string
+// literal; esc() then keeps that literal intact inside the double-quoted attribute.
+function jsq(s) { return esc(JSON.stringify(String(s ?? ''))); }
 function jparse(v) { if (v == null) return null; if (typeof v === 'object') return v; try { return JSON.parse(v); } catch { return null; } }
 function pad2(n) { return String(n).padStart(2, '0'); }
 function dkey(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
@@ -782,10 +854,19 @@ function pDate(iso) { const p = String(iso).split('-'); return new Date(+p[0], (
 function daysBetween(isoA, isoB) { return Math.round((pDate(isoB) - pDate(isoA)) / 86400000); }
 function timeAgo(iso) {
   if (!iso) return '—';
-  const d = Math.floor((Date.now() - new Date(iso)) / 86400000);
+  const d = daysSince(iso);
   if (d <= 0) return 'today'; if (d === 1) return 'yesterday'; return d + ' days ago';
 }
-function daysSince(iso) { return iso ? Math.floor((Date.now() - new Date(iso)) / 86400000) : 9999; }
+function daysSince(iso) {
+  if (!iso) return 9999;
+  // A date-only value ('2026-10-09', or one the callers wrote as '2026-10-09T12:00:00') is aged in
+  // calendar days from today: the clock maths read yesterday as "today" before noon and gave a
+  // weigh-in from this morning "-1 days ago".
+  const m = String(iso).match(/^(\d{4}-\d{2}-\d{2})(?:T12:00:00)?$/);
+  if (m) return Math.max(0, daysBetween(m[1], todayKey()));
+  const d = new Date(iso);   // a timestamp: the local calendar day it fell on
+  return isNaN(d) ? 9999 : Math.max(0, daysBetween(dkey(d), todayKey()));
+}
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DOWS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 function prettyDate(iso) {
@@ -844,9 +925,11 @@ const S = {
   seasons: [],     // seasons rows, newest first
   titles: [],      // hab_titles recent
   optin: {},       // athlete_id -> {display_name, title}
-  programs: {},    // athlete_id -> programme JSON (from the database, else the legacy file)
-  progSrc: {},     // athlete_id -> 'db' | 'file' | 'none'. Demo mode never calls
+  programs: {},    // athlete_id -> programme JSON (the row in public.programs)
+  progSrc: {},     // athlete_id -> 'db' | 'none'. Demo mode never calls
                    // loadPrograms(), so this has to start as an object, not undefined.
+  progMeta: {},    // athlete_id -> { updated_at, updated_by } of that row: the editor's
+                   // freshness check and the "last published" line read it.
   lib: [],         // public.library rows (workouts + articles)
   libCats: [],     // public.library_categories rows
   logins: {},      // athlete_id -> athlete_identities row, for athletes with a
@@ -869,8 +952,8 @@ const S = {
 async function loadAll() {
   if (DEMO) { demoStore(); S.ready = true; return; }
   const [prog, hist, notes, contacts, rules, seasons, titles, optin, intake, affs] = await Promise.all([
-    sb.from('athlete_progress').select('athlete_id, athlete_name, data, updated_at'),
-    sb.from('session_history').select('*'),
+    selectAll('athlete_progress', 'athlete_id, athlete_name, data, updated_at'),
+    selectAll('session_history', '*'),
     sb.from('hab_notes').select('*').gte('day', addDays(todayKey(), -7)),
     sb.rpc('contact_list'),
     sb.from('xp_rules').select('rules').eq('id', 1).maybeSingle(),
@@ -885,19 +968,36 @@ async function loadAll() {
   S.prog = prog.data || [];
   S.hist = hist.data || [];
   S.notes = notes.data || [];
-  S.contacts = (contacts && contacts.data) || [];   // RPC may be missing pre-stage16; degrade quietly
+  S.contacts = (contacts && contacts.data) || [];
   S.rules = (rules.data && rules.data.rules) || null;
   S.seasons = seasons.data || [];
   S.titles = titles.data || [];
   S.optin = {}; (optin.data || []).forEach(r => S.optin[r.athlete_id] = r);
-  S.intake = (intake && intake.data) || [];   // RPC may be missing pre-stage27; degrade quietly
-  S.affiliates = (affs && !affs.error && affs.data) || [];   // table may be missing pre-stage29; degrade quietly
-  await loadLogins();
-  await loadCoachingLogs();
-  await loadLibrary();
-  await loadPrograms();
+  S.intake = (intake && intake.data) || [];
+  S.affiliates = (affs && !affs.error && affs.data) || [];
+  // These three still load the page when they fail, but the banner says so: an empty
+  // funnel, inbox or code list must not look like a real one.
+  LOAD_ERR.contacts = contacts && contacts.error ? contacts.error.message : '';
+  LOAD_ERR.intake = intake && intake.error ? intake.error.message : '';
+  LOAD_ERR.affiliates = affs && affs.error ? affs.error.message : '';
+  await Promise.all([loadLogins(), loadCoachingLogs(), loadLibrary(), loadPrograms()]);
   assemble();
   S.ready = true;
+}
+
+// What failed to load, in words, under the tabs. Empty when everything came back.
+const LOAD_ERR_LABEL = {
+  programs: 'programmes', logins: 'athlete logins', contacts: 'Proof contacts', intake: 'intake forms',
+  affiliates: 'affiliate codes', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
+};
+function loadWarnHtml() {
+  const bad = Object.keys(LOAD_ERR).filter(k => LOAD_ERR[k]);
+  if (!bad.length) return '';
+  return `<b>Not everything loaded:</b> ${bad.map(k => esc(LOAD_ERR_LABEL[k] || k)).join(', ')}. ` +
+    `What you see for ${bad.length === 1 ? 'it' : 'them'} may be empty or out of date, and the actions that depend on ` +
+    `${bad.length === 1 ? 'it' : 'them'} are switched off until it loads. ` +
+    `<button class="btn sm" onclick="hardRefresh()">↻ Try again</button>` +
+    `<span class="lw-why">${bad.map(k => esc((LOAD_ERR_LABEL[k] || k) + ': ' + LOAD_ERR[k])).join(' · ')}</span>`;
 }
 
 // Refetch just the slices a write touched, then re-render.
@@ -909,50 +1009,55 @@ async function refetch(parts) {
   if (parts.includes('contacts')) jobs.push(sb.rpc('contact_list').then(r => { if (!r.error) S.contacts = r.data || []; }));
   if (parts.includes('intake')) jobs.push(sb.rpc('intake_list').then(r => { if (!r.error) S.intake = r.data || []; }));
   if (parts.includes('affiliates')) jobs.push(sb.from('affiliates').select('*').order('code').then(r => { if (!r.error) S.affiliates = r.data || []; }));
-  if (parts.includes('hist')) jobs.push(sb.from('session_history').select('*').then(r => { if (!r.error) { S.hist = r.data || []; assemble(); } }));
+  if (parts.includes('hist')) jobs.push(selectAll('session_history', '*').then(r => { if (!r.error) { S.hist = r.data || []; assemble(); } else toast('Saved, but the list could not refresh: ' + r.error.message); }));
+  if (parts.includes('programs')) jobs.push(loadPrograms().then(() => assemble()));
   await Promise.all(jobs);
   render();
 }
 
 // Load every athlete's programme. Names, tier, sessions/week for adherence, and
-// the prescribed plan for the detail view.
+// the prescribed plan for the detail view. The programs table IS the roster: every
+// athlete, free or coached, has a row. (Until 2026-10-10 an id with no row was looked
+// up as data/<id>.json, a file that has been gone from the live site since 2026-09-07;
+// on a failed read that turned every athlete into a 404 or, on a local server, into a
+// stale local file shown as their live programme.)
 async function loadPrograms() {
-  // The programs table IS the roster now. It used to be discovered partly from
-  // athlete_keys, which is empty since the old links were retired — without this
-  // an athlete with a programme but no logged session would vanish off the roster.
-  const db = {};
-  const r = await sb.from('programs').select('athlete_id, data, updated_at, updated_by');
-  if (!r.error) (r.data || []).forEach(row => { db[row.athlete_id] = row; });
-
-  const ids = new Set(Object.keys(db));
-  S.prog.forEach(r => ids.add(r.athlete_id));
-  S.hist.forEach(r => ids.add(r.athlete_id));
-  S.contacts.forEach(c => ids.add(c.athlete_id));
-  Object.keys(S.logins || {}).forEach(id => ids.add(id));
-  const list = [...ids];
-
-  const needFile = list.filter(id => !db[id]);
-  const files = await Promise.all(needFile.map(id =>
-    fetch(`data/${encodeURIComponent(id)}.json`).then(r => r.ok ? r.json() : null).catch(() => null)));
-
-  S.programs = {};
-  S.progSrc  = {};
-  list.forEach(id => {
-    if (db[id]) { S.programs[id] = db[id].data; S.progSrc[id] = 'db'; }
+  const r = await selectAll('programs', 'athlete_id, data, updated_at, updated_by');
+  LOAD_ERR.programs = r.error ? r.error.message : '';
+  if (r.error) return;   // keep what was loaded before: an error must not empty the roster
+  S.programs = {}; S.progSrc = {}; S.progMeta = {};
+  (r.data || []).forEach(row => {
+    S.programs[row.athlete_id] = row.data;
+    S.progSrc[row.athlete_id] = 'db';
+    S.progMeta[row.athlete_id] = { updated_at: row.updated_at, updated_by: row.updated_by };
   });
-  needFile.forEach((id, i) => {
-    S.programs[id] = files[i];
-    S.progSrc[id]  = files[i] ? 'file' : 'none';
-  });
+}
+// After anything that replaces S.programs: rebuild the roster and the athlete file from the
+// new copy. assemble() bumps S.stamp, which is what tells an open athlete file that its cached
+// programme is stale; without it the file kept drawing the old programme while the editor wrote
+// into the new one, by position, so an edit could land on a different exercise.
+async function reloadPrograms() {
+  await loadPrograms();
+  assemble();
 }
 
 // Which athletes have a username/password login. The identity row is the record —
 // there is no way to list auth users from the browser, and no need to.
 async function loadLogins() {
-  S.logins = {};
   const r = await sb.from('athlete_identities')
     .select('athlete_id, email, linked_at, initial_password, password_set_at, sent_at');
-  if (!r.error) (r.data || []).forEach(row => { S.logins[row.athlete_id] = row; });
+  // A failed read must not look like "nobody has a login": the bulk tool would then offer to
+  // create logins for everyone, and the server's create resets an existing password.
+  LOAD_ERR.logins = r.error ? r.error.message : '';
+  if (r.error) return;
+  S.logins = {};
+  (r.data || []).forEach(row => { S.logins[row.athlete_id] = row; });
+}
+// Login actions refuse to run while the list of who has a login is unknown.
+function loginsUnknown() {
+  if (!LOAD_ERR.logins) return false;
+  alert('The list of athlete logins did not load, so this is switched off: it could reset someone\'s password by mistake.\n\nTap ↻ Refresh and try again.');
+  return true;
 }
 
 // The message that actually goes to the athlete. One place, so the wording is the
@@ -1033,8 +1138,8 @@ function pendingCredsHtml() {
           <span class="credname">${esc(r.athlete_id)}</span>
           <code class="credpass">${esc(r.initial_password)}</code>
           <span class="acts">
-            <button class="btn sm primary" onclick="copyLoginFor('${esc(r.athlete_id)}')">Copy message</button>
-            <button class="btn sm" onclick="markLoginSent('${esc(r.athlete_id)}')">Mark sent</button>
+            <button class="btn sm primary" onclick="copyLoginFor(${jsq(r.athlete_id)})">Copy message</button>
+            <button class="btn sm" onclick="markLoginSent(${jsq(r.athlete_id)})">Mark sent</button>
           </span>
         </div>`).join('')}
     ` : ''}
@@ -1052,6 +1157,10 @@ function openAthletePw(athleteId) {
 }
 function closeAthletePw() { _athPwOpen = null; renderDetailBody(); }
 // Create a login or change its password with what is in the box: a typed password, or empty to generate one.
+function revokeAthleteLogin(athleteId) {
+  if (!confirm(`Remove ${athleteId}'s login? They will not be able to sign in until you make a new one.`)) return;
+  athleteLoginAction(athleteId, 'revoke');
+}
 function athleteSavePw(athleteId, action) {
   const el = document.getElementById('athPw');
   const t = typedPassword(el ? el.value : '', athleteId);
@@ -1066,6 +1175,7 @@ function athleteSavePw(athleteId, action) {
 // function); without one, the function generates it.
 async function athleteLoginAction(athleteId, action, password) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (action === 'create' && loginsUnknown()) return;
   const { data, error } = await sb.functions.invoke('athlete-login', {
     body: { action, athlete_id: athleteId, password: password || undefined },
   });
@@ -1105,6 +1215,7 @@ function athletesNeedingLogin() {
 // existing "Logins to send" panel picks all of them up automatically.
 async function bulkCreateLogins() {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (loginsUnknown()) return;
   const ids = athletesNeedingLogin();
   if (!ids.length) return;
   if (!confirm(
@@ -1122,12 +1233,10 @@ async function bulkCreateLogins() {
   const failed = data.failed || [];
   _credsOpen = true;
   render();
-  toast(
-    `${data.created} login${data.created === 1 ? '' : 's'} created` +
-    (failed.length ? ` — ${failed.length} failed, see console` : '') +
-    ' — copy & send from "Logins to send" below'
-  );
-  if (failed.length) console.error('athlete-login create_many failures:', failed);
+  // Failures are named, not left in the console where nobody looks.
+  const why = f => (f && (f.athlete_id || f.id) ? (f.athlete_id || f.id) + ': ' + (f.error || f.message || 'failed') : String(f));
+  if (failed.length) alert(`${data.created} login${data.created === 1 ? '' : 's'} created. ${failed.length} failed:\n\n` + failed.map(why).join('\n'));
+  else toast(`${data.created} login${data.created === 1 ? '' : 's'} created — copy & send from "Logins to send" below`);
 }
 window.bulkCreateLogins = bulkCreateLogins;
 
@@ -1171,6 +1280,9 @@ const BACKUP_TABLES = [
   'exercises', 'exercise_coach', 'qualities',
 ];
 
+const PASSWORD_TABLES = ['athlete_identities', 'tps_accounts', 'assess_accounts'];
+const LAST_BACKUP_KEY = 'coach_last_backup';
+function lastBackupAt() { try { return localStorage.getItem(LAST_BACKUP_KEY) || ''; } catch (e) { return ''; } }
 async function downloadBackup(btn) {
   if (DEMO) { toast('Demo mode — nothing to back up'); return; }
   const label = btn && btn.textContent;
@@ -1180,23 +1292,23 @@ async function downloadBackup(btn) {
     exported_at: new Date().toISOString(),
     project: SB_URL,
     note: 'Full export of the AA coaching database, taken from the coach dashboard. ' +
-          'Restore by importing each array back into its table of the same name.',
+          'Restore by importing each array back into its table of the same name. ' +
+          'Unsent login passwords (initial_password) are blanked on purpose: reset a login to issue a new one.',
     tables: {},
   };
   const problems = [];
 
   for (const t of BACKUP_TABLES) {
-    // Paged: a plain select caps at 1000 rows, and session_history will pass that.
-    // Silently truncating a backup is the worst possible failure for this feature.
-    let from = 0, rows = [];
-    for (;;) {
-      const { data, error } = await sb.from(t).select('*').range(from, from + 999);
-      if (error) { problems.push(t + ': ' + error.message); rows = null; break; }
-      rows = rows.concat(data || []);
-      if (!data || data.length < 1000) break;
-      from += 1000;
-    }
-    if (rows) out.tables[t] = rows;
+    // Paged in key order (selectAll), so no row is skipped or repeated between pages.
+    const r = await selectAll(t, '*');
+    if (r.error) { problems.push(t + ': ' + r.error.message); continue; }
+    let rows = r.data;
+    if (r.short) problems.push(`${t}: only ${rows.length} of ${r.total} rows came back`);
+    // Login passwords are kept only until the coach sends them (Logins to send). A backup file
+    // sits on a PC and a second drive for three months; it never needs them, because restoring
+    // an account means a new password anyway. They are blanked here, not in the database.
+    if (PASSWORD_TABLES.includes(t)) rows = rows.map(x => ('initial_password' in x) ? Object.assign({}, x, { initial_password: null }) : x);
+    out.tables[t] = rows;
   }
 
   const counts = Object.entries(out.tables).map(([t, r]) => `${t}: ${r.length}`);
@@ -1214,18 +1326,22 @@ async function downloadBackup(btn) {
   setTimeout(() => URL.revokeObjectURL(a.href), 30000);
 
   if (btn) { btn.disabled = false; btn.textContent = label; }
+  try { localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString()); } catch (e) {}
   const total = Object.values(out.tables).reduce((s, r) => s + r.length, 0);
   alert(`Backup downloaded — ${total} rows across ${Object.keys(out.tables).length} tables.\n\n` +
         counts.join('\n') +
-        (problems.length ? '\n\nCould NOT read:\n' + problems.join('\n') : '') +
+        (problems.length ? '\n\n⚠ INCOMPLETE — could not read everything:\n' + problems.join('\n') : '') +
         '\n\nKeep a copy somewhere that is not this computer.' +
         '\n\nKeep only the last 12 weekly backups, on both, and delete older ones: the privacy notice promises a deleted record leaves the backups within about three months.');
 }
 
-// Upload the coaching-log markdown files. Multi-select the whole folder at once;
-// the athlete id is taken from each filename, the way the pipeline names them.
+// Add coaching logs from .md files, ONLY for athletes who have none on the server yet.
+// Since 2026-09-07 the server copy is the record: publish_cycle() splices into it and /cycle-report
+// appends its Debrief there, so a local .md is always older. This used to replace the server log
+// wholesale (no history, no warning), wiping every Debrief written since. It now never overwrites.
 function pickCoachingLogs() {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (LOAD_ERR.clogs) { alert('The list of coaching logs did not load, so I cannot tell which athletes already have one. Tap ↻ Refresh first.'); return; }
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = '.md,text/markdown';
@@ -1233,34 +1349,43 @@ function pickCoachingLogs() {
   input.onchange = async () => {
     const files = [...(input.files || [])].filter(f => /\.md$/i.test(f.name) && !/^README/i.test(f.name));
     if (!files.length) { alert('No .md files selected.'); return; }
-    if (!confirm(`Upload ${files.length} coaching log(s)?\n\nThey become coach-only ` +
-                 `records on the server. Anything already there for the same athlete is replaced.`)) return;
-
-    const rows = [], skipped = [];
+    const rows = [], skipped = [], kept = [];
     for (const f of files) {
       const id = f.name.replace(/\.md$/i, '');
-      if (!/^[A-Za-z0-9_]+$/.test(id)) { skipped.push(f.name); continue; }
+      if (!/^[A-Za-z0-9_]+$/.test(id) || !S.ath[id]) { skipped.push(f.name + ' (no athlete with that id)'); continue; }
+      if ((S.clogs || {})[id]) { kept.push(id); continue; }
       rows.push({ athlete_id: id, body: await f.text() });
     }
+    if (!rows.length) {
+      alert('Nothing to add.' + (kept.length ? `\n\nAlready on the server (left exactly as they are):\n${kept.join(', ')}` : '') +
+            (skipped.length ? `\n\nSkipped:\n${skipped.join('\n')}` : ''));
+      return;
+    }
+    if (!confirm(`Add ${rows.length} new coaching log(s)?\n\n${rows.map(r => r.athlete_id).join(', ')}\n\n` +
+                 'They become coach-only records on the server.' +
+                 (kept.length ? `\n\n${kept.length} athlete(s) already have one on the server; those are NOT touched: ${kept.join(', ')}` : ''))) return;
     const failed = [];
     for (let i = 0; i < rows.length; i += 10) {
       const slice = rows.slice(i, i + 10);
-      const { error } = await sb.from('coaching_logs').upsert(slice, { onConflict: 'athlete_id' });
+      // ignoreDuplicates: insert only. If a log appeared on the server meanwhile, it wins.
+      const { error } = await sb.from('coaching_logs').upsert(slice, { onConflict: 'athlete_id', ignoreDuplicates: true });
       if (error) slice.forEach(r => failed.push(r.athlete_id + ': ' + error.message));
     }
     await loadCoachingLogs();
     render();
-    alert(`Uploaded ${rows.length - failed.length} of ${rows.length}.` +
-          (skipped.length ? `\n\nSkipped (filename is not an athlete id):\n` + skipped.join('\n') : '') +
+    alert(`Added ${rows.length - failed.length} of ${rows.length}.` +
+          (skipped.length ? `\n\nSkipped:\n` + skipped.join('\n') : '') +
           (failed.length ? `\n\nFailed:\n` + failed.join('\n') : ''));
   };
   input.click();
 }
 
 async function loadCoachingLogs() {
-  S.clogs = {};
   const r = await sb.from('coaching_logs').select('athlete_id, updated_at');
-  if (!r.error) (r.data || []).forEach(row => { S.clogs[row.athlete_id] = row; });
+  LOAD_ERR.clogs = r.error ? r.error.message : '';
+  if (r.error) return;
+  S.clogs = {};
+  (r.data || []).forEach(row => { S.clogs[row.athlete_id] = row; });
 }
 
 // Loaded on demand — a coaching log is long prose and there is no reason to pull
@@ -1298,14 +1423,23 @@ function pickLibraryFile(kind) {
       catch (e) { bad.push(f.name + ': not valid JSON'); continue; }
       const id  = String(d.id || '').trim();
       const cat = String(d.category || '').trim();
+      // A Farsi translation is a web page source, never an app article: if one carried id and
+      // category it would overwrite the English article for every athlete (CLAUDE.md).
+      if (/\.fa\.json$/i.test(f.name) || d.lang === 'fa' || d.sourceHash || d.translationOf) {
+        bad.push(f.name + ': a Farsi translation (.fa.json) — it builds the website page, it never goes in the app'); continue;
+      }
+      const looksWorkout = 'countsAs' in d || 'focusTag' in d || 'duration' in d;
+      if (kind === 'article' && looksWorkout) { bad.push(f.name + ': this is a workout file — use + Publish workout'); continue; }
+      if (kind === 'workout' && !looksWorkout && ('readMins' in d || 'date' in d)) { bad.push(f.name + ': this is an article file — use + Publish article'); continue; }
       if (!id)  { bad.push(f.name + ': no "id" field'); continue; }
       if (!cat) { bad.push(f.name + ': no "category" field, which decides its shelf'); continue; }
-      if (!(S.libCats || []).some(c => c.kind === kind && c.id === cat)) {
-        bad.push(f.name + ': category "' + cat + '" does not exist yet'); continue;
-      }
+      // Workouts name the shelf by its id ("conditioning"), articles by its title ("Pre-Competition").
+      const shelf = (S.libCats || []).find(c => c.kind === kind &&
+        (c.id === cat || String(c.title || '').toLowerCase() === cat.toLowerCase() || c.id === cat.toLowerCase()));
+      if (!shelf) { bad.push(f.name + ': category "' + cat + '" does not exist yet'); continue; }
       rows.push({
-        slug: (kind === 'workout' ? 'workouts/' : 'articles/') + cat + '/' + id,
-        kind, category_id: cat, data: d, published: true,
+        slug: (kind === 'workout' ? 'workouts/' : 'articles/') + shelf.id + '/' + id,
+        kind, category_id: shelf.id, data: d, published: true,
       });
     }
 
@@ -1315,8 +1449,9 @@ function pickLibraryFile(kind) {
     const skipped = bad.length ? NL + NL + 'Skipped:' + NL + bad.join(NL) : '';
     if (!confirm('Publish ' + rows.length + ' ' + kind + '(s)?' + NL + NL + preview + skipped)) return;
 
-    const { error } = await sb.from('library').upsert(rows, { onConflict: 'slug' });
-    if (error) { alert('Could not publish: ' + error.message); return; }
+    const res = await sb.from('library').upsert(rows, { onConflict: 'slug' }).select('slug');
+    const badW = writeFailed(res, 'published');
+    if (badW) { alert('Could not publish: ' + badW); return; }
     await loadLibrary();
     render();
     alert('Published ' + rows.length + '.' + skipped);
@@ -1333,6 +1468,7 @@ async function loadLibrary() {
   ]);
   if (!c.error) S.libCats = c.data || [];
   if (!l.error) S.lib = l.data || [];
+  LOAD_ERR.library = (c.error || l.error) ? (c.error || l.error).message : '';
 }
 
 async function toggleLibraryItem(slug, publish) {
@@ -1389,56 +1525,41 @@ function pickProgramFile() {
       alert('The athlete.id in that file is missing or has characters that are not allowed.\n\nFound: "' + id + '"');
       return;
     }
+    // The pipeline names the file after the athlete (data/<id>.json). A file whose name and
+    // athlete.id disagree is the wrong file, or a copy edited for someone else.
+    // "ava.json", "ava (1).json" and "ava.cycle3.json" all name ava; "ava_2.json" names someone else.
+    const stem = file.name.replace(/\.json$/i, '');
+    if (stem !== id && !(stem.startsWith(id) && /^[\s.\-(]/.test(stem.slice(id.length)))) {
+      alert(`The file is called "${file.name}" but its athlete.id is "${id}".\n\nNothing was published. Check you picked the right file (the pipeline writes data/<id>.json).`);
+      return;
+    }
+    if (LOAD_ERR.programs) { alert('Programmes did not load, so I cannot tell whether this would replace a newer one. Tap ↻ Refresh first.'); return; }
     const existing = S.programs[id];
+    const meta = S.progMeta[id] || {};
     const days = (data.workouts && data.workouts.days || []).length;
+    const cyc = p => { const c = p && p.cycles && p.cycles[p.currentCycleIndex || 0]; return c ? (c.name || ('cycle ' + ((p.currentCycleIndex || 0) + 1))) : '—'; };
+    const fileTime = file.lastModified ? new Date(file.lastModified) : null;
+    const liveTime = meta.updated_at ? new Date(meta.updated_at) : null;
+    const liveNewer = existing && fileTime && liveTime && liveTime > fileTime;
     const what = existing
-      ? `Replace ${id}'s programme?\n\nThe current version is kept in history, so this is reversible.`
-      : `Publish a NEW programme for "${id}"?\n\nNothing exists for that id yet — check the spelling, because a typo creates a second athlete.`;
-    if (!confirm(`${what}\n\n${file.name} · ${days} training day${days === 1 ? '' : 's'}`)) return;
+      ? `Replace ${nameOf(id)}'s programme (${id})?\n\n` +
+        `Live now: ${cyc(existing)} · ${(existing.workouts && existing.workouts.days || []).length} days · last saved ${liveTime ? fmtLocalStamp(meta.updated_at) : '—'}${meta.updated_by ? ' by ' + meta.updated_by : ''}\n` +
+        `This file: ${cyc(data)} · ${days} days · saved ${fileTime ? fmtLocalStamp(fileTime.toISOString()) : '—'}\n` +
+        (liveNewer ? `\n⚠ THE LIVE PROGRAMME IS NEWER THAN THIS FILE. Publishing it puts an older version back (an edit made here, or a cycle published by the pipeline, would be lost from the live app).\n` : '') +
+        `\nNew cycles normally go up through the pipeline (publish_cycle). The current version is kept in Version history, so this is reversible.`
+      : `Publish a NEW programme for "${id}"?\n\nNothing exists for that id yet — check the spelling, because a typo creates a second athlete.\n\n${file.name} · ${cyc(data)} · ${days} training day${days === 1 ? '' : 's'}`;
+    if (!confirm(what)) return;
 
-    const { error } = await sb.from('programs')
-      .upsert({ athlete_id: id, data }, { onConflict: 'athlete_id' });
-    if (error) { alert('Could not publish: ' + error.message); return; }
+    const res = await sb.from('programs')
+      .upsert({ athlete_id: id, data }, { onConflict: 'athlete_id' }).select('athlete_id');
+    const bad = writeFailed(res, 'published');
+    if (bad) { alert('Could not publish: ' + bad); return; }
 
-    await loadPrograms();
+    await reloadPrograms();
     render();
     toast(existing ? 'Programme replaced' : 'Programme published');
   };
   input.click();
-}
-
-// One-time move of the legacy JSON files into the programs table. Runs as the
-// coach's own session, so RLS applies — no service key anywhere. Safe to re-run:
-// it skips anyone already imported rather than overwriting edits with stale file
-// contents. Returns a short report for the caller to show.
-async function importProgramsToDb(overwrite) {
-  const ids = Object.keys(S.programs).filter(id => S.programs[id] &&
-    (overwrite || S.progSrc[id] === 'file'));
-  if (!ids.length) return { moved: 0, skipped: 0, failed: [], msg: 'Nothing to import — every programme is already in the database.' };
-
-  const rows = ids.map(id => ({ athlete_id: id, data: S.programs[id] }));
-  const failed = [];
-  // Chunked so one oversized payload can't take the whole batch down with it.
-  for (let i = 0; i < rows.length; i += 10) {
-    const slice = rows.slice(i, i + 10);
-    const { error } = await sb.from('programs').upsert(slice, { onConflict: 'athlete_id' });
-    if (error) slice.forEach(r => failed.push(r.athlete_id + ': ' + error.message));
-  }
-  return { moved: ids.length - failed.length, failed,
-           msg: `Imported ${ids.length - failed.length} of ${ids.length}.` };
-}
-
-async function runImport() {
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const pending = Object.keys(S.programs).filter(id => S.programs[id] && S.progSrc[id] === 'file');
-  if (!pending.length) { alert('Every programme is already in the database.'); return; }
-  if (!confirm(`Move ${pending.length} programme(s) from data/*.json into the database?\n\n` +
-               'Nothing is deleted — the files stay exactly where they are, and anyone ' +
-               'already imported is skipped.')) return;
-  const res = await importProgramsToDb(false);
-  await loadPrograms();
-  render();
-  alert(res.msg + (res.failed.length ? '\n\nFailed:\n' + res.failed.join('\n') : ''));
 }
 
 // The same "counts as a logged day" test contact_list() uses server-side: the
@@ -1677,9 +1798,72 @@ function assemble() {
     a.habToday = !!a.habDays[t];
     a.hab7 = 0; for (let i = 0; i < 7; i++) if (a.habDays[addDays(t, -i)]) a.hab7++;
     a.habGap = a.isHab ? daysBetween(a.habLast, t) : null;
+    a.cycle = cycleDatesOf(p);
+    a.hasLogin = !!(S.logins || {})[a.id];
+    const seen = [a.lastSession, a.habLast, a.lastActive && dkey(new Date(a.lastActive)),
+                  a.contact && a.contact.signed_up && dkey(new Date(a.contact.signed_up))].filter(Boolean).sort();
+    a.lastSeen = seen.length ? seen[seen.length - 1] : null;
   });
+  Object.values(map).forEach(a => { a.reasons = reasonsOf(a); });
   S.ath = map;
   S.stamp++;
+}
+
+// ── Who needs you, and why: ONE rule ─────────────────────────────────────────
+// Used by Today's Needs you, the roster's reason chips, its "Needs you" group and filter, and its
+// sort. Until 2026-10-10 there were four versions (the Today panel, rosterReasons, the roster
+// sort and the counters), and they disagreed: sync gaps and upgrade leads never reached Today,
+// new signups never reached the roster, and a run of low days did not move the sort.
+const SYSTEM_IDS = ['demo'];          // the public marketing demo: on the roster, never a client
+const LAPSED_DAYS = 30;               // nothing from them (session, habit, app sync) for this long
+const CYCLE_SOON_DAYS = 7;            // "cycle ends in N days": time for /cycle-report and the next cycle
+const CYCLE_RENEW_DAYS = 14;          // "cycle ended N days ago — renew?" for this long after the end
+function cycleDatesOf(p) {
+  const cyc = p && p.cycles && p.cycles[Number.isInteger(p.currentCycleIndex) ? p.currentCycleIndex : 0];
+  if (!cyc) return null;
+  const ok = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')) ? String(v) : null;   // a missing date is "no date", never "ended"
+  return { name: cyc.name || '', weeks: cyc.weeks || '', start: ok(cyc.startDate), end: ok(cyc.endDate) };
+}
+function reasonsOf(a) {
+  const out = [];
+  const add = (key, tone, text, weight, sub) => out.push({ key, tone, text, weight, sub });
+  const t = todayKey();
+  a.lapsed = false;
+  if (SYSTEM_IDS.includes(a.id) || a.id === AMIR_ATHLETE_ID) return out;
+  const n = a.needReplyRecent ? a.needReplyRecent.length : 0;
+  if (n) add('note', 'warn', n + ' note' + (n === 1 ? '' : 's') + ' to read', 100 + n, 'work');
+  if (a.syncGaps && a.syncGaps.length) {
+    const g = a.syncGaps[0];
+    // Ranked high: every session-derived number on the dashboard is wrong for them until it is resolved.
+    add('sync', 'warn', a.syncGaps.length === 1 ? `session not synced — Day ${g.day}, ${g.on}`
+      : `${a.syncGaps.length} sessions not synced — latest Day ${g.day}, ${g.on}`, 80, 'work');
+  }
+  if (a.lowRun) add('lowrun', 'warn', 'run of low days', 70, 'work');
+  const idle = a.lastSession ? daysBetween(a.lastSession, t) : null;
+  const ended = a.cycle && a.cycle.end ? daysBetween(a.cycle.end, t) : null;   // > 0: days since it ended
+  // A coached athlete inside a dated cycle that has not ended is never "gone quiet": they are paying
+  // for this cycle, so a month without a session is someone to chase, not someone to fold away.
+  const inCycle = a.tier === 'coached' && ended != null && ended <= 0;
+  a.lapsed = (!inCycle && !!(a.lastSeen && daysBetween(a.lastSeen, t) > LAPSED_DAYS && !n))
+          || !!(a.tier === 'coached' && ended != null && ended > CYCLE_RENEW_DAYS && (idle == null || idle > CYCLE_RENEW_DAYS));
+  if (a.tier === 'coached' && ended != null) {
+    if (ended >= -CYCLE_SOON_DAYS && ended <= 0) add('cycle', 'note', ended === 0 ? 'cycle ends today' : `cycle ends in ${-ended} day${ended === -1 ? '' : 's'}`, 45, 'work');
+    else if (ended > 0 && ended <= CYCLE_RENEW_DAYS) add('renew', 'warn', `cycle ended ${ended} day${ended === 1 ? '' : 's'} ago — renew?`, 60, 'file');
+  }
+  if (!a.lapsed && S.progSrc[a.id] === 'db' && !a.hasLogin && !LOAD_ERR.logins)
+    add('login', 'warn', 'no login — cannot open the app', 50, 'file');
+  if (a.contact && a.contact.signed_up && daysSince(a.contact.signed_up) <= 7)
+    add('signup', 'note', 'new signup · ' + timeAgo(a.contact.signed_up), 35, 'proof');
+  if (a.lapsed) return out;
+  if (a.tier === 'coached' && idle != null && idle > QUIET_SESSION_DAYS && !(ended != null && ended > 0))
+    add('idle', 'note', 'no session for ' + idle + ' days', 30, 'work');
+  // Proof silence is a reason for habit-only athletes. A coached athlete ticks habits on the
+  // training app's Home now and then; their training is the signal, so their dots stay on the row.
+  if (a.tier !== 'coached' && a.isHab && a.habGap >= QUIET_HABIT_DAYS)
+    add('silent', 'note', 'silent on Proof — ' + a.habGap + ' days', 20 + Math.min(a.habGap, 14), 'proof');
+  if (a.tier === 'free' && a.contact && a.contact.days_logged >= UPGRADE_DAYS)
+    add('upgrade', 'good', 'ready to upgrade?', 25, 'proof');
+  return out.sort((x, y) => y.weight - x.weight);
 }
 
 // Server-scored season level per Proof athlete (cached; never computed here).
@@ -1763,7 +1947,9 @@ function route() {
     const cut = rest.lastIndexOf('/');
     const maybeSub = cut > 0 ? rest.slice(cut + 1) : '';
     const isSub = SUBTABS.some(t => t.id === maybeSub) || RETIRED_SUBS.includes(maybeSub);
-    return { view: 'detail', id: decodeURIComponent(isSub ? rest.slice(0, cut) : rest), sub: isSub ? maybeSub : 'work' };
+    let id;
+    try { id = decodeURIComponent(isSub ? rest.slice(0, cut) : rest); } catch (e) { id = isSub ? rest.slice(0, cut) : rest; }
+    return { view: 'detail', id, sub: isSub ? maybeSub : '' };
   }
   return { view: TABS.some(t => t.id === h) ? h : 'today' };
 }
@@ -1773,7 +1959,7 @@ function renderRail() {
   const waiting = Object.values(S.ath).reduce((n, a) => n + a.toReply, 0);
   const newIntake = (S.intake || []).filter(i => (i.status || 'new') === 'new').length;
   $('rail').innerHTML = TABS.map(t => {
-    const badge = (t.id === 'athletes' && waiting > 0) ? `<span class="n">${waiting}</span>`
+    const badge = (t.id === 'athletes' && waiting > 0) ? `<span class="n" title="${waiting} note${waiting === 1 ? '' : 's'} to read">${waiting}</span>`
                 : (t.id === 'intake' && newIntake > 0) ? `<span class="n">${newIntake}</span>` : '';
     return `<a class="tab ${active === t.id ? 'active' : ''}" href="#${t.id}">${t.label}${badge}</a>`;
   }).join('') + `<span class="rail-spacer"></span><button class="refresh" onclick="hardRefresh()">↻ Refresh</button>`;
@@ -1781,13 +1967,20 @@ function renderRail() {
 async function hardRefresh() {
   $('content').innerHTML = '<div class="loading"><div class="spinner"></div>Refreshing…</div>';
   loadLevels._done = false; S.board = { season: null, week: null }; S.assess = null; S.course = null; S.spine = null;
+  S.callLogs = {};   // cached per athlete for the page's life: a failed read stuck as "No call logs yet"
   try { await loadAll(); } catch (e) { $('content').innerHTML = `<p class="empty">Could not load: ${esc(e.message)}</p>`; return; }
   render();
+  loadLevels().then(() => { if (S.ready) render(); });   // ↻ used to drop the levels and never fetch them again
 }
+let _lastViewKey = '';
 function render() {
   if (!S.ready) return;
   renderRail();
   const r = route();
+  // A new screen starts at the top. Same-page hash links keep the scroll offset, so a long roster
+  // used to drop the coach halfway down a short screen. A redraw of the same screen keeps its place.
+  const viewKey = r.view === 'detail' ? 'a/' + r.id + '/' + r.sub : r.view;
+  if (viewKey !== _lastViewKey) { if (_lastViewKey) window.scrollTo({ top: 0, behavior: 'instant' }); _lastViewKey = viewKey; }
   if (r.view === 'today') renderToday();
   else if (r.view === 'intake') renderIntake();
   else if (r.view === 'athletes') renderAthletes();
@@ -1829,7 +2022,7 @@ function renderToday() {
           <div class="n">${wallToday}</div><div class="l">Wall lines today</div></a>
         <a class="counter" href="#athletes"><div class="n">${sessions7}</div><div class="l">Sessions this week</div></a>
         <a class="counter ${waiting ? 'hot' : ''}" href="#today" onclick="scrollPanel(event,'needPanel')">
-          <div class="n">${waiting}</div><div class="l">Waiting on you</div></a>
+          <div class="n">${waiting}</div><div class="l">Notes to read</div></a>
       </div>
     </section>
     <div class="cols">
@@ -1843,6 +2036,7 @@ function renderToday() {
       </div>
     </div>`;
   wireWallComposer();
+  if (_questPicked.size) questPickCount();
 }
 function scrollPanel(ev, id) {
   if (route().view !== 'today') return; // let the href navigate first
@@ -1871,7 +2065,7 @@ function wallPanelHtml() {
     <div class="phead"><span class="t hd">The wall</span><span class="r">roll call · last ${showWeek ? '7 days' : '2 days'}</span></div>
     <div class="mic">
       <div class="cap"><span class="eyebrow">Your line to the crew — pinned on today's wall</span></div>
-      <textarea id="coachLineInput" maxlength="200" placeholder="No line yet today. Say something to everyone…">${esc(mine ? mine.body : '')}</textarea>
+      <textarea id="coachLineInput" maxlength="200" placeholder="No line yet today. Say something to everyone…">${esc(_coachLineDraft != null ? _coachLineDraft : (mine ? mine.body : ''))}</textarea>
       <div class="row">
         <button class="btn primary sm" onclick="postCoachLine()">${mine ? 'Update the line' : "Post today's line"}</button>
         ${mine ? `<button class="btn sm danger" onclick="clearCoachLine()">Take it down</button>` : ''}
@@ -1886,7 +2080,7 @@ function wallLineHtml(n) {
   const nm = isCoach ? 'Coach' : nameOf(n.athlete_id);
   const pct = (!isCoach && n.pct != null) ? `<span class="pct">${esc(n.pct)}%</span>` : '';
   const mod = isCoach ? '' :
-    `<button class="modbtn" onclick="toggleHide('${esc(n.athlete_id)}','${esc(n.day)}',${n.hidden ? 'false' : 'true'})">${n.hidden ? 'Show' : 'Hide'}</button>`;
+    `<button class="modbtn" onclick="toggleHide(${jsq(n.athlete_id)},${jsq(n.day)},${n.hidden ? 'false' : 'true'})">${n.hidden ? 'Show' : 'Hide'}</button>`;
   return `<div class="wline ${n.hidden ? 'hid' : ''} ${isCoach ? 'coachline' : ''}">
     <div class="ava">${esc(isCoach ? 'AA' : initials(nm))}</div>
     <div class="bd">
@@ -1896,11 +2090,14 @@ function wallLineHtml(n) {
     ${mod}
   </div>`;
 }
+// What the coach has typed and not posted: a redraw of Today (levels arriving, ↻, "Show the full
+// week") used to put the saved line back over it.
+let _coachLineDraft = null;
 function wireWallComposer() {
   const ta = $('coachLineInput'), c = $('coachLineCount');
   if (!ta || !c) return;
   const upd = () => c.textContent = `${ta.value.length}/200`;
-  ta.addEventListener('input', upd); upd();
+  ta.addEventListener('input', () => { _coachLineDraft = ta.value; upd(); }); upd();
 }
 function toggleWallWeek() { wallPanelHtml._week = !wallPanelHtml._week; render(); }
 window.toggleWallWeek = toggleWallWeek;
@@ -1910,15 +2107,19 @@ async function postCoachLine() {
   const body = ta.value.trim();
   if (!body) { toast('Write the line first'); return; }
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const { error } = await sb.rpc('set_coach_note', { p_body: body });
+  // p_day: the wall day this composer belongs to. Without it the server files the line under its
+  // own UTC date, so between local midnight and UTC midnight a new line overwrote yesterday's.
+  const { error } = await sb.rpc('set_coach_note', { p_body: body, p_day: todayKey() });
   if (error) { alert('Could not post: ' + error.message); return; }
+  _coachLineDraft = null;
   toast('On the wall');
   refetch(['notes']);
 }
 async function clearCoachLine() {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const { error } = await sb.rpc('set_coach_note', { p_body: '' });
+  const { error } = await sb.rpc('set_coach_note', { p_body: '', p_day: todayKey() });
   if (error) { alert('Could not clear: ' + error.message); return; }
+  _coachLineDraft = null;
   toast('Taken down');
   refetch(['notes']);
 }
@@ -1933,37 +2134,40 @@ window.postCoachLine = postCoachLine;
 window.clearCoachLine = clearCoachLine;
 window.toggleHide = toggleHide;
 
-// Who needs the coach, in one list: session notes not yet read, coached
-// athletes gone quiet, Proof athletes gone silent. (Unread chat messages left
-// with the in-app chat on 2026-09-26: athletes reach Amir on WhatsApp.)
+// Who needs the coach: one row per PERSON, from reasonsOf() (the same rule the roster uses), most
+// urgent first. A note row opens the day the note is on. Plus two things that are not a person:
+// new applications in Intake, and an overdue backup. (Unread chat messages left with the in-app
+// chat on 2026-09-26: athletes reach Amir on WhatsApp.)
+let _needAll = false;
 function needPanelHtml() {
-  const items = [];
-  Object.values(S.ath).forEach(a => {
-    a.needReplyRecent.forEach(s => items.push({
-      sev: 'clay', id: a.id, n: a.name,
-      s: `Day ${s.day} note: “${sessionNoteText(s)}”`, sort: 0,
-    }));
-  });
-  Object.values(S.ath).forEach(a => {
-    if (a.lowRun) items.push({ sev: 'clay', id: a.id, n: a.name, s: `Run of low days: ${a.lowRun}`, sort: 1 });
-    if (a.tier === 'coached' && a.finished > 0) {
-      const idle = daysSince(a.lastSession ? a.lastSession + 'T12:00:00' : null);
-      if (idle > QUIET_SESSION_DAYS) items.push({ sev: 'ochre', id: a.id, n: a.name, s: `No session for ${idle} days`, sort: 2 + idle / 100 });
-    }
-    if (a.isHab && a.habGap >= QUIET_HABIT_DAYS)
-      items.push({ sev: 'ochre', id: a.id, n: a.name, s: `Silent on Proof — ${a.habGap} days since a log`, sort: 3 + a.habGap / 100 });
-  });
-  (S.contacts || []).forEach(c => {
-    if (daysSince(c.signed_up) <= 7)
-      items.push({ sev: 'ochre', id: c.athlete_id, n: nameOf(c.athlete_id), s: `New signup · ${timeAgo(c.signed_up)}`, sort: 4 });
-  });
-  items.sort((x, y) => x.sort - y.sort);
-  const list = items.slice(0, 10).map(i => `
-    <button class="need" onclick="location.hash='a/${encodeURIComponent(i.id)}'">
-      <span class="dot ${i.sev}"></span>
-      <span class="b"><span class="n">${esc(i.n)}</span><div class="s">${esc(i.s)}</div></span>
+  const people = Object.values(S.ath).filter(a => (a.reasons || []).length)
+    .sort((x, y) => rosterAttention(y) - rosterAttention(x) || x.name.localeCompare(y.name));
+  const row = a => {
+    const top = a.reasons[0];
+    const note = top.key === 'note' && a.needReplyRecent[0];
+    const go = note ? `openAthlete(${jsq(a.id)},'work',${Number(note.day)},${jsq(note.completed_on)})`
+                    : `openAthlete(${jsq(a.id)},${jsq(top.sub)})`;
+    const say = note ? `Day ${note.day} note: “${sessionNoteText(note)}”` : top.text;
+    const more = a.reasons.slice(1).map(r => r.text).join(' · ');
+    return `<button class="need" onclick="${go}">
+      <span class="dot ${top.tone === 'warn' ? 'clay' : top.tone === 'good' ? 'court' : 'ochre'}"></span>
+      <span class="b"><span class="n">${esc(a.name)}</span><div class="s">${esc(say)}</div>${more ? `<div class="s more">${esc(more)}</div>` : ''}</span>
       <span class="go">open →</span>
-    </button>`).join('');
+    </button>`;
+  };
+  const CAP = 12;
+  const shown = _needAll ? people : people.slice(0, CAP);
+  const extra = [];
+  const newIntake = (S.intake || []).filter(i => (i.status || 'new') === 'new').length;
+  if (newIntake) extra.push(`<a class="need" href="#intake"><span class="dot clay"></span>
+      <span class="b"><span class="n">${newIntake} new application${newIntake === 1 ? '' : 's'}</span><div class="s">Coaching apply forms waiting in Intake</div></span>
+      <span class="go">open →</span></a>`);
+  const lb = lastBackupAt(), lbDays = lb ? daysSince(lb) : null;
+  if (!DEMO && (lbDays == null || lbDays >= 7)) extra.push(`<div class="need" style="border-style:dashed">
+      <span class="dot ochre"></span>
+      <span class="b"><span class="n">Weekly backup</span><div class="s">${lb ? 'Last taken on this computer ' + timeAgo(lb) : 'No backup taken on this computer yet'} — the free plan keeps none</div></span>
+      <button class="btn sm" onclick="downloadBackup(this)">⤓ Back up now</button>
+    </div>`);
   const stale = Object.values(S.ath).reduce((n, a) => n + a.needReplyStale, 0);
   const staleRow = stale ? `
     <div class="need" style="border-style:dashed">
@@ -1973,24 +2177,35 @@ function needPanelHtml() {
       <button class="btn sm" onclick="clearNoteBacklog()">Clear</button>
     </div>` : '';
   return `
-    <div class="phead"><span class="t hd">Needs you</span><span class="r">${items.length ? items.length + ' open' : ''}</span></div>
-    ${list || '<p class="empty">Nobody is waiting on you. Clean bench. ✓</p>'}
-    ${items.length > 10 ? `<p class="empty">+ ${items.length - 10} more — see Athletes.</p>` : ''}
+    <div class="phead"><span class="t hd">Needs you</span><span class="r">${people.length ? people.length + (people.length === 1 ? ' person' : ' people') : ''}</span></div>
+    ${extra.join('')}
+    ${shown.map(row).join('') || '<p class="empty">Nobody is waiting on you. Clean bench. ✓</p>'}
+    ${people.length > CAP ? `<button class="showweek" onclick="_needAll=!_needAll;render()">${_needAll ? 'Show fewer' : 'Show all ' + people.length}</button>` : ''}
     ${staleRow}`;
 }
+// Open an athlete on a given screen; for a note, open the day it is on and pick that session.
+let _pendingFocus = null;
+function openAthlete(id, sub, day, completedOn) {
+  _pendingFocus = day != null ? { id, day: Number(day), on: completedOn } : null;
+  location.hash = 'a/' + encodeURIComponent(id) + '/' + (sub || 'work');
+}
+window.openAthlete = openAthlete;
 // Discharge the backlog in one action. Only touches notes older than the
 // window that are still 'new' — nothing recent, and nothing already handled.
 async function clearNoteBacklog() {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const cut = addDays(todayKey(), -NEEDS_WINDOW_DAYS);
-  const stale = Object.values(S.ath).reduce((n, a) => n + a.needReplyStale, 0);
-  if (!confirm(`Mark ${stale} note${stale === 1 ? '' : 's'} older than ${cut} as read?\n\nThey stay on each athlete's file — this only clears them out of "needs you".`)) return;
-  const { error } = await sb.from('session_history')
-    .update({ coach_status: 'read' })
-    .lt('completed_on', cut)
-    .or('coach_status.is.null,coach_status.eq.new');
-  if (error) { alert('Could not clear: ' + error.message); return; }
-  toast('Backlog cleared');
+  // Exactly the notes the row counted, by their key. It used to mark every 'new' session older
+  // than the cut on the server, including notes that arrived after the page loaded and were never shown.
+  const rows = Object.values(S.ath).flatMap(a => a.needReplySessions.filter(s => a.needReplyRecent.indexOf(s) === -1));
+  if (!rows.length) return;
+  if (!confirm(`Mark ${rows.length} note${rows.length === 1 ? '' : 's'} older than ${NEEDS_WINDOW_DAYS} days as read?\n\nThey stay on each athlete's file — this only clears them out of "needs you".`)) return;
+  let done = 0, failed = 0;
+  for (const r of rows) {
+    const res = await sb.from('session_history').update({ coach_status: 'read' })
+      .eq('athlete_id', r.athlete_id).eq('day', r.day).eq('completed_on', r.completed_on).select('day');
+    if (writeFailed(res)) failed++; else done++;
+  }
+  if (failed) alert(`${done} marked read, ${failed} could not be. Refresh and try again.`); else toast(`${done} older note${done === 1 ? '' : 's'} marked read`);
   refetch(['hist']);
 }
 window.clearNoteBacklog = clearNoteBacklog;
@@ -2009,16 +2224,16 @@ function questPanelHtml(run) {
           <div class="qchip"><span class="qn">${esc(q.title || q.id)}</span><span class="qd">${esc(q.note || '')}</span><span class="qx">+${esc(q.xp)} XP</span></div>`; }).join('')}
       </div>
       <div class="note-actions">
-        <button class="btn sm danger" onclick="cancelQuestRun('${esc(run.start)}')">Cancel this run</button>
+        <button class="btn sm danger" onclick="cancelQuestRun(${jsq(run.start)})">Cancel this run</button>
       </div>`;
   }
   const pool = questPool();
   return `
     <div class="phead"><span class="t hd">Quest week</span><span class="r">no run live</span></div>
-    <p class="psub" style="margin-top:0">Pick 2–4 quests and start a 7-day run from today. The crew sees them the next time the app syncs.</p>
+    <p class="psub" style="margin-top:0">Pick 1–4 quests and start a 7-day run from today. The crew sees them the next time the app syncs.</p>
     <div class="qpick" style="border-top:0;margin-top:0;padding-top:0">
       ${pool.map(q => `
-        <label class="qopt"><input type="checkbox" value="${esc(q.id)}" onchange="questPickCount()">
+        <label class="qopt"><input type="checkbox" value="${esc(q.id)}" onchange="questPickCount()"${_questPicked.has(q.id) ? ' checked' : ''}>
           <span class="qn">${esc(q.title || q.id)}</span><span class="qd">${esc(q.note || '')}</span><span class="qx">+${esc(q.xp)}</span>
         </label>`).join('') || '<p class="empty">Quest pool unavailable (xp_rules not readable).</p>'}
     </div>
@@ -2027,8 +2242,10 @@ function questPanelHtml(run) {
       <span class="muted" style="font-size:12px" id="questPickHint">Pick at least one</span>
     </div>`;
 }
+const _questPicked = new Set();
 function questPickCount() {
   const picked = [...document.querySelectorAll('#questPanel input[type=checkbox]:checked')];
+  _questPicked.clear(); picked.forEach(i => _questPicked.add(i.value));
   const btn = $('questStartBtn'), hint = $('questPickHint');
   if (btn) btn.disabled = picked.length < 1 || picked.length > 4;
   if (hint) hint.textContent = picked.length === 0 ? 'Pick at least one' : picked.length > 4 ? 'Four at most — keep the week focused' : `${picked.length} picked · 7 days from today`;
@@ -2040,12 +2257,13 @@ async function startQuestRun() {
   if (!confirm(`Start a quest week from today with: ${ids.join(', ')}?`)) return;
   const { error } = await sb.rpc('set_quests', { p_start: todayKey(), p_ids: ids });
   if (error) { alert('Could not start: ' + error.message); return; }
+  _questPicked.clear();
   toast('Quest week live');
   refetch(['rules']);
 }
 async function cancelQuestRun(start) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!confirm('Cancel this quest run? Quests already paid keep their XP; the run disappears from the app.')) return;
+  if (!confirm('Cancel this quest run?\n\nThe run disappears from the app AND everyone who already completed one of its quests loses that XP, on the board and in the app: both scorers work the quest XP out from the run each time.\n\nStarting the same run again (same start day, same quests) brings the XP back.')) return;
   const { error } = await sb.rpc('clear_quests', { p_start: start });
   if (error) { alert('Could not cancel: ' + error.message); return; }
   toast('Run cancelled');
@@ -2072,7 +2290,7 @@ function pulsePanelHtml(habAthletes) {
     ${rows.map(a => {
       const lv = S.levels[a.id];
       const warn = a.habGap >= QUIET_HABIT_DAYS;
-      return `<button class="pulse" onclick="location.hash='a/${encodeURIComponent(a.id)}'">
+      return `<button class="pulse" onclick="location.hash=${jsq('a/' + encodeURIComponent(a.id))}">
         <span class="nm">${esc(a.name)}${lv ? ` <small>LV ${lv}${a.onBoard ? ' · on the board' : ''}</small>` : (a.onBoard ? '<small>on the board</small>' : '')}</span>
         <span class="dots">${dots(a)}</span>
         <span class="tag ${warn ? 'warn' : ''}">${a.habToday ? 'today ✓' : warn ? a.habGap + 'd silent' : a.habLast ? timeAgo(a.habLast + 'T12:00:00') : 'never'}</span>
@@ -2106,10 +2324,21 @@ function computeAcwr(daily, ref) {
     if (diff >= 0 && diff < 7)  acute   += daily[iso];
     if (diff >= 0 && diff < 28) chronic += daily[iso];
   });
-  const chronicWeekly = chronic / 4;
   const spanDays = earliest !== null ? Math.floor((refMid - earliest) / 86400000) : 0;
+  // The weekly average over the weeks that actually have history in the 28-day window. Dividing by
+  // 4 regardless made every new athlete read a false "High load" (1.7 at two weeks) for about a week.
+  const weeksCovered = Math.min(4, (Math.min(spanDays, 27) + 1) / 7);
+  const chronicWeekly = weeksCovered > 0 ? chronic / weeksCovered : 0;
   return { ratio: chronicWeekly > 0 ? acute / chronicWeekly : null,
            acute, chronicWeekly, enough: spanDays >= 14 && chronicWeekly > 0, spanDays };
+}
+// Sessions in the 28-day window with no load (no duration or no session RPE): they count as zero
+// in the ratio and the bars, so the card says how many there are.
+function loadCoverage(sessions, ref) {
+  const r = ref || new Date();
+  const from = addDays(dkey(r), -27);
+  const inWin = sessions.filter(s => s.completed_on && s.completed_on >= from && s.completed_on <= dkey(r));
+  return { total: inWin.length, withLoad: inWin.filter(s => s.session_rpe != null && s.duration_min != null).length };
 }
 function acwrZone(r) {
   if (r == null) return { label: '—', cls: '' };
@@ -2153,13 +2382,18 @@ function adherence(sessions, daysPerWeek, weeks, ref) {
   const refMid = new Date(r.getFullYear(), r.getMonth(), r.getDate());
   if (!earliest) return null;
   const daysActive = Math.floor((refMid - earliest) / 86400000) + 1;
-  const effWeeks = Math.max(1, Math.min(weeks, Math.ceil(daysActive / 7)));
-  const start = new Date(refMid); start.setDate(start.getDate() - (effWeeks * 7 - 1));
+  // Pro-rated to the days since they started (at most the window). Charging a whole week of
+  // planned sessions for a week that had only begun read a perfectly adherent new athlete as 33%.
+  const effDays = Math.max(1, Math.min(weeks * 7, daysActive));
+  const effWeeks = Math.max(1, Math.round(effDays / 7));
+  const start = new Date(refMid); start.setDate(start.getDate() - (effDays - 1));
   let done = 0;
   sessions.forEach(s => { if (!s.completed_on) return; const d = pDate(s.completed_on);
     if (d >= start && d <= refMid) done += isPartialStatus(s.status) ? 0.5 : 1; });
-  const expected = daysPerWeek * effWeeks;
-  return { done, expected, pct: expected > 0 ? Math.round((done / expected) * 100) : null, weeks: effWeeks, perWeek: daysPerWeek };
+  const expected = Math.max(1, Math.round(daysPerWeek * effDays / 7));
+  const raw = Math.round((done / expected) * 100);
+  return { done, expected, pct: Math.min(100, raw), extra: Math.max(0, done - expected), days: effDays,
+           weeks: effWeeks, perWeek: daysPerWeek };
 }
 function athleteMetrics(sessions, lastActive, daysPerWeek) {
   const daily = dailyLoad(sessions);
@@ -2170,7 +2404,7 @@ function athleteMetrics(sessions, lastActive, daysPerWeek) {
     .map(s => Number(s.session_rpe) * Number(s.duration_min));
   const byRecent = sessions.slice().sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on)));
   const lastPartial = byRecent.length ? isPartialStatus(byRecent[0].status) : false;
-  return { daily, acwr: computeAcwr(daily), rser, readiness: readinessStats(rser),
+  return { daily, acwr: computeAcwr(daily), cover: loadCoverage(sessions), rser, readiness: readinessStats(rser),
            adherence: adherence(sessions, daysPerWeek), loadPts, lastPartial,
            daysIdle: daysSince(lastActive), neverActive: !lastActive && !sessions.length };
 }
@@ -2220,11 +2454,12 @@ function renderCharts(m) {
     <h4>Training load</h4>
     ${m.acwr.enough && m.acwr.ratio != null
       ? `<div class="chart-big" style="color:${azColor}">${round1(m.acwr.ratio)}<span style="font-size:13px;color:var(--muted);margin-left:6px">ACWR · ${az.label}</span></div>
-         <div class="chart-sub">${Math.round(m.acwr.acute)} AU this week vs ${Math.round(m.acwr.chronicWeekly)} AU weekly average</div>`
+         <div class="chart-sub">${Math.round(m.acwr.acute)} AU this week vs ${Math.round(m.acwr.chronicWeekly)} AU weekly average${m.acwr.spanDays < 27 ? ` (over ${Math.min(m.acwr.spanDays + 1, 28)} days of history)` : ''}</div>`
       : `<div class="chart-big" style="font-size:17px;color:var(--muted)">Building baseline</div>
          <div class="chart-sub">Needs ~2 weeks of sessions with a duration logged.</div>`}
     ${hasLoad
-      ? barsSVG(weeklyLoad(m.daily, 8), C.green) + `<div class="chart-legend">Weekly load (AU = session RPE × minutes), last 8 weeks</div>`
+      ? barsSVG(weeklyLoad(m.daily, 8), C.green) + `<div class="chart-legend">Weekly load (AU = session RPE × minutes), last 8 weeks${
+          m.cover && m.cover.total > m.cover.withLoad ? ` · <b>${m.cover.total - m.cover.withLoad} of ${m.cover.total} sessions in the last 4 weeks have no duration or RPE and count as zero</b>` : ''}</div>`
       : `<p class="empty">No load data yet — needs sessions with a logged duration.</p>`}
   </div>`;
   const r = m.readiness;
@@ -2244,10 +2479,10 @@ function renderCharts(m) {
   const adhCard = `<div class="chart-card">
     <h4>Adherence</h4>
     ${adh && adh.pct != null
-      ? `<div class="chart-big" style="color:${adhColor}">${adh.pct}%<span style="font-size:13px;color:var(--muted);margin-left:4px">last ${adh.weeks} wk${adh.weeks === 1 ? '' : 's'}</span></div>
-         <div class="chart-sub">${adhDone} of ${adh.expected} planned sessions completed</div>
+      ? `<div class="chart-big" style="color:${adhColor}">${adh.pct}%<span style="font-size:13px;color:var(--muted);margin-left:4px">last ${adh.days < 28 ? adh.days + ' days' : '4 wks'}</span></div>
+         <div class="chart-sub">${adhDone} of ${adh.expected} planned sessions completed${adh.extra ? ` (${adh.extra % 1 ? adh.extra.toFixed(1) : adh.extra} more than planned)` : ''}</div>
          <div class="bar"><div class="bar-fill" style="width:${Math.min(adh.pct, 100)}%;background:${adhColor}"></div></div>
-         <div class="chart-legend">Planned = ${adh.perWeek}/week (their program) × ${adh.weeks} wk${adh.weeks === 1 ? '' : 's'}</div>`
+         <div class="chart-legend">Planned = ${adh.perWeek}/week (their program), over the last ${adh.days} day${adh.days === 1 ? '' : 's'}</div>`
       : `<p class="empty">Needs a program file and at least one finished session.</p>`}
   </div>`;
   return `<div class="charts">${loadCard}${readyCard}${adhCard}</div>`;
@@ -2267,34 +2502,13 @@ const R_FILTERS = [
   { id: 'coached', label: 'Coached',  test: a => a.tier === 'coached' },
   { id: 'free',    label: 'Free',     test: a => a.tier === 'free' },
   { id: 'proof',   label: 'Proof only', test: a => a.tier === 'proof' },
+  { id: 'lapsed',  label: 'Gone quiet', test: a => !!a.lapsed && !rosterReasons(a).length },
 ];
 function setRosterFilter(id) { _rFilter = id; renderAthletes(); }
 window.setRosterFilter = setRosterFilter;
 
-// Why this person is in front of you, in plain words. The roster used to fold
-// everything into one dot-separated sub-line, so a row that needed a reply
-// looked exactly like a row that didn't.
-function rosterReasons(a) {
-  const out = [];
-  if (a.needReplyRecent && a.needReplyRecent.length) out.push({ tone: 'warn', text: a.needReplyRecent.length + ' note' + (a.needReplyRecent.length === 1 ? '' : 's') + ' to read' });
-  if (a.lowRun) out.push({ tone: 'warn', text: 'run of low days' });
-  if (a.tier === 'coached' && a.finished > 0) {
-    const gap = daysSince(a.lastSession ? a.lastSession + 'T12:00:00' : null);
-    if (gap > QUIET_SESSION_DAYS) out.push({ tone: 'note', text: 'no session for ' + gap + ' days' });
-  }
-  if (a.isHab && a.habGap >= QUIET_HABIT_DAYS) out.push({ tone: 'note', text: 'silent on Proof — ' + a.habGap + ' days' });
-  if (a.tier === 'free' && a.contact && a.contact.days_logged >= UPGRADE_DAYS) out.push({ tone: 'good', text: 'ready to upgrade?' });
-  // A session they sent that never made it into session_history. Ranked as a warn
-  // because the dashboard is lying about their training until it is resolved —
-  // every other number on this screen is computed from session_history.
-  if (a.syncGaps && a.syncGaps.length) {
-    const g = a.syncGaps[0];
-    out.push({ tone: 'warn', text: a.syncGaps.length === 1
-      ? `session not synced — Day ${g.day}, ${g.on}`
-      : `${a.syncGaps.length} sessions not synced — latest Day ${g.day}, ${g.on}` });
-  }
-  return out;
-}
+// Why this person is in front of you, in plain words: reasonsOf(), the one rule (above).
+function rosterReasons(a) { return a.reasons || []; }
 function renderAthletes() {
   const list = Object.values(S.ath);
   const counts = {};
@@ -2308,16 +2522,8 @@ function renderAthletes() {
         <option value="name">Sort: name</option>
       </select>
       <button class="btn sm" onclick="pickProgramFile()" title="Publish a data/&lt;id&gt;.json written by the coaching pipeline">↑ Publish programme file</button>
-      <button class="btn sm" onclick="pickCoachingLogs()" title="Upload .claude/coaching-log/*.md — coach-only, never shown to athletes">↑ Coaching logs</button>
+      <button class="btn sm" onclick="pickCoachingLogs()" title="Add a coaching log from a .md file for an athlete who has none on the server yet. Never replaces one.">↑ Add coaching logs</button>
       <button class="btn sm" onclick="downloadBackup(this)" title="Download the whole database as one file. The free plan takes no automatic backups. Keep the last 12 and delete older ones (the privacy notice promises about three months).">⤓ Backup</button>
-      ${(() => {
-        // Only offer the move while something is still file-backed. Once every
-        // programme is in the database this control has nothing left to do.
-        const pending = Object.keys(S.programs || {}).filter(id => S.programs[id] && S.progSrc[id] === 'file');
-        return pending.length
-          ? `<button class="btn sm" onclick="runImport()" title="Copy data/*.json into the database so programmes become editable here">↑ Move ${pending.length} programme${pending.length === 1 ? '' : 's'} into the database</button>`
-          : '';
-      })()}
       ${(() => {
         const needLogin = athletesNeedingLogin();
         return needLogin.length
@@ -2333,13 +2539,8 @@ function renderAthletes() {
   renderRoster();
 }
 function rosterAttention(a) {
-  let n = a.toReply * 100;
-  if (a.tier === 'coached' && a.finished > 0 && daysSince(a.lastSession ? a.lastSession + 'T12:00:00' : null) > QUIET_SESSION_DAYS) n += 30;
-  if (a.isHab && a.habGap >= QUIET_HABIT_DAYS) n += 20 + a.habGap;
-  // Below unanswered notes, above a quiet week: it is a data problem, not a
-  // person problem, but it silently corrupts every session-derived number here.
-  if (a.syncGaps && a.syncGaps.length) n += 50 + a.syncGaps.length;
-  return n;
+  if (a.lapsed) return -1;
+  return (a.reasons || []).reduce((n, r) => n + r.weight, 0);
 }
 function renderRoster() {
   const q = (($('searchBox') || {}).value || '').toLowerCase();
@@ -2369,12 +2570,12 @@ function renderRoster() {
     const reasons = rosterReasons(a);
     const silent = a.isHab && a.habGap >= QUIET_HABIT_DAYS;
     const gapTag = !a.isHab ? '' : a.habToday ? 'on court ✓' : a.habGap + 'd off';
-    return `<button class="ath ${a.toReply ? 'flag' : ''} ${a.tier === 'free' ? 'freeath' : ''}" onclick="location.hash='a/${encodeURIComponent(a.id)}'">
+    return `<button class="ath ${a.toReply ? 'flag' : ''} ${a.tier === 'free' ? 'freeath' : ''}" onclick="location.hash=${jsq('a/' + encodeURIComponent(a.id))}">
       <span class="ava">${esc(initials(a.name))}</span>
       <span class="main">
         <span class="nm">${esc(a.name)} ${tierChip(a)} ${lv} ${acwrPill}</span>
         <span class="sub">${esc(subBits.join(' · '))}</span>
-        ${reasons.length ? `<span class="why">${reasons.map(r => `<span class="fl ${r.tone === 'warn' ? 'warn' : r.tone === 'good' ? 'note' : 'note'}">${esc(r.text)}</span>`).join('')}</span>` : ''}
+        ${reasons.length ? `<span class="why">${reasons.map(r => `<span class="fl ${r.tone === 'warn' ? 'warn' : r.tone === 'good' ? 'good' : 'quiet'}">${esc(r.text)}</span>`).join('')}</span>` : ''}
       </span>
       <span class="side">${dots}<span class="tag ${silent ? 'warn' : ''}">${gapTag}</span></span>
     </button>`;
@@ -2383,11 +2584,14 @@ function renderRoster() {
   // of the screen is "who is waiting on me", and a hard line says it plainly.
   if (sort === 'attention' && _rFilter === 'all') {
     const needs = list.filter(a => rosterReasons(a).length);
-    const rest = list.filter(a => !rosterReasons(a).length);
+    const rest = list.filter(a => !rosterReasons(a).length && !a.lapsed);
+    const gone = list.filter(a => !rosterReasons(a).length && a.lapsed);
     $('rosterBox').innerHTML = (needs.length
         ? `<div class="rgroup">Needs you <span class="c">${needs.length}</span></div>` + needs.map(rowHtml).join('') : '')
       + (rest.length
         ? `<div class="rgroup">All quiet <span class="c">${rest.length}</span></div>` + rest.map(rowHtml).join('') : '')
+      + (gone.length
+        ? `<div class="rgroup" title="No session, habit or app activity for ${LAPSED_DAYS}+ days, or a cycle that ended over ${CYCLE_RENEW_DAYS} days ago">Gone quiet <span class="c">${gone.length}</span></div>` + gone.map(rowHtml).join('') : '')
       || `<p class="empty">No one matches “${esc(q)}”.</p>`;
     return;
   }
@@ -2675,6 +2879,9 @@ function compareExercise(pex, logged, drop) {
     c.flags.push({ tone: 'miss', text: (want - c.doneSets) + ' set' + (want - c.doneSets === 1 ? '' : 's') + ' short' });
   else if (want && c.doneSets > want)
     c.flags.push({ tone: 'note', text: (c.doneSets - want) + ' extra set' + (c.doneSets - want === 1 ? '' : 's') });
+  // Touched (a weight or an RPE typed) but no set ticked: not "exactly as prescribed".
+  else if (want && !c.doneSets && c.state === 'part')
+    c.flags.push({ tone: 'warn', text: '0 of ' + want + ' sets ticked' });
   if (tgt && c.rpeMean != null && c.state !== 'skip') {
     if (c.rpeMean - tgt.hi >= RPE_OVER)       c.flags.push({ tone: 'warn', text: round1(c.rpeMean - tgt.hi) + ' over target RPE' });
     else if (tgt.lo - c.rpeMean >= RPE_UNDER) c.flags.push({ tone: 'under', text: round1(tgt.lo - c.rpeMean) + ' under target RPE' });
@@ -2692,14 +2899,26 @@ function compareExercise(pex, logged, drop) {
 // block, plus anything logged that was never prescribed.
 function compareDay(programDay, session) {
   const blocks = parseSessionLog(session && session.summary);
-  const byName = logIndex(blocks);
-  const seen = new Set();
+  // The summary is frozen text, but the structured log (session.log, written in the same loop and
+  // in the same order) is kept in step when an exercise is renamed (the one-name move of
+  // 2026-10-09). When the two line up one to one, the log's names win, so a renamed lift still
+  // matches its prescription instead of reading "not logged" plus a stray "not in the plan".
+  const flat = [];
+  blocks.forEach(b => b.exercises.forEach(e => flat.push(e)));
+  const log = jparse(session && session.log);
+  if (Array.isArray(log) && log.length === flat.length)
+    flat.forEach((e, i) => { const n = log[i] && log[i].ex; if (typeof n === 'string' && n.trim()) e.name = n.trim(); });
+  // Name → every logged entry with that name, taken in order: the same exercise twice in one day
+  // (a squat in two blocks) used to show the last log on both rows.
+  const queue = {};
+  flat.forEach(e => { (queue[normEx(e.name)] = queue[normEx(e.name)] || []).push(e); });
+  const used = new Set();
+  const take = name => { const q = queue[normEx(name)]; const e = q && q.shift(); if (e) used.add(e); return e; };
   const groups = [];
   const drop = dayDropC(session && session.readiness);
   ((programDay && programDay.blocks) || []).forEach((b, bi) => {
     const rows = (b.exercises || []).map((pex, ei) => {
-      seen.add(normEx(pex.name));
-      const row = compareExercise(pex, byName[normEx(pex.name)], drop);
+      const row = compareExercise(pex, take(pex.name), drop);
       // Where this exercise lives in the programme, so the editor can write it
       // back. Index-based rather than name-based: two blocks can hold the same
       // movement, and a rename would otherwise lose the row.
@@ -2709,9 +2928,7 @@ function compareDay(programDay, session) {
     if (rows.length) groups.push({ title: b.title || '', icon: b.icon || '', rows });
   });
   const extras = [];
-  blocks.forEach(b => b.exercises.forEach(e => {
-    if (!seen.has(normEx(e.name))) extras.push(compareExercise(null, e));
-  }));
+  flat.forEach(e => { if (!used.has(e)) extras.push(compareExercise(null, e)); });
   if (extras.length) groups.push({ title: 'Logged, not prescribed', icon: '', rows: extras });
   return { groups, hasLog: blocks.length > 0, extras: extras.length };
 }
@@ -2804,7 +3021,7 @@ function cmpRowHtml(c, lib, athleteId) {
     <div class="cmp-rx">${rxBits.join('') || '<span class="did-none">—</span>'}
       ${rxSub.length ? `<div class="rx-sub">${rxSub.join(' · ')}</div>` : ''}
       ${editable ? `<button class="rx-edit" title="Edit this prescription"
-        onclick="openExEditor('${esc(athleteId)}',${Number(c.path.day)},${c.path.block},${c.path.ex},'${eid}')">✎</button>` : ''}
+        aria-label="Edit ${esc(c.pex.name || c.name)}" onclick="openExEditor(${jsq(athleteId)},${Number(c.path.day)},${c.path.block},${c.path.ex},'${eid}',${jsq(c.pex.name)})">✎</button>` : ''}
       ${warn.length ? `<div class="rx-warn" title="${esc(warn.map(w => w.msg).join('\n'))}">⚠ ${esc(warn.length)} chip issue${warn.length > 1 ? 's' : ''}</div>` : ''}
     </div>
     <div class="cmp-did">${cmpCell(c)}</div>
@@ -2840,13 +3057,54 @@ function asSentence(t) {
   return /[.!?]$/.test(t) ? t : t + '.';
 }
 
-function openExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
+// Typed values of open editors, by editor id: a re-render (a save elsewhere, a refresh,
+// opening another day) redraws the row, and the coach's unsaved numbers must survive it.
+const _exDrafts = {};
+function exDraftFields(eid) {
+  const out = {};
+  ['exSets', 'exKind', 'exDose', 'exRpe', 'exTempo', 'exRest', 'exNote'].forEach(k => {
+    const el = document.getElementById(k + '-' + eid); if (el) out[k] = el.value;
+  });
+  const side = document.getElementById('exSide-' + eid); if (side) out.exSide = side.checked;
+  return out;
+}
+// Called after the athlete file is redrawn: reopen any editor that was open, with what was typed.
+function restoreExDrafts() {
+  Object.keys(_exDrafts).forEach(eid => {
+    const d = _exDrafts[eid];
+    const box = document.getElementById('exed-' + eid);
+    if (!box || !d) return;
+    openExEditor(d.athleteId, d.dayId, d.blockIdx, d.exIdx, eid, d.name, true);
+    Object.keys(d.fields || {}).forEach(k => {
+      const el = document.getElementById(k + '-' + eid); if (!el) return;
+      if (k === 'exSide') el.checked = !!d.fields[k]; else el.value = d.fields[k];
+    });
+  });
+}
+document.addEventListener('input', ev => {
+  const m = ev.target && ev.target.id && ev.target.id.match(/^ex(Sets|Kind|Dose|Rpe|Tempo|Rest|Note|Side)-(.+)$/);
+  if (m && _exDrafts[m[2]]) _exDrafts[m[2]].fields = exDraftFields(m[2]);
+});
+document.addEventListener('change', ev => {
+  const m = ev.target && ev.target.id && ev.target.id.match(/^ex(Kind|Side)-(.+)$/);
+  if (m && _exDrafts[m[2]]) _exDrafts[m[2]].fields = exDraftFields(m[2]);
+});
+
+// `expectName` is the exercise name the row showed. Positions (day, block, index) are only an
+// address; the name is the check that the address still points at the exercise the coach chose.
+function openExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, reopen) {
   const box = document.getElementById('exed-' + eid);
   if (!box) return;
-  if (box.style.display === 'block') { box.style.display = 'none'; box.innerHTML = ''; return; }
+  if (!reopen && box.style.display === 'block') { box.style.display = 'none'; box.innerHTML = ''; delete _exDrafts[eid]; return; }
 
   const found = exAt(athleteId, dayId, blockIdx, exIdx);
-  if (!found) { toast('Could not find that exercise'); return; }
+  if (!found || (expectName != null && found.ex.name !== expectName)) {
+    delete _exDrafts[eid];
+    toast('That exercise has moved in the programme. Refreshing it.');
+    reloadPrograms().then(render);
+    return;
+  }
+  if (!_exDrafts[eid]) _exDrafts[eid] = { athleteId, dayId, blockIdx, exIdx, name: found.ex.name, fields: null };
   const r  = Chips.rxOf(found.ex);
   const st = {
     sets:  r.sets || '',
@@ -2878,10 +3136,11 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
       <input type="checkbox" id="exSide-${eid}"${st.side ? ' checked' : ''} style="width:auto"></label>`;
 
   box.innerHTML = `
+    <div class="exed-title">Editing <b>${esc(found.ex.name)}</b> · Day ${esc(dayId)}</div>
     <div class="exed-grid">
       ${f('exSets',  'Sets',  st.sets,  'e.g. 4')}
       ${kindSel}
-      ${f('exDose',  'Value', st.dose,  'e.g. 6, 8-10, 30s, 20m', 132)}
+      ${f('exDose',  'Value', st.dose,  'reps 8 · time 30s · distance 20m', 150)}
       ${sideBox}
       ${f('exRpe',   'RPE',   st.rpe,   '6–10')}
       ${f('exTempo', 'Tempo', st.tempo, '3-0-1-0 / iso', 108)}
@@ -2895,67 +3154,106 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
       ${r.extras.map(m => `<span class="fl">${esc(m.label)}</span>`).join('')}</div>` : ''}
     ${problems.length ? `<div class="exed-warn">${problems.map(p => '⚠ ' + esc(p.msg)).join('<br>')}</div>` : ''}
     <div class="exed-acts">
-      <button class="btn sm primary" onclick="saveExEditor('${esc(athleteId)}',${Number(dayId)},${blockIdx},${exIdx},'${eid}')">Save</button>
-      <button class="btn sm" onclick="openExEditor('${esc(athleteId)}',${Number(dayId)},${blockIdx},${exIdx},'${eid}')">Cancel</button>
+      <button class="btn sm primary" onclick="saveExEditor(${jsq(athleteId)},${Number(dayId)},${blockIdx},${exIdx},'${eid}',${jsq(found.ex.name)}, this)">Save</button>
+      <button class="btn sm" onclick="openExEditor(${jsq(athleteId)},${Number(dayId)},${blockIdx},${exIdx},'${eid}',${jsq(found.ex.name)})">Cancel</button>
       <span class="exed-hint">Changes what they see next. Past logs are untouched.</span>
     </div>`;
   box.style.display = 'block';
 }
 
-async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid) {
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (S.progSrc[athleteId] !== 'db') {
-    alert('This programme is still a data/*.json file.\n\nRun "Move programmes into the database" on the roster first — editing writes to the database, and a file-backed athlete would keep showing the file.');
-    return;
+// What the editor's fields say, checked against the rx contract (SCHEMA.md, PROGRAM-APP.md):
+// one whole number of reps, a real duration for time, metres for distance, sets a whole number,
+// RPE 6–10 or a 6–10 range. Returns { patch } or { error }.
+function readExEditor(eid) {
+  const val = id => String((document.getElementById(id + '-' + eid) || {}).value || '').trim();
+  const kind = val('exKind') || 'reps';
+  const dose = val('exDose'), sets = val('exSets'), rpe = val('exRpe'), tempo = val('exTempo'), restRaw = val('exRest');
+  const num = v => /^\d+(\.\d+)?$/.test(v) ? Number(v) : v;   // the pipeline writes numbers; keep it that way
+  if (sets && !/^[1-9]\d?$/.test(sets)) return { error: `Sets "${sets}" must be a whole number (1–99), or blank.` };
+  if (dose) {
+    if (kind === 'reps' && !/^\d{1,3}$/.test(dose))
+      return { error: /\d\s*[-–]\s*\d/.test(dose)
+        ? `Reps are one number, not a range ("${dose}"): write the one you mean.`
+        : Chips.isPureDuration(dose) ? `"${dose}" is a time. Pick Time as the dose, then save.` : `Reps "${dose}" must be one whole number.` };
+    if (kind === 'time' && !Chips.isPureDuration(dose)) return { error: `Time "${dose}" is not a duration I understand. Try 30s, 45 sec, 2 min or 1:30.` };
+    if (kind === 'distance' && !/^\d+(\.\d+)?\s*(m|km|yd|yds|metres?|meters?)$/i.test(dose)) return { error: `Distance "${dose}" needs a unit: 20m, 400 m, 1 km.` };
   }
-  const found = exAt(athleteId, dayId, blockIdx, exIdx);
-  if (!found) { toast('Could not find that exercise'); return; }
-
-  const val = id => (document.getElementById(id + '-' + eid) || {}).value;
-  const chk = id => !!(document.getElementById(id + '-' + eid) || {}).checked;
-  const restRaw = (val('exRest') || '').trim();
-  const patch = {
-    rpe:     (val('exRpe') || '').trim(),
-    restSec: restRaw ? Chips.parseDurationToSec(restRaw) : 0
-  };
-  if (restRaw && !patch.restSec) { alert('Rest "' + restRaw + '" is not a duration I understand. Try 90s, 2 min, or 1:30.'); return; }
-  if (patch.rpe && !(Number(patch.rpe) >= 6 && Number(patch.rpe) <= 10) && !/[-–]/.test(patch.rpe)) {
-    if (!confirm('RPE ' + patch.rpe + ' is outside the 6–10 selector the app shows.\n\nThe athlete will not be able to log against it. Save anyway?')) return;
+  if (rpe) {
+    const m = rpe.match(/^(\d+(?:\.\d)?)(?:\s*[-–]\s*(\d+(?:\.\d)?))?$/);
+    const ok = m && [m[1], m[2]].filter(Boolean).every(x => Number(x) >= 6 && Number(x) <= 10);
+    if (!ok) return { error: `RPE "${rpe}" must be 6 to 10 (or a range like 7-8): the app's selector starts at 6, so anything else cannot be logged.` };
   }
-
-  // Saving an exercise that still carries chips[] also CONVERTS it: toRx() folds
-  // the old labels into rx and keeps every leftover technique chip in the pill
-  // (`intent`), so an ordinary edit is the migration and no chip is lost. From
-  // here the exercise has one source.
-  const kind = (val('exKind') || 'reps');
-  const rxPatch = {
-    sets:  (val('exSets')   || '').trim(),
-    rpe:   patch.rpe,
-    tempo: (val('exTempo')  || '').trim(),
-    rest:  patch.restSec,
-    side:  chk('exSide')
-  };
-  rxPatch[kind] = (val('exDose') || '').trim();   // clears the other three doses
-
-  const updated = Chips.applyRx(Chips.toRx(found.ex), rxPatch);
+  const restSec = restRaw ? Chips.parseDurationToSec(restRaw) : 0;
+  if (restRaw && !restSec) return { error: `Rest "${restRaw}" is not a duration I understand. Try 90s, 2 min, or 1:30.` };
+  const patch = { sets: sets ? Number(sets) : '', rpe: num(rpe), tempo, rest: restSec,
+                  side: !!(document.getElementById('exSide-' + eid) || {}).checked };
+  patch[kind] = kind === 'reps' ? num(dose) : dose;   // clears the other three doses
+  const note = val('exNote');
+  return { patch, kind, note };
+}
+function withEditedEx(ex, form) {
+  // Saving an exercise that still carries chips[] also CONVERTS it: toRx() folds the old labels
+  // into rx and keeps every leftover technique chip in the pill (`intent`), so an ordinary edit is
+  // the migration and no chip is lost. From here the exercise has one source.
+  const updated = Chips.applyRx(Chips.toRx(ex), form.patch);
   delete updated.setup;   // no floating text: openExEditor() put any old grey line in the note box
-  const note = (val('exNote') || '').trim();
-  if (note) updated.note = note; else delete updated.note;
+  if (form.kind !== (Chips.rxOf(ex).dose || {}).kind && updated.rx) delete updated.rx.label;
+  if (form.note) updated.note = form.note; else delete updated.note;
+  return updated;
+}
 
-  // Swap the edited exercise into the live programme object, then persist the
-  // whole blob — the table stores one row per athlete, not per exercise.
-  found.blk.exercises[exIdx] = updated;
-
-  const { error } = await sb.from('programs')
-    .update({ data: S.programs[athleteId] })
-    .eq('athlete_id', athleteId);
-
-  if (error) {
-    await loadPrograms();               // don't leave a failed edit sitting in memory
-    render();
-    alert('Could not save: ' + error.message);
+async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, btn) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (S.progSrc[athleteId] !== 'db') { alert('This athlete has no programme in the database, so there is nothing to edit.'); return; }
+  const shown = exAt(athleteId, dayId, blockIdx, exIdx);
+  if (!shown || shown.ex.name !== expectName) {
+    delete _exDrafts[eid];
+    await reloadPrograms(); render();
+    alert('That exercise has moved in the programme since this page was drawn, so nothing was saved. The page now shows the live programme: open ✎ on the exercise again.');
     return;
   }
+  const form = readExEditor(eid);
+  if (form.error) { alert(form.error); return; }
+  if (JSON.stringify(withEditedEx(shown.ex, form)) === JSON.stringify(shown.ex)) {
+    delete _exDrafts[eid]; toast('No change to save'); renderDetailBody(); return;
+  }
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  const done = () => { if (btn) { btn.disabled = false; btn.textContent = 'Save'; } };
+
+  // The programme on this page can be hours old (a new cycle published by the pipeline, another
+  // tab, a restore). Saving it whole would put the old programme back, so the edit is applied to
+  // the LIVE row, and only if nobody has written it since this page loaded.
+  const live = await sb.from('programs').select('data, updated_at, updated_by').eq('athlete_id', athleteId).maybeSingle();
+  if (live.error || !live.data) { done(); alert('Could not read the live programme, so nothing was saved: ' + (live.error ? live.error.message : 'no row')); return; }
+  const seen = (S.progMeta[athleteId] || {}).updated_at;
+  const stale = async (why) => {
+    done(); delete _exDrafts[eid];
+    await reloadPrograms(); render();
+    alert(why + '\n\nNothing was saved. The page now shows the live programme: open ✎ again and redo the change.');
+  };
+  if (seen && live.data.updated_at !== seen) {
+    return stale(`${nameOf(athleteId)}'s programme changed on the server after this page loaded ` +
+      `(saved ${String(live.data.updated_at).slice(0, 16).replace('T', ' ')} UTC by ${live.data.updated_by || 'someone'}).`);
+  }
+  const fresh = live.data.data;
+  const fd = ((fresh && fresh.workouts && fresh.workouts.days) || []).find(d => Number(d.id) === Number(dayId));
+  const fb = fd && (fd.blocks || [])[blockIdx];
+  const fex = fb && (fb.exercises || [])[exIdx];
+  if (!fex || fex.name !== expectName) return stale('That exercise is no longer at the same place in the live programme.');
+  fb.exercises[exIdx] = withEditedEx(fex, form);
+
+  const res = await sb.from('programs').update({ data: fresh })
+    .eq('athlete_id', athleteId).eq('updated_at', live.data.updated_at)
+    .select('athlete_id, updated_at, updated_by');
+  if (!res.error && (!res.data || !res.data.length)) {
+    // Either someone saved in the second between the read and the write, or the session lapsed.
+    return stale('The programme was not updated: it changed again while saving, or your sign-in lapsed.');
+  }
+  if (res.error) { done(); alert('Could not save: ' + res.error.message); return; }
+  S.programs[athleteId] = fresh;
+  S.progMeta[athleteId] = { updated_at: res.data[0].updated_at, updated_by: res.data[0].updated_by };
+  delete _exDrafts[eid];
+  assemble();
   toast('Saved — they see it next time they open the app');
   render();
 }
@@ -2972,27 +3270,36 @@ async function loadProgramVersions(athleteId) {
     .limit(20);
   if (r.error) { box.innerHTML = `<p class="empty">Could not load history: ${esc(r.error.message)}</p>`; return; }
   const rows = r.data || [];
+  // Each row is the programme as it was BEFORE a save at saved_at; saved_by wrote it. Times are
+  // shown in this computer's time zone (they are stored in UTC).
   box.innerHTML = rows.length
-    ? rows.map(v => `<div class="pvrow">
-        <span class="pvwhen">${esc(prettyDate(String(v.saved_at).slice(0, 10)))}
-          <span class="pvtime">${esc(String(v.saved_at).slice(11, 16))}</span></span>
+    ? `<p class="empty" style="padding:0 0 8px">Each line is the programme as it stood just before a save. Restoring one puts it back; the current version is kept here too, so a restore can itself be undone. Only the last 20 are kept.</p>` +
+      rows.map(v => `<div class="pvrow">
+        <span class="pvwhen">${esc(fmtLocalStamp(v.saved_at))}</span>
         <span class="pvwho">${esc(v.saved_by || '—')}</span>
-        <button class="btn sm" onclick="restoreProgramVersion('${esc(athleteId)}', ${Number(v.id)})">Restore this</button>
+        <button class="btn sm" onclick="restoreProgramVersion(${jsq(athleteId)}, ${Number(v.id)})">Restore this</button>
       </div>`).join('')
     : '<p class="empty">No earlier versions yet — history starts at the first edit.</p>';
+}
+function fmtLocalStamp(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return String(iso || '');
+  return `${DOWS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()} · ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
 
 // Roll one athlete's programme back to a stored version. The trigger snapshots
 // on every change, so restoring is itself an edit and is itself undoable.
 async function restoreProgramVersion(athleteId, versionId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const v = await sb.from('program_versions').select('data, saved_at').eq('id', versionId).maybeSingle();
+  const v = await sb.from('program_versions').select('athlete_id, data, saved_at').eq('id', versionId).maybeSingle();
   if (v.error || !v.data) { alert('Could not read that version.'); return; }
-  if (!confirm('Restore the version saved ' + prettyDate(String(v.data.saved_at).slice(0, 10)) +
-               '?\n\nThe current one is kept, so this is reversible.')) return;
-  const { error } = await sb.from('programs').update({ data: v.data.data }).eq('athlete_id', athleteId);
-  if (error) { alert('Could not restore: ' + error.message); return; }
-  await loadPrograms();
+  if (v.data.athlete_id !== athleteId) { alert('That version belongs to a different athlete. Nothing was changed.'); return; }
+  if (!confirm(`Restore ${nameOf(athleteId)}'s programme to how it was before the save of ${fmtLocalStamp(v.data.saved_at)}?\n\nThe current one is kept in this list, so this is reversible.`)) return;
+  const res = await sb.from('programs').update({ data: v.data.data }).eq('athlete_id', athleteId).select('athlete_id');
+  const bad = writeFailed(res, 'restored');
+  if (bad) { alert('Could not restore: ' + bad); return; }
+  Object.keys(_exDrafts).forEach(k => delete _exDrafts[k]);
+  await reloadPrograms();
   render();
   toast('Restored');
 }
@@ -3038,14 +3345,16 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
     : '';
 
   const picker = sessions.length > 1 ? `<div class="sesspick">${sessions.map(x =>
-      `<button class="sp ${x.completed_on === (s && s.completed_on) ? 'on' : ''}" onclick="event.stopPropagation();setWorkSession(${dayNum}, '${esc(x.completed_on)}')">${esc(prettyDate(x.completed_on))}${isPartialStatus(x.status) ? ' ·partial' : ''}</button>`
+      `<button class="sp ${x.completed_on === (s && s.completed_on) ? 'on' : ''}" onclick="event.stopPropagation();setWorkSession(${dayNum}, ${jsq(x.completed_on)})">${esc(prettyDate(x.completed_on))}${isPartialStatus(x.status) ? ' ·partial' : ''}</button>`
     ).join('')}<span class="sp-lbl">${sessions.length} logged</span></div>` : '';
 
   const uid = (athleteId + '_' + dayNum + '_' + (s ? s.completed_on : 'none')).replace(/[^a-z0-9]/gi, '_');
-  const noteBox = (s && s.day_note) ? `<div class="daynote">
-      <div class="dn-txt">“${esc(s.day_note)}”</div>
+  // Any note the waiting counters count (the day note OR a note on an exercise) gets this box and
+  // its Mark read. It used to need a day note, so 8 of 12 waiting notes had no way to be cleared.
+  const noteBox = (s && sessionHasNote(s)) ? `<div class="daynote">
+      <div class="dn-txt">“${esc(sessionNoteText(s))}”</div>
       ${sessionNeedsReply(s) ? `<div class="note-actions">
-        <button class="btn sm" onclick="markNoteRead('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Mark read</button>
+        <button class="btn sm" onclick="markNoteRead(${jsq(athleteId)}, ${Number(s.day)}, ${jsq(s.completed_on)})">Mark read</button>
       </div>` : '<div class="dn-read">read</div>'}
     </div>` : '';
 
@@ -3060,7 +3369,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
       </div>`).join('')
     : `<p class="empty">No prescribed exercises on this day${s ? ' and nothing readable in the log' : ''}.</p>`;
 
-  return `<div class="wday ${open ? 'open' : ''} ${statusTone}">
+  return `<div class="wday ${open ? 'open' : ''} ${statusTone}" id="wday-${esc(dayNum)}">
     <button class="wday-top" onclick="toggleWorkDay(${dayNum})">
       <span class="wday-n">${esc(dayNum)}</span>
       <span class="wday-main">
@@ -3077,7 +3386,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
       ${body}
       ${s ? `<details class="rawlog"><summary>Raw log, exactly as sent</summary>
         <div class="elog-body">${esc(exerciseLogPart(s.summary))}</div>
-        <div class="note-actions"><button class="btn sm danger" onclick="deleteSession('${esc(athleteId)}', ${Number(s.day)}, '${esc(s.completed_on)}')">Delete this log</button></div>
+        <div class="note-actions"><button class="btn sm danger" onclick="deleteSession(${jsq(athleteId)}, ${Number(s.day)}, ${jsq(s.completed_on)})">Delete this log</button></div>
       </details>` : ''}
     </div>
   </div>`;
@@ -3105,16 +3414,18 @@ function workTabHtml(D) {
   return `${cycHead}
     ${metricStripHtml(metrics)}
     ${maxesPanel(D)}
-    ${cards.length ? cards.join('') : `<p class="empty">No program file found (looked for data/${esc(athleteId)}.json) and no finished sessions yet.</p>`}
+    ${cards.length ? cards.join('') : `<p class="empty">${D.a.tier === 'coached' || S.progSrc[athleteId] !== 'db'
+        ? 'No training programme published yet, and no finished sessions.'
+        : 'No training programme: this is a habit-only (Proof) athlete. Their habits are under Proof.'}</p>`}
     <div class="sec"><span>Backfill</span>
       <span class="acts"><button class="btn sm" onclick="toggleAddSession()">+ Add past session from email</button></span></div>
     <div id="add-session" class="add-session" style="display:none">
       <p class="empty" style="padding:0 0 10px">Paste a session-report email, set the date it was done, then save. It's written exactly like a live finish.</p>
       <textarea id="as-paste" placeholder="Paste the whole email here…"></textarea>
       <div class="add-session-row">
-        <label>Date done <input type="date" id="as-date" value="${todayKey()}"></label>
+        <label>Date done <input type="date" id="as-date" max="${todayKey()}" required></label>
         <button class="btn sm" onclick="parseAndFillSession()">Read email</button>
-        <button class="btn sm primary" id="as-save" onclick="submitPastSession('${esc(athleteId)}')" disabled>Save to logs</button>
+        <button class="btn sm primary" id="as-save" onclick="submitPastSession(${jsq(athleteId)})" disabled>Save to logs</button>
       </div>
       <div id="as-preview" class="add-session-preview"></div>
     </div>
@@ -3186,7 +3497,7 @@ function metricStripHtml(m) {
     ${pill('Readiness', r ? round1(r.latest) + '<small>/5</small>' : '—',
            r ? (r.delta >= 0 ? '+' : '') + round1(r.delta) + ' vs their usual' : 'no check-ins yet', rTone)}
     ${pill('Adherence', adh && adh.pct != null ? adh.pct + '<small>%</small>' : '—',
-           adh && adh.pct != null ? 'last ' + adh.weeks + ' wk' + (adh.weeks === 1 ? '' : 's') : 'needs a program + a session', aTone)}
+           adh && adh.pct != null ? 'last ' + (adh.days < 28 ? adh.days + ' days' : '4 wks') : 'needs a program + a session', aTone)}
     <button class="mp mp-more" onclick="toggleCharts()">Charts<span>▾</span></button>
   </div>
   <div id="chartbox" class="chartbox" style="display:none">${renderCharts(m)}</div>`;
@@ -3244,36 +3555,59 @@ const SUBTABS = [
   { id: 'file',  label: 'File' },
 ];
 
+let _detailReq = 0;
+// The athlete file caches what it drew. Anything that changes that athlete's data without a
+// full assemble() (a call log deleted) calls this, so the next render rebuilds it.
+function invalidateDetail() { if (_D) _D.stamp = -1; }
 async function renderDetail(athleteId, sub) {
   const a = S.ath[athleteId];
   if (!a) { $('content').innerHTML = `<a class="back" href="#athletes">← Roster</a><p class="empty">No athlete “${esc(athleteId)}” in the store. Refresh?</p>`; return; }
   // Rebuild the context only when the athlete changes — switching sub-tabs must
   // not refetch, or every tap costs a round trip and the page flashes.
   if (!_D || _D.athleteId !== athleteId || _D.stamp !== S.stamp) {
-    $('content').innerHTML = '<div class="loading"><div class="spinner"></div>Opening…</div>';
-    if (!(athleteId in S.callLogs)) {
-      if (DEMO) S.callLogs[athleteId] = [];
+    // Each open gets a ticket. The awaits below can take a second; if the coach has opened
+    // someone else (or left the file) by the time they finish, this one must not paint, or
+    // athlete A's file lands on screen under athlete B's address.
+    const req = ++_detailReq;
+    const sameAthlete = _D && _D.athleteId === athleteId;
+    if (!sameAthlete) $('content').innerHTML = '<div class="loading"><div class="spinner"></div>Opening…</div>';
+    let callLogs = S.callLogs[athleteId];
+    if (!callLogs) {
+      if (DEMO) callLogs = S.callLogs[athleteId] = [];
       else {
         const r = await sb.from('call_logs').select('*').eq('athlete_id', athleteId).order('call_date', { ascending: false });
-        S.callLogs[athleteId] = (r && r.data) || [];
+        // Cached only when it really loaded: a failed read used to stick as "No call logs yet".
+        if (r && !r.error) callLogs = S.callLogs[athleteId] = r.data || [];
+        else { callLogs = []; toast('Call logs did not load: ' + ((r && r.error && r.error.message) || 'no answer')); }
       }
     }
+    const lib = await exLib();
+    const now = route();
+    if (req !== _detailReq || now.view !== 'detail' || now.id !== athleteId) return;
     const program = S.programs[athleteId] || null;
     const history = a.sessions.slice().sort((x, y) => String(y.completed_on).localeCompare(String(x.completed_on)) || (x.day - y.day));
     const programDays = (program && program.workouts && program.workouts.days) || [];
     _D = {
       athleteId, a, program, programDays, history,
-      callLogs: S.callLogs[athleteId],
-      lib: await exLib(),
+      callLogs,
+      lib,
       metrics: athleteMetrics(history, a.lastActive, programDays.length),
       stamp: S.stamp,
     };
-    _workSel = {}; _workOpen = {};
+    // A rebuild of the SAME athlete (after a save or a refresh) keeps the days the coach had
+    // open and the session they were comparing; only a different athlete starts fresh.
+    if (!sameAthlete) { _workSel = {}; _workOpen = {}; Object.keys(_exDrafts).forEach(k => delete _exDrafts[k]); }
     _detailName = a.name; _detailHistory = history; _detailCallLogs = _D.callLogs;
-
   }
-  _D.sub = SUBTABS.some(t => t.id === sub) ? sub : 'work';
   const has = { proof: !!(a.isHab || a.contact), calls: true, work: true, file: true };
+  // With no screen named in the address, a habit-only athlete (free or Proof, no training days)
+  // opens on Proof, where their facts are; everyone else on The work.
+  const noTraining = !_D.programDays.length && !_D.history.length;
+  _D.sub = SUBTABS.some(t => t.id === sub) ? sub : ((has.proof && (a.tier !== 'coached' || noTraining)) ? 'proof' : 'work');
+  if (_pendingFocus && _pendingFocus.id === athleteId) {
+    _workOpen[_pendingFocus.day] = true;
+    if (_pendingFocus.on) _workSel[_pendingFocus.day] = _pendingFocus.on;
+  }
   const lv = S.levels[athleteId];
   const sub2 = [];
   if (_D.history.length) sub2.push(_D.history.length + ' session' + (_D.history.length === 1 ? '' : 's'));
@@ -3291,19 +3625,24 @@ async function renderDetail(athleteId, sub) {
       </div>
     </div>
     <div class="subrail">${SUBTABS.filter(t => has[t.id]).map(t => {
-        const n = t.id === 'work' ? a.needReplySessions.length
+        const n = t.id === 'work' ? a.needReplyRecent.length
                 : t.id === 'calls' ? _D.callLogs.length : 0;
         return `<a class="stab ${_D.sub === t.id ? 'active' : ''}" href="#a/${encodeURIComponent(athleteId)}/${t.id}">${t.label}${n ? `<span class="n ${t.id === 'calls' ? 'quiet' : ''}">${n}</span>` : ''}</a>`;
       }).join('')}</div>
     <div id="tabbody"></div>`;
   renderDetailBody();
+  if (_pendingFocus && _pendingFocus.id === athleteId) {
+    const el = document.getElementById('wday-' + _pendingFocus.day);
+    _pendingFocus = null;
+    if (el) el.scrollIntoView({ block: 'start' });
+  }
 }
 function renderDetailBody() {
   if (!_D) return;
   const box = $('tabbody');
   if (!box) return;
   const D = _D;
-  if (D.sub === 'work') box.innerHTML = workTabHtml(D);
+  if (D.sub === 'work') { box.innerHTML = workTabHtml(D); restoreExDrafts(); }
   else if (D.sub === 'proof') box.innerHTML = proofTabHtml(D);
   else if (D.sub === 'calls') box.innerHTML = callsTabHtml(D);
   else box.innerHTML = fileTabHtml(D);
@@ -3333,7 +3672,7 @@ function proofTabHtml(D) {
     </div>
     ${c ? `<div class="note-actions" style="margin-top:12px">
       ${c.whatsapp ? `<a class="abtn" target="_blank" rel="noopener" href="https://wa.me/${esc(String(c.whatsapp).replace(/[^0-9]/g, ''))}">WhatsApp ↗</a>` : ''}
-      ${c.email ? `<button class="abtn" onclick="copyText('${esc(c.email)}', this)">${esc(c.email)}</button>` : ''}
+      ${c.email ? `<button class="abtn" onclick="copyText(${jsq(c.email)}, this)">${esc(c.email)}</button>` : ''}
       <span class="chip ${c.tier === 'free' ? 'ochre' : 'court'}">${esc(c.tier || '')}</span>
     </div>` : ''}
   </section>
@@ -3342,7 +3681,7 @@ function proofTabHtml(D) {
   ${myLines.length ? `<section class="panel">${myLines.map(n => `<div class="wline ${n.hidden ? 'hid' : ''}">
       <div class="bd"><div class="wtop"><span class="nm">${esc(wallDayLabel(n.day))}</span>${n.pct != null ? `<span class="pct">${esc(n.pct)}%</span>` : ''}${n.hidden ? '<span class="hidetag">hidden</span>' : ''}</div>
       <div class="txt">${esc(n.body)}</div></div>
-      <button class="modbtn" onclick="toggleHide('${esc(athleteId)}','${esc(n.day)}',${n.hidden ? 'false' : 'true'})">${n.hidden ? 'Show' : 'Hide'}</button>
+      <button class="modbtn" onclick="toggleHide(${jsq(athleteId)},${jsq(n.day)},${n.hidden ? 'false' : 'true'})">${n.hidden ? 'Show' : 'Hide'}</button>
     </div>`).join('')}</section>` : '<p class="empty">Nothing on the wall this week.</p>'}`;
 }
 // Weight is opt-in in the app and most athletes will never switch it on, so
@@ -3387,7 +3726,7 @@ function callsTabHtml(D) {
         <div class="readiness">${scoreBits ? `<span class="r">${scoreBits}</span>` : ''}${(l.sessions_done!=null||l.sessions_planned!=null)?`<span class="r">Sessions <b>${esc(l.sessions_done??'?')}/${esc(l.sessions_planned??'?')}</b></span>`:''}</div>
         ${l.win_vault ? `<div class="note green" style="margin-top:6px"><b>🏆 Win vault:</b> ${esc(l.win_vault)}</div>` : ''}
         ${ansHtml}
-        <div style="margin-top:10px"><button class="btn sm danger" onclick="deleteCallLog('${esc(l.id)}','${esc(athleteId)}','${esc(l.call_date)}')">Delete</button></div>
+        <div style="margin-top:10px"><button class="btn sm danger" onclick="deleteCallLog(${jsq(l.id)},${jsq(athleteId)},${jsq(l.call_date)})">Delete</button></div>
       </div></details>`;
   }).join('') : '<p class="empty">No call logs yet.</p>';
   const cycleNums = [...new Set(callLogs.map(l => (String(l.week||'').match(/Cycle\s*(\d+)/i)||[])[1]).filter(Boolean))].sort((a,b)=>a-b);
@@ -3412,8 +3751,8 @@ function fileTabHtml(D) {
         to their record.
       </p>
       <div class="note-actions">
-        <button class="btn sm primary" onclick="viewAsAthlete('${esc(athleteId)}')">View their app</button>
-        <button class="btn sm" onclick="viewAsAthlete('${esc(athleteId)}', 'habits')">View their Proof</button>
+        <button class="btn sm primary" onclick="viewAsAthlete(${jsq(athleteId)})">View their app</button>
+        <button class="btn sm" onclick="viewAsAthlete(${jsq(athleteId)}, 'habits')">View their Proof</button>
       </div>
     </section>
     <div class="sec"><span>Login</span></div>
@@ -3426,25 +3765,25 @@ function fileTabHtml(D) {
         ${_athPwOpen === athleteId ? `
         <div class="pwform">
           <input id="athPw" class="pwin" placeholder="new password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false"
-                 onkeydown="if(event.key==='Enter') athleteSavePw('${esc(athleteId)}','reset')">
-          <button class="btn sm primary" onclick="athleteSavePw('${esc(athleteId)}','reset')">Save password</button>
+                 onkeydown="if(event.key==='Enter') athleteSavePw(${jsq(athleteId)},'reset')">
+          <button class="btn sm primary" onclick="athleteSavePw(${jsq(athleteId)},'reset')">Save password</button>
           <button class="btn sm" onclick="closeAthletePw()">Cancel</button>
           <p class="pwhint">${PW_HINT} The old password stops working straight away.</p>
         </div>` : `
         <div class="note-actions">
-          <button class="btn sm" onclick="openAthletePw('${esc(athleteId)}')">Change password</button>
-          <button class="btn sm danger" onclick="if(confirm('Remove ${esc(athleteId)}\\'s login? They will not be able to sign in until you make a new one.')) athleteLoginAction('${esc(athleteId)}','revoke')">Remove login</button>
+          <button class="btn sm" onclick="openAthletePw(${jsq(athleteId)})">Change password</button>
+          <button class="btn sm danger" onclick="revokeAthleteLogin(${jsq(athleteId)})">Remove login</button>
         </div>`}`
       : `
         <p class="empty" style="padding:0 0 10px">
-          No login yet — ${esc(athleteId)} still gets in through the secret link below.
-          Creating one gives them a username and password to sign in with instead, which their
-          phone can save.
+          <b style="color:var(--clay)">No login yet: ${esc(athleteId)} cannot open the app.</b> The old secret links
+          were retired on 7 Sep 2026. Create a username and password here, then send it on WhatsApp
+          (it waits under “Logins to send” on the Athletes tab until you mark it sent).
         </p>
         <div class="pwform">
           <input id="athPw" class="pwin" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false"
-                 onkeydown="if(event.key==='Enter') athleteSavePw('${esc(athleteId)}','create')">
-          <button class="btn sm primary" onclick="athleteSavePw('${esc(athleteId)}','create')">Create login</button>
+                 onkeydown="if(event.key==='Enter') athleteSavePw(${jsq(athleteId)},'create')">
+          <button class="btn sm primary" onclick="athleteSavePw(${jsq(athleteId)},'create')">Create login</button>
           <p class="pwhint">${PW_HINT}</p>
         </div>`}
     </section>
@@ -3452,24 +3791,21 @@ function fileTabHtml(D) {
     <section class="panel">
       <table class="meta-table">
         <tr><td class="k">Athlete id</td><td class="v">${esc(athleteId)}</td></tr>
-        <tr><td class="k">Stored in</td><td class="v">${((src) =>
-          src === 'db'
-            ? '<b>the database</b> — editable here, and only this athlete can read it'
-            : src === 'file'
-              ? `<span style="color:var(--clay)">data/${esc(athleteId)}.json</span> — a public file, and not editable here yet`
-              : '<span style="color:var(--clay)">nothing found</span>'
-        )(S.progSrc[athleteId] || (program ? 'file' : 'none'))}</td></tr>
+        <tr><td class="k">Stored in</td><td class="v">${S.progSrc[athleteId] === 'db'
+            ? '<b>the database</b> — editable here; only this athlete and you can read it'
+            : '<span style="color:var(--clay)">no programme row</span>'}</td></tr>
+        ${S.progMeta[athleteId] ? `<tr><td class="k">Last saved</td><td class="v">${esc(fmtLocalStamp(S.progMeta[athleteId].updated_at))}${S.progMeta[athleteId].updated_by ? ' · ' + esc(S.progMeta[athleteId].updated_by) : ''}</td></tr>` : ''}
         <tr><td class="k">Tier</td><td class="v">${esc(a.tier)}</td></tr>
         <tr><td class="k">Days / week</td><td class="v">${programDays.length || '—'}</td></tr>
         <tr><td class="k">Cycle</td><td class="v">${cycles[ci] ? esc(cycles[ci].name || '') + (cycles[ci].weeks ? ' · ' + esc(cycles[ci].weeks) : '') : '—'}</td></tr>
         <tr><td class="k">Roadmap</td><td class="v">${cycles.length ? esc(ci + 1) + ' of ' + esc(cycles.length) : '—'}</td></tr>
       </table>
       ${S.progSrc[athleteId] === 'db' ? `
-      <details class="rawlog" ontoggle="if(this.open)loadProgramVersions('${esc(athleteId)}')">
+      <details class="rawlog" ontoggle="if(this.open)loadProgramVersions(${jsq(athleteId)})">
         <summary>Version history — undo an edit</summary>
         <div id="pvlist" class="pvlist">Loading…</div>
       </details>` : ''}
-      <details class="rawlog" ontoggle="if(this.open)openCoachingLog('${esc(athleteId)}')">
+      <details class="rawlog" ontoggle="if(this.open)openCoachingLog(${jsq(athleteId)})">
         <summary>Coaching log${(S.clogs || {})[athleteId] ? '' : ' — none yet'}
           &nbsp;<span class="muted" style="font-weight:400">coach only, never shown to the athlete</span></summary>
         <div class="elog-body" id="clog-body">Loading…</div>
@@ -3477,8 +3813,8 @@ function fileTabHtml(D) {
     </section>
     <div class="sec"><span>Danger zone</span></div>
     <section class="panel">
-      <p class="empty" style="padding:0 0 10px">Deletes every session and progress row for this athlete. The data file on disk is not touched.</p>
-      <button class="btn sm danger" onclick="deleteAthlete('${esc(athleteId)}')">Delete all data</button>
+      <p class="empty" style="padding:0 0 10px">Deletes every finished session and everything the app keeps for them on the server (habit log, body weight, personal records). Their programme, login, coaching log and calls stay, and so do they on the roster.</p>
+      <button class="btn sm danger" onclick="deleteAthlete(${jsq(athleteId)})">Delete training history</button>
     </section>`;
 }
 
@@ -3488,8 +3824,10 @@ function fileTabHtml(D) {
 // answer to WhatsApp; a note is marked read once Amir has seen it.
 async function markNoteRead(athleteId, day, completedOn) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const { error } = await sb.from('session_history').update({ coach_status: 'read' }).eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn);
-  if (error) { alert('Could not update: ' + error.message); return; }
+  const res = await sb.from('session_history').update({ coach_status: 'read' })
+    .eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn).select('day');
+  const bad = writeFailed(res, 'marked read');
+  if (bad) { alert('Could not mark it read: ' + bad); return; }
   refetch(['hist']);
 }
 window.markNoteRead = markNoteRead;
@@ -3508,8 +3846,12 @@ function parseSessionEmail(text) {
   const status = grab(/Status:?\s*\n?\s*([^\n]+)/) || 'Complete';
   const rpeM = t.match(/Session RPE:?\s*\n?\s*(\d+(?:\.\d+)?)/i);
   const durM = t.match(/Duration:?\s*\n?\s*(\d+)/i);
-  let note = grab(/Notes from athlete\s*\n\s*([^\n]+)/) || grab(/Notes from athlete:\s*\n\s*([^\n]+)/);
+  // The whole note, every line of it (the summary holds it between "Notes from athlete:" and the
+  // exercise log); the email's own field holds only its first line in some mail clients.
+  const nb = t.match(/Notes from athlete:\s*\n([\s\S]*?)\n\s*\n\s*Exercise log:/);
+  let note = nb ? nb[1].trim() : (grab(/Notes from athlete\s*\n\s*([^\n]+)/) || grab(/Notes from athlete:\s*\n\s*([^\n]+)/));
   if (/^\(?none\)?$/i.test(note)) note = '';
+  const who = grab(/^\s*Athlete:?[ \t]*\n?[ \t]*([^\n]+)/m);
   let readiness = null;
   const oneLine = t.match(/Composite\s+([\d.]+)\/5\s*·\s*Sleep\s+(\d+)\s*·\s*Energy\s+(\d+)\s*·\s*Soreness\s+(\d+)\s*·\s*Stress\s+(\d+)\s*·\s*Overall\s+(\d+)/i);
   if (oneLine) {
@@ -3525,7 +3867,15 @@ function parseSessionEmail(text) {
       readiness = { composite: comp ? Number(comp[1]) : null, sleep, energy, soreness, stress, overall };
     }
   }
-  return { day, focus, status, session_rpe: rpeM ? rpeM[1] : '', duration_min: durM ? durM[1] : '', readiness, day_note: note, summary };
+  return { day, focus, status, session_rpe: rpeM ? rpeM[1] : '', duration_min: durM ? durM[1] : '', readiness, day_note: note, summary, who };
+}
+// Does the email's "Athlete" line name this athlete? Loose on purpose (first name, either order).
+function emailNamesAthlete(who, athleteId) {
+  if (!who) return true;
+  const words = x => String(x || '').toLowerCase().replace(/[^a-z\u0600-\u06ff0-9 ]/g, ' ').split(/\s+/).filter(w => w.length > 1);
+  const p = S.programs[athleteId], ath = p && p.athlete;
+  const mine = new Set(words([nameOf(athleteId), ath && ath.firstName, ath && ath.lastName, unslug(athleteId)].join(' ')));
+  return words(who).some(w => mine.has(w));
 }
 let _pendingImport = null;
 function toggleAddSession() {
@@ -3542,6 +3892,7 @@ function parseAndFillSession() {
   $('as-preview').innerHTML = !p.day
     ? '<p style="color:var(--clay);margin-top:10px">Couldn\'t find a "Day N" line — paste the full email (including the Full summary block).</p>'
     : `<table class="meta-table">
+        ${p.who ? `<tr><td class="k">Athlete</td><td class="v">${esc(p.who)}${emailNamesAthlete(p.who, _D && _D.athleteId) ? '' : ' <b style="color:var(--clay)">— not ' + esc(_detailName) + '?</b>'}</td></tr>` : ''}
         <tr><td class="k">Day</td><td class="v">Day ${esc(p.day)}${p.focus ? ' — ' + esc(p.focus) : ''}</td></tr>
         <tr><td class="k">Status</td><td class="v">${esc(p.status)}</td></tr>
         <tr><td class="k">Session RPE</td><td class="v">${esc(p.session_rpe || '—')}</td></tr>
@@ -3558,6 +3909,16 @@ async function submitPastSession(athleteId) {
   if (!completedOn) { alert('Pick the date this session was done (from the email).'); return; }
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const p = _pendingImport;
+  if (!emailNamesAthlete(p.who, athleteId) &&
+      !confirm(`This email is from "${p.who}", but you are on ${_detailName}'s file.\n\nSave it to ${_detailName} anyway?`)) return;
+  // The same day already logged: on the same date the server REPLACES that session (and the
+  // app's set-by-set log for it) with the email's text; a few days apart it is probably the same
+  // session filed twice.
+  const sameDay = (_detailHistory || []).filter(x => Number(x.day) === Number(p.day));
+  const exact = sameDay.find(x => x.completed_on === completedOn);
+  const near = sameDay.filter(x => x !== exact && Math.abs(daysBetween(x.completed_on, completedOn)) <= 7);
+  if (exact && !confirm(`Day ${p.day} on ${prettyDate(completedOn)} is already logged.\n\nSaving REPLACES it with this email's text, and the set-by-set log the app saved for it is lost. Carry on?`)) return;
+  if (!exact && near.length && !confirm(`Day ${p.day} was already logged on ${near.map(x => prettyDate(x.completed_on)).join(', ')}.\n\nIs this a different session? Saving adds a second Day ${p.day}.`)) return;
   const btn = $('as-save'); if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
   const { error } = await sb.rpc('save_session', {
     p_athlete_id: athleteId,
@@ -3634,28 +3995,33 @@ window.copyDashCyclePrompt = copyDashCyclePrompt;
 async function deleteSession(athleteId, day, completedOn) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   if (!confirm(`Delete the Day ${day} log from ${completedOn}?\n\nThis permanently removes that finished session. It cannot be undone.`)) return;
-  const { error } = await sb.from('session_history').delete()
-    .eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn);
-  if (error) { alert('Could not delete: ' + error.message); return; }
+  const res = await sb.from('session_history').delete()
+    .eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn).select('day');
+  const bad = writeFailed(res, 'deleted');
+  if (bad) { alert('Could not delete: ' + bad); return; }
+  toast('Session log deleted');
   refetch(['hist']);
 }
 async function deleteAthlete(athleteId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const name = nameOf(athleteId);
-  if (!confirm(`Delete ALL data for ${name}?\n\nThis removes every finished session AND the live snapshot. It cannot be undone.`)) return;
+  if (!confirm(`Delete ${name}'s training history?\n\nThis permanently removes every finished session, and everything the app keeps for them on the server: habit log, body weight, personal records, the live snapshot. It cannot be undone, except from a backup file.\n\nWhat STAYS: their programme, their login, the coaching log, call logs, Proof contact and wall lines. They stay on the roster. To remove someone completely, ask Claude (it needs the database).`)) return;
   const r1 = await sb.from('session_history').delete().eq('athlete_id', athleteId);
   const r2 = await sb.from('athlete_progress').delete().eq('athlete_id', athleteId);
-  if (r1.error || r2.error) { alert('Could not delete: ' + ((r1.error || r2.error).message)); return; }
-  location.hash = 'athletes';
+  if (r1.error || r2.error) { alert('Could not delete everything: ' + ((r1.error || r2.error).message) + (r1.error ? '' : '\n\nThe finished sessions WERE deleted; the progress snapshot was not.')); hardRefresh(); return; }
+  toast('Training history deleted');
   hardRefresh();
 }
 async function deleteCallLog(id, athleteId, callDate) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   if (!confirm(`Delete the call log from ${callDate}?\n\nThis permanently removes that weekly check-in. It cannot be undone.`)) return;
-  const { error } = await sb.from('call_logs').delete().eq('id', id);
-  if (error) { alert('Could not delete: ' + error.message); return; }
+  const res = await sb.from('call_logs').delete().eq('id', id).select('id');
+  const bad = writeFailed(res, 'deleted');
+  if (bad) { alert('Could not delete: ' + bad); return; }
   delete S.callLogs[athleteId];
+  invalidateDetail();
   render();
+  toast('Call log deleted');
 }
 window.deleteSession = deleteSession;
 window.deleteAthlete = deleteAthlete;
@@ -3701,7 +4067,7 @@ async function renderProof() {
     const hot = c.tier === 'free' && c.days_logged >= UPGRADE_DAYS;
     const cold = !c.days_logged;
     const wa = c.whatsapp ? `<a class="abtn" target="_blank" rel="noopener" href="https://wa.me/${esc(String(c.whatsapp).replace(/[^0-9]/g, ''))}">WhatsApp ↗</a>` : '';
-    const mail = c.email ? `<button class="abtn" onclick="copyText('${esc(c.email)}', this)">✉ copy email</button>` : '';
+    const mail = c.email ? `<button class="abtn" onclick="copyText(${jsq(c.email)}, this)">✉ copy email</button>` : '';
     return `<div class="fun ${hot ? 'hotlead' : ''}">
       <div class="main">
         <div class="nm">${esc(c.shown_as || nameOf(c.athlete_id))}
@@ -3714,8 +4080,8 @@ async function renderProof() {
       </div>
       <div class="days">${c.days_logged}<small>days logged</small></div>
       <div class="acts">${wa}${mail}
-        <button class="abtn" onclick="location.hash='a/${encodeURIComponent(c.athlete_id)}'">open</button>
-        <button class="abtn" style="color:var(--clay)" onclick="forgetContact('${esc(c.athlete_id)}')">forget</button>
+        <button class="abtn" onclick="location.hash=${jsq('a/' + encodeURIComponent(c.athlete_id))}">open</button>
+        <button class="abtn" style="color:var(--clay)" onclick="forgetContact(${jsq(c.athlete_id)})">forget</button>
       </div>
     </div>`;
   }).join('') : '<p class="empty">No signups recorded yet. /proof-signup writes them here.</p>';
@@ -5041,7 +5407,7 @@ function demoStore() {
 }
 
 // --- auth + boot -------------------------------------------------------------
-if (!DEMO) {
+if (!DEMO && sb) {
   $('loginBtn').onclick = () =>
     sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.href.split('#')[0] } });
   $('logoutBtn').onclick = async () => { await sb.auth.signOut(); location.reload(); };
@@ -5049,9 +5415,15 @@ if (!DEMO) {
   $('logoutBtn').onclick = () => { location.search = ''; };
 }
 
-let booted = false;
+let booted = false, bootUser = null;
 async function boot() {
   if (booted) return; booted = true;
+  if (!DEMO && !sb) {
+    $('gate').style.display = 'block';
+    $('gateErr').textContent = 'The sign-in library did not load (the jsDelivr CDN is blocked or offline). Check the connection and reload.';
+    $('loginBtn').disabled = true;
+    return;
+  }
   if (DEMO) {
     $('gate').style.display = 'none';
     $('app').style.display = 'block';
@@ -5069,6 +5441,7 @@ async function boot() {
     booted = false;
     return showGate('That account isn’t the coach account. Try again.');
   }
+  bootUser = session.user.id;
   $('gate').style.display = 'none';
   $('app').style.display = 'block';
   $('who').textContent = session.user.email;
@@ -5080,7 +5453,22 @@ async function boot() {
   loadLevels().then(() => { if (S.ready) render(); });
 }
 function showGate(err) { $('app').style.display = 'none'; $('gate').style.display = 'block'; $('gateErr').textContent = err || ''; }
-if (!DEMO) sb.auth.onAuthStateChange(() => { booted = false; boot(); });
+// supabase-js fires an auth event on load, on every hourly token refresh, when the tab comes
+// back into focus, and on a real sign-in or sign-out. This used to re-run boot() on ALL of them:
+// three full loads on every open, and a full reload and repaint several times an hour that
+// threw away an open exercise editor, a typed coach line, the open days and the place on the
+// page. Now only a change of WHO is signed in rebuilds the page. setTimeout: calling supabase
+// from inside this callback can deadlock its auth lock.
+if (sb) sb.auth.onAuthStateChange((event, session) => {
+  const uid = session && session.user ? session.user.id : null;
+  if (!uid) {
+    if (bootUser) { bootUser = null; booted = false; S.ready = false; showGate('You were signed out. Sign in again to carry on.'); }
+    return;
+  }
+  if (booted && (bootUser === null || bootUser === uid)) return;   // booting now, or the same coach
+  booted = false; S.ready = false;
+  setTimeout(boot, 0);
+});
 boot();
 </script>
 </body>
