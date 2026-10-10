@@ -100,6 +100,14 @@
   const SB_URL = 'https://bvipfipbdcyqnbczjmaq.supabase.co';
   const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';   // public key, same as program.html
   const LOGIN_DOMAIN = 'amirardekani.com', LOGIN_PREFIX = 'tps.';
+  // Persian (۰-۹) and Arabic-Indic (٠-٩) digits, typed on a Farsi keyboard, as 0-9. Every login id
+  // and every password is plain English (the server allows nothing else, and generated passwords end
+  // in digits), so a sign-in typed with Farsi digits always failed. Same fold as coach.html's
+  // typedPassword(), where the passwords are made (2026-10-10).
+  function foldDigits(v) {
+    return String(v || '').replace(/[\u06F0-\u06F9]/g, d => String(d.charCodeAt(0) - 0x06F0))
+                          .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660));
+  }
   const NO_ACCESS = 'این حساب به سیستم آمادگی جسمانی تنیس دسترسی ندارد. اگر فکر می‌کنید اشتباه شده، به امیر پیام بدهید.';
   const NO_NET = 'الان ورود ممکن نشد. اینترنت را بررسی کنید و دوباره امتحان کنید.';
   const ACC = { userId: '', username: '' };
@@ -183,13 +191,16 @@
     form.onsubmit = async e => {
       e.preventDefault();
       setReveal(false);   // a password field must be in the form when it submits, or the save prompt won't come
-      const user = (userEl.value || '').trim().toLowerCase(), pass = passEl.value || '';
+      const user = foldDigits((userEl.value || '').trim().toLowerCase()), pass = passEl.value || '';
       if (!user || !pass) return;
       errBox.hidden = true; btn.disabled = true; btn.textContent = 'در حال ورود…';
       try {
         const sb = await sbReady();
         if (!sb) throw new Error('offline');
-        const { error } = await sb.auth.signInWithPassword({ email: LOGIN_PREFIX + user + '@' + LOGIN_DOMAIN, password: pass });
+        let { error } = await sb.auth.signInWithPassword({ email: LOGIN_PREFIX + user + '@' + LOGIN_DOMAIN, password: pass });
+        // As typed first (an old password is never touched); then with Farsi digits as 0-9 and no stray spaces at the ends.
+        const alt = foldDigits(pass).trim();
+        if (error && alt && alt !== pass) ({ error } = await sb.auth.signInWithPassword({ email: LOGIN_PREFIX + user + '@' + LOGIN_DOMAIN, password: alt }));
         if (error) throw error;
         try { localStorage.setItem('tps_last_user', user); } catch (err) { /* storage blocked */ }
         try {

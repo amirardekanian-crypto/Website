@@ -72,7 +72,10 @@ as a rainy-day fallback. Never commit one; the `.gitignore` entry explains why.
 coach.html (Athletes → an athlete → Create login), keyed on an internal address
 `athlete.<id>@amirardekani.com` that never receives mail. The password is generated, or typed
 there (8-72 printable English characters, no spaces, not the username: `typedPassword()` in
-coach.html and `checkTyped()` in each login function apply the same rule, so change both). The
+coach.html and `checkTyped()` in each login function apply the same rule, so change both). Sign-in
+folds Persian and Arabic-Indic digits to 0-9 (`foldDigits()` in program.html, habits.html and the two
+tennis apps, the same fold as `typedPassword()`): the username always, the password only on a retry
+after the typed one fails (2026-10-10; a Farsi keyboard failed every sign-in before). The
 Testing app and Course tabs work the same way. `demo` is named explicitly as
 public inside `get_program()` so the marketing link still opens.
 
@@ -320,7 +323,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v95` on 2026-10-05). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v96` on 2026-10-10). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

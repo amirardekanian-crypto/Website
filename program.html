@@ -5908,6 +5908,14 @@ function showError(msg, opts) {
    ═══════════════════════════════════════════════════════════════════════════ */
 const LOGIN_DOMAIN = 'amirardekani.com';
 const LOGIN_PREFIX = 'athlete.';
+// Persian (۰-۹) and Arabic-Indic (٠-٩) digits, typed on a Farsi keyboard, as 0-9. Every login id
+// and every password is plain English (the server allows nothing else, and generated passwords end
+// in digits), so a sign-in typed with Farsi digits always failed. Same fold as coach.html's
+// typedPassword(), where the passwords are made (2026-10-10).
+function foldDigits(v) {
+  return String(v || '').replace(/[\u06F0-\u06F9]/g, d => String(d.charCodeAt(0) - 0x06F0))
+                        .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660));
+}
 
 // The athlete_id behind the current session, or '' if nobody is signed in.
 // Reads athlete_identities, which RLS limits to the caller's own row.
@@ -5999,7 +6007,7 @@ function showSignIn() {
     // login form as far as the browser's save prompt is concerned - so leaving it
     // revealed would break the very prompt the block below is trying to earn.
     setReveal(false);
-    const user = (document.getElementById('si-user').value || '').trim().toLowerCase();
+    const user = foldDigits((document.getElementById('si-user').value || '').trim().toLowerCase());
     const pass = document.getElementById('si-pass').value || '';
     if (!user || !pass) return;
 
@@ -6009,10 +6017,13 @@ function showSignIn() {
     try {
       const sb = await _sbReady();
       if (!sb) throw new Error('offline');
-      const { error } = await sb.auth.signInWithPassword({
+      let { error } = await sb.auth.signInWithPassword({
         email: LOGIN_PREFIX + user + '@' + LOGIN_DOMAIN,
         password: pass,
       });
+      // As typed first (an old password is never touched); then with Farsi digits as 0-9 and no stray spaces at the ends.
+      const alt = foldDigits(pass).trim();
+      if (error && alt && alt !== pass) ({ error } = await sb.auth.signInWithPassword({ email: LOGIN_PREFIX + user + '@' + LOGIN_DOMAIN, password: alt }));
       if (error) throw error;
 
       // A fresh sign-in starts from the server (REL-01). The plan saved on this phone

@@ -180,7 +180,11 @@
 //      youtube.com link the phone hands to the YouTube app or the browser, for athletes in Iran whose embed
 //      will not play while those do. shared.js is in the shell and served cache-first, so this bump is what
 //      puts the pop-up's bar on installed phones.
-const CACHE = 'aap-v95';
+// v96: program.html and habits.html changed (2026-10-10, coach.html audit TWIN-5): sign-in reads Persian and
+//      Arabic-Indic digits as 0-9 in the username, and retries once with them folded (and the ends trimmed)
+//      when the password as typed fails. Every password is plain English and ends in digits, so a Farsi
+//      keyboard used to fail every sign-in.
+const CACHE = 'aap-v96';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
