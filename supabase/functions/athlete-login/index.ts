@@ -105,10 +105,12 @@ Deno.serve(async (req: Request) => {
     if (existing?.user_id) {
       const { error } = await admin.auth.admin.updateUserById(existing.user_id, { password });
       if (error) return { athlete_id: athleteId, error: error.message };
-      await admin.from('athlete_identities')
+      const { error: rowErr } = await admin.from('athlete_identities')
         .update({ initial_password: password, password_set_at: new Date().toISOString(), sent_at: null })
         .eq('athlete_id', athleteId);
-      return { athlete_id: athleteId, username: athleteId, password, created: false };
+      // The password IS changed, so it goes back either way; the warning says Logins to send is behind.
+      return { athlete_id: athleteId, username: athleteId, password, created: false,
+        ...(rowErr ? { warning: 'the password works, but it was not stored for Logins to send (' + rowErr.message + '): copy it now' } : {}) };
     }
 
     const { data: made, error: mkErr } = await admin.auth.admin.createUser({
@@ -164,8 +166,10 @@ Deno.serve(async (req: Request) => {
   if (action === 'revoke') {
     const athleteId = String(body.athlete_id || '').trim();
     if (!valid(athleteId)) return json({ error: 'bad athlete_id' }, 400);
-    const { data: existing } = await admin
+    const { data: existing, error: readErr } = await admin
       .from('athlete_identities').select('user_id').eq('athlete_id', athleteId).maybeSingle();
+    // A failed read is not "no login": the coach would be told it was removed while it still works.
+    if (readErr) return json({ error: 'could not check the login: ' + readErr.message }, 500);
     if (!existing?.user_id) return json({ ok: true, revoked: false });
     const { error: delErr } = await admin.auth.admin.deleteUser(existing.user_id);   // cascades the identity row
     if (delErr) return json({ error: 'could not remove the login: ' + delErr.message }, 400);

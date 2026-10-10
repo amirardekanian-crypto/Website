@@ -57,7 +57,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-10: 34 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-10: 38 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -87,6 +87,10 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | spine-unsaved-guard | typed work vs a redraw, another entry, leaving the tab | lost without a word |
 | spine-circuits-count | an exercise used only inside a circuit | counted as unused |
 | walink | intake / funnel WhatsApp links | "@sara_1990" opened wa.me/1990 |
+| session-import-replace | Add past session over one on the same date | the old set-by-set log stayed under the email's text |
+| login-used-mark | Logins to send after the person signed in | every stored password looked unsent |
+| calls-load-fail | call logs fail to load | the Calls tab said "No call logs yet" |
+| route-unknown-sub | `#a/<id>/<unknown>` | "No athlete in the store" |
 
 ## Adding a scenario
 

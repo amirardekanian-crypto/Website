@@ -67,9 +67,9 @@
   a { color: inherit; }
   :focus { outline: none; }
   :focus-visible { outline: 2px solid var(--court); outline-offset: 2px; border-radius: 6px; }
-  /* On the dark green surfaces a green ring is invisible. */
-  .topbar :focus-visible, .board :focus-visible, .cycbar :focus-visible, .wline.coachline :focus-visible,
-  .tab.active:focus-visible, .btn.primary:focus-visible { outline-color: #fff; }
+  /* On the dark green surfaces a green ring is invisible. The ring sits 2px OUTSIDE the element, over what
+     surrounds it, so a green button or the active tab on a light page keeps the green ring (white vanished there). */
+  .topbar :focus-visible, .board :focus-visible, .cycbar :focus-visible, .wline.coachline :focus-visible { outline-color: #fff; }
 
   .hd { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: .01em; }
   .mono { font-family: 'Space Mono', ui-monospace, Menlo, monospace; }
@@ -1300,10 +1300,12 @@ async function athleteLoginAction(athleteId, action, password) {
   assemble();
   render();
 
-  if (action === 'revoke') { toast('Login removed'); return; }
+  if (action === 'revoke') { toast(data.revoked === false ? 'There was no login to remove' : 'Login removed'); return; }
   // The password and its message now sit on the athlete's File tab (and under "Logins to send")
   // with Copy and Mark sent, so nothing depends on a dialog that is gone once dismissed.
   copyText(loginMessage(data.username, data.password));
+  // Unless the server could not store it (athlete-login v6 says so): then this is the only place it is shown.
+  if (data.warning) { alert('Password ' + (password ? 'changed' : 'reset') + ' for ' + data.username + ', but ' + data.warning + '.\n\nPassword: ' + data.password + '\n\nThe WhatsApp message is copied to your clipboard.'); return; }
   toast((data.created ? 'Login created' : password ? 'Password changed' : 'Password reset') + ' — the message is copied; send it on WhatsApp');
 }
 
@@ -1404,9 +1406,11 @@ async function downloadBackup(btn) {
   const out = {
     exported_at: new Date().toISOString(),
     project: SB_URL,
-    note: 'Full export of the AA coaching database, taken from the coach dashboard. ' +
-          'Restore by importing each array back into its table of the same name. ' +
-          'Unsent login passwords (initial_password) are blanked on purpose: reset a login to issue a new one.',
+    note: 'Export of the rows of every table in BACKUP_TABLES, taken from the coach dashboard: data only, no ' +
+          'schema, functions or policies (those are in supabase/*.sql). See "could_not_read" for anything that could not be read. ' +
+          'A restore is not a plain import: login tables point at auth users that must exist first. ' +
+          'Unsent login passwords (initial_password) are blanked on purpose: reset a login to issue a new one. ' +
+          'Keep the last 12 weekly files only (python scripts/prune_backups.py <folder>).',
     tables: {},
   };
   const problems = [];
@@ -1522,6 +1526,7 @@ async function openCoachingLog(athleteId) {
 // used to make adding a workout a two-file job.
 function pickLibraryFile(kind) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (LOAD_ERR.library) { alert('The library did not load (' + LOAD_ERR.library + '), so nothing can be published: its categories are unknown. Tap ↻ Refresh first.'); return; }
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'application/json,.json';
@@ -2068,6 +2073,8 @@ function route() {
     const isSub = SUBTABS.some(t => t.id === maybeSub) || RETIRED_SUBS.includes(maybeSub);
     let id;
     try { id = decodeURIComponent(isSub ? rest.slice(0, cut) : rest); } catch (e) { id = isSub ? rest.slice(0, cut) : rest; }
+    // Athlete ids never contain '/': an unknown screen name after the id opens the file on its first screen.
+    if (!isSub && cut > 0 && id.indexOf('/') > 0) id = id.slice(0, id.indexOf('/'));
     return { view: 'detail', id, sub: isSub ? maybeSub : '' };
   }
   return { view: TABS.some(t => t.id === h) ? h : 'today' };
@@ -2159,7 +2166,7 @@ function renderToday() {
           <div class="n">${onCourt}<small>/${habAthletes.length}</small></div><div class="l">On court today</div></a>
         <a class="counter" href="#today" onclick="scrollPanel(event,'wallPanel')">
           <div class="n">${wallToday}</div><div class="l">Wall lines today</div></a>
-        <a class="counter" href="#athletes"><div class="n">${sessions7}</div><div class="l">Sessions this week</div></a>
+        <a class="counter" href="#athletes"><div class="n">${sessions7}</div><div class="l">Sessions, last 7 days</div></a>
         <a class="counter ${waiting ? 'hot' : ''}" href="#today" onclick="scrollPanel(event,'needPanel')">
           <div class="n">${waiting}</div><div class="l">Notes to read</div></a>
       </div>
@@ -2394,7 +2401,8 @@ async function startQuestRun() {
   const ids = [...document.querySelectorAll('#questPanel input[type=checkbox]:checked')].map(i => i.value);
   if (!ids.length) return;
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!confirm(`Start a quest week from today with: ${ids.join(', ')}?`)) return;
+  const qTitle = id => { const q = questPool().find(x => x.id === id); return q && (q.title || q.name) ? (q.title || q.name) : id; };
+  if (!confirm(`Start a quest week from today (7 days) with:\n\n${ids.map(id => '• ' + qTitle(id)).join('\n')}?`)) return;
   const { error } = await sb.rpc('set_quests', { p_start: todayKey(), p_ids: ids });
   if (error) { alert('Could not start: ' + error.message); return; }
   _questPicked.clear();
@@ -2724,7 +2732,7 @@ function renderRoster() {
     const subBits = [];
     if (a.finished) subBits.push(`${a.finished} session${a.finished === 1 ? '' : 's'} · last ${a.lastSession ? timeAgo(a.lastSession + 'T12:00:00') : '—'}`);
     else if (a.tier === 'coached') subBits.push('no sessions yet');
-    if (a.isHab) subBits.push(`Proof ${a.hab7}/7 this week`);
+    if (a.isHab) subBits.push(`Proof ${a.hab7}/7 last 7 days`);
     if (!a.finished && !a.isHab) subBits.push('not started');
     const reasons = rosterReasons(a).concat(a.quietFlags || []);
     const silent = a.isHab && a.habGap >= QUIET_HABIT_DAYS;
@@ -3751,6 +3759,7 @@ function liveSnapshotHtml(D) {
 // three of which rendered the same program days three different ways — so the
 // page opened at four thousand pixels and buried the only thing worth reading.
 let _detailName = '', _detailHistory = [], _detailCallLogs = [], _D = null;
+const _callErr = {};   // athlete id -> why their call logs did not load (cleared when they do)
 const SUBTABS = [
   { id: 'work',  label: 'The work' },
   { id: 'proof', label: 'Proof' },
@@ -3780,8 +3789,8 @@ async function renderDetail(athleteId, sub) {
       else {
         const r = await sb.from('call_logs').select('*').eq('athlete_id', athleteId).order('call_date', { ascending: false });
         // Cached only when it really loaded: a failed read used to stick as "No call logs yet".
-        if (r && !r.error) callLogs = S.callLogs[athleteId] = r.data || [];
-        else { callLogs = []; toast('Call logs did not load: ' + ((r && r.error && r.error.message) || 'no answer')); }
+        if (r && !r.error) { callLogs = S.callLogs[athleteId] = r.data || []; delete _callErr[athleteId]; }
+        else { callLogs = []; _callErr[athleteId] = (r && r.error && r.error.message) || 'no answer'; toast('Call logs did not load: ' + _callErr[athleteId]); }
       }
     }
     const lib = await exLib();
@@ -3871,7 +3880,7 @@ function proofTabHtml(D) {
       ${lv ? `<div class="big">LV ${lv}<br><small>season level (server)</small></div>` : ''}
       <div>
         ${dots}
-        <div class="meta" style="margin-top:6px">last 14 days · ${a.hab7}/7 this week · ${a.habToday ? 'logged today' : a.habLast ? 'last log ' + timeAgo(a.habLast + 'T12:00:00') : 'never logged'}</div>
+        <div class="meta" style="margin-top:6px">last 14 days · ${a.hab7}/7 in the last 7 days · ${a.habToday ? 'logged today' : a.habLast ? 'last log ' + timeAgo(a.habLast + 'T12:00:00') : 'never logged'}</div>
       </div>
       ${o && o.title ? `<div class="meta">Wears <b>${esc(o.title)}</b></div>` : ''}
     </div>
@@ -3933,7 +3942,9 @@ function callsTabHtml(D) {
         ${ansHtml}
         <div style="margin-top:10px"><button class="btn sm danger" onclick="deleteCallLog(${jsq(l.id)},${jsq(athleteId)},${jsq(l.call_date)})">Delete</button></div>
       </div></details>`;
-  }).join('') : '<p class="empty">No call logs yet.</p>';
+  }).join('') : _callErr[D.athleteId]
+    ? `<p class="empty" style="color:var(--clay-ink)">Call logs did not load (${esc(_callErr[D.athleteId])}). Tap ↻ Refresh to try again.</p>`
+    : '<p class="empty">No call logs yet.</p>';
   const cycleNums = [...new Set(callLogs.map(l => (String(l.week||'').match(/Cycle\s*(\d+)/i)||[])[1]).filter(Boolean))].sort((a,b)=>a-b);
   const cycleCtl = cycleNums.length ? `<span style="display:flex;align-items:center;gap:6px">
       <select id="dashCycleSel" aria-label="Cycle" style="background:var(--card);border:1px solid var(--line);border-radius:999px;font-size:13px;padding:5px 10px">${cycleNums.map((n, i) => `<option value="${esc(n)}"${i === cycleNums.length - 1 ? ' selected' : ''}>Cycle ${esc(n)}</option>`).join('')}</select>
@@ -3978,7 +3989,7 @@ function fileTabHtml(D) {
         </div>` : ''}
         ${_athPwOpen === athleteId ? `
         <div class="pwform">
-          <input id="athPw" class="pwin" placeholder="new password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false"
+          <input id="athPw" class="pwin" aria-label="New password (empty to generate one)" placeholder="new password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false"
                  onkeydown="if(event.key==='Enter') athleteSavePw(${jsq(athleteId)},'reset')">
           <button class="btn sm primary" onclick="athleteSavePw(${jsq(athleteId)},'reset')">Save password</button>
           <button class="btn sm" onclick="closeAthletePw()">Cancel</button>
@@ -3995,7 +4006,7 @@ function fileTabHtml(D) {
           (it waits under “Logins to send” on the Athletes tab until you mark it sent).
         </p>
         <div class="pwform">
-          <input id="athPw" class="pwin" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false"
+          <input id="athPw" class="pwin" aria-label="Password (empty to generate one)" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false"
                  onkeydown="if(event.key==='Enter') athleteSavePw(${jsq(athleteId)},'create')">
           <button class="btn sm primary" onclick="athleteSavePw(${jsq(athleteId)},'create')">Create login</button>
           <p class="pwhint">${PW_HINT}</p>
@@ -4733,7 +4744,7 @@ function renderAssess() {
         : (r.initial_password ? `<button class="btn sm primary as-copy" data-u="${esc(r.username)}">Copy message</button><button class="btn sm as-sent" data-u="${esc(r.username)}">Mark sent</button>` : '') +
           `<button class="btn sm as-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm as-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}</span>
     </div>` + (_assessPw === r.username ? `<div class="pwform">
-      <input class="pwin as-pwin" placeholder="${r.revoked_at ? 'password' : 'new password'}, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <input class="pwin as-pwin" aria-label="Password (empty to generate one)" placeholder="${r.revoked_at ? 'password' : 'new password'}, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false">
       <button class="btn sm primary as-pwsave" data-act="${r.revoked_at ? 'restore' : 'reset'}" data-u="${esc(r.username)}">${r.revoked_at ? 'Restore' : 'Save password'}</button>
       <button class="btn sm as-pwcancel">Cancel</button>
       <p class="pwhint">${PW_HINT}${r.revoked_at ? '' : ' The old password stops working straight away.'}</p>
@@ -4742,9 +4753,9 @@ function renderAssess() {
   let html = `<div class="controls"><span class="empty" style="align-self:center">Logins for the tennis testing app, <a href="${ASSESS_URL}" target="_blank" rel="noopener">${ASSESS_URL}</a>. One login per buyer; an academy's coaches share it.</span></div>`;
   html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New login</span></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <input id="asUser" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
-      <input id="asLabel" placeholder="note for you: who bought it" autocomplete="off" style="${field}">
-      <input id="asPass" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field};font-family:'Space Mono',monospace">
+      <input id="asUser" aria-label="Username" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
+      <input id="asLabel" aria-label="Note for you" placeholder="note for you: who bought it" autocomplete="off" style="${field}">
+      <input id="asPass" aria-label="Password (empty to generate one)" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field};font-family:'Space Mono',monospace">
       <button class="btn primary sm" id="asCreate">Create login</button>
     </div>
     <p class="psub" style="margin:10px 0 0">Creates the account and copies a Farsi WhatsApp message with the link, username and password. ${PW_HINT}</p></section>`;
@@ -4872,7 +4883,7 @@ function renderCourse() {
         : (r.initial_password ? `<button class="btn sm primary tp-copy" data-u="${esc(r.username)}">Copy message</button><button class="btn sm tp-sent" data-u="${esc(r.username)}">Mark sent</button>` : '') +
           `<button class="btn sm tp-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm tp-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}</span>
     </div>` + (_coursePw === r.username ? `<div class="pwform">
-      <input class="pwin tp-pwin" placeholder="${r.revoked_at ? 'password' : 'new password'}, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <input class="pwin tp-pwin" aria-label="Password (empty to generate one)" placeholder="${r.revoked_at ? 'password' : 'new password'}, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false">
       <button class="btn sm primary tp-pwsave" data-act="${r.revoked_at ? 'restore' : 'reset'}" data-u="${esc(r.username)}">${r.revoked_at ? 'Restore' : 'Save password'}</button>
       <button class="btn sm tp-pwcancel">Cancel</button>
       <p class="pwhint">${PW_HINT}${r.revoked_at ? '' : ' The old password stops working straight away.'}</p>
@@ -4881,9 +4892,9 @@ function renderCourse() {
   let html = `<div class="controls"><span class="empty" style="align-self:center">Logins for the Tennis Performance System course (Level 2), <a href="${COURSE_URL}" target="_blank" rel="noopener">${COURSE_URL}</a>. One login per buyer.</span></div>`;
   html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New login</span></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <input id="tpUser" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
-      <input id="tpLabel" placeholder="note for you: who bought it" autocomplete="off" style="${field}">
-      <input id="tpPass" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field};font-family:'Space Mono',monospace">
+      <input id="tpUser" aria-label="Username" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
+      <input id="tpLabel" aria-label="Note for you" placeholder="note for you: who bought it" autocomplete="off" style="${field}">
+      <input id="tpPass" aria-label="Password (empty to generate one)" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field};font-family:'Space Mono',monospace">
       <button class="btn primary sm" id="tpCreate">Create login</button>
     </div>
     <p class="psub" style="margin:10px 0 0">Creates the account and copies a Farsi WhatsApp message with the link, username, password and install steps. ${PW_HINT}</p></section>`;
@@ -5388,12 +5399,12 @@ function qualityPanels(idx, byId) {
   let h = `<section class="panel" style="margin-bottom:16px"><details${nAp < quals.length ? ' open' : ''}><summary class="arch-toggle">The ten qualities · ${nAp} of ${quals.length} approved</summary>
     <p class="psub" style="margin:10px 0">What each day card on Home says it builds. A quality reaches a phone only when it is approved <b>and</b> the day's exercises carry it. Athletes see the words, never your numbers. The court line shows to tennis and padel players only.</p>` +
     quals.map(q => `<div class="credrow" style="display:block;padding:10px 0">
-      <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;align-items:start">
-        <div><input data-qf="${q.id}:name" value="${esc(q.name)}" style="${field};font-weight:700"><div class="muted" style="font-size:12px;margin-top:4px">${esc(q.family || 'no picture')} · ${q.status === 'approved' ? '<b style="color:#1E7A55">approved</b>' : 'draft'}</div></div>
+      <div style="display:grid;grid-template-columns:minmax(0,140px) minmax(0,1fr);gap:8px;align-items:start">
+        <div><input data-qf="${q.id}:name" aria-label="${esc(q.name)}: name" value="${esc(q.name)}" style="${field};font-weight:700"><div class="muted" style="font-size:12px;margin-top:4px">${esc(q.family || 'no picture')} · ${q.status === 'approved' ? '<b style="color:#1E7A55">approved</b>' : 'draft'}</div></div>
         <div style="display:grid;gap:6px">
-          <input data-qf="${q.id}:line" value="${esc(q.line || '')}" placeholder="One line, for everyone" style="${field}">
-          <input data-qf="${q.id}:tennis" value="${esc(q.tennis || '')}" placeholder="On court (tennis and padel only)" style="${field}">
-          <input data-qf="${q.id}:tests" value="${esc((q.tests || []).join(', '))}" placeholder="How we measure it (comma)" style="${field}">
+          <input data-qf="${q.id}:line" aria-label="${esc(q.name)}: one line" value="${esc(q.line || '')}" placeholder="One line, for everyone" style="${field}">
+          <input data-qf="${q.id}:tennis" aria-label="${esc(q.name)}: on court" value="${esc(q.tennis || '')}" placeholder="On court (tennis and padel only)" style="${field}">
+          <input data-qf="${q.id}:tests" aria-label="${esc(q.name)}: how it is measured" value="${esc((q.tests || []).join(', '))}" placeholder="How we measure it (comma)" style="${field}">
           <div style="display:flex;gap:8px">${q.status === 'draft'
             ? `<button class="btn primary sm qm-save" data-q="${q.id}" data-ap="1">Approve</button><button class="btn sm qm-save" data-q="${q.id}">Save draft</button>`
             : `<button class="btn primary sm qm-save" data-q="${q.id}">Save</button><button class="btn sm qm-save" data-q="${q.id}" data-ap="0" title="Takes it off every day card">Move back to draft…</button>`}</div>

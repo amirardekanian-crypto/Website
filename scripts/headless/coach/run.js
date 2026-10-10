@@ -646,6 +646,28 @@ S['login-used-mark'] = async (b) => {
   return r;
 };
 
+S['calls-load-fail'] = async (b) => {
+  const r = { id: 'calls-load-fail', title: 'Call logs fail to load: the Calls tab says so (it said "No call logs yet")', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'today' });
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'from', name: 'call_logs', op: 'select', message: 'fixture: offline', times: 1 }); });
+  await L.go(page, 'a/ava_test/calls');
+  const txt = await page.locator('#content').innerText();
+  check(r, 'the tab names the failure', /Call logs did not load/.test(txt) && !/No call logs yet/.test(txt), txt.slice(0, 300));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['route-unknown-sub'] = async (b) => {
+  const r = { id: 'route-unknown-sub', title: 'A link with an unknown screen name opens the athlete, not "no athlete"', checks: [] };
+  const { page } = await L.openCoach(b, { hash: 'a/ava_test/nonsense' });
+  const st = await page.evaluate(() => route());
+  check(r, 'route reads the athlete id', st.view === 'detail' && st.id === 'ava_test', st);
+  check(r, 'the file opens', !/No athlete/.test(await page.locator('#content').innerText()), '');
+  await page.context().close();
+  return r;
+};
+
 // ── 19. Clear the note backlog ───────────────────────────────────────────────
 S['backlog-clear'] = async (b) => {
   const r = { id: 'backlog-clear', title: 'Today → Needs you → Clear older notes', checks: [] };

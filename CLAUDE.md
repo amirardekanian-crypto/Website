@@ -317,7 +317,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
 - **Auth events rebuild the page only when the signed-in user changes** (token refreshes and tab refocus
   used to reload everything and throw away typed work).
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (34 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (38 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - supabase-js is pinned (2.117.3); bump it only with the harness's `reallib.js` run.
 
 ## Site layout (GitHub Pages → amirardekani.com)

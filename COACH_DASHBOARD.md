@@ -302,11 +302,11 @@ seven presence dots.
 **A flagged row says why, in words:** the reasons in §3's table, from the same function.
 
 **Above the roster:** *Create N missing logins* (coached athletes who have trained and have no
-login), then **Logins to send** (open while anything waits: each unsent password with Copy
-message and Mark sent; *signed in with it* marks one the person has already used, which is safe to
-mark sent; the Course and Testing app lists show the same mark), then a folded **Coach tools** line: *↑ Publish programme file*, *↑ Add
-coaching logs* and *⤓ Backup*, with when this computer last took a backup. (The secret-link tools
-are gone: the links were retired on 2026-09-07.)
+login), then a folded **Coach tools** line: *↑ Publish programme file*, *↑ Add coaching logs* and
+*⤓ Backup*, with when this computer last took a backup, then **Logins to send** (open while three
+or fewer wait, folded above that: each unsent password with Copy message and Mark sent; *signed in
+with it* marks one the person has already used, which is safe to mark sent; the Course and Testing
+app lists show the same mark). (The secret-link tools are gone: the links were retired on 2026-09-07.)
 
 - **↑ Publish programme file** checks that the file name matches its `athlete.id`, shows the live
   programme against the file (cycle, days, last saved, by whom) and warns in capitals when the live
