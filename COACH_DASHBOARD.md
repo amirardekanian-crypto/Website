@@ -315,7 +315,11 @@ app lists show the same mark). (The secret-link tools are gone: the links were r
   replaces one: the server copy is the record (publish_cycle splices into it, `/cycle-report`
   appends its Debrief). Until 2026-10-10 it replaced them wholesale.
 - **⤓ Backup** pages every table in key order, de-duplicates, blanks the unsent login passwords
-  (`initial_password`) and says **INCOMPLETE** when a table could not be read.
+  (`initial_password`) and says **INCOMPLETE** when a table could not be read. The file is the rows
+  only (no schema, functions or policies: those are `supabase/*.sql`), and a restore is not a plain
+  import, because the login tables point at sign-in accounts that must exist first. Keep the last 12
+  weekly files and delete older ones: `python scripts/prune_backups.py <folder>` lists them, `--delete`
+  removes them (the privacy notice promises a deleted record leaves the backups within about three months).
 
 ---
 
@@ -571,6 +575,7 @@ it in this file.
 | `call_logs` | Weekly check-ins (loaded per athlete, on open) |
 | `program_versions` | Version history: the programme as it was before each save (the `programs` trigger keeps 20) |
 | `coaching_logs` | The coach-only log on the File tab (loaded on open) |
+| `coaching_log_versions` | Every earlier text of a coaching log, kept by a trigger (stage47); only the backup reads it |
 | `library`, `library_categories` | The Library tab |
 | `exercises`, `exercise_coach`, `qualities` | The Exercises tab (the Spine) |
 | `hab_intake` via `intake_list()` | The Intake tab |

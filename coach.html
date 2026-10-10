@@ -1379,11 +1379,11 @@ window.bulkCreateLogins = bulkCreateLogins;
 // (tps_content, course_en), the exercise library (exercises, exercise_coach, qualities), the
 // testing app's content and accounts (assess_content, assess_accounts) and tps_accounts.
 // Left out on purpose: assess_publish_keys and tps_publish_keys (hashes of revoked keys).
-// STILL NOT BACKED UP, each needs a database change first: assess_players, assess_notes and
-// assess_results (only the member who owns them can read them, so the coach would read ZERO
-// rows and the backup would look fine while empty) and hab_season_results (no SELECT grant
-// for signed-in users, so it is listed under "Could NOT read" every time; it is empty until
-// the first season closes).
+// STILL NOT BACKED UP, each needs a database change first (Amir's call: the coach reading buyers'
+// player data): assess_players, assess_notes and assess_results (only the member who owns them can
+// read them, so the coach would read ZERO rows and the backup would look fine while empty).
+// hab_season_results got its SELECT grant in stage46 (2026-10-10); coaching_log_versions (stage47)
+// is every earlier text of a coaching log, kept by a trigger.
 const BACKUP_TABLES = [
   'programs', 'program_versions', 'coaching_logs', 'athlete_identities',
   'athlete_progress', 'session_history', 'messages', 'hab_notes', 'hab_contacts',
@@ -1392,7 +1392,7 @@ const BACKUP_TABLES = [
   'library', 'library_categories', 'library_sessions',
   'affiliates',
   'tps_content', 'course_en', 'tps_accounts', 'assess_content', 'assess_accounts',
-  'exercises', 'exercise_coach', 'qualities',
+  'exercises', 'exercise_coach', 'qualities', 'coaching_log_versions',
 ];
 
 const PASSWORD_TABLES = ['athlete_identities', 'tps_accounts', 'assess_accounts'];
@@ -4378,6 +4378,8 @@ async function renderProof() {
 function setBoardScope(s) { _boardScope = s; renderProof(); }
 async function forgetContact(athleteId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  // Without the programmes nobody's tier is known, and a coached client would look like a free signup.
+  if (LOAD_ERR.programs) { alert('The programmes did not load, so it is not known whether ' + athleteId + ' is a coached client. Forget is switched off until ↻ Refresh loads them.'); return; }
   if ((S.ath[athleteId] || {}).tier === 'coached') { alert('This is a coached athlete. Forget would delete their training app data (records, body weight, check-ins), so it is not offered for them.'); return; }
   // Says exactly what forget_contact() deletes (checked against the live function, 2026-09-26: this
   // used to say "Their logs and board place are untouched", the opposite of what it does).
