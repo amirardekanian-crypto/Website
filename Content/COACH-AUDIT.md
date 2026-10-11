@@ -267,14 +267,14 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-191 findings. Fixed 123 · Partly 46 · Open 9 · Your call 12 · Not a bug 1.
+191 findings. Fixed 123 · Partly 47 · Open 8 · Your call 12 · Not a bug 1.
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
 | high | 22 | 8 | 0 | 3 | 0 |
 | medium | 53 | 26 | 2 | 7 | 0 |
-| low | 36 | 12 | 7 | 2 | 1 |
+| low | 36 | 13 | 6 | 2 | 1 |
 
 ### The work and the ✎ editor (WORK)
 
@@ -289,7 +289,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | WORK-7 | medium | Editor writes rx that breaks the contract: duration under Reps, rep ranges, sets silently dropped, numbers turned to strings | Fixed | The editor checks the fields before saving: reps must be one whole number, a time must be a real duration and a distance needs a unit. It also checks sets and RPE (6 to 10), stores numbers as numbers and clears the old label when the dose type changes. |  |
 | WORK-8 | medium | Every re-render throws away the work tab's state: open editor with typed values, expanded days, picked session, scroll | Fixed | A redraw no longer resets your place: open days and the chosen session stay for the same athlete, an open editor comes back with what you typed, and routine sign-in refreshes no longer reload the page. |  |
 | WORK-9 | medium | Sessions from the previous cycle are judged against the new cycle's plan | Partly | A session trained before the current cycle began now shows 'previous cycle' instead of a verdict, plus a banner saying it is being compared with the current plan. | The rows underneath are still compared against the new cycle's plan. Amir still has to choose: hide that comparison, or compare the session with the archived previous cycle. |
-| WORK-10 | low | Version history: UTC times, a misleading 'saved' date, no athlete or time in the confirm, restore by id only, 20-version cap | Partly | Version history shows times in your own time zone, the restore confirm names the athlete and the time, a version from a different athlete is refused, and the list says only the last 20 are kept. | There is still no one-tap Undo after a save and no view of which exercises a version changes. Whether 20 versions per athlete is enough is still Amir's call. |
+| WORK-10 | low | Version history: UTC times, a misleading 'saved' date, no athlete or time in the confirm, restore by id only, 20-version cap | Partly | Version history shows times in your own time zone, the restore confirm names the athlete and the time, a version from a different athlete is refused, and since stage52 (your answer: about two cycles back) it keeps the last 20 saves and everything since the previous cycle began, at most 150. | There is still no one-tap Undo after a save and no view of which exercises a version changes. |
 | WORK-11 | low | dayTargetC drops the week note that program.html's dayRpe applies (latent drift) | Open |  | On a lowered day, the dashboard still works out the day's RPE target without the week-1 or back-off-week note that the athlete's app applies, so the two can show different targets. |
 | WORK-12 | low | 'kg' is appended to free-text loads | Fixed | 'kg' is added after a load only when it is a number, so 'red band' or 'BW+10' are shown exactly as typed. |  |
 | WORK-13 | low | The programs table, its version trigger and program_versions exist only in the live database | Fixed | supabase/stage44_programs_record.sql now records the programmes table, the version-history table, their access rules and the history trigger exactly as they are in the live database. |  |
@@ -528,7 +528,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | SERVER-9 | low | Five remaining direct writes cannot tell a write that changed nothing from a success; Delete training history is two separate deletes | Fixed | Mark sent (athletes, course, testing app) and Library Hide/Publish confirm a row really changed. Delete training history is now one server call, `coach_delete_training_history()` (stage48): the sessions and the progress snapshot go together or not at all, and the counts come back. (2026-10-10, second session) |  |
 | SERVER-10 | low | Reads that are not paged and full-table refetches: nothing is at the cap yet, but several tables are heading there | Partly | Mark read and Clear older notes update the page's own copy instead of re-downloading every session, and the Spine tables are read in pages. | The Library list is still read in one request (small today, far from the cap). |
 | SERVER-11 | low | Login edge functions ignore the error on their follow-up table write after a successful ban or password change | Fixed | All three login functions (athlete v6, course and testing app v3) report a failed account read and a failed bookkeeping write instead of ignoring it. |  |
-| SERVER-12 | low | Version history keeps 20 entries per athlete, and an SQL writer that does not set updated_by inherits the previous author's name | Open |  | Version history still keeps only the last 20 saves per athlete (how many to keep is your call), and a database edit with no signed-in user still shows the previous author's name. |
+| SERVER-12 | low | Version history keeps 20 entries per athlete, and an SQL writer that does not set updated_by inherits the previous author's name | Partly | Version history now keeps the last 20 saves and everything since the previous cycle began, at most 150 (stage52, your answer). | A database edit with no signed-in user still shows the previous author's name. |
 | SERVER-13 | low | Core server objects behind coach.html have no source in the repo; the manual describes an older contract; the coach email is hard-coded in about 25 places | Partly | The programme tables, their access rules, the coach check and the version-history trigger are now written down in the repo (stage44), and the manual was rewritten against the code. | The athlete's programme door and the 'which athlete is this' function still have no copy in the repo, and the coach email is still typed into many places. |
 | SERVER-14 | low | The coach check trusts the email claim alone; whether public sign-up is open cannot be verified from here | Open |  | The coach check still trusts the email address alone; someone needs to confirm in the Supabase dashboard that public sign-up is off, and optionally tie the check to your account id. |
 
@@ -628,7 +628,7 @@ You answered eight of the twelve questions in §7. This table is kept up to date
 | 4 | Stored first passwords | Clear one automatically once the person has signed in with it | **Done** (stage51). Today 3 course buyers had a used password stored; the backfill clears them. |
 | 5 | One-step full erasure | Athletes **and** buyers | to build |
 | 6 | Testing-app players, notes and results in the backup | Yes, add the read permission | **Done** (stage50, applied 2026-10-11; in `BACKUP_TABLES`) |
-| 7 | How many programme versions to keep | The current and the previous cycle | to build |
+| 7 | How many programme versions to keep | The current and the previous cycle | Written and tested (stage52). **Waits for you to run it** in the SQL editor: it contains a delete. |
 | 8 | Sessions from the previous cycle | Just label them, as now | decided: no change |
 | 9 | Sessions with no duration | not asked yet | open |
 | 10 | Affiliate commission tracking | not asked yet | open |

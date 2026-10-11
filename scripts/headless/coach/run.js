@@ -472,8 +472,12 @@ S['version-restore'] = async (b) => {
   await ed.locator('.exed-acts button', { hasText: 'Save' }).click();
   await L.settle(page, 600);
   await L.go(page, 'a/ava_test/file');
+  const nHist = await L.nCalls(page);
   await page.locator('details.rawlog summary', { hasText: 'Version history' }).click();
   await page.locator('#pvlist .pvrow').first().waitFor();
+  const histReads = (await L.callsSince(page, nHist)).filter(c => c.name === 'program_versions' && c.op === 'select');
+  check(r, 'the list asks for up to 150 saves (stage52 keeps the previous cycle, not 20)', histReads.length === 1 && histReads[0].mods.limit === 150, histReads.map(c => c.mods.limit));
+  check(r, 'the caption says what is kept', /last 20 saves, and every save since the previous cycle began/.test(await page.locator('#pvlist').innerText()), (await page.locator('#pvlist').innerText()).slice(0, 300));
   const n0 = await L.nCalls(page);
   await page.locator('#pvlist .pvrow button').first().click();
   await L.settle(page, 800);

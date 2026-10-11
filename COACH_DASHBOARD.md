@@ -450,7 +450,8 @@ or work), per side, RPE, tempo, rest and your note. **Save** then:
 
 Until 2026-10-10 Save wrote the whole programme as it was when the page opened, which could put an
 old cycle back over a newly published one, and after a publish or restore an edit could land on a
-different exercise. **Version history** (File tab) lists the last 20 saves in your own time zone;
+different exercise. **Version history** (File tab) lists the saves kept for that athlete in your own time zone
+(the last 20 always, and every save since the previous cycle began, never more than 150: stage52, 2026-10-11);
 each line is the programme just before that save, and Restore checks it belongs to this athlete.
 
 ### The three numbers, and the charts
@@ -622,7 +623,7 @@ it in this file.
 | `xp_rules` | The quest pool and the live runs |
 | `seasons` | Which season, and what day of it |
 | `call_logs` | Weekly check-ins (loaded per athlete, on open) |
-| `program_versions` | Version history: the programme as it was before each save (the `programs` trigger keeps 20) |
+| `program_versions` | Version history: the programme as it was before each save (the `programs` trigger keeps the last 20 and every save since the previous cycle began, at most 150) |
 | `coaching_logs` | The coach-only log on the File tab (loaded on open) |
 | `coaching_log_versions` | Every earlier text of a coaching log, kept by a trigger (stage47); only the backup reads it |
 | `library`, `library_categories` | The Library tab |

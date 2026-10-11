@@ -3,7 +3,7 @@
 #
 # Starts a THROWAWAY Postgres cluster (a temp folder, a unix socket, nothing on the network), loads a replica of the live
 # tables (supabase/tests/replica_schema.sql), applies supabase/stage45_forget_contact_guard.sql, stage48_coach_one_transaction.sql,
-# stage49_spine_versions.sql, stage50_assess_coach_read.sql and stage51_clear_used_passwords.sql, runs supabase/tests/stage48_49_test.sql (about 100 assertions:
+# stage49_spine_versions.sql, stage50_assess_coach_read.sql, stage51_clear_used_passwords.sql and stage52_version_history_two_cycles.sql, runs supabase/tests/stage48_49_test.sql (about 100 assertions:
 # the coach check, grants, row-level security, atomicity, malformed payloads, the version trigger, Forget's guard, the testing
 # app's tables, the stored-password trigger) and then two-session tests of the row
 # lock: a dashboard save must WAIT for an in-flight write by Claude's /spine and then see it, instead of overwriting it,
@@ -39,7 +39,7 @@ as_pg "$PGBIN/pg_ctl -D $DATA -o '-p $PORT -c listen_addresses= -c unix_socket_d
 P="psql -h $DATA -p $PORT -U postgres -qAt -v ON_ERROR_STOP=1"
 $P -d postgres -c "create database coachtest" || exit 2
 P="$P -d coachtest"
-for f in supabase/tests/replica_schema.sql supabase/stage45_forget_contact_guard.sql supabase/stage48_coach_one_transaction.sql supabase/stage49_spine_versions.sql supabase/stage50_assess_coach_read.sql supabase/stage51_clear_used_passwords.sql; do
+for f in supabase/tests/replica_schema.sql supabase/stage45_forget_contact_guard.sql supabase/stage48_coach_one_transaction.sql supabase/stage49_spine_versions.sql supabase/stage50_assess_coach_read.sql supabase/stage51_clear_used_passwords.sql supabase/stage52_version_history_two_cycles.sql; do
   (cd "$repo" && $P -f "$f" >/dev/null) || { echo "test_spine_sql: loading $f failed"; exit 2; }
 done
 

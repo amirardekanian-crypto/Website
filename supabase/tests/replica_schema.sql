@@ -207,3 +207,26 @@ create table public.tps_accounts (
   user_id uuid primary key, username text, label text, created_at timestamptz not null default now(),
   initial_password text, password_set_at timestamptz, sent_at timestamptz, revoked_at timestamptz
 );
+
+-- stage52 (programme version history): the table and the stage44 trigger as the live project had them (the newest 20 per
+-- athlete). stage52 replaces the function; the trigger on programs stays.
+create table public.program_versions (
+  id bigserial primary key, athlete_id text not null, data jsonb not null,
+  saved_at timestamptz not null default now(), saved_by text, note text
+);
+create function public.programs_version_snapshot()
+returns trigger language plpgsql security definer set search_path to 'public'
+as $function$
+begin
+  if old.data is distinct from new.data then
+    insert into public.program_versions (athlete_id, data, saved_by) values (old.athlete_id, old.data, old.updated_by);
+    delete from public.program_versions v
+     where v.athlete_id = old.athlete_id
+       and v.id not in (select id from public.program_versions where athlete_id = old.athlete_id order by id desc limit 20);
+  end if;
+  new.updated_at := now();
+  new.updated_by := coalesce(auth.jwt() ->> 'email', new.updated_by);
+  return new;
+end $function$;
+create trigger programs_version_trg before update on public.programs
+  for each row execute function public.programs_version_snapshot();

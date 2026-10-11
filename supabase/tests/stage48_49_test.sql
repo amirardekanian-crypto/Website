@@ -1,5 +1,5 @@
 -- Assertions for stage45 (forget_contact), stage48 (coach_delete_training_history, coach_save_spine), stage49 (spine_versions)
--- stage50 (the coach reads the testing app's tables) and stage51 (used first passwords are cleared) on the
+-- stage50 (the coach reads the testing app's tables), stage51 (used first passwords are cleared) and stage52 (version history) on the
 -- local replica. Run through scripts/test_spine_sql.sh, which loads replica_schema.sql and both stage files first.
 -- Every check writes a row to t_res; the runner prints the failures and exits non-zero if there are any.
 -- Test rows are all 'zz…' ids. Made-up data only.
@@ -610,6 +610,119 @@ begin
   exception when insufficient_privilege then perform pg_temp.rec('passwords: ...nor by anon', true, sqlerrm); end;
 end $t$;
 select pg_temp.coach() \g /dev/null
+
+-- ═════════════════════ G. stage52: a programme's version history keeps the current and the previous cycle ═════════════════════
+-- Always the newest 20; plus every save since the previous cycle began; never more than 150; 70 days back when the
+-- programme has no dates; a programme save must never fail over this.
+select pg_temp.nobody() \g /dev/null
+create function pg_temp.seed(a text, n int, from_ts timestamptz, to_ts timestamptz) returns void language sql as $$
+  insert into public.program_versions (athlete_id, data, saved_at, saved_by)
+  select a, '{}'::jsonb, from_ts + (to_ts - from_ts) * (g - 1) / greatest(n - 1, 1), 'seed' from generate_series(1, n) g order by 4 $$;
+create function pg_temp.nv(a text) returns int language sql as $$ select count(*)::int from public.program_versions where athlete_id = a $$;
+
+-- 1. cycle 2 (index 1) began 2026-08-10, cycle 1 on 2026-07-06: the horizon is 2026-07-06
+insert into public.programs (athlete_id, data) values ('zz_v1', '{"currentCycleIndex":1,"cycles":[{"startDate":"2026-07-06"},{"startDate":"2026-08-10"}],"v":0}');
+select pg_temp.seed('zz_v1', 15, '2026-05-01', '2026-05-30');      -- before the previous cycle: should go
+select pg_temp.seed('zz_v1', 10, '2026-07-10', '2026-08-05');      -- the previous cycle: keep
+select pg_temp.seed('zz_v1', 10, '2026-08-15', '2026-09-30');      -- the current cycle: keep
+do $t$
+declare n int; oldest timestamptz;
+begin
+  update public.programs set data = jsonb_set(data, '{v}', '1') where athlete_id = 'zz_v1';
+  n := pg_temp.nv('zz_v1');
+  select min(saved_at) into oldest from public.program_versions where athlete_id = 'zz_v1';
+  perform pg_temp.rec('versions: a save drops what is older than the previous cycle (35 + 1 new - 15 = 21 stay, more than the old 20)', n = 21, n::text);
+  perform pg_temp.rec('versions: ...and the oldest left is from the previous cycle or later', oldest >= '2026-07-06', oldest::text);
+end $t$;
+
+-- 2. the floor of 20: the cycle began last week, 30 old saves, only the newest 20 stay
+insert into public.programs (athlete_id, data) values ('zz_v2', '{"currentCycleIndex":0,"cycles":[{"startDate":"2026-10-05"}],"v":0}');
+select pg_temp.seed('zz_v2', 30, '2026-01-01', '2026-03-01');
+do $t$
+declare n int; kept_old int;
+begin
+  update public.programs set data = jsonb_set(data, '{v}', '1') where athlete_id = 'zz_v2';
+  n := pg_temp.nv('zz_v2');
+  select count(*) into kept_old from public.program_versions where athlete_id = 'zz_v2' and saved_by = 'seed';
+  perform pg_temp.rec('versions: however recent the cycle, the newest 20 always stay', n = 20, n::text);
+  perform pg_temp.rec('versions: ...they are the new save and the 19 newest old ones', kept_old = 19, kept_old::text);
+end $t$;
+
+-- 3. the safety cap: a horizon years back, 160 saves, 150 stay (the newest)
+insert into public.programs (athlete_id, data) values ('zz_v3', '{"currentCycleIndex":0,"cycles":[{"startDate":"2020-01-01"}],"v":0}');
+select pg_temp.seed('zz_v3', 160, '2026-08-01', '2026-09-30');
+do $t$
+declare n int; lowest_seed timestamptz;
+begin
+  update public.programs set data = jsonb_set(data, '{v}', '1') where athlete_id = 'zz_v3';
+  n := pg_temp.nv('zz_v3');
+  select min(saved_at) into lowest_seed from public.program_versions where athlete_id = 'zz_v3';
+  perform pg_temp.rec('versions: never more than 150', n = 150, n::text);
+  perform pg_temp.rec('versions: ...the oldest 11 went, the newest stay', lowest_seed > '2026-08-01'::timestamptz and (select count(*) from public.program_versions where athlete_id = 'zz_v3' and saved_at <= '2026-08-01'::timestamptz + (interval '60 days' * 10 / 159)) = 0, lowest_seed::text);
+end $t$;
+
+-- 4. no dates in the programme: 70 days back. 5 saves 100 days old and 22 from 30 days ago: the 5 go, 22 + the new one stay
+insert into public.programs (athlete_id, data) values ('zz_v4', '{"v":0}');
+select pg_temp.seed('zz_v4', 5, now() - interval '100 days', now() - interval '99 days');
+select pg_temp.seed('zz_v4', 22, now() - interval '31 days', now() - interval '29 days');
+do $t$
+declare n int;
+begin
+  update public.programs set data = jsonb_set(data, '{v}', '1') where athlete_id = 'zz_v4';
+  n := pg_temp.nv('zz_v4');
+  perform pg_temp.rec('versions: with no dates the horizon is 70 days back (the 5 older go; 22 recent + 1 new stay; the floor alone would keep 20)', n = 23, n::text);
+end $t$;
+
+-- 5. a programme of any shape can be saved
+insert into public.programs (athlete_id, data) values
+  ('zz_v5a', '{"currentCycleIndex":"x","cycles":"oops"}'), ('zz_v5b', '{"currentCycleIndex":5,"cycles":{"a":1}}'),
+  ('zz_v5c', '{"currentCycleIndex":1,"cycles":[{"startDate":"not a date"},{"startDate":"also not"}]}'), ('zz_v5d', '[1,2,3]'),
+  ('zz_v5e', '{"currentCycleIndex":-3,"cycles":[{"startDate":"2026-09-01"}]}'), ('zz_v5f', '"just a string"');
+do $t$
+declare a text; ok int := 0; n int;
+begin
+  foreach a in array array['zz_v5a','zz_v5b','zz_v5c','zz_v5d','zz_v5e','zz_v5f'] loop
+    begin
+      update public.programs set data = jsonb_build_object('changed', true, 'was', a) where athlete_id = a;
+      if pg_temp.nv(a) = 1 then ok := ok + 1; end if;
+    exception when others then null; end;
+  end loop;
+  perform pg_temp.rec('versions: programmes with odd shapes (a string index, cycles that is not a list, bad dates, an array, a negative index, a bare string) all save and keep their version', ok = 6, ok::text);
+end $t$;
+
+-- 6. an update that does not change the programme keeps no version and still stamps updated_at
+do $t$
+declare before_n int; t0 timestamptz; t1 timestamptz;
+begin
+  before_n := pg_temp.nv('zz_v1');
+  select updated_at into t0 from public.programs where athlete_id = 'zz_v1';
+  perform pg_sleep(0.02);
+  update public.programs set updated_by = 'someone' where athlete_id = 'zz_v1';
+  select updated_at into t1 from public.programs where athlete_id = 'zz_v1';
+  perform pg_temp.rec('versions: an update that changes nothing in the programme keeps no version', pg_temp.nv('zz_v1') = before_n, '');
+  perform pg_temp.rec('versions: ...and still stamps updated_at (the dashboard''s guarded save reads it)', t1 > t0, t0::text || ' -> ' || t1::text);
+end $t$;
+
+-- 7. each athlete is pruned on their own
+do $t$
+begin
+  perform pg_temp.rec('versions: another athlete''s history is untouched by a save', pg_temp.nv('zz_v2') = 20 and pg_temp.nv('zz_v3') = 150 and pg_temp.nv('zz_v4') = 23, '');
+end $t$;
+
+-- 8. if working out the horizon ever fails, the programme still saves and falls back to 70 days
+create or replace function public.programs_keep_versions_from(p_data jsonb) returns timestamptz language plpgsql as $$ begin raise exception 'fixture: the horizon function is broken'; end $$;
+insert into public.programs (athlete_id, data) values ('zz_v6', '{"v":0}');
+select pg_temp.seed('zz_v6', 3, now() - interval '200 days', now() - interval '190 days');
+select pg_temp.seed('zz_v6', 22, now() - interval '31 days', now() - interval '29 days');
+do $t$
+declare saved boolean := true; n int;
+begin
+  begin update public.programs set data = '{"v":1}' where athlete_id = 'zz_v6'; exception when others then saved := false; end;
+  n := pg_temp.nv('zz_v6');
+  perform pg_temp.rec('versions: a broken horizon function does not stop the programme save', saved, '');
+  perform pg_temp.rec('versions: ...and the 70-day fallback is used (3 old go, 22 + 1 stay)', n = 23, n::text);
+end $t$;
+\i supabase/stage52_version_history_two_cycles.sql
 
 -- ═════════════════════ report ═════════════════════
 select count(*) filter (where ok) as passed, count(*) filter (where not ok) as failed, (count(*) filter (where not ok) > 0) as anyfail from t_res \gset

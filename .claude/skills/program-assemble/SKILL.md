@@ -462,7 +462,7 @@ transaction, all or nothing, it:
   under `## Athlete profile`, before the ledger), `p_log_ledger` replaces the Exercise Ledger table, and
   `p_log_section` is appended; a first log comes whole in `p_log_new`. Nothing else in the body moves;
 - returns the programme's content fingerprint and the log's md5 and length. The version trigger keeps
-  ONE snapshot of the old row (`program_versions` holds only the last 20 per athlete).
+  ONE snapshot of the old row (`program_versions` keeps the last 20 per athlete and every save since the previous cycle began, at most 150: stage52).
 
 **Build the call with a script written by the Write tool, then run it verbatim** (never in a Bash
 heredoc: Git Bash halves backslashes, and a `regexp_replace(…, '×\1 Rounds')` once arrived as a control

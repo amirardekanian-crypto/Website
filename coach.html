@@ -3468,23 +3468,23 @@ async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, 
   render();
 }
 
-// The last 20 saves for one athlete, newest first. Loaded on demand — the
-// history is only interesting when something has gone wrong.
+// The saves kept for one athlete, newest first: at least the last 20 and everything since the previous cycle began, never
+// more than 150 (stage52). Loaded on demand — the history is only interesting when something has gone wrong.
 async function loadProgramVersions(athleteId) {
   const box = $('pvlist');
   if (!box) return;
-  if (DEMO) { box.innerHTML = '<p class="empty">Demo — the real page lists the last 20 saves here, each with Restore.</p>'; return; }
+  if (DEMO) { box.innerHTML = '<p class="empty">Demo — the real page lists the saves from the previous cycle on here, each with Restore.</p>'; return; }
   const r = await sb.from('program_versions')
     .select('id, saved_at, saved_by')
     .eq('athlete_id', athleteId)
     .order('id', { ascending: false })
-    .limit(20);
+    .limit(150);   // the server keeps at most 150 (stage52)
   if (r.error) { box.innerHTML = `<p class="empty">Could not load history: ${esc(r.error.message)}</p>`; return; }
   const rows = r.data || [];
   // Each row is the programme as it was BEFORE a save at saved_at; saved_by wrote it. Times are
   // shown in this computer's time zone (they are stored in UTC).
   box.innerHTML = rows.length
-    ? `<p class="empty" style="padding:0 0 8px">Each line is the programme as it stood just before a save. Restoring one puts it back; the current version is kept here too, so a restore can itself be undone. Only the last 20 are kept.</p>` +
+    ? `<p class="empty" style="padding:0 0 8px">Each line is the programme as it stood just before a save. Restoring one puts it back; the current version is kept here too, so a restore can itself be undone. Kept: the last 20 saves, and every save since the previous cycle began (never more than 150).</p>` +
       rows.map(v => `<div class="pvrow">
         <span class="pvwhen">${esc(fmtLocalStamp(v.saved_at))}</span>
         <span class="pvwho">${esc(v.saved_by || '—')}</span>
