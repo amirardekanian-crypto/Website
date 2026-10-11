@@ -21,7 +21,7 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 141 are fixed, 38 partly fixed (the harm is gone, something named in the finding is left), 11 open and 1 was not a bug. Of the 45 critical and high findings, 43 are fixed; not yet: TOOLS-4 (open), TOOLS-7 (partly).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
+**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 142 are fixed, 37 partly fixed (the harm is gone, something named in the finding is left), 11 open and 1 was not a bug. Of the 45 critical and high findings, 43 are fixed; not yet: TOOLS-4 (open), TOOLS-7 (partly).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
 questions in §7 and the eleven in §12 (pile A), and the one thing left for you is to switch off public sign-up in the Supabase
 dashboard (SERVER-14). The SQL pack and the removal script ran on 2026-10-11 and §11 records what was checked afterwards.
 **What is left, and how to continue in a new chat, is §12.**
@@ -265,14 +265,14 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-<!--T9-->191 findings. Fixed 141 · Partly 38 · Open 11 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
+<!--T9-->191 findings. Fixed 142 · Partly 37 · Open 11 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
 | high | 31 | 1 | 1 | 0 | 0 |
 | medium | 59 | 25 | 4 | 0 | 0 |
-| low | 39 | 12 | 6 | 0 | 1 |<!--/T9-->
+| low | 40 | 11 | 6 | 0 | 1 |<!--/T9-->
 
 ### The work and the ✎ editor (WORK)
 
@@ -527,7 +527,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | SERVER-10 | low | Reads that are not paged and full-table refetches: nothing is at the cap yet, but several tables are heading there | Partly | Mark read and Clear older notes update the page's own copy instead of re-downloading every session, and the Spine tables are read in pages. | The Library list is still read in one request (small today, far from the cap). |
 | SERVER-11 | low | Login edge functions ignore the error on their follow-up table write after a successful ban or password change | Fixed | All three login functions (athlete v6, course and testing app v3) report a failed account read and a failed bookkeeping write instead of ignoring it. |  |
 | SERVER-12 | low | Version history keeps 20 entries per athlete, and an SQL writer that does not set updated_by inherits the previous author's name | Partly | Version history now keeps the last 20 saves and everything since the previous cycle began, at most 150 (stage52, applied 2026-10-11, your answer). The most any one athlete holds today is 20, the old cap; the new rule applies from their next save. | A database edit with no signed-in user still shows the previous author's name. |
-| SERVER-13 | low | Core server objects behind coach.html have no source in the repo; the manual describes an older contract; the coach email is hard-coded in about 25 places | Partly | The programme tables, their access rules, the coach check and the version-history trigger are now written down in the repo (stage44), and the manual was rewritten against the code. | The athlete's programme door and the 'which athlete is this' function still have no copy in the repo, and the coach email is still typed into many places. |
+| SERVER-13 | low | Core server objects behind coach.html have no source in the repo; the manual describes an older contract; the coach email is hard-coded in about 25 places | Fixed | The programme tables, their access rules, the coach check and the version-history trigger are now written down in the repo (stage44), and the manual was rewritten against the code. Since 2026-10-11 (pile B3): `supabase/stage56_functions_record.sql` is the athlete's programme door `get_program()`, `current_athlete_id()` and the six other live functions that had no CREATE FUNCTION in the repo, exactly as the database holds them (run inside a transaction that was rolled back: all 8 definitions and ACLs identical, so re-running it changes nothing). `stage57_coach_policies_use_is_coach.sql` (applied) moved the 18 older policies that spelled out your address over to `public.is_coach()`: rehearsed on the live project in a rolled-back transaction, as you every table read and wrote exactly as before, as a stranger or the anonymous role every table stayed empty and every write was refused. The address is now typed in `is_coach()` and `coach_erase_person()` in the database, once as `COACH_EMAIL` in coach.html and once in each of the three login Edge Functions. Still to come with the restore path (A3): the tables, policies, triggers and grants themselves. |  |
 | SERVER-14 | low | The coach check trusts the email claim alone; whether public sign-up is open cannot be verified from here | Open |  | Checked 2026-10-11 from the project's own public settings (`/auth/v1/settings`): `disable_signup` is **false**, so anyone can register with their own e-mail (confirmation is required; the 38 accounts are all expected, and no page calls `signUp` or `signInWithOtp`). You said you would switch it off now: Supabase dashboard → Authentication → Sign In / Providers → User Signups → Allow new users to sign up → off. Read the setting back afterwards. Tying the coach check to your account id as well is optional. |
 
 ## 10. The second session (2026-10-10): what is done, and the one thing that needs you
@@ -737,7 +737,7 @@ a contact field holding two numbers matches the second only; the finder cannot b
 
 ## 12. Continue here (rewritten 2026-10-11, fourth session)
 
-<!--T12-->191 findings: 141 fixed, 38 partly, 11 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 31 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open), TOOLS-7 (partly).<!--/T12-->
+<!--T12-->191 findings: 142 fixed, 37 partly, 11 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 31 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open), TOOLS-7 (partly).<!--/T12-->
 What is left is in three piles: **A** your eleven answers, now jobs; **B** Claude can just do, in order; **C** is outside the audit.
 
 **To start a new chat:** *"Continue the Coach's Box audit: read `Content/COACH-AUDIT.md` §12 and `COACH_DASHBOARD.md`, then do the first job in
@@ -769,7 +769,7 @@ Decided earlier, nothing to do: MKT-11 (no payment tracking for now) and WORK-9 
 |---|---|---|---|
 | B1 | TODAY-12 (high) | Every open or refresh downloads every session in full (about 800 KB, 501 sessions and growing, not paged). Load a light summary for the numbers and the rest on demand, read in key order through `selectAll()`. | **done 2026-10-11** |
 | B2 | TOOLS-3 (high) | Name an incomplete backup differently (`aa-backup-INCOMPLETE-<date>.json`) and make `scripts/prune_backups.py` leave it out of the 12 it keeps. | **done 2026-10-11** |
-| B3 | SERVER-13 | Record the live definitions the dashboard depends on and the repo lacks (the athlete programme door `get_program`, the "which athlete is this" function) as a record file, like stage44, and put the coach email in one constant. It also feeds A3. | todo |
+| B3 | SERVER-13 | Record the live definitions the dashboard depends on and the repo lacks (the athlete programme door `get_program`, the "which athlete is this" function) as a record file, like stage44, and put the coach email in one constant. It also feeds A3. | **done 2026-10-11** |
 | B4 | FILE-9 | A redraw wipes what you are typing in the File tab (the login box, an email pasted into Add past session) and closes Version history and the Coaching log. | todo |
 | B5 | BROWSER-10, FLOW-22, MKT-13 | One way to report results: a persistent error line for failed saves (the affiliate and intake ones are a 2.6 s toast) and fewer pop-up alerts (53 became 71). | todo |
 | B6 | TWIN-2, WORK-11, TWIN-3, TODAY-11, TWIN-6, TWIN-9, TWIN-8, TWIN-7 | Make the dashboard judge a day the way the athlete app does: the week-1 and back-off-week RPE caps, the Readiness chart's measure, the 30-hour "in progress" window against `sessionIsStale()`, the retest flag, the quality check's 70% / 12% rules, the checker's name matching. A rule the dashboard copies goes into `scripts/check_twins.js` the same day. | todo |

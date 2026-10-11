@@ -362,6 +362,12 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.
 - supabase-js is pinned (2.117.3); bump it only with the harness's `reallib.js` run.
+- **The coach's address is typed once per layer** (stage57, 2026-10-11): `public.is_coach()` in the database (every policy and
+  function asks it; a new one never types the address; `coach_erase_person()` also names it, to protect the coach's own login),
+  `COACH_EMAIL` in coach.html, once in each of the three login Edge Functions. **Public sign-up must stay off** (Supabase →
+  Authentication → Sign In / Providers → User Signups): the coach check trusts the email in the sign-in alone. Read it back with
+  `curl -s https://bvipfipbdcyqnbczjmaq.supabase.co/auth/v1/settings -H "apikey: <the publishable key>"` → `"disable_signup": true`.
+  Every live database function has its `CREATE FUNCTION` in `supabase/` (the eight that did not are in `stage56_functions_record.sql`).
 
 ## Site layout (GitHub Pages → amirardekani.com)
 - **English is the default**: `/` = `index.html`. **Farsi** = `/index-fa.html`. `index-en.html` is a
