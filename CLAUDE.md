@@ -146,7 +146,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   numbers and nothing errors** (`scripts/check_twins.js` runs the dashboard/app pairs it can; `check_rx.js`,
   `check_setlog.js` and `check_parity.py` cover the rest). `rxOf()`/`repCount()`/`tempoDisplay()` (program.html + `assets/js/chips.js`,
   guarded by `scripts/check_rx.js`) · the Quality mix and its minutes rule (`qualityMix()` / `qualityDayC()`, the weekly `qualityCheckC()`,
-  `/program-design`, `check_program.py`; the 70% gate and 12% cut are one day card's) · the Spine resolver (`spineFor()` / `spineForC()`) · the body-part
+  `/program-design`, `check_program.py`; the 70% gate and 12% cut are one day card's) · the Spine resolver (`spineFor()` / `spineForC()`) · the exercise-name rule (`normExName()` / `exNameVariants()`,
+  `normExNameC()`, and the checker's `norm_name()` and `NORM_SQL` / `LOOSE_SQL`: `scripts/name_cases.json` holds the shared cases;
+  `check_twins.js` and `test_check_program.py` read it) · the body-part
   region and impact lists (four copies) · the muscle list of the Spine's volume credits (SIX copies since the
   muscle map: `spine_credits_ok()`, coach.html, `check_program.py`, `draft_sql.py`, program.html `MAP_MUSCLE` and
   the body drawing's groups; see PROGRAM-APP.md *The muscle map*) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,

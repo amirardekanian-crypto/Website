@@ -175,7 +175,7 @@ fi
 # checker, the rule guard, the app's shared rules (chips.js) or the principles runs all of them on
 # a made-up athlete, so a check that silently stops working is caught before it ships.
 if git diff --cached --name-only --diff-filter=ACMD \
-     | grep -qE '^(scripts/(check_program|check_rule_index|test_check_program)\.py|assets/js/chips\.js|\.claude/COACHING-PRINCIPLES\.md)$'; then
+     | grep -qE '^(scripts/(check_program|check_rule_index|test_check_program|name_cases_sql)\.py|scripts/name_cases\.json|assets/js/chips\.js|\.claude/COACHING-PRINCIPLES\.md)$'; then
   echo "pre-commit: the programme checker or its rules changed — running its tests..."
   if ! "$PY" scripts/test_check_program.py; then
     echo ""
@@ -285,7 +285,7 @@ fi
 # fails a change to assets/js/chips.js that keeps coach.html's hand-typed ?v= (TWIN-4): the service worker serves /assets/
 # cache-first, so the old file would stay in every browser that has it. test_check_twins.js proves the guard still fails
 # when a twin drifts, and runs only when the guard itself changes.
-if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|coach\.html|assets/js/chips\.js|scripts/(check_twins|test_check_twins)\.js|scripts/twins_stamp\.json)$'; then
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|coach\.html|assets/js/chips\.js|scripts/(check_twins|test_check_twins)\.js|scripts/twins_stamp\.json|scripts/name_cases\.json)$'; then
   echo "pre-commit: program.html, coach.html or chips.js changed — checking the rules they share still agree..."
   # CHECK_TWINS_INDEX=1: read the STAGED files, the ones that will be committed. A ?v= bumped in the working tree but
   # left unstaged must not pass. The output is kept so a failure is printed once.

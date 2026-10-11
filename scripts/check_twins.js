@@ -13,7 +13,9 @@
    must come here, not be swallowed.
 
    Pairs (app / dashboard):
-     exNameVariants, EX_ABBREV   / exNameVariantsC, EX_ABBREV_C   the four name tiers every exercise lookup uses
+     exNameVariants, EX_ABBREV   / exNameVariantsC, EX_ABBREV_C   the four name tiers every exercise lookup uses. scripts/name_cases.json stores
+                                                                  them for a few hundred names; the checker's Python norm_name() and its SQL
+                                                                  (NORM_SQL, LOOSE_SQL) are held to the same file by test_check_program.py (TWIN-8)
      ceilAliasMap (matchRenamed) / ceilAliasMapC                  a renamed lift is one lift
      setSpine + spineFor         / spineIndexC + spineForC        a card finds its Spine entry
      dayRpe                      / rpeTarget + dayTargetC         today's RPE target on a lower day (REC-2), with the week note
@@ -149,6 +151,42 @@ const D_NAMES = sandbox(null, [lineSrc(D_SRC, 'const EX_ABBREV_C =', 'coach.html
 run('exercise name tiers', () => {
   same('EX_ABBREV vs EX_ABBREV_C (the abbreviation table itself)', null, A_NAMES.EX_ABBREV, D_NAMES.EX_ABBREV_C);
   NAMES.forEach(n => same('exNameVariants vs exNameVariantsC', n, A_NAMES.exNameVariants(n), D_NAMES.exNameVariantsC(n)));
+});
+
+/* ── 1b. the shared name cases (TWIN-8) ──────────────────────────────────────── */
+// scripts/name_cases.json stores each name and the four tiers the athlete app gives it. This proves the dashboard gives the same four and
+// that the file is the app's CURRENT answer, so it cannot go stale. scripts/test_check_program.py then holds the programme checker's Python
+// norm_name() and the recorded answers of its SQL (NORM_SQL, LOOSE_SQL) to the same file. After a deliberate change to the app's name rule:
+//   node scripts/check_twins.js --write-names     (rewrites the names and tiers, keeps the SQL record)
+//   python scripts/name_cases_sql.py              (then redo the SQL record, as it says)
+const CASES_FILE = 'scripts/name_cases.json';
+const CASES_ABOUT = 'Shared cases for the exercise-name rule (audit TWIN-8). `variants` = the four tiers program.html exNameVariants() gives each name '
+  + '(written by: node scripts/check_twins.js --write-names). `sql` = what check_program.py NORM_SQL and LOOSE_SQL gave on the live database, recorded by '
+  + 'scripts/name_cases_sql.py with a hash of the two strings. Held by scripts/check_twins.js (app, dashboard) and scripts/test_check_program.py (the checker).';
+// Names that have tripped a rule before or would: curly apostrophes and dashes, accents, a degree sign, brackets, abbreviations, nothing but spaces, Persian.
+const HARD_NAMES = ['Farmer’s Carry', 'Farmer‘s Carry', 'Farmerʼs Carry', 'Farmer´s Carry', 'Café Squat', 'Cafe Squat', 'Zürich Lunge', 'Ångström Press', 'Naïve Press',
+  'Brøndby Row', 'Straße Squat', 'ÀÉÎ Squat', 'Pallof Press – Half Kneeling', 'Pallof Press - Half Kneeling', 'Half–Kneeling Press', 'Half-Kneeling Press', 'Push—Up',
+  '45° Cut', '45 Cut', '45°Cut', '½ Squat', 'ﬁnger Walk', 'Squat™', 'Ｓｑｕａｔ', 'Squat (Bodyweight)', 'Squat (Bodyweight) ', 'Cossack Squat (Bodyweight) (Light)',
+  'Leg Press (Machine) (Wide)', 'Hip Thrust – Banded (Light)', '(Bodyweight)', 'Squat (', 'Squat )', 'A (B) C (D)', '()', 'Machine', 'machine machine',
+  'Machine Leg Press Machine', 'db', 'DB', 'Db Bb Kb', 'DB KB BB Complex', 'ez bar curl', ' ', '  ', '-', 'x', '10 Reps', '3/4 Squat', '1.5 Rep Squat',
+  'تمرین اسکوات', 'Squat تمرین', 'تمرین Squat', 'Squat 💪', 'İ Squat', 'ǅ Squat', 'Back Squat\ttab', 'Back Squat\nnewline', "O'Brien Press", 'O’Brien Press'];
+const WANT_NAMES = Array.from(new Set(NAMES.concat(HARD_NAMES).filter(n => typeof n === 'string')));
+// The file's one format (scripts/name_cases_sql.py dump_cases() writes the same bytes): one name per line.
+function dumpCases(c) {
+  const one = (o, pad) => '{\n' + Object.keys(o).map(k => pad + JSON.stringify(k) + ': ' + JSON.stringify(o[k])).join(',\n') + '\n' + pad.slice(2) + '}';
+  const s = c.sql;
+  const sql = !s ? 'null' : '{\n    "recorded": ' + JSON.stringify(s.recorded) + ',\n    "sha": ' + JSON.stringify(s.sha) + ',\n    "rows": ' + one(s.rows, '      ') + '\n  }';
+  return '{\n  "about": ' + JSON.stringify(c.about) + ',\n  "variants": ' + one(c.variants, '    ') + ',\n  "sql": ' + sql + '\n}\n';
+}
+run('shared name cases (scripts/name_cases.json)', () => {
+  WANT_NAMES.forEach(n => same('exNameVariants vs exNameVariantsC (shared cases)', n, A_NAMES.exNameVariants(n), D_NAMES.exNameVariantsC(n)));
+  let file = null;
+  try { file = JSON.parse(read(CASES_FILE)); } catch (e) { /* reported below */ }
+  checks++;
+  if (!file || !file.variants) { failures.push(`${CASES_FILE} is missing or unreadable: run   node scripts/check_twins.js --write-names`); return; }
+  checks++;
+  if (J(Object.keys(file.variants)) !== J(WANT_NAMES)) failures.push(`${CASES_FILE} holds ${Object.keys(file.variants).length} names and this script lists ${WANT_NAMES.length}: run   node scripts/check_twins.js --write-names, then redo the SQL record (python scripts/name_cases_sql.py)`);
+  WANT_NAMES.forEach(n => { if (n in file.variants) expect(`the tiers stored for a name are what the app gives (${CASES_FILE}); if the rule changed on purpose, run --write-names and redo the SQL record`, n, file.variants[n], A_NAMES.exNameVariants(n)); });
 });
 
 /* ── 2. a renamed lift is one lift ────────────────────────────────────────── */
@@ -483,6 +521,15 @@ function chipsStamp() {
 }
 function stampOnDisk() {
   try { return JSON.parse(read('scripts/twins_stamp.json'))['assets/js/chips.js']; } catch (e) { return null; }
+}
+if (process.argv.includes('--write-names')) {
+  let prev = {};
+  try { prev = JSON.parse(fs.readFileSync(path.join(ROOT, CASES_FILE), 'utf8')); } catch (e) { /* a new file */ }
+  const variants = {};
+  WANT_NAMES.forEach(n => { variants[n] = A_NAMES.exNameVariants(n); });
+  fs.writeFileSync(path.join(ROOT, CASES_FILE), dumpCases({ about: CASES_ABOUT, variants, sql: prev.sql || null }));
+  console.log('wrote ' + WANT_NAMES.length + ' names to ' + CASES_FILE + (prev.sql ? ' (the SQL record was kept: redo it with   python scripts/name_cases_sql.py)' : ''));
+  process.exit(0);
 }
 if (process.argv.includes('--stamp')) {
   const now = chipsStamp(), prev = stampOnDisk();

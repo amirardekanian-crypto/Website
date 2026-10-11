@@ -545,6 +545,43 @@ guard_fails('a duplicate id', on(P, '| NAM-2 | Equipment', '| NAM-1 | Equipment'
 guard_fails('a skill citing a rule that does not exist',
             on(os.path.join(REPO, '.claude', 'skills', 'program-engage', 'SKILL.md'), '**Change no', '**Change (VOL-42) no'), 'cites VOL-42')
 
+# ── 7. the checker's name matching against the shared cases (audit TWIN-8, 2026-10-11) ────────────────────────────
+# scripts/name_cases.json holds the four tiers the athlete app gives each name (check_twins.js keeps them current) and what the checker's SQL
+# gave on the live database (scripts/name_cases_sql.py records it). norm_name() must give the app's tier 0; NORM_SQL tier 0 and LOOSE_SQL tier 2;
+# and the record must be of THESE two strings. Before this the Python turned a curly apostrophe into a space ("farmer s carry") and dropped
+# an accented letter ("caf"), so the checker and the phone disagreed about which card is which.
+spec_cp = importlib.util.spec_from_file_location('check_program_mod', CHECK)
+cp_mod = importlib.util.module_from_spec(spec_cp); spec_cp.loader.exec_module(cp_mod)
+spec_ncs = importlib.util.spec_from_file_location('name_cases_sql_mod', os.path.join(REPO, 'scripts', 'name_cases_sql.py'))
+ncs_mod = importlib.util.module_from_spec(spec_ncs); spec_ncs.loader.exec_module(ncs_mod)
+cases = json.load(open(os.path.join(REPO, 'scripts', 'name_cases.json'), encoding='utf-8'))
+def python_problems(norm, cases):
+    return [f"norm_name({n!r}) = {norm(n)!r}, the app's tier 0 is {v[0]!r}" for n, v in cases['variants'].items() if norm(n) != v[0]]
+def sql_problems(cases, sha):
+    s = cases.get('sql')
+    if not s: return ['no SQL record: run python scripts/name_cases_sql.py and record the answer']
+    bad = []
+    if s.get('sha') != sha:
+        bad.append(f"NORM_SQL or LOOSE_SQL changed since the record was made (record {s.get('sha')}, strings {sha}): redo it with python scripts/name_cases_sql.py")
+    for n, v in cases['variants'].items():
+        row = (s.get('rows') or {}).get(n)
+        if row != [v[0], v[2]]: bad.append(f"the SQL gave {row!r} for {n!r}; the app's tiers 0 and 2 are {[v[0], v[2]]!r}")
+    return bad
+sha_now = ncs_mod.sql_sha(cp_mod)
+expect('the shared name cases are a real corpus (a hundred names, the curly apostrophe among them)',
+       len(cases['variants']) >= 100 and cases['variants'].get('Farmer\u2019s Carry', [None])[0] == 'farmers carry', len(cases['variants']))
+expect("norm_name() gives the app's tier 0 for every shared name", not python_problems(cp_mod.norm_name, cases), '\n'.join(python_problems(cp_mod.norm_name, cases)[:6]))
+expect("the recorded SQL answers equal the app's tiers 0 and 2, and are of the current NORM_SQL and LOOSE_SQL", not sql_problems(cases, sha_now), '\n'.join(sql_problems(cases, sha_now)[:6]))
+# and the test fails when they drift
+import re as _re, unicodedata as _ud
+def old_norm_name(s): return _re.sub(r'\s+', ' ', _re.sub(r"[^a-z0-9]+", ' ', str(s or '').lower().replace("'", ''))).strip()
+expect('the old norm_name (no accent fold, a curly apostrophe becomes a space) is caught', any('Farmer' in p for p in python_problems(old_norm_name, cases)), '')
+expect('a norm_name that keeps dashes as spaces is caught', any('Half' in p for p in python_problems(lambda s: _re.sub(r'\s+', ' ', _re.sub(r"[^a-z0-9]+", ' ', _ud.normalize('NFKD', str(s or '').lower()).encode('ascii', 'replace').decode('ascii').replace('?', ' ').replace("'", ''))).strip(), cases)), '')
+expect('a changed NORM_SQL or LOOSE_SQL with the old record is caught', any('changed since the record' in p for p in sql_problems(cases, 'deadbeefdeadbeef')), '')
+expect('a name added with no SQL row is caught', any('Brand New Name' in p for p in sql_problems({'variants': dict(cases['variants'], **{'Brand New Name': ['brand new name'] * 4}), 'sql': cases['sql']}, sha_now)), '')
+bad_rows = dict(cases['sql']['rows']); bad_rows['Goblet Squat'] = ['goblet squats', 'goblet squat']
+expect('a recorded answer that differs from the app is caught', any('Goblet Squat' in p for p in sql_problems({'variants': cases['variants'], 'sql': dict(cases['sql'], rows=bad_rows)}, sha_now)), '')
+
 print(f"{sum(1 for _, ok in results if ok)}/{len(results)} passed" + ('' if HAVE_NODE else ' (node not found: the node-backed checks were skipped)'))
 for n, ok in results:
     if not ok: print('  failed:', n)

@@ -5,7 +5,7 @@
 'use strict';
 const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
 const ROOT = path.join(__dirname, '..');
-const FILES = ['program.html', 'coach.html', 'assets/js/chips.js', 'scripts/twins_stamp.json'];
+const FILES = ['program.html', 'coach.html', 'assets/js/chips.js', 'scripts/twins_stamp.json', 'scripts/name_cases.json'];
 
 function runOn(mutate, opts) {
   opts = opts || {};
@@ -54,6 +54,7 @@ want('the phone lens lets draft entries in (a card on a draft would show a chip 
 want('the phone lens counts draft qualities', swap('coach.html', "(quals || []).filter(q => !phone || q.status === 'approved')", '(quals || []).filter(q => true)'), 1, /qualityMix vs qualityDayC|phone lens/);
 want('a circuit\'s rounds are read from the wrong place on the dashboard', swap('coach.html', 'const rounds = roundCountC(Chips.rxOf(ex).rounds || ex.rounds);', 'const rounds = roundCountC(ex.rounds);'), 1, /qualityMix vs qualityDayC/);
 want('a circuit with 0 rounds counts 0 on the dashboard', swap('coach.html', 'return n > 0 ? n : 1;', 'return n;'), 1, /qualityMix vs qualityDayC/);
+want('the app\'s name rule changes on its own (accents are no longer folded), so the stored tiers are stale', swap('program.html', ".normalize('NFKD').replace(/[^\\x00-\\x7f]/g, '')", ".normalize('NFC')"), 1, /the tiers stored for a name are what the app gives|exNameVariants vs exNameVariantsC/);
 want('a name tier drifts (the dashboard stops folding DB to dumbbell)', swap('coach.html', "const EX_ABBREV_C = { db: 'dumbbell', bb: 'barbell', kb: 'kettlebell' };", "const EX_ABBREV_C = { bb: 'barbell', kb: 'kettlebell' };"), 1, /exNameVariants vs exNameVariantsC/);
 want('the Spine resolver drifts (exId no longer wins on the dashboard)', swap('coach.html', 'if (exId && byId[exId]) return exId;', 'if (false) return exId;'), 1, /spineFor vs spineForC/);
 want('the app rewords its check-in line', swap('program.html', "bits.push('lower day (every RPE 1 lower, never below 6)')", "bits.push('easier day (every RPE 1 lower, never below 6)')"), 1, /readinessPlanLine's wording/);

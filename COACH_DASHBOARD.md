@@ -788,7 +788,7 @@ covered by the real-mode harness in `scripts/headless/coach/`.
 
 **Logic that exists in both apps is guarded** (`scripts/check_twins.js`, pre-commit guard 15, 2026-10-10).
 It cuts each twin out of both files and runs the same vectors through both: the exercise-name
-tiers (`exNameVariants` / `exNameVariantsC`), a renamed lift (`ceilAliasMap` / `ceilAliasMapC`), the
+tiers (`exNameVariants` / `exNameVariantsC`; the programme checker's `norm_name()` and SQL are held to the same cases, `scripts/name_cases.json`), a renamed lift (`ceilAliasMap` / `ceilAliasMapC`), the
 Spine lookup (`spineFor` / `spineForC`), today's RPE target on a lower day with the week note (`dayRpe` / `dayTargetC`), the week a day
 falls in and its note (`cycleWeekInfo`, `weekNoteNow` / `cycleWeekOnC`, `weekNoteOnC`: over 5,000 checks in all), what
 the Quality check counts (`qmSets`, `isPrepBlockTitle` / `qmSetsC`, `QM_PREP`), and the check-in line's

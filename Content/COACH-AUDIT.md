@@ -21,7 +21,7 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 154 are fixed, 28 partly fixed (the harm is gone, something named in the finding is left), 8 open and 1 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
+**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 155 are fixed, 28 partly fixed (the harm is gone, something named in the finding is left), 7 open and 1 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
 questions in §7 and the eleven in §12 (pile A), and the one thing left for you is to switch off public sign-up in the Supabase
 dashboard (SERVER-14). The SQL pack and the removal script ran on 2026-10-11 and §11 records what was checked afterwards.
 **What is left, and how to continue in a new chat, is §12.**
@@ -265,14 +265,14 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-<!--T9-->191 findings. Fixed 154 · Partly 28 · Open 8 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
+<!--T9-->191 findings. Fixed 155 · Partly 28 · Open 7 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
 | high | 32 | 0 | 1 | 0 | 0 |
 | medium | 65 | 19 | 4 | 0 | 0 |
-| low | 45 | 9 | 3 | 0 | 1 |<!--/T9-->
+| low | 46 | 9 | 2 | 0 | 1 |<!--/T9-->
 
 ### The work and the ✎ editor (WORK)
 
@@ -428,7 +428,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | TWIN-5 | medium | Passwords are tidied (Persian or Arabic digits folded, ends trimmed) when Amir creates them, but never when the athlete signs in | Fixed | All four sign-in screens (training app, AA Proof, course app, testing app) now fold Persian and Arabic digits in the username, and retry the password once with digits folded and ends trimmed if the typed one fails. |  |
 | TWIN-6 | medium | The Live app snapshot calls any unfinished touched day 'in progress', ignoring program.html's sessionIsStale() rule | Fixed | The live snapshot now labels an old unfinished day 'started <date>, not finished, a leftover' instead of 'in progress'. Since 2026-10-11 (pile B6) the snapshot uses the app's own rule, `sessionIsStale()`: a started day is in progress while its stamp is on today's calendar day or under six hours old, and a leftover after that (`sessionIsStaleC`; the day is this computer's, as the app's is the phone's). `check_twins.js` runs both on 116 stamps at four clocks; `live-snapshot-window` pins the screen. |  |
 | TWIN-7 | low | Personal records: the coach's age is off by one before noon, and the retest flag is parsed three different ways | Fixed | Record ages are now counted in calendar days, so yesterday no longer reads 'today' before noon. Since 2026-10-11 (pile B6) the dashboard reads a lift's `test` the way the app does (`exTestSpecC`: true, or "<n>RM" with n from 1 to 10, anything else no flag) and `check_program.py` fails any other value under TST-5, so a flag the app ignores can no longer look live. `check_twins.js` (37 values) and `retest-flag` pin it; the checker has six new tests that fail on the old one. |  |
-| TWIN-8 | low | The checker's name matching (Python norm_name and the --spine-sql NORM/LOOSE match) is not the apps' exNameVariants | Open |  | The programme checker's Python and SQL name matching is still written separately from the apps' name rules, with no shared test cases. |
+| TWIN-8 | low | The checker's name matching (Python norm_name and the --spine-sql NORM/LOOSE match) is not the apps' exNameVariants | Fixed | Since 2026-10-11 (pile B6) the checker reads a name the way the app does: Python `norm_name()` and the SQL `NORM_SQL` use NFKD and drop anything that is not ASCII, so "Farmer’s Carry" typed with a curly apostrophe is no longer "farmer s carry" (it now resolves to its entry on the server; the old SQL missed it) and "Café" is "cafe". 109 shared names with the app's four tiers sit in `scripts/name_cases.json`: `check_twins.js` holds the app and the dashboard to it and keeps it current (`--write-names`), and `scripts/test_check_program.py` holds `norm_name()` and the SQL's answers, recorded from the live database by `scripts/name_cases_sql.py` with a hash of the two SQL strings, to it (a changed string fails the test until the record is redone). The SQL has no bracket tier on purpose: NAM-4 fails a card with brackets in its name. |  |
 | TWIN-9 | low | The Quality check predicts the athlete's day cards from a weekly number; docs claim the coach applies the 70% gate and 12% cut | Fixed | Since 2026-10-11 (pile B6) the Quality check says, day by day, what each day card on the athlete's phone will show: the app's own rule (`qualityDayC`, the twin of `qualityMix`: the 70% gate, the 12% cut, at most three words) run in the phone's view (approved entries and approved qualities only) and again once the drafts are approved, with the reason for every blank day. The weekly line no longer claims anything about the day cards, and PROGRAM-APP.md says which copies apply the gate and the cut. `check_twins.js` runs both on 1,863 checks over generated days, `test_check_twins.js` breaks the gate, the floor, the cut, the tie order, both lens filters and the round count on purpose, `check_parity.py` reads the coach's three numbers, and `quality-day-cards` pins the screen (9 of its 11 checks fail on the old code). |  |
 | TWIN-10 | low | Most coach.html twins have no guard; only rxOf, the set-log grammar and the word lists are checked | Fixed | `scripts/check_twins.js` runs the exercise-name tiers, renamed lifts, the Spine lookup, the lower-day RPE target, the Quality check's counts and the check-in line's writer and reader through both copies (923 checks, every pair agreed on the first run), and `scripts/test_check_twins.js` proves it fails when a twin drifts. The known differences (WORK-11, TWIN-1, TWIN-6, TWIN-7) are listed in the script's header, not hidden. (2026-10-10, second session) |  |
 
@@ -737,7 +737,7 @@ a contact field holding two numbers matches the second only; the finder cannot b
 
 ## 12. Continue here (rewritten 2026-10-11, fourth session)
 
-<!--T12-->191 findings: 154 fixed, 28 partly, 8 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
+<!--T12-->191 findings: 155 fixed, 28 partly, 7 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
 What is left is in three piles: **A** your eleven answers, now jobs; **B** Claude can just do, in order; **C** is outside the audit.
 
 **To start a new chat:** *"Continue the Coach's Box audit: read `Content/COACH-AUDIT.md` §12 and `COACH_DASHBOARD.md`, then do the first job in
@@ -772,7 +772,7 @@ Decided earlier, nothing to do: MKT-11 (no payment tracking for now) and WORK-9 
 | B3 | SERVER-13 | Record the live definitions the dashboard depends on and the repo lacks (the athlete programme door `get_program`, the "which athlete is this" function) as a record file, like stage44, and put the coach email in one constant. It also feeds A3. | **done 2026-10-11** |
 | B4 | FILE-9 | A redraw wipes what you are typing in the File tab (the login box, an email pasted into Add past session) and closes Version history and the Coaching log. | **done 2026-10-11** |
 | B5 | BROWSER-10, FLOW-22, MKT-13 | One way to report results: a persistent error line for failed saves (the affiliate and intake ones are a 2.6 s toast) and fewer pop-up alerts (53 became 71). | **done 2026-10-11** |
-| B6 | TWIN-2, WORK-11, TWIN-3, TODAY-11, TWIN-6, TWIN-9, TWIN-8, TWIN-7 | Make the dashboard judge a day the way the athlete app does: the week-1 and back-off-week RPE caps, the Readiness chart's measure, the 30-hour "in progress" window against `sessionIsStale()`, the retest flag, the quality check's 70% / 12% rules, the checker's name matching. A rule the dashboard copies goes into `scripts/check_twins.js` the same day. | **partly done 2026-10-11:** TWIN-2, WORK-11, TWIN-6, TWIN-7, TWIN-3, TODAY-11 and TWIN-9 are fixed; left: TWIN-8 |
+| B6 | TWIN-2, WORK-11, TWIN-3, TODAY-11, TWIN-6, TWIN-9, TWIN-8, TWIN-7 | Make the dashboard judge a day the way the athlete app does: the week-1 and back-off-week RPE caps, the Readiness chart's measure, the 30-hour "in progress" window against `sessionIsStale()`, the retest flag, the quality check's 70% / 12% rules, the checker's name matching. A rule the dashboard copies goes into `scripts/check_twins.js` the same day. | **done 2026-10-11:** TWIN-2, WORK-11, TWIN-3, TODAY-11, TWIN-6, TWIN-9, TWIN-8 and TWIN-7 are fixed |
 | B7 | TWIN-1 | The phone and the dashboard resolve a card whose exercise id points at a draft differently. | todo |
 | B8 | TODAY-3, TODAY-4, TODAY-13, TODAY-14, TODAY-15, MKT-3, MKT-8 | Small truthfulness fixes on Today and the board: a note on a single exercise added after Mark read, your day against the athlete's day, silent failed reloads, overlapping quest runs, the quote-stripping warning, the board's missing "as of" time and the leaderboard's missing reason. | todo |
 | B9 | FLOW-11, WORK-10 | Undo as a diff: say what changed between two versions, and a one-tap Undo after a save. | todo |

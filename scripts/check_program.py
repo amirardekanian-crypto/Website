@@ -66,7 +66,7 @@ bans, floor-except and --cap, so no run has to remember them. A flag typed here 
 
 Exit code 1 if anything FAILs. FAIL = a house rule is broken. WARN = look at it.
 """
-import argparse, datetime, decimal, hashlib, json, os, re, subprocess, sys
+import argparse, datetime, decimal, hashlib, json, os, re, subprocess, sys, unicodedata
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -172,7 +172,13 @@ def is_weighted(o, spine):
     return bool(LOAD_KIT.search(kit))
 
 def norm_name(s):
-    return re.sub(r'\s+', ' ', re.sub(r"[^a-z0-9]+", ' ', str(s or '').lower().replace("'", ''))).strip()
+    """An exercise name the way the athlete's app reads it: program.html normExName() (coach.html's normExNameC() is its twin). Lower case,
+    NFKD, anything that is not ASCII dropped (an accent folds into its letter, a curly apostrophe or a dash simply vanishes), straight
+    apostrophes dropped, every other run of punctuation one space. It used to turn "Farmer\u2019s Carry" into "farmer s carry" and "Caf\u00e9"
+    into "caf", so the checker and the phone disagreed about which card is which (audit TWIN-8, 2026-10-11).
+    scripts/name_cases.json holds the shared cases; scripts/test_check_program.py holds this function to them."""
+    t = unicodedata.normalize('NFKD', str(s or '').lower()).encode('ascii', 'ignore').decode('ascii')
+    return re.sub(r'\s+', ' ', re.sub(r"[^a-z0-9]+", ' ', t.replace("'", ''))).strip()
 
 # ── the rule checks ───────────────────────────────────────────────────────────
 def name_hint(name, names):
@@ -1229,9 +1235,13 @@ def check_spine(data, args, spine):
 # ── the two printouts ─────────────────────────────────────────────────────────
 def sql_text(s): return "'" + str(s).replace("'", "''") + "'"
 
-# How a name is matched, on the server, the way the old node scan did it: exact after lower-casing
-# and dropping punctuation, else "loose" (db/bb/kb spelled out, "machine" dropped, words sorted).
-NORM_SQL = "trim(regexp_replace(regexp_replace(lower({x}), '''', '', 'g'), '[^a-z0-9]+', ' ', 'g'))"
+# How a name is matched, on the server: exact after the app's own normalising (norm_name() above, tier 0 of exNameVariants()), else "loose"
+# (db/bb/kb spelled out, "machine" dropped, words sorted: tier 2). There is no bracket tier (tier 3): NAM-4 fails a card whose name has brackets.
+# Nothing here can run SQL, so scripts/name_cases_sql.py RECORDS the answers these two strings give for scripts/name_cases.json from the live
+# database, with a hash of the strings; scripts/test_check_program.py holds the record to the app's tiers. Change either string and that test
+# fails until the record is redone (audit TWIN-8, 2026-10-11).
+NORM_SQL = ("trim(regexp_replace(regexp_replace(regexp_replace(normalize(lower({x}), nfkd), '[^\\x01-\\x7f]', '', 'g'), '''', '', 'g'), "
+            "'[^a-z0-9]+', ' ', 'g'))")
 LOOSE_SQL = ("(select coalesce(string_agg(t, ' ' order by t), '') from (select case w when 'db' then 'dumbbell' "
              "when 'bb' then 'barbell' when 'kb' then 'kettlebell' else w end t from unnest(string_to_array({n}, ' ')) w) z "
              "where t not in ('machine', ''))")
