@@ -237,7 +237,7 @@ S['editor-wrong-exercise'] = async (b) => {
 // ── 7. Mark read ─────────────────────────────────────────────────────────────
 S['note-mark-read'] = async (b) => {
   const r = { id: 'note-mark-read', title: 'The work → session note → Mark read', checks: [] };
-  const { page, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const { page } = await L.openCoach(b, { hash: 'a/ava_test/work' });
   const badge0 = await page.locator('#rail a.tab', { hasText: 'Athletes' }).innerText();
   const n0 = await L.nCalls(page);
   await page.locator('.wday.open .daynote button', { hasText: 'Mark read' }).click();
@@ -332,7 +332,7 @@ S['quest-week'] = async (b) => {
 
 S['quest-week-end-fails'] = async (b) => {
   const r = { id: 'quest-week-end-fails', title: 'Ending a quest run when stage55 is not applied: nothing changes, and it never falls back to the call that takes the XP back', checks: [] };
-  const { page, today, log } = await L.openCoach(b, {});
+  const { page, log } = await L.openCoach(b, {});
   await page.evaluate(() => { const x = window.__DB.xp_rules[0]; x.rules.questRuns = [{ start: new Date().toISOString().slice(0, 10), ids: ['w_water5'] }]; });
   await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
   await page.evaluate(() => { window.__STUB.missingRpc = ['end_quests']; });
@@ -1047,7 +1047,7 @@ S['erase-fails'] = async (b) => {
   await page.evaluate(() => { window.__STUB.missingRpc = ['coach_erase_person']; });
   await open();
   let t = await erasePanelText(page);
-  check(r, 'stage54 not applied: the panel says which file to run, and offers no erase button', /cannot be erased now/.test(t) && /Run supabase\/PASTE-1-run-in-sql-editor\.sql in the Supabase SQL editor/.test(t) && (await page.locator('#eraseGo').count()) === 0, t);
+  check(r, 'stage54 not applied: the panel says which file to run, and offers no erase button', /cannot be erased now/.test(t) && /Run supabase\/stage53_buyer_notes\.sql, then supabase\/stage54_erase_person\.sql, in the Supabase SQL editor/.test(t) && (await page.locator('#eraseGo').count()) === 0, t);
   await page.locator('.erase button', { hasText: 'Close' }).click();
   await page.evaluate(() => { window.__STUB.missingRpc = []; });
   // 2. the dry run is refused
@@ -1530,13 +1530,11 @@ S['spine-clash'] = async (b) => {
   await spineOpen(page, 'goblet-squat');
   await serverSet(page, 'exercises', 'goblet-squat', { purpose: 'Claude purpose', updated_at: new Date(Date.now() + 1000).toISOString(), updated_by: 'claude-pipeline' });
   await page.locator('[data-sf=purpose]').fill('Amir purpose');
-  let n0 = await L.nCalls(page);
   await page.locator('.sp-save').first().click(); await L.settle(page, 700);
   check(r, 'nothing is written', (await L.db(page)).exercises.find(x => x.id === 'goblet-squat').purpose === 'Claude purpose', (await L.db(page)).exercises.find(x => x.id === 'goblet-squat').purpose);
   check(r, 'the dialog names the field and both values', log.dialogs.length === 1 && /Why it’s here: now "Claude purpose", was "Fixture purpose\."/.test(log.dialogs[0].message), log.dialogs.map(x => x.message));
   check(r, '...and says both halves were held back', log.dialogs.length === 1 && /Nothing was saved, to either half/.test(log.dialogs[0].message), log.dialogs.map(x => x.message));
   check(r, 'the typed text is still in the form', (await page.locator('[data-sf=purpose]').inputValue()) === 'Amir purpose', await page.locator('[data-sf=purpose]').count() ? await page.locator('[data-sf=purpose]').inputValue() : 'editor gone');
-  n0 = await L.nCalls(page);
   await page.locator('.sp-save').first().click(); await L.settle(page, 700);
   const d = await L.db(page);
   check(r, 'Save again puts his over theirs', d.exercises.find(x => x.id === 'goblet-squat').purpose === 'Amir purpose', d.exercises.find(x => x.id === 'goblet-squat').purpose);

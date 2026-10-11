@@ -59,7 +59,7 @@ function mockServer(program) {
 }
 
 // program.html on a phone whose stored session still looks valid. `withFix: false` takes the fix out of the page (the control).
-async function open(browser, withFix) {
+async function openPage(browser, withFix) {
   const server = mockServer(H.fixture());
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, serviceWorkers: 'block' });
   await ctx.route('**/*', r => {
@@ -108,7 +108,7 @@ async function open(browser, withFix) {
   const browser = await H.launch();
 
   // The control: the page without the fix, on a phone with a wrong clock.
-  let r = await open(browser, false);
+  let r = await openPage(browser, false);
   const rest = log => log.filter(l => l.includes('/rest/v1/'));
   t.check('control, the page without the fix: "Plan not available" (the field report)', r.state.errorShown && /Plan not available/.test(r.state.errorTitle) && !r.state.hasPlan, JSON.stringify(r.state));
   t.check('control: the first answer was 401 and nothing refreshed the token', rest(r.server.log).some(l => / 401 old$/.test(l)) && !r.server.log.some(l => l.includes('/auth/v1/token')), r.server.log.join(' | '));
@@ -116,7 +116,7 @@ async function open(browser, withFix) {
   await r.ctx.close();
 
   // The page as it is.
-  r = await open(browser, true);
+  r = await openPage(browser, true);
   t.check('the page as it is: the plan opens', !r.state.errorShown && !r.state.signInShown && r.state.hasPlan, JSON.stringify(r.state));
   t.check('it refreshed the token once, and every call that got through used the new one',
     r.server.log.filter(l => l.includes('/auth/v1/token')).length === 1 && rest(r.server.log).filter(l => / 200 /.test(l)).every(l => / new$/.test(l)), r.server.log.join(' | '));

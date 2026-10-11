@@ -1642,7 +1642,7 @@ Three rules follow on the client, all in `pushTitle()`:
 `owned`" — and that was the actual bug behind an athlete reporting *"once I turned my
 title off I can't turn it back on."* `set_title()` validates the id against the server's
 `xp_rules.passTrack` catalogue before allowing it on, and if that catalogue is missing an
-id the client already knows about (exactly what `RUN-THIS-NOW.sql` exists to repair),
+id the client already knows about (exactly what the July 2026 one-off repair, `RUN-THIS-NOW.sql`, fixed; it was run and has been deleted from the repo),
 every attempt to re-equip a perfectly-owned title failed server-side — and the old code
 reacted by clearing `CFG.pass.title` right back to null. Since `passTitle()` reads
 straight off `CFG.pass.owned`, that reset had nothing to do with what the athlete

@@ -325,7 +325,6 @@ WEEK_ZONES.forEach(zone => run(`week of a day and its note (cycleWeekInfo / week
 /* ── 4c. is a started session over? (TWIN-6) ───────────────────────────────── */
 // "On another calendar day AND more than six hours old". Run on two clocks: mid-afternoon, and just after midnight, where a session
 // started at 23:30 is only 2.5 hours old and must still be live.
-const D_STALE = sandbox(null, [lineSrc(D_SRC, 'const SESSION_GRACE_MS_C =', 'coach.html')].concat(fromD('sessionIsStaleC')), ['sessionIsStaleC']);
 function appStaleAt(nowIso) {
   const now = new Date(nowIso).getTime();
   const Fixed = class extends Date { constructor(...a) { if (a.length) super(...a); else super(now); } static now() { return now; } };

@@ -75,8 +75,6 @@ def build(cat, date):
         if cat.get(key):
             problems.append(f'the catalog has {key}: {cat[key]!r}. This script does not write them yet: teach it first.')
     tables, funcs = cat['tables'], cat['functions']
-    fnames = {f['name'] for f in funcs}
-    seqs = {s['name']: s for s in cat['sequences']}
 
     out = []
     add = out.append

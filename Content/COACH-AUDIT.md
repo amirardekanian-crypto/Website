@@ -248,11 +248,13 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 *The list to continue from is §12; this one keeps the order the third session started with.*
 
-1. ~~**Run the SQL pack** (§11): `supabase/PASTE-1-run-in-sql-editor.sql` (stage45, stage52, stage53, stage54), then
-   `supabase/one-off/remove-13-free-signups-2026-10-11.sql`.~~ **Done 2026-10-11**: you ran both and §11 records what was
+1. ~~**Run the SQL pack** (§11): one paste with stage45, stage52, stage53 and stage54, then the one-off removal of the 13 free signups.~~
+   **Done 2026-10-11**: you ran both and §11 records what was
    checked on the live database. The Forget refusal, the full erasure, the coach-only buyer note and the two-cycle version
-   history are on, and the 13 locked-out free users are gone.
-2. Your word on `Content/PRIVACY-DRAFT-BUYER-ACCOUNTS.md` (course and testing-app accounts in the privacy notices).
+   history are on, and the 13 locked-out free users are gone. (Both files were deleted from the repo on 2026-10-12: each ran once, the stage
+   files are the record, and commit 54570ac still has them.)
+2. ~~Your word on the privacy text for course and testing-app accounts.~~ **Done 2026-10-11**: it is in `privacy.html` (section 2.10) and
+   `privacy-fa.html`; the draft file was deleted on 2026-10-12 (commit b3ade72 has it).
 3. ~~A server function for "Delete training history" and the Spine save (one transaction each), so a
    half-finished two-table write cannot happen (SERVER-9, SPINE-5).~~ Done in the second session
    (stage48): written, tested on a real Postgres, applied to the live project and checked on 2026-10-10 (§10).
@@ -488,7 +490,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | MKT-13 | low | Four different feedback patterns for the same kinds of action across these tabs | Fixed | A buyer login (testing app and course) now behaves like an athlete's: the message is copied, a toast says so and the password waits in the list, with the pop-up kept only when the server could not store the password. Errors are lines in every tab. |  |
 | MKT-14 | low | Buyers can read Amir's private 'who bought it' note (and their stored password) through the buyer-read policy | Fixed | The note now lives in `buyer_notes`, which only you can read (stage53, applied 2026-10-11; your yes). A trigger moves any label the login functions still write, so they did not change; the two existing notes were copied across and every account row's label is now empty. A buyer can still read their own first password until they sign in with it (stage51 clears it then); that is their own credential, and no course buyer has one stored today. |  |
 | MKT-15 | low | Docs and comments contradict the code: forget, data sources, AMIR_ATHLETE_ID, and the tps-login header | Fixed | The manual now says what Forget really deletes, lists the affiliates, library and buyer tables, has short Library, Testing app and Course sections, and no longer claims every write goes through a guarded function. Since 2026-10-11 (pile B11) the two comments say what the code does: the board is read as the signed-in coach (`is_coach()`; `amir_ardekani` only marks which row is "you"), and `tps-login`'s header names this repo and Supabase, not the retired one. |  |
-| MKT-16 | low | Buyers cannot be erased from the dashboard, and the privacy notices do not mention buyer accounts | Fixed | **Erase…** on each Course and Testing row removes the buyer in one step (stage54, live since 2026-10-11): the login, your note, and for the testing app every player, note and result, including the ones the buyer had removed. A course buyer's dry run was checked on the live database; there is no testing-app account yet, so that kind has only been tested on a local copy. A text for the privacy notices is drafted in `Content/PRIVACY-DRAFT-BUYER-ACCOUNTS.md`. Since 2026-10-11 (pile A2) `privacy-fa.html` carries the same in Farsi, as you approved it: line 1 (the buyer decides about the players, you only store them), line 2 (the sign-in and the players in what you keep) and a new line 8 about the course and testing-app accounts, with the date 11 October 2026. |  |
+| MKT-16 | low | Buyers cannot be erased from the dashboard, and the privacy notices do not mention buyer accounts | Fixed | **Erase…** on each Course and Testing row removes the buyer in one step (stage54, live since 2026-10-11): the login, your note, and for the testing app every player, note and result, including the ones the buyer had removed. A course buyer's dry run was checked on the live database; there is no testing-app account yet, so that kind has only been tested on a local copy. The text for the privacy notices is in `privacy.html` (section 2.10). Since 2026-10-11 (pile A2) `privacy-fa.html` carries the same in Farsi, as you approved it: line 1 (the buyer decides about the players, you only store them), line 2 (the sign-in and the players in what you keep) and a new line 8 about the course and testing-app accounts, with the date 11 October 2026. |  |
 | MKT-17 | low | Funnel onclick handlers broke on an apostrophe in an email (an injection pattern); already fixed in the working copy | Fixed | Funnel buttons now pass emails and ids safely, so an apostrophe in an email can no longer break the button or run as code. |  |
 
 ### Exercises (the Spine) and Intake (SPINE)
@@ -630,7 +632,7 @@ screen) and I did not work round it: you ran them in the SQL editor on 2026-10-1
 
 | # | Question (§7) | Your answer | State |
 |---|---|---|---|
-| 1 | The 13 free Proof signups with no login | Forget them, and **remove everything** (their programme rows and 5 titles too) | **Done 2026-10-11** (you ran `supabase/one-off/remove-13-free-signups-2026-10-11.sql`): programmes 52 → 39, no free programme left, no row of the 13 left anywhere. |
+| 1 | The 13 free Proof signups with no login | Forget them, and **remove everything** (their programme rows and 5 titles too) | **Done 2026-10-11** (you ran the one-off removal script; deleted from the repo on 2026-10-12, commit 54570ac has it): programmes 52 → 39, no free programme left, no row of the 13 left anywhere. |
 | 2 | Apply stage45 (Forget refused for coached clients) | Apply it now | **Done and live** (first part of the SQL pack). Checked with two made-up people. |
 | 3 | Cancelling a quest week and the XP | **Keep what was earned** | **Done and live** (stage55 applied and checked 2026-10-11; the dashboard button and `habits.html` ship with the pull request). |
 | 4 | Stored first passwords | Clear one automatically once the person has signed in with it | **Done** (stage51). Today 3 course buyers had a used password stored; the backfill clears them. |
@@ -643,13 +645,13 @@ screen) and I did not work round it: you ran them in the SQL editor on 2026-10-1
 | 11 | The buyer note buyers can read | **Move it where only you can read it** | **Done and live** (stage53, third part of the pack; the two notes were copied across). |
 | 12 | Is the weekly call log retired | **Retired, fold it into File** | **Done** (dashboard only; ships with the pull request). |
 
-**The SQL pack.** One file you pasted into the Supabase SQL editor, `supabase/PASTE-1-run-in-sql-editor.sql`: stage45, stage52, stage53
-and stage54 in that order, ending with a row per part that says whether it is applied (all four said yes). Then `supabase/one-off/remove-13-free-signups-2026-10-11.sql`
+**The SQL pack.** One file you pasted into the Supabase SQL editor (deleted from the repo on 2026-10-12; commit 54570ac has it): stage45, stage52, stage53
+and stage54 in that order, ending with a row per part that says whether it is applied (all four said yes). Then the one-off removal script (deleted too)
 on its own (it stops, deleting nothing, unless there are exactly 13 free programmes and none has a login, a session or a message, so
 a new signup cannot make it delete the wrong set, and run a second time it stops at "Expected 13 free programmes, found 0"; keeping it apart means that guard cannot stop the four parts above. When it had deleted, it
 checks every table in the public and backup schemas that has an `athlete_id` column and undoes everything if one still holds a row for any of the 13.
-`scripts/test_spine_sql.sh` section 6 runs it on a throwaway Postgres: refuses with 12, refuses with a session, undoes itself for an unknown table,
-removes every row of the 13 and leaves a coached athlete alone).
+`scripts/test_spine_sql.sh` section 6 ran it on a throwaway Postgres before it was run: refused with 12, refused with a session, undid itself for an unknown table,
+removed every row of the 13 and left a coached athlete alone. The script is gone, so its test went with it).
 
 **Why 1 and 2 were handed to you.** The Supabase tool asks for a confirmation on SQL that deletes, and waits 60 seconds for it. It ran
 out five times (checked each time: no stuck session, the function and the 13 programmes unchanged). I did not work round it. Both were tested first on a throwaway
@@ -661,7 +663,7 @@ them until they roll off (about 3 months), which is what the privacy notice prom
 
 **Stage50 and the privacy notices.** The three tables hold a buyer's own players (name, birth year and month, sex, hand, squad), often
 juniors. The coach policy is read-only. The privacy notices say nothing about the testing app, its accounts or its players
-(MKT-16), so no promise was broken, but the notice should say it. A draft is in `Content/PRIVACY-DRAFT-BUYER-ACCOUNTS.md`; it needs your word, and one legal question answered (controller or processor for the players).
+(MKT-16), so no promise was broken, but the notice should say it. A draft was written; it was published in `privacy.html` section 2.10 on 2026-10-11 after your word, with the controller-or-processor question answered (the buyer decides, you only host). The draft file was deleted on 2026-10-12; commit b3ade72 has it.
 
 ### Checked on the live database (2026-10-11, after you ran both files)
 
@@ -740,7 +742,7 @@ a contact field holding two numbers matches the second only; the finder cannot b
 <!--T12-->191 findings: 188 fixed, 2 partly, 1 open, 0 waiting on you, 0 not a bug (§9 has every row). All 12 critical findings and all 33 high ones are fixed.<!--/T12-->
 Pile **B** (eleven things Claude could just do) is **finished**, and so is pile **A** except one thing: **A1** waits for you to switch public sign-up off (then Claude reads it back). **A2** is done in both languages (you approved the Farsi lines) and **A3**, the restore path, is built and rehearsed (see its row). **C** is outside the audit and, for the date fix, done (see C).
 
-**To start a new chat:** *"Continue the Coach's Box audit: read `Content/COACH-AUDIT.md` §12 and `COACH_DASHBOARD.md`. A1: read the sign-up setting back. A2: the Farsi privacy lines are in `Content/PRIVACY-DRAFT-BUYER-ACCOUNTS.md`, I have read them (or: change this). A3 is done; the one thing left is a dry run of the restore on a throwaway Supabase project (scripts/restore/README.md). Then the items in pile C that I say yes to."*
+**To start a new chat:** *"Continue the Coach's Box audit: read `Content/COACH-AUDIT.md` §12 and `COACH_DASHBOARD.md`. A1: read the sign-up setting back. A2 is done. A3 is done (a dry run of the restore on a throwaway Supabase project, scripts/restore/README.md, was offered and skipped on 2026-10-12). Then the items in pile C that I say yes to."*
 
 ### A. Your answers (2026-10-11, fourth session) and the jobs they made
 
@@ -749,7 +751,7 @@ Asked with the question tool. Nothing here waits on a decision any more; one ite
 | # | Finding | Your answer | The job | State |
 |---|---|---|---|---|
 | A1 | SERVER-14 | You will switch public sign-up off now | I read the project's own public auth settings (`/auth/v1/settings`) and `disable_signup` was **false** (e-mail sign-up on, confirmation required). The 38 accounts are all expected and nothing in the repo calls `signUp` or `signInWithOtp`, so switching it off breaks nothing (athlete and buyer logins are made by the Edge Functions through the admin API). Supabase dashboard → Authentication → Sign In / Providers → User Signups → "Allow new users to sign up" → off. Read it back with `curl -s https://bvipfipbdcyqnbczjmaq.supabase.co/auth/v1/settings -H "apikey: <the publishable key>"` and look for `"disable_signup": true` | **waiting for you**, then read it back |
-| A2 | MKT-16 | Publish the privacy text; the buyer decides why the players' data is collected and you only host it (you are the processor) | Put `Content/PRIVACY-DRAFT-BUYER-ACCOUNTS.md` into `privacy.html` (section 2.10, the short version, the retention lines), saying the buyer is responsible for having the right to record their players. `privacy-fa.html` after you have read the Farsi. A written data-processing term for academies is the usual companion before you sell the testing app to one | **done 2026-10-11**, English and Farsi |
+| A2 | MKT-16 | Publish the privacy text; the buyer decides why the players' data is collected and you only host it (you are the processor) | Put the drafted text into `privacy.html` (section 2.10, the short version, the retention lines), saying the buyer is responsible for having the right to record their players. `privacy-fa.html` after you have read the Farsi. A written data-processing term for academies is the usual companion before you sell the testing app to one | **done 2026-10-11**, English and Farsi |
 | A3 | TOOLS-4 | Yes, build and rehearse a restore path (then, asked how to rehearse: **PGlite in a scratch folder**) | B3 first (record the live definitions the repo lacks), then a full schema snapshot, a restore script, and one rehearsal on a throwaway Postgres | **done 2026-10-11**: `supabase/schema_snapshot.sql`, `scripts/restore/` (README, `restore_backup.py`, `rehearse.mjs`), `scripts/test_restore_backup.py`, pre-commit guard 17. The hard part was real: the login tables point at `auth.users`, which a backup does not hold, so the logins are re-created from the dashboard (new passwords, sent again) and the buyers' players, notes and results follow the login by username. PGlite was installed into a scratch folder outside the repo and deleted afterwards. Not done: a dry run on a real Supabase project. |
 | A4 | TOOLS-7 | "I don't need that publish programme button and never use it": remove the button and the function | Remove ↑ Publish programme file and its code from coach.html, its harness scenarios, the manual and CLAUDE.md | **done 2026-10-11** |
 | A5 | FILE-6 | No expiry | nothing (Mark sent and the first sign-in clear a stored password) | decided |
@@ -788,6 +790,6 @@ Decided earlier, nothing to do: MKT-11 (no payment tracking for now) and WORK-9 
 ### D. How the work was done, so the next chat can do it the same way
 
 - **Read first:** `COACH_DASHBOARD.md` (the manual) and §2 and §6 here. **Tests:** `node scripts/headless/coach/run.js` after any data or write path (made-up athletes, a stubbed Supabase); `sh scripts/test_spine_sql.sh` for any SQL file (a throwaway local Postgres); `node scripts/check_twins.js` for a rule the dashboard copies. `python scripts/test_prune_backups.py` for the backup prune script (14 checks); `python scripts/test_restore_backup.py` (50 checks, no database) and `node scripts/restore/rehearse.mjs` (49 checks, needs PGlite in a scratch folder: `scripts/restore/README.md`) for the restore path. Break a fix on purpose to prove its test fails without it.
-- **Supabase:** project `bvipfipbdcyqnbczjmaq`. SQL with a line-leading `delete` or `drop` makes the tool ask for a confirmation that never reaches Amir, so hand him that SQL as a file for his SQL editor (as `supabase/PASTE-1-run-in-sql-editor.sql` was); the tool can apply the rest. On 2026-10-11 Amir said to ask him whenever his opinion is needed (use the question tool) and gave permission to run SQL without asking. That never covers erasing or deleting a real person's data: he decides those, one at a time.
+- **Supabase:** project `bvipfipbdcyqnbczjmaq`. SQL with a line-leading `delete` or `drop` makes the tool ask for a confirmation that never reaches Amir, so hand him that SQL as a file for his SQL editor (as the 2026-10-11 pack was); the tool can apply the rest. On 2026-10-11 Amir said to ask him whenever his opinion is needed (use the question tool) and gave permission to run SQL without asking. That never covers erasing or deleting a real person's data: he decides those, one at a time.
 - **To try a write path on the live database without leaving a trace:** a `DO` block that sets the coach's claims (`set_config('request.jwt.claims', '{"email":"amirardekanian@gmail.com","role":"authenticated"}', true)` and `set local role authenticated`), uses made-up ids (`zz-…`) and ends in `raise exception` carrying the result. The error rolls everything back and its message returns the numbers; read the tables afterwards to prove nothing stayed. Never run Forget or a real erase on a real athlete, even this way.
 - **Ship the same day:** branch, pull request, merge (`CLAUDE.md`), then tell Amir to hard-refresh the page.

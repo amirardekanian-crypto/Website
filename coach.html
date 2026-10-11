@@ -72,7 +72,6 @@
   .topbar :focus-visible, .board :focus-visible, .cycbar :focus-visible, .wline.coachline :focus-visible { outline-color: #fff; }
 
   .hd { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: .01em; }
-  .mono { font-family: 'Space Mono', ui-monospace, Menlo, monospace; }
   .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
   .muted { color: var(--muted); }
 
@@ -141,7 +140,6 @@
   .tab .n { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; background: var(--clay-fill); color: #fff;
             min-width: 19px; text-align: center; padding: 2px 6px; border-radius: 999px; line-height: 1.2; }
   .tab.active .n { background: rgba(255,255,255,.22); }
-  .rail-spacer { flex: 1; }
   .refresh { font-size: 12px; font-weight: 600; color: var(--muted); padding: 6px 12px; border-radius: 999px;
              border: 1px solid var(--line); background: var(--card); white-space: nowrap; }
   .refresh:hover { color: var(--court); border-color: var(--court); }
@@ -408,10 +406,6 @@
   .dethead .sub { font-size: 13px; color: var(--muted); margin-top: 5px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .dethead .det-num { font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; }
   .dethead .sub a:not(.abtn) { color: var(--court); border-bottom: 1px solid var(--court-100); }
-  .detacts { display: flex; gap: 8px; flex-wrap: wrap; }
-  .keyline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
-  .keyline input { flex: 1; min-width: 230px; font-family: 'Space Mono', monospace; font-size: 12px; padding: 8px 11px;
-                   border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--muted); }
   .sec { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
          font-size: 17px; color: var(--muted); margin: 26px 0 12px; display: flex; align-items: center;
          justify-content: space-between; gap: 10px; flex-wrap: wrap; }
@@ -586,7 +580,6 @@
            border-bottom: 1px solid var(--rule); font-family: 'Barlow', sans-serif; font-size: 12px; }
   .pvrow:last-child { border-bottom: 0; }
   .pvwhen { min-width: 150px; font-weight: 600; }
-  .pvtime { color: var(--muted-soft); font-weight: 400; margin-left: 5px; }
   .pvwho { flex: 1; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pvdiffbox { flex-basis: 100%; }
   .spsec { border-top: 1px dashed var(--line); margin-top: 12px; padding-top: 6px; }
@@ -748,7 +741,6 @@
   .day-c[open] > summary { border-bottom: 1px solid var(--rule); }
   .day-c-main { flex: 1; min-width: 0; }
   .day-c-main h3 { font-size: 17px; font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .02em; }
-  .day-date { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
   .day-c-chev { margin-left: auto; color: var(--muted-soft); transition: transform .2s; flex: none; font-size: 12px; }
   .day-c[open] .day-c-chev { transform: rotate(180deg); }
   .day-c-body { padding: 14px 17px 17px; }
@@ -767,7 +759,6 @@
   .empty code, .pr-n, .credname { overflow-wrap: anywhere; }
   .note { background: var(--paper); border-left: 3px solid var(--ochre); padding: 9px 12px; border-radius: 8px; margin-top: 10px; font-size: 13px; }
   .note.green { border-left-color: var(--court); }
-  .elog-title { font-size: 12px; text-transform: uppercase; color: var(--muted); letter-spacing: .06em; margin: 16px 0 6px; font-weight: 700; }
   .elog-body { white-space: pre-wrap; font-family: 'Space Mono', monospace; font-size: 12px; line-height: 1.65;
                background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 13px 15px; overflow-x: auto; }
   .readiness { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
@@ -783,22 +774,10 @@
   .zpill.red { background: var(--clay-100); color: var(--clay-ink); }
   .zpill.reply { background: var(--clay-100); color: var(--clay-ink); font-weight: 700; }
 
-  .pblock { margin-top: 12px; }
-  .pblock-title { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
-                  border-bottom: 1px solid var(--line); padding-bottom: 5px; margin-bottom: 6px; font-weight: 700; }
   .pex { padding: 8px 0; border-bottom: 1px solid var(--rule); }
   .pex:last-child { border-bottom: none; }
-  .pex-top { display: flex; align-items: center; gap: 8px; }
-  .pex-name { font-weight: 600; font-size: 14px; }
-  .pex-vid { text-decoration: none; color: var(--court); font-size: 13px; }
   .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
   .chips .chip { text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 12px; border-radius: 6px; }
-  .chip-y { background: var(--court-100); color: var(--court); }
-  .chip-d { background: #2A2A2A; color: #fff; }
-  .pex-items { font-size: 12px; color: var(--muted); margin-top: 5px; font-family: 'Space Mono', monospace; line-height: 1.6; }
-  .logline { font-size: 12px; color: var(--court); margin-top: 6px; font-family: 'Space Mono', monospace; }
-  .prog-cycle-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 17px; letter-spacing: .03em; }
-  .prog-focus { margin: 6px 0 0 18px; font-size: 13px; color: var(--muted); line-height: 1.5; }
 
   /* Session-note actions (Mark read). Amir answers only on WhatsApp, 2026-09-26. */
   .note-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
@@ -2846,7 +2825,6 @@ function adherence(sessions, daysPerWeek, weeks, ref) {
   return { done, expected, pct: Math.min(100, raw), extra: Math.max(0, done - expected), days: effDays,
            weeks: effWeeks, perWeek: daysPerWeek };
 }
-function byRecentFirst(sessions) { return sessions.slice().sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on))); }
 function athleteMetrics(sessions, lastActive, daysPerWeek) {
   const daily = dailyLoad(sessions);
   const rser  = readinessSeries(sessions);
@@ -2872,17 +2850,6 @@ function athleteMetrics(sessions, lastActive, daysPerWeek) {
 }
 
 // --- tiny inline-SVG charts (ported) ----------------------------------------
-function sparkline(values, color, w, h) {
-  w = w || 400; h = h || 40;
-  const pts = values.filter(v => v != null && !isNaN(v));
-  if (pts.length < 2) return '<span class="muted" style="font-size:12px">not enough data yet</span>';
-  const min = Math.min(...pts), max = Math.max(...pts), rng = (max - min) || 1;
-  const X = i => (i / (pts.length - 1)) * (w - 2) + 1;
-  const Y = v => h - 2 - ((v - min) / rng) * (h - 4);
-  const d = pts.map((v, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1)).join(' ');
-  const lx = X(pts.length - 1), ly = Y(pts[pts.length - 1]);
-  return `<svg class="chart-svg" viewBox="0 0 ${w} ${h}"><path d="${d}" fill="none" stroke="${color}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="2.4" fill="${color}"/></svg>`;
-}
 function barsSVG(buckets, color) {
   const w = 320, h = 96, base = h - 4, top = 8, n = buckets.length || 1;
   const max = Math.max(1, ...buckets.map(b => b.load)), slot = w / n;
@@ -5186,7 +5153,7 @@ function eraseMatches(e) {
 }
 function eraseWhy(err) {
   const m = (err && err.message) || '', code = (err && err.code) || '';
-  if (/Could not find the function|PGRST202/i.test(m + code)) return 'the server does not have coach_erase_person yet. Run supabase/PASTE-1-run-in-sql-editor.sql in the Supabase SQL editor (it holds stage53 and stage54).';
+  if (/Could not find the function|PGRST202/i.test(m + code)) return 'the server does not have coach_erase_person yet. Run supabase/stage53_buyer_notes.sql, then supabase/stage54_erase_person.sql, in the Supabase SQL editor.';
   if (/coach only|permission denied|JWT/i.test(m)) return 'your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.';
   return m || 'the server refused.';
 }
@@ -5543,16 +5510,6 @@ async function setLibraryPublished(slug, publish) {
   toast(publish ? 'Published' : 'Hidden from the app');
 }
 window.setLibraryPublished = setLibraryPublished;
-function linkRow(title, url, meta) {
-  return `<div class="link-row">
-    <div class="link-row-info">
-      <div class="link-row-title">${esc(title)}</div>
-      <div class="link-row-url">${esc(url)}</div>
-      <div class="link-row-meta">${meta}</div>
-    </div>
-    <button class="btn sm primary copy-btn-js" data-url="${esc(url)}">Copy</button>
-  </div>`;
-}
 
 // --- AFFILIATES (referral-code roster) --------------------------------------
 // public.affiliates is the ONE list of discount codes. form.html and form-fa.html
@@ -5764,10 +5721,10 @@ function withBuyerNotes(rows, notes) {
 }
 
 // cfg: key (S[key] and LOAD_ERR[key]), kind (what usedMark() and the Erase panel call it), P (the two-letter prefix of its ids and classes), table, fn
-// (the Edge Function), url, noun (for the error line), demo (the one row demo mode shows), message(username, password) (the Farsi WhatsApp text),
+// (the Edge Function), noun (for the error line), demo (the one row demo mode shows), message(username, password) (the Farsi WhatsApp text),
 // revokeConfirm(username), introHtml, newNote. Everything else is the same for both.
 function buyerLogins(cfg) {
-  const { key, kind, P, table, fn, url } = cfg;
+  const { key, kind, P, table, fn } = cfg;
   const st = { busy: false, pw: null };   // busy: one call at a time (a double tap would be a second one); pw: the username whose password form is open (Change password or Restore)
 
   async function load() {
@@ -5888,7 +5845,7 @@ function buyerLogins(cfg) {
 // The WhatsApp messages the buyers get, in Farsi like their apps. The course's: iPhone installs before signing in, because Safari and a Home Screen
 // app keep separate storage, so signing in first means doing it twice.
 const BUYER = {
-  assess: buyerLogins({ key: 'assess', kind: 'testing', P: 'as', table: 'assess_accounts', fn: 'assess-login', url: ASSESS_URL, noun: 'testing-app logins', loadFn: 'loadAssess', renderFn: 'renderAssess',
+  assess: buyerLogins({ key: 'assess', kind: 'testing', P: 'as', table: 'assess_accounts', fn: 'assess-login', noun: 'testing-app logins', loadFn: 'loadAssess', renderFn: 'renderAssess',
     demo: { username: 'academy_demo', label: 'Demo academy', initial_password: 'amber-cedar-kite-42' },
     message: (username, password) => 'اپ آزمون آمادگی جسمانی تنیس\n\n' +
       'لینک: ' + ASSESS_URL + '\n' +
@@ -5900,7 +5857,7 @@ const BUYER = {
     revokeConfirm: u => 'Revoke ' + u + '?\n\nThey can no longer sign in. Their saved players and results are kept, and Restore brings the login back with a new password.',
     introHtml: `Logins for the tennis testing app, <a href="${ASSESS_URL}" target="_blank" rel="noopener">${ASSESS_URL}</a>. One login per buyer; an academy's coaches share it.`,
     newNote: 'Creates the account and copies a Farsi WhatsApp message with the link, username and password.' }),
-  course: buyerLogins({ key: 'course', kind: 'course', P: 'tp', table: 'tps_accounts', fn: 'tps-login', url: COURSE_URL, noun: 'course logins', loadFn: 'loadCourse', renderFn: 'renderCourse',
+  course: buyerLogins({ key: 'course', kind: 'course', P: 'tp', table: 'tps_accounts', fn: 'tps-login', noun: 'course logins', loadFn: 'loadCourse', renderFn: 'renderCourse',
     demo: { username: 'player_demo', label: 'Demo buyer', initial_password: 'cedar-harbor-kite-17' },
     message: (username, password) => 'سیستم آمادگی جسمانی تنیس · سطح ۲\n\n' +
       'لینک: ' + COURSE_URL + '\n' +
