@@ -243,8 +243,8 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
    "signed in with it", so you can clear them by hand today.
 5. **A full erasure** for a person (programme, login, logs, sessions, titles) in one confirmed step,
    to match the privacy notice (MKT-2, SERVER-5), and one for buyers (MKT-16)?
-6. **Testing-app player data is not in the backup** (SERVER-2): the coach has no read policy on those
-   three tables. Add one (you would be able to read buyers' player results)?
+6. ~~**Testing-app player data is not in the backup** (SERVER-2): the coach has no read policy on those
+   three tables. Add one (you would be able to read buyers' player results)?~~ **Yes** (2026-10-11): stage50.
 7. **Version history keeps 20 saves per athlete**; one athlete is at 20 (WORK-10, FLOW-11, SERVER-12).
    Keep 20, or keep everything from the current and last cycle?
 8. **Sessions from the previous cycle** are now labelled and not judged against the new plan
@@ -267,13 +267,13 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-191 findings. Fixed 120 · Partly 49 · Open 9 · Your call 12 · Not a bug 1.
+191 findings. Fixed 121 · Partly 48 · Open 9 · Your call 12 · Not a bug 1.
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
 | high | 22 | 8 | 0 | 3 | 0 |
-| medium | 50 | 29 | 2 | 7 | 0 |
+| medium | 51 | 28 | 2 | 7 | 0 |
 | low | 36 | 12 | 7 | 2 | 1 |
 
 ### The work and the ✎ editor (WORK)
@@ -518,7 +518,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | ID | Sev | Finding | Status | Now | Still |
 |---|---|---|---|---|---|
 | SERVER-1 | medium | Plaintext login passwords stay on the server after the person has already signed in, so 'Logins to send' overstates who is waiting | Partly | Logins to send (athletes, course and testing-app buyers, and the athlete's File card) now marks a stored password 'signed in with it' once the person has used it, so the list no longer overstates who is waiting. | The plain-text password still stays on the server until you tap Mark sent; clearing a used one automatically is waiting on your call. |
-| SERVER-2 | medium | The backup says INCOMPLETE every week (hab_season_results is unreadable), and testing-app buyer data is never backed up | Partly | Season results can now be read by the backup, so the weekly backup no longer says INCOMPLETE because of that table, and every table is paged in key order with repeats removed and short reads reported. | Testing-app buyers' players, notes and results are still not backed up; that needs you to agree the coach may read them. |
+| SERVER-2 | medium | The backup says INCOMPLETE every week (hab_season_results is unreadable), and testing-app buyer data is never backed up | Fixed | Season results can be read by the backup, every table is paged in key order with repeats removed and short reads reported, and since stage50 (2026-10-11, your yes) the coach has a read-only policy on the testing app's players, notes and results, which are now in the weekly backup. The dashboard still cannot change a buyer's data. |  |
 | SERVER-3 | medium | Importing a past session over an existing one keeps the old set-by-set log, so the athlete and the coach see different sessions | Fixed | Adding a past session over one already logged on the same date now really replaces it, set-by-set log included, so you and the athlete see the same session and the warning box tells the truth. |  |
 | SERVER-4 | medium | A note the athlete edits after Amir marked the session read never comes back to 'needs you' | Fixed | When an athlete edits a note after you marked the session read, it comes back to 'needs you'; re-saving the same note does not. |  |
 | SERVER-5 | medium | Forget (forget_contact) cannot deliver what the privacy notice promises, the manual says the opposite of what it does, and the screen keeps showing the forgotten person | Your call | The manual and the Forget box now say exactly what Forget deletes, the screen refreshes after it, and the page refuses Forget for coached clients. | There is still no one-step full erasure matching the privacy notice (your call), and the server-side refusal for coached clients (stage45) is not applied yet. |
@@ -614,7 +614,36 @@ no days-left banner) on its **last day**, one day early. Tehran and Madrid are r
 not (reproduced by running the real function under each time zone). The dashboard reads the date as a local day, so
 the two disagree for those athletes. A one-line fix in the app (parse the date as a local day) when you want it.
 
-**Still waiting on your decisions** (§7, unchanged): the 13 locked-out Proof signups; cancelling a quest week and the
-XP; clearing a used password; a one-step erasure; the testing-app player tables in the backup; how many programme
-versions to keep; previous-cycle sessions; sessions with no duration; commission tracking; the buyer label; and the
-weekly call log.
+**Your decisions** moved on 2026-10-11: see §11.
+
+## 11. Third session (2026-10-11): your answers, and where each one stands
+
+You answered eight of the twelve questions in §7. This table is kept up to date as each one lands.
+
+| # | Question (§7) | Your answer | State |
+|---|---|---|---|
+| 1 | The 13 free Proof signups with no login | Forget them, and **remove everything** (their programme rows and 5 titles too) | Script written and tested on a throwaway database. **Waits for you to run it** in the Supabase SQL editor (see below). |
+| 2 | Apply stage45 (Forget refused for coached clients) | Apply it now | The same: **waits for you to run it** in the SQL editor. |
+| 3 | Cancelling a quest week and the XP | not asked yet | open |
+| 4 | Stored first passwords | Clear one automatically once the person has signed in with it | to build |
+| 5 | One-step full erasure | Athletes **and** buyers | to build |
+| 6 | Testing-app players, notes and results in the backup | Yes, add the read permission | **Done** (stage50, applied 2026-10-11; in `BACKUP_TABLES`) |
+| 7 | How many programme versions to keep | The current and the previous cycle | to build |
+| 8 | Sessions from the previous cycle | Just label them, as now | decided: no change |
+| 9 | Sessions with no duration | not asked yet | open |
+| 10 | Affiliate commission tracking | not asked yet | open |
+| 11 | The buyer label buyers can read | not asked yet | open |
+| 12 | Is the weekly call log retired | not asked yet | open |
+
+**Why 1 and 2 are not done.** The Supabase tool asks for a confirmation on SQL that deletes, and waits 60 seconds for it. It ran
+out three times with you at the screen, so nothing reached the database (checked each time: no stuck session, the function and the
+13 programmes unchanged). I did not work round it. The SQL for both is in the chat message and was tested first on a throwaway
+Postgres with made-up people: `scripts/test_spine_sql.sh` section D covers stage45 (a free signup is forgotten, a coached athlete
+and a programme with no tier are refused and nothing is deleted, anon is refused), and the removal script stops without deleting
+anything unless there are exactly 13 free programmes and none has a login, a session or a message. What the 13 had: 13 programme
+rows, 13 contact records, 12 habit-data rows, 5 titles, 2 leaderboard entries, and nothing else anywhere. Your weekly backup files keep
+them until they roll off (about 3 months), which is what the privacy notice promises.
+
+**Stage50 and the privacy notices.** The three tables hold a buyer's own players (name, birth year and month, sex, hand, squad), often
+juniors. The coach policy is read-only. The privacy notices say nothing about the testing app, its accounts or its players
+(MKT-16), so no promise was broken, but the notice should say it: that is still open.

@@ -519,10 +519,11 @@ S['program-file-publish'] = async (b) => {
 };
 
 // ── 18. Backup ───────────────────────────────────────────────────────────────
-const BACKUP_TABLES = ['programs', 'program_versions', 'coaching_logs', 'athlete_identities', 'athlete_progress', 'session_history', 'messages', 'hab_notes', 'hab_contacts',
-  'hab_titles', 'hab_intake', 'leaderboard_optin', 'seasons', 'xp_rules', 'call_logs', 'cycle_reports', 'hab_season_results', 'athlete_keys',
-  'library', 'library_categories', 'library_sessions', 'affiliates', 'tps_content', 'course_en', 'tps_accounts', 'assess_content', 'assess_accounts',
-  'exercises', 'exercise_coach', 'qualities'];
+// The list under test is the PAGE's own BACKUP_TABLES (read in the scenario below), not a second copy here that could drift.
+// Tables that were each missing from the backup once with nothing erroring (CLAUDE.md, "A table added to the public schema goes
+// into BACKUP_TABLES the same day"): they must stay on it.
+const MUST_BE_BACKED_UP = ['exercises', 'exercise_coach', 'qualities', 'coaching_log_versions', 'spine_versions', 'hab_season_results',
+  'assess_players', 'assess_notes', 'assess_results'];
 async function takeBackup(page, tag) {
   await L.go(page, 'athletes');
   const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 30000 }), (async () => { await page.evaluate(() => document.querySelectorAll('details.tools').forEach(d => d.open = true)); await page.locator('details.tools button', { hasText: 'Backup' }).click(); })()]);
@@ -536,9 +537,13 @@ S['backup-basic'] = async (b) => {
   const { page, log } = await L.openCoach(b, {});
   const live = await L.db(page);
   const { file, name } = await takeBackup(page, 'basic');
-  const missing = BACKUP_TABLES.filter(t => !(t in file.tables));
-  const wrong = BACKUP_TABLES.filter(t => file.tables[t] && file.tables[t].length !== (live[t] || []).length).map(t => t + ' ' + file.tables[t].length + '/' + (live[t] || []).length);
+  const listed = await page.evaluate(() => BACKUP_TABLES.slice());
+  const missing = listed.filter(t => !(t in file.tables));
+  const wrong = listed.filter(t => file.tables[t] && file.tables[t].length !== (live[t] || []).length).map(t => t + ' ' + file.tables[t].length + '/' + (live[t] || []).length);
   check(r, 'every listed table present with every row', !missing.length && !wrong.length, { missing, wrong, name });
+  check(r, 'the tables that were once missing are still on the list', MUST_BE_BACKED_UP.every(t => listed.includes(t)), MUST_BE_BACKED_UP.filter(t => !listed.includes(t)));
+  const assess = ['assess_players', 'assess_notes', 'assess_results'].map(t => [t, (live[t] || []).length, (file.tables[t] || []).length]);
+  check(r, 'the testing app\'s players, notes and results (stage50) come back with every row, soft-deleted ones included', assess.every(([, onServer, inFile]) => onServer > 0 && onServer === inFile), assess);
   const pw = ['athlete_identities', 'tps_accounts', 'assess_accounts'].map(t => [t, (file.tables[t] || []).filter(x => x.initial_password).length]);
   check(r, 'no plaintext login passwords in the file', pw.every(([, n]) => n === 0), pw);
   check(r, 'alert summarises the counts', log.dialogs.some(d => /Backup downloaded/.test(d.message)), log.dialogs.map(d => d.message.split('\n')[0]));

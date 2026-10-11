@@ -33,3 +33,7 @@ begin
   delete from public.hab_contacts      where athlete_id = p_athlete_id;
   delete from public.athlete_keys      where athlete_id = p_athlete_id;
 end; $function$;
+-- The grants the live function already has (create or replace keeps them): the coach's signed-in account only, never anon.
+-- Stated here so a project built from these files has them too; the is_coach() check above is the second lock.
+revoke execute on function public.forget_contact(text) from public, anon;
+grant execute on function public.forget_contact(text) to authenticated;
