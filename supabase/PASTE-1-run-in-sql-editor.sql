@@ -1,3 +1,5 @@
+-- ★ RUN on 2026-10-11 by Amir and checked on the live database (Content/COACH-AUDIT.md §11). Nothing to do with this file now:
+--   it is kept as the record of what was pasted. Every part is safe to run again, but there is no need.
 -- ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 --  PASTE THIS WHOLE FILE INTO  Supabase → SQL Editor  AND PRESS RUN.   (made 2026-10-11 for Amir)
 --

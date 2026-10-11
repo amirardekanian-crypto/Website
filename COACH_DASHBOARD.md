@@ -586,7 +586,7 @@ contact details, their whole progress row (habit log, body weight, records), the
 their roll-call lines. Their programme, login, session history, titles and season results stay.
 It is not offered for coached clients: on them the progress row is their training app's cloud
 copy. (Until 2026-10-10 it was offered for everyone and this manual said their logs were untouched.
-`supabase/stage45_forget_contact_guard.sql` makes the server refuse a coached athlete too.) It is
+`supabase/stage45_forget_contact_guard.sql`, applied 2026-10-11, makes the server refuse a coached athlete too.) It is
 not a full erasure: their login still works, so a phone they still use can upload again.
 
 **The Library tab** (`#links`) lists every workout and article, published or hidden, with *Copy App*
@@ -597,8 +597,8 @@ instead of "No logins yet", and *Mark sent* asks first (it clears the only store
 The **private note** typed when a login is made lives in `buyer_notes`, which only the coach can read (stage53, Amir
 2026-10-11): it used to be the account row's `label`, which the buyer could read through their own account. A trigger
 moves any label the Edge Functions still write into `buyer_notes` and leaves the row's label empty, so the Edge
-Functions did not change; the lists read the note from `buyer_notes` and fall back to the old column while stage53
-is not applied. Each buyer row has **Erase…**.
+Functions did not change; the lists read the note from `buyer_notes` (applied 2026-10-11) and still fall back to the old
+column on a project that has not run stage53. Each buyer row has **Erase…**.
 
 ### Erasing a person
 
