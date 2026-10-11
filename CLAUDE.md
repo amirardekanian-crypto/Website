@@ -336,15 +336,18 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
 - **A person is erased by one call, `coach_erase_person()`** (stage54, 2026-10-11; Amir: "both athletes and buyers"), never table by
   table from the page: the inline Erase panel asks for a dry run first (the function does the whole erasure and undoes it, so the
   list shown is what a real run deletes), a real run needs the athlete id or the buyer's username typed, and after the deletes it
-  checks every public table with an `athlete_id` column and undoes everything if one still holds a row. **A table you add that holds
-  a person's data goes into its table list the day you create it** (`supabase/stage54_erase_person.sql`), and into
-  `BACKUP_TABLES`. An affiliate partner record stays when its athlete is erased (only the link is cleared). The private note about
-  a buyer lives in `buyer_notes`, coach-only; the account rows' `label` stays empty (a trigger moves anything written there).
+  checks every table in the public and backup schemas with an `athlete_id` column, and every public `uuid` column called `user_id` or
+  `account_id`, and undoes everything if one still holds a row. **A table you add that holds a person's data goes into its table list
+  the day you create it** (`supabase/stage54_erase_person.sql`), and into `BACKUP_TABLES`; the one-off rollback copies the pipeline
+  makes live in the `backup` schema and are emptied for the person automatically. Intake forms are the coach's pick (matches by email,
+  WhatsApp number or name are only offered; a finder lists any other, at most 10). An affiliate partner record stays when its athlete
+  is erased (only the link is cleared). The private note about a buyer lives in `buyer_notes`, coach-only; the account rows' `label`
+  stays empty (a trigger moves anything written there). Tables are emptied in `publish_cycle()`'s lock order (programme first).
 - **The weekly call log is retired** (Amir, 2026-10-11): no Calls tab, no new call logs, no Copy cycle prompt; old logs are read and
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (55 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (59 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.

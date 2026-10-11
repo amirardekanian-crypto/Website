@@ -625,7 +625,7 @@ reaches you (it ran out five times, three of them with you at the screen) and I 
 | 2 | Apply stage45 (Forget refused for coached clients) | Apply it now | **Waits for you to run it** (first part of the SQL pack). |
 | 3 | Cancelling a quest week and the XP | **Keep what was earned** | **Done and live** (stage55 applied and checked 2026-10-11; the dashboard button and `habits.html` ship with the pull request). |
 | 4 | Stored first passwords | Clear one automatically once the person has signed in with it | **Done** (stage51). Today 3 course buyers had a used password stored; the backfill clears them. |
-| 5 | One-step full erasure | Athletes **and** buyers | Built and tested (stage54). **Waits for you to run it.** A partner record stays and only its link to the athlete is cleared (your answer). |
+| 5 | One-step full erasure | Athletes **and** buyers | Built, reviewed by an independent agent, fixed and tested (stage54). **Waits for you to run it.** A partner record stays and only its link to the athlete is cleared; intake forms are **your pick** inside the Erase panel (your answer, below). |
 | 6 | Testing-app players, notes and results in the backup | Yes, add the read permission | **Done** (stage50, applied 2026-10-11; in `BACKUP_TABLES`) |
 | 7 | How many programme versions to keep | The current and the previous cycle | Written and tested (stage52). **Waits for you to run it** (it contains a delete). |
 | 8 | Sessions from the previous cycle | Just label them, as now | decided: no change |
@@ -650,3 +650,29 @@ them until they roll off (about 3 months), which is what the privacy notice prom
 **Stage50 and the privacy notices.** The three tables hold a buyer's own players (name, birth year and month, sex, hand, squad), often
 juniors. The coach policy is read-only. The privacy notices say nothing about the testing app, its accounts or its players
 (MKT-16), so no promise was broken, but the notice should say it. A draft is in `Content/PRIVACY-DRAFT-BUYER-ACCOUNTS.md`; it needs your word, and one legal question answered (controller or processor for the players).
+
+### The independent review of the erasure work (2026-10-11)
+
+A separate agent attacked stage53, stage54 and the Erase panel for about 70 minutes on a local copy and with read-only queries on the live
+database (it wrote nothing to the project). It found one blocker and a list of real gaps; none were caught by the suite that passed before.
+Everything below is fixed, with a test that fails without the fix (each one was broken on purpose to prove it).
+
+| Finding | What it did | Fix |
+|---|---|---|
+| **Blocker: `p_dry_run => NULL`** | `not null` is null, so the typed-word check, the receipt and the dry-run rollback were all skipped while every delete committed: a real erasure with no confirmation and no receipt | NULL is refused (`p_dry_run must be true or false`) |
+| **`backup.onename_2026_10_09`** | The rollback copy of the 9 Oct rename holds 42 rows (whole progress blobs of 17 athletes, 24 session logs of 9) keyed by `athlete_id`; the erasure never touched it and its leftover scan read the `public` schema only | Any table in the `backup` schema with an `athlete_id` column is emptied for the person, and the scan covers both schemas. **You can drop the table itself whenever you are sure the rename is right.** |
+| **Intake forms almost never found** | Only 6 of 50 athletes would be offered a form (emails only from the Proof contact, which 30 of 52 athletes lack; Latin programme names against Persian form names), and the panel was silent when none matched | WhatsApp numbers are matched too (last 9 digits, Persian digits folded); a number or email another athlete's contact carries is flagged and never ticked for you; the panel says plainly when nothing matched. **Your answer: a finder in the panel lists every other form** (name, email, contact, date), up to 10 per erasure |
+| **Revoked buyers** | Their Erase panel was drawn inside the closed *Revoked* section: invisible | The section opens for the person whose panel is open |
+| **A key in the wrong case** | `ZZ_Case_A` for `zz_case_a` deleted the login (found by lower-cased email) and left the data, with a receipt | A sign-in that an identity row ties to another id is never taken; the error names the id that exists |
+| **Lock order** | The erasure emptied the coaching log before the programme; `publish_cycle()` locks them the other way round: a deadlock, with the publish as the victim. The same order also let a publish's new version rows slip past | Programme first, as the publish does; tested with two sessions, checking both results |
+| **A phone saving at the moment of the erasure** | A write the erasure cannot see (uncommitted), or an upsert that waited for it, leaves one row under the erased id | Not closable without changing every athlete function. The person reappears in the roster and a second erase removes it; the final alert says so. Buyers are safe (foreign keys) |
+| Wording and state | "Sign-in account included" even for a free Proof athlete; *answer never arrived* told you to look for "nothing is stored" (an erased person is gone from the list); an error that only *looks* final (PostgREST's own connection codes) was reported as "nothing was erased"; a hung call stranded *Erasing…*; the confirm box lost focus on any redraw; the buyer notes read failed silently | Each corrected: the alert claims only what happened, the wording says "gone from the roster = it went through", only errors that prove nothing committed say so, **Stop waiting** after 30 s (a late success still finishes the job), focus is restored, a failed notes read raises the banner (a missing table, before stage53, does not) |
+| Leftover check for buyers | Only the four login tables were checked after a buyer's erasure | Any public `uuid` column called `user_id` or `account_id` that still holds the deleted sign-in undoes the erasure |
+
+**What the panel now says stays, because it is true:** your weekly backups; your inbox and WhatsApp; their phone; **any copy on your computer
+(`data/<id>.json`, a saved Backup)**; and their **board name in other athletes' last-seen standings** (`lbSeen`: 32 app-data blobs hold 447
+names and places; each phone rewrites it from the current board at its next view, so it clears itself).
+
+**Found, not fixable by code (for the record).** Free-text mentions of an erased person in *other* athletes' coaching logs (3 mention an id,
+1 a full name today); two athlete ids named in a migration's text (`20260907140013`); the auth audit log is empty because audit logging is
+off (if it is ever switched on its entries carry `athlete.<id>@…` and do not cascade).

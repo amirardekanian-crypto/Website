@@ -860,29 +860,29 @@ select pg_temp.coach() \g /dev/null
 
 -- ═════════════════════ I. stage54: one-step full erasure of an athlete or a buyer ═════════════════════
 select pg_temp.nobody() \g /dev/null
--- a fingerprint of every row in the public and auth tables: equal before and after means NOTHING changed
+-- a fingerprint of every row in the public, backup and auth tables: equal before and after means NOTHING changed
 create function pg_temp.fingerprint() returns text language plpgsql as $$
 declare t record; h text := ''; x text;
 begin
   for t in select n.nspname, c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace
-            where c.relkind = 'r' and n.nspname in ('public', 'auth') order by 1, 2 loop
+            where c.relkind = 'r' and n.nspname in ('public', 'backup', 'auth') order by 1, 2 loop
     execute format('select coalesce(md5(string_agg(r::text, ''|'' order by r::text)), '''') from %I.%I r', t.nspname, t.relname) into x;
     h := h || t.nspname || '.' || t.relname || '=' || x || ';';
   end loop;
   return md5(h);
 end $$;
--- rows left under an athlete id, found from the catalogue (not from the function's own list)
+-- rows left under an athlete id, in the public and backup schemas, found from the catalogue (not from the function's own list)
 create function pg_temp.rows_for(p_id text) returns bigint language plpgsql as $$
-declare t text; n bigint; total bigint := 0;
+declare t record; n bigint; total bigint := 0;
 begin
-  for t in select c.relname::text from pg_attribute a join pg_class c on c.oid = a.attrelid join pg_namespace s on s.oid = c.relnamespace
-            where s.nspname = 'public' and a.attname = 'athlete_id' and a.attnum > 0 and not a.attisdropped and c.relkind = 'r' loop
-    execute format('select count(*) from public.%I where athlete_id::text = $1', t) into n using p_id;
+  for t in select s.nspname::text as sch, c.relname::text as tbl from pg_attribute a join pg_class c on c.oid = a.attrelid join pg_namespace s on s.oid = c.relnamespace
+            where s.nspname in ('public', 'backup') and a.attname = 'athlete_id' and a.attnum > 0 and not a.attisdropped and c.relkind = 'r' loop
+    execute format('select count(*) from %I.%I where athlete_id::text = $1', t.sch, t.tbl) into n using p_id;
     total := total + n;
   end loop;
   return total;
 end $$;
-create function pg_temp.seed_athlete(p_id text, p_user uuid, p_first text, p_last text, p_email text) returns void language plpgsql as $$
+create function pg_temp.seed_athlete(p_id text, p_user uuid, p_first text, p_last text, p_email text, p_wa text default '+0000') returns void language plpgsql as $$
 begin
   insert into auth.users (id, email) values (p_user, 'athlete.' || p_id || '@amirardekani.com');
   insert into auth.sessions (user_id) values (p_user);
@@ -903,17 +903,21 @@ begin
   insert into public.coaching_logs (athlete_id, body) values (p_id, 'log');
   insert into public.coaching_log_versions (athlete_id, body) select p_id, 'old ' || g from generate_series(1, 3) g;
   insert into public.athlete_keys (athlete_id, secret_key) values (p_id, 'k');
-  insert into public.hab_contacts (athlete_id, email, whatsapp, source, tier) values (p_id, p_email, '+0000', 'proof', 'free');
+  insert into public.hab_contacts (athlete_id, email, whatsapp, source, tier) values (p_id, p_email, p_wa, 'proof', 'free');
+  -- the rollback copy the 2026-10-09 rename left in the backup schema: an old progress blob and an old session log
+  insert into backup.onename_2026_10_09 (athlete_id, kind, ref, old) values (p_id, 'progress', '{}', '{"x_note_1":"private words"}'), (p_id, 'session_log', '{"day":1}', '{}');
 end $$;
 
-select pg_temp.seed_athlete('zz_erase_a', '00000000-0000-0000-0000-0000000000e1', 'Zed', 'Erased', 'Zed.Erased@Example.Invalid');
-select pg_temp.seed_athlete('zz_keep_b',  '00000000-0000-0000-0000-0000000000e2', 'Kay', 'Kept', 'kay.kept@example.invalid');
+select pg_temp.seed_athlete('zz_erase_a', '00000000-0000-0000-0000-0000000000e1', 'Zed', 'Erased', 'Zed.Erased@Example.Invalid', '+989120001111');
+select pg_temp.seed_athlete('zz_keep_b',  '00000000-0000-0000-0000-0000000000e2', 'Kay', 'Kept', 'kay.kept@example.invalid', '+989120002222');
 insert into public.affiliates (code, coach_name, athlete_id) values ('ZZAFF', 'Zed Erased', 'zz_erase_a'), ('ZZAFFB', 'Kay Kept', 'zz_keep_b');
-insert into public.hab_intake (id, name, email, programme) values
-  ('00000000-0000-0000-0000-00000000f001', 'Zed Erased', ' ZED.erased@example.invalid ', '3 months'),   -- the same email (case and spaces differ)
-  ('00000000-0000-0000-0000-00000000f002', 'ZED   erased', 'other@example.invalid', '1 month'),         -- the same full name
-  ('00000000-0000-0000-0000-00000000f003', 'Someone Else', 'someone@example.invalid', '6 months'),      -- nobody we are erasing
-  ('00000000-0000-0000-0000-00000000f004', 'Kay Kept', 'kay.kept@example.invalid', '3 months');         -- the control's own form
+insert into public.hab_intake (id, name, email, contact, programme) values
+  ('00000000-0000-0000-0000-00000000f001', 'Zed Erased', ' ZED.erased@example.invalid ', '@zed', '3 months'),   -- the same email (case and spaces differ)
+  ('00000000-0000-0000-0000-00000000f002', 'ZED   erased', 'other@example.invalid', '@someone', '1 month'),     -- the same full name
+  ('00000000-0000-0000-0000-00000000f003', 'Someone Else', 'someone@example.invalid', '@else', '6 months'),    -- nobody we are erasing
+  ('00000000-0000-0000-0000-00000000f004', 'Kay Kept', 'kay.kept@example.invalid', '+989120002222', '3 months'), -- the control's own form
+  ('00000000-0000-0000-0000-00000000f005', 'زد', null, '۰۹۱۲۰۰۰۱۱۱۱', '6 months'),                           -- a Persian name and the same number typed with Persian digits
+  ('00000000-0000-0000-0000-00000000f006', 'Short', null, '09120', '1 month');                                 -- digits, but too few to be a number
 -- two course buyers and two testing-app buyers
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000f1', 'tps.zz_course_c@amirardekani.com'), ('00000000-0000-0000-0000-0000000000f2', 'tps.zz_course_d@amirardekani.com'),
@@ -971,20 +975,23 @@ begin
   perform pg_temp.rec('erase: ...and it changed nothing in any table (a fingerprint of every row is the same)', pg_temp.fingerprint() = fp0, '');
   perform pg_temp.rec('erase: the preview gives a name to show and the word to type', r ->> 'shown_as' = 'Zed Erased' and r ->> 'confirm_word' = 'zz_erase_a', r ->> 'shown_as');
   for k in select key as t, value::bigint as c from jsonb_each_text(r -> 'counts') where key not in ('auth_users', 'hab_intake') loop
-    execute format('select count(*) from public.%I where athlete_id = ''zz_erase_a''', k.t) into n;
+    -- a key is a public table, or "backup.<table>" for a rollback copy in the backup schema
+    execute format('select count(*) from %I.%I where athlete_id = ''zz_erase_a''', case when k.t like 'backup.%' then 'backup' else 'public' end, regexp_replace(k.t, '^backup\.', '')) into n;
     if n <> k.c then bad := bad || k.t || ' says ' || k.c || ' but has ' || n || '; '; end if;
     s := s + k.c;
   end loop;
   perform pg_temp.rec('erase: every count in the preview is the real number of rows in that table', bad = '', bad);
-  perform pg_temp.rec('erase: the preview lists all 17 athlete tables, the intake forms and the sign-in account',
-    (select count(*) from jsonb_object_keys(r -> 'counts')) = 19, (select count(*) from jsonb_object_keys(r -> 'counts'))::text);
+  perform pg_temp.rec('erase: the preview lists all 17 athlete tables, the rollback copy, the intake forms and the sign-in account',
+    (select count(*) from jsonb_object_keys(r -> 'counts')) = 20 and (r -> 'counts' ->> 'backup.onename_2026_10_09')::int = 2, (select count(*) from jsonb_object_keys(r -> 'counts'))::text);
   perform pg_temp.rec('erase: the total is their sum plus the sign-in account (and no intake form was picked)',
     (r ->> 'total')::bigint = s + 1 and (r -> 'counts' ->> 'auth_users')::int = 1 and (r -> 'counts' ->> 'hab_intake')::int = 0, r ->> 'total');
-  perform pg_temp.rec('erase: two intake forms look like theirs: the same email and the same full name, not the stranger''s and not the other athlete''s',
-    jsonb_array_length(r -> 'intake_candidates') = 2
+  perform pg_temp.rec('erase: three intake forms look like theirs: the same email, the same full name, and the same WhatsApp number typed with Persian digits; not the stranger''s, not the other athlete''s, not a number that is too short',
+    jsonb_array_length(r -> 'intake_candidates') = 3
     and (select string_agg(c ->> 'id' || ':' || (c ->> 'matched_on'), ',' order by c ->> 'id') from jsonb_array_elements(r -> 'intake_candidates') c)
-        = '00000000-0000-0000-0000-00000000f001:email,00000000-0000-0000-0000-00000000f002:name',
+        = '00000000-0000-0000-0000-00000000f001:email,00000000-0000-0000-0000-00000000f002:name,00000000-0000-0000-0000-00000000f005:whatsapp',
     (r -> 'intake_candidates')::text);
+  perform pg_temp.rec('erase: ...and none of them is shared with another athlete''s contact',
+    not (select bool_or((c ->> 'shared')::boolean) from jsonb_array_elements(r -> 'intake_candidates') c), (r -> 'intake_candidates')::text);
   perform pg_temp.rec('erase: the partner record that points at them is listed as unlinked (not erased)', r -> 'affiliates_unlinked' = '["ZZAFF"]'::jsonb, (r -> 'affiliates_unlinked')::text);
   -- a dry run with intake forms picked counts them
   execute 'set local role authenticated';
@@ -992,6 +999,21 @@ begin
   execute 'reset role';
   perform pg_temp.rec('erase: a dry run with an intake form picked counts it, and still changes nothing', (r -> 'counts' ->> 'hab_intake')::int = 1 and pg_temp.fingerprint() = fp0, r -> 'counts' ->> 'hab_intake');
 end $t$;
+
+-- 2b. the same email and number on ANOTHER athlete's contact (a parent's, for two children): those forms are flagged shared, so the
+-- dashboard never ticks them for the coach
+insert into public.hab_contacts (athlete_id, email, whatsapp, source, tier) values ('zz_sibling', ' ZED.erased@example.invalid', '989120001111', 'proof', 'free');
+do $t$
+declare r jsonb;
+begin
+  perform pg_temp.coach();
+  r := public.coach_erase_person('athlete', 'zz_erase_a');
+  perform pg_temp.rec('erase: a form matched by an email or number that another athlete''s contact also carries is flagged shared; a name match is not',
+    (select string_agg(c ->> 'id' || ':' || (c ->> 'shared'), ',' order by c ->> 'id') from jsonb_array_elements(r -> 'intake_candidates') c)
+      = '00000000-0000-0000-0000-00000000f001:true,00000000-0000-0000-0000-00000000f002:false,00000000-0000-0000-0000-00000000f005:true',
+    (r -> 'intake_candidates')::text);
+end $t$;
+delete from public.hab_contacts where athlete_id = 'zz_sibling';
 
 -- 3. a real run is refused without the typed word, with the wrong one, or with an intake form that is not theirs
 do $t$
@@ -1004,12 +1026,15 @@ begin
   begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_keep_b', '{}', false);
     perform pg_temp.rec('erase: ...and with someone else''s id', false, 'no error');
   exception when others then perform pg_temp.rec('erase: ...and with someone else''s id', sqlerrm like '%confirmation does not match%', sqlerrm); end;
-  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', array['00000000-0000-0000-0000-00000000f003']::uuid[], false);
-    perform pg_temp.rec('erase: an intake form that is a stranger''s cannot be added to the erasure', false, 'no error');
-  exception when others then perform pg_temp.rec('erase: an intake form that is a stranger''s cannot be added to the erasure', sqlerrm like '%not a form that carries this person%', sqlerrm); end;
-  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', array['00000000-0000-0000-0000-00000000f004']::uuid[], false);
-    perform pg_temp.rec('erase: ...nor another athlete''s own form', false, 'no error');
-  exception when others then perform pg_temp.rec('erase: ...nor another athlete''s own form', sqlerrm like '%not a form that carries this person%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', array['00000000-0000-0000-0000-00000000ffff']::uuid[], false);
+    perform pg_temp.rec('erase: an intake form that does not exist stops the erasure', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: an intake form that does not exist stops the erasure', sqlerrm like '%does not exist%' and sqlerrm like '%Nothing was erased%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', array['00000000-0000-0000-0000-00000000f001', null]::uuid[], false);
+    perform pg_temp.rec('erase: ...and so does an empty entry in the list', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: ...and so does an empty entry in the list', sqlerrm like '%does not exist%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', (select array_agg(gen_random_uuid()) from generate_series(1, 11)), false);
+    perform pg_temp.rec('erase: a list of more than 10 intake forms is refused as a mistake', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: a list of more than 10 intake forms is refused as a mistake', sqlerrm like '%More than 10 intake forms%', sqlerrm); end;
   perform pg_temp.rec('erase: none of those refusals changed anything', pg_temp.fingerprint() = fp0, '');
 end $t$;
 
@@ -1050,9 +1075,19 @@ begin
   begin perform public.coach_erase_person('athlete', 'zz_nobody_here', 'zz_nobody_here', '{}', false);
     perform pg_temp.rec('erase: an id with nothing stored raises (a typo cannot look like a success)', false, 'no error');
   exception when others then perform pg_temp.rec('erase: an id with nothing stored raises (a typo cannot look like a success)', sqlerrm like '%Nothing is stored%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'zz_nobody_here', 'zz_nobody_here', array['00000000-0000-0000-0000-00000000f003']::uuid[], false);
+    perform pg_temp.rec('erase: a mistyped id with an intake form ticked raises, and the form is not erased', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: a mistyped id with an intake form ticked raises, and the form is not erased', sqlerrm like '%Nothing is stored%', sqlerrm); end;
   begin perform public.coach_erase_person('guest', 'x');
     perform pg_temp.rec('erase: an unknown kind is refused', false, 'no error');
   exception when others then perform pg_temp.rec('erase: an unknown kind is refused', sqlerrm like '%Unknown kind%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', '{}', null);
+    perform pg_temp.rec('erase: a NULL dry-run flag is refused (it used to skip the confirmation and the receipt but still delete)', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: a NULL dry-run flag is refused (it used to skip the confirmation and the receipt but still delete)', sqlerrm like '%must be true or false%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'ZZ_ERASE_A', 'ZZ_ERASE_A', '{}', false);
+    perform pg_temp.rec('erase: an id typed in another case finds nothing, names the real id, and takes neither the login nor the data', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: an id typed in another case finds nothing, names the real id, and takes neither the login nor the data',
+    sqlerrm like '%Nothing is stored for "ZZ_ERASE_A"%' and sqlerrm like '%"zz_erase_a": ids are case-sensitive%', sqlerrm); end;
   begin perform public.coach_erase_person('athlete', '   ');
     perform pg_temp.rec('erase: an empty id is refused', false, 'no error');
   exception when others then perform pg_temp.rec('erase: an empty id is refused', sqlerrm like '%Who?%', sqlerrm); end;
@@ -1091,6 +1126,34 @@ begin
 end $t$;
 drop trigger zz_boom2 on public.hab_titles;
 
+-- 5b. the backup schema: a table there with an athlete_id column is emptied for the person even though the function was never told
+-- its name, and one whose rows cannot be removed stops the erasure like an unknown public table does
+create table backup.zz_extra (athlete_id text, note text);
+insert into backup.zz_extra values ('zz_erase_a', 'another rollback copy'), ('zz_keep_b', 'not theirs');
+create table backup.zz_stubborn (athlete_id text, note text);
+insert into backup.zz_stubborn values ('zz_erase_a', 'a row that refuses to go');
+create function pg_temp.skip_delete() returns trigger language plpgsql as $$ begin return null; end $$;
+create trigger zz_skip before delete on backup.zz_stubborn for each row execute function pg_temp.skip_delete();
+do $t$
+declare fp0 text := pg_temp.fingerprint(); r jsonb;
+begin
+  perform pg_temp.coach();
+  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', '{}', false);
+    perform pg_temp.rec('erase backup: a row in the backup schema that cannot be removed stops the erasure', false, 'no error');
+  exception when others then perform pg_temp.rec('erase backup: a row in the backup schema that cannot be removed stops the erasure', sqlerrm like '%backup.zz_stubborn%still holds 1 row%', sqlerrm); end;
+  perform pg_temp.rec('erase backup: ...and nothing was erased, not even the rollback copies it had already emptied', pg_temp.fingerprint() = fp0, '');
+end $t$;
+drop trigger zz_skip on backup.zz_stubborn;
+drop table backup.zz_stubborn;
+do $t$
+declare fp0 text := pg_temp.fingerprint(); r jsonb;
+begin
+  perform pg_temp.coach();
+  r := public.coach_erase_person('athlete', 'zz_erase_a');
+  perform pg_temp.rec('erase backup: the preview counts a backup table nobody told the function about, and still changes nothing',
+    (r -> 'counts' ->> 'backup.zz_extra')::int = 1 and (r -> 'counts' ->> 'backup.onename_2026_10_09')::int = 2 and pg_temp.fingerprint() = fp0, (r -> 'counts')::text);
+end $t$;
+
 -- 6. the real erasure of an athlete
 select set_config('zz.b_rows', pg_temp.rows_for('zz_keep_b')::text, false) \g /dev/null
 do $t$
@@ -1099,21 +1162,26 @@ begin
   perform pg_temp.coach();
   execute 'set local role authenticated';
   d := public.coach_erase_person('athlete', 'zz_erase_a');
-  r := public.coach_erase_person('athlete', 'zz_erase_a', 'ZZ_Erase_A', array['00000000-0000-0000-0000-00000000f001']::uuid[], false);
+  -- two forms are picked: f001 is one the function offered (the same email), f003 is a stranger's name typed in by hand: the coach decides
+  r := public.coach_erase_person('athlete', 'zz_erase_a', 'ZZ_Erase_A', array['00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-00000000f003']::uuid[], false);
   execute 'reset role';
   perform pg_temp.rec('erase: the real run reports it is not a dry run, and a receipt number', (r ->> 'dry_run')::boolean = false and (r ->> 'log_id') is not null, r::text);
-  perform pg_temp.rec('erase: ...with the same counts the dry run gave (plus the one intake form picked)',
-    (r -> 'counts') = (d -> 'counts') || '{"hab_intake":1}'::jsonb, (r -> 'counts')::text);
-  perform pg_temp.rec('erase: nothing is left under their id in ANY table of the public schema', pg_temp.rows_for('zz_erase_a') = 0, pg_temp.rows_for('zz_erase_a')::text);
+  perform pg_temp.rec('erase: ...with the same counts the dry run gave (plus the two intake forms picked)',
+    (r -> 'counts') = (d -> 'counts') || '{"hab_intake":2}'::jsonb, (r -> 'counts')::text);
+  perform pg_temp.rec('erase: nothing is left under their id in ANY table of the public or backup schema', pg_temp.rows_for('zz_erase_a') = 0, pg_temp.rows_for('zz_erase_a')::text);
+  perform pg_temp.rec('erase: the rollback copies in the backup schema went too, and another athlete''s stay',
+    (select count(*) from backup.onename_2026_10_09 where athlete_id = 'zz_erase_a') = 0 and (select count(*) from backup.zz_extra where athlete_id = 'zz_erase_a') = 0
+    and (select count(*) from backup.onename_2026_10_09 where athlete_id = 'zz_keep_b') = 2 and (select count(*) from backup.zz_extra where athlete_id = 'zz_keep_b') = 1, '');
   select count(*) into n from auth.users where id = '00000000-0000-0000-0000-0000000000e1';
   perform pg_temp.rec('erase: their sign-in account is gone', n = 0, n::text);
   select (select count(*) from auth.sessions where user_id = '00000000-0000-0000-0000-0000000000e1')
        + (select count(*) from auth.identities where user_id = '00000000-0000-0000-0000-0000000000e1') into n;
   perform pg_temp.rec('erase: ...and its sessions and identities went with it', n = 0, n::text);
-  select count(*) into n from public.hab_intake where id = '00000000-0000-0000-0000-00000000f001';
-  perform pg_temp.rec('erase: the intake form that was picked is gone', n = 0, n::text);
-  select count(*) into n from public.hab_intake where id in ('00000000-0000-0000-0000-00000000f002', '00000000-0000-0000-0000-00000000f003', '00000000-0000-0000-0000-00000000f004');
-  perform pg_temp.rec('erase: ...and the ones that were not picked, and the other people''s, are still there', n = 3, n::text);
+  select count(*) into n from public.hab_intake where id in ('00000000-0000-0000-0000-00000000f001', '00000000-0000-0000-0000-00000000f003');
+  perform pg_temp.rec('erase: the intake forms that were picked are gone, the offered one and the one named by hand', n = 0, n::text);
+  select count(*) into n from public.hab_intake where id in ('00000000-0000-0000-0000-00000000f002', '00000000-0000-0000-0000-00000000f004',
+                                                              '00000000-0000-0000-0000-00000000f005', '00000000-0000-0000-0000-00000000f006');
+  perform pg_temp.rec('erase: ...and the ones that were not picked (offered or not), and the other athlete''s, are still there', n = 4, n::text);
   select count(*) into n from public.affiliates where code = 'ZZAFF' and athlete_id is null;
   perform pg_temp.rec('erase: the partner record stays; only its link to the erased athlete is cleared', n = 1, n::text);
   select count(*) into n from public.affiliates where code = 'ZZAFFB' and athlete_id = 'zz_keep_b';
@@ -1130,15 +1198,31 @@ begin
   perform pg_temp.rec('erase: the receipt holds the kind, the coach, the date and a hash of "athlete:zz_erase_a"',
     l.kind = 'athlete' and l.erased_by = 'amirardekanian@gmail.com' and l.subject_hash = hash and l.erased_at > now() - interval '1 minute', l.subject_hash);
   perform pg_temp.rec('erase: ...and no name, id or email anywhere in it', position('zz_erase_a' in lower(l::text)) = 0 and position('zed' in lower(l::text)) = 0 and position('example' in lower(l::text)) = 0, l::text);
-  perform pg_temp.rec('erase: ...with the counts, and how many partner links were cleared', (l.counts ->> 'session_history')::int = 2 and (l.counts ->> 'affiliates_unlinked')::int = 1, l.counts::text);
+  perform pg_temp.rec('erase: ...with the counts, and how many partner links were cleared', (l.counts ->> 'session_history')::int = 2 and (l.counts ->> 'affiliates_unlinked')::int = 1
+    and (l.counts ->> 'backup.onename_2026_10_09')::int = 2, l.counts::text);
 
   -- run it again: there is nothing left
   begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', '{}', false);
     perform pg_temp.rec('erase: running it again finds nothing and says so', false, 'no error');
   exception when others then perform pg_temp.rec('erase: running it again finds nothing and says so', sqlerrm like '%Nothing is stored%', sqlerrm); end;
 end $t$;
+drop table backup.zz_extra;
 
 -- 7. a course buyer
+-- first, a table added after stage54 that keys its rows on the sign-in: the function does not know it, so it must stop
+create table public.zz_user_thing (user_id uuid, note text);
+insert into public.zz_user_thing values ('00000000-0000-0000-0000-0000000000f1', 'a table added after stage54, keyed on the sign-in');
+do $t$
+declare fp0 text := pg_temp.fingerprint();
+begin
+  perform pg_temp.coach();
+  begin perform public.coach_erase_person('course', 'zz_course_c', 'zz_course_c', '{}', false);
+    perform pg_temp.rec('erase course: a table keyed on the sign-in that the function does not know stops the erasure', false, 'no error');
+  exception when others then perform pg_temp.rec('erase course: a table keyed on the sign-in that the function does not know stops the erasure',
+    sqlerrm like '%zz_user_thing%user_id%does not know that table%', sqlerrm); end;
+  perform pg_temp.rec('erase course: ...and nothing was erased', pg_temp.fingerprint() = fp0, '');
+end $t$;
+drop table public.zz_user_thing;
 do $t$
 declare fp0 text; d jsonb; r jsonb; n int; l record;
 begin

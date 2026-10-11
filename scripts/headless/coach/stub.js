@@ -386,9 +386,16 @@
     // from the login rows. The SQL itself is tested on a real Postgres by scripts/test_spine_sql.sh.
     coach_erase_person: function (p) {
       var kind = String(p.p_kind == null ? '' : p.p_kind).trim().toLowerCase(), key = String(p.p_key == null ? '' : p.p_key).trim();
+      // Like the SQL: an explicit NULL is refused (it once skipped every check and still deleted); an omitted flag is a dry run.
+      if (p.p_dry_run === null) throw new Error('p_dry_run must be true or false, not null. Nothing was erased.');
       var dry = p.p_dry_run !== false, ids = p.p_intake_ids || [];
       var lc = function (v) { return String(v == null ? '' : v).trim().toLowerCase(); };
       var norm = function (v) { return lc(v).replace(/\s+/g, ' '); };
+      // the last 9 digits of a number, Persian and Arabic-Indic digits folded (null when there are fewer than 9 digits)
+      var phoneKey = function (v) {
+        var d = String(v == null ? '' : v).replace(/[٠-٩۰-۹]/g, function (c) { return String('٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹'.indexOf(c) % 10); }).replace(/\D/g, '');
+        return d.length >= 9 ? d.slice(-9) : null;
+      };
       if (['athlete', 'course', 'testing'].indexOf(kind) < 0) throw new Error('Unknown kind of person "' + kind + '": use athlete, course or testing.');
       if (!key) throw new Error('Who? The id or username is empty.');
       var del = {}, counts = {}, word, shown, cands = [], unlinked = [], users = [];
@@ -403,14 +410,24 @@
         if (!shown) { var ap = tbl('athlete_progress').find(function (r) { return r.athlete_id === key; }); shown = (ap && ap.athlete_name) || ''; }
         shown = shown || key;
         users = tbl('athlete_identities').filter(function (r) { return r.athlete_id === key; }).map(function (r) { return r.user_id; });
-        var emails = tbl('hab_contacts').filter(function (r) { return r.athlete_id === key && lc(r.email); }).map(function (r) { return lc(r.email); });
+        var mine = tbl('hab_contacts').filter(function (r) { return r.athlete_id === key; }), others = tbl('hab_contacts').filter(function (r) { return r.athlete_id !== key; });
+        var emails = mine.filter(function (r) { return lc(r.email); }).map(function (r) { return lc(r.email); });
+        var phones = mine.map(function (r) { return phoneKey(r.whatsapp); }).filter(Boolean);
         var full = a.firstName && a.lastName ? norm(a.firstName + ' ' + a.lastName) : null;
-        cands = tbl('hab_intake').filter(function (i) { return emails.indexOf(lc(i.email)) >= 0 || (full && norm(i.name) === full); })
-          .map(function (i) { return { id: i.id, created_at: i.created_at, name: i.name, programme: i.programme, lang: i.lang, matched_on: emails.indexOf(lc(i.email)) >= 0 ? 'email' : 'name' }; });
-        ids.forEach(function (id) { if (!cands.some(function (c) { return c.id === id; })) throw new Error('One of the intake forms is not a form that carries this person\'s email or full name. Nothing was erased.'); });
+        // email, then WhatsApp number, then full name (the SQL's order); 'shared' = another athlete's contact carries the same email or number
+        cands = tbl('hab_intake').map(function (i) {
+          var how = lc(i.email) && emails.indexOf(lc(i.email)) >= 0 ? 'email' : (phoneKey(i.contact) && phones.indexOf(phoneKey(i.contact)) >= 0 ? 'whatsapp' : (full && norm(i.name) === full ? 'name' : null));
+          var shared = (how === 'email' && others.some(function (c) { return lc(c.email) === lc(i.email); })) || (how === 'whatsapp' && others.some(function (c) { return phoneKey(c.whatsapp) === phoneKey(i.contact); }));
+          return how ? { id: i.id, created_at: i.created_at, name: i.name, programme: i.programme, lang: i.lang, matched_on: how, shared: !!shared } : null;
+        }).filter(Boolean);
+        // The forms to erase are the coach's pick: any form that exists, up to 10; a form that is gone stops the erasure.
+        if (ids.filter(function (id, n) { return ids.indexOf(id) === n; }).length > 10) throw new Error('More than 10 intake forms in one erasure is almost certainly a mistake. Nothing was erased.');
+        ids.forEach(function (id) { if (!id || !tbl('hab_intake').some(function (i) { return i.id === id; })) throw new Error('One of the intake forms does not exist (it may already be gone). Nothing was erased.'); });
         ['session_history', 'athlete_progress', 'hab_notes', 'hab_titles', 'hab_season_results', 'leaderboard_optin', 'library_sessions', 'messages',
           'call_logs', 'cycle_reports', 'coaching_log_versions', 'coaching_logs', 'program_versions', 'programs', 'athlete_keys', 'hab_contacts',
           'athlete_identities'].forEach(function (t) { pick(t, function (r) { return r.athlete_id === key; }); });
+        // the rollback copy the 2026-10-09 rename left in the backup schema (the SQL empties every table there with an athlete_id column)
+        pick('backup.onename_2026_10_09', function (r) { return r.athlete_id === key; });
         pick('hab_intake', function (r) { return ids.indexOf(r.id) >= 0; });
         unlinked = tbl('affiliates').filter(function (r) { return r.athlete_id === key; }).map(function (r) { return r.code; }).sort();
       } else {

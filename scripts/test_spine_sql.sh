@@ -29,7 +29,7 @@ else
   DATA=$(mktemp -d)
   as_pg() { sh -c "$*"; }
 fi
-PORT=54000
+PORT=${COACHTEST_PORT:-54000}   # a second run at the same time (mutation checks) uses another port
 cleanup() { as_pg "$PGBIN/pg_ctl -D $DATA -m immediate stop" >/dev/null 2>&1; rm -rf "$DATA"; }
 trap cleanup EXIT INT TERM
 
@@ -91,6 +91,21 @@ wait
 echo "$out" | grep -q 'deadlock' && check "documented order: no deadlock" no "$out" || check "documented order: no deadlock" ok
 echo "$out" | grep -q '"ok": true' && check "documented order: the dashboard save went through after waiting" ok || check "documented order: the dashboard save went through after waiting" no "$out"
 [ "$($P -c "select (select purpose from public.exercises where id='zz-conc3') || ' | ' || (select notes || ' | ' || cost from public.exercise_coach where id='zz-conc3')")" = "Claude A | Claude note | heavy" ] && check "documented order: both writers' columns are there" ok || check "documented order: both writers' columns are there" no "row differs"
+
+# 3b. the erasure of an athlete and a cycle being published (publish_cycle locks the programme, then the coaching log) take the
+#     rows in the SAME order, so neither can deadlock the other, and the new version rows the publish wrote are committed before the
+#     erasure deletes them. (With the coaching log emptied first, as it once was, the publish was the deadlock's victim.)
+$P -c "insert into public.programs (athlete_id, data) values ('zz-lock', '{\"athlete\":{\"firstName\":\"Lock\",\"lastName\":\"Test\"}}'); insert into public.coaching_logs (athlete_id, body) values ('zz-lock', 'log')" >/dev/null
+( $P -c "begin; select 1 from public.programs where athlete_id='zz-lock' for update; select pg_sleep(2); select 1 from public.coaching_logs where athlete_id='zz-lock' for update; insert into public.program_versions (athlete_id, data) values ('zz-lock', '{}'); update public.coaching_logs set body='new' where athlete_id='zz-lock'; commit;" >/dev/null 2>"$DATA/publish.err"; echo $? > "$DATA/publish.rc" ) &
+sleep 1
+out=$($P -c "$CL" -c "select public.coach_erase_person('athlete','zz-lock','zz-lock','{}',false)" 2>&1 | tail -1)
+wait
+# the publish is the one that used to lose the deadlock, so ITS result is checked too (psql exits non-zero when a statement fails)
+echo "$out" | grep -q 'deadlock' && check "erase and publish: the erasure was not the deadlock's victim" no "$out" || check "erase and publish: the erasure was not the deadlock's victim" ok
+[ "$(cat "$DATA/publish.rc" 2>/dev/null)" = "0" ] && check "erase and publish: the publish committed (it was not the deadlock's victim)" ok || check "erase and publish: the publish committed (it was not the deadlock's victim)" no "$(cat "$DATA/publish.err" 2>/dev/null | tail -2)"
+echo "$out" | grep -q '"ok": true' && check "erase and publish: the erasure went through after waiting for the publish" ok || check "erase and publish: the erasure went through after waiting for the publish" no "$out"
+left=$($P -c "select (select count(*) from public.programs where athlete_id='zz-lock') + (select count(*) from public.program_versions where athlete_id='zz-lock') + (select count(*) from public.coaching_logs where athlete_id='zz-lock') + (select count(*) from public.coaching_log_versions where athlete_id='zz-lock')")
+[ "$left" = "0" ] && check "erase and publish: nothing is left, the publish's new rows included" ok || check "erase and publish: nothing is left, the publish's new rows included" no "$left rows left"
 
 # 4. stage55 patches the scoring function in place; given a function it does not recognise it must stop and change nothing
 $P -c "create or replace function public.hab_bonus_xp(p_log jsonb, p_cfg jsonb, p_season_start date, p_from date, p_to date, p_rules jsonb) returns bigint language sql immutable as 'select 42::bigint'" >/dev/null

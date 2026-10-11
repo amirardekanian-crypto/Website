@@ -587,6 +587,10 @@
   .erase .pick { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; padding: 4px 0; line-height: 1.45; }
   .erase .pick input { margin-top: 3px; }
   .erase .stays { color: var(--muted); font-size: 13px; }
+  .erase ul.picked { columns: 1; list-style: none; padding-left: 0; }
+  .erase ul.picked li { padding: 3px 0; }
+  .erase .finder { margin-top: 10px; }
+  .erase .finder label { display: block; font-size: 13.5px; margin-bottom: 4px; }
   .erase .typed { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
   .erase .typed label { flex-basis: 100%; font-size: 13.5px; }
   @media (max-width: 640px) { .erase ul { columns: 1; } }
@@ -1107,7 +1111,7 @@ async function loadAll() {
 // What failed to load, in words, under the tabs. Empty when everything came back.
 const LOAD_ERR_LABEL = {
   programs: 'programmes', logins: 'athlete logins', contacts: 'Proof contacts', intake: 'intake forms',
-  assess: 'testing-app logins', course: 'course logins', spine: 'the exercise library (Spine)',
+  assess: 'testing-app logins', course: 'course logins', buyerNotes: 'your notes about buyers', spine: 'the exercise library (Spine)',
   affiliates: 'affiliate codes', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
 };
 function loadWarnHtml() {
@@ -2157,7 +2161,8 @@ async function hardRefresh() {
   loadLevels().then(() => { if (S.ready) render(); });   // ↻ used to drop the levels and never fetch them again
 }
 let _lastViewKey = '';
-function render() {
+function render() { withEraseFocus(renderNow); }   // withEraseFocus: the Erase panel's boxes keep focus across a redraw
+function renderNow() {
   if (!S.ready) return;
   $('content').classList.remove('no-anim');
   renderRail();
@@ -4104,7 +4109,7 @@ function fileTabHtml(D) {
     <section class="panel">
       <p class="empty" style="padding:0 0 10px">Deletes every finished session and everything the app keeps for them on the server (habit log, body weight, personal records). Their programme, login, coaching log and calls stay, and so do they on the roster.</p>
       <button class="btn sm danger" onclick="deleteAthlete(${jsq(athleteId)})">Delete training history</button>
-      <p class="empty" style="padding:18px 0 10px">Or remove them completely: the programme and its saved versions, the login and sign-in account, sessions, app data, coaching log, calls, reports, titles, board place and contact, in one step. You see the exact list first and type their id to confirm. Their intake forms are offered too.</p>
+      <p class="empty" style="padding:18px 0 10px">Or remove them completely: the programme and its saved versions, the login and sign-in account, sessions, app data, coaching log, calls, reports, titles, board place and contact, in one step. You see the exact list first and type their id to confirm. Intake forms that carry their email, WhatsApp number or name are offered, and you can look for any other form there.</p>
       ${SYSTEM_IDS.includes(athleteId) || athleteId === AMIR_ATHLETE_ID
         ? `<p class="empty" style="padding:0 0 4px">Not offered here: this is the public demo, or the identity the dashboard reads the board through.</p>`
         : (_erase && _erase.kind === 'athlete' && _erase.key === athleteId
@@ -4366,11 +4371,69 @@ const ERASE_WHAT = {
   assess_players: ['player', 'players'], assess_notes: ['player note', 'player notes'], assess_results: ['test result', 'test results'],
   buyer_notes: ['note of yours about them', 'notes of yours about them'],
 };
-function eraseWhat(k, n) { const w = ERASE_WHAT[k]; return w ? (Number(n) === 1 ? w[0] : w[1]) : k; }
+// A "backup.<table>" key is a rollback copy the pipeline made before a one-off change to live programmes (backup.onename_2026_10_09 today).
+const ERASE_ROLLBACK = ['saved rollback copy of their data', 'saved rollback copies of their data'];
+function eraseWhat(k, n) { const w = ERASE_WHAT[k] || (/^backup\./.test(k) ? ERASE_ROLLBACK : null); return w ? (Number(n) === 1 ? w[0] : w[1]) : k; }
 function eraseCountLines(counts) {
   return Object.keys(counts || {}).filter(k => Number(counts[k]) > 0)
     .map(k => `<li><b>${Number(counts[k]).toLocaleString()}</b> ${esc(eraseWhat(k, counts[k]))}</li>`).join('');
 }
+// ── intake forms (athletes only) ────────────────────────────────────────────────────────────────────────────────────────
+// The server OFFERS the forms that carry the athlete's email, WhatsApp number or full name (pv.intake_candidates). Most forms cannot
+// be tied to an athlete that way (the Farsi names against Latin programme names; no email or number stored for most athletes), so
+// the coach can also look for any form here (Amir, 2026-10-11: "pick any form in the Erase panel") and tick the ones that are
+// theirs. The server accepts any form that exists, at most ERASE_MAX_FORMS in one erasure.
+const ERASE_MAX_FORMS = 10;
+// lower case, Persian and Arabic-Indic digits as 0-9, Arabic yeh and kaf as the Persian letters, zero-width marks removed
+function eraseFold(s) {
+  return String(s == null ? '' : s).toLowerCase().replace(/[۰-۹]/g, c => String(c.charCodeAt(0) - 0x06F0)).replace(/[٠-٩]/g, c => String(c.charCodeAt(0) - 0x0660))
+    .replace(/ي/g, 'ی').replace(/ك/g, 'ک').replace(/[‌‍ـ]/g, '');
+}
+function eraseFormLabel(id, html) {   // "Name (Mon 12 Oct 2026)": what the panel and the final receipt call a form (html: the name isolated for a Persian name)
+  const i = (S.intake || []).find(x => String(x.id) === String(id));
+  if (!i) return 'form ' + String(id).slice(0, 8);
+  const name = html ? `<bdi>${esc(intakeName(i))}</bdi>` : intakeName(i);
+  return `${name} (${prettyDate(String(i.created_at || '').slice(0, 10)) || 'no date'})`;
+}
+function eraseFormLine(i) {     // one form on one line: the date, the name, and what else helps to recognise it
+  return [prettyDate(String(i.created_at || '').slice(0, 10)), `<bdi>${esc(intakeName(i))}</bdi>`, ...[i.email, i.contact, i.programme].filter(x => x && String(x).trim()).map(x => `<bdi>${esc(String(x))}</bdi>`)]
+    .filter(Boolean).join(' · ');
+}
+// What the finder shows under its box: nothing typed yet, no match, or up to 8 forms (the rest by narrowing the search).
+function eraseFoundHtml(e) {
+  if (!e || e.kind !== 'athlete') return '';
+  const offered = new Set(((e.pv && e.pv.intake_candidates) || []).map(c => String(c.id)));
+  const rest = (S.intake || []).filter(i => !offered.has(String(i.id)));
+  const q = eraseFold(e.find || '').trim();
+  if (!q) return `<p class="stays">${rest.length} other form${rest.length === 1 ? '' : 's'} in the Intake tab. Type part of a name, an email or a number to look for theirs.</p>`;
+  const toks = q.split(/\s+/).filter(Boolean);
+  const hits = rest.filter(i => { const hay = eraseFold([intakeName(i), i.email, i.contact, i.programme, String(i.created_at || '').slice(0, 10)].join(' ')); return toks.every(t => hay.includes(t)); });
+  if (!hits.length) return `<p class="stays">No other form matches “${esc(String(e.find).trim())}”.</p>`;
+  const shown = hits.slice(0, 8), busy = e.status === 'busy';
+  return shown.map(i => `<label class="pick"><input type="checkbox" data-eid="${esc(i.id)}" ${e.picked.includes(String(i.id)) ? 'checked' : ''} ${busy ? 'disabled' : ''} onchange="eraseTick(${jsq(i.id)}, this.checked)"><span>${eraseFormLine(i)}</span></label>`).join('')
+    + (hits.length > shown.length ? `<p class="stays">${hits.length - shown.length} more match. Type more to narrow it down.</p>` : '');
+}
+// Always says how many forms go with them, by name, so a form ticked by mistake is seen before the id is typed.
+function erasePickedHtml(e) {
+  if (!e || e.kind !== 'athlete') return '';
+  const busy = e.status === 'busy';
+  if (!e.picked.length) return '<p class="stays">No intake form is ticked, so none will be erased.</p>';
+  return `<p><b>${e.picked.length} intake form${e.picked.length === 1 ? '' : 's'} will be erased with them:</b></p>
+    <ul class="picked">${e.picked.map(id => `<li>${eraseFormLabel(id, true)} <button class="btn sm" ${busy ? 'disabled' : ''} onclick="eraseTick(${jsq(id)}, false)">remove</button></li>`).join('')}</ul>`;
+}
+function eraseRedrawForms() {
+  const e = _erase; if (!e) return;
+  const f = $('eraseFound'), p = $('erasePicked');
+  if (f) f.innerHTML = eraseFoundHtml(e);
+  if (p) p.innerHTML = erasePickedHtml(e);
+  document.querySelectorAll('.erase input[data-eid]').forEach(el => { el.checked = e.picked.includes(el.dataset.eid); });
+}
+function eraseFind(v) {   // typing in the finder redraws only its results, so the box keeps focus
+  const e = _erase; if (!e) return;
+  e.find = String(v || '');
+  const f = $('eraseFound'); if (f) f.innerHTML = eraseFoundHtml(e);
+}
+
 function eraseMatches(e) {
   return !!(e && e.pv && String(e.pv.confirm_word || '') !== '' && String(e.typed || '').trim().toLowerCase() === String(e.pv.confirm_word).toLowerCase());
 }
@@ -4380,72 +4443,124 @@ function eraseWhy(err) {
   if (/coach only|permission denied|JWT/i.test(m)) return 'your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.';
   return m || 'the server refused.';
 }
+// Does this error PROVE the transaction never committed? An error PostgreSQL itself raised (our own refusals are P0001, a missing
+// right is 42501, a deadlock 40P01) or a request PostgREST turned away before running anything does. No code at all (the answer
+// never came back), PostgREST's own connection errors (PGRST000-003) and the connection, shutdown and system classes (08, 57, 58, XX)
+// do not: the commit may have happened first. Those get the "cannot tell" wording and a way to find out.
+function eraseOutcomeUnknown(err) {
+  const c = String((err && err.code) || '');
+  return !c || /^PGRST00[0-3]$/.test(c) || /^(08|57|58|XX)/.test(c);
+}
+function eraseUnknownText(e, who, err) {
+  return `The answer never arrived${err && err.message ? ' (' + err.message + ')' : ''}, so the page cannot tell whether ${who} was erased. It is one step: it happened completely or not at all. Close this and tap ↻ Refresh. If ${who} is gone from ${e.kind === 'athlete' ? 'the roster' : 'the list'}, it went through; if they are still there, nothing was erased and you can run Erase again.`;
+}
 // The panel for one person, or '' when it is not the one open. Drawn by the athlete's File tab and by the two buyer lists.
 function erasePanelHtml(kind, key) {
   const e = _erase;
   if (!e || e.kind !== kind || e.key !== key) return '';
-  if (e.status === 'loading') return `<div class="erase"><p class="eh">Checking what is stored for ${esc(key)}…</p></div>`;
+  if (e.status === 'loading') return `<div class="erase"><p class="eh">Checking what is stored for ${esc(key)}…</p><button class="btn sm" onclick="eraseCancel()">Cancel</button></div>`;
   if (e.status === 'error') return `<div class="erase"><p class="eh" style="color:var(--clay-ink)">${esc(key)} cannot be erased now</p><p>${esc(e.err)}</p>
       <button class="btn sm" onclick="eraseCancel()">Close</button></div>`;
   const pv = e.pv || {}, busy = e.status === 'busy';
   const cands = pv.intake_candidates || [];
   const codes = pv.affiliates_unlinked || [], lastBackup = lastBackupAt();
   const coached = kind === 'athlete' && (S.ath[key] || {}).tier === 'coached';
+  const how = { email: 'same email', whatsapp: 'same WhatsApp number', name: 'same name' };
+  const forms = kind !== 'athlete' ? '' : `<div class="forms">
+    ${cands.length ? `<p><b>${cands.length} intake form${cands.length === 1 ? '' : 's'}</b> carry${cands.length === 1 ? 'es' : ''} their email, WhatsApp number or full name. They hold the answers about injuries, sleep and health. Tick the ones that are theirs and they go too:</p>
+      ${cands.map(c => `<label class="pick"><input type="checkbox" data-eid="${esc(c.id)}" ${e.picked.includes(String(c.id)) ? 'checked' : ''} ${busy ? 'disabled' : ''} onchange="eraseTick(${jsq(c.id)}, this.checked)">
+        <span>${esc(prettyDate(String(c.created_at || '').slice(0, 10)))} · <bdi>${esc(c.name || 'no name')}</bdi>${c.programme ? ' · ' + esc(c.programme) : ''}
+        <span class="chip ${c.matched_on === 'name' ? '' : 'court'}">${esc(how[c.matched_on] || c.matched_on)}</span>${c.shared ? ' <span class="chip" title="Another athlete\'s contact record carries the same email or number, for example a parent\'s">also another athlete\'s</span>' : ''}</span></label>`).join('')}${cands.some(c => c.shared) ? '<p class="stays">A form marked <i>also another athlete\'s</i> carries an email or number that another athlete\'s contact record has too (a parent\'s, for two children), so it is not ticked for you.</p>' : ''}`
+      : '<p><b>Intake forms:</b> none carries their email, WhatsApp number or full name. That is common: most forms are in Persian while the programme is in Latin letters, and most athletes have no email or number stored. Look for theirs below.</p>'}
+    <div class="finder">
+      <label for="eraseFindIn">Look for another intake form</label>
+      <input id="eraseFindIn" class="pwin" autocomplete="off" spellcheck="false" placeholder="name, email or number" value="${esc(e.find || '')}" ${busy ? 'disabled' : ''} oninput="eraseFind(this.value)">
+    </div>
+    <div id="eraseFound">${eraseFoundHtml(e)}</div>
+    <div id="erasePicked">${erasePickedHtml(e)}</div>
+  </div>`;
+  const stays = kind === 'athlete'
+    ? 'your weekly backup files (they leave those as the old files roll off, about three months, as the privacy notice says), emails about them in your inbox, WhatsApp, anything on their own phone, any copy on your own computer (a data/&lt;id&gt;.json file, a saved Backup), and their board name in other athletes\' last-seen standings until those athletes next open the board.'
+    : 'your weekly backup files (they leave those as the old files roll off, about three months, as the privacy notice says), emails about them in your inbox, WhatsApp, anything on their own phone, and any copy on your own computer (a saved Backup).';
   return `<div class="erase">
     <p class="eh">Erase ${esc(pv.shown_as || key)} completely</p>
     <p>${esc(ERASE_KIND[kind] || kind)} <code>${esc(key)}</code>. This permanently deletes everything the server keeps for them, in one step. There is no undo.${coached ? ' <b style="color:var(--clay-ink)">This is a coached athlete with a live programme.</b>' : ''}</p>
     <ul>${eraseCountLines(pv.counts)}</ul>
-    ${cands.length ? `<p><b>${cands.length} intake form${cands.length === 1 ? '' : 's'}</b> carry their email or their full name. They hold the answers about injuries and training history. Tick the ones that are theirs and they go too:</p>
-      ${cands.map(c => `<label class="pick"><input type="checkbox" ${e.picked.includes(c.id) ? 'checked' : ''} ${busy ? 'disabled' : ''} onchange="eraseTick(${jsq(c.id)}, this.checked)">
-        <span>${esc(prettyDate(String(c.created_at || '').slice(0, 10)))} · ${esc(c.name || 'no name')}${c.programme ? ' · ' + esc(c.programme) : ''}
-        <span class="chip ${c.matched_on === 'email' ? 'court' : ''}">${c.matched_on === 'email' ? 'same email' : 'same name'}</span></span></label>`).join('')}` : ''}
-    <p class="stays"><b>Stays:</b> your weekly backup files (they leave those as the old files roll off, about three months, as the privacy notice says), emails about them in your inbox, WhatsApp, and anything on their own phone. Your last ⤓ Backup on this computer: <b>${lastBackup ? esc(timeAgo(lastBackup)) : 'none yet'}</b>. If this might be a mistake, that file is the only way back.${codes.length ? ` The partner record${codes.length === 1 ? '' : 's'} <b>${esc(codes.join(', '))}</b> stays on the Affiliates tab: only the link to this athlete is removed.` : ''}</p>
+    ${forms}
+    <p class="stays"><b>Stays:</b> ${stays} Your last ⤓ Backup on this computer: <b>${lastBackup ? esc(timeAgo(lastBackup)) : 'none yet'}</b>. If this might be a mistake, that file is the only way back.${codes.length ? ` The partner record${codes.length === 1 ? '' : 's'} <b>${esc(codes.join(', '))}</b> stays on the Affiliates tab: only the link to this athlete is removed.` : ''}</p>
     <div class="typed">
       <label for="eraseIn">Type <code>${esc(pv.confirm_word || key)}</code> to confirm</label>
       <input id="eraseIn" class="pwin" autocomplete="off" autocapitalize="none" spellcheck="false" value="${esc(e.typed || '')}" ${busy ? 'disabled' : ''}
              oninput="eraseType(this.value)" onkeydown="if(event.key==='Enter') eraseRun()">
       <button id="eraseGo" class="btn sm danger" onclick="eraseRun()" ${eraseMatches(e) && !busy ? '' : 'disabled'}>${busy ? 'Erasing…' : 'Erase for good'}</button>
-      <button class="btn sm" onclick="eraseCancel()" ${busy ? 'disabled' : ''}>Cancel</button>
+      ${busy && e.slow ? '<button class="btn sm" onclick="eraseStopWaiting()">Stop waiting</button>' : `<button class="btn sm" onclick="eraseCancel()" ${busy ? 'disabled' : ''}>Cancel</button>`}
     </div>
   </div>`;
 }
 async function eraseOpen(kind, key) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   if (_erase && _erase.status === 'busy') return;
-  _erase = { kind, key, status: 'loading', pv: null, err: '', typed: '', picked: [] };
+  _erase = { kind, key, status: 'loading', pv: null, err: '', typed: '', picked: [], find: '' };
   render();
   const res = await sb.rpc('coach_erase_person', { p_kind: kind, p_key: key });   // a dry run by default: nothing is changed
   const e = _erase;
   if (!e || e.kind !== kind || e.key !== key) return;   // closed, or another person opened, while it was thinking
   if (res.error) { e.status = 'error'; e.err = eraseWhy(res.error); }
-  else { e.status = 'ready'; e.pv = res.data || {}; e.picked = (e.pv.intake_candidates || []).filter(c => c.matched_on === 'email').map(c => c.id); }
+  else {
+    e.status = 'ready'; e.pv = res.data || {};
+    // Ticked for you: a form with their email or number, unless another athlete's contact carries the same one. A name match is only offered.
+    e.picked = (e.pv.intake_candidates || []).filter(c => (c.matched_on === 'email' || c.matched_on === 'whatsapp') && !c.shared).map(c => String(c.id));
+  }
   render();
   const i = $('eraseIn'); if (i) i.focus();
 }
 function eraseCancel() { if (_erase && _erase.status === 'busy') return; _erase = null; render(); }
+// After 30 seconds with no answer the coach may stop waiting. The call is not cancelled (it cannot be): if it does come back with
+// a success later, eraseRun still finishes the job (refresh, receipt); if it comes back with a refusal, nothing was erased.
+function eraseStopWaiting() {
+  const e = _erase; if (!e || e.status !== 'busy') return;
+  e.stopped = true; e.status = 'error'; e.err = eraseUnknownText(e, (e.pv && e.pv.shown_as) || e.key, null);
+  render();
+}
 function eraseType(v) {
   if (!_erase) return;
   _erase.typed = String(v || '');
   const go = $('eraseGo'); if (go) go.disabled = !eraseMatches(_erase) || _erase.status === 'busy';
 }
 function eraseTick(id, on) {
-  if (!_erase) return;
-  _erase.picked = _erase.picked.filter(x => x !== id);
-  if (on) _erase.picked.push(id);
+  const e = _erase; if (!e) return;
+  id = String(id);
+  e.picked = e.picked.filter(x => x !== id);
+  if (on) {
+    if (e.picked.length >= ERASE_MAX_FORMS) toast(`At most ${ERASE_MAX_FORMS} intake forms in one erasure`);
+    else e.picked.push(id);
+  }
+  eraseRedrawForms();
+}
+// A redraw replaces the whole page, so a box being typed in loses focus and the next keystrokes go nowhere: the Erase panel's two
+// boxes get focus (and their caret) back after any redraw.
+function withEraseFocus(draw) {
+  const a = document.activeElement, id = a && (a.id === 'eraseIn' || a.id === 'eraseFindIn') ? a.id : null;
+  const caret = id ? [a.selectionStart, a.selectionEnd] : null;
+  draw();
+  const i = id && $(id);
+  if (i && !i.disabled) { i.focus(); try { i.setSelectionRange(caret[0], caret[1]); } catch (x) { /* a box without a caret */ } }
 }
 async function eraseRun() {
   const e = _erase;
   if (!e || e.status !== 'ready' || !e.pv) return;
   if (!eraseMatches(e)) { toast('Type ' + e.pv.confirm_word + ' exactly to confirm'); return; }
   const who = e.pv.shown_as || e.key;
-  e.status = 'busy'; render();
+  const forms = e.picked.map(eraseFormLabel);   // taken now: the lists reload after a success
+  e.status = 'busy'; e.slow = false; e.stopped = false; render();
+  e.timer = setTimeout(() => { if (_erase === e && e.status === 'busy') { e.slow = true; render(); } }, 30000);
   const res = await sb.rpc('coach_erase_person', { p_kind: e.kind, p_key: e.key, p_confirm: String(e.typed).trim(), p_intake_ids: e.picked, p_dry_run: false });
+  clearTimeout(e.timer);
   if (res.error) {
-    if (!res.error.code) {
-      // No database code = the answer never arrived (a dropped connection). It is one transaction, so it either went through
-      // completely or not at all; the page cannot tell which.
-      e.status = 'error';
-      e.err = `The answer never arrived (${res.error.message || 'no reply'}), so the page cannot tell whether ${who} was erased. It is one step: it happened completely or not at all. Close this, tap ↻ Refresh, and open Erase for them again. If it says nothing is stored for them, it went through.`;
+    if (e.stopped) return;   // the coach stopped waiting and was told what to check
+    if (eraseOutcomeUnknown(res.error)) {
+      // The answer never arrived, or a connection-level error: one transaction, so it went through completely or not at all, but the page cannot tell which.
+      e.status = 'error'; e.err = eraseUnknownText(e, who, res.error);
       render(); return;
     }
     e.status = 'ready'; render();
@@ -4453,11 +4568,19 @@ async function eraseRun() {
     return;
   }
   const d = res.data || {};
-  _erase = null;
-  const rows = Object.keys(d.counts || {}).reduce((s, k) => s + Number(d.counts[k] || 0), 0);
+  if (_erase === e) _erase = null;
+  const counts = d.counts || {};
+  const rows = Object.keys(counts).reduce((s, k) => s + Number(counts[k] || 0), 0);
   const codes = d.affiliates_unlinked || [];
-  const note = `Erased ${who} for good: ${rows.toLocaleString()} row${rows === 1 ? '' : 's'}, the sign-in account included.\n\nReceipt #${d.log_id} is kept (a hash, the date and the counts; no name or contact).\n\nStill yours to do if they asked for it all:\n• they leave your weekly backup files as those roll off (about three months);\n• emails about them in your inbox, and WhatsApp, are not touched by this.` +
-    (codes.length ? `\n• the partner record${codes.length === 1 ? '' : 's'} ${codes.join(', ')} stays on the Affiliates tab (only its link to the athlete was removed).` : '');
+  const login = Number(counts.auth_users || 0) > 0;
+  const nForms = Number(counts.hab_intake || 0);
+  const note = `Erased ${who} for good: ${rows.toLocaleString()} row${rows === 1 ? '' : 's'}${login ? ', the sign-in account included' : ''}.\n\nReceipt #${d.log_id} is kept (a hash, the date and the counts; no name or contact).` +
+    (e.kind === 'athlete'
+      ? (nForms ? `\n\nIntake form${nForms === 1 ? '' : 's'} erased: ${forms.join('; ')}.` : '\n\nNo intake form was erased. If they filled one in, it is still in the Intake tab.')
+      : '') +
+    `\n\nStill yours to do if they asked for it all:\n• they leave your weekly backup files as those roll off (about three months);\n• emails about them in your inbox, and WhatsApp, are not touched by this.` +
+    (codes.length ? `\n• the partner record${codes.length === 1 ? '' : 's'} ${codes.join(', ')} stays on the Affiliates tab (only its link to the athlete was removed).` : '') +
+    (e.kind === 'athlete' ? '\n\nIf their app was open on a phone just now, one last save can still land after this. Look at the roster in a minute: if they are back, erase them again.' : '');
   if (e.kind === 'athlete') { location.hash = 'athletes'; await hardRefresh(); }
   else if (e.kind === 'course') { await loadCourse(); render(); }
   else { await loadAssess(); render(); }
@@ -4465,6 +4588,7 @@ async function eraseRun() {
   alert(note);
 }
 window.eraseOpen = eraseOpen; window.eraseCancel = eraseCancel; window.eraseType = eraseType; window.eraseTick = eraseTick; window.eraseRun = eraseRun;
+window.eraseFind = eraseFind; window.eraseStopWaiting = eraseStopWaiting;
 
 // --- PROOF (board · funnel · titles · season) --------------------------------
 // The board comes from the server's own scorer via leaderboard_top, called
@@ -4880,10 +5004,18 @@ async function loadAssess() {
 
 // The note about a buyer ("who bought it") lives in buyer_notes since stage53: the account row's own label is always empty
 // now, so a buyer reading their own row no longer sees what Amir wrote. Until that stage is applied the note is still the
-// label, and a failed read of the notes (cosmetic) leaves the label in place, so neither case breaks the list.
+// label. A table that is not there yet is expected and quiet; any other failed read leaves the label in place AND is named by the
+// "Not everything loaded" banner (it used to show every buyer with no note, silently).
 async function loadBuyerNotes() {
-  const r = await sb.from('buyer_notes').select('user_id, note');
-  return r.error ? null : Object.fromEntries((r.data || []).map(x => [x.user_id, x.note]));
+  const r = await selectAll('buyer_notes', 'user_id, note', ['user_id']);
+  if (r.error) {
+    // Before stage53 the table does not exist and the note is still the account's label: not a failure. Any other error is named by the banner.
+    const missing = /^(42P01|PGRST205)$/.test(String(r.error.code || '')) || /does not exist|Could not find the table/i.test(r.error.message || '');
+    LOAD_ERR.buyerNotes = missing ? '' : (r.error.message || 'unreadable');
+    return null;
+  }
+  LOAD_ERR.buyerNotes = '';
+  return Object.fromEntries((r.data || []).map(x => [x.user_id, x.note]));
 }
 function withBuyerNotes(rows, notes) {
   return (rows || []).map(x => Object.assign({}, x, { label: (notes && notes[x.user_id]) || x.label || '' }));
@@ -4975,7 +5107,7 @@ function renderAssess() {
     <p class="psub" style="margin:10px 0 0">Creates the account and copies a Farsi WhatsApp message with the link, username and password. ${PW_HINT}</p></section>`;
   html += `<section class="panel"><div class="phead"><span class="t hd">Logins</span><span class="r">${active.length} active${toSend ? ` · <span style="color:var(--clay-ink)">${toSend} to send</span>` : ''}</span></div>` +
     (active.length ? active.map(row).join('') : '<p class="empty">No logins yet.</p>') + `</section>`;
-  if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details${revoked.some(r => r.username === _assessPw) ? ' open' : ''}><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
+  if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details${revoked.some(r => r.username === _assessPw || (_erase && _erase.kind === 'testing' && _erase.key === r.username)) ? ' open' : ''}><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
   c.innerHTML = html;
   const on = (sel, fn) => c.querySelectorAll(sel).forEach(el => el.addEventListener('click', e => { e.preventDefault(); fn(el); }));
   on('#asCreate', el => {
@@ -5117,7 +5249,7 @@ function renderCourse() {
     <p class="psub" style="margin:10px 0 0">Creates the account and copies a Farsi WhatsApp message with the link, username, password and install steps. ${PW_HINT}</p></section>`;
   html += `<section class="panel"><div class="phead"><span class="t hd">Logins</span><span class="r">${active.length} active${toSend ? ` · <span style="color:var(--clay-ink)">${toSend} to send</span>` : ''}</span></div>` +
     (active.length ? active.map(row).join('') : '<p class="empty">No logins yet.</p>') + `</section>`;
-  if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details${revoked.some(r => r.username === _coursePw) ? ' open' : ''}><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
+  if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details${revoked.some(r => r.username === _coursePw || (_erase && _erase.kind === 'course' && _erase.key === r.username)) ? ' open' : ''}><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
   c.innerHTML = html;
   const on = (sel, fn) => c.querySelectorAll(sel).forEach(el => el.addEventListener('click', e => { e.preventDefault(); fn(el); }));
   on('#tpCreate', el => {

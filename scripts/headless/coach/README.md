@@ -59,7 +59,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 55 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 59 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -81,11 +81,15 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | calllog-delete | the Calls tab is retired (2026-10-11): old call logs are read and deleted in File → Old call logs; no Calls tab, no New call log, no Copy cycle prompt; the section disappears when none is left | the deleted log stayed listed |
 | calls-old-link | an old `#a/<id>/calls` link | must open the athlete on a screen that exists |
 | load-partial | a session in the last 4 weeks with no duration or RPE, then two, then filled in, then an old one | (TODAY-6) it counted as zero and the ratio swung; now the ratio is left out and the pill says *not enough data* until they are filled in |
-| erase-athlete | File → Danger zone → Erase completely…: the dry run, the typed id, two intake forms (same email ticked, same name not), one real call | (stage54) no way to erase a person from the page |
+| erase-athlete | File → Danger zone → Erase completely…: the dry run, the typed id, three offered intake forms (same email and same WhatsApp number ticked, same name not), the rollback copies in the count, one real call, the receipt alert names the forms | (stage54) no way to erase a person from the page |
+| erase-forms | the finder: a number another athlete's contact carries is flagged and not ticked, a search finds any other form, 8 shown at a time, the cap of 10, *remove*, focus kept while typing and across a redraw, a ticked form that no longer exists stops the erasure, an athlete with no login gets no "sign-in account" claim | (review, 2026-10-11) forms were found for 6 of 50 athletes and the rest could not be removed at all |
+| erase-revoked | Erase… on a REVOKED course buyer and testing-app buyer: the Revoked section opens and the panel is visible, also after a redraw | (review) the panel was drawn inside the closed section |
+| erase-slow | the server does not answer: after 30 s *Stop waiting*, and a success that arrives later still finishes the job (fake clock) | (review) a hung call stranded *Erasing…* |
 | erase-guards | wrong id + Enter, Cancel, leaving the page with the panel open, the board identity | a wrong id must call nothing; the panel never follows the coach to another screen |
-| erase-fails | stage54 missing, a refusal, a server error, a lapsed sign-in, an answer that never arrives | the words must fit the cause; "never arrived" must not claim nothing was erased |
+| erase-fails | stage54 missing, a refusal, a server error, a lapsed sign-in, a deadlock (proves nothing committed), PostgREST's own `PGRST001` and an answer that never arrives (neither proves it) | the words must fit the cause; "never arrived" must not claim nothing was erased |
 | erase-buyers | Course and Testing lists: the note comes from `buyer_notes`; Erase… on a course buyer and on a testing-app buyer (players, notes, results) | (stage53/54) the buyer could read the note; buyers could not be erased |
-| buyer-notes-fallback | `buyer_notes` unreadable (stage53 not applied) | the old label shows and nothing breaks |
+| buyer-notes-fallback | `buyer_notes` missing (stage53 not applied) | the old label shows, nothing breaks, and no banner (expected) |
+| buyer-notes-error | `buyer_notes` fails for a real reason | (review) every buyer showed with no note, silently; now the banner names *your notes about buyers* |
 | version-restore | Restore a version, then The work | showed the pre-restore programme |
 | program-file-publish | ↑ Publish programme file (in Coach tools), then the athlete page; a NEW athlete | showed the old cycle; a new athlete was missing until Refresh |
 | backup-basic | every table, every row; passwords | unsent initial passwords were in the file |

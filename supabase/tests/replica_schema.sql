@@ -23,6 +23,11 @@ create table auth.users (id uuid primary key, email text, last_sign_in_at timest
 create table auth.identities (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users (id) on delete cascade);
 create table auth.sessions   (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users (id) on delete cascade);
 
+-- The rollback copy the one-name rename left in a schema of its own on 2026-10-09: an old progress blob or session log per athlete
+-- (42 rows, 17 athletes, on 2026-10-11). It is the only table outside "public" with an athlete_id column; stage54 empties it for an erased athlete.
+create schema backup;
+create table backup.onename_2026_10_09 (id bigint generated always as identity primary key, athlete_id text, kind text, ref jsonb, old jsonb, saved_at timestamptz not null default now());
+
 -- stage44
 create or replace function public.is_coach()
 returns boolean language sql stable set search_path to 'public'

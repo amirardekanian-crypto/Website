@@ -6,7 +6,9 @@
 --
 -- public.coach_erase_person(kind, key, confirm, intake_ids, dry_run) does it in ONE transaction, for three kinds of person:
 --   'athlete'  key = the athlete id         every table below that holds that id, the login (athlete_identities) and the auth
---                                           user, plus the intake forms the coach picks (the ones that carry their email or full name)
+--                                           user, plus the intake forms the coach picks. Forms that carry their email, WhatsApp number
+--                                           or full name are OFFERED; any other form (most Farsi forms) is named by hand in the panel
+--                                           (Amir, 2026-10-11: "pick any form in the Erase panel"), up to 10 per erasure.
 --   'course'   key = the course username    the tps_accounts row, the coach's note about them, the auth user
 --   'testing'  key = the testing username   the assess_accounts row, its players, notes and results (soft-deleted ones too),
 --                                           the coach's note about them, the auth user
@@ -19,12 +21,22 @@
 --
 -- Guards (each raises, and nothing is erased):
 --   · coach only (is_coach()); anon cannot even call it.
+--   · p_dry_run must be true or false: NULL is refused (it used to skip every check and still delete).
 --   · 'demo' (the public demo) and 'amir_ardekani' (the identity the dashboard reads the board through) are never erased.
 --   · a login that is the coach's own, or the signed-in user's, is never deleted.
 --   · a login shared by two accounts (an athlete who is also a buyer) is refused: sort it out by hand.
---   · nothing found under the key raises, so a typo cannot look like a success.
---   · AFTER the deletes, every table in the public schema that has an athlete_id column is checked for that id. If one still
---     holds a row (a table added after this file was written), everything is undone and the error names the table.
+--   · nothing found under the key raises, so a typo cannot look like a success. Ids are case-sensitive: a key typed in another case
+--     finds nothing (and says which id exists) instead of taking the login and leaving the data.
+--   · AFTER the deletes, every table in the public and backup schemas that has an athlete_id column is checked for that id. If one
+--     still holds a row (a table added after this file was written), everything is undone and the error names the table.
+--     (The backup schema holds the rollback copies the pipeline makes before a one-off change to live programmes, such as
+--     backup.onename_2026_10_09: any table there with an athlete_id column is emptied for the person as part of the erasure.)
+--   · for every kind, any public table with a uuid column called user_id or account_id that still holds one of the deleted
+--     sign-ins undoes everything the same way.
+--   · the tables are emptied in the order publish_cycle() locks them (programme first), so a publish and an erasure never deadlock.
+--
+-- A phone that saves at the very moment of the erasure can still write one row after it (the erasure cannot see an uncommitted
+-- write): the person then shows up in the roster again, and erasing them a second time removes it. The dashboard says so.
 --
 -- What it does NOT touch, and the dashboard says so before it asks: weekly backup files (they roll off within about three
 -- months, as the privacy notice promises), emails already in Amir's inbox (Web3Forms), WhatsApp, anything on the person's own
@@ -71,12 +83,18 @@ as $function$
 declare
   -- Every table that holds a row under an athlete id, in the order they are emptied. A table that is missing here but has an
   -- athlete_id column is caught by the check near the end, which undoes everything and names it.
+  -- The first four are in the order publish_cycle() and the dashboard's editor lock them (programs, its versions, the coaching log,
+  -- its versions): the same order means the two can wait for each other but never deadlock, and an erasure that starts while a
+  -- cycle is being published waits at programs, so the publish's new version rows are committed before they are deleted.
   c_athlete_tables constant text[] := array[
+    'programs', 'program_versions', 'coaching_logs', 'coaching_log_versions',
     'session_history', 'athlete_progress', 'hab_notes', 'hab_titles', 'hab_season_results', 'leaderboard_optin',
-    'library_sessions', 'messages', 'call_logs', 'cycle_reports', 'coaching_log_versions', 'coaching_logs',
-    'program_versions', 'programs', 'athlete_keys', 'hab_contacts', 'athlete_identities'];
+    'library_sessions', 'messages', 'call_logs', 'cycle_reports', 'athlete_keys', 'hab_contacts', 'athlete_identities'];
   -- Not clients: the public demo, and the identity coach.html reads the board through (AMIR_ATHLETE_ID there).
   c_protected constant text[] := array['demo', 'amir_ardekani'];
+  -- Arabic-Indic (U+0660-0669) and Persian (U+06F0-06F9) digits, and what they fold to.
+  c_digits_from constant text := U&'\0660\0661\0662\0663\0664\0665\0666\0667\0668\0669\06F0\06F1\06F2\06F3\06F4\06F5\06F6\06F7\06F8\06F9';
+  c_digits_to   constant text := '01234567890123456789';
   v_kind      text    := lower(btrim(coalesce(p_kind, '')));
   v_key       text    := btrim(coalesce(p_key, ''));
   v_word      text;                         -- what the coach must type to confirm
@@ -87,16 +105,25 @@ declare
   v_total     bigint  := 0;
   v_n         bigint;
   v_emails    text[]  := '{}';
+  v_phones    text[]  := '{}';              -- the last 9 digits of each WhatsApp number on their contact record
   v_fullname  text;
   v_cands     jsonb   := '[]'::jsonb;       -- intake forms that look like theirs
   v_unlinked  jsonb   := '[]'::jsonb;       -- affiliate codes whose link to this athlete was cleared
   v_ids       uuid[]  := coalesce(p_intake_ids, '{}');
   v_log_id    bigint;
   v_result    jsonb;
+  v_other     text;
   t           text;
+  sch         text;
+  v_col       text;
 begin
   if not public.is_coach() then
     raise exception 'coach only';
+  end if;
+  -- NULL is neither a dry run nor a real run: "not null" is null, so every test of the flag below would be skipped while the deletes
+  -- still ran and committed (found in review, 2026-10-11). Only an explicit true or false is accepted.
+  if p_dry_run is null then
+    raise exception 'p_dry_run must be true or false, not null. Nothing was erased.';
   end if;
   if v_kind not in ('athlete', 'course', 'testing') then
     raise exception 'Unknown kind of person "%": use athlete, course or testing.', v_kind;
@@ -114,11 +141,15 @@ begin
         raise exception '"%" is not a client (the public demo, or the identity this dashboard reads the board through). It is never erased.', v_key;
       end if;
       v_word := v_key;
-      -- the identity row, plus an auth user on the internal address in case the identity row was already lost
+      -- The identity row for exactly this id, plus a sign-in on the internal address that NO identity row claims (the row was lost
+      -- earlier). Ids are case-sensitive but GoTrue lower-cases the address, so a sign-in whose identity row names another id (a key
+      -- typed in another case) is never taken: before this, typing ZZ_Case_A for zz_case_a deleted the login and left the data.
       select coalesce(array_agg(distinct x.id), '{}'::uuid[]) into v_users
         from (select i.user_id as id from public.athlete_identities i where i.athlete_id = v_key
               union
-              select u.id from auth.users u where lower(u.email) = lower('athlete.' || v_key || '@amirardekani.com')) x;
+              select u.id from auth.users u
+               where lower(u.email) = lower('athlete.' || v_key || '@amirardekani.com')
+                 and not exists (select 1 from public.athlete_identities i2 where i2.user_id = u.id)) x;
       select nullif(btrim(concat_ws(' ', p.data -> 'athlete' ->> 'firstName', p.data -> 'athlete' ->> 'lastName')), '')
         into v_shown from public.programs p where p.athlete_id = v_key;
       if v_shown is null then
@@ -171,23 +202,52 @@ begin
 
     -- ── athlete: the intake forms that look like theirs, then everything under the id ───────────────────────────────────
     if v_kind = 'athlete' then
-      select coalesce(array_agg(distinct lower(btrim(c.email))) filter (where nullif(btrim(c.email), '') is not null), '{}'::text[])
-        into v_emails from public.hab_contacts c where c.athlete_id = v_key;
+      -- What identifies them: the emails and WhatsApp numbers on their contact record, and their full name as the programme spells it.
+      -- A number is compared by its last 9 digits with Persian and Arabic-Indic digits folded to 0-9, so 0912…, +98912… and ۰۹۱۲… are one.
+      select coalesce(array_agg(distinct lower(btrim(c.email))) filter (where nullif(btrim(c.email), '') is not null), '{}'::text[]),
+             coalesce(array_agg(distinct right(d.digits, 9)) filter (where length(d.digits) >= 9), '{}'::text[])
+        into v_emails, v_phones
+        from public.hab_contacts c
+        cross join lateral (select regexp_replace(translate(coalesce(c.whatsapp, ''), c_digits_from, c_digits_to), '\D', '', 'g') as digits) d
+       where c.athlete_id = v_key;
       select lower(regexp_replace(btrim(concat_ws(' ', p.data -> 'athlete' ->> 'firstName', p.data -> 'athlete' ->> 'lastName')), '\s+', ' ', 'g'))
         into v_fullname from public.programs p
        where p.athlete_id = v_key
          and nullif(btrim(p.data -> 'athlete' ->> 'firstName'), '') is not null
          and nullif(btrim(p.data -> 'athlete' ->> 'lastName'), '') is not null;
+      -- 'shared' = the same email or number is also on ANOTHER athlete's contact record (a parent's address for two children): the
+      -- dashboard never ticks such a form for you.
+      with f as (
+        select i.id, i.created_at, i.name, i.programme, i.lang,
+               lower(btrim(coalesce(i.email, ''))) as em,
+               case when length(q.digits) >= 9 then right(q.digits, 9) end as ph,
+               lower(regexp_replace(btrim(coalesce(i.name, '')), '\s+', ' ', 'g')) as nm
+          from public.hab_intake i
+          cross join lateral (select regexp_replace(translate(coalesce(i.contact, ''), c_digits_from, c_digits_to), '\D', '', 'g') as digits) q),
+      m as (
+        select f.*, case when f.em <> '' and f.em = any (v_emails) then 'email'
+                         when f.ph is not null and f.ph = any (v_phones) then 'whatsapp'
+                         when v_fullname is not null and f.nm = v_fullname then 'name' end as how
+          from f)
       select coalesce(jsonb_agg(jsonb_build_object(
-               'id', i.id, 'created_at', i.created_at, 'name', i.name, 'programme', i.programme, 'lang', i.lang,
-               'matched_on', case when lower(btrim(coalesce(i.email, ''))) = any (v_emails) then 'email' else 'name' end)
-               order by i.created_at), '[]'::jsonb)
-        into v_cands from public.hab_intake i
-       where lower(btrim(coalesce(i.email, ''))) = any (v_emails)
-          or (v_fullname is not null and lower(regexp_replace(btrim(coalesce(i.name, '')), '\s+', ' ', 'g')) = v_fullname);
+               'id', m.id, 'created_at', m.created_at, 'name', m.name, 'programme', m.programme, 'lang', m.lang,
+               'matched_on', m.how,
+               'shared', (m.how = 'email' and exists (select 1 from public.hab_contacts c2
+                                                       where c2.athlete_id <> v_key and lower(btrim(coalesce(c2.email, ''))) = m.em))
+                      or (m.how = 'whatsapp' and exists (select 1 from public.hab_contacts c2
+                                                          cross join lateral (select regexp_replace(translate(coalesce(c2.whatsapp, ''), c_digits_from, c_digits_to), '\D', '', 'g') as digits) q2
+                                                         where c2.athlete_id <> v_key and length(q2.digits) >= 9 and right(q2.digits, 9) = m.ph)))
+               order by m.created_at), '[]'::jsonb)
+        into v_cands from m where m.how is not null;
+      -- The forms to erase are the coach's pick (Amir, 2026-10-11): the matches above are only offered, and a form filled in under
+      -- another name or number (most Farsi forms: the programme is in Latin letters) is found by hand in the dashboard. So any
+      -- form that exists may be named, but not a runaway list, and a form that is already gone stops the erasure.
+      if (select count(distinct s.id) from unnest(v_ids) s(id)) > 10 then
+        raise exception 'More than 10 intake forms in one erasure is almost certainly a mistake. Nothing was erased.';
+      end if;
       if exists (select 1 from unnest(v_ids) s(id)
-                  where not exists (select 1 from jsonb_array_elements(v_cands) c where (c ->> 'id')::uuid = s.id)) then
-        raise exception 'One of the intake forms is not a form that carries this person''s email or full name. Nothing was erased.';
+                  where s.id is null or not exists (select 1 from public.hab_intake i where i.id = s.id)) then
+        raise exception 'One of the intake forms does not exist (it may already be gone). Nothing was erased.';
       end if;
 
       foreach t in array c_athlete_tables loop
@@ -197,10 +257,29 @@ begin
         v_total := v_total + v_n;
       end loop;
 
+      -- The rollback copies the pipeline keeps before a one-off change to live programmes sit in the "backup" schema, outside the list
+      -- above (backup.onename_2026_10_09 holds 17 athletes' old progress and session logs from the rename of 2026-10-09). Whatever table
+      -- there has an athlete_id column is emptied for this person too, so a table added later is covered without anyone remembering it.
+      for t in
+        select c.relname::text
+          from pg_catalog.pg_attribute a
+          join pg_catalog.pg_class c on c.oid = a.attrelid
+          join pg_catalog.pg_namespace n on n.oid = c.relnamespace
+         where n.nspname = 'backup' and a.attname = 'athlete_id' and a.attnum > 0 and not a.attisdropped
+           and c.relkind in ('r', 'p')
+         order by 1
+      loop
+        execute format('delete from backup.%I where athlete_id::text = $1', t) using v_key;
+        get diagnostics v_n = row_count;
+        v_counts := v_counts || jsonb_build_object('backup.' || t, v_n);
+        v_total := v_total + v_n;
+      end loop;
+
+      -- The forms are counted in v_total only AFTER the "nothing is stored" check below: a mistyped id with forms ticked must raise
+      -- that error, not erase the forms and write a receipt.
       delete from public.hab_intake where id = any (v_ids);
       get diagnostics v_n = row_count;
       v_counts := v_counts || jsonb_build_object('hab_intake', v_n);
-      v_total := v_total + v_n;
 
       -- A partner record is a business record and stays; only its link to the erased athlete id goes.
       with u as (update public.affiliates set athlete_id = null where athlete_id = v_key returning code)
@@ -253,25 +332,49 @@ begin
        or exists (select 1 from public.buyer_notes x where x.user_id = any (v_users)) then
       raise exception 'Stopped, nothing was erased: a login row was still there after its sign-in account was deleted.';
     end if;
+    -- A table added later that keys its rows on a sign-in (a uuid column called user_id or account_id) and is not emptied by the
+    -- cascade from the deleted sign-in: for a buyer this is the only check that such a table was never forgotten.
+    for sch, t, v_col in
+      select n.nspname::text, c.relname::text, a.attname::text
+        from pg_catalog.pg_attribute a
+        join pg_catalog.pg_class c on c.oid = a.attrelid
+        join pg_catalog.pg_namespace n on n.oid = c.relnamespace
+       where n.nspname = 'public' and a.attname in ('user_id', 'account_id') and a.atttypid = 'uuid'::regtype
+         and a.attnum > 0 and not a.attisdropped and c.relkind in ('r', 'p')
+       order by 1, 2, 3
+    loop
+      execute format('select count(*) from %I.%I where %I = any ($1)', sch, t, v_col) into v_n using v_users;
+      if v_n > 0 then
+        raise exception 'Stopped, nothing was erased: the table %.% still holds % row(s) for their sign-in (column %). coach_erase_person does not know that table yet.', sch, t, v_n, v_col;
+      end if;
+    end loop;
     if v_kind = 'athlete' then
-      for t in
-        select c.relname::text
+      for sch, t in
+        select n.nspname::text, c.relname::text
           from pg_catalog.pg_attribute a
           join pg_catalog.pg_class c on c.oid = a.attrelid
           join pg_catalog.pg_namespace n on n.oid = c.relnamespace
-         where n.nspname = 'public' and a.attname = 'athlete_id' and a.attnum > 0 and not a.attisdropped
+         where n.nspname in ('public', 'backup') and a.attname = 'athlete_id' and a.attnum > 0 and not a.attisdropped
            and c.relkind in ('r', 'p')
-         order by 1
+         order by 1, 2
       loop
-        execute format('select count(*) from public.%I where athlete_id::text = $1', t) into v_n using v_key;
+        execute format('select count(*) from %I.%I where athlete_id::text = $1', sch, t) into v_n using v_key;
         if v_n > 0 then
-          raise exception 'Stopped, nothing was erased: the table % still holds % row(s) for "%". coach_erase_person does not know that table yet.', t, v_n, v_key;
+          raise exception 'Stopped, nothing was erased: the table %.% still holds % row(s) for "%". coach_erase_person does not know that table yet.', sch, t, v_n, v_key;
         end if;
       end loop;
     end if;
     if v_total = 0 then
-      raise exception 'Nothing is stored for "%". Nothing was erased.', v_key;
+      if v_kind = 'athlete' then   -- ids are case-sensitive: say so when only the case differs
+        select p.athlete_id into v_other from public.programs p where lower(p.athlete_id) = lower(v_key) and p.athlete_id <> v_key limit 1;
+        if v_other is null then
+          select a.athlete_id into v_other from public.athlete_progress a where lower(a.athlete_id) = lower(v_key) and a.athlete_id <> v_key limit 1;
+        end if;
+      end if;
+      raise exception 'Nothing is stored for "%". Nothing was erased.%', v_key,
+        case when v_other is not null then ' (There is an athlete "' || v_other || '": ids are case-sensitive.)' else '' end;
     end if;
+    v_total := v_total + coalesce((v_counts ->> 'hab_intake')::bigint, 0);
 
     -- ── the receipt (a real run only) and the answer ───────────────────────────────────────────────────────────────────
     if not p_dry_run then
