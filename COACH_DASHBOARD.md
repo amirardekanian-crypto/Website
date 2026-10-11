@@ -163,8 +163,14 @@ answered) rolled the whole call back, and says so. If `spine_versions` is missin
   it is meant to build (iron = Strength, voltage = Power …), what the current week trains most in
   working sets a week (an exercise's second quality counts half a set, warm-ups don't count), and a
   verdict: ✓ in the top two, or ⚠ *only #4 this week*. Foundation (bedrock), peaking and recovery
-  blocks train a mix on purpose and are never flagged. *Every exercise tagged* / *N% tagged*
-  says how much of the week the athlete's day cards can read. Below 70% they show nothing.
+  blocks train a mix on purpose and are never flagged. *Every exercise tagged* / *N% of the week's sets tagged* is a weekly number.
+  **Under it, day by day, what each day card on their phone will say** (audit TWIN-9, 2026-10-11): the app's own rule run for every
+  day, at most three words, or *blank* with the reason: under 70% of the day's working sets sit on approved, tagged exercises
+  (*blank (58% tagged, 70% needed)*), or too few sets to name a quality (no quality reaches 12% of the day, and at least 1.5 sets).
+  It is the phone's view: draft exercises and draft qualities do not count, because a phone is served approved ones only. A second
+  line, *Once the drafts are approved*, appears when approving them would change a card, and with no quality approved the line says so.
+  (The week's number used to be read as "below 70% the day cards show nothing", which is not the app's rule: each day is judged on its
+  own sets, so a week at 77% can have four blank cards out of five.)
 
 ### Intake — where the apply form lands
 
@@ -784,13 +790,14 @@ covered by the real-mode harness in `scripts/headless/coach/`.
 It cuts each twin out of both files and runs the same vectors through both: the exercise-name
 tiers (`exNameVariants` / `exNameVariantsC`), a renamed lift (`ceilAliasMap` / `ceilAliasMapC`), the
 Spine lookup (`spineFor` / `spineForC`), today's RPE target on a lower day with the week note (`dayRpe` / `dayTargetC`), the week a day
-falls in and its note (`cycleWeekInfo`, `weekNoteNow` / `cycleWeekOnC`, `weekNoteOnC`: over 3,500 checks in all), what
+falls in and its note (`cycleWeekInfo`, `weekNoteNow` / `cycleWeekOnC`, `weekNoteOnC`: over 5,000 checks in all), what
 the Quality check counts (`qmSets`, `isPrepBlockTitle` / `qmSetsC`, `QM_PREP`), and the check-in line's
 writer and reader (`readinessPlanLine` / `parseCheckinPlan`). It also fails a change to `assets/js/chips.js`
 that keeps coach.html's hand-typed `?v=` (the service worker serves `/assets/` cache-first): bump the
 token, then `node scripts/check_twins.js --stamp`. `scripts/test_check_twins.js` breaks a copy on purpose
 to prove each kind of drift is caught. Also guarded: whether a started session is over (`sessionIsStale` / `sessionIsStaleC`), which values of a lift's `test`
-are a retest flag (`exTestSpec` / `exTestSpecC`) and the check-in score and the athlete's usual (`readinessS`, `readinessBase` / `readinessSC`, `usualC`). Not covered, on purpose: the dashboard resolving cards against drafts too
+are a retest flag (`exTestSpec` / `exTestSpecC`), the check-in score and the athlete's usual (`readinessS`, `readinessBase` / `readinessSC`, `usualC`)
+and one day card's quality chips with the 70% gate and the 12% cut, in the phone's view and the coach's (`qualityMix` / `qualityLensC`, `qualityDayC`). Not covered, on purpose: the dashboard resolving cards against drafts too
 (TWIN-1), a known difference listed in the script's header. A new copy of an app rule in coach.html goes into the script the same day.
 
 Some coach writes go through RPCs that check the coach themselves (`set_coach_note`, `hide_note`,

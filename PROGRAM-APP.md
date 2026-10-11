@@ -372,14 +372,20 @@ you recommend."* Server: `supabase/stage32_qualities.sql`.
   explanation is enough"*): the list of exercises that train it (*In your plan*) shows only when the
   page is reached from Library → Exercises (`openQualitySheet(q, fromLib)`), never from a day card or
   a card's ⓘ. **Words only: athletes never see set counts.**
-- ⚠ **The mix rule exists four times**: `qualityMix()` (program.html), `qualityCheckC()` (coach.html),
-  the quality check in `/program-design` and `mix()`/`top3()` in `scripts/check_program.py` (2026-09-25).
-  Same weights, same prep test, same minutes rule (`qmSets()` / `qmSetsC()` / `qm_sets()`), same 70%
-  coverage and 12% cut, or the coach's check, the pipeline's check and the athlete's card disagree.
+- ⚠ **The mix rule exists in four places, one of them twice**: `qualityMix()` (program.html), `qualityDayC()` and the weekly
+  `qualityCheckC()` (coach.html), the quality check in `/program-design` and `mix()`/`top3()` in `scripts/check_program.py`
+  (2026-09-25). Same weights, same prep test and same minutes rule everywhere (`qmSets()` / `qmSetsC()` / `qm_sets()`), or the coach's
+  check, the pipeline's check and the athlete's card disagree. The **70% coverage and the 12% cut belong to one day's card**, so they
+  are in `qualityMix()`, `qualityDayC()` and `top3()`; `qualityCheckC()` is the week's ranking for the headline check and does not apply
+  them. Until 2026-10-11 this paragraph said the coach's check applied both, and the dashboard guessed the day cards from the week's
+  coverage (audit TWIN-9): it now runs the app's own rule for every day, in the phone's view (approved entries and approved qualities only,
+  `qualityLensC()`) and again once the drafts are approved. `scripts/check_twins.js` runs `qualityMix()` and `qualityDayC()` on generated days
+  and `check_parity.py` reads the three numbers in every copy.
 - **A cycle's headline quality is its `art` word** (`QM_ART` in coach.html). `bedrock`, `peak` and `reset` are
   phases, not qualities: they have no headline and are never flagged (bedrock→movement flagged almost
   every foundation block, 2026-09-24). coach.html → Exercises →
-  *Quality check* flags every current programme whose headline is not in its week's top two.
+  *Quality check* flags every current programme whose headline is not in its week's top two, and says day by day what each
+  day card will show (or why it will be blank).
 - `qualcache` (localStorage, no prefix) caches `get_qualities()` and never syncs.
 - **There is NO Library → Qualities door.** It shipped and was removed the same day (Amir,
   2026-09-24: *"remove the qualities from library, bad decision"*). Library has three doors:

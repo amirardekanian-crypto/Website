@@ -23,6 +23,8 @@
      exTestSpec                  / exTestSpecC                    which values of a lift's `test` are a retest flag (TWIN-7)
      readinessS, readinessBase   / readinessSC, usualC            the check-in score and the athlete's usual (TWIN-3, TODAY-11)
      qmSets, isPrepBlockTitle    / qmSetsC, QM_PREP               what the Quality check counts
+     qualityMix                  / qualityLensC + qualityDayC     one day card's chips, the 70% gate and the 12% cut included, in the phone's view
+                                                                  (approved entries and qualities) and in the coach's (TWIN-9)
      the report writer in buildSessionData() + readinessPlanLine, readinessPlan
                                  / parseCheckinPlan, parseSessionEmail
                                  the WRITER of the check-in line and its READER (the email import). The writer is the
@@ -33,7 +35,8 @@
    (check_setlog.js), the shared word lists (check_parity.py), the XP rules (check_xp_rules.py).
 
    Known, deliberate differences (printed as notes, never failures):
-     TWIN-1   the dashboard resolves a card against ALL Spine entries, the phone against approved ones.
+     TWIN-1   the dashboard resolves a card against ALL Spine entries, the phone against approved ones. (The Quality check's DAY cards
+              already run in the phone's view, qualityLensC(); the weekly ranking and the videos still read every entry.)
 
    Wired into .githooks/pre-commit (guard 15), which sets CHECK_TWINS_INDEX=1 so it reads the STAGED files, the
    ones that will be committed, not whatever else is in the working tree. Run by hand:   node scripts/check_twins.js
@@ -311,6 +314,94 @@ const TITLES = ['Warm-Up', 'Warmup', 'WARM UP', 'Warm', 'Cool', 'Cooldown', 'Coo
 run('Quality check (sets, prep blocks)', () => {
   RXS.forEach(rx => same('qmSets vs qmSetsC', rx, A_QM.qmSets(rx), D_QM.qmSetsC(rx)));
   TITLES.forEach(t => same('isPrepBlockTitle vs QM_PREP', t, A_QM.isPrepBlockTitle(t), D_QM.QM_PREP.test(t || '')));
+});
+
+/* ── 5b. one day card's quality chips: the 70% gate, the 12% cut, the phone's view (TWIN-9) ───────────── */
+// qualityMix() is the athlete's Home card. The dashboard's qualityDayC() must give the same chips for the same day, and qualityLensC()
+// must build what the phone is served: approved entries and approved qualities only (get_exercises() and get_qualities()). The days
+// are generated (a fixed seed) so that every branch is reached; rxOf() is the same stub on both sides because check_rx.js guards it.
+const A_QMIX = sandbox('var SPINE = null, SPINE_BY_ID = {}, SPINE_IDX = [{}, {}, {}, {}], QUALS = null, QUALS_BY_ID = {};\nfunction rxOf(ex) { return (ex && ex.rx) || {}; }',
+  [lineSrc(A_SRC, 'const EX_ABBREV =', 'program.html'), lineSrc(A_SRC, 'const QM_COVERAGE =', 'program.html')].concat(
+    fromA('normExName', 'exNameVariants', 'setSpine', 'spineFor', 'setQualities', 'qmSets', 'isPrepBlockTitle', 'parseRoundCount', 'qualityMix')), ['setSpine', 'setQualities', 'qualityMix']);
+const D_QMIX = sandbox('var Chips = { rxOf: function (ex) { return (ex && ex.rx) || {}; } };',
+  [lineSrc(D_SRC, 'const EX_ABBREV_C =', 'coach.html'), lineSrc(D_SRC, 'const QM_PREP =', 'coach.html'), lineSrc(D_SRC, 'const QM_COVERAGE_C =', 'coach.html')].concat(
+    fromD('normExNameC', 'exNameVariantsC', 'spineIndexC', 'spineForC', 'qmSetsC', 'roundCountC', 'qualityLensC', 'qualityDayC')), ['qualityLensC', 'qualityDayC']);
+const QM_ENTRIES = [
+  { id: 'a-squat', name: 'Alpha Squat', aliases: ['Alpha Sq'], status: 'approved', qualities: ['strength', 'muscle'] },
+  { id: 'a-press', name: 'Beta Press', aliases: [], status: 'approved', qualities: ['strength'] },
+  { id: 'a-jump', name: 'Gamma Jump', aliases: [], status: 'approved', qualities: ['power', 'spring', 'speed'] },
+  { id: 'a-row', name: 'Delta Row', aliases: [], status: 'approved', qualities: ['muscle', 'strength'] },
+  { id: 'a-carry', name: 'Epsilon Carry', aliases: [], status: 'approved', qualities: [] },
+  { id: 'a-ride', name: 'Zeta Ride', aliases: [], status: 'approved', qualities: ['engine'] },
+  { id: 'a-brace', name: 'Eta Brace', aliases: [], status: 'approved', qualities: ['armour', 'brakes'] },
+  { id: 'a-twist', name: 'Theta Twist', aliases: [], status: 'approved', qualities: ['rotation', 'notaquality'] },
+  { id: 'a-plank', name: 'Mu Plank', aliases: [], status: 'approved', qualities: ['armour'] },
+  { id: 'a-plankw', name: 'Mu Plank (Weighted)', aliases: [], status: 'approved', qualities: ['armour', 'strength'] },
+  { id: 'a-walk', name: 'Nu Walk', aliases: [], status: 'approved' },
+  { id: 'd-lunge', name: 'Iota Lunge', aliases: [], status: 'draft', qualities: ['strength', 'brakes'] },
+  { id: 'd-bound', name: 'Kappa Bound', aliases: ['Gamma Jump'], status: 'draft', qualities: ['spring'] },   // a draft that shares a name with an approved entry
+  { id: 'd-hang', name: 'Lambda Hang', aliases: [], status: 'draft', qualities: ['movement'] },
+  { id: 'd-sprint', name: 'Xi Sprint', aliases: [], status: 'draft', qualities: ['speed', 'engine'] },
+];
+const QM_QUALITY_IDS = ['strength', 'muscle', 'power', 'spring', 'speed', 'brakes', 'rotation', 'engine', 'armour', 'movement'];
+const QM_STATUS = { speed: 'draft', rotation: 'draft', movement: 'draft' };
+// two orders, so a tie between two qualities breaks one way in the first and the other way in the second
+const QM_QUALS = [1, -1].map(dir => QM_QUALITY_IDS.map((id, i) => ({ id, name: id, status: QM_STATUS[id] || 'approved', sort: dir * (i + 1) })));
+function mulberry32(a) { return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const QM_NAMES = ['Alpha Squat', 'Alpha Sq', 'alpha squat', 'Beta Press', 'Gamma Jump', 'Delta Row', 'Epsilon Carry', 'Zeta Ride', 'Eta Brace', 'Theta Twist', 'Mu Plank', 'Mu Plank (Weighted)',
+  'Nu Walk', 'Iota Lunge', 'Kappa Bound', 'Lambda Hang', 'Xi Sprint', 'Unknown Lift', 'Omicron Thing', ''];
+const QM_IDS = ['', '', '', 'a-squat', 'a-jump', 'a-brace', 'd-lunge', 'd-bound', 'd-sprint', 'zzz-missing'];
+const QM_RX = [{ sets: 1 }, { sets: 2 }, { sets: 3 }, { sets: 3 }, { sets: 4 }, { sets: 5 }, { sets: 6 }, { sets: '4' }, { time: '30 min' }, { time: '45:00' }, { time: '90 s' }, {}, { sets: 0, time: '20 min' }, undefined];
+const QM_TITLES = ['Warm-Up', 'Primary', 'Primary', 'Accessory', 'Conditioning Circuit', 'Cool-Down', 'Activation & Prep', 'Core', 'Mobility', 'Power', '', undefined];
+const QM_ROUNDS = [2, 3, '4', '×3 Rounds', 0, '0', undefined, 'x', 1];
+function qmDays(seed, n) {
+  const rnd = mulberry32(seed), pick = a => a[Math.floor(rnd() * a.length)], days = [];
+  for (let i = 0; i < n; i++) {
+    const blocks = [];
+    for (let b = 0, nb = 1 + Math.floor(rnd() * 4); b < nb; b++) {
+      const exercises = [];
+      for (let e = 0, ne = 1 + Math.floor(rnd() * 4); e < ne; e++) {
+        if (rnd() < 0.25) {
+          const items = [];
+          for (let k = 0, nk = 1 + Math.floor(rnd() * 3); k < nk; k++) items.push({ name: pick(QM_NAMES), exId: pick(QM_IDS) });
+          const r = pick(QM_ROUNDS), ex = { type: 'circuit', name: 'Circuit', items };
+          if (rnd() < 0.5) ex.rx = { rounds: r }; else ex.rounds = typeof r === 'number' ? '×' + r + ' Rounds' : r;
+          exercises.push(ex);
+        } else exercises.push({ type: 'standard', name: pick(QM_NAMES), exId: pick(QM_IDS), rx: pick(QM_RX) });
+      }
+      blocks.push({ title: pick(QM_TITLES), exercises });
+    }
+    days.push({ id: i + 1, blocks });
+  }
+  return days;
+}
+// Hand-built edges: exactly 70% tagged, just under, the 12% share exactly met and just missed, and the 1.5 floor.
+const sq = n => ({ name: 'Alpha Squat', type: 'standard', rx: { sets: n } }), walk = n => ({ name: 'Nu Walk', type: 'standard', rx: { sets: n } });
+const press = n => ({ name: 'Beta Press', type: 'standard', rx: { sets: n } }), ride = n => ({ name: 'Zeta Ride', type: 'standard', rx: { sets: n } });
+const dayOf = (...exercises) => ({ id: 1, blocks: [{ title: 'Primary', exercises }] });
+const QM_EDGES = [dayOf(sq(7), walk(3)), dayOf(sq(6), walk(4)), dayOf(sq(14), walk(5)), dayOf(sq(1)), dayOf(sq(2)), dayOf(press(22), ride(3)), dayOf(press(22), ride(2)),
+  dayOf(press(22), ride(2.5)), dayOf(), { id: 2, blocks: [] }, { id: 3 }, null, undefined, dayOf(sq(7), walk(3), { title: 'x' }), { id: 4, blocks: [{ title: 'Warm-Up', exercises: [sq(9)] }] }];
+const tally = { shown: 0, lowCover: 0, floor: 0, none: 0 };
+run('one day card\'s quality chips (qualityMix)', () => {
+  QM_QUALS.forEach(quals => ['phone', 'coach'].forEach(view => {
+    const phone = view === 'phone';
+    vm.runInContext('setSpine(' + J(QM_ENTRIES.filter(e => !phone || e.status === 'approved')) + '); setQualities(' + J(quals.filter(q => !phone || q.status === 'approved')) + ');', A_QMIX.ctx);
+    const lens = D_QMIX.qualityLensC(QM_ENTRIES, quals, phone);
+    qmDays(20261011, 450).concat(QM_EDGES).forEach(day => {
+      const a = A_QMIX.qualityMix(day), m = D_QMIX.qualityDayC(day, lens);
+      same('qualityMix vs qualityDayC (' + view + ' view)', day, a, m.chips);
+      if (m.chips.length) tally.shown++; else if (m.total && m.coverage < 0.7) tally.lowCover++; else if (m.total) tally.floor++; else tally.none++;
+    });
+  }));
+  // the generated corpus must reach every branch, or agreeing on it would prove little
+  expect('the days reach a shown card, a blank one for low coverage, one for too few sets, and one with nothing to count', 'corpus',
+    [tally.shown > 200, tally.lowCover > 200, tally.floor > 5, tally.none > 5], [true, true, true, true]);
+  // the phone is served approved entries and qualities only: the lens must drop the rest, and keep the order and the status of what it keeps
+  const lens = D_QMIX.qualityLensC(QM_ENTRIES, QM_QUALS[0], true);
+  expect('the phone lens holds approved entries and qualities only', 'lens', [Object.keys(lens.byId).sort(), Object.keys(lens.qById).sort()],
+    [QM_ENTRIES.filter(e => e.status === 'approved').map(e => e.id).sort(), QM_QUALITY_IDS.filter(q => !QM_STATUS[q]).sort()]);
+  const all = D_QMIX.qualityLensC(QM_ENTRIES, QM_QUALS[0], false);
+  expect('the coach lens holds everything', 'lens', [Object.keys(all.byId).length, Object.keys(all.qById).length], [QM_ENTRIES.length, QM_QUALITY_IDS.length]);
 });
 
 /* ── 6. the check-in line: the writer and its reader ──────────────────────── */

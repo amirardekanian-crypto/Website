@@ -219,10 +219,13 @@ def main():
 
     # The Quality mix rule's numbers (qualityMix(), qualityCheckC(), check_program mix()/top3()).
     same_num('quality mix: coverage', {'program': one_number(PROGRAM, r'const QM_COVERAGE = ([\d.]+)', 'QM_COVERAGE'),
+                                       'coach': one_number(COACH, r'const QM_COVERAGE_C = ([\d.]+)', 'QM_COVERAGE_C'),
                                        'check_program': one_number(CHECKER, r'QM_COVERAGE = ([\d.]+)', 'QM_COVERAGE')})
     same_num('quality mix: floor', {'program': one_number(PROGRAM, r'score\[q\] >= Math\.max\(([\d.]+), sum \* [\d.]+\)', 'the 1.5 floor'),
+                                    'coach': one_number(COACH, r'score\[q\] >= Math\.max\(([\d.]+), sum \* [\d.]+\)', 'the 1.5 floor'),
                                     'check_program': one_number(CHECKER, r'score\[q\] >= max\(([\d.]+), s \* [\d.]+\)', 'the 1.5 floor')})
     same_num('quality mix: share', {'program': one_number(PROGRAM, r'score\[q\] >= Math\.max\([\d.]+, sum \* ([\d.]+)\)', 'the 12% share'),
+                                    'coach': one_number(COACH, r'score\[q\] >= Math\.max\([\d.]+, sum \* ([\d.]+)\)', 'the 12% share'),
                                     'check_program': one_number(CHECKER, r'score\[q\] >= max\([\d.]+, s \* ([\d.]+)\)', 'the 12% share')})
     same_num('quality mix: second quality', {
         'program': one_number(PROGRAM, r'sets \* \(i === 0 \? 1 : ([\d.]+)\)', 'the half weight'),

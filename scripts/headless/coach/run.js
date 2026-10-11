@@ -2082,6 +2082,60 @@ S['readiness-chart'] = async (b) => {
   return r;
 };
 
+S['quality-day-cards'] = async (b) => {
+  const r = { id: 'quality-day-cards', title: 'Quality check: each day card, day by day, by the app\'s rule (70% gate, 12% cut, the phone\'s view)', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'athletes' });
+  // Ava: five days. The Spine has approved entries and one DRAFT lift; of the ten qualities only strength, muscle and power are approved.
+  await page.evaluate(() => {
+    const now = new Date().toISOString();
+    const E = (id, name, status, q) => ({ id, name, aliases: [], pattern: 'squat', qualities: q, purpose: 'Fixture.', tennis: null, cues: null, equipment: [], loads: [], easier: [], harder: [], alts: [], video: null,
+      status, updated_at: now, updated_by: 'coach', impact: 'none', muscles: null });
+    const list = [E('sc-squat', 'Scenario Squat', 'approved', ['strength', 'muscle']), E('sc-press', 'Scenario Press', 'approved', ['strength']), E('sc-row', 'Scenario Row', 'approved', ['muscle', 'strength']),
+      E('sc-brace', 'Scenario Brace', 'approved', ['armour']), E('sc-untagged', 'Scenario Untagged', 'approved', []), E('sc-draft', 'Scenario Draft Lift', 'draft', ['power'])];
+    window.__DB.exercises.splice(0, window.__DB.exercises.length, ...list);
+    window.__DB.exercise_coach.splice(0, window.__DB.exercise_coach.length, ...list.map(e => ({ id: e.id, sfr: null, flags: [], notes: null, suggested_qualities: null, links_before: null, links_history: null, credits: null, cost: null, suggested_changes: null })));
+    const row = window.__DB.programs.find(p => p.athlete_id === 'ava_test');
+    const d = JSON.parse(JSON.stringify(row.data));
+    const ex = (name, sets, exId) => ({ name, exId, type: 'standard', rx: { sets, reps: 8 } });
+    const day = (id, ...exs) => ({ id, focusTag: 'Scenario day ' + id, blocks: [{ icon: '💪', title: 'Primary', exercises: exs }] });
+    d.workouts.days = [
+      { id: 1, focusTag: 'Scenario day 1', blocks: [{ icon: '🔥', title: 'Warm-Up', exercises: [ex('Scenario Untagged', 2)] },
+        { icon: '💪', title: 'Primary', exercises: [ex('Scenario Squat', 4, 'sc-squat'), ex('Scenario Press', 3, 'sc-press'), ex('Scenario Row', 3, 'sc-row')] }] },
+      day(2, ex('Scenario Squat', 3, 'sc-squat'), ex('Scenario Untagged', 4, 'sc-untagged'), ex('Unknown Exercise', 3)),
+      day(3, ex('Scenario Draft Lift', 4, 'sc-draft'), ex('Scenario Squat', 2, 'sc-squat')),
+      day(4, ex('Scenario Brace', 4, 'sc-brace')),
+      day(5, ex('Scenario Squat', 1, 'sc-squat')),
+    ];
+    row.data = d; row.updated_at = new Date(Date.now() + 1000).toISOString();
+  });
+  await page.evaluate(() => { S.spine = null; return reloadPrograms(); });
+  await L.go(page, 'exercises'); await L.settle(page, 900);
+  const avaRow = () => page.evaluate(() => {
+    document.querySelectorAll('#content details').forEach(d => { d.open = true; });
+    const row = [...document.querySelectorAll('#content .credrow')].find(x => /Ava Example/.test(x.textContent) && /Trains most/.test(x.textContent));
+    return row ? row.textContent.replace(/\s+/g, ' ').trim() : null;
+  });
+  let txt = await avaRow();
+  check(r, 'Ava has a row in the Quality check', !!txt, '');
+  const now = (/Day cards on their phone: (.*?)(?: Once the drafts are approved:|$)/.exec(txt || '') || [])[1] || '', later = (/Once the drafts are approved: (.*)$/.exec(txt || '') || [])[1] || '';
+  check(r, 'on the phone, Day 1 names its two qualities (the warm-up is not counted)', /Day 1 Strength · Muscle \|/.test(now), now);
+  check(r, 'Day 2 is blank: 30% of its sets are tagged and 70% are needed', /Day 2 blank \(30% tagged, 70% needed\)/.test(now), now);
+  check(r, 'Day 3 is blank on the phone: its draft lift is not served there (33% tagged)', /Day 3 blank \(33% tagged, 70% needed\)/.test(now), now);
+  check(r, 'Day 4 is blank on the phone: the quality it trains is not approved (0% tagged)', /Day 4 blank \(0% tagged, 70% needed\)/.test(now), now);
+  check(r, 'Day 5 is blank: one set is too few to name a quality', /Day 5 blank \(too few sets to name a quality\)/.test(now), now);
+  check(r, 'once the drafts are approved, Day 3 reads Power · Strength and Day 4 reads Armour (the others stay as they are)', /Day 1 Strength · Muscle \| Day 2 blank \(30% tagged, 70% needed\) \| Day 3 Power · Strength \| Day 4 Armour \| Day 5 blank/.test(later), later);
+  check(r, 'the weekly line says nothing about the day cards (it is a weekly number)', !/so the day cards show nothing/.test(txt || '') && /77% of the week's sets tagged/.test(txt || ''), txt);
+  // No approved quality at all: no day card can show one, and the line says so instead of listing five blanks.
+  await page.evaluate(() => { window.__DB.qualities.forEach(q => { q.status = 'draft'; }); S.spine = null; renderExercises(); });
+  await L.settle(page, 900);
+  txt = await avaRow();
+  check(r, 'with no quality approved the phone line says so', /Day cards on their phone: no quality is approved yet, so no day card shows one/.test(txt || ''), txt);
+  check(r, 'and the "once approved" line still shows what the cards will say', /Once the drafts are approved: Day 1 Strength · Muscle/.test(txt || ''), txt);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── One way to say what did not work (audit BROWSER-10, FLOW-22, MKT-13, 2026-10-11, pile B5) ─────────────────────────────────────
 // A failure used to be a 2.6-second toast in some tabs (easy to miss) and a pop-up in others (it stopped everything, and was gone once
 // dismissed). Now: it worked = a toast; it did not = a line at the bottom that stays until it is dismissed; a question = a confirm;
