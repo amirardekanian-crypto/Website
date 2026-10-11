@@ -60,7 +60,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 93 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 95 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -145,6 +145,8 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | session-hide-undo | Hide this log from the Raw log: one `coach_hide_session`, nothing deleted, the day card back to not logged, the Undo bar, Undo, the File's Hidden sessions list, Restore, Delete for good (only a hidden row) | (pile A6, FILE-11) a hard delete: gone for good, no Undo |
 | session-hide-no-false-warning | A session whose report mark is in the athlete's progress, hidden: no "session not synced"; a mark with no session at all still warns | (pile A6, ROSTER-9) deleting a session left a warning that could never clear (mutation-tested: without `.concat(a.hidden)` it fails) |
 | session-hide-add-over | Add past session from email over a HIDDEN one | (pile A6) it would have updated a row nobody could see |
+| intake-outcome | Intake: a client needs an athlete (refused on the page, nothing sent), a saved outcome moves the card and the badge, a not-a-fit sends no athlete, the athlete's File says "Came from", clearing it, a server without stage61, the pre-selected likely athlete | (pile A8, FLOW-17, SPINE-11) "Handled" could not say what happened and a lead could not be linked to the athlete it became |
+| erase-linked-form | Erase completely…: two applications linked to the athlete are offered with "linked to them" and ticked; the one left unticked keeps its answers and loses only the link | (pile A8) a link would have made the athlete impossible to erase (the server's own check) |
 | file-preview-wording | The File tab's "Their app" words, the two buttons' addresses, and the bar program.html draws over a preview | (pile A7, TOOLS-11) the File tab promised "their real data" and the bar "exactly as they see it", but the preview shows the programme without their logged work |
 | library-publish-guards | A file that is new, one that replaces a live item, one that replaces a hidden item, and one whose id is already on another shelf | (pile B11, TOOLS-6) the confirm did not say, a hidden item was published again, a moved item was published twice |
 

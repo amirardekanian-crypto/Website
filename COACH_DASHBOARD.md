@@ -213,6 +213,16 @@ and the **badge on the tab counts the new ones**:
 - **Archive** — spam or not a fit (collapsed at the bottom; **Reopen** brings it back).
 - **Reopen** — send a handled/archived lead back to *New*.
 
+**What became of it** (stage61, 2026-10-11; audit FLOW-17 and SPINE-11; Amir: "link an application to the athlete it became, and let Handled
+record an outcome"). Every card has a small form: **What happened** (*Became a client*, *Joined the free tracker*, *Not a fit*, *No reply*,
+*Said no*, *Something else*) and, for the first two, **Which athlete** (a list of the roster by name; when one athlete has the application's
+email, WhatsApp number or full name they are pre-selected, never saved for you). **Save outcome** calls `set_intake_outcome()`: a new application
+becomes *Handled* by it, a client needs an athlete, only a client or a free-tracker joiner keeps one, and "No outcome (clear it)" removes both. The
+card wears the outcome as a pill, and **the athlete's File says where they came from** (*Came from · date application · programme · outcome · open
+Intake*). A linked application is also the surest way to find the right form when you erase the athlete (see *Erasing a person*). The tab reads
+`hab_intake` itself, paged, under the "coach manage intake" policy (`intake_list()` still exists and is no longer called). `intake-outcome` and
+`erase-linked-form` drive it.
+
 Nothing here joins anyone to Proof or writes a programme — it's an inbox. When you take
 a lead on, onboard them the usual way (`/athlete-intake`). Backend, and the coach-only
 guard on every read/write: [`supabase/stage27_intake.sql`](supabase/stage27_intake.sql).
@@ -743,8 +753,9 @@ list is long and a phone clips a dialog.
 - **Intake forms are the coach's pick** (Amir, 2026-10-11: *"pick any form in the Erase panel"*). Most forms cannot
   be tied to an athlete by data (the Farsi forms are in Persian script, the programmes in Latin letters, and 30 of 52
   athletes have no email or number stored), so the panel does two things. It **offers** the forms that carry their
-  email, their WhatsApp number (last 9 digits, Persian digits folded) or their full name. **Only a same-email form
-  starts ticked**, and not when another athlete's contact carries the same email (a parent's, for two children: flagged
+  email, their WhatsApp number (last 9 digits, Persian digits folded) or their full name, and **first the ones you linked to them on the Intake
+  tab** (stage61: *linked to them*; ticked for you, because you did the linking). **A linked form and a same-email form
+  start ticked**, and not when another athlete's contact carries the same email (a parent's, for two children: flagged
   *also another athlete's*); a number match (it can be a foreign number with the same last digits, or a handle that holds
   digits) and a name match (two people can share a name) are offered, never ticked for you. And a
   **finder** under it searches every other form by name, email, contact, programme or date, shows 8 at a time, and
@@ -836,7 +847,7 @@ it in this file.
 | `library`, `library_categories` | The Library tab |
 | `exercises`, `exercise_coach`, `qualities` | The Exercises tab (the Spine) |
 | `spine_versions` | An entry's History: every row of those three as it was before a change, kept by a trigger (stage49); the weekly backup reads it |
-| `hab_intake` via `intake_list()` | The Intake tab |
+| `hab_intake` (read as a table, paged: stage61) | The Intake tab, the athlete's *Came from* line and the erase panel's forms |
 | `affiliates` | The Affiliates tab |
 | `assess_accounts`, `tps_accounts` | The Testing app and Course tabs (loaded when opened) |
 | `buyer_notes` | The private note beside each buyer in those two tabs (stage53); coach-only |

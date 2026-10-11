@@ -249,6 +249,12 @@
   .i-contact a { color: var(--court); border-bottom: 1px solid var(--court-100); }
   .i-contact .dot { color: var(--muted-soft); }
   .i-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .i-outcome { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--rule); display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: end; }
+  .i-outcome .i-now { flex-basis: 100%; margin: 0; font-size: 13px; }
+  .i-outcome .i-now a { color: var(--court); border-bottom: 1px solid var(--court-100); }
+  .i-outcome label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
+  .i-outcome select { min-height: 36px; font: inherit; font-size: 14px; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; max-width: 100%; }
+  .i-outcome [hidden] { display: none; }
   .arch-toggle { cursor: pointer; font-weight: 700; font-size: 13px; color: var(--muted); }
 
   /* ── Affiliates (referral-code roster — public.affiliates, stage29) ── */
@@ -1113,7 +1119,7 @@ const S = {
   fullFor: {},     // athlete_id -> the histVer their summary + log were merged for (ensureSessionsFull)
   notes: [],       // hab_notes rows, last 7 days, hidden included
   contacts: [],    // contact_list() rows
-  intake: [],      // intake_list() rows — coaching apply-form submissions
+  intake: [],      // hab_intake rows — coaching apply-form submissions, with the athlete each became and the outcome (stage61)
   rules: null,     // xp_rules.rules jsonb
   seasons: [],     // seasons rows, newest first
   titles: [],      // hab_titles recent
@@ -1212,7 +1218,7 @@ async function loadAll() {
     sb.from('seasons').select('*').order('starts_on', { ascending: false }),
     sb.from('hab_titles').select('*').order('earned_on', { ascending: false }).limit(30),
     sb.from('leaderboard_optin').select('athlete_id, display_name, title'),
-    sb.rpc('intake_list'),
+    selectAll('hab_intake', '*'),   // the table itself, paged (stage61): intake_list() cannot return the new columns and stops at the row cap
     sb.from('affiliates').select('*').order('code'),
   ]);
   const firstErr = [prog, hist, notes, rules, seasons, titles, optin].find(r => r && r.error);
@@ -1230,7 +1236,7 @@ async function loadAll() {
   // These three still load the page when they fail, but the banner says so: an empty
   // funnel, inbox or code list must not look like a real one.
   LOAD_ERR.contacts = contacts && contacts.error ? contacts.error.message : '';
-  LOAD_ERR.intake = intake && intake.error ? intake.error.message : '';
+  LOAD_ERR.intake = intake && intake.error ? intake.error.message : intake && intake.short ? `only ${intake.data.length} of ${intake.total} intake forms came back` : '';
   LOAD_ERR.affiliates = affs && affs.error ? affs.error.message : '';
   await Promise.all([loadLogins(), loadCoachingLogs(), loadLibrary(), loadPrograms()]);
   assemble();
@@ -1269,7 +1275,7 @@ async function refetch(parts) {
   if (parts.includes('notes')) take('the crew wall', sb.from('hab_notes').select('*').gte('day', addDays(todayKey(), -7)), r => { S.notes = r.data || []; });
   if (parts.includes('rules')) take('the quest and XP rules', sb.from('xp_rules').select('rules').eq('id', 1).maybeSingle(), r => { S.rules = (r.data && r.data.rules) || null; });
   if (parts.includes('contacts')) take('the Proof contacts', sb.rpc('contact_list'), r => { S.contacts = r.data || []; });
-  if (parts.includes('intake')) take('the intake forms', sb.rpc('intake_list'), r => { S.intake = r.data || []; });
+  if (parts.includes('intake')) take('the intake forms', selectAll('hab_intake', '*'), r => { S.intake = r.data || []; });
   if (parts.includes('affiliates')) take('the affiliate codes', sb.from('affiliates').select('*').order('code'), r => { S.affiliates = r.data || []; });
   if (parts.includes('hist')) take('the session list', loadHistory(), r => { S.hist = r.data || []; });
   if (parts.includes('programs')) jobs.push(loadPrograms());
@@ -4465,6 +4471,12 @@ function oldCallLogsHtml(D) {
       ${body}
     </section>`;
 }
+// The application(s) this athlete came from (stage61): the ones linked to them on the Intake tab. Nothing when none is linked.
+function cameFromHtml(athleteId) {
+  const apps = (S.intake || []).filter(i => i.athlete_id === athleteId).sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)));
+  if (!apps.length) return '';
+  return `<tr><td class="k">Came from</td><td class="v">${apps.map(i => `${esc(prettyDate(String(i.created_at || '').slice(0, 10)))} application${i.programme ? ' · ' + esc(i.programme) : ''}${i.outcome ? ' · ' + esc(intakeOutcomeLabel(i.outcome)) : ''} · <a href="#intake">open Intake</a>`).join('<br>')}</td></tr>`;
+}
 // The sessions the coach hid (stage60), newest first, each with Restore and, for a genuine erasure request, Delete for good. Absent when there are none.
 function hiddenSessionsHtml(D) {
   const { athleteId, a } = D;
@@ -4543,6 +4555,7 @@ function fileTabHtml(D) {
     <section class="panel">
       <table class="meta-table">
         <tr><td class="k">Athlete id</td><td class="v">${esc(athleteId)}</td></tr>
+        ${cameFromHtml(athleteId)}
         <tr><td class="k">Stored in</td><td class="v">${S.progSrc[athleteId] === 'db'
             ? '<b>the database</b> — editable here; only this athlete and you can read it'
             : '<span style="color:var(--clay-ink)">no programme row</span>'}</td></tr>
@@ -4968,13 +4981,13 @@ function erasePanelHtml(kind, key) {
   const cands = pv.intake_candidates || [];
   const codes = pv.affiliates_unlinked || [], lastBackup = lastBackupAt();
   const coached = kind === 'athlete' && (S.ath[key] || {}).tier === 'coached';
-  const how = { email: 'same email', whatsapp: 'same WhatsApp number', name: 'same name' };
+  const how = { linked: 'linked to them', email: 'same email', whatsapp: 'same WhatsApp number', name: 'same name' };
   const forms = kind !== 'athlete' ? '' : `<div class="forms">
-    ${cands.length ? `<p><b>${cands.length} intake form${cands.length === 1 ? '' : 's'}</b> ${cands.length === 1 ? 'carries' : 'carry'} their email, WhatsApp number or full name. They hold the answers about injuries, sleep and health. Tick the ones that are theirs and they go too:</p>
+    ${cands.length ? `<p><b>${cands.length} intake form${cands.length === 1 ? '' : 's'}</b> may be theirs: linked to them on the Intake tab, or carrying their email, WhatsApp number or full name. They hold the answers about injuries, sleep and health. Tick the ones that are theirs and they go too:</p>
       ${cands.map(c => `<label class="pick"><input type="checkbox" data-eid="${esc(c.id)}" ${e.picked.includes(String(c.id)) ? 'checked' : ''} ${busy ? 'disabled' : ''} onchange="eraseTick(${jsq(c.id)}, this.checked)">
         <span>${esc(prettyDate(String(c.created_at || '').slice(0, 10)))} · <bdi>${esc(c.name || 'no name')}</bdi>${c.programme ? ' · ' + esc(c.programme) : ''}
         <span class="chip ${c.matched_on === 'name' ? '' : 'court'}">${esc(how[c.matched_on] || c.matched_on)}</span>${c.shared ? ' <span class="chip" title="Another athlete\'s contact record carries the same email or number, for example a parent\'s">also another athlete\'s</span>' : ''}</span></label>`).join('')}${cands.some(c => c.shared) ? '<p class="stays">A form marked <i>also another athlete\'s</i> carries an email or number that another athlete\'s contact record has too (a parent\'s, for two children), so it is not ticked for you.</p>' : ''}`
-      : '<p><b>Intake forms:</b> none carries their email, WhatsApp number or full name. That is common: most forms are in Persian while the programme is in Latin letters, and most athletes have no email or number stored. Look for theirs below.</p>'}
+      : '<p><b>Intake forms:</b> none is linked to them or carries their email, WhatsApp number or full name. That is common: most forms are in Persian while the programme is in Latin letters, and most athletes have no email or number stored. Look for theirs below.</p>'}
     <div class="finder">
       <label for="eraseFindIn">Look for another intake form</label>
       <input id="eraseFindIn" class="pwin" autocomplete="off" spellcheck="false" placeholder="name, email or number" value="${esc(e.find || '')}" ${busy || LOAD_ERR.intake ? 'disabled' : ''} oninput="eraseFind(this.value)">
@@ -5012,10 +5025,10 @@ async function eraseOpen(kind, key) {
   if (res.error) { e.status = 'error'; e.err = eraseWhy(res.error); }
   else {
     e.status = 'ready'; e.pv = res.data || {};
-    // Ticked for you: a form with their exact email, unless another athlete's contact carries the same one. A number match and a name match are
+    // Ticked for you: a form you linked to them yourself (stage61), and a form with their exact email unless another athlete's contact carries the same one. A number match and a name match are
     // only offered (a number can be a foreign number with the same last digits, or a handle that holds digits): the list of what goes is
     // right above the box where the id is typed, and every form is named there.
-    e.picked = (e.pv.intake_candidates || []).filter(c => c.matched_on === 'email' && !c.shared).map(c => String(c.id)).slice(0, ERASE_MAX_FORMS);
+    e.picked = (e.pv.intake_candidates || []).filter(c => c.matched_on === 'linked' || (c.matched_on === 'email' && !c.shared)).map(c => String(c.id)).slice(0, ERASE_MAX_FORMS);
   }
   render();
   const i = $('eraseIn'); if (i) i.focus();
@@ -6681,11 +6694,47 @@ function waLink(num) {
   return 'https://wa.me/' + d;
 }
 
+// What became of an application (stage61, audit FLOW-17 and SPINE-11; Amir: "link an application to the athlete it became, and let Handled record an
+// outcome"). The server keeps the same six; only 'client' and 'free' keep an athlete.
+const INTAKE_OUTCOMES = [['client', 'Became a client'], ['free', 'Joined the free tracker'], ['not_a_fit', 'Not a fit'], ['no_reply', 'No reply'], ['declined', 'Said no'], ['other', 'Something else']];
+const intakeOutcomeLabel = k => (INTAKE_OUTCOMES.find(o => o[0] === k) || [k, k])[1];
+const intakeKeepsAthlete = k => k === 'client' || k === 'free';
+// The last 9 digits of a number, Persian and Arabic-Indic digits folded: the same comparison coach_erase_person() makes.
+const last9 = v => { const d = String(v == null ? '' : v).replace(/[۰-۹]/g, c => String(c.charCodeAt(0) - 0x06F0)).replace(/[٠-٩]/g, c => String(c.charCodeAt(0) - 0x0660)).replace(/\D/g, ''); return d.length >= 9 ? d.slice(-9) : ''; };
+// The athletes an application may have become: everyone on the roster except the demo and the dashboard's own identity, by name.
+function intakeAthletes() {
+  return Object.values(S.ath || {}).filter(a => !SYSTEM_IDS.includes(a.id) && a.id !== AMIR_ATHLETE_ID)
+    .sort((x, y) => String(x.name).localeCompare(String(y.name)) || String(x.id).localeCompare(String(y.id)));
+}
+// The one athlete this application most likely became: the same email or WhatsApp number on their contact record, or the same full name.
+// Only when exactly one fits; the coach still picks.
+function intakeGuess(i) {
+  const em = String(i.email || '').trim().toLowerCase(), ph = last9(i.contact), nm = intakeName(i).trim().toLowerCase().replace(/\s+/g, ' ');
+  const hits = intakeAthletes().filter(a => {
+    const c = a.contact || {};
+    return (em && String(c.email || '').trim().toLowerCase() === em) || (ph && last9(c.whatsapp) === ph) || (nm && nm !== 'unnamed' && String(a.name || '').trim().toLowerCase().replace(/\s+/g, ' ') === nm);
+  });
+  return hits.length === 1 ? hits[0].id : '';
+}
+function intakeOutcomeHtml(i) {
+  const cur = i.outcome || '', ath = i.athlete_id || '', pick = ath || intakeGuess(i);
+  const now = cur ? `<p class="i-now">Outcome: <b>${esc(intakeOutcomeLabel(cur))}</b>${ath ? ` · <a href="#a/${esc(encodeURIComponent(ath))}">${esc(nameOf(ath))}</a>` : ''}</p>` : '';
+  const opts = INTAKE_OUTCOMES.map(([k, l]) => `<option value="${k}"${k === cur ? ' selected' : ''}>${esc(l)}</option>`).join('');
+  const aths = intakeAthletes().map(a => `<option value="${esc(a.id)}"${a.id === pick ? ' selected' : ''}>${esc(a.name)} · ${esc(a.id)}</option>`).join('');
+  // an athlete linked to an id that is no longer on the roster (erased, renamed) stays selectable so saving does not drop it silently
+  const gone = ath && !intakeAthletes().some(a => a.id === ath) ? `<option value="${esc(ath)}" selected>${esc(ath)} (not on the roster)</option>` : '';
+  return `<div class="i-outcome" data-id="${esc(i.id)}">${now}
+    <label>What happened<select class="i-out-sel"><option value="">${cur ? 'No outcome (clear it)' : 'Choose…'}</option>${opts}</select></label>
+    <label class="i-who"${intakeKeepsAthlete(cur) ? '' : ' hidden'}>Which athlete<select class="i-ath-sel"><option value="">Choose…</option>${gone}${aths}</select></label>
+    <button class="btn sm intake-outcome-save">Save outcome</button>
+  </div>`;
+}
 function intakeCard(i) {
   const name = intakeName(i);
   const st = i.status || 'new';
   const langPill = `<span class="ipill ${i.lang === 'fa' ? 'fa' : 'en'}">${i.lang === 'fa' ? 'FA' : 'EN'}</span>`;
   const progPill = i.programme ? `<span class="ipill prog">${esc(i.programme)}</span>` : '';
+  const outPill = i.outcome ? `<span class="ipill pct">${esc(intakeOutcomeLabel(i.outcome))}</span>` : '';
 
   const rows = [];
   const p = i.payload || {};
@@ -6710,8 +6759,8 @@ function intakeCard(i) {
   else                   acts = `<button class="btn sm intake-act" data-id="${esc(i.id)}" data-to="new">Reopen</button>`;
 
   return `<details class="intake-card ${st}"${st === 'new' ? ' open' : ''}>
-    <summary><span class="ava">${esc(initials(name))}</span><span class="i-name">${esc(name)}</span>${langPill}${progPill}<span class="i-when">${esc(timeAgo(i.created_at))}</span></summary>
-    <div class="i-body"><div class="i-contact">${contactLine}</div>${qa}<div class="i-actions">${acts}</div></div>
+    <summary><span class="ava">${esc(initials(name))}</span><span class="i-name">${esc(name)}</span>${langPill}${progPill}${outPill}<span class="i-when">${esc(timeAgo(i.created_at))}</span></summary>
+    <div class="i-body"><div class="i-contact">${contactLine}</div>${qa}${intakeOutcomeHtml(i)}<div class="i-actions">${acts}</div></div>
   </details>`;
 }
 
@@ -6726,6 +6775,31 @@ async function intakeSetStatus(id, to, btn) {
   renderIntake(); renderRail();
 }
 
+async function intakeSaveOutcome(btn) {
+  const box = btn.closest('.i-outcome'), id = box.dataset.id;
+  const outcome = box.querySelector('.i-out-sel').value || null;
+  const athlete = intakeKeepsAthlete(outcome) ? (box.querySelector('.i-ath-sel').value || null) : null;
+  if (outcome === 'client' && !athlete) { fail('Pick the athlete this application became.'); return; }
+  if (!DEMO) {
+    btn.disabled = true;
+    const res = await sb.rpc('set_intake_outcome', { p_id: id, p_outcome: outcome, p_athlete_id: athlete });
+    if (res.error) {
+      btn.disabled = false;
+      const m = res.error.message || '';
+      fail('Could not save the outcome: ' + (/Could not find the function|PGRST202/i.test(m + (res.error.code || '')) ? 'the server does not have set_intake_outcome yet (supabase/stage61_intake_outcome.sql has not been applied).' : m));
+      return;
+    }
+  }
+  const row = (S.intake || []).find(x => String(x.id) === String(id));
+  if (row) {
+    row.linked_at = !athlete ? null : (row.athlete_id === athlete ? row.linked_at : new Date().toISOString());
+    row.outcome = outcome; row.athlete_id = athlete;
+    if (outcome && (row.status || 'new') === 'new') { row.status = 'handled'; row.handled_at = new Date().toISOString(); }
+  }
+  invalidateDetail();       // the athlete's File says where they came from
+  renderIntake(); renderRail();
+  toast(outcome ? 'Outcome saved' : 'Outcome cleared');
+}
 function renderIntake() {
   const all = (S.intake || []).slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   const g = { new: [], handled: [], archived: [] };
@@ -6741,6 +6815,8 @@ function renderIntake() {
   $('content').innerHTML = html;
   $('content').querySelectorAll('.copy-btn-js').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); copyText(btn.dataset.url, btn); }));
   $('content').querySelectorAll('.intake-act').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); intakeSetStatus(btn.dataset.id, btn.dataset.to, btn); }));
+  $('content').querySelectorAll('.i-out-sel').forEach(sel => sel.addEventListener('change', () => { const w = sel.closest('.i-outcome').querySelector('.i-who'); if (w) w.hidden = !intakeKeepsAthlete(sel.value); }));
+  $('content').querySelectorAll('.intake-outcome-save').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); intakeSaveOutcome(btn); }));
 }
 
 // --- demo fixtures (?demo=1) — layout preview only, nothing is real ----------

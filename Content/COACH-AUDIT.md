@@ -21,7 +21,7 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 181 are fixed, 7 partly fixed (the harm is gone, something named in the finding is left), 2 open and 1 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
+**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 183 are fixed, 6 partly fixed (the harm is gone, something named in the finding is left), 2 open and 0 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
 questions in §7 and the eleven in §12 (pile A), and the one thing left for you is to switch off public sign-up in the Supabase
 dashboard (SERVER-14). The SQL pack and the removal script ran on 2026-10-11 and §11 records what was checked afterwards.
 **What is left, and how to continue in a new chat, is §12.**
@@ -265,14 +265,14 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-<!--T9-->191 findings. Fixed 181 · Partly 7 · Open 2 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
+<!--T9-->191 findings. Fixed 183 · Partly 6 · Open 2 · Your call 0 · Not a bug 0. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
 | high | 32 | 0 | 1 | 0 | 0 |
-| medium | 82 | 6 | 0 | 0 | 0 |
-| low | 55 | 1 | 1 | 0 | 1 |<!--/T9-->
+| medium | 83 | 5 | 0 | 0 | 0 |
+| low | 56 | 1 | 1 | 0 | 0 |<!--/T9-->
 
 ### The work and the ✎ editor (WORK)
 
@@ -410,7 +410,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | FLOW-14 | medium | Free, Proof and new-signup athletes open on 'The work' with empty training metrics and stale copy; every Needs you row lands on The work whatever the reason | Fixed | A habit-only athlete (free or Proof) opens on their Proof screen. Rows about Proof silence, a new signup or an upgrade lead open Proof, and an empty Work tab now explains why it is empty instead of mentioning old data files. |  |
 | FLOW-15 | medium | Retired migration tools sit on the daily roster screen; '↑ Coaching logs' replaces server logs that publish_cycle now writes | Fixed | The 'Move programmes into the database' button and the old data-file fallback are gone. The coaching-log upload can now only add a log for an athlete who has none, never replace one, and it sits in the folded Coach tools line. It was kept add-only as the default; say if you want it removed. |  |
 | FLOW-16 | medium | Calls and 'Copy cycle prompt' are a second, mostly unused end-of-cycle workflow that leaves the app and returns to Today | Fixed | Retired (Amir, 2026-10-11: one call log ever, 12 July). The Calls tab, + New call log and Copy cycle prompt are gone; old call logs are read and deleted in the athlete's File under *Old call logs*; an old `/calls` link opens the athlete. `call-log.html` and `CALL_LOG.md` still exist but nothing links to them. |  |
-| FLOW-17 | medium | Intake is an island: new leads never reach Today, a lead cannot be linked to the athlete it became, and 24 of 64 are still 'new' | Partly | Today now shows 'N new applications' with a link to Intake. | The old 'new' backlog is cleared (1 of 64 applications is new). Decided (2026-10-11): link an application to the athlete it became, and let Handled record an outcome. Not built yet (A8). |
+| FLOW-17 | medium | Intake is an island: new leads never reach Today, a lead cannot be linked to the athlete it became, and 24 of 64 are still 'new' | Fixed | Today now shows 'N new applications' with a link to Intake. Since 2026-10-11 (pile A8, stage61 applied) an application records what became of it: each card has What happened (Became a client, Joined the free tracker, Not a fit, No reply, Said no, Something else) and, for the first two, Which athlete (the likely one pre-selected, never saved for you). `set_intake_outcome()` marks a new application handled, refuses a client with no athlete, and `hab_intake.athlete_id` / `outcome` / `linked_at` hold it. The athlete's File says Came from the application. `coach_erase_person()` was patched in place: a linked application is offered first and ticked, and one left unticked keeps its answers and loses only the link (rehearsed on the live database, including a real erasure inside a rolled-back transaction). `intake-outcome` and `erase-linked-form` pin it. |  |
 | FLOW-18 | medium | Nothing reminds the coach to take the weekly backup, and the backup button is hidden among roster tools | Fixed | Today shows a 'Weekly backup' row with a Back up now button when no backup has been taken on this computer in 7 days. The Coach tools line on the Athletes tab shows when the last backup was taken. |  |
 | FLOW-19 | low | The 'Links' tab is really the Library publisher, cannot unpublish, hides unpublished items and ignores Library Sessions | Fixed | The tab is now called Library. It lists every article and workout, hidden ones included (folded away), and each has a Hide or Publish button and a Copy link. Workouts are shown under their Sessions shelves. |  |
 | FLOW-20 | low | After a publish there is no 'published at / by' on the athlete, so the coach cannot check that a cycle landed | Fixed | The athlete's File tab shows when their programme was last saved and by whom, so you can check that a cycle landed. |  |
@@ -505,7 +505,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | SPINE-8 | medium | 'Move back to draft' takes an entry (or a quality) off every phone in one tap, next to Save, and also saves the form | Fixed | 'Move back to draft…' now asks first and says how many athletes would lose it, and on an exercise it sits away from Save at the other end of the bar. |  |
 | SPINE-9 | medium | Intake WhatsApp links are built from any digits in the contact, so handles and emails become wa.me links to wrong numbers | Fixed | An intake contact only becomes a WhatsApp link when it is a real phone number (Persian digits, 00, +98 and 09… handled); Instagram handles and emails stay plain text with a Copy button. |  |
 | SPINE-10 | low | Farsi intake answers render left-to-right in a Latin monospace font | Fixed | Farsi intake answers now read right to left in the page's normal font, and Farsi lists are joined with the Persian comma. |  |
-| SPINE-11 | low | An intake card is a dead end: no step from a lead to onboarding, and 'Handled' cannot say what happened | Not a bug | Nothing changed: the Intake tab is still a plain inbox, which is its documented job (the verification refuted this as a defect). | Decided (2026-10-11): add both, see FLOW-17 (A8). |
+| SPINE-11 | low | An intake card is a dead end: no step from a lead to onboarding, and 'Handled' cannot say what happened | Fixed | Nothing changed: the Intake tab is still a plain inbox, which is its documented job (the verification refuted this as a defect). Since 2026-10-11 (pile A8) the intake card is no longer a dead end: it has an outcome form and a link to the athlete it became (see FLOW-17). |  |
 | SPINE-12 | low | Links saved from the editor are one-way, and typed names can link to a different version through loose name tiers | Fixed | A typed link now only matches an entry by its exact name (no more linking to a different version through loose matching), and the editor lists the links that do not point back yet. Your answer (2026-10-11): the editor stays one entry at a time and Claude's /spine Upkeep adds the way back. |  |
 | SPINE-13 | low | Values outside the editor's lists are silently dropped or reinterpreted on save | Fixed | A stored value the lists do not know is shown and kept, extra qualities without a primary are refused, SFR must be a whole number, a muscle named twice is refused, and 'quadriceps' and 'hams' are understood. |  |
 | SPINE-14 | low | Manual and on-page text drift from the code | Fixed | The manual's Exercises section and the on-page labels now describe what the editor really does (only muscles reach the phone, never SFR, flags, cost or notes; programmes with workouts only; circuits counted). |  |
@@ -737,7 +737,7 @@ a contact field holding two numbers matches the second only; the finder cannot b
 
 ## 12. Continue here (rewritten 2026-10-11, fourth session)
 
-<!--T12-->191 findings: 181 fixed, 7 partly, 2 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
+<!--T12-->191 findings: 183 fixed, 6 partly, 2 open, 0 waiting on you, 0 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
 What is left is in three piles: **A** your eleven answers, now jobs; **B** Claude can just do, in order (**all eleven are done**); **C** is outside the audit.
 
 **To start a new chat:** *"Continue the Coach's Box audit: read `Content/COACH-AUDIT.md` §12 and `COACH_DASHBOARD.md`, then do the first job in
@@ -756,7 +756,7 @@ Asked with the question tool. Nothing here waits on a decision any more; one ite
 | A5 | FILE-6 | No expiry | nothing (Mark sent and the first sign-in clear a stored password) | decided |
 | A6 | FILE-11, ROSTER-9 | Hide the session and keep it recoverable | A tombstone on `session_history` (a stage file), hide and undo through one coach-only function, every reader leaves hidden sessions out, the athlete app's save must not bring one back, an Undo in the File. Touches program.html | **done 2026-10-11** (stage60; program.html did not need a change: the server keeps the row hidden, and `get_my_history()` already replaces the phone's copy) |
 | A7 | TOOLS-11 | Fix the wording | The File tab says the preview shows their programme as they see it, without their logged work | **done 2026-10-11** |
-| A8 | FLOW-17, SPINE-11 | Link an application to the athlete it became, and let Handled record an outcome | A stage file (athlete id and outcome on the application), a picker on the card, and the athlete's File shows where they came from | todo |
+| A8 | FLOW-17, SPINE-11 | Link an application to the athlete it became, and let Handled record an outcome | A stage file (athlete id and outcome on the application), a picker on the card, and the athlete's File shows where they came from | **done 2026-10-11** (stage61) |
 | A9 | FLOW-8 | A WhatsApp number on each coached athlete's File | A coach-only function that sets it, a field in the File, the number in the header with a WhatsApp button | todo |
 | A10 | ROSTER-7, ROSTER-12 | A status (active, paused, former), the demo out of the totals, and a ⚙ Tools button for the admin tools | The status stored per athlete and read by `reasonsOf()`; the demo not counted; Coach tools and Logins to send behind one button | todo |
 | A11 | SPINE-12 | Leave it to `/spine` Upkeep | nothing | decided |

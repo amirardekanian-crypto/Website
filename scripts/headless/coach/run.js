@@ -1206,7 +1206,7 @@ S['erase-forms'] = async (b) => {
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   t = await erasePanelText(page);
-  check(r, 'one offered form: the words are "1 intake form carries their email…", and it is ticked', /1 intake form carries their email/.test(t) && /1 intake form will be erased with them/.test(t) && !/carryes/.test(t), t.slice(0, 700));
+  check(r, 'one offered form: the words are "1 intake form may be theirs…" (no plural slip), and it is ticked', /1 intake form may be theirs/.test(t) && /1 intake form will be erased with them/.test(t) && !/carryes/.test(t), t.slice(0, 700));
   await page.locator('.erase button', { hasText: 'Cancel' }).click();
 
   // an athlete with no login and no form: the alert does not claim a sign-in account, and says that no form went
@@ -1216,7 +1216,7 @@ S['erase-forms'] = async (b) => {
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   t = await erasePanelText(page);
-  check(r, 'with nothing matched the panel says so, why that is common, and offers the finder', /none carries their email, WhatsApp number or full name/.test(t) && /most forms are in Persian/.test(t) && (await page.locator('#eraseFindIn').count()) === 1 && /No intake form is ticked, so none will be erased/.test(t), t.slice(0, 900));
+  check(r, 'with nothing matched the panel says so, why that is common, and offers the finder', /none is linked to them or carries their email, WhatsApp number or full name/.test(t) && /most forms are in Persian/.test(t) && (await page.locator('#eraseFindIn').count()) === 1 && /No intake form is ticked, so none will be erased/.test(t), t.slice(0, 900));
   await page.locator('#eraseIn').fill('nolo_erase');
   log.dialogs.length = 0;
   await page.locator('#eraseGo').click();
@@ -1347,7 +1347,7 @@ S['erase-stale'] = async (b) => {
 // With the intake list unreadable the finder must not claim there are no forms.
 S['erase-forms-unreadable'] = async (b) => {
   const r = { id: 'erase-forms-unreadable', title: 'Erase completely… when the intake forms did not load: the finder says so and is switched off', checks: [] };
-  const { page, log } = await L.openCoach(b, { seed: { stub: { fail: [{ kind: 'rpc', name: 'intake_list', message: 'fixture: the forms are unreadable', times: 99 }] } } });
+  const { page, log } = await L.openCoach(b, { seed: { stub: { fail: [{ kind: 'from', name: 'hab_intake', op: 'select', message: 'fixture: the forms are unreadable', times: 99 }] } } });
   await seedErasable(page);
   await L.go(page, 'a/zed_erase/file');
   await page.locator('button', { hasText: /Erase completely/ }).click();
@@ -2803,6 +2803,101 @@ S['session-hide-add-over'] = async (b) => {
   check(r, 'save_session asks to replace the old log', !!c && c.payload.p_session.replace_log === true, c && c.payload.p_session.replace_log);
   const row = (await L.db(page)).session_history.find(x => x.athlete_id === 'ava_test' && x.day === 3 && x.completed_on === day);
   check(r, "the session is back (not hidden) with the email's log, the old set-by-set log gone", !!row && !row.hidden_at && row.log == null && /Trap Bar Deadlift/.test(row.summary), row && { hidden: row.hidden_at, log: row.log });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── What became of an application (audit FLOW-17, SPINE-11; pile A8, stage61; 2026-10-11) ───────────────────────────────────────────────────
+S['intake-outcome'] = async (b) => {
+  const r = { id: 'intake-outcome', title: "Intake: an application records what happened and the athlete it became; the athlete's File says where they came from", checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'intake' });
+  const card = name => page.locator('.intake-card', { hasText: name });
+  const badge = async () => (await page.locator('#rail a.tab', { hasText: 'Intake' }).innerText()).replace(/\s+/g, ' ');
+  const b0 = await badge();
+  const one = card('Fixture Applicant One');
+  // 1. a client needs an athlete
+  await one.locator('.i-out-sel').selectOption('client');
+  check(r, 'choosing "Became a client" shows the athlete picker', await one.locator('.i-who').isVisible(), '');
+  let n0 = await L.nCalls(page);
+  await one.locator('.intake-outcome-save').click(); await L.settle(page, 500);
+  check(r, 'saving a client with no athlete picked is refused on the page, and nothing is sent', !(await L.callsSince(page, n0)).some(c => c.name === 'set_intake_outcome') && /Pick the athlete/.test(await L.failText(page)), await L.failText(page));
+  await one.locator('.i-ath-sel').selectOption('ava_test');
+  n0 = await L.nCalls(page);
+  await one.locator('.intake-outcome-save').click(); await L.settle(page, 900);
+  const c1 = lastOf(await L.callsSince(page, n0), c => c.name === 'set_intake_outcome');
+  check(r, 'one set_intake_outcome(id, client, ava_test)', !!c1 && /1a1$/.test(c1.payload.p_id) && c1.payload.p_outcome === 'client' && c1.payload.p_athlete_id === 'ava_test', c1 && c1.payload);
+  const t1 = (await one.evaluate(el => el.textContent)).replace(/\s+/g, ' ');      // textContent: the card is folded, its body is not drawn
+  check(r, 'the card moved to Handled, wears the outcome as a pill, names the athlete, and the Intake badge dropped', /handled/.test(await one.getAttribute('class')) && /Became a client/.test(t1) && /Ava Example/.test(t1) && (await badge()) !== b0, { cls: await one.getAttribute('class'), t1: t1.slice(0, 200), badge: await badge() });
+  check(r, 'the server row holds the link and the outcome, and marked the application handled', await page.evaluate(() => { const i = window.__DB.hab_intake.find(x => /1a1$/.test(x.id)); return i.athlete_id === 'ava_test' && i.outcome === 'client' && i.status === 'handled' && !!i.linked_at; }), '');
+  // 2. an outcome that keeps no athlete
+  const two = card('Fixture Applicant Two');
+  await two.locator('.i-out-sel').selectOption('not_a_fit');
+  check(r, 'a "Not a fit" has no athlete picker', !(await two.locator('.i-who').isVisible()), '');
+  n0 = await L.nCalls(page);
+  await two.locator('.intake-outcome-save').click(); await L.settle(page, 900);
+  const c2 = lastOf(await L.callsSince(page, n0), c => c.name === 'set_intake_outcome');
+  check(r, 'it is saved with no athlete', !!c2 && c2.payload.p_outcome === 'not_a_fit' && c2.payload.p_athlete_id === null, c2 && c2.payload);
+  // 3. the athlete's File says where they came from
+  await L.go(page, 'a/ava_test/file'); await L.settle(page, 700);
+  const meta = (await page.locator('.meta-table').first().innerText()).replace(/\s+/g, ' ');
+  check(r, 'the File says "Came from" the application, its programme and its outcome, with a link to Intake', /came from/i.test(meta) && /Set — \$180/.test(meta) && /Became a client/.test(meta) && (await page.locator('.meta-table a[href="#intake"]').count()) === 1, meta.slice(0, 400));
+  // 4. clearing it
+  await L.go(page, 'intake'); await L.settle(page, 500);
+  await card('Fixture Applicant One').locator('summary').click();
+  await card('Fixture Applicant One').locator('.i-out-sel').selectOption('');
+  n0 = await L.nCalls(page);
+  await card('Fixture Applicant One').locator('.intake-outcome-save').click(); await L.settle(page, 900);
+  const c3 = lastOf(await L.callsSince(page, n0), c => c.name === 'set_intake_outcome');
+  check(r, 'clearing sends a null outcome and no athlete', !!c3 && c3.payload.p_outcome === null && c3.payload.p_athlete_id === null, c3 && c3.payload);
+  await L.go(page, 'a/ava_test/file'); await L.settle(page, 700);
+  check(r, 'and the File no longer says where they came from', !/came from/i.test(await page.locator('.meta-table').first().innerText()), '');
+  // 5. a server without stage61
+  await L.go(page, 'intake'); await L.settle(page, 500);
+  await page.evaluate(() => { window.__STUB.missingRpc = ['set_intake_outcome']; });
+  await card('Fixture Applicant One').locator('summary').click();      // a handled card is folded after every redraw
+  await card('Fixture Applicant One').locator('.i-out-sel').selectOption('declined');
+  await card('Fixture Applicant One').locator('.intake-outcome-save').click(); await L.settle(page, 700);
+  check(r, 'a server that has not had stage61 says so, in words', /set_intake_outcome yet/.test(await L.failText(page)) && /stage61/.test(await L.failText(page)), await L.failText(page));
+  // 6. the likely athlete is suggested, never saved on its own
+  await page.evaluate(() => { window.__STUB.missingRpc = []; window.__DB.hab_intake.push({ id: 'guess-1', created_at: new Date().toISOString(), lang: 'en', name: 'Ava  Example', email: '', contact: '', programme: 'Set', payload: {}, status: 'new', handled_at: null }); return hardRefresh(); });
+  await L.settle(page, 900); await L.go(page, 'intake'); await L.settle(page, 500);
+  check(r, 'an application with the same full name as one athlete has that athlete pre-selected', (await page.locator('.i-outcome[data-id="guess-1"] .i-ath-sel').inputValue()) === 'ava_test', await page.locator('.i-outcome[data-id="guess-1"] .i-ath-sel').inputValue());
+  check(r, '...and a saved outcome is only what the coach saved (nothing was sent for it)', await page.evaluate(() => { const i = window.__DB.hab_intake.find(x => x.id === 'guess-1'); return !i.athlete_id && !i.outcome; }), '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['erase-linked-form'] = async (b) => {
+  const r = { id: 'erase-linked-form', title: 'Erase completely…: an application you linked to the athlete is offered and ticked; one left unticked keeps its answers and loses only the link', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  await seedErasable(page);
+  await page.evaluate(() => {
+    const now = new Date().toISOString();
+    window.__DB.hab_intake.push({ id: 'zed-linked-1', created_at: now, lang: 'fa', name: 'ناشناس', email: '', contact: '', programme: 'Set', payload: {}, status: 'handled', handled_at: now, athlete_id: 'zed_erase', outcome: 'client', linked_at: now },
+      { id: 'zed-linked-2', created_at: now, lang: 'fa', name: 'ناشناس دو', email: '', contact: '', programme: 'Set', payload: {}, status: 'handled', handled_at: now, athlete_id: 'zed_erase', outcome: 'client', linked_at: now });
+    return hardRefresh();
+  });
+  await L.settle(page, 900);
+  await L.go(page, 'a/zed_erase/file');
+  await page.locator('button', { hasText: /Erase completely/ }).click();
+  await page.locator('.erase #eraseIn').waitFor();
+  const t = await erasePanelText(page);
+  const picks = page.locator('.erase .pick');
+  check(r, 'both linked applications are offered, with the chip "linked to them"', (await picks.filter({ hasText: 'linked to them' }).count()) === 2, t.slice(0, 900));
+  check(r, 'they are ticked for you (the coach linked them by hand), and so is the same-email one', (await picks.filter({ hasText: 'linked to them' }).locator('input:checked').count()) === 2 && await page.locator('.erase .pick', { hasText: 'same email' }).locator('input').isChecked(), '');
+  await page.locator('.erase .pick', { hasText: 'linked to them' }).first().locator('input').uncheck();   // leave one of them
+  await page.locator('#eraseIn').fill('zed_erase');
+  const n0 = await L.nCalls(page);
+  await page.locator('#eraseGo').click(); await L.settle(page, 1300);
+  const real = (await L.callsSince(page, n0)).filter(c => c.name === 'coach_erase_person' && c.payload.p_dry_run === false);
+  const picked = (real[0] && real[0].payload.p_intake_ids) || [];
+  check(r, 'the real call names the ticked linked form and not the unticked one', real.length === 1 && picked.length === 2 && picked.filter(x => /^zed-linked-/.test(x)).length === 1, picked);
+  const d = await L.db(page);
+  const left = d.hab_intake.filter(i => /^zed-linked-/.test(i.id));
+  check(r, 'one linked form is gone; the other keeps its answers, with no athlete id and no link time', left.length === 1 && left[0].athlete_id === null && left[0].linked_at === null && left[0].outcome === 'client', left);
+  check(r, 'nothing is left under their id in any table', Object.keys(d).filter(t => Array.isArray(d[t]) && d[t].some(x => x.athlete_id === 'zed_erase')).length === 0, '');
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

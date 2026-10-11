@@ -335,6 +335,26 @@
       else { row.coach_status = 'new'; t.push(row); }
       return null;
     },
+    // stage61: record what became of an application. The same rules as the SQL: 'client' needs an athlete, only 'client' and 'free' keep one, the
+    // athlete must exist, a new application becomes handled, a null outcome clears the outcome and the link.
+    set_intake_outcome: function (p) {
+      var OUT = ['client', 'free', 'not_a_fit', 'no_reply', 'declined', 'other'];
+      if (p.p_outcome != null && OUT.indexOf(p.p_outcome) < 0) throw new Error('bad intake outcome: ' + p.p_outcome);
+      var ath = String(p.p_athlete_id == null ? '' : p.p_athlete_id).trim() || null;
+      if (p.p_outcome == null || ['client', 'free'].indexOf(p.p_outcome) < 0) ath = null;
+      if (p.p_outcome === 'client' && !ath) throw new Error('pick the athlete this application became');
+      if (ath && !tbl('programs').some(function (r) { return r.athlete_id === ath; }) && !tbl('hab_contacts').some(function (r) { return r.athlete_id === ath; })) throw new Error('there is no athlete called "' + ath + '"');
+      var hit = 0;
+      tbl('hab_intake').forEach(function (i) {
+        if (String(i.id) !== String(p.p_id)) return;
+        hit++;
+        i.linked_at = !ath ? null : (i.athlete_id === ath ? i.linked_at : nowIso());
+        i.athlete_id = ath; i.outcome = p.p_outcome == null ? null : p.p_outcome;
+        if (p.p_outcome != null && (i.status || 'new') === 'new') { i.status = 'handled'; i.handled_at = nowIso(); }
+      });
+      if (!hit) throw new Error('no such application');
+      return { outcome: p.p_outcome == null ? null : p.p_outcome, athlete_id: ath };
+    },
     // stage60: hide (p_hide true, the default) or restore a finished session; the stub's caller is always the coach. Only rows that change count.
     coach_hide_session: function (p) {
       if (!String(p.p_athlete_id == null ? '' : p.p_athlete_id).trim() || p.p_day == null || p.p_completed_on == null) throw new Error('which session?');
@@ -429,7 +449,7 @@
         var full = a.firstName && a.lastName ? norm(a.firstName + ' ' + a.lastName) : null;
         // email, then WhatsApp number, then full name (the SQL's order); 'shared' = another athlete's contact carries the same email or number
         cands = tbl('hab_intake').map(function (i) {
-          var how = lc(i.email) && emails.indexOf(lc(i.email)) >= 0 ? 'email' : (phoneKey(i.contact) && phones.indexOf(phoneKey(i.contact)) >= 0 ? 'whatsapp' : (full && norm(i.name) === full ? 'name' : null));
+          var how = i.athlete_id === key ? 'linked' : lc(i.email) && emails.indexOf(lc(i.email)) >= 0 ? 'email' : (phoneKey(i.contact) && phones.indexOf(phoneKey(i.contact)) >= 0 ? 'whatsapp' : (full && norm(i.name) === full ? 'name' : null));
           var shared = (how === 'email' && others.some(function (c) { return lc(c.email) === lc(i.email); })) || (how === 'whatsapp' && others.some(function (c) { return phoneKey(c.whatsapp) === phoneKey(i.contact); }));
           return how ? { id: i.id, created_at: i.created_at, name: i.name, programme: i.programme, lang: i.lang, matched_on: how, shared: !!shared } : null;
         }).filter(Boolean);
@@ -467,6 +487,8 @@
       var logId = null;
       if (!dry) {
         Object.keys(del).forEach(function (t) { if (DB[t]) DB[t] = DB[t].filter(function (r) { return del[t].indexOf(r) < 0; }); });
+        // stage61: an application linked to the erased athlete that was not ticked keeps its answers and loses only the link
+        if (kind === 'athlete') tbl('hab_intake').forEach(function (r) { if (r.athlete_id === key) { r.athlete_id = null; r.linked_at = null; } });
         tbl('affiliates').forEach(function (r) { if (r.athlete_id === key && kind === 'athlete') r.athlete_id = null; });
         logId = tbl('erasure_log').length + 1;
         tbl('erasure_log').push({ id: logId, erased_at: nowIso(), erased_by: COACH, kind: kind, subject_hash: 'hash:' + kind + ':' + lc(word),

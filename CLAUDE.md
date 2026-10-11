@@ -355,7 +355,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   `account_id`, and undoes everything if one still holds a row. **A table you add that holds a person's data goes into its table list
   the day you create it** (`supabase/stage54_erase_person.sql`), and into `BACKUP_TABLES`; the one-off rollback copies the pipeline
   makes live in the `backup` schema and are emptied for the person automatically. Intake forms are the coach's pick (matches by email,
-  WhatsApp number or name are offered, only a same-email one is ticked for you; a finder lists any other, at most 10). An affiliate partner record stays when its athlete
+  WhatsApp number or name are offered, and one you linked to the athlete on the Intake tab (stage61) comes first; a linked or same-email one is ticked for you; a finder lists any other, at most 10; a linked form left unticked keeps its answers and loses only the link). An affiliate partner record stays when its athlete
   is erased (only the link is cleared). The private note about a buyer lives in `buyer_notes`, coach-only; the account rows' `label`
   stays empty (a trigger moves anything written there). Tables are emptied in `publish_cycle()`'s lock order (programme first).
 - **A finished session is hidden, never deleted, from the dashboard** (stage60, 2026-10-11; Amir: "hide it, keep it recoverable"): `session_history.hidden_at`,
@@ -367,7 +367,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (93 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (95 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.
