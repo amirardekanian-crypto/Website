@@ -342,6 +342,13 @@ not "needs you" any more: they sit in a folded **Gone quiet** group at the botto
 (and its filter). A coached athlete inside a dated cycle that has not ended is never folded away.
 The marketing `demo` row and your own record are never flagged.
 
+**Paused and former** (stage63, 2026-10-11; audit ROSTER-7; Amir: "a status: active, paused, former, and the demo out of the totals"). An athlete is
+**active** unless the File's **Status** panel says otherwise (three buttons and an optional note: *back in January*, *moved abroad*). **Paused** takes them
+out of Needs you and Gone quiet while they are away (no "cycle ends", "renew?", "no session for N days", "silent on Proof", "run of low days", no login
+nudge): they still count in Everyone and their tier chip, and sit under a **Paused** group on the roster. **Former** also takes them out of the totals and
+the main list; they stay under the **Former** chip and everything they logged stays. A **note they send** and a **session that did not sync** still reach
+Needs you for both, because those are messages and data problems, not chasing. The mark lives in `athlete_status` (only a paused or former athlete has a row,
+coach-only, in the backup, emptied by an erasure); `coach_set_status()` sets it and *Active* removes the row. `status-paused-former` drives it.
 Above the people: a row for **new applications** in Intake, and a **weekly backup** row when
 this computer has not taken one for 7 days. Tap a person to open them on the right screen (a note
 opens the day the note is on; a Proof reason opens Proof). **Show all** lists everyone past the
@@ -396,7 +403,7 @@ screen — a row of grey dots is someone drifting before they churn.
 One row per person across **both** systems, split under three headings — **Needs you**,
 **All quiet** and **Gone quiet** — so the line between "waiting on me" and "fine" is drawn rather
 than implied. Filter chips across the top (Everyone · Needs you · Coached · Free · Proof only · No file ·
-Gone quiet) each carry their count, and **the tier chips add up to Everyone** (a person with no programme and no habits is under *No file*; a chip
+Gone quiet, and Paused and Former when someone has that status) each carry their count, and **the tier chips add up to Everyone** (the public demo and your own record are in no count and not on the list; the footer says so and links the demo, `roster-demo-out`; a former athlete is in none of them) (a person with no programme and no habits is under *No file*; a chip
 with nobody in it is not drawn, except Everyone, Needs you and the one you are on). Search reads the name, the id, the board name, the contact's
 name, email and WhatsApp digits (Persian ی/ک and extra spaces are normalised); the sort and the
 search survive a redraw.
@@ -408,10 +415,12 @@ seven presence dots.
 
 **A flagged row says why, in words:** the reasons in §3's table, from the same function.
 
-**Above the roster:** *Create N missing logins* (coached athletes who have trained and have no
-login), then a folded **Coach tools** line: *↑ Add coaching logs* and
+**Behind the ⚙ Tools button** (stage63 round, 2026-10-11; audit ROSTER-12; Amir: "a ⚙ Tools button"), so the roster starts right under the filter chips (at 360 px the first athlete was at
+y = 495; it is above 400 now): *Create N missing logins* (coached athletes who have trained and have no
+login), the **Coach tools** line: *↑ Add coaching logs* and
 *⤓ Backup*, with when this computer last took a backup, then **Logins to send** (open while three
-or fewer wait, folded above that: each unsent password with Copy message and Mark sent). **A stored
+or fewer wait, folded above that: each unsent password with Copy message and Mark sent). The button's badge counts the logins waiting to be sent; the panel is folded when
+you arrive, stays open through a redraw, and closes on a second tap (`tools-button`). **A stored
 password clears by itself** (stage51, 2026-10-11): the database removes it the moment the person signs in
 with it and stamps *sent* with that time, so they drop out of the list. *Signed in with it* can only show
 for a moment, or on a password stored before stage51; the Course and Testing app lists behave the same.
@@ -843,6 +852,7 @@ it in this file.
 | ~~`athlete_keys`~~ | ⚠️ Empty since the secret links were retired — reads nothing useful |
 | ~~`messages`~~ | ⚠️ Nothing reads it since the in-app chat was removed (2026-09-26). Kept, not dropped |
 | `hab_notes` | The wall, the coach line, moderation |
+| `athlete_status` (read as a table, paged: stage63) | Paused and former marks: the roster, Needs you, the totals |
 | `hab_contacts` via `contact_list()` | The funnel (signups only: not a `source 'coach'` record), contact buttons, the header's WhatsApp button, days logged |
 | `leaderboard_optin` | Who's on the board, their display name and worn title |
 | `hab_titles` | Titles-minted feed |

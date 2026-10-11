@@ -541,11 +541,16 @@ S['version-restore'] = async (b) => {
 // ── 17. The programme-file upload is gone (pile A4, 2026-10-11) ───────────────────────────────────────────────
 // Amir: "i dont need that publish programme button and i never use it, remove the whole button and function". New athletes and
 // new cycles go up through publish_cycle() (the pipeline); day-to-day changes through the inline editor.
+// The roster's tools sit behind a ⚙ button (audit ROSTER-12, pile A10): open the panel, and the Coach tools line inside it.
+async function openTools(page) {
+  if (await page.locator('#toolsPanel').isHidden()) await page.locator('#toolsBtn').click();
+  await page.evaluate(() => document.querySelectorAll('details.tools').forEach(d => { d.open = true; }));
+}
 S['no-program-file-button'] = async (b) => {
   const r = { id: 'no-program-file-button', title: 'Athletes → Coach tools has no programme-file upload any more', checks: [] };
   const { page, log } = await L.openCoach(b, {});
   await L.go(page, 'athletes');
-  await page.evaluate(() => document.querySelectorAll('details.tools').forEach(d => d.open = true));
+  await openTools(page);
   const tools = (await page.locator('details.tools').innerText()).replace(/\s+/g, ' ');
   check(r, 'the Coach tools line still offers Add coaching logs and Backup', /Add coaching logs/.test(tools) && /Backup/.test(tools), tools);
   check(r, 'and no programme-file upload, in the line or its note', !/programme file|Publish programme|upload button/i.test(tools.replace(/there is no upload button/i, '')), tools);
@@ -560,10 +565,10 @@ S['no-program-file-button'] = async (b) => {
 // Tables that were each missing from the backup once with nothing erroring (CLAUDE.md, "A table added to the public schema goes
 // into BACKUP_TABLES the same day"): they must stay on it.
 const MUST_BE_BACKED_UP = ['exercises', 'exercise_coach', 'qualities', 'coaching_log_versions', 'spine_versions', 'hab_season_results',
-  'assess_players', 'assess_notes', 'assess_results', 'buyer_notes', 'erasure_log'];
+  'assess_players', 'assess_notes', 'assess_results', 'buyer_notes', 'erasure_log', 'athlete_status'];
 async function takeBackup(page, tag) {
   await L.go(page, 'athletes');
-  const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 30000 }), (async () => { await page.evaluate(() => document.querySelectorAll('details.tools').forEach(d => d.open = true)); await page.locator('details.tools button', { hasText: 'Backup' }).click(); })()]);
+  const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 30000 }), (async () => { await openTools(page); await page.locator('details.tools button', { hasText: 'Backup' }).click(); })()]);
   const fp = path.join(L.OUT, 'backup-' + tag + '.json');
   await dl.saveAs(fp);
   await L.settle(page, 300);
@@ -606,6 +611,7 @@ S['backup-incomplete'] = async (b) => {
   const row = (await page.locator('.need', { hasText: 'Weekly backup' }).first().innerText()).replace(/\s+/g, ' ');
   check(r, 'Today still asks for the weekly backup and says the last try was INCOMPLETE', /No complete backup taken/.test(row) && /INCOMPLETE and does not count/.test(row), row);
   await L.go(page, 'athletes');
+  await openTools(page);
   const sum = (await page.locator('details.tools summary').innerText()).replace(/\s+/g, ' ');
   check(r, 'the Coach tools line says there is no complete backup and the last try was INCOMPLETE', /no complete backup on this computer yet/.test(sum) && /last try was INCOMPLETE/.test(sum), sum);
   // A complete one afterwards: plain name, counts, and the memory of the bad try goes.
@@ -616,6 +622,7 @@ S['backup-incomplete'] = async (b) => {
   await L.go(page, 'today');
   check(r, 'Today no longer asks', (await page.locator('.need', { hasText: 'Weekly backup' }).count()) === 0, '');
   await L.go(page, 'athletes');
+  await openTools(page);
   const sum2 = (await page.locator('details.tools summary').innerText()).replace(/\s+/g, ' ');
   check(r, 'the Coach tools line says when the last complete backup was, with no INCOMPLETE note', /last complete backup today/.test(sum2) && !/INCOMPLETE/.test(sum2), sum2);
   check(r, 'no page errors', !log.errors.length, log.errors);
@@ -759,6 +766,7 @@ S['session-import-checkin'] = async (b) => {
 S['login-used-mark'] = async (b) => {
   const r = { id: 'login-used-mark', title: 'Logins to send marks a password that has already been used to sign in', checks: [] };
   const { page } = await L.openCoach(b, { hash: 'athletes' });
+  await openTools(page);
   check(r, 'an unused stored password carries no mark', (await page.locator('.creds .credrow', { hasText: 'ben_test' }).locator('.fl.good').count()) === 0, '');
   await page.evaluate(() => { const el = document.querySelector('.creds-top'); if (el && el.getAttribute('aria-expanded') !== 'true') el.click(); });
   const credsText = (await page.locator('.creds').innerText()).replace(/\s+/g, ' ');
@@ -2947,6 +2955,116 @@ S['whatsapp-number'] = async (b) => {
   await page.evaluate(() => { window.__STUB.missingRpc = []; });
   await page.locator('button', { hasText: 'Save number' }).click(); await L.settle(page, 900);
   check(r, 'a number typed with Persian digits is accepted and the button opens the Iranian chat', (await page.locator('.dethead a.abtn[href="https://wa.me/989121234567"]').count()) === 1, await head());
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Status, the demo out of the totals, and the ⚙ Tools button (audit ROSTER-7, ROSTER-12; pile A10, stage63; 2026-10-11) ────────────────────
+const rosterCounts = page => page.evaluate(() => Object.fromEntries(R_FILTERS.map(f => [f.id, Object.values(S.ath).filter(f.test).length])));
+
+S['status-paused-former'] = async (b) => {
+  const r = { id: 'status-paused-former', title: 'File → Status: paused and former take an athlete out of Needs you and Gone quiet, former also out of the totals, a note from them still gets through', checks: [] };
+  const { page, log, today } = await L.openCoach(b, { hash: 'a/ben_test/file' });
+  const FX = require('./fixtures');
+  // Give ben_test two reasons to be in front of Amir: a cycle that ended 5 days ago (renew?), and a note he has not read.
+  await page.evaluate(([end, d]) => {
+    const p = window.__DB.programs.find(x => x.athlete_id === 'ben_test'); p.data.cycles[p.data.currentCycleIndex || 0].endDate = end;
+    window.__DB.session_history.push({ athlete_id: 'ben_test', athlete_name: 'Ben Example', day: 1, completed_on: d, status: 'Complete', session_rpe: 7, duration_min: 30, readiness: null,
+      day_note: 'Knee felt sore on the last set', focus: 'Day 1', summary: 'Day 1', log: null, coach_status: 'new', updated_at: new Date().toISOString(), hidden_at: null, hidden_by: null });
+    return hardRefresh();
+  }, [FX.daysAgo(today, 5), FX.daysAgo(today, 1)]);
+  await L.settle(page, 900);
+  const keys = () => page.evaluate(() => reasonsOf(S.ath.ben_test).map(x => x.key).sort());
+  const c0 = await rosterCounts(page);
+  const k0 = await keys();
+  check(r, 'to begin with they are active, in front of you for a note and a cycle that ended, and the Status panel shows Active pressed', k0.includes('note') && k0.includes('renew') && (await page.locator('.stbtns button[aria-pressed="true"]').innerText()) === 'Active', k0);
+  // 1. pause, with a note
+  await page.locator('#stNote').fill('  back   in January ');
+  let n0 = await L.nCalls(page);
+  await page.locator('.stbtns button', { hasText: 'Paused' }).click(); await L.settle(page, 900);
+  const c1 = lastOf(await L.callsSince(page, n0), c => c.name === 'coach_set_status');
+  check(r, 'one coach_set_status(ben_test, paused, no date, "back in January")', !!c1 && c1.payload.p_athlete_id === 'ben_test' && c1.payload.p_status === 'paused' && c1.payload.p_since === null && c1.payload.p_note === 'back in January', c1 && c1.payload);
+  check(r, 'the header carries a Paused chip, and the Paused button is the pressed one', /paused/i.test(await page.locator('.dethead').innerText()) && (await page.locator('.stbtns button[aria-pressed="true"]').innerText()) === 'Paused', await page.locator('.dethead').innerText());
+  const k1 = await keys();
+  check(r, 'the cycle reason is gone while they are away, the note they sent is not', JSON.stringify(k1) === JSON.stringify(['note']), k1);
+  await L.go(page, 'athletes'); await L.settle(page, 500);
+  const c2 = await rosterCounts(page);
+  check(r, 'the Paused chip counts one, and Everyone and Coached still count them', c2.paused === 1 && c2.all === c0.all && c2.coached === c0.coached, c2);
+  const box = (await page.locator('#rosterBox').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the row says "Paused since … back in January" and carries the chip', /Paused since .*back in January/.test(box), box.slice(0, 400));
+  // 2. their note was read: now nothing at all is asked of Amir for them, and they are in the Paused group, never in Gone quiet
+  await page.evaluate(() => { window.__DB.session_history.forEach(s => { if (s.athlete_id === 'ben_test') s.coach_status = 'read'; }); return hardRefresh(); }); await L.settle(page, 900);
+  check(r, 'with the note read they have no reason at all, and are not "gone quiet"', await page.evaluate(() => reasonsOf(S.ath.ben_test).length === 0 && !S.ath.ben_test.lapsed), '');
+  check(r, 'the roster lists them under a Paused group', /PAUSED\s*1/i.test((await page.locator('#rosterBox .rgroup').allInnerTexts()).join(' ')), await page.locator('#rosterBox .rgroup').allInnerTexts());
+  // 3. former: out of the totals, under their own chip
+  await L.go(page, 'a/ben_test/file'); await L.settle(page, 500);
+  n0 = await L.nCalls(page);
+  await page.locator('.stbtns button', { hasText: 'Former' }).click(); await L.settle(page, 900);
+  const c3 = lastOf(await L.callsSince(page, n0), c => c.name === 'coach_set_status');
+  check(r, 'Former sends status former, keeping the note box as it was', !!c3 && c3.payload.p_status === 'former' && c3.payload.p_note === 'back in January', c3 && c3.payload);
+  await L.go(page, 'athletes'); await L.settle(page, 500);
+  const c4 = await rosterCounts(page);
+  check(r, 'a former athlete is out of Everyone and Coached and has their own chip', c4.former === 1 && c4.paused === 0 && c4.all === c0.all - 1 && c4.coached === c0.coached - 1, c4);
+  check(r, 'the footer says one is former and not counted', /1 former, not counted/.test(await page.locator('#content').innerText()), '');
+  await page.locator('.rf', { hasText: 'Former' }).click(); await L.settle(page, 300);
+  check(r, 'the Former chip lists them', /ben/i.test(await page.locator('#rosterBox').innerText()), await page.locator('#rosterBox').innerText());
+  // 4. active again
+  await L.go(page, 'a/ben_test/file'); await L.settle(page, 500);
+  n0 = await L.nCalls(page);
+  await page.locator('.stbtns button', { hasText: 'Active' }).click(); await L.settle(page, 900);
+  const c5 = lastOf(await L.callsSince(page, n0), c => c.name === 'coach_set_status');
+  check(r, 'Active sends status active and no note, and the row is gone from the server', !!c5 && c5.payload.p_status === 'active' && c5.payload.p_note === null && !(await L.db(page)).athlete_status.some(x => x.athlete_id === 'ben_test'), c5 && c5.payload);
+  const k5 = await keys();
+  check(r, 'and the reasons come back (the cycle that ended, and nothing else new)', k5.includes('renew'), k5);
+  // 5. a server without stage63
+  await page.evaluate(() => { window.__STUB.missingRpc = ['coach_set_status']; });
+  await page.locator('.stbtns button', { hasText: 'Paused' }).click(); await L.settle(page, 700);
+  check(r, 'a server that has not had stage63 says so, in words', /coach_set_status/.test(await L.failText(page)) && /stage63/.test(await L.failText(page)), await L.failText(page));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['roster-demo-out'] = async (b) => {
+  const r = { id: 'roster-demo-out', title: 'The public demo and your own identity are not in the roster totals or its chips; the footer says so and links the demo', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'athletes' });
+  const c0 = await rosterCounts(page);
+  await page.evaluate(() => {
+    const D = window.__DB, now = new Date().toISOString();
+    ['demo', 'amir_ardekani'].forEach(id => { const prog = JSON.parse(JSON.stringify(D.programs.find(x => x.athlete_id === 'ben_test').data)); prog.athlete = Object.assign({}, prog.athlete, { id, firstName: id === 'demo' ? 'Demo' : 'Amir', lastName: 'Fixture' });
+      D.programs.push({ athlete_id: id, data: prog, updated_at: now, updated_by: 'pipeline@example.invalid' }); });
+    return hardRefresh();
+  });
+  await L.settle(page, 900);
+  const c1 = await rosterCounts(page);
+  check(r, 'two more people with a programme change no count at all', JSON.stringify(c1) === JSON.stringify(c0), { before: c0, after: c1 });
+  check(r, 'the tier chips still add up to Everyone', c1.coached + c1.free + c1.proof + c1.nofile === c1.all, c1);
+  const rows = (await page.locator('#rosterBox .ath .nm').allInnerTexts()).join(' | ');
+  check(r, 'neither is a row on the roster', !/Demo Fixture|Amir Fixture/.test(rows), rows);
+  const foot = (await page.locator('#content > p.empty').last().innerText()).replace(/\s+/g, ' ');
+  check(r, 'the footer counts the people without them and says the demo is not counted, with a link to open it', new RegExp(c1.all + ' people').test(foot) && /public demo is not counted/.test(foot) && (await page.locator('#content a[href="#a/demo"]').count()) === 1, foot);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['tools-button'] = async (b) => {
+  const r = { id: 'tools-button', title: 'The roster starts under the filter chips: Coach tools, Logins to send and Create missing logins sit behind one ⚙ Tools button (360 px phone)', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'athletes' });
+  await page.setViewportSize({ width: 360, height: 780 });
+  await page.evaluate(() => { window.__DB.athlete_identities = window.__DB.athlete_identities.filter(x => x.athlete_id !== 'ava_test'); return hardRefresh(); });   // a coached athlete with sessions and no login
+  await L.settle(page, 900);
+  check(r, 'the panel is folded, the button says how many logins wait, and it is not expanded', await page.locator('#toolsPanel').isHidden() && (await page.locator('#toolsBtn .tn').innerText()) === '1' && (await page.locator('#toolsBtn').getAttribute('aria-expanded')) === 'false', await page.locator('#toolsBtn').innerText());
+  const top = await page.locator('#rosterBox .ath').first().evaluate(el => Math.round(el.getBoundingClientRect().top));
+  check(r, 'the first athlete starts above y = 400 at 360 px (it was about 495 with the tools in the way)', top < 400, top);
+  check(r, 'none of the tools is on screen: no Backup button, no Logins to send, no Create missing logins', !(await page.locator('details.tools button', { hasText: 'Backup' }).isVisible()) && !(await page.locator('.creds').isVisible()) && !(await page.locator('button', { hasText: /missing login/ }).isVisible()), '');
+  await page.locator('#toolsBtn').click();
+  check(r, 'the button opens the panel, and it holds Backup, Logins to send and Create 1 missing login', await page.locator('#toolsPanel').isVisible() && (await page.locator('#toolsBtn').getAttribute('aria-expanded')) === 'true' && await page.locator('details.tools button', { hasText: 'Backup' }).isVisible() && await page.locator('#toolsPanel .creds').isVisible() && await page.locator('#toolsPanel button', { hasText: 'Create 1 missing login' }).isVisible(), await page.locator('#toolsPanel').innerText());
+  await page.evaluate(() => renderAthletes());
+  check(r, 'it stays open through a redraw', await page.locator('#toolsPanel').isVisible(), '');
+  await page.locator('#toolsBtn').click();
+  check(r, 'and closes again', await page.locator('#toolsPanel').isHidden(), '');
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

@@ -363,13 +363,16 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   `save_session()` never un-hides one, the coach's does. `get_my_history()`, `get_workout_days()`, the dashboard (`S.hist` leaves them out, `S.histHidden` keeps
   them for the File, `syncGapsOf()` counts them as present) and every pipeline query that reads sessions (`and hidden_at is null`) leave them out: **a new reader
   of `session_history` filters on `hidden_at`**, or a hidden session comes back in its numbers.
+- **A paused or former athlete is nobody's chase** (stage63, 2026-10-11; Amir: "active, paused, former"): `athlete_status` (coach only, in the backup, emptied by an erasure) holds only
+  those two; `reasonsOf()` returns only a note they sent and a session that did not sync for them; a former athlete and the demo and your own identity are in no roster
+  total (`inTotals()`). The roster's tools sit behind one ⚙ Tools button. A new table with an `athlete_id` column goes into `coach_erase_person()`'s list the day you create it (stage63 did it by patching the live function).
 - **A contact record with `source 'coach'` is a WhatsApp number the coach typed, not a signup** (stage62, 2026-10-11): `isSignup()` keeps it out of the Proof signup
   funnel, the "new signup" reason, `lastSeen` and the Proof tab. A new place that reads `S.contacts` or `a.contact` as "this person signed up" must use it.
 - **The weekly call log is retired** (Amir, 2026-10-11): no Calls tab, no new call logs, no Copy cycle prompt; old logs are read and
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (96 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (99 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.

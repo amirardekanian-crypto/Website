@@ -367,6 +367,15 @@
   .tools > summary::before { content: '▸ '; } .tools[open] > summary::before { content: '▾ '; }
   .tools-in { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 14px 12px; align-items: center; }
   .tools-note { flex-basis: 100%; font-size: 12px; color: var(--muted); }
+  .toolspanel[hidden] { display: none; }
+  .toolspanel { margin: -4px 0 12px; }
+  .toolspanel .tools-row { margin-bottom: 10px; }
+  #toolsBtn .tn { margin-left: 6px; background: var(--clay-fill); color: #fff; border-radius: 999px; font-size: 12px; font-weight: 700; padding: 0 7px; }
+  .stbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .hidrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 0; border-top: 1px solid var(--rule); }
+  .hidrow .hw { font-size: 14px; }
+  .hidrow .acts { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  .hidrow .hwho { flex-basis: 100%; font-size: 13px; color: var(--muted); }
   /* ── Roster ── */
   .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
   .controls input[type=search], .controls select { font-size: 14px; padding: 9px 14px; border: 1px solid var(--line);
@@ -946,7 +955,7 @@ const TABLE_KEYS = {
   library: ['slug'], buyer_notes: ['user_id'],
 };
 function keysOf(table) {
-  return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys']
+  return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys', 'athlete_status']
     .includes(table) ? ['athlete_id'] : ['id']);
 }
 // `apply` narrows the read ((q) => q.eq('athlete_id', id)); the paging and the key order stay the same.
@@ -1122,6 +1131,7 @@ const S = {
   fullFor: {},     // athlete_id -> the histVer their summary + log were merged for (ensureSessionsFull)
   notes: [],       // hab_notes rows, last 7 days, hidden included
   contacts: [],    // contact_list() rows
+  status: {},      // athlete_status rows by athlete id: only the PAUSED and FORMER ones (stage63); no row means active
   intake: [],      // hab_intake rows — coaching apply-form submissions, with the athlete each became and the outcome (stage61)
   rules: null,     // xp_rules.rules jsonb
   seasons: [],     // seasons rows, newest first
@@ -1212,7 +1222,7 @@ function ensureSessionsFull(athleteId) {
 
 async function loadAll() {
   if (DEMO) { demoStore(); S.ready = true; return; }
-  const [prog, hist, notes, contacts, rules, seasons, titles, optin, intake, affs] = await Promise.all([
+  const [prog, hist, notes, contacts, rules, seasons, titles, optin, intake, affs, stat] = await Promise.all([
     selectAll('athlete_progress', 'athlete_id, athlete_name, data, updated_at'),
     loadHistory(),
     sb.from('hab_notes').select('*').gte('day', addDays(todayKey(), -7)),
@@ -1223,6 +1233,7 @@ async function loadAll() {
     sb.from('leaderboard_optin').select('athlete_id, display_name, title'),
     selectAll('hab_intake', '*'),   // the table itself, paged (stage61): intake_list() cannot return the new columns and stops at the row cap
     sb.from('affiliates').select('*').order('code'),
+    selectAll('athlete_status', '*'),
   ]);
   const firstErr = [prog, hist, notes, rules, seasons, titles, optin].find(r => r && r.error);
   if (firstErr) throw new Error(firstErr.error.message);
@@ -1236,11 +1247,13 @@ async function loadAll() {
   S.optin = {}; (optin.data || []).forEach(r => S.optin[r.athlete_id] = r);
   S.intake = (intake && intake.data) || [];
   S.affiliates = (affs && !affs.error && affs.data) || [];
+  S.status = {}; ((stat && !stat.error && stat.data) || []).forEach(x => { S.status[x.athlete_id] = x; });
   // These three still load the page when they fail, but the banner says so: an empty
   // funnel, inbox or code list must not look like a real one.
   LOAD_ERR.contacts = contacts && contacts.error ? contacts.error.message : '';
   LOAD_ERR.intake = intake && intake.error ? intake.error.message : intake && intake.short ? `only ${intake.data.length} of ${intake.total} intake forms came back` : '';
   LOAD_ERR.affiliates = affs && affs.error ? affs.error.message : '';
+  LOAD_ERR.status = stat && stat.error ? stat.error.message : '';
   await Promise.all([loadLogins(), loadCoachingLogs(), loadLibrary(), loadPrograms()]);
   assemble();
   S.ready = true;
@@ -1250,7 +1263,7 @@ async function loadAll() {
 const LOAD_ERR_LABEL = {
   programs: 'programmes', logins: 'athlete logins', contacts: 'Proof contacts', intake: 'intake forms',
   assess: 'testing-app logins', course: 'course logins', buyerNotes: 'your notes about buyers', spine: 'the exercise library (Spine)',
-  affiliates: 'affiliate codes', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
+  affiliates: 'affiliate codes', status: 'paused and former marks', library: 'the library', clogs: 'coaching logs', levels: 'Proof levels',
 };
 function paintLoadWarn() {
   const lw = $('loadwarn'), warn = loadWarnHtml();
@@ -1279,6 +1292,7 @@ async function refetch(parts) {
   if (parts.includes('rules')) take('the quest and XP rules', sb.from('xp_rules').select('rules').eq('id', 1).maybeSingle(), r => { S.rules = (r.data && r.data.rules) || null; });
   if (parts.includes('contacts')) take('the Proof contacts', sb.rpc('contact_list'), r => { S.contacts = r.data || []; });
   if (parts.includes('intake')) take('the intake forms', selectAll('hab_intake', '*'), r => { S.intake = r.data || []; });
+  if (parts.includes('status')) take('the paused and former marks', selectAll('athlete_status', '*'), r => { S.status = {}; (r.data || []).forEach(x => { S.status[x.athlete_id] = x; }); });
   if (parts.includes('affiliates')) take('the affiliate codes', sb.from('affiliates').select('*').order('code'), r => { S.affiliates = r.data || []; });
   if (parts.includes('hist')) take('the session list', loadHistory(), r => { S.hist = r.data || []; });
   if (parts.includes('programs')) jobs.push(loadPrograms());
@@ -1289,7 +1303,7 @@ async function refetch(parts) {
   // Everything that feeds the roster and the athlete file is rebuilt in one place, after all the
   // reads: a contact forgotten, a programme replaced, a progress blob deleted. (Only 'hist' did
   // this before, so a forgotten contact kept their dots and board name until ↻ Refresh.)
-  if (parts.some(x => ['hist', 'programs', 'prog', 'optin', 'contacts'].includes(x))) assemble();
+  if (parts.some(x => ['hist', 'programs', 'prog', 'optin', 'contacts', 'status'].includes(x))) assemble();
   render();
 }
 
@@ -1507,7 +1521,7 @@ async function athleteLoginAction(athleteId, action, password) {
 // single "Create login" from their own page whenever you're ready for them.)
 function athletesNeedingLogin() {
   return Object.values(S.ath)
-    .filter(a => a.id !== 'demo' && a.tier === 'coached' && a.finished > 0 && !S.logins[a.id])
+    .filter(a => a.id !== 'demo' && a.status !== 'former' && a.tier === 'coached' && a.finished > 0 && !S.logins[a.id])
     .map(a => a.id);
 }
 
@@ -1591,7 +1605,7 @@ const BACKUP_TABLES = [
   'tps_content', 'course_en', 'tps_accounts', 'assess_content', 'assess_accounts',
   'assess_players', 'assess_notes', 'assess_results',
   'exercises', 'exercise_coach', 'qualities', 'coaching_log_versions', 'spine_versions',
-  'buyer_notes', 'erasure_log',
+  'buyer_notes', 'erasure_log', 'athlete_status',
 ];
 
 const PASSWORD_TABLES = ['athlete_identities', 'tps_accounts', 'assess_accounts'];
@@ -2055,6 +2069,9 @@ function assemble() {
     // hand-written row either way still reads right.
     const ptier = p && (p.tier || (p.athlete && p.athlete.tier));
     a.tier = ptier === 'free' ? 'free' : (p ? 'coached' : (a.isHab ? 'proof' : 'unknown'));
+    const stRow = (S.status || {})[a.id];      // stage63: only a paused or former athlete has a row
+    a.status = stRow && (stRow.status === 'paused' || stRow.status === 'former') ? stRow.status : 'active';
+    a.statusSince = stRow ? stRow.since : null; a.statusNote = stRow ? (stRow.note || '') : '';
     a.perWeek = (p && p.workouts && p.workouts.days && p.workouts.days.length) || 0;
     a.onBoard = !!S.optin[a.id];
     a.lastSession = a.sessions.length ? a.sessions.map(s => s.completed_on).sort().slice(-1)[0] : null;
@@ -2115,6 +2132,8 @@ function reasonsOf(a) {
     add('sync', 'warn', a.syncGaps.length === 1 ? `session not synced — Day ${g.day}, ${g.on}`
       : `${a.syncGaps.length} sessions not synced — latest Day ${g.day}, ${g.on}`, 80, 'work');
   }
+  // On a break or gone (stage63, audit ROSTER-7): nobody is chasing them. A note they sent and a data mismatch above still count; nothing below does.
+  if (a.status === 'paused' || a.status === 'former') { a.quietFlags = []; return out.sort((x, y) => y.weight - x.weight); }
   if (a.lowRun) add('lowrun', 'warn', 'run of low days', 70, 'work');
   const idle = a.lastSession ? daysBetween(a.lastSession, t) : null;
   const ended = a.cycle && a.cycle.end ? daysBetween(a.cycle.end, t) : null;   // > 0: days since it ended
@@ -2916,15 +2935,34 @@ function tierChip(a) {
   return '<span class="chip">No file</span>';
 }
 let _rFilter = 'all', _rSort = 'attention', _rSearch = '';
+// The public demo and the dashboard's own identity are not clients: never in a total (audit ROSTER-7, stage63). A FORMER athlete is not in the totals either;
+// they sit under their own chip. A PAUSED one is, and has their own chip too.
+const isDemoRow = a => SYSTEM_IDS.includes(a.id) || a.id === AMIR_ATHLETE_ID;
+const inTotals = a => !isDemoRow(a) && a.status !== 'former';
 const R_FILTERS = [
-  { id: 'all',     label: 'Everyone', test: () => true },
-  { id: 'needs',   label: 'Needs you', test: a => rosterReasons(a).length > 0 },
-  { id: 'coached', label: 'Coached',  test: a => a.tier === 'coached' },
-  { id: 'free',    label: 'Free',     test: a => a.tier === 'free' },
-  { id: 'proof',   label: 'Proof only', test: a => a.tier === 'proof' },
-  { id: 'nofile',  label: 'No file',  test: a => ['coached', 'free', 'proof'].indexOf(a.tier) < 0 },   // someone with no programme and no habits: the chips now add up to Everyone
-  { id: 'lapsed',  label: 'Gone quiet', test: a => !!a.lapsed && !rosterReasons(a).length },
+  { id: 'all',     label: 'Everyone', test: inTotals },
+  { id: 'needs',   label: 'Needs you', test: a => inTotals(a) && rosterReasons(a).length > 0 },
+  { id: 'coached', label: 'Coached',  test: a => inTotals(a) && a.tier === 'coached' },
+  { id: 'free',    label: 'Free',     test: a => inTotals(a) && a.tier === 'free' },
+  { id: 'proof',   label: 'Proof only', test: a => inTotals(a) && a.tier === 'proof' },
+  { id: 'nofile',  label: 'No file',  test: a => inTotals(a) && ['coached', 'free', 'proof'].indexOf(a.tier) < 0 },   // someone with no programme and no habits: the chips add up to Everyone
+  { id: 'lapsed',  label: 'Gone quiet', test: a => inTotals(a) && !!a.lapsed && !rosterReasons(a).length },
+  { id: 'paused',  label: 'Paused',   test: a => !isDemoRow(a) && a.status === 'paused' },
+  { id: 'former',  label: 'Former',   test: a => !isDemoRow(a) && a.status === 'former' },
 ];
+function statusChip(a) {
+  return a.status === 'paused' ? '<span class="chip">Paused</span>' : a.status === 'former' ? '<span class="chip">Former</span>' : '';
+}
+// The roster's tools (Coach tools, Logins to send, Create missing logins) sit behind one button (audit ROSTER-12, stage63 round: Amir "a ⚙ Tools button"),
+// so the list starts right under the filter chips on a phone. The badge counts the logins waiting to be sent.
+let _toolsOpen = false;
+function toggleTools() {
+  _toolsOpen = !_toolsOpen;
+  const p = $('toolsPanel'), b = $('toolsBtn');
+  if (p) p.hidden = !_toolsOpen;
+  if (b) b.setAttribute('aria-expanded', String(_toolsOpen));
+}
+window.toggleTools = toggleTools;
 function setRosterFilter(id) { _rFilter = id; renderAthletes(); }
 window.setRosterFilter = setRosterFilter;
 
@@ -2936,6 +2974,7 @@ function renderAthletes() {
   R_FILTERS.forEach(f => counts[f.id] = list.filter(f.test).length);
   const lb = lastBackupAt(), lbBad = lastBadBackupAt();
   const needLogin = athletesNeedingLogin();
+  const toolsN = Object.values(S.logins || {}).filter(r => r.initial_password).length;
   $('content').innerHTML = `
     <div class="controls">
       <input type="search" id="searchBox" aria-label="Search the roster" placeholder="Search name, id, board name, email…" oninput="_rSearch=this.value;renderRoster()" value="${esc(_rSearch)}">
@@ -2944,11 +2983,13 @@ function renderAthletes() {
         <option value="recent"${_rSort === 'recent' ? ' selected' : ''}>Sort: recently active</option>
         <option value="name"${_rSort === 'name' ? ' selected' : ''}>Sort: name</option>
       </select>
-      ${needLogin.length && !LOAD_ERR.logins
-        ? `<button class="btn sm primary" onclick="bulkCreateLogins()" title="${esc(needLogin.join(', '))} — coached, trained, no login yet">Create ${needLogin.length} missing login${needLogin.length === 1 ? '' : 's'}</button>`
-        : ''}
+      <button id="toolsBtn" class="btn sm" aria-expanded="${_toolsOpen}" aria-controls="toolsPanel" onclick="toggleTools()" title="Coach tools, the backup, and the logins waiting to be sent">⚙ Tools${toolsN ? `<span class="tn" title="${toolsN} login${toolsN === 1 ? '' : 's'} waiting to be sent">${toolsN}</span>` : ''}</button>
     </div>
-    <details class="tools">
+    <div id="toolsPanel" class="toolspanel"${_toolsOpen ? '' : ' hidden'}>
+    ${needLogin.length && !LOAD_ERR.logins
+        ? `<div class="tools-row"><button class="btn sm primary" onclick="bulkCreateLogins()" title="${esc(needLogin.join(', '))} — coached, trained, no login yet">Create ${needLogin.length} missing login${needLogin.length === 1 ? '' : 's'}</button></div>`
+        : ''}
+    <details class="tools" open>
       <summary>Coach tools · add coaching logs, back up${lb ? ' (last complete backup ' + esc(timeAgo(lb)) + ')' : ' (no complete backup on this computer yet)'}${lbBad ? ' · the last try was INCOMPLETE' : ''}</summary>
       <div class="tools-in">
         <button class="btn sm" onclick="pickCoachingLogs()" title="Add a coaching log from a .md file for an athlete who has none on the server yet. Never replaces one.">↑ Add coaching logs</button>
@@ -2958,10 +2999,11 @@ function renderAthletes() {
       </div>
     </details>
     ${pendingCredsHtml()}
+    </div>
     <div class="controls rfilters">${R_FILTERS.filter(f => counts[f.id] > 0 || ['all', 'needs'].includes(f.id) || f.id === _rFilter).map(f =>
       `<button class="rf ${_rFilter === f.id ? 'on' : ''}" onclick="setRosterFilter('${f.id}')">${f.label}<span class="c">${counts[f.id]}</span></button>`).join('')}</div>
     <div class="roster" id="rosterBox"></div>
-    <p class="empty" style="margin-top:14px">${list.length} people across coaching and Proof · tap anyone to open their file.</p>`;
+    <p class="empty" style="margin-top:14px">${counts.all} people across coaching and Proof${counts.paused ? ` (${counts.paused} paused)` : ''}${counts.former ? ` · ${counts.former} former, not counted` : ''} · tap anyone to open their file.${S.ath.demo ? ' The public demo is not counted: <a href="#a/demo">open it</a>.' : ''}</p>`;
   renderRoster();
 }
 function rosterAttention(a) {
@@ -3003,13 +3045,14 @@ function renderRoster() {
     else if (a.tier === 'coached') subBits.push('no sessions yet');
     if (a.isHab) subBits.push(`Proof ${a.hab7}/7 last 7 days`);
     if (!a.finished && !a.isHab) subBits.push('not started');
+    if (a.status !== 'active') subBits.unshift(`${a.status === 'paused' ? 'Paused' : 'Former'} since ${prettyDate(a.statusSince)}${a.statusNote ? ': ' + a.statusNote : ''}`);
     const reasons = rosterReasons(a).concat(a.quietFlags || []);
     const silent = a.isHab && a.habGap >= QUIET_HABIT_DAYS;
     const gapTag = !a.isHab ? '' : a.habToday ? 'on court ✓' : a.habGap + 'd off';
     return `<button class="ath ${a.toReply ? 'flag' : ''} ${a.tier === 'free' ? 'freeath' : ''}" onclick="location.hash=${jsq('a/' + encodeURIComponent(a.id))}">
       <span class="ava">${esc(initials(a.name))}</span>
       <span class="main">
-        <span class="nm">${esc(a.name)} ${tierChip(a)} ${lv} ${acwrPill}</span>
+        <span class="nm">${esc(a.name)} ${tierChip(a)} ${statusChip(a)} ${lv} ${acwrPill}</span>
         <span class="sub">${esc(subBits.join(' · '))}</span>
         ${reasons.length ? `<span class="why">${reasons.map(r => `<span class="fl ${r.tone === 'warn' ? 'warn' : r.tone === 'good' ? 'good' : 'quiet'}">${esc(r.text)}</span>`).join('')}</span>` : ''}
       </span>
@@ -3020,12 +3063,15 @@ function renderRoster() {
   // of the screen is "who is waiting on me", and a hard line says it plainly.
   if (sort === 'attention' && _rFilter === 'all') {
     const needs = list.filter(a => rosterReasons(a).length);
-    const rest = list.filter(a => !rosterReasons(a).length && !a.lapsed);
+    const rest = list.filter(a => !rosterReasons(a).length && !a.lapsed && a.status !== 'paused');
+    const away = list.filter(a => !rosterReasons(a).length && a.status === 'paused');
     const gone = list.filter(a => !rosterReasons(a).length && a.lapsed);
     $('rosterBox').innerHTML = (needs.length
         ? `<div class="rgroup">Needs you <span class="c">${needs.length}</span></div>` + needs.map(rowHtml).join('') : '')
       + (rest.length
         ? `<div class="rgroup">All quiet <span class="c">${rest.length}</span></div>` + rest.map(rowHtml).join('') : '')
+      + (away.length
+        ? `<div class="rgroup" title="On a break: out of Needs you and Gone quiet until you make them active again">Paused <span class="c">${away.length}</span></div>` + away.map(rowHtml).join('') : '')
       + (gone.length
         ? `<div class="rgroup" title="No session, habit or app activity for ${LAPSED_DAYS}+ days, or a cycle that ended over ${CYCLE_RENEW_DAYS} days ago">Gone quiet <span class="c">${gone.length}</span></div>` + gone.map(rowHtml).join('') : '')
       || `<p class="empty">No one matches “${esc(q)}”.</p>`;
@@ -4330,7 +4376,7 @@ async function renderDetail(athleteId, sub) {
         <span class="det-ava">${esc(initials(a.name))}</span>
         <div>
           <h2 class="hd">${esc(a.name)}</h2>
-          <div class="sub">${tierChip(a)}${lvSlot('hchip', athleteId)} <span>${esc(sub2.join(' · '))}</span></div>
+          <div class="sub">${tierChip(a)}${statusChip(a)}${lvSlot('hchip', athleteId)} <span>${esc(sub2.join(' · '))}</span></div>
           ${waHeaderHtml(a)}
         </div>
       </div>
@@ -4354,7 +4400,7 @@ async function renderDetail(athleteId, sub) {
 // box again and fold shut every section the coach had opened (Version history, the Coaching log, a day's raw log, the live
 // snapshot). The snapshot is read off the tab that is on screen BEFORE it is replaced and put back on the new one, and only when it is
 // the same athlete's same screen (a different athlete or sub-tab starts clean). A save that clears a field clears it first.
-const KEEP_TYPED = ['athPw', 'waNum', 'as-paste', 'as-date'];
+const KEEP_TYPED = ['athPw', 'waNum', 'stNote', 'as-paste', 'as-date'];
 function snapTabBody() {
   const box = $('tabbody');
   if (!box || !box.dataset.athlete) return null;
@@ -4485,6 +4531,36 @@ function oldCallLogsHtml(D) {
       ${body}
     </section>`;
 }
+// The Status panel on the File (stage63, audit ROSTER-7; Amir: "a status: active, paused, former"). One tap sets it; the note is optional.
+function statusPanelHtml(D) {
+  const { athleteId, a } = D;
+  if (isDemoRow(a)) return '';
+  const st = a.status || 'active';
+  const btn = (k, l) => `<button class="btn sm ${st === k ? 'primary' : ''}" aria-pressed="${st === k}" onclick="setAthleteStatus(${jsq(athleteId)}, '${k}')">${l}</button>`;
+  const now = st === 'active' ? 'Active: the normal case.'
+    : `${st === 'paused' ? 'On a break' : 'A former client'} since ${esc(prettyDate(a.statusSince))}${a.statusNote ? ': ' + esc(a.statusNote) : ''}.`;
+  return `<div class="sec"><span>Status</span></div>
+    <section class="panel">
+      <p class="empty" style="padding:0 0 10px">${now} <b>Paused</b> takes them out of Needs you and Gone quiet while they are away, and they still count. <b>Former</b> also takes them out of the totals and the main list (they stay under the Former chip, and everything they logged stays). A note they send still reaches Needs you. Write a note first if you want one.</p>
+      <div class="stbtns">${btn('active', 'Active')}${btn('paused', 'Paused')}${btn('former', 'Former')}</div>
+      <div class="waform"><input id="stNote" class="pwin" aria-label="Note about their status" placeholder="note (optional): back in January, moved abroad…" autocomplete="off" value="${esc(a.statusNote || '')}"></div>
+    </section>`;
+}
+async function setAthleteStatus(athleteId, status) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const box = $('stNote');
+  const note = String(box ? box.value : '').replace(/\s+/g, ' ').trim();
+  const res = await sb.rpc('coach_set_status', { p_athlete_id: athleteId, p_status: status, p_since: null, p_note: status === 'active' ? null : (note || null) });
+  if (res.error) {
+    const m = res.error.message || '';
+    fail('Could not set the status: ' + (/Could not find the function|PGRST202|does not exist/i.test(m + (res.error.code || '')) ? 'the server does not have coach_set_status or athlete_status yet (supabase/stage63_athlete_status.sql has not been applied).' : m));
+    return;
+  }
+  if (box) box.value = status === 'active' ? '' : note;
+  await refetch(['status']);
+  toast(status === 'active' ? 'Active again' : status === 'paused' ? 'Paused' : 'Marked as a former client');
+}
+window.setAthleteStatus = setAthleteStatus;
 // The WhatsApp number box on the File (stage62). Saving calls coach_set_whatsapp(); an empty box (or Remove) clears the number.
 function waPanelHtml(D) {
   const { athleteId, a } = D;
@@ -4530,11 +4606,13 @@ function hiddenSessionsHtml(D) {
   return `<div class="sec"><span>Hidden sessions · ${hid.length}</span></div>
     <section class="panel" id="hidden-sessions">
       <p class="empty" style="padding:0 0 10px">Left out of their numbers, the roster's warnings and the history their app shows, and kept in the database. If their phone sends one again it stays hidden. <b>Restore</b> brings it back; <b>Delete for good</b> removes it, and it can then only come back from a backup file.</p>
-      ${hid.map(h => `<div class="pvrow">
-        <span class="pvwhen">Day ${esc(h.day)} · ${esc(prettyDate(h.completed_on))}</span>
-        <span class="pvwho">${esc(h.focus || '')}${h.hidden_at ? (h.focus ? ' · ' : '') + 'hidden ' + esc(fmtLocalStamp(h.hidden_at)) : ''}</span>
-        <button class="btn sm" onclick="restoreSession(${jsq(athleteId)}, ${Number(h.day)}, ${jsq(h.completed_on)})">Restore</button>
-        <button class="btn sm danger" onclick="deleteHiddenSession(${jsq(athleteId)}, ${Number(h.day)}, ${jsq(h.completed_on)})">Delete for good</button>
+      ${hid.map(h => `<div class="hidrow">
+        <b class="hw">Day ${esc(h.day)} · ${esc(prettyDate(h.completed_on))}</b>
+        <span class="acts">
+          <button class="btn sm" onclick="restoreSession(${jsq(athleteId)}, ${Number(h.day)}, ${jsq(h.completed_on)})">Restore</button>
+          <button class="btn sm danger" onclick="deleteHiddenSession(${jsq(athleteId)}, ${Number(h.day)}, ${jsq(h.completed_on)})">Delete for good</button>
+        </span>
+        <span class="hwho">${esc(h.focus || '')}${h.hidden_at ? (h.focus ? ' · ' : '') + 'hidden ' + esc(fmtLocalStamp(h.hidden_at)) : ''}</span>
       </div>`).join('')}
     </section>`;
 }
@@ -4555,6 +4633,7 @@ function fileTabHtml(D) {
         <button class="btn sm" onclick="viewAsAthlete(${jsq(athleteId)}, 'habits')">View their Proof</button>
       </div>
     </section>
+    ${statusPanelHtml(D)}
     ${waPanelHtml(D)}
     <div class="sec"><span>Login</span></div>
     <section class="panel">
@@ -4931,6 +5010,7 @@ const ERASE_WHAT = {
   tps_accounts: ['course login', 'course logins'], assess_accounts: ['testing-app login', 'testing-app logins'],
   assess_players: ['player', 'players'], assess_notes: ['player note', 'player notes'], assess_results: ['test result', 'test results'],
   buyer_notes: ['note of yours about them', 'notes of yours about them'],
+  athlete_status: ['paused or former mark', 'paused or former marks'],
 };
 // A "backup.<table>" key is a rollback copy the pipeline made before a one-off change to live programmes (backup.onename_2026_10_09 today).
 const ERASE_ROLLBACK = ['saved rollback copy of their data', 'saved rollback copies of their data'];
@@ -7026,6 +7106,7 @@ function demoStore() {
     summary: summary || ('Day ' + day + ' — Demo\n\nExercise log:\n[Primary]\n• Goblet Squat (✓)\n    Set 1: 24 @7 ✓\n    Set 2: 24 @8 ✓\n• Bench Press (✓)\n    Set 1: 40 @7 ✓'),
   });
   S.histHidden = [];
+  S.status = { demo_kian: { athlete_id: 'demo_kian', status: 'paused', since: d(10), note: 'Back after the holidays' } };
   S.hist = [
     mkSession('demo_ana', 'Ana', 1, 0, 7, 60, 'Complete', 'Squats felt way heavier than last week. Shoulder fine though.', DEMO_A_D1),
     mkSession('demo_ana', 'Ana', 1, 7, 7, 58, 'Complete', '', DEMO_A_D1_OLD),

@@ -60,7 +60,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 96 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 99 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -148,6 +148,9 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | intake-outcome | Intake: a client needs an athlete (refused on the page, nothing sent), a saved outcome moves the card and the badge, a not-a-fit sends no athlete, the athlete's File says "Came from", clearing it, a server without stage61, the pre-selected likely athlete | (pile A8, FLOW-17, SPINE-11) "Handled" could not say what happened and a lead could not be linked to the athlete it became |
 | erase-linked-form | Erase completely…: two applications linked to the athlete are offered with "linked to them" and ticked; the one left unticked keeps its answers and loses only the link | (pile A8) a link would have made the athlete impossible to erase (the server's own check) |
 | whatsapp-number | The File's WhatsApp box (nonsense refused on the page, typed text kept through a redraw, a number saved tidy, Remove, an Iranian number in Persian digits, a server without stage62) and the header's button; a coach-made record is not a signup (no reason, no Proof tab, not in the funnel) | (pile A9, FLOW-8) no number for most coached athletes; mutation-tested: if `isSignup()` counts it, three checks fail |
+| status-paused-former | File → Status: pause with a note, the cycle reason goes while a note they sent stays, the Paused group and chip, former out of Everyone and Coached with their own chip and the footer line, Active removes the row, a server without stage63 | (pile A10, ROSTER-7) "Needs you" held 36 of 49 people and nobody could be set aside |
+| roster-demo-out | The public demo and the dashboard's own identity added to the roster: no count changes, the tier chips still add up, no row, the footer says so and links the demo | (pile A10, ROSTER-7) the demo was counted |
+| tools-button | At 360 px the tools (Backup, Logins to send, Create missing logins) are folded behind the ⚙ Tools button with a badge, the first athlete starts above y = 400, the panel opens, survives a redraw and closes | (pile A10, ROSTER-12) the first athlete started at y 495 |
 | file-preview-wording | The File tab's "Their app" words, the two buttons' addresses, and the bar program.html draws over a preview | (pile A7, TOOLS-11) the File tab promised "their real data" and the bar "exactly as they see it", but the preview shows the programme without their logged work |
 | library-publish-guards | A file that is new, one that replaces a live item, one that replaces a hidden item, and one whose id is already on another shelf | (pile B11, TOOLS-6) the confirm did not say, a hidden item was published again, a moved item was published twice |
 

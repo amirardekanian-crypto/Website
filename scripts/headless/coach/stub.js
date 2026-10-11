@@ -335,6 +335,22 @@
       else { row.coach_status = 'new'; t.push(row); }
       return null;
     },
+    // stage63: a paused or former mark; 'active' removes it. The same rules as the SQL (the demo and the dashboard's own identity have no status).
+    coach_set_status: function (p) {
+      var id = String(p.p_athlete_id == null ? '' : p.p_athlete_id).trim();
+      if (!id) throw new Error('which athlete?');
+      if (['active', 'paused', 'former'].indexOf(p.p_status) < 0) throw new Error('bad status: ' + p.p_status);
+      if (['demo', 'amir_ardekani'].indexOf(id.toLowerCase()) >= 0) throw new Error('"' + id + '" is the public demo or your own identity: it has no status');
+      if (!tbl('programs').some(function (r) { return r.athlete_id === id; }) && !tbl('hab_contacts').some(function (r) { return r.athlete_id === id; }) && !tbl('athlete_progress').some(function (r) { return r.athlete_id === id; })) throw new Error('there is no athlete called "' + id + '"');
+      var rows = tbl('athlete_status'), at = rows.findIndex(function (r) { return r.athlete_id === id; });
+      if (p.p_status === 'active') { if (at >= 0) rows.splice(at, 1); }
+      else {
+        var note = String(p.p_note == null ? '' : p.p_note).trim() || null, today = nowIso().slice(0, 10);
+        if (at >= 0) { var old = rows[at]; rows[at] = { athlete_id: id, status: p.p_status, since: p.p_since || (old.status === p.p_status ? old.since : today), note: note, updated_at: nowIso() }; }
+        else rows.push({ athlete_id: id, status: p.p_status, since: p.p_since || today, note: note, updated_at: nowIso() });
+      }
+      return { athlete_id: id, status: p.p_status };
+    },
     // stage62: a WhatsApp number from the coach. A new contact record (source 'coach') only when there is a number to keep; an existing one only has its
     // number changed. The caller is always the coach.
     coach_set_whatsapp: function (p) {
@@ -473,7 +489,7 @@
         ids.forEach(function (id) { if (!id || !tbl('hab_intake').some(function (i) { return i.id === id; })) throw new Error('One of the intake forms does not exist (it may already be gone). Nothing was erased.'); });
         ['session_history', 'athlete_progress', 'hab_notes', 'hab_titles', 'hab_season_results', 'leaderboard_optin', 'library_sessions', 'messages',
           'call_logs', 'cycle_reports', 'coaching_log_versions', 'coaching_logs', 'program_versions', 'programs', 'athlete_keys', 'hab_contacts',
-          'athlete_identities'].forEach(function (t) { pick(t, function (r) { return r.athlete_id === key; }); });
+          'athlete_identities', 'athlete_status'].forEach(function (t) { pick(t, function (r) { return r.athlete_id === key; }); });
         // the rollback copy the 2026-10-09 rename left in the backup schema (the SQL empties every table there with an athlete_id column)
         pick('backup.onename_2026_10_09', function (r) { return r.athlete_id === key; });
         pick('hab_intake', function (r) { return ids.indexOf(r.id) >= 0; });
