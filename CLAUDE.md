@@ -433,6 +433,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
     (`supabase/tps_03_revoke_publish_keys.sql`): `tps_publish()` and `assess_publish()` can no longer be called by anyone
     without the service role, so content changes are SQL through the Supabase MCP.
   - The demo's lock is server-side (`tps_demo()`): never "lock" anything in `app.js` alone.
+  - **The course's exercises are fed from the Spine** (stage65, 2026-10-12; Amir: "fed from spine", one live source). Each course exercise in `tps_content` names its entry (`spine`); the entry's `steps_fa`, `cues_fa`, `purpose_fa` and `tennis_fa`, and its video, reach the course live through `get_exercises_fa()` (kept on the phone as `tps.spinefa` for offline) and replace the course's own copies; the Spine's one fault replaces the old list of common mistakes (CUE-7). **A change to an entry's English steps, cues, purpose or On court line changes its Farsi in the same run.** The course's own `easier`, `harder`, `equipment`, `noEquipment` and `u16` stay in the course. A new course exercise needs a Spine entry with its Farsi before it ships.
   - The course app's tour finds real controls by CSS selector: move a control or rename a class and it
     lies, silently, on a new buyer's first screen.
   - A new lesson or test needs its cover in `ART` by id, and a regraded picture needs `ART_V` raised.

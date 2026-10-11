@@ -42,6 +42,13 @@ publicly (Amir, 2026-09-15, before his Iran test): from `/tennis/` (menu, hero l
 screenshot, the inside section, the price card, an FAQ), the course card on `index-fa.html`, and
 `links.html`. If it will not open in Iran without a VPN, move the free parts to static files on the website.
 
+## Exercises come from the Spine
+
+**The course's exercises are fed from the Spine** (stage65, 2026-10-12; Amir: "fed from spine", one live source). Each course exercise in `tps_content` names its entry (`spine`); the entry's `steps_fa`, `cues_fa`, `purpose_fa` and `tennis_fa`, and its video, reach the course live through `get_exercises_fa()` (kept on the phone as `tps.spinefa` for offline) and replace the course's own copies; the Spine's one fault replaces the old list of common mistakes (CUE-7). **A change to an entry's English steps, cues, purpose or On court line changes its Farsi in the same run.** The course's own `easier`, `harder`, `equipment`, `noEquipment` and `u16` stay in the course. A new course exercise needs a Spine entry with its Farsi before it ships.
+114 course exercises, 114 entries (43 drafted for the course that night, approved on Amir's word; 5 course ids map to an
+entry with another id, e.g. `easy-jog` → `easy-run`). The Farsi was written from the Spine's English in the course's own
+voice and published on Amir's word ("Publish, I'll edit"); he edits it in coach.html → Exercises → an entry → Farsi.
+
 ## The tour and the guide
 
 **The course app has a TOUR and a GUIDE** (2026-09-21, Amir: *"i want the TPS course, and the demo,

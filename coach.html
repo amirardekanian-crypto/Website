@@ -6141,12 +6141,15 @@ function spineMayLeave(what) {
 const SPINE_ENTRY_COL = { 'sf:name': 'name', 'sf:aliases': 'aliases', 'sf:pattern': 'pattern', 'sf:video': 'video',
   'sf:q1': 'qualities', 'sf:q2': 'qualities', 'sf:q3': 'qualities', 'sf:purpose': 'purpose', 'sf:tennis': 'tennis',
   'sf:good': 'cues', 'sf:bad': 'cues', 'sf:easier': 'easier', 'sf:harder': 'harder', 'sf:alts': 'alts',
-  'sf:equipment': 'equipment', sload: 'loads', 'sf:impact': 'impact', 'sf:muscles': 'muscles', 'sf:steps': 'steps' };
+  'sf:equipment': 'equipment', sload: 'loads', 'sf:impact': 'impact', 'sf:muscles': 'muscles', 'sf:steps': 'steps',
+  // stage65: the Farsi the course app reads (get_exercises_fa)
+  'sf:steps_fa': 'steps_fa', 'sf:good_fa': 'cues_fa', 'sf:bad_fa': 'cues_fa', 'sf:purpose_fa': 'purpose_fa', 'sf:tennis_fa': 'tennis_fa' };
 const SPINE_COACH_COL = { 'sf:sfr': 'sfr', sflag: 'flags', 'sf:credits': 'credits', 'sf:cost': 'cost', 'sf:notes': 'notes' };
 // What each column is called on screen (a clash message, the history list). A column not named here is
 // Claude's bookkeeping (links_before, suggested_changes …) and never shown.
 const SPINE_LABEL = { name: 'Name', aliases: 'Also written as', pattern: 'Pattern', video: 'Video', qualities: 'Qualities',
-  purpose: 'Why it’s here', tennis: 'On court', steps: 'Steps', cues: 'Cues / Don’t', easier: 'Regressions', harder: 'Progressions',
+  purpose: 'Why it’s here', tennis: 'On court', steps: 'Steps', cues: 'Cues / Don’t',
+  steps_fa: 'Steps (Farsi)', cues_fa: 'Cues (Farsi)', purpose_fa: 'Why it’s here (Farsi)', tennis_fa: 'On court (Farsi)', easier: 'Regressions', harder: 'Progressions',
   alts: 'Alternatives', equipment: 'Equipment', loads: 'Body parts', impact: 'Impact', muscles: 'Muscles shown',
   status: 'Status', sfr: 'SFR rank', flags: 'Flags', credits: 'Counts toward', cost: 'Cost', notes: 'Notes' };
 function stableJson(v) {
@@ -6482,8 +6485,14 @@ async function spineSave(id, approve) {
   if (steps.length > SPINE_STEPS_MAX) { alert(`How to do it has ${steps.length} steps: ${SPINE_STEPS_MAX} at most (3 to 5, a 6th only for a rack lift's bail). One step per line.\n\nNothing was saved.`); return; }
   const longStep = steps.findIndex(x => x.length > SPINE_STEP_CHARS);
   if (longStep >= 0) { alert(`Step ${longStep + 1} of How to do it is ${steps[longStep].length} characters: ${SPINE_STEP_CHARS} at most (aim under ${SPINE_STEP_AIM}). Say it shorter, or split it.\n\nNothing was saved.`); return; }
+  // The Farsi the course reads (stage65): the same limits as the English steps.
+  const stepsFa = spineSteps(f('steps_fa')), goodFa = spineLines(f('good_fa')), badFa = spineLines(f('bad_fa'));
+  if (stepsFa.length > SPINE_STEPS_MAX || stepsFa.some(x => x.length > SPINE_STEP_CHARS)) {
+    alert(`The Farsi How to do it has ${stepsFa.length} steps: ${SPINE_STEPS_MAX} at most, each ${SPINE_STEP_CHARS} characters at most.\n\nNothing was saved.`); return; }
   const row = {
     name: f('name').trim() || cur.name, aliases: spineCsv(f('aliases')), pattern: f('pattern') || null,
+    steps_fa: stepsFa, cues_fa: (goodFa.length || badFa.length) ? { good: goodFa, bad: badFa } : null,
+    purpose_fa: f('purpose_fa').trim() || null, tennis_fa: f('tennis_fa').trim() || null,
     purpose: f('purpose').trim() || null, tennis: f('tennis').trim() || null, steps,
     cues: (good.length || badCues.length) ? { good, bad: badCues } : null,
     equipment: spineCsv(f('equipment')), loads: st.sload ? st.sload.split(',') : [],
@@ -6866,6 +6875,17 @@ function renderExercises() {
         placeholder="${k.credits && Object.keys(k.credits).length ? 'not needed: the map shows what it counts toward' : 'e.g. calves 1, shins 0.5'}" style="${field}">
       ${lbl('What the athlete sees · redraws as you type, saved when you save')}
       <div id="spineMap">${spineMapHtml(k.credits, e.muscles, e.loads)}</div>
+      </details>
+      <details class="spsec"${secOpen('fa', false)} ontoggle="spineSecToggle('fa', this)"><summary>Farsi · what the course app shows${
+        (e.steps_fa || []).length ? '' : ' · <b style="color:var(--clay-ink)">none yet</b>'}</summary>
+        <p class="sp-hint" style="margin:6px 0 2px">The course (/tennis/app/) reads these live. Change them with the English, in the same save.</p>
+        ${lbl('Why it’s here (Farsi)')}<textarea data-sf="purpose_fa" rows="2" dir="rtl" style="${field}">${esc(e.purpose_fa || '')}</textarea>
+        ${lbl('On court (Farsi)')}<input data-sf="tennis_fa" dir="rtl" value="${esc(e.tennis_fa || '')}" style="${field}">
+        ${lbl('How to do it (Farsi) · one step per line')}<textarea data-sf="steps_fa" rows="6" dir="rtl" style="${field}">${esc((e.steps_fa || []).join('\n'))}</textarea>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 14px">
+          <div>${lbl('Cues (Farsi)')}<textarea data-sf="good_fa" rows="3" dir="rtl" style="${field}">${esc(((e.cues_fa || {}).good || []).join('\n'))}</textarea></div>
+          <div>${lbl('Don’t (Farsi)')}<textarea data-sf="bad_fa" rows="3" dir="rtl" style="${field}">${esc(((e.cues_fa || {}).bad || []).join('\n'))}</textarea></div>
+        </div>
       </details>
       <details class="spsec"${secOpen('coach', k.credits == null || k.cost == null || k.sfr == null)} ontoggle="spineSecToggle('coach', this)"><summary>Coach only: SFR, flags, counts, cost${k.credits == null ? ' · <b style="color:var(--clay-ink)">no count yet</b>' : ''}</summary>
       <div style="padding-top:4px">
