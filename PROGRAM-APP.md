@@ -604,6 +604,20 @@ sits in front of the whole site).
 - **Left as is:** one bar of signal still costs up to the 6 s `get_program` wait before the copy opens.
   Waiting less when a copy exists would open slow-but-working connections on the copy more often; it is
   a separate call.
+- **A wrong phone clock no longer reads as a refusal** (SITE-AUDIT 25b, 2026-10-12; the 2026-10-04 reach reports: an Irancell iPhone 89 minutes behind).
+  supabase-js decides by the phone's clock whether a token has expired, so a clock that runs behind keeps sending an hour-old token and the server
+  answers `401 "JWT expired"` (PostgREST `PGRST301`) for about an hour and a half of every cycle. That used to be a 4xx, so `planAnswerOf()` said
+  *no*: *Plan not available*, the saved plan deleted (`dropPlanCopy()`), the athlete told to sign in again, and the identity lookup that finds who is
+  signed in failed the same way. **`fetchRetryExpired()`** is the fix: `_sb()` hands `createClient` a `global.fetch` that, on a 401 whose body says
+  `JWT expired` or `PGRST301`, calls `auth.refreshSession()` once (concurrent calls share one refresh; the library dedupes it) and repeats the call with
+  the new token. A sign-in or refresh call, any other status and any other 401 pass through, a call is repeated at most once, and a refresh that fails
+  leaves the original 401 (so a signed-out athlete still sees *Sign in again*). A clock running *ahead* is a different case (the library refreshes on
+  every call; nothing breaks) and is not touched.
+  ⚠️ **Exists four times**: `program.html`, `habits.html`, `tennis/app/app.js` and `tennis-testing/app/app.js`, the same text.
+  `node scripts/test_fetch_retry.js` (pre-commit guard 18) cuts it out of all four, requires one text, requires every `createClient(SB_URL, SB_KEY …)` to
+  be given it, and runs the real library (the bundled 2.116; `SUPABASE_LIB=<a UMD build>` for another version, 2.117.3 passes) through 27 vectors.
+  `node scripts/headless/clock-skew.js` runs the real page: the same page without the fix shows *Plan not available* (the field report), with it Home
+  opens after one refresh and the saved plan stays.
 
 ## 🌙 Midnight is not the end of a session (DATA-02, 2026-09-26)
 

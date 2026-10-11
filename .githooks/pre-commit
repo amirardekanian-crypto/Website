@@ -1,5 +1,5 @@
 #!/bin/sh
-# Seventeen guards. Each runs only when its own files are staged, so a commit that
+# Eighteen guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -346,6 +346,24 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^supabase/stage[0
   echo "pre-commit: WARNING — a supabase/stage*.sql file is staged but supabase/schema_snapshot.sql is not."
   echo "            If that stage was applied to the live project, regenerate the snapshot (scripts/restore/README.md, \"Keeping the snapshot current\")"
   echo "            and stage it, or the restore path will rebuild the old structure. Not blocking: a stage file that was only drafted needs nothing."
+fi
+
+# ── 18. a wrong phone clock must not break sign-in (added 2026-10-12) ───────────────────────────────────────────────────────
+# Why: supabase-js decides by the phone's clock whether a token has expired. A phone 89 minutes behind (an Irancell iPhone in the 2026-10-04 reach reports) kept sending an
+# hour-old token, the server answered 401 "JWT expired", and program.html read that as a refusal: "Plan not available", and the saved plan thrown away (SITE-AUDIT 25b).
+# Each app now gives createClient a fetch, fetchRetryExpired(), that refreshes the session once on that answer and repeats the call. It exists four times (program.html,
+# habits.html, tennis/app/app.js, tennis-testing/app/app.js) and a copy that drifts, or a client made without it, brings the symptom back for the people it hit.
+# scripts/test_fetch_retry.js cuts the function out of all four, requires one text, and runs the real supabase-js through it against a mock server. No browser needed.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|habits\.html|tennis/app/app\.js|tennis-testing/app/app\.js|scripts/test_fetch_retry\.js)$'; then
+  echo "pre-commit: an app's Supabase client changed — checking the retry on an expired token is in every copy..."
+  if ! retry_out=$(node scripts/test_fetch_retry.js 2>&1); then
+    echo "$retry_out" | grep -v '^ok '
+    echo ""
+    echo "pre-commit: BLOCKED — fetchRetryExpired() differs between the four apps, is missing from a createClient, or no longer does its job (details above)."
+    failed=1
+  else
+    echo "pre-commit: expired-token retry OK."
+  fi
 fi
 
 exit $failed

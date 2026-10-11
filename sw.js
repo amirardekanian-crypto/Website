@@ -230,7 +230,10 @@
 //      "How to do it · video · 5 steps · 3 cues" and shows the green ▶ only with a video, it opens by itself the first
 //      time on a simple card too, the Spine's cues win over a card's own, a working circuit folds each item's steps
 //      behind a How to do it line, and the About sheet from Library → Exercises puts How to do it above the body map.
-const CACHE = 'aap-v108';
+// v109: program.html and habits.html changed (2026-10-12, SITE-AUDIT 25b): a phone whose clock runs behind no longer breaks sign-in. The Supabase client is
+//      given a fetch (fetchRetryExpired) that, on a 401 "JWT expired", refreshes the session once and repeats the call; before, the athlete saw "Plan not
+//      available" and the saved plan was thrown away. Without the bump a phone that cached the v108 shell keeps the old client.
+const CACHE = 'aap-v109';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -28,6 +28,11 @@ The handbook itself is in Supabase (`tps_content`, readable only by an active bu
 became the permanent home.) Whenever this folder is edited, run `python scripts/stamp_tps_app.py`
 (the pre-commit hook blocks a stale stamp): the app's worker answers from its cache first, so a change
 shipped under an unchanged `sw.js` VERSION never reaches a phone that already has the app.
+**A phone with a wrong clock** (SITE-AUDIT 25b, 2026-10-12; an Irancell iPhone 89 minutes behind in the 2026-10-04 reach reports): supabase-js decides by the phone's clock whether a
+token has expired, so it kept sending an hour-old one and the server answered `401 JWT expired` for an hour and a half of each cycle. This app and the testing app
+give `createClient` the same `fetchRetryExpired()` as `program.html` and `habits.html` (one refresh, one repeat; `PROGRAM-APP.md` → *No signal*), four copies of one
+text that `scripts/test_fetch_retry.js` keeps equal (pre-commit guard 18). Editing `app.js` here also means the usual stamp (`stamp_tps_app.py`, and for the
+testing app the 8 hex of its `app.js` in `index.html`'s `app.js?v=`).
 **The demo is `/tennis/app/?demo=1`** (Amir, 2026-09-15): no sign-in; week 1, the broad jump test and
 three lessons open, everything else locked behind a WhatsApp buy button. The lock is server-side:
 `tps_demo()` (`supabase/tps_02_demo.sql`, where the picks live) sends each locked item as its card

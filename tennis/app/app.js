@@ -156,11 +156,35 @@
   // session apart from program.html's, coach.html's and the testing app's on the same website.
   // ?stub=1 (local testing only) swaps in _dev/stub-supabase.js, a fake backend.
   const sbLib = () => (window.STUB_SUPABASE && new URLSearchParams(location.search).get('stub') === '1') ? window.STUB_SUPABASE : window.supabase;
+  // A wrong phone clock breaks sign-in (SITE-AUDIT 25b; the 2026-10-04 reach reports: an Irancell iPhone 89 minutes behind). supabase-js decides by the phone's
+  // clock whether a token has expired, so a clock that runs behind keeps sending an hour-old token and the server answers 401 "JWT expired". That used to read
+  // as a refusal: "Plan not available", and the saved plan thrown away. This fetch is handed to createClient. On that answer it refreshes the session ONCE and
+  // repeats the call with the new token. A sign-in or refresh call, every other status and every other 401 pass through untouched, and a call is never repeated
+  // twice. The same function sits in program.html, habits.html and both tennis apps; scripts/test_fetch_retry.js runs the real library through all four.
+  function fetchRetryExpired(getClient) {
+    return async function (input, init) {
+      const res = await fetch(input, init);
+      if (res.status !== 401 || typeof input !== 'string' || input.indexOf('/auth/v1/') !== -1) return res;
+      let said = '';
+      try { said = await res.clone().text(); } catch (e) { /* unreadable: leave it */ }
+      if (!/JWT expired|PGRST301/.test(said)) return res;
+      let token = null;
+      try {
+        const client = getClient();
+        const r = client ? await client.auth.refreshSession() : null;
+        token = r && r.data && r.data.session ? r.data.session.access_token : null;
+      } catch (e) { /* no session to refresh: the 401 stands */ }
+      if (!token) return res;
+      const headers = new Headers((init && init.headers) || undefined);
+      headers.set('Authorization', 'Bearer ' + token);
+      return fetch(input, Object.assign({}, init, { headers }));
+    };
+  }
   async function sbReady() {
     for (let i = 0; i < 120 && !(sbLib() && sbLib().createClient); i++) await new Promise(r => setTimeout(r, 25));
     const lib = sbLib();
     if (!lib || !lib.createClient) return null;
-    if (!sbClient) sbClient = lib.createClient(SB_URL, SB_KEY, { auth: { storageKey: 'tps-auth', persistSession: true, autoRefreshToken: true } });
+    if (!sbClient) sbClient = lib.createClient(SB_URL, SB_KEY, { auth: { storageKey: 'tps-auth', persistSession: true, autoRefreshToken: true }, global: { fetch: fetchRetryExpired(() => sbClient) } });
     return sbClient;
   }
 
