@@ -44,7 +44,7 @@ a second row that scrolls sideways) are opened now and then.
 | **Today** | The day's play: who's on court, who needs you (and why), the wall, the quest lever |
 | **Athletes** | The whole roster — coached and Proof-only — and each person's file, opening on prescribed-vs-done (a habit-only athlete opens on Proof) |
 | **Intake** | New coaching applications from the apply form (English & Farsi) — the whole questionnaire, per lead |
-| **Exercises** | The Spine (2026-09-24): one entry per exercise you programme. Coverage of the names in live programmes, Claude's drafts waiting for you, a search, and an editor (purpose, cues, links, body parts and the muscle map, video, and the coach-only SFR rank, flags, counts and cost) showing who is doing each exercise now. A save sends only what you changed. **Approve** is what puts an entry on athletes' phones |
+| **Exercises** | The Spine (2026-09-24): one entry per exercise you programme. Coverage of the names in live programmes, Claude's drafts waiting for you, a search, and an editor (purpose, How to do it, cues, links, body parts and the muscle map, video, and the coach-only SFR rank, flags, counts and cost) showing who is doing each exercise now. Claude's draft steps, cues or purpose for an approved entry wait in the editor's boxes, and your Save approves them. A save sends only what you changed. **Approve** is what puts an entry on athletes' phones |
 | **Proof** | The board, the season, the signup funnel, titles minted |
 | **Library** | Publishes workouts and articles into the app's Library, and copies a link to each (the address is still `#links`; the tab was called Links until 2026-10-10) |
 | **Affiliates** | The referral-code roster: who holds which discount code, how to reach them, which intakes used it. The apply forms accept exactly the live codes listed here |
@@ -133,6 +133,36 @@ only; the stage49 header has the statement).
 page does not say "nothing was saved" or "nothing was removed", because the server may have committed before the
 connection dropped. It says it cannot tell and to refresh and look. An error that carries a code (the server
 answered) rolled the whole call back, and says so. If `spine_versions` is missing (a project before stage49) the panel says so and nothing else changes.
+
+**How to do it (stage52, 2026-10-11; CUE-6).** Each entry has a **How to do it** box, before the cues: one step
+per line, the plain steps that let someone who has never seen the exercise do it safely with no video (3 to 5; 2
+or 3 for a stretch or the bike; up to 6 for a rack lift, so the bail fits). A number you type in front ("1.",
+"2)") is dropped, because the app numbers them, and a blank line is no step. The line under the box counts them
+and names a step over 90 characters (aim shorter) or over 140 (it will not save). Save refuses more than 6 steps
+or a step over 140 characters before anything leaves the page: those are the database's own limits
+(`spine_steps_ok()`), so nothing is refused twice. The steps reach phones with the entry, in `get_exercises()`.
+They are in History as **Steps**, numbered, and Undo puts them back like any other field. The list marks an
+entry with **no steps** in clay, and the Coverage line counts the approved entries with no How to do it. The
+cue boxes now say what each line is for (CUE-1): **Cues** is the key point, then a feel or a check; **Don't** is
+the one fault, then the fix.
+
+**Claude's drafts (stage52).** Claude never writes steps, cues or the purpose on an **approved** entry. `/spine`
+leaves a draft on the entry's coach-only half (`exercise_coach.suggested_changes`), and the editor shows it:
+the box is pre-filled and outlined, and a clay line above it says **Claude's draft · saved when you press
+Save**, with Claude's reason, **Discard draft**, and what the entry holds now. A cues draft fills both cue
+boxes. Edit the draft freely; **your Save is the approval**. The same `coach_save_spine()` call writes the entry
+and takes every draft you decided off the list (kept, edited or discarded), so a draft is never left behind
+after you saved over it. **Discard draft** puts the entry's own value back in the box (Bring it back undoes
+that until you save); the discarded draft leaves the list with the next Save. Closing without saving leaves the
+drafts waiting and does not ask, because a draft is not your unsaved work; a discard is, so closing after one asks
+first. A draft is shown only while its `old` still equals what the entry holds. One that no longer matches (you
+edited the field since) is stale: it is not shown, a quiet line says so, and Claude's next `/spine` run drops
+it. When two drafts wait for one field, the newest is shown and the line says so. Other proposals on the list (a
+court line, a link, a count) are never touched by Save: they stay for Claude's `/spine` yes/no. The Coverage line
+says how many entries have **Claude's draft to read**, the list marks each one, and a **Claude's drafts** filter
+(beside Drafts and Approved) lists them; the tab opens on it when there are no new drafts to approve. If Claude
+adds a draft while you have the entry open, your Save is refused whole (the list changed under you), the box
+shows the list as it is now, and Save again goes through.
 
 **The Quality Map (2026-09-24)** adds three things to this tab:
 - **The ten qualities.** The words each athlete's Home day cards use (Strength, Brakes …): one
@@ -388,7 +418,7 @@ Inside, every prescribed exercise is a row with three columns:
 
 | | |
 |---|---|
-| **Prescribed** | what you wrote — `4 × 10`, `RPE 7`, tempo and any extra chips underneath |
+| **Prescribed** | what you wrote — `4 × 10`, `RPE 7`, tempo, any extra chips and the pill underneath (a pill off the list in clay) |
 | **Done** | sets completed against sets asked for, the load they actually used (`10 → 12 kg` when it moved within the session), and their **average RPE** — with the per-set RPEs under it |
 | **Flag** | the gap, named: `2 sets short` · `not done` · `2.5 over target RPE` · `not in the plan` |
 
@@ -450,7 +480,20 @@ or work), per side, RPE, tempo, rest and your note. **Save** then:
 
 Until 2026-10-10 Save wrote the whole programme as it was when the page opened, which could put an
 old cycle back over a newly published one, and after a publish or restore an edit could land on a
-different exercise. **Version history** (File tab) lists the last 20 saves in your own time zone;
+different exercise.
+
+**The pill (CHP-2, 2026-10-11).** The editor has a **Pill** picker: the closed list from `assets/js/chips.js`
+(`Chips.PILLS`, the same object as `check_program.py` and SCHEMA.md), grouped as Hands, Lead side, Intent, Hold,
+Brakes and Pace. A tap puts a value on, a second tap takes it off, and a value from a group already on takes that
+one's place: at most two, one per group. A third is refused with a toast. There is no box to type a new value: one
+joins the list only on your word. A hold value is warned unless Tempo is `iso`, and *easy pace* unless RPE is empty.
+An old spelling on a card ("right leg first") shows as its list value ("right side first") and is saved that way.
+A value on the card that is not on the list ("glute focus", "3s eccentric") is shown in clay with **Move to the
+note** (it goes to the end of your note as a sentence) or **Drop it**; left alone it is kept, so nothing is lost, and
+`check_program.py` flags it. Save writes the pill as one `intent` string joined by " · ", and a save that changes
+nothing still writes nothing. The note box now says what a note is for (COM-14): about this athlete, one to three
+short sentences, the point first. On The work, the row shows the pill under the dose, and a pill problem counts in
+its chip issues. **Version history** (File tab) lists the last 20 saves in your own time zone;
 each line is the programme just before that save, and Restore checks it belongs to this athlete.
 
 ### The three numbers, and the charts

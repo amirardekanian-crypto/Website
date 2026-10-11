@@ -54,15 +54,6 @@
           "name": "March in Place",
           "exId": "march-in-place",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Knee up, opposite arm back",
-              "Build the pace across the two minutes"
-            ],
-            "bad": [
-              "Starting at full speed"
-            ]
-          },
           "rx": {
             "time": "2 minutes"
           }
@@ -72,15 +63,6 @@
           "name": "Squat",
           "exId": "bodyweight-squat",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Sit between your hips, chest tall",
-              "Go as deep as you can hold the position"
-            ],
-            "bad": [
-              "Heels lifting off the floor"
-            ]
-          },
           "rx": {
             "reps": 10
           }
@@ -90,15 +72,6 @@
           "name": "Reverse Lunge",
           "exId": "reverse-lunge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Step back and drop the back knee softly",
-              "The front heel drives you up"
-            ],
-            "bad": [
-              "Crashing the back knee into the floor"
-            ]
-          },
           "rx": {
             "reps": 6,
             "side": true
@@ -109,15 +82,6 @@
           "name": "Inchworm",
           "exId": "inchworm",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Walk the hands out to a plank, then the feet back in",
-              "Ribs down when you are long"
-            ],
-            "bad": [
-              "Letting the hips sag at the top of the walk-out"
-            ]
-          },
           "rx": {
             "reps": 6
           }
@@ -135,15 +99,6 @@
             {
               "name": "Squat Jump",
               "exId": "squat-jump",
-              "cues": {
-                "good": [
-                  "Land soft and go straight into the next one",
-                  "Height matters less than landing well"
-                ],
-                "bad": [
-                  "Landing stiff and loud once you get tired"
-                ]
-              },
               "rx": {
                 "time": "20 seconds"
               }
@@ -151,15 +106,6 @@
             {
               "name": "Mountain Climber",
               "exId": "mountain-climber",
-              "cues": {
-                "good": [
-                  "Hands under the shoulders, drive the knees fast",
-                  "Hips stay level"
-                ],
-                "bad": [
-                  "Bouncing the hips up and down"
-                ]
-              },
               "rx": {
                 "time": "20 seconds"
               }
@@ -167,29 +113,11 @@
             {
               "name": "Reverse Lunge",
               "exId": "reverse-lunge",
-              "detail": "20 seconds, alternating",
-              "cues": {
-                "good": [
-                  "Step back and drop the back knee softly",
-                  "The front heel drives you up"
-                ],
-                "bad": [
-                  "Crashing the back knee into the floor"
-                ]
-              }
+              "detail": "20 seconds, alternating"
             },
             {
               "name": "Fast Feet",
               "exId": "fast-feet",
-              "cues": {
-                "good": [
-                  "Tiny, quick contacts on the balls of the feet",
-                  "Light rather than heavy"
-                ],
-                "bad": [
-                  "Big heavy steps"
-                ]
-              },
               "rx": {
                 "time": "20 seconds"
               }
@@ -211,15 +139,6 @@
           "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Keep moving until your breathing settles",
-              "Let it come down on its own"
-            ],
-            "bad": [
-              "Sitting down the second the last round ends"
-            ]
-          },
           "rx": {
             "time": "2 minutes"
           }

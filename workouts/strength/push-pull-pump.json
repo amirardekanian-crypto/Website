@@ -46,15 +46,6 @@
           "name": "Rowing",
           "exId": "rowing",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Easy pace, any machine if there is no rower",
-              "Warm and breathing, nothing more"
-            ],
-            "bad": [
-              "Hammering it"
-            ]
-          },
           "rx": {
             "time": "4 minutes"
           }
@@ -64,15 +55,6 @@
           "name": "Arm Circles",
           "exId": "arm-circles",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Start small and grow the circle as it loosens",
-              "Backward circles matter more for your sport"
-            ],
-            "bad": [
-              "Starting with the biggest circle you can make"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -83,15 +65,6 @@
           "name": "Open Book",
           "exId": "open-book",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Knees stacked, open the top arm and follow it with your eyes",
-              "Feel the turn in the ribs"
-            ],
-            "bad": [
-              "Letting the knees roll apart"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -102,15 +75,6 @@
           "name": "Prone Y-T Raise",
           "exId": "prone-y-t-raise",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Face down, lift the arms a few inches, thumbs up",
-              "Feel the muscles between the shoulder blades switch on"
-            ],
-            "bad": [
-              "Shrugging towards the ears"
-            ]
-          },
           "rx": {
             "reps": "8 Reps / shape"
           },
@@ -146,15 +110,6 @@
           "name": "Single-Arm Dumbbell Row",
           "exId": "single-arm-dumbbell-row",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Flat back, pull to the hip and pause at the top",
-              "Feel it in the mid-back, not the arm"
-            ],
-            "bad": [
-              "Twisting the torso to get the dumbbell higher"
-            ]
-          },
           "note": "Pulling leads this session on purpose.",
           "rx": {
             "sets": 4,
@@ -168,15 +123,6 @@
           "name": "Half-Kneeling Single-Arm Dumbbell Press",
           "exId": "half-kneeling-single-arm-dumbbell-press",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Press straight up beside the ear, not out in front",
-              "Squeeze the back glute and keep the ribs down"
-            ],
-            "bad": [
-              "Leaning back to press the weight up"
-            ]
-          },
           "note": "Kneeling is what stops your lower back arching to finish the rep.",
           "rx": {
             "sets": 3,
@@ -196,15 +142,6 @@
           "name": "Dumbbell Bench Press",
           "exId": "dumbbell-bench-press",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Elbows about 45 degrees from the body",
-              "Chest does the work, not the front of the shoulder"
-            ],
-            "bad": [
-              "Letting the elbows flare out wide"
-            ]
-          },
           "note": "Two sets only, and that is on purpose.",
           "rx": {
             "sets": 2,
@@ -218,15 +155,6 @@
           "name": "Bent-Over Dumbbell Reverse Fly",
           "exId": "bent-over-dumbbell-reverse-fly",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hinge over, light weight, lead with the elbows",
-              "Feel the back of the shoulder"
-            ],
-            "bad": [
-              "Going so heavy it becomes a row"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 12,
@@ -239,15 +167,6 @@
           "name": "Dumbbell Wrist Extension",
           "exId": "dumbbell-wrist-extension",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Forearm on your thigh, palm down, very light and slow",
-              "Feel the top of the forearm"
-            ],
-            "bad": [
-              "Going heavy"
-            ]
-          },
           "note": "This is the one that keeps tennis elbow away.",
           "rx": {
             "sets": 2,
@@ -267,15 +186,6 @@
           "name": "Suitcase Carry",
           "exId": "suitcase-carry",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Pick it up like a deadlift, then walk tall",
-              "Do not let yourself lean away from it"
-            ],
-            "bad": [
-              "Bending over and yanking it off the floor"
-            ]
-          },
           "rx": {
             "sets": 3,
             "distance": "20 m",

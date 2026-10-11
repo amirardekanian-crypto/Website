@@ -17,7 +17,7 @@ programming.** Read the roadmap — never rewrite it (that's /program-roadmap, l
 
 First, read the **rule index** at the top of **`.claude/COACHING-PRINCIPLES.md`** (one numbered line
 per rule, and the line is the rule), then the **Communication & in-app text** stories in full
-(COM-1 to COM-16): they are this stage's job. Open any other rule's story, by searching its ID,
+(COM-1 to COM-17) and CUE-7's: they are this stage's job. Open any other rule's story, by searching its ID,
 only when its line is not enough to write the note. Design already applied the rest: the rest of
 the file (about 80 KB) you do not need, and `COACHING-PRINCIPLES-HISTORY.md` none of it.
 
@@ -155,14 +155,27 @@ with `<strong>`. A note that reads as one dense paragraph when opened is a forma
 just a style nit — rewrite it before shipping.
 
 **Exercise-scoped Coach's Notes (from design's `note_flag`s).** For every exercise design
-flagged with a `note_flag`, write the actual athlete-facing note text — 1–3 short sentences (COM-14),
-**plain text, no HTML** (it renders as a short callout on the exercise card, not a notes
-card). This is the one place a specific starting weight may appear, when the flag calls for
-it — draw the number from the athlete's own logs, never invent one. Tie it directly to the
-flag's reason (injury, plateau, unclear log) so it reads as coaching, not filler. **If the
-same issue also has a notes card** (e.g. a standing injury protocol), the card is where the
+flagged with a `note_flag`, write the athlete-facing note to COM-14 (what a note holds, in order of
+value, and what it never holds), **plain text, no HTML** (it renders as a short callout on the
+exercise card, not a notes card). How this stage applies it:
+- **Point first.** Only about 75 characters show before More ›, so the first sentence is the thing
+  they act on. One to three short sentences.
+- **Read the entry's steps and cues first**, in one query for every flagged card
+  (`select id, name, steps, cues from public.exercises where id in (<the flagged cards' exIds>)`,
+  PRC-6), so the note never repeats them and a limit that changes a step says what changes:
+  *"Stop at the box, not the floor."* (CUE-7) The note is never general how-to: a step that is
+  missing or wrong for anyone is a `spine_cue:` for the entry, not a sentence on one card.
+- **A starting weight** comes from the athlete's own logs, framed by the RPE (PRG-2), never invented;
+  with no logs, say how to find it. **Never when to add weight** (PRG-3).
+- **A fallback** goes in only when it is the one design checked against this athlete's restrictions
+  (SEL-20); an unchecked "machine busy" swap is the About sheet's Alternatives.
+- **A reason** goes in as a few words only when the exercise has no Because; with one, the
+  reason is the Because (PART 3b), never said twice.
+- Never the grip or the side that goes first (that is the pill), a cue, the tempo, sets or reps.
+**If the same issue also has a notes card** (e.g. a standing injury protocol), the card is where the
 full protocol/stop-rule ladder lives — the exercise note gives only the point-of-action
-specifics for that exercise (starting depth, load, cue) and does not re-explain the ladder.
+specifics for that exercise (starting depth, load, a fault seen on their film) and does not
+re-explain the ladder (COM-12).
 List these separately from the cycle notes cards — tag each with the card's **`exId`** from the
 built programme (Part A stamped one on every card) and its name, so assemble places it by id: a
 name can differ between the spec and the built card, an id cannot. Skip an exercise with no flag; don't invent notes design didn't ask for.
@@ -179,7 +192,8 @@ opens the About sheet under **Why you**, and the cycle's Why page groups them by
 - **Personal or nothing.** If the sentence would be true for anyone, drop the flag. That is the
   Spine's purpose.
 - **Split it out of the Coach's Note.** When a `note_flag` and a `why_flag` sit on the same
-  exercise, the reason goes in `why` and the note keeps only the how-to. Never say it twice.
+  exercise, the reason goes in `why` and the note keeps only what this athlete does (COM-14). Never
+  say it twice.
 - `part` only with `src: body` (knee, back, shoulder, hip, elbow, ankle, wrist, groin), so the
   tag reads "Your knee". `cycle` names what moved when it did (*"your hip thrust went 60 to 75
   kg, so it stays and gets heavier"*); the numbers come from the athlete's own logs.
@@ -301,5 +315,7 @@ Hand off to **/program-assemble Part B**, which places the words, runs the full 
 - Don't write an exercise Coach's Note as HTML — it's a short plain-text callout, not a
   notes card. Don't invent one for an exercise design didn't flag, and don't have it
   re-explain a protocol its matching notes card already covers.
+- Don't put general how-to, a cue, the grip or when to add weight in a Coach's Note (COM-14):
+  the Spine's steps and cues and the card's pill already say them.
 - Don't put week 1 or the back-off week in a notes card. They are the week notes (PART 3c), which
   the app shows in that week; a card would say it twice.

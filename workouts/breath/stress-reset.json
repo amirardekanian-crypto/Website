@@ -30,15 +30,6 @@
           "name": "Cat-Cow",
           "exId": "cat-cow",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Move slowly between the two shapes, let the breath lead",
-              "Out as you round, in as you arch"
-            ],
-            "bad": [
-              "Pushing into end range — nothing here should feel like effort"
-            ]
-          },
           "rx": {
             "reps": 10
           }
@@ -48,15 +39,6 @@
           "name": "Thread the Needle",
           "exId": "thread-the-needle",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Reach one arm under the other and let the shoulder settle",
-              "Feel it across the back of the shoulder blade"
-            ],
-            "bad": [
-              "Letting the hips drift away from over the knees"
-            ]
-          },
           "rx": {
             "reps": 6,
             "side": true
@@ -67,15 +49,6 @@
           "name": "Open Book",
           "exId": "open-book",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Knees stacked, open the top arm and follow it with your eyes",
-              "Breathe out as you open"
-            ],
-            "bad": [
-              "Letting the knees come apart so the hips do the turning"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -117,15 +90,6 @@
           "exId": "childs-pose",
           "videoUrl": null,
           "note": "In 4, out 8. Box breathing steadies you; the long exhale is what drops you.",
-          "cues": {
-            "good": [
-              "Knees wide, forehead down, in for four and out for eight",
-              "Let the shoulders get heavier on every exhale"
-            ],
-            "bad": [
-              "Getting up the second the timer goes"
-            ]
-          },
           "rx": {
             "time": "2 minutes"
           }

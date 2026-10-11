@@ -1,0 +1,711 @@
+<title>Exercise Card Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: one reading column (~720px) on the app's paper, with phone-sized card mockups set beside or inside it. Bands alternate like the Farsi site. */
+:root{
+  --paper:#FAF7F2; --band:#F1ECE3; --card:#FFFFFF; --line:#E2DBCF;
+  --ink:#1A1A1A; --muted:#5C5C5C;
+  --green:#0E4A36; --green-ink:#0E4A36; --green-soft:rgba(14,74,54,.08);
+  --clay:#C7552F; --clay-ink:#B04A27; --clay-soft:rgba(199,85,47,.09);
+  --good:#2f7a17; --bad:#a32014; --badbar:#E74C3C; --goodbar:#6DBE45;
+  --steel:#3E6A92;
+  --f-display:'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --f-body:'Barlow', 'Segoe UI', system-ui, sans-serif;
+  --f-mono:'Space Mono', ui-monospace, 'SFMono-Regular', monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#161816; --band:#1d201d; --card:#232623; --line:#343834;
+  --ink:#EEEAE2; --muted:#AAA59B;
+  --green:#2E8A64; --green-ink:#6DBE95; --green-soft:rgba(109,190,149,.10);
+  --clay:#E06B43; --clay-ink:#E9825E; --clay-soft:rgba(224,107,67,.12);
+  --good:#7FCB6A; --bad:#F08A7E; --badbar:#E7685A; --goodbar:#5FAF3E; --steel:#7EA6CC;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#161816; --band:#1d201d; --card:#232623; --line:#343834;
+  --ink:#EEEAE2; --muted:#AAA59B;
+  --green:#2E8A64; --green-ink:#6DBE95; --green-soft:rgba(109,190,149,.10);
+  --clay:#E06B43; --clay-ink:#E9825E; --clay-soft:rgba(224,107,67,.12);
+  --good:#7FCB6A; --bad:#F08A7E; --badbar:#E7685A; --goodbar:#5FAF3E; --steel:#7EA6CC;
+  color-scheme:dark }
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px}
+section{padding-block:40px}
+section.band{background:var(--band)}
+h1,h2,h3{font-family:var(--f-display);font-weight:800;line-height:1.05;text-wrap:balance;margin:0}
+h1{font-size:clamp(40px,8vw,60px);letter-spacing:-.5px}
+h2{font-size:clamp(28px,5vw,36px);margin-bottom:14px}
+h3{font-size:22px;font-weight:700;margin:26px 0 8px}
+p{margin:0 0 12px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--green-ink);margin-bottom:10px}
+.lede{font-size:19px;line-height:1.5;max-width:65ch}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-mono)}
+a{color:var(--green-ink)}
+strong{font-weight:700}
+.hero{padding-block:48px 36px}
+.hero .lede{margin-top:16px}
+.layers-mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:24px}
+.lm{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:12px 14px;min-width:0}
+.lm b{display:block;font-family:var(--f-display);font-size:20px;font-weight:700}
+.lm span{font-size:14px;color:var(--muted)}
+.lm .tag{font-family:var(--f-mono);font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.lm.spine .tag{color:var(--green-ink)} .lm.card .tag{color:var(--clay-ink)}
+
+/* findings */
+.find{display:grid;grid-template-columns:96px 1fr;gap:4px 16px;padding:16px 0;border-top:1px solid var(--line)}
+.find:last-child{border-bottom:1px solid var(--line)}
+.find .num{font-family:var(--f-display);font-weight:800;font-size:38px;line-height:1;color:var(--clay-ink);font-variant-numeric:tabular-nums}
+.find .num small{display:block;font-family:var(--f-mono);font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-top:4px}
+.find h3{margin:0 0 4px;font-size:21px}
+.find p{margin:0;font-size:15px}
+@media (max-width:480px){.find{grid-template-columns:1fr}.find .num{font-size:32px}}
+
+/* tables */
+.tbl{overflow-x:auto;margin:14px 0 18px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:560px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-family:var(--f-mono);font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);background:var(--band)}
+tr:last-child td{border-bottom:0}
+td b{font-family:var(--f-display);font-size:18px;font-weight:700}
+
+/* layer blocks */
+.layer{border-left:4px solid var(--green);padding:4px 0 4px 18px;margin:28px 0}
+.layer.cardl{border-color:var(--clay)}
+.layer h3{margin-top:0}
+.layer .who{font-family:var(--f-mono);font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.rules{margin:8px 0 0;padding-left:20px}
+.rules li{margin-bottom:6px}
+.never{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:10px;font-size:15px}
+.never b{font-family:var(--f-mono);font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--bad)}
+.ev{font-size:13.5px;color:var(--muted);margin-top:8px}
+
+/* phone mockups */
+.mock-row{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start;margin:20px 0}
+.mock-col{flex:1 1 300px;min-width:0;max-width:380px}
+.mock-cap{font-family:var(--f-mono);font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.phone{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:12px;box-shadow:0 1px 0 var(--line)}
+.ex{background:var(--card);border-radius:14px;border-left:4px solid var(--green);padding:14px 14px 12px;}
+.ex-head{display:flex;gap:10px;align-items:flex-start}
+.ex-n{font-family:var(--f-display);font-weight:700;font-size:30px;line-height:1;color:var(--muted)}
+.ex-name{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1.1;flex:1;min-width:0}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--clay);vertical-align:middle;margin-left:6px}
+.info{flex:none;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);font:italic 700 14px/24px Georgia,serif;text-align:center;color:var(--muted)}
+.numline{font-family:var(--f-mono);font-size:11.5px;font-weight:700;color:var(--ink);margin-top:5px}
+.numline b{color:var(--green-ink)} .numline .hot{color:var(--clay-ink)}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pill{font-family:var(--f-mono);font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--green);color:#fff;white-space:nowrap}
+.note{margin-top:12px;background:var(--clay-soft);border-left:3px solid var(--clay);border-radius:8px;padding:9px 11px;font-size:14.5px}
+.note b{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--clay-ink);margin-right:6px}
+.lt{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:13.5px}
+.lt .mono{font-size:11px;font-weight:700;color:var(--muted);margin-right:8px}
+.how{margin-top:10px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.how-sum{display:flex;align-items:center;gap:9px;min-height:42px;padding:0 11px;font-family:var(--f-mono);font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.how-sum .play{width:22px;height:22px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:9px}
+.how-sum .chev{margin-left:auto;color:var(--muted)}
+.how-body{padding:0 12px 10px}
+.need{font-size:13.5px;color:var(--muted);margin:2px 0 8px}
+.need b{color:var(--ink);font-weight:600}
+.steps{margin:0 0 10px;padding-left:20px;font-size:14.5px;line-height:1.45}
+.steps li{margin-bottom:5px}
+.sublab{font-family:var(--f-mono);font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:10px 0 6px}
+.cue{position:relative;padding:6px 0 6px 12px;font-size:14.5px;line-height:1.4;border-left:3px solid var(--goodbar);margin-bottom:6px}
+.cue.bad{border-color:var(--badbar);color:var(--bad)}
+.cue.good{color:var(--good)}
+.vid{aspect-ratio:16/9;max-width:100%;border-radius:8px;background:repeating-linear-gradient(135deg,var(--band) 0 10px,var(--line) 10px 20px);display:grid;place-items:center;font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-bottom:10px}
+.ann{font-size:13px;color:var(--muted);margin-top:8px}
+.strike{text-decoration:line-through;color:var(--muted)}
+
+/* before/after pilot */
+.pilot{border-top:1px solid var(--line);padding:22px 0}
+.pilot h3{margin:0 0 4px}
+.pilot .meta{font-family:var(--f-mono);font-size:11px;font-weight:700;letter-spacing:.6px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:620px){.ba{grid-template-columns:1fr}}
+.ba > div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.ba .lab{font-family:var(--f-mono);font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.ba .now .lab{color:var(--muted)} .ba .new .lab{color:var(--green-ink)}
+.ba ol{margin:0 0 8px;padding-left:20px;font-size:14.5px}
+.ba .c{font-size:14px;padding:3px 0 3px 10px;border-left:3px solid var(--goodbar);margin:4px 0}
+.ba .c.b{border-color:var(--badbar)}
+.ba .p{font-size:13.5px;color:var(--muted);margin-bottom:8px}
+.caught{font-size:14px;margin-top:10px}
+.conf{font-family:var(--f-mono);font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--clay-soft);color:var(--clay-ink)}
+
+/* decisions */
+.dec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:14px 0}
+.dec .q{font-family:var(--f-display);font-size:21px;font-weight:700;line-height:1.15;margin-bottom:8px}
+.dec .id{font-family:var(--f-mono);font-size:11px;font-weight:700;color:var(--clay-ink);letter-spacing:.8px}
+.opts{margin:6px 0 8px;padding-left:0;list-style:none}
+.opts li{padding:6px 0 6px 28px;position:relative;font-size:15px}
+.opts li::before{content:attr(data-k);position:absolute;left:0;top:6px;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);font-family:var(--f-mono);font-size:11px;font-weight:700;display:grid;place-items:center;color:var(--muted)}
+.opts li.rec::before{background:var(--green);border-color:var(--green);color:#fff}
+.opts li.rec{font-weight:600}
+.dec .why{font-size:14px;color:var(--muted)}
+
+/* rule lines */
+.rule{font-family:var(--f-mono);font-size:12.5px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+.rule .rid{color:var(--clay-ink);font-weight:700}
+
+/* phases */
+.phase{display:grid;grid-template-columns:44px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.phase .pn{font-family:var(--f-display);font-weight:800;font-size:30px;color:var(--green-ink);line-height:1}
+.phase h3{margin:0 0 4px;font-size:20px}
+.phase p{margin:0;font-size:15px}
+.cite{font-size:14px;margin:0;padding-left:18px}
+.cite li{margin-bottom:6px}
+footer{padding-block:28px 48px;font-size:13px;color:var(--muted)}
+:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+</style>
+
+<div class="wrap hero">
+  <div class="eyebrow">The Spine · the exercise card · 11 Oct 2026</div>
+  <h1>Exercise Card Blueprint</h1>
+  <p class="lede">An athlete with no video gets three short cues today, and nothing else. The fix is one new thing on the Spine, <strong>How to do it</strong>: a few plain steps, written once for everyone. Then each part of the card gets one job, and nothing is said twice. Tested on 12 real exercises with a simulated beginner reading the words alone, confidence went from 2.3 to 3.6 out of 5.</p>
+  <div class="layers-mini" aria-label="The four layers">
+    <div class="lm spine"><div class="tag">Spine · new</div><b>How to do it</b><span>3–5 plain steps. Enough with no video.</span></div>
+    <div class="lm spine"><div class="tag">Spine</div><b>3 cues</b><span>Finish the steps. Never repeat them.</span></div>
+    <div class="lm card"><div class="tag">Card</div><b>The pill</b><span>One change for this athlete, from a fixed list.</span></div>
+    <div class="lm card"><div class="tag">Card</div><b>Coach's Note</b><span>Only about this athlete: weight, limits, kit.</span></div>
+  </div>
+</div>
+
+<section class="band" id="today">
+<div class="wrap">
+  <div class="eyebrow">1 · What the card shows today</div>
+  <h2>Six things the audit found</h2>
+  <p class="muted">Read from all 320 approved Spine entries, the 37 live programmes (1,393 cards) and the 42 Library sessions, plus program.html and coach.html. No data was changed.</p>
+
+  <div class="find"><div class="num">44%<small>141 OF 320</small></div><div><h3>Almost half the exercises have no video</h3><p>194 live cards sit on one, and 31 of your 36 athletes have at least one. With no video the athlete gets about 40 words: three cues inside the card, and the purpose sentence two taps away in the ⓘ. A coach's read of 15 of them, asking "could a beginner do this from the words?", found 2 doable, 9 partly, 4 not at all (Lateral Step-Down, DB Single-Leg RDL, Incline Y-T Raise, Bottoms-Up KB Press). None says where to start, and none mentions breathing.</p></div></div>
+
+  <div class="find"><div class="num">1 in 5<small>CARDS SEE THE SPINE</small></div><div><h3>Your Spine cues barely reach the phones</h3><p>1,094 cards in 29 older programmes still carry their own cues, and the app shows those first. 962 of them differ from the Spine. Glute Bridge has 45 cards and 33 different cue sets. So any Spine improvement, steps included, reaches about one card in five until this changes. Library sessions do the same: 371 of 376 cards carry their own cues.</p></div></div>
+
+  <div class="find"><div class="num">31%<small>OF COACH'S NOTES</small></div><div><h3>The missing instructions are being typed into Coach's Notes</h3><p>About a third of notes carry general how-to: <em>"Sit with your leg straight and the band around the outside of your foot…"</em> One band external rotation instruction is pasted into three circuit notes for one athlete. Notes average 194 characters (longest 774), 89 run past three sentences, and 86% are cut by the two-line "More ›".</p></div></div>
+
+  <div class="find"><div class="num">116<small>PILL LABELS · 280 USES</small></div><div><h3>The pill has no fixed words</h3><p>83 labels are used once. "Stick the landing" is spelled six ways. 44% of pills say the tempo in words ("3s eccentric" ×40), and 23 of those disagree with the card's own tempo. Only 25% of old pills follow your rule (a grip or one intention). The pills written fresh as <span class="mono">intent</span> do much better: 86%. coach.html has no box to set or fix a pill.</p></div></div>
+
+  <div class="find"><div class="num">52%<small>OF FIRST CUES</small></div><div><h3>The cue slots are doing the steps' job</h3><p>Half the first cues chain several orders with commas, and 23% carry setup ("Half-kneeling, pull the handle down to the ribs"). 98% of avoid cues start with "Don't". In the top 60, only 38% of avoid cues are the injury fault CUE-1 asks for. About 1 in 6 spend two cues on the same point (Dead Bug: "low back pinned" and "low back lifts").</p></div></div>
+
+  <div class="find"><div class="num">▶ 3<small>CUES</small></div><div><h3>The "How to do it" row says something else</h3><p>The row is labelled with counts, and it always draws the green ▶, so a no-video card reads <span class="mono">▶ 3 CUES</span>, promising a video that isn't there. The athlete never sees the words "How to do it", though the in-app guide uses them. The kit an exercise needs (<span class="mono">equipment</span>) is never shown anywhere. Warm-up cardio cards (Stationary Bike, 39 cards) never open the row by themselves.</p></div></div>
+</div>
+</section>
+
+<section id="framework">
+<div class="wrap">
+  <div class="eyebrow">2 · The proposal</div>
+  <h2>Four layers, four jobs</h2>
+  <p>Two layers live on the Spine and are the same for every athlete. Two live on the programme card and are about one athlete. Each says something the others don't. If a sentence would help anyone, it belongs on the Spine; if it's about this athlete, it belongs on the card.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Layer</th><th>Its one job</th><th>Who it's for</th><th>Where it shows</th><th>Size</th></tr></thead>
+    <tbody>
+      <tr><td><b>How to do it</b><br><span class="muted">Spine · new field</span></td><td>Someone who has never seen it can do it safely from the words alone</td><td>Everyone</td><td>Inside the card's How to do it, first when there's no video</td><td>3–5 steps, one action each</td></tr>
+      <tr><td><b>3 cues</b><br><span class="muted">Spine</span></td><td>Finish the steps: the key point, what to feel or check, the one fault</td><td>Everyone</td><td>Under the steps</td><td>About 10 words each</td></tr>
+      <tr><td><b>The pill</b><br><span class="muted">Card · intent</span></td><td>One thing this athlete changes or adds, every rep</td><td>This athlete</td><td>On the closed card</td><td>A value from the list, at most 2</td></tr>
+      <tr><td><b>Coach's Note</b><br><span class="muted">Card · note</span></td><td>What only this athlete needs: their weight, limit, kit, swap</td><td>This athlete</td><td>Clay dot closed, callout open</td><td>1–3 short sentences, point first</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted" style="font-size:14px">Unchanged: <strong>purpose</strong> stays the one "What it does" sentence in the ⓘ sheet (it stops doing instructions), and the <strong>Because</strong> stays why this athlete has it.</p>
+
+  <div class="mock-row">
+    <div class="mock-col">
+      <p class="mock-cap">Today · no-video exercise, opened</p>
+      <div class="phone"><div class="ex">
+        <div class="ex-head"><span class="ex-n">4</span><span class="ex-name">Lateral Step-Down</span><span class="info">i</span></div>
+        <div class="numline"><b>3 × 8</b> · RPE 7</div>
+        <div class="lt"><span class="mono">FIRST TIME</span>Today sets your baseline.</div>
+        <div class="how"><div class="how-sum"><span class="play">▶</span>3 cues<span class="chev">⌄</span></div>
+          <div class="how-body">
+            <div class="cue good">Tap the heel down softly, don't crash</div>
+            <div class="cue good">Control the descent with the standing leg</div>
+            <div class="cue bad">Don't let the knee shoot inward</div>
+          </div></div>
+      </div></div>
+      <p class="ann">The real entry today. Where to stand, which leg works, and how the rep ends are all missing. The ▶ promises a video that isn't there.</p>
+    </div>
+    <div class="mock-col">
+      <p class="mock-cap">Proposed · same card</p>
+      <div class="phone"><div class="ex">
+        <div class="ex-head"><span class="ex-n">4</span><span class="ex-name">Lateral Step-Down<span class="dot" title="Coach's Note"></span></span><span class="info">i</span></div>
+        <div class="numline"><b>3 × 8</b> · RPE 7</div>
+        <div class="pills"><span class="pill">left side first</span></div>
+        <div class="note"><b>Coach's note</b>Start on a 10 cm step this cycle. If the front of your knee hurts, stop the set and message me.</div>
+        <div class="lt"><span class="mono">FIRST TIME</span>Today sets your baseline.</div>
+        <div class="how"><div class="how-sum">How to do it · 5 steps · 3 cues<span class="chev">⌄</span></div>
+          <div class="how-body" id="mock-steps">
+            <p class="need"><b>You need:</b> a step or low box</p>
+            <ol class="steps">
+              <li>Put one whole foot on a solid step about stair height, near its side edge.</li>
+              <li>Stand tall on it, hands on hips, other leg straight and hanging off that side.</li>
+              <li>Bend your standing knee, hips back a little, until your other heel touches the floor.</li>
+              <li>Push up with the step leg only until it is straight. That is one rep.</li>
+              <li>Do all reps on one side, then step down and switch.</li>
+            </ol>
+            <div class="sublab">Cues</div>
+            <div class="cue good">Tap your heel down like the floor is thin glass.</div>
+            <div class="cue good">Feel the side of your standing hip holding your hips level.</div>
+            <div class="cue bad">Knee falling inward. Keep it over your second toe.</div>
+          </div></div>
+      </div></div>
+      <p class="ann">The steps and cues are the pilot's final text. The pill and the note are a made-up athlete, to show the split: the step says "about stair height" for everyone, and the note sets this athlete's 10 cm. The closed card is the same height as today.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="band" id="layers">
+<div class="wrap">
+  <div class="eyebrow">3 · How to write each layer</div>
+  <h2>The writing rules</h2>
+  <p>These are what you asked for: what's best for the cues, how to instruct so no video is enough, what a pill should add, and what a Coach's Note should hold.</p>
+
+  <div class="layer">
+    <div class="who">Spine · for everyone · new field "steps"</div>
+    <h3>How to do it</h3>
+    <p><strong>The test:</strong> someone who has never seen the exercise, with no video, can do it safely from these words alone. That's the international standard for describing an exercise (CERT item 8: "described well enough to replicate").</p>
+    <ol class="rules">
+      <li><strong>Set up:</strong> the kit, where you and the weight go, and the normal way to hold it ("a dumbbell in each hand, palms facing you"). A grip pill on the card overrides it (<a href="#q3">Q3</a>).</li>
+      <li><strong>Start position.</strong></li>
+      <li><strong>The move</strong>, ending at something you can see or feel ("until your back knee is just above the floor"), never "go deep".</li>
+      <li><strong>The way back</strong>, and where the rep ends.</li>
+      <li><strong>Optional:</strong> breathing, putting a free weight down safely, or "do all the reps on one side, then switch".</li>
+    </ol>
+    <p style="margin-top:10px">3–5 steps (2–3 for a stretch or the bike; the count follows the entry's pattern so two writers agree). One phase per step, under 90 characters, "you" voice, everyday words. Gym words get a plain version: "push your hips back" instead of "hinge", "the muscles under your armpit" instead of "lats". The entry's own name is never jargon.</p>
+    <p><strong>What the pilot added</strong>, from a test reader with no video:</p>
+    <ul class="rules">
+      <li><strong>Every direction word needs its reference.</strong> "Side-on", "square", "sit back", "caving in" and "middle toes" each caused a guess or a wrong picture. "Hips face the floor", "level with your shoulders", "second toe" didn't.</li>
+      <li><strong>Getting in and out is a step</strong> whenever it's where people get hurt: unracking and racking a bar, a bell upside down, lying face down with weights, a spin bike's flywheel, a band under tension.</li>
+      <li><strong>Safety setup goes in step 1:</strong> a non-slip floor, space to land, a band with no cuts on an anchor it can't slide off.</li>
+      <li><strong>A range landmark needs a form stop:</strong> "dumbbells at mid-shin, or higher if your back rounds". A fixed landmark alone tells a stiff beginner to round.</li>
+      <li><strong>"How long?" is answered with a landmark, never a time:</strong> "until you are steady", "until your hands are beside your ears".</li>
+      <li><strong>Balance work gets a way out:</strong> "Tap the other foot down if you lose balance."</li>
+      <li><strong>Words that tripped a second-language reader:</strong> plant, stumble, freeze, slumped, drive, shrug, trunk, balls of your feet, hip bone, tears, "straight arms" (read as locked: say "elbows almost straight"). These go on a list every draft is checked against.</li>
+    </ul>
+    <div class="never"><b>Never in steps</b> · sets, reps, time, tempo, RPE, kilos, which side this athlete starts, home furniture, why the exercise is good, what to feel (that's a cue), another exercise's name or when to move to it (that's Regressions and Progressions).</div>
+    <p class="ev">Why: a handout alone gave more than twice the errors of video or live teaching (Reo &amp; Mercer 2004), so where text is all there is, it has to be complete. Plain, explicit wording is understood far better than vague wording: 89% vs 53% in one study (Davis 2008). 65.5% of weight-room injuries seen in US emergency departments were weights dropping on the person (Kerr 2010), so free weights get a safe set-up and set-down.</p>
+  </div>
+
+  <div class="layer">
+    <div class="who">Spine · for everyone</div>
+    <h3>The 3 cues: finish the steps, never repeat them</h3>
+    <p>Your words were: cues "complete the instruction, things to avoid, or important things to think about". With the steps carrying the setup, the three slots are free to do exactly that:</p>
+    <ol class="rules">
+      <li><strong>✓ Key point:</strong> the one thing to hold in mind during the set. The effect outside the body, or an analogy, works best: your own "Throw it through the wall, not at it", "Bounce off the floor like it's hot". About 10 words, no setup, no comma chains.</li>
+      <li><strong>✓ Feel or check:</strong> for muscle, armour and mobility exercises, where you should feel it, in plain words ("Feel a stretch in the back of your standing thigh"). For jumps, sprints, throws, braking and heavy strength, a quick position check instead ("Chest and hips rise together as you stand"). The entry's first quality decides which, so two writers agree.</li>
+      <li><strong>✕ Avoid:</strong> the one fault that most risks injury or ruins the rep, named in words, with the fix in the same line: "Knee falling inward. Keep it over your second toe." One fault, never two joined by "or", no reps or seconds. A stop rule is fine: "Low back stays on the floor. If it lifts, stop the set."</li>
+    </ol>
+    <p style="margin-top:10px">The pilot taught two things here. A line that only says the fix ("Knee stays over your toes") on the red line read to the test reader as "don't do this", so the fault has to be named. And the app tells the avoid line apart by red against green only, which fails for colour-blind athletes, so again the words must carry it. That is question <a href="#q2">Q2</a>.</p>
+    <p class="ev">Why: focusing on the effect outside the body is a safe default with a small benefit (Chua 2021; the effect shrinks once you correct for publication bias, McKay 2024). A "feel the muscle" cue helps muscle work at light to moderate loads, not above about 60–80% of max (Calatayud 2016; Schoenfeld 2018), and on max-effort work it lowers force (Halperin 2016). A "don't do X" cue can pull you toward X under pressure or fatigue (Gorgulu 2019; Gray 2017), and the brain handles "not doing" by planning the alternative (Kühn &amp; Brass 2010). Hence fix-first. People hold about four things at once (Cowan 2001), so three cues plus the steps is the ceiling.</p>
+  </div>
+
+  <div class="layer cardl">
+    <div class="who">Programme card · for this athlete · field "intent"</div>
+    <h3>The pill: one change, from a fixed list</h3>
+    <p>A pill is the only words on the closed card, so it should be the one thing this athlete acts on every rep that <strong>changes or adds to</strong> the Spine's normal way. Built from the pills you actually use:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Kind</th><th>Values</th><th>Absorbs today's labels</th></tr></thead>
+      <tbody>
+        <tr><td><b>Hands</b></td><td>neutral grip · wide grip · overhand grip · underhand grip · straps</td><td>neutral grip ×16, wide grip, double overhand, straps ×3</td></tr>
+        <tr><td><b>Lead</b></td><td>left side first · right side first · alternate sides</td><td>left leads, right leg first, left side first, right hand first</td></tr>
+        <tr><td><b>Intent</b></td><td>max intent · max speed · 90% speed · drive up fast · stick the landing · fast contact</td><td>max intent ×19, the six "stick" spellings, minimal ground time, fast turnover</td></tr>
+        <tr><td><b>Hold</b></td><td>hold at the top · mid-range hold · hold at 90°</td><td>only with tempo "Hold"; the four mid-range holds</td></tr>
+      </tbody>
+    </table></div>
+    <p>At most two values, never two from the same group, kept in the one <span class="mono">intent</span> field joined by " · " as today, so no app change is needed. A new value joins the list only on your word, like a new quality. Old spellings map onto the list ("right leg first" → right side first, "fast turnover" → fast contact, "max power" → max intent). Whether braking drills and warm-up pace get their own group is <a href="#q4">Q4</a>.</p>
+    <div class="never"><b>Never a pill</b> · tempo or seconds ("3s eccentric" belongs in the tempo), a number or dose ("8 Rounds"), a muscle or category ("glute focus", "court transfer", which is on the public demo), a cue ("ribs down"), or the normal grip the steps already state.</div>
+  </div>
+
+  <div class="layer cardl">
+    <div class="who">Programme card · for this athlete · field "note"</div>
+    <h3>The Coach's Note: only what's about them</h3>
+    <p>One to three short sentences. <strong>The first sentence carries the point</strong>, because only about 75 characters show before "More ›". In order of value:</p>
+    <ol class="rules">
+      <li><strong>Their starting weight</strong>, from their own logs and framed by the RPE (PRG-2): "Last cycle 20 kg for 10 at RPE 8. Try 22.5 kg and let the first set's RPE decide." With no logs, how to find it: "Start with a bell you can keep upright every rep." Unsupervised lifters pick weights that are too light (Mazzetti 2000), so this is the most useful thing a note can say.</li>
+      <li><strong>Their limit:</strong> a range, a pain stop, a side. A limit that changes a step says so: "Stop at the box, not the floor."</li>
+      <li><strong>Their kit or place:</strong> box height, a home anchor for a band, the court version.</li>
+      <li><strong>Their checked fallback</strong> (SEL-20), when the station is busy or it hurts: the swap that has been checked against their restrictions.</li>
+      <li><strong>An ask:</strong> "Film set 2 and send it." A fault seen on their own film belongs here too.</li>
+    </ol>
+    <div class="never"><b>Never in a note</b> · when to add weight (PRG-3: they hit the RPE and log, you change the card), general how-to (it's a step), a general cue, tempo, sets or reps, the grip (it's the pill), the reason when the exercise has a Because, an unchecked "machine busy" swap (the Spine's Alternatives cover that).</div>
+  </div>
+</div>
+</section>
+
+<section id="pilot">
+<div class="wrap">
+  <div class="eyebrow">4 · The pilot</div>
+  <h2>Twelve real exercises, written and tested</h2>
+  <p>Eight with no video and four of your most-used. For each one a writer drafted the steps and cues from the Spine entry, your live cards and notes, and the course and testing apps. Then a test reader with no video read only the text: a 38-year-old in Tehran, four months in the gym, English as a second language. A senior coach checked it for accuracy and safety, and a third pass fixed what both found. Fresh readers then rated today's Spine text and the final text, each 1–5 for "I would do this right".</p>
+  <p class="muted" style="font-size:14px">The readers and the coach were AI role-plays, not people. That makes this a fast, cheap screen that finds unclear words and missing steps; it doesn't prove real athletes will do better. The real check is a few of your athletes doing the first batch with no video, before the rest is written.</p>
+  <div class="tbl"><table style="min-width:0">
+    <thead><tr><th>Same reader, no video</th><th>Today's Spine text</th><th>Final text</th></tr></thead>
+    <tbody>
+      <tr><td>Average confidence (1–5)</td><td><b>2.3</b></td><td><b>3.6</b></td></tr>
+      <tr><td>Exercises rated 4 or 5</td><td>1 of 12</td><td>7 of 12</td></tr>
+      <tr><td>Avoid line understood on the first read</td><td>8 of 12 ("Don't…")</td><td>12 of 12 fault-then-fix · 4 of 12 fix-first</td></tr>
+    </tbody>
+  </table></div>
+  <p>Text closes most of the gap, but not all of it. The two that stay lowest, the bottoms-up press and the Y-T raise, are about how to get into position (flipping the bell, lying on the bench with weights), which is where a video still wins. Those go to the top of your filming list. The avoid lines below are the fault-then-fix form (<a href="#q2">Q2</a>). None of this text is on the Spine yet.</p>
+  <div class="pilot" id="p-lsd">
+    <h3>Lateral Step-Down</h3>
+    <div class="meta">Single leg · no video · 4 live cards · confidence <span class="conf">2 → 4</span></div>
+    <div class="ba">
+      <div class="now"><div class="lab">Now</div>
+        <div class="p">Teaches the knee to stay in line while one leg lowers you slowly.</div>
+        <div class="c">Tap the heel down softly, don't crash</div><div class="c">Control the descent with the standing leg</div><div class="c b">Don't let the knee shoot inward</div></div>
+      <div class="new"><div class="lab">Proposed</div>
+        <ol><li>Put one whole foot on a solid step about stair height, near its side edge.</li><li>Stand tall on it, hands on hips, other leg straight and hanging off that side.</li><li>Bend your standing knee, hips back a little, until your other heel touches the floor.</li><li>Push up with the step leg only until it is straight. That is one rep.</li><li>Do all reps on one side, then step down and switch.</li></ol>
+        <div class="c">Tap your heel down like the floor is thin glass.</div><div class="c">Feel the side of your standing hip holding your hips level.</div><div class="c b">Knee falling inward. Keep it over your second toe.</div></div>
+    </div>
+    <p class="caught"><strong>Caught:</strong> the reader couldn't tell whether to start on the floor or the step, which edge, or what the free leg does, and the top of the rep and the way off were missing. "Side-on" and "sit back" were unclear. <strong>Your call:</strong> is "about stair height" the right default for everyone, with lower steps set in the note?</p>
+  </div>
+
+  <div class="pilot" id="p-slrdl">
+    <h3>Dumbbell Single-Leg Romanian Deadlift</h3>
+    <div class="meta">Hinge · no video · 3 live cards · confidence <span class="conf">2 → 4</span></div>
+    <div class="ba">
+      <div class="now"><div class="lab">Now</div>
+        <div class="p">A hinge on one leg: hamstring, glute and balance at the same time.</div>
+        <div class="c">Hips square, hinge over the standing leg</div><div class="c">Single hamstring and glute loading</div><div class="c b">Don't rotate the torso open</div></div>
+      <div class="new"><div class="lab">Proposed</div>
+        <ol><li>Hold a dumbbell in each hand at your thighs, palms facing you.</li><li>Stand on one leg, knee slightly bent. Tap the other foot down if you lose balance.</li><li>Push your hips back and lean forward, other leg straight behind, dumbbells hanging down.</li><li>Stop with the dumbbells at mid-shin, or higher if your back rounds, then stand tall.</li><li>Switch sides after all reps. Put both feet down before you set the weights down.</li></ol>
+        <div class="c">Push your back heel toward the wall behind you.</div><div class="c">Feel a stretch in the back of your standing thigh.</div><div class="c b">One hip turning up to the ceiling. Keep both hips facing the floor.</div>
+        <div class="p" style="margin-top:6px">Purpose: Trains the back of the thigh, the buttocks and your balance, all on one leg.</div></div>
+    </div>
+    <p class="caught"><strong>Caught:</strong> the coach found the draft's key point ("reach the dumbbells toward the floor") invites a rounded back, and "to your shins" pushes a stiff beginner to round, so the range now has a form stop. A balance way-out was added. <strong>Your call:</strong> a dumbbell in each hand, or one in the hand opposite the standing leg with the other hand on a rack, as one live card does?</p>
+  </div>
+
+  <div class="pilot" id="p-yt">
+    <h3>Incline Y-T Raise</h3>
+    <div class="meta">Isolation · no video · 3 live cards · confidence <span class="conf">2 → 3</span></div>
+    <div class="ba">
+      <div class="now"><div class="lab">Now</div>
+        <div class="p">Two raises lying face down on an incline bench: the Y for the lower traps, the T for the rear shoulder.</div>
+        <div class="c">Thumbs up on the Y, pinkies up on the T</div><div class="c">Lower traps and rear delts</div><div class="c b">Don't shrug to lift higher</div></div>
+      <div class="new"><div class="lab">Proposed</div>
+        <ol><li>Lie face down on a bench at about 45°, toes on the floor, eyes down.</li><li>Pick up a light dumbbell in each hand, arms hanging straight, thumbs pointing forward.</li><li>Raise your straight arms wide into a Y, in line with your back, then lower.</li><li>Raise them out to the sides into a T, palms down, level with your shoulders.</li><li>Lower until your arms hang. One Y plus one T is one rep.</li></ol>
+        <div class="c">Reach your fingertips away, as if someone is pulling them.</div><div class="c">Feel it between your shoulder blades and behind your shoulders.</div><div class="c b">Shoulders lifting toward your ears. Keep them down.</div>
+        <div class="p" style="margin-top:6px">Purpose: Strengthens the muscles that hold your shoulder blades back and down, and the back of the shoulder.</div></div>
+    </div>
+    <p class="caught"><strong>Caught:</strong> the first draft described an I (straight overhead), not a Y, and the reader pictured Superman. "Pinkies up on the T" is the pinch position, so the hand is now set once, thumbs forward, and nothing turns. Picking the weights up only after lying down was added. <strong>Your call:</strong> T with palms down (as written, your live card's wording) or thumbs up? Bench at 45° or 30°? One Y plus one T per rep, or all Ys then all Ts?</p>
+  </div>
+
+  <div class="pilot" id="p-kb">
+    <h3>Half-Kneeling Bottoms-Up Kettlebell Press</h3>
+    <div class="meta">Vertical push · no video · 1 live card · confidence <span class="conf">2 → 2–3</span></div>
+    <div class="ba">
+      <div class="now"><div class="lab">Now</div>
+        <div class="p">Pressing a kettlebell held upside down, so the shoulder has to stay stable the whole way.</div>
+        <div class="c">Keep the bell balanced straight above the wrist</div><div class="c">Shoulder working hard to hold it steady</div><div class="c b">Don't let the bell tip over your hand</div></div>
+      <div class="new"><div class="lab">Proposed</div>
+        <ol><li>Kneel on a pad on your pressing-side knee, front foot flat, both knees at 90°.</li><li>Grip the kettlebell handle hard with your pressing hand, other hand on the ball.</li><li>Lift it to your shoulder, ball on top, wrist straight, then take the other hand away.</li><li>Press until your arm is straight beside your ear, then lower back to your shoulder.</li><li>Do all reps, then set it down with both hands. Switch knee and arm.</li></ol>
+        <div class="c">Keep the kettlebell balanced straight above your wrist.</div><div class="c">Feel it in your grip and deep in your shoulder.</div><div class="c b">Leaning back to get it up. Stay tall.</div></div>
+    </div>
+    <p class="caught"><strong>Caught:</strong> the lowest score. Nothing said how an upside-down bell gets to the shoulder or back down, which both testers called the riskiest moment, so there's a two-hand set-up and set-down. "Upside down" became "ball on top". <strong>Your call:</strong> avoid line about leaning back or about the bell tipping? And should every card with this exercise be required to carry a find-it load line in the note ("a bell you can keep upright every rep")?</p>
+  </div>
+
+  <div class="pilot" id="p-bj">
+    <h3>Broad Jump</h3>
+    <div class="meta">Jump &amp; land · no video · 4 live cards · confidence <span class="conf">2 → 3–4</span></div>
+    <div class="ba">
+      <div class="now"><div class="lab">Now</div>
+        <div class="p">A jump for distance, landing balanced on both feet.</div>
+        <div class="c">Jump for distance and land like you meant it</div><div class="c">Feel the hips snap open</div><div class="c b">Don't land stiff-legged</div></div>
+      <div class="new"><div class="lab">Proposed</div>
+        <ol><li>Stand on a non-slip floor with about 3 m of space ahead, feet hip-width apart.</li><li>Swing your arms back as you push your hips back into a quarter squat.</li><li>Without pausing, swing your arms forward and up, and jump off both feet.</li><li>Land softly, feet flat and hip-width apart, sinking into a half squat.</li><li>Stay where you land until you are steady, then walk back to the start.</li></ol>
+        <div class="c">Pick a spot far ahead and jump out to it.</div><div class="c">If you fall forward or need an extra step, jump shorter.</div><div class="c b">Knees falling inward as you land. Keep them pointing where your toes point.</div>
+        <div class="p" style="margin-top:6px">Purpose: Builds the power to push off forward, and to land under control.</div></div>
+    </div>
+    <p class="caught"><strong>Caught:</strong> "Feel the hips snap open" turns attention inward on a max-effort jump, which lowers force, so the key point is now a far target (in trained athletes, a far target beat a near one for jump distance, Porter 2013). Floor and space were added, and the landing is now a step. Because the steps hold the landing, the pill "stick the landing" would only repeat them on this exercise. <strong>Your call:</strong> is a setup number like "about 3 m of space" fine in the steps?</p>
+  </div>
+
+  <div class="pilot" id="p-jog">
+    <h3>Jog-In Two-Step Stop</h3>
+    <div class="meta">Sprint &amp; change of direction · no video · 2 live cards · confidence <span class="conf">2 → 3</span></div>
+    <div class="ba">
+      <div class="now"><div class="lab">Now</div>
+        <div class="p">Teaches you to stop in two steps at an easy speed, so the stop is right before it gets fast.</div>
+        <div class="c">Jog in and sink your hips to stop</div><div class="c">Feel your hips and thighs take the stop</div><div class="c b">Don't let your knees cave in</div></div>
+      <div class="new"><div class="lab">Proposed</div>
+        <ol><li>Set two cones on a non-slip floor, with open space past the second one.</li><li>From the first cone, jog toward the second at an easy, steady pace.</li><li>Just before the second cone, lower your hips and brake on one foot ahead of you.</li><li>Put the other foot down beside it, feet wider than your hips, and stop.</li><li>Walk back to the start, and brake on the other foot next time.</li></ol>
+        <div class="c">Stop so quietly that nobody hears your feet.</div><div class="c">Chest over your knees, weight on your whole foot.</div><div class="c b">Knees falling inward as you stop. Keep them pointing where your toes point.</div>
+        <div class="p" style="margin-top:6px">Purpose: Teaches you to stop safely in two steps at a jog, before you do it at speed.</div></div>
+    </div>
+    <p class="caught"><strong>Caught:</strong> "plant" read as a tree, and "take one shorter step" gave a stutter and a third step, so it's now "brake on one foot ahead of you". Space past the stop was added so an overshoot doesn't meet a wall. The live pill "stop in two steps" only repeats the name. <strong>Your call:</strong> does the gap between the cones go in the steps (same for everyone) or the note?</p>
+  </div>
+
+  <div class="pilot" id="p-bike">
+    <h3>Stationary Bike</h3>
+    <div class="meta">Conditioning · no video · 39 live cards, 16 athletes · confidence <span class="conf">4 → 4</span></div>
+    <div class="ba">
+      <div class="now"><div class="lab">Now</div>
+        <div class="p">Easy spinning to warm the legs without impact.</div>
+        <div class="c">Sit tall, hips above the knees</div><div class="c">Feel the legs warm through</div><div class="c b">Don't round forward over the bars</div></div>
+      <div class="new"><div class="lab">Proposed</div>
+        <ol><li>Stand beside the bike and set the seat level with the bony front of your hip.</li><li>Sit, hold the bars lightly, and pedal with the pad behind your toes.</li><li>To finish, slow down until the pedals stop, then take your feet off.</li></ol>
+        <div class="c">Pedal in smooth, even circles, not hard pushes down.</div><div class="c">Knee a little bent when the pedal is lowest.</div><div class="c b">Hips rocking side to side. Lower the seat until they stay still.</div>
+        <div class="p" style="margin-top:6px">Purpose: Warms up the legs or builds fitness, with no impact on the joints.</div></div>
+    </div>
+    <p class="caught"><strong>Caught:</strong> "hip bone" was unclear, and a spin bike's heavy wheel keeps the pedals turning, so how to stop safely is now a step. The old avoid (rounding over the bars) isn't what hurts people; a seat set too high is, so the avoid line now gives its sign and the fix. <strong>Your call:</strong> should the entry say "upright or spin bike"? The seat rule is wrong for a recumbent bike, which would need its own entry.</p>
+  </div>
+
+  <div class="pilot" id="p-bfp">
+    <h3>Band Face Pull</h3>
+    <div class="meta">Horizontal pull · no video · 3 live cards · confidence <span class="conf">2 → 3</span></div>
+    <div class="ba">
+      <div class="now"><div class="lab">Now</div>
+        <div class="p">The face pull with a band, for the back of the shoulder when there is no cable.</div>
+        <div class="c">Pull the band to your forehead and split your hands apart</div><div class="c">Rear delts and upper back squeezing</div><div class="c b">Don't drop the elbows, keep them high</div></div>
+      <div class="new"><div class="lab">Proposed</div>
+        <ol><li>Loop a band with no cuts around a rack post, resting on a hook at face height.</li><li>Hold one side of the loop in each hand, palms facing down.</li><li>Step back until the band is tight, arms straight and pointing at the post.</li><li>Pull the band toward your forehead until your hands are beside your ears.</li><li>Straighten your arms back toward the post, keeping the band tight.</li></ol>
+        <div class="c">Pull the band apart, not just back.</div><div class="c">Feel the back of your shoulders and upper back working.</div><div class="c b">Elbows dropping below your shoulders. Keep them up.</div>
+        <div class="p" style="margin-top:6px">Purpose: Strengthens the back of the shoulder and upper back, with only a band.</div></div>
+    </div>
+    <p class="caught"><strong>Caught:</strong> the draft missed the real danger: a band that snaps or slides off its anchor flies at the face. Step 1 now asks for a band with no cuts, resting on a hook so it can't slide. A home anchor stays in the athlete's note. <strong>Your call:</strong> palms down as the default, or thumbs up to match the Cable Face Pull rope?</p>
+  </div>
+
+  <div class="pilot" id="p-bpa">
+    <h3>Band Pull-Apart</h3>
+    <div class="meta">Horizontal pull · video · 52 live cards, 33 athletes (your most-used) · confidence <span class="conf">3 → 4</span></div>
+    <div class="ba">
+      <div class="now"><div class="lab">Now</div>
+        <div class="p">Switches the upper back on before you train.</div>
+        <div class="c">Pull the band apart to the chest line</div><div class="c">Back of the shoulders and mid-back working</div><div class="c b">No shrugging, shoulders stay down</div></div>
+      <div class="new"><div class="lab">Proposed</div>
+        <ol><li>Hold a light, long band in both hands, palms facing down, hands shoulder-width apart.</li><li>Raise your arms in front to shoulder height, with the band straight, not loose.</li><li>Open your arms wide, elbows almost straight, until the band touches your upper chest.</li><li>Bring your hands slowly back to the front. That ends one rep.</li></ol>
+        <div class="c">Stretch the band toward the side walls</div><div class="c">Back of the shoulders and between the shoulder blades working</div><div class="c b">Shoulders lifting toward your ears. Keep them down.</div></div>
+    </div>
+    <p class="caught"><strong>Caught:</strong> "straight arms" read as locked elbows, and "the chest line" wasn't clear. The end landmark "the band touches your upper chest" keeps the arms at shoulder height with no extra words. "Light" is in step 1 because a stiff band makes people shrug. <strong>Your call:</strong> key point "toward the side walls", or "Arms sweep out like opening curtains"?</p>
+  </div>
+
+  <div class="pilot" id="p-squat">
+    <h3>Barbell Back Squat</h3>
+    <div class="meta">Squat · video · 11 live cards · confidence <span class="conf">2 → 3</span></div>
+    <div class="ba">
+      <div class="now"><div class="lab">Now</div>
+        <div class="p">The heaviest whole-body leg lift we use, for building maximum strength.</div>
+        <div class="c">Drive the floor away from you</div><div class="c">Feel the weight through the middle of the foot and the glutes</div><div class="c b">Don't let the knees cave in as you stand up</div></div>
+      <div class="new"><div class="lab">Proposed</div>
+        <ol><li>Set the hooks at armpit height and the safety bars a little below your lowest squat.</li><li>Rest the bar on your upper back, not your neck, hands just outside your shoulders.</li><li>Lift it off and take 3 small steps back. Feet shoulder-width, toes out a little.</li><li>Hold a big breath and sit down until your thighs are level with the floor.</li><li>Stand up, breathe out. After the last rep, walk forward until the bar touches the rack.</li></ol>
+        <div class="c">Push the floor away with your whole foot</div><div class="c">Chest and hips rise together as you stand</div><div class="c b">Knees moving in toward each other. Keep them pointing where your toes point.</div></div>
+    </div>
+    <p class="caught"><strong>Caught:</strong> read as text only, it scored 2, the same as the no-video exercises. The reader couldn't tell the rack's hooks from its safety bars, and nothing said how to walk out, breathe or re-rack. Everything fit in 5 steps except the bail: "If you get stuck, sit down and let the safety bars take the bar." <strong>Your call:</strong> allow a 6th step for rack and bench lifts so the bail fits?</p>
+  </div>
+
+  <div class="pilot" id="p-db">
+    <h3>Dead Bug</h3>
+    <div class="meta">Anti-extension · video · 23 live cards · confidence <span class="conf">2 → 4</span></div>
+    <div class="ba">
+      <div class="now"><div class="lab">Now</div>
+        <div class="p">Teaches the trunk to stay still while the arms and legs move.</div>
+        <div class="c">Reach the heel long and low</div><div class="c">Low back pinned to the floor</div><div class="c b">The set ends the moment your low back lifts off the floor, even if that's rep 4</div></div>
+      <div class="new"><div class="lab">Proposed</div>
+        <ol><li>Lie on your back with your head and low back touching the floor.</li><li>Point your arms straight up and lift your knees over your hips, bent to 90°.</li><li>Lower one arm behind your head and straighten the opposite leg, both just off the floor.</li><li>Come back to the start and switch sides. Each reach counts as one rep.</li><li>Breathe out as you reach, and breathe in as you come back.</li></ol>
+        <div class="c">Move slow and smooth, like pushing through water</div><div class="c">Lower belly working hard, below your belly button</div><div class="c b">Low back lifting off the floor. If it lifts, stop the set.</div>
+        <div class="p" style="margin-top:6px">Purpose: Teaches your stomach and low back to stay still while your arms and legs move.</div></div>
+    </div>
+    <p class="caught"><strong>Caught:</strong> when one rep ends was the reader's main guess, so step 4 says each reach is one rep, which matches the side flag on all six cards that carry it. The old cues spent two of three slots on the low back. <strong>Your call:</strong> low back "touching" (as written, fits the one note that asks for a neutral back) or "pressed flat"? The regression it links to, Dead Bug Heel Tap, has no entry; draft it?</p>
+  </div>
+
+  <div class="pilot" id="p-gb">
+    <h3>Glute Bridge</h3>
+    <div class="meta">Hinge · video · 50 live cards, 28 athletes · confidence <span class="conf">3 → 5</span></div>
+    <div class="ba">
+      <div class="now"><div class="lab">Now</div>
+        <div class="p">Wakes the glutes up before they are asked to take load.</div>
+        <div class="c">Hips fully extended, ribs tucked down</div><div class="c">Squeeze the glutes hard at the top, no low back work</div><div class="c b">Don't over-arch the lower back to fake height</div></div>
+      <div class="new"><div class="lab">Proposed</div>
+        <ol><li>Lie on your back, knees bent, feet flat and hip-width apart, arms by your sides.</li><li>Slide your heels in until your fingertips can just touch them.</li><li>Lift your hips until your shoulders, hips and knees make one straight line.</li><li>Lower your hips back down. The rep ends when they touch the floor.</li></ol>
+        <div class="c">Push the floor away through your heels</div><div class="c">Glutes squeezing hard at the top</div><div class="c b">Arching your low back to go higher. Stop at the straight line.</div></div>
+    </div>
+    <p class="caught"><strong>Caught:</strong> the coach said ship it. Only the avoid line changed: the draft's "low back stays flat at the top" was read as "on the floor", which is impossible at the top. Today this exercise has 33 different cue sets across its 45 old cards.</p>
+  </div>
+
+  <div class="dec" style="margin-top:22px">
+    <div class="q">What the pilot changed in the rule</div>
+    <ul class="rules" style="margin:0">
+      <li>Character count is the hard limit (under 90 per step). Setup steps that carry a safety detail run to about 16 words.</li>
+      <li>"One action per step" became "one phase per step": a Y-T raise lifts and lowers in one step, and a short fragment can give the end position ("Feet shoulder-width, toes out a little.").</li>
+      <li>Rack and bench lifts may need a 6th step (the squat's bail).</li>
+      <li>Write the steps first, then the cues from what's left, so a cue never repeats a step.</li>
+      <li>A cue is read on its own, so it points back to a landmark the steps gave ("Stop at the straight line"), never "flat" or "tight".</li>
+      <li>Twins aren't word swaps: Sprint to Two-Step Stop brakes earlier than the jog version and needs its own landmark.</li>
+      <li>Every line of a cue starts with a verb or "Feel".</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section class="band" id="decisions">
+<div class="wrap">
+  <div class="eyebrow">5 · Your decisions</div>
+  <h2>Thirteen questions, one line each to answer</h2>
+  <p>The filled circle is my recommendation. Answer like <span class="mono">Q1 B, Q2 A …</span>, or say "all recommended" and name the ones you'd change. Nothing goes on the Spine, the app or a programme before you answer.</p>
+
+  <div class="dec" id="q1"><div class="id">Q1 · CUES</div><div class="q">What is the second cue?</div>
+    <ul class="opts"><li data-k="A">Always where you feel it (CUE-1 as it is today).</li>
+    <li data-k="B" class="rec">A feel for muscle, armour and mobility exercises; a quick position check for power, speed, braking, rotation and heavy strength. The entry's first quality decides.</li>
+    <li data-k="C">The writer chooses each time.</li></ul>
+    <p class="why">"Feel your calves" on a sprint says little, and on max-effort work an inward focus lowers force. B lets two writers agree.</p></div>
+
+  <div class="dec" id="q2"><div class="id">Q2 · CUES</div><div class="q">How is the avoid line written?</div>
+    <ul class="opts"><li data-k="A" class="rec">The fault, then the fix: "Knee falling inward. Keep it over your second toe."</li>
+    <li data-k="B">The fix first: "Knee stays over your second toe, never falling inward." (the pilot's form)</li>
+    <li data-k="C">As today: "Don't let the knee shoot inward."</li></ul>
+    <p class="why" id="q2-why">Tested on all 12: fault-then-fix was understood on the first read 12 times out of 12. Fix-first read backwards on 8 ("avoid: knee stays over your toe"). Today's "Don't…" was clear on 8 and never says what to do instead. A also names the fault for colour-blind athletes, who can't tell the red line from the green ones, and ends on the right picture. The rewrite rides along with each entry's steps, not as a separate pass.</p></div>
+
+  <div class="dec" id="q3"><div class="id">Q3 · PILL</div><div class="q">May the steps name the normal grip?</div>
+    <ul class="opts"><li data-k="A" class="rec">Yes, in plain words ("palms facing you"). A grip pill on the card overrides it. NAM-5 is reworded to say so.</li>
+    <li data-k="B">No. Steps say "hold the handles", and a grip exists only as the pill.</li>
+    <li data-k="C">Only for lifts with one standard grip (bench press), never for pulldowns, rows and curls.</li></ul>
+    <p class="why">With no grip in the steps, an athlete with no video and no pill doesn't know how to hold the weight. Your 25 Sept rule was that the athlete's grip chip never goes on the library entry; A keeps that, because a grip choice for one athlete is still only the pill.</p></div>
+
+  <div class="dec" id="q4"><div class="id">Q4 · PILL</div><div class="q">How wide is the pill list?</div>
+    <ul class="opts"><li data-k="A" class="rec">The four groups above, plus Brakes (stop in two steps, stick the outside leg) and Pace (easy pace, only on a warm-up item with no RPE).</li>
+    <li data-k="B">The four groups only. Braking and pace go in the note.</li>
+    <li data-k="C">No list. Keep CHP-2's test and a checker.</li></ul>
+    <p class="why">Seven live cards already use braking and pace words every rep. Leaving them out of the list pushes them into longer notes.</p></div>
+
+  <div class="dec" id="q5"><div class="id">Q5 · NOTE</div><div class="q">May a note say when to add weight?</div>
+    <ul class="opts"><li data-k="A" class="rec">No. PRG-3 stands: the athlete hits the RPE and logs, and you change the card.</li>
+    <li data-k="B">Only a gated step: "after I've seen your video, add a plate".</li>
+    <li data-k="C">Yes, freely.</li></ul>
+    <p class="why">13 live notes already say it, which breaks your own PRG-3. The framework shouldn't make that permanent.</p></div>
+
+  <div class="dec" id="q6"><div class="id">Q6 · NOTE</div><div class="q">Do "machine busy" swaps stay in the note?</div>
+    <ul class="opts"><li data-k="A" class="rec">Only this athlete's checked fallback (SEL-20): on primary lifts, or where a Spine alternative breaks their restrictions.</li>
+    <li data-k="B">Never. Athletes use the About sheet's Alternatives.</li>
+    <li data-k="C">A new field just for the fallback.</li></ul>
+    <p class="why">Your pain rule sends the athlete to "the card's fallback", and the Spine's Alternatives aren't checked against one athlete's bans.</p></div>
+
+  <div class="dec" id="q7"><div class="id">Q7 · NOTE</div><div class="q">May a note give a reason?</div>
+    <ul class="opts"><li data-k="A">Never; the reason is only the Because.</li>
+    <li data-k="B" class="rec">A few words ("for your wrists"), only when the exercise has no Because.</li>
+    <li data-k="C">Freely.</li></ul>
+    <p class="why">With 5–10 Becauses a cycle, most limits would arrive with no reason, and a limit with no reason is the one athletes ignore.</p></div>
+
+  <div class="dec" id="q8"><div class="id">Q8 · STEPS</div><div class="q">Rack and bench lifts: a 6th step?</div>
+    <ul class="opts"><li data-k="A" class="rec">Yes, up to 6 for a lift that comes off a rack or is kicked into place, so the bail fits ("If you get stuck, sit down and let the safety bars take the bar").</li>
+    <li data-k="B">No, but every rack lift carries one fixed safety line.</li>
+    <li data-k="C">5 is the limit.</li></ul>
+    <p class="why">Setup, walk-out, the move, the way back, the re-rack and the bail are six jobs. For someone training alone, the bail is the most important missing line.</p></div>
+
+  <div class="dec" id="q9"><div class="id">Q9 · CONSISTENCY</div><div class="q">The 1,094 old cards that carry their own cues</div>
+    <ul class="opts"><li data-k="A" class="rec">When steps go live, the app shows the Spine's cues on every card. First, the 32 old cards whose cues are about one athlete (a side, home kit, a pain stop) get that line moved into the athlete's note.</li>
+    <li data-k="B">Each athlete changes over at their next cycle.</li></ul>
+    <p class="why">Otherwise the new steps sit next to 962 cue sets that differ from the Spine, and an improvement reaches one card in five. The old cue text stays in the programmes, so it's a small app change and fully undoable. The 42 Library sessions drop their own cues the same day.</p></div>
+
+  <div class="dec" id="q10"><div class="id">Q10 · APP</div><div class="q">Where do the steps show?</div>
+    <ul class="opts"><li data-k="A" class="rec">Inside How to do it, on every exercise: "You need:" from the entry's kit, then the steps, then the cues (video first when there is one). The row is labelled "How to do it", the ▶ shows only with a video, and it opens by itself the first time, warm-up cardio included. Also in the About sheet.</li>
+    <li data-k="B">Only on exercises with no video.</li>
+    <li data-k="C">Only in the About sheet.</li></ul>
+    <p class="why">A keeps the closed card exactly as it is and still helps when a video won't play in Iran. B hides the steps exactly when the embed fails, and C needs a second tap mid-set.</p></div>
+
+  <div class="dec" id="q11"><div class="id">Q11 · ROLLOUT</div><div class="q">How do 320 entries get their steps approved?</div>
+    <ul class="opts"><li data-k="A" class="rec">You read the 12 pilot entries plus the next 20 most-used no-video ones; that sets the voice. Then batches of about 40, no-video first, waiting in coach.html's Steps box. Your Save is the approval.</li>
+    <li data-k="B">You approve a style sample, then "approve all" for the rest.</li>
+    <li data-k="C">Only through Upkeep, as programmes touch each entry.</li></ul>
+    <p class="why">71 entries with no video sit on 193 live cards today. C would take months, and B puts unread text on phones.</p></div>
+
+  <div class="dec" id="q12"><div class="id">Q12 · RULES</div><div class="q">New rules during the rule freeze (PRC-25)?</div>
+    <ul class="opts"><li data-k="A" class="rec">Yes, as an exception, with what broke written in the history (141 entries with no video, three short cues all an athlete got), as SES-17 was.</li>
+    <li data-k="B">No new IDs; fold it into CUE-1's story.</li>
+    <li data-k="C">Wait until eight cycles have run.</li></ul></div>
+
+  <div class="dec" id="q13"><div class="id">Q13 · COURSE</div><div class="q">Do the Farsi course's exercises get steps too?</div>
+    <ul class="opts"><li data-k="A">Yes, now, each one read by you.</li>
+    <li data-k="B">No, Spine only.</li>
+    <li data-k="C" class="rec">Decide after the Spine's first batch.</li></ul>
+    <p class="why">The course tells buyers «نکته‌های نوشته برای اجرا کافی‌اند» (the written tips are enough to do it), and 65 of its 114 exercises have no video. 66 of them are the same exercise as a Spine entry, so the Farsi steps can follow the English ones once the format is proven.</p></div>
+</div>
+</section>
+
+<section id="rules">
+<div class="wrap">
+  <div class="eyebrow">6 · The rule for every later programme</div>
+  <h2>What goes into the rule index</h2>
+  <p>Drafted to the recommended answers, in the index's own format (25 words at most; <span class="mono">check_rule_index.py</span> enforces it). Each new or changed line also gets its story bullet and a history entry with your words. The Check column stays blank until <span class="mono">check_program.py</span> actually warns on it, because the pre-commit fails a claim the checker doesn't make.</p>
+
+  <h3>New</h3>
+  <div class="rule"><span class="rid">CUE-6</span> | Every Spine entry has steps for anyone: 3–5 one-phase lines (2–3 stretches and conditioning, 6 rack lifts), setup to safe finish, never dose or side. | spine | warn, later ✓</div>
+  <div class="rule"><span class="rid">CUE-7</span> | Say each thing once: steps the how, cues the focus and the avoid, pill the change, note this athlete. A card overrides its entry's default. | spine · engage · assemble · workout | warn</div>
+
+  <h3>Reworded</h3>
+  <div class="rule"><span class="rid">CUE-1</span> | Exactly 3 cues per Spine entry, for anyone: key point, a feel or position check, one avoid naming the fault. No side, kit, tempo or dose. | spine |</div>
+  <div class="rule"><span class="rid">CHP-2</span> | The `intent` pill comes from the closed list (hands, lead side, intent, hold): at most one hand-or-side plus one intent-or-hold, never pairing, dose or muscle. | assemble | part</div>
+  <div class="rule"><span class="rid">NAM-5</span> | A grip is the card's `intent` pill, never free text; the entry's steps may name the default grip in plain words, never as a pill. | assemble · spine | ✓ (grip as text)</div>
+  <div class="rule"><span class="rid">COM-14</span> | A Coach's Note is one to three sentences about this athlete, point first: start weight, limit, kit, checked fallback. Never general how-to, cue or dose. | engage · edit | warn (over 3 sentences)</div>
+  <div class="rule"><span class="rid">SEL-11</span> | Audit every range or height restriction against every exercise, its steps and cues, and every warm-up and prep item; if nothing fits, the pattern leaves. | design | part</div>
+  <div class="rule"><span class="rid">NAM-7</span> | A hold on a dynamic exercise keeps the canonical name; `rx.tempo: "iso"` and the time carry it, and a hold pill says where. | assemble |</div>
+
+  <h3>Stories that change with them</h3>
+  <ul class="rules">
+    <li><strong>NAM-9:</strong> "Compensate for the missing video with a clear Coach's Note" becomes "A missing video is covered by the entry's steps (CUE-6)". This line is the root cause of the general how-to in notes.</li>
+    <li><strong>COM-12</strong> and /program-engage: the note gives "starting depth, load, a fault seen on their film", no longer "cue".</li>
+    <li><strong>CUE-2 and CHP-1:</strong> which side goes first is the Lead pill; a hand position the pill list can't say stays in the note.</li>
+    <li><strong>PRC-23:</strong> the pill rule is written out in four skills and SCHEMA.md today. They cite CHP-2 and the list lives once, in SCHEMA.md.</li>
+  </ul>
+
+  <h3>Where each part of the pipeline applies it</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Stage</th><th>What it does with the four layers</th></tr></thead>
+    <tbody>
+      <tr><td><b>/spine</b></td><td>Writes steps, cues and purpose for a new entry (CUE-1, 6, 7), checked by <span class="mono">draft_sql.py</span>: step count and length, no digits before s/sec/reps/kg, no em-dash, the word list, a step never repeating a cue. Upkeep on an approved entry with no steps <strong>proposes</strong> them and never fills them.</td></tr>
+      <tr><td><b>/program-design</b></td><td>Chooses the pill from the list and flags which exercises need a note and why (<span class="mono">note_flag</span>), as now.</td></tr>
+      <tr><td><b>/program-engage</b></td><td>Writes each note to COM-14: point first, about this athlete, never how-to. Reads the entry's steps so a note that changes one says so ("Stop at the box, not the floor").</td></tr>
+      <tr><td><b>/program-assemble</b></td><td><span class="mono">check_program.py</span> warns on a pill off the list, a note over three sentences or repeating a step or cue, and an entry on a card with no steps. The warn becomes a fail once the no-video entries are done.</td></tr>
+      <tr><td><b>/workout</b></td><td>Library sessions carry no cues of their own. A Library note is one sentence for anyone, only what the session changes.</td></tr>
+      <tr><td><b>/program-edit</b></td><td>Same checks on the exercises an edit touches. Old notes are left alone unless you name one (PRC-2).</td></tr>
+    </tbody>
+  </table></div>
+</div>
+</section>
+
+<section class="band" id="rollout">
+<div class="wrap">
+  <div class="eyebrow">7 · Rollout</div>
+  <h2>Five steps, each one shipped and checked</h2>
+  <div class="phase"><div class="pn">1</div><div><h3>Rules and skills</h3><p>The index lines, stories and history; /spine, /program-design, /program-engage, /program-assemble, /program-edit and /workout updated; the checker's warnings. No phone changes. From here, every new programme follows the four layers.</p></div></div>
+  <div class="phase"><div class="pn">2</div><div><h3>The server and coach.html</h3><p>A <span class="mono">steps</span> column on the Spine, sent to phones by <span class="mono">get_exercises()</span> and saved by <span class="mono">coach_save_spine()</span>, tested on a throwaway database first. Every change is kept in <span class="mono">spine_versions</span> and backed up automatically. In coach.html: a "How to do it" box on each entry, showing Claude's draft until you save, and a pill box in the ✎ editor, which has none today.</p></div></div>
+  <div class="phase"><div class="pn">3</div><div><h3>The writing</h3><p>The 12 pilot entries and the next 20 most-used no-video entries for you to read first. Then batches of about 40: the 71 no-video entries on live cards, then the rest by use. Each entry's cues and purpose are cleaned in the same pass, so you review each entry once. Before the rest is written, a few of your athletes do the first batch with no video, and what they get wrong feeds the rule.</p></div></div>
+  <div class="phase"><div class="pn">4</div><div><h3>The app</h3><p>How to do it shows "You need", the steps and the cues; the ▶ only with a video; the Spine's cues win over old card cues; the About sheet shows the steps. The in-app guide and the promises in HOW-IT-WORKS and on the site ("Video + cues for every move") are updated in the same change, as CNT-01 requires. Checked on a real phone width before it goes live.</p></div></div>
+  <div class="phase"><div class="pn">5</div><div><h3>Cleanup</h3><p>Old pills mapped onto the list as each card is next saved (tempo words move into the tempo, "3s eccentric" ×40 included); the 32 athlete-specific old cues moved into notes; Library sessions' own cues dropped. Notes aren't backfilled: each athlete's next cycle uses the new layout. The course's Farsi steps, if Q13 says so.</p></div></div>
+</div>
+</section>
+
+<section id="evidence">
+<div class="wrap">
+  <div class="eyebrow">8 · The evidence</div>
+  <h2>What the research supports, and how strongly</h2>
+  <p>Every source was found and checked in PubMed. Where the evidence is thin, it says so.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Finding</th><th>Strength</th><th>What it changes</th></tr></thead>
+    <tbody>
+      <tr><td>A handout alone gave more than twice the errors of video or live teaching</td><td>Moderate (one RCT)</td><td>Where text is all there is, the steps must be complete</td></tr>
+      <tr><td>Focusing on the effect outside the body helps a little; the gain shrinks after correcting for publication bias</td><td>Moderate, contested</td><td>Key point is external by default, an analogy where you have one</td></tr>
+      <tr><td>"Feel the muscle" raises its use at light to moderate loads, not heavy; amateurs feel it poorly</td><td>Low to moderate</td><td>A feel for muscle work, a position check for power and heavy work (Q1)</td></tr>
+      <tr><td>"Don't do X" can pull you toward X under pressure or fatigue</td><td>Moderate</td><td>The avoid line names the fix as well as the fault (Q2)</td></tr>
+      <tr><td>People hold about four things at once; one picture beats a list of rules under load</td><td>Strong (lab), small applied trials</td><td>3–5 steps, three cues, one pill</td></tr>
+      <tr><td>Plain, explicit instructions are understood far better (89% vs 53%)</td><td>Moderate</td><td>Landmarks instead of adjectives, no gym jargon</td></tr>
+      <tr><td>Most weight-room injuries are weights dropping on the person</td><td>Epidemiological</td><td>Safe pick-up and set-down are steps</td></tr>
+      <tr><td>Unsupervised lifters pick loads that are too light</td><td>Moderate</td><td>The starting weight is the most useful thing a note says</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted" style="font-size:14px">Sources retrieved from PubMed.</p>
+  <ol class="cite">
+    <li>Reo &amp; Mercer 2004, Phys Ther: live, video or written teaching of a home exercise programme. PMID 15225081.</li>
+    <li>Chua et al. 2021, Psychol Bull, PMID 34843301, <a href="https://doi.org/10.1037/bul0000335">DOI</a>. McKay et al. 2024, Psychol Bull, PMID 39480294, <a href="https://doi.org/10.1037/bul0000451">DOI</a>.</li>
+    <li>Schoenfeld et al. 2018, Eur J Sport Sci, PMID 29533715, <a href="https://doi.org/10.1080/17461391.2018.1447020">DOI</a>. Calatayud et al. 2016, Eur J Appl Physiol, PMID 26700744, <a href="https://doi.org/10.1007/s00421-015-3305-7">DOI</a>. Halperin et al. 2016, J Strength Cond Res, PMID 27003451, <a href="https://doi.org/10.1519/JSC.0000000000001194">DOI</a>.</li>
+    <li>Gorgulu, Cooke &amp; Woodman 2019, J Sport Exerc Psychol, PMID 31027456, <a href="https://doi.org/10.1123/jsep.2018-0268">DOI</a>. Gray, Orn &amp; Woodman 2017, J Sport Exerc Psychol, PMID 27834550, <a href="https://doi.org/10.1123/jsep.2016-0035">DOI</a>. Kühn &amp; Brass 2010, Cognition, PMID 20594549, <a href="https://doi.org/10.1016/j.cognition.2010.06.006">DOI</a>.</li>
+    <li>Cowan 2001, Behav Brain Sci, PMID 11515286, <a href="https://doi.org/10.1017/s0140525x01003922">DOI</a>. Carnero-Diaz et al. 2024, analogy vs explicit instruction meta-analysis, PMID 39419241, <a href="https://doi.org/10.1016/j.psychsport.2024.102766">DOI</a>.</li>
+    <li>Davis et al. 2008, J Gen Intern Med, PMID 18979142, <a href="https://doi.org/10.1007/s11606-008-0833-4">DOI</a>. Shoemaker, Wolf &amp; Brach 2014 (PEMAT), PMID 24973195, <a href="https://doi.org/10.1016/j.pec.2014.05.027">DOI</a>.</li>
+    <li>Slade et al. 2016, CERT: Phys Ther, PMID 27149962, <a href="https://doi.org/10.2522/ptj.20150668">DOI</a>; Br J Sports Med, PMID 27707738, <a href="https://doi.org/10.1136/bjsports-2016-096651">DOI</a>.</li>
+    <li>Kerr, Collins &amp; Comstock 2010, Am J Sports Med, PMID 20139328, <a href="https://doi.org/10.1177/0363546509351560">DOI</a>. Mazzetti et al. 2000, Med Sci Sports Exerc, PMID 10862549, <a href="https://doi.org/10.1097/00005768-200006000-00023">DOI</a>.</li>
+    <li>Porter et al. 2013, J Strength Cond Res: in 38 trained college athletes, a far external target gave longer standing long jumps than a near one, an internal focus or no instruction. PMID 23222082, <a href="https://doi.org/10.1519/JSC.0b013e31827e1521">DOI</a>.</li>
+  </ol>
+</div>
+</section>
+
+<footer class="wrap">Built from seven read-only audits of the Spine, the 37 live programmes, the Library, the course and testing apps, the rules and the research, plus a 12-exercise pilot with simulated readers. Nothing in the app, the database or the repo has been changed.</footer>

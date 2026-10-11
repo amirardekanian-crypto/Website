@@ -38,15 +38,6 @@
           "name": "March in Place",
           "exId": "march-in-place",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Knee up, opposite arm back",
-              "Build the pace"
-            ],
-            "bad": [
-              "Shuffling on the spot without driving the knee"
-            ]
-          },
           "rx": {
             "time": "2 minutes"
           }
@@ -56,15 +47,6 @@
           "name": "Glute Bridge",
           "exId": "glute-bridge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Push through the heels until the hips are level",
-              "Feel the glutes, not the lower back"
-            ],
-            "bad": [
-              "Arching the back to get higher"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 12
@@ -75,15 +57,6 @@
           "name": "Squat",
           "exId": "bodyweight-squat",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Slow down, sit between the hips, chest tall",
-              "Use these to find today's depth"
-            ],
-            "bad": [
-              "Rushing them like a warm-up you want to be over"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 10
@@ -94,15 +67,6 @@
           "name": "Arm Circles",
           "exId": "arm-circles",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Start small and grow the circle",
-              "Loosen the shoulder before you press it"
-            ],
-            "bad": [
-              "Starting with the biggest circle you can make"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -113,15 +77,6 @@
           "name": "Inchworm",
           "exId": "inchworm",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Walk the hands out to a plank and hold a second",
-              "Ribs down when you are long"
-            ],
-            "bad": [
-              "Letting the hips sag at the top of the walk-out"
-            ]
-          },
           "rx": {
             "reps": 5
           }
@@ -137,15 +92,6 @@
           "name": "Split Squat",
           "exId": "split-squat",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Long stance, drop straight down, push through the front heel",
-              "Torso tall the whole way"
-            ],
-            "bad": [
-              "A short stance that turns it into a knee-only movement"
-            ]
-          },
           "note": "Three seconds on the way down if you want it harder.",
           "rx": {
             "sets": 3,
@@ -159,15 +105,6 @@
           "name": "Single-Leg Glute Bridge",
           "exId": "single-leg-glute-bridge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "One foot planted, drive the hips up level",
-              "Feel the glute, not the hamstring"
-            ],
-            "bad": [
-              "Letting the hips twist towards the working side"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 10,
@@ -187,15 +124,6 @@
           "name": "Push-Up",
           "exId": "push-up",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "One straight line from ear to heel",
-              "Elbows about 45 degrees, not flared wide"
-            ],
-            "bad": [
-              "Hips sagging or riding up"
-            ]
-          },
           "note": "Hands on a step or a wall if you cannot hold the line for all eight.",
           "rx": {
             "sets": 3,
@@ -207,15 +135,6 @@
           "name": "Prone Y-T Raise",
           "exId": "prone-y-t-raise",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Face down, lift the arms a few inches, thumbs up",
-              "Feel between the shoulder blades"
-            ],
-            "bad": [
-              "Shrugging the shoulders towards the ears"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": "8 each shape"
@@ -232,15 +151,6 @@
           "name": "Dead Bug",
           "exId": "dead-bug",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Opposite arm and leg, slow, breathe out as you reach",
-              "Lower back stays glued to the floor"
-            ],
-            "bad": [
-              "The lower back lifting away from the floor"
-            ]
-          },
           "note": "Shorten the reach rather than let the back lift.",
           "rx": {
             "sets": 3,

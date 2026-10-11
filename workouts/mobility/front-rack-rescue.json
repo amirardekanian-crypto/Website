@@ -26,15 +26,6 @@
           "name": "Lat Roll",
           "exId": "lat-roll",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Roll slowly from the armpit down the side of the back, pausing on any tender spots",
-              "Breathe out into each tight area and let it release"
-            ],
-            "bad": [
-              "Rushing through — this is meant to soften the tissue, not bruise it"
-            ]
-          },
           "rx": {
             "time": "60s",
             "side": true
@@ -45,15 +36,6 @@
           "name": "Foam Roller Thoracic Extension",
           "exId": "foam-roller-thoracic-extension",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Roller under the upper back — extend back over it one segment at a time",
-              "Support the head and keep the ribs from flaring"
-            ],
-            "bad": [
-              "Cranking from the lower back instead of the mid-back"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 10
@@ -70,15 +52,6 @@
           "name": "Wrist Rocks",
           "exId": "wrist-rocks",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hands flat, rock gently forward and back to open the wrists",
-              "Stay in a pain-free range — this preps the bottom-rack wrist angle"
-            ],
-            "bad": [
-              "Forcing the stretch or loading it hard"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 10
@@ -89,15 +62,6 @@
           "name": "Quadruped Thoracic Rotation",
           "exId": "quadruped-thoracic-rotation",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hand behind the head — rotate the elbow up toward the ceiling and follow it with the eyes",
-              "Rotate from the mid-back and keep the hips square"
-            ],
-            "bad": [
-              "Twisting from the lower back or letting the hips rock"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -108,15 +72,6 @@
           "name": "Banded Lat Stretch",
           "exId": "banded-lat-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Anchor the band high, hinge back and sink the chest to lengthen the lat",
-              "Relax into it and let the shoulder open"
-            ],
-            "bad": [
-              "Shrugging the shoulder up toward the ear"
-            ]
-          },
           "rx": {
             "time": "40s",
             "side": true
@@ -127,15 +82,6 @@
           "name": "Overhead Triceps Stretch",
           "exId": "overhead-triceps-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Reach the hand down the spine and gently guide the elbow back and overhead",
-              "Keep the ribs down so the stretch stays in the triceps and lat"
-            ],
-            "bad": [
-              "Arching the lower back to fake more range"
-            ]
-          },
           "rx": {
             "time": "40s",
             "side": true
@@ -146,15 +92,6 @@
           "name": "Kneeling Thoracic Extension",
           "exId": "kneeling-thoracic-extension",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Elbows on the bench holding a dowel — sink the chest to open T-spine, lats and triceps at once",
-              "Ease a little deeper on each exhale"
-            ],
-            "bad": [
-              "Bouncing — hold a steady, settled stretch"
-            ]
-          },
           "rx": {
             "sets": 2,
             "time": "30s"
@@ -171,15 +108,6 @@
           "name": "Front-Rack Elbow Punches",
           "exId": "front-rack-elbow-punches",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Empty bar in the front rack — actively drive the elbows up to their new ceiling",
-              "Move slow and own the top position on every rep"
-            ],
-            "bad": [
-              "Rushing — the point is to teach the nervous system to hold the range the stretching just opened"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 10
@@ -190,15 +118,6 @@
           "name": "Front Rack Hold",
           "exId": "front-rack-hold",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hold the front rack on fingertips or three fingers, elbows as high as they'll stay controlled",
-              "Film it once a week — elbow height and seconds held are the two numbers to track"
-            ],
-            "bad": [
-              "Letting the elbows drop or the chest collapse just to hold longer"
-            ]
-          },
           "rx": {
             "sets": 2
           },

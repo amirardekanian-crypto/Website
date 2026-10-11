@@ -118,15 +118,30 @@ function buildSeed(opt) {
     library_sessions: [],
     exercises: [
       { id: 'goblet-squat', name: 'Goblet Squat', aliases: [], pattern: 'squat', qualities: ['strength'], purpose: 'Fixture purpose.', tennis: null, cues: { good: ['Fixture cue'], bad: [] },
-        equipment: ['dumbbell'], loads: ['knee'], easier: [], harder: ['machine-leg-press'], alts: [], video: 'https://www.youtube.com/watch?v=FIXTURE0001', status: 'approved', updated_at: iso(today, 10), updated_by: 'coach', impact: 'none', muscles: null },
+        equipment: ['dumbbell'], loads: ['knee'], easier: [], harder: ['machine-leg-press'], alts: [], video: 'https://www.youtube.com/watch?v=FIXTURE0001', status: 'approved', updated_at: iso(today, 10), updated_by: 'coach', impact: 'none', muscles: null,
+        steps: ['Fixture step one: hold the weight at your chest.', 'Fixture step two: sit down between your heels.', 'Fixture step three: stand back up.'] },
       { id: 'machine-leg-press', name: 'Machine Leg Press', aliases: [], pattern: 'squat', qualities: [], purpose: 'Fixture draft purpose.', tennis: null, cues: null,
-        equipment: ['machine'], loads: ['knee'], easier: ['goblet-squat'], harder: [], alts: [], video: null, status: 'draft', updated_at: iso(today, 2), updated_by: 'claude', impact: null, muscles: null },
+        equipment: ['machine'], loads: ['knee'], easier: ['goblet-squat'], harder: [], alts: [], video: null, status: 'draft', updated_at: iso(today, 2), updated_by: 'claude', impact: null, muscles: null, steps: [] },
       { id: 'dead-bug', name: 'Dead Bug', aliases: [], pattern: 'anti-extension', qualities: ['armour'], purpose: 'Fixture.', tennis: null, cues: null,
-        equipment: [], loads: ['trunk'], easier: [], harder: [], alts: [], video: null, status: 'draft', updated_at: iso(today, 2), updated_by: 'claude', impact: 'none', muscles: null },
+        equipment: [], loads: ['trunk'], easier: [], harder: [], alts: [], video: null, status: 'draft', updated_at: iso(today, 2), updated_by: 'claude', impact: 'none', muscles: null, steps: [] },
+      // stage52: an approved entry with no steps yet, and Claude's drafts for it waiting in its coach-only half (below).
+      { id: 'band-pull-apart', name: 'Band Pull-Apart', aliases: [], pattern: 'pull-horizontal', qualities: ['armour'], purpose: 'Fixture live purpose.', tennis: null,
+        cues: { good: ['Fixture live key', 'Fixture live feel'], bad: ['Fixture live avoid'] },
+        equipment: ['band'], loads: ['shoulder'], easier: [], harder: [], alts: [], video: null, status: 'approved', updated_at: iso(today, 5), updated_by: 'coach', impact: 'none', muscles: null, steps: [] },
     ],
     exercise_coach: [
       { id: 'goblet-squat', sfr: 2, flags: [], notes: null, suggested_qualities: null, links_before: null, links_history: null, credits: { quads: 1, glutes: 0.5 }, cost: 'moderate', suggested_changes: null },
       { id: 'machine-leg-press', sfr: 1, flags: ['loaded-knee-flexion'], notes: 'fixture coach note', suggested_qualities: ['strength', 'muscle'], links_before: { keep: 'me' }, links_history: [{ fixture: true }], credits: null, cost: null, suggested_changes: { fixture: 'keep me' } },
+      // Claude's drafts (stage43 items): steps and cues are fresh (their `old` is the entry as it is), the purpose draft is
+      // stale (written against an older purpose), and the tennis item is a different kind of proposal the editor never touches.
+      { id: 'band-pull-apart', sfr: 3, flags: [], notes: null, suggested_qualities: [], links_before: null, links_history: [], credits: { back: 1, shoulder: 0.5 }, cost: 'isolation',
+        suggested_changes: [
+          { field: 'steps', old: [], new: ['Fixture draft step one.', 'Fixture draft step two.', 'Fixture draft step three.', 'Fixture draft step four.'], why: 'How to do it (CUE-6)', from: 'spine fixture', at: iso(today, 1, '08') },
+          { field: 'cues', old: { good: ['Fixture live key', 'Fixture live feel'], bad: ['Fixture live avoid'] },
+            new: { good: ['Fixture draft key', 'Fixture draft feel'], bad: ['Fixture draft fault. Fixture draft fix.'] }, why: 'CUE-1 roles', from: 'spine fixture', at: iso(today, 1, '09') },
+          { field: 'purpose', old: 'An older fixture purpose.', new: 'Fixture stale purpose draft.', why: 'plain words', from: 'spine fixture', at: iso(today, 3, '08') },
+          { field: 'tennis', old: null, new: 'Fixture court line.', why: 'a court moment', from: 'spine fixture', at: iso(today, 1, '10') },
+        ] },
     ],
     qualities: ['strength', 'muscle', 'power', 'spring', 'speed', 'brakes', 'rotation', 'engine', 'armour', 'movement'].map((id, i) =>
       ({ id, name: id[0].toUpperCase() + id.slice(1), family: null, line: 'Fixture line.', tennis: null, tests: [], sort: i + 1, status: i < 3 ? 'approved' : 'draft', updated_at: iso(today, 30), updated_by: 'coach' })),

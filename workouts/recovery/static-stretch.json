@@ -34,15 +34,6 @@
           "name": "Supine Hamstring Stretch",
           "exId": "supine-hamstring-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "One leg up, hands behind the thigh, other leg flat on the floor",
-              "Soft bend in the raised knee — straighter is not better"
-            ],
-            "bad": [
-              "Yanking the leg towards you"
-            ]
-          },
           "rx": {
             "time": "45 sec",
             "side": true
@@ -53,15 +44,6 @@
           "name": "Supine Figure-4 Stretch",
           "exId": "supine-figure-4-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Ankle across the opposite knee, pull the bottom thigh in",
-              "Feel it deep in the glute of the crossed leg"
-            ],
-            "bad": [
-              "Pulling so hard the hips lift off the floor"
-            ]
-          },
           "rx": {
             "time": "45 sec",
             "side": true
@@ -72,15 +54,6 @@
           "name": "Butterfly Stretch",
           "exId": "butterfly-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Soles together, sit tall and lean forward from the hips",
-              "Let the knees fall rather than pushing them"
-            ],
-            "bad": [
-              "Rounding the spine to get lower"
-            ]
-          },
           "rx": {
             "time": "60 sec"
           }
@@ -90,15 +63,6 @@
           "name": "Couch Stretch",
           "exId": "couch-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Back foot up on a sofa or wall, squeeze the back glute and stand tall",
-              "Feel the front of the back hip, never the lower back"
-            ],
-            "bad": [
-              "Arching the lower back to get deeper"
-            ]
-          },
           "rx": {
             "time": "45 sec",
             "side": true
@@ -109,15 +73,6 @@
           "name": "Standing Calf Stretch",
           "exId": "standing-calf-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Back leg straight, heel down, hips forward, then repeat with the knee bent",
-              "Two different muscles, so do both"
-            ],
-            "bad": [
-              "Turning the back foot out to cheat the range"
-            ]
-          },
           "rx": {
             "time": "45 sec",
             "side": true
@@ -135,15 +90,6 @@
           "name": "Doorway Pec Stretch",
           "exId": "doorway-pec-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Forearm on the door frame, elbow at shoulder height, step through and turn away",
-              "Feel it across the front of the chest"
-            ],
-            "bad": [
-              "Letting the shoulder roll forward into it"
-            ]
-          },
           "rx": {
             "time": "45 sec",
             "side": true
@@ -154,15 +100,6 @@
           "name": "Child's Pose",
           "exId": "childs-pose",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "From child's pose, walk both hands round to one side",
-              "Feel it down the side of the ribs and into the lat"
-            ],
-            "bad": [
-              "Letting the hips come off the heels"
-            ]
-          },
           "rx": {
             "time": "45 sec",
             "side": true
@@ -174,15 +111,6 @@
           "exId": "cross-body-shoulder-stretch",
           "videoUrl": null,
           "note": "The back of the serving shoulder is the one nobody stretches — go gently.",
-          "cues": {
-            "good": [
-              "Arm straight across the chest, pull it in with the other forearm",
-              "Shoulder stays down, not shrugged to the ear"
-            ],
-            "bad": [
-              "Pushing into a pinch at the front of the shoulder"
-            ]
-          },
           "rx": {
             "time": "45 sec",
             "side": true

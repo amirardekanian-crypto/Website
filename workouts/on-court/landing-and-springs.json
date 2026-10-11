@@ -54,15 +54,6 @@
           "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Jog easy, or march on the spot if you're indoors, until you're warm and breathing a little harder",
-              "Feel your legs loosen up with every minute"
-            ],
-            "bad": [
-              "Starting at run pace"
-            ]
-          },
           "rx": {
             "time": "3 minutes"
           }
@@ -72,15 +63,6 @@
           "name": "Ankle Dorsiflexion Rocks",
           "exId": "ankle-dorsiflexion-rocks",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Drive the knee forward over your toes",
-              "Feel the stretch low in the calf and the front of the ankle"
-            ],
-            "bad": [
-              "Letting the heel lift or the arch collapse"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -91,15 +73,6 @@
           "name": "Leg Swings",
           "exId": "leg-swings",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hold a wall and swing the leg front to back, then side to side",
-              "Feel the hip loosen up as the swing gets bigger"
-            ],
-            "bad": [
-              "Arching your lower back to throw the leg higher"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -110,15 +83,6 @@
           "name": "Lateral Lunge",
           "exId": "lateral-lunge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Step wide and sit back into that hip, chest tall",
-              "Feel the inside of the straight leg stretch"
-            ],
-            "bad": [
-              "Letting the bent knee cave inward"
-            ]
-          },
           "rx": {
             "reps": 6,
             "side": true
@@ -129,15 +93,6 @@
           "name": "World's Greatest Stretch",
           "exId": "worlds-greatest-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Step long, drop the back hip, then reach the inside arm up to the ceiling",
-              "Feel the front of the back hip and your upper back open up"
-            ],
-            "bad": [
-              "Rushing the reach before the hips have dropped"
-            ]
-          },
           "rx": {
             "reps": 3,
             "side": true
@@ -148,15 +103,6 @@
           "name": "Glute Bridge",
           "exId": "glute-bridge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Push the floor away through your heels",
-              "Feel your glutes squeeze at the top"
-            ],
-            "bad": [
-              "Arching your lower back to lift higher"
-            ]
-          },
           "rx": {
             "reps": 10
           }
@@ -166,15 +112,6 @@
           "name": "Single-Leg Calf Raise",
           "exId": "single-leg-calf-raise",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Rise onto the ball of your foot, pause, then lower slowly",
-              "Feel the calf working, not just the toes"
-            ],
-            "bad": [
-              "Bouncing out of the bottom"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -192,15 +129,6 @@
           "name": "Snap Down",
           "exId": "snap-down",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "From tall on your toes, snap down into an athletic stance and freeze, as quietly as you can",
-              "Your hips go back and your knees soak it up"
-            ],
-            "bad": [
-              "Landing stiff-legged and taking it through your knees"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 5
@@ -211,15 +139,6 @@
           "name": "Single-Leg Snap Down",
           "exId": "single-leg-snap-down",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "From tall on one foot, snap down into a single-leg landing and freeze",
-              "Feel your hip and thigh catching the landing, not your knee"
-            ],
-            "bad": [
-              "Letting your knee cave inward on the landing"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 3,
@@ -237,15 +156,6 @@
           "name": "Countermovement Jump",
           "exId": "countermovement-jump",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Dip fast and jump as high as you can",
-              "Feel the floor pushing back through your whole foot"
-            ],
-            "bad": [
-              "Landing with stiff legs"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 3,
@@ -258,15 +168,6 @@
           "name": "Lateral Bound",
           "exId": "lateral-bound",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Push off one foot and bound sideways as far as you can still land and hold for two seconds",
-              "Feel the outside of the landing hip catching you"
-            ],
-            "bad": [
-              "Letting your landing knee cave inward"
-            ]
-          },
           "rx": {
             "sets": 6,
             "reps": 1,
@@ -287,15 +188,6 @@
           "name": "Pogo Jump",
           "exId": "pogo-jump",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Stay stiff through the ankles and bounce off the floor quickly",
-              "Your calves acting like springs"
-            ],
-            "bad": [
-              "Landing on your heels instead of the balls of your feet"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 10
@@ -307,15 +199,6 @@
           "name": "Lateral Line Hop",
           "exId": "lateral-line-hop",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hop over the line and back as fast as you can, both feet together",
-              "Feel your ankles doing the work, with quiet contacts"
-            ],
-            "bad": [
-              "Landing on stiff, locked knees"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 10

@@ -59,7 +59,8 @@ BASE = {
   "notes": {"cards": [{"title": "Hi", "body": "<p>Hello.</p>"}]}
 }
 # The made-up Spine the checker reads (the --spine-sql shape): id|status|cues|qualities|pattern|
-# impact|equipment|name|aliases|credits|cost. The volume count comes from the last two fields.
+# impact|equipment|name|aliases|credits|cost, and since 2026-10-11 |has-steps (section 11 adds it).
+# The volume count comes from credits and cost.
 SB = "\n".join([
   "stationary-bike|approved|true|engine|conditioning|none|bike|Stationary Bike||none|moderate",
   "barbell-back-squat|approved|true|strength,muscle|squat|none|barbell;rack|Barbell Back Squat|Back Squat|glutes:0.5,quads:1|heavy",
@@ -445,6 +446,73 @@ sql = subprocess.run([sys.executable, CHECK, p, '--spine-sql'], capture_output=T
 expect("--spine-sql: a card name's apostrophe is doubled", "'Farmer''s Carry'" in sql and 'cards(n)' in sql, sql[:400])
 expect("--spine-sql: a circuit's own name is not a card", "'Carry Pair'" not in sql, sql[:400])
 expect('--spine-sql: checksums and minutes are asked for', 'spine_md5' in sql and 'prev_n' in sql and 'as minutes' in sql, sql[-600:])
+
+# ── 11. added 2026-10-11 (the exercise card blueprint): the pill list, the Coach's Note, steps ──
+def with_pill(intent, **rx):
+    d = copy.deepcopy(BASE); e = d['workouts']['days'][0]['blocks'][1]['exercises'][0]
+    e['intent'] = intent; e['rx'].update(rx); return d
+def pill_fails(d): return [l for l in run(d, ctx=CTX).splitlines() if l.startswith('FAIL') and '[CHP-2]' in l]
+expect('CHP-2: two values from two groups pass', not pill_fails(with_pill('neutral grip · max intent')))
+expect('CHP-2: case and spaces do not matter', not pill_fails(with_pill('  Neutral Grip  ·Max Intent ')))
+out = '\n'.join(pill_fails(with_pill('right leg first')))
+expect('CHP-2: an old spelling fails and names its value', "the pill 'right leg first' is not on the list (write 'right side first')" in out, out)
+out = '\n'.join(pill_fails(with_pill('3s eccentric')))
+expect('CHP-2: tempo words in the pill point at rx.tempo', 'the tempo is said once, in rx.tempo' in out, out)
+expect('CHP-2: a muscle or category fails', pill_fails(with_pill('glute focus')))
+out = '\n'.join(pill_fails(with_pill('neutral grip · wide grip')))
+expect('CHP-2: two from one group fail', 'two pills from the hands group' in out, out)
+out = '\n'.join(pill_fails(with_pill('neutral grip · left side first · max intent')))
+expect('CHP-2: three values fail', '3 pills' in out, out)
+expect('CHP-2: a hold pill without iso fails', any('needs rx.tempo "iso"' in l for l in pill_fails(with_pill('mid-range hold'))))
+expect('CHP-2: a hold pill with iso passes', not pill_fails(with_pill('mid-range hold', tempo='iso', time='30s', reps=None)))
+expect('CHP-2: a pace pill beside an RPE fails', any('only on an item with no RPE' in l for l in pill_fails(with_pill('easy pace'))))
+d = with_pill('easy pace'); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['rx'].pop('rpe')
+expect('CHP-2: a pace pill with no RPE passes', not pill_fails(d))
+out = run(with_pill('superset'), ctx=CTX)
+expect('CHP-2: a pairing fails once, as a pairing', sum(1 for l in out.splitlines() if l.startswith('FAIL') and 'superset' in l) == 1
+       and has(out, 'FAIL', 'a pairing written as a pill'), out)
+d = copy.deepcopy(BASE); e = d['workouts']['days'][0]['blocks'][1]['exercises'][0]
+e['intent'] = 'right leg first'; e['chips'] = [{'label': '4 Sets'}]
+expect('CHP-2: a legacy chips card fails CHP-5, not the list', not pill_fails(d) and has(run(d, ctx=CTX), 'FAIL', 'carries chips[]'))
+d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'][0]['exercises'].append({"type": "circuit", "name": "Pair",
+    "rx": {"rounds": 3}, "items": [{"name": "Dead Bug", "exId": "dead-bug", "intent": "slow", "rx": {"reps": 8}}]})
+expect('CHP-2: a circuit item is checked too', any("'slow'" in l for l in pill_fails(d)))
+
+def with_note(note, intent=None):
+    d = copy.deepcopy(BASE); e = d['workouts']['days'][0]['blocks'][1]['exercises'][0]
+    e['note'] = note
+    if intent: e['intent'] = intent
+    return d
+expect('COM-14: a two-sentence note passes', not has(run(with_note("Last cycle 60 kg for 6 at RPE 8. Try 62.5 kg and let the first set decide.")), 'WARN', '[COM-14]'))
+expect('COM-14: four sentences warn', has(run(with_note("One. Two. Three. Four.")), 'WARN', "[COM-14] Day 1 · Barbell Back Squat: the Coach's Note is 4 sentences"))
+expect('COM-14: over 300 characters warns', has(run(with_note("Start light " + "and keep going " * 25 + "today.")), 'WARN', '[COM-14]'))
+expect('COM-14: --stage build skips the note checks', not has(run(with_note("One. Two. Three. Four."), '--stage', 'build'), 'WARN', '[COM-14]'))
+expect('CUE-7: a note repeating its pill warns', has(run(with_note("Left side first, then switch.", intent='left side first')), 'WARN', "[CUE-7]"))
+expect('CUE-7: a note that only shares a word passes', not has(run(with_note("Stop at the box, not the floor.", intent='max intent')), 'WARN', '[CUE-7]'))
+expect('NAM-5: a grip in the note with no grip pill warns', has(run(with_note("Use a neutral grip, it suits your wrists.")), 'WARN', '[NAM-5 · COM-14]'))
+expect('NAM-5: a grip pill plus a grip in the note is CUE-7, not NAM-5',
+       not has(run(with_note("Neutral grip only.", intent='neutral grip')), 'WARN', '[NAM-5'))
+
+SB_STEPS = "\n".join(l + ('|false' if l.startswith(('barbell-back-squat', 'lat-pulldown')) else '|true') for l in SB.splitlines())
+out = run(BASE, ctx=[{"spine": SB_STEPS, "prev": None, "ledger": None}])
+expect('CUE-6: approved entries with no steps warn, in one line', has(out, 'WARN', '[CUE-6] 2 approved entries') and 'barbell-back-squat, lat-pulldown' in out, out)
+out = run(BASE, ctx=[{"spine": SB_STEPS.replace('lat-pulldown|approved', 'lat-pulldown|draft'), "prev": None, "ledger": None}])
+expect('CUE-6: a draft is CUE-5, not CUE-6', has(out, 'WARN', '[CUE-6] 1 approved entry') and has(out, 'WARN', '[CUE-5]'), out)
+out = run(BASE, ctx=CTX)
+expect('CUE-6: an 11-field Spine file says to run --spine-sql again', has(out, 'INFO', 'no steps field') and not has(out, 'WARN', '[CUE-6]'), out)
+expect('CUE-6: every entry with steps is quiet', not has(run(BASE, ctx=[{"spine": SB_STEPS.replace('|false', '|true'), "prev": None, "ledger": None}]), 'WARN', '[CUE-6]'))
+PURP = "barbell-back-squat|The heaviest whole-body leg lift we use, for building maximum strength."
+good_p ={"spine": SB, "prev": None, "ledger": None, "purposes": PURP, "purposes_md5": hashlib.md5(PURP.encode('utf-8')).hexdigest()}
+if HAVE_NODE:
+    d = with_why({"src": "goal", "text": "The heaviest whole-body leg lift we use, for building maximum strength."})
+    expect("Because: a why that repeats the entry's purpose fails (why-generic)", has(run(d, ctx=[good_p]), 'FAIL', 'repeats the Spine purpose'))
+    expect('Because: a personal why beside the purpose passes', not has(run(with_why({"src": "goal", "text": "Your legs drive every serve, so this is your main lift."}), ctx=[good_p]), 'FAIL', 'why'))
+out = run(BASE, ctx=[dict(good_p, purposes=PURP + " Extra.")])
+expect("checksum: a mistyped purposes copy stops the run", "the saved 'purposes' is not what the server sent" in out, out)
+p = os.path.join(TMP, 'sql2.json'); json.dump(BASE, open(p, 'w', encoding='utf-8'))
+sql = subprocess.run([sys.executable, CHECK, p, '--spine-sql'], capture_output=True, text=True, encoding='utf-8', cwd=REPO).stdout
+expect("--spine-sql: each line ends with has-steps, read safely before stage52", "to_jsonb(e)->'steps'" in sql, sql[-1600:])
+expect('--spine-sql: the purposes and their checksum are asked for', 'as purposes' in sql and 'purposes_md5' in sql, sql[-600:])
 
 # ── 6. the rule index guard (scripts/check_rule_index.py) ────────────────────
 spec_ri = importlib.util.spec_from_file_location('cri', os.path.join(REPO, 'scripts', 'check_rule_index.py'))

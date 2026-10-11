@@ -199,7 +199,12 @@
 //      (the rule that only typed weights count stands), the clock is offered once a day, the Welcome has a ✕ and Back closes
 //      it, only Game Plan's Active banner goes Home, the rest pill is gone (the card's Rest ⏱ button and Guided remain), and the
 //      notes appear in a box in the middle of the screen.
-const CACHE = 'aap-v99';
+// v100: program.html changed (2026-10-11, the Exercise Card Blueprint): How to do it holds the Spine entry's steps
+//      ("You need", then the numbered steps, then the cues, the video first when there is one), its row reads
+//      "How to do it · video · 5 steps · 3 cues" and shows the green ▶ only with a video, it opens by itself the first
+//      time on a simple card too, the Spine's cues win over a card's own, a working circuit folds each item's steps
+//      behind a How to do it line, and the About sheet from Library → Exercises puts How to do it above the body map.
+const CACHE = 'aap-v100';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -22,6 +22,9 @@ disagreement.
   quality mix  the numbers of the mix rule (coverage 0.7, the 1.5 floor, the 12% share, a second
                quality at half, one set per 600 s of a timed effort) in program.html, coach.html and
                check_program.py
+  pill list    the card's `intent` values by group and the old spellings they replace (CHP-2,
+               2026-10-11): check_program PILLS, the object between // PILLS:BEGIN and // PILLS:END
+               in assets/js/chips.js, and the two tables under SCHEMA.md → `intent`: the pill list
 
 The database half is a committed copy, supabase/word_lists_snapshot.json, because a commit hook
 cannot reach the server. To refresh it (--live), run this read-only query with the Supabase MCP:
@@ -48,6 +51,8 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 P = lambda *a: os.path.join(REPO, *a)
 PROGRAM, COACH, CHECKER = P('program.html'), P('coach.html'), P('scripts', 'check_program.py')
 DRAFT, SCHEMA, COURSE = P('.claude', 'skills', 'spine', 'draft_sql.py'), P('SCHEMA.md'), P('tennis', 'app', 'app.js')
+CHIPS = P('assets', 'js', 'chips.js')
+PILL_GROUPS = ('hands', 'lead', 'intent', 'hold', 'brakes', 'pace')
 SNAP = P('supabase', 'word_lists_snapshot.json')
 PHASES = {'bedrock', 'peak', 'reset'}  # art words that name a phase, not a quality (coach QM_PHASE)
 
@@ -156,6 +161,66 @@ def same_map(label, maps):
         for k, v in have.items(): print(f"       {k}: " + ', '.join(f"{a}→{b}" for a, b in sorted(v.items())))
         fail(f"{label}: the copies disagree")
 
+def chips_pills():
+    """The pill list in assets/js/chips.js: ONE strict-JSON object between the // PILLS:BEGIN and // PILLS:END
+    lines. None while the markers are absent; {'_error': ...} when the block is there but not strict JSON."""
+    m = re.search(r'^[ \t]*//[ \t]*PILLS:BEGIN[^\n]*\n(.*?)^[ \t]*//[ \t]*PILLS:END', read(CHIPS), re.S | re.M)
+    if not m: return None
+    body = m.group(1)
+    i, j = body.find('{'), body.rfind('}')
+    try: return json.loads(body[i:j + 1]) if 0 <= i < j else {'_error': 'no object literal between the markers'}
+    except ValueError as e: return {'_error': f'not strict JSON ({e})'}
+
+def schema_pills():
+    """SCHEMA.md → `intent`: the pill list. The groups table (each group's values are the backticked words in
+    its second cell) and the old-spellings table (old words in the first cell, the value in the second)."""
+    text = read(SCHEMA)
+    m = re.search(r'^#{3,5} `intent`: the pill list[^\n]*\n(.*?)(?=^#{2,5} )', text, re.S | re.M)
+    if not m: return None
+    out, syn = {}, {}
+    for line in m.group(1).splitlines():
+        cells = [c.strip() for c in line.strip().strip('|').split('|')] if line.startswith('|') else []
+        if len(cells) < 2: continue
+        if cells[0] in PILL_GROUPS: out[cells[0]] = re.findall(r'`([^`]+)`', cells[1])
+        else:
+            new = re.findall(r'`([^`]+)`', cells[1])
+            for old in re.findall(r'`([^`]+)`', cells[0]):
+                if len(new) == 1: syn[old] = new[0]
+    out['synonyms'] = syn
+    return out
+
+def pills_parity(ref):
+    """CHP-2's list must read the same in the checker, the app's chips.js and SCHEMA.md."""
+    copies = {'check_program PILLS': ref, 'SCHEMA.md `intent`': schema_pills()}
+    ch = chips_pills()
+    if ch is None:
+        print("SKIP pill list in assets/js/chips.js: no // PILLS:BEGIN … // PILLS:END block yet, so only "
+              "check_program and SCHEMA.md are compared. This skip ends the day the block exists.")
+    elif '_error' in ch: fail(f"pill list: assets/js/chips.js PILLS block is {ch['_error']}")
+    else: copies['chips.js PILLS'] = ch
+    for k, v in copies.items():
+        if v is None: fail(f"pill list: could not read the copy in {k}")
+    have = {k: v for k, v in copies.items() if v is not None}
+    if not have or ref is None: return
+    bad_keys = []
+    for k, v in have.items():
+        for g in PILL_GROUPS + ('synonyms',):
+            if v.get(g) != ref.get(g): bad_keys.append((k, g))
+        extra = set(v) - set(PILL_GROUPS) - {'synonyms'}
+        if extra: bad_keys.append((k, ', '.join(sorted(extra))))
+    if not bad_keys:
+        print(f"OK   pill list ({len(have)} copies, groups in order, {len(ref.get('synonyms') or {})} old spellings)\n       "
+              + ' | '.join(f"{g}: {', '.join(ref.get(g) or [])}" for g in PILL_GROUPS))
+        return
+    print('DIFF pill list')
+    for k, g in bad_keys:
+        a, b = have[k].get(g), ref.get(g)
+        if isinstance(a, dict) and isinstance(b, dict):
+            miss = sorted(set(b.items()) - set(a.items())); more = sorted(set(a.items()) - set(b.items()))
+            print(f"       {k} {g}: missing {miss or '-'} · extra {more or '-'}")
+        else: print(f"       {k} {g}: {a!r} (check_program: {b!r})")
+    fail('pill list: the copies disagree (see the list above)')
+
 def same_num(label, nums):
     have = {k: v for k, v in nums.items() if v is not None}
     vals = set(have.values())
@@ -167,7 +232,7 @@ def main():
     elif len(sys.argv) > 1: print(__doc__); return 2
     snap = json.load(open(SNAP, encoding='utf-8'))
     db = f"the db (snapshot {snap.get('read_at')})"
-    cp = py_consts(CHECKER, ['QUALITIES', 'ART_HEADLINE', 'MUSCLES', 'MUSCLE_ALIAS', 'COST', 'UNLOADED_PATTERNS'])
+    cp = py_consts(CHECKER, ['QUALITIES', 'ART_HEADLINE', 'MUSCLES', 'MUSCLE_ALIAS', 'COST', 'UNLOADED_PATTERNS', 'PILLS'])
     ds = py_consts(DRAFT, ['PATTERNS', 'FLAGS', 'QUALITIES', 'REGIONS', 'IMPACTS', 'MUSCLES', 'COSTS'])
     co = js_consts(COACH, ['SPINE_PATTERNS', 'SPINE_FLAGS', 'SPINE_REGIONS', 'SPINE_IMPACTS', 'SPINE_MUSCLES',
                            'SPINE_MUSCLE_ALIAS', 'SPINE_COSTS', 'QM_IDS', 'QM_ART', 'QM_PHASE'])
@@ -232,6 +297,7 @@ def main():
         'program qmSets': one_number(PROGRAM, r'function qmSets\(rx\)[\s\S]*?sec / (\d+)', 'qmSets'),
         'coach qmSetsC': one_number(COACH, r'function qmSetsC\(rx\)[\s\S]*?sec / (\d+)', 'qmSetsC'),
         'check_program qm_sets': one_number(CHECKER, r'def qm_sets\(rx\)[\s\S]*?t / (\d+)', 'qm_sets')})
+    pills_parity(cp.get('PILLS'))
 
     print()
     for m in fails: print('FAIL  ' + m)

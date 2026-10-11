@@ -38,15 +38,6 @@
           "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Easy pace until you are warm and breathing",
-              "Nothing here is fast yet"
-            ],
-            "bad": [
-              "Starting hard — you are about to sprint"
-            ]
-          },
           "rx": {
             "time": "3 minutes"
           }
@@ -56,15 +47,6 @@
           "name": "Lateral Shuffle",
           "exId": "lateral-shuffle",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Stay low and push the ground away with the trailing foot",
-              "Face the net the whole way"
-            ],
-            "bad": [
-              "Bobbing up and down between steps"
-            ]
-          },
           "rx": {
             "reps": "4 Lengths"
           },
@@ -75,15 +57,6 @@
           "name": "Carioca",
           "exId": "carioca",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Let the hips rotate and keep the shoulders quiet",
-              "Build the speed across the length"
-            ],
-            "bad": [
-              "Turning the whole body and making it a run"
-            ]
-          },
           "rx": {
             "reps": "2 Lengths",
             "side": true
@@ -94,15 +67,6 @@
           "name": "Split-Step Bounce",
           "exId": "split-step-bounce",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Small hop, land wide and low on the balls of both feet",
-              "Land already loaded, ready to push either way"
-            ],
-            "bad": [
-              "A big jump that leaves you in the air when the ball is struck"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 6
@@ -119,15 +83,6 @@
           "name": "Wall Feed Reaction",
           "exId": "wall-feed-reaction",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Throw hard at the wall, split-step, then move to where it comes off",
-              "Get there and set your feet"
-            ],
-            "bad": [
-              "Throwing the same ball to the same spot every time"
-            ]
-          },
           "note": "Vary how hard you throw so you cannot predict the bounce.",
           "rx": {
             "sets": 6,
@@ -140,15 +95,6 @@
           "name": "Self-Drop Drop-Step",
           "exId": "self-drop-drop-step",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Drop the ball from shoulder height behind you and chase it down",
-              "First move is the drop-step — open the hip"
-            ],
-            "bad": [
-              "Turning your back and running"
-            ]
-          },
           "rx": {
             "sets": 4,
             "reps": 3,
@@ -169,15 +115,6 @@
             {
               "name": "Lateral Line Hop",
               "exId": "lateral-line-hop",
-              "cues": {
-                "good": [
-                  "Two feet over the line and back, as fast as you can cycle them",
-                  "Stay on the balls of the feet"
-                ],
-                "bad": [
-                  "Looking down at the line"
-                ]
-              },
               "rx": {
                 "time": "15 seconds"
               }
@@ -185,15 +122,6 @@
             {
               "name": "Front-Back Line Hop",
               "exId": "front-back-line-hop",
-              "cues": {
-                "good": [
-                  "Tiny hops over the line and back",
-                  "Stiff ankles, light contacts"
-                ],
-                "bad": [
-                  "Jumping high instead of fast"
-                ]
-              },
               "rx": {
                 "time": "15 seconds"
               }
@@ -201,15 +129,6 @@
             {
               "name": "Shadow Change of Direction",
               "exId": "shadow-change-of-direction",
-              "cues": {
-                "good": [
-                  "Split-step, move to a corner, recover to the middle, repeat",
-                  "Pick the corner late"
-                ],
-                "bad": [
-                  "Falling into the same left-right-left pattern every round"
-                ]
-              },
               "rx": {
                 "time": "20 seconds"
               }

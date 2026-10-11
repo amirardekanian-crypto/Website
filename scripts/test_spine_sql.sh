@@ -3,9 +3,10 @@
 #
 # Starts a THROWAWAY Postgres cluster (a temp folder, a unix socket, nothing on the network), loads a replica of the live
 # tables (supabase/tests/replica_schema.sql), applies supabase/stage45_forget_contact_guard.sql, stage48_coach_one_transaction.sql,
-# stage49_spine_versions.sql, stage50_assess_coach_read.sql and stage51_clear_used_passwords.sql, runs supabase/tests/stage48_49_test.sql (about 100 assertions:
+# stage49_spine_versions.sql, stage50_assess_coach_read.sql, stage51_clear_used_passwords.sql and stage52_spine_steps.sql (twice:
+# it must be safe to re-run), runs supabase/tests/stage48_49_test.sql (about 150 assertions:
 # the coach check, grants, row-level security, atomicity, malformed payloads, the version trigger, Forget's guard, the testing
-# app's tables, the stored-password trigger) and then two-session tests of the row
+# app's tables, the stored-password trigger, the steps column, get_exercises() and Claude's drafts) and then two-session tests of the row
 # lock: a dashboard save must WAIT for an in-flight write by Claude's /spine and then see it, instead of overwriting it,
 # and a /spine call that writes exercises first (the documented order) must never deadlock with it.
 #
@@ -14,7 +15,7 @@
 #
 # Needs the Postgres 14+ server binaries (a cloud session has them: /usr/lib/postgresql/*/bin). Run from anywhere:
 #     sh scripts/test_spine_sql.sh
-# Exit 0 = every check passed. Run it after changing either stage file, BEFORE applying the change to the project.
+# Exit 0 = every check passed. Run it after changing any of these stage files, BEFORE applying the change to the project.
 set -u
 repo=$(cd "$(dirname "$0")/.." && pwd)
 PGBIN=$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null | sort -V | tail -1)
@@ -39,8 +40,9 @@ as_pg "$PGBIN/pg_ctl -D $DATA -o '-p $PORT -c listen_addresses= -c unix_socket_d
 P="psql -h $DATA -p $PORT -U postgres -qAt -v ON_ERROR_STOP=1"
 $P -d postgres -c "create database coachtest" || exit 2
 P="$P -d coachtest"
-for f in supabase/tests/replica_schema.sql supabase/stage45_forget_contact_guard.sql supabase/stage48_coach_one_transaction.sql supabase/stage49_spine_versions.sql supabase/stage50_assess_coach_read.sql supabase/stage51_clear_used_passwords.sql; do
-  (cd "$repo" && $P -f "$f" >/dev/null) || { echo "test_spine_sql: loading $f failed"; exit 2; }
+for f in supabase/tests/replica_schema.sql supabase/stage45_forget_contact_guard.sql supabase/stage48_coach_one_transaction.sql supabase/stage49_spine_versions.sql supabase/stage50_assess_coach_read.sql supabase/stage51_clear_used_passwords.sql supabase/stage52_spine_steps.sql supabase/stage52_spine_steps.sql; do
+  # (the second stage52 run is the "safe to re-run" check: its "already exists, skipping" notices are expected, so hidden)
+  (cd "$repo" && PGOPTIONS='-c client_min_messages=warning' $P -f "$f" >/dev/null) || { echo "test_spine_sql: loading $f failed"; exit 2; }
 done
 
 echo "== assertions (supabase/tests/stage48_49_test.sql)"

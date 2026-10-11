@@ -42,15 +42,6 @@
           "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Walk at an easy pace with your arms swinging",
-              "Feel your hips and legs warming up"
-            ],
-            "bad": [
-              "Cutting the walk short before you feel warm"
-            ]
-          },
           "rx": {
             "time": "7 minutes"
           }
@@ -66,15 +57,6 @@
           "name": "90/90 Hip Switch",
           "exId": "90-90-hip-switch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Sit tall and swing both knees across to the other side",
-              "Feel the turn happening deep in your hips"
-            ],
-            "bad": [
-              "Pushing your knees down with your hands"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -85,15 +67,6 @@
           "name": "Adductor Rock Back",
           "exId": "adductor-rock-back",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Kneel with one leg out to the side and rock your hips back toward your heels",
-              "Feel a gentle stretch along the inside of the straight leg"
-            ],
-            "bad": [
-              "Letting your lower back round as you rock back"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -104,15 +77,6 @@
           "name": "Lateral Lunge",
           "exId": "lateral-lunge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Step wide and sit back into one hip, going a little deeper each rep",
-              "Feel the inside of the straight leg lengthen"
-            ],
-            "bad": [
-              "Letting the heel of the bent leg lift"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -130,15 +94,6 @@
           "exId": "cossack-squat",
           "videoUrl": null,
           "note": "Go only as deep as you can control and come up a little if the front of the hip pinches.",
-          "cues": {
-            "good": [
-              "Sit deep into one hip with the other leg straight and its heel down",
-              "Feel the inside of the straight leg holding the stretch"
-            ],
-            "bad": [
-              "Bouncing out of the bottom"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 8,
@@ -154,15 +109,6 @@
           "exId": "copenhagen-plank",
           "videoUrl": null,
           "note": "Stop the set when your hips start to drop, even if that's before fifteen seconds.",
-          "cues": {
-            "good": [
-              "Lie on your side with your top knee on a bench and lift your hips in a straight line",
-              "Feel the inside of the top thigh working hard"
-            ],
-            "bad": [
-              "Letting your hips sag toward the floor"
-            ]
-          },
           "rx": {
             "sets": 3,
             "time": "15s",

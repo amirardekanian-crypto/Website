@@ -34,15 +34,6 @@
           "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Walk at an easy pace and roll through each foot",
-              "Feel your ankles and knees warming up"
-            ],
-            "bad": [
-              "Shuffling flat-footed"
-            ]
-          },
           "rx": {
             "time": "4 minutes"
           }
@@ -52,15 +43,6 @@
           "name": "Ankle Dorsiflexion Rocks",
           "exId": "ankle-dorsiflexion-rocks",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Drive the knee forward over your toes with your heel down",
-              "Feel your ankle glide forward, only as far as it stays comfortable"
-            ],
-            "bad": [
-              "Pushing on into pain at the back of the heel or a pinch at the front of the ankle"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -71,15 +53,6 @@
           "name": "Tibialis Raise",
           "exId": "tibialis-raise",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Lean back against a wall with your feet a step out and lift your toes toward your shins",
-              "Feel the muscle along the front of your shin"
-            ],
-            "bad": [
-              "Bending at the hips to help the lift"
-            ]
-          },
           "rx": {
             "reps": 15
           }
@@ -89,15 +62,6 @@
           "name": "Glute Bridge",
           "exId": "glute-bridge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Push the floor away through your heels",
-              "Feel your glutes squeeze at the top"
-            ],
-            "bad": [
-              "Arching your lower back to lift higher"
-            ]
-          },
           "rx": {
             "reps": 12
           }
@@ -107,15 +71,6 @@
           "name": "Single-Leg Balance",
           "exId": "single-leg-balance",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Stand on one foot next to a wall and look straight ahead, then turn your head slowly side to side",
-              "Feel the small muscles around your ankle working to keep you steady"
-            ],
-            "bad": [
-              "Standing away from the wall, where a wobble puts you on the floor"
-            ]
-          },
           "rx": {
             "sets": 2,
             "time": "30s",
@@ -135,15 +90,6 @@
           "exId": "wall-sit",
           "videoUrl": null,
           "note": "Let pain set the depth, and if it feels easier than a 7 at a depth that stays quiet, hold it for the full time anyway.",
-          "cues": {
-            "good": [
-              "Rest your back flat against the wall with your feet a step out and hold",
-              "Feel your thighs working, not the front of your knees"
-            ],
-            "bad": [
-              "Sliding down deeper than the depth where it stays quiet"
-            ]
-          },
           "rx": {
             "sets": 4,
             "time": "45s",
@@ -165,15 +111,6 @@
           "exId": "lateral-step-down",
           "videoUrl": null,
           "note": "If your knee, Achilles or ankle feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
-          "cues": {
-            "good": [
-              "Stand on the bottom stair with a hand on a wall or rail, slowly lower the other heel toward the floor, then tap and come back up",
-              "Feel your standing thigh and hip controlling the lowering"
-            ],
-            "bad": [
-              "Letting your standing knee cave inward"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 8,
@@ -188,15 +125,6 @@
           "exId": "single-leg-calf-raise",
           "videoUrl": null,
           "note": "Once the bodyweight version feels easier than a 7, hold something heavy in the other hand and add weight before you add reps.",
-          "cues": {
-            "good": [
-              "Stand on flat floor with a fingertip on the wall, rise onto the ball of one foot, then lower",
-              "Feel the calf and Achilles taking the load"
-            ],
-            "bad": [
-              "Bouncing at the bottom"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 12,
@@ -210,15 +138,6 @@
           "name": "Side-Lying Hip Abduction",
           "exId": "side-lying-hip-abduction",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Lie on your side with your bottom knee bent and lift the top leg straight up and back a little",
-              "Feel the side of your hip working"
-            ],
-            "bad": [
-              "Rolling your hips backward to lift the leg higher"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 15,

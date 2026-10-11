@@ -34,15 +34,6 @@
           "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Walk tall with your arms swinging",
-              "Feel your hips and back loosening up"
-            ],
-            "bad": [
-              "Hunching over as you walk"
-            ]
-          },
           "rx": {
             "time": "5 minutes"
           }
@@ -52,15 +43,6 @@
           "name": "Dowel Hip Hinge",
           "exId": "dowel-hip-hinge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hold a broom handle along your spine and push your hips back",
-              "Feel the backs of your thighs load as you hinge"
-            ],
-            "bad": [
-              "Rounding your back away from the handle"
-            ]
-          },
           "rx": {
             "reps": 10
           }
@@ -70,15 +52,6 @@
           "name": "Glute Bridge",
           "exId": "glute-bridge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Push the floor away through your heels",
-              "Feel your glutes squeeze at the top"
-            ],
-            "bad": [
-              "Arching your lower back to lift higher"
-            ]
-          },
           "rx": {
             "reps": 12
           }
@@ -88,15 +61,6 @@
           "name": "Quadruped Thoracic Rotation",
           "exId": "quadruped-thoracic-rotation",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "On hands and knees, put a hand behind your head and turn your elbow up to the ceiling",
-              "Feel the turn in your ribs and upper back"
-            ],
-            "bad": [
-              "Turning from your lower back"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -107,15 +71,6 @@
           "name": "Dead Bug",
           "exId": "dead-bug",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Lie on your back with your knees over your hips and lower the opposite arm and leg slowly",
-              "Feel your lower back staying flat against the floor"
-            ],
-            "bad": [
-              "Letting your back arch as the leg goes down"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -133,15 +88,6 @@
           "exId": "suitcase-carry",
           "videoUrl": null,
           "note": "On a flared-up day, do just this block at an RPE of 6 and don't mark the session done.",
-          "cues": {
-            "good": [
-              "Hold one dumbbell at your side and stand dead tall",
-              "Feel the side of your waist away from the weight working to keep you level"
-            ],
-            "bad": [
-              "Letting your ribs sag toward the weight"
-            ]
-          },
           "rx": {
             "sets": 4,
             "time": "25s",
@@ -164,15 +110,6 @@
           "exId": "dumbbell-split-squat",
           "videoUrl": null,
           "note": "If your back feels worse the next morning than before you started, drop one set from each exercise in this block next time, and if it's still worse after that, get it looked at.",
-          "cues": {
-            "good": [
-              "Hold the dumbbell at your side and a wall with your other hand, step back into a long stance and lower your back knee straight down",
-              "Feel your front thigh and glute doing the work while your body stays tall"
-            ],
-            "bad": [
-              "Leaning your body toward the weight"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 8,
@@ -186,15 +123,6 @@
           "name": "Single-Leg Dumbbell Hip Thrust",
           "exId": "single-leg-dumbbell-hip-thrust",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Rest your upper back on a bench and drive your hips up until your body is flat, with a dumbbell on your hip once bodyweight feels easy",
-              "Feel your glute doing the work, not your lower back"
-            ],
-            "bad": [
-              "Arching your lower back to get your hips higher"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 10,
@@ -208,15 +136,6 @@
           "name": "Suitcase Carry",
           "exId": "suitcase-carry",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Walk tall with one dumbbell at your side and your eyes on a spot ahead",
-              "Feel the side of your waist stopping the weight from pulling you over"
-            ],
-            "bad": [
-              "Leaning away from the weight"
-            ]
-          },
           "rx": {
             "sets": 3,
             "distance": "30 m",

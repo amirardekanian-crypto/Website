@@ -46,15 +46,6 @@
           "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Easy pace until you are warm and breathing",
-              "Feel your legs loosen up with every minute"
-            ],
-            "bad": [
-              "Starting at run pace"
-            ]
-          },
           "rx": {
             "time": "3 minutes"
           }
@@ -64,15 +55,6 @@
           "name": "Leg Swings",
           "exId": "leg-swings",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hold a wall and swing the leg front to back, then side to side",
-              "The swing should get a little bigger every rep"
-            ],
-            "bad": [
-              "Arching your lower back to throw the leg higher"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -83,15 +65,6 @@
           "name": "Lateral Lunge",
           "exId": "lateral-lunge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Step wide and sit back into that hip, chest tall",
-              "Feel the inside of the straight leg stretch"
-            ],
-            "bad": [
-              "Letting the bent knee cave inward"
-            ]
-          },
           "rx": {
             "reps": 6,
             "side": true
@@ -102,15 +75,6 @@
           "name": "World's Greatest Stretch",
           "exId": "worlds-greatest-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Step long, drop the back hip, then reach the inside arm up to the ceiling",
-              "Feel the front of the back hip and your upper back open up"
-            ],
-            "bad": [
-              "Rushing the reach before the hips have dropped"
-            ]
-          },
           "rx": {
             "reps": 4,
             "side": true
@@ -121,15 +85,6 @@
           "name": "A-Skip",
           "exId": "a-skip",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Tall hips, and strike the ground right underneath you",
-              "Feel a light, springy bounce off the ball of the foot"
-            ],
-            "bad": [
-              "Reaching the foot out in front of your body"
-            ]
-          },
           "rx": {
             "sets": 3,
             "distance": "20 m",
@@ -142,15 +97,6 @@
           "exId": "build-up-run",
           "videoUrl": null,
           "note": "Easy to fast. Run the last two as ten metres out, a turn at about three quarters speed and ten metres back.",
-          "cues": {
-            "good": [
-              "Each one a little faster than the last, and the final one at about nine tenths of top speed",
-              "Feel fast but relaxed, never straining"
-            ],
-            "bad": [
-              "Going flat out on the first one"
-            ]
-          },
           "rx": {
             "sets": 4,
             "distance": "20 m",
@@ -170,15 +116,6 @@
           "exId": "shuttle-sprint",
           "videoUrl": null,
           "note": "Game 1 of 4: if your turns get sloppy, a foot slips, something twinges or your sprints slow right down, stop after this game and go to the cool-down.",
-          "cues": {
-            "good": [
-              "Sprint to the line, plant and turn, then drive straight back out",
-              "Feel your whole foot push into the floor on every turn"
-            ],
-            "bad": [
-              "Planting with a stiff leg way out in front of your body"
-            ]
-          },
           "rx": {
             "sets": 6,
             "distance": "20 m",
@@ -192,15 +129,6 @@
           "exId": "shuttle-sprint",
           "videoUrl": null,
           "note": "Game 2 of 4: walk and breathe for ninety seconds first, and go to the cool-down instead if the last game got sloppy, twinged or slowed right down.",
-          "cues": {
-            "good": [
-              "Sprint to the line, plant and turn, then drive straight back out",
-              "Feel your whole foot push into the floor on every turn"
-            ],
-            "bad": [
-              "Planting with a stiff leg way out in front of your body"
-            ]
-          },
           "rx": {
             "sets": 6,
             "distance": "20 m",
@@ -214,15 +142,6 @@
           "exId": "shuttle-sprint",
           "videoUrl": null,
           "note": "Game 3 of 4: walk and breathe for ninety seconds first, and go to the cool-down instead if the last game got sloppy, twinged or slowed right down.",
-          "cues": {
-            "good": [
-              "Sprint to the line, plant and turn, then drive straight back out",
-              "Feel your whole foot push into the floor on every turn"
-            ],
-            "bad": [
-              "Planting with a stiff leg way out in front of your body"
-            ]
-          },
           "rx": {
             "sets": 6,
             "distance": "20 m",
@@ -236,15 +155,6 @@
           "exId": "shuttle-sprint",
           "videoUrl": null,
           "note": "Game 4 of 4: walk and breathe for ninety seconds first, and go to the cool-down instead if the last game got sloppy, twinged or slowed right down.",
-          "cues": {
-            "good": [
-              "Sprint to the line, plant and turn, then drive straight back out",
-              "Feel your whole foot push into the floor on every turn"
-            ],
-            "bad": [
-              "Planting with a stiff leg way out in front of your body"
-            ]
-          },
           "rx": {
             "sets": 6,
             "distance": "20 m",
@@ -263,15 +173,6 @@
           "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Walk slowly and let your arms swing loose",
-              "Your breathing should slow down a little every minute"
-            ],
-            "bad": [
-              "Sitting down while your heart is still racing"
-            ]
-          },
           "rx": {
             "time": "4 minutes"
           }

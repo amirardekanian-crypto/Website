@@ -50,15 +50,6 @@
           "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Easy pace until you are warm and breathing",
-              "Nothing here is fast yet"
-            ],
-            "bad": [
-              "Starting hard — you are about to sprint"
-            ]
-          },
           "rx": {
             "time": "3 minutes"
           }
@@ -68,15 +59,6 @@
           "name": "Leg Swings",
           "exId": "leg-swings",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hold the fence, stand tall, let the leg swing freely",
-              "Build the range across the ten"
-            ],
-            "bad": [
-              "Arching the back to throw the leg higher"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -88,15 +70,6 @@
           "name": "Lateral Lunge",
           "exId": "lateral-lunge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Step wide and sit into that hip, chest tall",
-              "Feel the inside of the straight leg"
-            ],
-            "bad": [
-              "Letting the knee roll inward"
-            ]
-          },
           "rx": {
             "reps": 6,
             "side": true
@@ -107,15 +80,6 @@
           "name": "World's Greatest Stretch",
           "exId": "worlds-greatest-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Drive the back hip down, then rotate and reach tall",
-              "Feel the front of the back hip open"
-            ],
-            "bad": [
-              "Rotating before the hip has opened"
-            ]
-          },
           "rx": {
             "reps": 4,
             "side": true
@@ -126,15 +90,6 @@
           "name": "A-Skip",
           "exId": "a-skip",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Tall hips, strike the ground underneath you",
-              "Rhythm first, height second"
-            ],
-            "bad": [
-              "Reaching the foot out in front of the body"
-            ]
-          },
           "rx": {
             "sets": 2,
             "distance": "15 m"
@@ -145,15 +100,6 @@
           "name": "Pogo Jump",
           "exId": "pogo-jump",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Stiff ankles, off the ground as fast as you land",
-              "Quiet contacts"
-            ],
-            "bad": [
-              "Bending the knees and turning it into a squat jump"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 10
@@ -164,15 +110,6 @@
           "name": "Build-Up Run",
           "exId": "build-up-run",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Accelerate smoothly to the top speed of each one",
-              "The last one should feel fast but relaxed"
-            ],
-            "bad": [
-              "Going straight to full effort on the first one"
-            ]
-          },
           "note": "This is the bridge between warm and sprinting — do not skip it.",
           "rx": {
             "sets": 3,
@@ -190,15 +127,6 @@
           "name": "Split-Step to Sprint",
           "exId": "split-step-to-sprint",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Land the split-step already loaded, then explode into the first stride",
-              "Stay low for the first two steps"
-            ],
-            "bad": [
-              "A slow, flat-footed first step"
-            ]
-          },
           "note": "Full rest between every one — this is a speed session, not conditioning.",
           "rx": {
             "sets": 6,
@@ -211,15 +139,6 @@
           "name": "Falling Start",
           "exId": "falling-start",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Lean from the ankles until you have to catch yourself, then run",
-              "Let the first three steps be long and low"
-            ],
-            "bad": [
-              "Bending at the hips instead of leaning from the ankle"
-            ]
-          },
           "rx": {
             "sets": 4,
             "distance": "10 m",
@@ -240,29 +159,11 @@
               "name": "Split-Step to Sprint",
               "exId": "split-step-to-sprint",
               "note": "One hard push-off, then set.",
-              "detail": "6 reps, alternating sides",
-              "cues": {
-                "good": [
-                  "Split-step on the baseline, then one hard push-off and set",
-                  "The first step goes where you are going, not across your body"
-                ],
-                "bad": [
-                  "Landing the split-step flat and heavy"
-                ]
-              }
+              "detail": "6 reps, alternating sides"
             },
             {
               "name": "Lateral Shuffle",
               "exId": "lateral-shuffle",
-              "cues": {
-                "good": [
-                  "From the tramline, shuffle back to the middle and set",
-                  "Stay low the whole way, facing the net"
-                ],
-                "bad": [
-                  "Standing up tall halfway back"
-                ]
-              },
               "rx": {
                 "reps": 4,
                 "side": true
@@ -271,15 +172,6 @@
             {
               "name": "Backward-to-Forward Transition",
               "exId": "backward-to-forward-transition",
-              "cues": {
-                "good": [
-                  "Drop-step back three steps, then turn and drive forward",
-                  "Open the hip to turn"
-                ],
-                "bad": [
-                  "Turning your back on the court"
-                ]
-              },
               "rx": {
                 "reps": 4
               }

@@ -25,16 +25,6 @@
           "type": "simple",
           "name": "Easy Run",
           "exId": "easy-run",
-          "cues": {
-            "good": [
-              "Alternate between jogging and skipping — jog a length, skip a length",
-              "Keep effort very low — you should be able to hold a conversation",
-              "Breathe through your nose if you can"
-            ],
-            "bad": [
-              "Going too hard — you're warming the engine, not racing it"
-            ]
-          },
           "rx": {
             "time": "3 min"
           }
@@ -43,15 +33,6 @@
           "type": "simple",
           "name": "Lateral Shuffle",
           "exId": "lateral-shuffle",
-          "cues": {
-            "good": [
-              "Face the net, stay low through the hips",
-              "Push off the outside foot each time"
-            ],
-            "bad": [
-              "Crossing your feet over each other"
-            ]
-          },
           "rx": {
             "reps": "3 Lengths"
           }
@@ -60,15 +41,6 @@
           "type": "simple",
           "name": "High Knees",
           "exId": "high-knees",
-          "cues": {
-            "good": [
-              "Drive each knee up to hip height",
-              "Stay on the balls of your feet"
-            ],
-            "bad": [
-              "Leaning back — stay tall"
-            ]
-          },
           "rx": {
             "reps": "1 Length"
           }
@@ -77,15 +49,6 @@
           "type": "simple",
           "name": "Butt Kicks",
           "exId": "butt-kicks",
-          "cues": {
-            "good": [
-              "Quick tempo, heels flicking up behind you",
-              "Arms pumping in rhythm"
-            ],
-            "bad": [
-              "Big, slow strides — this should be fast and tight"
-            ]
-          },
           "rx": {
             "reps": "1 Length"
           }
@@ -100,17 +63,6 @@
           "type": "simple",
           "name": "Squat",
           "exId": "bodyweight-squat",
-          "cues": {
-            "good": [
-              "Hands laced behind your head, elbows wide — keep them there throughout",
-              "Sit into the squat with your chest proud and knees tracking over your toes",
-              "Stand tall at the top, squeeze the glutes"
-            ],
-            "bad": [
-              "Letting the elbows collapse forward — if they drop, your chest is following",
-              "Rushing the descent — control the way down"
-            ]
-          },
           "rx": {
             "reps": 10
           }
@@ -119,17 +71,6 @@
           "type": "simple",
           "name": "Hip Airplane",
           "exId": "hip-airplane",
-          "cues": {
-            "good": [
-              "Stand on one leg, hinge forward until your torso and free leg are parallel to the floor",
-              "Arms out wide like wings — use them for balance and to open the chest",
-              "Squeeze the glute of the standing leg at the top as you return to upright"
-            ],
-            "bad": [
-              "Letting the hip of the raised leg hike up — keep both hips level",
-              "Rushing through — hold a beat at the bottom to feel the balance challenge"
-            ]
-          },
           "rx": {
             "reps": 6,
             "side": true
@@ -139,17 +80,6 @@
           "type": "simple",
           "name": "Standing Hip Circle",
           "exId": "standing-hip-circle",
-          "cues": {
-            "good": [
-              "Standing tall, drive one knee up to hip height then rotate it out to the side",
-              "Think 'step over a fence' — full circle through the hip",
-              "Hold onto a wall or racket for balance if needed"
-            ],
-            "bad": [
-              "Leaning away from the working leg — stay upright and let the hip do the work",
-              "Small, lazy circles — open the hip as wide as you can each rep"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -159,17 +89,6 @@
           "type": "simple",
           "name": "Reverse Lunge with Knee Drive",
           "exId": "reverse-lunge-with-knee-drive",
-          "cues": {
-            "good": [
-              "Step back and lower until your back knee is just above the floor",
-              "Drive that same knee forward and up to hip height as you return to standing",
-              "Use the knee drive to load the hip and glute — feel it working"
-            ],
-            "bad": [
-              "Letting the front knee cave inward — keep it tracking over your second toe",
-              "Rushing the drive — the knee lift should be deliberate, not a flick"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -179,15 +98,6 @@
           "type": "simple",
           "name": "Arm Circles",
           "exId": "arm-circles",
-          "cues": {
-            "good": [
-              "Start small and build to full shoulder range",
-              "Slow to fast — let the shoulder open gradually"
-            ],
-            "bad": [
-              "Going straight to big circles with a cold shoulder"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -197,15 +107,6 @@
           "type": "simple",
           "name": "Cross-Body Arm Swing",
           "exId": "cross-body-arm-swing",
-          "cues": {
-            "good": [
-              "Swing across the chest and let momentum carry it back",
-              "Alternate arms in a relaxed rhythm"
-            ],
-            "bad": [
-              "Forcing the range — it should swing freely, not be pulled"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -215,18 +116,6 @@
           "type": "simple",
           "name": "Half-Kneeling Thoracic Rotation",
           "exId": "half-kneeling-thoracic-rotation",
-          "cues": {
-            "good": [
-              "Take a half-kneeling position — one knee down, one foot forward at 90°",
-              "Place both hands behind your head, elbows wide",
-              "Rotate your upper back, reaching the top elbow toward the sky",
-              "Keep your hips square to the floor — all movement from the thoracic spine"
-            ],
-            "bad": [
-              "Rotating from the lower back or letting the hips open — lock them in place",
-              "Collapsing the chest forward between reps"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -244,17 +133,6 @@
           "name": "Pogo Jump",
           "exId": "pogo-jump",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Feet hip-width, bounce through the ankles — minimal knee bend",
-              "Think stiff springs, not pogo sticks — fast ground contact",
-              "Land softly on the balls of your feet and rebound immediately"
-            ],
-            "bad": [
-              "Bending too much at the knee — the ankle should be doing the work",
-              "Slow, lazy bounces — this should feel snappy"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 10,
@@ -267,17 +145,6 @@
           "name": "Countermovement Jump",
           "exId": "countermovement-jump",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Quick dip into a quarter squat, then drive arms up and explode off the floor",
-              "Land softly with bent knees, absorbing the force — stick each landing for a beat",
-              "Full intent on every rep — this should feel like max effort"
-            ],
-            "bad": [
-              "Slow, stiff take-off — you want a sharp, fast countermovement",
-              "Crashing the landing — control it, don't collapse"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 3
@@ -289,17 +156,6 @@
           "name": "Split-Stance Start",
           "exId": "split-stance-start",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Start from a split stance, lean forward and drive hard for the first 3–4 steps",
-              "Pump the arms aggressively — your legs follow your arms",
-              "Stay low for the first few metres, then rise naturally"
-            ],
-            "bad": [
-              "Standing tall from the start — you need that forward lean to accelerate",
-              "Jogging it — these are maximal sprints, not strides"
-            ]
-          },
           "rx": {
             "sets": 3,
             "distance": "10 m"

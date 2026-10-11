@@ -2754,7 +2754,7 @@
     text-transform: uppercase; color: var(--clay-ink); }
   .ex-note-more[hidden] { display: none; }
 
-  /* How to do it: the video and the cues, folded to one row after the first time. */
+  /* How to do it: the video, "You need", the steps and the cues, folded to one row after the first time. */
   .ex-how { margin: 10px 0 4px; border: 1px solid var(--grey-card); border-radius: 10px; background: var(--white); }
   .ex-how[hidden] { display: none; }
   .ex-how-sum { list-style: none; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px;
@@ -2769,6 +2769,26 @@
   .ex-how .ex-vunit { margin-top: 2px; }
   .ex-how .ex-section-label { display: none; }
   body[data-dark] .ex-how { background: #1e1e1e; border-color: #2a2a2a; }
+  /* The row's words: "How to do it", then a quiet count of what it holds. On a narrow phone the count
+     wraps under it rather than pushing the chevron off the row. The ▶ only with a video. */
+  .ex-how-play[hidden] { display: none; }
+  .ex-how-tx { flex: 1; min-width: 0; padding: 6px 0; line-height: 1.45; }
+  .ex-how-n { font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--grey-text); }
+  /* The steps (2026-10-11): "You need", then numbered lines. The numbers are green, never clay (DS-01). With
+     steps above them the cues take back their label, so the two lists read apart. */
+  .ex-kit { margin: 10px 0 2px; font-family: 'Barlow', sans-serif; font-size: var(--fs-small); line-height: 1.45; color: var(--grey-text); }
+  .ex-kit b { font-weight: 600; color: var(--grey-dark); }
+  .ex-steps { list-style: none; margin: 4px 0 0; padding: 0; counter-reset: st; }
+  .ex-steps li { counter-increment: st; display: flex; gap: 10px; align-items: baseline; padding: 6px 0;
+    font-family: 'Barlow', sans-serif; font-size: var(--fs-body); line-height: 1.45; color: var(--grey-dark); }
+  .ex-steps li::before { content: counter(st); flex: none; width: 20px; height: 20px; border-radius: 50%; box-sizing: border-box;
+    box-shadow: inset 0 0 0 1.5px currentColor; color: var(--green-ink); display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); line-height: 1; transform: translateY(-1px); }
+  .ex-how .ex-steps-slot:not(:empty) + .ex-cues-slot .ex-section-label { display: block; margin: 14px 0 4px; }
+  body[data-dark] .ex-kit { color: #999; }
+  body[data-dark] .ex-kit b, body[data-dark] .ex-steps li { color: #ddd; }
+  .sp-how .ex-vunit { margin: 2px 0 4px; }
+  .sp-how .ex-kit { margin-top: 4px; }
 
   /* Last time as a box: closed, the last set; open, every set (paintLastTime()). */
   .lt-slot:empty { display: none; }
@@ -3528,9 +3548,25 @@
   .round-row.prep .round-row-main { min-height: 44px; gap: 10px; }
   .round-row.prep.has-cues .round-row-main { cursor: pointer; }
   .round-row.prep .round-cues,
-  .round-row.prep .round-cues-slot { display: none; }
+  .round-row.prep .round-cues-slot,
+  .round-row.prep .round-steps-slot { display: none; }
   .round-row.prep.cues-open .round-cues-slot { display: block; }
   .round-row.prep.cues-open .round-cues { display: block; padding: 0 0 6px 26px; }
+  .round-row.prep.cues-open .round-steps-slot { display: block; padding: 0 0 2px 26px; }
+  /* A circuit item's steps (2026-10-11): in a warm-up under the same tap as its cues; in a working circuit,
+     whose cues stay open, behind one small How to do it line, so the circuit does not grow by them. */
+  .round-row .ex-kit { margin: 4px 0 0; }
+  .round-row .ex-steps li { font-size: var(--fs-small); padding: 4px 0; }
+  .round-row:not(.prep) .round-steps-slot { display: none; }
+  .round-row.steps-open:not(.prep) .round-steps-slot { display: block; padding-bottom: 2px; }
+  .round-how-tog { display: none; position: relative; align-self: flex-start; align-items: center; gap: 0; min-height: 36px; margin-top: 2px;
+    padding: 0; background: none; border: 0; cursor: pointer; text-align: left;
+    font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 0.6px; text-transform: uppercase; color: var(--green-ink); }
+  .round-how-tog::after { content: ''; position: absolute; inset: -4px 0; }   /* 36 to see, 44 to hit */
+  .round-how-n { font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--grey-text); white-space: pre; }
+  .round-how-tog i { font-style: normal; color: var(--grey-text); margin-left: 8px; transition: transform 0.2s; }
+  .round-row.steps-open .round-how-tog i { transform: rotate(90deg); }
+  .round-row.has-steps:not(.prep) .round-how-tog { display: inline-flex; }
   .round-cue-tog { display: none; order: 10; flex: none; width: 44px; height: 44px; margin: -8px -10px -8px -6px;
     align-items: center; justify-content: center; background: transparent; border: 0; padding: 0;
     color: var(--grey-text); cursor: pointer; }
@@ -3971,7 +4007,7 @@
 
   /* ── Guided Mode — walks the day's standard exercises one set at a time. See
      openStepMode() in the script: it relocates the REAL .ex-detail node (the note, Last
-     time, video, cues, the set-log table) from the card below into .step-scroll, so nothing
+     time, How to do it, the set-log table) from the card below into .step-scroll, so nothing
      about logging a set is reimplemented here — this is layout and navigation only. ── */
   .step-overlay { display: none; position: fixed; inset: 0; z-index: 90; background: var(--grey-bg); flex-direction: column; }
   .step-overlay.visible { display: flex; }
@@ -7908,6 +7944,30 @@ function renderInlineCues(cues) {
   (cues.bad  || []).forEach(c => { body += `<div class="ex-cue bad">${esc(c)}</div>`; });
   return `<div class="ex-section-label">Coaching Cues</div><div class="ex-cues">${body}</div>`;
 }
+function hasCues(cues) { return !!(cues && (cues.good?.length || cues.bad?.length)); }
+
+// THE STEPS (2026-10-11, the Exercise Card Blueprint; CUE-6, CUE-7). A Spine entry's `steps` are 3 to 5 plain
+// lines for anyone, from setup to a safe finish, enough to do the exercise with no video. Each part of the card
+// says one thing: the steps the how, the cues the focus and the one fault, the pill this athlete's change, the
+// Coach's Note this athlete. "You need" leads, from the entry's kit; the floor and "none" need no saying.
+const KIT_SILENT = /^(floor|none|bodyweight|body weight|no equipment)$/i;
+function stepsOf(e) {
+  return (e && Array.isArray(e.steps)) ? e.steps.filter(s => typeof s === 'string' && s.trim()) : [];   // an old spinecache has none
+}
+function kitLine(e) {
+  const seen = {};
+  const kit = ((e && e.equipment) || []).map(k => String(k || '').trim())
+    .filter(k => k && !KIT_SILENT.test(k) && !seen[k.toLowerCase()] && (seen[k.toLowerCase()] = 1));
+  return kit.length ? `<p class="ex-kit"><b>You need:</b> ${esc(kit.join(', '))}</p>` : '';
+}
+// "You need" and the numbered steps, or nothing when the entry has no steps yet.
+function renderSteps(e) {
+  const st = stepsOf(e);
+  if (!st.length) return '';
+  return kitLine(e) + `<ol class="ex-steps">${st.map(s => `<li>${esc(s.trim())}</li>`).join('')}</ol>`;
+}
+// Writes only when the markup changes, so a repaint never redraws what the athlete is reading.
+function setSlot(el, html) { if (el && el.innerHTML !== html) el.innerHTML = html; }
 
 // The YouTube mark (YouTube's own red, white triangle) and an external-link arrow, drawn inline: no
 // request, no emoji. Sized by CSS (.ex-yt); the attributes are only the fallback.
@@ -7936,33 +7996,57 @@ function renderVideoBlock(url) {
   </div>`;
 }
 
-// How to do it (CARD-01, Amir 2026-09-27): the video and the cues in one folded row,
-// "▶ Video & 4 cues". It opens by itself only when the athlete has no history for the
-// lift (paintLastTime() → openHowFirstTime()), and on a Library session, which is read
-// more than it is logged. Once the athlete opens or closes it, it stays as they left it.
-function renderHowTo(videoBlock, cuesHtml, open) {
+// How to do it (CARD-01, Amir 2026-09-27; the steps since 2026-10-11): one folded row that holds, in this
+// order, the video when there is one, "You need", the entry's steps and then the cues. It opens by itself
+// the first time the athlete meets the exercise (paintLastTime() or, for a simple card with no sets,
+// openHowSimple() → openHowFirstTime()), and on a Library session, which is read more than it is logged.
+// Once the athlete opens or closes it, it stays as they left it. The steps and the cues go into their
+// slots in paintSpine(): the Spine's always win, and the card's own cues (older programmes carry them)
+// wait in the cue slot as the fallback for an exercise with no approved entry or no cues on it.
+function renderHowTo(videoBlock, ownCuesHtml, open) {
   return `<details class="ex-how"${open ? ' open' : ''}>
-    <summary class="ex-how-sum" onclick="this.parentElement.dataset.user = '1'"><span class="ex-how-play" aria-hidden="true">▶</span><span class="ex-how-t">How to do it</span><i aria-hidden="true">›</i></summary>
-    <div class="ex-how-body">${videoBlock}${cuesHtml}</div>
+    <summary class="ex-how-sum" onclick="this.parentElement.dataset.user = '1'">${videoBlock ? '<span class="ex-how-play" aria-hidden="true">▶</span>' : ''}<span class="ex-how-tx"><span class="ex-how-t">How to do it</span><span class="ex-how-n"></span></span><i aria-hidden="true">›</i></summary>
+    <div class="ex-how-body">${videoBlock}<div class="ex-steps-slot"></div><div class="ex-cues-slot">${ownCuesHtml}</div></div>
   </details>`;
 }
-// The row names what it holds ("Video & 4 cues", "Video", "3 cues") and hides while it
-// holds nothing: the Spine's cues can arrive after the card is drawn (paintSpine()).
+// The row reads "How to do it" with a quiet count of what it holds ("· video · 5 steps · 3 cues", only the
+// parts there), and hides while it holds nothing: the Spine can arrive after the card is drawn. The green ▶
+// shows only with a video: a ▶ with no video behind it promised one that was not there.
 function paintHowTo(card) {
   const d = cardDetail(card);
   const how = d && d.querySelector('.ex-how');
   if (!how) return;
   const hasVid = !!how.querySelector('.ex-video');
-  const n = how.querySelectorAll('.ex-cue').length;
-  how.hidden = !hasVid && !n;
-  const cues = n + (n === 1 ? ' cue' : ' cues');
-  const t = how.querySelector('.ex-how-t');
-  if (t) t.textContent = hasVid && n ? 'Video & ' + cues : hasVid ? 'Video' : cues;
+  const steps = how.querySelectorAll('.ex-steps li').length;
+  const cues = how.querySelectorAll('.ex-cue').length;
+  how.hidden = !hasVid && !steps && !cues;
+  // A part never breaks inside ("5 steps"), and a line ends on a dot rather than starting with one.
+  const parts = [];
+  if (hasVid) parts.push('video');
+  if (steps) parts.push(steps + (steps === 1 ? '\u00a0step' : '\u00a0steps'));
+  if (cues) parts.push(cues + (cues === 1 ? '\u00a0cue' : '\u00a0cues'));
+  const n = how.querySelector('.ex-how-n');
+  if (n) n.textContent = parts.map(x => '\u00a0· ' + x).join('');
+  const play = how.querySelector('.ex-how-play');
+  if (play) play.hidden = !hasVid;
 }
 function openHowFirstTime(card, first) {
   const d = cardDetail(card);
   const how = d && d.querySelector('.ex-how');
   if (how && !how.dataset.user) how.open = !!first;
+}
+// A simple card (a warm-up ride, a stretch) logs no sets, so historyFor() never finds it and paintLastTime()
+// never runs on it. It has met the athlete once an earlier session carries it at all: buildSessionData()
+// writes every exercise of the day into the record, sets or none. Only its How to do it changes here.
+function seenBefore(name) {
+  if (!HIST) return false;
+  const want = histNorm(name), today = ymdLocal(new Date());
+  return HIST.some(s => s.date < today && (s.entries || []).some(e => histNorm(HIST_ALIAS[e.ex] || e.ex) === want));
+}
+function openHowSimple(card) {
+  if (HIST == null || !card || !card.closest('#screen-home')) return;   // a Library session keeps it open
+  const n = card.querySelector('.item-name');
+  if (n) openHowFirstTime(card, !seenBefore(n.textContent.trim()));
 }
 // A card's open part. Guided Mode moves it into its own overlay while it is on that
 // exercise, so it is not always inside the card.
@@ -7999,12 +8083,12 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   const noteHtml   = renderCoachNote(ex.note);
   const videoBlock = renderVideoBlock(_vid);
   const setupHtml  = rx.setup ? `<div class="ex-setup">${esc(rx.setup)}</div>` : '';
-  // THE SPINE (2026-09-24): cues are written ONCE, on the exercise's entry. A
-  // programme only carries cues when the coach wants different ones for this
-  // athlete, so an exercise without its own gets a slot that paintSpine() fills.
-  const cuesHtml  = (ex.cues && (ex.cues.good?.length || ex.cues.bad?.length))
-    ? renderInlineCues(ex.cues) : '<div class="ex-cues-slot"></div>';
-  const howHtml = (_vid || cuesHtml) ? renderHowTo(videoBlock, cuesHtml, dayId === 'ws') : '';
+  // THE SPINE (2026-09-24): the steps and the cues are written ONCE, on the exercise's entry,
+  // for everyone, and paintSpine() puts them in. The Spine wins (Q9 A, 2026-10-11): a card's
+  // own cues, which older programmes and Library sessions still carry, show only when no
+  // approved entry with cues resolves. Anything about this one athlete is the Coach's Note.
+  const ownCues = hasCues(ex.cues) ? renderInlineCues(ex.cues) : '';
+  const howHtml = renderHowTo(videoBlock, ownCues, dayId === 'ws');
 
   // The log section is only meaningful for "standard" exercises (the ones that
   // get rest, weight, RPE). Simple warm-ups skip it. Its header (SET · KG · REPS)
@@ -8103,11 +8187,13 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
 
   const roundsHtml = (ex.items || []).map((item, i) => {
     const letter = String.fromCharCode(65 + i); // 65 = 'A'
-    // THE SPINE: an item without its own cues gets a slot that paintSpine() fills
-    // from its entry, exactly like a standalone card's .ex-cues-slot.
+    // THE SPINE: every item gets a steps slot and a cue slot that paintSpine() fills from its entry,
+    // exactly like a standalone card's. The Spine's cues win (Q9 A, 2026-10-11); an item's own cues,
+    // which older programmes carry, wait in the slot as the fallback for an item with no approved entry.
     const ownCues = renderRoundCues(item.cues);
-    const itemCues = ownCues
-      || `<div class="round-cues-slot" data-name="${esc(item.name || '')}" data-exid="${esc(item.exId || '')}"></div>`;
+    const slotData = `data-name="${esc(item.name || '')}" data-exid="${esc(item.exId || '')}"`;
+    const itemCues = `<div class="round-cues-slot" ${slotData}>${ownCues}</div>`;
+    const itemSteps = `<div class="round-steps-slot" ${slotData}></div>`;
     // Per-item play button — only renders if this sub-exercise has a video
     // (either an explicit videoUrl, or its Spine entry's video: getVideoUrl()).
     const itemVid = getVideoUrl(item);
@@ -8119,11 +8205,15 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
     // No YouTube mark on the row (2026-10-05): beside the ▶ it pushed a superset's row 6 to 36 px past its card
     // at 360-390 px and squeezed a warm-up's names to two or three lines. The pop-up this ▶ opens carries the
     // "Open in YouTube" bar under its player instead (shared.js, VideoModal).
-    // A warm-up row: the cues fold under a chevron (shown once the row has cues: its own,
-    // or its Spine entry's when paintSpine() fills the slot). A tap on the row opens them too.
+    // A warm-up row: the steps and the cues fold under a chevron (shown once the row has either: its
+    // own cues, or its Spine entry's when paintSpine() fills the slots). A tap on the row opens them too.
     const cueTog = isPrep
-      ? `<button class="round-cue-tog" type="button" aria-expanded="false" aria-label="Cues for ${esc(item.name || '')}" onclick="togglePrepCues(event, this.closest('.round-row'))"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`
+      ? `<button class="round-cue-tog" type="button" aria-expanded="false" aria-label="How to do it: ${esc(item.name || '')}" onclick="togglePrepCues(event, this.closest('.round-row'))"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`
       : '';
+    // A working circuit keeps its cues open (WK-05), so the steps go behind one small How to do it line
+    // under them, shown once the entry has steps (paintSpine()), and the circuit does not grow by them.
+    const howTog = isPrep ? '' : `<button class="round-how-tog" type="button" aria-expanded="false" onclick="toggleRoundSteps(event, this.closest('.round-row'))">How to do it<span class="round-how-n"></span><i aria-hidden="true">›</i></button>`;
+    const fold = isPrep ? itemSteps + itemCues : itemCues + howTog + itemSteps;
     return `<div class="round-row${isPrep ? ' prep' : ''}${isPrep && ownCues ? ' has-cues' : ''}">
       <div class="round-row-main"${isPrep ? ` onclick="togglePrepCues(event, this.closest('.round-row'))"` : ''}>
         <span class="round-letter">${letter}</span>
@@ -8133,7 +8223,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
         ${itemPlay}
         ${cueTog}
       </div>
-      ${itemCues}
+      ${fold}
     </div>`;
   }).join('');
 
@@ -8333,8 +8423,9 @@ function handlePlayVideo(url) {
 
 // Round cues — same green/red accent-line design as standard exercise cues.
 // Always visible inside the expanded circuit (no collapse).
-// A warm-up row's cues, on a tap (WK-05). The row itself or its chevron; the ▶ plays and
-// never toggles. A row with no cues (none written, no Spine entry yet) does nothing.
+// A warm-up row's steps and cues, on a tap (WK-05). The row itself or its chevron; the ▶ plays
+// and never toggles. A row with neither (none written, no Spine entry yet) does nothing.
+// (`has-cues` means "has something to fold": its cues, its steps, or both.)
 function togglePrepCues(ev, row) {
   if (ev) ev.stopPropagation();
   if (!row || !row.classList.contains('has-cues')) return;
@@ -8344,6 +8435,15 @@ function togglePrepCues(ev, row) {
   if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 window.togglePrepCues = togglePrepCues;
+// A working circuit item's steps, behind its How to do it line (2026-10-11).
+function toggleRoundSteps(ev, row) {
+  if (ev) ev.stopPropagation();
+  if (!row) return;
+  const open = row.classList.toggle('steps-open');
+  const b = row.querySelector('.round-how-tog');
+  if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+window.toggleRoundSteps = toggleRoundSteps;
 
 function renderRoundCues(cues) {
   if (!cues || (!cues.good?.length && !cues.bad?.length)) return '';
@@ -8462,17 +8562,17 @@ const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
     body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
-    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes. When the last week is over, Home says so: your cycle card reads <strong>Cycle complete</strong>, and there's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo, target RPE, a demo video, and coaching cues.</li></ul><p>The "Why This Cycle Matters" note on <strong>Game Plan</strong> explains what we're chasing right now.</p>` },
+    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. When you're in one of them, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes. When the last week is over, Home says so: your cycle card reads <strong>Cycle complete</strong>, and there's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The "Why This Cycle Matters" note on <strong>Game Plan</strong> explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
     body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video and the cues, open the first time you meet an exercise, folded after that; if the video won't play on your phone, tap <strong>Open in YouTube</strong> under it), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and the circle ticks the whole warm-up.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues; it opens by itself the first time you meet an exercise and is folded after that, and the ▶ on it means there is a video; if the video won't play on your phone, tap <strong>Open in YouTube</strong> under it), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and the circle ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. When the rest is over it moves you to the next set. Supersets and circuits come round by round; warm-ups stay in the list.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
-    body: `<p>The small <strong>i</strong> at the right end of every exercise tells you what it does, which qualities it builds, where it shows up on court, which parts of your body it works (and whether it jumps, lands or runs), and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its video and cues, and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
+    body: `<p>The small <strong>i</strong> at the right end of every exercise tells you what it does, which qualities it builds, where it shows up on court, which parts of your body it works (and whether it jumps, lands or runs), and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its <strong>How to do it</strong> (the video when there is one, the steps and the cues), and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
     body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Last time — your history on every exercise',
@@ -8487,7 +8587,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app — full-screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong> — the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>Exercise videos</strong> — most exercises have a video. Tap it if you're unsure of form. If it won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong> — the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>How to do it</strong> — inside an exercise: the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab, in every exercise's ⓘ, and at the end of every session, where your message already says which day or exercise it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days; quick check-ins beat long waits.</p>` },
 ];
@@ -10182,7 +10282,7 @@ async function openWorkout(file) {
     });
   });
   body.innerHTML = html || `<div class="wl-empty">This workout has no exercises yet.</div>`;
-  paintSpine();   // a library exercise without its own cues shows its Spine entry's
+  paintSpine();   // a library exercise shows its Spine entry's steps and cues (its own cues only without one)
 
   // Re-bind check-off to our local-only handler. The rendered cards carry the
   // training screen's inline onclick (onCheckBoxTap / onExerciseRowTap), which
@@ -13086,7 +13186,8 @@ function initSetOrRPE() {
   document.querySelectorAll('#screen-home .checklist-item').forEach(card => {
     // A simple exercise has no rest button. A circuit may have none either (a warm-up with no
     // written rest, WK-05), and is still a circuit.
-    if (!card.classList.contains('round-group') && !card.querySelector('.rest-btn')) return; // simple exercise — skip
+    // A simple exercise logs nothing: only its How to do it opens the first time (openHowSimple()).
+    if (!card.classList.contains('round-group') && !card.querySelector('.rest-btn')) { openHowSimple(card); return; }
     if (card.classList.contains('round-group')) {
       // Circuit logging — weight grid and/or per-round RPE, per the JSON flags.
       attachCircuitLog(card);
@@ -13646,7 +13747,7 @@ function renderStep() {
     STEP.homeCard = item.card;
     STEP.homeDetail = item.card.querySelector('.ex-detail');
     // The exercise name lives in .item-main, not the relocated .ex-detail, so it's
-    // repainted here — everything below it (the note, Last time, video, cues, the
+    // repainted here — everything below it (the note, Last time, How to do it with its steps, the
     // set-log table) is the real node, moved in whole.
     // The numbers and the pills live in the header now (CARD-02), so they are copied too.
     const nl = item.card.querySelector('.ex-numline'), pl = item.card.querySelector('.ex-summary');
@@ -14164,6 +14265,7 @@ function paintAllLastTime() {
   document.querySelectorAll('.checklist-item').forEach(card => {
     const d = cardDetail(card);
     if ((d && d.querySelector('.ex-set-log')) || card.classList.contains('round-group')) paintLastTime(card);
+    else if (!(d && d.querySelector('.rest-btn'))) openHowSimple(card);   // a simple card: its How to do it only
   });
 }
 
@@ -14192,7 +14294,10 @@ function demoHistory() {
       const dt = new Date(day0.getTime() - ((di + 2) + 7 * k) * 86400000);
       const log = [];
       (d.blocks || []).forEach(b => (b.exercises || []).forEach((ex, xi) => {
-        if (!ex || ex.type !== 'standard') return;
+        if (!ex || ex.type === 'circuit') return;
+        // A simple item is in the record with no sets, as buildSessionData() writes it, so the
+        // demo's warm-up has been met before like everything else (its How to do it starts folded).
+        if (ex.type !== 'standard') { log.push({ ex: ex.name, block: b.title || '', reps: null, sets: [], note: '' }); return; }
         const planned = repCount(ex), r = rxOf(ex), tgt = parseInt(r.rpe, 10) || 7;
         const sets = parseInt(r.sets, 10) || 3;
         const base = planned ? demoLoad(ex.name, hash(ex.name)) : 0;
@@ -14556,16 +14661,31 @@ function whyList() {
   return out;
 }
 
-// Cues into empty slots, and the ⓘ at the right end of the row. Safe to call again: it only
-// fills what is still empty and never adds a second button. A card with a reason
-// (ex.why) gets the ⓘ even before its Spine entry is approved, solid clay (has-why).
+// The steps and cues into their slots, and the ⓘ at the right end of the row. Safe to call
+// again: a slot always shows what the Spine says now, and it never adds a second button. A
+// card with a reason (ex.why) gets the ⓘ even before its Spine entry is approved, solid clay
+// (has-why). THE SPINE WINS (Q9 A, Amir 2026-10-11): an approved entry's cues replace the
+// card's own; those are kept on the slot (data-own) and come back only when no entry with
+// cues resolves, so a Spine that arrives late, or drops an entry, can swap either way.
+function spineCuesInto(slot, entry, render) {
+  if (!slot) return;
+  if (slot.dataset.own == null) slot.dataset.own = slot.innerHTML;
+  setSlot(slot, entry && hasCues(entry.cues) ? render(entry.cues) : slot.dataset.own);
+}
 function paintSpine() {
-  // Exercises inside a circuit: cues only (a circuit row has no ⓘ).
-  if (SPINE) document.querySelectorAll('.round-cues-slot').forEach(slot => {
-    if (slot.childElementCount) return;
-    const entry = spineFor(slot.dataset.name, slot.dataset.exid);
-    if (entry && entry.cues) slot.innerHTML = renderRoundCues(entry.cues);
-    if (slot.querySelector('.ex-cue')) { const r = slot.closest('.round-row'); if (r) r.classList.add('has-cues'); }
+  // Exercises inside a circuit: steps and cues (a circuit row has no ⓘ).
+  document.querySelectorAll('.round-cues-slot').forEach(slot => {
+    const entry = SPINE ? spineFor(slot.dataset.name, slot.dataset.exid) : null;
+    spineCuesInto(slot, entry, renderRoundCues);
+    const row = slot.closest('.round-row');
+    if (!row) return;
+    const st = row.querySelector('.round-steps-slot');
+    setSlot(st, renderSteps(entry));
+    const n = st ? st.querySelectorAll('.ex-steps li').length : 0;
+    row.classList.toggle('has-steps', !!n);
+    const rn = row.querySelector('.round-how-n');
+    if (rn) rn.textContent = n ? '\u00a0·\u00a0' + n + (n === 1 ? '\u00a0step' : '\u00a0steps') : '';
+    row.classList.toggle('has-cues', !!(n || slot.querySelector('.ex-cue')));
   });
   document.querySelectorAll('.checklist-item').forEach(card => {
     if (card.classList.contains('round-group')) return;
@@ -14573,8 +14693,11 @@ function paintSpine() {
     if (!nameEl) return;
     const entry = SPINE ? spineFor(nameEl.textContent.trim(), card.dataset.exid) : null;
     const why = whyOfCard(card);
-    const slot = card.querySelector('.ex-cues-slot');
-    if (slot && !slot.childElementCount && entry && entry.cues) slot.innerHTML = renderInlineCues(entry.cues);
+    const d = cardDetail(card);   // Guided may have moved it into its own overlay
+    if (d) {
+      setSlot(d.querySelector('.ex-steps-slot'), renderSteps(entry));
+      spineCuesInto(d.querySelector('.ex-cues-slot'), entry, renderInlineCues);
+    }
     paintHowTo(card);
     if (entry) paintKgCol(card);
     // The ⓘ sits at the right end of the row and of the open card's header (CARD-01, Amir
@@ -14614,8 +14737,8 @@ function spineUsesInProgramme(id) {
 // The About sheet. Uses the History sheet's own frame (#hist-overlay), so the
 // two never stack: History › from here swaps the content in place.
 // Opened WITHOUT a card (from the Exercises library, or tapping a linked exercise
-// that is not on the athlete's page) the sheet is the whole entry: it also carries the
-// video and the cues, because there is no card on screen showing them.
+// that is not on the athlete's page) the sheet is the whole entry: it also carries How
+// to do it (the video, the steps, the cues), because there is no card on screen showing them.
 function openExerciseSheet(id, card, fromLib) {
   const e = id ? SPINE_BY_ID[id] : null;
   const full = !!fromLib || !card;
@@ -14665,6 +14788,13 @@ function openExerciseSheet(id, card, fromLib) {
   const linksHtml = linkList('Regressions', e.easier) + linkList('Progressions', e.harder) + linkList('Alternatives', e.alts);
   const whereHtml = inProg.length ? `<div class="sp-sec"><div class="sp-lbl">In your programme</div>${
     inProg.map(w => `<div class="sp-where"><span>Day ${esc(String(w.day))}${w.focus ? ' · ' + esc(w.focus) : ''}</span><small>${esc(w.block)}</small></div>`).join('')}</div>` : '';
+  // Opened whole (Library → Exercises, or no card on screen), How to do it comes before the body map
+  // (2026-10-11): the video, then "You need" and the steps, then the cues. From a card it stays out:
+  // the card is right there with its own.
+  const stepsHtml = renderSteps(e);
+  const howHtml = (e.video || stepsHtml ? `<div class="sp-sec sp-how"><div class="sp-lbl">How to do it</div>${
+    e.video ? renderVideoBlock(e.video) : ''}${stepsHtml}</div>` : '')
+    + (hasCues(e.cues) ? `<div class="sp-sec sp-cues">${renderInlineCues(e.cues)}</div>` : '');
   const hist = card ? historyFor(card.querySelector('.item-name').textContent.trim()) : historyFor(e.name);
   const histBtn = (card && hist.length) ? `<button type="button" class="hs-link" id="sp-hist">Your history · ${hist.length} session${hist.length === 1 ? '' : 's'} ›</button>` : '';
 
@@ -14679,9 +14809,8 @@ function openExerciseSheet(id, card, fromLib) {
       (e.qualities || []).filter(q => QUALS_BY_ID[q]).map(q =>
         `<button type="button" class="sp-chip sp-q" data-q="${esc(q)}">${esc(QUALS_BY_ID[q].name)}</button>`).join('')}</div>
     ${e.tennis && isRacketSport() ? `<div class="sp-sec"><div class="sp-lbl">On court</div><p class="sp-court">${esc(e.tennis)}</p></div>` : ''}
+    ${full ? howHtml : ''}
     ${bodyPartsHtml(e)}
-    ${full && e.video ? `<div class="sp-sec">${renderVideoBlock(e.video)}</div>` : ''}
-    ${full && e.cues ? `<div class="sp-sec sp-cues">${renderInlineCues(e.cues)}</div>` : ''}
     ${linksHtml}
     ${fromLib ? whereHtml : ''}
     ${waInlineHtml(coachWhatsAppUrl('About ' + e.name + (card && card.dataset.day ? ' (Day ' + card.dataset.day + ')' : '') + ': '), 'Ask me about this exercise', 'Form check, a swap, anything that hurts. On WhatsApp.')}
@@ -14904,8 +15033,8 @@ window.openQualitySheet = openQualitySheet;
 // The same approved Spine entries the ⓘ reads, as a searchable list: this
 // athlete's own exercises first, then everything else, filterable by pattern.
 // Every row opens openExerciseSheet() — with the athlete's card when the exercise
-// is in their programme (so History comes along), without it otherwise (so the
-// sheet carries the video and cues itself). No new data, no second design.
+// is in their programme (so History comes along). Opened from here the sheet always
+// carries How to do it itself: the video, the steps, the cues. No new data, no second design.
 let _xlPattern = 'all';
 function paintExerciseCount() {
   const el = document.getElementById('exercises-count');

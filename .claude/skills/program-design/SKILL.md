@@ -395,21 +395,14 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   each with its own `rest:` and an `intent: superset` tag — see the "Superset" bullet in STEP 2.
 - **warm-up / prep (simple or circuit)** → dose only (reps/duration); **no RPE, logs nothing**
   (prep circuits get `warmup: true` in assembly). RPE on a warm-up is noise.
-- `intent` is ONE coaching intention in plain words (`max intent`, `stick the landing`,
-  `right leg first`) — it ships as the exercise's `intent` field and draws the single green
-  pill. Leave blank if none. **Never restate the tempo here** (CHP-6): `3s eccentric` beside a tempo of
-  `3-1-1-0` is the same instruction twice, and the card already shows the tempo with its key
-  digits highlighted.
-  **A GRIP is written here too, as the pill** (`neutral grip`, `wide grip`; with an intention,
-  `neutral grip · max intent`). Amir, 2026-09-25: *"grips should be a chip on the card not a
-  free text"*. It is the athlete's chip, never the library entry's. **No floating text**: nothing
-  goes on a grey `setup` line (*"i dont like floating text"*); a detail for this athlete is the
-  `note:`. A variant that changes the exercise (Short-Lever Copenhagen Plank) is its own exercise,
-  a `new_exercise:` with its own cues, never the parent plus a note.
-  It must be something the athlete actively does mid-set, never a restatement of the target
-  muscle/category already covered by a cue (CHP-2).
-  **`intent` is never a structural pairing like `superset`** — a superset is a circuit-role
-  decision (see above), not an `intent` on a standard exercise.
+- `intent` is the pill: one or two values from the closed list in SCHEMA.md → *`intent`: the pill
+  list*, under CHP-2's rules (the groups, two at most, one per group, what is never a pill). Leave it
+  blank if none. Choose it from the athlete, not the exercise: the grip this athlete needs, the side
+  that goes first, the effort of every rep (`max intent` on ballistic work), where a hold sits. It is
+  the athlete's, never the library entry's (NAM-5), and it never repeats what the entry's steps already
+  say (CUE-7). Nothing goes on a grey `setup` line (CHP-1): a detail for this athlete is a `note_flag`.
+  A variant that changes the exercise is its own `new_exercise:` (NAM-6), and a superset is a
+  circuit-role decision, never a pill (SES-12).
 - Tempo = Eccentric–Pause–Concentric–Reset (e.g. 3-0-1-0). RPE 1–10.
 - `test_flag` (optional, standard lifts only; TST-5): `test_flag: 5RM` marks a lift as one this
   cycle is genuinely **about** — the Personal Records screen then tracks how long it has been
@@ -430,11 +423,13 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   exercise that would be in anyone's programme gets none; its general job is the Spine's
   `purpose`. The ledger row you already write is where this comes from. /program-engage writes
   the athlete's sentence from it; you don't.
-- `note_flag` (optional, NOT athlete-facing wording): when an exercise carries guidance that
-  belongs on the card itself — an injury caveat, a starting point drawn from the athlete's
-  logs, how to load it — flag it in one short coaching-domain line, e.g. `note_flag: staged
-  knee return, shallow + pain-guided depth` or `note_flag: log shows no confirmed RPE at
-  40 kg, start from the confirmed 35 kg`. That's the whole job here: name the exercise + the
+- `note_flag` (optional, NOT athlete-facing wording): when THIS athlete needs something on the card
+  that the entry's steps, cues and the pill can't say, flag it in one short coaching-domain line naming
+  what COM-14 lets a note carry (a starting weight from their logs, their limit, their kit, their checked
+  fallback, a film ask) and why, e.g. `note_flag: staged knee return, stops at the box (changes the
+  entry's step 3)` or `note_flag: log shows no confirmed RPE at 40 kg, start from the confirmed 35 kg`.
+  Never a flag for general how-to (a missing or wrong step is a `spine_cue:` line for the entry, CUE-6),
+  a general cue, or when to add weight (PRG-3). That's the whole job here: name the exercise + the
   reason. **Don't draft the athlete-facing sentence** — /program-engage PART 3 writes the
   actual "Coach's Note" copy from this flag + the full athlete picture, and /program-assemble
   places it on the exercise. This is the ONLY athlete-facing place a weight number may ever
@@ -495,32 +490,30 @@ line. Report the per-day top three too: it is exactly what each day card on Home
 it builds, so a day card that reads "Movement · Armour" on a day you meant as the power day is a
 design bug.
 
-**CUES COME FROM THE SPINE, and only from the Spine (Amir, 2026-09-24: *"the aim is to use these
-cues for all the exercises that everyone has from now on … if there is a cue for someone specific,
-it should be in coach's notes. thats why its there"*).** The spec carries **no cues**. Each exercise
-has one set of three cues, on its Spine entry, and every athlete's card shows those.
-- **Something only THIS athlete needs** (an injury limit, a range to stop at, a side, a setup for
-  their home kit, a fault you saw on video) goes in that exercise's **`note:`**, the Coach's Note.
-  It is one to three short sentences (COM-14) and is never written as a cue. Examples: *"Hands on a bench, not the floor:
-  your wrists take too much at your bodyweight."* or *"Stop at about 90 degrees of knee bend."*
+**STEPS AND CUES COME FROM THE SPINE, and only from the Spine (Amir, 2026-09-24: *"the aim is to use
+these cues for all the exercises that everyone has from now on … if there is a cue for someone specific,
+it should be in coach's notes. thats why its there"*).** The spec carries **no cues and no steps**. Each
+exercise has one set of steps (CUE-6) and three cues (CUE-1) on its Spine entry, and every athlete's card
+shows those; each layer says one thing (CUE-7).
+- **Something only THIS athlete needs** (an injury limit, a range to stop at, a setup for their home
+  kit, a fault you saw on their film) is a `note_flag` on that exercise, which engage writes as the
+  Coach's Note (COM-14), never as a cue. The side that goes first is the pill (CHP-2). A limit that
+  changes one of the entry's steps is flagged as such, so the note can say what changes.
 - **A general coaching point is not a note.** If it would help anyone doing the lift, it belongs on
-  the Spine entry. Say so in the spec (`spine_cue:` + the entry id + the wording) and Amir changes
-  the entry in coach.html → Exercises. Never put it on one card.
+  the Spine entry: a missing or unclear step, a better cue. Say so in the spec (`spine_cue:` + the
+  entry id + the wording) and Upkeep proposes it to Amir. Never put it on one card.
 - **RETURNING athlete whose last cycle's cards carry their own `cues`** (every programme before
   2026-09-24 does): read each card's cues against its Spine entry's. Anything that is about THIS
   athlete becomes a `note_flag` on the same exercise in the new cycle, so it is not lost when the
   card stops carrying cues. The rest is dropped. Two athletes had such cues moved into their
   Coach's Notes on 2026-09-24; their coaching logs say which. (This file is in a public repo:
   never name an athlete or their health here.)
-- **An exercise with no Spine entry** is `new_exercise:` with three cues written for ANYONE
-  (ext · int · avoid, no athlete, no home kit, no tempo, no dose). They go on the new entry via
-  `/spine`, with every other field the existing entries carry, never on the card.
+- **An exercise with no Spine entry** is `new_exercise:` with its steps (CUE-6) and three cues
+  (CUE-1), written for ANYONE. They go on the new entry via `/spine`, with every other field the
+  existing entries carry, never on the card.
 
-**Never spend a cue on the tempo.** The card already shows `rx.tempo` with the digits that
-matter picked out in clay. A cue reading "three seconds down, one second pause, drive up" is
-the same instruction a third time (the pill was the second), and it costs one of only three
-cues. Say something the numbers cannot: what to feel, where to brace, what usually goes wrong.
-Write it for anyone; a point about this athlete's training age goes in their `note:`.
+**Never spend a step or a cue on the tempo** (CHP-6): the card already shows `rx.tempo` with the digits
+that matter picked out in clay. A point about this athlete's training age is a `note_flag`.
 
 **AUTOREGULATION (required output):** `low-readiness` goes on every athlete's obligations (REC-2),
 with REC-6 for high-stress and concurrent athletes. Design's part is making REC-2's red day readable
@@ -565,12 +558,12 @@ SECTION: Activation & Prep   (logs nothing — no RPE)
 
 SECTION: Primary
 [Movement] | role: primary
-sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [a grip (neutral grip) or one intention (max intent) / none]
-note_flag: [only if THIS athlete needs something the Spine cues can't say]
+sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [one or two values from the pill list (CHP-2) / none]
+note_flag: [only if THIS athlete needs something the Spine's steps, cues and the pill can't say (COM-14)]
 
 SECTION: Accessory
 [Movement] | role: accessory
-sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [a grip (neutral grip) or one intention (max intent) / none]
+sets: X | reps: X | tempo: X-X-X-X | RPE: X | rest: Xs | intent: [one or two values from the pill list (CHP-2) / none]
 note_flag: [optional]
 
 SECTION: Accessory (superset pair — role: circuit, NOT two accessory entries)
@@ -582,11 +575,12 @@ per round, after BOTH exercises, not per exercise) | RPE: X (one for the whole r
 SECTION: Core
 [Movement or circuit] | dose | note_flag: [optional]
 
-(cues: none in the spec. They come from each exercise's Spine entry. Anything you noticed about
- an entry while designing, such as a missing regression/progression/alternative, a wrong flag or a better general cue, goes in as
- spine_cue: / new_exercise: lines. /program-assemble applies them in its Spine upkeep step.
- new_exercise: [name] | ext / int / avoid, written for anyone → drafted into the Spine
- spine_cue: [entry id] | [a general wording change for Amir to make on the entry])
+(cues and steps: none in the spec. They come from each exercise's Spine entry. Anything you noticed
+ about an entry while designing, such as a missing regression/progression/alternative, a wrong flag, a
+ missing or unclear step or a better general cue, goes in as spine_cue: / new_exercise: lines.
+ /program-assemble applies them in its Spine upkeep step.
+ new_exercise: [name] | steps: 1. … 2. … 3. … (CUE-6) | key point / feel or check / avoid (CUE-1), written for anyone → drafted into the Spine
+ spine_cue: [entry id] | [a general change to a step, a cue or the purpose, for Amir to approve on the entry])
 
 (fallback per primary: one same-pattern swap if pain / station busy)
 ---

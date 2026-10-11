@@ -1,6 +1,7 @@
 -- Assertions for stage45 (forget_contact), stage48 (coach_delete_training_history, coach_save_spine), stage49 (spine_versions)
--- stage50 (the coach reads the testing app's tables) and stage51 (used first passwords are cleared) on the
--- local replica. Run through scripts/test_spine_sql.sh, which loads replica_schema.sql and both stage files first.
+-- stage50 (the coach reads the testing app's tables), stage51 (used first passwords are cleared) and stage52 (steps,
+-- get_exercises(), Claude's drafts) on the local replica. Run through scripts/test_spine_sql.sh, which loads
+-- replica_schema.sql and the stage files first.
 -- Every check writes a row to t_res; the runner prints the failures and exits non-zero if there are any.
 -- Test rows are all 'zz…' ids. Made-up data only.
 \set ON_ERROR_STOP on
@@ -608,6 +609,171 @@ begin
     execute 'reset role';
     perform pg_temp.rec('passwords: ...nor by anon', false, 'no error');
   exception when insufficient_privilege then perform pg_temp.rec('passwords: ...nor by anon', true, sqlerrm); end;
+end $t$;
+select pg_temp.coach() \g /dev/null
+
+-- ═════════════════════ G. stage52: How to do it (steps), what a phone reads, and Claude's drafts ═════════════════════
+-- The column holds 0 to 6 steps, none blank, none over 140 characters. coach_save_spine() writes steps and, in the same
+-- guarded call, the coach-only list of Claude's drafts (suggested_changes). get_exercises() sends steps for approved entries.
+select pg_temp.coach() \g /dev/null
+do $t$
+declare c record;
+begin
+  select data_type, column_default, is_nullable into c from information_schema.columns
+   where table_schema = 'public' and table_name = 'exercises' and column_name = 'steps';
+  perform pg_temp.rec('steps: the column is text[], not null, empty by default', c.data_type = 'ARRAY' and c.is_nullable = 'NO' and c.column_default like '''{}''%', coalesce(c.data_type || ' ' || c.column_default, 'missing'));
+  perform pg_temp.rec('steps: every entry that was there before has none', not exists (select 1 from public.exercises where cardinality(steps) > 0), '');
+  perform pg_temp.rec('steps: the check is in place', exists (select 1 from pg_constraint where conrelid = 'public.exercises'::regclass and conname = 'exercises_steps_ok'), '');
+  perform pg_temp.rec('spine_steps_ok: none, one to six, 140 characters are fine', public.spine_steps_ok('{}') and public.spine_steps_ok(null)
+    and public.spine_steps_ok(array['a','b','c','d','e','f']) and public.spine_steps_ok(array[repeat('x', 140)]), '');
+  perform pg_temp.rec('spine_steps_ok: seven, a blank, 141 characters, a null and a list of lists are not',
+    not public.spine_steps_ok(array['a','b','c','d','e','f','g']) and not public.spine_steps_ok(array['a', '   '])
+    and not public.spine_steps_ok(array[E'\t\n']) and not public.spine_steps_ok(array[repeat('x', 141)])
+    and not public.spine_steps_ok(array['a', null]) and not public.spine_steps_ok('{{a,b},{c,d}}'::text[]), '');
+  perform pg_temp.rec('spine_steps_ok: counts characters, not bytes (140 Persian letters fit)', public.spine_steps_ok(array[repeat('ب', 140)]), '');
+end $t$;
+
+select pg_temp.nobody() \g /dev/null
+insert into public.exercises (id, name, status, purpose, cues) values
+  ('zz-steps', 'ZZ Steps', 'approved', 'Old purpose.', '{"good":["old key","old feel"],"bad":["old avoid"]}'),
+  ('zz-steps-none', 'ZZ Steps None', 'approved', null, null),
+  ('zz-steps-draft', 'ZZ Steps Draft', 'draft', null, null);
+-- Claude's /spine Upkeep: a drafted entry gets its steps directly; an approved one gets them on the pending list.
+update public.exercises set steps = array['Stand tall.', 'Do the thing.', 'Stand up again.'] where id = 'zz-steps-draft' and status = 'draft';
+insert into public.exercise_coach (id, suggested_changes)
+select x.id, jsonb_build_array(
+         jsonb_build_object('field', 'steps', 'old', to_jsonb(x.steps), 'new', '["Lie on your back.", "Lift your hips.", "Lower them."]'::jsonb,
+                            'why', 'How to do it (CUE-6)', 'from', 'spine 2026-10-11', 'at', '2026-10-11T08:00:00Z'),
+         jsonb_build_object('field', 'tennis', 'old', to_jsonb(x.tennis), 'new', '"A court line."'::jsonb,
+                            'why', 'a court moment', 'from', 'spine 2026-10-11', 'at', '2026-10-11T08:00:01Z'))
+  from public.exercises x where x.id = 'zz-steps' and x.status = 'approved';
+select pg_temp.coach() \g /dev/null
+
+do $t$
+declare r jsonb; v record; n int; before_list jsonb; item_steps jsonb; item_tennis jsonb;
+begin
+  perform pg_temp.rec('steps: Claude writes a draft entry''s steps directly', (select steps from public.exercises where id = 'zz-steps-draft') = array['Stand tall.', 'Do the thing.', 'Stand up again.'], '');
+  select suggested_changes into before_list from public.exercise_coach where id = 'zz-steps';
+  item_steps := before_list -> 0; item_tennis := before_list -> 1;
+  perform pg_temp.rec('drafts: the pending item''s old is [] for an entry with no steps (the editor compares it with the live value)', item_steps -> 'old' = '[]'::jsonb, coalesce((item_steps -> 'old')::text, 'null'));
+
+  -- Amir's Save approves the steps draft: the entry gets the steps and the list loses that item, in one call
+  r := public.coach_save_spine('zz-steps', jsonb_build_object('steps', item_steps -> 'new'), '{"steps":[]}',
+         jsonb_build_object('suggested_changes', jsonb_build_array(item_tennis)), jsonb_build_object('suggested_changes', before_list));
+  perform pg_temp.rec('save: steps written as text[] through coach_save_spine', r ->> 'ok' = 'true'
+    and (select steps from public.exercises where id = 'zz-steps') = array['Lie on your back.', 'Lift your hips.', 'Lower them.']
+    and r -> 'entry' -> 'steps' = item_steps -> 'new', r::text);
+  perform pg_temp.rec('save: ...and the approved draft left the list in the same call, the other item stayed', (select suggested_changes from public.exercise_coach where id = 'zz-steps') = jsonb_build_array(item_tennis)
+    and r -> 'coach' -> 'suggested_changes' = jsonb_build_array(item_tennis), (select suggested_changes::text from public.exercise_coach where id = 'zz-steps'));
+  select * into v from public.spine_versions where tbl = 'exercises' and row_id = 'zz-steps' and changed ? 'steps' order by id desc limit 1;
+  perform pg_temp.rec('versions: a steps change is kept (History can show and undo it)', v.id is not null and v.data -> 'steps' = '[]'::jsonb and v.changed -> 'steps' = item_steps -> 'new' and v.saved_by = 'amirardekanian@gmail.com', coalesce(v.changed::text, 'none'));
+  perform pg_temp.rec('versions: the list change is kept too, under the coach-only half', exists (select 1 from public.spine_versions where tbl = 'exercise_coach' and row_id = 'zz-steps' and changed ? 'suggested_changes'), '');
+
+  -- what a phone reads
+  r := public.get_exercises();
+  perform pg_temp.rec('get_exercises: an approved entry sends its steps', (select e -> 'steps' from jsonb_array_elements(r) e where e ->> 'id' = 'zz-steps') = item_steps -> 'new', '');
+  perform pg_temp.rec('get_exercises: an approved entry with none sends []', (select e -> 'steps' from jsonb_array_elements(r) e where e ->> 'id' = 'zz-steps-none') = '[]'::jsonb, '');
+  perform pg_temp.rec('get_exercises: a draft is not sent, steps or not', not exists (select 1 from jsonb_array_elements(r) e where e ->> 'id' = 'zz-steps-draft'), '');
+  perform pg_temp.rec('get_exercises: still never sends the coach-only half (no suggested_changes, sfr, flags, cost)', not exists (select 1 from jsonb_array_elements(r) e where e ? 'suggested_changes' or e ? 'sfr' or e ? 'flags' or e ? 'cost'), '');
+end $t$;
+
+-- what a phone reads, as the roles a phone has
+select pg_temp.nobody() \g /dev/null
+do $t$
+declare r jsonb;
+begin
+  execute 'set local role anon';
+  r := public.get_exercises();
+  execute 'reset role';
+  perform pg_temp.rec('get_exercises: anon can still call it (the demo and a signed-out phone), and gets the steps', (select e -> 'steps' from jsonb_array_elements(r) e where e ->> 'id' = 'zz-steps') = '["Lie on your back.", "Lift your hips.", "Lower them."]'::jsonb, '');
+end $t$;
+select pg_temp.coach() \g /dev/null
+
+do $t$
+declare r jsonb; v jsonb; n int; list jsonb; claude_item jsonb;
+begin
+  -- the database refuses what can never be right, through the save and by SQL, and writes nothing to either half
+  select suggested_changes into list from public.exercise_coach where id = 'zz-steps';
+  begin
+    perform public.coach_save_spine('zz-steps', '{"steps":["1","2","3","4","5","6","7"]}', '{"steps":["Lie on your back.", "Lift your hips.", "Lower them."]}',
+                                    '{"suggested_changes":[]}', jsonb_build_object('suggested_changes', list));
+    perform pg_temp.rec('refused: seven steps', false, 'no error');
+  exception when check_violation then perform pg_temp.rec('refused: seven steps', true, sqlerrm); end;
+  perform pg_temp.rec('refused: ...and the draft list was not emptied with it (one transaction)', (select suggested_changes from public.exercise_coach where id = 'zz-steps') = list, '');
+  begin
+    perform public.coach_save_spine('zz-steps', jsonb_build_object('steps', jsonb_build_array('ok', repeat('x', 141))), '{"steps":["Lie on your back.", "Lift your hips.", "Lower them."]}', '{}', '{}');
+    perform pg_temp.rec('refused: a step of 141 characters', false, 'no error');
+  exception when check_violation then perform pg_temp.rec('refused: a step of 141 characters', true, sqlerrm); end;
+  begin
+    perform public.coach_save_spine('zz-steps', '{"steps":["Stand.", ""]}', '{"steps":["Lie on your back.", "Lift your hips.", "Lower them."]}', '{}', '{}');
+    perform pg_temp.rec('refused: an empty step', false, 'no error');
+  exception when check_violation then perform pg_temp.rec('refused: an empty step', true, sqlerrm); end;
+  begin
+    perform public.coach_save_spine('zz-steps', '{"steps":["Stand.", "   "]}', '{"steps":["Lie on your back.", "Lift your hips.", "Lower them."]}', '{}', '{}');
+    perform pg_temp.rec('refused: a step of only spaces', false, 'no error');
+  exception when check_violation then perform pg_temp.rec('refused: a step of only spaces', true, sqlerrm); end;
+  begin
+    perform public.coach_save_spine('zz-steps', '{"steps":null}', '{"steps":["Lie on your back.", "Lift your hips.", "Lower them."]}', '{}', '{}');
+    perform pg_temp.rec('refused: steps cleared to null (none is [])', false, 'no error');
+  exception when not_null_violation then perform pg_temp.rec('refused: steps cleared to null (none is [])', true, sqlerrm); end;
+  begin
+    update public.exercises set steps = array['a','b','c','d','e','f','g'] where id = 'zz-steps-draft';
+    perform pg_temp.rec('refused: seven steps by SQL too (Claude''s /spine)', false, 'no error');
+  exception when check_violation then perform pg_temp.rec('refused: seven steps by SQL too (Claude''s /spine)', true, sqlerrm); end;
+  perform pg_temp.rec('refused: ...and the entry kept its steps through all of it', (select steps from public.exercises where id = 'zz-steps') = array['Lie on your back.', 'Lift your hips.', 'Lower them.'], '');
+  begin
+    perform public.coach_save_spine('zz-steps', '{}', '{}', '{"suggested_changes":{"field":"steps"}}', jsonb_build_object('suggested_changes', list));
+    perform pg_temp.rec('refused: a draft list that is not a list', false, 'no error');
+  exception when check_violation then perform pg_temp.rec('refused: a draft list that is not a list', true, sqlerrm); end;
+
+  -- six steps and none are fine; clearing back to none is []
+  r := public.coach_save_spine('zz-steps', '{"steps":["1","2","3","4","5","6"]}', '{"steps":["Lie on your back.", "Lift your hips.", "Lower them."]}', '{}', '{}');
+  perform pg_temp.rec('save: six steps (a rack lift with its bail) go through', r ->> 'ok' = 'true' and cardinality((select steps from public.exercises where id = 'zz-steps')) = 6, r::text);
+  r := public.coach_save_spine('zz-steps', '{"steps":[]}', '{"steps":["1","2","3","4","5","6"]}', '{}', '{}');
+  perform pg_temp.rec('save: clearing every step stores none ([])', r ->> 'ok' = 'true' and (select steps from public.exercises where id = 'zz-steps') = '{}'::text[] and r -> 'entry' -> 'steps' = '[]'::jsonb, r::text);
+
+  -- Claude adds a draft while the page is open: the save that clears the list it read is refused, nothing written
+  claude_item := jsonb_build_object('field', 'purpose', 'old', '"Old purpose."'::jsonb, 'new', '"New purpose."'::jsonb, 'why', 'plain words', 'from', 'spine 2026-10-11', 'at', '2026-10-11T09:00:00Z');
+  perform pg_temp.nobody();
+  update public.exercise_coach set suggested_changes = suggested_changes || jsonb_build_array(claude_item) where id = 'zz-steps';
+  perform pg_temp.coach();
+  r := public.coach_save_spine('zz-steps', '{"tennis":"A court line."}', '{"tennis":null}', '{"suggested_changes":[]}', jsonb_build_object('suggested_changes', list));
+  perform pg_temp.rec('clash: a draft that arrived since the page read refuses the save, naming the list', r ->> 'ok' = 'false'
+    and r -> 'coach' -> 'cols' = '["suggested_changes"]'::jsonb and r -> 'coach' -> 'live' -> 'suggested_changes' = list || jsonb_build_array(claude_item) and not (r ? 'entry'), r::text);
+  perform pg_temp.rec('clash: ...and nothing was written: the court line, and Claude''s new draft, are as they were',
+    (select tennis from public.exercises where id = 'zz-steps') is null and (select suggested_changes from public.exercise_coach where id = 'zz-steps') = list || jsonb_build_array(claude_item), '');
+  -- Save again with the list as it is now: the tennis item is approved, the new purpose draft stays
+  r := public.coach_save_spine('zz-steps', '{"tennis":"A court line."}', '{"tennis":null}', jsonb_build_object('suggested_changes', jsonb_build_array(claude_item)), jsonb_build_object('suggested_changes', list || jsonb_build_array(claude_item)));
+  perform pg_temp.rec('save again: goes through, and only the decided item leaves the list', r ->> 'ok' = 'true'
+    and (select tennis from public.exercises where id = 'zz-steps') = 'A court line.' and (select suggested_changes from public.exercise_coach where id = 'zz-steps') = jsonb_build_array(claude_item), r::text);
+
+  -- a discard alone: no entry column, only the list
+  r := public.coach_save_spine('zz-steps', '{}', '{}', '{"suggested_changes":[]}', jsonb_build_object('suggested_changes', jsonb_build_array(claude_item)));
+  perform pg_temp.rec('discard: the list alone can be saved (the purpose stays as it was)', r ->> 'ok' = 'true' and r -> 'entry' = 'null'::jsonb
+    and (select suggested_changes from public.exercise_coach where id = 'zz-steps') = '[]'::jsonb and (select purpose from public.exercises where id = 'zz-steps') = 'Old purpose.', r::text);
+
+  -- an entry with no coach-only row: the list can still be written (the row is created with it)
+  r := public.coach_save_spine('zz-steps-none', '{"steps":["One.","Two.","Three."]}', '{"steps":[]}', '{"suggested_changes":[]}', '{"suggested_changes":null}');
+  perform pg_temp.rec('save: steps on an entry with no coach-only row, the row is made', r ->> 'ok' = 'true' and exists (select 1 from public.exercise_coach where id = 'zz-steps-none' and suggested_changes = '[]'::jsonb), r::text);
+
+  -- the old guards stand: the coach's other bookkeeping columns are still refused
+  begin perform public.coach_save_spine('zz-steps', '{}', '{}', '{"suggested_qualities":["strength"]}', '{}');
+    perform pg_temp.rec('refused: suggested_qualities is still Claude''s', false, 'no error');
+  exception when others then perform pg_temp.rec('refused: suggested_qualities is still Claude''s', sqlerrm like 'exercise_coach.suggested_qualities cannot be written%', sqlerrm); end;
+end $t$;
+
+select pg_temp.other() \g /dev/null
+do $t$
+begin
+  begin perform public.coach_save_spine('zz-steps', '{"steps":["x"]}', '{}', '{"suggested_changes":[]}', '{}');
+    perform pg_temp.rec('save: steps or the draft list, someone who is not the coach is refused', false, 'no error');
+  exception when others then perform pg_temp.rec('save: steps or the draft list, someone who is not the coach is refused', sqlerrm = 'coach only', sqlerrm); end;
+  begin
+    execute 'set local role anon';
+    perform public.coach_save_spine('zz-steps', '{"steps":["x"]}', '{}', '{}', '{}');
+    execute 'reset role';
+    perform pg_temp.rec('save: anon still cannot call it after stage52', false, 'no error');
+  exception when insufficient_privilege then perform pg_temp.rec('save: anon still cannot call it after stage52', true, sqlerrm); end;
 end $t$;
 select pg_temp.coach() \g /dev/null
 

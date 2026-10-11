@@ -97,7 +97,7 @@ fields map one-to-one; there is nothing to convert:
 | RPE | `"rpe": 7` |
 | tempo | `"tempo": "3-1-1-0"` |
 | rest | `"rest": 120` |
-| `intent` | `"intent": "max intent"` or a grip, `"intent": "neutral grip"`, at exercise level — the one green pill |
+| `intent` | `"intent": "neutral grip · max intent"`: the spec's values from the pill list, joined with ` · `, at exercise level — the one green pill (CHP-2) |
 
 **Rest belongs to the BLOCK when a section shares one (CHP-7).** Write `"rest": 120` on the block and
 leave `rx.rest` off its exercises — the section header states it once and every timer in the
@@ -114,18 +114,13 @@ app draws no cell for it — that is the entire contract. Never write a placehol
 string, or a zero. In particular: **no `rpe` on warm-up/prep, no `tempo` on ballistic work
 or carries, and no `rest` unless the spec named one** (the app stopped inventing 120s).
 
-**Never restate the tempo in `intent` (CHP-6).** `"3s eccentric"` beside `"tempo": "3-1-1-0"` is the
-same instruction twice; the card already shows the tempo with its key digits highlighted.
-
 **Never write `chips[]`.** It is legacy-read-only.
 
-**A GRIP IS THE PILL, never free text** (Amir, 2026-09-25: *"grips should be a chip on the card not
-a free text … you changed how my file look like"*). `"intent": "neutral grip"` draws the same
-deep-green pill his older cards draw for a grip chip; a card that also has an intention joins them in
-the one pill (`"neutral grip · max intent"`). The grip is the athlete's: never on the library entry.
-**No `setup` on a programme card at all** (Amir, 2026-09-25: *"i dont like floating text"*): any other
-detail for this athlete is the Coach's Note (`note`; on a circuit item, the circuit's note).
-`check_program.py` fails any `setup`.
+**The pill follows CHP-2**: the list and its old spellings are SCHEMA.md → *`intent`: the pill list*, and
+the check fails a value off it (naming the list value an old spelling became), so copy the spec's pill and
+fix what the check names. A grip is the pill (NAM-5), the tempo never is (CHP-6), and there is **no `setup`
+on a programme card at all** (CHP-1): any other detail for this athlete is the Coach's Note (`note`; on a
+circuit item, the circuit's note).
 
 **Working (non-warm-up) circuits:** give each item its own `rx` from the spec's per-item reps
 (`{"rx":{"reps":12}}`), and put one overall circuit RPE on the circuit's own `rx.rpe`.
@@ -217,7 +212,9 @@ count and what landed on the cards differ, which is how a dropped or invented on
   "Coach's Note" (per SCHEMA "Exercise coach's note"). The text comes from /program-engage (which
   wrote it from design's `note_flag`), not from design directly. Copy verbatim, plain text — never
   wrap it in HTML (that's the cycle notes cards' convention, not this field's). Never move
-  exercise-scoped guidance into the notes cards, and never invent a note nothing flagged.
+  exercise-scoped guidance into the notes cards, and never invent a note nothing flagged. The full
+  check warns on a note past COM-14's length, one that repeats its own pill (CUE-7) and a grip written
+  in a note (NAM-5): send those back to engage rather than trimming the words yourself.
 - **The week notes' words:** engage's PART 3c `WEEK 1:` / `LAST WEEK:` text into `weekNotes.first.text`
   and `weekNotes.last.text`, beside the numbers Part A wrote.
 - **Becauses** (PART 3b) as `"why": { "src", "part"?, "text" }` on that exercise (standard or
@@ -306,17 +303,18 @@ node scan over a 39,000-character copy). Act on what it prints:
   2026-10-09: one name, the Spine's; a different version is its own entry, via `/spine`).
 Re-run `--spine-sql` and the check after stamping or drafting, until the names are clean.
 
-**The Spine is a publishing gate**, because the cards carry no cues of their own. Every exercise
-AND every circuit item must resolve to an entry that is **`approved` with cues**, or the athlete
-sees a card with no cues at all (`get_exercises()` serves approved entries only). The check FAILs an
-id with no entry, an entry with no cues, or a quality outside the ten, and lists the drafts. Don't
-look entries up one by one.
+**The Spine is a publishing gate**, because the cards carry no cues or steps of their own. Every
+exercise AND every circuit item must resolve to an entry that is **`approved` with cues and steps**, or
+the athlete sees a card with no cues and no How to do it at all (`get_exercises()` serves approved
+entries only). The check FAILs an id with no entry, an entry with no cues, or a quality outside the ten,
+and lists the drafts. An approved entry with no steps is a WARN (CUE-6) while the steps are being
+written: it goes in the handoff, and Step 8's Upkeep proposes them. Don't look entries up one by one.
 **A new exercise goes INTO the library, in full, and stays in the programme** (NAM-9, CUE-5). Never
-swap one out because it has no entry. Add it with `/spine`: three cues written for anyone, and every
-field the existing entries carry (purpose, on-court line, equipment, body parts, links both ways,
+swap one out because it has no entry. Add it with `/spine`: its steps (CUE-6) and three cues (CUE-1)
+written for anyone, and every field the existing entries carry (purpose, on-court line, equipment, body parts, links both ways,
 SFR and flags), qualities from the ten and a pattern from the library's list, never a new pill of
 either kind. Only an approved entry reaches the phone, so the new entries are one question for Amir
-before publishing (Step 6a): *"approve these N so their cards show cues?"* Approve only on his word.
+before publishing (Step 6a): *"approve these N so their cards show cues and steps?"* Approve only on his word.
 
 An exercise whose Spine line in the design pull says `novideo` is fine to ship: it goes on the
 handoff's film list.
@@ -417,7 +415,7 @@ reason (an obligation is never repeated here):
 
 **New Spine entries are asked about in 6a, before Step 7** (2026-09-26): a draft entry's card shows
 no cues until Amir approves it, so a returning athlete (who already has a login) would open blank
-cards. Put *"approve these N so their cards show cues?"* at the top of 6a and publish once he
+cards. Put *"approve these N so their cards show cues and steps?"* at the top of 6a and publish once he
 answers, or publish now only if he says the cards can wait.
 
 **6b, the closing block (after Step 8), two lines:**
@@ -511,7 +509,7 @@ the RPC.
 
 ## Step 8 — Spine upkeep, what's left (every programme, the last thing you do)
 Part A already drafted every new exercise (Step 4), so this is the rest: links, body parts,
-qualities on approved entries as suggestions, better cues as proposals.
+qualities on approved entries as suggestions, missing steps and better cues as proposals (CUE-6).
 Amir, 2026-09-24: *"when i write or update a program, and there are movements that are not there,
 or missing some info, or can be updated, it should be updated there at the end … so everytime i
 write a program for an athlete, this gets more complete."* Run **`/spine` → Upkeep** on this

@@ -9,7 +9,16 @@
 #     "sfr": 3, "flags": ["loaded-knee-flexion"],
 #     "credits": {"quads": 1, "glutes": 0.5}, "cost": "moderate",
 #     "muscles": {"calves": 1, "shins": 0.5},   (only when credits is {}: see below)
-#     "cues": {"good": [ext, int], "bad": [avoid]} }   (optional; written for anyone)
+#     "steps": ["Put one whole foot on a solid step about stair height.", ...],   (How to do it, CUE-6)
+#     "cues": {"good": [key point, feel or check], "bad": [avoid]} }   (optional; written for anyone, CUE-1)
+# steps (stage52, 2026-10-11): How to do it, for anyone, setup to a safe finish. REFUSED: more than 6, a step that is
+# empty or over 140 characters (the database's own limits, spine_steps_ok), an em-dash, a semicolon or a curly apostrophe,
+# and a number with a unit of dose (3s, 30 sec, 10 reps, 20 kg, 80%). WARNED (the SQL is still written): no steps at all,
+# a count outside the pattern's range (mobility and conditioning 2 to 3, the rest 3 to 5, a 6th only for a rack lift's
+# bail), a step over 90 characters, a word from PLAIN_WORDS (gym words and the words a second-language reader tripped on),
+# home furniture, a side, an RPE, and a cue that repeats a step. The entry's own name and pattern are exempt from the
+# word list ("Hip Hinge" may say hinge). The cues get the same refusals and word list.
+# A batch with no steps at all writes no steps column, so it still runs on a database without stage52.
 # credits: what one working set counts toward (VOL-10: 1 prime mover, 0.5 helper; {} = nothing, as
 # for a stretch or a sprint). cost: heavy | moderate | isolation | none (VOL-2). Both required: the
 # checker counts every programme's volume tables and day loads from them (stage39).
@@ -60,17 +69,78 @@ IMPACTS = {'none', 'running', 'plyometric', 'landing'}
 MUSCLES = {'quads', 'hamstrings', 'glutes', 'adductors', 'calves', 'shins', 'peroneals', 'back', 'chest',
            'shoulder', 'biceps', 'triceps', 'forearm', 'core', 'neck'}
 COSTS = {'heavy', 'moderate', 'isolation', 'none'}
+# How to do it (stage52): the database's limits (public.spine_steps_ok) and the aim.
+STEPS_MAX, STEP_CHARS, STEP_AIM = 6, 140, 90
+# Plain words (CUE-6, 2026-10-11 pilot). The ONE list (PRC-23): the skill and the principles point here. Each word, and the
+# plain version where the pilot or the blueprint wrote one (None: say it another way). JARGON: gym words a beginner does
+# not know. ESL_TRAPS: words a second-language reader with no video read wrong ("plant" read as a tree, "straight arms"
+# as locked elbows).
+JARGON = {'hinge': 'push your hips back', 'brace': None, 'neutral spine': None, 'scapula': 'shoulder blade',
+          'valgus': 'knee falling inward', 'lockout': None, 'packed': None, 'ribs stacked': None, 'flare': None,
+          'lats': 'the muscles under your armpit', 'delts': None, 'traps': None, 'obliques': None}
+ESL_TRAPS = {'plant': 'brake on one foot', 'stumble': None, 'freeze': None, 'slumped': None, 'drive': 'push',
+             'shrug': 'shoulders lifting toward your ears', 'trunk': None, 'balls of your feet': 'the pad behind your toes',
+             'hip bone': 'the bony front of your hip', 'tears': 'cuts', 'straight arms': 'elbows almost straight'}
+PLAIN_WORDS = dict(JARGON, **ESL_TRAPS)
+# Never on an entry, warned: a side for one athlete, home furniture, an effort score (CUE-6; the skill's own audit query).
+ATHLETE_WORDS = re.compile(r'\b(?:right|left) (?:shoulder|knee|hip|side|leg|arm|foot|hand)\b|\b(?:sofa|couch|chair|worktop|table edge|cushion)\b|\brpe\b', re.I)
+# Refused: an em-dash, a semicolon, a curly apostrophe or quote, and a number with a unit of dose.
+VOICE = re.compile(r'[—;’‘]')
+DOSE = re.compile(r'\d+(?:\.\d+)?\s*(?:s|sec|secs|seconds|reps|kg|%)(?![a-z])', re.I)
+
+def word_re(w):
+    """A word from PLAIN_WORDS as written, or with an ending (hinges, hinging, planted, drives)."""
+    alt = re.escape(w) + r'(?:s|es|d|ed|ing)?'
+    if w.endswith('e') and ' ' not in w: alt += '|' + re.escape(w[:-1]) + 'ing'
+    return re.compile(r'\b(?:' + alt + r')\b', re.I)
+PLAIN_RE = {w: word_re(w) for w in PLAIN_WORDS}
+
+def lint_text(i, where, text, own, problems, warnings):
+    """The refusals and warnings shared by a step and a cue. `own` is the entry's name and pattern, exempt from the list."""
+    if VOICE.search(text): problems.append(f'{i}: {where}: an em-dash, a semicolon or a curly apostrophe ({VOICE.search(text).group(0)!r}): not how Amir writes')
+    if DOSE.search(text): problems.append(f'{i}: {where}: a dose ({DOSE.search(text).group(0)!r}). Sets, reps, time and kilos are the card\'s, never the entry\'s')
+    for w, rx in PLAIN_RE.items():
+        if rx.search(text) and not rx.search(own):
+            warnings.append(f'{i}: {where}: "{w}" is on the plain-words list' + (f': say "{PLAIN_WORDS[w]}"' if PLAIN_WORDS[w] else ''))
+    for m in dict.fromkeys(x.group(0) for x in ATHLETE_WORDS.finditer(text)):
+        warnings.append(f'{i}: {where}: "{m}" reads as one athlete\'s side, kit or effort. The entry is for anyone')
 
 ids = {e['id'] for e in batch}
 known = ids | existing
-problems = []
+problems, warnings = [], []
 for e in batch:
     i = e['id']
     if not re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*', i): problems.append(f'{i}: id is not a slug')
     if i in existing: problems.append(f'{i}: already in the Spine')
+    own = ' '.join([e.get('name') or ''] + list(e.get('aliases') or []) + [str(e.get('pattern') or '').replace('-', ' ')])
     c = e.get('cues')
     if c and (len(c.get('good', [])) != 2 or len(c.get('bad', [])) != 1): problems.append(f'{i}: cues must be 2 good + 1 bad')
-    if c and '—' in json.dumps(c, ensure_ascii=False): problems.append(f'{i}: em-dash in cues')
+    for n, line in enumerate((c or {}).get('good', []) + (c or {}).get('bad', [])):
+        lint_text(i, 'cue ' + ('key point', 'feel or check', 'avoid')[min(n, 2)], str(line), own, problems, warnings)
+    # How to do it (CUE-6, stage52)
+    st = e.get('steps')
+    if st is None or st == []:
+        warnings.append(f'{i}: no steps (How to do it, CUE-6): every entry gets them')
+    elif not isinstance(st, list) or not all(isinstance(x, str) for x in st):
+        problems.append(f'{i}: steps must be a list of text, one step each')
+    else:
+        if len(st) > STEPS_MAX: problems.append(f'{i}: {len(st)} steps: {STEPS_MAX} at most (the database refuses more)')
+        lo, hi = (2, 3) if e.get('pattern') in ('mobility', 'conditioning') else (3, 5)
+        if len(st) < lo or (len(st) > hi and not (hi == 5 and len(st) == 6)):
+            warnings.append(f'{i}: {len(st)} steps: a {e.get("pattern")} entry takes {lo} to {hi}')
+        elif len(st) == 6:
+            warnings.append(f'{i}: 6 steps: only for a lift that comes off a rack or is kicked into place, so the bail fits')
+        for n, x in enumerate(st, 1):
+            if not x.strip(): problems.append(f'{i}: step {n} is empty'); continue
+            if len(x) > STEP_CHARS: problems.append(f'{i}: step {n} is {len(x)} characters: {STEP_CHARS} at most (the database refuses more)')
+            elif len(x) > STEP_AIM: warnings.append(f'{i}: step {n} is {len(x)} characters: aim under {STEP_AIM}')
+            lint_text(i, f'step {n}', x, own, problems, warnings)
+        # CUE-7: a cue completes the steps and never repeats one. Whole words, three or more, either way round.
+        norm = lambda t: ' ' + ' '.join(re.sub(r'[^a-z0-9 ]', ' ', t.lower()).split()) + ' '
+        for line in (c or {}).get('good', []) + (c or {}).get('bad', []):
+            cl = norm(str(line))
+            if any((len(cl.split()) >= 3 and cl in norm(x)) or (len(norm(x).split()) >= 3 and norm(x) in cl) for x in st):
+                warnings.append(f'{i}: the cue "{line}" repeats a step. A cue says what the steps do not')
     # Only the library's own patterns: never a new pill (Amir, 2026-09-25: "remember to never create new pills").
     if e.get('pattern') not in PATTERNS: problems.append(f'{i}: unknown pattern {e.get("pattern")!r}: use one from the list, never a new one')
     for f in e.get('flags', []):
@@ -105,12 +175,15 @@ for e in batch:
             # exercise with no entry yet (2026-09-24), shown as a quiet pill until one exists.
             if re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*', x) and x not in known: problems.append(f'{i}.{k} -> {x} (no such id)')
             if x == i: problems.append(f'{i}.{k} points at itself')
+for w in warnings: print('WARN ' + w, file=sys.stderr)
 if problems:
     sys.exit('\n'.join(problems))
 
 def q(s): return 'null' if s is None or s == '' else "'" + str(s).replace("'", "''") + "'"
 def arr(a): return "'{}'" if not a else 'array[' + ','.join(q(x) for x in a) + ']::text[]'
 
+# The steps column only when the batch has steps, so a batch without them still runs before stage52 is applied.
+with_steps = any(e.get('steps') for e in batch)
 rows, crow, nvid = [], [], 0
 for e in batch:
     vid = next((libn[k] for k in (re.sub(r'\s+', ' ', x.lower()).strip() for x in [e['name']] + e.get('aliases', [])) if k in libn), None)
@@ -120,11 +193,13 @@ for e in batch:
         arr(e.get('easier')), arr(e.get('harder')), arr(e.get('alts')), arr(e.get('qualities')), q(vid),
         # cues written in the batch (for anyone: 2 good + 1 bad) win; otherwise the UPDATE below copies them
         (q(json.dumps(e['cues'])) + '::jsonb') if e.get('cues') else 'null',
-        (q(json.dumps(e['muscles'])) + '::jsonb') if e.get('muscles') else 'null', "'draft'", "'claude-draft'"]) + ')')
+        (q(json.dumps(e['muscles'])) + '::jsonb') if e.get('muscles') else 'null', "'draft'", "'claude-draft'"]
+        + ([arr([x.strip() for x in e.get('steps') or []])] if with_steps else [])) + ')')
     crow.append(f"({q(e['id'])},{'null' if e.get('sfr') is None else int(e['sfr'])},{arr(e.get('flags'))},"
                 f"{q(json.dumps(e['credits']))}::jsonb,{q(e['cost'])})")
 
-print('insert into public.exercises (id,name,aliases,pattern,purpose,tennis,equipment,loads,impact,easier,harder,alts,qualities,video,cues,muscles,status,updated_by) values')
+print('insert into public.exercises (id,name,aliases,pattern,purpose,tennis,equipment,loads,impact,easier,harder,alts,qualities,video,cues,muscles,status,updated_by'
+      + (',steps' if with_steps else '') + ') values')
 print(',\n'.join(rows) + '\non conflict (id) do nothing;')
 print('insert into public.exercise_coach (id,sfr,flags,credits,cost) values')
 print(',\n'.join(crow) + '\non conflict (id) do nothing;')
@@ -145,4 +220,4 @@ from (
 ) c
 where x.cues is null and x.status = 'draft'
   and (c.name = lower(x.name) or c.name = any(select lower(a) from unnest(x.aliases) a));""")
-print(f'-- {len(batch)} drafts, {nvid} with a video', file=sys.stderr)
+print(f'-- {len(batch)} drafts, {nvid} with a video, {sum(1 for e in batch if e.get("steps"))} with steps, {len(warnings)} warnings', file=sys.stderr)

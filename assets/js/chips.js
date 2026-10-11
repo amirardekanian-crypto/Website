@@ -466,6 +466,7 @@
     const DOSE = ['reps', 'time', 'distance', 'work'];
 
     Object.keys(patch).forEach(k => {
+      if (k === 'setup' || k === 'intent') return;   // on the exercise, below: never inside rx
       const v = patch[k];
       const cleared = v === '' || v === null || v === undefined || v === false;
       if (cleared) { delete rx[k]; return; }
@@ -479,12 +480,101 @@
     });
 
     if ('setup'  in patch) { const v = cleanStr(patch.setup);  if (v) next.setup  = v; else delete next.setup; }
-    if ('intent' in patch) { const v = cleanStr(patch.intent); if (v) next.intent = v; else delete next.intent; }
+    // The pill in the list's own words (CHP-2): an old spelling becomes its list value, an off-list leftover stays.
+    if ('intent' in patch) { const v = cleanStr(pillJoin(pillSplit(patch.intent))); if (v) next.intent = v; else delete next.intent; }
 
     next.rx = rx;
     delete next.chips;      // one source of truth, or it is the old bug again
     delete next.restSec;    // rest lives in rx.rest now
     return next;
+  }
+
+  /* ── THE PILL LIST (CHP-2, Amir 2026-10-11: "all recommended, go ahead") ──
+     The green pill (`ex.intent`) is the one change THIS athlete makes to the Spine entry's normal way, every rep.
+     It had no fixed words: 116 labels on 280 uses, 83 of them used once, "stick the landing" spelled six ways.
+     Now it comes from this closed list: at most two values, never two from one group, joined by " · ".
+     `hold` goes only with rx.tempo "iso", `pace` only on an item with no RPE. A new value joins only on Amir's word.
+     `synonyms` maps an old spelling to the value it became; matching ignores case and the spaces around a value.
+     The same object is PILLS in scripts/check_program.py and the tables in SCHEMA.md → `intent`: the pill list, and
+     scripts/check_parity.py fails when the copies disagree. Keep the block below strict JSON (double quotes, no
+     trailing comma, no comment inside): the parity check reads it as JSON. */
+  // PILLS:BEGIN
+  const PILLS = {
+    "hands": ["neutral grip", "wide grip", "overhand grip", "underhand grip", "straps"],
+    "lead": ["left side first", "right side first", "alternate sides"],
+    "intent": ["max intent", "max speed", "90% speed", "drive up fast", "stick the landing", "fast contact"],
+    "hold": ["hold at the top", "mid-range hold", "hold at 90°"],
+    "brakes": ["stop in two steps", "stick the outside leg"],
+    "pace": ["easy pace"],
+    "synonyms": {
+      "right leg first": "right side first", "right hand first": "right side first",
+      "left leads": "left side first", "left leg first": "left side first", "left hand first": "left side first",
+      "fast turnover": "fast contact", "minimal ground time": "fast contact",
+      "max power": "max intent", "all out": "max intent",
+      "double overhand grip": "overhand grip", "double overhand": "overhand grip",
+      "stick landing": "stick the landing", "stick landing 2s": "stick the landing",
+      "stick 2s": "stick the landing", "stick 2 seconds": "stick the landing",
+      "fast off the floor": "drive up fast",
+      "talk test": "easy pace", "conversational pace": "easy pace",
+      "conversational the whole way": "easy pace", "easy, keep moving": "easy pace",
+      "stop on the outside leg": "stick the outside leg",
+      "build to 90%": "90% speed",
+      "hold at top": "hold at the top"
+    }
+  };
+  // PILLS:END
+  const PILL_GROUPS = Object.keys(PILLS).filter(g => g !== 'synonyms');
+  const PILL_SPELL = {};   // lower case -> the list's own spelling
+  const PILL_GROUP = {};   // lower case -> its group
+  PILL_GROUPS.forEach(g => PILLS[g].forEach(v => { PILL_SPELL[v.toLowerCase()] = v; PILL_GROUP[v.toLowerCase()] = g; }));
+  const PILL_OLD = {};
+  Object.keys(PILLS.synonyms).forEach(k => { PILL_OLD[k.toLowerCase()] = PILLS.synonyms[k]; });
+
+  // The values in one `intent` string: split on the middle dot, spaces trimmed (the checker's pill_values()).
+  function pillSplit(intent) {
+    return String(intent == null ? '' : intent).split('·').map(x => x.trim()).filter(Boolean);
+  }
+  // One value as the list spells it: an old spelling becomes its list value, a list value in any case the list's
+  // own spelling. Anything else comes back as written, trimmed: an off-list value is never lost here, the checker
+  // and the coach editor flag it.
+  function pillCanon(v) {
+    const t = String(v == null ? '' : v).trim(), k = t.toLowerCase();
+    return PILL_OLD[k] || PILL_SPELL[k] || t;
+  }
+  // The group a value belongs to, or null when it is not on the list.
+  function pillGroup(v) { return PILL_GROUP[pillCanon(v).toLowerCase()] || null; }
+  // An `intent` string sorted into the list values it holds and the leftovers, both in the card's order, each once.
+  function pillsOf(intent) {
+    const on = [], off = [];
+    pillSplit(intent).map(pillCanon).forEach(v => {
+      const into = pillGroup(v) ? on : off;
+      if (!on.concat(off).some(x => x.toLowerCase() === v.toLowerCase())) into.push(v);
+    });
+    return { on, off };
+  }
+  // Values to one `intent` string: each in the list's spelling, each once, in the order given, joined by " · ".
+  function pillJoin(values) {
+    const out = [];
+    (values || []).map(pillCanon).forEach(v => { if (v && !out.some(x => x.toLowerCase() === v.toLowerCase())) out.push(v); });
+    return out.join(' · ');
+  }
+  // One card's pill against the list, for the coach dashboard's row and editor. Kept apart from auditRx(): an old card's
+  // pill is fixed the next time it is saved, and check_program.py is what fails a programme on it (CHP-2).
+  function auditPill(ex) {
+    ex = ex || {};
+    const problems = [], vals = pillSplit(ex.intent), r = rxOf(ex), groups = {};
+    const push = (code, label, msg) => problems.push({ level: 'warn', code, label, msg });
+    vals.forEach(v => {
+      const c = pillCanon(v), g = pillGroup(c);
+      if (!g) { push('pill-off-list', v, 'The pill "' + v + '" is not on the list. Anything else for this athlete goes in the Coach\'s Note.'); return; }
+      if (c !== v) push('pill-old-spelling', v, 'The pill "' + v + '" is written "' + c + '" now. Saving the card fixes it.');
+      (groups[g] = groups[g] || []).push(c);
+      if (g === 'hold' && String(r.tempo || '').trim().toLowerCase() !== 'iso') push('pill-hold-no-iso', c, 'The hold pill "' + c + '" needs the tempo "iso".');
+      if (g === 'pace' && r.rpe) push('pill-pace-rpe', c, 'The pill "' + c + '" goes only on an item with no RPE.');
+    });
+    Object.keys(groups).forEach(g => { if (groups[g].length > 1) push('pill-same-group', groups[g].join(' + '), 'Two pills from the ' + g + ' group: keep one.'); });
+    if (vals.length > 2) push('pill-too-many', String(vals.length), vals.length + ' pills: two at most.');
+    return problems;
   }
 
   // Convert one legacy exercise to rx. Used by scripts/migrate_rx.py's JS twin
@@ -501,7 +591,12 @@
 
   function toRx(ex) {
     const r = rxOf(ex);
-    if (r.source === 'rx') return Object.assign({}, ex);
+    if (r.source === 'rx') {
+      // Already rx: only the pill's old spellings move onto the list (CHP-2, 2026-10-11).
+      const done = Object.assign({}, ex);
+      if (cleanStr(ex.intent)) { const v = pillJoin(pillSplit(ex.intent)); if (v) done.intent = v; else delete done.intent; }
+      return done;
+    }
     const rx = {};
     if (r.sets)   rx.sets   = Number(r.sets) || r.sets;
     if (r.rounds) rx.rounds = Number(r.rounds) || r.rounds;
@@ -518,15 +613,18 @@
       .filter(l => !(rx.tempo && TEMPO_WORDS.test(l)));
 
     // The pill is the only chip an rx card draws, so the leftovers share it, in
-    // the card's own order: "max speed · neutral grip".
-    const pill = [ex.intent].concat(keep).filter((l, i, a) => l && a.indexOf(l) === i);
+    // the card's own order: "max speed · neutral grip". Since 2026-10-11 an old
+    // spelling becomes its value on the pill list ("right leg first" -> "right side
+    // first"), and anything else off the list stays, so nothing is lost: the
+    // checker and the coach editor flag it.
+    const pill = pillSplit(ex.intent).concat(keep);
 
     // An exercise with no countable dose — "Start the Run", "Empty Bar Warm-Up
     // Sets" — gets NO rx at all rather than an empty one. Its instruction lives
     // in its pill/cues, and an empty object would only be a slot for a future bug.
     const next = Object.assign({}, ex);
     if (Object.keys(rx).length) next.rx = rx; else delete next.rx;
-    const intent = pill.join(' · ');
+    const intent = pillJoin(pill);
     if (intent) next.intent = intent; else delete next.intent;
     delete next.chips;
     delete next.restSec;
@@ -678,6 +776,7 @@
     parseChips, parseDurationToSec, isPureDuration,
     slotOf, fmt, readStats, applyStats, audit,
     rxOf, repCount, applyRx, toRx, circuitToRx, detailToRx, auditRx, tempoDisplay, DOSE_LABEL,
-    auditWhy, auditWhyProgram, WHY_SRCS
+    auditWhy, auditWhyProgram, WHY_SRCS,
+    PILLS, PILL_GROUPS, pillSplit, pillCanon, pillGroup, pillsOf, pillJoin, auditPill
   };
 })(typeof window !== 'undefined' ? window : globalThis);

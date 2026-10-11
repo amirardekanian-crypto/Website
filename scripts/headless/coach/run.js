@@ -833,9 +833,9 @@ S['athlete-delete-fails'] = async (b) => {
 // ── 21. The Spine editor (Exercises tab) ─────────────────────────────────────
 // Claude's /spine Upkeep writes the same rows by SQL while Amir reviews them. Since 2026-10-10 a save
 // sends only the columns the coach changed, and refuses when someone else changed one of THOSE.
-async function spineOpen(page, id) {
+async function spineOpen(page, id, q) {   // q: what to type in the search (default: the id with spaces)
   await page.evaluate(() => { _spineQ = ''; });
-  await page.locator('#spineQ').fill(id.replace(/-/g, ' '));
+  await page.locator('#spineQ').fill(q || id.replace(/-/g, ' '));
   await L.settle(page, 200);
   await page.locator(`button[data-open="${id}"]`).click();
   await page.locator('#spineEd').waitFor();
@@ -1215,6 +1215,213 @@ S['spine-circuits-count'] = async (b) => {
   await spineOpen(page, 'glute-bridge');
   const txt = await page.locator('#spineEd').innerText();
   check(r, 'the editor says who does it', /Doing it now: /.test(txt), txt.slice(0, 160));
+  await page.context().close();
+  return r;
+};
+
+// ── stage52 (2026-10-11): How to do it, Claude's drafts, the pill picker ─────────────────────────────────────
+const spineRpcs = cs => cs.filter(c => c.kind === 'rpc' && c.name === 'coach_save_spine');
+const GOBLET_STEPS = ['Fixture step one: hold the weight at your chest.', 'Fixture step two: sit down between your heels.', 'Fixture step three: stand back up.'];
+const DRAFT_STEPS = ['Fixture draft step one.', 'Fixture draft step two.', 'Fixture draft step three.', 'Fixture draft step four.'];
+const coachRow = (d, id) => d.exercise_coach.find(x => x.id === id);
+
+S['spine-steps-save'] = async (b) => {
+  const r = { id: 'spine-steps-save', title: 'How to do it: one per line, saved as a list, refused past the database limits, in History', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  await page.locator('.sp-filter[data-f="approved"]').click(); await L.settle(page, 300);
+  const gobletRow = await page.locator('.spine-row[data-open="goblet-squat"]').innerText();
+  const pullRow = await page.locator('.spine-row[data-open="band-pull-apart"]').innerText();
+  check(r, 'the list says which entries have steps and which have none', /steps ✓/.test(gobletRow) && /no steps/.test(pullRow), { gobletRow, pullRow });
+  await spineOpen(page, 'goblet-squat');
+  const box = page.locator('textarea[data-sf=steps]');
+  check(r, "the box holds the entry's steps, one per line", (await box.inputValue()) === GOBLET_STEPS.join('\n'), await box.inputValue());
+  // seven steps: refused before anything leaves the page
+  await box.fill(['a', 'b', 'c', 'd', 'e', 'f', 'g'].map(x => 'Step ' + x + '.').join('\n'));
+  let n0 = await L.nCalls(page);
+  await page.locator('.sp-save').first().click(); await L.settle(page, 400);
+  check(r, 'seven steps: refused with the reason, nothing sent', log.dialogs.length === 1 && /7 steps: 6 at most/.test(log.dialogs[0].message) && !spineRpcs(await L.callsSince(page, n0)).length, log.dialogs.map(x => x.message));
+  // a step of 141 characters
+  log.dialogs.length = 0;
+  await box.fill('Short step.\n' + 'x'.repeat(141));
+  n0 = await L.nCalls(page);
+  await page.locator('.sp-save').first().click(); await L.settle(page, 400);
+  check(r, 'a step over 140 characters: refused, naming the step, nothing sent', log.dialogs.length === 1 && /Step 2 of How to do it is 141 characters/.test(log.dialogs[0].message) && !spineRpcs(await L.callsSince(page, n0)).length, log.dialogs.map(x => x.message));
+  check(r, 'the hint under the box says it will not save', /will not save/.test(await page.locator('[data-steps-hint]').innerText()), await page.locator('[data-steps-hint]').innerText());
+  // a good edit: a typed "1." or "2)" and blank lines are dropped; only the steps go up
+  log.dialogs.length = 0;
+  const want = ['Hold one dumbbell at your chest.', 'Sit down between your heels.', 'Stand back up.'];
+  await box.fill('1. Hold one dumbbell at your chest.\n\n2) Sit down between your heels.\nStand back up.\n');
+  n0 = await L.nCalls(page);
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  const up = lastOf(await L.callsSince(page, n0), c => c.kind === 'rpc' && c.name === 'coach_save_spine');
+  check(r, 'one save with only the steps, as a list (typed numbers and blank lines dropped)', up && Object.keys(up.payload.p_entry).join() === 'steps' && JSON.stringify(up.payload.p_entry.steps) === JSON.stringify(want), up && up.payload.p_entry);
+  check(r, 'the snapshot is the steps the page read', up && JSON.stringify(up.payload.p_entry_snap.steps) === JSON.stringify(GOBLET_STEPS), up && up.payload.p_entry_snap);
+  check(r, 'the coach-only half is not sent (no drafts on this entry)', up && !Object.keys(up.payload.p_coach).length, up && up.payload.p_coach);
+  check(r, 'saved on the server', JSON.stringify((await L.db(page)).exercises.find(x => x.id === 'goblet-squat').steps) === JSON.stringify(want), (await L.db(page)).exercises.find(x => x.id === 'goblet-squat').steps);
+  // History lists it as Steps, numbered, with Undo
+  await page.locator('#spineEd details.rawlog > summary').click(); await L.settle(page, 500);
+  const hist = await page.locator('#spvlist').innerText();
+  check(r, 'History shows the change as Steps, numbered, with Undo', /Steps: 1\. Fixture step one/.test(hist) && /1\. Hold one dumbbell at your chest\./.test(hist) && /Undo this change/.test(hist), hist.slice(0, 400));
+  // a server without stage52 is named, and the typing stays
+  await box.fill('Hold it.\nSquat.\nStand.');
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_save_spine', message: 'exercises.steps cannot be written from the editor', times: 1 }));
+  await page.locator('.sp-save').first().click(); await L.settle(page, 600);
+  check(r, 'a server without stage52 is named, nothing saved, the typing kept', log.dialogs.length === 1 && /stage52_spine_steps\.sql has not been applied/.test(log.dialogs[0].message) && (await box.inputValue()) === 'Hold it.\nSquat.\nStand.', log.dialogs.map(x => x.message));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['spine-draft-prefill'] = async (b) => {
+  const r = { id: 'spine-draft-prefill', title: "Claude's drafts: counted, listed, pre-filled and marked; a stale one is not shown; closing asks nothing", checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  dismissDialogs(page, log);
+  const cov = await page.locator('#content').innerText();
+  check(r, "the page says how many entries have a draft from Claude to read", /1 with Claude’s draft to read/.test(cov), cov.slice(0, 500));
+  const fb = page.locator('.sp-filter[data-f="claude"]');
+  check(r, "a Claude's drafts filter, with the count", (await fb.count()) === 1 && /Claude’s drafts · 1/.test(await fb.innerText()), (await fb.count()) ? await fb.innerText() : 'no button');
+  await fb.click(); await L.settle(page, 300);
+  const rows = await page.locator('.spine-row').allInnerTexts();
+  check(r, 'the filter lists the entry with a draft, and only it', rows.length === 1 && /Band Pull-Apart/.test(rows[0]) && /Claude’s draft to read/.test(rows[0]), rows);
+  const n0 = await L.nCalls(page);
+  await page.locator('button[data-open="band-pull-apart"]').click(); await page.locator('#spineEd').waitFor(); await L.settle(page, 200);
+  check(r, 'the steps box is pre-filled with the draft', (await page.locator('textarea[data-sf=steps]').inputValue()) === DRAFT_STEPS.join('\n'), await page.locator('textarea[data-sf=steps]').inputValue());
+  check(r, 'both cue boxes are pre-filled with the cues draft', (await page.locator('textarea[data-sf=good]').inputValue()) === 'Fixture draft key\nFixture draft feel' && (await page.locator('textarea[data-sf=bad]').inputValue()) === 'Fixture draft fault. Fixture draft fix.',
+    [await page.locator('textarea[data-sf=good]').inputValue(), await page.locator('textarea[data-sf=bad]').inputValue()]);
+  check(r, "a stale draft is ignored: the purpose box holds the entry's own purpose", (await page.locator('textarea[data-sf=purpose]').inputValue()) === 'Fixture live purpose.', await page.locator('textarea[data-sf=purpose]').inputValue());
+  const ed = await page.locator('#spineEd').innerText();
+  check(r, 'each pre-filled draft says it is Claude’s and saved with Save, with Discard and what the entry holds now',
+    (ed.match(/Claude’s draft · saved when you press Save/g) || []).length === 2 && (await page.locator('#spineEd button', { hasText: 'Discard draft' }).count()) === 2 && /On the entry now: Fixture live key/.test(ed), ed.slice(0, 900));
+  check(r, 'the stale one is named as not shown', /no longer matches the entry/.test(ed), '');
+  check(r, 'the three pre-filled boxes are outlined', (await page.locator('#spineEd .sp-drafted').count()) === 3, await page.locator('#spineEd .sp-drafted').count());
+  check(r, 'opening the entry sends nothing', !(await L.callsSince(page, n0)).some(c => c.kind === 'rpc' || (c.kind === 'from' && c.op !== 'select')), '');
+  await page.locator('#spineEd .sp-close').first().click(); await L.settle(page, 300);
+  check(r, 'closing without saving asks nothing (a draft is not unsaved work)', !log.dialogs.length && (await page.locator('#spineEd').count()) === 0, log.dialogs);
+  check(r, '...and the drafts are all still waiting', (coachRow(await L.db(page), 'band-pull-apart').suggested_changes || []).length === 4, coachRow(await L.db(page), 'band-pull-apart').suggested_changes);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['spine-draft-save'] = async (b) => {
+  const r = { id: 'spine-draft-save', title: "Save approves Claude's drafts: the entry gets them and the list loses them, in one call; the rest stay", checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  await spineOpen(page, 'band-pull-apart', 'band-pull-apart');
+  const n0 = await L.nCalls(page);
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  const ups = spineRpcs(await L.callsSince(page, n0)), up = ups[0];
+  check(r, 'one coach_save_spine call', ups.length === 1, ups.length);
+  check(r, 'the entry half carries the drafted steps and cues, and nothing else', up && Object.keys(up.payload.p_entry).sort().join() === 'cues,steps'
+    && JSON.stringify(up.payload.p_entry.steps) === JSON.stringify(DRAFT_STEPS) && JSON.stringify(up.payload.p_entry.cues) === JSON.stringify({ good: ['Fixture draft key', 'Fixture draft feel'], bad: ['Fixture draft fault. Fixture draft fix.'] }), up && up.payload.p_entry);
+  const left = up && up.payload.p_coach.suggested_changes;
+  check(r, 'the coach-only half sends the list without the two it decided: the stale purpose and the tennis item stay', up && Object.keys(up.payload.p_coach).join() === 'suggested_changes'
+    && Array.isArray(left) && left.map(x => x.field).join() === 'purpose,tennis', up && up.payload.p_coach);
+  check(r, 'the snapshot is the list as the page read it (the guard against a draft that arrived since)', up && (up.payload.p_coach_snap.suggested_changes || []).length === 4, up && up.payload.p_coach_snap);
+  const d = await L.db(page);
+  const e = d.exercises.find(x => x.id === 'band-pull-apart');
+  check(r, 'the server has the steps and the cues', JSON.stringify(e.steps) === JSON.stringify(DRAFT_STEPS) && e.cues.good[0] === 'Fixture draft key', { steps: e.steps, cues: e.cues });
+  check(r, '...and two items left on the list', coachRow(d, 'band-pull-apart').suggested_changes.map(x => x.field).join() === 'purpose,tennis', coachRow(d, 'band-pull-apart').suggested_changes);
+  check(r, 'the toast says the drafts are off the list', /2 drafts from Claude off the list/.test(await L.toastText(page)), await L.toastText(page));
+  check(r, 'the editor no longer shows a draft, and the filter is gone', (await page.locator('#spineEd .sp-draft:not(.off)').count()) === 0 && (await page.locator('.sp-filter[data-f="claude"]').count()) === 0, '');
+  check(r, 'no dialog, no page errors', !log.dialogs.length && !log.errors.length, { dialogs: log.dialogs, errors: log.errors });
+  await page.context().close();
+  return r;
+};
+
+S['spine-draft-discard'] = async (b) => {
+  const r = { id: 'spine-draft-discard', title: "Discard puts the entry's value back and takes the draft off the list with Save; Bring it back undoes it", checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  dismissDialogs(page, log);
+  await spineOpen(page, 'band-pull-apart', 'band-pull-apart');
+  await page.locator('#spineEd button', { hasText: 'Discard draft' }).first().click(); await L.settle(page, 300);   // the steps' (it comes first)
+  check(r, "the steps box goes back to the entry's own value (none)", (await page.locator('textarea[data-sf=steps]').inputValue()) === '', await page.locator('textarea[data-sf=steps]').inputValue());
+  check(r, 'the line says discarded, and offers Bring it back', /Claude’s draft discarded/.test(await page.locator('#spineEd').innerText()) && (await page.locator('#spineEd button', { hasText: 'Bring it back' }).count()) === 1, '');
+  await page.locator('#spineEd button', { hasText: 'Bring it back' }).click(); await L.settle(page, 300);
+  check(r, 'Bring it back fills the box again', (await page.locator('textarea[data-sf=steps]').inputValue()) === DRAFT_STEPS.join('\n'), await page.locator('textarea[data-sf=steps]').inputValue());
+  await page.locator('#spineEd button', { hasText: 'Discard draft' }).first().click(); await L.settle(page, 300);
+  await page.locator('#spineEd .sp-close').first().click(); await L.settle(page, 300);
+  check(r, 'a discard is unsaved work: closing asks first, and a no stays', log.dialogs.some(x => x.type === 'confirm' && /unsaved changes to Band Pull-Apart/.test(x.message)) && (await page.locator('#spineEd').count()) === 1, log.dialogs);
+  log.dialogs.length = 0;
+  const n0 = await L.nCalls(page);
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  const up = spineRpcs(await L.callsSince(page, n0))[0];
+  check(r, 'Save sends the kept cues draft and no steps', up && Object.keys(up.payload.p_entry).join() === 'cues', up && up.payload.p_entry);
+  check(r, '...and takes both decided drafts (kept and discarded) off the list', up && (up.payload.p_coach.suggested_changes || []).map(x => x.field).join() === 'purpose,tennis', up && up.payload.p_coach);
+  const d = await L.db(page);
+  check(r, 'the server: still no steps, the cues draft written, two items left', JSON.stringify(d.exercises.find(x => x.id === 'band-pull-apart').steps) === '[]'
+    && d.exercises.find(x => x.id === 'band-pull-apart').cues.good[0] === 'Fixture draft key' && coachRow(d, 'band-pull-apart').suggested_changes.length === 2, '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['spine-draft-arrives'] = async (b) => {
+  const r = { id: 'spine-draft-arrives', title: 'A draft Claude adds while the page is open: the save is refused whole, then Save again keeps the new one', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  await spineOpen(page, 'band-pull-apart', 'band-pull-apart');
+  // /spine Upkeep adds a proposal by SQL while Amir reads
+  await page.evaluate(() => { window.__DB.exercise_coach.find(x => x.id === 'band-pull-apart').suggested_changes.push(
+    { field: 'equipment', old: ['band'], new: ['band', 'rack'], why: 'fixture', from: 'spine fixture', at: new Date().toISOString() }); });
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  let d = await L.db(page);
+  check(r, 'refused: the dialog names Claude’s drafts and the counts', log.dialogs.length === 1 && /Claude’s drafts: 5 on the list now, 4 when you opened it/.test(log.dialogs[0].message) && /Nothing was saved, to either half/.test(log.dialogs[0].message), log.dialogs.map(x => x.message));
+  check(r, 'nothing written: no steps, and the new item is on the list', JSON.stringify(d.exercises.find(x => x.id === 'band-pull-apart').steps) === '[]' && coachRow(d, 'band-pull-apart').suggested_changes.length === 5, coachRow(d, 'band-pull-apart').suggested_changes.length);
+  check(r, 'the editor still shows the drafts, pre-filled from the list as it is now', (await page.locator('textarea[data-sf=steps]').inputValue()) === DRAFT_STEPS.join('\n'), await page.locator('textarea[data-sf=steps]').inputValue());
+  log.dialogs.length = 0;
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  d = await L.db(page);
+  check(r, 'Save again goes through: the steps are on the entry', JSON.stringify(d.exercises.find(x => x.id === 'band-pull-apart').steps) === JSON.stringify(DRAFT_STEPS) && !log.dialogs.length, log.dialogs);
+  check(r, "...and Claude's new item is still waiting, beside the two the editor never touches", coachRow(d, 'band-pull-apart').suggested_changes.map(x => x.field).join() === 'purpose,tennis,equipment', coachRow(d, 'band-pull-apart').suggested_changes.map(x => x.field));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['editor-pill-picker'] = async (b) => {
+  const r = { id: 'editor-pill-picker', title: 'The ✎ pill picker: the closed list, two at most, one per group; an old pill to the note or dropped; saved as one string', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  // an old card: an old spelling, an off-list pill, a tempo said in words. And a card already on the list.
+  await page.evaluate(async () => {
+    const row = window.__DB.programs.find(p => p.athlete_id === 'ava_test');
+    row.data.workouts.days[0].blocks[1].exercises[1].intent = 'Right leg first · glute focus · 3s eccentric';
+    row.data.workouts.days[0].blocks[1].exercises[0].intent = 'neutral grip';
+    await reloadPrograms(); render();
+  });
+  await L.settle(page, 600);
+  const rx = rowLoc(page, 'Chest-Supported Dumbbell Row').locator('.cmp-rx');
+  check(r, 'the row shows the pill: a list value in its list spelling, the two off the list in clay', (await rx.locator('.rx-pill:not(.off)').allInnerTexts()).join() === 'right side first' && (await rx.locator('.rx-pill.off').count()) === 2,
+    { on: await rx.locator('.rx-pill:not(.off)').allInnerTexts(), off: await rx.locator('.rx-pill.off').allInnerTexts() });
+  check(r, "the row's issue count includes the pill", /chip issue/.test(await rx.innerText()), await rx.innerText());
+  // a card already on the list: Save with no change sends nothing
+  let ed = await openEditor(page, 'Goblet Squat');
+  check(r, 'the picker shows the card’s pill as on', (await ed.locator('.pp.on').allInnerTexts()).join() === 'neutral grip', await ed.locator('.pp.on').allInnerTexts());
+  let n0 = await L.nCalls(page);
+  await ed.locator('.exed-acts button', { hasText: 'Save' }).click(); await L.settle(page, 500);
+  check(r, 'a pill already on the list does not make a no-change save write', !lastOf(await L.callsSince(page, n0), isUpd('programs')), '');
+  ed = await openEditor(page, 'Chest-Supported Dumbbell Row');
+  check(r, 'the old spelling is on, as its list value', (await ed.locator('.pp.on').allInnerTexts()).join() === 'right side first', await ed.locator('.pp.on').allInnerTexts());
+  check(r, 'each value off the list is flagged, with Move to the note and Drop it', (await ed.locator('.pp-off').count()) === 2 && (await ed.locator('.pp-off button', { hasText: 'Move to the note' }).count()) === 2, await ed.locator('.pp-off').allInnerTexts());
+  await ed.locator('.pp-off', { hasText: 'glute focus' }).locator('button', { hasText: 'Move to the note' }).click();
+  await ed.locator('.pp-off', { hasText: '3s eccentric' }).locator('button', { hasText: 'Drop it' }).click();
+  check(r, 'Move to the note puts it in the note as a sentence; both flags gone', (await ed.locator('[id^="exNote-"]').inputValue()) === 'Glute focus.' && (await ed.locator('.pp-off').count()) === 0, await ed.locator('[id^="exNote-"]').inputValue());
+  const pp = v => ed.locator('.pp', { hasText: new RegExp('^' + v + '$') });
+  await pp('neutral grip').click(); await pp('wide grip').click();
+  check(r, 'one per group: wide grip takes neutral grip’s place', (await ed.locator('.pp.on').allInnerTexts()).sort().join() === 'right side first,wide grip', await ed.locator('.pp.on').allInnerTexts());
+  await pp('max intent').click(); await L.settle(page, 100);
+  check(r, 'a third is refused, with a toast', (await ed.locator('.pp.on').count()) === 2 && /Two pills at most/.test(await L.toastText(page)), { on: await ed.locator('.pp.on').allInnerTexts(), toast: await L.toastText(page) });
+  await pp('right side first').click(); await pp('hold at the top').click();
+  check(r, 'a hold pill without tempo iso is warned', /needs Tempo iso/.test(await ed.locator('.pillpick').innerText()), await ed.locator('.pillpick').innerText());
+  await setField(ed, 'exTempo', 'iso'); await L.settle(page, 100);
+  check(r, '...and the warning goes when the tempo is iso', !/needs Tempo iso/.test(await ed.locator('.pillpick').innerText()), await ed.locator('.pillpick').innerText());
+  await setField(ed, 'exTempo', ''); await pp('hold at the top').click(); await pp('max intent').click();
+  n0 = await L.nCalls(page);
+  await ed.locator('.exed-acts button', { hasText: 'Save' }).click(); await L.settle(page, 700);
+  const up = lastOf(await L.callsSince(page, n0), isUpd('programs'));
+  const ex = up && up.payload.data.workouts.days[0].blocks[1].exercises[1];
+  check(r, 'saved as ONE string, joined by " · ", in the order picked', ex && ex.intent === 'wide grip · max intent', ex && ex.intent);
+  check(r, 'the old pill moved into the note', ex && ex.note === 'Glute focus.', ex && ex.note);
+  check(r, 'the row redraws with the two pills, both on the list', (await rowLoc(page, 'Chest-Supported Dumbbell Row').locator('.rx-pill:not(.off)').allInnerTexts()).join() === 'wide grip,max intent', await rowLoc(page, 'Chest-Supported Dumbbell Row').locator('.rx-pill').allInnerTexts());
+  check(r, 'no dialog, no page errors', !log.dialogs.length && !log.errors.length, { dialogs: log.dialogs, errors: log.errors });
   await page.context().close();
   return r;
 };

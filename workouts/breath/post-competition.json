@@ -35,15 +35,6 @@
           "exId": "walk",
           "videoUrl": null,
           "note": "Five minutes of easy movement first is what makes the rest of this land.",
-          "cues": {
-            "good": [
-              "Slow walk anywhere, around the court is fine",
-              "Let your breathing come down on its own"
-            ],
-            "bad": [
-              "Sitting straight down with your bag"
-            ]
-          },
           "rx": {
             "time": "5 minutes"
           }
@@ -53,15 +44,6 @@
           "name": "Cross-Body Arm Swing",
           "exId": "cross-body-arm-swing",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Swing the arm across the body and back open, relaxed",
-              "Let the upper back turn with it"
-            ],
-            "bad": [
-              "Forcing the end range"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -72,15 +54,6 @@
           "name": "Cat-Cow",
           "exId": "cat-cow",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Move slowly between the two shapes",
-              "Breathe with it, out as you round"
-            ],
-            "bad": [
-              "Snapping between the shapes"
-            ]
-          },
           "rx": {
             "reps": 10
           }
@@ -97,15 +70,6 @@
           "exId": "legs-up-the-wall",
           "videoUrl": null,
           "note": "Feet above the heart is what helps heavy legs drain after a long match.",
-          "cues": {
-            "good": [
-              "Heels resting up the wall, arms out wide",
-              "Let the legs be heavy and the floor take you"
-            ],
-            "bad": [
-              "Checking your phone through it"
-            ]
-          },
           "rx": {
             "time": "3 minutes"
           }
@@ -114,15 +78,6 @@
           "type": "simple",
           "name": "Child's Pose",
           "exId": "childs-pose",
-          "cues": {
-            "good": [
-              "Knees wide, hips back to the heels, arms long",
-              "Breathe into your back and feel it widen"
-            ],
-            "bad": [
-              "Rushing to get to the breathing"
-            ]
-          },
           "rx": {
             "time": "90 sec"
           }

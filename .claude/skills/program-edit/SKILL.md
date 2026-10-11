@@ -211,10 +211,13 @@ you changed her program and removed some of the exercises?"* It was restored fro
 file is touched during an edit (*"dont touch the html file … share it with me"*): the one change
 outside the programme is adding a newly prescribed exercise to the library, in full.
 
-**Cues are not edited on a card any more** (2026-09-24). Each exercise's cues are its Spine entry's
-and every athlete sees the same three. A cue change that would help anyone is an edit to the entry
-(coach.html → Exercises). A point about this athlete only is the exercise's `note` (Coach's Note),
-one to three short sentences (COM-14). Never add or change `cues` on a programme card.
+**Cues and steps are not edited on a card** (2026-09-24; steps 2026-10-11). Each exercise's steps and
+three cues are its Spine entry's and every athlete sees the same ones (CUE-7). A change that would help
+anyone is a proposal for the entry (`/spine` → the pending list; Amir saves it in coach.html →
+Exercises). A point about this athlete only is the exercise's `note` (Coach's Note), written to COM-14,
+and what this athlete changes every rep is the pill, from the list (CHP-2). Never add or change `cues`
+on a programme card. A note or pill the edit writes follows those rules; an old note or pill the edit
+does not touch is left alone, even when the check flags it, unless Amir names it (PRC-2): report it.
 
 Edit the programme JSON using precise string matches, block by block — never rewrite the whole thing. Then write it yourself, path by path (Step 0b: one `jsonb_set` per path you changed, never a whole-object `update`), and list every path you wrote in the report, so it can be read against what Amir asked for (PRC-2).
 
@@ -226,8 +229,8 @@ Report what changed, the updated set tally, and flag anything left for a future 
 
 **Then run `/spine` → Upkeep** on this athlete's programme (Amir, 2026-09-24: every programme
 write leaves the Spine more complete). An exercise the edit brought in that has no entry gets
-drafted; empty fields get filled; a better general cue that came up is applied to a draft or
-proposed for an approved entry (written to `/spine`'s pending list, not only printed); qualities and body parts (`loads` + `impact`) filled; `exId` stamped on the new card. One-line
+drafted; empty fields get filled; missing steps or a better general cue that came up are applied to a
+draft or proposed for an approved entry (written to `/spine`'s pending list, not only printed); qualities and body parts (`loads` + `impact`) filled; `exId` stamped on the new card. One-line
 **SPINE** report at the end.
 
 **And keep the edit honest to the rest of the system** (2026-09-24):

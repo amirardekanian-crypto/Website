@@ -88,6 +88,26 @@ create table public.qualities (
   updated_at  timestamptz not null default now(),
   updated_by  text
 );
+-- The live get_exercises() BEFORE stage52 (read 2026-10-11 with pg_get_functiondef; stage42's). stage52 replaces it with
+-- one that also sends steps, and adds exercises.steps and spine_steps_ok() itself: they are left out of this file on
+-- purpose, so the runner tests the real migration (a column that is not there yet), as stage49 does for spine_versions.
+create or replace function public.get_exercises()
+ returns jsonb language sql stable security definer set search_path to 'public'
+as $function$
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'id', e.id, 'name', e.name, 'aliases', e.aliases, 'pattern', e.pattern,
+           'qualities', e.qualities, 'purpose', e.purpose, 'tennis', e.tennis,
+           'cues', e.cues, 'equipment', e.equipment, 'loads', e.loads, 'impact', e.impact,
+           'easier', e.easier, 'harder', e.harder, 'alts', e.alts, 'video', e.video,
+           'muscles', coalesce(nullif(c.credits, '{}'::jsonb), e.muscles)
+         ) order by e.name), '[]'::jsonb)
+  from public.exercises e
+  left join public.exercise_coach c on c.id = e.id
+  where e.status = 'approved';
+$function$;
+revoke all on function public.get_exercises() from public;
+grant execute on function public.get_exercises() to anon, authenticated;
+
 -- stage46 §4
 create trigger exercises_touch_updated_at before update on public.exercises for each row execute function public.touch_updated_at();
 create trigger qualities_touch_updated_at before update on public.qualities for each row execute function public.touch_updated_at();

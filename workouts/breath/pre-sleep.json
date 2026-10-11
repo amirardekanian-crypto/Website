@@ -27,15 +27,6 @@
           "exId": "legs-up-the-wall",
           "videoUrl": null,
           "note": "Go straight to bed after this — going back to a screen undoes it.",
-          "cues": {
-            "good": [
-              "Heels up the wall or the headboard, arms out wide",
-              "Let the legs be heavy"
-            ],
-            "bad": [
-              "Scrolling through it"
-            ]
-          },
           "rx": {
             "time": "4 minutes"
           }
@@ -45,15 +36,6 @@
           "name": "Knees to Chest",
           "exId": "knees-to-chest",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hug both knees in gently and rock slowly side to side",
-              "Just enough movement to let the lower back let go"
-            ],
-            "bad": [
-              "Pulling hard"
-            ]
-          },
           "rx": {
             "time": "60 sec"
           }
