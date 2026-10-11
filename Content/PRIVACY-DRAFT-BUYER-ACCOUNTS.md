@@ -3,8 +3,7 @@
 **Status (2026-10-11): the English text is PUBLISHED in `privacy.html`** (section 2.10, short-version lines 1 and 2, the retention line
 and the erasure-receipt paragraph; last updated 11 October 2026). You decided the legal point below: the buyer decides why the players'
 data is collected and you only host it, so the text says the buyer is responsible for having the right to record their players and that
-you store it for them. **`privacy-fa.html` is not changed yet:** its Farsi lines are at the end of this file and ship after you have
-read them. It answers coach.html audit finding MKT-16 (the notices said nothing about the course app, the testing app, their accounts
+you store it for them. **`privacy-fa.html` shipped too, the same day:** you read the Farsi lines at the end of this file and said "ship as written" (it has line 1 and line 2 changed, one new line 8, and the date 11 October 2026). It answers coach.html audit finding MKT-16 (the notices said nothing about the course app, the testing app, their accounts
 or the testing app's players) and is the text the **Erase…** button (stage54) keeps true. Nothing in the notices needs to change for
 athletes: the existing promises (delete on request, gone from backups within about three months) are exactly what *Erase completely…* now does.
 
@@ -65,7 +64,7 @@ the academy that is the controller? The text above avoids the word by saying the
 record people, which is true either way, but a lawyer (or the ICO's controller/processor checklist) should say which it is
 before you sell the app to organisations: a processor has to be bound by a written agreement.
 
-## Farsi text for `privacy-fa.html` (needs your reading before it ships)
+## Farsi text for `privacy-fa.html` (PUBLISHED 2026-10-11, exactly as you approved it)
 
 `privacy-fa.html` is a one-page summary, so it gets two changed lines and one new line, not a section. Your voice, colloquial.
 
@@ -75,4 +74,4 @@ before you sell the app to organisations: a processor has to be bound by a writt
 
 **New line (after line 7):** اگه دوره‌ی تنیس یا اپِ تست رو بخری، یه نام‌کاربری و رمز برات می‌سازم. نام‌کاربری، تاریخِ ساخت و یه یادداشتِ خصوصیِ خودم رو نگه می‌دارم که فقط خودم می‌بینمش. دوره روی گوشی‌ت دانلود می‌شه و پیشرفتت رو برام نمی‌فرسته. اپِ تست چیزهایی که توش وارد می‌کنی (بازیکن‌ها، یادداشت‌ها، نتیجه‌ها) رو توی پایگاه‌داده‌م نگه می‌داره. نمی‌خونمشون و برای کارِ دیگه‌ای ازشون استفاده نمی‌کنم. این‌که چرا و چطور ثبتشون می‌کنی با خودته، و باید حقِ ثبتِ اطلاعاتِ اون آدم‌ها رو داشته باشی (به‌خصوص بچه‌ها). «حذفِ بازیکن» توی اپ فقط پنهونش می‌کنه؛ بخوای، حسابت و همه‌چیزِ زیرش، حتی پنهون‌شده‌ها، رو یه‌جا پاک می‌کنم. این بخش در متنِ کامل بخشِ ۲٫۱۰ ـه.
 
-The date line becomes «آخرین به‌روزرسانی: ۱۱ اکتبرِ ۲۰۲۶». Say the word after you have read it and I will make the change, run the style guard and push.
+The date line becomes «آخرین به‌روزرسانی: ۱۱ اکتبرِ ۲۰۲۶». The only addition to the approved words: *بخشِ ۲٫۱۰* in the last sentence is a link to the English section.
