@@ -23,6 +23,7 @@
      cycleWeekInfo, weekNoteNow  / cycleWeekOnC, weekNoteOnC      the week a day falls in and the cycle's note for it (the app asks about today,
                                                                   the dashboard about the day a session was trained)
      sessionIsStale              / sessionIsStaleC                is a started session over (the live app snapshot's "in progress", TWIN-6)
+     habits.html runEndKey, activeQuestRun / questRunEnd, activeQuestRun   the live quest run and its last day, with runs overlapping or scheduled ahead (TODAY-14)
      exTestSpec                  / exTestSpecC                    which values of a lift's `test` are a retest flag (TWIN-7)
      readinessS, readinessBase   / readinessSC, usualC            the check-in score and the athlete's usual (TWIN-3, TODAY-11)
      qmSets, isPrepBlockTitle    / qmSetsC, QM_PREP               what the Quality check counts
@@ -63,7 +64,7 @@ function read(f) {
   }
   return fs.readFileSync(path.join(ROOT, f), 'utf8').replace(/\r\n/g, '\n');
 }
-const A_SRC = read('program.html'), D_SRC = read('coach.html');
+const A_SRC = read('program.html'), D_SRC = read('coach.html'), H_SRC = read('habits.html');
 const STAMP_FILE = path.join(ROOT, 'scripts', 'twins_stamp.json');
 
 let checks = 0;
@@ -325,6 +326,40 @@ run('is a started session over (sessionIsStale)', () => ['2026-10-11T14:00:00Z',
   const stamps = OFFSETS_MIN.map(m => new Date(c.now + m * 60000).toISOString()).concat([null, undefined, '', 'junk', '2026-10-11', '2026-10-10', '2026-10-10T23:30:00Z', '2026-10-11T00:30:00Z', 0, false]);
   stamps.forEach(s => same('sessionIsStale vs sessionIsStaleC', { now: nowIso, stamp: s }, c.app(s), c.dash(s)));
 }));
+
+/* ── 4g. the live quest run (TODAY-14): habits.html is the app, coach.html the dashboard ─────────────── */
+// A run lasts seven days, is clipped the day before the next run starts, and can be ended early by the coach; the one shown is the
+// LATEST-STARTING run that covers today. Both run on the same runs and the same clock (a fixed Date, in UTC).
+function questAt(nowIso, runs) {
+  const now = new Date(nowIso).getTime();
+  const Fixed = class extends Date { constructor(...a) { if (a.length) super(...a); else super(now); } static now() { return now; } };
+  const hctx = vm.createContext({ console, Date: Fixed });
+  vm.runInContext(['var CFG = { questRuns: ' + J(runs) + ' };', lineSrc(H_SRC, 'const QUEST_RUN_DAYS =', 'habits.html')].concat(
+    ['today', 'addDays', 'fmtKey', 'parseKey'].map(n => fnSrc(H_SRC, n, 'habits.html')), [lineSrc(H_SRC, 'const TKEY =', 'habits.html')],
+    ['questRuns', 'runEndKey', 'activeQuestRun'].map(n => fnSrc(H_SRC, n, 'habits.html'))).join('\n'), hctx);
+  const dctx = vm.createContext({ console, Date: Fixed });
+  vm.runInContext(['var S = { rules: { questRuns: ' + J(runs) + ' } };'].concat(['pad2', 'dkey', 'todayKey', 'addDays', 'questRuns', 'questRunEnd', 'activeQuestRun'].map(n => fnSrc(D_SRC, n, 'coach.html'))).join('\n'), dctx);
+  return { app: n => vm.runInContext(n, hctx), dash: n => vm.runInContext(n, dctx) };
+}
+const RUN_SETS = [
+  [],
+  [{ start: '2026-10-09', ids: ['a'] }],
+  [{ start: '2026-10-07', ids: ['a'] }, { start: '2026-10-10', ids: ['b'] }],                                  // the second takes over from its own start
+  [{ start: '2026-10-14', ids: ['b'] }, { start: '2026-10-09', ids: ['a'] }],                                  // one scheduled ahead, listed first
+  [{ start: '2026-10-09', ids: ['a'] }, { start: '2026-10-14', ids: ['b'] }],                                  // the same, listed last
+  [{ start: '2026-10-08', ids: ['a'], end: '2026-10-10' }],                                                    // ended early by the coach
+  [{ start: '2026-10-08', ids: ['a'], end: '2026-10-20' }],                                                    // an end after the seventh day changes nothing
+  [{ start: '2026-10-08', ids: ['a'], end: 'soon' }, { start: '2026-10-09', ids: ['b'], end: '2026-10-09' }],  // not a date; a one-day run
+  [{ start: '2026-10-12', ids: ['a'], end: '2026-10-10' }],                                                    // ended before it began
+  [null, { start: 5, ids: ['a'] }, { start: '2026-10-09' }, { start: '2026-10-09', ids: 'x' }, { start: '2026-10-10', ids: ['ok'] }],
+  [{ start: '2026-10-04', ids: ['a'] }, { start: '2026-10-08', ids: ['b'], end: '2026-10-11' }, { start: '2026-10-10', ids: ['c'] }, { start: '2026-10-17', ids: ['d'] }],
+  [{ start: '2026-10-10', ids: ['a'] }, { start: '2026-10-10', ids: ['b'] }],                                  // two on one start day
+];
+run('the live quest run (activeQuestRun, runEndKey)', () => RUN_SETS.forEach(runs => ['2026-10-03', '2026-10-07', '2026-10-09', '2026-10-10', '2026-10-11', '2026-10-12', '2026-10-14', '2026-10-17', '2026-10-25'].forEach(day => {
+  const q = questAt(day + 'T12:00:00Z', runs);
+  same('activeQuestRun (the live run)', { runs, day }, q.app('activeQuestRun()'), q.dash('activeQuestRun()'));
+  q.app('questRuns()').forEach(r => same('runEndKey vs questRunEnd (the last day)', { runs, run: r }, q.app('runEndKey')(r), q.dash('questRunEnd')(r)));
+})));
 
 /* ── 4d. which values of `test` are a retest flag (TWIN-7) ──────────────────── */
 const A_TEST = sandbox(null, [lineSrc(A_SRC, 'const ONE_RM_MAX_EFFECTIVE =', 'program.html'), lineSrc(A_SRC, 'const DEFAULT_TEST_REPS =', 'program.html')].concat(fromA('exTestSpec')), ['exTestSpec']);

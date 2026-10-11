@@ -5,7 +5,7 @@
 'use strict';
 const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
 const ROOT = path.join(__dirname, '..');
-const FILES = ['program.html', 'coach.html', 'assets/js/chips.js', 'scripts/twins_stamp.json', 'scripts/name_cases.json'];
+const FILES = ['program.html', 'coach.html', 'habits.html', 'assets/js/chips.js', 'scripts/twins_stamp.json', 'scripts/name_cases.json'];
 
 function runOn(mutate, opts) {
   opts = opts || {};
@@ -55,6 +55,10 @@ want('the phone lens counts draft qualities', swap('coach.html', "(quals || []).
 want('a circuit\'s rounds are read from the wrong place on the dashboard', swap('coach.html', 'const rounds = roundCountC(Chips.rxOf(ex).rounds || ex.rounds);', 'const rounds = roundCountC(ex.rounds);'), 1, /qualityMix vs qualityDayC/);
 want('a circuit with 0 rounds counts 0 on the dashboard', swap('coach.html', 'return n > 0 ? n : 1;', 'return n;'), 1, /qualityMix vs qualityDayC/);
 want('the app\'s name rule changes on its own (accents are no longer folded), so the stored tiers are stale', swap('program.html', ".normalize('NFKD').replace(/[^\\x00-\\x7f]/g, '')", ".normalize('NFC')"), 1, /the tiers stored for a name are what the app gives|exNameVariants vs exNameVariantsC/);
+want('the dashboard stops clipping a run at the next one (it shows a longer week than the app)', swap('coach.html', 'if (dayBefore < end) end = dayBefore;', 'if (false) end = dayBefore;'), 1, /activeQuestRun|runEndKey vs questRunEnd/);
+want('the dashboard shows the last run in the list, not the latest-starting', swap('coach.html', 'reduce((best, r) => (r.start > best.start ? r : best)) : null;', 'reduce((best, r) => r) : null;'), 1, /activeQuestRun/);
+want('the dashboard ignores a run the coach ended early', swap('coach.html', 'r.end < end) end = r.end;', 'false) end = r.end;'), 1, /runEndKey vs questRunEnd|activeQuestRun/);
+want('the dashboard reads a run with no quest list', swap('coach.html', 'typeof x.start === \'string\' && Array.isArray(x.ids));', 'typeof x.start === \'string\');'), 1, /activeQuestRun|runEndKey vs questRunEnd/);
 want('a name tier drifts (the dashboard stops folding DB to dumbbell)', swap('coach.html', "const EX_ABBREV_C = { db: 'dumbbell', bb: 'barbell', kb: 'kettlebell' };", "const EX_ABBREV_C = { bb: 'barbell', kb: 'kettlebell' };"), 1, /exNameVariants vs exNameVariantsC/);
 want('the Spine resolver drifts (exId no longer wins on the dashboard)', swap('coach.html', 'if (exId) return byId[exId] ? exId : null;', 'if (false) return exId;'), 1, /spineFor vs spineForC/);
 want('the dashboard guesses by name again when a card\'s exId is a draft (the old rule)', swap('coach.html', 'if (exId) return byId[exId] ? exId : null;', 'if (exId && byId[exId]) return exId;'), 1, /spineFor vs spineForC|DRAFT shows nothing/);

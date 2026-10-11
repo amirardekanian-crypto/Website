@@ -1206,7 +1206,8 @@ leaves the athlete's Progress screen. A value that is not a `YYYY-MM-DD` date in
 two sides. `rulesSignature()` includes the `end`, so ending a run re-baselines quietly instead of celebrating.
 
 A run's window now ends **the day before the next run starts** — a later run simply takes
-over, which is the same rule `activeQuestRun()` already used for display. `runEndKey()` on
+over, which is the same rule `activeQuestRun()` already used for display (coach.html's `questRunEnd()` / `activeQuestRun()` are the twins since
+2026-10-11, guarded by `scripts/check_twins.js`). `runEndKey()` on
 the client and the `qruns` CTE's `least(rstart + 6, next_start - 1)` on the server. Proven
 to agree on the live database: runs starting 27 July and 31 July clip the first to
 **30 July** on both sides, against a natural end of 2 August.

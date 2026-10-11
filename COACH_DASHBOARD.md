@@ -115,6 +115,11 @@ card on a draft has no cues and no video until you approve it (it used to fall b
 phone*, gives each one: what you see here, and what the phone shows (nothing, or the closest approved entry). The video next to an
 exercise in the compare view is the phone's too, so a draft's video does not appear until the draft is approved.
 
+**A save that worked and a reload that did not.** After a write the page reloads the slice it touched. If that reload fails (the wall, the quest rules,
+the Proof contacts, the intake forms, the affiliate codes, the session list, the athletes' progress, the leaderboard names) a red line says
+*Saved, but the crew wall (<reason>) could not be reloaded, so what you see for it may be out of date. Tap ↻ Refresh* and names every slice that
+failed. Until 2026-10-11 (audit TODAY-13) only the session list said so; the others kept the old numbers and said nothing.
+
 **Saving is safe against Claude's work (2026-10-10).** Claude's `/spine` writes the same rows by SQL
 while you review them. A save sends **only the fields you changed**, so a court line, a link, a count
 or a cost Claude wrote after you opened the tab survives your edit to a video. If Claude (or another
@@ -275,7 +280,9 @@ The roll call, straight from `hab_notes`, newest day first. Two days by default,
   Posting again updates it; **Take it down** deletes it. 200 characters, the
   server's own limit. It is filed under the day on your computer's clock (`p_day`): until
   2026-10-10 the server used its own UTC date, so a line posted between your midnight and UTC
-  midnight replaced yesterday's. What you type survives a redraw until you post it.
+  midnight replaced yesterday's. What you type survives a redraw until you post it. The box says what the server strips
+  (`hab_clean_note()`): quotes, `<`, `>` and backslashes are removed and line breaks become spaces. A line filed under tomorrow's date (an athlete
+  east of you, in the last hours of your day) is headed *Tomorrow, their time* instead of a bare date; the wall otherwise keeps your day.
 - **Hide / Show** on any athlete's line calls `hide_note()`. Hidden lines stay
   visible *to you*, greyed and tagged, so moderation is reversible and you can
   still see what you hid.
@@ -346,7 +353,10 @@ runs seven days from today via `set_quests()`.
 longer live (its quests are not offered), a quest completed on or before that day keeps paying, one not
 completed by then never pays. Both scorers read the `end` (`hab_bonus_xp()`'s `qruns` CTE and `runEndKey()` in
 `habits.html`; `scripts/test_quest_runs.js` and `scripts/test_spine_sql.sh` section J keep them in step). The
-panel then says *ended early* and the picker returns the next day. The button never falls back to
+panel then says *ended early* and the picker returns the next day. **The live run is the app's** (audit TODAY-14, 2026-10-11): the
+latest-starting run that covers today, and its last day is its seventh, clipped the day before the next run starts (a run scheduled ahead, or one
+starting mid-week, hands over: the panel says *the run from <date> takes over*) or the day you ended it. `questRunEnd()` / `activeQuestRun()` are
+the twins of `runEndKey()` / `activeQuestRun()` in `habits.html`, and `scripts/check_twins.js` runs both on 12 run lists and 9 days. The button never falls back to
 `clear_quests()` when stage55 is not applied (it says so instead): `clear_quests()` is the call that takes the
 XP back, now only from the SQL editor (`QUESTS.md`). Until 2026-10-11 the button was *Cancel this run* and did
 take the XP back from everyone (the dialog had promised the opposite until 2026-10-10).
@@ -478,7 +488,9 @@ no set ticked is flagged *0 of N sets ticked* instead of counting as exactly as 
 **Every note has Mark read.** A note written against one exercise counts as a note to read (it did
 before), and since 2026-10-10 it also gets the note box and Mark read (8 of 12 waiting notes had no
 way to be cleared). **A note the athlete edits after you marked it read comes back** to *needs you*
-(stage46; the server used to keep it read whatever it now said). Mark read changes that one row in
+(stage46 for the note on the whole session; **stage58, 2026-10-11, for a note on one exercise too**: `save_session()` compares the exercise notes of
+the new save with the old row's, taking a note away or editing a weight does not bring it back, and your own saves never do). A `Note:` line
+with nothing after it is not a note to read. Mark read changes that one row in
 the page's copy; it no longer re-downloads the whole session history.
 
 **What the file needs from the server, and what it says when it cannot have it.** The page loads every session's numbers
@@ -627,7 +639,10 @@ read 33%). Shown up to 100%, with "N more than planned" when they did extra. Gre
 ## 7. PROOF
 
 **The board** — `leaderboard_top()`, the server's own scorer, season or week.
-These are the exact rows and the exact order the crew sees in their app.
+These are the exact rows and the exact order the crew sees in their app. It is read once and kept (so a long Proof visit does not re-score the
+board on every redraw), and it says **when it was read** (*As of 14:32*) with a **Reload** button; starting or ending a quest week reads it again,
+because the XP moved (audit MKT-3, 2026-10-11). When the read fails the page says why (*Couldn't fetch the board: <reason>*) and has **Try again**
+(MKT-8).
 
 **Titles minted** — the last 30 rows of `hab_titles`, newest first. A quiet
 health check: if this stops moving, minting has broken (it did once, silently,

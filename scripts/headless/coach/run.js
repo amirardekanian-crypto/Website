@@ -2188,6 +2188,120 @@ S['spine-phone-view'] = async (b) => {
   return r;
 };
 
+// ── Small truthfulness fixes on Today and the board (audit TODAY-3, TODAY-4, TODAY-13, TODAY-14, TODAY-15, MKT-3, MKT-8; 2026-10-11, pile B8) ─────────
+S['today-small-truths'] = async (b) => {
+  const r = { id: 'today-small-truths', title: 'Today: a blank exercise note is no note, a line from tomorrow says so, and the line box says what it strips', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  const has = await page.evaluate(() => [
+    sessionHasNote({ day_note: '', summary: 'Day 1\n\nExercise log:\n[Primary]\n• Squat (✓)\n    Set 1: 20 ✓\n    Note:  \n' }),
+    sessionHasNote({ day_note: '', summary: 'Day 1\n\nExercise log:\n[Primary]\n• Squat (✓)\n    Set 1: 20 ✓\n    Note: knee felt odd\n' }),
+    sessionHasNote({ day_note: '   ', summary: '' }), sessionHasNote({ day_note: 'knee', summary: '' })]);
+  check(r, 'a "Note:" line with nothing after it is not a note to read; a real one is, and so is a day note', JSON.stringify(has) === JSON.stringify([false, true, false, true]), has);
+  await page.evaluate(() => {
+    window.__DB.hab_notes.push({ athlete_id: 'cara_free', day: addDays(todayKey(), 1), body: 'Early riser line', pct: 100, hidden: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() });
+    return refetch(['notes']);
+  });
+  await L.settle(page, 700);
+  const wall = (await page.locator('#wallPanel').innerText()).replace(/\s+/g, ' ');
+  check(r, 'a line filed under tomorrow (an athlete whose clock is ahead) says "Tomorrow, their time", not a bare date', /Tomorrow, their time/i.test(wall) && /Early riser line/.test(wall), wall);
+  check(r, 'the line box says that quotes, < > and backslashes are removed and line breaks become spaces', /Quotes, < > and backslashes are removed when you post, and line breaks become spaces/.test(wall), wall);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['refetch-failures'] = async (b) => {
+  const r = { id: 'refetch-failures', title: 'After a save, a reload that fails is told (the wall, contacts, rules), not skipped', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  // 1. post a line while the wall's read fails: the post works, the reload does not
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'from', name: 'hab_notes', op: 'select', message: 'fixture: the wall is down', times: 1 }); });
+  await page.locator('#coachLineInput').fill('Back to it today');
+  await page.getByRole('button', { name: /Post today's line/ }).click();
+  await L.settle(page, 900);
+  let bar = await L.failText(page);
+  check(r, 'the line was saved, and the page says the wall could not be reloaded and why', /Saved, but the crew wall \(fixture: the wall is down\) could not be reloaded/.test(bar), bar);
+  check(r, 'it says what you see may be out of date and what to do', /may be out of date\. Tap ↻ Refresh/.test(bar), bar);
+  // 2. two slices fail at once: one line names both
+  await page.evaluate(() => {
+    window.__STUB.fail.push({ kind: 'rpc', name: 'contact_list', message: 'fixture: contacts down', times: 1 });
+    window.__STUB.fail.push({ kind: 'from', name: 'xp_rules', op: 'select', message: 'fixture: rules down', times: 1 });
+    return refetch(['contacts', 'rules']);
+  });
+  await L.settle(page, 700);
+  bar = await L.failText(page);
+  check(r, 'two failed reloads are named in one line, each with its reason', /the quest and XP rules \(fixture: rules down\) and the Proof contacts \(fixture: contacts down\) could not be reloaded, so what you see for them may be out of date/.test(bar), bar);
+  // 3. nothing fails: nothing is said
+  await page.evaluate(() => { failDismissAll(); return refetch(['notes', 'rules', 'contacts']); });
+  await L.settle(page, 700);
+  check(r, 'when every reload works the bar stays empty', (await L.failText(page)) === '', await L.failText(page));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['quest-run-window'] = async (b) => {
+  const r = { id: 'quest-run-window', title: 'Today → the live quest run and its last day are the app\'s: latest-starting run, clipped where the next one starts', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  const day = n => page.evaluate(n => addDays(todayKey(), n), n);
+  const pretty = async n => page.evaluate(k => prettyDate(k), await day(n));
+  const setRuns = async runs => { await page.evaluate(runs => { window.__DB.xp_rules[0].rules.questRuns = runs; return refetch(['rules']); }, runs); await L.settle(page, 600); };
+  const panel = async () => (await page.locator('#questPanel').innerText()).replace(/\s+/g, ' ');
+  // 1. two runs overlap: the later-starting one is live, for its own seven days
+  await setRuns([{ start: await day(-4), ids: ['w_water5'] }, { start: await day(-1), ids: ['w_train3'] }]);
+  let t1 = await panel();
+  check(r, 'overlapping runs: the one that started later is live (its quest, not the older run\'s)', /FIXTURE SHOW-UP/.test(t1) && !/FIXTURE WELL/.test(t1), t1);
+  check(r, 'and it runs its full seven days from its own start', t1.includes('ends ' + await pretty(5)) && /Day 2\/7/.test(t1), t1);
+  // 2. listed the other way round: still the latest-starting, not the last in the list
+  await setRuns([{ start: await day(-1), ids: ['w_train3'] }, { start: await day(-4), ids: ['w_water5'] }]);
+  t1 = await panel();
+  check(r, 'the same two runs listed the other way round: still the later-starting one (it used to be the last in the list)', /FIXTURE SHOW-UP/.test(t1) && !/FIXTURE WELL/.test(t1), t1);
+  // 3. one scheduled ahead: this run stops the day before it, and the panel says who takes over
+  await setRuns([{ start: await day(3), ids: ['w_sleep5'] }, { start: await day(-2), ids: ['w_water5'] }]);
+  t1 = await panel();
+  check(r, 'a run scheduled ahead: the live run ends the day before it starts (not on its seventh day)', t1.includes('ends ' + await pretty(2)) && !t1.includes('ends ' + await pretty(4)), t1);
+  check(r, 'and the panel says the next run takes over, not that this one was ended early', t1.includes('the run from ' + await pretty(3) + ' takes over') && !/ended early/.test(t1) && /FIXTURE WELL/.test(t1), t1);
+  // 4. a run the coach ended is still "ended early"
+  await setRuns([{ start: await day(-2), ids: ['w_water5'], end: await day(0) }]);
+  t1 = await panel();
+  check(r, 'a run you ended today still reads "ended early · last day" with today\'s date', /ended early · last day/.test(t1) && t1.includes(await pretty(0)), t1);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['proof-board-truth'] = async (b) => {
+  const r = { id: 'proof-board-truth', title: 'Proof: the board says when it was read, says why it failed, and is read again after a quest week starts', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'proof' });
+  await L.settle(page, 700);
+  const boardCalls = async n0 => (await L.callsSince(page, n0)).filter(c => c.kind === 'rpc' && c.name === 'leaderboard_top').length;
+  let txt = (await page.locator('#content').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the board says when it was read, with a Reload button', /As of \d\d:\d\d\./.test(txt) && (await page.getByRole('button', { name: /Reload/ }).count()) === 1, txt.slice(0, 300));
+  // a failed read says why and offers to try again
+  await page.evaluate(() => { window.__STUB.fail.push({ kind: 'rpc', name: 'leaderboard_top', message: 'fixture: the board is down', times: 1 }); });
+  await page.getByRole('button', { name: /Reload/ }).click();
+  await L.settle(page, 700);
+  txt = (await page.locator('#content').innerText()).replace(/\s+/g, ' ');
+  check(r, 'a board that fails to load says why, not just that it could not be fetched', /Couldn't fetch the board: fixture: the board is down/.test(txt) && (await page.getByRole('button', { name: /Try again/ }).count()) === 1, txt.slice(0, 300));
+  await page.getByRole('button', { name: /Try again/ }).click();
+  await L.settle(page, 700);
+  txt = (await page.locator('#content').innerText()).replace(/\s+/g, ' ');
+  check(r, 'Try again reads it again and the board is back, with its time', /As of \d\d:\d\d\./.test(txt) && !/Couldn't fetch/.test(txt) && /Cara/.test(txt), txt.slice(0, 300));
+  // the board is kept until something moves the XP: starting a quest week rereads it
+  let n0 = await L.nCalls(page);
+  await L.go(page, 'today'); await L.go(page, 'proof'); await L.settle(page, 500);
+  check(r, 'leaving and coming back to Proof does not read the board again (it is kept)', (await boardCalls(n0)) === 0, await boardCalls(n0));
+  await L.go(page, 'today'); await L.settle(page, 500);
+  await page.locator('#questPanel input[type=checkbox]').first().check();
+  await page.locator('#questStartBtn').click();
+  await L.settle(page, 700);
+  n0 = await L.nCalls(page);
+  await L.go(page, 'proof'); await L.settle(page, 700);
+  check(r, 'after a quest week starts the board is read again (its XP moved)', (await boardCalls(n0)) === 1, await boardCalls(n0));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── One way to say what did not work (audit BROWSER-10, FLOW-22, MKT-13, 2026-10-11, pile B5) ─────────────────────────────────────
 // A failure used to be a 2.6-second toast in some tabs (easy to miss) and a pop-up in others (it stopped everything, and was gone once
 // dismissed). Now: it worked = a toast; it did not = a line at the bottom that stays until it is dismissed; a question = a confirm;

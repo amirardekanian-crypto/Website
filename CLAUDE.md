@@ -154,7 +154,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   the body drawing's groups; see PROGRAM-APP.md *The muscle map*) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
   `parseSetText()`) · the records rename matcher (`matchRenamed()` / `ceilAliasMapC()`) · how a session's set ends (`carrySet()`, called by
   the midnight sweep, the cloud copy and a rename) · whether a session is over (`sessionIsStale()`, 6 h grace past
-  midnight; DATA-02) and the date it is filed under (`sessionDateFor()`, the local day it was finished).
+  midnight; DATA-02) · the live quest run and its last day (`runEndKey()` / `activeQuestRun()` in habits.html, `questRunEnd()` / `activeQuestRun()` in coach.html) and the date it is filed under (`sessionDateFor()`, the local day it was finished).
 - **`rxOf()` returns a VIEW** (strings, the dose as `dose: {kind, value, side, label}`), not the `rx` object:
   test app code against real `rxOf()` output.
 - **A prescription is `rx`**; legacy `chips[]` is read, never written; **the app never invents a rest** (the pipeline writes one on every working exercise and circuit, CHP-7); reps are
@@ -361,7 +361,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (72 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (76 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.

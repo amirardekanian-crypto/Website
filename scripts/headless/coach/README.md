@@ -60,7 +60,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 72 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 76 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -126,6 +126,10 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | readiness-chart | Ava with eleven check-ins (six from before the verdict, five stored, two on one day, soreness 1 on one) and Eli with three | (pile B6, TWIN-3 and TODAY-11) the chart plotted the old composite against an all-time mean, the pill took the first of two same-day check-ins, Eli's "usual" was made up from three; now all three places read the app's score and usual |
 | quality-day-cards | Ava with five designed days against a Spine with one draft lift and only three approved qualities | (pile B6, TWIN-9) the Quality check was weekly only, so a week at 77% tagged looked fine while four of five day cards were blank; now each day is named by the app's rule, in the phone's view and "once the drafts are approved" |
 | spine-phone-view | Two approved entries with a video each and a DRAFT loose twin of each ("Machine …"), and three cards: one on a draft, one on an approved entry, one with no exId | (pile B7, TWIN-1) the compare view showed a draft's video that a phone cannot play, and nothing told you which cards show something else on a phone; now the video is the phone's and the Exercises tab lists those cards |
+| today-small-truths | A blank `Note:` line, a wall line filed under tomorrow, the line box | (pile B8, TODAY-3, TODAY-4, TODAY-15) a blank note counted as one, a line from tomorrow showed a bare date, the box did not say it strips quotes |
+| refetch-failures | A post while the wall's reload fails, two reloads failing at once, then all working | (pile B8, TODAY-13) only the session list's failed reload was told; the rest kept the old numbers and said nothing |
+| quest-run-window | Runs overlapping, listed the other way round, one scheduled ahead, one you ended | (pile B8, TODAY-14) the panel showed the last run in the list and a seventh day the app has already clipped |
+| proof-board-truth | The board read, failed and retried; a quest week started | (pile B8, MKT-3, MKT-8) no time on the board, no reason when it failed, and it stayed stale after a quest week started |
 | fail-bar | a failed post on Today (and the same again, and a failed intake status), then a success, on a 1280 px screen and a 360 px phone | (pile B5) a failure was a 2.6 s toast in some tabs and a pop-up in others; now a line that stays until dismissed, in view when scrolled, merged when repeated, never a pop-up; a success stays a toast |
 
 ## Adding a scenario

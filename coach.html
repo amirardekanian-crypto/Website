@@ -1009,6 +1009,9 @@ function wallDayLabel(iso) {
   const t = todayKey();
   if (iso === t) return 'Today';
   if (iso === addDays(t, -1)) return 'Yesterday';
+  // An athlete east of the coach (Tehran is 3.5 hours ahead of London) is on tomorrow's date for the last hours of the coach's day: their line is
+  // filed under their day, so it says so instead of a bare date (audit TODAY-4, 2026-10-11).
+  if (iso === addDays(t, 1)) return 'Tomorrow, their time';
   return prettyDate(iso);
 }
 function initials(name) {
@@ -1055,7 +1058,8 @@ function copyText(t, btn) {
   }, () => alert('Copy failed — here it is:\n\n' + t));
 }
 function isPartialStatus(s) { return String(s || '').toLowerCase().indexOf('partial') === 0; }
-function sessionHasNote(s) { return !!((s.day_note && s.day_note.trim()) || (s.summary && /\n\s+Note:/.test(s.summary))); }
+// A "Note:" line with nothing after it is not a note (two old sessions carry one): it is not something to read.
+function sessionHasNote(s) { return !!((s.day_note && s.day_note.trim()) || (s.summary && /\n\s+Note:[ \t]*\S/.test(s.summary))); }
 function sessionNeedsReply(s) { return sessionHasNote(s) && (s.coach_status || 'new') === 'new'; }
 // When a session's note reached the server, as a day in the coach's own time zone: the row's updated_at
 // (save_session stamps it on every save, and the coach marking a note read does not touch it). A note's age
@@ -1113,6 +1117,8 @@ const S = {
   ath: {},         // assembled per-athlete records
   levels: {},      // athlete_id -> server season level
   board: { season: null, week: null },
+  boardAt: {},     // scope -> when the board was read (it is kept until ↻ Refresh, or a quest week starts or ends)
+  boardErr: '',    // why the last board read failed
   callLogs: {},    // athlete_id -> rows (fetched on detail)
   // Bumped by every assemble(). The athlete file caches its own context so that
   // switching sub-tabs costs nothing; this is what tells it the cache is stale
@@ -1228,17 +1234,23 @@ function loadWarnHtml() {
 // Refetch just the slices a write touched, then re-render.
 async function refetch(parts) {
   if (DEMO) { render(); return; }
-  const jobs = [];
-  if (parts.includes('notes')) jobs.push(sb.from('hab_notes').select('*').gte('day', addDays(todayKey(), -7)).then(r => { if (!r.error) S.notes = r.data || []; }));
-  if (parts.includes('rules')) jobs.push(sb.from('xp_rules').select('rules').eq('id', 1).maybeSingle().then(r => { if (!r.error) S.rules = (r.data && r.data.rules) || null; }));
-  if (parts.includes('contacts')) jobs.push(sb.rpc('contact_list').then(r => { if (!r.error) S.contacts = r.data || []; }));
-  if (parts.includes('intake')) jobs.push(sb.rpc('intake_list').then(r => { if (!r.error) S.intake = r.data || []; }));
-  if (parts.includes('affiliates')) jobs.push(sb.from('affiliates').select('*').order('code').then(r => { if (!r.error) S.affiliates = r.data || []; }));
-  if (parts.includes('hist')) jobs.push(loadHistory().then(r => { if (!r.error) S.hist = r.data || []; else fail('Saved, but the list could not refresh: ' + r.error.message); }));
+  const jobs = [], bad = [];
+  // A slice that fails to come back is TOLD, not skipped: a save that worked and then showed the old wall, quest week or contact list looked like
+  // nothing had happened (audit TODAY-13, 2026-10-11; only the session list used to say so). Programmes report through the banner (LOAD_ERR).
+  const take = (label, p, apply) => jobs.push(Promise.resolve(p).then(
+    r => { if (r && r.error) bad.push(`${label} (${r.error.message})`); else apply(r); },
+    e => { bad.push(`${label} (${(e && e.message) || e})`); }));
+  if (parts.includes('notes')) take('the crew wall', sb.from('hab_notes').select('*').gte('day', addDays(todayKey(), -7)), r => { S.notes = r.data || []; });
+  if (parts.includes('rules')) take('the quest and XP rules', sb.from('xp_rules').select('rules').eq('id', 1).maybeSingle(), r => { S.rules = (r.data && r.data.rules) || null; });
+  if (parts.includes('contacts')) take('the Proof contacts', sb.rpc('contact_list'), r => { S.contacts = r.data || []; });
+  if (parts.includes('intake')) take('the intake forms', sb.rpc('intake_list'), r => { S.intake = r.data || []; });
+  if (parts.includes('affiliates')) take('the affiliate codes', sb.from('affiliates').select('*').order('code'), r => { S.affiliates = r.data || []; });
+  if (parts.includes('hist')) take('the session list', loadHistory(), r => { S.hist = r.data || []; });
   if (parts.includes('programs')) jobs.push(loadPrograms());
-  if (parts.includes('prog')) jobs.push(selectAll('athlete_progress', 'athlete_id, athlete_name, data, updated_at').then(r => { if (!r.error) S.prog = r.data || []; }));
-  if (parts.includes('optin')) jobs.push(sb.from('leaderboard_optin').select('athlete_id, display_name, title').then(r => { if (!r.error) { S.optin = {}; (r.data || []).forEach(x => S.optin[x.athlete_id] = x); } }));
+  if (parts.includes('prog')) take('the athletes\' progress', selectAll('athlete_progress', 'athlete_id, athlete_name, data, updated_at'), r => { S.prog = r.data || []; });
+  if (parts.includes('optin')) take('the leaderboard names', sb.from('leaderboard_optin').select('athlete_id, display_name, title'), r => { S.optin = {}; (r.data || []).forEach(x => S.optin[x.athlete_id] = x); });
   await Promise.all(jobs);
+  if (bad.length) fail(`Saved, but ${bad.join(' and ')} could not be reloaded, so what you see for ${bad.length === 1 ? 'it' : 'them'} may be out of date. Tap ↻ Refresh.`);
   // Everything that feeds the roster and the athlete file is rebuilt in one place, after all the
   // reads: a contact forgotten, a programme replaced, a progress blob deleted. (Only 'hist' did
   // this before, so a forgotten contact kept their dots and board name until ↻ Refresh.)
@@ -2117,16 +2129,24 @@ function seasonDay() {
 
 // --- quest helpers ----------------------------------------------------------
 function questPool() { return (S.rules && S.rules.quests) || []; }
-function questRuns() { return (S.rules && S.rules.questRuns) || []; }
-// A run's last live day: its seventh, or the day the coach ENDED it (end_quests(), stage55: what was earned keeps counting).
+// The runs as habits.html reads them: an entry with no start date or no quest list is skipped.
+function questRuns() { return ((S.rules && S.rules.questRuns) || []).filter(x => x && typeof x.start === 'string' && Array.isArray(x.ids)); }
+// A run's last live day, worked out exactly as habits.html runEndKey() does (audit TODAY-14, 2026-10-11): its seventh day, CLIPPED the day before
+// the next run starts (two runs never both score a day), or the day the coach ENDED it (end_quests(), stage55: what was earned keeps counting).
+// It used to ignore the next run, so with two runs overlapping or one scheduled ahead it showed a longer week than the athletes' app does.
 function questRunEnd(r) {
-  const nat = addDays(r.start, 6);
-  return (typeof r.end === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.end) && r.end < nat) ? r.end : nat;
+  let end = addDays(r.start, 6);
+  const next = questRuns().map(x => x.start).filter(s => s > r.start).sort()[0];
+  if (next) { const dayBefore = addDays(next, -1); if (dayBefore < end) end = dayBefore; }
+  if (typeof r.end === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.end) && r.end < end) end = r.end;
+  return end;
 }
+// The run covering today: the LATEST-STARTING one, as activeQuestRun() in habits.html (a week announced mid-week takes over from its own start;
+// it used to take the last one in the list, which is a different run when one is scheduled ahead).
 function activeQuestRun() {
   const t = todayKey();
-  const runs = questRuns().filter(r => r.start <= t && t <= questRunEnd(r));
-  return runs.length ? runs[runs.length - 1] : null;
+  const covering = questRuns().filter(r => r.start <= t && t <= questRunEnd(r));
+  return covering.length ? covering.reduce((best, r) => (r.start > best.start ? r : best)) : null;
 }
 function questById(id) { return questPool().find(q => q.id === id) || { id, note: id, xp: '' }; }
 
@@ -2199,7 +2219,7 @@ function renderRail() {
 async function hardRefresh() {
   if (route().view === 'exercises' && !spineMayLeave('Refresh')) return;
   $('content').innerHTML = '<div class="loading"><div class="spinner"></div>Refreshing…</div>';
-  loadLevels._done = false; S.board = { season: null, week: null }; S.assess = null; S.course = null; S.spine = null;
+  loadLevels._done = false; resetBoard(); S.assess = null; S.course = null; S.spine = null;
   LOAD_ERR.assess = LOAD_ERR.course = LOAD_ERR.spine = '';
   S.callLogs = {};   // cached per athlete for the page's life: a failed read stuck as "No call logs yet"
   try { await loadAll(); } catch (e) { $('content').innerHTML = `<p class="empty">Could not load: ${esc(e.message)}</p>`; return; }
@@ -2312,6 +2332,7 @@ function wallPanelHtml() {
     <div class="mic">
       <div class="cap"><span class="eyebrow">Your line to the crew — pinned on today's wall</span></div>
       <textarea id="coachLineInput" maxlength="200" placeholder="No line yet today. Say something to everyone…">${esc(_coachLineDraft != null ? _coachLineDraft : (mine ? mine.body : ''))}</textarea>
+      <div class="muted" style="font-size:12px;margin:4px 0 0">Quotes, &lt; &gt; and backslashes are removed when you post, and line breaks become spaces.</div>
       <div class="row">
         <button class="btn primary sm" onclick="postCoachLine()">${mine ? 'Update the line' : "Post today's line"}</button>
         ${mine ? `<button class="btn sm danger" onclick="clearCoachLine()">Take it down</button>` : ''}
@@ -2463,9 +2484,13 @@ window.clearNoteBacklog = clearNoteBacklog;
 function questPanelHtml(run) {
   if (run) {
     const dayN = daysBetween(run.start, todayKey()) + 1;
-    const ends = questRunEnd(run), endedEarly = ends < addDays(run.start, 6);
+    const natural = addDays(run.start, 6), ends = questRunEnd(run);
+    const nextStart = questRuns().map(x => x.start).filter(s => s > run.start).sort()[0];
+    const ownEnd = typeof run.end === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(run.end) && run.end < natural ? run.end : null;
+    // Ended by you, or cut short because the next run starts (then it is not "ended early": the next week takes over).
+    const endedEarly = !!ownEnd && ownEnd === ends, handedOver = ends < natural && !endedEarly && !!nextStart;
     return `
-      <div class="phead"><span class="t hd">Quest week</span><span class="r">${endedEarly ? 'ended early · last day ' : 'ends '}${esc(prettyDate(ends))}</span></div>
+      <div class="phead"><span class="t hd">Quest week</span><span class="r">${endedEarly ? 'ended early · last day ' : 'ends '}${esc(prettyDate(ends))}${handedOver ? ' · the run from ' + esc(prettyDate(nextStart)) + ' takes over' : ''}</span></div>
       <div class="questrun">
         <div class="qtop"><span class="eyebrow">Live run</span><span class="qday">Day ${dayN}/7</span></div>
         ${run.ids.map(id => { const q = questById(id); return `
@@ -2510,6 +2535,7 @@ async function startQuestRun() {
   const { error } = await sb.rpc('set_quests', { p_start: todayKey(), p_ids: ids });
   if (error) { fail('Could not start: ' + error.message); return; }
   _questPicked.clear();
+  resetBoard();                         // the XP the board shows moves with the quests
   toast('Quest week live');
   refetch(['rules']);
 }
@@ -2526,6 +2552,7 @@ async function endQuestRun(start) {
       ? 'the server does not have end_quests yet (supabase/stage55_end_quests.sql has not been run).' : error.message) + '\n\nNothing was changed.');
     return;
   }
+  resetBoard();                         // the XP the board shows moves with the quests
   toast('Run ended — everyone keeps what they earned');
   refetch(['rules']);
 }
@@ -4794,15 +4821,22 @@ window.eraseFind = eraseFind; window.eraseStopWaiting = eraseStopWaiting;
 // --- PROOF (board · funnel · titles · season) --------------------------------
 // The board comes from the server's own scorer via leaderboard_top, called
 // through Amir's athlete identity — the exact rows and order athletes see.
+// The board is kept from the first time it is read until ↻ Refresh or a Proof write that moves XP (a quest week started or ended), and says when
+// it was read (audit MKT-3, 2026-10-11). When the read fails the page says why (MKT-8) and offers to try again.
+function resetBoard() { S.board = { season: null, week: null }; S.boardAt = {}; }
 async function loadBoard(scope) {
   if (S.board[scope]) return S.board[scope];
   if (DEMO) return S.board[scope] || [];
   const { data, error } = await sb.rpc('leaderboard_top', {
     p_athlete_id: AMIR_ATHLETE_ID, p_key: null, p_scope: scope, p_limit: 50 });
-  if (error) { console.warn('leaderboard_top:', error.message); return null; }
+  if (error) { console.warn('leaderboard_top:', error.message); S.boardErr = error.message || 'no answer'; return null; }
+  S.boardErr = '';
   S.board[scope] = data || [];
+  S.boardAt[scope] = new Date();
   return S.board[scope];
 }
+function reloadBoard() { S.board[_boardScope] = null; delete S.boardAt[_boardScope]; renderProof(); }
+window.reloadBoard = reloadBoard;
 let _boardScope = 'season';
 async function renderProof() {
   const season = currentSeason();
@@ -4812,7 +4846,7 @@ async function renderProof() {
   if (route().view !== 'proof') return;   // user navigated away mid-fetch
 
   const boardHtml = rows === null
-    ? `<p class="empty">Couldn't fetch the board.</p>`
+    ? `<p class="empty">Couldn't fetch the board: ${esc(S.boardErr || 'no answer')}. <button class="btn sm" onclick="reloadBoard()">↻ Try again</button></p>`
     : rows.length
       ? rows.map(r => `
         <div class="lbrow ${r.pos <= 3 ? 'top' + r.pos : ''} ${r.is_me ? 'me' : ''}">
@@ -4873,7 +4907,7 @@ async function renderProof() {
               <button class="seg ${_boardScope === 'season' ? 'active' : ''}" onclick="setBoardScope('season')">Season</button>
               <button class="seg ${_boardScope === 'week' ? 'active' : ''}" onclick="setBoardScope('week')">Week</button>
             </span></div>
-          <p class="psub">Scored by the server — exactly what the crew sees in the app.</p>
+          <p class="psub">Scored by the server — exactly what the crew sees in the app.${S.boardAt[_boardScope] ? ` As of ${pad2(S.boardAt[_boardScope].getHours())}:${pad2(S.boardAt[_boardScope].getMinutes())}. <button class="btn sm" onclick="reloadBoard()">↻ Reload</button>` : ''}</p>
           ${boardHtml}
         </section>
         <section class="panel">
@@ -4911,7 +4945,7 @@ async function forgetContact(athleteId) {
   const { error } = await sb.rpc('forget_contact', { p_athlete_id: athleteId });
   if (error) { fail('Could not forget: ' + error.message); return; }
   toast('Forgotten');
-  S.board = { season: null, week: null };             // their board place went too
+  resetBoard();                                        // their board place went too
   refetch(['contacts', 'notes', 'prog', 'optin']);   // forget_contact() deletes all four
 }
 window.setBoardScope = setBoardScope;
