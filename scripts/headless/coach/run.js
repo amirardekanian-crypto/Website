@@ -928,8 +928,8 @@ S['erase-athlete'] = async (b) => {
   check(r, 'it warns that this is a coached athlete with a live programme', /coached athlete with a live programme/.test(text), '');
   const emailPick = page.locator('.erase .pick', { hasText: 'same email' }).locator('input'), namePick = page.locator('.erase .pick', { hasText: 'same name' }).locator('input');
   const waPick = page.locator('.erase .pick', { hasText: 'same WhatsApp number' }).locator('input');
-  check(r, 'three intake forms are offered: the same-email and the same-number ones are ticked, the same-name one is not, the stranger\'s is not listed', (await page.locator('.erase .pick').count()) === 3 && await emailPick.isChecked() && await waPick.isChecked() && !(await namePick.isChecked()) && !/Someone Else/.test(text), text.slice(0, 900));
-  check(r, 'the finder box is there, and the panel says three forms will go (the two ticked, by name)', (await page.locator('#eraseFindIn').count()) === 1 && /2 intake forms will be erased with them/.test(text), text.slice(0, 1100));
+  check(r, 'three intake forms are offered: only the same-EMAIL one is ticked (a number can be a foreign number or a handle), the same-number and same-name ones are not, the stranger\'s is not listed', (await page.locator('.erase .pick').count()) === 3 && await emailPick.isChecked() && !(await waPick.isChecked()) && !(await namePick.isChecked()) && !/Someone Else/.test(text), text.slice(0, 900));
+  check(r, 'the finder box is there, and the panel says one form will go, by name', (await page.locator('#eraseFindIn').count()) === 1 && /1 intake form will be erased with them/.test(text), text.slice(0, 1100));
   check(r, 'it says what stays: backups, the inbox, and that the partner record stays with only its link removed', /weekly backup files/.test(text) && /inbox/.test(text) && /FIXTURE10 stays on the Affiliates tab/.test(text), text.slice(-420));
   check(r, 'it says when the last backup was taken (none yet here), because that file is the only way back from a mistake', /last ⤓ Backup on this computer: none yet/.test(text) && /only way back/.test(text), text.slice(-520));
   const go = page.locator('#eraseGo');
@@ -940,7 +940,7 @@ S['erase-athlete'] = async (b) => {
   check(r, '...and is still disabled one letter short', await go.isDisabled(), '');
   await page.locator('#eraseIn').fill('ZED_Erase');
   check(r, '...and is enabled for the right id in any case', await go.isEnabled(), '');
-  await namePick.check();
+  await namePick.check(); await waPick.check();   // the coach ticks the other two offered forms by hand
   const n1 = await L.nCalls(page);
   log.dialogs.length = 0;
   await go.click();
@@ -1136,6 +1136,12 @@ S['erase-forms'] = async (b) => {
   await page.evaluate(() => render());
   const st = await page.evaluate(() => ({ id: document.activeElement && document.activeElement.id, at: document.activeElement && document.activeElement.selectionStart, v: document.activeElement && document.activeElement.value }));
   check(r, 'after the whole page is redrawn the confirm box still has focus, its text and its caret', st.id === 'eraseIn' && st.v === 'zed' && st.at === 3, st);
+  // ...and the redraw does not scroll the page (focus() without preventScroll jumped it back to the box)
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));   // the page smooth-scrolls by default
+  const y0 = await page.evaluate(() => window.scrollY);
+  await page.evaluate(() => render());
+  const y1 = await page.evaluate(() => window.scrollY);
+  check(r, 'a redraw with the focus in the confirm box does not scroll the page', y0 === 0 && y1 === 0, { y0, y1 });
   // a ticked form that is gone by the time the button is pressed stops the erasure
   await page.evaluate(() => { const D = window.__DB; D.hab_intake = D.hab_intake.filter(i => i.id !== 'zed-intake-email'); });
   await page.locator('#eraseIn').fill('zed_erase');
@@ -1159,6 +1165,19 @@ S['erase-forms'] = async (b) => {
     !ids.includes('zed-intake-email') && ['zed-intake-wa', 'zed-intake-name', 'zed-intake-stranger'].every(i => ids.includes(i)) && ids.filter(i => /^bulk-/.test(i)).length === 4, ids);
   const al3 = log.dialogs.filter(x => x.type === 'alert').map(x => x.message).slice(-1)[0] || '';
   check(r, 'the final alert lists the nine forms by name, as plain text (no markup)', /Intake forms erased: .*Z\. E\./.test(al3) && /Bulk /.test(al3) && !/[<>]/.test(al3), al3);
+
+  // exactly one form offered: "carries", not "carryes", and it is ticked
+  await seedBare(page, 'uno_erase', 'Uno', 'Erase');
+  await page.evaluate(() => { const D = window.__DB, now = new Date().toISOString();
+    D.hab_contacts.push({ athlete_id: 'uno_erase', email: 'uno@example.invalid', whatsapp: null, source: 'proof.html', tier: 'coached', note: null, created_at: now, updated_at: now, display_name: 'Uno' });
+    D.hab_intake.push({ id: 'uno-form', created_at: now, lang: 'en', name: 'Uno Erase', email: 'uno@example.invalid', contact: '', programme: 'Set', payload: {}, status: 'handled', handled_at: now }); });
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  await L.go(page, 'a/uno_erase/file');
+  await page.locator('button', { hasText: /Erase completely/ }).click();
+  await page.locator('.erase #eraseIn').waitFor();
+  t = await erasePanelText(page);
+  check(r, 'one offered form: the words are "1 intake form carries their email…", and it is ticked', /1 intake form carries their email/.test(t) && /1 intake form will be erased with them/.test(t) && !/carryes/.test(t), t.slice(0, 700));
+  await page.locator('.erase button', { hasText: 'Cancel' }).click();
 
   // an athlete with no login and no form: the alert does not claim a sign-in account, and says that no form went
   await seedBare(page, 'nolo_erase', 'Nolo', 'Erase');
@@ -1233,12 +1252,79 @@ S['erase-slow'] = async (b) => {
   await page.locator('.erase button', { hasText: 'Stop waiting' }).click();
   t = await erasePanelText(page);
   check(r, 'Stop waiting says the page cannot tell, and how to find out', /cannot tell whether Zed Erased was erased/.test(t) && /gone from the roster, it went through/.test(t), t);
+  // meanwhile the coach opens ANOTHER athlete's panel and starts typing the id
+  await page.locator('.erase button', { hasText: 'Close' }).click();
+  await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 0; });
+  await L.go(page, 'a/ben_test/file');
+  await page.locator('button', { hasText: /Erase completely/ }).click();
+  await page.clock.runFor(200); await L.settle(page, 300); await page.clock.runFor(200);
+  await page.locator('.erase #eraseIn').waitFor();
+  await page.locator('#eraseIn').fill('ben_te');
   // the answer arrives at 40 s: a success after the coach stopped waiting still finishes the job
   await page.clock.runFor(15000);
   await page.clock.runFor(3000); await L.settle(page, 400); await page.clock.runFor(3000); await L.settle(page, 400); await page.clock.runFor(3000); await L.settle(page, 400);
+  check(r, 'the late success did not drag the coach away: Ben\'s panel is still open, on his page, with what was typed', (await page.evaluate(() => location.hash)) === '#a/ben_test/file' && (await page.locator('#eraseIn').count()) === 1 && (await page.locator('#eraseIn').inputValue()) === 'ben_te', await page.evaluate(() => location.hash));
   const d = await L.db(page);
   const al = log.dialogs.filter(x => x.type === 'alert').map(x => x.message);
   check(r, 'the late success is handled: the data is gone, the receipt is written, and the coach gets the receipt alert', !d.programs.some(x => x.athlete_id === 'zed_erase') && d.erasure_log.length === 1 && al.some(m => /Erased Zed Erased for good/.test(m)), { programs: d.programs.length, receipts: d.erasure_log.length, al: al.map(m => m.slice(0, 40)) });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// A preview answer that arrives late (the coach cancelled while it loaded and opened the panel again) must not touch the newer panel.
+S['erase-stale'] = async (b) => {
+  const r = { id: 'erase-stale', title: 'Erase completely…: an old preview answer never overwrites a newer panel (cancel while loading, then reopen)', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  await seedErasable(page);
+  await L.go(page, 'a/zed_erase/file');
+  const reopenAfterCancel = async () => {
+    await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 2500; });
+    await page.locator('button', { hasText: /Erase completely/ }).click();       // answer #1 will take 2.5 s
+    await page.locator('.erase button', { hasText: 'Cancel' }).click();          // the loading panel has a Cancel
+    await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 0; });
+    await page.locator('button', { hasText: /Erase completely/ }).click();       // answer #2 is immediate
+    await page.locator('.erase #eraseIn').waitFor();
+  };
+  // round 1: the stale answer lands while the new panel is ready, after the coach took a ticked form off the list and typed the id
+  await reopenAfterCancel();
+  await page.locator('#erasePicked button', { hasText: 'remove' }).first().click();
+  await page.locator('#eraseIn').fill('zed_er');
+  await L.settle(page, 2900);
+  let t = await erasePanelText(page);
+  check(r, 'the stale answer did not re-tick the form the coach removed, nor wipe what was typed', /No intake form is ticked, so none will be erased/.test(t) && (await page.locator('#eraseIn').inputValue()) === 'zed_er', t.slice(0, 600));
+  await page.locator('.erase button', { hasText: 'Cancel' }).click();
+  // round 2: the stale answer lands while the real erasure is running
+  await reopenAfterCancel();
+  await page.locator('#eraseIn').fill('zed_erase');
+  await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 4500; });
+  const n0 = await L.nCalls(page);
+  log.dialogs.length = 0;
+  await page.locator('#eraseGo').click();
+  await L.settle(page, 3000);
+  const go = page.locator('#eraseGo');
+  check(r, 'the stale answer landed during the erasure and left the panel busy: "Erasing…", the button disabled, still ONE real call', /Erasing…/.test(await go.innerText()) && await go.isDisabled()
+    && (await L.callsSince(page, n0)).filter(c => c.kind === 'rpc' && c.name === 'coach_erase_person' && c.payload.p_dry_run === false).length === 1, await go.innerText());
+  await L.settle(page, 3000);
+  const d = await L.db(page);
+  const real = (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === 'coach_erase_person' && c.payload.p_dry_run === false);
+  check(r, 'the erasure finished once: one real call in all, one receipt, the data gone', real.length === 1 && d.erasure_log.length === 1 && !d.programs.some(x => x.athlete_id === 'zed_erase'), { real: real.length, receipts: d.erasure_log.length });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// With the intake list unreadable the finder must not claim there are no forms.
+S['erase-forms-unreadable'] = async (b) => {
+  const r = { id: 'erase-forms-unreadable', title: 'Erase completely… when the intake forms did not load: the finder says so and is switched off', checks: [] };
+  const { page, log } = await L.openCoach(b, { seed: { stub: { fail: [{ kind: 'rpc', name: 'intake_list', message: 'fixture: the forms are unreadable', times: 99 }] } } });
+  await seedErasable(page);
+  await L.go(page, 'a/zed_erase/file');
+  await page.locator('button', { hasText: /Erase completely/ }).click();
+  await page.locator('.erase #eraseIn').waitFor();
+  const t = await erasePanelText(page);
+  check(r, 'the finder says the forms did not load (not "0 other forms") and its box is disabled', /The intake forms did not load, so they cannot be searched here/.test(t) && !/0 other forms/.test(t) && await page.locator('#eraseFindIn').isDisabled(), t.slice(0, 900));
+  check(r, 'the page-wide banner names the intake forms too', /Not everything loaded/.test(await page.locator('#loadwarn').innerText()) && /intake forms/.test(await page.locator('#loadwarn').innerText()), await page.locator('#loadwarn').innerText());
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

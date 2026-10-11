@@ -447,8 +447,10 @@
       }
       counts.auth_users = users.length;
       if (!dry && lc(p.p_confirm) !== lc(word)) throw new Error('The confirmation does not match. Type exactly "' + word + '" to erase. Nothing was erased.');
-      var total = Object.keys(counts).reduce(function (n, k) { return n + counts[k]; }, 0);
+      // Like the SQL: "nothing is stored" looks at DATA only (not a bare sign-in, not the intake forms ticked), and the forms are added after
+      var total = Object.keys(counts).reduce(function (n, k) { return k === 'auth_users' || k === 'hab_intake' ? n : n + counts[k]; }, 0);
       if (total === 0) throw new Error('Nothing is stored for "' + key + '". Nothing was erased.');
+      total += (counts.auth_users || 0) + (counts.hab_intake || 0);
       var logId = null;
       if (!dry) {
         Object.keys(del).forEach(function (t) { if (DB[t]) DB[t] = DB[t].filter(function (r) { return del[t].indexOf(r) < 0; }); });

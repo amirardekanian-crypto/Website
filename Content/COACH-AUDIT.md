@@ -679,3 +679,19 @@ names and places; each phone rewrites it from the current board at its next view
 **Found, not fixable by code (for the record).** Free-text mentions of an erased person in *other* athletes' coaching logs (3 mention an id,
 1 a full name today); two athlete ids named in a migration's text (`20260907140013`); the auth audit log is empty because audit logging is
 off (if it is ever switched on its entries carry `athlete.<id>@…` and do not cascade).
+
+**A second pass over the fixes (same reviewer, 2026-10-11).** It confirmed the blocker, the lock order, the backup-schema deletion, the revoked
+panel and the wrong-case key fixed, and found these, all now fixed with a test that fails without the fix:
+
+| Finding | Fix |
+|---|---|
+| A preview answer that arrives after the coach cancelled and reopened (Cancel is offered while it loads) overwrote the newer panel: it could flip a running erasure back to *ready*, enable the button and allow a second real call | Only the panel that asked may use its answer |
+| A late success after *Stop waiting* sent the page to the roster and closed a panel the coach had opened meanwhile | The page only navigates when no other panel is open |
+| A redraw with focus in the confirm box scrolled the page back to it | `focus({ preventScroll: true })` |
+| With the intake forms unreadable the finder said "0 other forms" | It says they did not load and is switched off |
+| A WhatsApp match was ticked for you (a foreign number with the same last 9 digits, or a handle holding digits, would be wrong) | Only a same-email form is ticked; number and name matches are offered |
+| One exotic case still took only the login: identity row lost, data under a mixed-case id, key typed in lower case | "Nothing is stored" now looks at data only; a bare login does not count |
+| "1 intake form carryes"; a very long email widened the page on a phone | Grammar and `overflow-wrap` |
+
+Left as they are, on purpose: WhatsApp matching only sees a contact that exists (30 of 52 athletes have none, so 41 of 50 athletes depend on the finder);
+a contact field holding two numbers matches the second only; the finder cannot be offered a form the Intake tab could not load.

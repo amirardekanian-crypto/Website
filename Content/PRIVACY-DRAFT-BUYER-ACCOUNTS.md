@@ -48,6 +48,9 @@ new **Erase…** button (stage54) keeps true. It needs your word, and for the te
 - **Section 4 (Retention):** "Course and testing-app accounts are kept while the account is active and deleted on request:
   the sign-in, my note about it and, for the testing app, every player, note and result you entered. They leave my weekly
   backups within about three months."
+- **Section 4 (Retention), one more line (from the independent review):** "When I erase an account, I keep a receipt: the date, the kind of
+  record, how many rows were removed and a one-way hash of the username or id. It holds no name, email or contact. It lets me check, if I ever
+  restore an old backup, that I do not bring back someone I already erased."
 - **Section 3 (What I do not do):** nothing to add.
 
 ## The one decision for you

@@ -620,9 +620,10 @@ list is long and a phone clips a dialog.
 - **Intake forms are the coach's pick** (Amir, 2026-10-11: *"pick any form in the Erase panel"*). Most forms cannot
   be tied to an athlete by data (the Farsi forms are in Persian script, the programmes in Latin letters, and 30 of 52
   athletes have no email or number stored), so the panel does two things. It **offers** the forms that carry their
-  email, their WhatsApp number (last 9 digits, Persian digits folded) or their full name: the email and number ones
-  start ticked **unless another athlete's contact carries the same email or number** (a parent's, for two children:
-  flagged *also another athlete's*, never ticked for you), the name ones do not (two people can share a name). And a
+  email, their WhatsApp number (last 9 digits, Persian digits folded) or their full name. **Only a same-email form
+  starts ticked**, and not when another athlete's contact carries the same email (a parent's, for two children: flagged
+  *also another athlete's*); a number match (it can be a foreign number with the same last digits, or a handle that holds
+  digits) and a name match (two people can share a name) are offered, never ticked for you. And a
   **finder** under it searches every other form by name, email, contact, programme or date, shows 8 at a time, and
   ticks go into a list *"N intake forms will be erased with them"* by name, each with *remove*. At most 10 per
   erasure; the server accepts any form that exists and refuses a missing one. The final alert names the forms that went,
@@ -660,7 +661,10 @@ list is long and a phone clips a dialog.
   classes (`08`, `57`, `58`, `XX`) cannot prove that: the panel says it cannot tell and how to find out (tap
   ↻ Refresh: **gone from the roster or list = it went through**; still there = nothing was erased). After 30 seconds
   with no answer a **Stop waiting** button appears; a success that arrives afterwards still finishes the job
-  (refresh, receipt). The Erase boxes keep focus across a redraw of the page.
+  (refresh, receipt), without dragging you off a panel you opened meanwhile. A preview answer that arrives late (you cancelled
+  while it loaded and reopened) is dropped, so it can never overwrite a newer panel or flip a running erasure back to
+  *ready*. The Erase boxes keep focus across a redraw of the page, without scrolling it. When the intake forms did not load
+  the finder says so and is switched off (it never says "0 other forms").
 - **A revoked buyer** has the same Erase… button; the *Revoked* section opens for the person whose panel is open
   (it used to draw the panel inside the closed section, invisible).
 

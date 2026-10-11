@@ -340,7 +340,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   `account_id`, and undoes everything if one still holds a row. **A table you add that holds a person's data goes into its table list
   the day you create it** (`supabase/stage54_erase_person.sql`), and into `BACKUP_TABLES`; the one-off rollback copies the pipeline
   makes live in the `backup` schema and are emptied for the person automatically. Intake forms are the coach's pick (matches by email,
-  WhatsApp number or name are only offered; a finder lists any other, at most 10). An affiliate partner record stays when its athlete
+  WhatsApp number or name are offered, only a same-email one is ticked for you; a finder lists any other, at most 10). An affiliate partner record stays when its athlete
   is erased (only the link is cleared). The private note about a buyer lives in `buyer_notes`, coach-only; the account rows' `label`
   stays empty (a trigger moves anything written there). Tables are emptied in `publish_cycle()`'s lock order (programme first).
 - **The weekly call log is retired** (Amir, 2026-10-11): no Calls tab, no new call logs, no Copy cycle prompt; old logs are read and

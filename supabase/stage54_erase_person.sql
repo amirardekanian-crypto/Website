@@ -25,8 +25,9 @@
 --   · 'demo' (the public demo) and 'amir_ardekani' (the identity the dashboard reads the board through) are never erased.
 --   · a login that is the coach's own, or the signed-in user's, is never deleted.
 --   · a login shared by two accounts (an athlete who is also a buyer) is refused: sort it out by hand.
---   · nothing found under the key raises, so a typo cannot look like a success. Ids are case-sensitive: a key typed in another case
---     finds nothing (and says which id exists) instead of taking the login and leaving the data.
+--   · nothing found under the key raises, so a typo cannot look like a success. "Found" means DATA: a sign-in account on its own
+--     (its identity row lost earlier) does not count, and ids are case-sensitive, so a key typed in another case finds nothing
+--     (and says which id exists) instead of taking the login and leaving the data.
 --   · AFTER the deletes, every table in the public and backup schemas that has an athlete_id column is checked for that id. If one
 --     still holds a row (a table added after this file was written), everything is undone and the error names the table.
 --     (The backup schema holds the rollback copies the pipeline makes before a one-off change to live programmes, such as
@@ -364,7 +365,9 @@ begin
         end if;
       end loop;
     end if;
-    if v_total = 0 then
+    -- "Nothing is stored" looks at DATA only: a sign-in account on its own (the identity row was lost earlier) does not count, or a key
+    -- typed in another case would take that login and leave the data under the real id.
+    if v_total - coalesce((v_counts ->> 'auth_users')::bigint, 0) = 0 then
       if v_kind = 'athlete' then   -- ids are case-sensitive: say so when only the case differs
         select p.athlete_id into v_other from public.programs p where lower(p.athlete_id) = lower(v_key) and p.athlete_id <> v_key limit 1;
         if v_other is null then

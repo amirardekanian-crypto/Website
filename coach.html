@@ -586,6 +586,7 @@
   .erase ul { margin: 6px 0 10px; padding-left: 20px; font-size: 13.5px; line-height: 1.6; columns: 2; column-gap: 28px; }
   .erase .pick { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; padding: 4px 0; line-height: 1.45; }
   .erase .pick input { margin-top: 3px; }
+  .erase .pick span { overflow-wrap: anywhere; min-width: 0; }
   .erase .stays { color: var(--muted); font-size: 13px; }
   .erase ul.picked { columns: 1; list-style: none; padding-left: 0; }
   .erase ul.picked li { padding: 3px 0; }
@@ -4402,6 +4403,7 @@ function eraseFormLine(i) {     // one form on one line: the date, the name, and
 // What the finder shows under its box: nothing typed yet, no match, or up to 8 forms (the rest by narrowing the search).
 function eraseFoundHtml(e) {
   if (!e || e.kind !== 'athlete') return '';
+  if (LOAD_ERR.intake) return '<p class="stays">The intake forms did not load, so they cannot be searched here. Tap ↻ Try again at the top of the page, then open Erase again.</p>';
   const offered = new Set(((e.pv && e.pv.intake_candidates) || []).map(c => String(c.id)));
   const rest = (S.intake || []).filter(i => !offered.has(String(i.id)));
   const q = eraseFold(e.find || '').trim();
@@ -4467,20 +4469,20 @@ function erasePanelHtml(kind, key) {
   const coached = kind === 'athlete' && (S.ath[key] || {}).tier === 'coached';
   const how = { email: 'same email', whatsapp: 'same WhatsApp number', name: 'same name' };
   const forms = kind !== 'athlete' ? '' : `<div class="forms">
-    ${cands.length ? `<p><b>${cands.length} intake form${cands.length === 1 ? '' : 's'}</b> carry${cands.length === 1 ? 'es' : ''} their email, WhatsApp number or full name. They hold the answers about injuries, sleep and health. Tick the ones that are theirs and they go too:</p>
+    ${cands.length ? `<p><b>${cands.length} intake form${cands.length === 1 ? '' : 's'}</b> ${cands.length === 1 ? 'carries' : 'carry'} their email, WhatsApp number or full name. They hold the answers about injuries, sleep and health. Tick the ones that are theirs and they go too:</p>
       ${cands.map(c => `<label class="pick"><input type="checkbox" data-eid="${esc(c.id)}" ${e.picked.includes(String(c.id)) ? 'checked' : ''} ${busy ? 'disabled' : ''} onchange="eraseTick(${jsq(c.id)}, this.checked)">
         <span>${esc(prettyDate(String(c.created_at || '').slice(0, 10)))} · <bdi>${esc(c.name || 'no name')}</bdi>${c.programme ? ' · ' + esc(c.programme) : ''}
         <span class="chip ${c.matched_on === 'name' ? '' : 'court'}">${esc(how[c.matched_on] || c.matched_on)}</span>${c.shared ? ' <span class="chip" title="Another athlete\'s contact record carries the same email or number, for example a parent\'s">also another athlete\'s</span>' : ''}</span></label>`).join('')}${cands.some(c => c.shared) ? '<p class="stays">A form marked <i>also another athlete\'s</i> carries an email or number that another athlete\'s contact record has too (a parent\'s, for two children), so it is not ticked for you.</p>' : ''}`
       : '<p><b>Intake forms:</b> none carries their email, WhatsApp number or full name. That is common: most forms are in Persian while the programme is in Latin letters, and most athletes have no email or number stored. Look for theirs below.</p>'}
     <div class="finder">
       <label for="eraseFindIn">Look for another intake form</label>
-      <input id="eraseFindIn" class="pwin" autocomplete="off" spellcheck="false" placeholder="name, email or number" value="${esc(e.find || '')}" ${busy ? 'disabled' : ''} oninput="eraseFind(this.value)">
+      <input id="eraseFindIn" class="pwin" autocomplete="off" spellcheck="false" placeholder="name, email or number" value="${esc(e.find || '')}" ${busy || LOAD_ERR.intake ? 'disabled' : ''} oninput="eraseFind(this.value)">
     </div>
     <div id="eraseFound">${eraseFoundHtml(e)}</div>
     <div id="erasePicked">${erasePickedHtml(e)}</div>
   </div>`;
   const stays = kind === 'athlete'
-    ? 'your weekly backup files (they leave those as the old files roll off, about three months, as the privacy notice says), emails about them in your inbox, WhatsApp, anything on their own phone, any copy on your own computer (a data/&lt;id&gt;.json file, a saved Backup), and their board name in other athletes\' last-seen standings until those athletes next open the board.'
+    ? 'your weekly backup files (they leave those as the old files roll off, about three months, as the privacy notice says), emails about them in your inbox, WhatsApp, anything on their own phone, any copy on your own computer (a data/&lt;id&gt;.json file, a saved Backup), any mention of them in your other coaching logs, and their board name in other athletes\' last-seen standings until those athletes next open the board.'
     : 'your weekly backup files (they leave those as the old files roll off, about three months, as the privacy notice says), emails about them in your inbox, WhatsApp, anything on their own phone, and any copy on your own computer (a saved Backup).';
   return `<div class="erase">
     <p class="eh">Erase ${esc(pv.shown_as || key)} completely</p>
@@ -4500,16 +4502,19 @@ function erasePanelHtml(kind, key) {
 async function eraseOpen(kind, key) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   if (_erase && _erase.status === 'busy') return;
-  _erase = { kind, key, status: 'loading', pv: null, err: '', typed: '', picked: [], find: '' };
+  const e = _erase = { kind, key, status: 'loading', pv: null, err: '', typed: '', picked: [], find: '' };
   render();
   const res = await sb.rpc('coach_erase_person', { p_kind: kind, p_key: key });   // a dry run by default: nothing is changed
-  const e = _erase;
-  if (!e || e.kind !== kind || e.key !== key) return;   // closed, or another person opened, while it was thinking
+  // Only the panel that asked may use the answer. Cancel is offered while it loads, so a coach can cancel and reopen the same
+  // person: the old answer then arrives into a newer panel (even one already erasing) and must be dropped.
+  if (_erase !== e || e.status !== 'loading') return;
   if (res.error) { e.status = 'error'; e.err = eraseWhy(res.error); }
   else {
     e.status = 'ready'; e.pv = res.data || {};
-    // Ticked for you: a form with their email or number, unless another athlete's contact carries the same one. A name match is only offered.
-    e.picked = (e.pv.intake_candidates || []).filter(c => (c.matched_on === 'email' || c.matched_on === 'whatsapp') && !c.shared).map(c => String(c.id));
+    // Ticked for you: a form with their exact email, unless another athlete's contact carries the same one. A number match and a name match are
+    // only offered (a number can be a foreign number with the same last digits, or a handle that holds digits): the list of what goes is
+    // right above the box where the id is typed, and every form is named there.
+    e.picked = (e.pv.intake_candidates || []).filter(c => c.matched_on === 'email' && !c.shared).map(c => String(c.id)).slice(0, ERASE_MAX_FORMS);
   }
   render();
   const i = $('eraseIn'); if (i) i.focus();
@@ -4544,7 +4549,7 @@ function withEraseFocus(draw) {
   const caret = id ? [a.selectionStart, a.selectionEnd] : null;
   draw();
   const i = id && $(id);
-  if (i && !i.disabled) { i.focus(); try { i.setSelectionRange(caret[0], caret[1]); } catch (x) { /* a box without a caret */ } }
+  if (i && !i.disabled) { i.focus({ preventScroll: true }); try { i.setSelectionRange(caret[0], caret[1]); } catch (x) { /* a box without a caret */ } }
 }
 async function eraseRun() {
   const e = _erase;
@@ -4568,6 +4573,7 @@ async function eraseRun() {
     return;
   }
   const d = res.data || {};
+  const elsewhere = !!_erase && _erase !== e;   // after Stop waiting the coach may have opened another panel: leave it alone
   if (_erase === e) _erase = null;
   const counts = d.counts || {};
   const rows = Object.keys(counts).reduce((s, k) => s + Number(counts[k] || 0), 0);
@@ -4581,7 +4587,7 @@ async function eraseRun() {
     `\n\nStill yours to do if they asked for it all:\n• they leave your weekly backup files as those roll off (about three months);\n• emails about them in your inbox, and WhatsApp, are not touched by this.` +
     (codes.length ? `\n• the partner record${codes.length === 1 ? '' : 's'} ${codes.join(', ')} stays on the Affiliates tab (only its link to the athlete was removed).` : '') +
     (e.kind === 'athlete' ? '\n\nIf their app was open on a phone just now, one last save can still land after this. Look at the roster in a minute: if they are back, erase them again.' : '');
-  if (e.kind === 'athlete') { location.hash = 'athletes'; await hardRefresh(); }
+  if (e.kind === 'athlete') { if (!elsewhere) location.hash = 'athletes'; await hardRefresh(); }
   else if (e.kind === 'course') { await loadCourse(); render(); }
   else { await loadAssess(); render(); }
   toast('Erased ' + who);

@@ -1046,6 +1046,9 @@ insert into auth.users (id, email) values
 insert into public.athlete_identities (user_id, athlete_id) values
   ('00000000-0000-0000-0000-0000000000e3', 'zz_coachlogin'), ('00000000-0000-0000-0000-0000000000e4', 'zz_selfdel'), ('00000000-0000-0000-0000-0000000000e5', 'zz_shared');
 insert into public.athlete_progress (athlete_id, data) values ('zz_coachlogin', '{}'), ('zz_selfdel', '{}'), ('zz_shared', '{}'), ('demo', '{}'), ('amir_ardekani', '{}');
+-- an orphan login (its identity row was lost earlier) beside data under a MIXED-case id: a lower-case key finds no data and must not take the login
+insert into auth.users (id, email) values ('00000000-0000-0000-0000-0000000000e6', 'athlete.zz_orphan@amirardekani.com');
+insert into public.programs (athlete_id, data) values ('ZZ_Orphan', '{"athlete":{"firstName":"Orphan","lastName":"Case","tier":"coached"}}');
 insert into public.tps_accounts (user_id, username) values ('00000000-0000-0000-0000-0000000000e5', 'zz_shared_buyer');
 do $t$
 declare fp0 text := pg_temp.fingerprint();
@@ -1075,6 +1078,10 @@ begin
   begin perform public.coach_erase_person('athlete', 'zz_nobody_here', 'zz_nobody_here', '{}', false);
     perform pg_temp.rec('erase: an id with nothing stored raises (a typo cannot look like a success)', false, 'no error');
   exception when others then perform pg_temp.rec('erase: an id with nothing stored raises (a typo cannot look like a success)', sqlerrm like '%Nothing is stored%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'zz_orphan', 'zz_orphan', '{}', false);
+    perform pg_temp.rec('erase: a login with no identity row does not count as "something stored": a key in the wrong case does not take it and leave the data', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: a login with no identity row does not count as "something stored": a key in the wrong case does not take it and leave the data',
+    sqlerrm like '%Nothing is stored for "zz_orphan"%' and sqlerrm like '%"ZZ_Orphan": ids are case-sensitive%', sqlerrm); end;
   begin perform public.coach_erase_person('athlete', 'zz_nobody_here', 'zz_nobody_here', array['00000000-0000-0000-0000-00000000f003']::uuid[], false);
     perform pg_temp.rec('erase: a mistyped id with an intake form ticked raises, and the form is not erased', false, 'no error');
   exception when others then perform pg_temp.rec('erase: a mistyped id with an intake form ticked raises, and the form is not erased', sqlerrm like '%Nothing is stored%', sqlerrm); end;
