@@ -1136,12 +1136,18 @@ S['erase-forms'] = async (b) => {
   await page.evaluate(() => render());
   const st = await page.evaluate(() => ({ id: document.activeElement && document.activeElement.id, at: document.activeElement && document.activeElement.selectionStart, v: document.activeElement && document.activeElement.value }));
   check(r, 'after the whole page is redrawn the confirm box still has focus, its text and its caret', st.id === 'eraseIn' && st.v === 'zed' && st.at === 3, st);
-  // ...and the redraw does not scroll the page (focus() without preventScroll jumped it back to the box)
-  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));   // the page smooth-scrolls by default
+  // ...and the redraw does not scroll the page (focus() without preventScroll jumped it back to the box). Instant scrolling, so a jump shows at once.
+  await L.settle(page, 1500);   // let any redraw the page schedules itself (Proof levels) finish first
+  await page.addStyleTag({ content: 'html { scroll-behavior: auto !important; }' });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForFunction(() => window.scrollY === 0, null, { timeout: 4000 }).catch(() => {});
   const y0 = await page.evaluate(() => window.scrollY);
+  await page.evaluate(() => { document.getElementById('eraseIn').dataset.mark = 'old'; });   // to prove the redraw really replaced the box
   await page.evaluate(() => render());
+  await L.settle(page, 300);
   const y1 = await page.evaluate(() => window.scrollY);
-  check(r, 'a redraw with the focus in the confirm box does not scroll the page', y0 === 0 && y1 === 0, { y0, y1 });
+  const geo = await page.evaluate(() => ({ vh: innerHeight, docH: document.documentElement.scrollHeight, boxTop: Math.round(document.getElementById('eraseIn').getBoundingClientRect().top + scrollY), active: document.activeElement && document.activeElement.id, replaced: document.getElementById('eraseIn').dataset.mark !== 'old' }));
+  check(r, 'a redraw with the focus in the confirm box does not jump the page to the box (a few pixels of layout settling are fine; the bug moved it by hundreds)', y0 === 0 && Math.abs(y1 - y0) < 100 && geo.replaced && geo.boxTop > geo.vh + 200, { y0, y1, geo });
   // a ticked form that is gone by the time the button is pressed stops the erasure
   await page.evaluate(() => { const D = window.__DB; D.hab_intake = D.hab_intake.filter(i => i.id !== 'zed-intake-email'); });
   await page.locator('#eraseIn').fill('zed_erase');
