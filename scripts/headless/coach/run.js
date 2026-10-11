@@ -1956,6 +1956,82 @@ S['hist-heavy-fails'] = async (b) => {
   return r;
 };
 
+// ── What the coach typed or opened in an athlete's file survives a redraw (audit FILE-9, 2026-10-11, pile B4) ───────────────────
+// A redraw used to rebuild the tab from scratch: it wiped the password box and an email pasted under "Add past session", hid the add-session
+// box again and folded Version history, the Coaching log, a day's raw log and the live snapshot shut.
+S['file-redraw-keeps-work'] = async (b) => {
+  const r = { id: 'file-redraw-keeps-work', title: 'A redraw keeps the password box, the pasted email and the sections the coach opened, for that athlete only', checks: [] };
+  const { page, log, today } = await L.openCoach(b, { hash: 'a/ava_test/file' });
+  const FX = require('./fixtures');
+  // File tab: the Change password box with typed text and the cursor in it; Version history and the Coaching log open.
+  await page.locator('button', { hasText: 'Change password' }).click();
+  await page.locator('#athPw').fill('typed-Secret-123');
+  const section = title => page.locator('details.rawlog', { hasText: title }).first();   // by what the coach reads, not by an id
+  await section('Version history').evaluate(d => { d.open = true; });
+  await section('Coaching log').evaluate(d => { d.open = true; });
+  await L.settle(page, 600);
+  await page.locator('#athPw').focus();
+  const fileState = async () => Object.assign(await page.evaluate(() => ({
+    pw: (document.getElementById('athPw') || {}).value,
+    focus: document.activeElement && document.activeElement.id,
+    pvlist: (document.getElementById('pvlist') || {}).innerText || '', clog: (document.getElementById('clog-body') || {}).innerText || '' })),
+    { pv: await section('Version history').evaluate(d => d.open), cl: await section('Coaching log').evaluate(d => d.open) });
+  const redraws = [
+    ['a full redraw (the Proof levels arriving, ↻ Refresh or a save)', () => { assemble(); render(); }],
+    ['a redraw of the tab body only', () => renderDetailBody()],
+  ];
+  for (const [name, fn] of redraws) {
+    await page.evaluate(fn); await L.settle(page, 800);
+    const st = await fileState();
+    check(r, name + ': the typed password is still in the box', st.pw === 'typed-Secret-123', st);
+    check(r, name + ': Version history and the Coaching log are still open, and loaded again', st.pv && st.cl && !/Loading/.test(st.pvlist + st.clog) && /Fixture coaching log/.test(st.clog), st);
+    check(r, name + ': the cursor is still in the box', st.focus === 'athPw', st.focus);
+  }
+  // Another athlete's file starts clean.
+  await L.go(page, 'a/ben_test/file');
+  const ben = await fileState();
+  check(r, 'another athlete\'s file starts with no typed password and the sections shut', !ben.pw && !ben.pv && !ben.cl, ben);
+
+  // The work tab: Add past session from email with a pasted email, a date and the preview.
+  await L.go(page, 'a/ava_test/work');
+  await page.locator('button', { hasText: '+ Add past session from email' }).click();
+  const email = 'Athlete: Ava Example\nDay 3 — Pull Day (fixture)\nStatus: Complete\nSession RPE: 7\nDuration: 40\n\nExercise log:\n[Primary]\n• Trap Bar Deadlift (✓)\n    Set 1: 80 @8 ✓';
+  const day = FX.daysAgo(today, 2);
+  await page.locator('#as-paste').fill(email);
+  await page.locator('#as-date').fill(day);
+  await page.locator('button', { hasText: 'Read email' }).click();
+  await page.evaluate(() => { const d = document.querySelector('.wday .rawlog'); if (d) d.open = true; });
+  const addState = () => page.evaluate(() => ({
+    shown: (document.getElementById('add-session') || {}).style && document.getElementById('add-session').style.display === 'block',
+    paste: (document.getElementById('as-paste') || {}).value, date: (document.getElementById('as-date') || {}).value,
+    preview: (document.getElementById('as-preview') || {}).innerText || '', canSave: !!document.getElementById('as-save') && !document.getElementById('as-save').disabled,
+    rawOpen: !!document.querySelector('.wday .rawlog[open]') }));
+  const before = await addState();
+  check(r, 'set-up: the box is open, the email read, Save enabled, a raw log open', before.shown && before.paste === email && /Day 3/.test(before.preview) && before.canSave && before.rawOpen, before);
+  for (const [name, fn] of [['toggling a day card (a tab-body redraw)', () => toggleWorkDay(2)], ['a full redraw', () => { assemble(); render(); }]]) {
+    await page.evaluate(fn); await L.settle(page, 700);
+    const st = await addState();
+    check(r, name + ': the add-session box stays open with the pasted email, the date, the preview and Save', st.shown && st.paste === email && st.date === day && /Day 3/.test(st.preview) && st.canSave, st);
+  }
+  check(r, 'a day\'s raw log that was open stays open through a full redraw', (await addState()).rawOpen, '');
+  // Saving the session clears the box (it must not come back after the refresh the save triggers).
+  const saveBtn = page.locator('#as-save');
+  const pressable = (await saveBtn.isVisible()) && (await saveBtn.isEnabled());
+  check(r, 'Save to logs can still be pressed after the redraws', pressable, await addState());
+  if (pressable) {
+    await saveBtn.click(); await L.settle(page, 1200);
+    const after = await addState();
+    check(r, 'after Save the box is empty and shut, with no preview and Save disabled', !after.shown && !after.paste && !after.date && !after.preview.trim() && !after.canSave, after);
+    check(r, 'the session was saved', (await L.db(page)).session_history.some(x => x.athlete_id === 'ava_test' && x.day === 3 && x.completed_on === day), '');
+  }
+  await L.go(page, 'a/ben_test/work');
+  const benWork = await addState();
+  check(r, 'another athlete\'s work tab has the box shut and empty', !benWork.shown && !benWork.paste, benWork);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));

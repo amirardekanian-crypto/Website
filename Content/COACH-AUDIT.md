@@ -21,7 +21,7 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 143 are fixed, 36 partly fixed (the harm is gone, something named in the finding is left), 11 open and 1 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
+**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 144 are fixed, 35 partly fixed (the harm is gone, something named in the finding is left), 11 open and 1 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
 questions in §7 and the eleven in §12 (pile A), and the one thing left for you is to switch off public sign-up in the Supabase
 dashboard (SERVER-14). The SQL pack and the removal script ran on 2026-10-11 and §11 records what was checked afterwards.
 **What is left, and how to continue in a new chat, is §12.**
@@ -265,13 +265,13 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-<!--T9-->191 findings. Fixed 143 · Partly 36 · Open 11 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
+<!--T9-->191 findings. Fixed 144 · Partly 35 · Open 11 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
 | high | 32 | 0 | 1 | 0 | 0 |
-| medium | 59 | 25 | 4 | 0 | 0 |
+| medium | 60 | 24 | 4 | 0 | 0 |
 | low | 40 | 11 | 6 | 0 | 1 |<!--/T9-->
 
 ### The work and the ✎ editor (WORK)
@@ -342,7 +342,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | FILE-6 | high | Plaintext athlete passwords stay in athlete_identities for weeks and are copied into every weekly backup | Fixed | Backups now blank every stored, unsent password (athlete, course and testing-app logins), an athlete's File tab shows an unsent password with Copy, WhatsApp and Mark sent, and since stage51 (2026-10-11, your yes) the database clears a stored password the moment the person signs in with it. Your answer (2026-10-11): an unused first password does not expire; Mark sent and the person's first sign-in already clear it. |  |
 | FILE-7 | high | 'Delete all data' deletes only sessions and the progress snapshot; programme, login, coaching log, calls, contacts and more survive | Fixed | The button is now 'Delete training history' and lists exactly what goes and what stays. **Erase completely…** under it removes the whole person in one step (stage54, live and checked on the real database 2026-10-11): every table that holds their id (the rollback copy in the `backup` schema included), the login and the sign-in account, with a dry run first, the id typed to confirm, the intake forms you pick, and a receipt that keeps only a hash and counts. |  |
 | FILE-8 | high | Email backfill can file a session on the wrong athlete, on today's date, twice, and drops what the app records | Fixed | Adding a past session from an email now warns when the email names a different athlete, has no date filled in for you (you must pick one), warns before replacing or doubling a session for that day, and reads the athlete's whole note. It also reads the email's check-in line (lower day, short day, sore, trained as written) and stores it the way the app does, so the imported session is judged on the day's real targets and counts toward a run of low days; Claude's Gmail import stores the same keys. (2026-10-10, second session) |  |
-| FILE-9 | medium | Every render repaints the whole athlete file: typed passwords/emails are wiped, open sections close, the card being read collapses | Partly | Redrawing the same athlete no longer flashes a spinner, the day cards you had open and the session you picked stay put, and Mark read updates the page without reloading everything. | A redraw still clears a password you were typing in the login box and an email pasted into Add past session, and it closes Version history and the Coaching log. |
+| FILE-9 | medium | Every render repaints the whole athlete file: typed passwords/emails are wiped, open sections close, the card being read collapses | Fixed | Redrawing the same athlete no longer flashes a spinner, the day cards you had open and the session you picked stay put, and Mark read updates the page without reloading everything. Since 2026-10-11 (pile B4) what you typed or opened in the tab survives every redraw: the password box (with the cursor in it), an email pasted under Add past session with its date and preview, Version history, the Coaching log, a day's raw log and the live snapshot. It holds for the same athlete's same screen only (another athlete or screen starts clean) and a saved past session clears its own box. `file-redraw-keeps-work` (16 checks; 10 fail on the old code) pins it. |  |
 | FILE-10 | medium | Call logs are cached once per page load: a failed read shows 'No call logs yet' and ↻ Refresh never refetches | Fixed | Call logs are kept only when they really loaded; if they fail, the Calls tab itself says they did not load and ↻ Refresh tries again. |  |
 | FILE-11 | medium | Deleting a session raises a false 'session not synced' warning and can be undone by the athlete's phone | Open | Nothing has changed: deleting a session still removes it outright. | Decided (2026-10-11): a delete hides the session and keeps it recoverable, with an Undo in the File. Not built yet (A6). |
 | FILE-12 | low | Manual and in-app copy still describe retired secret links and data files | Fixed | The File and Work tabs no longer mention secret links or data files. The sign-in address now matches the athlete's tier, and the manual describes logins, Logins to send and what 'Delete training history' removes. |  |
@@ -737,7 +737,7 @@ a contact field holding two numbers matches the second only; the finder cannot b
 
 ## 12. Continue here (rewritten 2026-10-11, fourth session)
 
-<!--T12-->191 findings: 143 fixed, 36 partly, 11 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
+<!--T12-->191 findings: 144 fixed, 35 partly, 11 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
 What is left is in three piles: **A** your eleven answers, now jobs; **B** Claude can just do, in order; **C** is outside the audit.
 
 **To start a new chat:** *"Continue the Coach's Box audit: read `Content/COACH-AUDIT.md` §12 and `COACH_DASHBOARD.md`, then do the first job in
@@ -770,7 +770,7 @@ Decided earlier, nothing to do: MKT-11 (no payment tracking for now) and WORK-9 
 | B1 | TODAY-12 (high) | Every open or refresh downloads every session in full (about 800 KB, 501 sessions and growing, not paged). Load a light summary for the numbers and the rest on demand, read in key order through `selectAll()`. | **done 2026-10-11** |
 | B2 | TOOLS-3 (high) | Name an incomplete backup differently (`aa-backup-INCOMPLETE-<date>.json`) and make `scripts/prune_backups.py` leave it out of the 12 it keeps. | **done 2026-10-11** |
 | B3 | SERVER-13 | Record the live definitions the dashboard depends on and the repo lacks (the athlete programme door `get_program`, the "which athlete is this" function) as a record file, like stage44, and put the coach email in one constant. It also feeds A3. | **done 2026-10-11** |
-| B4 | FILE-9 | A redraw wipes what you are typing in the File tab (the login box, an email pasted into Add past session) and closes Version history and the Coaching log. | todo |
+| B4 | FILE-9 | A redraw wipes what you are typing in the File tab (the login box, an email pasted into Add past session) and closes Version history and the Coaching log. | **done 2026-10-11** |
 | B5 | BROWSER-10, FLOW-22, MKT-13 | One way to report results: a persistent error line for failed saves (the affiliate and intake ones are a 2.6 s toast) and fewer pop-up alerts (53 became 71). | todo |
 | B6 | TWIN-2, WORK-11, TWIN-3, TODAY-11, TWIN-6, TWIN-9, TWIN-8, TWIN-7 | Make the dashboard judge a day the way the athlete app does: the week-1 and back-off-week RPE caps, the Readiness chart's measure, the 30-hour "in progress" window against `sessionIsStale()`, the retest flag, the quality check's 70% / 12% rules, the checker's name matching. A rule the dashboard copies goes into `scripts/check_twins.js` the same day. | todo |
 | B7 | TWIN-1 | The phone and the dashboard resolve a card whose exercise id points at a draft differently. | todo |

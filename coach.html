@@ -3649,7 +3649,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
         : stale ? `<div class="stalewarn">This session was done against an <b>earlier version of the program</b> — none of the current day’s exercises appear in it. What they actually did is under <i>Logged, not prescribed</i>.</div>` : ''}
       ${noteBox}
       ${body}
-      ${s ? `<details class="rawlog"><summary>Raw log, exactly as sent</summary>
+      ${s ? `<details class="rawlog" id="raw-${uid}"><summary>Raw log, exactly as sent</summary>
         <div class="elog-body">${noLog ? 'The log did not load.' : esc(exerciseLogPart(s.summary))}</div>
         <div class="note-actions"><button class="btn sm danger" onclick="deleteSession(${jsq(athleteId)}, ${Number(s.day)}, ${jsq(s.completed_on)})">Delete this log</button></div>
       </details>` : ''}
@@ -3815,7 +3815,7 @@ function liveSnapshotHtml(D) {
     return d.completed || d.srpe || d.note || d.readiness;
   });
   if (!rows.length && !touchedDays.length) return '';
-  return `<details class="rawlog livesnap"><summary>Live app snapshot — what's on their phone right now</summary>
+  return `<details class="rawlog livesnap" id="livesnap"><summary>Live app snapshot — what's on their phone right now</summary>
     ${touchedDays.map(pd => {
       const d = days[pd.id] || {};
       // The cloud blob keeps keys a phone no longer has (program.html ignores a day's keys from
@@ -3916,6 +3916,7 @@ async function renderDetail(athleteId, sub) {
   if (a.isHab) sub2.push('Proof ' + a.hab7 + '/7');
   sub2.push('last active ' + timeAgo(a.lastActive));
 
+  const keep = snapTabBody();     // what is typed or open in the tab on screen, before the page is replaced
   $('content').innerHTML = `<a class="back" href="#athletes">← Roster</a>
     <div class="dethead">
       <div class="det-id">
@@ -3931,7 +3932,7 @@ async function renderDetail(athleteId, sub) {
         return `<a class="stab ${_D.sub === t.id ? 'active' : ''}"${_D.sub === t.id ? ' aria-current="page"' : ''} href="#a/${encodeURIComponent(athleteId)}/${t.id}">${t.label}${n ? `<span class="n">${n}</span>` : ''}</a>`;
       }).join('')}</div>
     <div id="tabbody"></div>`;
-  renderDetailBody();
+  renderDetailBody(keep);
   const st = document.querySelector('.subrail .stab.active');
   if (st && st.scrollIntoView) st.scrollIntoView({ inline: 'center', block: 'nearest' });
   if (_pendingFocus && _pendingFocus.id === athleteId) {
@@ -3940,14 +3941,51 @@ async function renderDetail(athleteId, sub) {
     if (el) el.scrollIntoView({ block: 'start' });
   }
 }
-function renderDetailBody() {
+// ── What the coach typed or opened in an athlete's tab survives a redraw (audit FILE-9, pile B4) ───────────────────────────────
+// A redraw rebuilds the tab from scratch. It used to wipe the password box and an email pasted under "Add past session", hide that
+// box again and fold shut every section the coach had opened (Version history, the Coaching log, a day's raw log, the live
+// snapshot). The snapshot is read off the tab that is on screen BEFORE it is replaced and put back on the new one, and only when it is
+// the same athlete's same screen (a different athlete or sub-tab starts clean). A save that clears a field clears it first.
+const KEEP_TYPED = ['athPw', 'as-paste', 'as-date'];
+function snapTabBody() {
+  const box = $('tabbody');
+  if (!box || !box.dataset.athlete) return null;
+  const st = { athleteId: box.dataset.athlete, sub: box.dataset.sub, typed: {}, open: [], add: null, focus: null };
+  KEEP_TYPED.forEach(id => { const el = $(id); if (el && el.value !== '') st.typed[id] = el.value; });
+  box.querySelectorAll('details[id]').forEach(d => { if (d.open) st.open.push(d.id); });
+  const add = $('add-session');
+  if (add) st.add = { shown: add.style.display !== 'none', preview: $('as-preview') ? $('as-preview').innerHTML : '', canSave: !!$('as-save') && !$('as-save').disabled };
+  const f = document.activeElement;
+  if (f && f.id && KEEP_TYPED.includes(f.id) && box.contains(f)) st.focus = { id: f.id, a: f.selectionStart, b: f.selectionEnd };
+  return st;
+}
+function restoreTabBody(st, athleteId, sub) {
+  if (!st || st.athleteId !== athleteId || st.sub !== sub || !$('tabbody')) return;
+  Object.keys(st.typed).forEach(id => { const el = $(id); if (el) el.value = st.typed[id]; });
+  // Setting open fires the section's own toggle handler, which loads what it shows again.
+  st.open.forEach(id => { const d = $(id); if (d && d.tagName === 'DETAILS') d.open = true; });
+  if (st.add && $('add-session')) {
+    $('add-session').style.display = st.add.shown ? 'block' : 'none';
+    if ($('as-preview')) $('as-preview').innerHTML = st.add.preview;
+    if ($('as-save')) $('as-save').disabled = !st.add.canSave;
+  }
+  if (st.focus) {
+    const el = $(st.focus.id);
+    if (el) { el.focus({ preventScroll: true }); try { el.setSelectionRange(st.focus.a, st.focus.b); } catch (e) {} }
+  }
+}
+// `keep` is a snapshot taken before the whole page was replaced (renderDetail); a call from a handler takes its own.
+function renderDetailBody(keep) {
   if (!_D) return;
   const box = $('tabbody');
   if (!box) return;
   const D = _D;
+  const st = keep && keep.athleteId ? keep : snapTabBody();
   if (D.sub === 'work') { box.innerHTML = workTabHtml(D); restoreExDrafts(); }
   else if (D.sub === 'proof') box.innerHTML = proofTabHtml(D);
   else box.innerHTML = fileTabHtml(D);
+  box.dataset.athlete = D.athleteId; box.dataset.sub = D.sub;
+  restoreTabBody(st, D.athleteId, D.sub);
 }
 window.renderDetailBody = renderDetailBody;
 
@@ -4112,11 +4150,11 @@ function fileTabHtml(D) {
         <tr><td class="k">Roadmap</td><td class="v">${cycles.length ? esc(ci + 1) + ' of ' + esc(cycles.length) : '—'}</td></tr>
       </table>
       ${S.progSrc[athleteId] === 'db' ? `
-      <details class="rawlog" ontoggle="if(this.open)loadProgramVersions(${jsq(athleteId)})">
+      <details class="rawlog" id="pvdet" ontoggle="if(this.open)loadProgramVersions(${jsq(athleteId)})">
         <summary>Version history — undo an edit</summary>
         <div id="pvlist" class="pvlist">Loading…</div>
       </details>` : ''}
-      <details class="rawlog" ontoggle="if(this.open)openCoachingLog(${jsq(athleteId)})">
+      <details class="rawlog" id="clogdet" ontoggle="if(this.open)openCoachingLog(${jsq(athleteId)})">
         <summary>Coaching log${(S.clogs || {})[athleteId] ? '' : ' — none yet'}
           &nbsp;<span class="muted" style="font-weight:400">coach only, never shown to the athlete</span></summary>
         <div class="elog-body" id="clog-body">Loading…</div>
@@ -4306,6 +4344,10 @@ async function submitPastSession(athleteId) {
   });
   if (error) { alert('Could not save: ' + error.message); if (btn) { btn.disabled = false; btn.textContent = 'Save to logs'; } return; }
   _pendingImport = null;
+  KEEP_TYPED.forEach(id => { if (id !== 'athPw' && $(id)) $(id).value = ''; });
+  if ($('as-preview')) $('as-preview').innerHTML = '';
+  if ($('as-save')) { $('as-save').disabled = true; $('as-save').textContent = 'Save to logs'; }
+  if ($('add-session')) $('add-session').style.display = 'none';
   toast('Session saved');
   refetch(['hist']);
 }

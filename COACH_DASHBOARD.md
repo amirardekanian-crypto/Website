@@ -392,7 +392,10 @@ can be bookmarked. Plain `#a/<id>` (or an old `/chat` or `/calls` bookmark) open
 a habit-only athlete with no training days. Opening someone else while a file is still loading
 never paints the first person's file under the second person's address (it could until 2026-10-10).
 A save or a refresh keeps the days you had open, the session you were comparing and anything typed
-into an open editor.
+into an open editor, and (since 2026-10-11) what you typed or opened in the tab itself: the password box with the cursor in it,
+an email pasted under *Add past session* with its date and preview, Version history, the Coaching log, a day's raw log and
+the live snapshot. That holds for the same athlete's same screen only; another athlete or screen starts clean, and a saved
+past session clears its own box.
 
 ### The work — prescribed vs done, on one line
 
