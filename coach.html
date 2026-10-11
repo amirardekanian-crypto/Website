@@ -4551,7 +4551,7 @@ async function eraseRun() {
   if (!e || e.status !== 'ready' || !e.pv) return;
   if (!eraseMatches(e)) { toast('Type ' + e.pv.confirm_word + ' exactly to confirm'); return; }
   const who = e.pv.shown_as || e.key;
-  const forms = e.picked.map(eraseFormLabel);   // taken now: the lists reload after a success
+  const forms = e.picked.map(id => eraseFormLabel(id));   // plain text for the alert; taken now, the lists reload after a success
   e.status = 'busy'; e.slow = false; e.stopped = false; render();
   e.timer = setTimeout(() => { if (_erase === e && e.status === 'busy') { e.slow = true; render(); } }, 30000);
   const res = await sb.rpc('coach_erase_person', { p_kind: e.kind, p_key: e.key, p_confirm: String(e.typed).trim(), p_intake_ids: e.picked, p_dry_run: false });

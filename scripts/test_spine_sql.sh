@@ -125,4 +125,62 @@ if [ -f supabase/PASTE-1-run-in-sql-editor.sql ]; then
   [ "$(echo "$res2" | grep -c '|t$')" = "4" ] && check "...and runs a second time without error (safe to re-run)" ok || check "...and runs a second time without error (safe to re-run)" no "$res2"
 fi
 
+# 6. the one-off removal of the 13 free Proof signups (Amir runs it in the SQL editor): it stops, deleting nothing, unless there are exactly
+#    13 free programmes with no login, session or message; it removes every row of the 13, leaves a coached athlete alone, and undoes
+#    everything when a table it does not know still holds a row for one of them
+if [ -f supabase/one-off/remove-13-free-signups-2026-10-11.sql ]; then
+  psql -h $DATA -p $PORT -U postgres -qAt -v ON_ERROR_STOP=1 -d postgres -c "create database removetest" >/dev/null
+  RT="psql -h $DATA -p $PORT -U postgres -qAt -v ON_ERROR_STOP=1 -d removetest"
+  (cd "$repo" && $RT -f supabase/tests/replica_schema.sql >/dev/null) || { echo "test_spine_sql: replica did not load for the removal test"; exit 2; }
+  $RT >/dev/null <<'SQL'
+insert into public.programs (athlete_id, data) select 'f'||g, jsonb_build_object('athlete', jsonb_build_object('tier','free','firstName','F'||g)) from generate_series(1,13) g;
+insert into public.hab_contacts (athlete_id, email, source, tier) select 'f'||g, 'f'||g||'@example.invalid', 'proof', 'free' from generate_series(1,13) g;
+insert into public.athlete_progress (athlete_id, data) select 'f'||g, '{}' from generate_series(1,12) g;
+insert into public.hab_titles (athlete_id, title) select 'f'||g, 'T' from generate_series(1,5) g;
+insert into public.leaderboard_optin (athlete_id, display_name) select 'f'||g, 'F'||g from generate_series(1,2) g;
+insert into public.library_sessions (athlete_id, slug) values ('f3', 'zz-lib');
+insert into auth.users (id, email) values ('00000000-0000-0000-0000-0000000000c1', 'athlete.c1@amirardekani.com');
+insert into public.athlete_identities (user_id, athlete_id) values ('00000000-0000-0000-0000-0000000000c1', 'c1');
+insert into public.programs (athlete_id, data) values ('c1', '{"athlete":{"tier":"coached"}}');
+insert into public.hab_contacts (athlete_id, email, source, tier) values ('c1', 'c1@example.invalid', 'proof', 'coached');
+insert into public.athlete_progress (athlete_id, data) values ('c1', '{}');
+-- how many rows f1..f13 still have, in every table that has an athlete_id column
+create function public.zz_left13() returns bigint language plpgsql as $f$
+declare t text; n bigint; tot bigint := 0;
+begin
+  for t in select c.relname from pg_attribute a join pg_class c on c.oid = a.attrelid join pg_namespace s on s.oid = c.relnamespace
+            where s.nspname = 'public' and a.attname = 'athlete_id' and a.attnum > 0 and not a.attisdropped and c.relkind = 'r' loop
+    execute format('select count(*) from public.%I where athlete_id ~ ''^f[0-9]+$''', t) into n;
+    tot := tot + n;
+  end loop;
+  return tot;
+end $f$;
+SQL
+  left13() { $RT -c "select public.zz_left13()" | tail -1; }
+  run13() { (cd "$repo" && $RT -f supabase/one-off/remove-13-free-signups-2026-10-11.sql 2>&1); }
+  before=$(left13)
+  # a. only 12 free programmes: refuses
+  $RT -c "delete from public.programs where athlete_id='f13'" >/dev/null
+  out=$(run13); rc=$?
+  [ $rc -ne 0 ] && echo "$out" | grep -q "Expected 13 free programmes, found 12" && [ "$(left13)" = "$((before - 1))" ] && check "removal: refuses with 12 free programmes and deletes nothing" ok || check "removal: refuses with 12 free programmes and deletes nothing" no "rc=$rc $out"
+  $RT -c "insert into public.programs (athlete_id, data) values ('f13', '{\"athlete\":{\"tier\":\"free\"}}')" >/dev/null
+  # b. one of them has a session: refuses
+  $RT -c "insert into public.session_history (athlete_id, day, completed_on) values ('f5', 1, '2026-01-01')" >/dev/null
+  b2=$(left13)
+  out=$(run13); rc=$?
+  [ $rc -ne 0 ] && echo "$out" | grep -q "now has a login, a session or a message" && [ "$(left13)" = "$b2" ] && check "removal: refuses when one of the 13 has a session and deletes nothing" ok || check "removal: refuses when one of the 13 has a session and deletes nothing" no "rc=$rc $out"
+  $RT -c "delete from public.session_history where athlete_id='f5'" >/dev/null
+  # c. a table the script does not know holds a row for one of them: undone, names the table
+  $RT -c "create table public.zz_extra2 (athlete_id text); insert into public.zz_extra2 values ('f2')" >/dev/null
+  b3=$(left13)
+  out=$(run13); rc=$?
+  [ $rc -ne 0 ] && echo "$out" | grep -q "zz_extra2 still holds 1 row" && [ "$(left13)" = "$b3" ] && check "removal: a table it does not know stops it and undoes everything" ok || check "removal: a table it does not know stops it and undoes everything" no "rc=$rc left=$(left13) vs $b3 $out"
+  $RT -c "drop table public.zz_extra2" >/dev/null
+  # d. the real run
+  out=$(run13); rc=$?
+  kept=$($RT -c "select (select count(*) from public.programs where athlete_id='c1') + (select count(*) from public.hab_contacts where athlete_id='c1') + (select count(*) from public.athlete_progress where athlete_id='c1') + (select count(*) from public.athlete_identities where athlete_id='c1')")
+  [ $rc -eq 0 ] && [ "$(left13)" = "0" ] && check "removal: every row of the 13 is gone, from every table" ok || check "removal: every row of the 13 is gone, from every table" no "rc=$rc left=$(left13) $out"
+  [ "$kept" = "4" ] && check "removal: a coached athlete keeps every row" ok || check "removal: a coached athlete keeps every row" no "kept=$kept"
+fi
+
 [ $fail = 0 ] && echo "test_spine_sql: all passed" || { echo "test_spine_sql: FAILED"; exit 1; }

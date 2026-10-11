@@ -637,7 +637,10 @@ reaches you (it ran out five times, three of them with you at the screen) and I 
 **The SQL pack.** One file to paste into the Supabase SQL editor, `supabase/PASTE-1-run-in-sql-editor.sql`: stage45, stage52, stage53
 and stage54 in that order, ending with a row per part that says whether it is applied. Then `supabase/one-off/remove-13-free-signups-2026-10-11.sql`
 on its own (it stops, deleting nothing, unless there are exactly 13 free programmes and none has a login, a session or a message, so
-a new signup cannot make it delete the wrong set; keeping it apart means that guard cannot stop the four parts above).
+a new signup cannot make it delete the wrong set; keeping it apart means that guard cannot stop the four parts above. When it has deleted, it
+checks every table in the public and backup schemas that has an `athlete_id` column and undoes everything if one still holds a row for any of the 13.
+`scripts/test_spine_sql.sh` section 6 runs it on a throwaway Postgres: refuses with 12, refuses with a session, undoes itself for an unknown table,
+removes every row of the 13 and leaves a coached athlete alone).
 
 **Why 1 and 2 are not done.** The Supabase tool asks for a confirmation on SQL that deletes, and waits 60 seconds for it. It ran
 out five times (checked each time: no stuck session, the function and the 13 programmes unchanged). I did not work round it. Both were tested first on a throwaway

@@ -962,7 +962,7 @@ S['erase-athlete'] = async (b) => {
   check(r, 'they are off the roster and the page is back on the Athletes tab', (await page.evaluate(() => location.hash)) === '#athletes' && !(await page.evaluate(() => !!S.ath.zed_erase)), await page.evaluate(() => location.hash));
   const al = log.dialogs.filter(x => x.type === 'alert').map(x => x.message);
   check(r, 'one receipt alert: the receipt number, what is left to do, the partner note', al.length === 1 && /Receipt #1/.test(al[0]) && /weekly backup files/.test(al[0]) && /FIXTURE10/.test(al[0]) && !/native/.test(al[0]), al);
-  check(r, '...it names the intake forms that went, says the sign-in account went, and warns that an open phone can save once more', /Intake forms erased: .*Z\. E\./.test(al[0]) && /sign-in account included/.test(al[0]) && /app was open on a phone/.test(al[0]), al[0]);
+  check(r, '...it names the intake forms that went, says the sign-in account went, and warns that an open phone can save once more', /Intake forms erased: .*Z\. E\./.test(al[0]) && !/[<>]/.test(al[0]) && /sign-in account included/.test(al[0]) && /app was open on a phone/.test(al[0]), al[0]);
   check(r, 'no confirm() or prompt() dialogs were used', !log.dialogs.some(x => x.type === 'confirm' || x.type === 'prompt'), log.dialogs.map(x => x.type));
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
@@ -1158,7 +1158,7 @@ S['erase-forms'] = async (b) => {
   check(r, 'those nine are gone; the shared-number form, the same-name form, the stranger\'s and the four forms nobody ticked are still there',
     !ids.includes('zed-intake-email') && ['zed-intake-wa', 'zed-intake-name', 'zed-intake-stranger'].every(i => ids.includes(i)) && ids.filter(i => /^bulk-/.test(i)).length === 4, ids);
   const al3 = log.dialogs.filter(x => x.type === 'alert').map(x => x.message).slice(-1)[0] || '';
-  check(r, 'the final alert lists the nine forms by name', /Intake forms erased: .*Z\. E\./.test(al3) && /Bulk /.test(al3), al3);
+  check(r, 'the final alert lists the nine forms by name, as plain text (no markup)', /Intake forms erased: .*Z\. E\./.test(al3) && /Bulk /.test(al3) && !/[<>]/.test(al3), al3);
 
   // an athlete with no login and no form: the alert does not claim a sign-in account, and says that no form went
   await seedBare(page, 'nolo_erase', 'Nolo', 'Erase');
