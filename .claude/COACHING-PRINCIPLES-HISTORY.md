@@ -298,6 +298,9 @@ the principles (their *How to add*).
 - `COM-16` **A week note is short and says it once.**
   - It lived in /program-engage PART 3c, and the checker already warned on the length and the label.
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+- `COM-17` **The WhatsApp messages point into the app; they never rewrite it.**
+  - Amir, 2026-10-11, after a cycle's two handoff messages restated the cards (the cough rule, the food, the period week) in full: "if something is inside the app show them how to find those with a very brief explanation of how to find them … if the info exist in their app, show them how to find them instead of writring the whole thing again in a very long message."
+  - 2026-10-11
 
 ## Coaching cues
 
