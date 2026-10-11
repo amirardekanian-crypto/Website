@@ -28,6 +28,8 @@ const { parseSessionLog, parseChips, compareDay, compareExercise, dayVerdict, lo
 const emailCode = grab('function parseSessionEmail(text) {', '// Does the email\'s "Athlete" line name this athlete?');
 new Function('ctx', 'with (ctx) {' + emailCode + '\nObject.assign(ctx, {parseSessionEmail, parseCheckinPlan});}')(sandbox);
 const { parseSessionEmail, parseCheckinPlan, planLabelC } = sandbox;
+// What a save changed, in words (FLOW-11, WORK-10): the diff between two copies of a programme.
+new Function('ctx', 'with (ctx) {' + grab('function programCards(p) {', '// ── One-tap Undo after a programme save') + '\nObject.assign(ctx, {programDiff});}')(sandbox);
 // The Readiness series (TWIN-3, TODAY-11): the check-in score and the athlete's usual, as the app works them out.
 new Function('ctx', 'with (ctx) {' + grab('const READY_FOUR_C = ', 'function weeklyLoad(daily, weeks, ref) {') + '\nObject.assign(ctx, {readinessSC, usualC, checkinOrderC, readinessSeries, readinessStats});}')(sandbox);
 
@@ -448,6 +450,45 @@ console.log('12. email import: the check-in line');
   const a = ses(d(9), ans(4, 4, 4, 4, 3, { timestamp: '2026-09-09T08:00:00.000Z' })), b = ses(d(9), ans(2, 2, 2, 2, 3, { timestamp: '2026-09-09T17:00:00.000Z' }));
   is([readinessSeries([a, b]).map(p => p.v), readinessSeries([b, a]).map(p => p.v)], [[4, 2], [4, 2]], 'two check-ins on one day: the later one is the latest, whatever order the rows came in');
   is(readinessSeries(legacy.slice().reverse()).map(p => p.v), [4, 4, 3, 4.5, 4, 4, 3], 'rows newest first give the same series');
+}
+
+// ── 15. What a save changed, in words (FLOW-11, WORK-10, 2026-10-11) ────
+{
+  const { programDiff } = sandbox;
+  const ex = (name, rx, extra) => Object.assign({ name, type: 'standard', rx }, extra || {});
+  const blk = (title, ...exs) => ({ title, exercises: exs });
+  const day = (id, ...blocks) => ({ id, focusTag: 'Day ' + id + ' name', blocks });
+  const prog = (days, extra) => Object.assign({ athlete: { id: 'x', tier: 'coached' }, currentCycleIndex: 0, cycles: [{ name: 'C1', art: 'iron', weeks: '4' }], workouts: { days } }, extra || {});
+  const A = () => prog([day(1, blk('Primary', ex('Goblet Squat', { sets: 3, reps: 8, rpe: 7, rest: 90 }), ex('Row', { sets: 3, reps: 10 }))), day(2, blk('Primary', ex('Bench', { sets: 4, reps: 6, rpe: 8 })))]);
+  const edit = f => { const p = A(); f(p); return p; };
+  const cardOf = (p, d, b, e) => p.workouts.days[d].blocks[b].exercises[e];
+  is(programDiff(A(), A()), [], 'two identical programmes: nothing changed');
+  is(programDiff(A(), edit(p => { cardOf(p, 0, 0, 0).rx.sets = 4; })), ['Day 1 · Goblet Squat: sets 3 → 4'], 'one number');
+  is(programDiff(A(), edit(p => { Object.assign(cardOf(p, 0, 0, 0).rx, { sets: 4, reps: 6, rpe: 8, rest: 120 }); })), ['Day 1 · Goblet Squat: sets 3 → 4, reps 8 → 6, RPE 7 → 8, rest 90 s → 120 s'], 'several numbers, in the order the card reads');
+  is(programDiff(A(), edit(p => { delete cardOf(p, 0, 0, 0).rx.rest; })), ['Day 1 · Goblet Squat: rest 90 s → none'], 'a rest taken away');
+  is(programDiff(A(), edit(p => { cardOf(p, 0, 0, 1).rx = { sets: 3, time: '30 s' }; })), ['Day 1 · Row: 10 reps → 30 s'], 'reps become a time');
+  is(programDiff(A(), edit(p => { cardOf(p, 0, 0, 1).rx.side = true; })), ['Day 1 · Row: 10 reps → 10 reps a side'], 'a side added');
+  is(programDiff(A(), edit(p => { cardOf(p, 0, 0, 0).note = 'Two in the tank'; })), ['Day 1 · Goblet Squat: Coach\u2019s Note added'], 'a note added');
+  is(programDiff(edit(p => { cardOf(p, 0, 0, 0).note = 'Two in the tank'; }), edit(p => { cardOf(p, 0, 0, 0).note = 'Three in the tank'; })), ['Day 1 · Goblet Squat: Coach\u2019s Note changed'], 'a note changed');
+  is(programDiff(edit(p => { cardOf(p, 0, 0, 0).note = 'Two in the tank'; }), A()), ['Day 1 · Goblet Squat: Coach\u2019s Note removed'], 'a note removed');
+  is(programDiff(A(), edit(p => { cardOf(p, 0, 0, 0).intent = 'neutral grip'; })), ['Day 1 · Goblet Squat: grip or intent added'], 'an intent added');
+  is(programDiff(A(), edit(p => { cardOf(p, 0, 0, 0).exId = 'goblet-squat'; })), ['Day 1 · Goblet Squat: details changed (not the dose)'], 'a change that is not on the card says so');
+  is(programDiff(A(), edit(p => { p.workouts.days[0].blocks[0].exercises.push(ex('Face Pull', { sets: 3, reps: 12 })); })), ['Day 1 · Face Pull added (3 × 12)'], 'a card added, with its dose');
+  is(programDiff(A(), edit(p => { p.workouts.days[0].blocks[0].exercises.splice(1, 1); })), ['Day 1 · Row removed'], 'a card removed');
+  is(programDiff(A(), edit(p => { cardOf(p, 0, 0, 0).name = 'Goblet Squat (tempo)'; })).sort(), ['Day 1 · Goblet Squat removed', 'Day 1 · Goblet Squat (tempo) added (3 × 8)'].sort(), 'a rename reads as one taken away and one added');
+  is(programDiff(A(), edit(p => { const e = p.workouts.days[0].blocks[0].exercises; e.push(e.shift()); })), ['Day 1 block 1: the order of the exercises changed'], 'the same cards in another order');
+  is(programDiff(A(), edit(p => { p.workouts.days.push(day(3, blk('Primary'))); })), ['Day 3 added'], 'a day added');
+  is(programDiff(A(), edit(p => { p.workouts.days.pop(); })), ['Day 2 removed (1 exercise)'], 'a day removed, its cards not listed again');
+  is(programDiff(A(), edit(p => { p.workouts.days.push(day(3, blk('Primary', ex('Squat', { sets: 3, reps: 5 }), ex('Press', { sets: 3, reps: 8 })))); })), ['Day 3 added (2 exercises)'], 'a day added with cards');
+  is(programDiff(A(), edit(p => { p.workouts.days[0].focusTag = 'Legs First'; })), ['Day 1 name: Day 1 name → Legs First'], 'a day renamed');
+  is(programDiff(A(), edit(p => { p.workouts.days[0].blocks[0].title = 'Strength'; })), ['Day 1 block 1: Primary → Strength'], 'a block renamed');
+  is(programDiff(A(), edit(p => { p.cycles.push({ name: 'C2' }); p.currentCycleIndex = 1; })), ['a cycle was added (C2)', 'the current cycle moved from 1 to 2'], 'a new cycle published');
+  is(programDiff(A(), edit(p => { p.cycles[0].weekNotes = { first: { text: 'Go easy' } }; })), ['C1: weekNotes changed'], 'a week note');
+  is(programDiff(A(), edit(p => { p.athlete.tier = 'free'; })), ['the athlete block changed'], 'the athlete block');
+  is(programDiff(A(), edit(p => { p.someNewThing = { a: 1 }; })), ['someNewThing changed'], 'a top-level key it has never heard of');
+  is(programDiff(null, A()).length > 0, true, 'a missing old copy does not throw');
+  is(programDiff(A(), {}).length > 0, true, 'a missing new copy does not throw');
+  is(programDiff(A(), edit(p => { p.workouts.days[0].blocks[0].exercises.push(ex('Row', { sets: 2, reps: 15 })); })), ['Day 1 · Row added (2 × 15)'], 'a second card with the same name is a new card, not a change to the first');
 }
 
 console.log('\n' + (fail ? 'FAILED ' + fail + ' / ' + (pass + fail) : 'all ' + pass + ' assertions passed'));

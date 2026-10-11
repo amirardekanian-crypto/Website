@@ -526,10 +526,11 @@ S['version-restore'] = async (b) => {
   check(r, 'the list asks for up to 150 saves (stage52 keeps the previous cycle, not 20)', histReads.length === 1 && histReads[0].mods.limit === 150, histReads.map(c => c.mods.limit));
   check(r, 'the caption says what is kept', /last 20 saves, and every save since the previous cycle began/.test(await page.locator('#pvlist').innerText()), (await page.locator('#pvlist').innerText()).slice(0, 300));
   const n0 = await L.nCalls(page);
-  await page.locator('#pvlist .pvrow button').first().click();
+  await page.locator('#pvlist .pvrow').first().getByRole('button', { name: /Restore this/ }).click();
   await L.settle(page, 800);
   const up = lastOf(await L.callsSince(page, n0), isUpd('programs'));
   check(r, 'programs.update with the stored version', up && up.payload.data.workouts.days[0].blocks[1].exercises[0].rx.sets === 4, up && up.payload.data.workouts.days[0].blocks[1].exercises[0].rx);
+  check(r, 'and it is written only against the stamp it read (a restore cannot wipe a newer save)', !!up && up.filters.some(f => /^updated_at\.eq\./.test(f)), up && up.filters);
   await L.go(page, 'a/ava_test/work');
   const shown = await doseText(page, 'Goblet Squat');
   check(r, 'The work shows the restored prescription (4 × 10)', /4 × 10/.test(shown), shown);
@@ -2297,6 +2298,92 @@ S['proof-board-truth'] = async (b) => {
   n0 = await L.nCalls(page);
   await L.go(page, 'proof'); await L.settle(page, 700);
   check(r, 'after a quest week starts the board is read again (its XP moved)', (await boardCalls(n0)) === 1, await boardCalls(n0));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Undo as a diff (audit FLOW-11, WORK-10; 2026-10-11, pile B9) ─────────────────────────────────────────────
+S['undo-after-save'] = async (b) => {
+  const r = { id: 'undo-after-save', title: 'A programme save offers a one-tap Undo that says what it changed, and refuses when the programme was written since', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const prog = async () => (await L.db(page)).programs.find(p => p.athlete_id === 'ava_test').data;
+  const sets = async () => (await prog()).workouts.days[0].blocks[1].exercises[0].rx.sets;
+  const save = async v => { const ed = await openEditor(page, 'Goblet Squat'); await setField(ed, 'exSets', v); await ed.locator('.exed-acts button', { hasText: 'Save' }).click(); await L.settle(page, 700); };
+  // 1. a save offers Undo, in words
+  await save(5);
+  const bar = page.locator('#undobar');
+  check(r, 'the save worked and an Undo bar is up', (await sets()) === 5 && (await bar.isVisible()), { sets: await sets(), visible: await bar.isVisible() });
+  const said = (await bar.innerText()).replace(/\s+/g, ' ');
+  check(r, 'it says in words what the save changed, and whose programme', /Ava Example: Day 1 · Goblet Squat: sets 4 → 5/.test(said), said);
+  // 2. Undo puts the programme back, but only against the stamp the save left
+  const n0 = await L.nCalls(page);
+  await bar.locator('.btn', { hasText: 'Undo' }).click();
+  await L.settle(page, 700);
+  const upd = lastOf(await L.callsSince(page, n0), isUpd('programs'));
+  check(r, 'Undo restores the programme as it was before the save', (await sets()) === 4, await sets());
+  check(r, 'the write is guarded by the stamp the save left (updated_at), so it cannot overwrite a newer one', !!upd && upd.filters.some(f => /^updated_at\.eq\./.test(f)), upd && upd.filters);
+  check(r, 'the bar is gone and the page says Undone', !(await bar.isVisible()) && /Undone/.test(await L.toastText(page)), await L.toastText(page));
+  // 3. someone else writes after the save: Undo refuses and leaves their work
+  await save(6);
+  await page.evaluate(() => {
+    const row = window.__DB.programs.find(p => p.athlete_id === 'ava_test');
+    row.data.workouts.days[0].blocks[1].exercises[0].rx.sets = 9;
+    row.updated_at = new Date(Date.now() + 3000).toISOString(); row.updated_by = 'publish_cycle';
+  });
+  await bar.locator('.btn', { hasText: 'Undo' }).click();
+  await L.settle(page, 700);
+  check(r, 'a programme written since the save is left alone (9 sets stay)', (await sets()) === 9, await sets());
+  check(r, 'and the page says why, and that nothing was changed', /has been written since your save/.test(await L.failText(page)) && /Nothing was changed/.test(await L.failText(page)), await L.failText(page));
+  // 4. a restore from Version history is guarded the same way, and can itself be undone
+  await page.evaluate(() => failDismissAll());
+  await L.go(page, 'a/ava_test/file'); await L.settle(page, 500);
+  await page.evaluate(() => { document.getElementById('pvdet').open = true; });
+  await page.locator('.pvrow').first().waitFor();
+  const before = JSON.stringify(await prog());
+  await page.locator('.pvrow').first().getByRole('button', { name: /Restore this/ }).click();
+  await L.settle(page, 800);
+  check(r, 'a restore changes the programme', JSON.stringify(await prog()) !== before, '');
+  const said2 = (await bar.innerText().catch(() => '')).replace(/\s+/g, ' ');
+  check(r, 'a restore offers Undo too, with the words', (await bar.isVisible()) && /^Ava Example restored: /.test(said2), said2);
+  await bar.locator('.btn', { hasText: 'Undo' }).click();
+  await L.settle(page, 800);
+  check(r, 'Undo of the restore gives back exactly the programme from before it', JSON.stringify(await prog()) === before, '');
+  // 5. a restore against a programme that moved while it was being read is refused
+  await page.evaluate(() => { document.getElementById('pvdet').open = false; document.getElementById('pvdet').open = true; });
+  await page.locator('.pvrow').first().waitFor();
+  const before2 = JSON.stringify(await prog());
+  await page.evaluate(() => {
+    window.__bumped = false;
+    window.__STUB.afterSelect = (table) => { if (table === 'programs' && !window.__bumped) { window.__bumped = true; window.__DB.programs.find(p => p.athlete_id === 'ava_test').updated_at = new Date(Date.now() + 9000).toISOString(); } };
+  });
+  await page.locator('.pvrow').first().getByRole('button', { name: /Restore this/ }).click();
+  await L.settle(page, 800);
+  check(r, 'a restore that finds the programme newer than it read is refused and changes nothing', JSON.stringify(await prog()) === before2 && /Could not restore/.test(await L.failText(page)), (await L.failText(page)).slice(0, 200));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['version-diff'] = async (b) => {
+  const r = { id: 'version-diff', title: 'Version history says in words what each save changed', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const save = async (field, v) => { const ed = await openEditor(page, 'Goblet Squat'); await setField(ed, field, v); await ed.locator('.exed-acts button', { hasText: 'Save' }).click(); await L.settle(page, 700); };
+  await save('exSets', 5);
+  await save('exNote', 'Two in the tank');
+  await L.go(page, 'a/ava_test/file'); await L.settle(page, 500);
+  await page.evaluate(() => { document.getElementById('pvdet').open = true; });
+  await page.locator('.pvrow').nth(1).waitFor();
+  const rows = page.locator('.pvrow');
+  check(r, 'each version has a button that says what the save after it changed', (await rows.first().getByRole('button', { name: /What this save changed/ }).count()) === 1, await rows.count());
+  await rows.first().getByRole('button', { name: /What this save changed/ }).click();
+  await L.settle(page, 500);
+  const newest = (await rows.first().locator('.pvdiffbox').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the newest version against the programme now: the last save changed the note (the card already had one)', /Day 1 · Goblet Squat: Coach’s Note changed/.test(newest), newest);
+  await rows.nth(1).getByRole('button', { name: /What this save changed/ }).click();
+  await L.settle(page, 500);
+  const older = (await rows.nth(1).locator('.pvdiffbox').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the version before it against the next one: the earlier save changed the sets', /Day 1 · Goblet Squat: sets 4 → 5/.test(older) && !/Note/.test(older), older);
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

@@ -520,6 +520,16 @@ different exercise. **Version history** (File tab) lists the saves kept for that
 (the last 20 always, and every save since the previous cycle began, never more than 150: stage52, 2026-10-11);
 each line is the programme just before that save, and Restore checks it belongs to this athlete.
 
+**Undo is a one-tap button and a sentence** (audit FLOW-11 and WORK-10, 2026-10-11). After a ✎ save a bar above the toast says what the save
+changed, in the athlete's words (*Ava Example: Day 1 · Goblet Squat: sets 4 → 5*), with **Undo** (it stays for half a minute). Undo puts the
+programme back as it was just before the save, **only if** the row still carries the stamp the save left: if the pipeline, another tab or a
+restore has written it since, Undo refuses, says so and changes nothing (Version history still has every save). A **restore** gets the same bar
+(*Ava Example restored: …*), and a restore is itself written only if the programme has not moved since it was read. Every line in Version
+history has **What this save changed**: this stored version against the next one (the newest against the programme now), as a short list: a number
+that moved (*sets 3 → 4, RPE 7 → 8, rest 90 s → 120 s*), a card added or removed (*Face Pull added (3 × 12)*), a note, a day, an order, a cycle or
+the athlete block. Cards are matched by day, block and name, so a rename reads as one removed and one added. The wording is `programDiff()`;
+`test_coach_compare.js` section 15 has its 27 cases.
+
 ### The three numbers, and the charts
 
 Training load, readiness and adherence sit as a strip of three above the day cards; the full charts

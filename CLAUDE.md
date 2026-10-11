@@ -325,7 +325,8 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
 Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is open; **its §12 is the list to continue from**). What must never break:
 - **A programme write from coach.html is never the page's copy written whole.** The ✎ editor reads the live
   row, refuses when `updated_at` moved since the page loaded or the exercise is not at that place any more
-  (checked by name), applies the edit to the live copy and writes it `.eq('updated_at', <read>)`. Anything
+  (checked by name), applies the edit to the live copy and writes it `.eq('updated_at', <read>)`. **So does a restore, and so does Undo**
+  (FLOW-11, 2026-10-11: the one-tap bar after a save writes the pre-save copy back only against the stamp that save left). Anything
   that replaces `S.programs` goes through `reloadPrograms()` (it re-assembles, so the athlete file redraws).
 - **A Spine or Quality save sends only the columns the coach changed.** An exercise entry is one call,
   `coach_save_spine()` (stage48): both tables in one transaction, the rows locked, nothing written to either
@@ -361,7 +362,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (76 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (78 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.

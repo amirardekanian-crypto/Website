@@ -60,7 +60,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 76 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 78 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -130,6 +130,8 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | refetch-failures | A post while the wall's reload fails, two reloads failing at once, then all working | (pile B8, TODAY-13) only the session list's failed reload was told; the rest kept the old numbers and said nothing |
 | quest-run-window | Runs overlapping, listed the other way round, one scheduled ahead, one you ended | (pile B8, TODAY-14) the panel showed the last run in the list and a seventh day the app has already clipped |
 | proof-board-truth | The board read, failed and retried; a quest week started | (pile B8, MKT-3, MKT-8) no time on the board, no reason when it failed, and it stayed stale after a quest week started |
+| undo-after-save | A save, Undo, a save then another writer, a restore and its Undo, a restore against a moved programme | (pile B9, FLOW-11) no Undo after an edit; a restore could overwrite a newer programme |
+| version-diff | Two saves, then Version history's "What this save changed" | (pile B9, WORK-10) a version could only be restored blind, with no word on what it differed by |
 | fail-bar | a failed post on Today (and the same again, and a failed intake status), then a success, on a 1280 px screen and a 360 px phone | (pile B5) a failure was a 2.6 s toast in some tabs and a pop-up in others; now a line that stays until dismissed, in view when scrolled, merged when repeated, never a pop-up; a success stays a toast |
 
 ## Adding a scenario

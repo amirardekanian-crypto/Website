@@ -540,12 +540,21 @@
   .exed-acts { margin-top: 13px; display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
   .exed-hint { font-family: 'Barlow', sans-serif; font-size: 11px; color: var(--muted-soft); }
   .pvlist { margin-top: 4px; }
-  .pvrow { display: flex; align-items: center; gap: 12px; padding: 7px 0;
+  .pvrow { display: flex; align-items: center; gap: 12px; padding: 7px 0; flex-wrap: wrap;
            border-bottom: 1px solid var(--rule); font-family: 'Barlow', sans-serif; font-size: 12px; }
   .pvrow:last-child { border-bottom: 0; }
   .pvwhen { min-width: 150px; font-weight: 600; }
   .pvtime { color: var(--muted-soft); font-weight: 400; margin-left: 5px; }
   .pvwho { flex: 1; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pvdiffbox { flex-basis: 100%; }
+  .pvdiff { margin: 2px 0 4px; padding-left: 18px; color: var(--ink); font-size: 12.5px; line-height: 1.5; }
+  /* One-tap Undo after a programme save (FLOW-11): above the toast, clickable, gone after half a minute. */
+  .undobar { position: fixed; left: 16px; right: 16px; bottom: 76px; margin: 0 auto; width: max-content; max-width: min(560px, calc(100vw - 32px)); z-index: 199;
+             display: flex; align-items: center; gap: 10px; background: var(--ink); color: #fff; font-size: 13.5px; padding: 8px 10px 8px 16px;
+             border-radius: 18px; box-shadow: 0 12px 30px -12px rgba(0,0,0,.4); }
+  .undobar[hidden] { display: none; }
+  .undobar .btn { background: #fff; color: var(--ink); border-color: #fff; }
+  .undobar .ux { background: none; border: 0; color: #fff; opacity: .7; font-size: 15px; cursor: pointer; padding: 4px 8px; }
   /* An entry's history (Exercises → an entry → History): one block per change, what it changed under it. */
   .spvrow { padding: 9px 0; border-bottom: 1px solid var(--rule); font-family: 'Barlow', sans-serif; font-size: 13px; }
   .spvrow:last-child { border-bottom: 0; }
@@ -882,6 +891,7 @@
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="undobar" class="undobar" role="status" hidden></div>
 
 <script>
 // --- config -----------------------------------------------------------------
@@ -3627,6 +3637,7 @@ async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, 
       `(saved ${String(live.data.updated_at).slice(0, 16).replace('T', ' ')} UTC by ${live.data.updated_by || 'someone'}).`);
   }
   const fresh = live.data.data;
+  const before = JSON.parse(JSON.stringify(fresh));      // for Undo: the programme as it was just before this save
   const fd = ((fresh && fresh.workouts && fresh.workouts.days) || []).find(d => Number(d.id) === Number(dayId));
   const fb = fd && (fd.blocks || [])[blockIdx];
   const fex = fb && (fb.exercises || [])[exIdx];
@@ -3646,8 +3657,123 @@ async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, 
   delete _exDrafts[eid];
   assemble();
   toast('Saved — they see it next time they open the app');
+  const said = programDiff(before, fresh);
+  offerUndo(athleteId, before, res.data[0].updated_at, `${nameOf(athleteId)}: ${said.length ? said.slice(0, 2).join('; ') + (said.length > 2 ? ' …' : '') : 'saved'}`);
   render();
 }
+
+// ── What changed between two copies of a programme, in words (audit FLOW-11 and WORK-10, 2026-10-11) ──────────────────────────────────────────
+// Cards are matched by day, block position and name (the n-th card of that name in the block), so a changed dose reads as a change and not as one
+// card taken away and another added. The words are the athlete's own: sets, reps, RPE, tempo, rest.
+function programCards(p) {
+  const out = [];
+  ((p && p.workouts && p.workouts.days) || []).forEach(d => ((d && d.blocks) || []).forEach((bl, bi) => {
+    const seen = {};
+    ((bl && bl.exercises) || []).forEach(ex => {
+      if (!ex || typeof ex !== 'object') return;
+      const n = seen[ex.name] = (seen[ex.name] || 0) + 1;
+      const r = window.Chips.rxOf(ex), dz = r.dose;
+      out.push({ key: [d.id, bi, ex.name, n].join('|'), day: d.id, name: ex.name || '(no name)', raw: JSON.stringify(ex),
+        view: { sets: r.sets, dose: dz ? { kind: dz.kind, value: dz.value, side: !!dz.side } : null, rpe: r.rpe, tempo: r.tempo, rest: r.rest, rounds: r.rounds,
+                intent: r.intent, note: ex.note ? String(ex.note) : '', items: (ex.items || []).map(i => i && i.name).join(' · ') } });
+    });
+  }));
+  return out;
+}
+function doseWords(dz) {
+  if (!dz) return 'no dose';
+  return (dz.kind === 'reps' ? dz.value + ' reps' : dz.value) + (dz.side ? ' a side' : '');
+}
+function cardChange(a, b) {
+  const out = [], va = a.view, vb = b.view;
+  const show = (v, unit) => (v == null || v === '') ? 'none' : v + (unit || '');
+  const one = (label, x, y, unit) => { if ((x == null ? '' : String(x)) !== (y == null ? '' : String(y))) out.push(`${label} ${show(x, unit)} → ${show(y, unit)}`); };
+  one('sets', va.sets, vb.sets);
+  if (JSON.stringify(va.dose) !== JSON.stringify(vb.dose)) {
+    if (va.dose && vb.dose && va.dose.kind === vb.dose.kind && va.dose.side === vb.dose.side) out.push(`${va.dose.kind} ${va.dose.value} → ${vb.dose.value}`);
+    else out.push(`${doseWords(va.dose)} → ${doseWords(vb.dose)}`);
+  }
+  one('RPE', va.rpe, vb.rpe); one('tempo', va.tempo, vb.tempo); one('rest', va.rest, vb.rest, ' s'); one('rounds', va.rounds, vb.rounds);
+  if ((va.intent || '') !== (vb.intent || '')) out.push(vb.intent ? (va.intent ? 'grip or intent changed' : 'grip or intent added') : 'grip or intent removed');
+  if (va.note !== vb.note) out.push(!va.note ? 'Coach\u2019s Note added' : !vb.note ? 'Coach\u2019s Note removed' : 'Coach\u2019s Note changed');
+  if (va.items !== vb.items) out.push('the circuit\u2019s exercises changed');
+  if (!out.length && a.raw !== b.raw) out.push('details changed (not the dose)');
+  return out;
+}
+function programDiff(a, b) {
+  const out = [];
+  const ca = programCards(a), cb = programCards(b), ma = {}, mb = {};
+  ca.forEach(c => { ma[c.key] = c; }); cb.forEach(c => { mb[c.key] = c; });
+  const doseOf = c => [c.view.sets && c.view.dose ? c.view.sets + ' × ' + c.view.dose.value : (c.view.dose ? c.view.dose.value : (c.view.sets ? c.view.sets + ' sets' : ''))].filter(Boolean).join('');
+  // days, in order
+  const da = {}, db = {};
+  ((a && a.workouts && a.workouts.days) || []).forEach(d => { da[d.id] = d; }); ((b && b.workouts && b.workouts.days) || []).forEach(d => { db[d.id] = d; });
+  const nCards = (d) => ((d && d.blocks) || []).reduce((n, bl) => n + ((bl && bl.exercises) || []).length, 0);
+  const inDay = (d) => nCards(d) ? ` (${nCards(d)} exercise${nCards(d) === 1 ? '' : 's'})` : '';
+  const newDays = Object.keys(db).filter(id => !(id in da)), goneDays = Object.keys(da).filter(id => !(id in db));
+  newDays.forEach(id => out.push(`Day ${id} added${inDay(db[id])}`));
+  goneDays.forEach(id => out.push(`Day ${id} removed${inDay(da[id])}`));
+  Object.keys(da).filter(id => id in db && (da[id].focusTag || '') !== (db[id].focusTag || '')).forEach(id => out.push(`Day ${id} name: ${da[id].focusTag || 'none'} → ${db[id].focusTag || 'none'}`));
+  Object.keys(da).filter(id => id in db).forEach(id => {
+    const ba = da[id].blocks || [], bb = db[id].blocks || [];
+    for (let i = 0; i < Math.min(ba.length, bb.length); i++) if ((ba[i].title || '') !== (bb[i].title || '')) out.push(`Day ${id} block ${i + 1}: ${ba[i].title || 'none'} → ${bb[i].title || 'none'}`);
+  });
+  // The cards of a day that was added or removed are in that day's line, not listed again.
+  cb.filter(c => !(c.key in ma) && !newDays.includes(String(c.day))).forEach(c => out.push(`Day ${c.day} · ${c.name} added${doseOf(c) ? ' (' + doseOf(c) + ')' : ''}`));
+  ca.filter(c => !(c.key in mb) && !goneDays.includes(String(c.day))).forEach(c => out.push(`Day ${c.day} · ${c.name} removed`));
+  cb.filter(c => c.key in ma).forEach(c => { const ch = cardChange(ma[c.key], c); if (ch.length) out.push(`Day ${c.day} · ${c.name}: ${ch.join(', ')}`); });
+  // The same cards in another order inside a block (cards are matched by place and name, so a reorder moves none of them on its own).
+  Object.keys(da).filter(id => id in db).forEach(id => {
+    const ba = da[id].blocks || [], bb = db[id].blocks || [];
+    for (let i = 0; i < Math.min(ba.length, bb.length); i++) {
+      const na = (ba[i].exercises || []).map(e => e && e.name), nb = (bb[i].exercises || []).map(e => e && e.name);
+      if (na.join('\u0001') !== nb.join('\u0001') && na.slice().sort().join('\u0001') === nb.slice().sort().join('\u0001')) out.push(`Day ${id} block ${i + 1}: the order of the exercises changed`);
+    }
+  });
+  // cycles and the rest of the file
+  const cyA = (a && a.cycles) || [], cyB = (b && b.cycles) || [];
+  if (cyB.length > cyA.length) out.push(`a cycle was added (${(cyB[cyB.length - 1] || {}).name || 'Cycle ' + cyB.length})`);
+  if (cyB.length < cyA.length) out.push('a cycle was removed');
+  for (let i = 0; i < Math.min(cyA.length, cyB.length); i++) {
+    const keys = Object.keys(Object.assign({}, cyA[i], cyB[i])).filter(k => JSON.stringify((cyA[i] || {})[k]) !== JSON.stringify((cyB[i] || {})[k]));
+    if (keys.length) out.push(`${(cyB[i] || {}).name || 'Cycle ' + (i + 1)}: ${keys.join(', ')} changed`);
+  }
+  if ((a && a.currentCycleIndex) !== (b && b.currentCycleIndex)) out.push(`the current cycle moved from ${((a && a.currentCycleIndex) || 0) + 1} to ${((b && b.currentCycleIndex) || 0) + 1}`);
+  const top = o => Object.keys(o || {}).filter(k => !['workouts', 'cycles', 'currentCycleIndex'].includes(k));
+  top(Object.assign({}, a, b)).filter(k => JSON.stringify((a || {})[k]) !== JSON.stringify((b || {})[k])).forEach(k => out.push(`${k === 'athlete' ? 'the athlete block' : k} changed`));
+  if (!out.length && JSON.stringify(a) !== JSON.stringify(b)) out.push('something in the file changed that is not an exercise, a cycle or the athlete block');
+  return out;
+}
+
+// ── One-tap Undo after a programme save (audit FLOW-11, 2026-10-11) ─────────────────────────────────────────────────────────────────────
+// The programme as it was just before the save is kept in memory, and Undo writes it back only if the row still carries the stamp the save left:
+// anything written since (the pipeline, another tab) makes Undo refuse instead of overwriting it. Version history keeps every save either way.
+let _undo = null;
+function offerUndo(athleteId, before, afterUpdatedAt, what) {
+  _undo = { athleteId, before, afterUpdatedAt };
+  const bar = $('undobar');
+  bar.innerHTML = `<span>${esc(what)}</span><button class="btn sm" onclick="undoLastSave()">Undo</button><button class="ux" aria-label="Dismiss" onclick="dismissUndo()">✕</button>`;
+  bar.hidden = false;
+  clearTimeout(offerUndo._h); offerUndo._h = setTimeout(dismissUndo, 30000);
+}
+function dismissUndo() { _undo = null; clearTimeout(offerUndo._h); const bar = $('undobar'); if (bar) { bar.hidden = true; bar.innerHTML = ''; } }
+async function undoLastSave() {
+  const u = _undo;
+  if (!u) return;
+  if (DEMO) { dismissUndo(); toast('Demo mode — nothing saved'); return; }
+  const res = await sb.from('programs').update({ data: u.before }).eq('athlete_id', u.athleteId).eq('updated_at', u.afterUpdatedAt).select('athlete_id, updated_at, updated_by');
+  dismissUndo();
+  if (res.error) { fail('Could not undo: ' + res.error.message); return; }
+  if (!res.data || !res.data.length) {
+    await reloadPrograms(); render();
+    fail(`${nameOf(u.athleteId)}'s programme has been written since your save (or your sign-in lapsed), so Undo would overwrite that. Nothing was changed. Version history on their File tab lists every save and what each one changed.`);
+    return;
+  }
+  Object.keys(_exDrafts).forEach(k => delete _exDrafts[k]);
+  await reloadPrograms(); render();
+  toast('Undone');
+}
+window.undoLastSave = undoLastSave; window.dismissUndo = dismissUndo;
 
 // The saves kept for one athlete, newest first: at least the last 20 and everything since the previous cycle began, never
 // more than 150 (stage52). Loaded on demand — the history is only interesting when something has gone wrong.
@@ -3665,14 +3791,36 @@ async function loadProgramVersions(athleteId) {
   // Each row is the programme as it was BEFORE a save at saved_at; saved_by wrote it. Times are
   // shown in this computer's time zone (they are stored in UTC).
   box.innerHTML = rows.length
-    ? `<p class="empty" style="padding:0 0 8px">Each line is the programme as it stood just before a save. Restoring one puts it back; the current version is kept here too, so a restore can itself be undone. Kept: the last 20 saves, and every save since the previous cycle began (never more than 150).</p>` +
-      rows.map(v => `<div class="pvrow">
+    ? `<p class="empty" style="padding:0 0 8px">Each line is the programme as it stood just before a save. <b>What this save changed</b> says, in words, what the save after it did to it. Restoring one puts it back; the current version is kept here too, so a restore can itself be undone. Kept: the last 20 saves, and every save since the previous cycle began (never more than 150).</p>` +
+      rows.map((v, i) => `<div class="pvrow">
         <span class="pvwhen">${esc(fmtLocalStamp(v.saved_at))}</span>
         <span class="pvwho">${esc(v.saved_by || '—')}</span>
+        <button class="btn sm" onclick="explainVersion(${jsq(athleteId)}, ${Number(v.id)}, ${i ? Number(rows[i - 1].id) : 'null'})">What this save changed</button>
         <button class="btn sm" onclick="restoreProgramVersion(${jsq(athleteId)}, ${Number(v.id)})">Restore this</button>
+        <div class="pvdiffbox" id="pvd-${Number(v.id)}"></div>
       </div>`).join('')
     : '<p class="empty">No earlier versions yet — history starts at the first edit.</p>';
 }
+// What the save that came after this stored version did to it: this version against the next newer one, or against the live programme for the newest.
+async function explainVersion(athleteId, versionId, newerId) {
+  const box = $('pvd-' + versionId);
+  if (!box) return;
+  box.innerHTML = '<span class="muted">Reading…</span>';
+  const ids = [versionId].concat(newerId ? [newerId] : []);
+  const [vs, live] = await Promise.all([
+    sb.from('program_versions').select('id, athlete_id, data').in('id', ids),
+    newerId ? Promise.resolve(null) : sb.from('programs').select('data').eq('athlete_id', athleteId).maybeSingle()]);
+  const old = !vs.error && (vs.data || []).find(x => Number(x.id) === Number(versionId));
+  const next = newerId ? (vs.data || []).find(x => Number(x.id) === Number(newerId)) : (live && live.data);
+  if (vs.error || (live && live.error) || !old || !next || old.athlete_id !== athleteId) {
+    box.innerHTML = `<span class="muted">Could not read these two versions${vs.error ? ': ' + esc(vs.error.message) : ''}.</span>`; return;
+  }
+  const lines = programDiff(old.data, next.data);
+  box.innerHTML = lines.length
+    ? `<ul class="pvdiff">${lines.slice(0, 12).map(l => `<li>${esc(l)}</li>`).join('')}</ul>${lines.length > 12 ? `<div class="muted">…and ${lines.length - 12} more.</div>` : ''}`
+    : '<span class="muted">The next save left the programme as it was (it was saved again unchanged).</span>';
+}
+window.explainVersion = explainVersion;
 function fmtLocalStamp(iso) {
   const d = new Date(iso);
   if (isNaN(d)) return String(iso || '');
@@ -3687,13 +3835,18 @@ async function restoreProgramVersion(athleteId, versionId) {
   if (v.error || !v.data) { fail('Could not read that version.'); return; }
   if (v.data.athlete_id !== athleteId) { fail('That version belongs to a different athlete. Nothing was changed.'); return; }
   if (!confirm(`Restore ${nameOf(athleteId)}'s programme to how it was before the save of ${fmtLocalStamp(v.data.saved_at)}?\n\nThe current one is kept in this list, so this is reversible.`)) return;
-  const res = await sb.from('programs').update({ data: v.data.data }).eq('athlete_id', athleteId).select('athlete_id');
+  // Written only if nobody has saved since it was read here, like the ✎ editor: a restore must not wipe a cycle the pipeline published a minute ago.
+  const live = await sb.from('programs').select('data, updated_at').eq('athlete_id', athleteId).maybeSingle();
+  if (live.error || !live.data) { fail('Could not read the live programme, so nothing was restored: ' + (live.error ? live.error.message : 'no row')); return; }
+  const res = await sb.from('programs').update({ data: v.data.data }).eq('athlete_id', athleteId).eq('updated_at', live.data.updated_at).select('athlete_id, updated_at');
   const bad = writeFailed(res, 'restored');
-  if (bad) { fail('Could not restore: ' + bad); return; }
+  if (bad) { await reloadPrograms(); render(); fail('Could not restore: ' + bad + '\n\nIf the programme was saved a moment ago, open Version history again and restore from the fresh list.'); return; }
   Object.keys(_exDrafts).forEach(k => delete _exDrafts[k]);
   await reloadPrograms();
   render();
   toast('Restored');
+  const said = programDiff(live.data.data, v.data.data);
+  offerUndo(athleteId, live.data.data, res.data[0].updated_at, `${nameOf(athleteId)} restored: ${said.length ? said.slice(0, 2).join('; ') + (said.length > 2 ? ' …' : '') : 'no difference'}`);
 }
 function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   const chosen = _workSel[dayNum];
