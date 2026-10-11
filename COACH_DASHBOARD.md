@@ -350,7 +350,7 @@ seven presence dots.
 **A flagged row says why, in words:** the reasons in §3's table, from the same function.
 
 **Above the roster:** *Create N missing logins* (coached athletes who have trained and have no
-login), then a folded **Coach tools** line: *↑ Publish programme file*, *↑ Add coaching logs* and
+login), then a folded **Coach tools** line: *↑ Add coaching logs* and
 *⤓ Backup*, with when this computer last took a backup, then **Logins to send** (open while three
 or fewer wait, folded above that: each unsent password with Copy message and Mark sent). **A stored
 password clears by itself** (stage51, 2026-10-11): the database removes it the moment the person signs in
@@ -359,9 +359,9 @@ for a moment, or on a password stored before stage51; the Course and Testing app
 If you sign in as the person yourself to test a login before sending it, that clears it too: reset the
 login for a new password. (The secret-link tools are gone: the links were retired on 2026-09-07.)
 
-- **↑ Publish programme file** checks that the file name matches its `athlete.id`, shows the live
-  programme against the file (cycle, days, last saved, by whom) and warns in capitals when the live
-  one is newer. New cycles normally go up through the pipeline (`publish_cycle()`).
+- **There is no programme upload button** (removed 2026-10-11, Amir: *"i never use it"*, with its function). A NEW athlete's first
+  programme and every new cycle go up through the pipeline (`publish_cycle()`, `p_new_cycle => false` for a new athlete); a
+  day-to-day change is the ✎ editor; an old version comes back from Version history.
 - **↑ Add coaching logs** only adds a log for an athlete who has none on the server. It never
   replaces one: the server copy is the record (publish_cycle splices into it, `/cycle-report`
   appends its Debrief). Until 2026-10-10 it replaced them wholesale.

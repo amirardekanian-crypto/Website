@@ -21,7 +21,7 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 142 are fixed, 37 partly fixed (the harm is gone, something named in the finding is left), 11 open and 1 was not a bug. Of the 45 critical and high findings, 43 are fixed; not yet: TOOLS-4 (open), TOOLS-7 (partly).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
+**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 143 are fixed, 36 partly fixed (the harm is gone, something named in the finding is left), 11 open and 1 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
 questions in §7 and the eleven in §12 (pile A), and the one thing left for you is to switch off public sign-up in the Supabase
 dashboard (SERVER-14). The SQL pack and the removal script ran on 2026-10-11 and §11 records what was checked afterwards.
 **What is left, and how to continue in a new chat, is §12.**
@@ -35,7 +35,7 @@ The work · Proof · Calls · File.
 | Feature | Reads | Writes | Shares logic with |
 |---|---|---|---|
 | Today: Needs you, wall, coach line, quest week, notes to read | everything in memory; `hab_notes`, `xp_rules` | `set_coach_note`, `hide_note`, `set_quests`, `clear_quests`, `session_history.coach_status` | the roster (`reasonsOf()`, one rule) |
-| Athletes: roster, logins, backup, publish a programme file, add coaching logs | `programs`, `athlete_progress`, `session_history`, `athlete_identities`, `coaching_logs` | `programs` (file publish), `coaching_logs` (create only), athlete-login function | `athletesNeedingLogin()` |
+| Athletes: roster, logins, backup, add coaching logs | `programs`, `athlete_progress`, `session_history`, `athlete_identities`, `coaching_logs` | `coaching_logs` (create only), athlete-login function | `athletesNeedingLogin()` |
 | The work: plan vs logged, ✎ prescription editor, readiness, load, adherence | `programs`, `session_history`, check-ins in `athlete_progress` | `programs` (guarded), `session_history` (import, delete) | program.html (`rxOf`, set-log grammar, the REC-2 target rule `dayTargetC()`) |
 | File: login, version history, raw logs, delete history | `program_versions`, `call_logs` | `programs` (restore), `session_history`, `athlete_progress` | |
 | Exercises: the Spine, the ten qualities, coverage | `exercises`, `exercise_coach`, `qualities` | the same three (guarded, changed columns only) | program.html `spineFor()`, `check_program.py` |
@@ -265,12 +265,12 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-<!--T9-->191 findings. Fixed 142 · Partly 37 · Open 11 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
+<!--T9-->191 findings. Fixed 143 · Partly 36 · Open 11 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
-| high | 31 | 1 | 1 | 0 | 0 |
+| high | 32 | 0 | 1 | 0 | 0 |
 | medium | 59 | 25 | 4 | 0 | 0 |
 | low | 40 | 11 | 6 | 0 | 1 |<!--/T9-->
 
@@ -361,7 +361,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | TOOLS-4 | high | No restore path: the backup has no schema, FK-bound login tables cannot be re-inserted, and the DDL for the core tables is not in the repo | Open | The recipe for the programme and version-history tables is now written down in the repo (stage44). | Decided (2026-10-11): yes. A full schema snapshot, a restore script and one rehearsal on a throwaway local Postgres. Not built yet (A3; B3 is its first step). |
 | TOOLS-5 | high | '+ Publish article' refuses every article the /article skill writes: it matches category against the category id, but articles carry the display name | Fixed | + Publish article now accepts the category by its name (for example 'Pre-Competition') as well as its id, so articles from the /article skill publish onto the right shelf. |  |
 | TOOLS-6 | medium | Library publish has no guard against the wrong file: a .fa.json carrying id+category overwrites the English article, a workout can be published as an article, unpublished items get republished, and a recategorised item is duplicated | Partly | The Library publish now refuses a Farsi translation file and a workout picked as an article (or the reverse), so the English article can no longer be overwritten by its Farsi copy. | Re-uploading an item you hid publishes it again without asking, the confirm does not say which items are new and which replace one, and an item moved to another category is published twice. |
-| TOOLS-7 | high | '↑ Publish programme file' is a blind whole-programme overwrite: no filename-to-athlete check, no staleness or diff, and it bypasses publish_cycle()'s guarantees | Partly | Publish programme file now refuses a file whose name does not match the athlete inside it, shows the live programme against the file (cycle, days, when and by whom saved) and warns in capitals when the live one is newer. | Decided (2026-10-11): you never use the button, so the button and its code are removed. Not removed yet (A4). |
+| TOOLS-7 | high | '↑ Publish programme file' is a blind whole-programme overwrite: no filename-to-athlete check, no staleness or diff, and it bypasses publish_cycle()'s guarantees | Fixed | Publish programme file now refuses a file whose name does not match the athlete inside it, shows the live programme against the file (cycle, days, when and by whom saved) and warns in capitals when the live one is newer. Removed (pile A4, 2026-10-11; you said you never use it): the button and its function are gone from coach.html, so no route is left that replaces a whole live programme outside the pipeline. A new athlete and every new cycle go up through `publish_cycle()`. `no-program-file-button` guards it. |  |
 | TOOLS-8 | medium | After publishing or importing a programme the store is not re-assembled: a new athlete is missing from the roster, and the athlete file keeps showing the old programme | Fixed | After publishing or restoring a programme the roster and the open athlete file are rebuilt from the new copy, so a new athlete appears straight away and the file shows the programme you just put up. |  |
 | TOOLS-9 | medium | Load errors for programmes, library, coaching logs and logins are swallowed: the roster shows every athlete with no programme, the Library looks empty, and publish blames a missing category | Fixed | A failed load of programmes, logins, coaching logs or the library shows a 'Not everything loaded' banner, and + Publish refuses while the library is not loaded. |  |
 | TOOLS-10 | medium | The legacy data/*.json fallback and 'Move programmes into the database' are dead code that can still fire: on a programs read error from a local server with the gitignored data/ copy, one click would overwrite live programmes with stale files | Fixed | The old local-file fallback and the 'Move programmes into the database' button are gone, and the File tab says 'create one below' instead of pointing at secret links. |  |
@@ -737,7 +737,7 @@ a contact field holding two numbers matches the second only; the finder cannot b
 
 ## 12. Continue here (rewritten 2026-10-11, fourth session)
 
-<!--T12-->191 findings: 142 fixed, 37 partly, 11 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 31 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open), TOOLS-7 (partly).<!--/T12-->
+<!--T12-->191 findings: 143 fixed, 36 partly, 11 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
 What is left is in three piles: **A** your eleven answers, now jobs; **B** Claude can just do, in order; **C** is outside the audit.
 
 **To start a new chat:** *"Continue the Coach's Box audit: read `Content/COACH-AUDIT.md` §12 and `COACH_DASHBOARD.md`, then do the first job in
@@ -752,7 +752,7 @@ Asked with the question tool. Nothing here waits on a decision any more; one ite
 | A1 | SERVER-14 | You will switch public sign-up off now | I read the project's own public auth settings (`/auth/v1/settings`) and `disable_signup` was **false** (e-mail sign-up on, confirmation required). The 38 accounts are all expected and nothing in the repo calls `signUp` or `signInWithOtp`, so switching it off breaks nothing (athlete and buyer logins are made by the Edge Functions through the admin API). Supabase dashboard → Authentication → Sign In / Providers → User Signups → "Allow new users to sign up" → off. Read it back with `curl -s https://bvipfipbdcyqnbczjmaq.supabase.co/auth/v1/settings -H "apikey: <the publishable key>"` and look for `"disable_signup": true` | **waiting for you**, then read it back |
 | A2 | MKT-16 | Publish the privacy text; the buyer decides why the players' data is collected and you only host it (you are the processor) | Put `Content/PRIVACY-DRAFT-BUYER-ACCOUNTS.md` into `privacy.html` (section 2.10, the short version, the retention lines), saying the buyer is responsible for having the right to record their players. `privacy-fa.html` after you have read the Farsi. A written data-processing term for academies is the usual companion before you sell the testing app to one | todo |
 | A3 | TOOLS-4 | Yes, build and rehearse a restore path | B3 first (record the live definitions the repo lacks), then a full schema snapshot, a restore script, and one rehearsal on a throwaway local Postgres | todo |
-| A4 | TOOLS-7 | "I don't need that publish programme button and never use it": remove the button and the function | Remove ↑ Publish programme file and its code from coach.html, its harness scenarios, the manual and CLAUDE.md | todo |
+| A4 | TOOLS-7 | "I don't need that publish programme button and never use it": remove the button and the function | Remove ↑ Publish programme file and its code from coach.html, its harness scenarios, the manual and CLAUDE.md | **done 2026-10-11** |
 | A5 | FILE-6 | No expiry | nothing (Mark sent and the first sign-in clear a stored password) | decided |
 | A6 | FILE-11, ROSTER-9 | Hide the session and keep it recoverable | A tombstone on `session_history` (a stage file), hide and undo through one coach-only function, every reader leaves hidden sessions out, the athlete app's save must not bring one back, an Undo in the File. Touches program.html | todo |
 | A7 | TOOLS-11 | Fix the wording | The File tab says the preview shows their programme as they see it, without their logged work | todo |

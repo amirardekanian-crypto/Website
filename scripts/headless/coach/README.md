@@ -68,7 +68,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | editor-save-error | server refuses the save | the row kept showing the failed value |
 | editor-stale-overwrite | pipeline publishes after load, then an inline edit | the new cycle was silently reverted |
 | editor-zero-rows | update matches no row | "Saved" toast |
-| editor-wrong-exercise | file publish for an athlete viewed earlier, then ✎ on their page | the edit landed on a different exercise |
+| editor-wrong-exercise | the programme replaced on the server and reloaded (`reloadPrograms`) while an athlete was viewed earlier, then ✎ on their page | the edit landed on a different exercise |
 | auth-TOKEN_REFRESHED / auth-SIGNED_IN | open editor with typed values, auth event | full reload, editor gone |
 | auth-SIGNED_IN-forms | Spine editor / coach line / affiliate form with typed text | Spine editor stayed open with old text; others wiped |
 | note-mark-read | Mark read | ok |
@@ -91,7 +91,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | buyer-notes-fallback | `buyer_notes` missing (stage53 not applied) | the old label shows, nothing breaks, and no banner (expected) |
 | buyer-notes-error | `buyer_notes` fails for a real reason | (review) every buyer showed with no note, silently; now the banner names *your notes about buyers* |
 | version-restore | Restore a version, then The work | showed the pre-restore programme |
-| program-file-publish | ↑ Publish programme file (in Coach tools), then the athlete page; a NEW athlete | showed the old cycle; a new athlete was missing until Refresh |
+| no-program-file-button | Athletes → Coach tools after the upload button was removed (pile A4, 2026-10-11) | the line offers Add coaching logs and Backup only; `pickProgramFile` is gone |
 | backup-basic | every table, every row; passwords | unsent initial passwords were in the file |
 | backup-incomplete | a table cannot be read during a backup, then a complete backup | (pile B2, TOOLS-3) an incomplete file had the plain name, counted as the weekly backup and silenced the reminder; now `aa-backup-INCOMPLETE-<date>.json`, `complete: false`, the alert says it is not a restore point, Today and the Coach tools line keep asking |
 | backup-paging | 2,345 rows; 500-row cap; a write mid-backup | unordered OFFSET paging (1 row lost + 1 duplicated); a cap under 1000 truncated silently |

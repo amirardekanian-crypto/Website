@@ -193,7 +193,7 @@ row through `get_program()`, which checks who is asking (see "How an athlete is 
 
 `data/<id>.json` is only a local, gitignored working copy on Amir's PC: it is 404 on the live
 site and the app never reads it. A built file reaches the row through `/program-assemble`'s
-publish step, or coach.html → Athletes → Coach tools → **↑ Publish programme file**.
+publish step (`publish_cycle()`); the dashboard has no upload button since 2026-10-11.
 
 ---
 
@@ -994,7 +994,7 @@ single unbroken paragraph, it renders as one dense block with no visual structur
 1. Copy any existing JSON file (e.g. `john_doe.json`)
 2. Rename to `new_athlete.json`
 3. Update `athlete`, `sport`, `cycles`, and `workouts`
-4. Publish it into `public.programs` — coach.html → Athletes → Coach tools → **↑ Publish programme file**.
+4. Publish it into `public.programs` — `/program-assemble`'s publish step (`publish_cycle()` with `p_new_cycle => false`).
    `data/*.json` is gitignored and 404 on the live site; the row is what the app serves.
 5. Give them a login — coach.html → Athletes → the athlete → **Create login**, then send the
    username and password. ⚠️ **Not** a `?client=` link: those are retired and refused.

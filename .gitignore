@@ -13,8 +13,8 @@ data/patch_jsons_1.py.txt
 
 # Athlete JSONs are NO LONGER pushed. Programmes live in the Supabase `programs`
 # table; program.html, habits.html and coach.html all read them from there. The
-# coaching pipeline still WRITES data/<id>.json as a local working file — publish it
-# with coach.html → Athletes → "Publish programme file". Committing one would put
+# coaching pipeline still WRITES data/<id>.json as a local working file — it goes up through
+# publish_cycle() (/program-assemble). Committing one would put
 # every programme, and the athlete keys 30 of them carry, back on the public web.
 data/*.json
 !data/.gitkeep

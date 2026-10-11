@@ -86,7 +86,8 @@ public inside `get_program()` so the marketing link still opens.
 `data/<id>.json` as a working artifact, but that file is never published as a file: a new cycle
 goes up in ONE call to **`public.publish_cycle()`** (`supabase/stage38_publish_cycle.sql`, 2026-09-26:
 archive, cycle advance, workouts, notes, roadmap patch and the coaching-log splice, all or nothing,
-returning the fingerprint), or by hand through coach.html → Athletes → Coach tools → **↑ Publish programme file**.
+returning the fingerprint); a NEW athlete's first programme goes up the same way (`p_new_cycle => false`). The dashboard has no
+upload button: **↑ Publish programme file** was removed with its function on 2026-10-11 (Amir: *"i never use it"*).
 Execute is revoked from anon and authenticated. Day-to-day changes (sets, reps, RPE,
 tempo, rest, the coach's note) are made in the dashboard's inline editor, which writes
 straight to `programs` and keeps the previous version in `program_versions`.

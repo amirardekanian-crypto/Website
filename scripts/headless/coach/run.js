@@ -197,18 +197,19 @@ S['auth-SIGNED_IN-forms'] = async (b) => {
 
 // ── 6c. Stale athlete view after a programme reload: the editor writes to whatever sits at that index now ──
 S['editor-wrong-exercise'] = async (b) => {
-  const r = { id: 'editor-wrong-exercise', title: 'Publish a new file for an athlete viewed earlier, then edit a row on their (stale) page', checks: [] };
-  const { page, seed } = await L.openCoach(b, { hash: 'a/ava_test/work' });
-  const file = JSON.parse(JSON.stringify(seed.db.programs[0].data));
-  file.athlete.id = 'ava_test';
-  file.cycles = [{ name: 'Cycle 3 — New File', weeks: '4 weeks' }];
-  // the new cycle's Day 1 Primary block starts with a different lift
-  file.workouts.days[0].blocks[1].exercises = [{ name: 'Box Jump', type: 'standard', rx: { sets: 3, reps: 5 } }, { name: 'Chest-Supported Dumbbell Row', type: 'standard', rx: { sets: 3, reps: 12, rpe: 8 } }];
-  const fp = path.join(L.OUT, 'ava_test.newcycle.json'); fs.writeFileSync(fp, JSON.stringify(file));
+  const r = { id: 'editor-wrong-exercise', title: 'The programme is replaced on the server and reloaded while an athlete was viewed earlier, then edit a row on their (stale) page', checks: [] };
+  const { page } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  // The new cycle's Day 1 Primary block starts with a different lift. A restored version, a cycle from the pipeline and a refresh all
+  // end like this: the page reloads the programmes (reloadPrograms) while the athlete's file was drawn from the old ones.
+  await page.evaluate(() => {
+    const row = window.__DB.programs.find(p => p.athlete_id === 'ava_test');
+    const d = JSON.parse(JSON.stringify(row.data));
+    d.cycles = [{ name: 'Cycle 3 — New File', weeks: '4 weeks' }]; d.currentCycleIndex = 0;
+    d.workouts.days[0].blocks[1].exercises = [{ name: 'Box Jump', type: 'standard', rx: { sets: 3, reps: 5 } }, { name: 'Chest-Supported Dumbbell Row', type: 'standard', rx: { sets: 3, reps: 12, rpe: 8 } }];
+    row.data = d; row.updated_at = new Date(Date.now() + 1000).toISOString(); row.updated_by = 'publish_cycle';
+  });
   await L.go(page, 'athletes');
-  const [chooser] = await Promise.all([page.waitForEvent('filechooser'), (async () => { await page.evaluate(() => document.querySelectorAll('details.tools').forEach(d => d.open = true)); await page.locator('button', { hasText: 'Publish programme file' }).click(); })()]);
-  await chooser.setFiles(fp);
-  await L.settle(page, 900);
+  await page.evaluate(() => reloadPrograms().then(render)); await L.settle(page, 700);
   await L.go(page, 'a/ava_test/work');
   const rowName = await page.locator('.wday.open .cmp-row').nth(1).locator('.cmp-nm').innerText();
   const editableGoblet = await page.locator('.wday.open .cmp-row', { hasText: 'Goblet Squat' }).locator('.rx-edit').count();
@@ -535,34 +536,19 @@ S['version-restore'] = async (b) => {
   return r;
 };
 
-// ── 17. Publish a programme file while that athlete was open ──────────────────
-S['program-file-publish'] = async (b) => {
-  const r = { id: 'program-file-publish', title: 'Athletes → ↑ Publish programme file (athlete viewed earlier)', checks: [] };
-  const { page, seed } = await L.openCoach(b, { hash: 'a/ava_test/work' });
-  const file = JSON.parse(JSON.stringify(seed.db.programs[0].data));
-  file.athlete.id = 'ava_test';
-  file.cycles = [{ name: 'Cycle 9 — From The File', weeks: '4 weeks' }];
-  const fp = path.join(L.OUT, 'ava_test.fixture.json'); fs.writeFileSync(fp, JSON.stringify(file));
+// ── 17. The programme-file upload is gone (pile A4, 2026-10-11) ───────────────────────────────────────────────
+// Amir: "i dont need that publish programme button and i never use it, remove the whole button and function". New athletes and
+// new cycles go up through publish_cycle() (the pipeline); day-to-day changes through the inline editor.
+S['no-program-file-button'] = async (b) => {
+  const r = { id: 'no-program-file-button', title: 'Athletes → Coach tools has no programme-file upload any more', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
   await L.go(page, 'athletes');
-  const [chooser] = await Promise.all([page.waitForEvent('filechooser'), (async () => { await page.evaluate(() => document.querySelectorAll('details.tools').forEach(d => d.open = true)); await page.locator('button', { hasText: 'Publish programme file' }).click(); })()]);
-  const n0 = await L.nCalls(page);
-  await chooser.setFiles(fp);
-  await L.settle(page, 900);
-  const up = lastOf(await L.callsSince(page, n0), c => c.name === 'programs' && c.op === 'upsert');
-  check(r, 'programs.upsert onConflict athlete_id', up && up.opts.onConflict === 'athlete_id', up && up.opts);
-  await L.go(page, 'a/ava_test/work');
-  const head = await page.locator('.cycbar').innerText().catch(() => '');
-  check(r, 'the athlete page shows the published cycle', /From The File/i.test(head), head);
-  // a brand-new athlete published the same way
-  const nf = JSON.parse(JSON.stringify(file)); nf.athlete.id = 'zed_new'; nf.athlete.firstName = 'Zed';
-  const fp2 = path.join(L.OUT, 'zed_new.fixture.json'); fs.writeFileSync(fp2, JSON.stringify(nf));
-  await L.go(page, 'athletes');
-  const [ch2] = await Promise.all([page.waitForEvent('filechooser'), (async () => { await page.evaluate(() => document.querySelectorAll('details.tools').forEach(d => d.open = true)); await page.locator('button', { hasText: 'Publish programme file' }).click(); })()]);
-  await ch2.setFiles(fp2);
-  await L.settle(page, 900);
-  const onRoster = await page.locator('#rosterBox .ath', { hasText: 'Zed' }).count();
-  const inDb = (await L.db(page)).programs.some(p => p.athlete_id === 'zed_new');
-  check(r, 'a NEW athlete appears on the roster after "Programme published"', onRoster === 1, { onRoster, inDb, toast: await L.toastText(page) });
+  await page.evaluate(() => document.querySelectorAll('details.tools').forEach(d => d.open = true));
+  const tools = (await page.locator('details.tools').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the Coach tools line still offers Add coaching logs and Backup', /Add coaching logs/.test(tools) && /Backup/.test(tools), tools);
+  check(r, 'and no programme-file upload, in the line or its note', !/programme file|Publish programme|upload button/i.test(tools.replace(/there is no upload button/i, '')), tools);
+  check(r, 'the function is gone from the page', await page.evaluate(() => typeof pickProgramFile === 'undefined'), '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
 };

@@ -1724,78 +1724,6 @@ function viewAsAthlete(athleteId, which) {
   window.open(`${SITE}/${page}?client=${encodeURIComponent(athleteId)}&preview=1`, '_blank', 'noopener');
 }
 
-// Publish a programme JSON straight from disk into the database.
-//
-// The coaching pipeline (/program-assemble and friends) still writes a local
-// data/<id>.json — that stays exactly as it was. What changed is where the file
-// goes afterwards: it used to be committed and served publicly; now it is
-// uploaded here and the file never leaves the machine. This is the only route
-// for a NEW athlete or a whole-cycle rewrite; day-to-day changes go through the
-// inline editor.
-function pickProgramFile() {
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'application/json,.json';
-  input.onchange = async () => {
-    const file = input.files && input.files[0];
-    if (!file) return;
-    let data;
-    try {
-      data = JSON.parse(await file.text());
-    } catch (e) {
-      alert('That file is not valid JSON:\n\n' + e.message);
-      return;
-    }
-    // Guard against publishing a half-written or wrong-shaped file. The athlete
-    // block is the one thing every consumer reads — program.html and habits.html
-    // both take the name and tier from it.
-    if (!data || typeof data !== 'object' || !data.athlete || typeof data.athlete !== 'object') {
-      alert('That file has no "athlete" block, so it is not a programme file.');
-      return;
-    }
-    const id = String(data.athlete.id || '').trim();
-    if (!/^[A-Za-z0-9_]+$/.test(id)) {
-      alert('The athlete.id in that file is missing or has characters that are not allowed.\n\nFound: "' + id + '"');
-      return;
-    }
-    // The pipeline names the file after the athlete (data/<id>.json). A file whose name and
-    // athlete.id disagree is the wrong file, or a copy edited for someone else.
-    // "ava.json", "ava (1).json" and "ava.cycle3.json" all name ava; "ava_2.json" names someone else.
-    const stem = file.name.replace(/\.json$/i, '');
-    if (stem !== id && !(stem.startsWith(id) && /^[\s.\-(]/.test(stem.slice(id.length)))) {
-      alert(`The file is called "${file.name}" but its athlete.id is "${id}".\n\nNothing was published. Check you picked the right file (the pipeline writes data/<id>.json).`);
-      return;
-    }
-    if (LOAD_ERR.programs) { alert('Programmes did not load, so I cannot tell whether this would replace a newer one. Tap ↻ Refresh first.'); return; }
-    const existing = S.programs[id];
-    const meta = S.progMeta[id] || {};
-    const days = (data.workouts && data.workouts.days || []).length;
-    const cyc = p => { const c = p && p.cycles && p.cycles[p.currentCycleIndex || 0]; return c ? (c.name || ('cycle ' + ((p.currentCycleIndex || 0) + 1))) : '—'; };
-    const fileTime = file.lastModified ? new Date(file.lastModified) : null;
-    const liveTime = meta.updated_at ? new Date(meta.updated_at) : null;
-    const liveNewer = existing && fileTime && liveTime && liveTime > fileTime;
-    const what = existing
-      ? `Replace ${nameOf(id)}'s programme (${id})?\n\n` +
-        `Live now: ${cyc(existing)} · ${(existing.workouts && existing.workouts.days || []).length} days · last saved ${liveTime ? fmtLocalStamp(meta.updated_at) : '—'}${meta.updated_by ? ' by ' + meta.updated_by : ''}\n` +
-        `This file: ${cyc(data)} · ${days} days · saved ${fileTime ? fmtLocalStamp(fileTime.toISOString()) : '—'}\n` +
-        (liveNewer ? `\n⚠ THE LIVE PROGRAMME IS NEWER THAN THIS FILE. Publishing it puts an older version back (an edit made here, or a cycle published by the pipeline, would be lost from the live app).\n` : '') +
-        `\nNew cycles normally go up through the pipeline (publish_cycle). The current version is kept in Version history, so this is reversible.`
-      : `Publish a NEW programme for "${id}"?\n\nNothing exists for that id yet — check the spelling, because a typo creates a second athlete.\n\n${file.name} · ${cyc(data)} · ${days} training day${days === 1 ? '' : 's'}`;
-    if (!confirm(what)) return;
-
-    const res = await sb.from('programs')
-      .upsert({ athlete_id: id, data }, { onConflict: 'athlete_id' }).select('athlete_id');
-    const bad = writeFailed(res, 'published');
-    if (bad) { alert('Could not publish: ' + bad); return; }
-
-    await reloadPrograms();
-    render();
-    toast(existing ? 'Programme replaced' : 'Programme published');
-  };
-  input.click();
-}
-
 // The same "counts as a logged day" test contact_list() uses server-side: the
 // day's value is an object with at least one key. Presence, not score.
 // ── Body weight ───────────────────────────────────────────────────────────
@@ -2826,12 +2754,11 @@ function renderAthletes() {
         : ''}
     </div>
     <details class="tools">
-      <summary>Coach tools · publish a programme file, add coaching logs, back up${lb ? ' (last complete backup ' + esc(timeAgo(lb)) + ')' : ' (no complete backup on this computer yet)'}${lbBad ? ' · the last try was INCOMPLETE' : ''}</summary>
+      <summary>Coach tools · add coaching logs, back up${lb ? ' (last complete backup ' + esc(timeAgo(lb)) + ')' : ' (no complete backup on this computer yet)'}${lbBad ? ' · the last try was INCOMPLETE' : ''}</summary>
       <div class="tools-in">
-        <button class="btn sm" onclick="pickProgramFile()" title="Publish a data/&lt;id&gt;.json written by the coaching pipeline">↑ Publish programme file</button>
         <button class="btn sm" onclick="pickCoachingLogs()" title="Add a coaching log from a .md file for an athlete who has none on the server yet. Never replaces one.">↑ Add coaching logs</button>
         <button class="btn sm" onclick="downloadBackup(this)">⤓ Backup</button>
-        <span class="tools-note">New cycles normally go up through the pipeline (publish_cycle); the file button is for a new athlete or a hand fix.
+        <span class="tools-note">New athletes and new cycles go up through the pipeline (publish_cycle); there is no upload button.
           Back up weekly: the free plan keeps no backups. Keep the last 12 files, on this computer and off it, and delete older ones (the privacy notice promises about three months).</span>
       </div>
     </details>
