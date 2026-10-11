@@ -1,11 +1,16 @@
 # Draft: what the privacy notices should say about course and testing-app accounts
 
-**Status: a proposal for Amir. Nothing here is on the site.** It answers coach.html audit finding MKT-16 (the notices
-say nothing about the course app, the testing app, their accounts or the testing app's players) and is the text the
-new **Erase…** button (stage54) keeps true. It needs your word, and for the testing app it needs a decision from you
-(or advice) on one legal point, below. If you approve it, I add it to `privacy.html` and, after you have read the Farsi,
-`privacy-fa.html`, in the same release. Nothing in the notices needs to change for athletes: the existing promises
-(delete on request, gone from backups within about three months) are exactly what *Erase completely…* now does.
+**Status (2026-10-11): the English text is PUBLISHED in `privacy.html`** (section 2.10, short-version lines 1 and 2, the retention line
+and the erasure-receipt paragraph; last updated 11 October 2026). You decided the legal point below: the buyer decides why the players'
+data is collected and you only host it, so the text says the buyer is responsible for having the right to record their players and that
+you store it for them. **`privacy-fa.html` is not changed yet:** its Farsi lines are at the end of this file and ship after you have
+read them. It answers coach.html audit finding MKT-16 (the notices said nothing about the course app, the testing app, their accounts
+or the testing app's players) and is the text the **Erase…** button (stage54) keeps true. Nothing in the notices needs to change for
+athletes: the existing promises (delete on request, gone from backups within about three months) are exactly what *Erase completely…* now does.
+
+The published words differ from the draft below in four places: the "Who decides about the players" paragraph (your decision), a sentence
+that removing a player in the testing app only hides it (true today; the erasure takes the hidden ones too), one line in the short version
+that the players are the buyer's to decide about, and no dash in the lawful-basis line (the notice is waiting for its plain-words pass).
 
 ## What is true today (checked against the database, 2026-10-11)
 
@@ -53,9 +58,21 @@ new **Erase…** button (stage54) keeps true. It needs your word, and for the te
   restore an old backup, that I do not bring back someone I already erased."
 - **Section 3 (What I do not do):** nothing to add.
 
-## The one decision for you
+## The one decision for you (decided 2026-10-11: the buyer decides, you host)
 
 For the testing app's players, are you the **controller** of that data (you decide why it is collected) or a **processor** for
 the academy that is the controller? The text above avoids the word by saying the buyer is responsible for having the right to
 record people, which is true either way, but a lawyer (or the ICO's controller/processor checklist) should say which it is
 before you sell the app to organisations: a processor has to be bound by a written agreement.
+
+## Farsi text for `privacy-fa.html` (needs your reading before it ships)
+
+`privacy-fa.html` is a one-page summary, so it gets two changed lines and one new line, not a section. Your voice, colloquial.
+
+**Line 1 (changed):** من امیر اردکانی‌ام و توی بریتانیا، به‌صورتِ شخصی (نه شرکت)، کار می‌کنم. من تصمیم می‌گیرم اطلاعاتِ تو چطور استفاده بشه، به‌جز بازیکن‌هایی که خریدار توی اپِ تست وارد می‌کنه: دربارهٔ اون‌ها خریدار تصمیم می‌گیره و من فقط نگهشون می‌دارم. ایمیلم: amirardekanian@gmail.com
+
+**Line 2 (changed):** اطلاعاتی رو نگه می‌دارم که خودت بهم می‌دی: فرمِ درخواست (با آسیب‌دیدگی‌هایی که می‌نویسی)، تمرین‌ها و تیکِ عادت‌هات توی اپ، اسم و ایمیل و شماره‌ی واتساپت اگه ردیابِ رایگان بخوای، و اگه دوره یا اپِ تست رو بخری، نام‌کاربری‌ت و بازیکن‌هایی که توی اپِ تست وارد می‌کنی.
+
+**New line (after line 7):** اگه دوره‌ی تنیس یا اپِ تست رو بخری، یه نام‌کاربری و رمز برات می‌سازم. نام‌کاربری، تاریخِ ساخت و یه یادداشتِ خصوصیِ خودم رو نگه می‌دارم که فقط خودم می‌بینمش. دوره روی گوشی‌ت دانلود می‌شه و پیشرفتت رو برام نمی‌فرسته. اپِ تست چیزهایی که توش وارد می‌کنی (بازیکن‌ها، یادداشت‌ها، نتیجه‌ها) رو توی پایگاه‌داده‌م نگه می‌داره. نمی‌خونمشون و برای کارِ دیگه‌ای ازشون استفاده نمی‌کنم. این‌که چرا و چطور ثبتشون می‌کنی با خودته، و باید حقِ ثبتِ اطلاعاتِ اون آدم‌ها رو داشته باشی (به‌خصوص بچه‌ها). «حذفِ بازیکن» توی اپ فقط پنهونش می‌کنه؛ بخوای، حسابت و همه‌چیزِ زیرش، حتی پنهون‌شده‌ها، رو یه‌جا پاک می‌کنم. این بخش در متنِ کامل بخشِ ۲٫۱۰ ـه.
+
+The date line becomes «آخرین به‌روزرسانی: ۱۱ اکتبرِ ۲۰۲۶». Say the word after you have read it and I will make the change, run the style guard and push.
