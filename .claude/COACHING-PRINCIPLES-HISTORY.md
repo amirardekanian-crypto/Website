@@ -271,6 +271,7 @@ the principles (their *How to add*).
 - `COM-2` **The WhatsApp handoff messages are PIPELINE OUTPUT, and they are written in the ATHLETE'S OWN LANGUAGE — not English, and not on request.**
   - Amir, 2026-08-08: "this actually should be part of our program writing pipeline."
   - 2026-08-08
+  - 2026-10-11: one message, not two (with COM-17).
 - `COM-3` `COM-4` **⚠️ EVERY word an athlete reads must sound like AMIR wrote it — not like AI wrote it.**
   - Amir, 2026-07-30, verbatim: "write in a friendly human voice, dont let them think ai wrote these, let them think i wrote them, and my english is not very high level."
 - `COM-5` **Notes speak in the athlete's app language — day numbers + on-screen names, never design-side shorthand.**
@@ -301,6 +302,7 @@ the principles (their *How to add*).
 - `COM-17` **The WhatsApp messages point into the app; they never rewrite it.**
   - Amir, 2026-10-11, after a cycle's two handoff messages restated the cards (the cough rule, the food, the period week) in full: "if something is inside the app show them how to find those with a very brief explanation of how to find them … if the info exist in their app, show them how to find them instead of writring the whole thing again in a very long message."
   - 2026-10-11
+  - Amir, same day, on the proposal (one message, only what is new for a returning athlete, a gist plus where): "this text is too short, can be longer a bit specially for people who are doing the first time. we dont need reminders, we just advise people to go to the doctor, but if they went to doctor, and reported, we may adjust the program. if they didnt, we dont care"
 
 ## Coaching cues
 

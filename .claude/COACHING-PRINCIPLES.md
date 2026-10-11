@@ -177,7 +177,7 @@ stale copy reached athletes.
 | ID | Rule | Stage | Check |
 |---|---|---|---|
 | COM-1 | In-app athlete text (message, outcomes, notes, completion text) is English. | engage | |
-| COM-2 | Two WhatsApp messages ship with every programme, in the athlete's own language (Farsi: Persian numerals, Persian date first). | engage | |
+| COM-2 | One WhatsApp handoff message ships with every programme, in the athlete's own language (Farsi: Persian numerals, Persian date first). | engage | |
 | COM-3 | Everything an athlete reads sounds like Amir typed it: plain words, short sentences; no em-dashes, semicolons, triads or brochure lines. | engage · report | warn (em-dash) |
 | COM-4 | 5–10 personal Becauses (`why`) a cycle, on exercises chosen for this athlete: the body part not the diagnosis, the next step not the failure. | engage | ✓ |
 | COM-5 | Notes name days as Day N and their on-screen names, never internal labels like "the Control day". | engage | |
@@ -192,7 +192,7 @@ stale copy reached athletes.
 | COM-14 | A Coach's Note is one to three short sentences of plain text about this athlete only; never a cue. | engage | |
 | COM-15 | A Because is one sentence of 140 characters at most, written fresh each cycle, never carried over. | engage | ✓ (140 characters) |
 | COM-16 | A week note is one or two short sentences under about 260 characters, starting with the instruction; no notes card repeats it. | engage | warn (length, label) |
-| COM-17 | WhatsApp never repeats the app: for anything the app holds, say what to do and where it is (tab, then card) in one line. | engage | |
+| COM-17 | The handoff message points into the app: each action is a one-line gist plus where it is; never a card's full text. | engage | |
 
 ### Coaching cues & the library
 | ID | Rule | Stage | Check |
@@ -864,16 +864,12 @@ same ID. Read a rule's story and its history before changing it.
 
 ## Communication & in-app text
 - `COM-1` **In-app athlete text (message, outcomes, notes, completion) is ENGLISH.**
-- `COM-2` **The WhatsApp handoff messages are PIPELINE OUTPUT, and they are written in the ATHLETE'S OWN
-  LANGUAGE — not English, and not on request.** Every finished programme ships with two: **(1)** the
-  introduction — link, why their programme looks the way it does in plain words they recognise
-  from their own body, the week's shape, what they'll have by the end; **(2)** what to watch for —
-  what to film and what it unlocks, dated appointments + escalation triggers, the weekly measures,
-  fuelling, the rest rule, and the modification menu. Farsi for Iran-based athletes, English
-  otherwise. In Farsi use Persian numerals and put the **Persian calendar date first** with the
-  Gregorian in brackets. These never enter the programme — the in-app text stays English.
-  Message 2 names the back-off week with its dates. Owned by /program-engage PART 5. Both are short and
-  point into the app for anything it already holds (COM-17).
+- `COM-2` **The WhatsApp handoff message is PIPELINE OUTPUT, and it is written in the ATHLETE'S OWN
+  LANGUAGE — not English, and not on request.** Every finished programme ships with ONE message (two until
+  2026-10-11): what changed and why, the week, this cycle's actions pointed into the app (COM-17), what they
+  will have by the end, then dates and questions. Farsi for Iran-based athletes, English otherwise. In Farsi
+  use Persian numerals and put the **Persian calendar date first** with the Gregorian in brackets. It never
+  enters the programme — the in-app text stays English. Owned by /program-engage PART 5.
 - `COM-3` `COM-4` **⚠️ EVERY word an athlete reads must sound like AMIR wrote it — not like AI wrote it.**
    This governs
   all athlete-facing copy: cycle messages, notes cards, Coach's Notes, completion messages,
@@ -921,7 +917,7 @@ same ID. Read a rule's story and its history before changing it.
    Design lists the keys that apply (`backoff`, `week1`, `explainer`,
   `pain-ladder`, `modification-menu`, `film`, `weigh-in`, `double-day`, `low-readiness`, `period`,
   `start-lower`, `close-loop`, `win`); engage writes each and tags its card; the same list drives
-  WhatsApp message 2 and Amir's handoff. A required note is written first, before the breadth.
+  the WhatsApp message's action lines (COM-17) and Amir's handoff. A required note is written first, before the breadth.
 - `COM-10` **Notes card count is a byproduct, not a target — never pad.** Write every mandatory note
   that applies plus whatever else is genuinely load-bearing this cycle; a simple cycle with
   less to say gets fewer, sharper cards. Manufacturing a card to hit a number produces exactly
@@ -951,13 +947,20 @@ same ID. Read a rule's story and its history before changing it.
 - `COM-14` **A Coach's Note is one to three short sentences.** Plain text, about this athlete only, never a cue (CUE-2). Three copies said one sentence (design, edit and the cue story) and two said one to three (engage, SCHEMA); Amir chose one to three on 2026-09-26, because a note sometimes carries a starting weight and a caveat.
 - `COM-15` **A Because is one sentence of 140 characters at most, written fresh each cycle.** A reason from Cycle 1 is stale by Cycle 3, so it is never carried over.
 - `COM-16` **A week note is short and says it once.** One or two short sentences under about 260 characters, starting with the instruction (the app already prints *Week 1* or *Back-off week* above it), and no notes card repeats it.
-- `COM-17` **The WhatsApp messages point into the app; they never rewrite it.** Anything the app already
-  holds (a notes card, a Coach's Note, a week note, the weigh-in, the check-in, a film instruction) gets ONE
-  line: what to do and where to find it, by the app's own names (*Coach tab → "The Cough Rule"*, *Home →
-  Body Weight*, *the clay dot on the exercise*). "I want a video of your split squat in week 2: the how-to is
-  on the exercise's Coach's Note" is the whole line. Only what the app does not hold is written out: why the
-  programme looks the way it does, a date with its trigger, a question. Short is the point: a long message
-  repeats the app, the athlete reads neither, and the two copies drift apart.
+- `COM-17` **The handoff message points into the app; it never rewrites it.** The cards, Coach's Notes and
+  week notes hold everything in full, so a line about anything the app holds is a short gist in the athlete's
+  language (what to do) plus where it is, by the app's own names: *"if the cough won't settle, stop and
+  message me ← Coach ← The Cough Rule"*, *"weigh in once a week ← Home ← Body Weight"*, *"film your split
+  squat in week 2; how to film it is on the exercise's clay dot"*. The gist matters because the app is in
+  English and the message is in their language: a bare pointer leaves them reading an English card to learn
+  what to do. Only what the app does not hold is written out: why, a date, a question.
+  - **Length:** about 12 to 15 lines for a returning athlete; about 20 to 25 for a new one, the extra being
+    the sign-in and a short tour of where things are, never card content.
+  - **A returning athlete hears only what is new or changed this cycle**, plus the good news; the rest is
+    one line (*everything else is where it always is, on the Coach tab*). Week 1 and the back-off week are
+    never in the message: Home shows each in its own week.
+  - **A doctor is advised once, never chased.** No reminder is written for later, and nothing waits on it:
+    if the athlete goes and reports back, the programme may change; if not, nothing follows.
 
 ## Coaching cues
 - `CUE-1` **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an

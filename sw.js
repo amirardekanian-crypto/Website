@@ -188,11 +188,22 @@
 //      Arabic-Indic digits as 0-9 in the username, and retries once with them folded (and the ends trimmed)
 //      when the password as typed fails. Every password is plain English and ends in digits, so a Farsi
 //      keyboard used to fail every sign-in. (Made as v96 on a branch alongside PROG-02's v96/v97.)
-// v99: habits.html changed (2026-10-11, coach.html audit TODAY-1, stage55): a quest run the coach ENDS early keeps an `end` day, and
+// v99: program.html changed (2026-10-11): two texts in the in-app guide now match the app. "Getting around" lists
+//      the tabs in the bar's order (Home · Coach · Library · Game Plan), and "How your program is structured"
+//      sends the "Why This Cycle Matters" note to Game Plan, where it is, not Home. And first-timer fixes found by walking
+//      the app (Content/CLIENT-APP-MAP.md): the Library counts retry after a failed first load instead of freezing at 0,
+//      Game Plan's dates are the cycle's own local days (they showed a day early west of UTC), Reset clears a circuit's
+//      round ratings, the sore-only line reads properly, sign-in's "Message Amir" is a WhatsApp link, the grey
+//      "Begin session" counts the answers (3 of 5 answered), and after the last card closes the page scrolls to the finish card.
+//      Then Amir's calls on the rest: a first-timer's circle on a closed card opens it, a set ticked with no weight nudges
+//      (the rule that only typed weights count stands), the clock is offered once a day, the Welcome has a ✕ and Back closes
+//      it, only Game Plan's Active banner goes Home, the rest pill is gone (the card's Rest ⏱ button and Guided remain), and the
+//      notes appear in a box in the middle of the screen.
+// v100: habits.html changed (2026-10-11, coach.html audit TODAY-1, stage55): a quest run the coach ENDS early keeps an `end` day, and
 //      runEndKey() stops the run there (a quest completed by then keeps paying, one not completed never does), the same bound the
 //      server's hab_bonus_xp() now reads. Without the bump an installed phone would keep scoring an ended run to its seventh day
 //      while the board stopped at the end day.
-const CACHE = 'aap-v99';
+const CACHE = 'aap-v100';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
