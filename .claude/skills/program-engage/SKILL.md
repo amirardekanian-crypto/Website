@@ -204,21 +204,20 @@ For each training day in the program spec (Day 1…N), tied to that day's focus 
 it serves the goal. Triumphant, not cheesy; one breath of recovery guidance is fine.
 Per day: `DAY [n] — [focus]` · `Title:` (2–4 words) · `Message:` (1–2 sentences).
 
-## PART 5 — WHATSAPP HANDOFF MESSAGES (always produced, in the ATHLETE'S OWN LANGUAGE)
+## PART 5 — THE WHATSAPP HANDOFF MESSAGE (always produced, in the ATHLETE'S OWN LANGUAGE)
 *(Amir, 2026-08-08: "this actually should be part of our program writing pipeline.")* The in-app
-text stays English (PART 1–4). These two are what Amir actually pastes into WhatsApp to hand the
-programme over, so they are written in **the athlete's own language** — Farsi for Iran-based /
-Farsi-speaking athletes, English otherwise. They are pipeline output now, not an on-request extra.
-They live in chat + a scratch file, **never** in `data/<id>.json`.
+text stays English (PART 1–4). This one message is what Amir pastes into WhatsApp to hand the
+programme over, so it is written in **the athlete's own language** — Farsi for Iran-based /
+Farsi-speaking athletes, English otherwise (COM-2). It lives in chat + a scratch file, **never** in
+`data/<id>.json`.
 
-**Both messages are SHORT and point into the app (COM-17, Amir 2026-10-11).** The cards, the Coach's
-Notes and the week notes already say everything in full. So for anything the app holds, write ONE line:
-what to do, and where to find it, by the app's own names. Never restate a card's content. Only what the
-app does not hold is written out: why the programme looks the way it does, a date with its trigger, a
-question. If a line starts explaining HOW, it belongs in the app, not in the message.
+**It points into the app; it never rewrites it (COM-17, Amir 2026-10-11).** The cards, the Coach's Notes
+and the week notes hold everything in full. A line about something the app holds is a short gist in the
+athlete's language (what to do) plus where it is, by the app's own names. The app is in English, so keep
+its labels in English inside a Farsi message. Only what the app does not hold is written out: why, a date,
+a question. If a line starts explaining HOW, it belongs in the app.
 
-**Where things are (use these names; the app is in English, so keep its labels in English inside a Farsi
-message):**
+**Where things are:**
 
 | what | where the athlete finds it |
 |---|---|
@@ -231,44 +230,55 @@ message):**
 | how the app works (RPE, tempo, Guided) | **Coach** tab → *How the app works* (or their initials, top right) |
 | the whole plan, this cycle and the next | **Game Plan** tab |
 
-**MESSAGE 1 — the introduction, about six lines.** **A new athlete:** welcome · tell them to sign in with
-**their username and password** — ⚠️ **NEVER a `?client=`/`&key=` link. Every secret link was retired
-2026-09-07 and `athlete_keys` is empty, so any such URL is refused whatever key it carries.** If they have
-no login yet, say so in the handoff: Amir creates it in coach.html → Athletes → Create login (Claude
-can't) · one line telling them to add it to their home screen. **A returning athlete** already has all
-that, so their message opens the new cycle instead: its name, its dates and what changed. **Then, for
-both:** why their programme looks the way it does, in one or two plain sentences they recognise from their
-own body · the week's shape in one line and the day that matters most · what they'll have by the end, in
-one line. Nothing a card says.
+**Length:** about 12 to 15 lines for a returning athlete; about 20 to 25 for a new one. A new athlete's
+extra lines are the sign-in and the tour, never card content.
 
-**MESSAGE 2 — what to do, and where. Built from design's `obligations:` list, not written freehand**
-(COM-9). **One short line per key, the same keys in the same order as the list**: the action, and where it
-is in the app (table above). What each key's line holds:
+**The message, in this order:**
+1. **Opening.** **A new athlete:** welcome · sign in with **their username and password** — ⚠️ **NEVER
+   a `?client=`/`&key=` link. Every secret link was retired 2026-09-07 and `athlete_keys` is empty, so any
+   such URL is refused whatever key it carries.** If they have no login yet, say so in the handoff: Amir
+   creates it in coach.html → Athletes → Create login (Claude can't) · add the app to the home screen ·
+   then a short tour, one line each: **Home** (today's training, This Week, Body Weight, Records), the
+   **check-in** before every session, the **Coach** tab (Amir's notes for them, and WhatsApp), the **clay
+   dot** and the **ⓘ** on an exercise, **Game Plan**, and *How the app works* on the Coach tab for RPE and
+   tempo. **A returning athlete:** the new cycle's name, its dates (COM-2's calendar rule) and what changed
+   from the last one.
+2. **Why** the programme looks the way it does: two or three plain sentences they recognise from their own
+   body.
+3. **The week:** its shape in a line or two, and the day that matters most.
+4. **What to do this cycle**, from design's `obligations:` list, in its order (COM-9). **A new athlete:** a
+   line for every key. **A returning athlete:** only the keys that are new or changed this cycle (no card
+   carried that tag last cycle, `ctx.row.notes`, or the content differs), plus `win` and `close-loop`, then
+   one line: *everything else is where it always is, on the Coach tab*.
+5. **By the end:** what they'll have, in a line.
+6. **Dates and questions:** only what no card holds. A doctor or physio is advised in one line, with its
+   date when there is one. Then any open question (the kit at their gym, a missing history), so the answer
+   comes back without a separate ask.
 
-| key | the line: the action · where |
+| key | the line: the gist · where |
 |---|---|
-| `backoff` | the back-off week's dates (COM-2's calendar rule) · *Home → This Week* says what changes |
-| `week1` | week 1's dates and "lighter this week" · *Home → This Week* says how |
 | `explainer` | read it before Day 1 · *Coach* tab → the card's title |
-| `pain-ladder: <part>` | the one stop rule (stop, message Amir the same day) · *Coach* tab → the card |
+| `pain-ladder: <part>` | the stop rule in half a line (stop, message Amir the same day) · *Coach* tab → the card |
 | `modification-menu` | tell Amir and he changes it, nothing gets banned (INT-10; for a pain-hiding athlete this is the line that matters most, so give it two sentences) · *Coach* tab → the card |
-| `film: <what, weeks>` | film the exercise in which weeks and send it on WhatsApp · the how-to is on that exercise's Coach's Note (or its card); say what it unlocks (PRC-8) |
+| `film: <what, weeks>` | film what, in which weeks, sent on WhatsApp, and what it unlocks (PRC-8) · how to film it: the clay dot on that exercise |
 | `weigh-in` | how often · *Home → Body Weight → Weigh in* |
 | `double-day` | the order on a day with both sport and gym · *Coach* tab → the card |
-| `low-readiness` | answer the check-in honestly · the app lowers the day for them; the *Coach* tab card has the rest |
-| `period` | only if design listed it: use the menu that week · *Coach* tab → the card |
+| `low-readiness` | answer the check-in honestly, the app lowers the day · *Coach* tab → the card for the rest |
+| `period` | that week, use the menu · *Coach* tab → the card |
 | `start-lower: <what, number>` | start easier for these weeks · *Coach* tab → the card |
-| `close-loop`, `win` | the good news, one line, with its number (nothing to find) |
+| `close-loop`, `win` | the good news, one line, with its number |
+| `week1`, `backoff` | no line: Home shows each in its own week |
 
-**Then, after the list and never between its lines,** only what no card or note holds: a dated
-appointment or referral with its trigger, and any outstanding question (unquantified swim volume, missing
-history, does your gym have the kit), so the answer comes back without a separate ask. Fuelling, rest and
-anything else with a card get a pointer, not a paragraph.
+**A doctor is advised, never chased** (Amir, 2026-10-11: *"we just advise people to go to the doctor, but
+if they went to doctor, and reported, we may adjust the program. if they didnt, we dont care"*). One line in
+the message, no reminder written for later, and nothing in the programme waits on it. A report back goes
+through /program-edit.
 **Self-check, one line, coach-only, under the message (never pasted to the athlete):**
-`MSG2 CHECK — obligations N · lines N · same order ✓ · nothing a card says is repeated ✓`. Assemble copies
-the count into its OBLIGATIONS CHECK (Step 6a).
+`MSG CHECK — obligations N · lines M (new athlete: all; returning: the new or changed keys, named) ·
+week1/backoff left to Home ✓ · nothing a card says is repeated ✓`. Assemble copies it into its
+OBLIGATIONS CHECK (Step 6a).
 
-Voice: COM-3, for both messages and for every line built from the list: the tables above say
+Voice: COM-3, for the whole message and every line built from the list: the tables above say
 what a line covers and where it points, never how to word it. Warm, direct, simple words, short sentences. When writing Farsi, use natural colloquial Farsi with **Persian
 numerals**, and give any date in the **Persian calendar first** with the Gregorian in brackets —
 that's the calendar the athlete actually lives by.
