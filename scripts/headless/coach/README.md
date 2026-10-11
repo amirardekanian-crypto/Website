@@ -60,7 +60,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 90 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 93 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -74,7 +74,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | auth-SIGNED_IN-forms | Spine editor / coach line / affiliate form with typed text | Spine editor stayed open with old text; others wiped |
 | note-mark-read | Mark read | ok |
 | coach-line-utc / coach-line-tehran-0130 | post + take down the coach line | no p_day; 00:00–03:30 Tehran overwrote yesterday's line |
-| wall-hide, intake-status, affiliates, spine-approve, login-create, session-import-delete | the other writes | ok (login-create now checks the in-place password card) |
+| wall-hide, intake-status, affiliates, spine-approve, login-create, session-import-delete (now ends in Hide this log) | the other writes | ok (login-create now checks the in-place password card) |
 | quest-week | start a quest week, then End this run today | (2026-10-11, stage55) the button was *Cancel* and called `clear_quests`, which took the XP back from everyone; it now calls `end_quests(start, today)`, the run stays with an `end` day, the panel says *ended early* |
 | quest-week-end-fails | End this run when stage55 is not applied | must name the missing file, change nothing and never fall back to `clear_quests` |
 | backlog-clear | Clear older notes | now: one update per counted note, by key |
@@ -142,6 +142,9 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | buyer-logins-course, buyer-logins-assess | On each buyer tab: create (a double tap makes one login), copy, mark sent (asks first), change the password, a password the function refuses, revoke, restore, and a function that fails; the page keeps the words of what it did | (pile B11, MKT-6) pinned on the two copied blocks before they became one `buyerLogins()`; the "Copied" toast replaced the login toast |
 | athlete-login-double-tap | Save password tapped twice on an athlete's File tab | (pile B11, MKT-6) two calls, two passwords, and the message kept the first |
 | library-paged | Nine Library items with a server that answers three rows at a time | (pile B11, SERVER-10) one request stopped at the row cap and the shelf looked half empty |
+| session-hide-undo | Hide this log from the Raw log: one `coach_hide_session`, nothing deleted, the day card back to not logged, the Undo bar, Undo, the File's Hidden sessions list, Restore, Delete for good (only a hidden row) | (pile A6, FILE-11) a hard delete: gone for good, no Undo |
+| session-hide-no-false-warning | A session whose report mark is in the athlete's progress, hidden: no "session not synced"; a mark with no session at all still warns | (pile A6, ROSTER-9) deleting a session left a warning that could never clear (mutation-tested: without `.concat(a.hidden)` it fails) |
+| session-hide-add-over | Add past session from email over a HIDDEN one | (pile A6) it would have updated a row nobody could see |
 | file-preview-wording | The File tab's "Their app" words, the two buttons' addresses, and the bar program.html draws over a preview | (pile A7, TOOLS-11) the File tab promised "their real data" and the bar "exactly as they see it", but the preview shows the programme without their logged work |
 | library-publish-guards | A file that is new, one that replaces a live item, one that replaces a hidden item, and one whose id is already on another shelf | (pile B11, TOOLS-6) the confirm did not say, a hidden item was published again, a moved item was published twice |
 

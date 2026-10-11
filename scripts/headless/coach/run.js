@@ -662,7 +662,7 @@ S['backup-paging'] = async (b) => {
 
 // ── 18b. Backfill a past session from an email, then delete it ────────────────
 S['session-import-delete'] = async (b) => {
-  const r = { id: 'session-import-delete', title: 'The work → + Add past session from email → Save; then Raw log → Delete this log', checks: [] };
+  const r = { id: 'session-import-delete', title: 'The work → + Add past session from email → Save; then Raw log → Hide this log', checks: [] };
   const { page, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
   const email = ['Full summary', 'Day 3 — Pull Day (fixture)', 'Status: Complete', 'Session RPE: 8/10', 'Duration: 40 min', '',
     'Notes from athlete', 'Fixture imported note.', '', 'Exercise log:', '[Primary]', '• Trap Bar Deadlift (✓)', '    Set 1: 80 @7 ✓', '    Set 2: 80 @8 ✓'].join('\n');
@@ -681,10 +681,11 @@ S['session-import-delete'] = async (b) => {
   await card3.locator('.wday-top').click();
   n0 = await L.nCalls(page);
   await card3.locator('details.rawlog summary').first().click();
-  await card3.locator('button', { hasText: 'Delete this log' }).click();
+  await card3.locator('button', { hasText: 'Hide this log' }).click();
   await L.settle(page, 800);
-  const del = (await L.callsSince(page, n0)).filter(x => x.name === 'session_history' && x.op === 'delete').slice(-1)[0];
-  check(r, 'delete filtered on athlete, day and date (the primary key)', del && del.filters.length === 3, del && del.filters);
+  const calls = await L.callsSince(page, n0);
+  const hid = calls.filter(x => x.name === 'coach_hide_session').slice(-1)[0];
+  check(r, 'the log is hidden by athlete, day and date (the primary key), and nothing is deleted (stage60)', !!hid && hid.payload.p_athlete_id === 'ava_test' && hid.payload.p_day === 3 && hid.payload.p_completed_on === day && hid.payload.p_hide === true && !calls.some(x => x.name === 'session_history' && x.op === 'delete'), hid && hid.payload);
   check(r, 'Day 3 is back to not logged', /not logged yet/.test(await page.locator('.wday', { hasText: 'Pull Day (fixture)' }).locator('.wday-top').innerText()), '');
   await page.context().close();
   return r;
@@ -2684,6 +2685,124 @@ S['file-preview-wording'] = async (b) => {
   const src = await page.evaluate(async () => (await fetch('/program.html')).text());
   const bar = (src.match(/bar\.textContent = '(COACH PREVIEW[^']*)' \+ clientId \+ '([^']*)'/) || []).slice(1).join('<id>');
   check(r, 'the preview bar in program.html says "without their logged work", not "exactly as they see it"', /without their logged work/.test(bar) && !/exactly as they see/.test(bar), bar);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Hide a session instead of deleting it (audit FILE-11, ROSTER-9; pile A6, stage60; 2026-10-11) ─────────────────────────────────────────
+const hideFixture = async (page, day, withMarks) => {
+  await page.evaluate(([d, marks]) => {
+    window.__DB.session_history.push({ athlete_id: 'ava_test', athlete_name: 'Ava Example', day: 3, completed_on: d, status: 'Complete', session_rpe: 7, duration_min: 30,
+      readiness: null, day_note: '', focus: 'Pull Day (fixture)', summary: 'Day 3 — Pull Day (fixture)\nExercise log:\n• Old Lift (✓)', log: [{ ex: 'Old Lift', sets: [] }],
+      coach_status: 'read', updated_at: new Date().toISOString(), hidden_at: null, hidden_by: null });
+    if (marks) { const p = window.__DB.athlete_progress.find(x => x.athlete_id === 'ava_test'); p.data['ava_test_sent_d3'] = d + 'T18:00:00.000Z'; p.data['ava_test_senton_d3'] = d; }
+    return hardRefresh();
+  }, [day, !!withMarks]);
+  await L.settle(page, 900);
+};
+
+S['session-hide-undo'] = async (b) => {
+  const r = { id: 'session-hide-undo', title: 'Hide this log: the session leaves the numbers, Undo and Restore bring it back, Delete for good only reaches a hidden one', checks: [] };
+  const { page, log, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const day = require('./fixtures').daysAgo(today, 5);
+  await hideFixture(page, day, false);
+  const dayCard = () => page.locator('.wday', { hasText: 'Pull Day (fixture)' });
+  const dayText = async () => (await dayCard().locator('.wday-top').innerText()).replace(/\s+/g, ' ');
+  const row = async () => (await L.db(page)).session_history.find(x => x.athlete_id === 'ava_test' && x.day === 3 && x.completed_on === day);
+  check(r, 'Day 3 shows the logged session to begin with', /Complete/.test(await dayText()), await dayText());
+  // 1. hide it from the raw log
+  await dayCard().locator('.wday-top').click();
+  let n0 = await L.nCalls(page);
+  await dayCard().locator('details.rawlog summary').first().click();
+  await dayCard().locator('button', { hasText: 'Hide this log' }).click();
+  await L.settle(page, 900);
+  let calls = await L.callsSince(page, n0);
+  const hide = calls.filter(x => x.name === 'coach_hide_session').slice(-1)[0];
+  check(r, 'one coach_hide_session call, for that athlete, day and date, hide true', !!hide && calls.filter(x => x.name === 'coach_hide_session').length === 1 && hide.payload.p_athlete_id === 'ava_test' && hide.payload.p_day === 3 && hide.payload.p_completed_on === day && hide.payload.p_hide === true, hide && hide.payload);
+  check(r, 'no row was deleted', !calls.some(x => x.name === 'session_history' && x.op === 'delete'), calls.filter(x => x.op === 'delete'));
+  check(r, 'the day card is back to not logged', /not logged yet/.test(await dayText()), await dayText());
+  const bar = (await page.locator('#undobar').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the Undo bar says what was hidden, and that it is out of the numbers', /Hid Ava Example.s Day 3 log from/.test(bar) && /Undo/.test(bar) && /out of their numbers/.test(bar), bar);
+  const hidden = await row();
+  check(r, 'the row is still in the database, marked hidden by the coach', !!hidden && !!hidden.hidden_at && hidden.hidden_by === 'amirardekanian@gmail.com', hidden && { at: hidden.hidden_at, by: hidden.hidden_by });
+  check(r, 'the dashboard keeps it out of every number (S.hist) and lists it apart (S.histHidden)', await page.evaluate(d => !S.hist.some(h => h.day === 3 && h.completed_on === d) && S.histHidden.some(h => h.day === 3 && h.completed_on === d), day), '');
+  // 2. Undo from the bar
+  n0 = await L.nCalls(page);
+  await page.locator('#undobar button', { hasText: 'Undo' }).click();
+  await L.settle(page, 900);
+  calls = await L.callsSince(page, n0);
+  const un = calls.filter(x => x.name === 'coach_hide_session').slice(-1)[0];
+  check(r, 'Undo calls coach_hide_session with hide false', !!un && un.payload.p_hide === false && un.payload.p_day === 3, un && un.payload);
+  check(r, 'Day 3 shows the session again, and the row is no longer hidden', /Complete/.test(await dayText()) && !(await row()).hidden_at, await dayText());
+  check(r, 'the Undo bar is gone', await page.locator('#undobar').isHidden(), '');
+  // 3. the File lists a hidden session, and Restore brings it back
+  await page.evaluate(([k]) => hideSession('ava_test', 3, k), [day]); await L.settle(page, 900);
+  await page.locator('#undobar .ux').click();
+  await L.go(page, 'a/ava_test/file'); await L.settle(page, 700);
+  const list = (await page.locator('#hidden-sessions').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the File lists it under Hidden sessions: day, date, what it was, Restore and Delete for good', /Day 3/.test(list) && /Pull Day \(fixture\)/.test(list) && /Restore/.test(list) && /Delete for good/.test(list), list);
+  n0 = await L.nCalls(page);
+  await page.locator('#hidden-sessions button', { hasText: 'Restore' }).click();
+  await L.settle(page, 900);
+  const rs = (await L.callsSince(page, n0)).filter(x => x.name === 'coach_hide_session').slice(-1)[0];
+  check(r, 'Restore calls coach_hide_session with hide false', !!rs && rs.payload.p_hide === false, rs && rs.payload);
+  check(r, 'the list is gone when nothing is hidden', (await page.locator('#hidden-sessions').count()) === 0 && !(await row()).hidden_at, '');
+  // 4. Delete for good reaches a hidden session only
+  await page.evaluate(([k]) => hideSession('ava_test', 3, k), [day]); await L.settle(page, 900);
+  await page.locator('#undobar .ux').click();
+  await L.go(page, 'a/ava_test/file'); await L.settle(page, 700);
+  n0 = await L.nCalls(page);
+  await page.locator('#hidden-sessions button', { hasText: 'Delete for good' }).click();
+  await L.settle(page, 900);
+  const del = (await L.callsSince(page, n0)).filter(x => x.name === 'session_history' && x.op === 'delete').slice(-1)[0];
+  check(r, 'Delete for good deletes by athlete, day, date AND only a hidden row', !!del && del.filters.length === 4 && del.filters.some(f => /hidden_at/.test(String(f))), del && del.filters);
+  const confirmText = ((log.dialogs.filter(d => d.type === 'confirm').slice(-1)[0]) || {}).message || '';
+  check(r, 'it asked first, and said it can only come back from a backup file', /for good/.test(confirmText) && /backup file/.test(confirmText), confirmText);
+  check(r, 'the row is gone', !(await row()), '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['session-hide-no-false-warning'] = async (b) => {
+  const r = { id: 'session-hide-no-false-warning', title: 'Hiding a session whose report was emailed does not start a "session not synced" warning', checks: [] };
+  const { page, log, today } = await L.openCoach(b, { hash: 'today' });
+  const day = require('./fixtures').daysAgo(today, 4);
+  await hideFixture(page, day, true);      // the athlete's progress carries the report's marks for Day 3
+  const keys = () => page.evaluate(() => reasonsOf(S.ath.ava_test).map(x => x.key));
+  check(r, 'with the session on file there is no sync warning', !(await keys()).includes('sync'), await keys());
+  await page.evaluate(([k]) => hideSession('ava_test', 3, k), [day]); await L.settle(page, 900);
+  check(r, 'after hiding it there is still none', !(await keys()).includes('sync'), await keys());
+  check(r, 'the roster still holds the hidden session apart and counts it as present', await page.evaluate(() => S.ath.ava_test.hidden.length === 1 && S.ath.ava_test.syncGaps.length === 0), '');
+  // The old way: the session row simply gone while its report mark stays is the warning.
+  await page.evaluate(([k]) => { window.__DB.session_history = window.__DB.session_history.filter(x => !(x.athlete_id === 'ava_test' && x.completed_on === k && x.day === 3)); return hardRefresh(); }, [day]);
+  await L.settle(page, 900);
+  check(r, 'a report mark with no session at all is still a warning (the check itself is unchanged)', (await keys()).includes('sync'), await keys());
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['session-hide-add-over'] = async (b) => {
+  const r = { id: 'session-hide-add-over', title: 'Add past session over a HIDDEN one: it asks, brings it back and replaces the old log', checks: [] };
+  const { page, log, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const day = require('./fixtures').daysAgo(today, 6);
+  await hideFixture(page, day, false);
+  await page.evaluate(([k]) => hideSession('ava_test', 3, k), [day]); await L.settle(page, 900);
+  const email = ['Full summary', 'Day 3 — Pull Day (fixture)', 'Status: Complete', 'Session RPE: 8/10', 'Duration: 40 min', '', 'Exercise log:', '[Primary]', '• Trap Bar Deadlift (✓)', '    Set 1: 80 @7 ✓'].join('\n');
+  await page.locator('button', { hasText: 'Add past session from email' }).click();
+  await page.locator('#as-paste').fill(email);
+  await page.locator('button', { hasText: 'Read email' }).click();
+  await page.locator('#as-date').fill(day);
+  const n0 = await L.nCalls(page);
+  await page.locator('#as-save').click(); await L.settle(page, 900);
+  const confirmText = ((log.dialogs.filter(d => d.type === 'confirm').slice(-1)[0]) || {}).message || '';
+  check(r, 'it asks first and says the session is hidden and will come back', /HIDDEN session/.test(confirmText) && /brings it back/.test(confirmText), confirmText);
+  const c = (await L.callsSince(page, n0)).filter(x => x.name === 'save_session').slice(-1)[0];
+  check(r, 'save_session asks to replace the old log', !!c && c.payload.p_session.replace_log === true, c && c.payload.p_session.replace_log);
+  const row = (await L.db(page)).session_history.find(x => x.athlete_id === 'ava_test' && x.day === 3 && x.completed_on === day);
+  check(r, "the session is back (not hidden) with the email's log, the old set-by-set log gone", !!row && !row.hidden_at && row.log == null && /Trap Bar Deadlift/.test(row.summary), row && { hidden: row.hidden_at, log: row.log });
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

@@ -1107,7 +1107,8 @@ function sessionNoteText(s) {
 const S = {
   ready: false,
   prog: [],        // athlete_progress rows
-  hist: [],        // session_history rows, LIGHT: no `summary` and no `log` (see loadHistory); an athlete's are merged in when their file opens
+  hist: [],        // session_history rows, LIGHT: no `summary` and no `log` (see loadHistory); an athlete's are merged in when their file opens. HIDDEN sessions are not in it
+  histHidden: [],  // the rows the coach hid (stage60): kept apart so every number leaves them out; the athlete's File lists them and syncGapsOf() counts them as present
   histVer: 0,      // bumped by every loadHistory(): the rows are new objects, so what was merged into the old ones is gone
   fullFor: {},     // athlete_id -> the histVer their summary + log were merged for (ensureSessionsFull)
   notes: [],       // hab_notes rows, last 7 days, hidden included
@@ -1150,24 +1151,28 @@ const S = {
 //    because an exercise note lives inside the text and is what puts someone in Needs you (sessionHasNote);
 //  - an athlete's own text and log are read when their file opens (ensureSessionsFull), once, and again only after the
 //    list itself was reloaded.
-const HIST_LIGHT = 'athlete_id, athlete_name, day, completed_on, status, session_rpe, duration_min, readiness, day_note, focus, updated_at, coach_status';
+const HIST_LIGHT = 'athlete_id, athlete_name, day, completed_on, status, session_rpe, duration_min, readiness, day_note, focus, updated_at, coach_status, hidden_at, hidden_by';
 const HIST_HEAVY = 'athlete_id, day, completed_on, summary, log';
 const histKey = h => h.athlete_id + '|' + h.day + '|' + h.completed_on;
 async function loadHistory() {
   const [light, withNote] = await Promise.all([
     selectAll('session_history', HIST_LIGHT),
     selectAll('session_history', 'athlete_id, day, completed_on, summary', null,
-      q => q.or('coach_status.is.null,coach_status.eq.new').like('summary', '%Note:%')),
+      q => q.or('coach_status.is.null,coach_status.eq.new').like('summary', '%Note:%').is('hidden_at', null)),
   ]);
   // A failed read of either half is a failed load: without the second, an exercise-only note would silently
   // stop counting and the athlete would drop out of Needs you.
   if (light.error) return light;
   if (withNote.error) return { data: null, error: withNote.error };
+  // A session the coach hid (stage60) is kept apart: S.hist, and so every number, list and warning built from it, leaves it out. It stays in
+  // memory only so the athlete's File can list it with Restore and syncGapsOf() can tell a hidden session from one that never arrived.
+  const visible = light.data.filter(h => !h.hidden_at);
   const byKey = {};
-  light.data.forEach(h => { byKey[histKey(h)] = h; });
+  visible.forEach(h => { byKey[histKey(h)] = h; });
   (withNote.data || []).forEach(n => { const h = byKey[histKey(n)]; if (h) h.summary = n.summary; });
   S.histVer++; S.fullFor = {};
-  return light;
+  S.histHidden = light.data.filter(h => h.hidden_at);
+  return Object.assign({}, light, { data: visible });
 }
 // Merge an athlete's `summary` and `log` into the rows already in memory (the athlete file's comparison and raw log read
 // them). Resolves { ok: true } or { ok: false, error }: a failed read must not look like a day nobody logged.
@@ -1180,7 +1185,7 @@ function ensureSessionsFull(athleteId) {
   const job = (async () => {
     for (let tries = 0; tries < 3; tries++) {
       const ver = S.histVer;
-      const r = await selectAll('session_history', HIST_HEAVY, null, q => q.eq('athlete_id', athleteId));
+      const r = await selectAll('session_history', HIST_HEAVY, null, q => q.eq('athlete_id', athleteId).is('hidden_at', null));
       if (r.error) return { ok: false, error: r.error.message || 'no answer' };
       if (ver !== S.histVer) continue;     // the list was reloaded while this was on its way: those rows are gone, ask again
       const byKey = {};
@@ -1988,7 +1993,7 @@ function syncGapsOf(blob, id, sessions) {
 function assemble() {
   const map = {};
   const get = (id) => (map[id] = map[id] || {
-    id, name: id, lastActive: null, sessions: [], finished: 0,
+    id, name: id, lastActive: null, sessions: [], hidden: [], finished: 0,
     habDays: {}, habLast: null, isHab: false, contact: null,
     toReply: 0,
   });
@@ -2016,6 +2021,8 @@ function assemble() {
   // links are retired.
   Object.keys(S.programs || {}).forEach(id => get(id));
   S.contacts.forEach(c => { const a = get(c.athlete_id); a.contact = c; });
+  // The sessions the coach hid (stage60) belong to an athlete who exists anyway; they never create a roster row of their own.
+  (S.histHidden || []).forEach(r => { const a = map[r.athlete_id]; if (a) a.hidden.push(r); });
 
   Object.values(map).forEach(a => {
     const p = S.programs[a.id];
@@ -2040,7 +2047,8 @@ function assemble() {
     a.onBoard = !!S.optin[a.id];
     a.lastSession = a.sessions.length ? a.sessions.map(s => s.completed_on).sort().slice(-1)[0] : null;
     // Needs both halves, so it runs here rather than in either pass above.
-    a.syncGaps = syncGapsOf(a.blob, a.id, a.sessions);
+    // A hidden session still has its `_sent_dN` mark in their progress, so it counts as present: hiding must not start a "not synced" warning (ROSTER-9).
+    a.syncGaps = syncGapsOf(a.blob, a.id, a.sessions.concat(a.hidden));
     a.lowRun = a.tier === 'coached' ? lowRunOf(a.sessions) : '';
     // Split unanswered notes at the window: `recent` is what "waiting" means
     // anywhere a count is shown; `stale` is backlog. Every note still keeps its
@@ -3809,6 +3817,11 @@ function programDiff(a, b) {
 let _undo = null;
 function offerUndo(athleteId, before, afterUpdatedAt, what) {
   _undo = { athleteId, before, afterUpdatedAt };
+  paintUndo(what);
+}
+// The same bar for something that is not a programme save (hiding a session, stage60): `fn` is what Undo runs.
+function offerUndoFn(what, fn) { _undo = { fn }; paintUndo(what); }
+function paintUndo(what) {
   const bar = $('undobar');
   bar.innerHTML = `<span>${esc(what)}</span><button class="btn sm" onclick="undoLastSave()">Undo</button><button class="ux" aria-label="Dismiss" onclick="dismissUndo()">✕</button>`;
   bar.hidden = false;
@@ -3818,6 +3831,7 @@ function dismissUndo() { _undo = null; clearTimeout(offerUndo._h); const bar = $
 async function undoLastSave() {
   const u = _undo;
   if (!u) return;
+  if (u.fn) { dismissUndo(); await u.fn(); return; }
   if (DEMO) { dismissUndo(); toast('Demo mode — nothing saved'); return; }
   const res = await sb.from('programs').update({ data: u.before }).eq('athlete_id', u.athleteId).eq('updated_at', u.afterUpdatedAt).select('athlete_id, updated_at, updated_by');
   dismissUndo();
@@ -4001,7 +4015,8 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
       ${body}
       ${s ? `<details class="rawlog" id="raw-${uid}"><summary>Raw log, exactly as sent</summary>
         <div class="elog-body">${noLog ? 'The log did not load.' : esc(exerciseLogPart(s.summary))}</div>
-        <div class="note-actions"><button class="btn sm danger" onclick="deleteSession(${jsq(athleteId)}, ${Number(s.day)}, ${jsq(s.completed_on)})">Delete this log</button></div>
+        <div class="note-actions"><button class="btn sm" onclick="hideSession(${jsq(athleteId)}, ${Number(s.day)}, ${jsq(s.completed_on)})">Hide this log</button></div>
+        <p class="empty" style="padding:6px 0 0">Hiding leaves it out of their numbers and the history their app shows, and keeps it: bring it back from <b>Hidden sessions</b> on their File.</p>
       </details>` : ''}
     </div>
   </div>`;
@@ -4450,6 +4465,22 @@ function oldCallLogsHtml(D) {
       ${body}
     </section>`;
 }
+// The sessions the coach hid (stage60), newest first, each with Restore and, for a genuine erasure request, Delete for good. Absent when there are none.
+function hiddenSessionsHtml(D) {
+  const { athleteId, a } = D;
+  const hid = (a.hidden || []).slice().sort((x, y) => String(y.completed_on).localeCompare(String(x.completed_on)) || Number(y.day) - Number(x.day));
+  if (!hid.length) return '';
+  return `<div class="sec"><span>Hidden sessions · ${hid.length}</span></div>
+    <section class="panel" id="hidden-sessions">
+      <p class="empty" style="padding:0 0 10px">Left out of their numbers, the roster's warnings and the history their app shows, and kept in the database. If their phone sends one again it stays hidden. <b>Restore</b> brings it back; <b>Delete for good</b> removes it, and it can then only come back from a backup file.</p>
+      ${hid.map(h => `<div class="pvrow">
+        <span class="pvwhen">Day ${esc(h.day)} · ${esc(prettyDate(h.completed_on))}</span>
+        <span class="pvwho">${esc(h.focus || '')}${h.hidden_at ? (h.focus ? ' · ' : '') + 'hidden ' + esc(fmtLocalStamp(h.hidden_at)) : ''}</span>
+        <button class="btn sm" onclick="restoreSession(${jsq(athleteId)}, ${Number(h.day)}, ${jsq(h.completed_on)})">Restore</button>
+        <button class="btn sm danger" onclick="deleteHiddenSession(${jsq(athleteId)}, ${Number(h.day)}, ${jsq(h.completed_on)})">Delete for good</button>
+      </div>`).join('')}
+    </section>`;
+}
 function fileTabHtml(D) {
   const { athleteId, a, program, programDays } = D;
   const cycles = (program && program.cycles) || [];
@@ -4533,9 +4564,10 @@ function fileTabHtml(D) {
       </details>
     </section>
     ${oldCallLogsHtml(D)}
+    ${hiddenSessionsHtml(D)}
     <div class="sec"><span>Danger zone</span></div>
     <section class="panel">
-      <p class="empty" style="padding:0 0 10px">Deletes every finished session and everything the app keeps for them on the server (habit log, body weight, personal records). Their programme, login, coaching log and calls stay, and so do they on the roster.</p>
+      <p class="empty" style="padding:0 0 10px">Deletes every finished session (the hidden ones too) and everything the app keeps for them on the server (habit log, body weight, personal records). Their programme, login, coaching log and calls stay, and so do they on the roster.</p>
       <button class="btn sm danger" onclick="deleteAthlete(${jsq(athleteId)})">Delete training history</button>
       <p class="empty" style="padding:18px 0 10px">Or remove them completely: the programme and its saved versions, the login and sign-in account, sessions, app data, coaching log, calls, reports, titles, board place and contact, in one step. You see the exact list first and type their id to confirm. Intake forms that carry their email, WhatsApp number or name are offered, and you can look for any other form there.</p>
       ${SYSTEM_IDS.includes(athleteId) || athleteId === AMIR_ATHLETE_ID
@@ -4690,6 +4722,9 @@ async function submitPastSession(athleteId) {
   const sameDay = (_detailHistory || []).filter(x => Number(x.day) === Number(p.day));
   const exact = sameDay.find(x => x.completed_on === completedOn);
   const near = sameDay.filter(x => x !== exact && Math.abs(daysBetween(x.completed_on, completedOn)) <= 7);
+  // A session the coach hid (stage60) on that date: the server brings it back when the coach saves over it, so say so, and replace its log too.
+  const hiddenExact = (S.histHidden || []).find(x => x.athlete_id === athleteId && Number(x.day) === Number(p.day) && x.completed_on === completedOn);
+  if (hiddenExact && !confirm(`Day ${p.day} on ${prettyDate(completedOn)} is a HIDDEN session.\n\nSaving brings it back, REPLACED by this email's text, and the set-by-set log the app saved for it is lost. Carry on?`)) return;
   if (exact && !confirm(`Day ${p.day} on ${prettyDate(completedOn)} is already logged.\n\nSaving REPLACES it with this email's text, and the set-by-set log the app saved for it is lost. Carry on?`)) return;
   if (!exact && near.length && !confirm(`Day ${p.day} was already logged on ${near.map(x => prettyDate(x.completed_on)).join(', ')}.\n\nIs this a different session? Saving adds a second Day ${p.day}.`)) return;
   const btn = $('as-save'); if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
@@ -4708,7 +4743,7 @@ async function submitPastSession(athleteId) {
       summary: p.summary,
       // Over a session already on that date: the email REPLACES it, set-by-set log included
       // (stage46; the server used to keep the old log under the new text, coach only).
-      replace_log: !!exact
+      replace_log: !!exact || !!hiddenExact
     },
     // The coach is authorised as the coach now, not by holding the athlete's
     // secret. Every key was deleted when the old links were retired.
@@ -4727,21 +4762,54 @@ window.toggleAddSession = toggleAddSession;
 window.parseAndFillSession = parseAndFillSession;
 window.submitPastSession = submitPastSession;
 
-// --- deletes (ported; coach-only via RLS) -----------------------------------
-async function deleteSession(athleteId, day, completedOn) {
+// --- hide a session, and the deletes (ported; coach-only via RLS) -----------------------------------
+// A finished session is HIDDEN, not deleted (stage60, audit FILE-11 and ROSTER-9; Amir 2026-10-11: "hide it, keep it recoverable"). A hard delete left the
+// report's `_sent_dN` mark in the athlete's progress, so the roster warned "session not synced" for ever, and their phone could send the session again
+// and bring it back. Now the row stays, marked hidden: every reader leaves it out, the phone cannot un-hide it, and the athlete's File lists it with
+// Restore. One coach-only function does both directions and says how many rows it changed.
+function hideFailed(res, verb) {
+  if (res.error) {
+    const m = res.error.message || '';
+    // A database error code means the server answered; no code means the answer never arrived, so the page cannot say whether it went through.
+    if (!res.error.code) return `the answer never arrived (${m || 'no reply'}), so the page cannot tell whether it went through. Refresh and look at their File.`;
+    if (/Could not find the function|PGRST202/i.test(m + res.error.code)) return 'the server does not have coach_hide_session yet (supabase/stage60_hide_sessions.sql has not been applied).';
+    if (/coach only|permission denied|JWT/i.test(m)) return 'your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.';
+    return m;
+  }
+  if (!res.data || !res.data.changed) return verb === 'hide' ? 'the server found no visible session for that day. Refresh and look again.' : 'that session is not hidden any more. Refresh and look again.';
+  return '';
+}
+async function hideSession(athleteId, day, completedOn) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!confirm(`Delete the Day ${day} log from ${completedOn}?\n\nThis permanently removes that finished session. It cannot be undone.`)) return;
+  const res = await sb.rpc('coach_hide_session', { p_athlete_id: athleteId, p_day: Number(day), p_completed_on: completedOn, p_hide: true });
+  const bad = hideFailed(res, 'hide');
+  if (bad) { fail('Could not hide it: ' + bad); await refetch(['hist']); return; }
+  await refetch(['hist']);
+  offerUndoFn(`Hid ${nameOf(athleteId)}'s Day ${day} log from ${prettyDate(completedOn)}. It is out of their numbers and their app's history.`, () => restoreSession(athleteId, day, completedOn));
+}
+async function restoreSession(athleteId, day, completedOn) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const res = await sb.rpc('coach_hide_session', { p_athlete_id: athleteId, p_day: Number(day), p_completed_on: completedOn, p_hide: false });
+  const bad = hideFailed(res, 'restore');
+  if (bad) { fail('Could not bring it back: ' + bad); await refetch(['hist']); return; }
+  toast(`Day ${day} from ${prettyDate(completedOn)} is back`);
+  await refetch(['hist']);
+}
+// For a real erasure request about one session: only a HIDDEN session can be deleted from here, so a visible one is never lost by one tap.
+async function deleteHiddenSession(athleteId, day, completedOn) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (!confirm(`Delete the hidden Day ${day} log from ${completedOn} for good?\n\nThis removes it from the database. It can only come back from a backup file. If you only want it out of the numbers, leave it hidden.`)) return;
   const res = await sb.from('session_history').delete()
-    .eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn).select('day');
+    .eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn).not('hidden_at', 'is', null).select('day');
   const bad = writeFailed(res, 'deleted');
   if (bad) { fail('Could not delete: ' + bad); return; }
   toast('Session log deleted');
-  refetch(['hist']);
+  await refetch(['hist']);
 }
 async function deleteAthlete(athleteId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const name = nameOf(athleteId);
-  if (!confirm(`Delete ${name}'s training history?\n\nThis permanently removes every finished session, and everything the app keeps for them on the server: habit log, body weight, personal records, the live snapshot. It cannot be undone, except from a backup file.\n\nWhat STAYS: their programme, their login, the coaching log, call logs, Proof contact and wall lines. They stay on the roster. To remove someone completely, cancel this and use "Erase completely…" just below the button.`)) return;
+  if (!confirm(`Delete ${name}'s training history?\n\nThis permanently removes every finished session (the hidden ones too), and everything the app keeps for them on the server: habit log, body weight, personal records, the live snapshot. It cannot be undone, except from a backup file.\n\nWhat STAYS: their programme, their login, the coaching log, call logs, Proof contact and wall lines. They stay on the roster. To remove someone completely, cancel this and use "Erase completely…" just below the button.`)) return;
   // One call, one transaction (stage48): the sessions and the progress snapshot go together or not at all.
   // It used to be two deletes from this page, and a failure between them left one gone and one standing.
   // The function checks the coach itself and counts what it removed, so a lapsed sign-in (which RLS used to
@@ -4761,7 +4829,7 @@ async function deleteAthlete(athleteId) {
     return;
   }
   const d = res.data || {}, nS = Number(d.sessions) || 0, nP = Number(d.progress) || 0;
-  const had = (S.hist || []).some(h => h.athlete_id === athleteId) || (S.prog || []).some(p => p.athlete_id === athleteId);
+  const had = (S.hist || []).some(h => h.athlete_id === athleteId) || (S.histHidden || []).some(h => h.athlete_id === athleteId) || (S.prog || []).some(p => p.athlete_id === athleteId);
   if (!nS && !nP && had) { fail('Nothing was deleted: the server removed no rows although the dashboard lists some. Refresh and try again.'); hardRefresh(); return; }
   toast(`Deleted ${nS} session${nS === 1 ? '' : 's'}${nP ? ' and the app data' : ''}`);
   hardRefresh();
@@ -4777,7 +4845,9 @@ async function deleteCallLog(id, athleteId, callDate) {
   render();
   toast('Call log deleted');
 }
-window.deleteSession = deleteSession;
+window.hideSession = hideSession;
+window.restoreSession = restoreSession;
+window.deleteHiddenSession = deleteHiddenSession;
 window.deleteAthlete = deleteAthlete;
 window.deleteCallLog = deleteCallLog;
 
@@ -6833,6 +6903,7 @@ function demoStore() {
     day_note: note || '', coach_status: note ? 'new' : 'read', updated_at: new Date(Date.now() - off * 86400000).toISOString(),
     summary: summary || ('Day ' + day + ' — Demo\n\nExercise log:\n[Primary]\n• Goblet Squat (✓)\n    Set 1: 24 @7 ✓\n    Set 2: 24 @8 ✓\n• Bench Press (✓)\n    Set 1: 40 @7 ✓'),
   });
+  S.histHidden = [];
   S.hist = [
     mkSession('demo_ana', 'Ana', 1, 0, 7, 60, 'Complete', 'Squats felt way heavier than last week. Shoulder fine though.', DEMO_A_D1),
     mkSession('demo_ana', 'Ana', 1, 7, 7, 58, 'Complete', '', DEMO_A_D1_OLD),

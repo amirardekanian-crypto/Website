@@ -24,7 +24,7 @@ select h.completed_on, to_char(h.completed_on, 'Dy') dow, h.day, h.status, h.ses
        h.duration_min mins, h.readiness->>'composite' rdy, h.readiness->>'sleep' sleep,
        h.readiness->>'soreness' sore, nullif(h.day_note, '') day_note, h.log is not null has_log
 from public.session_history h, params
-where h.athlete_id = params.id and h.completed_on between params.s and params.e
+where h.athlete_id = params.id and h.completed_on between params.s and params.e and h.hidden_at is null   -- a session the coach hid (stage60) is not a session
 order by h.completed_on, h.day;
 
 -- ─── Q3 · every loaded exercise, one row per session: weights, reps, RPEs ───────────────
@@ -33,7 +33,7 @@ order by h.completed_on, h.day;
 -- are normalised. Only exercises with at least one weight typed are returned.
 with params as (select 'ATHLETE_ID'::text id, date 'START' - 3 s, date 'END' e),
 s as (select h.completed_on, h.day, h.summary, h.log from public.session_history h, params
-      where h.athlete_id = params.id and h.completed_on between params.s and params.e),
+      where h.athlete_id = params.id and h.completed_on between params.s and params.e and h.hidden_at is null),
 from_log as (
   select s.completed_on, s.day, e->>'block' block, e->>'ex' ex, st.ord::int set_no,
          substring(translate(st.v->>'w', '۰۱۲۳۴۵۶۷۸۹٫', '0123456789.') from '[0-9]+(?:[.,][0-9]+)?') w,

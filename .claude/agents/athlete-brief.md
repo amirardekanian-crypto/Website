@@ -19,9 +19,10 @@ Amir, 2026-09-26: the Gmail import is still needed, because a session can still 
 without reaching the database.
 1. Supabase, one query:
    ```sql
-   SELECT completed_on, day, status FROM session_history
+   SELECT completed_on, day, status, hidden_at FROM session_history
    WHERE athlete_id = '<id>' AND completed_on BETWEEN '<start>' AND '<end>' ORDER BY completed_on, day;
    ```
+   A row with `hidden_at` set is a session Amir hid (stage60): it counts as PRESENT here, on purpose, so it is not imported a second time.
 2. Gmail: find the Web3Forms **session-report** emails for this athlete in the same window (first
    name + the dates). For each report with no matching row (same date and day), INSERT it,
    mirroring the existing `summary` / `readiness` format, `coach_status='new'`, and `updated_at` = the

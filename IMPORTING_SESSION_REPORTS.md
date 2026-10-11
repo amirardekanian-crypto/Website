@@ -28,7 +28,7 @@ That's it. Claude reads the emails, parses them, and upserts the rows.
 
 ## The golden rule: no duplicate same-date data
 
-`session_history`'s primary key is **`(athlete_id, day, completed_on)`**.
+`session_history`'s primary key is **`(athlete_id, day, completed_on)`**. A row with `hidden_at` set is a session Amir hid from the dashboard (stage60): it still holds its key, so `ON CONFLICT DO NOTHING` leaves it alone and it is never imported again. Every query that READS sessions adds `and hidden_at is null`.
 
 - Same athlete + same day number + same date = **one row, always**.
 - If an athlete taps send 3 times, you get 3 identical emails → they collapse to a

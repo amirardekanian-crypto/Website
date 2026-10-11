@@ -316,7 +316,7 @@ quoted in the row and then shows the next one, or the row goes. The athlete does
 | Reason | Trigger | Weight |
 |---|---|---|
 | **N notes to read** | A session carries a note (the day note, or a note on an exercise), `coach_status` is still `new`, and the note **arrived** in the last 14 days: the day it reached the server (`updated_at`), not the day the athlete trained. A phone that syncs a fortnight late delivers a note that is new to you; filed by its training day it used to land in *older notes* and never reach this list. The newest arrival comes first | 100+ |
-| **Session not synced** | The phone sent a report for a day that has no `session_history` row (every number here is wrong for them until it is fixed) | 80 |
+| **Session not synced** | The phone sent a report for a day that has no `session_history` row, hidden or not (every number here is wrong for them until it is fixed) | 80 |
 | **Run of low days** | A coached athlete's last 5 check-ins (within 3 weeks) hold 3 lower or short days, or stress 2 or lower on 3 of them (REC-2: the run is your call, never the app's) | 70 |
 | **Cycle ended N days ago — renew?** | The current cycle's `endDate` passed in the last 14 days | 60 |
 | **No login — cannot open the app** | They have a programme row but no username and password (the old links died on 2026-09-07) | 50 |
@@ -585,13 +585,24 @@ here and one lift there — both sides run the same name matcher, on purpose.
   change password, remove; an unsent password shows here with Copy message, WhatsApp when the
   number is known, and Mark sent), the programme row (tier, days/week, which cycle of the roadmap,
   when it was last saved and by whom, Version history), the coaching log, **Old call logs** and the
-  **Danger zone**, which has **Delete training history**: every finished session plus what the app keeps for them on the server (habit log, body
+  **Danger zone**, which has **Delete training history**: every finished session (the hidden ones too) plus what the app keeps for them on the server (habit log, body
   weight, personal records). Their programme, login, coaching log, calls and wall lines stay, and so
   do they on the roster. (It was called *Delete all data* until 2026-10-10, which it never was.) It is
   one call, `coach_delete_training_history()` (stage48): the sessions and the progress snapshot go
   together or not at all, and the counts come back. It used to be two deletes from this page, and a
   failure between them left one gone and one standing. Under it, **Erase completely…** removes the whole
   person (see *Erasing a person* below).
+- **Hidden sessions** (stage60, 2026-10-11; audit FILE-11 and ROSTER-9; Amir: "hide it, keep it recoverable"). The Raw log's button is **Hide this
+  log**, no longer Delete. A deleted session left the report's mark in the athlete's progress, so the roster warned *session not synced* for ever,
+  and their phone could send the session again and bring it back. A hidden session stays in the database (`session_history.hidden_at`, `hidden_by`)
+  and leaves every number, list and warning: the dashboard (`S.hist` holds the visible ones, `S.histHidden` the hidden ones, and `syncGapsOf()`
+  counts a hidden session as present), the app's history (`get_my_history()`), the WORKOUT tick (`get_workout_days()`) and the pipeline's queries
+  (`and hidden_at is null`). The athlete's phone can re-send it as often as it likes and it stays hidden; only a coach's save brings it back. A bar
+  with **Undo** follows the hide for 30 seconds. The athlete's File lists every hidden session under **Hidden sessions** with **Restore** and, for a
+  real erasure request about one session, **Delete for good** (only a hidden row can be deleted from there, and it asks first). *+ Add past session
+  from email* over a hidden session asks, brings it back and replaces its log. One coach-only function does both directions, `coach_hide_session()`
+  (it never touches `updated_at`: hiding is not athlete activity). `session-hide-undo`, `session-hide-no-false-warning` and `session-hide-add-over`
+  drive it.
 - **Backfill** (The work, bottom): *+ Add past session from email* now checks the email's Athlete
   line against this athlete, starts with no date (it used to default to today), and warns before it
   replaces a session logged on the same date (the email's session replaces it, set-by-set log

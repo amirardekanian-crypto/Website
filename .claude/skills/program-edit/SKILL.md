@@ -28,7 +28,7 @@ build, and the differences are the part that bites. *(Written 2026-09-19 from a 
 reasoning stays in her log on the server; only the transferable process is here.)*
 
 1. **Pull the evidence before proposing anything.** `select ... from session_history where
-   athlete_id = '<id>' and completed_on >= '<date of the last edit>'`. Mid-cycle changes are
+   athlete_id = '<id>' and hidden_at is null and completed_on >= '<date of the last edit>'` (`hidden_at is null`: a session Amir hid is not a session, stage60). Mid-cycle changes are
    report-driven (PRG-1), and the sessions since the
    last edit routinely change the recommendation. They tell you whether the last edit actually
    worked, and they surface what nobody reported: an exercise quietly skipped twice, a capped

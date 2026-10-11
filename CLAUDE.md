@@ -358,11 +358,16 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   WhatsApp number or name are offered, only a same-email one is ticked for you; a finder lists any other, at most 10). An affiliate partner record stays when its athlete
   is erased (only the link is cleared). The private note about a buyer lives in `buyer_notes`, coach-only; the account rows' `label`
   stays empty (a trigger moves anything written there). Tables are emptied in `publish_cycle()`'s lock order (programme first).
+- **A finished session is hidden, never deleted, from the dashboard** (stage60, 2026-10-11; Amir: "hide it, keep it recoverable"): `session_history.hidden_at`,
+  one coach-only `coach_hide_session()` for both directions, an Undo bar, and **Hidden sessions** (Restore, Delete for good) in the athlete's File. The phone's
+  `save_session()` never un-hides one, the coach's does. `get_my_history()`, `get_workout_days()`, the dashboard (`S.hist` leaves them out, `S.histHidden` keeps
+  them for the File, `syncGapsOf()` counts them as present) and every pipeline query that reads sessions (`and hidden_at is null`) leave them out: **a new reader
+  of `session_history` filters on `hidden_at`**, or a hidden session comes back in its numbers.
 - **The weekly call log is retired** (Amir, 2026-10-11): no Calls tab, no new call logs, no Copy cycle prompt; old logs are read and
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (90 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (93 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.

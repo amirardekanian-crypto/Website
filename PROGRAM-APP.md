@@ -229,7 +229,8 @@ day, across cycles via `matchRenamed()`), and **History ›** opens the History 
 - **Only in the open card** (2026-09-27, *The working card*): the **Last time** box under the Coach's Note. The closed
   card's clay *Last* pill is gone (Amir: *"no history on the exercise card when not opened"*).
 - **`<id>_histcache` is a cache and never syncs** (`_snapshot()` skips it; written with
-  `_lsRawSet` so it never stamps `lastEditAt`). The source is `get_my_history()`, stage30.
+  `_lsRawSet` so it never stamps `lastEditAt`). The source is `get_my_history()`, stage30; since stage60 it leaves out a session the coach hid, so the next
+  online open drops it from Last time and the Records.
 
 ## 🦴 The Spine — one record per exercise (2026-09-24)
 

@@ -26,9 +26,9 @@ select jsonb_build_object(
           from public.programs where athlete_id = '<id>'),
   'sessions', (select jsonb_build_object('n', count(*), 'last', max(completed_on),
                  'minutes_by_day', (select jsonb_object_agg(dd, m) from (select day as dd, round(avg(duration_min)) as m
-                    from public.session_history where athlete_id = '<id>' and duration_min > 10
+                    from public.session_history where athlete_id = '<id>' and duration_min > 10 and hidden_at is null
                      and completed_on >= current_date - 42 group by day) x))
-               from public.session_history where athlete_id = '<id>'),
+               from public.session_history where athlete_id = '<id>' and hidden_at is null),
   'log', (select case when k > 1 and body ~ '```profile' and body !~ '\nstatus:\s*partial'
              then substring(body from '^(.*?)\n## Cycle')
                || E'\n\n[Older cycle sections left out: ctx.log_index lists every heading.]\n'

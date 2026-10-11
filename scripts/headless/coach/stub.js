@@ -330,9 +330,21 @@
       var at = t.findIndex(function (r) { return r.athlete_id === row.athlete_id && Number(r.day) === Number(row.day) && r.completed_on === row.completed_on; });
       // stage46: an existing row keeps its log unless the coach says replace_log, and keeps its
       // coach_status (the caller here is always the coach, whose saves never re-open a note).
-      if (at >= 0) { if (!s.replace_log && row.log == null) row.log = t[at].log; t[at] = Object.assign(t[at], row); }
+      // stage60: the caller here is the coach, and a coach's save over a hidden session brings it back (the phone's never does).
+      if (at >= 0) { if (!s.replace_log && row.log == null) row.log = t[at].log; row.hidden_at = null; row.hidden_by = null; t[at] = Object.assign(t[at], row); }
       else { row.coach_status = 'new'; t.push(row); }
       return null;
+    },
+    // stage60: hide (p_hide true, the default) or restore a finished session; the stub's caller is always the coach. Only rows that change count.
+    coach_hide_session: function (p) {
+      if (!String(p.p_athlete_id == null ? '' : p.p_athlete_id).trim() || p.p_day == null || p.p_completed_on == null) throw new Error('which session?');
+      var hide = p.p_hide == null ? true : !!p.p_hide, n = 0;
+      tbl('session_history').forEach(function (r) {
+        if (r.athlete_id === p.p_athlete_id && Number(r.day) === Number(p.p_day) && r.completed_on === p.p_completed_on && (r.hidden_at == null) === hide) {
+          r.hidden_at = hide ? nowIso() : null; r.hidden_by = hide ? COACH : null; n++;
+        }
+      });
+      return { changed: n, hidden: hide };
     },
     // stage48: both deletes or neither. The coach check is the signed-in email, as in the SQL.
     coach_delete_training_history: function (p) {

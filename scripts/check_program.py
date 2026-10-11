@@ -1300,7 +1300,7 @@ s as (select
  (select substring(body from '(```profile.*?\\n *```)')
   from public.coaching_logs where athlete_id = '{aid}') as profile,
  (select jsonb_object_agg(dd, m) from (select day::text dd, round(avg(duration_min)) m from public.session_history
-     where athlete_id = '{aid}' and day is not null and duration_min > 10 and completed_on >= current_date - 42
+     where athlete_id = '{aid}' and day is not null and duration_min > 10 and hidden_at is null and completed_on >= current_date - 42
      group by day) x) as minutes)
 select spine, md5(coalesce(spine, '')) spine_md5, names, md5(coalesce(names, '')) names_md5,
        prev, (select count(*) from jsonb_array_elements(case when jsonb_typeof(prev->'days') = 'array' then prev->'days' else '[]'::jsonb end) d,
