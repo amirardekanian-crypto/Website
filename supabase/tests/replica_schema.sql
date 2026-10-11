@@ -116,3 +116,83 @@ create table public.athlete_progress (
   data          jsonb not null default '{}',
   updated_at    timestamptz not null default now()
 );
+
+-- stage45 (forget_contact): the programme row that says which tier someone is on, and the Proof tables Forget empties
+create table public.programs (
+  athlete_id  text primary key,
+  data        jsonb not null default '{}',
+  updated_at  timestamptz not null default now(),
+  updated_by  text
+);
+create table public.hab_contacts (
+  athlete_id    text primary key,
+  email         text,
+  whatsapp      text,
+  source        text not null,
+  tier          text not null,
+  note          text,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz not null default now(),
+  display_name  text
+);
+create table public.hab_notes (
+  athlete_id  text not null,
+  day         date not null,
+  body        text,
+  pct         smallint,
+  hidden      boolean not null default false,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now(),
+  primary key (athlete_id, day)
+);
+create table public.leaderboard_optin (
+  athlete_id    text primary key,
+  display_name  text not null,
+  joined_at     timestamptz not null default now(),
+  updated_at    timestamptz not null default now(),
+  title         text
+);
+create table public.athlete_keys (
+  athlete_id  text primary key,
+  secret_key  text,
+  created_at  timestamptz not null default now()
+);
+
+-- stage50 (the testing app): a buyer's account, players, notes and results with the buyers' own row-level policies as they
+-- are live (2026-10-11). auth.uid() is the Supabase function of that name, read here from the "sub" claim.
+create or replace function auth.uid() returns uuid language sql stable as $$
+  select nullif(coalesce(auth.jwt() ->> 'sub', ''), '')::uuid
+$$;
+grant execute on function auth.uid() to anon, authenticated;
+create table public.assess_accounts (
+  user_id uuid primary key, username text, label text, created_at timestamptz not null default now(),
+  initial_password text, password_set_at timestamptz, sent_at timestamptz, revoked_at timestamptz
+);
+create function public.assess_member() returns boolean language sql stable set search_path to 'public'
+as $$ select exists (select 1 from public.assess_accounts a where a.user_id = auth.uid() and a.revoked_at is null) $$;
+create table public.assess_players (
+  id uuid primary key default gen_random_uuid(), account_id uuid, name text, birth_year integer, birth_month integer,
+  sex text, hand text, squad text, created_at timestamptz default now(), updated_at timestamptz default now(), deleted_at timestamptz
+);
+create table public.assess_notes (
+  id uuid primary key default gen_random_uuid(), player_id uuid, account_id uuid, body text,
+  created_at timestamptz default now(), deleted_at timestamptz
+);
+create table public.assess_results (
+  player_id uuid, test text, day text, account_id uuid, value numeric, extra jsonb,
+  updated_at timestamptz default now(), deleted_at timestamptz, primary key (player_id, test, day)
+);
+alter table public.assess_accounts enable row level security;
+alter table public.assess_players  enable row level security;
+alter table public.assess_notes    enable row level security;
+alter table public.assess_results  enable row level security;
+create policy "buyer reads own assess account" on public.assess_accounts for select to authenticated using (user_id = (select auth.uid()));
+create policy "coach manages assess accounts"  on public.assess_accounts for all to authenticated using ((select public.is_coach()));
+create policy "member owns players" on public.assess_players for all to authenticated
+  using ((account_id = (select auth.uid())) and (select public.assess_member()));
+create policy "member owns notes" on public.assess_notes for all to authenticated
+  using ((account_id = (select auth.uid())) and (select public.assess_member()));
+create policy "member owns results" on public.assess_results for all to authenticated
+  using ((account_id = (select auth.uid())) and (select public.assess_member()));
+-- Supabase's default table grants for the signed-in role; row-level security is what limits them. anon has none.
+grant select, insert, update, delete on public.assess_accounts, public.assess_players, public.assess_notes, public.assess_results to authenticated;

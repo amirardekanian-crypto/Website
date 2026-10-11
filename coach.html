@@ -1402,9 +1402,10 @@ window.bulkCreateLogins = bulkCreateLogins;
 // (tps_content, course_en), the exercise library (exercises, exercise_coach, qualities), the
 // testing app's content and accounts (assess_content, assess_accounts) and tps_accounts.
 // Left out on purpose: assess_publish_keys and tps_publish_keys (hashes of revoked keys).
-// STILL NOT BACKED UP, each needs a database change first (Amir's call: the coach reading buyers'
-// player data): assess_players, assess_notes and assess_results (only the member who owns them can
-// read them, so the coach would read ZERO rows and the backup would look fine while empty).
+// 2026-10-11 (stage50, Amir's yes): assess_players, assess_notes and assess_results are in too. They are a buyer's own
+// players (name, birth year and month, sex, hand, squad), notes and test results; only the member who owns them could
+// read them, so before stage50 the coach read ZERO rows and a backup would have looked fine while empty. The coach now
+// has a read-only policy on each (no write), so the dashboard still cannot change a buyer's data.
 // hab_season_results got its SELECT grant in stage46 (2026-10-10); coaching_log_versions (stage47)
 // is every earlier text of a coaching log, kept by a trigger. spine_versions (stage49) is the same for the
 // Spine: every row of exercises, exercise_coach and qualities as it was before a change, deletes included.
@@ -1416,6 +1417,7 @@ const BACKUP_TABLES = [
   'library', 'library_categories', 'library_sessions',
   'affiliates',
   'tps_content', 'course_en', 'tps_accounts', 'assess_content', 'assess_accounts',
+  'assess_players', 'assess_notes', 'assess_results',
   'exercises', 'exercise_coach', 'qualities', 'coaching_log_versions', 'spine_versions',
 ];
 

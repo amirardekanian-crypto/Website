@@ -122,9 +122,9 @@ record leaves the backups within about three months, so a backup kept longer mak
 (`select tablename from pg_tables where schemaname = 'public'`; on 2026-10-05 13 of 35 were missing,
 among them the course lessons and the exercise library, which exist nowhere else). A table the coach
 cannot read must be fixed in the database first: with RLS and only a member policy it backs up as
-silently EMPTY, with no SELECT grant it is listed under "Could NOT read". Still open: `assess_players`,
-`assess_notes` and `assess_results` (see the comment above `BACKUP_TABLES`; `hab_season_results` was fixed
-in stage46). **Coaching logs keep every earlier text** in `coaching_log_versions` (stage47, 2026-10-10): a
+silently EMPTY, with no SELECT grant it is listed under "Could NOT read". The testing app's `assess_players`,
+`assess_notes` and `assess_results` were that case until stage50 (2026-10-11, Amir's yes): the coach now has a
+READ-ONLY policy on each and they are in the backup (`hab_season_results` was fixed in stage46). **Coaching logs keep every earlier text** in `coaching_log_versions` (stage47, 2026-10-10): a
 splice or upload that goes wrong can be put back with SQL.
 
 ## The athlete app (`program.html`) — read `PROGRAM-APP.md` before changing it

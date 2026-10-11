@@ -46,6 +46,7 @@
     leaderboard_optin: ['athlete_id'], seasons: ['id'], xp_rules: ['id'], call_logs: ['id'], affiliates: ['code'],
     library: ['slug'], library_categories: ['kind', 'id'], exercises: ['id'], exercise_coach: ['id'], qualities: ['id'],
     tps_accounts: ['username'], assess_accounts: ['username'], messages: ['id'], cycle_reports: ['id'], spine_versions: ['id'],
+    assess_players: ['id'], assess_notes: ['id'], assess_results: ['player_id', 'test', 'day'],
   };
   function persist() { if (ST.persist) { try { localStorage.setItem('__harness_db', JSON.stringify(DB)); } catch (e) {} } }
   function tbl(name) { return DB[name] || (DB[name] = []); }

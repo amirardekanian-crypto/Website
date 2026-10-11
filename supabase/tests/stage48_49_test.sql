@@ -1,4 +1,5 @@
--- Assertions for stage48 (coach_delete_training_history, coach_save_spine) and stage49 (spine_versions) on the
+-- Assertions for stage45 (forget_contact), stage48 (coach_delete_training_history, coach_save_spine), stage49 (spine_versions)
+-- and stage50 (the coach reads the testing app's tables) on the
 -- local replica. Run through scripts/test_spine_sql.sh, which loads replica_schema.sql and both stage files first.
 -- Every check writes a row to t_res; the runner prints the failures and exits non-zero if there are any.
 -- Test rows are all 'zz…' ids. Made-up data only.
@@ -360,6 +361,147 @@ begin
     execute 'reset role';
     perform pg_temp.rec('the trigger function cannot be called as a function', false, 'no error');
   exception when insufficient_privilege then perform pg_temp.rec('the trigger function cannot be called as a function', true, sqlerrm); end;
+end $t$;
+select pg_temp.coach() \g /dev/null
+
+-- ═════════════════════ D. stage45: forget_contact() refuses a coached athlete ═════════════════════
+-- A free Proof signup is forgotten exactly as before; an athlete whose programme is not tier 'free' is refused and
+-- NOTHING is deleted (their progress row is also their training app's cloud copy). A Proof-only contact (no programme
+-- row) is forgotten. Someone who is not the coach is refused.
+select pg_temp.coach() \g /dev/null
+insert into public.programs (athlete_id, data) values
+  ('zz_free',    '{"athlete":{"tier":"free","name":"Zed Free"}}'),
+  ('zz_free2',   '{"tier":"free"}'),
+  ('zz_coached', '{"athlete":{"tier":"3mo","name":"Zed Coached"}}'),
+  ('zz_notier',  '{"athlete":{"name":"No Tier"}}');
+insert into public.hab_contacts (athlete_id, email, source, tier) values
+  ('zz_free', 'free@example.invalid', 'proof', 'free'), ('zz_free2', 'free2@example.invalid', 'proof', 'free'),
+  ('zz_coached', 'coached@example.invalid', 'proof', 'coached'), ('zz_notier', 'notier@example.invalid', 'proof', 'free'),
+  ('zz_proofonly', 'proofonly@example.invalid', 'proof', 'free');
+insert into public.athlete_progress (athlete_id, data) values
+  ('zz_free', '{"habits":1}'), ('zz_free2', '{"habits":2}'), ('zz_coached', '{"records":"precious"}'), ('zz_notier', '{"x":1}'), ('zz_proofonly', '{"habits":3}');
+insert into public.leaderboard_optin (athlete_id, display_name) values ('zz_free', 'Zed'), ('zz_coached', 'Zed C');
+insert into public.hab_notes (athlete_id, day, body) values ('zz_free', '2026-01-01', 'hi'), ('zz_coached', '2026-01-01', 'hi');
+insert into public.athlete_keys (athlete_id, secret_key) values ('zz_free', 'k1'), ('zz_coached', 'k2');
+
+do $t$
+declare n int;
+begin
+  perform public.forget_contact('zz_free');
+  select count(*) into n from (
+    select 1 from public.hab_contacts where athlete_id = 'zz_free' union all select 1 from public.athlete_progress where athlete_id = 'zz_free'
+    union all select 1 from public.leaderboard_optin where athlete_id = 'zz_free' union all select 1 from public.hab_notes where athlete_id = 'zz_free'
+    union all select 1 from public.athlete_keys where athlete_id = 'zz_free') x;
+  perform pg_temp.rec('forget: a free signup is forgotten (contact, habit data, board entry, notes, key)', n = 0, n::text);
+  perform pg_temp.rec('forget: ...their programme row stays (Forget is not an erasure)', exists (select 1 from public.programs where athlete_id = 'zz_free'), '');
+  perform public.forget_contact('zz_free2');
+  perform pg_temp.rec('forget: a programme whose tier sits at the top level (not under athlete) counts as free too', not exists (select 1 from public.hab_contacts where athlete_id = 'zz_free2'), '');
+  perform public.forget_contact('zz_proofonly');
+  perform pg_temp.rec('forget: a Proof-only contact (no programme row) is forgotten', not exists (select 1 from public.hab_contacts where athlete_id = 'zz_proofonly') and not exists (select 1 from public.athlete_progress where athlete_id = 'zz_proofonly'), '');
+  begin perform public.forget_contact('zz_coached');
+    perform pg_temp.rec('forget: a coached athlete is refused', false, 'no error');
+  exception when others then perform pg_temp.rec('forget: a coached athlete is refused', sqlerrm like 'coached athlete: forget would delete their training app data%', sqlerrm); end;
+  select count(*) into n from (
+    select 1 from public.hab_contacts where athlete_id = 'zz_coached' union all select 1 from public.athlete_progress where athlete_id = 'zz_coached'
+    union all select 1 from public.leaderboard_optin where athlete_id = 'zz_coached' union all select 1 from public.hab_notes where athlete_id = 'zz_coached'
+    union all select 1 from public.athlete_keys where athlete_id = 'zz_coached') x;
+  perform pg_temp.rec('forget: ...and not one of their rows was deleted', n = 5, n::text);
+  begin perform public.forget_contact('zz_notier');
+    perform pg_temp.rec('forget: a programme with no tier at all is treated as coached (refused)', false, 'no error');
+  exception when others then perform pg_temp.rec('forget: a programme with no tier at all is treated as coached (refused)', sqlerrm like 'coached athlete:%', sqlerrm); end;
+end $t$;
+
+select pg_temp.other() \g /dev/null
+do $t$
+begin
+  begin perform public.forget_contact('zz_coached');
+    perform pg_temp.rec('forget: someone who is not the coach is refused', false, 'no error');
+  exception when others then perform pg_temp.rec('forget: someone who is not the coach is refused', sqlerrm = 'coach only', sqlerrm); end;
+  begin
+    execute 'set local role anon';
+    perform public.forget_contact('zz_coached');
+    execute 'reset role';
+    perform pg_temp.rec('forget: anon cannot even call it', false, 'no error');
+  exception when insufficient_privilege then perform pg_temp.rec('forget: anon cannot even call it', true, sqlerrm); end;
+end $t$;
+select pg_temp.coach() \g /dev/null
+
+-- ═════════════════════ E. stage50: the coach READS the testing app's players, notes and results ═════════════════════
+-- A buyer sees only their own rows (their policies are untouched), the coach reads every buyer's rows and cannot change
+-- one, someone who is neither sees nothing, anon has no access at all.
+create function pg_temp.buyer(u uuid) returns void language plpgsql as $$ begin
+  perform set_config('request.jwt.claims', json_build_object('sub', u, 'role', 'authenticated', 'email', 'buyer@example.invalid')::text, false);
+end $$;
+select pg_temp.nobody() \g /dev/null
+insert into public.assess_accounts (user_id, username) values
+  ('00000000-0000-0000-0000-0000000000a1', 'zz_buyer_a'), ('00000000-0000-0000-0000-0000000000a2', 'zz_buyer_b');
+insert into public.assess_players (id, account_id, name) values
+  ('00000000-0000-0000-0000-00000000b001', '00000000-0000-0000-0000-0000000000a1', 'Zed One'),
+  ('00000000-0000-0000-0000-00000000b002', '00000000-0000-0000-0000-0000000000a1', 'Zed Two'),
+  ('00000000-0000-0000-0000-00000000b003', '00000000-0000-0000-0000-0000000000a2', 'Zed Three');
+insert into public.assess_notes (player_id, account_id, body) values
+  ('00000000-0000-0000-0000-00000000b001', '00000000-0000-0000-0000-0000000000a1', 'note a'),
+  ('00000000-0000-0000-0000-00000000b003', '00000000-0000-0000-0000-0000000000a2', 'note b');
+insert into public.assess_results (player_id, test, day, account_id, value, deleted_at) values
+  ('00000000-0000-0000-0000-00000000b001', 'sprint', '2026-01-01', '00000000-0000-0000-0000-0000000000a1', 5.1, null),
+  ('00000000-0000-0000-0000-00000000b001', 'sprint', '2026-02-01', '00000000-0000-0000-0000-0000000000a1', 5.0, now()),
+  ('00000000-0000-0000-0000-00000000b003', 'sprint', '2026-01-01', '00000000-0000-0000-0000-0000000000a2', 6.0, null);
+
+do $t$
+declare p int; n int; r int; k int;
+begin
+  -- the coach reads everything, soft-deleted rows included (a backup must be complete)
+  perform pg_temp.coach();
+  execute 'set local role authenticated';
+  select count(*) into p from public.assess_players; select count(*) into n from public.assess_notes; select count(*) into r from public.assess_results;
+  execute 'reset role';
+  perform pg_temp.rec('testing app: the coach reads every buyer''s players, notes and results (soft-deleted rows too)', p = 3 and n = 2 and r = 3, format('%s/%s/%s', p, n, r));
+
+  -- ...and cannot change one: read only
+  begin
+    execute 'set local role authenticated';
+    insert into public.assess_players (account_id, name) values ('00000000-0000-0000-0000-0000000000a1', 'Injected');
+    execute 'reset role';
+    perform pg_temp.rec('testing app: the coach cannot add a player', false, 'no error');
+  exception when insufficient_privilege then perform pg_temp.rec('testing app: the coach cannot add a player', true, sqlerrm); end;
+  execute 'set local role authenticated';
+  with u as (update public.assess_players set name = 'Changed' returning 1) select count(*) into k from u;
+  execute 'reset role';
+  perform pg_temp.rec('testing app: the coach cannot rename a player (no row is touched)', k = 0, k::text);
+  execute 'set local role authenticated';
+  with d as (delete from public.assess_notes returning 1) select count(*) into k from d;
+  execute 'reset role';
+  perform pg_temp.rec('testing app: the coach cannot delete a note (no row is touched)', k = 0, k::text);
+  execute 'set local role authenticated';
+  with u as (update public.assess_results set value = 0 returning 1) select count(*) into k from u;
+  execute 'reset role';
+  perform pg_temp.rec('testing app: the coach cannot change a result (no row is touched)', k = 0, k::text);
+
+  -- a buyer sees only their own
+  perform pg_temp.buyer('00000000-0000-0000-0000-0000000000a1');
+  execute 'set local role authenticated';
+  select count(*) into p from public.assess_players; select count(*) into n from public.assess_notes; select count(*) into r from public.assess_results;
+  execute 'reset role';
+  perform pg_temp.rec('testing app: a buyer still reads only their own players, notes and results', p = 2 and n = 1 and r = 2, format('%s/%s/%s', p, n, r));
+  execute 'set local role authenticated';
+  with u as (update public.assess_players set name = 'Renamed by owner' where account_id = '00000000-0000-0000-0000-0000000000a1' returning 1) select count(*) into k from u;
+  execute 'reset role';
+  perform pg_temp.rec('testing app: ...and can still change their own', k = 2, k::text);
+
+  -- someone who is neither a buyer nor the coach sees nothing
+  perform pg_temp.other();
+  execute 'set local role authenticated';
+  select count(*) into p from public.assess_players; select count(*) into n from public.assess_notes; select count(*) into r from public.assess_results;
+  execute 'reset role';
+  perform pg_temp.rec('testing app: a signed-in user who is neither buyer nor coach reads none', p = 0 and n = 0 and r = 0, format('%s/%s/%s', p, n, r));
+
+  -- anon has no access at all
+  begin
+    execute 'set local role anon';
+    perform count(*) from public.assess_players;
+    execute 'reset role';
+    perform pg_temp.rec('testing app: anon has no access', false, 'no error');
+  exception when insufficient_privilege then perform pg_temp.rec('testing app: anon has no access', true, sqlerrm); end;
 end $t$;
 select pg_temp.coach() \g /dev/null
 

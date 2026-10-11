@@ -134,6 +134,16 @@ function buildSeed(opt) {
     course_en: [{ id: 'fixture', kind: 'lesson', sort: 1, body: { fixture: true }, updated_at: iso(today, 9) }],
     tps_accounts: [{ user_id: 'u-tps-1', username: 'fixture_buyer', label: 'Fixture', created_at: iso(today, 3), initial_password: 'fixture-unsent-pw-2', password_set_at: iso(today, 3), sent_at: null, revoked_at: null }],
     assess_content: [], assess_accounts: [],
+    // a testing-app buyer's players, notes and results (made up). The coach reads them since stage50, for the backup only.
+    assess_players: [
+      { id: 'p-0001', account_id: 'u-assess-1', name: 'Fixture Player One', birth_year: 2012, birth_month: 4, sex: 'f', hand: 'r', squad: 'U14', created_at: iso(today, 20), updated_at: iso(today, 5), deleted_at: null },
+      { id: 'p-0002', account_id: 'u-assess-1', name: 'Fixture Player Two', birth_year: 2011, birth_month: 9, sex: 'm', hand: 'l', squad: 'U14', created_at: iso(today, 20), updated_at: iso(today, 5), deleted_at: iso(today, 2) },
+    ],
+    assess_notes: [{ id: 'n-0001', player_id: 'p-0001', account_id: 'u-assess-1', body: 'Fixture note', created_at: iso(today, 4), deleted_at: null }],
+    assess_results: [
+      { player_id: 'p-0001', test: 'sprint-10m', day: daysAgo(today, 6), account_id: 'u-assess-1', value: 1.9, extra: null, updated_at: iso(today, 6), deleted_at: null },
+      { player_id: 'p-0001', test: 'sprint-10m', day: daysAgo(today, 1), account_id: 'u-assess-1', value: 1.85, extra: { wind: 'none' }, updated_at: iso(today, 1), deleted_at: null },
+    ],
   };
   if (opt.bigHistory) {
     for (let i = 0; i < opt.bigHistory; i++) {
