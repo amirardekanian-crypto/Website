@@ -315,7 +315,7 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
 
 ## The coach dashboard (`coach.html`) — read `COACH_DASHBOARD.md` before changing it
 
-Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is open). What must never break:
+Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is open; **its §12 is the list to continue from**). What must never break:
 - **A programme write from coach.html is never the page's copy written whole.** The ✎ editor reads the live
   row, refuses when `updated_at` moved since the page loaded or the exercise is not at that place any more
   (checked by name), applies the edit to the live copy and writes it `.eq('updated_at', <read>)`. Anything
