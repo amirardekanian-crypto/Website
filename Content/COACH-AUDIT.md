@@ -21,10 +21,11 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands** (after the second session, 2026-10-10): of 191 findings, 120 are fixed, 49 partly fixed
-(the harm is gone, something named in the finding is left), 12 wait on a decision from you, 9 are open (all
-low or medium) and 1 was not a bug. Of the 45 critical and high ones, 34 are fixed, 8 partly and 3 are your
-call; none is untouched.
+**Where it stands** (after the third session, 2026-10-11): of 191 findings, 127 are fixed, 50 partly fixed
+(the harm is gone, something named in the finding is left), 5 wait on you, 8 are open (all low or medium) and 1
+was not a bug. Of the 45 critical and high ones, 35 are fixed, 8 partly and 2 are your call; none is untouched.
+Most of the "partly" ones are written and tested but wait for you to run SQL in the Supabase editor (§11). You have
+answered all twelve questions in §7.
 
 ## 2. The system, as it is now
 
@@ -230,51 +231,42 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 - "Delete all data" is now **"Delete training history"** and says what stays (FILE-7, HARNESS-7).
 - Forget is **refused for coached clients** (MKT-1).
 
-**Waiting on you:**
-1. **The 13 free Proof signups have had no way into the app since 7 September** (FILE-4, SERVER-7):
-   create their logins and re-invite them, or forget them?
-2. **Apply the Forget guard on the server** (stage45). The database tool asks for a confirmation on
-   anything containing a delete, and nobody was there to give it. Say "apply stage45" and it is one
-   step.
-3. **Cancelling a quest week takes back the XP already earned** (TODAY-1). The box now says so. Should
-   athletes keep it instead (a small server and app change)?
-4. **Stored passwords:** may the server clear one automatically once the person has signed in with it
-   (SERVER-1, MKT-5)? 13 are still stored and 8 of them already used; the lists now mark those
-   "signed in with it", so you can clear them by hand today.
-5. **A full erasure** for a person (programme, login, logs, sessions, titles) in one confirmed step,
-   to match the privacy notice (MKT-2, SERVER-5), and one for buyers (MKT-16)?
-6. ~~**Testing-app player data is not in the backup** (SERVER-2): the coach has no read policy on those
-   three tables. Add one (you would be able to read buyers' player results)?~~ **Yes** (2026-10-11): stage50.
-7. **Version history keeps 20 saves per athlete**; one athlete is at 20 (WORK-10, FLOW-11, SERVER-12).
-   Keep 20, or keep everything from the current and last cycle?
-8. **Sessions from the previous cycle** are now labelled and not judged against the new plan
-   (WORK-9). Compare them against the archived cycle instead?
-9. **Session with no duration** counts as no load (TODAY-6): skip and say so, or estimate?
-10. **Commission:** affiliate "uses" count applications, not payments (MKT-11). Track conversions?
-11. **Buyers can read the label you write about them** (MKT-14). Move it out of their reach?
-12. **Is the weekly call log retired?** If yes, Calls folds into File (FLOW-16, FILE-15).
+**Waiting on you** (all twelve answered on 2026-10-11; the state of each is in §11):
+1. ~~**The 13 free Proof signups have had no way into the app since 7 September** (FILE-4, SERVER-7)~~ **Forget them all, remove everything.**
+2. ~~**Apply the Forget guard on the server** (stage45).~~ **Apply it.** (Waits for you to run it: the tool's confirmation never reaches you.)
+3. ~~**Cancelling a quest week takes back the XP already earned** (TODAY-1).~~ **Athletes keep it** (stage55, live).
+4. ~~**Stored passwords:** may the server clear one automatically once the person has signed in with it (SERVER-1, MKT-5)?~~ **Yes** (stage51, live).
+5. ~~**A full erasure** for a person, and one for buyers (MKT-2, SERVER-5, MKT-16)?~~ **Both** (stage54; waits for you to run it).
+6. ~~**Testing-app player data is not in the backup** (SERVER-2)~~ **Yes** (stage50, live).
+7. ~~**Version history keeps 20 saves per athlete** (WORK-10, FLOW-11, SERVER-12).~~ **The current and the previous cycle** (stage52; waits for you to run it).
+8. ~~**Sessions from the previous cycle** are labelled and not judged against the new plan (WORK-9).~~ **Just label them, as now.**
+9. ~~**Session with no duration** counts as no load (TODAY-6).~~ **Skip it and grey out the ratio** (done).
+10. ~~**Commission:** affiliate "uses" count applications, not payments (MKT-11).~~ **Not yet.**
+11. ~~**Buyers can read the label you write about them** (MKT-14).~~ **Move it out of their reach** (stage53; waits for you to run it).
+12. ~~**Is the weekly call log retired?** (FLOW-16, FILE-15)~~ **Retired; Calls folded into File** (done).
 
 ## 8. Next steps, ranked
 
-1. Decision 2 (apply stage45): one step, closes the last server gap behind a critical-class finding.
-2. Decision 1 (the 13 locked-out free users): the top of the funnel is closed for them today.
-3. Decision 4 and 5 (passwords and erasure): what the privacy notice already promises.
-4. ~~A server function for "Delete training history" and the Spine save (one transaction each), so a
+1. **Run the SQL pack** (§11): `supabase/PASTE-1-run-in-sql-editor.sql` (stage45, stage52, stage53, stage54), then
+   `supabase/one-off/remove-13-free-signups-2026-10-11.sql`. It closes the last server gap behind a critical-class finding,
+   removes the 13 locked-out free users, and switches on the full erasure and the coach-only buyer note.
+2. Your word on `Content/PRIVACY-DRAFT-BUYER-ACCOUNTS.md` (course and testing-app accounts in the privacy notices).
+3. ~~A server function for "Delete training history" and the Spine save (one transaction each), so a
    half-finished two-table write cannot happen (SERVER-9, SPINE-5).~~ Done in the second session
    (stage48): written, tested on a real Postgres, applied to the live project and checked on 2026-10-10 (§10).
-5. The structure items in §5, one at a time, each with its harness scenario.
-6. Run the live dashboard once after this deploy and tap through each tab on your phone.
+4. The structure items in §5, one at a time, each with its harness scenario.
+5. Run the live dashboard once after this deploy and tap through each tab on your phone.
 
 ## 9. Appendix: every finding and where it stands
 
-191 findings. Fixed 123 · Partly 47 · Open 8 · Your call 12 · Not a bug 1.
+191 findings. Fixed 127 · Partly 50 · Open 8 · Your call 5 · Not a bug 1.
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
-| high | 22 | 8 | 0 | 3 | 0 |
-| medium | 53 | 26 | 2 | 7 | 0 |
-| low | 36 | 13 | 6 | 2 | 1 |
+| high | 23 | 8 | 0 | 2 | 0 |
+| medium | 55 | 28 | 2 | 3 | 0 |
+| low | 37 | 14 | 6 | 0 | 1 |
 
 ### The work and the ✎ editor (WORK)
 
@@ -316,12 +308,12 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 | ID | Sev | Finding | Status | Now | Still |
 |---|---|---|---|---|---|
-| TODAY-1 | high | 'Cancel this run' says paid quests keep their XP; cancelling actually takes that XP back from every athlete | Your call | The Cancel this run warning now tells the truth: everyone who already completed a quest in the run loses that XP, on the board and in the app. | Your call: should cancelling a live quest week keep the XP people already earned? That needs a small change on the server and in the app. If un-awarding is what you want, nothing more is needed. |
+| TODAY-1 | high | 'Cancel this run' says paid quests keep their XP; cancelling actually takes that XP back from every athlete | Fixed | The button is now **End this run today** (stage55, applied and checked on the live database 2026-10-11). It keeps the run with an end day: the quests stop being offered from tomorrow, a quest completed by then keeps paying on the board and in the app, one not completed never pays. The server's scorer and the phone's `runEndKey()` read the same `end`; both are tested, and the live function was compared with the patched one on all 50 athletes in four windows (no difference when no run has an end). Taking a run's XP back is still possible from the SQL editor (`clear_quests`), on purpose. |  |
 | TODAY-2 | high | Note backlog is defined and cleared by training date, not by what the coach saw: Clear marks unseen notes read, and late-synced notes skip 'Waiting on you' | Fixed | Clear older notes marks as read only the notes the row counted, matched one by one, and the page updates without downloading everything again. A note's age is now counted from the day it arrived (the row's `updated_at`), not the day the athlete trained, and the unread list is newest arrival first: a note synced late about an old session is waiting for you instead of going straight to older notes. (2026-10-10, second session) |  |
 | TODAY-3 | medium | An athlete's note added or changed after Amir marked the session read never returns to 'Waiting on you' | Partly | Since stage46 (applied), when an athlete adds or edits their session note after you marked it read, the session comes back to Needs you. | This only covers the note for the whole session. A note on a single exercise, added or changed after you marked the session read, still stays read. |
 | TODAY-4 | medium | Coach line is filed on the server's UTC day but read on the browser's local day; the dashboard assumes the coach's day equals the athlete's day | Partly | Your line to the crew is now saved and read under your own date, so after midnight it no longer overwrites yesterday's line or shows the wrong one in the box. | The wall still assumes your day is the athlete's day. A line from an athlete whose clock has already moved to tomorrow just shows a plain date, not 'tomorrow, their time'. |
 | TODAY-5 | high | ACWR divides chronic load by 4 weeks even when only 2–3 weeks exist: every new athlete shows a false 'High load' or 'Climbing' spike in weeks 3–4 | Fixed | The load ratio now averages over the weeks of history the athlete actually has. A new athlete in weeks 3 and 4 no longer shows a false High load or Climbing. |  |
-| TODAY-6 | medium | Sessions with no duration or RPE count as zero load, so ACWR and the weekly bars swing with logging gaps and nothing says so | Your call | The load chart now says how many of the last four weeks' sessions have no duration or RPE and count as zero. | Those sessions still count as zero in the ratio and on the roster. Your call: skip them and grey out the ratio, or estimate them from the athlete's usual session. |
+| TODAY-6 | medium | Sessions with no duration or RPE count as zero load, so ACWR and the weekly bars swing with logging gaps and nothing says so | Fixed | A session in the last four weeks with no duration or RPE is left out, and while any exist the ratio is not shown: the pill and the card say *not enough data* and how many sessions are missing; the bars still use the sessions that have a load. It comes back when they are filled in or are older than four weeks (Amir, 2026-10-11: skip and grey out). |  |
 | TODAY-7 | medium | Adherence rounds partial weeks up: a new athlete is red after their first session, and a perfectly adherent athlete reads 67–78% in their first weeks | Fixed | Adherence now counts only the days since the athlete started (up to four weeks) and stops at 100%, so a new athlete who trains as planned reads 100%, not red. |  |
 | TODAY-8 | medium | Four 'needs attention' numbers count four different things from two drifting trigger lists | Fixed | Today, the roster's reasons, its Needs you group and its sort now all follow one rule. Needs you counts people, the counter is labelled Notes to read, the demo and your own account are left out, and anyone with no activity for 30 days is folded into Gone quiet. The cut-offs (30 days, notes vs people) were set without asking you and are easy to change. |  |
 | TODAY-9 | medium | Every render() rebuilds the Today view: an unsent coach line and ticked quest boxes are wiped, including by the automatic levels repaint after boot | Fixed | A line you have typed but not posted, and the quests you have ticked, now stay when the page redraws, including when the Proof levels arrive after opening. |  |
@@ -342,7 +334,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | FILE-4 | high | Every free (Proof) athlete has been locked out since the link retirement, and the dashboard tells the coach they still have a secret link | Your call | Every athlete with a programme but no login (free or coached) now shows 'no login — cannot open the app' on the roster, even once they have gone quiet, and their File tab no longer says they have a secret link. | The free signups are still locked out until you decide whether to create logins and re-invite them or forget them, and the bulk 'Create N missing logins' button still covers only coached athletes who have trained. |
 | FILE-5 | high | Login tools trust S.logins blindly: a failed identities read makes the bulk tool silently RESET every existing athlete's password | Fixed | If the login list fails to load, the dashboard says so, hides the bulk button and refuses to create logins, and the server now never resets an existing login on a create: bulk runs skip those athletes and name them. |  |
 | FILE-6 | high | Plaintext athlete passwords stay in athlete_identities for weeks and are copied into every weekly backup | Partly | Backups now blank every stored, unsent password (athlete, course and testing-app logins), and an athlete's File tab shows an unsent password with Copy, WhatsApp and Mark sent. | Passwords still sit in the database until you tap Mark sent, because copying the message does not count as sent and nothing expires them. Whether it should is your call. |
-| FILE-7 | high | 'Delete all data' deletes only sessions and the progress snapshot; programme, login, coaching log, calls, contacts and more survive | Partly | The button is now 'Delete training history'. It lists exactly what goes and what stays, says how many sessions were deleted, and warns you if nothing was removed. | There is still no single button that fully erases an athlete (programme, login, logs, calls, contact). Whether to build one for privacy requests is your call. |
+| FILE-7 | high | 'Delete all data' deletes only sessions and the progress snapshot; programme, login, coaching log, calls, contacts and more survive | Partly | The button is now 'Delete training history' and lists exactly what goes and what stays. **Erase completely…** under it removes the whole person in one step (stage54): every table that holds their id, the login and the sign-in account, with a dry run first, the id typed to confirm, and the matching intake forms offered. | **Waits for you to run stage54** (it contains deletes). |
 | FILE-8 | high | Email backfill can file a session on the wrong athlete, on today's date, twice, and drops what the app records | Fixed | Adding a past session from an email now warns when the email names a different athlete, has no date filled in for you (you must pick one), warns before replacing or doubling a session for that day, and reads the athlete's whole note. It also reads the email's check-in line (lower day, short day, sore, trained as written) and stores it the way the app does, so the imported session is judged on the day's real targets and counts toward a run of low days; Claude's Gmail import stores the same keys. (2026-10-10, second session) |  |
 | FILE-9 | medium | Every render repaints the whole athlete file: typed passwords/emails are wiped, open sections close, the card being read collapses | Partly | Redrawing the same athlete no longer flashes a spinner, the day cards you had open and the session you picked stay put, and Mark read updates the page without reloading everything. | A redraw still clears a password you were typing in the login box and an email pasted into Add past session, and it closes Version history and the Coaching log. |
 | FILE-10 | medium | Call logs are cached once per page load: a failed read shows 'No call logs yet' and ↻ Refresh never refetches | Fixed | Call logs are kept only when they really loaded; if they fail, the Calls tab itself says they did not load and ↻ Refresh tries again. |  |
@@ -350,7 +342,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | FILE-12 | low | Manual and in-app copy still describe retired secret links and data files | Fixed | The File and Work tabs no longer mention secret links or data files. The sign-in address now matches the athlete's tier, and the manual describes logins, Logins to send and what 'Delete training history' removes. |  |
 | FILE-13 | low | HTML escaping used inside JS-string onclick handlers (contact email) | Fixed | Values inside button actions (contact emails and the rest) are now passed as proper quoted text, so a quote in a signup's email can no longer break out and run as code. |  |
 | FILE-14 | medium | session_history is loaded with an unpaged select; past 1000 rows the athlete file silently loses sessions | Fixed | Session history is now read in pages of 1000 until every row is in, both on load and after a save, so no athlete loses sessions once the table passes 1000 rows. |  |
-| FILE-15 | low | Copy cycle prompt: defaults to the oldest cycle, guesses the session window, and loses the text if the clipboard fails | Partly | Copy cycle prompt now picks the newest cycle by default, and if the clipboard fails it shows the text so you can copy it by hand. | It still guesses which sessions belong to the cycle from the call dates rather than the cycle's own start and end, and whether to keep it or retire it for /cycle-report is your call. |
+| FILE-15 | low | Copy cycle prompt: defaults to the oldest cycle, guesses the session window, and loses the text if the clipboard fails | Fixed | Removed with the Calls tab (FLOW-16): `/cycle-report` is the end-of-cycle review. |  |
 | FILE-16 | low | athlete-login revoke reports success even if the auth user was not deleted | Fixed | Remove login reports an error when the account could not be deleted or the login list could not be read, and says when there was no login to remove. |  |
 
 ### Coach tools: backup, publish, logs (TOOLS)
@@ -411,7 +403,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | FLOW-13 | medium | The Exercises tab opens on an empty Drafts list (0) with all 319 entries behind a button, no search, and no way to start an entry | Partly | The Exercises tab opens on Approved when there are no drafts, has a search box (name, other names, pattern, equipment, id), and keeps the quality panels folded when nothing needs you. | The 'Not in the Spine yet' list still has no one-tap way (such as a Copy '/spine add <name>' button) to hand a missing exercise to Claude. |
 | FLOW-14 | medium | Free, Proof and new-signup athletes open on 'The work' with empty training metrics and stale copy; every Needs you row lands on The work whatever the reason | Fixed | A habit-only athlete (free or Proof) opens on their Proof screen. Rows about Proof silence, a new signup or an upgrade lead open Proof, and an empty Work tab now explains why it is empty instead of mentioning old data files. |  |
 | FLOW-15 | medium | Retired migration tools sit on the daily roster screen; '↑ Coaching logs' replaces server logs that publish_cycle now writes | Fixed | The 'Move programmes into the database' button and the old data-file fallback are gone. The coaching-log upload can now only add a log for an athlete who has none, never replace one, and it sits in the folded Coach tools line. It was kept add-only as the default; say if you want it removed. |  |
-| FLOW-16 | medium | Calls and 'Copy cycle prompt' are a second, mostly unused end-of-cycle workflow that leaves the app and returns to Today | Your call | Copy cycle prompt now picks the newest cycle by default and never loses the text, but Calls is still a separate tab beside /cycle-report. | This waits on you: is the weekly call log retired, so that Calls can be folded into the File tab and Copy cycle prompt removed? |
+| FLOW-16 | medium | Calls and 'Copy cycle prompt' are a second, mostly unused end-of-cycle workflow that leaves the app and returns to Today | Fixed | Retired (Amir, 2026-10-11: one call log ever, 12 July). The Calls tab, + New call log and Copy cycle prompt are gone; old call logs are read and deleted in the athlete's File under *Old call logs*; an old `/calls` link opens the athlete. `call-log.html` and `CALL_LOG.md` still exist but nothing links to them. |  |
 | FLOW-17 | medium | Intake is an island: new leads never reach Today, a lead cannot be linked to the athlete it became, and 24 of 64 are still 'new' | Partly | Today now shows 'N new applications' with a link to Intake. | An application still cannot be linked to the athlete it became, and the old 'new' backlog has not been cleared. Both wait on your decision. |
 | FLOW-18 | medium | Nothing reminds the coach to take the weekly backup, and the backup button is hidden among roster tools | Fixed | Today shows a 'Weekly backup' row with a Back up now button when no backup has been taken on this computer in 7 days. The Coach tools line on the Athletes tab shows when the last backup was taken. |  |
 | FLOW-19 | low | The 'Links' tab is really the Library publisher, cannot unpublish, hides unpublished items and ignores Library Sessions | Fixed | The tab is now called Library. It lists every article and workout, hidden ones included (folded away), and each has a Hide or Publish button and a Copy link. Workouts are shown under their Sessions shelves. |  |
@@ -476,7 +468,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | ID | Sev | Finding | Status | Now | Still |
 |---|---|---|---|---|---|
 | MKT-1 | high | Forget on a coached contact deletes that athlete's training-app data (Personal Records, body weight, set logs, check-ins), and the warning says their training stays | Partly | Forget is not offered for coached clients (they show as 'coached · converted'), and it is switched off while the programmes have not loaded, when a coached client could look like a free signup. | The server-side refusal (stage45) is written but not applied: it needs your OK because the database tool asks for a confirmation on anything containing a delete. |
-| MKT-2 | medium | Forget is not an erasure: the login stays live, so the person's phone quietly re-creates their data, and the programme, titles and login survive | Your call | The Forget box and the manual now say exactly what is deleted and what stays, and that the login still works. | There is still no full erasure, and the person's login stays live, so their phone can quietly upload their data again; a one-step erasure waits on your decision. |
+| MKT-2 | medium | Forget is not an erasure: the login stays live, so the person's phone quietly re-creates their data, and the programme, titles and login survive | Partly | The Forget box and the manual say exactly what is deleted and what stays. **Erase completely…** (stage54) is the real erasure: it deletes the login and the sign-in account too, so the phone cannot upload again. Forget now points to it. | **Waits for you to run stage54.** Forget itself is unchanged (free signups only). |
 | MKT-3 | medium | After a Proof write, the board, wall and presence data stay stale until Refresh | Partly | After a Forget the board, wall, contacts and roster are all reloaded, so the person disappears straight away. | Otherwise the board is still kept from the first time you opened it until you press Refresh (for example after cancelling a quest week), and it shows no 'as of' time. |
 | MKT-4 | medium | WhatsApp links are built three different ways; 8 of 19 funnel links are invalid and an affiliate number typed in Persian digits gives an empty link | Fixed | The funnel, the Proof tab, Affiliates and the login card all use one WhatsApp link builder that handles Persian digits and Iranian 09 numbers, and a number it cannot read gets no button instead of a wrong one. |  |
 | MKT-5 | medium | Plaintext login passwords stay stored and on screen after delivery; 'to send' never clears; every Backup file carries them | Fixed | Backups no longer carry stored passwords, Mark sent asks first, and since stage51 (2026-10-11, your yes) the database clears a stored password the moment the person signs in with it, so it stops counting as 'to send' and leaves the screen. | |
@@ -485,12 +477,12 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | MKT-8 | medium | A failed load of Testing app or Course logins shows '0 active · No logins yet' and is never retried | Partly | If testing-app or course logins fail to load, the tab now says so with a Try again button and offers no Create, instead of showing 'No logins yet'. | When the leaderboard fails to load it still just says it couldn't fetch the board, with no reason. |
 | MKT-9 | medium | The Library can publish but not unpublish; unpublished items are invisible and toggleLibraryItem is dead code | Fixed | Every Library item has a Hide or Publish button (with a confirm), and hidden items are listed under a folded 'Hidden' group. |  |
 | MKT-10 | low | Links offers only the in-app deep link; the public English and Farsi article pages are never offered | Fixed | Each article now has Copy App, Copy Web · FA and Copy Web · EN buttons, workouts keep Copy App, and items are grouped under their category name. |  |
-| MKT-11 | medium | An affiliate code's 'uses' counts intakes, not paying clients, yet it is documented as the commission list; typed codes are matched too strictly | Partly | Each code card now counts applications (archived ones left out), says plainly they are not payments, and matches codes typed with spaces, Persian digits or any case. | The apply forms and the server's code check still reject a code typed with a space or Persian digits, codes that match no affiliate are not shown anywhere, and tracking who actually paid waits on your decision. |
+| MKT-11 | medium | An affiliate code's 'uses' counts intakes, not paying clients, yet it is documented as the commission list; typed codes are matched too strictly | Partly | Each code card now counts applications (archived ones left out), says plainly they are not payments, and matches codes typed with spaces, Persian digits or any case. | The apply forms and the server's code check still reject a code typed with a space or Persian digits, and codes that match no affiliate are not shown anywhere. **Decided 2026-10-11: no payment tracking for now.** |
 | MKT-12 | low | The 'free signups' funnel includes coached clients, and reads tier from a second copy | Fixed | The funnel takes each person's tier from their programme, counts only free signups in its headline, and lists coached clients separately as 'coached · converted'. |  |
 | MKT-13 | low | Four different feedback patterns for the same kinds of action across these tabs | Open |  | Results still come back four different ways: a buyer login create shows a blocking pop-up while an athlete one shows a short toast, and errors are pop-ups in some tabs and toasts in others (only Mark sent gained a confirm). |
-| MKT-14 | low | Buyers can read Amir's private 'who bought it' note (and their stored password) through the buyer-read policy | Your call |  | A buyer can still read the private note you write about them (and their stored password) through their own account; moving it out of their reach waits on your call. |
+| MKT-14 | low | Buyers can read Amir's private 'who bought it' note (and their stored password) through the buyer-read policy | Partly | The note now lives in `buyer_notes`, which only you can read (stage53, Amir 2026-10-11: yes, move it). A trigger moves any label the login functions still write, so they did not change, and the two existing notes are copied across. The lists read the note from the new table and fall back to the old column until it is applied. | **Waits for you to run stage53** in the SQL editor (the tool's confirmation never reaches you). A buyer can still read their own first password until they sign in with it (stage51 clears it then); that is their own credential. |
 | MKT-15 | low | Docs and comments contradict the code: forget, data sources, AMIR_ATHLETE_ID, and the tps-login header | Partly | The manual now says what Forget really deletes, lists the affiliates, library and buyer tables, has short Library, Testing app and Course sections, and no longer claims every write goes through a guarded function. | The code comment still says the board is fetched through your own athlete identity, the course login function's header still names the retired private repo, and the manual says the stage45 server refusal is in place when it is not applied yet. |
-| MKT-16 | low | Buyers cannot be erased from the dashboard, and the privacy notices do not mention buyer accounts | Your call |  | There is still no way to erase a buyer from the dashboard, and the privacy notices still do not mention course or testing-app accounts; both wait on your decision. |
+| MKT-16 | low | Buyers cannot be erased from the dashboard, and the privacy notices do not mention buyer accounts | Partly | **Erase…** on each Course and Testing row removes the buyer in one step (stage54): the login, your note, and for the testing app every player, note and result, including the ones the buyer had removed. A text for the privacy notices is drafted in `Content/PRIVACY-DRAFT-BUYER-ACCOUNTS.md`. | Waits for you to run stage54, and for your word on the draft (one legal question in it: controller or processor for the testing app's players). Nothing on the site changed. |
 | MKT-17 | low | Funnel onclick handlers broke on an apostrophe in an email (an injection pattern); already fixed in the working copy | Fixed | Funnel buttons now pass emails and ids safely, so an apostrophe in an email can no longer break the button or run as code. |  |
 
 ### Exercises (the Spine) and Intake (SPINE)
@@ -521,7 +513,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | SERVER-2 | medium | The backup says INCOMPLETE every week (hab_season_results is unreadable), and testing-app buyer data is never backed up | Fixed | Season results can be read by the backup, every table is paged in key order with repeats removed and short reads reported, and since stage50 (2026-10-11, your yes) the coach has a read-only policy on the testing app's players, notes and results, which are now in the weekly backup. The dashboard still cannot change a buyer's data. |  |
 | SERVER-3 | medium | Importing a past session over an existing one keeps the old set-by-set log, so the athlete and the coach see different sessions | Fixed | Adding a past session over one already logged on the same date now really replaces it, set-by-set log included, so you and the athlete see the same session and the warning box tells the truth. |  |
 | SERVER-4 | medium | A note the athlete edits after Amir marked the session read never comes back to 'needs you' | Fixed | When an athlete edits a note after you marked the session read, it comes back to 'needs you'; re-saving the same note does not. |  |
-| SERVER-5 | medium | Forget (forget_contact) cannot deliver what the privacy notice promises, the manual says the opposite of what it does, and the screen keeps showing the forgotten person | Your call | The manual and the Forget box now say exactly what Forget deletes, the screen refreshes after it, and the page refuses Forget for coached clients. | There is still no one-step full erasure matching the privacy notice (your call), and the server-side refusal for coached clients (stage45) is not applied yet. |
+| SERVER-5 | medium | Forget (forget_contact) cannot deliver what the privacy notice promises, the manual says the opposite of what it does, and the screen keeps showing the forgotten person | Partly | The manual and the Forget box say exactly what Forget deletes, the screen refreshes after it, and the page refuses Forget for coached clients. The one-step full erasure the notice promises now exists (stage54). | **Wait for you to run stage45** (the server-side refusal for coached clients) and **stage54**. |
 | SERVER-6 | medium | Spine and Quality saves overwrite without a freshness check and keep no history | Fixed | Spine and quality saves check freshness (only changed boxes, refused if someone else changed the same box), the server stamps the time on every change, and since stage49 every change to an exercise entry, its coach-only half or a quality is kept in `spine_versions` by a trigger, from any writer. Exercises → an entry → History lists each change (who, what, old then new) and Undo puts the fields back through the guarded save, under the same identity rules as Save (it will not bring back a name cards no longer use, an alias another entry owns, or a link to a deleted entry). The weekly backup includes the table. (2026-10-10, second session) |  |
 | SERVER-7 | medium | 13 free Proof users have had no way into the app since the 2026-09-07 key cutover, yet the funnel still scores them | Your call | Each locked-out person's roster row now keeps saying 'no login — cannot open the app', even once they have gone quiet. | The 13 free Proof users still have no login; whether to create logins and re-invite them, or forget them, is your call. |
 | SERVER-8 | low | Level functions run with the owner's rights and have no access check: any signed-in athlete or buyer can read any athlete's level or mint their titles | Fixed | Career level, title minting, note purging and the season-level helper can no longer be run by athletes or buyers; the dashboard reads every level through one coach-only call (coach_season_levels). Revoked after this version went live. |  |
@@ -618,26 +610,32 @@ the two disagree for those athletes. A one-line fix in the app (parse the date a
 
 ## 11. Third session (2026-10-11): your answers, and where each one stands
 
-You answered eight of the twelve questions in §7. This table is kept up to date as each one lands.
+You answered all twelve questions in §7. This table is kept up to date as each one lands. "Waits for you" means the SQL is written,
+tested on a throwaway Postgres and ready, but it contains a delete or a drop, so the Supabase tool asks for a confirmation that never
+reaches you (it ran out five times, three of them with you at the screen) and I did not work round it: you run it in the SQL editor.
 
 | # | Question (§7) | Your answer | State |
 |---|---|---|---|
-| 1 | The 13 free Proof signups with no login | Forget them, and **remove everything** (their programme rows and 5 titles too) | Script written and tested on a throwaway database. **Waits for you to run it** in the Supabase SQL editor (see below). |
-| 2 | Apply stage45 (Forget refused for coached clients) | Apply it now | The same: **waits for you to run it** in the SQL editor. |
-| 3 | Cancelling a quest week and the XP | not asked yet | open |
+| 1 | The 13 free Proof signups with no login | Forget them, and **remove everything** (their programme rows and 5 titles too) | Script written and tested. **Waits for you to run it** (`supabase/one-off/remove-13-free-signups-2026-10-11.sql`). |
+| 2 | Apply stage45 (Forget refused for coached clients) | Apply it now | **Waits for you to run it** (first part of the SQL pack). |
+| 3 | Cancelling a quest week and the XP | **Keep what was earned** | **Done and live** (stage55 applied and checked 2026-10-11; the dashboard button and `habits.html` ship with the pull request). |
 | 4 | Stored first passwords | Clear one automatically once the person has signed in with it | **Done** (stage51). Today 3 course buyers had a used password stored; the backfill clears them. |
-| 5 | One-step full erasure | Athletes **and** buyers | to build |
+| 5 | One-step full erasure | Athletes **and** buyers | Built and tested (stage54). **Waits for you to run it.** A partner record stays and only its link to the athlete is cleared (your answer). |
 | 6 | Testing-app players, notes and results in the backup | Yes, add the read permission | **Done** (stage50, applied 2026-10-11; in `BACKUP_TABLES`) |
-| 7 | How many programme versions to keep | The current and the previous cycle | Written and tested (stage52). **Waits for you to run it** in the SQL editor: it contains a delete. |
+| 7 | How many programme versions to keep | The current and the previous cycle | Written and tested (stage52). **Waits for you to run it** (it contains a delete). |
 | 8 | Sessions from the previous cycle | Just label them, as now | decided: no change |
-| 9 | Sessions with no duration | not asked yet | open |
-| 10 | Affiliate commission tracking | not asked yet | open |
-| 11 | The buyer label buyers can read | not asked yet | open |
-| 12 | Is the weekly call log retired | not asked yet | open |
+| 9 | Sessions with no duration | **Skip them and grey out the ratio** | **Done** (dashboard only; ships with the pull request). |
+| 10 | Affiliate commission tracking | **Not yet** | decided: no change; the code card says plainly that its count is applications, not payments. |
+| 11 | The buyer note buyers can read | **Move it where only you can read it** | Built and tested (stage53). **Waits for you to run it** (it has `drop policy` / `drop trigger` lines for re-running). |
+| 12 | Is the weekly call log retired | **Retired, fold it into File** | **Done** (dashboard only; ships with the pull request). |
+
+**The SQL pack.** One file to paste into the Supabase SQL editor, `supabase/PASTE-1-run-in-sql-editor.sql`: stage45, stage52, stage53
+and stage54 in that order, ending with a row per part that says whether it is applied. Then `supabase/one-off/remove-13-free-signups-2026-10-11.sql`
+on its own (it stops, deleting nothing, unless there are exactly 13 free programmes and none has a login, a session or a message, so
+a new signup cannot make it delete the wrong set; keeping it apart means that guard cannot stop the four parts above).
 
 **Why 1 and 2 are not done.** The Supabase tool asks for a confirmation on SQL that deletes, and waits 60 seconds for it. It ran
-out three times with you at the screen, so nothing reached the database (checked each time: no stuck session, the function and the
-13 programmes unchanged). I did not work round it. The SQL for both is in the chat message and was tested first on a throwaway
+out five times (checked each time: no stuck session, the function and the 13 programmes unchanged). I did not work round it. Both were tested first on a throwaway
 Postgres with made-up people: `scripts/test_spine_sql.sh` section D covers stage45 (a free signup is forgotten, a coached athlete
 and a programme with no tier are refused and nothing is deleted, anon is refused), and the removal script stops without deleting
 anything unless there are exactly 13 free programmes and none has a login, a session or a message. What the 13 had: 13 programme
@@ -646,4 +644,4 @@ them until they roll off (about 3 months), which is what the privacy notice prom
 
 **Stage50 and the privacy notices.** The three tables hold a buyer's own players (name, birth year and month, sex, hand, squad), often
 juniors. The coach policy is read-only. The privacy notices say nothing about the testing app, its accounts or its players
-(MKT-16), so no promise was broken, but the notice should say it: that is still open.
+(MKT-16), so no promise was broken, but the notice should say it. A draft is in `Content/PRIVACY-DRAFT-BUYER-ACCOUNTS.md`; it needs your word, and one legal question answered (controller or processor for the players).

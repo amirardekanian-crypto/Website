@@ -4351,7 +4351,7 @@ window.deleteCallLog = deleteCallLog;
 // native dialog: the list is long and a phone clips a dialog. The server also refuses the demo, the board identity, the
 // coach's own login and a login shared by two accounts, and undoes everything when a table it does not know still holds a row.
 let _erase = null;   // { kind, key, status: 'loading' | 'ready' | 'busy' | 'error', pv, err, typed, picked: [intake ids] }
-const ERASE_KIND = { athlete: 'athlete', course: 'course buyer', testing: 'testing-app buyer' };
+const ERASE_KIND = { athlete: 'Athlete', course: 'Course buyer', testing: 'Testing-app buyer' };
 // [one, many] for each table the server reports; a table it reports that is not here is shown by its own name.
 const ERASE_WHAT = {
   session_history: ['finished session', 'finished sessions'], athlete_progress: ['app data record (personal records, body weight, check-ins)', 'app data records'],

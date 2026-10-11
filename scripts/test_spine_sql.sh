@@ -98,4 +98,16 @@ out=$($P -f supabase/stage55_end_quests.sql 2>&1); rc=$?
 [ $rc -ne 0 ] && echo "$out" | grep -q "does not look as expected" && check "stage55 refuses a scoring function it does not recognise" ok || check "stage55 refuses a scoring function it does not recognise" no "rc=$rc $out"
 [ "$($P -c "select public.hab_bonus_xp('{}','{}',null,null,null,'{}')")" = "42" ] && check "...and leaves that function exactly as it found it" ok || check "...and leaves that function exactly as it found it" no "the function changed"
 
+# 5. the one-paste pack handed to Amir (stage45 + 52 + 53 + 54 in one file) runs in ONE go on a fresh replica, reports every part
+#    applied, and runs a second time unchanged (every part is safe to re-run)
+if [ -f supabase/PASTE-1-run-in-sql-editor.sql ]; then
+  PK="psql -h $DATA -p $PORT -U postgres -qAt -v ON_ERROR_STOP=1"
+  $PK -d postgres -c "create database packtest" >/dev/null
+  (cd "$repo" && $PK -d packtest -f supabase/tests/replica_schema.sql >/dev/null) || { echo "test_spine_sql: replica did not load for the pack test"; exit 2; }
+  res=$(cd "$repo" && $PK -d packtest -f supabase/PASTE-1-run-in-sql-editor.sql 2>&1 | tail -5)
+  [ "$(echo "$res" | grep -c '|t$')" = "4" ] && check "the SQL pack runs in one go and every part reports applied" ok || check "the SQL pack runs in one go and every part reports applied" no "$res"
+  res2=$(cd "$repo" && $PK -d packtest -f supabase/PASTE-1-run-in-sql-editor.sql 2>&1 | tail -5)
+  [ "$(echo "$res2" | grep -c '|t$')" = "4" ] && check "...and runs a second time without error (safe to re-run)" ok || check "...and runs a second time without error (safe to re-run)" no "$res2"
+fi
+
 [ $fail = 0 ] && echo "test_spine_sql: all passed" || { echo "test_spine_sql: FAILED"; exit 1; }
