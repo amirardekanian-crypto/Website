@@ -908,11 +908,13 @@ function keysOf(table) {
   return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys']
     .includes(table) ? ['athlete_id'] : ['id']);
 }
-async function selectAll(table, cols, orderCols) {
+// `apply` narrows the read ((q) => q.eq('athlete_id', id)); the paging and the key order stay the same.
+async function selectAll(table, cols, orderCols, apply) {
   const order = orderCols || keysOf(table);
   let from = 0, rows = [], total = null, cap = 1000;
   for (;;) {
     let q = sb.from(table).select(cols || '*', from === 0 ? { count: 'exact' } : undefined);
+    if (apply) q = apply(q);
     order.forEach(c => { q = q.order(c, { ascending: true }); });
     const { data, error, count } = await q.range(from, from + 999);
     if (error) return { data: null, error };
@@ -1040,7 +1042,9 @@ function sessionNoteText(s) {
 const S = {
   ready: false,
   prog: [],        // athlete_progress rows
-  hist: [],        // session_history rows (full)
+  hist: [],        // session_history rows, LIGHT: no `summary` and no `log` (see loadHistory); an athlete's are merged in when their file opens
+  histVer: 0,      // bumped by every loadHistory(): the rows are new objects, so what was merged into the old ones is gone
+  fullFor: {},     // athlete_id -> the histVer their summary + log were merged for (ensureSessionsFull)
   keys: {},        // athlete_id -> secret_key
   notes: [],       // hab_notes rows, last 7 days, hidden included
   contacts: [],    // contact_list() rows
@@ -1073,11 +1077,64 @@ const S = {
   stamp: 0,
 };
 
+// session_history is the one table that grows without limit (about 135 sessions a month), and 78% of its bytes are two
+// columns the numbers never read: `summary` (the plain-text log) and `log` (the structured one). Every open and every
+// refresh used to download all of it (about 750 kB for 501 sessions). Now (audit TODAY-12, 2026-10-11):
+//  - boot reads every session's numbers (HIST_LIGHT), and ONLY the text of the unread sessions that contain "Note:",
+//    because an exercise note lives inside the text and is what puts someone in Needs you (sessionHasNote);
+//  - an athlete's own text and log are read when their file opens (ensureSessionsFull), once, and again only after the
+//    list itself was reloaded.
+const HIST_LIGHT = 'athlete_id, athlete_name, day, completed_on, status, session_rpe, duration_min, readiness, day_note, focus, updated_at, coach_status';
+const HIST_HEAVY = 'athlete_id, day, completed_on, summary, log';
+const histKey = h => h.athlete_id + '|' + h.day + '|' + h.completed_on;
+async function loadHistory() {
+  const [light, withNote] = await Promise.all([
+    selectAll('session_history', HIST_LIGHT),
+    selectAll('session_history', 'athlete_id, day, completed_on, summary', null,
+      q => q.or('coach_status.is.null,coach_status.eq.new').like('summary', '%Note:%')),
+  ]);
+  // A failed read of either half is a failed load: without the second, an exercise-only note would silently
+  // stop counting and the athlete would drop out of Needs you.
+  if (light.error) return light;
+  if (withNote.error) return { data: null, error: withNote.error };
+  const byKey = {};
+  light.data.forEach(h => { byKey[histKey(h)] = h; });
+  (withNote.data || []).forEach(n => { const h = byKey[histKey(n)]; if (h) h.summary = n.summary; });
+  S.histVer++; S.fullFor = {};
+  return light;
+}
+// Merge an athlete's `summary` and `log` into the rows already in memory (the athlete file's comparison and raw log read
+// them). Resolves { ok: true } or { ok: false, error }: a failed read must not look like a day nobody logged.
+const _fullBusy = {};
+function ensureSessionsFull(athleteId) {
+  if (DEMO) return Promise.resolve({ ok: true });     // the demo's rows were built whole
+  const mine = () => (S.hist || []).filter(h => h.athlete_id === athleteId);
+  if (!mine().length || S.fullFor[athleteId] === S.histVer) return Promise.resolve({ ok: true });
+  if (_fullBusy[athleteId]) return _fullBusy[athleteId];
+  const job = (async () => {
+    for (let tries = 0; tries < 3; tries++) {
+      const ver = S.histVer;
+      const r = await selectAll('session_history', HIST_HEAVY, null, q => q.eq('athlete_id', athleteId));
+      if (r.error) return { ok: false, error: r.error.message || 'no answer' };
+      if (ver !== S.histVer) continue;     // the list was reloaded while this was on its way: those rows are gone, ask again
+      const byKey = {};
+      mine().forEach(h => { byKey[histKey(h)] = h; });
+      (r.data || []).forEach(n => { const h = byKey[histKey(n)]; if (h) { h.summary = n.summary; h.log = n.log; } });
+      S.fullFor[athleteId] = ver;
+      return { ok: true };
+    }
+    return { ok: false, error: 'the session list kept changing while it loaded' };
+  })();
+  _fullBusy[athleteId] = job;
+  job.then(() => { delete _fullBusy[athleteId]; }, () => { delete _fullBusy[athleteId]; });
+  return job;
+}
+
 async function loadAll() {
   if (DEMO) { demoStore(); S.ready = true; return; }
   const [prog, hist, notes, contacts, rules, seasons, titles, optin, intake, affs] = await Promise.all([
     selectAll('athlete_progress', 'athlete_id, athlete_name, data, updated_at'),
-    selectAll('session_history', '*'),
+    loadHistory(),
     sb.from('hab_notes').select('*').gte('day', addDays(todayKey(), -7)),
     sb.rpc('contact_list'),
     sb.from('xp_rules').select('rules').eq('id', 1).maybeSingle(),
@@ -1134,7 +1191,7 @@ async function refetch(parts) {
   if (parts.includes('contacts')) jobs.push(sb.rpc('contact_list').then(r => { if (!r.error) S.contacts = r.data || []; }));
   if (parts.includes('intake')) jobs.push(sb.rpc('intake_list').then(r => { if (!r.error) S.intake = r.data || []; }));
   if (parts.includes('affiliates')) jobs.push(sb.from('affiliates').select('*').order('code').then(r => { if (!r.error) S.affiliates = r.data || []; }));
-  if (parts.includes('hist')) jobs.push(selectAll('session_history', '*').then(r => { if (!r.error) S.hist = r.data || []; else toast('Saved, but the list could not refresh: ' + r.error.message); }));
+  if (parts.includes('hist')) jobs.push(loadHistory().then(r => { if (!r.error) S.hist = r.data || []; else toast('Saved, but the list could not refresh: ' + r.error.message); }));
   if (parts.includes('programs')) jobs.push(loadPrograms());
   if (parts.includes('prog')) jobs.push(selectAll('athlete_progress', 'athlete_id, athlete_name, data, updated_at').then(r => { if (!r.error) S.prog = r.data || []; }));
   if (parts.includes('optin')) jobs.push(sb.from('leaderboard_optin').select('athlete_id, display_name, title').then(r => { if (!r.error) { S.optin = {}; (r.data || []).forEach(x => S.optin[x.athlete_id] = x); } }));
@@ -3561,7 +3618,10 @@ async function restoreProgramVersion(athleteId, versionId) {
 function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   const chosen = _workSel[dayNum];
   const s = (chosen && sessions.find(x => x.completed_on === chosen)) || sessions[0] || null;
-  const cmp = compareDay(pd, s);
+  // Their sessions' text did not load (renderDetail): there is nothing to compare, and comparing against nothing would read as
+  // a day they skipped. The numbers on the card (date, sRPE, minutes) came with the first read and stay.
+  const noLog = !!(s && _D && _D.logsErr);
+  const cmp = noLog ? { groups: [], hasLog: false, extras: 0 } : compareDay(pd, s);
   const groups = cmp.groups;
   const v = dayVerdict(groups);
   // Nothing prescribed today appears in the log, yet the log is full: this
@@ -3625,6 +3685,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
         <div class="cmp-grp-t">${g.icon ? esc(g.icon) + ' ' : ''}${esc(g.title)}</div>
         ${g.rows.map(r => cmpRowHtml(r, lib, athleteId)).join('')}
       </div>`).join('')
+    : noLog ? `<p class="empty">This session’s log did not load, so nothing is compared. Use Try again at the top of this tab.</p>`
     : `<p class="empty">No prescribed exercises on this day${s ? ' and nothing readable in the log' : ''}.</p>`;
 
   return `<div class="wday ${open ? 'open' : ''} ${statusTone}" id="wday-${esc(dayNum)}">
@@ -3644,7 +3705,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
       ${noteBox}
       ${body}
       ${s ? `<details class="rawlog"><summary>Raw log, exactly as sent</summary>
-        <div class="elog-body">${esc(exerciseLogPart(s.summary))}</div>
+        <div class="elog-body">${noLog ? 'The log did not load.' : esc(exerciseLogPart(s.summary))}</div>
         <div class="note-actions"><button class="btn sm danger" onclick="deleteSession(${jsq(athleteId)}, ${Number(s.day)}, ${jsq(s.completed_on)})">Delete this log</button></div>
       </details>` : ''}
     </div>
@@ -3676,7 +3737,9 @@ function workTabHtml(D) {
     </div>` : '';
 
   const live = liveSnapshotHtml(D);
-  return `${cycHead}
+  const logsWarn = D.logsErr ? `<div class="loadwarn" role="alert" style="margin:0 0 14px"><b>Their session logs did not load.</b> Every comparison below is blank because of that, not because they skipped the work.
+      <button class="btn sm" onclick="retryLogs()">↻ Try again</button><span class="lw-why">${esc(D.logsErr)}</span></div>` : '';
+  return `${logsWarn}${cycHead}
     ${metricStripHtml(metrics)}
     ${maxesPanel(D)}
     ${cards.length ? cards.join('') : `<p class="empty">${D.a.tier === 'coached' || S.progSrc[athleteId] !== 'db'
@@ -3844,8 +3907,11 @@ let _detailReq = 0;
 // The athlete file caches what it drew. Anything that changes that athlete's data without a
 // full assemble() (a call log deleted) calls this, so the next render rebuilds it.
 function invalidateDetail() { if (_D) _D.stamp = -1; }
+// Try again after their logs failed to load: rebuild the file, which reads them again.
+function retryLogs() { invalidateDetail(); render(); }
+window.retryLogs = retryLogs;
 async function renderDetail(athleteId, sub) {
-  const a = S.ath[athleteId];
+  let a = S.ath[athleteId];
   if (!a) { $('content').innerHTML = `<a class="back" href="#athletes">← Roster</a><p class="empty">No athlete “${esc(athleteId)}” in the store. Refresh?</p>`; return; }
   // Rebuild the context only when the athlete changes — switching sub-tabs must
   // not refetch, or every tap costs a round trip and the page flashes.
@@ -3867,8 +3933,13 @@ async function renderDetail(athleteId, sub) {
       }
     }
     const lib = await exLib();
+    // Their sessions' text and log (the boot read only the numbers). A failure is kept on the file and said on the
+    // work tab, never drawn as days nobody logged.
+    const full = await ensureSessionsFull(athleteId);
     const now = route();
     if (req !== _detailReq || now.view !== 'detail' || now.id !== athleteId) return;
+    // The awaits above can span a reload of the store (assemble() builds new athlete objects): draw the current one.
+    a = S.ath[athleteId] || a;
     const program = S.programs[athleteId] || null;
     const history = a.sessions.slice().sort((x, y) => String(y.completed_on).localeCompare(String(x.completed_on)) || (x.day - y.day));
     const programDays = (program && program.workouts && program.workouts.days) || [];
@@ -3876,6 +3947,7 @@ async function renderDetail(athleteId, sub) {
       athleteId, a, program, programDays, history,
       callLogs,
       lib,
+      logsErr: full.ok ? '' : full.error,
       metrics: athleteMetrics(history, a.lastActive, programDays.length),
       stamp: S.stamp,
     };

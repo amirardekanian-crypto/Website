@@ -84,7 +84,8 @@
       case 'lte': return v != null && cmp(v, arg) <= 0;
       case 'is': return (arg === null || arg === 'null') ? v == null : String(v) === String(arg);
       case 'in': { var list = Array.isArray(arg) ? arg : String(arg).replace(/^\(|\)$/g, '').split(','); return list.some(function (x) { return eqv(v, x); }); }
-      case 'like': case 'ilike': { var re = new RegExp('^' + String(arg).replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/%/g, '.*') + '$', op === 'ilike' ? 'i' : ''); return re.test(String(v == null ? '' : v)); }
+      // LIKE as PostgreSQL has it: % is any run of characters INCLUDING newlines (a session's summary is many lines), _ is one character.
+      case 'like': case 'ilike': { var re = new RegExp('^' + String(arg).replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/%/g, '[\\s\\S]*').replace(/_/g, '[\\s\\S]') + '$', op === 'ilike' ? 'i' : ''); return re.test(String(v == null ? '' : v)); }
       default: throw new Error('stub: unsupported operator ' + op);
     }
   }

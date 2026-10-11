@@ -437,6 +437,12 @@ way to be cleared). **A note the athlete edits after you marked it read comes ba
 (stage46; the server used to keep it read whatever it now said). Mark read changes that one row in
 the page's copy; it no longer re-downloads the whole session history.
 
+**What the file needs from the server, and what it says when it cannot have it.** The page loads every session's numbers
+at boot but not its text: an athlete's logged sets and the raw log are read when you open their file (one read, then they
+stay in memory until the list is reloaded). If that read fails, the work tab opens with a red line, *Their session logs did
+not load*, the reason and **↻ Try again**; the day cards keep the numbers that did arrive (date, sRPE, minutes) but show no
+comparison and no verdict, because comparing against nothing would read as a week they skipped.
+
 ### Editing a prescription (✎)
 
 ✎ sits at the end of the prescribed column (always visible on a touch screen). The editor names
@@ -694,7 +700,7 @@ it in this file.
 
 | Source | Feeds |
 |---|---|
-| `session_history` | Sessions, ACWR, readiness, adherence, notes to read |
+| `session_history` | Sessions, ACWR, readiness, adherence, notes to read. **Read light** (2026-10-11): at boot every session's numbers (everything but `summary` and `log`, 78% of the bytes) and the text of the unread sessions that contain "Note:" (an exercise-only note is inside the text and is what puts someone in Needs you); an athlete's `summary` and `log` are read when their file opens (`ensureSessionsFull()`), and again only after the list was reloaded. If that read fails the work tab says *Their session logs did not load* with **↻ Try again**, and shows no verdicts |
 | `athlete_progress` | Last active, live snapshot, and the habit log behind every presence dot |
 | `programs` | **The roster** — every athlete, their name, tier and prescribed plan |
 | `athlete_identities` | Who has a username/password login, and the passwords still to send |

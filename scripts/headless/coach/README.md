@@ -59,7 +59,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 59 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 64 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -115,6 +115,9 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | login-used-mark | Logins to send after the person signed in | every stored password looked unsent |
 | calls-load-fail | call logs fail to load | the File tab must name the failure (the Calls tab used to say "No call logs yet") |
 | route-unknown-sub | `#a/<id>/<unknown>` | "No athlete in the store" |
+| hist-light-boot | boot reads session_history twice: every session's numbers (no `summary`, no `log`) and the text of the unread sessions that contain "Note:"; an exercise-only note still reaches Needs you and is quoted | (pile B1, TODAY-12) every open downloaded every session in full, 78% of it text the numbers never read |
+| hist-athlete-open | opening an athlete reads their text and log once (filtered on their id), the comparison and the raw log have them, sub-tabs and going back read nothing, another athlete reads only theirs, a reloaded list reads them again | (pile B1) all of it was loaded at boot |
+| hist-heavy-fails | the read of an athlete's logs fails | (pile B1) must say *did not load* with the reason and Try again, keep the numbers, show no verdict or "not logged"; Try again brings the comparison |
 
 ## Adding a scenario
 

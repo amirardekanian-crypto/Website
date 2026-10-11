@@ -1847,6 +1847,94 @@ S['walink'] = async (b) => {
   return r;
 };
 
+// ── Session history is read light (audit TODAY-12, 2026-10-11, pile B1) ──────────────────────────────────────────────────────
+// session_history is the one table that grows without limit, and 78% of its bytes are two columns the numbers never read:
+// `summary` (the plain-text log) and `log` (the structured one). Boot reads everything else, plus the text of the few unread
+// sessions that might hold an exercise note (the note lives inside the text and is what puts someone in Needs you); an
+// athlete's own text and log are read when their file opens, once, and again only after the list itself was reloaded.
+const histSel = cs => cs.filter(c => c.kind === 'from' && c.name === 'session_history' && c.op === 'select');
+const heavySel = cs => histSel(cs).filter(c => /summary/.test(c.mods.cols) && c.filters.some(f => /^athlete_id\.eq\./.test(f)));
+
+S['hist-light-boot'] = async (b) => {
+  const r = { id: 'hist-light-boot', title: 'Boot reads sessions without their text, and an exercise-only note still reaches Needs you', checks: [] };
+  const { page, today, log } = await L.openCoach(b, { seed: { bigHistory: 300 } });
+  const FX = require('./fixtures');
+  // Ben's only note is on an exercise (nothing in the day note): it lives inside the summary text.
+  await page.evaluate(([on]) => {
+    window.__DB.session_history.push({ athlete_id: 'ben_test', athlete_name: 'Ben Example', day: 3, completed_on: on, status: 'Complete', session_rpe: 7, duration_min: 50,
+      readiness: null, day_note: '', focus: '', coach_status: 'new', log: null, updated_at: new Date().toISOString(),
+      summary: 'Day 3 — Pull Day (fixture)\n\nExercise log:\n[Primary]\n• Trap Bar Deadlift (✓)\n    Set 1: 80 @8 ✓\n    Note: fixture lower back felt tight' });
+  }, [FX.daysAgo(today, 1)]);
+  const n0 = await L.nCalls(page);
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  const sel = histSel(await L.callsSince(page, n0));
+  const light = sel.find(c => !/summary/.test(c.mods.cols)), notes = sel.find(c => /summary/.test(c.mods.cols));
+  check(r, 'a refresh reads session_history twice: the numbers, and the text of unread sessions that may hold an exercise note', sel.length === 2 && !!light && !!notes, sel.map(c => c.mods.cols + ' | ' + c.filters.join(' & ')));
+  check(r, 'the numbers read neither `summary` nor `log` (and not *)', !!light && !/\*|summary|\blog\b/.test(light.mods.cols), light && light.mods.cols);
+  check(r, 'the text read is limited to unread sessions that contain "Note:"', !!notes && notes.filters.some(f => /^or\(coach_status\.is\.null,coach_status\.eq\.new\)$/.test(f)) && notes.filters.some(f => /^summary\.like\./.test(f)), notes && notes.filters);
+  const st = await page.evaluate(() => ({
+    withSummary: S.hist.filter(h => h.summary !== undefined).map(h => h.athlete_id + ':' + h.day),
+    withLog: S.hist.filter(h => 'log' in h).length, rows: S.hist.length,
+    ben: S.ath.ben_test.needReplyRecent.map(s => s.day), reasons: S.ath.ben_test.reasons.map(x => x.key + ':' + x.text) }));
+  check(r, 'only the one session with an exercise note holds its text in memory, and none holds a log', st.withSummary.join() === 'ben_test:3' && st.withLog === 0, st);
+  check(r, 'every session is still there for the numbers (no row lost to the lighter read)', st.rows === 5 + 300 + 1, st.rows);
+  check(r, 'the exercise-only note still counts: Ben has a note to read', st.ben.join() === '3' && st.reasons.some(x => /^note:1 note to read/.test(x)), st);
+  const need = await page.locator('#needPanel .need', { hasText: 'Ben' }).first().innerText();
+  check(r, 'Needs you quotes it', /Day 3 note: “fixture lower back felt tight”/.test(need), need.replace(/\s+/g, ' '));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['hist-athlete-open'] = async (b) => {
+  const r = { id: 'hist-athlete-open', title: 'An athlete\'s text and log are read when their file opens, once, and again only after the list was reloaded', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  let n0 = await L.nCalls(page);
+  await L.go(page, 'a/ava_test/work');
+  let hs = heavySel(await L.callsSince(page, n0));
+  check(r, 'opening Ava reads her sessions\' text and log, filtered on her id', hs.length === 1 && /\blog\b/.test(hs[0].mods.cols) && hs[0].filters.includes('athlete_id.eq."ava_test"'), hs.map(c => c.mods.cols + ' | ' + c.filters.join(' & ')));
+  const did = await rowLoc(page, 'Goblet Squat').locator('.cmp-did').innerText();
+  check(r, 'the comparison has her log: Goblet Squat reads 4/4 sets', /4\/4 sets/.test(did), did.replace(/\s+/g, ' '));
+  const raw = await page.locator('.wday.open .rawlog .elog-body').first().textContent();
+  check(r, 'the raw log shows what was sent', /Set 1: 20 @7/.test(raw || ''), (raw || '').slice(0, 80));
+  n0 = await L.nCalls(page);
+  await L.go(page, 'a/ava_test/proof'); await L.go(page, 'a/ava_test/work');
+  check(r, 'switching sub-tabs reads nothing again', !histSel(await L.callsSince(page, n0)).length, '');
+  n0 = await L.nCalls(page);
+  await L.go(page, 'a/ben_test/work');
+  hs = heavySel(await L.callsSince(page, n0));
+  check(r, 'opening Ben reads only Ben\'s', hs.length === 1 && hs[0].filters.includes('athlete_id.eq."ben_test"'), hs.map(c => c.filters));
+  n0 = await L.nCalls(page);
+  await L.go(page, 'a/ava_test/work');
+  check(r, 'going back to Ava reads nothing: her text is already in memory', !histSel(await L.callsSince(page, n0)).length, '');
+  n0 = await L.nCalls(page);
+  await page.evaluate(() => refetch(['hist'])); await L.settle(page, 900);
+  const cs2 = await L.callsSince(page, n0);
+  check(r, 'after the list is reloaded the open file reads her text again (the old rows are gone)', heavySel(cs2).length === 1 && histSel(cs2).length === 3, histSel(cs2).map(c => c.mods.cols));
+  check(r, 'and the comparison is still there', /4\/4 sets/.test(await rowLoc(page, 'Goblet Squat').locator('.cmp-did').innerText()), '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['hist-heavy-fails'] = async (b) => {
+  const r = { id: 'hist-heavy-fails', title: 'A failed read of an athlete\'s logs says so; it never reads as "not logged"', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'from', name: 'session_history', op: 'select', message: 'fixture: logs unavailable', times: 1 }));
+  await L.go(page, 'a/ava_test/work');
+  const txt = (await page.locator('#tabbody').innerText()).replace(/\s+/g, ' ');
+  const open = (await page.locator('.wday.open').first().innerText()).replace(/\s+/g, ' ');
+  check(r, 'the work tab says the logs did not load, and why', /did not load/i.test(txt) && /fixture: logs unavailable/.test(txt), txt.slice(0, 260));
+  check(r, 'the open day shows no verdict or "not logged" built from a log that never arrived', !/not logged|exactly as prescribed|not done|off plan/.test(open), open.slice(0, 260));
+  check(r, 'the numbers that did load are still shown (date, sRPE, minutes)', /sRPE 7\/10/.test(open) && /50 min/.test(open), open.slice(0, 200));
+  await page.locator('#tabbody button', { hasText: 'Try again' }).click(); await L.settle(page, 900);
+  const txt2 = (await page.locator('#tabbody').innerText()).replace(/\s+/g, ' ');
+  check(r, 'Try again reads them: the notice is gone and the comparison appears', !/did not load/i.test(txt2) && /4\/4 sets/.test(txt2), txt2.slice(0, 200));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));
