@@ -125,14 +125,25 @@ more is spent on voice. His own voice also fits the product better: clients are 
 
 **How he records it** (a one-page recording sheet follows once the script is final: the script in big type, one beat at a time, English words marked, pauses marked):
 - **Where:** a small quiet room with soft things around (a wardrobe, a bed, the car with the windows up). No fan, no echo. Phone on Do Not Disturb.
-- **With what:** the phone's own Voice Memos or Recorder app is fine. The phone about a hand-and-a-half from the mouth, a little to the side so the breaths don't pop.
+- **With what:** the phone's own recorder (apps below). The phone about a hand-and-a-half from the mouth, a little to the side so the breaths don't pop.
 - **How:** **seven files, one per beat** (1 to 7), so one line can be redone without touching the rest. Two takes of each, say which is the keeper. Calm, like talking to one new client, about 2 words a second.
   A second of silence before and after each take. **Five seconds of silence** at the start of file 1 (I use it to clean the room noise).
 - **What to say:** exactly the approved text, with the app's words in English. If he changes a word while recording, he tells me the final text, because the subtitles must match what he says.
 - **How I clean it:** a light noise reduction, a gentle low cut, a little compression, and the level set to −16 LUFS (measured, not guessed). I do not change how he sounds.
 
-**How he sends it to me** (the simplest first): on GitHub, open the folder `Content/client-videos/start-here/voice/` on the branch `claude/vibrant-davinci-8ps44e` → **Add file → Upload files**, drop the
-seven files (or fourteen with the second takes), and commit. If that is awkward from a phone, put them in a Google Drive folder, share it, and send me the link.
+**Which app (Amir, on his phone):** the phone's own recorder, no new app needed.
+- **iPhone:** **Voice Memos.** First, Settings → Voice Memos → **Audio Quality → Lossless**, and leave *Enhance Recording* off (I do the cleaning, and I can undo nothing that the phone has already baked in).
+- **Android:** the built-in recorder (Samsung **Voice Recorder**, Pixel **Recorder**), with the highest quality setting; or **Easy Voice Recorder** set to WAV.
+- **Do not use:** WhatsApp, Telegram or Instagram voice messages (they squash the sound), earbuds or a Bluetooth mic (thin and slightly delayed), or the speakerphone. Talk to the phone itself.
+
+**What I do with the audio, and what I cannot:**
+- **I can:** cut the silences, shorten long pauses, add breathing room where a scene needs it, remove clicks and the start/end silence, lightly reduce the room noise, level it to −16 LUFS, check it is not clipping, and time every animation to it exactly.
+- **I cannot, in this environment, turn Farsi speech into text, and I cannot judge how a take sounds** (pronunciation, mistakes, which take has the better feeling). There is no speech-to-text model here and the hosts that provide one are blocked. So:
+  **Amir picks the keeper take of each beat, and sends me the text exactly as he says it** (nothing if he reads the approved script word for word). The subtitles come from that text, placed by where the voice pauses.
+
+**How he sends it to me:** the audio has to arrive as a file I can open, and the one route that does is GitHub. Easiest: send the recordings from the phone to his computer (AirDrop, Google Drive, email, or WhatsApp **as a document**, not a voice
+message), then on GitHub open **`Content/client-videos/start-here/voice/`** on the branch `claude/vibrant-davinci-8ps44e` → **Add file → Upload files** → commit to that branch (steps are in that folder's README). I then pull them straight in.
+He can also try attaching the audio to a message in the Claude app: if it arrives I will say so; if it does not, use GitHub. Google Drive is not good for me here: it hands the file over as plain text in the chat, far too large for audio.
 
 ## 7 · How it gets made, and where Amir says yes
 
