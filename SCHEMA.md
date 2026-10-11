@@ -343,8 +343,9 @@ it in that week only: not before the cycle starts, not after it ends.
 
 The final week's note must carry at least one of the three numbers, so the dose is a decision and not only a
 feeling. The numbers never change a card: the app shows `text` only (`weekNoteHTML()` in
-`program.html`, under **This Week** on Home and at the top of every session that week), applies the numbers
-to that week's daily target only, and `scripts/check_program.py` reads them. A cycle without
+`program.html`, under **This Week** on Home and at the top of every session that week). `rpeCap` and `rpeDrop`
+also move that week's daily RPE target, and only that week's (`dayRpe()`); `setsDrop` is a decision the text tells
+the athlete, and nothing in the app applies it. `scripts/check_program.py` reads all three. A cycle without
 `weekNotes` (every programme written before 2026-09-26) shows nothing: the app never invents a
 back-off. `/program-design` decides which weeks get a note and the dose, `/program-engage` writes the text,
 `/program-assemble` writes the object on `cycles[currentCycleIndex]`.
