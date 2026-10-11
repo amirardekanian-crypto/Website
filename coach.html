@@ -546,6 +546,14 @@
   .pvwhen { min-width: 150px; font-weight: 600; }
   .pvtime { color: var(--muted-soft); font-weight: 400; margin-left: 5px; }
   .pvwho { flex: 1; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* An entry's history (Exercises → an entry → History): one block per change, what it changed under it. */
+  .spvrow { padding: 9px 0; border-bottom: 1px solid var(--rule); font-family: 'Barlow', sans-serif; font-size: 13px; }
+  .spvrow:last-child { border-bottom: 0; }
+  .spvtop { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .spvwhen { font-weight: 600; }
+  .spvwho { flex: 1; min-width: 120px; color: var(--muted); }
+  .spvchg { margin-top: 5px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
+  .spvchg b { font-weight: 600; color: var(--ink); }
 
   /* ── Logins waiting to be sent ───────────────────────────────────────── */
   .creds { margin-bottom: 14px; border-left: 3px solid var(--clay); }
@@ -1398,7 +1406,8 @@ window.bulkCreateLogins = bulkCreateLogins;
 // player data): assess_players, assess_notes and assess_results (only the member who owns them can
 // read them, so the coach would read ZERO rows and the backup would look fine while empty).
 // hab_season_results got its SELECT grant in stage46 (2026-10-10); coaching_log_versions (stage47)
-// is every earlier text of a coaching log, kept by a trigger.
+// is every earlier text of a coaching log, kept by a trigger. spine_versions (stage49) is the same for the
+// Spine: every row of exercises, exercise_coach and qualities as it was before a change, deletes included.
 const BACKUP_TABLES = [
   'programs', 'program_versions', 'coaching_logs', 'athlete_identities',
   'athlete_progress', 'session_history', 'messages', 'hab_notes', 'hab_contacts',
@@ -1407,7 +1416,7 @@ const BACKUP_TABLES = [
   'library', 'library_categories', 'library_sessions',
   'affiliates',
   'tps_content', 'course_en', 'tps_accounts', 'assess_content', 'assess_accounts',
-  'exercises', 'exercise_coach', 'qualities', 'coaching_log_versions',
+  'exercises', 'exercise_coach', 'qualities', 'coaching_log_versions', 'spine_versions',
 ];
 
 const PASSWORD_TABLES = ['athlete_identities', 'tps_accounts', 'assess_accounts'];
@@ -4297,14 +4306,27 @@ async function deleteAthlete(athleteId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const name = nameOf(athleteId);
   if (!confirm(`Delete ${name}'s training history?\n\nThis permanently removes every finished session, and everything the app keeps for them on the server: habit log, body weight, personal records, the live snapshot. It cannot be undone, except from a backup file.\n\nWhat STAYS: their programme, their login, the coaching log, call logs, Proof contact and wall lines. They stay on the roster. To remove someone completely, ask Claude (it needs the database).`)) return;
-  // Ask for the rows back: with a lapsed sign-in RLS deletes nothing and reports no error, and
-  // this used to say "Training history deleted" all the same.
-  const r1 = await sb.from('session_history').delete().eq('athlete_id', athleteId).select('day');
-  const r2 = await sb.from('athlete_progress').delete().eq('athlete_id', athleteId).select('athlete_id');
-  if (r1.error || r2.error) { alert('Could not delete everything: ' + ((r1.error || r2.error).message) + (r1.error ? '' : `\n\nThe finished sessions WERE deleted (${(r1.data || []).length}); the progress snapshot was not.`)); hardRefresh(); return; }
-  const nS = (r1.data || []).length, nP = (r2.data || []).length;
+  // One call, one transaction (stage48): the sessions and the progress snapshot go together or not at all.
+  // It used to be two deletes from this page, and a failure between them left one gone and one standing.
+  // The function checks the coach itself and counts what it removed, so a lapsed sign-in (which RLS used to
+  // turn into "0 rows, no error") is an error or a zero, never a success.
+  const res = await sb.rpc('coach_delete_training_history', { p_athlete_id: athleteId });
+  if (res.error) {
+    const m = res.error.message || '';
+    // A database error code means the server answered, and an error rolls the whole call back. No code means the answer
+    // never arrived (a dropped connection): the delete may have gone through, so say that instead of "nothing was removed".
+    if (!res.error.code) {
+      alert(`The answer never arrived (${m || 'no reply'}), so the page cannot tell whether ${name}'s training history was deleted.\n\nRefresh and open their File to see; delete again only if it is still there.`);
+      return;
+    }
+    alert('Nothing was deleted: ' + (/coach only|permission denied|JWT/i.test(m) ? 'your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.'
+      : /Could not find the function|PGRST202/i.test(m + (res.error.code || '')) ? 'the server does not have coach_delete_training_history yet (supabase/stage48_coach_one_transaction.sql has not been applied).'
+      : m) + '\n\nNothing was removed: both parts are one step, so a failure undoes it all.');
+    return;
+  }
+  const d = res.data || {}, nS = Number(d.sessions) || 0, nP = Number(d.progress) || 0;
   const had = (S.hist || []).some(h => h.athlete_id === athleteId) || (S.prog || []).some(p => p.athlete_id === athleteId);
-  if (!nS && !nP && had) { alert('Nothing was deleted: the server removed no rows. Your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.'); return; }
+  if (!nS && !nP && had) { alert('Nothing was deleted: the server removed no rows although the dashboard lists some. Refresh and try again.'); hardRefresh(); return; }
   toast(`Deleted ${nS} session${nS === 1 ? '' : 's'}${nP ? ' and the app data' : ''}`);
   hardRefresh();
 }
@@ -5228,6 +5250,12 @@ const SPINE_ENTRY_COL = { 'sf:name': 'name', 'sf:aliases': 'aliases', 'sf:patter
   'sf:good': 'cues', 'sf:bad': 'cues', 'sf:easier': 'easier', 'sf:harder': 'harder', 'sf:alts': 'alts',
   'sf:equipment': 'equipment', sload: 'loads', 'sf:impact': 'impact', 'sf:muscles': 'muscles' };
 const SPINE_COACH_COL = { 'sf:sfr': 'sfr', sflag: 'flags', 'sf:credits': 'credits', 'sf:cost': 'cost', 'sf:notes': 'notes' };
+// What each column is called on screen (a clash message, the history list). A column not named here is
+// Claude's bookkeeping (links_before, suggested_changes …) and never shown.
+const SPINE_LABEL = { name: 'Name', aliases: 'Also written as', pattern: 'Pattern', video: 'Video', qualities: 'Qualities',
+  purpose: 'Why it’s here', tennis: 'On court', cues: 'Cues / Don’t', easier: 'Regressions', harder: 'Progressions',
+  alts: 'Alternatives', equipment: 'Equipment', loads: 'Body parts', impact: 'Impact', muscles: 'Muscles shown',
+  status: 'Status', sfr: 'SFR rank', flags: 'Flags', credits: 'Counts toward', cost: 'Cost', notes: 'Notes' };
 function stableJson(v) {
   return JSON.stringify(v ?? null, (k, x) => x && typeof x === 'object' && !Array.isArray(x)
     ? Object.keys(x).sort().reduce((o, kk) => { o[kk] = x[kk]; return o; }, {}) : x);
@@ -5235,25 +5263,20 @@ function stableJson(v) {
 // Write only the columns the coach changed, and only when nobody changed THOSE columns since the
 // page read the row. Claude's /spine Upkeep writes the same rows by SQL while Amir reviews them, and
 // the old save sent every column from the page's copy, so it undid that work without a word.
+// Used by the ten qualities (qualSave), a single table. The exercise editor's two-table save is the
+// server's coach_save_spine() (stage48): one transaction, the same rule.
 // Returns { row } on success, { clash: [cols], live } when someone else changed a column the coach
 // also changed, or { error }.
-async function saveChangedCols(table, id, snap, changes, versioned) {
+async function saveChangedCols(table, id, snap, changes) {
   const live = await sb.from(table).select('*').eq('id', id).maybeSingle();
   if (live.error) return { error: 'could not read it back first: ' + live.error.message };
-  if (!live.data) {
-    if (versioned) return { error: 'this entry is no longer on the server. Refresh.' };
-    const ins = await sb.from(table).insert(Object.assign({ id }, changes)).select('*');
-    const bad = writeFailed(ins);
-    return bad ? { error: bad } : { row: ins.data[0] };
-  }
+  if (!live.data) return { error: 'this entry is no longer on the server. Refresh.' };
   const clash = Object.keys(changes).filter(k => k !== 'updated_at' && k !== 'updated_by' &&
     stableJson(live.data[k]) !== stableJson(snap[k]) && stableJson(live.data[k]) !== stableJson(changes[k]));
   if (clash.length) return { clash, live: live.data };
-  let q = sb.from(table).update(changes).eq('id', id);
-  if (versioned) q = q.eq('updated_at', live.data.updated_at);
-  const r = await q.select('*');
+  const r = await sb.from(table).update(changes).eq('id', id).eq('updated_at', live.data.updated_at).select('*');
   if (r.error) return { error: r.error.message };
-  if (!r.data || !r.data.length) return { error: versioned ? 'it changed on the server again while saving. Save again.' : writeFailed(r) };
+  if (!r.data || !r.data.length) return { error: 'it changed on the server again while saving. Save again.' };
   return { row: r.data[0] };
 }
 function spineShort(v) {
@@ -5262,6 +5285,172 @@ function spineShort(v) {
 }
 function spineCsv(v) { return String(v || '').split(',').map(x => x.trim()).filter(Boolean); }
 function spineLines(v) { return String(v || '').split('\n').map(x => x.trim()).filter(Boolean); }
+
+// ── An entry's history (stage49, 2026-10-10) ─────────────────────────────────────────────
+// spine_versions keeps the row as it was before every real change, from any writer (this page, Claude's /spine
+// SQL, a hand-written UPDATE). The list shows what each change did; "Undo this change" puts the changed fields
+// back through coach_save_spine, so the undo is itself guarded and itself in the list.
+let _spineHistId = null;                 // the entry whose History is open (survives a redraw)
+// The versions on screen, so a button can find its row. `ok` says the rows are current for this entry and this copy
+// of the Spine: a redraw (every keystroke in the search box redraws this tab) repaints from them instead of reading
+// 80 rows with their full data again. Anything that changes the entry calls spineHistStale().
+let _spVers = { id: null, rows: [], capped: false, ok: false, spine: null };
+let _spLoading = null;                   // the entry whose versions are being read right now
+let _spGen = 0;                          // bumped when the entry changes, so a read that was in flight is not trusted
+function spineHistStale() { _spGen++; _spVers.ok = false; }
+function spineWho(by) { return by === COACH_EMAIL ? 'you' : by === 'sql' ? 'Claude (SQL)' : (by || '—'); }
+// One value as a person reads it: counts as "quads 1, glutes 0.5", cues as lines, lists joined, nothing as (empty).
+function spineValFull(k, v) {
+  if (v == null || v === '' || (Array.isArray(v) && !v.length) || (typeof v === 'object' && !Array.isArray(v) && !Object.keys(v).length)) return '(empty)';
+  if (k === 'credits' || k === 'muscles') return spineCreditsText(v) || '(empty)';
+  if (k === 'cues') return [(v.good || []).join(' / '), (v.bad || []).length ? 'don’t: ' + v.bad.join(' / ') : ''].filter(Boolean).join(' · ') || '(empty)';
+  return Array.isArray(v) ? v.join(', ') : typeof v === 'object' ? JSON.stringify(v) : String(v);
+}
+// Two values side by side, for History and the Undo confirm. Long text is cut to the same window in both, starting
+// a little before the first difference: cutting each at its first 140 characters showed an edit near the end of a
+// long purpose as two identical lines.
+function spinePair(k, a, b) {
+  const x = spineValFull(k, a), y = spineValFull(k, b), cap = 140;
+  if (x.length <= cap && y.length <= cap) return [x, y];
+  let p = 0;
+  while (p < x.length && p < y.length && x[p] === y[p]) p++;
+  let from = Math.max(0, p - 40);
+  const sp = x.lastIndexOf(' ', from);                 // both texts are the same up to p, so one word boundary serves both
+  if (from && sp >= 0 && from - sp <= 20) from = sp + 1;   // start on a word, not mid-word
+  const cut = s => (from ? '…' : '') + s.slice(from, from + cap) + (s.length > from + cap ? '…' : '');
+  return [cut(x), cut(y)];
+}
+function spineHistToggle(el, id) {
+  const wasOpen = _spineHistId === id;
+  _spineHistId = el.open ? id : (_spineHistId === id ? null : _spineHistId);
+  // Opened by the coach: read it fresh. A toggle the browser fires when a redraw puts an already-open History back
+  // changes nothing (renderExercises refills it from the rows it already has).
+  if (el.open && !wasOpen) loadSpineVersions(id, true);
+}
+function paintSpineVersions(box, id) {
+  const rows = _spVers.rows;
+  box.innerHTML = rows.length
+    ? `<p class="empty" style="padding:0 0 6px">Each block is one change, newest first: the old value, then <b>the new one</b>. Undo puts the old values back (the current ones stay in this list). Nothing is ever pruned.</p>` +
+      rows.map(v => {
+        const cols = Object.keys(v.changed).filter(k => SPINE_LABEL[k]);
+        return `<div class="spvrow"><div class="spvtop"><span class="spvwhen">${esc(fmtLocalStamp(v.saved_at))}</span>
+          <span class="spvwho">${esc(spineWho(v.saved_by))}${v.tbl === 'exercise_coach' ? ' · coach-only part' : ''}</span>
+          <button class="btn sm" onclick="undoSpineVersion(${jsq(id)}, ${Number(v.id)})">Undo this change</button></div>
+          <div class="spvchg">${cols.map(k => { const [o, n] = spinePair(k, v.data[k], v.changed[k]); return `<div><b>${esc(SPINE_LABEL[k])}</b>: ${esc(o)} → <b>${esc(n)}</b></div>`; }).join('')}</div></div>`;
+      }).join('') + (_spVers.capped ? '<p class="empty" style="padding:8px 0 0">These are the newest 80 changes. Older ones are still kept in <code>spine_versions</code>.</p>' : '')
+    : '<p class="empty">No earlier versions yet. History starts with the next change, from this page or from Claude.</p>';
+}
+async function loadSpineVersions(id, fresh) {
+  const box = $('spvlist');
+  if (!box) return;
+  if (DEMO) { box.innerHTML = '<p class="empty">Demo: the real page lists every earlier version of this entry here, with what changed and an Undo for each.</p>'; return; }
+  if (!fresh && _spVers.ok && _spVers.id === id && _spVers.spine === S.spine) { paintSpineVersions(box, id); return; }   // a redraw: same rows
+  if (_spLoading === id) return;   // a read for this entry is on its way and fills whichever box is on screen when it lands
+  _spLoading = id;
+  const gen = _spGen;
+  let r;
+  try {
+    r = await sb.from('spine_versions').select('id, tbl, op, data, changed, saved_at, saved_by')
+      .in('tbl', ['exercises', 'exercise_coach']).eq('row_id', id).order('id', { ascending: false }).limit(80);
+  } finally { _spLoading = null; }
+  const now = $('spvlist');
+  if (!now || _spineOpen !== id) return;   // moved on while it loaded
+  if (gen !== _spGen) { loadSpineVersions(id, true); return; }   // the entry changed while it loaded: read again
+  if (r.error) {
+    const code = r.error.code || '', msg = r.error.message || '';
+    // A missing table is PGRST205 (or 42P01); a lapsed sign-in is 42501 "permission denied for table spine_versions",
+    // which names the table too and must not read as "stage49 is not applied".
+    const missing = code === 'PGRST205' || code === '42P01' || /could not find the table|schema cache|does not exist/i.test(msg);
+    const denied = code === '42501' || code === 'PGRST301' || /permission denied|JWT/i.test(msg);
+    _spVers = { id, rows: [], capped: false, ok: false, spine: null };
+    now.innerHTML = `<p class="empty">${missing ? 'History is not on the server yet (supabase/stage49_spine_versions.sql has not been applied).'
+      : denied ? 'Could not load history: your sign-in may have lapsed. Refresh, and sign in again if asked.' : 'Could not load history: ' + esc(msg)}</p>`;
+    return;
+  }
+  // Only changes to columns this page shows; a change to Claude's bookkeeping alone is not worth a line.
+  const rows = (r.data || []).filter(v => v.op === 'update' && Object.keys(v.changed || {}).some(k => SPINE_LABEL[k]));
+  const capped = (r.data || []).length >= 80;   // the read asks for the newest 80; older ones are still in spine_versions
+  _spVers = { id, rows, capped, ok: true, spine: S.spine };
+  paintSpineVersions(now, id);
+}
+async function undoSpineVersion(id, versionId) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (!S.spine || S.spine.failed) { alert('The Spine did not load, so nothing can be saved. Tap ↻ Refresh first.'); return; }
+  const v = _spVers.id === id && _spVers.rows.find(x => Number(x.id) === Number(versionId));
+  if (!v) { alert('That change is not on screen any more. Close History and open it again.'); return; }
+  if (!spineMayLeave('Put it back')) return;
+  // Compare against the server's copy now, not the page's: the point is what is there at this moment.
+  const [le, lc] = await Promise.all([sb.from('exercises').select('*').eq('id', id).maybeSingle(), sb.from('exercise_coach').select('*').eq('id', id).maybeSingle()]);
+  if (le.error || lc.error || !le.data) { alert('Could not read the entry first: ' + ((le.error || lc.error || {}).message || 'it is not on the server any more') + '\n\nNothing was changed.'); return; }
+  const half = v.tbl === 'exercises' ? le.data : (lc.data || {});
+  const cols = Object.keys(v.changed || {}).filter(k => SPINE_LABEL[k] && stableJson(half[k]) !== stableJson(v.data[k]));
+  if (!cols.length) { toast('Already as it was then: nothing to put back'); return; }
+  const changes = {}, snap = {};
+  cols.forEach(k => { changes[k] = v.data[k] === undefined ? null : v.data[k]; snap[k] = half[k] === undefined ? null : half[k]; });
+  const mine = v.tbl === 'exercises';
+  // Undo can bring an old name, alias or link back, so it meets the rules Save does (spineIdentityProblem): it must not
+  // take a card away from an entry, rename an entry live cards use, or point a link at an entry that is gone. The page's
+  // copy of this entry is brought up to the server's first, so the rules judge what is there now.
+  if (mine && cols.some(k => k === 'name' || k === 'aliases' || k === 'easier' || k === 'harder' || k === 'alts')) {
+    const cur = S.spine.list.find(e => e.id === id);
+    if (cur) Object.assign(cur, le.data);
+    const problem = spineUndoProblem(id, cur, changes);
+    if (problem) { alert(problem); return; }
+  }
+  const toDraft = cols.includes('status') && v.data.status === 'draft', toLive = cols.includes('status') && v.data.status === 'approved';
+  if (!confirm(`Undo the change of ${fmtLocalStamp(v.saved_at)}?\n\n${cols.map(k => { const [now, back] = spinePair(k, half[k], v.data[k]); return `${SPINE_LABEL[k]}: now ${now}\n   back to ${back}`; }).join('\n')}${
+    toDraft ? '\n\nThat moves the entry back to draft: it comes off every phone until you approve it again.' : toLive ? '\n\nThat approves the entry: athletes see it on their next open.' : ''}\n\nThe values it replaces stay in the history, so this can be undone too.`)) return;
+  const res = await sb.rpc('coach_save_spine', { p_id: id, p_entry: mine ? changes : {}, p_entry_snap: mine ? snap : {}, p_coach: mine ? {} : changes, p_coach_snap: mine ? {} : snap });
+  spineHistStale();   // whatever the answer, the entry's history may have moved: the next paint reads it again
+  if (res.error) {
+    // No database code means the answer never arrived: the change may have gone in, so do not say it did not.
+    alert(!res.error.code
+      ? 'The answer never arrived (' + (res.error.message || 'no reply') + '), so the page cannot tell whether it was put back.\n\nTap ↻ Refresh and look at the entry before trying again.'
+      : 'Could not put it back: ' + res.error.message + '\n\nNothing was changed.');
+    return;
+  }
+  if (res.data && res.data.ok === false) { alert('It was changed again while you were looking, so nothing was put back. Close History and open it again.'); renderExercises(); return; }
+  const cur = S.spine.list.find(e => e.id === id);
+  if (cur && res.data.entry) Object.assign(cur, res.data.entry);
+  if (res.data.coach) S.spine.coach[id] = res.data.coach;
+  _spineDraft = null;
+  toast('Put back');
+  renderExercises();
+}
+window.spineHistToggle = spineHistToggle;
+window.undoSpineVersion = undoSpineVersion;
+
+// The identity rules, shared by Save and Undo (Undo can bring an old name, alias or link back, so it meets the same
+// rules). A new name or alias must not take a card away from this entry or from another one; an entry that live
+// cards use cannot be renamed from here (the cards and their logged history have to move with it: /spine's "One name
+// in live programmes"); and a link that looks like an id must be an entry. Returns the text for an alert, or '' when
+// the change is fine. `undoing` only changes the closing words.
+function spineIdentityProblem(id, cur, name, aliases, undoing) {
+  const tail = undoing ? 'Nothing was changed.' : 'Nothing was saved.';
+  const idx = spineIndexC(S.spine.list);
+  const next = S.spine.list.map(e => e.id === id ? Object.assign({}, e, { name, aliases }) : e);
+  const fresh = (name !== cur.name ? [name] : []).concat(aliases.filter(x => !(cur.aliases || []).includes(x)));
+  const clashWith = fresh.map(n => exNameVariantsC(n)).flatMap(vs => [0, 1].flatMap(t =>
+    (vs[t] && idx[t][vs[t]] || []).filter(x => x !== id))).filter((x, i, a) => a.indexOf(x) === i);
+  if (clashWith.length) return `${fresh.map(x => '"' + x + '"').join(' or ')} is already how ${clashWith.map(x => (S.spine.list.find(e => e.id === x) || {}).name || x).join(', ')} is written. Two entries with one name both stop matching any card. ${tail}`;
+  if (name !== cur.name) {
+    const used = spineCardsFor(id), who = Object.keys(used.athletes);
+    if (used.cards) return `${cur.name} is on ${used.cards} card${used.cards === 1 ? '' : 's'} in ${who.length} programme${who.length === 1 ? '' : 's'} (${who.map(nameOf).join(', ')}).\n\nOne name per exercise: a rename has to change those cards too and move their logged history (Last time, Personal Records) to the new name, or the cards stop finding this entry. That is Claude's /spine "One name in live programmes" job.\n\n${tail} Ask Claude to rename it${undoing ? '.' : '; your other changes are still in the form.'}`;
+  }
+  const lost = spineResolveChanges(S.spine.list, next);
+  if (lost.length) return `That would take ${lost.length} card name${lost.length === 1 ? '' : 's'} away from ${lost.length === 1 ? 'its' : 'their'} entry:\n\n${lost.slice(0, 8).map(l => `${l.name} (${l.athletes.map(nameOf).join(', ')})`).join('\n')}\n\n${tail}`;
+  return '';
+}
+// Undo's side of the same rules: `changes` are the columns it would write back.
+function spineUndoProblem(id, cur, changes) {
+  if (!cur) return 'This entry is not in the page\'s copy of the Spine yet. Tap ↻ Refresh, then try again.\n\nNothing was changed.';
+  const ids = new Set(S.spine.list.map(e => e.id));
+  const bad = ['easier', 'harder', 'alts'].filter(k => k in changes).flatMap(k => changes[k] || []).filter(x => SPINE_ID_RE.test(x) && !ids.has(x));
+  if (bad.length) return 'These links point at entries that are not in the Spine any more:\n\n' + bad.join('\n') + '\n\nNothing was changed. Edit that field in the form instead.';
+  if ('name' in changes || 'aliases' in changes)
+    return spineIdentityProblem(id, cur, 'name' in changes ? changes.name : cur.name, 'aliases' in changes ? (changes.aliases || []) : (cur.aliases || []), true);
+  return '';
+}
 
 async function spineSave(id, approve) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
@@ -5323,53 +5512,50 @@ async function spineSave(id, approve) {
   // Claude's suggested qualities fill the boxes of an entry that has none, and go up with any save.
   if (!(cur.qualities || []).length && row.qualities.length) entry.qualities = row.qualities;
   if (!Object.keys(entry).length && !Object.keys(coach).length) { toast('Nothing changed, so nothing to save'); return; }
-  // Identity: a new name or alias must not take a card away from this entry or from another one.
+  // Identity: a new name or alias must not take a card away from this entry or from another one (the rules Undo meets too).
   if ('name' in entry || 'aliases' in entry) {
-    const next = S.spine.list.map(e => e.id === id ? Object.assign({}, e, { name: row.name, aliases: row.aliases }) : e);
-    const fresh = (row.name !== cur.name ? [row.name] : []).concat(row.aliases.filter(x => !(cur.aliases || []).includes(x)));
-    const clashWith = fresh.map(n => exNameVariantsC(n)).flatMap(vs => [0, 1].flatMap(t =>
-      (vs[t] && idx[t][vs[t]] || []).filter(x => x !== id))).filter((x, i, a) => a.indexOf(x) === i);
-    if (clashWith.length) { alert(`${fresh.map(x => '"' + x + '"').join(' or ')} is already how ${clashWith.map(x => (S.spine.list.find(e => e.id === x) || {}).name || x).join(', ')} is written. Two entries with one name both stop matching any card. Nothing was saved.`); return; }
-    if ('name' in entry && row.name !== cur.name) {
-      const used = spineCardsFor(id), who = Object.keys(used.athletes);
-      if (used.cards) { alert(`${cur.name} is on ${used.cards} card${used.cards === 1 ? '' : 's'} in ${who.length} programme${who.length === 1 ? '' : 's'} (${who.map(nameOf).join(', ')}).\n\nOne name per exercise: a rename has to change those cards too and move their logged history (Last time, Personal Records) to the new name, or the cards stop finding this entry. That is Claude's /spine "One name in live programmes" job.\n\nNothing was saved. Ask Claude to rename it; your other changes are still in the form.`); return; }
-    }
-    const lost = spineResolveChanges(S.spine.list, next);
-    if (lost.length) { alert(`That would take ${lost.length} card name${lost.length === 1 ? '' : 's'} away from ${lost.length === 1 ? 'its' : 'their'} entry:\n\n${lost.slice(0, 8).map(l => `${l.name} (${l.athletes.map(nameOf).join(', ')})`).join('\n')}\n\nNothing was saved.`); return; }
+    const problem = spineIdentityProblem(id, cur, row.name, row.aliases, false);
+    if (problem) { alert(problem); return; }
   }
   if (approve === false) {
     const used = spineCardsFor(id), n = Object.keys(used.athletes).length;
     if (!confirm(`Move ${cur.name} back to draft?\n\nA draft is off every phone: ${n ? `${n} athlete${n === 1 ? '' : 's'} with it in their programme lose its cues, its ⓘ sheet and its qualities on the day card until you approve it again` : 'nobody has it in a programme right now'}.${Object.keys(edits).length ? '\n\nYour other changes in the form are saved with it.' : ''}`)) return;
   }
-  const label = { name: 'Name', aliases: 'Also written as', pattern: 'Pattern', video: 'Video', qualities: 'Qualities',
-    purpose: 'Why it’s here', tennis: 'On court', cues: 'Cues / Don’t', easier: 'Regressions', harder: 'Progressions',
-    alts: 'Alternatives', equipment: 'Equipment', loads: 'Body parts', impact: 'Impact', muscles: 'Muscles shown',
-    status: 'Status', sfr: 'SFR rank', flags: 'Flags', credits: 'Counts toward', cost: 'Cost', notes: 'Notes' };
-  const clashMsg = (res, snap, partial) => `Since you opened ${cur.name}, someone else (Claude's /spine, or this page in another tab) changed what you changed:\n\n${
-    res.clash.map(k => `${label[k] || k}: now "${spineShort(res.live[k])}", was "${spineShort(snap[k])}"`).join('\n')}\n\n${
-    partial ? 'The entry itself was saved; the coach-only part was NOT.' : 'Nothing was saved.'} Your typed values are still in the form: Save again to put yours over theirs, or Close to keep theirs.`;
-  let resE = null, resC = null;
-  if (Object.keys(entry).length) {
-    entry.updated_at = new Date().toISOString(); entry.updated_by = 'coach';
-    resE = await saveChangedCols('exercises', id, cur, entry, true);
-    if (resE.clash) { const was = Object.assign({}, cur); Object.assign(cur, resE.live); alert(clashMsg(resE, was, false)); renderExercises(); return; }
-    if (resE.error) { alert('Could not save ' + cur.name + ': ' + resE.error + '\n\nNothing was saved; what you typed is still in the form.'); return; }
-    Object.assign(cur, resE.row);
-    // The entry is saved: those fields are no longer unsaved edits.
-    Object.keys(edits).forEach(k => { if (SPINE_ENTRY_COL[k]) delete edits[k]; });
+  // One call, one transaction (stage48). The server re-reads both rows under a lock, refuses (writing NOTHING, to
+  // either half) when someone else changed a column this save also changes, and otherwise writes exactly the
+  // columns sent. It used to be two reads and two writes from this page: a failure on the second left the entry
+  // saved and the coach-only half not, and the coach-only half had no lock between its read and its write.
+  // The snapshot is what this page read for the columns being changed; a column it never had counts as null.
+  const snapE = {}, snapC = {}, nm0 = cur.name;
+  Object.keys(entry).forEach(k => { snapE[k] = cur[k] === undefined ? null : cur[k]; });
+  Object.keys(coach).forEach(k => { snapC[k] = k0[k] === undefined ? null : k0[k]; });
+  const res = await sb.rpc('coach_save_spine', { p_id: id, p_entry: entry, p_entry_snap: snapE, p_coach: coach, p_coach_snap: snapC });
+  spineHistStale();   // whatever the answer, the entry's history may have moved: the next paint reads it again
+  if (res.error) {
+    const m = res.error.message || '';
+    // A database error code means the server answered, and an error rolls the whole call back: nothing was saved. No code
+    // means the answer never arrived (a dropped connection): the save may have gone in, so the page must not say it did not.
+    alert(!res.error.code
+      ? `The answer never arrived (${m || 'no reply'}), so the page cannot tell whether ${nm0} was saved.\n\nTap ↻ Refresh and look at the entry before saving again; what you typed is still in the form.`
+      : `Could not save ${nm0}: ` + (/Could not find the function|PGRST202/i.test(m + (res.error.code || '')) ? 'the server does not have coach_save_spine yet (supabase/stage48_coach_one_transaction.sql has not been applied).'
+        : /coach only|permission denied|JWT/i.test(m) ? 'your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.' : m)
+        + '\n\nNothing was saved, to either half; what you typed is still in the form.');
+    return;
   }
-  if (Object.keys(coach).length) {
-    resC = await saveChangedCols('exercise_coach', id, k0, coach, false);
-    if (resC.clash) {
-      S.spine.coach[id] = Object.assign({}, k0, resC.live);
-      alert(clashMsg(resC, k0, !!resE)); renderExercises(); return;
-    }
-    if (resC.error) {
-      alert(`${resE ? 'Saved the entry, but NOT' : 'Could not save'} the coach-only part (counts, SFR, flags, cost, notes): ${resC.error}\n\nThose values are still in the form. Save again.`);
-      renderExercises(); return;
-    }
-    S.spine.coach[id] = resC.row;
+  const out = res.data || {};
+  if (out.ok === false) {
+    const lines = [];
+    ['entry', 'coach'].forEach(half => (out[half] ? out[half].cols : []).forEach(k =>
+      lines.push(`${SPINE_LABEL[k] || k}: now "${spineShort(out[half].live[k])}", was "${spineShort((half === 'entry' ? cur : k0)[k])}"`)));
+    // The page's copy becomes what the server holds, so a Save again compares against it and goes through.
+    if (out.entry) Object.assign(cur, out.entry.live);
+    if (out.coach) S.spine.coach[id] = Object.assign({}, k0, out.coach.live);
+    alert(`Since you opened ${nm0}, someone else (Claude's /spine, or this page in another tab) changed what you changed:\n\n${lines.join('\n')}\n\nNothing was saved, to either half. Your typed values are still in the form: Save again to put yours over theirs, or Close to keep theirs.`);
+    renderExercises();
+    return;
   }
+  if (out.entry) Object.assign(cur, out.entry);
+  if (out.coach) S.spine.coach[id] = out.coach;
   _spineDraft = null;
   toast(row.status === 'approved' ? (approve ? 'Approved — athletes see it on their next open' : 'Saved') : approve === false ? 'Moved back to draft: off every phone' : 'Saved as draft');
   if (approve === true) _spineOpen = null;
@@ -5394,7 +5580,7 @@ async function qualSave(id, approve) {
   if (!Object.keys(changes).length) { toast('Nothing changed, so nothing to save'); return; }
   if (approve === false && !confirm(`Move ${cur.name} back to draft?\n\nA draft quality comes off every athlete's day cards until you approve it again.`)) return;
   changes.updated_at = new Date().toISOString(); changes.updated_by = 'coach';
-  const r = await saveChangedCols('qualities', id, cur, changes, true);
+  const r = await saveChangedCols('qualities', id, cur, changes);
   if (r.clash) {
     Object.assign(cur, r.live);
     alert(`Since the page loaded, someone else changed ${cur.name}'s ${r.clash.join(', ')}. Nothing was saved. Your text is still in the boxes: Save again to put yours over theirs.`);
@@ -5504,6 +5690,7 @@ function renderExercises() {
     return;
   }
   c.classList.toggle('no-anim', !!$('spineQ'));
+  if (_spineHistId && _spineHistId !== _spineOpen) _spineHistId = null;   // History belongs to the entry it was opened on
   const list = S.spine.list, byId = {};
   list.forEach(e => { byId[e.id] = e; });
   const idx = spineIndexC(list);
@@ -5598,6 +5785,10 @@ function renderExercises() {
         </div>
         <input data-sf="notes" placeholder="notes" value="${esc(k.notes || '')}" style="${field};margin-top:8px">
       </div>
+      <details class="rawlog"${_spineHistId === e.id ? ' open' : ''} ontoggle="spineHistToggle(this, ${jsq(e.id)})">
+        <summary>History: earlier versions of this entry</summary>
+        <div id="spvlist" class="pvlist">Loading…</div>
+      </details>
       <div class="spine-acts">
         ${e.status === 'draft' ? `<button class="btn primary sm sp-save" data-id="${esc(e.id)}" data-ap="1">Approve</button><button class="btn sm sp-save" data-id="${esc(e.id)}">Save draft</button>`
           : `<button class="btn primary sm sp-save" data-id="${esc(e.id)}">Save</button><button class="btn sm sp-close">Close</button><span style="flex:1"></span><button class="btn sm sp-save" data-id="${esc(e.id)}" data-ap="0" title="Takes it off every phone">Move back to draft…</button>`}
@@ -5632,6 +5823,7 @@ function renderExercises() {
 
   // The open editor: remember it as drawn, then put back what the coach had typed before this redraw.
   const ed = $('spineEd');
+  if (ed && _spineHistId === _spineOpen) loadSpineVersions(_spineHistId);   // History was open: it redraws closed-then-open, so refill it
   if (ed) {
     _spineBase = { id: _spineOpen, state: spineFormState(ed) };
     if (_spineDraft && _spineDraft.id === _spineOpen) { spineFormSet(ed, _spineDraft.edits); spineMapRefresh(); }

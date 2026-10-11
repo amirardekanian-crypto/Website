@@ -740,6 +740,15 @@ bodyweight version (Box Step-Up vs Dumbbell Box Step-Up, NAM-2).
   where it sits in the programme, History.
 - Drafts are invisible to athletes: `get_exercises()` serves approved entries only, and never
   the coach half (`exercise_coach`: SFR rank, restriction flags, the muscle credits and cost tier).
+- **Every change is kept** (stage49, 2026-10-10): `spine_versions` holds the row as it was before each change
+  to `exercises`, `exercise_coach` or `qualities` (`tbl`, `row_id`, `op` update|delete, `data` = the whole row
+  before, `changed` = `{ column: the value it became }` for an update, `saved_at`, `saved_by` = the signed-in
+  email or `sql`, `was_updated_at`). A trigger writes it, from any writer; only the coach can read it; nothing
+  is pruned. coach.html's History panel reads it. A SQL writer needs to do nothing: set `updated_at` and
+  `updated_by` as before, and the trigger records the rest.
+- **The editor's save is `coach_save_spine(id, entry, entry_snap, coach, coach_snap)`** (stage48): coach only,
+  one transaction over `exercises` and `exercise_coach`, writing only the columns it is sent and refusing (and
+  writing nothing) when a column it changes has moved since the page read it. Claude's SQL is not affected.
 
 #### The TEMPO cell, and the digit that carries the instruction
 

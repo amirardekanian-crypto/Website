@@ -14,9 +14,12 @@
 //
 // Knobs (window.__STUB, also settable before load via window.__HARNESS_SEED.stub):
 //   maxRows      PostgREST max-rows cap (default 1000)
-//   fail         [{ kind:'from'|'rpc'|'fn', name, op?, message, times? }]  one-shot or N-shot errors
+//   fail         [{ kind:'from'|'rpc'|'fn', name, op?, message, code?, times? }]  one-shot or N-shot errors. `code` is the database
+//                error code (default P0001 for an rpc, XX000 for a table); code:'' is what supabase-js returns when the answer never
+//                arrived (a dropped connection), where the write may or may not have gone in
 //   rlsDeny      { table: ['update','delete','insert'] } -> zero rows touched, NO error (PostgREST behaviour)
 //   delay        { name: ms } extra latency per table/rpc/function name
+//   missingRpc   ['coach_save_spine', ...] -> those RPCs answer "Could not find the function" (PGRST202), like a server that has not had the stage applied
 //   emitInitial  true (default) = fire INITIAL_SESSION after onAuthStateChange, as supabase-js v2 does
 //   persist      true (default) = DB saved to localStorage '__harness_db' after every write, reloaded on boot
 //
@@ -42,7 +45,7 @@
     hab_notes: ['athlete_id', 'day'], hab_contacts: ['athlete_id'], hab_intake: ['id'], hab_titles: ['athlete_id', 'title'],
     leaderboard_optin: ['athlete_id'], seasons: ['id'], xp_rules: ['id'], call_logs: ['id'], affiliates: ['code'],
     library: ['slug'], library_categories: ['kind', 'id'], exercises: ['id'], exercise_coach: ['id'], qualities: ['id'],
-    tps_accounts: ['username'], assess_accounts: ['username'], messages: ['id'], cycle_reports: ['id'],
+    tps_accounts: ['username'], assess_accounts: ['username'], messages: ['id'], cycle_reports: ['id'], spine_versions: ['id'],
   };
   function persist() { if (ST.persist) { try { localStorage.setItem('__harness_db', JSON.stringify(DB)); } catch (e) {} } }
   function tbl(name) { return DB[name] || (DB[name] = []); }
@@ -153,7 +156,35 @@
       newRow.updated_at = nowIso(); newRow.updated_by = COACH;
     }
     if (table === 'affiliates' || table === 'coaching_logs' || table === 'library') newRow.updated_at = nowIso();
+    if (table === 'exercises' || table === 'qualities') newRow.updated_at = nowIso();   // stage46: touch_updated_at()
+    keepSpineVersion(table, oldRow, newRow, COACH);
   }
+  // stage49: spine_keep_version(). The row as it was, plus { column: the value it became } for every column that
+  // really changed (updated_at / updated_by do not count). `who` is the signed-in email, or 'sql' for a write
+  // with none (Claude's /spine, the SQL editor).
+  function canon(v) {
+    if (Array.isArray(v)) return v.map(canon);
+    if (v && typeof v === 'object') { var o = {}; Object.keys(v).sort().forEach(function (k) { o[k] = canon(v[k]); }); return o; }
+    return v === undefined ? null : v;
+  }
+  var same = function (a, b) { return JSON.stringify(canon(a)) === JSON.stringify(canon(b)); };
+  function keepSpineVersion(table, oldRow, newRow, who) {
+    if (['exercises', 'exercise_coach', 'qualities'].indexOf(table) < 0) return;
+    var ch = {};
+    Object.keys(oldRow).forEach(function (k) { if (k !== 'updated_at' && k !== 'updated_by' && !same(oldRow[k], newRow[k])) ch[k] = clone(newRow[k] === undefined ? null : newRow[k]); });
+    if (!Object.keys(ch).length) return;
+    tbl('spine_versions').push({ id: ++ST.seq, tbl: table, row_id: oldRow.id, op: 'update', data: clone(oldRow), changed: ch,
+      saved_at: nowIso(), saved_by: who, was_updated_at: oldRow.updated_at || null });
+  }
+  // Claude's /spine Upkeep, or any SQL with no signed-in user: a write that fires the trigger as 'sql'.
+  window.__sqlWrite = function (table, id, patch) {
+    var rows = tbl(table), at = rows.findIndex(function (r) { return r.id === id; });
+    if (at < 0) throw new Error('__sqlWrite: no ' + table + ' row ' + id);
+    var nr = Object.assign({}, rows[at], clone(patch));
+    if (table === 'exercises' || table === 'qualities') nr.updated_at = nowIso();
+    keepSpineVersion(table, rows[at], nr, 'sql');
+    rows[at] = nr; persist();
+  };
 
   B._run = async function () {
     var self = this, table = this.table, op = this.op;
@@ -162,7 +193,7 @@
     if (ST.delay[table]) await sleep(ST.delay[table]);
     await sleep(0);
     var f = takeFail('from', table, op);
-    if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code || 'XX000' }, status: f.status || 400, count: null }; }
+    if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code != null ? f.code : 'XX000' }, status: f.status || 400, count: null }; }
     var rows = tbl(table);
     var match = function (r) { return self.filters.every(function (fn) { return fn(r); }); };
     var denied = (ST.rlsDeny[table] || []).indexOf(op) >= 0;
@@ -287,6 +318,53 @@
       else { row.coach_status = 'new'; t.push(row); }
       return null;
     },
+    // stage48: both deletes or neither. The coach check is the signed-in email, as in the SQL.
+    coach_delete_training_history: function (p) {
+      if (!String(p.p_athlete_id == null ? '' : p.p_athlete_id).trim()) throw new Error('which athlete?');
+      var ns = tbl('session_history').length, np = tbl('athlete_progress').length;
+      DB.session_history = tbl('session_history').filter(function (r) { return r.athlete_id !== p.p_athlete_id; });
+      DB.athlete_progress = tbl('athlete_progress').filter(function (r) { return r.athlete_id !== p.p_athlete_id; });
+      return { sessions: ns - DB.session_history.length, progress: np - DB.athlete_progress.length };
+    },
+    // stage48: the Spine editor's two-table save. Lock both rows, refuse (writing nothing) on a clash, else write
+    // exactly the columns sent; the version trigger runs on each update.
+    coach_save_spine: function (p) {
+      var E = ['name', 'aliases', 'pattern', 'qualities', 'purpose', 'tennis', 'cues', 'equipment', 'loads', 'easier', 'harder', 'alts', 'video', 'status', 'impact', 'muscles'];
+      var C = ['sfr', 'flags', 'notes', 'credits', 'cost'];
+      // SQL NULL and JSON null mean nothing for that half; any other non-object is an error (a double-encoded payload).
+      var obj = function (v) {
+        if (v == null) return {};
+        if (typeof v !== 'object' || Array.isArray(v)) throw new Error('the entry, the coach-only part and their two snapshots must each be a JSON object');
+        return v;
+      };
+      var entry = obj(p.p_entry), coach = obj(p.p_coach), es = obj(p.p_entry_snap), cs = obj(p.p_coach_snap);
+      Object.keys(entry).forEach(function (k) { if (E.indexOf(k) < 0) throw new Error('exercises.' + k + ' cannot be written from the editor'); });
+      Object.keys(coach).forEach(function (k) { if (C.indexOf(k) < 0) throw new Error('exercise_coach.' + k + ' cannot be written from the editor'); });
+      var ex = tbl('exercises').find(function (r) { return r.id === p.p_id; });
+      if (!ex) throw new Error('this entry is no longer on the server (' + p.p_id + '). Refresh.');
+      var co = tbl('exercise_coach').find(function (r) { return r.id === p.p_id; }) || null;
+      var bad = function (live, changes, snap) {
+        return Object.keys(changes).filter(function (k) { return !same(live[k], snap[k]) && !same(live[k], changes[k]); }).sort();
+      };
+      var ce = bad(ex, entry, es), cc = co ? bad(co, coach, cs) : [];
+      if (ce.length || cc.length) {
+        var res = { ok: false };
+        if (ce.length) res.entry = { cols: ce, live: clone(ex) };
+        if (cc.length) res.coach = { cols: cc, live: clone(co) };
+        return res;
+      }
+      var hasE = Object.keys(entry).length > 0, hasC = Object.keys(coach).length > 0;
+      if (hasE) {
+        var ne = Object.assign({}, ex, clone(entry), { updated_by: 'coach', updated_at: nowIso() });
+        keepSpineVersion('exercises', ex, ne, COACH);
+        Object.assign(ex, ne);
+      }
+      if (hasC) {
+        if (co) { var nc = Object.assign({}, co, clone(coach)); keepSpineVersion('exercise_coach', co, nc, COACH); Object.assign(co, nc); }
+        else { co = Object.assign({ id: p.p_id, sfr: null, flags: [], notes: null, suggested_qualities: [], links_before: null, links_history: [], credits: null, cost: null, suggested_changes: [] }, clone(coach)); tbl('exercise_coach').push(co); }
+      }
+      return { ok: true, entry: hasE ? clone(ex) : null, coach: hasC ? clone(co) : null };
+    },
     forget_contact: function (p) {
       ['hab_contacts', 'leaderboard_optin', 'athlete_progress'].forEach(function (n) { DB[n] = tbl(n).filter(function (r) { return r.athlete_id !== p.p_athlete_id; }); });
       DB.hab_notes = tbl('hab_notes').filter(function (r) { return r.athlete_id !== p.p_athlete_id; }); return null;
@@ -306,8 +384,8 @@
         if (ST.delay[name]) await sleep(ST.delay[name]);
         await sleep(0);
         var f = takeFail('rpc', name);
-        if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code || 'P0001' }, status: 400 }; }
-        if (!RPC[name]) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name, code: 'PGRST202' }, status: 404 }; }
+        if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code != null ? f.code : 'P0001' }, status: 400 }; }
+        if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
         try { var d = RPC[name](params || {}); persist(); call.result = { ok: true }; return { data: clone(d), error: null, status: 200 }; }
         catch (e) { call.result = { error: e.message }; return { data: null, error: { message: e.message, code: 'P0001' }, status: 400 }; }
       })();
