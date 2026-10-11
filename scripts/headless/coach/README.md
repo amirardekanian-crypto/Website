@@ -60,7 +60,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 84 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 89 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -139,6 +139,10 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | spine-editor-folds | An approved entry and a draft with no count: which parts of the editor are folded, redraw, save | (pile B10, SPINE-7) the editor was one long form |
 | levels-in-place | Athletes with the levels held back 1.5 s | (pile B10, ROSTER-15) the whole page was replaced when the Proof levels arrived |
 | fail-bar | a failed post on Today (and the same again, and a failed intake status), then a success, on a 1280 px screen and a 360 px phone | (pile B5) a failure was a 2.6 s toast in some tabs and a pop-up in others; now a line that stays until dismissed, in view when scrolled, merged when repeated, never a pop-up; a success stays a toast |
+| buyer-logins-course, buyer-logins-assess | On each buyer tab: create (a double tap makes one login), copy, mark sent (asks first), change the password, a password the function refuses, revoke, restore, and a function that fails; the page keeps the words of what it did | (pile B11, MKT-6) pinned on the two copied blocks before they became one `buyerLogins()`; the "Copied" toast replaced the login toast |
+| athlete-login-double-tap | Save password tapped twice on an athlete's File tab | (pile B11, MKT-6) two calls, two passwords, and the message kept the first |
+| library-paged | Nine Library items with a server that answers three rows at a time | (pile B11, SERVER-10) one request stopped at the row cap and the shelf looked half empty |
+| library-publish-guards | A file that is new, one that replaces a live item, one that replaces a hidden item, and one whose id is already on another shelf | (pile B11, TOOLS-6) the confirm did not say, a hidden item was published again, a moved item was published twice |
 
 ## Adding a scenario
 

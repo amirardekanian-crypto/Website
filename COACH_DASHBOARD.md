@@ -531,7 +531,9 @@ Until 2026-10-10 Save wrote the whole programme as it was when the page opened, 
 old cycle back over a newly published one, and after a publish or restore an edit could land on a
 different exercise. **Version history** (File tab) lists the saves kept for that athlete in your own time zone
 (the last 20 always, and every save since the previous cycle began, never more than 150: stage52, 2026-10-11);
-each line is the programme just before that save, and Restore checks it belongs to this athlete.
+each line is the programme just before that save, and Restore checks it belongs to this athlete. **Who saved it** is the signed-in email;
+an edit made in the SQL editor or by Claude's database tool has no signed-in user and used to carry the previous person's name, as if they had made it.
+Since stage59 (2026-10-11, audit SERVER-12) that edit says `sql`, and a label a writer sets itself (`publish_cycle`, `claude`) stays.
 
 **Undo is a one-tap button and a sentence** (audit FLOW-11 and WORK-10, 2026-10-11). After a ✎ save a bar above the toast says what the save
 changed, in the athlete's words (*Ava Example: Day 1 · Goblet Squat: sets 4 → 5*), with **Undo** (it stays for half a minute). Undo puts the
@@ -693,13 +695,22 @@ not a full erasure: their login still works, so a phone they still use can uploa
 **The Library tab** (`#links`) lists every workout and article, published or hidden, with *Copy App*
 (the in-app link) and, for articles, *Copy Web · FA* and *Copy Web · EN* (the public pages). **Hide**
 takes an item off every athlete's app at once (the file and its web page stay); **Publish** puts it
-back. **Testing app** and **Course** list buyer logins; a failed load says so with *↻ Try again*
+back. The list is read in pages (audit SERVER-10), so a server with a row cap still shows every item. **Publishing a file asks properly**
+(audit TOOLS-6, 2026-10-11): the confirm says per item whether it is *new*, *replaces the live one* or *replaces a hidden one, which STAYS hidden*
+(publish it from its row when you want it live); a file whose id is already on **another shelf** is refused, naming the shelf (hide that one first,
+then publish again), so an item moved to another category is no longer published twice; a Farsi translation or a workout picked as an article is
+refused as before. **Testing app** and **Course** list buyer logins; a failed load says so with *↻ Try again*
 instead of "No logins yet", and *Mark sent* asks first (it clears the only stored copy of the password).
 The **private note** typed when a login is made lives in `buyer_notes`, which only the coach can read (stage53, Amir
 2026-10-11): it used to be the account row's `label`, which the buyer could read through their own account. A trigger
 moves any label the Edge Functions still write into `buyer_notes` and leaves the row's label empty, so the Edge
 Functions did not change; the lists read the note from `buyer_notes` (applied 2026-10-11) and still fall back to the old
 column on a project that has not run stage53. Each buyer row has **Erase…**.
+**The two buyer tabs are one block** (`buyerLogins()`, audit MKT-6, 2026-10-11), built twice with their own table, Edge Function, address and
+Farsi message; before that they were two copied blocks that had drifted. A login call runs one at a time on a buyer tab and on an athlete's
+File tab (a double tap on *Save password* used to make two passwords and leave the message with the first), and after a create, reset or restore
+the page keeps saying what it did (*Login created for …*) instead of "Copied" a moment later. `buyer-logins-course` and `buyer-logins-assess`
+drive create, copy, mark sent, change password, revoke, restore and a failing function through both.
 
 ### Erasing a person
 

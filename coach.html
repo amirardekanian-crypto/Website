@@ -905,7 +905,7 @@ const SB_KEY = 'sb_publishable_BuDVTTC1E0eg3wc7F1Pcig_1A_tqYCy';
 const COACH_EMAIL = 'amirardekanian@gmail.com';   // UX-only; the DB (RLS) is the real gate
 const SITE = 'https://www.amirardekani.com';
 const COACH_NOTE_ID = '__coach__';                // hab_notes row id the coach line lives under
-const AMIR_ATHLETE_ID = 'amir_ardekani';          // the board is fetched through Amir's own athlete identity
+const AMIR_ATHLETE_ID = 'amir_ardekani';          // leaderboard_top() is called AS THE SIGNED-IN COACH (is_coach() lets it through); this id only marks which row is "you" on the board
 const QUIET_SESSION_DAYS = 7;                     // coached athlete idle threshold
 const QUIET_HABIT_DAYS = 3;                       // Proof athlete silent threshold
 const UPGRADE_DAYS = 14;                          // free athlete with this many logged days = upgrade candidate
@@ -1068,9 +1068,10 @@ function renderFails() {
       `<button class="fb-x" aria-label="Dismiss" onclick="failDismiss(${f.id})">✕</button></div>`).join('') +
     (FAILS.length > 1 ? `<button class="btn sm fb-all" onclick="failDismissAll()">Dismiss all</button>` : '');
 }
-function copyText(t, btn) {
+// quiet: the caller says what it did in its own toast (a login created, a password changed); "Copied" arrived a moment later and replaced it.
+function copyText(t, btn, quiet) {
   navigator.clipboard.writeText(t).then(() => {
-    toast('Copied');
+    if (!quiet) toast('Copied');
     if (btn) { const o = btn.textContent; btn.textContent = 'Copied ✓'; setTimeout(() => btn.textContent = o, 1400); }
   }, () => alert('Copy failed — here it is:\n\n' + t));
 }
@@ -1109,7 +1110,6 @@ const S = {
   hist: [],        // session_history rows, LIGHT: no `summary` and no `log` (see loadHistory); an athlete's are merged in when their file opens
   histVer: 0,      // bumped by every loadHistory(): the rows are new objects, so what was merged into the old ones is gone
   fullFor: {},     // athlete_id -> the histVer their summary + log were merged for (ensureSessionsFull)
-  keys: {},        // athlete_id -> secret_key
   notes: [],       // hab_notes rows, last 7 days, hidden included
   contacts: [],    // contact_list() rows
   intake: [],      // intake_list() rows — coaching apply-form submissions
@@ -1459,12 +1459,15 @@ function athleteSavePw(athleteId, action) {
 // and that must never exist in a page anyone can view source on. A create or reset
 // can carry a password Amir typed (checked by typedPassword first, and again by the
 // function); without one, the function generates it.
+let _athLoginBusy = false;   // one login call at a time: a double tap on Reset made two passwords and left the message with the first (audit MKT-6)
 async function athleteLoginAction(athleteId, action, password) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   if (action === 'create' && loginsUnknown()) return;
-  const { data, error } = await sb.functions.invoke('athlete-login', {
-    body: { action, athlete_id: athleteId, password: password || undefined },
-  });
+  if (_athLoginBusy) return;
+  _athLoginBusy = true;
+  let data, error;
+  try { ({ data, error } = await sb.functions.invoke('athlete-login', { body: { action, athlete_id: athleteId, password: password || undefined } })); }
+  finally { _athLoginBusy = false; }
   let msg = data && data.error;
   if (!msg && error) { try { msg = (await error.context.json()).error; } catch (e) { msg = error.message; } }
   if (msg) { fail('Could not ' + action + ' the login:\n\n' + msg); return; }
@@ -1476,7 +1479,7 @@ async function athleteLoginAction(athleteId, action, password) {
   if (action === 'revoke') { toast(data.revoked === false ? 'There was no login to remove' : 'Login removed'); return; }
   // The password and its message now sit on the athlete's File tab (and under "Logins to send")
   // with Copy and Mark sent, so nothing depends on a dialog that is gone once dismissed.
-  copyText(loginMessage(data.username, data.password));
+  copyText(loginMessage(data.username, data.password), null, true);
   // Unless the server could not store it (athlete-login v6 says so): then this is the only place it is shown.
   if (data.warning) { alert('Password ' + (password ? 'changed' : 'reset') + ' for ' + data.username + ', but ' + data.warning + '.\n\nPassword: ' + data.password + '\n\nThe WhatsApp message is copied to your clipboard.'); return; }
   toast((data.created ? 'Login created' : password ? 'Password changed' : 'Password reset') + ' — the message is copied; send it on WhatsApp');
@@ -1507,9 +1510,11 @@ async function bulkCreateLogins() {
     `Create logins for ${ids.length} athlete${ids.length === 1 ? '' : 's'}?\n\n${ids.join(', ')}\n\n` +
     'Each gets a new username/password, ready to copy under "Logins to send".'
   )) return;
-  const { data, error } = await sb.functions.invoke('athlete-login', {
-    body: { action: 'create_many', athlete_ids: ids },
-  });
+  if (_athLoginBusy) return;
+  _athLoginBusy = true;
+  let data, error;
+  try { ({ data, error } = await sb.functions.invoke('athlete-login', { body: { action: 'create_many', athlete_ids: ids } })); }
+  finally { _athLoginBusy = false; }
   if (error || (data && data.error)) {
     fail('Could not create logins:\n\n' + ((data && data.error) || error.message));
     return;
@@ -1732,7 +1737,7 @@ function pickLibraryFile(kind) {
     const files = [...(input.files || [])];
     if (!files.length) return;
 
-    const rows = [], bad = [];
+    const rows = [], bad = [], fileOf = {};
     for (const f of files) {
       let d;
       try { d = JSON.parse(await f.text()); }
@@ -1753,15 +1758,24 @@ function pickLibraryFile(kind) {
       const shelf = (S.libCats || []).find(c => c.kind === kind &&
         (c.id === cat || String(c.title || '').toLowerCase() === cat.toLowerCase() || c.id === cat.toLowerCase()));
       if (!shelf) { bad.push(f.name + ': category "' + cat + '" does not exist yet'); continue; }
-      rows.push({
-        slug: (kind === 'workout' ? 'workouts/' : 'articles/') + shelf.id + '/' + id,
-        kind, category_id: shelf.id, data: d, published: true,
-      });
+      const slug = (kind === 'workout' ? 'workouts/' : 'articles/') + shelf.id + '/' + id;
+      // The same id already lives on ANOTHER shelf: publishing here would put it in the Library twice (audit TOOLS-6, 2026-10-11).
+      const elsewhere = (S.lib || []).find(l => l.kind === kind && l.slug !== slug && String((l.data || {}).id || '') === id);
+      if (elsewhere) {
+        const was = (S.libCats || []).find(c => c.id === elsewhere.category_id);
+        bad.push(f.name + ': "' + id + '" is already on the ' + ((was && was.title) || elsewhere.category_id) + ' shelf. To move it, hide that one first (its row in the Library list), then publish this file again');
+        continue;
+      }
+      // An item you hid stays hidden when its file is published again: the confirm says so, and publishing it is the Show button's job.
+      const before = (S.lib || []).find(l => l.slug === slug);
+      fileOf[slug] = { name: f.name, was: !before ? 'new' : before.published === false ? 'hidden' : 'live' };
+      rows.push({ slug, kind, category_id: shelf.id, data: d, published: before && before.published === false ? false : true });
     }
 
     const NL = String.fromCharCode(10);
     if (bad.length && !rows.length) { fail('Nothing published:' + NL + NL + bad.join(NL)); return; }
-    const preview = rows.map(r => '· ' + (r.data.title || r.slug)).join(NL);
+    const WAS = { 'new': 'new', live: 'replaces the live one', hidden: 'replaces a hidden one, which STAYS hidden (show it from its row when you want it live)' };
+    const preview = rows.map(r => '· ' + (r.data.title || r.slug) + ' — ' + WAS[fileOf[r.slug].was]).join(NL);
     const skipped = bad.length ? NL + NL + 'Skipped:' + NL + bad.join(NL) : '';
     if (!confirm('Publish ' + rows.length + ' ' + kind + '(s)?' + NL + NL + preview + skipped)) return;
 
@@ -1778,13 +1792,15 @@ function pickLibraryFile(kind) {
 async function loadLibrary() {
   S.libCats = [];
   S.lib = [];
+  // The items are read in pages like every growing table (audit SERVER-10, 2026-10-11): one request stops at the server's row cap. All or nothing, as
+  // the Spine: a short answer would show a half-empty shelf as if the rest were gone.
   const [c, l] = await Promise.all([
     sb.from('library_categories').select('*').order('sort_order'),
-    sb.from('library').select('slug, kind, category_id, published, updated_at, data').order('sort_order'),
+    selectAll('library', 'slug, kind, category_id, published, updated_at, data, sort_order', ['sort_order', 'slug']),
   ]);
   if (!c.error) S.libCats = c.data || [];
-  if (!l.error) S.lib = l.data || [];
-  LOAD_ERR.library = (c.error || l.error) ? (c.error || l.error).message : '';
+  if (!l.error && !l.short) S.lib = l.data || [];
+  LOAD_ERR.library = c.error ? c.error.message : l.error ? l.error.message : l.short ? `only ${l.data.length} of ${l.total} library items came back` : '';
 }
 
 // Open an athlete's own app in a new tab, read-only.
@@ -2999,8 +3015,6 @@ function renderRoster() {
 window.renderRoster = renderRoster;
 window.renderAthletes = renderAthletes;
 
-// --- secure links (ported) ---------------------------------------------------
-function normalizeAthleteId(raw) { return (raw || '').trim().replace(/\s+/g, '_').replace(/[^A-Za-z0-9_]/g, ''); }
 window.copyText = copyText;
 
 // --- live-activity decode (ported) ------------------------------------------
@@ -5012,8 +5026,9 @@ window.eraseOpen = eraseOpen; window.eraseCancel = eraseCancel; window.eraseType
 window.eraseFind = eraseFind; window.eraseStopWaiting = eraseStopWaiting;
 
 // --- PROOF (board · funnel · titles · season) --------------------------------
-// The board comes from the server's own scorer via leaderboard_top, called
-// through Amir's athlete identity — the exact rows and order athletes see.
+// The board comes from the server's own scorer via leaderboard_top, called as the signed-in
+// coach (the function lets is_coach() through, with no key): the rows and the order are the ones athletes
+// see. `amir_ardekani` is only the row it marks as "you".
 // The board is kept from the first time it is read until ↻ Refresh or a Proof write that moves XP (a quest week started or ended), and says when
 // it was read (audit MKT-3, 2026-10-11). When the read fails the page says why (MKT-8) and offers to try again.
 function resetBoard() { S.board = { season: null, week: null }; S.boardAt = {}; }
@@ -5402,33 +5417,16 @@ function renderAffiliates() {
   on('.aff-reactivate', el => affSetActive(el.dataset.code, true, el));
 }
 
-// --- TESTING APP (buyer logins) ---------------------------------------------
-// The tennis testing app at /tennis-testing/app/ (its source is tennis-testing/app/ in this repo;
-// /tennis-testing/ itself is the product page).
-// Same pattern as athlete logins: the assess-login Edge Function makes the auth user on an
-// internal address, assess.<username>@amirardekani.com, and hands back a password to send.
-// Revoke bans the login but keeps the buyer's saved players and results; Restore brings it back
-// with a new password. Buyer data itself is not readable from here, by design ("we don't monitor").
-// Backend: supabase/assess_01_accounts_content_data.sql + supabase/functions/assess-login.
+// --- BUYER LOGINS: the testing app and the course (one block, built twice: audit MKT-6, 2026-10-11; it was two copies that had drifted) ----------------
+// Same pattern as athlete logins: an Edge Function (assess-login, tps-login) makes the auth user on an internal address (assess.<username>@ or
+// tps.<username>@amirardekani.com, never read) and hands back a password to send. Revoke bans the login: the testing app keeps the buyer's saved
+// players and results, the course app deletes the handbook from their phone the next time it opens online. Restore brings the login back with a new
+// password. Buyer data itself is not readable from here, by design ("we don't monitor"); the course stores nothing about buyers.
+// Backend: supabase/assess_01_accounts_content_data.sql + supabase/functions/assess-login (the testing app, /tennis-testing/app/, its source is
+// tennis-testing/app/ in this repo; /tennis-testing/ is the product page), and supabase/tps_01_accounts_content.sql + supabase/functions/tps-login
+// (the Tennis Performance System course app, /tennis/app/, its source is tennis/app/ in this repo).
 const ASSESS_URL = SITE + '/tennis-testing/app/';
-let _assessBusy = false;
-let _assessPw = null;   // the username whose password form is open (Change password or Restore), or null
-
-async function loadAssess() {
-  if (DEMO) {
-    S.assess = S.assess || [{ username: 'academy_demo', label: 'Demo academy', created_at: new Date().toISOString(),
-      initial_password: 'amber-cedar-kite-42', sent_at: null, revoked_at: null }];
-    return;
-  }
-  const [r, notes] = await Promise.all([
-    sb.from('assess_accounts')
-      .select('user_id, username, label, created_at, initial_password, password_set_at, sent_at, revoked_at')
-      .order('created_at', { ascending: false }),
-    loadBuyerNotes()]);
-  // A failed read stays "unknown" (null + the error), never an empty list that reads "No logins yet".
-  LOAD_ERR.assess = r.error ? r.error.message : '';
-  S.assess = r.error ? null : withBuyerNotes(r.data, notes);
-}
+const COURSE_URL = SITE + '/tennis/app/';
 
 // The note about a buyer ("who bought it") lives in buyer_notes since stage53: the account row's own label is always empty
 // now, so a buyer reading their own row no longer sees what Amir wrote. Until that stage is applied the note is still the
@@ -5449,263 +5447,162 @@ function withBuyerNotes(rows, notes) {
   return (rows || []).map(x => Object.assign({}, x, { label: (notes && notes[x.user_id]) || x.label || '' }));
 }
 
-// The WhatsApp message a buyer gets, in Farsi like the app.
-function assessMessage(username, password) {
-  return 'اپ آزمون آمادگی جسمانی تنیس\n\n' +
-    'لینک: ' + ASSESS_URL + '\n' +
-    'نام کاربری: ' + username + '\n' +
-    'رمز عبور: ' + password + '\n\n' +
-    'وقتی گوشی پیشنهاد ذخیرهٔ رمز داد، ذخیره کنید تا دفعهٔ بعد بدون تایپ وارد شوید. ' +
-    'این اطلاعات را فقط به مربی‌های آکادمی خودتان بدهید.\n\n' +
-    'برای افزودن به صفحهٔ اصلی گوشی: لینک را باز کنید، بعد Share و Add to Home Screen.';
-}
+// cfg: key (S[key] and LOAD_ERR[key]), kind (what usedMark() and the Erase panel call it), P (the two-letter prefix of its ids and classes), table, fn
+// (the Edge Function), url, noun (for the error line), demo (the one row demo mode shows), message(username, password) (the Farsi WhatsApp text),
+// revokeConfirm(username), introHtml, newNote. Everything else is the same for both.
+function buyerLogins(cfg) {
+  const { key, kind, P, table, fn, url } = cfg;
+  const st = { busy: false, pw: null };   // busy: one call at a time (a double tap would be a second one); pw: the username whose password form is open (Change password or Restore)
 
-// password: one Amir typed (already checked by typedPassword), or '' to have the function generate one.
-async function assessAction(action, username, label, btn, password) {
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (_assessBusy) return;
-  if (action === 'revoke' && !confirm('Revoke ' + username + '?\n\nThey can no longer sign in. Their saved players and results are kept, and Restore brings the login back with a new password.')) return;
-  _assessBusy = true; if (btn) btn.disabled = true;
-  const { data, error } = await sb.functions.invoke('assess-login', { body: { action, username, label, password: password || undefined } });
-  _assessBusy = false; if (btn) btn.disabled = false;
-  let msg = data && data.error;
-  if (!msg && error) { try { msg = (await error.context.json()).error; } catch (e) { msg = error.message; } }
-  if (msg) { fail('Could not ' + action + ' the login:\n\n' + msg); return; }
-  _assessPw = null;
-  await loadAssess();
-  if (action === 'revoke') { toast(username + ' revoked'); renderAssess(); return; }
-  copyText(assessMessage(data.username, data.password));
-  renderAssess();
-  // Like an athlete's login: the message is on the clipboard and the password waits in the list (Copy, Mark sent) until they sign in with
-  // it, so a toast is enough. Only when the server could not store the password is this the one place it is shown.
-  const what = (data.created ? 'Login created' : action === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username;
-  if (data.warning) alert(what + '\n\nPassword: ' + data.password + '\n\nThe Farsi WhatsApp message is copied to your clipboard.\n\n⚠ ' + data.warning);
-  else toast(what + ' — the message is copied; send it on WhatsApp');
-}
-
-async function assessMarkSent(username) {
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!confirm(`Mark ${username}'s login as sent?\n\nThis clears the stored password: after this the only way to see one again is a reset. Do it once the message has reached them.`)) return;
-  const res = await sb.from('assess_accounts')
-    .update({ initial_password: null, sent_at: new Date().toISOString() }).eq('username', username).select('username');
-  const bad = writeFailed(res, 'marked sent');
-  if (bad) { fail('Could not update: ' + bad); return; }
-  await loadAssess();
-  renderAssess();
-}
-
-function renderAssess() {
-  const c = $('content');
-  if (!S.assess && LOAD_ERR.assess) {
-    c.innerHTML = `<section class="panel"><p class="empty" style="color:var(--clay-ink)">The testing-app logins did not load: ${esc(LOAD_ERR.assess)}. Nothing here can be changed until they do.</p>
-      <button class="btn sm" onclick="LOAD_ERR.assess='';loadAssess().then(renderAssess)">↻ Try again</button></section>`;
-    return;
+  async function load() {
+    if (DEMO) { S[key] = S[key] || [Object.assign({ created_at: new Date().toISOString(), sent_at: null, revoked_at: null }, cfg.demo)]; return; }
+    const [r, notes] = await Promise.all([
+      sb.from(table).select('user_id, username, label, created_at, initial_password, password_set_at, sent_at, revoked_at').order('created_at', { ascending: false }),
+      loadBuyerNotes()]);
+    // A failed read stays "unknown" (null + the error), never an empty list that reads "No logins yet".
+    LOAD_ERR[key] = r.error ? r.error.message : '';
+    S[key] = r.error ? null : withBuyerNotes(r.data, notes);
   }
-  if (!S.assess) {
-    c.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
-    loadAssess().then(renderAssess);
-    return;
+
+  // password: one Amir typed (already checked by typedPassword), or '' to have the function generate one.
+  async function action(act, username, label, btn, password) {
+    if (DEMO) { toast('Demo mode — nothing saved'); return; }
+    if (st.busy) return;
+    if (act === 'revoke' && !confirm(cfg.revokeConfirm(username))) return;
+    st.busy = true; if (btn) btn.disabled = true;
+    const { data, error } = await sb.functions.invoke(fn, { body: { action: act, username, label, password: password || undefined } });
+    st.busy = false; if (btn) btn.disabled = false;
+    let msg = data && data.error;
+    if (!msg && error) { try { msg = (await error.context.json()).error; } catch (e) { msg = error.message; } }
+    if (msg) { fail('Could not ' + act + ' the login:\n\n' + msg); return; }
+    st.pw = null;
+    await load();
+    if (act === 'revoke') { toast(username + ' revoked'); render(); return; }
+    copyText(cfg.message(data.username, data.password), null, true);
+    render();
+    // Like an athlete's login: the message is on the clipboard and the password waits in the list (Copy, Mark sent) until they sign in with
+    // it, so a toast is enough. Only when the server could not store the password is this the one place it is shown.
+    const what = (data.created ? 'Login created' : act === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username;
+    if (data.warning) alert(what + '\n\nPassword: ' + data.password + '\n\nThe Farsi WhatsApp message is copied to your clipboard.\n\n⚠ ' + data.warning);
+    else toast(what + ' — the message is copied; send it on WhatsApp');
   }
-  const rows = S.assess;
-  const active = rows.filter(r => !r.revoked_at), revoked = rows.filter(r => r.revoked_at);
-  const toSend = active.filter(r => r.initial_password).length;
-  const day = d => esc(String(d || '').slice(0, 10));
-  const row = r => `<div class="credrow">
+
+  async function markSent(username) {
+    if (DEMO) { toast('Demo mode — nothing saved'); return; }
+    if (!confirm(`Mark ${username}'s login as sent?\n\nThis clears the stored password: after this the only way to see one again is a reset. Do it once the message has reached them.`)) return;
+    const res = await sb.from(table).update({ initial_password: null, sent_at: new Date().toISOString() }).eq('username', username).select('username');
+    const bad = writeFailed(res, 'marked sent');
+    if (bad) { fail('Could not update: ' + bad); return; }
+    await load();
+    render();
+  }
+
+  function render() {
+    const c = $('content');
+    if (!S[key] && LOAD_ERR[key]) {
+      c.innerHTML = `<section class="panel"><p class="empty" style="color:var(--clay-ink)">The ${cfg.noun} did not load: ${esc(LOAD_ERR[key])}. Nothing here can be changed until they do.</p>
+        <button class="btn sm" onclick="LOAD_ERR.${key}='';${cfg.loadFn}().then(${cfg.renderFn})">↻ Try again</button></section>`;
+      return;
+    }
+    if (!S[key]) {
+      c.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+      load().then(render);
+      return;
+    }
+    const rows = S[key];
+    const active = rows.filter(r => !r.revoked_at), revoked = rows.filter(r => r.revoked_at);
+    const toSend = active.filter(r => r.initial_password).length;
+    const day = d => esc(String(d || '').slice(0, 10));
+    const row = r => `<div class="credrow">
       <span class="credname">${esc(r.username)}${r.label ? ` <span class="muted">· ${esc(r.label)}</span>` : ''}</span>
-      ${r.initial_password && !r.revoked_at ? `<code class="credpass">${esc(r.initial_password)}</code>${usedMark('testing', r.username)}`
+      ${r.initial_password && !r.revoked_at ? `<code class="credpass">${esc(r.initial_password)}</code>${usedMark(kind, r.username)}`
         : `<span class="muted">${r.revoked_at ? 'revoked ' + day(r.revoked_at) : r.sent_at ? 'sent ' + day(r.sent_at) : 'created ' + day(r.created_at)}</span>`}
       <span class="acts">${r.revoked_at
-        ? `<button class="btn sm as-pw" data-u="${esc(r.username)}">Restore</button>`
-        : (r.initial_password ? `<button class="btn sm primary as-copy" data-u="${esc(r.username)}">Copy message</button><button class="btn sm as-sent" data-u="${esc(r.username)}">Mark sent</button>` : '') +
-          `<button class="btn sm as-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm as-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}<button class="btn sm danger as-erase" data-u="${esc(r.username)}" title="Remove this buyer and everything they stored, for good">Erase…</button></span>
-    </div>` + (_assessPw === r.username ? `<div class="pwform">
-      <input class="pwin as-pwin" aria-label="Password (empty to generate one)" placeholder="${r.revoked_at ? 'password' : 'new password'}, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false">
-      <button class="btn sm primary as-pwsave" data-act="${r.revoked_at ? 'restore' : 'reset'}" data-u="${esc(r.username)}">${r.revoked_at ? 'Restore' : 'Save password'}</button>
-      <button class="btn sm as-pwcancel">Cancel</button>
+        ? `<button class="btn sm ${P}-pw" data-u="${esc(r.username)}">Restore</button>`
+        : (r.initial_password ? `<button class="btn sm primary ${P}-copy" data-u="${esc(r.username)}">Copy message</button><button class="btn sm ${P}-sent" data-u="${esc(r.username)}">Mark sent</button>` : '') +
+          `<button class="btn sm ${P}-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm ${P}-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}<button class="btn sm danger ${P}-erase" data-u="${esc(r.username)}" title="Remove this buyer and everything they stored, for good">Erase…</button></span>
+    </div>` + (st.pw === r.username ? `<div class="pwform">
+      <input class="pwin ${P}-pwin" aria-label="Password (empty to generate one)" placeholder="${r.revoked_at ? 'password' : 'new password'}, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <button class="btn sm primary ${P}-pwsave" data-act="${r.revoked_at ? 'restore' : 'reset'}" data-u="${esc(r.username)}">${r.revoked_at ? 'Restore' : 'Save password'}</button>
+      <button class="btn sm ${P}-pwcancel">Cancel</button>
       <p class="pwhint">${PW_HINT}${r.revoked_at ? '' : ' The old password stops working straight away.'}</p>
-    </div>` : '') + erasePanelHtml('testing', r.username);
-  const field = 'flex:1;min-width:190px;font:inherit;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fff';
-  let html = `<div class="controls"><span class="empty" style="align-self:center">Logins for the tennis testing app, <a href="${ASSESS_URL}" target="_blank" rel="noopener">${ASSESS_URL}</a>. One login per buyer; an academy's coaches share it.</span></div>`;
-  html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New login</span></div>
+    </div>` : '') + erasePanelHtml(kind, r.username);
+    const field = 'flex:1;min-width:190px;font:inherit;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fff';
+    let html = `<div class="controls"><span class="empty" style="align-self:center">${cfg.introHtml}</span></div>`;
+    html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New login</span></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <input id="asUser" aria-label="Username" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
-      <input id="asLabel" aria-label="Private note for you" placeholder="private note for you: who bought it" autocomplete="off" style="${field}">
-      <input id="asPass" aria-label="Password (empty to generate one)" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field};font-family:'Space Mono',monospace">
-      <button class="btn primary sm" id="asCreate">Create login</button>
+      <input id="${P}User" aria-label="Username" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
+      <input id="${P}Label" aria-label="Private note for you" placeholder="private note for you: who bought it" autocomplete="off" style="${field}">
+      <input id="${P}Pass" aria-label="Password (empty to generate one)" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field};font-family:'Space Mono',monospace">
+      <button class="btn primary sm" id="${P}Create">Create login</button>
     </div>
-    <p class="psub" style="margin:10px 0 0">Creates the account and copies a Farsi WhatsApp message with the link, username and password. ${PW_HINT}</p></section>`;
-  html += `<section class="panel"><div class="phead"><span class="t hd">Logins</span><span class="r">${active.length} active${toSend ? ` · <span style="color:var(--clay-ink)">${toSend} to send</span>` : ''}</span></div>` +
-    (active.length ? active.map(row).join('') : '<p class="empty">No logins yet.</p>') + `</section>`;
-  if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details${revoked.some(r => r.username === _assessPw || (_erase && _erase.kind === 'testing' && _erase.key === r.username)) ? ' open' : ''}><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
-  c.innerHTML = html;
-  const on = (sel, fn) => c.querySelectorAll(sel).forEach(el => el.addEventListener('click', e => { e.preventDefault(); fn(el); }));
-  on('#asCreate', el => {
-    const u = ($('asUser').value || '').trim().toLowerCase();
-    if (!/^[a-z0-9_]{3,32}$/.test(u)) { toast('Username: 3 to 32 characters, a-z, 0-9 or _'); return; }
-    const t = typedPassword($('asPass').value, u);
-    if (t.error) { fail(t.error); return; }
-    assessAction('create', u, ($('asLabel').value || '').trim(), el, t.password);
-  });
-  on('.as-act', el => assessAction(el.dataset.act, el.dataset.u, '', el));
-  on('.as-pw', el => { _assessPw = el.dataset.u; renderAssess(); const i = c.querySelector('.as-pwin'); if (i) i.focus(); });
-  on('.as-pwcancel', () => { _assessPw = null; renderAssess(); });
-  on('.as-pwsave', el => {
-    const t = typedPassword(c.querySelector('.as-pwin').value, el.dataset.u);
-    if (t.error) { fail(t.error); return; }
-    assessAction(el.dataset.act, el.dataset.u, '', el, t.password);
-  });
-  const asPwIn = c.querySelector('.as-pwin');
-  if (asPwIn) asPwIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); c.querySelector('.as-pwsave').click(); } });
-  on('.as-sent', el => assessMarkSent(el.dataset.u));
-  on('.as-erase', el => eraseOpen('testing', el.dataset.u));
-  on('.as-copy', el => {
-    const r = rows.find(x => x.username === el.dataset.u);
-    if (r && r.initial_password) { copyText(assessMessage(r.username, r.initial_password), el); toast('Message copied — paste it into WhatsApp'); }
-  });
-}
-
-// --- COURSE (buyer logins) --------------------------------------------------
-// The Tennis Performance System course app at /tennis/app/ (its source is tennis/app/ in this repo). Same pattern as the testing app above: the tps-login Edge Function makes the auth user on
-// an internal address, tps.<username>@amirardekani.com, and hands back a password to send. Revoke
-// bans the login, and the app deletes the handbook from the buyer's phone the next time it opens
-// online; Restore brings the login back with a new password. The course stores nothing about buyers.
-// Backend: supabase/tps_01_accounts_content.sql + supabase/functions/tps-login.
-const COURSE_URL = SITE + '/tennis/app/';
-let _courseBusy = false;
-let _coursePw = null;   // the username whose password form is open (Change password or Restore), or null
-
-async function loadCourse() {
-  if (DEMO) {
-    S.course = S.course || [{ username: 'player_demo', label: 'Demo buyer', created_at: new Date().toISOString(),
-      initial_password: 'cedar-harbor-kite-17', sent_at: null, revoked_at: null }];
-    return;
+    <p class="psub" style="margin:10px 0 0">${cfg.newNote} ${PW_HINT}</p></section>`;
+    html += `<section class="panel"><div class="phead"><span class="t hd">Logins</span><span class="r">${active.length} active${toSend ? ` · <span style="color:var(--clay-ink)">${toSend} to send</span>` : ''}</span></div>` +
+      (active.length ? active.map(row).join('') : '<p class="empty">No logins yet.</p>') + `</section>`;
+    if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details${revoked.some(r => r.username === st.pw || (_erase && _erase.kind === kind && _erase.key === r.username)) ? ' open' : ''}><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
+    c.innerHTML = html;
+    const on = (sel, fn2) => c.querySelectorAll(sel).forEach(el => el.addEventListener('click', e => { e.preventDefault(); fn2(el); }));
+    on('#' + P + 'Create', el => {
+      const u = ($(P + 'User').value || '').trim().toLowerCase();
+      if (!/^[a-z0-9_]{3,32}$/.test(u)) { toast('Username: 3 to 32 characters, a-z, 0-9 or _'); return; }
+      const t = typedPassword($(P + 'Pass').value, u);
+      if (t.error) { fail(t.error); return; }
+      action('create', u, ($(P + 'Label').value || '').trim(), el, t.password);
+    });
+    on('.' + P + '-act', el => action(el.dataset.act, el.dataset.u, '', el));
+    on('.' + P + '-pw', el => { st.pw = el.dataset.u; render(); const i = c.querySelector('.' + P + '-pwin'); if (i) i.focus(); });
+    on('.' + P + '-pwcancel', () => { st.pw = null; render(); });
+    on('.' + P + '-pwsave', el => {
+      const t = typedPassword(c.querySelector('.' + P + '-pwin').value, el.dataset.u);
+      if (t.error) { fail(t.error); return; }
+      action(el.dataset.act, el.dataset.u, '', el, t.password);
+    });
+    const pwIn = c.querySelector('.' + P + '-pwin');
+    if (pwIn) pwIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); c.querySelector('.' + P + '-pwsave').click(); } });
+    on('.' + P + '-sent', el => markSent(el.dataset.u));
+    on('.' + P + '-erase', el => eraseOpen(kind, el.dataset.u));
+    on('.' + P + '-copy', el => {
+      const r = rows.find(x => x.username === el.dataset.u);
+      if (r && r.initial_password) { copyText(cfg.message(r.username, r.initial_password), el, true); toast('Message copied — paste it into WhatsApp'); }
+    });
   }
-  const [r, notes] = await Promise.all([
-    sb.from('tps_accounts')
-      .select('user_id, username, label, created_at, initial_password, password_set_at, sent_at, revoked_at')
-      .order('created_at', { ascending: false }),
-    loadBuyerNotes()]);
-  // A failed read stays "unknown" (null + the error), never an empty list that reads "No logins yet".
-  LOAD_ERR.course = r.error ? r.error.message : '';
-  S.course = r.error ? null : withBuyerNotes(r.data, notes);
+  return { load, render, action, markSent, st };
 }
 
-// The WhatsApp message a buyer gets, in Farsi like the app. iPhone installs before signing in:
-// Safari and a Home Screen app keep separate storage, so signing in first means doing it twice.
-function courseMessage(username, password) {
-  return 'سیستم آمادگی جسمانی تنیس · سطح ۲\n\n' +
-    'لینک: ' + COURSE_URL + '\n' +
-    'نام کاربری: ' + username + '\n' +
-    'رمز عبور: ' + password + '\n\n' +
-    'آیفون: لینک را در Safari باز کنید، دکمهٔ Share و بعد Add to Home Screen را بزنید، بعد اپ را از آیکون تازه باز کنید و وارد شوید.\n' +
-    'اندروید: لینک را در Chrome باز کنید و وارد شوید، بعد از منوی ⋮ گزینهٔ Install app یا Add to Home screen را بزنید.\n\n' +
-    'بار اول، ورود و دریافت کتاب به اینترنت نیاز دارد (اگر وصل نشد، با VPN امتحان کنید). بعد از آن، اپ بدون اینترنت هم باز می‌شود.\n' +
-    'وقتی گوشی پیشنهاد ذخیرهٔ رمز داد، ذخیره کنید.';
-}
-
-// password: one Amir typed (already checked by typedPassword), or '' to have the function generate one.
-async function courseAction(action, username, label, btn, password) {
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (_courseBusy) return;
-  if (action === 'revoke' && !confirm('Revoke ' + username + '?\n\nThey can no longer sign in, and the app deletes the handbook from their phone the next time it opens online. Restore brings the login back with a new password.')) return;
-  _courseBusy = true; if (btn) btn.disabled = true;
-  const { data, error } = await sb.functions.invoke('tps-login', { body: { action, username, label, password: password || undefined } });
-  _courseBusy = false; if (btn) btn.disabled = false;
-  let msg = data && data.error;
-  if (!msg && error) { try { msg = (await error.context.json()).error; } catch (e) { msg = error.message; } }
-  if (msg) { fail('Could not ' + action + ' the login:\n\n' + msg); return; }
-  _coursePw = null;
-  await loadCourse();
-  if (action === 'revoke') { toast(username + ' revoked'); renderCourse(); return; }
-  copyText(courseMessage(data.username, data.password));
-  renderCourse();
-  // Like an athlete's login: the message is on the clipboard and the password waits in the list (Copy, Mark sent) until they sign in with
-  // it, so a toast is enough. Only when the server could not store the password is this the one place it is shown.
-  const what = (data.created ? 'Login created' : action === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username;
-  if (data.warning) alert(what + '\n\nPassword: ' + data.password + '\n\nThe Farsi WhatsApp message is copied to your clipboard.\n\n⚠ ' + data.warning);
-  else toast(what + ' — the message is copied; send it on WhatsApp');
-}
-
-async function courseMarkSent(username) {
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!confirm(`Mark ${username}'s login as sent?\n\nThis clears the stored password: after this the only way to see one again is a reset. Do it once the message has reached them.`)) return;
-  const res = await sb.from('tps_accounts')
-    .update({ initial_password: null, sent_at: new Date().toISOString() }).eq('username', username).select('username');
-  const bad = writeFailed(res, 'marked sent');
-  if (bad) { fail('Could not update: ' + bad); return; }
-  await loadCourse();
-  renderCourse();
-}
-
-function renderCourse() {
-  const c = $('content');
-  if (!S.course && LOAD_ERR.course) {
-    c.innerHTML = `<section class="panel"><p class="empty" style="color:var(--clay-ink)">The course logins did not load: ${esc(LOAD_ERR.course)}. Nothing here can be changed until they do.</p>
-      <button class="btn sm" onclick="LOAD_ERR.course='';loadCourse().then(renderCourse)">↻ Try again</button></section>`;
-    return;
-  }
-  if (!S.course) {
-    c.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
-    loadCourse().then(renderCourse);
-    return;
-  }
-  const rows = S.course;
-  const active = rows.filter(r => !r.revoked_at), revoked = rows.filter(r => r.revoked_at);
-  const toSend = active.filter(r => r.initial_password).length;
-  const day = d => esc(String(d || '').slice(0, 10));
-  const row = r => `<div class="credrow">
-      <span class="credname">${esc(r.username)}${r.label ? ` <span class="muted">· ${esc(r.label)}</span>` : ''}</span>
-      ${r.initial_password && !r.revoked_at ? `<code class="credpass">${esc(r.initial_password)}</code>${usedMark('course', r.username)}`
-        : `<span class="muted">${r.revoked_at ? 'revoked ' + day(r.revoked_at) : r.sent_at ? 'sent ' + day(r.sent_at) : 'created ' + day(r.created_at)}</span>`}
-      <span class="acts">${r.revoked_at
-        ? `<button class="btn sm tp-pw" data-u="${esc(r.username)}">Restore</button>`
-        : (r.initial_password ? `<button class="btn sm primary tp-copy" data-u="${esc(r.username)}">Copy message</button><button class="btn sm tp-sent" data-u="${esc(r.username)}">Mark sent</button>` : '') +
-          `<button class="btn sm tp-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm tp-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}<button class="btn sm danger tp-erase" data-u="${esc(r.username)}" title="Remove this buyer and everything they stored, for good">Erase…</button></span>
-    </div>` + (_coursePw === r.username ? `<div class="pwform">
-      <input class="pwin tp-pwin" aria-label="Password (empty to generate one)" placeholder="${r.revoked_at ? 'password' : 'new password'}, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false">
-      <button class="btn sm primary tp-pwsave" data-act="${r.revoked_at ? 'restore' : 'reset'}" data-u="${esc(r.username)}">${r.revoked_at ? 'Restore' : 'Save password'}</button>
-      <button class="btn sm tp-pwcancel">Cancel</button>
-      <p class="pwhint">${PW_HINT}${r.revoked_at ? '' : ' The old password stops working straight away.'}</p>
-    </div>` : '') + erasePanelHtml('course', r.username);
-  const field = 'flex:1;min-width:190px;font:inherit;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fff';
-  let html = `<div class="controls"><span class="empty" style="align-self:center">Logins for the Tennis Performance System course (Level 2), <a href="${COURSE_URL}" target="_blank" rel="noopener">${COURSE_URL}</a>. One login per buyer.</span></div>`;
-  html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New login</span></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <input id="tpUser" aria-label="Username" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
-      <input id="tpLabel" aria-label="Private note for you" placeholder="private note for you: who bought it" autocomplete="off" style="${field}">
-      <input id="tpPass" aria-label="Password (empty to generate one)" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field};font-family:'Space Mono',monospace">
-      <button class="btn primary sm" id="tpCreate">Create login</button>
-    </div>
-    <p class="psub" style="margin:10px 0 0">Creates the account and copies a Farsi WhatsApp message with the link, username, password and install steps. ${PW_HINT}</p></section>`;
-  html += `<section class="panel"><div class="phead"><span class="t hd">Logins</span><span class="r">${active.length} active${toSend ? ` · <span style="color:var(--clay-ink)">${toSend} to send</span>` : ''}</span></div>` +
-    (active.length ? active.map(row).join('') : '<p class="empty">No logins yet.</p>') + `</section>`;
-  if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details${revoked.some(r => r.username === _coursePw || (_erase && _erase.kind === 'course' && _erase.key === r.username)) ? ' open' : ''}><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
-  c.innerHTML = html;
-  const on = (sel, fn) => c.querySelectorAll(sel).forEach(el => el.addEventListener('click', e => { e.preventDefault(); fn(el); }));
-  on('#tpCreate', el => {
-    const u = ($('tpUser').value || '').trim().toLowerCase();
-    if (!/^[a-z0-9_]{3,32}$/.test(u)) { toast('Username: 3 to 32 characters, a-z, 0-9 or _'); return; }
-    const t = typedPassword($('tpPass').value, u);
-    if (t.error) { fail(t.error); return; }
-    courseAction('create', u, ($('tpLabel').value || '').trim(), el, t.password);
-  });
-  on('.tp-act', el => courseAction(el.dataset.act, el.dataset.u, '', el));
-  on('.tp-pw', el => { _coursePw = el.dataset.u; renderCourse(); const i = c.querySelector('.tp-pwin'); if (i) i.focus(); });
-  on('.tp-pwcancel', () => { _coursePw = null; renderCourse(); });
-  on('.tp-pwsave', el => {
-    const t = typedPassword(c.querySelector('.tp-pwin').value, el.dataset.u);
-    if (t.error) { fail(t.error); return; }
-    courseAction(el.dataset.act, el.dataset.u, '', el, t.password);
-  });
-  const tpPwIn = c.querySelector('.tp-pwin');
-  if (tpPwIn) tpPwIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); c.querySelector('.tp-pwsave').click(); } });
-  on('.tp-sent', el => courseMarkSent(el.dataset.u));
-  on('.tp-erase', el => eraseOpen('course', el.dataset.u));
-  on('.tp-copy', el => {
-    const r = rows.find(x => x.username === el.dataset.u);
-    if (r && r.initial_password) { copyText(courseMessage(r.username, r.initial_password), el); toast('Message copied — paste it into WhatsApp'); }
-  });
-}
+// The WhatsApp messages the buyers get, in Farsi like their apps. The course's: iPhone installs before signing in, because Safari and a Home Screen
+// app keep separate storage, so signing in first means doing it twice.
+const BUYER = {
+  assess: buyerLogins({ key: 'assess', kind: 'testing', P: 'as', table: 'assess_accounts', fn: 'assess-login', url: ASSESS_URL, noun: 'testing-app logins', loadFn: 'loadAssess', renderFn: 'renderAssess',
+    demo: { username: 'academy_demo', label: 'Demo academy', initial_password: 'amber-cedar-kite-42' },
+    message: (username, password) => 'اپ آزمون آمادگی جسمانی تنیس\n\n' +
+      'لینک: ' + ASSESS_URL + '\n' +
+      'نام کاربری: ' + username + '\n' +
+      'رمز عبور: ' + password + '\n\n' +
+      'وقتی گوشی پیشنهاد ذخیرهٔ رمز داد، ذخیره کنید تا دفعهٔ بعد بدون تایپ وارد شوید. ' +
+      'این اطلاعات را فقط به مربی‌های آکادمی خودتان بدهید.\n\n' +
+      'برای افزودن به صفحهٔ اصلی گوشی: لینک را باز کنید، بعد Share و Add to Home Screen.',
+    revokeConfirm: u => 'Revoke ' + u + '?\n\nThey can no longer sign in. Their saved players and results are kept, and Restore brings the login back with a new password.',
+    introHtml: `Logins for the tennis testing app, <a href="${ASSESS_URL}" target="_blank" rel="noopener">${ASSESS_URL}</a>. One login per buyer; an academy's coaches share it.`,
+    newNote: 'Creates the account and copies a Farsi WhatsApp message with the link, username and password.' }),
+  course: buyerLogins({ key: 'course', kind: 'course', P: 'tp', table: 'tps_accounts', fn: 'tps-login', url: COURSE_URL, noun: 'course logins', loadFn: 'loadCourse', renderFn: 'renderCourse',
+    demo: { username: 'player_demo', label: 'Demo buyer', initial_password: 'cedar-harbor-kite-17' },
+    message: (username, password) => 'سیستم آمادگی جسمانی تنیس · سطح ۲\n\n' +
+      'لینک: ' + COURSE_URL + '\n' +
+      'نام کاربری: ' + username + '\n' +
+      'رمز عبور: ' + password + '\n\n' +
+      'آیفون: لینک را در Safari باز کنید، دکمهٔ Share و بعد Add to Home Screen را بزنید، بعد اپ را از آیکون تازه باز کنید و وارد شوید.\n' +
+      'اندروید: لینک را در Chrome باز کنید و وارد شوید، بعد از منوی ⋮ گزینهٔ Install app یا Add to Home screen را بزنید.\n\n' +
+      'بار اول، ورود و دریافت کتاب به اینترنت نیاز دارد (اگر وصل نشد، با VPN امتحان کنید). بعد از آن، اپ بدون اینترنت هم باز می‌شود.\n' +
+      'وقتی گوشی پیشنهاد ذخیرهٔ رمز داد، ذخیره کنید.',
+    revokeConfirm: u => 'Revoke ' + u + '?\n\nThey can no longer sign in, and the app deletes the handbook from their phone the next time it opens online. Restore brings the login back with a new password.',
+    introHtml: `Logins for the Tennis Performance System course (Level 2), <a href="${COURSE_URL}" target="_blank" rel="noopener">${COURSE_URL}</a>. One login per buyer.`,
+    newNote: 'Creates the account and copies a Farsi WhatsApp message with the link, username, password and install steps.' }),
+};
+// The names the router, the Erase panel and the inline "Try again" buttons call.
+function loadAssess() { return BUYER.assess.load(); }
+function renderAssess() { return BUYER.assess.render(); }
+function loadCourse() { return BUYER.course.load(); }
+function renderCourse() { return BUYER.course.render(); }
 
 // --- EXERCISES (The Spine, 2026-09-24) ---------------------------------------
 // One record per exercise Amir programmes: supabase/stage31_spine.sql. Claude
@@ -6946,7 +6843,6 @@ function demoStore() {
     mkSession('demo_mina', 'Mina', 2, 22, 7, 45, 'Complete', 'Grip went on the last set.'),
     mkSession('demo_omid', 'Omid', 2, 30, 6, 40, 'Complete', 'Hotel gym had no kettlebells.'),
   ];
-  S.keys = { demo_ana: 'demo', demo_lena: 'demo', demo_mina: 'demo', amir_ardekani: 'demo', demo_omid: 'demo', demo_kian: 'demo' };
   S.notes = [
     { athlete_id: '__coach__', day: d(1), body: 'Quest week is live — steps, train, water. Go.', hidden: false, pct: null },
     { athlete_id: 'demo_ana', day: t, body: 'Five days straight. Not stopping now.', hidden: false, pct: 95 },

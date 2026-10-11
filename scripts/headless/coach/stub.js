@@ -509,6 +509,28 @@
       return [400, { error: 'unknown action' }];
     },
   };
+  // assess-login and tps-login (the testing app and the course): create / reset / revoke / restore a buyer's login in assess_accounts / tps_accounts,
+  // as supabase/functions/*-login/index.ts do (username a-z0-9_ 3-32; revoke bans and keeps the row; restore needs a revoked one).
+  function buyerFn(table) {
+    return function (b) {
+      var rows = tbl(table), u = String(b.username || '');
+      if (!/^[a-z0-9_]{3,32}$/.test(u)) return [400, { error: 'bad username' }];
+      var row = rows.find(function (r) { return r.username === u; });
+      var pw = b.password || genPw();
+      if (b.action === 'create') {
+        if (row) return [409, { error: 'that username already exists' }];
+        rows.push({ user_id: 'u-' + table + '-' + u, username: u, label: b.label || '', created_at: nowIso(), initial_password: pw, password_set_at: nowIso(), sent_at: null, revoked_at: null });
+        return [200, { username: u, password: pw, created: true }];
+      }
+      if (!row) return [404, { error: 'no such login' }];
+      if (b.action === 'reset') { row.initial_password = pw; row.password_set_at = nowIso(); row.sent_at = null; return [200, { username: u, password: pw, created: false }]; }
+      if (b.action === 'revoke') { row.revoked_at = nowIso(); row.initial_password = null; return [200, { username: u, revoked: true }]; }
+      if (b.action === 'restore') { row.revoked_at = null; row.initial_password = pw; row.password_set_at = nowIso(); row.sent_at = null; return [200, { username: u, password: pw, created: false }]; }
+      return [400, { error: 'unknown action' }];
+    };
+  }
+  FN['assess-login'] = buyerFn('assess_accounts');
+  FN['tps-login'] = buyerFn('tps_accounts');
   var functions = {
     invoke: async function (name, o) {
       var body = o && o.body;

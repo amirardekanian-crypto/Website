@@ -2522,6 +2522,145 @@ S['levels-in-place'] = async (b) => {
   return r;
 };
 
+// ── Buyer logins: the Testing app and Course tabs (audit MKT-6; pinned 2026-10-11 before the two copied blocks were merged) ───────────────────────
+for (const [tab, P, fn, table, urlPart] of [['course', 'tp', 'tps-login', 'tps_accounts', '/tennis/app/'], ['assess', 'as', 'assess-login', 'assess_accounts', '/tennis-testing/app/']]) {
+  S['buyer-logins-' + tab] = async (b) => {
+    const r = { id: 'buyer-logins-' + tab, title: `${tab === 'course' ? 'Course' : 'Testing app'} tab: create, copy, mark sent, change the password, revoke and restore a buyer's login, and a double tap`, checks: [] };
+    const { page, log } = await L.openCoach(b, { hash: tab });
+    await L.settle(page, 600);
+    const row = u => page.locator('#content .credrow', { hasText: u }).first();
+    const fnCalls = async n0 => (await L.callsSince(page, n0)).filter(c => c.kind === 'fn' && c.name === fn);
+    const clip = () => page.evaluate(() => navigator.clipboard.readText());
+    // create (double tap: one call)
+    await page.locator('#' + P + 'User').fill('new_buyer'); await page.locator('#' + P + 'Label').fill('who bought it');
+    let n0 = await L.nCalls(page);
+    await page.locator('#' + P + 'Create').dblclick(); await L.settle(page, 900);
+    let calls = await fnCalls(n0);
+    check(r, 'Create calls the login function once even on a double tap, with the username and the note', calls.length === 1 && calls[0].payload.action === 'create' && calls[0].payload.username === 'new_buyer' && calls[0].payload.label === 'who bought it', calls.map(c => c.payload));
+    check(r, 'the new login is in the list with its stored password and a Copy message button', (await row('new_buyer').locator('.credpass').count()) === 1 && (await row('new_buyer').locator('.' + P + '-copy').count()) === 1, '');
+    const msg = await clip();
+    check(r, 'the Farsi message with the link, username and password is on the clipboard', msg.includes(urlPart) && msg.includes('new_buyer') && /رمز عبور/.test(msg), msg.slice(0, 120));
+    check(r, 'the page says Login created for them', /Login created for new_buyer/.test(await L.toastText(page)), await L.toastText(page));
+    // copy again
+    await page.evaluate(() => navigator.clipboard.writeText('x'));
+    await row('new_buyer').locator('.' + P + '-copy').click(); await L.settle(page, 300);
+    check(r, 'Copy message puts the same message back', (await clip()).includes('new_buyer') && (await clip()).includes(urlPart), (await clip()).slice(0, 80));
+    // mark sent clears the stored password
+    n0 = await L.nCalls(page);
+    await row('new_buyer').locator('.' + P + '-sent').click(); await L.settle(page, 700);
+    const upd = lastOf(await L.callsSince(page, n0), isUpd(table));
+    check(r, 'Mark sent clears the stored password and stamps sent, for that username', !!upd && upd.payload.initial_password === null && !!upd.payload.sent_at && upd.filters.some(f => /^username\.eq\./.test(f)), upd && upd.payload);
+    check(r, 'the row now says sent and has no password or Copy message', /sent \d{4}-\d{2}-\d{2}/.test((await row('new_buyer').innerText()).replace(/\s+/g, ' ')) && (await row('new_buyer').locator('.credpass').count()) === 0, (await row('new_buyer').innerText()).replace(/\s+/g, ' '));
+    // change the password: a typed one, then the function's
+    await row('new_buyer').locator('.' + P + '-pw').click(); await L.settle(page, 300);
+    check(r, 'Change password opens a form under the row, focused', (await page.locator('.' + P + '-pwin').count()) === 1 && await page.evaluate(sel => document.activeElement && document.activeElement.matches(sel), '.' + P + '-pwin'), '');
+    await page.locator('.' + P + '-pwin').fill('AbcdEfgh12');
+    n0 = await L.nCalls(page);
+    await page.locator('.' + P + '-pwsave').click(); await L.settle(page, 800);
+    calls = await fnCalls(n0);
+    check(r, 'Save password calls reset with the typed password', calls.length === 1 && calls[0].payload.action === 'reset' && calls[0].payload.username === 'new_buyer' && calls[0].payload.password === 'AbcdEfgh12', calls.map(c => c.payload));
+    check(r, 'and says Password changed', /Password changed for new_buyer/.test(await L.toastText(page)), await L.toastText(page));
+    await row('new_buyer').locator('.' + P + '-pw').click(); await L.settle(page, 300);
+    await page.locator('.' + P + '-pwin').fill('short');
+    n0 = await L.nCalls(page);
+    await page.locator('.' + P + '-pwsave').click(); await L.settle(page, 400);
+    check(r, 'a password that breaks the rule is refused before the function is called', (await fnCalls(n0)).length === 0 && /8/.test(await L.failText(page)), await L.failText(page));
+    await page.evaluate(() => failDismissAll());
+    await page.locator('.' + P + '-pwcancel').click(); await L.settle(page, 300);
+    // revoke and restore
+    n0 = await L.nCalls(page);
+    await row('new_buyer').locator('.' + P + '-act').click(); await L.settle(page, 800);
+    calls = await fnCalls(n0);
+    check(r, 'Revoke (after the confirm) calls revoke, and the login moves to Revoked', calls.length === 1 && calls[0].payload.action === 'revoke' && /new_buyer revoked/.test(await L.toastText(page)), { calls: calls.map(c => c.payload), toast: await L.toastText(page) });
+    await page.evaluate(() => { document.querySelectorAll('#content details').forEach(d => { d.open = true; }); });
+    await row('new_buyer').locator('.' + P + '-pw').click(); await L.settle(page, 300);
+    n0 = await L.nCalls(page);
+    await page.locator('.' + P + '-pwsave').click(); await L.settle(page, 800);
+    calls = await fnCalls(n0);
+    check(r, 'Restore calls restore (no typed password: the function makes one) and says Login restored', calls.length === 1 && calls[0].payload.action === 'restore' && /Login restored for new_buyer/.test(await L.toastText(page)), { calls: calls.map(c => c.payload), toast: await L.toastText(page) });
+    // the function fails: the page says why, in the persistent bar
+    await page.evaluate(f => { window.__STUB.fail.push({ kind: 'fn', name: f, message: 'fixture: the login function is down', times: 1 }); }, fn);
+    await page.locator('#' + P + 'User').fill('another_one');
+    await page.locator('#' + P + 'Create').click(); await L.settle(page, 800);
+    check(r, 'a failed create says why and nothing is added', /Could not create the login/.test(await L.failText(page)) && /fixture: the login function is down/.test(await L.failText(page)) && (await row('another_one').count()) === 0, await L.failText(page));
+    check(r, 'no page errors', !log.errors.length, log.errors);
+    await page.context().close();
+    return r;
+  };
+}
+
+S['athlete-login-double-tap'] = async (b) => {
+  const r = { id: 'athlete-login-double-tap', title: 'An athlete\'s Save password tapped twice calls the login function once (a second call made a second password and left the message with the first)', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/file' });
+  await page.getByRole('button', { name: 'Change password' }).click();
+  await page.locator('#athPw').fill('AbcdEfgh12');
+  const n0 = await L.nCalls(page);
+  await page.getByRole('button', { name: 'Save password' }).dblclick(); await L.settle(page, 900);
+  const calls = (await L.callsSince(page, n0)).filter(c => c.kind === 'fn' && c.name === 'athlete-login');
+  check(r, 'one call, with the typed password', calls.length === 1 && calls[0].payload.action === 'reset' && calls[0].payload.password === 'AbcdEfgh12', calls.map(c => c.payload));
+  check(r, 'and the page says what happened (the "Copied" toast no longer replaces it)', /Password changed — the message is copied; send it on WhatsApp/.test(await L.toastText(page)), await L.toastText(page));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Tidying (audit SERVER-10, TOOLS-6, ROSTER-13; 2026-10-11, pile B11) ─────────────────────────────────────────────────────────────
+S['library-paged'] = async (b) => {
+  const r = { id: 'library-paged', title: 'The Library items are read in pages, so a server with a small row cap still shows every one', checks: [] };
+  const { page, log } = await L.openCoach(b, { seed: { stub: { maxRows: 3 } } });
+  await page.evaluate(() => {
+    for (let i = 1; i <= 8; i++) window.__DB.library.push({ slug: 'workouts/strength/item-' + i, kind: 'workout', category_id: 'strength', published: true, sort_order: 10 + i, updated_at: new Date().toISOString(),
+      data: { id: 'item-' + i, title: 'Item ' + i, duration: '15 min', equipment: 'Bands', category: 'strength' } });
+    return hardRefresh();
+  });
+  await L.settle(page, 900);
+  const st = await page.evaluate(() => ({ n: S.lib.length, err: LOAD_ERR.library || '', slugs: S.lib.map(x => x.slug) }));
+  check(r, 'all nine items are there although the server answers three at a time', st.n === 9 && !st.err, st);
+  check(r, 'and they are in their shelf order (sort_order, then slug)', st.slugs[0] === 'workouts/strength/fixture-burner' && st.slugs[8] === 'workouts/strength/item-8', st.slugs);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['library-publish-guards'] = async (b) => {
+  const r = { id: 'library-publish-guards', title: 'Library publish: the confirm says what is new and what replaces, a hidden item stays hidden, and an id on another shelf is refused', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'links' });
+  await page.evaluate(() => {
+    window.__DB.library_categories.push({ id: 'conditioning', kind: 'workout', title: 'Conditioning (fixture)', banner: null, icon: null, sort_order: 2 });
+    window.__DB.library.push({ slug: 'workouts/strength/hidden-one', kind: 'workout', category_id: 'strength', published: false, sort_order: 2, updated_at: new Date().toISOString(),
+      data: { id: 'hidden-one', title: 'Hidden One', duration: '10 min', category: 'strength' } });
+    return hardRefresh();
+  });
+  await L.settle(page, 900);
+  const file = (name, d) => ({ name, mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(d)) });
+  const pick = async files => {
+    const [fc] = await Promise.all([page.waitForEvent('filechooser'), page.getByRole('button', { name: /\+ Publish workout/ }).click()]);
+    await fc.setFiles(files); await L.settle(page, 900);
+  };
+  const lastConfirm = () => (log.dialogs.filter(d => d.type === 'confirm').slice(-1)[0] || {}).message || '';
+  // 1. new, replaces a live one, replaces a hidden one
+  let n0 = await L.nCalls(page);
+  await pick([file('fixture-burner.json', { id: 'fixture-burner', title: 'Fixture Burner', duration: '20 min', category: 'strength' }),
+    file('brand-new.json', { id: 'brand-new', title: 'Brand New', duration: '15 min', category: 'strength' }),
+    file('hidden-one.json', { id: 'hidden-one', title: 'Hidden One', duration: '10 min', category: 'strength' })]);
+  const c1 = lastConfirm();
+  check(r, 'the confirm says which is new', /Brand New — new/.test(c1), c1);
+  check(r, 'it says which replaces the live one', /Fixture Burner — replaces the live one/.test(c1), c1);
+  check(r, 'and which replaces a hidden one, which stays hidden', /Hidden One — replaces a hidden one, which STAYS hidden/.test(c1), c1);
+  const up = lastOf(await L.callsSince(page, n0), c => c.kind === 'from' && c.name === 'library' && c.op === 'upsert');
+  const pubOf = slug => ((up && up.payload) || []).find(x => x.slug === slug);
+  check(r, 'the write keeps the hidden one hidden and publishes the other two', !!up && pubOf('workouts/strength/hidden-one').published === false && pubOf('workouts/strength/fixture-burner').published === true && pubOf('workouts/strength/brand-new').published === true, up && up.payload.map(x => [x.slug, x.published]));
+  // 2. the same id on another shelf: refused, nothing written
+  n0 = await L.nCalls(page);
+  await pick([file('fixture-burner.json', { id: 'fixture-burner', title: 'Fixture Burner', duration: '20 min', category: 'conditioning' })]);
+  const bar = await L.failText(page);
+  check(r, 'an id that is already on another shelf is refused, naming the shelf and what to do', /already on the Strength \(fixture\) shelf/.test(bar) && /hide that one first/.test(bar), bar);
+  check(r, 'and nothing was written', !(await L.callsSince(page, n0)).some(c => c.name === 'library' && c.op === 'upsert'), '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── One way to say what did not work (audit BROWSER-10, FLOW-22, MKT-13, 2026-10-11, pile B5) ─────────────────────────────────────
 // A failure used to be a 2.6-second toast in some tabs (easy to miss) and a pop-up in others (it stopped everything, and was gone once
 // dismissed). Now: it worked = a toast; it did not = a line at the bottom that stays until it is dismissed; a question = a confirm;

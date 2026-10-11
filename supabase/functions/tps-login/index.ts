@@ -1,5 +1,5 @@
 // Creates, resets, revokes and restores logins for the Tennis Performance System course ("tps"),
-// the paid Farsi handbook app at /tennis/app/ (its source is the private tps-content repo).
+// the paid Farsi handbook app at /tennis/app/ (its source is tennis/app/ in the website repo; the lessons live in Supabase, tps_content).
 //
 // A copy of assess-login (the testing app) with its own address prefix and table; read
 // athlete-login's header before changing either. Buyers have no email here, so an account is keyed
