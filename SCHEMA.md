@@ -168,7 +168,7 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
 
 ### Placeholder guidance
 
-- `athlete.id` → lowercase, underscore-separated (e.g. `john_doe`).
+- `athlete.id` → lowercase, underscore-separated (e.g. `alex_rivera`).
 - `athlete.boardName` → the name they chose. AA Proof puts them on the shared leaderboard under it once they have finished a workout (`autoJoinBoard()`, since 2026-09-12); they can rename it or leave in Crew.
 - `athlete.tier` → `"free"` for a free Proof user; omit for a coaching client.
 - `sport.badge` → short line shown above the name, e.g. `"🎾 Tennis Performance"`. Omit the whole `sport` object if not relevant.
@@ -1083,7 +1083,7 @@ single unbroken paragraph, it renders as one dense block with no visual structur
 
 ### Adding a New Athlete
 
-1. Copy any existing JSON file (e.g. `john_doe.json`)
+1. Copy any existing JSON file (e.g. `alex_rivera.json`)
 2. Rename to `new_athlete.json`
 3. Update `athlete`, `sport`, `cycles`, and `workouts`
 4. Publish it into `public.programs` — `/program-assemble`'s publish step (`publish_cycle()` with `p_new_cycle => false`).
