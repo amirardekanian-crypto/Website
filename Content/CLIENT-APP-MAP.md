@@ -1,6 +1,6 @@
 # The athlete app — a map for someone opening it for the first time
 
-**Status: DRAFT 2 · 2026-10-11 · English only** (Farsi follows once Amir has approved this text).
+**Status: DRAFT 3 · 2026-10-11 · English only** (Farsi follows once Amir has approved this text).
 **Who it is for:** a new client who is comfortable with phones but new to this system, and, further down, the returning athlete starting cycle 2, 3 or 4.
 **What it covers (Amir, 2026-10-11):** core training (sign-in → Home → a session → finishing it), the Library (Sessions, Playbook, Exercises), and Personal Records + Body Weight. AA Proof (the habit tracker) appears only as the row and strip on Home, with a pointer. The full AA Proof app, the coach dashboard, the Farsi course app and the testing app are not here.
 
@@ -28,7 +28,7 @@ You do not need to read the rest of this to start. Do these in order.
 4. **Four tabs along the bottom:** **Home** is your training. **Coach** is the button to message me. **Library** is extras. **Game Plan** is the whole plan.
 5. **To train:** Home → the day card with the green ring → **Start ▶** → answer five quick questions → **Begin session ▶**.
 6. **Open an exercise** (tap its row). Type the weight. Tap the **circle** when the set is done. Tap how hard it was, **6 to 10**.
-7. **At the end, scroll to the bottom.** Rate the whole session **1 to 10**, then tap **Done · send to coach ✓**. That sends it to me.
+7. **After your last exercise the page scrolls you down to the finish card.** Rate the whole session **1 to 10**, then tap **Done · send to coach ✓**. That sends it to me.
 8. **Any question, any niggle:** Coach tab → **Message me on WhatsApp**. I answer there, not in the app.
 
 **Four things nobody tells you:**
@@ -136,7 +136,7 @@ DAY  (opened from a day card; the tab bar hides once you tap Begin or Skip)
 **The sign-in screen.** A green photo, the small heading *AA Performance*, "A *coach* in your pocket.", the line *A path to your target.*, then two boxes, **Username** and **Password** (the eye shows what you typed), and **Sign in**.
 - Your username is not an email. Type it as I sent it. A Farsi keyboard works: Persian digits are converted.
 - If it fails: *"That username or password is not right. Check the message Amir sent you."* or *"Could not sign in just now. Check your connection and try again."*
-- *"Lost your details? Message Amir and he'll send new ones."* is plain text, not a button. Message me on WhatsApp.
+- *"Lost your details? **Message Amir** and he'll send new ones."* — **Message Amir** opens WhatsApp with the reason already written.
 - If your password manager fills both boxes, the app signs you in by itself within a few seconds. Type, or tap the eye, to stop it.
 
 **First open needs signal.** The first time, the app has to reach the server. Once it has opened with signal, it opens without signal too, from the plan saved on your phone (a quiet line says *"Offline · your plan as saved on this phone"*).
@@ -163,7 +163,7 @@ This is the order of a real first session, as the app behaves.
 7. **Say how hard it was.** A strip opens: **How hard?** and **6 7 8 9 10**. A note says: *"How hard was that set? **10**: not one more rep. **8**: two left. I set your weights from it."* Tap a number.
 8. **Rest.** The moment you tick a set, a pill, **Rest 2:30 ×**, slides up at the bottom of the screen, together with the strip above, and it stays after you've picked your number. It shows my rest for that exercise (2:00 if I didn't write one). Tap it for the Rest Timer; tap **×** to dismiss it. It never starts on its own.
 9. **Repeat for each set.** After the last set's number, the card folds into one summary line and the next exercise opens by itself.
-10. **A card appears at the bottom of the session:** **In progress · 4 of 11 sets**, with **Finish early**. It's at the very end of the page, so scroll down to find it.
+10. **A card appears at the bottom of the session:** **In progress · 4 of 11 sets**, with **Finish early**. It's at the very end of the page. When you finish the last exercise the page scrolls to it for you; until then, scroll down to find it.
 11. **When every set is done** it reads **All done with Day 1**. Rate the whole session **1 to 10** (*1 = very easy · 10 = maximum effort*), add a note if you want (**Notes for Coach**), then tap **Done · send to coach ✓**. If you haven't rated: *"Rate the session first: 1 to 10."*
 12. **Finished.** A ✓ card shows a message I wrote for that day, and the send status: *"Sending to your coach…"* then **"✓ With your coach · 2:14 PM"**. No signal? *"Saved on your phone. It goes to your coach when you have signal."* It sends itself later. The tab bar comes back.
 13. **Install nudge.** About two seconds after your first sent report, the app may ask you to put it on your home screen (once).
@@ -217,7 +217,7 @@ Top to bottom:
 | 4 | How's your stress / mood today? | Very stressed · Stressed · Neutral · Good · Great |
 | 5 | Overall, how ready do you feel? | Not ready · Bit off · OK · Good · Fully ready |
 
-- **Begin session ▶** stays grey until all five are answered.
+- The button is grey and counts your answers (**3 of 5 answered**), then becomes **Begin session ▶** at five.
 - **Skip for today** starts the clock without the questions (no banner and no adjustments; I just see that you skipped).
 - To cancel: tap the dark area outside, swipe the sheet down, or press Back. Nothing is saved.
 
@@ -586,8 +586,8 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 1. **FIXED on this branch (commit `585a2b5`, sw `aap-v99`, not live until merged): "Getting around" listed the tabs in the wrong order.** It said Home, Game Plan, Coach, Library; the bar is **Home · Coach · Library · Game Plan** [`APP_GUIDE` 8435 vs 4671]. The card now lists them in the bar's order.
 2. **FIXED on this branch: "How your program is structured" sent people to the wrong place.** It ended *"The 'Why this cycle matters' note on Home…"*. That note is on **Game Plan** (the Active card) [8437 vs `renderPlan` 7291]. It now says Game Plan and uses the app's own label, "Why This Cycle Matters".
 3. **Not a bug, walked back:** the guide says **orange** where the code and `CLAUDE.md` say **clay**. The guide says "orange" every time (the dot, an RPE over target, the ⓘ), and that is the plain word an athlete understands; "clay" is the internal token. I left it, and Part 1 uses "orange" too.
-4. **Open, confirmed by running: Reset leaves circuit round ratings in place.** The guide says Reset clears the RPEs. `resetDay` [11363] clears the sets of standard exercises and hides the round-rating rows; the browser walk confirmed that circuit round ratings survive a Reset, and circuit kg boxes are deliberately not cleared.
-5. **Open, confirmed on screen: copy slip.** After **Train as written** on a sore-only day the line reads *"Your check-in suggested a sore today."* (the title "Sore today" lower-cased into a sentence) [`readinessBannerHtml` 10954].
+4. **FIXED on this branch: Reset leaves circuit round ratings in place.** The guide says Reset clears the RPEs. `resetDay` [11363] clears the sets of standard exercises and hides the round-rating rows; the browser walk confirmed that circuit round ratings survived a Reset. `resetDay` now clears them; circuit kg boxes are deliberately kept.
+5. **FIXED on this branch: copy slip.** After **Train as written** on a sore-only day the line reads *"Your check-in suggested a sore today."* (the title "Sore today" lower-cased into a sentence). It now reads *"Your check-in said you were sore today."*
 
 ## B. What a first-timer is not told (onboarding gaps)
 
@@ -597,15 +597,15 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 - **The app's own install nudge waits** until the first finished session, so the first session usually runs from the browser.
 - **The Welcome is one-shot,** has no ✕ and ignores Back. **The three first-session notes are permanent once dismissed** (**Got it**) and never appear for anyone past cycle 1, anyone with a finished session, or anyone with a LAST weight. The guide is the only way back to them.
 - **AA Proof is first explained by a one-line quiet row** on Home. Its own onboarding appears only after a tap.
-- **"Lost your details? Message Amir…"** on the sign-in screen is not a link and has no number.
+- **"Lost your details? Message Amir…"** on the sign-in screen was not a link and had no number. *(FIXED on this branch: Message Amir is now a WhatsApp link.)*
 
 ## C. What will most likely trip a first-timer (ranked)
 
-1. **Finishing is hidden at the bottom of a long page.** Rating and **Done** appear only when every set is ticked or after **Finish early** (two taps), and the page does not scroll there. Guided's **Finish Session ✓** only takes you there. Nothing is sent until rated and Done.
+1. **Finishing is hidden at the bottom of a long page.** Rating and **Done** appear only when every set is ticked or after **Finish early** (two taps). *(FIXED on this branch: after the last card closes the page scrolls to the finish card.)* Guided's **Finish Session ✓** only takes you there. Nothing is sent until rated and Done.
 2. **The big circle on a closed card ticks every set at once, as written,** with no weight and no RPE, and folds the card. The notes say "tap the circle", which means the per-set circle inside.
 3. **A tick on an empty weight box saves no weight.** The grey LAST figure looks like a value. No weight means no Last time, no History line and no Personal Record.
 4. **No RPE, no Personal Record.** And RPE is asked in two scales (6–10 per set, 1–10 per session).
-5. **Readiness.** **Begin session ▶** stays grey with no reason given. A low answer silently lowers targets and may mark cards **Optional today**, which can alarm a first-timer. **Skip for today** starts the clock anyway.
+5. **Readiness.** *(FIXED on this branch: the grey button now counts the answers, "3 of 5 answered".)* A low answer silently lowers targets and may mark cards **Optional today**, which can alarm a first-timer. **Skip for today** starts the clock anyway.
 6. **No Start, no duration.** Sets can be logged without pressing Start, so the report has no time, load or readiness. The slim bar hides its "In progress / Paused" label, so forgetting **Pause** inflates the session.
 7. **Records look dead for the first sessions:** nothing at Done, only strength lifts with weight + RPE qualify, and the first value is never celebrated.
 8. **Tapping the Active card (even the text) on Game Plan jumps to Home.** Only **Read less** stays.
@@ -629,8 +629,8 @@ None of these are errors, but none is explained on screen.
 
 ## D. Small things reported in the code (not all re-checked)
 
-- **Library counts can stick at "0 Sessions / 0 Reads"** if the first visit is offline: `loadLibCounts` sets `_libCountsLoaded = true` after a failed load and never retries [9546–9557]. *(I re-read this; it holds.)*
-- **Dates can show a day early west of UTC** in Game Plan's header and banner: `fmtDate` parses `YYYY-MM-DD` as UTC then reads local parts [7166]. *(I re-read this; it holds.)* Home's week maths parses correctly, so the two screens could disagree.
+- **Library counts could stick at "0 Sessions / 0 Reads"** if the first visit was offline: `loadLibCounts` set `_libCountsLoaded = true` after a failed load and never retried. *(FIXED on this branch, reproduced first.)*
+- **Dates showed a day early west of UTC** in Game Plan's header and banner ("SEP 30 — NOV 3" for a cycle of Oct 1 — Nov 4, in Los Angeles): `fmtDate` parsed `YYYY-MM-DD` as UTC. *(FIXED on this branch, reproduced first.)*
 - **"Rest 2:00" pill** appears with a default 2:00 even when the card shows no rest. *(Confirmed on screen.)*
 - **Guided has no ⓘ** (only History ›; the code shows none, not run). **Circuit cards have no ⓘ** *(confirmed on screen)*.
 - **Quality words and ⓘ** are absent until the exercise library has loaded once (a new phone offline shows neither).

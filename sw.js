@@ -190,7 +190,11 @@
 //      keyboard used to fail every sign-in. (Made as v96 on a branch alongside PROG-02's v96/v97.)
 // v99: program.html changed (2026-10-11): two texts in the in-app guide now match the app. "Getting around" lists
 //      the tabs in the bar's order (Home · Coach · Library · Game Plan), and "How your program is structured"
-//      sends the "Why This Cycle Matters" note to Game Plan, where it is, not Home. No behaviour changed.
+//      sends the "Why This Cycle Matters" note to Game Plan, where it is, not Home. And first-timer fixes found by walking
+//      the app (Content/CLIENT-APP-MAP.md): the Library counts retry after a failed first load instead of freezing at 0,
+//      Game Plan's dates are the cycle's own local days (they showed a day early west of UTC), Reset clears a circuit's
+//      round ratings, the sore-only line reads properly, sign-in's "Message Amir" is a WhatsApp link, the grey
+//      "Begin session" counts the answers (3 of 5 answered), and after the last card closes the page scrolls to the finish card.
 const CACHE = 'aap-v99';
 
 // Pre-cached on install — the minimum needed to open the app offline.

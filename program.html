@@ -375,6 +375,7 @@
     background: rgba(199,85,47,.10); color: #C7552F; line-height: 1.45; }
   .signin-help { margin: 16px 0 0; font-size: var(--fs-small); color: #7d8a86; text-align: center;
     line-height: 1.5; }
+  .signin-help a { color: var(--green-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
   /* Anchors the bottom of the sheet. Without it a tall phone leaves ~200px of bare
      paper under the help line, which reads as unfinished rather than as space. */
   .signin-foot { margin: auto 0 0; padding-top: 22px; text-align: center;
@@ -4370,7 +4371,7 @@
     </label>
     <button class="signin-go" id="si-go" type="submit">Sign in</button>
     <div class="signin-err" id="si-err" hidden></div>
-    <p class="signin-help">Lost your details? Message Amir and he'll send new ones.</p>
+    <p class="signin-help">Lost your details? <a id="si-help-wa" href="https://wa.me/" target="_blank" rel="noopener">Message Amir</a> and he'll send new ones.</p>
     <div class="signin-foot">amirardekani.com</div>
     </div>
   </form>
@@ -5962,6 +5963,9 @@ async function athleteFromSession() {
 function showSignIn() {
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('signin-screen').classList.add('visible');
+  // "Message Amir" opens WhatsApp with the reason already written (the number is COACH_WHATSAPP, the same one the rest of the app uses).
+  const helpWa = document.getElementById('si-help-wa');
+  if (helpWa) helpWa.href = 'https://wa.me/' + COACH_WHATSAPP + '?text=' + encodeURIComponent("Hi Amir, I've lost my login details for the app. ");
   const form = document.getElementById('signin-form');
   const errBox = document.getElementById('si-err');
   const btn = document.getElementById('si-go');
@@ -7163,9 +7167,11 @@ function renderPlan() {
 
   // Format an ISO date ("2024-04-28") into "APR 28". Returns '' on failure so
   // we just hide the dates row when the schema field is missing or malformed.
+  // A date-only string is a local calendar day (new Date('2026-10-16') is UTC midnight, which is the 15th west of UTC).
+  const isoDay = (iso) => { const s = String(iso).slice(0, 10); return /^\d{4}-\d\d-\d\d$/.test(s) ? new Date(s + 'T00:00:00') : new Date(iso); };
   const fmtDate = (iso) => {
     if (!iso) return '';
-    const d = new Date(iso);
+    const d = isoDay(iso);
     if (isNaN(d)) return '';
     const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     return `${months[d.getMonth()]} ${d.getDate()}`;
@@ -7174,7 +7180,7 @@ function renderPlan() {
   // Days remaining until a date string (returns null if the date is missing/invalid)
   const daysUntil = (iso) => {
     if (!iso) return null;
-    const end = new Date(iso);
+    const end = isoDay(iso);
     if (isNaN(end)) return null;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -8213,7 +8219,7 @@ function toggleCheckOnly(item, day) {
     const rpeRows = item.querySelectorAll('.rpe-row');
     rpeRows.forEach(r => r.classList.toggle('visible', item.classList.contains('checked')));
     // Simple items (no RPE): auto-collapse on check, expand on uncheck.
-    if (item.classList.contains('checked') && !rpeRows.length) item.classList.add('collapsed');
+    if (item.classList.contains('checked') && !rpeRows.length) { item.classList.add('collapsed'); setTimeout(() => nudgeFinishCard(day), 700); }
     if (!item.classList.contains('checked'))         { item.classList.remove('collapsed'); fitNotes(item); }
   }
   saveState();
@@ -9546,6 +9552,9 @@ window.exitWorld = exitWorld;
 async function loadLibCounts() {
   if (_libCountsLoaded) return;
   await ensureLibManifests();
+  // A load that failed (offline on the first visit) must not be written as "0 Sessions" and then
+  // never retried: leave the counts blank, and the next visit to the Library asks again.
+  if (!_trainManifest || !_readManifest) return;
   const sCount = ((_trainManifest && _trainManifest.categories) || []).reduce((n, c) => n + ((c.workouts || []).length), 0);
   const rCount = ((_readManifest && _readManifest.categories) || []).reduce((n, c) => n + ((c.articles || []).length), 0);
   const sEl = document.getElementById('sessions-count');
@@ -10500,9 +10509,23 @@ function foldWhenDone(card, openStrips) {
       next.classList.remove('collapsed');
       fitNotes(next);
       next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      nudgeFinishCard(card.dataset.day);
     }
     paintHints(card.dataset.day);
   }, 700);
+}
+
+// Nothing left to do in the day: the way on is the finish card (rate, then Done), and it sits at the very end of a
+// long page. Take the athlete to it, as folding a card takes them to the next one. Only once the last card has closed,
+// never mid-card, and never in Guided (which has its own way to the finish card).
+function nudgeFinishCard(day) {
+  if (typeof STEP !== 'undefined' && STEP) return;
+  const left = [...document.querySelectorAll(`.checklist-item[data-day="${day}"]`)]
+    .some(c => !c.classList.contains('checked') && !c.classList.contains('rd-skip'));
+  if (left) return;
+  const conf = document.getElementById('confirm-' + day);
+  if (conf && conf.classList.contains('visible')) conf.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function updateProgress(day) {
@@ -10788,7 +10811,9 @@ function openReadiness(day) {
           </button>`).join('')}
       </div>
     </div>`).join('');
-  document.getElementById('readiness-begin').disabled = true;
+  const beginBtn = document.getElementById('readiness-begin');
+  beginBtn.disabled = true;
+  beginBtn.textContent = '0 of ' + READINESS_QUESTIONS.length + ' answered';
   document.getElementById('readiness-overlay').classList.add('visible');
 }
 
@@ -10799,8 +10824,11 @@ function pickReadiness(key, val, btn) {
   row.querySelectorAll('.readiness-opt').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   // Begin only unlocks once every question is answered.
-  const allAnswered = READINESS_QUESTIONS.every(q => _readinessSel[q.key]);
-  document.getElementById('readiness-begin').disabled = !allAnswered;
+  const answered = READINESS_QUESTIONS.filter(q => _readinessSel[q.key]).length;
+  const allAnswered = answered === READINESS_QUESTIONS.length;
+  const beginBtn = document.getElementById('readiness-begin');
+  beginBtn.disabled = !allAnswered;
+  beginBtn.textContent = allAnswered ? 'Begin session ▶' : answered + ' of ' + READINESS_QUESTIONS.length + ' answered';   // a grey button that says why
   if (navigator.vibrate) navigator.vibrate(5);
 }
 
@@ -10951,7 +10979,7 @@ function readinessBannerHtml(day, r, dayData) {
   const d = esc(String(day));
   if (r.asWritten) {
     return `<div class="rd-in rd-plain"><div class="rd-k">Training as written</div>
-      <div class="rd-t">Your check-in suggested a ${esc(title.toLowerCase())}. Your call, and I'll see it with the session.</div>
+      <div class="rd-t">Your check-in ${low ? 'suggested ' + (r.level === 'red' ? 'a short day' : 'a lower day') : 'said you were sore today'}. Your call, and I'll see it with the session.</div>
       <button type="button" class="rd-btn" onclick="setAsWritten('${d}', false)">Use today's targets</button></div>`;
   }
   const lines = [];
@@ -11391,6 +11419,13 @@ function resetDay(day) {
       });
       if (card._paintSets) card._paintSets();
     }
+  });
+  // A circuit's round ratings belong to this session too, so they go with the ticks; its kg boxes stay, like a set's weights.
+  document.querySelectorAll(`[data-day="${day}"].round-group`).forEach(card => {
+    const nm = card.querySelector('.item-name').textContent.trim();
+    const rounds = parseInt(card.dataset.rounds, 10) || 1;
+    for (let r = 1; r <= rounds; r++) localStorage.removeItem(circuitRpeKey(nm, r));
+    card.querySelectorAll('.rpe-row .rpe-btn.selected').forEach(b => b.classList.remove('selected'));
   });
   // Hide RPE row indicator (used by circuits + simple exercises)
   document.querySelectorAll(`[data-day="${day}"] .rpe-row`).forEach(r => r.classList.remove('visible'));
@@ -13190,7 +13225,7 @@ function selectRPE(btn, key, e) {
   if (card && card.classList.contains('checked')) {
     const rows = card.querySelectorAll('.rpe-row');
     const allRated = Array.from(rows).every(r => r.querySelector('.rpe-btn.selected'));
-    if (allRated) card.classList.add('collapsed');
+    if (allRated) { card.classList.add('collapsed'); setTimeout(() => nudgeFinishCard(card.dataset.day), 700); }
   }
 }
 

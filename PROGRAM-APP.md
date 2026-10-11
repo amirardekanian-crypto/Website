@@ -1243,3 +1243,22 @@ history* in Settings → Body weight, next to the on/off switch, same double-tap
 would resurrect every reading on its next push, the identical failure mode the single-day
 tombstone fix (above) already exists to prevent. Proven across a simulated second device
 that still holds real readings: it ends up with every reading tombstoned too.
+
+## 🧭 First-timer fixes (2026-10-11, found by walking the app: `Content/CLIENT-APP-MAP.md`)
+
+Seven small changes, all found while mapping the app as a first-time client and each checked in a phone-width browser
+(`scripts/headless/first-timer.js`, which fails on the unfixed code):
+
+- **The Library's counts retry.** `loadLibCounts()` used to mark itself loaded after a failed first load (offline), so the doors read
+  "0 Sessions / 0 Reads" for the rest of the visit. A failed load now leaves the counts blank and the next visit asks again.
+- **Game Plan's dates are the cycle's own local days.** `fmtDate()` and `daysUntil()` read `YYYY-MM-DD` as UTC midnight, so west of UTC the
+  header and the "N days left" banner showed the day before (`isoDay()` now reads it as a local day, as `cycDate()` always did).
+- **Reset clears a circuit's round ratings too** (`resetDay()`); a circuit's kg boxes stay, like a set's weights. The guide already said RPEs clear.
+- **The sore-only line reads "Your check-in said you were sore today."** (it said "suggested a sore today"). Lower and short days are unchanged.
+- **Sign-in's "Message Amir" is a link** (`#si-help-wa`, set in `showSignIn()` from `COACH_WHATSAPP`) opening WhatsApp with "Hi Amir, I've lost my login details for the app."
+- **The grey Begin button counts the answers** ("0 of 5 answered", then "Begin session ▶") so a first-timer sees why it is grey.
+- **After the last card closes the page scrolls to the finish card** (`nudgeFinishCard()`: a standard card's fold, a circuit's last round, a
+  warm-up/simple tick), as a fold already scrolled to the next card. Never in Guided, which has its own way there.
+
+The in-app guide's "Getting around" now lists the tabs in the bar's order (Home · Coach · Library · Game Plan) and "How your program is
+structured" puts the "Why This Cycle Matters" note on Game Plan, where it is.
