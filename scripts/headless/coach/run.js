@@ -922,6 +922,7 @@ S['erase-athlete'] = async (b) => {
   const emailPick = page.locator('.erase .pick', { hasText: 'same email' }).locator('input'), namePick = page.locator('.erase .pick', { hasText: 'same name' }).locator('input');
   check(r, 'two intake forms are offered: the same-email one is ticked, the same-name one is not, the stranger\'s is not listed', (await page.locator('.erase .pick').count()) === 2 && await emailPick.isChecked() && !(await namePick.isChecked()) && !/Someone Else/.test(text), text.slice(0, 900));
   check(r, 'it says what stays: backups, the inbox, and that the partner record stays with only its link removed', /weekly backup files/.test(text) && /inbox/.test(text) && /FIXTURE10 stays on the Affiliates tab/.test(text), text.slice(-420));
+  check(r, 'it says when the last backup was taken (none yet here), because that file is the only way back from a mistake', /last ⤓ Backup on this computer: none yet/.test(text) && /only way back/.test(text), text.slice(-520));
   const go = page.locator('#eraseGo');
   check(r, 'Erase for good is disabled until the id is typed', await go.isDisabled(), '');
   await page.locator('#eraseIn').fill('zed');
@@ -1002,7 +1003,7 @@ S['erase-fails'] = async (b) => {
   await page.evaluate(() => { window.__STUB.missingRpc = ['coach_erase_person']; });
   await open();
   let t = await erasePanelText(page);
-  check(r, 'stage54 not applied: the panel says which files to run, and offers no erase button', /cannot be erased now/.test(t) && /stage53_buyer_notes\.sql and then stage54_erase_person\.sql have not been run/.test(t) && (await page.locator('#eraseGo').count()) === 0, t);
+  check(r, 'stage54 not applied: the panel says which file to run, and offers no erase button', /cannot be erased now/.test(t) && /Run supabase\/PASTE-1-run-in-sql-editor\.sql in the Supabase SQL editor/.test(t) && (await page.locator('#eraseGo').count()) === 0, t);
   await page.locator('.erase button', { hasText: 'Close' }).click();
   await page.evaluate(() => { window.__STUB.missingRpc = []; });
   // 2. the dry run is refused

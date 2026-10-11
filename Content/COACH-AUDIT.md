@@ -606,6 +606,11 @@ no days-left banner) on its **last day**, one day early. Tehran and Madrid are r
 not (reproduced by running the real function under each time zone). The dashboard reads the date as a local day, so
 the two disagree for those athletes. A one-line fix in the app (parse the date as a local day) when you want it.
 
+**Found while doing it, not fixed (outside the five items).** The old stand-alone `backup_supabase.py` (a script that needs the
+service key; its own header says you do not need it) still has a 22-table list where the dashboard's ⤓ Backup has 37, and it pages
+rows by offset with no order, the flaw the dashboard's backup lost a row to (`backup-paging`). Keep using the dashboard's ⤓ Backup; if you
+want the script kept, it needs the table list and an ordered paging fix, or retiring.
+
 **Your decisions** moved on 2026-10-11: see §11.
 
 ## 11. Third session (2026-10-11): your answers, and where each one stands

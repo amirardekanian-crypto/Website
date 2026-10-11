@@ -4376,7 +4376,7 @@ function eraseMatches(e) {
 }
 function eraseWhy(err) {
   const m = (err && err.message) || '', code = (err && err.code) || '';
-  if (/Could not find the function|PGRST202/i.test(m + code)) return 'the server does not have coach_erase_person yet (supabase/stage53_buyer_notes.sql and then stage54_erase_person.sql have not been run).';
+  if (/Could not find the function|PGRST202/i.test(m + code)) return 'the server does not have coach_erase_person yet. Run supabase/PASTE-1-run-in-sql-editor.sql in the Supabase SQL editor (it holds stage53 and stage54).';
   if (/coach only|permission denied|JWT/i.test(m)) return 'your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.';
   return m || 'the server refused.';
 }
@@ -4389,7 +4389,7 @@ function erasePanelHtml(kind, key) {
       <button class="btn sm" onclick="eraseCancel()">Close</button></div>`;
   const pv = e.pv || {}, busy = e.status === 'busy';
   const cands = pv.intake_candidates || [];
-  const codes = pv.affiliates_unlinked || [];
+  const codes = pv.affiliates_unlinked || [], lastBackup = lastBackupAt();
   const coached = kind === 'athlete' && (S.ath[key] || {}).tier === 'coached';
   return `<div class="erase">
     <p class="eh">Erase ${esc(pv.shown_as || key)} completely</p>
@@ -4399,7 +4399,7 @@ function erasePanelHtml(kind, key) {
       ${cands.map(c => `<label class="pick"><input type="checkbox" ${e.picked.includes(c.id) ? 'checked' : ''} ${busy ? 'disabled' : ''} onchange="eraseTick(${jsq(c.id)}, this.checked)">
         <span>${esc(prettyDate(String(c.created_at || '').slice(0, 10)))} · ${esc(c.name || 'no name')}${c.programme ? ' · ' + esc(c.programme) : ''}
         <span class="chip ${c.matched_on === 'email' ? 'court' : ''}">${c.matched_on === 'email' ? 'same email' : 'same name'}</span></span></label>`).join('')}` : ''}
-    <p class="stays"><b>Stays:</b> your weekly backup files (they leave those as the old files roll off, about three months, as the privacy notice says), emails about them in your inbox, WhatsApp, and anything on their own phone.${codes.length ? ` The partner record${codes.length === 1 ? '' : 's'} <b>${esc(codes.join(', '))}</b> stays on the Affiliates tab: only the link to this athlete is removed.` : ''}</p>
+    <p class="stays"><b>Stays:</b> your weekly backup files (they leave those as the old files roll off, about three months, as the privacy notice says), emails about them in your inbox, WhatsApp, and anything on their own phone. Your last ⤓ Backup on this computer: <b>${lastBackup ? esc(timeAgo(lastBackup)) : 'none yet'}</b>. If this might be a mistake, that file is the only way back.${codes.length ? ` The partner record${codes.length === 1 ? '' : 's'} <b>${esc(codes.join(', '))}</b> stays on the Affiliates tab: only the link to this athlete is removed.` : ''}</p>
     <div class="typed">
       <label for="eraseIn">Type <code>${esc(pv.confirm_word || key)}</code> to confirm</label>
       <input id="eraseIn" class="pwin" autocomplete="off" autocapitalize="none" spellcheck="false" value="${esc(e.typed || '')}" ${busy ? 'disabled' : ''}
