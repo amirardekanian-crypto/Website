@@ -11,9 +11,9 @@ const path = require('path');
 const H = require('./lib');
 
 const loc = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-// cycleWeekInfo() reads a startDate as new Date('YYYY-MM-DD') (UTC midnight) and takes that instant's LOCAL midnight,
-// so west of UTC the string has to name the next day for the cycle to start on the day we mean.
-const asCycleDate = d => { const x = new Date(d); if (x.getTimezoneOffset() > 0) x.setDate(x.getDate() + 1); return loc(x); };
+// A startDate is a calendar day (cycleWeekInfo() reads it in whole days since pile C, 2026-10-11): the string names the day we mean, in every zone.
+// (Until then it read new Date('YYYY-MM-DD') as a UTC midnight, so west of UTC this had to name the next day.)
+const asCycleDate = d => loc(d);
 
 // The fixture's current cycle (index 1) with today `dayIn` days after its start (negative: it starts in -dayIn days),
 // `len` days from start to end (34 = five weeks), the given weekNotes (omitted: none), and the squat at RPE 9 so a

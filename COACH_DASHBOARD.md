@@ -887,7 +887,7 @@ covered by the real-mode harness in `scripts/headless/coach/`.
 It cuts each twin out of both files and runs the same vectors through both: the exercise-name
 tiers (`exNameVariants` / `exNameVariantsC`; the programme checker's `norm_name()` and SQL are held to the same cases, `scripts/name_cases.json`), a renamed lift (`ceilAliasMap` / `ceilAliasMapC`), the
 Spine lookup (`spineFor` / `spineForC`), today's RPE target on a lower day with the week note (`dayRpe` / `dayTargetC`), the week a day
-falls in and its note (`cycleWeekInfo`, `weekNoteNow` / `cycleWeekOnC`, `weekNoteOnC`: over 5,000 checks in all), what
+falls in and its note (`cycleWeekInfo`, `weekNoteNow` / `cycleWeekOnC`, `weekNoteOnC`: about 40,000 checks, run with the athlete's clock in eight time zones), what
 the Quality check counts (`qmSets`, `isPrepBlockTitle` / `qmSetsC`, `QM_PREP`), and the check-in line's
 writer and reader (`readinessPlanLine` / `parseCheckinPlan`). It also fails a change to `assets/js/chips.js`
 that keeps coach.html's hand-typed `?v=` (the service worker serves `/assets/` cache-first): bump the

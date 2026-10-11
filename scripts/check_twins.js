@@ -47,8 +47,9 @@
    After editing assets/js/chips.js: bump ?v= in coach.html, then:   node scripts/check_twins.js --stamp
    ═══════════════════════════════════════════════════════════════════════════ */
 'use strict';
-// The week arithmetic below is compared in UTC. The app reads a cycle's date as a UTC midnight and the clock in local time (a known
-// difference west of Greenwich and on a clock-change day, item C2 of the audit's section 12); the dashboard counts calendar days.
+// Everything below is compared in UTC, except the week of a day (section 4b): that one runs in several time zones, because the app used to read a
+// cycle's date as a UTC midnight and the clock in local time, a day off west of Greenwich and an hour off on a clock-change day (fixed in pile C,
+// 2026-10-11: both copies now count calendar days). Section 4b sets process.env.TZ for each zone and puts it back.
 process.env.TZ = 'UTC';
 const fs = require('fs'), path = require('path'), vm = require('vm'), crypto = require('crypto'), cp = require('child_process');
 
@@ -272,15 +273,19 @@ run('lower-day RPE target (dayRpe), with and without a week note', () => WRITTEN
 
 /* ── 4b. the week a day falls in, and the note for it (WORK-11) ────────────── */
 // The app reads the clock (cycleWeekInfo / weekNoteNow ask about TODAY); the dashboard is told the day (cycleWeekOnC / weekNoteOnC: the day a
-// session was trained). So the app's two functions run in a sandbox whose clock is set to each day in turn.
+// session was trained). So the app's functions run in a sandbox whose clock is set to LOCAL NOON of each day in turn, in the time zone being tested.
 const D_WEEK = sandbox(null, fromD('dayNumC', 'cycleWeekOnC', 'weekNoteOnC'), ['cycleWeekOnC', 'weekNoteOnC']);
 function appWeekAt(dayIso) {
-  const noon = new Date(dayIso + 'T12:00:00Z').getTime();
+  const [y, m, d] = dayIso.split('-').map(Number);
+  const noon = new Date(y, m - 1, d, 12, 0, 0).getTime();      // local noon of that calendar day, in the zone under test (process.env.TZ)
   const Fixed = class extends Date { constructor(...a) { if (a.length) super(...a); else super(noon); } static now() { return noon; } };
   const ctx = vm.createContext({ console, Date: Fixed });
-  vm.runInContext(fromA('cycleWeekInfo', 'weekNoteNow').join('\n'), ctx);
+  vm.runInContext(fromA('cycleDayNo', 'todayDayNo', 'cycleWeekInfo', 'weekNoteNow').join('\n'), ctx);
   return { info: vm.runInContext('cycleWeekInfo', ctx), note: vm.runInContext('weekNoteNow', ctx) };
 }
+// The athletes' clocks: UTC, the Americas (west of Greenwich, where the app was a day early), Europe, Iran, and the two southern zones that change their
+// clocks inside the days below (Sydney on 4 Oct, Auckland on 27 Sep). New York and Europe change theirs inside the spring and autumn ranges.
+const WEEK_ZONES = ['UTC', 'America/Los_Angeles', 'America/New_York', 'America/Sao_Paulo', 'Europe/London', 'Asia/Tehran', 'Australia/Sydney', 'Pacific/Auckland'];
 const WEEK_CYCLES = [
   { startDate: '2026-09-01', endDate: '2026-10-06', weekNotes: { '1': { text: 'w1', rpeCap: 7 }, '3': { text: 'w3', rpeDrop: 1 }, '5': { text: 'w5', rpeCap: 6 } } },
   { startDate: '2026-09-01', endDate: '2026-09-29', weekNotes: { first: { text: 'first', rpeDrop: 1 }, last: { text: 'last', rpeCap: 6 } } },
@@ -295,16 +300,26 @@ const WEEK_CYCLES = [
   { startDate: '2026-09-01', endDate: '2026-10-06', weekNotes: { '2': { title: 'no text' }, '4': { text: '' } } },
   { startDate: '2026-02-23', endDate: '2026-03-30', weekNotes: { '1': { text: 'across a month' }, last: { text: 'z' } } },
   { startDate: '2026-09-01', endDate: '2026-10-13', weekNotes: { '6': { text: 'six weeks', rpeCap: 7 } } },
+  { startDate: '2026-03-01', endDate: '2026-04-05', weekNotes: { '1': { text: 'across the spring clock changes', rpeCap: 7 }, '4': { text: 'w4' }, last: { text: 'last' } } },
+  { startDate: '2026-10-05', endDate: '2026-11-09', weekNotes: { first: { text: 'across the autumn clock changes' }, '4': { text: 'w4', rpeDrop: 1 } } },
   null, undefined, {}];
 const WEEK_DAYS = []; for (let n = -4; n <= 46; n++) WEEK_DAYS.push(new Date(Date.UTC(2026, 7, 29 + n)).toISOString().slice(0, 10));
+// the spring clock changes (20 Feb to 12 Apr) and the autumn ones (20 Oct to 12 Nov)
+for (let n = 0; n < 52; n++) WEEK_DAYS.push(new Date(Date.UTC(2026, 1, 20 + n)).toISOString().slice(0, 10));
+for (let n = 0; n < 24; n++) WEEK_DAYS.push(new Date(Date.UTC(2026, 9, 20 + n)).toISOString().slice(0, 10));
 // The dashboard returns { wk } on a note; the app also returns its `key` ('first' | 'last' | 'week'), which the dashboard does not need.
 const noteView = n => n && { text: n.text, title: n.title, setsDrop: n.setsDrop, rpeDrop: n.rpeDrop, rpeCap: n.rpeCap, wk: n.wk };
-run('week of a day and its note (cycleWeekInfo / weekNoteNow)', () => WEEK_DAYS.forEach(day => {
-  const app = appWeekAt(day);
-  WEEK_CYCLES.forEach(c => {
-    same('cycleWeekInfo vs cycleWeekOnC', { cycle: c, day }, app.info(c), D_WEEK.cycleWeekOnC(c, day));
-    same('weekNoteNow vs weekNoteOnC', { cycle: c, day }, noteView(app.note(c)), noteView(D_WEEK.weekNoteOnC(c, day)));
-  });
+WEEK_ZONES.forEach(zone => run(`week of a day and its note (cycleWeekInfo / weekNoteNow), the athlete's clock in ${zone}`, () => {
+  process.env.TZ = zone;
+  try {
+    WEEK_DAYS.forEach(day => {
+      const app = appWeekAt(day);
+      WEEK_CYCLES.forEach(c => {
+        same(`cycleWeekInfo vs cycleWeekOnC (${zone})`, { cycle: c, day, zone }, app.info(c), D_WEEK.cycleWeekOnC(c, day));
+        same(`weekNoteNow vs weekNoteOnC (${zone})`, { cycle: c, day, zone }, noteView(app.note(c)), noteView(D_WEEK.weekNoteOnC(c, day)));
+      });
+    });
+  } finally { process.env.TZ = 'UTC'; }
 }));
 
 /* ── 4c. is a started session over? (TWIN-6) ───────────────────────────────── */

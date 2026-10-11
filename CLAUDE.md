@@ -155,6 +155,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   `parseSetText()`) · the records rename matcher (`matchRenamed()` / `ceilAliasMapC()`) · how a session's set ends (`carrySet()`, called by
   the midnight sweep, the cloud copy and a rename) · whether a session is over (`sessionIsStale()`, 6 h grace past
   midnight; DATA-02) · the live quest run and its last day (`runEndKey()` / `activeQuestRun()` in habits.html, `questRunEnd()` / `activeQuestRun()` in coach.html) and the date it is filed under (`sessionDateFor()`, the local day it was finished).
+- **A cycle's `startDate` and `endDate` are CALENDAR days, read in whole days** (pile C, 2026-10-11): `cycleDayNo()` / `todayDayNo()` (never `new Date('2026-10-06')`,
+  which is the evening of the 5th west of Greenwich: the app said "Cycle complete" a day early in the Americas). `cycleWeekInfo()`, `weekWindow()` and `inRetestWindow()` use them;
+  `check_twins.js` runs the week twin in eight time zones, across clock changes, and `scripts/headless/cycle-tz.js` runs Home in nine. A new date comparison does the same.
 - **`rxOf()` returns a VIEW** (strings, the dose as `dose: {kind, value, side, label}`), not the `rx` object:
   test app code against real `rxOf()` output.
 - **A prescription is `rx`**; legacy `chips[]` is read, never written; **the app never invents a rest** (the pipeline writes one on every working exercise and circuit, CHP-7); reps are
@@ -395,7 +398,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v106` on 2026-10-11). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v107` on 2026-10-11). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

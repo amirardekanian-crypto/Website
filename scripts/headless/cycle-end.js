@@ -7,7 +7,7 @@ const path = require('path');
 const H = require('./lib');
 
 const DAY = 86400000;
-const ymd = d => d.toISOString().slice(0, 10);
+const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');   // the LOCAL calendar day: that is what a cycle date is
 // The fixture with the current cycle (idx) ending `endedAgo` days ago (negative: still running), five weeks a cycle.
 function prog(endedAgo, idx = 1) {
   const P = H.fixture();

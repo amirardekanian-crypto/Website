@@ -6647,16 +6647,29 @@ function toggleCycleCard(btn, ev) {
 // the cycle's length. The ONE place the week is worked out: the This cycle card,
 // the week's window (weekWindow()) and the week note all read it, so
 // they can never disagree.
+// A cycle's startDate and endDate are CALENDAR days ("2026-10-06"), so they are read as whole days, never as a clock instant (pile C, 2026-10-11).
+// new Date('2026-10-06') is UTC midnight, which is the evening of the 5th west of Greenwich: a cycle read that way ended, and Home said "Cycle
+// complete", a day early for an athlete in the Americas (Tehran, London and Madrid were right). And two local midnights are not always a whole
+// number of days apart (a clock change in between), so the week could flip an hour wrong. cycleDayNo() is the calendar day as a number of days since
+// 1970, todayDayNo() is today's local calendar day in the same unit, and a difference of two of them is exact in every zone and every season.
+// The dashboard's dayNumC() / cycleWeekOnC() work the same way (scripts/check_twins.js runs both in ten time zones).
+function cycleDayNo(v) {
+  const m = String(v == null ? '' : v).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return Date.UTC(+m[1], +m[2] - 1, +m[3]) / 86400000;
+  const d = new Date(v);          // anything else a programme might hold: the local day that moment falls on
+  return isNaN(d) ? NaN : Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000;
+}
+function todayDayNo() {
+  const n = new Date();
+  return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) / 86400000;
+}
 function cycleWeekInfo(cycle) {
   if (!cycle || !cycle.startDate || !cycle.endDate) return null;
-  const s = new Date(cycle.startDate);
-  const e = new Date(cycle.endDate);
+  const s = cycleDayNo(cycle.startDate), e = cycleDayNo(cycle.endDate);
   if (isNaN(s) || isNaN(e)) return null;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); s.setHours(0, 0, 0, 0); e.setHours(0, 0, 0, 0);
-  const WEEK = 7 * 86400000;
-  const total = Math.max(1, Math.round((e - s) / WEEK));
-  const wk = Math.min(Math.max(Math.floor((today - s) / WEEK) + 1, 1), total);
+  const today = todayDayNo();
+  const total = Math.max(1, Math.round((e - s) / 7));
+  const wk = Math.min(Math.max(Math.floor((today - s) / 7) + 1, 1), total);
   return { wk, total, before: today < s, after: today > e };
 }
 
@@ -6830,8 +6843,9 @@ function weekWindow() {
   const w = cycleWeekInfo(cur);
   const start = new Date(); start.setHours(0, 0, 0, 0);
   if (w && !w.after) {   // before the start, w.wk is clamped to 1: the first week, nothing earlier counts
-    const s0 = new Date(cur.startDate); s0.setHours(0, 0, 0, 0);
-    start.setTime(s0.getTime()); start.setDate(start.getDate() + (w.wk - 1) * 7);
+    // the calendar day that week starts on, counted in days from the day startDate names (see cycleDayNo()): never a UTC instant, never 7 × 24 hours
+    const d0 = new Date((cycleDayNo(cur.startDate) + (w.wk - 1) * 7) * 86400000);
+    start.setFullYear(d0.getUTCFullYear(), d0.getUTCMonth(), d0.getUTCDate());
   } else {
     start.setDate(start.getDate() - ((start.getDay() + 6) % 7));   // Monday
   }
@@ -9085,11 +9099,9 @@ function currentCycle() {
 function inRetestWindow() {
   const c = currentCycle();
   if (!c || !c.endDate) return true;
-  const end = new Date(c.endDate);
+  const end = cycleDayNo(c.endDate);
   if (isNaN(end)) return true;
-  end.setHours(0, 0, 0, 0);
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  return (end - today) / 86400000 <= RETEST_WINDOW_DAYS;
+  return end - todayDayNo() <= RETEST_WINDOW_DAYS;
 }
 
 // Flagged lifts with nothing on the record, or nothing recent enough.

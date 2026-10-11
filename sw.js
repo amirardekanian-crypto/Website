@@ -222,7 +222,10 @@
 //      phone keeps the old lookup.
 // v106: program.html changed (2026-10-11, coach.html audit TOOLS-11): the coach preview's bar no longer says the app is shown "exactly as they
 //      see it": it shows the programme without their logged work. Only the coach sees the bar; the bump is so his browser does not keep the old text.
-const CACHE = 'aap-v106';
+// v107: program.html changed (2026-10-11, pile C): a cycle's dates are read as calendar days in whole days. Before, an athlete west of Greenwich (the
+//      Americas) was told "Cycle complete" a day early, the week's window and the retest window were a day off there, and across a clock change the week
+//      could flip an hour wrong. Tehran, London and Madrid were already right. Without the bump a phone keeps the old reading.
+const CACHE = 'aap-v107';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

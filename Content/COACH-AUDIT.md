@@ -612,7 +612,7 @@ directly, so nothing is exposed; the one-line cleanup, which changes no behaviou
 `endDate` as a UTC midnight, so for an athlete west of Greenwich the app says the cycle is over (*Cycle complete*,
 no days-left banner) on its **last day**, one day early. Tehran and Madrid are right; New York and Los Angeles are
 not (reproduced by running the real function under each time zone). The dashboard reads the date as a local day, so
-the two disagree for those athletes. A one-line fix in the app (parse the date as a local day) when you want it.
+the two disagree for those athletes. **Fixed 2026-10-11 (pile C, Amir: "fix it"):** `cycleDayNo()` / `todayDayNo()` read a date as a calendar day in whole days (also in `weekWindow()` and `inRetestWindow()`, which had the same slip, and across clock changes); `sw.js` aap-v107; `check_twins.js` runs the week twin in eight time zones and `scripts/headless/cycle-tz.js` runs Home in nine (it fails on the old app in Los Angeles, New York and São Paulo).
 
 **Found while doing it, not fixed (outside the five items).** The old stand-alone `backup_supabase.py` (a script that needs the
 service key; its own header says you do not need it) still has a 22-table list where the dashboard's ⤓ Backup has 37, and it pages
@@ -781,7 +781,7 @@ Decided earlier, nothing to do: MKT-11 (no payment tracking for now) and WORK-9 
 ### C. Outside the audit (found on the way)
 
 - Drop `backup.onename_2026_10_09` once you are sure the 9 October rename is right (§8, item 6).
-- `cycleWeekInfo()` in `program.html` reads a cycle's end date as a UTC midnight, so an athlete west of Greenwich is told "Cycle complete" a day early (Tehran and Madrid are right). A one-line fix in the athlete app.
+- ~~`cycleWeekInfo()` in `program.html` reads a cycle's end date as a UTC midnight, so an athlete west of Greenwich is told "Cycle complete" a day early.~~ **Fixed 2026-10-11** (your yes; see §6).
 - `backup_supabase.py`, the old stand-alone script, has a 22-table list where the dashboard's ⤓ Backup has 37, and pages rows with no order. Keep using ⤓ Backup; fix or retire the script.
 - Five programmes have no login (the demo, a sample athlete and three others); the roster shows "no login" for a real athlete.
 
