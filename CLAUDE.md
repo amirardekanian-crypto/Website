@@ -134,6 +134,14 @@ silently EMPTY, with no SELECT grant it is listed under "Could NOT read". The te
 READ-ONLY policy on each and they are in the backup (`hab_season_results` was fixed in stage46). `buyer_notes` (stage53, the private note
 about each buyer) and `erasure_log` (stage54, the receipts of full erasures) are in it too. **Coaching logs keep every earlier text** in `coaching_log_versions` (stage47, 2026-10-10): a
 splice or upload that goes wrong can be put back with SQL.
+**There is a way back, and it is rehearsed** (audit TOOLS-4, Amir "yes, build and rehearse it", 2026-10-11): `scripts/restore/README.md` is the whole
+procedure (a new project, `supabase/schema_snapshot.sql`, `restore_backup.py`, the logins re-created from the dashboard, then the rows that wait for a login).
+Rules that keep it true: **(1) the snapshot is the live structure, made again in the same commit as any `supabase/stage*.sql` applied to the project**
+(three commands in the README, *Keeping the snapshot current*; pre-commit guard 17 warns when a stage file is staged without it), and `scripts/restore/rehearse.mjs`
+is run after (PGlite in a scratch folder: `npm install @electric-sql/pglite --prefix "$TEMP/pglite"`, never in the repo); **(2) a restore is always given the NEWEST
+backup as `--receipts`**, or a person erased since comes back (`coach_erase_person()` leaves the receipt, `erasure_log`); **(3) a table that holds a person's data goes
+into `BACKUP_TABLES`, the snapshot and the erase function's list the same day** (`scripts/test_restore_backup.py` fails when the first two disagree; a table that hangs
+off a login must also be taught to `REMAP` in `restore_backup.py`, which refuses otherwise). Not yet done: one dry run on a real, throwaway Supabase project.
 
 ## The athlete app (`program.html`) — read `PROGRAM-APP.md` before changing it
 
@@ -382,7 +390,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (99 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (105 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.

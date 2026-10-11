@@ -465,8 +465,13 @@ login for a new password. (The secret-link tools are gone: the links were retire
   appends its Debrief). Until 2026-10-10 it replaced them wholesale.
 - **⤓ Backup** pages every table in key order, de-duplicates, blanks the unsent login passwords
   (`initial_password`) and says **INCOMPLETE** when a table could not be read or came back short. The file is the rows
-  only (no schema, functions or policies: those are `supabase/*.sql`), and a restore is not a plain
-  import, because the login tables point at sign-in accounts that must exist first. Keep the last 12
+  only (no schema, functions or policies: those are `supabase/*.sql`, and the structure as a whole is `supabase/schema_snapshot.sql`),
+  and a restore is not a plain import, because the login tables point at sign-in accounts that must exist first.
+  **The way back is written and rehearsed (2026-10-11, audit TOOLS-4): `scripts/restore/README.md`.** `restore_backup.py` turns a
+  backup into SQL files and leaves out everyone a receipt in `erasure_log` names, so give it the NEWEST backup as `--receipts`
+  even when you restore an older one; the logins are re-created from this dashboard (Create missing logins; the Course and Testing app tabs with the
+  same usernames), then `20-after-logins.sql` puts back what belongs to a login. A table added to the schema goes in `BACKUP_TABLES` the
+  same day (`scripts/test_restore_backup.py`, pre-commit guard 17, fails when the list and the snapshot disagree). Keep the last 12
   weekly files and delete older ones: `python scripts/prune_backups.py <folder>` lists them, `--delete`
   removes them (the privacy notice promises a deleted record leaves the backups within about three months).
   **An incomplete backup is a different file** (2026-10-11): `aa-backup-INCOMPLETE-<date>.json`, with `complete: false` and

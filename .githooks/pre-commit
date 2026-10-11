@@ -1,5 +1,5 @@
 #!/bin/sh
-# Sixteen guards. Each runs only when its own files are staged, so a commit that
+# Seventeen guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -322,6 +322,30 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(habits\.html|sc
     echo "pre-commit: BLOCKED — a quest run's window in habits.html no longer matches the rule (details above). The server twin is hab_bonus_xp()'s qruns CTE (stage55)."
     failed=1
   fi
+fi
+
+# ── 17. the restore path: schema snapshot, backup list, restore generator (added 2026-10-11) ───────────────────────────────
+# Why: there were no automatic backups and no way back. A restore needs (1) the database's structure, supabase/schema_snapshot.sql (generated from the live
+# project by scripts/restore/), (2) a backup of the rows (coach.html's BACKUP_TABLES), and (3) the generator that turns one into the other
+# (scripts/restore/restore_backup.py). When the three stop agreeing nothing errors until the day a restore is needed. scripts/test_restore_backup.py checks that
+# the dashboard backs up exactly the snapshot's tables and that the generator still does its job (erased people stay erased, a login's rows follow the login,
+# nothing a row says can end a quote early). The complete proof, on a real PostgreSQL, is scripts/restore/rehearse.mjs (README there); it needs PGlite, so it is
+# not run here. A new stage file is only a WARNING: the snapshot is regenerated from the live project (README, "Keeping the snapshot current").
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(supabase/schema_snapshot\.sql|scripts/restore/[^/]+|scripts/test_restore_backup\.py|coach\.html)$'; then
+  echo "pre-commit: the restore path changed — checking the snapshot, the backup list and the generator agree..."
+  if ! restore_out=$("$PY" scripts/test_restore_backup.py 2>&1); then
+    echo "$restore_out" | grep -v '^ok '
+    echo ""
+    echo "pre-commit: BLOCKED — the restore path no longer agrees with itself (details above). A new table goes in coach.html BACKUP_TABLES and in the snapshot."
+    failed=1
+  else
+    echo "pre-commit: restore path OK."
+  fi
+fi
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^supabase/stage[0-9]+[a-z]?_[A-Za-z0-9_]+\.sql$'    && ! git diff --cached --name-only | grep -qx 'supabase/schema_snapshot.sql'; then
+  echo "pre-commit: WARNING — a supabase/stage*.sql file is staged but supabase/schema_snapshot.sql is not."
+  echo "            If that stage was applied to the live project, regenerate the snapshot (scripts/restore/README.md, \"Keeping the snapshot current\")"
+  echo "            and stage it, or the restore path will rebuild the old structure. Not blocking: a stage file that was only drafted needs nothing."
 fi
 
 exit $failed

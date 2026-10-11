@@ -192,6 +192,10 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
   habit it actually is in Proof, coach-only `library_sessions_for` is the report).
 - **Exercise videos:** on the Spine entries, edited in coach.html → Exercises (the Notion sync
   was retired 2026-09-26).
+- **The way back from a lost database** (2026-10-11, rehearsed): [`scripts/restore/README.md`](scripts/restore/README.md): the structure is
+  [`supabase/schema_snapshot.sql`](supabase/schema_snapshot.sql) (generated; made again after any stage file is applied), the rows are the weekly backup, and
+  [`restore_backup.py`](scripts/restore/restore_backup.py) is the step between (it leaves out everyone you erased). Proved by
+  [`rehearse.mjs`](scripts/restore/rehearse.mjs) on a throwaway PostgreSQL; pre-commit guard 17 runs [`test_restore_backup.py`](scripts/test_restore_backup.py).
 - **Importing reports:** [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md).
 
 ---

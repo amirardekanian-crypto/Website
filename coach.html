@@ -1617,7 +1617,10 @@ window.bulkCreateLogins = bulkCreateLogins;
 // Spine: every row of exercises, exercise_coach and qualities as it was before a change, deletes included.
 // 2026-10-11: buyer_notes (stage53) is the private note about each buyer, moved out of the buyer's reach; erasure_log
 // (stage54) is the receipt of every full erasure (a hash, the counts, no personal data). A restore from an old backup
-// brings erased people back: hash each restored id and check it against the receipts (stage54's header says how).
+// would bring erased people back: scripts/restore/restore_backup.py leaves out everyone a receipt names (give it the NEWEST backup
+// as --receipts). The way back, step by step: scripts/restore/README.md (2026-10-11, audit TOOLS-4; rehearsed by rehearse.mjs).
+// A table added to the schema goes in this list the same day AND in supabase/schema_snapshot.sql: scripts/test_restore_backup.py
+// (pre-commit guard 17) fails when the two disagree.
 const BACKUP_TABLES = [
   'programs', 'program_versions', 'coaching_logs', 'athlete_identities',
   'athlete_progress', 'session_history', 'messages', 'hab_notes', 'hab_contacts',
@@ -1651,7 +1654,7 @@ async function downloadBackup(btn) {
     project: SB_URL,
     note: 'Export of the rows of every table in BACKUP_TABLES, taken from the coach dashboard: data only, no ' +
           'schema, functions or policies (those are in supabase/*.sql). See "could_not_read" for anything that could not be read. ' +
-          'A restore is not a plain import: login tables point at auth users that must exist first. ' +
+          'To put it back: scripts/restore/README.md. python scripts/restore/restore_backup.py turns this file into SQL (give it your newest backup as --receipts, so nobody you erased comes back); the structure is supabase/schema_snapshot.sql; logins are not in this file, they are re-created from the dashboard. ' +
           'Unsent login passwords (initial_password) are blanked on purpose: reset a login to issue a new one. ' +
           'Keep the last 12 weekly files only (python scripts/prune_backups.py <folder>). ' +
           'A file named aa-backup-INCOMPLETE-<date>.json (complete: false, with "could_not_read") is NOT a restore point.',
@@ -3018,7 +3021,8 @@ function renderAthletes() {
         <button class="btn sm" onclick="pickCoachingLogs()" title="Add a coaching log from a .md file for an athlete who has none on the server yet. Never replaces one.">↑ Add coaching logs</button>
         <button class="btn sm" onclick="downloadBackup(this)">⤓ Backup</button>
         <span class="tools-note">New athletes and new cycles go up through the pipeline (publish_cycle); there is no upload button.
-          Back up weekly: the free plan keeps no backups. Keep the last 12 files, on this computer and off it, and delete older ones (the privacy notice promises about three months).</span>
+          Back up weekly: the free plan keeps no backups. Keep the last 12 files, on this computer and off it, and delete older ones (the privacy notice promises about three months).
+          The way back is written down and rehearsed: scripts/restore/README.md in the repo.</span>
       </div>
     </details>
     ${pendingCredsHtml()}
