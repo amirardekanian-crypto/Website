@@ -228,7 +228,7 @@ count and what landed on the cards differ, which is how a dropped or invented on
   wrap it in HTML (that's the cycle notes cards' convention, not this field's). Never move
   exercise-scoped guidance into the notes cards, and never invent a note nothing flagged. The full
   check warns on a note past COM-14's length, one that repeats its own pill or its entry's steps or
-  cues (CUE-7) and a grip written in a note (NAM-5): send those back to engage rather than trimming the
+  cues, a Because that retells the entry's purpose, On court line, a step or a cue (CUE-7) and a grip written in a note (NAM-5): send those back to engage rather than trimming the
   words yourself. The check needs the steps and cues text from `--spine-sql`; a Spine file saved before
   2026-10-11 says to run it again.
 - **The week notes' words:** engage's PART 3c `WEEK <n>:` lines, each into `weekNotes["<n>"].text`

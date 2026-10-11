@@ -633,6 +633,21 @@ def check_whys(data, ctx=None):
     # /program-assemble until 2026-09-26, beside a partial Python copy of it here. Since 2026-10-11 it
     # also gets the entry's purpose (from --spine-sql), so a Because that only repeats it fails (why-generic).
     purposes = (ctx or {}).get('purposes') or {}
+    # CUE-7 (2026-10-11): Why you sits in the ⓘ above What it does and On court, and the card shows the entry's steps
+    # and cues. A Because that retells any of them is not about this athlete (2 of the 81 live Becauses retold the
+    # On court line). Wording only, as for the notes: a paraphrase is the writer's and the reviewer's call.
+    texts = (ctx or {}).get('texts') or {}
+    for d, ex in whys:
+        txt = str(ex['why'].get('text') or '') if isinstance(ex.get('why'), dict) else ''
+        if not txt: continue
+        i, where = ex.get('exId') or '', f"Day {d.get('id')} {ex.get('name')} why"
+        for label, other in (('On court line', (texts.get(i) or {}).get('tennis')), ('What it does line', purposes.get(i))):
+            if other and (repeats(txt, other) or repeats(other, txt)):
+                warn(f"{where}: the Because retells the entry's {label} (\"{other[:70]}\"). The ⓘ already shows it; "
+                     "Why you says why THIS athlete has the exercise", 'CUE-7', 'COM-4')
+        hit = next((w for w, x in layer_lines(texts, ex) if repeats(txt, x)), None)
+        if hit:
+            warn(f"{where}: the Because repeats the entry's {hit}. Why you is the reason, never how to do it", 'CUE-7', 'COM-4')
     probs = run_chips("a.map(p=>{try{return C.auditWhy(p.ex,p.purpose)}catch(x){return null}})",
                       [{'ex': ex, 'purpose': purposes.get(ex.get('exId') or '')} for _, ex in whys])
     if probs is None:
@@ -1097,13 +1112,14 @@ def load_context(path):
             for l in str(o.get('purposes') or '').splitlines():
                 i, _, t = l.partition('|')
                 if i and t: purposes[i] = t
-            # id|steps|cues, ' ¶ ' between lines (2026-10-11): what the Coach's Note and the pill must not repeat (CUE-7)
+            # id|steps|cues|on court, ' ¶ ' between lines (2026-10-11): what the Coach's Note, the pill and the
+            # Because must not repeat (CUE-7). A file saved before the On court field reads as no court line.
             if 'texts' in o:
                 texts = texts or {}
                 for l in str(o.get('texts') or '').splitlines():
-                    i, st, cu = (l.split('|', 2) + ['', ''])[:3]
+                    i, st, cu, tn = (l.split('|', 3) + ['', '', ''])[:4]
                     if i: texts[i] = {'steps': [x.strip() for x in st.split('¶') if x.strip()],
-                                      'cues': [x.strip() for x in cu.split('¶') if x.strip()]}
+                                      'cues': [x.strip() for x in cu.split('¶') if x.strip()], 'tennis': tn.strip()}
     else:
         lines = raw.splitlines()
     spine = {}
@@ -1431,8 +1447,8 @@ def spine_sql(data):
 -- Read-only, one call. It returns the Spine lines for this programme's exercises (by exId, or found by a
 -- card's name), how each card name resolves (the old node name scan, 2026-09-27), the athlete's live
 -- programme BEFORE this build (prev: the cycle just trained), their Exercise Ledger, their stored athlete
--- profile, the real minutes per day, each entry's purpose (the Because audit), each entry's steps and cues
--- (so a Coach's Note or a pill that repeats them is flagged, CUE-7), and checksums: the checker
+-- profile, the real minutes per day, each entry's purpose (the Because audit), each entry's steps, cues and On
+-- court line (so a Coach's Note, a pill or a Because that repeats them is flagged, CUE-7), and checksums: the checker
 -- stops if the saved copy differs. Each Spine line ends with the entry's muscle credits and cost, which the
 -- volume count reads, and whether it has steps (How to do it, CUE-6).
 with cards(n) as (select unnest(array[{namelist}]::text[])),
@@ -1489,7 +1505,8 @@ s as (select
      || '|' || coalesce((select string_agg(regexp_replace(c.t, '\\s+', ' ', 'g'), ' ¶ ' order by c.o)
           from jsonb_array_elements_text(case when jsonb_typeof(e.cues->'good') = 'array' then e.cues->'good' else '[]'::jsonb end
                                          || case when jsonb_typeof(e.cues->'bad') = 'array' then e.cues->'bad' else '[]'::jsonb end)
-               with ordinality c(t, o)), ''), E'\\n' order by e.id)
+               with ordinality c(t, o)), '')
+     || '|' || coalesce(regexp_replace(e.tennis, '\\s+', ' ', 'g'), ''), E'\\n' order by e.id)
   from public.exercises e where e.id in ({idlist})) as texts)
 select spine, md5(coalesce(spine, '')) spine_md5, names, md5(coalesce(names, '')) names_md5,
        prev, (select count(*) from jsonb_array_elements(case when jsonb_typeof(prev->'days') = 'array' then prev->'days' else '[]'::jsonb end) d,

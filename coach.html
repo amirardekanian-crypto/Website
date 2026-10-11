@@ -6249,8 +6249,9 @@ window.spineStepsHint = spineStepsHint;
 // the entry holds, and says it is Claude's. A draft whose `old` no longer matches is stale (the entry moved on): it is not
 // shown, and /spine drops it. Amir's Save is the approval: the same coach_save_spine() call writes the entry and takes every
 // draft he decided (kept, edited or discarded) off the list. Closing without saving leaves the drafts waiting.
-const SPINE_DRAFT_FIELDS = ['steps', 'cues', 'purpose'];
-const SPINE_DRAFT_BOX = { steps: ['sf:steps'], cues: ['sf:good', 'sf:bad'], purpose: ['sf:purpose'] };
+// On court too (2026-10-11): the backfill cleans an entry's purpose and On court line beside its steps, so Amir reads it once.
+const SPINE_DRAFT_FIELDS = ['steps', 'cues', 'purpose', 'tennis'];
+const SPINE_DRAFT_BOX = { steps: ['sf:steps'], cues: ['sf:good', 'sf:bad'], purpose: ['sf:purpose'], tennis: ['sf:tennis'] };
 let _spineDisc = { id: null, fields: {} };   // drafts discarded in the open editor: they leave the list on Save
 let _spinePF = { id: null, state: {} };      // what the pre-fill put in the open editor's boxes, to tell it from typing
 function spineDiscOf(id) { return id && _spineDisc.id === id ? _spineDisc.fields : {}; }
@@ -6286,6 +6287,7 @@ function spineHasDraft(e) { const p = spinePending(e, S.spine.coach[e.id]); retu
 function spineDraftForm(field, v) {
   if (field === 'steps') return { 'sf:steps': v.join('\n') };
   if (field === 'cues') return { 'sf:good': (v.good || []).join('\n'), 'sf:bad': (v.bad || []).join('\n') };
+  if (field === 'tennis') return { 'sf:tennis': v };
   return { 'sf:purpose': v };
 }
 // What the pre-fill puts in the open editor: the newest fresh draft of each field the coach has not discarded.
@@ -6882,7 +6884,7 @@ function renderExercises() {
           `<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">${sel(1, cur[0])}${sel(2, cur[1])}${sel(3, cur[2])}</div>`;
       })()}
       ${lbl('Why it’s here (the athlete reads this) · what it does, for anyone, never how')}${spineDraftNote(e, 'purpose')}<textarea data-sf="purpose" rows="2" dir="auto" style="${field}">${esc(e.purpose || '')}</textarea>
-      ${lbl('On court')}<input data-sf="tennis" dir="auto" value="${esc(e.tennis || '')}" style="${field}">
+      ${lbl('On court · the match moment it serves, never how')}${spineDraftNote(e, 'tennis')}<input data-sf="tennis" dir="auto" value="${esc(e.tennis || '')}" style="${field}">
       ${lbl('How to do it · one step per line, setup to a safe finish (the athlete reads these)')}${spineDraftNote(e, 'steps')}
       <textarea data-sf="steps" rows="6" dir="auto" oninput="spineStepsHint(this)" placeholder="One step per line, for anyone who has never seen it. No sets, reps, time, kilos or side." style="${field}">${esc((e.steps || []).join('\n'))}</textarea>
       <div class="sp-hint" data-steps-hint></div>

@@ -219,9 +219,9 @@ and what this athlete changes every rep is the pill, from the list (CHP-2). Neve
 on a programme card. A note or pill the edit writes follows those rules; an old note or pill the edit
 does not touch is left alone, even when the check flags it, unless Amir names it (PRC-2): report it.
 **Before writing a note or a pill, read that exercise's entry** (one query for every exercise the edit
-touches: `select id, name, steps, cues from public.exercises where id in (…)`, PRC-6), so the note never
+touches: `select id, name, steps, cues, purpose, tennis from public.exercises where id in (…)`, PRC-6), so the note never
 repeats a step or a cue, a limit that changes a step says what changes (*"Stop at the box, not the
-floor."*), and the pill is never something the entry already says (CUE-7). The check warns on both.
+floor."*), and the pill is never something the entry already says, and a Because never retells the purpose or the On court line (CUE-7). The check warns on all three. The entry's steps and cues themselves are never rewritten here.
 
 Edit the programme JSON using precise string matches, block by block — never rewrite the whole thing. Then write it yourself, path by path (Step 0b: one `jsonb_set` per path you changed, never a whole-object `update`), and list every path you wrote in the report, so it can be read against what Amir asked for (PRC-2).
 

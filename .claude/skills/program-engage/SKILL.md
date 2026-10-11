@@ -161,7 +161,7 @@ exercise card, not a notes card). How this stage applies it:
 - **Point first.** Only about 75 characters show before More ›, so the first sentence is the thing
   they act on. One to three short sentences.
 - **Read the entry's steps and cues first**, in one query for every flagged card
-  (`select id, name, steps, cues from public.exercises where id in (<the flagged cards' exIds>)`,
+  (`select id, name, steps, cues, purpose, tennis from public.exercises where id in (<the flagged and why cards' exIds>)`,
   PRC-6), so the note never repeats them and a limit that changes a step says what changes:
   *"Stop at the box, not the floor."* (CUE-7) The note is never general how-to: a step that is
   missing or wrong for anyone is a `spine_cue:` for the entry, not a sentence on one card. Part B's
@@ -191,7 +191,8 @@ opens the About sheet under **Why you**, and the cycle's Why page groups them by
   "you stalled" becomes "we build from 15 kg". Build, don't scare: *"so your knee can take more
   later"*, never *"to protect your damaged knee"*.
 - **Personal or nothing.** If the sentence would be true for anyone, drop the flag. That is the
-  Spine's purpose.
+  Spine's purpose, or its On court line: the ⓘ shows both right under Why you, so a Because that retells
+  either says it twice (CUE-7; the check warns).
 - **Split it out of the Coach's Note.** When a `note_flag` and a `why_flag` sit on the same
   exercise, the reason goes in `why` and the note keeps only what this athlete does (COM-14). Never
   say it twice.

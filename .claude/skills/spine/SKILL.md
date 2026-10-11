@@ -91,8 +91,8 @@ the existing ids for the links, and they show you which names are only variants.
   new pills"*).
 - **purpose:** one sentence in Amir's voice (COM-3). Say what
   it does for anyone, in plain words: short, no em-dashes, no textbook terms. It is general, and never
-  an instruction (how to do it is the steps, CUE-7). The *why for this athlete* belongs to the
-  programme, not to the entry.
+  an instruction (how to do it is the steps, CUE-7) and never the court moment (that is `tennis`). Start
+  with what it does: *Builds…*, *Teaches…*, *Trains…*. The *why for this athlete* belongs to the programme.
 - **steps** (How to do it): a list of strings written to CUE-6, which holds the count, the order and
   everything the pilot taught; don't restate it here. The count comes from the `pattern`: `mobility`
   and `conditioning` take 2 or 3, a lift that comes off a rack or is kicked into place up to 6 (the
@@ -100,7 +100,8 @@ the existing ids for the links, and they show you which names are only variants.
   checks the batch (its header says exactly what it refuses).
 - **cues:** `{"good": [key point, feel or check], "bad": [the avoid]}`, the roles in CUE-1. The entry's
   FIRST quality decides whether `good[1]` is a feel or a position check, so write `qualities` before it.
-- **tennis:** the court moment it serves, or `""` when there honestly isn't one. Do not stretch.
+- **tennis:** the court moment it serves, or `""` when there honestly isn't one. Do not stretch. Never the
+  purpose again and never how (CUE-7).
 - **loads + impact = "Body parts involved"** (Amir, 2026-09-24, from the course app's
   «بخش‌هایی از بدن که درگیر است»; stage36). The athlete sees them in the About sheet: the regions as
   soft pills, the impact word in clay. **Every entry gets both, and `draft_sql.py` refuses one without.**
@@ -339,7 +340,8 @@ no SFR. Answer them once and they stop mattering.
 | **No steps** (How to do it, CUE-6) | Write them, and clean the cues and purpose in the same pass (CUE-1, CUE-7) | **Don't write them. Propose them** on the pending list (field `steps`, and `cues` / `purpose` when those need the same cleaning, so Amir reviews the entry once): coach.html pre-fills the editor's boxes, and his Save is the approval. Never fill steps on an approved entry |
 | **No count** (`credits` + `cost`, coach-only) | Fill both | Fill both: without them the checker FAILs every programme that uses the entry, and the body map has nothing to light. Since stage42 the phone receives the credits' muscle names and 1/0.5 (never the cost). **Changing** a count already there is a proposal: it changes every athlete's volume tables AND their body map |
 | **No muscles for the body map** (`credits` is `{}` and `muscles` is empty) | Fill `muscles` | Fill `muscles`, on Amir's standing word (2026-09-26). Changing muscles already there is a proposal |
-| **A field that has content** (steps, cues, purpose, tennis) | Improve it | **Don't change it. Propose it**: write it to the pending list (below) and name it in the handoff, old → new |
+| **Steps and cues that exist** | Improve them | **Locked** (CUE-7: *"we dont have to rewrite the instruction again"*). Read them; propose a change only when one is wrong or unsafe, never for wording |
+| **Purpose or On court that exists** | Improve it | **Propose it** only when it breaks CUE-7 (reads as how-to, names the court, repeats another piece): the pending list, old → new |
 - **Video:** the card's `videoUrl` wins when the entry has none (YouTube only, as `draft_sql.py`).
 - **Name:** a card whose name is not its entry's is renamed to the entry's name (rule 4), never
   aliased. In a live programme, check the athlete's logged history first (rule 4).
@@ -396,9 +398,10 @@ on conflict (id) do update
 The same field with the same new value is never listed twice. A second, different proposal for the
 same field sits beside the first: Amir picks one.
 
-**Steps, cues and purpose drafts on an approved entry** (2026-10-11) use the same items, with `field`
-`steps` (a JSON array of strings), `cues` (the whole `{"good": [...], "bad": [...]}`) or `purpose` (a
-string). coach.html pre-fills the entry editor's box from an item **only when its `old` equals the live
+**Steps, cues, purpose and On court drafts on an approved entry** (2026-10-11) use the same items, with
+`field` `steps` (a JSON array of strings), `cues` (the whole `{"good": [...], "bad": [...]}`), `purpose` or
+`tennis` (a string). Lint them first: `python .claude/skills/spine/draft_sql.py --lint <proposals.json>`
+(the entry as it will read, one object each). coach.html pre-fills the entry editor's box from an item **only when its `old` equals the live
 value**, so take `old` from the entry in the same statement, never retyped (`to_jsonb(x.steps)` is `[]` for
 none). Write each entry's steps, and its cues and purpose when they need the same cleaning, in one run, so
 Amir reviews the entry once:
@@ -412,10 +415,10 @@ on conflict (id) do update
  where not exists (select 1 from jsonb_array_elements(public.exercise_coach.suggested_changes) s
                     where s->>'field' = 'steps' and s->'new' = excluded.suggested_changes->0->'new');
 ```
-(The same for `cues` with `'old', x.cues` and for `purpose` with `'old', to_jsonb(x.purpose)`.) The editor
+(The same for `cues` with `'old', x.cues`, `purpose` with `'old', to_jsonb(x.purpose)` and `tennis` with `'old', to_jsonb(x.tennis)`.) The editor
 marks them *Claude's draft · saved when you press Save*, with a way to discard each, and **his Save is the
 approval**: it writes the entry and removes the items it applied or discarded in the same guarded call. So a
-steps, cues or purpose item is never cleared by SQL; the yes/no below is for every other field.
+steps, cues, purpose or On court item is never cleared by SQL; the yes/no below is for every other field.
 
 **Read** (at the start of every `/spine` run and every Upkeep, one query, PRC-6):
 ```sql

@@ -1953,6 +1953,30 @@ S['spine-draft-prefill'] = async (b) => {
   return r;
 };
 
+S['spine-draft-court'] = async (b) => {
+  const r = { id: 'spine-draft-court', title: "An On court draft (2026-10-11): pre-filled and marked like the others, and Save approves it in the same call", checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises', seed: { courtDraft: true } });
+  dismissDialogs(page, log);
+  await spineOpen(page, 'goblet-squat', 'goblet squat');
+  check(r, 'the On court box is pre-filled with the draft', (await page.locator('input[data-sf=tennis]').inputValue()) === 'Fixture court draft: the low ready position.',
+    await page.locator('input[data-sf=tennis]').inputValue());
+  const ed = await page.locator('#spineEd').innerText();
+  check(r, "it is marked as Claude's, with its reason and what the entry holds now", /Claude’s draft · saved when you press Save: a court moment/.test(ed) && /On the entry now: \(empty\)/.test(ed), ed.slice(0, 700));
+  check(r, 'the box is outlined', (await page.locator('#spineEd input[data-sf=tennis].sp-drafted').count()) === 1, '');
+  const n0 = await L.nCalls(page);
+  await page.locator('.sp-save').first().click(); await L.settle(page, 700);
+  const up = spineRpcs(await L.callsSince(page, n0))[0];
+  check(r, 'Save sends the court line in the entry half and an empty list in the coach-only half, in one call',
+    up && up.payload.p_entry.tennis === 'Fixture court draft: the low ready position.' && Array.isArray(up.payload.p_coach.suggested_changes) && up.payload.p_coach.suggested_changes.length === 0,
+    up && { entry: up.payload.p_entry, coach: up.payload.p_coach });
+  const d = await L.db(page);
+  check(r, 'the server has it, and the list is empty', d.exercises.find(x => x.id === 'goblet-squat').tennis === 'Fixture court draft: the low ready position.'
+    && (coachRow(d, 'goblet-squat').suggested_changes || []).length === 0, coachRow(d, 'goblet-squat').suggested_changes);
+  check(r, 'no dialog, no page errors', !log.dialogs.length && !log.errors.length, { dialogs: log.dialogs, errors: log.errors });
+  await page.context().close();
+  return r;
+};
+
 S['spine-draft-save'] = async (b) => {
   const r = { id: 'spine-draft-save', title: "Save approves Claude's drafts: the entry gets them and the list loses them, in one call; the rest stay", checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'exercises' });
@@ -1964,13 +1988,13 @@ S['spine-draft-save'] = async (b) => {
   check(r, 'the entry half carries the drafted steps and cues, and nothing else', up && Object.keys(up.payload.p_entry).sort().join() === 'cues,steps'
     && JSON.stringify(up.payload.p_entry.steps) === JSON.stringify(DRAFT_STEPS) && JSON.stringify(up.payload.p_entry.cues) === JSON.stringify({ good: ['Fixture draft key', 'Fixture draft feel'], bad: ['Fixture draft fault. Fixture draft fix.'] }), up && up.payload.p_entry);
   const left = up && up.payload.p_coach.suggested_changes;
-  check(r, 'the coach-only half sends the list without the two it decided: the stale purpose and the tennis item stay', up && Object.keys(up.payload.p_coach).join() === 'suggested_changes'
-    && Array.isArray(left) && left.map(x => x.field).join() === 'purpose,tennis', up && up.payload.p_coach);
+  check(r, 'the coach-only half sends the list without the two it decided: the stale purpose and the link item stay', up && Object.keys(up.payload.p_coach).join() === 'suggested_changes'
+    && Array.isArray(left) && left.map(x => x.field).join() === 'purpose,easier', up && up.payload.p_coach);
   check(r, 'the snapshot is the list as the page read it (the guard against a draft that arrived since)', up && (up.payload.p_coach_snap.suggested_changes || []).length === 4, up && up.payload.p_coach_snap);
   const d = await L.db(page);
   const e = d.exercises.find(x => x.id === 'band-pull-apart');
   check(r, 'the server has the steps and the cues', JSON.stringify(e.steps) === JSON.stringify(DRAFT_STEPS) && e.cues.good[0] === 'Fixture draft key', { steps: e.steps, cues: e.cues });
-  check(r, '...and two items left on the list', coachRow(d, 'band-pull-apart').suggested_changes.map(x => x.field).join() === 'purpose,tennis', coachRow(d, 'band-pull-apart').suggested_changes);
+  check(r, '...and two items left on the list', coachRow(d, 'band-pull-apart').suggested_changes.map(x => x.field).join() === 'purpose,easier', coachRow(d, 'band-pull-apart').suggested_changes);
   check(r, 'the toast says the drafts are off the list', /2 drafts from Claude off the list/.test(await L.toastText(page)), await L.toastText(page));
   check(r, 'the editor no longer shows a draft, and the filter is gone', (await page.locator('#spineEd .sp-draft:not(.off)').count()) === 0 && (await page.locator('.sp-filter[data-f="claude"]').count()) === 0, '');
   check(r, 'no dialog, no page errors', !log.dialogs.length && !log.errors.length, { dialogs: log.dialogs, errors: log.errors });
@@ -1996,7 +2020,7 @@ S['spine-draft-discard'] = async (b) => {
   await page.locator('.sp-save').first().click(); await L.settle(page, 700);
   const up = spineRpcs(await L.callsSince(page, n0))[0];
   check(r, 'Save sends the kept cues draft and no steps', up && Object.keys(up.payload.p_entry).join() === 'cues', up && up.payload.p_entry);
-  check(r, '...and takes both decided drafts (kept and discarded) off the list', up && (up.payload.p_coach.suggested_changes || []).map(x => x.field).join() === 'purpose,tennis', up && up.payload.p_coach);
+  check(r, '...and takes both decided drafts (kept and discarded) off the list', up && (up.payload.p_coach.suggested_changes || []).map(x => x.field).join() === 'purpose,easier', up && up.payload.p_coach);
   const d = await L.db(page);
   check(r, 'the server: still no steps, the cues draft written, two items left', JSON.stringify(d.exercises.find(x => x.id === 'band-pull-apart').steps) === '[]'
     && d.exercises.find(x => x.id === 'band-pull-apart').cues.good[0] === 'Fixture draft key' && coachRow(d, 'band-pull-apart').suggested_changes.length === 2, '');
@@ -2021,7 +2045,7 @@ S['spine-draft-arrives'] = async (b) => {
   await page.locator('.sp-save').first().click(); await L.settle(page, 700);
   d = await L.db(page);
   check(r, 'Save again goes through: the steps are on the entry', JSON.stringify(d.exercises.find(x => x.id === 'band-pull-apart').steps) === JSON.stringify(DRAFT_STEPS) && !log.dialogs.length, log.dialogs);
-  check(r, "...and Claude's new item is still waiting, beside the two the editor never touches", coachRow(d, 'band-pull-apart').suggested_changes.map(x => x.field).join() === 'purpose,tennis,equipment', coachRow(d, 'band-pull-apart').suggested_changes.map(x => x.field));
+  check(r, "...and Claude's new item is still waiting, beside the two the editor never touches", coachRow(d, 'band-pull-apart').suggested_changes.map(x => x.field).join() === 'purpose,easier,equipment', coachRow(d, 'band-pull-apart').suggested_changes.map(x => x.field));
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

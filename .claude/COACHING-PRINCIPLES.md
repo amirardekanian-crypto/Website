@@ -203,7 +203,7 @@ stale copy reached athletes.
 | CUE-4 | Every programme write leaves the Spine more complete: `/spine` → Upkeep ends every run. | assemble · edit · workout | part (`exId`, Spine gate) |
 | CUE-5 | Claude drafts library entries and never approves one; new entries are one approval question to Amir, answered before the programme publishes. | assemble · spine | warn (drafts) |
 | CUE-6 | Every Spine entry has steps for anyone: 3–5 one-phase lines (2–3 stretches and conditioning, 6 rack lifts), setup to safe finish, never dose or side. | spine | warn (later ✓) |
-| CUE-7 | Say each thing once: steps the how, cues the focus and the avoid, pill the change, note this athlete. A card overrides its entry's default. | design · spine · engage · edit · assemble · workout | warn (a note repeating its pill, steps or cues; a pill they already say) |
+| CUE-7 | Say each thing once across seven pieces: purpose, on court, steps, cues (entry); pill, note, Because (card). Existing steps and cues are read, never rewritten. | design · spine · engage · edit · assemble · workout | warn (a note or Because repeating its entry; a pill the entry already says) |
 
 ### Chips & modifiers
 | ID | Rule | Stage | Check |
@@ -1073,24 +1073,35 @@ same ID. Read a rule's story and its history before changing it.
     entry Claude never fills the steps: they wait on the pending list, and Amir's Save in coach.html is the
     approval (CUE-5). The checker warns when an approved entry on a card has none; it becomes a fail once the
     entries with no video are done.
-- `CUE-7` **Say each thing once: four layers, four jobs.** Two layers live on the Spine entry and are the
-  same for every athlete; two live on the programme card and are about one athlete. If a sentence would
-  help anyone, it belongs on the entry; if it is about this athlete, it belongs on the card.
+- `CUE-7` **Say each thing once: seven pieces, seven jobs.** Four live on the Spine entry and are the same
+  for every athlete; three live on the programme card and are about one athlete. If a sentence would help
+  anyone, it belongs on the entry; if it is about this athlete, it belongs on the card.
+  - **What it does** (`purpose`, in the ⓘ): what it builds, one sentence for anyone. Never how to do it,
+    never the court moment.
+  - **On court** (`tennis`, in the ⓘ): the match moment it serves. Never the purpose again, never how.
+  - **Why you** (the Because, `why`, in the ⓘ, COM-4): why THIS athlete has it. Never the purpose or the On
+    court line in other words, never how.
+  **An entry's steps and cues, once written, are read and never rewritten** (Amir, 2026-10-11: *"we dont have
+  to rewrite the instruction again"*): a programme run writes only the card's pieces against them. A step or
+  cue that is wrong or unsafe is a proposal, never a quiet edit. **A new exercise is written in order**: steps,
+  cues, purpose, On court, each checked against those before it, then the card's pill, note and Because
+  against all four. The four layers on the entry and the card:
   - **Steps** (CUE-6): how to do it, from the setup to a safe finish.
   - **Cues** (CUE-1): the key point, a feel or a position check, and the one fault. They finish the steps.
   - **The pill** (`intent`, CHP-2): the one thing this athlete changes or adds, every rep, from the list.
   - **The Coach's Note** (`note`, COM-14): what only this athlete needs: their weight, limit, kit, checked
     fallback.
-  - Unchanged: `purpose` is the one sentence of what the exercise does for anyone, never an instruction,
-    and the Because (`why`) is why this athlete has it (COM-4).
   **The card overrides its entry, and says what it changes.** A grip pill overrides the grip the steps
   name; a limit that changes a step says so in the note (*"Stop at the box, not the floor."*). A pill that
   only repeats the steps adds nothing: the Broad Jump's steps hold the landing, so `stick the landing` on it
   says it twice. Before this rule the missing how-to was typed into notes (about a third of them), the cue
   slots carried setup and the pill carried the tempo. **Every stage that writes a pill or a note reads the
   entry's steps and cues first** (design and edit in one query; engage for the flagged cards), and the
-  checker warns when a note repeats its own pill, a step or a cue, and when a pill says what the steps or
-  cues already say. It compares wording, so a paraphrase is still the writer's and the reviewer's judgment.
+  checker warns when a note repeats its own pill, a step or a cue, when a pill says what the steps or cues
+  already say, and when a Because retells the On court line, the purpose, a step or a cue (2 of 81 live
+  Becauses retold the On court line on 2026-10-11). `draft_sql.py` warns when a purpose reads as an
+  instruction or names the court, and when an On court line repeats the purpose or reads as how-to (about
+  20 of 322 purposes read as instructions that day). It compares wording, so a paraphrase is still the writer's and the reviewer's judgment.
 
 ## Chips & modifiers
 - `CHP-1` **No floating text on a card.** Nothing goes on a programme card as a grey `setup` line. A grip,

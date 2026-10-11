@@ -199,7 +199,7 @@ drafts waiting and does not ask, because a draft is not your unsaved work; a dis
 first. A draft is shown only while its `old` still equals what the entry holds. One that no longer matches (you
 edited the field since) is stale: it is not shown, a quiet line says so, and Claude's next `/spine` run drops
 it. When two drafts wait for one field, the newest is shown and the line says so. Other proposals on the list (a
-court line, a link, a count) are never touched by Save: they stay for Claude's `/spine` yes/no. The Coverage line
+link, a count) are never touched by Save: they stay for Claude's `/spine` yes/no. The Coverage line
 says how many entries have **Claude's draft to read**, the list marks each one, and a **Claude's drafts** filter
 (beside Drafts and Approved) lists them; the tab opens on it when there are no new drafts to approve. If Claude
 adds a draft while you have the entry open, your Save is refused whole (the list changed under you), the box

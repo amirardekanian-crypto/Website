@@ -620,6 +620,17 @@ out = run(BASE, ctx=[dict(ctx_t[0], texts=TX + " Extra.")])
 expect("checksum: a mistyped steps-and-cues copy stops the run", "the saved 'texts' is not what the server sent" in out, out)
 expect('--spine-sql: the steps and cues text and its checksum are asked for', 'as texts' in sql and 'texts_md5' in sql and "e.cues->'bad'" in sql, sql[-900:])
 
+# CUE-7, the ⓘ (2026-10-11): a Because that retells the On court line, the purpose, a step or a cue warns.
+TX3 = TX + "|The deep squat you sink into for a low ball."
+ctx3 = [{"spine": SB, "prev": None, "ledger": None, "texts": TX3, "purposes": PURP}]
+out = run(with_why({"src": "goal", "text": "The deep squat you sink into for a low ball, every match."}), ctx=ctx3)
+expect("CUE-7: a Because that retells the On court line warns", has(out, 'WARN', "the Because retells the entry's On court line"), out)
+out = run(with_why({"src": "goal", "text": "Your knees cave when you get tired, so this rebuilds the squat first."}), ctx=ctx3)
+expect("CUE-7: a personal Because passes", not has(out, 'WARN', "the Because re"), out)
+out = run(with_why({"src": "goal", "text": "Push the floor away with your whole foot, that is what you need."}), ctx=ctx3)
+expect("CUE-7: a Because that repeats a cue warns", has(out, 'WARN', "the Because repeats the entry's cue"), out)
+expect('--spine-sql: the On court line is in the texts', "e.tennis, '\\s+'" in sql, sql[-900:])
+
 # ── 6. the rule index guard (scripts/check_rule_index.py) ────────────────────
 spec_ri = importlib.util.spec_from_file_location('cri', os.path.join(REPO, 'scripts', 'check_rule_index.py'))
 P = os.path.join(REPO, '.claude', 'COACHING-PRINCIPLES.md')

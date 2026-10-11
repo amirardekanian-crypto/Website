@@ -55,6 +55,7 @@ function session(id, name, day, completed_on, extra) {
 function buildSeed(opt) {
   opt = opt || {};
   const today = opt.today;                     // the page's local YYYY-MM-DD
+  // opt.courtDraft: an On court draft waiting on goblet-squat (approved, no court line), for spine-draft-court.
   const db = {
     programs: [
       { athlete_id: 'ava_test', data: programme('Ava'), updated_at: iso(today, 3), updated_by: 'pipeline@example.invalid' },
@@ -130,17 +131,19 @@ function buildSeed(opt) {
         equipment: ['band'], loads: ['shoulder'], easier: [], harder: [], alts: [], video: null, status: 'approved', updated_at: iso(today, 5), updated_by: 'coach', impact: 'none', muscles: null, steps: [] },
     ],
     exercise_coach: [
-      { id: 'goblet-squat', sfr: 2, flags: [], notes: null, suggested_qualities: null, links_before: null, links_history: null, credits: { quads: 1, glutes: 0.5 }, cost: 'moderate', suggested_changes: null },
+      { id: 'goblet-squat', sfr: 2, flags: [], notes: null, suggested_qualities: null, links_before: null, links_history: null, credits: { quads: 1, glutes: 0.5 }, cost: 'moderate',
+        suggested_changes: opt.courtDraft ? [{ field: 'tennis', old: null, new: 'Fixture court draft: the low ready position.', why: 'a court moment (CUE-7)', from: 'spine fixture', at: iso(today, 1, '08') }] : null },
       { id: 'machine-leg-press', sfr: 1, flags: ['loaded-knee-flexion'], notes: 'fixture coach note', suggested_qualities: ['strength', 'muscle'], links_before: { keep: 'me' }, links_history: [{ fixture: true }], credits: null, cost: null, suggested_changes: { fixture: 'keep me' } },
       // Claude's drafts (stage43 items): steps and cues are fresh (their `old` is the entry as it is), the purpose draft is
-      // stale (written against an older purpose), and the tennis item is a different kind of proposal the editor never touches.
+      // stale (written against an older purpose), and the easier item (a link) is a different kind of proposal the editor
+      // never touches. (It was a court line until On court became a draft field, 2026-10-11.)
       { id: 'band-pull-apart', sfr: 3, flags: [], notes: null, suggested_qualities: [], links_before: null, links_history: [], credits: { back: 1, shoulder: 0.5 }, cost: 'isolation',
         suggested_changes: [
           { field: 'steps', old: [], new: ['Fixture draft step one.', 'Fixture draft step two.', 'Fixture draft step three.', 'Fixture draft step four.'], why: 'How to do it (CUE-6)', from: 'spine fixture', at: iso(today, 1, '08') },
           { field: 'cues', old: { good: ['Fixture live key', 'Fixture live feel'], bad: ['Fixture live avoid'] },
             new: { good: ['Fixture draft key', 'Fixture draft feel'], bad: ['Fixture draft fault. Fixture draft fix.'] }, why: 'CUE-1 roles', from: 'spine fixture', at: iso(today, 1, '09') },
           { field: 'purpose', old: 'An older fixture purpose.', new: 'Fixture stale purpose draft.', why: 'plain words', from: 'spine fixture', at: iso(today, 3, '08') },
-          { field: 'tennis', old: null, new: 'Fixture court line.', why: 'a court moment', from: 'spine fixture', at: iso(today, 1, '10') },
+          { field: 'easier', old: [], new: ['dead-bug'], why: 'a regression', from: 'spine fixture', at: iso(today, 1, '10') },
         ] },
     ],
     qualities: ['strength', 'muscle', 'power', 'spring', 'speed', 'brakes', 'rotation', 'engine', 'armour', 'movement'].map((id, i) =>

@@ -27,6 +27,13 @@
 # the map shows the credits whenever they name a muscle. Display only: no checker reads it.
 # existing_ids.txt: one id per line, from `select id from public.exercises order by 1`.
 #
+# LINT ONLY (2026-10-11), for drafts on APPROVED entries (exercise_coach.suggested_changes), which this file does not write:
+#   python .claude/skills/spine/draft_sql.py --lint <proposals.json>
+# proposals.json: a list of {id, name, pattern, qualities?, steps?, cues?, purpose?, tennis?}, the entry as it will read
+# with the drafts applied (the live value for a field you are not changing). It runs the text checks below and nothing
+# else, prints them, and exits 1 on a refusal. CUE-7's seven pieces: the purpose says what it does (never how, never
+# the court), the On court line the match moment (never the purpose again, never how), the steps how, the cues the
+# focus and the one fault; each WARNED when it reads as another's or repeats one.
 # The batch file carries the coach-only half (sfr, flags), which is why it stays in the scratchpad
 # and only the SQL reaches the database. Every row lands as status 'draft'; nothing here approves.
 # Cues are not written here: the UPDATE at the end copies Amir's own wording from the most
@@ -41,8 +48,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]          # <repo>/.claude/skills/spine/draft_sql.py
 for stream in (sys.stdout, sys.stderr):
     stream.reconfigure(encoding='utf-8')
-batch = json.load(open(sys.argv[1], encoding='utf-8'))
-existing = {l.strip() for l in open(sys.argv[2], encoding='utf-8') if l.strip()}
+LINT = len(sys.argv) > 1 and sys.argv[1] == '--lint'
+batch = json.load(open(sys.argv[2 if LINT else 1], encoding='utf-8'))
+existing = set() if LINT else {l.strip() for l in open(sys.argv[2], encoding='utf-8') if l.strip()}
 # Videos live on the Spine entries now (coach.html -> Exercises). exercise_library.json, the
 # Notion-synced list, was retired on 2026-09-26; the few videos it held under names no entry
 # carries are kept in legacy_videos.json, so a new draft of one of those still gets its video.
@@ -105,13 +113,26 @@ def lint_text(i, where, text, own, problems, warnings):
     for m in dict.fromkeys(x.group(0) for x in ATHLETE_WORDS.finditer(text)):
         warnings.append(f'{i}: {where}: "{m}" reads as one athlete\'s side, kit or effort. The entry is for anyone')
 
-ids = {e['id'] for e in batch}
-known = ids | existing
-problems, warnings = [], []
-for e in batch:
+# CUE-7: one piece never says another's job. The same wording test as scripts/check_program.py repeats(): the whole
+# line (three words or more) inside the other, or a run of five words shared.
+def _words(t): return re.sub(r'[^a-z0-9 ]', ' ', str(t or '').lower()).split()
+def repeats(text, line, run=5):
+    wt, wl = _words(text), _words(line)
+    if not wt or not wl: return False
+    if len(wl) >= 3 and (' ' + ' '.join(wl) + ' ') in (' ' + ' '.join(wt) + ' '): return True
+    grams = {tuple(wl[k:k + run]) for k in range(len(wl) - run + 1)}
+    return any(tuple(wt[k:k + run]) in grams for k in range(len(wt) - run + 1))
+# A purpose or an On court line that opens with an order reads as how-to (2026-10-11: "Lift the ball overhead and throw
+# it into the floor as hard as you can" was a purpose). "Builds…", "Teaches…", "Trains…" say what it does.
+IMPERATIVE = re.compile(r"^\W*(?:keep|push|pull|drive|hold|lift|lower|stand|sit|lie|squeeze|brace|step|press|row|stay|don't|do|"
+                        r"never|put|set|grip|swing|jump|land|throw|raise|reach|bend|place|start|walk|run|kneel|rest|slide|rotate|"
+                        r"turn|tap|bring|hinge|sink|snap|hop|bounce|roll|open|use|make|loop|face|point|curl|kick|go|get|let|try|aim)\b", re.I)
+COURT = re.compile(r'\b(?:court|match|matches|rally|rallies|serve|serves|serving|forehand|backhand|volley|smash|split step|'
+                   r'padel|tennis|racket|baseline)\b', re.I)
+
+def text_checks(e, problems, warnings):
+    """Steps, cues, purpose and On court for one entry: the refusals, the warnings, and CUE-7 between them."""
     i = e['id']
-    if not re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*', i): problems.append(f'{i}: id is not a slug')
-    if i in existing: problems.append(f'{i}: already in the Spine')
     own = ' '.join([e.get('name') or ''] + list(e.get('aliases') or []) + [str(e.get('pattern') or '').replace('-', ' ')])
     c = e.get('cues')
     if c and (len(c.get('good', [])) != 2 or len(c.get('bad', [])) != 1): problems.append(f'{i}: cues must be 2 good + 1 bad')
@@ -141,6 +162,39 @@ for e in batch:
             cl = norm(str(line))
             if any((len(cl.split()) >= 3 and cl in norm(x)) or (len(norm(x).split()) >= 3 and norm(x) in cl) for x in st):
                 warnings.append(f'{i}: the cue "{line}" repeats a step. A cue says what the steps do not')
+    # What it does and On court (the ⓘ): each its own job, never how to do it, never each other (CUE-7).
+    lines = [('a step', x) for x in (st if isinstance(st, list) else [])] + [('a cue', x) for x in (c or {}).get('good', []) + (c or {}).get('bad', [])]
+    p, t = str(e.get('purpose') or '').strip(), str(e.get('tennis') or '').strip()
+    for label, txt in (('purpose', p), ('On court', t)):
+        if not txt: continue
+        if VOICE.search(txt): problems.append(f'{i}: {label}: an em-dash, a semicolon or a curly apostrophe ({VOICE.search(txt).group(0)!r}): not how Amir writes')
+        if IMPERATIVE.search(txt): warnings.append(f'{i}: {label} reads as an instruction ("{txt[:60]}"). How to do it is the steps; '
+                                                  + ('say what it does for anyone: Builds…, Teaches…, Trains…' if label == 'purpose' else 'say the match moment it serves'))
+        hit = next((w for w, x in lines if repeats(txt, x) or repeats(x, txt)), None)
+        if hit: warnings.append(f'{i}: {label} repeats {hit}. Each piece says its own thing (CUE-7)')
+    if p and t and (repeats(p, t) or repeats(t, p)):
+        warnings.append(f'{i}: purpose and On court say the same thing. What it does is for anyone; On court is the match moment (CUE-7)')
+    if p and t and COURT.search(p):
+        warnings.append(f'{i}: purpose names the court ("{COURT.search(p).group(0)}"). That is the On court line\'s job (CUE-7)')
+
+if LINT:
+    problems, warnings = [], []
+    for e in batch:
+        if not e.get('id'): problems.append('an entry with no id'); continue
+        if e.get('cues') or e.get('steps') or e.get('purpose') or e.get('tennis'): text_checks(e, problems, warnings)
+    for w in warnings: print('WARN ' + w)
+    for p_ in problems: print('REFUSED ' + p_)
+    print(f'lint: {len(batch)} entries, {len(problems)} refused, {len(warnings)} warnings')
+    sys.exit(1 if problems else 0)
+
+ids = {e['id'] for e in batch}
+known = ids | existing
+problems, warnings = [], []
+for e in batch:
+    i = e['id']
+    if not re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*', i): problems.append(f'{i}: id is not a slug')
+    if i in existing: problems.append(f'{i}: already in the Spine')
+    text_checks(e, problems, warnings)
     # Only the library's own patterns: never a new pill (Amir, 2026-09-25: "remember to never create new pills").
     if e.get('pattern') not in PATTERNS: problems.append(f'{i}: unknown pattern {e.get("pattern")!r}: use one from the list, never a new one')
     for f in e.get('flags', []):

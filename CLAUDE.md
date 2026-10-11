@@ -181,11 +181,11 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   a rename in a live programme must move the athlete's logged history with it (`/spine` → *One name in live
   programmes*); rungs are gone for good; Library has three doors (Sessions,
   Playbook, Exercises) and **no Qualities door**.
-- **Four layers, four jobs** (the Exercise Card Blueprint, Amir 2026-10-11: *"all recommended, go ahead"*; CUE-6, CUE-7,
+- **Seven pieces, seven jobs** (CUE-7; the Exercise Card Blueprint, Amir 2026-10-11: *"all recommended, go ahead"*; CUE-6, CUE-7,
   `Content/exercise-card/`): the entry's **steps** (`exercises.steps`, stage64: How to do it, for anyone, enough with no
   video) and its **three cues** (key point, feel or check, the one fault written fault-then-fix), the card's **pill**
   (`intent`, a closed list: SCHEMA.md → *`intent`: the pill list*, three copies kept equal by `check_parity.py`) and the
-  card's **Coach's Note** (this athlete only, COM-14). **The Spine's cues win on every card**: a legacy card's own cues
+  card's **Coach's Note** (this athlete only, COM-14); in the ⓘ, the entry's purpose and On court line and the card's Because, each its own job. **An entry's steps and cues, once written, are never rewritten**. **The Spine's cues win on every card**: a legacy card's own cues
   show only when no approved entry with cues resolves. Claude never writes steps, cues or purpose on an APPROVED entry:
   they wait in `exercise_coach.suggested_changes`, coach.html pre-fills the editor and **Amir's Save is the approval**.
 - **A delete is a tombstone** (Personal Records `{del: true}`, body weight `kg: null` with a fresh `t`), and every
