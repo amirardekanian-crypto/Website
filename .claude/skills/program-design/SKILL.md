@@ -459,7 +459,7 @@ lives only as "engage should write a card about X" can no longer slip. List ever
 - `start-lower: <what, the number>` — a start-lower longer than week 1 (a staged return).
 - `close-loop: <what resolved>` — a standing issue confirmed resolved.
 - `win: <what, with its number>` — a real win in the data (never manufactured).
-The same list drives WhatsApp message 2 and your handoff (MEASURE, GATE, FILM, DATES, WATCH).
+The same list drives the WhatsApp message's action lines (COM-17) and your handoff (MEASURE, GATE, FILM, DATES, WATCH).
 
 **THE SPINE — read it before choosing (2026-09-24).** Every exercise Amir programmes has (or
 will have) one entry in `public.exercises`, with its coach-only half in `public.exercise_coach`.

@@ -398,7 +398,8 @@ What each key asks of him:
 
 Then the self-check, one line, printed under the block:
 `OBLIGATIONS CHECK — spec lists N · handoff lines N · same order ✓ · every key but backoff/week1 is a
-tagged card ✓ · WhatsApp message 2 lines N ✓`. Any mismatch is fixed before Step 7, never explained.
+tagged card ✓ · the WhatsApp message has a line for every key it needs (all for a new athlete; the new or
+changed ones for a returning athlete) ✓`. Any mismatch is fixed before Step 7, never explained.
 
 **Then the rest, for what the obligations list does not already cover**, one line each with its
 reason (an obligation is never repeated here):
