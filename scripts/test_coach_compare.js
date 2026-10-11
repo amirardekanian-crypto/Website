@@ -22,7 +22,7 @@ vm.runInContext(fs.readFileSync('assets/js/chips.js', 'utf8'), chipsCtx);
 // jparse is coach.html's own JSON-or-object reader (compareDay reads session.log with it).
 const jparse = v => { if (v == null) return null; if (typeof v === 'object') return v; try { return JSON.parse(v); } catch { return null; } };
 const sandbox = { round1: n => Math.round(n * 10) / 10, window: chipsCtx.window, jparse };
-new Function('ctx', 'with (ctx) {' + code + '\nObject.assign(ctx, {parseSetLine, parseSessionLog, parseChips, compareExercise, compareDay, dayVerdict, loadSummary, rpeTarget, normEx, logIndex, rxLine, dayTargetC, dayDropC, planLabelC});}')(sandbox);
+new Function('ctx', 'with (ctx) {' + code + '\nObject.assign(ctx, {parseSetLine, parseSessionLog, parseChips, compareExercise, compareDay, dayVerdict, loadSummary, rpeTarget, normEx, logIndex, rxLine, dayTargetC, dayDropC, planLabelC, weekNoteOnC, cycleWeekOnC});}')(sandbox);
 const { parseSessionLog, parseChips, compareDay, compareExercise, dayVerdict, loadSummary } = sandbox;
 // The email import (the "Add past session from email" box on an athlete's work tab).
 const emailCode = grab('function parseSessionEmail(text) {', '// Does the email\'s "Athlete" line name this athlete?');
@@ -388,6 +388,30 @@ console.log('12. email import: the check-in line');
   // A skipped check-in has nothing to judge.
   const sk = parseSessionEmail(['Day 1 — Legs', 'Status: Complete', 'Readiness (at start): skipped', 'Today: ' + LOWER].join('\n')).readiness;
   is(sk, { skipped: true }, 'a skipped check-in stays skipped');
+}
+
+// ── 13. A lower day inside a week with a note (WORK-11, 2026-10-11): the lower of the two targets wins ────
+{
+  const { weekNoteOnC, cycleWeekOnC } = sandbox;
+  const c = (...l) => l.map(label => ({ label }));
+  const mk = rpes => ({ name: 'X', label: '✓', done: true, items: [], note: '', rounds: '', gear: '',
+                        sets: rpes.map(r => ({ w: '', rpe: String(r), done: true, skipped: false })) });
+  const pex = { name: 'X', chips: c('3 Sets', '×5 Reps', 'RPE 9') };
+  is(compareExercise(pex, mk([9, 9, 9]), 1, null, null).flags.length, 0, 'lower day, no note: target 8, a 9 is one over, not flagged');
+  is(compareExercise(pex, mk([9, 9, 9]), 1, null, { text: 'w', rpeCap: 7 }).flags.map(f => f.text), ['2 over target RPE'], 'lower day in a capped week: target 7, a 9 is two over');
+  is(compareExercise(pex, mk([9, 9, 9]), 0, null, { text: 'w', rpeCap: 7 }).flags.length, 0, 'a normal day ignores the note (the app only reads it on a lower day)');
+  is(compareExercise(pex, mk([9, 9, 9]), 1, null, { text: 'w', rpeDrop: 3 }).flags.map(f => f.text), ['3 over target RPE'], 'rpeDrop 3 from 9 gives 6 and the drop gives 8: the lower wins, 6 is also the floor');
+  const cycle = { startDate: '2026-09-01', endDate: '2026-10-06', weekNotes: { '1': { text: 'week one', rpeCap: 7 }, last: { text: 'back-off', rpeCap: 6 } } };
+  const plan = { id: 1, blocks: [{ title: 'Primary', exercises: [{ name: 'Back Squat', chips: c('3 Sets', '×5 Reps', 'RPE 9') }] }] };
+  const sessOn = day => ({ completed_on: day, readiness: { level: 'amber', drop: 1 }, summary: 'Exercise log:\n[Primary]\n• Back Squat (✓)\n    Set 1: 100 ×5 @9 ✓\n    Set 2: 100 ×5 @9 ✓\n    Set 3: 100 ×5 @9 ✓\n' });
+  const row = (day, cyc) => compareDay(plan, sessOn(day), cyc).groups.flatMap(g => g.rows)[0];
+  is([row('2026-09-03', cycle).tgt.label, row('2026-09-03', cycle).flags.map(f => f.text)], ['7', ['2 over target RPE']], 'a session in week 1 is judged against the week-1 cap');
+  is([row('2026-09-12', cycle).tgt.label, row('2026-09-12', cycle).flags.length], ['8', 0], 'a session in week 2 has no note: the drop alone');
+  is([row('2026-10-02', cycle).tgt.label, row('2026-10-02', cycle).flags.map(f => f.text)], ['6', ['3 over target RPE']], 'a session in the back-off week is judged against its cap');
+  is(row('2026-08-30', cycle).tgt.label, '8', 'a session before the cycle began has no note');
+  is(row('2026-09-03').tgt.label, '8', 'no cycle given: the check-in alone');
+  is(weekNoteOnC(cycle, '2026-09-03').wk, 1, 'the note carries its week');
+  is(cycleWeekOnC({ startDate: '2026-09-01', endDate: '2026-10-06' }, '2026-10-06'), { wk: 5, total: 5, before: false, after: false }, 'the last day is still the last week');
 }
 
 console.log('\n' + (fail ? 'FAILED ' + fail + ' / ' + (pass + fail) : 'all ' + pass + ' assertions passed'));

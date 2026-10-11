@@ -1957,6 +1957,65 @@ S['hist-heavy-fails'] = async (b) => {
   return r;
 };
 
+// ── Twin rules the dashboard now shares with the athlete app (audit TWIN-6, TWIN-7, 2026-10-11, pile B6) ─────────────────────
+// The rules themselves are pinned by scripts/check_twins.js (3,500 checks). These scenarios check the SCREENS that use them.
+S['live-snapshot-window'] = async (b) => {
+  const r = { id: 'live-snapshot-window', title: 'Live app snapshot: a started day is "in progress" by the app\'s rule (another calendar day AND over six hours), not a 30-hour window', checks: [] };
+  const states = async (fixedTime, stamps) => {
+    const { page, log } = await L.openCoach(b, { tz: 'UTC', fixedTime });
+    await page.evaluate(stamps => {
+      const blob = window.__DB.athlete_progress.find(p => p.athlete_id === 'ava_test').data;
+      Object.keys(stamps).forEach(day => { blob['ava_test_readiness_' + day] = JSON.stringify({ timestamp: stamps[day], composite: 3.5, skipped: false }); });
+      S.prog.find(p => p.athlete_id === 'ava_test').data = blob;
+    }, stamps);
+    await L.go(page, 'a/ava_test/work');
+    await page.evaluate(() => { const d = document.getElementById('livesnap'); if (d) d.open = true; });
+    const txt = (await page.locator('#livesnap').innerText()).replace(/\s+/g, ' ');
+    const out = {};
+    ['1', '2', '3'].forEach(d => { const m = new RegExp('Day ' + d + '\\b[^]*?(in progress|a leftover, not live)').exec(txt); out[d] = m ? m[1] : null; });
+    await page.context().close();
+    return { out, errors: log.errors, txt };
+  };
+  // 14:00 UTC. Day 1: this morning (5 h). Day 2: last night 22:00 (16 h, another day: the old 30-hour window said live). Day 3: 23 h ago.
+  const a = await states('2026-10-11T14:00:00Z', { 1: '2026-10-11T09:00:00Z', 2: '2026-10-10T22:00:00Z', 3: '2026-10-10T15:00:00Z' });
+  check(r, 'at 14:00, a day started at 09:00 today is in progress', a.out['1'] === 'in progress', a.out);
+  check(r, 'at 14:00, a day started yesterday at 22:00 (16 h) is a leftover (it used to read in progress for 30 hours)', a.out['2'] === 'a leftover, not live', a.out);
+  check(r, 'at 14:00, a day started yesterday at 15:00 (23 h) is a leftover', a.out['3'] === 'a leftover, not live', a.out);
+  // 02:00 UTC the next day. A session begun at 23:30 is 2.5 h old: midnight is not the end of a session (DATA-02).
+  const c = await states('2026-10-11T02:00:00Z', { 1: '2026-10-10T23:30:00Z', 2: '2026-10-10T19:30:00Z', 3: '2026-10-11T01:00:00Z' });
+  check(r, 'at 02:00, a day started at 23:30 (2.5 h, across midnight) is still in progress', c.out['1'] === 'in progress', c.out);
+  check(r, 'at 02:00, a day started at 19:30 the evening before (6.5 h, another day) is a leftover', c.out['2'] === 'a leftover, not live', c.out);
+  check(r, 'at 02:00, a day started at 01:00 today is in progress', c.out['3'] === 'in progress', c.out);
+  check(r, 'no page errors', !a.errors.length && !c.errors.length, a.errors.concat(c.errors));
+  return r;
+};
+
+S['retest-flag'] = async (b) => {
+  const r = { id: 'retest-flag', title: 'Personal records: only a `test` value the athlete\'s app reads is a retest flag', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  await page.evaluate(() => {
+    const row = window.__DB.programs.find(p => p.athlete_id === 'ava_test');
+    const d = JSON.parse(JSON.stringify(row.data));
+    const ex = d.workouts.days[0].blocks[1].exercises;               // Goblet Squat, Chest-Supported Dumbbell Row
+    ex[0].test = '3RM';
+    ex[1].test = 'heavy';                                             // the app ignores it
+    d.workouts.days[1].blocks[0].exercises[0].test = true;            // Dumbbell Bench Press: the 5RM default
+    d.workouts.days[2].blocks[0].exercises[0].test = '11RM';          // Trap Bar Deadlift: over the 10-rep ceiling, ignored
+    row.data = d; row.updated_at = new Date(Date.now() + 1000).toISOString();
+  });
+  await page.evaluate(() => reloadPrograms().then(render)); await L.settle(page, 700);
+  await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work');
+  const rows = (await page.locator('.prlist .pr-row').allInnerTexts()).map(x => x.replace(/\s+/g, ' ').trim());
+  const has = name => rows.some(x => x.toLowerCase().startsWith(name.toLowerCase()));
+  check(r, 'a "3RM" lift is listed with its tag', rows.some(x => /^goblet squat\s*3rm/i.test(x)), rows);
+  check(r, '`test: true` is the 5RM default', rows.some(x => /^dumbbell bench press\s*5rm/i.test(x)), rows);
+  check(r, 'a value the app ignores ("heavy") is not a flag here either', !has('Chest-Supported Dumbbell Row'), rows);
+  check(r, '"11RM", over the 10-rep ceiling, is not a flag', !has('Trap Bar Deadlift'), rows);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── One way to say what did not work (audit BROWSER-10, FLOW-22, MKT-13, 2026-10-11, pile B5) ─────────────────────────────────────
 // A failure used to be a 2.6-second toast in some tabs (easy to miss) and a pop-up in others (it stopped everything, and was gone once
 // dismissed). Now: it worked = a toast; it did not = a line at the bottom that stays until it is dismissed; a question = a confirm;

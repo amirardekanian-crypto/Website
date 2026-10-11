@@ -16,7 +16,11 @@
      exNameVariants, EX_ABBREV   / exNameVariantsC, EX_ABBREV_C   the four name tiers every exercise lookup uses
      ceilAliasMap (matchRenamed) / ceilAliasMapC                  a renamed lift is one lift
      setSpine + spineFor         / spineIndexC + spineForC        a card finds its Spine entry
-     dayRpe                      / rpeTarget + dayTargetC         today's RPE target on a lower day (REC-2)
+     dayRpe                      / rpeTarget + dayTargetC         today's RPE target on a lower day (REC-2), with the week note
+     cycleWeekInfo, weekNoteNow  / cycleWeekOnC, weekNoteOnC      the week a day falls in and the cycle's note for it (the app asks about today,
+                                                                  the dashboard about the day a session was trained)
+     sessionIsStale              / sessionIsStaleC                is a started session over (the live app snapshot's "in progress", TWIN-6)
+     exTestSpec                  / exTestSpecC                    which values of a lift's `test` are a retest flag (TWIN-7)
      qmSets, isPrepBlockTitle    / qmSetsC, QM_PREP               what the Quality check counts
      the report writer in buildSessionData() + readinessPlanLine, readinessPlan
                                  / parseCheckinPlan, parseSessionEmail
@@ -28,16 +32,16 @@
    (check_setlog.js), the shared word lists (check_parity.py), the XP rules (check_xp_rules.py).
 
    Known, deliberate differences (printed as notes, never failures):
-     WORK-11  dayTargetC() has no week-note input: a session does not record which week it was.
      TWIN-1   the dashboard resolves a card against ALL Spine entries, the phone against approved ones.
-     TWIN-6   the dashboard's "leftover session" window (30 h) is not sessionIsStale().
-     TWIN-7   the retest flag is read more loosely by the dashboard than by exTestSpec().
 
    Wired into .githooks/pre-commit (guard 15), which sets CHECK_TWINS_INDEX=1 so it reads the STAGED files, the
    ones that will be committed, not whatever else is in the working tree. Run by hand:   node scripts/check_twins.js
    After editing assets/js/chips.js: bump ?v= in coach.html, then:   node scripts/check_twins.js --stamp
    ═══════════════════════════════════════════════════════════════════════════ */
 'use strict';
+// The week arithmetic below is compared in UTC. The app reads a cycle's date as a UTC midnight and the clock in local time (a known
+// difference west of Greenwich and on a clock-change day, item C2 of the audit's section 12); the dashboard counts calendar days.
+process.env.TZ = 'UTC';
 const fs = require('fs'), path = require('path'), vm = require('vm'), crypto = require('crypto'), cp = require('child_process');
 
 // CHECK_TWINS_ROOT points the guard at another copy of the files (scripts/test_check_twins.js breaks one on purpose).
@@ -196,14 +200,82 @@ run('Spine lookup (spineFor)', () => {
   expect('spineFor before the Spine loads', 'SPINE = null', vm.runInContext('SPINE = null; spineFor("Goblet Squat", "")', A_SPINE.ctx), null);
 });
 
-/* ── 4. today's RPE target on a lower day (REC-2) ─────────────────────────── */
+/* ── 4. today's RPE target on a lower day (REC-2), with the week note ─────── */
 const A_RPE = sandbox(null, [lineSrc(A_SRC, 'const READY_BASE_N', 'program.html')].concat(fromA('dayRpe')), ['dayRpe']);
 const D_RPE = sandbox(null, fromD('rpeTarget', 'dayTargetC'), ['rpeTarget', 'dayTargetC']);
 const WRITTEN = ['8', 8, '7-8', '7–8', '7 - 8', '6', 6, '6-7', '5', '5-6', '9', '10', '8.5', '7.5-8', '@8', '9-10', '', null, undefined, 'easy', '7-9', '6.5', '10-10'];
-run('lower-day RPE target (dayRpe)', () => WRITTEN.forEach(w => [0, 1, 2].forEach(drop => {
-  const t = D_RPE.rpeTarget(w), r = D_RPE.dayTargetC(t, drop);
-  same('dayRpe vs dayTargetC', { written: w, drop }, A_RPE.dayRpe(w, drop, null), r && r.written !== undefined ? r.label : '');
-})));
+// A week note can lower the target further on a lower day (the lower of the two wins, never under 6); a note alone changes nothing.
+const NOTES = [null, { text: 'n' }, { text: 'n', rpeCap: 7 }, { text: 'n', rpeCap: 6 }, { text: 'n', rpeCap: 5 }, { text: 'n', rpeCap: 9 }, { text: 'n', rpeDrop: 1 },
+  { text: 'n', rpeDrop: 2 }, { text: 'n', rpeDrop: 0 }, { text: 'n', rpeCap: 7, rpeDrop: 1 }, { text: 'n', setsDrop: 1 }, { text: 'n', rpeCap: '7' }, { text: 'n', rpeCap: 'x' }];
+run('lower-day RPE target (dayRpe), with and without a week note', () => WRITTEN.forEach(w => [0, 1, 2].forEach(drop => NOTES.forEach(note => {
+  const t = D_RPE.rpeTarget(w), r = D_RPE.dayTargetC(t, drop, note);
+  same('dayRpe vs dayTargetC', { written: w, drop, note }, A_RPE.dayRpe(w, drop, note), r && r.written !== undefined ? r.label : '');
+}))));
+
+/* ── 4b. the week a day falls in, and the note for it (WORK-11) ────────────── */
+// The app reads the clock (cycleWeekInfo / weekNoteNow ask about TODAY); the dashboard is told the day (cycleWeekOnC / weekNoteOnC: the day a
+// session was trained). So the app's two functions run in a sandbox whose clock is set to each day in turn.
+const D_WEEK = sandbox(null, fromD('dayNumC', 'cycleWeekOnC', 'weekNoteOnC'), ['cycleWeekOnC', 'weekNoteOnC']);
+function appWeekAt(dayIso) {
+  const noon = new Date(dayIso + 'T12:00:00Z').getTime();
+  const Fixed = class extends Date { constructor(...a) { if (a.length) super(...a); else super(noon); } static now() { return noon; } };
+  const ctx = vm.createContext({ console, Date: Fixed });
+  vm.runInContext(fromA('cycleWeekInfo', 'weekNoteNow').join('\n'), ctx);
+  return { info: vm.runInContext('cycleWeekInfo', ctx), note: vm.runInContext('weekNoteNow', ctx) };
+}
+const WEEK_CYCLES = [
+  { startDate: '2026-09-01', endDate: '2026-10-06', weekNotes: { '1': { text: 'w1', rpeCap: 7 }, '3': { text: 'w3', rpeDrop: 1 }, '5': { text: 'w5', rpeCap: 6 } } },
+  { startDate: '2026-09-01', endDate: '2026-09-29', weekNotes: { first: { text: 'first', rpeDrop: 1 }, last: { text: 'last', rpeCap: 6 } } },
+  { startDate: '2026-09-01', endDate: '2026-09-29', weekNotes: { first: { text: 'first' }, '1': { text: 'a numeric key wins', rpeCap: 8 }, last: { text: 'last' } } },
+  { startDate: '2026-09-01', endDate: '2026-09-08', weekNotes: { first: { text: 'one week', rpeCap: 7 }, last: { text: 'also last' } } },
+  { startDate: '2026-09-01', endDate: '2026-09-08', weekNotes: { last: { text: 'only a last note, in a one-week cycle', rpeCap: 7 } } },
+  { startDate: '2026-09-01', weekNotes: { first: { text: 'no end date' } } },
+  { weekNotes: { first: { text: 'no dates' } } },
+  { startDate: '2026-09-01', endDate: '2026-10-06' },
+  { startDate: 'not a date', endDate: '2026-10-06', weekNotes: { first: { text: 'x' } } },
+  { startDate: '2026-10-06', endDate: '2026-09-01', weekNotes: { first: { text: 'end before start' } } },
+  { startDate: '2026-09-01', endDate: '2026-10-06', weekNotes: { '2': { title: 'no text' }, '4': { text: '' } } },
+  { startDate: '2026-02-23', endDate: '2026-03-30', weekNotes: { '1': { text: 'across a month' }, last: { text: 'z' } } },
+  { startDate: '2026-09-01', endDate: '2026-10-13', weekNotes: { '6': { text: 'six weeks', rpeCap: 7 } } },
+  null, undefined, {}];
+const WEEK_DAYS = []; for (let n = -4; n <= 46; n++) WEEK_DAYS.push(new Date(Date.UTC(2026, 7, 29 + n)).toISOString().slice(0, 10));
+// The dashboard returns { wk } on a note; the app also returns its `key` ('first' | 'last' | 'week'), which the dashboard does not need.
+const noteView = n => n && { text: n.text, title: n.title, setsDrop: n.setsDrop, rpeDrop: n.rpeDrop, rpeCap: n.rpeCap, wk: n.wk };
+run('week of a day and its note (cycleWeekInfo / weekNoteNow)', () => WEEK_DAYS.forEach(day => {
+  const app = appWeekAt(day);
+  WEEK_CYCLES.forEach(c => {
+    same('cycleWeekInfo vs cycleWeekOnC', { cycle: c, day }, app.info(c), D_WEEK.cycleWeekOnC(c, day));
+    same('weekNoteNow vs weekNoteOnC', { cycle: c, day }, noteView(app.note(c)), noteView(D_WEEK.weekNoteOnC(c, day)));
+  });
+}));
+
+/* ── 4c. is a started session over? (TWIN-6) ───────────────────────────────── */
+// "On another calendar day AND more than six hours old". Run on two clocks: mid-afternoon, and just after midnight, where a session
+// started at 23:30 is only 2.5 hours old and must still be live.
+const D_STALE = sandbox(null, [lineSrc(D_SRC, 'const SESSION_GRACE_MS_C =', 'coach.html')].concat(fromD('sessionIsStaleC')), ['sessionIsStaleC']);
+function appStaleAt(nowIso) {
+  const now = new Date(nowIso).getTime();
+  const Fixed = class extends Date { constructor(...a) { if (a.length) super(...a); else super(now); } static now() { return now; } };
+  const ctx = vm.createContext({ console, Date: Fixed });
+  vm.runInContext([lineSrc(A_SRC, 'const SESSION_GRACE_MS =', 'program.html')].concat(fromA('sessionIsStale')).join('\n'), ctx);
+  const dctx = vm.createContext({ console, Date: Fixed });
+  vm.runInContext([lineSrc(D_SRC, 'const SESSION_GRACE_MS_C =', 'coach.html')].concat(fromD('sessionIsStaleC')).join('\n'), dctx);
+  return { app: vm.runInContext('sessionIsStale', ctx), dash: vm.runInContext('sessionIsStaleC', dctx), now };
+}
+run('is a started session over (sessionIsStale)', () => ['2026-10-11T14:00:00Z', '2026-10-11T02:00:00Z', '2026-10-11T00:05:00Z', '2026-10-11T23:50:00Z'].forEach(nowIso => {
+  const c = appStaleAt(nowIso);
+  const OFFSETS_MIN = [0, -1, -30, -120, -300, -359, -360, -361, -420, -600, -900, -1500, -1799, -1801, -3000, -10000, 60, 600, -100000];
+  const stamps = OFFSETS_MIN.map(m => new Date(c.now + m * 60000).toISOString()).concat([null, undefined, '', 'junk', '2026-10-11', '2026-10-10', '2026-10-10T23:30:00Z', '2026-10-11T00:30:00Z', 0, false]);
+  stamps.forEach(s => same('sessionIsStale vs sessionIsStaleC', { now: nowIso, stamp: s }, c.app(s), c.dash(s)));
+}));
+
+/* ── 4d. which values of `test` are a retest flag (TWIN-7) ──────────────────── */
+const A_TEST = sandbox(null, [lineSrc(A_SRC, 'const ONE_RM_MAX_EFFECTIVE =', 'program.html'), lineSrc(A_SRC, 'const DEFAULT_TEST_REPS =', 'program.html')].concat(fromA('exTestSpec')), ['exTestSpec']);
+const D_TEST = sandbox(null, [lineSrc(D_SRC, 'const DEFAULT_TEST_REPS_C =', 'coach.html')].concat(fromD('exTestSpecC')), ['exTestSpecC']);
+const TEST_VALUES = [true, false, 'true', '5RM', '5rm', '5 RM', '3RM', '1RM', '10RM', '11RM', '0RM', '00RM', '05RM', '5RM ', ' 5RM', '5RMx', 5, 0, 10, 11, null, undefined, '', ' ', {}, [], ['5RM'],
+  'heavy', 'test', 'AMRAP', '8-10RM', '5RM\n', '١٠RM', '2.5RM', '-3RM', '5 rm', '5\trm'];
+run('retest flag (exTestSpec)', () => TEST_VALUES.forEach(v => same('exTestSpec vs exTestSpecC', v, A_TEST.exTestSpec({ test: v }), D_TEST.exTestSpecC({ test: v }))));
+same('exTestSpec vs exTestSpecC on no exercise', null, A_TEST.exTestSpec(null), D_TEST.exTestSpecC(null));
 
 /* ── 5. what the Quality check counts ─────────────────────────────────────── */
 const A_QM = sandbox(null, fromA('qmSets', 'isPrepBlockTitle'), ['qmSets', 'isPrepBlockTitle']);
@@ -320,7 +392,7 @@ run('chips.js cache token', () => {
 });
 
 /* ── report ───────────────────────────────────────────────────────────────── */
-console.log('  note WORK-11 dayTargetC() ignores the week note; TWIN-1 drafts; TWIN-6 leftover window; TWIN-7 retest flag (see the header)');
+console.log('  note TWIN-1 drafts (see the header)');
 if (failures.length || chipsFailures.length) {
   console.error('\ncheck_twins: ' + (failures.length + chipsFailures.length) + ' problem' + (failures.length + chipsFailures.length === 1 ? '' : 's') + ' (of ' + checks + ' checks):\n');
   failures.slice(0, 12).forEach(f => console.error('  ✗ ' + f + '\n'));

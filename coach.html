@@ -3066,11 +3066,41 @@ function rpeTarget(target) {
 // Today's targets (program.html, REC-2, 2026-09-26). The athlete's app works the day's
 // level out at the check-in and stores it with the check-in: { level, sore, drop,
 // asWritten }. Nothing here recomputes it; it reads what the athlete was shown.
-// ⚠ dayTargetC() is dayRpe() in program.html without the week note (a session does not
-// record which week it was): 1 off each end, never below 6, never above what was written.
-function dayTargetC(t, drop) {
+// ⚠ dayTargetC() is dayRpe() in program.html: 1 off each end, never below 6, never above what was written, and a lower day
+// does not stack with the week note (week 1, a test week, the back-off week): the lower of the two targets wins. The week note
+// is the cycle's note for the week the SESSION fell in (weekNoteOnC), because a session does not record which week it was;
+// the app asks the same question about today (cycleWeekInfo() / weekNoteNow()). scripts/check_twins.js runs both on the same
+// cycles and days (it was a known difference, WORK-11, until 2026-10-11).
+function dayNumC(iso) {   // a calendar day as a whole number, whatever the time zone
+  const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) / 86400000 : NaN;
+}
+function cycleWeekOnC(cycle, dayKey) {
+  if (!cycle || !cycle.startDate || !cycle.endDate) return null;
+  const s = dayNumC(cycle.startDate), e = dayNumC(cycle.endDate), d = dayNumC(dayKey);
+  if (isNaN(s) || isNaN(e) || isNaN(d)) return null;
+  const total = Math.max(1, Math.round((e - s) / 7));
+  const wk = Math.min(Math.max(Math.floor((d - s) / 7) + 1, 1), total);
+  return { wk, total, before: d < s, after: d > e };
+}
+function weekNoteOnC(cycle, dayKey) {
+  const notes = cycle && cycle.weekNotes;
+  if (!notes || typeof notes !== 'object') return null;
+  const w = cycleWeekOnC(cycle, dayKey);
+  if (!w || w.before || w.after) return null;
+  const ok = n => !!(n && typeof n === 'object' && n.text);
+  let n = null;
+  if (ok(notes[String(w.wk)])) n = notes[String(w.wk)];
+  else if (w.wk === 1 && ok(notes.first)) n = notes.first;
+  else if (w.total > 1 && w.wk === w.total && ok(notes.last)) n = notes.last;
+  return n ? Object.assign({}, n, { wk: w.wk }) : null;
+}
+function dayTargetC(t, drop, note) {
   if (!t || !drop) return t;
-  const one = v => Math.min(v, Math.max(6, v - drop));
+  const floored = (v, x) => Math.min(v, Math.max(6, x));   // never under 6, never over what was written
+  const week = v => (note && Number(note.rpeCap) > 0) ? floored(v, Number(note.rpeCap))
+                  : (note && Number(note.rpeDrop) > 0) ? floored(v, v - Number(note.rpeDrop)) : v;
+  const one = v => Math.min(v, week(v), floored(v, v - drop));
   const lo = one(t.lo), hi = one(t.hi);
   if (lo === t.lo && hi === t.hi) return t;
   return { lo, hi, label: lo === hi ? String(lo) : `${lo}–${hi}`, written: t.label };
@@ -3128,10 +3158,10 @@ function loadSummary(sets) {
 // One prescribed exercise against its log line. Returns only what is actually
 // known. Reps are logged per set since 2026-09-24 ("×5"); older sessions have
 // none, and nothing here claims a rep count that was never recorded.
-function compareExercise(pex, logged, drop, rd) {
+function compareExercise(pex, logged, drop, rd, note) {
   const rx = legacyRx(pex);
   const want = rx.sets ? parseInt(rx.sets, 10) : null;
-  const tgt = dayTargetC(rpeTarget(rx.target), drop);
+  const tgt = dayTargetC(rpeTarget(rx.target), drop, note);
   const c = {
     name: (pex && pex.name) || (logged && logged.name) || '', pex, rx, tgt, logged,
     state: 'none', doneSets: 0, allSets: 0, load: '', rpeMean: null, rpePer: '', repsPer: '',
@@ -3195,7 +3225,8 @@ function compareExercise(pex, logged, drop, rd) {
 }
 // A whole day: every prescribed exercise, in program order and grouped by
 // block, plus anything logged that was never prescribed.
-function compareDay(programDay, session) {
+// `cycle` is the cycle the day is judged against (its week notes); without one only the check-in lowers a target.
+function compareDay(programDay, session, cycle) {
   const blocks = parseSessionLog(session && session.summary);
   // The summary is frozen text, but the structured log (session.log, written in the same loop and
   // in the same order) is kept in step when an exercise is renamed (the one-name move of
@@ -3215,9 +3246,10 @@ function compareDay(programDay, session) {
   const groups = [];
   const drop = dayDropC(session && session.readiness);
   const rd = jparse(session && session.readiness);
+  const note = drop && cycle && session && session.completed_on ? weekNoteOnC(cycle, session.completed_on) : null;
   ((programDay && programDay.blocks) || []).forEach((b, bi) => {
     const rows = (b.exercises || []).map((pex, ei) => {
-      const row = compareExercise(pex, take(pex.name), drop, rd);
+      const row = compareExercise(pex, take(pex.name), drop, rd, note);
       // Where this exercise lives in the programme, so the editor can write it
       // back. Index-based rather than name-based: two blocks can hold the same
       // movement, and a rename would otherwise lose the row.
@@ -3609,7 +3641,8 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   // Their sessions' text did not load (renderDetail): there is nothing to compare, and comparing against nothing would read as
   // a day they skipped. The numbers on the card (date, sRPE, minutes) came with the first read and stay.
   const noLog = !!(s && _D && _D.logsErr);
-  const cmp = noLog ? { groups: [], hasLog: false, extras: 0 } : compareDay(pd, s);
+  const prog = _D && _D.program, curCycle = prog && (prog.cycles || [])[Number.isInteger(prog.currentCycleIndex) ? prog.currentCycleIndex : 0];
+  const cmp = noLog ? { groups: [], hasLog: false, extras: 0 } : compareDay(pd, s, curCycle);
   const groups = cmp.groups;
   const v = dayVerdict(groups);
   // Nothing prescribed today appears in the log, yet the log is full: this
@@ -3757,6 +3790,19 @@ function workTabHtml(D) {
 // in — the athlete's strip waits for the closing week so it does not nag, but
 // Amir is the one deciding when to ask, so he needs it early.
 const RETEST_MIN_DAYS_C = 28;
+// The coach's retest flag the way program.html's exTestSpec() reads it (TWIN-7, 2026-10-11): true is the 5RM default, "<n>RM" with n from
+// 1 to 10 is that test, anything else is no flag at all, because the flag decides what nags an athlete. The dashboard showed any text
+// as a tag, so a flag the app ignores looked live here. scripts/check_twins.js runs both on the same values.
+const DEFAULT_TEST_REPS_C = 5, ONE_RM_MAX_EFFECTIVE_C = 10;
+function exTestSpecC(ex) {
+  const raw = ex && ex.test;
+  if (raw === true) return { reps: DEFAULT_TEST_REPS_C, label: DEFAULT_TEST_REPS_C + 'RM' };
+  const m = String(raw || '').match(/^(\d+)\s*rm$/i);
+  if (!m) return null;
+  const reps = parseInt(m[1], 10);
+  if (!(reps > 0) || reps > ONE_RM_MAX_EFFECTIVE_C) return null;
+  return { reps: reps, label: reps + 'RM' };
+}
 function maxesPanel(D) {
   const a = D.a || {};
   const entries = a.oneRm || [];
@@ -3766,7 +3812,8 @@ function maxesPanel(D) {
     const n = String((ex && ex.name) || '').trim();
     if (!n) return;
     if (names.indexOf(n) === -1) names.push(n);
-    if (ex.test) flagged[n] = (ex.test === true) ? '5RM' : String(ex.test);
+    const spec = exTestSpecC(ex);
+    if (spec) flagged[n] = spec.label;
   })));
   const lifts = oneRmLifts(entries, names);
   // A flagged lift with nothing on the record at all never reaches oneRmLifts,
@@ -3839,6 +3886,16 @@ function toggleCharts() {
 }
 window.toggleCharts = toggleCharts;
 
+// Is a started session over? program.html's sessionIsStale() (DATA-02: midnight is not the end of a session): its stamp is on another
+// calendar day AND more than six hours old. The snapshot used its own 30-hour window until 2026-10-11 (TWIN-6); scripts/check_twins.js
+// runs both on the same stamps. The day is this computer's, as the app's is the phone's.
+const SESSION_GRACE_MS_C = 6 * 3600000;
+function sessionIsStaleC(stamp) {
+  if (!stamp) return false;
+  const d = new Date(stamp);
+  if (isNaN(d)) return false;
+  return d.toDateString() !== new Date().toDateString() && (Date.now() - d.getTime()) > SESSION_GRACE_MS_C;
+}
 // What is sitting in their app right now — a different question from "what did
 // they finish", so it keeps its own place instead of being a third copy of the
 // day list. Collapsed: most days there is nothing to see.
@@ -3864,7 +3921,7 @@ function liveSnapshotHtml(D) {
       // The cloud blob keeps keys a phone no longer has (program.html ignores a day's keys from
       // an earlier date), so an old, unfinished day is not "in progress": it is a leftover.
       const ts = (d.readiness && d.readiness.timestamp) || (d.completedOn && String(d.completedOn).slice(0, 10)) || null;
-      const recent = ts && (Date.now() - new Date(ts)) < 30 * 3600e3;
+      const recent = !!ts && !sessionIsStaleC(ts);
       return `<div class="ls-day"><b>Day ${esc(pd.id)}${pd.focusTag ? ' — ' + esc(pd.focusTag) : ''}</b>
         ${d.completed ? '<span class="tag done">✓ completed</span>' : recent ? '<span class="tag">in progress</span>'
           : `<span class="tag">started${ts ? ' ' + esc(prettyDate(dkey(new Date(ts)))) : ' earlier'}, not finished — a leftover, not live</span>`}

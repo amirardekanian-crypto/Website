@@ -35,7 +35,14 @@ function want(name, mutate, expectCode, mustSay, opts) {
 
 want('untouched files pass', null, 0, /all \d+ checks agree/);
 want('the prep-block words drift (Quality check)', swap('coach.html', '/warm|mobility|activation|cool|prime|prep/i', '/warm|mobility|activation|cool|prep/i'), 1, /isPrepBlockTitle vs QM_PREP/);
-want('the RPE floor drifts (6 -> 5 on the dashboard)', swap('coach.html', 'Math.max(6, v - drop)', 'Math.max(5, v - drop)'), 1, /dayRpe vs dayTargetC/);
+want('the RPE floor drifts (6 -> 5 on the dashboard)', swap('coach.html', 'Math.min(v, Math.max(6, x));', 'Math.min(v, Math.max(5, x));'), 1, /dayRpe vs dayTargetC/);
+want('the week note stops lowering a lower day on the dashboard (rpeCap ignored)', swap('coach.html', '(note && Number(note.rpeCap) > 0) ? floored(', '(false) ? floored('), 1, /dayRpe vs dayTargetC/);
+want('the week boundary drifts (the dashboard starts week 2 a day late)', swap('coach.html', 'Math.floor((d - s) / 7) + 1', 'Math.floor((d - s - 1) / 7) + 1'), 1, /cycleWeekInfo vs cycleWeekOnC/);
+want('the last-week alias drifts (the dashboard applies `last` in a one-week cycle too)', swap('coach.html', 'w.total > 1 && w.wk === w.total && ok(notes.last)', 'w.wk === w.total && ok(notes.last)'), 1, /weekNoteNow vs weekNoteOnC/);
+want('the session grace drifts (six hours become five on the dashboard)', swap('coach.html', 'const SESSION_GRACE_MS_C = 6 * 3600000;', 'const SESSION_GRACE_MS_C = 5 * 3600000;'), 1, /sessionIsStale vs sessionIsStaleC/);
+want('the dashboard goes back to its own 30-hour window idea (a day is no longer the test)', swap('coach.html', 'return d.toDateString() !== new Date().toDateString() && (Date.now() - d.getTime()) > SESSION_GRACE_MS_C;', 'return (Date.now() - d.getTime()) > 30 * 3600e3;'), 1, /sessionIsStale vs sessionIsStaleC/);
+want('the retest flag accepts 11RM on the dashboard only', swap('coach.html', 'reps > ONE_RM_MAX_EFFECTIVE_C', 'reps > 11'), 1, /exTestSpec vs exTestSpecC/);
+want('the retest flag is read looser on the dashboard (no anchors: "5RMx" is a flag)', swap('coach.html', String.raw`const m = String(raw || '').match(/^(\d+)\s*rm$/i);`, String.raw`const m = String(raw || '').match(/(\d+)\s*rm/i);`), 1, /exTestSpec vs exTestSpecC/);
 want('a name tier drifts (the dashboard stops folding DB to dumbbell)', swap('coach.html', "const EX_ABBREV_C = { db: 'dumbbell', bb: 'barbell', kb: 'kettlebell' };", "const EX_ABBREV_C = { bb: 'barbell', kb: 'kettlebell' };"), 1, /exNameVariants vs exNameVariantsC/);
 want('the Spine resolver drifts (exId no longer wins on the dashboard)', swap('coach.html', 'if (exId && byId[exId]) return exId;', 'if (false) return exId;'), 1, /spineFor vs spineForC/);
 want('the app rewords its check-in line', swap('program.html', "bits.push('lower day (every RPE 1 lower, never below 6)')", "bits.push('easier day (every RPE 1 lower, never below 6)')"), 1, /readinessPlanLine's wording/);

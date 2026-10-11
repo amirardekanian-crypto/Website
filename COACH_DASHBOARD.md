@@ -316,7 +316,10 @@ session line on The work says *lower day*, *short day* or *sore* (and *trained a
 chose to), the prescribed column prints `RPE 7 → 6 that day`, and the sets are judged against that
 number. Work the day left optional or skipped reads *optional today* / *skipped today: sore*, in grey,
 and is not counted as *not done*. The athlete's app decided the day and stored it with the
-check-in; nothing here recomputes it. `dayTargetC()` is the twin of `dayRpe()` in program.html.
+check-in; nothing here recomputes it. `dayTargetC()` is the twin of `dayRpe()` in program.html, week note included (2026-10-11): a
+lower day inside a week that carries a note with `rpeCap` or `rpeDrop` is judged against the lower of the two targets, never under 6, the
+week being the one the SESSION fell in (`weekNoteOnC(cycle, completed_on)`); a normal day ignores the note, exactly as the app does, and a
+session from before the cycle began or after it ended has no note.
 
 ### Quest week
 
@@ -445,7 +448,9 @@ Other things on this tab: the **day's session picker** when a day has been train
 WhatsApp, 2026-09-26, and the athlete app sends anything that needs an answer there),
 the **raw log exactly as sent** behind a toggle on every day, **+ Add past session from email**, and
 a collapsed **live app snapshot** — what is on their phone right now, which is a different question
-from what they finished.
+from what they finished. A started day is *in progress* by the app's own rule (2026-10-11): its check-in stamp is on today's
+calendar day, or under six hours old; anything older and unfinished reads *a leftover, not live* (it used to count 30 hours).
+The day is this computer's, as the app's is the phone's.
 
 ⚠ **Plan and log are matched by exercise name.** A session done before you rewrote the program won't
 line up with the current plan — every prescribed row reads *not logged* and their real work shows
@@ -503,7 +508,8 @@ long ago. Absent entirely when there is nothing to show, like the body-weight pa
 on every athlete's page trains you to scroll past the one that has something in it.
 
 A lift marked **due a retest** has gone 28 days or more without a number, and the current cycle
-flags it with `"test": "5RM"` (see `SCHEMA.md` → `test`, and `/program-design` → The Ceiling for how
+flags it with `"test": "5RM"` (`true`, or `"<n>RM"` with n from 1 to 10: anything else is no flag, here and in the athlete's app,
+and the programme checker refuses it; see `SCHEMA.md` → `test`, and `/program-design` → The Ceiling for how
 to set one). A flagged lift with nothing on the record at all is listed too, with a dash — it is the
 one most worth chasing. **You see this whatever week the cycle is in**; the athlete's own retest
 nudge waits for the closing week so it does not nag them, but you are the one deciding when to ask.
@@ -765,15 +771,15 @@ covered by the real-mode harness in `scripts/headless/coach/`.
 **Logic that exists in both apps is guarded** (`scripts/check_twins.js`, pre-commit guard 15, 2026-10-10).
 It cuts each twin out of both files and runs the same vectors through both: the exercise-name
 tiers (`exNameVariants` / `exNameVariantsC`), a renamed lift (`ceilAliasMap` / `ceilAliasMapC`), the
-Spine lookup (`spineFor` / `spineForC`), today's RPE target on a lower day (`dayRpe` / `dayTargetC`), what
+Spine lookup (`spineFor` / `spineForC`), today's RPE target on a lower day with the week note (`dayRpe` / `dayTargetC`), the week a day
+falls in and its note (`cycleWeekInfo`, `weekNoteNow` / `cycleWeekOnC`, `weekNoteOnC`: 3,281 checks in all), what
 the Quality check counts (`qmSets`, `isPrepBlockTitle` / `qmSetsC`, `QM_PREP`), and the check-in line's
 writer and reader (`readinessPlanLine` / `parseCheckinPlan`). It also fails a change to `assets/js/chips.js`
 that keeps coach.html's hand-typed `?v=` (the service worker serves `/assets/` cache-first): bump the
 token, then `node scripts/check_twins.js --stamp`. `scripts/test_check_twins.js` breaks a copy on purpose
-to prove each kind of drift is caught. Not covered, on purpose: the week-note input to the lower-day
-target (WORK-11), the dashboard resolving cards against drafts too (TWIN-1), the 30-hour "leftover
-session" window (TWIN-6) and the loose retest flag (TWIN-7) are known differences, listed in the script's
-header. A new copy of an app rule in coach.html goes into the script the same day.
+to prove each kind of drift is caught. Also guarded: whether a started session is over (`sessionIsStale` / `sessionIsStaleC`) and which values of a lift's `test`
+are a retest flag (`exTestSpec` / `exTestSpecC`). Not covered, on purpose: the dashboard resolving cards against drafts too
+(TWIN-1), a known difference listed in the script's header. A new copy of an app rule in coach.html goes into the script the same day.
 
 Some coach writes go through RPCs that check the coach themselves (`set_coach_note`, `hide_note`,
 `set_quests`, `end_quests` (stage55), `clear_quests`, `forget_contact`, `save_session`, `coach_season_levels`, and since stage48

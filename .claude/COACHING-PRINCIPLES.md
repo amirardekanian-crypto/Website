@@ -170,7 +170,7 @@ stale copy reached athletes.
 | TST-2 | No test goes to a grind: it stops at the first rep that slows, shortens or breaks position. Never a true 1RM. | design · engage | |
 | TST-3 | No max-effort set in a first cycle; its logs are the baseline. A flagged 5RM retest is one set of 3–5 at about RPE 9. | design | |
 | TST-4 | A test that goes past the cycle's RPE ceiling is written as a stated exception to it. | design · engage | |
-| TST-5 | Flag two or three lifts a cycle for a retest (`test_flag`), never in a first cycle, in pain or with poor technique under load. | design | ✓ (a first cycle; more than 3) |
+| TST-5 | Flag two or three lifts a cycle for a retest (`test_flag`), never in a first cycle, in pain or with poor technique under load. | design | ✓ (a first cycle; more than 3; a value the app ignores) |
 | TST-6 | An e1RM graded Rough is a trend only: never set a starting load from a single Rough estimate. | design · report | |
 
 ### Communication & in-app text

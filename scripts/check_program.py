@@ -289,6 +289,14 @@ def check_names(data, ctx):
             warn(f"{where}: the card is not named as its Spine entry {o.get('exId')} ({e['name']}): rename the card to the "
                  "entry's name, one name and no alias (Amir, 2026-10-09). A different version is its own entry", 'NAM-8')
 
+def test_flag_ok(v):
+    """program.html exTestSpec(): a retest flag is true (the 5RM default) or "<n>RM" with n from 1 to 10, any case, spaces allowed before
+    RM. The app ignores anything else (and coach.html's exTestSpecC() agrees: scripts/check_twins.js runs both), so a flag like "heavy"
+    would look live in the file and nag nobody."""
+    if v is True: return True
+    m = re.fullmatch(r'([0-9]+)\s*rm', str(v if v is not None else ''), re.I)
+    return bool(m) and 0 < int(m.group(1)) <= 10
+
 def check_tests(data, args):
     """TST-5: two or three retest flags a cycle, on grinding standard lifts, and none in a first cycle
     (TST-3, Amir 2026-09-27: a new athlete's first cycle gets no max-effort set; the logs are its baseline)."""
@@ -297,6 +305,8 @@ def check_tests(data, args):
         o = it or ex
         if not o.get('test'): continue
         where = f"Day {d.get('id')} · {o.get('name')}"
+        if not test_flag_ok(o.get('test')):
+            fail(f"{where}: test {o.get('test')!r} is not true or \"<n>RM\" (1 to 10): the app ignores it, so the lift is not flagged and the nudge never comes", 'TST-5')
         flagged.append(where)
         rx = o.get('rx') or {}
         if it or ex.get('type') != 'standard' or PREP.search(b.get('title') or '') or rx.get('time') or rx.get('distance'):

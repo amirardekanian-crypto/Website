@@ -452,6 +452,9 @@ d['workouts']['days'][0]['blocks'][2]['exercises'] += [ex("Goblet Squat", "goble
 for i in range(3): flag(d, 0, 2, i)
 flag(d, 0, 1, 0)
 expect('TST-5: four retest flags fail', has(run(d, ctx=CTX), 'FAIL', '4 retest flags'))
+for v, ok in [(True, True), ('3RM', True), ('10RM', True), ('5 rm', True), ('11RM', False), ('0RM', False), ('heavy', False), (5, False), ('5RMx', False), ('5RM\n', False)]:
+    d = flag(copy.deepcopy(BASE), 0, 1, 0, v)
+    expect(f'TST-5: test {v!r} is {"a flag the app reads" if ok else "refused (the app ignores it)"}', ok != has(run(d, ctx=CTX), 'FAIL', 'the app ignores it'))
 d = copy.deepcopy(BASE); flag(d, 0, 0, 0)
 expect('TST-5: a flag on a timed warm-up warns', has(run(d, ctx=CTX), 'WARN', 'a retest flag belongs on a grinding standard lift'))
 d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['title'] = 'Strength'
