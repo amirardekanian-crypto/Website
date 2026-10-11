@@ -61,7 +61,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 105 scenarios, the last 6 for stage64, the card's How to do it and the pill; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-12: 104 scenarios; the Add past session ones went with the box, `work-this-cycle` and `sync-finished-list` came in; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -75,7 +75,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | auth-SIGNED_IN-forms | Spine editor / coach line / affiliate form with typed text | Spine editor stayed open with old text; others wiped |
 | note-mark-read | Mark read | ok |
 | coach-line-utc / coach-line-tehran-0130 | post + take down the coach line | no p_day; 00:00–03:30 Tehran overwrote yesterday's line |
-| wall-hide, intake-status, affiliates, spine-approve, login-create, session-import-delete (now ends in Hide this log) | the other writes | ok (login-create now checks the in-place password card) |
+| wall-hide, intake-status, affiliates, spine-approve, login-create | the other writes | ok (login-create now checks the in-place password card) |
 | quest-week | start a quest week, then End this run today | (2026-10-11, stage55) the button was *Cancel* and called `clear_quests`, which took the XP back from everyone; it now calls `end_quests(start, today)`, the run stays with an `end` day, the panel says *ended early* |
 | quest-week-end-fails | End this run when stage55 is not applied | must name the missing file, change nothing and never fall back to `clear_quests` |
 | backlog-clear | Clear older notes | now: one update per counted note, by key |
@@ -113,15 +113,13 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | spine-unsaved-guard | typed work vs a redraw, another entry, leaving the tab | lost without a word |
 | spine-circuits-count | an exercise used only inside a circuit | counted as unused |
 | walink | intake / funnel WhatsApp links | "@sara_1990" opened wa.me/1990 |
-| session-import-replace | Add past session over one on the same date | the old set-by-set log stayed under the email's text |
-| session-import-checkin | Add past session from an email with the `Today: lower day … · sore: …` check-in line, and one without | the line was never read: no verdict on an imported session (second session) |
 | login-used-mark | Logins to send after the person signed in | every stored password looked unsent |
 | calls-load-fail | call logs fail to load | the File tab must name the failure (the Calls tab used to say "No call logs yet") |
 | route-unknown-sub | `#a/<id>/<unknown>` | "No athlete in the store" |
 | hist-light-boot | boot reads session_history twice: every session's numbers (no `summary`, no `log`) and the text of the unread sessions that contain "Note:"; an exercise-only note still reaches Needs you and is quoted | (pile B1, TODAY-12) every open downloaded every session in full, 78% of it text the numbers never read |
 | hist-athlete-open | opening an athlete reads their text and log once (filtered on their id), the comparison and the raw log have them, sub-tabs and going back read nothing, another athlete reads only theirs, a reloaded list reads them again | (pile B1) all of it was loaded at boot |
 | hist-heavy-fails | the read of an athlete's logs fails | (pile B1) must say *did not load* with the reason and Try again, keep the numbers, show no verdict or "not logged"; Try again brings the comparison |
-| file-redraw-keeps-work | the Change password box (typed, cursor in it), Version history and the Coaching log opened, then a full redraw and a tab-body redraw; Add past session with a pasted email, date and preview, a day card toggled, a full redraw, Save; another athlete's file | (pile B4, FILE-9) the box emptied, the sections folded, the add-session box hid again and lost the email |
+| file-redraw-keeps-work | the Change password box (typed, cursor in it), Version history and the Coaching log opened, then a full redraw and a tab-body redraw; another athlete's file; a day's raw log open through a day card toggled and a full redraw | (pile B4, FILE-9) the box emptied, the sections folded |
 | live-snapshot-window | the live app snapshot at 14:00 and 02:00 UTC with check-ins stamped 1 h to 23 h earlier | (pile B6, TWIN-6) a started day read "in progress" for 30 hours; now the app's rule: today's date, or under six hours |
 | retest-flag | Personal records with `test` set to "3RM", true, "heavy" and "11RM" | (pile B6, TWIN-7) any text was shown as a flag; now only what the athlete's app reads |
 | readiness-chart | Ava with eleven check-ins (six from before the verdict, five stored, two on one day, soreness 1 on one) and Eli with three | (pile B6, TWIN-3 and TODAY-11) the chart plotted the old composite against an all-time mean, the pill took the first of two same-day check-ins, Eli's "usual" was made up from three; now all three places read the app's score and usual |
@@ -145,11 +143,12 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | library-paged | Nine Library items with a server that answers three rows at a time | (pile B11, SERVER-10) one request stopped at the row cap and the shelf looked half empty |
 | session-hide-undo | Hide this log from the Raw log: one `coach_hide_session`, nothing deleted, the day card back to not logged, the Undo bar, Undo, the File's Hidden sessions list, Restore, Delete for good (only a hidden row) | (pile A6, FILE-11) a hard delete: gone for good, no Undo |
 | session-hide-no-false-warning | A session whose report mark is in the athlete's progress, hidden: no "session not synced"; a mark with no session at all still warns | (pile A6, ROSTER-9) deleting a session left a warning that could never clear (mutation-tested: without `.concat(a.hidden)` it fails) |
-| session-hide-add-over | Add past session from email over a HIDDEN one | (pile A6) it would have updated a row nobody could see |
 | intake-outcome | Intake: a client needs an athlete (refused on the page, nothing sent), a saved outcome moves the card and the badge, a not-a-fit sends no athlete, the athlete's File says "Came from", clearing it, a server without stage61, the pre-selected likely athlete | (pile A8, FLOW-17, SPINE-11) "Handled" could not say what happened and a lead could not be linked to the athlete it became |
 | erase-linked-form | Erase completely…: two applications linked to the athlete are offered with "linked to them" and ticked; the one left unticked keeps its answers and loses only the link | (pile A8) a link would have made the athlete impossible to erase (the server's own check) |
 | whatsapp-number | The File's WhatsApp box (nonsense refused on the page, typed text kept through a redraw, a number saved tidy, Remove, an Iranian number in Persian digits, a server without stage62) and the header's button; a coach-made record is not a signup (no reason, no Proof tab, not in the funnel) | (pile A9, FLOW-8) no number for most coached athletes; mutation-tested: if `isSignup()` counts it, three checks fail |
 | status-paused-former | File → Status: pause with a note, the cycle reason goes while a note they sent stays, the Paused group and chip, former out of Everyone and Coached with their own chip and the footer line, Active removes the row, a server without stage63 | (pile A10, ROSTER-7) "Needs you" held 36 of 49 people and nobody could be set aside |
+| work-this-cycle | The work with an undated cycle, then a cycle that began two days ago: this cycle's Day 1 alone on its card (no picker), Day 2 not logged this cycle, the two older sessions under Earlier cycles (folded, newest first, open through a redraw, Hide this log works there); no Add past session box | (2026-10-12) a new cycle's day cards showed the last cycle's sessions |
+| sync-finished-list | The phone's finished list (`<id>_finished`) against the sessions on file: all there, one missing (named), one older than 14 days (not chased), one hidden (counts as there) | (2026-10-12) without the email's marks a lost session was invisible |
 | roster-demo-out | The public demo and the dashboard's own identity added to the roster: no count changes, the tier chips still add up, no row, the footer says so and links the demo | (pile A10, ROSTER-7) the demo was counted |
 | tools-button | At 360 px the tools (Backup, Logins to send, Create missing logins) are folded behind the ⚙ Tools button with a badge, the first athlete starts above y = 400, the panel opens, survives a redraw and closes | (pile A10, ROSTER-12) the first athlete started at y 495 |
 | file-preview-wording | The File tab's "Their app" words, the two buttons' addresses, and the bar program.html draws over a preview | (pile A7, TOOLS-11) the File tab promised "their real data" and the bar "exactly as they see it", but the preview shows the programme without their logged work |

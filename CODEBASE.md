@@ -189,6 +189,27 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   stayed queued for good. It runs on the signed-in session now (`save_session` accepts
   `current_athlete_id()`), and it re-reads the queue before writing it back, so a save that
   fails while a replay is still waiting on the network is not erased.
+  ⚠️ **Until 2026-10-12 a session went into the queue only when `save_session` came back with an error.** A call
+  that never came back (no signal in the gym, a connection that hangs, Iran's filtering, the app put away or closed
+  mid-save) left no trace on the phone, while the email waited in its outbox and arrived: 10 sessions of 4 athletes
+  between 16 Sep and 10 Oct (Elmira 4, Behnam 4, Maryam 1, Alireza 1), found from Amir's inbox and trash and put back
+  from the emails the same day (`scripts/restore/sessions_from_email.js`, coach.html's own email reader). Now:
+  - **The queue first.** `recordSessionToCloud()` puts the record in `<id>_csq` BEFORE the call and takes it out only
+    when the server answers (`_enqueueSession()`, `_sendSession()`, `_dequeueSession()`). One entry per SESSION (day and
+    date), a newer save of the same session replaces the waiting one, every call is capped at `SESSION_SAVE_MS`.
+  - **It drains** at every open, back in the foreground, when the connection comes back and after a report goes.
+  - **It never syncs**, like the outbox: another phone would send it again, and a cloud copy pulled back over it (every
+    progress row still holds an old `[]`) would wipe a session still waiting. `_snapshot()` and `syncFromCloud()` skip it.
+  - **A day left unfinished is filed by itself** at the next open (`fileUnfinished()`; the Send it / Clear it card is gone):
+    under the day it was trained, with that day's check-in and clock (`buildSessionData()` judges both by the session's own
+    date now, so a rating changed after midnight no longer drops the check-in), then the page opens once more so the sweep
+    clears the day. The sweep keeps a waiting day's check-in, clock and shared exercises until it is filed (`_awaitingFile()`).
+  - **The phone's finished list** `<id>_finished` ("day|date", the last 60, synced as a union) lets `syncGapsOf()` name a
+    session the phone finished and the server does not have WITHOUT the email (the last 14 days), so the warning survives
+    the day the email reports are switched off. `scripts/headless/session-queue.js` and the coach harness's
+    `sync-finished-list` hold all of it.
+  To find lost sessions again while emails still exist: every Web3Forms "Session Report" since a date (inbox and trash),
+  against `session_history` by athlete name, day and a window of three days before to one day after the email.
 - **Coach preview (`?preview=1`) must never write.** It runs under Amir's own sign-in, and every
   athlete RPC accepts `is_coach()` — so a write that is not gated on `IS_PREVIEW` lands in that
   athlete's real record. Boot skips the backup mirror, the pull and the queue replay;

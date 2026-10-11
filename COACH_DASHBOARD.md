@@ -387,9 +387,7 @@ from both apps: athletes message you on WhatsApp now.)
 
 **Clear** on the *older notes* row (notes that arrived more than 14 days ago and were never marked
 read) marks exactly the notes it counted, by their key. It used to mark every unread session
-older than 14 days on the server, including notes that arrived after the page loaded. A note you
-imported yourself with *+ Add past session from email* arrives the moment you save it, so it shows
-in Needs you until you mark it read (it is not marked read for you: the preview does not show the note).
+older than 14 days on the server, including notes that arrived after the page loaded.
 
 **Today's targets on a session (2026-09-26).** When an athlete's check-in eased the day (REC-2), the
 session line on The work says *lower day*, *short day* or *sore* (and *trained as written* if they
@@ -496,9 +494,8 @@ a habit-only athlete with no training days. Opening someone else while a file is
 never paints the first person's file under the second person's address (it could until 2026-10-10).
 A save or a refresh keeps the days you had open, the session you were comparing and anything typed
 into an open editor, and (since 2026-10-11) what you typed or opened in the tab itself: the password box with the cursor in it,
-an email pasted under *Add past session* with its date and preview, Version history, the Coaching log, a day's raw log and
-the live snapshot. That holds for the same athlete's same screen only; another athlete or screen starts clean, and a saved
-past session clears its own box.
+Version history, the Coaching log, a day's raw log, Earlier cycles and the live snapshot. That holds for the same athlete's same
+screen only; another athlete or screen starts clean.
 
 ### The work — prescribed vs done, on one line
 
@@ -537,7 +534,7 @@ for the athlete's own history, so a change to the log line moves three places to
 Other things on this tab: the **day's session picker** when a day has been trained more than once
 (tap a date to compare against that run instead), the athlete's note with **Mark read** (a note is read here, never answered: you answer only on
 WhatsApp, 2026-09-26, and the athlete app sends anything that needs an answer there),
-the **raw log exactly as sent** behind a toggle on every day, **+ Add past session from email**, and
+the **raw log exactly as sent** behind a toggle on every day, **Earlier cycles**, and
 a collapsed **live app snapshot** — what is on their phone right now, which is a different question
 from what they finished. A started day is *in progress* by the app's own rule (2026-10-11): its check-in stamp is on today's
 calendar day, or under six hours old; anything older and unfinished reads *a leftover, not live* (it used to count 30 hours).
@@ -674,23 +671,24 @@ here and one lift there — both sides run the same name matcher, on purpose.
   counts a hidden session as present), the app's history (`get_my_history()`), the WORKOUT tick (`get_workout_days()`) and the pipeline's queries
   (`and hidden_at is null`). The athlete's phone can re-send it as often as it likes and it stays hidden; only a coach's save brings it back. A bar
   with **Undo** follows the hide for 30 seconds. The athlete's File lists every hidden session under **Hidden sessions** with **Restore** and, for a
-  real erasure request about one session, **Delete for good** (only a hidden row can be deleted from there, and it asks first). *+ Add past session
-  from email* over a hidden session asks, brings it back and replaces its log. One coach-only function does both directions, `coach_hide_session()`
-  (it never touches `updated_at`: hiding is not athlete activity). `session-hide-undo`, `session-hide-no-false-warning` and `session-hide-add-over`
-  drive it.
-- **Backfill** (The work, bottom): *+ Add past session from email* now checks the email's Athlete
-  line against this athlete, starts with no date (it used to default to today), and warns before it
-  replaces a session logged on the same date (the email's session replaces it, set-by-set log
-  included: since stage46 that is true, before it the old log stayed under the new text) or
-  adds a second one within a week. It reads the whole athlete note, not just its first line.
-  It also reads the **check-in line** (2026-10-10): the "Today: lower day (…) · sore: jumps and landings
-  halved — trained as written by choice" that the app writes on the Readiness field and in the full
-  summary, stored as `{ level, sore, drop, asWritten, score }` exactly as the app stores it, so the
-  session is judged on the day's real targets and counts toward *run of low days*. An email with no
-  such line stores no verdict: it is either a normal day or older than 2026-09-26, and the two cannot
-  be told apart, so nothing is guessed. `parseCheckinPlan()` reads it and `scripts/check_twins.js`
-  round-trips the app's own `readinessPlanLine()` through it. Claude's Gmail import
-  (`IMPORTING_SESSION_REPORTS.md`) stores the same keys.
+  real erasure request about one session, **Delete for good** (only a hidden row can be deleted from there, and it asks first). One coach-only
+  function does both directions, `coach_hide_session()` (it never touches `updated_at`: hiding is not athlete activity). `session-hide-undo` and
+  `session-hide-no-false-warning` drive it.
+- **This cycle on the day cards, earlier cycles folded** (2026-10-12; Amir, a day into Elmira's new cycle: *"all im seeing is his
+  past cycle"*). When the current cycle has a start date, a day card holds only the sessions trained on or after it, and its picker
+  lists only those; a day not trained yet this cycle says *nothing logged on this day this cycle yet*. Last cycle's sessions are
+  under **Earlier cycles** (folded, newest first, each with its log exactly as sent and **Hide this log**): they used to sit on the
+  new cycle's cards, compared with a plan they never trained. A cycle with no start date keeps every session on the cards.
+  `work-this-cycle` drives it.
+- **No Add past session from email** (removed 2026-10-12; Amir: *"i will never do that manually"*). Nothing is meant to need it:
+  since the same day the athlete app keeps every finished session in its queue until the server has it, and files a day left
+  unfinished by itself (`PROGRAM-APP.md` → *No signal*, *An unfinished day is filed by itself*). If one is ever lost while the
+  emailed reports still exist, Claude puts it back with `scripts/restore/sessions_from_email.js`, which reads each report with
+  `parseSessionEmail()` (kept in coach.html as the one reader of the report's format, with `parseCheckinPlan()`; not called by the
+  page; `scripts/check_twins.js` round-trips the app's `readinessPlanLine()` through it).
+- **"Session not synced" without the email** (2026-10-12). `syncGapsOf()` also reads the phone's own list of the sessions it
+  finished, `<id>_finished` in their progress, for the last 14 days: a session on it with no row (hidden counts as a row) is the
+  same warning the report marks give. It keeps working when the reports are switched off. `sync-finished-list` drives it.
 
 ## 6. The three metrics
 

@@ -24,8 +24,8 @@ const jparse = v => { if (v == null) return null; if (typeof v === 'object') ret
 const sandbox = { round1: n => Math.round(n * 10) / 10, window: chipsCtx.window, jparse };
 new Function('ctx', 'with (ctx) {' + code + '\nObject.assign(ctx, {parseSetLine, parseSessionLog, parseChips, compareExercise, compareDay, dayVerdict, loadSummary, rpeTarget, normEx, logIndex, rxLine, dayTargetC, dayDropC, planLabelC, weekNoteOnC, cycleWeekOnC});}')(sandbox);
 const { parseSessionLog, parseChips, compareDay, compareExercise, dayVerdict, loadSummary } = sandbox;
-// The email import (the "Add past session from email" box on an athlete's work tab).
-const emailCode = grab('function parseSessionEmail(text) {', '// Does the email\'s "Athlete" line name this athlete?');
+// The email reader (the page's "Add past session from email" box is gone since 2026-10-12; scripts/restore/sessions_from_email.js uses it).
+const emailCode = grab('function parseSessionEmail(text) {', '// ── end of the email reader');
 new Function('ctx', 'with (ctx) {' + emailCode + '\nObject.assign(ctx, {parseSessionEmail, parseCheckinPlan});}')(sandbox);
 const { parseSessionEmail, parseCheckinPlan, planLabelC } = sandbox;
 // What a save changed, in words (FLOW-11, WORK-10): the diff between two copies of a programme.

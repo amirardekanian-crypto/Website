@@ -667,102 +667,6 @@ S['backup-paging'] = async (b) => {
   return r;
 };
 
-// ── 18b. Backfill a past session from an email, then delete it ────────────────
-S['session-import-delete'] = async (b) => {
-  const r = { id: 'session-import-delete', title: 'The work → + Add past session from email → Save; then Raw log → Hide this log', checks: [] };
-  const { page, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
-  const email = ['Full summary', 'Day 3 — Pull Day (fixture)', 'Status: Complete', 'Session RPE: 8/10', 'Duration: 40 min', '',
-    'Notes from athlete', 'Fixture imported note.', '', 'Exercise log:', '[Primary]', '• Trap Bar Deadlift (✓)', '    Set 1: 80 @7 ✓', '    Set 2: 80 @8 ✓'].join('\n');
-  await page.locator('button', { hasText: 'Add past session from email' }).click();
-  await page.locator('#as-paste').fill(email);
-  await page.locator('button', { hasText: 'Read email' }).click();
-  const day = require('./fixtures').daysAgo(today, 5);
-  await page.locator('#as-date').fill(day);
-  let n0 = await L.nCalls(page);
-  await page.locator('#as-save').click();
-  await L.settle(page, 800);
-  const c = (await L.callsSince(page, n0)).filter(x => x.name === 'save_session').slice(-1)[0];
-  check(r, 'save_session(ava_test, day 3, date, {...}, p_key null)', c && c.payload.p_athlete_id === 'ava_test' && c.payload.p_day === 3 && c.payload.p_completed_on === day && c.payload.p_key === null && c.payload.p_session.session_rpe === '8', c && Object.assign({}, c.payload, { p_session: Object.assign({}, c.payload.p_session, { summary: '(' + c.payload.p_session.summary.length + ' chars)' }) }));
-  const card3 = page.locator('.wday', { hasText: 'Pull Day (fixture)' });
-  check(r, 'Day 3 now shows the imported session', /Complete/.test(await card3.locator('.wday-top').innerText()), (await card3.locator('.wday-top').innerText()).replace(/\s+/g, ' '));
-  await card3.locator('.wday-top').click();
-  n0 = await L.nCalls(page);
-  await card3.locator('details.rawlog summary').first().click();
-  await card3.locator('button', { hasText: 'Hide this log' }).click();
-  await L.settle(page, 800);
-  const calls = await L.callsSince(page, n0);
-  const hid = calls.filter(x => x.name === 'coach_hide_session').slice(-1)[0];
-  check(r, 'the log is hidden by athlete, day and date (the primary key), and nothing is deleted (stage60)', !!hid && hid.payload.p_athlete_id === 'ava_test' && hid.payload.p_day === 3 && hid.payload.p_completed_on === day && hid.payload.p_hide === true && !calls.some(x => x.name === 'session_history' && x.op === 'delete'), hid && hid.payload);
-  check(r, 'Day 3 is back to not logged', /not logged yet/.test(await page.locator('.wday', { hasText: 'Pull Day (fixture)' }).locator('.wday-top').innerText()), '');
-  await page.context().close();
-  return r;
-};
-
-S['session-import-replace'] = async (b) => {
-  const r = { id: 'session-import-replace', title: 'Add past session over one already on that date: the email really replaces it', checks: [] };
-  const { page, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
-  const day = require('./fixtures').daysAgo(today, 6);
-  await page.evaluate(d => {
-    window.__DB.session_history.push({ athlete_id: 'ava_test', athlete_name: 'Ava Example', day: 3, completed_on: d, status: 'Complete', session_rpe: 7, duration_min: 30,
-      readiness: null, day_note: '', focus: 'Pull Day (fixture)', summary: 'Day 3 — Pull Day (fixture)\nExercise log:\n• Old Lift (✓)', log: [{ ex: 'Old Lift', sets: [] }], coach_status: 'read', updated_at: new Date().toISOString() });
-  }, day);
-  await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
-  const email = ['Full summary', 'Day 3 — Pull Day (fixture)', 'Status: Complete', 'Session RPE: 8/10', 'Duration: 40 min', '', 'Exercise log:', '[Primary]', '• Trap Bar Deadlift (✓)', '    Set 1: 80 @7 ✓'].join('\n');
-  await page.locator('button', { hasText: 'Add past session from email' }).click();
-  await page.locator('#as-paste').fill(email);
-  await page.locator('button', { hasText: 'Read email' }).click();
-  await page.locator('#as-date').fill(day);
-  const n0 = await L.nCalls(page);
-  await page.locator('#as-save').click(); await L.settle(page, 800);
-  const c = (await L.callsSince(page, n0)).filter(x => x.name === 'save_session').slice(-1)[0];
-  check(r, 'save_session asks to replace the old log', c && c.payload.p_session.replace_log === true, c && c.payload.p_session.replace_log);
-  const row = (await L.db(page)).session_history.find(x => x.athlete_id === 'ava_test' && x.day === 3 && x.completed_on === day);
-  check(r, "the old set-by-set log is gone, so coach and athlete see the email's session", row && row.log == null && /Trap Bar Deadlift/.test(row.summary), row && { log: row.log });
-  await page.context().close();
-  return r;
-};
-
-// The email's check-in line (audit FILE-8, 2026-10-10): the import stores the day's verdict the way the app does.
-S['session-import-checkin'] = async (b) => {
-  const r = { id: 'session-import-checkin', title: 'Add past session from email: the Today: check-in line is read and stored', checks: [] };
-  const { page, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
-  const LOWER = 'lower day (every RPE 1 lower, never below 6)', SORE = 'sore: jumps and landings halved';
-  const email = ['Athlete', 'Ava Example', '', 'Day', 'Day 3 — Pull Day (fixture)', '', 'Status', 'Complete', '', 'Session RPE', '8/10', '', 'Duration', '40 min', '',
-    'Readiness', `Composite 3.5/5 · Sleep 3 · Energy 4 · Soreness 2 · Stress 4 · Overall 3 · ${LOWER} · ${SORE} — trained as written by choice`, '',
-    'Notes from athlete', 'Fixture imported note.', '', 'Full summary',
-    'Day 3 — Pull Day (fixture)', 'Status: Complete', 'Session RPE: 8/10', 'Duration: 40 min', '',
-    'Readiness (at start) — composite 3.5/5:', '  Sleep last night: 3/5 (Okay)', '  Energy levels: 4/5 (Good)', '  How sore are you: 2/5 (Quite sore)',
-    '  Stress: 4/5 (Calm)', '  How ready do you feel overall: 3/5 (Okay)', `Today: ${LOWER} · ${SORE} — trained as written by choice`, '',
-    'Notes from athlete:', 'Fixture imported note.', '', 'Exercise log:', '', '[Primary]', '• Trap Bar Deadlift (✓)', '    Set 1: 80 ×6 @7 ✓', '    Set 2: 80 ×6 @8 ✓'].join('\n');
-  await page.locator('button', { hasText: 'Add past session from email' }).click();
-  await page.locator('#as-paste').fill(email);
-  await page.locator('button', { hasText: 'Read email' }).click();
-  const preview = await page.locator('#as-preview').innerText();
-  check(r, 'the preview shows the verdict beside the readiness number', /3\.5\/5 · lower day · sore: jumps halved \(trained as written\)/.test(preview.replace(/\s+/g, ' ')), preview.replace(/\s+/g, ' ').slice(0, 300));
-  const day = require('./fixtures').daysAgo(today, 5);
-  await page.locator('#as-date').fill(day);
-  const n0 = await L.nCalls(page);
-  await page.locator('#as-save').click(); await L.settle(page, 800);
-  const c = (await L.callsSince(page, n0)).filter(x => x.name === 'save_session').slice(-1)[0];
-  const rd = c && c.payload.p_session.readiness;
-  check(r, 'save_session carries the verdict in the shape the app stores', rd && rd.level === 'amber' && rd.sore === 'half' && rd.drop === 1 && rd.asWritten === true && rd.score === 3.5, rd);
-  check(r, 'and the answers', rd && rd.composite === 3.5 && rd.sleep === 3 && rd.soreness === 2, rd);
-  const top = await page.locator('.wday', { hasText: 'Pull Day (fixture)' }).locator('.wday-top').innerText();
-  check(r, 'the day card names it like any session the app sent', /lower day · sore: jumps halved \(trained as written\)/.test(top.replace(/\s+/g, ' ')), top.replace(/\s+/g, ' '));
-  // An email with no check-in line stores no verdict.
-  await page.locator('button', { hasText: 'Add past session from email' }).click();
-  await page.locator('#as-paste').fill(email.replace(/Today: [^\n]*\n/, '').replace(/ · lower day[^\n]*/, ''));
-  await page.locator('button', { hasText: 'Read email' }).click();
-  await page.locator('#as-date').fill(require('./fixtures').daysAgo(today, 9));
-  const n1 = await L.nCalls(page);
-  await page.locator('#as-save').click(); await L.settle(page, 800);
-  const c2 = (await L.callsSince(page, n1)).filter(x => x.name === 'save_session').slice(-1)[0];
-  const rd2 = c2 && c2.payload.p_session.readiness;
-  check(r, 'no check-in line: the answers are stored and no verdict is invented', rd2 && rd2.composite === 3.5 && rd2.level === undefined && rd2.sore === undefined, rd2);
-  await page.context().close();
-  return r;
-};
-
 S['login-used-mark'] = async (b) => {
   const r = { id: 'login-used-mark', title: 'Logins to send marks a password that has already been used to sign in', checks: [] };
   const { page } = await L.openCoach(b, { hash: 'athletes' });
@@ -3021,30 +2925,6 @@ S['session-hide-no-false-warning'] = async (b) => {
   return r;
 };
 
-S['session-hide-add-over'] = async (b) => {
-  const r = { id: 'session-hide-add-over', title: 'Add past session over a HIDDEN one: it asks, brings it back and replaces the old log', checks: [] };
-  const { page, log, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
-  const day = require('./fixtures').daysAgo(today, 6);
-  await hideFixture(page, day, false);
-  await page.evaluate(([k]) => hideSession('ava_test', 3, k), [day]); await L.settle(page, 900);
-  const email = ['Full summary', 'Day 3 — Pull Day (fixture)', 'Status: Complete', 'Session RPE: 8/10', 'Duration: 40 min', '', 'Exercise log:', '[Primary]', '• Trap Bar Deadlift (✓)', '    Set 1: 80 @7 ✓'].join('\n');
-  await page.locator('button', { hasText: 'Add past session from email' }).click();
-  await page.locator('#as-paste').fill(email);
-  await page.locator('button', { hasText: 'Read email' }).click();
-  await page.locator('#as-date').fill(day);
-  const n0 = await L.nCalls(page);
-  await page.locator('#as-save').click(); await L.settle(page, 900);
-  const confirmText = ((log.dialogs.filter(d => d.type === 'confirm').slice(-1)[0]) || {}).message || '';
-  check(r, 'it asks first and says the session is hidden and will come back', /HIDDEN session/.test(confirmText) && /brings it back/.test(confirmText), confirmText);
-  const c = (await L.callsSince(page, n0)).filter(x => x.name === 'save_session').slice(-1)[0];
-  check(r, 'save_session asks to replace the old log', !!c && c.payload.p_session.replace_log === true, c && c.payload.p_session.replace_log);
-  const row = (await L.db(page)).session_history.find(x => x.athlete_id === 'ava_test' && x.day === 3 && x.completed_on === day);
-  check(r, "the session is back (not hidden) with the email's log, the old set-by-set log gone", !!row && !row.hidden_at && row.log == null && /Trap Bar Deadlift/.test(row.summary), row && { hidden: row.hidden_at, log: row.log });
-  check(r, 'no page errors', !log.errors.length, log.errors);
-  await page.context().close();
-  return r;
-};
-
 // ── What became of an application (audit FLOW-17, SPINE-11; pile A8, stage61; 2026-10-11) ───────────────────────────────────────────────────
 S['intake-outcome'] = async (b) => {
   const r = { id: 'intake-outcome', title: "Intake: an application records what happened and the athlete it became; the athlete's File says where they came from", checks: [] };
@@ -3355,10 +3235,10 @@ S['fail-bar'] = async (b) => {
 };
 
 // ── What the coach typed or opened in an athlete's file survives a redraw (audit FILE-9, 2026-10-11, pile B4) ───────────────────
-// A redraw used to rebuild the tab from scratch: it wiped the password box and an email pasted under "Add past session", hid the add-session
-// box again and folded Version history, the Coaching log, a day's raw log and the live snapshot shut.
+// A redraw used to rebuild the tab from scratch: it wiped the password box and folded Version history, the Coaching log, a day's raw
+// log and the live snapshot shut. (The Add past session box it also covered was removed on 2026-10-12.)
 S['file-redraw-keeps-work'] = async (b) => {
-  const r = { id: 'file-redraw-keeps-work', title: 'A redraw keeps the password box, the pasted email and the sections the coach opened, for that athlete only', checks: [] };
+  const r = { id: 'file-redraw-keeps-work', title: 'A redraw keeps the password box and the sections the coach opened, for that athlete only', checks: [] };
   const { page, log, today } = await L.openCoach(b, { hash: 'a/ava_test/file' });
   const FX = require('./fixtures');
   // File tab: the Change password box with typed text and the cursor in it; Version history and the Coaching log open.
@@ -3390,41 +3270,76 @@ S['file-redraw-keeps-work'] = async (b) => {
   const ben = await fileState();
   check(r, 'another athlete\'s file starts with no typed password and the sections shut', !ben.pw && !ben.pv && !ben.cl, ben);
 
-  // The work tab: Add past session from email with a pasted email, a date and the preview.
+  // The work tab: a day's raw log the coach opened stays open through a tab-body redraw and a full one.
   await L.go(page, 'a/ava_test/work');
-  await page.locator('button', { hasText: '+ Add past session from email' }).click();
-  const email = 'Athlete: Ava Example\nDay 3 — Pull Day (fixture)\nStatus: Complete\nSession RPE: 7\nDuration: 40\n\nExercise log:\n[Primary]\n• Trap Bar Deadlift (✓)\n    Set 1: 80 @8 ✓';
-  const day = FX.daysAgo(today, 2);
-  await page.locator('#as-paste').fill(email);
-  await page.locator('#as-date').fill(day);
-  await page.locator('button', { hasText: 'Read email' }).click();
   await page.evaluate(() => { const d = document.querySelector('.wday .rawlog'); if (d) d.open = true; });
-  const addState = () => page.evaluate(() => ({
-    shown: (document.getElementById('add-session') || {}).style && document.getElementById('add-session').style.display === 'block',
-    paste: (document.getElementById('as-paste') || {}).value, date: (document.getElementById('as-date') || {}).value,
-    preview: (document.getElementById('as-preview') || {}).innerText || '', canSave: !!document.getElementById('as-save') && !document.getElementById('as-save').disabled,
-    rawOpen: !!document.querySelector('.wday .rawlog[open]') }));
-  const before = await addState();
-  check(r, 'set-up: the box is open, the email read, Save enabled, a raw log open', before.shown && before.paste === email && /Day 3/.test(before.preview) && before.canSave && before.rawOpen, before);
+  const rawOpen = () => page.evaluate(() => !!document.querySelector('.wday .rawlog[open]'));
+  check(r, 'set-up: a day\'s raw log is open', await rawOpen(), '');
   for (const [name, fn] of [['toggling a day card (a tab-body redraw)', () => toggleWorkDay(2)], ['a full redraw', () => { assemble(); render(); }]]) {
     await page.evaluate(fn); await L.settle(page, 700);
-    const st = await addState();
-    check(r, name + ': the add-session box stays open with the pasted email, the date, the preview and Save', st.shown && st.paste === email && st.date === day && /Day 3/.test(st.preview) && st.canSave, st);
+    check(r, name + ': the raw log is still open', await rawOpen(), '');
   }
-  check(r, 'a day\'s raw log that was open stays open through a full redraw', (await addState()).rawOpen, '');
-  // Saving the session clears the box (it must not come back after the refresh the save triggers).
-  const saveBtn = page.locator('#as-save');
-  const pressable = (await saveBtn.isVisible()) && (await saveBtn.isEnabled());
-  check(r, 'Save to logs can still be pressed after the redraws', pressable, await addState());
-  if (pressable) {
-    await saveBtn.click(); await L.settle(page, 1200);
-    const after = await addState();
-    check(r, 'after Save the box is empty and shut, with no preview and Save disabled', !after.shown && !after.paste && !after.date && !after.preview.trim() && !after.canSave, after);
-    check(r, 'the session was saved', (await L.db(page)).session_history.some(x => x.athlete_id === 'ava_test' && x.day === 3 && x.completed_on === day), '');
-  }
-  await L.go(page, 'a/ben_test/work');
-  const benWork = await addState();
-  check(r, 'another athlete\'s work tab has the box shut and empty', !benWork.shown && !benWork.paste, benWork);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── The work tab is this cycle's (2026-10-12; Amir, a day into a new cycle: "all im seeing is his past cycle") ─────────────────────────
+S['work-this-cycle'] = async (b) => {
+  const r = { id: 'work-this-cycle', title: "The work: a dated cycle's day cards hold only its own sessions; earlier ones are under Earlier cycles", checks: [] };
+  const { page, log, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const FX = require('./fixtures');
+  const card = n => page.locator('.wday', { hasText: n });
+  const top = async n => (await card(n).locator('.wday-top').innerText()).replace(/\s+/g, ' ');
+  // An undated cycle (the fixture): every session on the cards and no Earlier cycles, as before.
+  check(r, 'an undated cycle: Day 2 shows its session and there is no Earlier cycles', /Complete/.test(await top('Upper Push (fixture)')) && (await page.locator('#earlier-cycles').count()) === 0, await top('Upper Push (fixture)'));
+  // The cycle began 2 days ago: Day 1 from yesterday is this cycle's; Day 2 (3 days ago) and the older Day 1 (8 days ago) are the last cycle's.
+  await page.evaluate(s => { const p = window.__DB.programs.find(x => x.athlete_id === 'ava_test'); p.data.cycles[0].startDate = s; return hardRefresh(); }, FX.daysAgo(today, 2));
+  await L.settle(page, 900);
+  check(r, "Day 1 shows this cycle's session", /Complete/.test(await top('Legs First (fixture)')), await top('Legs First (fixture)'));
+  check(r, "Day 1 has no picker: last cycle's Day 1 is not one of its sessions", (await card('Legs First (fixture)').locator('.sesspick').count()) === 0, '');
+  check(r, 'Day 2 is not logged this cycle (its last session was the previous cycle)', /not logged yet/.test(await top('Upper Push (fixture)')) && /this cycle/.test(await top('Upper Push (fixture)')), await top('Upper Push (fixture)'));
+  const earlier = page.locator('#earlier-cycles');
+  check(r, 'Earlier cycles lists the two older sessions, folded', (await earlier.count()) === 1 && /Earlier cycles · 2 sessions/i.test(await earlier.locator('summary').first().innerText()) && (await earlier.getAttribute('open')) === null, await earlier.count());
+  await earlier.locator('summary').first().click();
+  const rows = await earlier.locator(':scope > details.rawlog > summary').allInnerTexts();
+  check(r, 'each one dated, with its day, newest first', rows.length === 2 && /Day 2/i.test(rows[0]) && /Day 1/i.test(rows[1]), rows);
+  await page.evaluate(() => { assemble(); render(); }); await L.settle(page, 700);
+  check(r, 'Earlier cycles stays open through a redraw', (await page.locator('#earlier-cycles').getAttribute('open')) !== null, '');
+  const n0 = await L.nCalls(page);
+  const first = page.locator('#earlier-cycles > details.rawlog').first();
+  await first.locator('summary').click();
+  await first.locator('button', { hasText: 'Hide this log' }).click();
+  await L.settle(page, 900);
+  const hid = (await L.callsSince(page, n0)).filter(x => x.name === 'coach_hide_session').slice(-1)[0];
+  check(r, 'Hide this log works from Earlier cycles', !!hid && hid.payload.p_day === 2 && hid.payload.p_completed_on === FX.daysAgo(today, 3) && hid.payload.p_hide === true, hid && hid.payload);
+  check(r, 'the work tab has no Add past session box any more', (await page.locator('button', { hasText: 'Add past session' }).count()) === 0 && (await page.locator('#as-paste').count()) === 0, '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── The phone's finished-sessions list (program.html _noteFinished(), 2026-10-12): "session not synced" with no email report ─────────
+S['sync-finished-list'] = async (b) => {
+  const r = { id: 'sync-finished-list', title: "A session on the phone's finished list with no row is a sync warning, email or not", checks: [] };
+  const { page, log, today } = await L.openCoach(b, { hash: 'today' });
+  const FX = require('./fixtures');
+  const keys = () => page.evaluate(() => reasonsOf(S.ath.ava_test).map(x => x.key));
+  const gaps = () => page.evaluate(() => S.ath.ava_test.syncGaps.map(g => g.day + '|' + g.on));
+  const setList = async list => {
+    await page.evaluate(l => { const p = window.__DB.athlete_progress.find(x => x.athlete_id === 'ava_test'); p.data['ava_test_finished'] = JSON.stringify(l); return hardRefresh(); }, list);
+    await L.settle(page, 900);
+  };
+  await setList(['1|' + FX.daysAgo(today, 1), '2|' + FX.daysAgo(today, 3)]);
+  check(r, 'every session on the list is on file: no warning', !(await keys()).includes('sync'), await gaps());
+  await setList(['1|' + FX.daysAgo(today, 1), '3|' + FX.daysAgo(today, 2)]);
+  check(r, 'Day 3 finished on the phone two days ago and not on file: the warning names it', (await keys()).includes('sync') && (await gaps()).join() === '3|' + FX.daysAgo(today, 2), await gaps());
+  await setList(['3|' + FX.daysAgo(today, 20)]);
+  check(r, 'an entry older than 14 days is not chased', !(await keys()).includes('sync'), await gaps());
+  await setList(['3|' + FX.daysAgo(today, 2)]);
+  await hideFixture(page, FX.daysAgo(today, 2), false);
+  await page.evaluate(([k]) => hideSession('ava_test', 3, k), [FX.daysAgo(today, 2)]); await L.settle(page, 900);
+  check(r, 'a hidden session counts as on file', !(await keys()).includes('sync'), await gaps());
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

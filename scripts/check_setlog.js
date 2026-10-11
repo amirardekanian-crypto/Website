@@ -44,6 +44,8 @@ Object.assign(P, {
   getDayCompletion: () => ({ done: 1, total: 1, missing: [], excused: [] }),
   loadTimer: () => null, timerElapsedMs: () => 0,
   loadReadiness: () => null, READINESS_QUESTIONS: [], readinessPlanLine: () => '',
+  // The day the session is filed under (2026-10-12: its check-in and clock are judged by it). No clock or check-in here.
+  sessionDateFor: () => '2026-01-01', ymdLocal: () => '2026-01-01', sessionIsStale: () => true,
   loadSessionNote: () => '',
   circuitWKey: n => 'test_cwlog_' + n, circuitRpeKey: n => 'test_rpe_' + n,
 });

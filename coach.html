@@ -782,14 +782,8 @@
   /* Session-note actions (Mark read). Amir answers only on WhatsApp, 2026-09-26. */
   .note-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 
-  /* Import form (ported) */
-  .add-session { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
-  .add-session textarea { width: 100%; min-height: 120px; resize: vertical; border: 1px solid var(--line); border-radius: 10px;
-    padding: 10px 12px; font-family: 'Space Mono', monospace; font-size: 12px; line-height: 1.5; background: var(--paper); }
-  .add-session-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
-  .add-session-row label { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
-  .add-session-row input[type=date] { font-size: 14px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--paper); }
-  .add-session-preview:empty { display: none; }
+  /* Earlier cycles (workTabHtml): last cycle's sessions, folded under this cycle's day cards. */
+  details.rawlog.earlier > details.rawlog { margin: 8px 0 0; }
 
   /* ── Board (leaderboard) ── */
   .lbrow { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; margin-bottom: 7px;
@@ -2014,6 +2008,18 @@ function syncGapsOf(blob, id, sessions) {
     const on = /^\d{4}-\d{2}-\d{2}$/.test(filed) ? filed : String(blob[k] || '').slice(0, 10);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(on)) return;
     if (!have.has(Number(day) + '|' + on)) gaps.push({ day: Number(day), on });
+  });
+  // The phone's own list of the sessions it finished (program.html _noteFinished(), 2026-10-12): the same check with no email at all,
+  // so it keeps working when the reports go. The last 14 days only: a session deleted for good from the athlete's File stays on the
+  // phone's list, and an old entry is not chased for ever.
+  let fin = blob[id + '_finished'];
+  try { if (typeof fin === 'string') fin = JSON.parse(fin); } catch (e) { fin = null; }
+  const since = addDays(todayKey(), -14);
+  (Array.isArray(fin) ? fin : []).forEach(x => {
+    const m = /^(\d+)\|(\d{4}-\d{2}-\d{2})$/.exec(String(x));
+    if (!m || m[2] < since) return;
+    const day = Number(m[1]), on = m[2];
+    if (!have.has(day + '|' + on) && !gaps.some(g => g.day === day && g.on === on)) gaps.push({ day, on });
   });
   return gaps.sort((x, y) => String(y.on).localeCompare(String(x.on)));
 }
@@ -4064,9 +4070,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   // session was done against an older version of the program. Say so — the
   // alternative is a screen of "not logged" rows that reads like they quit.
   const stale = !!(s && v.total && v.missing === v.total && cmp.extras > 0);
-  // Trained before the current cycle began: the plan on screen is not the one they trained.
-  const cyc0 = _D && _D.a && _D.a.cycle;
-  const before = !!(s && cyc0 && cyc0.start && s.completed_on < cyc0.start);
+  // (A session trained before the current cycle began never reaches a day card: workTabHtml() lists it under Earlier cycles.)
   const focus = (s && s.focus) || (pd && pd.focusTag) || '';
   const open = _workOpen[dayNum] !== undefined ? _workOpen[dayNum] : !!defaultOpen;
   const needsReply = sessions.some(sessionNeedsReply);
@@ -4076,6 +4080,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   if (!s) { status = sessions.length ? 'never finished' : 'not logged yet'; statusTone = 'idle'; }
   else if (isPartialStatus(s.status)) { status = 'Partial'; statusTone = 'warn'; }
   else { status = 'Complete'; statusTone = 'ok'; }
+  const thisCycle = !!(_D && _D.a && _D.a.cycle && _D.a.cycle.start);   // a dated cycle: the cards hold only its sessions (workTabHtml)
   const meta = [];
   if (s) {
     meta.push(prettyDate(s.completed_on));
@@ -4096,7 +4101,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
   const verdictBits = [];
   if (v.missing) verdictBits.push(v.missing + ' not done');
   if (v.off) verdictBits.push(v.off + ' off plan');
-  const scoreline = !s ? '' : before ? `<span class="dv">previous cycle</span>` : v.total
+  const scoreline = !s ? '' : v.total
     ? `<span class="dv ${v.missing ? 'miss' : v.off ? 'warn' : 'ok'}">${esc(verdictBits.join(' · ')) || 'all on plan'}</span>
        <span class="dv-sub">${v.clean}/${v.total} exactly as prescribed</span>`
     : '';
@@ -4132,15 +4137,14 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
       <span class="wday-n">${esc(dayNum)}</span>
       <span class="wday-main">
         <span class="wday-title">${esc(focus || 'Day ' + dayNum)}${needsReply ? ' <span class="zpill reply">note to read</span>' : ''}</span>
-        <span class="wday-meta">${esc(meta.join(' · ')) || 'nothing logged against this day yet'}</span>
+        <span class="wday-meta">${esc(meta.join(' · ')) || (thisCycle ? 'nothing logged on this day this cycle yet' : 'nothing logged against this day yet')}</span>
       </span>
       <span class="wday-right">${scoreline}<span class="tag ${statusTone === 'ok' ? 'done' : statusTone === 'warn' ? 'partial' : ''}">${esc(status)}</span></span>
       <span class="day-c-chev">▾</span>
     </button>
     <div class="wday-body">
       ${picker}
-      ${before ? `<div class="stalewarn">Trained on ${esc(prettyDate(s.completed_on))}, <b>before this cycle began</b> (${esc(prettyDate(cyc0.start))}): it is compared with the current plan, not the one they trained.</div>`
-        : stale ? `<div class="stalewarn">This session was done against an <b>earlier version of the program</b> — none of the current day’s exercises appear in it. What they actually did is under <i>Logged, not prescribed</i>.</div>` : ''}
+      ${stale ? `<div class="stalewarn">This session was done against an <b>earlier version of the program</b> — none of the current day’s exercises appear in it. What they actually did is under <i>Logged, not prescribed</i>.</div>` : ''}
       ${noteBox}
       ${body}
       ${s ? `<details class="rawlog" id="raw-${uid}"><summary>Raw log, exactly as sent</summary>
@@ -4153,20 +4157,27 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
 }
 function workTabHtml(D) {
   const { athleteId, programDays, history, lib, metrics } = D;
+  // The dates the athlete's phone uses for its renewal banner (SCHEMA.md: endDate). They were never shown here.
+  const cd = D.a && D.a.cycle;
+  // The day cards are THIS cycle's (Amir, 2026-10-12, a day after a new cycle began: "all im seeing is his past cycle"):
+  // a session trained before the cycle's start date is not this Day 1, it is last cycle's, and it sat on the new day's
+  // card compared with a plan it never trained. Those are listed under Earlier cycles. A cycle with no start date
+  // keeps every session on the cards, as before.
+  const startOn = cd && cd.start ? String(cd.start) : null;
+  const cur = startOn ? history.filter(s => String(s.completed_on) >= startOn) : history;
+  const earlier = startOn ? history.filter(s => String(s.completed_on) < startOn) : [];
   const byDay = {};
-  history.forEach(s => { (byDay[s.day] = byDay[s.day] || []).push(s); });
+  cur.forEach(s => { (byDay[s.day] = byDay[s.day] || []).push(s); });
   Object.values(byDay).forEach(arr => arr.sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on))));
   const order = programDays.map(d => Number(d.id));
   const loggedOnly = Object.keys(byDay).map(Number).filter(d => order.indexOf(d) === -1).sort((a, b) => a - b);
   // Only the most recently trained day opens by itself. Every card expanded at
   // once is how the old page got to four thousand pixels.
-  const freshest = history.length ? Number(history[0].day) : null;
+  const freshest = cur.length ? Number(cur[0].day) : null;
   const cards = order.map(d => workDayCard(athleteId, programDays.find(p => Number(p.id) === d), d, byDay[d] || [], lib, d === freshest))
     .concat(loggedOnly.map(d => workDayCard(athleteId, null, d, byDay[d], lib, d === freshest)));
 
   const cyc = (D.program && D.program.cycles || [])[(D.program && Number.isInteger(D.program.currentCycleIndex)) ? D.program.currentCycleIndex : 0];
-  // The dates the athlete's phone uses for its renewal banner (SCHEMA.md: endDate). They were never shown here.
-  const cd = D.a && D.a.cycle;
   const fmtD = iso => { const p = pDate(iso); return `${p.getDate()} ${MONTHS[p.getMonth()]}`; };
   const left = cd && cd.end ? daysBetween(todayKey(), cd.end) : null;
   const dates = cd && (cd.start || cd.end) ? `<div class="cyc-dt">${cd.start ? esc(fmtD(cd.start)) : '?'} – ${cd.end ? esc(fmtD(cd.end)) : '?'}${
@@ -4185,19 +4196,26 @@ function workTabHtml(D) {
     ${cards.length ? cards.join('') : `<p class="empty">${D.a.tier === 'coached' || S.progSrc[athleteId] !== 'db'
         ? 'No training programme published yet, and no finished sessions.'
         : 'No training programme: this is a habit-only (Proof) athlete. Their habits are under Proof.'}</p>`}
-    <div class="sec"><span>Backfill</span>
-      <span class="acts"><button class="btn sm" onclick="toggleAddSession()">+ Add past session from email</button></span></div>
-    <div id="add-session" class="add-session" style="display:none">
-      <p class="empty" style="padding:0 0 10px">Paste a session-report email, set the date it was done, then save. It's written exactly like a live finish.</p>
-      <textarea id="as-paste" placeholder="Paste the whole email here…"></textarea>
-      <div class="add-session-row">
-        <label>Date done <input type="date" id="as-date" max="${todayKey()}" required></label>
-        <button class="btn sm" onclick="parseAndFillSession()">Read email</button>
-        <button class="btn sm primary" id="as-save" onclick="submitPastSession(${jsq(athleteId)})" disabled>Save to logs</button>
-      </div>
-      <div id="as-preview" class="add-session-preview"></div>
-    </div>
+    ${earlierCyclesHtml(D, earlier)}
     ${live}`;
+}
+// Sessions from before this cycle began, newest first, each with its log exactly as sent. Folded: the cycle on
+// screen is the one being coached; this is where last cycle's Day 1 went (workTabHtml()).
+function earlierCyclesHtml(D, earlier) {
+  if (!earlier.length) return '';
+  const rows = earlier.slice(0, 80).map(s => {
+    const uid = ('eh_' + D.athleteId + '_' + s.day + '_' + s.completed_on).replace(/[^a-z0-9]/gi, '_');
+    const bits = [prettyDate(s.completed_on), 'Day ' + s.day + (s.focus ? ' — ' + s.focus : ''), isPartialStatus(s.status) ? 'Partial' : 'Complete'];
+    if (s.session_rpe != null) bits.push('sRPE ' + s.session_rpe + '/10');
+    if (s.duration_min != null) bits.push(s.duration_min + ' min');
+    return `<details class="rawlog" id="${uid}"><summary>${esc(bits.join(' · '))}</summary>
+      <div class="elog-body">${D.logsErr ? 'The log did not load.' : esc(exerciseLogPart(s.summary))}</div>
+      <div class="note-actions"><button class="btn sm" onclick="hideSession(${jsq(D.athleteId)}, ${Number(s.day)}, ${jsq(s.completed_on)})">Hide this log</button></div>
+    </details>`;
+  }).join('');
+  return `<details class="rawlog earlier" id="earlier-cycles"><summary>Earlier cycles · ${earlier.length} session${earlier.length === 1 ? '' : 's'}</summary>
+    ${rows}${earlier.length > 80 ? `<p class="empty" style="padding:8px 0 0">The 80 most recent are listed.</p>` : ''}
+  </details>`;
 }
 // What the athlete has on the record, and how stale it is. Absent rather than
 // empty when there is nothing — same rule as weightPanel(): an empty card on
@@ -4359,7 +4377,7 @@ function liveSnapshotHtml(D) {
 // One person, five screens. It used to be eight sections on a single scroll —
 // three of which rendered the same program days three different ways — so the
 // page opened at four thousand pixels and buried the only thing worth reading.
-let _detailName = '', _detailHistory = [], _D = null;
+let _D = null;
 const _callErr = {};   // athlete id -> why their call logs did not load (cleared when they do)
 const SUBTABS = [
   { id: 'work',  label: 'The work' },
@@ -4425,7 +4443,6 @@ async function renderDetail(athleteId, sub) {
     // A rebuild of the SAME athlete (after a save or a refresh) keeps the days the coach had
     // open and the session they were comparing; only a different athlete starts fresh.
     if (!sameAthlete) { _workSel = {}; _workOpen = {}; Object.keys(_exDrafts).forEach(k => delete _exDrafts[k]); }
-    _detailName = a.name; _detailHistory = history;
   }
   const has = { proof: !!(a.isHab || isSignup(a.contact)), work: true, file: true };
   // With no screen named in the address, a habit-only athlete (free or Proof, no training days)
@@ -4468,19 +4485,17 @@ async function renderDetail(athleteId, sub) {
   }
 }
 // ── What the coach typed or opened in an athlete's tab survives a redraw (audit FILE-9, pile B4) ───────────────────────────────
-// A redraw rebuilds the tab from scratch. It used to wipe the password box and an email pasted under "Add past session", hide that
-// box again and fold shut every section the coach had opened (Version history, the Coaching log, a day's raw log, the live
-// snapshot). The snapshot is read off the tab that is on screen BEFORE it is replaced and put back on the new one, and only when it is
-// the same athlete's same screen (a different athlete or sub-tab starts clean). A save that clears a field clears it first.
-const KEEP_TYPED = ['athPw', 'waNum', 'stNote', 'as-paste', 'as-date'];
+// A redraw rebuilds the tab from scratch. It used to wipe the password box and fold shut every section the coach had opened
+// (Version history, the Coaching log, a day's raw log, Earlier cycles, the live snapshot). The snapshot is read off the tab that is
+// on screen BEFORE it is replaced and put back on the new one, and only when it is the same athlete's same screen (a different
+// athlete or sub-tab starts clean). A save that clears a field clears it first.
+const KEEP_TYPED = ['athPw', 'waNum', 'stNote'];
 function snapTabBody() {
   const box = $('tabbody');
   if (!box || !box.dataset.athlete) return null;
-  const st = { athleteId: box.dataset.athlete, sub: box.dataset.sub, typed: {}, open: [], add: null, focus: null };
+  const st = { athleteId: box.dataset.athlete, sub: box.dataset.sub, typed: {}, open: [], focus: null };
   KEEP_TYPED.forEach(id => { const el = $(id); if (el && el.value !== '') st.typed[id] = el.value; });
   box.querySelectorAll('details[id]').forEach(d => { if (d.open) st.open.push(d.id); });
-  const add = $('add-session');
-  if (add) st.add = { shown: add.style.display !== 'none', preview: $('as-preview') ? $('as-preview').innerHTML : '', canSave: !!$('as-save') && !$('as-save').disabled };
   const f = document.activeElement;
   if (f && f.id && KEEP_TYPED.includes(f.id) && box.contains(f)) st.focus = { id: f.id, a: f.selectionStart, b: f.selectionEnd };
   return st;
@@ -4490,11 +4505,6 @@ function restoreTabBody(st, athleteId, sub) {
   Object.keys(st.typed).forEach(id => { const el = $(id); if (el) el.value = st.typed[id]; });
   // Setting open fires the section's own toggle handler, which loads what it shows again.
   st.open.forEach(id => { const d = $(id); if (d && d.tagName === 'DETAILS') d.open = true; });
-  if (st.add && $('add-session')) {
-    $('add-session').style.display = st.add.shown ? 'block' : 'none';
-    if ($('as-preview')) $('as-preview').innerHTML = st.add.preview;
-    if ($('as-save')) $('as-save').disabled = !st.add.canSave;
-  }
   if (st.focus) {
     const el = $(st.focus.id);
     if (el) { el.focus({ preventScroll: true }); try { el.setSelectionRange(st.focus.a, st.focus.b); } catch (e) {} }
@@ -4809,7 +4819,11 @@ function markHistRead(rows) {
 }
 window.markNoteRead = markNoteRead;
 
-// --- import a past session from a coach email (ported) ----------------------
+// --- the session-report email, read back into a session -----------------------
+// The page no longer offers it (the "+ Add past session from email" box was removed on 2026-10-12; Amir: "i will never do
+// that manually"). It stays here as the ONE reader of the report's format, held to the app's writer by scripts/check_twins.js
+// and scripts/test_coach_compare.js, and used by scripts/restore/sessions_from_email.js when a session must be put back from
+// an email. Not called by the page.
 function parseSessionEmail(text) {
   const t = String(text || '').replace(/\r/g, '');
   const fs = t.indexOf('Full summary');
@@ -4884,93 +4898,7 @@ function parseCheckinPlan(text) {
   if (!red && !amber && !sore) return null;
   return { level: red ? 'red' : amber ? 'amber' : 'green', sore, drop: red || amber ? 1 : 0, asWritten: /trained as written by choice/.test(win) };
 }
-// Does the email's "Athlete" line name this athlete? Loose on purpose (first name, either order).
-function emailNamesAthlete(who, athleteId) {
-  if (!who) return true;
-  const words = x => String(x || '').toLowerCase().replace(/[^a-z\u0600-\u06ff0-9 ]/g, ' ').split(/\s+/).filter(w => w.length > 1);
-  const p = S.programs[athleteId], ath = p && p.athlete;
-  const mine = new Set(words([nameOf(athleteId), ath && ath.firstName, ath && ath.lastName, unslug(athleteId)].join(' ')));
-  return words(who).some(w => mine.has(w));
-}
-let _pendingImport = null;
-function toggleAddSession() {
-  const el = $('add-session');
-  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
-}
-function parseAndFillSession() {
-  const ta = $('as-paste');
-  if (!ta) return;
-  _pendingImport = parseSessionEmail(ta.value);
-  const p = _pendingImport;
-  const r = p.readiness;
-  const rTxt = !r ? '—' : r.skipped ? 'skipped' : `${r.composite != null ? r.composite + '/5' : ''}${planLabelC(r) ? ' · ' + planLabelC(r) : ''}`;
-  $('as-preview').innerHTML = !p.day
-    ? '<p style="color:var(--clay-ink);margin-top:10px">Couldn\'t find a "Day N" line — paste the full email (including the Full summary block).</p>'
-    : `<table class="meta-table">
-        ${p.who ? `<tr><td class="k">Athlete</td><td class="v">${esc(p.who)}${emailNamesAthlete(p.who, _D && _D.athleteId) ? '' : ' <b style="color:var(--clay-ink)">— not ' + esc(_detailName) + '?</b>'}</td></tr>` : ''}
-        <tr><td class="k">Day</td><td class="v">Day ${esc(p.day)}${p.focus ? ' — ' + esc(p.focus) : ''}</td></tr>
-        <tr><td class="k">Status</td><td class="v">${esc(p.status)}</td></tr>
-        <tr><td class="k">Session RPE</td><td class="v">${esc(p.session_rpe || '—')}</td></tr>
-        <tr><td class="k">Duration</td><td class="v">${esc(p.duration_min || '—')}${p.duration_min ? ' min' : ''}</td></tr>
-        <tr><td class="k">Readiness</td><td class="v">${esc(rTxt)}</td></tr>
-        <tr><td class="k">Exercises</td><td class="v">${Object.keys(logIndex(parseSessionLog(p.summary))).length} logged</td></tr>
-      </table>`;
-  $('as-save').disabled = !p.day;
-}
-async function submitPastSession(athleteId) {
-  if (!_pendingImport || !_pendingImport.day) { fail('Paste an email and tap "Read email" first.'); return; }
-  const dateEl = $('as-date');
-  const completedOn = dateEl && dateEl.value;
-  if (!completedOn) { fail('Pick the date this session was done (from the email).'); return; }
-  if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  const p = _pendingImport;
-  if (!emailNamesAthlete(p.who, athleteId) &&
-      !confirm(`This email is from "${p.who}", but you are on ${_detailName}'s file.\n\nSave it to ${_detailName} anyway?`)) return;
-  // The same day already logged: on the same date the server REPLACES that session (and the
-  // app's set-by-set log for it) with the email's text; a few days apart it is probably the same
-  // session filed twice.
-  const sameDay = (_detailHistory || []).filter(x => Number(x.day) === Number(p.day));
-  const exact = sameDay.find(x => x.completed_on === completedOn);
-  const near = sameDay.filter(x => x !== exact && Math.abs(daysBetween(x.completed_on, completedOn)) <= 7);
-  // A session the coach hid (stage60) on that date: the server brings it back when the coach saves over it, so say so, and replace its log too.
-  const hiddenExact = (S.histHidden || []).find(x => x.athlete_id === athleteId && Number(x.day) === Number(p.day) && x.completed_on === completedOn);
-  if (hiddenExact && !confirm(`Day ${p.day} on ${prettyDate(completedOn)} is a HIDDEN session.\n\nSaving brings it back, REPLACED by this email's text, and the set-by-set log the app saved for it is lost. Carry on?`)) return;
-  if (exact && !confirm(`Day ${p.day} on ${prettyDate(completedOn)} is already logged.\n\nSaving REPLACES it with this email's text, and the set-by-set log the app saved for it is lost. Carry on?`)) return;
-  if (!exact && near.length && !confirm(`Day ${p.day} was already logged on ${near.map(x => prettyDate(x.completed_on)).join(', ')}.\n\nIs this a different session? Saving adds a second Day ${p.day}.`)) return;
-  const btn = $('as-save'); if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
-  const { error } = await sb.rpc('save_session', {
-    p_athlete_id: athleteId,
-    p_athlete_name: _detailName,
-    p_day: Number(p.day),
-    p_completed_on: completedOn,
-    p_session: {
-      status: p.status || 'Complete',
-      session_rpe: String(p.session_rpe || ''),
-      duration_min: String(p.duration_min || ''),
-      readiness: p.readiness || null,
-      day_note: p.day_note || '',
-      focus: p.focus || '',
-      summary: p.summary,
-      // Over a session already on that date: the email REPLACES it, set-by-set log included
-      // (stage46; the server used to keep the old log under the new text, coach only).
-      replace_log: !!exact || !!hiddenExact
-    },
-    // The coach is authorised as the coach now, not by holding the athlete's
-    // secret. Every key was deleted when the old links were retired.
-    p_key: null
-  });
-  if (error) { fail('Could not save: ' + error.message); if (btn) { btn.disabled = false; btn.textContent = 'Save to logs'; } return; }
-  _pendingImport = null;
-  ['as-paste', 'as-date'].forEach(id => { if ($(id)) $(id).value = ''; });      // the pasted email and its date; not the password box or the number box
-  if ($('as-preview')) $('as-preview').innerHTML = '';
-  if ($('as-save')) { $('as-save').disabled = true; $('as-save').textContent = 'Save to logs'; }
-  if ($('add-session')) $('add-session').style.display = 'none';
-  toast('Session saved');
-  refetch(['hist']);
-}
-window.toggleAddSession = toggleAddSession;
-window.parseAndFillSession = parseAndFillSession;
-window.submitPastSession = submitPastSession;
+// ── end of the email reader (scripts/test_coach_compare.js reads up to this line) ──
 
 // --- hide a session, and the deletes (ported; coach-only via RLS) -----------------------------------
 // A finished session is HIDDEN, not deleted (stage60, audit FILE-11 and ROSTER-9; Amir 2026-10-11: "hide it, keep it recoverable"). A hard delete left the

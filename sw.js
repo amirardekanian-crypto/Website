@@ -233,7 +233,10 @@
 // v109: program.html and habits.html changed (2026-10-12, SITE-AUDIT 25b): a phone whose clock runs behind no longer breaks sign-in. The Supabase client is
 //      given a fetch (fetchRetryExpired) that, on a 401 "JWT expired", refreshes the session once and repeats the call; before, the athlete saw "Plan not
 //      available" and the saved plan was thrown away. Without the bump a phone that cached the v108 shell keeps the old client.
-const CACHE = 'aap-v109';
+// v110: program.html changed (2026-10-12): a finished session goes into the phone's queue BEFORE it is sent and leaves it only when the server
+//      has it (10 sessions of 4 athletes were lost when the call never came back), a day left unfinished is filed by itself at the next open
+//      (no more Send it / Clear it), and the phone keeps a synced list of the sessions it finished. Without the bump a phone keeps the old save.
+const CACHE = 'aap-v110';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

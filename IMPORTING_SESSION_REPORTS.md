@@ -9,6 +9,15 @@ the one-liner below, to Claude.)
 
 That's it. Claude reads the emails, parses them, and upserts the rows.
 
+> **2026-10-12: putting back sessions the app lost.** Before that day a finished session could reach the inbox and never
+> reach `session_history` (the app queued a save only when the call came back with an error; one that never came back was
+> lost). Ten were found that way, by comparing every report since a date (inbox AND trash) with `session_history` by athlete
+> name, day and a window of three days before to one day after the email, and put back with
+> **`node scripts/restore/sessions_from_email.js <emails.json>`**: it reads each report with coach.html's own
+> `parseSessionEmail()` and prints an INSERT … ON CONFLICT DO NOTHING, so a session already on the server is never touched.
+> Read each email with Gmail's `get_message` (PLAIN_TEXT); `get_thread` was refused. The app now queues every session before
+> sending it, so this should not be needed again. The dashboard's *+ Add past session from email* box was removed the same day.
+
 ---
 
 ## How it works

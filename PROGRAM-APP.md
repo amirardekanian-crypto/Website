@@ -601,6 +601,14 @@ sits in front of the whole site).
 - ⚠️ **Exists twice**, in this file and `habits.html`: `_noAnswer()`, `_sbLoad()`, `_sbForSignIn()`, `readPlanCopy()` /
   `savePlanCopy()` / `dropPlanCopy()` / `planAnswerOf()` and the `plancache` shape. Change both. Proof's
   side: `HABITS.md` → *No signal*.
+- **A finished session waits on the phone until the server has it** (2026-10-12, after 10 sessions of 4 athletes reached
+  Amir by email and never reached the dashboard). `recordSessionToCloud()` puts the record in the session queue
+  (`<id>_csq`) BEFORE it calls `save_session`, and only the server's answer takes it out; a call that never answers
+  (capped at `SESSION_SAVE_MS`, 20 s) leaves it there. One entry per session (day and date). The queue drains at every
+  open, back in the foreground, on `online` and after a report goes, and it never syncs. Every finished session is also
+  noted in `<id>_finished` (synced), which coach.html reads to name one the server is missing. CODEBASE.md has the story;
+  `node scripts/headless/session-queue.js` holds it (a hanging server, a cloud copy of the queue, two Day 1s from
+  different weeks, an unfinished day filed online and offline).
 - **Left as is:** one bar of signal still costs up to the 6 s `get_program` wait before the copy opens.
   Waiting less when a copy exists would open slow-but-working connections on the copy more often; it is
   a separate call.
@@ -630,14 +638,19 @@ sits in front of the whole site).
   `sessionIsStale()`, the one test, used by the boot sweep, Start/Pause, `openGuided()` and
   `liveExerciseKeys()`). A session started at 23:30 used to lose its clock and check-in on a reopen after
   midnight, and a Start/Pause tap reset it; one finished at 23:50 lost its unsent note and rating.
-- **An unfinished day is asked about** (Amir, 2026-09-26: "Ask the athlete next open"). A real tick
-  (`toggleCheckOnly()`, `syncExerciseCheck()`, via `markTouched()`) records the day it happened in
-  `<id>_touched_d<N>`; the redraws that also run `updateProgress()` never write it. On a later open, a day with
-  logged work, no finish stamp and no session running (6 h grace) whose ticks are from an earlier date gets one
-  card above This Week: "Tuesday's Day 2 was never sent · 2 of 9 sets logged", **Send it** (a partial session
-  filed under the day it was trained: the finish stamp carries that date) or **Clear it** (two taps). Both then
-  let the sweep close the day as it would at midnight. Ticks from before 2026-09-26 carry no date and are not
-  asked about. The sweep still runs at launch only, not when the app returns to the foreground.
+- **An unfinished day is filed by itself** (Amir, 2026-10-12: *"i dont want any info or log to be lost"*; from
+  2026-09-26 it was asked about instead). A real tick (`toggleCheckOnly()`, `syncExerciseCheck()`, via
+  `markTouched()`) records the day it happened in `<id>_touched_d<N>`; the redraws that also run `updateProgress()`
+  never write it. On a later open, a day with logged work, no finish stamp and no session running (6 h grace) whose
+  ticks are from an earlier date is filed at once, before anything can be tapped (`fileUnfinished()`, from boot once
+  the days are drawn): a session as it was left, under the day it was trained (the finish stamp carries that date),
+  with that day's check-in and clock and no rating, into the session queue (*No signal* below). The page then opens once
+  more so the sweep closes the day, and one card above This Week says what was filed: "Saturday's Day 3 wasn't finished
+  · I still got it, as you left it: 1 of 25 sets", with OK (`paintUnfinished()`, the note `<id>_autofiled`, this phone
+  only). There is no Clear: Send it / Clear it threw the work away on Clear, and an athlete who did neither and trained
+  that day again mixed two sessions. Until a day is filed the sweep keeps its check-in, clock and the exercises it shares
+  with a finished day (`_awaitingFile()`). Ticks from before 2026-09-26 carry no date and are not filed. The sweep still
+  runs at launch only, not when the app returns to the foreground.
 
 ## 🏠 Home, led by the training (HOME-02, 2026-09-26)
 
@@ -794,7 +807,7 @@ tints, the running bar, labels, and so it marked nothing. Now:
 - **Clay stays on what asks the athlete to look**: the Coach's note (the box, its label, *More*, and the dot
   after the name), a Because (the solid clay ⓘ), an RPE over its target (the set's RPE tag, the selected
   button, the Last time box and the ghost line under a set that ran over), the tempo digit, a banner that asks
-  for something (a day never sent, a report waiting), a suggestion's kicker (LIB-01: *Sore today*, *Week done*),
+  for something (a day filed unfinished, a report waiting), a suggestion's kicker (LIB-01: *Sore today*, *Week done*),
   and the one number on a dark Home card (*Week 2*, the habits row's *2 to go*). The Library's Playbook door keeps its clay: it is a brand tile, not a signal.
 - **Green or grey for everything else**: every block's title, stripe and done tint are the same green (warm-up
   and power were clay and strength green, and a block the app did not recognise took its colour from its
@@ -844,13 +857,13 @@ size is a token in `:root`, picked by its job:
   four parts take two lines; before, they fitted only by running into the card's padding.
 - **One primary button** (part 2, 2026-09-27, after DS-01 settled that buttons are green): every filled action
   (Sign in, the welcome's Open Day 1, Begin session, Start/Pause, Rest, the rest timer's Pause, Guided's Done,
-  Send it, Done · send to coach, + Log a max, Log a max's Save to Personal Records, Weigh in) wears one look, set once at the end of the stylesheet:
+  the filed day's OK, Done · send to coach, + Log a max, Log a max's Save to Personal Records, Weigh in) wears one look, set once at the end of the stylesheet:
   green, white Barlow Condensed 700 in capitals, 1 px tracking, an 8 px corner, 44 px at the least. There were
   eleven (corners from 4 to 13 px, two fonts, tracking from 0.02 em to 1.5 px, weights 700 and 900, and Sign in
   and Open Day 1 in clay). Each rule keeps only its place and size: full-width actions at `--fs-body` (the
   welcome and Done at `--fs-lead`), compact ones in a card or the session bar smaller, where WK-02 and WK-03
   measured their widths (the slim bar's Pause keeps its 0.5 px tracking under 480 px). **A new primary action
-  joins that list; a secondary one is outlined** (Guided, Reset, Clear it).
+  joins that list; a secondary one is outlined** (Guided, Reset).
 - AA Proof's type (Outfit, its own sizes) goes with SEAM-01; its labels are 11 px at the least since #286.
 
 ## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26 and 2026-09-27)

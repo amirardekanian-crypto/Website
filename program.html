@@ -1320,7 +1320,7 @@
   .complete-sugg-slot:not(:empty) { margin: 0 0 4px; }
   .session-complete .lib-sugg { background: var(--grey-bg); }
   /* "2 of 3 sessions done this week" (HOME-01), from paintWeek(). */
-  /* An unfinished day (DATA-02): one card above This Week, clay edge like a Coach's Note. */
+  /* An unfinished day filed by itself (DATA-02, fileUnfinished()): one card above This Week, clay edge like a Coach's Note. */
   .uf-card { margin: 0 24px 16px; padding: 14px 16px; border-radius: 12px; display: grid; gap: 6px;
     background: rgba(199,85,47,0.08); box-shadow: inset 3px 0 0 var(--ice); }
   .uf-k { font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700; letter-spacing: 1.2px;
@@ -1328,11 +1328,9 @@
   .uf-t { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-lead); color: var(--grey-dark); }
   .uf-s { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); color: var(--grey-text); }
   .uf-a { display: flex; gap: 10px; margin-top: 6px; }
-  .uf-send, .uf-clear { min-height: 44px; padding: 0 16px; border-radius: 8px; cursor: pointer;
+  .uf-send { min-height: 44px; padding: 0 16px; border-radius: 8px; cursor: pointer;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 1px; text-transform: uppercase; }
   .uf-send { flex: 1; background: var(--yellow); color: var(--on-accent); border: 0; }
-  .uf-clear { background: transparent; color: var(--grey-text); border: 1px solid var(--grey-mid); }
-  .uf-clear.armed { color: #C7552F; border-color: #C7552F; }
   .home-week-sum { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); color: var(--grey-text);
     margin: -6px 24px 12px; }
   .home-week-sum:empty { display: none; }
@@ -4331,7 +4329,7 @@
      0.02 em to 1.5 px, weights 700 and 900, and two of them clay). Each rule above keeps only its place and
      its size: the full-width actions at --fs-body (--fs-lead for the welcome and Done · send to coach), the
      compact ones in a card or the session bar smaller, where their widths were measured (WK-02, WK-03).
-     A new primary action joins this list; a secondary one is outlined (Guided, Reset, Clear it). */
+     A new primary action joins this list; a secondary one is outlined (Guided, Reset). */
   .signin-go, .wel-go, .readiness-begin, .session-timer-btn:not(.guided), .step-primary-btn, .uf-send,
   .session-confirm.ready .confirm-btn, .timer-ctrl-btn.btn-start, .ceil-add, .wt-save, .rest-btn, .ex-1rm-save {
     background: var(--yellow); color: var(--on-accent); border: 0; border-radius: 8px; min-height: 44px;
@@ -4650,7 +4648,7 @@
     <!-- This cycle card (PROG-01, paintCycleCard()) → Game Plan -->
     <div id="home-cycle-wrap"></div>
 
-    <!-- An unfinished day's card (DATA-02), then "This Week": its header, the week's
+    <!-- What fileUnfinished() filed (DATA-02), then "This Week": its header, the week's
          session count (paintWeek()) and the week note, when this week has one -->
     <div id="home-unfinished-wrap"></div>
     <div id="home-week-wrap"></div>
@@ -5061,6 +5059,10 @@ function _snapshot() {
     // The report outbox (WK-04): a report waiting to be emailed from THIS phone. Synced,
     // another phone would send it a second time.
     if (k === prefix + 'outbox') continue;
+    // The session queue (sessions waiting for save_session) is this phone's too, for the
+    // same reason; and a cloud copy pulled back over it would wipe a session still waiting.
+    // So is the note of what fileUnfinished() filed: it is said on this phone only.
+    if (k === prefix + 'csq' || k === prefix + 'autofiled') continue;
     if (k && k.indexOf(prefix) === 0) out[k] = localStorage.getItem(k);
   }
   // When this snapshot's data was last edited on this device. syncFromCloud
@@ -5158,6 +5160,7 @@ async function syncFromCloud(athleteId, key, isLive) {
       if (k.indexOf(prefix) !== 0) return;
       if (k === prefix + 'snapAt' || k === prefix + 'lastEditAt') return;  // bookkeeping, not data
       if (k === prefix + 'drops'  || k === prefix + 'skey')       return;  // ditto — see _snapshot()
+      if (k === prefix + 'csq' || k === prefix + 'autofiled')     return;  // this phone's own; old blobs still hold a queue
       if (plan.skip.has(k)) return;
       // Weights are the athlete's working loads and always come back; the RPE and
       // done-ticks of a session that is already over must not, or they re-tick
@@ -5409,6 +5412,18 @@ function mergeStoredValue(key, localVal, cloudVal, preferLocal) {
       }
     } catch (e) { /* not parseable — fall through */ }
   }
+  // The finished-sessions list (_noteFinished()): a union, so a phone that has not
+  // synced never drops a session the other one finished.
+  if (key.slice(-9) === '_finished') {
+    try {
+      const L = JSON.parse(localVal), C = JSON.parse(cloudVal);
+      if (Array.isArray(L) && Array.isArray(C)) {
+        const out = C.concat(L).filter((x, i, a) => typeof x === 'string' && a.indexOf(x) === i);
+        out.sort((a, b) => String(a.split('|')[1] || '').localeCompare(String(b.split('|')[1] || '')));
+        return JSON.stringify(out.slice(-60));
+      }
+    } catch (e) { /* not parseable — fall through */ }
+  }
   // Scalars (notes, RPE, session note, etc.): the fresher side wins, but an
   // empty value never overwrites a real one in either direction.
   if (preferLocal) return (localVal !== '') ? localVal : cloudVal;
@@ -5457,66 +5472,99 @@ function setupCloudBackup(athleteId, data, key) {
   // Hidden/killed → flush NOW: a debounced timer never fires once iOS suspends
   // the page, and a backgrounded PWA is routinely killed without warning.
   // Back in the foreground with uploads still held (REL-01): try the pull again.
+  // Back in the foreground the session queue tries again too: a session finished with no
+  // signal goes the moment the athlete looks at the app again.
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) _pushSnapshot(true);
     else if (_sbHold) _resumeSync();
+    else _replayQueue();
   });
   window.addEventListener('pagehide', () => _pushSnapshot(true));
-  // Connection back after offline logging → push what the gym couldn't send. A run
+  // Connection back after offline logging → push what the gym couldn't send, and the
+  // waiting sessions (flushOutbox() drains them only when a report was waiting). A run
   // that has not pulled yet (REL-01) pulls first and pushes after: _resumeSync().
-  window.addEventListener('online', () => { if (_sbHold) _resumeSync(); else _pushSnapshot(true); flushOutbox(); });
+  window.addEventListener('online', () => { if (_sbHold) _resumeSync(); else { _pushSnapshot(true); _replayQueue(); } flushOutbox(); });
 }
 
-// ── Cloud-session retry queue ──────────────────────────────────────────
-// When save_session fails for any reason (offline, Supabase not loaded
-// yet, the server refusing the call), we store the payload in localStorage
-// and retry on the next load and again right after a successful Send.
-//
-// ⚠️ NO KEY REQUIRED. Replay used to return early whenever _sbKey was empty,
-// which was harmless while every athlete opened a secret link. Since logins
-// replaced the links (2026-09-07) an athlete who signs in has no key at all,
-// so a save that failed once — no signal in the gym — sat in this queue for
-// ever: the email reached the coach and session_history never got the row.
-// save_session accepts the signed-in session (current_athlete_id()), so
-// replay just calls it; a stored legacy key rides along and changes nothing.
-// A refused replay stays queued, exactly as before.
-function _enqueueSession(base) {
-  if (!ATHLETE_ID) return;
-  try {
-    const k = ATHLETE_ID + '_csq';
-    let q = JSON.parse(localStorage.getItem(k) || '[]');
-    q = q.filter(s => Number(s.p_day) !== Number(base.p_day));  // one entry per day
-    q.push(base);
-    localStorage.setItem(k, JSON.stringify(q.slice(-20)));       // cap at 20
-  } catch (e) {}
+// ── The session queue: a session waits on the phone until the server has it ──
+// Every save of a session goes into this queue (<id>_csq) BEFORE save_session is called,
+// and leaves it only when the server answers that it has the row. Until 2026-10-12 it went
+// in only when the call came back with an error, so a call that never came back lost the
+// session without a trace on the phone: no signal in the gym, a connection that hangs, the
+// app put away or closed mid-save. The email went (its outbox keeps a report until it goes)
+// and the dashboard never got the row: 10 sessions of 4 athletes between 16 Sep and 10 Oct,
+// put back from the emails on 2026-10-12.
+//   · One entry per SESSION (its day and the date it is filed under), never per day number:
+//     last week's Day 1 still waiting is not replaced by this week's. A newer save of the same
+//     session (a rating or a note changed after Done) replaces the waiting one.
+//   · Every call is capped (SESSION_SAVE_MS). One that never answers leaves the entry queued;
+//     save_session is an upsert, so a session sent twice is still one row.
+//   · It drains at every open, back in the foreground, when the connection comes back and
+//     after a report goes. It never syncs (_snapshot()): another phone would send it again, and
+//     the cloud's copy pulled back over it would wipe a session still waiting.
+// ⚠️ NO KEY REQUIRED (2026-09-13): save_session accepts the signed-in session
+// (current_athlete_id()); a stored legacy key rides along and changes nothing.
+const SESSION_SAVE_MS = 20000;
+function _csqKey() { return ATHLETE_ID + '_csq'; }
+function _csqLoad() {
+  try { const q = JSON.parse(localStorage.getItem(_csqKey()) || '[]'); return Array.isArray(q) ? q : []; }
+  catch (e) { return []; }
 }
+// Raw: the queue is this phone's bookkeeping, not progress, so it never stamps an edit or a push.
+function _csqSave(q) {
+  try { _lsRawSet(_csqKey(), JSON.stringify(q.slice(-40))); } catch (e) { /* storage full: the call still goes */ }
+}
+function _csqSess(e) { return Number(e && e.p_day) + '|' + String((e && e.p_completed_on) || ''); }
+function _csqId(e) { return e._q || JSON.stringify(e); }   // entries from before 2026-10-12 have no _q
+// Puts this version of the session in the queue and hands it back.
+function _enqueueSession(base) {
+  if (!ATHLETE_ID) return null;
+  const entry = Object.assign({}, base, { _q: Date.now() + '.' + Math.random().toString(36).slice(2, 8) });
+  _csqSave(_csqLoad().filter(e => _csqSess(e) !== _csqSess(entry)).concat([entry]));
+  return entry;
+}
+// The server has this version: it leaves the queue. A newer version of the same session stays.
+function _dequeueSession(entry) {
+  const id = _csqId(entry);
+  _csqSave(_csqLoad().filter(e => _csqId(e) !== id));
+}
+// One call for one entry; true when the server has it.
+async function _sendSession(sb, entry) {
+  const args = Object.assign({}, entry, { p_key: _sbKey });
+  delete args._q;                                   // not a parameter of save_session
+  try {
+    const res = await _withTimeout(sb.rpc('save_session', args), SESSION_SAVE_MS);
+    return !!(res && !res.error);
+  } catch (e) { return false; }
+}
+let _replaying = false;
 async function _replayQueue() {
   // IS_PREVIEW is checked here and not only at boot: flushOutbox() drains the
   // queue too, and coach preview runs under Amir's own sign-in, which
   // save_session accepts — a replay there would write into the athlete's record.
-  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return;
-  const k = ATHLETE_ID + '_csq';
-  let q; try { q = JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return; }
-  if (!Array.isArray(q) || !q.length) return;
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID || _replaying) return;
+  if (!_csqLoad().length) return;
   const sb = _sb(); if (!sb) return;
-  const failed = [];
-  for (const base of q) {
-    try {
-      const { error } = await sb.rpc('save_session', { ...base, p_key: _sbKey });
-      if (error) failed.push(base);
-    } catch (e) { failed.push(base); }
-  }
-  // Re-read before writing back. A save that failed WHILE this loop was waiting
-  // on the network (stalled gym wifi) was queued after `q` was read, and writing
-  // `failed` straight over the queue would silently erase it. Keep whatever was
-  // added meanwhile; it supersedes a failed entry for the same day, the same
-  // one-entry-per-day rule _enqueueSession applies.
-  let now; try { now = JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { now = []; }
-  if (!Array.isArray(now)) now = [];
-  const tried = new Set(q.map(s => JSON.stringify(s)));
-  const added = now.filter(s => !tried.has(JSON.stringify(s)));
-  const keep  = failed.filter(f => !added.some(a => Number(a.p_day) === Number(f.p_day)));
-  localStorage.setItem(k, JSON.stringify(keep.concat(added).slice(-20)));
+  _replaying = true;
+  try {
+    for (const entry of _csqLoad()) {
+      // Replaced by a newer save while this loop waited on the network: that one is sent by its own save.
+      if (!_csqLoad().some(e => _csqId(e) === _csqId(entry))) continue;
+      if (await _sendSession(sb, entry)) _dequeueSession(entry);
+    }
+  } finally { _replaying = false; }
+}
+// The phone's own list of the sessions it finished, "day|YYYY-MM-DD", the last 60. It syncs with
+// the progress (a union, mergeStoredValue()), so coach.html's syncGapsOf() can name a session the
+// phone finished and the server does not have from the app itself, without the email report.
+function _noteFinished(day, on) {
+  if (!ATHLETE_ID || !on) return;
+  const k = ATHLETE_ID + '_finished', item = Number(day) + '|' + on;
+  let a = [];
+  try { a = JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) {}
+  if (!Array.isArray(a)) a = [];
+  if (a.indexOf(item) >= 0) return;
+  try { localStorage.setItem(k, JSON.stringify(a.concat([item]).slice(-60))); } catch (e) {}
 }
 // ──────────────────────────────────────────────────────────────────────
 let STORAGE_KEY = '';
@@ -5953,6 +6001,10 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   mountProofStrip();
 
   restoreState();
+  // A day left unfinished on an earlier date is filed now, before anything can be tapped,
+  // and the page opens again so the sweep clears it (fileUnfinished()). The record is in
+  // the session queue already; the next open sends it.
+  if (fileUnfinished()) { location.reload(); return; }
   // The Card Remembers: paint last time from the phone's copy now, then refresh
   // it from the server. Never blocks the first paint.
   loadHistory();
@@ -5965,7 +6017,7 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   refreshQualities();
   isLoading = false;
   paintWeek();   // pills, suggested day and the week's count (HOME-01)
-  paintUnfinished();   // "Tuesday's Day 2 was never sent" (DATA-02)
+  paintUnfinished();   // "Tuesday's Day 2 wasn't finished. I still got it" (DATA-02)
   setTimeout(flushOutbox, 2500);   // a report left waiting for signal goes now (WK-04)
   // restoreState() ran updateProgress() while isLoading was still true, which
   // suppresses the finish card. Re-run it now so users who closed the
@@ -6922,12 +6974,16 @@ function weekDoneDays() {
   ids.forEach(id => { if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) done.add(id); });
   return done;
 }
-// ── AN UNFINISHED DAY (DATA-02, Amir 2026-09-26: "Ask the athlete next open") ─────────
+// ── AN UNFINISHED DAY IS FILED BY ITSELF (DATA-02; Amir, 2026-10-12: "i dont want any info or log to be lost") ──
 // Sets ticked on a day that was never finished used to carry into next week and never reach
-// the coach. On a later open, a day with logged work, no finish stamp and no session running
-// (6 h grace, sessionIsStale()) whose ticks are from an EARLIER date gets one card at the top
-// of Home: Send it (a partial session, filed under the day it was trained) or Clear it. Only
-// days with a <id>_touched_d<N> date are asked about: ticks from before this shipped have none.
+// the coach. From 2026-09-26 the next open asked on Home: Send it, or Clear it, which threw the
+// work away, and an athlete who did neither and trained that day again mixed two sessions.
+// Now a day with logged work, no finish stamp and no session running (6 h grace,
+// sessionIsStale()) whose ticks are from an EARLIER date is filed at the next open, before the
+// athlete can touch anything (fileUnfinished(), from boot): a session as it was left, under the
+// day it was trained, with that day's check-in and clock (buildSessionData()) and no rating.
+// Home then says what was filed (paintUnfinished()). Only days with a <id>_touched_d<N> date
+// count: ticks from before 2026-09-26 have none.
 function unfinishedDays() {
   const today = new Date().toDateString();
   return (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id)).filter(id => {
@@ -6938,46 +6994,80 @@ function unfinishedDays() {
     try { return getDayCompletion(id).done > 0; } catch (e) { return false; }
   });
 }
-function paintUnfinished() {
-  const wrap = document.getElementById('home-unfinished-wrap');
-  if (!wrap) return;
-  if (window.IS_DEMO || window.IS_PREVIEW) { wrap.innerHTML = ''; return; }
-  const id = unfinishedDays()[0];
-  if (!id) { wrap.innerHTML = ''; return; }
-  const on = new Date(localStorage.getItem(ATHLETE_ID + '_touched_d' + id));
-  const dayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][on.getDay()];
-  const st = getDayCompletion(id);
-  wrap.innerHTML = `<div class="uf-card">
-      <div class="uf-k">Not finished</div>
-      <div class="uf-t">${esc(dayName)}'s Day ${esc(id)} was never sent</div>
-      <div class="uf-s">${st.done} of ${st.total} sets logged. Send it to me as it is, or clear it.</div>
-      <div class="uf-a">
-        <button type="button" class="uf-send" onclick="sendUnfinished('${esc(id)}')">Send it</button>
-        <button type="button" class="uf-clear" onclick="armedTap(this, 'Tap again to clear', () => clearUnfinished('${esc(id)}'))">Clear it</button>
-      </div>
-    </div>`;
+// A day trained on an earlier date and never finished, waiting for fileUnfinished(). Until it is
+// filed, the midnight sweep keeps its check-in and clock (autoResetStaleDays()) and the exercises
+// it shares with a finished day (liveExerciseKeys()), so the record has them.
+function _awaitingFile(id) {
+  const on = localStorage.getItem(ATHLETE_ID + '_touched_d' + id);
+  if (!on || on === new Date().toDateString() || isNaN(new Date(on))) return false;
+  return !completedDate(localStorage.getItem(ATHLETE_ID + '_completed_d' + id));
 }
-// Both close the day as the midnight sweep would, filed under the day it was trained:
-// the finish stamp carries that date, so sessionDateFor() names it, and the sweep then
-// clears it (carrySet() keeps the weights as last time's hint).
+// Closes the day as a finish would, under the day it was trained: the finish stamp carries
+// that date, so sessionDateFor() names it, and the sweep then clears it (carrySet() keeps the
+// weights as last time's hint).
 function closeUnfinished(id) {
   const on = localStorage.getItem(ATHLETE_ID + '_touched_d' + id);
   localStorage.setItem(ATHLETE_ID + '_completed_d' + id, on + '|' + progToken());
 }
-async function sendUnfinished(id) {
-  const btn = document.querySelector('#home-unfinished-wrap .uf-send');
-  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
-  closeUnfinished(id);
-  try { await Promise.race([recordSessionToCloud(id), new Promise(r => setTimeout(r, 6000))]); } catch (e) {}
-  // No signal: recordSessionToCloud() already queued it for the next open (_replayQueue).
-  location.reload();
+// From boot, once the days are drawn (getDayCompletion() counts the drawn sets). Files each
+// unfinished day into the session queue, notes what it filed for Home, and answers true when
+// the page should open again: the next boot's sweep clears the filed days. A day touched with
+// nothing left logged has nothing to file and only loses its leftovers. Never twice in a row
+// (the reload guard), so a day that somehow stays unfinished can never loop the page.
+function fileUnfinished() {
+  if (window.IS_DEMO || window.IS_PREVIEW || !ATHLETE_ID) return false;
+  const filed = [];
+  unfinishedDays().forEach(id => {
+    const st = getDayCompletion(id);
+    closeUnfinished(id);
+    recordSessionToCloud(id);              // queued before its first await (see there)
+    filed.push({ day: id, on: sessionDateFor(id), done: st.done, total: st.total, at: Date.now() });
+  });
+  (DATA.workouts && DATA.workouts.days || []).forEach(d => {
+    const id = String(d.id);
+    if (!_awaitingFile(id) || sessionStartedToday(id, new Date().toDateString())) return;
+    [timerKey(id), readinessKey(id), ATHLETE_ID + '_touched_d' + id].forEach(k => localStorage.removeItem(k));
+  });
+  if (!filed.length) return false;
+  let notes = [];
+  try { notes = JSON.parse(localStorage.getItem(ATHLETE_ID + '_autofiled') || '[]') || []; } catch (e) {}
+  try { _lsRawSet(ATHLETE_ID + '_autofiled', JSON.stringify(notes.concat(filed).slice(-5))); } catch (e) {}
+  let last = 0;
+  try { last = Number(sessionStorage.getItem('aa_filed_reload')) || 0; } catch (e) {}
+  if (Date.now() - last < 60000) return false;
+  try { sessionStorage.setItem('aa_filed_reload', String(Date.now())); } catch (e) {}
+  return true;
 }
-function clearUnfinished(id) {
-  closeUnfinished(id);
-  location.reload();
+// What fileUnfinished() filed, said on Home in Amir's words until OK, or for four days. (The
+// four days are inside the function: a const declared down here sits in its dead zone while boot()
+// runs, the trap that broke sign-in on 2026-10-11.)
+function paintUnfinished() {
+  const FILED_NOTE_MS = 4 * 86400000;
+  const wrap = document.getElementById('home-unfinished-wrap');
+  if (!wrap) return;
+  if (window.IS_DEMO || window.IS_PREVIEW) { wrap.innerHTML = ''; return; }
+  let notes = [];
+  try { notes = JSON.parse(localStorage.getItem(ATHLETE_ID + '_autofiled') || '[]') || []; } catch (e) {}
+  notes = (Array.isArray(notes) ? notes : []).filter(x => x && Date.now() - (Number(x.at) || 0) < FILED_NOTE_MS);
+  const n = notes[notes.length - 1];
+  if (!n || !n.on) { wrap.innerHTML = ''; return; }
+  const on = new Date(n.on + 'T12:00:00');
+  const dayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][on.getDay()];
+  const more = notes.length - 1;
+  wrap.innerHTML = `<div class="uf-card">
+      <div class="uf-k">Saved for you</div>
+      <div class="uf-t">${esc(dayName)}'s Day ${esc(n.day)} wasn't finished</div>
+      <div class="uf-s">I still got it, as you left it: ${Number(n.done) || 0} of ${Number(n.total) || 0} sets.${more > 0 ? ` And ${more} more like it.` : ''} Next time tap Done at the end.</div>
+      <div class="uf-a">
+        <button type="button" class="uf-send" onclick="dismissFiled()">OK</button>
+      </div>
+    </div>`;
 }
-window.sendUnfinished = sendUnfinished;
-window.clearUnfinished = clearUnfinished;
+function dismissFiled() {
+  try { _lsRawRemove(ATHLETE_ID + '_autofiled'); } catch (e) {}
+  paintUnfinished();
+}
+window.dismissFiled = dismissFiled;
 
 // ── THIS CYCLE (PROG-01, 2026-09-27) ──────────────────────────────────────────
 // "Is this working?" had no answer in the paid app: progress was one exercise at a time.
@@ -11833,8 +11923,8 @@ function liveExerciseKeys(days, today) {
     const on = completedDate(localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id));
     if (on) {
       if (on !== today) return;                     // finished on an earlier day — stale
-    } else if (!sessionStartedToday(d.id, today)) {
-      return;                                       // never finished, not underway — not protective
+    } else if (!sessionStartedToday(d.id, today) && !_awaitingFile(d.id)) {
+      return;                                       // never finished, not underway, nothing to file — not protective
     }
     (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => {
       liveNames.add(String(ex.name || '').replace(/\s+/g, '_'));
@@ -11885,7 +11975,8 @@ function autoResetStaleDays() {
     // behind with NO completed stamp, so the completed-day branch below never
     // touches them — the timer keeps counting wall-clock for days and the stale
     // readiness gets re-sent with every later session. Sweep them independently.
-    if (!completedOn) {
+    // A day waiting to be filed keeps both until fileUnfinished() has put them in its record.
+    if (!completedOn && !_awaitingFile(day.id)) {
       const t = loadTimer(day.id);
       const r = loadReadiness(day.id);
       const staleT = t && t.sessionStart && sessionIsStale(t.sessionStart);
@@ -12110,13 +12201,19 @@ function buildSessionData(day) {
     : 'Complete';
   const sRpe = localStorage.getItem(ATHLETE_ID + '_srpe_' + day) || '';
 
-  // Duration is only trustworthy from a timer that belongs to today's session
+  // The check-in and the clock belong to THIS session when they are from the day it is
+  // filed under (sessionDateFor(): the finish stamp's day), or still running (6 h grace,
+  // sessionIsStale()). It used to be "from today", so a rating changed after midnight
+  // sent the record again without its check-in, and a day filed the morning after
+  // (fileUnfinished()) lost both.
+  const onDay = sessionDateFor(day);
+  const ownStamp = t => { const d = new Date(t); return !isNaN(d) && (ymdLocal(d) === onDay || !sessionIsStale(t)); };
+  // Duration is only trustworthy from a timer that belongs to this session
   // (or one legitimately finished, e.g. just past midnight) — a stale timer
   // left running by a never-finished day measures days, not minutes, and
   // poisons the sRPE load. Belt-and-braces: no real session is 12+ hours.
   const timerState = loadTimer(day);
-  const timerStartedToday = !!(timerState && timerState.sessionStart &&
-    new Date(timerState.sessionStart).toDateString() === new Date().toDateString());
+  const timerStartedToday = !!(timerState && timerState.sessionStart && ownStamp(timerState.sessionStart));
   const durMs  = (timerStartedToday || (timerState && timerState.finished)) ? timerElapsedMs(day) : 0;
   const durMin = Math.round(durMs / 60000);
   const hasDur = durMin > 0 && durMin <= 720;
@@ -12130,13 +12227,10 @@ function buildSessionData(day) {
     if (auLoad != null) summary += `Session Load: ${auLoad} AU (sRPE ${sRpe} × ${durMin} min)\n`;
   }
 
-  // Readiness is captured at today's session start; a record stamped on a
-  // previous date is leftover state from an unfinished day — never re-send it.
+  // Readiness is captured at the session's start; one from another day is leftover
+  // state from an earlier session — never re-send it.
   let readiness = loadReadiness(day);
-  if (readiness && readiness.timestamp &&
-      new Date(readiness.timestamp).toDateString() !== new Date().toDateString()) {
-    readiness = null;
-  }
+  if (readiness && readiness.timestamp && !ownStamp(readiness.timestamp)) readiness = null;
   let readinessSummary = '', readinessField = '';
   if (readiness) {
     if (readiness.skipped) { readinessSummary = 'Readiness (at start): skipped'; readinessField = 'Skipped'; }
@@ -12252,10 +12346,12 @@ function buildSessionData(day) {
 }
 
 // Saves a permanent session record to the cloud (coach dashboard). Called on
-// finish (full OR partial), on later RPE/note edits, and on send — all upsert
-// the same (athlete, day, today) row, so the dashboard always has the latest.
-// On failure the payload is queued in localStorage and replayed on the next load
-// and again right after a successful Send (see _replayQueue).
+// finish (full OR partial), on later RPE/note edits, and when a day left
+// unfinished is filed (fileUnfinished()) — all upsert the same (athlete, day,
+// date) row, so the dashboard always has the latest. The record goes into the
+// session queue FIRST and leaves it when the server has it (see _replayQueue).
+// Everything up to the first await runs at once: a caller that reloads or clears
+// the day straight after has the record in the queue already.
 async function recordSessionToCloud(day) {
   // Never in coach preview. Preview runs under Amir's own sign-in and save_session
   // accepts the coach, so Finish, an RPE tap or a note typed while looking around
@@ -12285,12 +12381,11 @@ async function recordSessionToCloud(day) {
       log:          D.log
     }
   };
+  _noteFinished(day, completedOn);
+  const entry = _enqueueSession(base);       // on the phone first: nothing below can lose it
   const sb = _sb();
-  if (!sb) { _enqueueSession(base); return; }
-  try {
-    const { error } = await sb.rpc('save_session', { ...base, p_key: _sbKey });
-    if (error) _enqueueSession(base);
-  } catch (e) { _enqueueSession(base); }
+  if (!sb || !entry) return;                 // no library yet: the queue sends it at the next chance
+  if (await _sendSession(sb, entry)) _dequeueSession(entry);
 }
 
 // Tiny helper: HH:MM in the user's locale (e.g. "2:14 PM")

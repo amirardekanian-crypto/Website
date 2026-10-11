@@ -268,6 +268,14 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   day, saves the record and sends the report once. The report waits in `<id>_outbox` (one entry per session: the day
   and its finish stamp) until it goes, and **never syncs**, or another phone sends it again. A second email only when
   the rating or note changed after the first went. Done needs the rating.
+- **⚠️ No finished session is ever lost on the way to the server** (2026-10-12; Amir: *"i dont want any info or log to be lost"*;
+  10 sessions of 4 athletes reached his inbox and never reached the dashboard, put back from the emails that day). The record goes
+  into the session queue `<id>_csq` BEFORE `save_session` is called and leaves it only on the server's answer (`recordSessionToCloud()`,
+  one entry per session: day and date); the queue drains at every open, foreground, `online` and after a report, and **never syncs**.
+  **A day left unfinished is filed by itself** at the next open (`fileUnfinished()`: no Send it, no Clear it). The phone's synced
+  `<id>_finished` list lets coach.html's `syncGapsOf()` name a missing session without the email. Never go back to "queue on error";
+  a new way a session ends goes through `recordSessionToCloud()`. `node scripts/headless/session-queue.js` (21 checks); CODEBASE.md has the story.
+  Amir wants the email reports gone in the future: `syncGapsOf()` already works without them; switch them off only on his word.
 - **The in-app guide (`APP_GUIDE`, *How the app works* in the sheet: `openHelp()` from your initials, the Coach tab's row,
   "How hard?", "tempo" and Guided's ?; COACH-02) and the first-session hints (`ONB_TEXT`,
   ONB-01) name real controls.** Rename a button, move a control or change when a card appears, and change its guide
@@ -381,6 +389,9 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   `save_session()` never un-hides one, the coach's does. `get_my_history()`, `get_workout_days()`, the dashboard (`S.hist` leaves them out, `S.histHidden` keeps
   them for the File, `syncGapsOf()` counts them as present) and every pipeline query that reads sessions (`and hidden_at is null`) leave them out: **a new reader
   of `session_history` filters on `hidden_at`**, or a hidden session comes back in its numbers.
+- **The work tab is the current cycle's** (2026-10-12): with a dated cycle a day card holds only sessions on or after its `startDate`;
+  older ones are under **Earlier cycles** (`workTabHtml()`, `earlierCyclesHtml()`). **There is no "Add past session from email"** (Amir:
+  "i will never do that manually"); `parseSessionEmail()` stays only as the tested reader that `scripts/restore/sessions_from_email.js` uses.
 - **A paused or former athlete is nobody's chase** (stage63, 2026-10-11; Amir: "active, paused, former"): `athlete_status` (coach only, in the backup, emptied by an erasure) holds only
   those two; `reasonsOf()` returns only a note they sent and a session that did not sync for them; a former athlete and the demo and your own identity are in no roster
   total (`inTotals()`). The roster's tools sit behind one ⚙ Tools button. A new table with an `athlete_id` column goes into `coach_erase_person()`'s list the day you create it (stage63 did it by patching the live function).
@@ -390,7 +401,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (105 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (104 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.
@@ -413,7 +424,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v109` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v110` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
