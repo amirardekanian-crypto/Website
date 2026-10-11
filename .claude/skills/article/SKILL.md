@@ -40,6 +40,13 @@ and the phrase log is its **section 10**. In short, settle these before Step 3:
 3. **Never name a sport or group in the title/description that the body does not cover** (the padel gap).
 4. Real numbers, with the sources named at the end of the article.
 5. The companion Instagram caption follows SOP section 5 step 3 (phrase first, 3–5 hashtags, last line points to the bio link).
+6. **Spell the phrase as a player types it** in the `seoTitle` and `description`: a normal space, no ezafe mark, no
+   half-space («گرم کردن قبل از تنیس», SOP gate item 9). The title also states the concrete payoff the body delivers.
+7. **3–5 related phrases** (search-box suggestions, People also ask, Related searches, or Search Console → Queries)
+   worked naturally into headings and body sentences, never a keyword list (SOP gate item 10).
+8. **Keywords go where Google reads them** (title, description, headings, first paragraph, link text, image `alt`).
+   **No `<meta name="keywords">` and no hashtags on the web page**: Google ignores the first and the second does
+   nothing there. Hashtags are for the Instagram caption only (SOP gate item 11).
 
 At Step 9, the handoff must say: the target phrase, whether it was researched or a guess, any
 near-duplicate in the log, the exact Farsi URL for Search Console → *Request indexing*, and that the
@@ -206,8 +213,9 @@ and fact-checks.
 
 **Title, seoTitle, description** — these decide whether the page is found (`.claude/SEO-SOP.md`):
 - `title`: the Farsi phrase a player would actually type into Google (`گرم‌کردنِ قبل از تنیس`), not a literal translation of a clever English title.
-- `seoTitle`: under ~65 characters including ` | امیر اردکانیان`; the search phrase first.
-- `description`: 120–160 characters, says what the reader gets.
+- `seoTitle`: under ~65 characters including ` | امیر اردکانیان`; the search phrase first, **spelled as a player types it** (`گرم کردن قبل از تنیس: ۴ مرحله در ۱۰ تا ۱۵ دقیقه`: a normal space, no ezafe mark, no half-space), then the concrete payoff.
+- `description`: 120–160 characters, same typed spelling of the phrase, says what the reader gets.
+- Related phrases go into headings and body sentences naturally (Step 0.5 item 7). Do not add a keywords field or hashtags to the web page.
 
 Run the lint, then **show Amir the Farsi — title, seoTitle, description and the full text — and
 WAIT for his OK.** He is the native speaker and the coach of record; nothing Farsi ships unread.

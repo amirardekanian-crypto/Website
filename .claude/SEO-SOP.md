@@ -111,6 +111,20 @@ an article does not ship with a box unticked, or with the reason it was skipped 
    (`amirardekani.com/fa/articles/`), **3–5 hashtags, not 30**. One reel or carousel = one phrase = one article.
 8. **After it ships** (Claude cannot do this, so the handoff names the exact URL): Search Console →
    URL inspection → paste the Farsi URL → *Request indexing*. Then **log the phrase** (section 10).
+9. **Spell the phrase the way a player types it** (Amir, 2026-10-11, from `tennis-warm-up`: 27 impressions at
+   position 6, no clicks). In the `seoTitle` and the `description` the target phrase has a normal space, no
+   ezafe mark (ِ) and no half-space: «گرم کردن قبل از تنیس», not «گرم‌کردنِ قبل از تنیس». The body keeps the house
+   typography (half-space in `می‌` verbs and compounds). This is a hypothesis, not a proven rule: when Search
+   Console → Queries shows how people really type it, follow that. The title also states the concrete payoff
+   the body delivers (a number of steps, minutes, a rule), not a teaser.
+10. **Related phrases, used naturally.** From the search box (section 6) or Search Console → Queries, pick 3–5
+    phrases that sit around the main one (a question from "People also ask", a related search) and work them
+    into headings and body sentences where they read naturally. A heading can be the question itself. No
+    lists of keywords, no repeating the phrase to fill space: Google reads that as thin.
+11. **What does NOT help on a web page.** A `<meta name="keywords">` tag (Google ignores it) and hashtags
+    (they do nothing on a page). Do not add either. Keywords work where Google reads them: the title, the
+    description, headings, the first paragraph, link text and image `alt`. **Hashtags belong to the
+    Instagram caption only** (item 7: 3–5, never 30).
 
 ## 5. Instagram reels that show up on Google
 
@@ -227,7 +241,7 @@ suggestions when he sends screenshots, or after 3–4 weeks of Search Console da
 
 | Slug | Target phrase (Farsi) | Basis | Shipped |
 |---|---|---|---|
-| `tennis-warm-up` | گرم‌کردنِ قبل از تنیس (also covers «قبل از جلسه‌ی تنیس») | guess. **Merged 2026-10-02** with `pre-session-warm-up`, which now redirects here | 2026-09, rewritten 2026-10-02 |
+| `tennis-warm-up` | گرم‌کردنِ قبل از تنیس (also covers «قبل از جلسه‌ی تنیس») | guess. **Merged 2026-10-02** with `pre-session-warm-up`, which now redirects here. **2026-10-11:** Search Console (12 Sep–8 Oct) gave 27 impressions, 0 clicks, position 6 (plus 16 on the two redirect stubs); `seoTitle` and `description` respelled «گرم کردن قبل از تنیس» (gate item 9, PR #312). The real query is still to be read from Performance → Pages → this page → Queries | 2026-09, rewritten 2026-10-02, respelled 2026-10-11 |
 | ~~`pre-session-warm-up`~~ | (merged into `tennis-warm-up`) | the old address redirects (`REDIRECTS` in `scripts/build_article_pages.py`) | merged 2026-10-02 |
 | `training-with-injury` | تمرین با آسیب‌دیدگی | guess | 2026-09 |
 | `training-on-your-period` | تمرین در دورانِ قاعدگی | guess | 2026-09 |
