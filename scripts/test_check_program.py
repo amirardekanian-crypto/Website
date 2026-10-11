@@ -150,6 +150,16 @@ expect('three rounds of prep warns', has(run(d, ctx=CTX), 'WARN', '3 rounds. A l
 d = copy.deepcopy(BASE); del d['workouts']['days'][0]['blocks'][1]['exercises'][0]['rx']['rest']
 out = run(d, ctx=CTX)
 expect('a main lift with no rest fails', has(out, 'FAIL', '[CHP-7] Day 1 · Primary · Barbell Back Squat: no rest'), out)
+# Every working card of a day resting the same is a section's number copied down (2026-10-11).
+d = copy.deepcopy(BASE)
+d['workouts']['days'][0]['blocks'][2]['exercises'] += [dict(copy.deepcopy(d['workouts']['days'][0]['blocks'][2]['exercises'][0]), name=n, exId=i) for n, i in
+    (('Machine Leg Extension', 'machine-leg-extension'), ('Goblet Squat', 'goblet-squat'))]
+for b in d['workouts']['days'][0]['blocks'][1:]:
+    for e in b['exercises']: e['rx']['rest'] = 90
+out = run(d, ctx=CTX)
+expect('a day with every working card at one rest warns', has(out, 'WARN', 'all 4 working cards rest 90 s'), out)
+d['workouts']['days'][0]['blocks'][1]['exercises'][0]['rx']['rest'] = 150
+expect('...and stops warning once the rests differ', not has(run(d, ctx=CTX), 'WARN', 'working cards rest'))
 d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][2]['rest'] = 90
 expect('a block rest next to card rests warns', has(run(d, ctx=CTX), 'WARN', 'the block carries a rest'))
 d = copy.deepcopy(BASE); d['workouts']['days'].append({"id": 3, "blocks": [

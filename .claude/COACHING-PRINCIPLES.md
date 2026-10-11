@@ -212,7 +212,7 @@ stale copy reached athletes.
 | CHP-4 | No RPE below 6 anywhere; a note that lowers RPE names the floor of 6 in the same sentence. | design · engage | ✓ |
 | CHP-5 | A prescription is the `rx` object: write what is prescribed and omit the rest (absent means not prescribed). Never write `chips[]`. | assemble | part (`chips[]`, two doses) |
 | CHP-6 | Say the tempo once, in its cell: never restate it in `intent`, a note or a cue. | design · assemble | |
-| CHP-7 | Every working exercise and every circuit carries its own rest in `rx.rest`; a prep circuit's can be as short as 30 seconds. | design · assemble | ✓ |
+| CHP-7 | Every working exercise and circuit carries its own rest in `rx.rest`, chosen for that exercise; a prep circuit's can be 30 seconds. | design · assemble | ✓ |
 
 ### Process
 | ID | Rule | Stage | Check |
@@ -1041,6 +1041,21 @@ same ID. Read a rule's story and its history before changing it.
   circuit included, writes `rx.rest` (30 s at the least; a `simple` item such as a bike or a walk has none),
   and the block's `rest` is not written (the app still reads it on programmes written before this). The app
   still never invents a rest: writing one on every card is the pipeline's duty, not a fallback.
+  **The number is chosen for that exercise, never one value for a whole section** (Amir, 2026-10-11: *"as a
+  coach i think its better that each exercise has its own rest time, this is more accurate ... unless its a
+  circuit, and in circuit we dont have rest for each exercise"*). Start from PRG-10's ranges and the exercise
+  in front of you:
+  - a heavy compound at 6 reps or fewer (squat, hinge, bench, hip thrust, leg press): 150 to 180 s;
+  - any other Primary compound (a pulldown, a press at 8 reps or more): 120 s;
+  - a compound or single-leg Accessory (a row, an incline press, a split squat, a hinge accessory): 75 to 90 s;
+  - a machine, cable or isolation Accessory (curl, raise, extension, face pull, calf raise): 60 to 75 s;
+  - core: 45 to 60 s; a carry: 60 s;
+  - sprints and starts: 90 s; throws, jumps and landings: 60 to 90 s (power wants full rest, PRG-10);
+  - a circuit (a superset) has ONE rest, after the round, 75 to 90 s, and never a rest per item; a prep
+    circuit rests 30 to 45 s.
+  What the athlete has told us moves a number (Pooya feels strongest on long rests and hates one minute: his
+  Primary lifts stay at 150 to 180 s). The checker warns when every working card of a day rests the same, the
+  sign of a section's number copied onto its cards.
 
 ## Naming
 - `NAM-10` **Cycle names are cool & evocative** — punchy 1–2 word power-names (Foundation Forge,

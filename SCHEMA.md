@@ -684,7 +684,7 @@ cell for it. There is no placeholder, no default, and nothing to remember about 
 | `side` | `true` | The dose is **per side**. The cell's label becomes `REPS / SIDE`. |
 | `rpe` | number or `"6-7"` | **Omit on warm-up and prep** — an RPE on a mobility drill is noise. Floor is 6 (the selector runs 6–10). |
 | `tempo` | `"3-1-1-0"` or `"iso"` | Eccentric–Pause–Concentric–Reset. Omit on ballistic work and carries. **The athlete never sees this notation** — see below. |
-| `rest` | seconds | **Written on every `standard` exercise and every `circuit`, 30 s at the least** (CHP-7). The app never invents one: a card with none draws no rest, and its timer button just opens at a neutral default. A `simple` line (bike, walk) has none. |
+| `rest` | seconds | **Written on every `standard` exercise and every `circuit`, chosen for that exercise, 30 s at the least** (CHP-7). The app never invents one: a card with none draws no rest, and its timer button just opens at a neutral default. A `simple` line (bike, walk) has none. |
 | `rounds` | number | Circuits only. |
 | `label` | one word | Rare override for the dose cell, e.g. `"Hold"` instead of `TIME`. |
 

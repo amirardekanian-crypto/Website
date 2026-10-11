@@ -395,7 +395,10 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   placeholder. The one field that is never absent is the rest: write `rest:` on every working
   exercise and every circuit, a prep circuit included, 30 s at the least (CHP-7; Amir, 2026-10-11:
   *"some main exercise and some accessory exercises have rest time, some dont, it must be
-  consistent"*).
+  consistent"*). **Choose it for THAT exercise from CHP-7's guide** (heavy compound 150 to 180,
+  other Primary 120, compound Accessory 75 to 90, isolation 60 to 75, core 45 to 60, a circuit once
+  per round, never per item), never one number for a whole section. Show the rests in the spec so
+  Amir sees each at the checkpoint.
 - standard grinding lift → sets · reps/duration/distance · tempo · RPE · rest · intent (or none)
 - ballistic (jumps/throws/Olympic) → sets · reps · RPE · rest · intent `max intent` — **no tempo**
 - loaded carry → sets · distance/duration · RPE · rest — **no tempo**

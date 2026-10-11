@@ -103,7 +103,8 @@ fields map one-to-one; there is nothing to convert:
 
 **Rest is written on EVERY card (CHP-7; Amir, 2026-10-11: *"some main exercise and some accessory
 exercises have rest time, some dont, it must be consistent"*).** Every `standard` exercise and every
-`circuit`, a prep circuit included, carries `rx.rest` from the spec's `rest:` (30 s at the least). Do not
+`circuit`, a prep circuit included, carries `rx.rest` from the spec's `rest:` (30 s at the least), the number design
+chose for THAT exercise (CHP-7): copy it card by card, never one section's number onto its neighbours. Do not
 write `block.rest`: it used to state a section's rest once and left the cards under it with no REST cell,
 so one section showed a rest on some cards and none on others. A `simple` line (bike, walk) has no rest. If
 the spec leaves a rest off a working card, stop: that is a design gap, not a blank to leave.

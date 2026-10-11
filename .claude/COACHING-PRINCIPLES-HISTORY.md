@@ -338,6 +338,7 @@ the principles (their *How to add*).
 - `CHP-7` **A section's shared rest is written once, on its block.**
   - It lived in /program-assemble, the workout skill, SCHEMA and PROGRAM-APP.md.
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+  - 2026-10-11, Amir, after the five programmes got a rest on every card: "as a coach i think its better that each exercise has its own rest time, this is more accurate, unless its a circuit, and in circuit we dont have rest for each exercise", then "yes this is a very good idea. and the pipeline should do exactly like this": the number is chosen for the exercise from a guide (now in the rule's story), not one value copied across a section.
   - Replaced 2026-10-11 by "every working exercise and every circuit carries its own rest". Amir: "when you are writing the program, you must write a rest time for circuits. can be short as 30 seconds" and "some main exercise and some accessory exercises have rest time, some dont, it must be consistent". The 2026-09-20 reason (eight cards each repeating REST 2m) gave way to consistency. To go back: restore this line and drop the check in `check_rest()`.
 
 ## Naming

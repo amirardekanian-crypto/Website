@@ -392,6 +392,12 @@ def check_prep_rest(data, args):
                              "On a lifting day the movements are the items of ONE prep circuit, two rounds (the bike stays a simple line)", 'SES-6')
         if lifting and not prep_circuits:
             fail(f"{day}: a lifting day (it has a Primary block) with no prep circuit. Its prep is a machine raise plus one two-round circuit", 'SES-6')
+        # A section's number copied onto its cards looks like this: every working card of the day rests the same.
+        rests = [own_rest(ex) for b in blocks if not PREP.search(b.get('title') or '')
+                 for ex in b.get('exercises') or [] if ex.get('type') == 'standard' and own_rest(ex)]
+        if len(rests) >= 4 and len(set(rests)) == 1:
+            warn(f"{day}: all {len(rests)} working cards rest {int(rests[0])} s. Choose each rest for its exercise "
+                 "(a heavy lift longer than a curl), not one number for the day", 'CHP-7')
 
 # COM-13: weighing in happens on Home → Body Weight in program.html. AA Proof has had no weight
 # screen since 2026-09-12, yet eleven live lines in six programmes still sent athletes there (the
