@@ -1,5 +1,5 @@
 -- Assertions for stage45 (forget_contact), stage48 (coach_delete_training_history, coach_save_spine), stage49 (spine_versions)
--- and stage50 (the coach reads the testing app's tables) on the
+-- stage50 (the coach reads the testing app's tables) and stage51 (used first passwords are cleared) on the
 -- local replica. Run through scripts/test_spine_sql.sh, which loads replica_schema.sql and both stage files first.
 -- Every check writes a row to t_res; the runner prints the failures and exits non-zero if there are any.
 -- Test rows are all 'zz…' ids. Made-up data only.
@@ -502,6 +502,112 @@ begin
     execute 'reset role';
     perform pg_temp.rec('testing app: anon has no access', false, 'no error');
   exception when insufficient_privilege then perform pg_temp.rec('testing app: anon has no access', true, sqlerrm); end;
+end $t$;
+select pg_temp.coach() \g /dev/null
+
+-- ═════════════════════ F. stage51: a stored first password is cleared once the person has signed in with it ═════════════════════
+-- The rule is the one coach_login_use() always used for "signed in with it": last_sign_in_at later than password_set_at.
+-- It must never get in the way of a sign-in, and a reset (a newer password_set_at) is cleared by the NEXT sign-in.
+select pg_temp.nobody() \g /dev/null
+insert into auth.users (id, email) values
+  ('00000000-0000-0000-0000-0000000000c1', 'c1@example.invalid'), ('00000000-0000-0000-0000-0000000000c2', 'c2@example.invalid'),
+  ('00000000-0000-0000-0000-0000000000c3', 'c3@example.invalid'), ('00000000-0000-0000-0000-0000000000c4', 'c4@example.invalid'),
+  ('00000000-0000-0000-0000-0000000000c5', 'c5@example.invalid'), ('00000000-0000-0000-0000-0000000000c6', 'c6@example.invalid');
+insert into public.athlete_identities (user_id, athlete_id, initial_password, password_set_at) values
+  ('00000000-0000-0000-0000-0000000000c1', 'zz_p1', 'pw-1', now() - interval '2 hours'),
+  ('00000000-0000-0000-0000-0000000000c2', 'zz_p2', 'pw-2', now() - interval '2 hours'),
+  ('00000000-0000-0000-0000-0000000000c3', 'zz_p3', 'pw-3', now() - interval '1 hour');
+insert into public.tps_accounts (user_id, username, initial_password, password_set_at) values
+  ('00000000-0000-0000-0000-0000000000c4', 'zz_course', 'pw-4', now() - interval '2 hours');
+insert into public.assess_accounts (user_id, username, initial_password, password_set_at, sent_at) values
+  ('00000000-0000-0000-0000-0000000000c5', 'zz_test5', 'pw-5', now() - interval '2 hours', null),
+  ('00000000-0000-0000-0000-0000000000c6', 'zz_test6', 'pw-6', now() - interval '2 hours', '2020-01-01');
+create function pg_temp.pw(t text, k text) returns text language plpgsql as $$ declare r text; begin
+  if t = 'a' then select coalesce(initial_password, '(cleared)') into r from public.athlete_identities where athlete_id = k;
+  elsif t = 'c' then select coalesce(initial_password, '(cleared)') into r from public.tps_accounts where username = k;
+  else select coalesce(initial_password, '(cleared)') into r from public.assess_accounts where username = k; end if;
+  return r; end $$;
+
+do $t$
+declare sent timestamptz; ls timestamptz;
+begin
+  -- nothing happens until someone signs in
+  update auth.users set email = 'c1b@example.invalid' where id = '00000000-0000-0000-0000-0000000000c1';
+  perform pg_temp.rec('passwords: a change to anything but the sign-in time leaves the password alone', pg_temp.pw('a', 'zz_p1') = 'pw-1', pg_temp.pw('a', 'zz_p1'));
+  update auth.users set last_sign_in_at = null where id = '00000000-0000-0000-0000-0000000000c1';
+  perform pg_temp.rec('passwords: a sign-in time that did not change fires nothing', pg_temp.pw('a', 'zz_p1') = 'pw-1', '');
+
+  -- an athlete signs in after the password was set: cleared, and sent_at says when it reached them
+  update auth.users set last_sign_in_at = now() where id = '00000000-0000-0000-0000-0000000000c2';
+  select sent_at into sent from public.athlete_identities where athlete_id = 'zz_p2';
+  select last_sign_in_at into ls from auth.users where id = '00000000-0000-0000-0000-0000000000c2';
+  perform pg_temp.rec('passwords: an athlete who signs in with it has it cleared', pg_temp.pw('a', 'zz_p2') = '(cleared)', pg_temp.pw('a', 'zz_p2'));
+  perform pg_temp.rec('passwords: ...and sent_at is the sign-in time (they drop out of "Logins to send")', sent is not distinct from ls and sent is not null, coalesce(sent::text, 'null'));
+  perform pg_temp.rec('passwords: ...while nobody else is touched', pg_temp.pw('a', 'zz_p1') = 'pw-1' and pg_temp.pw('a', 'zz_p3') = 'pw-3', '');
+
+  -- a reset after the last sign-in: the old sign-in does not clear the new password; the next one does
+  update auth.users set last_sign_in_at = now() - interval '3 hours' where id = '00000000-0000-0000-0000-0000000000c3';
+  perform pg_temp.rec('passwords: a sign-in from BEFORE the password was set (a reset since) does not clear it', pg_temp.pw('a', 'zz_p3') = 'pw-3', pg_temp.pw('a', 'zz_p3'));
+  update auth.users set last_sign_in_at = now() where id = '00000000-0000-0000-0000-0000000000c3';
+  perform pg_temp.rec('passwords: ...the next sign-in clears it', pg_temp.pw('a', 'zz_p3') = '(cleared)', pg_temp.pw('a', 'zz_p3'));
+
+  -- the course and the testing app are the same; a sent_at that was already set is kept
+  update auth.users set last_sign_in_at = now() where id in ('00000000-0000-0000-0000-0000000000c4', '00000000-0000-0000-0000-0000000000c5', '00000000-0000-0000-0000-0000000000c6');
+  perform pg_temp.rec('passwords: a course buyer who signs in has it cleared', pg_temp.pw('c', 'zz_course') = '(cleared)', pg_temp.pw('c', 'zz_course'));
+  perform pg_temp.rec('passwords: a testing-app buyer who signs in has it cleared', pg_temp.pw('t', 'zz_test5') = '(cleared)' and pg_temp.pw('t', 'zz_test6') = '(cleared)', pg_temp.pw('t', 'zz_test5'));
+  perform pg_temp.rec('passwords: ...and an existing sent_at is kept, not overwritten', (select sent_at from public.assess_accounts where username = 'zz_test6') = '2020-01-01', (select sent_at::text from public.assess_accounts where username = 'zz_test6'));
+end $t$;
+
+-- it must never block a sign-in: a failure inside the bookkeeping is swallowed and the sign-in time still lands
+create function pg_temp.refuse() returns trigger language plpgsql as $$ begin raise exception 'fixture: the login table is locked down'; end $$;
+create trigger zz_refuse before update on public.athlete_identities for each row execute function pg_temp.refuse();
+do $t$
+declare ls timestamptz;
+begin
+  update auth.users set last_sign_in_at = now() where id = '00000000-0000-0000-0000-0000000000c1';
+  select last_sign_in_at into ls from auth.users where id = '00000000-0000-0000-0000-0000000000c1';
+  perform pg_temp.rec('passwords: if clearing fails, the sign-in still goes through', ls is not null, coalesce(ls::text, 'null'));
+  perform pg_temp.rec('passwords: ...and the password stays, as before (nothing half-done)', pg_temp.pw('a', 'zz_p1') = 'pw-1', pg_temp.pw('a', 'zz_p1'));
+end $t$;
+drop trigger zz_refuse on public.athlete_identities;
+do $t$
+begin
+  update auth.users set last_sign_in_at = now() + interval '1 second' where id = '00000000-0000-0000-0000-0000000000c1';
+  perform pg_temp.rec('passwords: ...and once the table works again the next sign-in clears it', pg_temp.pw('a', 'zz_p1') = '(cleared)', pg_temp.pw('a', 'zz_p1'));
+end $t$;
+
+-- the backfill (the end of the stage file) clears passwords whose person already signed in before the trigger existed
+insert into auth.users (id, email, last_sign_in_at) values
+  ('00000000-0000-0000-0000-0000000000d1', 'd1@example.invalid', now() - interval '1 hour'),
+  ('00000000-0000-0000-0000-0000000000d2', 'd2@example.invalid', now() - interval '3 hours'),
+  ('00000000-0000-0000-0000-0000000000d3', 'd3@example.invalid', null);
+insert into public.athlete_identities (user_id, athlete_id, initial_password, password_set_at) values
+  ('00000000-0000-0000-0000-0000000000d1', 'zz_old_used', 'pw-d1', now() - interval '2 hours'),
+  ('00000000-0000-0000-0000-0000000000d2', 'zz_old_reset', 'pw-d2', now() - interval '2 hours'),
+  ('00000000-0000-0000-0000-0000000000d3', 'zz_old_never', 'pw-d3', now() - interval '2 hours');
+-- (d1 signed in an hour ago, after the password was set 2 hours ago: used. d2 signed in 3 hours ago, before: not used. d3 never.)
+\i supabase/stage51_clear_used_passwords.sql
+do $t$
+begin
+  perform pg_temp.rec('passwords: the backfill clears one already used', pg_temp.pw('a', 'zz_old_used') = '(cleared)', pg_temp.pw('a', 'zz_old_used'));
+  perform pg_temp.rec('passwords: ...and leaves one from before a reset and one never used', pg_temp.pw('a', 'zz_old_reset') = 'pw-d2' and pg_temp.pw('a', 'zz_old_never') = 'pw-d3', '');
+end $t$;
+
+select pg_temp.other() \g /dev/null
+do $t$
+begin
+  begin
+    execute 'set local role authenticated';
+    perform public.clear_used_first_passwords();
+    execute 'reset role';
+    perform pg_temp.rec('passwords: the trigger function cannot be called by a signed-in user', false, 'no error');
+  exception when insufficient_privilege then perform pg_temp.rec('passwords: the trigger function cannot be called by a signed-in user', true, sqlerrm); end;
+  begin
+    execute 'set local role anon';
+    perform public.clear_used_first_passwords();
+    execute 'reset role';
+    perform pg_temp.rec('passwords: ...nor by anon', false, 'no error');
+  exception when insufficient_privilege then perform pg_temp.rec('passwords: ...nor by anon', true, sqlerrm); end;
 end $t$;
 select pg_temp.coach() \g /dev/null
 

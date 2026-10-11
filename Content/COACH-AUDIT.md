@@ -267,13 +267,13 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-191 findings. Fixed 121 · Partly 48 · Open 9 · Your call 12 · Not a bug 1.
+191 findings. Fixed 123 · Partly 46 · Open 9 · Your call 12 · Not a bug 1.
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
 | high | 22 | 8 | 0 | 3 | 0 |
-| medium | 51 | 28 | 2 | 7 | 0 |
+| medium | 53 | 26 | 2 | 7 | 0 |
 | low | 36 | 12 | 7 | 2 | 1 |
 
 ### The work and the ✎ editor (WORK)
@@ -479,7 +479,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | MKT-2 | medium | Forget is not an erasure: the login stays live, so the person's phone quietly re-creates their data, and the programme, titles and login survive | Your call | The Forget box and the manual now say exactly what is deleted and what stays, and that the login still works. | There is still no full erasure, and the person's login stays live, so their phone can quietly upload their data again; a one-step erasure waits on your decision. |
 | MKT-3 | medium | After a Proof write, the board, wall and presence data stay stale until Refresh | Partly | After a Forget the board, wall, contacts and roster are all reloaded, so the person disappears straight away. | Otherwise the board is still kept from the first time you opened it until you press Refresh (for example after cancelling a quest week), and it shows no 'as of' time. |
 | MKT-4 | medium | WhatsApp links are built three different ways; 8 of 19 funnel links are invalid and an affiliate number typed in Persian digits gives an empty link | Fixed | The funnel, the Proof tab, Affiliates and the login card all use one WhatsApp link builder that handles Persian digits and Iranian 09 numbers, and a number it cannot read gets no button instead of a wrong one. |  |
-| MKT-5 | medium | Plaintext login passwords stay stored and on screen after delivery; 'to send' never clears; every Backup file carries them | Partly | Backups no longer carry stored passwords, and Mark sent now asks first. | Passwords still stay stored and on screen, and still count as 'to send', until you tap Mark sent, even after the person has signed in; clearing them automatically waits on your yes. |
+| MKT-5 | medium | Plaintext login passwords stay stored and on screen after delivery; 'to send' never clears; every Backup file carries them | Fixed | Backups no longer carry stored passwords, Mark sent asks first, and since stage51 (2026-10-11, your yes) the database clears a stored password the moment the person signs in with it, so it stops counting as 'to send' and leaves the screen. | |
 | MKT-6 | medium | Buyer logins are two copy-pasted 129-line blocks, and the third copy (athlete logins) and the edge functions have drifted | Partly | The course and testing-app login functions now report a failed read or write the way the athlete one does (deployed as v3). | The Testing app and Course tabs are still two copied blocks, the athlete login buttons still have no double-tap guard, and the course login function's header still names the retired private repo. |
 | MKT-7 | low | 'Mark sent' does not check that a row changed, and erases the only stored password without asking | Fixed | Mark sent, for athletes and both kinds of buyer, now asks before clearing the stored password and reports a failure if nothing on the server changed. |  |
 | MKT-8 | medium | A failed load of Testing app or Course logins shows '0 active · No logins yet' and is never retried | Partly | If testing-app or course logins fail to load, the tab now says so with a Try again button and offers no Create, instead of showing 'No logins yet'. | When the leaderboard fails to load it still just says it couldn't fetch the board, with no reason. |
@@ -517,7 +517,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 | ID | Sev | Finding | Status | Now | Still |
 |---|---|---|---|---|---|
-| SERVER-1 | medium | Plaintext login passwords stay on the server after the person has already signed in, so 'Logins to send' overstates who is waiting | Partly | Logins to send (athletes, course and testing-app buyers, and the athlete's File card) now marks a stored password 'signed in with it' once the person has used it, so the list no longer overstates who is waiting. | The plain-text password still stays on the server until you tap Mark sent; clearing a used one automatically is waiting on your call. |
+| SERVER-1 | medium | Plaintext login passwords stay on the server after the person has already signed in, so 'Logins to send' overstates who is waiting | Fixed | Logins to send marked a used password 'signed in with it'; since stage51 (2026-10-11, your yes) the database clears it by itself the moment the person signs in with it, and sent_at says when it reached them. | |
 | SERVER-2 | medium | The backup says INCOMPLETE every week (hab_season_results is unreadable), and testing-app buyer data is never backed up | Fixed | Season results can be read by the backup, every table is paged in key order with repeats removed and short reads reported, and since stage50 (2026-10-11, your yes) the coach has a read-only policy on the testing app's players, notes and results, which are now in the weekly backup. The dashboard still cannot change a buyer's data. |  |
 | SERVER-3 | medium | Importing a past session over an existing one keeps the old set-by-set log, so the athlete and the coach see different sessions | Fixed | Adding a past session over one already logged on the same date now really replaces it, set-by-set log included, so you and the athlete see the same session and the warning box tells the truth. |  |
 | SERVER-4 | medium | A note the athlete edits after Amir marked the session read never comes back to 'needs you' | Fixed | When an athlete edits a note after you marked the session read, it comes back to 'needs you'; re-saving the same note does not. |  |
@@ -625,7 +625,7 @@ You answered eight of the twelve questions in §7. This table is kept up to date
 | 1 | The 13 free Proof signups with no login | Forget them, and **remove everything** (their programme rows and 5 titles too) | Script written and tested on a throwaway database. **Waits for you to run it** in the Supabase SQL editor (see below). |
 | 2 | Apply stage45 (Forget refused for coached clients) | Apply it now | The same: **waits for you to run it** in the SQL editor. |
 | 3 | Cancelling a quest week and the XP | not asked yet | open |
-| 4 | Stored first passwords | Clear one automatically once the person has signed in with it | to build |
+| 4 | Stored first passwords | Clear one automatically once the person has signed in with it | **Done** (stage51). Today 3 course buyers had a used password stored; the backfill clears them. |
 | 5 | One-step full erasure | Athletes **and** buyers | to build |
 | 6 | Testing-app players, notes and results in the backup | Yes, add the read permission | **Done** (stage50, applied 2026-10-11; in `BACKUP_TABLES`) |
 | 7 | How many programme versions to keep | The current and the previous cycle | to build |
