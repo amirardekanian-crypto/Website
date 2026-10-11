@@ -225,7 +225,12 @@
 // v107: program.html changed (2026-10-11, pile C): a cycle's dates are read as calendar days in whole days. Before, an athlete west of Greenwich (the
 //      Americas) was told "Cycle complete" a day early, the week's window and the retest window were a day off there, and across a clock change the week
 //      could flip an hour wrong. Tehran, London and Madrid were already right. Without the bump a phone keeps the old reading.
-const CACHE = 'aap-v107';
+// v108: program.html changed (2026-10-11, the Exercise Card Blueprint): How to do it holds the Spine entry's steps
+//      ("You need", then the numbered steps, then the cues, the video first when there is one), its row reads
+//      "How to do it · video · 5 steps · 3 cues" and shows the green ▶ only with a video, it opens by itself the first
+//      time on a simple card too, the Spine's cues win over a card's own, a working circuit folds each item's steps
+//      behind a How to do it line, and the About sheet from Library → Exercises puts How to do it above the body map.
+const CACHE = 'aap-v108';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

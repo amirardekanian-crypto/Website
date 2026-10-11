@@ -59,13 +59,27 @@ function fixture({ dated = true } = {}) {
   return PROG;
 }
 
-// A few approved Spine entries (the shape get_exercises() returns), stored as 'spinecache'.
+// A few approved Spine entries (the shape get_exercises() returns), stored as 'spinecache'. Since
+// 2026-10-11 an entry can carry `steps` (How to do it): the squat has a video and steps, the box jump
+// and the side plank steps and no video, the split squat and the Pallof press none yet.
 const SPINE = [
-  { id: 'barbell-back-squat', name: 'Barbell Back Squat', aliases: [], equipment: ['barbell', 'rack'], cues: { good: ['Brace before you unrack', 'Knees over the middle toes', 'Drive the floor away'], bad: ['Hips shooting up first'] }, video: 'https://www.youtube.com/watch?v=ultWZbUMPL8', purpose: 'Leg strength.' },
-  { id: 'box-jump', name: 'Box Jump', aliases: [], equipment: ['box'], cues: { good: ['Land soft'], bad: [] }, purpose: 'Power.' },
+  { id: 'barbell-back-squat', name: 'Barbell Back Squat', aliases: [], equipment: ['barbell', 'rack'], cues: { good: ['Brace before you unrack', 'Knees over the middle toes', 'Drive the floor away'], bad: ['Hips shooting up first'] }, video: 'https://www.youtube.com/watch?v=ultWZbUMPL8', purpose: 'Leg strength.',
+    steps: ['Set the hooks at armpit height and the safety bars a little below your lowest squat.',
+      'Rest the bar on your upper back, not your neck, hands just outside your shoulders.',
+      'Lift it off and take 3 small steps back. Feet shoulder-width, toes out a little.',
+      'Hold a big breath and sit down until your thighs are level with the floor.',
+      'Stand up, breathe out. After the last rep, walk forward until the bar touches the rack.'] },
+  { id: 'box-jump', name: 'Box Jump', aliases: [], equipment: ['box', 'floor'], cues: { good: ['Land soft'], bad: [] }, purpose: 'Power.',
+    steps: ['Stand facing a solid box on a non-slip floor, about one small step away.',
+      'Swing your arms back as you push your hips back into a quarter squat.',
+      'Swing your arms up and jump onto the box, landing on both whole feet.',
+      'Stand tall on the box, then step down one foot at a time.'] },
   { id: 'dumbbell-bulgarian-split-squat', name: 'Dumbbell Bulgarian Split Squat', aliases: [], equipment: ['dumbbells', 'bench'], cues: { good: ['Back foot on the bench', 'Front shin vertical'], bad: [] }, video: 'https://youtu.be/2C-uNgKwPLE', purpose: 'Single leg.' },
   { id: 'half-kneeling-pallof-press', name: 'Half Kneeling Pallof Press', aliases: [], equipment: ['band'], cues: { good: ['Ribs down'], bad: [] }, purpose: 'Anti-rotation.' },
-  { id: 'side-plank', name: 'Side Plank', aliases: [], equipment: ['floor'], cues: { good: ['Stack the hips'], bad: [] }, purpose: 'Lateral core.' },
+  { id: 'side-plank', name: 'Side Plank', aliases: [], equipment: ['floor'], cues: { good: ['Stack the hips'], bad: [] }, purpose: 'Lateral core.',
+    steps: ['Lie on your side, elbow under your shoulder, legs straight and stacked.',
+      'Lift your hips until your head, hips and feet make one straight line.',
+      'Lower your hips to the floor, then turn over for the other side.'] },
 ];
 
 // One finished session two days ago, stored as '<id>_histcache' (the shape of public.session_history).

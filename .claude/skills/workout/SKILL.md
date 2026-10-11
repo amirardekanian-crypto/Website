@@ -68,7 +68,7 @@ Best for: warm-up drills, mobility movements, cool-down, time/distance entries t
 }
 ```
 
-No `cues` on a new session's exercises: each shows its Spine entry's three (CUE-1, CUE-2).
+No `cues` on a Library card: each shows its Spine entry's steps and three cues (CUE-2, CUE-7).
 
 **`rx` is the prescription, and the only rule is: write what you prescribed, omit what you
 did not.** An absent field means *not prescribed*, and the app draws no cell for it. (Before
@@ -127,23 +127,22 @@ junk drawer of 121 labels:**
 
 | Field | What it is | How it draws |
 |---|---|---|
-| `setup` | **Don't use it** (Amir, 2026-09-25: *"i dont like floating text"*). A detail like `"In 4, out 8"` or `"alternate sides"` goes in the `note`; a grip is the `intent` pill | quiet grey line under the name |
-| `intent` | a **grip** (`"neutral grip"`) or **ONE** intention (`"max intent"`, `"max speed"`); both join in the one pill: `"neutral grip · max intent"` | the green pill (the only pill) |
-| `cues` | **don't write them**: the exercise's Spine entry supplies its three (the 42 older sessions keep theirs) | the cues list |
+| `setup` | **Don't use it** (CHP-1). A detail like `"In 4, out 8"` goes in the `note`; a grip or the side that goes first is the `intent` pill | quiet grey line under the name |
+| `intent` | the pill: one or two values from the list in SCHEMA.md → *`intent`: the pill list*, joined with ` · ` (CHP-2) | the green pill (the only pill) |
+| `cues` | **don't write them**: the exercise's Spine entry supplies its steps and three cues (CUE-7; the 42 older sessions' own were dropped on 2026-10-11, except the 12 cards with no entry) | the cues list |
 
-**Never restate the tempo in `intent` — or in a cue.** The card already shows `rx.tempo` with
-its key digits in clay, so `"3s eccentric"` as a pill, or "three seconds down, one second
-pause" as a cue, is the same instruction a second and third time. Spend the cue on what the
-numbers cannot say.
+The pill follows CHP-2: never the tempo (CHP-6), a dose, a muscle or a cue, and never what the entry's
+steps already say. A Library pill is for anyone doing the session, so it is the session's intention, not
+one athlete's.
 
-**Potentiate / power blocks** (CMJ, pogos, sprints, med-ball) use `type: "standard"` — not `"simple"` — so they get a rest timer. Use `intent` to communicate the movement intention:
+**Potentiate / power blocks** (CMJ, pogos, sprints, med-ball) use `type: "standard"` — not `"simple"` — so they get a rest timer. Use `intent` to communicate the movement intention, from the list:
 
 | Movement type | `intent` |
 |---|---|
-| Ankle pogos, fast hops | `"fast turnover"` |
+| Ankle pogos, fast hops | `"fast contact"` |
 | CMJ, box jumps, bounding | `"max intent"` |
 | Short sprints, accelerations | `"max speed"` |
-| Med-ball throws | `"max power"` |
+| Med-ball throws | `"max intent"` |
 
 **How the card draws it:** the grid is as wide as the prescription — two facts, two cells —
 and stat pills collapse into it when the card is expanded. The `intent` pill stays visible
@@ -180,23 +179,23 @@ Leave it out: the app plays the exercise's Spine entry's video (by `exId`, then 
 
 ### Coaching cues
 ⚠️ **Since 2026-09-24 the cues come from the Spine** (Amir: *"the aim is to use these cues for
-all the exercises that everyone has from now on"*). A new library workout writes **no `cues`**:
-every card and circuit item shows its exercise's approved Spine entry (`public.exercises`). Before
-publishing, check every name resolves to an **approved** entry with cues; a name with no entry gets
-one drafted with `/spine`, and Amir approves it in coach.html → Exercises. When Amir pastes a
-workout with his own cues, compare them with the entry's: a better general cue is a change to the
-entry (tell him), a point about this one session goes in `note`. Workouts already in the library
-keep the cues they carry.
+all the exercises that everyone has from now on"*). A Library card writes **no `cues`** (CUE-7):
+every card and circuit item shows its exercise's approved Spine entry (`public.exercises`): its steps
+(CUE-6) and its three cues (CUE-1). Before publishing, check every name resolves to an **approved**
+entry with cues and steps; a name with no entry gets one drafted with `/spine`, and Amir approves it in
+coach.html → Exercises. When Amir pastes a workout with his own cues, compare them with the entry's: a
+better general cue or a missing step is a proposal for the entry (tell him), and a point about this one
+session goes in `note`. The older sessions' own cues were dropped on 2026-10-11; only the 12 cards with
+no entry (breathing drills, warm-up sets) keep theirs.
 
-The shape, for reference (it is what a Spine entry holds): `cues.good[]` and `cues.bad[]`.
+The shape, for reference (it is what a Spine entry holds): `cues.good[]` (the key point, then a feel or
+a position check) and `cues.bad[]` (the one fault, fault first). Every entry has exactly three (CUE-1).
 
 **At the end, run `/spine` → Upkeep** on the workout's exercises, the same as after a programme:
 draft what is missing, fill empty fields (qualities included, or the day's quality chips go blank, and body parts: `loads` + `impact`), propose changes to approved entries (on `/spine`'s pending list, so they outlive the handoff).
 
-- `good` → what to do / what to feel (shown with ✅)
-- `bad` → what to avoid (shown with ❌)
-
-2 good + 1 bad is a good default. Don't write more than 3 per array.
+- `good` → the key point, then a feel or a position check (shown with ✅)
+- `bad` → the one fault to avoid, then its fix (shown with ❌)
 
 ---
 
@@ -222,30 +221,30 @@ Create **`workouts/<category-id>/<slug>.json`**:
 }
 ```
 
-### ⚠️ Four places to coach, and they must not repeat each other
+### ⚠️ Five places to coach, and they must not repeat each other
 
 Amir's correction, 2026-09-12, after every AI-written session in the library got
 this wrong: *"you are coaching in the Coach's Note and on the cues, that's too
-much."*
+much."* Since 2026-10-11 the Spine entry's steps carry the how-to (CUE-6, CUE-7).
 
 | | Job | Length |
 |---|---|---|
 | **`before`** | What to stop for: who it is not for today, the red flags, spacing, the first-time dose | rows of `{label, text}`, **50–210 words** in all |
 | **`intro`** | Why this session exists, how it runs, kit and timing | **1–2 paragraphs, about 100–150 words** |
-| **`note`** | One thing about *this exercise* the cues cannot carry | **ONE SENTENCE** |
-| **`cues`** | How to do the rep. **Comes from the Spine now, not written here** | **EXACTLY 3**, on the entry |
+| **`note`** | What this session changes about the exercise, for anyone doing it. Never how-to (the steps) or a cue | **ONE SENTENCE, for anyone** |
+| **`steps`** | How to do it, setup to a safe finish. **On the Spine entry, not written here** | **3–5** (CUE-6) |
+| **`cues`** | The key point, a feel or check, the one fault. **On the Spine entry, not written here** | **EXACTLY 3** (CUE-1) |
 
-**Cues: exactly three. One external, one internal, one avoid.** External +
-internal go in `cues.good[]`, the avoid cue in `cues.bad[]` — so `good` has 2
-entries and `bad` has 1, on every exercise, **including every item inside a
-circuit**. This is CUE-1, not a library-only rule: never more, never fewer.
+**Cues: exactly three, in CUE-1's roles** (the key point, a feel or a position check, the one
+fault), `good` 2 and `bad` 1 on every exercise, **including every item inside a circuit**. Steps
+and cues belong to the entry: a Library card carries neither (CUE-7).
 
 **Do not write a `note` on most exercises.** Neither workout Amir authored
-himself uses one at all. A note is for a caveat the cues cannot hold — a
-regression ("start on your knees"), a timing rule ("leave this one for an hour
-after you wake up"), a safety line. It is **not** where you explain why the
-session is built the way it is. That is `intro`, and giving the reasoning its own
-home is exactly what lets a note stay to one sentence.
+himself uses one at all. A Library note is one sentence for anyone doing this session, and
+only what the session changes: a regression ("start on your knees"), a timing rule ("leave this
+one for an hour after you wake up"), a safety line. It is **not** how to do the exercise (the
+steps), a cue, or why the session is built the way it is. That is `intro`, and giving the
+reasoning its own home is exactly what lets a note stay to one sentence.
 
 **`before` is the safety card and `intro` is not.** The app draws `before` as a white "Before you start" card
 that no toggle can hide, while *Why this session* is one preference shared by every workout and starts closed
@@ -276,8 +275,8 @@ wording the coaches' panel reviewed on the 20 new sessions. *Lightheaded* was wr
 | Swollen calf | If one calf is swollen, warm or tender and you didn't strain it playing, see a doctor the same day. | any session that stretches or rolls the calf |
 | Lightheaded | Dizzy, or pins and needles in your hands or face? Stop counting and breathe normally. Never do breath holds in water or while driving. | box breathing and any breath hold |
 
-**Check before publishing:** every exercise resolves to an approved Spine entry with cues (a new
-session writes no `cues`), carries its `exId` and is named EXACTLY as its entry, one name with no alias (Amir,
+**Check before publishing:** every exercise resolves to an approved Spine entry with cues and steps (a
+Library card writes no `cues`), carries its `exId` and is named EXACTLY as its entry, one name with no alias (Amir,
 2026-10-09; `python scripts/check_library_spine.py --online`, pre-commit
 guard 14: a card with no `exId` blocks the commit, 2026-10-09), every note one sentence, `intro` present and about 100–150 words, `before` present with no warning also repeated in the intro.
 
@@ -370,8 +369,8 @@ Before committing:
 - `file` path in the manifest exactly matches the file you created
 - Every `standard` exercise has `rx.sets` and exactly one dose
   (`reps` / `time` / `distance` / `work`)
-- No dose hiding in `intent`, and no `setup` at all — `intent` is a grip or ONE intention, any other
-  detail is the `note` (Amir, 2026-09-25: a grip is a chip, never free text; no floating text)
+- No dose hiding in `intent`, and no `setup` at all — `intent` comes from the pill list (CHP-2), any
+  other detail is the `note` (CHP-1, NAM-5)
 - No `chips[]` anywhere, and no `chips` left beside an `rx`
 - Circuits use `rx.rounds` (a NUMBER) and `rx.rest`; items take their own `rx` when the dose is
   plain and keep free-text `detail` only when the wording says more than a number

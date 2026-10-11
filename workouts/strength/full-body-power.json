@@ -54,15 +54,6 @@
           "name": "Stationary Bike",
           "exId": "stationary-bike",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Easy to moderate, any machine you like",
-              "Warm enough to sweat, not enough to tire you"
-            ],
-            "bad": [
-              "Going hard — you are lifting in fifteen minutes"
-            ]
-          },
           "rx": {
             "time": "5 minutes"
           }
@@ -72,15 +63,6 @@
           "name": "Glute Bridge",
           "exId": "glute-bridge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Push through your heels until your hips are level",
-              "Feel the glutes, not the lower back"
-            ],
-            "bad": [
-              "Arching the back to lift higher"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 12
@@ -91,15 +73,6 @@
           "name": "World's Greatest Stretch",
           "exId": "worlds-greatest-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Back hip down first, then rotate and reach tall",
-              "Feel the front of the back hip open"
-            ],
-            "bad": [
-              "Rotating before the hip has opened"
-            ]
-          },
           "rx": {
             "reps": 5,
             "side": true
@@ -110,15 +83,6 @@
           "name": "Goblet Squat",
           "exId": "goblet-squat",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Light weight at the chest, slow, find today's depth",
-              "It should feel like a rehearsal, not a set"
-            ],
-            "bad": [
-              "Loading it up — this is prep"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": "8 Reps, light"
@@ -150,15 +114,6 @@
           "name": "Countermovement Jump",
           "exId": "countermovement-jump",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Dip fast and jump as high as you can",
-              "Land soft and reset between every rep"
-            ],
-            "bad": [
-              "Rushing the reps and turning it into conditioning"
-            ]
-          },
           "note": "Power goes first in the session, while you are fresh.",
           "rx": {
             "sets": 4,
@@ -177,15 +132,6 @@
           "name": "Barbell Back Squat",
           "exId": "barbell-back-squat",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Brace before every rep, then sit between the hips",
-              "Same depth on the last rep as the first"
-            ],
-            "bad": [
-              "Knees caving in as it gets heavy"
-            ]
-          },
           "note": "Leave two or three reps in the tank — this is not a testing day.",
           "rx": {
             "sets": 4,
@@ -199,15 +145,6 @@
           "name": "Barbell Romanian Deadlift",
           "exId": "barbell-romanian-deadlift",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Push the hips back with the bar close to your legs",
-              "Stop where your hamstrings stop, not where the floor is"
-            ],
-            "bad": [
-              "Rounding the back to reach lower"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 8,
@@ -226,15 +163,6 @@
           "name": "Dumbbell Split Squat",
           "exId": "dumbbell-split-squat",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Long stance, drop straight down, push through the front heel",
-              "The front leg does the work, not the back"
-            ],
-            "bad": [
-              "Leaning forward to make it easier"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 8,
@@ -248,15 +176,6 @@
           "name": "Chest-Supported Dumbbell Row",
           "exId": "chest-supported-dumbbell-row",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Chest on the bench, pull to the hip and pause",
-              "Feel it between the shoulder blades"
-            ],
-            "bad": [
-              "Heaving it with the whole body"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 10,
@@ -275,15 +194,6 @@
           "name": "Half-Kneeling Pallof Press",
           "exId": "half-kneeling-pallof-press",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Press straight out and resist the pull",
-              "Nothing should turn"
-            ],
-            "bad": [
-              "Letting the ribs twist towards the cable"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 10,

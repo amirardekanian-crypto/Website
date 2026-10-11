@@ -34,15 +34,6 @@
           "name": "Frog Stretch",
           "exId": "frog-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Knees wide, feet turned out, rock the hips back slowly",
-              "Feel it through the groin"
-            ],
-            "bad": [
-              "Rocking back far enough that the lower back rounds"
-            ]
-          },
           "rx": {
             "reps": 10
           }
@@ -52,15 +43,6 @@
           "name": "Adductor Rock Back",
           "exId": "adductor-rock-back",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "One leg out straight to the side, foot flat, rock back",
-              "Feel it down the inside of the straight leg"
-            ],
-            "bad": [
-              "Letting the straight leg's foot roll onto its edge"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -78,15 +60,6 @@
           "exId": "cossack-squat",
           "videoUrl": null,
           "note": "Go only as deep as you can come back up from without a wobble.",
-          "cues": {
-            "good": [
-              "Wide stance, sit down over one leg with the other straight",
-              "The bent-leg heel stays down"
-            ],
-            "bad": [
-              "Dropping in and bouncing to get out"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -97,15 +70,6 @@
           "name": "Lateral Lunge",
           "exId": "lateral-lunge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Step wide, sit into that hip, reach past the outside of the foot",
-              "Push back out through the heel"
-            ],
-            "bad": [
-              "Staying upright — the reach is what makes the hip work"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -121,15 +85,6 @@
           "type": "simple",
           "name": "Half-Kneeling Hip Flexor with Overhead Reach",
           "exId": "half-kneeling-hip-flexor-with-overhead-reach",
-          "cues": {
-            "good": [
-              "Squeeze the back glute, then reach the same-side arm overhead",
-              "Feel the front of the back hip, never the lower back"
-            ],
-            "bad": [
-              "Arching the lower back to feel more"
-            ]
-          },
           "rx": {
             "time": "45 sec",
             "side": true
@@ -140,15 +95,6 @@
           "name": "Deep Squat Hold",
           "exId": "deep-squat-hold",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Sit into the bottom of a squat, elbows inside the knees",
-              "Let it settle rather than fighting it"
-            ],
-            "bad": [
-              "Bouncing to get lower"
-            ]
-          },
           "rx": {
             "time": "90 sec"
           }

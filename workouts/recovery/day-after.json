@@ -34,15 +34,6 @@
           "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Walk with your arms swinging and look ahead, not at your feet",
-              "Feel your legs warming up and your stiffness easing"
-            ],
-            "bad": [
-              "Walking so fast that you can't hold a conversation"
-            ]
-          },
           "rx": {
             "time": "10 minutes"
           },
@@ -59,15 +50,6 @@
           "name": "Ankle Dorsiflexion Rocks",
           "exId": "ankle-dorsiflexion-rocks",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Drive the knee forward over your toes",
-              "Feel a stretch low in the calf, and back off if you feel a pinch at the front of your ankle"
-            ],
-            "bad": [
-              "Letting the heel lift or the arch collapse"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -78,15 +60,6 @@
           "name": "Hamstring Scoop",
           "exId": "hamstring-scoop",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Step forward onto a straight leg and reach both hands toward your toes",
-              "Feel a gentle stretch down the back of the leg you stepped forward with, never a sharp pull"
-            ],
-            "bad": [
-              "Rounding your back instead of hinging at the hip"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -97,15 +70,6 @@
           "name": "Glute Bridge",
           "exId": "glute-bridge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Push the floor away through your heels",
-              "Feel your glutes squeeze at the top"
-            ],
-            "bad": [
-              "Arching your lower back to lift higher"
-            ]
-          },
           "rx": {
             "reps": 10
           }
@@ -121,15 +85,6 @@
           "name": "Squat",
           "exId": "bodyweight-squat",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hold a broom handle or racket out in front and sit down slowly, only as deep as feels comfortable",
-              "Feel your hips and ankles moving freely"
-            ],
-            "bad": [
-              "Rushing the reps or bouncing at the bottom"
-            ]
-          },
           "rx": {
             "reps": 10
           }
@@ -140,15 +95,6 @@
           "exId": "dowel-hip-hinge",
           "videoUrl": null,
           "note": "With no broom handle, put your hands on your hips and push them back instead.",
-          "cues": {
-            "good": [
-              "Hold a broom handle along your spine and push your hips back",
-              "Feel the backs of your thighs load as you hinge"
-            ],
-            "bad": [
-              "Rounding your back as you lean forward"
-            ]
-          },
           "rx": {
             "reps": 10
           }

@@ -34,15 +34,6 @@
           "name": "Quadruped Thoracic Rotation",
           "exId": "quadruped-thoracic-rotation",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Sit tall with a hand behind your head and turn your elbow round to the side",
-              "Feel the turn in your upper back and ribs"
-            ],
-            "bad": [
-              "Turning from your lower back"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -53,15 +44,6 @@
           "name": "Alternating Overhead Reach",
           "exId": "alternating-overhead-reach",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Stand tall and reach one arm long toward the ceiling, then the other",
-              "Feel the side of your ribs lengthen on the reaching side"
-            ],
-            "bad": [
-              "Leaning back and arching your lower back"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -78,15 +60,6 @@
           "name": "Glute Bridge",
           "exId": "glute-bridge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Push the floor away through your heels",
-              "Feel your glutes squeeze at the top"
-            ],
-            "bad": [
-              "Arching your lower back to lift higher"
-            ]
-          },
           "rx": {
             "reps": 12
           }
@@ -96,15 +69,6 @@
           "name": "Leg Swings",
           "exId": "leg-swings",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hold a wall and swing the leg forward and back like a pendulum",
-              "Feel the hip loosen up as the swing gets bigger"
-            ],
-            "bad": [
-              "Swinging harder than you can control"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -115,15 +79,6 @@
           "name": "Reverse Lunge",
           "exId": "reverse-lunge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Step back and lower the back knee toward the floor",
-              "Feel the front of the back hip and thigh stretch"
-            ],
-            "bad": [
-              "Letting the front knee cave inward"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -140,15 +95,6 @@
           "name": "Inchworm",
           "exId": "inchworm",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Walk your hands out to a plank, then walk your feet up to them",
-              "Feel the backs of your legs stretch as your feet come in"
-            ],
-            "bad": [
-              "Letting your hips sag when your hands are out"
-            ]
-          },
           "rx": {
             "reps": 6
           }
@@ -158,15 +104,6 @@
           "name": "Squat to Stand",
           "exId": "squat-to-stand",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hold your toes, sink your hips down, then lift your chest and stand",
-              "Feel your hips and ankles opening at the bottom"
-            ],
-            "bad": [
-              "Letting your heels lift off the floor"
-            ]
-          },
           "rx": {
             "reps": 8
           }

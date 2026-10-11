@@ -33,7 +33,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js"></script>
 <!-- Chip semantics, shared with program.html so the editor and the athlete app
      can never disagree about what a prescription says. See chips-selftest.html. -->
-<script src="/assets/js/chips.js?v=20260925a"></script>
+<script src="/assets/js/chips.js?v=20261011b"></script>
 <style>
   :root {
     --paper: #FAF7F2; --card: #FFFFFF; --ink: #1A1A1A;
@@ -558,6 +558,29 @@
                color: var(--clay-ink); font-family: 'Barlow', sans-serif; font-size: 12px; line-height: 1.5; }
   .exed-acts { margin-top: 13px; display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
   .exed-hint { font-family: 'Barlow', sans-serif; font-size: 12px; color: var(--muted-soft); }
+  /* The pill picker (CHP-2, 2026-10-11): the closed list from chips.js, at most two, one per group. */
+  .pillpick { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }
+  .pp-grp { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; font-family: 'Barlow', sans-serif; }
+  .pp-g { width: 112px; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); font-weight: 600; }
+  .pp { font-family: 'Barlow', sans-serif; font-size: 12px; padding: 4px 10px; border-radius: 999px;
+        border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  .pp:hover { border-color: var(--court); }
+  .pp.on { background: var(--court); border-color: var(--court); color: #fff; }
+  .pp-off { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 4px;
+            font-family: 'Barlow', sans-serif; font-size: 12px; color: var(--clay-ink); }
+  .pp-note { font-family: 'Barlow', sans-serif; font-size: 12px; color: var(--clay-ink); margin-top: 2px; line-height: 1.45; }
+  .rx-pill { display: inline-block; padding: 0 7px; border-radius: 999px; background: var(--court-100);
+             color: var(--court); font-family: 'Barlow', sans-serif; font-size: 12px; font-weight: 700; }
+  .rx-pill.off { background: var(--clay-100); color: var(--clay-ink); }
+  /* Claude's draft in the Spine editor (stage64): the box it filled, and the line that says so. */
+  .sp-draft { margin: 2px 0 6px; padding: 7px 10px; border-radius: 8px; background: var(--clay-100); color: var(--clay-ink);
+              font-size: 12.5px; line-height: 1.45; }
+  .sp-draft .btn { margin-left: 6px; }
+  .sp-draft .now { color: var(--muted); margin-top: 3px; }
+  .sp-draft.off { background: var(--paper); color: var(--muted); border: 1px dashed var(--line); }
+  .spine-ed .sp-drafted { border-color: var(--clay) !important; box-shadow: 0 0 0 1px var(--clay); }
+  .sp-hint { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .sp-hint.bad { color: var(--clay-ink); font-weight: 700; }
   .pvlist { margin-top: 4px; }
   .pvrow { display: flex; align-items: center; gap: 12px; padding: 7px 0; flex-wrap: wrap;
            border-bottom: 1px solid var(--rule); font-family: 'Barlow', sans-serif; font-size: 12px; }
@@ -3231,7 +3254,8 @@ function legacyRx(ex) {
     target: r.rpe ? '@' + r.rpe : '',
     tempo:  r.tempo || '',
     rest:   r.rest || 0,
-    extras: (r.extras || []).concat(r.setup ? [{ label: r.setup, style: 'dark' }] : [])
+    extras: (r.extras || []).concat(r.setup ? [{ label: r.setup, style: 'dark' }] : []),
+    intent: r.intent || ''   // the green pill (CHP-2): shown on the row, a value off the list in clay
   };
 }
 
@@ -3523,7 +3547,7 @@ function cmpRowHtml(c, lib, athleteId) {
   const eid = editable
     ? (athleteId + '_' + c.path.day + '_' + c.path.block + '_' + c.path.ex).replace(/[^a-z0-9]/gi, '_')
     : '';
-  const warn = c.pex ? Chips.audit(c.pex).concat(Chips.auditRx(c.pex)) : [];
+  const warn = c.pex ? Chips.audit(c.pex).concat(Chips.auditRx(c.pex), Chips.auditPill(c.pex)) : [];
   const rxBits = [];
   if (dose) rxBits.push(`<span class="rx-dose">${esc(dose)}</span>`);
   if (rx.target) rxBits.push(`<span class="rx-rpe">RPE ${esc(rpeTarget(rx.target) ? rpeTarget(rx.target).label : rx.target.replace(/^@/, ''))}${
@@ -3531,6 +3555,11 @@ function cmpRowHtml(c, lib, athleteId) {
   const rxSub = [];
   if (rx.tempo) rxSub.push('tempo ' + esc(rx.tempo));
   (rx.extras || []).forEach(x => rxSub.push(esc(x.label)));
+  // The pill (CHP-2), on the same line: a value on the list in its list spelling, one off the list in clay. A line of its
+  // own would push the hover pencil (absolute, at the end of this cell) under the next row.
+  if (rx.intent) rxSub.push(Chips.pillSplit(rx.intent).map(p => Chips.pillGroup(p)
+    ? `<span class="rx-pill">${esc(Chips.pillCanon(p))}</span>`
+    : `<span class="rx-pill off" title="Not on the pill list: open ✎ to move it to the note or drop it">${esc(p)}</span>`).join(' '));
   const v = c.pex ? vidUrl(c.pex, lib) : '';
   const items = (c.pex && c.pex.items && c.pex.items.length)
     ? c.pex.items.map(it => esc(it.name) + (it.detail ? ' (' + esc(it.detail) + ')' : '')).join(' · ')
@@ -3604,16 +3633,80 @@ function restoreExDrafts() {
       const el = document.getElementById(k + '-' + eid); if (!el) return;
       if (k === 'exSide') el.checked = !!d.fields[k]; else el.value = d.fields[k];
     });
+    paintPills(eid);
   });
 }
 document.addEventListener('input', ev => {
   const m = ev.target && ev.target.id && ev.target.id.match(/^ex(Sets|Kind|Dose|Rpe|Tempo|Rest|Note|Side)-(.+)$/);
   if (m && _exDrafts[m[2]]) _exDrafts[m[2]].fields = exDraftFields(m[2]);
+  if (m && (m[1] === 'Rpe' || m[1] === 'Tempo') && _exDrafts[m[2]]) paintPills(m[2]);   // the hold and pace warnings read them
 });
 document.addEventListener('change', ev => {
   const m = ev.target && ev.target.id && ev.target.id.match(/^ex(Kind|Side)-(.+)$/);
   if (m && _exDrafts[m[2]]) _exDrafts[m[2]].fields = exDraftFields(m[2]);
 });
+
+// ── The pill picker (CHP-2, 2026-10-11) ─────────────────────────────────────────────────
+// The card's `intent` from the closed list in chips.js (Chips.PILLS): at most two values, never two from one group. A tap
+// puts a value on; a second tap takes it off; a value from a group already on takes its place. A value already on the card
+// that is not on the list (an old pill: "3s eccentric", "glute focus") is shown in clay with two ways out: into the note,
+// or dropped. Left alone it is kept, so nothing is lost, and check_program.py flags it. A new value joins the list only on
+// Amir's word, so there is no box to type one.
+const PILL_GROUP_NAME = { hands: 'Hands', lead: 'Lead side', intent: 'Intent', hold: 'Hold · tempo iso', brakes: 'Brakes', pace: 'Pace · no RPE' };
+function pillWarnings(eid, vals) {
+  const val = id => String((document.getElementById(id + '-' + eid) || {}).value || '').trim();
+  const out = [], groups = {};
+  vals.forEach(v => { const g = Chips.pillGroup(v); if (g) (groups[g] = groups[g] || []).push(v); });
+  (groups.hold || []).forEach(v => { if (val('exTempo').toLowerCase() !== 'iso') out.push(`“${v}” needs Tempo iso: a hold is the tempo's Hold.`); });
+  (groups.pace || []).forEach(v => { if (val('exRpe')) out.push(`“${v}” goes only on an item with no RPE: clear the RPE or take the pill off.`); });
+  Object.keys(groups).forEach(g => { if (groups[g].length > 1) out.push(`Two from the ${(PILL_GROUP_NAME[g] || g).toLowerCase()} group (${groups[g].join(', ')}): keep one.`); });
+  if (vals.length > 2) out.push(`${vals.length} pills: two at most.`);
+  return out;
+}
+function pillPickHtml(eid) {
+  const vals = (_exDrafts[eid] && _exDrafts[eid].pills) || [];
+  const on = v => vals.some(x => x.toLowerCase() === v.toLowerCase());
+  const warn = pillWarnings(eid, vals);
+  return Chips.PILL_GROUPS.map(g => `<div class="pp-grp"><span class="pp-g">${esc(PILL_GROUP_NAME[g] || g)}</span>${
+      Chips.PILLS[g].map(v => `<button type="button" class="pp${on(v) ? ' on' : ''}" aria-pressed="${on(v)}" data-v="${esc(v)}" onclick="pillPick('${eid}', this.dataset.v)">${esc(v)}</button>`).join('')}</div>`).join('') +
+    vals.filter(v => !Chips.pillGroup(v)).map(v => `<div class="pp-off">⚠ “${esc(v)}” is not on the pill list.
+      <button type="button" class="btn sm" data-v="${esc(v)}" onclick="pillToNote('${eid}', this.dataset.v)">Move to the note</button>
+      <button type="button" class="btn sm" data-v="${esc(v)}" onclick="pillDrop('${eid}', this.dataset.v)">Drop it</button></div>`).join('') +
+    (warn.length ? `<div class="pp-note">${warn.map(w => '⚠ ' + esc(w)).join('<br>')}</div>` : '');
+}
+function paintPills(eid) { const box = document.getElementById('exPills-' + eid); if (box) box.innerHTML = pillPickHtml(eid); }
+function pillPick(eid, v) {
+  const d = _exDrafts[eid];
+  if (!d) return;
+  const vals = d.pills || (d.pills = []);
+  const i = vals.findIndex(x => x.toLowerCase() === v.toLowerCase());
+  if (i >= 0) vals.splice(i, 1);
+  else {
+    const g = Chips.pillGroup(v), j = vals.findIndex(x => Chips.pillGroup(x) === g);
+    if (j >= 0) vals.splice(j, 1, v);
+    else if (vals.length >= 2) { toast('Two pills at most: take one off first'); return; }
+    else vals.push(v);
+  }
+  paintPills(eid);
+}
+function pillDrop(eid, v) {
+  const d = _exDrafts[eid];
+  if (!d || !d.pills) return;
+  d.pills = d.pills.filter(x => x !== v);
+  paintPills(eid);
+}
+// An old pill that says something about this athlete goes to the end of the note, as a sentence.
+function pillToNote(eid, v) {
+  const note = document.getElementById('exNote-' + eid);
+  if (note) {
+    note.value = [note.value.trim(), asSentence(v)].filter(Boolean).join(' ');
+    if (_exDrafts[eid]) _exDrafts[eid].fields = exDraftFields(eid);
+  }
+  pillDrop(eid, v);
+}
+window.pillPick = pillPick;
+window.pillDrop = pillDrop;
+window.pillToNote = pillToNote;
 
 // `expectName` is the exercise name the row showed. Positions (day, block, index) are only an
 // address; the name is the check that the address still points at the exercise the coach chose.
@@ -3629,7 +3722,9 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, reopen
     reloadPrograms().then(render);
     return;
   }
-  if (!_exDrafts[eid]) _exDrafts[eid] = { athleteId, dayId, blockIdx, exIdx, name: found.ex.name, fields: null };
+  if (!_exDrafts[eid]) _exDrafts[eid] = { athleteId, dayId, blockIdx, exIdx, name: found.ex.name, fields: null, pills: null };
+  // The pill as the card will be saved: an old card's chips fold in (toRx), old spellings become list values.
+  if (!_exDrafts[eid].pills) _exDrafts[eid].pills = Chips.pillSplit(Chips.toRx(found.ex).intent);
   const r  = Chips.rxOf(found.ex);
   const st = {
     sets:  r.sets || '',
@@ -3671,12 +3766,14 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, reopen
       ${f('exTempo', 'Tempo', st.tempo, '3-0-1-0 / iso', 108)}
       ${f('exRest',  'Rest',  st.restSec ? st.restSec + 's' : '', 'blank = none', 116)}
     </div>
-    <label class="exf exf-wide"><span>Your note to them</span>
-      <textarea id="exNote-${eid}" rows="2" placeholder="Optional coaching note on this exercise">${esc(st.note)}</textarea>
+    <div class="exf exf-wide"><span>Pill · what this athlete changes every rep · at most two, one per group</span>
+      <div class="pillpick" id="exPills-${eid}">${pillPickHtml(eid)}</div></div>
+    <label class="exf exf-wide"><span>Your note to them · about this athlete: start weight, limit, kit, fallback</span>
+      <textarea id="exNote-${eid}" rows="2" placeholder="Optional. One to three short sentences, the point first">${esc(st.note)}</textarea>
     </label>
     ${r.setup ? `<div class="exed-mods">Its old grey line is now the start of your note, and moves there when you save.</div>` : ''}
-    ${r.extras.length ? `<div class="exed-mods">Old technique chips — saving keeps them as the pill:
-      ${r.extras.map(m => `<span class="fl">${esc(m.label)}</span>`).join('')}</div>` : ''}
+    ${r.extras.length ? `<div class="exed-mods">Old chips on this card:
+      ${r.extras.map(m => `<span class="fl">${esc(m.label)}</span>`).join('')} They are in the pill above now (one that only repeats the tempo is dropped), and move there when you save.</div>` : ''}
     ${problems.length ? `<div class="exed-warn">${problems.map(p => '⚠ ' + esc(p.msg)).join('<br>')}</div>` : ''}
     <div class="exed-acts">
       <button class="btn sm primary" onclick="saveExEditor(${jsq(athleteId)},${Number(dayId)},${blockIdx},${exIdx},'${eid}',${jsq(found.ex.name)}, this)">Save</button>
@@ -3684,6 +3781,7 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, reopen
       <span class="exed-hint">Changes what they see next. Past logs are untouched.</span>
     </div>`;
   box.style.display = 'block';
+  paintPills(eid);   // again, now the tempo and RPE boxes exist: the hold and pace warnings read them
 }
 
 // What the editor's fields say, checked against the rx contract (SCHEMA.md, PROGRAM-APP.md):
@@ -3712,6 +3810,9 @@ function readExEditor(eid) {
   if (restRaw && !restSec) return { error: `Rest "${restRaw}" is not a duration I understand. Try 90s, 2 min, or 1:30.` };
   const patch = { sets: sets ? Number(sets) : '', rpe: num(rpe), tempo, rest: restSec,
                   side: !!(document.getElementById('exSide-' + eid) || {}).checked };
+  // The pill: the picker's values, one string joined by " · " (chips.js applyRx puts each in the list's spelling).
+  const dr = _exDrafts[eid];
+  if (dr && Array.isArray(dr.pills)) patch.intent = Chips.pillJoin(dr.pills);
   patch[kind] = kind === 'reps' ? num(dose) : dose;   // clears the other three doses
   const note = val('exNote');
   return { patch, kind, note };
@@ -5930,8 +6031,13 @@ async function loadSpine() {
     S.spine = S.spine || { list: [
       mk('goblet-squat', 'Goblet Squat', 'squat', 'draft', { harder: ['machine-leg-press'] }),
       mk('machine-leg-press', 'Machine Leg Press', 'squat', 'approved', { easier: ['goblet-squat'] }),
-      mk('dead-bug', 'Dead Bug', 'anti-extension', 'draft'),
-    ], coach: { 'machine-leg-press': { id: 'machine-leg-press', sfr: 1, flags: ['loaded-knee-flexion'], suggested_qualities: ['strength', 'muscle'] } },
+      mk('dead-bug', 'Dead Bug', 'anti-extension', 'draft', { steps: ['Lie on your back with your head and low back touching the floor.',
+        'Point your arms straight up and lift your knees over your hips, bent to 90°.', 'Lower one arm behind your head and straighten the opposite leg, both just off the floor.',
+        'Come back to the start and switch sides. Each reach counts as one rep.'] }),
+    ], coach: { 'machine-leg-press': { id: 'machine-leg-press', sfr: 1, flags: ['loaded-knee-flexion'], suggested_qualities: ['strength', 'muscle'],
+      suggested_changes: [{ field: 'steps', old: [], new: ['Sit with your back flat on the pad and your feet hip-width on the platform.', 'Push the platform up and release the handles that hold it.',
+        'Bend your knees and lower it until your knees are near your chest, or higher if your low back lifts.', 'Push it back up until your legs are almost straight. Lock the handles back in before you stand.'],
+        why: 'How to do it (CUE-6)', from: 'spine (demo)', at: '2026-10-11T08:00:00Z' }] } },
       quals: QM_IDS.map((id, i) => ({ id, name: id[0].toUpperCase() + id.slice(1), family: null, line: 'Sample line.', tennis: '', tests: [], sort: i + 1, status: i < 3 ? 'approved' : 'draft' })) };
     return;
   }
@@ -6056,7 +6162,10 @@ function spineEdits() {
 }
 function spineNoteEdits() { if (_spineOpen) _spineDraft = { id: _spineOpen, edits: spineEdits() }; }
 function spineHasEdits() {
-  return !!(_spineDraft && _spineDraft.id === _spineOpen && Object.keys(_spineDraft.edits).length) || Object.keys(_qualDraft).length > 0;
+  // A box that only holds Claude's draft is not unsaved work (closing leaves the draft waiting); a discard is (stage64).
+  const ed = _spineDraft && _spineDraft.id === _spineOpen ? _spineDraft.edits : {};
+  const pf = _spinePF.id === _spineOpen ? _spinePF.state : {};
+  return Object.keys(ed).some(k => ed[k] !== pf[k]) || Object.keys(spineDiscOf(_spineOpen)).length > 0 || Object.keys(_qualDraft).length > 0;
 }
 // Before anything that would throw typed work away: true = carry on.
 function spineMayLeave(what) {
@@ -6064,19 +6173,19 @@ function spineMayLeave(what) {
   if (!spineHasEdits()) return true;
   const e = _spineOpen && S.spine && S.spine.list.find(x => x.id === _spineOpen);
   if (!confirm(`You have unsaved changes${e ? ' to ' + e.name : ''}${Object.keys(_qualDraft).length ? (e ? ' and' : ' to') + ' the quality texts' : ''}.\n\n${what || 'Leave'} and lose them?`)) return false;
-  _spineDraft = null; _qualDraft = {};
+  _spineDraft = null; _qualDraft = {}; spineDiscReset();
   return true;
 }
 // Columns behind each editor field.
 const SPINE_ENTRY_COL = { 'sf:name': 'name', 'sf:aliases': 'aliases', 'sf:pattern': 'pattern', 'sf:video': 'video',
   'sf:q1': 'qualities', 'sf:q2': 'qualities', 'sf:q3': 'qualities', 'sf:purpose': 'purpose', 'sf:tennis': 'tennis',
   'sf:good': 'cues', 'sf:bad': 'cues', 'sf:easier': 'easier', 'sf:harder': 'harder', 'sf:alts': 'alts',
-  'sf:equipment': 'equipment', sload: 'loads', 'sf:impact': 'impact', 'sf:muscles': 'muscles' };
+  'sf:equipment': 'equipment', sload: 'loads', 'sf:impact': 'impact', 'sf:muscles': 'muscles', 'sf:steps': 'steps' };
 const SPINE_COACH_COL = { 'sf:sfr': 'sfr', sflag: 'flags', 'sf:credits': 'credits', 'sf:cost': 'cost', 'sf:notes': 'notes' };
 // What each column is called on screen (a clash message, the history list). A column not named here is
 // Claude's bookkeeping (links_before, suggested_changes …) and never shown.
 const SPINE_LABEL = { name: 'Name', aliases: 'Also written as', pattern: 'Pattern', video: 'Video', qualities: 'Qualities',
-  purpose: 'Why it’s here', tennis: 'On court', cues: 'Cues / Don’t', easier: 'Regressions', harder: 'Progressions',
+  purpose: 'Why it’s here', tennis: 'On court', steps: 'Steps', cues: 'Cues / Don’t', easier: 'Regressions', harder: 'Progressions',
   alts: 'Alternatives', equipment: 'Equipment', loads: 'Body parts', impact: 'Impact', muscles: 'Muscles shown',
   status: 'Status', sfr: 'SFR rank', flags: 'Flags', credits: 'Counts toward', cost: 'Cost', notes: 'Notes' };
 function stableJson(v) {
@@ -6109,6 +6218,108 @@ function spineShort(v) {
 function spineCsv(v) { return String(v || '').split(',').map(x => x.trim()).filter(Boolean); }
 function spineLines(v) { return String(v || '').split('\n').map(x => x.trim()).filter(Boolean); }
 
+// ── How to do it (stage64, 2026-10-11; CUE-6) ───────────────────────────────────────────────
+// One step per line. A number typed in front ("1. ", "2) ") is dropped: the app numbers the steps itself. The limits are
+// public.spine_steps_ok()'s, so a box that passes here passes there: 6 steps at most, none over 140 characters (none empty:
+// a blank line is no step). The aim, under 90 characters, is only a hint.
+const SPINE_STEPS_MAX = 6, SPINE_STEP_CHARS = 140, SPINE_STEP_AIM = 90;
+function spineSteps(v) { return spineLines(v).map(x => x.replace(/^\d{1,2}\s*[.)]\s+/, '').trim()).filter(Boolean); }
+function spineStepsHint(el) {
+  const box = el && el.parentNode && el.parentNode.querySelector('[data-steps-hint]');
+  if (!box) return;
+  const s = spineSteps(el.value);
+  if (!s.length) { box.className = 'sp-hint'; box.textContent = 'No steps yet: 3 to 5 (2 or 3 for a stretch or the bike, up to 6 for a rack lift, so the bail fits).'; return; }
+  const at = test => s.map((x, i) => test(x) ? i + 1 : 0).filter(Boolean);
+  const over = at(x => x.length > SPINE_STEP_CHARS), long = at(x => x.length > SPINE_STEP_AIM && x.length <= SPINE_STEP_CHARS);
+  box.className = 'sp-hint' + (s.length > SPINE_STEPS_MAX || over.length ? ' bad' : '');
+  box.textContent = `${s.length} step${s.length === 1 ? '' : 's'} · longest ${Math.max(...s.map(x => x.length))} characters` +
+    (s.length > SPINE_STEPS_MAX ? ` · ${SPINE_STEPS_MAX} at most, so it will not save` : '') +
+    (over.length ? ` · step ${over.join(', ')} over ${SPINE_STEP_CHARS}, so it will not save` : '') +
+    (long.length ? ` · step ${long.join(', ')} over ${SPINE_STEP_AIM}: aim shorter` : '');
+}
+window.spineStepsHint = spineStepsHint;
+
+// ── Claude's drafts on an entry (stage64, 2026-10-11) ───────────────────────────────────────
+// Claude never writes steps, cues or purpose on an APPROVED entry: /spine leaves a draft in exercise_coach.suggested_changes
+// (stage43's items: {field, old, new, why, from, at}). The editor pre-fills the box from a draft whose `old` still equals what
+// the entry holds, and says it is Claude's. A draft whose `old` no longer matches is stale (the entry moved on): it is not
+// shown, and /spine drops it. Amir's Save is the approval: the same coach_save_spine() call writes the entry and takes every
+// draft he decided (kept, edited or discarded) off the list. Closing without saving leaves the drafts waiting.
+const SPINE_DRAFT_FIELDS = ['steps', 'cues', 'purpose'];
+const SPINE_DRAFT_BOX = { steps: ['sf:steps'], cues: ['sf:good', 'sf:bad'], purpose: ['sf:purpose'] };
+let _spineDisc = { id: null, fields: {} };   // drafts discarded in the open editor: they leave the list on Save
+let _spinePF = { id: null, state: {} };      // what the pre-fill put in the open editor's boxes, to tell it from typing
+function spineDiscOf(id) { return id && _spineDisc.id === id ? _spineDisc.fields : {}; }
+function spineDiscReset() { _spineDisc = { id: null, fields: {} }; }
+// A value as the drafts compare it: no steps is [], no cues and no purpose are null.
+function spineDraftNorm(field, v) {
+  if (field === 'steps') return Array.isArray(v) ? v : [];
+  if (field === 'cues') return v && typeof v === 'object' && !Array.isArray(v) ? v : null;
+  return v == null || v === '' ? null : String(v);
+}
+// A draft the editor can show: steps a list of text, cues {good:[…], bad:[…]}, purpose some text.
+function spineDraftUsable(field, v) {
+  if (field === 'steps') return Array.isArray(v) && v.length > 0 && v.every(x => typeof x === 'string');
+  if (field === 'cues') return !!v && typeof v === 'object' && !Array.isArray(v) &&
+    ['good', 'bad'].every(k => v[k] == null || (Array.isArray(v[k]) && v[k].every(x => typeof x === 'string')));
+  return typeof v === 'string' && !!v.trim();
+}
+// The drafts waiting on one entry, per field: `fresh` (old still equals the entry; oldest first, the newest is the one shown)
+// and how many are stale.
+function spinePending(e, k) {
+  const out = {};
+  ((k && Array.isArray(k.suggested_changes)) ? k.suggested_changes : []).forEach(it => {
+    if (!it || SPINE_DRAFT_FIELDS.indexOf(it.field) < 0) return;
+    const p = out[it.field] || (out[it.field] = { fresh: [], stale: 0 });
+    if (spineDraftUsable(it.field, it.new) && stableJson(spineDraftNorm(it.field, it.old)) === stableJson(spineDraftNorm(it.field, e[it.field]))) p.fresh.push(it);
+    else p.stale++;
+  });
+  Object.keys(out).forEach(f => out[f].fresh.sort((a, b) => String(a.at || '').localeCompare(String(b.at || ''))));
+  return out;
+}
+function spineHasDraft(e) { const p = spinePending(e, S.spine.coach[e.id]); return SPINE_DRAFT_FIELDS.some(f => p[f] && p[f].fresh.length > 0); }
+// The boxes a draft fills, as the form holds them.
+function spineDraftForm(field, v) {
+  if (field === 'steps') return { 'sf:steps': v.join('\n') };
+  if (field === 'cues') return { 'sf:good': (v.good || []).join('\n'), 'sf:bad': (v.bad || []).join('\n') };
+  return { 'sf:purpose': v };
+}
+// What the pre-fill puts in the open editor: the newest fresh draft of each field the coach has not discarded.
+function spinePrefill(e) {
+  const p = spinePending(e, S.spine.coach[e.id]), disc = spineDiscOf(e.id), st = {};
+  SPINE_DRAFT_FIELDS.forEach(f => { const d = p[f] && p[f].fresh[p[f].fresh.length - 1]; if (d && !disc[f]) Object.assign(st, spineDraftForm(f, d.new)); });
+  return st;
+}
+// The line above a box a draft filled: whose it is, why, Discard, and what the entry holds now.
+function spineDraftNote(e, field) {
+  const p = spinePending(e, S.spine.coach[e.id])[field];
+  if (!p) return '';
+  const d = p.fresh[p.fresh.length - 1];
+  if (!d) return `<p class="sp-hint">Claude left a draft here that no longer matches the entry (it changed since), so it is not shown. Claude's next /spine run drops it.</p>`;
+  if (spineDiscOf(e.id)[field]) return `<div class="sp-draft off">Claude’s draft discarded: the box shows the entry as it is, and the draft leaves the list when you press Save.
+    <button class="btn sm" onclick="spineDraftKeep(${jsq(field)})">Bring it back</button></div>`;
+  return `<div class="sp-draft"><b>Claude’s draft · saved when you press Save</b>${d.why ? ': ' + esc(d.why) : ''}${p.fresh.length > 1 ? ` · the newest of ${p.fresh.length}` : ''}
+    <button class="btn sm" onclick="spineDraftDiscard(${jsq(field)})">Discard draft</button>
+    <div class="now">On the entry now: ${esc(spineValFull(field, e[field]))}</div></div>`;
+}
+// Discard: the boxes go back to the entry's own value (whatever the pre-fill or typing over it put there goes), and the
+// draft leaves the list with the next Save. Bring it back undoes that before the Save.
+function spineDraftDiscard(field) {
+  if (!_spineOpen || !SPINE_DRAFT_BOX[field]) return;
+  spineNoteEdits();
+  _spineDisc = { id: _spineOpen, fields: Object.assign({}, spineDiscOf(_spineOpen), { [field]: true }) };
+  if (_spineDraft && _spineDraft.id === _spineOpen) SPINE_DRAFT_BOX[field].forEach(k => { delete _spineDraft.edits[k]; });
+  renderExercises();
+}
+function spineDraftKeep(field) {
+  if (!_spineOpen) return;
+  spineNoteEdits();
+  if (_spineDisc.id === _spineOpen) delete _spineDisc.fields[field];
+  renderExercises();
+}
+window.spineDraftDiscard = spineDraftDiscard;
+window.spineDraftKeep = spineDraftKeep;
+
 // ── An entry's history (stage49, 2026-10-10) ─────────────────────────────────────────────
 // spine_versions keeps the row as it was before every real change, from any writer (this page, Claude's /spine
 // SQL, a hand-written UPDATE). The list shows what each change did; "Undo this change" puts the changed fields
@@ -6127,6 +6338,7 @@ function spineValFull(k, v) {
   if (v == null || v === '' || (Array.isArray(v) && !v.length) || (typeof v === 'object' && !Array.isArray(v) && !Object.keys(v).length)) return '(empty)';
   if (k === 'credits' || k === 'muscles') return spineCreditsText(v) || '(empty)';
   if (k === 'cues') return [(v.good || []).join(' / '), (v.bad || []).length ? 'don’t: ' + v.bad.join(' / ') : ''].filter(Boolean).join(' · ') || '(empty)';
+  if (k === 'steps' && Array.isArray(v)) return v.map((x, i) => (i + 1) + '. ' + x).join(' ');
   return Array.isArray(v) ? v.join(', ') : typeof v === 'object' ? JSON.stringify(v) : String(v);
 }
 // Two values side by side, for History and the Undo confirm. Long text is cut to the same window in both, starting
@@ -6302,9 +6514,14 @@ async function spineSave(id, approve) {
   const sfrTxt = f('sfr').trim();
   if (sfrTxt && !/^[1-9]\d*$/.test(sfrTxt)) { fail('SFR rank is a whole number from 1 (best stimulus for its fatigue in its pattern), or blank.'); return; }
   const good = spineLines(f('good')), badCues = spineLines(f('bad'));
+  // How to do it: the database's own limits (spine_steps_ok), checked here first so the answer names the step.
+  const steps = spineSteps(f('steps'));
+  if (steps.length > SPINE_STEPS_MAX) { alert(`How to do it has ${steps.length} steps: ${SPINE_STEPS_MAX} at most (3 to 5, a 6th only for a rack lift's bail). One step per line.\n\nNothing was saved.`); return; }
+  const longStep = steps.findIndex(x => x.length > SPINE_STEP_CHARS);
+  if (longStep >= 0) { alert(`Step ${longStep + 1} of How to do it is ${steps[longStep].length} characters: ${SPINE_STEP_CHARS} at most (aim under ${SPINE_STEP_AIM}). Say it shorter, or split it.\n\nNothing was saved.`); return; }
   const row = {
     name: f('name').trim() || cur.name, aliases: spineCsv(f('aliases')), pattern: f('pattern') || null,
-    purpose: f('purpose').trim() || null, tennis: f('tennis').trim() || null,
+    purpose: f('purpose').trim() || null, tennis: f('tennis').trim() || null, steps,
     cues: (good.length || badCues.length) ? { good, bad: badCues } : null,
     equipment: spineCsv(f('equipment')), loads: st.sload ? st.sload.split(',') : [],
     impact: f('impact') || null,
@@ -6334,6 +6551,11 @@ async function spineSave(id, approve) {
   if (row.status !== cur.status) entry.status = row.status;
   // Claude's suggested qualities fill the boxes of an entry that has none, and go up with any save.
   if (!(cur.qualities || []).length && row.qualities.length) entry.qualities = row.qualities;
+  // Claude's drafts this Save decides (stage64): every fresh steps, cues or purpose draft the editor offered, kept, edited or
+  // discarded, leaves the list in the same call. A stale one stays (the editor never showed it; /spine drops it).
+  const pend = spinePending(cur, k0);
+  const decided = SPINE_DRAFT_FIELDS.flatMap(fl => (pend[fl] && pend[fl].fresh) || []);
+  if (decided.length) coach.suggested_changes = (k0.suggested_changes || []).filter(it => decided.indexOf(it) < 0);
   if (!Object.keys(entry).length && !Object.keys(coach).length) { toast('Nothing changed, so nothing to save'); return; }
   // Identity: a new name or alias must not take a card away from this entry or from another one (the rules Undo meets too).
   if ('name' in entry || 'aliases' in entry) {
@@ -6361,6 +6583,8 @@ async function spineSave(id, approve) {
     fail(!res.error.code
       ? `The answer never arrived (${m || 'no reply'}), so the page cannot tell whether ${nm0} was saved.\n\nTap ↻ Refresh and look at the entry before saving again; what you typed is still in the form.`
       : `Could not save ${nm0}: ` + (/Could not find the function|PGRST202/i.test(m + (res.error.code || '')) ? 'the server does not have coach_save_spine yet (supabase/stage48_coach_one_transaction.sql has not been applied).'
+        : /exercises\.steps cannot be written|exercise_coach\.suggested_changes cannot be written/i.test(m) ? 'the server does not have How to do it yet (supabase/stage64_spine_steps.sql has not been applied).'
+        : /exercises_steps_ok/i.test(m) ? `the server refused How to do it: ${SPINE_STEPS_MAX} steps at most, none empty, none over ${SPINE_STEP_CHARS} characters.`
         : /coach only|permission denied|JWT/i.test(m) ? 'your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.' : m)
         + '\n\nNothing was saved, to either half; what you typed is still in the form.');
     return;
@@ -6369,7 +6593,12 @@ async function spineSave(id, approve) {
   if (out.ok === false) {
     const lines = [];
     ['entry', 'coach'].forEach(half => (out[half] ? out[half].cols : []).forEach(k =>
-      lines.push(`${SPINE_LABEL[k] || k}: now "${spineShort(out[half].live[k])}", was "${spineShort((half === 'entry' ? cur : k0)[k])}"`)));
+      lines.push(k === 'suggested_changes'
+        ? `Claude’s drafts: ${(out[half].live[k] || []).length} on the list now, ${(k0[k] || []).length} when you opened it`
+        : `${SPINE_LABEL[k] || k}: now "${spineShort(out[half].live[k])}", was "${spineShort((half === 'entry' ? cur : k0)[k])}"`)));
+    // A box that only held Claude's draft is not typing: let the next drawing pre-fill from the list as it is now.
+    if (_spineDraft && _spineDraft.id === id && _spinePF.id === id)
+      Object.keys(_spineDraft.edits).forEach(k => { if (_spineDraft.edits[k] === _spinePF.state[k]) delete _spineDraft.edits[k]; });
     // The page's copy becomes what the server holds, so a Save again compares against it and goes through.
     if (out.entry) Object.assign(cur, out.entry.live);
     if (out.coach) S.spine.coach[id] = Object.assign({}, k0, out.coach.live);
@@ -6379,8 +6608,9 @@ async function spineSave(id, approve) {
   }
   if (out.entry) Object.assign(cur, out.entry);
   if (out.coach) S.spine.coach[id] = out.coach;
-  _spineDraft = null;
-  toast(row.status === 'approved' ? (approve ? 'Approved — athletes see it on their next open' : 'Saved') : approve === false ? 'Moved back to draft: off every phone' : 'Saved as draft');
+  _spineDraft = null; spineDiscReset();
+  toast((row.status === 'approved' ? (approve ? 'Approved — athletes see it on their next open' : 'Saved') : approve === false ? 'Moved back to draft: off every phone' : 'Saved as draft')
+    + (decided.length ? ` · ${decided.length === 1 ? 'Claude’s draft' : decided.length + ' drafts from Claude'} off the list` : ''));
   if (approve === true) _spineOpen = null;
   renderExercises();
 }
@@ -6604,10 +6834,12 @@ function renderExercises() {
   differ.sort((x, y) => Object.keys(y.u.athletes).length - Object.keys(x.u.athletes).length || y.u.slots - x.u.slots);
   const pct = slotsAll ? Math.round(slotsMapped / slotsAll * 100) : 0;
   const drafts = list.filter(e => e.status === 'draft'), approved = list.filter(e => e.status === 'approved');
-  const filter = _spineFilter || (drafts.length ? 'draft' : 'approved');
+  // Entries with a draft from Claude to read (steps, cues or purpose, stage64), and approved entries with no How to do it.
+  const withDraft = list.filter(spineHasDraft), noSteps = approved.filter(e => !(e.steps || []).length).length;
+  const filter = _spineFilter || (drafts.length ? 'draft' : withDraft.length ? 'claude' : 'approved');
   const q = normQ(_spineQ);
   const hay = e => normQ([e.name, e.id, e.pattern].concat(e.aliases || [], e.equipment || []).join(' '));
-  const shown = q ? list.filter(e => hay(e).includes(q)) : filter === 'approved' ? approved : drafts;
+  const shown = q ? list.filter(e => hay(e).includes(q)) : filter === 'approved' ? approved : filter === 'claude' ? withDraft : drafts;
   const nAth = id => Object.keys((who[id] || {}).athletes || {}).length;
   const nLive = Object.entries(S.programs || {}).filter(([k, v]) => v && !SYSTEM_IDS.includes(k) && v.workouts && (v.workouts.days || []).length).length;
   const field = 'width:100%;font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;box-sizing:border-box';
@@ -6645,11 +6877,15 @@ function renderExercises() {
         return lbl('Qualities · first is the primary' + (sug ? ' · <b style="color:var(--clay-ink)">Claude’s suggestion, saved when you save</b>' : '')) +
           `<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">${sel(1, cur[0])}${sel(2, cur[1])}${sel(3, cur[2])}</div>`;
       })()}
-      ${lbl('Why it’s here (the athlete reads this)')}<textarea data-sf="purpose" rows="2" dir="auto" style="${field}">${esc(e.purpose || '')}</textarea>
+      ${lbl('Why it’s here (the athlete reads this) · what it does, for anyone, never how')}${spineDraftNote(e, 'purpose')}<textarea data-sf="purpose" rows="2" dir="auto" style="${field}">${esc(e.purpose || '')}</textarea>
       ${lbl('On court')}<input data-sf="tennis" dir="auto" value="${esc(e.tennis || '')}" style="${field}">
+      ${lbl('How to do it · one step per line, setup to a safe finish (the athlete reads these)')}${spineDraftNote(e, 'steps')}
+      <textarea data-sf="steps" rows="6" dir="auto" oninput="spineStepsHint(this)" placeholder="One step per line, for anyone who has never seen it. No sets, reps, time, kilos or side." style="${field}">${esc((e.steps || []).join('\n'))}</textarea>
+      <div class="sp-hint" data-steps-hint></div>
+      ${spineDraftNote(e, 'cues') ? `<div style="margin-top:10px">${spineDraftNote(e, 'cues')}</div>` : ''}
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 14px">
-        <div>${lbl('Cues · one per line')}<textarea data-sf="good" rows="3" dir="auto" style="${field}">${esc(((e.cues || {}).good || []).join('\n'))}</textarea></div>
-        <div>${lbl('Don’t · one per line')}<textarea data-sf="bad" rows="3" dir="auto" style="${field}">${esc(((e.cues || {}).bad || []).join('\n'))}</textarea></div>
+        <div>${lbl('Cues · the key point, then a feel or a check')}<textarea data-sf="good" rows="3" dir="auto" style="${field}">${esc(((e.cues || {}).good || []).join('\n'))}</textarea></div>
+        <div>${lbl('Don’t · the one fault, then the fix')}<textarea data-sf="bad" rows="3" dir="auto" style="${field}">${esc(((e.cues || {}).bad || []).join('\n'))}</textarea></div>
         <div>${lbl('Regressions: easier versions of the same movement (ids, or a name)')}<input data-sf="easier" list="spineIds" value="${esc((e.easier || []).join(', '))}" style="${field}"></div>
         <div>${lbl('Progressions: harder versions of the same movement (ids, or a name)')}<input data-sf="harder" list="spineIds" value="${esc((e.harder || []).join(', '))}" style="${field}"></div>
         <div>${lbl('Alternatives: same movement, other equipment or machine (ids, or a name)')}<input data-sf="alts" list="spineIds" value="${esc((e.alts || []).join(', '))}" style="${field}"></div>
@@ -6697,7 +6933,8 @@ function renderExercises() {
   const pill = e => q ? ` · ${e.status === 'approved' ? '<b style="color:var(--green-ink, #1E7A55)">approved</b>' : 'draft'}` : '';
   const row = e => `<div class="credrow spine-row" style="cursor:pointer" data-open="${esc(e.id)}">
       <span class="credname">${esc(e.name)} <span class="muted">· ${esc(e.pattern || 'no pattern')} · ${nAth(e.id)} athlete${nAth(e.id) === 1 ? '' : 's'}${pill(e)}</span></span>
-      <span class="muted">${e.cues ? 'cues ✓' : 'no cues'}${e.video ? ' · video ✓' : ''}${(e.qualities || []).length ? ' · ' + esc(e.qualities.join(', ')) : ' · <b style="color:var(--clay-ink)">no qualities</b>'}${(S.spine.coach[e.id] || {}).credits == null ? ' · <b style="color:var(--clay-ink)">no count</b>' : ''}${
+      <span class="muted">${(e.steps || []).length ? 'steps ✓ · ' : '<b style="color:var(--clay-ink)">no steps</b> · '}${e.cues ? 'cues ✓' : 'no cues'}${e.video ? ' · video ✓' : ''}${
+        spineHasDraft(e) ? ' · <b style="color:var(--clay-ink)">Claude’s draft to read</b>' : ''}${(e.qualities || []).length ? ' · ' + esc(e.qualities.join(', ')) : ' · <b style="color:var(--clay-ink)">no qualities</b>'}${(S.spine.coach[e.id] || {}).credits == null ? ' · <b style="color:var(--clay-ink)">no count</b>' : ''}${
         (() => { const cc = (S.spine.coach[e.id] || {}).credits; return cc && !Object.keys(cc).length && !(e.muscles && Object.keys(e.muscles).length); })() ? ' · <b style="color:var(--clay-ink)">no muscles on the map</b>' : ''}</span>
       <span class="acts"><button class="btn sm" data-open="${esc(e.id)}" aria-expanded="${_spineOpen === e.id}">${_spineOpen === e.id ? 'Close' : 'Open'}</button></span>
     </div>` + (_spineOpen === e.id ? editor(e) : '');
@@ -6705,15 +6942,17 @@ function renderExercises() {
   let html = `<div class="controls"><span class="empty" style="align-self:center">The Spine: one entry per exercise you programme. Cues written here fill every card that has none of its own, and the athlete's <b>i</b> opens the rest. Nothing shows on a phone until it is <b>Approved</b>.</span></div>`;
   html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">Coverage</span><span class="r">${namesMapped} of ${usage.length} card names · ${pct}% of exercise slots</span></div>
     <div style="height:10px;border-radius:999px;background:var(--line);overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--clay)"></div></div>
-    <p class="psub" style="margin:10px 0 0">${approved.length} approved · ${drafts.length} draft${drafts.length === 1 ? '' : 's'} waiting for you. Counted across the ${nLive} programme${nLive === 1 ? '' : 's'} with workouts, circuit items included.${
+    <p class="psub" style="margin:10px 0 0">${approved.length} approved · ${drafts.length} draft${drafts.length === 1 ? '' : 's'} waiting for you${
+      withDraft.length ? ` · <b style="color:var(--clay-ink)">${withDraft.length} with Claude’s draft to read</b>` : ''} · ${noSteps} approved with no How to do it. Counted across the ${nLive} programme${nLive === 1 ? '' : 's'} with workouts, circuit items included.${
       differ.length ? ` <b style="color:var(--clay-ink)">${differ.length} card name${differ.length === 1 ? '' : 's'} show${differ.length === 1 ? 's' : ''} something else on a phone until the draft is approved</b> (listed at the bottom).` : ''}</p></section>`;
   html += qualityPanels(idx, byId);
   const fbtn = (f, t) => `<button class="btn sm sp-filter${filter === f && !q ? ' primary' : ''}" data-f="${f}" aria-pressed="${filter === f && !q}">${t}</button>`;
-  html += `<section class="panel"><div class="phead"><span class="t hd">${q ? 'Matches' : filter === 'approved' ? 'Approved' : 'Waiting for you'}</span>
-    <span class="r">${fbtn('draft', 'Drafts · ' + drafts.length)} ${fbtn('approved', 'Approved · ' + approved.length)}</span></div>
+  html += `<section class="panel"><div class="phead"><span class="t hd">${q ? 'Matches' : filter === 'approved' ? 'Approved' : filter === 'claude' ? 'Claude’s drafts to read' : 'Waiting for you'}</span>
+    <span class="r">${fbtn('draft', 'Drafts · ' + drafts.length)} ${withDraft.length || filter === 'claude' ? fbtn('claude', 'Claude’s drafts · ' + withDraft.length) + ' ' : ''}${fbtn('approved', 'Approved · ' + approved.length)}</span></div>
     <input id="spineQ" type="search" value="${esc(_spineQ)}" placeholder="Find an exercise: name, other name, pattern, equipment or id" aria-label="Find an exercise" style="${field};margin:0 0 8px">` +
     (shown.length ? shown.slice().sort((a, b) => nAth(b.id) - nAth(a.id) || a.name.localeCompare(b.name)).map(row).join('')
-      : `<p class="empty">${q ? 'No entry matches “' + esc(_spineQ) + '”.' : filter === 'draft' ? 'No drafts waiting. Ask Claude to draft the next batch.' : 'Nothing approved yet: open a draft and tap Approve.'}</p>`) + `</section>`;
+      : `<p class="empty">${q ? 'No entry matches “' + esc(_spineQ) + '”.' : filter === 'draft' ? 'No drafts waiting. Ask Claude to draft the next batch.'
+        : filter === 'claude' ? 'No drafts from Claude waiting. Each one you open and Save leaves this list.' : 'Nothing approved yet: open a draft and tap Approve.'}</p>`) + `</section>`;
   if (differ.length) html += `<section class="panel" style="margin-top:16px"><details><summary class="arch-toggle">Cards that show something else on a phone · ${differ.length} name${differ.length === 1 ? '' : 's'}</summary><div style="margin-top:12px">
     <p class="psub" style="margin:0 0 8px">A phone is served approved entries only. These cards find a draft here, so on a phone they show nothing (a card that names its entry shows that entry or nothing) or, with no entry named, the closest approved one. Approve the draft and both agree.</p>${
     differ.slice(0, 60).map(d => `<div class="credrow"><span class="credname">${esc(d.u.name)}</span><span class="muted">${Object.keys(d.u.athletes).length} athlete${Object.keys(d.u.athletes).length === 1 ? '' : 's'} · here: ${esc((byId[d.a] || {}).name || d.a)} (${byId[d.a] && byId[d.a].status === 'approved' ? 'approved' : 'draft'}) · phone: ${d.p ? esc((phone.byId[d.p] || {}).name || d.p) : 'nothing'}</span></div>`).join('')
@@ -6732,7 +6971,15 @@ function renderExercises() {
   if (ed && _spineHistId === _spineOpen) loadSpineVersions(_spineHistId);   // History was open: it redraws closed-then-open, so refill it
   if (ed) {
     _spineBase = { id: _spineOpen, state: spineFormState(ed) };
+    // Claude's drafts go in after the base is taken, so they count as changes and go up with Save (stage64); then what
+    // the coach had typed, over them.
+    const eOpen = byId[_spineOpen];
+    const pf = eOpen ? spinePrefill(eOpen) : {};
+    _spinePF = { id: _spineOpen, state: pf };
+    spineFormSet(ed, pf);
+    Object.keys(pf).forEach(k => { const el = ed.querySelector(`[data-sf="${k.slice(3)}"]`); if (el) el.classList.add('sp-drafted'); });
     if (_spineDraft && _spineDraft.id === _spineOpen) { spineFormSet(ed, _spineDraft.edits); spineMapRefresh(); }
+    spineStepsHint(ed.querySelector('[data-sf="steps"]'));
     const note = () => spineNoteEdits();
     ed.addEventListener('input', note); ed.addEventListener('change', note);
   } else _spineBase = null;
@@ -6755,7 +7002,7 @@ function renderExercises() {
     ev.preventDefault(); ev.stopPropagation();
     const id = el.dataset.open;
     if (!spineMayLeave(_spineOpen === id ? 'Close it' : 'Open another entry')) return;
-    _spineOpen = _spineOpen === id ? null : id; _spineDraft = null; renderExercises();
+    _spineOpen = _spineOpen === id ? null : id; _spineDraft = null; spineDiscReset(); renderExercises();
     // Keep the row the coach tapped under their finger: an editor closing above it used to throw it
     // a thousand pixels up the page.
     const r = _spineOpen && c.querySelector(`.spine-row[data-open="${CSS.escape(_spineOpen)}"]`);
@@ -6763,11 +7010,11 @@ function renderExercises() {
   }));
   c.querySelectorAll('.sp-filter').forEach(el => el.addEventListener('click', () => {
     if (_spineOpen && !spineMayLeave('Switch the list')) return;
-    _spineFilter = el.dataset.f; _spineQ = ''; _spineOpen = null; _spineDraft = null; renderExercises();
+    _spineFilter = el.dataset.f; _spineQ = ''; _spineOpen = null; _spineDraft = null; spineDiscReset(); renderExercises();
   }));
   c.querySelectorAll('.sp-close').forEach(el => el.addEventListener('click', () => {
     if (!spineMayLeave('Close it')) return;
-    _spineOpen = null; _spineDraft = null; renderExercises();
+    _spineOpen = null; _spineDraft = null; spineDiscReset(); renderExercises();
   }));
   c.querySelectorAll('.qm-save').forEach(el => el.addEventListener('click', () => {
     spineNoteEdits();

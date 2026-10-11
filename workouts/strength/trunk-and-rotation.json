@@ -34,15 +34,6 @@
           "name": "March in Place",
           "exId": "march-in-place",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Knee up, opposite arm back",
-              "Enough to get warm, no more"
-            ],
-            "bad": [
-              "Standing still between reps"
-            ]
-          },
           "rx": {
             "time": "2 minutes"
           }
@@ -52,15 +43,6 @@
           "name": "Cat-Cow",
           "exId": "cat-cow",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Move slowly between the two shapes",
-              "Breathe with it"
-            ],
-            "bad": [
-              "Rushing between the two shapes"
-            ]
-          },
           "rx": {
             "reps": 8
           }
@@ -70,15 +52,6 @@
           "name": "Open Book",
           "exId": "open-book",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Knees stacked and together, open the top arm",
-              "Feel the turn in the ribs"
-            ],
-            "bad": [
-              "Letting the top knee lift"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -89,15 +62,6 @@
           "name": "Glute Bridge",
           "exId": "glute-bridge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Push through the heels until the hips are level",
-              "Feel the glutes switch on"
-            ],
-            "bad": [
-              "Arching the lower back at the top"
-            ]
-          },
           "note": "Rotation gets its power from the hips, so wake them first.",
           "rx": {
             "reps": 12
@@ -115,15 +79,6 @@
           "name": "Half-Kneeling Thoracic Rotation",
           "exId": "half-kneeling-thoracic-rotation",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Turn the ribs and keep the hips square",
-              "Squeeze the back glute to lock the hips"
-            ],
-            "bad": [
-              "The hips turning with the shoulders"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 8,
@@ -135,15 +90,6 @@
           "name": "Standing Chop",
           "exId": "standing-chop",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Chop from high on one side to low on the other",
-              "Let the back heel turn — the shot starts at the ground"
-            ],
-            "bad": [
-              "Arms only, with the feet glued to the floor"
-            ]
-          },
           "note": "With a ball and a wall, throw it instead — same movement, more intent.",
           "rx": {
             "sets": 3,
@@ -163,15 +109,6 @@
           "name": "Plank with Shoulder Taps",
           "exId": "plank-with-shoulder-taps",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Feet wide, tap the opposite shoulder",
-              "The hips stay completely still"
-            ],
-            "bad": [
-              "Hips swinging side to side with every tap"
-            ]
-          },
           "note": "Slower taps are harder taps.",
           "rx": {
             "sets": 3,
@@ -184,15 +121,6 @@
           "name": "Side Plank",
           "exId": "side-plank",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Straight line ankle to ear, hips stacked",
-              "Feel it down the bottom side"
-            ],
-            "bad": [
-              "Letting the top hip roll forward"
-            ]
-          },
           "rx": {
             "sets": 3,
             "time": "30 sec",
@@ -204,15 +132,6 @@
           "name": "Bird Dog",
           "exId": "bird-dog",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Reach the opposite arm and leg long, not high",
-              "Back stays flat"
-            ],
-            "bad": [
-              "Lifting the leg above hip height and arching"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 8,

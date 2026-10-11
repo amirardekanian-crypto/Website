@@ -62,6 +62,7 @@ the principles (their *How to add*).
   - 2026-07-30, Amir, on Athlete E C1: "leg press as its safer a bit for his lower back, if he was pain free the whole cycle then we can progress to a back squat"
 - `SEL-11` **A RANGE OR HEIGHT RESTRICTION MUST BE AUDITED AGAINST EVERY EXERCISE IN THE CYCLE, INCLUDING WARM-UP AND PREP — not just the ones it obviously names.**
   - 2026-08-17, Athlete F C1 — the clinical audit lens caught four separate breaches of the cycle's own shoulder rule plus a prep-circuit flexion leak on a chronic back
+  - Reworded 2026-10-11 to name the entry's steps beside its cues: the Spine's steps are written for anyone, so a step can take an athlete past their own limit unless the Coach's Note says what changes (CUE-6, CUE-7). Amir, 2026-10-11, on the exercise card blueprint (claude.ai/artifact/HR2fYTMcn4bp5q8NbqjtmP): "all recommended, go ahead".
 - `SEL-12` **The fallback rule above generalises: EVERY fallback is checked against EVERY deferral the cycle makes, not just the free hinge.**
   - 2026-08-17, Athlete F C1
 - `SEL-13` **Posture / tennis clients:**
@@ -101,14 +102,19 @@ the principles (their *How to add*).
   - 2026-06-15
   - Amir, 2026-09-25, after a first cycle came back with its grips as grey lines: "grips should be a chip on the card not a free text. you changed how my file look like"
   - Same day: "the chips you added for grip, is specific to the athlete, so dont add that chip to the whole exercise library"
+  - Reworded 2026-10-11 (Q3 A): the entry's steps may name the default grip in plain words, because with no grip anywhere an athlete with no video and no pill doesn't know how to hold the weight. The grip PILL is still the athlete's only, which keeps the 2026-09-25 rule. Amir, 2026-10-11, on the exercise card blueprint (claude.ai/artifact/HR2fYTMcn4bp5q8NbqjtmP): "all recommended, go ahead".
 - `NAM-6` **A variant that changes the exercise is its own exercise**
   - Amir, 2026-09-25: "if some one is doing short lever copenhagen, thats another exercise with its own name and different cues"
+- `NAM-7` **An isometric hold on a dynamic library exercise KEEPS the canonical library name.**
+  - 2026-07-24, Athlete I C1: a rename to "…Hold" broke the video join and Amir reverted it.
+  - Reworded 2026-10-11: the hold is carried by the tempo cell (which reads Hold) and a hold pill from the closed list that says where; the Coach's Note no longer restates it (CUE-7, CHP-2). Amir, 2026-10-11, on the exercise card blueprint (claude.ai/artifact/HR2fYTMcn4bp5q8NbqjtmP): "all recommended, go ahead".
 - `NAM-8` **The Spine is the source of truth for names and videos.**
   - 2026-06-15, when the source was `exercise_library.json`, generated from Notion; the Spine replaced it on 2026-09-26, Amir: yes to "take videos from the exercise library and retire the Notion-synced list".
   - Amir, 2026-10-09, after the Library's cards had been linked to the Spine through aliases (Ankle Pogos on Pogo Jump): "i dont want to have 2 names, being linked, i want to have one name consistent in my workouts with my spine. the source of the truth should be my naming rules which is my spine". Asked the same day whether athletes' programmes follow: yes. Every alias was removed (107), Library and programme cards took their entry's name, and versions that differ by equipment or setup got entries of their own.
 - `NAM-8` `NAM-9` **The library is a video-join key, not a whitelist — programming is never restricted to what's already catalogued.**
   - 2026-07-27, Amir, verbatim: "you can prescribe any movement that you like" — said after Athlete G C2 avoided a genuinely better exercise, a leaning cable lateral raise, out of a mistaken belief that only library entries were available.
   - Amir, 2026-09-25: "if there is any exercise that is outside of the exercise library, after its prescribed for any athlete, it should be added to our library, with all the cues and other details like the ones already there". A first cycle had shipped seven new outside-day drills as bare drafts, so every card was blank; the "fix" then removed the drills, which was worse.
+  - 2026-10-11: the story's "compensate for the missing video with a clear Coach's Note" was the root of the general how-to found in about a third of Coach's Notes. It now says a missing video is covered by the entry's steps (CUE-6). Amir, 2026-10-11, on the exercise card blueprint (claude.ai/artifact/HR2fYTMcn4bp5q8NbqjtmP): "all recommended, go ahead".
 - `NAM-8` **The app resolver normalizes case/punctuation/accents**
   - 2026-06-15
 
@@ -292,8 +298,12 @@ the principles (their *How to add*).
   - 2026-07-12
 - `COM-12` **A cycle notes card and its matching exercise Coach's Note don't repeat each other.**
   - 2026-07-12
+  - 2026-10-11: the note's point-of-action detail became "starting depth, load, a fault seen on their film", no longer "cue": a cue is the Spine's, for anyone (COM-14, CUE-7).
 - `COM-13` **Body weight is logged in the programme app — when an athlete's goal actually turns on the scale, point them at it in a notes card.**
   - 2026-09-05, Amir: "if some one like Athlete K need to monitor her weight, add a note in their app and point it to them so they start using it". Moved 2026-09-12; this bullet still said Proof until 2026-09-26, and two programmes written that week sent athletes to a Proof button that no longer existed.
+- `COM-14` **A Coach's Note is one to three short sentences about this athlete, the point first.**
+  - 2026-09-26: three copies said one sentence (design, edit and the cue story) and two said one to three (engage, SCHEMA); Amir chose one to three, because a note sometimes carries a starting weight and a caveat.
+  - Reworded 2026-10-11, with what goes in a note and what never does. The audit of the 37 live programmes found about 31% of notes carrying general how-to (one band external rotation instruction pasted into three circuit notes for one athlete), notes averaging 194 characters with the longest at 774, 89 past three sentences, 86% cut by the two-line More ›, and 13 notes telling the athlete when to add weight, against PRG-3. Q5 A: no add-weight lines, PRG-3 stands. Q6 A: only this athlete's checked fallback (SEL-20), because the pain rule sends the athlete to "the card's fallback" and the Spine's Alternatives are not checked against one athlete's bans. Q7 B: a few words of reason only when the exercise has no Because, since with 5 to 10 Becauses a cycle most limits would otherwise arrive with no reason. Amir, 2026-10-11, on the exercise card blueprint (claude.ai/artifact/HR2fYTMcn4bp5q8NbqjtmP): "all recommended, go ahead".
 - `COM-15` **A Because is one sentence of 140 characters at most, written fresh each cycle.**
   - The checker has failed a long one since 2026-09-24; the limits lived in /program-engage PART 3b and SCHEMA.
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
@@ -309,21 +319,31 @@ the principles (their *How to add*).
 
 - `CUE-1` **Exactly 3 cues per exercise — never more, never fewer:**
   - 2026-06-17; "calibrate to training age" retired 2026-09-26, it contradicted one set of cues for everyone
+  - Reworded 2026-10-11 (Q1 B, Q2 A): the slots became key point, feel or position check (decided by the entry's first quality), and one avoid written fault first, then the fix. Amir's words for what cues are for: they "complete the instruction, things to avoid, or important things to think about". The audit of 320 approved entries found half the first cues chaining several orders with commas and 23% carrying setup, 98% of avoid cues starting "Don't", only 38% of the top 60 avoid cues naming the injury fault, and about one in six spending two cues on the same point. In the pilot the fault-then-fix line was understood on the first read 12 times out of 12; the fix-first form read backwards on 8. A "feel the muscle" cue helps muscle work at light to moderate loads and lowers force on max-effort work (Calatayud 2016, PMID 26700744; Halperin 2016, PMID 27003451). Amir, 2026-10-11, on the exercise card blueprint (claude.ai/artifact/HR2fYTMcn4bp5q8NbqjtmP): "all recommended, go ahead".
 - `CUE-1` `CUE-2` **The cues live on the exercise, not the athlete.**
   - Amir, 2026-09-24: "the aim is to use these cues for all the exercises that everyone has from now on … if there is a cue for someone specific, it should be in coach's notes. thats why its there"
+  - 2026-10-11: which side goes first moved from the note to the card's lead pill (CHP-2); a hand position the pill list can't say stays in the note.
 - `CUE-3` **Never create a new pill.**
   - Amir, 2026-09-25: "we only use the 10 pills which cover everything … remember to never create new pills", and on the pattern pills, which he had first taken for extra qualities: "pattern pills are good, if its ones i created in my library, ofcourse use them"
 - `CUE-4` **Every programme write leaves the Spine more complete.**
   - Amir, 2026-09-24: "so everytime i write a program for an athlete, this gets more complete"
 - `CUE-5` **Claude drafts library entries; only Amir approves them, and before the programme publishes.**
   - 2026-09-24, the Spine. Approval moved before publishing 2026-09-26: a first cycle had gone live with seven new drills as bare drafts, and every one of those cards was blank.
+- `CUE-6` **How to do it: every Spine entry has steps, written once for anyone.**
+  - Amir, 2026-10-11, on the exercise card blueprint (claude.ai/artifact/HR2fYTMcn4bp5q8NbqjtmP): "all recommended, go ahead" (every answer Q1 to Q13 the recommended one). Added during the rule freeze (PRC-25) because something broke: 141 of 320 approved entries had no video, 194 live cards sat on one and 31 of 36 athletes had at least one, and such an athlete got about 40 words: three cues in the card and the purpose two taps away. A coach's read of 15 of them found 2 doable from the words, 9 partly and 4 not at all.
+  - The pilot (12 real entries, eight with no video): a writer drafted, a test reader with no video and English as a second language read only the text, a senior coach checked accuracy and safety, and a third pass fixed both. Confidence went from 2.3 to 3.6 out of 5; 7 of 12 rated 4 or 5, against 1 of 12 before. The readers were role-plays, so this is a screen, not proof; the real check is a few athletes doing the first batch with no video. Q8 A: up to 6 steps for a rack lift, so the bail fits. Q11 A: Amir reads the 12 pilot entries and the next 20 most-used no-video ones first, then batches of about 40 wait in coach.html, and his Save is the approval.
+  - Why text has to be complete: a handout alone gave more than twice the errors of video or live teaching (Reo & Mercer 2004, PMID 15225081); plain, explicit wording was understood far better, 89% against 53% (Davis 2008, PMID 18979142); 65.5% of weight-room injuries seen in US emergency departments were weights dropping on the person (Kerr 2010, PMID 20139328), so a free weight gets a safe set-up and set-down.
+- `CUE-7` **Say each thing once: four layers, four jobs.**
+  - Amir, 2026-10-11, on the exercise card blueprint (claude.ai/artifact/HR2fYTMcn4bp5q8NbqjtmP): "all recommended, go ahead". Added during the rule freeze (PRC-25), with CUE-6. What broke: 1,094 cards in 29 older programmes carried their own cues, 962 of them different from the Spine (Glute Bridge: 45 cards, 33 cue sets), about a third of Coach's Notes carried general how-to, half the first cues did the steps' job, and 44% of pills said the tempo in words. Nothing said where each kind of sentence belonged, so the same instruction landed in two or three places and the rest in none.
 
 ## Chips & modifiers
 
 - `CHP-1` **No floating text on a card.**
   - Amir, 2026-09-25: "i suggest you put them in coaching notes as i dont like floating text and remember this"
+  - 2026-10-11: a grip, the side that goes first and anything else on the pill list is the pill (CHP-2); only what the list can't say goes in the note.
 - `CHP-2` **A modifier (`intent`) chip must be something the athlete actively does or holds in mind that set**
   - 2026-07-05, Athlete M C1 — dropped "knee control," "adductor focus," "anti-rotation," "no push-off," "dysplasia stability" as redundant with cues/ rationale already stated elsewhere on the card. 2026-07-18, Athlete A C3 — this file itself was found listing `superset` as a valid chip value, alongside the same mistake in SCHEMA.md's chip tables and the design SPEC template; all three fixed the same day, see "Session structure & time."
+  - Reworded 2026-10-11 (Q4 A): the pill comes from a closed list of six groups (hands, lead, intent, hold, brakes, pace), at most two values, never two from one group. Read from 1,393 live cards: 116 pill labels on 280 uses, 83 used once, "stick the landing" spelled six ways, 44% saying the tempo in words ("3s eccentric" 40 times, 23 of them disagreeing with the card's own tempo), and only 25% of old pills following the rule (a grip or one intention); pills written fresh as `intent` did better, 86%. Brakes and pace got their own groups because seven live cards already used those words every rep, and leaving them off would push them into longer notes. The list lives once, in SCHEMA.md (PRC-23: four skills and SCHEMA had each written the rule out). Amir, 2026-10-11, on the exercise card blueprint (claude.ai/artifact/HR2fYTMcn4bp5q8NbqjtmP): "all recommended, go ahead".
 - `CHP-3` **Hold exercises write `Iso` in the Tempo — Amir's rule, verbatim (2026-07-24): "if it's a hold exercise, in the Tempo write Iso."**
   - 2026-07-24, Athlete I C1 — applied to the leg-extension holds and Side Plank. rx wording 2026-09-26.
 - `CHP-4` **The app's RPE selector runs 6–10 — never prescribe an RPE below 6, anywhere.**
@@ -415,6 +435,7 @@ the principles (their *How to add*).
   - Quality Map 2026-09-24; a WARN since 2026-09-26, Amir: "report it, but recommend what you think should happen"
 - `PRC-25` **Rule freeze: no new rules until eight cycles have run on this pipeline.**
   - Amir, 2026-09-26, yes to the audit's recommendation.
+  - 2026-10-11, an exception like SES-17: CUE-6 and CUE-7 were added, and CUE-1, CHP-2, NAM-5, NAM-7, COM-14 and SEL-11 reworded, because something broke. 141 of 320 approved entries had no video and three short cues were all such an athlete got; about a third of Coach's Notes were carrying the missing how-to; the pill had 116 labels. Amir, on the exercise card blueprint (claude.ai/artifact/HR2fYTMcn4bp5q8NbqjtmP) (Q12 A): "all recommended, go ahead".
 - `PRC-26` **How the Quality mix counts.**
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
 - `PRC-27` **A first cycle's picture word is a foundation one.**

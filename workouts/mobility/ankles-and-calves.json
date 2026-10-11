@@ -42,15 +42,6 @@
           "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Walk at an easy pace and roll through each foot",
-              "Feel your calves and ankles warming up"
-            ],
-            "bad": [
-              "Shuffling flat-footed"
-            ]
-          },
           "rx": {
             "time": "5 minutes"
           }
@@ -61,15 +52,6 @@
           "exId": "ankle-dorsiflexion-rocks",
           "videoUrl": null,
           "note": "A doorframe works if you don't have a wall to face.",
-          "cues": {
-            "good": [
-              "Drive the knee forward over your toes with your heel down",
-              "Feel the stretch low in the calf and the front of the ankle"
-            ],
-            "bad": [
-              "Letting your heel lift to get the knee further"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -80,15 +62,6 @@
           "name": "Tibialis Raise",
           "exId": "tibialis-raise",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Lean back against a wall with your feet a step out and lift your toes toward your shins",
-              "Feel the muscle along the front of your shin"
-            ],
-            "bad": [
-              "Bending at the hips to help the lift"
-            ]
-          },
           "rx": {
             "reps": 15
           }
@@ -98,15 +71,6 @@
           "name": "Toe Walk",
           "exId": "toe-walk",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Walk on the balls of your feet with your heels high",
-              "Feel your calves and the arches of your feet working"
-            ],
-            "bad": [
-              "Letting your heels sink between steps"
-            ]
-          },
           "rx": {
             "distance": "20m"
           }
@@ -116,15 +80,6 @@
           "name": "Downward Dog Heel Drive",
           "exId": "downward-dog-heel-drive",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "From downward dog, bend one knee and press the other heel toward the floor",
-              "Feel the stretch through the calf and Achilles of the straight leg"
-            ],
-            "bad": [
-              "Rounding your back to reach the heel down"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -142,15 +97,6 @@
           "exId": "split-squat",
           "videoUrl": null,
           "note": "This is one long hold, not reps, and if the front of the ankle pinches rather than stretches, take the knee back a little.",
-          "cues": {
-            "good": [
-              "Sink into a long split stance and drive the front knee forward over your toes",
-              "Feel the front ankle stretch and the thigh working"
-            ],
-            "bad": [
-              "Letting the front heel lift"
-            ]
-          },
           "rx": {
             "sets": 3,
             "time": "20s",
@@ -173,15 +119,6 @@
           "exId": "double-leg-calf-raise",
           "videoUrl": null,
           "note": "Lower until your heels are just below the step, and if the last set feels easy, wear a backpack with a couple of books in it.",
-          "cues": {
-            "good": [
-              "Rise onto the balls of both feet from the edge of a step, holding a wall, then lower",
-              "Feel the calves working the whole way down"
-            ],
-            "bad": [
-              "Bouncing at the bottom"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 20,
@@ -194,15 +131,6 @@
           "name": "Bent-Knee Calf Raise",
           "exId": "bent-knee-calf-raise",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Keep your knees bent and stay there as you rise onto the balls of your feet",
-              "Feel the deeper calf muscle under the big one working"
-            ],
-            "bad": [
-              "Straightening your knees as you rise"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 15,

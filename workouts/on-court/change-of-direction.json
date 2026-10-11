@@ -54,15 +54,6 @@
           "name": "Easy Run",
           "exId": "easy-run",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Easy pace until you are warm and breathing",
-              "Nothing here is fast yet"
-            ],
-            "bad": [
-              "Starting hard — you are about to sprint"
-            ]
-          },
           "rx": {
             "time": "3 minutes"
           }
@@ -72,15 +63,6 @@
           "name": "Leg Swings",
           "exId": "leg-swings",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hold the fence, stand tall, let the leg swing freely",
-              "Build the range across the ten"
-            ],
-            "bad": [
-              "Arching the back to throw the leg higher"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -92,15 +74,6 @@
           "name": "Lateral Lunge",
           "exId": "lateral-lunge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Step wide and sit into that hip, chest tall",
-              "Feel the inside of the straight leg"
-            ],
-            "bad": [
-              "Letting the knee roll inward"
-            ]
-          },
           "rx": {
             "reps": 6,
             "side": true
@@ -111,15 +84,6 @@
           "name": "World's Greatest Stretch",
           "exId": "worlds-greatest-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Drive the back hip down, then rotate and reach tall",
-              "Feel the front of the back hip open"
-            ],
-            "bad": [
-              "Rotating before the hip has opened"
-            ]
-          },
           "rx": {
             "reps": 4,
             "side": true
@@ -130,15 +94,6 @@
           "name": "A-Skip",
           "exId": "a-skip",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Tall hips, strike the ground underneath you",
-              "Rhythm first, height second"
-            ],
-            "bad": [
-              "Reaching the foot out in front of the body"
-            ]
-          },
           "rx": {
             "sets": 2,
             "distance": "15 m"
@@ -149,15 +104,6 @@
           "name": "Pogo Jump",
           "exId": "pogo-jump",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Stiff ankles, off the ground as fast as you land",
-              "Quiet contacts"
-            ],
-            "bad": [
-              "Bending the knees and turning it into a squat jump"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 10
@@ -174,15 +120,6 @@
           "name": "Snap Down",
           "exId": "snap-down",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "From tall on the toes, snap down into an athletic stance and freeze",
-              "Feel the hips go back and the knees soak it up"
-            ],
-            "bad": [
-              "Landing stiff-legged and taking it through the knees"
-            ]
-          },
           "note": "Land quiet — you should hear almost nothing.",
           "rx": {
             "sets": 3,
@@ -195,15 +132,6 @@
           "name": "Sprint to Two-Step Stop",
           "exId": "sprint-to-two-step-stop",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Accelerate hard, then kill it in two steps and hold the stance",
-              "The last two steps get wider and lower"
-            ],
-            "bad": [
-              "Slowing down gradually over five or six steps"
-            ]
-          },
           "note": "Own the stop before you make it faster.",
           "rx": {
             "sets": 5,
@@ -222,15 +150,6 @@
           "name": "Shuffle to Sprint",
           "exId": "shuffle-to-sprint",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Shuffle low, plant the outside foot, then sprint off it",
-              "The plant foot lands outside your hip — that is what turns you"
-            ],
-            "bad": [
-              "Standing up tall to change direction"
-            ]
-          },
           "rx": {
             "sets": 6,
             "reps": 3,
@@ -243,15 +162,6 @@
           "name": "Turn and Go",
           "exId": "turn-and-go",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Run out, plant one foot, turn 180 degrees and sprint back",
-              "Brake over two steps, then push"
-            ],
-            "bad": [
-              "Rounding the turn like a running track"
-            ]
-          },
           "note": "Turn off the same foot for a whole set, then swap.",
           "rx": {
             "sets": 6,

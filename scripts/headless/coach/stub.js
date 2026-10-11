@@ -174,7 +174,7 @@
   function keepSpineVersion(table, oldRow, newRow, who) {
     if (['exercises', 'exercise_coach', 'qualities'].indexOf(table) < 0) return;
     var ch = {};
-    Object.keys(oldRow).forEach(function (k) { if (k !== 'updated_at' && k !== 'updated_by' && !same(oldRow[k], newRow[k])) ch[k] = clone(newRow[k] === undefined ? null : newRow[k]); });
+    Object.keys(Object.assign({}, oldRow, newRow)).forEach(function (k) { if (k !== 'updated_at' && k !== 'updated_by' && !same(oldRow[k], newRow[k])) ch[k] = clone(newRow[k] === undefined ? null : newRow[k]); });
     if (!Object.keys(ch).length) return;
     tbl('spine_versions').push({ id: ++ST.seq, tbl: table, row_id: oldRow.id, op: 'update', data: clone(oldRow), changed: ch,
       saved_at: nowIso(), saved_by: who, was_updated_at: oldRow.updated_at || null });
@@ -408,8 +408,9 @@
     // stage48: the Spine editor's two-table save. Lock both rows, refuse (writing nothing) on a clash, else write
     // exactly the columns sent; the version trigger runs on each update.
     coach_save_spine: function (p) {
-      var E = ['name', 'aliases', 'pattern', 'qualities', 'purpose', 'tennis', 'cues', 'equipment', 'loads', 'easier', 'harder', 'alts', 'video', 'status', 'impact', 'muscles'];
-      var C = ['sfr', 'flags', 'notes', 'credits', 'cost'];
+      // The whitelists of supabase/stage64_spine_steps.sql (stage48's, plus steps and Claude's draft list).
+      var E = ['name', 'aliases', 'pattern', 'qualities', 'purpose', 'tennis', 'cues', 'equipment', 'loads', 'easier', 'harder', 'alts', 'video', 'status', 'impact', 'muscles', 'steps'];
+      var C = ['sfr', 'flags', 'notes', 'credits', 'cost', 'suggested_changes'];
       // SQL NULL and JSON null mean nothing for that half; any other non-object is an error (a double-encoded payload).
       var obj = function (v) {
         if (v == null) return {};
@@ -432,6 +433,15 @@
         if (cc.length) res.coach = { cols: cc, live: clone(co) };
         return res;
       }
+      // The table's own checks (stage64 steps, stage43 the draft list), as the database applies them on the write.
+      var dbErr = function (m, code) { var e = new Error(m); e.code = code; return e; };
+      if ('steps' in entry) {
+        if (entry.steps == null) throw dbErr('null value in column "steps" of relation "exercises" violates not-null constraint', '23502');
+        if (!Array.isArray(entry.steps) || entry.steps.length > 6 || entry.steps.some(function (x) { return typeof x !== 'string' || !/\S/.test(x) || x.length > 140; }))
+          throw dbErr('new row for relation "exercises" violates check constraint "exercises_steps_ok"', '23514');
+      }
+      if ('suggested_changes' in coach && !Array.isArray(coach.suggested_changes))
+        throw dbErr('new row for relation "exercise_coach" violates check constraint "exercise_coach_suggested_changes_ok"', '23514');
       var hasE = Object.keys(entry).length > 0, hasC = Object.keys(coach).length > 0;
       if (hasE) {
         var ne = Object.assign({}, ex, clone(entry), { updated_by: 'coach', updated_at: nowIso() });
@@ -550,7 +560,7 @@
         if (f) { call.result = { error: f.message }; return { data: null, error: { message: f.message, code: f.code != null ? f.code : 'P0001' }, status: 400 }; }
         if (!RPC[name] || (ST.missingRpc || []).indexOf(name) >= 0) { call.result = { error: 'missing' }; return { data: null, error: { message: 'Could not find the function public.' + name + ' in the schema cache', code: 'PGRST202' }, status: 404 }; }
         try { var d = RPC[name](params || {}); persist(); call.result = { ok: true }; return { data: clone(d), error: null, status: 200 }; }
-        catch (e) { call.result = { error: e.message }; return { data: null, error: { message: e.message, code: 'P0001' }, status: 400 }; }
+        catch (e) { call.result = { error: e.message }; return { data: null, error: { message: e.message, code: e.code || 'P0001' }, status: 400 }; }
       })();
       return ran;
     }

@@ -34,15 +34,6 @@
           "name": "Calf Roll",
           "exId": "calf-roll",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Slow from the ankle up, cross the other leg on top for more pressure",
-              "Stop on the sore spots and breathe"
-            ],
-            "bad": [
-              "Rolling back and forth fast"
-            ]
-          },
           "rx": {
             "time": "60 sec",
             "side": true
@@ -53,15 +44,6 @@
           "name": "Quad Roll",
           "exId": "quad-roll",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Face down, slow from knee to hip",
-              "Bend and straighten the knee while you pause on a spot"
-            ],
-            "bad": [
-              "Rolling directly over the kneecap"
-            ]
-          },
           "rx": {
             "time": "60 sec",
             "side": true
@@ -72,15 +54,6 @@
           "name": "Glute Roll",
           "exId": "glute-roll",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Sit on the roller, cross one ankle over the opposite knee and lean into it",
-              "Small movements — you are hunting one spot"
-            ],
-            "bad": [
-              "Sitting on it without actually loading one side"
-            ]
-          },
           "note": "This is the one most players skip and most need.",
           "rx": {
             "time": "60 sec",
@@ -92,15 +65,6 @@
           "name": "Upper Back Roll",
           "exId": "upper-back-roll",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Roller across the upper back, hands behind the head, ribs down",
-              "Pause and breathe at each level"
-            ],
-            "bad": [
-              "Rolling the lower back"
-            ]
-          },
           "rx": {
             "time": "60 sec"
           }
@@ -110,15 +74,6 @@
           "name": "Lat Roll",
           "exId": "lat-roll",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "On your side, arm overhead, roller under the armpit",
-              "Small movements, pause where it bites"
-            ],
-            "bad": [
-              "Rolling onto the ribs themselves"
-            ]
-          },
           "rx": {
             "time": "45 sec",
             "side": true
@@ -134,15 +89,6 @@
           "type": "simple",
           "name": "Child's Pose",
           "exId": "childs-pose",
-          "cues": {
-            "good": [
-              "Knees wide, hips back to the heels, arms long",
-              "Breathe into your back and let it widen"
-            ],
-            "bad": [
-              "Rushing to get to the breathing"
-            ]
-          },
           "rx": {
             "time": "60 sec"
           }

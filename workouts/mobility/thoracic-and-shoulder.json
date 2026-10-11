@@ -38,15 +38,6 @@
           "name": "Walk",
           "exId": "walk",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Walk at an easy pace and let your arms swing",
-              "Feel your shoulders and hips loosening up"
-            ],
-            "bad": [
-              "Hunching your shoulders up as you walk"
-            ]
-          },
           "rx": {
             "time": "5 minutes"
           }
@@ -56,15 +47,6 @@
           "name": "Arm Circles",
           "exId": "arm-circles",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Make slow circles with your arms straight out to the sides, starting small and getting bigger",
-              "Feel your shoulders loosen as the circles get bigger"
-            ],
-            "bad": [
-              "Shrugging your shoulders up to your ears"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -81,15 +63,6 @@
           "name": "Quadruped Thoracic Rotation",
           "exId": "quadruped-thoracic-rotation",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "On hands and knees, put a hand behind your head and turn your elbow up to the ceiling",
-              "Feel the turn in your ribs and upper back"
-            ],
-            "bad": [
-              "Turning from your lower back"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -101,15 +74,6 @@
           "exId": "bench-thoracic-extension",
           "videoUrl": null,
           "note": "Use a bench or the arm of a heavy sofa, not a chair, because a chair can slide out from behind you.",
-          "cues": {
-            "good": [
-              "Rest the edge under your shoulder blades with your hands behind your head and open your chest toward the ceiling",
-              "Feel your upper back bending over the edge"
-            ],
-            "bad": [
-              "Arching from your lower back instead of your upper back"
-            ]
-          },
           "rx": {
             "reps": 10
           }
@@ -119,15 +83,6 @@
           "name": "Open Book",
           "exId": "open-book",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Lie on your side with your knees bent and stacked, and sweep your top arm in a big arc across your body",
-              "Feel your chest and upper back opening as the arm goes back"
-            ],
-            "bad": [
-              "Forcing your arm down to the floor"
-            ]
-          },
           "rx": {
             "reps": 8,
             "side": true
@@ -146,15 +101,6 @@
           "exId": "half-kneeling-single-arm-dumbbell-overhead-hold",
           "videoUrl": null,
           "note": "Use a lighter dumbbell than you use for the press.",
-          "cues": {
-            "good": [
-              "Hold a dumbbell straight over your shoulder with your ribs down",
-              "Feel your shoulder blade and the side of your trunk holding you steady"
-            ],
-            "bad": [
-              "Letting your ribs flare and your lower back arch"
-            ]
-          },
           "rx": {
             "sets": 3,
             "time": "25s",
@@ -169,15 +115,6 @@
           "exId": "half-kneeling-single-arm-dumbbell-press",
           "videoUrl": null,
           "note": "If your arm won't go all the way up without your back arching, stop the press where it starts to arch.",
-          "cues": {
-            "good": [
-              "Press the dumbbell straight up from your shoulder and lower it under control",
-              "Feel your shoulder blade slide up and round your ribs"
-            ],
-            "bad": [
-              "Leaning back to help the press"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 8,

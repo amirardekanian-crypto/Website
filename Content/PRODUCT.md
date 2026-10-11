@@ -113,7 +113,7 @@ This is the human half of *"the coach actually watches you"* — the live app da
 - **"A coach in your pocket"** — the app IS the product → the cinematic phone reel.
 - **The coach actually watches** — readiness + ACWR + the live dashboard: *"before you get injured, I message you."*
 - **The weekly check-in** — it's a relationship, not a file drop: every week the coach reviews your data *and talks to you*, then the cycle's trends shape what comes next.
-- **Video + cues for every move** — this is not a PDF.
+- **Cues for every move, steps as they are approved, video where there is one** — this is not a PDF. (Since 2026-10-11 the Spine entries get plain steps, How to do it, in batches Amir approves; about 141 of 322 entries have no video yet, so never promise a video for every exercise.)
 - **Auto-regulation** — the readiness check adapts the session to how you walk in.
 - **Proof & retention** — athlete "results" cards, the 6-month journey.
 - **Free content as a funnel** — Playbook articles (`?article=<id>`) and Sessions workouts (`?workout=<id>`) are each their own URL; share them as content, they open inside the app experience, and the "try the app" demo (`?client=demo`) is one tap away.

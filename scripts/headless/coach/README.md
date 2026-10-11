@@ -42,7 +42,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | file | what |
 |---|---|
 | `stub.js` | the fake supabase-js v2 client, injected by `addInitScript` before the page's scripts. In-memory DB (`window.__DB`, persisted to localStorage `__harness_db` so a reload keeps it), a chainable thenable query builder (select/eq/neq/in/gte/lte/gt/lt/is/like/order/limit/range/maybeSingle/single/insert/update/upsert/delete/match/not/or/filter, `.select()` after a write returns the rows, `{count:'exact'}`), the RPCs coach.html calls (emulated from their SQL: `set_coach_note` defaults `p_day` to the UTC date like `CURRENT_DATE` on the UTC server), `functions.invoke` for `athlete-login`, auth (`getSession` = signed-in coach; `onAuthStateChange` stores callbacks in `window.__authCbs` and fires `INITIAL_SESSION` like the real v2 client). The `programs` BEFORE UPDATE trigger is emulated (snapshot into `program_versions`, keep 20, bump `updated_at`). Every call lands in `window.__calls` with filters, modifiers and payload. |
-| `fixtures.js` | `buildSeed({today, bigHistory, stub})`: the made-up rows, column names taken from `information_schema` on 2026-10-10. |
+| `fixtures.js` | `buildSeed({today, bigHistory, stub})`: the made-up rows, column names taken from `information_schema` on 2026-10-10 (plus `exercises.steps`, stage64). `band-pull-apart` is the approved entry with Claude's drafts waiting: steps and cues fresh, a stale purpose, a tennis proposal. |
 | `lib.js` | `openCoach(browser, {hash, tz, fixedTime, seed})`: new context, routes jsDelivr's supabase-js to an empty script and every other outside host to 204, seeds, injects the stub, opens the page, auto-accepts confirm/alert (recorded in `log.dialogs`; `dismissDialogs(page, log)` in run.js answers No to confirms instead). Helpers: `calls`, `callsSince`, `db`, `go`, `jsClick`, `loadAllCount`, `toastText`, `failText` (the bar of lines that stay until dismissed). Every new line in that bar is also pushed to `log.dialogs` as an `alert` with `via: 'bar'`, so a check that asks "was the coach told X?" finds it whether it was a pop-up or a line; filter `d.via !== 'bar'` to see only real pop-ups. |
 | `run.js` | the scenarios (below). |
 | `reallib.js` | loads the REAL supabase-js UMD (vendored, step 3) with a fake stored session and answers every Supabase request locally; counts store loads at page load and after a hidden→visible tab switch, and logs the auth events. |
@@ -53,6 +53,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - `window.__STUB.rlsDeny.<table> = ['update','insert','delete']` — the write "succeeds" with zero rows, like PostgREST under RLS.
 - `window.__STUB.maxRows` (seed `stub.maxRows`) — PostgREST max-rows cap, default 1000.
 - `window.__STUB.missingRpc = ['coach_save_spine']` — those RPCs answer "Could not find the function" (a server that has not had the stage applied).
+- `coach_save_spine` is stage64's: it takes `steps` and `suggested_changes`, and refuses what the table's checks refuse (more than 6 steps, a blank one or one over 140 characters, a draft list that is not a list) with the database's code. A server without stage64: `__STUB.fail.push({kind:'rpc', name:'coach_save_spine', message:'exercises.steps cannot be written from the editor'})`.
 - `window.__sqlWrite(table, id, patch)` — a write with no signed-in user (Claude's `/spine`, the SQL editor): fires the version trigger as `sql`.
 - `window.__STUB.delay.<name> = ms` — extra latency.
 - `window.__STUB.afterSelect = (table, call, DB) => {}` — mutate the DB between two reads (concurrency).
@@ -60,7 +61,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 99 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 105 scenarios, the last 6 for stage64, the card's How to do it and the pill; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -153,6 +154,12 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | tools-button | At 360 px the tools (Backup, Logins to send, Create missing logins) are folded behind the ⚙ Tools button with a badge, the first athlete starts above y = 400, the panel opens, survives a redraw and closes | (pile A10, ROSTER-12) the first athlete started at y 495 |
 | file-preview-wording | The File tab's "Their app" words, the two buttons' addresses, and the bar program.html draws over a preview | (pile A7, TOOLS-11) the File tab promised "their real data" and the bar "exactly as they see it", but the preview shows the programme without their logged work |
 | library-publish-guards | A file that is new, one that replaces a live item, one that replaces a hidden item, and one whose id is already on another shelf | (pile B11, TOOLS-6) the confirm did not say, a hidden item was published again, a moved item was published twice |
+| spine-steps-save | How to do it (stage64): one step per line, a typed "1." dropped, 7 steps or a 141-character step refused before anything is sent, History shows Steps, a server without stage64 named | (new, 2026-10-11) |
+| spine-draft-prefill | Claude's drafts (`suggested_changes`): counted, a filter, the boxes pre-filled and outlined, a stale draft not shown, closing asks nothing | (new) |
+| spine-draft-save | Save approves the drafts: entry and list in ONE `coach_save_spine` call, the stale item and a non-draft item stay | (new) |
+| spine-draft-discard | Discard puts the entry's value back, Bring it back undoes it, a discard is unsaved work, Save takes both decided drafts off | (new) |
+| spine-draft-arrives | a draft Claude adds while the entry is open: the save is refused whole, Save again keeps Claude's new item | (new) |
+| editor-pill-picker | the ✎ pill picker: list values, one per group, two at most, an old spelling mapped, an off-list pill to the note or dropped, the hold warning, saved as one " · " string, no phantom save; the row shows the pill | (new) caught `applyRx()` copying `intent` into `rx` |
 
 ## Adding a scenario
 

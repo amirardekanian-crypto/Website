@@ -18,7 +18,7 @@ we'll always tell you what that purpose is.
 1. **We get to know you** — your goals, your life, your injuries, your schedule, your equipment, how you recover.
 2. **We analyse** — we line your goals up, resolve any that pull against each other, and (if you're an athlete) run a proper needs analysis for your sport.
 3. **We build your six months** — a science-based programme shaped around *your* constraints, mapped cycle by cycle, with a clear reason and a clear outcome for each one.
-4. **You train through the app** — every session comes with demo videos and coaching cues; you log your sets and answer a quick wellbeing check each time.
+4. **You train through the app** — every exercise comes with coaching cues and, where there is one, a demo video; you log your sets and answer a quick wellbeing check each time.
 5. **We watch, we talk, we adjust** — your data flows to your coach, and a real weekly check-in plus ongoing review means your plan keeps changing as *you* change.
 
 Below is the long version — the part that explains *why* this works.
@@ -111,9 +111,10 @@ does two things: it lets the session adapt to how you actually walked in that da
 it shows your coach exactly how you're holding up.
 
 **During the session — everything you need on the card.** Tap any exercise and you
-get a **demo video**, the full prescription (sets, reps, target, tempo, rest), and
-**coaching cues** — what to do, what to feel, and the one mistake to avoid. No
-guessing what an exercise is or how it should look.
+get the full prescription (sets, reps, target, tempo, rest) and **How to do it**: three
+**coaching cues** (the key point, what to feel or check, and the one mistake to avoid), a
+**demo video** when there is one, and, as each exercise gets them, plain steps written so you
+can do it safely from the words alone. No guessing what an exercise is or how it should look.
 
 **As you go — you log your work.** Each set, you record the weight, your effort (RPE),
 and tick it off (and the reps, if you didn't hit the number). Every exercise also shows what you

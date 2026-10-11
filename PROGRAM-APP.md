@@ -325,10 +325,32 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   a cue for someone specific, it should be in coach's notes. thats why its there"*). The pipeline
   writes **no `cues`** on a programme card. Anything about one athlete is that exercise's `note`
   (Coach's Note). `paintSpine()` fills `.ex-cues-slot` on a card and `.round-cues-slot` on a
-  circuit item. Legacy cards still carry their own `cues` and show those until their next cycle.
-  So **an entry must be approved before a programme using it goes live** (`/program-assemble`
-  checks), or the card shows no cues. Entry cues are 2 good + 1 bad, written for anyone: no side,
-  no home kit, no tempo, no dose.
+  circuit item. So **an entry must be approved before a programme using it goes live** (`/program-assemble`
+  checks), or the card shows no cues. Entry cues are three, written for anyone (CUE-1, reworded 2026-10-11):
+  the key point, a feel or a quick position check, and one avoid that names the fault, then the fix. No side,
+  no kit, no tempo, no dose.
+  ⚠ **The Spine wins** (Q9 A, Amir 2026-10-11: *"all recommended, go ahead"*). Until then a card that carried
+  its own `cues` (1,094 cards in 29 older programmes, 962 of them different from the Spine, and 371 of the 376
+  Library cards) showed those first, so a Spine improvement reached about one card in five. Now an approved entry
+  with cues replaces the card's own on every card, circuit item and Library session. The card's own cues stay in the
+  programme (nothing is deleted, so it is undone in one line) and show only when no approved entry with cues
+  resolves: `spineCuesInto()` keeps them on the slot (`data-own`) the first time it paints, so a Spine that arrives
+  late, or drops an entry, can swap either way. **Q9 A's first step went first** (2026-10-11, before the app change
+  shipped): the old card lines that were about one athlete (a side, home kit, a pain stop, a depth or load limit) were
+  moved into that card's Coach's Note, on a circuit item into the circuit's note with the item's name in front (an
+  item's own note is not drawn). 30 notes in 15 programmes; 5 more lines were already said in the note and were left.
+- **How to do it: the steps** (2026-10-11, the Exercise Card Blueprint; CUE-6, CUE-7; server
+  `supabase/stage64_spine_steps.sql`). 141 of 320 approved entries had no video, and those athletes got three
+  short cues and nothing else. An entry now carries `steps` (`text[]`, sent by `get_exercises()` for approved rows,
+  `[]` when none): 3 to 5 plain lines for anyone (2 to 3 for a stretch or conditioning, up to 6 for a rack lift so
+  the bail fits), one phase each, from setup to a safe finish, enough to do it safely from the words alone. Never a
+  dose, a side, a tempo or a reason. Each part of the card says one thing (CUE-7): **the steps** the how, **the
+  cues** the focus and the one fault, **the pill** this athlete's change (CHP-2's closed list), **the Coach's Note**
+  this athlete. On the phone: `renderSteps(entry)` draws **You need:** (the entry's `equipment`, the floor and
+  "none" left out: `kitLine()`) and the numbered steps (`.ex-steps`, the numbers green, never clay: DS-01).
+  `stepsOf()` reads them, so an old `spinecache` without `steps` is the same as none. Where they show: the card's
+  How to do it (*The working card*), a circuit item (*Warm-ups are a list*), the About sheet opened whole, Guided
+  (it moves the card's own node). Check: `scripts/headless/howto-steps.js`.
 - **Every programme write ends with Spine upkeep** (Amir, 2026-09-24: *"when i write or update a
   program, and there are movements that are not there, or missing some info, or can be updated, it
   should be updated there at the end … so everytime i write a program for an athlete, this gets more
@@ -348,7 +370,9 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
 - **Library → Exercises is the third door** (Amir, 2026-09-24: *"something like the one i have in tps
   course"*): search, pattern chips, *In your plan* first. Every row opens the same About sheet
   (`renderExerciseLibrary()` → `openExerciseSheet(id, card, true)`); opened from the library, or with
-  no card on screen, the sheet also carries the video and cues. One design, not two.
+  no card on screen, the sheet also carries **How to do it** (2026-10-11): the video, then You need and the
+  steps, then the cues, all ABOVE the body map. Opened from a card it shows none of them: the card has its own.
+  One design, not two.
 
 ## 🗺️ The Quality Map — what each day builds (2026-09-24)
 
@@ -887,10 +911,18 @@ Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8r
   RPEs against the target, the note and **History ›**. Open or closed is ONE setting for the phone,
   `lt_open` (`ltToggle()`: every box follows the one tapped; unprefixed, so it never syncs). A first
   meeting shows the **First time** box. A circuit keeps its old strip, always open.
-- **How to do it** (`renderHowTo()`, a `<details class="ex-how">`): the video and the cues in one row that
-  names what it holds, *Video & 4 cues* (`paintHowTo()`, which also hides it while it holds nothing, since the
-  Spine's cues arrive late). It opens by itself only when the athlete has **no history** for the lift
-  (`openHowFirstTime()`, run by `paintLastTime()`), and on a Library session; once tapped it stays as left.
+- **How to do it** (`renderHowTo()`, a `<details class="ex-how">`; the steps since 2026-10-11): one folded row that
+  holds, in this order, the video when there is one, **You need:**, the entry's numbered steps, then the cues (with
+  steps above them the cues take back their *Coaching Cues* label). The row reads **How to do it** with a quiet count
+  after it, *· video · 5 steps · 3 cues*, only the parts there (`paintHowTo()`, which also hides it while it holds
+  nothing, since the Spine can arrive late). The green ▶ shows **only with a video**: it used to show on every row,
+  so a card with no video read *▶ 3 cues* and promised one that was not there. It opens by itself the first time the
+  athlete meets the exercise (`openHowFirstTime()`): a logged lift when it has **no history** (`paintLastTime()`),
+  and since 2026-10-11 **a simple card too** (a warm-up ride, a stretch), which logs no sets and so never opened by
+  itself (39 Stationary Bike cards): `openHowSimple()` opens it until any earlier session carries the exercise
+  (`seenBefore()`; `buildSessionData()` records every exercise, sets or none, and the demo's history does the same).
+  Nothing else about a simple card changes: no Last time, no set log. On a Library session it is always open; once
+  tapped it stays as left. The closed card is the same height as before: everything here is inside the open part.
 - **Open in YouTube** (Amir, 2026-10-05: *"C and red"*): under every player, one 44 px bar, a red YouTube mark and
   *Open in YouTube ↗*, attached to the video as one rounded unit (`renderVideoBlock()`: `.ex-vunit` holds `.ex-video` and
   `a.ex-yt`). Athletes in Iran can have the YouTube app or browser working while the embedded player in the app does not
@@ -902,7 +934,7 @@ Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8r
   About sheet, Library → Exercises, Guided), so one function covers them; the pop-up a circuit item's ▶ opens has the same
   bar (`.video-modal-yt`, built in `shared.js`). **No mark on the circuit rows themselves**: beside the ▶ it pushed a
   superset's row 6 px past its card at 390 px and 36 px at 360 px, and squeezed a warm-up's names to two or three lines.
-  Guide cards that name it: *Logging your sets* (the card, and the warm-up line) and *Built-in tools* (*Exercise videos*) in
+  Guide cards that name it: *Logging your sets* (the card, and the warm-up line) and *Built-in tools* (*How to do it*, which was *Exercise videos* until 2026-10-11) in
   `APP_GUIDE`. Check: `scripts/headless/youtube.js`.
 
 **Done**: a finished exercise's closed row is small and says what was done, *72.5 kg × 6 · 6 · 6 · 6 ·
@@ -1006,10 +1038,16 @@ lived only in the guide, two tabs away. Now three hints, `paintHints(day)` in `p
 
 - **A circuit that logs nothing is a warm-up list** (`isPrep` in `renderCircuit()`: no `logWeight`, no
   `logRPE`, which is what a prep block gives by default). One line per movement: letter, name, dose and ▶ when
-  it has a video, with its cues folded under a chevron (`.round-row.prep`, `togglePrepCues()`). A tap on the
-  row or the chevron opens that movement's cues; ▶ plays and never toggles. The chevron shows only once the row
-  has cues (`has-cues`: its own, or its Spine entry's, which `paintSpine()` fills in). A real four-movement
-  primer opened to 1001 px with twelve cue lines always open; it opens to 452 px now, on one screen.
+  it has a video, with its steps and cues folded under a chevron (`.round-row.prep`, `togglePrepCues()`; the steps
+  first, since 2026-10-11). A tap on the row or the chevron opens them; ▶ plays and never toggles. The chevron
+  shows only once the row has something to fold (`has-cues`: its cues, its steps or both, which `paintSpine()`
+  fills in from the Spine). A real four-movement primer opened to 1001 px with twelve cue lines always open; it
+  opens to 452 px now, on one screen.
+- **A working circuit keeps its cues open, and folds its steps** (2026-10-11): under an item's cues, one small
+  **How to do it · 5 steps ›** line (`.round-how-tog`, `toggleRoundSteps()`, 36 px to see and 44 to hit), shown only
+  when the entry has steps (`has-steps`). A tap shows You need and the steps under it. So the circuit grows by that
+  one line per item, about 38 px, and not by the steps (measured at 320, 360 and 390 px in `howto-steps.js`). The
+  Spine's cues win on a circuit item too, its own only the fallback.
 - **Rest is never invented, for a circuit either.** It fell back to 60 s, so 19 of the 135 live circuits
   (7 athletes, 18 of them warm-ups) showed "rest 1:00" that nobody wrote. Now: the circuit's own rest
   (`rx.rest`, or legacy `restSec`) → the block's → none. Only its own shows in the line of numbers. None
@@ -1093,6 +1131,11 @@ appears "when every exercise is checked off", and "tap the timer icon". What is 
 - The session RPE (1–10), an optional note, and **Done · send to coach ✓**, which finishes and sends (WK-04,
   above). **Reset** sits in the session bar once a day has started.
 - The rest timer opens from the **Rest** offer after a tick, or the **Rest ⏱** button under an exercise's sets (WK-02, above).
+- **How to do it** (2026-10-11) holds the steps, the cues and the video when there is one, and its ▶ means a video. Five
+  texts said otherwise and changed with it: *How your program is structured* (each exercise "carries a demo video and
+  coaching cues"), *Logging your sets* (How to do it was "the video and the cues"; the warm-up line, and a line for a
+  working circuit's How to do it), *The ⓘ* (Library → Exercises "with its video and cues") and *Built-in tools*
+  ("most exercises have a video": 141 of 320 entries had none). `ONB_TEXT` names none of these and did not change.
 
 **Rule:** a PR that renames a button, moves a control or changes when a card appears updates its guide card
 too (CLAUDE.md says the same). The Library's *Mark as done* note promises a habit tick only when AA Proof

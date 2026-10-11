@@ -34,15 +34,6 @@
           "name": "Forearm Roll",
           "exId": "forearm-roll",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Forearm across the roller, slow from elbow to wrist, top side first",
-              "Open and close your fist while you pause on a sore spot"
-            ],
-            "bad": [
-              "Rolling straight over the bony point of the elbow"
-            ]
-          },
           "rx": {
             "time": "60 sec",
             "side": true
@@ -54,15 +45,6 @@
           "name": "Wrist Extensor Stretch",
           "exId": "wrist-extensor-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Arm straight, palm down, bend the wrist so the fingers point down",
-              "Feel the top of the forearm"
-            ],
-            "bad": [
-              "Pulling hard — this one is easy to overdo"
-            ]
-          },
           "rx": {
             "time": "30 sec",
             "side": true
@@ -73,15 +55,6 @@
           "name": "Wrist Flexor Stretch",
           "exId": "wrist-flexor-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Arm straight, palm up, bend the wrist so the fingers point down",
-              "Feel the underside of the forearm"
-            ],
-            "bad": [
-              "Letting the elbow bend"
-            ]
-          },
           "rx": {
             "time": "30 sec",
             "side": true
@@ -99,15 +72,6 @@
           "exId": "lat-roll",
           "videoUrl": null,
           "note": "Your serving side will be the worse one, so give it the extra time.",
-          "cues": {
-            "good": [
-              "On your side, arm overhead, roller under the armpit",
-              "Small movements, pause where it bites"
-            ],
-            "bad": [
-              "Rolling onto the ribs themselves"
-            ]
-          },
           "rx": {
             "time": "60 sec",
             "side": true
@@ -118,15 +82,6 @@
           "name": "Upper Back Roll",
           "exId": "upper-back-roll",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Roller across the upper back, hands behind the head, ribs down",
-              "Pause and breathe at each level"
-            ],
-            "bad": [
-              "Rolling the lower back"
-            ]
-          },
           "rx": {
             "time": "60 sec"
           }
@@ -136,15 +91,6 @@
           "name": "Cross-Body Shoulder Stretch",
           "exId": "cross-body-shoulder-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Arm straight across the chest, pull it in with the other forearm",
-              "Shoulder stays down, not shrugged to the ear"
-            ],
-            "bad": [
-              "Pushing into a pinch at the front of the shoulder"
-            ]
-          },
           "rx": {
             "time": "45 sec",
             "side": true
@@ -155,15 +101,6 @@
           "name": "Doorway Pec Stretch",
           "exId": "doorway-pec-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Forearm on the door frame, elbow at shoulder height, step through and turn away",
-              "Feel it across the front of the chest"
-            ],
-            "bad": [
-              "Letting the shoulder roll forward into it"
-            ]
-          },
           "rx": {
             "time": "45 sec",
             "side": true

@@ -173,6 +173,13 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   a rename in a live programme must move the athlete's logged history with it (`/spine` → *One name in live
   programmes*); rungs are gone for good; Library has three doors (Sessions,
   Playbook, Exercises) and **no Qualities door**.
+- **Four layers, four jobs** (the Exercise Card Blueprint, Amir 2026-10-11: *"all recommended, go ahead"*; CUE-6, CUE-7,
+  `Content/exercise-card/`): the entry's **steps** (`exercises.steps`, stage64: How to do it, for anyone, enough with no
+  video) and its **three cues** (key point, feel or check, the one fault written fault-then-fix), the card's **pill**
+  (`intent`, a closed list: SCHEMA.md → *`intent`: the pill list*, three copies kept equal by `check_parity.py`) and the
+  card's **Coach's Note** (this athlete only, COM-14). **The Spine's cues win on every card**: a legacy card's own cues
+  show only when no approved entry with cues resolves. Claude never writes steps, cues or purpose on an APPROVED entry:
+  they wait in `exercise_coach.suggested_changes`, coach.html pre-fills the editor and **Amir's Save is the approval**.
 - **A delete is a tombstone** (Personal Records `{del: true}`, body weight `kg: null` with a fresh `t`), and every
   records write rebuilds from `loadCeilingRaw()`, or a device that missed the delete brings it back.
 - **No estimate on the working card** (Fresh Eyes, Amir 2026-09-26: "Off the card, keep in Records"): nothing on
@@ -398,7 +405,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v107` on 2026-10-11). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v108` on 2026-10-11). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

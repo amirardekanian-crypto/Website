@@ -74,7 +74,7 @@ stale copy reached athletes.
 | SEL-8 | A swap fits demonstrated capacity, not the most advanced-sounding progression. | design | |
 | SEL-9 | Knee history: reverse lunge over forward; plyometrics return through stick landings and step-downs; lateral bounds come last. | design | |
 | SEL-10 | Chronic back: a supported hinge and a supported squat pattern first; the free hinge and axial loading return after one pain-free cycle. | design | |
-| SEL-11 | Audit every range or height restriction against every exercise, cue, warm-up and prep item; if nothing fits, the pattern leaves. | design | part (`bans:`) |
+| SEL-11 | Audit every range or height restriction against every exercise, its steps and cues, and every warm-up and prep item; if nothing fits, the pattern leaves. | design | part (`bans:`) |
 | SEL-12 | Check every fallback against every deferral in the cycle, and read the fallback list last. | design | ✓ (`bans:`) |
 | SEL-13 | Posture and tennis clients: horizontal pressing low or none; bias the posterior chain and scapular health. | design | |
 | SEL-14 | No corrective or postural drill without a noted posture issue; prep mobilises and activates the day's patterns. | design | |
@@ -92,9 +92,9 @@ stale copy reached athletes.
 | NAM-2 | Equipment goes in a name only when the movement has several implements; bodyweight moves take the bare name. | assemble | ✓ (a "Bodyweight" prefix) |
 | NAM-3 | Defining setups belong in the name: Chest-Supported, Heels-Elevated, Half-Kneeling, Incline, B-Stance, Single-Arm, Single-Leg. | assemble | |
 | NAM-4 | Never in a name: grip, intent, range, tempo, holds, bare digits, brackets, colons, commas. Canonical digits (45°, 90/90) stay. | assemble | ✓ (brackets, colons, commas) |
-| NAM-5 | A grip or one intention is the card's `intent` pill: the athlete's own, never free text, never on the library entry. | assemble | ✓ (grip as text) |
+| NAM-5 | A grip is the card's `intent` pill, never free text; the entry's steps may name the default grip in plain words, never as a pill. | assemble · spine | ✓ (grip as text) |
 | NAM-6 | A variant that changes the exercise (Short-Lever Copenhagen Plank) is its own exercise, with its own name, entry and cues. | design · spine | |
-| NAM-7 | A hold on a dynamic exercise keeps the canonical name; `rx.tempo: "iso"`, the time and a Coach's Note carry the hold. | assemble | |
+| NAM-7 | A hold on a dynamic exercise keeps the canonical name; `rx.tempo: "iso"` and the time carry it, and a hold pill says where. | assemble | |
 | NAM-8 | Use the Spine entry's exact name, no alias; a different version is its own entry. Not a whitelist: prescribe any real movement. | design · assemble | warn (a name that is not its entry's) |
 | NAM-9 | A newly prescribed exercise joins the library in the same run, in full: cues, details, qualities, links both ways. Never swap it out instead. | assemble · spine | ✓ |
 | NAM-10 | Cycle names are punchy, evocative one- or two-word power-names, set in the roadmap. | roadmap | |
@@ -189,7 +189,7 @@ stale copy reached athletes.
 | COM-11 | Celebrate a genuine win each cycle on its own card; never invent one. | engage | oblig `win` |
 | COM-12 | A notes card and the matching Coach's Note never repeat: the card holds the protocol, the note the point-of-action detail. | engage | |
 | COM-13 | When a cycle turns on body mass, a card sends the athlete to Home → Body Weight in the programme app, never AA Proof. | engage | ✓ (weighing in + Proof) · oblig `weigh-in` |
-| COM-14 | A Coach's Note is one to three short sentences of plain text about this athlete only; never a cue. | engage | |
+| COM-14 | A Coach's Note is one to three sentences about this athlete, point first: start weight, limit, kit, checked fallback. Never general how-to, cue or dose. | engage · edit | warn (over 3 sentences or 300 characters) |
 | COM-15 | A Because is one sentence of 140 characters at most, written fresh each cycle, never carried over. | engage | ✓ (140 characters) |
 | COM-16 | A week note is one or two short sentences under about 260 characters, starting with the instruction; no notes card repeats it. | engage | warn (length, label) |
 | COM-17 | The handoff message points into the app: each action is a one-line gist plus where it is; never a card's full text. | engage | |
@@ -197,17 +197,19 @@ stale copy reached athletes.
 ### Coaching cues & the library
 | ID | Rule | Stage | Check |
 |---|---|---|---|
-| CUE-1 | Exactly 3 cues per exercise (external, internal, avoid), written once on its Spine entry for anyone: no side, kit, tempo or dose. | spine | |
+| CUE-1 | Exactly 3 cues per Spine entry, for anyone: key point, feel or position check, one avoid naming the fault. No side, kit, tempo or dose. | spine | |
 | CUE-2 | A programme card carries no cues; what only this athlete needs is the exercise's Coach's Note. | assemble | ✓ |
 | CUE-3 | Never create a new pill: qualities come from the ten, patterns from the library's own list. | spine · assemble | part (qualities) |
 | CUE-4 | Every programme write leaves the Spine more complete: `/spine` → Upkeep ends every run. | assemble · edit · workout | part (`exId`, Spine gate) |
 | CUE-5 | Claude drafts library entries and never approves one; new entries are one approval question to Amir, answered before the programme publishes. | assemble · spine | warn (drafts) |
+| CUE-6 | Every Spine entry has steps for anyone: 3–5 one-phase lines (2–3 stretches and conditioning, 6 rack lifts), setup to safe finish, never dose or side. | spine | warn (later ✓) |
+| CUE-7 | Say each thing once: steps the how, cues the focus and the avoid, pill the change, note this athlete. A card overrides its entry's default. | spine · engage · assemble · workout | warn (a note repeating its pill) |
 
 ### Chips & modifiers
 | ID | Rule | Stage | Check |
 |---|---|---|---|
 | CHP-1 | No floating text: no grey `setup` line on a programme card; the detail is the Coach's Note (for a circuit item, the circuit's note). | assemble | ✓ |
-| CHP-2 | An `intent` pill is something the athlete does or holds in mind that set, never a pairing, a muscle or a category. | assemble | part (a pairing) |
+| CHP-2 | The `intent` pill is from the closed list (hands, lead, intent, hold, brakes, pace), at most two, one per group; never pairing, dose or muscle. | assemble | ✓ (off the list, two in a group, a pairing) |
 | CHP-3 | A hold is `rx.tempo: "iso"` with the hold as `rx.time`. | assemble | part (format) |
 | CHP-4 | No RPE below 6 anywhere; a note that lowers RPE names the floor of 6 in the same sentence. | design · engage | ✓ |
 | CHP-5 | A prescription is the `rx` object: write what is prescribed and omit the rest (absent means not prescribed). Never write `chips[]`. | assemble | part (`chips[]`, two doses) |
@@ -379,8 +381,10 @@ same ID. Read a rule's story and its history before changing it.
   dead in the middle of the painful arc rather than below it, and a Cat-Cow in the prep circuit
   cues the exact end-range flexion the primary's own note forbids. Two lines of a programme must
   never give opposite instructions for the same joint. Sweep the restriction across every
-  movement, every cue and every prep item before the spec is final; if no exercise in a pattern
-  can satisfy it, the PATTERN leaves the cycle rather than the rule bending.
+  movement, its steps and cues, and every prep item before the spec is final. The Spine's steps are
+  written for anyone, so a step that takes this athlete past their limit (down to the floor when they
+  stop at a box) gets a Coach's Note that says what changes (CUE-7). If no exercise in a pattern can
+  satisfy it, the PATTERN leaves the cycle rather than the rule bending.
 - `SEL-12` **The fallback rule above generalises: EVERY fallback is checked against EVERY deferral the
   cycle makes, not just the free hinge.** A fallback is written as an afterthought ("if the
   station is busy") and is the easiest place for a banned pattern to walk back in — the athlete
@@ -430,7 +434,9 @@ same ID. Read a rule's story and its history before changing it.
   set-downs per session, at a grip-limiting load, usually in the last block when she is tired — an
   offset free hinge, unsupervised, and typically the only rep in the program with no instruction
   attached to it. The exercise's own cues describe the walk; nobody writes a cue for getting the
-  thing off the floor. Extends "audit the restriction against every exercise, including warm-up
+  thing off the floor. Since 2026-10-11 the entry's steps say how anyone picks it up and sets it down
+  (CUE-6); while the free hinge is deferred, the Coach's Note says where THIS athlete picks it up instead,
+  because it changes a step (CUE-7). Extends "audit the restriction against every exercise, including warm-up
   and fallbacks" (2026-08-17) to the parts of an exercise nobody thinks to write down.
 - `SEL-20` **One same-pattern fallback per primary, named in the spec.** For pain or a busy station, so the athlete never improvises a swap. A fallback is also where a banned movement hides, which is why the checker scans every `fallback:` line (SEL-12).
 
@@ -449,25 +455,27 @@ same ID. Read a rule's story and its history before changing it.
   Half-Kneeling, Incline, B-Stance, Bottoms-Up, Single-Arm, Single-Leg).
 - `NAM-4` **Never in the name → these go in the prescription, the pill or the Coach's Note:** grip ·
   focus/intent · range qualifier · tempo emphasis · holds/durations · bare digits · parentheses ·
-  colons · commas. (A 30s plank → `rx.time: "30s"`; a hold → `rx.tempo: "iso"`; a grip or one
-  intention → the `intent` pill; anything else for this athlete → the Coach's Note. `chips[]` is
+  colons · commas. (A 30s plank → `rx.time: "30s"`; a hold → `rx.tempo: "iso"`; a grip, a lead side
+  or one intention from the list → the `intent` pill, CHP-2; anything else for this athlete → the Coach's Note. `chips[]` is
   legacy and never written: SCHEMA.md → `rx`.) **Exception — digits in an established/canonical name stay** (45° Back
   Extension, 90/90, B-Stance); don't mangle them.
-- `NAM-5` **Grip / intent / execution tweak is a chip, never the name** (e.g. Lat Pulldown +
-  `wide grip`; Chin-Up). Keeps card titles clean and stable.
-  **And never free text either:** on an `rx` card the chip is `intent` (`"intent": "neutral grip"`),
-  never the grey `setup` line. **A grip chip belongs to the athlete, on their card, never on the exercise's library
-  entry.**
+- `NAM-5` **A grip is the card's pill, never the name** (e.g. Lat Pulldown + `wide grip`; Chin-Up). Keeps card
+  titles clean and stable. **And never free text either:** on an `rx` card it is the `intent` pill
+  (`"intent": "neutral grip"`), never the grey `setup` line and never words in the Coach's Note.
+  **The grip pill belongs to the athlete, on their card.** The entry's steps may name the default grip in plain
+  words (*"a dumbbell in each hand, palms facing you"*, CUE-6), so an athlete with no video and no pill still
+  knows how to hold the weight; a grip pill on the card overrides it. A grip never goes on the entry as a pill.
 - `NAM-6` **A variant that changes the exercise is its own exercise**, with its own name, its own library
-  entry and its own cues, never the parent exercise with a note or a chip. Short-Lever Copenhagen
+  entry and its own steps and cues, never the parent exercise with a note or a chip. Short-Lever Copenhagen
   Plank is not Copenhagen Plank + "short lever".
 - `NAM-7` **An isometric hold on a dynamic library exercise KEEPS the canonical library name —
-  the video stays; the chip + Coach's Note carry the hold.** Amir's ruling (2026-07-24,
+  the video stays; the tempo cell and a hold pill carry the hold.** Amir's ruling (2026-07-24,
   Athlete I C1): a rename-to-"…Hold" was tried (it breaks the video join) and he reverted
   it — the machine-setup video is still worth having, and the execution change is
   communicated by the hold time (`rx.time`), `rx.tempo: "iso"` (the TEMPO cell reads
-  **Hold**; see "Chips & modifiers", Amir's rule), a `mid-range hold` intent pill where it
-  helps, and a Coach's Note that states it's one continuous hold, not reps. When telling Amir about a
+  **Hold**, so the card already says it's one continuous hold; CHP-3) and a hold pill that says
+  where (`hold at the top`, `mid-range hold`, `hold at 90°`; CHP-2). The Coach's Note adds only
+  what is about this athlete (COM-14). When telling Amir about a
   program, point at where the isometric lives (exercise + day) rather than assuming the
   card reads as one. Longer-term option stands: add a dedicated isometric (Wall Sit,
   Spanish Squat…) with its own video to the Spine and rotate it in.
@@ -482,11 +490,11 @@ same ID. Read a rule's story and its history before changing it.
   already catalogued.** Pick whatever real movement is right for the athlete; a new one joins the
   Spine in the same run and ships without a demo video until Amir adds one in coach.html →
   Exercises (the app handles a missing video gracefully — no play button, nothing breaks). Follow
-  the naming *convention* above regardless of whether the name is already catalogued. Compensate
-  for the missing video with a clear Coach's Note when the movement is new to the athlete.
+  the naming *convention* above regardless of whether the name is already catalogued. A missing
+  video is covered by the entry's steps (CUE-6), never by how-to in a Coach's Note.
   ⚠ **Since the Spine (2026-09-24) the card's cues come from the library**, so a newly prescribed
-  exercise is ADDED to the library in the same run, in full: its three cues and every detail the
-  existing entries carry (purpose, on-court line, body parts, qualities, links both ways). Never
+  exercise is ADDED to the library in the same run, in full: its steps, its three cues and every detail
+  the existing entries carry (purpose, on-court line, body parts, qualities, links both ways). Never
   swap the movement out because it has no entry. Only an approved entry reaches the phone, so the
   new entries are the one approval question in the handoff.
 - `NAM-8` **The app resolver normalizes case/punctuation/accents** as a safety net, so minor
@@ -674,7 +682,7 @@ same ID. Read a rule's story and its history before changing it.
   cards, messages, and completion text never contain target weights or kg increments — the
   athlete picks whatever load lands at the prescribed RPE. The one place load guidance may
   appear is that exercise's own `note` field (see *Communication*): a starting-weight
-  suggestion drawn from the athlete's own past logs, or how to load, framed around the RPE.
+  suggestion drawn from the athlete's own past logs, or how to find it, framed around the RPE (COM-14).
   Coach-side load targets stay in the coaching log.
 - `PRG-1` `PRG-3` **Mid-cycle adjustments are report-driven only.** No self-progression rules in the program
   ("add 2.5 kg when you complete all sets…") — Amir adjusts from the weekly logs and check-ins
@@ -903,8 +911,8 @@ same ID. Read a rule's story and its history before changing it.
 - `COM-6` **Exercise-scoped guidance goes ON the exercise — the `note` field.** Anything about one
   specific exercise (an injury caveat like "start slower", a starting-weight suggestion from
   the athlete's past logs, how to load it) is authored as that exercise's `note`, which the
-  app renders as a highlighted clay "Coach's Note" (pill on the collapsed row + callout in
-  the expanded card) so the athlete pays attention. The cycle notes cards carry only
+  app renders as a highlighted clay "Coach's Note" (a clay dot after the name on the closed card,
+  a callout when it is open) so the athlete pays attention. The cycle notes cards carry only
   program-wide guidance. See SCHEMA.md → "Exercise coach's note".
 - `COM-7` **Coach-facing reports** (the two volume tables) print in chat for Amir — never in the
   athlete app or the programme. They are also archived per athlete in the coach-only
@@ -935,7 +943,7 @@ same ID. Read a rule's story and its history before changing it.
 - `COM-12` **A cycle notes card and its matching exercise Coach's Note don't repeat each other.** When
   the same issue has both (e.g. a standing injury protocol), the card states the full
   protocol/stop-rule ladder once; the exercise note gives only the point-of-action specifics
-  for that exercise (starting depth, load, cue) — it never re-explains the ladder.
+  for that exercise (starting depth, load, a fault seen on their film) — it never re-explains the ladder.
 
 - `COM-13` **Body weight is logged in the programme app — when an athlete's goal actually turns on the
   scale, point them at it in a notes card.** It lives on **Home → Body Weight** in `program.html`:
@@ -948,7 +956,26 @@ same ID. Read a rule's story and its history before changing it.
   in and exactly where. Two things the card must say: that nobody else sees it, and — for anyone
   previously told not to trust the scale — why the rolling average is a different instrument from
   the number under their feet.
-- `COM-14` **A Coach's Note is one to three short sentences.** Plain text, about this athlete only, never a cue (CUE-2). Three copies said one sentence (design, edit and the cue story) and two said one to three (engage, SCHEMA); Amir chose one to three on 2026-09-26, because a note sometimes carries a starting weight and a caveat.
+- `COM-14` **A Coach's Note is one to three short sentences about this athlete, the point first.** Plain text.
+  Only about 75 characters show before More ›, so the first sentence carries the point. One to three, not one,
+  because a note sometimes carries a starting weight and a caveat. What it holds, most useful first:
+  - **Their starting weight**, from their own logs and framed by the RPE (PRG-2): *"Last cycle 20 kg for 10 at
+    RPE 8. Try 22.5 kg and let the first set's RPE decide."* With no logs, how to find it: *"Start with a bell
+    you can keep upright every rep."* Unsupervised lifters pick weights that are too light, so this is the
+    most useful thing a note says.
+  - **Their limit**: a range, a pain stop, a side. A limit that changes one of the entry's steps says so:
+    *"Stop at the box, not the floor."* (CUE-7)
+  - **Their kit or place**: a box height, a home anchor for a band, the court version.
+  - **Their checked fallback** (SEL-20): the swap for pain or a busy station that has been checked against
+    their restrictions (SEL-12). An unchecked "if the machine is busy" swap is not a note: the About sheet's
+    Alternatives cover that.
+  - **An ask**: *"Film set 2 and send it."* A fault seen on their own film belongs here too.
+  - **A few words of reason** (*"for your wrists"*) only when the exercise has no Because; when it has one,
+    the reason is the Because (COM-4), never said twice.
+  **Never in a note:** when to add weight (PRG-3 stands: the athlete hits the RPE and logs, and Amir changes the
+  card), general how-to (it is a step, CUE-6), a general cue (CUE-1, CUE-2), the tempo (CHP-6), sets or reps,
+  the grip (the pill, NAM-5). The checker warns past three sentences or 300 characters, on a note that repeats
+  its own pill (CUE-7), and on a grip written in a note.
 - `COM-15` **A Because is one sentence of 140 characters at most, written fresh each cycle.** A reason from Cycle 1 is stale by Cycle 3, so it is never carried over.
 - `COM-16` **A week note is short and says it once.** One or two short sentences under about 260 characters, starting with the instruction (the app already prints its label above it: the note's title, or *Week N*), and no notes card repeats it.
 - `COM-17` **The handoff message points into the app; it never rewrites it.** The cards, Coach's Notes and
@@ -967,46 +994,123 @@ same ID. Read a rule's story and its history before changing it.
     if the athlete goes and reports back, the programme may change; if not, nothing follows.
 
 ## Coaching cues
-- `CUE-1` **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an
-  action/focus *outside* the body — where to push, what to move toward), one **internal**
-  cue (what to *feel* — the target muscle/sensation), and one **avoid** cue (the single
-  mistake that most risks injury). They are written once, for anyone (next bullet), so a point
-  about one athlete's training age or history goes in their Coach's Note, not in the wording. On
-  the Spine entry the external + internal go in `cues.good[]`, the avoid cue in `cues.bad[]`.
-- `CUE-1` `CUE-2` **The cues live on the exercise, not the athlete.** Each exercise's three cues are written once,
-  on its Spine entry (`public.exercises`, edited in coach.html → Exercises), and every athlete's
-  card shows them. A programme carries **no cues**. Something only this athlete needs (an injury
-  limit, a range, a side, a home-kit setup, a fault seen on video) is the exercise's **Coach's
-  Note**, one to three short sentences (COM-14), never a cue. A point that would help anyone is a change to the Spine entry.
-  Spine cues are written for anyone: no athlete, no side, no home furniture, no tempo, no dose.
+- `CUE-1` **Exactly 3 cues per entry — never more, never fewer — and each has its own job.** They
+  finish the entry's steps and never repeat them (CUE-6, CUE-7). The key point and the feel or check go
+  in `cues.good[]`, the avoid in `cues.bad[]`:
+  - **Key point** (`good[0]`): the one thing to hold in mind during the set, about ten words. The effect
+    outside the body or an analogy works best, as in Amir's own *"Throw it through the wall, not at it"* and
+    *"Bounce off the floor like it's hot"*. No setup and no chain of orders joined by commas: half the first
+    cues once did the steps' job (*"Half-kneeling, pull the handle down to the ribs"*).
+  - **Feel or check** (`good[1]`), decided by the entry's FIRST quality so two writers agree. `muscle`,
+    `armour` or `movement`: where you should feel it, in plain place words, starting "Feel" (*"Feel a
+    stretch in the back of your standing thigh"*). `power`, `spring`, `speed`, `brakes`, `rotation`,
+    `strength` or `engine`: a quick position check (*"Chest and hips rise together as you stand"*). A
+    "feel the muscle" focus helps light-to-moderate muscle work and lowers force on a max-effort jump.
+  - **Avoid** (`bad[0]`): the ONE fault that most risks injury or ruins the rep, written **fault first,
+    then the fix**: *"Knee falling inward. Keep it over your second toe."* Never two faults joined by "or",
+    never two cues on the same point. A stop rule is fine: *"Low back lifting off the floor. If it lifts,
+    stop the set."* The fault is named because a fix-only line on the red row read as "don't do this",
+    and a colour-blind athlete can't tell the red row from the green ones, so the words carry it.
+  - A cue is read on its own, so it points back to a landmark the steps gave (*"Stop at the straight
+    line"*), never "flat" or "tight". Written once, for anyone (next bullet): a point about one athlete's
+    training age or history goes in their Coach's Note.
+- `CUE-1` `CUE-2` **The cues live on the exercise, not the athlete.** Each exercise's steps and three cues are
+  written once, on its Spine entry (`public.exercises`, edited in coach.html → Exercises), and every
+  athlete's card shows them. A programme carries **no cues**. Something only this athlete needs (an
+  injury limit, a range, a home-kit setup, a fault seen on their film) is the exercise's **Coach's
+  Note**, one to three short sentences (COM-14), never a cue; which side goes first is the card's lead
+  pill (CHP-2), and a hand position the pill list can't say stays in the note. A point that would help
+  anyone is a change to the Spine entry. Spine cues are written for anyone: no athlete, no side, no home
+  furniture, no tempo, no dose.
 - `CUE-3` **Never create a new pill.** An exercise's quality pills come from the ten (Strength, Muscle,
   Power, Spring, Speed, Brakes, Rotation, Engine, Armour, Movement), which cover every physical
   quality, and its pattern pill from the library's own list (Squat, Hinge, Single leg … Jump & land,
   Sprint & change of direction, Conditioning). Use those; never invent another of either kind.
 - `CUE-4` **Every programme write leaves the Spine more complete.** At the end of writing or editing a
   programme (or a library workout), every exercise it used is checked against the Spine: a missing
-  one is drafted, empty fields are filled, and a better general cue is applied to a draft or
-  proposed for an approved entry (`/spine` → Upkeep).
+  one is drafted, empty fields are filled, and missing steps or a better general cue are applied to a
+  draft or proposed for an approved entry (`/spine` → Upkeep).
 - `CUE-5` **Claude drafts library entries; only Amir approves them, and before the programme
-  publishes.** A card shows cues only from an approved entry (`get_exercises()` serves approved
+  publishes.** A card shows cues and steps only from an approved entry (`get_exercises()` serves approved
   rows only), so a new exercise's entry is drafted in the same run and put to Amir as one question
-  at the top of the handoff: *"approve these N so their cards show cues?"* Never approve one
+  at the top of the handoff: *"approve these N so their cards show cues and steps?"* Never approve one
   without his word, and never put anything about one athlete on an entry.
+- `CUE-6` **How to do it: every Spine entry has steps, written once for anyone.** The test: someone who has
+  never seen the exercise, with no video, can do it safely from the words alone. With no video an athlete
+  used to get three short cues and nothing else, and a handout alone gives more than twice the errors of video
+  or live teaching, so where text is all there is, it has to be complete. The steps are the entry's `steps`
+  (stage64), shown inside the card's *How to do it* and in the About sheet.
+  - **Shape.** 3 to 5 steps, one phase each: a raise may lift and lower in one step, and a short fragment can
+    give an end position (*"Feet shoulder-width, toes out a little."*). 2 to 3 for a `mobility` or
+    `conditioning` entry (the count follows the pattern, so two writers agree). Up to 6 for a lift that comes
+    off a rack or is kicked into place, so the bail fits (*"If you get stuck, sit down and let the safety bars
+    take the bar."*). Each step under about 90 characters (140 at most; the database refuses more), in the
+    "you" voice and everyday words. The entry's own name is never jargon.
+  - **Order.** The setup (the kit, where you and the weight go, the normal grip in plain words: *"a dumbbell
+    in each hand, palms facing you"*, NAM-5), the start position, the move ending at something you can see or
+    feel (*"until your back knee is just above the floor"*, never "go deep"), the way back and where the rep
+    ends, then what is left: breathing, setting a free weight down, *"do all the reps on one side, then
+    switch"*.
+  - **What the pilot taught** (twelve real entries read by a test reader with no video, 2026-10-11):
+    every direction word needs its reference point (*"side-on"*, *"square"* and *"sit back"* each caused a
+    guess; *"hips face the floor"* and *"second toe"* did not). Getting in and out is a step wherever people
+    get hurt: unracking and racking, a kettlebell held upside down, lying face down with weights, a spin
+    bike's flywheel, a band under tension. Safety setup goes in step 1: a non-slip floor, space to land or
+    run past, a band with no cuts on an anchor it can't slide off. A range landmark gets a form stop
+    (*"dumbbells at mid-shin, or higher if your back rounds"*), because a fixed landmark alone tells a stiff
+    beginner to round. "How long?" is answered by a landmark, never a time (*"until you are steady"*).
+    Balance work gets a way out (*"Tap the other foot down if you lose balance."*). An alternating exercise
+    says what counts as one rep (*"Each reach counts as one rep."*). A setup number that is the same for
+    everyone is fine (*"about 3 m of space"*, *"about 45°"*, *"3 small steps"*); one set for one athlete (a
+    lower step) is their Coach's Note.
+  - **Plain words.** The words a second-language reader tripped on and the gym words that need a plain
+    version are one list, in `.claude/skills/spine/draft_sql.py`, which checks every draft against it. The
+    list lives there only (PRC-23).
+  - **Never in steps:** sets, reps, time, tempo or seconds, RPE, kilos, which side this athlete starts, home
+    furniture, why the exercise is good (the `purpose`), what to feel (a cue), another exercise's name or when
+    to move to it (Regressions and Progressions).
+  - Write the steps first, then the cues from what is left, so a cue never repeats a step. On an approved
+    entry Claude never fills the steps: they wait on the pending list, and Amir's Save in coach.html is the
+    approval (CUE-5). The checker warns when an approved entry on a card has none; it becomes a fail once the
+    entries with no video are done.
+- `CUE-7` **Say each thing once: four layers, four jobs.** Two layers live on the Spine entry and are the
+  same for every athlete; two live on the programme card and are about one athlete. If a sentence would
+  help anyone, it belongs on the entry; if it is about this athlete, it belongs on the card.
+  - **Steps** (CUE-6): how to do it, from the setup to a safe finish.
+  - **Cues** (CUE-1): the key point, a feel or a position check, and the one fault. They finish the steps.
+  - **The pill** (`intent`, CHP-2): the one thing this athlete changes or adds, every rep, from the list.
+  - **The Coach's Note** (`note`, COM-14): what only this athlete needs: their weight, limit, kit, checked
+    fallback.
+  - Unchanged: `purpose` is the one sentence of what the exercise does for anyone, never an instruction,
+    and the Because (`why`) is why this athlete has it (COM-4).
+  **The card overrides its entry, and says what it changes.** A grip pill overrides the grip the steps
+  name; a limit that changes a step says so in the note (*"Stop at the box, not the floor."*). A pill that
+  only repeats the steps adds nothing: the Broad Jump's steps hold the landing, so `stick the landing` on it
+  says it twice. Before this rule the missing how-to was typed into notes (about a third of them), the cue
+  slots carried setup and the pill carried the tempo. The checker warns when a note repeats its own pill;
+  the rest is the writer's and the reviewer's judgment.
 
 ## Chips & modifiers
-- `CHP-1` **No floating text on a card.** Nothing goes on a programme card as a grey `setup` line. A
-  detail for this athlete (a hand position, a bench, a range, how a drill is called) is the
-  exercise's Coach's Note; on a circuit item, the circuit's note.
-- `CHP-2` **A modifier (`intent`) chip must be something the athlete actively does or holds in mind
-  that set** — a sequencing order (`right leg first`), an effort cue (`max intent`) or a grip
-  (`neutral grip`). Never the tempo: it has its own cell (CHP-6). **A superset/complex pairing is never
-  a chip** — it's a structural decision (see "Session structure & time" below): the paired
-  exercises become one `type: circuit` block with a shared name + rest, not a `"superset"`
-  chip on a standalone standard exercise. A modifier chip is also never a restatement of the
-  target muscle or exercise category — if it just re-labels what the exercise already trains,
-  especially when that's already said in the internal cue right next to it, drop it; it's a
-  label, not an instruction. Test before adding one: could the athlete act on this mid-set, or
-  would removing it lose nothing?
+- `CHP-1` **No floating text on a card.** Nothing goes on a programme card as a grey `setup` line. A grip,
+  the side that goes first or another value on the pill list is the pill (CHP-2). Any other detail for this
+  athlete (a hand position the list can't say, a bench, a range, how a drill is called) is the exercise's
+  Coach's Note; on a circuit item, the circuit's note.
+- `CHP-2` **The pill comes from a closed list.** The pill (`intent`) is the only words on the closed card,
+  so it carries the one thing this athlete does differently from the entry's normal way, every rep. The list
+  and the old spellings it replaces live once, in SCHEMA.md → *`intent`: the pill list*; the checker and the
+  app hold copies that `scripts/check_parity.py` keeps equal. Six groups: **hands** (a grip, or straps),
+  **lead** (which side goes first, or alternating), **intent** (the effort of every rep), **hold** (where the
+  hold is, only with `rx.tempo: "iso"`), **brakes** (how a braking drill stops) and **pace** (only on an item
+  with no RPE). **At most two values, never two from one group**, joined in the one `intent` string with
+  " · ". A new value joins only on Amir's word, like a new quality (CUE-3).
+  Never a pill: the tempo or seconds (it has its own cell, CHP-6), a number or dose, a muscle or category
+  (*glute focus*, *court transfer*: a label, not an instruction), a cue, or the grip the entry's steps
+  already state. **A superset/complex pairing is never a pill** — it's a structural decision (see
+  "Session structure & time" below): the paired exercises become one `type: circuit` block with a shared
+  name + rest, not a `"superset"` pill on a standalone standard exercise. Test before adding one: does it
+  change what the entry already says, and could the athlete act on it every rep? The checker fails a value
+  off the list (naming the list value an old spelling became), two from one group, more than two, a hold
+  pill without `iso`, a pace pill beside an RPE, and a pairing.
 - `CHP-3` **Hold exercises write `Iso` in the Tempo — Amir's rule, verbatim (2026-07-24): "if
   it's a hold exercise, in the Tempo write Iso."** Every isometric/hold prescription
   (iso holds on a machine, planks, wall sits…) is `rx.tempo: "iso"` with the hold as

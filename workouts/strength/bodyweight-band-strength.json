@@ -50,15 +50,6 @@
           "name": "March in Place",
           "exId": "march-in-place",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Knee up, opposite arm back",
-              "Build the pace across the three minutes"
-            ],
-            "bad": [
-              "Standing still between reps"
-            ]
-          },
           "rx": {
             "time": "3 minutes"
           }
@@ -68,15 +59,6 @@
           "name": "Banded Glute Bridge",
           "exId": "banded-glute-bridge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Push the knees out against the band the whole set",
-              "Feel the glutes, not the lower back"
-            ],
-            "bad": [
-              "Letting the knees collapse in"
-            ]
-          },
           "rx": {
             "sets": 2,
             "reps": 15
@@ -88,15 +70,6 @@
           "name": "Banded Lateral Walk",
           "exId": "banded-lateral-walk",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Half-squat, step wide and stay low",
-              "Keep tension on the band even on the trailing leg"
-            ],
-            "bad": [
-              "Standing tall and waddling"
-            ]
-          },
           "rx": {
             "reps": "10 Steps",
             "side": true
@@ -107,15 +80,6 @@
           "name": "Squat",
           "exId": "bodyweight-squat",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Chest tall",
-              "Find today's depth before you load one leg"
-            ],
-            "bad": [
-              "Rushing them"
-            ]
-          },
           "rx": {
             "reps": 10,
             "tempo": "3-0-1-0"
@@ -126,15 +90,6 @@
           "name": "World's Greatest Stretch",
           "exId": "worlds-greatest-stretch",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Back hip down first, then rotate and reach tall",
-              "Feel the hip open before the turn"
-            ],
-            "bad": [
-              "Rotating before the hip opens"
-            ]
-          },
           "rx": {
             "reps": 4,
             "side": true
@@ -152,15 +107,6 @@
           "name": "Bulgarian Split Squat",
           "exId": "bulgarian-split-squat",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Back foot on a chair, drop straight down",
-              "The front heel drives you back up"
-            ],
-            "bad": [
-              "Leaning forward onto the front knee"
-            ]
-          },
           "note": "Straight sets with full rest: finish one leg, rest, then do the other.",
           "rx": {
             "sets": 3,
@@ -175,15 +121,6 @@
           "name": "Single-Leg Romanian Deadlift",
           "exId": "single-leg-romanian-deadlift",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Hinge from the hip with the back leg long behind you",
-              "Feel the hamstring of the standing leg"
-            ],
-            "bad": [
-              "Twisting open at the hip"
-            ]
-          },
           "note": "Fingertips on a wall if balance is the limiter rather than the hamstring.",
           "rx": {
             "sets": 3,
@@ -204,15 +141,6 @@
           "name": "Reverse Lunge",
           "exId": "reverse-lunge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Step back and drop the back knee softly",
-              "The front heel drives you up"
-            ],
-            "bad": [
-              "Crashing the back knee into the floor"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 10,
@@ -226,15 +154,6 @@
           "name": "Banded Single-Leg Glute Bridge",
           "exId": "banded-single-leg-glute-bridge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "One foot planted, drive the hips up level",
-              "Push out against the band on the working side"
-            ],
-            "bad": [
-              "Letting the hips twist towards the working leg"
-            ]
-          },
           "rx": {
             "sets": 3,
             "reps": 12,
@@ -254,15 +173,6 @@
           "name": "Side Plank",
           "exId": "side-plank",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Straight line ankle to ear, hips stacked and lifted",
-              "Feel it down the bottom side"
-            ],
-            "bad": [
-              "Letting the top hip roll forward"
-            ]
-          },
           "rx": {
             "sets": 3,
             "time": "30 sec",

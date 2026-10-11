@@ -50,7 +50,9 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
                   "reintroduce:" lines name the ones kept or brought back on purpose, with reasons.
                   It also says how every card's NAME resolves in the Spine (the name scan that was
                   a separate node step in /program-assemble until 2026-09-27), and it carries
-                  checksums: a saved copy that differs from what the server sent stops the run
+                  checksums: a saved copy that differs from what the server sent stops the run.
+                  Since 2026-10-11 each line also says whether the entry has steps (How to do it,
+                  CUE-6), and the result carries each entry's purpose for the Because audit
   --spine-sql     print the one query whose result is the --spine file, then stop
   --art WORD      the cycle's art word for the headline check, when the built file has none
   --stage S       build = straight after design, before engage writes any text: every
@@ -90,6 +92,40 @@ LOWER = ('quads', 'hamstrings', 'glutes')
 MAJOR = ('quads', 'hamstrings', 'glutes', 'back', 'chest', 'shoulder')
 NEGATION = re.compile(r"\b(no|not|never|nothing|without|avoid|avoids|banned|ban|instead of|skip|don't|do not|"
                       r"are out|is out|ruled out|off the table)\b", re.I)
+# The pill (`intent`) comes from this closed list: at most two values, never two from one group, joined
+# by " · " (CHP-2; Amir, 2026-10-11, "all recommended, go ahead"). Its home in words is SCHEMA.md →
+# *`intent`: the pill list*. assets/js/chips.js holds the same object between its PILLS markers, and
+# scripts/check_parity.py fails when the copies disagree. A new value joins only on Amir's word.
+# `synonyms` maps an old spelling to the value it became (matched lower case, spaces trimmed).
+PILLS = {
+    "hands": ["neutral grip", "wide grip", "overhand grip", "underhand grip", "straps"],
+    "lead": ["left side first", "right side first", "alternate sides"],
+    "intent": ["max intent", "max speed", "90% speed", "drive up fast", "stick the landing", "fast contact"],
+    "hold": ["hold at the top", "mid-range hold", "hold at 90°"],
+    "brakes": ["stop in two steps", "stick the outside leg"],
+    "pace": ["easy pace"],
+    "synonyms": {
+        "right leg first": "right side first", "right hand first": "right side first",
+        "left leads": "left side first", "left leg first": "left side first", "left hand first": "left side first",
+        "fast turnover": "fast contact", "minimal ground time": "fast contact",
+        "max power": "max intent", "all out": "max intent",
+        "double overhand grip": "overhand grip", "double overhand": "overhand grip",
+        "stick landing": "stick the landing", "stick landing 2s": "stick the landing",
+        "stick 2s": "stick the landing", "stick 2 seconds": "stick the landing",
+        "fast off the floor": "drive up fast",
+        "talk test": "easy pace", "conversational pace": "easy pace",
+        "conversational the whole way": "easy pace", "easy, keep moving": "easy pace",
+        "stop on the outside leg": "stick the outside leg",
+        "build to 90%": "90% speed",
+        "hold at top": "hold at the top"}}
+PILL_GROUP = {v.lower(): g for g, vs in PILLS.items() if g != 'synonyms' for v in vs}
+PILL_OLD = {k.lower(): v for k, v in PILLS['synonyms'].items()}
+PAIRING = re.compile(r'super-?set|paired with|pair with|complex with', re.I)
+TEMPO_WORDS = re.compile(r'\d\s*s\b|\bsec|second|eccentric|concentric|pause|tempo|\bslow', re.I)
+
+def pill_values(s):
+    """The values in one `intent` string: split on the middle dot, spaces trimmed."""
+    return [p.strip() for p in str(s or '').split('·') if p.strip()]
 
 out = {'FAIL': [], 'WARN': [], 'INFO': []}
 # Every FAIL and WARN names the rule it enforces, from the rule index at the top of
@@ -191,6 +227,32 @@ def name_hint(name, names):
             "(Back Squat for Barbell Back Squat), stamp that id and rename the card to that entry's name, one name and no alias (NAM-8); if it is new, "
             "draft it with /spine, in full (NAM-9)")
 
+def check_pill(o, where, paired=False):
+    """CHP-2: every value from the list (any case, spaces trimmed), at most two, never two from one
+    group; a hold value only beside rx.tempo "iso" (CHP-3), a pace value only on an item with no RPE.
+    Before 2026-10-11 the pill had no fixed words: 116 labels on 280 uses, 83 of them used once."""
+    rx = o.get('rx') if isinstance(o.get('rx'), dict) else {}
+    vals, groups = pill_values(o.get('intent')), {}
+    for v in vals:
+        if paired and PAIRING.search(v): continue  # the pairing FAIL in check_structure names it
+        g = PILL_GROUP.get(v.lower())
+        if not g:
+            new = PILL_OLD.get(v.lower())
+            hint = (f"write '{new}'" if new else
+                    "the tempo is said once, in rx.tempo" if TEMPO_WORDS.search(v) else
+                    "anything else for this athlete is the Coach's Note")
+            fail(f"{where}: the pill '{v}' is not on the list ({hint}). The list is SCHEMA.md → `intent`; "
+                 "a new value joins only on Amir's word", 'CHP-2')
+            continue
+        groups.setdefault(g, []).append(v)
+        if g == 'hold' and str(rx.get('tempo') or '').strip().lower() != 'iso':
+            fail(f"{where}: the hold pill '{v}' needs rx.tempo \"iso\" (a hold is the tempo cell's Hold, CHP-3)", 'CHP-2')
+        if g == 'pace' and rx.get('rpe') not in (None, ''):
+            fail(f"{where}: the pace pill '{v}' goes only on an item with no RPE: drop one of them", 'CHP-2')
+    for g, vs in groups.items():
+        if len(vs) > 1: fail(f"{where}: two pills from the {g} group ({' and '.join(vs)}): keep one", 'CHP-2')
+    if len(vals) > 2: fail(f"{where}: {len(vals)} pills ('{o.get('intent')}'): two at most", 'CHP-2')
+
 def check_structure(data, args, spine=None, names=None):
     seen = {}
     for d, b, ex, it in exercises(data):
@@ -201,6 +263,10 @@ def check_structure(data, args, spine=None, names=None):
             fail(f"{where}: type must be standard, simple or circuit (got {ex.get('type')!r})", 'CHP-5')
         if o.get('chips'): fail(f"{where}: carries chips[] (write rx, never chips)", 'CHP-5')
         if o.get('cues'): fail(f"{where}: carries cues (cues come from the Spine entry only)", 'CUE-2')
+        # The pill from the closed list (CHP-2, 2026-10-11). A legacy chips[] card already fails CHP-5
+        # above, so its old pill is not reported twice. A pairing on a standard card has its own FAIL below.
+        if o.get('intent') and not o.get('chips'):
+            check_pill(o, where, paired=not it and ex.get('type') != 'circuit')
         if not it and ex.get('type') == 'circuit':
             if not prep and args.new:
                 fail(f"{where}: a working circuit (superset) in a new athlete's first cycle: straight sets only", 'SES-11')
@@ -216,7 +282,7 @@ def check_structure(data, args, spine=None, names=None):
             fail(f"{where}: floating text on the card ('{o['setup']}'): put it in the Coach's Note", 'CHP-1')
         # A superset is a circuit, never a pill on two standard cards (it shipped once: each card got
         # its own rest timer and nothing showed they were paired). Was a manual grep in assemble.
-        if not it and re.search(r'super-?set|paired with|pair with|complex with', o.get('intent') or '', re.I):
+        if not it and PAIRING.search(o.get('intent') or ''):
             fail(f"{where}: a pairing written as a pill ('{o['intent']}'): make the pair ONE circuit (SCHEMA → circuit)", 'SES-12', 'CHP-2')
         if isinstance(o.get('rx'), dict) and not o['rx']:
             fail(f"{where}: an empty rx (leave rx out when nothing is prescribed)", 'CHP-5')
@@ -483,7 +549,34 @@ def run_chips(expr, payload):
     except Exception:
         return None
 
-def check_whys(data):
+def check_notes(data):
+    """The Coach's Note (2026-10-11). COM-14: one to three short sentences, the point first (about 75
+    characters show before More ›); before this rule 89 live notes ran past three sentences and the
+    longest was 774 characters. CUE-7: say each thing once, so a note never repeats its own card's pill,
+    and a grip is the pill, never words in the note (NAM-5)."""
+    for d, b, ex, it in exercises(data):
+        o = it or ex
+        note = str(o.get('note') or '').strip()
+        if not note: continue
+        where = f"Day {d.get('id')} · {o.get('name')}"
+        n = len(sentences(note))
+        if n > 3 or len(note) > 300:
+            warn(f"{where}: the Coach's Note is {n} sentence{'s' if n != 1 else ''} and {len(note)} characters. "
+                 "One to three short sentences about this athlete, the point first", 'COM-14')
+        low = re.sub(r'\s+', ' ', note.lower())
+        said = lambda v: re.search(r'(?<![a-z0-9])' + re.escape(v) + r'(?![a-z0-9])', low)
+        pills = [v.lower() for v in pill_values(o.get('intent'))]
+        for v in pills:
+            if said(v):
+                warn(f"{where}: the Coach's Note repeats its pill ('{v}'). The pill says it; the note says what "
+                     "only this athlete needs", 'CUE-7')
+        if not any(PILL_GROUP.get(v) == 'hands' for v in pills):
+            for g in PILLS['hands']:
+                if g != 'straps' and said(g):
+                    warn(f"{where}: the Coach's Note names a grip ('{g}'). A grip is the card's pill, never words in the note",
+                         'NAM-5', 'COM-14')
+
+def check_whys(data, ctx=None):
     whys = [(d, ex) for d, b, ex, it in exercises(data) if not it and ex.get('why') is not None]
     n = len(whys)
     if n > 10: fail(f"{n} Becauses: keep the 5-10 real personal decisions", 'COM-4')
@@ -491,8 +584,11 @@ def check_whys(data):
     if not whys: return
     # The app's own audit, Chips.auditWhy(): shape, source, part, length, the voice, diagnosis
     # words and a reason the Coach's Note repeats. It was a separate node snippet in
-    # /program-assemble until 2026-09-26, beside a partial Python copy of it here.
-    probs = run_chips("a.map(e=>{try{return C.auditWhy(e)}catch(x){return null}})", [ex for _, ex in whys])
+    # /program-assemble until 2026-09-26, beside a partial Python copy of it here. Since 2026-10-11 it
+    # also gets the entry's purpose (from --spine-sql), so a Because that only repeats it fails (why-generic).
+    purposes = (ctx or {}).get('purposes') or {}
+    probs = run_chips("a.map(p=>{try{return C.auditWhy(p.ex,p.purpose)}catch(x){return null}})",
+                      [{'ex': ex, 'purpose': purposes.get(ex.get('exId') or '')} for _, ex in whys])
     if probs is None:
         warn("node could not run assets/js/chips.js, so only the basic Because checks ran "
              "(not the diagnosis words or a repeat of the Coach's Note)", 'COM-4')
@@ -931,7 +1027,7 @@ def load_context(path):
     the athlete's live programme BEFORE this build (`prev`: the cycle just trained), and the
     Exercise Ledger table from their coaching log. So continuity costs no extra lookup."""
     raw = open(path, encoding='utf-8').read().strip()
-    lines, prev, ledger, profile, names, minutes = [], None, None, None, {}, {}
+    lines, prev, ledger, profile, names, minutes, purposes = [], None, None, None, {}, {}, {}
     if raw[:1] in '[{':
         rows = json.loads(raw)
         for o in (rows if isinstance(rows, list) else [rows]):
@@ -951,6 +1047,10 @@ def load_context(path):
             if o.get('minutes'):
                 m = o['minutes'] if isinstance(o['minutes'], dict) else json.loads(o['minutes'])
                 minutes = {str(k): v for k, v in m.items()}
+            # id|purpose, one per entry this programme uses (2026-10-11): the Because audit's why-generic
+            for l in str(o.get('purposes') or '').splitlines():
+                i, _, t = l.partition('|')
+                if i and t: purposes[i] = t
     else:
         lines = raw.splitlines()
     spine = {}
@@ -968,14 +1068,17 @@ def load_context(path):
             elif p[9]:
                 e['credits'] = {norm_muscle(k): float(w) for k, w in (x.split(':') for x in p[9].split(',') if ':' in x)}
             e['cost'] = p[10] or None
+        # Whether the entry has steps, How to do it (CUE-6, stage64, 2026-10-11). None = a file saved before.
+        e['steps'] = (p[11].lower() in ('true', 't')) if len(p) >= 12 else None
         spine[p[0]] = e
-    return {'spine': spine, 'prev': prev, 'ledger': ledger, 'profile': profile, 'names': names, 'minutes': minutes}
+    return {'spine': spine, 'prev': prev, 'ledger': ledger, 'profile': profile, 'names': names, 'minutes': minutes,
+            'purposes': purposes}
 
 def verify_copy(o, path):
     """The --spine file reaches disk only by being copied from the database's answer, so a slip in
     the copy would quietly change a volume table or a ledger check. --spine-sql returns an md5 of each
     text it sends, and of how many exercises `prev` holds; a mismatch stops the run (2026-09-27)."""
-    for key in ('spine', 'names', 'ledger'):
+    for key in ('spine', 'names', 'ledger', 'purposes'):
         want = o.get(key + '_md5')
         if want and hashlib.md5(str(o.get(key) or '').encode('utf-8')).hexdigest() != want:
             sys.exit(f"STOP  {path}: the saved '{key}' is not what the server sent (its checksum differs). "
@@ -1210,6 +1313,16 @@ def check_spine(data, args, spine):
         bad = [q for q in spine[i]['q'] if q not in QUALITIES]
         if bad: fail(f"{i}: tagged {', '.join(bad)}, not one of the ten qualities ({', '.join(QUALITIES)})", 'CUE-3')
     if drafts: warn(f"{len(drafts)} library entries are drafts, so their cards show no cues until Amir approves them. Ask him in the handoff: {', '.join(drafts)}", 'CUE-5')
+    # How to do it (CUE-6, 2026-10-11): 141 of 320 approved entries had no video, and an athlete with none
+    # got three short cues and nothing else. A WARN while the steps are written; a FAIL once the entries
+    # with no video are done. Never filled on an approved entry: /spine proposes them on the pending list.
+    nosteps = sorted(i for i in ids if i in spine and spine[i]['status'] == 'approved' and spine[i].get('steps') is False)
+    if nosteps:
+        warn(f"{len(nosteps)} approved entr{'y' if len(nosteps) == 1 else 'ies'} on this programme ha{'s' if len(nosteps) == 1 else 've'} "
+             f"no steps (How to do it), so a card with no video shows only the three cues: {', '.join(nosteps)}. "
+             "/spine Upkeep proposes them on the pending list for Amir's Save", 'CUE-6')
+    if any(i in spine and spine[i].get('steps') is None for i in ids):
+        info('the Spine file has no steps field (saved before 2026-10-11): run --spine-sql again for the steps check (CUE-6)')
     days = (data.get('workouts') or {}).get('days') or []
     now, later = [], []
     week = {}
@@ -1265,8 +1378,9 @@ def spine_sql(data):
 -- Read-only, one call. It returns the Spine lines for this programme's exercises (by exId, or found by a
 -- card's name), how each card name resolves (the old node name scan, 2026-09-27), the athlete's live
 -- programme BEFORE this build (prev: the cycle just trained), their Exercise Ledger, their stored athlete
--- profile, the real minutes per day, and checksums: the checker stops if the saved copy differs.
--- Each Spine line ends with the entry's muscle credits and cost, which the volume count reads.
+-- profile, the real minutes per day, each entry's purpose (the Because audit), and checksums: the checker
+-- stops if the saved copy differs. Each Spine line ends with the entry's muscle credits and cost, which the
+-- volume count reads, and whether it has steps (How to do it, CUE-6).
 with cards(n) as (select unnest(array[{namelist}]::text[])),
 cat as (select e.id, e.name, k, {NORM_SQL.format(x='k')} nk
         from public.exercises e, unnest(array[e.name] || e.aliases) k),
@@ -1284,7 +1398,9 @@ s as (select
      || '|' || e.name || '|' || array_to_string(e.aliases, ';')
      || '|' || coalesce(case when c.credits = '{{}}'::jsonb then 'none' else
           (select string_agg(k || ':' || w, ',' order by k) from jsonb_each_text(c.credits) t(k, w)) end, '')
-     || '|' || coalesce(c.cost, ''), E'\\n' order by e.id)
+     || '|' || coalesce(c.cost, '')
+     || '|' || (coalesce(jsonb_array_length(case when jsonb_typeof(to_jsonb(e)->'steps') = 'array'
+                                                 then to_jsonb(e)->'steps' end), 0) > 0)::text, E'\\n' order by e.id)
   from public.exercises e left join public.exercise_coach c using (id)
   where e.id in ({idlist}) or e.id in (select hit from res) or e.id in (select near from res)) as spine,
  (select string_agg(r.n || '|' || coalesce(r.hit, '') || '|' || coalesce(case when r.hit is null then r.near end, '')
@@ -1309,12 +1425,14 @@ s as (select
   from public.coaching_logs where athlete_id = '{aid}') as profile,
  (select jsonb_object_agg(dd, m) from (select day::text dd, round(avg(duration_min)) m from public.session_history
      where athlete_id = '{aid}' and day is not null and duration_min > 10 and hidden_at is null and completed_on >= current_date - 42
-     group by day) x) as minutes)
+     group by day) x) as minutes,
+ (select string_agg(e.id || '|' || regexp_replace(e.purpose, '\\s+', ' ', 'g'), E'\\n' order by e.id)
+  from public.exercises e where e.id in ({idlist}) and coalesce(e.purpose, '') <> '') as purposes)
 select spine, md5(coalesce(spine, '')) spine_md5, names, md5(coalesce(names, '')) names_md5,
        prev, (select count(*) from jsonb_array_elements(case when jsonb_typeof(prev->'days') = 'array' then prev->'days' else '[]'::jsonb end) d,
                 jsonb_array_elements(case when jsonb_typeof(d->'blocks') = 'array' then d->'blocks' else '[]'::jsonb end) b,
                 jsonb_array_elements(case when jsonb_typeof(b->'x') = 'array' then b->'x' else '[]'::jsonb end) x) prev_n,
-       ledger, md5(coalesce(ledger, '')) ledger_md5, profile, minutes
+       ledger, md5(coalesce(ledger, '')) ledger_md5, profile, minutes, purposes, md5(coalesce(purposes, '')) purposes_md5
 from s;""")
 
 KEYS = ['athlete', 'sport', 'currentCycleIndex', 'cycles', 'workouts', 'notes']
@@ -1379,7 +1497,8 @@ def main():
     # --stage build runs straight after design, BEFORE engage writes a word (2026-09-26): a FAIL
     # there changes the programme while no note, Because or message has been written around it.
     if args.stage == 'final':
-        check_text(data); check_cards(data); check_whys(data); check_obligations(data, args); check_placed(data, args)
+        check_text(data); check_cards(data); check_notes(data); check_whys(data, ctx)
+        check_obligations(data, args); check_placed(data, args)
     else:
         info('--stage build: the text checks (notes, Becauses, week-note words, RPE in text) run in the final pass')
     check_week_notes(data, args)

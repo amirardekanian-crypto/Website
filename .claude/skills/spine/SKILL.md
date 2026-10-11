@@ -21,15 +21,15 @@ What the Spine is and why: `CLAUDE.md` → *The Spine*, `SCHEMA.md` → *`exId` 
 2. **The coach-only half never enters this repo.** `sfr`, `flags` (restriction flags), `credits`
    and `cost` live in `public.exercise_coach`. The repo is PUBLIC. Write the batch file in the
    **scratchpad**; only the SQL goes to the database.
-3. **An entry's cues are THE cues, for every athlete** (Amir, 2026-09-24: *"the aim is to use these
-   cues for all the exercises that everyone has from now on"*). Programmes stop carrying cues, so
-   the entry is what every card shows. Exactly **2 good + 1 bad** (external, internal, avoid), and
-   written for ANYONE: no athlete, no side ("the right shoulder"), no home kit ("sofa", "worktop",
-   "table edge"), no tempo ("stick 2 sec", "the pause"), no dose ("stop 2 reps short"), no
-   em-dashes. The generated SQL copies Amir's wording from the most recent live programme; keep
-   his words and strip only what is about one person. What you strip belongs in THAT athlete's
-   Coach's Note (`note`), not lost: list it for Amir with the athlete id. If no programme has
-   cues for a name, write three general ones and say so, since the entry is where cues live now.
+3. **An entry's steps and cues are THE steps and cues, for every athlete** (Amir, 2026-09-24: *"the aim
+   is to use these cues for all the exercises that everyone has from now on"*). Programmes carry no
+   cues, so the entry is what every card shows. The steps follow CUE-6, the three cues CUE-1, and each
+   thing is said once (CUE-7): **write the steps first, then the cues from what is left**, so a cue never
+   repeats a step. The generated SQL copies Amir's cue wording from the most recent live programme; keep
+   his words, put them in CUE-1's roles and strip only what is about one person (a side like "the right
+   shoulder", home kit like "sofa" or "table edge", a tempo, a dose). What you strip belongs in THAT
+   athlete's Coach's Note (`note`), not lost: list it for Amir with the athlete id, in chat only. If no
+   programme has cues for a name, write three for anyone and say so.
 4. **ONE name, the Spine's** (Amir, 2026-10-09: *"i dont want to have 2 names, being linked, i want to
    have one name consistent in my workouts with my spine. the source of the truth should be my naming
    rules which is my spine"*; the same day, yes for athletes' programmes too). **Claude adds no aliases**:
@@ -81,7 +81,7 @@ the existing ids for the links, and they show you which names are only variants.
 
 **3. Write the batch** to `<scratchpad>/spine_batchN.json`, as a list of objects with these fields:
 `id` (kebab-case, the name slugged), `name` (as programmes spell it), `aliases`, `pattern`,
-`purpose`, `tennis`, `equipment`, `loads`, `impact`, `easier`, `harder`, `alts` (ids), `qualities`, `sfr`, `flags`,
+`purpose`, `steps`, `cues`, `tennis`, `equipment`, `loads`, `impact`, `easier`, `harder`, `alts` (ids), `qualities`, `sfr`, `flags`,
 `credits`, `cost`.
 - **pattern:** one of the tool's `PATTERNS` (the same list as `SPINE_PATTERNS` in coach.html;
   sprints are `sprint-cod`, not `sprint`). Keep a new exercise inside an existing pattern
@@ -90,8 +90,16 @@ the existing ids for the links, and they show you which names are only variants.
   are good, if its ones i created in my library, ofcourse use them"* and *"remember to never create
   new pills"*).
 - **purpose:** one sentence in Amir's voice (COM-3). Say what
-  it does for anyone, in plain words: short, no em-dashes, no textbook terms. It is general. The
-  *why for this athlete* belongs to the programme, not to the entry.
+  it does for anyone, in plain words: short, no em-dashes, no textbook terms. It is general, and never
+  an instruction (how to do it is the steps, CUE-7). The *why for this athlete* belongs to the
+  programme, not to the entry.
+- **steps** (How to do it): a list of strings written to CUE-6, which holds the count, the order and
+  everything the pilot taught; don't restate it here. The count comes from the `pattern`: `mobility`
+  and `conditioning` take 2 or 3, a lift that comes off a rack or is kicked into place up to 6 (the
+  bail), everything else 3 to 5. Read each step against the plain-words list in `draft_sql.py`, which
+  checks the batch (its header says exactly what it refuses).
+- **cues:** `{"good": [key point, feel or check], "bad": [the avoid]}`, the roles in CUE-1. The entry's
+  FIRST quality decides whether `good[1]` is a feel or a position check, so write `qualities` before it.
 - **tennis:** the court moment it serves, or `""` when there honestly isn't one. Do not stretch.
 - **loads + impact = "Body parts involved"** (Amir, 2026-09-24, from the course app's
   «بخش‌هایی از بدن که درگیر است»; stage36). The athlete sees them in the About sheet: the regions as
@@ -169,6 +177,24 @@ the existing ids for the links, and they show you which names are only variants.
   calves 1, glutes 0.5`. `draft_sql.py` refuses `{}` credits without it, and refuses it beside real
   credits. The 60 that existed on 2026-09-26 are in `supabase/stage42_muscle_map.sql`: calibrate on them.
 
+**Calibrate the steps and cues on the pilot** (2026-10-11: twelve entries, written, read by a test reader
+with no video, checked by a senior coach; all twelve finals are in section 4 of the blueprint,
+claude.ai/artifact/HR2fYTMcn4bp5q8NbqjtmP). Four of them, one per kind, with each `good[1]` set by the
+entry's first quality (CUE-1):
+
+| Entry (first quality) | steps | cues: key point · feel or check · avoid |
+|---|---|---|
+| Glute Bridge (`movement`, 4 steps) | 1. Lie on your back, knees bent, feet flat and hip-width apart, arms by your sides. 2. Slide your heels in until your fingertips can just touch them. 3. Lift your hips until your shoulders, hips and knees make one straight line. 4. Lower your hips back down. The rep ends when they touch the floor. | Push the floor away through your heels · Feel your glutes squeezing hard at the top · Arching your low back to go higher. Stop at the straight line. |
+| Broad Jump (`power`, 5 steps) | 1. Stand on a non-slip floor with about 3 m of space ahead, feet hip-width apart. 2. Swing your arms back as you push your hips back into a quarter squat. 3. Without pausing, swing your arms forward and up, and jump off both feet. 4. Land softly, feet flat and hip-width apart, sinking into a half squat. 5. Stay where you land until you are steady, then walk back to the start. | Pick a spot far ahead and jump out to it. · If you fall forward or need an extra step, jump shorter. · Knees falling inward as you land. Keep them pointing where your toes point. |
+| Stationary Bike (`engine`, `conditioning`: 3 steps) | 1. Stand beside the bike and set the seat level with the bony front of your hip. 2. Sit, hold the bars lightly, and pedal with the pad behind your toes. 3. To finish, slow down until the pedals stop, then take your feet off. | Pedal in smooth, even circles, not hard pushes down. · Knee a little bent when the pedal is lowest. · Hips rocking side to side. Lower the seat until they stay still. |
+| Barbell Back Squat (`strength`, a rack lift: 6 steps) | 1. Set the hooks at armpit height and the safety bars a little below your lowest squat. 2. Rest the bar on your upper back, not your neck, hands just outside your shoulders. 3. Lift it off and take 3 small steps back. Feet shoulder-width, toes out a little. 4. Hold a big breath and sit down until your thighs are level with the floor. 5. Stand up, breathe out. After the last rep, walk forward until the bar touches the rack. 6. If you get stuck, sit down and let the safety bars take the bar. | Push the floor away with your whole foot · Chest and hips rise together as you stand · Knees moving in toward each other. Keep them pointing where your toes point. |
+
+The twelve went onto the pending list on 2026-10-11 with four fixes to the blueprint's text, so calibrate on
+the drafts as Amir saves them, not on the blueprint: Lateral Step-Down (first quality `brakes`) and Dumbbell
+Single-Leg Romanian Deadlift (`strength`) got a position check as `good[1]` in place of the pilot's feel;
+Band Pull-Apart, Dead Bug and Glute Bridge got "Feel" in front of theirs; the Y-T Raise's step 3 says
+"elbows almost straight" (the plain-words list).
+
 **4. Generate and check.**
 Save the ids from `select id from public.exercises order by 1` to
 `<scratchpad>/existing_ids.txt`, one per line. Then:
@@ -187,12 +213,13 @@ no entry carries) gets that video; every other video is added in coach.html → 
 `on conflict do nothing`, so running it again is safe. Then check it:
 ```sql
 select status, count(*), count(*) filter (where cues is null) no_cues,
-       count(*) filter (where video is null) no_video from public.exercises group by 1;
+       count(*) filter (where coalesce(jsonb_array_length(to_jsonb(e)->'steps'), 0) = 0) no_steps,
+       count(*) filter (where video is null) no_video from public.exercises e group by 1;
 ```
 
 **6. Tell Amir, in numbers:**
 - how many drafts were added, how many cards were renamed to an entry's name, and what you skipped and why;
-- how many have no cues (he writes those) and how many have no video;
+- how many have no cues, how many have no steps, and how many have no video;
 - that he approves them in **coach.html → Exercises → Drafts**, and that the list shows which
   athletes use each one.
 
@@ -203,8 +230,9 @@ the 42 older sessions predate it, so a video on an entry never reached them. Fin
 359 of 371 cards carry an `exId`, 77 drafts went in (four batches) and `to_draft` in
 `scripts/library_spine_baseline.json` is empty; the 12 cards left are `not_exercises` (breathing, warm-up
 sets). A NEW Library exercise with no entry is drafted the same way, with three differences from the Run:
-- **The cues come from the Library card** (no programme has them), cleaned to rule 3. The card keeps
-  its own cues; the entry's are for everyone else.
+- **The cues and the steps are written for the entry** (CUE-1, CUE-6): a Library card carries no cues of
+  its own since 2026-10-11 (CUE-7), so there is nothing on the card to copy. Amir's own words in a pasted
+  session are the starting point, cleaned to rule 3.
 - **Link the cards in the same run**, to the draft id: `exId` on the card in `workouts/` AND on the
   live `public.library` row (guarded `jsonb_set`, md5 before and after, as in the workout skill). A
   draft is not served, so the card falls back to its name until Amir approves, then lights up with no
@@ -272,7 +300,7 @@ with ex as (
                  then e->'items' else '[]' end) i on true
   where p.athlete_id = '<id>' and not (e ? 'items' and i is null)),
 hit as (
-  select ex.*, x.id, x.status, x.aliases, x.video, x.cues, x.purpose, x.tennis, x.equipment,
+  select ex.*, x.id, x.status, x.aliases, x.video, x.cues, to_jsonb(x)->'steps' steps, x.purpose, x.tennis, x.equipment,
          x.loads, x.impact, x.easier, x.harder, x.alts, x.qualities, c.sfr, c.flags, c.suggested_qualities,
          c.credits, c.cost, x.muscles
   from ex left join public.exercises x
@@ -286,6 +314,7 @@ select nm, id, status,
     case when video is null and vid is not null then 'video (card has one)' end,
     case when video is null and vid is null then 'video' end,
     case when cues is null then 'cues' end,
+    case when id is not null and coalesce(jsonb_array_length(steps), 0) = 0 then 'steps' end,
     case when coalesce(tennis, '') = '' then 'tennis?' end,
     case when cardinality(equipment) = 0 then 'equipment' end,
     case when id is not null and (cardinality(loads) = 0 or impact is null) then 'body parts (loads + impact)' end,
@@ -307,9 +336,10 @@ no SFR. Answer them once and they stop mattering.
 | **Empty field** (video, equipment, a regression/progression/alternative, SFR, flags) | Fill it | Fill it. Adding what was missing changes nothing an athlete already reads |
 | **Body parts** (`loads` + `impact`; `impact` null means never checked) | Fill both | Fill both, on Amir's standing word (2026-09-24: *"remember if we add a exercise … to add these details"*). Since stage37 every entry has both, so a gap here is a new exercise or one somebody cleared |
 | **No qualities** (the Quality Map) | Fill `qualities` (first = primary, max 3) | **Don't write them.** Put them in `exercise_coach.suggested_qualities`: coach.html pre-fills his editor with them, and they reach phones only when he saves |
+| **No steps** (How to do it, CUE-6) | Write them, and clean the cues and purpose in the same pass (CUE-1, CUE-7) | **Don't write them. Propose them** on the pending list (field `steps`, and `cues` / `purpose` when those need the same cleaning, so Amir reviews the entry once): coach.html pre-fills the editor's boxes, and his Save is the approval. Never fill steps on an approved entry |
 | **No count** (`credits` + `cost`, coach-only) | Fill both | Fill both: without them the checker FAILs every programme that uses the entry, and the body map has nothing to light. Since stage42 the phone receives the credits' muscle names and 1/0.5 (never the cost). **Changing** a count already there is a proposal: it changes every athlete's volume tables AND their body map |
 | **No muscles for the body map** (`credits` is `{}` and `muscles` is empty) | Fill `muscles` | Fill `muscles`, on Amir's standing word (2026-09-26). Changing muscles already there is a proposal |
-| **A field that has content** (cues, purpose, tennis) | Improve it | **Don't change it. Propose it**: write it to the pending list (below) and name it in the handoff, old → new |
+| **A field that has content** (steps, cues, purpose, tennis) | Improve it | **Don't change it. Propose it**: write it to the pending list (below) and name it in the handoff, old → new |
 - **Video:** the card's `videoUrl` wins when the entry has none (YouTube only, as `draft_sql.py`).
 - **Name:** a card whose name is not its entry's is renamed to the entry's name (rule 4), never
   aliased. In a live programme, check the athlete's logged history first (rule 4).
@@ -337,7 +367,7 @@ no SFR. Answer them once and they stop mattering.
 
 **3. Report it in one block at the end of the handoff** (`/program-assemble` Step 6b, the closing
 block after publishing):
-`SPINE — added 2 drafts (names) · filled 5 gaps (what) · body parts on 4 · counts on 2 · body-map muscles on 1 · tagged qualities on 3 (2 as suggestions on
+`SPINE — added 2 drafts (names) · steps on 2 drafts, 4 approved entries still without them (3 proposed, ids) · filled 5 gaps (what) · body parts on 4 · counts on 2 · body-map muscles on 1 · tagged qualities on 3 (2 as suggestions on
 approved entries) · linked 2 (regressions/progressions/alternatives) · 3 new proposals on the pending list (entry: field old → new) ·
 7 waiting in all, yes or no on each? · N entries this programme uses are still drafts, approve them in coach.html → Exercises.`
 The proposals in that line are read back from the pending list, not retyped, so the handoff and the
@@ -365,6 +395,27 @@ on conflict (id) do update
 ```
 The same field with the same new value is never listed twice. A second, different proposal for the
 same field sits beside the first: Amir picks one.
+
+**Steps, cues and purpose drafts on an approved entry** (2026-10-11) use the same items, with `field`
+`steps` (a JSON array of strings), `cues` (the whole `{"good": [...], "bad": [...]}`) or `purpose` (a
+string). coach.html pre-fills the entry editor's box from an item **only when its `old` equals the live
+value**, so take `old` from the entry in the same statement, never retyped (`to_jsonb(x.steps)` is `[]` for
+none). Write each entry's steps, and its cues and purpose when they need the same cleaning, in one run, so
+Amir reviews the entry once:
+```sql
+insert into public.exercise_coach (id, suggested_changes)
+select x.id, jsonb_build_array(jsonb_build_object('field', 'steps', 'old', to_jsonb(x.steps),
+       'new', '["…", "…", "…"]'::jsonb, 'why', 'How to do it (CUE-6)', 'from', 'spine <date>', 'at', now()))
+from public.exercises x where x.id = '<id>' and x.status = 'approved'
+on conflict (id) do update
+   set suggested_changes = public.exercise_coach.suggested_changes || excluded.suggested_changes
+ where not exists (select 1 from jsonb_array_elements(public.exercise_coach.suggested_changes) s
+                    where s->>'field' = 'steps' and s->'new' = excluded.suggested_changes->0->'new');
+```
+(The same for `cues` with `'old', x.cues` and for `purpose` with `'old', to_jsonb(x.purpose)`.) The editor
+marks them *Claude's draft · saved when you press Save*, with a way to discard each, and **his Save is the
+approval**: it writes the entry and removes the items it applied or discarded in the same guarded call. So a
+steps, cues or purpose item is never cleared by SQL; the yes/no below is for every other field.
 
 **Read** (at the start of every `/spine` run and every Upkeep, one query, PRC-6):
 ```sql
@@ -416,11 +467,14 @@ Say so, and offer to stop at the names that are used now.
 - *(2026-09-24, batch 2)* Copying the most recent programme's cues brings that ATHLETE's words with
   it: "Letting the **right** shoulder roll forward", "shoulders on a **sofa** edge", "grip the
   **table** edge", a tempo ("stick 2 sec", "loads in the pause") or a dose ("stop 2 reps short").
-  38 entries were rewritten for anyone the same day (Amir's call). After every run, check:
+  38 entries were rewritten for anyone the same day (Amir's call). After every run, check the cues and
+  (since 2026-10-11) the steps, which take the same athlete words plus a time, a rep count or kilos:
   ```sql
-  select id, cues from public.exercises
+  select id, cues, to_jsonb(e)->'steps' steps from public.exercises e
   where jsonb_array_length(cues->'good') <> 2 or jsonb_array_length(cues->'bad') <> 1
-     or cues::text ~* '—|right (shoulder|knee|hip|side|leg)|left (shoulder|knee|hip|side|leg)|sofa|chair|worktop|table edge|cushion|\d+ ?sec|\mpause\M|reps short';
+     or cues::text ~* '—|right (shoulder|knee|hip|side|leg)|left (shoulder|knee|hip|side|leg)|sofa|chair|worktop|table edge|cushion|\d+ ?sec|\mpause\M|reps short'
+     or coalesce(jsonb_array_length(to_jsonb(e)->'steps'), 0) > 6
+     or coalesce(to_jsonb(e)->>'steps', '') ~* '—|right (shoulder|knee|hip|side|leg)|left (shoulder|knee|hip|side|leg)|sofa|chair|worktop|table edge|cushion|\d+ ?(s|sec|secs|seconds|reps?|kg)\M|\mrpe\M';
   ```
 - *(2026-09-24, batch 2)* Check what the cues say before calling a name an alias. `Single-Leg RDL
   (BW)` has cues that say "a dumbbell in each hand", so it is an alias of the dumbbell entry. `Cable

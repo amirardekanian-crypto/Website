@@ -34,15 +34,6 @@
           "name": "Stationary Bike",
           "exId": "stationary-bike",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Set the seat so your knee is slightly bent at the bottom of each stroke",
-              "Keep it easy enough to breathe through your nose"
-            ],
-            "bad": [
-              "A seat set so low that your knees pinch up at the top of the stroke"
-            ]
-          },
           "rx": {
             "time": "5 minutes"
           },
@@ -52,15 +43,6 @@
           "type": "simple",
           "name": "Half-Kneeling Hip Flexor with Overhead Reach",
           "exId": "half-kneeling-hip-flexor-with-overhead-reach",
-          "cues": {
-            "good": [
-              "Squeeze the back glute, then reach the same-side arm overhead",
-              "Feel it at the front of the back hip"
-            ],
-            "bad": [
-              "Arching your lower back to feel more"
-            ]
-          },
           "rx": {
             "time": "45s",
             "side": true
@@ -71,15 +53,6 @@
           "name": "Ankle Dorsiflexion Rocks",
           "exId": "ankle-dorsiflexion-rocks",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Drive the knee forward over your toes",
-              "Feel the stretch low in the calf and the front of the ankle"
-            ],
-            "bad": [
-              "Letting the heel lift or the arch collapse"
-            ]
-          },
           "rx": {
             "reps": 10,
             "side": true
@@ -90,15 +63,6 @@
           "name": "Glute Bridge",
           "exId": "glute-bridge",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Push the floor away through your heels",
-              "Squeeze the glutes hard at the top"
-            ],
-            "bad": [
-              "Arching your lower back to lift higher"
-            ]
-          },
           "rx": {
             "reps": 12
           }
@@ -108,15 +72,6 @@
           "name": "Stationary Bike",
           "exId": "stationary-bike",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Add a little resistance on each one and keep the same cadence",
-              "Feel your legs load up without any strain"
-            ],
-            "bad": [
-              "Going hard on the first one"
-            ]
-          },
           "rx": {
             "sets": 3,
             "time": "30s",
@@ -136,15 +91,6 @@
           "exId": "stationary-bike",
           "videoUrl": null,
           "note": "If you can't hold the same cadence at the same resistance for a whole effort, that was your last one.",
-          "cues": {
-            "good": [
-              "Hold one steady cadence and one resistance for all four minutes",
-              "Your breathing should be hard but steady, never gasping"
-            ],
-            "bad": [
-              "Grinding a heavy gear at a slow cadence"
-            ]
-          },
           "rx": {
             "sets": 5,
             "time": "4 min",
@@ -163,15 +109,6 @@
           "name": "Stationary Bike",
           "exId": "stationary-bike",
           "videoUrl": null,
-          "cues": {
-            "good": [
-              "Ease the resistance right off and keep the legs turning",
-              "Your heart rate should settle a little every minute"
-            ],
-            "bad": [
-              "Stopping pedalling the moment the last effort ends"
-            ]
-          },
           "rx": {
             "time": "3 minutes"
           },
