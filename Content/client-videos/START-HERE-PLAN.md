@@ -1,9 +1,9 @@
 # "Start here" — creative plan and production plan (v2)
 
-**Status: PLAN for Amir's approval · 2026-10-11.** Amir's script edits are in (§3). The 5-second voice test is done (§6). Nothing else is generated, and nothing else is spent.
+**Status: PLAN for Amir's approval · 2026-10-11.** **Amir records the voice himself** (decided 2026-10-11 after the AI test), so no more credits are needed. He has more script edits to send; the script in §3 is his edited version so far. Nothing else is generated.
 **Rules from Amir (2026-10-11):** the app is shown in **English**, exactly as it is; the **video, the voice and the subtitles are Farsi**; **everything that comes from the app is
-said in English** (Home, Coach, Library, Game Plan, Open Day 1, Start, Done, send to coach, Message me on WhatsApp). A script first, Amir approves it, a 5-second
-voice test, then the full voice, then the pictures, then the final video. I act as creative director.
+said in English** (Home, Coach, Library, Game Plan, Open Day 1, Start, Done, send to coach, Message me on WhatsApp). A script first, Amir approves it, he records it, then the pictures are timed to his voice,
+then the final video. I act as creative director.
 
 ---
 
@@ -39,7 +39,7 @@ set as its own left-to-right word (so «Open Day 1» never flips). Each line sta
 ## 3 · The script
 
 Words from the app stay English; the rest is Farsi. Spoken length about **88–103 s** (220 words); the real length comes from the audio.
-**This is Amir's edited version (his message, 2026-10-11), word for word, with two things to confirm:** (1) in line 1 he wrote *tozih* in Latin letters; I read it as **توضیح** ("explain"). (2) He wrote *Gameplan* as one word; the app's label is **Game Plan**, so the screen and subtitles say that, and the voice says it the same either way. His other changes: the opening no longer says «من امیرم», and where a tab is only referred back to, he writes it in Persian letters (**هوم** in line 4, **کوچ** in line 7) while the first mention of each tab is in English; I kept exactly that.
+**This is Amir's edited version (his message, 2026-10-11), word for word, with two things to confirm:** (1) in line 1 he wrote *tozih* in Latin letters; **confirmed: توضیح** ("explain"). (2) He wrote *Gameplan* as one word; the app's label is **Game Plan**, so the screen and subtitles say that, and the voice says it the same either way. His other changes: the opening no longer says «من امیرم», and where a tab is only referred back to, he writes it in Persian letters (**هوم** in line 4, **کوچ** in line 7) while the first mention of each tab is in English; I kept exactly that.
 
 | # | Voice (Farsi) | Meaning |
 |---|---|---|
@@ -112,48 +112,52 @@ push-in and pan on the phone · soft push and cross-dissolve transitions.
 **E · Brand pieces already in the repo:** the AA icon, Vazirmatn, Barlow, Barlow Condensed, the green and orange. **No photos of people.** *(Option: Amir's coach photo on the end card. Not in this
 plan unless he says so, because the voice is AI and the photo would suggest he is speaking.)*
 
-**F · Sound:** the Farsi voice as seven clips (one per beat, so one line can be redone without touching the rest) · small synthesized taps, ticks, a soft whoosh and a success chime, made here. **No music.**
+**F · Sound:** Amir's voice as seven clips (one per beat, so one line can be redone without touching the rest), cleaned and levelled · small synthesized taps, ticks, a soft whoosh and a success chime, made here. **No music.**
 
 **G · Text:** the subtitles (burned in and as a .srt), the callouts, the title and end card.
 
 **H · Delivered:** the finished MP4, the .srt, a cover frame (1080 × 1920), and the sources, so a changed label means re-rendering, and a changed line means re-recording one clip.
 
-## 6 · The voice
+## 6 · The voice: Amir records it
 
-**The 5-second test is done** (0.6 credits in total, a little over 7 seconds each): «سلام، من امیرم. پایین صفحه چهار تا تب داری: Home، Coach، Library و Game Plan.» *(It was made before the script edits, so it still says «من امیرم», which the final script no longer does. It is only a test of the voice and of the English words inside Farsi.)*
-One male preset voice ("Reid") on two engines. **A = ElevenLabs, B = MiniMax.** They are in the generation panel above. What to listen for: is it natural Farsi (not accented), are
-"Home, Coach, Library, Game Plan" said cleanly inside the Farsi, and is the tone warm rather than newsreader.
+**The AI voice test is closed.** On 2026-10-11 two engines (ElevenLabs and MiniMax, one male preset voice) were tested on one short line, **0.6 credits in total**. Amir chose to record the voice himself. Nothing
+more is spent on voice. His own voice also fits the product better: clients are hiring *him*.
 
-If neither is good enough: another voice on the same engines (about 0.3 credits a try), a different engine, or Amir recording himself (I cut the pictures to his voice), or cloning his own
-voice from a 30-second recording (only if he asks).
+**How he records it** (a one-page recording sheet follows once the script is final: the script in big type, one beat at a time, English words marked, pauses marked):
+- **Where:** a small quiet room with soft things around (a wardrobe, a bed, the car with the windows up). No fan, no echo. Phone on Do Not Disturb.
+- **With what:** the phone's own Voice Memos or Recorder app is fine. The phone about a hand-and-a-half from the mouth, a little to the side so the breaths don't pop.
+- **How:** **seven files, one per beat** (1 to 7), so one line can be redone without touching the rest. Two takes of each, say which is the keeper. Calm, like talking to one new client, about 2 words a second.
+  A second of silence before and after each take. **Five seconds of silence** at the start of file 1 (I use it to clean the room noise).
+- **What to say:** exactly the approved text, with the app's words in English. If he changes a word while recording, he tells me the final text, because the subtitles must match what he says.
+- **How I clean it:** a light noise reduction, a gentle low cut, a little compression, and the level set to −16 LUFS (measured, not guessed). I do not change how he sounds.
 
-**Then the full voice:** seven clips, about **3.45 credits** for the lot on ElevenLabs or MiniMax (7.5 on Seed Audio). A budget of **25 credits** covers many retakes. Balance **545**.
-No picture or clip is generated, so the voice is the only spend.
+**How he sends it to me** (the simplest first): on GitHub, open the folder `Content/client-videos/start-here/voice/` on the branch `claude/vibrant-davinci-8ps44e` → **Add file → Upload files**, drop the
+seven files (or fourteen with the second takes), and commit. If that is awkward from a phone, put them in a Google Drive folder, share it, and send me the link.
 
 ## 7 · How it gets made, and where Amir says yes
 
-1. **G1 · This plan and the script.** Amir's edits are in (§3). Waiting for his yes on the plan and on the two points to confirm. ← *we are here*
-2. **G2 · The 5-second voice.** Amir picks A, B, or neither. ← *done, waiting for his ears*
-3. **G3 · The full voice,** seven clips. Amir listens and says yes or "redo line N".
-4. **Captures and build,** with no spend: record the real app (A), draw the phone and the drawings (B, C), build one animated page that is a pure function of time (D), time it to the real
-   audio, cut and place the subtitles from the audio's pauses.
-5. **Checks before any render:** every callout and subtitle meets the reading rule; nothing sits outside the safe zones; every Farsi word on screen is in the approved script; every English
-   word on screen is a word the app really shows.
-6. **G4 · A draft** (half size, with voice and subtitles). Amir watches it and says what to change.
-7. **G5 · The final render and QC:** frames checked, sound level measured (not guessed), subtitles read against the script. Delivered as the MP4, the .srt and the cover.
-8. **G6 · The WhatsApp message:** one line added to the login message template (`coach.html`) pointing at the video. I show the wording first.
+1. **G1 · This plan and the script.** The script has Amir's edits so far; more are coming. Then his yes on the plan. ← *we are here*
+2. **G2 · Amir records the seven files** from the recording sheet and sends them.
+3. **Captures and build,** no spend: record the real app (A), draw the phone and the drawings (B, C), build one animated page that is a pure function of time (D), **time it to Amir's real audio**,
+   cut and place the subtitles from the audio's pauses.
+4. **Checks before any render:** every callout and subtitle meets the reading rule; nothing sits outside the safe zones; every Farsi word on screen is in the approved script (or the text he told me he changed);
+   every English word on screen is a word the app really shows.
+5. **G3 · A draft** (half size, with his voice and the subtitles). Amir watches it and says what to change.
+6. **G4 · The final render and QC:** frames checked, sound level measured, subtitles read against the script. Delivered as the MP4, the .srt and the cover.
+7. **G5 · The WhatsApp message:** one line added to the login message template (`coach.html`) pointing at the video. I show the wording first.
 
-## 8 · One thing only Amir can do (a setting)
+*The free work (the captures, the phone, the drawings) can start as soon as the plan is approved. It does not depend on the audio. Only the timing does.*
 
-This session's network blocks the host where the generated voice files live (`d8j0ntlcm91z4.cloudfront.net`), so **I cannot download the voice into the build.** Fix, once: in the cloud environment
-menu in the session's title bar → **Edit** → **Network access**, add `d8j0ntlcm91z4.cloudfront.net` under **Allowed domains** (keep the package-managers box ticked), then start a new message.
-The steps are at https://code.claude.com/docs/en/cloud-environments#network-access. Until then I can do everything except mixing the voice into the video. If he would rather not change it, the
-other route is to download the seven voice files from the generation panel himself and drop them in the folder.
+## 8 · What I need from Amir next
+
+1. **The remaining script edits** (the changed lines, in Farsi).
+2. **A yes on the plan** (the look, the 19 shots, the assets in §4 and §5).
+3. Then I write the one-page recording sheet from the final script.
 
 ## 9 · Risks
 
-- **Farsi voice quality** is unproven until the test is heard.
-- **English words inside Farsi speech** may be said oddly; the test includes four of them.
+- **Recorded audio quality** (room noise, plosives) is the main thing that can lower the look of the video. The recording notes above are there for that; I check every file before building on it.
+- **If he changes words while recording,** the subtitles and callouts have to change with them: he sends me the final text.
 - **The app will change.** Every label in the video lives in one table so it can follow the app.
 - **The pictures show an invented athlete.** Nothing real is shown.
 - **The phone's own install menus differ** by phone and language; the drawing is schematic and says so in one small line.
