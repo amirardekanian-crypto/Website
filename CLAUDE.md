@@ -121,6 +121,9 @@ and on the off-machine copy, and delete older ones (Amir, 2026-10-04: "rolling")
 notice (section 4, line 6 of its short version, and `privacy-fa.html`) promises that a deleted
 record leaves the backups within about three months, so a backup kept longer makes it false.
 `python scripts/prune_backups.py <folder>` lists what is older (add `--delete` to remove it).
+A backup that could not read a table is saved as `aa-backup-INCOMPLETE-<date>.json` (and says `complete: false`
+inside): it is NOT a restore point, it does not silence the weekly reminder, and the prune script never counts it
+as the newest backup (`scripts/test_prune_backups.py`).
 **A table added to the public schema goes into `BACKUP_TABLES` in coach.html the same day**
 (`select tablename from pg_tables where schemaname = 'public'`; on 2026-10-05 13 of 35 were missing,
 among them the course lessons and the exercise library, which exist nowhere else). A table the coach

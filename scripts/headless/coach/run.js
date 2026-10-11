@@ -596,6 +596,41 @@ S['backup-basic'] = async (b) => {
   const pw = ['athlete_identities', 'tps_accounts', 'assess_accounts'].map(t => [t, (file.tables[t] || []).filter(x => x.initial_password).length]);
   check(r, 'no plaintext login passwords in the file', pw.every(([, n]) => n === 0), pw);
   check(r, 'alert summarises the counts', log.dialogs.some(d => /Backup downloaded/.test(d.message)), log.dialogs.map(d => d.message.split('\n')[0]));
+  check(r, 'a complete backup has the plain name and says complete: true inside', /^aa-backup-\d{4}-\d{2}-\d{2}\.json$/.test(name) && file.complete === true && !file.could_not_read, { name, complete: file.complete });
+  await page.context().close();
+  return r;
+};
+// A backup that could not read a table is not a restore point (audit TOOLS-3, pile B2): its name says so, scripts/prune_backups.py
+// reads the name, and it must not silence the weekly reminder.
+S['backup-incomplete'] = async (b) => {
+  const r = { id: 'backup-incomplete', title: 'A backup that could not read a table is named INCOMPLETE and does not count as the weekly one', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  const stamp = await page.evaluate(() => new Date().toISOString().slice(0, 10));
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'from', name: 'hab_intake', op: 'select', message: 'fixture: cannot read hab_intake', times: 1 }));
+  const bad = await takeBackup(page, 'incomplete');
+  check(r, 'the file is named aa-backup-INCOMPLETE-<date>.json', bad.name === `aa-backup-INCOMPLETE-${stamp}.json`, bad.name);
+  check(r, 'inside, complete is false and could_not_read names the table and why', bad.file.complete === false && (bad.file.could_not_read || []).some(x => /^hab_intake: fixture: cannot read hab_intake/.test(x)), { complete: bad.file.complete, could_not_read: bad.file.could_not_read });
+  check(r, 'the rest of the tables are still in it', Object.keys(bad.file.tables).length >= 30 && !('hab_intake' in bad.file.tables), Object.keys(bad.file.tables).length);
+  check(r, 'the alert opens with INCOMPLETE and says it is not a restore point', log.dialogs.some(d => /^⚠ INCOMPLETE backup — saved as aa-backup-INCOMPLETE-/.test(d.message) && /NOT a restore point/.test(d.message)), log.dialogs.map(d => d.message.split('\n')[0]));
+  const ls = await page.evaluate(() => ({ ok: localStorage.getItem('coach_last_backup'), bad: localStorage.getItem('coach_last_backup_incomplete') }));
+  check(r, 'it does not count as the weekly backup (no "last backup" stamp), but the try is remembered', !ls.ok && !!ls.bad, ls);
+  await L.go(page, 'today');
+  const row = (await page.locator('.need', { hasText: 'Weekly backup' }).first().innerText()).replace(/\s+/g, ' ');
+  check(r, 'Today still asks for the weekly backup and says the last try was INCOMPLETE', /No complete backup taken/.test(row) && /INCOMPLETE and does not count/.test(row), row);
+  await L.go(page, 'athletes');
+  const sum = (await page.locator('details.tools summary').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the Coach tools line says there is no complete backup and the last try was INCOMPLETE', /no complete backup on this computer yet/.test(sum) && /last try was INCOMPLETE/.test(sum), sum);
+  // A complete one afterwards: plain name, counts, and the memory of the bad try goes.
+  const good = await takeBackup(page, 'complete-after');
+  check(r, 'the next backup, complete, has the plain name and complete: true', good.name === `aa-backup-${stamp}.json` && good.file.complete === true, { name: good.name, complete: good.file.complete });
+  const ls2 = await page.evaluate(() => ({ ok: localStorage.getItem('coach_last_backup'), shownBad: lastBadBackupAt() }));
+  check(r, 'it counts now, and the old INCOMPLETE try is no longer shown', !!ls2.ok && ls2.shownBad === '', ls2);
+  await L.go(page, 'today');
+  check(r, 'Today no longer asks', (await page.locator('.need', { hasText: 'Weekly backup' }).count()) === 0, '');
+  await L.go(page, 'athletes');
+  const sum2 = (await page.locator('details.tools summary').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the Coach tools line says when the last complete backup was, with no INCOMPLETE note', /last complete backup today/.test(sum2) && !/INCOMPLETE/.test(sum2), sum2);
+  check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
 };

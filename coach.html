@@ -1500,8 +1500,15 @@ const BACKUP_TABLES = [
 ];
 
 const PASSWORD_TABLES = ['athlete_identities', 'tps_accounts', 'assess_accounts'];
+// Only a COMPLETE backup counts as the weekly one. An incomplete one (a table could not be read, or came back short) is saved
+// under another name and is not a restore point, so it must not silence the weekly reminder either (audit TOOLS-3, pile B2).
 const LAST_BACKUP_KEY = 'coach_last_backup';
+const LAST_BAD_BACKUP_KEY = 'coach_last_backup_incomplete';
 function lastBackupAt() { try { return localStorage.getItem(LAST_BACKUP_KEY) || ''; } catch (e) { return ''; } }
+// The latest INCOMPLETE try, only while it is newer than the last good backup (a good one after it clears the memory of it).
+function lastBadBackupAt() {
+  try { const bad = localStorage.getItem(LAST_BAD_BACKUP_KEY) || '', ok = lastBackupAt(); return bad && (!ok || bad > ok) ? bad : ''; } catch (e) { return ''; }
+}
 async function downloadBackup(btn) {
   if (DEMO) { toast('Demo mode — nothing to back up'); return; }
   const label = btn && btn.textContent;
@@ -1514,7 +1521,8 @@ async function downloadBackup(btn) {
           'schema, functions or policies (those are in supabase/*.sql). See "could_not_read" for anything that could not be read. ' +
           'A restore is not a plain import: login tables point at auth users that must exist first. ' +
           'Unsent login passwords (initial_password) are blanked on purpose: reset a login to issue a new one. ' +
-          'Keep the last 12 weekly files only (python scripts/prune_backups.py <folder>).',
+          'Keep the last 12 weekly files only (python scripts/prune_backups.py <folder>). ' +
+          'A file named aa-backup-INCOMPLETE-<date>.json (complete: false, with "could_not_read") is NOT a restore point.',
     tables: {},
   };
   const problems = [];
@@ -1534,24 +1542,33 @@ async function downloadBackup(btn) {
 
   const counts = Object.entries(out.tables).map(([t, r]) => `${t}: ${r.length}`);
   out.row_counts = Object.fromEntries(Object.entries(out.tables).map(([t, r]) => [t, r.length]));
-  if (problems.length) out.could_not_read = problems;
+  const incomplete = problems.length > 0;
+  out.complete = !incomplete;
+  if (incomplete) out.could_not_read = problems;
 
+  // The name says what the file is: an incomplete one must never sit among the weekly files looking like a restore point,
+  // and scripts/prune_backups.py reads the name to keep it out of the 12 it keeps.
   const stamp = new Date().toISOString().slice(0, 10);
+  const fileName = `aa-backup-${incomplete ? 'INCOMPLETE-' : ''}${stamp}.json`;
   const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `aa-backup-${stamp}.json`;
+  a.download = fileName;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(a.href), 30000);
 
   if (btn) { btn.disabled = false; btn.textContent = label; }
-  try { localStorage.setItem(LAST_BACKUP_KEY, new Date().toISOString()); } catch (e) {}
+  // A complete backup is "the last backup"; an incomplete one is remembered separately, so the reminder keeps asking.
+  try { localStorage.setItem(incomplete ? LAST_BAD_BACKUP_KEY : LAST_BACKUP_KEY, new Date().toISOString()); } catch (e) {}
   const total = Object.values(out.tables).reduce((s, r) => s + r.length, 0);
-  alert(`Backup downloaded — ${total} rows across ${Object.keys(out.tables).length} tables.\n\n` +
+  alert((incomplete
+        ? `⚠ INCOMPLETE backup — saved as ${fileName}.\n\nIt is NOT a restore point and does not count as this week's backup: some tables could not be read, so a restore from it would be missing data. Fix what is listed below, then take the backup again, and delete this file.\n\n`
+        : '') +
+        `Backup downloaded — ${total} rows across ${Object.keys(out.tables).length} tables.\n\n` +
         counts.join('\n') +
-        (problems.length ? '\n\n⚠ INCOMPLETE — could not read everything:\n' + problems.join('\n') : '') +
+        (incomplete ? '\n\n⚠ INCOMPLETE — could not read everything:\n' + problems.join('\n') : '') +
         '\n\nKeep a copy somewhere that is not this computer.' +
         '\n\nKeep only the last 12 weekly backups, on both, and delete older ones: the privacy notice promises a deleted record leaves the backups within about three months.');
 }
@@ -2420,10 +2437,11 @@ function needPanelHtml() {
   if (newIntake) extra.push(`<a class="need" href="#intake"><span class="dot clay"></span>
       <span class="b"><span class="n">${newIntake} new application${newIntake === 1 ? '' : 's'}</span><div class="s">Coaching apply forms waiting in Intake</div></span>
       <span class="go">open →</span></a>`);
-  const lb = lastBackupAt(), lbDays = lb ? daysSince(lb) : null;
+  const lb = lastBackupAt(), lbDays = lb ? daysSince(lb) : null, lbBad = lastBadBackupAt();
   if (!DEMO && (lbDays == null || lbDays >= 7)) extra.push(`<div class="need" style="border-style:dashed">
       <span class="dot ochre"></span>
-      <span class="b"><span class="n">Weekly backup</span><div class="s">${lb ? 'Last taken on this computer ' + timeAgo(lb) : 'No backup taken on this computer yet'} — the free plan keeps none</div></span>
+      <span class="b"><span class="n">Weekly backup</span><div class="s">${lb ? 'Last complete one taken on this computer ' + timeAgo(lb) : 'No complete backup taken on this computer yet'}${
+        lbBad ? `; the try ${esc(timeAgo(lbBad))} was INCOMPLETE and does not count` : ''} — the free plan keeps none</div></span>
       <button class="btn sm" onclick="downloadBackup(this)">⤓ Back up now</button>
     </div>`);
   const stale = Object.values(S.ath).reduce((n, a) => n + a.needReplyStale, 0);
@@ -2793,7 +2811,7 @@ function renderAthletes() {
   const list = Object.values(S.ath);
   const counts = {};
   R_FILTERS.forEach(f => counts[f.id] = list.filter(f.test).length);
-  const lb = lastBackupAt();
+  const lb = lastBackupAt(), lbBad = lastBadBackupAt();
   const needLogin = athletesNeedingLogin();
   $('content').innerHTML = `
     <div class="controls">
@@ -2808,7 +2826,7 @@ function renderAthletes() {
         : ''}
     </div>
     <details class="tools">
-      <summary>Coach tools · publish a programme file, add coaching logs, back up${lb ? ' (last backup ' + esc(timeAgo(lb)) + ')' : ' (no backup on this computer yet)'}</summary>
+      <summary>Coach tools · publish a programme file, add coaching logs, back up${lb ? ' (last complete backup ' + esc(timeAgo(lb)) + ')' : ' (no complete backup on this computer yet)'}${lbBad ? ' · the last try was INCOMPLETE' : ''}</summary>
       <div class="tools-in">
         <button class="btn sm" onclick="pickProgramFile()" title="Publish a data/&lt;id&gt;.json written by the coaching pipeline">↑ Publish programme file</button>
         <button class="btn sm" onclick="pickCoachingLogs()" title="Add a coaching log from a .md file for an athlete who has none on the server yet. Never replaces one.">↑ Add coaching logs</button>

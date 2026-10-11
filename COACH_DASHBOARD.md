@@ -357,11 +357,15 @@ login for a new password. (The secret-link tools are gone: the links were retire
   replaces one: the server copy is the record (publish_cycle splices into it, `/cycle-report`
   appends its Debrief). Until 2026-10-10 it replaced them wholesale.
 - **⤓ Backup** pages every table in key order, de-duplicates, blanks the unsent login passwords
-  (`initial_password`) and says **INCOMPLETE** when a table could not be read. The file is the rows
+  (`initial_password`) and says **INCOMPLETE** when a table could not be read or came back short. The file is the rows
   only (no schema, functions or policies: those are `supabase/*.sql`), and a restore is not a plain
   import, because the login tables point at sign-in accounts that must exist first. Keep the last 12
   weekly files and delete older ones: `python scripts/prune_backups.py <folder>` lists them, `--delete`
   removes them (the privacy notice promises a deleted record leaves the backups within about three months).
+  **An incomplete backup is a different file** (2026-10-11): `aa-backup-INCOMPLETE-<date>.json`, with `complete: false` and
+  `could_not_read` inside. It is not a restore point: it does not count as the weekly backup (Today keeps asking, and says the
+  last try was incomplete; the Coach tools line says so too), and the prune script lists it apart, never treats it as the
+  newest backup and deletes it on the same 12-week rule as the others. Fix what the alert lists, back up again, and delete it.
 
 ---
 

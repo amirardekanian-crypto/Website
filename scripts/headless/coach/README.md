@@ -59,7 +59,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 64 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 65 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -93,6 +93,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | version-restore | Restore a version, then The work | showed the pre-restore programme |
 | program-file-publish | ↑ Publish programme file (in Coach tools), then the athlete page; a NEW athlete | showed the old cycle; a new athlete was missing until Refresh |
 | backup-basic | every table, every row; passwords | unsent initial passwords were in the file |
+| backup-incomplete | a table cannot be read during a backup, then a complete backup | (pile B2, TOOLS-3) an incomplete file had the plain name, counted as the weekly backup and silenced the reminder; now `aa-backup-INCOMPLETE-<date>.json`, `complete: false`, the alert says it is not a restore point, Today and the Coach tools line keep asking |
 | backup-paging | 2,345 rows; 500-row cap; a write mid-backup | unordered OFFSET paging (1 row lost + 1 duplicated); a cap under 1000 truncated silently |
 | athlete-delete-all | Danger zone → Delete training history | the copy promised "all data"; it now says what stays. Since stage48 it is ONE `coach_delete_training_history` call, no direct deletes |
 | athlete-delete-fails | the same, when the server refuses, the sign-in lapsed, stage48 is not applied, or the answer never arrives (no database code: the page must not say "nothing was removed") | (second session) two deletes from the page: a failure between them left one gone and one standing |

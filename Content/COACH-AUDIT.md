@@ -21,11 +21,9 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands** (fourth session, 2026-10-11): of 191 findings, 140 are fixed, 39 partly fixed (the harm is gone, something
-named in the finding is left), 11 open and 1 was not a bug. Nothing waits on a decision from you any more: you answered the twelve
+**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 141 are fixed, 38 partly fixed (the harm is gone, something named in the finding is left), 11 open and 1 was not a bug. Of the 45 critical and high findings, 43 are fixed; not yet: TOOLS-4 (open), TOOLS-7 (partly).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
 questions in §7 and the eleven in §12 (pile A), and the one thing left for you is to switch off public sign-up in the Supabase
-dashboard (SERVER-14). Of the 45 critical and high findings, 42 are fixed, 2 partly and 1 open (TOOLS-4, the restore path you said yes to).
-The SQL pack and the removal script ran on 2026-10-11 and §11 records what was checked afterwards.
+dashboard (SERVER-14). The SQL pack and the removal script ran on 2026-10-11 and §11 records what was checked afterwards.
 **What is left, and how to continue in a new chat, is §12.**
 
 ## 2. The system, as it is now
@@ -267,14 +265,14 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-191 findings. Fixed 140 · Partly 39 · Open 11 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
+<!--T9-->191 findings. Fixed 141 · Partly 38 · Open 11 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
-| high | 30 | 2 | 1 | 0 | 0 |
+| high | 31 | 1 | 1 | 0 | 0 |
 | medium | 59 | 25 | 4 | 0 | 0 |
-| low | 39 | 12 | 6 | 0 | 1 |
+| low | 39 | 12 | 6 | 0 | 1 |<!--/T9-->
 
 ### The work and the ✎ editor (WORK)
 
@@ -359,7 +357,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 |---|---|---|---|---|---|
 | TOOLS-1 | critical | '↑ Coaching logs' replaces server logs with local files: it wipes every Debrief and publish_cycle splice, with no history and no staleness check | Fixed | The button is now '↑ Add coaching logs' and only creates a log for an athlete who has none, never replacing one; and every earlier text of a coaching log is now kept on the server (stage47), so a bad overwrite from anywhere can be put back. |  |
 | TOOLS-2 | high | Unpaged reads silently cap at PostgREST max_rows: session_history (497 rows, about 135/month) passes 1000 around Feb 2027 and the dashboard will drop sessions without an error | Fixed | Session history, progress, programmes, the Spine tables and the backup are now read page by page in a fixed order, so nothing is silently cut off at 1,000 rows. |  |
-| TOOLS-3 | high | The backup is not complete, and it cannot tell an empty table from a hidden or failed one: tables are missing, an RLS-empty table reads as 0, partial files look like full ones, and paging is unordered | Partly | The backup now reads every table page by page in a fixed order, checks it got as many rows as the server says exist, and records any table it could not read inside the file and in the INCOMPLETE warning; season results are now readable, and the testing app's players, notes and results are in it since stage50. | An incomplete file still gets the normal file name, so it can be mistaken for a full one, and `scripts/prune_backups.py` cannot tell it from a full one either (it could count as one of the 12 you keep). |
+| TOOLS-3 | high | The backup is not complete, and it cannot tell an empty table from a hidden or failed one: tables are missing, an RLS-empty table reads as 0, partial files look like full ones, and paging is unordered | Fixed | The backup now reads every table page by page in a fixed order, checks it got as many rows as the server says exist, and records any table it could not read inside the file and in the INCOMPLETE warning; season results are now readable, and the testing app's players, notes and results are in it since stage50. Since 2026-10-11 (pile B2) a backup that could not read a table is saved as `aa-backup-INCOMPLETE-<date>.json` with `complete: false` and `could_not_read` inside, the alert opens with INCOMPLETE and says it is not a restore point, it does not count as the weekly backup (Today keeps asking and says the last try was incomplete), and `scripts/prune_backups.py` lists it apart, never counts it as the newest backup and removes it on the same 12-week rule (`scripts/test_prune_backups.py`, 14 checks; 7 fail on the old script). |  |
 | TOOLS-4 | high | No restore path: the backup has no schema, FK-bound login tables cannot be re-inserted, and the DDL for the core tables is not in the repo | Open | The recipe for the programme and version-history tables is now written down in the repo (stage44). | Decided (2026-10-11): yes. A full schema snapshot, a restore script and one rehearsal on a throwaway local Postgres. Not built yet (A3; B3 is its first step). |
 | TOOLS-5 | high | '+ Publish article' refuses every article the /article skill writes: it matches category against the category id, but articles carry the display name | Fixed | + Publish article now accepts the category by its name (for example 'Pre-Competition') as well as its id, so articles from the /article skill publish onto the right shelf. |  |
 | TOOLS-6 | medium | Library publish has no guard against the wrong file: a .fa.json carrying id+category overwrites the English article, a workout can be published as an article, unpublished items get republished, and a recategorised item is duplicated | Partly | The Library publish now refuses a Farsi translation file and a workout picked as an article (or the reverse), so the English article can no longer be overwritten by its Farsi copy. | Re-uploading an item you hid publishes it again without asking, the confirm does not say which items are new and which replace one, and an item moved to another category is published twice. |
@@ -739,8 +737,7 @@ a contact field holding two numbers matches the second only; the finder cannot b
 
 ## 12. Continue here (rewritten 2026-10-11, fourth session)
 
-191 findings: 140 fixed, 39 partly, 11 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 30 of the 33
-high ones are fixed; the three high ones left are TOOLS-3 (pile B, second job), TOOLS-7 (A4: remove the button) and TOOLS-4 (A3: the restore path).
+<!--T12-->191 findings: 141 fixed, 38 partly, 11 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 31 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open), TOOLS-7 (partly).<!--/T12-->
 What is left is in three piles: **A** your eleven answers, now jobs; **B** Claude can just do, in order; **C** is outside the audit.
 
 **To start a new chat:** *"Continue the Coach's Box audit: read `Content/COACH-AUDIT.md` §12 and `COACH_DASHBOARD.md`, then do the first job in
@@ -771,7 +768,7 @@ Decided earlier, nothing to do: MKT-11 (no payment tracking for now) and WORK-9 
 | # | Finding | What | State |
 |---|---|---|---|
 | B1 | TODAY-12 (high) | Every open or refresh downloads every session in full (about 800 KB, 501 sessions and growing, not paged). Load a light summary for the numbers and the rest on demand, read in key order through `selectAll()`. | **done 2026-10-11** |
-| B2 | TOOLS-3 (high) | Name an incomplete backup differently (`aa-backup-INCOMPLETE-<date>.json`) and make `scripts/prune_backups.py` leave it out of the 12 it keeps. | todo |
+| B2 | TOOLS-3 (high) | Name an incomplete backup differently (`aa-backup-INCOMPLETE-<date>.json`) and make `scripts/prune_backups.py` leave it out of the 12 it keeps. | **done 2026-10-11** |
 | B3 | SERVER-13 | Record the live definitions the dashboard depends on and the repo lacks (the athlete programme door `get_program`, the "which athlete is this" function) as a record file, like stage44, and put the coach email in one constant. It also feeds A3. | todo |
 | B4 | FILE-9 | A redraw wipes what you are typing in the File tab (the login box, an email pasted into Add past session) and closes Version history and the Coaching log. | todo |
 | B5 | BROWSER-10, FLOW-22, MKT-13 | One way to report results: a persistent error line for failed saves (the affiliate and intake ones are a 2.6 s toast) and fewer pop-up alerts (53 became 71). | todo |
@@ -791,7 +788,7 @@ Decided earlier, nothing to do: MKT-11 (no payment tracking for now) and WORK-9 
 
 ### D. How the work was done, so the next chat can do it the same way
 
-- **Read first:** `COACH_DASHBOARD.md` (the manual) and §2 and §6 here. **Tests:** `node scripts/headless/coach/run.js` after any data or write path (made-up athletes, a stubbed Supabase); `sh scripts/test_spine_sql.sh` for any SQL file (a throwaway local Postgres); `node scripts/check_twins.js` for a rule the dashboard copies. Break a fix on purpose to prove its test fails without it.
+- **Read first:** `COACH_DASHBOARD.md` (the manual) and §2 and §6 here. **Tests:** `node scripts/headless/coach/run.js` after any data or write path (made-up athletes, a stubbed Supabase); `sh scripts/test_spine_sql.sh` for any SQL file (a throwaway local Postgres); `node scripts/check_twins.js` for a rule the dashboard copies. `python scripts/test_prune_backups.py` for the backup prune script (14 checks). Break a fix on purpose to prove its test fails without it.
 - **Supabase:** project `bvipfipbdcyqnbczjmaq`. SQL with a line-leading `delete` or `drop` makes the tool ask for a confirmation that never reaches Amir, so hand him that SQL as a file for his SQL editor (as `supabase/PASTE-1-run-in-sql-editor.sql` was); the tool can apply the rest. On 2026-10-11 Amir said to ask him whenever his opinion is needed (use the question tool) and gave permission to run SQL without asking. That never covers erasing or deleting a real person's data: he decides those, one at a time.
 - **To try a write path on the live database without leaving a trace:** a `DO` block that sets the coach's claims (`set_config('request.jwt.claims', '{"email":"amirardekanian@gmail.com","role":"authenticated"}', true)` and `set local role authenticated`), uses made-up ids (`zz-…`) and ends in `raise exception` carrying the result. The error rolls everything back and its message returns the numbers; read the tables afterwards to prove nothing stayed. Never run Forget or a real erase on a real athlete, even this way.
 - **Ship the same day:** branch, pull request, merge (`CLAUDE.md`), then tell Amir to hard-refresh the page.
