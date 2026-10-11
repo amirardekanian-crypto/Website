@@ -335,6 +335,21 @@
       else { row.coach_status = 'new'; t.push(row); }
       return null;
     },
+    // stage62: a WhatsApp number from the coach. A new contact record (source 'coach') only when there is a number to keep; an existing one only has its
+    // number changed. The caller is always the coach.
+    coach_set_whatsapp: function (p) {
+      var id = String(p.p_athlete_id == null ? '' : p.p_athlete_id).trim();
+      if (!id) throw new Error('which athlete?');
+      var wa = String(p.p_whatsapp == null ? '' : p.p_whatsapp).trim() || null;
+      if (wa && wa.length > 40) throw new Error('that is too long for a phone number');
+      var prog = tbl('programs').find(function (r) { return r.athlete_id === id; });
+      var row = tbl('hab_contacts').find(function (r) { return r.athlete_id === id; });
+      if (!prog && !row) throw new Error('there is no athlete called "' + id + '"');
+      if (row) { row.whatsapp = wa; row.updated_at = nowIso(); }
+      else if (wa) tbl('hab_contacts').push({ athlete_id: id, email: null, whatsapp: wa, source: 'coach', tier: prog && prog.data && prog.data.athlete && prog.data.athlete.tier === 'free' ? 'free' : 'coached',
+        note: null, created_at: nowIso(), updated_at: nowIso(), display_name: null });
+      return { athlete_id: id, whatsapp: wa };
+    },
     // stage61: record what became of an application. The same rules as the SQL: 'client' needs an athlete, only 'client' and 'free' keep one, the
     // athlete must exist, a new application becomes handled, a null outcome clears the outcome and the link.
     set_intake_outcome: function (p) {

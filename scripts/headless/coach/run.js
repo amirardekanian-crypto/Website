@@ -2903,6 +2903,55 @@ S['erase-linked-form'] = async (b) => {
   return r;
 };
 
+// ── A WhatsApp number on the File (audit FLOW-8; pile A9, stage62; 2026-10-11) ───────────────────────────────────────────────────────────
+S['whatsapp-number'] = async (b) => {
+  const r = { id: 'whatsapp-number', title: "A WhatsApp number on the File: saved by the coach, shown in the header with a button, never mistaken for a signup", checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ben_test/file' });
+  const head = async () => (await page.locator('.dethead').innerText()).replace(/\s+/g, ' ');
+  check(r, 'a coached athlete with no number gets "add a WhatsApp number" under their name', /add a WhatsApp number/i.test(await head()) && (await page.locator('.dethead a[href$="/file"]').count()) === 1, await head());
+  check(r, 'the File has the number box, empty, with no Remove button', (await page.locator('#waNum').inputValue()) === '' && !(await page.getByRole('button', { name: 'Remove', exact: true }).count()), '');
+  // 1. nonsense is refused on the page
+  let n0 = await L.nCalls(page);
+  await page.locator('#waNum').fill('hello there');
+  await page.locator('button', { hasText: 'Save number' }).click(); await L.settle(page, 500);
+  check(r, 'something that is not a phone number is refused with words, and nothing is sent', /does not look like a phone number/.test(await L.failText(page)) && !(await L.callsSince(page, n0)).some(c => c.name === 'coach_set_whatsapp'), await L.failText(page));
+  // 2. what is typed survives a redraw
+  await page.evaluate(() => renderDetailBody()); await L.settle(page, 300);
+  check(r, 'what was typed is still in the box after a redraw', (await page.locator('#waNum').inputValue()) === 'hello there', await page.locator('#waNum').inputValue());
+  // 3. a real number
+  await page.locator('#waNum').fill('  +44 7700   900123 ');
+  n0 = await L.nCalls(page);
+  await page.locator('button', { hasText: 'Save number' }).click(); await L.settle(page, 900);
+  const c1 = lastOf(await L.callsSince(page, n0), c => c.name === 'coach_set_whatsapp');
+  check(r, 'one coach_set_whatsapp(ben_test, "+44 7700 900123") with the spaces tidied', !!c1 && c1.payload.p_athlete_id === 'ben_test' && c1.payload.p_whatsapp === '+44 7700 900123', c1 && c1.payload);
+  check(r, 'the header shows a WhatsApp button to wa.me and the number', (await page.locator('.dethead a.abtn[href="https://wa.me/447700900123"]').count()) === 1 && /\+44 7700 900123/.test(await head()), await head());
+  check(r, 'the record was made by the coach, as a coached athlete, not as a signup', await page.evaluate(() => { const c = window.__DB.hab_contacts.find(x => x.athlete_id === 'ben_test'); return !!c && c.source === 'coach' && c.tier === 'coached'; }), '');
+  check(r, 'the box holds the saved number and there is a Remove button', (await page.locator('#waNum').inputValue()) === '+44 7700 900123' && (await page.getByRole('button', { name: 'Remove', exact: true }).count()) === 1, '');
+  // 4. it is not a signup anywhere
+  check(r, 'it is not a "new signup" reason', await page.evaluate(() => !reasonsOf(S.ath.ben_test).some(x => x.key === 'signup')), '');
+  check(r, 'it gives them no Proof tab', !/proof/i.test(await page.locator('.subrail').innerText()), await page.locator('.subrail').innerText());
+  await L.go(page, 'proof'); await L.settle(page, 600);
+  check(r, 'and it is not in the Proof signup funnel', !/ben_test/.test(await page.locator('#content').innerText()) && /cara_free/.test(await page.locator('#content').innerText()), '');
+  // 5. remove it
+  await L.go(page, 'a/ben_test/file'); await L.settle(page, 500);
+  n0 = await L.nCalls(page);
+  await page.getByRole('button', { name: 'Remove', exact: true }).click(); await L.settle(page, 900);
+  const c2 = lastOf(await L.callsSince(page, n0), c => c.name === 'coach_set_whatsapp');
+  check(r, 'Remove sends an empty number', !!c2 && c2.payload.p_whatsapp === null, c2 && c2.payload);
+  check(r, 'the header goes back to "add a WhatsApp number" and the box is empty', /add a WhatsApp number/i.test(await head()) && (await page.locator('#waNum').inputValue()) === '', await head());
+  // 6. an Iranian number, and a server without stage62
+  await page.locator('#waNum').fill('۰۹۱۲ ۱۲۳ ۴۵۶۷');
+  await page.evaluate(() => { window.__STUB.missingRpc = ['coach_set_whatsapp']; });
+  await page.locator('button', { hasText: 'Save number' }).click(); await L.settle(page, 700);
+  check(r, 'a server that has not had stage62 says so, in words', /coach_set_whatsapp yet/.test(await L.failText(page)) && /stage62/.test(await L.failText(page)), await L.failText(page));
+  await page.evaluate(() => { window.__STUB.missingRpc = []; });
+  await page.locator('button', { hasText: 'Save number' }).click(); await L.settle(page, 900);
+  check(r, 'a number typed with Persian digits is accepted and the button opens the Iranian chat', (await page.locator('.dethead a.abtn[href="https://wa.me/989121234567"]').count()) === 1, await head());
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── One way to say what did not work (audit BROWSER-10, FLOW-22, MKT-13, 2026-10-11, pile B5) ─────────────────────────────────────
 // A failure used to be a 2.6-second toast in some tabs (easy to miss) and a pop-up in others (it stopped everything, and was gone once
 // dismissed). Now: it worked = a toast; it did not = a line at the bottom that stays until it is dismissed; a question = a confirm;

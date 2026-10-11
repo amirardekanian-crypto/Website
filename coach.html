@@ -397,6 +397,8 @@
   .dethead { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
   .dethead h2 { font-size: 40px; line-height: .95; }
   .dethead .sub { font-size: 13px; color: var(--muted); margin-top: 5px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .dethead .det-num { font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .dethead .sub a:not(.abtn) { color: var(--court); border-bottom: 1px solid var(--court-100); }
   .detacts { display: flex; gap: 8px; flex-wrap: wrap; }
   .keyline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
   .keyline input { flex: 1; min-width: 230px; font-family: 'Space Mono', monospace; font-size: 12px; padding: 8px 11px;
@@ -599,6 +601,7 @@
     border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); }
   .pwin:focus { border-color: var(--court); }
   .pwhint { flex-basis: 100%; font-size: 12px; color: var(--muted); margin: 0; }
+  .waform { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 2px 0 4px; }      /* the WhatsApp number box: the password row's look, its own class so the two never match each other */
   /* Full erasure (stage54): an inline panel, like the password forms, because the list is long and a phone clips a native dialog. */
   .erase { border: 1px solid var(--clay); border-radius: 14px; padding: 14px 16px; margin: 12px 0 4px; background: #fff; }
   .erase .eh { font-weight: 700; font-size: 15px; margin: 0 0 6px; }
@@ -1996,6 +1999,9 @@ function syncGapsOf(blob, id, sessions) {
   return gaps.sort((x, y) => String(y.on).localeCompare(String(x.on)));
 }
 
+// A contact record made by the coach for a number (stage62, source 'coach') is not a signup: it is not in the Proof signup funnel, is not a
+// "new signup", does not count as the athlete being seen, and gives them no Proof tab.
+const isSignup = c => !!c && c.source !== 'coach';
 function assemble() {
   const map = {};
   const get = (id) => (map[id] = map[id] || {
@@ -2072,7 +2078,7 @@ function assemble() {
     a.cycle = cycleDatesOf(p);
     a.hasLogin = !!(S.logins || {})[a.id];
     const seen = [a.lastSession, a.habLast, a.lastActive && dkey(new Date(a.lastActive)),
-                  a.contact && a.contact.signed_up && dkey(new Date(a.contact.signed_up))].filter(Boolean).sort();
+                  isSignup(a.contact) && a.contact.signed_up && dkey(new Date(a.contact.signed_up))].filter(Boolean).sort();
     a.lastSeen = seen.length ? seen[seen.length - 1] : null;
   });
   Object.values(map).forEach(a => { a.reasons = reasonsOf(a); });
@@ -2126,7 +2132,7 @@ function reasonsOf(a) {
   // Someone locked out since the links were retired produces no activity, so they drift into Gone
   // quiet; the row still says why, without putting them in Needs you.
   a.quietFlags = a.lapsed && noLogin ? [{ tone: 'warn', text: 'no login — cannot open the app' }] : [];
-  if (a.contact && a.contact.signed_up && daysSince(a.contact.signed_up) <= 7)
+  if (isSignup(a.contact) && a.contact.signed_up && daysSince(a.contact.signed_up) <= 7)
     add('signup', 'note', 'new signup · ' + timeAgo(a.contact.signed_up), 35, 'proof');
   if (a.lapsed) return out;
   if (a.tier === 'coached' && idle != null && idle > QUIET_SESSION_DAYS && !(ended != null && ended > 0))
@@ -4250,6 +4256,13 @@ function invalidateDetail() { if (_D) _D.stamp = -1; }
 // Try again after their logs failed to load: rebuild the file, which reads them again.
 function retryLogs() { invalidateDetail(); render(); }
 window.retryLogs = retryLogs;
+// The number you reach them on, with a button, or a nudge to add it (stage62, audit FLOW-8; Amir: "shown in the header with a WhatsApp button").
+function waHeaderHtml(a) {
+  const num = a.contact ? String(a.contact.whatsapp || '').trim() : '', link = num && waLink(num), file = '#a/' + encodeURIComponent(a.id) + '/file';
+  if (link) return `<div class="sub"><a class="abtn" target="_blank" rel="noopener" href="${esc(link)}">WhatsApp ↗</a><bdi class="det-num">${esc(num)}</bdi></div>`;
+  if (num) return `<div class="sub"><bdi class="det-num">${esc(num)}</bdi><span>is not a number WhatsApp can open</span><a href="${file}">fix it</a></div>`;
+  return a.tier === 'coached' ? `<div class="sub"><a href="${file}">add a WhatsApp number</a></div>` : '';
+}
 async function renderDetail(athleteId, sub) {
   let a = S.ath[athleteId];
   if (!a) { $('content').innerHTML = `<a class="back" href="#athletes">← Roster</a><p class="empty">No athlete “${esc(athleteId)}” in the store. Refresh?</p>`; return; }
@@ -4296,7 +4309,7 @@ async function renderDetail(athleteId, sub) {
     if (!sameAthlete) { _workSel = {}; _workOpen = {}; Object.keys(_exDrafts).forEach(k => delete _exDrafts[k]); }
     _detailName = a.name; _detailHistory = history;
   }
-  const has = { proof: !!(a.isHab || a.contact), work: true, file: true };
+  const has = { proof: !!(a.isHab || isSignup(a.contact)), work: true, file: true };
   // With no screen named in the address, a habit-only athlete (free or Proof, no training days)
   // opens on Proof, where their facts are; everyone else on The work.
   const noTraining = !_D.programDays.length && !_D.history.length;
@@ -4318,6 +4331,7 @@ async function renderDetail(athleteId, sub) {
         <div>
           <h2 class="hd">${esc(a.name)}</h2>
           <div class="sub">${tierChip(a)}${lvSlot('hchip', athleteId)} <span>${esc(sub2.join(' · '))}</span></div>
+          ${waHeaderHtml(a)}
         </div>
       </div>
     </div>
@@ -4340,7 +4354,7 @@ async function renderDetail(athleteId, sub) {
 // box again and fold shut every section the coach had opened (Version history, the Coaching log, a day's raw log, the live
 // snapshot). The snapshot is read off the tab that is on screen BEFORE it is replaced and put back on the new one, and only when it is
 // the same athlete's same screen (a different athlete or sub-tab starts clean). A save that clears a field clears it first.
-const KEEP_TYPED = ['athPw', 'as-paste', 'as-date'];
+const KEEP_TYPED = ['athPw', 'waNum', 'as-paste', 'as-date'];
 function snapTabBody() {
   const box = $('tabbody');
   if (!box || !box.dataset.athlete) return null;
@@ -4471,6 +4485,37 @@ function oldCallLogsHtml(D) {
       ${body}
     </section>`;
 }
+// The WhatsApp number box on the File (stage62). Saving calls coach_set_whatsapp(); an empty box (or Remove) clears the number.
+function waPanelHtml(D) {
+  const { athleteId, a } = D;
+  const cur = (a.contact && a.contact.whatsapp) || '';
+  return `<div class="sec"><span>WhatsApp number</span></div>
+    <section class="panel">
+      <p class="empty" style="padding:0 0 10px">The number you reach ${esc(a.name)} on. It shows under their name with a WhatsApp button, and it gives <b>Copy message</b> on a new login a WhatsApp button too. Only you can see it. Write it with the country code (+44 7700 900123) or the Iranian way (0912 123 4567).</p>
+      <div class="waform">
+        <input id="waNum" class="pwin" aria-label="WhatsApp number" placeholder="+44 7700 900123" inputmode="tel" autocomplete="off" spellcheck="false" value="${esc(cur)}"
+               onkeydown="if(event.key==='Enter') saveWhatsApp(${jsq(athleteId)})">
+        <button class="btn sm primary" onclick="saveWhatsApp(${jsq(athleteId)})">Save number</button>
+        ${cur ? `<button class="btn sm" onclick="saveWhatsApp(${jsq(athleteId)}, '')">Remove</button>` : ''}
+      </div>
+    </section>`;
+}
+async function saveWhatsApp(athleteId, forced) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  const box = $('waNum');
+  const num = String(forced != null ? forced : (box ? box.value : '')).replace(/\s+/g, ' ').trim();
+  if (num && !waLink(num)) { fail('That does not look like a phone number WhatsApp can open. Use the country code, for example +44 7700 900123, or an Iranian number like 0912 123 4567.'); return; }
+  const res = await sb.rpc('coach_set_whatsapp', { p_athlete_id: athleteId, p_whatsapp: num || null });
+  if (res.error) {
+    const m = res.error.message || '';
+    fail('Could not save the number: ' + (/Could not find the function|PGRST202/i.test(m + (res.error.code || '')) ? 'the server does not have coach_set_whatsapp yet (supabase/stage62_coach_whatsapp.sql has not been applied).' : m));
+    return;
+  }
+  if (box) box.value = num;       // the redraw keeps what was typed; make that what was saved
+  await refetch(['contacts']);
+  toast(num ? 'WhatsApp number saved' : 'WhatsApp number removed');
+}
+window.saveWhatsApp = saveWhatsApp;
 // The application(s) this athlete came from (stage61): the ones linked to them on the Intake tab. Nothing when none is linked.
 function cameFromHtml(athleteId) {
   const apps = (S.intake || []).filter(i => i.athlete_id === athleteId).sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)));
@@ -4510,6 +4555,7 @@ function fileTabHtml(D) {
         <button class="btn sm" onclick="viewAsAthlete(${jsq(athleteId)}, 'habits')">View their Proof</button>
       </div>
     </section>
+    ${waPanelHtml(D)}
     <div class="sec"><span>Login</span></div>
     <section class="panel">
       ${login ? `
@@ -4764,7 +4810,7 @@ async function submitPastSession(athleteId) {
   });
   if (error) { fail('Could not save: ' + error.message); if (btn) { btn.disabled = false; btn.textContent = 'Save to logs'; } return; }
   _pendingImport = null;
-  KEEP_TYPED.forEach(id => { if (id !== 'athPw' && $(id)) $(id).value = ''; });
+  ['as-paste', 'as-date'].forEach(id => { if ($(id)) $(id).value = ''; });      // the pasted email and its date; not the password box or the number box
   if ($('as-preview')) $('as-preview').innerHTML = '';
   if ($('as-save')) { $('as-save').disabled = true; $('as-save').textContent = 'Save to logs'; }
   if ($('add-session')) $('add-session').style.display = 'none';
@@ -5154,7 +5200,7 @@ async function renderProof() {
   // never offered forget (forget_contact() deletes the whole progress row: their training app's
   // records, body weight and check-ins).
   const tierOf = c => (S.ath[c.athlete_id] && S.ath[c.athlete_id].tier) || c.tier || 'free';
-  const funnel = (S.contacts || []).slice().sort((a, b) => String(b.signed_up).localeCompare(String(a.signed_up)));
+  const funnel = (S.contacts || []).filter(isSignup).sort((a, b) => String(b.signed_up).localeCompare(String(a.signed_up)));
   const freeFunnel = funnel.filter(c => tierOf(c) !== 'coached');
   // Signed up and never logged a single day is its own bucket, and the biggest
   // one — a different problem from someone logging and drifting. They need a

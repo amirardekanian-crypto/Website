@@ -602,6 +602,14 @@ here and one lift there — both sides run the same name matcher, on purpose.
   together or not at all, and the counts come back. It used to be two deletes from this page, and a
   failure between them left one gone and one standing. Under it, **Erase completely…** removes the whole
   person (see *Erasing a person* below).
+- **A WhatsApp number on every File** (stage62, 2026-10-11; audit FLOW-8; Amir: "a WhatsApp number field on each coached athlete's File, shown in
+  the header with a WhatsApp button"). Most coached athletes had no contact record (9 of 49, all made from an intake form), so a new login's
+  *Copy message* had no WhatsApp button for them. The File has a **WhatsApp number** box (*Save number*, *Remove*); the header under the name
+  shows a **WhatsApp ↗** button and the number, or *add a WhatsApp number* for a coached athlete with none. The page checks that `waLink()` can open the
+  number (the country code, or an Iranian 09…; Persian digits are folded) before it sends it; `coach_set_whatsapp()` stores it as typed on the athlete's
+  `hab_contacts` record, making one only when there is a number to keep (`source 'coach'`, tier from the programme). **A contact the coach made is
+  not a signup** (`isSignup()`): it is not in the Proof signup funnel, is not a *new signup* reason, does not count as the athlete being seen and gives
+  them no Proof tab. The typed number survives a redraw (`KEEP_TYPED`). `whatsapp-number` drives it.
 - **Hidden sessions** (stage60, 2026-10-11; audit FILE-11 and ROSTER-9; Amir: "hide it, keep it recoverable"). The Raw log's button is **Hide this
   log**, no longer Delete. A deleted session left the report's mark in the athlete's progress, so the roster warned *session not synced* for ever,
   and their phone could send the session again and bring it back. A hidden session stays in the database (`session_history.hidden_at`, `hidden_by`)
@@ -835,7 +843,7 @@ it in this file.
 | ~~`athlete_keys`~~ | ⚠️ Empty since the secret links were retired — reads nothing useful |
 | ~~`messages`~~ | ⚠️ Nothing reads it since the in-app chat was removed (2026-09-26). Kept, not dropped |
 | `hab_notes` | The wall, the coach line, moderation |
-| `hab_contacts` via `contact_list()` | The funnel, contact buttons, days logged |
+| `hab_contacts` via `contact_list()` | The funnel (signups only: not a `source 'coach'` record), contact buttons, the header's WhatsApp button, days logged |
 | `leaderboard_optin` | Who's on the board, their display name and worn title |
 | `hab_titles` | Titles-minted feed |
 | `xp_rules` | The quest pool and the live runs |

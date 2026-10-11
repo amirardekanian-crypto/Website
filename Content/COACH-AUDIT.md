@@ -21,7 +21,7 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 183 are fixed, 6 partly fixed (the harm is gone, something named in the finding is left), 2 open and 0 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
+**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 184 are fixed, 5 partly fixed (the harm is gone, something named in the finding is left), 2 open and 0 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
 questions in §7 and the eleven in §12 (pile A), and the one thing left for you is to switch off public sign-up in the Supabase
 dashboard (SERVER-14). The SQL pack and the removal script ran on 2026-10-11 and §11 records what was checked afterwards.
 **What is left, and how to continue in a new chat, is §12.**
@@ -265,13 +265,13 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-<!--T9-->191 findings. Fixed 183 · Partly 6 · Open 2 · Your call 0 · Not a bug 0. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
+<!--T9-->191 findings. Fixed 184 · Partly 5 · Open 2 · Your call 0 · Not a bug 0. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
 | high | 32 | 0 | 1 | 0 | 0 |
-| medium | 83 | 5 | 0 | 0 | 0 |
+| medium | 84 | 4 | 0 | 0 | 0 |
 | low | 56 | 1 | 1 | 0 | 0 |<!--/T9-->
 
 ### The work and the ✎ editor (WORK)
@@ -401,7 +401,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | FLOW-5 | high | 'Needs you' has five definitions, and Today shows the narrowest: notes fill the 10-row cap, while sync gaps, upgrade leads, new applications and cycle ends never appear | Fixed | One rule now decides who needs you, and Today, the roster's reasons, its Needs you group, filter and sort all use it. Today shows one row per person with all their reasons, a 'Show all' button instead of a hard cap, and a line for new applications. |  |
 | FLOW-6 | high | Cycle end and renewal are invisible to the coach: endDate is never read, and lapsed clients stay in Needs you as 'No session for N days' for ever | Fixed | The dashboard now reads each cycle's end date. A client shows 'cycle ends in N days' in the last week and 'cycle ended N days ago, renew?' for 14 days after the end, then moves to Gone quiet instead of sitting under 'no session for N days' for ever. The Work tab shows the cycle's dates and the days left. The 14 days is a default you can change. |  |
 | FLOW-7 | medium | Reading notes loses your place: a Today row opens the athlete with the note's day closed, and Mark read collapses the open cards | Fixed | Tapping a note on Today opens the athlete on that note's day, with the right session picked. Mark read now updates the page in place, so the cards you had open stay open. Since 2026-10-11 (pile B10) a note's row in Needs you has a **Mark read** button beside *open →*: it marks the one quoted session and shows the next, without opening the athlete. `today-mark-read` pins it. |  |
-| FLOW-8 | medium | Login hand-off is spread over three places and ends in a collapsed panel, with no WhatsApp number for most coached athletes; 10 passwords are still waiting | Partly | An unsent password now shows on the athlete's own File tab with Copy message, Mark sent and a WhatsApp button (when a number is known), instead of an alert that disappears. 'Logins to send' opens by itself while three or fewer are waiting. | Decided (2026-10-11): a WhatsApp number field on each coached athlete's File, shown in the header with a WhatsApp button. Not built yet (A9). |
+| FLOW-8 | medium | Login hand-off is spread over three places and ends in a collapsed panel, with no WhatsApp number for most coached athletes; 10 passwords are still waiting | Fixed | An unsent password now shows on the athlete's own File tab with Copy message, Mark sent and a WhatsApp button (when a number is known), instead of an alert that disappears. 'Logins to send' opens by itself while three or fewer are waiting. Since 2026-10-11 (pile A9, stage62 applied) every File has a WhatsApp number box (Save number, Remove) and the header under the name shows a WhatsApp button and the number, or "add a WhatsApp number" for a coached athlete with none; a new login's Copy message gets its WhatsApp button once the number is there. `coach_set_whatsapp()` keeps it on the athlete's contact record (made only when there is a number to keep, `source 'coach'`); that record is never counted as a signup (funnel, new-signup reason, last seen, Proof tab). Rehearsed on the live database in a rolled-back transaction (13 checks); `whatsapp-number` pins it, mutation-tested. |  |
 | FLOW-9 | medium | The prescription ✎ is invisible and tiny on a phone (hover-only, 18×24 px) | Fixed | On a phone or tablet the ✎ pencil is always visible and bigger, and the editor's fields are large enough that the iPhone does not zoom in. |  |
 | FLOW-10 | medium | On a phone, six of the nine tabs and Refresh sit off-screen, and Today's Needs you starts about 1.6 screens down, below the hero and the whole wall | Fixed | On a phone the four daily tabs fit on one row and the other five scroll on a second row, Refresh sits in the top bar, and on Today Needs you comes before the wall. |  |
 | FLOW-11 | medium | Undo means restoring the whole programme from a collapsed list in another tab, with no description of what changed and only 20 versions kept | Fixed | Since 2026-10-11 (pile B9) a ✎ save offers a one-tap **Undo** in a bar that says in words what the save changed (*Ava Example: Day 1 · Goblet Squat: sets 4 → 5*). Undo puts the pre-save programme back only if the row still carries the stamp the save left, and refuses (changing nothing) if anything wrote it since. A restore gets the same bar. Every line in Version history has **What this save changed**, a short list from `programDiff()` (27 cases in `test_coach_compare.js`). `undo-after-save` and `version-diff` pin it; both fail on the old page. |  |
@@ -737,7 +737,7 @@ a contact field holding two numbers matches the second only; the finder cannot b
 
 ## 12. Continue here (rewritten 2026-10-11, fourth session)
 
-<!--T12-->191 findings: 183 fixed, 6 partly, 2 open, 0 waiting on you, 0 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
+<!--T12-->191 findings: 184 fixed, 5 partly, 2 open, 0 waiting on you, 0 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
 What is left is in three piles: **A** your eleven answers, now jobs; **B** Claude can just do, in order (**all eleven are done**); **C** is outside the audit.
 
 **To start a new chat:** *"Continue the Coach's Box audit: read `Content/COACH-AUDIT.md` §12 and `COACH_DASHBOARD.md`, then do the first job in
@@ -757,7 +757,7 @@ Asked with the question tool. Nothing here waits on a decision any more; one ite
 | A6 | FILE-11, ROSTER-9 | Hide the session and keep it recoverable | A tombstone on `session_history` (a stage file), hide and undo through one coach-only function, every reader leaves hidden sessions out, the athlete app's save must not bring one back, an Undo in the File. Touches program.html | **done 2026-10-11** (stage60; program.html did not need a change: the server keeps the row hidden, and `get_my_history()` already replaces the phone's copy) |
 | A7 | TOOLS-11 | Fix the wording | The File tab says the preview shows their programme as they see it, without their logged work | **done 2026-10-11** |
 | A8 | FLOW-17, SPINE-11 | Link an application to the athlete it became, and let Handled record an outcome | A stage file (athlete id and outcome on the application), a picker on the card, and the athlete's File shows where they came from | **done 2026-10-11** (stage61) |
-| A9 | FLOW-8 | A WhatsApp number on each coached athlete's File | A coach-only function that sets it, a field in the File, the number in the header with a WhatsApp button | todo |
+| A9 | FLOW-8 | A WhatsApp number on each coached athlete's File | A coach-only function that sets it, a field in the File, the number in the header with a WhatsApp button | **done 2026-10-11** (stage62) |
 | A10 | ROSTER-7, ROSTER-12 | A status (active, paused, former), the demo out of the totals, and a ⚙ Tools button for the admin tools | The status stored per athlete and read by `reasonsOf()`; the demo not counted; Coach tools and Logins to send behind one button | todo |
 | A11 | SPINE-12 | Leave it to `/spine` Upkeep | nothing | decided |
 
