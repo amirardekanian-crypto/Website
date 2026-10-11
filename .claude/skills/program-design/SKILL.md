@@ -510,6 +510,22 @@ these cues for all the exercises that everyone has from now on … if there is a
 it should be in coach's notes. thats why its there"*).** The spec carries **no cues and no steps**. Each
 exercise has one set of steps (CUE-6) and three cues (CUE-1) on its Spine entry, and every athlete's card
 shows those; each layer says one thing (CUE-7).
+- **Read the four layers before you write a pill or a flag** (CUE-7; Amir, 2026-10-11: *"everytime we write a
+  program, we dont have conflict of coaching with the cues, coaches notes, and how to do the exercise and
+  pills"*). The context pull's `spine` lines carry no steps or cues, so once the exercises are chosen, read
+  them for all of them in ONE query (PRC-6):
+  `select id, name, steps, cues from public.exercises where id in (<every chosen exercise and circuit item's id>)`.
+  Then, exercise by exercise:
+  - **The pill** changes or adds to what the entry says, every rep. Never a value the steps or cues already
+    say (the Broad Jump's steps hold the landing, so no `stick the landing`), never the grip the steps name
+    unless this athlete holds it differently.
+  - **A `note_flag`** only for what the steps, the cues and the pill can't say about this athlete (COM-14). A
+    limit that changes a step names the step: `note_flag: stops at the box, changes step 3`. Never a flag
+    that restates a step or a cue.
+  - **An approved entry with no steps yet** is no reason to put how-to in a note: add a `spine_cue:` line
+    asking for its steps, and Upkeep proposes them to Amir.
+  The checker backs this up: Part A warns on a pill the entry's steps or cues already say, Part B on a
+  note that repeats a step or a cue. A warn there comes back to this step.
 - **Something only THIS athlete needs** (an injury limit, a range to stop at, a setup for their home
   kit, a fault you saw on their film) is a `note_flag` on that exercise, which engage writes as the
   Coach's Note (COM-14), never as a cue. The side that goes first is the pill (CHP-2). A limit that

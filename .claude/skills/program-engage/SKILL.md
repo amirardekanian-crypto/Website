@@ -164,7 +164,8 @@ exercise card, not a notes card). How this stage applies it:
   (`select id, name, steps, cues from public.exercises where id in (<the flagged cards' exIds>)`,
   PRC-6), so the note never repeats them and a limit that changes a step says what changes:
   *"Stop at the box, not the floor."* (CUE-7) The note is never general how-to: a step that is
-  missing or wrong for anyone is a `spine_cue:` for the entry, not a sentence on one card.
+  missing or wrong for anyone is a `spine_cue:` for the entry, not a sentence on one card. Part B's
+  check warns on a note that repeats one of its entry's steps or cues, so a repeat comes back to you.
 - **A starting weight** comes from the athlete's own logs, framed by the RPE (PRG-2), never invented;
   with no logs, say how to find it. **Never when to add weight** (PRG-3).
 - **A fallback** goes in only when it is the one design checked against this athlete's restrictions

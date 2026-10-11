@@ -124,7 +124,8 @@ card is yours to write, CHP-7).
 
 **The pill follows CHP-2**: the list and its old spellings are SCHEMA.md → *`intent`: the pill list*, and
 the check fails a value off it (naming the list value an old spelling became), so copy the spec's pill and
-fix what the check names. A grip is the pill (NAM-5), the tempo never is (CHP-6), and there is **no `setup`
+fix what the check names. It also warns on a pill the entry's steps or cues already say (CUE-7): that one
+goes back to design, which chose it. A grip is the pill (NAM-5), the tempo never is (CHP-6), and there is **no `setup`
 on a programme card at all** (CHP-1): any other detail for this athlete is the Coach's Note (`note`; on a
 circuit item, the circuit's note).
 
@@ -226,8 +227,10 @@ count and what landed on the cards differ, which is how a dropped or invented on
   wrote it from design's `note_flag`), not from design directly. Copy verbatim, plain text — never
   wrap it in HTML (that's the cycle notes cards' convention, not this field's). Never move
   exercise-scoped guidance into the notes cards, and never invent a note nothing flagged. The full
-  check warns on a note past COM-14's length, one that repeats its own pill (CUE-7) and a grip written
-  in a note (NAM-5): send those back to engage rather than trimming the words yourself.
+  check warns on a note past COM-14's length, one that repeats its own pill or its entry's steps or
+  cues (CUE-7) and a grip written in a note (NAM-5): send those back to engage rather than trimming the
+  words yourself. The check needs the steps and cues text from `--spine-sql`; a Spine file saved before
+  2026-10-11 says to run it again.
 - **The week notes' words:** engage's PART 3c `WEEK <n>:` lines, each into `weekNotes["<n>"].text`
   (its `title` too, when the line has one), beside the numbers Part A wrote.
 - **Becauses** (PART 3b) as `"why": { "src", "part"?, "text" }` on that exercise (standard or

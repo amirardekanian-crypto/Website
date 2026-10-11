@@ -593,6 +593,33 @@ sql = subprocess.run([sys.executable, CHECK, p, '--spine-sql'], capture_output=T
 expect("--spine-sql: each line ends with has-steps, read safely before stage64", "to_jsonb(e)->'steps'" in sql, sql[-1600:])
 expect('--spine-sql: the purposes and their checksum are asked for', 'as purposes' in sql and 'purposes_md5' in sql, sql[-600:])
 
+# CUE-7 against the entry's own words (2026-10-11): --spine-sql returns each entry's steps and cues, and a Coach's
+# Note or a pill that says them again is flagged. The squat's steps and cues are the pilot's.
+TX = ("barbell-back-squat|Set the hooks at armpit height and the safety bars a little below your lowest squat. ¶ "
+      "Hold a big breath and sit down until your thighs are level with the floor. ¶ If you get stuck, sit down and let "
+      "the safety bars take the bar.|Push the floor away with your whole foot ¶ Chest and hips rise together as you stand ¶ "
+      "Knees moving in toward each other. Keep them pointing where your toes point.")
+ctx_t = [{"spine": SB, "prev": None, "ledger": None, "texts": TX, "texts_md5": hashlib.md5(TX.encode('utf-8')).hexdigest()}]
+out = run(with_note("Push the floor away with your whole foot and keep your chest up."), ctx=ctx_t)
+expect("CUE-7: a note that repeats its entry's cue warns", has(out, 'WARN', "[CUE-7 · COM-14] Day 1 · Barbell Back Squat: the Coach's Note repeats the entry's cue"), out)
+out = run(with_note("Sit down until your thighs are level with the floor, no lower."), ctx=ctx_t)
+expect("CUE-7: a note that repeats five words of a step warns, naming the step", has(out, 'WARN', "repeats the entry's step 2"), out)
+out = run(with_note("Last cycle 60 kg for 6 at RPE 8. Try 62.5 kg and let the first set decide."), ctx=ctx_t)
+expect("CUE-7: a personal note beside the entry's words passes", not has(out, 'WARN', "repeats the entry's"), out)
+out = run(with_note("Push the floor away with your whole foot.", intent=None), '--stage', 'build', ctx=ctx_t)
+expect("CUE-7: --stage build leaves the note to the final pass", not has(out, 'WARN', "repeats the entry's"), out)
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['intent'] = 'drive up fast'
+TX2 = TX.replace("Chest and hips rise together as you stand", "Drive up fast, chest and hips together")
+out = run(d, '--stage', 'build', ctx=[{"spine": SB, "prev": None, "ledger": None, "texts": TX2}])
+expect("CUE-7: a pill the entry's cues already say warns at build time", has(out, 'WARN', "[CUE-7 · CHP-2] Day 1 · Barbell Back Squat: the pill 'drive up fast' is already in the entry's cue"), out)
+d['workouts']['days'][0]['blocks'][1]['exercises'][0]['intent'] = 'max intent'
+expect("CUE-7: a pill the entry does not say passes", not has(run(d, '--stage', 'build', ctx=ctx_t), 'WARN', '[CUE-7 · CHP-2]'))
+out = run(with_note("Push the floor away with your whole foot."), ctx=[{"spine": SB, "prev": None, "ledger": None}])
+expect("CUE-7: a Spine file with no texts says to run --spine-sql again, and does not guess", has(out, 'INFO', 'no steps and cues text') and not has(out, 'WARN', "repeats the entry's"), out)
+out = run(BASE, ctx=[dict(ctx_t[0], texts=TX + " Extra.")])
+expect("checksum: a mistyped steps-and-cues copy stops the run", "the saved 'texts' is not what the server sent" in out, out)
+expect('--spine-sql: the steps and cues text and its checksum are asked for', 'as texts' in sql and 'texts_md5' in sql and "e.cues->'bad'" in sql, sql[-900:])
+
 # ── 6. the rule index guard (scripts/check_rule_index.py) ────────────────────
 spec_ri = importlib.util.spec_from_file_location('cri', os.path.join(REPO, 'scripts', 'check_rule_index.py'))
 P = os.path.join(REPO, '.claude', 'COACHING-PRINCIPLES.md')

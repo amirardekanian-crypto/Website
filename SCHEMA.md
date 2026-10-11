@@ -662,7 +662,7 @@ a limit that changes one of the entry's steps says so: *"Stop at the box, not th
 place; their checked fallback (SEL-20); an ask (*"Film set 2 and send it"*) or a fault seen on their own film.
 A few words of reason only when the exercise has no Because. **Never** when to add weight (PRG-3), general
 how-to (that is the entry's steps), a general cue, the tempo, sets or reps, or the grip (that is the pill).
-`check_program.py` warns past three sentences or 300 characters, and on a note that repeats its own pill (CUE-7).
+`check_program.py` warns past three sentences or 300 characters, and on a note that repeats its own pill or its entry's steps or cues (CUE-7).
 
 **Placement rule (COM-6):** anything about ONE exercise for this athlete belongs here, so they see it exactly
 where it applies. Program-wide guidance belongs in the `notes` cards instead. This is also the only

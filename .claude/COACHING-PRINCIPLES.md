@@ -203,7 +203,7 @@ stale copy reached athletes.
 | CUE-4 | Every programme write leaves the Spine more complete: `/spine` → Upkeep ends every run. | assemble · edit · workout | part (`exId`, Spine gate) |
 | CUE-5 | Claude drafts library entries and never approves one; new entries are one approval question to Amir, answered before the programme publishes. | assemble · spine | warn (drafts) |
 | CUE-6 | Every Spine entry has steps for anyone: 3–5 one-phase lines (2–3 stretches and conditioning, 6 rack lifts), setup to safe finish, never dose or side. | spine | warn (later ✓) |
-| CUE-7 | Say each thing once: steps the how, cues the focus and the avoid, pill the change, note this athlete. A card overrides its entry's default. | spine · engage · assemble · workout | warn (a note repeating its pill) |
+| CUE-7 | Say each thing once: steps the how, cues the focus and the avoid, pill the change, note this athlete. A card overrides its entry's default. | design · spine · engage · edit · assemble · workout | warn (a note repeating its pill, steps or cues; a pill they already say) |
 
 ### Chips & modifiers
 | ID | Rule | Stage | Check |
@@ -975,7 +975,7 @@ same ID. Read a rule's story and its history before changing it.
   **Never in a note:** when to add weight (PRG-3 stands: the athlete hits the RPE and logs, and Amir changes the
   card), general how-to (it is a step, CUE-6), a general cue (CUE-1, CUE-2), the tempo (CHP-6), sets or reps,
   the grip (the pill, NAM-5). The checker warns past three sentences or 300 characters, on a note that repeats
-  its own pill (CUE-7), and on a grip written in a note.
+  its own pill or its entry's steps or cues (CUE-7), and on a grip written in a note.
 - `COM-15` **A Because is one sentence of 140 characters at most, written fresh each cycle.** A reason from Cycle 1 is stale by Cycle 3, so it is never carried over.
 - `COM-16` **A week note is short and says it once.** One or two short sentences under about 260 characters, starting with the instruction (the app already prints its label above it: the note's title, or *Week N*), and no notes card repeats it.
 - `COM-17` **The handoff message points into the app; it never rewrites it.** The cards, Coach's Notes and
@@ -1087,8 +1087,10 @@ same ID. Read a rule's story and its history before changing it.
   name; a limit that changes a step says so in the note (*"Stop at the box, not the floor."*). A pill that
   only repeats the steps adds nothing: the Broad Jump's steps hold the landing, so `stick the landing` on it
   says it twice. Before this rule the missing how-to was typed into notes (about a third of them), the cue
-  slots carried setup and the pill carried the tempo. The checker warns when a note repeats its own pill;
-  the rest is the writer's and the reviewer's judgment.
+  slots carried setup and the pill carried the tempo. **Every stage that writes a pill or a note reads the
+  entry's steps and cues first** (design and edit in one query; engage for the flagged cards), and the
+  checker warns when a note repeats its own pill, a step or a cue, and when a pill says what the steps or
+  cues already say. It compares wording, so a paraphrase is still the writer's and the reviewer's judgment.
 
 ## Chips & modifiers
 - `CHP-1` **No floating text on a card.** Nothing goes on a programme card as a grey `setup` line. A grip,

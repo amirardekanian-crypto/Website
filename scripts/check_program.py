@@ -549,11 +549,51 @@ def run_chips(expr, payload):
     except Exception:
         return None
 
-def check_notes(data):
+def _words(t):
+    return re.sub(r'[^a-z0-9 ]', ' ', str(t or '').lower()).split()
+
+def repeats(text, line, run=5):
+    """True when `line` (a step or a cue) is said again in `text`: the whole line (three words or more) sits
+    inside it, or the two share a run of `run` words. Wording is compared, not meaning, so a paraphrase
+    passes: the writer's and the reviewer's job (CUE-7)."""
+    wt, wl = _words(text), _words(line)
+    if len(wl) >= 3 and (' ' + ' '.join(wl) + ' ') in (' ' + ' '.join(wt) + ' '): return True
+    grams = {tuple(wl[i:i + run]) for i in range(len(wl) - run + 1)}
+    return any(tuple(wt[i:i + run]) in grams for i in range(len(wt) - run + 1))
+
+def layer_lines(texts, o):
+    """The entry's steps and cues for one card (by its exId), each labelled as the app shows it."""
+    t = (texts or {}).get(o.get('exId') or '') or {}
+    return [(f'step {n}', x) for n, x in enumerate(t.get('steps') or [], 1)] + [('cue', x) for x in t.get('cues') or []]
+
+def check_pill_layers(data, ctx=None):
+    """CUE-7 at build time: a pill whose words the entry's steps or cues already say adds nothing (CHP-2's
+    test: does it change what the entry already says?). Runs before engage, so design changes the pill, not
+    the words around it. Needs the steps and cues text from --spine-sql (2026-10-11)."""
+    texts = (ctx or {}).get('texts')
+    if texts is None: return
+    for d, b, ex, it in exercises(data):
+        o = it or ex
+        if not o.get('intent'): continue
+        lines = layer_lines(texts, o)
+        for v in pill_values(o.get('intent')):
+            v = PILL_OLD.get(v.lower(), v)
+            if len(_words(v)) < 2: continue
+            hit = next((w for w, x in lines if (' ' + ' '.join(_words(v)) + ' ') in (' ' + ' '.join(_words(x)) + ' ')), None)
+            if hit:
+                warn(f"Day {d.get('id')} · {o.get('name')}: the pill '{v}' is already in the entry's {hit}. A pill changes or adds "
+                     "to what the entry says; drop it, or pick what this athlete does differently", 'CUE-7', 'CHP-2')
+
+def check_notes(data, ctx=None):
     """The Coach's Note (2026-10-11). COM-14: one to three short sentences, the point first (about 75
     characters show before More ›); before this rule 89 live notes ran past three sentences and the
     longest was 774 characters. CUE-7: say each thing once, so a note never repeats its own card's pill,
-    and a grip is the pill, never words in the note (NAM-5)."""
+    its entry's steps or its entry's cues (about a third of live notes carried general how-to that belongs
+    on the entry), and a grip is the pill, never words in the note (NAM-5)."""
+    texts = (ctx or {}).get('texts')
+    if ctx and ctx.get('spine') and texts is None:
+        info("the Spine file has no steps and cues text (saved before this check): run --spine-sql again so a note "
+             "that repeats its entry's steps or cues is flagged (CUE-7)")
     for d, b, ex, it in exercises(data):
         o = it or ex
         note = str(o.get('note') or '').strip()
@@ -575,6 +615,12 @@ def check_notes(data):
                 if g != 'straps' and said(g):
                     warn(f"{where}: the Coach's Note names a grip ('{g}'). A grip is the card's pill, never words in the note",
                          'NAM-5', 'COM-14')
+        # CUE-7: the entry's steps and cues are read by everyone; the note says only what changes for this athlete.
+        for what, line in layer_lines(texts, o):
+            if repeats(note, line):
+                warn(f"{where}: the Coach's Note repeats the entry's {what} (\"{line[:70]}\"). Everyone reads that on the "
+                     "Spine; the note says only what changes for this athlete (a limit that changes a step says what changes)",
+                     'CUE-7', 'COM-14')
 
 def check_whys(data, ctx=None):
     whys = [(d, ex) for d, b, ex, it in exercises(data) if not it and ex.get('why') is not None]
@@ -1027,7 +1073,7 @@ def load_context(path):
     the athlete's live programme BEFORE this build (`prev`: the cycle just trained), and the
     Exercise Ledger table from their coaching log. So continuity costs no extra lookup."""
     raw = open(path, encoding='utf-8').read().strip()
-    lines, prev, ledger, profile, names, minutes, purposes = [], None, None, None, {}, {}, {}
+    lines, prev, ledger, profile, names, minutes, purposes, texts = [], None, None, None, {}, {}, {}, None
     if raw[:1] in '[{':
         rows = json.loads(raw)
         for o in (rows if isinstance(rows, list) else [rows]):
@@ -1051,6 +1097,13 @@ def load_context(path):
             for l in str(o.get('purposes') or '').splitlines():
                 i, _, t = l.partition('|')
                 if i and t: purposes[i] = t
+            # id|steps|cues, ' ¶ ' between lines (2026-10-11): what the Coach's Note and the pill must not repeat (CUE-7)
+            if 'texts' in o:
+                texts = texts or {}
+                for l in str(o.get('texts') or '').splitlines():
+                    i, st, cu = (l.split('|', 2) + ['', ''])[:3]
+                    if i: texts[i] = {'steps': [x.strip() for x in st.split('¶') if x.strip()],
+                                      'cues': [x.strip() for x in cu.split('¶') if x.strip()]}
     else:
         lines = raw.splitlines()
     spine = {}
@@ -1072,13 +1125,13 @@ def load_context(path):
         e['steps'] = (p[11].lower() in ('true', 't')) if len(p) >= 12 else None
         spine[p[0]] = e
     return {'spine': spine, 'prev': prev, 'ledger': ledger, 'profile': profile, 'names': names, 'minutes': minutes,
-            'purposes': purposes}
+            'purposes': purposes, 'texts': texts}
 
 def verify_copy(o, path):
     """The --spine file reaches disk only by being copied from the database's answer, so a slip in
     the copy would quietly change a volume table or a ledger check. --spine-sql returns an md5 of each
     text it sends, and of how many exercises `prev` holds; a mismatch stops the run (2026-09-27)."""
-    for key in ('spine', 'names', 'ledger', 'purposes'):
+    for key in ('spine', 'names', 'ledger', 'purposes', 'texts'):
         want = o.get(key + '_md5')
         if want and hashlib.md5(str(o.get(key) or '').encode('utf-8')).hexdigest() != want:
             sys.exit(f"STOP  {path}: the saved '{key}' is not what the server sent (its checksum differs). "
@@ -1378,7 +1431,8 @@ def spine_sql(data):
 -- Read-only, one call. It returns the Spine lines for this programme's exercises (by exId, or found by a
 -- card's name), how each card name resolves (the old node name scan, 2026-09-27), the athlete's live
 -- programme BEFORE this build (prev: the cycle just trained), their Exercise Ledger, their stored athlete
--- profile, the real minutes per day, each entry's purpose (the Because audit), and checksums: the checker
+-- profile, the real minutes per day, each entry's purpose (the Because audit), each entry's steps and cues
+-- (so a Coach's Note or a pill that repeats them is flagged, CUE-7), and checksums: the checker
 -- stops if the saved copy differs. Each Spine line ends with the entry's muscle credits and cost, which the
 -- volume count reads, and whether it has steps (How to do it, CUE-6).
 with cards(n) as (select unnest(array[{namelist}]::text[])),
@@ -1427,12 +1481,22 @@ s as (select
      where athlete_id = '{aid}' and day is not null and duration_min > 10 and hidden_at is null and completed_on >= current_date - 42
      group by day) x) as minutes,
  (select string_agg(e.id || '|' || regexp_replace(e.purpose, '\\s+', ' ', 'g'), E'\\n' order by e.id)
-  from public.exercises e where e.id in ({idlist}) and coalesce(e.purpose, '') <> '') as purposes)
+  from public.exercises e where e.id in ({idlist}) and coalesce(e.purpose, '') <> '') as purposes,
+ (select string_agg(e.id
+     || '|' || coalesce((select string_agg(regexp_replace(u.t, '\\s+', ' ', 'g'), ' ¶ ' order by u.o)
+          from jsonb_array_elements_text(case when jsonb_typeof(to_jsonb(e)->'steps') = 'array' then to_jsonb(e)->'steps'
+                                              else '[]'::jsonb end) with ordinality u(t, o)), '')
+     || '|' || coalesce((select string_agg(regexp_replace(c.t, '\\s+', ' ', 'g'), ' ¶ ' order by c.o)
+          from jsonb_array_elements_text(case when jsonb_typeof(e.cues->'good') = 'array' then e.cues->'good' else '[]'::jsonb end
+                                         || case when jsonb_typeof(e.cues->'bad') = 'array' then e.cues->'bad' else '[]'::jsonb end)
+               with ordinality c(t, o)), ''), E'\\n' order by e.id)
+  from public.exercises e where e.id in ({idlist})) as texts)
 select spine, md5(coalesce(spine, '')) spine_md5, names, md5(coalesce(names, '')) names_md5,
        prev, (select count(*) from jsonb_array_elements(case when jsonb_typeof(prev->'days') = 'array' then prev->'days' else '[]'::jsonb end) d,
                 jsonb_array_elements(case when jsonb_typeof(d->'blocks') = 'array' then d->'blocks' else '[]'::jsonb end) b,
                 jsonb_array_elements(case when jsonb_typeof(b->'x') = 'array' then b->'x' else '[]'::jsonb end) x) prev_n,
-       ledger, md5(coalesce(ledger, '')) ledger_md5, profile, minutes, purposes, md5(coalesce(purposes, '')) purposes_md5
+       ledger, md5(coalesce(ledger, '')) ledger_md5, profile, minutes, purposes, md5(coalesce(purposes, '')) purposes_md5,
+       texts, md5(coalesce(texts, '')) texts_md5
 from s;""")
 
 KEYS = ['athlete', 'sport', 'currentCycleIndex', 'cycles', 'workouts', 'notes']
@@ -1492,12 +1556,12 @@ def main():
     else: apply_profile(args, parse_profile(ctx.get('profile')), 'coaching log')
     if not args.week and spec_lines(args, 'week'):
         args.week = spec_lines(args, 'week')[0]  # the spec's example week (2026-09-26)
-    check_structure(data, args, ctx['spine'], ctx.get('names'))
+    check_structure(data, args, ctx['spine'], ctx.get('names')); check_pill_layers(data, ctx)
     check_names(data, ctx); check_tests(data, args); check_blocks(data); check_prep_rest(data, args)
     # --stage build runs straight after design, BEFORE engage writes a word (2026-09-26): a FAIL
     # there changes the programme while no note, Because or message has been written around it.
     if args.stage == 'final':
-        check_text(data); check_cards(data); check_notes(data); check_whys(data, ctx)
+        check_text(data); check_cards(data); check_notes(data, ctx); check_whys(data, ctx)
         check_obligations(data, args); check_placed(data, args)
     else:
         info('--stage build: the text checks (notes, Becauses, week-note words, RPE in text) run in the final pass')
