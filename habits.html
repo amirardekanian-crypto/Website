@@ -2508,12 +2508,20 @@ function questRuns() {
 // start date and only replaces a run starting on the same one, so overlap was
 // always one mid-week announcement away. A later run simply takes over from its
 // own start date, which is the rule activeQuestRun() already displays.
+//
+// A run can also be ENDED EARLY by the coach (end_quests(), stage55, 2026-10-11: "cancel keeps the XP already earned"). That gives
+// the run its own `end` day: it stops being live after it, a quest completed on or before it keeps paying, and one not completed
+// by then never does. hab_bonus_xp() reads the same `end` in its qruns CTE: change both together. A value that is not a date is
+// ignored, as on the server.
 function runEndKey(run) {
-  const natural = fmtKey(addDays(parseKey(run.start), QUEST_RUN_DAYS - 1));
+  let end = fmtKey(addDays(parseKey(run.start), QUEST_RUN_DAYS - 1));
   const next = questRuns().map(r => r.start).filter(s => s > run.start).sort()[0];
-  if (!next) return natural;
-  const dayBefore = fmtKey(addDays(parseKey(next), -1));
-  return dayBefore < natural ? dayBefore : natural;
+  if (next) {
+    const dayBefore = fmtKey(addDays(parseKey(next), -1));
+    if (dayBefore < end) end = dayBefore;
+  }
+  if (typeof run.end === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(run.end) && run.end < end) end = run.end;
+  return end;
 }
 function runQuests(run) {
   const pool = questPool();
@@ -5196,7 +5204,7 @@ function rulesSignature() {
     // one, or clearing a finished run, dropped their level with no word of
     // explanation. Both are precisely what the re-baseline path exists for.
     questPool().map(q => [q.id, q.kind, q.need, q.xp]),
-    questRuns().map(r => [r.start, r.ids]),
+    questRuns().map(r => [r.start, r.ids, r.end || null]),
     // The GATE RULE itself, not just its threshold. Pro-rata counters and the
     // one-miss door change which days qualify, which moves every day streak,
     // every `qualify` quest and every comeback — bump this token whenever that

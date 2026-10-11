@@ -127,7 +127,8 @@ among them the course lessons and the exercise library, which exist nowhere else
 cannot read must be fixed in the database first: with RLS and only a member policy it backs up as
 silently EMPTY, with no SELECT grant it is listed under "Could NOT read". The testing app's `assess_players`,
 `assess_notes` and `assess_results` were that case until stage50 (2026-10-11, Amir's yes): the coach now has a
-READ-ONLY policy on each and they are in the backup (`hab_season_results` was fixed in stage46). **Coaching logs keep every earlier text** in `coaching_log_versions` (stage47, 2026-10-10): a
+READ-ONLY policy on each and they are in the backup (`hab_season_results` was fixed in stage46). `buyer_notes` (stage53, the private note
+about each buyer) and `erasure_log` (stage54, the receipts of full erasures) are in it too. **Coaching logs keep every earlier text** in `coaching_log_versions` (stage47, 2026-10-10): a
 splice or upload that goes wrong can be put back with SQL.
 
 ## The athlete app (`program.html`) — read `PROGRAM-APP.md` before changing it
@@ -281,6 +282,10 @@ the rules are in **`XP_SYSTEM.md`**; quest runs are in **`QUESTS.md`** (moved ou
   captioned DAY STREAK, and "run" never comes back.
 - **"On target" means `dayQualifies()`.** Changing `streakQualifyPct` means both scorers and any text
   that names the number; a quest note never spells it out.
+- **Ending a quest run keeps the XP already earned** (Amir, 2026-10-11): the dashboard's button is `end_quests(start, today)`, which keeps
+  the run with an `end` day; both scorers read it (`hab_bonus_xp()`'s `qruns` CTE and `runEndKey()` in `habits.html`; pre-commit guard
+  16 and `scripts/test_spine_sql.sh` run the same cases). `clear_quests()` removes a run and takes its XP back, so it is the SQL editor
+  only, on purpose; the page never falls back to it.
 - **Roll call pays no XP** and no scorer reads `hab_notes`. The client shows 7 days and the server
   keeps 9, on purpose.
 - **Back closes the top layer here too** (NAV-01): `topLayer()` reads `UI`, `render()` ends with `navSync()`.
@@ -328,8 +333,21 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   (`writeFailed()`): a lapsed session sends writes as anonymous and RLS turns them into silent no-ops.
 - **Auth events rebuild the page only when the signed-in user changes** (token refreshes and tab refocus
   used to reload everything and throw away typed work).
+- **A person is erased by one call, `coach_erase_person()`** (stage54, 2026-10-11; Amir: "both athletes and buyers"), never table by
+  table from the page: the inline Erase panel asks for a dry run first (the function does the whole erasure and undoes it, so the
+  list shown is what a real run deletes), a real run needs the athlete id or the buyer's username typed, and after the deletes it
+  checks every table in the public and backup schemas with an `athlete_id` column, and every public `uuid` column called `user_id` or
+  `account_id`, and undoes everything if one still holds a row. **A table you add that holds a person's data goes into its table list
+  the day you create it** (`supabase/stage54_erase_person.sql`), and into `BACKUP_TABLES`; the one-off rollback copies the pipeline
+  makes live in the `backup` schema and are emptied for the person automatically. Intake forms are the coach's pick (matches by email,
+  WhatsApp number or name are offered, only a same-email one is ticked for you; a finder lists any other, at most 10). An affiliate partner record stays when its athlete
+  is erased (only the link is cleared). The private note about a buyer lives in `buyer_notes`, coach-only; the account rows' `label`
+  stays empty (a trigger moves anything written there). Tables are emptied in `publish_cycle()`'s lock order (programme first).
+- **The weekly call log is retired** (Amir, 2026-10-11): no Calls tab, no new call logs, no Copy cycle prompt; old logs are read and
+  deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
+  exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (47 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (59 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.
@@ -346,7 +364,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v98` on 2026-10-10). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v100` on 2026-10-11). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

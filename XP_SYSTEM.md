@@ -1010,7 +1010,7 @@ object. **It has 18 keys** (read from the live row, 2026-09-26), and every one b
 | `milestones` | `ACHIEVEMENTS` (32 rungs) | Milestone XP differs |
 | `quests` | `QUEST_POOL` | A quest pays on one side only |
 | `passTrack` | `PASS_TRACK`, plus the event titles in `EVENTS` | **The server refuses a title the app already gave** |
-| `questRuns` | — (cached on the phone as `CFG.questRuns`) | Server-only; written by `set_quests()` / `clear_quests()` |
+| `questRuns` | — (cached on the phone as `CFG.questRuns`) | Server-only; written by `set_quests()` / `end_quests()` / `clear_quests()` |
 
 Three more mirrors live in **SQL function bodies**, not on the row:
 
@@ -1157,7 +1157,7 @@ were always there they would be wallpaper.
 
 The everyday lever is **coach.html → Today → *Quest week***: tick one to four quests from
 the pool and press *Start the week* — a dashboard run always starts **today** — and
-*Cancel this run* while one is live. The SQL below does the same job and is the way to
+*End this run today* while one is live (it keeps the XP already earned, see *Ending a run early* below). The SQL below does the same job and is the way to
 back-date or future-date a run:
 
 ```sql
@@ -1167,7 +1167,13 @@ select public.set_quests('2026-07-29', array['w_water5','w_steps50k','w_perfect2
 Runs 29 July → 4 August inclusive. Pass however many ids you like — one, three, five.
 Re-running it with the same start date **replaces** that run.
 
-**Cancelling one:**
+**Ending one early, keeping what was earned** (stage55, 2026-10-11, Amir: *"yes, they keep it"*):
+
+```sql
+select public.end_quests('2026-07-29', '2026-07-31');   -- the run's last day is 31 July
+```
+
+**Taking a run's XP back on purpose** (the SQL editor only; the dashboard no longer offers it):
 
 ```sql
 select public.clear_quests('2026-07-29');
@@ -1188,6 +1194,16 @@ leave two runs covering the same days — and since `questEvents()` walks every 
 independently, as does `hab_bonus_xp()`, a quest id present in both **paid twice** off one
 stretch of logging. Both scorers did it identically, so the board and the phone agreed and
 were both wrong: the hardest kind of error to notice here.
+
+**Ending a run early** (stage55). `end_quests(start, end)` does not remove the run: it gives it an `end` day (capped
+at its seventh day; an end before the start drops a run that had not begun, since nothing was earned in it). The run's
+window is then the earliest of three bounds: its seventh day, the day before the next run starts, and its own `end`. Both
+scorers read it, in the same place: `hab_bonus_xp()`'s `qruns` CTE (`least(rstart + 6, next_start - 1, own_end)`) and
+`runEndKey()` in `habits.html`. A quest completed on or before the end day keeps paying (it pays once, on the day it
+completes, as always); one not completed by then never pays. The run stops being live the day after, so the quest block
+leaves the athlete's Progress screen. A value that is not a `YYYY-MM-DD` date in `end` is ignored by both.
+`scripts/test_quest_runs.js` (pre-commit guard 16) and `scripts/test_spine_sql.sh` section J run the same cases against the
+two sides. `rulesSignature()` includes the `end`, so ending a run re-baselines quietly instead of celebrating.
 
 A run's window now ends **the day before the next run starts** — a later run simply takes
 over, which is the same rule `activeQuestRun()` already used for display. `runEndKey()` on

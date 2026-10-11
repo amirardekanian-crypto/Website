@@ -199,7 +199,11 @@
 //      (the rule that only typed weights count stands), the clock is offered once a day, the Welcome has a ✕ and Back closes
 //      it, only Game Plan's Active banner goes Home, the rest pill is gone (the card's Rest ⏱ button and Guided remain), and the
 //      notes appear in a box in the middle of the screen.
-const CACHE = 'aap-v99';
+// v100: habits.html changed (2026-10-11, coach.html audit TODAY-1, stage55): a quest run the coach ENDS early keeps an `end` day, and
+//      runEndKey() stops the run there (a quest completed by then keeps paying, one not completed never does), the same bound the
+//      server's hab_bonus_xp() now reads. Without the bump an installed phone would keep scoring an ended run to its seventh day
+//      while the board stopped at the end day.
+const CACHE = 'aap-v100';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

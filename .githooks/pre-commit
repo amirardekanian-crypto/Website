@@ -1,5 +1,5 @@
 #!/bin/sh
-# Fifteen guards. Each runs only when its own files are staged, so a commit that
+# Sixteen guards. Each runs only when its own files are staged, so a commit that
 # touches none of them costs nothing.
 #
 # ── 1. habits.html must actually boot ────────────────────────────────────────
@@ -305,6 +305,22 @@ if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(program\.html|c
       echo "pre-commit: BLOCKED — the twin guard no longer fails when a twin drifts (details above)."
       failed=1
     fi
+  fi
+fi
+
+# ── 16. a quest run's last scoring day, phone and server (added 2026-10-11) ────────────────────────────────────────────────
+# Why: cancelling a quest week used to REMOVE the run, which took back the XP everyone had already earned from it (coach.html audit
+# TODAY-1). Since stage55 the coach ENDS a run: it keeps an `end` day that stops the run, and a quest completed by then keeps paying.
+# That bound lives twice, runEndKey() in habits.html and the qruns CTE of hab_bonus_xp() on the server, and when they differ the
+# board and the phone disagree about a quest's XP and nothing errors. scripts/test_quest_runs.js cuts runEndKey out of habits.html
+# and runs the vectors the SQL suite (scripts/test_spine_sql.sh, section J) runs against the server.
+if git diff --cached --name-only --diff-filter=ACM | grep -qE '^(habits\.html|scripts/test_quest_runs\.js)$'; then
+  echo "pre-commit: habits.html changed — checking a quest run's last scoring day..."
+  if ! node scripts/test_quest_runs.js >/dev/null; then
+    node scripts/test_quest_runs.js | grep -v '^ok '
+    echo ""
+    echo "pre-commit: BLOCKED — a quest run's window in habits.html no longer matches the rule (details above). The server twin is hab_bonus_xp()'s qruns CTE (stage55)."
+    failed=1
   fi
 fi
 

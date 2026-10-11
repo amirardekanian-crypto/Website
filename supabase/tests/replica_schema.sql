@@ -18,6 +18,16 @@ grant usage on schema auth to anon, authenticated;
 grant usage on schema public to anon, authenticated;
 grant execute on function auth.jwt() to anon, authenticated;
 
+-- auth.users with only the columns the code reads, and two of the auth tables that cascade from it on a delete (stage51, stage54).
+create table auth.users (id uuid primary key, email text, last_sign_in_at timestamptz);
+create table auth.identities (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users (id) on delete cascade);
+create table auth.sessions   (id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users (id) on delete cascade);
+
+-- The rollback copy the one-name rename left in a schema of its own on 2026-10-09: an old progress blob or session log per athlete
+-- (42 rows, 17 athletes, on 2026-10-11). It is the only table outside "public" with an athlete_id column; stage54 empties it for an erased athlete.
+create schema backup;
+create table backup.onename_2026_10_09 (id bigint generated always as identity primary key, athlete_id text, kind text, ref jsonb, old jsonb, saved_at timestamptz not null default now());
+
 -- stage44
 create or replace function public.is_coach()
 returns boolean language sql stable set search_path to 'public'
@@ -165,22 +175,25 @@ create or replace function auth.uid() returns uuid language sql stable as $$
 $$;
 grant execute on function auth.uid() to anon, authenticated;
 create table public.assess_accounts (
-  user_id uuid primary key, username text, label text, created_at timestamptz not null default now(),
+  user_id uuid primary key references auth.users (id) on delete cascade, username text unique, label text, created_at timestamptz not null default now(),
   initial_password text, password_set_at timestamptz, sent_at timestamptz, revoked_at timestamptz
 );
 create function public.assess_member() returns boolean language sql stable set search_path to 'public'
 as $$ select exists (select 1 from public.assess_accounts a where a.user_id = auth.uid() and a.revoked_at is null) $$;
 create table public.assess_players (
-  id uuid primary key default gen_random_uuid(), account_id uuid, name text, birth_year integer, birth_month integer,
-  sex text, hand text, squad text, created_at timestamptz default now(), updated_at timestamptz default now(), deleted_at timestamptz
+  id uuid primary key default gen_random_uuid(), account_id uuid references public.assess_accounts (user_id) on delete cascade, name text, birth_year integer, birth_month integer,
+  sex text, hand text, squad text, created_at timestamptz default now(), updated_at timestamptz default now(), deleted_at timestamptz,
+  unique (id, account_id)
 );
 create table public.assess_notes (
   id uuid primary key default gen_random_uuid(), player_id uuid, account_id uuid, body text,
-  created_at timestamptz default now(), deleted_at timestamptz
+  created_at timestamptz default now(), deleted_at timestamptz,
+  foreign key (player_id, account_id) references public.assess_players (id, account_id) on delete cascade
 );
 create table public.assess_results (
   player_id uuid, test text, day text, account_id uuid, value numeric, extra jsonb,
-  updated_at timestamptz default now(), deleted_at timestamptz, primary key (player_id, test, day)
+  updated_at timestamptz default now(), deleted_at timestamptz, primary key (player_id, test, day),
+  foreign key (player_id, account_id) references public.assess_players (id, account_id) on delete cascade
 );
 alter table public.assess_accounts enable row level security;
 alter table public.assess_players  enable row level security;
@@ -197,13 +210,94 @@ create policy "member owns results" on public.assess_results for all to authenti
 -- Supabase's default table grants for the signed-in role; row-level security is what limits them. anon has none.
 grant select, insert, update, delete on public.assess_accounts, public.assess_players, public.assess_notes, public.assess_results to authenticated;
 
--- stage51 (stored first passwords): auth.users with only the columns the trigger reads, and the other login tables.
-create table auth.users (id uuid primary key, email text, last_sign_in_at timestamptz);
+-- stage51 (stored first passwords): the other login tables (auth.users is defined near the top).
 create table public.athlete_identities (
   user_id uuid primary key references auth.users (id) on delete cascade, athlete_id text not null unique, email text,
   linked_at timestamptz not null default now(), initial_password text, password_set_at timestamptz, sent_at timestamptz
 );
 create table public.tps_accounts (
-  user_id uuid primary key, username text, label text, created_at timestamptz not null default now(),
+  user_id uuid primary key references auth.users (id) on delete cascade, username text unique, label text, created_at timestamptz not null default now(),
   initial_password text, password_set_at timestamptz, sent_at timestamptz, revoked_at timestamptz
+);
+alter table public.tps_accounts enable row level security;
+create policy "buyer reads own tps account" on public.tps_accounts for select to authenticated using (user_id = (select auth.uid()));
+create policy "coach manages tps accounts" on public.tps_accounts for all to authenticated
+  using ((select public.is_coach())) with check ((select public.is_coach()));
+grant select, insert, update, delete on public.tps_accounts to authenticated;
+
+-- stage52 (programme version history): the table and the stage44 trigger as the live project had them (the newest 20 per
+-- athlete). stage52 replaces the function; the trigger on programs stays.
+create table public.program_versions (
+  id bigserial primary key, athlete_id text not null, data jsonb not null,
+  saved_at timestamptz not null default now(), saved_by text, note text
+);
+create function public.programs_version_snapshot()
+returns trigger language plpgsql security definer set search_path to 'public'
+as $function$
+begin
+  if old.data is distinct from new.data then
+    insert into public.program_versions (athlete_id, data, saved_by) values (old.athlete_id, old.data, old.updated_by);
+    delete from public.program_versions v
+     where v.athlete_id = old.athlete_id
+       and v.id not in (select id from public.program_versions where athlete_id = old.athlete_id order by id desc limit 20);
+  end if;
+  new.updated_at := now();
+  new.updated_by := coalesce(auth.jwt() ->> 'email', new.updated_by);
+  return new;
+end $function$;
+create trigger programs_version_trg before update on public.programs
+  for each row execute function public.programs_version_snapshot();
+
+-- stage54 (full erasure): the other tables that hold a row under an athlete id, columns as the live catalogue has them
+-- (2026-10-11), the partner roster (stage29) and the intake forms (stage27). No policies: the function runs as the owner.
+create table public.hab_titles (
+  athlete_id text not null, title text not null, earned_on date not null default current_date,
+  created_at timestamptz not null default now(), primary key (athlete_id, title)
+);
+create table public.hab_season_results (
+  athlete_id text not null, starts_on date not null, season_name text not null, ended_on date not null,
+  level integer not null, xp bigint not null, created_at timestamptz not null default now(), primary key (athlete_id, starts_on)
+);
+create table public.library_sessions (
+  athlete_id text not null, slug text not null, completed_on date not null default current_date, counts_as text, title text,
+  category_id text, duration_min integer, created_at timestamptz not null default now(), primary key (athlete_id, slug, completed_on)
+);
+create table public.messages (
+  id bigint generated by default as identity primary key, athlete_id text not null, sender text not null, body text not null,
+  context text, created_at timestamptz not null default now(), read_by_coach boolean not null default false,
+  read_by_athlete boolean not null default false
+);
+create table public.call_logs (
+  id uuid primary key default gen_random_uuid(), athlete_id text not null, athlete_name text, call_date date not null, week text,
+  duration text, tier text, rating integer, scores jsonb not null default '{}'::jsonb, sessions_done integer, sessions_planned integer,
+  win_vault text, answers jsonb not null default '{}'::jsonb, summary text, created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(), ai_summary jsonb, ai_model text, ai_generated_at timestamptz
+);
+create table public.cycle_reports (
+  id uuid primary key default gen_random_uuid(), athlete_id text not null, athlete_name text, cycle text not null, report jsonb not null,
+  weeks_count integer, sessions_count integer, model text, generated_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
+);
+create table public.coaching_logs (
+  athlete_id text primary key, body text not null, updated_at timestamptz not null default now()
+);
+create table public.coaching_log_versions (
+  id bigserial primary key, athlete_id text not null, body text not null, saved_at timestamptz not null default now(),
+  was_updated_at timestamptz
+);
+create table public.affiliates (
+  code text primary key check (code ~ '^[A-Z0-9]{2,32}$'), percent integer not null default 10 check (percent between 1 and 90),
+  coach_name text, coach_name_fa text, instagram text, whatsapp text, email text, athlete_id text, applied_on date,
+  active boolean not null default true, retired_on date, notes text, created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create table public.hab_intake (
+  id uuid primary key default gen_random_uuid(), created_at timestamptz not null default now(), lang text not null default 'en',
+  name text, email text, contact text, programme text, payload jsonb not null default '{}'::jsonb,
+  status text not null default 'new', handled_at timestamptz
+);
+
+-- stage55 (quest runs): the one-row rules table the quest functions read and write (columns as live, 2026-10-11).
+create table public.xp_rules (
+  id integer primary key, rules jsonb not null, updated_at timestamptz not null default now()
 );

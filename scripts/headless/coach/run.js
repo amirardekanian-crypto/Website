@@ -299,7 +299,7 @@ S['wall-hide'] = async (b) => {
 
 // ── 10. Quest week ───────────────────────────────────────────────────────────
 S['quest-week'] = async (b) => {
-  const r = { id: 'quest-week', title: 'Today → start and cancel a quest week', checks: [] };
+  const r = { id: 'quest-week', title: 'Today → start a quest week and end it: the XP already earned is kept (stage55)', checks: [] };
   const { page, today, log } = await L.openCoach(b, {});
   const boxes = page.locator('#questPanel input[type=checkbox]');
   await boxes.nth(0).check(); await boxes.nth(1).check();
@@ -308,14 +308,43 @@ S['quest-week'] = async (b) => {
   await L.settle(page, 600);
   const st = lastOf(await L.callsSince(page, n0), x => x.kind === 'rpc' && x.name === 'set_quests');
   check(r, 'set_quests(today, [two ids])', st && st.payload.p_start === today && st.payload.p_ids.length === 2, st && st.payload);
-  check(r, 'the panel shows the live run', /Live run/i.test(await page.locator('#questPanel').innerText()), (await page.locator('#questPanel').innerText()).slice(0, 120));
+  const live = (await page.locator('#questPanel').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the panel shows the live run, and says everyone keeps the XP they earned if it is ended', /Live run/i.test(live) && /End this run today/i.test(live) && /keeps the XP they already earned/.test(live) && !/Cancel this run/i.test(live), live.slice(0, 200));
+  log.dialogs.length = 0;
   n0 = await L.nCalls(page);
   await page.locator('#questPanel .btn.danger').click();
   await L.settle(page, 600);
-  const cl = lastOf(await L.callsSince(page, n0), x => x.kind === 'rpc' && x.name === 'clear_quests');
-  check(r, 'clear_quests(start)', cl && cl.payload.p_start === today, cl && cl.payload);
-  check(r, 'the picker is back', (await page.locator('#questStartBtn').count()) === 1, '');
+  const cs = await L.callsSince(page, n0);
+  const en = lastOf(cs, x => x.kind === 'rpc' && x.name === 'end_quests');
+  check(r, 'end_quests(start, today): the run is ended, not removed', en && en.payload.p_start === today && en.payload.p_end === today && !cs.some(x => x.name === 'clear_quests'), en && en.payload);
+  const runs = (await L.db(page)).xp_rules[0].rules.questRuns;
+  check(r, 'the run is still on the server with its end day, so nobody loses XP', runs.length === 1 && runs[0].start === today && runs[0].end === today && runs[0].ids.length === 2, runs);
+  check(r, 'the confirm tells the coach everyone keeps the XP', log.dialogs.some(d => d.type === 'confirm' && /Everyone keeps the XP they already earned/.test(d.message)), log.dialogs.map(d => d.message.slice(0, 80)));
+  await L.settle(page, 400);
+  const ended = (await page.locator('#questPanel').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the panel now says the run ended early and everyone keeps the XP; the End button is gone (the run stays live until tonight, then the picker returns)', /ended early/i.test(ended) && /keeps the XP they already earned/.test(ended) && (await page.locator('#questPanel .btn.danger').count()) === 0, ended.slice(0, 260));
   r.evidence = { dialogs: log.dialogs.map(d => d.message.slice(0, 90)) };
+  await page.context().close();
+  return r;
+};
+
+S['quest-week-end-fails'] = async (b) => {
+  const r = { id: 'quest-week-end-fails', title: 'Ending a quest run when stage55 is not applied: nothing changes, and it never falls back to the call that takes the XP back', checks: [] };
+  const { page, today, log } = await L.openCoach(b, {});
+  await page.evaluate(() => { const x = window.__DB.xp_rules[0]; x.rules.questRuns = [{ start: new Date().toISOString().slice(0, 10), ids: ['w_water5'] }]; });
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
+  await page.evaluate(() => { window.__STUB.missingRpc = ['end_quests']; });
+  log.dialogs.length = 0;
+  const n0 = await L.nCalls(page);
+  await page.locator('#questPanel .btn.danger').click();
+  await L.settle(page, 600);
+  const cs = await L.callsSince(page, n0);
+  const alerts = log.dialogs.filter(d => d.type === 'alert').map(d => d.message);
+  check(r, 'the alert names the missing stage and says nothing was changed', alerts.length === 1 && /stage55_end_quests\.sql has not been run/.test(alerts[0]) && /Nothing was changed/.test(alerts[0]), alerts);
+  check(r, 'clear_quests is never called as a fallback', !cs.some(x => x.name === 'clear_quests'), cs.map(x => x.name));
+  const runs = (await L.db(page)).xp_rules[0].rules.questRuns;
+  check(r, 'the run is untouched', runs.length === 1 && !('end' in runs[0]), runs);
+  check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
 };
@@ -445,10 +474,13 @@ S['login-create'] = async (b) => {
   return r;
 };
 
-// ── 15. Delete a call log ────────────────────────────────────────────────────
+// ── 15. The call log is retired (Amir, 2026-10-11): old logs stay readable and deletable in File ──
 S['calllog-delete'] = async (b) => {
-  const r = { id: 'calllog-delete', title: 'Athlete → Calls → Delete a call log', checks: [] };
-  const { page } = await L.openCoach(b, { hash: 'a/ava_test/calls' });
+  const r = { id: 'calllog-delete', title: 'Athlete → File → Old call logs → Delete a call log (the Calls tab is retired)', checks: [] };
+  const { page } = await L.openCoach(b, { hash: 'a/ava_test/file' });
+  check(r, 'there is no Calls tab any more, and no "+ New call log" or "Copy cycle prompt"', (await page.locator('.subrail .stab', { hasText: 'Calls' }).count()) === 0
+    && !/New call log|Copy cycle prompt/.test(await page.locator('#content').innerText()), await page.locator('.subrail').innerText());
+  check(r, 'the old logs are listed in File, with their count and the note that the log is retired', /old call logs\s*·\s*2/i.test(await page.locator('#content').innerText()) && /call log is retired/.test(await page.locator('#content').innerText()), '');
   const before = await page.locator('details.day-c').count();
   const n0 = await L.nCalls(page);
   await page.locator('details.day-c').first().locator('summary').click();
@@ -457,8 +489,21 @@ S['calllog-delete'] = async (b) => {
   const del = lastOf(await L.callsSince(page, n0), c => c.name === 'call_logs' && c.op === 'delete');
   check(r, 'delete on call_logs by id', del && del.filters.length === 1 && /^id\.eq\./.test(del.filters[0]), del && del.filters);
   const after = await page.locator('details.day-c').count();
-  const sub = (await page.locator('.subrail .stab', { hasText: 'Calls' }).innerText()).replace(/\s+/g, ' ');
-  check(r, 'the deleted call disappears from the list and the count', after === before - 1, { before, after, subtab: sub, inDb: (await L.db(page)).call_logs.length });
+  const txt = await page.locator('#content').innerText();
+  check(r, 'the deleted call disappears from the list and the count', after === before - 1 && /old call logs\s*·\s*1/i.test(txt), { before, after, inDb: (await L.db(page)).call_logs.length });
+  await page.locator('details.day-c').first().locator('summary').click();
+  await page.locator('details.day-c').first().locator('.btn.danger').click();
+  await L.settle(page, 800);
+  check(r, 'with none left the section is gone (no empty "No call logs yet")', !/old call logs/i.test(await page.locator('#content').innerText()), '');
+  await page.context().close();
+  return r;
+};
+
+S['calls-old-link'] = async (b) => {
+  const r = { id: 'calls-old-link', title: 'An old #a/<id>/calls link opens the athlete, not an error', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/calls' });
+  check(r, 'the athlete opens on a screen that exists', /ava example/i.test(await page.locator('#content').innerText()) && (await page.locator('.subrail .stab.active').count()) === 1, await page.locator('.subrail').innerText());
+  check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
 };
@@ -472,8 +517,12 @@ S['version-restore'] = async (b) => {
   await ed.locator('.exed-acts button', { hasText: 'Save' }).click();
   await L.settle(page, 600);
   await L.go(page, 'a/ava_test/file');
+  const nHist = await L.nCalls(page);
   await page.locator('details.rawlog summary', { hasText: 'Version history' }).click();
   await page.locator('#pvlist .pvrow').first().waitFor();
+  const histReads = (await L.callsSince(page, nHist)).filter(c => c.name === 'program_versions' && c.op === 'select');
+  check(r, 'the list asks for up to 150 saves (stage52 keeps the previous cycle, not 20)', histReads.length === 1 && histReads[0].mods.limit === 150, histReads.map(c => c.mods.limit));
+  check(r, 'the caption says what is kept', /last 20 saves, and every save since the previous cycle began/.test(await page.locator('#pvlist').innerText()), (await page.locator('#pvlist').innerText()).slice(0, 300));
   const n0 = await L.nCalls(page);
   await page.locator('#pvlist .pvrow button').first().click();
   await L.settle(page, 800);
@@ -523,7 +572,7 @@ S['program-file-publish'] = async (b) => {
 // Tables that were each missing from the backup once with nothing erroring (CLAUDE.md, "A table added to the public schema goes
 // into BACKUP_TABLES the same day"): they must stay on it.
 const MUST_BE_BACKED_UP = ['exercises', 'exercise_coach', 'qualities', 'coaching_log_versions', 'spine_versions', 'hab_season_results',
-  'assess_players', 'assess_notes', 'assess_results'];
+  'assess_players', 'assess_notes', 'assess_results', 'buyer_notes', 'erasure_log'];
 async function takeBackup(page, tag) {
   await L.go(page, 'athletes');
   const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 30000 }), (async () => { await page.evaluate(() => document.querySelectorAll('details.tools').forEach(d => d.open = true)); await page.locator('details.tools button', { hasText: 'Backup' }).click(); })()]);
@@ -699,17 +748,16 @@ S['login-used-mark'] = async (b) => {
 };
 
 S['calls-load-fail'] = async (b) => {
-  const r = { id: 'calls-load-fail', title: 'Call logs fail to load: the Calls tab says so (it said "No call logs yet")', checks: [] };
+  const r = { id: 'calls-load-fail', title: 'Call logs fail to load: the File tab says so (it said "No call logs yet")', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'today' });
   await page.evaluate(() => { window.__STUB.fail.push({ kind: 'from', name: 'call_logs', op: 'select', message: 'fixture: offline', times: 1 }); });
-  await L.go(page, 'a/ava_test/calls');
+  await L.go(page, 'a/ava_test/file');
   const txt = await page.locator('#content').innerText();
-  check(r, 'the tab names the failure', /Call logs did not load/.test(txt) && !/No call logs yet/.test(txt), txt.slice(0, 300));
+  check(r, 'the File tab names the failure', /Call logs did not load/.test(txt) && !/No call logs yet/.test(txt), txt.slice(-600));
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
 };
-
 S['route-unknown-sub'] = async (b) => {
   const r = { id: 'route-unknown-sub', title: 'A link with an unknown screen name opens the athlete, not "no athlete"', checks: [] };
   const { page } = await L.openCoach(b, { hash: 'a/ava_test/nonsense' });
@@ -825,6 +873,575 @@ S['athlete-delete-fails'] = async (b) => {
     const d = await L.db(page);
     check(r, c.name + ': the sessions and the snapshot are both still there', d.session_history.filter(x => x.athlete_id === 'ben_test').length === 2 && d.athlete_progress.some(x => x.athlete_id === 'ben_test'), '');
   }
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── 20b. Full erasure of a person (stage54) ──────────────────────────────────
+// One more athlete with a row in every athlete table, a login, a Proof contact, three intake forms (the same email, the same
+// full name, a stranger) and a partner record linked to them. Only this page's in-memory stub is changed.
+async function seedErasable(page) {
+  await page.evaluate(() => {
+    const D = window.__DB, now = new Date().toISOString(), day = n => new Date(Date.now() - n * 86400e3).toISOString().slice(0, 10);
+    const prog = JSON.parse(JSON.stringify(D.programs.find(x => x.athlete_id === 'ben_test').data));
+    prog.athlete = Object.assign({}, prog.athlete, { id: 'zed_erase', firstName: 'Zed', lastName: 'Erased', tier: 'coached' });
+    D.programs.push({ athlete_id: 'zed_erase', data: prog, updated_at: now, updated_by: 'pipeline@example.invalid' });
+    D.program_versions.push({ id: 9001, athlete_id: 'zed_erase', data: {}, saved_at: now, saved_by: null, note: null });
+    [[1, day(1)], [2, day(2)]].forEach(([n, d]) => D.session_history.push({ athlete_id: 'zed_erase', athlete_name: 'Zed Erased', day: n, completed_on: d, status: 'Complete',
+      session_rpe: 7, duration_min: 40, readiness: null, day_note: null, focus: null, summary: null, updated_at: now, coach_status: 'read', log: null }));
+    D.athlete_progress.push({ athlete_id: 'zed_erase', athlete_name: 'Zed Erased', data: {}, updated_at: now });
+    D.athlete_identities.push({ user_id: 'u-zed', athlete_id: 'zed_erase', email: 'athlete.zed_erase@amirardekani.com', linked_at: now, initial_password: null, password_set_at: now, sent_at: now });
+    D.coaching_logs.push({ athlete_id: 'zed_erase', body: 'Fixture log', updated_at: now });
+    // the rollback copy of the 2026-10-09 rename (schema "backup" on the server): two rows for Zed, one for another athlete
+    D['backup.onename_2026_10_09'] = (D['backup.onename_2026_10_09'] || []).concat([
+      { id: 1, athlete_id: 'zed_erase', kind: 'progress', ref: {}, old: { zed_note: 'private words' }, saved_at: now },
+      { id: 2, athlete_id: 'zed_erase', kind: 'session_log', ref: { day: 1 }, old: {}, saved_at: now },
+      { id: 3, athlete_id: 'ben_test', kind: 'progress', ref: {}, old: {}, saved_at: now }]);
+    D.hab_contacts.push({ athlete_id: 'zed_erase', email: 'Zed.Erased@Example.Invalid', whatsapp: '+10000000009', source: 'proof.html', tier: 'coached', note: null, created_at: now, updated_at: now, display_name: 'Zed' });
+    const form = (id, name, email, contact) => ({ id, created_at: now, lang: 'en', name, email, contact: contact || '', programme: 'Set — $180 / 3 months', payload: {}, status: 'handled', handled_at: now });
+    // Zed's contact number is +1 000 000 0009; one form carries it typed with Persian digits and a Persian name (the common case on the live data)
+    D.hab_intake.push(form('zed-intake-email', 'Z. E.', ' zed.erased@example.invalid '), form('zed-intake-name', 'ZED  erased', 'other@example.invalid'),
+      form('zed-intake-wa', 'زد ارزد', '', '۱ ۰۰۰ ۰۰۰ ۰۰۰۹'), form('zed-intake-stranger', 'Someone Else', 'else@example.invalid', '@someone'));
+    D.affiliates.find(a => a.code === 'FIXTURE10').athlete_id = 'zed_erase';
+  });
+  await page.evaluate(() => hardRefresh());
+  await L.settle(page, 900);
+}
+const erasePanelText = async page => (await page.locator('.erase').innerText()).replace(/\s+/g, ' ');
+
+S['erase-athlete'] = async (b) => {
+  const r = { id: 'erase-athlete', title: 'File → Danger zone → Erase completely…: a dry run first, the id typed, one real call, everything gone', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  await seedErasable(page);
+  await L.go(page, 'a/zed_erase/file');
+  const before = JSON.stringify(await L.db(page));
+  const n0 = await L.nCalls(page);
+  await page.locator('button', { hasText: /Erase completely/ }).click();
+  await page.locator('.erase #eraseIn').waitFor();
+  const rpc0 = (await L.callsSince(page, n0)).filter(c => c.kind === 'rpc' && c.name === 'coach_erase_person');
+  check(r, 'opening the panel makes ONE call, and it is a dry run (kind and key only: no flag, no confirmation)', rpc0.length === 1 && JSON.stringify(rpc0[0].payload) === JSON.stringify({ p_kind: 'athlete', p_key: 'zed_erase' }), rpc0.map(c => c.payload));
+  check(r, '...which changed nothing on the server', JSON.stringify(await L.db(page)) === before, '');
+  const text = await erasePanelText(page);
+  check(r, 'the panel names them and lists what goes with real numbers', /Erase Zed Erased completely/.test(text) && /2 finished sessions/.test(text) && /1 programme\b/.test(text) && /1 coaching log\b/.test(text) && /1 contact record/.test(text) && /1 sign-in account/.test(text), text.slice(0, 600));
+  check(r, 'it also lists the rollback copies kept in the backup schema (not as a raw table name)', /2 saved rollback copies of their data/.test(text) && !/backup\.onename/.test(text), text.slice(0, 700));
+  check(r, 'it warns that this is a coached athlete with a live programme', /coached athlete with a live programme/.test(text), '');
+  const emailPick = page.locator('.erase .pick', { hasText: 'same email' }).locator('input'), namePick = page.locator('.erase .pick', { hasText: 'same name' }).locator('input');
+  const waPick = page.locator('.erase .pick', { hasText: 'same WhatsApp number' }).locator('input');
+  check(r, 'three intake forms are offered: only the same-EMAIL one is ticked (a number can be a foreign number or a handle), the same-number and same-name ones are not, the stranger\'s is not listed', (await page.locator('.erase .pick').count()) === 3 && await emailPick.isChecked() && !(await waPick.isChecked()) && !(await namePick.isChecked()) && !/Someone Else/.test(text), text.slice(0, 900));
+  check(r, 'the finder box is there, and the panel says one form will go, by name', (await page.locator('#eraseFindIn').count()) === 1 && /1 intake form will be erased with them/.test(text), text.slice(0, 1100));
+  check(r, 'it says what stays: backups, the inbox, and that the partner record stays with only its link removed', /weekly backup files/.test(text) && /inbox/.test(text) && /FIXTURE10 stays on the Affiliates tab/.test(text), text.slice(-420));
+  check(r, 'it says when the last backup was taken (none yet here), because that file is the only way back from a mistake', /last ⤓ Backup on this computer: none yet/.test(text) && /only way back/.test(text), text.slice(-520));
+  const go = page.locator('#eraseGo');
+  check(r, 'Erase for good is disabled until the id is typed', await go.isDisabled(), '');
+  await page.locator('#eraseIn').fill('zed');
+  check(r, '...and stays disabled for a wrong word', await go.isDisabled(), '');
+  await page.locator('#eraseIn').fill('ZED_Eras');
+  check(r, '...and is still disabled one letter short', await go.isDisabled(), '');
+  await page.locator('#eraseIn').fill('ZED_Erase');
+  check(r, '...and is enabled for the right id in any case', await go.isEnabled(), '');
+  await namePick.check(); await waPick.check();   // the coach ticks the other two offered forms by hand
+  const n1 = await L.nCalls(page);
+  log.dialogs.length = 0;
+  await go.click();
+  await L.settle(page, 1300);
+  const cs = await L.callsSince(page, n1);
+  const real = cs.filter(c => c.kind === 'rpc' && c.name === 'coach_erase_person');
+  check(r, 'exactly one real call, with the typed id and the three ticked forms', real.length === 1 && real[0].payload.p_dry_run === false && real[0].payload.p_confirm === 'ZED_Erase'
+    && real[0].payload.p_kind === 'athlete' && real[0].payload.p_key === 'zed_erase' && JSON.stringify([...real[0].payload.p_intake_ids].sort()) === JSON.stringify(['zed-intake-email', 'zed-intake-name', 'zed-intake-wa']), real.map(c => c.payload));
+  check(r, 'no separate deletes from the page (it is one transaction on the server)', !cs.some(c => c.kind === 'from' && c.op === 'delete'), '');
+  const d = await L.db(page);
+  const left = Object.keys(d).filter(t => Array.isArray(d[t]) && d[t].some(x => x.athlete_id === 'zed_erase'));
+  check(r, 'nothing is left under their id in any table', left.length === 0, left);
+  check(r, '...including the rollback copies in the backup schema, while another athlete\'s stay', (d['backup.onename_2026_10_09'] || []).filter(x => x.athlete_id === 'zed_erase').length === 0
+    && (d['backup.onename_2026_10_09'] || []).filter(x => x.athlete_id === 'ben_test').length === 1, d['backup.onename_2026_10_09']);
+  check(r, 'the stranger\'s intake form is still there; the three chosen ones are gone', d.hab_intake.some(i => i.id === 'zed-intake-stranger') && !d.hab_intake.some(i => /^zed-intake-(email|name|wa)$/.test(i.id)), d.hab_intake.map(i => i.id));
+  check(r, 'the partner record stays, unlinked', d.affiliates.some(a => a.code === 'FIXTURE10' && a.athlete_id === null), '');
+  check(r, 'other athletes keep everything', d.session_history.filter(x => x.athlete_id === 'ben_test').length === 2 && d.programs.some(x => x.athlete_id === 'ben_test') && d.athlete_identities.some(x => x.athlete_id === 'ben_test'), '');
+  check(r, 'a receipt row was written', d.erasure_log.length === 1 && d.erasure_log[0].kind === 'athlete', d.erasure_log);
+  check(r, 'they are off the roster and the page is back on the Athletes tab', (await page.evaluate(() => location.hash)) === '#athletes' && !(await page.evaluate(() => !!S.ath.zed_erase)), await page.evaluate(() => location.hash));
+  const al = log.dialogs.filter(x => x.type === 'alert').map(x => x.message);
+  check(r, 'one receipt alert: the receipt number, what is left to do, the partner note', al.length === 1 && /Receipt #1/.test(al[0]) && /weekly backup files/.test(al[0]) && /FIXTURE10/.test(al[0]) && !/native/.test(al[0]), al);
+  check(r, '...it names the intake forms that went, says the sign-in account went, and warns that an open phone can save once more', /Intake forms erased: .*Z\. E\./.test(al[0]) && !/[<>]/.test(al[0]) && /sign-in account included/.test(al[0]) && /app was open on a phone/.test(al[0]), al[0]);
+  check(r, 'no confirm() or prompt() dialogs were used', !log.dialogs.some(x => x.type === 'confirm' || x.type === 'prompt'), log.dialogs.map(x => x.type));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['erase-guards'] = async (b) => {
+  const r = { id: 'erase-guards', title: 'Erase completely…: a wrong id, Cancel, leaving the page, and the ids that are never offered', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  await seedErasable(page);
+  await page.evaluate(() => {
+    const D = window.__DB, p = JSON.parse(JSON.stringify(D.programs.find(x => x.athlete_id === 'ben_test').data));
+    p.athlete = Object.assign({}, p.athlete, { id: 'amir_ardekani', firstName: 'Amir', lastName: 'Board' });
+    D.programs.push({ athlete_id: 'amir_ardekani', data: p, updated_at: new Date().toISOString(), updated_by: null });
+  });
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
+  await L.go(page, 'a/zed_erase/file');
+  await page.locator('button', { hasText: /Erase completely/ }).click();
+  await page.locator('#eraseIn').waitFor();
+  const n0 = await L.nCalls(page);
+  await page.locator('#eraseIn').fill('not-the-id');
+  await page.locator('#eraseIn').press('Enter');
+  await L.settle(page, 400);
+  check(r, 'Enter with the wrong id calls nothing and says what to type', (await L.callsSince(page, n0)).filter(c => c.kind === 'rpc').length === 0 && /Type zed_erase exactly/.test(await L.toastText(page)), await L.toastText(page));
+  await page.locator('.erase button', { hasText: 'Cancel' }).click();
+  check(r, 'Cancel closes the panel and brings the button back', (await page.locator('.erase').count()) === 0 && (await page.locator('button', { hasText: /Erase completely/ }).count()) === 1, '');
+  await page.locator('button', { hasText: /Erase completely/ }).click(); await page.locator('#eraseIn').waitFor();
+  await L.go(page, 'athletes'); await L.go(page, 'a/zed_erase/file');
+  check(r, 'an open panel does not follow the coach to another screen', (await page.locator('.erase').count()) === 0, '');
+  await L.go(page, 'a/amir_ardekani/file');
+  const t = (await page.locator('#content').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the board identity gets no Erase button and the page says why', (await page.locator('button', { hasText: /Erase completely/ }).count()) === 0 && /Not offered here/.test(t), t.slice(-300));
+  const d = await L.db(page);
+  check(r, 'nothing was erased by any of that', d.programs.some(x => x.athlete_id === 'zed_erase') && d.erasure_log.length === 0, '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// The server refuses, the sign-in lapsed, stage54 is not applied, or the answer never comes back.
+S['erase-fails'] = async (b) => {
+  const r = { id: 'erase-fails', title: 'Erase completely… when the server cannot or will not: nothing goes, and the words fit the cause', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  await seedErasable(page);
+  await L.go(page, 'a/zed_erase/file');
+  const open = async () => { await page.locator('button', { hasText: /Erase completely/ }).click(); await page.waitForFunction(() => !!document.querySelector('.erase #eraseIn, .erase .eh'), null, { timeout: 5000 }); await L.settle(page, 250); };
+  const intact = async () => { const d = await L.db(page); return d.programs.some(x => x.athlete_id === 'zed_erase') && d.session_history.filter(x => x.athlete_id === 'zed_erase').length === 2 && d.erasure_log.length === 0; };
+
+  // 1. the server does not have the function yet
+  await page.evaluate(() => { window.__STUB.missingRpc = ['coach_erase_person']; });
+  await open();
+  let t = await erasePanelText(page);
+  check(r, 'stage54 not applied: the panel says which file to run, and offers no erase button', /cannot be erased now/.test(t) && /Run supabase\/PASTE-1-run-in-sql-editor\.sql in the Supabase SQL editor/.test(t) && (await page.locator('#eraseGo').count()) === 0, t);
+  await page.locator('.erase button', { hasText: 'Close' }).click();
+  await page.evaluate(() => { window.__STUB.missingRpc = []; });
+  // 2. the dry run is refused
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_erase_person', message: 'That login is yours, the coach\'s. Nothing was erased.', times: 1 }));
+  await open();
+  t = await erasePanelText(page);
+  check(r, 'a refusal from the server is shown in its own words, with no erase button', /That login is yours/.test(t) && (await page.locator('#eraseGo').count()) === 0, t);
+  await page.locator('.erase button', { hasText: 'Close' }).click();
+  // 3. real run: a server error, a lapsed sign-in, then an answer that never arrives
+  await open();
+  await page.locator('#eraseIn').fill('zed_erase');
+  const cases = [
+    { name: 'a server error', set: () => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_erase_person', message: 'fixture: connection reset', times: 1 }), say: /Nothing was erased: fixture: connection reset/ },
+    { name: 'a lapsed sign-in', set: () => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_erase_person', message: 'permission denied for function coach_erase_person', times: 1 }), say: /sign-in may have lapsed/ },
+  ];
+  for (const c of cases) {
+    log.dialogs.length = 0;
+    await page.evaluate(c.set);
+    await page.locator('#eraseGo').click();
+    await L.settle(page, 600);
+    const alerts = log.dialogs.filter(x => x.type === 'alert').map(x => x.message);
+    check(r, c.name + ': the alert says nothing was erased, in words that fit', alerts.length === 1 && c.say.test(alerts[0]) && /nothing was half done/.test(alerts[0]), alerts);
+    check(r, c.name + ': the panel is still open with the word typed, and the data is intact', (await page.locator('#eraseGo').isEnabled()) && (await page.locator('#eraseIn').inputValue()) === 'zed_erase' && await intact(), '');
+  }
+  log.dialogs.length = 0;
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_erase_person', message: 'TypeError: Failed to fetch', code: '', times: 1 }));
+  await page.locator('#eraseGo').click();
+  await L.settle(page, 600);
+  t = await erasePanelText(page);
+  const alerts = log.dialogs.filter(x => x.type === 'alert').map(x => x.message);
+  check(r, 'the answer never arrives: the panel says it cannot tell, and does NOT claim nothing was erased', /answer never arrived/.test(t) && /cannot tell whether Zed Erased was erased/.test(t) && !/Nothing was erased/.test(t) && !alerts.length, t);
+  check(r, '...and tells the coach how to find out: gone from the roster after a Refresh = it went through', /Refresh/.test(t) && /gone from the roster, it went through/.test(t) && /still there, nothing was erased/.test(t), t);
+  // an error that proves the transaction never committed (a deadlock) vs one that does not (PostgREST's own connection error)
+  await page.locator('.erase button', { hasText: 'Close' }).click();
+  await open();
+  await page.locator('#eraseIn').fill('zed_erase');
+  log.dialogs.length = 0;
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_erase_person', message: 'deadlock detected', code: '40P01', times: 1 }));
+  await page.locator('#eraseGo').click();
+  await L.settle(page, 600);
+  let al2 = log.dialogs.filter(x => x.type === 'alert').map(x => x.message);
+  check(r, 'a deadlock (40P01) proves nothing committed: the alert says so and the panel stays open', al2.length === 1 && /Nothing was erased: deadlock detected/.test(al2[0]) && (await page.locator('#eraseGo').isEnabled()) && await intact(), al2);
+  log.dialogs.length = 0;
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_erase_person', message: 'Internal error while the connection closed', code: 'PGRST001', times: 1 }));
+  await page.locator('#eraseGo').click();
+  await L.settle(page, 600);
+  t = await erasePanelText(page);
+  al2 = log.dialogs.filter(x => x.type === 'alert').map(x => x.message);
+  check(r, 'PostgREST\'s own connection error (PGRST001) does NOT prove that: the panel says it cannot tell, with no "nothing was erased" claim', /cannot tell whether Zed Erased was erased/.test(t) && !/Nothing was erased:/.test(t) && !al2.length, t);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// The intake-form finder (Amir, 2026-10-11: "pick any form in the Erase panel"): the matches are only OFFERED; any form can be named.
+const seedBare = (page, id, first, last) => page.evaluate(([id, first, last]) => {
+  const D = window.__DB, now = new Date().toISOString();
+  const prog = JSON.parse(JSON.stringify(D.programs.find(x => x.athlete_id === 'ben_test').data));
+  prog.athlete = Object.assign({}, prog.athlete, { id, firstName: first, lastName: last, tier: 'coached' });
+  D.programs.push({ athlete_id: id, data: prog, updated_at: now, updated_by: null });
+  D.session_history.push({ athlete_id: id, athlete_name: first + ' ' + last, day: 1, completed_on: now.slice(0, 10), status: 'Complete', session_rpe: 7, duration_min: 40, readiness: null, day_note: null, focus: null, summary: null, updated_at: now, coach_status: 'read', log: null });
+}, [id, first, last]);
+S['erase-forms'] = async (b) => {
+  const r = { id: 'erase-forms', title: 'Erase completely…: shared contacts are not ticked for you, the finder names any other form, the cap of 10, remove, a form that is gone, focus', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  await seedErasable(page);
+  const NAMES = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'India', 'Juliet', 'Kilo', 'Lima'];
+  await page.evaluate(NAMES => {
+    const D = window.__DB, now = new Date().toISOString();
+    // another athlete's contact carries Zed's number (a parent's, say): the form that carries it is "shared"
+    D.hab_contacts.push({ athlete_id: 'sib_test', email: null, whatsapp: '+1 000 000 0009', source: 'proof.html', tier: 'free', note: null, created_at: now, updated_at: now, display_name: 'Sib' });
+    // twelve more forms, none of them Zed's by email, number or name
+    NAMES.forEach((n, i) => D.hab_intake.push({ id: 'bulk-' + (i + 1), created_at: now, lang: 'fa', name: 'Bulk ' + n, email: 'bulk' + (i + 1) + '@example.invalid', contact: '@bulk' + (i + 1), programme: 'Set', payload: {}, status: 'handled', handled_at: now }));
+  }, NAMES);
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  await L.go(page, 'a/zed_erase/file');
+  await page.locator('button', { hasText: /Erase completely/ }).click();
+  await page.locator('.erase #eraseIn').waitFor();
+  let t = await erasePanelText(page);
+  const waRow = page.locator('.erase .pick', { hasText: 'same WhatsApp number' });
+  check(r, 'the form that carries a number another athlete\'s contact also has is offered, flagged, and NOT ticked for you; the email form is ticked',
+    (await waRow.count()) === 1 && !(await waRow.locator('input').isChecked()) && /also another athlete's/i.test(await waRow.innerText()) && /not ticked for you/.test(await page.locator('.erase').innerText())
+    && await page.locator('.erase .pick', { hasText: 'same email' }).locator('input').isChecked(), t.slice(0, 900));
+  const others = (await L.db(page)).hab_intake.length - 3;   // every form except the three the panel offers
+  check(r, 'the panel says one form will go, by name, and the finder lists how many others there are', /1 intake form will be erased with them/.test(t) && /Z\. E\./.test(t) && new RegExp(others + ' other forms in the Intake tab').test(t), t.slice(0, 1100) + ' | others=' + others);
+  // the finder: typing redraws only its results, so the box keeps focus
+  const find = page.locator('#eraseFindIn');
+  await find.click(); await find.pressSequentially('someone');
+  check(r, 'typing in the finder keeps focus in the finder (only the results are redrawn)', await page.evaluate(() => document.activeElement && document.activeElement.id) === 'eraseFindIn', '');
+  const stranger = page.locator('#eraseFound .pick', { hasText: 'Someone Else' });
+  check(r, 'a form that nothing matched is found by a part of its name, with its email and contact on the line', (await stranger.count()) === 1 && /else@example\.invalid/.test(await stranger.innerText()) && /@someone/.test(await stranger.innerText()), await page.locator('#eraseFound').innerText());
+  await stranger.locator('input').check();
+  t = await erasePanelText(page);
+  check(r, 'ticking it puts it in the list of forms that will go, by name and date', /2 intake forms will be erased with them/.test(t) && /Someone Else \(/.test(t), t.slice(0, 1200));
+  await find.fill('zzzz-nobody');
+  check(r, 'a search with no hit says so', /No other form matches “zzzz-nobody”/.test(await page.locator('#eraseFound').innerText()), await page.locator('#eraseFound').innerText());
+  await find.fill('alpha');
+  check(r, 'a search narrows to the one form', (await page.locator('#eraseFound .pick').count()) === 1, await page.locator('#eraseFound').innerText());
+  await find.fill('bulk');
+  const shown = page.locator('#eraseFound .pick');
+  check(r, '"bulk" matches 12 forms: 8 are listed and the rest is a count, not a scroll', (await shown.count()) === 8 && /4 more match\. Type more to narrow it down/.test(await page.locator('#eraseFound').innerText()), await page.locator('#eraseFound').innerText());
+  for (let i = 0; i < 8; i++) await shown.nth(i).locator('input').check();
+  t = await erasePanelText(page);
+  check(r, 'eight more ticked: ten forms will go', /10 intake forms will be erased with them/.test(t), t.slice(0, 1400));
+  // the cap: find a bulk form that is not ticked yet by name, and try to tick it
+  const left = await page.evaluate(() => window.__DB.hab_intake.filter(i => /^bulk-/.test(i.id) && !_erase.picked.includes(i.id)).map(i => i.name));
+  await find.fill(left[0]);
+  await page.locator('#eraseFound .pick input').first().click();   // click, not check(): the box is meant to un-tick itself
+  await L.settle(page, 300);
+  t = await erasePanelText(page);
+  check(r, 'an 11th form is refused with a toast and is not ticked (the cap is 10)', left.length === 4 && /10 intake forms will be erased with them/.test(t) && !/11 intake forms/.test(t) && /At most 10 intake forms/.test(await L.toastText(page)) && !(await page.locator('#eraseFound .pick input').first().isChecked()), (await L.toastText(page)) + ' | ' + t.slice(0, 200));
+  // remove: the stranger's form comes off the list
+  await page.locator('#erasePicked li', { hasText: 'Someone Else' }).locator('button').click();
+  t = await erasePanelText(page);
+  check(r, '"remove" next to a form takes it off the list', /9 intake forms will be erased with them/.test(t) && !/Someone Else \(/.test(t), t.slice(0, 400));
+  // focus survives a redraw of the whole page
+  await page.locator('#eraseIn').fill('zed');
+  await page.evaluate(() => render());
+  const st = await page.evaluate(() => ({ id: document.activeElement && document.activeElement.id, at: document.activeElement && document.activeElement.selectionStart, v: document.activeElement && document.activeElement.value }));
+  check(r, 'after the whole page is redrawn the confirm box still has focus, its text and its caret', st.id === 'eraseIn' && st.v === 'zed' && st.at === 3, st);
+  // ...and the redraw does not scroll the page (focus() without preventScroll jumped it back to the box). Instant scrolling, so a jump shows at once.
+  await L.settle(page, 1500);   // let any redraw the page schedules itself (Proof levels) finish first
+  await page.addStyleTag({ content: 'html { scroll-behavior: auto !important; }' });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForFunction(() => window.scrollY === 0, null, { timeout: 4000 }).catch(() => {});
+  const y0 = await page.evaluate(() => window.scrollY);
+  await page.evaluate(() => { document.getElementById('eraseIn').dataset.mark = 'old'; });   // to prove the redraw really replaced the box
+  await page.evaluate(() => render());
+  await L.settle(page, 300);
+  const y1 = await page.evaluate(() => window.scrollY);
+  const geo = await page.evaluate(() => ({ vh: innerHeight, docH: document.documentElement.scrollHeight, boxTop: Math.round(document.getElementById('eraseIn').getBoundingClientRect().top + scrollY), active: document.activeElement && document.activeElement.id, replaced: document.getElementById('eraseIn').dataset.mark !== 'old' }));
+  check(r, 'a redraw with the focus in the confirm box does not jump the page to the box (a few pixels of layout settling are fine; the bug moved it by hundreds)', y0 === 0 && Math.abs(y1 - y0) < 100 && geo.replaced && geo.boxTop > geo.vh + 200, { y0, y1, geo });
+  // a ticked form that is gone by the time the button is pressed stops the erasure
+  await page.evaluate(() => { const D = window.__DB; D.hab_intake = D.hab_intake.filter(i => i.id !== 'zed-intake-email'); });
+  await page.locator('#eraseIn').fill('zed_erase');
+  log.dialogs.length = 0;
+  await page.locator('#eraseGo').click();
+  await L.settle(page, 700);
+  const al = log.dialogs.filter(x => x.type === 'alert').map(x => x.message);
+  const d0 = await L.db(page);
+  check(r, 'a ticked form that no longer exists stops the erasure with the server\'s words, and nothing is erased', al.length === 1 && /Nothing was erased: One of the intake forms does not exist/.test(al[0]) && d0.programs.some(x => x.athlete_id === 'zed_erase') && d0.erasure_log.length === 0, al);
+  // put the form back and erase
+  await page.evaluate(() => { const D = window.__DB; D.hab_intake.push({ id: 'zed-intake-email', created_at: new Date().toISOString(), lang: 'en', name: 'Z. E.', email: ' zed.erased@example.invalid ', contact: '', programme: 'Set', payload: {}, status: 'handled', handled_at: null }); });
+  log.dialogs.length = 0;
+  await page.locator('#eraseGo').click();
+  await L.settle(page, 1300);
+  const d = await L.db(page);
+  const ids = d.hab_intake.map(i => i.id);
+  const calls = (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === 'coach_erase_person' && c.payload.p_dry_run === false);
+  check(r, 'the real call carries the nine ticked forms and not the shared-number one, the same-name one or the stranger\'s', calls.length === 2 && calls[1].payload.p_intake_ids.length === 9
+    && !calls[1].payload.p_intake_ids.some(i => ['zed-intake-wa', 'zed-intake-name', 'zed-intake-stranger'].includes(i)), calls.map(c => c.payload.p_intake_ids));
+  check(r, 'those nine are gone; the shared-number form, the same-name form, the stranger\'s and the four forms nobody ticked are still there',
+    !ids.includes('zed-intake-email') && ['zed-intake-wa', 'zed-intake-name', 'zed-intake-stranger'].every(i => ids.includes(i)) && ids.filter(i => /^bulk-/.test(i)).length === 4, ids);
+  const al3 = log.dialogs.filter(x => x.type === 'alert').map(x => x.message).slice(-1)[0] || '';
+  check(r, 'the final alert lists the nine forms by name, as plain text (no markup)', /Intake forms erased: .*Z\. E\./.test(al3) && /Bulk /.test(al3) && !/[<>]/.test(al3), al3);
+
+  // exactly one form offered: "carries", not "carryes", and it is ticked
+  await seedBare(page, 'uno_erase', 'Uno', 'Erase');
+  await page.evaluate(() => { const D = window.__DB, now = new Date().toISOString();
+    D.hab_contacts.push({ athlete_id: 'uno_erase', email: 'uno@example.invalid', whatsapp: null, source: 'proof.html', tier: 'coached', note: null, created_at: now, updated_at: now, display_name: 'Uno' });
+    D.hab_intake.push({ id: 'uno-form', created_at: now, lang: 'en', name: 'Uno Erase', email: 'uno@example.invalid', contact: '', programme: 'Set', payload: {}, status: 'handled', handled_at: now }); });
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  await L.go(page, 'a/uno_erase/file');
+  await page.locator('button', { hasText: /Erase completely/ }).click();
+  await page.locator('.erase #eraseIn').waitFor();
+  t = await erasePanelText(page);
+  check(r, 'one offered form: the words are "1 intake form carries their email…", and it is ticked', /1 intake form carries their email/.test(t) && /1 intake form will be erased with them/.test(t) && !/carryes/.test(t), t.slice(0, 700));
+  await page.locator('.erase button', { hasText: 'Cancel' }).click();
+
+  // an athlete with no login and no form: the alert does not claim a sign-in account, and says that no form went
+  await seedBare(page, 'nolo_erase', 'Nolo', 'Erase');
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  await L.go(page, 'a/nolo_erase/file');
+  await page.locator('button', { hasText: /Erase completely/ }).click();
+  await page.locator('.erase #eraseIn').waitFor();
+  t = await erasePanelText(page);
+  check(r, 'with nothing matched the panel says so, why that is common, and offers the finder', /none carries their email, WhatsApp number or full name/.test(t) && /most forms are in Persian/.test(t) && (await page.locator('#eraseFindIn').count()) === 1 && /No intake form is ticked, so none will be erased/.test(t), t.slice(0, 900));
+  await page.locator('#eraseIn').fill('nolo_erase');
+  log.dialogs.length = 0;
+  await page.locator('#eraseGo').click();
+  await L.settle(page, 1300);
+  const al4 = log.dialogs.filter(x => x.type === 'alert').map(x => x.message).slice(-1)[0] || '';
+  check(r, 'the alert does not claim a sign-in account for an athlete who had none, and says no form was erased', /Erased Nolo Erase for good/.test(al4) && !/sign-in account included/.test(al4) && /No intake form was erased/.test(al4), al4);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// A revoked buyer's panel was drawn inside a closed <details>: invisible. It opens for the person whose Erase is open.
+S['erase-revoked'] = async (b) => {
+  const r = { id: 'erase-revoked', title: 'Course and Testing lists: Erase… on a REVOKED buyer shows its panel (the Revoked section opens)', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'course' });
+  const rev = new Date().toISOString();
+  await page.evaluate(rev => {
+    const D = window.__DB, base = { label: null, created_at: rev, initial_password: null, password_set_at: rev, sent_at: rev, revoked_at: rev };
+    D.tps_accounts.push(Object.assign({ user_id: 'u-tps-rev', username: 'revoked_course' }, base));
+    D.assess_accounts.push(Object.assign({ user_id: 'u-assess-rev', username: 'revoked_academy' }, base));
+  }, rev);
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  await L.go(page, 'course');
+  const det = page.locator('details', { has: page.locator('summary', { hasText: /Revoked/ }) });
+  check(r, 'the Revoked section is closed until something in it is opened', (await det.count()) === 1 && (await det.getAttribute('open')) === null, '');
+  await det.locator('summary').click();
+  await det.locator('.credrow', { hasText: 'revoked_course' }).locator('.tp-erase').click();
+  await page.locator('.erase #eraseIn').waitFor({ state: 'visible', timeout: 5000 });
+  check(r, 'Erase… on a revoked course buyer: the panel is VISIBLE', await page.locator('.erase').isVisible() && await page.locator('#eraseIn').isVisible(), '');
+  await page.evaluate(() => render());
+  check(r, '...and still visible after the page redraws (the section stays open)', await page.locator('.erase').isVisible() && (await det.getAttribute('open')) !== null, '');
+  await page.locator('.erase button', { hasText: 'Cancel' }).click();
+  await L.go(page, 'assess');
+  const det2 = page.locator('details', { has: page.locator('summary', { hasText: /Revoked/ }) });
+  await det2.locator('summary').click();
+  await det2.locator('.credrow', { hasText: 'revoked_academy' }).locator('.as-erase').click();
+  await page.locator('.erase #eraseIn').waitFor({ state: 'visible', timeout: 5000 });
+  await page.evaluate(() => render());
+  check(r, 'the same on the testing-app list, also after a redraw', await page.locator('.erase').isVisible() && await page.locator('#eraseIn').isVisible(), '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// An answer that does not come: after 30 s the coach may stop waiting; a success that arrives later still finishes the job.
+S['erase-slow'] = async (b) => {
+  const r = { id: 'erase-slow', title: 'Erase completely… when the server is slow: Stop waiting after 30 s, and a late success still finishes (fake clock)', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  await seedErasable(page);
+  await L.go(page, 'a/zed_erase/file');
+  await page.locator('button', { hasText: /Erase completely/ }).click();
+  await page.locator('.erase #eraseIn').waitFor();
+  await page.locator('#eraseIn').fill('zed_erase');
+  await page.clock.install();
+  await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 40000; });
+  log.dialogs.length = 0;
+  await page.locator('#eraseGo').click();
+  await page.clock.runFor(5000);
+  let t = await erasePanelText(page);
+  check(r, 'while it waits (5 s) the panel says Erasing… and Cancel is disabled', /Erasing…/.test(t) && await page.locator('.erase button', { hasText: 'Cancel' }).isDisabled() && (await page.locator('.erase button', { hasText: 'Stop waiting' }).count()) === 0, t.slice(-200));
+  await page.clock.runFor(26000);
+  check(r, 'after 30 s a "Stop waiting" button replaces Cancel', (await page.locator('.erase button', { hasText: 'Stop waiting' }).count()) === 1 && (await page.locator('.erase button', { hasText: 'Cancel' }).count()) === 0, (await erasePanelText(page)).slice(-200));
+  await page.locator('.erase button', { hasText: 'Stop waiting' }).click();
+  t = await erasePanelText(page);
+  check(r, 'Stop waiting says the page cannot tell, and how to find out', /cannot tell whether Zed Erased was erased/.test(t) && /gone from the roster, it went through/.test(t), t);
+  // meanwhile the coach opens ANOTHER athlete's panel and starts typing the id
+  await page.locator('.erase button', { hasText: 'Close' }).click();
+  await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 0; });
+  await L.go(page, 'a/ben_test/file');
+  await page.locator('button', { hasText: /Erase completely/ }).click();
+  await page.clock.runFor(200); await L.settle(page, 300); await page.clock.runFor(200);
+  await page.locator('.erase #eraseIn').waitFor();
+  await page.locator('#eraseIn').fill('ben_te');
+  // the answer arrives at 40 s: a success after the coach stopped waiting still finishes the job
+  await page.clock.runFor(15000);
+  await page.clock.runFor(3000); await L.settle(page, 400); await page.clock.runFor(3000); await L.settle(page, 400); await page.clock.runFor(3000); await L.settle(page, 400);
+  check(r, 'the late success did not drag the coach away: Ben\'s panel is still open, on his page, with what was typed', (await page.evaluate(() => location.hash)) === '#a/ben_test/file' && (await page.locator('#eraseIn').count()) === 1 && (await page.locator('#eraseIn').inputValue()) === 'ben_te', await page.evaluate(() => location.hash));
+  const d = await L.db(page);
+  const al = log.dialogs.filter(x => x.type === 'alert').map(x => x.message);
+  check(r, 'the late success is handled: the data is gone, the receipt is written, and the coach gets the receipt alert', !d.programs.some(x => x.athlete_id === 'zed_erase') && d.erasure_log.length === 1 && al.some(m => /Erased Zed Erased for good/.test(m)), { programs: d.programs.length, receipts: d.erasure_log.length, al: al.map(m => m.slice(0, 40)) });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// A preview answer that arrives late (the coach cancelled while it loaded and opened the panel again) must not touch the newer panel.
+S['erase-stale'] = async (b) => {
+  const r = { id: 'erase-stale', title: 'Erase completely…: an old preview answer never overwrites a newer panel (cancel while loading, then reopen)', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  await seedErasable(page);
+  await L.go(page, 'a/zed_erase/file');
+  const reopenAfterCancel = async () => {
+    await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 2500; });
+    await page.locator('button', { hasText: /Erase completely/ }).click();       // answer #1 will take 2.5 s
+    await page.locator('.erase button', { hasText: 'Cancel' }).click();          // the loading panel has a Cancel
+    await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 0; });
+    await page.locator('button', { hasText: /Erase completely/ }).click();       // answer #2 is immediate
+    await page.locator('.erase #eraseIn').waitFor();
+  };
+  // round 1: the stale answer lands while the new panel is ready, after the coach took a ticked form off the list and typed the id
+  await reopenAfterCancel();
+  await page.locator('#erasePicked button', { hasText: 'remove' }).first().click();
+  await page.locator('#eraseIn').fill('zed_er');
+  await L.settle(page, 2900);
+  let t = await erasePanelText(page);
+  check(r, 'the stale answer did not re-tick the form the coach removed, nor wipe what was typed', /No intake form is ticked, so none will be erased/.test(t) && (await page.locator('#eraseIn').inputValue()) === 'zed_er', t.slice(0, 600));
+  await page.locator('.erase button', { hasText: 'Cancel' }).click();
+  // round 2: the stale answer lands while the real erasure is running
+  await reopenAfterCancel();
+  await page.locator('#eraseIn').fill('zed_erase');
+  await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 4500; });
+  const n0 = await L.nCalls(page);
+  log.dialogs.length = 0;
+  await page.locator('#eraseGo').click();
+  await L.settle(page, 3000);
+  const go = page.locator('#eraseGo');
+  check(r, 'the stale answer landed during the erasure and left the panel busy: "Erasing…", the button disabled, still ONE real call', /Erasing…/.test(await go.innerText()) && await go.isDisabled()
+    && (await L.callsSince(page, n0)).filter(c => c.kind === 'rpc' && c.name === 'coach_erase_person' && c.payload.p_dry_run === false).length === 1, await go.innerText());
+  await L.settle(page, 3000);
+  const d = await L.db(page);
+  const real = (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === 'coach_erase_person' && c.payload.p_dry_run === false);
+  check(r, 'the erasure finished once: one real call in all, one receipt, the data gone', real.length === 1 && d.erasure_log.length === 1 && !d.programs.some(x => x.athlete_id === 'zed_erase'), { real: real.length, receipts: d.erasure_log.length });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// With the intake list unreadable the finder must not claim there are no forms.
+S['erase-forms-unreadable'] = async (b) => {
+  const r = { id: 'erase-forms-unreadable', title: 'Erase completely… when the intake forms did not load: the finder says so and is switched off', checks: [] };
+  const { page, log } = await L.openCoach(b, { seed: { stub: { fail: [{ kind: 'rpc', name: 'intake_list', message: 'fixture: the forms are unreadable', times: 99 }] } } });
+  await seedErasable(page);
+  await L.go(page, 'a/zed_erase/file');
+  await page.locator('button', { hasText: /Erase completely/ }).click();
+  await page.locator('.erase #eraseIn').waitFor();
+  const t = await erasePanelText(page);
+  check(r, 'the finder says the forms did not load (not "0 other forms") and its box is disabled', /The intake forms did not load, so they cannot be searched here/.test(t) && !/0 other forms/.test(t) && await page.locator('#eraseFindIn').isDisabled(), t.slice(0, 900));
+  check(r, 'the page-wide banner names the intake forms too', /Not everything loaded/.test(await page.locator('#loadwarn').innerText()) && /intake forms/.test(await page.locator('#loadwarn').innerText()), await page.locator('#loadwarn').innerText());
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['erase-buyers'] = async (b) => {
+  const r = { id: 'erase-buyers', title: 'Course and Testing lists: the private note comes from buyer_notes, and Erase… removes a buyer for good', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'course' });
+  let row = page.locator('.credrow', { hasText: 'fixture_buyer' });
+  let rowText = (await row.innerText()).replace(/\s+/g, ' ');
+  check(r, 'the course list shows the note from buyer_notes, not the account row\'s old label', /Fixture note about a course buyer/.test(rowText) && !/· Fixture\b(?! note)/.test(rowText), rowText);
+  const sel = (await L.calls(page)).filter(c => c.kind === 'from' && c.name === 'tps_accounts' && c.op === 'select')[0];
+  check(r, 'the list asks for the account\'s user_id (to match the note) and reads buyer_notes', !!sel && (await L.calls(page)).some(c => c.kind === 'from' && c.name === 'buyer_notes' && c.op === 'select'), sel && sel.mods);
+  const n0 = await L.nCalls(page);
+  await row.locator('.tp-erase').click();
+  await page.locator('.erase #eraseIn').waitFor();
+  const rpc0 = (await L.callsSince(page, n0)).filter(c => c.kind === 'rpc' && c.name === 'coach_erase_person');
+  check(r, 'Erase… on a course buyer makes one dry-run call keyed on the username', rpc0.length === 1 && JSON.stringify(rpc0[0].payload) === JSON.stringify({ p_kind: 'course', p_key: 'fixture_buyer' }), rpc0.map(c => c.payload));
+  let t = await erasePanelText(page);
+  check(r, 'the panel names them by the note, lists the login, the note and the sign-in account, and asks for the username', /Erase Fixture note about a course buyer completely/.test(t) && /1 course login/.test(t) && /1 note of yours about them/.test(t) && /1 sign-in account/.test(t) && /Type fixture_buyer to confirm/.test(t) && !/intake form/.test(t), t.slice(0, 500));
+  await page.locator('#eraseIn').fill('fixture_buyer');
+  const m0 = await L.nCalls(page);
+  log.dialogs.length = 0;
+  await page.locator('#eraseGo').click();
+  await L.settle(page, 1000);
+  const real = (await L.callsSince(page, m0)).filter(c => c.kind === 'rpc' && c.name === 'coach_erase_person');
+  check(r, 'one real call: kind course, the username, the typed word, no intake forms', real.length === 1 && real[0].payload.p_dry_run === false && real[0].payload.p_confirm === 'fixture_buyer' && real[0].payload.p_kind === 'course' && real[0].payload.p_key === 'fixture_buyer' && real[0].payload.p_intake_ids.length === 0, real.map(c => c.payload));
+  let d = await L.db(page);
+  check(r, 'the login and the note are gone; the list says there are no logins; the testing buyer is untouched', d.tps_accounts.length === 0 && !d.buyer_notes.some(x => x.user_id === 'u-tps-1') && d.buyer_notes.some(x => x.user_id === 'u-assess-1') && d.assess_accounts.length === 1 && /No logins yet/.test(await page.locator('#content').innerText()), d.buyer_notes);
+  check(r, 'a receipt alert was shown', log.dialogs.some(x => x.type === 'alert' && /Receipt #1/.test(x.message)), log.dialogs.map(x => x.message.slice(0, 60)));
+
+  // the testing-app list
+  await L.go(page, 'assess');
+  row = page.locator('.credrow', { hasText: 'fixture_academy' });
+  rowText = (await row.innerText()).replace(/\s+/g, ' ');
+  check(r, 'the testing list shows its note from buyer_notes too', /Fixture academy note/.test(rowText), rowText);
+  await row.locator('.as-erase').click();
+  await page.locator('.erase #eraseIn').waitFor();
+  t = await erasePanelText(page);
+  check(r, 'the panel counts every player (the removed one too), note and result', /2 players/.test(t) && /1 player note/.test(t) && /2 test results/.test(t) && /1 testing-app login/.test(t) && /1 sign-in account/.test(t), t.slice(0, 600));
+  await page.locator('#eraseIn').fill('FIXTURE_ACADEMY');
+  await page.locator('#eraseGo').click();
+  await L.settle(page, 1000);
+  d = await L.db(page);
+  check(r, 'all of it is gone, in one call', d.assess_players.length === 0 && d.assess_notes.length === 0 && d.assess_results.length === 0 && d.assess_accounts.length === 0 && d.erasure_log.length === 2
+    && (await L.calls(page)).filter(c => c.kind === 'rpc' && c.name === 'coach_erase_person' && c.payload.p_dry_run === false).length === 2, { players: d.assess_players.length, receipts: d.erasure_log.length });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['buyer-notes-fallback'] = async (b) => {
+  const r = { id: 'buyer-notes-fallback', title: 'Course list when buyer_notes cannot be read (stage53 not applied): the account\'s own label shows, nothing breaks', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'course', seed: { stub: { fail: [{ kind: 'from', name: 'buyer_notes', message: 'relation "public.buyer_notes" does not exist', code: '42P01', times: 99 }] } } });
+  const rowText = (await page.locator('.credrow', { hasText: 'fixture_buyer' }).innerText()).replace(/\s+/g, ' ');
+  check(r, 'the old label is shown, and the list still loads with its buttons', /· Fixture/.test(rowText) && !/Fixture note about/.test(rowText) && (await page.locator('.credrow .tp-erase').count()) === 1, rowText);
+  check(r, 'there is no load-error banner for a missing notes table (before stage53 that is expected)', !/Not everything loaded/.test(await page.locator('#loadwarn').innerText()), await page.locator('#loadwarn').innerText());
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+S['buyer-notes-error'] = async (b) => {
+  const r = { id: 'buyer-notes-error', title: 'Course list when buyer_notes fails for a real reason: the list still loads and the banner names it (it used to show every buyer with no note, silently)', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'course', seed: { stub: { fail: [{ kind: 'from', name: 'buyer_notes', message: 'fixture: the server fell over', code: 'XX000', times: 99 }] } } });
+  const banner = (await page.locator('#loadwarn').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the banner says your notes about buyers did not load, with the reason', /Not everything loaded/.test(banner) && /your notes about buyers/.test(banner) && /fixture: the server fell over/.test(banner), banner);
+  check(r, 'the list still loads, with the account\'s own label as the fallback', (await page.locator('.credrow .tp-erase').count()) === 1 && /· Fixture/.test((await page.locator('.credrow', { hasText: 'fixture_buyer' }).innerText()).replace(/\s+/g, ' ')), '');
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Training load when a session has no duration or RPE (TODAY-6, Amir 2026-10-11: skip them and grey out the ratio) ──
+S['load-partial'] = async (b) => {
+  const r = { id: 'load-partial', title: 'Training load: sessions with no duration or RPE are left out and the ratio is not shown (not enough data)', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const addSessions = rows => page.evaluate(rows => { rows.forEach(x => window.__DB.session_history.push(x)); }, rows);
+  const day = n => page.evaluate(n => new Date(Date.now() - n * 86400e3).toISOString().slice(0, 10), n);
+  const mk = async (n, extra) => Object.assign({ athlete_id: 'ava_test', athlete_name: 'Ava Example', day: 1, completed_on: await day(n), status: 'Complete', session_rpe: 7, duration_min: 50,
+    readiness: null, day_note: '', focus: '', summary: '', updated_at: new Date().toISOString(), coach_status: 'read', log: null }, extra || {});
+  const strip = async () => (await page.locator('.mstrip').first().innerText()).replace(/\s+/g, ' ');
+  const reload = async () => { await page.evaluate(() => hardRefresh()); await L.settle(page, 900); };
+  // 1. a month of full data: the ratio shows
+  await addSessions([await mk(15), await mk(20), await mk(26), await mk(12), await mk(9)]);
+  await reload();
+  let t = await strip();
+  check(r, 'every session has a duration and RPE: the ratio and its zone are shown', /ACWR · (Optimal|Climbing|High load|Low load)/.test(t) && !/not enough data/.test(t), t);
+  // 2. one session with no duration: the ratio goes, with the reason
+  await addSessions([await mk(5, { duration_min: null })]);
+  await reload();
+  t = await strip();
+  check(r, 'one session in the window has no duration: the pill says "not enough data" and shows no number or zone', /not enough data/.test(t) && !/ACWR ·/.test(t) && /training load\s*—/i.test(t), t);
+  const card = (await page.locator('.chart-card', { hasText: 'Training load' }).first().innerText().catch(() => '')).replace(/\s+/g, ' ');
+  const cardText = card || (await page.evaluate(() => { const d = document.querySelector('.chart-card'); return d ? d.textContent : ''; })).replace(/\s+/g, ' ');
+  check(r, 'the load card says why, with the count, in the singular', /Not enough data/.test(cardText) && /1 of 9 sessions in the last 4 weeks has no duration or RPE/.test(cardText) && /It is left out/.test(cardText), cardText);
+  check(r, 'the bars still show the sessions that do have a load, and say one was left out', /and (is|are) left out/.test(cardText) && !/count as zero/.test(cardText), cardText);
+  // 3. two sessions
+  await addSessions([await mk(3, { session_rpe: null })]);
+  await reload();
+  const card2 = await page.evaluate(() => (document.querySelector('.chart-card') || {}).textContent || '');
+  check(r, 'two missing: the plural wording', /2 of 10 sessions in the last 4 weeks have no duration or RPE/.test(card2.replace(/\s+/g, ' ')) && /They are left out/.test(card2.replace(/\s+/g, ' ')), card2.replace(/\s+/g, ' ').slice(0, 400));
+  // 4. once they are filled in the ratio comes back
+  await page.evaluate(() => { window.__DB.session_history.filter(x => x.athlete_id === 'ava_test').forEach(x => { if (x.duration_min == null) x.duration_min = 45; if (x.session_rpe == null) x.session_rpe = 6; }); });
+  await reload();
+  t = await strip();
+  check(r, 'once the duration and RPE are filled in, the ratio is back', /ACWR · /.test(t) && !/not enough data/.test(t), t);
+  // 5. a session older than four weeks without a duration does not matter
+  await addSessions([await mk(40, { duration_min: null })]);
+  await reload();
+  t = await strip();
+  check(r, 'a session older than 4 weeks with no duration is outside the window and changes nothing', /ACWR · /.test(t), t);
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

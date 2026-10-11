@@ -80,7 +80,8 @@ select rules -> 'questRuns' from public.xp_rules where id = 1;
 **From the dashboard** (the everyday way): `coach.html` → **Today** → **Quest week**.
 With no run live you get the pool as checkboxes — tick 1–4 and *Start the week*, which
 runs 7 days **from today**. While a run is live you see its quests, the XP each pays and
-which day of seven it's on, with *Cancel this run*.
+which day of seven it's on, with *End this run today*: the quests stop being offered from tomorrow and
+everyone keeps the XP they already earned (stage55, 2026-10-11).
 
 **From SQL** (for anything the dashboard can't do — back-dating or future-dating a run):
 run these in the **Supabase SQL editor**. Same functions, same effect.
@@ -89,7 +90,10 @@ run these in the **Supabase SQL editor**. Same functions, same effect.
 -- start a run (any day in the week works; it runs 7 days from that date)
 select public.set_quests('2026-08-03', array['w_water5','w_train3']);
 
--- cancel a run
+-- end a run early, keeping the XP already earned (the dashboard's button does this, with today as the last day)
+select public.end_quests('2026-08-03', '2026-08-05');
+
+-- remove a run, taking its XP back from everyone (SQL editor only)
 select public.clear_quests('2026-08-03');
 
 -- see what's set
