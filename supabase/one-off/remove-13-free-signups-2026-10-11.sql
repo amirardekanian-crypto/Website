@@ -1,3 +1,5 @@
+-- ★ RUN on 2026-10-11 by Amir: the 13 free signups are gone (programmes 52 -> 39). DO NOT RUN AGAIN: with no free programme it stops at
+--   "Expected 13 free programmes, found 0" and deletes nothing. Kept as the record, and because scripts/test_spine_sql.sh tests it.
 -- Remove the 13 free Proof signups who never got a login.
 -- Amir, 2026-10-11: "Forget them all", then "Remove everything" (programme rows and titles too).
 --
