@@ -71,6 +71,15 @@ actions that depend on it are switched off until ↻ Refresh brings it back. Bef
 failed read looked exactly like an empty table. A save that the server did not apply (a lapsed
 sign-in, a record that moved) says so; it used to report success.
 
+**One way to say what happened** (2026-10-11, `fail()` and `toast()` in coach.html). *It worked*: a short toast at the bottom
+that goes away by itself. *It did not*: a red line at the bottom that **stays until you dismiss it** with its ✕, in view wherever
+you have scrolled to, with the words the pop-up used to carry; the same words twice become one line with a count (×2), at most
+four lines stay, and *Dismiss all* clears them. *A question*: a confirm. A pop-up (alert) only when there is something to read or
+copy once: a first password the server could not store, the backup summary, the result of adding coaching logs or logins in
+bulk, an erasure receipt. Before this a failed save was a 2.6-second toast in some tabs (easy to miss: the affiliate and intake
+ones) and a blocking pop-up in others, and a buyer login ended in a pop-up where an athlete's ended in a toast. A buyer login
+(testing app, course) now copies its message and says so in a toast, like an athlete's; the password waits in the list.
+
 ### Exercises — the Spine
 
 Cues written here fill **every card that has no cues of its own**, so a cue is written once and

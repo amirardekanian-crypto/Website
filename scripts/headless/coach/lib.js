@@ -38,6 +38,21 @@ async function openCoach(browser, opts) {
   const seed = buildSeed(Object.assign({ today }, opts.seed || {}));
   const log = { dialogs: [], errors: [], console: [] };
   page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await d.accept().catch(() => {}); });
+  // What did not work is shown as a line at the bottom that stays until dismissed (fail(), pile B5), not as a pop-up. A check that asks
+  // "was the coach told X?" reads log.dialogs, so each new line is recorded there once, as an 'alert' with its words. The bar itself is
+  // asserted on in the scenario `fail-bar`.
+  await page.exposeFunction('__noteFail', m => { log.dialogs.push({ type: 'alert', message: m, via: 'bar' }); });
+  await page.addInitScript(() => {
+    const seen = new Set();
+    const scan = () => document.querySelectorAll('#failbar .fb-line').forEach(l => {
+      const id = l.getAttribute('data-fid');
+      if (seen.has(id)) return;
+      seen.add(id);
+      const m = l.querySelector('.fb-msg');
+      if (window.__noteFail) window.__noteFail(m && m.childNodes[0] ? m.childNodes[0].textContent : '');
+    });
+    new MutationObserver(scan).observe(document, { childList: true, subtree: true });
+  });
   page.on('pageerror', e => log.errors.push(String(e && e.message || e)));
   page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') log.console.push(m.type() + ': ' + m.text()); });
   await page.route('**/*', route => {
@@ -63,6 +78,7 @@ const db = page => page.evaluate(() => JSON.parse(JSON.stringify(window.__DB)));
 async function callsSince(page, n) { return (await calls(page)).slice(n); }
 async function nCalls(page) { return page.evaluate(() => window.__calls.length); }
 async function toastText(page) { return page.evaluate(() => (document.getElementById('toast') || {}).textContent || ''); }
+async function failText(page) { return page.evaluate(() => { const b = document.getElementById('failbar'); return b && !b.hidden ? b.innerText.replace(/\s+/g, ' ').trim() : ''; }); }
 async function go(page, hash) {
   await page.evaluate(h => { location.hash = h; }, hash);
   await page.waitForFunction(() => !document.querySelector('#content .loading'), null, { timeout: 10000 });
@@ -73,4 +89,4 @@ async function go(page, hash) {
 async function jsClick(locator) { await locator.first().evaluate(el => el.click()); }
 function loadAllCount(cs) { return cs.filter(c => c.kind === 'from' && c.name === 'athlete_progress' && c.op === 'select').length; }
 
-module.exports = { BASE, OUT, launch, openCoach, settle, calls, db, callsSince, nCalls, toastText, go, jsClick, loadAllCount, localDay };
+module.exports = { BASE, OUT, launch, openCoach, settle, calls, db, callsSince, nCalls, toastText, failText, go, jsClick, loadAllCount, localDay };

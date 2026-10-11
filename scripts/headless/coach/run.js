@@ -4,6 +4,7 @@
 //
 //   node run.js                 # every scenario
 //   node run.js editor backup   # only scenarios whose id contains one of the words
+//   SHARD=0/3 node run.js        # every 3rd scenario from the 1st: run 0/3, 1/3, 2/3 in parallel (give each its own OUT)
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -376,7 +377,7 @@ S['intake-status'] = async (b) => {
   await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'set_intake_status', message: 'fixture failure', times: 1 }));
   await L.jsClick(card().locator('.intake-act[data-to=handled]'));
   await L.settle(page);
-  check(r, 'a failed update leaves the card as it was and says so', (await card().getAttribute('class')).includes('new') && /Could not update/.test(await L.toastText(page)), { cls: await card().getAttribute('class'), toast: await L.toastText(page) });
+  check(r, 'a failed update leaves the card as it was and says so', (await card().getAttribute('class')).includes('new') && /Could not update/.test(await L.failText(page)), { cls: await card().getAttribute('class'), failBar: await L.failText(page) });
   await page.context().close();
   return r;
 };
@@ -407,7 +408,7 @@ S['affiliates'] = async (b) => {
   await page.locator('.aff-form[data-new="1"] [data-k=code]').fill('DENIED10');
   await page.locator('.aff-form[data-new="1"] .aff-save').click();
   await L.settle(page);
-  check(r, 'a write RLS filtered out is reported, not claimed', /nothing was saved/.test(await L.toastText(page)), await L.toastText(page));
+  check(r, 'a write RLS filtered out is reported, not claimed', /nothing was saved/i.test(await L.failText(page)), await L.failText(page));
   r.evidence = { dialogs: log.dialogs.map(d => d.message.slice(0, 80)) };
   await page.context().close();
   return r;
@@ -452,7 +453,7 @@ S['login-create'] = async (b) => {
   let n0 = await L.nCalls(page);
   await page.locator('.pwform .btn.primary').click();
   await L.settle(page, 300);
-  check(r, 'a too-short typed password is stopped before any call', (await L.callsSince(page, n0)).filter(c => c.kind === 'fn').length === 0 && /8 to 72/.test(await L.toastText(page)), await L.toastText(page));
+  check(r, 'a too-short typed password is stopped before any call', (await L.callsSince(page, n0)).filter(c => c.kind === 'fn').length === 0 && /8 to 72/.test(await L.failText(page)), await L.failText(page));
   await page.locator('#athPw').fill('');
   n0 = await L.nCalls(page);
   await page.locator('.pwform .btn.primary').click();
@@ -1956,6 +1957,61 @@ S['hist-heavy-fails'] = async (b) => {
   return r;
 };
 
+// ── One way to say what did not work (audit BROWSER-10, FLOW-22, MKT-13, 2026-10-11, pile B5) ─────────────────────────────────────
+// A failure used to be a 2.6-second toast in some tabs (easy to miss) and a pop-up in others (it stopped everything, and was gone once
+// dismissed). Now: it worked = a toast; it did not = a line at the bottom that stays until it is dismissed; a question = a confirm;
+// something to read or copy once = an alert. Lines carry the same words the pop-ups did, so every other scenario still finds them.
+S['fail-bar'] = async (b) => {
+  const r = { id: 'fail-bar', title: 'A failure stays on screen until it is dismissed, in view wherever the page is scrolled; a success stays a toast; neither is a pop-up', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  const pops = () => log.dialogs.filter(d => d.via !== 'bar');
+  const lines = () => page.locator('#failbar .fb-line').count();
+  const post = async text => { await page.locator('#coachLineInput').fill(text); await page.locator('.mic .row .btn.primary').click(); await L.settle(page, 500); };
+  // 1. a failed post on Today
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'set_coach_note', message: 'fixture: the line could not be saved', times: 2 }));
+  await post('first try');
+  let fb = await L.failText(page);
+  check(r, 'a failed save shows a line that says why', /Could not post: fixture: the line could not be saved/.test(fb), fb);
+  check(r, 'it is not a pop-up, and the toast does not carry it', !pops().length && !/Could not post/.test(await L.toastText(page)), pops());
+  await page.waitForTimeout(3600);
+  check(r, 'it is still there after the 2.6 seconds a toast lasts', /Could not post/.test(await L.failText(page)), await L.failText(page));
+  await page.evaluate(() => window.scrollTo(0, 99999));
+  const box = await page.evaluate(() => { const e = document.getElementById('failbar'), q = e ? e.getBoundingClientRect() : { top: -1, bottom: -1 }; return { top: q.top, bottom: q.bottom, h: innerHeight }; });
+  check(r, 'it stays in view wherever the page is scrolled to', box.top >= 0 && box.bottom <= box.h, box);
+  // 2. the same failure again: one line, with a count
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await post('second try');
+  fb = await L.failText(page);
+  check(r, 'the same words twice are one line with a count', (await lines()) === 1 && /×2/.test(fb), fb);
+  // 3. a different failure is a second line, and Dismiss all appears
+  await L.go(page, 'intake');
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'set_intake_status', message: 'fixture failure', times: 1 }));
+  await L.jsClick(page.locator('.intake-card', { hasText: 'Fixture Applicant One' }).locator('.intake-act[data-to=handled]'));
+  await L.settle(page, 500);
+  check(r, 'a different failure is a second line, and Dismiss all appears', (await lines()) === 2 && (await page.locator('#failbar .fb-all').count()) === 1, await L.failText(page));
+  // 4. dismissing
+  if (await lines()) await page.locator('#failbar .fb-line').first().locator('.fb-x').click();
+  check(r, 'the cross removes just that line, and Dismiss all goes with the second line', (await lines()) === 1 && (await page.locator('#failbar .fb-all').count()) === 0, await L.failText(page));
+  // 5. a success is a toast, not a line
+  await L.go(page, 'today');
+  await post('works now');
+  check(r, 'a success is a toast', /On the wall/.test(await L.toastText(page)), await L.toastText(page));
+  check(r, 'and adds no line', (await lines()) === 1, await L.failText(page));
+  if (await lines()) await page.locator('#failbar .fb-x').click();
+  check(r, 'dismissing the last line hides the bar', await page.evaluate(() => { const e = document.getElementById('failbar'); return !!e && e.hidden; }), '');
+  check(r, 'the bar is announced as an alert', await page.evaluate(() => { const e = document.getElementById('failbar'); return !!e && e.getAttribute('role') === 'alert'; }), '');
+  // 6. a phone
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'set_coach_note', message: 'fixture: ' + 'long reason '.repeat(18), times: 1 }));
+  await post('on a phone');
+  const ph = await page.evaluate(() => { const e = document.getElementById('failbar'), q = e ? e.getBoundingClientRect() : { left: -1, right: 9999 }; return { left: q.left, right: q.right, w: innerWidth, sideways: document.documentElement.scrollWidth > innerWidth }; });
+  check(r, 'on a 360 px phone the line fits and nothing scrolls sideways', ph.left >= 0 && ph.right <= ph.w && !ph.sideways, ph);
+  check(r, 'no pop-up was shown at any point', !pops().length, pops());
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── What the coach typed or opened in an athlete's file survives a redraw (audit FILE-9, 2026-10-11, pile B4) ───────────────────
 // A redraw used to rebuild the tab from scratch: it wiped the password box and an email pasted under "Add past session", hid the add-session
 // box again and folded Version history, the Coaching log, a day's raw log and the live snapshot shut.
@@ -2035,6 +2091,9 @@ S['file-redraw-keeps-work'] = async (b) => {
 (async () => {
   const b = await L.launch();
   const ids = Object.keys(S).filter(id => !only.length || only.some(w => id.includes(w)));
+  // SHARD=0/3, SHARD=1/3, SHARD=2/3 in three processes (each with its own OUT) run the whole suite in a third of the time.
+  const shard = /^(\d+)\/(\d+)$/.exec(process.env.SHARD || '');
+  if (shard) { const i = +shard[1], n = +shard[2]; ids.splice(0, ids.length, ...ids.filter((_, k) => k % n === i)); }
   for (const id of ids) {
     let res;
     try { res = await S[id](b); }

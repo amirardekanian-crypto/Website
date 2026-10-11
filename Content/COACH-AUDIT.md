@@ -21,7 +21,7 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 144 are fixed, 35 partly fixed (the harm is gone, something named in the finding is left), 11 open and 1 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
+**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 147 are fixed, 33 partly fixed (the harm is gone, something named in the finding is left), 10 open and 1 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
 questions in §7 and the eleven in §12 (pile A), and the one thing left for you is to switch off public sign-up in the Supabase
 dashboard (SERVER-14). The SQL pack and the removal script ran on 2026-10-11 and §11 records what was checked afterwards.
 **What is left, and how to continue in a new chat, is §12.**
@@ -265,14 +265,14 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-<!--T9-->191 findings. Fixed 144 · Partly 35 · Open 11 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
+<!--T9-->191 findings. Fixed 147 · Partly 33 · Open 10 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
 | high | 32 | 0 | 1 | 0 | 0 |
-| medium | 60 | 24 | 4 | 0 | 0 |
-| low | 40 | 11 | 6 | 0 | 1 |<!--/T9-->
+| medium | 61 | 23 | 4 | 0 | 0 |
+| low | 42 | 10 | 5 | 0 | 1 |<!--/T9-->
 
 ### The work and the ✎ editor (WORK)
 
@@ -415,7 +415,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | FLOW-19 | low | The 'Links' tab is really the Library publisher, cannot unpublish, hides unpublished items and ignores Library Sessions | Fixed | The tab is now called Library. It lists every article and workout, hidden ones included (folded away), and each has a Hide or Publish button and a Copy link. Workouts are shown under their Sessions shelves. |  |
 | FLOW-20 | low | After a publish there is no 'published at / by' on the athlete, so the coach cannot check that a cycle landed | Fixed | The athlete's File tab shows when their programme was last saved and by whom, so you can check that a cycle landed. |  |
 | FLOW-21 | medium | The manual and in-app copy describe the pre-server system; the manual says 'forget' keeps logs, but it deletes them | Fixed | The manual has been rewritten against the current dashboard. It says Forget permanently deletes the habit log and progress. The screens' empty and Danger-zone text now say exactly what is deleted and what stays. |  |
-| FLOW-22 | low | Feedback and confirm patterns are inconsistent across the app (53 alerts, 18 confirms, 73 toasts), and destructive actions warn differently | Partly | The two delete actions (Delete training history and Forget) now say what stays and suggest taking a backup first, and a new login's password shows on the athlete's file instead of in an alert. | There is still no single way of showing results: pop-up alerts went up from 53 to 71, and the backup summary is still an alert. |
+| FLOW-22 | low | Feedback and confirm patterns are inconsistent across the app (53 alerts, 18 confirms, 73 toasts), and destructive actions warn differently | Fixed | The two delete actions (Delete training history and Forget) now say what stays and suggest taking a backup first, and a new login's password shows on the athlete's file instead of in an alert. One rule now (pile B5, 2026-10-11): it worked is a toast; it did not work is a line that stays (`fail()`); a question is a confirm; a pop-up only for something to read or copy once (a first password the server could not store, the backup summary, a bulk result, an erasure receipt). Pop-ups went from 71 to 10, 61 of them became lines. |  |
 
 ### Logic shared with the athlete app (TWIN)
 
@@ -459,7 +459,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | BROWSER-7 | medium | On touch screens the prescription edit pencil is invisible, and many targets are under 32 px | Fixed | On a phone the edit pencil is always visible and finger-sized (about 33 by 39 px), small buttons are taller, and fields are 16 px so the iPhone does not zoom. |  |
 | BROWSER-8 | medium | Muted greys, clay text and many sub-12 px labels fail WCAG AA, and the faintest text is the per-set coaching detail | Partly | Grey and clay text were darkened to pass contrast, the comparison header and per-set detail are bigger, and the Exercises filter shows the active choice properly. | Many small labels are still 9 to 10.5 px (table labels, flag pills, the funnel's day captions), and coach.html is still outside the site's style check. |
 | BROWSER-9 | medium | daysSince() is off by one before noon: today's weigh-in reads '-1 days ago' and quiet-athlete flags come half a day late | Fixed | 'Days ago' now counts calendar days, so a weigh-in from this morning reads 'today' and quiet-athlete flags come on the right day. |  |
-| BROWSER-10 | medium | Save failures are reported three different ways; several write failures are only a 2.6-second toast | Partly | Anything that fails to load (Spine, testing app, course, intake, affiliates) now shows in a banner under the tabs, and most saves check that they really changed something. | Some failed saves (affiliate save or retire, intake status) are still only a 2.6-second message at the bottom, and there is still no single persistent error banner for failed saves. |
+| BROWSER-10 | medium | Save failures are reported three different ways; several write failures are only a 2.6-second toast | Fixed | Anything that fails to load (Spine, testing app, course, intake, affiliates) now shows in a banner under the tabs, and most saves check that they really changed something. Since 2026-10-11 (pile B5) every failed save, in every tab, is a line at the bottom that stays until you dismiss it with the cross (`fail()`), in view wherever the page is scrolled to, with the same words the pop-up carried; the affiliate and intake failures that were 2.6-second toasts are in it too. `fail-bar` pins it. |  |
 | BROWSER-11 | medium | Demo fixtures on the public page use real athlete ids and first names, with made-up weights, notes and flags | Fixed | The public demo now uses made-up people only (demo_ana, Lena, Mina and so on, plus Amir himself) with invented wall lines, and 'View their app' in the demo opens the public demo programme. |  |
 | BROWSER-12 | low | At 320 px every view scrolls sideways, and four components overflow their cards | Fixed | At 320 px every screen fits without sideways scrolling, the ten-qualities editor included. |  |
 | BROWSER-13 | low | Intake and affiliate card summaries cut off dates and warning pills at common phone widths | Fixed | Intake and affiliate cards now let their pills and dates wrap onto a second line instead of cutting them off. |  |
@@ -485,7 +485,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | MKT-10 | low | Links offers only the in-app deep link; the public English and Farsi article pages are never offered | Fixed | Each article now has Copy App, Copy Web · FA and Copy Web · EN buttons, workouts keep Copy App, and items are grouped under their category name. |  |
 | MKT-11 | medium | An affiliate code's 'uses' counts intakes, not paying clients, yet it is documented as the commission list; typed codes are matched too strictly | Partly | Each code card now counts applications (archived ones left out), says plainly they are not payments, and matches codes typed with spaces, Persian digits or any case. | The apply forms and the server's code check still reject a code typed with a space or Persian digits, and codes that match no affiliate are not shown anywhere. **Decided 2026-10-11: no payment tracking for now.** |
 | MKT-12 | low | The 'free signups' funnel includes coached clients, and reads tier from a second copy | Fixed | The funnel takes each person's tier from their programme, counts only free signups in its headline, and lists coached clients separately as 'coached · converted'. |  |
-| MKT-13 | low | Four different feedback patterns for the same kinds of action across these tabs | Open |  | Results still come back four different ways: a buyer login create shows a blocking pop-up while an athlete one shows a short toast, and errors are pop-ups in some tabs and toasts in others (only Mark sent gained a confirm). |
+| MKT-13 | low | Four different feedback patterns for the same kinds of action across these tabs | Fixed | A buyer login (testing app and course) now behaves like an athlete's: the message is copied, a toast says so and the password waits in the list, with the pop-up kept only when the server could not store the password. Errors are lines in every tab. |  |
 | MKT-14 | low | Buyers can read Amir's private 'who bought it' note (and their stored password) through the buyer-read policy | Fixed | The note now lives in `buyer_notes`, which only you can read (stage53, applied 2026-10-11; your yes). A trigger moves any label the login functions still write, so they did not change; the two existing notes were copied across and every account row's label is now empty. A buyer can still read their own first password until they sign in with it (stage51 clears it then); that is their own credential, and no course buyer has one stored today. |  |
 | MKT-15 | low | Docs and comments contradict the code: forget, data sources, AMIR_ATHLETE_ID, and the tps-login header | Partly | The manual now says what Forget really deletes, lists the affiliates, library and buyer tables, has short Library, Testing app and Course sections, and no longer claims every write goes through a guarded function. | The code comment still says the board is fetched through your own athlete identity, and the course login function's header still names the retired private repo. |
 | MKT-16 | low | Buyers cannot be erased from the dashboard, and the privacy notices do not mention buyer accounts | Partly | **Erase…** on each Course and Testing row removes the buyer in one step (stage54, live since 2026-10-11): the login, your note, and for the testing app every player, note and result, including the ones the buyer had removed. A course buyer's dry run was checked on the live database; there is no testing-app account yet, so that kind has only been tested on a local copy. A text for the privacy notices is drafted in `Content/PRIVACY-DRAFT-BUYER-ACCOUNTS.md`. | Decided (2026-10-11): publish the draft with the buyer as the controller of the players' data and you as the processor. English into privacy.html first, Farsi after you have read it. Not published yet (A2). |
@@ -737,7 +737,7 @@ a contact field holding two numbers matches the second only; the finder cannot b
 
 ## 12. Continue here (rewritten 2026-10-11, fourth session)
 
-<!--T12-->191 findings: 144 fixed, 35 partly, 11 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
+<!--T12-->191 findings: 147 fixed, 33 partly, 10 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
 What is left is in three piles: **A** your eleven answers, now jobs; **B** Claude can just do, in order; **C** is outside the audit.
 
 **To start a new chat:** *"Continue the Coach's Box audit: read `Content/COACH-AUDIT.md` §12 and `COACH_DASHBOARD.md`, then do the first job in
@@ -771,7 +771,7 @@ Decided earlier, nothing to do: MKT-11 (no payment tracking for now) and WORK-9 
 | B2 | TOOLS-3 (high) | Name an incomplete backup differently (`aa-backup-INCOMPLETE-<date>.json`) and make `scripts/prune_backups.py` leave it out of the 12 it keeps. | **done 2026-10-11** |
 | B3 | SERVER-13 | Record the live definitions the dashboard depends on and the repo lacks (the athlete programme door `get_program`, the "which athlete is this" function) as a record file, like stage44, and put the coach email in one constant. It also feeds A3. | **done 2026-10-11** |
 | B4 | FILE-9 | A redraw wipes what you are typing in the File tab (the login box, an email pasted into Add past session) and closes Version history and the Coaching log. | **done 2026-10-11** |
-| B5 | BROWSER-10, FLOW-22, MKT-13 | One way to report results: a persistent error line for failed saves (the affiliate and intake ones are a 2.6 s toast) and fewer pop-up alerts (53 became 71). | todo |
+| B5 | BROWSER-10, FLOW-22, MKT-13 | One way to report results: a persistent error line for failed saves (the affiliate and intake ones are a 2.6 s toast) and fewer pop-up alerts (53 became 71). | **done 2026-10-11** |
 | B6 | TWIN-2, WORK-11, TWIN-3, TODAY-11, TWIN-6, TWIN-9, TWIN-8, TWIN-7 | Make the dashboard judge a day the way the athlete app does: the week-1 and back-off-week RPE caps, the Readiness chart's measure, the 30-hour "in progress" window against `sessionIsStale()`, the retest flag, the quality check's 70% / 12% rules, the checker's name matching. A rule the dashboard copies goes into `scripts/check_twins.js` the same day. | todo |
 | B7 | TWIN-1 | The phone and the dashboard resolve a card whose exercise id points at a draft differently. | todo |
 | B8 | TODAY-3, TODAY-4, TODAY-13, TODAY-14, TODAY-15, MKT-3, MKT-8 | Small truthfulness fixes on Today and the board: a note on a single exercise added after Mark read, your day against the athlete's day, silent failed reloads, overlapping quest runs, the quote-stripping warning, the board's missing "as of" time and the leaderboard's missing reason. | todo |

@@ -817,6 +817,22 @@
            transform: translateY(calc(100% + 40px)); visibility: hidden;
            transition: transform .25s cubic-bezier(.16,1,.3,1), visibility 0s linear .25s; }
   #toast.on { transform: none; visibility: visible; transition: transform .25s cubic-bezier(.16,1,.3,1); }
+  /* What did not work stays on screen until it is dismissed (fail()). A banner in the page flow, so it never covers a control at rest
+     (a bar over the bottom of the screen covered the Spine editor's Save bar), and sticky under the header, so it is in view
+     wherever the page is scrolled to. On a phone the tabs scroll away and it sits right under the header. */
+  .failbar { position: sticky; top: var(--stick); z-index: 58; max-width: 1180px; margin: 10px auto 0; padding: 0 20px;
+             display: flex; flex-direction: column; gap: 6px; align-items: stretch; max-height: 45vh; overflow: auto; }
+  .failbar[hidden] { display: none; }
+  .failbar .fb-line { display: flex; gap: 10px; align-items: flex-start; background: var(--clay-100); color: var(--ink);
+                      border-left: 3px solid var(--clay); border-radius: 12px; padding: 10px 6px 10px 14px; font-size: 13px; line-height: 1.5;
+                      box-shadow: 0 10px 24px -16px rgba(0,0,0,.5); }
+  .failbar .fb-msg { flex: 1; white-space: pre-line; overflow-wrap: anywhere; }
+  .failbar .fb-x { flex: none; border: 0; background: transparent; color: var(--muted); font-size: 16px; line-height: 1; cursor: pointer;
+                   min-width: 34px; min-height: 34px; border-radius: 10px; }
+  .failbar .fb-x:hover { background: rgba(0,0,0,.06); }
+  .failbar .fb-all { align-self: flex-end; }
+  @media (max-width: 1220px) { .failbar { padding: 0 20px; } }
+  @media (max-width: 480px) { .failbar { padding: 0 14px; } }
   .demoband { background: var(--ochre); color: #fff; text-align: center; font-size: 12px; font-weight: 700;
               letter-spacing: .08em; text-transform: uppercase; padding: 6px 12px; }
   /* The muscle map (stage42): the same body and colours as program.html's About sheet, drawn in
@@ -861,6 +877,7 @@
   </header>
   <nav class="rail" aria-label="Sections"><div class="rail-in" id="rail"></div></nav>
   <div id="loadwarn" class="loadwarn" role="alert" hidden></div>
+  <div id="failbar" class="failbar" role="alert" hidden></div>
   <main class="wrap" id="content"><div class="loading"><div class="spinner"></div>Warming up…</div></main>
 </div>
 
@@ -1004,6 +1021,32 @@ function round1(n) { return Math.round(n * 10) / 10; }
 function toast(msg) {
   const t = $('toast'); t.textContent = msg; t.classList.add('on');
   clearTimeout(toast._h); toast._h = setTimeout(() => t.classList.remove('on'), 2600);
+}
+// ── How the page says what happened (audit BROWSER-10, FLOW-22, MKT-13; pile B5) ───────────────────────────────────────────────────
+//   it worked           toast()    a line at the bottom that goes away by itself
+//   it did not work     fail()     a line at the bottom that STAYS until you dismiss it. A failed save used to be a 2.6-second toast in
+//                                  some tabs (easy to miss) and a pop-up in others (it stopped everything and was gone once dismissed)
+//   a question          confirm()
+//   something to read or copy once (a first password, the backup summary, an erasure receipt)   alert()
+// A line is the same words the pop-up used to carry. The same words twice become one line with a count; at most four stay.
+const FAILS = []; let _failId = 0;
+function fail(msg) {
+  const text = String(msg == null ? '' : msg).trim();
+  if (!text) return;
+  const same = FAILS.find(f => f.text === text);
+  if (same) same.n++;
+  else { FAILS.push({ id: ++_failId, text, n: 1 }); while (FAILS.length > 4) FAILS.shift(); }
+  renderFails();
+}
+function failDismiss(id) { const i = FAILS.findIndex(f => f.id === id); if (i >= 0) FAILS.splice(i, 1); renderFails(); }
+function failDismissAll() { FAILS.length = 0; renderFails(); }
+function renderFails() {
+  const el = $('failbar');
+  if (!el) return;
+  el.hidden = !FAILS.length;
+  el.innerHTML = FAILS.map(f => `<div class="fb-line" data-fid="${f.id}"><span class="fb-msg" dir="auto">${esc(f.text)}${f.n > 1 ? ` <b>×${f.n}</b>` : ''}</span>` +
+      `<button class="fb-x" aria-label="Dismiss" onclick="failDismiss(${f.id})">✕</button></div>`).join('') +
+    (FAILS.length > 1 ? `<button class="btn sm fb-all" onclick="failDismissAll()">Dismiss all</button>` : '');
 }
 function copyText(t, btn) {
   navigator.clipboard.writeText(t).then(() => {
@@ -1191,7 +1234,7 @@ async function refetch(parts) {
   if (parts.includes('contacts')) jobs.push(sb.rpc('contact_list').then(r => { if (!r.error) S.contacts = r.data || []; }));
   if (parts.includes('intake')) jobs.push(sb.rpc('intake_list').then(r => { if (!r.error) S.intake = r.data || []; }));
   if (parts.includes('affiliates')) jobs.push(sb.from('affiliates').select('*').order('code').then(r => { if (!r.error) S.affiliates = r.data || []; }));
-  if (parts.includes('hist')) jobs.push(loadHistory().then(r => { if (!r.error) S.hist = r.data || []; else toast('Saved, but the list could not refresh: ' + r.error.message); }));
+  if (parts.includes('hist')) jobs.push(loadHistory().then(r => { if (!r.error) S.hist = r.data || []; else fail('Saved, but the list could not refresh: ' + r.error.message); }));
   if (parts.includes('programs')) jobs.push(loadPrograms());
   if (parts.includes('prog')) jobs.push(selectAll('athlete_progress', 'athlete_id, athlete_name, data, updated_at').then(r => { if (!r.error) S.prog = r.data || []; }));
   if (parts.includes('optin')) jobs.push(sb.from('leaderboard_optin').select('athlete_id, display_name, title').then(r => { if (!r.error) { S.optin = {}; (r.data || []).forEach(x => S.optin[x.athlete_id] = x); } }));
@@ -1259,7 +1302,7 @@ function usedMark(app, key) {
 // Login actions refuse to run while the list of who has a login is unknown.
 function loginsUnknown() {
   if (!LOAD_ERR.logins) return false;
-  alert('The list of athlete logins did not load, so this is switched off: it could reset someone\'s password by mistake.\n\nTap ↻ Refresh and try again.');
+  fail('The list of athlete logins did not load, so this is switched off: it could reset someone\'s password by mistake.\n\nTap ↻ Refresh and try again.');
   return true;
 }
 
@@ -1305,7 +1348,7 @@ async function markLoginSent(athleteId) {
     .update({ initial_password: null, sent_at: new Date().toISOString() })
     .eq('athlete_id', athleteId).select('athlete_id');
   const bad = writeFailed(res, 'marked sent');
-  if (bad) { alert('Could not update: ' + bad); return; }
+  if (bad) { fail('Could not update: ' + bad); return; }
   await loadLogins();
   render();
 }
@@ -1374,7 +1417,7 @@ function revokeAthleteLogin(athleteId) {
 function athleteSavePw(athleteId, action) {
   const el = document.getElementById('athPw');
   const t = typedPassword(el ? el.value : '', athleteId);
-  if (t.error) { toast(t.error); return; }
+  if (t.error) { fail(t.error); return; }
   athleteLoginAction(athleteId, action, t.password);
 }
 
@@ -1391,7 +1434,7 @@ async function athleteLoginAction(athleteId, action, password) {
   });
   let msg = data && data.error;
   if (!msg && error) { try { msg = (await error.context.json()).error; } catch (e) { msg = error.message; } }
-  if (msg) { alert('Could not ' + action + ' the login:\n\n' + msg); return; }
+  if (msg) { fail('Could not ' + action + ' the login:\n\n' + msg); return; }
   _athPwOpen = null;
   await loadLogins();
   assemble();
@@ -1435,7 +1478,7 @@ async function bulkCreateLogins() {
     body: { action: 'create_many', athlete_ids: ids },
   });
   if (error || (data && data.error)) {
-    alert('Could not create logins:\n\n' + ((data && data.error) || error.message));
+    fail('Could not create logins:\n\n' + ((data && data.error) || error.message));
     return;
   }
   await loadLogins();
@@ -1579,14 +1622,14 @@ async function downloadBackup(btn) {
 // wholesale (no history, no warning), wiping every Debrief written since. It now never overwrites.
 function pickCoachingLogs() {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (LOAD_ERR.clogs) { alert('The list of coaching logs did not load, so I cannot tell which athletes already have one. Tap ↻ Refresh first.'); return; }
+  if (LOAD_ERR.clogs) { fail('The list of coaching logs did not load, so I cannot tell which athletes already have one. Tap ↻ Refresh first.'); return; }
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = '.md,text/markdown';
   input.multiple = true;
   input.onchange = async () => {
     const files = [...(input.files || [])].filter(f => /\.md$/i.test(f.name) && !/^README/i.test(f.name));
-    if (!files.length) { alert('No .md files selected.'); return; }
+    if (!files.length) { fail('No .md files selected.'); return; }
     const rows = [], skipped = [], kept = [];
     for (const f of files) {
       const id = f.name.replace(/\.md$/i, '');
@@ -1647,7 +1690,7 @@ async function openCoachingLog(athleteId) {
 // used to make adding a workout a two-file job.
 function pickLibraryFile(kind) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (LOAD_ERR.library) { alert('The library did not load (' + LOAD_ERR.library + '), so nothing can be published: its categories are unknown. Tap ↻ Refresh first.'); return; }
+  if (LOAD_ERR.library) { fail('The library did not load (' + LOAD_ERR.library + '), so nothing can be published: its categories are unknown. Tap ↻ Refresh first.'); return; }
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'application/json,.json';
@@ -1684,17 +1727,17 @@ function pickLibraryFile(kind) {
     }
 
     const NL = String.fromCharCode(10);
-    if (bad.length && !rows.length) { alert('Nothing published:' + NL + NL + bad.join(NL)); return; }
+    if (bad.length && !rows.length) { fail('Nothing published:' + NL + NL + bad.join(NL)); return; }
     const preview = rows.map(r => '· ' + (r.data.title || r.slug)).join(NL);
     const skipped = bad.length ? NL + NL + 'Skipped:' + NL + bad.join(NL) : '';
     if (!confirm('Publish ' + rows.length + ' ' + kind + '(s)?' + NL + NL + preview + skipped)) return;
 
     const res = await sb.from('library').upsert(rows, { onConflict: 'slug' }).select('slug');
     const badW = writeFailed(res, 'published');
-    if (badW) { alert('Could not publish: ' + badW); return; }
+    if (badW) { fail('Could not publish: ' + badW); return; }
     await loadLibrary();
     render();
-    alert('Published ' + rows.length + '.' + skipped);
+    if (skipped) alert('Published ' + rows.length + '.' + skipped); else toast('Published ' + rows.length);
   };
   input.click();
 }
@@ -2313,7 +2356,7 @@ async function postCoachLine() {
   // p_day: the wall day this composer belongs to. Without it the server files the line under its
   // own UTC date, so between local midnight and UTC midnight a new line overwrote yesterday's.
   const { error } = await sb.rpc('set_coach_note', { p_body: body, p_day: todayKey() });
-  if (error) { alert('Could not post: ' + error.message); return; }
+  if (error) { fail('Could not post: ' + error.message); return; }
   _coachLineDraft = null;
   toast('On the wall');
   refetch(['notes']);
@@ -2321,7 +2364,7 @@ async function postCoachLine() {
 async function clearCoachLine() {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const { error } = await sb.rpc('set_coach_note', { p_body: '', p_day: todayKey() });
-  if (error) { alert('Could not clear: ' + error.message); return; }
+  if (error) { fail('Could not clear: ' + error.message); return; }
   _coachLineDraft = null;
   toast('Taken down');
   refetch(['notes']);
@@ -2329,7 +2372,7 @@ async function clearCoachLine() {
 async function toggleHide(athleteId, day, hide) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const { error } = await sb.rpc('hide_note', { p_athlete_id: athleteId, p_day: day, p_hidden: hide });
-  if (error) { alert('Could not update: ' + error.message); return; }
+  if (error) { fail('Could not update: ' + error.message); return; }
   toast(hide ? 'Hidden from the wall' : 'Back on the wall');
   refetch(['notes']);
 }
@@ -2368,7 +2411,7 @@ function needPanelHtml() {
   const lb = lastBackupAt(), lbDays = lb ? daysSince(lb) : null, lbBad = lastBadBackupAt();
   if (!DEMO && (lbDays == null || lbDays >= 7)) extra.push(`<div class="need" style="border-style:dashed">
       <span class="dot ochre"></span>
-      <span class="b"><span class="n">Weekly backup</span><div class="s">${lb ? 'Last complete one taken on this computer ' + timeAgo(lb) : 'No complete backup taken on this computer yet'}${
+      <span class="b"><span class="n">Weekly backup</span><div class="s" style="white-space:normal">${lb ? 'Last complete one taken on this computer ' + timeAgo(lb) : 'No complete backup taken on this computer yet'}${
         lbBad ? `; the try ${esc(timeAgo(lbBad))} was INCOMPLETE and does not count` : ''} — the free plan keeps none</div></span>
       <button class="btn sm" onclick="downloadBackup(this)">⤓ Back up now</button>
     </div>`);
@@ -2410,7 +2453,7 @@ async function clearNoteBacklog() {
       .eq('athlete_id', r.athlete_id).eq('day', r.day).eq('completed_on', r.completed_on).select('athlete_id, day, completed_on');
     if (writeFailed(res)) failed++; else { done++; marked.push(...res.data); }
   }
-  if (failed) alert(`${done} marked read, ${failed} could not be. Refresh and try again.`); else toast(`${done} older note${done === 1 ? '' : 's'} marked read`);
+  if (failed) fail(`${done} marked read, ${failed} could not be. Refresh and try again.`); else toast(`${done} older note${done === 1 ? '' : 's'} marked read`);
   markHistRead(marked);
 }
 window.clearNoteBacklog = clearNoteBacklog;
@@ -2465,7 +2508,7 @@ async function startQuestRun() {
   const qTitle = id => { const q = questPool().find(x => x.id === id); return q && (q.title || q.name) ? (q.title || q.name) : id; };
   if (!confirm(`Start a quest week from today (7 days) with:\n\n${ids.map(id => '• ' + qTitle(id)).join('\n')}?`)) return;
   const { error } = await sb.rpc('set_quests', { p_start: todayKey(), p_ids: ids });
-  if (error) { alert('Could not start: ' + error.message); return; }
+  if (error) { fail('Could not start: ' + error.message); return; }
   _questPicked.clear();
   toast('Quest week live');
   refetch(['rules']);
@@ -2479,7 +2522,7 @@ async function endQuestRun(start) {
   const { error } = await sb.rpc('end_quests', { p_start: start, p_end: todayKey() });
   if (error) {
     // Never fall back to clear_quests: that is the call that takes the XP back.
-    alert('Could not end the run: ' + (/Could not find the function|PGRST202/i.test((error.message || '') + (error.code || ''))
+    fail('Could not end the run: ' + (/Could not find the function|PGRST202/i.test((error.message || '') + (error.code || ''))
       ? 'the server does not have end_quests yet (supabase/stage55_end_quests.sql has not been run).' : error.message) + '\n\nNothing was changed.');
     return;
   }
@@ -3460,16 +3503,16 @@ function withEditedEx(ex, form) {
 
 async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, btn) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (S.progSrc[athleteId] !== 'db') { alert('This athlete has no programme in the database, so there is nothing to edit.'); return; }
+  if (S.progSrc[athleteId] !== 'db') { fail('This athlete has no programme in the database, so there is nothing to edit.'); return; }
   const shown = exAt(athleteId, dayId, blockIdx, exIdx);
   if (!shown || shown.ex.name !== expectName) {
     delete _exDrafts[eid];
     await reloadPrograms(); render();
-    alert('That exercise has moved in the programme since this page was drawn, so nothing was saved. The page now shows the live programme: open ✎ on the exercise again.');
+    fail('That exercise has moved in the programme since this page was drawn, so nothing was saved. The page now shows the live programme: open ✎ on the exercise again.');
     return;
   }
   const form = readExEditor(eid);
-  if (form.error) { alert(form.error); return; }
+  if (form.error) { fail(form.error); return; }
   if (JSON.stringify(withEditedEx(shown.ex, form)) === JSON.stringify(shown.ex)) {
     delete _exDrafts[eid]; toast('No change to save'); renderDetailBody(); return;
   }
@@ -3480,12 +3523,12 @@ async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, 
   // tab, a restore). Saving it whole would put the old programme back, so the edit is applied to
   // the LIVE row, and only if nobody has written it since this page loaded.
   const live = await sb.from('programs').select('data, updated_at, updated_by').eq('athlete_id', athleteId).maybeSingle();
-  if (live.error || !live.data) { done(); alert('Could not read the live programme, so nothing was saved: ' + (live.error ? live.error.message : 'no row')); return; }
+  if (live.error || !live.data) { done(); fail('Could not read the live programme, so nothing was saved: ' + (live.error ? live.error.message : 'no row')); return; }
   const seen = (S.progMeta[athleteId] || {}).updated_at;
   const stale = async (why) => {
     done(); delete _exDrafts[eid];
     await reloadPrograms(); render();
-    alert(why + '\n\nNothing was saved. The page now shows the live programme: open ✎ again and redo the change.');
+    fail(why + '\n\nNothing was saved. The page now shows the live programme: open ✎ again and redo the change.');
   };
   if (seen && live.data.updated_at !== seen) {
     return stale(`${nameOf(athleteId)}'s programme changed on the server after this page loaded ` +
@@ -3505,7 +3548,7 @@ async function saveExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, 
     // Either someone saved in the second between the read and the write, or the session lapsed.
     return stale('The programme was not updated: it changed again while saving, or your sign-in lapsed.');
   }
-  if (res.error) { done(); alert('Could not save: ' + res.error.message); return; }
+  if (res.error) { done(); fail('Could not save: ' + res.error.message); return; }
   S.programs[athleteId] = fresh;
   S.progMeta[athleteId] = { updated_at: res.data[0].updated_at, updated_by: res.data[0].updated_by };
   delete _exDrafts[eid];
@@ -3549,12 +3592,12 @@ function fmtLocalStamp(iso) {
 async function restoreProgramVersion(athleteId, versionId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const v = await sb.from('program_versions').select('athlete_id, data, saved_at').eq('id', versionId).maybeSingle();
-  if (v.error || !v.data) { alert('Could not read that version.'); return; }
-  if (v.data.athlete_id !== athleteId) { alert('That version belongs to a different athlete. Nothing was changed.'); return; }
+  if (v.error || !v.data) { fail('Could not read that version.'); return; }
+  if (v.data.athlete_id !== athleteId) { fail('That version belongs to a different athlete. Nothing was changed.'); return; }
   if (!confirm(`Restore ${nameOf(athleteId)}'s programme to how it was before the save of ${fmtLocalStamp(v.data.saved_at)}?\n\nThe current one is kept in this list, so this is reversible.`)) return;
   const res = await sb.from('programs').update({ data: v.data.data }).eq('athlete_id', athleteId).select('athlete_id');
   const bad = writeFailed(res, 'restored');
-  if (bad) { alert('Could not restore: ' + bad); return; }
+  if (bad) { fail('Could not restore: ' + bad); return; }
   Object.keys(_exDrafts).forEach(k => delete _exDrafts[k]);
   await reloadPrograms();
   render();
@@ -3874,7 +3917,7 @@ async function renderDetail(athleteId, sub) {
         const r = await sb.from('call_logs').select('*').eq('athlete_id', athleteId).order('call_date', { ascending: false });
         // Cached only when it really loaded: a failed read used to stick as "No call logs yet".
         if (r && !r.error) { callLogs = S.callLogs[athleteId] = r.data || []; delete _callErr[athleteId]; }
-        else { callLogs = []; _callErr[athleteId] = (r && r.error && r.error.message) || 'no answer'; toast('Call logs did not load: ' + _callErr[athleteId]); }
+        else { callLogs = []; _callErr[athleteId] = (r && r.error && r.error.message) || 'no answer'; fail('Call logs did not load: ' + _callErr[athleteId]); }
       }
     }
     const lib = await exLib();
@@ -4183,7 +4226,7 @@ async function markNoteRead(athleteId, day, completedOn) {
   const res = await sb.from('session_history').update({ coach_status: 'read' })
     .eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn).select('athlete_id, day, completed_on');
   const bad = writeFailed(res, 'marked read');
-  if (bad) { alert('Could not mark it read: ' + bad); return; }
+  if (bad) { fail('Could not mark it read: ' + bad); return; }
   markHistRead(res.data);
 }
 // The rows the server just marked read, patched into the copy in memory. Re-reading the whole of
@@ -4304,10 +4347,10 @@ function parseAndFillSession() {
   $('as-save').disabled = !p.day;
 }
 async function submitPastSession(athleteId) {
-  if (!_pendingImport || !_pendingImport.day) { alert('Paste an email and tap "Read email" first.'); return; }
+  if (!_pendingImport || !_pendingImport.day) { fail('Paste an email and tap "Read email" first.'); return; }
   const dateEl = $('as-date');
   const completedOn = dateEl && dateEl.value;
-  if (!completedOn) { alert('Pick the date this session was done (from the email).'); return; }
+  if (!completedOn) { fail('Pick the date this session was done (from the email).'); return; }
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const p = _pendingImport;
   if (!emailNamesAthlete(p.who, athleteId) &&
@@ -4342,7 +4385,7 @@ async function submitPastSession(athleteId) {
     // secret. Every key was deleted when the old links were retired.
     p_key: null
   });
-  if (error) { alert('Could not save: ' + error.message); if (btn) { btn.disabled = false; btn.textContent = 'Save to logs'; } return; }
+  if (error) { fail('Could not save: ' + error.message); if (btn) { btn.disabled = false; btn.textContent = 'Save to logs'; } return; }
   _pendingImport = null;
   KEEP_TYPED.forEach(id => { if (id !== 'athPw' && $(id)) $(id).value = ''; });
   if ($('as-preview')) $('as-preview').innerHTML = '';
@@ -4362,7 +4405,7 @@ async function deleteSession(athleteId, day, completedOn) {
   const res = await sb.from('session_history').delete()
     .eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn).select('day');
   const bad = writeFailed(res, 'deleted');
-  if (bad) { alert('Could not delete: ' + bad); return; }
+  if (bad) { fail('Could not delete: ' + bad); return; }
   toast('Session log deleted');
   refetch(['hist']);
 }
@@ -4380,17 +4423,17 @@ async function deleteAthlete(athleteId) {
     // A database error code means the server answered, and an error rolls the whole call back. No code means the answer
     // never arrived (a dropped connection): the delete may have gone through, so say that instead of "nothing was removed".
     if (!res.error.code) {
-      alert(`The answer never arrived (${m || 'no reply'}), so the page cannot tell whether ${name}'s training history was deleted.\n\nRefresh and open their File to see; delete again only if it is still there.`);
+      fail(`The answer never arrived (${m || 'no reply'}), so the page cannot tell whether ${name}'s training history was deleted.\n\nRefresh and open their File to see; delete again only if it is still there.`);
       return;
     }
-    alert('Nothing was deleted: ' + (/coach only|permission denied|JWT/i.test(m) ? 'your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.'
+    fail('Nothing was deleted: ' + (/coach only|permission denied|JWT/i.test(m) ? 'your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.'
       : /Could not find the function|PGRST202/i.test(m + (res.error.code || '')) ? 'the server does not have coach_delete_training_history yet (supabase/stage48_coach_one_transaction.sql has not been applied).'
       : m) + '\n\nNothing was removed: both parts are one step, so a failure undoes it all.');
     return;
   }
   const d = res.data || {}, nS = Number(d.sessions) || 0, nP = Number(d.progress) || 0;
   const had = (S.hist || []).some(h => h.athlete_id === athleteId) || (S.prog || []).some(p => p.athlete_id === athleteId);
-  if (!nS && !nP && had) { alert('Nothing was deleted: the server removed no rows although the dashboard lists some. Refresh and try again.'); hardRefresh(); return; }
+  if (!nS && !nP && had) { fail('Nothing was deleted: the server removed no rows although the dashboard lists some. Refresh and try again.'); hardRefresh(); return; }
   toast(`Deleted ${nS} session${nS === 1 ? '' : 's'}${nP ? ' and the app data' : ''}`);
   hardRefresh();
 }
@@ -4399,7 +4442,7 @@ async function deleteCallLog(id, athleteId, callDate) {
   if (!confirm(`Delete the call log from ${callDate}?\n\nThis permanently removes that weekly check-in. It cannot be undone.`)) return;
   const res = await sb.from('call_logs').delete().eq('id', id).select('id');
   const bad = writeFailed(res, 'deleted');
-  if (bad) { alert('Could not delete: ' + bad); return; }
+  if (bad) { fail('Could not delete: ' + bad); return; }
   delete S.callLogs[athleteId];
   invalidateDetail();
   render();
@@ -4628,7 +4671,7 @@ async function eraseRun() {
       render(); return;
     }
     e.status = 'ready'; render();
-    alert('Nothing was erased: ' + eraseWhy(res.error) + '\n\nIt is one step, so nothing was half done.');
+    fail('Nothing was erased: ' + eraseWhy(res.error) + '\n\nIt is one step, so nothing was half done.');
     return;
   }
   const d = res.data || {};
@@ -4767,13 +4810,13 @@ function setBoardScope(s) { _boardScope = s; renderProof(); }
 async function forgetContact(athleteId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   // Without the programmes nobody's tier is known, and a coached client would look like a free signup.
-  if (LOAD_ERR.programs) { alert('The programmes did not load, so it is not known whether ' + athleteId + ' is a coached client. Forget is switched off until ↻ Refresh loads them.'); return; }
-  if ((S.ath[athleteId] || {}).tier === 'coached') { alert('This is a coached athlete. Forget would delete their training app data (records, body weight, check-ins), so it is not offered for them.'); return; }
+  if (LOAD_ERR.programs) { fail('The programmes did not load, so it is not known whether ' + athleteId + ' is a coached client. Forget is switched off until ↻ Refresh loads them.'); return; }
+  if ((S.ath[athleteId] || {}).tier === 'coached') { fail('This is a coached athlete. Forget would delete their training app data (records, body weight, check-ins), so it is not offered for them.'); return; }
   // Says exactly what forget_contact() deletes (checked against the live function, 2026-09-26: this
   // used to say "Their logs and board place are untouched", the opposite of what it does).
   if (!confirm(`Forget ${athleteId}?\n\nThis PERMANENTLY deletes their contact details, their whole habit log and progress, their board place and their roll-call lines. There is no undo and no automatic backup: take a ⤓ Backup first if you are not sure.\n\nTheir programme, login, session history, titles and season results stay. To remove everything about them, cancel this and use "Erase completely…" on their File tab.`)) return;
   const { error } = await sb.rpc('forget_contact', { p_athlete_id: athleteId });
-  if (error) { alert('Could not forget: ' + error.message); return; }
+  if (error) { fail('Could not forget: ' + error.message); return; }
   toast('Forgotten');
   S.board = { season: null, week: null };             // their board place went too
   refetch(['contacts', 'notes', 'prog', 'optin']);   // forget_contact() deletes all four
@@ -4843,7 +4886,7 @@ async function setLibraryPublished(slug, publish) {
   if (!confirm(publish ? `Publish "${title}"? It appears in every athlete's app.` : `Hide "${title}"? It disappears from every athlete's app (the file and its web page stay).`)) return;
   const res = await sb.from('library').update({ published: publish }).eq('slug', slug).select('slug');
   const bad = writeFailed(res, publish ? 'published' : 'hidden');
-  if (bad) { alert('Could not update: ' + bad); return; }
+  if (bad) { fail('Could not update: ' + bad); return; }
   await loadLibrary();
   render();
   toast(publish ? 'Published' : 'Hidden from the app');
@@ -4986,7 +5029,7 @@ async function affSave(formEl, btn) {
     else Object.assign((S.affiliates || []).find(x => x.code === code) || {}, patch);
   } else {
     const err = await affWrite(isNew ? sb.from('affiliates').insert(row) : sb.from('affiliates').update(patch).eq('code', code));
-    if (err) { if (btn) btn.disabled = false; toast('Could not save — ' + err); return; }
+    if (err) { if (btn) btn.disabled = false; fail('Could not save — ' + err); return; }
   }
   _affEditing = null;
   toast(DEMO ? 'Demo mode — nothing saved' : (isNew ? code + ' is live on both apply forms' : 'Saved'));
@@ -5001,7 +5044,7 @@ async function affSetActive(code, active, btn) {
     Object.assign((S.affiliates || []).find(x => x.code === code) || {}, patch);
   } else {
     const err = await affWrite(sb.from('affiliates').update(patch).eq('code', code));
-    if (err) { if (btn) btn.disabled = false; toast('Could not update — ' + err); return; }
+    if (err) { if (btn) btn.disabled = false; fail('Could not update — ' + err); return; }
   }
   toast(DEMO ? 'Demo mode — nothing saved' : (active ? code + ' is live again' : code + ' retired'));
   if (DEMO) renderAffiliates(); else await refetch(['affiliates']);
@@ -5107,16 +5150,17 @@ async function assessAction(action, username, label, btn, password) {
   _assessBusy = false; if (btn) btn.disabled = false;
   let msg = data && data.error;
   if (!msg && error) { try { msg = (await error.context.json()).error; } catch (e) { msg = error.message; } }
-  if (msg) { alert('Could not ' + action + ' the login:\n\n' + msg); return; }
+  if (msg) { fail('Could not ' + action + ' the login:\n\n' + msg); return; }
   _assessPw = null;
   await loadAssess();
   if (action === 'revoke') { toast(username + ' revoked'); renderAssess(); return; }
   copyText(assessMessage(data.username, data.password));
   renderAssess();
-  alert((data.created ? 'Login created' : action === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username + '\n\n' +
-    'Password: ' + data.password + '\n\n' +
-    'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent, or until they sign in with it (then the database clears it).' +
-    (data.warning ? '\n\n⚠ ' + data.warning : ''));
+  // Like an athlete's login: the message is on the clipboard and the password waits in the list (Copy, Mark sent) until they sign in with
+  // it, so a toast is enough. Only when the server could not store the password is this the one place it is shown.
+  const what = (data.created ? 'Login created' : action === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username;
+  if (data.warning) alert(what + '\n\nPassword: ' + data.password + '\n\nThe Farsi WhatsApp message is copied to your clipboard.\n\n⚠ ' + data.warning);
+  else toast(what + ' — the message is copied; send it on WhatsApp');
 }
 
 async function assessMarkSent(username) {
@@ -5125,7 +5169,7 @@ async function assessMarkSent(username) {
   const res = await sb.from('assess_accounts')
     .update({ initial_password: null, sent_at: new Date().toISOString() }).eq('username', username).select('username');
   const bad = writeFailed(res, 'marked sent');
-  if (bad) { alert('Could not update: ' + bad); return; }
+  if (bad) { fail('Could not update: ' + bad); return; }
   await loadAssess();
   renderAssess();
 }
@@ -5179,7 +5223,7 @@ function renderAssess() {
     const u = ($('asUser').value || '').trim().toLowerCase();
     if (!/^[a-z0-9_]{3,32}$/.test(u)) { toast('Username: 3 to 32 characters, a-z, 0-9 or _'); return; }
     const t = typedPassword($('asPass').value, u);
-    if (t.error) { toast(t.error); return; }
+    if (t.error) { fail(t.error); return; }
     assessAction('create', u, ($('asLabel').value || '').trim(), el, t.password);
   });
   on('.as-act', el => assessAction(el.dataset.act, el.dataset.u, '', el));
@@ -5187,7 +5231,7 @@ function renderAssess() {
   on('.as-pwcancel', () => { _assessPw = null; renderAssess(); });
   on('.as-pwsave', el => {
     const t = typedPassword(c.querySelector('.as-pwin').value, el.dataset.u);
-    if (t.error) { toast(t.error); return; }
+    if (t.error) { fail(t.error); return; }
     assessAction(el.dataset.act, el.dataset.u, '', el, t.password);
   });
   const asPwIn = c.querySelector('.as-pwin');
@@ -5249,16 +5293,17 @@ async function courseAction(action, username, label, btn, password) {
   _courseBusy = false; if (btn) btn.disabled = false;
   let msg = data && data.error;
   if (!msg && error) { try { msg = (await error.context.json()).error; } catch (e) { msg = error.message; } }
-  if (msg) { alert('Could not ' + action + ' the login:\n\n' + msg); return; }
+  if (msg) { fail('Could not ' + action + ' the login:\n\n' + msg); return; }
   _coursePw = null;
   await loadCourse();
   if (action === 'revoke') { toast(username + ' revoked'); renderCourse(); return; }
   copyText(courseMessage(data.username, data.password));
   renderCourse();
-  alert((data.created ? 'Login created' : action === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username + '\n\n' +
-    'Password: ' + data.password + '\n\n' +
-    'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent, or until they sign in with it (then the database clears it).' +
-    (data.warning ? '\n\n⚠ ' + data.warning : ''));
+  // Like an athlete's login: the message is on the clipboard and the password waits in the list (Copy, Mark sent) until they sign in with
+  // it, so a toast is enough. Only when the server could not store the password is this the one place it is shown.
+  const what = (data.created ? 'Login created' : action === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username;
+  if (data.warning) alert(what + '\n\nPassword: ' + data.password + '\n\nThe Farsi WhatsApp message is copied to your clipboard.\n\n⚠ ' + data.warning);
+  else toast(what + ' — the message is copied; send it on WhatsApp');
 }
 
 async function courseMarkSent(username) {
@@ -5267,7 +5312,7 @@ async function courseMarkSent(username) {
   const res = await sb.from('tps_accounts')
     .update({ initial_password: null, sent_at: new Date().toISOString() }).eq('username', username).select('username');
   const bad = writeFailed(res, 'marked sent');
-  if (bad) { alert('Could not update: ' + bad); return; }
+  if (bad) { fail('Could not update: ' + bad); return; }
   await loadCourse();
   renderCourse();
 }
@@ -5321,7 +5366,7 @@ function renderCourse() {
     const u = ($('tpUser').value || '').trim().toLowerCase();
     if (!/^[a-z0-9_]{3,32}$/.test(u)) { toast('Username: 3 to 32 characters, a-z, 0-9 or _'); return; }
     const t = typedPassword($('tpPass').value, u);
-    if (t.error) { toast(t.error); return; }
+    if (t.error) { fail(t.error); return; }
     courseAction('create', u, ($('tpLabel').value || '').trim(), el, t.password);
   });
   on('.tp-act', el => courseAction(el.dataset.act, el.dataset.u, '', el));
@@ -5329,7 +5374,7 @@ function renderCourse() {
   on('.tp-pwcancel', () => { _coursePw = null; renderCourse(); });
   on('.tp-pwsave', el => {
     const t = typedPassword(c.querySelector('.tp-pwin').value, el.dataset.u);
-    if (t.error) { toast(t.error); return; }
+    if (t.error) { fail(t.error); return; }
     courseAction(el.dataset.act, el.dataset.u, '', el, t.password);
   });
   const tpPwIn = c.querySelector('.tp-pwin');
@@ -5710,13 +5755,13 @@ async function loadSpineVersions(id, fresh) {
 }
 async function undoSpineVersion(id, versionId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!S.spine || S.spine.failed) { alert('The Spine did not load, so nothing can be saved. Tap ↻ Refresh first.'); return; }
+  if (!S.spine || S.spine.failed) { fail('The Spine did not load, so nothing can be saved. Tap ↻ Refresh first.'); return; }
   const v = _spVers.id === id && _spVers.rows.find(x => Number(x.id) === Number(versionId));
-  if (!v) { alert('That change is not on screen any more. Close History and open it again.'); return; }
+  if (!v) { fail('That change is not on screen any more. Close History and open it again.'); return; }
   if (!spineMayLeave('Put it back')) return;
   // Compare against the server's copy now, not the page's: the point is what is there at this moment.
   const [le, lc] = await Promise.all([sb.from('exercises').select('*').eq('id', id).maybeSingle(), sb.from('exercise_coach').select('*').eq('id', id).maybeSingle()]);
-  if (le.error || lc.error || !le.data) { alert('Could not read the entry first: ' + ((le.error || lc.error || {}).message || 'it is not on the server any more') + '\n\nNothing was changed.'); return; }
+  if (le.error || lc.error || !le.data) { fail('Could not read the entry first: ' + ((le.error || lc.error || {}).message || 'it is not on the server any more') + '\n\nNothing was changed.'); return; }
   const half = v.tbl === 'exercises' ? le.data : (lc.data || {});
   const cols = Object.keys(v.changed || {}).filter(k => SPINE_LABEL[k] && stableJson(half[k]) !== stableJson(v.data[k]));
   if (!cols.length) { toast('Already as it was then: nothing to put back'); return; }
@@ -5730,7 +5775,7 @@ async function undoSpineVersion(id, versionId) {
     const cur = S.spine.list.find(e => e.id === id);
     if (cur) Object.assign(cur, le.data);
     const problem = spineUndoProblem(id, cur, changes);
-    if (problem) { alert(problem); return; }
+    if (problem) { fail(problem); return; }
   }
   const toDraft = cols.includes('status') && v.data.status === 'draft', toLive = cols.includes('status') && v.data.status === 'approved';
   if (!confirm(`Undo the change of ${fmtLocalStamp(v.saved_at)}?\n\n${cols.map(k => { const [now, back] = spinePair(k, half[k], v.data[k]); return `${SPINE_LABEL[k]}: now ${now}\n   back to ${back}`; }).join('\n')}${
@@ -5739,12 +5784,12 @@ async function undoSpineVersion(id, versionId) {
   spineHistStale();   // whatever the answer, the entry's history may have moved: the next paint reads it again
   if (res.error) {
     // No database code means the answer never arrived: the change may have gone in, so do not say it did not.
-    alert(!res.error.code
+    fail(!res.error.code
       ? 'The answer never arrived (' + (res.error.message || 'no reply') + '), so the page cannot tell whether it was put back.\n\nTap ↻ Refresh and look at the entry before trying again.'
       : 'Could not put it back: ' + res.error.message + '\n\nNothing was changed.');
     return;
   }
-  if (res.data && res.data.ok === false) { alert('It was changed again while you were looking, so nothing was put back. Close History and open it again.'); renderExercises(); return; }
+  if (res.data && res.data.ok === false) { fail('It was changed again while you were looking, so nothing was put back. Close History and open it again.'); renderExercises(); return; }
   const cur = S.spine.list.find(e => e.id === id);
   if (cur && res.data.entry) Object.assign(cur, res.data.entry);
   if (res.data.coach) S.spine.coach[id] = res.data.coach;
@@ -5789,11 +5834,11 @@ function spineUndoProblem(id, cur, changes) {
 
 async function spineSave(id, approve) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!S.spine || S.spine.failed) { alert('The Spine did not load, so nothing can be saved. Tap ↻ Refresh first.'); return; }
+  if (!S.spine || S.spine.failed) { fail('The Spine did not load, so nothing can be saved. Tap ↻ Refresh first.'); return; }
   const ed = $('spineEd');
   if (!ed || _spineOpen !== id) return;
   const cur = S.spine.list.find(e => e.id === id);
-  if (!cur) { alert('This entry is not in the list any more. Refresh.'); return; }
+  if (!cur) { fail('This entry is not in the list any more. Refresh.'); return; }
   const k0 = S.spine.coach[id] || {};
   const edits = spineEdits();
   _spineDraft = { id, edits };   // a refusal below keeps what was typed, whatever redraws next
@@ -5808,11 +5853,11 @@ async function spineSave(id, approve) {
   const links = {};
   ['easier', 'harder', 'alts'].forEach(k => { links[k] = spineCsv(f(k)).map(toLink).filter((x, i, a) => x !== id && a.indexOf(x) === i); });
   const bad = [].concat(links.easier, links.harder, links.alts).filter(x => SPINE_ID_RE.test(x) && !ids.has(x));
-  if (bad.length) { alert('These look like ids but are not entries:\n\n' + bad.join('\n') + '\n\nPick an id from the list, or type the exercise\'s name (e.g. Nordic Hamstring Curl).'); return; }
+  if (bad.length) { fail('These look like ids but are not entries:\n\n' + bad.join('\n') + '\n\nPick an id from the list, or type the exercise\'s name (e.g. Nordic Hamstring Curl).'); return; }
   const qs = [f('q1'), f('q2'), f('q3')];
-  if (!qs[0] && (qs[1] || qs[2])) { alert('Pick the primary quality first: the first box is the one the day card names.'); return; }
+  if (!qs[0] && (qs[1] || qs[2])) { fail('Pick the primary quality first: the first box is the one the day card names.'); return; }
   const sfrTxt = f('sfr').trim();
-  if (sfrTxt && !/^[1-9]\d*$/.test(sfrTxt)) { alert('SFR rank is a whole number from 1 (best stimulus for its fatigue in its pattern), or blank.'); return; }
+  if (sfrTxt && !/^[1-9]\d*$/.test(sfrTxt)) { fail('SFR rank is a whole number from 1 (best stimulus for its fatigue in its pattern), or blank.'); return; }
   const good = spineLines(f('good')), badCues = spineLines(f('bad'));
   const row = {
     name: f('name').trim() || cur.name, aliases: spineCsv(f('aliases')), pattern: f('pattern') || null,
@@ -5828,11 +5873,11 @@ async function spineSave(id, approve) {
   // Counts toward: blank means "counts toward nothing" ({}), except on an entry never given a
   // count, which stays unset (null) so the checker still asks for one.
   const cr = spineParseCredits(f('credits'));
-  if (cr.bad.length) { alert('Counts toward: write each one as a muscle and 1 or 0.5, e.g. "quads 1, glutes 0.5".\n\nMuscles: ' + SPINE_MUSCLES.join(', ') + '\n\nNot understood: ' + cr.bad.join(', ')); return; }
+  if (cr.bad.length) { fail('Counts toward: write each one as a muscle and 1 or 0.5, e.g. "quads 1, glutes 0.5".\n\nMuscles: ' + SPINE_MUSCLES.join(', ') + '\n\nNot understood: ' + cr.bad.join(', ')); return; }
   // The muscle map (stage42): display only, for an entry that counts toward nothing. The app shows
   // the counts when they name a muscle, so this is ignored then. Same list and grammar as the counts.
   const mu = spineParseCredits(f('muscles'));
-  if (mu.bad.length) { alert('Muscles shown: write each one as a muscle and 1 or 0.5, e.g. "calves 1, shins 0.5".\n\nMuscles: ' + SPINE_MUSCLES.join(', ') + '\n\nNot understood: ' + mu.bad.join(', ')); return; }
+  if (mu.bad.length) { fail('Muscles shown: write each one as a muscle and 1 or 0.5, e.g. "calves 1, shins 0.5".\n\nMuscles: ' + SPINE_MUSCLES.join(', ') + '\n\nNot understood: ' + mu.bad.join(', ')); return; }
   row.muscles = Object.keys(mu.out).length ? mu.out : null;
   const coachRow = { sfr: sfrTxt ? parseInt(sfrTxt, 10) : null, flags: st.sflag ? st.sflag.split(',') : [],
     notes: f('notes').trim() || null, cost: f('cost') || null,
@@ -5850,7 +5895,7 @@ async function spineSave(id, approve) {
   // Identity: a new name or alias must not take a card away from this entry or from another one (the rules Undo meets too).
   if ('name' in entry || 'aliases' in entry) {
     const problem = spineIdentityProblem(id, cur, row.name, row.aliases, false);
-    if (problem) { alert(problem); return; }
+    if (problem) { fail(problem); return; }
   }
   if (approve === false) {
     const used = spineCardsFor(id), n = Object.keys(used.athletes).length;
@@ -5870,7 +5915,7 @@ async function spineSave(id, approve) {
     const m = res.error.message || '';
     // A database error code means the server answered, and an error rolls the whole call back: nothing was saved. No code
     // means the answer never arrived (a dropped connection): the save may have gone in, so the page must not say it did not.
-    alert(!res.error.code
+    fail(!res.error.code
       ? `The answer never arrived (${m || 'no reply'}), so the page cannot tell whether ${nm0} was saved.\n\nTap ↻ Refresh and look at the entry before saving again; what you typed is still in the form.`
       : `Could not save ${nm0}: ` + (/Could not find the function|PGRST202/i.test(m + (res.error.code || '')) ? 'the server does not have coach_save_spine yet (supabase/stage48_coach_one_transaction.sql has not been applied).'
         : /coach only|permission denied|JWT/i.test(m) ? 'your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.' : m)
@@ -5885,7 +5930,7 @@ async function spineSave(id, approve) {
     // The page's copy becomes what the server holds, so a Save again compares against it and goes through.
     if (out.entry) Object.assign(cur, out.entry.live);
     if (out.coach) S.spine.coach[id] = Object.assign({}, k0, out.coach.live);
-    alert(`Since you opened ${nm0}, someone else (Claude's /spine, or this page in another tab) changed what you changed:\n\n${lines.join('\n')}\n\nNothing was saved, to either half. Your typed values are still in the form: Save again to put yours over theirs, or Close to keep theirs.`);
+    fail(`Since you opened ${nm0}, someone else (Claude's /spine, or this page in another tab) changed what you changed:\n\n${lines.join('\n')}\n\nNothing was saved, to either half. Your typed values are still in the form: Save again to put yours over theirs, or Close to keep theirs.`);
     renderExercises();
     return;
   }
@@ -5900,7 +5945,7 @@ async function spineSave(id, approve) {
 // ── The Quality Map (2026-09-24) — the ten texts, and the check across athletes ──
 async function qualSave(id, approve) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!S.spine || S.spine.failed) { alert('The Spine did not load, so nothing can be saved. Tap ↻ Refresh first.'); return; }
+  if (!S.spine || S.spine.failed) { fail('The Spine did not load, so nothing can be saved. Tap ↻ Refresh first.'); return; }
   const c = $('content');
   const el = n => c.querySelector(`[data-qf="${id}:${n}"]`);
   const f = n => ((el(n) || {}).value || '').trim();
@@ -5918,10 +5963,10 @@ async function qualSave(id, approve) {
   const r = await saveChangedCols('qualities', id, cur, changes);
   if (r.clash) {
     Object.assign(cur, r.live);
-    alert(`Since the page loaded, someone else changed ${cur.name}'s ${r.clash.join(', ')}. Nothing was saved. Your text is still in the boxes: Save again to put yours over theirs.`);
+    fail(`Since the page loaded, someone else changed ${cur.name}'s ${r.clash.join(', ')}. Nothing was saved. Your text is still in the boxes: Save again to put yours over theirs.`);
     renderExercises(); return;
   }
-  if (r.error) { alert('Could not save ' + cur.name + ': ' + r.error); return; }
+  if (r.error) { fail('Could not save ' + cur.name + ': ' + r.error); return; }
   Object.assign(cur, r.row);
   Object.keys(_qualDraft).forEach(k => { if (k.startsWith(id + ':')) delete _qualDraft[k]; });
   toast(row.status === 'approved' ? (approve ? 'Approved — it shows on day cards once exercises carry it' : 'Saved') : approve === false ? 'Moved back to draft' : 'Saved as draft');
@@ -6287,7 +6332,7 @@ async function intakeSetStatus(id, to, btn) {
   if (btn) btn.disabled = true;
   if (!DEMO) {
     const { error } = await sb.rpc('set_intake_status', { p_id: id, p_status: to });
-    if (error) { if (btn) btn.disabled = false; toast('Could not update — try Refresh'); return; }
+    if (error) { if (btn) btn.disabled = false; fail('Could not update — try Refresh'); return; }
   }
   const row = (S.intake || []).find(x => String(x.id) === String(id));
   if (row) row.status = to;
@@ -6606,7 +6651,7 @@ async function boot() {
   // Server-scored levels fill in behind the first paint.
   loadLevels().then(() => { if (S.ready) render(); });
 }
-function showGate(err) { $('app').style.display = 'none'; $('gate').style.display = 'block'; $('gateErr').textContent = err || ''; }
+function showGate(err) { failDismissAll(); $('app').style.display = 'none'; $('gate').style.display = 'block'; $('gateErr').textContent = err || ''; }
 // supabase-js fires an auth event on load, on every hourly token refresh, when the tab comes
 // back into focus, and on a real sign-in or sign-out. This used to re-run boot() on ALL of them:
 // three full loads on every open, and a full reload and repaint several times an hour that

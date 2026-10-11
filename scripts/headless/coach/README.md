@@ -21,6 +21,7 @@ cd <repo> && python3 -m http.server 8765 --bind 127.0.0.1 &
 # 2. the scenarios
 node scripts/headless/coach/run.js              # all of them -> $OUT/results.json, backups, screenshots
 node scripts/headless/coach/run.js editor backup  # only ids containing one of the words
+sh scripts/headless/coach/run-parallel.sh [3]    # the whole suite in 3 parallel shards (SHARD=i/n), one summary: about a third of the time
 COACH_BASE=http://127.0.0.1:9000 node scripts/headless/coach/run.js
 
 # 3. (optional) the REAL supabase-js, for the auth events: vendor it once, outside git
@@ -42,7 +43,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 |---|---|
 | `stub.js` | the fake supabase-js v2 client, injected by `addInitScript` before the page's scripts. In-memory DB (`window.__DB`, persisted to localStorage `__harness_db` so a reload keeps it), a chainable thenable query builder (select/eq/neq/in/gte/lte/gt/lt/is/like/order/limit/range/maybeSingle/single/insert/update/upsert/delete/match/not/or/filter, `.select()` after a write returns the rows, `{count:'exact'}`), the RPCs coach.html calls (emulated from their SQL: `set_coach_note` defaults `p_day` to the UTC date like `CURRENT_DATE` on the UTC server), `functions.invoke` for `athlete-login`, auth (`getSession` = signed-in coach; `onAuthStateChange` stores callbacks in `window.__authCbs` and fires `INITIAL_SESSION` like the real v2 client). The `programs` BEFORE UPDATE trigger is emulated (snapshot into `program_versions`, keep 20, bump `updated_at`). Every call lands in `window.__calls` with filters, modifiers and payload. |
 | `fixtures.js` | `buildSeed({today, bigHistory, stub})`: the made-up rows, column names taken from `information_schema` on 2026-10-10. |
-| `lib.js` | `openCoach(browser, {hash, tz, fixedTime, seed})`: new context, routes jsDelivr's supabase-js to an empty script and every other outside host to 204, seeds, injects the stub, opens the page, auto-accepts confirm/alert (recorded in `log.dialogs`; `dismissDialogs(page, log)` in run.js answers No to confirms instead). Helpers: `calls`, `callsSince`, `db`, `go`, `jsClick`, `loadAllCount`. |
+| `lib.js` | `openCoach(browser, {hash, tz, fixedTime, seed})`: new context, routes jsDelivr's supabase-js to an empty script and every other outside host to 204, seeds, injects the stub, opens the page, auto-accepts confirm/alert (recorded in `log.dialogs`; `dismissDialogs(page, log)` in run.js answers No to confirms instead). Helpers: `calls`, `callsSince`, `db`, `go`, `jsClick`, `loadAllCount`, `toastText`, `failText` (the bar of lines that stay until dismissed). Every new line in that bar is also pushed to `log.dialogs` as an `alert` with `via: 'bar'`, so a check that asks "was the coach told X?" finds it whether it was a pop-up or a line; filter `d.via !== 'bar'` to see only real pop-ups. |
 | `run.js` | the scenarios (below). |
 | `reallib.js` | loads the REAL supabase-js UMD (vendored, step 3) with a fake stored session and answers every Supabase request locally; counts store loads at page load and after a hidden→visible tab switch, and logs the auth events. |
 
@@ -59,7 +60,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 66 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 67 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -120,6 +121,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | hist-athlete-open | opening an athlete reads their text and log once (filtered on their id), the comparison and the raw log have them, sub-tabs and going back read nothing, another athlete reads only theirs, a reloaded list reads them again | (pile B1) all of it was loaded at boot |
 | hist-heavy-fails | the read of an athlete's logs fails | (pile B1) must say *did not load* with the reason and Try again, keep the numbers, show no verdict or "not logged"; Try again brings the comparison |
 | file-redraw-keeps-work | the Change password box (typed, cursor in it), Version history and the Coaching log opened, then a full redraw and a tab-body redraw; Add past session with a pasted email, date and preview, a day card toggled, a full redraw, Save; another athlete's file | (pile B4, FILE-9) the box emptied, the sections folded, the add-session box hid again and lost the email |
+| fail-bar | a failed post on Today (and the same again, and a failed intake status), then a success, on a 1280 px screen and a 360 px phone | (pile B5) a failure was a 2.6 s toast in some tabs and a pop-up in others; now a line that stays until dismissed, in view when scrolled, merged when repeated, never a pop-up; a success stays a toast |
 
 ## Adding a scenario
 
