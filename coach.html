@@ -1807,8 +1807,10 @@ async function loadLibrary() {
 //
 // No impersonation needed: get_program() and the athlete RPCs accept the coach, so
 // Amir's own session already resolves their programme. `preview=1` is what stops the
-// app writing — it loads their real data but skips every cloud write, so looking
-// around cannot land a stray tick or note in the athlete's logged record.
+// app writing, and it also skips the pull of their saved progress: the preview shows
+// their PROGRAMME, never their logged work (sets, weights, records, habits), and looking
+// around cannot land a stray tick or note in the athlete's record. The File tab's words
+// and the preview bar in program.html say the same (audit TOOLS-11, 2026-10-11).
 function viewAsAthlete(athleteId, which) {
   const page = which === 'habits' ? 'habits.html' : 'program.html';
   // The demo's athletes are made up: show the public demo programme instead.
@@ -4456,9 +4458,9 @@ function fileTabHtml(D) {
   return `<div class="sec"><span>Their app</span></div>
     <section class="panel">
       <p class="empty" style="padding:0 0 10px">
-        Open ${esc(athleteId)}'s programme exactly as they see it on their phone — same
-        screens, same wording, their real data. It is read-only: nothing you tap is saved
-        to their record.
+        Open ${esc(athleteId)}'s programme in the same screens and words as their phone. It shows
+        the programme only: what they have logged (sets, weights, records, habits) is not in it,
+        and that is under The work and Proof here. It is read-only: nothing you tap is saved.
       </p>
       <div class="note-actions">
         <button class="btn sm primary" onclick="viewAsAthlete(${jsq(athleteId)})">View their app</button>

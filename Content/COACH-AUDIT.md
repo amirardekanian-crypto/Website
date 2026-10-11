@@ -21,7 +21,7 @@ at the root: every save that can collide now reads the live record first, sends 
 and refuses with both values shown when someone else changed the same thing; every read that can
 fail says so in a banner, and every write asks for its rows back.
 
-**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 178 are fixed, 8 partly fixed (the harm is gone, something named in the finding is left), 4 open and 1 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
+**Where it stands** (fourth session, 2026-10-11): <!--T1-->of 191 findings, 179 are fixed, 8 partly fixed (the harm is gone, something named in the finding is left), 3 open and 1 was not a bug. Of the 45 critical and high findings, 44 are fixed; not yet: TOOLS-4 (open).<!--/T1--> Nothing waits on a decision from you any more: you answered the twelve
 questions in §7 and the eleven in §12 (pile A), and the one thing left for you is to switch off public sign-up in the Supabase
 dashboard (SERVER-14). The SQL pack and the removal script ran on 2026-10-11 and §11 records what was checked afterwards.
 **What is left, and how to continue in a new chat, is §12.**
@@ -265,13 +265,13 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 
 ## 9. Appendix: every finding and where it stands
 
-<!--T9-->191 findings. Fixed 178 · Partly 8 · Open 4 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
+<!--T9-->191 findings. Fixed 179 · Partly 8 · Open 3 · Your call 0 · Not a bug 1. (*Open* includes the findings you decided on in §12, pile A, that are not built yet.)
 
 | Severity | Fixed | Partly | Open | Your call | Not a bug |
 |---|---|---|---|---|---|
 | critical | 12 | 0 | 0 | 0 | 0 |
 | high | 32 | 0 | 1 | 0 | 0 |
-| medium | 79 | 7 | 2 | 0 | 0 |
+| medium | 80 | 7 | 1 | 0 | 0 |
 | low | 55 | 1 | 1 | 0 | 1 |<!--/T9-->
 
 ### The work and the ✎ editor (WORK)
@@ -365,7 +365,7 @@ Where a safe default existed, it was taken and is listed so you can overrule it.
 | TOOLS-8 | medium | After publishing or importing a programme the store is not re-assembled: a new athlete is missing from the roster, and the athlete file keeps showing the old programme | Fixed | After publishing or restoring a programme the roster and the open athlete file are rebuilt from the new copy, so a new athlete appears straight away and the file shows the programme you just put up. |  |
 | TOOLS-9 | medium | Load errors for programmes, library, coaching logs and logins are swallowed: the roster shows every athlete with no programme, the Library looks empty, and publish blames a missing category | Fixed | A failed load of programmes, logins, coaching logs or the library shows a 'Not everything loaded' banner, and + Publish refuses while the library is not loaded. |  |
 | TOOLS-10 | medium | The legacy data/*.json fallback and 'Move programmes into the database' are dead code that can still fire: on a programs read error from a local server with the gitignored data/ copy, one click would overwrite live programmes with stale files | Fixed | The old local-file fallback and the 'Move programmes into the database' button are gone, and the File tab says 'create one below' instead of pointing at secret links. |  |
-| TOOLS-11 | medium | 'View their app / View their Proof' shows the athlete's programme but none of their logged progress, while the File tab promises 'their real data'; it also opens real athletes from ?demo=1 | Open | From the demo, 'View their app' now opens the public demo programme instead of a real athlete, and the demo uses made-up people. | Decided (2026-10-11): change the File tab's wording; the preview stays without their logged work. Not done yet (A7). |
+| TOOLS-11 | medium | 'View their app / View their Proof' shows the athlete's programme but none of their logged progress, while the File tab promises 'their real data'; it also opens real athletes from ?demo=1 | Fixed | From the demo, 'View their app' now opens the public demo programme instead of a real athlete, and the demo uses made-up people. Since 2026-10-11 (pile A7) the File tab says the preview shows the programme only (what they have logged is under The work and Proof), the bar program.html draws over a preview says "without their logged work" instead of "exactly as they see it" (sw.js aap-v106, so the coach's browser does not keep the old text), and the comment that said the preview "loads their real data" is corrected (it skips the pull of their saved progress). `file-preview-wording` pins all three and the two buttons' addresses. |  |
 | TOOLS-12 | medium | Every backup file carries 13 plaintext login passwords (athlete_identities and tps_accounts initial_password), kept on two machines for 12 weeks | Fixed | Every backup now blanks the stored login passwords for athletes, course buyers and testing-app buyers before the file is saved. |  |
 | TOOLS-13 | low | Unpublishing a Library item has no button, and unpublished items are invisible in coach.html | Fixed | The Library tab lists every item with a Hide or Publish button, and hidden items sit in a folded 'Hidden' group. |  |
 | TOOLS-14 | low | Docs and copy drift around the tools: the manual describes retired controls and data sources, and the skills name a tab that does not exist | Fixed | The manual has the nine tabs, the Coach tools and what each overwrites; the backup file and the manual both say it is data only, what a restore needs, and to keep 12 files with the prune script. |  |
@@ -737,7 +737,7 @@ a contact field holding two numbers matches the second only; the finder cannot b
 
 ## 12. Continue here (rewritten 2026-10-11, fourth session)
 
-<!--T12-->191 findings: 178 fixed, 8 partly, 4 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
+<!--T12-->191 findings: 179 fixed, 8 partly, 3 open, 0 waiting on you, 1 not a bug (§9 has every row). All 12 critical findings and 32 of the 33 high ones are fixed; the high ones left: TOOLS-4 (open).<!--/T12-->
 What is left is in three piles: **A** your eleven answers, now jobs; **B** Claude can just do, in order (**all eleven are done**); **C** is outside the audit.
 
 **To start a new chat:** *"Continue the Coach's Box audit: read `Content/COACH-AUDIT.md` §12 and `COACH_DASHBOARD.md`, then do the first job in
@@ -755,7 +755,7 @@ Asked with the question tool. Nothing here waits on a decision any more; one ite
 | A4 | TOOLS-7 | "I don't need that publish programme button and never use it": remove the button and the function | Remove ↑ Publish programme file and its code from coach.html, its harness scenarios, the manual and CLAUDE.md | **done 2026-10-11** |
 | A5 | FILE-6 | No expiry | nothing (Mark sent and the first sign-in clear a stored password) | decided |
 | A6 | FILE-11, ROSTER-9 | Hide the session and keep it recoverable | A tombstone on `session_history` (a stage file), hide and undo through one coach-only function, every reader leaves hidden sessions out, the athlete app's save must not bring one back, an Undo in the File. Touches program.html | todo |
-| A7 | TOOLS-11 | Fix the wording | The File tab says the preview shows their programme as they see it, without their logged work | todo |
+| A7 | TOOLS-11 | Fix the wording | The File tab says the preview shows their programme as they see it, without their logged work | **done 2026-10-11** |
 | A8 | FLOW-17, SPINE-11 | Link an application to the athlete it became, and let Handled record an outcome | A stage file (athlete id and outcome on the application), a picker on the card, and the athlete's File shows where they came from | todo |
 | A9 | FLOW-8 | A WhatsApp number on each coached athlete's File | A coach-only function that sets it, a field in the File, the number in the header with a WhatsApp button | todo |
 | A10 | ROSTER-7, ROSTER-12 | A status (active, paused, former), the demo out of the totals, and a ⚙ Tools button for the admin tools | The status stored per athlete and read by `reasonsOf()`; the demo not counted; Coach tools and Logins to send behind one button | todo |

@@ -581,7 +581,7 @@ here and one lift there — both sides run the same name matcher, on purpose.
   prompt** are gone. The old logs stay readable, and deletable one by one, in the File tab under **Old call
   logs** (the section is absent when there are none). An old `#a/<id>/calls` link opens the athlete on The
   work. `call-log.html` and `CALL_LOG.md` still exist but nothing in the dashboard links to them.
-- **File** — *View their app* / *View their Proof* (read-only previews), the **login** (create,
+- **File** — *View their app* / *View their Proof* (read-only previews of the programme: what they have logged is not in them, it is under The work and Proof here; audit TOOLS-11), the **login** (create,
   change password, remove; an unsent password shows here with Copy message, WhatsApp when the
   number is known, and Mark sent), the programme row (tier, days/week, which cycle of the roadmap,
   when it was last saved and by whom, Version history), the coaching log, **Old call logs** and the

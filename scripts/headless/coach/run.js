@@ -2661,6 +2661,34 @@ S['library-publish-guards'] = async (b) => {
   return r;
 };
 
+// ── The preview says what it shows (audit TOOLS-11, pile A7; 2026-10-11) ─────────────────────────────────────────────────────────────
+S['file-preview-wording'] = async (b) => {
+  const r = { id: 'file-preview-wording', title: 'The File tab says the preview shows the programme only, and the preview bar in program.html says the same', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/file' });
+  const panel = await page.evaluate(() => {
+    const h = [...document.querySelectorAll('.sec')].find(x => /their app/i.test(x.innerText));   // the heading is drawn in capitals, which innerText returns
+    const p = h && h.nextElementSibling;
+    return p ? p.innerText.replace(/\s+/g, ' ').trim() : '';
+  });
+  check(r, 'the File tab does not promise "their real data" or "exactly as they see it"', !!panel && !/real data|exactly as they see/i.test(panel), panel);
+  check(r, 'it says the preview shows the programme only', /programme only/.test(panel), panel);
+  check(r, 'it says what is not in it (sets, weights, records, habits) and where to read that (The work and Proof)', /sets, weights, records, habits/.test(panel) && /The work and Proof/.test(panel), panel);
+  // The two buttons still open the read-only preview of this athlete.
+  await page.evaluate(() => { window.__opened = []; window.open = u => { window.__opened.push(String(u)); return null; }; });
+  await page.getByRole('button', { name: 'View their app' }).click();
+  await page.getByRole('button', { name: 'View their Proof' }).click();
+  const opened = await page.evaluate(() => window.__opened);
+  check(r, 'View their app opens program.html for that athlete in preview mode', /\/program\.html\?client=ava_test&preview=1$/.test(opened[0] || ''), opened);
+  check(r, 'View their Proof opens habits.html for that athlete in preview mode', /\/habits\.html\?client=ava_test&preview=1$/.test(opened[1] || ''), opened);
+  // The bar the athlete app draws over a preview makes the same claim, so the two cannot drift apart again.
+  const src = await page.evaluate(async () => (await fetch('/program.html')).text());
+  const bar = (src.match(/bar\.textContent = '(COACH PREVIEW[^']*)' \+ clientId \+ '([^']*)'/) || []).slice(1).join('<id>');
+  check(r, 'the preview bar in program.html says "without their logged work", not "exactly as they see it"', /without their logged work/.test(bar) && !/exactly as they see/.test(bar), bar);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── One way to say what did not work (audit BROWSER-10, FLOW-22, MKT-13, 2026-10-11, pile B5) ─────────────────────────────────────
 // A failure used to be a 2.6-second toast in some tabs (easy to miss) and a pop-up in others (it stopped everything, and was gone once
 // dismissed). Now: it worked = a toast; it did not = a line at the bottom that stays until it is dismissed; a question = a confirm;

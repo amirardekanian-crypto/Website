@@ -60,7 +60,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 89 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 90 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -142,6 +142,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | buyer-logins-course, buyer-logins-assess | On each buyer tab: create (a double tap makes one login), copy, mark sent (asks first), change the password, a password the function refuses, revoke, restore, and a function that fails; the page keeps the words of what it did | (pile B11, MKT-6) pinned on the two copied blocks before they became one `buyerLogins()`; the "Copied" toast replaced the login toast |
 | athlete-login-double-tap | Save password tapped twice on an athlete's File tab | (pile B11, MKT-6) two calls, two passwords, and the message kept the first |
 | library-paged | Nine Library items with a server that answers three rows at a time | (pile B11, SERVER-10) one request stopped at the row cap and the shelf looked half empty |
+| file-preview-wording | The File tab's "Their app" words, the two buttons' addresses, and the bar program.html draws over a preview | (pile A7, TOOLS-11) the File tab promised "their real data" and the bar "exactly as they see it", but the preview shows the programme without their logged work |
 | library-publish-guards | A file that is new, one that replaces a live item, one that replaces a hidden item, and one whose id is already on another shelf | (pile B11, TOOLS-6) the confirm did not say, a hidden item was published again, a moved item was published twice |
 
 ## Adding a scenario

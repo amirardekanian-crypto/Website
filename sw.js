@@ -220,7 +220,9 @@
 //      served approved entries only, so a card on a DRAFT used to be looked up by name and could borrow another approved entry's cues and video
 //      (the word "machine" and word order are ignored by the loose tiers); now it shows none until the draft is approved. Without the bump a
 //      phone keeps the old lookup.
-const CACHE = 'aap-v105';
+// v106: program.html changed (2026-10-11, coach.html audit TOOLS-11): the coach preview's bar no longer says the app is shown "exactly as they
+//      see it": it shows the programme without their logged work. Only the coach sees the bar; the bump is so his browser does not keep the old text.
+const CACHE = 'aap-v106';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
