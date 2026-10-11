@@ -60,7 +60,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 69 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 70 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -123,6 +123,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | file-redraw-keeps-work | the Change password box (typed, cursor in it), Version history and the Coaching log opened, then a full redraw and a tab-body redraw; Add past session with a pasted email, date and preview, a day card toggled, a full redraw, Save; another athlete's file | (pile B4, FILE-9) the box emptied, the sections folded, the add-session box hid again and lost the email |
 | live-snapshot-window | the live app snapshot at 14:00 and 02:00 UTC with check-ins stamped 1 h to 23 h earlier | (pile B6, TWIN-6) a started day read "in progress" for 30 hours; now the app's rule: today's date, or under six hours |
 | retest-flag | Personal records with `test` set to "3RM", true, "heavy" and "11RM" | (pile B6, TWIN-7) any text was shown as a flag; now only what the athlete's app reads |
+| readiness-chart | Ava with eleven check-ins (six from before the verdict, five stored, two on one day, soreness 1 on one) and Eli with three | (pile B6, TWIN-3 and TODAY-11) the chart plotted the old composite against an all-time mean, the pill took the first of two same-day check-ins, Eli's "usual" was made up from three; now all three places read the app's score and usual |
 | fail-bar | a failed post on Today (and the same again, and a failed intake status), then a success, on a 1280 px screen and a 360 px phone | (pile B5) a failure was a 2.6 s toast in some tabs and a pop-up in others; now a line that stays until dismissed, in view when scrolled, merged when repeated, never a pop-up; a success stays a toast |
 
 ## Adding a scenario

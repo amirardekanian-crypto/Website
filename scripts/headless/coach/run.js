@@ -2016,6 +2016,72 @@ S['retest-flag'] = async (b) => {
   return r;
 };
 
+S['readiness-chart'] = async (b) => {
+  const r = { id: 'readiness-chart', title: 'Readiness: the pill, the chart and the day card all read the app\'s check-in score and the athlete\'s usual', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const T = s => s.replace(/\s+/g, ' ').trim();
+  // Ava: nine check-ins, oldest first. The first six are from before the app stored a verdict (no score, no usual: they are worked out);
+  // the rest carry what the app stored. Soreness is 1 on one of them, so the old composite and the score differ. The last day has two
+  // check-ins, put in the database newest first.
+  await page.evaluate(() => {
+    const arr = window.__DB.session_history;
+    for (let i = arr.length - 1; i >= 0; i--) if (arr[i].athlete_id === 'ava_test') arr.splice(i, 1);
+    const day = n => new Date(Date.now() - n * 86400e3).toISOString().slice(0, 10);
+    const ans = (s, e, st, o, so, extra) => Object.assign({ sleep: s, energy: e, stress: st, overall: o, soreness: so, composite: Math.round(((s + e + so + st) / 4) * 100) / 100, skipped: false }, extra || {});
+    const row = (ago, d, rd) => ({ athlete_id: 'ava_test', athlete_name: 'Ava Example', day: d, completed_on: day(ago), status: 'Complete', session_rpe: 7, duration_min: 50,
+      readiness: rd, day_note: '', focus: '', summary: 'Day ' + d + ' — fixture', coach_status: 'read', log: null, updated_at: new Date().toISOString() });
+    [row(30, 1, ans(4, 4, 4, 4, 4)), row(27, 2, ans(4, 4, 4, 4, 4)), row(24, 3, ans(3, 3, 3, 3, 1)), row(21, 1, ans(4, 5, 4, 5, 3)), row(18, 2, ans(4, 4, 4, 4, 4)), row(15, 3, ans(4, 4, 4, 4, 4)),
+     row(12, 1, ans(3, 3, 3, 3, 3, { level: 'amber', sore: '', drop: 1, score: 3, base: 3.92, asWritten: false })),
+     row(9, 2, ans(2, 2, 2, 2, 2, { level: 'red', sore: 'half', drop: 1, score: 2, base: 3.79, asWritten: false })),
+     row(6, 3, ans(4, 4, 4, 4, 1, { level: 'green', sore: 'skip', drop: 0, score: 4, base: 3.56, asWritten: false })),
+     row(3, 2, ans(2, 3, 3, 2, 3, { level: 'amber', sore: '', drop: 1, score: 2.5, base: 3.6, asWritten: false, timestamp: new Date(Date.now() - 3 * 86400e3 + 5000).toISOString() })),
+     row(3, 1, ans(4, 4, 4, 4, 3, { level: 'green', sore: '', drop: 0, score: 4, base: 3.6, asWritten: false, timestamp: new Date(Date.now() - 3 * 86400e3 - 5000).toISOString() }))
+    ].forEach(x => arr.push(x));
+  });
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  await L.go(page, 'a/ava_test/work');
+  const strip = T(await page.locator('.mstrip').first().innerText());
+  const chart = await page.evaluate(() => {
+    const c = [...document.querySelectorAll('#chartbox .chart-card')].find(x => /Readiness/.test(x.textContent));
+    return c ? { text: c.textContent.replace(/\s+/g, ' ').trim(), dots: c.querySelectorAll('svg circle').length, dashed: c.querySelectorAll('svg line[stroke-dasharray]').length } : null;
+  });
+  check(r, 'the chart card is there', !!chart, strip);
+  if (chart) {
+    check(r, 'the big number is the latest check-in\'s score (2.5, not the composite 2.75), against their usual 3.6', /^Readiness 2\.5\/5 · usual 3\.6/.test(chart.text), chart.text);
+    check(r, 'it says how far under their usual, in the app\'s measure', /-1\.1 vs their usual \(the mean of their last ten check-ins before this one\)/.test(chart.text), chart.text);
+    check(r, 'one dot per answered check-in (11) and a dashed line at their usual', chart.dots === 11 && chart.dashed === 1, { dots: chart.dots, dashed: chart.dashed });
+    check(r, 'the legend names the measure the app uses, and the old "Composite per session" wording is gone', /sleep, energy, stress and how ready they feel/.test(chart.text) && /as the athlete's app scores it/.test(chart.text) && !/omposite/.test(chart.text), chart.text);
+  }
+  check(r, 'the pill and the chart name the same check-in: 2.5 against their usual 3.6, a lower day', /Readiness\s*2\.5\/5\s*lower day · usual 3\.6/i.test(strip), strip);
+  // The day cards: the number beside the verdict is the one that made it.
+  const meta = async n => T(await page.locator('#wday-' + n + ' .wday-meta').innerText());
+  const m2 = await meta(2), m1 = await meta(1), m3 = await meta(3);
+  check(r, 'Day 2 (the later check-in of the shared day) reads 2.5/5 with its lower day, not the composite 2.75', /readiness 2\.5\/5 · lower day/.test(m2) && !/2\.75/.test(m2), m2);
+  check(r, 'Day 1 reads its stored score (4/5), not the composite (3.75)', /readiness 4\/5/.test(m1) && !/3\.75/.test(m1), m1);
+  check(r, 'Day 3 reads the score 4/5 although its soreness answer was 1 (the composite would say 3.25), and says the jumps were skipped', /readiness 4\/5 · sore: no jumps/.test(m3) && !/3\.25/.test(m3), m3);
+
+  // Eli: too few check-ins for a usual. Two from before the verdict and one stored with `base: null` (the app's own "fewer than five").
+  await page.evaluate(() => {
+    const day = n => new Date(Date.now() - n * 86400e3).toISOString().slice(0, 10);
+    const ans = (s, e, st, o, so, extra) => Object.assign({ sleep: s, energy: e, stress: st, overall: o, soreness: so, composite: Math.round(((s + e + so + st) / 4) * 100) / 100, skipped: false }, extra || {});
+    const row = (ago, d, rd) => ({ athlete_id: 'eli_new', athlete_name: 'Eli Example', day: d, completed_on: day(ago), status: 'Complete', session_rpe: 7, duration_min: 50,
+      readiness: rd, day_note: '', focus: '', summary: 'Day ' + d + ' — fixture', coach_status: 'read', log: null, updated_at: new Date().toISOString() });
+    [row(9, 1, ans(3, 3, 3, 3, 3)), row(6, 2, ans(4, 4, 4, 4, 4)), row(2, 1, ans(4, 3, 4, 3, 3, { level: 'green', sore: '', drop: 0, score: 3.5, base: null, asWritten: false }))].forEach(x => window.__DB.session_history.push(x));
+  });
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  await L.go(page, 'athletes'); await L.go(page, 'a/eli_new/work');
+  const strip2 = T(await page.locator('.mstrip').first().innerText());
+  const chart2 = await page.evaluate(() => {
+    const c = [...document.querySelectorAll('#chartbox .chart-card')].find(x => /Readiness/.test(x.textContent));
+    return c ? { text: c.textContent.replace(/\s+/g, ' ').trim(), dots: c.querySelectorAll('svg circle').length, dashed: c.querySelectorAll('svg line[stroke-dasharray]').length } : null;
+  });
+  check(r, 'three check-ins: the pill says "no usual yet" beside the app\'s verdict, with no invented difference', /Readiness\s*3\.5\/5\s*normal day · no usual yet/i.test(strip2) && !/vs their usual/.test(strip2), strip2);
+  check(r, 'the chart says the same, plots three dots and draws no dashed line', !!chart2 && /^Readiness 3\.5\/5 · no usual yet/.test(chart2.text) && /Their usual starts once they have five check-ins to go on/.test(chart2.text) && chart2.dots === 3 && chart2.dashed === 0, chart2);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── One way to say what did not work (audit BROWSER-10, FLOW-22, MKT-13, 2026-10-11, pile B5) ─────────────────────────────────────
 // A failure used to be a 2.6-second toast in some tabs (easy to miss) and a pop-up in others (it stopped everything, and was gone once
 // dismissed). Now: it worked = a toast; it did not = a line at the bottom that stays until it is dismissed; a question = a confirm;

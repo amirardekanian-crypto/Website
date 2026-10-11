@@ -28,6 +28,8 @@ const { parseSessionLog, parseChips, compareDay, compareExercise, dayVerdict, lo
 const emailCode = grab('function parseSessionEmail(text) {', '// Does the email\'s "Athlete" line name this athlete?');
 new Function('ctx', 'with (ctx) {' + emailCode + '\nObject.assign(ctx, {parseSessionEmail, parseCheckinPlan});}')(sandbox);
 const { parseSessionEmail, parseCheckinPlan, planLabelC } = sandbox;
+// The Readiness series (TWIN-3, TODAY-11): the check-in score and the athlete's usual, as the app works them out.
+new Function('ctx', 'with (ctx) {' + grab('const READY_FOUR_C = ', 'function weeklyLoad(daily, weeks, ref) {') + '\nObject.assign(ctx, {readinessSC, usualC, checkinOrderC, readinessSeries, readinessStats});}')(sandbox);
 
 let pass = 0, fail = 0;
 function is(got, want, what) {
@@ -412,6 +414,40 @@ console.log('12. email import: the check-in line');
   is(row('2026-09-03').tgt.label, '8', 'no cycle given: the check-in alone');
   is(weekNoteOnC(cycle, '2026-09-03').wk, 1, 'the note carries its week');
   is(cycleWeekOnC({ startDate: '2026-09-01', endDate: '2026-10-06' }, '2026-10-06'), { wk: 5, total: 5, before: false, after: false }, 'the last day is still the last week');
+}
+
+// ── 14. The Readiness chart plots the app's own score against the app's own usual (TWIN-3, TODAY-11, 2026-10-11) ────
+{
+  const { readinessSC, usualC, readinessSeries, readinessStats } = sandbox;
+  // a check-in as the app stores it: the five answers and the composite (which counts soreness and leaves out `overall`)
+  const ans = (s, e, st, o, so, extra) => Object.assign({ sleep: s, energy: e, stress: st, overall: o, soreness: so, composite: Math.round(((s + e + so + st) / 4) * 100) / 100 }, extra || {});
+  const ses = (day, rd) => ({ completed_on: day, readiness: rd });
+  const d = n => '2026-09-' + String(n).padStart(2, '0');
+  is(readinessSC(ans(4, 4, 4, 4, 1)), 4, 'the score leaves soreness out (the composite would say 3.25)');
+  is(readinessSC(ans(5, 5, 1, 1, 5)), 3, 'the score counts how ready they feel and stress');
+  is([readinessSC({ skipped: true, sleep: 4, energy: 4, stress: 4, overall: 4 }), readinessSC(null), readinessSC({ sleep: 4, energy: 4, stress: 4 }), readinessSC({ sleep: 0, energy: 4, stress: 4, overall: 4 })], [null, null, null, null], 'a skipped, empty, incomplete or out-of-range check-in has no score');
+  is([usualC([4, 4, 4, 4]), usualC([4, 4, 4, 4, 3])], [null, 3.8], 'their usual needs five check-ins');
+  is(usualC([5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 1]), 5, 'their usual is the last ten, newest first');
+  // an older or imported check-in (no score, no base): both are worked out, the way the app would have
+  const legacy = [4, 4, 3, 4.5, 4, 4, 3].map((s, i) => ses(d(i + 1), ans(s, s, s, s, 1)));
+  const ser = readinessSeries(legacy);
+  is(ser.map(p => p.v), [4, 4, 3, 4.5, 4, 4, 3], 'an old check-in is scored from its four answers, soreness left out');
+  is(ser.map(p => p.base === null ? null : Math.round(p.base * 1000) / 1000), [null, null, null, null, null, 3.9, 3.917], 'their usual is the mean of the check-ins before it, from the fifth on');
+  is(readinessStats(ser), { baseline: ser[6].base, latest: 3, delta: 3 - ser[6].base, n: 7 }, 'the card reads the latest against the usual it had');
+  // what the app stored wins over a recount
+  const stored = readinessSeries([ses(d(1), ans(4, 4, 4, 4, 3, { score: 3, base: 3.92, level: 'amber' }))]);
+  is([stored[0].v, stored[0].base], [3, 3.92], 'a stored score and usual are shown as stored');
+  is(readinessSeries(legacy.slice(0, 5).concat([ses(d(6), ans(4, 4, 4, 4, 3, { score: 4, base: null }))]))[5].base, null, 'a stored `base: null` (fewer than five at the time) stays null');
+  is(readinessSeries(legacy.slice(0, 5).concat([ses(d(6), ans(4, 4, 4, 4, 3, { score: 4, base: '3.9' }))]))[5].base, null, 'a stored usual that is not a number is no usual');
+  // a skipped or unreadable check-in is not a point and does not disturb the others; a JSON string is read
+  const mixed = [ses(d(1), JSON.stringify(ans(4, 4, 4, 4, 3))), ses(d(2), { skipped: true }), ses(d(3), null), ses(d(4), ans(3, 3, 3, 3, 3)), ses(d(5), { sleep: 4, energy: 4, stress: 4 }), ses(null, ans(2, 2, 2, 2, 2))];
+  is(readinessSeries(mixed).map(p => [p.iso, p.v]), [[d(1), 4], [d(4), 3]], 'only answered, dated check-ins are points');
+  is(readinessStats([]), null, 'no check-ins: no card');
+  is(readinessStats(readinessSeries([ses(d(1), ans(4, 4, 4, 4, 3))])), { baseline: null, latest: 4, delta: null, n: 1 }, 'under five check-ins there is no usual and no delta');
+  // the order does not depend on how the rows came in; two on one day are told apart by when they were answered
+  const a = ses(d(9), ans(4, 4, 4, 4, 3, { timestamp: '2026-09-09T08:00:00.000Z' })), b = ses(d(9), ans(2, 2, 2, 2, 3, { timestamp: '2026-09-09T17:00:00.000Z' }));
+  is([readinessSeries([a, b]).map(p => p.v), readinessSeries([b, a]).map(p => p.v)], [[4, 2], [4, 2]], 'two check-ins on one day: the later one is the latest, whatever order the rows came in');
+  is(readinessSeries(legacy.slice().reverse()).map(p => p.v), [4, 4, 3, 4.5, 4, 4, 3], 'rows newest first give the same series');
 }
 
 console.log('\n' + (fail ? 'FAILED ' + fail + ' / ' + (pass + fail) : 'all ' + pass + ' assertions passed'));

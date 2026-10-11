@@ -582,10 +582,22 @@ load. It comes back when those are filled in or are more than 4 weeks old. On th
 
 ### Readiness
 
-The athlete's self-report (sleep, energy, soreness, stress, overall) as a
-composite out of 5, **higher = fresher**. The dashboard tracks each athlete's
-own baseline, so a 2/5 reads as *"down from their usual 4.1"* rather than
-against a generic cutoff.
+The athlete's check-in, scored out of 5 **the way their app scores it** (REC-2), **higher = fresher**. The score is the mean of
+sleep, energy, stress and how ready they feel (soreness is asked, but it only moves impact work, so it is left out), and
+**their usual is the mean of their last ten earlier scores, once they have five**. A 2/5 therefore reads as *"down from their
+usual 4.1"* rather than against a generic cutoff. The app stores both with the check-in (`score`, `base`; `base` is null while
+they had fewer than five) and the dashboard shows what was stored. A check-in from before 2026-09-26, or one imported from an
+email, has neither, so the score is worked out from the four answers and the usual from the check-ins before it, by the same
+rule (`readinessSC()` and `usualC()` are the twins of `readinessS()` and `readinessBase()` in `program.html`; `scripts/check_twins.js`
+runs both on the same check-ins).
+
+Three places show it and they say the same thing (audit TWIN-3 and TODAY-11, fixed 2026-10-11): the **pill** (the app's verdict for
+the latest check-in: normal, lower or short day, the score and the usual), the **chart** behind the Charts button (the score of every
+check-in, a dashed line at their usual now) and the **day card** (the score beside the verdict that it made). Until then the chart
+plotted the old composite, which counts soreness and leaves out how ready they feel, against an all-time mean, so it could call a
+day normal that the app had made lower. With fewer than five earlier check-ins there is no usual: the card says so, draws no dashed
+line and colours nothing, and the pill never shows a made-up difference. Two check-ins on one day are told apart by the moment they
+were answered, so the pill, the chart and the card name the same one as the latest.
 
 ### Adherence
 
@@ -764,7 +776,7 @@ The **prescribed-vs-done** comparison joins the plan in `programs` with what hap
 the plain-text `summary` that `program.html` wrote into `session_history` (with the names taken
 from the structured `log` when it lines up). Both readers live in `coach.html` (`rxOf()` from
 `assets/js/chips.js`, `parseSessionLog()`) and both mirror code in `program.html` — change the
-grammar there and they have to follow. `node scripts/test_coach_compare.js` runs 96 assertions
+grammar there and they have to follow. `node scripts/test_coach_compare.js` runs 123 assertions
 over real logs and the email import, and catches it if they don't. The write paths (saves, deletes, logins, backups) are
 covered by the real-mode harness in `scripts/headless/coach/`.
 
@@ -772,13 +784,13 @@ covered by the real-mode harness in `scripts/headless/coach/`.
 It cuts each twin out of both files and runs the same vectors through both: the exercise-name
 tiers (`exNameVariants` / `exNameVariantsC`), a renamed lift (`ceilAliasMap` / `ceilAliasMapC`), the
 Spine lookup (`spineFor` / `spineForC`), today's RPE target on a lower day with the week note (`dayRpe` / `dayTargetC`), the week a day
-falls in and its note (`cycleWeekInfo`, `weekNoteNow` / `cycleWeekOnC`, `weekNoteOnC`: 3,281 checks in all), what
+falls in and its note (`cycleWeekInfo`, `weekNoteNow` / `cycleWeekOnC`, `weekNoteOnC`: over 3,500 checks in all), what
 the Quality check counts (`qmSets`, `isPrepBlockTitle` / `qmSetsC`, `QM_PREP`), and the check-in line's
 writer and reader (`readinessPlanLine` / `parseCheckinPlan`). It also fails a change to `assets/js/chips.js`
 that keeps coach.html's hand-typed `?v=` (the service worker serves `/assets/` cache-first): bump the
 token, then `node scripts/check_twins.js --stamp`. `scripts/test_check_twins.js` breaks a copy on purpose
-to prove each kind of drift is caught. Also guarded: whether a started session is over (`sessionIsStale` / `sessionIsStaleC`) and which values of a lift's `test`
-are a retest flag (`exTestSpec` / `exTestSpecC`). Not covered, on purpose: the dashboard resolving cards against drafts too
+to prove each kind of drift is caught. Also guarded: whether a started session is over (`sessionIsStale` / `sessionIsStaleC`), which values of a lift's `test`
+are a retest flag (`exTestSpec` / `exTestSpecC`) and the check-in score and the athlete's usual (`readinessS`, `readinessBase` / `readinessSC`, `usualC`). Not covered, on purpose: the dashboard resolving cards against drafts too
 (TWIN-1), a known difference listed in the script's header. A new copy of an app rule in coach.html goes into the script the same day.
 
 Some coach writes go through RPCs that check the coach themselves (`set_coach_note`, `hide_note`,

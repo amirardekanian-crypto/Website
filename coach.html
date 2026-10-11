@@ -2605,19 +2605,51 @@ function acwrZone(r) {
   if (r >= 0.8) return { label: 'Optimal',   cls: 'green' };
   return { label: 'Low load', cls: 'amber' };
 }
-function readinessSeries(sessions) {
-  return sessions
-    .map(s => ({ s, rd: jparse(s.readiness) }))
-    .filter(x => x.rd && !x.rd.skipped && x.rd.composite != null)
-    .map(x => ({ iso: x.s.completed_on, v: Number(x.rd.composite) }))
-    .filter(p => p.iso && !isNaN(p.v))
-    .sort((a, b) => a.iso.localeCompare(b.iso));
+// The check-in as the athlete's app scores it (REC-2, 2026-09-26; audit TWIN-3 and TODAY-11, fixed 2026-10-11): the score S is the mean of
+// sleep, energy, stress and how ready they feel (soreness is left out: it only moves impact work), and their "usual" is the mean of
+// their last ten scores BEFORE this one, once there are five. readinessS() and readinessBase() in program.html are the twins;
+// scripts/check_twins.js runs both on the same check-ins. The chart used to plot the old composite (soreness in, how ready they feel
+// out) against an all-time mean, so it could disagree with the number above it, which reads the app's own verdict.
+const READY_FOUR_C = ['sleep', 'energy', 'stress', 'overall'];
+const READY_BASE_N_C = 10, READY_BASE_MIN_C = 5;
+function readinessSC(r) {
+  if (!r || r.skipped) return null;
+  const v = READY_FOUR_C.map(k => Number(r[k]));
+  return v.every(x => x >= 1 && x <= 5) ? v.reduce((a, b) => a + b, 0) / 4 : null;
 }
+function usualC(scoresNewestFirst) {
+  const last = scoresNewestFirst.slice(0, READY_BASE_N_C);
+  return last.length >= READY_BASE_MIN_C ? last.reduce((a, b) => a + b, 0) / last.length : null;
+}
+// Oldest first: the day it was finished, then the moment the check-in was answered. Two sessions can share a day, and the pill, the
+// chart and the day card must name the same one as the latest.
+function checkinOrderC(a, b) {
+  return String(a.iso).localeCompare(String(b.iso)) || String(a.at || '').localeCompare(String(b.at || ''));
+}
+// One point per answered check-in, oldest first: { iso, v: the score, base: their usual then, or null }. The app stores both with the
+// check-in ({ score, base }, base null while it had fewer than five to go on); an older or imported check-in gets them worked out the same way.
+function readinessSeries(sessions) {
+  const num = x => typeof x === 'number' && Number.isFinite(x);
+  const pts = sessions
+    .map(s => ({ iso: s.completed_on, rd: jparse(s.readiness) }))
+    .filter(x => x.iso && x.rd && typeof x.rd === 'object' && !x.rd.skipped)
+    .map(x => {
+      const v = num(x.rd.score) ? x.rd.score : readinessSC(x.rd);
+      return v == null ? null : { iso: x.iso, at: x.rd.timestamp, v, rd: x.rd };
+    })
+    .filter(Boolean)
+    .sort(checkinOrderC);
+  return pts.map((p, i) => {
+    const base = 'base' in p.rd ? (num(p.rd.base) ? p.rd.base : null)
+      : usualC(pts.slice(0, i).map(q => q.v).reverse());
+    return { iso: p.iso, v: p.v, base };
+  });
+}
+// The latest check-in against their usual then. `baseline` and `delta` are null until they have five earlier check-ins.
 function readinessStats(series) {
   if (!series.length) return null;
-  const v = series.map(p => p.v), base = v.reduce((a, b) => a + b, 0) / v.length;
-  const latest = v[v.length - 1];
-  return { baseline: base, latest, delta: latest - base, n: v.length };
+  const last = series[series.length - 1], base = last.base;
+  return { baseline: base, latest: last.v, delta: base == null ? null : last.v - base, n: series.length };
 }
 function weeklyLoad(daily, weeks, ref) {
   const r = ref || new Date();
@@ -2663,14 +2695,17 @@ function athleteMetrics(sessions, lastActive, daysPerWeek) {
     .map(s => Number(s.session_rpe) * Number(s.duration_min));
   const byRecent = sessions.slice().sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on)));
   const lastPartial = byRecent.length ? isPartialStatus(byRecent[0].status) : false;
-  const latestRd = byRecentFirst(sessions).map(s => jparse(s.readiness)).find(x => x && !x.skipped && (x.level || x.composite != null));
+  const latestRd = sessions
+    .map(s => { const rd = jparse(s.readiness); return { iso: s.completed_on, at: rd && rd.timestamp, rd }; })
+    .filter(x => x.iso && x.rd && typeof x.rd === 'object' && !x.rd.skipped && (x.rd.level || x.rd.composite != null))
+    .sort((a, b) => checkinOrderC(b, a))[0];
   const cover = loadCoverage(sessions), acwr = computeAcwr(daily);
   // A session in the last 4 weeks with no duration or no session RPE has no load to add, so the ratio would be wrong in a direction
   // nobody can tell. While any exist the ratio is not shown at all: "not enough data" (Amir, 2026-10-11: skip them and grey out the
   // ratio, no invented figures). The bars and totals still use the sessions that do have a load.
   if (cover.total > cover.withLoad) { acwr.enough = false; acwr.partial = true; }
   return { daily, acwr, cover, rser, readiness: readinessStats(rser),
-           latestPlan: latestRd && latestRd.level ? latestRd : null,
+           latestPlan: latestRd && latestRd.rd.level ? latestRd.rd : null,
            adherence: adherence(sessions, daysPerWeek), loadPts, lastPartial,
            daysIdle: daysSince(lastActive), neverActive: !lastActive && !sessions.length };
 }
@@ -2732,14 +2767,14 @@ function renderCharts(m) {
       : `<p class="empty">No load data yet — needs sessions with a logged duration.</p>`}
   </div>`;
   const r = m.readiness;
-  const rColor = !r ? 'var(--muted)' : r.delta <= -1 ? 'var(--clay)' : r.delta <= -0.5 ? 'var(--ochre)' : 'var(--court)';
+  const rColor = !r || r.delta == null ? 'var(--muted)' : r.delta <= -1 ? 'var(--clay)' : r.delta <= -0.5 ? 'var(--ochre)' : 'var(--court)';
   const readyCard = `<div class="chart-card">
     <h4>Readiness</h4>
     ${r
-      ? `<div class="chart-big" style="color:${rColor}">${round1(r.latest)}<span style="font-size:13px;color:var(--muted);margin-left:4px">/5 · usual ${round1(r.baseline)}</span></div>
-         <div class="chart-sub">${r.delta >= 0 ? '+' : ''}${round1(r.delta)} vs their ${r.n}-session average</div>
+      ? `<div class="chart-big" style="color:${rColor}">${round1(r.latest)}<span style="font-size:13px;color:var(--muted);margin-left:4px">/5${r.baseline != null ? ' · usual ' + round1(r.baseline) : ' · no usual yet'}</span></div>
+         <div class="chart-sub">${r.delta == null ? 'Their usual starts once they have five check-ins to go on.' : (r.delta >= 0 ? '+' : '') + round1(r.delta) + ' vs their usual (the mean of their last ten check-ins before this one)'}</div>
          ${lineSVG(m.rser, { color: C.green, baseline: r.baseline, yMin: 1, yMax: 5 })}
-         <div class="chart-legend">Composite per session (1–5, higher = fresher) · dashed = baseline</div>`
+         <div class="chart-legend">The check-in score per session (1–5: sleep, energy, stress and how ready they feel; higher = fresher), as the athlete's app scores it · dashed = their usual now</div>`
       : `<p class="empty">No readiness check-ins yet.</p>`}
   </div>`;
   const adh = m.adherence;
@@ -3668,7 +3703,10 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
     if (s.duration_min != null) meta.push(s.duration_min + ' min');
     if (s.session_rpe != null && s.duration_min != null) meta.push((s.session_rpe * s.duration_min) + ' AU');
     const rd = jparse(s.readiness);
-    if (rd && !rd.skipped && rd.composite != null) meta.push('readiness ' + rd.composite + '/5');
+    // The score the athlete's app judged the day on (sleep, energy, stress and overall) when it stored one, so the number beside "lower
+    // day" is the one that made it lower; a check-in from before 2026-09-26 or an imported email has only the composite.
+    const rdNum = rd && !rd.skipped ? (typeof rd.score === 'number' ? round1(rd.score) : rd.composite) : null;
+    if (rdNum != null) meta.push('readiness ' + rdNum + '/5');
     else if (rd && rd.skipped) meta.push('readiness skipped');
     const plan = planLabelC(rd);
     if (plan) meta.push(plan);
@@ -3863,7 +3901,7 @@ function metricStripHtml(m) {
     // which cannot know their usual, so it says nothing about it rather than "no usual yet".
     m._readyPill = { val: round1(lp.score) + '<small>/5</small>', sub: said + (lp.base != null ? ' · usual ' + round1(lp.base) : 'base' in lp ? ' · no usual yet' : ''), tone };
   }
-  const rTone = !r ? '' : r.delta <= -1 ? 'red' : r.delta <= -0.5 ? 'amber' : 'green';
+  const rTone = !r || r.delta == null ? '' : r.delta <= -1 ? 'red' : r.delta <= -0.5 ? 'amber' : 'green';
   const aTone = !adh || adh.pct == null ? '' : adh.pct >= 85 ? 'green' : adh.pct >= 60 ? 'amber' : 'red';
   const pill = (label, val, sub, tone) =>
     `<div class="mp ${tone || ''}"><div class="mp-l">${label}</div><div class="mp-v">${val}</div><div class="mp-s">${sub}</div></div>`;
@@ -3872,7 +3910,7 @@ function metricStripHtml(m) {
            m.acwr.enough && m.acwr.ratio != null ? 'ACWR · ' + az.label : m.acwr.partial ? 'not enough data' : 'building baseline', az.cls)}
     ${m._readyPill ? pill('Readiness', m._readyPill.val, m._readyPill.sub, m._readyPill.tone)
       : pill('Readiness', r ? round1(r.latest) + '<small>/5</small>' : '—',
-           r ? (r.delta >= 0 ? '+' : '') + round1(r.delta) + ' vs their usual' : 'no check-ins yet', rTone)}
+           r ? (r.delta == null ? 'no usual yet' : (r.delta >= 0 ? '+' : '') + round1(r.delta) + ' vs their usual') : 'no check-ins yet', rTone)}
     ${pill('Adherence', adh && adh.pct != null ? adh.pct + '<small>%</small>' : '—',
            adh && adh.pct != null ? 'last ' + (adh.days < 28 ? adh.days + ' days' : '4 wks') : 'needs a program + a session', aTone)}
     <button class="mp mp-more" id="chartsBtn" aria-expanded="false" aria-controls="chartbox" onclick="toggleCharts()">Charts<span>▾</span></button>

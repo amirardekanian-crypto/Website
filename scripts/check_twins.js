@@ -21,6 +21,7 @@
                                                                   the dashboard about the day a session was trained)
      sessionIsStale              / sessionIsStaleC                is a started session over (the live app snapshot's "in progress", TWIN-6)
      exTestSpec                  / exTestSpecC                    which values of a lift's `test` are a retest flag (TWIN-7)
+     readinessS, readinessBase   / readinessSC, usualC            the check-in score and the athlete's usual (TWIN-3, TODAY-11)
      qmSets, isPrepBlockTitle    / qmSetsC, QM_PREP               what the Quality check counts
      the report writer in buildSessionData() + readinessPlanLine, readinessPlan
                                  / parseCheckinPlan, parseSessionEmail
@@ -276,6 +277,25 @@ const TEST_VALUES = [true, false, 'true', '5RM', '5rm', '5 RM', '3RM', '1RM', '1
   'heavy', 'test', 'AMRAP', '8-10RM', '5RM\n', '١٠RM', '2.5RM', '-3RM', '5 rm', '5\trm'];
 run('retest flag (exTestSpec)', () => TEST_VALUES.forEach(v => same('exTestSpec vs exTestSpecC', v, A_TEST.exTestSpec({ test: v }), D_TEST.exTestSpecC({ test: v }))));
 same('exTestSpec vs exTestSpecC on no exercise', null, A_TEST.exTestSpec(null), D_TEST.exTestSpecC(null));
+
+/* ── 4e. the check-in score and the athlete's usual (TWIN-3, TODAY-11) ───────── */
+const A_USUAL = sandbox('var HIST = null;', [lineSrc(A_SRC, 'const READY_FOUR =', 'program.html'), lineSrc(A_SRC, 'const READY_BASE_N =', 'program.html')].concat(fromA('readinessS', 'readinessBase')), ['readinessS', 'readinessBase']);
+const D_USUAL = sandbox(null, [lineSrc(D_SRC, 'const READY_FOUR_C =', 'coach.html'), lineSrc(D_SRC, 'const READY_BASE_N_C =', 'coach.html')].concat(fromD('readinessSC', 'usualC')), ['readinessSC', 'usualC']);
+const ANSWERS = [{ sleep: 4, energy: 4, stress: 4, overall: 4, soreness: 3 }, { sleep: 1, energy: 5, stress: 3, overall: 2, soreness: 5 }, { sleep: 5, energy: 5, stress: 5, overall: 5 },
+  { sleep: 3, energy: 3, stress: 3, overall: 3, soreness: 1 }, { sleep: 0, energy: 3, stress: 3, overall: 3 }, { sleep: 6, energy: 3, stress: 3, overall: 3 }, { sleep: 3, energy: 3, stress: 3 },
+  { sleep: '4', energy: '4', stress: '3', overall: '2' }, { sleep: 2.5, energy: 3, stress: 3.5, overall: 4 }, { skipped: true, sleep: 4, energy: 4, stress: 4, overall: 4 }, {}, null, undefined,
+  { sleep: null, energy: 4, stress: 4, overall: 4 }, { sleep: 'x', energy: 4, stress: 4, overall: 4 }, { sleep: 4, energy: 4, stress: 4, overall: 4, composite: 1 }];
+run('check-in score (readinessS)', () => ANSWERS.forEach(r => same('readinessS vs readinessSC', r, A_USUAL.readinessS(r), D_USUAL.readinessSC(r))));
+// The usual: the app reads the phone's history (newest first, each row's `ready`); the dashboard is handed the scores newest first.
+const HISTORIES = [[], [4], [4, 4, 4, 4], [4, 4, 4, 4, 4], [3, 4, 5, 3, 4, 5], [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 5, 5, 5, 5], [5, 5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1],
+  [2.5, 3.25, 4, 4.75, 3], [4, 4, 4, 4, 4, 4, 4, 4, 4, 4], [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1], [3, 3, 3, 3, 3.5]];
+run('the athlete\'s usual (readinessBase)', () => HISTORIES.forEach(h => {
+  vm.runInContext('HIST = ' + J(h.map(s => ({ ready: { sleep: s, energy: s, stress: s, overall: s } }))), A_USUAL.ctx);
+  same('readinessBase vs usualC', h, A_USUAL.readinessBase(), D_USUAL.usualC(h));
+  // answered and unanswered check-ins mixed: the app skips a row it cannot score
+  vm.runInContext('HIST = ' + J([{ ready: null }, { ready: { skipped: true } }].concat(h.map(s => ({ ready: { sleep: s, energy: s, stress: s, overall: s } })))), A_USUAL.ctx);
+  same('readinessBase (with unanswered rows) vs usualC', h, A_USUAL.readinessBase(), D_USUAL.usualC(h));
+}));
 
 /* ── 5. what the Quality check counts ─────────────────────────────────────── */
 const A_QM = sandbox(null, fromA('qmSets', 'isPrepBlockTitle'), ['qmSets', 'isPrepBlockTitle']);
