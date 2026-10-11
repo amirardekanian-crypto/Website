@@ -14543,11 +14543,15 @@ async function refreshSpine() {
   } catch (e) { /* offline: the cached copy stays */ }
 }
 
-// Name (or a card's exId) -> entry, or null. The tightest tier with exactly ONE
-// entry wins; anything ambiguous resolves to nothing rather than the wrong lift.
+// Name (or a card's exId) -> entry, or null. A card that names its entry IS that entry: with an exId the
+// answer is that entry or nothing. The phone is served approved entries only, so a card on a DRAFT shows no
+// cues or video until Amir approves it; guessing an approved entry from the name (the machine / word-order
+// tiers) put a DIFFERENT exercise's cues and video on it (audit TWIN-1, 2026-10-11). coach.html's spineForC()
+// is the twin; scripts/check_twins.js runs both. Without an exId the tightest tier with exactly ONE entry
+// wins; anything ambiguous resolves to nothing rather than the wrong lift.
 function spineFor(name, exId) {
   if (!SPINE) return null;
-  if (exId && SPINE_BY_ID[exId]) return SPINE_BY_ID[exId];
+  if (exId) return SPINE_BY_ID[exId] || null;
   const vs = exNameVariants(name || '');
   for (let t = 0; t < vs.length; t++) {
     const ids = vs[t] && SPINE_IDX[t][vs[t]];

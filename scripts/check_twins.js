@@ -17,7 +17,8 @@
                                                                   them for a few hundred names; the checker's Python norm_name() and its SQL
                                                                   (NORM_SQL, LOOSE_SQL) are held to the same file by test_check_program.py (TWIN-8)
      ceilAliasMap (matchRenamed) / ceilAliasMapC                  a renamed lift is one lift
-     setSpine + spineFor         / spineIndexC + spineForC        a card finds its Spine entry
+     setSpine + spineFor         / spineIndexC + spineForC        a card finds its Spine entry (an exId is the entry or nothing), in the phone's
+                                                                  view (approved entries) and the coach's (all), spineLensC()
      dayRpe                      / rpeTarget + dayTargetC         today's RPE target on a lower day (REC-2), with the week note
      cycleWeekInfo, weekNoteNow  / cycleWeekOnC, weekNoteOnC      the week a day falls in and the cycle's note for it (the app asks about today,
                                                                   the dashboard about the day a session was trained)
@@ -36,9 +37,9 @@
    Already guarded elsewhere (not repeated): rxOf/repCount/tempoDisplay (check_rx.js), the set-log grammar
    (check_setlog.js), the shared word lists (check_parity.py), the XP rules (check_xp_rules.py).
 
-   Known, deliberate differences (printed as notes, never failures):
-     TWIN-1   the dashboard resolves a card against ALL Spine entries, the phone against approved ones. (The Quality check's DAY cards
-              already run in the phone's view, qualityLensC(); the weekly ranking and the videos still read every entry.)
+   Known, deliberate differences: none. (The dashboard's catalogue views count DRAFT entries on purpose, because a draft's cards are "waiting for
+   you"; anything that predicts what an athlete sees reads the phone's view, spineLensC(): a video, a day card's qualities, and the Exercises tab's
+   list of cards that show something else on a phone. A card that names its entry is that entry or nothing, on both sides: TWIN-1.)
 
    Wired into .githooks/pre-commit (guard 15), which sets CHECK_TWINS_INDEX=1 so it reads the STAGED files, the
    ones that will be committed, not whatever else is in the working tree. Run by hand:   node scripts/check_twins.js
@@ -214,30 +215,44 @@ run('renamed lifts (ceilAliasMap)', () => ALIAS_CASES.forEach(c => {
 /* ── 3. a card finds its Spine entry ──────────────────────────────────────── */
 const A_SPINE = sandbox('var SPINE = null, SPINE_BY_ID = {}, SPINE_IDX = [{}, {}, {}, {}];',
   [lineSrc(A_SRC, 'const EX_ABBREV =', 'program.html')].concat(fromA('normExName', 'exNameVariants', 'setSpine', 'spineFor')), ['setSpine', 'spineFor']);
-const D_SPINE = sandbox(null, [lineSrc(D_SRC, 'const EX_ABBREV_C =', 'coach.html')].concat(fromD('normExNameC', 'exNameVariantsC', 'spineIndexC', 'spineForC')),
-  ['spineIndexC', 'spineForC']);
+const D_SPINE = sandbox(null, [lineSrc(D_SRC, 'const EX_ABBREV_C =', 'coach.html')].concat(fromD('normExNameC', 'exNameVariantsC', 'spineIndexC', 'spineForC', 'spineLensC')),
+  ['spineIndexC', 'spineForC', 'spineLensC']);
+// 'machine-leg-press' and 'cossack-bw' are DRAFTS: a phone is not served them, and 'leg-press' / 'cossack' are their approved loose twins.
 const SPINE = [
-  { id: 'goblet-squat', name: 'Goblet Squat', aliases: ['Dumbbell Goblet Squat'] },
-  { id: 'machine-leg-press', name: 'Machine Leg Press', aliases: [] },
-  { id: 'leg-press', name: 'Leg Press', aliases: [] },
-  { id: 'db-bench', name: 'Dumbbell Bench Press', aliases: ['DB Bench'] },
-  { id: 'cossack', name: 'Cossack Squat', aliases: [] },
-  { id: 'cossack-bw', name: 'Cossack Squat (Bodyweight)', aliases: [] },
-  { id: 'farmers-carry', name: "Farmer's Carry", aliases: [] },
-  { id: 'push-up', name: 'Push-Up', aliases: ['Pushup'] },
+  { id: 'goblet-squat', name: 'Goblet Squat', aliases: ['Dumbbell Goblet Squat'], status: 'approved' },
+  { id: 'machine-leg-press', name: 'Machine Leg Press', aliases: [], status: 'draft' },
+  { id: 'leg-press', name: 'Leg Press', aliases: [], status: 'approved' },
+  { id: 'db-bench', name: 'Dumbbell Bench Press', aliases: ['DB Bench'], status: 'approved' },
+  { id: 'cossack', name: 'Cossack Squat', aliases: [], status: 'approved' },
+  { id: 'cossack-bw', name: 'Cossack Squat (Bodyweight)', aliases: [], status: 'draft' },
+  { id: 'farmers-carry', name: "Farmer's Carry", aliases: [], status: 'approved' },
+  { id: 'push-up', name: 'Push-Up', aliases: ['Pushup'], status: 'approved' },
 ];
 const LOOKUPS = [['Goblet Squat', ''], ['goblet squat', ''], ['Dumbbell Goblet Squat', ''], ['DB Goblet Squat', ''], ['Machine Leg Press', ''],
   ['Leg Press Machine', ''], ['Leg Press', ''], ['Leg Press (Machine)', ''], ['Cossack Squat (Bodyweight)', ''], ['Cossack Squat', ''],
   ['Cossack Squat (Light)', ''], ['Farmers Carry', ''], ['DB Bench Press', ''], ['Dumbbell Bench', ''], ['Push Up', ''], ['Pushup', ''], ['Unknown Lift', ''],
-  ['', ''], [null, null], [undefined, undefined], ['Goblet Squat', 'machine-leg-press'], ['Goblet Squat', 'nonexistent'], ['xxx', 'db-bench'], ['', 'cossack']];
+  ['', ''], [null, null], [undefined, undefined], ['Goblet Squat', 'machine-leg-press'], ['Goblet Squat', 'nonexistent'], ['xxx', 'db-bench'], ['', 'cossack'],
+  ['Machine Leg Press', 'machine-leg-press'], ['Leg Press (Machine)', 'machine-leg-press'], ['Machine Leg Press', ''], ['Machine Leg Press', 'leg-press'],
+  ['Cossack Squat (Bodyweight)', 'cossack-bw'], ['Cossack Squat (Bodyweight)', ''], ['Cossack Squat', 'cossack-bw'], ['Leg Press', 'machine-leg-press']];
 run('Spine lookup (spineFor)', () => {
-  A_SPINE.setSpine(SPINE);
-  const byId = {}; SPINE.forEach(e => { byId[e.id] = e; });
-  const idx = D_SPINE.spineIndexC(SPINE);
-  LOOKUPS.forEach(([name, exId]) => {
-    const a = A_SPINE.spineFor(name, exId), d = D_SPINE.spineForC(idx, name, exId, byId);
-    same('spineFor vs spineForC', { name, exId }, a ? a.id : null, d);
+  const found = {};
+  ['phone', 'coach'].forEach(view => {
+    const phone = view === 'phone';
+    // The phone is served approved entries only; the coach's view counts the drafts too.
+    A_SPINE.setSpine(SPINE.filter(e => !phone || e.status === 'approved'));
+    const lens = D_SPINE.spineLensC(SPINE, phone);
+    LOOKUPS.forEach(([name, exId]) => {
+      const a = A_SPINE.spineFor(name, exId), d = D_SPINE.spineForC(lens.idx, name, exId, lens.byId);
+      same('spineFor vs spineForC (' + view + ' view)', { name, exId }, a ? a.id : null, d);
+      found[view + '|' + name + '|' + exId] = d;
+    });
   });
+  // The rule, pinned by hand (TWIN-1): a card that names its entry is that entry, or nothing.
+  expect('a card on a DRAFT shows nothing on the phone, not its approved loose twin', 'Machine Leg Press / machine-leg-press (draft)', found['phone|Machine Leg Press|machine-leg-press'], null);
+  expect('and the coach\'s view finds the draft', 'Machine Leg Press / machine-leg-press', found['coach|Machine Leg Press|machine-leg-press'], 'machine-leg-press');
+  expect('an exId the Spine does not have is no entry, whatever the name says', 'Goblet Squat / nonexistent', [found['phone|Goblet Squat|nonexistent'], found['coach|Goblet Squat|nonexistent']], [null, null]);
+  expect('an exId wins over a name that belongs to another entry', 'Goblet Squat / machine-leg-press', [found['phone|Goblet Squat|machine-leg-press'], found['coach|Goblet Squat|machine-leg-press']], [null, 'machine-leg-press']);
+  expect('with no exId a name is still found by its tiers', 'Machine Leg Press', [found['phone|Machine Leg Press|'], found['coach|Machine Leg Press|']], ['leg-press', 'machine-leg-press']);
   // The phone has no Spine until it loads: it answers null, never throws.
   expect('spineFor before the Spine loads', 'SPINE = null', vm.runInContext('SPINE = null; spineFor("Goblet Squat", "")', A_SPINE.ctx), null);
 });
@@ -363,7 +378,7 @@ const A_QMIX = sandbox('var SPINE = null, SPINE_BY_ID = {}, SPINE_IDX = [{}, {},
     fromA('normExName', 'exNameVariants', 'setSpine', 'spineFor', 'setQualities', 'qmSets', 'isPrepBlockTitle', 'parseRoundCount', 'qualityMix')), ['setSpine', 'setQualities', 'qualityMix']);
 const D_QMIX = sandbox('var Chips = { rxOf: function (ex) { return (ex && ex.rx) || {}; } };',
   [lineSrc(D_SRC, 'const EX_ABBREV_C =', 'coach.html'), lineSrc(D_SRC, 'const QM_PREP =', 'coach.html'), lineSrc(D_SRC, 'const QM_COVERAGE_C =', 'coach.html')].concat(
-    fromD('normExNameC', 'exNameVariantsC', 'spineIndexC', 'spineForC', 'qmSetsC', 'roundCountC', 'qualityLensC', 'qualityDayC')), ['qualityLensC', 'qualityDayC']);
+    fromD('normExNameC', 'exNameVariantsC', 'spineIndexC', 'spineForC', 'spineLensC', 'qmSetsC', 'roundCountC', 'qualityLensC', 'qualityDayC')), ['qualityLensC', 'qualityDayC']);
 const QM_ENTRIES = [
   { id: 'a-squat', name: 'Alpha Squat', aliases: ['Alpha Sq'], status: 'approved', qualities: ['strength', 'muscle'] },
   { id: 'a-press', name: 'Beta Press', aliases: [], status: 'approved', qualities: ['strength'] },
@@ -550,7 +565,6 @@ run('chips.js cache token', () => {
 });
 
 /* ── report ───────────────────────────────────────────────────────────────── */
-console.log('  note TWIN-1 drafts (see the header)');
 if (failures.length || chipsFailures.length) {
   console.error('\ncheck_twins: ' + (failures.length + chipsFailures.length) + ' problem' + (failures.length + chipsFailures.length === 1 ? '' : 's') + ' (of ' + checks + ' checks):\n');
   failures.slice(0, 12).forEach(f => console.error('  ✗ ' + f + '\n'));

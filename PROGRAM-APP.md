@@ -340,7 +340,9 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   `exNameVariants()`; the Spine has no aliases, and a card is named exactly as its entry. A rename in a
   LIVE programme loses the athlete's history for that lift unless it moves too: logged sets, `setlog_`
   keys and Records are joined by name, through `matchRenamed()`'s spelling tiers only. ⚠ **The resolver exists twice** — `spineFor()` (program.html) and
-  `spineForC()` (coach.html). Same rule: `exId` first, then the tightest tier with ONE entry.
+  `spineForC()` (coach.html). Same rule: **a card with an `exId` is that entry or nothing** (since 2026-10-11, audit TWIN-1: the phone is served
+  approved entries only, so a card on a DRAFT shows no cues or video until it is approved; it used to guess an approved entry from the name, and the loose
+  tiers found a different exercise's), and with no `exId` the tightest tier with ONE entry. `scripts/headless/spine-link.js` covers it in the app.
 - `spinecache` (localStorage, no athlete prefix) is a cache of `get_exercises()` and never syncs.
 - **Library → Exercises is the third door** (Amir, 2026-09-24: *"something like the one i have in tps
   course"*): search, pattern chips, *In your plan* first. Every row opens the same About sheet

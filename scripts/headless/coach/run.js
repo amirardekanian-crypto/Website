@@ -2136,6 +2136,58 @@ S['quality-day-cards'] = async (b) => {
   return r;
 };
 
+S['spine-phone-view'] = async (b) => {
+  const r = { id: 'spine-phone-view', title: 'Spine: a card on a draft has no video here (it has none on a phone), and the Exercises tab lists the cards that show something else on a phone', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'athletes' });
+  // Two approved entries with a video each and a DRAFT loose twin of each (the word "machine"): the phone is served the approved ones only.
+  await page.evaluate(() => {
+    const now = new Date().toISOString();
+    const E = (id, name, status, video) => ({ id, name, aliases: [], pattern: 'isolation', qualities: ['strength'], purpose: 'Fixture.', tennis: null, cues: { good: ['Fixture cue'], bad: [] },
+      equipment: [], loads: [], easier: [], harder: [], alts: [], video, status, updated_at: now, updated_by: 'coach', impact: 'none', muscles: null });
+    const list = [E('seated-leg-curl', 'Seated Leg Curl', 'approved', 'https://www.youtube.com/watch?v=APPROVED001'), E('machine-seated-leg-curl', 'Machine Seated Leg Curl', 'draft', 'https://www.youtube.com/watch?v=DRAFT000001'),
+      E('hip-abduction', 'Hip Abduction', 'approved', 'https://www.youtube.com/watch?v=HIPABD00001'), E('machine-hip-abduction', 'Machine Hip Abduction', 'draft', 'https://www.youtube.com/watch?v=DRAFT000002')];
+    window.__DB.exercises.splice(0, window.__DB.exercises.length, ...list);
+    window.__DB.exercise_coach.splice(0, window.__DB.exercise_coach.length);
+    const row = window.__DB.programs.find(p => p.athlete_id === 'ava_test');
+    const d = JSON.parse(JSON.stringify(row.data));
+    const ex = (name, exId) => ({ name, exId, type: 'standard', rx: { sets: 3, reps: 10, rpe: 7 } });
+    d.workouts.days = [{ id: 1, focusTag: 'Legs First (fixture)', blocks: [{ icon: '💪', title: 'Primary', exercises: [
+      ex('Machine Seated Leg Curl', 'machine-seated-leg-curl'),     // names the draft
+      ex('Seated Leg Curl', 'seated-leg-curl'),                     // names an approved entry
+      ex('Machine Hip Abduction', undefined) ] }] },                // names nothing: the coach's view finds the draft, a phone its approved twin
+      { id: 2, focusTag: 'Upper Push (fixture)', blocks: [] }, { id: 3, focusTag: 'Pull Day (fixture)', blocks: [] }];
+    row.data = d; row.updated_at = new Date(Date.now() + 1000).toISOString();
+  });
+  await page.evaluate(() => { S.spine = null; return reloadPrograms(); });
+  // 1. the compare view: the video a phone can play
+  await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work'); await L.settle(page, 900);
+  const vid = async name => page.evaluate(n => {
+    const row = [...document.querySelectorAll('.wday.open .cmp-row')].find(x => (x.querySelector('.cmp-nm') || {}).textContent.replace('▶', '').trim() === n);
+    if (!row) return 'no row';
+    const a = row.querySelector('.cmp-vid');
+    return a ? a.getAttribute('href') : null;
+  }, name);
+  check(r, 'the card on the DRAFT has no video link (a phone has nothing for it; the draft\'s own video is not shown here)', (await vid('Machine Seated Leg Curl')) === null, await vid('Machine Seated Leg Curl'));
+  check(r, 'the card on the approved entry has its video', (await vid('Seated Leg Curl')) === 'https://www.youtube.com/watch?v=APPROVED001', await vid('Seated Leg Curl'));
+  check(r, 'the card with no exId finds the approved twin\'s video, as a phone does', (await vid('Machine Hip Abduction')) === 'https://www.youtube.com/watch?v=HIPABD00001', await vid('Machine Hip Abduction'));
+  // 2. the Exercises tab
+  await L.go(page, 'exercises'); await L.settle(page, 900);
+  const txt = await page.evaluate(() => { document.querySelectorAll('#content details').forEach(d => { d.open = true; }); return document.getElementById('content').textContent.replace(/\s+/g, ' '); });
+  check(r, 'Coverage says two card names show something else on a phone until the drafts are approved', /2 card names show something else on a phone until the draft is approved/.test(txt), txt.slice(0, 500));
+  const list = (/Cards that show something else on a phone · 2 names(.*?)(?:Not in the Spine yet|$)/.exec(txt) || [])[1] || '';
+  check(r, 'the list names the card on the draft: here the draft, on a phone nothing', /Machine Seated Leg Curl\s*1 athlete · here: Machine Seated Leg Curl \(draft\) · phone: nothing/.test(list), list);
+  check(r, 'and the card with no exId: here the draft, on a phone the closest approved one', /Machine Hip Abduction\s*1 athlete · here: Machine Hip Abduction \(draft\) · phone: Hip Abduction/.test(list), list);
+  check(r, 'the approved card is not in the list', !/[^e]Seated Leg Curl\s*1 athlete · here: Seated Leg Curl/.test(list), list);
+  // 3. once the draft is approved both agree and the list goes
+  await page.evaluate(() => { window.__DB.exercises.forEach(e => { e.status = 'approved'; }); S.spine = null; renderExercises(); });
+  await L.settle(page, 900);
+  const txt2 = await page.evaluate(() => document.getElementById('content').textContent.replace(/\s+/g, ' '));
+  check(r, 'with every entry approved nothing shows something else on a phone', !/show something else on a phone|Cards that show something else/.test(txt2), txt2.slice(0, 300));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── One way to say what did not work (audit BROWSER-10, FLOW-22, MKT-13, 2026-10-11, pile B5) ─────────────────────────────────────
 // A failure used to be a 2.6-second toast in some tabs (easy to miss) and a pop-up in others (it stopped everything, and was gone once
 // dismissed). Now: it worked = a toast; it did not = a line at the bottom that stays until it is dismissed; a question = a confirm;

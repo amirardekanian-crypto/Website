@@ -2955,10 +2955,8 @@ function decode(athleteId, blob) {
 // entry (edited under Exercises), found the way a card finds it, by exId and then by name.
 async function exLib() {
   if (!S.spine) await loadSpine();
-  const list = (S.spine && S.spine.list) || [];
-  const byId = {};
-  list.forEach(e => { byId[e.id] = e; });
-  return { idx: spineIndexC(list), byId };
+  // The phone's view (approved entries only): the video an athlete can play, not one a draft holds (audit TWIN-1, 2026-10-11).
+  return spineLensC((S.spine && S.spine.list) || [], true);
 }
 function vidUrl(ex, lib) {
   if (ex && ex.videoUrl) return ex.videoUrl;
@@ -5493,7 +5491,7 @@ function renderCourse() {
 // Name -> entry uses exNameVariantsC(), the port of program.html's own tiers, so
 // the dashboard and the athlete's phone agree about which card is which entry.
 // ⚠ The resolver itself exists twice: spineFor() in program.html and spineForC()
-// here. Same rule in both: ex.exId first, then the tightest tier with ONE entry.
+// here. Same rule in both: ex.exId is the entry or nothing, and with no exId the tightest tier with ONE entry.
 const SPINE_PATTERNS = ['squat','hinge','single-leg','push-horizontal','push-vertical','pull-horizontal','pull-vertical',
   'carry','anti-extension','anti-rotation','anti-lateral-flexion','rotation','jump-land','throw','sprint-cod',
   'mobility','isolation','conditioning'];
@@ -5626,13 +5624,22 @@ function spineIndexC(list) {
   return idx;
 }
 function spineForC(idx, name, exId, byId) {
-  if (exId && byId[exId]) return exId;
+  if (exId) return byId[exId] ? exId : null;   // a card that names its entry IS that entry, or nothing (audit TWIN-1; program.html spineFor())
   const vs = exNameVariantsC(name || '');
   for (let t = 0; t < vs.length; t++) {
     const ids = vs[t] && idx[t][vs[t]];
     if (ids && ids.length === 1) return ids[0];
   }
   return null;
+}
+// The Spine as a reader sees it (audit TWIN-1, 2026-10-11). A PHONE is served approved entries only (get_exercises()), so what it can show for
+// a card is found among those; the coach's own view counts drafts too, because a draft's cards are "waiting for you". Anything that predicts
+// what an athlete sees (a video, a day card's qualities, the list of cards that show something else) reads the phone's view.
+function spineLensC(list, phone) {
+  const entries = (list || []).filter(e => !phone || e.status === 'approved');
+  const byId = {};
+  entries.forEach(e => { byId[e.id] = e; });
+  return { idx: spineIndexC(entries), byId };
 }
 // Every exercise card in the live programmes, circuit items included (a third of all cards sit
 // inside circuits, and some entries are used nowhere else), grouped by name and exId, with who uses it.
@@ -6096,12 +6103,11 @@ function roundCountC(s) {
 // scripts/check_twins.js runs both on hundreds of generated days.
 const QM_COVERAGE_C = 0.7;
 function qualityLensC(list, quals, phone) {
-  const entries = (list || []).filter(e => !phone || e.status === 'approved');
-  const byId = {};
-  entries.forEach(e => { byId[e.id] = e; });
+  const lens = spineLensC(list, phone);
   const qById = {};
   (quals || []).filter(q => !phone || q.status === 'approved').forEach(q => { qById[q.id] = q; });
-  return { idx: spineIndexC(entries), byId, qById };
+  lens.qById = qById;
+  return lens;
 }
 function qualityDayC(day, lens) {
   const out = { chips: [], total: 0, covered: 0, coverage: 0 };
@@ -6247,6 +6253,14 @@ function renderExercises() {
     } else unmapped.push(u);
   });
   unmapped.sort((a, b) => Object.keys(b.athletes).length - Object.keys(a.athletes).length || b.slots - a.slots);
+  // Cards that show something else on a phone (audit TWIN-1, 2026-10-11): this page counts draft entries (their cards are "waiting for you"), a
+  // phone is served approved ones only. A card with an exId shows that entry or nothing; one with no exId is found by name among the approved.
+  const phone = spineLensC(list, true), differ = [];
+  usage.forEach(u => {
+    const a = spineForC(idx, u.name, u.exId, byId), p = spineForC(phone.idx, u.name, u.exId, phone.byId);
+    if (a && a !== p) differ.push({ u, a, p });
+  });
+  differ.sort((x, y) => Object.keys(y.u.athletes).length - Object.keys(x.u.athletes).length || y.u.slots - x.u.slots);
   const pct = slotsAll ? Math.round(slotsMapped / slotsAll * 100) : 0;
   const drafts = list.filter(e => e.status === 'draft'), approved = list.filter(e => e.status === 'approved');
   const filter = _spineFilter || (drafts.length ? 'draft' : 'approved');
@@ -6346,7 +6360,8 @@ function renderExercises() {
   let html = `<div class="controls"><span class="empty" style="align-self:center">The Spine: one entry per exercise you programme. Cues written here fill every card that has none of its own, and the athlete's <b>i</b> opens the rest. Nothing shows on a phone until it is <b>Approved</b>.</span></div>`;
   html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">Coverage</span><span class="r">${namesMapped} of ${usage.length} card names · ${pct}% of exercise slots</span></div>
     <div style="height:10px;border-radius:999px;background:var(--line);overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--clay)"></div></div>
-    <p class="psub" style="margin:10px 0 0">${approved.length} approved · ${drafts.length} draft${drafts.length === 1 ? '' : 's'} waiting for you. Counted across the ${nLive} programme${nLive === 1 ? '' : 's'} with workouts, circuit items included.</p></section>`;
+    <p class="psub" style="margin:10px 0 0">${approved.length} approved · ${drafts.length} draft${drafts.length === 1 ? '' : 's'} waiting for you. Counted across the ${nLive} programme${nLive === 1 ? '' : 's'} with workouts, circuit items included.${
+      differ.length ? ` <b style="color:var(--clay-ink)">${differ.length} card name${differ.length === 1 ? '' : 's'} show${differ.length === 1 ? 's' : ''} something else on a phone until the draft is approved</b> (listed at the bottom).` : ''}</p></section>`;
   html += qualityPanels(idx, byId);
   const fbtn = (f, t) => `<button class="btn sm sp-filter${filter === f && !q ? ' primary' : ''}" data-f="${f}" aria-pressed="${filter === f && !q}">${t}</button>`;
   html += `<section class="panel"><div class="phead"><span class="t hd">${q ? 'Matches' : filter === 'approved' ? 'Approved' : 'Waiting for you'}</span>
@@ -6354,6 +6369,10 @@ function renderExercises() {
     <input id="spineQ" type="search" value="${esc(_spineQ)}" placeholder="Find an exercise: name, other name, pattern, equipment or id" aria-label="Find an exercise" style="${field};margin:0 0 8px">` +
     (shown.length ? shown.slice().sort((a, b) => nAth(b.id) - nAth(a.id) || a.name.localeCompare(b.name)).map(row).join('')
       : `<p class="empty">${q ? 'No entry matches “' + esc(_spineQ) + '”.' : filter === 'draft' ? 'No drafts waiting. Ask Claude to draft the next batch.' : 'Nothing approved yet: open a draft and tap Approve.'}</p>`) + `</section>`;
+  if (differ.length) html += `<section class="panel" style="margin-top:16px"><details><summary class="arch-toggle">Cards that show something else on a phone · ${differ.length} name${differ.length === 1 ? '' : 's'}</summary><div style="margin-top:12px">
+    <p class="psub" style="margin:0 0 8px">A phone is served approved entries only. These cards find a draft here, so on a phone they show nothing (a card that names its entry shows that entry or nothing) or, with no entry named, the closest approved one. Approve the draft and both agree.</p>${
+    differ.slice(0, 60).map(d => `<div class="credrow"><span class="credname">${esc(d.u.name)}</span><span class="muted">${Object.keys(d.u.athletes).length} athlete${Object.keys(d.u.athletes).length === 1 ? '' : 's'} · here: ${esc((byId[d.a] || {}).name || d.a)} (${byId[d.a] && byId[d.a].status === 'approved' ? 'approved' : 'draft'}) · phone: ${d.p ? esc((phone.byId[d.p] || {}).name || d.p) : 'nothing'}</span></div>`).join('')
+  }${differ.length > 60 ? `<p class="psub">…and ${differ.length - 60} more.</p>` : ''}</div></details></section>`;
   if (unmapped.length) html += `<section class="panel" style="margin-top:16px"><details><summary class="arch-toggle">Not in the Spine yet · ${unmapped.length} names</summary><div style="margin-top:12px">${
     unmapped.slice(0, 60).map(u => `<div class="credrow"><span class="credname">${esc(u.name)}</span><span class="muted">${Object.keys(u.athletes).length} athlete${Object.keys(u.athletes).length === 1 ? '' : 's'} · ${u.slots} slot${u.slots === 1 ? '' : 's'}</span></div>`).join('')
   }${unmapped.length > 60 ? `<p class="psub">…and ${unmapped.length - 60} more.</p>` : ''}</div></details></section>`;

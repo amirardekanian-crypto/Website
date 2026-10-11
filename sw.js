@@ -216,7 +216,11 @@
 //      The keys are week numbers ("1", "3", "5"), `first` and `last` still work as week 1 and the final week, a numeric key wins over the
 //      alias, and nothing shows before the start date (the week-1 note used to show the day before a cycle began) or after the end date.
 //      A note's rpeCap / rpeDrop move today's target in its week only. Without the bump a phone keeps the old two-note reader.
-const CACHE = 'aap-v104';
+// v105: program.html changed (2026-10-11, coach.html audit TWIN-1): a card that names its entry (exId) shows that entry or nothing. The phone is
+//      served approved entries only, so a card on a DRAFT used to be looked up by name and could borrow another approved entry's cues and video
+//      (the word "machine" and word order are ignored by the loose tiers); now it shows none until the draft is approved. Without the bump a
+//      phone keeps the old lookup.
+const CACHE = 'aap-v105';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -107,6 +107,14 @@ every card in a programme with workouts, **circuit items included** (before 2026
 circuits, a third of all cards). *Not in the Spine yet* lists the names still without an entry,
 most-used first.
 
+**This page counts drafts; a phone does not** (audit TWIN-1, 2026-10-11). A phone is served approved entries only, so what an athlete sees
+is found among those. A card that names its entry (`exId`) shows that entry **or nothing** on the phone and on the dashboard alike: a
+card on a draft has no cues and no video until you approve it (it used to fall back to the closest approved entry by name, so
+"Machine Seated Leg Curl" showed "Seated Leg Curl"'s cues and video). A card with no `exId` is found by its name tiers, as before.
+*Coverage* says how many card names show something else on a phone, and the list at the bottom, *Cards that show something else on a
+phone*, gives each one: what you see here, and what the phone shows (nothing, or the closest approved entry). The video next to an
+exercise in the compare view is the phone's too, so a draft's video does not appear until the draft is approved.
+
 **Saving is safe against Claude's work (2026-10-10).** Claude's `/spine` writes the same rows by SQL
 while you review them. A save sends **only the fields you changed**, so a court line, a link, a count
 or a cost Claude wrote after you opened the tab survives your edit to a video. If Claude (or another

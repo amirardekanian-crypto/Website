@@ -60,7 +60,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 71 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 72 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -125,6 +125,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | retest-flag | Personal records with `test` set to "3RM", true, "heavy" and "11RM" | (pile B6, TWIN-7) any text was shown as a flag; now only what the athlete's app reads |
 | readiness-chart | Ava with eleven check-ins (six from before the verdict, five stored, two on one day, soreness 1 on one) and Eli with three | (pile B6, TWIN-3 and TODAY-11) the chart plotted the old composite against an all-time mean, the pill took the first of two same-day check-ins, Eli's "usual" was made up from three; now all three places read the app's score and usual |
 | quality-day-cards | Ava with five designed days against a Spine with one draft lift and only three approved qualities | (pile B6, TWIN-9) the Quality check was weekly only, so a week at 77% tagged looked fine while four of five day cards were blank; now each day is named by the app's rule, in the phone's view and "once the drafts are approved" |
+| spine-phone-view | Two approved entries with a video each and a DRAFT loose twin of each ("Machine …"), and three cards: one on a draft, one on an approved entry, one with no exId | (pile B7, TWIN-1) the compare view showed a draft's video that a phone cannot play, and nothing told you which cards show something else on a phone; now the video is the phone's and the Exercises tab lists those cards |
 | fail-bar | a failed post on Today (and the same again, and a failed intake status), then a success, on a 1280 px screen and a 360 px phone | (pile B5) a failure was a 2.6 s toast in some tabs and a pop-up in others; now a line that stays until dismissed, in view when scrolled, merged when repeated, never a pop-up; a success stays a toast |
 
 ## Adding a scenario
