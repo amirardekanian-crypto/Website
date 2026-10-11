@@ -1,6 +1,6 @@
 # The athlete app — a map for someone opening it for the first time
 
-**Status: DRAFT 3 · 2026-10-11 · English only** (Farsi follows once Amir has approved this text).
+**Status: DRAFT 5 · 2026-10-11 · English only** (Farsi follows once Amir has approved this text).
 **Who it is for:** a new client who is comfortable with phones but new to this system, and, further down, the returning athlete starting cycle 2, 3 or 4.
 **What it covers (Amir, 2026-10-11):** core training (sign-in → Home → a session → finishing it), the Library (Sessions, Playbook, Exercises), and Personal Records + Body Weight. AA Proof (the habit tracker) appears only as the row and strip on Home, with a pointer. The full AA Proof app, the coach dashboard, the Farsi course app and the testing app are not here.
 
@@ -8,7 +8,7 @@
 
 **Colours, as the athlete is told them:** the app's accent (the `--clay` token) is called **orange** in everything an athlete reads, and RPE under target is **blue**. Part 1 keeps to those words. Do not write "clay" in athlete-facing text.
 
-**How this was made:** all 14,927 lines of `program.html` were read in eight slices on 2026-10-11, plus `PROGRAM-APP.md`, `MAP.md`, `Content/HOW-IT-WORKS.md`, `Content/PRODUCT.md` and the Proof sections of `HABITS.md`. Every label below is quoted from the code. Then the labels and flows were walked in a headless phone-width browser (Part 2, F), and the 49 screenshots are in `Content/client-app-map/` (index: §12).
+**How this was made:** all 14,927 lines of `program.html` were read in eight slices on 2026-10-11, plus `PROGRAM-APP.md`, `MAP.md`, `Content/HOW-IT-WORKS.md`, `Content/PRODUCT.md` and the Proof sections of `HABITS.md`. Every label below is quoted from the code. Then the labels and flows were walked in a headless phone-width browser (Part 2, F), and the 50 screenshots are in `Content/client-app-map/` (index: §12).
 
 **Two parts.** Part 1 is the map itself and can be lifted as it is into a page, a guide or a WhatsApp message later. Part 2 is **for Amir only**: findings, first-timer traps, gaps.
 
@@ -32,8 +32,8 @@ You do not need to read the rest of this to start. Do these in order.
 8. **Any question, any niggle:** Coach tab → **Message me on WhatsApp**. I answer there, not in the app.
 
 **Four things nobody tells you:**
-- On a *closed* exercise, the circle on the left ticks **every set at once**. Open the card first.
-- The grey number in an empty kg box is last time's weight, as a reminder. It is **not saved**. Type your weight.
+- On a *closed* exercise, open the card first and tick each set there. (Once you've finished a session, the circle on a closed card ticks every set as written.)
+- The grey number in an empty kg box is last time's weight, as a reminder. It is **not saved**. Type your weight. (If you tick a set with no weight, a small note tells you.)
 - Week 1 is for finding your weights. If it feels light, that's the point.
 - No signal? Keep training. Everything saves on your phone and sends itself later.
 
@@ -144,24 +144,24 @@ DAY  (opened from a day card; the tab bar hides once you tap Begin or Skip)
 **The Welcome.** After your first sign-in on a phone, a full screen appears once: **"You're in"**, **"Welcome, {first name}."**, *"Your plan is ready. First up is {cycle name}, {weeks}."* and *"Any questions, message me on WhatsApp. The button is in the Coach tab."*
 - **Open Day 1** goes Home and opens Day 1.
 - **Look around first** just closes it.
-- It has no ✕ and the phone's Back button does not close it. It won't come back on this phone.
+- The **✕** top right closes it too, and so does the phone's Back button. It won't come back on this phone.
 
 ---
 
 ## 4. Your first session, step by step
 
-*Screens: [05-day-opened](client-app-map/05-day-opened.jpg) · [06-readiness-empty](client-app-map/06-readiness-empty.jpg) · [07-session-slim-bar](client-app-map/07-session-slim-bar.jpg) · [11-card-open](client-app-map/11-card-open.jpg) · [14-rpe-strip](client-app-map/14-rpe-strip.jpg) · [15-rest-offer](client-app-map/15-rest-offer.jpg) · [17-card-folds-next-opens](client-app-map/17-card-folds-next-opens.jpg) · [22-finish-card-in-progress](client-app-map/22-finish-card-in-progress.jpg) · [23-finish-card-all-done](client-app-map/23-finish-card-all-done.jpg) · [24-done-without-rating](client-app-map/24-done-without-rating.jpg) · [25-finished-card](client-app-map/25-finished-card.jpg) · [26-install-nudge](client-app-map/26-install-nudge.jpg) · [27-home-after-session](client-app-map/27-home-after-session.jpg)*
+*Screens: [05-day-opened](client-app-map/05-day-opened.jpg) · [06-readiness-empty](client-app-map/06-readiness-empty.jpg) · [07-session-slim-bar](client-app-map/07-session-slim-bar.jpg) · [11-card-open](client-app-map/11-card-open.jpg) · [14-rpe-strip](client-app-map/14-rpe-strip.jpg) · [17-card-folds-next-opens](client-app-map/17-card-folds-next-opens.jpg) · [22-finish-card-in-progress](client-app-map/22-finish-card-in-progress.jpg) · [23-finish-card-all-done](client-app-map/23-finish-card-all-done.jpg) · [24-done-without-rating](client-app-map/24-done-without-rating.jpg) · [25-finished-card](client-app-map/25-finished-card.jpg) · [26-install-nudge](client-app-map/26-install-nudge.jpg) · [27-home-after-session](client-app-map/27-home-after-session.jpg)*
 
 This is the order of a real first session, as the app behaves.
 
 1. **Home → pick a day.** Under **This Week** each day is a big card: a photo, **Day 1**, its name, *"N blocks · M movements"* and up to three words such as *Strength · Brakes · Spring* (what the day builds). A faint green ring marks the day to do next. Tap the card.
 2. **The day opens.** The card repeats at the top with a **←**. Under it is the **session bar**: *"Ready when you are"*, **00:00**, **Start ▶** and **Guided ▶**. A green note appears: *"Tap **Start** as you begin, so I know how long the session took. Or **Guided**: one set at a time, with your rest timed."* (tap **Got it**). Below are the blocks with their exercises, all folded.
 3. **Tap Start ▶.** The **Readiness check** slides up (§5.2). Answer five questions, 1–5 each.
-4. **Tap Begin session ▶.** The clock starts and the bar shrinks to one slim line (**← Home · clock · Pause ⏸ · ⋯**). The tab bar disappears so the workout has the screen.
+4. **Tap Begin session ▶.** (If you tick a set before pressing Start, a note box offers it once: *"The session clock isn't running."* with **Start** and **Not now**.) The clock starts and the bar shrinks to one slim line (**← Home · clock · Pause ⏸ · ⋯**). The tab bar disappears so the workout has the screen.
 5. **Open an exercise** by tapping its row. Read my note if there is one. Open the **Video & cues** row if you want the video and the cues.
-6. **Log set 1.** Type the weight in the **kg** box (the reps box already shows the prescribed number in grey), then tap the **circle** on the right. A note says: *"Weight in, set done: tap the **circle**. One tap means done as written. Different reps? Type them first."*
+6. **Log set 1.** Type the weight in the **kg** box (the reps box already shows the prescribed number in grey), then tap the **circle** on the right. Tick with no weight and a note appears in the middle of the screen: *"No weight saved on that set. Type it in the kg box."* (tap **Got it**) A note says: *"Weight in, set done: tap the **circle**. One tap means done as written. Different reps? Type them first."*
 7. **Say how hard it was.** A strip opens: **How hard?** and **6 7 8 9 10**. A note says: *"How hard was that set? **10**: not one more rep. **8**: two left. I set your weights from it."* Tap a number.
-8. **Rest.** The moment you tick a set, a pill, **Rest 2:30 ×**, slides up at the bottom of the screen, together with the strip above, and it stays after you've picked your number. It shows my rest for that exercise (2:00 if I didn't write one). Tap it for the Rest Timer; tap **×** to dismiss it. It never starts on its own.
+8. **Rest.** When you want the timer, tap the card's **Rest ⏱** button (under the sets). It never starts on its own, and Guided starts it for you after every set.
 9. **Repeat for each set.** After the last set's number, the card folds into one summary line and the next exercise opens by itself.
 10. **A card appears at the bottom of the session:** **In progress · 4 of 11 sets**, with **Finish early**. It's at the very end of the page. When you finish the last exercise the page scrolls to it for you; until then, scroll down to find it.
 11. **When every set is done** it reads **All done with Day 1**. Rate the whole session **1 to 10** (*1 = very easy · 10 = maximum effort*), add a note if you want (**Notes for Coach**), then tap **Done · send to coach ✓**. If you haven't rated: *"Rate the session first: 1 to 10."*
@@ -228,7 +228,7 @@ Top to bottom:
 - Your programme itself never changes, only today's targets. **Train as written** reverses it all (the banner then offers **Use today's targets**). I see which one you chose.
 
 **The exercise card — closed.** One row per exercise, in order:
-- **A circle on the left.** ⚠ On a closed card this ticks **every set at once, as written**, with no weight and no RPE, and folds the card (the name is struck through and the line shows only the reps). For normal logging, open the card and use the per-set circles.
+- **A circle on the left.** Until you've finished your first session it **opens the card** (with a note on how to log). After that it ticks **every set at once, as written**, with no weight and no RPE, and folds the card (the name is struck through and the line shows only the reps): a shortcut for when you did exactly what was written. For normal logging, open the card and use the per-set circles.
 - A number, the **name**, and a small **orange dot** if I left you a **Coach's note**.
 - **The line of numbers:** `4 × 6 · RPE 7 · 3-1-1 · 2:30` = sets × reps · target RPE · tempo · rest. Only what's prescribed shows. A rest for a whole block sits on the block's header instead (*Rest 2m*).
 - A **green pill** when there's a grip or one intention (for example *neutral grip*).
@@ -245,7 +245,7 @@ Top to bottom:
 
 **Logging a set.** Each row: **SET · KG · REPS**, an **RPE** tag and a **circle**.
 
-- **KG:** type the weight you used. A grey figure with a tiny **LAST** under it is last time's weight, as a reminder only: it is **not saved unless you type it**. A tick on an empty weight box records no weight. A weight typed in one set fills the empty sets below it.
+- **KG:** type the weight you used. A grey figure with a tiny **LAST** under it is last time's weight, as a reminder only: it is **not saved unless you type it**. A tick on an empty weight box records no weight, and the app tells you (the box pulses and a note says *"No weight saved on that set. Type it in the kg box."*; once a session after your first). A weight typed in one set fills the empty sets below it.
 - **REPS:** the grey number is the prescription. It looks filled but holds nothing. Type only if your reps differed. Typing the prescribed number stores nothing.
 - **Circle:** tick = "done as written".
 - **After a tick,** a **How hard?** strip opens: **6 7 8 9 10**. Tap one (tap it again to clear). An RPE over the target shows in **orange**, under it in **blue**. **How hard?** itself opens the short guide.
@@ -262,7 +262,7 @@ Top to bottom:
 
 **Last time and History.** In an open card: **Last time · Tue** and the last set (*70 kg × 5 @ 8*). A tap shows every set, your RPEs against the target, your note and **History ›** (a chart and the last sessions). A faint *"last · 80 × 4 @ 9"* under a set means that set ran over target last time. It never tells you what to lift. A different version of an exercise (a progression) counts as new: *"First time"* again.
 
-**The Rest Timer.** Full-screen. Opens already running. **Pause**, **+15s**, **Reset**, **Close** and **Sound on/off** (a beep and a buzz at zero; iPhones don't buzz). The screen stays awake. At zero it shows **GO!** and closes. The pill shows my rest for that exercise (for example *Rest 2:30*); *Rest 2:00* is only a default when I wrote none, not a prescription.
+**The Rest Timer.** Full-screen. Opens already running. **Pause**, **+15s**, **Reset**, **Close** and **Sound on/off** (a beep and a buzz at zero; iPhones don't buzz). The screen stays awake. At zero it shows **GO!** and closes. The card's button shows my rest for that exercise (for example *Rest ⏱ 2:30*); when I wrote none it says *Rest timer* and opens a neutral 2:00.
 
 **Guided mode** (the ▶ next to Start, or under ⋯). One exercise and one set at a time, the current set pinned.
 - Footer: **Done — Start Rest ✓** (ticks the set as written, then rests), **‹ Prev**, then **Next →**, and **Finish Session ✓** on the last set.
@@ -316,7 +316,7 @@ The whole route, top to bottom:
 - *"**5 days** left in cycle · ends OCT 24"* — only in the last 14 days (it isn't a billing message; it has no button).
 - **Cycle meter:** one segment per cycle, labelled **C1 C2 … Cn**. Finished ones are faded green, the current one is solid dark green with a glow and a bold label, the rest grey. Not tappable. (The pills are **Done** in orange and **Active** in green.)
 - **Done** — the cycle just finished. Tap it to open the **Archive** (that cycle's plan as I wrote it, read-only, without your numbers).
-- **Active** — this cycle, the only one open by default: **The Aims**, **Why This Cycle Matters**, **Expected outcomes after this cycle** (✓ list). Tapping the card jumps you to Home (only **Read less** stays on this screen).
+- **Active** — this cycle, the only one open by default: **The Aims**, **Why This Cycle Matters**, **Expected outcomes after this cycle** (✓ list). Tap its picture banner to jump to Home; reading its text stays on this screen.
 - **Why your plan looks like this · N reasons ›** — appears when I've given at least three personal reasons (§5.8).
 - **Up next!** and **Locked** — later cycles, folded; **Read more** shows their teaser. They can't be opened further.
 
@@ -496,7 +496,7 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 | Do today's workout | Home → the ringed day card → Start ▶ |
 | See which day is next | Home → This Week (the green ring) |
 | Train one set at a time | In a day: Guided ▶ (or ⋯ → Guided) |
-| Rest between sets | Tick a set → **Rest 2:00**; or the card's **Rest ⏱** |
+| Rest between sets | The card's **Rest ⏱** button (Guided rests for you) |
 | See what I lifted last time | Open the exercise → **Last time** → **History ›** |
 | Know why this exercise is here | The ⓘ at the right end of the card |
 | Watch how to do it | Open the card → **How to do it**; or Library → Exercises |
@@ -522,12 +522,12 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 
 ## 12. The screens (phone width, light mode)
 
-49 screenshots in `Content/client-app-map/`, taken on 2026-10-11 from the test fixture (an invented athlete, so names, dates and numbers are not real). **Small monospace labels use a stand-in font** (JetBrains Mono for Space Mono, which is not in the repo), so the little grey labels look slightly different from the real app. Everything else is the app's own code and fonts.
+50 screenshots in `Content/client-app-map/`, taken on 2026-10-11 from the test fixture (an invented athlete, so names, dates and numbers are not real). **Small monospace labels use a stand-in font** (JetBrains Mono for Space Mono, which is not in the repo), so the little grey labels look slightly different from the real app. Everything else is the app's own code and fonts.
 
 | File | Shows | § |
 |---|---|---|
 | [01-sign-in](client-app-map/01-sign-in.jpg) | Username, Password, eye, Sign in, "Lost your details?" | 3 |
-| [02-welcome](client-app-map/02-welcome.jpg) | The Welcome overlay | 3 |
+| [02-welcome](client-app-map/02-welcome.jpg) | The Welcome overlay, with its ✕ | 3 |
 | [03-home-top](client-app-map/03-home-top.jpg) | Home top for a new athlete, week-1 note, day cards | 5.1 |
 | [04-home-lower](client-app-map/04-home-lower.jpg) | The ringed next day; habits, records and weight rows (empty) | 5.1 |
 | [05-day-opened](client-app-map/05-day-opened.jpg) | A day opened: session bar and the first note | 4 |
@@ -540,7 +540,6 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 | [12-card-open-last-time](client-app-map/12-card-open-last-time.jpg) | Last time box and LAST weights | 5.2 |
 | [13-history-sheet](client-app-map/13-history-sheet.jpg) | The History sheet | 5.2 |
 | [14-rpe-strip](client-app-map/14-rpe-strip.jpg) | The RPE strip after a tick | 5.2 |
-| [15-rest-offer](client-app-map/15-rest-offer.jpg) | The Rest pill | 4 |
 | [16-rest-timer](client-app-map/16-rest-timer.jpg) | The Rest Timer | 5.2 |
 | [17-card-folds-next-opens](client-app-map/17-card-folds-next-opens.jpg) | A finished card folded; the next opens | 4 |
 | [18-circuit-card](client-app-map/18-circuit-card.jpg) | A circuit: Rounds and Log | 5.2 |
@@ -575,6 +574,8 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 | [47-home-not-finished](client-app-map/47-home-not-finished.jpg) | The Not finished card | 5.1 / 7 |
 | [48-home-offline](client-app-map/48-home-offline.jpg) | The offline note | 7 |
 | [49-home-dark](client-app-map/49-home-dark.jpg) | Home in dark mode | 5.9 |
+| [50-closed-circle-note](client-app-map/50-closed-circle-note.jpg) | A first-timer taps the circle on a closed card: it opens, and a note box says how to log | 5.2 |
+| [51-clock-offer](client-app-map/51-clock-offer.jpg) | A set ticked with the clock not running: the one offer, Start or Not now | 4 |
 
 ---
 ---
@@ -595,20 +596,20 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 - **The two WhatsApp messages** (the login, then the handoff, `coach.html` 1195 and `program-engage` SKILL 207-286) are the real onboarding. The handoff's tour of the app names Home, the check-in, Coach, the clay dot and ⓘ, Game Plan and the guide, but **not Library, and not Daily habits / AA Proof**.
 - **The login message's install line** says only *Share → Add to Home Screen* (iPhone). It has no Android route and no warning that a link opened inside WhatsApp cannot install. (§0 and §3 now say both.)
 - **The app's own install nudge waits** until the first finished session, so the first session usually runs from the browser.
-- **The Welcome is one-shot,** has no ✕ and ignores Back. **The three first-session notes are permanent once dismissed** (**Got it**) and never appear for anyone past cycle 1, anyone with a finished session, or anyone with a LAST weight. The guide is the only way back to them.
+- **The Welcome is one-shot.** *(Its ✕ and Back are FIXED on this branch, Amir's call.)* **The three first-session notes are permanent once dismissed** (**Got it**) and never appear for anyone past cycle 1, anyone with a finished session, or anyone with a LAST weight. The guide is the only way back to them.
 - **AA Proof is first explained by a one-line quiet row** on Home. Its own onboarding appears only after a tap.
 - **"Lost your details? Message Amir…"** on the sign-in screen was not a link and had no number. *(FIXED on this branch: Message Amir is now a WhatsApp link.)*
 
 ## C. What will most likely trip a first-timer (ranked)
 
 1. **Finishing is hidden at the bottom of a long page.** Rating and **Done** appear only when every set is ticked or after **Finish early** (two taps). *(FIXED on this branch: after the last card closes the page scrolls to the finish card.)* Guided's **Finish Session ✓** only takes you there. Nothing is sent until rated and Done.
-2. **The big circle on a closed card ticks every set at once, as written,** with no weight and no RPE, and folds the card. The notes say "tap the circle", which means the per-set circle inside.
-3. **A tick on an empty weight box saves no weight.** The grey LAST figure looks like a value. No weight means no Last time, no History line and no Personal Record.
+2. **The big circle on a closed card ticks every set at once, as written,** with no weight and no RPE, and folds the card. *(CHANGED on this branch, Amir's call: until a first-timer's first finished session the circle opens the card instead, with a note.)*
+3. **A tick on an empty weight box saves no weight.** The grey LAST figure looks like a value. No weight means no Last time, no History line and no Personal Record. *(CHANGED on this branch, Amir's call: a nudge, every time for a first-timer and once a session after that. Nothing is invented; the rule stands.)*
 4. **No RPE, no Personal Record.** And RPE is asked in two scales (6–10 per set, 1–10 per session).
 5. **Readiness.** *(FIXED on this branch: the grey button now counts the answers, "3 of 5 answered".)* A low answer silently lowers targets and may mark cards **Optional today**, which can alarm a first-timer. **Skip for today** starts the clock anyway.
-6. **No Start, no duration.** Sets can be logged without pressing Start, so the report has no time, load or readiness. The slim bar hides its "In progress / Paused" label, so forgetting **Pause** inflates the session.
+6. **No Start, no duration.** *(CHANGED on this branch, Amir's call: a set or warm-up ticked with the clock not running gets one offer a day, "The session clock isn't running. Start". A late start under-reports the duration, so it is offered at the first tick.)* Sets can still be logged without pressing Start, so the report may have no time, load or readiness. The slim bar hides its "In progress / Paused" label, so forgetting **Pause** inflates the session.
 7. **Records look dead for the first sessions:** nothing at Done, only strength lifts with weight + RPE qualify, and the first value is never celebrated.
-8. **Tapping the Active card (even the text) on Game Plan jumps to Home.** Only **Read less** stays.
+8. **Tapping the Active card (even the text) on Game Plan jumped to Home.** *(FIXED on this branch, Amir's call: only the picture banner goes Home.)*
 9. **Tapping the Daily habits row leaves this page** for AA Proof, and the finished-card line does the same.
 10. **Between cycles the only action is a WhatsApp message,** and on the very last cycle it still says "Ready for Cycle N+1?" for a cycle that does not exist. *(Confirmed: the last cycle offered "Ready for Cycle 4?".)*
 11. The **same exercise name on two days shares one set log** until the midnight sweep, so a card can look pre-ticked on the other day. *(Confirmed: a Rowing warm-up on both days made Day 2 show "In progress · 1 of 10 sets" and Resume before Day 2 was started.)*
@@ -619,7 +620,6 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 None of these are errors, but none is explained on screen.
 - A **dark rail down the right edge** inside a day (the sets-done meter).
 - After the **closed-card circle** ticks everything, the card shows a **struck-through name** and a bare "× 10 · 10 · 10" line, which looks like a mistake.
-- The **Rest pill floats over** the Note row or the next card.
 - An open card's numbers line adds the words "tempo" and "rest" (*tempo 3-1-1 · rest 2:30*) that the closed card leaves out.
 - **Library sessions** open with a long **Before you start** safety block before any exercise.
 - The **Exercises chip row scrolls sideways** and a chip is cut at the edge.
@@ -631,7 +631,7 @@ None of these are errors, but none is explained on screen.
 
 - **Library counts could stick at "0 Sessions / 0 Reads"** if the first visit was offline: `loadLibCounts` set `_libCountsLoaded = true` after a failed load and never retried. *(FIXED on this branch, reproduced first.)*
 - **Dates showed a day early west of UTC** in Game Plan's header and banner ("SEP 30 — NOV 3" for a cycle of Oct 1 — Nov 4, in Los Angeles): `fmtDate` parsed `YYYY-MM-DD` as UTC. *(FIXED on this branch, reproduced first.)*
-- **"Rest 2:00" pill** appears with a default 2:00 even when the card shows no rest. *(Confirmed on screen.)*
+- **The "Rest 2:00" pill** (it showed a default 2:00 even when the card showed no rest). *(REMOVED on this branch, Amir's call: "remove the rest pill, I don't like it". The card's Rest ⏱ button and Guided remain.)*
 - **Guided has no ⓘ** (only History ›; the code shows none, not run). **Circuit cards have no ⓘ** *(confirmed on screen)*.
 - **Quality words and ⓘ** are absent until the exercise library has loaded once (a new phone offline shows neither).
 - **`shortLift`** cuts names over 13 characters, so a record can read "Romanian Dea…".

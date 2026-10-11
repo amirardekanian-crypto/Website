@@ -3880,17 +3880,27 @@
     background: transparent; border: 1px solid var(--grey-mid); color: var(--green-ink); }
   .timer-sound.off { color: var(--grey-text); text-decoration: line-through; }
   body[data-dark] .timer-sound { border-color: #444; }
-  /* The rest offer after a tick: one button above the tab bar, by the thumb. */
-  .rest-offer { position: fixed; left: 50%; transform: translateX(-50%); z-index: 70; display: flex; align-items: stretch;
-    border-radius: 999px; background: var(--yellow); color: var(--on-accent); box-shadow: 0 6px 20px rgba(0,0,0,0.22);
-    animation: restOfferIn 0.2s ease; }
-  .rest-offer[hidden] { display: none; }
-  @keyframes restOfferIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
-  .rest-offer-go { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); letter-spacing: 1.2px; text-transform: uppercase;
-    background: transparent; border: none; color: inherit; cursor: pointer; min-height: 48px; padding: 0 10px 0 24px; white-space: nowrap; }
-  .rest-offer-go b { font-weight: 900; font-variant-numeric: tabular-nums; margin-left: 4px; }
-  .rest-offer-x { background: transparent; border: none; border-left: 1px solid rgba(255,255,255,0.28); color: inherit; cursor: pointer;
-    min-width: 48px; min-height: 48px; font-size: var(--fs-title); line-height: 1; padding: 0 16px 0 12px; }
+  /* A note in a box in the middle of the screen (first-timer pass, 2026-10-11): one at a time, never dims or blocks the page,
+     gone by itself or on its button. Used for a first-timer's note on the closed circle, the empty-weight nudge and the clock offer. */
+  .aa-toast { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 71; box-sizing: border-box;
+    width: min(86vw, 340px); display: flex; flex-direction: column; gap: 14px; padding: 20px 18px 16px; border-radius: 16px;
+    background: #1c2420; color: #fff; box-shadow: 0 12px 40px rgba(0,0,0,0.4); animation: aaToastIn 0.18s ease; }
+  .aa-toast[hidden] { display: none; }
+  @keyframes aaToastIn { from { opacity: 0; transform: translate(-50%, -46%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+  .aa-toast-t { font-size: var(--fs-body); line-height: 1.45; }
+  .aa-toast-row { display: flex; gap: 10px; justify-content: flex-end; }
+  .aa-toast-go, .aa-toast-x { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); letter-spacing: 1.2px;
+    text-transform: uppercase; min-height: 44px; padding: 0 20px; border-radius: 10px; cursor: pointer; }
+  .aa-toast-go { background: var(--yellow); border: none; color: var(--on-accent); }
+  .aa-toast-x { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: #fff; }
+  /* A set ticked with no weight in its box: the box pulses once or twice, the toast says why. */
+  .ex-set-wbox.kg-nudge .ex-set-weight { border-color: var(--ice); animation: kgNudge 0.9s ease 2; }
+  @keyframes kgNudge { 0%, 100% { box-shadow: 0 0 0 3px rgba(199,85,47,0.28); } 50% { box-shadow: 0 0 0 6px rgba(199,85,47,0.45); } }
+  /* The Welcome's ✕, top right (one close grammar: a full-screen overlay closes with ✕ there). */
+  .wel-x { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); right: 12px; z-index: 3; width: 44px; height: 44px;
+    border-radius: 50%; border: 0; background: rgba(0,0,0,0.35); color: #fff; font-size: var(--fs-lead); line-height: 1; cursor: pointer; }
+  /* A card whose banner (not the whole card) is the way to Home: Game Plan's Active card. */
+  .cm-banner[role="button"] { cursor: pointer; }
   .timer-ring { width: 220px; height: 220px; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
   .timer-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
   .timer-ring circle { fill: none; stroke-width: 4; }
@@ -4718,11 +4728,8 @@
   <div class="timer-log" id="timerLog" hidden></div>
 </div>
 
-<!-- The rest offer: shown after a set is ticked in list mode (offerRest, WK-02). -->
-<div class="rest-offer" id="restOffer" hidden>
-  <button type="button" class="rest-offer-go" onclick="takeRestOffer()">Rest <b id="restOfferTime">2:00</b></button>
-  <button type="button" class="rest-offer-x" onclick="hideRestOffer()" aria-label="No rest now">×</button>
-</div>
+<!-- A note in a box in the middle of the screen: aaToast() fills it. One at a time, with a button. -->
+<div class="aa-toast" id="aaToast" role="status" aria-live="polite" hidden></div>
 
 <!-- Readiness check — shown on Start, before the timer runs. Records the answers and,
      on a lower day, eases today's targets (REC-2; never the programme). -->
@@ -6364,6 +6371,7 @@ function maybeWelcome() {
     '<div class="wel-hero">' +
       '<img src="' + ART_MOMENTS + APP_ART.welcome + '.webp" alt="" aria-hidden="true" onload="this.classList.add(\'in\')">' +
       '<div class="wel-scrim"></div>' +
+      '<button type="button" class="wel-x" aria-label="Close">✕</button>' +
       '<div class="wel-copy">' +
         '<div class="wel-eyebrow">You\'re in</div>' +
         '<div class="wel-title">Welcome, ' + esc(first) + '.</div>' +
@@ -6376,14 +6384,18 @@ function maybeWelcome() {
       '<button type="button" class="wel-skip">Look around first</button>' +
     '</div>';
   document.body.appendChild(el);
+  navSync();   // the Welcome is a layer: the phone's Back closes it (topLayer), as ✕ and Look around first do
   // To the training, not the plan (PLAN-01, Amir 2026-09-26): a new athlete's first tap lands on Day 1.
   el.querySelector('.wel-go').addEventListener('click', function () {
     el.remove();
     const d0 = (DATA.workouts && DATA.workouts.days || [])[0];
     goTo('home');
     if (d0) openDayView(String(d0.id));
+    navSync();
   });
-  el.querySelector('.wel-skip').addEventListener('click', function () { el.remove(); });
+  const closeWelcome = function () { el.remove(); navSync(); };
+  el.querySelector('.wel-skip').addEventListener('click', closeWelcome);
+  el.querySelector('.wel-x').addEventListener('click', closeWelcome);
 }
 
 // ── First-session hints (ONB-01, 2026-09-27) ──
@@ -6473,12 +6485,14 @@ function cycleCardHTML(cycle, opts) {
   // opens expanded. Past and future cycles pass `folded`: collapsed, on a slim banner, so
   // Game Plan reaches this cycle's reasoning without scrolling past last month's.
   const folded = !!opts.folded;
-  const cls = 'current-message' + (folded ? ' is-folded' : ' is-open') + (opts.onclick ? ' is-clickable' : '');
+  // opts.bannerOnly: only the picture banner is the way on (Game Plan's Active card: tapping its text to read it used to throw you to Home).
+  const bannerOnly = !!(opts.bannerOnly && opts.onclick);
+  const cls = 'current-message' + (folded ? ' is-folded' : ' is-open') + (opts.onclick && !bannerOnly ? ' is-clickable' : '');
   // ⚠️ The card's own tap must ignore taps on the Read less/more button inside
   // it. stopPropagation() in toggleCycleCard() was not enough on its own — a
   // tap on the toggle of a clickable card both collapsed it AND navigated away.
   // Checking the target here cannot fail whatever the event does.
-  const attrs = opts.onclick
+  const attrs = opts.onclick && !bannerOnly
     ? ` role="button" tabindex="0" onclick="if(event.target.closest('.cm-toggle'))return; ${opts.onclick}"`
     : '';
   let h = `<div class="${cls}"${attrs}>`;
@@ -6492,7 +6506,7 @@ function cycleCardHTML(cycle, opts) {
   const family = cycleArt(cycle);
   const artFile = ART_CYCLES + (APP_ART.cycles[family] || APP_ART.cycles.bedrock) + '.webp';
   const bannerCls = 'cm-banner' + (opts.alt ? ' is-alt' : '');
-  h += `<div class="${bannerCls}">`;
+  h += `<div class="${bannerCls}"${bannerOnly ? ` role="button" tabindex="0" onclick="if(event.target.closest('.cm-toggle'))return; ${opts.onclick}"` : ''}>`;
   h += `<img class="cm-banner-img" alt="" aria-hidden="true" loading="lazy" ` +
        `src="${artFile}" onerror="cycleImgError(this)">`;
   h += `<div class="cm-banner-scrim"></div>`;
@@ -7136,7 +7150,6 @@ function closeDayView() {
   if (dv) dv.hidden = true;
   if (ov) ov.hidden = false;
   document.getElementById('v-progress').classList.remove('active');
-  hideRestOffer();
   dropHint();
   paintSessionChrome();   // the tabs come back
   document.querySelectorAll('.session-timer.open').forEach(foldBarMore);
@@ -7293,6 +7306,7 @@ function renderPlan() {
       pillStyle: done ? '' : 'active',
       total: cycles.length,
       onclick: "goTo('home')",
+      bannerOnly: true,
       paragraphs: msg.paragraphs,
       bodyLabel: 'Why This Cycle Matters',
       outcomes: msg.outcomes
@@ -8209,6 +8223,13 @@ function onCheckBoxTap(ev, item, day) {
 function toggleCheckOnly(item, day) {
   if (navigator.vibrate) navigator.vibrate(15);
   const isStandardWithSets = item.dataset.sets && !item.classList.contains('round-group');
+  // A first-timer's circle on a closed card opens it: ticking every set at once logs no weight and no RPE, so nothing to
+  // remember. After the first finished session the circle is the as-written shortcut it always was.
+  if (isStandardWithSets && !item.classList.contains('checked') && item.classList.contains('collapsed') && !window.IS_PREVIEW && !onbVeteran()) {
+    toggleExpand(item);
+    aaToast('Log each set in the open card: the weight, the circle, then how hard it was.');
+    return;
+  }
   if (isStandardWithSets) {
     const willBeChecked = !item.classList.contains('checked');
     setAllSetsDone(item, willBeChecked);
@@ -8225,6 +8246,7 @@ function toggleCheckOnly(item, day) {
   saveState();
   markTouched(day);
   updateProgress(day);
+  if (item.classList.contains('checked')) offerClock(day);
 }
 
 // The day this session was trained on (DATA-02). Ticks carry no time of their own, so without
@@ -8465,7 +8487,7 @@ const APP_GUIDE = [
   { icon: 'phone-install', title: 'Install the app on your home screen',
     body: `<p><strong>iPhone:</strong> open this page in Safari, tap the Share button, then "Add to Home Screen".</p><p><strong>Android:</strong> open in Chrome, tap the menu (⋮), then "Install app" or "Add to Home Screen".</p><p>Once installed it opens like a normal app — full-screen, no browser bar.</p>` },
   { icon: 'tool', title: 'Built-in tools',
-    body: `<ul><li><strong>Rest timer</strong> — tick a set and a <strong>Rest</strong> button comes up at the bottom of the screen: tap it and the countdown starts. The <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets does the same. It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>Exercise videos</strong> — most exercises have a video. Tap it if you're unsure of form. If it won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
+    body: `<ul><li><strong>Rest timer</strong> — the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>Exercise videos</strong> — most exercises have a video. Tap it if you're unsure of form. If it won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
     body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab, in every exercise's ⓘ, and at the end of every session, where your message already says which day or exercise it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days; quick check-ins beat long waits.</p>` },
 ];
@@ -8549,7 +8571,6 @@ function coachContactHtml() {
 let _libScrollY = null;
 let _wsReturn = null;   // where a suggested Library session's ← goes (LIB-01): wsBack()
 function goTo(screen, historyId, keepContent) {
-  hideRestOffer();
   if (screen !== 'workout') _wsReturn = null;
   const was = (document.querySelector('.screen.active') || {}).id || '';
   if (was === 'screen-workouts' && (screen === 'workout' || screen === 'article')) _libScrollY = window.scrollY;
@@ -8639,6 +8660,7 @@ function _visibleBtn(root, sel) {
 }
 function topLayer() {
   const on = id => { const e = document.getElementById(id); return !!(e && e.classList.contains('visible')); };
+  if (document.querySelector('.wel')) return () => { const w = document.querySelector('.wel'); if (w) w.remove(); };   // the Welcome sits over everything
   const vm = document.querySelector('.video-modal.is-open');
   if (vm) return () => window.VideoModal && window.VideoModal.close();
   if (on('timerOverlay')) return closeTimer;
@@ -11140,7 +11162,6 @@ function finishDay(day) {
   const isPartial = st.done < st.total;
   delete card.dataset.early;
   card.classList.remove('visible');
-  hideRestOffer();                       // no rest offer left over a finished day
   // Lock in the session duration the moment they finish.
   finishTimer(day);
   localStorage.setItem(ATHLETE_ID + '_completed_d' + day, stampCompleted());
@@ -11390,6 +11411,7 @@ function markSuggestedDay() {
 
 function resetDay(day) {
   localStorage.removeItem(ATHLETE_ID + '_touched_d' + day);   // nothing left to call unfinished (DATA-02)
+  localStorage.removeItem(ATHLETE_ID + '_clockasked_d' + day);  // the next start may be asked about again
   // A report still waiting in the outbox for the session being reset never goes (an
   // earlier week's, for the same day, still does).
   const sess = sessOf(day);
@@ -11397,7 +11419,6 @@ function resetDay(day) {
   const conf = document.getElementById('confirm-' + day);
   if (conf) delete conf.dataset.early;
   moveRatePanel(day, false);
-  hideRestOffer();
   // Clear UI state for every exercise in this day
   document.querySelectorAll(`[data-day="${day}"]`).forEach(card => {
     card.classList.remove('checked');
@@ -12359,10 +12380,8 @@ function attachSetLog(card) {
       paintSets();
       // Sync the exercise-level check: all sets done = exercise checked.
       syncExerciseCheck(card, cur);
-      // A set just done with more to come: offer the rest (WK-02). Unticking takes it back.
-      if (cur[idx].d && cur.some(x => !x.d)) offerRest(card);
-      else if (_restOffer && _restOffer.card === card) hideRestOffer();
       if (cur[idx].d) foldWhenDone(card, open);
+      if (cur[idx].d && !kgNudge(row, card, cur[idx])) offerClock(card.dataset.day);
       if (navigator.vibrate) navigator.vibrate(12);
     });
   });
@@ -13293,7 +13312,6 @@ function openTimerAuto(secs, name, onComplete) {
 
 // Shared setup for both entry points above.
 function showTimer(secs, name, onComplete) {
-  hideRestOffer();
   clearTimeout(timerGoTimeout); timerGoTimeout = null;   // a "GO!" still closing the last rest
   timerDuration = secs;
   timerRemaining = secs;
@@ -13447,43 +13465,59 @@ async function restWake(on) {
   } catch (e) { _restLock = null; }
 }
 
-// ── The rest offer ──
-// Ticking a set in list mode, with sets still to go on that exercise, slides up one
-// button above the tab bar: "Rest 2:00". It sits by the thumb, where the old Rest button
-// sat at the very bottom of the card. It never starts on its own, because athletes also
-// tick sets after the fact. Guided Mode rests itself and never shows it.
-let _restOffer = null, _restOfferT = null;
-function offerRest(card) {
-  if (typeof STEP !== 'undefined' && STEP) return;
-  if (timerRunning || !card) return;
-  const btn = card.querySelector('.rest-btn');
-  if (!btn) return;
-  const parsed = parseInt(btn.getAttribute('data-rest'), 10);
-  const secs = (Number.isFinite(parsed) && parsed > 0) ? parsed : 120;
-  const nm = card.querySelector('.item-name');
-  _restOffer = { secs, name: nm ? nm.textContent.trim() : '', card };
-  const el = document.getElementById('restOffer');
+// A note in a box in the middle of the screen: one at a time, a button, gone by itself. It never dims or blocks the page, so the athlete
+// can keep logging with it showing. Used for a first-timer's note on the closed circle, the empty-weight nudge and the clock offer.
+let _toastT = null, _toastRun = null;
+function aaToast(text, opts) {
+  const el = document.getElementById('aaToast');
   if (!el) return;
-  const tabs = document.querySelector('.global-tabs');
-  el.style.bottom = ((tabs && tabs.offsetHeight) || 0) + 12 + 'px';
-  document.getElementById('restOfferTime').textContent = formatClock(secs);
+  opts = opts || {};
+  _toastRun = opts.run || null;
+  el.innerHTML = '<div class="aa-toast-t"></div><div class="aa-toast-row">' +
+    (opts.action ? '<button type="button" class="aa-toast-go"></button>' : '') + '<button type="button" class="aa-toast-x"></button></div>';
+  el.querySelector('.aa-toast-t').textContent = text;
+  const go = el.querySelector('.aa-toast-go');
+  if (go) { go.textContent = opts.action; go.addEventListener('click', () => { const r = _toastRun; hideAaToast(); if (r) r(); }); }
+  const x = el.querySelector('.aa-toast-x');
+  x.textContent = opts.action ? 'Not now' : 'Got it';
+  x.addEventListener('click', hideAaToast);
   el.hidden = false;
-  clearTimeout(_restOfferT);
-  _restOfferT = setTimeout(hideRestOffer, 90000);
+  clearTimeout(_toastT);
+  _toastT = setTimeout(hideAaToast, opts.ms || 6000);
 }
-function hideRestOffer() {
-  clearTimeout(_restOfferT); _restOfferT = null;
-  _restOffer = null;
-  const el = document.getElementById('restOffer');
+function hideAaToast() {
+  clearTimeout(_toastT); _toastT = null; _toastRun = null;
+  const el = document.getElementById('aaToast');
   if (el) el.hidden = true;
 }
-function takeRestOffer() {
-  const o = _restOffer;
-  if (!o) return hideRestOffer();
-  openRest(o.secs, o.name);
+// A set ticked with an empty kg box records no weight (the 2026-09-26 rule), so there will be no Last time, History or Personal
+// Record for it. Say so, once the athlete can see it: a first-timer every time, a returning athlete once a session (per day, in memory).
+// Returns true when it spoke, so the clock offer waits for the next tick. Never in Guided, whose rest screen asks for the weight.
+const _kgNudged = {};
+function kgNudge(row, card, set) {
+  if (window.IS_PREVIEW || (typeof STEP !== 'undefined' && STEP)) return false;
+  const box = row.querySelector('.ex-set-wbox');
+  if (!box || !box.offsetParent || String((set && set.w) || '').trim() !== '') return false;
+  const day = card.dataset.day;
+  if (onbVeteran() && _kgNudged[day]) return false;
+  _kgNudged[day] = true;
+  box.classList.remove('kg-nudge'); void box.offsetWidth; box.classList.add('kg-nudge');
+  aaToast('No weight saved on that set. Type it in the kg box.');
+  return true;
 }
-// 90 → "1:30", 45 → "0:45".
-function formatClock(secs) { return Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0'); }
+// The clock is only started by Start, and the report's duration, load and readiness come from it. A set or a warm-up ticked
+// with the clock not running gets one offer a day: tap Start (the readiness check comes first, as always) or ignore it.
+function offerClock(day) {
+  if (window.IS_PREVIEW || day == null || (typeof STEP !== 'undefined' && STEP)) return;
+  day = String(day);
+  const t = loadTimer(day);
+  if (t && (t.sessionStart || t.finished || t.running)) return;
+  if (localStorage.getItem(ATHLETE_ID + '_completed_d' + day)) return;
+  const askKey = ATHLETE_ID + '_clockasked_d' + day, today = new Date().toDateString();
+  if (localStorage.getItem(askKey) === today) return;
+  localStorage.setItem(askKey, today);
+  aaToast("The session clock isn't running.", { action: 'Start', ms: 20000, run: () => toggleSessionTimer(day) });
+}
 
 function updateTimerDisplay() {
   const el = document.getElementById('timerDisplay');

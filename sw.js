@@ -195,6 +195,10 @@
 //      Game Plan's dates are the cycle's own local days (they showed a day early west of UTC), Reset clears a circuit's
 //      round ratings, the sore-only line reads properly, sign-in's "Message Amir" is a WhatsApp link, the grey
 //      "Begin session" counts the answers (3 of 5 answered), and after the last card closes the page scrolls to the finish card.
+//      Then Amir's calls on the rest: a first-timer's circle on a closed card opens it, a set ticked with no weight nudges
+//      (the rule that only typed weights count stands), the clock is offered once a day, the Welcome has a ✕ and Back closes
+//      it, only Game Plan's Active banner goes Home, the rest pill is gone (the card's Rest ⏱ button and Guided remain), and the
+//      notes appear in a box in the middle of the screen.
 const CACHE = 'aap-v99';
 
 // Pre-cached on install — the minimum needed to open the app offline.

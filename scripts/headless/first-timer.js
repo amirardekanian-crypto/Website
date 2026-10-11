@@ -1,12 +1,13 @@
 // The first-timer fixes (2026-10-11, Content/CLIENT-APP-MAP.md): the Library counts retry after a failed load, Game Plan's dates are
 // local days, Reset clears a circuit's round ratings, the sore-only wording, sign-in's WhatsApp link, the readiness button's count and
-// the scroll to the finish card. Serve the repo (see lib.js), then: TZ=America/Los_Angeles node scripts/headless/first-timer.js
+// the scroll to the finish card, and the decisions of 2026-10-11: the closed circle and the empty-weight nudge for first-timers, the clock offer, the
+// Welcome's ✕ and Back, Game Plan's banner-only tap, the notes in a centred box, and that the rest pill is gone. Serve the repo (see lib.js), then: TZ=America/Los_Angeles node scripts/headless/first-timer.js
 // (the date check needs a zone west of UTC; in UTC it passes either way).
 'use strict';
 const H = require('./lib');
 
+const t = H.checker();
 (async () => {
-  const t = H.checker();
   const browser = await H.launch();
 
   // ── the programme: the fixture plus one circuit in Day 1's Core block ──
@@ -133,6 +134,108 @@ const H = require('./lib');
     await ctx.close();
   }
 
+  // ── 8. Welcome: a ✕, and the phone's Back closes it without leaving the page ──
+  {
+    const { ctx, p } = await H.openProgram(browser, { prog });
+    const open = () => p.evaluate(() => { localStorage.setItem('aa_fresh_signin', '1'); localStorage.removeItem(ATHLETE_ID + '_welcomed'); maybeWelcome(); return !!document.querySelector('.wel'); });
+    t.check('Welcome opens', await open());
+    t.check('Welcome has a ✕', await p.evaluate(() => !!document.querySelector('.wel .wel-x')));
+    await p.click('.wel .wel-x'); await p.waitForTimeout(300);
+    t.check('✕ closes the Welcome', await p.evaluate(() => !document.querySelector('.wel')));
+    await open();
+    await p.goBack().catch(() => {}); await p.waitForTimeout(500);
+    const after = await p.evaluate(() => ({ wel: !!document.querySelector('.wel'), path: location.pathname }));
+    t.check('Back closes the Welcome and stays on the app', !after.wel && /program\.html$/.test(after.path), JSON.stringify(after));
+    t.check('no page errors (welcome)', p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
+  }
+
+  // ── 9. Game Plan: reading the Active card's text stays; its banner goes Home ──
+  {
+    const { ctx, p } = await H.openProgram(browser, { prog });
+    await p.evaluate(() => goTo('plan')); await p.waitForTimeout(300);
+    const on = () => p.evaluate(() => document.querySelector('.screen.active').id);
+    await p.evaluate(() => { const b = document.querySelector('#current-message-wrap .cm-body, #current-message-wrap .focus-list'); if (b) b.click(); });
+    t.check('tapping the Active card\'s text stays on Game Plan', (await on()) === 'screen-plan', await on());
+    await p.evaluate(() => document.querySelector('#current-message-wrap .cm-banner').click()); await p.waitForTimeout(300);
+    t.check('tapping its banner goes Home', (await on()) === 'screen-home', await on());
+    await ctx.close();
+  }
+
+  // ── 10. No rest pill: ticking a set brings up nothing at the bottom (Amir removed it, 2026-10-11); the card's own Rest button stays ──
+  {
+    const { ctx, p } = await H.openProgram(browser, { prog });
+    await p.evaluate(() => { openDayView('1'); startTimerNow('1'); }); await p.waitForTimeout(300);
+    await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; if (c.classList.contains('collapsed')) toggleExpand(c); c.querySelector('.ex-set-check').click(); })()`);
+    await p.waitForTimeout(300);
+    t.check('no rest pill exists after a tick', await p.evaluate(() => !document.getElementById('restOffer') && !document.querySelector('.rest-offer')));
+    t.check('the card keeps its own Rest button', await p.evaluate(`(() => !!${H.card('Barbell Back Squat')}.querySelector('.rest-btn'))()`));
+    await ctx.close();
+  }
+
+  // ── 11. first-timer vs returning: the closed circle, the empty-weight nudge, the clock offer ──
+  {
+    const firstTimer = H.fixture(); firstTimer.currentCycleIndex = 0;
+    const toast = p => p.evaluate(() => { const e = document.getElementById('aaToast'); return { shown: !e.hidden, txt: e.textContent.replace(/\s+/g, ' ').trim(), go: !!e.querySelector('.aa-toast-go') }; });
+    // a first-timer: no history, cycle 1
+    {
+      const { ctx, p } = await H.openProgram(browser, { prog: firstTimer, hist: [], spine: H.SPINE });
+      await p.evaluate(() => openDayView('1')); await p.waitForTimeout(300);
+      const veteran = await p.evaluate(() => onbVeteran());
+      t.check('the first-timer fixture is not a veteran', veteran === false, veteran);
+      // closed circle opens the card, ticks nothing
+      await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; c.querySelector('.check-box').click(); })()`); await p.waitForTimeout(250);
+      let s = await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; return { open: !c.classList.contains('collapsed'), checked: c.classList.contains('checked'), done: c.querySelectorAll('.ex-set-row.done').length }; })()`);
+      t.check('first-timer: the closed circle opens the card and ticks nothing', s.open && !s.checked && s.done === 0, JSON.stringify(s));
+      let tt = await toast(p);
+      t.check('first-timer: a note says how to log', tt.shown && /Log each set in the open card/.test(tt.txt), JSON.stringify(tt));
+      const box = await p.evaluate(() => { const r = document.getElementById('aaToast').getBoundingClientRect(); return { cx: Math.round(r.left + r.width / 2), cy: Math.round(r.top + r.height / 2), w: innerWidth, h: innerHeight, inside: r.left >= 0 && r.right <= innerWidth }; });
+      t.check('the note is a box in the middle of the screen', Math.abs(box.cx - box.w / 2) <= 2 && Math.abs(box.cy - box.h / 2) <= 6 && box.inside, JSON.stringify(box));
+      t.check('the note has a Got it button', await p.evaluate(() => /Got it/.test(document.querySelector('#aaToast .aa-toast-x').textContent)));
+      // an empty weight box, ticked: a nudge, every time
+      await p.evaluate(() => hideAaToast());
+      await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; c.querySelectorAll('.ex-set-check')[0].click(); })()`); await p.waitForTimeout(250);
+      tt = await toast(p);
+      t.check('first-timer: ticking a set with no weight nudges', tt.shown && /No weight saved/.test(tt.txt), JSON.stringify(tt));
+      t.check('first-timer: the kg box pulses', await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; return c.querySelectorAll('.ex-set-wbox')[0].classList.contains('kg-nudge'); })()`));
+      await p.evaluate(() => hideAaToast());
+      await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; c.querySelectorAll('.ex-set-check')[1].click(); })()`); await p.waitForTimeout(250);
+      tt = await toast(p);
+      t.check('first-timer: and again on the next set', tt.shown && /No weight saved/.test(tt.txt), JSON.stringify(tt));
+      // the clock offer waits for a tick that has no nudge: weight typed, clock not started
+      await p.evaluate(() => hideAaToast());
+      await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; const w = c.querySelectorAll('.ex-set-weight')[2]; w.value = '60'; w.dispatchEvent(new Event('input', { bubbles: true })); c.querySelectorAll('.ex-set-check')[2].click(); })()`); await p.waitForTimeout(250);
+      tt = await toast(p);
+      t.check('clock not running: one offer to start it (a Start button)', tt.shown && /clock isn't running/.test(tt.txt) && tt.go, JSON.stringify(tt));
+      if (tt.go) { await p.click('#aaToast .aa-toast-go'); await p.waitForTimeout(300); }
+      t.check('Start opens the readiness check first', await p.evaluate(() => document.getElementById('readiness-overlay').classList.contains('visible')));
+      t.check('no page errors (first-timer)', p.errs.length === 0, p.errs.join(' | '));
+      await ctx.close();
+    }
+    // a returning athlete: the closed circle still ticks everything, the nudge speaks once a session
+    {
+      const { ctx, p } = await H.openProgram(browser, { prog });
+      await p.evaluate(() => { openDayView('1'); startTimerNow('1'); }); await p.waitForTimeout(300);
+      const veteran = await p.evaluate(() => onbVeteran());
+      t.check('the returning fixture is a veteran', veteran === true, veteran);
+      await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; c.querySelector('.check-box').click(); })()`); await p.waitForTimeout(250);
+      const s = await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; return { checked: c.classList.contains('checked'), done: c.querySelectorAll('.ex-set-row.done').length, want: parseInt(c.dataset.sets, 10) }; })()`);
+      t.check('returning: the closed circle still ticks every set as written', s.checked && s.done === s.want, JSON.stringify(s));
+      // untick, then tick two sets with no weight: one nudge only
+      await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; c.querySelector('.check-box').click(); })()`); await p.waitForTimeout(200);
+      await p.evaluate(() => hideAaToast());
+      await p.evaluate(`(() => { const c = ${H.card('Dumbbell Bulgarian Split Squat')}; if (c.classList.contains('collapsed')) toggleExpand(c); c.querySelectorAll('.ex-set-check')[0].click(); })()`); await p.waitForTimeout(250);
+      let tt = await toast(p);
+      t.check('returning: the first empty-weight tick nudges', tt.shown && /No weight saved/.test(tt.txt), JSON.stringify(tt));
+      await p.evaluate(() => hideAaToast());
+      await p.evaluate(`(() => { const c = ${H.card('Dumbbell Bulgarian Split Squat')}; c.querySelectorAll('.ex-set-check')[1].click(); })()`); await p.waitForTimeout(250);
+      tt = await toast(p);
+      t.check('returning: not again in the same session', !tt.shown, JSON.stringify(tt));
+      t.check('no page errors (returning)', p.errs.length === 0, p.errs.join(' | '));
+      await ctx.close();
+    }
+  }
+
   await browser.close();
   process.exit(t.report() ? 1 : 0);
-})().catch(e => { console.error(e); process.exit(2); });
+})().catch(e => { console.error(e); t.report(); process.exit(2); });
