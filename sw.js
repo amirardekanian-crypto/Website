@@ -203,7 +203,11 @@
 //      runEndKey() stops the run there (a quest completed by then keeps paying, one not completed never does), the same bound the
 //      server's hab_bonus_xp() now reads. Without the bump an installed phone would keep scoring an ended run to its seventh day
 //      while the board stopped at the end day.
-const CACHE = 'aap-v100';
+// v101: program.html changed (2026-10-11): the sign-in screen works again. v99 made showSignIn() read COACH_WHATSAPP for the
+//      "Message Amir" link, but that const was declared below boot(), so for anyone with no saved session showSignIn() threw before
+//      it wired the form and every button on the login screen did nothing. The number is now declared above boot().
+//      Without the bump a phone that cached the v99/v100 shell keeps the dead login screen.
+const CACHE = 'aap-v101';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

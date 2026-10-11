@@ -5615,6 +5615,15 @@ const ERROR_ICONS = {
   locked:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
 };
 
+// ⚠️ The coach's WhatsApp number is declared HERE, above boot(), and must stay here. With no
+// session boot() reaches showSignIn() synchronously, while this script is still being evaluated,
+// and showSignIn() builds the "Message Amir" link from it: declared down in the Coach Contact
+// section (as it was from commit 504c215 on 2026-10-11) it was still in its temporal dead zone,
+// showSignIn() threw before it wired the form, and every signed-out athlete saw a login screen
+// whose buttons all did nothing. scripts/headless/signin.js guards this.
+const COACH_WHATSAPP = '447435363461';        // the number the site's buy buttons use
+const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
+
 // ── 1. BOOT ──
 (async function boot() {
   const params = new URLSearchParams(window.location.search);
@@ -8515,8 +8524,8 @@ function buildAppGuideCards(openKey) {
 //  hours". public.messages and its rows stay in the database; nothing here reads
 //  or writes them any more.
 // ═══════════════════════════════════════════════════════════════════════
-const COACH_WHATSAPP = '447435363461';        // the number the site's buy buttons use
-const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
+// COACH_WHATSAPP and COACH_WHATSAPP_SHOWN are declared above boot() (the sign-in screen needs
+// the number before this point of the script has run); do not move them back down here.
 // Pre-fills who is writing and where they are in the plan, so a message that
 // arrives cold on WhatsApp still has its context. The athlete edits it freely.
 // `about` names what the message is about (a day, an exercise) when the door that
