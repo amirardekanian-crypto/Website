@@ -106,6 +106,34 @@ const state = p => p.evaluate(() => ({
     await ctx.close();
   }
 
+  // Published a day early (2026-10-11, Pooya): the new cycle starts tomorrow and the OLD cycle's last session, on the
+  // same day number, sits in this Monday–Sunday. It must not tick the new cycle's day; a cycle that has started still counts.
+  {
+    const monday = new Date(); monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+    const old = [{ completed_on: ymd(new Date(monday.getTime() - monday.getTimezoneOffset() * 60000)), day: '1', readiness: 4, log: [
+      { ex: 'Barbell Back Squat', block: 'Strength', reps: 6, note: '', sets: [{ w: '70', n: 6, r: '7', d: true }] }] }];
+    const startsIn = (n, idx = 1) => {
+      const P = H.fixture(); P.currentCycleIndex = idx;
+      const s = new Date(); s.setHours(0, 0, 0, 0); s.setDate(s.getDate() + n);
+      const e = new Date(s); e.setDate(e.getDate() + 34);
+      const loc = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      P.cycles[idx].startDate = loc(s); P.cycles[idx].endDate = loc(e);
+      return P;
+    };
+    const done = p => p.evaluate(() => ({ days: [...weekDoneDays()], win: weekWindow() }));
+    const early = await H.openProgram(browser, { prog: startsIn(1), hist: old });
+    let d = await done(early.p);
+    t.check('starts tomorrow: last cycle\'s Day 1 from this week does not tick the new Day 1', d.days.length === 0, JSON.stringify(d));
+    t.check('starts tomorrow: the window is the new cycle\'s first week', d.win.from > ymd(new Date()) || d.win.from === ymd(new Date(Date.now() + 86400000)), JSON.stringify(d));
+    t.check('starts tomorrow: no page errors', early.p.errs.length === 0, early.p.errs.join(' | '));
+    await early.ctx.close();
+    // The control: the same session inside a cycle that has started (it began on the Monday) still counts.
+    const live = await H.openProgram(browser, { prog: startsIn(-((new Date().getDay() + 6) % 7)), hist: old });
+    d = await done(live.p);
+    t.check('started this week: a session since the start still ticks its day', d.days.join() === '1', JSON.stringify(d));
+    await live.ctx.close();
+  }
+
   // A cycle with no dates cannot end: the small line, the week, the day cards.
   {
     const { ctx, p } = await H.openProgram(browser, { prog: H.fixture({ dated: false }) });

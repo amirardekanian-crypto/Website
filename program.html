@@ -6806,6 +6806,9 @@ function dayInProgress(id) {
 // training week (cycleWeekInfo(): 7 days from startDate + (wk-1)×7), or Monday–Sunday for
 // a cycle with no dates, and a day is done this week when a session of it is in HIST
 // (get_my_history, or its phone copy) inside that window, or finished on this phone today.
+// BEFORE the cycle starts (published a day or two early) the window is the cycle's own first week, not
+// Monday–Sunday: the old cycle's last sessions share the day numbers 1–4 and used to tick the new
+// cycle's days (2026-10-11: Pooya's 6 Oct Day 4 showed the new Day 4 as done).
 // completed_on is the LOCAL day the session was finished since DATA-02 (sessionDateFor());
 // rows saved before 2026-09-26 carry a UTC date, off by a day only for 00:00–03:30 in Iran.
 function ymdLocal(d) {
@@ -6815,7 +6818,7 @@ function weekWindow() {
   const cur = (DATA.cycles || [])[Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0];
   const w = cycleWeekInfo(cur);
   const start = new Date(); start.setHours(0, 0, 0, 0);
-  if (w && !w.before && !w.after) {
+  if (w && !w.after) {   // before the start, w.wk is clamped to 1: the first week, nothing earlier counts
     const s0 = new Date(cur.startDate); s0.setHours(0, 0, 0, 0);
     start.setTime(s0.getTime()); start.setDate(start.getDate() + (w.wk - 1) * 7);
   } else {

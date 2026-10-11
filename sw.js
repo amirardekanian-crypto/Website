@@ -210,7 +210,9 @@
 // v102: program.html and habits.html changed (2026-10-11): sign-in no longer gives up when the Supabase library's first download
 //      failed or is slow. _sbForSignIn() fetches it again and takes whichever copy arrives first, and says "The sign-in could not
 //      load" (not "check your connection") when it truly cannot. Without the bump a phone keeps the sign-in that needs a force-close.
-const CACHE = 'aap-v102';
+// v103: program.html changed (2026-10-11): before a cycle starts, This Week is the cycle's own first week, not Monday-Sunday, so the
+//      old cycle's last session (same day number) no longer ticks the new cycle's day as done. Without the bump a phone keeps the old window.
+const CACHE = 'aap-v103';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
