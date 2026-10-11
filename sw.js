@@ -188,7 +188,11 @@
 //      Arabic-Indic digits as 0-9 in the username, and retries once with them folded (and the ends trimmed)
 //      when the password as typed fails. Every password is plain English and ends in digits, so a Farsi
 //      keyboard used to fail every sign-in. (Made as v96 on a branch alongside PROG-02's v96/v97.)
-const CACHE = 'aap-v98';
+// v99: habits.html changed (2026-10-11, coach.html audit TODAY-1, stage55): a quest run the coach ENDS early keeps an `end` day, and
+//      runEndKey() stops the run there (a quest completed by then keeps paying, one not completed never does), the same bound the
+//      server's hab_bonus_xp() now reads. Without the bump an installed phone would keep scoring an ended run to its seventh day
+//      while the board stopped at the end day.
+const CACHE = 'aap-v99';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
