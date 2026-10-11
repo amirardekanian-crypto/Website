@@ -192,6 +192,7 @@ stale copy reached athletes.
 | COM-14 | A Coach's Note is one to three short sentences of plain text about this athlete only; never a cue. | engage | |
 | COM-15 | A Because is one sentence of 140 characters at most, written fresh each cycle, never carried over. | engage | ✓ (140 characters) |
 | COM-16 | A week note is one or two short sentences under about 260 characters, starting with the instruction; no notes card repeats it. | engage | warn (length, label) |
+| COM-17 | WhatsApp never repeats the app: for anything the app holds, say what to do and where it is (tab, then card) in one line. | engage | |
 
 ### Coaching cues & the library
 | ID | Rule | Stage | Check |
@@ -871,7 +872,8 @@ same ID. Read a rule's story and its history before changing it.
   fuelling, the rest rule, and the modification menu. Farsi for Iran-based athletes, English
   otherwise. In Farsi use Persian numerals and put the **Persian calendar date first** with the
   Gregorian in brackets. These never enter the programme — the in-app text stays English.
-  Message 2 names the back-off week with its dates. Owned by /program-engage PART 5.
+  Message 2 names the back-off week with its dates. Owned by /program-engage PART 5. Both are short and
+  point into the app for anything it already holds (COM-17).
 - `COM-3` `COM-4` **⚠️ EVERY word an athlete reads must sound like AMIR wrote it — not like AI wrote it.**
    This governs
   all athlete-facing copy: cycle messages, notes cards, Coach's Notes, completion messages,
@@ -949,6 +951,13 @@ same ID. Read a rule's story and its history before changing it.
 - `COM-14` **A Coach's Note is one to three short sentences.** Plain text, about this athlete only, never a cue (CUE-2). Three copies said one sentence (design, edit and the cue story) and two said one to three (engage, SCHEMA); Amir chose one to three on 2026-09-26, because a note sometimes carries a starting weight and a caveat.
 - `COM-15` **A Because is one sentence of 140 characters at most, written fresh each cycle.** A reason from Cycle 1 is stale by Cycle 3, so it is never carried over.
 - `COM-16` **A week note is short and says it once.** One or two short sentences under about 260 characters, starting with the instruction (the app already prints *Week 1* or *Back-off week* above it), and no notes card repeats it.
+- `COM-17` **The WhatsApp messages point into the app; they never rewrite it.** Anything the app already
+  holds (a notes card, a Coach's Note, a week note, the weigh-in, the check-in, a film instruction) gets ONE
+  line: what to do and where to find it, by the app's own names (*Coach tab → "The Cough Rule"*, *Home →
+  Body Weight*, *the clay dot on the exercise*). "I want a video of your split squat in week 2: the how-to is
+  on the exercise's Coach's Note" is the whole line. Only what the app does not hold is written out: why the
+  programme looks the way it does, a date with its trigger, a question. Short is the point: a long message
+  repeats the app, the athlete reads neither, and the two copies drift apart.
 
 ## Coaching cues
 - `CUE-1` **Exactly 3 cues per exercise — never more, never fewer:** one **external** cue (an
