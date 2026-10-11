@@ -47,6 +47,7 @@
     library: ['slug'], library_categories: ['kind', 'id'], exercises: ['id'], exercise_coach: ['id'], qualities: ['id'],
     tps_accounts: ['username'], assess_accounts: ['username'], messages: ['id'], cycle_reports: ['id'], spine_versions: ['id'],
     assess_players: ['id'], assess_notes: ['id'], assess_results: ['player_id', 'test', 'day'],
+    buyer_notes: ['user_id'], erasure_log: ['id'],
   };
   function persist() { if (ST.persist) { try { localStorage.setItem('__harness_db', JSON.stringify(DB)); } catch (e) {} } }
   function tbl(name) { return DB[name] || (DB[name] = []); }
@@ -290,6 +291,19 @@
     clear_quests: function (p) {
       var x = tbl('xp_rules').find(function (r) { return r.id === 1; }); x.rules.questRuns = (x.rules.questRuns || []).filter(function (r) { return r.start !== p.p_start; }); return x.rules.questRuns;
     },
+    // stage55: ending a run keeps it with an `end` day (capped at its seventh day); an end before the start drops it (nothing earned).
+    end_quests: function (p) {
+      if (p.p_start == null || p.p_end == null) throw new Error("give the run's start day and the day it ends");
+      var x = tbl('xp_rules').find(function (r) { return r.id === 1; }), out = [], found = false;
+      var plus6 = function (k) { return new Date(Date.parse(k + 'T00:00:00Z') + 6 * 86400e3).toISOString().slice(0, 10); };
+      (x.rules.questRuns || []).forEach(function (r) {
+        if (r.start !== p.p_start) { out.push(r); return; }
+        found = true;
+        if (p.p_end >= p.p_start) out.push(Object.assign({}, r, { end: p.p_end < plus6(r.start) ? p.p_end : plus6(r.start) }));
+      });
+      if (!found) throw new Error('no quest run starts on ' + p.p_start);
+      x.rules.questRuns = out; x.updated_at = nowIso(); return out;
+    },
     set_intake_status: function (p) {
       if (['new', 'handled', 'archived'].indexOf(p.p_status) < 0) throw new Error('bad intake status: ' + p.p_status);
       tbl('hab_intake').forEach(function (i) { if (String(i.id) === String(p.p_id)) { i.status = p.p_status; i.handled_at = p.p_status === 'new' ? null : (i.handled_at || nowIso()); } });
@@ -365,6 +379,69 @@
         else { co = Object.assign({ id: p.p_id, sfr: null, flags: [], notes: null, suggested_qualities: [], links_before: null, links_history: [], credits: null, cost: null, suggested_changes: [] }, clone(coach)); tbl('exercise_coach').push(co); }
       }
       return { ok: true, entry: hasE ? clone(ex) : null, coach: hasC ? clone(co) : null };
+    },
+    // stage54: one-step full erasure, emulated from supabase/stage54_erase_person.sql. The same refusals, the same counts, a dry run
+    // (the default) that changes nothing, the typed confirmation on a real run, intake forms offered by email or full name, the partner
+    // link cleared (the record stays), a receipt without personal data. The stub has no auth.users: the sign-in accounts are counted
+    // from the login rows. The SQL itself is tested on a real Postgres by scripts/test_spine_sql.sh.
+    coach_erase_person: function (p) {
+      var kind = String(p.p_kind == null ? '' : p.p_kind).trim().toLowerCase(), key = String(p.p_key == null ? '' : p.p_key).trim();
+      var dry = p.p_dry_run !== false, ids = p.p_intake_ids || [];
+      var lc = function (v) { return String(v == null ? '' : v).trim().toLowerCase(); };
+      var norm = function (v) { return lc(v).replace(/\s+/g, ' '); };
+      if (['athlete', 'course', 'testing'].indexOf(kind) < 0) throw new Error('Unknown kind of person "' + kind + '": use athlete, course or testing.');
+      if (!key) throw new Error('Who? The id or username is empty.');
+      var del = {}, counts = {}, word, shown, cands = [], unlinked = [], users = [];
+      var pick = function (t, pred) { var rows = (DB[t] || []).filter(pred); del[t] = rows; counts[t] = rows.length; };   // reads never create a table
+      if (kind === 'athlete') {
+        if (['demo', 'amir_ardekani'].indexOf(key.toLowerCase()) >= 0) throw new Error('"' + key + '" is not a client (the public demo, or the identity this dashboard reads the board through). It is never erased.');
+        word = key;
+        var prog = tbl('programs').find(function (r) { return r.athlete_id === key; });
+        var a = (prog && prog.data && prog.data.athlete) || {};
+        shown = ((a.firstName || '') + ' ' + (a.lastName || '')).trim();
+        if (!shown) { var hc = tbl('hab_contacts').find(function (r) { return r.athlete_id === key; }); shown = (hc && hc.display_name) || ''; }
+        if (!shown) { var ap = tbl('athlete_progress').find(function (r) { return r.athlete_id === key; }); shown = (ap && ap.athlete_name) || ''; }
+        shown = shown || key;
+        users = tbl('athlete_identities').filter(function (r) { return r.athlete_id === key; }).map(function (r) { return r.user_id; });
+        var emails = tbl('hab_contacts').filter(function (r) { return r.athlete_id === key && lc(r.email); }).map(function (r) { return lc(r.email); });
+        var full = a.firstName && a.lastName ? norm(a.firstName + ' ' + a.lastName) : null;
+        cands = tbl('hab_intake').filter(function (i) { return emails.indexOf(lc(i.email)) >= 0 || (full && norm(i.name) === full); })
+          .map(function (i) { return { id: i.id, created_at: i.created_at, name: i.name, programme: i.programme, lang: i.lang, matched_on: emails.indexOf(lc(i.email)) >= 0 ? 'email' : 'name' }; });
+        ids.forEach(function (id) { if (!cands.some(function (c) { return c.id === id; })) throw new Error('One of the intake forms is not a form that carries this person\'s email or full name. Nothing was erased.'); });
+        ['session_history', 'athlete_progress', 'hab_notes', 'hab_titles', 'hab_season_results', 'leaderboard_optin', 'library_sessions', 'messages',
+          'call_logs', 'cycle_reports', 'coaching_log_versions', 'coaching_logs', 'program_versions', 'programs', 'athlete_keys', 'hab_contacts',
+          'athlete_identities'].forEach(function (t) { pick(t, function (r) { return r.athlete_id === key; }); });
+        pick('hab_intake', function (r) { return ids.indexOf(r.id) >= 0; });
+        unlinked = tbl('affiliates').filter(function (r) { return r.athlete_id === key; }).map(function (r) { return r.code; }).sort();
+      } else {
+        var T = kind === 'course' ? 'tps_accounts' : 'assess_accounts';
+        var acct = tbl(T).find(function (r) { return lc(r.username) === lc(key); });
+        if (!acct) throw new Error('There is no ' + (kind === 'course' ? 'course' : 'testing-app') + ' login called "' + key + '". Nothing was erased.');
+        word = acct.username; users = [acct.user_id];
+        var bn = tbl('buyer_notes').find(function (r) { return r.user_id === acct.user_id; });
+        shown = (bn && bn.note) || word;
+        if (kind === 'testing') {
+          pick('assess_notes', function (r) { return r.account_id === acct.user_id; });
+          pick('assess_results', function (r) { return r.account_id === acct.user_id; });
+          pick('assess_players', function (r) { return r.account_id === acct.user_id; });
+        }
+        pick('buyer_notes', function (r) { return r.user_id === acct.user_id; });
+        pick(T, function (r) { return r.user_id === acct.user_id; });
+      }
+      counts.auth_users = users.length;
+      if (!dry && lc(p.p_confirm) !== lc(word)) throw new Error('The confirmation does not match. Type exactly "' + word + '" to erase. Nothing was erased.');
+      var total = Object.keys(counts).reduce(function (n, k) { return n + counts[k]; }, 0);
+      if (total === 0) throw new Error('Nothing is stored for "' + key + '". Nothing was erased.');
+      var logId = null;
+      if (!dry) {
+        Object.keys(del).forEach(function (t) { if (DB[t]) DB[t] = DB[t].filter(function (r) { return del[t].indexOf(r) < 0; }); });
+        tbl('affiliates').forEach(function (r) { if (r.athlete_id === key && kind === 'athlete') r.athlete_id = null; });
+        logId = tbl('erasure_log').length + 1;
+        tbl('erasure_log').push({ id: logId, erased_at: nowIso(), erased_by: COACH, kind: kind, subject_hash: 'hash:' + kind + ':' + lc(word),
+          counts: Object.assign({}, counts, { affiliates_unlinked: unlinked.length }) });
+      }
+      return { ok: true, dry_run: dry, kind: kind, key: key, shown_as: shown, confirm_word: word, counts: counts, total: total,
+        intake_candidates: cands, intake_erased: counts.hab_intake == null ? null : counts.hab_intake, affiliates_unlinked: unlinked, log_id: logId };
     },
     forget_contact: function (p) {
       ['hab_contacts', 'leaderboard_optin', 'athlete_progress'].forEach(function (n) { DB[n] = tbl(n).filter(function (r) { return r.athlete_id !== p.p_athlete_id; }); });

@@ -1,6 +1,8 @@
 -- Assertions for stage45 (forget_contact), stage48 (coach_delete_training_history, coach_save_spine), stage49 (spine_versions)
--- stage50 (the coach reads the testing app's tables), stage51 (used first passwords are cleared) and stage52 (version history) on the
--- local replica. Run through scripts/test_spine_sql.sh, which loads replica_schema.sql and both stage files first.
+-- stage50 (the coach reads the testing app's tables), stage51 (used first passwords are cleared), stage52 (version history),
+-- stage53 (the buyer note leaves the buyer's reach), stage54 (one-step full erasure) and stage55 (ending a quest run keeps the
+-- XP already earned) on the local replica. Run through
+-- scripts/test_spine_sql.sh, which loads replica_schema.sql and every stage file first.
 -- Every check writes a row to t_res; the runner prints the failures and exits non-zero if there are any.
 -- Test rows are all 'zz…' ids. Made-up data only.
 \set ON_ERROR_STOP on
@@ -433,6 +435,8 @@ create function pg_temp.buyer(u uuid) returns void language plpgsql as $$ begin
   perform set_config('request.jwt.claims', json_build_object('sub', u, 'role', 'authenticated', 'email', 'buyer@example.invalid')::text, false);
 end $$;
 select pg_temp.nobody() \g /dev/null
+insert into auth.users (id, email) values
+  ('00000000-0000-0000-0000-0000000000a1', 'a1@example.invalid'), ('00000000-0000-0000-0000-0000000000a2', 'a2@example.invalid');
 insert into public.assess_accounts (user_id, username) values
   ('00000000-0000-0000-0000-0000000000a1', 'zz_buyer_a'), ('00000000-0000-0000-0000-0000000000a2', 'zz_buyer_b');
 insert into public.assess_players (id, account_id, name) values
@@ -723,6 +727,628 @@ begin
   perform pg_temp.rec('versions: ...and the 70-day fallback is used (3 old go, 22 + 1 stay)', n = 23, n::text);
 end $t$;
 \i supabase/stage52_version_history_two_cycles.sql
+
+-- ═════════════════════ H. stage53: the coach's note about a buyer is out of the buyer's reach ═════════════════════
+-- The note is typed when the login is made. The Edge Functions still insert it as `label`; a trigger moves it to buyer_notes, which
+-- only the coach can read or write, and leaves the account row's label empty. A buyer reads their own account row.
+select pg_temp.nobody() \g /dev/null
+insert into auth.users (id, email) values
+  ('00000000-0000-0000-0000-0000000000b1', 'b1@example.invalid'), ('00000000-0000-0000-0000-0000000000b2', 'b2@example.invalid'),
+  ('00000000-0000-0000-0000-0000000000b3', 'b3@example.invalid'), ('00000000-0000-0000-0000-0000000000b4', 'b4@example.invalid');
+-- written as the Edge Functions write it: as the table owner, with a label
+insert into public.tps_accounts (user_id, username, label) values ('00000000-0000-0000-0000-0000000000b1', 'zz_note_a', '  Ali from Instagram  ');
+insert into public.tps_accounts (user_id, username) values ('00000000-0000-0000-0000-0000000000b2', 'zz_note_b');
+insert into public.assess_accounts (user_id, username, label) values ('00000000-0000-0000-0000-0000000000b3', 'zz_note_c', repeat('x', 85));
+
+do $t$
+declare l text; note text; app text; n int; k int;
+begin
+  select label into l from public.tps_accounts where user_id = '00000000-0000-0000-0000-0000000000b1';
+  select b.note, b.app into note, app from public.buyer_notes b where b.user_id = '00000000-0000-0000-0000-0000000000b1';
+  perform pg_temp.rec('buyer notes: a label written with the account lands in buyer_notes, trimmed, for the right app', note = 'Ali from Instagram' and app = 'course', coalesce(note, '(none)'));
+  perform pg_temp.rec('buyer notes: ...and the account row itself carries no label', l is null, coalesce(l, 'null'));
+  select count(*) into n from public.buyer_notes where user_id = '00000000-0000-0000-0000-0000000000b2';
+  perform pg_temp.rec('buyer notes: an account made with no label gets no note row', n = 0, n::text);
+  select length(b.note), b.app into k, app from public.buyer_notes b where b.user_id = '00000000-0000-0000-0000-0000000000b3';
+  perform pg_temp.rec('buyer notes: a testing-app note is kept to 80 characters and filed under testing', k = 80 and app = 'testing', coalesce(k::text, '(none)'));
+  select label into l from public.assess_accounts where user_id = '00000000-0000-0000-0000-0000000000b3';
+  perform pg_temp.rec('buyer notes: ...the testing account row carries no label either', l is null, coalesce(l, 'null'));
+
+  -- a later label (the coach, or an Edge Function) replaces the note
+  update public.tps_accounts set label = 'Ali, the second one' where user_id = '00000000-0000-0000-0000-0000000000b1';
+  select b.note into note from public.buyer_notes b where b.user_id = '00000000-0000-0000-0000-0000000000b1';
+  select label into l from public.tps_accounts where user_id = '00000000-0000-0000-0000-0000000000b1';
+  perform pg_temp.rec('buyer notes: a label written later replaces the note and is cleared from the row', note = 'Ali, the second one' and l is null, coalesce(note, '(none)'));
+  -- the coach's other updates (Mark sent) do not touch the note
+  update public.tps_accounts set initial_password = null, sent_at = now() where user_id = '00000000-0000-0000-0000-0000000000b1';
+  select b.note into note from public.buyer_notes b where b.user_id = '00000000-0000-0000-0000-0000000000b1';
+  perform pg_temp.rec('buyer notes: Mark sent and other updates leave the note alone', note = 'Ali, the second one', coalesce(note, '(none)'));
+  -- a blank label moves nothing
+  update public.tps_accounts set label = '   ' where user_id = '00000000-0000-0000-0000-0000000000b1';
+  select b.note into note from public.buyer_notes b where b.user_id = '00000000-0000-0000-0000-0000000000b1';
+  perform pg_temp.rec('buyer notes: a blank label leaves the note as it was', note = 'Ali, the second one', coalesce(note, '(none)'));
+end $t$;
+
+do $t$
+declare l text; n int; k int;
+begin
+  -- the buyer: their own account row has no note, and buyer_notes is closed to them
+  perform pg_temp.buyer('00000000-0000-0000-0000-0000000000b1');
+  execute 'set local role authenticated';
+  select count(*), max(label) into n, l from public.tps_accounts;
+  select count(*) into k from public.buyer_notes;
+  execute 'reset role';
+  perform pg_temp.rec('buyer notes: a buyer reads their own account row and its label is empty', n = 1 and l is null, format('%s rows, label %s', n, coalesce(l, 'null')));
+  perform pg_temp.rec('buyer notes: ...and reads none of the notes', k = 0, k::text);
+  begin
+    execute 'set local role authenticated';
+    insert into public.buyer_notes (user_id, app, note) values ('00000000-0000-0000-0000-0000000000b1', 'course', 'self-written');
+    execute 'reset role';
+    perform pg_temp.rec('buyer notes: a buyer cannot write a note', false, 'no error');
+  exception when others then perform pg_temp.rec('buyer notes: a buyer cannot write a note', sqlstate in ('42501'), sqlerrm); end;
+  execute 'set local role authenticated';
+  with u as (update public.buyer_notes set note = 'changed' returning 1) select count(*) into k from u;
+  execute 'reset role';
+  perform pg_temp.rec('buyer notes: ...or change one (no row is touched)', k = 0, k::text);
+  execute 'set local role authenticated';
+  with d as (delete from public.buyer_notes returning 1) select count(*) into k from d;
+  execute 'reset role';
+  perform pg_temp.rec('buyer notes: ...or delete one (no row is touched)', k = 0, k::text);
+
+  -- someone who is neither: nothing
+  perform pg_temp.other();
+  execute 'set local role authenticated';
+  select count(*) into k from public.buyer_notes;
+  execute 'reset role';
+  perform pg_temp.rec('buyer notes: a signed-in user who is not the coach reads none', k = 0, k::text);
+
+  -- the coach reads, writes and deletes
+  perform pg_temp.coach();
+  execute 'set local role authenticated';
+  select count(*) into k from public.buyer_notes where user_id in ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000b3');
+  execute 'reset role';
+  perform pg_temp.rec('buyer notes: the coach reads every note', k = 2, k::text);
+  execute 'set local role authenticated';
+  update public.buyer_notes set note = 'coach edit' where user_id = '00000000-0000-0000-0000-0000000000b1';
+  insert into public.buyer_notes (user_id, app, note) values ('00000000-0000-0000-0000-0000000000b2', 'course', 'coach insert');
+  with d as (delete from public.buyer_notes where user_id = '00000000-0000-0000-0000-0000000000b2' returning 1) select count(*) into k from d;
+  execute 'reset role';
+  perform pg_temp.rec('buyer notes: ...and can edit, add and remove one', k = 1 and (select note from public.buyer_notes where user_id = '00000000-0000-0000-0000-0000000000b1') = 'coach edit', k::text);
+
+  -- shape
+  begin insert into public.buyer_notes (user_id, app, note) values ('00000000-0000-0000-0000-0000000000b2', 'elsewhere', 'x');
+    perform pg_temp.rec('buyer notes: an app other than course or testing is refused', false, 'no error');
+  exception when check_violation then perform pg_temp.rec('buyer notes: an app other than course or testing is refused', true, sqlerrm); end;
+  begin insert into public.buyer_notes (user_id, app, note) values ('00000000-0000-0000-0000-0000000000b2', 'course', repeat('y', 81));
+    perform pg_temp.rec('buyer notes: a note over 80 characters is refused', false, 'no error');
+  exception when check_violation then perform pg_temp.rec('buyer notes: a note over 80 characters is refused', true, sqlerrm); end;
+  perform pg_temp.rec('buyer notes: the trigger function cannot be called by a signed-in user', not has_function_privilege('authenticated', 'public.move_buyer_label()', 'execute'), '');
+  perform pg_temp.rec('buyer notes: ...nor by anon', not has_function_privilege('anon', 'public.move_buyer_label()', 'execute'), '');
+
+  -- the note goes with the buyer
+  delete from auth.users where id = '00000000-0000-0000-0000-0000000000b3';
+  select count(*) into k from public.buyer_notes where user_id = '00000000-0000-0000-0000-0000000000b3';
+  perform pg_temp.rec('buyer notes: deleting the buyer''s sign-in account takes the note with it', k = 0, k::text);
+end $t$;
+
+-- the backfill: notes already stored (written while the trigger was off, as they were before stage53) move on a re-run
+alter table public.tps_accounts disable trigger tps_accounts_label_trg;
+insert into public.tps_accounts (user_id, username, label) values ('00000000-0000-0000-0000-0000000000b4', 'zz_note_old', 'Old note');
+alter table public.tps_accounts enable trigger tps_accounts_label_trg;
+-- what the project's default privileges hand every new table: the file must take it away from anon again
+grant all on table public.buyer_notes to anon;
+\i supabase/stage53_buyer_notes.sql
+do $t$
+declare l text; note text; keep text;
+begin
+  select label into l from public.tps_accounts where user_id = '00000000-0000-0000-0000-0000000000b4';
+  select b.note into note from public.buyer_notes b where b.user_id = '00000000-0000-0000-0000-0000000000b4';
+  select b.note into keep from public.buyer_notes b where b.user_id = '00000000-0000-0000-0000-0000000000b1';
+  perform pg_temp.rec('buyer notes: re-running the file moves an old stored label into buyer_notes and clears it', note = 'Old note' and l is null, coalesce(note, '(none)'));
+  perform pg_temp.rec('buyer notes: ...and leaves a note that is already there as it was', keep = 'coach edit', coalesce(keep, '(none)'));
+end $t$;
+do $t$
+begin
+  begin
+    execute 'set local role anon';
+    perform count(*) from public.buyer_notes;
+    execute 'reset role';
+    perform pg_temp.rec('buyer notes: anon has no access (the file takes back the project''s default grant)', false, 'no error');
+  exception when insufficient_privilege then perform pg_temp.rec('buyer notes: anon has no access (the file takes back the project''s default grant)', true, sqlerrm); end;
+end $t$;
+select pg_temp.coach() \g /dev/null
+
+-- ═════════════════════ I. stage54: one-step full erasure of an athlete or a buyer ═════════════════════
+select pg_temp.nobody() \g /dev/null
+-- a fingerprint of every row in the public and auth tables: equal before and after means NOTHING changed
+create function pg_temp.fingerprint() returns text language plpgsql as $$
+declare t record; h text := ''; x text;
+begin
+  for t in select n.nspname, c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace
+            where c.relkind = 'r' and n.nspname in ('public', 'auth') order by 1, 2 loop
+    execute format('select coalesce(md5(string_agg(r::text, ''|'' order by r::text)), '''') from %I.%I r', t.nspname, t.relname) into x;
+    h := h || t.nspname || '.' || t.relname || '=' || x || ';';
+  end loop;
+  return md5(h);
+end $$;
+-- rows left under an athlete id, found from the catalogue (not from the function's own list)
+create function pg_temp.rows_for(p_id text) returns bigint language plpgsql as $$
+declare t text; n bigint; total bigint := 0;
+begin
+  for t in select c.relname::text from pg_attribute a join pg_class c on c.oid = a.attrelid join pg_namespace s on s.oid = c.relnamespace
+            where s.nspname = 'public' and a.attname = 'athlete_id' and a.attnum > 0 and not a.attisdropped and c.relkind = 'r' loop
+    execute format('select count(*) from public.%I where athlete_id::text = $1', t) into n using p_id;
+    total := total + n;
+  end loop;
+  return total;
+end $$;
+create function pg_temp.seed_athlete(p_id text, p_user uuid, p_first text, p_last text, p_email text) returns void language plpgsql as $$
+begin
+  insert into auth.users (id, email) values (p_user, 'athlete.' || p_id || '@amirardekani.com');
+  insert into auth.sessions (user_id) values (p_user);
+  insert into auth.identities (user_id) values (p_user);
+  insert into public.athlete_identities (user_id, athlete_id, email) values (p_user, p_id, 'athlete.' || p_id || '@amirardekani.com');
+  insert into public.programs (athlete_id, data) values (p_id, jsonb_build_object('athlete', jsonb_build_object('firstName', p_first, 'lastName', p_last, 'tier', 'coached')));
+  insert into public.program_versions (athlete_id, data) select p_id, '{"v":1}'::jsonb from generate_series(1, 4);
+  insert into public.session_history (athlete_id, day, completed_on) values (p_id, 1, '2026-01-01'), (p_id, 2, '2026-01-02');
+  insert into public.athlete_progress (athlete_id, data) values (p_id, '{"a":1}');
+  insert into public.hab_notes (athlete_id, day, body) values (p_id, '2026-01-01', 'x'), (p_id, '2026-01-02', 'y');
+  insert into public.hab_titles (athlete_id, title) values (p_id, 'T1'), (p_id, 'T2');
+  insert into public.hab_season_results (athlete_id, starts_on, season_name, ended_on, level, xp) values (p_id, '2026-01-01', 'S', '2026-03-01', 3, 100);
+  insert into public.leaderboard_optin (athlete_id, display_name) values (p_id, 'Board ' || p_first);
+  insert into public.library_sessions (athlete_id, slug) values (p_id, 'zz-session');
+  insert into public.messages (athlete_id, sender, body) values (p_id, 'athlete', 'hi'), (p_id, 'coach', 'hello');
+  insert into public.call_logs (athlete_id, call_date) values (p_id, '2026-01-05');
+  insert into public.cycle_reports (athlete_id, cycle, report) values (p_id, 'C1', '{}');
+  insert into public.coaching_logs (athlete_id, body) values (p_id, 'log');
+  insert into public.coaching_log_versions (athlete_id, body) select p_id, 'old ' || g from generate_series(1, 3) g;
+  insert into public.athlete_keys (athlete_id, secret_key) values (p_id, 'k');
+  insert into public.hab_contacts (athlete_id, email, whatsapp, source, tier) values (p_id, p_email, '+0000', 'proof', 'free');
+end $$;
+
+select pg_temp.seed_athlete('zz_erase_a', '00000000-0000-0000-0000-0000000000e1', 'Zed', 'Erased', 'Zed.Erased@Example.Invalid');
+select pg_temp.seed_athlete('zz_keep_b',  '00000000-0000-0000-0000-0000000000e2', 'Kay', 'Kept', 'kay.kept@example.invalid');
+insert into public.affiliates (code, coach_name, athlete_id) values ('ZZAFF', 'Zed Erased', 'zz_erase_a'), ('ZZAFFB', 'Kay Kept', 'zz_keep_b');
+insert into public.hab_intake (id, name, email, programme) values
+  ('00000000-0000-0000-0000-00000000f001', 'Zed Erased', ' ZED.erased@example.invalid ', '3 months'),   -- the same email (case and spaces differ)
+  ('00000000-0000-0000-0000-00000000f002', 'ZED   erased', 'other@example.invalid', '1 month'),         -- the same full name
+  ('00000000-0000-0000-0000-00000000f003', 'Someone Else', 'someone@example.invalid', '6 months'),      -- nobody we are erasing
+  ('00000000-0000-0000-0000-00000000f004', 'Kay Kept', 'kay.kept@example.invalid', '3 months');         -- the control's own form
+-- two course buyers and two testing-app buyers
+insert into auth.users (id, email) values
+  ('00000000-0000-0000-0000-0000000000f1', 'tps.zz_course_c@amirardekani.com'), ('00000000-0000-0000-0000-0000000000f2', 'tps.zz_course_d@amirardekani.com'),
+  ('00000000-0000-0000-0000-0000000000f3', 'assess.zz_test_t@amirardekani.com'), ('00000000-0000-0000-0000-0000000000f4', 'assess.zz_test_u@amirardekani.com');
+insert into auth.sessions (user_id) values ('00000000-0000-0000-0000-0000000000f1'), ('00000000-0000-0000-0000-0000000000f3');
+insert into public.tps_accounts (user_id, username, label) values
+  ('00000000-0000-0000-0000-0000000000f1', 'zz_course_c', 'Course buyer C'), ('00000000-0000-0000-0000-0000000000f2', 'zz_course_d', 'Course buyer D');
+insert into public.assess_accounts (user_id, username, label) values
+  ('00000000-0000-0000-0000-0000000000f3', 'zz_test_t', 'Academy T'), ('00000000-0000-0000-0000-0000000000f4', 'zz_test_u', 'Academy U');
+insert into public.assess_players (id, account_id, name, deleted_at) values
+  ('00000000-0000-0000-0000-00000000c101', '00000000-0000-0000-0000-0000000000f3', 'T Player 1', null),
+  ('00000000-0000-0000-0000-00000000c102', '00000000-0000-0000-0000-0000000000f3', 'T Player 2 (removed)', now()),
+  ('00000000-0000-0000-0000-00000000c103', '00000000-0000-0000-0000-0000000000f4', 'U Player 1', null);
+insert into public.assess_notes (player_id, account_id, body) values
+  ('00000000-0000-0000-0000-00000000c101', '00000000-0000-0000-0000-0000000000f3', 'n1'),
+  ('00000000-0000-0000-0000-00000000c102', '00000000-0000-0000-0000-0000000000f3', 'n2'),
+  ('00000000-0000-0000-0000-00000000c103', '00000000-0000-0000-0000-0000000000f4', 'n3');
+insert into public.assess_results (player_id, test, day, account_id, value) values
+  ('00000000-0000-0000-0000-00000000c101', 'sprint', '2026-01-01', '00000000-0000-0000-0000-0000000000f3', 5.1),
+  ('00000000-0000-0000-0000-00000000c101', 'sprint', '2026-02-01', '00000000-0000-0000-0000-0000000000f3', 5.0),
+  ('00000000-0000-0000-0000-00000000c102', 'sprint', '2026-01-01', '00000000-0000-0000-0000-0000000000f3', 6.0),
+  ('00000000-0000-0000-0000-00000000c103', 'sprint', '2026-01-01', '00000000-0000-0000-0000-0000000000f4', 7.0);
+
+-- 1. who may call it
+select pg_temp.coach() \g /dev/null
+do $t$
+begin
+  perform pg_temp.nobody();
+  begin
+    execute 'set local role anon';
+    perform public.coach_erase_person('athlete', 'zz_erase_a');
+    execute 'reset role';
+    perform pg_temp.rec('erase: anon cannot even call it', false, 'no error');
+  exception when insufficient_privilege then perform pg_temp.rec('erase: anon cannot even call it', true, sqlerrm); end;
+  perform pg_temp.other();
+  begin
+    execute 'set local role authenticated';
+    perform public.coach_erase_person('athlete', 'zz_erase_a');
+    execute 'reset role';
+    perform pg_temp.rec('erase: a signed-in user who is not the coach is refused', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: a signed-in user who is not the coach is refused', sqlerrm like '%coach only%', sqlerrm); end;
+  perform pg_temp.coach();
+end $t$;
+
+-- 2. the dry run: the default, exact, and it changes nothing
+do $t$
+declare fp0 text; r jsonb; k record; n bigint; bad text := ''; s bigint := 0;
+begin
+  perform pg_temp.coach();
+  fp0 := pg_temp.fingerprint();
+  execute 'set local role authenticated';
+  r := public.coach_erase_person('athlete', 'zz_erase_a');
+  execute 'reset role';
+  perform pg_temp.rec('erase: with no flag the call is a dry run', (r ->> 'dry_run')::boolean, r ->> 'dry_run');
+  perform pg_temp.rec('erase: ...and it changed nothing in any table (a fingerprint of every row is the same)', pg_temp.fingerprint() = fp0, '');
+  perform pg_temp.rec('erase: the preview gives a name to show and the word to type', r ->> 'shown_as' = 'Zed Erased' and r ->> 'confirm_word' = 'zz_erase_a', r ->> 'shown_as');
+  for k in select key as t, value::bigint as c from jsonb_each_text(r -> 'counts') where key not in ('auth_users', 'hab_intake') loop
+    execute format('select count(*) from public.%I where athlete_id = ''zz_erase_a''', k.t) into n;
+    if n <> k.c then bad := bad || k.t || ' says ' || k.c || ' but has ' || n || '; '; end if;
+    s := s + k.c;
+  end loop;
+  perform pg_temp.rec('erase: every count in the preview is the real number of rows in that table', bad = '', bad);
+  perform pg_temp.rec('erase: the preview lists all 17 athlete tables, the intake forms and the sign-in account',
+    (select count(*) from jsonb_object_keys(r -> 'counts')) = 19, (select count(*) from jsonb_object_keys(r -> 'counts'))::text);
+  perform pg_temp.rec('erase: the total is their sum plus the sign-in account (and no intake form was picked)',
+    (r ->> 'total')::bigint = s + 1 and (r -> 'counts' ->> 'auth_users')::int = 1 and (r -> 'counts' ->> 'hab_intake')::int = 0, r ->> 'total');
+  perform pg_temp.rec('erase: two intake forms look like theirs: the same email and the same full name, not the stranger''s and not the other athlete''s',
+    jsonb_array_length(r -> 'intake_candidates') = 2
+    and (select string_agg(c ->> 'id' || ':' || (c ->> 'matched_on'), ',' order by c ->> 'id') from jsonb_array_elements(r -> 'intake_candidates') c)
+        = '00000000-0000-0000-0000-00000000f001:email,00000000-0000-0000-0000-00000000f002:name',
+    (r -> 'intake_candidates')::text);
+  perform pg_temp.rec('erase: the partner record that points at them is listed as unlinked (not erased)', r -> 'affiliates_unlinked' = '["ZZAFF"]'::jsonb, (r -> 'affiliates_unlinked')::text);
+  -- a dry run with intake forms picked counts them
+  execute 'set local role authenticated';
+  r := public.coach_erase_person('athlete', 'zz_erase_a', null, array['00000000-0000-0000-0000-00000000f001']::uuid[], true);
+  execute 'reset role';
+  perform pg_temp.rec('erase: a dry run with an intake form picked counts it, and still changes nothing', (r -> 'counts' ->> 'hab_intake')::int = 1 and pg_temp.fingerprint() = fp0, r -> 'counts' ->> 'hab_intake');
+end $t$;
+
+-- 3. a real run is refused without the typed word, with the wrong one, or with an intake form that is not theirs
+do $t$
+declare fp0 text := pg_temp.fingerprint(); r jsonb;
+begin
+  perform pg_temp.coach();
+  begin perform public.coach_erase_person('athlete', 'zz_erase_a', null, '{}', false);
+    perform pg_temp.rec('erase: a real run without the typed word is refused', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: a real run without the typed word is refused', sqlerrm like '%confirmation does not match%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_keep_b', '{}', false);
+    perform pg_temp.rec('erase: ...and with someone else''s id', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: ...and with someone else''s id', sqlerrm like '%confirmation does not match%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', array['00000000-0000-0000-0000-00000000f003']::uuid[], false);
+    perform pg_temp.rec('erase: an intake form that is a stranger''s cannot be added to the erasure', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: an intake form that is a stranger''s cannot be added to the erasure', sqlerrm like '%not a form that carries this person%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', array['00000000-0000-0000-0000-00000000f004']::uuid[], false);
+    perform pg_temp.rec('erase: ...nor another athlete''s own form', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: ...nor another athlete''s own form', sqlerrm like '%not a form that carries this person%', sqlerrm); end;
+  perform pg_temp.rec('erase: none of those refusals changed anything', pg_temp.fingerprint() = fp0, '');
+end $t$;
+
+-- 4. ids and logins that are never erased
+insert into auth.users (id, email) values
+  ('00000000-0000-0000-0000-0000000000e3', 'amirardekanian@gmail.com'),
+  ('00000000-0000-0000-0000-0000000000e4', 'athlete.zz_selfdel@amirardekani.com'),
+  ('00000000-0000-0000-0000-0000000000e5', 'athlete.zz_shared@amirardekani.com');
+insert into public.athlete_identities (user_id, athlete_id) values
+  ('00000000-0000-0000-0000-0000000000e3', 'zz_coachlogin'), ('00000000-0000-0000-0000-0000000000e4', 'zz_selfdel'), ('00000000-0000-0000-0000-0000000000e5', 'zz_shared');
+insert into public.athlete_progress (athlete_id, data) values ('zz_coachlogin', '{}'), ('zz_selfdel', '{}'), ('zz_shared', '{}'), ('demo', '{}'), ('amir_ardekani', '{}');
+insert into public.tps_accounts (user_id, username) values ('00000000-0000-0000-0000-0000000000e5', 'zz_shared_buyer');
+do $t$
+declare fp0 text := pg_temp.fingerprint();
+begin
+  perform pg_temp.coach();
+  begin perform public.coach_erase_person('athlete', 'demo', 'demo', '{}', false);
+    perform pg_temp.rec('erase: the public demo is never erased', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: the public demo is never erased', sqlerrm like '%never erased%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'AMIR_ardekani', 'AMIR_ardekani', '{}', false);
+    perform pg_temp.rec('erase: ...nor the identity the dashboard reads the board through (any case)', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: ...nor the identity the dashboard reads the board through (any case)', sqlerrm like '%never erased%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'zz_coachlogin', 'zz_coachlogin', '{}', false);
+    perform pg_temp.rec('erase: an athlete whose login is the coach''s own Google account is refused', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: an athlete whose login is the coach''s own Google account is refused', sqlerrm like '%yours%', sqlerrm); end;
+  -- the signed-in user's own login
+  perform set_config('request.jwt.claims', '{"email":"amirardekanian@gmail.com","sub":"00000000-0000-0000-0000-0000000000e4","role":"authenticated"}', false);
+  begin perform public.coach_erase_person('athlete', 'zz_selfdel', 'zz_selfdel', '{}', false);
+    perform pg_temp.rec('erase: ...and a login that is the signed-in user''s own is refused', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: ...and a login that is the signed-in user''s own is refused', sqlerrm like '%yours%', sqlerrm); end;
+  perform pg_temp.coach();
+  begin perform public.coach_erase_person('athlete', 'zz_shared', 'zz_shared', '{}', false);
+    perform pg_temp.rec('erase: a login shared with a course account is refused (sort it out by hand)', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: a login shared with a course account is refused (sort it out by hand)', sqlerrm like '%also a course or testing-app login%', sqlerrm); end;
+  begin perform public.coach_erase_person('course', 'zz_shared_buyer', 'zz_shared_buyer', '{}', false);
+    perform pg_temp.rec('erase: ...from the buyer''s side too', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: ...from the buyer''s side too', sqlerrm like '%also an athlete or testing-app login%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', 'zz_nobody_here', 'zz_nobody_here', '{}', false);
+    perform pg_temp.rec('erase: an id with nothing stored raises (a typo cannot look like a success)', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: an id with nothing stored raises (a typo cannot look like a success)', sqlerrm like '%Nothing is stored%', sqlerrm); end;
+  begin perform public.coach_erase_person('guest', 'x');
+    perform pg_temp.rec('erase: an unknown kind is refused', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: an unknown kind is refused', sqlerrm like '%Unknown kind%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', '   ');
+    perform pg_temp.rec('erase: an empty id is refused', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: an empty id is refused', sqlerrm like '%Who?%', sqlerrm); end;
+  begin perform public.coach_erase_person('athlete', null);
+    perform pg_temp.rec('erase: ...and so is a null one', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: ...and so is a null one', sqlerrm like '%Who?%', sqlerrm); end;
+  perform pg_temp.rec('erase: none of those changed anything', pg_temp.fingerprint() = fp0, '');
+end $t$;
+
+-- 5. a table the function does not know yet, and a failure half way: everything is undone
+create table public.zz_new_thing (athlete_id text, note text);
+insert into public.zz_new_thing values ('zz_erase_a', 'a table added after stage54');
+create function pg_temp.boom2() returns trigger language plpgsql as $$ begin raise exception 'fixture: titles cannot be deleted'; end $$;
+do $t$
+declare fp0 text := pg_temp.fingerprint(); r jsonb;
+begin
+  perform pg_temp.coach();
+  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', '{}', false);
+    perform pg_temp.rec('erase: a table with an athlete_id column that the function does not know stops the erasure', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: a table with an athlete_id column that the function does not know stops the erasure', sqlerrm like '%zz_new_thing%does not know that table%', sqlerrm); end;
+  perform pg_temp.rec('erase: ...and nothing was erased, not even the tables it did know', pg_temp.fingerprint() = fp0, '');
+  begin r := public.coach_erase_person('athlete', 'zz_erase_a');
+    perform pg_temp.rec('erase: the dry run stops the same way, so the dashboard shows the problem before anything is typed', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: the dry run stops the same way, so the dashboard shows the problem before anything is typed', sqlerrm like '%zz_new_thing%', sqlerrm); end;
+end $t$;
+drop table public.zz_new_thing;
+create trigger zz_boom2 before delete on public.hab_titles for each row when (old.athlete_id = 'zz_erase_a') execute function pg_temp.boom2();
+do $t$
+declare fp0 text := pg_temp.fingerprint();
+begin
+  perform pg_temp.coach();
+  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', '{}', false);
+    perform pg_temp.rec('erase: a failure half way raises', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: a failure half way raises', sqlerrm like '%fixture: titles cannot be deleted%', sqlerrm); end;
+  perform pg_temp.rec('erase: ...and the tables emptied before the failure are back (one transaction)', pg_temp.fingerprint() = fp0, '');
+end $t$;
+drop trigger zz_boom2 on public.hab_titles;
+
+-- 6. the real erasure of an athlete
+select set_config('zz.b_rows', pg_temp.rows_for('zz_keep_b')::text, false) \g /dev/null
+do $t$
+declare r jsonb; d jsonb; n int; l record; hash text; still int;
+begin
+  perform pg_temp.coach();
+  execute 'set local role authenticated';
+  d := public.coach_erase_person('athlete', 'zz_erase_a');
+  r := public.coach_erase_person('athlete', 'zz_erase_a', 'ZZ_Erase_A', array['00000000-0000-0000-0000-00000000f001']::uuid[], false);
+  execute 'reset role';
+  perform pg_temp.rec('erase: the real run reports it is not a dry run, and a receipt number', (r ->> 'dry_run')::boolean = false and (r ->> 'log_id') is not null, r::text);
+  perform pg_temp.rec('erase: ...with the same counts the dry run gave (plus the one intake form picked)',
+    (r -> 'counts') = (d -> 'counts') || '{"hab_intake":1}'::jsonb, (r -> 'counts')::text);
+  perform pg_temp.rec('erase: nothing is left under their id in ANY table of the public schema', pg_temp.rows_for('zz_erase_a') = 0, pg_temp.rows_for('zz_erase_a')::text);
+  select count(*) into n from auth.users where id = '00000000-0000-0000-0000-0000000000e1';
+  perform pg_temp.rec('erase: their sign-in account is gone', n = 0, n::text);
+  select (select count(*) from auth.sessions where user_id = '00000000-0000-0000-0000-0000000000e1')
+       + (select count(*) from auth.identities where user_id = '00000000-0000-0000-0000-0000000000e1') into n;
+  perform pg_temp.rec('erase: ...and its sessions and identities went with it', n = 0, n::text);
+  select count(*) into n from public.hab_intake where id = '00000000-0000-0000-0000-00000000f001';
+  perform pg_temp.rec('erase: the intake form that was picked is gone', n = 0, n::text);
+  select count(*) into n from public.hab_intake where id in ('00000000-0000-0000-0000-00000000f002', '00000000-0000-0000-0000-00000000f003', '00000000-0000-0000-0000-00000000f004');
+  perform pg_temp.rec('erase: ...and the ones that were not picked, and the other people''s, are still there', n = 3, n::text);
+  select count(*) into n from public.affiliates where code = 'ZZAFF' and athlete_id is null;
+  perform pg_temp.rec('erase: the partner record stays; only its link to the erased athlete is cleared', n = 1, n::text);
+  select count(*) into n from public.affiliates where code = 'ZZAFFB' and athlete_id = 'zz_keep_b';
+  perform pg_temp.rec('erase: ...another partner''s link is untouched', n = 1, n::text);
+  perform pg_temp.rec('erase: another athlete keeps every row in every table', pg_temp.rows_for('zz_keep_b') = current_setting('zz.b_rows')::bigint, pg_temp.rows_for('zz_keep_b')::text);
+  select count(*) into n from auth.users where id = '00000000-0000-0000-0000-0000000000e2';
+  perform pg_temp.rec('erase: ...and their sign-in account', n = 1, n::text);
+  perform pg_temp.rec('erase: the buyers are untouched', (select count(*) from public.tps_accounts where username in ('zz_course_c', 'zz_course_d')) = 2
+    and (select count(*) from public.assess_accounts where username in ('zz_test_t', 'zz_test_u')) = 2, '');
+
+  -- the receipt
+  select * into l from public.erasure_log order by id desc limit 1;
+  hash := encode(sha256(convert_to('athlete:zz_erase_a', 'UTF8')), 'hex');
+  perform pg_temp.rec('erase: the receipt holds the kind, the coach, the date and a hash of "athlete:zz_erase_a"',
+    l.kind = 'athlete' and l.erased_by = 'amirardekanian@gmail.com' and l.subject_hash = hash and l.erased_at > now() - interval '1 minute', l.subject_hash);
+  perform pg_temp.rec('erase: ...and no name, id or email anywhere in it', position('zz_erase_a' in lower(l::text)) = 0 and position('zed' in lower(l::text)) = 0 and position('example' in lower(l::text)) = 0, l::text);
+  perform pg_temp.rec('erase: ...with the counts, and how many partner links were cleared', (l.counts ->> 'session_history')::int = 2 and (l.counts ->> 'affiliates_unlinked')::int = 1, l.counts::text);
+
+  -- run it again: there is nothing left
+  begin perform public.coach_erase_person('athlete', 'zz_erase_a', 'zz_erase_a', '{}', false);
+    perform pg_temp.rec('erase: running it again finds nothing and says so', false, 'no error');
+  exception when others then perform pg_temp.rec('erase: running it again finds nothing and says so', sqlerrm like '%Nothing is stored%', sqlerrm); end;
+end $t$;
+
+-- 7. a course buyer
+do $t$
+declare fp0 text; d jsonb; r jsonb; n int; l record;
+begin
+  perform pg_temp.coach();
+  fp0 := pg_temp.fingerprint();
+  d := public.coach_erase_person('course', 'ZZ_Course_C');
+  perform pg_temp.rec('erase course: the preview names the buyer by the note and asks for the username',
+    d ->> 'shown_as' = 'Course buyer C' and d ->> 'confirm_word' = 'zz_course_c' and (d ->> 'dry_run')::boolean, d::text);
+  perform pg_temp.rec('erase course: ...counts the login, the note and the sign-in account, and changed nothing',
+    d -> 'counts' = '{"buyer_notes":1,"tps_accounts":1,"auth_users":1}'::jsonb and (d ->> 'total')::int = 3 and pg_temp.fingerprint() = fp0, (d -> 'counts')::text);
+  begin perform public.coach_erase_person('course', 'zz_course_c', 'zz_course_d', '{}', false);
+    perform pg_temp.rec('erase course: the wrong username as confirmation is refused', false, 'no error');
+  exception when others then perform pg_temp.rec('erase course: the wrong username as confirmation is refused', sqlerrm like '%confirmation does not match%', sqlerrm); end;
+  begin perform public.coach_erase_person('course', 'zz_test_t', 'zz_test_t', '{}', false);
+    perform pg_temp.rec('erase course: a testing-app username is not found among course logins', false, 'no error');
+  exception when others then perform pg_temp.rec('erase course: a testing-app username is not found among course logins', sqlerrm like '%no course login%', sqlerrm); end;
+  r := public.coach_erase_person('course', 'zz_course_c', 'ZZ_COURSE_C', '{}', false);
+  perform pg_temp.rec('erase course: the real run deletes the login, the note and the sign-in account (and its sessions)',
+    (select count(*) from public.tps_accounts where username = 'zz_course_c') = 0
+    and (select count(*) from public.buyer_notes where user_id = '00000000-0000-0000-0000-0000000000f1') = 0
+    and (select count(*) from auth.users where id = '00000000-0000-0000-0000-0000000000f1') = 0
+    and (select count(*) from auth.sessions where user_id = '00000000-0000-0000-0000-0000000000f1') = 0, r::text);
+  perform pg_temp.rec('erase course: another course buyer and their note are untouched',
+    (select count(*) from public.tps_accounts where username = 'zz_course_d') = 1
+    and (select count(*) from public.buyer_notes where user_id = '00000000-0000-0000-0000-0000000000f2') = 1
+    and (select count(*) from auth.users where id = '00000000-0000-0000-0000-0000000000f2') = 1, '');
+  select * into l from public.erasure_log order by id desc limit 1;
+  perform pg_temp.rec('erase course: the receipt hashes "course:zz_course_c" and holds no username or note',
+    l.kind = 'course' and l.subject_hash = encode(sha256(convert_to('course:zz_course_c', 'UTF8')), 'hex')
+    and position('zz_course_c' in l::text) = 0 and position('Course buyer' in l::text) = 0, l::text);
+end $t$;
+
+-- 8. a testing-app buyer: players, notes and results, soft-deleted ones included
+do $t$
+declare fp0 text; d jsonb; r jsonb; l record;
+begin
+  perform pg_temp.coach();
+  fp0 := pg_temp.fingerprint();
+  d := public.coach_erase_person('testing', 'zz_test_t');
+  perform pg_temp.rec('erase testing: the preview counts every player (the removed one too), note and result, and changed nothing',
+    d -> 'counts' = '{"assess_notes":2,"assess_results":3,"assess_players":2,"buyer_notes":1,"assess_accounts":1,"auth_users":1}'::jsonb
+    and d ->> 'shown_as' = 'Academy T' and pg_temp.fingerprint() = fp0, (d -> 'counts')::text);
+  r := public.coach_erase_person('testing', 'zz_test_t', 'zz_test_t', '{}', false);
+  perform pg_temp.rec('erase testing: the real run deletes them all',
+    (select count(*) from public.assess_players where account_id = '00000000-0000-0000-0000-0000000000f3') = 0
+    and (select count(*) from public.assess_notes where account_id = '00000000-0000-0000-0000-0000000000f3') = 0
+    and (select count(*) from public.assess_results where account_id = '00000000-0000-0000-0000-0000000000f3') = 0
+    and (select count(*) from public.assess_accounts where username = 'zz_test_t') = 0
+    and (select count(*) from auth.users where id = '00000000-0000-0000-0000-0000000000f3') = 0, r::text);
+  perform pg_temp.rec('erase testing: another academy''s player, note and result are untouched',
+    (select count(*) from public.assess_players where account_id = '00000000-0000-0000-0000-0000000000f4') = 1
+    and (select count(*) from public.assess_notes where account_id = '00000000-0000-0000-0000-0000000000f4') = 1
+    and (select count(*) from public.assess_results where account_id = '00000000-0000-0000-0000-0000000000f4') = 1, '');
+  select * into l from public.erasure_log order by id desc limit 1;
+  perform pg_temp.rec('erase testing: the receipt holds the counts and no player name',
+    l.kind = 'testing' and (l.counts ->> 'assess_players')::int = 2 and position('Player' in l::text) = 0 and position('Academy' in l::text) = 0, l::text);
+end $t$;
+
+-- 9. the receipts: the coach reads them, nobody changes them
+-- what the project's default privileges hand every new table: the file must take it away again (re-running it is also the idempotence test)
+grant all on table public.erasure_log to anon, authenticated;
+\i supabase/stage54_erase_person.sql
+do $t$
+declare n int; k int;
+begin
+  perform pg_temp.coach();
+  execute 'set local role authenticated';
+  select count(*) into n from public.erasure_log;
+  execute 'reset role';
+  perform pg_temp.rec('erase log: the coach reads the three receipts', n = 3, n::text);
+  perform pg_temp.other();
+  execute 'set local role authenticated';
+  select count(*) into n from public.erasure_log;
+  execute 'reset role';
+  perform pg_temp.rec('erase log: someone who is not the coach reads none', n = 0, n::text);
+  begin
+    execute 'set local role anon';
+    perform count(*) from public.erasure_log;
+    execute 'reset role';
+    perform pg_temp.rec('erase log: anon has no access', false, 'no error');
+  exception when insufficient_privilege then perform pg_temp.rec('erase log: anon has no access', true, sqlerrm); end;
+  perform pg_temp.coach();
+  begin
+    execute 'set local role authenticated';
+    insert into public.erasure_log (kind, subject_hash) values ('athlete', 'forged');
+    execute 'reset role';
+    perform pg_temp.rec('erase log: not even the coach can add a receipt by hand', false, 'no error');
+  exception when insufficient_privilege then perform pg_temp.rec('erase log: not even the coach can add a receipt by hand', true, sqlerrm); end;
+  begin
+    execute 'set local role authenticated';
+    delete from public.erasure_log;
+    execute 'reset role';
+    perform pg_temp.rec('erase log: ...or remove one', false, 'no error');
+  exception when insufficient_privilege then perform pg_temp.rec('erase log: ...or remove one', true, sqlerrm); end;
+  perform pg_temp.rec('erase: the function is closed to anon and open to the signed-in role (the coach check is the real lock)',
+    not has_function_privilege('anon', 'public.coach_erase_person(text,text,text,uuid[],boolean)', 'execute')
+    and has_function_privilege('authenticated', 'public.coach_erase_person(text,text,text,uuid[],boolean)', 'execute'), '');
+end $t$;
+select pg_temp.coach() \g /dev/null
+
+-- ═════════════════════ J. stage55: ending a quest run keeps the XP already earned ═════════════════════
+-- hab_bonus_xp() is loaded twice by the runner: as itself (stage55 patches it) and as zz_bonus_base, the untouched stage24 text the
+-- tests compare with. A run with no "end" must score exactly as before; "end" must stop the run's window there.
+select pg_temp.coach() \g /dev/null
+create function pg_temp.qrules(p_runs jsonb) returns jsonb language sql as $$
+  select jsonb_build_object(
+    'targets', '{"water":8,"steps":10000}'::jsonb, 'weights', '{"water":24,"steps":30}'::jsonb, 'completionBonus', 1.2, 'customXp', 25,
+    'streakQualifyPct', 80, 'tiers', '[]'::jsonb, 'milestones', '[]'::jsonb,
+    'quests', '[{"id":"q_water3","kind":"daysHit:water","need":3,"xp":150},{"id":"q_steps2","kind":"daysHit:steps","need":2,"xp":100},{"id":"q_total","kind":"total:steps","need":25000,"xp":200}]'::jsonb,
+    'questRuns', p_runs) $$;
+-- water on 3-6 Aug; steps over the target on 4 and 5 Aug, and a short day on the 6th (counts towards the total only)
+create function pg_temp.qlog() returns jsonb language sql as $$
+  select '{"2026-08-03":{"water":8},"2026-08-04":{"water":8,"steps":12000},"2026-08-05":{"water":8,"steps":11000},"2026-08-06":{"water":8,"steps":3000}}'::jsonb $$;
+create function pg_temp.bonus(p_runs jsonb) returns bigint language sql as $$
+  select public.hab_bonus_xp(pg_temp.qlog(), '{}'::jsonb, null, null, null, pg_temp.qrules(p_runs)) $$;
+create function pg_temp.bonus_base(p_runs jsonb) returns bigint language sql as $$
+  select public.zz_bonus_base(pg_temp.qlog(), '{}'::jsonb, null, null, null, pg_temp.qrules(p_runs)) $$;
+
+do $t$
+declare ids jsonb := '["q_water3","q_steps2","q_total"]'::jsonb; runs jsonb; n bigint; src text;
+begin
+  -- 1. nothing changes for a run with no end
+  runs := jsonb_build_array(jsonb_build_object('start', '2026-08-03', 'ids', ids));
+  perform pg_temp.rec('quests: a run with no end pays 150 + 100 + 200 (the water and steps quests complete on 5 Aug, the total on 6 Aug)', pg_temp.bonus(runs) = 450, pg_temp.bonus(runs)::text);
+  perform pg_temp.rec('quests: ...exactly what the untouched stage24 function pays', pg_temp.bonus(runs) = pg_temp.bonus_base(runs), pg_temp.bonus_base(runs)::text);
+  runs := jsonb_build_array(jsonb_build_object('start', '2026-08-03', 'ids', ids), jsonb_build_object('start', '2026-08-05', 'ids', '["q_water3"]'::jsonb));
+  perform pg_temp.rec('quests: two runs, the first clipped by the second, pay as before the patch', pg_temp.bonus(runs) = pg_temp.bonus_base(runs), pg_temp.bonus(runs)::text || ' vs ' || pg_temp.bonus_base(runs)::text);
+  perform pg_temp.rec('quests: no runs at all pays nothing, as before', pg_temp.bonus('[]'::jsonb) = 0 and pg_temp.bonus_base('[]'::jsonb) = 0, '');
+
+  -- 2. an end stops the window there
+  runs := jsonb_build_array(jsonb_build_object('start', '2026-08-03', 'ids', ids, 'end', '2026-08-04'));
+  perform pg_temp.rec('quests: ended on 4 Aug, nothing had completed yet, so nothing pays', pg_temp.bonus(runs) = 0, pg_temp.bonus(runs)::text);
+  runs := jsonb_build_array(jsonb_build_object('start', '2026-08-03', 'ids', ids, 'end', '2026-08-05'));
+  perform pg_temp.rec('quests: ended on 5 Aug, the two quests that completed that day keep their XP and the total (6 Aug) never pays', pg_temp.bonus(runs) = 250, pg_temp.bonus(runs)::text);
+  runs := jsonb_build_array(jsonb_build_object('start', '2026-08-03', 'ids', ids, 'end', '2026-08-06'));
+  perform pg_temp.rec('quests: ended on 6 Aug, all three have completed and pay', pg_temp.bonus(runs) = 450, pg_temp.bonus(runs)::text);
+  runs := jsonb_build_array(jsonb_build_object('start', '2026-08-03', 'ids', ids, 'end', '2026-08-30'));
+  perform pg_temp.rec('quests: an end after the natural last day changes nothing', pg_temp.bonus(runs) = 450, pg_temp.bonus(runs)::text);
+  runs := jsonb_build_array(jsonb_build_object('start', '2026-08-03', 'ids', ids, 'end', '2026-08-01'));
+  perform pg_temp.rec('quests: an end before the start leaves an empty window that pays nothing', pg_temp.bonus(runs) = 0, pg_temp.bonus(runs)::text);
+
+  -- 3. a bad end is ignored, not an error
+  perform pg_temp.rec('quests: an end that is not a date is ignored (the run runs its seven days)',
+    pg_temp.bonus(jsonb_build_array(jsonb_build_object('start', '2026-08-03', 'ids', ids, 'end', 'tomorrow'))) = 450
+    and pg_temp.bonus(jsonb_build_array(jsonb_build_object('start', '2026-08-03', 'ids', ids, 'end', null))) = 450
+    and pg_temp.bonus(jsonb_build_array(jsonb_build_object('start', '2026-08-03', 'ids', ids, 'end', 20260805))) = 450, '');
+
+  -- 4. an end inside a clipped run takes the earlier of the two bounds
+  runs := jsonb_build_array(jsonb_build_object('start', '2026-08-03', 'ids', ids, 'end', '2026-08-04'), jsonb_build_object('start', '2026-08-06', 'ids', '["q_water3"]'::jsonb));
+  perform pg_temp.rec('quests: the end and the next run''s start both bound a run: the earlier wins', pg_temp.bonus(runs) = 0, pg_temp.bonus(runs)::text);
+
+  -- 5. the patch: applied once, and re-running the file changes nothing
+  select md5(pg_get_functiondef('public.hab_bonus_xp(jsonb,jsonb,date,date,date,jsonb)'::regprocedure)) into src;
+  perform pg_temp.rec('quests: the scoring function now reads the run''s own end', position('own_end' in pg_get_functiondef('public.hab_bonus_xp(jsonb,jsonb,date,date,date,jsonb)'::regprocedure)) > 0, '');
+  perform set_config('zz.bonus_md5', src, false);
+end $t$;
+\i supabase/stage55_end_quests.sql
+do $t$
+begin
+  perform pg_temp.rec('quests: re-running stage55 leaves the scoring function byte for byte the same',
+    md5(pg_get_functiondef('public.hab_bonus_xp(jsonb,jsonb,date,date,date,jsonb)'::regprocedure)) = current_setting('zz.bonus_md5'), '');
+  perform pg_temp.rec('quests: the function keeps its attributes (immutable, not security definer, bigint)',
+    (select provolatile = 'i' and not prosecdef and prorettype = 'bigint'::regtype from pg_proc where oid = 'public.hab_bonus_xp(jsonb,jsonb,date,date,date,jsonb)'::regprocedure), '');
+end $t$;
+
+-- 6. end_quests()
+insert into public.xp_rules (id, rules) values (1, pg_temp.qrules(jsonb_build_array(
+  jsonb_build_object('start', '2026-07-27', 'ids', '["q_water3"]'::jsonb),
+  jsonb_build_object('start', '2026-08-03', 'ids', '["q_water3","q_steps2"]'::jsonb, 'note', 'kept')))) on conflict (id) do update set rules = excluded.rules;
+do $t$
+declare r jsonb; run jsonb; ts0 timestamptz; ts1 timestamptz;
+begin
+  perform pg_temp.coach();
+  select updated_at into ts0 from public.xp_rules where id = 1;
+  perform pg_sleep(0.02);
+  r := public.end_quests('2026-08-03', '2026-08-05');
+  select updated_at into ts1 from public.xp_rules where id = 1;
+  run := (select x from jsonb_array_elements(r) x where x ->> 'start' = '2026-08-03');
+  perform pg_temp.rec('end_quests: the run gets an end and keeps its ids and every other key', run ->> 'end' = '2026-08-05' and run -> 'ids' = '["q_water3","q_steps2"]'::jsonb and run ->> 'note' = 'kept', run::text);
+  perform pg_temp.rec('end_quests: another run is untouched, and the stored rules are what it returned',
+    (select x from jsonb_array_elements(r) x where x ->> 'start' = '2026-07-27') = '{"start":"2026-07-27","ids":["q_water3"]}'::jsonb
+    and (select rules -> 'questRuns' from public.xp_rules where id = 1) = r and ts1 > ts0, r::text);
+  perform pg_temp.rec('end_quests: the other keys of the rules row (the quest pool, the targets) are untouched', (select rules -> 'quests' from public.xp_rules where id = 1) = pg_temp.qrules('[]'::jsonb) -> 'quests'
+    and (select rules -> 'targets' from public.xp_rules where id = 1) = '{"water":8,"steps":10000}'::jsonb, '');
+  r := public.end_quests('2026-08-03', '2026-09-30');
+  perform pg_temp.rec('end_quests: an end after the seventh day is capped at the seventh day', (select x ->> 'end' from jsonb_array_elements(r) x where x ->> 'start' = '2026-08-03') = '2026-08-09', r::text);
+  r := public.end_quests('2026-08-03', '2026-08-02');
+  perform pg_temp.rec('end_quests: an end before the start (a run that had not begun) removes the run: nothing was earned in it',
+    not exists (select 1 from jsonb_array_elements(r) x where x ->> 'start' = '2026-08-03') and jsonb_array_length(r) = 1, r::text);
+  begin perform public.end_quests('2026-08-03', '2026-08-05');
+    perform pg_temp.rec('end_quests: a start with no run is refused', false, 'no error');
+  exception when others then perform pg_temp.rec('end_quests: a start with no run is refused', sqlerrm like '%no quest run starts on 2026-08-03%', sqlerrm); end;
+  begin perform public.end_quests(null, '2026-08-05');
+    perform pg_temp.rec('end_quests: a null start is refused', false, 'no error');
+  exception when others then perform pg_temp.rec('end_quests: a null start is refused', sqlerrm like '%start day%', sqlerrm); end;
+  perform pg_temp.other();
+  begin perform public.end_quests('2026-07-27', '2026-07-29');
+    perform pg_temp.rec('end_quests: only the coach', false, 'no error');
+  exception when others then perform pg_temp.rec('end_quests: only the coach', sqlerrm like '%coach only%', sqlerrm); end;
+  perform pg_temp.nobody();
+  begin
+    execute 'set local role anon';
+    perform public.end_quests('2026-07-27', '2026-07-29');
+    execute 'reset role';
+    perform pg_temp.rec('end_quests: anon cannot even call it', false, 'no error');
+  exception when insufficient_privilege then perform pg_temp.rec('end_quests: anon cannot even call it', true, sqlerrm); end;
+  perform pg_temp.coach();
+  perform pg_temp.rec('end_quests: the stored run now scores what the dashboard promised: an ended run keeps what was earned',
+    public.hab_bonus_xp(pg_temp.qlog(), '{}'::jsonb, null, null, null, (select rules from public.xp_rules where id = 1)) is not null, '');
+end $t$;
 
 -- ═════════════════════ report ═════════════════════
 select count(*) filter (where ok) as passed, count(*) filter (where not ok) as failed, (count(*) filter (where not ok) > 0) as anyfail from t_res \gset

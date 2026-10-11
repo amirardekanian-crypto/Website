@@ -59,7 +59,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-10: 47 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 55 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -73,10 +73,19 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | auth-SIGNED_IN-forms | Spine editor / coach line / affiliate form with typed text | Spine editor stayed open with old text; others wiped |
 | note-mark-read | Mark read | ok |
 | coach-line-utc / coach-line-tehran-0130 | post + take down the coach line | no p_day; 00:00–03:30 Tehran overwrote yesterday's line |
-| wall-hide, quest-week, intake-status, affiliates, spine-approve, login-create, session-import-delete | the other writes | ok (login-create now checks the in-place password card) |
+| wall-hide, intake-status, affiliates, spine-approve, login-create, session-import-delete | the other writes | ok (login-create now checks the in-place password card) |
+| quest-week | start a quest week, then End this run today | (2026-10-11, stage55) the button was *Cancel* and called `clear_quests`, which took the XP back from everyone; it now calls `end_quests(start, today)`, the run stays with an `end` day, the panel says *ended early* |
+| quest-week-end-fails | End this run when stage55 is not applied | must name the missing file, change nothing and never fall back to `clear_quests` |
 | backlog-clear | Clear older notes | now: one update per counted note, by key |
 | backlog-late-note | a 30-day-old session whose note arrived today; a note trained 12 days ago but delivered today beside yesterday's | filed by training day: skipped Needs you and went into *older notes* (second session; failed 10 checks on the old code) |
-| calllog-delete | delete a call log | the deleted log stayed listed |
+| calllog-delete | the Calls tab is retired (2026-10-11): old call logs are read and deleted in File → Old call logs; no Calls tab, no New call log, no Copy cycle prompt; the section disappears when none is left | the deleted log stayed listed |
+| calls-old-link | an old `#a/<id>/calls` link | must open the athlete on a screen that exists |
+| load-partial | a session in the last 4 weeks with no duration or RPE, then two, then filled in, then an old one | (TODAY-6) it counted as zero and the ratio swung; now the ratio is left out and the pill says *not enough data* until they are filled in |
+| erase-athlete | File → Danger zone → Erase completely…: the dry run, the typed id, two intake forms (same email ticked, same name not), one real call | (stage54) no way to erase a person from the page |
+| erase-guards | wrong id + Enter, Cancel, leaving the page with the panel open, the board identity | a wrong id must call nothing; the panel never follows the coach to another screen |
+| erase-fails | stage54 missing, a refusal, a server error, a lapsed sign-in, an answer that never arrives | the words must fit the cause; "never arrived" must not claim nothing was erased |
+| erase-buyers | Course and Testing lists: the note comes from `buyer_notes`; Erase… on a course buyer and on a testing-app buyer (players, notes, results) | (stage53/54) the buyer could read the note; buyers could not be erased |
+| buyer-notes-fallback | `buyer_notes` unreadable (stage53 not applied) | the old label shows and nothing breaks |
 | version-restore | Restore a version, then The work | showed the pre-restore programme |
 | program-file-publish | ↑ Publish programme file (in Coach tools), then the athlete page; a NEW athlete | showed the old cycle; a new athlete was missing until Refresh |
 | backup-basic | every table, every row; passwords | unsent initial passwords were in the file |
@@ -100,7 +109,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | session-import-replace | Add past session over one on the same date | the old set-by-set log stayed under the email's text |
 | session-import-checkin | Add past session from an email with the `Today: lower day … · sore: …` check-in line, and one without | the line was never read: no verdict on an imported session (second session) |
 | login-used-mark | Logins to send after the person signed in | every stored password looked unsent |
-| calls-load-fail | call logs fail to load | the Calls tab said "No call logs yet" |
+| calls-load-fail | call logs fail to load | the File tab must name the failure (the Calls tab used to say "No call logs yet") |
 | route-unknown-sub | `#a/<id>/<unknown>` | "No athlete in the store" |
 
 ## Adding a scenario

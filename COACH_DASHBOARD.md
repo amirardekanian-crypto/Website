@@ -303,14 +303,18 @@ check-in; nothing here recomputes it. `dayTargetC()` is the twin of `dayRpe()` i
 ### Quest week
 
 The lever, not just the readout. If a run is live you see its quests, the XP each
-pays and which day of seven it's on, with **Cancel this run**. If none is live
+pays and which day of seven it's on, with **End this run today**. If none is live
 you get the pool as checkboxes — pick one to four, **Start the week**, and it
-runs seven days from today via `set_quests()`. Cancelling calls `clear_quests()`.
-⚠ **Cancelling takes back the XP** everyone already earned from that run: both scorers work quest
-XP out from the run each time (`hab_bonus_xp()` and `habits.html`), so a removed run pays nothing.
-Starting the same run again (same start day, same quests) brings it back. (Until 2026-10-10 the
-dialog promised the opposite. An "end the run but keep the XP" option would change both scorers:
-Amir's call.)
+runs seven days from today via `set_quests()`.
+**Ending a run keeps what was earned** (stage55, Amir 2026-10-11: *"yes, they keep it"*). The button calls
+`end_quests(start, today)`, which keeps the run and gives it an `end` day: from the day after it is no
+longer live (its quests are not offered), a quest completed on or before that day keeps paying, one not
+completed by then never pays. Both scorers read the `end` (`hab_bonus_xp()`'s `qruns` CTE and `runEndKey()` in
+`habits.html`; `scripts/test_quest_runs.js` and `scripts/test_spine_sql.sh` section J keep them in step). The
+panel then says *ended early* and the picker returns the next day. The button never falls back to
+`clear_quests()` when stage55 is not applied (it says so instead): `clear_quests()` is the call that takes the
+XP back, now only from the SQL editor (`QUESTS.md`). Until 2026-10-11 the button was *Cancel this run* and did
+take the XP back from everyone (the dialog had promised the opposite until 2026-10-10).
 
 ### Proof pulse
 
@@ -366,12 +370,12 @@ login for a new password. (The secret-link tools are gone: the links were retire
 **Rebuilt 2026-08-22.** It used to be eight sections on one scroll, three of which drew the same
 program days three different ways — *Prescribed program*, *Training logs by day* and *Live activity* —
 hundreds of pixels apart. Answering "did she do what I asked?" meant reading the chips in one section,
-scrolling to another, and holding the numbers in your head. Now it's **four sub-tabs** (five until
-Chat went, 2026-09-26), and the first
+scrolling to another, and holding the numbers in your head. Now it's **three sub-tabs** (five until
+Chat went, 2026-09-26, and four until the call log was retired, 2026-10-11), and the first
 one answers that question directly.
 
-The sub-tab lives in the URL (`#a/<id>/work`, `/proof`, `/calls`, `/file`), so any screen
-can be bookmarked. Plain `#a/<id>` (or an old `/chat` bookmark) opens **The work**, or **Proof** for
+The sub-tab lives in the URL (`#a/<id>/work`, `/proof`, `/file`), so any screen
+can be bookmarked. Plain `#a/<id>` (or an old `/chat` or `/calls` bookmark) opens **The work**, or **Proof** for
 a habit-only athlete with no training days. Opening someone else while a file is still loading
 never paints the first person's file under the second person's address (it could until 2026-10-10).
 A save or a refresh keeps the days you had open, the session you were comparing and anything typed
@@ -477,25 +481,29 @@ Read-only. The athlete owns the record: they log a max from **Personal Records �
 their app, and they can delete any entry. A lift they have renamed between cycles reads as one lift
 here and one lift there — both sides run the same name matcher, on purpose.
 
-### Proof · Calls · File
+### Proof · File (and the retired Calls)
 
 - **Proof** (only for people who log habits) — server-scored level, 14 presence dots, their week,
   board name and worn title, WhatsApp and email, and their wall lines with hide/show on each.
 - ~~**Chat**~~ — **removed 2026-09-26** (Amir: *"whatsapp first, remove in app chat from app and
   coach.html"*). The `messages` table and its three functions stay on the server untouched, so no
   past thread is lost; nothing reads or writes them now.
-- **Calls** — every `call_logs` row, **+ New call log**, and **Copy cycle prompt** (bundles a cycle's
-  check-ins and sessions into a ready-to-paste report prompt).
+- ~~**Calls**~~ — **retired 2026-10-11** (Amir: *"Retired, fold it into File"*; one call log in the table, from
+  12 July, and `/cycle-report` does the end-of-cycle review). The tab, **+ New call log** and **Copy cycle
+  prompt** are gone. The old logs stay readable, and deletable one by one, in the File tab under **Old call
+  logs** (the section is absent when there are none). An old `#a/<id>/calls` link opens the athlete on The
+  work. `call-log.html` and `CALL_LOG.md` still exist but nothing in the dashboard links to them.
 - **File** — *View their app* / *View their Proof* (read-only previews), the **login** (create,
   change password, remove; an unsent password shows here with Copy message, WhatsApp when the
   number is known, and Mark sent), the programme row (tier, days/week, which cycle of the roadmap,
-  when it was last saved and by whom, Version history), the coaching log, and **Delete training
-  history**: every finished session plus what the app keeps for them on the server (habit log, body
+  when it was last saved and by whom, Version history), the coaching log, **Old call logs** and the
+  **Danger zone**, which has **Delete training history**: every finished session plus what the app keeps for them on the server (habit log, body
   weight, personal records). Their programme, login, coaching log, calls and wall lines stay, and so
   do they on the roster. (It was called *Delete all data* until 2026-10-10, which it never was.) It is
   one call, `coach_delete_training_history()` (stage48): the sessions and the progress snapshot go
   together or not at all, and the counts come back. It used to be two deletes from this page, and a
-  failure between them left one gone and one standing.
+  failure between them left one gone and one standing. Under it, **Erase completely…** removes the whole
+  person (see *Erasing a person* below).
 - **Backfill** (The work, bottom): *+ Add past session from email* now checks the email's Athlete
   line against this athlete, starts with no date (it used to default to today), and warns before it
   replaces a session logged on the same date (the email's session replaces it, set-by-set log
@@ -528,8 +536,11 @@ average; **ACWR = acute ÷ chronic**.
 Shows **"Building baseline"** until there are ~2 weeks of data, because the
 ratio is meaningless before that. Between 2 and 4 weeks of history, the weekly average is taken over
 the weeks that actually have history (it was always divided by 4, which made every new athlete read
-a false *High load* of about 1.7 for a week). A session with no duration or no session RPE counts as
-zero; the load card says how many of the last 4 weeks' sessions are like that. On the roster a
+a false *High load* of about 1.7 for a week). **A session in the last 4 weeks with no duration or no session
+RPE is left out, and while any exist the ratio is not shown at all** (Amir, 2026-10-11: *"skip and grey out"*;
+it used to count them as zero, which made the ratio wrong in a direction nobody could tell). The pill says
+*not enough data*, the card says how many sessions are missing, and the weekly bars still use the sessions that do have a
+load. It comes back when those are filled in or are more than 4 weeks old. On the roster a
 **load** pill appears only for a spike (above 1.3), in words.
 
 ### Readiness
@@ -583,6 +594,47 @@ not a full erasure: their login still works, so a phone they still use can uploa
 takes an item off every athlete's app at once (the file and its web page stay); **Publish** puts it
 back. **Testing app** and **Course** list buyer logins; a failed load says so with *↻ Try again*
 instead of "No logins yet", and *Mark sent* asks first (it clears the only stored copy of the password).
+The **private note** typed when a login is made lives in `buyer_notes`, which only the coach can read (stage53, Amir
+2026-10-11): it used to be the account row's `label`, which the buyer could read through their own account. A trigger
+moves any label the Edge Functions still write into `buyer_notes` and leaves the row's label empty, so the Edge
+Functions did not change; the lists read the note from `buyer_notes` and fall back to the old column while stage53
+is not applied. Each buyer row has **Erase…**.
+
+### Erasing a person
+
+One panel, three kinds of person (stage54, Amir 2026-10-11: *"both athletes and buyers"*): an athlete (File →
+Danger zone → **Erase completely…**), a course buyer or a testing-app buyer (**Erase…** on the row). It opens by
+asking the server for a **dry run** of `coach_erase_person(kind, key, confirm, intake_ids, dry_run)`: the function
+does exactly the work of a real erasure and then undoes it, so the list shown (rows per table, the sign-in
+account) is what a real run would delete. Nothing is erased until the id (athlete) or username (buyer) is typed;
+the button stays disabled until it matches, in any case. It is an inline panel, not a native dialog, because the
+list is long and a phone clips a dialog.
+
+- **What goes, one transaction:** every table that holds the athlete's id (sessions, app data, roll-call lines,
+  titles, season results, board place, library sessions, old messages, call logs, cycle reports, coaching log and
+  its earlier texts, the programme and its saved versions, old keys, the Proof contact, the login) and the
+  sign-in account itself, whose sessions and tokens go with it, so their phone cannot upload again. For a
+  testing-app buyer: the login, the note, every player, note and result including the ones they had removed.
+- **Intake forms:** the ones that carry the person's email, or their full name, are listed with a tick box. The
+  same-email ones start ticked, the same-name ones do not (two people can share a name). A form that does not match
+  cannot be added; the server checks.
+- **What stays, and the panel says so:** your weekly backup files (the privacy notice promises a deleted record
+  leaves them within about three months), emails in your inbox (Web3Forms), WhatsApp, anything on their own phone,
+  and **an affiliate partner record** (Amir, 2026-10-11): an athlete who is also a partner keeps the record on the
+  Affiliates tab; only its link to the athlete is cleared.
+- **Never erased:** the public demo, the identity the dashboard reads the board through (`amir_ardekani`), a login
+  that is the coach's own, a login shared by two accounts (an athlete who is also a buyer). Each raises, and the
+  Erase button is not even drawn for the first two.
+- **Fail-closed:** after the deletes the function checks every table in the public schema that has an `athlete_id`
+  column; one that still holds a row (a table added after stage54) undoes the whole erasure and names the table.
+  Add the table to the function's list the day you create it.
+- **The receipt** (`erasure_log`, in the backup): the date, the kind, the counts and a SHA-256 of
+  `kind:id` (athlete id or username, lower case). No name, id or email is stored. To ask "did I erase X?", hash
+  `athlete:x` and look it up. After restoring an old backup, hash every restored id the same way to find the people to
+  erase again.
+- **Failure words:** a database error means the transaction rolled back (*Nothing was erased*); no database code
+  means the answer never arrived, and the panel says it cannot tell and how to find out (open Erase for them again;
+  *nothing is stored* means it went through).
 
 ---
 
@@ -632,6 +684,8 @@ it in this file.
 | `hab_intake` via `intake_list()` | The Intake tab |
 | `affiliates` | The Affiliates tab |
 | `assess_accounts`, `tps_accounts` | The Testing app and Course tabs (loaded when opened) |
+| `buyer_notes` | The private note beside each buyer in those two tabs (stage53); coach-only |
+| `erasure_log` | Receipts of full erasures (stage54); only the backup reads it |
 
 `data/<id>.json` is no longer read at all (2026-10-10): it has not been served since 2026-09-07, and
 the dashboard used to fall back to it for any id without a programme row. Growing tables are read
@@ -659,7 +713,7 @@ session" window (TWIN-6) and the loose retest flag (TWIN-7) are known difference
 header. A new copy of an app rule in coach.html goes into the script the same day.
 
 Some coach writes go through RPCs that check the coach themselves (`set_coach_note`, `hide_note`,
-`set_quests`, `clear_quests`, `forget_contact`, `save_session`, `coach_season_levels`, and since stage48
-`coach_delete_training_history` and `coach_save_spine`, each one transaction); the rest are
+`set_quests`, `end_quests` (stage55), `clear_quests`, `forget_contact`, `save_session`, `coach_season_levels`, and since stage48
+`coach_delete_training_history` and `coach_save_spine`, and since stage54 `coach_erase_person`, each one transaction); the rest are
 direct table writes that only the coach's RLS policies let through. Every one of them asks for its
 rows back, so a write RLS silently refused (a lapsed sign-in) says so instead of reporting success.

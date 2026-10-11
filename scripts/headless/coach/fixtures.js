@@ -133,7 +133,15 @@ function buildSeed(opt) {
     tps_content: [{ key: 'fixture', body: { fixture: true }, version: 'v1', updated_at: iso(today, 9) }],
     course_en: [{ id: 'fixture', kind: 'lesson', sort: 1, body: { fixture: true }, updated_at: iso(today, 9) }],
     tps_accounts: [{ user_id: 'u-tps-1', username: 'fixture_buyer', label: 'Fixture', created_at: iso(today, 3), initial_password: 'fixture-unsent-pw-2', password_set_at: iso(today, 3), sent_at: null, revoked_at: null }],
-    assess_content: [], assess_accounts: [],
+    assess_content: [],
+    // The testing-app buyer the fixture players below belong to. The note about each buyer is in buyer_notes (stage53), so the account
+    // rows carry the OLD label only for 'fixture_buyer' (to show buyer_notes wins, and the label is the fallback when it cannot be read).
+    assess_accounts: [{ user_id: 'u-assess-1', username: 'fixture_academy', label: null, created_at: iso(today, 12), initial_password: null, password_set_at: iso(today, 12), sent_at: iso(today, 11), revoked_at: null }],
+    buyer_notes: [
+      { user_id: 'u-tps-1', app: 'course', note: 'Fixture note about a course buyer', updated_at: iso(today, 3) },
+      { user_id: 'u-assess-1', app: 'testing', note: 'Fixture academy note', updated_at: iso(today, 12) },
+    ],
+    erasure_log: [],
     // a testing-app buyer's players, notes and results (made up). The coach reads them since stage50, for the backup only.
     assess_players: [
       { id: 'p-0001', account_id: 'u-assess-1', name: 'Fixture Player One', birth_year: 2012, birth_month: 4, sex: 'f', hand: 'r', squad: 'U14', created_at: iso(today, 20), updated_at: iso(today, 5), deleted_at: null },

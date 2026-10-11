@@ -579,6 +579,17 @@
     border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); }
   .pwin:focus { border-color: var(--court); }
   .pwhint { flex-basis: 100%; font-size: 12px; color: var(--muted); margin: 0; }
+  /* Full erasure (stage54): an inline panel, like the password forms, because the list is long and a phone clips a native dialog. */
+  .erase { border: 1px solid var(--clay); border-radius: 14px; padding: 14px 16px; margin: 12px 0 4px; background: #fff; }
+  .erase .eh { font-weight: 700; font-size: 15px; margin: 0 0 6px; }
+  .erase p { margin: 8px 0; font-size: 13.5px; line-height: 1.5; }
+  .erase ul { margin: 6px 0 10px; padding-left: 20px; font-size: 13.5px; line-height: 1.6; columns: 2; column-gap: 28px; }
+  .erase .pick { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; padding: 4px 0; line-height: 1.45; }
+  .erase .pick input { margin-top: 3px; }
+  .erase .stays { color: var(--muted); font-size: 13px; }
+  .erase .typed { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  .erase .typed label { flex-basis: 100%; font-size: 13.5px; }
+  @media (max-width: 640px) { .erase ul { columns: 1; } }
   .cmp-did { font-family: 'Space Mono', monospace; font-size: 12.5px; line-height: 1.5; }
   .cmp-did > span { display: inline-block; margin-right: 8px; }
   .did-sets.ok { color: var(--court); } .did-sets.warn { color: var(--ochre); } .did-sets.miss { color: var(--clay-ink); }
@@ -886,7 +897,7 @@ const TABLE_KEYS = {
   library_categories: ['kind', 'id'], library_sessions: ['athlete_id', 'slug', 'completed_on'],
   assess_results: ['player_id', 'test', 'day'], affiliates: ['code'], assess_accounts: ['user_id'],
   assess_content: ['key'], tps_content: ['key'], tps_accounts: ['user_id'], athlete_identities: ['user_id'],
-  library: ['slug'],
+  library: ['slug'], buyer_notes: ['user_id'],
 };
 function keysOf(table) {
   return TABLE_KEYS[table] || (['programs', 'athlete_progress', 'coaching_logs', 'hab_contacts', 'leaderboard_optin', 'athlete_keys']
@@ -1410,6 +1421,9 @@ window.bulkCreateLogins = bulkCreateLogins;
 // hab_season_results got its SELECT grant in stage46 (2026-10-10); coaching_log_versions (stage47)
 // is every earlier text of a coaching log, kept by a trigger. spine_versions (stage49) is the same for the
 // Spine: every row of exercises, exercise_coach and qualities as it was before a change, deletes included.
+// 2026-10-11: buyer_notes (stage53) is the private note about each buyer, moved out of the buyer's reach; erasure_log
+// (stage54) is the receipt of every full erasure (a hash, the counts, no personal data). A restore from an old backup
+// brings erased people back: hash each restored id and check it against the receipts (stage54's header says how).
 const BACKUP_TABLES = [
   'programs', 'program_versions', 'coaching_logs', 'athlete_identities',
   'athlete_progress', 'session_history', 'messages', 'hab_notes', 'hab_contacts',
@@ -1420,6 +1434,7 @@ const BACKUP_TABLES = [
   'tps_content', 'course_en', 'tps_accounts', 'assess_content', 'assess_accounts',
   'assess_players', 'assess_notes', 'assess_results',
   'exercises', 'exercise_coach', 'qualities', 'coaching_log_versions', 'spine_versions',
+  'buyer_notes', 'erasure_log',
 ];
 
 const PASSWORD_TABLES = ['athlete_identities', 'tps_accounts', 'assess_accounts'];
@@ -2053,9 +2068,14 @@ function seasonDay() {
 // --- quest helpers ----------------------------------------------------------
 function questPool() { return (S.rules && S.rules.quests) || []; }
 function questRuns() { return (S.rules && S.rules.questRuns) || []; }
+// A run's last live day: its seventh, or the day the coach ENDED it (end_quests(), stage55: what was earned keeps counting).
+function questRunEnd(r) {
+  const nat = addDays(r.start, 6);
+  return (typeof r.end === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.end) && r.end < nat) ? r.end : nat;
+}
 function activeQuestRun() {
   const t = todayKey();
-  const runs = questRuns().filter(r => r.start <= t && t <= addDays(r.start, 6));
+  const runs = questRuns().filter(r => r.start <= t && t <= questRunEnd(r));
   return runs.length ? runs[runs.length - 1] : null;
 }
 function questById(id) { return questPool().find(q => q.id === id) || { id, note: id, xp: '' }; }
@@ -2158,6 +2178,7 @@ function render() {
   else if (r.view === 'exercises') renderExercises();
 }
 window.addEventListener('hashchange', ev => {
+  if (_erase && _erase.status !== 'busy') _erase = null;   // an open Erase panel never follows the coach to another screen
   // Leaving the Exercises tab with typed, unsaved work asks first, and stays put on a no.
   if (/#exercises$/.test(ev.oldURL || '') && route().view !== 'exercises' && !spineMayLeave('Leave the Exercises tab')) {
     history.replaceState(null, '', ev.oldURL); renderRail(); return;
@@ -2390,16 +2411,19 @@ window.clearNoteBacklog = clearNoteBacklog;
 function questPanelHtml(run) {
   if (run) {
     const dayN = daysBetween(run.start, todayKey()) + 1;
-    const ends = addDays(run.start, 6);
+    const ends = questRunEnd(run), endedEarly = ends < addDays(run.start, 6);
     return `
-      <div class="phead"><span class="t hd">Quest week</span><span class="r">ends ${esc(prettyDate(ends))}</span></div>
+      <div class="phead"><span class="t hd">Quest week</span><span class="r">${endedEarly ? 'ended early · last day ' : 'ends '}${esc(prettyDate(ends))}</span></div>
       <div class="questrun">
         <div class="qtop"><span class="eyebrow">Live run</span><span class="qday">Day ${dayN}/7</span></div>
         ${run.ids.map(id => { const q = questById(id); return `
           <div class="qchip"><span class="qn">${esc(q.title || q.id)}</span><span class="qd">${esc(q.note || '')}</span><span class="qx">+${esc(q.xp)} XP</span></div>`; }).join('')}
       </div>
       <div class="note-actions">
-        <button class="btn sm danger" onclick="cancelQuestRun(${jsq(run.start)})">Cancel this run</button>
+        ${endedEarly
+          ? `<span class="muted" style="font-size:12px">Ended. The quests stop after ${esc(prettyDate(ends))} and everyone keeps the XP they already earned. A new week can start tomorrow.</span>`
+          : `<button class="btn sm danger" onclick="endQuestRun(${jsq(run.start)})">End this run today</button>
+        <span class="muted" style="font-size:12px">everyone keeps the XP they already earned</span>`}
       </div>`;
   }
   const pool = questPool();
@@ -2437,17 +2461,23 @@ async function startQuestRun() {
   toast('Quest week live');
   refetch(['rules']);
 }
-async function cancelQuestRun(start) {
+// Ending a run keeps it (with an end day) instead of removing it, so nobody loses XP they already earned (stage55, Amir 2026-10-11:
+// "cancelling a quest week keeps the XP already earned"). The old Cancel called clear_quests(), which took that XP back from everyone who
+// had completed a quest, on the board and in the app. clear_quests() is still in the SQL editor for taking a run's XP back on purpose.
+async function endQuestRun(start) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!confirm('Cancel this quest run?\n\nThe run disappears from the app AND everyone who already completed one of its quests loses that XP, on the board and in the app: both scorers work the quest XP out from the run each time.\n\nStarting the same run again (same start day, same quests) brings the XP back.')) return;
-  const { error } = await sb.rpc('clear_quests', { p_start: start });
-  if (error) { alert('Could not cancel: ' + error.message); return; }
-  toast('Run cancelled');
+  if (!confirm('End this quest run today?\n\nThe quests stop being offered from tomorrow. Everyone keeps the XP they already earned from it, on the board and in the app; a quest nobody has completed by tonight never pays.\n\n(To take the XP back instead, clear the run in the SQL editor: QUESTS.md says how.)')) return;
+  const { error } = await sb.rpc('end_quests', { p_start: start, p_end: todayKey() });
+  if (error) {
+    // Never fall back to clear_quests: that is the call that takes the XP back.
+    alert('Could not end the run: ' + (/Could not find the function|PGRST202/i.test((error.message || '') + (error.code || ''))
+      ? 'the server does not have end_quests yet (supabase/stage55_end_quests.sql has not been run).' : error.message) + '\n\nNothing was changed.');
+    return;
+  }
+  toast('Run ended — everyone keeps what they earned');
   refetch(['rules']);
 }
-window.questPickCount = questPickCount;
-window.startQuestRun = startQuestRun;
-window.cancelQuestRun = cancelQuestRun;
+window.endQuestRun = endQuestRun;
 
 // Proof pulse: the whole habit crew, most-silent first, 7 presence dots each.
 function pulsePanelHtml(habAthletes) {
@@ -2582,7 +2612,12 @@ function athleteMetrics(sessions, lastActive, daysPerWeek) {
   const byRecent = sessions.slice().sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on)));
   const lastPartial = byRecent.length ? isPartialStatus(byRecent[0].status) : false;
   const latestRd = byRecentFirst(sessions).map(s => jparse(s.readiness)).find(x => x && !x.skipped && (x.level || x.composite != null));
-  return { daily, acwr: computeAcwr(daily), cover: loadCoverage(sessions), rser, readiness: readinessStats(rser),
+  const cover = loadCoverage(sessions), acwr = computeAcwr(daily);
+  // A session in the last 4 weeks with no duration or no session RPE has no load to add, so the ratio would be wrong in a direction
+  // nobody can tell. While any exist the ratio is not shown at all: "not enough data" (Amir, 2026-10-11: skip them and grey out the
+  // ratio, no invented figures). The bars and totals still use the sessions that do have a load.
+  if (cover.total > cover.withLoad) { acwr.enough = false; acwr.partial = true; }
+  return { daily, acwr, cover, rser, readiness: readinessStats(rser),
            latestPlan: latestRd && latestRd.level ? latestRd : null,
            adherence: adherence(sessions, daysPerWeek), loadPts, lastPartial,
            daysIdle: daysSince(lastActive), neverActive: !lastActive && !sessions.length };
@@ -2634,11 +2669,14 @@ function renderCharts(m) {
     ${m.acwr.enough && m.acwr.ratio != null
       ? `<div class="chart-big" style="color:${azColor}">${round1(m.acwr.ratio)}<span style="font-size:13px;color:var(--muted);margin-left:6px">ACWR · ${az.label}</span></div>
          <div class="chart-sub">${Math.round(m.acwr.acute)} AU this week vs ${Math.round(m.acwr.chronicWeekly)} AU weekly average${m.acwr.spanDays < 27 ? ` (over ${Math.min(m.acwr.spanDays + 1, 28)} days of history)` : ''}</div>`
-      : `<div class="chart-big" style="font-size:17px;color:var(--muted)">Building baseline</div>
-         <div class="chart-sub">Needs ~2 weeks of sessions with a duration logged.</div>`}
+      : m.acwr.partial
+        ? `<div class="chart-big" style="font-size:17px;color:var(--muted)">Not enough data</div>
+           <div class="chart-sub">${m.cover.total - m.cover.withLoad} of ${m.cover.total} session${m.cover.total === 1 ? '' : 's'} in the last 4 weeks ${m.cover.total - m.cover.withLoad === 1 ? 'has' : 'have'} no duration or RPE, so a ratio would be a wrong number. ${m.cover.total - m.cover.withLoad === 1 ? 'It is' : 'They are'} left out. The ratio comes back when ${m.cover.total - m.cover.withLoad === 1 ? 'it is' : 'those are'} filled in, or once ${m.cover.total - m.cover.withLoad === 1 ? 'it is' : 'they are'} more than 4 weeks old.</div>`
+        : `<div class="chart-big" style="font-size:17px;color:var(--muted)">Building baseline</div>
+           <div class="chart-sub">Needs ~2 weeks of sessions with a duration logged.</div>`}
     ${hasLoad
       ? barsSVG(weeklyLoad(m.daily, 8), C.green) + `<div class="chart-legend">Weekly load (AU = session RPE × minutes), last 8 weeks${
-          m.cover && m.cover.total > m.cover.withLoad ? ` · <b>${m.cover.total - m.cover.withLoad} of ${m.cover.total} sessions in the last 4 weeks have no duration or RPE and count as zero</b>` : ''}</div>`
+          m.cover && m.cover.total > m.cover.withLoad ? ` · <b>${m.cover.total - m.cover.withLoad} of ${m.cover.total} sessions in the last 4 weeks have no duration or RPE and are left out</b>` : ''}</div>`
       : `<p class="empty">No load data yet — needs sessions with a logged duration.</p>`}
   </div>`;
   const r = m.readiness;
@@ -3727,7 +3765,7 @@ function metricStripHtml(m) {
     `<div class="mp ${tone || ''}"><div class="mp-l">${label}</div><div class="mp-v">${val}</div><div class="mp-s">${sub}</div></div>`;
   return `<div class="mstrip">
     ${pill('Training load', m.acwr.enough && m.acwr.ratio != null ? round1(m.acwr.ratio) : '—',
-           m.acwr.enough && m.acwr.ratio != null ? 'ACWR · ' + az.label : 'building baseline', az.cls)}
+           m.acwr.enough && m.acwr.ratio != null ? 'ACWR · ' + az.label : m.acwr.partial ? 'not enough data' : 'building baseline', az.cls)}
     ${m._readyPill ? pill('Readiness', m._readyPill.val, m._readyPill.sub, m._readyPill.tone)
       : pill('Readiness', r ? round1(r.latest) + '<small>/5</small>' : '—',
            r ? (r.delta >= 0 ? '+' : '') + round1(r.delta) + ' vs their usual' : 'no check-ins yet', rTone)}
@@ -3788,12 +3826,11 @@ function liveSnapshotHtml(D) {
 // One person, five screens. It used to be eight sections on a single scroll —
 // three of which rendered the same program days three different ways — so the
 // page opened at four thousand pixels and buried the only thing worth reading.
-let _detailName = '', _detailHistory = [], _detailCallLogs = [], _D = null;
+let _detailName = '', _detailHistory = [], _D = null;
 const _callErr = {};   // athlete id -> why their call logs did not load (cleared when they do)
 const SUBTABS = [
   { id: 'work',  label: 'The work' },
   { id: 'proof', label: 'Proof' },
-  { id: 'calls', label: 'Calls' },
   { id: 'file',  label: 'File' },
 ];
 
@@ -3839,9 +3876,9 @@ async function renderDetail(athleteId, sub) {
     // A rebuild of the SAME athlete (after a save or a refresh) keeps the days the coach had
     // open and the session they were comparing; only a different athlete starts fresh.
     if (!sameAthlete) { _workSel = {}; _workOpen = {}; Object.keys(_exDrafts).forEach(k => delete _exDrafts[k]); }
-    _detailName = a.name; _detailHistory = history; _detailCallLogs = _D.callLogs;
+    _detailName = a.name; _detailHistory = history;
   }
-  const has = { proof: !!(a.isHab || a.contact), calls: true, work: true, file: true };
+  const has = { proof: !!(a.isHab || a.contact), work: true, file: true };
   // With no screen named in the address, a habit-only athlete (free or Proof, no training days)
   // opens on Proof, where their facts are; everyone else on The work.
   const noTraining = !_D.programDays.length && !_D.history.length;
@@ -3867,9 +3904,8 @@ async function renderDetail(athleteId, sub) {
       </div>
     </div>
     <div class="subrail">${SUBTABS.filter(t => has[t.id]).map(t => {
-        const n = t.id === 'work' ? a.needReplyRecent.length
-                : t.id === 'calls' ? _D.callLogs.length : 0;
-        return `<a class="stab ${_D.sub === t.id ? 'active' : ''}"${_D.sub === t.id ? ' aria-current="page"' : ''} href="#a/${encodeURIComponent(athleteId)}/${t.id}">${t.label}${n ? `<span class="n ${t.id === 'calls' ? 'quiet' : ''}">${n}</span>` : ''}</a>`;
+        const n = t.id === 'work' ? a.needReplyRecent.length : 0;
+        return `<a class="stab ${_D.sub === t.id ? 'active' : ''}"${_D.sub === t.id ? ' aria-current="page"' : ''} href="#a/${encodeURIComponent(athleteId)}/${t.id}">${t.label}${n ? `<span class="n">${n}</span>` : ''}</a>`;
       }).join('')}</div>
     <div id="tabbody"></div>`;
   renderDetailBody();
@@ -3888,7 +3924,6 @@ function renderDetailBody() {
   const D = _D;
   if (D.sub === 'work') { box.innerHTML = workTabHtml(D); restoreExDrafts(); }
   else if (D.sub === 'proof') box.innerHTML = proofTabHtml(D);
-  else if (D.sub === 'calls') box.innerHTML = callsTabHtml(D);
   else box.innerHTML = fileTabHtml(D);
 }
 window.renderDetailBody = renderDetailBody;
@@ -3954,8 +3989,11 @@ function weightPanel(a) {
       : `<p class="empty">One reading so far — a line needs a few more.</p>`}
   </div></section>`;
 }
-function callsTabHtml(D) {
+// The weekly check-in call log is retired (Amir, 2026-10-11). Nothing new is written; what was written stays readable here, in the
+// athlete's File, until it is deleted or the person is erased. No section at all when there is nothing to show.
+function oldCallLogsHtml(D) {
   const { athleteId, callLogs } = D;
+  if (!callLogs.length && !_callErr[athleteId]) return '';
   const stars = n => n ? '★'.repeat(n) : '—';
   const body = callLogs.length ? callLogs.map(l => {
     const s = l.scores || {}, ans = l.answers || {};
@@ -3972,17 +4010,12 @@ function callsTabHtml(D) {
         ${ansHtml}
         <div style="margin-top:10px"><button class="btn sm danger" onclick="deleteCallLog(${jsq(l.id)},${jsq(athleteId)},${jsq(l.call_date)})">Delete</button></div>
       </div></details>`;
-  }).join('') : _callErr[D.athleteId]
-    ? `<p class="empty" style="color:var(--clay-ink)">Call logs did not load (${esc(_callErr[D.athleteId])}). Tap ↻ Refresh to try again.</p>`
-    : '<p class="empty">No call logs yet.</p>';
-  const cycleNums = [...new Set(callLogs.map(l => (String(l.week||'').match(/Cycle\s*(\d+)/i)||[])[1]).filter(Boolean))].sort((a,b)=>a-b);
-  const cycleCtl = cycleNums.length ? `<span style="display:flex;align-items:center;gap:6px">
-      <select id="dashCycleSel" aria-label="Cycle" style="background:var(--card);border:1px solid var(--line);border-radius:999px;font-size:13px;padding:5px 10px">${cycleNums.map((n, i) => `<option value="${esc(n)}"${i === cycleNums.length - 1 ? ' selected' : ''}>Cycle ${esc(n)}</option>`).join('')}</select>
-      <button class="btn sm" onclick="copyDashCyclePrompt()">📋 Copy cycle prompt</button>
-    </span>` : '';
-  return `<div class="sec"><span>Weekly check-in calls</span>
-      <span class="acts">${cycleCtl}${DEMO ? `<button class="btn sm primary" onclick="toast('Demo — call logs are written in call-log.html')">+ New call log</button>` : `<a class="btn sm primary" href="call-log.html?athlete=${encodeURIComponent(athleteId)}" style="text-decoration:none">+ New call log</a>`}</span></div>
-    ${body}`;
+  }).join('') : `<p class="empty" style="color:var(--clay-ink)">Call logs did not load (${esc(_callErr[athleteId])}). Tap ↻ Refresh to try again.</p>`;
+  return `<div class="sec"><span>Old call logs${callLogs.length ? ' · ' + callLogs.length : ''}</span></div>
+    <section class="panel">
+      <p class="empty" style="padding:0 0 10px">The weekly check-in call log is retired: nothing new is written here. What was written stays until you delete it or erase the person.</p>
+      ${body}
+    </section>`;
 }
 function fileTabHtml(D) {
   const { athleteId, a, program, programDays } = D;
@@ -4066,10 +4099,17 @@ function fileTabHtml(D) {
         <div class="elog-body" id="clog-body">Loading…</div>
       </details>
     </section>
+    ${oldCallLogsHtml(D)}
     <div class="sec"><span>Danger zone</span></div>
     <section class="panel">
       <p class="empty" style="padding:0 0 10px">Deletes every finished session and everything the app keeps for them on the server (habit log, body weight, personal records). Their programme, login, coaching log and calls stay, and so do they on the roster.</p>
       <button class="btn sm danger" onclick="deleteAthlete(${jsq(athleteId)})">Delete training history</button>
+      <p class="empty" style="padding:18px 0 10px">Or remove them completely: the programme and its saved versions, the login and sign-in account, sessions, app data, coaching log, calls, reports, titles, board place and contact, in one step. You see the exact list first and type their id to confirm. Their intake forms are offered too.</p>
+      ${SYSTEM_IDS.includes(athleteId) || athleteId === AMIR_ATHLETE_ID
+        ? `<p class="empty" style="padding:0 0 4px">Not offered here: this is the public demo, or the identity the dashboard reads the board through.</p>`
+        : (_erase && _erase.kind === 'athlete' && _erase.key === athleteId
+            ? erasePanelHtml('athlete', athleteId)
+            : `<button class="btn sm danger" onclick="eraseOpen('athlete', ${jsq(athleteId)})">Erase completely…</button>`)}
     </section>`;
 }
 
@@ -4250,50 +4290,6 @@ window.toggleAddSession = toggleAddSession;
 window.parseAndFillSession = parseAndFillSession;
 window.submitPastSession = submitPastSession;
 
-// --- cycle-report prompt (ported) -------------------------------------------
-const CYCLE_PROMPT = `You are assisting an elite strength & conditioning coach (tennis + physical prep). A training cycle (~4–5 weeks) just ended for ONE athlete. Below are (1) the weekly check-in data for each week of the cycle and (2) the logged workout sessions across the cycle. Write an end-of-cycle report whose JOB is to drive the NEXT cycle's programming. Analyse TRENDS across the weeks and the logs — do not restate single weeks. Cross-reference: does the self-report match what they actually logged?
-
-Output these sections:
-• Overview — 3–5 sentences: the arc of the cycle and the headline.
-• Trends — specific, data-backed (cite direction and rough numbers, e.g. "soreness 3→7 over weeks 3–5", "adherence 13/15 sessions").
-• What worked / What to change.
-• Programming decisions for next cycle — concrete DECISIONS (load direction, volume, exercise emphasis, recovery, scheduling), not vague advice.
-• Overall load direction — progress / maintain / reduce / deload / mixed.
-• Content-worthy wins — improvements across the cycle worth posting, with specifics.
-• Flags — anything to address before/into next cycle.
-Use ONLY the provided data; if it's sparse, say so plainly.`;
-function fmtCycleData(name, cyc, weeklies, sessions) {
-  const L = [];
-  L.push(`ATHLETE: ${name} — CYCLE ${cyc}`);
-  L.push(`Weekly check-ins: ${weeklies.length} · Logged sessions: ${sessions.length}`);
-  L.push('\n=== WEEKLY CHECK-INS ===');
-  weeklies.forEach((w, i) => { L.push(`\n--- ${w.week || ('Week ' + (i + 1))} (${w.call_date || '—'}) ---`); L.push(w.summary || '(no detail saved)'); });
-  L.push('\n=== LOGGED WORKOUT SESSIONS ===');
-  if (!sessions.length) L.push('(No logged sessions found in the cycle window.)');
-  else sessions.forEach(s => { const rd = jparse(s.readiness); const comp = rd && typeof rd === 'object' ? rd.composite : null; const plan = planLabelC(rd); L.push(`${s.completed_on} · Day ${s.day ?? '—'} · ${s.status || '—'} · RPE ${s.session_rpe ?? '—'} · ${s.duration_min ?? '—'}min${comp != null ? ' · readiness ' + comp + '/5' : ''}${plan ? ' · ' + plan : ''}${s.focus ? ' · ' + s.focus : ''}${s.day_note ? ' · note: ' + s.day_note : ''}`); });
-  return L.join('\n');
-}
-function copyDashCyclePrompt() {
-  const sel = $('dashCycleSel');
-  const cyc = sel ? sel.value : '';
-  if (!cyc) { alert('Pick a cycle first.'); return; }
-  const weeklies = _detailCallLogs
-    .filter(l => ((String(l.week || '').match(/Cycle\s*(\d+)/i) || [])[1]) === cyc)
-    .sort((a, b) => String(a.call_date).localeCompare(String(b.call_date)));
-  if (!weeklies.length) { alert('No weekly check-ins saved for Cycle ' + cyc + '.'); return; }
-  const dates = weeklies.map(w => w.call_date).filter(Boolean).sort();
-  const start = addDays(dates[0], -16), end = addDays(dates[dates.length - 1], 3);
-  const sessions = (_detailHistory || [])
-    .filter(s => s.completed_on && s.completed_on >= start && s.completed_on <= end)
-    .sort((a, b) => String(a.completed_on).localeCompare(String(b.completed_on)));
-  const text = CYCLE_PROMPT + '\n\n' + fmtCycleData(_detailName, cyc, weeklies, sessions);
-  navigator.clipboard.writeText(text).then(
-    () => toast(`Cycle ${cyc} prompt copied — ${weeklies.length} check-in(s) + ${sessions.length} session(s)`),
-    () => copyText(text),   // shows the text so it can be copied by hand
-  );
-}
-window.copyDashCyclePrompt = copyDashCyclePrompt;
-
 // --- deletes (ported; coach-only via RLS) -----------------------------------
 async function deleteSession(athleteId, day, completedOn) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
@@ -4308,7 +4304,7 @@ async function deleteSession(athleteId, day, completedOn) {
 async function deleteAthlete(athleteId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const name = nameOf(athleteId);
-  if (!confirm(`Delete ${name}'s training history?\n\nThis permanently removes every finished session, and everything the app keeps for them on the server: habit log, body weight, personal records, the live snapshot. It cannot be undone, except from a backup file.\n\nWhat STAYS: their programme, their login, the coaching log, call logs, Proof contact and wall lines. They stay on the roster. To remove someone completely, ask Claude (it needs the database).`)) return;
+  if (!confirm(`Delete ${name}'s training history?\n\nThis permanently removes every finished session, and everything the app keeps for them on the server: habit log, body weight, personal records, the live snapshot. It cannot be undone, except from a backup file.\n\nWhat STAYS: their programme, their login, the coaching log, call logs, Proof contact and wall lines. They stay on the roster. To remove someone completely, cancel this and use "Erase completely…" just below the button.`)) return;
   // One call, one transaction (stage48): the sessions and the progress snapshot go together or not at all.
   // It used to be two deletes from this page, and a failure between them left one gone and one standing.
   // The function checks the coach itself and counts what it removed, so a lapsed sign-in (which RLS used to
@@ -4347,6 +4343,128 @@ async function deleteCallLog(id, athleteId, callDate) {
 window.deleteSession = deleteSession;
 window.deleteAthlete = deleteAthlete;
 window.deleteCallLog = deleteCallLog;
+
+// --- ERASE a whole person (stage54, 2026-10-11) -------------------------------------------------------------------------
+// coach_erase_person(kind, key, confirm, intake_ids, dry_run): one call, one transaction. The panel first asks for a DRY RUN
+// (the server does exactly the work of a real erasure and undoes it, so the numbers shown are the numbers that would go),
+// lists what goes and what stays, and the real run needs the id (athlete) or username (buyer) typed. An inline panel, not a
+// native dialog: the list is long and a phone clips a dialog. The server also refuses the demo, the board identity, the
+// coach's own login and a login shared by two accounts, and undoes everything when a table it does not know still holds a row.
+let _erase = null;   // { kind, key, status: 'loading' | 'ready' | 'busy' | 'error', pv, err, typed, picked: [intake ids] }
+const ERASE_KIND = { athlete: 'athlete', course: 'course buyer', testing: 'testing-app buyer' };
+// [one, many] for each table the server reports; a table it reports that is not here is shown by its own name.
+const ERASE_WHAT = {
+  session_history: ['finished session', 'finished sessions'], athlete_progress: ['app data record (personal records, body weight, check-ins)', 'app data records'],
+  hab_notes: ['roll-call line', 'roll-call lines'], hab_titles: ['title', 'titles'], hab_season_results: ['season result', 'season results'],
+  leaderboard_optin: ['board place', 'board places'], library_sessions: ['library session done', 'library sessions done'],
+  messages: ['old message', 'old messages'], call_logs: ['call log', 'call logs'], cycle_reports: ['cycle report', 'cycle reports'],
+  coaching_log_versions: ['earlier coaching-log text', 'earlier coaching-log texts'], coaching_logs: ['coaching log', 'coaching logs'],
+  program_versions: ['saved programme version', 'saved programme versions'], programs: ['programme', 'programmes'],
+  athlete_keys: ['old access key', 'old access keys'], hab_contacts: ['contact record (email, WhatsApp)', 'contact records'],
+  athlete_identities: ['login', 'logins'], hab_intake: ['intake form', 'intake forms'], auth_users: ['sign-in account', 'sign-in accounts'],
+  tps_accounts: ['course login', 'course logins'], assess_accounts: ['testing-app login', 'testing-app logins'],
+  assess_players: ['player', 'players'], assess_notes: ['player note', 'player notes'], assess_results: ['test result', 'test results'],
+  buyer_notes: ['note of yours about them', 'notes of yours about them'],
+};
+function eraseWhat(k, n) { const w = ERASE_WHAT[k]; return w ? (Number(n) === 1 ? w[0] : w[1]) : k; }
+function eraseCountLines(counts) {
+  return Object.keys(counts || {}).filter(k => Number(counts[k]) > 0)
+    .map(k => `<li><b>${Number(counts[k]).toLocaleString()}</b> ${esc(eraseWhat(k, counts[k]))}</li>`).join('');
+}
+function eraseMatches(e) {
+  return !!(e && e.pv && String(e.pv.confirm_word || '') !== '' && String(e.typed || '').trim().toLowerCase() === String(e.pv.confirm_word).toLowerCase());
+}
+function eraseWhy(err) {
+  const m = (err && err.message) || '', code = (err && err.code) || '';
+  if (/Could not find the function|PGRST202/i.test(m + code)) return 'the server does not have coach_erase_person yet (supabase/stage53_buyer_notes.sql and then stage54_erase_person.sql have not been run).';
+  if (/coach only|permission denied|JWT/i.test(m)) return 'your sign-in may have lapsed. Refresh, sign in again if asked, and redo it.';
+  return m || 'the server refused.';
+}
+// The panel for one person, or '' when it is not the one open. Drawn by the athlete's File tab and by the two buyer lists.
+function erasePanelHtml(kind, key) {
+  const e = _erase;
+  if (!e || e.kind !== kind || e.key !== key) return '';
+  if (e.status === 'loading') return `<div class="erase"><p class="eh">Checking what is stored for ${esc(key)}…</p></div>`;
+  if (e.status === 'error') return `<div class="erase"><p class="eh" style="color:var(--clay-ink)">${esc(key)} cannot be erased now</p><p>${esc(e.err)}</p>
+      <button class="btn sm" onclick="eraseCancel()">Close</button></div>`;
+  const pv = e.pv || {}, busy = e.status === 'busy';
+  const cands = pv.intake_candidates || [];
+  const codes = pv.affiliates_unlinked || [];
+  const coached = kind === 'athlete' && (S.ath[key] || {}).tier === 'coached';
+  return `<div class="erase">
+    <p class="eh">Erase ${esc(pv.shown_as || key)} completely</p>
+    <p>${esc(ERASE_KIND[kind] || kind)} <code>${esc(key)}</code>. This permanently deletes everything the server keeps for them, in one step. There is no undo.${coached ? ' <b style="color:var(--clay-ink)">This is a coached athlete with a live programme.</b>' : ''}</p>
+    <ul>${eraseCountLines(pv.counts)}</ul>
+    ${cands.length ? `<p><b>${cands.length} intake form${cands.length === 1 ? '' : 's'}</b> carry their email or their full name. They hold the answers about injuries and training history. Tick the ones that are theirs and they go too:</p>
+      ${cands.map(c => `<label class="pick"><input type="checkbox" ${e.picked.includes(c.id) ? 'checked' : ''} ${busy ? 'disabled' : ''} onchange="eraseTick(${jsq(c.id)}, this.checked)">
+        <span>${esc(prettyDate(String(c.created_at || '').slice(0, 10)))} · ${esc(c.name || 'no name')}${c.programme ? ' · ' + esc(c.programme) : ''}
+        <span class="chip ${c.matched_on === 'email' ? 'court' : ''}">${c.matched_on === 'email' ? 'same email' : 'same name'}</span></span></label>`).join('')}` : ''}
+    <p class="stays"><b>Stays:</b> your weekly backup files (they leave those as the old files roll off, about three months, as the privacy notice says), emails about them in your inbox, WhatsApp, and anything on their own phone.${codes.length ? ` The partner record${codes.length === 1 ? '' : 's'} <b>${esc(codes.join(', '))}</b> stays on the Affiliates tab: only the link to this athlete is removed.` : ''}</p>
+    <div class="typed">
+      <label for="eraseIn">Type <code>${esc(pv.confirm_word || key)}</code> to confirm</label>
+      <input id="eraseIn" class="pwin" autocomplete="off" autocapitalize="none" spellcheck="false" value="${esc(e.typed || '')}" ${busy ? 'disabled' : ''}
+             oninput="eraseType(this.value)" onkeydown="if(event.key==='Enter') eraseRun()">
+      <button id="eraseGo" class="btn sm danger" onclick="eraseRun()" ${eraseMatches(e) && !busy ? '' : 'disabled'}>${busy ? 'Erasing…' : 'Erase for good'}</button>
+      <button class="btn sm" onclick="eraseCancel()" ${busy ? 'disabled' : ''}>Cancel</button>
+    </div>
+  </div>`;
+}
+async function eraseOpen(kind, key) {
+  if (DEMO) { toast('Demo mode — nothing saved'); return; }
+  if (_erase && _erase.status === 'busy') return;
+  _erase = { kind, key, status: 'loading', pv: null, err: '', typed: '', picked: [] };
+  render();
+  const res = await sb.rpc('coach_erase_person', { p_kind: kind, p_key: key });   // a dry run by default: nothing is changed
+  const e = _erase;
+  if (!e || e.kind !== kind || e.key !== key) return;   // closed, or another person opened, while it was thinking
+  if (res.error) { e.status = 'error'; e.err = eraseWhy(res.error); }
+  else { e.status = 'ready'; e.pv = res.data || {}; e.picked = (e.pv.intake_candidates || []).filter(c => c.matched_on === 'email').map(c => c.id); }
+  render();
+  const i = $('eraseIn'); if (i) i.focus();
+}
+function eraseCancel() { if (_erase && _erase.status === 'busy') return; _erase = null; render(); }
+function eraseType(v) {
+  if (!_erase) return;
+  _erase.typed = String(v || '');
+  const go = $('eraseGo'); if (go) go.disabled = !eraseMatches(_erase) || _erase.status === 'busy';
+}
+function eraseTick(id, on) {
+  if (!_erase) return;
+  _erase.picked = _erase.picked.filter(x => x !== id);
+  if (on) _erase.picked.push(id);
+}
+async function eraseRun() {
+  const e = _erase;
+  if (!e || e.status !== 'ready' || !e.pv) return;
+  if (!eraseMatches(e)) { toast('Type ' + e.pv.confirm_word + ' exactly to confirm'); return; }
+  const who = e.pv.shown_as || e.key;
+  e.status = 'busy'; render();
+  const res = await sb.rpc('coach_erase_person', { p_kind: e.kind, p_key: e.key, p_confirm: String(e.typed).trim(), p_intake_ids: e.picked, p_dry_run: false });
+  if (res.error) {
+    if (!res.error.code) {
+      // No database code = the answer never arrived (a dropped connection). It is one transaction, so it either went through
+      // completely or not at all; the page cannot tell which.
+      e.status = 'error';
+      e.err = `The answer never arrived (${res.error.message || 'no reply'}), so the page cannot tell whether ${who} was erased. It is one step: it happened completely or not at all. Close this, tap ↻ Refresh, and open Erase for them again. If it says nothing is stored for them, it went through.`;
+      render(); return;
+    }
+    e.status = 'ready'; render();
+    alert('Nothing was erased: ' + eraseWhy(res.error) + '\n\nIt is one step, so nothing was half done.');
+    return;
+  }
+  const d = res.data || {};
+  _erase = null;
+  const rows = Object.keys(d.counts || {}).reduce((s, k) => s + Number(d.counts[k] || 0), 0);
+  const codes = d.affiliates_unlinked || [];
+  const note = `Erased ${who} for good: ${rows.toLocaleString()} row${rows === 1 ? '' : 's'}, the sign-in account included.\n\nReceipt #${d.log_id} is kept (a hash, the date and the counts; no name or contact).\n\nStill yours to do if they asked for it all:\n• they leave your weekly backup files as those roll off (about three months);\n• emails about them in your inbox, and WhatsApp, are not touched by this.` +
+    (codes.length ? `\n• the partner record${codes.length === 1 ? '' : 's'} ${codes.join(', ')} stays on the Affiliates tab (only its link to the athlete was removed).` : '');
+  if (e.kind === 'athlete') { location.hash = 'athletes'; await hardRefresh(); }
+  else if (e.kind === 'course') { await loadCourse(); render(); }
+  else { await loadAssess(); render(); }
+  toast('Erased ' + who);
+  alert(note);
+}
+window.eraseOpen = eraseOpen; window.eraseCancel = eraseCancel; window.eraseType = eraseType; window.eraseTick = eraseTick; window.eraseRun = eraseRun;
 
 // --- PROOF (board · funnel · titles · season) --------------------------------
 // The board comes from the server's own scorer via leaderboard_top, called
@@ -4464,7 +4582,7 @@ async function forgetContact(athleteId) {
   if ((S.ath[athleteId] || {}).tier === 'coached') { alert('This is a coached athlete. Forget would delete their training app data (records, body weight, check-ins), so it is not offered for them.'); return; }
   // Says exactly what forget_contact() deletes (checked against the live function, 2026-09-26: this
   // used to say "Their logs and board place are untouched", the opposite of what it does).
-  if (!confirm(`Forget ${athleteId}?\n\nThis PERMANENTLY deletes their contact details, their whole habit log and progress, their board place and their roll-call lines. There is no undo and no automatic backup: take a ⤓ Backup first if you are not sure.\n\nTheir programme, login, session history, titles and season results stay.`)) return;
+  if (!confirm(`Forget ${athleteId}?\n\nThis PERMANENTLY deletes their contact details, their whole habit log and progress, their board place and their roll-call lines. There is no undo and no automatic backup: take a ⤓ Backup first if you are not sure.\n\nTheir programme, login, session history, titles and season results stay. To remove everything about them, cancel this and use "Erase completely…" on their File tab.`)) return;
   const { error } = await sb.rpc('forget_contact', { p_athlete_id: athleteId });
   if (error) { alert('Could not forget: ' + error.message); return; }
   toast('Forgotten');
@@ -4750,12 +4868,25 @@ async function loadAssess() {
       initial_password: 'amber-cedar-kite-42', sent_at: null, revoked_at: null }];
     return;
   }
-  const r = await sb.from('assess_accounts')
-    .select('username, label, created_at, initial_password, password_set_at, sent_at, revoked_at')
-    .order('created_at', { ascending: false });
+  const [r, notes] = await Promise.all([
+    sb.from('assess_accounts')
+      .select('user_id, username, label, created_at, initial_password, password_set_at, sent_at, revoked_at')
+      .order('created_at', { ascending: false }),
+    loadBuyerNotes()]);
   // A failed read stays "unknown" (null + the error), never an empty list that reads "No logins yet".
   LOAD_ERR.assess = r.error ? r.error.message : '';
-  S.assess = r.error ? null : (r.data || []);
+  S.assess = r.error ? null : withBuyerNotes(r.data, notes);
+}
+
+// The note about a buyer ("who bought it") lives in buyer_notes since stage53: the account row's own label is always empty
+// now, so a buyer reading their own row no longer sees what Amir wrote. Until that stage is applied the note is still the
+// label, and a failed read of the notes (cosmetic) leaves the label in place, so neither case breaks the list.
+async function loadBuyerNotes() {
+  const r = await sb.from('buyer_notes').select('user_id, note');
+  return r.error ? null : Object.fromEntries((r.data || []).map(x => [x.user_id, x.note]));
+}
+function withBuyerNotes(rows, notes) {
+  return (rows || []).map(x => Object.assign({}, x, { label: (notes && notes[x.user_id]) || x.label || '' }));
 }
 
 // The WhatsApp message a buyer gets, in Farsi like the app.
@@ -4825,19 +4956,19 @@ function renderAssess() {
       <span class="acts">${r.revoked_at
         ? `<button class="btn sm as-pw" data-u="${esc(r.username)}">Restore</button>`
         : (r.initial_password ? `<button class="btn sm primary as-copy" data-u="${esc(r.username)}">Copy message</button><button class="btn sm as-sent" data-u="${esc(r.username)}">Mark sent</button>` : '') +
-          `<button class="btn sm as-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm as-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}</span>
+          `<button class="btn sm as-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm as-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}<button class="btn sm danger as-erase" data-u="${esc(r.username)}" title="Remove this buyer and everything they stored, for good">Erase…</button></span>
     </div>` + (_assessPw === r.username ? `<div class="pwform">
       <input class="pwin as-pwin" aria-label="Password (empty to generate one)" placeholder="${r.revoked_at ? 'password' : 'new password'}, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false">
       <button class="btn sm primary as-pwsave" data-act="${r.revoked_at ? 'restore' : 'reset'}" data-u="${esc(r.username)}">${r.revoked_at ? 'Restore' : 'Save password'}</button>
       <button class="btn sm as-pwcancel">Cancel</button>
       <p class="pwhint">${PW_HINT}${r.revoked_at ? '' : ' The old password stops working straight away.'}</p>
-    </div>` : '');
+    </div>` : '') + erasePanelHtml('testing', r.username);
   const field = 'flex:1;min-width:190px;font:inherit;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fff';
   let html = `<div class="controls"><span class="empty" style="align-self:center">Logins for the tennis testing app, <a href="${ASSESS_URL}" target="_blank" rel="noopener">${ASSESS_URL}</a>. One login per buyer; an academy's coaches share it.</span></div>`;
   html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New login</span></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <input id="asUser" aria-label="Username" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
-      <input id="asLabel" aria-label="Note for you" placeholder="note for you: who bought it" autocomplete="off" style="${field}">
+      <input id="asLabel" aria-label="Private note for you" placeholder="private note for you: who bought it" autocomplete="off" style="${field}">
       <input id="asPass" aria-label="Password (empty to generate one)" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field};font-family:'Space Mono',monospace">
       <button class="btn primary sm" id="asCreate">Create login</button>
     </div>
@@ -4865,6 +4996,7 @@ function renderAssess() {
   const asPwIn = c.querySelector('.as-pwin');
   if (asPwIn) asPwIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); c.querySelector('.as-pwsave').click(); } });
   on('.as-sent', el => assessMarkSent(el.dataset.u));
+  on('.as-erase', el => eraseOpen('testing', el.dataset.u));
   on('.as-copy', el => {
     const r = rows.find(x => x.username === el.dataset.u);
     if (r && r.initial_password) { copyText(assessMessage(r.username, r.initial_password), el); toast('Message copied — paste it into WhatsApp'); }
@@ -4887,12 +5019,14 @@ async function loadCourse() {
       initial_password: 'cedar-harbor-kite-17', sent_at: null, revoked_at: null }];
     return;
   }
-  const r = await sb.from('tps_accounts')
-    .select('username, label, created_at, initial_password, password_set_at, sent_at, revoked_at')
-    .order('created_at', { ascending: false });
+  const [r, notes] = await Promise.all([
+    sb.from('tps_accounts')
+      .select('user_id, username, label, created_at, initial_password, password_set_at, sent_at, revoked_at')
+      .order('created_at', { ascending: false }),
+    loadBuyerNotes()]);
   // A failed read stays "unknown" (null + the error), never an empty list that reads "No logins yet".
   LOAD_ERR.course = r.error ? r.error.message : '';
-  S.course = r.error ? null : (r.data || []);
+  S.course = r.error ? null : withBuyerNotes(r.data, notes);
 }
 
 // The WhatsApp message a buyer gets, in Farsi like the app. iPhone installs before signing in:
@@ -4964,19 +5098,19 @@ function renderCourse() {
       <span class="acts">${r.revoked_at
         ? `<button class="btn sm tp-pw" data-u="${esc(r.username)}">Restore</button>`
         : (r.initial_password ? `<button class="btn sm primary tp-copy" data-u="${esc(r.username)}">Copy message</button><button class="btn sm tp-sent" data-u="${esc(r.username)}">Mark sent</button>` : '') +
-          `<button class="btn sm tp-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm tp-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}</span>
+          `<button class="btn sm tp-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm tp-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}<button class="btn sm danger tp-erase" data-u="${esc(r.username)}" title="Remove this buyer and everything they stored, for good">Erase…</button></span>
     </div>` + (_coursePw === r.username ? `<div class="pwform">
       <input class="pwin tp-pwin" aria-label="Password (empty to generate one)" placeholder="${r.revoked_at ? 'password' : 'new password'}, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false">
       <button class="btn sm primary tp-pwsave" data-act="${r.revoked_at ? 'restore' : 'reset'}" data-u="${esc(r.username)}">${r.revoked_at ? 'Restore' : 'Save password'}</button>
       <button class="btn sm tp-pwcancel">Cancel</button>
       <p class="pwhint">${PW_HINT}${r.revoked_at ? '' : ' The old password stops working straight away.'}</p>
-    </div>` : '');
+    </div>` : '') + erasePanelHtml('course', r.username);
   const field = 'flex:1;min-width:190px;font:inherit;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fff';
   let html = `<div class="controls"><span class="empty" style="align-self:center">Logins for the Tennis Performance System course (Level 2), <a href="${COURSE_URL}" target="_blank" rel="noopener">${COURSE_URL}</a>. One login per buyer.</span></div>`;
   html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New login</span></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <input id="tpUser" aria-label="Username" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
-      <input id="tpLabel" aria-label="Note for you" placeholder="note for you: who bought it" autocomplete="off" style="${field}">
+      <input id="tpLabel" aria-label="Private note for you" placeholder="private note for you: who bought it" autocomplete="off" style="${field}">
       <input id="tpPass" aria-label="Password (empty to generate one)" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field};font-family:'Space Mono',monospace">
       <button class="btn primary sm" id="tpCreate">Create login</button>
     </div>
@@ -5004,6 +5138,7 @@ function renderCourse() {
   const tpPwIn = c.querySelector('.tp-pwin');
   if (tpPwIn) tpPwIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); c.querySelector('.tp-pwsave').click(); } });
   on('.tp-sent', el => courseMarkSent(el.dataset.u));
+  on('.tp-erase', el => eraseOpen('course', el.dataset.u));
   on('.tp-copy', el => {
     const r = rows.find(x => x.username === el.dataset.u);
     if (r && r.initial_password) { copyText(courseMessage(r.username, r.initial_password), el); toast('Message copied — paste it into WhatsApp'); }

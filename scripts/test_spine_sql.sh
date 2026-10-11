@@ -3,9 +3,10 @@
 #
 # Starts a THROWAWAY Postgres cluster (a temp folder, a unix socket, nothing on the network), loads a replica of the live
 # tables (supabase/tests/replica_schema.sql), applies supabase/stage45_forget_contact_guard.sql, stage48_coach_one_transaction.sql,
-# stage49_spine_versions.sql, stage50_assess_coach_read.sql, stage51_clear_used_passwords.sql and stage52_version_history_two_cycles.sql, runs supabase/tests/stage48_49_test.sql (about 100 assertions:
+# stage49_spine_versions.sql, stage50_assess_coach_read.sql, stage51_clear_used_passwords.sql, stage52_version_history_two_cycles.sql, stage53_buyer_notes.sql and stage54_erase_person.sql, runs
+# supabase/tests/stage48_49_test.sql (about 200 assertions:
 # the coach check, grants, row-level security, atomicity, malformed payloads, the version trigger, Forget's guard, the testing
-# app's tables, the stored-password trigger) and then two-session tests of the row
+# app's tables, the stored-password trigger, the version history, the buyer note, the full erasure) and then two-session tests of the row
 # lock: a dashboard save must WAIT for an in-flight write by Claude's /spine and then see it, instead of overwriting it,
 # and a /spine call that writes exercises first (the documented order) must never deadlock with it.
 #
@@ -38,8 +39,13 @@ as_pg "$PGBIN/pg_ctl -D $DATA -o '-p $PORT -c listen_addresses= -c unix_socket_d
 
 P="psql -h $DATA -p $PORT -U postgres -qAt -v ON_ERROR_STOP=1"
 $P -d postgres -c "create database coachtest" || exit 2
+# The scoring function as stage24 left it (the live one, give or take a comment), twice: as itself (stage55 patches it) and as zz_bonus_base, the untouched copy
+# the tests compare with.
+sed -n '/^create or replace function public.hab_bonus_xp(/,/^\$fn\$;/p' "$repo/supabase/stage24_marks_quests_customcap.sql" > "$DATA/bonus22.sql"
+sed 's/public\.hab_bonus_xp(/public.zz_bonus_base(/' "$DATA/bonus22.sql" > "$DATA/bonus22_base.sql"
+[ -s "$DATA/bonus22.sql" ] || { echo "test_spine_sql: could not cut hab_bonus_xp out of stage24"; exit 2; }
 P="$P -d coachtest"
-for f in supabase/tests/replica_schema.sql supabase/stage45_forget_contact_guard.sql supabase/stage48_coach_one_transaction.sql supabase/stage49_spine_versions.sql supabase/stage50_assess_coach_read.sql supabase/stage51_clear_used_passwords.sql supabase/stage52_version_history_two_cycles.sql; do
+for f in supabase/tests/replica_schema.sql supabase/stage45_forget_contact_guard.sql supabase/stage48_coach_one_transaction.sql supabase/stage49_spine_versions.sql supabase/stage50_assess_coach_read.sql supabase/stage51_clear_used_passwords.sql supabase/stage52_version_history_two_cycles.sql supabase/stage53_buyer_notes.sql supabase/stage54_erase_person.sql $DATA/bonus22.sql $DATA/bonus22_base.sql supabase/stage55_end_quests.sql; do
   (cd "$repo" && $P -f "$f" >/dev/null) || { echo "test_spine_sql: loading $f failed"; exit 2; }
 done
 
@@ -85,5 +91,11 @@ wait
 echo "$out" | grep -q 'deadlock' && check "documented order: no deadlock" no "$out" || check "documented order: no deadlock" ok
 echo "$out" | grep -q '"ok": true' && check "documented order: the dashboard save went through after waiting" ok || check "documented order: the dashboard save went through after waiting" no "$out"
 [ "$($P -c "select (select purpose from public.exercises where id='zz-conc3') || ' | ' || (select notes || ' | ' || cost from public.exercise_coach where id='zz-conc3')")" = "Claude A | Claude note | heavy" ] && check "documented order: both writers' columns are there" ok || check "documented order: both writers' columns are there" no "row differs"
+
+# 4. stage55 patches the scoring function in place; given a function it does not recognise it must stop and change nothing
+$P -c "create or replace function public.hab_bonus_xp(p_log jsonb, p_cfg jsonb, p_season_start date, p_from date, p_to date, p_rules jsonb) returns bigint language sql immutable as 'select 42::bigint'" >/dev/null
+out=$($P -f supabase/stage55_end_quests.sql 2>&1); rc=$?
+[ $rc -ne 0 ] && echo "$out" | grep -q "does not look as expected" && check "stage55 refuses a scoring function it does not recognise" ok || check "stage55 refuses a scoring function it does not recognise" no "rc=$rc $out"
+[ "$($P -c "select public.hab_bonus_xp('{}','{}',null,null,null,'{}')")" = "42" ] && check "...and leaves that function exactly as it found it" ok || check "...and leaves that function exactly as it found it" no "the function changed"
 
 [ $fail = 0 ] && echo "test_spine_sql: all passed" || { echo "test_spine_sql: FAILED"; exit 1; }

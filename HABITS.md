@@ -2399,6 +2399,7 @@ schema: see the box below):
 | 23 | the title-mint fix (see *Titles on the board*) |
 | 24 | `maxCustom`, quest runs clipped, the milestone marks (applied as 24a/b/c) |
 | 25 | the season record, the `start_season()` guard, `undo_season()` |
+| 55 | `end_quests()` and the `end` day of a quest run: ending a run keeps the XP already earned (see `XP_SYSTEM.md` §8.5); `hab_bonus_xp()` patched in place |
 
 Stages 18 and 20 have no entry in the database's migration history, but both are live: 18's
 per-day roster is inside every later `hab_bonus_xp()`, and 20's event titles are on the row.
@@ -2414,7 +2415,7 @@ per-day roster is inside every later `hab_bonus_xp()`, and 20's event titles are
 > a `hab_bonus_xp` overload that no longer exists, and re-running it would point
 > the board at rules the athletes' own screens do not use — silently, with no
 > error. Where the latest definitions sit today: `hab_bonus_xp()` and `hab_xp()` —
-> the latest definition, currently `stage24_marks_quests_customcap.sql`;
+> the latest definition, currently `stage24_marks_quests_customcap.sql` plus the `qruns` patch in `stage55_end_quests.sql`;
 > `leaderboard_top()` and `roll_call()` — `stage17_titles.sql`; `set_title()` —
 > `stage25_season_record.sql`. ⚠️ **And no file holds the live board RPCs exactly:**
 > since 2026-09-07 `leaderboard_top`, `roll_call`, `set_day_note`, `set_leaderboard_optin`,
