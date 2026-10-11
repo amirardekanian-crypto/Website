@@ -60,7 +60,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-11: 78 scenarios; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-11: 84 scenarios; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -132,6 +132,12 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | proof-board-truth | The board read, failed and retried; a quest week started | (pile B8, MKT-3, MKT-8) no time on the board, no reason when it failed, and it stayed stale after a quest week started |
 | undo-after-save | A save, Undo, a save then another writer, a restore and its Undo, a restore against a moved programme | (pile B9, FLOW-11) no Undo after an edit; a restore could overwrite a newer programme |
 | version-diff | Two saves, then Version history's "What this save changed" | (pile B9, WORK-10) a version could only be restored blind, with no word on what it differed by |
+| back-keeps-place | The roster scrolled, an athlete opened, Back; then a tap on the Athletes tab | (pile B10, BROWSER-4) Back landed at the top of the roster |
+| roster-tier-chips | The tier chips with and without a person who has no file | (pile B10, ROSTER-11) the chips did not add up to Everyone and a chip with nobody in it was drawn |
+| today-mark-read | Needs you → a note → Mark read | (pile B10, FLOW-7) a note could only be cleared by opening the athlete |
+| spine-copy-add | Exercises → Not in the Spine yet → the two copy buttons | (pile B10, FLOW-13) no one-tap way to hand a missing exercise to Claude |
+| spine-editor-folds | An approved entry and a draft with no count: which parts of the editor are folded, redraw, save | (pile B10, SPINE-7) the editor was one long form |
+| levels-in-place | Athletes with the levels held back 1.5 s | (pile B10, ROSTER-15) the whole page was replaced when the Proof levels arrived |
 | fail-bar | a failed post on Today (and the same again, and a failed intake status), then a success, on a 1280 px screen and a 360 px phone | (pile B5) a failure was a 2.6 s toast in some tabs and a pop-up in others; now a line that stays until dismissed, in view when scrolled, merged when repeated, never a pop-up; a success stays a toast |
 
 ## Adding a scenario

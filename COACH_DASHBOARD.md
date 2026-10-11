@@ -45,6 +45,12 @@ safe to open anywhere — handy for screenshots or design work.
 
 ## 2. The nine tabs, in two groups
 
+**Back keeps your place** (audit BROWSER-4, 2026-10-11). A new screen opens at the top; going Back to a screen you left lands where you were on it,
+so the roster no longer jumps to the first athlete after you open someone and come back. A tap on a tab or a link is a new screen and starts at
+the top. (The page stamps each screen on its history entry and switches the browser's own scroll restore off: the browser's ran before the page
+drew and was then overwritten.) Every label is at least 12 px: `scripts/check_site_style.py` guards `coach.html` too since 2026-10-11, so
+text under 12 px cannot come back.
+
 The first four are the daily coaching work. The other five (smaller, after a divider; on a phone
 a second row that scrolls sideways) are opened now and then.
 
@@ -105,7 +111,11 @@ The tab opens on **Drafts** while there are any, else on **Approved**, and the s
 entry across both by name, other name, pattern, equipment or id. *Coverage* and *Doing it now* count
 every card in a programme with workouts, **circuit items included** (before 2026-10-10 they skipped
 circuits, a third of all cards). *Not in the Spine yet* lists the names still without an entry,
-most-used first.
+most-used first, each with **Copy /spine add** (one tap puts `/spine add <name>` on the clipboard for Claude) and a **Copy /spine add for all N** at
+the top (the command, then one `- name` per line; each becomes a draft for you to approve) (audit FLOW-13, 2026-10-11).
+**The entry editor folds what you rarely touch** (audit SPINE-7): *Body parts and the body map* and *Coach only: SFR, flags, counts, cost* are closed
+under a heading, and each opens by itself when something in it is missing (an entry with no count yet says so on its heading). What you open stays
+open across a redraw, and a save sends whatever is in the folded parts exactly as before.
 
 **This page counts drafts; a phone does not** (audit TWIN-1, 2026-10-11). A phone is served approved entries only, so what an athlete sees
 is found among those. A card that names its entry (`exId`) shows that entry **or nothing** on the phone and on the dashboard alike: a
@@ -300,6 +310,8 @@ chips, its *Needs you* group and filter, and its default sort use the same funct
 screens always agree. (Until 2026-10-10 four places counted "needs you" four different ways:
 sync gaps and upgrade leads never reached Today, signups never reached the roster, and Today cut
 off at 10 rows of notes.) The header counts **people**; the counter above counts **notes**.
+**A note that needs no action is cleared from here** (audit FLOW-7, 2026-10-11): its row has **Mark read** beside *open →*, which marks the one session
+quoted in the row and then shows the next one, or the row goes. The athlete does not have to be opened.
 
 | Reason | Trigger | Weight |
 |---|---|---|
@@ -373,8 +385,9 @@ screen — a row of grey dots is someone drifting before they churn.
 
 One row per person across **both** systems, split under three headings — **Needs you**,
 **All quiet** and **Gone quiet** — so the line between "waiting on me" and "fine" is drawn rather
-than implied. Filter chips across the top (Everyone · Needs you · Coached · Free · Proof only ·
-Gone quiet) each carry their count. Search reads the name, the id, the board name, the contact's
+than implied. Filter chips across the top (Everyone · Needs you · Coached · Free · Proof only · No file ·
+Gone quiet) each carry their count, and **the tier chips add up to Everyone** (a person with no programme and no habits is under *No file*; a chip
+with nobody in it is not drawn, except Everyone, Needs you and the one you are on). Search reads the name, the id, the board name, the contact's
 name, email and WhatsApp digits (Persian ی/ک and extra spaces are normalised); the sort and the
 search survive a redraw.
 

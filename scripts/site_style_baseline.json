@@ -8,6 +8,10 @@
  "index-fa.html": {
   "tiny-text|font-size:11px": 1
  },
+ "coach.html": {
+  "gold|⚠": 2,
+  "google-font|fonts.googleapis.com": 1
+ },
  "uts-padel.html": {
   "google-font|fonts.googleapis.com": 2,
   "google-font|fonts.gstatic.com": 1

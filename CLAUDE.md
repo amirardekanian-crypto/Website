@@ -45,7 +45,7 @@ Durable context for working in this repo. Read the linked docs before diving in.
   viewport and the lessons are in `scripts/site_audit/README.md`; the seven page reviews are in `Content/site-audit/`.
   **Public pages have a style guard** (2026-10-02): `scripts/check_site_style.py` (pre-commit guard 13) stops a commit that adds
   yellow, text under 12 px, a pale grey, letter-spaced Farsi, a Google font link or white text on the plain clay; it is a ratchet on
-  `scripts/site_style_baseline.json` and `/* style-ok */` marks an exception. The English fonts are our own files (`assets/css/fonts.css`,
+  `scripts/site_style_baseline.json` and `/* style-ok */` marks an exception. **`coach.html` is under it too since 2026-10-11** (no text under 12 px; its two coloured warning signs and its Google Fonts link are the baseline). The English fonts are our own files (`assets/css/fonts.css`,
   made by `scripts/site_audit/fetch_fonts.py`); the fill under white text is `--accent-2-fill` / `--clay-fill` (#C2512C), never #C7552F.
 - `.claude/COACHING-PRINCIPLES.md` — Amir's codified coaching philosophy. **It opens with the RULE INDEX**
   (2026-09-26): one numbered line per rule (`VOL-8`, `SEL-4` …), the stage that applies it and whether
@@ -362,7 +362,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (78 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (84 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.

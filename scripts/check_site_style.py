@@ -11,6 +11,8 @@ brings back one of the faults the 2026-10-02 website audit fixed (Content/SITE-A
   clay-fill    white text on the plain clay #C7552F (4.40:1): the fill under white text is
                var(--accent-2-fill) / var(--clay-fill), #C2512C (4.66:1)
 
+coach.html (the dashboard, not public) joined on 2026-10-11 (audit BROWSER-8): it has no text under 12 px now, and the guard keeps it so.
+
 It is a RATCHET, not a ban on what already exists: scripts/site_style_baseline.json holds what each page had on
 2026-10-02 (the drawn mini app's small labels, the Etminan amber, the UTS page's own fonts ...). A change may keep
 those or remove them (then run --update so they cannot come back) but may not ADD one. A deliberate exception
@@ -28,7 +30,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 BASELINE = os.path.join(ROOT, 'scripts', 'site_style_baseline.json')
 
-FILES = ['index.html', 'index-fa.html', 'links.html', 'proof.html', 'form.html', 'form-fa.html', 'partner-fa.html',
+FILES = ['index.html', 'index-fa.html', 'links.html', 'proof.html', 'form.html', 'form-fa.html', 'partner-fa.html', 'coach.html',
          'tennis/index.html', 'tennis-testing/index.html', 'terms.html', 'terms-fa.html', 'privacy.html', 'privacy-fa.html', '404.html',
          'uts-padel.html', 'etminan-en.html', 'etminan.html', 'etminan-dv.html',
          'partials/nav.html', 'partials/footer.html',

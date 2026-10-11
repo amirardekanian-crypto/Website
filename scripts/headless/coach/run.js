@@ -1611,6 +1611,7 @@ S['spine-save-atomic'] = async (b) => {
   const r = { id: 'spine-save-atomic', title: 'A clash in the coach-only half holds the entry half back too; a failed save writes neither', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'exercises' });
   await spineOpen(page, 'goblet-squat');
+  await page.evaluate(() => document.querySelectorAll('#spineEd details.spsec').forEach(d => { d.open = true; })); await L.settle(page, 150);   // the editor folds the coach-only part (SPINE-7)
   // Claude changes the coach-only note by SQL after the page read; Amir changes a video (entry) AND the same note.
   await serverSet(page, 'exercise_coach', 'goblet-squat', { notes: 'Claude coach note' });
   await page.locator('[data-sf=video]').fill('https://www.youtube.com/watch?v=AMIRVIDEO01');
@@ -2384,6 +2385,138 @@ S['version-diff'] = async (b) => {
   await L.settle(page, 500);
   const older = (await rows.nth(1).locator('.pvdiffbox').innerText()).replace(/\s+/g, ' ');
   check(r, 'the version before it against the next one: the earlier save changed the sets', /Day 1 · Goblet Squat: sets 4 → 5/.test(older) && !/Note/.test(older), older);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Phone and reading polish (audit BROWSER-4, ROSTER-11, ROSTER-15, FLOW-7, FLOW-13, SPINE-7; 2026-10-11, pile B10) ───────────────────────────
+S['back-keeps-place'] = async (b) => {
+  const r = { id: 'back-keeps-place', title: 'Back to a screen you left lands where you were on it; a new screen starts at the top', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'athletes' });
+  await page.evaluate(() => { document.body.style.minHeight = '3500px'; });     // the fixtures are a short list: give the page room to scroll
+  const y = () => page.evaluate(() => Math.round(window.scrollY));
+  check(r, 'the browser\'s own scroll restore is switched off (it ran before the page drew and was then overwritten)', await page.evaluate(() => history.scrollRestoration) === 'manual', await page.evaluate(() => history.scrollRestoration));
+  await page.evaluate(() => window.scrollTo(0, 600)); await L.settle(page, 300);
+  check(r, 'the roster is scrolled', (await y()) === 600, await y());
+  await page.evaluate(() => { location.hash = '#a/ava_test/work'; }); await L.settle(page, 700);
+  check(r, 'a new screen (an athlete) starts at the top', (await y()) === 0, await y());
+  await page.goBack(); await L.settle(page, 700);
+  check(r, 'Back to the roster lands where you were (600), not at the top', Math.abs((await y()) - 600) <= 2, await y());
+  // a fresh tap on the Athletes tab, from another screen, starts at the top
+  await page.evaluate(() => { location.hash = '#a/ava_test/work'; }); await L.settle(page, 700);
+  await page.locator('#rail a.tab', { hasText: 'Athletes' }).first().click(); await L.settle(page, 700);
+  check(r, 'tapping the Athletes tab (not Back) starts the roster at the top', (await y()) === 0, await y());
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['roster-tier-chips'] = async (b) => {
+  const r = { id: 'roster-tier-chips', title: 'Roster: the tier chips add up to Everyone, and a chip with nobody in it is not shown', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'athletes' });
+  const chips = async () => page.evaluate(() => [...document.querySelectorAll('.rfilters .rf')].map(x => [x.firstChild.textContent.trim(), Number(x.querySelector('.c').textContent), x.classList.contains('on')]));
+  let c = await chips(); const n = Object.fromEntries(c.map(x => [x[0], x[1]]));
+  check(r, 'Coached + Free + Proof only add up to Everyone when everybody has a file', n['Coached'] + n['Free'] + n['Proof only'] === n['Everyone'] && !('No file' in n), c);
+  check(r, 'a chip with nobody in it (Gone quiet 0) is not shown', !('Gone quiet' in n) || n['Gone quiet'] > 0, c);
+  // someone who signed up and has no programme and no habits: they used to sit under no tier chip
+  await page.evaluate(() => { window.__DB.hab_contacts.push({ athlete_id: 'zed_nofile', email: 'zed@example.invalid', whatsapp: '+10000000009', source: 'proof.html', tier: 'free', note: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), display_name: 'Zed' }); return hardRefresh(); });
+  await L.settle(page, 900);
+  c = await chips(); const m = Object.fromEntries(c.map(x => [x[0], x[1]]));
+  check(r, 'a person with no file gets a "No file" chip, and the tier chips add up to Everyone again', m['No file'] === 1 && m['Coached'] + m['Free'] + m['Proof only'] + m['No file'] === m['Everyone'], c);
+  await page.locator('.rfilters .rf', { hasText: 'No file' }).click(); await L.settle(page, 400);
+  const list = (await page.locator('#content .ath').allInnerTexts()).join(' ').replace(/\s+/g, ' ');
+  check(r, 'the chip lists exactly them', /zed/i.test(list) && !/ava/i.test(list), list.slice(0, 200));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['today-mark-read'] = async (b) => {
+  const r = { id: 'today-mark-read', title: 'Today: a note in Needs you can be marked read from there', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  const rows = () => page.locator('#needPanel .need.needrow');
+  const n0 = await rows().count();
+  check(r, 'a waiting note shows as a row with Mark read beside open →', n0 >= 1 && (await rows().first().getByRole('button', { name: 'Mark read' }).count()) === 1, n0);
+  const said = (await rows().first().innerText()).replace(/\s+/g, ' ');
+  check(r, 'the row quotes the note', /note: “/.test(said), said);
+  const before = await page.evaluate(() => Object.values(S.ath).reduce((n, a) => n + a.toReply, 0));
+  const c0 = await L.nCalls(page);
+  await rows().first().getByRole('button', { name: 'Mark read' }).click(); await L.settle(page, 700);
+  const upd = lastOf(await L.callsSince(page, c0), isUpd('session_history'));
+  check(r, 'it marks that one session read, on the server', !!upd && upd.payload.coach_status === 'read' && upd.filters.some(f => /^athlete_id\.eq\./.test(f)) && upd.filters.some(f => /^day\.eq\./.test(f)), upd && { payload: upd.payload, filters: upd.filters });
+  const after = await page.evaluate(() => Object.values(S.ath).reduce((n, a) => n + a.toReply, 0));
+  check(r, 'the notes-to-read count goes down by one, without opening the athlete', after === before - 1 && location_is_today(await page.evaluate(() => location.hash)), { before, after });
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+function location_is_today(h) { return h === '' || h === '#today'; }
+
+S['spine-copy-add'] = async (b) => {
+  const r = { id: 'spine-copy-add', title: 'Exercises → Not in the Spine yet: one tap copies "/spine add <name>" for Claude', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  await L.settle(page, 700);
+  await page.evaluate(() => document.querySelectorAll('#content details').forEach(d => { d.open = true; }));
+  const panel = page.locator('details', { hasText: 'Not in the Spine yet' }).first();
+  const names = await page.evaluate(() => [...document.querySelectorAll('details')].find(d => /Not in the Spine yet/.test(d.textContent)).querySelectorAll('.credrow .credname').length);
+  check(r, 'the list has names with no entry', names >= 1, names);
+  const one = panel.locator('.credrow').first();
+  const nm = (await one.locator('.credname').innerText()).trim();
+  await one.getByRole('button', { name: /Copy \/spine add/ }).click(); await L.settle(page, 300);
+  const clip = await page.evaluate(() => navigator.clipboard.readText());
+  check(r, 'a row copies "/spine add <that name>"', clip === '/spine add ' + nm, clip);
+  await panel.getByRole('button', { name: /Copy \/spine add for all/ }).click(); await L.settle(page, 300);
+  const all = (await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, '\n');   // Windows hands the clipboard back with CRLF
+  check(r, 'the top button copies every name, one per line, after "/spine add"', /^\/spine add\n- /.test(all) && all.split('\n').length === names + 1 && all.includes('- ' + nm), all.slice(0, 160));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['spine-editor-folds'] = async (b) => {
+  const r = { id: 'spine-editor-folds', title: 'Exercises → an entry: the body map and the coach-only half are folded, and open by themselves when something is missing', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  await L.settle(page, 600);
+  await page.locator('.sp-filter', { hasText: 'Approved' }).click(); await L.settle(page, 300);
+  await page.locator('.spine-row', { hasText: 'Goblet Squat' }).first().getByRole('button', { name: 'Open' }).click(); await L.settle(page, 500);
+  let secs = await page.evaluate(() => [...document.querySelectorAll('#spineEd details.spsec')].map(d => [d.querySelector('summary').textContent.replace(/\s+/g, ' ').trim(), d.open]));
+  check(r, 'a complete entry (counts, cost and SFR set) has two folded parts', secs.length === 2 && secs.every(s => s[1] === false), secs);
+  // one that is missing its counts: the coach-only part opens by itself and says so
+  await page.locator('.sp-close').first().click(); await L.settle(page, 400);
+  await page.locator('.sp-filter', { hasText: 'Drafts' }).click(); await L.settle(page, 300);
+  await page.locator('.spine-row', { hasText: 'Machine Leg Press' }).first().getByRole('button', { name: 'Open' }).click(); await L.settle(page, 500);
+  secs = await page.evaluate(() => [...document.querySelectorAll('#spineEd details.spsec')].map(d => [d.querySelector('summary').textContent.replace(/\s+/g, ' ').trim(), d.open]));
+  check(r, 'an entry with no count yet opens the coach-only part by itself and says "no count yet"', secs.some(s => /Coach only/.test(s[0]) && s[1] && /no count yet/.test(s[0])), secs);
+  // typing into the coach-only part works, and a redraw leaves the parts as they were
+  await page.locator('#spineEd [data-sf="sfr"]').fill('3');
+  await page.evaluate(() => { const d = document.querySelector('#spineEd details.spsec'); d.open = true; d.dispatchEvent(new Event('toggle')); });
+  await page.evaluate(() => renderExercises()); await L.settle(page, 400);
+  secs = await page.evaluate(() => [...document.querySelectorAll('#spineEd details.spsec')].map(d => d.open));
+  check(r, 'the parts stay as you left them across a redraw, and what was typed is kept', secs.every(x => x === true) && (await page.locator('#spineEd [data-sf="sfr"]').inputValue()) === '3', secs);
+  const c0 = await L.nCalls(page);
+  await page.locator('#spineEd .sp-save').first().click(); await L.settle(page, 800);
+  const upd = lastOf(await L.callsSince(page, c0), c => c.kind === 'rpc' && c.name === 'coach_save_spine');
+  check(r, 'a save from the folded editor still sends what was typed (the SFR)', !!upd && JSON.stringify(upd.payload).includes('"sfr":3'), upd && JSON.stringify(upd.payload).slice(0, 200));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+S['levels-in-place'] = async (b) => {
+  const r = { id: 'levels-in-place', title: 'The Proof levels arrive without redrawing the page that is already on screen', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'athletes', seed: { stub: { delay: { coach_season_levels: 1500 } } } });
+  const text0 = await page.locator('#content').innerText();
+  check(r, 'the roster is drawn before the levels arrive (no LV yet)', !/LV 3/.test(text0), text0.slice(0, 120));
+  await page.evaluate(() => { window.__row = document.querySelector('#content .ath'); window.__q = document.querySelector('#rsearch, #content input[type=search], #content input'); });
+  await L.settle(page, 2200);
+  const same = await page.evaluate(() => ({ rowKept: !!window.__row && window.__row.isConnected, firstRowNow: document.querySelector('#content .ath') === window.__row }));
+  check(r, 'when the levels arrive the rows on screen are the same elements (nothing was replaced)', same.rowKept && same.firstRowNow, same);
+  const text1 = await page.locator('#content').innerText();
+  check(r, 'and the levels are on the roster now', /LV 3/.test(text1) && /LV 4/.test(text1), text1.replace(/\s+/g, ' ').slice(0, 200));
+  // the athlete's header and the Proof panel use the same slots
+  await L.go(page, 'a/ava_test/work'); await L.settle(page, 500);
+  check(r, 'an athlete\'s header shows the level', /LV 3/.test(await page.locator('#content').innerText()), '');
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
