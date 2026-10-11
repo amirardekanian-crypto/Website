@@ -143,6 +143,7 @@ the principles (their *How to add*).
   - 2026-06-19; rx wording 2026-09-26
 - `SES-6` **Lifting-day warm-ups can repeat rounds; cardio/running-day warm-ups shouldn't.**
   - 2026-07-08
+  - Amir, 2026-10-11: "i want my lifting day preps to be a circuit, because we dont need much rest". "May repeat rounds" became "is a circuit of two rounds", after Pooya's Cycle 5 prep shipped as separate cards with sets.
 - `SES-7` **Time-limited clients (esp. tennis): cap sessions ~45–50 min.**
   - 2026-06-15
 - `SES-7` **The session length on the intake form is a starting guess, not a limit.**
@@ -337,6 +338,7 @@ the principles (their *How to add*).
 - `CHP-7` **A section's shared rest is written once, on its block.**
   - It lived in /program-assemble, the workout skill, SCHEMA and PROGRAM-APP.md.
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+  - Replaced 2026-10-11 by "every working exercise and every circuit carries its own rest". Amir: "when you are writing the program, you must write a rest time for circuits. can be short as 30 seconds" and "some main exercise and some accessory exercises have rest time, some dont, it must be consistent". The 2026-09-20 reason (eight cards each repeating REST 2m) gave way to consistency. To go back: restore this line and drop the check in `check_rest()`.
 
 ## Naming
 
@@ -383,6 +385,7 @@ the principles (their *How to add*).
   - Amir, 2026-08-17, verbatim: "the rule is 5 cycles of 5 weeks and you need to remember that."
   - Written after a roadmap shipped as 6 cycles of 4/5/5/4/6/5 because the multi-lens panel argued the arc from the science and nobody checked it against the house rule.
   - The audit that day found 16 of 34 live programmes with no back-off at all, and no drop in week-5 session RPE across 12 finished cycles. Amir: "update the app in a way that it can show first week or last week".
+  - 2026-10-11, Amir: "add to the pipeline that we can have week notes. but lets change the design of the week notes. and only make it appear on the assigned week. for example when some one has a testing week, or reduced load". Week notes went from two fixed slots (`first`, `last`) to a note per week number, shown only in that week (the week 1 note had also been showing the day before the cycle started).
 - `PRC-16` **One record of who the athlete is today: the athlete profile.**
   - 2026-09-26, from the pipeline audit.
 - `PRC-17` **Roadmap is created once and locked**

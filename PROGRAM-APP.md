@@ -119,24 +119,37 @@ prescribed number and a tick means "done as written", so a range leaves the app 
 live programmes; the app shows them as a range and records
 reps only when the athlete types them, rather than inventing the low end.
 
-## 🗓️ Week 1 and the back-off week are DATA — `cycles[n].weekNotes` (2026-09-26)
+## 🗓️ Week notes are DATA, for any week of a cycle — `cycles[n].weekNotes` (2026-09-26; any week 2026-10-11)
 
 Every cycle is 4 loading weeks + 1 back-off, and the cards never change mid-cycle, so the back-off
 used to exist only if a notes card said so. The pipeline audit that day found 16 of 34 live
 programmes with no back-off wording and no drop in week-5 session RPE across 12 finished cycles.
-Amir: *"update the app in a way that it can show first week or last week"*.
-- **`cycles[n].weekNotes = { first?, last }`**, each `{ text, title?, setsDrop?, rpeDrop?, rpeCap? }`
-  (SCHEMA.md → `weekNotes`). ⚠️ **Not `weeks`**, which is the "Weeks 1–5" label string; the first
-  build used that name and would have broken every cycle card.
-- **program.html `weekNoteHTML()`** shows the text (in the Coach's Note look) under **This Week** on
-  Home and at the top of every session, only in week 1 and in the last week, from the same
-  `cycleWeekInfo()` that draws "Week X of Y". Nothing after `endDate`, and nothing for a cycle
-  without the field: the app never invents a back-off. The numbers never change a card on their
-  own: only a lower day's target reads them, and the lower of the two wins (`dayRpe()`, below).
+Amir: *"update the app in a way that it can show first week or last week"*. On 2026-10-11 he made it
+any week: a note can sit on a test week or a lighter week, and shows only during its own week.
+- **`cycles[n].weekNotes = { "1": note, "3": note, "5": note }`**: the keys are week numbers (strings),
+  each note `{ text, title?, setsDrop?, rpeDrop?, rpeCap? }` (SCHEMA.md → `weekNotes`). **`first` and
+  `last` still work** as aliases for week 1 and for the final week (about 35 live programmes were
+  written with them; no migration), and a numeric key wins over the alias for the same week.
+  ⚠️ **Not `weeks`**, which is the "Weeks 1–5" label string; the first build used that name and
+  would have broken every cycle card.
+- **program.html `weekNoteNow()` / `weekNoteHTML()`** show the text (in the Coach's Note look) under
+  **This Week** on Home and at the top of every session, **only inside the note's own week**, from the
+  same `cycleWeekInfo()` that draws "Week X of Y". With today's week `wk` of `total`, a note shows only
+  while the cycle has started and not ended (`!before && !after`): `notes[String(wk)]`, else
+  `notes.first` when `wk` is 1, else `notes.last` when `wk` is the last of more than one. Before the
+  start date nothing shows (until 2026-10-11 `cycleWeekInfo()` clamped to week 1 and the `first` note
+  showed the day before the cycle began), nor after `endDate`, nor for a cycle without the field: the
+  app never invents a back-off. The label is the note's `title`, else *Back-off week* for the legacy
+  `last`, else *Week N*. The result carries the note's fields plus `key` (`first` / `last` for the
+  aliases, `week` for a numeric key, the CSS class `week-note-<key>`; all look the same) and `wk`.
+  The numbers never change a card on their own: only a lower day's target reads them (`dayRpe()`,
+  below), in that week only, and the lower of the two wins. `scripts/headless/week-notes.js` (61 checks)
+  covers every row above and fails on the old `weekNoteNow()`.
 - **The pipeline owns it:** /program-design decides both doses as numbers (`week1:` / `lastweek:`),
   /program-engage writes the words (PART 3c), /program-assemble stores them, and
-  `scripts/check_program.py` FAILs a cycle with no `weekNotes.last` (and a first cycle with no
-  `weekNotes.first`). The 32 older programmes gain it with their next cycle, not by a bulk write.
+  `scripts/check_program.py` FAILs a cycle with no note on its final week (and a first cycle with no
+  week 1 note). The 32 older programmes gain it with their next cycle, not by a bulk write.
+  (What the pipeline writes and checks is in SCHEMA.md and the rule index; the app reads both shapes.)
 - **The athlete profile** (same day): a `profile` block at the top of each coaching log (aim,
   goals, bottleneck, minutes/cap, kit, bans, injuries, proven…), kept current like the Exercise
   Ledger. Design copies it into the spec and the checker sets its flags from it. Older athletes get

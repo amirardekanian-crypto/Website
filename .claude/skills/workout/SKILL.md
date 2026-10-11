@@ -115,10 +115,10 @@ range** (Amir, 2026-09-24).
 button is still there, labelled *Rest timer*. It used to fall back to 120s, which is how the
 demo ended up claiming "REST 2m" on all 26 cards while every rest in it was actually unset.
 
-**When a whole block shares one rest, put it on the block** — `{"title":"Strength","rest":120}` (CHP-7;
-the Library screen reads it since 2026-10-01, SCHEMA.md → `block.rest`). It renders once on the section
-header and feeds every timer in it; `rx.rest` on an exercise overrides it. Only when every `standard`
-exercise and circuit in the block has a rest written, so none inherits a rest nobody prescribed. **The tempo is one cell** — `TEMPO 3-1-1-0`, with the digits that carry the
+**Write `rx.rest` on every `standard` exercise and every circuit** (CHP-7, 2026-10-11: one rule for the
+programmes and the Library, so no card shows a rest while its neighbour shows none). The 42 sessions already
+in the Library keep the `block.rest` they were written with (the screen still reads it, SCHEMA.md →
+`block.rest`); a new session does not write one. **The tempo is one cell** — `TEMPO 3-1-1-0`, with the digits that carry the
 instruction drawn in clay (the slowest phase when it is 2s or more, plus any non-zero pause).
 `"iso"` reads `Hold`. Nothing to author beyond `rx.tempo` itself.
 
@@ -375,7 +375,7 @@ Before committing:
 - No `chips[]` anywhere, and no `chips` left beside an `rx`
 - Circuits use `rx.rounds` (a NUMBER) and `rx.rest`; items take their own `rx` when the dose is
   plain and keep free-text `detail` only when the wording says more than a number
-- A rest shared by a block sits once on the block, and `rx.rest` stays only on a card that differs (CHP-7)
+- Every `standard` exercise and every circuit carries its own `rx.rest`, and no `block.rest` (CHP-7)
 - **`node scripts/check_rx.js` passes** — it audits every `rx` in the library and is in the
   pre-commit hook anyway
 - Every exercise resolves to an approved Spine entry, carries its `exId` and its entry's exact name (no `cues` on a new session), every `note` one

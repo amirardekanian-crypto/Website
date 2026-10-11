@@ -212,7 +212,11 @@
 //      load" (not "check your connection") when it truly cannot. Without the bump a phone keeps the sign-in that needs a force-close.
 // v103: program.html changed (2026-10-11): before a cycle starts, This Week is the cycle's own first week, not Monday-Sunday, so the
 //      old cycle's last session (same day number) no longer ticks the new cycle's day as done. Without the bump a phone keeps the old window.
-const CACHE = 'aap-v103';
+// v104: program.html changed (2026-10-11): a week note (cycles[n].weekNotes) can sit on ANY week of a cycle and shows only in that week.
+//      The keys are week numbers ("1", "3", "5"), `first` and `last` still work as week 1 and the final week, a numeric key wins over the
+//      alias, and nothing shows before the start date (the week-1 note used to show the day before a cycle began) or after the end date.
+//      A note's rpeCap / rpeDrop move today's target in its week only. Without the bump a phone keeps the old two-note reader.
+const CACHE = 'aap-v104';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -185,19 +185,23 @@ opens the About sheet under **Why you**, and the cycle's Why page groups them by
   kg, so it stays and gets heavier"*); the numbers come from the athlete's own logs.
 - List them with the card's `exId` and name, like the Coach's Notes. Amir reviews them with the rest.
 
-**PART 3c — The two special weeks (2026-09-26).** From design's `week1:` and `lastweek:` lines,
-write the words the app shows the athlete during that week (`cycles[n].weekNotes`, SCHEMA.md),
-under This Week on Home and at the top of every session. Amir: *"update the app in a way that it
-can show first week or last week"*.
+**PART 3c — Week notes (2026-09-26; any week since 2026-10-11).** From design's `weeknotes:` lines,
+write the words the app shows the athlete during that week and only then (`cycles[n].weekNotes`,
+SCHEMA.md), under This Week on Home and at the top of every session. Amir: *"update the app in a way
+that it can show first week or last week"*, then *"only make it appear on the assigned week, for example
+when some one has a testing week, or reduced load"*.
 - **One or two short sentences, under ~260 characters, in Amir's voice** (COM-16). Start with the
-  instruction, never with the label: the app already prints **Week 1** or **Back-off week** above it.
+  instruction, never with the label: the app already prints the note's title, or **Week N**, above it.
+  A testing or lighter week has a title, which design names on its line.
 - **The numbers exactly as design decided, in words:** "one set fewer on every exercise",
   "every RPE at 6". An RPE going down names the floor in the same sentence ("never below 6").
 - A few words of why, when it helps: *"You get stronger in the easy week, not only the hard ones."*
 - **Say it once.** No notes card repeats it. A longer protocol (a staged return) can still have a
   card, and the week note can point to it.
-- The last week: every cycle. Week 1: whenever design wrote one (always for a new athlete).
-List them as `WEEK 1:` and `LAST WEEK:`, each with design's numbers, so assemble can store both.
+- The final week: every cycle. Week 1: whenever design wrote one (always for a new athlete). Any
+  other week: only the ones design gave a line.
+List them as `WEEK <n>:` (n is the week number; `TITLE:` after it for a testing or lighter week), each with
+design's numbers, so assemble can store them under that week's number.
 
 ## PART 4 — DAY COMPLETION MESSAGES
 For each training day in the program spec (Day 1…N), tied to that day's focus and how
@@ -224,7 +228,7 @@ a question. If a line starts explaining HOW, it belongs in the app.
 | a notes card | **Coach** tab → the card's title, exactly as the app shows it |
 | a Coach's Note (how to start an exercise, how to film it) | the **clay dot** after the exercise's name; open the card |
 | why they have an exercise (a Because) | the **ⓘ** on the exercise |
-| week 1 / the back-off week | **Home → This Week**, shown on its own that week |
+| a week note (week 1, a testing week, the back-off) | **Home → This Week**, shown on its own that week |
 | body weight | **Home → Body Weight → Weigh in** |
 | a bad day | the **check-in** before every session; the app lowers that day's targets |
 | how the app works (RPE, tempo, Guided) | **Coach** tab → *How the app works* (or their initials, top right) |
@@ -301,5 +305,5 @@ Hand off to **/program-assemble Part B**, which places the words, runs the full 
 - Don't write an exercise Coach's Note as HTML — it's a short plain-text callout, not a
   notes card. Don't invent one for an exercise design didn't flag, and don't have it
   re-explain a protocol its matching notes card already covers.
-- Don't put week 1 or the back-off week in a notes card. They are the week notes (PART 3c), which
-  the app shows in that week; a card would say it twice.
+- Don't put a week's instruction (week 1, a testing week, the back-off) in a notes card. It is a week note
+  (PART 3c), which the app shows in that week; a card would say it twice.

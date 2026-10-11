@@ -78,11 +78,13 @@ Leave `videoUrl` out: the app plays the card's Spine entry's video (found by `ex
   `test_flag: 5RM`; see SCHEMA "test"). Verbatim, standard lifts only, and never invent one —
   which lifts get retested is a coaching decision the design pass already made. An exercise
   with no flag simply has no `test` field.
-- **Write the two special weeks' NUMBERS on the cycle** (2026-09-26): `cycles[currentCycleIndex]
-  .weekNotes = { "first": {…}, "last": {…} }` with design's `setsDrop` / `rpeDrop` / `rpeCap` from its
-  `week1:` / `lastweek:` lines; engage's words join them in 2f. Leave `first` out only when design
-  wrote "same as the card". ⚠️ The field is `weekNotes`, never `weeks` (that is the "Weeks 1–5"
-  label). The app shows each in its week; see SCHEMA.md → `weekNotes`.
+- **Write the week notes' NUMBERS on the cycle** (2026-09-26; any week since 2026-10-11):
+  `cycles[currentCycleIndex].weekNotes = { "1": {…}, "3": {…}, "5": {…} }`, one key per week design gave a
+  `weeknotes:` line, the key being the week number, with design's `setsDrop` / `rpeDrop` / `rpeCap` and the
+  `title` (a testing or lighter week needs one); engage's words join them in 2f. No key for a week design
+  left out (a week 1 that is "same as the card" has none). Never write the older `first` / `last`: they are
+  only still read on programmes written before 2026-10-11. ⚠️ The field is `weekNotes`, never `weeks` (that is
+  the "Weeks 1–5" label). The app shows each note in its own week only; see SCHEMA.md → `weekNotes`.
 
 **2b — Copy the dose into `rx`** (per SCHEMA → "`rx` — the prescription"). Design's dose
 fields map one-to-one; there is nothing to convert:
@@ -99,10 +101,12 @@ fields map one-to-one; there is nothing to convert:
 | rest | `"rest": 120` |
 | `intent` | `"intent": "max intent"` or a grip, `"intent": "neutral grip"`, at exercise level — the one green pill |
 
-**Rest belongs to the BLOCK when a section shares one (CHP-7).** Write `"rest": 120` on the block and
-leave `rx.rest` off its exercises — the section header states it once and every timer in the
-block uses it. Put `rx.rest` only on the exercises that genuinely differ; it overrides the
-block and draws its own cell. Eight cards each repeating "REST 2m" is the same fact eight times.
+**Rest is written on EVERY card (CHP-7; Amir, 2026-10-11: *"some main exercise and some accessory
+exercises have rest time, some dont, it must be consistent"*).** Every `standard` exercise and every
+`circuit`, a prep circuit included, carries `rx.rest` from the spec's `rest:` (30 s at the least). Do not
+write `block.rest`: it used to state a section's rest once and left the cards under it with no REST cell,
+so one section showed a rest on some cards and none on others. A `simple` line (bike, walk) has no rest. If
+the spec leaves a rest off a working card, stop: that is a design gap, not a blank to leave.
 
 **Circuits take `rx` too:** `{"rx": {"rounds": 3, "rest": 60}}` — `rounds` is a NUMBER, not
 `"×3 Rounds"`. Each item takes its own `rx` when the dose is plain (`{"rx":{"reps":12}}`,
@@ -112,7 +116,8 @@ when the wording carries more than a number (`"15 sec, switch legs each round"`)
 **OMIT ANYTHING THE SPEC DID NOT GIVE YOU.** An absent field means "not prescribed" and the
 app draws no cell for it — that is the entire contract. Never write a placeholder, an empty
 string, or a zero. In particular: **no `rpe` on warm-up/prep, no `tempo` on ballistic work
-or carries, and no `rest` unless the spec named one** (the app stopped inventing 120s).
+or carries, and no `rest` on a `simple` line** (the app invents none either: the rest on a working
+card is yours to write, CHP-7).
 
 **Never restate the tempo in `intent` (CHP-6).** `"3s eccentric"` beside `"tempo": "3-1-1-0"` is the
 same instruction twice; the card already shows the tempo with its key digits highlighted.
@@ -159,6 +164,13 @@ prep — `Activation & Prep`, `Prime`, `Warm-Up`, or a free name containing *mob
 Warm-up `simple` items carry the dose only — **no `rpe`, no `tempo`, no `rest`** (an RPE on a
 warm-up is noise; readiness check covers feel). With only a dose, the app drops the grid and
 renders the item as a name and a number on one line, which is what a warm-up should look like (SES-5).
+
+**A lifting day's prep is a circuit (SES-6; Amir, 2026-10-11: *"i want my lifting day preps to be a circuit,
+because we dont need much rest"*).** The `Activation & Prep` block holds the machine raise as a `simple` line
+(`rx.time`) and the spec's PREP CIRCUIT as ONE `type: "circuit"` entry: `rx: {"rounds": 2, "rest": 30}` (the
+spec's rest, 30 s at the least) and `items[]`, each with `exId` and `rx.reps`. Never the same movements as
+separate `simple` cards with `sets`. `check_program.py` fails a lifting day (one with a Primary block) that has
+no prep circuit, and a prep movement written as a card with sets.
 
 **RETURNING — the cycle advances on the server.** `publish_cycle()` (Step 7) builds the finished
 cycle's archive entry from the live row, puts it FIRST in `programHistory` with its `id`
@@ -218,8 +230,8 @@ count and what landed on the cards differ, which is how a dropped or invented on
   wrote it from design's `note_flag`), not from design directly. Copy verbatim, plain text — never
   wrap it in HTML (that's the cycle notes cards' convention, not this field's). Never move
   exercise-scoped guidance into the notes cards, and never invent a note nothing flagged.
-- **The week notes' words:** engage's PART 3c `WEEK 1:` / `LAST WEEK:` text into `weekNotes.first.text`
-  and `weekNotes.last.text`, beside the numbers Part A wrote.
+- **The week notes' words:** engage's PART 3c `WEEK <n>:` lines, each into `weekNotes["<n>"].text`
+  (its `title` too, when the line has one), beside the numbers Part A wrote.
 - **Becauses** (PART 3b) as `"why": { "src", "part"?, "text" }` on that exercise (standard or
   simple, never a circuit). Verbatim, and never invent one. **Write `why` fresh every cycle:
   never carry a previous cycle's `why` over**, because a reason from Cycle 1 is stale by Cycle 3.
@@ -256,8 +268,8 @@ count and what landed on the cards differ, which is how a dropped or invented on
   day, sets per muscle and the **QUALITY** line. The JSON parse, the rx shape checks and the
   Because audit (`Chips.auditWhy`) run inside it, so there is no separate node step any more.
 - **Coaching lint** (still yours: the script can't judge these): every `standard` has sets, a dose
-  and an RPE unless the movement says otherwise; rest sits on the block when the section shares
-  one, on the exercise only when it differs; a tempo only where the spec gave one; ballistic work
+  and an RPE unless the movement says otherwise; every `standard` exercise and every circuit carries its own
+  `rx.rest` (CHP-7); a tempo only where the spec gave one; ballistic work
   and carries omit tempo and carry an `intent`; section titles use the standard names
   (Primary/Accessory/etc, never "Strength"). A rep range in the spec means stop and ask (PRG-6):
   never pick an end yourself.
@@ -387,7 +399,7 @@ What each key asks of him:
 
 | key | Amir's line |
 |---|---|
-| `backoff`, `week1` | the week's dates and the week note exactly as the athlete reads it (this was WEEKS) |
+| `backoff`, `week1` (and any other week note design assigned) | the week's dates and the week note exactly as the athlete reads it (this was WEEKS) |
 | `film` | what to film, which weeks, when he reviews it, what stays blocked until he clears it |
 | `weigh-in` | how often, what number moves what, where it shows in coach.html |
 | `pain-ladder`, `modification-menu` | the step that makes him act (a stop, a swap, a referral) |

@@ -60,9 +60,9 @@ never drift from the plan.
 - **Each cycle is 4 loading weeks + 1 back-off week.** The back-off is the 5th week of every
   cycle, which is what satisfies "never program past a fatigue wall" without a mid-cycle
   deload. ⚠️ The back-off week is **NOT authored into the exercise cards**: /program-design sets
-  its dose as numbers and it ships as the cycle's `weekNotes.last`, which the app shows during
-  the last week (2026-09-26; SCHEMA.md → `weekNotes`).
-- ⚠️ **The cards carry the athlete's NORMAL prescription.** Week 1 and the back-off week live in
+  its dose as numbers and it ships as the cycle's week note on its final week, which the app shows
+  during that week only (2026-09-26; SCHEMA.md → `weekNotes`).
+- ⚠️ **The cards carry the athlete's NORMAL prescription.** Week 1, the back-off week and any testing or lighter week live in
   the cycle's `weekNotes`; a low-readiness stretch lives in a notes card. None of these is ever
   written as a lower RPE/volume on the exercise itself. Amir does not change a program
   mid-cycle, so the card is a stable reference all cycle (PRG-4, PRC-15). Write

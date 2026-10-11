@@ -106,7 +106,7 @@ stale copy reached athletes.
 | REC-1 | Recovery capacity gates everything: set the weekly volume ceiling before the number of sessions. | roadmap · design | |
 | REC-2 | Low-readiness days: amber, 1 off every RPE (never below 6); red, warm-up, first power and first primary, rest optional; sore, half the jumps and landings. | design · engage | oblig `low-readiness` |
 | REC-3 | Separate training fatigue from life load in every review. | design · report | |
-| REC-4 | Never program past a fatigue wall: every cycle's last week is a back-off, written as `weekNotes.last`. | design | ✓ |
+| REC-4 | Never program past a fatigue wall: every cycle's last week is a back-off, written as that week's week note. | design | ✓ |
 | REC-5 | A concurrent athlete gets a double-day rule: gym after sport or 4–6 hours apart, otherwise the minimum dose with the primary at RPE 6. | design · engage | oblig `double-day` |
 | REC-6 | High-stress and concurrent athletes also get a flexible session order in their notes. | design · engage | |
 
@@ -118,7 +118,7 @@ stale copy reached athletes.
 | SES-3 | Warm-up plus prep is always 10–15 minutes of programmed time. | design | |
 | SES-4 | Gym clients warm up on a machine; strength prep has no joint-isolation drills; skips, shuffles and sprints belong to court or run days. | design · edit | |
 | SES-5 | Warm-up and prep items log nothing and carry no RPE. | design · assemble | warn |
-| SES-6 | Lifting-day prep may repeat rounds; a cardio or running day's prep builds through distinct movements in one pass. | design | |
+| SES-6 | A lifting day's prep is a machine raise plus one two-round prep circuit; a cardio or running day's prep is one pass through distinct movements. | design · assemble | part (lifting days) |
 | SES-7 | Design to the real minutes the logs show; a new athlete gets the form's minutes plus 15. A cap binds only on a hard stop. | design | warn |
 | SES-8 | No competition calendar unless Amir names one: the arc runs straight through. | roadmap · design | |
 | SES-9 | Order within a session: power, then primary, accessories, core; blocks use the standard section names (SCHEMA.md), never one "Strength" block. | design · assemble | part (a Strength block; the order warns) |
@@ -212,7 +212,7 @@ stale copy reached athletes.
 | CHP-4 | No RPE below 6 anywhere; a note that lowers RPE names the floor of 6 in the same sentence. | design · engage | ✓ |
 | CHP-5 | A prescription is the `rx` object: write what is prescribed and omit the rest (absent means not prescribed). Never write `chips[]`. | assemble | part (`chips[]`, two doses) |
 | CHP-6 | Say the tempo once, in its cell: never restate it in `intent`, a note or a cue. | design · assemble | |
-| CHP-7 | A section's shared rest sits once on its block; an exercise carries its own rest only when it differs. | assemble | |
+| CHP-7 | Every working exercise and every circuit carries its own rest in `rx.rest`; a prep circuit's can be as short as 30 seconds. | design · assemble | ✓ |
 
 ### Process
 | ID | Rule | Stage | Check |
@@ -231,7 +231,7 @@ stale copy reached athletes.
 | PRC-12 | Every build ends with a coach handoff: measurements, gates, films, dated escalations and decisions made for Amir, each with its reason. | assemble | |
 | PRC-13 | Reassessment is scheduled: every cycle has a set length and a trigger (a primary stalled about two weeks). | design | |
 | PRC-14 | The roadmap is 5 cycles of 5 weeks, each 4 loading weeks and 1 back-off. Deviate only on Amir's word, and say so. | roadmap | |
-| PRC-15 | Week 1 and the back-off: design sets the dose as numbers, engage writes the words, assemble stores them as `weekNotes`. | design · engage · assemble | ✓ |
+| PRC-15 | A week note is assigned to one week and shows only then: design sets the numbers, engage the words, assemble stores them as `weekNotes`. | design · engage · assemble | ✓ |
 | PRC-16 | One current athlete profile heads the coaching log: intake drafts it, every run keeps it current, and the checker reads it. | intake · design · edit | warn (missing) |
 | PRC-17 | The roadmap is written once and locked. A change goes through design's `roadmap_amend:` line at the checkpoint, never a quiet rewrite. | roadmap · design | |
 | PRC-18 | Every cycle's rationale is appended to the coach-only coaching log and never overwritten. | assemble | |
@@ -532,7 +532,7 @@ same ID. Read a rule's story and its history before changing it.
   life, not load).
 - `REC-4` **Never program past a fatigue wall** — build a deload/back-off after dense weeks
   (Athlete D ran 4 sessions in 5 days in C2 and hit a wall). Every cycle's
-  last week is that back-off, written as `weekNotes.last` (Process → 5 cycles of 5 weeks).
+  last week is that back-off, written as a week note on the final week (PRC-15).
 - `REC-5` **Concurrent athletes (heavy sport schedule alongside the gym) always get a double-day
   rule in autoregulation.** When most gym days will also be sport days, the program must say
   what to do on one: gym after the sport session, or at least 4–6 h apart; if the gap is
@@ -580,12 +580,16 @@ same ID. Read a rule's story and its history before changing it.
   with **no `rx.rpe`**. An RPE on a warm-up is noise; the pre-session readiness check already
   captures how the athlete feels. RPE on a `simple` item is reserved for a genuinely
   effort-graded piece (a cool-down jog, a conditioning finisher), never the warm-up.
-- `SES-6` **Lifting-day warm-ups can repeat rounds; cardio/running-day warm-ups shouldn't.** A prep
-  circuit before a *lifting* session is fine at ×2 rounds of a tight movement list (repetition
-  reinforces the pattern before loading it). A prep circuit before a *cardio/running* session
-  should instead build progressively through **more distinct movements in a single pass**
-  (mobility → activation → dynamic movement → plyo/stride primer) rather than repeating the
-  same short list twice — that progression is the point, not the rep count.
+- `SES-6` **A lifting day's prep is a machine raise plus ONE prep circuit of two rounds** (Amir, 2026-10-11:
+  "I want my lifting day preps to be a circuit, because we don't need much rest"). The raise is a `simple`
+  item (bike, `rx.time`); the movements are the circuit's `items`, one `rx.reps` (or `rx.time`) each, with
+  `rx.rounds: 2` and the circuit's own rest (CHP-7, 30 s is enough). Never the same movements as separate
+  `simple` cards with `sets`: that made the athlete tick every set of a warm-up like a lift (Pooya's Cycle 5
+  was built that way, and 33 of 36 live programmes already had the circuit). A lifting day is a day with a
+  Primary block; repeating a short list twice reinforces the pattern before loading it. A prep circuit
+  before a *cardio/running* session builds progressively through **more distinct movements in a single
+  pass** (mobility → activation → dynamic movement → plyo/stride primer) rather than repeating the same
+  short list twice: that progression is the point, not the rep count.
 - `SES-7` **Time-limited clients (esp. tennis): cap sessions ~45–50 min.** Power work (low volume,
   long rest, few reps) is naturally shorter and fits the constraint. Only for a
   REAL limit: see the next bullet.
@@ -693,7 +697,7 @@ same ID. Read a rule's story and its history before changing it.
   mode, and a card that merely teaches load-finding ("start under what you think and let the
   first set tell you") is NOT that instruction — it explains *how* to pick a weight, never
   that this week's effort ceiling is lower. Whenever the design read says start lower, write
-  it where she will meet it: week 1 is `weekNotes.first` (with `rpeCap` or `rpeDrop`), and a
+  it where she will meet it: week 1 is its week note (with `rpeCap` or `rpeDrop`), and a
   longer start-lower, like a staged return, is a notes card. Either way it names: **the reduced
   RPE as an actual number** (≥6 — see the RPE-floor
   rules in "Chips & modifiers"), **which exercises it applies to**, and **what moves her back
@@ -946,7 +950,7 @@ same ID. Read a rule's story and its history before changing it.
   the number under their feet.
 - `COM-14` **A Coach's Note is one to three short sentences.** Plain text, about this athlete only, never a cue (CUE-2). Three copies said one sentence (design, edit and the cue story) and two said one to three (engage, SCHEMA); Amir chose one to three on 2026-09-26, because a note sometimes carries a starting weight and a caveat.
 - `COM-15` **A Because is one sentence of 140 characters at most, written fresh each cycle.** A reason from Cycle 1 is stale by Cycle 3, so it is never carried over.
-- `COM-16` **A week note is short and says it once.** One or two short sentences under about 260 characters, starting with the instruction (the app already prints *Week 1* or *Back-off week* above it), and no notes card repeats it.
+- `COM-16` **A week note is short and says it once.** One or two short sentences under about 260 characters, starting with the instruction (the app already prints its label above it: the note's title, or *Week N*), and no notes card repeats it.
 - `COM-17` **The handoff message points into the app; it never rewrites it.** The cards, Coach's Notes and
   week notes hold everything in full, so a line about anything the app holds is a short gist in the athlete's
   language (what to do) plus where it is, by the app's own names: *"if the cough won't settle, stop and
@@ -957,8 +961,8 @@ same ID. Read a rule's story and its history before changing it.
   - **Length:** about 12 to 15 lines for a returning athlete; about 20 to 25 for a new one, the extra being
     the sign-in and a short tour of where things are, never card content.
   - **A returning athlete hears only what is new or changed this cycle**, plus the good news; the rest is
-    one line (*everything else is where it always is, on the Coach tab*). Week 1 and the back-off week are
-    never in the message: Home shows each in its own week.
+    one line (*everything else is where it always is, on the Coach tab*). A week note is never in the
+    message: Home shows each in its own week.
   - **A doctor is advised once, never chased.** No reminder is written for later, and nothing waits on it:
     if the athlete goes and reports back, the programme may change; if not, nothing follows.
 
@@ -1028,7 +1032,15 @@ same ID. Read a rule's story and its history before changing it.
   (rest used to default to 2 minutes, so a calf raise and a back squat showed the same rest).
   Legacy `chips[]` is still read by the app and never written. Full spec: SCHEMA.md → `rx`.
 - `CHP-6` **Say the tempo once, in its cell.** Never restate it in `intent`, a note or a cue: *3s eccentric* beside a tempo of 3-1-1-0 is the same instruction twice, and the card already highlights the digit that carries the instruction (2026-09-20).
-- `CHP-7` **A section's shared rest is written once, on its block.** The section header states it and every timer in the block uses it; an exercise carries its own `rx.rest` only when it differs (2026-09-20: eight cards each repeating REST 2m is one fact eight times).
+- `CHP-7` **Every working exercise and every circuit carries its own rest, in `rx.rest`** (Amir, 2026-10-11:
+  "some main exercise and some accessory exercises have rest time, some don't, it must be consistent"; "you
+  must write a rest time for circuits, can be as short as 30 seconds"). A block's shared `rest` used to be
+  written once on its header with no cell on the cards under it (2026-09-20: eight cards each repeating REST
+  2m is one fact eight times), so a card with its own number showed a REST cell and its neighbours showed
+  none, and a prep circuit had no rest at all. Now every `standard` exercise and every `circuit`, a prep
+  circuit included, writes `rx.rest` (30 s at the least; a `simple` item such as a bike or a walk has none),
+  and the block's `rest` is not written (the app still reads it on programmes written before this). The app
+  still never invents a rest: writing one on every card is the pipeline's duty, not a fallback.
 
 ## Naming
 - `NAM-10` **Cycle names are cool & evocative** — punchy 1–2 word power-names (Foundation Forge,
@@ -1169,12 +1181,16 @@ same ID. Read a rule's story and its history before changing it.
   arc to 5×5 and make the extra block do real work rather than padding it with a retest or a
   maintenance phase. Each cycle runs **4 loading weeks + 1 back-off week**, which is what
   satisfies "never program past a fatigue wall" without a mid-cycle deload.
-  **The back-off week has an owner (2026-09-26).** /program-design decides its dose as numbers
-  (how many sets fewer, how many RPE points off, or an RPE cap, never below 6), /program-engage
-  writes the athlete's words, and /program-assemble stores both as the cycle's `weekNotes.last`,
-  which the app shows in the last week, under This Week on Home and at the top of every session.
-  Week 1 works the same way through `weekNotes.first`. `scripts/check_program.py` fails a cycle
-  without them.
+  **A week note belongs to one week (2026-09-26, widened 2026-10-11).** /program-design decides a special
+  week's dose as numbers (how many sets fewer, how many RPE points off, or an RPE cap, never below 6),
+  /program-engage writes the athlete's words, and /program-assemble stores both in the cycle's `weekNotes`
+  under that week's number (`"1"`, `"4"`, `"5"`). The app shows a note only in its own week, under This Week
+  on Home and at the top of every session, and nowhere else: not before the cycle starts, not after it ends.
+  Every cycle has the back-off on its final week, and week 1 has a note when it differs (always for a new
+  athlete). Any other week that differs from the card, a testing week or a reduced-load week, gets its own
+  note with a title (*Testing week*, *Lighter week*). `first` and `last` still read as week 1 and the final
+  week on programmes written before 2026-10-11. `scripts/check_program.py` fails a cycle without its
+  back-off and a new athlete's first cycle without the week 1 note.
 - `PRC-16` **One record of who the athlete is today: the athlete profile.** Goals in order, the bottleneck, days and real minutes, kit, standing bans, injuries with
   their status, recovery, and whether the aim is sport or strength-and-muscle live in a small
   `profile` block at the top of the coaching log, kept current like the Exercise Ledger:

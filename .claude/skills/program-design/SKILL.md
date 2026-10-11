@@ -290,7 +290,8 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   and no grind (7 or more working exercises, SES-15). For poor-recovery clients this distribution is the
   primary lever.
 - **Warm-up + prep** on every day: 10–15 minutes (SES-3), its contents by SES-4, and its shape
-  by SES-6 (lifting days may repeat rounds; cardio and running days build through distinct
+  by SES-6 (a lifting day: the machine raise plus ONE prep circuit of two rounds, three or four
+  movements, with a rest of 30 s or more; a cardio or running day builds through distinct
   movements in one pass). Sweep it against every restriction (SEL-11, SEL-18).
 - **Time-budget check (required — not optional):** estimate each day's actual working time
   (Σ sets × (rest + ~30–45s per set), plus warm-up) against its session-length cap. **The cap
@@ -318,10 +319,11 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   Cycle 2 a rotated accessory can be paired), and never a unilateral Primary (SES-10). Spec the
   whole pair as ONE circuit-role entry (the STEP 3 template below), never two accessory-role
   entries carrying `intent: superset` (SES-12).
-- **WEEK 1 AND THE LAST WEEK (required output, 2026-09-26).** Every cycle is four loading weeks
-  plus a back-off week, and the cards never change, so decide both special weeks here, as
-  numbers. The app shows them to the athlete during that week (`cycles[n].weekNotes`, SCHEMA.md).
-  - **Last week, every cycle:** the back-off dose. Pick from `setsDrop` (sets fewer on every
+- **WEEK NOTES (required output, 2026-09-26; any week since 2026-10-11).** Every cycle is four
+  loading weeks plus a back-off week, and the cards never change, so every week that differs from
+  the card gets a note, decided here as numbers. A note belongs to ONE week and the app shows it only
+  then (`cycles[n].weekNotes`, keyed by week number: SCHEMA.md, PRC-15).
+  - **The final week, every cycle:** the back-off dose. Pick from `setsDrop` (sets fewer on every
     exercise), `rpeDrop` (RPE points off, never below 6) and `rpeCap` (no set above it, 6–9), and
     say what else changes: retests on flagged lifts only, no new top sets, a shorter outside day.
     The usual shape is one set fewer and every RPE at 6 or 7. The one exception is a cycle Amir
@@ -329,7 +331,12 @@ Day count + type of each day; one line of rationale per day citing Step 1.
   - **Week 1, when it differs:** always for a new athlete, and for a returning one after a
     layoff, a return from injury, or a cycle full of new patterns. Usually an `rpeCap` of 7 on
     what's new, or `rpeDrop` 1 across the board, and what moves them back to the card from week 2.
-  Engage writes the athlete's words for both; you write the decision.
+  - **Any other week that differs from the card** (Amir, 2026-10-11: *"for example when some one has a
+    testing week, or reduced load"*): a testing week (which lifts get one test set, and what the rest
+    of the week does) or a reduced-load week (a mid-cycle deload, a travel or exam week, a staged
+    return). Name the week number, a short title (*Testing week*, *Lighter week*) and the dose in the
+    same three numbers. Never a note for a week that matches the card.
+  Engage writes the athlete's words for each; you write the decision, one `weeknotes:` line per week.
 - **DAY NAMING:** just note *what each day trains* in a plain working title (e.g. "Lower —
   squat/quad", "Upper push & pull"). The **vivid, banner-correct `focusTag` is finalized in
   /program-assemble** (it owns the keyword→image matching per SCHEMA) — don't do
@@ -359,7 +366,7 @@ writes anything (so a fix never leaves notes describing the old programme):
 So write the spec for a script to read: each
 banned movement named in one line (`bans: goblet, hanging, …`), every fallback on a line that
 starts `fallback:`, a muscle excused from the floor on `floor-except: chest (posture)`, and the
-two special weeks on `week1:` and `lastweek:` lines. A ban word is matched anywhere on a line holding `fallback`, `→`, `instead`
+week notes on the `weeknotes:` lines. A ban word is matched anywhere on a line holding `fallback`, `→`, `instead`
 or `swap`, so never reuse it in another sense there (`two sessions running` failed with
 `running` banned).
 
@@ -385,7 +392,10 @@ so what you write is what ships. You just decide the numbers + the coaching inte
 - **OMIT WHAT YOU DID NOT PRESCRIBE.** An absent field is not a gap for someone downstream to
   fill — it means "not prescribed", and the app draws no cell for it. This is why a warm-up
   with no RPE now renders as a clean one-liner instead of a grid of dashes. Never ask for a
-  placeholder, and do not invent a rest just to have one.
+  placeholder. The one field that is never absent is the rest: write `rest:` on every working
+  exercise and every circuit, a prep circuit included, 30 s at the least (CHP-7; Amir, 2026-10-11:
+  *"some main exercise and some accessory exercises have rest time, some dont, it must be
+  consistent"*).
 - standard grinding lift → sets · reps/duration/distance · tempo · RPE · rest · intent (or none)
 - ballistic (jumps/throws/Olympic) → sets · reps · RPE · rest · intent `max intent` — **no tempo**
 - loaded carry → sets · distance/duration · RPE · rest — **no tempo**
@@ -393,8 +403,10 @@ so what you write is what ships. You just decide the numbers + the coaching inte
   **This is also how a superset/complex is spec'd — one circuit block, each paired exercise
   is one `items[]` entry.** Never spec a superset pair as two separate standard-role entries
   each with its own `rest:` and an `intent: superset` tag — see the "Superset" bullet in STEP 2.
-- **warm-up / prep (simple or circuit)** → dose only (reps/duration); **no RPE, logs nothing**
-  (prep circuits get `warmup: true` in assembly). RPE on a warm-up is noise.
+- **warm-up / prep** → dose only (reps/duration); **no RPE, logs nothing** (prep circuits get
+  `warmup: true` in assembly). RPE on a warm-up is noise. The bike is a simple line (time); a
+  lifting day's movements are ONE circuit, two rounds, one reps number per item, and a rest of its
+  own (SES-6, CHP-7).
 - `intent` is ONE coaching intention in plain words (`max intent`, `stick the landing`,
   `right leg first`) — it ships as the exercise's `intent` field and draws the single green
   pill. Leave blank if none. **Never restate the tempo here** (CHP-6): `3s eccentric` beside a tempo of
@@ -446,8 +458,8 @@ so what you write is what ships. You just decide the numbers + the coaching inte
 **OBLIGATIONS (required output, 2026-09-26): name every note this cycle MUST carry.** Engage writes
 each one, tags the card that carries it, and the checker fails a missing one, so a rule that
 lives only as "engage should write a card about X" can no longer slip. List every key that applies:
-- `backoff` — every cycle (carried by `weekNotes.last`).
-- `week1` — a new athlete, a layoff, a return from injury, a cycle of new patterns (`weekNotes.first`).
+- `backoff` — every cycle (carried by the week note on the cycle's final week).
+- `week1` — a new athlete, a layoff, a return from injury, a cycle of new patterns (the week 1 note).
 - `explainer` — a new athlete; a returning one only when the read flags RPE drift or confusion.
 - `pain-ladder: <body part>` — any active injury, rehab stage or managed history.
 - `modification-menu` — an athlete who hides pain (reporting buys a change, never a ban).
@@ -545,8 +557,10 @@ ATHLETE_ID: [id]
 SPORT_BADGE: [emoji] [label]
 PROGRAM: [number] | [N] days | [one-line focus]
 week: [the usual training week, e.g. Sat:1, Mon:2, Wed:3 — turns on the back-to-back check]
-week1: [rpeCap 7 / rpeDrop 1 on what, and what moves them back to the card] (or "same as the card")
-lastweek: [setsDrop 1 · rpeCap 6, plus anything else that changes] (every cycle)
+weeknotes:
+- 1 | [rpeCap 7 / rpeDrop 1 on what, and what moves them back to the card] (leave the line out when week 1 is "same as the card")
+- [N] | [title: Testing week / Lighter week] | [the dose, and what changes] (any other week that differs from the card)
+- 5 | [setsDrop 1 · rpeCap 6, plus anything else that changes] (the final week, every cycle)
 bans: [one line, if any]
 floor-except: [muscle (reason), only when the aim is strength-muscle and a muscle is excused]
 obligations:
@@ -560,8 +574,11 @@ roadmap_amend: [cycle N: field → new value (the data point that forces it) —
 DAY [N] — [plain working title: what it trains] | load identity: [peak/moderate/low]
 
 SECTION: Activation & Prep   (logs nothing — no RPE)
-  • [Movement] | [reps or duration] | note_flag: [only if this athlete needs one]
-  • ...
+  • [Machine raise] | [duration] | note_flag: [only if this athlete needs one]
+  PREP CIRCUIT (a lifting day: ONE circuit of two rounds, SES-6) | rounds: 2 | rest: Xs (30 or more, CHP-7)
+    [Movement A] — reps: X | note_flag: [optional]
+    [Movement B] — reps: X
+    ...
 
 SECTION: Primary
 [Movement] | role: primary
@@ -580,7 +597,7 @@ per round, after BOTH exercises, not per exercise) | RPE: X (one for the whole r
   [Movement B] — reps: X | note_flag: [optional]
 
 SECTION: Core
-[Movement or circuit] | dose | note_flag: [optional]
+[Movement or circuit] | dose | rest: Xs | note_flag: [optional]
 
 (cues: none in the spec. They come from each exercise's Spine entry. Anything you noticed about
  an entry while designing, such as a missing regression/progression/alternative, a wrong flag or a better general cue, goes in as
@@ -636,7 +653,7 @@ where to invest if time allows (VOL-1), a muscle under 10 by choice and why (VOL
 (peak, moderate, low: VOL-2). A count that looks wrong for one exercise is fixed on its Spine
 entry (a proposal to Amir, /spine), never by hand in the log.
 
-**Special weeks** — the week-1 and back-off doses as decided (one line each).
+**Week notes** — each as decided: week, title, numbers (one line each: week 1, the final week, and any testing or reduced-load week).
 ```
 *(Progression levers and an e1RM section used to close the entry. Amir doesn't read them, so they
 went on 2026-09-26. An e1RM that drove a decision belongs in "The read", with its grade.)*

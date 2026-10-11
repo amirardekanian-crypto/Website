@@ -29,11 +29,14 @@
   - `"simple"` → just the row. No rest, no weight, no RPE, no note.
   - `"standard"` → always has rest timer + weight log + RPE selector + personal note.
   - `"circuit"` → rest timer at the end (when a rest is written, or for a working circuit) + personal note, and **the block decides whether it logs**: a circuit in a **prep/activation block logs nothing**; a circuit in any **working block** gets an inline **weight field per item** plus **one RPE per round** (supersets, complexes, conditioning). Override either way with `logWeight` / `logRPE`. See "Circuit logging" below.
-- Rest is **`rx.rest`** (seconds), or **`block.rest`** once for a whole section. **Nothing invents
-  one** (WK-05, 2026-09-27: circuits used to fall back to 60 s): omit it and the card draws no rest in
-  its line. A `standard` exercise's timer still opens at 2 minutes and says "Rest timer"; a working
+- Rest is **`rx.rest`** (seconds), written on **every `standard` exercise and every `circuit`**, a prep
+  circuit included, 30 s at the least (CHP-7, 2026-10-11). `block.rest` (one rest for a whole section) is
+  still read on programmes written before that and is no longer written. **The app invents nothing**
+  (WK-05, 2026-09-27: circuits used to fall back to 60 s): a card with no rest draws none in its line.
+  A `standard` exercise's timer opens at 2 minutes and says "Rest timer" when none is written; a working
   circuit's opens at 1 minute, the same way; a warm-up circuit with none has no rest button. `restSec`
-  is the old spelling, still read.
+  is the old spelling, still read. Writing one on every card is the pipeline's job, checked by
+  `scripts/check_program.py`.
 - A `"circuit"` carries `items[]` and its rounds as **`rx.rounds`, a number**. The old
   `"rounds": "×3 Rounds"` string is still read, never written.
 - The legacy `"hasRest"` field is no longer used and can be removed. Old files that still contain it will keep working — the field is simply ignored.
@@ -79,8 +82,8 @@ Replace each placeholder value. Keep an optional section only if it applies; oth
         ]
       },
       "weekNotes": {
-        "first": { "rpeCap": 7, "text": "What week 1 does differently, with the number." },
-        "last": { "setsDrop": 1, "rpeCap": 6, "text": "What the back-off week does, never below RPE 6." }
+        "1": { "rpeCap": 7, "text": "What week 1 does differently, with the number." },
+        "5": { "setsDrop": 1, "rpeCap": 6, "text": "What the back-off week does, never below RPE 6." }
       }
     },
     {
@@ -306,41 +309,45 @@ Each cycle describes one training phase.
 | `focuses` | string[] | optional | Unlimited list of focus statements |
 | `message` | object | optional | Only used when this is the current cycle (see below) |
 | `teaser` | object | optional | Only used when this is the next cycle (see below) |
-| `weekNotes` | object | **required on every new cycle** | The first and the last week of the cycle, shown by the app while that week is on (see below). ⚠️ Not `weeks`, which is the "Weeks 1–5" label. |
+| `weekNotes` | object | **required on every new cycle** | A note per week number, each shown by the app only while its own week is on: the back-off on the final week always, week 1 when it differs, and any other week that differs from the card (see below). ⚠️ Not `weeks`, which is the "Weeks 1–5" label. |
 
-#### `weekNotes` — the first week and the back-off week (2026-09-26)
+#### `weekNotes` — a note for one week of the cycle (2026-09-26, any week since 2026-10-11)
 
-Amir: *"update the app in a way that it can show first week or last week."* Every cycle is four
-loading weeks plus a back-off week, and the exercise cards never change mid-cycle, so until now the
-back-off existed only if a notes card said so. In the audit that day, 16 of 34 live programmes had
-no such card, and in 12 finished cycles week-5 session RPE (6.71) matched weeks 1–4 (6.74).
+Amir, 2026-09-26: *"update the app in a way that it can show first week or last week."* Every cycle is
+four loading weeks plus a back-off week, and the exercise cards never change mid-cycle, so until then the
+back-off existed only if a notes card said so (16 of 34 live programmes had no such card). On 2026-10-11 he
+widened it: *"we can have week notes ... and only make it appear on the assigned week. for example when some
+one has a testing week, or reduced load."* A note is now assigned to a week by its number and the app shows
+it in that week only: not before the cycle starts, not after it ends.
 
 ```json
 "weekNotes": {
-  "first": { "rpeCap": 7,
-             "text": "Start lighter than you think on the new exercises and keep every set at RPE 7 or under. From week 2 the card is your target." },
-  "last":  { "setsDrop": 1, "rpeCap": 6,
-             "text": "One set fewer on every exercise and every RPE at 6. You get stronger in the easy week, not only in the hard ones." }
+  "1": { "rpeCap": 7,
+         "text": "Start lighter than you think on the new exercises and keep every set at RPE 7 or under. From week 2 the card is your target." },
+  "3": { "title": "Testing week", "setsDrop": 1,
+         "text": "Bench, leg press and hip thrust get one test set instead: as many good reps as you can, 3 to 5, and stop at the first rep that slows." },
+  "5": { "setsDrop": 1, "rpeCap": 6,
+         "text": "One set fewer on every exercise and every RPE at 6. You get stronger in the easy week, not only in the hard ones." }
 }
 ```
 
-| Field | Type | Meaning |
-|-------|------|---------|
-| `first` | object | Shown in week 1, from the moment the cycle is published until day 7. **Required for a new athlete's first cycle**; for a returning athlete only when week 1 really differs (new exercises, a layoff, a return from injury). |
-| `last` | object | Shown in the cycle's last week (week 5 of 5). **Required on every cycle**; the one exception is a cycle Amir said has no back-off, checked with `--no-backoff`. |
+| Key / field | Type | Meaning |
+|-------------|------|---------|
+| `"1"` … `"N"` | object | The note for that week of the cycle (N is the cycle's length: its dates, else its `weeks` label, else 5). Shown in that week only. **The final week's note is required on every cycle** (the back-off; the one exception is a cycle Amir said has no back-off, checked with `--no-backoff`). **Week 1's is required for a new athlete's first cycle**, and for a returning athlete when week 1 really differs (new exercises, a layoff, a return from injury). Any other week that differs from the card (a testing week, a reduced-load week) gets a note too. |
+| `first`, `last` | object | The older names for week 1 and the final week, still read on every programme written before 2026-10-11. A numeric key wins over them for the same week. New programmes write the number. |
 | `.text` | string | What the athlete reads, in Amir's voice: plain, short, under ~260 characters, the numbers in words. Starts with the instruction, never with its own label. An RPE going down names the floor in the same sentence ("never below 6"). |
-| `.title` | string | Optional label. Defaults to **Week 1** and **Back-off week**. |
+| `.title` | string | The label above the text. Defaults to **Week N** (and **Back-off week** for the older `last`). Give a week other than 1 a title: *Testing week*, *Lighter week*. |
 | `.setsDrop` | number | Optional, 1–3: how many sets fewer on every exercise. |
 | `.rpeDrop` | number | Optional, 1–3: how many points off every RPE, never below 6. |
 | `.rpeCap` | number | Optional, 6–9: no set above this RPE this week. |
 
-`last` must carry at least one of the three numbers, so the dose is a decision and not only a
+The final week's note must carry at least one of the three numbers, so the dose is a decision and not only a
 feeling. The numbers never change a card: the app shows `text` only (`weekNoteHTML()` in
-`program.html`, under **This Week** on Home and at the top of every session that week), and
-`scripts/check_program.py` reads the numbers. Nothing shows after `endDate`, and a cycle without
+`program.html`, under **This Week** on Home and at the top of every session that week), applies the numbers
+to that week's daily target only, and `scripts/check_program.py` reads them. A cycle without
 `weekNotes` (every programme written before 2026-09-26) shows nothing: the app never invents a
-back-off. `/program-design` decides the dose, `/program-engage` writes the text, `/program-assemble`
-writes the object on `cycles[currentCycleIndex]`.
+back-off. `/program-design` decides which weeks get a note and the dose, `/program-engage` writes the text,
+`/program-assemble` writes the object on `cycles[currentCycleIndex]`.
 
 #### `message` (only rendered on the current cycle)
 
@@ -386,8 +393,8 @@ writes the object on `cycles[currentCycleIndex]`.
     ]
   },
   "weekNotes": {
-    "first": { "rpeCap": 7, "text": "Everything is new, so keep every set at RPE 7 or under. From week 2 the card is your target." },
-    "last": { "setsDrop": 1, "rpeCap": 6, "text": "One set fewer on every exercise and every RPE at 6. You get stronger in the easy week too." }
+    "1": { "rpeCap": 7, "text": "Everything is new, so keep every set at RPE 7 or under. From week 2 the card is your target." },
+    "5": { "setsDrop": 1, "rpeCap": 6, "text": "One set fewer on every exercise and every RPE at 6. You get stronger in the easy week too." }
   }
 }
 ```
@@ -505,6 +512,18 @@ Every circuit gets, automatically:
 - A **Rest** button at the bottom (rests once, after the whole round of sub-items is done — `rx.rest`, else the block's `rest`). None written: a working circuit's button says **Rest timer** and opens at 1 minute; a warm-up circuit has no rest button (WK-05).
 - In a working block, a weight field on each item and **one RPE per round**. A circuit in a prep block logs nothing (see "Circuit logging") and shows as a **list**: one line per item (letter, name, dose, ▶), its cues folded under a chevron (WK-05).
 - A free-form **Note** row where the client can log weights, equipment, and how it felt (e.g. *"KB 16, slam 6, box 50, third round felt heavy"*).
+
+**A lifting day's prep is a circuit** (SES-6, 2026-10-11): the `Activation & Prep` block holds the machine raise as a
+`simple` line and ONE prep circuit of two rounds, with its own rest (CHP-7, 30 s is enough). The movements are the
+circuit's `items`, never separate `simple` cards with `sets`:
+
+```json
+{ "title": "Activation & Prep", "exercises": [
+  { "type": "simple", "name": "Stationary Bike", "exId": "stationary-bike", "rx": { "time": "5 min" } },
+  { "type": "circuit", "name": "Lower Primer", "rx": { "rounds": 2, "rest": 30 },
+    "items": [ { "name": "Banded Glute Bridge", "exId": "banded-glute-bridge", "rx": { "reps": 15 } },
+               { "name": "Squat", "exId": "squat", "rx": { "reps": 10 } } ] } ] }
+```
 
 ##### Circuit logging (`warmup`, and optional `logWeight` / `logRPE`)
 
@@ -664,7 +683,7 @@ cell for it. There is no placeholder, no default, and nothing to remember about 
 | `side` | `true` | The dose is **per side**. The cell's label becomes `REPS / SIDE`. |
 | `rpe` | number or `"6-7"` | **Omit on warm-up and prep** — an RPE on a mobility drill is noise. Floor is 6 (the selector runs 6–10). |
 | `tempo` | `"3-1-1-0"` or `"iso"` | Eccentric–Pause–Concentric–Reset. Omit on ballistic work and carries. **The athlete never sees this notation** — see below. |
-| `rest` | seconds | **Omit and nothing is invented.** The timer button still works; the card just stops claiming a number you did not pick. |
+| `rest` | seconds | **Written on every `standard` exercise and every `circuit`, 30 s at the least** (CHP-7). The app never invents one: a card with none draws no rest, and its timer button just opens at a neutral default. A `simple` line (bike, walk) has none. |
 | `rounds` | number | Circuits only. |
 | `label` | one word | Rare override for the dose cell, e.g. `"Hold"` instead of `TIME`. |
 
@@ -780,9 +799,12 @@ second pause, drive up" as a cue is the same instruction again and costs one of 
 cues (39 of 506 live exercises with a tempo still do this). Spend the cue on what the
 numbers cannot say.
 
-### `block.rest` — one rest for a whole section
+### `block.rest` — one rest for a whole section (read, no longer written for athletes)
 
-A block can prescribe rest once for everything in it:
+Since 2026-10-11 every card in a programme carries its own `rx.rest` (CHP-7: *"some main exercise and some
+accessory exercises have rest time, some dont, it must be consistent"*), so the pipeline does not write
+`block.rest`; `scripts/check_program.py` warns when it finds one beside the cards' own. The app still reads it,
+and a Library session still uses it. A block can prescribe rest once for everything in it:
 
 ```json
 { "title": "Primary", "rest": 120, "exercises": [ ... ] }

@@ -38,6 +38,10 @@ def expect(name, cond, out=''):
     if not cond: print('--- FAILED:', name, '\n', out)
 
 # ── the made-up athlete ───────────────────────────────────────────────────────
+# A lifting day's prep (SES-6): the movements are the items of ONE circuit, two rounds, with its own rest (CHP-7).
+PREP_CIRCUIT = {"type": "circuit", "name": "Lower Primer", "rx": {"rounds": 2, "rest": 30},
+                "items": [{"name": "Glute Bridge", "exId": "glute-bridge", "rx": {"reps": 12}},
+                          {"name": "Dead Bug", "exId": "dead-bug", "rx": {"reps": 8}}]}
 BASE = {
   "athlete": {"id": "test_athlete", "firstName": "Test", "lastName": "Athlete"},
   "currentCycleIndex": 1,
@@ -50,10 +54,11 @@ BASE = {
   ],
   "workouts": {"days": [
     {"id": 1, "blocks": [
-      {"title": "Activation & Prep", "exercises": [{"type": "simple", "name": "Stationary Bike", "exId": "stationary-bike", "rx": {"time": "5 min"}}]},
+      {"title": "Activation & Prep", "exercises": [{"type": "simple", "name": "Stationary Bike", "exId": "stationary-bike", "rx": {"time": "5 min"}}, PREP_CIRCUIT]},
       {"title": "Primary", "exercises": [{"type": "standard", "name": "Barbell Back Squat", "exId": "barbell-back-squat", "rx": {"sets": 4, "reps": 6, "rpe": 8, "tempo": "3-0-1-0", "rest": 150}}]},
       {"title": "Accessory", "exercises": [{"type": "standard", "name": "Machine Seated Leg Curl", "exId": "machine-seated-leg-curl", "rx": {"sets": 3, "reps": 10, "rpe": 8, "tempo": "3-0-1-0", "rest": 60}}]}]},
     {"id": 2, "blocks": [
+      {"title": "Activation & Prep", "exercises": [PREP_CIRCUIT]},
       {"title": "Primary", "exercises": [{"type": "standard", "name": "Lat Pulldown", "exId": "lat-pulldown", "rx": {"sets": 4, "reps": 8, "rpe": 8, "tempo": "3-0-1-0", "rest": 90}}]}]}
   ]},
   "notes": {"cards": [{"title": "Hi", "body": "<p>Hello.</p>"}]}
@@ -79,7 +84,7 @@ out = run(BASE, ctx=CTX)
 expect('valid weekNotes pass', not has(out, 'FAIL', 'weekNotes'), out)
 d = copy.deepcopy(BASE); del d['cycles'][1]['weekNotes']
 out = run(d, ctx=CTX)
-expect('missing last week fails', has(out, 'FAIL', 'no weekNotes.last'), out)
+expect('missing last week fails', has(out, 'FAIL', 'no week note on the final week'), out)
 out = run(d, '--no-backoff', ctx=CTX)
 expect('--no-backoff excuses it', not has(out, 'FAIL', 'weekNotes.last') and has(out, 'INFO', 'no back-off week'), out)
 d = copy.deepcopy(BASE); d['cycles'][1]['weekNotes']['last'] = {"text": "An easier week."}
@@ -93,8 +98,65 @@ expect('a text repeating its label warns', has(run(d, ctx=CTX), 'WARN', 'repeati
 d = copy.deepcopy(BASE); d['currentCycleIndex'] = 0; d['cycles'][0]['weekNotes'] = {"last": {"setsDrop": 1, "text": "One set fewer on everything."}}
 out = run(d, ctx=CTX)
 expect('cci 0 turns on the new-athlete rules', has(out, 'INFO', 'new-athlete rules apply'), out)
-expect('a new athlete needs the first week', has(out, 'FAIL', 'needs weekNotes.first'), out)
+expect('a new athlete needs the first week', has(out, 'FAIL', 'needs a week 1 note'), out)
 expect('cci 0: a 6-rep weighted squat fails the 8-rep rule', has(out, 'FAIL', 'no weighted exercise under 8 reps'), out)
+# A week note belongs to one week (2026-10-11): numeric keys, first / last as the older names.
+def with_notes(notes, **cyc):
+    d = copy.deepcopy(BASE); d['cycles'][1]['weekNotes'] = notes; d['cycles'][1].update(cyc); return d
+W1 = {"rpeCap": 7, "text": "Keep every set at RPE 7 or under while you find your weights."}
+BACKOFF = {"setsDrop": 1, "rpeCap": 6, "text": "One set fewer on everything and every RPE at 6."}
+TEST = {"title": "Testing week", "setsDrop": 1, "text": "Bench, leg press and hip thrust get one test set: as many good reps as you can."}
+out = run(with_notes({"1": W1, "5": BACKOFF}), ctx=CTX)
+expect('week-number keys pass', not has(out, 'FAIL', 'weekNotes') and not has(out, 'FAIL', 'week note'), out)
+out = run(with_notes({"1": W1, "3": TEST, "5": BACKOFF}), ctx=CTX)
+expect('a testing week on week 3 passes', not has(out, 'FAIL', 'week note') and not has(out, 'WARN', 'give week 3'), out)
+untitled = {k: v for k, v in TEST.items() if k != 'title'}
+expect('a note on a middle week without a title warns', has(run(with_notes({"3": untitled, "5": BACKOFF}), ctx=CTX), 'WARN', "give week 3's note a title"))
+out = run(with_notes({"3": TEST}), ctx=CTX)
+expect('only a middle week: the back-off is still missing', has(out, 'FAIL', 'no week note on the final week'), out)
+out = run(with_notes({"5": BACKOFF}), ctx=CTX)
+expect('the back-off can be written as "5" instead of last', not has(out, 'FAIL', 'week note'), out)
+out = run(with_notes({"first": W1, "5": BACKOFF}), ctx=CTX)
+expect('first plus "5" is fine (different weeks)', not has(out, 'FAIL', 'week note') and not has(out, 'FAIL', 'two notes'), out)
+out = run(with_notes({"last": BACKOFF, "5": BACKOFF}), ctx=CTX)
+expect('last and "5" are the same week: keep one', has(out, 'FAIL', 'week 5 has two notes'), out)
+out = run(with_notes({"7": TEST, "5": BACKOFF}), ctx=CTX)
+expect('a note past the cycle fails', has(out, 'FAIL', 'the cycle runs 5 weeks'), out)
+out = run(with_notes({"second": TEST, "5": BACKOFF}), ctx=CTX)
+expect('a key that is not a week fails', has(out, 'FAIL', "a week note's key is its week number"), out)
+out = run(with_notes({"6": BACKOFF}, startDate="2026-10-12", endDate="2026-11-22"), ctx=CTX)
+expect('a six-week cycle (from its dates) ends on week 6', not has(out, 'FAIL', 'week note'), out)
+out = run(with_notes({"5": BACKOFF}, startDate="2026-10-12", endDate="2026-11-22"), ctx=CTX)
+expect('...so a note on week 5 is not its back-off', has(out, 'FAIL', 'no week note on the final week (week 6)'), out)
+d = with_notes({"3": dict(TEST, text="Take 1 off every RPE this week."), "5": BACKOFF})
+expect('a middle week\'s words are read too (RPE drop without the floor)', has(run(d, ctx=CTX), 'FAIL', 'lowers the RPE without naming the floor'))
+
+# Prep is a circuit and every working exercise and circuit has its own rest (2026-10-11).
+def set_prep(d, day, exercises): d['workouts']['days'][day]['blocks'][0]['exercises'] = exercises; return d
+out = run(BASE, ctx=CTX)
+expect('the made-up athlete passes the prep and rest rules', not has(out, 'FAIL', '[SES-6]') and not has(out, 'FAIL', '[CHP-7]') and not has(out, 'WARN', '[CHP-7]') and not has(out, 'WARN', '[SES-6]'), out)
+d = set_prep(copy.deepcopy(BASE), 0, [{"type": "simple", "name": "Stationary Bike", "exId": "stationary-bike", "rx": {"time": "5 min"}}])
+expect('a lifting day with no prep circuit fails', has(run(d, ctx=CTX), 'FAIL', '[SES-6] Day 1: a lifting day'))
+d = set_prep(copy.deepcopy(BASE), 0, [{"type": "simple", "name": "Stationary Bike", "exId": "stationary-bike", "rx": {"time": "5 min"}}, PREP_CIRCUIT,
+    {"type": "simple", "name": "Glute Bridge", "exId": "glute-bridge", "rx": {"reps": 15, "sets": 2}}])
+expect('a prep movement written as a card with sets fails', has(run(d, ctx=CTX), 'FAIL', 'a prep movement written as a card with sets'))
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][0]['exercises'][1] = dict(PREP_CIRCUIT, rx={"rounds": 2})
+out = run(d, ctx=CTX)
+expect('a prep circuit with no rest fails', has(out, 'FAIL', '[CHP-7] Day 1 · Activation & Prep · Lower Primer: no rest'), out)
+d['workouts']['days'][0]['blocks'][0]['exercises'][1] = dict(PREP_CIRCUIT, rx={"rounds": 2, "rest": 20})
+expect('a rest under 30 s fails', has(run(d, ctx=CTX), 'FAIL', 'under 30 s'))
+d['workouts']['days'][0]['blocks'][0]['exercises'][1] = dict(PREP_CIRCUIT, rx={"rounds": 3, "rest": 30})
+expect('three rounds of prep warns', has(run(d, ctx=CTX), 'WARN', '3 rounds. A lifting day'))
+d = copy.deepcopy(BASE); del d['workouts']['days'][0]['blocks'][1]['exercises'][0]['rx']['rest']
+out = run(d, ctx=CTX)
+expect('a main lift with no rest fails', has(out, 'FAIL', '[CHP-7] Day 1 · Primary · Barbell Back Squat: no rest'), out)
+d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][2]['rest'] = 90
+expect('a block rest next to card rests warns', has(run(d, ctx=CTX), 'WARN', 'the block carries a rest'))
+d = copy.deepcopy(BASE); d['workouts']['days'].append({"id": 3, "blocks": [
+    {"title": "Conditioning", "exercises": [{"type": "simple", "name": "Incline Treadmill Walk", "exId": "incline-treadmill-walk", "rx": {"time": "20 min"}}]}]})
+out = run(d, ctx=CTX)
+expect('a day with no Primary block needs no prep circuit, and a simple walk needs no rest', not has(out, 'FAIL', 'Day 3: a lifting day') and not has(out, 'FAIL', 'Incline Treadmill Walk: no rest'), out)
+
 d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['rx']['sets'] = 5
 expect('5 sets fail without --proven', has(run(d, ctx=CTX), 'FAIL', 'never more than 4'))
 out = run(d, '--proven', ctx=CTX)
@@ -133,7 +195,7 @@ expect('floor-except from the profile', not has(out, 'FAIL', 'chest: 0') and not
 expect('a profile ban is enforced', has(out, 'FAIL', "Lat Pulldown: banned for this athlete ('lat pulldown'"), out)
 expect('cap 75 from the profile', has(out, 'INFO', '--cap 75') and not has(out, 'WARN', 'past the 60-min cap'), out)
 expect('an arrow inside the profile is not a fallback', not has(out, 'FAIL', 'a fallback or swap gives a banned'), out)
-d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'][0]['exercises'][0]['name'] = 'Goblet Squat'
+d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'][1]['exercises'][0]['name'] = 'Goblet Squat'
 expect("the spec's bans line merges with the profile's", has(run(d, ctx=CTX, spec=PROFILE + "\n\nbans: goblet\n"), 'FAIL', "Goblet Squat: banned for this athlete ('goblet'"))
 d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['rx']['sets'] = 5
 out = run(d, ctx=CTX, spec=PROFILE.replace('proven: -', 'proven: C2 logged 5x6 at RPE 8, every rep made'))
@@ -152,8 +214,8 @@ OB['notes'] = {"cards": [
   {"title": "Film week one", "body": "<p>Film your last set.</p>", "tags": ["film"]},
   {"title": "Rough days", "body": "<p>Take 1 off every RPE, never below 6.</p>", "tags": ["low-readiness"]}]}
 OBSPEC = """obligations:
-- backoff → weekNotes.last
-- week1 → weekNotes.first
+- backoff → the week note on the final week
+- week1 → the week note on week 1
 - pain-ladder: knee → card
 - film: squat and RDL, week 1 → card
 - low-readiness → card
@@ -164,7 +226,7 @@ expect('every obligation met: no FAIL', not has(out, 'FAIL', 'obligation'), out)
 d = copy.deepcopy(OB); d['notes']['cards'] = d['notes']['cards'][:2]
 expect('a missing tagged card fails', has(run(d, spec=OBSPEC), 'FAIL', "obligation 'low-readiness' is not met"))
 d = copy.deepcopy(OB); del d['cycles'][1]['weekNotes']['first']
-expect('week1 needs weekNotes.first', has(run(d, spec=OBSPEC), 'FAIL', "obligation 'week1' is not met: weekNotes.first"))
+expect('week1 needs a week 1 note', has(run(d, spec=OBSPEC), 'FAIL', "obligation 'week1' is not met: a week note on week 1"))
 expect('an unknown key warns', has(run(OB, spec=OBSPEC + "- teleport → card\n"), 'WARN', "obligation 'teleport'"))
 expect('no obligations block warns', has(run(OB, spec="bans: goblet\n"), 'WARN', 'no obligations: block'))
 out = run(OB, '--stage', 'build', spec=OBSPEC)
@@ -279,7 +341,7 @@ d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['
 SPEC2 = ("Barbell Back Squat | role: primary\nnote_flag: staged knee return, shallow first\n"
          "Lat Pulldown | role: primary\nnote_flag: neutral grip only, elbow history\n")
 expect("a flagged Coach's Note that never landed warns", has(run(d, spec=SPEC2), 'WARN', "flags 2 Coach's Notes and the programme carries 1"))
-d['workouts']['days'][1]['blocks'][0]['exercises'][0]['note'] = "Neutral grip only."
+d['workouts']['days'][1]['blocks'][1]['exercises'][0]['note'] = "Neutral grip only."
 expect('every flagged note placed: no warning', not has(run(d, spec=SPEC2), 'WARN', "Coach's Notes and the programme"))
 expect('template placeholders are not flags', not has(run(BASE, spec="note_flag: [optional]\nnote_flag: -\n"), 'WARN', "Coach's Notes and the programme"))
 expect('a Because with no why_flag warns', has(run(with_why({"src": "goal", "text": "Your legs drive every serve."}), spec="bans: -\n"), 'WARN', 'flags 0 Becauses and the programme carries 1'))
@@ -413,12 +475,12 @@ NAMES = "\n".join(["Back Squat|barbell-back-squat||Barbell Back Squat", "DB Gobl
 d = copy.deepcopy(BASE)
 d['workouts']['days'][0]['blocks'][1]['exercises'][0].pop('exId'); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['name'] = 'Back Squat'
 d['workouts']['days'][0]['blocks'][2]['exercises'].append({"type": "standard", "name": "DB Goblet Squat", "rx": {"sets": 3, "reps": 10, "rpe": 8}})
-d['workouts']['days'][1]['blocks'][0]['exercises'].append({"type": "standard", "name": "Sled Push", "rx": {"sets": 3, "distance": "20m", "rpe": 8}})
+d['workouts']['days'][1]['blocks'][1]['exercises'].append({"type": "standard", "name": "Sled Push", "rx": {"sets": 3, "distance": "20m", "rpe": 8}})
 out = run(d, ctx=[{"spine": SB, "prev": None, "ledger": None, "names": NAMES}])
 expect('names: an alias hit says which exId to stamp', has(out, 'FAIL', 'no exId: the Spine has it as barbell-back-squat'), out)
 expect('names: a near miss names the entry', has(out, 'FAIL', 'the nearest is Goblet Squat [goblet-squat]'), out)
 expect('names: an unknown name says alias or draft', has(out, 'FAIL', 'not in the Spine by that name') and 'draft it with /spine' in out, out)
-d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'][0]['exercises'][0]['exId'] = 'chest-supported-dumbbell-row'
+d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'][1]['exercises'][0]['exId'] = 'chest-supported-dumbbell-row'
 expect('NAM-8: a name that is another entry warns', has(run(d, ctx=[{"spine": SB, "prev": None, "ledger": None, "names": NAMES}]),
        'WARN', 'its name is the Spine entry lat-pulldown, but its exId is chest-supported-dumbbell-row'))
 import hashlib
@@ -438,7 +500,7 @@ out = run(BASE, ctx=[{"spine": SB, "prev": PREV_T, "ledger": None, "minutes": {"
 expect('minutes: a ratio past 2.5 (a timer left running) is not used', has(out, 'INFO', 'too far off to use') and "real at last cycle's" not in out, out)
 out = run(BASE, ctx=[{"spine": SB, "prev": PREV_T, "ledger": None, "prev_n": 5}])
 expect('checksum: a prev with missing exercises stops the run', "the saved 'prev' holds 2 exercises" in out, out)
-d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'][0]['exercises'].append(
+d = copy.deepcopy(BASE); d['workouts']['days'][1]['blocks'][1]['exercises'].append(
     {"type": "circuit", "name": "Carry Pair", "items": [{"name": "Farmer's Carry", "rx": {"distance": "20m"}}]})
 p = os.path.join(TMP, 'sql.json'); json.dump(d, open(p, 'w', encoding='utf-8'))
 sql = subprocess.run([sys.executable, CHECK, p, '--spine-sql'], capture_output=True, text=True, encoding='utf-8', cwd=REPO).stdout

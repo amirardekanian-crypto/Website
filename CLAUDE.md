@@ -151,10 +151,10 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   midnight; DATA-02) and the date it is filed under (`sessionDateFor()`, the local day it was finished).
 - **`rxOf()` returns a VIEW** (strings, the dose as `dose: {kind, value, side, label}`), not the `rx` object:
   test app code against real `rxOf()` output.
-- **A prescription is `rx`**; legacy `chips[]` is read, never written; **rest is never invented**; reps are
+- **A prescription is `rx`**; legacy `chips[]` is read, never written; **the app never invents a rest** (the pipeline writes one on every working exercise and circuit, CHP-7); reps are
   one number; a grip is the `intent` pill; no `setup` line. The tempo cell has had four shapes: do not
   re-litigate it.
-- **Week 1 and the back-off week are `cycles[n].weekNotes`**; the app never invents a back-off.
+- **A week note belongs to ONE week** (Amir, 2026-10-11): `cycles[n].weekNotes` is keyed by week number (week 1, a testing or lighter week, the back-off; `first` / `last` are the old names for week 1 and the final week) and the app shows a note only in its own week, never before the cycle starts or after it ends; the app never invents a back-off.
 - **The Spine**: only approved entries reach a phone; cues and **videos** live on the entry (a video is added
   in coach.html → Exercises; `exercise_library.json` and its Notion sync were retired 2026-09-26);
   **one name per exercise, the Spine's** (Amir, 2026-10-09): every card in the Library and in programmes carries
@@ -371,7 +371,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v103` on 2026-10-11). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v104` on 2026-10-11). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

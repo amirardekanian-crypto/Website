@@ -236,6 +236,10 @@ proposed for an approved entry (written to `/spine`'s pending list, not only pri
   (`src: body/you…`, one sentence, the /program-engage PART 3b rules) and run `Chips.auditWhy()`.
 - **Quality Map.** Re-read the day's top three after the edit. If the swap changed what the day
   card says it builds (a power day now reading Armour first), say so in the Step 4 report.
+- **Rest and prep (2026-10-11).** A card you add or swap carries its own `rx.rest` like every other card
+  (CHP-7, 30 s at the least). A lifting day's prep is a circuit (SES-6): if the day you touch has its
+  movements as separate cards with sets, say so in the report, and rebuild the prep only when Amir says so
+  (PRC-2: a correction changes only what he named).
 
 **If the edit changes who the athlete is** (a new injury or ban, one resolved, new kit, a new
 schedule), update the `## Athlete profile` block at the top of their coaching log in place (format

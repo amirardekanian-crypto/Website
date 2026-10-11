@@ -58,7 +58,7 @@ the database: the one lookup it needs is printed by --spine-sql for you to run a
   --fingerprint   print the content fingerprint and the SQL that computes the server's, then stop
 
 In the full run it also reads the spec's "obligations:" block (the notes this cycle must carry)
-and fails any key that no notes card's `tags` (or, for backoff/week1, the weekNotes) carries.
+and fails any key that no notes card's `tags` (or, for backoff/week1, the week note on that week) carries.
 
 The athlete profile (a ```profile block at the top of the spec, else the one stored at the top of
 the coaching log, which --spine-sql returns) sets --floor (aim: strength-muscle), --proven, the
@@ -66,7 +66,7 @@ bans, floor-except and --cap, so no run has to remember them. A flag typed here 
 
 Exit code 1 if anything FAILs. FAIL = a house rule is broken. WARN = look at it.
 """
-import argparse, decimal, hashlib, json, os, re, subprocess, sys
+import argparse, datetime, decimal, hashlib, json, os, re, subprocess, sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -139,12 +139,9 @@ def text_fields(data):
         for part in ('message', 'teaser'):
             for p in (c.get(part) or {}).get('paragraphs') or []: yield f"cycle {c.get('num')} {part}", p
             for o in (c.get(part) or {}).get('outcomes') or []: yield f"cycle {c.get('num')} outcome", o
-        wn = c.get('weekNotes')
-        for k in ('first', 'last'):
-            n = wn.get(k) if isinstance(wn, dict) else None
-            if isinstance(n, dict):
-                for f in ('title', 'text'):
-                    if n.get(f): yield f"cycle {c.get('num')} weekNotes.{k} {f}", n[f]
+        for _wk, (k, n) in week_notes(c)[0].items():
+            for f in ('title', 'text'):
+                if n.get(f): yield f"cycle {c.get('num')} weekNotes.{k} {f}", n[f]
     for d in (data.get('workouts') or {}).get('days') or []:
         for k in ('focusTag', 'completionTitle', 'completionMessage'):
             if d.get(k): yield f"Day {d.get('id')} {k}", d[k]
@@ -337,6 +334,49 @@ def check_blocks(data):
                      "Primary, Accessory, Core, [conditioning]", 'SES-9')
             seen.append((r, t))
 
+# ── prep is a circuit, and every working exercise and circuit has its own rest (2026-10-11) ──────
+# Amir: "i want my lifting day preps to be a circuit, because we dont need much rest" and "when you are
+# writing the program, you must write a rest time for circuits. can be short as 30 seconds" and "some main
+# exercise and some accessory exercises have rest time, some dont, it must be consistent". Pooya's Cycle 5
+# shipped with the prep as separate cards with sets, no rest on his prep and a REST cell on some cards only.
+MIN_REST = 30
+
+def own_rest(ex):
+    """Seconds, from rx.rest (or the legacy restSec); None when the card writes none."""
+    return secs((ex.get('rx') or {}).get('rest')) or secs(ex.get('restSec'))
+
+def check_prep_rest(data, args):
+    for d in (data.get('workouts') or {}).get('days') or []:
+        day = f"Day {d.get('id')}"
+        blocks = d.get('blocks') or []
+        lifting = any(re.search(r'\bprimary\b', b.get('title') or '', re.I) for b in blocks)
+        prep_circuits = 0
+        for b in blocks:
+            prep = bool(PREP.search(b.get('title') or ''))
+            if b.get('rest') not in (None, '', 0):
+                warn(f"{day} · {b.get('title')}: the block carries a rest ({b['rest']}), and every card carries its own; drop the block's", 'CHP-7')
+            for ex in b.get('exercises') or []:
+                where = f"{day} · {b.get('title')} · {ex.get('name')}"
+                kind = ex.get('type')
+                if kind not in ('standard', 'circuit'): continue
+                if kind == 'circuit' and prep: prep_circuits += 1
+                r = own_rest(ex)
+                if r is None:
+                    fail(f"{where}: no rest. Every working exercise and every circuit, a prep circuit included, writes rx.rest ({MIN_REST} s at the least)", 'CHP-7')
+                elif r < MIN_REST:
+                    fail(f"{where}: rest {int(r)} s is under {MIN_REST} s, the shortest rest a card can have", 'CHP-7')
+                if kind == 'circuit' and prep and lifting:
+                    rounds = num((ex.get('rx') or {}).get('rounds'))
+                    if rounds is not None and rounds != 2:
+                        warn(f"{where}: {int(rounds)} rounds. A lifting day's prep circuit runs two rounds", 'SES-6')
+            if prep and lifting:
+                for ex in b.get('exercises') or []:
+                    if ex.get('type') == 'simple' and num((ex.get('rx') or {}).get('sets')):
+                        fail(f"{day} · {b.get('title')} · {ex.get('name')}: a prep movement written as a card with sets. "
+                             "On a lifting day the movements are the items of ONE prep circuit, two rounds (the bike stays a simple line)", 'SES-6')
+        if lifting and not prep_circuits:
+            fail(f"{day}: a lifting day (it has a Primary block) with no prep circuit. Its prep is a machine raise plus one two-round circuit", 'SES-6')
+
 # COM-13: weighing in happens on Home → Body Weight in program.html. AA Proof has had no weight
 # screen since 2026-09-12, yet eleven live lines in six programmes still sent athletes there (the
 # 2026-09-26 pipeline audit). A sentence that names Proof AND weighing in fails; a sleep or protein
@@ -469,26 +509,66 @@ def check_placed(data, args):
         warn(f"the spec flags {wflags} Becauses and the programme carries {whys}: one was dropped or "
              "invented on the way", 'COM-4')
 
+def cycle_weeks(cyc):
+    """How many weeks the cycle runs: from its dates (the app's own sum, program.html cycleWeekInfo()),
+    else its 'Weeks 6-10' label, else the house five."""
+    try:
+        s = datetime.date.fromisoformat(str(cyc.get('startDate'))[:10])
+        e = datetime.date.fromisoformat(str(cyc.get('endDate'))[:10])
+        return max(1, round((e - s).days / 7))
+    except (TypeError, ValueError):
+        pass
+    m = re.search(r'(\d+)\s*[\u2013-]\s*(\d+)', str(cyc.get('weeks') or ''))
+    return int(m.group(2)) - int(m.group(1)) + 1 if m else 5
+
+def week_notes(cyc):
+    """({week number: (key as written, note)}, [problems], weeks in the cycle).
+    A week note belongs to ONE week and the app shows it only then (2026-10-11): the keys are week
+    numbers ("1", "4", "5"), and `first` / `last` are the older names for week 1 and the final week,
+    which programmes written before that still use. A numeric key wins over the old name."""
+    wn, total = cyc.get('weekNotes'), cycle_weeks(cyc)
+    found, problems = {}, []
+    if not isinstance(wn, dict): return found, problems, total
+    entries = {}
+    for key, n in wn.items():
+        if key == 'first': wk = 1
+        elif key == 'last': wk = total
+        elif re.fullmatch(r'[1-9]\d*', str(key)): wk = int(key)
+        else:
+            problems.append(f"weekNotes.{key}: a week note's key is its week number (\"1\" to \"{total}\"), or the older first / last")
+            continue
+        if not isinstance(n, dict):
+            problems.append(f"weekNotes.{key}: must be an object {{text, title?, setsDrop?, rpeDrop?, rpeCap?}}")
+            continue
+        if wk > total:
+            problems.append(f"weekNotes.{key}: that is week {wk}, and the cycle runs {total} weeks")
+            continue
+        entries.setdefault(wk, []).append((key, n))
+    for wk, es in entries.items():
+        if len(es) > 1:
+            problems.append(f"week {wk} has two notes ({' and '.join('weekNotes.' + k for k, _ in es)}): keep one")
+        found[wk] = sorted(es, key=lambda e: e[0] in ('first', 'last'))[0]  # a numeric key wins
+    return found, problems, total
+
 def check_week_notes(data, args):
-    """The first and last week of the cycle being built (cycles[currentCycleIndex].weekNotes).
+    """The week notes of the cycle being built (cycles[currentCycleIndex].weekNotes).
     Every cycle is 4 loading weeks + 1 back-off week, and the card never changes mid-cycle, so
     the back-off only happens if something tells the athlete. Before 2026-09-26 that was a
-    notes card nobody was required to write: 16 of 34 live programmes had none. The app now
-    shows weekNotes.first in week 1 and weekNotes.last in the last week (program.html
-    weekNoteHTML), so both are data, and required."""
+    notes card nobody was required to write: 16 of 34 live programmes had none. The app shows a
+    note in its own week and nowhere else (program.html weekNoteHTML), so each is data. The final
+    week's back-off is required, week 1's note is required for a new athlete, and design may
+    assign a note to any other week that differs from the card (a testing week, a lighter week)."""
     cycles = data.get('cycles') or []
     i = data.get('currentCycleIndex') or 0
     cyc = cycles[i] if 0 <= i < len(cycles) else {}
+    cn = cyc.get('num')
     wn = cyc.get('weekNotes')
     if wn is not None and not isinstance(wn, dict):
-        fail(f"cycle {cyc.get('num')}: weekNotes must be an object {{first, last}}", 'PRC-15'); return
-    wn = wn or {}
-    for key in ('first', 'last'):
-        n = wn.get(key)
-        if n is None: continue
-        where = f"cycle {cyc.get('num')} weekNotes.{key}"
-        if not isinstance(n, dict):
-            fail(f"{where}: must be an object {{text, setsDrop?, rpeDrop?, rpeCap?}}", 'PRC-15'); continue
+        fail(f"cycle {cn}: weekNotes must be an object keyed by week number ({{\"1\": {{...}}, \"5\": {{...}}}})", 'PRC-15'); return
+    found, problems, total = week_notes(cyc)
+    for p in problems: fail(f"cycle {cn} {p}", 'PRC-15')
+    for wk, (key, n) in sorted(found.items()):
+        where = f"cycle {cn} weekNotes.{key}"
         text = str(n.get('text') or '').strip()
         # At --stage build only design's numbers exist; engage writes the words after the checks.
         if not text and args.stage == 'final':
@@ -499,21 +579,23 @@ def check_week_notes(data, args):
         if 'rpeCap' in n and not (isinstance(n['rpeCap'], (int, float)) and 6 <= n['rpeCap'] <= 9):
             fail(f"{where}: rpeCap must be 6 to 9 (the app's floor is 6), got {n['rpeCap']!r}", 'PRC-15', 'CHP-4')
         if len(text) > 260: warn(f"{where}: {len(text)} characters; it's a note, keep it under ~260", 'COM-16')
-        label = (n.get('title') or ('Back-off week' if key == 'last' else 'Week 1')).lower()
+        label = (n.get('title') or ('Back-off week' if key == 'last' else f'Week {wk}')).lower()
         if text and text.lower().startswith(label):
             warn(f"{where}: the text starts by repeating its label ('{label}'); start with the instruction", 'COM-16')
-    last = wn.get('last')
+        if key not in ('first', 'last') and wk > 1 and not n.get('title'):
+            warn(f"{where}: give week {wk}'s note a title (Testing week, Lighter week) so the athlete sees what kind of week it is", 'PRC-15')
+    key, last = found.get(total, (None, None))
     if args.no_backoff:
         info('no back-off week this cycle (--no-backoff: only on Amir\'s word)')
     elif not isinstance(last, dict):
-        fail(f"cycle {cyc.get('num')}: no weekNotes.last. Every cycle ends with a back-off week: "
+        fail(f"cycle {cn}: no week note on the final week (week {total}). Every cycle ends with a back-off week: "
              "design sets the dose (setsDrop / rpeDrop / rpeCap) and engage writes the text", 'REC-4', 'PRC-15')
     elif not any(k in last for k in ('setsDrop', 'rpeDrop', 'rpeCap')):
-        fail(f"cycle {cyc.get('num')} weekNotes.last: name the back-off dose as numbers (setsDrop, rpeDrop or rpeCap), not only words", 'PRC-15')
-    if args.new and not isinstance(wn.get('first'), dict):
-        fail(f"cycle {cyc.get('num')}: a new athlete's first cycle needs weekNotes.first (how week 1 finds their weights, with the number)", 'PRG-5', 'PRC-15')
-    elif not isinstance(wn.get('first'), dict):
-        info(f"cycle {cyc.get('num')}: no weekNotes.first (fine when nothing in week 1 is different)")
+        fail(f"cycle {cn} weekNotes.{key}: name the back-off dose as numbers (setsDrop, rpeDrop or rpeCap), not only words", 'PRC-15')
+    if args.new and not isinstance(found.get(1, (None, None))[1], dict):
+        fail(f"cycle {cn}: a new athlete's first cycle needs a week 1 note (weekNotes \"1\": how week 1 finds their weights, with the number)", 'PRG-5', 'PRC-15')
+    elif 1 not in found:
+        info(f"cycle {cn}: no week 1 note (fine when nothing in week 1 is different)")
 
 # ── the notes obligations list (2026-09-26) ───────────────────────────────────
 # Rules that exist only as "engage should write a card about X" were missed: engage's own list
@@ -544,15 +626,16 @@ def check_obligations(data, args):
         return
     cycles = data.get('cycles') or []
     i = data.get('currentCycleIndex') or 0
-    wn = (cycles[i] if 0 <= i < len(cycles) else {}).get('weekNotes') or {}
+    found, _problems, total = week_notes(cycles[i] if 0 <= i < len(cycles) else {})
     tags = {str(t).lower() for c in (data.get('notes') or {}).get('cards') or [] for t in (c.get('tags') or [])}
     for k in keys:
         if k not in OBLIGATIONS:
             warn(f"obligation '{k}' is not one of the known ones ({', '.join(OBLIGATIONS)})", 'COM-9'); continue
         if k in ('backoff', 'week1'):
-            n = wn.get('last' if k == 'backoff' else 'first')
+            wk = total if k == 'backoff' else 1
+            n = found.get(wk, (None, None))[1]
             ok = isinstance(n, dict) and str(n.get('text') or '').strip()
-            where = 'weekNotes.' + ('last' if k == 'backoff' else 'first')
+            where = f"a week note on week {wk}"
         else:
             ok, where = k in tags, f"a notes card tagged '{k}'"
         if not ok: fail(f"obligation '{k}' is not met: {where} must carry it", OBLIG_RULES[k], 'COM-9')
@@ -1264,7 +1347,7 @@ def main():
     if not args.week and spec_lines(args, 'week'):
         args.week = spec_lines(args, 'week')[0]  # the spec's example week (2026-09-26)
     check_structure(data, args, ctx['spine'], ctx.get('names'))
-    check_names(data, ctx); check_tests(data, args); check_blocks(data)
+    check_names(data, ctx); check_tests(data, args); check_blocks(data); check_prep_rest(data, args)
     # --stage build runs straight after design, BEFORE engage writes a word (2026-09-26): a FAIL
     # there changes the programme while no note, Because or message has been written around it.
     if args.stage == 'final':
