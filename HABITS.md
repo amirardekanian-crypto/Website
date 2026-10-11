@@ -91,7 +91,7 @@ Now (Amir's pick, "A with Proof"; the full account is `PROGRAM-APP.md` → *No s
   if it never arrived.
 - **The error screen names the cause**: *No connection* (no copy yet) or *Not available*
   (the server refused), each with a button. Its old hint showed a `?client=` link.
-- ⚠️ `_noAnswer()`, `_sbLoad()` and the copy's helpers exist in both apps: change both.
+- ⚠️ `_noAnswer()`, `_sbLoad()`, `_sbForSignIn()` (the sign-in's own door to the library) and the copy's helpers exist in both apps: change both.
 
 ### Putting it on the home screen
 

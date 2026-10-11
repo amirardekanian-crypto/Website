@@ -4052,6 +4052,21 @@ function _sbLoad() {
     document.head.appendChild(s);
   });
 }
+// The library for a SIGN-IN tap (2026-10-11): waits ~3 s, fetches it again if the <script> tag
+// reported a failure, and if there is still nothing treats the first download as lost and fetches
+// it once more; whichever arrives first, the original or the new fetch, is used (12 s ceiling).
+// null = still nothing; the caller says so in words (the 'lib' error).
+// ⚠️ A copy of _sbForSignIn() in program.html: change both.
+async function _sbForSignIn() {
+  let sb = await _sbLoad();
+  if (sb) return sb;
+  window.SB_FAILED = true;
+  const arrived = new Promise(res => {          // the original download, if it only turns up late
+    const t = setInterval(() => { if (window.supabase && window.supabase.createClient) { clearInterval(t); res(_sb()); } }, 100);
+    setTimeout(() => { clearInterval(t); res(null); }, 12000);
+  });
+  return Promise.race([_sbLoad().then(c => c || arrived), arrived]);
+}
 // Did the server answer at all? supabase-js returns a fetch that never got through
 // as an error with status 0; a 5xx is the server not coping, the same thing to the
 // athlete. A 4xx is a real answer (a refusal). null = _withTimeout() ran out.
@@ -4217,8 +4232,8 @@ function showSignIn() {
     btn.disabled = true;
     btn.textContent = 'Signing in…';
     try {
-      const sb = await _sbReady();
-      if (!sb) throw new Error('offline');
+      const sb = await _sbForSignIn();
+      if (!sb) throw new Error('lib');
       let { error } = await sb.auth.signInWithPassword({
         email: LOGIN_PREFIX + user + '@' + LOGIN_DOMAIN,
         password: pass,
@@ -4263,7 +4278,9 @@ function showSignIn() {
     } catch (err) {
       errBox.textContent = /invalid|credentials/i.test(err.message || '')
         ? 'That username or password is not right. Check the message Amir sent you.'
-        : 'Could not sign in just now. Check your connection and try again.';
+        : (err.message === 'lib'
+          ? 'The sign-in could not load on this connection. Check your connection, or switch between wifi and mobile data, then tap Sign in again.'
+          : 'Could not sign in just now. Check your connection and try again.');
       errBox.hidden = false;
       btn.disabled = false;
       btn.textContent = 'Sign in';

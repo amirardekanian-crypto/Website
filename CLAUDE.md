@@ -236,7 +236,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   nothing and Pooya could not sign in). With no session `boot()` reaches `showSignIn()` synchronously, while the script is still
   being evaluated, so anything `showSignIn()` reads must be a function, a `window.*` value set in the head, or a `const` declared
   ABOVE `boot()` (`COACH_WHATSAPP` was below it and sat in its temporal dead zone). The form is painted by an inline script, so a
-  throw looks like a working screen. Run `node scripts/headless/signin.js` after any change near sign-in; it taps every button.
+  throw looks like a working screen. Run `node scripts/headless/signin.js` after any change near sign-in; it taps every button on program.html and habits.html, with the Supabase library loading, never loading, failing once and arriving late (`_sbForSignIn()` is the sign-in's door to it; the copy in each app moves together).
   Sign-in also signs out EVERY device of that athlete (supabase-js `signOut()` is global), and the first sign-in clears the stored
   first password: never test a login as an athlete unless you mean both.
 - **One finish, one email** (WK-04, 2026-09-27; `PROGRAM-APP.md` → *One finish*): rate, then **Done** finishes the
@@ -371,7 +371,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v101` on 2026-10-11). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v102` on 2026-10-11). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

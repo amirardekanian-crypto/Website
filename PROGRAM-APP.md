@@ -537,7 +537,7 @@ sits in front of the whole site).
   icon in clay.
 - **The library** (`supabase-js` from jsDelivr, which the worker does not keep) marks a failed download
   (`onerror` → `window.SB_FAILED`), so `_sbReady()` stops at once instead of polling ~3 s before
-  every call; `_sbLoad()` fetches it again once the connection is back.
+  every call; `_sbLoad()` fetches it again once the connection is back. **Sign-in uses `_sbForSignIn()`** (2026-10-11): it waits, fetches the library again when the first download failed or is only slow, takes whichever copy arrives first (12 s ceiling) and, if there is still nothing, says "The sign-in could not load…" instead of "check your connection". Before this a failed first download answered every tap with the connection message until the app was force-closed.
 - **Uploads wait for a pull (`_sbHold`).** A run opened from the copy, or whose boot pull ran out of
   its new 6 s cap, has not merged the cloud's progress, so `_pushSnapshot()` sends nothing; every edit
   is still saved and stamped (`lastEditAt`), which is what lets this device's offline session win the
@@ -552,7 +552,7 @@ sits in front of the whole site).
   for the remembered id it was saved under, and the server checks again on reconnect). Elsewhere it is
   capped at 6 s. The legacy `data/<id>.json` fetch stays, capped at 4 s, because the headless render
   checks serve one.
-- ⚠️ **Exists twice**, in this file and `habits.html`: `_noAnswer()`, `_sbLoad()`, `readPlanCopy()` /
+- ⚠️ **Exists twice**, in this file and `habits.html`: `_noAnswer()`, `_sbLoad()`, `_sbForSignIn()`, `readPlanCopy()` /
   `savePlanCopy()` / `dropPlanCopy()` / `planAnswerOf()` and the `plancache` shape. Change both. Proof's
   side: `HABITS.md` → *No signal*.
 - **Left as is:** one bar of signal still costs up to the 6 s `get_program` wait before the copy opens.

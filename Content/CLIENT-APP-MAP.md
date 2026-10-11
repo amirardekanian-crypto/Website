@@ -135,7 +135,7 @@ DAY  (opened from a day card; the tab bar hides once you tap Begin or Skip)
 
 **The sign-in screen.** A green photo, the small heading *AA Performance*, "A *coach* in your pocket.", the line *A path to your target.*, then two boxes, **Username** and **Password** (the eye shows what you typed), and **Sign in**.
 - Your username is not an email. Type it as I sent it. A Farsi keyboard works: Persian digits are converted.
-- If it fails: *"That username or password is not right. Check the message Amir sent you."* or *"Could not sign in just now. Check your connection and try again."*
+- If it fails: *"That username or password is not right. Check the message Amir sent you."* or *"Could not sign in just now. Check your connection and try again."* (the server did not answer), or *"The sign-in could not load on this connection. Check your connection, or switch between wifi and mobile data, then tap Sign in again."* (the app's own sign-in library did not download; Sign in fetches it again by itself, so one tap is enough once the signal is back).
 - *"Lost your details? **Message Amir** and he'll send new ones."* — **Message Amir** opens WhatsApp with the reason already written.
 - If your password manager fills both boxes, the app signs you in by itself within a few seconds. Type, or tap the eye, to stop it.
 

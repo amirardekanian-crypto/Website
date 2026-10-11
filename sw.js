@@ -207,7 +207,10 @@
 //      "Message Amir" link, but that const was declared below boot(), so for anyone with no saved session showSignIn() threw before
 //      it wired the form and every button on the login screen did nothing. The number is now declared above boot().
 //      Without the bump a phone that cached the v99/v100 shell keeps the dead login screen.
-const CACHE = 'aap-v101';
+// v102: program.html and habits.html changed (2026-10-11): sign-in no longer gives up when the Supabase library's first download
+//      failed or is slow. _sbForSignIn() fetches it again and takes whichever copy arrives first, and says "The sign-in could not
+//      load" (not "check your connection") when it truly cannot. Without the bump a phone keeps the sign-in that needs a force-close.
+const CACHE = 'aap-v102';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

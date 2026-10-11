@@ -4946,6 +4946,25 @@ function _sbLoad() {
     document.head.appendChild(s);
   });
 }
+// The library for a SIGN-IN tap (2026-10-11). Every other caller can shrug and try again at the next
+// nudge; this one is a person staring at a button, so it must not answer "check your connection"
+// while the library is merely slow or its one download failed. _sbLoad() already waits ~3 s and, when
+// the <script> tag reported a failure, fetches it again. If it still has nothing, the first download
+// is treated as lost (it may be stalled, not failed) and the library is fetched once more; whichever
+// arrives first, the original or the new fetch, is used, with a 12 s ceiling. So a flaky first load of
+// cdn.jsdelivr.net no longer needs a force-close to recover.
+// null = still nothing; the caller says so in words (the 'lib' error below).
+// ⚠️ A copy of _sbForSignIn() in habits.html: change both.
+async function _sbForSignIn() {
+  let sb = await _sbLoad();
+  if (sb) return sb;
+  window.SB_FAILED = true;
+  const arrived = new Promise(res => {          // the original download, if it only turns up late
+    const t = setInterval(() => { if (window.supabase && window.supabase.createClient) { clearInterval(t); res(_sb()); } }, 100);
+    setTimeout(() => { clearInterval(t); res(null); }, 12000);
+  });
+  return Promise.race([_sbLoad().then(c => c || arrived), arrived]);
+}
 function _snapshot() {
   const out = {}, prefix = _sbId + '_';
   for (let i = 0; i < localStorage.length; i++) {
@@ -6057,8 +6076,8 @@ function showSignIn() {
     btn.disabled = true;
     btn.textContent = 'Signing in…';
     try {
-      const sb = await _sbReady();
-      if (!sb) throw new Error('offline');
+      const sb = await _sbForSignIn();
+      if (!sb) throw new Error('lib');
       let { error } = await sb.auth.signInWithPassword({
         email: LOGIN_PREFIX + user + '@' + LOGIN_DOMAIN,
         password: pass,
@@ -6109,7 +6128,9 @@ function showSignIn() {
     } catch (err) {
       errBox.textContent = /invalid|credentials/i.test(err.message || '')
         ? 'That username or password is not right. Check the message Amir sent you.'
-        : 'Could not sign in just now. Check your connection and try again.';
+        : (err.message === 'lib'
+          ? 'The sign-in could not load on this connection. Check your connection, or switch between wifi and mobile data, then tap Sign in again.'
+          : 'Could not sign in just now. Check your connection and try again.');
       errBox.hidden = false;
       btn.disabled = false;
       btn.textContent = 'Sign in';
