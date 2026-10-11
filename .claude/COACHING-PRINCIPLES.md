@@ -1038,7 +1038,8 @@ same ID. Read a rule's story and its history before changing it.
   written once on its header with no cell on the cards under it (2026-09-20: eight cards each repeating REST
   2m is one fact eight times), so a card with its own number showed a REST cell and its neighbours showed
   none, and a prep circuit had no rest at all. Now every `standard` exercise and every `circuit`, a prep
-  circuit included, writes `rx.rest` (30 s at the least; a `simple` item such as a bike or a walk has none),
+  circuit included, writes `rx.rest` (30 s at the least; a `simple` item such as a bike or a walk has none, and
+  neither has a card that is one continuous effort with no sets),
   and the block's `rest` is not written (the app still reads it on programmes written before this). The app
   still never invents a rest: writing one on every card is the pipeline's duty, not a fallback.
   **The number is chosen for that exercise, never one value for a whole section** (Amir, 2026-10-11: *"as a

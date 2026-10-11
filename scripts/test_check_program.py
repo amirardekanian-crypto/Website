@@ -166,6 +166,10 @@ d = copy.deepcopy(BASE); d['workouts']['days'].append({"id": 3, "blocks": [
     {"title": "Conditioning", "exercises": [{"type": "simple", "name": "Incline Treadmill Walk", "exId": "incline-treadmill-walk", "rx": {"time": "20 min"}}]}]})
 out = run(d, ctx=CTX)
 expect('a day with no Primary block needs no prep circuit, and a simple walk needs no rest', not has(out, 'FAIL', 'Day 3: a lifting day') and not has(out, 'FAIL', 'Incline Treadmill Walk: no rest'), out)
+d['workouts']['days'][2]['blocks'][0]['exercises'][0]['type'] = 'standard'
+expect('a continuous effort typed standard, with no sets, needs no rest either', not has(run(d, ctx=CTX), 'FAIL', 'Incline Treadmill Walk: no rest'))
+d['workouts']['days'][2]['blocks'][0]['exercises'][0]['rx'] = {"sets": 4, "time": "5 min"}
+expect('...but the same card in four sets does', has(run(d, ctx=CTX), 'FAIL', 'Incline Treadmill Walk: no rest'))
 
 d = copy.deepcopy(BASE); d['workouts']['days'][0]['blocks'][1]['exercises'][0]['rx']['sets'] = 5
 expect('5 sets fail without --proven', has(run(d, ctx=CTX), 'FAIL', 'never more than 4'))

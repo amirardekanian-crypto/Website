@@ -376,6 +376,8 @@ def check_prep_rest(data, args):
                 kind = ex.get('type')
                 if kind not in ('standard', 'circuit'): continue
                 if kind == 'circuit' and prep: prep_circuits += 1
+                # One continuous effort (a 35-minute walk typed standard, no sets) has nothing to rest between.
+                if kind == 'standard' and (num((ex.get('rx') or {}).get('sets')) or 0) <= 1: continue
                 r = own_rest(ex)
                 if r is None:
                     fail(f"{where}: no rest. Every working exercise and every circuit, a prep circuit included, writes rx.rest ({MIN_REST} s at the least)", 'CHP-7')
