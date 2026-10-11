@@ -29,6 +29,7 @@ This is the **index**; the deep guides it points to (`CODEBASE.md`, `SCHEMA.md`,
 | How to run the coaching skills (intake → ship) | [`.claude/COACHING-HOWTO.md`](.claude/COACHING-HOWTO.md) |
 | The home page / hero | [`index.html`](index.html) (EN) · [`index-fa.html`](index-fa.html) (FA) |
 | The athlete training app | [`program.html`](program.html) · how its features work: [`PROGRAM-APP.md`](PROGRAM-APP.md) |
+| **The athlete app, as a first-time client sees it** (screens, first session, words, situations; plus findings for Amir) | [`Content/CLIENT-APP-MAP.md`](Content/CLIENT-APP-MAP.md) |
 | The Farsi products (the paid course app, the testing app's page) | [`FARSI-PRODUCTS.md`](FARSI-PRODUCTS.md) |
 | The coach dashboard ("The Coach's Box") | [`coach.html`](coach.html) · manual: [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | Where one athlete's program lives | a row in `public.programs` (Supabase; `data/<id>.json` is local scratch only) → [`SCHEMA.md`](SCHEMA.md) |
