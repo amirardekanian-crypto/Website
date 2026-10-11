@@ -1154,7 +1154,7 @@ same ID. Read a rule's story and its history before changing it.
   - any other Primary compound (a pulldown, a press at 8 reps or more): 120 s;
   - a compound or single-leg Accessory (a row, an incline press, a split squat, a hinge accessory): 75 to 90 s;
   - a machine, cable or isolation Accessory (curl, raise, extension, face pull, calf raise): 60 to 75 s;
-  - core: 45 to 60 s; a carry: 60 s;
+  - core: 45 to 60 s; a carry: 60 s; a light prehab or rehab drill (external rotation, ankle, wrist): 30 to 45 s;
   - sprints and starts: 90 s; throws, jumps and landings: 60 to 90 s (power wants full rest, PRG-10);
   - a circuit (a superset) has ONE rest, after the round, 75 to 90 s, and never a rest per item; a prep
     circuit rests 30 to 45 s.
