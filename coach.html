@@ -1265,9 +1265,10 @@ function pendingCredsHtml() {
     </button>
     ${credsOpen(pending.length) ? `
       <p class="empty" style="padding:6px 0 12px">
-        Copy each one and send it on WhatsApp, then mark it sent. Passwords are stored
-        here only until you do — after that the only way to see one again is a reset.
-        <b>Signed in with it</b> means it already reached them: mark it sent to clear it.
+        Copy each one and send it on WhatsApp, then mark it sent. A password is stored here
+        only until you do, or until the person signs in with it: the database then clears it by
+        itself (stage51) and they drop out of this list. After that the only way to see one again
+        is a reset. <b>Signed in with it</b> can only show for a moment, or for one stored before stage51.
       </p>
       ${pending.map(r => `
         <div class="credrow">
@@ -4032,7 +4033,7 @@ function fileTabHtml(D) {
         <p class="empty" style="padding:0 0 10px">
           <b style="color:var(--clay-ink)">No login yet: ${esc(athleteId)} cannot open the app.</b> The old secret links
           were retired on 7 Sep 2026. Create a username and password here, then send it on WhatsApp
-          (it waits under “Logins to send” on the Athletes tab until you mark it sent).
+          (it waits under “Logins to send” on the Athletes tab until you mark it sent, or they sign in with it).
         </p>
         <div class="pwform">
           <input id="athPw" class="pwin" aria-label="Password (empty to generate one)" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false"
@@ -4786,7 +4787,7 @@ async function assessAction(action, username, label, btn, password) {
   renderAssess();
   alert((data.created ? 'Login created' : action === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username + '\n\n' +
     'Password: ' + data.password + '\n\n' +
-    'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent.' +
+    'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent, or until they sign in with it (then the database clears it).' +
     (data.warning ? '\n\n⚠ ' + data.warning : ''));
 }
 
@@ -4925,7 +4926,7 @@ async function courseAction(action, username, label, btn, password) {
   renderCourse();
   alert((data.created ? 'Login created' : action === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username + '\n\n' +
     'Password: ' + data.password + '\n\n' +
-    'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent.' +
+    'The Farsi WhatsApp message is copied to your clipboard. It also stays in the list until you mark it sent, or until they sign in with it (then the database clears it).' +
     (data.warning ? '\n\n⚠ ' + data.warning : ''));
 }
 

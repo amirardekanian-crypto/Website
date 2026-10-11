@@ -339,9 +339,12 @@ seven presence dots.
 **Above the roster:** *Create N missing logins* (coached athletes who have trained and have no
 login), then a folded **Coach tools** line: *↑ Publish programme file*, *↑ Add coaching logs* and
 *⤓ Backup*, with when this computer last took a backup, then **Logins to send** (open while three
-or fewer wait, folded above that: each unsent password with Copy message and Mark sent; *signed in
-with it* marks one the person has already used, which is safe to mark sent; the Course and Testing
-app lists show the same mark). (The secret-link tools are gone: the links were retired on 2026-09-07.)
+or fewer wait, folded above that: each unsent password with Copy message and Mark sent). **A stored
+password clears by itself** (stage51, 2026-10-11): the database removes it the moment the person signs in
+with it and stamps *sent* with that time, so they drop out of the list. *Signed in with it* can only show
+for a moment, or on a password stored before stage51; the Course and Testing app lists behave the same.
+If you sign in as the person yourself to test a login before sending it, that clears it too: reset the
+login for a new password. (The secret-link tools are gone: the links were retired on 2026-09-07.)
 
 - **↑ Publish programme file** checks that the file name matches its `athlete.id`, shows the live
   programme against the file (cycle, days, last saved, by whom) and warns in capitals when the live

@@ -687,6 +687,9 @@ S['login-used-mark'] = async (b) => {
   const r = { id: 'login-used-mark', title: 'Logins to send marks a password that has already been used to sign in', checks: [] };
   const { page } = await L.openCoach(b, { hash: 'athletes' });
   check(r, 'an unused stored password carries no mark', (await page.locator('.creds .credrow', { hasText: 'ben_test' }).locator('.fl.good').count()) === 0, '');
+  await page.evaluate(() => { const el = document.querySelector('.creds-top'); if (el && el.getAttribute('aria-expanded') !== 'true') el.click(); });
+  const credsText = (await page.locator('.creds').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the panel says the database clears a password by itself once they sign in with it (stage51)', /signs in with it: the database then clears it by itself/.test(credsText), credsText.slice(0, 400));
   await page.evaluate(() => { window.__DB.athlete_identities.find(x => x.athlete_id === 'ben_test').signed_in_test = true; });
   await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
   const row = page.locator('.creds .credrow', { hasText: 'ben_test' });

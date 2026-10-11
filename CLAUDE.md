@@ -72,7 +72,10 @@ as a rainy-day fallback. Never commit one; the `.gitignore` entry explains why.
 coach.html (Athletes → an athlete → Create login), keyed on an internal address
 `athlete.<id>@amirardekani.com` that never receives mail. The password is generated, or typed
 there (8-72 printable English characters, no spaces, not the username: `typedPassword()` in
-coach.html and `checkTyped()` in each login function apply the same rule, so change both). Sign-in
+coach.html and `checkTyped()` in each login function apply the same rule, so change both). **The stored
+first password is cleared by the database as soon as the person signs in with it** (stage51, 2026-10-11, a
+trigger on `auth.users.last_sign_in_at`; Mark sent clears it too): it exists only to be copied into the
+WhatsApp message. Sign-in
 folds Persian and Arabic-Indic digits to 0-9 (`foldDigits()` in program.html, habits.html and the two
 tennis apps, the same fold as `typedPassword()`): the username always, the password only on a retry
 after the typed one fails (2026-10-10; a Farsi keyboard failed every sign-in before). The

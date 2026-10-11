@@ -196,3 +196,14 @@ create policy "member owns results" on public.assess_results for all to authenti
   using ((account_id = (select auth.uid())) and (select public.assess_member()));
 -- Supabase's default table grants for the signed-in role; row-level security is what limits them. anon has none.
 grant select, insert, update, delete on public.assess_accounts, public.assess_players, public.assess_notes, public.assess_results to authenticated;
+
+-- stage51 (stored first passwords): auth.users with only the columns the trigger reads, and the other login tables.
+create table auth.users (id uuid primary key, email text, last_sign_in_at timestamptz);
+create table public.athlete_identities (
+  user_id uuid primary key references auth.users (id) on delete cascade, athlete_id text not null unique, email text,
+  linked_at timestamptz not null default now(), initial_password text, password_set_at timestamptz, sent_at timestamptz
+);
+create table public.tps_accounts (
+  user_id uuid primary key, username text, label text, created_at timestamptz not null default now(),
+  initial_password text, password_set_at timestamptz, sent_at timestamptz, revoked_at timestamptz
+);
