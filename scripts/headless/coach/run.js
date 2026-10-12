@@ -2794,6 +2794,113 @@ S['hints-once'] = async (b) => {
   return r;
 };
 
+// ── The look, round 3 of the UX pass (2026-10-12): the rules the whole page follows, measured on the demo screens ──────────────────
+// Five font sizes, three radii, typefaces with jobs, capitals only on column heads and group labels, ONE fold, a neutral Free chip, one button
+// height, and no font, colour, radius or shadow typed into a template (the demo has every screen filled in, and nothing in it is real).
+S['design-rules'] = async (b) => {
+  const r = { id: 'design-rules', title: 'The look: five font sizes, three radii, Barlow Condensed only on the brand and the athlete\'s name, Space Mono and capitals only where they have a job, one fold, a neutral Free chip, one button height, no styling typed into a template', checks: [] };
+  // Where a face or a case is allowed. Space Mono: numbers that line up or must be exact. Capitals: column heads and group labels.
+  const MONO_OK = '.aff-code, .mic .count, .qx, .cmp-rx, .cmp-rx *, .cmp-did, .cmp-did *, .rx-editor input, .rx-editor select, .credpass, #athPw, [class*="-pwin"], #eraseIn, .pw-secret, .elog-body, .xp small, .pr-v, .pr-v *, td.num, .fb-sel, code, .rpe-set';
+  const UP_OK = '.eyebrow, .rhead, .rgroup, .cmp-head, .cmp-grp-t, .qm-head, .in-gh, .in-h, .wallday .d, th, .brand, .gate h1, .gate .mark, .dethead h2, input.uc';
+  const COND_OK = '.brand, .gate h1, .gate .mark, .dethead h2';
+  const SCREENS = [
+    ['today', 'today'], ['today with Tools open', 'today', async p => { await p.click('#toolsBtn'); await p.waitForTimeout(300); }],
+    ['athletes', 'athletes'], ['an athlete (the work)', 'a/demo_ana'], ['an athlete, charts open', 'a/demo_ana', async p => { await p.click('#chartsBtn'); await p.waitForTimeout(300); }],
+    ['an athlete (the file)', 'a/demo_ana/file'], ['a free athlete', 'a/demo_kian'],
+    ['exercises', 'exercises'], ['exercises, an entry open', 'exercises', async p => { const row = await p.$('.spine-row'); if (row) { await row.click(); await p.waitForTimeout(500); } }],
+    ['qualities', 'exercises/qualities'], ['coverage', 'exercises/coverage'],
+    ['proof', 'proof'], ['leads', 'leads'], ['free signups', 'leads/signups'], ['referral codes', 'leads/codes'], ['library', 'links'], ['buyers', 'buyers'], ['testing app', 'buyers/testing'],
+  ];
+  const sizeBad = [], radiusBad = [], condBad = [], monoBad = [], upBad = [], foldBad = [], btnBad = [], primaryBad = [], freeChips = [], plumDots = [], errs = [];
+  let seen = 0;
+  for (const vw of [1440, 390]) {
+    const ctx = await b.newContext({ viewport: { width: vw, height: 900 }, timezoneId: 'UTC' });
+    const page = await ctx.newPage();
+    page.on('pageerror', e => errs.push(String(e && e.message || e)));
+    await page.route('**/*', route => route.request().url().startsWith(L.BASE) ? route.continue() : route.fulfill({ status: 204, body: '' }));
+    await page.goto(L.BASE + '/coach.html?demo=1#today');
+    await page.waitForFunction(() => document.querySelector('#rail a.tab') && !document.querySelector('#content .loading'), null, { timeout: 15000 });
+    for (const [name, hash, act] of SCREENS) {
+      await page.evaluate(h => { if (document.getElementById('toolsPanel') && !document.getElementById('toolsPanel').hidden) document.getElementById('toolsBtn').click(); location.hash = h; }, hash);
+      await page.waitForTimeout(600);
+      if (act) { try { await act(page); } catch (e) { errs.push(name + ': ' + e.message); } }
+      const res = await page.evaluate(({ MONO_OK, UP_OK, COND_OK, vw }) => {
+        const out = { size: [], radius: [], cond: [], mono: [], up: [], fold: [], btn: [], primary: [], free: [], dots: [], n: 0 };
+        const SIZES = [12, 14, 17, 22, 30];
+        const desc = el => (el.tagName.toLowerCase() + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).join('.') : '')).slice(0, 56) + ' "' + (el.textContent || '').trim().slice(0, 18) + '"';
+        const shown = el => { const cs = getComputedStyle(el), q = el.getBoundingClientRect(); return cs.display !== 'none' && cs.visibility !== 'hidden' && q.width > 0 && q.height > 0; };
+        for (const el of document.querySelectorAll('#app *')) {
+          if (el.closest('svg') || el.tagName === 'OPTION' || el.tagName === 'SCRIPT' || el.tagName === 'STYLE' || !shown(el)) continue;
+          out.n++;
+          const cs = getComputedStyle(el);
+          const own = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+          const field = (el.tagName === 'INPUT' && !['checkbox', 'radio', 'hidden', 'range'].includes(el.type)) || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT';
+          if (own || field) {
+            const fs = parseFloat(cs.fontSize);
+            if (!SIZES.includes(fs) && !(fs === 16 && field && vw < 900)) out.size.push(desc(el) + ' ' + cs.fontSize);
+            const fam = cs.fontFamily.split(',')[0].replace(/["']/g, '').trim();
+            if (fam === 'Barlow Condensed' && !el.closest(COND_OK)) out.cond.push(desc(el));
+            if (fam === 'Space Mono' && !el.closest(MONO_OK)) out.mono.push(desc(el));
+            if (cs.textTransform === 'uppercase' && !el.closest(UP_OK)) out.up.push(desc(el));
+          }
+          const isChk = el.tagName === 'INPUT' && ['checkbox', 'radio'].includes(el.type);
+          if (!isChk) {
+            for (const k of ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius']) {
+              const v = cs[k];
+              if (!v || v === '0px') continue;
+              const bad = v.split(' ').some(t => { const n = parseFloat(t); return t.endsWith('%') ? false : !(n === 8 || n === 12 || n >= 999); });
+              if (bad) { out.radius.push(desc(el) + ' ' + k + ' ' + v); break; }
+            }
+          }
+          if (el.matches('.btn:not(.mp-more), .abtn, .modbtn, .tbtn')) {
+            const h = Math.round(el.getBoundingClientRect().height);
+            if (Math.abs(h - 32) > 1) out.btn.push(desc(el) + ' ' + h + 'px');
+          }
+          if (el.matches('details > summary')) {
+            const p = getComputedStyle(el, '::before');
+            if (!(p.content && p.content !== 'none' && p.content !== 'normal' && p.borderRightWidth === '2px' && p.transform !== 'none' && p.width === '8px')) out.fold.push(desc(el));
+          }
+          if (el.matches('.chip') && /^free$/i.test(el.textContent.trim())) out.free.push({ bg: cs.backgroundColor, color: cs.color });
+          if (el.matches('.need .dot.ochre')) out.dots.push(desc(el));
+        }
+        // at most one primary button per panel (a row's own primary, in a login or a credential row, is that row's)
+        for (const sec of document.querySelectorAll('.panel')) {
+          if (!shown(sec)) continue;
+          const n = [...sec.querySelectorAll('.btn.primary')].filter(x => shown(x) && !x.closest('.credrow, .pwform, .fun, .hidrow')).length;
+          if (n > 1) out.primary.push(desc(sec) + ' has ' + n);
+        }
+        return out;
+      }, { MONO_OK, UP_OK, COND_OK, vw });
+      seen += res.n;
+      const tag = s => vw + ' px · ' + name + ' · ' + s;
+      res.size.forEach(s => sizeBad.push(tag(s))); res.radius.forEach(s => radiusBad.push(tag(s))); res.cond.forEach(s => condBad.push(tag(s)));
+      res.mono.forEach(s => monoBad.push(tag(s))); res.up.forEach(s => upBad.push(tag(s))); res.fold.forEach(s => foldBad.push(tag(s)));
+      res.btn.forEach(s => btnBad.push(tag(s))); res.primary.forEach(s => primaryBad.push(tag(s))); res.dots.forEach(s => plumDots.push(tag(s)));
+      res.free.forEach(f => freeChips.push(f));
+    }
+    await ctx.close();
+  }
+  const uniq = a => [...new Set(a)].slice(0, 12);
+  check(r, 'the screens were measured (a few thousand elements)', seen > 3000, seen);
+  check(r, 'every font size is 12, 14, 17, 22 or 30 (16 only on a form field below 900 px)', sizeBad.length === 0, uniq(sizeBad));
+  check(r, 'every corner is 0, 8, 12 or a pill (999 or 50%)', radiusBad.length === 0, uniq(radiusBad));
+  check(r, 'Barlow Condensed is on the brand and the athlete\'s name, and nowhere else', condBad.length === 0, uniq(condBad));
+  check(r, 'Space Mono is only on numbers that line up or must be exact (the allow-list), never on a date, a fact or a label', monoBad.length === 0, uniq(monoBad));
+  check(r, 'capitals are only on column heads and group labels (the allow-list)', upBad.length === 0, uniq(upBad));
+  check(r, 'every <details> summary has the shared chevron on its left', foldBad.length === 0, uniq(foldBad));
+  check(r, 'every button is 32 px high with a mouse', btnBad.length === 0, uniq(btnBad));
+  check(r, 'a panel shows at most one primary button', primaryBad.length === 0, uniq(primaryBad));
+  const PLUM = ['rgb(122, 78, 110)', 'rgba(122, 78, 110, 0.12)'];
+  check(r, 'the Free tier is a neutral outline chip: found, and neither its fill nor its text is plum', freeChips.length >= 2 && freeChips.every(f => !PLUM.includes(f.bg) && !PLUM.includes(f.color) && f.bg === 'rgba(0, 0, 0, 0)'), freeChips.slice(0, 4));
+  check(r, 'a Needs-you dot that is not a warning is grey, not plum', plumDots.length === 0, uniq(plumDots));
+  // Nothing typed into a template: a font, a colour, a radius or a shadow is a class next to its component's CSS (a width or a margin may stay).
+  const src = await (await fetch(L.BASE + '/coach.html')).text();
+  const typed = (src.match(/style="[^"]*"/g) || []).filter(s => /font-size|font-family|border-radius|box-shadow|text-transform|letter-spacing|(^|[;"])\s*color\s*:/.test(s));
+  check(r, 'no font, colour, radius or shadow is typed into a template as a style attribute', typed.length === 0, typed.slice(0, 8));
+  check(r, 'no page errors', errs.length === 0, errs.slice(0, 5));
+  return r;
+};
+
 S['refetch-failures'] = async (b) => {
   const r = { id: 'refetch-failures', title: 'After a save, a reload that fails is told (the wall, contacts, rules), not skipped', checks: [] };
   const { page, log } = await L.openCoach(b, {});
@@ -4583,7 +4690,8 @@ S['intake-list-detail'] = async (b) => {
   const row = name => page.locator('.in-row', { hasText: name });
   const title = async () => ((await page.locator('.in-detail .in-title').textContent()) || '').trim();
   const box = sel => page.locator(sel).first().boundingBox();
-  const heads = async () => (await page.locator('.in-list .in-gh').allInnerTexts()).map(t => t.replace(/\s+/g, ' ').trim());
+  // textContent, not innerText: the group labels are drawn in small capitals now (round 3's look), and innerText follows the rendering
+  const heads = async () => (await page.locator('.in-list .in-gh').allTextContents()).map(t => t.replace(/\s+/g, ' ').trim());
   const grp = name => row(name).getAttribute('data-st');
   const quiet = async () => (await page.locator('.in-detail .in-quiet .btn').allInnerTexts()).map(t => t.trim());
   const noOverflow = () => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
