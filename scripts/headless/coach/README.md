@@ -61,7 +61,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-12: 112 scenarios after round 2 of the UX pass: round 1 brought `today-also-waiting`, `roster-dense` and `file-groups`, round 2 `intake-list-detail`, `proof-home`, `spine-subtabs` and `nav-seven`; the Add past session ones went with the box, `work-this-cycle`, `sync-finished-list` and `work-week-cap` came in; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-12: 116 scenarios after round 3's first wave of the UX pass: round 1 brought `today-also-waiting`, `roster-dense` and `file-groups`, round 2 `intake-list-detail`, `proof-home`, `spine-subtabs` and `nav-seven`, round 3 `danger-panels`, `r3-library-charts-editor`, `phone-bottom-bar` and `hints-once`; the Add past session ones went with the box, `work-this-cycle`, `sync-finished-list` and `work-week-cap` came in; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|

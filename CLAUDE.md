@@ -421,7 +421,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (112 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (116 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **The UX pass (2026-10-12; Amir's answers in memory `coach-redesign-2026-10-12`)**, round 1 shipped: Today puts Needs you first and wide,
   each row's button names what it does, and **"Also waiting"** (applications, logins to send, backup, older notes) is NOT a reason, so it never
   touches `reasonsOf()` or the people count. The roster is one aligned table (Athlete · Cycle · Last session · Proof · Why); the athlete header
@@ -430,8 +430,11 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   one bar (Today · Athletes · Exercises · Proof · **Leads** · Library · **Buyers**; `#intake`, `#affiliates`, `#assess`, `#course` are rewritten to
   their new homes by `fixLegacyHash()`, keep them working); Leads = Applications (`intakeViewHtml()`, a list and the chosen one) · Free signups
   (`funnelPanelHtml()`) · Referral codes; Buyers = Course · Testing app; Exercises = Entries (the editor beside the list) · Qualities · Coverage;
-  Proof is the crew's home (wall, quest lever, pulse, board) and Today keeps a short Proof column; body weight is on The work. Round 3 (type,
-  colour and corners, long confirms as inline panels, Library rows, the phone bottom bar) is planned, not built.
+  Proof is the crew's home (wall, quest lever, pulse, board) and Today keeps a short Proof column; body weight is on The work. **Round 3:** destroying
+  something asks in an inline panel under its button (`dangerAsk()`: Delete training history, Forget, End the quest run, the two record deletes),
+  and anything to read or copy once is a `notice()` line beside `fail()`'s (there is **no `alert()`** in coach.html; keep it that way); Library
+  rows with one Copy link; chart axes; a folded pill picker; a phone bottom bar below 600 px only; one hint line per panel with the rest in
+  How this works. The global type, colour and corner pass comes last.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.
