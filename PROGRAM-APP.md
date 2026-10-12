@@ -996,7 +996,7 @@ dashboard do not change.
 - **Scroll margins**: `foldWhenDone()` lands the next card under the slim bar with the row it just folded showing
   whole above it: 110 px, 142 with the week's limits row (156 under 360, where that row can wrap), plus 44 in the demo.
   That is the bar, 16 px for Chrome's smooth scroll stopping short of an instant one, and 38 px so the 54 px done row is
-  never a cut-off sliver under the bar (`RESKIN/tools/b1-fold.js` measures it).
+  never a cut-off sliver under the bar.
 - **The cards** (section 7 of the block, Centre Court 2/3). No card is a box any more: a row on the paper, a
   hairline from the name column between rows, no white, no shadow, no stripe, no press scale.
   - **Closed**: the tick-all ring (30 px drawn, 44 to hit) with the **exercise's number inside it** (Amir: *"exercise
@@ -1070,6 +1070,17 @@ dashboard do not change.
   weight by `body[data-dark] :where(…)` rules in the block.
 - **320 px**: the gutter is 16; the set table's columns narrow; the slim bar never drops a word; the finish's tap rows
   close their gap to 16. Measured on every state: no sideways scroll, no text under 11 px, every control 44 px to hit (the TEMPO caption reaches it through a ::after).
+- **Taps and keys** (E's build notes n and o): an open card folds from its name row only. A thumb on the scoreboard
+  (*4 × 6*, *2:30*) or the pill mid-set leaves it open (`onExerciseRowTap()`); a closed row still opens from anywhere.
+  The tick-all ring is `role="button"`, `tabindex="0"` with an `aria-label`, and Enter or Space ticks it like a tap
+  (`onCheckBoxKey()`; a Library session wires its own listener, as it does for the tap).
+- **Waiting for Amir's word** (left as they are until he says): (1) E's **p** (a per-side move with no kg box shows *4*
+  in its reps box, not *4 / side*), **s** (a working circuit's ▶ is still the disc beside the kg box, not in its How to
+  do it line) and **t** (a circuit's Last time strip sits above the rounds' RPE rows, not under the head); (2) with ⋯
+  open, **Pause** moves to the second row beside Guided and Reset (A's and E's frames keep it on the first row);
+  (3) the cover's *● DAY 1* has white words and a mint dot, as P4's picture draws it (the spec's words said a mint
+  eyebrow); (4) the fault cue's bar is clay (it was red `#E74C3C`): if it counts as *look here* it joins the list in
+  *Clay means look here*, if not it goes grey or steel.
 
 ## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26 and 2026-09-27)
 

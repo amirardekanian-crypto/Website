@@ -4441,7 +4441,6 @@
     font: 700 var(--fs-title)/1 'Barlow', sans-serif; letter-spacing: 1px; }
   :where(#day-view) .session-timer.slim .session-timer-week { margin: 0 -4px 0 -2px; padding: 7px var(--g) 10px; border-top: 0; background: rgba(0,0,0,.18); }
   :where(#day-view) .session-timer.slim .stb-prog { display: block; position: absolute; left: 0; right: 0; top: 53px; height: 3px;   /* the 56 px strip's foot, above the limits row */
-   
     background: rgba(255,255,255,.12); pointer-events: none; }
   :where(#day-view) .stb-prog i { display: block; width: 0; height: 100%; border-radius: 0 2px 2px 0; background: var(--mint);
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -4518,11 +4517,6 @@
   :where(#day-view) .session-complete { scroll-margin-top: 16px; }
   body.is-demo :where(#day-view) .session-complete { scroll-margin-top: 60px; }
 
-
-
-
-
-
   /* 7. THE CARDS (Centre Court 2/3). Calm paper: a card is a row on the paper with a hairline between rows, not a box.
      The one strong green thing is the open card's head. Selectors repeat the old rule they replace, so the weight ties
      and this block (later) wins; the old card look further up (white boxes, shadows, the stripe, the bordered log) is
@@ -4542,7 +4536,7 @@
     z-index: 1; top: 0; bottom: auto; left: calc(var(--g) + 56px); right: 0; width: auto; height: 1px; opacity: 1; background: var(--hair); }
   :where(#day-view, .step-scroll, #ws-body) .section-header-prog.same-name + .checklist-item { margin-top: 18px; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item > .item-main { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px;
-    column-gap: 12px; align-items: center; min-height: 74px; padding: 14px var(--g); cursor: pointer; }
+    gap: 0 12px; align-items: center; min-height: 74px; padding: 14px var(--g); cursor: pointer; }
 
   /* The tick-all ring, with the exercise's number INSIDE it (Amir: "exercise number inside the circle"). The number stays in
      .item-name-row in the DOM; CSS lays it on the ring, and it lets taps through to the ring (.check-box). Done: the ring
@@ -4564,7 +4558,7 @@
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-num { visibility: hidden; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .item-name { text-decoration: none; color: var(--grey); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item .item-name { min-width: 0; letter-spacing: 0; transition: none; text-decoration: none;
-    font: 600 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; text-wrap: pretty; }
+    font: 600 var(--fs-lead)/22px 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; text-wrap: pretty; }
   /* the old closed-row sizes (.checklist-item.collapsed .item-name 700, .ex-num 22 px; 0,3,0) matched at their weight, so a
      closed row and an open warm-up draw the same name and the same 16 px number in the ring */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed .item-name { font-size: var(--fs-lead); font-weight: 600; }
@@ -4581,7 +4575,7 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-doneline { display: none; }
   /* the line of numbers: 15 px, the dose bold, "·" between the parts; the tempo's hot digits clay */
   :where(#day-view, .step-scroll, #ws-body) .ex-numline { display: flex; flex-wrap: wrap; align-items: baseline; margin: 4px 0 0; letter-spacing: 0;
-    font: 500 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+    font: 500 var(--fs-body)/20px 'Barlow', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
   :where(#day-view, .step-scroll, #ws-body) .ex-numline > span:not(:last-child)::after { content: none; }
   :where(#day-view, .step-scroll, #ws-body) .ex-numline > span + span::before { content: '\00B7'; margin: 0 7px; font-weight: 400; color: var(--grey); }
   :where(#day-view, .step-scroll, #ws-body) .ex-numline b { font-weight: 700; color: var(--ink); }
@@ -4617,10 +4611,10 @@
   /* 7b. The DONE row: a receipt on the paper. The filled ring, the name grey 15 px, what was done 13 px grey on one line. */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-main { min-height: 54px; padding-top: 5px; padding-bottom: 5px; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .check-box { width: 44px; height: 44px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-name { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-name { font: 600 var(--fs-body)/20px 'Barlow', sans-serif; color: var(--grey); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-note-dot { background: var(--ring); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-doneline { display: block; margin-top: 2px; letter-spacing: 0; word-spacing: 1px;
-    font: 500 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+    font: 500 var(--fs-small)/17px 'Barlow', sans-serif; color: var(--grey); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-numline,
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-summary { display: none; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-about { opacity: 1; }
@@ -4639,7 +4633,7 @@
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) > .item-main { grid-template-areas: "name name side" "nums nums nums" "pill pill pill"; }
   /* only when the card has its own set circles: an open Library exercise (no set table) keeps its ring in the head */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .check-box { display: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-name-row { grid-area: name; display: flex; flex-direction: column; align-items: flex-start; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-name-row { grid-area: name; display: flex; flex-direction: column; align-items: flex-start; gap: 0; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-num { position: static; display: flex; align-items: center; gap: 8px; width: auto; height: auto;
     margin: 0 0 6px; visibility: visible; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 2px; color: var(--mint); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-num::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
@@ -4712,7 +4706,7 @@
   :where(#day-view, .step-scroll, #ws-body) .rest-btn:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
 
   /* Note: a 32 px outlined circle with its chevron, then NOTE in green condensed capitals; 44 px to hit. */
-  :where(#day-view, .step-scroll, #ws-body) .note-row { border: 0; opacity: 1; }
+  :where(#day-view, .step-scroll, #ws-body) .note-row, :where(#day-view, .step-scroll, #ws-body) .ex-log .note-row { border: 0; opacity: 1; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .note-row { opacity: 1; }
   :where(#day-view, .step-scroll, #ws-body) .note-row summary { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 12px 0 0; background: none;
     font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: var(--green-ink); }
@@ -5012,7 +5006,7 @@
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-btn { background: #2A2A2A; color: var(--ink); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-btn.selected { background: var(--mark); color: #fff; }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .rpe-label { color: var(--green-ink); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .note-row, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .note-row textarea { border-color: var(--box); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .note-row textarea { border-color: var(--box); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .note-row textarea { color: var(--ink); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .round-row { color: var(--ink); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .round-name { color: var(--ink); }
@@ -5025,7 +5019,7 @@
   /* a round's words take their own line where they and five 44 px keys do not fit in one */
   @media (max-width: 374px) {
     :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row { flex-wrap: wrap; gap: 0 4px; }
-    :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-label { flex: 0 0 100%; min-height: 36px; }
+    :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-label { flex: 0 0 100%; min-height: 44px; }
     :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-btn { flex: 1 1 0; }
   }
 
@@ -5125,10 +5119,10 @@
   :where(#day-view) .session-complete .complete-emoji { display: none; }   /* DAY 1 DONE says it, the way the About sheet opens on its words */
   :where(#day-view) .session-complete .complete-title { grid-row: 2; margin: 0; padding: 30px var(--g) 0; font: 900 var(--fs-display)/.92 'Barlow Condensed', sans-serif;
     letter-spacing: .4px; text-transform: uppercase; color: #fff; text-wrap: balance; }
-  :where(#day-view) .session-complete .complete-sub { grid-row: 3; margin: 18px var(--g) 0; padding: 16px 0 0 44px; border-top: 1px solid rgba(255,255,255,.16);
+  :where(#day-view) .session-complete .complete-sub { grid-row: 3; margin: 18px var(--g) 0; padding: 16px 0 0 56px; border-top: 1px solid rgba(255,255,255,.16);
     font: 500 var(--fs-lead)/1.42 'Barlow', sans-serif; color: #fff; text-wrap: pretty; }
   :where(#day-view) .session-complete .complete-sub:empty { display: none; }
-  :where(#day-view) .session-complete .complete-sub::before { content: '\201C'; position: absolute; left: 0; top: 15px; width: 32px; text-align: left;
+  :where(#day-view) .session-complete .complete-sub::before { content: '\201C'; position: absolute; left: 0; top: 15px; width: 44px; text-align: center;
     font: 900 var(--fs-display)/1 'Barlow Condensed', sans-serif; color: var(--clay-on-green); }
   :where(#day-view) .session-complete .complete-by { grid-row: 4; display: flex; align-items: flex-end; justify-content: flex-end; gap: 10px; padding: 8px var(--g) 24px; color: #fff; }
   :where(#day-view) .session-complete .complete-by .wn-sig { width: 104px; height: 37px; margin: 0; color: #fff; }
@@ -7786,7 +7780,7 @@ function weekLimitsHTML(cycle, day) {
   // Each dot rides with the item after it, so a wrapped line never ends on a dot. The spaces between the pieces are
   // for a screen reader (a flex row does not draw them). The numbers sit in <em>, so the day view's green bar can colour
   // only them (Centre Court, 2026-10-12); Guided's copies colour the whole row and keep em upright.
-  const nums = s => String(s).split(/(\d+)/).map((x, k) => k % 2 ? `<em>${x}</em>` : esc(x)).join('');
+  const nums = s => String(s).split(/(\d+(?:\.\d+)?)/).map((x, k) => k % 2 ? `<em>${x}</em>` : esc(x)).join('');
   return `<div class="session-timer-week"><span class="stw-k">${esc(name)}</span> ${bits.map((b, i) => `<b>${i ? '<i aria-hidden="true">·</i>' : ''}${nums(b)}</b>`).join(' ')}</div>`;
 }
 
@@ -9283,7 +9277,7 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // (which every lookup reads) is unchanged.
   return `<div class="checklist-item collapsed ${blockClass}" data-day="${dayId}" data-sets="${setsCount}" data-reps="${esc(repsData)}" data-dose="${esc(doseData)}" data-target="${esc(rx.rpe || '')}" data-exid="${esc(ex.exId || '')}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
-      <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
+      <div class="check-box" role="button" tabindex="0" aria-label="Tick every set" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')" onkeydown="onCheckBoxKey(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
         <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}${ex.note ? NOTE_DOT : ''}</div></div>
         <div class="ex-doneline"></div>
@@ -9438,7 +9432,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
 
   return `<div class="checklist-item round-group collapsed ${blockClass}" data-day="${dayId}" data-rounds="${roundCount}" data-log-weight="${logWeight ? '1' : '0'}" data-log-rpe="${logRPE ? '1' : '0'}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
-      <div class="check-box" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')"></div>
+      <div class="check-box" role="button" tabindex="0" aria-label="Tick every round" onclick="onCheckBoxTap(event, this.closest('.checklist-item'), '${dayId}')" onkeydown="onCheckBoxKey(event, this.closest('.checklist-item'), '${dayId}')"></div>
       <div class="item-body">
         <div class="item-name-row">${numBadge}<div class="item-name">${esc(ex.name)}${ex.note ? NOTE_DOT : ''}</div></div>
         <div class="ex-doneline"></div>
@@ -9460,7 +9454,16 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
 function onExerciseRowTap(ev, item, day) {
   // Don't toggle if the user actually tapped a button/input/details inside the row
   if (ev.target.closest('details, .weight-log, .rpe-row, .play-btn, .rest-btn, .check-box, button, input, textarea')) return;
+  // An open card folds from its name row only: a thumb on the scoreboard's numbers or the pill mid-set leaves it open (Centre Court)
+  if (!item.classList.contains('collapsed') && ev.target.closest('.ex-numline, .ex-summary')) return;
   toggleExpand(item);
+}
+
+// The ring is a div: Enter or Space on it does what a tap does (keyboard and screen readers)
+function onCheckBoxKey(ev, item, day) {
+  if (ev.key !== 'Enter' && ev.key !== ' ') return;
+  ev.preventDefault();
+  onCheckBoxTap(ev, item, day);
 }
 
 // Tap on the check circle → toggle completion (existing behavior)
@@ -11463,7 +11466,7 @@ async function openWorkout(file) {
     const main = item.querySelector('.item-main');
     const box  = item.querySelector('.check-box');
     if (main) main.removeAttribute('onclick');
-    if (box)  box.removeAttribute('onclick');
+    if (box)  { box.removeAttribute('onclick'); box.removeAttribute('onkeydown'); box.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); box.click(); } }); }
     // Restore saved tick
     if (saved[i]) item.classList.add('checked');
     // Tapping the row toggles expand (unless tapping the check box / a button / video)
