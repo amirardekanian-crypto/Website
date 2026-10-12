@@ -1035,7 +1035,8 @@ same ID. Read a rule's story and its history before changing it.
   rows only), so a new exercise's entry is drafted in the same run and put to Amir as one question
   at the top of the handoff: *"approve these N so their cards show cues and steps?"* Never approve one
   without his word, and never put anything about one athlete on an entry.
-- `CUE-6` **How to do it: every Spine entry has steps, written once for anyone.** The test: someone who has
+- `CUE-6` **How to do it: every Spine entry has steps, written once for anyone.** The Farsi course reads the same entry's
+  Farsi (stage65), so a change to the English steps, cues, purpose or On court line changes the Farsi in the same run. The test: someone who has
   never seen the exercise, with no video, can do it safely from the words alone. With no video an athlete
   used to get three short cues and nothing else, and a handout alone gives more than twice the errors of video
   or live teaching, so where text is all there is, it has to be complete. The steps are the entry's `steps`

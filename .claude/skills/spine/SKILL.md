@@ -100,6 +100,9 @@ the existing ids for the links, and they show you which names are only variants.
   checks the batch (its header says exactly what it refuses).
 - **cues:** `{"good": [key point, feel or check], "bad": [the avoid]}`, the roles in CUE-1. The entry's
   FIRST quality decides whether `good[1]` is a feel or a position check, so write `qualities` before it.
+- **The Farsi** (`steps_fa`, `cues_fa`, `purpose_fa`, `tennis_fa`, stage65): the Farsi course reads them live. Write them for
+  every entry a course exercise names (`tps_content` → `spine`), in the course's voice (polite plural, Persian digits), and
+  **change them in the same run whenever the English steps, cues, purpose or On court line change**.
 - **tennis:** the court moment it serves, or `""` when there honestly isn't one. Do not stretch. Never the
   purpose again and never how (CUE-7).
 - **loads + impact = "Body parts involved"** (Amir, 2026-09-24, from the course app's

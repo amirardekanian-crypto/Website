@@ -2623,7 +2623,7 @@ S['spine-editor-folds'] = async (b) => {
   await page.locator('.sp-filter', { hasText: 'Approved' }).click(); await L.settle(page, 300);
   await page.locator('.spine-row', { hasText: 'Goblet Squat' }).first().getByRole('button', { name: 'Open' }).click(); await L.settle(page, 500);
   let secs = await page.evaluate(() => [...document.querySelectorAll('#spineEd details.spsec')].map(d => [d.querySelector('summary').textContent.replace(/\s+/g, ' ').trim(), d.open]));
-  check(r, 'a complete entry (counts, cost and SFR set) has two folded parts', secs.length === 2 && secs.every(s => s[1] === false), secs);
+  check(r, 'a complete entry (counts, cost and SFR set) has three folded parts (body map, Farsi, coach only)', secs.length === 3 && secs.every(s => s[1] === false), secs);
   // one that is missing its counts: the coach-only part opens by itself and says so
   await page.locator('.sp-close').first().click(); await L.settle(page, 400);
   await page.locator('.sp-filter[data-f="draft"]').click(); await L.settle(page, 300);
@@ -2635,7 +2635,7 @@ S['spine-editor-folds'] = async (b) => {
   await page.evaluate(() => { const d = document.querySelector('#spineEd details.spsec'); d.open = true; d.dispatchEvent(new Event('toggle')); });
   await page.evaluate(() => renderExercises()); await L.settle(page, 400);
   secs = await page.evaluate(() => [...document.querySelectorAll('#spineEd details.spsec')].map(d => d.open));
-  check(r, 'the parts stay as you left them across a redraw, and what was typed is kept', secs.every(x => x === true) && (await page.locator('#spineEd [data-sf="sfr"]').inputValue()) === '3', secs);
+  check(r, 'the parts stay as you left them across a redraw, and what was typed is kept', secs[0] === true && secs[1] === false && secs[2] === true && (await page.locator('#spineEd [data-sf="sfr"]').inputValue()) === '3', secs);
   const c0 = await L.nCalls(page);
   await page.locator('#spineEd .sp-save').first().click(); await L.settle(page, 800);
   const upd = lastOf(await L.callsSince(page, c0), c => c.kind === 'rpc' && c.name === 'coach_save_spine');

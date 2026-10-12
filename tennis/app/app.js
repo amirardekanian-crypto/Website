@@ -483,7 +483,8 @@
   const exName = ex => (ex && (ex.nameEn || ex.name)) || '';   // English only (Amir, 2026-09-14)
   // Same loose match as the coaching app: case, accents and punctuation don't matter; words and digits do.
   function libKey(n) { return String(n || '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ''); }
-  const videoFor = ex => (C.libIndex && C.libIndex[libKey(exName(ex))]) || (ex && ex.video) || '';   // library first (Amir, 2026-09-14)
+  // The Spine's video first (stage65: the course reads its exercises from the Spine), then the old name list, then the file.
+  const videoFor = ex => (ex && ex.spineVideo) || (C.libIndex && C.libIndex[libKey(exName(ex))]) || (ex && ex.video) || '';
   const pill = (t, cls) => `<span class="pill ${cls || ''}">${t}</span>`;
   const GEAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>';
 
@@ -568,6 +569,8 @@
     if (it && it.note) h += `<div class="note">${esc(it.note)}</div>`;
     if (ex.purpose) h += `<div class="label">چرا این تمرین؟</div><p>${esc(ex.purpose)}</p>`;
     if (ex.tennis) h += `<div class="label">در تنیس</div><p>${esc(ex.tennis)}</p>`;
+    // How to do it (stage65), from the exercise's Spine entry: numbered, before the cues, which finish it (CUE-7).
+    if (ex.steps && ex.steps.length) h += `<div class="label">روش انجام</div><ol class="steps">${ex.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>`;
     if ((ex.cues && ex.cues.length) || ex.avoid) {
       h += `<div class="label">نکته‌های اجرا</div>`;
       (ex.cues || []).forEach(c => { h += `<div class="cue">${esc(c)}</div>`; });
@@ -1901,7 +1904,49 @@
   // for the new view rather than guessing how long the router takes.
   window.addEventListener('hashchange', () => { if (READY) { route(); tourAfterRoute(); } });
 
-  const startApp = () => { READY = true; route(); maybeTour(); };
+  /* ── The Spine (stage65, 2026-10-12; Amir: "fed from spine", one source) ──
+     Each course exercise names its Spine entry (`spine`, else its own id). The entry's Farsi steps, cues, purpose and
+     court line, and its video, come live from get_exercises_fa() and replace the course's own copies, so a fix on the
+     Spine reaches every buyer. The last answer is kept on the phone (tps.spinefa) and used first, so the course opens
+     offline with it. With no entry, or nothing in Farsi on it yet, the course's own text stays. The Spine's one fault
+     replaces the old list of common mistakes: CUE-7, each thing said once. Local test modes never call the server. */
+  const SPINE_KEY = 'tps.spinefa';
+  function spineCached() { try { const v = JSON.parse(localStorage.getItem(SPINE_KEY) || 'null'); return Array.isArray(v) ? v : null; } catch (e) { return null; } }
+  function applySpine(list) {
+    if (!list || !C.exercises) return;
+    const byId = {}; list.forEach(e => { if (e && e.id) byId[e.id] = e; });
+    Object.keys(C.exercises).forEach(k => {
+      const ex = C.exercises[k];
+      if (!ex) return;
+      if (!ex._own) ex._own = { purpose: ex.purpose, tennis: ex.tennis, cues: ex.cues, avoid: ex.avoid, mistakes: ex.mistakes };
+      const o = ex._own, sp = byId[ex.spine || k];
+      const cues = sp && sp.cues && typeof sp.cues === 'object' ? sp.cues : null;
+      ex.purpose = (sp && sp.purpose) || o.purpose;
+      ex.tennis = (sp && sp.tennis) || o.tennis;
+      ex.cues = cues && cues.good && cues.good.length ? cues.good : o.cues;
+      ex.avoid = cues && cues.bad && cues.bad.length ? cues.bad[0] : o.avoid;
+      ex.mistakes = cues ? null : o.mistakes;
+      ex.steps = sp && Array.isArray(sp.steps) && sp.steps.length ? sp.steps : null;
+      ex.spineVideo = (sp && sp.video) || '';
+    });
+  }
+  async function refreshSpine() {
+    if (window.LOCAL) return;
+    try {
+      const r = await withTimeout(fetch(SB_URL + '/rest/v1/rpc/get_exercises_fa', { method: 'POST', cache: 'no-store',
+        headers: { apikey: SB_KEY, 'Content-Type': 'application/json' }, body: '{}' }), 15000);
+      if (!r || !r.ok) return;
+      const list = await withTimeout(r.json(), 15000);
+      if (!Array.isArray(list)) return;
+      const txt = JSON.stringify(list);
+      if (txt === localStorage.getItem(SPINE_KEY)) return;
+      try { localStorage.setItem(SPINE_KEY, txt); } catch (e) { /* storage full: still used for this open */ }
+      applySpine(list);
+      if (READY && (!stepEl() || stepEl().hidden)) route();
+    } catch (e) { /* offline: the copy on the phone stays */ }
+  }
+
+  const startApp = () => { if (!window.LOCAL) applySpine(spineCached()); READY = true; route(); maybeTour(); refreshSpine(); };
   document.querySelectorAll('a[data-buy]').forEach(a => { a.href = BUY_URL; });   // the demo bar in index.html
   (window.LOCAL ? loadLocalContent().then(startApp) : DEMO ? bootDemo(startApp) : bootCloud(startApp)).catch(err => {
     view().innerHTML = `<div class="section"><div class="card clay"><h3>محتوا بارگذاری نشد</h3><p class="lead" dir="ltr">${esc(err.message)}</p></div></div>`;
