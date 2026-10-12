@@ -476,10 +476,19 @@ with nobody in it is not drawn, except Everyone, Needs you and the one you are o
 name, email and WhatsApp digits (Persian ی/ک and extra spaces are normalised); the sort and the
 search survive a redraw.
 
-Each row carries a tier chip — **Coached**, **Free**, **Proof only** (they log
-habits but have no programme row) or **No file** — their level, a **load** pill only for a real
-spike (`load 1.6 · high load`, `· climbing`), their session count, their Proof week (`n/7`) and
-seven presence dots.
+**The list is one dense white surface** (redesign round 1, 2026-10-12; `roster-dense`): the groups are quiet label bands inside it, and each
+person is one row, a single `<button class="ath">` that opens their file. On a PC (900 px and up) the rows are aligned columns under a
+head row, about 52 px each (it was about 100 px a card, 4,000 px for 38 athletes): **Athlete** (a 28 px initials disc, court green, an
+outline for the free tier because plum means a warning; the name; the tier as small grey text: coached, free, Proof only, no file; the
+Paused or Former chip), **Cycle** (`C2 · wk 3/5 · ends 22 Oct`, from `rosterCycleHtml()`: the number is the programme's current cycle
+index + 1, the week is `cycleWeekOnC()`; in the last 7 days it says `ends in 3 d` / `ends today` and after the end `ended 5 d ago`, in clay
+for an active coached athlete; an undated cycle shows its name and length, then `no cycle`, or `no programme` for someone with no
+programme row), **Last session** (how long ago and how many; `no sessions yet` for a coached athlete with none, a dash for anyone
+else), **Proof** (seven presence dots, `n/7`, and the level as plain text, filled in place by `paintLevels()` when the levels arrive;
+empty for a person with no habits) and **Why** (the reasons from §3's one rule, clay when it is a warning and grey when it is only worth knowing,
+a pause or former status in words, and a load spike in plum: `load 1.6 · high load`, `· climbing`). A note waiting keeps a clay mark on
+the left edge. On a phone (under 900 px) there are no column heads and a row is two lines: the name, tier and Why, then the cycle, the last
+session and Proof (the dots wrap to a third line when there is no room); nothing is ever clipped.
 
 **A flagged row says why, in words:** the reasons in §3's table, from the same function.
 
@@ -829,12 +838,18 @@ The **private note** typed when a login is made lives in `buyer_notes`, which on
 2026-10-11): it used to be the account row's `label`, which the buyer could read through their own account. A trigger
 moves any label the Edge Functions still write into `buyer_notes` and leaves the row's label empty, so the Edge
 Functions did not change; the lists read the note from `buyer_notes` (applied 2026-10-11) and still fall back to the old
-column on a project that has not run stage53. Each buyer row has **Erase…**.
+column on a project that has not run stage53. **A buyer row keeps what is done every day in view and the rest behind one button**
+(redesign round 1, 2026-10-12): the name, then the stored password or the state (*sent*, *created*, *revoked*), then **Copy message**
+(the primary button) and **Mark sent** while a password waits, or **Restore** on a revoked row, and always **Manage**. Manage opens one line
+under the row with **Change password**, **Revoke** (not on a revoked row) and **Erase…**. Which row's Manage is open lives in the tab's
+state (`st.manage`, one at a time), so it survives a redraw; it is also open while that row's password form or Erase panel is open, so the
+button that led there stays in view; a second tap on Manage folds it and closes what it opened (the password form, an Erase panel that has not
+started); a finished action (a new password, a revoke, a restore) folds it by itself; and the *Revoked* section opens for a row whose Manage is open.
 **The two buyer tabs are one block** (`buyerLogins()`, audit MKT-6, 2026-10-11), built twice with their own table, Edge Function, address and
 Farsi message; before that they were two copied blocks that had drifted. A login call runs one at a time on a buyer tab and on an athlete's
 File tab (a double tap on *Save password* used to make two passwords and leave the message with the first), and after a create, reset or restore
 the page keeps saying what it did (*Login created for …*) instead of "Copied" a moment later. `buyer-logins-course` and `buyer-logins-assess`
-drive create, copy, mark sent, change password, revoke, restore and a failing function through both.
+drive create, copy, mark sent, Manage, change password, revoke, restore and a failing function through both.
 
 ### Erasing a person
 
@@ -902,7 +917,7 @@ list is long and a phone clips a dialog.
   while it loaded and reopened) is dropped, so it can never overwrite a newer panel or flip a running erasure back to
   *ready*. The Erase boxes keep focus across a redraw of the page, without scrolling it. When the intake forms did not load
   the finder says so and is switched off (it never says "0 other forms").
-- **A revoked buyer** has the same Erase… button; the *Revoked* section opens for the person whose panel is open
+- **A revoked buyer** has the same Erase… button (behind Manage); the *Revoked* section opens for the person whose panel is open
   (it used to draw the panel inside the closed section, invisible).
 
 ---

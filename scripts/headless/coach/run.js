@@ -1155,6 +1155,7 @@ S['erase-revoked'] = async (b) => {
   const det = page.locator('details', { has: page.locator('summary', { hasText: /Revoked/ }) });
   check(r, 'the Revoked section is closed until something in it is opened', (await det.count()) === 1 && (await det.getAttribute('open')) === null, '');
   await det.locator('summary').click();
+  await det.locator('.credrow', { hasText: 'revoked_course' }).locator('.tp-manage').click();   // Erase… waits behind Manage
   await det.locator('.credrow', { hasText: 'revoked_course' }).locator('.tp-erase').click();
   await page.locator('.erase #eraseIn').waitFor({ state: 'visible', timeout: 5000 });
   check(r, 'Erase… on a revoked course buyer: the panel is VISIBLE', await page.locator('.erase').isVisible() && await page.locator('#eraseIn').isVisible(), '');
@@ -1164,6 +1165,7 @@ S['erase-revoked'] = async (b) => {
   await L.go(page, 'assess');
   const det2 = page.locator('details', { has: page.locator('summary', { hasText: /Revoked/ }) });
   await det2.locator('summary').click();
+  await det2.locator('.credrow', { hasText: 'revoked_academy' }).locator('.as-manage').click();
   await det2.locator('.credrow', { hasText: 'revoked_academy' }).locator('.as-erase').click();
   await page.locator('.erase #eraseIn').waitFor({ state: 'visible', timeout: 5000 });
   await page.evaluate(() => render());
@@ -1281,10 +1283,12 @@ S['erase-buyers'] = async (b) => {
   const sel = (await L.calls(page)).filter(c => c.kind === 'from' && c.name === 'tps_accounts' && c.op === 'select')[0];
   check(r, 'the list asks for the account\'s user_id (to match the note) and reads buyer_notes', !!sel && (await L.calls(page)).some(c => c.kind === 'from' && c.name === 'buyer_notes' && c.op === 'select'), sel && sel.mods);
   const n0 = await L.nCalls(page);
+  await row.locator('.tp-manage').click();
   await row.locator('.tp-erase').click();
   await page.locator('.erase #eraseIn').waitFor();
   const rpc0 = (await L.callsSince(page, n0)).filter(c => c.kind === 'rpc' && c.name === 'coach_erase_person');
   check(r, 'Erase… on a course buyer makes one dry-run call keyed on the username', rpc0.length === 1 && JSON.stringify(rpc0[0].payload) === JSON.stringify({ p_kind: 'course', p_key: 'fixture_buyer' }), rpc0.map(c => c.payload));
+  check(r, 'while the Erase panel is open, Manage stays open with Erase… in view (also after a redraw)', await (async () => { const ok = async () => (await row.locator('.tp-manage').getAttribute('aria-expanded')) === 'true' && await row.locator('.tp-erase').isVisible(); const a = await ok(); await page.evaluate(() => render()); return a && await ok(); })(), '');
   let t = await erasePanelText(page);
   check(r, 'the panel names them by the note, lists the login, the note and the sign-in account, and asks for the username', /Erase Fixture note about a course buyer completely/.test(t) && /1 course login/.test(t) && /1 note of yours about them/.test(t) && /1 sign-in account/.test(t) && /Type fixture_buyer to confirm/.test(t) && !/intake form/.test(t), t.slice(0, 500));
   await page.locator('#eraseIn').fill('fixture_buyer');
@@ -1303,6 +1307,7 @@ S['erase-buyers'] = async (b) => {
   row = page.locator('.credrow', { hasText: 'fixture_academy' });
   rowText = (await row.innerText()).replace(/\s+/g, ' ');
   check(r, 'the testing list shows its note from buyer_notes too', /Fixture academy note/.test(rowText), rowText);
+  await row.locator('.as-manage').click();
   await row.locator('.as-erase').click();
   await page.locator('.erase #eraseIn').waitFor();
   t = await erasePanelText(page);
@@ -1322,6 +1327,7 @@ S['buyer-notes-fallback'] = async (b) => {
   const r = { id: 'buyer-notes-fallback', title: 'Course list when buyer_notes cannot be read (stage53 not applied): the account\'s own label shows, nothing breaks', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'course', seed: { stub: { fail: [{ kind: 'from', name: 'buyer_notes', message: 'relation "public.buyer_notes" does not exist', code: '42P01', times: 99 }] } } });
   const rowText = (await page.locator('.credrow', { hasText: 'fixture_buyer' }).innerText()).replace(/\s+/g, ' ');
+  await page.locator('.credrow .tp-manage').click();   // Erase… waits behind Manage
   check(r, 'the old label is shown, and the list still loads with its buttons', /· Fixture/.test(rowText) && !/Fixture note about/.test(rowText) && (await page.locator('.credrow .tp-erase').count()) === 1, rowText);
   check(r, 'there is no load-error banner for a missing notes table (before stage53 that is expected)', !/Not everything loaded/.test(await page.locator('#loadwarn').innerText()), await page.locator('#loadwarn').innerText());
   check(r, 'no page errors', !log.errors.length, log.errors);
@@ -1333,6 +1339,7 @@ S['buyer-notes-error'] = async (b) => {
   const { page, log } = await L.openCoach(b, { hash: 'course', seed: { stub: { fail: [{ kind: 'from', name: 'buyer_notes', message: 'fixture: the server fell over', code: 'XX000', times: 99 }] } } });
   const banner = (await page.locator('#loadwarn').innerText()).replace(/\s+/g, ' ');
   check(r, 'the banner says your notes about buyers did not load, with the reason', /Not everything loaded/.test(banner) && /your notes about buyers/.test(banner) && /fixture: the server fell over/.test(banner), banner);
+  await page.locator('.credrow .tp-manage').click();   // Erase… waits behind Manage
   check(r, 'the list still loads, with the account\'s own label as the fallback', (await page.locator('.credrow .tp-erase').count()) === 1 && /· Fixture/.test((await page.locator('.credrow', { hasText: 'fixture_buyer' }).innerText()).replace(/\s+/g, ' ')), '');
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
@@ -2574,6 +2581,69 @@ S['roster-tier-chips'] = async (b) => {
   return r;
 };
 
+// The roster as one dense list (2026-10-12, redesign round 1): a PC row is 60 px or less with aligned columns under column heads, a phone row is two lines.
+S['roster-dense'] = async (b) => {
+  const r = { id: 'roster-dense', title: 'Roster: a dense row per person (column heads, aligned columns, 60 px or less) on a PC, two lines and no sideways scroll on a phone; the cycle with its week, its end in clay near the end; the level still fills in place', checks: [] };
+  const FX = require('./fixtures');
+  const { page, log, today } = await L.openCoach(b, { hash: 'athletes', seed: { stub: { delay: { coach_season_levels: 1500 } } } });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const row = name => page.locator('#content .ath', { hasText: name });
+  // 1. the levels arrive into the Proof column of the rows that are already on screen
+  await row('Ava Example').locator('.a-proof').waitFor();
+  check(r, 'the roster is drawn before the levels arrive: Ava has her seven dots and no level yet', (await row('Ava Example').locator('.a-proof .dt').count()) === 7 && !/LV/.test(await row('Ava Example').locator('.a-proof').innerText()), await row('Ava Example').locator('.a-proof').innerText());
+  await page.evaluate(() => { window.__row = document.querySelector('#content .ath'); });
+  await L.settle(page, 2200);
+  check(r, 'when the levels arrive the rows are the same elements, and the level is plain text in the Proof column', await page.evaluate(() => document.querySelector('#content .ath') === window.__row) && /^LV \d+$/.test(await row('Ava Example').locator('.a-proof .lvtext').innerText()) && (await row('Ava Example').locator('.a-proof .lvchip').count()) === 0, await row('Ava Example').locator('.a-proof').innerText());
+  // 2. dated cycles: Ava is 10 days into 4 weeks, Ben's (4 weeks) ends in 3 days, Eli's (5 weeks) ended 5 days ago
+  await page.evaluate(([s, e, s2, e2, s3, e3]) => {
+    const set = (id, a, z) => { const p = window.__DB.programs.find(x => x.athlete_id === id); p.data.cycles[0].startDate = a; p.data.cycles[0].endDate = z; };
+    set('ava_test', s, e); set('ben_test', s2, e2); set('eli_new', s3, e3);
+    return hardRefresh();
+  }, [FX.daysAgo(today, 10), FX.daysAgo(today, -18), FX.daysAgo(today, 25), FX.daysAgo(today, -3), FX.daysAgo(today, 40), FX.daysAgo(today, 5)]);
+  await L.settle(page, 900);
+  const clay = await page.evaluate(() => { const i = document.createElement('i'); i.style.color = 'var(--clay-ink)'; document.body.appendChild(i); const c = getComputedStyle(i).color; i.remove(); return c; });
+  const colourOf = loc => loc.evaluate(el => getComputedStyle(el).color);
+  const heads = await page.locator('.rhead > span').evaluateAll(els => els.map(e => e.textContent));
+  check(r, 'the column heads are there: Athlete, Cycle, Last session, Proof, Why, in small capitals', JSON.stringify(heads) === JSON.stringify(['Athlete', 'Cycle', 'Last session', 'Proof', 'Why']) && await page.locator('.rhead').isVisible() && await page.locator('.rhead').evaluate(el => getComputedStyle(el).textTransform === 'uppercase' && getComputedStyle(el).fontSize === '12px'), heads);
+  const heights = await page.locator('#content .ath').evaluateAll(els => els.map(e => Math.round(e.getBoundingClientRect().height)));
+  check(r, 'every athlete row is 60 px or less at 1440 px', heights.length >= 5 && Math.max(...heights) <= 60, heights);
+  const lefts = await page.evaluate(() => ['a-cycle', 'a-last', 'a-proof', 'a-why'].map(c => [...new Set([...document.querySelectorAll('#content .ath .' + c)].map(e => Math.round(e.getBoundingClientRect().left)))].length));
+  check(r, 'the columns line up: every row starts each of Cycle, Last session, Proof and Why at the same x', JSON.stringify(lefts) === '[1,1,1,1]', lefts);
+  const cyc = async name => (await row(name).locator('.a-cycle').innerText()).replace(/\s+/g, ' ');
+  check(r, 'a dated cycle says its number, the week and its end: "C1 · wk 2/4 · ends 30 Oct"', /^C1 · wk 2\/4 · ends \d{1,2} [A-Z][a-z]{2}$/.test(await cyc('Ava Example')) && (await row('Ava Example').locator('.a-cycle .warn').count()) === 0, await cyc('Ava Example'));
+  check(r, 'a cycle that ends in 3 days says so, in clay', /^C1 · wk 4\/4 · ends in 3 d$/.test(await cyc('Ben Example')) && (await colourOf(row('Ben Example').locator('.a-cycle .warn'))) === clay, [await cyc('Ben Example'), await colourOf(row('Ben Example').locator('.a-cycle .warn'))]);
+  check(r, 'a cycle that ended 5 days ago says so, in clay', /^C1 · wk 5\/5 · ended 5 d ago$/.test(await cyc('Eli Example')) && (await colourOf(row('Eli Example').locator('.a-cycle .warn'))) === clay, await cyc('Eli Example'));
+  check(r, 'a free athlete with no cycle and a person with no programme say so, quietly', /^no cycle$/.test(await cyc('Cara')) && /^no programme$/.test(await cyc('Dan')) && (await row('Dan').locator('.a-cycle .warn').count()) === 0, [await cyc('Cara'), await cyc('Dan')]);
+  const last = async name => (await row(name).locator('.a-last').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the last session and the session count share a cell; no sessions reads "no sessions yet" for a coached athlete and a dash for anyone else', /^yesterday · 3 sessions$/.test(await last('Ava Example')) && /^no sessions yet$/.test(await last('Eli Example')) && /^—$/.test(await last('Dan')), [await last('Ava Example'), await last('Eli Example'), await last('Dan')]);
+  check(r, 'Proof: seven dots, n/7 and the level for Ava; nothing at all for Ben, who has no habits', (await row('Ava Example').locator('.a-proof .dt').count()) === 7 && /4\/7/.test(await row('Ava Example').locator('.a-proof .n7').innerText()) && (await row('Ben Example').locator('.a-proof').innerText()) === '' && (await row('Ben Example').locator('.dt').count()) === 0, '');
+  check(r, 'the old "on court ✓ / N d off" tag is gone (the dots say it)', !/on court|d off/.test(await page.locator('#rosterBox').innerText()), '');
+  const whyAva = await row('Ava Example').locator('.a-why').innerText();
+  check(r, 'Why: Ava\'s unread note is in clay, in words', /note/.test(whyAva) && (await colourOf(row('Ava Example').locator('.a-why .warn').first())) === clay, whyAva);
+  const ava = await row('Ava Example').locator('.ava').evaluate(el => getComputedStyle(el).backgroundColor), cara = await row('Cara').locator('.ava').evaluate(el => getComputedStyle(el).backgroundColor);
+  check(r, 'the avatar is court green for a coached athlete, and a plain outline (not plum) for a free one, whose tier reads "free"', ava === 'rgb(14, 74, 54)' && cara !== 'rgb(122, 78, 110)' && cara !== ava && (await row('Cara').locator('.tier').innerText()) === 'free' && (await row('Ava Example').locator('.tier').innerText()) === 'coached', [ava, cara]);
+  check(r, 'a row is still one button that opens the athlete, and a note waiting leaves its clay mark', (await row('Ava Example').evaluate(el => el.tagName)) === 'BUTTON' && await row('Ava Example').evaluate(el => el.classList.contains('flag') && /inset/.test(getComputedStyle(el).boxShadow)), '');
+  // 3. no sideways scroll at any width, and on a phone a row is two lines
+  const overflow = () => page.evaluate(() => ({ page: document.documentElement.scrollWidth - window.innerWidth, roster: document.getElementById('rosterBox').scrollWidth - document.getElementById('rosterBox').clientWidth,
+    rows: Math.max(...[...document.querySelectorAll('#content .ath')].map(e => e.scrollWidth - e.clientWidth)) }));
+  for (const w of [1180, 900]) {
+    await page.setViewportSize({ width: w, height: 800 }); await L.settle(page, 250);
+    const o = await overflow();
+    check(r, w + ' px: no sideways scroll, on the page, the roster or any row', o.page <= 0 && o.roster <= 0 && o.rows <= 0, o);
+  }
+  for (const [w, h] of [[390, 844], [320, 640]]) {
+    await page.setViewportSize({ width: w, height: h }); await L.settle(page, 250);
+    const o = await overflow();
+    check(r, w + ' px: no sideways scroll, on the page, the roster or any row', o.page <= 0 && o.roster <= 0 && o.rows <= 0, o);
+    const g = await row('Ava Example').evaluate(el => { const t = s => el.querySelector(s).getBoundingClientRect().top; return { head: getComputedStyle(document.querySelector('.rhead')).display, id: t('.a-id'), why: t('.a-why'), cycle: t('.a-cycle'), h: el.getBoundingClientRect().height }; });
+    // at 390 px the name and "1 note to read" share line 1; at 320 px the words may wrap under the name, but the cycle is always below both
+    check(r, w + ' px: no column heads; line 1 is the name and why (wrapping under the name when there is no room), then the cycle line', g.head === 'none' && (w < 360 || Math.abs(g.why - g.id) <= 6) && g.cycle > g.why - 2 && g.cycle > g.id + 14 && g.h <= (w < 360 ? 150 : 110), g);
+  }
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 S['today-mark-read'] = async (b) => {
   const r = { id: 'today-mark-read', title: 'Today: a note in Needs you can be marked read from there', checks: [] };
   const { page, log } = await L.openCoach(b, {});
@@ -2793,6 +2863,8 @@ for (const [tab, P, fn, table, urlPart] of [['course', 'tp', 'tps-login', 'tps_a
     let calls = await fnCalls(n0);
     check(r, 'Create calls the login function once even on a double tap, with the username and the note', calls.length === 1 && calls[0].payload.action === 'create' && calls[0].payload.username === 'new_buyer' && calls[0].payload.label === 'who bought it', calls.map(c => c.payload));
     check(r, 'the new login is in the list with its stored password and a Copy message button', (await row('new_buyer').locator('.credpass').count()) === 1 && (await row('new_buyer').locator('.' + P + '-copy').count()) === 1, '');
+    const rowBtns = async cls => (await row('new_buyer').locator(cls.map(c => '.' + P + '-' + c).join(', ')).count());
+    check(r, 'a row with a password waiting shows Copy message (the primary button), Mark sent and Manage, and none of Change password, Revoke or Erase…', (await row('new_buyer').locator('.' + P + '-copy.primary').count()) === 1 && (await rowBtns(['sent'])) === 1 && (await rowBtns(['manage'])) === 1 && (await rowBtns(['pw', 'act', 'erase'])) === 0, '');
     const msg = await clip();
     check(r, 'the Farsi message with the link, username and password is on the clipboard', msg.includes(urlPart) && msg.includes('new_buyer') && /رمز عبور/.test(msg), msg.slice(0, 120));
     check(r, 'the page says Login created for them', /Login created for new_buyer/.test(await L.toastText(page)), await L.toastText(page));
@@ -2806,6 +2878,16 @@ for (const [tab, P, fn, table, urlPart] of [['course', 'tp', 'tps-login', 'tps_a
     const upd = lastOf(await L.callsSince(page, n0), isUpd(table));
     check(r, 'Mark sent clears the stored password and stamps sent, for that username', !!upd && upd.payload.initial_password === null && !!upd.payload.sent_at && upd.filters.some(f => /^username\.eq\./.test(f)), upd && upd.payload);
     check(r, 'the row now says sent and has no password or Copy message', /sent \d{4}-\d{2}-\d{2}/.test((await row('new_buyer').innerText()).replace(/\s+/g, ' ')) && (await row('new_buyer').locator('.credpass').count()) === 0, (await row('new_buyer').innerText()).replace(/\s+/g, ' '));
+    // Change password, Revoke and Erase… sit behind Manage; it stays open through a redraw
+    const mg = row('new_buyer').locator('.' + P + '-manage');
+    check(r, 'a row with nothing to send shows only Manage, folded: Change password, Revoke and Erase… are not on it yet', (await rowBtns(['manage'])) === 1 && (await rowBtns(['pw', 'act', 'erase', 'copy', 'sent'])) === 0 && (await mg.getAttribute('aria-expanded')) === 'false', '');
+    await mg.click(); await L.settle(page, 300);
+    check(r, 'Manage opens Change password, Revoke and Erase… under the row, and says it is expanded', (await rowBtns(['pw'])) === 1 && (await rowBtns(['act'])) === 1 && (await rowBtns(['erase'])) === 1 && (await mg.getAttribute('aria-expanded')) === 'true', '');
+    await page.evaluate(() => render()); await L.settle(page, 200);
+    check(r, 'it is still open after the page redraws', (await rowBtns(['pw', 'act', 'erase'])) === 3 && (await mg.getAttribute('aria-expanded')) === 'true', '');
+    await mg.click(); await L.settle(page, 200);
+    check(r, 'a second tap on Manage folds it again', (await rowBtns(['pw', 'act', 'erase'])) === 0 && (await mg.getAttribute('aria-expanded')) === 'false', '');
+    await mg.click(); await L.settle(page, 200);
     // change the password: a typed one, then the function's
     await row('new_buyer').locator('.' + P + '-pw').click(); await L.settle(page, 300);
     check(r, 'Change password opens a form under the row, focused', (await page.locator('.' + P + '-pwin').count()) === 1 && await page.evaluate(sel => document.activeElement && document.activeElement.matches(sel), '.' + P + '-pwin'), '');
@@ -2815,6 +2897,8 @@ for (const [tab, P, fn, table, urlPart] of [['course', 'tp', 'tps-login', 'tps_a
     calls = await fnCalls(n0);
     check(r, 'Save password calls reset with the typed password', calls.length === 1 && calls[0].payload.action === 'reset' && calls[0].payload.username === 'new_buyer' && calls[0].payload.password === 'AbcdEfgh12', calls.map(c => c.payload));
     check(r, 'and says Password changed', /Password changed for new_buyer/.test(await L.toastText(page)), await L.toastText(page));
+    check(r, 'a finished action folds Manage again (the row has a new password to send: Copy message, Mark sent and Manage)', (await rowBtns(['pw', 'act', 'erase'])) === 0 && (await rowBtns(['copy', 'sent', 'manage'])) === 3, '');
+    await mg.click(); await L.settle(page, 200);
     await row('new_buyer').locator('.' + P + '-pw').click(); await L.settle(page, 300);
     await page.locator('.' + P + '-pwin').fill('short');
     n0 = await L.nCalls(page);
@@ -2822,12 +2906,16 @@ for (const [tab, P, fn, table, urlPart] of [['course', 'tp', 'tps-login', 'tps_a
     check(r, 'a password that breaks the rule is refused before the function is called', (await fnCalls(n0)).length === 0 && /8/.test(await L.failText(page)), await L.failText(page));
     await page.evaluate(() => failDismissAll());
     await page.locator('.' + P + '-pwcancel').click(); await L.settle(page, 300);
+    check(r, 'Cancel closes the password form and leaves Manage open', (await page.locator('.' + P + '-pwin').count()) === 0 && (await rowBtns(['pw', 'act', 'erase'])) === 3, '');
     // revoke and restore
     n0 = await L.nCalls(page);
     await row('new_buyer').locator('.' + P + '-act').click(); await L.settle(page, 800);
     calls = await fnCalls(n0);
     check(r, 'Revoke (after the confirm) calls revoke, and the login moves to Revoked', calls.length === 1 && calls[0].payload.action === 'revoke' && /new_buyer revoked/.test(await L.toastText(page)), { calls: calls.map(c => c.payload), toast: await L.toastText(page) });
     await page.evaluate(() => { document.querySelectorAll('#content details').forEach(d => { d.open = true; }); });
+    check(r, 'a revoked row shows Restore and Manage; Manage holds only Erase… (no Revoke, no Change password), and keeps the Revoked section open', (await row('new_buyer').locator('.' + P + '-pw').innerText()) === 'Restore' && (await rowBtns(['manage'])) === 1 && (await rowBtns(['act', 'erase'])) === 0, '');
+    await row('new_buyer').locator('.' + P + '-manage').click(); await L.settle(page, 300);
+    check(r, '...and opening it shows Erase… alone, with the Revoked section still open', (await rowBtns(['erase'])) === 1 && (await rowBtns(['act'])) === 0 && (await rowBtns(['pw'])) === 1 && await row('new_buyer').isVisible(), '');
     await row('new_buyer').locator('.' + P + '-pw').click(); await L.settle(page, 300);
     n0 = await L.nCalls(page);
     await page.locator('.' + P + '-pwsave').click(); await L.settle(page, 800);

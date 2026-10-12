@@ -415,24 +415,50 @@
     border-radius: 999px; background: var(--card); }
   .controls input[type=search] { flex: 1; min-width: 170px; }
   .controls input[type=search]:focus, .controls select:focus { border-color: var(--court); }
-  .roster { display: flex; flex-direction: column; gap: 9px; }
-  .ath { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: var(--card);
-         border: 1px solid var(--line); border-radius: 18px; padding: 13px 16px;
-         transition: border-color .15s, transform .12s, box-shadow .15s; }
-  .ath:hover { border-color: var(--court); transform: translateY(-1px); box-shadow: var(--shadow); }
-  .ath.flag { border-left: 3px solid var(--clay); }
-  .ath .ava { flex: none; width: 40px; height: 40px; border-radius: 999px; background: var(--court); color: #fff;
-              display: flex; align-items: center; justify-content: center;
-              font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 15px; }
-  .ath.freeath .ava { background: var(--ochre); }
-  .ath .main { flex: 1; min-width: 0; }
-  .ath .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 19px; text-transform: uppercase;
-             letter-spacing: .01em; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .ath .sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
-  .ath .side { flex: none; display: flex; align-items: center; gap: 14px; }
-  .ath .side .tag { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); text-align: right; }
-  .ath .side .tag.warn { color: var(--clay-ink); font-weight: 700; }
-  @media (max-width: 700px) { .ath .side .dots { display: none; } }
+  /* The roster is one white surface, one row per person (2026-10-12). The same markup is a row of aligned columns on a PC (900 px and up)
+     and a two-line row on a phone: line 1 the name and why they are here, line 2 the cycle, the last session and Proof. */
+  .roster { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .roster > :last-child { border-bottom: 0; }
+  .roster > .empty { padding: 18px 16px; }
+  .ath { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; position: relative; width: 100%; min-height: 64px;
+         padding: 10px 14px 10px 54px; text-align: left; border-bottom: 1px solid var(--rule); transition: background .12s; }
+  .ath:hover { background: rgba(14,74,54,.05); }
+  .ath:focus-visible { outline-offset: -2px; }
+  .ath.flag { box-shadow: inset 3px 0 0 var(--clay); }
+  .ath > span { min-width: 0; font-size: 13px; line-height: 1.35; }
+  .ath .ava { position: absolute; left: 14px; top: 11px; width: 28px; height: 28px; border-radius: 999px; background: var(--court); color: #fff;
+              display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; line-height: 1; }
+  /* Free tier: the same disc, outlined and neutral (plum means a warning here, never a tier). */
+  .ath.freeath .ava { background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1.5px rgba(26,26,26,.28); }
+  .ath .a-id { order: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; }
+  .ath .nm { font-size: 15px; font-weight: 600; line-height: 1.3; }
+  .ath .tier { font-size: 12px; color: var(--muted); }
+  .ath .chip { text-transform: none; letter-spacing: 0; font-weight: 600; padding: 1px 8px; }
+  .ath .a-why { order: 2; flex: 1 1 140px; color: var(--muted); }
+  .ath .a-why .warn { color: var(--clay-ink); font-weight: 600; }
+  .ath .a-why .spike { color: var(--ochre); }
+  .ath::after { content: ''; flex-basis: 100%; height: 0; order: 3; }
+  .ath .a-cycle, .ath .a-last, .ath .a-proof { order: 4; color: var(--muted); overflow-wrap: anywhere; margin-right: 6px; }
+  .ath .a-last.dash { display: none; }   /* a phone row has no room for an empty cell */
+  .ath .a-cycle b { color: var(--ink); font-weight: 600; }
+  .ath .a-cycle .warn { color: var(--clay-ink); font-weight: 600; }
+  .ath .a-last .n { font-size: 12px; }
+  .ath .a-proof { display: flex; align-items: center; gap: 8px; overflow-wrap: normal; }
+  .ath .a-proof:empty, .ath .a-why:empty { display: none; }
+  .ath .a-proof .n7 { font-variant-numeric: tabular-nums; }
+  .ath .lvtext { font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .rhead { display: none; }
+  @media (min-width: 900px) {
+    .rhead, .ath { --rcols: 28px minmax(130px, 1.1fr) minmax(150px, 1fr) minmax(120px, .9fr) 190px minmax(140px, 2fr); }
+    .rhead { display: grid; grid-template-columns: var(--rcols); column-gap: 14px; align-items: end; padding: 9px 16px;
+             border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+    .rhead .h-ath { grid-column: 1 / 3; }
+    .ath { display: grid; grid-template-columns: var(--rcols); column-gap: 14px; align-items: center; min-height: 52px; padding: 8px 16px; }
+    .ath::after { content: none; }
+    .ath .ava { position: static; }
+    .ath .a-id, .ath .a-why, .ath .a-cycle, .ath .a-last, .ath .a-proof { order: 0; margin-right: 0; }
+    .ath .a-last.dash, .ath .a-why:empty, .ath .a-proof:empty { display: block; }
+  }
 
   /* ── Detail ── */
   .back { display: inline-block; font-size: 13px; color: var(--court); font-weight: 700; margin-bottom: 14px; text-decoration: none; padding: 6px 0; }
@@ -653,6 +679,12 @@
   .credpass { font-family: 'Space Mono', monospace; font-size: 12.5px; background: var(--court-100);
     padding: 3px 9px; border-radius: 6px; flex: 1; min-width: 190px; }
   .credrow .acts { display: flex; gap: 7px; flex-wrap: wrap; }
+  /* A buyer's row (Course, Testing app): the buttons used every day sit at the right, the rest wait behind Manage, one line under the row. */
+  .credrow.buyer .acts { margin-left: auto; }
+  .credrow.buyer .credstate { flex: 1; }
+  .credrow.buyer .acts .btn[aria-expanded="true"] { border-color: var(--court); color: var(--court); }
+  @media (max-width: 640px) { .credrow.buyer .acts { margin-left: 0; } }
+  .credmore { flex-basis: 100%; display: flex; gap: 7px; flex-wrap: wrap; padding: 2px 0 4px; }
   /* Typing a login password (Athletes, Testing app, Course): the box, its buttons, and the rule under them. */
   .pwform { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 10px 0 12px;
     border-bottom: 1px solid var(--rule); }
@@ -724,12 +756,11 @@
   .rf:hover { border-color: var(--court); color: var(--court); }
   .rf.on { background: var(--court); border-color: var(--court); color: #fff; }
   .rf .c { font-family: 'Space Mono', monospace; font-size: 12px; opacity: .7; margin-left: 5px; }
-  .ath .why { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
-  .rgroup { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
-            font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px; margin: 18px 0 4px; }
-  .rgroup:first-child { margin-top: 0; }
-  .rgroup::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
-  .rgroup .c { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted-soft); }
+  /* A group's label is a quiet band inside the roster's surface, not a heading of its own. */
+  .rgroup { display: flex; align-items: baseline; gap: 8px; padding: 7px 16px; background: rgba(26,26,26,.03);
+            border-bottom: 1px solid var(--rule); font-size: 12px; font-weight: 600; color: var(--muted); }
+  .rgroup .c { font-family: 'Space Mono', monospace; font-weight: 400; color: var(--muted-soft); }
+  .rgroup.needs .c { color: var(--clay-ink); font-weight: 700; }
 
   /* Proof strip on detail */
   .proofstrip { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
@@ -2220,6 +2251,7 @@ function lvHtml(kind, id) {
   const lv = S.levels[id], a = S.ath[id];
   if (kind === 'pulse') return lv ? ` <small>LV ${lv}${a && a.onBoard ? ' · on the board' : ''}</small>` : (a && a.onBoard ? '<small>on the board</small>' : '');
   if (kind === 'chip') return lv ? `<span class="lvchip">LV ${lv}</span>` : '';
+  if (kind === 'text') return lv ? `<span class="lvtext">LV ${lv}</span>` : '';   // the roster's plain-text level (a chip on every row was loud)
   if (kind === 'hchip') return lv ? ` <span class="lvchip">LV ${lv}</span>` : '';
   if (kind === 'big') return lv ? `<div class="big">LV ${lv}<br><small>season level (server)</small></div>` : '';
   return '';
@@ -3064,7 +3096,7 @@ function renderAthletes() {
     <div class="controls rfilters">${R_FILTERS.filter(f => counts[f.id] > 0 || ['all', 'needs'].includes(f.id) || f.id === _rFilter).map(f =>
       `<button class="rf ${_rFilter === f.id ? 'on' : ''}" onclick="setRosterFilter('${f.id}')">${f.label}<span class="c">${counts[f.id]}</span></button>`).join('')}</div>
     <div class="roster" id="rosterBox"></div>
-    <p class="empty" style="margin-top:14px">${counts.all} people across coaching and Proof${counts.paused ? ` (${counts.paused} paused)` : ''}${counts.former ? ` · ${counts.former} former, not counted` : ''} · tap anyone to open their file.${S.ath.demo ? ' The public demo is not counted: <a href="#a/demo">open it</a>.' : ''}</p>`;
+    <p class="empty" style="margin-top:12px">${counts.all} people${counts.paused ? ` (${counts.paused} paused)` : ''}${counts.former ? ` · ${counts.former} former, not counted` : ''}.${S.ath.demo ? ' The public demo is not counted: <a href="#a/demo">open it</a>.' : ''}</p>`;
   renderRoster();
 }
 function rosterAttention(a) {
@@ -3079,6 +3111,27 @@ function rosterHay(a) {
   return normQ([a.name, a.id, unslug(a.id), o && o.display_name, c.shown_as, c.display_name, c.email,
                 String(c.whatsapp || '').replace(/[^0-9]/g, '')].filter(Boolean).join(' | '));
 }
+// The tier as the small muted word on a row (tierChip() draws the same four words as a chip on the athlete's header).
+function tierText(a) { return a.tier === 'coached' ? 'coached' : a.tier === 'free' ? 'free' : a.tier === 'proof' ? 'Proof only' : 'no file'; }
+// The Cycle column: "C2 · wk 3/5 · ends 22 Oct". Inside the last 7 days of a cycle, and after it, the end says so in clay (only for an active
+// coached athlete: nobody chases a paused, former or free one). The week is cycleWeekOnC(), the cycle number the programme's own index.
+function rosterCycleHtml(a) {
+  const p = S.programs[a.id], c = a.cycle;
+  if (!p) return '<span class="muted">no programme</span>';
+  if (!c) return '<span class="muted">no cycle</span>';
+  if (!c.start || !c.end) return `<span class="muted">${esc([c.name, c.weeks].filter(Boolean).join(' · ') || 'no cycle')}</span>`;   // undated: its name and length
+  const dayMon = iso => { const q = iso.split('-'); return +q[2] + ' ' + MONTHS[+q[1] - 1]; };
+  const t = todayKey();
+  const w = cycleWeekOnC({ startDate: c.start, endDate: c.end }, t);
+  const n = (Number.isInteger(p.currentCycleIndex) ? p.currentCycleIndex : 0) + 1;
+  if (!w) return `<span class="muted">${esc(c.name || 'C' + n)}</span>`;
+  if (w.before) return `<b>C${n}</b><span class="muted"> · starts ${dayMon(c.start)}</span>`;
+  const left = daysBetween(t, c.end);   // days to go; below 0 once it has ended
+  const soon = left <= CYCLE_SOON_DAYS;
+  const end = left < 0 ? `ended ${-left} d ago` : left === 0 ? 'ends today' : soon ? `ends in ${left} d` : `ends ${dayMon(c.end)}`;
+  const warn = soon && a.tier === 'coached' && a.status === 'active';
+  return `<b>C${n}</b><span class="muted"> · wk ${w.wk}/${w.total} · </span>${warn ? `<span class="warn">${end}</span>` : `<span class="muted">${end}</span>`}`;
+}
 function renderRoster() {
   const q = normQ(_rSearch);
   const sort = _rSort || 'attention';
@@ -3090,34 +3143,40 @@ function renderRoster() {
   else if (sort === 'recent') list.sort((a, b) => String(b.lastActive || '').localeCompare(String(a.lastActive || '')));
   else list.sort((a, b) => (rosterAttention(b) - rosterAttention(a)) || String(b.lastActive || '').localeCompare(String(a.lastActive || '')));
   const t = todayKey();
+  // The column heads (a PC only: CSS hides them on a phone, where a row is two lines).
+  const head = '<div class="rhead" aria-hidden="true"><span class="h-ath">Athlete</span><span>Cycle</span><span>Last session</span><span>Proof</span><span>Why</span></div>';
   const rowHtml = (a) => {
     const m = athleteMetrics(a.sessions, a.lastActive, a.tier === 'coached' ? a.perWeek : 0);
     const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
-    // Only a load spike earns a pill, in words. "Low load" looked the same as "climbing", and an
+    // Only a load spike earns a word, in plum. "Low load" looked the same as "climbing", and an
     // idle athlete's "ACWR 0" repeated the no-session reason.
-    const acwrPill = (m.acwr.enough && m.acwr.acute > 0 && m.acwr.ratio > 1.3)
-      ? `<span class="zpill ${az.cls}">load ${round1(m.acwr.ratio)} · ${az.label.toLowerCase()}</span>` : '';
-    const lv = lvSlot('chip', a.id);
-    let dots = '';
-    if (a.isHab) { dots = '<span class="dots">'; for (let i = 6; i >= 0; i--) { const d = addDays(t, -i);
-      dots += `<span class="dt ${a.habDays[d] ? 'on' : ''} ${i === 0 ? 'today' : ''}"></span>`; } dots += '</span>'; }
-    const subBits = [];
-    if (a.finished) subBits.push(`${a.finished} session${a.finished === 1 ? '' : 's'} · last ${a.lastSession ? timeAgo(a.lastSession + 'T12:00:00') : '—'}`);
-    else if (a.tier === 'coached') subBits.push('no sessions yet');
-    if (a.isHab) subBits.push(`Proof ${a.hab7}/7 last 7 days`);
-    if (!a.finished && !a.isHab) subBits.push('not started');
-    if (a.status !== 'active') subBits.unshift(`${a.status === 'paused' ? 'Paused' : 'Former'} since ${prettyDate(a.statusSince)}${a.statusNote ? ': ' + a.statusNote : ''}`);
-    const reasons = rosterReasons(a).concat(a.quietFlags || []);
-    const silent = a.isHab && a.habGap >= QUIET_HABIT_DAYS;
-    const gapTag = !a.isHab ? '' : a.habToday ? 'on court ✓' : a.habGap + 'd off';
-    return `<button class="ath ${a.toReply ? 'flag' : ''} ${a.tier === 'free' ? 'freeath' : ''}" onclick="location.hash=${jsq('a/' + encodeURIComponent(a.id))}">
+    const acwrPill = m.acwr.enough && m.acwr.acute > 0 && m.acwr.ratio > 1.3;
+    // Proof: the seven presence dots, n/7 and the level (filled in place by paintLevels() when the levels arrive). Nothing for a person with no habits.
+    let proof = '';
+    if (a.isHab) {
+      let dots = '<span class="dots">';
+      for (let i = 6; i >= 0; i--) { const d = addDays(t, -i); dots += `<span class="dt ${a.habDays[d] ? 'on' : ''} ${i === 0 ? 'today' : ''}"></span>`; }
+      proof = `${dots}</span><span class="n7">${a.hab7}/7</span>${lvSlot('text', a.id)}`;
+    }
+    const last = a.finished && a.lastSession
+      ? `${esc(timeAgo(a.lastSession + 'T12:00:00'))}<span class="n muted"> · ${a.finished} session${a.finished === 1 ? '' : 's'}</span>`
+      : `<span class="muted">${a.tier === 'coached' ? 'no sessions yet' : '—'}</span>`;
+    // Why: the reasons (clay when they ask something of you, grey when they are only worth knowing), a pause or a former status in words, a load spike.
+    const why = [];
+    if (a.status !== 'active') why.push(`<span>${esc(`${a.status === 'paused' ? 'Paused' : 'Former'} since ${prettyDate(a.statusSince)}${a.statusNote ? ': ' + a.statusNote : ''}`)}</span>`);
+    // The cycle reasons ("cycle ends in 3 days", "cycle ended 5 days ago — renew?") are said once, in clay, in the Cycle column
+    // (rosterCycleHtml() marks the same window, CYCLE_SOON_DAYS); the row's place in Needs you still comes from them.
+    const cycleSaid = a.cycle && a.cycle.start && a.cycle.end && daysBetween(t, a.cycle.end) <= CYCLE_SOON_DAYS;
+    rosterReasons(a).concat(a.quietFlags || []).filter(r => !(cycleSaid && (r.key === 'cycle' || r.key === 'renew')))
+      .forEach(r => why.push(`<span${r.tone === 'warn' ? ' class="warn"' : ''}>${esc(r.text)}</span>`));
+    if (acwrPill) why.push(`<span class="spike">load ${round1(m.acwr.ratio)} · ${esc(az.label.toLowerCase())}</span>`);
+    return `<button class="ath${a.toReply ? ' flag' : ''}${a.tier === 'free' ? ' freeath' : ''}" onclick="location.hash=${jsq('a/' + encodeURIComponent(a.id))}">
       <span class="ava">${esc(initials(a.name))}</span>
-      <span class="main">
-        <span class="nm">${esc(a.name)} ${tierChip(a)} ${statusChip(a)} ${lv} ${acwrPill}</span>
-        <span class="sub">${esc(subBits.join(' · '))}</span>
-        ${reasons.length ? `<span class="why">${reasons.map(r => `<span class="fl ${r.tone === 'warn' ? 'warn' : r.tone === 'good' ? 'good' : 'quiet'}">${esc(r.text)}</span>`).join('')}</span>` : ''}
-      </span>
-      <span class="side">${dots}<span class="tag ${silent ? 'warn' : ''}">${gapTag}</span></span>
+      <span class="a-id"><span class="nm">${esc(a.name)}</span><span class="tier">${tierText(a)}</span>${statusChip(a)}</span>
+      <span class="a-cycle">${rosterCycleHtml(a)}</span>
+      <span class="a-last${a.finished && a.lastSession || a.tier === 'coached' ? '' : ' dash'}">${last}</span>
+      <span class="a-proof"${a.isHab ? ` title="Habits logged on ${a.hab7} of the last 7 days"` : ''}>${proof}</span>
+      <span class="a-why">${why.join(' · ')}</span>
     </button>`;
   };
   // On the attention sort, split the list where the reasons run out — the point
@@ -3127,18 +3186,18 @@ function renderRoster() {
     const rest = list.filter(a => !rosterReasons(a).length && !a.lapsed && a.status !== 'paused');
     const away = list.filter(a => !rosterReasons(a).length && a.status === 'paused');
     const gone = list.filter(a => !rosterReasons(a).length && a.lapsed);
-    $('rosterBox').innerHTML = (needs.length
-        ? `<div class="rgroup">Needs you <span class="c">${needs.length}</span></div>` + needs.map(rowHtml).join('') : '')
+    const body = (needs.length
+        ? `<div class="rgroup needs">Needs you <span class="c">${needs.length}</span></div>` + needs.map(rowHtml).join('') : '')
       + (rest.length
         ? `<div class="rgroup">All quiet <span class="c">${rest.length}</span></div>` + rest.map(rowHtml).join('') : '')
       + (away.length
         ? `<div class="rgroup" title="On a break: out of Needs you and Gone quiet until you make them active again">Paused <span class="c">${away.length}</span></div>` + away.map(rowHtml).join('') : '')
       + (gone.length
-        ? `<div class="rgroup" title="No session, habit or app activity for ${LAPSED_DAYS}+ days, or a cycle that ended over ${CYCLE_RENEW_DAYS} days ago">Gone quiet <span class="c">${gone.length}</span></div>` + gone.map(rowHtml).join('') : '')
-      || `<p class="empty">No one matches “${esc(q)}”.</p>`;
+        ? `<div class="rgroup" title="No session, habit or app activity for ${LAPSED_DAYS}+ days, or a cycle that ended over ${CYCLE_RENEW_DAYS} days ago">Gone quiet <span class="c">${gone.length}</span></div>` + gone.map(rowHtml).join('') : '');
+    $('rosterBox').innerHTML = body ? head + body : `<p class="empty">No one matches “${esc(q)}”.</p>`;
     return;
   }
-  $('rosterBox').innerHTML = list.map(rowHtml).join('') ||
+  $('rosterBox').innerHTML = list.length ? head + list.map(rowHtml).join('') :
     `<p class="empty">${q ? `No one matches “${esc(q)}” here.` : `Nobody in ${esc(filt.label)} right now.`}</p>`;
 }
 window.renderRoster = renderRoster;
@@ -5738,7 +5797,9 @@ function withBuyerNotes(rows, notes) {
 // revokeConfirm(username), introHtml, newNote. Everything else is the same for both.
 function buyerLogins(cfg) {
   const { key, kind, P, table, fn } = cfg;
-  const st = { busy: false, pw: null };   // busy: one call at a time (a double tap would be a second one); pw: the username whose password form is open (Change password or Restore)
+  // busy: one call at a time (a double tap would be a second one); pw: the username whose password form is open (Change password or Restore);
+  // manage: the username whose Manage row is open (Change password, Revoke, Erase…). One at a time, kept here so it survives a redraw.
+  const st = { busy: false, pw: null, manage: null };
 
   async function load() {
     if (DEMO) { S[key] = S[key] || [Object.assign({ created_at: new Date().toISOString(), sent_at: null, revoked_at: null }, cfg.demo)]; return; }
@@ -5761,7 +5822,7 @@ function buyerLogins(cfg) {
     let msg = data && data.error;
     if (!msg && error) { try { msg = (await error.context.json()).error; } catch (e) { msg = error.message; } }
     if (msg) { fail('Could not ' + act + ' the login:\n\n' + msg); return; }
-    st.pw = null;
+    st.pw = null; st.manage = null;
     await load();
     if (act === 'revoke') { toast(username + ' revoked'); render(); return; }
     copyText(cfg.message(data.username, data.password), null, true);
@@ -5799,14 +5860,18 @@ function buyerLogins(cfg) {
     const active = rows.filter(r => !r.revoked_at), revoked = rows.filter(r => r.revoked_at);
     const toSend = active.filter(r => r.initial_password).length;
     const day = d => esc(String(d || '').slice(0, 10));
-    const row = r => `<div class="credrow">
+    // Manage holds what is done now and then (Change password, Revoke, Erase…). It is open when it was opened, and while the password form or the
+    // Erase panel it led to is open, so the button that opened them stays in view.
+    const manageOpen = u => st.manage === u || st.pw === u || !!(_erase && _erase.kind === kind && _erase.key === u);
+    const row = r => `<div class="credrow buyer">
       <span class="credname">${esc(r.username)}${r.label ? ` <span class="muted">· ${esc(r.label)}</span>` : ''}</span>
       ${r.initial_password && !r.revoked_at ? `<code class="credpass">${esc(r.initial_password)}</code>${usedMark(kind, r.username)}`
-        : `<span class="muted">${r.revoked_at ? 'revoked ' + day(r.revoked_at) : r.sent_at ? 'sent ' + day(r.sent_at) : 'created ' + day(r.created_at)}</span>`}
+        : `<span class="muted credstate">${r.revoked_at ? 'revoked ' + day(r.revoked_at) : r.sent_at ? 'sent ' + day(r.sent_at) : 'created ' + day(r.created_at)}</span>`}
       <span class="acts">${r.revoked_at
         ? `<button class="btn sm ${P}-pw" data-u="${esc(r.username)}">Restore</button>`
-        : (r.initial_password ? `<button class="btn sm primary ${P}-copy" data-u="${esc(r.username)}">Copy message</button><button class="btn sm ${P}-sent" data-u="${esc(r.username)}">Mark sent</button>` : '') +
-          `<button class="btn sm ${P}-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm ${P}-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}<button class="btn sm danger ${P}-erase" data-u="${esc(r.username)}" title="Remove this buyer and everything they stored, for good">Erase…</button></span>
+        : (r.initial_password ? `<button class="btn sm primary ${P}-copy" data-u="${esc(r.username)}">Copy message</button><button class="btn sm ${P}-sent" data-u="${esc(r.username)}">Mark sent</button>` : '')}<button class="btn sm ${P}-manage" data-u="${esc(r.username)}" aria-expanded="${manageOpen(r.username)}">Manage</button></span>
+      ${manageOpen(r.username) ? `<div class="credmore">${r.revoked_at ? ''
+        : `<button class="btn sm ${P}-pw" data-u="${esc(r.username)}">Change password</button><button class="btn sm ${P}-act" data-act="revoke" data-u="${esc(r.username)}">Revoke</button>`}<button class="btn sm danger ${P}-erase" data-u="${esc(r.username)}" title="Remove this buyer and everything they stored, for good">Erase…</button></div>` : ''}
     </div>` + (st.pw === r.username ? `<div class="pwform">
       <input class="pwin ${P}-pwin" aria-label="Password (empty to generate one)" placeholder="${r.revoked_at ? 'password' : 'new password'}, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false">
       <button class="btn sm primary ${P}-pwsave" data-act="${r.revoked_at ? 'restore' : 'reset'}" data-u="${esc(r.username)}">${r.revoked_at ? 'Restore' : 'Save password'}</button>
@@ -5825,7 +5890,7 @@ function buyerLogins(cfg) {
     <p class="psub" style="margin:10px 0 0">${cfg.newNote} ${PW_HINT}</p></section>`;
     html += `<section class="panel"><div class="phead"><span class="t hd">Logins</span><span class="r">${active.length} active${toSend ? ` · <span style="color:var(--clay-ink)">${toSend} to send</span>` : ''}</span></div>` +
       (active.length ? active.map(row).join('') : '<p class="empty">No logins yet.</p>') + `</section>`;
-    if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details${revoked.some(r => r.username === st.pw || (_erase && _erase.kind === kind && _erase.key === r.username)) ? ' open' : ''}><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
+    if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details${revoked.some(r => manageOpen(r.username)) ? ' open' : ''}><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
     c.innerHTML = html;
     const on = (sel, fn2) => c.querySelectorAll(sel).forEach(el => el.addEventListener('click', e => { e.preventDefault(); fn2(el); }));
     on('#' + P + 'Create', el => {
@@ -5838,6 +5903,16 @@ function buyerLogins(cfg) {
     on('.' + P + '-act', el => action(el.dataset.act, el.dataset.u, '', el));
     on('.' + P + '-pw', el => { st.pw = el.dataset.u; render(); const i = c.querySelector('.' + P + '-pwin'); if (i) i.focus(); });
     on('.' + P + '-pwcancel', () => { st.pw = null; render(); });
+    on('.' + P + '-manage', el => {
+      const u = el.dataset.u;
+      if (manageOpen(u)) {   // closing it also closes what it opened: the password form, and an Erase panel that has not started
+        st.manage = null; if (st.pw === u) st.pw = null;
+        if (_erase && _erase.kind === kind && _erase.key === u && _erase.status !== 'busy') _erase = null;
+      } else st.manage = u;
+      render();
+      const again = [...c.querySelectorAll('.' + P + '-manage')].find(x => x.dataset.u === u);   // the page was redrawn: keep the keyboard on the button
+      if (again) again.focus();
+    });
     on('.' + P + '-pwsave', el => {
       const t = typedPassword(c.querySelector('.' + P + '-pwin').value, el.dataset.u);
       if (t.error) { fail(t.error); return; }
