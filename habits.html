@@ -1982,6 +1982,32 @@
     #app .gridkey { flex-wrap: wrap; row-gap: 6px; }
     #app .gridkey .gk { order: 3; flex-basis: 100%; justify-content: center; flex-wrap: wrap; }
   }
+  /* ── THE ROW AND THE LOG SHEET (2026-10-12, the UX audit's batch A) ──────────────────────────────
+     One badge slot right of the name (a streak from 3 days, or a level's flash), and a sheet that takes
+     a typed number. */
+  #app .hrow .line1 .rbadge { flex: none; margin-left: auto; background: var(--clay-100); color: var(--clay-deep);
+    border-radius: 999px; padding: 3px 9px 3px 20px; font-size: 12px; }
+  #app .hrow .line1 .rbadge::before { left: 7px; background: none; }
+  #app .logsheet { gap: 14px; padding-top: 16px; }
+  #app .logsheet .sh-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  #app .logsheet .sh-t { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 20px; line-height: 1.2; color: var(--ink); }
+  #app .logsheet .sh-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  #app .logsheet .sh-x { flex: none; width: 40px; height: 40px; border-radius: 999px; background: var(--surface); color: var(--muted);
+    border: 0; font-size: 15px; display: flex; align-items: center; justify-content: center; }
+  #app .logfield { display: flex; align-items: baseline; gap: 10px; border: 2px solid var(--accent); border-radius: 16px;
+    padding: 10px 14px; background: var(--card); cursor: text; }
+  #app .logfield input { flex: 1; min-width: 0; width: 100%; border: 0; background: transparent; color: var(--ink); outline: none; padding: 0;
+    font: 800 38px/1.1 'Outfit', sans-serif; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+  #app .logfield .u { flex: none; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  #app .logsheet .stepper .val { padding: 0 4px; }
+  #app .logsheet .sbar { display: block; width: 100%; height: 8px; border-radius: 999px; background: var(--track); overflow: hidden; }
+  #app .logsheet .sbar > span { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width .2s ease; }
+  #app .logquick { display: flex; flex-wrap: wrap; gap: 8px; }
+  #app .logquick button { min-height: 40px; border: 1.5px solid var(--rule); border-radius: 999px; padding: 0 14px; background: none;
+    color: var(--ink); font: 700 14px 'Outfit', sans-serif; }
+  #app .logquick .clear { border-color: var(--clay); color: var(--clay-deep); }
+  #app .logquick .clear.armed { background: var(--clay); color: #FFFFFF; }
+  #app .logsheet .sh-voice { font-size: 13.5px; line-height: 1.4; color: var(--muted); }
   #app .wins-share { flex: none; min-height: 44px; padding: 0 18px; border-radius: 999px; background: none;
     border: 1.5px solid rgba(246,244,255,.35); color: #F6F4FF; font-weight: 700; font-size: 13.5px; }
 
@@ -2207,6 +2233,28 @@
   html.embed body[data-dark] #app.emb .e-plus { color: #9fd3bd; border-color: #9fd3bd; }
   html.embed body[data-dark] #app.emb .e-open { color: #E06B43; }
   html.embed body[data-dark] #app.emb .e-toast { color: #9fd3bd; background: rgba(62,156,116,0.12); }
+  /* The whole circle is the tick (2026-10-12), and a counted habit's number row opens under it. */
+  html.embed #app.emb .e-box { border-radius: 99px; background: #FFFFFF; border: 2px solid #CFC7B9; }
+  html.embed #app.emb .e-row.done .e-box { background: #0E4A36; border-color: #0E4A36; }
+  html.embed #app.emb .e-tk svg.tick { width: 20px; height: 20px; display: block; }
+  html.embed #app.emb .e-tk svg.tick path { fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  html.embed #app.emb .e-row.editing { border-bottom: 0; }
+  html.embed #app.emb .e-edit { padding: 2px 10px 12px 66px; border-bottom: 1px solid #EDE8E0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  html.embed #app.emb .e-field { min-width: 0; display: flex; align-items: baseline; gap: 8px; border: 1.5px solid #0E4A36; border-radius: 10px; padding: 6px 10px; background: #FFFFFF; }
+  html.embed #app.emb .e-field input { flex: 1; min-width: 0; width: 100%; border: 0; outline: none; background: transparent; color: #1A1A1A; padding: 0;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.1; }
+  html.embed #app.emb .e-field span { font-size: 12px; font-weight: 600; color: #5C5C5C; text-transform: uppercase; letter-spacing: .06em; }
+  html.embed #app.emb .e-acts { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  html.embed #app.emb .e-sm { width: 40px; height: 40px; border-radius: 99px; border: 1.5px solid #CFC7B9; color: #1A1A1A; font-size: 18px; font-weight: 600; }
+  html.embed #app.emb .e-chip { height: 40px; border-radius: 99px; border: 1.5px solid #CFC7B9; padding: 0 12px; font-size: 14px; font-weight: 600; color: #1A1A1A; }
+  html.embed #app.emb .e-save { height: 40px; border-radius: 99px; background: #0E4A36; color: #FFFFFF; padding: 0 18px; font-size: 14px; font-weight: 700; }
+  html.embed body[data-dark] #app.emb .e-box { background: #202020; border-color: #444; }
+  html.embed body[data-dark] #app.emb .e-row.done .e-box { background: #3E9C74; border-color: #3E9C74; }
+  html.embed body[data-dark] #app.emb .e-edit { border-color: #2a2a2a; }
+  html.embed body[data-dark] #app.emb .e-field { background: #202020; border-color: #3E9C74; }
+  html.embed body[data-dark] #app.emb .e-field input, html.embed body[data-dark] #app.emb .e-sm, html.embed body[data-dark] #app.emb .e-chip { color: #EEE; }
+  html.embed body[data-dark] #app.emb .e-sm, html.embed body[data-dark] #app.emb .e-chip { border-color: #444; }
+  html.embed body[data-dark] #app.emb .e-save { background: #3E9C74; color: #0E1A15; }
 </style>
 </head>
 <body>
@@ -5664,6 +5712,12 @@ function toggleHabit(h) {
   // hand, so explain what does earn it instead of silently doing nothing. No
   // haptic and no XP flight either: nothing was earned to celebrate.
   if (h.locked) { toast((isFree() && h.freeHint) || h.lockedHint || 'This one is earned elsewhere.'); return; }
+  // A COUNTED HABIT'S CIRCLE OPENS THE LOG SHEET (Amir, 2026-10-12, the UX audit's 1A). It used to write
+  // the full target in one tap (4,500 steps became 10,000, with the XP) and 0 on the next (the real
+  // 4,500 gone, no undo). Now it opens the sheet with the target filled in, so a full day is still two
+  // taps, any real number is three, and no tap ever wipes a value. In the strip on the training app's
+  // Home the same tap opens the strip's own number row (openEmbedEdit()).
+  if (h.kind === 'count') { if (window.IS_EMBED) openEmbedEdit(h); else openSheet(h, true); return; }
   const done = isDone(h, AKEY()), before = habitXp(h), rect = UI._tapRect;
   setVal(h.id, done ? 0 : h.target);
   checkLevelUps();
@@ -5771,7 +5825,69 @@ function resetScroll() {
   const sc = document.getElementById('scroll');
   if (sc) sc.scrollTop = 0;
 }
-function openSheet(h) { UI.sheet = h.id; UI.sheetVal = valOf(AKEY(), h.id); render(); }
+// prefill (the circle's door): a counted habit short of its target opens at the target, so Save alone
+// logs a full day. Never below what is already logged: the sheet only ever starts at a real number.
+function openSheet(h, prefill) {
+  const cur = valOf(AKEY(), h.id);
+  UI.sheet = h.id; UI.sheetClear = false; UI._logSync = true;
+  UI.sheetVal = prefill && cur < h.target ? h.target : cur;
+  render();
+}
+// The number field (2026-10-12): typed, so 8,437 steps is 8,437 and not the nearest 500. A Farsi
+// keyboard's digits are folded to 0-9 (foldDigits(), as sign-in does) and either decimal mark works.
+function parseLogNum(raw) {
+  const t = foldDigits(raw).replace(/\u066B/g, '.').replace(/,/g, '').replace(/[^0-9.]/g, '');
+  const n = parseFloat(t);
+  return isFinite(n) ? n : 0;
+}
+// The ceiling never sits below what is already logged (see setVal()).
+function logCeiling(h) { return Math.max(capFor(h), valOf(AKEY(), h.id) || 0); }
+function setLogVal(h, n, fromField) {
+  const step = h.dec ? Math.pow(10, -h.dec) : 1;
+  UI.sheetVal = Math.max(0, Math.min(logCeiling(h), Math.round(n / step) * step));
+  UI.sheetClear = false;
+  if (!fromField) UI._logSync = true;     // a button changed it: write the field after the render
+  render();
+}
+// The field is a live input, so the renderer never writes its value (morphAttrs()); a button that
+// changes the number writes it here, once, after the render.
+function syncLogField() {
+  if (!UI._logSync) return;
+  UI._logSync = false;
+  const f = document.getElementById('logval'), id = UI.sheet || UI.embedEdit;
+  if (f && id) f.value = fmtVal(habitById(id), UI.sheetVal);
+}
+function saveSheetLog() {
+  const id = UI.sheet || UI.embedEdit;
+  if (!id) return;
+  const h = habitById(id), before = habitXp(h), rect = UI._tapRect, logged = UI.sheetVal;
+  setVal(h.id, logged);
+  UI.sheet = null; UI.embedEdit = null;
+  checkLevelUps();
+  render();
+  const gained = Math.max(0, habitXp(h) - before);
+  haptic(logged >= h.target ? 'done' : 'tick');
+  toast(h.name + ' updated' + dayTag() + (gained > 0 ? ' · +' + gained + ' XP.' : '.'));
+  if (!window.IS_EMBED) flyXp(gained, rect);
+}
+// Clear empties the number, and like every delete it takes two taps (LOG-02's rule).
+function clearLog() {
+  if (!UI.sheetClear) {
+    UI.sheetClear = true; render();
+    setTimeout(() => { if (UI.sheetClear) { UI.sheetClear = false; render(); } }, 4000);
+    return;
+  }
+  UI.sheetClear = false; UI.sheetVal = 0; UI._logSync = true; render();
+}
+// The strip on the training app's Home has no room for a sheet: its own number row opens under the
+// habit, with the same field, buttons and save (saveSheetLog()).
+function openEmbedEdit(h) {
+  const cur = valOf(AKEY(), h.id);
+  UI.embedEdit = UI.embedEdit === h.id ? null : h.id;
+  UI.sheetClear = false; UI._logSync = true;
+  UI.sheetVal = cur < h.target ? h.target : cur;
+  render();
+}
 // Which way a screen should travel. Tabs move along their own order; a detail or
 // the manual always pushes in from the right and pops back out to the left, which
 // is what "deeper" and "back" feel like.
@@ -6406,6 +6522,16 @@ function installDelegates(app) {
     // Safe: morphAttrs never writes `value` onto a live field, so the caret and
     // any selection belong to whoever is typing, not to the last render.
     else if (t.id === 'dayline') { UI.note = t.value; render(); }
+    // The log sheet's number field: re-rendered per keystroke so the bar and "banks +N XP" stay true.
+    // The renderer never writes a live field's value, so the caret stays where the athlete put it.
+    else if (t.id === 'logval') { const h = habitById(UI.sheet || UI.embedEdit); if (h) setLogVal(h, parseLogNum(t.value), true); }
+  });
+  app.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter' && ev.target && ev.target.id === 'logval') { ev.preventDefault(); saveSheetLog(); }
+  });
+  // Leaving the field tidies what it shows (8437 → 8,437) without changing the number.
+  app.addEventListener('focusout', ev => {
+    if (ev.target && ev.target.id === 'logval') { UI._logSync = true; syncLogField(); }
   });
 }
 
@@ -6428,6 +6554,7 @@ function render() {
   fillBars(app);
   typeLines(app);
   fitRankName(app);
+  syncLogField();
   bindGestures(app);
   // The tour rings a live element measured in viewport coordinates, so every
   // repaint can move it. Re-measuring here is what keeps the box on its target
@@ -6517,7 +6644,7 @@ function renderEmbed() {
   return `<div class="e-wrap">
     <div class="e-head"><span class="e-k">Today</span><span class="e-n">${said}</span>
       <a class="e-open" href="${esc(proofUrl())}" target="_top">Open AA Proof →</a></div>
-    ${rows.map(h => embedRow(h, t)).join('')}
+    ${rows.filter(h => !h.locked).concat(rows.filter(h => h.locked)).map(h => embedRow(h, t)).join('')}
     ${UI.toast ? `<div class="e-toast">${esc(UI.toast)}</div>` : ''}
   </div>`;
 }
@@ -6530,10 +6657,27 @@ function embedRow(h, t) {
       ? fmtVal(h, v) + ' of ' + fmtVal(h, h.target) + ' ' + h.unit + (left > 0 ? ' · ' + fmtVal(h, left) + ' to go' : '')
       : (done ? 'Done · ' + (h.goal || h.unit) : (h.goal || h.source || ''));
   const parts = splitEmoji(h.name), emo = parts[0], label = parts[1];
-  return `<div class="e-row${done ? ' done' : ''}${locked ? ' locked' : ''}">
-    <button class="e-box" ${on(() => toggleHabit(h))} aria-label="${locked ? esc(label) + ' is earned in your programme' : 'Toggle ' + esc(label)}">${emo || esc(h.code)}<span class="e-mark">${done ? TICK : ''}</span></button>
+  // THE WHOLE CIRCLE IS THE TICK here too (2026-10-12): the strip still drew the small corner ring
+  // the full app gave up in PRF-01, and a done tile hid its emoji under a solid fill.
+  const editing = UI.embedEdit === h.id;
+  return `<div class="e-row${done ? ' done' : ''}${locked ? ' locked' : ''}${editing ? ' editing' : ''}" data-k="erow:${h.id}">
+    <button class="e-box" ${on(() => toggleHabit(h))} aria-label="${locked ? esc(label) + ' is earned in your programme' : h.kind === 'count' ? 'Log ' + esc(label) : (done ? 'Clear ' : 'Tick ') + esc(label)}">${done ? `<span class="e-tk">${TICK}</span>` : (emo || esc(h.code))}</button>
     <a class="e-body" href="${esc(proofUrl(h.id))}" target="_top"><span class="e-nm">${esc(label)}</span><span class="e-st">${esc(status)}</span></a>
     ${h.kind === 'count' && !h.locked ? `<button class="e-plus" ${on(() => bump(h))} aria-label="Add to ${esc(label)}">+</button>` : ''}
+  </div>${editing ? embedEdit(h) : ''}`;
+}
+// The strip's number row (see openEmbedEdit()): the same field, buttons and save as the sheet (saveSheetLog()).
+function embedEdit(h) {
+  return `<div class="e-edit" data-k="eedit:${h.id}">
+    <label class="e-field" for="logval"><input id="logval" data-k="logval:${h.id}" inputmode="${h.dec ? 'decimal' : 'numeric'}"
+      autocomplete="off" enterkeyhint="done" value="${esc(fmtVal(h, UI.sheetVal))}" aria-label="${esc(h.unit)}"><span>${esc(h.unit)}</span></label>
+    <div class="e-acts">
+      <button class="e-sm" aria-label="Less" ${on(() => setLogVal(h, UI.sheetVal - (h.step || 1)))}>–</button>
+      <button class="e-sm" aria-label="More" ${on(() => setLogVal(h, UI.sheetVal + (h.step || 1)))}>+</button>
+      <button class="e-chip" ${on(() => setLogVal(h, Math.max(UI.sheetVal, h.target)))}>Hit ${esc(fmtVal(h, h.target))}</button>
+      <button class="e-save" ${on(saveSheetLog)}>Save</button>
+      <button class="e-sm" aria-label="Cancel" ${on(() => { UI.embedEdit = null; render(); })}>&#10005;</button>
+    </div>
   </div>`;
 }
 // Tells the training app what to show: 'ready' with the height the frame needs, 'setup'
@@ -7105,8 +7249,8 @@ function tourSteps() {
   // the name open its history in the middle of the tour.
   S.push({
     title: 'One row, three taps',
-    body: `Tap the <strong>circle</strong> when it is done: on a habit you count it fills the whole target in one
-           go, and a second tap clears it.${counter ? ` Tap <strong>+</strong> to add one at a time, and hold it to go faster.` : ''}
+    body: `Tap the <strong>circle</strong> when it's done.${counter ? ` On a habit you count it opens the number,
+           with the target filled in: save it, or type what you really did. <strong>+</strong> adds one, hold it to go faster.` : ''}
            Tap the <strong>name</strong> for its history: it logs nothing, so reading about a habit never costs you a day.`,
     screen: 'today', sel: () => $t('.hrow:not(.locked)'), pad: 0
   });
@@ -7872,12 +8016,17 @@ function habitRing(li) {
 // ── Habit row, shared by Today and Habits ─────────────────────────────────
 // The best current run across the tracked habits. Used to decide which single
 // ember animates; see the `.ember.lead` rules.
+// ONE BADGE SLOT, RIGHT OF THE NAME (2026-10-12, the UX audit). A habit's streak shows there from 3
+// days, the marks the flame uses (a 1- or 2-day streak is not news, and it sat on most rows in three
+// different places); a new habit level flashes in the same slot and goes. The level at rest lives on
+// Progress and the habit's page: on Today it was seven numbers beside the thing being ticked.
+const BADGE_FROM = 3;
 function leadStreak() {
   return live().reduce((m, h) => Math.max(m, habitStreak(h)), 0);
 }
 function habitRow(h, from, lead, pausedThen) {
   const v = valOf(AKEY(), h.id), done = isDone(h, AKEY()), st = habitStreak(h);
-  const hl = habitLevel(h), flashed = UI.flash[h.id];
+  const flashed = UI.flash[h.id];
   const locked = !!h.locked && !done;
   // What is LEFT, on a habit you count and have not finished — the number the
   // + button is about. "5 of 8 glasses" states the position; "3 to go" states
@@ -7898,7 +8047,7 @@ function habitRow(h, from, lead, pausedThen) {
   // sleep days were the full 7.5 h, a tick; most water, protein and step days stopped part-way, the +).
   // The programme's session (h.locked) is one slim line at the END of the list: it cannot be ticked here.
   return `<div class="hrow ${done ? 'done' : ''} ${locked ? 'locked' : ''} ${h.locked ? 'slim' : ''}" data-k="row:${h.id}" style="--hcol:${hue[0]};--hbg:${hue[1]}">
-    <button class="checkcell" ${on(() => toggleHabit(h))} aria-label="${locked ? esc(hLabel) + ' is earned in your programme' : (done ? 'Clear ' : 'Tick ') + esc(hLabel)}"${locked ? '' : ` aria-pressed="${done}"`}>
+    <button class="checkcell" ${on(() => toggleHabit(h))} aria-label="${locked ? esc(hLabel) + ' is earned in your programme' : h.kind === 'count' ? 'Log ' + esc(hLabel) : (done ? 'Clear ' : 'Tick ') + esc(hLabel)}"${locked || h.kind === 'count' ? '' : ` aria-pressed="${done}"`}>
       <span class="htile${locked ? ' lockt' : ''}${nudged ? ' nudge' : ''}"${hEmo ? '' : ' data-code'} aria-hidden="true"><span class="emo">${hEmo || esc(h.code)}</span>${done ? `<span class="tk">${TICK}</span>` : ''}${locked ? `<span class="lockb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>` : ''}</span>
     </button>
     <button class="body" ${on(() => openHabit(h.id, from))}>
@@ -7914,11 +8063,10 @@ function habitRow(h, from, lead, pausedThen) {
              The flash chip still takes the slot for a moment when the level
              actually changes, because that is the one time it should shout. -->
         ${flashed ? `<span class="lvchip" data-k="chip">LV ${flashed} ↑</span>`
-                  : `<span class="hlv" data-k="hlv">LV ${hl.lv}</span>`}
+                  : (st >= BADGE_FROM ? `<span class="ember rbadge${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}" data-k="hst" title="${st}-day streak" aria-label="${st}-day streak">${st}</span>` : '')}
       </span>
       <span class="status">
         <span>${esc(status)}</span>
-        ${st > 0 ? `<span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}" data-k="hst">${st}<span class="u">-day streak</span></span>` : ''}
       </span>
       <!-- One pip per step, not a continuous bar (Amir, 2026-08-01). See
            segBar(): the meter now counts the same unit the + button adds. -->
@@ -8122,10 +8270,10 @@ function renderToday(LI, doneCount) {
            tap targets sat two screens past the moment anyone needed it. It
            still goes BELOW the list (the list is what the screen is for), just
            immediately below rather than after everything else. -->
-      <div class="rowhint" data-k="rowhint">
-        Tap the <strong>circle</strong> when it is done${live().some(h => h.kind === 'count' && !h.locked) ? ', <strong>+</strong> to add one (hold it to go faster)' : ''},
+      ${dayNumber() <= 7 ? `<div class="rowhint" data-k="rowhint">
+        Tap the <strong>circle</strong> when it's done${live().some(h => h.kind === 'count' && !h.locked) ? ' (on a habit you count it opens the number), <strong>+</strong> to add one (hold it to go faster)' : ''},
         the <strong>name</strong> for its history.
-      </div>
+      </div>` : ''}
 
       <!-- BELOW the list, and below the hint that explains the list — the hint
            belongs to the rows it describes and must not be cut off from them.
@@ -9058,7 +9206,8 @@ function renderManual() {
         p(`Four things and you have the whole app.`) +
         `<div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.55;color:var(--muted);margin-bottom:14px">
           <div>▸ <strong style="color:var(--ink)">Every habit row takes three different taps.</strong> The
-            <strong style="color:var(--ink)">circle</strong> logs it. The <strong style="color:var(--ink)">name</strong>
+            <strong style="color:var(--ink)">circle</strong> logs it. On a habit you count it opens the number with the target
+            filled in: save it, or type what you really did. The <strong style="color:var(--ink)">name</strong>
             opens that habit's history. <strong style="color:var(--ink)">+</strong> adds one unit at a time, and holding it goes faster.</div>
           <div>▸ <strong style="color:var(--ink)">Four tabs.</strong> Today is where you log, Progress is where you stand, Crew is everyone else, and Locker holds what you have earned.</div>
           <div>▸ <strong style="color:var(--ink)">Your initials, top right,</strong> open Settings from any screen — and close it again. Everything not on a tab is behind them, including this page.</div>
@@ -10532,37 +10681,42 @@ function renderSheet() {
   // the xp_rules row drops capFor() under values written when the old target
   // was in force, and clamping to the bare cap then turned + into a control
   // that lowers the number and Save into one that deletes real steps.
-  const cap = Math.max(capFor(h), valOf(AKEY(), h.id) || 0), atCap = UI.sheetVal >= cap;
+  const cap = logCeiling(h), atCap = UI.sheetVal >= cap;
   const gain = previewXp(h, UI.sheetVal);
+  const parts = splitEmoji(h.name), pct = Math.min(100, Math.round(UI.sheetVal / h.target * 100));
+  // A NUMBER YOU CAN TYPE (2026-10-12). The stepper alone moved steps in 500s, so not one of 45 step
+  // entries in 30 days was a real count. The field opens the phone's number pad; the stepper, "Hit the
+  // target" and the habit's own quick add stay for the thumb. ✕ closes it, like the share sheet.
+  const quick = h.id === 'steps' ? [['+1,000', 1000]] : h.id === 'water' ? [['+2', 2]] : [];
   return `
     <div class="scrim" data-k="scrim" ${on(() => { UI.sheet = null; render(); })}></div>
-    <div class="sheet" data-k="sheet:${h.id}">
-      <div style="display:flex;justify-content:space-between;align-items:baseline">
-        <div class="hd" style="font-size:21px;line-height:1">Log ${esc(h.name)}${editingPast() ? ' · ' + esc(dayLong(AKEY())) : ''}</div>
-        <button class="hd" style="font-size:13px;color:var(--clay-deep)" ${on(() => { UI.sheet = null; render(); })}>Close</button>
-      </div>
-      <div style="font-size:13px;line-height:1.4;color:var(--muted)">${atCap
-        ? fmtVal(h, cap) + ' ' + esc(h.unit) + ' is the most this will take in a day. Anything past that is not a number, it is a typo.'
-        : 'Target is ' + fmtVal(h, h.target) + ' ' + esc(h.unit) + ' a day. Round up generously, I will never know.'}</div>
-      <div class="stepper">
-        <button class="minus" ${on(() => { UI.sheetVal = Math.max(0, UI.sheetVal - stepBy); render(); })}>–</button>
-        <div class="val">
-          <span class="figure" style="font-size:36px;line-height:1">${fmtVal(h, UI.sheetVal)}</span>
-          <span class="eyebrow">${esc(h.unit)}</span>
+    <div class="sheet logsheet" data-k="sheet:${h.id}" role="dialog" aria-modal="true" aria-label="Log ${esc(parts[1])}">
+      <div class="sh-top">
+        <div style="min-width:0">
+          <div class="sh-t">${esc(h.name)}</div>
+          <div class="sh-sub">${editingPast() ? 'Filling in ' + esc(dayLong(AKEY())) : 'Today'}</div>
         </div>
-        <button class="plus" ${on(() => { UI.sheetVal = Math.min(cap, UI.sheetVal + stepBy); render(); })}>+</button>
+        <button class="sh-x" aria-label="Close" ${on(() => { UI.sheet = null; render(); })}>&#10005;</button>
       </div>
-      <button class="btn btn-primary btn-block" ${on(() => {
-        const before = habitXp(h), rect = UI._tapRect, logged = UI.sheetVal;
-        setVal(h.id, logged);
-        UI.sheet = null;
-        checkLevelUps();
-        render();
-        const gained = Math.max(0, habitXp(h) - before);
-        haptic(logged >= h.target ? 'done' : 'tick');
-        toast(h.name + ' updated' + dayTag() + ' · +' + gained + ' XP.');
-        flyXp(gained, rect);
-      })}>Save it${gain > 0 ? `<span class="savexp">banks +${gain} XP</span>` : ''}</button>
+      <label class="logfield" for="logval">
+        <input id="logval" data-k="logval:${h.id}" inputmode="${h.dec ? 'decimal' : 'numeric'}" autocomplete="off"
+               enterkeyhint="done" value="${esc(fmtVal(h, UI.sheetVal))}" aria-label="${esc(h.unit)}">
+        <span class="u">${esc(h.unit)}</span>
+      </label>
+      <div class="stepper">
+        <button class="minus" aria-label="Less" ${on(() => setLogVal(h, UI.sheetVal - stepBy))}>–</button>
+        <div class="val"><span class="sbar"><span style="width:${pct}%"></span></span></div>
+        <button class="plus" aria-label="More" ${on(() => setLogVal(h, UI.sheetVal + stepBy))}>+</button>
+      </div>
+      <div class="logquick">
+        <button ${on(() => setLogVal(h, Math.max(UI.sheetVal, h.target)))}>Hit ${esc(fmtVal(h, h.target))}</button>
+        ${quick.map(q => `<button ${on(() => setLogVal(h, UI.sheetVal + q[1]))}>${esc(q[0])}</button>`).join('')}
+        <button class="clear${UI.sheetClear ? ' armed' : ''}" ${on(clearLog)}>${UI.sheetClear ? 'Tap again to clear' : 'Clear'}</button>
+      </div>
+      <div class="sh-voice">${atCap
+        ? fmtVal(h, cap) + ' ' + esc(h.unit) + ' is the most this takes in a day. Anything past that is a typo.'
+        : 'Target is ' + fmtVal(h, h.target) + ' ' + esc(h.unit) + ' a day. Round up generously, I will never know.'}</div>
+      <button class="btn btn-primary btn-block" ${on(saveSheetLog)}>Save it${gain > 0 ? `<span class="savexp">banks +${gain} XP</span>` : ''}</button>
     </div>`;
 }
 

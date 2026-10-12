@@ -314,7 +314,23 @@ The screen they actually live on. **In this order, and the order is the point:**
    the day you are almost always logging at the far left), and `canLog()` owns the window
    (the chips' `editableDays()` was removed with the rest of the dead code on 2026-09-27).
 4. **The habit list** — tap the **circle** to tick, tap the name for that habit's history, tap
-   `+` on counter habits. Each row shows that habit's own level and current streak.
+   `+` on counter habits. A row's one badge slot, right of the name, shows its streak from 3 days
+   (`BADGE_FROM`), or a new habit level for a moment.
+   **On a counted habit the circle opens the log sheet** (Amir, 2026-10-12, the UX audit's 1A;
+   `toggleHabit()`): with the target filled in when the day is short of it, otherwise at what is
+   logged. A full day is still two taps (circle, Save) and any real number is three. Until then one
+   tap wrote the full target and the next wrote **0**: 4,500 real steps became 10,000 (with the XP, and
+   a level-up), then nothing, with no undo. **The sheet takes a typed number** (`#logval`, the phone's
+   number pad; `foldDigits()` folds Persian and Arabic digits, as sign-in does), beside the stepper,
+   *Hit the target*, a quick add on steps and water, and *Clear*, which takes two taps. In 30 days
+   before this, not one of 45 step entries was off the 500 grid: nobody could enter a real count.
+   The field is a live input, so the renderer never writes its value (`morphAttrs()`): a button that
+   changes the number sets `UI._logSync` and `syncLogField()` writes it once after the render. The
+   save is `saveSheetLog()` (⚠️ not `saveLog()`, which writes the log to the phone). In the strip on the
+   training app's Home the same tap opens the strip's own number row under the habit (`embedEdit()`).
+   **No level on the row at rest, and the help line only in the first week** (`dayNumber() <= 7`):
+   a habit's level lives on Progress and its page; seven `LV n` chips and a "1-day streak" on most rows,
+   in three different places, were noise beside the thing being ticked.
    **The circle is the tick** (PRF-01, 2026-09-27): the emoji sits in a 48 px circle ringed in the
    habit's colour, and a tap fills it with that colour and a white tick. It used to be a 22 px ring
    on the tile's corner while `+` was a 36 px solid grape button, so the main action was the quietest
@@ -908,12 +924,10 @@ the hero directly beneath it is a 76px level. The **35-day grid marks today** an
 a key; without either it was 35 identical squares with no anchor, and the empty leading
 row read as broken rather than as "before you started".
 
-**A note on the habit-row badge.** A row on Today shows **both**: the level (`LV n`) always
-on the right, and the streak, when there is one, on the status line under the name. They
-used to share one slot (the streak when there was one, the level otherwise), so a habit's
-level vanished the moment it started going well. Levels still
-announce themselves the moment they change, through the flash chip in the level's place — which is when they
-actually matter — and both Progress and the detail screen carry the level permanently.
+**A note on the habit-row badge.** Since 2026-10-12 a row on Today has **one badge slot**, right of the
+name: the habit's streak from 3 days (a flame and the number), or, for a moment, a new level (`LV 9 ↑`,
+`UI.flash`). The level at rest is on Progress and the habit's page. (Until then the row showed the level
+always on the right and the streak on the status line, from 1 day.)
 
 ### 03 · CREW — everyone else
 It holds the **whole** social layer. Two views, switched at the top: **Leaderboard** (the
