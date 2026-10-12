@@ -954,6 +954,16 @@ name: the habit's streak from 3 days (a flame and the number), or, for a moment,
 always on the right and the streak on the status line, from 1 day.)
 
 ### 03 · CREW — everyone else
+
+> **Since 2026-10-12 (the UX audit):** the header says **Crew** once (eyebrow *Season 1 · day 31*;
+> "Leaderboard" was written three times), one switch **Board | Roll call**, and *This season / Past
+> week* sits in the list's heading (*Top 10*). The board is **one grouped list** with hairlines, your
+> row in the accent, scores in ink (teal went), the rule as a footnote, and no "Server-scored". Your
+> name is one row, **You appear as … · Edit ›**, which opens a sheet (`renderBoardSheet()`, in
+> `topLayer()`) with the name, *Rename* and *Leave the leaderboard* on two taps; Settings' *Board name*
+> opens the same sheet. Join and *Keep me off* (not on the board yet) are unchanged. The roll call
+> composer is one line, its prompt as the placeholder, and grows its counter and *Post it* once you
+> type. Settings and the manual hide the tab bar (`hidden`): ‹ and ✕ are their ways out.
 It holds the **whole** social layer. Two views, switched at the top: **Leaderboard** (the
 default since PRF-02, Amir's 6A, 2026-09-27) and **Roll call**. Who is on the board, and how
 they got there, is under *The leaderboard* below.
@@ -1026,6 +1036,12 @@ Nobody else's streak or days-on-target is ever invented. Teaching either RPC to 
 per-athlete streak is the whole change needed for everyone's cards to carry one.
 
 ### 04 · LOCKER — the long game
+
+> **Since 2026-10-12 (the UX audit), the order stays and the repeats go:** no *4/14* in the header
+> (eyebrow *Kept for good*), *4 of 14 rewards kept* once, in the hero; *What you have* has no count; the
+> title you wear is first in its rail (*Titles · tap to wear*); on the road the NEXT reward keeps its pill
+> and drops the bar and XP line the hero already shows; the level ring and the next bar are the accent,
+> not teal; the rank name no longer wraps at 320 px.
 The reward track, as a tab of its own (screen id `pass`, drawn by `renderPass()`). Four ways
 in: the tab bar; the **level ring** or the **rank** on Today's hero, both `go('pass')` — the
 rank lives here and nowhere else now that Progress dropped its strip; the profile card at
@@ -1336,7 +1352,12 @@ each row a door with an icon tile, a name, a line of explanation and its current
 | Card | Rows |
 |---|---|
 | — | **Profile** — name, `Day N · rank · coached/free`. Tapping it opens the **Locker**, because that is where the rank lives. |
-| Tracking | **Habits & targets** (`N of M add-ons on`) · **Appearance** (`Dark`/`Light`) · **Install on your phone** (only while `installable()`) |
+| *Since 2026-10-12 (the UX audit) the groups have visible headings and are:* | |
+| Your habits | **Your habits** (`N of M add-ons on`; it was *Habits & targets*, but targets cannot be changed) |
+| App | **Dark mode** and **Tick sound** as switches in the list (the Appearance screen went) · **Install on your phone** (only while `installable()`) · **Open your programme** / **See about coaching** |
+| Help | **The tour** · **The manual** (the Locker row went: the tab and the profile card both open it) |
+| Account | **Board name** (opens the same sheet as Crew's *You appear as*, `renderBoardSheet()`) · **Sync** · **Reset today's log** · **Sign out** |
+| *Until then:* Tracking | **Habits & targets** (`N of M add-ons on`) · **Appearance** (`Dark`/`Light`) · **Install on your phone** (only while `installable()`) |
 | How this works | **The tour** · **The manual — how XP works** · **Locker** · **Open your programme** / **See about coaching** |
 | Crew & data | **Crew board** (your board name; `Not yet` for a coached athlete the sweep will list after their first session; `Not joined` otherwise) · **Sync** (live `syncLabel()`, tap to sync now) · **Reset today's log** (destructive, still two-tap armed; it wipes the day picked on Today's week, `AKEY()`, and names it: *Reset yesterday's log* when yesterday is picked. It used to wipe today whatever the strip showed.) · **Sign out** (two-tap, never in the demo or a coach preview; see *The four tabs*) |
 
@@ -2290,7 +2311,7 @@ sheet.
 > forever, clicking a control nobody was touching: the number drained 500 at a time
 > while the athlete watched it.
 
-**Sound** is off unless the athlete turns it on (Settings → Appearance → Sound). It is *synthesised*,
+**Sound** is off unless the athlete turns it on (Settings → App → Tick sound; it was under Appearance until 2026-10-12). It is *synthesised*,
 not loaded — a short square blip through WebAudio, so it costs no bytes and cannot fail
 to download. It rides inside `haptic()`, so every existing call site gets it for free.
 This is also the only feedback an iPhone actually gets, since Safari exposes no

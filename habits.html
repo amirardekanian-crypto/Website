@@ -1569,7 +1569,7 @@
   #app .ph-nn { font-size: 13.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #app .ph-nx { font-size: 10.5px; color: #A9A3C9; }
   #app .ph-next .bar { background: rgba(246,244,255,.18); }
-  #app .ph-next .bar > span { background: #35D0BA; }
+  #app .ph-next .bar > span { background: #8B7CFF; }
   #app .ph-go { flex: none; font-size: 17px; font-weight: 800; color: #CBC6E4; }
 
   /* Loadout — what you own and what you are wearing. */
@@ -2254,6 +2254,29 @@
   .signin-err { margin-top: 13px; padding: 10px 12px; border-radius: 11px; font-size: 13px;
     background: var(--clay-100); color: var(--clay-deep); line-height: 1.45; }
   .signin-help { margin: 16px 0 0; font-size: 12px; color: var(--muted-soft); text-align: center; }
+  /* ── CREW, LOCKER AND SETTINGS (2026-10-12, the UX audit's batch D; last in the sheet, so it wins over the board's older rules) ── */
+  #app .tabs[hidden] { display: none; }
+  #app .lbwrap { background: var(--card); box-shadow: var(--shadow); padding: 10px 8px 10px; }
+  #app .lbhd { align-items: center; padding: 2px 6px 8px; }
+  #app .lbhd .h { font-size: 15px; }
+  #app .lbhd .chips { display: flex; gap: 6px; }
+  #app .lbhd .chip { min-height: 32px; padding: 0 12px; font-size: 12.5px; }
+  #app .lbrow { margin: 0; border-radius: 0; box-shadow: none; background: none; border-top: 1px solid var(--rule); padding: 10px 8px; }
+  #app .lbrow:first-of-type, #app .passline + .lbrow { border-top: 0; }
+  #app .lbrow.me { border-radius: 14px; border-top-color: transparent; }
+  #app .lbrow.me + .lbrow { border-top-color: transparent; }
+  #app .lbxp, body[data-dark] #app .lbxp { color: var(--ink); }
+  #app .lbrow.me .lbxp { color: #fff; }
+  #app .lbfoot { margin-top: 8px; background: none; color: var(--muted); padding: 4px 8px 0; font-weight: 500; }
+  #app .lbme { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: calc(100% - 32px); margin: 4px 16px 24px;
+    padding: 14px 16px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); border: 0; color: inherit; text-align: left; }
+  #app .lbme > span:first-child { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  #app .lbme b { font-size: 16px; font-weight: 800; }
+  #app .lbme .go { flex: none; color: var(--accent); font-weight: 700; font-size: 14px; }
+  #app .lbleave.armed { border-color: var(--clay); color: var(--clay-deep); }
+  #app .ph-ring { background: conic-gradient(#8B7CFF var(--p,0%), rgba(246,244,255,.16) 0); }
+  #app .ph-rank b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  @media (max-width: 359px) { #app .ph-rank b { font-size: 17px; } }
 </style>
 <style>
   /* ── Embedded on the training app's Home (Fork 1B, 2026-09-26) — see renderEmbed() ──
@@ -6651,6 +6674,7 @@ function topLayer() {
   if (TOUR.on) return () => endTour(false);
   if (UI.share) return () => { UI.share = null; render(); };
   if (UI.install) return closeInstall;
+  if (UI.boardSheet) return () => { UI.boardSheet = false; render(); };
   if (UI.sheet) return () => { UI.sheet = null; render(); };
   if (UI.screen === 'settings' || UI.screen === 'manual') return overlayBack;   // one step, as its own ←
   if (UI.screen === 'detail') return () => go(UI.from === 'today' ? 'today' : 'progress');
@@ -7683,19 +7707,17 @@ function renderApp() {
     // "MANUAL" — which reads as the manual, the document in Settings. The goal
     // is what an athlete actually wants reminding of at the top of the screen.
     detail:   [openH.goal || openH.source, openH.name],
-    crew:     LB.view === 'roll'
-                ? ['Everyone, one line a day', 'Roll call']
-                : [LB.scope === 'week' ? 'Past 7 days' : seasonName(), 'Leaderboard'],
+    // One title for the tab (2026-10-12): "Leaderboard" was written three times on this screen.
+    crew:     [seasonName() + ' · day ' + Math.max(1, Math.round((today() - parseKey(seasonStart())) / 86400000) + 1), 'Crew'],
     // Screen titles are the canonical names, and the Settings rows that lead
     // here now use exactly these words. Tapping "Read the manual" and arriving
     // at "How this works" made two screens feel like four.
     manual:   ['Everything, explained', 'The manual'],
-    pass:     ['Rewards a season cannot take back', 'Locker'],
+    pass:     ['Kept for good', 'Locker'],
     // No XP, no rank, no streak in this header on purpose — it is the one
     // screen in the app that is not scoring anything.
     // Settings is a list of doors, so its header names the door you are behind.
-    settings: UI.sub === 'habits'     ? ['Settings', 'Habits & targets']
-            : UI.sub === 'appearance' ? ['Settings', 'Appearance']
+    settings: UI.sub === 'habits'     ? ['Settings', 'Your habits']
             : ['Day ' + dayNumber() + ' · ' + LI.label, 'You']
   };
   const rights = {
@@ -7703,14 +7725,8 @@ function renderApp() {
     today: '', progress: '',   // the stat grid states the badge count
     detail: (() => { const s = habitStreak(openH);       // not the level — the hero says it
                      return s >= BADGE_FROM ? s + '-DAY STREAK' : ''; })(),
-    crew: (() => {
-      if (LB.view === 'roll') {
-        const n = RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length;
-        return n ? n + ' IN TODAY' : '';
-      }
-      return LB.rows.length ? 'TOP ' + Math.min(10, LB.rows.filter(r => r.pos <= 10).length) : '';
-    })(),
-    pass: (() => { const o = passOwned().length; return o ? o + '/' + PASS_TRACK.length : ''; })(),
+    crew: '',
+    pass: '',
     settings: ''
   };
   const head = heads[UI.screen] || heads.today;
@@ -7777,7 +7793,7 @@ function renderApp() {
       </div>
     </div>
     <div class="scroll" id="scroll" data-k="scroll">${screenHtml}</div>
-    <div class="tabs" data-k="tabs">
+    <div class="tabs" data-k="tabs"${OVERLAY ? ' hidden' : ''}>
       <div class="tabslab" data-k="tabslab" style="width:calc(100% / ${tabDefs.length});transform:translateX(${Math.max(0, tabAt) * 100}%)${tabAt < 0 ? ';opacity:0' : ''}"></div>
       ${tabDefs.map(t => `<button class="${activeTab === t[1] ? 'on' : ''}" data-k="tab:${t[1]}" ${on(() => go(t[1]))}>
         <span class="num">${t[2]}</span><span class="nm">${t[0]}</span>
@@ -7785,6 +7801,7 @@ function renderApp() {
     </div>
     <div id="fx" data-k="fx" data-static></div>
     ${UI.sheet ? renderSheet() : ''}
+    ${UI.boardSheet ? renderBoardSheet() : ''}
     ${UI.share ? renderShareSheet() : ''}
     ${UI.install ? renderInstall() : ''}
     ${UI.toast && !UI.celebrate.length ? `<div class="toast${UI.sheet || UI.share || UI.install ? ' over' : ''}" data-k="toast">${esc(UI.toast)}</div>` : ''}
@@ -8178,14 +8195,13 @@ function renderNoteBox() {
     <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
       <span>Roll call · today</span><span>${posted ? 'ANSWERED' : 'ONE SENTENCE'}</span>
     </div>
-    <div class="noteq" data-k="noteq">${esc(pickLine('prompt', 'rollcall'))}</div>
     <input class="input" id="dayline" maxlength="${NOTE_MAX}" data-k="dayline"
-           placeholder="Say something about today…" value="${esc(draft)}"
+           placeholder="${esc(pickLine('prompt', 'rollcall'))}" value="${esc(draft)}"
            aria-label="Your line for today">
-    <div class="noterow">
+    ${draft || posted ? `<div class="noterow">
       <!-- Your day rides along with the line, which is the one thing an athlete
            is not told before they post. Said here, next to the button. -->
-      <span class="mono ${left <= 20 ? 'tight' : ''}">${dayPct(TKEY())}% day rides along · ${draft.length}/${NOTE_MAX}</span>
+      <span class="mono ${left <= 20 ? 'tight' : ''}">Your day so far (${dayPct(TKEY())}%) goes with it · ${draft.length}/${NOTE_MAX}</span>
       <div style="display:flex;gap:8px">
         ${posted ? `<button class="btn btn-secondary" style="padding:0 12px"
           ${on(() => postNote(''))}>Delete</button>` : ''}
@@ -8196,8 +8212,8 @@ function renderNoteBox() {
     </div>
     <div class="setnote">
       Everyone on the board sees this next to your name and today's percentage.
-      Change it as often as you like until midnight — after that it stands.
-    </div>
+      Change it as often as you like until midnight. After that it stands.
+    </div>` : ''}
   </div>`;
 }
 
@@ -8824,7 +8840,6 @@ function renderCrew() {
   const scopeBtn = (key, label) => `<button class="chip ${LB.scope === key ? 'chip-on' : ''}"
     ${on(() => { if (LB.scope !== key) { LB.scope = key; LB.loaded = false; fetchBoard(); } })}>${label}</button>`;
   const started = parseKey(seasonStart()).toLocaleDateString('en-GB', { day:'numeric', month:'long' });
-  const dayOfSeason = Math.max(1, Math.round((today() - parseKey(seasonStart())) / 86400000) + 1);
 
   let body = '';
   if (LB.loading && !LB.rows.length) {
@@ -8857,7 +8872,7 @@ function renderCrew() {
       ${outside ? `<div class="lbsplit">YOUR POSITION</div>${boardRow(me, ahead(me), top.length)}` : ''}
       <!-- The rule the whole board runs on, stated where it is read. Server-
            scored from the log means a day nobody logs is a day nobody scores. -->
-      <div class="lbfoot">XP only counts when the day is logged — nobody climbs this board from the sofa.</div>`;
+      <div class="lbfoot">XP only counts when the day is logged. Nobody climbs this board from the sofa.</div>`;
   }
 
   const viewBtn = (key, label) => `<button class="chip ${LB.view === key ? 'chip-on' : ''}"
@@ -8874,8 +8889,7 @@ function renderCrew() {
         <!-- The board leads (PRF-02, Amir's 6A, 2026-09-27): where you stand first, Roll call one tap
              away. It led the other way while the wall was the default, and the wall held 2 lines in
              9 days across 19 athletes. Today's Roll call row still opens the wall. -->
-        <div class="chips">${viewBtn('board', 'Leaderboard')}${viewBtn('roll', 'Roll call')}</div>
-        <div class="mono boardday">SEASON DAY ${dayOfSeason}</div>
+        <div class="chips">${viewBtn('board', 'Board')}${viewBtn('roll', 'Roll call')}</div>
       </div>
       ${LB.view === 'roll' ? renderNoteBox() + renderRollCall() : `
         <!-- The board is a PANEL now (Amir, 2026-08-01): its own title, its own
@@ -8884,17 +8898,14 @@ function renderCrew() {
              the screen continuing. -->
         <div class="lbwrap" data-k="lbwrap">
           <div class="lbhd">
-            <span class="h">Leaderboard</span>
-            <span class="r">resets with the season</span>
-          </div>
-          <div class="boardbar">
-            <div class="chips">${scopeBtn('season', 'This season')}${scopeBtn('week', 'Past week')}</div>
+            <span class="h">Top 10</span>
+            <span class="chips">${scopeBtn('season', 'This season')}${scopeBtn('week', 'Past week')}</span>
           </div>
           ${body}
         </div>
         <div class="boardnote">${LB.scope === 'week'
-          ? 'Today and the six days before it. Server-scored from what you logged.'
-          : 'Everything since ' + esc(started) + '. Server-scored from what you logged.'}</div>
+          ? 'Today and the six days before it. It resets with the season.'
+          : 'Everything since ' + esc(started) + '. It resets with the season.'}</div>
         ${renderBoardJoin()}`}
     </div>`;
 }
@@ -9076,14 +9087,10 @@ function renderBoardJoin() {
       </div>`;
   }
   return `
-    <div class="block" data-k="join" data-tour="join" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
-      <div class="eyebrow" style="letter-spacing:.12em">You appear as</div>
-      <div style="display:flex;gap:8px">
-        <input class="input" id="boardname" maxlength="24" placeholder="${esc(CFG.boardName || defaultDisplayName())}" value="${esc(LB.nameDraft)}" style="flex:1">
-        <button class="btn btn-secondary" style="padding:0 14px" ${on(() => joinBoard(LB.nameDraft.trim() || CFG.boardName, true))}>Rename</button>
-      </div>
-      <button class="btn btn-secondary btn-block" ${on(() => joinBoard(null, false))}>Leave the leaderboard</button>
-    </div>`;
+    <button class="lbme" data-k="join" data-tour="join" ${on(() => { LB.nameDraft = ''; UI.boardSheet = true; render(); })}>
+      <span><span class="eyebrow">You appear as</span><b>${esc(CFG.boardName || defaultDisplayName())}</b></span>
+      <span class="go">Edit ›</span>
+    </button>`;
 }
 
 // ── The manual ────────────────────────────────────────────────────────────
@@ -9180,7 +9187,7 @@ function renderManual() {
             : `finish a session in your programme and it ticks itself, whether you got through all of it or not.`}</div>
           ${isFree() ? '' : `<div>▸ <strong style="color:var(--ink)">Use the Library.</strong> Open a workout in your programme app and mark it done. A strength, conditioning or on-court session ticks your session. A mobility flow or a recovery session ticks Mobility. Anything in Breath ticks Breathe. A warm-up ticks nothing, because a warm-up is part of a session rather than a session of its own. If the habit it counts towards is one you are not tracking, this screen will offer to switch it on.</div>`}
           <div>▸ <strong style="color:var(--ink)">Finish what you start.</strong> The completion bonus means the last glass of water is worth more than the first.</div>
-          <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings, under <strong style="color:var(--ink)">Habits &amp; targets</strong>.</div>
+          <div>▸ <strong style="color:var(--ink)">Turn off what you'll never do.</strong> Points come from what you complete, so a habit you ignore only drags your daily percentage down. Switch it off in Settings, under <strong style="color:var(--ink)">Your habits</strong>.</div>
           <div>▸ <strong style="color:var(--ink)">Show up daily.</strong> Consistency tiers below are worth real points — up to ${(() => { const h = live()[0] || HABITS[0]; return CONSISTENCY_TIERS.reduce((s, t, i) => s + tierXp(h, i), 0).toLocaleString(); })()} XP on a single habit — and they only come from unbroken streaks.</div>
           <div>▸ <strong style="color:var(--ink)">Go after the milestones.</strong> The ${ACHIEVEMENTS.length} on your Progress tab pay ${ACHIEVEMENTS.reduce((s, a) => s + a.xp, 0).toLocaleString()} XP between them, once each.</div>
         </div>`)}
@@ -9288,7 +9295,7 @@ function renderManual() {
         p(isFree()
           ? `You join it from Crew when you want to. Nobody sees you before that.`
           : `Once you finish your first workout in the programme app, you are put on it under your first name and last initial.`) +
-        p(`You can rename yourself whenever you like (it does not have to be your real name), or leave in Settings, Crew board. <strong style="color:var(--ink)">If you leave, you stay off.</strong> Other athletes see <strong style="color:var(--ink)">your name, your points, your rank and the title you wear</strong>. They never see your habits, your logs, your programme or anything else.`) +
+        p(`You can rename yourself whenever you like (it does not have to be your real name), or leave: tap <strong style="color:var(--ink)">You appear as</strong> under the board on Crew, or <strong style="color:var(--ink)">Board name</strong> in Settings. <strong style="color:var(--ink)">If you leave, you stay off.</strong> Other athletes see <strong style="color:var(--ink)">your name, your points, your rank and the title you wear</strong>. They never see your habits, your logs, your programme or anything else.`) +
         p(`There are two boards. <strong style="color:var(--ink)">This season</strong> is every point since ${esc(seasonName().toLowerCase())} opened. <strong style="color:var(--ink)">Past week</strong> is a rolling seven days, so a strong week always shows and anyone can win it.`) +
         p(`Your points are worked out on the server from what you have actually logged — so the board is honest, and there is nothing to gain from fiddling with your phone.`))}
 
@@ -9358,7 +9365,8 @@ function renderPass() {
   const nextDays = Math.max(1, Math.round(toNext / Math.max(1, perfectDayXp())));
   const titles = PASS_TRACK.filter(p => p.kind === 'title').concat(eventTitles()).concat(seasonTitles());
   const cards = [CARD_BASE].concat(PASS_TRACK.filter(p => p.kind === 'card'));
-  const myTitles = titles.filter(p => passHas(p.id));
+  const myTitles = titles.filter(p => passHas(p.id))
+    .sort((a, b) => (b.id === (CFG.pass && CFG.pass.title)) - (a.id === (CFG.pass && CFG.pass.title)));   // the one you wear first
   const myCards = cards.filter(p => passHas(p.id));
 
   const wear = p => {
@@ -9430,8 +9438,7 @@ function renderPass() {
               <span class="tn-kind">${kind} · LEVEL ${p.lv}</span>
               <span class="tn-name">${esc(p.name)}</span>
               <span class="tn-note">${esc(p.note)}</span>
-              ${isNext ? `<span class="bar thin tn-bar" style="height:6px"><span data-fill style="width:${nextPct}%"></span></span>
-              <span class="tn-xp">${toNext.toLocaleString()} XP — about ${nextDays} good day${nextDays === 1 ? '' : 's'}</span>` : ''}
+
             </span>
             ${has ? '<span class="tn-flag">KEPT</span>' : (isNext ? '<span class="tn-flag">NEXT</span>' : '')}
           </button>
@@ -9535,7 +9542,7 @@ function renderPass() {
         </div>`}
       </div>
 
-      ${sectionLabel('What you have', owned + ' of ' + PASS_TRACK.length + ' kept')}
+      ${sectionLabel('What you have')}
       <div class="loadout">
         <!-- A thumbnail of the share card in the equipped skin: the skin and the crest. Its 7.5 px rank name
              never read and could not be raised to 11 px inside 66 px (A11Y-01); the hero above names the rank. -->
@@ -9549,7 +9556,7 @@ function renderPass() {
       </div>
 
       <div class="lo-rail">
-        <span class="lo-rl">TITLES · ${myTitles.length} OF ${titles.length}</span>
+        <span class="lo-rl">TITLES · TAP TO WEAR · ${myTitles.length} OF ${titles.length}</span>
         <div class="rail">${myTitles.length
           ? myTitles.map(plateBtn).join('')
           : `<span class="lo-empty">Nothing yet — your first lands at level ${PASS_TRACK[0].lv}</span>`}</div>
@@ -9558,7 +9565,7 @@ function renderPass() {
         <span class="lo-rl">CARD SKINS · ${myCards.length} OF ${cards.length}</span>
         <div class="rail">${myCards.map(skinBtn).join('')}</div>
       </div>
-      <div style="padding:8px 20px 2px;font-size:11px;line-height:1.45;color:var(--muted-soft)">Tap a title to wear it${eqT ? ', tap it again to show nothing' : ''}. It rides on the board, the wall and your card.</div>
+      <div style="padding:8px 20px 2px;font-size:11px;line-height:1.45;color:var(--muted-soft)">The title you wear rides on the board, the wall and your card${eqT ? '. Tap it again to show none' : ''}.</div>
 
       <!-- ── SEASONS ────────────────────────────────────────────────────────
            Only once there IS one. A heading over an empty box on the screen a
@@ -10370,45 +10377,58 @@ function renderSettings() {
         <span class="navgo">&#8250;</span>
       </button>
 
+      ${sectionLabel('Your habits')}
       <div class="cardgrp">
-        ${navRow('🎯', 'Habits & targets',
+        ${navRow('🎯', 'Your habits',
                  'The five, your add-ons and anything you invent',
                  navVal(onCount + ' of ' + addTotal + ' add-ons on'),
                  () => goSub('habits'))}
-        ${navRow('🎨', 'Appearance', 'Dark mode and the tick sound',
-                 navVal(CFG.dark ? 'Dark' : 'Light'),
-                 () => goSub('appearance'))}
+      </div>
+
+      <!-- The two switches sit here (2026-10-12): Appearance was a whole screen for two of them. -->
+      ${sectionLabel('App')}
+      <div class="cardgrp">
+        <button class="navrow" ${on(() => { CFG.dark = !CFG.dark; document.body.toggleAttribute('data-dark', CFG.dark); saveCfg(); render(); })} role="switch" aria-checked="${!!CFG.dark}">
+          <span class="navtile" aria-hidden="true">${CFG.dark ? '🌙' : '☀️'}</span>
+          <span class="navmid"><span class="navnm">Dark mode</span><span class="navsub">Your choice. It doesn't follow the phone.</span></span>
+          <span class="sw ${CFG.dark ? 'on' : ''}"><i></i></span>
+        </button>
+        <button class="navrow" ${on(() => { CFG.sound = !CFG.sound; saveCfg(); render(); if (CFG.sound) haptic('done'); })} role="switch" aria-checked="${!!CFG.sound}">
+          <span class="navtile" aria-hidden="true">🔔</span>
+          <span class="navmid"><span class="navnm">Tick sound</span><span class="navsub">A short blip when you tick something.</span></span>
+          <span class="sw ${CFG.sound ? 'on' : ''}"><i></i></span>
+        </button>
         ${installable() ? navRow('📱', 'Install on your phone',
                  'Open it in one tap, and keep it working with no signal', '',
                  () => { UI.install = true; render(); }) : ''}
-      </div>
-
-      <div class="cardgrp">
-        <!-- First in the group, because it is the one an athlete who is lost
-             needs. The tour is not a settings screen, it is the only explanation
-             of what the controls do, and a one-shot explanation is worth little. -->
-        ${navRow('🧭', 'The tour', 'Five steps on the real screen', '',
-                 () => { UI.backTo = 'settings'; startTour('settings'); })}
-        ${navRow('📖', 'The manual — how XP works',
-                 'Points, levels, ranks, consistency and the board', '',
-                 () => go('manual'), '', 'data-tour="manual"')}
-        ${navRow('🎁', 'Locker', 'Every rank and every reward on one road', '',
-                 () => go('pass'))}
         ${navRow(isFree() ? '💬' : '🏋', isFree() ? 'See about coaching' : 'Open your programme',
                  isFree() ? 'A programme built for you, your sport and your week'
                           : "Today's session, your plan and the library", '',
                  () => (isFree() ? (window.location.href = '/form.html') : goProgram()))}
       </div>
 
+      ${sectionLabel('Help')}
       <div class="cardgrp">
-        ${navRow('👥', 'Crew board',
+        <!-- First in the group, because it is the one an athlete who is lost
+             needs. The tour is not a settings screen, it is the only explanation
+             of what the controls do, and a one-shot explanation is worth little. -->
+        ${navRow('🧭', 'The tour', 'Five steps on the real screen', '',
+                 () => { UI.backTo = 'settings'; startTour('settings'); })}
+        ${navRow('📖', 'The manual',
+                 'How XP, levels, ranks, consistency and the board work', '',
+                 () => go('manual'), '', 'data-tour="manual"')}
+      </div>
+
+      ${sectionLabel('Account')}
+      <div class="cardgrp">
+        ${navRow('👥', 'Board name',
                  // Three states, from boardState() (PRIV-01).
                  boardState() === 'on' ? 'Tap to rename or leave'
                    : boardState() === 'coming' ? 'You go on after your first session · tap to rename or keep off'
                    : 'Other athletes only see you if you join',
                  navVal(boardState() === 'on' ? (CFG.boardName || defaultDisplayName())
                    : boardState() === 'coming' ? 'Not yet' : 'Not joined'),
-                 () => go('crew'))}
+                 () => { if (boardState() === 'on') { LB.nameDraft = ''; UI.boardSheet = true; render(); } else go('crew'); })}
         ${navRow('☁️', 'Sync', 'Everything is saved here first, then sent up',
                  `<span class="navval" data-sync>${esc(syncLabel())}</span>`,
                  async () => { if (window.IS_DEMO) { toast('Demo mode — nothing is sent.'); return; }
@@ -10595,6 +10615,35 @@ function renderSettingsHabits() {
 }
 
 // ── Log sheet ─────────────────────────────────────────────────────────────
+// YOUR NAME ON THE BOARD, IN A SHEET (2026-10-12, the UX audit). Rename and "Leave the leaderboard"
+// sat open at the foot of Crew at full weight, every visit, and Settings had a second door to them.
+// Crew shows one row, "You appear as …", and it and Settings' row open this. Leaving takes two taps.
+function renderBoardSheet() {
+  const cur = CFG.boardName || defaultDisplayName();
+  const close = () => { UI.boardSheet = false; UI.confirmLeave = false; render(); };
+  return `
+    <div class="scrim" data-k="bscrim" ${on(close)}></div>
+    <div class="sheet logsheet" data-k="boardsheet" role="dialog" aria-modal="true" aria-label="Your name on the board">
+      <div class="sh-top">
+        <div style="min-width:0">
+          <div class="sh-t">Your name on the board</div>
+          <div class="sh-sub">Others see this name, your points, your rank and the title you wear. Nothing else.</div>
+        </div>
+        <button class="sh-x" aria-label="Close" ${on(close)}>&#10005;</button>
+      </div>
+      <input class="input" id="boardname" data-k="bsname" maxlength="24" placeholder="${esc(cur)}" value="${esc(LB.nameDraft)}" aria-label="Board name">
+      <button class="btn btn-primary btn-block" ${on(() => { const v = LB.nameDraft.trim() || CFG.boardName; UI.boardSheet = false; joinBoard(v, true); })}>Rename</button>
+      <button class="btn btn-secondary btn-block lbleave${UI.confirmLeave ? ' armed' : ''}" ${on(() => {
+        if (!UI.confirmLeave) {
+          UI.confirmLeave = true; render();
+          setTimeout(() => { if (UI.confirmLeave) { UI.confirmLeave = false; render(); } }, 4000);
+          return;
+        }
+        UI.confirmLeave = false; UI.boardSheet = false; joinBoard(null, false);
+      })}>${UI.confirmLeave ? 'Tap again to leave the board' : 'Leave the leaderboard'}</button>
+    </div>`;
+}
+
 function renderSheet() {
   const h = habitById(UI.sheet);
   const stepBy = h.step || 1;
