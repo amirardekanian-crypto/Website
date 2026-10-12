@@ -79,7 +79,7 @@ WhatsApp message. Sign-in
 folds Persian and Arabic-Indic digits to 0-9 (`foldDigits()` in program.html, habits.html and the two
 tennis apps, the same fold as `typedPassword()`): the username always, the password only on a retry
 after the typed one fails (2026-10-10; a Farsi keyboard failed every sign-in before). The
-Testing app and Course tabs work the same way. `demo` is named explicitly as
+Course and Testing app logins (coach.html → Buyers) work the same way. `demo` is named explicitly as
 public inside `get_program()` so the marketing link still opens.
 
 **The coaching pipeline writes to the server.** It may still produce a local
@@ -115,7 +115,7 @@ PUBLIC repo — world-readable, despite each opening with "Never published". The
 in `public.coaching_logs`, coach-only, with no athlete arm at all.
 
 **⚠️ There are NO automatic backups.** The Supabase project is on the free plan. 378
-session logs and every progress blob exist in exactly one place. coach.html → Athletes →
+session logs and every progress blob exist in exactly one place. coach.html → ⚙ Tools →
 **⤓ Backup** downloads the whole database as one JSON file; do it weekly and keep a copy
 off the machine. **Keep only the last 12 weekly files** (`aa-backup-<date>.json`), on this PC
 and on the off-machine copy, and delete older ones (Amir, 2026-10-04: "rolling"). The privacy
@@ -421,7 +421,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (116 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (117 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **The UX pass (2026-10-12; Amir's answers in memory `coach-redesign-2026-10-12`)**, round 1 shipped: Today puts Needs you first and wide,
   each row's button names what it does, and **"Also waiting"** (applications, logins to send, backup, older notes) is NOT a reason, so it never
   touches `reasonsOf()` or the people count. The roster is one aligned table (Athlete · Cycle · Last session · Proof · Why); the athlete header
@@ -434,7 +434,9 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   something asks in an inline panel under its button (`dangerAsk()`: Delete training history, Forget, End the quest run, the two record deletes),
   and anything to read or copy once is a `notice()` line beside `fail()`'s (there is **no `alert()`** in coach.html; keep it that way); Library
   rows with one Copy link; chart axes; a folded pill picker; a phone bottom bar below 600 px only; one hint line per panel with the rest in
-  How this works. The global type, colour and corner pass comes last.
+  How this works. **The look** (shipped last): five font sizes (12/14/17/22/30), three radii (8/12/999), Barlow Condensed only for the brand
+  and an athlete's name, Space Mono only for numbers that line up, plum only for the middle warning, one fold, two pick-one controls; the
+  `design-rules` scenario fails a change that breaks them (COACH_DASHBOARD.md §2, "The look").
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.
