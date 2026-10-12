@@ -5,8 +5,10 @@
 //     shorts), opened in a new tab, 44 px tall, as wide as the player, outside the box the iframe fills;
 //   · it is still reachable once the embed has loaded, and a tap on it never plays, folds or ticks anything;
 //   · a Short gets a tall player with a bar of the same width, a non-YouTube link gets no bar at all;
-//   · the About sheet's player has one, and so has the pop-up a circuit item's ▶ opens (wide and Short, fitting
+//   · the About sheet's player has one, and so has the pop-up a warm-up item's ▶ opens (wide and Short, fitting
 //     a 320 x 568 screen with the bar under the player), while the circuit rows themselves are unchanged;
+//   · a working circuit's item has no ▶ disc (Centre Court r2, E's s): its ▶ is in its How to do it line, which opens
+//     the card's player, bar and all, above the steps;
 //   · nothing runs sideways at 320 / 360 / 390 px, light and dark.
 // Serve the repo (python3 -m http.server 8765 --bind 127.0.0.1), then: node scripts/headless/youtube.js [--out <dir>]
 'use strict';
@@ -205,9 +207,9 @@ function spine() {
     const still = await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; return { open: !c.classList.contains('collapsed'), url: location.pathname }; })()`);
     t.check('and the app stays where it was (the card is still open, the page did not leave)', still.open && /program\.html$/.test(still.url), JSON.stringify(still));
 
-    // the pop-up's bar: a tap opens the address and the pop-up stays
-    await circuit(p, 'Press and Pull');
-    await p.locator('#day-view .round-row', { hasText: 'Dumbbell Bench Press' }).locator('.round-play-btn').click();
+    // the pop-up's bar: a tap opens the address and the pop-up stays (a warm-up item's ▶; a working circuit's is below)
+    await circuit(p, 'Hip Primer');
+    await p.locator('#day-view .round-row', { hasText: '90/90 Hip Switch' }).locator('.round-play-btn').click();
     await p.waitForTimeout(250);
     before = navs.length;
     [pop] = await Promise.all([ctx.waitForEvent('page', { timeout: 5000 }).catch(() => null), p.locator('.video-modal-yt').click()]);
@@ -215,8 +217,31 @@ function spine() {
     if (pop) await pop.close().catch(() => {});
     const stay = await modal(p);
     t.check('a tap on the pop-up\'s bar opens the watch address in a new tab and leaves the pop-up open',
-      !!pop && navs.slice(before).includes(WATCH('ddddddddddd')) && stay.open, JSON.stringify({ popup: !!pop, navs: navs.slice(before), open: stay.open }));
+      !!pop && navs.slice(before).includes(WATCH('aaaaaaaaaaa')) && stay.open, JSON.stringify({ popup: !!pop, navs: navs.slice(before), open: stay.open }));
     await p.evaluate(() => VideoModal.close());
+
+    // a working circuit (Centre Court r2, E's s): no ▶ disc on its rows; the ▶ is in How to do it, which opens the
+    // card's player with its bar above the steps, built on the first open
+    await circuit(p, 'Press and Pull');
+    const wc = await p.evaluate(() => {
+      const c = [...document.querySelectorAll('#day-view .round-group')].find(x => x.textContent.includes('Press and Pull'));
+      const row = [...c.querySelectorAll('.round-row')].find(r => r.textContent.includes('Dumbbell Bench Press'));
+      const tog = row.querySelector('.round-how-tog'), built = !!row.querySelector('.ex-vunit');
+      const shown = tog.getBoundingClientRect().height > 0;
+      const text = tog.textContent.replace(/[\s ]+/g, ' ').replace('›', '').trim();
+      tog.click();
+      const u = row.querySelector('.round-how-vid .ex-vunit'), a = u && u.querySelector('a.ex-yt');
+      if (a) a.scrollIntoView({ block: 'center' });
+      const ar = a && a.getBoundingClientRect(), hit = ar && document.elementFromPoint(ar.left + ar.width / 2, ar.top + ar.height / 2);
+      const st = row.querySelector('.round-steps-slot');
+      return { discs: c.querySelectorAll('.round-play-btn').length, shown, text, built, unit: !!(u && u.offsetParent),
+        href: a && a.getAttribute('href'), h: ar && Math.round(ar.height), hit: !!(hit && hit.closest('a.ex-yt')),
+        above: !!(u && st && (u.compareDocumentPosition(st) & Node.DOCUMENT_POSITION_FOLLOWING)), over: c.scrollWidth - c.clientWidth };
+    });
+    t.check('a working circuit: no ▶ disc on its rows, the line says "▶ How to do it · video", no player built yet',
+      wc.discs === 0 && wc.shown && wc.text === '▶How to do it · video' && !wc.built, JSON.stringify(wc));
+    t.check('a working circuit: a tap on the line opens the player with its bar, above the steps',
+      wc.unit && wc.href === WATCH('ddddddddddd') && wc.h >= 44 && wc.hit && wc.above && wc.over <= 0, JSON.stringify(wc));
 
     // Guided moves the card's open part into its own overlay: the bar goes with it
     await p.evaluate(() => { startTimerNow('1'); openGuided('1'); });

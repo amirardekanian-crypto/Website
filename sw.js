@@ -253,7 +253,8 @@
 // v122: habits.html changed (2026-10-12, UX audit): Outfit is our own file (/assets/fonts/Outfit-Variable.woff2), the takeover's Continue is the app's primary.
 // v123: habits.html changed (2026-10-12, UX audit type pass): six font sizes (12-40) and four corner radii across the app.
 // v124: program.html changed (2026-10-12): Centre Court, the training day re-skinned (the cover, the session bar, the cards, the finish).
-const CACHE = 'aap-v124';
+// v125: program.html changed (2026-10-12): Centre Court round 2 (the number is the tick, the chevrons, a working circuit's ▶ in How to do it, "4 / side").
+const CACHE = 'aap-v125';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

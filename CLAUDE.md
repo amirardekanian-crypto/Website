@@ -304,7 +304,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Dark mode is the athlete's choice** (Amir, 2026-09-27: *"Let the client choose dark mode"*): both apps start
   light and switch only on the athlete's tap; neither follows the phone's setting.
 - **Clay means "look here"** (DS-01, Amir 2026-09-27; `PROGRAM-APP.md` → *Clay means look here*): the Coach's note,
-  a Because, an RPE over target, the tempo digit, a banner that asks for something, the one number on a dark Home card, the numbers in a week note's headline and on the session bar's limits row.
+  a Because, an RPE over target, the tempo digit, a banner that asks for something, the one number on a dark Home card, the numbers in a week note's headline and on the session bar's limits row, the fault cue's bar in How to do it.
   Block titles, stripes and done tints, the running bar, labels and buttons are green or grey.
 - **The Library offers a session at two moments only** (LIB-01, Amir 2026-09-27; `PROGRAM-APP.md` → *The Library's
   Sessions*): a sore check-in (soreness 1 or 2, on the finished card) and a finished week (Home, under This Week), never
@@ -459,7 +459,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v124` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v125` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
@@ -495,8 +495,8 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   reads «باز کردن در یوتیوب». It is drawn only for a YouTube address, and it sits OUTSIDE the box the iframe fills (`.ex-vunit`
   + `.ex-yt`, `.vunit` + `.vyt`, `.video-modal-yt`): the iframe covers anything inside that box the moment the embed loads,
   which is exactly when it fails. The mark is YouTube's own red so it never reads as the green ▶. There is **no mark on the
-  circuit rows** (beside the ▶ it pushed a superset's row 6 to 36 px past its card at 360 to 390 px); a circuit item's pop-up
-  carries the bar instead. The earlier "open in the YouTube app" link (2026-09-23) was tried and removed the same day; this one
+  circuit rows** (beside the ▶ it pushed a superset's row 6 to 36 px past its card at 360 to 390 px); a warm-up item's pop-up
+  carries the bar instead, and a working circuit's item plays in its own How to do it line (Centre Court round 2), the card's player with the bar under it. The earlier "open in the YouTube app" link (2026-09-23) was tried and removed the same day; this one
   is Amir's later call. `privacy.html` §2.7 stays true (nothing leaves until the athlete taps). Guards: `scripts/headless/youtube.js`
   (program.html, shared.js) and `youtube-course.js` (the course app).
   The three parsers must agree: `ytId()` in `tennis/app/app.js`, `ytVideoId()` in `program.html`, the modal in
