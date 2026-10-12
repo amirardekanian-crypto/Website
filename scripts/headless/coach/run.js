@@ -2280,6 +2280,8 @@ S['editor-pill-picker'] = async (b) => {
   await ed.locator('.pp-off', { hasText: '3s eccentric' }).locator('button', { hasText: 'Drop it' }).click();
   check(r, 'Move to the note puts it in the note as a sentence; both flags gone', (await ed.locator('[id^="exNote-"]').inputValue()) === 'Glute focus.' && (await ed.locator('.pp-off').count()) === 0, await ed.locator('[id^="exNote-"]').inputValue());
   const pp = v => ed.locator('.pp', { hasText: new RegExp('^' + v + '$') });
+  // The six groups are folded behind "Change pill" (round 3, 2026-10-12): open them the way the coach would. They stay open for the rest of this editor.
+  await ed.locator('.pp-toggle').click();
   await pp('neutral grip').click(); await pp('wide grip').click();
   check(r, 'one per group: wide grip takes neutral grip’s place', (await ed.locator('.pp.on').allInnerTexts()).sort().join() === 'right side first,wide grip', await ed.locator('.pp.on').allInnerTexts());
   await pp('max intent').click(); await L.settle(page, 100);
@@ -3803,6 +3805,228 @@ S['library-publish-guards'] = async (b) => {
   check(r, 'an id that is already on another shelf is refused, naming the shelf and what to do', /already on the Strength \(fixture\) shelf/.test(bar) && /hide that one first/.test(bar), bar);
   check(r, 'and nothing was written', !(await L.callsSince(page, n0)).some(c => c.name === 'library' && c.op === 'upsert'), '');
   check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Round 3 of the coach UX pass (2026-10-12): the Library as compact rows, the charts with axes, the ✎ editor with a folded pill picker ─────────────────────
+S['r3-library-charts-editor'] = async (b) => {
+  const r = { id: 'r3-library-charts-editor', title: 'Round 3: the Library is compact rows with folding shelves and one Copy link; the charts have labelled axes; the ✎ editor folds its pill groups and the pencil shows at rest', checks: [] };
+  const DAY = n => new Date(Date.now() - n * 86400e3).toISOString().slice(0, 10);
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // the way a chart says its first and last date: "12 Sep", with the year on both when they are not both this year
+  const axisFmt = (a, c) => { const yr = DAY(0).slice(0, 4), wy = a.slice(0, 4) !== yr || c.slice(0, 4) !== yr; const f = s => +s.slice(8) + ' ' + MON[+s.slice(5, 7) - 1] + (wy ? ' ' + s.slice(0, 4) : ''); return a === c ? [f(a)] : [f(a), f(c)]; };
+  const overflow = page => page.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, wide: [...document.querySelectorAll('#content *')].filter(el => el.getBoundingClientRect().right > innerWidth + 1).slice(0, 4).map(el => el.tagName + '.' + el.className) }));
+  const seedLibrary = (page, n) => page.evaluate(n => {
+    const cats = [['recovery', 'article', 'Recovery'], ['nutrition', 'article', 'Nutrition'], ['conditioning', 'workout', 'Conditioning'], ['mobility', 'workout', 'Mobility']];
+    cats.forEach(([id, kind, title], i) => window.__DB.library_categories.push({ id, kind, title, banner: null, icon: null, sort_order: 10 + i }));
+    for (let i = 0; i < n; i++) {
+      const art = i % 3 === 0, cat = art ? cats[i % 2] : cats[2 + (i % 2)];
+      window.__DB.library.push({ slug: (art ? 'articles/' : 'workouts/') + cat[0] + '/gen-' + i, kind: art ? 'article' : 'workout', category_id: cat[0], published: i % 11 !== 5, sort_order: 100 + i,
+        updated_at: new Date(Date.now() - i * 86400e3).toISOString(),
+        data: art ? { id: 'gen-' + i, title: 'Article ' + i, readMins: 4 + (i % 6) } : { id: 'gen-' + i, title: 'Workout ' + i, duration: '15 min', equipment: 'Bands', category: cat[0] } });
+    }
+    return hardRefresh();
+  }, n).then(() => L.settle(page, 900));
+  const openShelves = page => page.evaluate(() => [...document.querySelectorAll('details.lib-shelf[open]')].map(d => d.dataset.lk));
+  const SITE = 'https://www.amirardekani.com';   // typed here on purpose: the addresses copied must be the ones the Library always copied
+
+  // ── 1. The Library with 64 items, at 1440 ────────────────────────────────────────────────────────────────────────────────────────────────
+  let { page, log } = await L.openCoach(b, { hash: 'today' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await seedLibrary(page, 63);
+  await L.go(page, 'links');
+  const st = await page.evaluate(() => ({ n: document.querySelectorAll('details.lib-shelf').length, open: document.querySelectorAll('details.lib-shelf[open]').length,
+    sum: [...document.querySelectorAll('details.lib-shelf > summary .lib-n')].reduce((a, s) => a + Number(s.textContent), 0), pub: S.lib.filter(l => l.published).length, total: S.lib.length,
+    head: document.querySelector('.lib-count').textContent.replace(/\s+/g, ' ').trim(), nHidden: S.lib.filter(l => !l.published).length }));
+  check(r, 'first visit with 64 items: every shelf is folded', st.total === 64 && st.n >= 4 && st.open === 0, st);
+  check(r, 'each shelf says its count, and the counts add up to the published items', st.sum === st.pub, st);
+  check(r, 'the header line gives the totals', st.head === `64 items · ${st.nHidden} hidden`, st.head);
+  await page.locator('details.lib-shelf').first().locator('summary').click();
+  const rows = await page.evaluate(() => [...document.querySelectorAll('details.lib-shelf[open] .link-row')].map(el => Math.round(el.getBoundingClientRect().height)));
+  check(r, 'an open shelf lists compact rows: none taller than 52 px at 1440', rows.length >= 5 && rows.every(h => h <= 52 && h >= 40), rows);
+  const first = page.locator('details.lib-shelf').first().locator('.link-row').first();
+  const vis = async loc => (await loc.locator('button:visible').allInnerTexts()).map(t => t.replace(/\s+/g, ' ').trim());
+  check(r, 'an article row has ONE Copy link and Hide, and no printed address', JSON.stringify(await vis(first)) === JSON.stringify(['Copy link ▾', 'Hide']) && !/https?:/.test(await first.innerText()), await vis(first));
+  check(r, 'the row names its kind and meta in muted text', /Article 0/.test(await first.innerText()) && /article · 4 min read · updated /.test((await first.locator('.link-row-meta').innerText()).trim()), await first.innerText());
+  await first.locator('.lr-copy-btn').click();
+  check(r, 'Copy link on an article opens a small choice: App, Web FA, Web EN', JSON.stringify(await vis(first)) === JSON.stringify(['Copy link ▾', 'App', 'Web FA', 'Web EN', 'Hide']), await vis(first));
+  const clip = () => page.evaluate(() => navigator.clipboard.readText());
+  const got = {};
+  for (const lab of ['App', 'Web FA', 'Web EN']) {
+    if (!(await first.locator('.lr-pick').isVisible())) await first.locator('.lr-copy-btn').click();
+    await first.locator('.lr-pick button', { hasText: new RegExp('^' + lab + '$') }).click(); await L.settle(page, 200);
+    got[lab] = await clip();
+    await L.settle(page, 1000);   // the choice folds itself away a moment after a copy; the next round opens it again
+  }
+  check(r, 'it copies the same addresses as before: the app link, the Farsi page and the English page', got.App === SITE + '/program.html?article=gen-0' && got['Web FA'] === SITE + '/fa/articles/gen-0.html' && got['Web EN'] === SITE + '/en/articles/gen-0.html', got);
+  await L.settle(page, 1100);
+  check(r, 'the choice folds away again by itself after a copy', !(await first.locator('.lr-pick').isVisible()), '');
+  // a workout has one address: Copy link copies it straight away
+  await page.locator('details.lib-shelf summary', { hasText: 'Strength (fixture)' }).click();
+  const wk = page.locator('.link-row', { hasText: 'Fixture Burner' }).first();
+  check(r, 'a workout row has Copy link and Hide, nothing more', JSON.stringify(await vis(wk)) === JSON.stringify(['Copy link', 'Hide']), await vis(wk));
+  await wk.locator('button', { hasText: 'Copy link' }).click(); await L.settle(page, 200);
+  check(r, 'and copies its app address at once', (await clip()) === SITE + '/program.html?workout=fixture-burner', await clip());
+  // shelves remember
+  const o1 = await openShelves(page);
+  await page.evaluate(() => { render(); });
+  const o2 = await openShelves(page);
+  await L.go(page, 'today'); await L.go(page, 'links');
+  const o3 = await openShelves(page);
+  check(r, 'the shelves you opened stay open through a redraw and a visit to another tab, and the others stay folded', o1.length === 2 && JSON.stringify(o2) === JSON.stringify(o1) && JSON.stringify(o3) === JSON.stringify(o1), { o1, o2, o3 });
+  // the header and the How this works fold
+  const hd = await page.evaluate(() => ({ primary: document.querySelectorAll('#content .btn.primary').length,
+    btns: [...document.querySelectorAll('.lib-acts .btn')].map(x => x.textContent.trim()),
+    sentence: [...document.querySelectorAll('#content p')].filter(p => /changes every athlete's app at once/.test(p.textContent)).map(p => !!p.closest('details.how')),
+    howLast: document.querySelector('#content').lastElementChild === document.querySelector('details.how'), howOpen: document.querySelector('details.how').open }));
+  check(r, 'the two publish buttons are plain buttons in the header line, and there is no primary button on the screen', hd.primary === 0 && JSON.stringify(hd.btns) === JSON.stringify(['+ Publish workout', '+ Publish article']), hd);
+  check(r, 'the sentence about what publishing does is in the How this works fold at the foot, shut', hd.sentence.length === 1 && hd.sentence[0] && hd.howLast && !hd.howOpen, hd);
+  // Hide still goes through the same guarded write
+  const hid0 = await page.locator('details.lib-hidden').count();
+  const n0 = await L.nCalls(page);
+  await wk.locator('button', { hasText: 'Hide' }).click(); await L.settle(page, 800);
+  const upd = lastOf(await L.callsSince(page, n0), isUpd('library'));
+  check(r, 'Hide asks, then writes published=false for that item only', !!upd && upd.payload.published === false && upd.filters.some(f => /slug\.eq/.test(f) && /fixture-burner/.test(f)), upd && [upd.payload, upd.filters]);
+  check(r, 'the row goes to the Hidden fold, which stays shut and keeps its marker', (await page.locator('details.lib-hidden').count()) >= hid0 && !(await page.locator('details.lib-hidden').first().evaluate(d => d.open)) && (await page.locator('details.lib-hidden .link-row.hiddenitem .chip', { hasText: 'hidden' }).count()) >= 1, '');
+  // no sideways scroll, with a shelf open and a choice open
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 844 });
+    await L.go(page, 'today'); await L.go(page, 'links');
+    await page.locator('details.lib-shelf').first().locator('.lr-copy-btn').first().click(); await L.settle(page, 150);
+    const o = await overflow(page);
+    check(r, `the Library with a shelf and a choice open at ${w} px: no sideways scroll`, o.over <= 0, o);
+  }
+  check(r, 'no page errors (Library)', !log.errors.length, log.errors);
+  await page.context().close();
+
+  // ── 2. A small library opens its shelves the first time ─────────────────────────────────────────────────────────────────────────────────
+  ({ page, log } = await L.openCoach(b, { hash: 'today' }));
+  await seedLibrary(page, 8);
+  await L.go(page, 'links');
+  const sm = await page.evaluate(() => ({ n: document.querySelectorAll('details.lib-shelf').length, open: document.querySelectorAll('details.lib-shelf[open]').length, total: S.lib.length, hiddenOpen: [...document.querySelectorAll('details.lib-hidden[open]')].length }));
+  check(r, 'first visit with 9 items (under 12): every shelf is open, the Hidden fold is shut', sm.total === 9 && sm.n >= 3 && sm.open === sm.n && sm.hiddenOpen === 0, sm);
+  check(r, 'no page errors (small Library)', !log.errors.length, log.errors);
+  await page.context().close();
+
+  // ── 3. The charts: axes that match the data ────────────────────────────────────────────────────────────────────────────────────────────
+  ({ page, log } = await L.openCoach(b, { hash: 'a/ava_test/work' }));
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const sess = [[30, 7, 60], [27, 8, 60], [24, 7, 50], [21, 7, 60], [18, 7, 50], [15, 7, 60], [12, 8, 70], [9, 7, 60], [6, 7, 60], [3, 8, 60], [2, 7, 60], [1, 8, 60]];   // [days ago, session RPE, minutes]
+  const checkIns = [30, 27, 24, 21, 18, 15, 12, 9, 6, 3];                                                                                    // the last two sessions have no check-in
+  await page.evaluate(([sess, checkIns]) => {
+    const arr = window.__DB.session_history;
+    for (let i = arr.length - 1; i >= 0; i--) if (arr[i].athlete_id === 'ava_test') arr.splice(i, 1);
+    const day = n => new Date(Date.now() - n * 86400e3).toISOString().slice(0, 10);
+    sess.forEach(([ago, rpe, min], i) => arr.push({ athlete_id: 'ava_test', athlete_name: 'Ava Example', day: 1 + (i % 3), completed_on: day(ago), status: 'Complete', session_rpe: rpe, duration_min: min,
+      readiness: checkIns.indexOf(ago) < 0 ? null : { sleep: 3 + (i % 3), energy: 3 + ((i + 1) % 3), stress: 4, overall: 3 + (i % 2), soreness: 3, composite: 3.5, skipped: false },
+      day_note: '', focus: '', summary: 'Day ' + (1 + (i % 3)) + ' — fixture', coach_status: 'read', log: null, updated_at: new Date().toISOString() }));
+    const wt = {};
+    for (let i = 0; i < 40; i++) wt[addDays(todayKey(), -i)] = { kg: Math.round((64.7 + i * 0.08) * 10) / 10, t: Date.now() - i * 86400000 };
+    window.__DB.athlete_progress.find(p => p.athlete_id === 'ava_test').data.ava_test_hab_wt = JSON.stringify(wt);
+    return hardRefresh();
+  }, [sess, checkIns]);
+  await L.settle(page, 900);
+  await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work');
+  await page.locator('#chartsBtn').click(); await page.locator('#wtdet summary').click(); await L.settle(page, 250);
+  // what the load chart should say, worked out here from the same sessions: the Monday of each of the last 8 weeks and each week's load
+  const monday = s => new Date(new Date(s + 'T00:00:00Z').getTime() - ((new Date(s + 'T00:00:00Z').getUTCDay() + 6) % 7) * 86400e3);
+  const m0 = monday(DAY(0)), buckets = [];
+  for (let i = 7; i >= 0; i--) buckets.push({ start: new Date(m0.getTime() - i * 7 * 86400e3).toISOString().slice(0, 10), load: 0 });
+  sess.forEach(([ago, rpe, min]) => { const d = DAY(ago); for (let i = buckets.length - 1; i >= 0; i--) if (d >= buckets[i].start) { buckets[i].load += rpe * min; break; } });
+  const maxLoad = Math.max.apply(null, buckets.map(x => x.load));
+  const cardInfo = name => page.evaluate(n => {
+    const c = [...document.querySelectorAll('#chartbox .chart-card')].find(x => x.querySelector('h4').textContent === n);
+    if (!c) return null;
+    const svg = c.querySelector('svg');
+    return { y: [...c.querySelectorAll('.cp-y span')].map(s => s.textContent), x: [...c.querySelectorAll('.cp-x span')].map(s => s.textContent), h: Math.round(c.getBoundingClientRect().height),
+      px: [...c.querySelectorAll('.cp-y span, .cp-x span')].map(s => parseFloat(getComputedStyle(s).fontSize)),
+      circles: c.querySelectorAll('svg circle').length, dashed: c.querySelectorAll('svg line[stroke-dasharray]').length, rects: c.querySelectorAll('svg rect').length,
+      fill: c.querySelector('.bar-fill') ? c.querySelector('.bar-fill').style.width : null, big: (c.querySelector('.chart-big') || {}).textContent || '',
+      rules: svg ? [...svg.querySelectorAll('line:not([stroke-dasharray])')].map(l => Number(l.getAttribute('y1'))) : [], vb: svg ? svg.viewBox.baseVal.height : 0, svgTop: svg ? svg.getBoundingClientRect().top : 0, svgH: svg ? svg.getBoundingClientRect().height : 0,
+      yMid: [...c.querySelectorAll('.cp-y span')].map(s => { const q = s.getBoundingClientRect(); return q.top + q.height / 2; }) };
+  }, name);
+  const ld = await cardInfo('Training load'), rd = await cardInfo('Readiness'), ad = await cardInfo('Adherence');
+  check(r, 'the three chart cards are there and each is shorter than the old 280 px (260 or less at 1440)', !!ld && !!rd && !!ad && [ld.h, rd.h, ad.h].every(h => h <= 260), [ld && ld.h, rd && rd.h, ad && ad.h]);
+  check(r, 'Training load: the y axis is 0 and the tallest week, the x axis the Monday of the first and of the last week', !!ld && JSON.stringify(ld.y) === JSON.stringify([maxLoad.toLocaleString('en-GB'), '0']) && JSON.stringify(ld.x) === JSON.stringify(axisFmt(buckets[0].start, buckets[7].start).map(t => 'w/c ' + t)), { got: ld && [ld.y, ld.x], want: [maxLoad.toLocaleString('en-GB'), buckets[0].start, buckets[7].start] });
+  check(r, 'Training load keeps its eight weekly bars', !!ld && ld.rects === 8, ld && ld.rects);
+  check(r, 'Readiness: the y axis is the 1 to 5 scale, the x axis the first and the last check-in', !!rd && JSON.stringify(rd.y) === JSON.stringify(['5', '1']) && JSON.stringify(rd.x) === JSON.stringify(axisFmt(DAY(30), DAY(3))), { got: rd && [rd.y, rd.x], want: axisFmt(DAY(30), DAY(3)) });
+  check(r, 'Readiness keeps one point per check-in (10) and its dashed "usual" line', !!rd && rd.circles === 10 && rd.dashed === 1, rd && [rd.circles, rd.dashed]);
+  check(r, 'a y label sits at the height of the value it names: 5 and 1 at the chart\'s two rules, within 2 px', !!rd && rd.rules.length === 2 && rd.yMid.every((m, i) => Math.abs(m - (rd.svgTop + rd.rules[i] / rd.vb * rd.svgH)) <= 2), rd && { rules: rd.rules, mids: rd.yMid, svgTop: rd.svgTop, svgH: rd.svgH, vb: rd.vb });
+  check(r, 'Adherence keeps its bar, with the 0 % and 100 % ends under it, and the bar is as long as the number says', !!ad && JSON.stringify(ad.x) === JSON.stringify(['0%', '100%']) && ad.fill === parseInt(ad.big, 10) + '%', ad && [ad.x, ad.fill, ad.big]);
+  check(r, 'every axis label is 12 px or more', [ld, rd, ad].every(c => c && c.px.length && c.px.every(p => p >= 12)), [ld && ld.px, rd && rd.px, ad && ad.px]);
+  // body weight: the lowest and highest point of the line it draws, and its first and last day
+  const wtAvg = []; { const kg = []; for (let i = 0; i < 40; i++) kg.push(Math.round((64.7 + i * 0.08) * 10) / 10);
+    for (let i = 0; i < 40; i++) { const w = kg.slice(i, Math.min(i + 7, 40)); wtAvg.push(w.reduce((a, v) => a + v, 0) / w.length); } }
+  const r1 = v => (Math.round(v * 10) / 10).toFixed(1);
+  const wtc = await page.evaluate(() => { const d = document.getElementById('wtdet'); return { y: [...d.querySelectorAll('.cp-y span')].map(s => s.textContent), x: [...d.querySelectorAll('.cp-x span')].map(s => s.textContent), w: Math.round(d.querySelector('.chart-svg').getBoundingClientRect().width), open: d.open }; });
+  check(r, 'Body weight: the y axis is the highest and the lowest kg of its line, the x axis its first and last day, and the chart is not wider than 520 px', JSON.stringify(wtc.y) === JSON.stringify([r1(Math.max.apply(null, wtAvg)) + ' kg', r1(Math.min.apply(null, wtAvg)) + ' kg']) && JSON.stringify(wtc.x) === JSON.stringify(axisFmt(DAY(39), DAY(0))) && wtc.w <= 520, { wtc, want: [r1(Math.max.apply(null, wtAvg)), r1(Math.min.apply(null, wtAvg)), axisFmt(DAY(39), DAY(0))] });
+
+  // ── 4. The ✎ editor ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  await page.evaluate(() => {
+    const row = window.__DB.programs.find(p => p.athlete_id === 'ava_test');
+    row.data.workouts.days[0].blocks[1].exercises[0].intent = 'neutral grip';
+    row.data.workouts.days[0].blocks[1].exercises[1].intent = 'Right leg first · glute focus';
+    return reloadPrograms().then(() => render());
+  });
+  await L.settle(page, 600);
+  await page.evaluate(() => { const d = document.getElementById('wday-1'); if (d && !d.classList.contains('open')) d.querySelector('.wday-top').click(); });
+  await L.settle(page, 200);
+  await page.mouse.move(2, 2);
+  const pen = rowLoc(page, 'Goblet Squat').locator('.rx-edit');
+  const grey = async () => pen.evaluate(el => { const c = getComputedStyle(el); const m = c.color.match(/[\d.]+/g).map(Number); return { opacity: c.opacity, rgb: m.slice(0, 3), vis: c.visibility, box: (() => { const q = el.getBoundingClientRect(), p = el.closest('.cmp-row').getBoundingClientRect(); return q.width > 0 && q.height > 0 && q.left >= p.left && q.right <= p.right && q.top >= p.top && q.bottom <= p.bottom; })() }; });
+  const rest = await grey();
+  check(r, 'at 1440 the ✎ is visible at rest (not hidden until hover), a faint grey glyph, inside its row', (await pen.isVisible()) && rest.opacity === '1' && rest.vis === 'visible' && rest.box && Math.max.apply(null, rest.rgb) - Math.min.apply(null, rest.rgb) <= 12, rest);
+  await pen.hover(); await L.settle(page, 250);
+  const hov = await grey();
+  check(r, 'and it goes to the dark green on hover', hov.rgb[1] > hov.rgb[0] + 20 && hov.rgb[1] <= 80 && hov.opacity === '1', { rest: rest.rgb, hov });
+  await page.mouse.move(2, 2);
+  let ed = await openEditor(page, 'Goblet Squat');
+  const fields = await ed.evaluate(e => ({ labels: [...e.querySelectorAll('.exed-grid .exf')].map(f => f.firstElementChild.textContent.trim()),
+    tops: [...e.querySelectorAll('.exed-grid .exf')].map(f => Math.round(f.getBoundingClientRect().top)), hs: [...e.querySelectorAll('.exed-grid .exf')].map(f => Math.round(f.getBoundingClientRect().height)),
+    ctl: (() => { const s = e.querySelector('select').getBoundingClientRect(), i = e.querySelector('[id^="exSets-"]').getBoundingClientRect(); const cs = getComputedStyle(e.querySelector('select')), ci = getComputedStyle(e.querySelector('[id^="exSets-"]')); return { sh: Math.round(s.height), ih: Math.round(i.height), sf: cs.fontFamily === ci.fontFamily, sb: cs.borderTopColor === ci.borderTopColor && cs.borderRadius === ci.borderRadius }; })() }));
+  check(r, 'the seven fields are one row: same top, same height, the Dose select drawn like the boxes', fields.labels.join() === 'Sets,Dose,Value,Per side,RPE,Tempo,Rest' && new Set(fields.tops).size === 1 && new Set(fields.hs).size === 1 && fields.ctl.sh === fields.ctl.ih && fields.ctl.sf && fields.ctl.sb, fields);
+  const pills = async () => ed.evaluate(e => ({ chips: [...e.querySelectorAll('.pp-chip')].map(c => c.textContent.replace('✕', '').trim()), link: e.querySelector('.pp-toggle').textContent.trim(), buttons: [...e.querySelectorAll('.pp')].filter(p => p.getClientRects().length).length,
+    groupsHidden: e.querySelector('.pp-groups').hidden }));
+  let pl = await pills();
+  check(r, 'the pill groups are folded: the pill on the card is a chip with a ✕, and the link says Change pill', pl.groupsHidden && pl.buttons === 0 && pl.chips.join() === 'neutral grip' && pl.link === 'Change pill' && (await ed.locator('.pp-chip .pp-x').count()) === 1, pl);
+  await ed.locator('.pp-toggle').click();
+  pl = await pills();
+  check(r, 'Change pill opens the six groups, the card\'s pill marked on', !pl.groupsHidden && pl.buttons > 15 && (await ed.locator('.pp.on:visible').allInnerTexts()).join() === 'neutral grip' && pl.link === 'Done', pl);
+  await ed.locator('.pp', { hasText: /^wide grip$/ }).click();
+  check(r, 'picking one in the same group takes its place, and the chip follows', (await pills()).chips.join() === 'wide grip', await pills());
+  await page.evaluate(() => { assemble(); render(); }); await L.settle(page, 600);
+  ed = page.locator('.rx-editor[style*="block"]').first();
+  pl = await pills();
+  check(r, 'the groups stay open, and the chip stays, through a redraw while the editor is open', (await page.locator('.rx-editor[style*="block"]').count()) === 1 && !pl.groupsHidden && pl.buttons > 15 && pl.chips.join() === 'wide grip', pl);
+  await ed.locator('.pp-chip .pp-x').click();
+  pl = await pills();
+  check(r, 'the ✕ on a chip takes the pill off, and no button in the open groups stays on', pl.chips.length === 0 && pl.link === 'Done' && (await ed.locator('.pp.on').count()) === 0, pl);
+  await ed.locator('.pp-toggle').click();
+  pl = await pills();
+  check(r, 'Done folds the groups again, and with no pill the link says Add a pill', pl.groupsHidden && pl.buttons === 0 && pl.link === 'Add a pill', pl);
+  await ed.locator('.exed-acts button', { hasText: 'Cancel' }).click(); await L.settle(page, 200);
+  // a value off the pill list stays in view with its two ways out, whatever is folded
+  ed = await openEditor(page, 'Chest-Supported Dumbbell Row');
+  pl = await pills();
+  check(r, 'a value off the list is shown in clay with Move to the note and Drop it while the groups are folded; the list value shows as a chip', pl.groupsHidden && (await ed.locator('.pp-off:visible').count()) === 1 && (await ed.locator('.pp-off:visible button').allInnerTexts()).join() === 'Move to the note,Drop it' && pl.chips.join() === 'right side first', { pl, off: await ed.locator('.pp-off').allInnerTexts() });
+  await ed.locator('.exed-acts button', { hasText: 'Cancel' }).click(); await L.settle(page, 200);
+  // no sideways scroll on The work with the charts, the weight and an editor open, with its groups open
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 844 });
+    await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work');
+    await page.evaluate(() => { document.getElementById('chartbox').style.display = 'block'; document.getElementById('wtdet').open = true; const d = document.getElementById('wday-1'); if (d && !d.classList.contains('open')) d.querySelector('.wday-top').click(); });
+    await L.settle(page, 250);
+    // an editor left open by the last round comes back with the page (its typed work and its open groups survive a redraw): that is the one to look at
+    const e2 = (await page.locator('.rx-editor[style*="block"]').count()) ? page.locator('.rx-editor[style*="block"]').first() : await openEditor(page, 'Goblet Squat');
+    if (await e2.locator('.pp-groups').evaluate(g => g.hidden)) await e2.locator('.pp-toggle').click();
+    await L.settle(page, 150);
+    const o = await overflow(page);
+    // the page clips a day card at its edge, so also ask whether anything inside the editor reaches past the screen
+    const edge = await page.evaluate(() => [...document.querySelectorAll('.rx-editor[style*="block"] *')].filter(el => el.getBoundingClientRect().right > innerWidth + 1).slice(0, 3).map(el => el.tagName + '.' + el.className));
+    check(r, `The work with the charts, the weight and the editor with its pill groups open at ${w} px: no sideways scroll, nothing in the editor past the screen`, o.over <= 0 && edge.length === 0, { o, edge });
+  }
+  check(r, 'no page errors (charts and editor)', !log.errors.length, log.errors);
   await page.context().close();
   return r;
 };

@@ -802,18 +802,18 @@
   .rx-sub { font-family: 'Barlow', sans-serif; font-size: 12px; color: var(--muted-soft); margin-top: 2px; line-height: 1.4; }
 
   /* ── Prescription editor ─────────────────────────────────────────────── */
-  /* The pencil stays quiet until the row is hovered — 800 exercises with a
-     permanent button on each reads as a form, not a comparison. */
-  .rx-edit { opacity: 0; transition: opacity .12s; background: none; border: 0; cursor: pointer;
-             color: var(--court); font-size: 13px; padding: 2px 5px; margin-top: 3px; border-radius: 5px; }
-  .cmp-row:hover .rx-edit, .rx-edit:focus { opacity: 1; }
-  /* No hover on a touch screen: the pencil is always there, with a finger-sized target. */
-  @media (hover: none) { .rx-edit { opacity: 1; padding: 8px 12px; margin-left: -12px; font-size: 15px; }
+  /* The pencil is always there, a faint grey glyph that goes dark on hover and focus (round 3 of the coach UX pass, 2026-10-12: it used to be
+     hidden until the row was hovered, and nobody knew it was there). It sits at the top right of the prescribed column, out of the text's way. */
+  .rx-edit { background: none; border: 0; cursor: pointer; color: var(--muted-soft); font-size: 14px; line-height: 1;
+             padding: 3px 5px; margin-top: 3px; border-radius: 5px; transition: color .12s, background .12s; }
+  .rx-edit:hover, .rx-edit:focus-visible { color: var(--court); }
+  /* A finger-sized target on a touch screen. */
+  @media (hover: none) { .rx-edit { padding: 8px 12px; margin-left: -12px; font-size: 15px; }
     /* iOS zooms the page into any field under 16 px when it gets focus. */
     .exf input, .exf textarea, .exf select, .pwin, .controls input[type=search], .controls select { font-size: 16px; }
     .sp { padding: 8px 12px; } }
-  /* On a pointer screen the hidden pencil takes no line of its own. */
-  @media (hover: hover) { .rx-edit { position: absolute; margin-top: 0; } .cmp-rx { position: relative; } }
+  /* On a pointer screen the pencil takes no line of its own: it sits at the top right of the prescribed column, which keeps room for it. */
+  @media (hover: hover) { .rx-edit { position: absolute; top: 0; right: 0; margin-top: 0; } .cmp-rx { position: relative; padding-right: 30px; } }
   .rx-edit:hover { background: var(--court-100); }
   .rx-warn { font-family: 'Barlow', sans-serif; font-size: 12px; color: var(--clay-ink);
              margin-top: 3px; cursor: help; }
@@ -823,9 +823,20 @@
   .exed-grid { display: flex; flex-wrap: wrap; gap: 14px 18px; }
   .exf { display: flex; flex-direction: column; gap: 4px; font-family: 'Barlow', sans-serif; }
   .exf > span { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
-  .exf input, .exf textarea { font-family: 'Space Mono', monospace; font-size: 12.5px; padding: 7px 9px;
+  .exf input, .exf textarea, .exf select { font-family: 'Space Mono', monospace; font-size: 12.5px; padding: 7px 9px;
     border: 1px solid var(--rule); border-radius: 7px; background: var(--card); color: var(--ink); }
-  .exf input:focus, .exf textarea:focus { outline: 2px solid var(--court); outline-offset: -1px; border-color: transparent; }
+  .exf input:focus, .exf textarea:focus, .exf select:focus { outline: 2px solid var(--court); outline-offset: -1px; border-color: transparent; }
+  /* The seven fields of the ✎ editor are one row (they wrap on a narrow screen): labels all one line high, boxes all one height, the Dose select drawn
+     like the boxes, and Per side's tick in a box of the same height so the row's bottom edge is straight. */
+  .rx-editor .exed-grid { align-items: flex-end; gap: 12px 16px; }
+  .rx-editor .exed-grid .exf > span { line-height: 16px; white-space: nowrap; }
+  .rx-editor .exf input:not([type=checkbox]), .rx-editor .exf select { height: 34px; }
+  .rx-editor .exf select { cursor: pointer; }
+  .rx-editor .exf input[type=checkbox] { width: 18px; height: 18px; margin: 8px 4px; accent-color: var(--court); cursor: pointer; }
+  @media (hover: none) { .rx-editor .exf input:not([type=checkbox]), .rx-editor .exf select { height: 38px; } .rx-editor .exf input[type=checkbox] { margin: 10px 4px; } }
+  /* A phone: two to a row (Sets Dose / Value Per side / RPE Tempo / Rest), the boxes the width of their half. The inline widths are for the one-row desktop. */
+  @media (max-width: 560px) { .rx-editor .exed-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 14px; align-items: end; }
+    .rx-editor .exed-grid .exf input:not([type=checkbox]), .rx-editor .exed-grid .exf select { width: 100% !important; } }
   .exf-wide { margin-top: 12px; }
   .exf-wide textarea { width: 100%; box-sizing: border-box; resize: vertical; }
   .exed-mods { margin-top: 11px; font-family: 'Barlow', sans-serif; font-size: 12px; color: var(--muted); }
@@ -835,6 +846,18 @@
   .exed-hint { font-family: 'Barlow', sans-serif; font-size: 12px; color: var(--muted-soft); }
   /* The pill picker (CHP-2, 2026-10-11): the closed list from chips.js, at most two, one per group. */
   .pillpick { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }
+  /* Folded (round 3, 2026-10-12): the chosen pills are chips with a ✕, and the six groups open only on "Change pill" / "Add a pill". */
+  .pp-sel { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-height: 30px; font-family: 'Barlow', sans-serif; }
+  .pp-chip { display: inline-flex; align-items: center; gap: 2px; padding: 0 2px 0 11px; min-height: 28px; border-radius: 999px; background: var(--card);
+             border: 1px solid var(--court); color: var(--court); font-size: 12px; font-weight: 700; }
+  .pp-x { width: 24px; height: 24px; border-radius: 999px; font-size: 12px; line-height: 1; color: var(--muted); }
+  .pp-x:hover, .pp-x:focus-visible { background: var(--court-100); color: var(--court); }
+  .pp-none { font-size: 12px; color: var(--muted); }
+  .pp-toggle { font-size: 12px; font-weight: 600; color: var(--court); padding: 4px 2px; text-decoration: underline; text-underline-offset: 3px; }
+  .pp-toggle:hover { color: var(--court-deep); }
+  .pp-groups { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; }
+  .pp-groups[hidden] { display: none; }
+  @media (hover: none) { .pp-x { width: 32px; height: 32px; } .pp-toggle { padding: 8px 4px; } }
   .pp-grp { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; font-family: 'Barlow', sans-serif; }
   .pp-g { width: 112px; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); font-weight: 600; }
   .pp { font-family: 'Barlow', sans-serif; font-size: 12px; padding: 4px 10px; border-radius: 999px;
@@ -996,14 +1019,34 @@
   .proofstrip .meta { font-size: 12.5px; color: var(--muted); }
 
   /* Charts */
+  /* The three charts (round 3 of the coach UX pass, 2026-10-12): the card is the title and the number on one line, one line of what it means, the plot
+     with its axes, and the legend pushed to the foot, so the three legends line up whatever the card above them says. The axis labels are HTML
+     (12 px, muted), not text drawn in the SVG, which scales with its card: a label drawn in it fell under 12 px on a phone. The y labels sit at
+     the height of the value they name (a % of the plot's height); the x labels are the first and last date (the load bars: the week's Monday). */
   .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
-  .chart-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 15px 17px; }
+  /* From 900 px the readiness card, which has the longest words, is the wide one and adherence, which is one bar, the narrow one: the cards come out about as tall as the plot needs. */
+  @media (min-width: 900px) { .charts { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, .8fr); } }
+  .chart-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 11px 16px 10px;
+                display: flex; flex-direction: column; min-width: 0; }
+  .chart-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 12px; }
   .chart-card h4 { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .06em;
-                   font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 700; }
-  .chart-big { font-family: 'Space Mono', monospace; font-size: 27px; font-weight: 700; line-height: 1.1; }
-  .chart-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+                   font-size: 13px; color: var(--muted); margin-bottom: 2px; font-weight: 700; }
+  .chart-big { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; line-height: 1.15; }
+  .chart-sub { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
   .chart-svg { display: block; width: 100%; height: auto; margin-top: 12px; }
-  .chart-legend { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+  .chart-legend { font-size: 12px; color: var(--muted); margin-top: auto; padding-top: 6px; line-height: 1.4; }
+  .chart-plot { display: grid; grid-template-columns: var(--cpy, 28px) minmax(0, 1fr); margin-top: 8px; }
+  .chart-plot .cp-y { position: relative; }
+  .chart-plot .cp-y span { position: absolute; right: 6px; transform: translateY(-50%); font-size: 12px; line-height: 1; color: var(--muted); white-space: nowrap;
+                           font-variant-numeric: tabular-nums; }
+  .chart-plot .cp-main { min-width: 0; }
+  .chart-plot .chart-svg { margin-top: 0; }
+  .cp-x { grid-column: 2; display: flex; justify-content: space-between; gap: 8px; margin-top: 3px; font-size: 12px; line-height: 1.2; color: var(--muted); white-space: nowrap; }
+  .cp-x.one { justify-content: center; }
+  /* Adherence is one bar, 0 to 100 %: the same x line under it, in the same place the other two charts' dates are. */
+  .chart-bar { margin-top: 10px; }
+  .chart-bar .bar { margin-top: 0; }
+  .chart-bar .cp-x { margin-top: 5px; }
   /* Body weight on The work: ONE compact panel. The figures are its header line (the summary) and the chart folds under it. */
   .wtpanel { padding: 12px 20px; margin-bottom: 12px; }
   .wtdet > summary { cursor: pointer; list-style: none; font-size: 14px; line-height: 1.5; }
@@ -1013,6 +1056,7 @@
   .wtdet > summary:hover { color: var(--court); }
   .wtdet .wt-t { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase; font-size: 17px; letter-spacing: .01em; }
   .wtdet .chart-svg { max-width: 520px; }
+  .wtdet .chart-plot { max-width: 560px; }
 
   /* Personal records — one line per lift on The work tab */
   .pr-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline;
@@ -1128,15 +1172,38 @@
   .tfeed .td { margin-left: auto; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted-soft); white-space: nowrap; }
 
   /* Links (ported) */
-  .links-cat { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 16px 0 6px; }
-  .link-row { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; margin-bottom: 7px;
-              display: flex; align-items: center; gap: 12px; }
-  .link-row-info { flex: 1; min-width: 0; }
-  .link-row-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-  .link-row-url { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Space Mono', monospace; }
-  .link-row-meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
-  .link-row.hiddenitem { opacity: .7; }
-  @media (max-width: 560px) { .link-row { flex-wrap: wrap; } .link-row .acts { flex-basis: 100%; justify-content: flex-start !important; } }
+  /* The Library (round 3 of the coach UX pass, 2026-10-12): one panel per kind, a fold per shelf with its count, and a compact row per item (about 44 px:
+     title, kind and meta in muted text, then one Copy link and Hide / Publish). It was a card of 85 px with the whole address printed in mono, 64 times. */
+  .lib-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 14px; }
+  .lib-count { font-size: 13px; color: var(--muted); }
+  .lib-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .lib-shelf > summary { cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 8px; padding: 10px 0; border-top: 1px solid var(--rule);
+                         font-size: 14px; font-weight: 700; }
+  .lib-shelf > summary::-webkit-details-marker { display: none; }
+  .lib-shelf > summary::before { content: '▸'; color: var(--muted); font-weight: 400; }
+  .lib-shelf[open] > summary::before { content: '▾'; }
+  .lib-shelf > summary:hover { color: var(--court); }
+  .lib-n { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 400; color: var(--muted); }
+  .link-row { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 6px 0 6px 20px; border-top: 1px solid var(--rule); }
+  .link-row-info { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 2px 10px; }
+  .link-row-title { flex: 0 1 auto; min-width: 0; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .link-row-info .chip { flex: none; align-self: center; }
+  .link-row-meta { flex: 1 100 auto; min-width: 0; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .link-row.hiddenitem .link-row-title { color: var(--muted); }
+  .lr-acts { flex: none; display: flex; align-items: center; gap: 6px; }
+  .lr-copy { display: flex; align-items: center; gap: 6px; }
+  .lr-pick { display: flex; align-items: center; gap: 6px; }
+  .lr-pick[hidden] { display: none; }
+  .lr-copy-btn[aria-expanded="true"] { border-color: var(--court); color: var(--court); }
+  /* A phone: the title above its meta, and the buttons on a line of their own so the title is read in full. */
+  @media (max-width: 560px) {
+    .link-row { flex-wrap: wrap; padding: 8px 0 8px 12px; gap: 6px 12px; }
+    .link-row-info { flex: 1 1 100%; flex-direction: column; align-items: flex-start; gap: 0; }
+    .link-row-title, .link-row-meta { max-width: 100%; }
+    .link-row-meta { white-space: normal; }
+    .lr-acts { flex: 1 1 100%; flex-wrap: wrap; }
+  }
+  .rawlog.lib-hidden > .link-row { padding-left: 0; }
 
   /* Toast + demo banner */
   /* Hidden with visibility, not only moved: a long message used to stay half on screen. */
@@ -3342,18 +3409,42 @@ function athleteMetrics(sessions, lastActive, daysPerWeek) {
 }
 
 // --- tiny inline-SVG charts (ported) ----------------------------------------
+// Axes (round 3 of the coach UX pass, 2026-10-12). Every chart says what its marks are measured against: the y labels are the scale the marks
+// use (readiness 1 and 5, the load bars 0 and the tallest week, body weight the lowest and highest reading), the x labels the first and last
+// date. They are HTML beside and under the SVG, not <text> in it: the SVG scales down with its card, and a label drawn in it would fall under 12 px.
+// `y` is a list of { at: 0..1 down the plot, text }; `x` the labels under the plot's two ends (one label centres).
+function plotAxes(svg, y, x) {
+  const gutter = Math.ceil(Math.max.apply(null, y.map(p => String(p.text).length)) * 7) + 8;   // a 12 px digit is about 7 px wide
+  const xs = (x || []).filter(t => t);
+  return `<div class="chart-plot" style="--cpy:${gutter}px"><div class="cp-y" aria-hidden="true">${
+      y.map(p => `<span style="top:${(p.at * 100).toFixed(1)}%">${esc(p.text)}</span>`).join('')}</div>
+    <div class="cp-main">${svg}</div>${xs.length ? `<div class="cp-x${xs.length === 1 ? ' one' : ''}">${xs.map(t => `<span>${esc(t)}</span>`).join('')}</div>` : ''}</div>`;
+}
+// The first and last date as a reader says them ("12 Sep"); the year only when they are not both this year.
+function axisDays(a, b) {
+  const p = iso => { const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? { y: m[1], t: +m[3] + ' ' + MONTHS[+m[2] - 1] } : null; };
+  const A = p(a), B = p(b);
+  if (!A || !B) return [];
+  const yr = todayKey().slice(0, 4), withYear = A.y !== yr || B.y !== yr;
+  const s = q => q.t + (withYear ? ' ' + q.y : '');
+  return String(a).slice(0, 10) === String(b).slice(0, 10) ? [s(A)] : [s(A), s(B)];
+}
 function barsSVG(buckets, color) {
-  const w = 320, h = 96, base = h - 4, top = 8, n = buckets.length || 1;
+  const w = 320, h = 80, base = h - 2, top = 6, n = buckets.length || 1;
   const max = Math.max(1, ...buckets.map(b => b.load)), slot = w / n;
   const bars = buckets.map((b, i) => {
     const bh = (b.load / max) * (base - top), x = i * slot + slot * 0.18, bw = slot * 0.64, y = base - bh;
     return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0, bh).toFixed(1)}" rx="2" fill="${color}" opacity="${b.load ? 0.85 : 0.18}"></rect>`;
   }).join('');
-  return `<svg class="chart-svg" viewBox="0 0 ${w} ${h}">${bars}</svg>`;
+  const rules = [top, base].map(y => `<line x1="0" y1="${y}" x2="${w}" y2="${y}" stroke="${C.grey}" stroke-width="1" opacity="0.18"/>`).join('');
+  return plotAxes(`<svg class="chart-svg" viewBox="0 0 ${w} ${h}">${rules}${bars}</svg>`,
+    [{ at: top / h, text: Math.round(max).toLocaleString('en-GB') }, { at: base / h, text: '0' }],
+    buckets.length ? axisDays(dkey(buckets[0].start), dkey(buckets[buckets.length - 1].start)).map(t => 'w/c ' + t) : []);
 }
+// opts.axis = { hi: { v, text }, lo: { v, text }, x: [first label, last label] } draws the plot with its axes (labels at the height of those two values).
 function lineSVG(series, opts) {
   opts = opts || {};
-  const w = 320, h = 96, top = 10, bot = h - 14, left = 4, right = w - 4;
+  const w = opts.w || 320, h = opts.h || 80, top = 8, bot = h - 8, left = 4, right = w - 4;
   const yMin = opts.yMin != null ? opts.yMin : 1, yMax = opts.yMax != null ? opts.yMax : 5;
   const X = i => series.length > 1 ? left + (i / (series.length - 1)) * (right - left) : (left + right) / 2;
   const Y = v => bot - ((v - yMin) / ((yMax - yMin) || 1)) * (bot - top);
@@ -3365,22 +3456,33 @@ function lineSVG(series, opts) {
     : series.map((p, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="2.2" fill="${opts.color}"/>`).join('');
   let baseLine = '';
   if (opts.baseline != null) { const by = Y(opts.baseline).toFixed(1); baseLine = `<line x1="${left}" y1="${by}" x2="${right}" y2="${by}" stroke="${C.grey}" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>`; }
-  return `<svg class="chart-svg" viewBox="0 0 ${w} ${h}">${baseLine}<path d="${d}" fill="none" stroke="${opts.color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>`;
+  const ax = opts.axis;
+  // Two faint solid rules at the labelled values (the dashed one is the athlete's usual, and the only dashed line).
+  const rules = ax ? [ax.hi.v, ax.lo.v].map(v => `<line x1="${left}" y1="${Y(v).toFixed(1)}" x2="${right}" y2="${Y(v).toFixed(1)}" stroke="${C.grey}" stroke-width="1" opacity="0.18"/>`).join('') : '';
+  const svg = `<svg class="chart-svg" viewBox="0 0 ${w} ${h}">${rules}${baseLine}<path d="${d}" fill="none" stroke="${opts.color}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>`;
+  if (!ax) return svg;
+  // Two labels closer than a line of text are pushed apart (a flat weight: 64.2 and 64.4) so neither covers the other.
+  let hiAt = Y(ax.hi.v) / h, loAt = Y(ax.lo.v) / h;
+  if (loAt - hiAt < 0.18) { const mid = (hiAt + loAt) / 2; hiAt = mid - 0.09; loAt = mid + 0.09; }
+  return plotAxes(svg, [{ at: hiAt, text: ax.hi.text }, { at: loAt, text: ax.lo.text }], ax.x);
 }
 function renderCharts(m) {
   const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
   const azColor = az.cls === 'red' ? 'var(--clay)' : az.cls === 'amber' ? 'var(--ochre)' : az.cls === 'green' ? 'var(--court)' : 'var(--ink)';
   const hasLoad = Object.keys(m.daily).length > 0;
+  const head = (title, big) => `<div class="chart-head"><h4>${title}</h4> ${big || ''}</div>`;
+  const loadBig = m.acwr.enough && m.acwr.ratio != null
+    ? `<div class="chart-big" style="color:${azColor}">${round1(m.acwr.ratio)}<span style="font-size:13px;color:var(--muted);margin-left:6px">ACWR · ${az.label}</span></div>`
+    : m.acwr.partial ? `<div class="chart-big" style="font-size:17px;color:var(--muted)">Not enough data</div>`
+    : `<div class="chart-big" style="font-size:17px;color:var(--muted)">Building baseline</div>`;
+  const loadSub = m.acwr.enough && m.acwr.ratio != null
+    ? `<div class="chart-sub">${Math.round(m.acwr.acute)} AU this week vs ${Math.round(m.acwr.chronicWeekly)} AU weekly average${m.acwr.spanDays < 27 ? ` (over ${Math.min(m.acwr.spanDays + 1, 28)} days of history)` : ''}</div>`
+    : m.acwr.partial
+      ? `<div class="chart-sub">${m.cover.total - m.cover.withLoad} of ${m.cover.total} session${m.cover.total === 1 ? '' : 's'} in the last 4 weeks ${m.cover.total - m.cover.withLoad === 1 ? 'has' : 'have'} no duration or RPE, so a ratio would be a wrong number. ${m.cover.total - m.cover.withLoad === 1 ? 'It is' : 'They are'} left out. The ratio comes back when ${m.cover.total - m.cover.withLoad === 1 ? 'it is' : 'those are'} filled in, or once ${m.cover.total - m.cover.withLoad === 1 ? 'it is' : 'they are'} more than 4 weeks old.</div>`
+      : `<div class="chart-sub">Needs ~2 weeks of sessions with a duration logged.</div>`;
   const loadCard = `<div class="chart-card">
-    <h4>Training load</h4>
-    ${m.acwr.enough && m.acwr.ratio != null
-      ? `<div class="chart-big" style="color:${azColor}">${round1(m.acwr.ratio)}<span style="font-size:13px;color:var(--muted);margin-left:6px">ACWR · ${az.label}</span></div>
-         <div class="chart-sub">${Math.round(m.acwr.acute)} AU this week vs ${Math.round(m.acwr.chronicWeekly)} AU weekly average${m.acwr.spanDays < 27 ? ` (over ${Math.min(m.acwr.spanDays + 1, 28)} days of history)` : ''}</div>`
-      : m.acwr.partial
-        ? `<div class="chart-big" style="font-size:17px;color:var(--muted)">Not enough data</div>
-           <div class="chart-sub">${m.cover.total - m.cover.withLoad} of ${m.cover.total} session${m.cover.total === 1 ? '' : 's'} in the last 4 weeks ${m.cover.total - m.cover.withLoad === 1 ? 'has' : 'have'} no duration or RPE, so a ratio would be a wrong number. ${m.cover.total - m.cover.withLoad === 1 ? 'It is' : 'They are'} left out. The ratio comes back when ${m.cover.total - m.cover.withLoad === 1 ? 'it is' : 'those are'} filled in, or once ${m.cover.total - m.cover.withLoad === 1 ? 'it is' : 'they are'} more than 4 weeks old.</div>`
-        : `<div class="chart-big" style="font-size:17px;color:var(--muted)">Building baseline</div>
-           <div class="chart-sub">Needs ~2 weeks of sessions with a duration logged.</div>`}
+    ${head('Training load', loadBig)}
+    ${loadSub}
     ${hasLoad
       ? barsSVG(weeklyLoad(m.daily, 8), C.green) + `<div class="chart-legend">Weekly load (AU = session RPE × minutes), last 8 weeks${
           m.cover && m.cover.total > m.cover.withLoad ? ` · <b>${m.cover.total - m.cover.withLoad} of ${m.cover.total} sessions in the last 4 weeks have no duration or RPE and are left out</b>` : ''}</div>`
@@ -3389,25 +3491,25 @@ function renderCharts(m) {
   const r = m.readiness;
   const rColor = !r || r.delta == null ? 'var(--muted)' : r.delta <= -1 ? 'var(--clay)' : r.delta <= -0.5 ? 'var(--ochre)' : 'var(--court)';
   const readyCard = `<div class="chart-card">
-    <h4>Readiness</h4>
     ${r
-      ? `<div class="chart-big" style="color:${rColor}">${round1(r.latest)}<span style="font-size:13px;color:var(--muted);margin-left:4px">/5${r.baseline != null ? ' · usual ' + round1(r.baseline) : ' · no usual yet'}</span></div>
+      ? `${head('Readiness', `<div class="chart-big" style="color:${rColor}">${round1(r.latest)}<span style="font-size:13px;color:var(--muted);margin-left:4px">/5${r.baseline != null ? ' · usual ' + round1(r.baseline) : ' · no usual yet'}</span></div>`)}
          <div class="chart-sub">${r.delta == null ? 'Their usual starts once they have five check-ins to go on.' : (r.delta >= 0 ? '+' : '') + round1(r.delta) + ' vs their usual (the mean of their last ten check-ins before this one)'}</div>
-         ${lineSVG(m.rser, { color: C.green, baseline: r.baseline, yMin: 1, yMax: 5 })}
+         ${lineSVG(m.rser, { color: C.green, baseline: r.baseline, yMin: 1, yMax: 5,
+           axis: { hi: { v: 5, text: '5' }, lo: { v: 1, text: '1' }, x: axisDays(m.rser[0].iso, m.rser[m.rser.length - 1].iso) } })}
          <div class="chart-legend">The check-in score per session (1–5: sleep, energy, stress and how ready they feel; higher = fresher), as the athlete's app scores it · dashed = their usual now</div>`
-      : `<p class="empty">No readiness check-ins yet.</p>`}
+      : `${head('Readiness')}<p class="empty">No readiness check-ins yet.</p>`}
   </div>`;
   const adh = m.adherence;
   const adhColor = !adh || adh.pct == null ? 'var(--muted)' : adh.pct >= 85 ? 'var(--court)' : adh.pct >= 60 ? 'var(--ochre)' : 'var(--clay)';
   const adhDone = adh ? (adh.done % 1 ? adh.done.toFixed(1) : adh.done) : 0;
+  const adhFrom = adh && adh.pct != null ? axisDays(addDays(todayKey(), -(adh.days - 1)), todayKey()) : [];
   const adhCard = `<div class="chart-card">
-    <h4>Adherence</h4>
     ${adh && adh.pct != null
-      ? `<div class="chart-big" style="color:${adhColor}">${adh.pct}%<span style="font-size:13px;color:var(--muted);margin-left:4px">last ${adh.days < 28 ? adh.days + ' days' : '4 wks'}</span></div>
+      ? `${head('Adherence', `<div class="chart-big" style="color:${adhColor}">${adh.pct}%<span style="font-size:13px;color:var(--muted);margin-left:4px">last ${adh.days < 28 ? adh.days + ' days' : '4 wks'}</span></div>`)}
          <div class="chart-sub">${adhDone} of ${adh.expected} planned sessions completed${adh.extra ? ` (${adh.extra % 1 ? adh.extra.toFixed(1) : adh.extra} more than planned)` : ''}</div>
-         <div class="bar"><div class="bar-fill" style="width:${Math.min(adh.pct, 100)}%;background:${adhColor}"></div></div>
-         <div class="chart-legend">Planned = ${adh.perWeek}/week (their program), over the last ${adh.days} day${adh.days === 1 ? '' : 's'}</div>`
-      : `<p class="empty">Needs a program file and at least one finished session.</p>`}
+         <div class="chart-bar"><div class="bar"><div class="bar-fill" style="width:${Math.min(adh.pct, 100)}%;background:${adhColor}"></div></div><div class="cp-x"><span>0%</span><span>100%</span></div></div>
+         <div class="chart-legend">Planned = ${adh.perWeek}/week (their program), over the last ${adh.days} day${adh.days === 1 ? '' : 's'}${adhFrom.length === 2 ? ` (${adhFrom[0]} to ${adhFrom[1]})` : ''}</div>`
+      : `${head('Adherence')}<p class="empty">Needs a program file and at least one finished session.</p>`}
   </div>`;
   return `<div class="charts">${loadCard}${readyCard}${adhCard}</div>`;
 }
@@ -4206,18 +4308,42 @@ function pillWarnings(eid, vals) {
   if (vals.length > 2) out.push(`${vals.length} pills: two at most.`);
   return out;
 }
+// Folded (round 3 of the coach UX pass, 2026-10-12): what is on the card shows as chips with a ✕ and one link, "Change pill" (or "Add a pill" when there is none);
+// the six groups open only on that tap (`ppOpen` on the draft, so they stay open through a redraw of the screen while the editor is open). A value off the
+// list is always in view, in clay, with its two ways out, and so are the warnings.
 function pillPickHtml(eid) {
-  const vals = (_exDrafts[eid] && _exDrafts[eid].pills) || [];
+  const d = _exDrafts[eid] || {};
+  const vals = d.pills || [];
+  const open = !!d.ppOpen;
   const on = v => vals.some(x => x.toLowerCase() === v.toLowerCase());
   const warn = pillWarnings(eid, vals);
-  return Chips.PILL_GROUPS.map(g => `<div class="pp-grp"><span class="pp-g">${esc(PILL_GROUP_NAME[g] || g)}</span>${
-      Chips.PILLS[g].map(v => `<button type="button" class="pp${on(v) ? ' on' : ''}" aria-pressed="${on(v)}" data-v="${esc(v)}" onclick="pillPick('${eid}', this.dataset.v)">${esc(v)}</button>`).join('')}</div>`).join('') +
+  const listed = vals.filter(v => Chips.pillGroup(v));
+  return `<div class="pp-sel">${listed.map(v => `<span class="pp-chip">${esc(Chips.pillCanon(v))}<button type="button" class="pp-x" data-fk="x:${esc(v)}" data-v="${esc(v)}" aria-label="Take off ${esc(Chips.pillCanon(v))}" title="Take it off" onclick="pillPick('${eid}', this.dataset.v)">✕</button></span>`).join('')}${
+      listed.length ? '' : '<span class="pp-none">No pill</span>'}<button type="button" class="pp-toggle" data-fk="toggle" aria-expanded="${open}" onclick="pillGroups('${eid}')">${open ? 'Done' : listed.length ? 'Change pill' : 'Add a pill'}</button></div>` +
     vals.filter(v => !Chips.pillGroup(v)).map(v => `<div class="pp-off">⚠ “${esc(v)}” is not on the pill list.
       <button type="button" class="btn sm" data-v="${esc(v)}" onclick="pillToNote('${eid}', this.dataset.v)">Move to the note</button>
       <button type="button" class="btn sm" data-v="${esc(v)}" onclick="pillDrop('${eid}', this.dataset.v)">Drop it</button></div>`).join('') +
-    (warn.length ? `<div class="pp-note">${warn.map(w => '⚠ ' + esc(w)).join('<br>')}</div>` : '');
+    (warn.length ? `<div class="pp-note">${warn.map(w => '⚠ ' + esc(w)).join('<br>')}</div>` : '') +
+    `<div class="pp-groups"${open ? '' : ' hidden'}>${Chips.PILL_GROUPS.map(g => `<div class="pp-grp"><span class="pp-g">${esc(PILL_GROUP_NAME[g] || g)}</span>${
+      Chips.PILLS[g].map(v => `<button type="button" class="pp${on(v) ? ' on' : ''}" aria-pressed="${on(v)}" data-fk="p:${esc(v)}" data-v="${esc(v)}" onclick="pillPick('${eid}', this.dataset.v)">${esc(v)}</button>`).join('')}</div>`).join('')}</div>`;
 }
-function paintPills(eid) { const box = document.getElementById('exPills-' + eid); if (box) box.innerHTML = pillPickHtml(eid); }
+// A repaint replaces the buttons, so the one that had the keyboard focus is found again by its data-fk (a ✕ that was just pressed is gone: the link takes it).
+function paintPills(eid) {
+  const box = document.getElementById('exPills-' + eid);
+  if (!box) return;
+  const ae = document.activeElement, fk = ae && box.contains(ae) ? ae.getAttribute('data-fk') : null;
+  box.innerHTML = pillPickHtml(eid);
+  if (fk) {
+    const same = [...box.querySelectorAll('[data-fk]')].find(b => b.getAttribute('data-fk') === fk) || box.querySelector('[data-fk="toggle"]');
+    if (same) same.focus();
+  }
+}
+function pillGroups(eid) {
+  const d = _exDrafts[eid];
+  if (!d) return;
+  d.ppOpen = !d.ppOpen;
+  paintPills(eid);
+}
 function pillPick(eid, v) {
   const d = _exDrafts[eid];
   if (!d) return;
@@ -4248,6 +4374,7 @@ function pillToNote(eid, v) {
   pillDrop(eid, v);
 }
 window.pillPick = pillPick;
+window.pillGroups = pillGroups;
 window.pillDrop = pillDrop;
 window.pillToNote = pillToNote;
 
@@ -4265,7 +4392,7 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, reopen
     reloadPrograms().then(render);
     return;
   }
-  if (!_exDrafts[eid]) _exDrafts[eid] = { athleteId, dayId, blockIdx, exIdx, name: found.ex.name, fields: null, pills: null };
+  if (!_exDrafts[eid]) _exDrafts[eid] = { athleteId, dayId, blockIdx, exIdx, name: found.ex.name, fields: null, pills: null, ppOpen: false };
   // The pill as the card will be saved: an old card's chips fold in (toRx), old spellings become list values.
   if (!_exDrafts[eid].pills) _exDrafts[eid].pills = Chips.pillSplit(Chips.toRx(found.ex).intent);
   const r  = Chips.rxOf(found.ex);
@@ -4296,7 +4423,7 @@ function openExEditor(athleteId, dayId, blockIdx, exIdx, eid, expectName, reopen
           `<option value="${k}"${st.kind === k ? ' selected' : ''}>${Chips.DOSE_LABEL[k]}</option>`).join('')}
       </select></label>`;
   const sideBox = `<label class="exf"><span>Per side</span>
-      <input type="checkbox" id="exSide-${eid}"${st.side ? ' checked' : ''} style="width:auto"></label>`;
+      <input type="checkbox" id="exSide-${eid}"${st.side ? ' checked' : ''}></label>`;
 
   box.innerHTML = `
     <div class="exed-title">Editing <b>${esc(found.ex.name)}</b> · Day ${esc(dayId)}</div>
@@ -5158,7 +5285,9 @@ function weightPanel(a) {
   return `<section class="panel wtpanel"><details class="wtdet" id="wtdet">
     <summary><span class="wt-t">Body weight</span> · <b>${round1(kg).toFixed(1)} kg</b> · ${gap === 0 ? 'today' : gap === 1 ? 'yesterday' : gap + ' days ago'} · ${c30 ? fmtDeltaKg(c30.delta) + ' kg over 30 days' : 'not enough readings for a 30-day change'}${c90 ? ' · ' + fmtDeltaKg(c90.delta) + ' over 90' : ''}</summary>
     ${ser.length > 1
-      ? lineSVG(ser, { color: C.green, yMin: lo - pad, yMax: hi + pad, dots: false })
+      ? lineSVG(ser, { color: C.green, yMin: lo - pad, yMax: hi + pad, dots: false, w: 520, h: 120,
+          // the lowest and highest point of the line, in kg, and its first and last day: the same scale the line is drawn on
+          axis: { hi: { v: hi, text: round1(hi).toFixed(1) + ' kg' }, lo: { v: lo, text: round1(lo).toFixed(1) + ' kg' }, x: axisDays(ser[0].day, ser[ser.length - 1].day) } })
         + `<div class="chart-legend">${WT_AVG_WINDOW}-day rolling average, last 90 days · ${keys.length} reading${keys.length === 1 ? '' : 's'} all time</div>`
       : `<p class="empty">One reading so far — a line needs a few more.</p>`}
   </details></section>`;
@@ -6107,6 +6236,33 @@ window.setBoardScope = setBoardScope;
 window.forgetContact = forgetContact;
 
 // --- LINKS (ported) ----------------------------------------------------------
+// The Library tab (round 3 of the coach UX pass, 2026-10-12). 64 items were 64 cards of 85 px, each with its whole address in mono and, above them all, two big
+// green buttons and a sentence. Now: a small header line (the count, and the two publish buttons as plain buttons), a panel per kind, a fold per shelf with its
+// count, and a row of about 44 px per item: its title, its kind and meta in muted text, and on the right ONE Copy link (an item with more than one address opens a
+// small choice, App / Web FA / Web EN; one address is copied straight away) and Hide / Publish. The sentence about what publishing does is in a "How this works"
+// fold at the foot. Which folds are open is kept in _libOpen across redraws; the first time the Library is drawn it opens every shelf when the whole library is
+// under LIB_OPEN_ALL items and none of them otherwise. The addresses copied are the same ones as before.
+const LIB_OPEN_ALL = 12;
+let _libOpen = null;   // the keys of the folds that are open (shelf:<kind>:<category>, hidden:<kind>, how); null until the Library has been drawn with items in it
+function libCopyClose(except) {
+  document.querySelectorAll('.lr-pick').forEach(p => {
+    if (p === except) return;
+    p.hidden = true;
+    const b = p.parentNode.querySelector('.lr-copy-btn'); if (b) b.setAttribute('aria-expanded', 'false');
+  });
+}
+// Copy link on an article: open (or close) the small choice of addresses beside the button.
+function libCopyMenu(btn) {
+  const pick = btn.parentNode.querySelector('.lr-pick');
+  if (!pick) return;
+  const opening = pick.hidden;
+  libCopyClose(pick);
+  pick.hidden = !opening;
+  btn.setAttribute('aria-expanded', String(opening));
+}
+window.libCopyMenu = libCopyMenu;
+document.addEventListener('click', e => { if (!e.target.closest || !e.target.closest('.lr-copy')) libCopyClose(null); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') libCopyClose(null); });
 async function renderLinks() {
   const BASE = SITE + '/program.html';
   if (route().view !== 'links') return;
@@ -6114,25 +6270,32 @@ async function renderLinks() {
   // published items were listed and nothing could hide one again (toggleLibraryItem had no button).
   const shelf = (kind) => (S.libCats || []).filter(c => c.kind === kind).map(c => ({
     cat: c, items: (S.lib || []).filter(l => l.kind === kind && l.category_id === c.id) }));
+  if (_libOpen === null && (S.lib || []).length) {
+    _libOpen = new Set();
+    if (S.lib.length < LIB_OPEN_ALL) ['article', 'workout'].forEach(k => shelf(k).forEach(g => { if (g.items.some(l => l.published)) _libOpen.add('shelf:' + k + ':' + g.cat.id); }));
+  }
+  const openAttr = key => _libOpen && _libOpen.has(key) ? ' open' : '';
   const row = (l) => {
     const d = l.data || {};
     const id = encodeURIComponent(d.id || '');
     const app = `${BASE}?${l.kind === 'article' ? 'article' : 'workout'}=${id}`;
     const links = l.kind === 'article'
-      ? [['App', app], ['Web · FA', `${SITE}/fa/articles/${id}.html`], ['Web · EN', `${SITE}/en/articles/${id}.html`]]
+      ? [['App', app], ['Web FA', `${SITE}/fa/articles/${id}.html`], ['Web EN', `${SITE}/en/articles/${id}.html`]]
       : [['App', app]];
-    const meta = l.kind === 'article'
-      ? `${esc(d.readMins || '?')} min read`
-      : [d.duration, d.equipment].filter(Boolean).map(esc).join(' · ');
+    const meta = [l.kind === 'article' ? 'article' : 'workout',
+      l.kind === 'article' ? `${esc(d.readMins || '?')} min read` : [d.duration, d.equipment].filter(Boolean).map(esc).join(' · '),
+      l.updated_at ? 'updated ' + esc(prettyDate(String(l.updated_at).slice(0, 10))) : ''].filter(Boolean).join(' · ');
+    const copy = links.length === 1
+      ? `<button class="btn sm copy-btn-js" data-url="${esc(links[0][1])}" title="Copy ${esc(links[0][1])}">Copy link</button>`
+      : `<span class="lr-copy"><button class="btn sm lr-copy-btn" aria-expanded="false" aria-haspopup="true" onclick="libCopyMenu(this)" title="Copy the in-app link or a web page">Copy link ▾</button>
+          <span class="lr-pick" hidden>${links.map(([lab, u]) => `<button class="btn sm copy-btn-js" data-url="${esc(u)}" title="Copy ${esc(u)}">${esc(lab)}</button>`).join('')}</span></span>`;
     return `<div class="link-row ${l.published ? '' : 'hiddenitem'}">
       <div class="link-row-info">
-        <div class="link-row-title">${esc(d.title || l.slug)}${l.published ? '' : ' <span class="chip">hidden</span>'}</div>
-        <div class="link-row-url">${esc(app)}</div>
-        <div class="link-row-meta">${meta}${l.updated_at ? ' · updated ' + esc(prettyDate(String(l.updated_at).slice(0, 10))) : ''}</div>
+        <span class="link-row-title" title="${esc(d.title || l.slug)}">${esc(d.title || l.slug)}</span>${l.published ? '' : '<span class="chip">hidden</span>'}
+        <span class="link-row-meta">${meta}</span>
       </div>
-      <span class="acts" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-        ${links.map(([lab, u]) => `<button class="btn sm ${lab === 'App' ? 'primary' : ''} copy-btn-js" data-url="${esc(u)}" title="Copy ${esc(u)}">Copy ${esc(lab)}</button>`).join('')}
-        <button class="btn sm ${l.published ? 'danger' : ''}" onclick="setLibraryPublished(${jsq(l.slug)}, ${l.published ? 'false' : 'true'})">${l.published ? 'Hide' : 'Publish'}</button>
+      <span class="lr-acts">${copy}
+        <button class="btn sm" onclick="setLibraryPublished(${jsq(l.slug)}, ${l.published ? 'false' : 'true'})">${l.published ? 'Hide' : 'Publish'}</button>
       </span>
     </div>`;
   };
@@ -6140,25 +6303,42 @@ async function renderLinks() {
     const groups = shelf(kind);
     const shown = groups.map(g => {
       const pub = g.items.filter(l => l.published);
-      return pub.length ? `<div class="links-cat">${esc(g.cat.title)}</div>${pub.map(row).join('')}` : '';
+      const key = 'shelf:' + kind + ':' + g.cat.id;
+      return pub.length ? `<details class="lib-shelf" data-lk="${esc(key)}"${openAttr(key)}><summary>${esc(g.cat.title)} <span class="lib-n">${pub.length}</span></summary>${pub.map(row).join('')}</details>` : '';
     }).join('');
     const hidden = groups.flatMap(g => g.items.filter(l => !l.published));
     return `<section class="panel" style="margin-top:16px"><div class="phead"><span class="t hd">${title}</span>
         <span class="r">${groups.reduce((n, g) => n + g.items.filter(l => l.published).length, 0)} published</span></div>
       ${shown || `<p class="empty">Nothing published yet.</p>`}
-      ${hidden.length ? `<details class="rawlog"><summary>Hidden · ${hidden.length}</summary>${hidden.map(row).join('')}</details>` : ''}
+      ${hidden.length ? `<details class="rawlog lib-hidden" data-lk="hidden:${kind}"${openAttr('hidden:' + kind)}><summary>Hidden · ${hidden.length}</summary>${hidden.map(row).join('')}</details>` : ''}
     </section>`;
   };
-  $('content').innerHTML = `<div class="controls">
-      <button class="btn primary sm" onclick="pickLibraryFile('workout')" title="Publish a workout JSON written by the /workout skill">+ Publish workout</button>
-      <button class="btn primary sm" onclick="pickLibraryFile('article')" title="Publish an article JSON written by the /article skill (the English file, never a .fa.json)">+ Publish article</button>
-      <span class="empty" style="align-self:center">The Library lives on the server: publishing or hiding here changes every athlete's app at once, with no deploy.</span>
+  const nAll = (S.lib || []).length, nHid = (S.lib || []).filter(l => !l.published).length;
+  $('content').innerHTML = `<div class="lib-head">
+      <span class="lib-count">${nAll} item${nAll === 1 ? '' : 's'}${nHid ? ` · ${nHid} hidden` : ''}</span>
+      <span class="lib-acts">
+        <button class="btn sm" onclick="pickLibraryFile('workout')" title="Publish a workout JSON written by the /workout skill">+ Publish workout</button>
+        <button class="btn sm" onclick="pickLibraryFile('article')" title="Publish an article JSON written by the /article skill (the English file, never a .fa.json)">+ Publish article</button>
+      </span>
     </div>
     ${LOAD_ERR.library ? `<p class="empty" style="color:var(--clay-ink)">The library did not load: ${esc(LOAD_ERR.library)}</p>` : ''}
     ${section('article', 'Articles — the Playbook')}
-    ${section('workout', 'Workouts — Sessions')}`;
+    ${section('workout', 'Workouts — Sessions')}
+    <details class="how" data-lk="how"${openAttr('how')}><summary>How this works</summary>
+      <p>The Library lives on the server: publishing or hiding here changes every athlete's app at once, with no deploy.</p>
+      <p><b>Copy link</b> copies the address of the item in the app. An article also has its two public web pages, Web FA and Web EN.</p>
+      <p><b>Hide</b> takes an item off every athlete's app. The file and its web page stay. <b>Publish</b> puts it back.</p>
+      <p><b>+ Publish workout</b> and <b>+ Publish article</b> take a file written by /workout or /article. The confirm says what is new, and what replaces a live or a hidden item.</p>
+    </details>`;
   $('content').querySelectorAll('.copy-btn-js').forEach(btn => {
-    btn.addEventListener('click', () => copyText(btn.dataset.url, btn));
+    btn.addEventListener('click', () => {
+      copyText(btn.dataset.url, btn);
+      const pick = btn.closest('.lr-pick');
+      if (pick) setTimeout(() => libCopyClose(null), 900);   // the choice folds away once it has done its job
+    });
+  });
+  $('content').querySelectorAll('details[data-lk]').forEach(d => {
+    d.addEventListener('toggle', () => { if (!_libOpen) return; if (d.open) _libOpen.add(d.dataset.lk); else _libOpen.delete(d.dataset.lk); });
   });
 }
 async function setLibraryPublished(slug, publish) {

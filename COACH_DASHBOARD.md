@@ -739,9 +739,10 @@ comparison and no verdict, because comparing against nothing would read as a wee
 
 ### Editing a prescription (✎)
 
-✎ sits at the end of the prescribed column (always visible on a touch screen). The editor names
-the exercise it is editing and takes sets, the dose (one value plus its kind: reps, time, distance
-or work), per side, RPE, tempo, rest and your note. **Save** then:
+✎ sits at the top right of the prescribed column and is **always visible**: a faint grey glyph that goes dark green on hover and focus (until round 3 of the UX pass,
+2026-10-12, it was hidden until the row was hovered on a PC). The editor names
+the exercise it is editing and takes, on **one row** (equal heights and aligned labels; two to a row on a phone), sets, the dose (one value plus its kind: reps, time, distance
+or work, the Dose select drawn like the boxes), per side, RPE, tempo, rest, then the pill and your note. **Save** then:
 
 1. checks the fields against the rx contract — reps one whole number (a range or a time is refused
    with the reason), a time it can read, a distance with a unit, sets 1–99, RPE 6–10 or a 6–10 range,
@@ -772,7 +773,10 @@ the athlete block. Cards are matched by day, block and name, so a rename reads a
 
 **The pill (CHP-2, 2026-10-11).** The editor has a **Pill** picker: the closed list from `assets/js/chips.js`
 (`Chips.PILLS`, the same object as `check_program.py` and SCHEMA.md), grouped as Hands, Lead side, Intent, Hold,
-Brakes and Pace. A tap puts a value on, a second tap takes it off, and a value from a group already on takes that
+Brakes and Pace. **It is folded** (round 3, 2026-10-12): the pill on the card shows as a chip with a ✕ (*No pill* when there is none) and one link, **Change pill**
+(**Add a pill** when there is none); the six groups open only on that tap, the link then says **Done**, and they stay open through a redraw while the editor is open
+(`ppOpen` on the draft, gone when the editor closes). A value off the list and the warnings are never folded. A tap puts a value on, a second tap (or the chip's ✕) takes it off,
+and a value from a group already on takes that
 one's place: at most two, one per group. A third is refused with a toast. There is no box to type a new value: one
 joins the list only on your word. A hold value is warned unless Tempo is `iso`, and *easy pace* unless RPE is empty.
 An old spelling on a card ("right leg first") shows as its list value ("right side first") and is saved that way.
@@ -788,6 +792,14 @@ its chip issues.
 Training load, readiness and adherence sit as a strip of three above the day cards; the full charts
 are behind **Charts**. §6 explains all three. They used to be three full-width cards above
 everything, which pushed the actual work below the fold on every athlete.
+
+**The charts have axes** (round 3, 2026-10-12). Each card is the title and the number on one line, one line of what it means, the plot, and the legend at its
+foot (about 240 px at 1440, 280 before; from 900 px the readiness card is the wide one and adherence the narrow one). Every plot says what it is measured against,
+in muted 12 px text from the same scale the marks use: **readiness** 5 and 1 at the height of its two rules, with its dashed *usual* line and a point per check-in, and
+the dates of the first and last check-in under it; **training load** 0 and the tallest week (AU) beside its eight weekly bars, and *w/c* the Monday of the first and of the last
+week under them; **adherence** 0 % and 100 % under its bar, and the window's two dates in its legend. **Body weight** (folded on The work) gets the same: the highest and lowest
+kg of its line (labels pushed apart when the line is nearly flat) and its first and last day. The labels are HTML beside and under the SVG (`plotAxes()`), not text drawn
+in it, because the SVG shrinks with its card and drawn text fell under 12 px on a phone. The numbers and rules are unchanged (§6).
 
 ### Personal records — what they can lift, and what has gone stale
 
@@ -811,7 +823,7 @@ here and one lift there — both sides run the same name matcher, on purpose.
 
 Under the Personal records (and above the day cards) sits **one compact panel** with the body weight the athlete logs in their training app: its header line reads
 *Body weight · 64.7 kg · today · −1.3 kg over 30 days · −2.5 over 90* (the latest reading and how long ago, then the change of the 7-day average over 30 and
-over 90 days, the same average the app draws), and the chart is folded under it in `<details id="wtdet">`, **shut until you open it** and kept open through
+over 90 days, the same average the app draws), and the chart (with its axes: the highest and lowest kg of the line, its first and last day) is folded under it in `<details id="wtdet">`, **shut until you open it** and kept open through
 a redraw (`snapTabBody()` collects every `details[id]`). It is **absent, not empty, when there is no reading**. It moved here on 2026-10-12 (round 2): the
 weight comes from the training app, not from Proof, and a coached athlete who never ticks a habit has no Proof tab to find it on. Read-only, never scored
 (`weightPanel()`; `proof-home` drives it).
@@ -989,8 +1001,15 @@ copy. (Until 2026-10-10 it was offered for everyone and this manual said their l
 `supabase/stage45_forget_contact_guard.sql`, applied 2026-10-11, makes the server refuse a coached athlete too.) It is
 not a full erasure: their login still works, so a phone they still use can upload again.
 
-**The Library tab** (`#links`) lists every workout and article, published or hidden, with *Copy App*
-(the in-app link) and, for articles, *Copy Web · FA* and *Copy Web · EN* (the public pages). **Hide**
+**The Library tab** (`#links`) lists every workout and article, published or hidden, as **compact rows** (round 3 of the UX pass, 2026-10-12; they were
+85 px cards with the whole address printed, 64 of them). A small header line gives the count (*64 items · 6 hidden*) and holds **+ Publish workout** and
+**+ Publish article** as plain buttons (no primary button on the screen). Each kind is one panel; inside it each **shelf** (category) is a fold with its count, and a row
+(about 44 px) is the title, its kind and meta (minutes or equipment, the updated date) in muted text, and on the right **one Copy link** and **Hide** / **Publish**.
+An item with one address (a workout) copies it at once; an article opens a small choice beside the button, **App**, **Web FA**, **Web EN**, which copies the same three
+addresses as before and folds away by itself a moment later. A hidden item sits in its kind's **Hidden · N** fold with a *hidden* marker. **The first time the Library is
+drawn every shelf is open when the whole library is under 12 items, and every shelf is folded otherwise**; the folds you open stay open through a redraw and a visit
+to another tab (`_libOpen`, a module variable, so not after a reload of the page). What publishing does is explained in a **How this works** fold at the foot (`<details class="how">`).
+**Hide**
 takes an item off every athlete's app at once (the file and its web page stay); **Publish** puts it
 back. The list is read in pages (audit SERVER-10), so a server with a row cap still shows every item. **Publishing a file asks properly**
 (audit TOOLS-6, 2026-10-11): the confirm says per item whether it is *new*, *replaces the live one* or *replaces a hidden one, which STAYS hidden*
