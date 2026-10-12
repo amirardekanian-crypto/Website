@@ -59,7 +59,7 @@ The two apps are **linked both ways**:
 | From | To | Where |
 |---|---|---|
 | `program.html` | Proof | **Daily Habits card** on Home *and* at the end of Game Plan (a plain shortcut — it shows no level or XP, because that is Proof's job). On Home it sits **below** This Week and the day cards since 2026-09-26: training leads, habits follow. Under it on Home, **today's habits, ticked in place** (Proof embedded, `?embed=1`; see *Embedded on the training app's Home*) |
-| Proof | `program.html` | **Your training programme** card at the bottom of Today, and a row in Settings (behind the initials button) |
+| Proof | `program.html` | The session row at the end of Today's list (its → opens the programme), and a row in Settings (behind the initials button). The **Your training programme** card at the bottom of Today went on 2026-10-12; a free athlete keeps **Want the training too?** there |
 
 Both are the same origin with the same PWA scope, so tapping through from an installed
 app stays inside the app shell — no browser bounce, no second install. The handover
@@ -247,6 +247,22 @@ on the phone either way. Never in the demo or a coach preview; the embed has no 
 ### 01 · TODAY — the daily loop
 The screen they actually live on. **In this order, and the order is the point:**
 
+> **A logbook, not a dashboard (2026-10-12, the UX audit's batch B; the audit is the private page
+> https://claude.ai/artifact/NcodiruuPzbdiwZ13FQMsM).** Everything on Today must be logged or must say
+> whether today counts. The card carries the game on **one line** (the level ring at 46 px with no
+> LEVEL caption, the rank, XP to next, the day-streak flame as a small tile), the bar, the verdict and
+> the week, then **one line that says what to do now: the nudge**, typed, with no button (its button
+> opened the habit's history page, not a way to log it). That line is the one "what now" slot: clay
+> with *Streak at risk · N to go before midnight* when the streak is at risk (the separate strip went),
+> and the *Filling in* bar on an earlier day (the separate banner went, the card gets a clay ring). The
+> card went from about 360 px to about 195, so five rows sit fully above the fold at 390 × 844 (it was
+> about three). Under the list: the library offer, the board notice, **one quest line while a run is
+> on** (`questLine()`, into Progress; Amir, "3 yes"), the tour prompt until it has run, and for a free
+> athlete *Want the training too?*. **Gone from Today:** the dark nudge card, the roll call row (Crew
+> keeps roll call; Amir, "2 demote", after 0 lines in 7 days), the week's heat map with "days on
+> target" and XP (they are Progress's week table now) and a coached athlete's programme card.
+> The numbered list below is the older account, kept for its reasons; where it disagrees, this note wins.
+
 1. **The hero card** — a floating white card (Amir, 2026-08-01: *"i like the design of the
    hero that looks like a card"*) carrying, on one row: the **level ring**, the **rank**
    (a link into the Locker), **distance to the next level** and its bar, and the **streak
@@ -386,8 +402,8 @@ The screen they actually live on. **In this order, and the order is the point:**
 > list rather than a wall in front of it. If you add anything to this screen, it goes
 > *below* the habit list unless it is something the athlete must act on first.
 
-**Streak at risk** gets one clay strip immediately above the list, rather than being
-said three ways at once (card, day-bar and header flag) as it was before.
+**Streak at risk** is said once, in the card's nudge line, in clay with the count (since 2026-10-12; it
+was a clay strip above the list, and before that three things at once: card, day-bar and header flag).
 
 **The wins card** (`winsCard()`, PRF-02) sits between the hero and the list while it holds
 anything, until it is tapped, and stands down while a past day is being filled in. What lands
@@ -823,6 +839,14 @@ the hero tile and the wall chip can never disagree about the same integer.
 
 ### 02 · PROGRESS — where do I stand
 Habits and achievements merged, because they were two views of one question.
+
+> **Since 2026-10-12 (the UX audit):** quests come **first** while a run is on (the one thing here that
+> expires), the four stats sit in **one row**, and one **week table** (`weekTable()`) replaces both the
+> habit list that sat here (rings, five pips, a lavender tint on rows done today that had no key) and
+> the heat map at the foot of Today: a row per habit in Today's order, seven day cells (hit, part,
+> none, before you started; `rosterOn(k)` per day, compared by id), the habit's level ring at the end,
+> the row opening the habit's page, and paused add-ons as dim rows. Its heading carries *N of 7 on
+> target · +XP*. The five consistency pips are on the habit's page. Milestones below are unchanged.
 
 Opens straight on **four season stats**: days logged, **milestones** (the same count as the
 section at the foot, since POL-02; the tile said *Badges 8/72*, tiers included), **day streak** (as the

@@ -17,6 +17,8 @@ const only = process.argv.slice(2);
 
 const lastOf = (cs, pred) => cs.filter(pred).slice(-1)[0];
 const isUpd = (t) => c => c.kind === 'from' && c.name === t && c.op === 'update';
+// The File's Danger zone is folded until it is needed (2026-10-12): open it the way the coach would, before touching what is inside it.
+const openDanger = async (page) => { await page.evaluate(() => { const d = document.getElementById('dangerzone'); if (d) d.open = true; }); };
 const rowLoc = (page, name) => page.locator('.wday.open .cmp-row', { hasText: name }).first();
 async function openEditor(page, exName) {
   await rowLoc(page, exName).locator('.rx-edit').click();
@@ -767,6 +769,7 @@ S['backlog-late-note'] = async (b) => {
 S['athlete-delete-all'] = async (b) => {
   const r = { id: 'athlete-delete-all', title: 'File → Danger zone → Delete training history: one call, one transaction', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'a/ben_test/file' });
+  await openDanger(page);
   const before = await L.db(page);
   const n0 = await L.nCalls(page);
   await page.locator('button', { hasText: /Delete training history/ }).click();
@@ -791,6 +794,7 @@ S['athlete-delete-all'] = async (b) => {
 S['athlete-delete-fails'] = async (b) => {
   const r = { id: 'athlete-delete-fails', title: 'Delete training history when the server refuses: nothing goes, and the message fits the cause', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'a/ben_test/file' });
+  await openDanger(page);
   const cases = [
     { name: 'a server error', set: () => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_delete_training_history', message: 'fixture: connection reset', times: 1 }), say: /Nothing was deleted: fixture: connection reset/ },
     { name: 'a lapsed sign-in', set: () => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_delete_training_history', message: 'permission denied for function coach_delete_training_history', times: 1 }), say: /sign-in may have lapsed/ },
@@ -850,7 +854,7 @@ S['erase-athlete'] = async (b) => {
   const r = { id: 'erase-athlete', title: 'File → Danger zone → Erase completely…: a dry run first, the id typed, one real call, everything gone', checks: [] };
   const { page, log } = await L.openCoach(b, {});
   await seedErasable(page);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   const before = JSON.stringify(await L.db(page));
   const n0 = await L.nCalls(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
@@ -915,7 +919,7 @@ S['erase-guards'] = async (b) => {
     D.programs.push({ athlete_id: 'amir_ardekani', data: p, updated_at: new Date().toISOString(), updated_by: null });
   });
   await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('#eraseIn').waitFor();
   const n0 = await L.nCalls(page);
@@ -926,9 +930,9 @@ S['erase-guards'] = async (b) => {
   await page.locator('.erase button', { hasText: 'Cancel' }).click();
   check(r, 'Cancel closes the panel and brings the button back', (await page.locator('.erase').count()) === 0 && (await page.locator('button', { hasText: /Erase completely/ }).count()) === 1, '');
   await page.locator('button', { hasText: /Erase completely/ }).click(); await page.locator('#eraseIn').waitFor();
-  await L.go(page, 'athletes'); await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'athletes'); await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   check(r, 'an open panel does not follow the coach to another screen', (await page.locator('.erase').count()) === 0, '');
-  await L.go(page, 'a/amir_ardekani/file');
+  await L.go(page, 'a/amir_ardekani/file'); await openDanger(page);
   const t = (await page.locator('#content').innerText()).replace(/\s+/g, ' ');
   check(r, 'the board identity gets no Erase button and the page says why', (await page.locator('button', { hasText: /Erase completely/ }).count()) === 0 && /Not offered here/.test(t), t.slice(-300));
   const d = await L.db(page);
@@ -943,7 +947,7 @@ S['erase-fails'] = async (b) => {
   const r = { id: 'erase-fails', title: 'Erase completely… when the server cannot or will not: nothing goes, and the words fit the cause', checks: [] };
   const { page, log } = await L.openCoach(b, {});
   await seedErasable(page);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   const open = async () => { await page.locator('button', { hasText: /Erase completely/ }).click(); await page.waitForFunction(() => !!document.querySelector('.erase #eraseIn, .erase .eh'), null, { timeout: 5000 }); await L.settle(page, 250); };
   const intact = async () => { const d = await L.db(page); return d.programs.some(x => x.athlete_id === 'zed_erase') && d.session_history.filter(x => x.athlete_id === 'zed_erase').length === 2 && d.erasure_log.length === 0; };
 
@@ -1027,7 +1031,7 @@ S['erase-forms'] = async (b) => {
     NAMES.forEach((n, i) => D.hab_intake.push({ id: 'bulk-' + (i + 1), created_at: now, lang: 'fa', name: 'Bulk ' + n, email: 'bulk' + (i + 1) + '@example.invalid', contact: '@bulk' + (i + 1), programme: 'Set', payload: {}, status: 'handled', handled_at: now }));
   }, NAMES);
   await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   let t = await erasePanelText(page);
@@ -1114,7 +1118,7 @@ S['erase-forms'] = async (b) => {
     D.hab_contacts.push({ athlete_id: 'uno_erase', email: 'uno@example.invalid', whatsapp: null, source: 'proof.html', tier: 'coached', note: null, created_at: now, updated_at: now, display_name: 'Uno' });
     D.hab_intake.push({ id: 'uno-form', created_at: now, lang: 'en', name: 'Uno Erase', email: 'uno@example.invalid', contact: '', programme: 'Set', payload: {}, status: 'handled', handled_at: now }); });
   await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
-  await L.go(page, 'a/uno_erase/file');
+  await L.go(page, 'a/uno_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   t = await erasePanelText(page);
@@ -1124,7 +1128,7 @@ S['erase-forms'] = async (b) => {
   // an athlete with no login and no form: the alert does not claim a sign-in account, and says that no form went
   await seedBare(page, 'nolo_erase', 'Nolo', 'Erase');
   await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
-  await L.go(page, 'a/nolo_erase/file');
+  await L.go(page, 'a/nolo_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   t = await erasePanelText(page);
@@ -1180,7 +1184,7 @@ S['erase-slow'] = async (b) => {
   const r = { id: 'erase-slow', title: 'Erase completely… when the server is slow: Stop waiting after 30 s, and a late success still finishes (fake clock)', checks: [] };
   const { page, log } = await L.openCoach(b, {});
   await seedErasable(page);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   await page.locator('#eraseIn').fill('zed_erase');
@@ -1199,7 +1203,7 @@ S['erase-slow'] = async (b) => {
   // meanwhile the coach opens ANOTHER athlete's panel and starts typing the id
   await page.locator('.erase button', { hasText: 'Close' }).click();
   await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 0; });
-  await L.go(page, 'a/ben_test/file');
+  await L.go(page, 'a/ben_test/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.clock.runFor(200); await L.settle(page, 300); await page.clock.runFor(200);
   await page.locator('.erase #eraseIn').waitFor();
@@ -1221,7 +1225,7 @@ S['erase-stale'] = async (b) => {
   const r = { id: 'erase-stale', title: 'Erase completely…: an old preview answer never overwrites a newer panel (cancel while loading, then reopen)', checks: [] };
   const { page, log } = await L.openCoach(b, {});
   await seedErasable(page);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   const reopenAfterCancel = async () => {
     await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 2500; });
     await page.locator('button', { hasText: /Erase completely/ }).click();       // answer #1 will take 2.5 s
@@ -1263,7 +1267,7 @@ S['erase-forms-unreadable'] = async (b) => {
   const r = { id: 'erase-forms-unreadable', title: 'Erase completely… when the intake forms did not load: the finder says so and is switched off', checks: [] };
   const { page, log } = await L.openCoach(b, { seed: { stub: { fail: [{ kind: 'from', name: 'hab_intake', op: 'select', message: 'fixture: the forms are unreadable', times: 99 }] } } });
   await seedErasable(page);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   const t = await erasePanelText(page);
@@ -3008,18 +3012,22 @@ S['library-publish-guards'] = async (b) => {
 S['file-preview-wording'] = async (b) => {
   const r = { id: 'file-preview-wording', title: 'The File tab says the preview shows the programme only, and the preview bar in program.html says the same', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/file' });
+  // Since 2026-10-12 Their app is a row of Contact and access: its one-line hint is on the row and its full explanation (what the preview
+  // shows and does not) is the group's How this works, one tap away. textContent reads a folded fold too.
   const panel = await page.evaluate(() => {
-    const h = [...document.querySelectorAll('.sec')].find(x => /their app/i.test(x.innerText));   // the heading is drawn in capitals, which innerText returns
-    const p = h && h.nextElementSibling;
-    return p ? p.innerText.replace(/\s+/g, ' ').trim() : '';
+    const row = [...document.querySelectorAll('.frow')].find(x => /their app/i.test(x.querySelector('.frow-l').textContent));
+    const how = document.getElementById('how-contact');
+    const theirs = how ? [...how.querySelectorAll('p')].find(p => /their app/i.test(p.textContent)) : null;
+    return ((row ? row.innerText : '') + ' ' + (theirs ? theirs.textContent : '')).replace(/\s+/g, ' ').trim();
   });
   check(r, 'the File tab does not promise "their real data" or "exactly as they see it"', !!panel && !/real data|exactly as they see/i.test(panel), panel);
   check(r, 'it says the preview shows the programme only', /programme only/.test(panel), panel);
   check(r, 'it says what is not in it (sets, weights, records, habits) and where to read that (The work and Proof)', /sets, weights, records, habits/.test(panel) && /The work and Proof/.test(panel), panel);
   // The two buttons still open the read-only preview of this athlete.
   await page.evaluate(() => { window.__opened = []; window.open = u => { window.__opened.push(String(u)); return null; }; });
-  await page.getByRole('button', { name: 'View their app' }).click();
-  await page.getByRole('button', { name: 'View their Proof' }).click();
+  // (The header carries a View their app too, on every sub-tab: these are the File's own two buttons.)
+  await page.locator('#tabbody').getByRole('button', { name: 'View their app' }).click();
+  await page.locator('#tabbody').getByRole('button', { name: 'View their Proof' }).click();
   const opened = await page.evaluate(() => window.__opened);
   check(r, 'View their app opens program.html for that athlete in preview mode', /\/program\.html\?client=ava_test&preview=1$/.test(opened[0] || ''), opened);
   check(r, 'View their Proof opens habits.html for that athlete in preview mode', /\/habits\.html\?client=ava_test&preview=1$/.test(opened[1] || ''), opened);
@@ -3158,8 +3166,10 @@ S['intake-outcome'] = async (b) => {
   check(r, 'it is saved with no athlete', !!c2 && c2.payload.p_outcome === 'not_a_fit' && c2.payload.p_athlete_id === null, c2 && c2.payload);
   // 3. the athlete's File says where they came from
   await L.go(page, 'a/ava_test/file'); await L.settle(page, 700);
-  const meta = (await page.locator('.meta-table').first().innerText()).replace(/\s+/g, ' ');
-  check(r, 'the File says "Came from" the application, its programme and its outcome, with a link to Intake', /came from/i.test(meta) && /Set — \$180/.test(meta) && /Became a client/.test(meta) && (await page.locator('.meta-table a[href="#intake"]').count()) === 1, meta.slice(0, 400));
+  // (2026-10-12: Came from is a row of Contact and access, no longer a line of the Program file table.)
+  const cameRow = page.locator('.frow', { has: page.locator('.frow-l', { hasText: /^came from$/i }) });
+  const meta = (await cameRow.first().innerText()).replace(/\s+/g, ' ');
+  check(r, 'the File says "Came from" the application, its programme and its outcome, with a link to Intake', /came from/i.test(meta) && /Set — \$180/.test(meta) && /Became a client/.test(meta) && (await cameRow.locator('a[href="#intake"]').count()) === 1, meta.slice(0, 400));
   // 4. clearing it
   await L.go(page, 'intake'); await L.settle(page, 500);
   await card('Fixture Applicant One').locator('summary').click();
@@ -3169,7 +3179,7 @@ S['intake-outcome'] = async (b) => {
   const c3 = lastOf(await L.callsSince(page, n0), c => c.name === 'set_intake_outcome');
   check(r, 'clearing sends a null outcome and no athlete', !!c3 && c3.payload.p_outcome === null && c3.payload.p_athlete_id === null, c3 && c3.payload);
   await L.go(page, 'a/ava_test/file'); await L.settle(page, 700);
-  check(r, 'and the File no longer says where they came from', !/came from/i.test(await page.locator('.meta-table').first().innerText()), '');
+  check(r, 'and the File no longer says where they came from', !/came from/i.test(await page.locator('#tabbody').innerText()), '');
   // 5. a server without stage61
   await L.go(page, 'intake'); await L.settle(page, 500);
   await page.evaluate(() => { window.__STUB.missingRpc = ['set_intake_outcome']; });
@@ -3198,7 +3208,7 @@ S['erase-linked-form'] = async (b) => {
     return hardRefresh();
   });
   await L.settle(page, 900);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   const t = await erasePanelText(page);
@@ -3479,6 +3489,106 @@ S['file-redraw-keeps-work'] = async (b) => {
   for (const [name, fn] of [['toggling a day card (a tab-body redraw)', () => toggleWorkDay(2)], ['a full redraw', () => { assemble(); render(); }]]) {
     await page.evaluate(fn); await L.settle(page, 700);
     check(r, name + ': the raw log is still open', await rawOpen(), '');
+  }
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── The athlete header and the File's four groups (2026-10-12, round 1 of the coach.html redesign) ──────────────────────────────────────
+// The header says why this person needs you and where their cycle is, on every sub-tab (the dark cycle block on The work is gone); the File is
+// four groups in one order, the Danger zone is shut until it is needed, and Forget lives there, not in the Proof funnel's row.
+S['file-groups'] = async (b) => {
+  const r = { id: 'file-groups', title: 'The athlete header (cycle, Needs you, actions) and the File tab: four groups, a folded Danger zone, Forget out of the funnel row', checks: [] };
+  const { page, log, today } = await L.openCoach(b, { hash: 'a/ben_test/file' });
+  const FX = require('./fixtures');
+  const head = async () => (await page.locator('.dethead').innerText()).replace(/\s+/g, ' ');
+  const headings = async () => (await page.locator('#tabbody .fh').allInnerTexts()).map(x => x.replace(/\s+/g, ' ').trim());
+  const dangerOpen = () => page.evaluate(() => { const d = document.getElementById('dangerzone'); return !!d && d.open; });
+  // 1. An undated cycle: its name and focus, and no "week x of y".
+  const h0 = await head();
+  check(r, 'an undated cycle: the header names the cycle and its focus and has no week text', /Cycle 2 — Made-Up Block/.test(h0) && /Strength base/.test(h0) && !/week \d+ of \d+/i.test(h0), h0);
+  // 2. The four groups, in order (Records appears because Ava has old call logs; Ben has nothing for it).
+  check(r, 'Ben has no records to show: three groups, in order', JSON.stringify(await headings()) === JSON.stringify(['Contact and access', 'Programme', 'Danger zone']), await headings());
+  await L.go(page, 'a/ava_test/file');
+  check(r, 'Ava has old call logs: the four groups, in order', JSON.stringify(await headings()) === JSON.stringify(['Contact and access', 'Programme', 'Records', 'Danger zone']), await headings());
+  const rowsOf = async () => (await page.locator('#tabbody .fgroup').first().locator('.frow-l').allInnerTexts()).map(x => x.trim());
+  check(r, 'Contact and access holds WhatsApp, Login, Status and Their app, in that order', JSON.stringify(await rowsOf()) === JSON.stringify(['WhatsApp', 'Login', 'Status', 'Their app']), await rowsOf());
+  check(r, 'no card inside a card: no old section heading or second-level panel is left on the File', (await page.locator('#tabbody .sec').count()) === 0 && (await page.locator('#tabbody .panel .panel').count()) === 0, '');
+  // 3. A dated cycle: week x of y, the dates, the days left; Needs you as links to the screen that has each reason.
+  await page.evaluate(([as, ae, bs, be]) => {
+    const pa = window.__DB.programs.find(x => x.athlete_id === 'ava_test'); pa.data.cycles[0].startDate = as; pa.data.cycles[0].endDate = ae;
+    const pb = window.__DB.programs.find(x => x.athlete_id === 'ben_test'); pb.data.cycles[0].startDate = bs; pb.data.cycles[0].endDate = be;
+    return hardRefresh();
+  }, [FX.daysAgo(today, 8), FX.daysAgo(today, -20), FX.daysAgo(today, 33), FX.daysAgo(today, 5)]);
+  await L.settle(page, 900);
+  await L.go(page, 'a/ava_test/file'); await L.settle(page, 500);
+  const h1 = await head();
+  check(r, 'a dated cycle: "week 2 of 4", the dates and "20 days left" sit under the name', /Cycle 2 — Made-Up Block · week 2 of 4 · \d{1,2} [A-Z][a-z]{2} – \d{1,2} [A-Z][a-z]{2} · 20 days left/.test(h1) && /Strength base/.test(h1), h1);
+  const needs = await page.locator('.dethead .det-need a').evaluateAll(as => as.map(a => [a.textContent.trim(), a.getAttribute('href'), a.className]));
+  check(r, 'Needs you lists each reason as a link to its own sub-tab (the unread note goes to The work, in clay)', /^Needs you:/.test((await page.locator('.det-need').innerText()).trim()) && needs.some(n => /note/.test(n[0]) && n[1] === '#a/ava_test/work' && /warn/.test(n[2])), needs);
+  const cycbarFile = await page.locator('.cycbar').count();
+  await L.go(page, 'a/ava_test/work'); await L.settle(page, 400);
+  check(r, 'the same header (cycle line) is on The work, and the green cycle block is gone from it and from the File', (await page.locator('.dethead .det-cycle').count()) === 1 && (await page.locator('.cycbar').count()) === 0 && cycbarFile === 0, await head());
+  await L.go(page, 'a/ava_test/proof'); await L.settle(page, 400);
+  check(r, 'and on Proof', (await page.locator('.dethead .det-cycle').count()) === 1 && (await page.locator('.dethead .det-need').count()) === 1, await head());
+  await L.go(page, 'a/ben_test/file'); await L.settle(page, 400);
+  const h2 = await head();
+  const bn = await page.locator('.dethead .det-need a').evaluateAll(as => as.map(a => [a.textContent.trim(), a.getAttribute('href')]));
+  check(r, 'a cycle that ended: "ended 5 days ago", and its reason links to the File', /ended 5 days ago/.test(h2) && !/week \d+ of \d+/i.test(h2) && bn.some(n => /renew/.test(n[0]) && n[1] === '#a/ben_test/file'), { h2, bn });
+  // 4. The actions on the right: WhatsApp (three cases are in whatsapp-number), View their app with programme days, View their Proof without.
+  check(r, 'View their app is in the header when they have programme days', (await page.locator('.dethead .det-acts button', { hasText: 'View their app' }).count()) === 1, await head());
+  await L.go(page, 'a/dan_proof/file'); await L.settle(page, 500);
+  check(r, 'a habit-only person gets View their Proof instead', (await page.locator('.dethead .det-acts button', { hasText: 'View their Proof' }).count()) === 1 && (await page.locator('.dethead .det-acts button', { hasText: 'View their app' }).count()) === 0, await head());
+
+  // 5. The Danger zone: shut on arrival, open while Erase… is open, kept open across a redraw, shut again on another visit.
+  await L.go(page, 'a/ava_test/file'); await L.settle(page, 500);
+  check(r, 'the Danger zone is folded on arrival, and what is inside is not on screen', !(await dangerOpen()) && !(await page.locator('button', { hasText: /Erase completely/ }).isVisible()), '');
+  const sum = await page.locator('#dangerzone > summary').evaluate(el => ({ t: el.textContent.trim(), c: getComputedStyle(el).color }));
+  check(r, 'its summary reads "Danger zone", in clay', sum.t === 'Danger zone' && sum.c === 'rgb(176, 74, 39)', sum);
+  await page.locator('#dangerzone > summary').click();
+  check(r, 'a tap opens it: Delete training history and Erase completely… are there, each with a line', (await dangerOpen()) && await page.locator('button', { hasText: /Delete training history/ }).isVisible() && await page.locator('button', { hasText: /Erase completely/ }).isVisible() && /one step/.test(await page.locator('#dangerzone').innerText()), '');
+  await page.evaluate(() => { assemble(); render(); }); await L.settle(page, 600);
+  check(r, 'opened by hand, it is still open after a full redraw', await dangerOpen(), '');
+  await page.locator('button', { hasText: /Erase completely/ }).click(); await page.locator('.erase #eraseIn').waitFor();
+  check(r, 'with Erase… open the Danger zone is open and the panel is inside it', (await dangerOpen()) && (await page.locator('#dangerzone .erase').count()) === 1, '');
+  await page.evaluate(() => { document.getElementById('dangerzone').open = false; assemble(); render(); }); await L.settle(page, 600);
+  check(r, 'folded by hand while Erase… is open, a redraw opens it again (the panel is never hidden)', (await dangerOpen()) && (await page.locator('#dangerzone .erase').count()) === 1, '');
+  await page.locator('.erase button', { hasText: 'Cancel' }).click(); await L.settle(page, 400);
+  check(r, 'Cancel closes the panel and leaves the Danger zone open', (await dangerOpen()) && (await page.locator('.erase').count()) === 0, '');
+  await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/file'); await L.settle(page, 400);
+  check(r, 'coming back to the File later finds it folded again', !(await dangerOpen()), '');
+
+  // 6. Forget: offered in the File for a free person who signed up, not for a coached athlete, and gone from the funnel row.
+  await page.evaluate(() => { window.__DB.hab_contacts.push({ athlete_id: 'ava_test', email: 'ava@example.invalid', whatsapp: '+10000000003', source: 'proof.html', tier: 'free', note: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), display_name: 'Ava' }); return hardRefresh(); });
+  await L.settle(page, 900);
+  await L.go(page, 'a/ava_test/file'); await openDanger(page);
+  check(r, 'a coached athlete who signed up through Proof first is not offered Forget', await page.evaluate(() => isSignup(S.ath.ava_test.contact)) && (await page.locator('button', { hasText: /Forget/ }).count()) === 0, '');
+  await L.go(page, 'a/cara_free/file'); await openDanger(page);
+  const fb = page.locator('#dangerzone button', { hasText: 'Forget their Proof data…' });
+  check(r, 'a free person with a signup record is offered "Forget their Proof data…" in their Danger zone', (await fb.count()) === 1 && await fb.isVisible(), await page.locator('#dangerzone').innerText());
+  await L.go(page, 'proof'); await L.settle(page, 700);
+  const funRow = page.locator('.fun', { hasText: 'cara_free' });
+  const acts = (await funRow.locator('.acts').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the Proof funnel row keeps WhatsApp, copy email and open, and has no forget button', /WhatsApp/.test(acts) && /copy email/.test(acts) && /open/.test(acts) && !/forget/i.test(acts) && (await page.locator('.fun button', { hasText: /forget/i }).count()) === 0, acts);
+  await L.go(page, 'a/cara_free/file'); await openDanger(page);
+  const n0 = await L.nCalls(page);
+  await page.locator('#dangerzone button', { hasText: 'Forget their Proof data…' }).click(); await L.settle(page, 900);
+  const fg = lastOf(await L.callsSince(page, n0), c => c.name === 'forget_contact');
+  check(r, 'it asks first, then calls forget_contact for that person', !!fg && fg.payload.p_athlete_id === 'cara_free' && log.dialogs.some(d => d.type === 'confirm' && /Forget cara_free\?/.test(d.message)), { fg: fg && fg.payload, dialogs: log.dialogs.map(d => d.type) });
+  check(r, 'and their contact is gone, so the offer goes with it', !(await L.db(page)).hab_contacts.some(c => c.athlete_id === 'cara_free'), '');
+
+  // 7. Narrow screens: no sideways scroll, with the Danger zone and every How this works open.
+  await L.go(page, 'a/dan_proof/file'); await L.settle(page, 400);
+  await page.evaluate(() => { const d = document.getElementById('dangerzone'); if (d) d.open = true; document.querySelectorAll('details.how').forEach(x => x.open = true); });
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 800 }); await L.settle(page, 300);
+    const sw = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth }));
+    check(r, `at ${w} px the File fits the screen (no sideways scroll)`, sw.sw <= sw.iw, sw);
+    await L.go(page, 'a/ava_test/work'); await L.settle(page, 300);
+    const sw2 = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth }));
+    check(r, `at ${w} px the header fits the screen on The work`, sw2.sw <= sw2.iw, sw2);
+    await L.go(page, 'a/dan_proof/file'); await L.settle(page, 300);
   }
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();

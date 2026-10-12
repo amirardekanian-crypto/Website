@@ -246,7 +246,8 @@
 // v115: program.html changed (2026-10-12): a tennis or padel athlete's goal on Game Plan is a sport badge (ball or racket).
 // v116: program.html changed (2026-10-12): Guided shows the week's limits row (under its top bar and on the rest screen).
 // v117: habits.html changed (2026-10-12, UX audit batch A): a counted habit's circle opens the log sheet, which takes a typed number.
-const CACHE = 'aap-v117';
+// v118: habits.html changed (2026-10-12, UX audit batch B): Today's card is one game line, the week and one nudge line; Progress has one week table.
+const CACHE = 'aap-v118';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

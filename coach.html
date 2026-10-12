@@ -69,7 +69,7 @@
   :focus-visible { outline: 2px solid var(--court); outline-offset: 2px; border-radius: 6px; }
   /* On the dark green surfaces a green ring is invisible. The ring sits 2px OUTSIDE the element, over what
      surrounds it, so a green button or the active tab on a light page keeps the green ring (white vanished there). */
-  .topbar :focus-visible, .board :focus-visible, .cycbar :focus-visible, .wline.coachline :focus-visible { outline-color: #fff; }
+  .topbar :focus-visible, .board :focus-visible, .wline.coachline :focus-visible { outline-color: #fff; }
 
   .hd { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: .01em; }
   .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
@@ -405,6 +405,7 @@
   .toolspanel .tools-row { margin-bottom: 10px; }
   #toolsBtn .tn { margin-left: 6px; background: var(--clay-fill); color: #fff; border-radius: 999px; font-size: 12px; font-weight: 700; padding: 0 7px; }
   .stbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .stbtns .btn[aria-pressed="true"] { background: var(--court-100); border-color: var(--court); color: var(--court); font-weight: 700; }
   .hidrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 0; border-top: 1px solid var(--rule); }
   .hidrow .hw { font-size: 14px; }
   .hidrow .acts { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
@@ -462,23 +463,93 @@
 
   /* ── Detail ── */
   .back { display: inline-block; font-size: 13px; color: var(--court); font-weight: 700; margin-bottom: 14px; text-decoration: none; padding: 6px 0; }
-  .dethead { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
-  .dethead h2 { font-size: 40px; line-height: .95; }
-  .dethead .sub { font-size: 13px; color: var(--muted); margin-top: 5px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .dethead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; margin-bottom: 12px; }
+  .dethead h2 { font-size: 30px; line-height: 1; }
+  .dethead .sub { font-size: 13px; color: var(--muted); margin-top: 6px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .dethead .det-num { font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; }
-  .dethead .sub a:not(.abtn) { color: var(--court); border-bottom: 1px solid var(--court-100); }
+  .dethead .det-wa a:not(.abtn) { color: var(--court); border-bottom: 1px solid var(--court-100); }
   .sec { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
          font-size: 17px; color: var(--muted); margin: 26px 0 12px; display: flex; align-items: center;
          justify-content: space-between; gap: 10px; flex-wrap: wrap; }
   .sec .acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  /* ── Athlete → File: four groups, one white panel each; label / value / action rows between hairlines (2026-10-12) ── */
+  .fgroup { margin-top: 28px; }
+  .fgroup:first-child { margin-top: 4px; }
+  .fh { font-size: 17px; font-weight: 700; color: var(--ink); margin: 0 0 10px; }
+  .fpanel { padding: 2px 20px; }
+  .frow { display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 4px 16px; padding: 14px 0; border-top: 1px solid var(--rule); align-items: start; }
+  .frow:first-child { border-top: 0; }
+  .frow-l { font-size: 13px; font-weight: 600; color: var(--muted); padding-top: 6px; }
+  .frow-b { min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .frow-v { flex: 1 1 220px; min-width: 0; font-size: 14px; overflow-wrap: anywhere; }
+  .frow-v .pwin { width: 100%; min-width: 0; }
+  .frow-b.is-form .frow-v { flex: 0 1 380px; }
+  .frow-a { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+  .frow-b.is-form .frow-a { margin-left: 0; }
+  .frow-a .stbtns { margin: 0; }
+  .frow-h { flex: 1 0 100%; margin: 0; font-size: 12.5px; color: var(--muted); }
+  .frow-w { flex: 1 0 100%; min-width: 0; }
+  .frow .credrow { padding: 8px 0 0; border-bottom: 0; }
+  .frow .pwform { padding: 4px 0 0; }
+  .frow-w .waform { padding: 0; }
+  .frow-w .waform .pwin { max-width: 520px; }
+  .frow-w .erase { margin: 4px 0 0; }
+  .ffacts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px 20px; padding: 14px 0; }
+  .ffacts dt { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .ffacts dd { margin-top: 2px; font-family: 'Space Mono', monospace; font-size: 12.5px; overflow-wrap: anywhere; }
+  .ffacts dd.warn { color: var(--clay-ink); font-weight: 700; }
+  .fpanel .rawlog { margin-top: 0; padding: 12px 0; }
+  .fpanel .rawlog > summary { font-size: 14px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--ink); }
+  .fpanel .rawlog > summary .muted { font-weight: 400; font-size: 13px; }
+  .fpanel .rawlog > summary:hover { color: var(--court); }
+  .frec { padding: 14px 0; border-top: 1px solid var(--rule); }
+  .frec:first-child { border-top: 0; }
+  .frec-h { font-size: 14px; font-weight: 700; margin: 0 0 2px; }
+  .frec-t { font-size: 12.5px; color: var(--muted); margin: 0 0 8px; }
+  .fpanel .day-c { border: 0; border-top: 1px solid var(--rule); border-radius: 0; margin: 0; background: none; }
+  .fpanel .day-c > summary { padding: 10px 0; }
+  .fpanel .day-c > summary:hover { background: none; }
+  .fpanel .day-c[open] > summary { border-bottom: 0; }
+  .fpanel .day-c-body { padding: 0 0 14px; }
+  details.fdanger > summary { cursor: pointer; list-style: none; font-size: 17px; font-weight: 700; color: var(--clay-ink); margin: 0 0 10px; }
+  details.fdanger > summary::-webkit-details-marker { display: none; }
+  details.fdanger > summary::before { content: '▸ '; }
+  details.fdanger[open] > summary::before { content: '▾ '; }
+  .how { border-top: 1px solid var(--rule); padding: 10px 0 12px; }
+  .how > summary { cursor: pointer; list-style: none; font-size: 13px; color: var(--muted); }
+  .how > summary::-webkit-details-marker { display: none; }
+  .how > summary::before { content: '▸ '; }
+  .how[open] > summary::before { content: '▾ '; }
+  .how > summary:hover { color: var(--court); }
+  .how p { margin: 8px 0 0; max-width: 72ch; font-size: 13px; line-height: 1.55; color: var(--muted); }
+  .how p b { font-weight: 600; color: var(--ink); }
+  @media (max-width: 640px) {
+    .frow { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+    .frow-l { padding-top: 0; }
+    .frow-a { margin-left: 0; }
+    .fpanel { padding: 2px 16px; }
+  }
 
   /* ── Athlete file: identity + sub-tabs ── */
-  .det-id { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .det-id { display: flex; align-items: flex-start; gap: 14px; min-width: 0; flex: 1 1 380px; }
   .det-id > div { min-width: 0; }
   .dethead h2 { overflow-wrap: anywhere; }
-  .det-ava { flex: none; width: 54px; height: 54px; border-radius: 999px; background: var(--court); color: #fff;
+  .det-ava { flex: none; width: 44px; height: 44px; border-radius: 999px; background: var(--court); color: #fff;
              display: flex; align-items: center; justify-content: center;
-             font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 21px; }
+             font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px; }
+  /* The cycle and what needs the coach sit under the name on every sub-tab; the actions sit on the right (below the name on a phone). */
+  .det-cycle { margin-top: 8px; font-size: 13.5px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+  .det-cycle b { font-weight: 700; }
+  .det-cycle .det-fo { color: var(--muted); }
+  .det-need { margin-top: 4px; font-size: 13.5px; }
+  .det-need a { color: var(--ink); text-underline-offset: 3px; }
+  .det-need a:hover { color: var(--court); }
+  .det-need a.warn { color: var(--clay-ink); font-weight: 600; }
+  .det-acts { display: flex; gap: 8px 12px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+  .det-wa { display: inline-flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; font-size: 13px; }
+  .det-wa .abtn { background: var(--court); border-color: var(--court); color: #fff; padding: 6px 14px; font-size: 13px; }
+  .det-wa .abtn:hover { background: var(--court-deep); color: #fff; }
+  @media (max-width: 640px) { .det-acts { flex-basis: 100%; justify-content: flex-start; } .dethead h2 { font-size: 26px; } }
   .subrail { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line);
              margin-bottom: 18px; padding-bottom: 0; }
   .subrail::-webkit-scrollbar { display: none; }
@@ -503,13 +574,6 @@
   .mp-more:hover { border-color: var(--court); color: var(--court); }
   .chartbox { margin-bottom: 16px; }
   @media (max-width: 760px) { .mstrip { grid-template-columns: repeat(3, 1fr); } .mp-more { grid-column: 1 / -1; justify-content: center; } }
-
-  .cycbar { background: var(--court); color: #fff; border-radius: 18px; padding: 13px 18px; margin-bottom: 14px; }
-  .cyc-nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase; font-size: 19px; letter-spacing: .02em; }
-  .cyc-fo { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
-  .cyc-dt { font-family: 'Space Mono', monospace; font-size: 12px; color: rgba(255,255,255,.82); margin-top: 3px; }
-  .cyc-fo span { font-size: 12px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.2);
-                 padding: 3px 10px; border-radius: 999px; }
 
   /* ── A day of work: prescribed and done on one line ── */
   .wday { background: var(--card); border: 1px solid var(--line); border-radius: 20px; margin-bottom: 12px; overflow: clip;
@@ -4313,7 +4377,7 @@ function workDayCard(athleteId, pd, dayNum, sessions, lib, defaultOpen) {
 }
 function workTabHtml(D) {
   const { athleteId, programDays, history, lib, metrics } = D;
-  // The dates the athlete's phone uses for its renewal banner (SCHEMA.md: endDate). They were never shown here.
+  // The dates the athlete's phone uses for its renewal banner (SCHEMA.md: endDate); the header shows them on every sub-tab.
   const cd = D.a && D.a.cycle;
   // The day cards are THIS cycle's (Amir, 2026-10-12, a day after a new cycle began: "all im seeing is his past cycle"):
   // a session trained before the cycle's start date is not this Day 1, it is last cycle's, and it sat on the new day's
@@ -4333,20 +4397,11 @@ function workTabHtml(D) {
   const cards = order.map(d => workDayCard(athleteId, programDays.find(p => Number(p.id) === d), d, byDay[d] || [], lib, d === freshest))
     .concat(loggedOnly.map(d => workDayCard(athleteId, null, d, byDay[d], lib, d === freshest)));
 
-  const cyc = (D.program && D.program.cycles || [])[(D.program && Number.isInteger(D.program.currentCycleIndex)) ? D.program.currentCycleIndex : 0];
-  const fmtD = iso => { const p = pDate(iso); return `${p.getDate()} ${MONTHS[p.getMonth()]}`; };
-  const left = cd && cd.end ? daysBetween(todayKey(), cd.end) : null;
-  const dates = cd && (cd.start || cd.end) ? `<div class="cyc-dt">${cd.start ? esc(fmtD(cd.start)) : '?'} – ${cd.end ? esc(fmtD(cd.end)) : '?'}${
-      left == null ? '' : left > 0 ? ` · ${left} day${left === 1 ? '' : 's'} left` : left === 0 ? ' · ends today' : ` · ended ${-left} day${left === -1 ? '' : 's'} ago`}</div>` : '';
-  const cycHead = cyc ? `<div class="cycbar">
-      <div class="cyc-nm">${esc(cyc.name || '')}${cyc.weeks ? ' · ' + esc(cyc.weeks) : ''}</div>${dates}
-      ${cyc.focuses && cyc.focuses.length ? `<div class="cyc-fo">${cyc.focuses.map(f => `<span>${esc(f)}</span>`).join('')}</div>` : ''}
-    </div>` : '';
-
+  // (The cycle's name, week and dates are in the header on every sub-tab now: cycleLineHtml(), under renderDetail.)
   const live = liveSnapshotHtml(D);
   const logsWarn = D.logsErr ? `<div class="loadwarn" role="alert" style="margin:0 0 14px"><b>Their session logs did not load.</b> Every comparison below is blank because of that, not because they skipped the work.
       <button class="btn sm" onclick="retryLogs()">↻ Try again</button><span class="lw-why">${esc(D.logsErr)}</span></div>` : '';
-  return `${logsWarn}${cycHead}
+  return `${logsWarn}
     ${metricStripHtml(metrics)}
     ${maxesPanel(D)}
     ${cards.length ? cards.join('') : `<p class="empty">${D.a.tier === 'coached' || S.progSrc[athleteId] !== 'db'
@@ -4537,11 +4592,38 @@ function invalidateDetail() { if (_D) _D.stamp = -1; }
 function retryLogs() { invalidateDetail(); render(); }
 window.retryLogs = retryLogs;
 // The number you reach them on, with a button, or a nudge to add it (stage62, audit FLOW-8; Amir: "shown in the header with a WhatsApp button").
+// It sits on the right of the header (below the name on a phone), beside View their app.
 function waHeaderHtml(a) {
   const num = a.contact ? String(a.contact.whatsapp || '').trim() : '', link = num && waLink(num), file = '#a/' + encodeURIComponent(a.id) + '/file';
-  if (link) return `<div class="sub"><a class="abtn" target="_blank" rel="noopener" href="${esc(link)}">WhatsApp ↗</a><bdi class="det-num">${esc(num)}</bdi></div>`;
-  if (num) return `<div class="sub"><bdi class="det-num">${esc(num)}</bdi><span>is not a number WhatsApp can open</span><a href="${file}">fix it</a></div>`;
-  return a.tier === 'coached' ? `<div class="sub"><a href="${file}">add a WhatsApp number</a></div>` : '';
+  if (link) return `<span class="det-wa"><a class="abtn" target="_blank" rel="noopener" href="${esc(link)}">WhatsApp ↗</a><bdi class="det-num">${esc(num)}</bdi></span>`;
+  if (num) return `<span class="det-wa"><bdi class="det-num">${esc(num)}</bdi><span class="muted">is not a number WhatsApp can open</span><a href="${file}">fix it</a></span>`;
+  return a.tier === 'coached' ? `<span class="det-wa"><a href="${file}">add a WhatsApp number</a></span>` : '';
+}
+// The cycle the athlete is in, as one line under their name on every sub-tab (it was a dark green block on The work only):
+// the name, "week 2 of 4" when the cycle has dates (cycleWeekOnC(), the app's own week), the dates and the days left, then the focuses.
+// A cycle with no dates has no week text; its roadmap label ("Weeks 1-5") stands in, as the block showed it.
+function cycleLineHtml(D) {
+  const p = D.program;
+  const cyc = (p && p.cycles || [])[(p && Number.isInteger(p.currentCycleIndex)) ? p.currentCycleIndex : 0];
+  if (!cyc) return '';
+  const cd = D.a && D.a.cycle, dated = !!(cd && (cd.start || cd.end));
+  const fmtD = iso => { const q = pDate(iso); return `${q.getDate()} ${MONTHS[q.getMonth()]}`; };
+  const wk = dated ? cycleWeekOnC(cyc, todayKey()) : null;
+  const left = cd && cd.end ? daysBetween(todayKey(), cd.end) : null;
+  const bits = [];
+  if (wk && !wk.before && !wk.after) bits.push(`week ${wk.wk} of ${wk.total}`);
+  else if (!dated && cyc.weeks) bits.push(esc(cyc.weeks));
+  if (dated) bits.push(`${cd.start ? esc(fmtD(cd.start)) : '?'} – ${cd.end ? esc(fmtD(cd.end)) : '?'}`);
+  if (left != null) bits.push(left > 0 ? `${left} day${left === 1 ? '' : 's'} left` : left === 0 ? 'ends today' : `ended ${-left} day${left === -1 ? '' : 's'} ago`);
+  const fo = cyc.focuses && cyc.focuses.length ? `<span class="det-fo">· ${cyc.focuses.map(esc).join(', ')}</span>` : '';
+  return `<div class="det-cycle"><b>${esc(cyc.name || 'This cycle')}</b>${bits.length ? `<span>· ${bits.join(' · ')}</span>` : ''}${fo}</div>`;
+}
+// Why this person needs the coach, from the one rule (reasonsOf(): a.reasons, plus the quiet flag a gone-quiet athlete keeps), each a link to
+// the screen that has it. A quiet flag names no screen: the one it can carry (no login) is fixed on the File.
+function needsLineHtml(a) {
+  const need = (a.reasons || []).concat(a.quietFlags || []);
+  if (!need.length) return '';
+  return `<div class="det-need"><b>Needs you:</b> ${need.map(r => `<a${r.tone === 'warn' ? ' class="warn"' : ''} href="#a/${encodeURIComponent(a.id)}/${encodeURIComponent(r.sub || 'file')}">${esc(r.text)}</a>`).join(' · ')}</div>`;
 }
 async function renderDetail(athleteId, sub) {
   let a = S.ath[athleteId];
@@ -4602,6 +4684,11 @@ async function renderDetail(athleteId, sub) {
   if (a.isHab) sub2.push('Proof ' + a.hab7 + '/7');
   sub2.push('last active ' + timeAgo(a.lastActive));
 
+  // View their app when they have a programme to show; their Proof when habits are all they have.
+  const viewBtn = _D.programDays.length ? `<button class="btn sm" onclick="viewAsAthlete(${jsq(athleteId)})">View their app</button>`
+    : a.isHab ? `<button class="btn sm" onclick="viewAsAthlete(${jsq(athleteId)}, 'habits')">View their Proof</button>` : '';
+  const acts = waHeaderHtml(a) + viewBtn;
+
   const keep = snapTabBody();     // what is typed or open in the tab on screen, before the page is replaced
   $('content').innerHTML = `<a class="back" href="#athletes">← Roster</a>
     <div class="dethead">
@@ -4610,9 +4697,11 @@ async function renderDetail(athleteId, sub) {
         <div>
           <h2 class="hd">${esc(a.name)}</h2>
           <div class="sub">${tierChip(a)}${statusChip(a)}${lvSlot('hchip', athleteId)} <span>${esc(sub2.join(' · '))}</span></div>
-          ${waHeaderHtml(a)}
+          ${cycleLineHtml(_D)}
+          ${needsLineHtml(a)}
         </div>
       </div>
+      ${acts ? `<div class="det-acts">${acts}</div>` : ''}
     </div>
     <div class="subrail">${SUBTABS.filter(t => has[t.id]).map(t => {
         const n = t.id === 'work' ? a.needReplyRecent.length : 0;
@@ -4729,8 +4818,19 @@ function weightPanel(a) {
       : `<p class="empty">One reading so far — a line needs a few more.</p>`}
   </div></section>`;
 }
+// ── The File tab's building blocks (2026-10-12: four groups, one white panel each; label / value / action rows between hairlines) ──
+// A row: its label, then the value, its actions (right-aligned, wrapping under on a phone), one short muted hint, and `full` (a form, the
+// unsent password, the Erase panel: anything that wants the whole width). Every part but the label is optional.
+function fRow(label, o) {
+  return `<div class="frow"><div class="frow-l">${label}</div><div class="frow-b${o.form ? ' is-form' : ''}">${o.val ? `<div class="frow-v">${o.val}</div>` : ''}${o.acts ? `<div class="frow-a">${o.acts}</div>` : ''}${o.hint ? `<p class="frow-h">${o.hint}</p>` : ''}${o.full ? `<div class="frow-w">${o.full}</div>` : ''}</div></div>`;
+}
+// The longer text a group's short hints stand for, one tap away at the end of the group. `paras` are HTML strings.
+function howFold(id, paras) {
+  return paras.length ? `<details class="how" id="${id}"><summary>How this works</summary>${paras.map(p => `<p>${p}</p>`).join('')}</details>` : '';
+}
 // The weekly check-in call log is retired (Amir, 2026-10-11). Nothing new is written; what was written stays readable here, in the
 // athlete's File, until it is deleted or the person is erased. No section at all when there is nothing to show.
+const CALLS_HOW = 'The weekly check-in call log is retired: nothing new is written here. What was written stays until you delete it or erase the person.';
 function oldCallLogsHtml(D) {
   const { athleteId, callLogs } = D;
   if (!callLogs.length && !_callErr[athleteId]) return '';
@@ -4751,26 +4851,27 @@ function oldCallLogsHtml(D) {
         <div style="margin-top:10px"><button class="btn sm danger" onclick="deleteCallLog(${jsq(l.id)},${jsq(athleteId)},${jsq(l.call_date)})">Delete</button></div>
       </div></details>`;
   }).join('') : `<p class="empty" style="color:var(--clay-ink)">Call logs did not load (${esc(_callErr[athleteId])}). Tap ↻ Refresh to try again.</p>`;
-  return `<div class="sec"><span>Old call logs${callLogs.length ? ' · ' + callLogs.length : ''}</span></div>
-    <section class="panel">
-      <p class="empty" style="padding:0 0 10px">The weekly check-in call log is retired: nothing new is written here. What was written stays until you delete it or erase the person.</p>
+  return `<div class="frec">
+      <h4 class="frec-h">Old call logs${callLogs.length ? ' · ' + callLogs.length : ''}</h4>
+      <p class="frec-t">The weekly call log is retired. Nothing new is written here.</p>
       ${body}
-    </section>`;
+    </div>`;
 }
-// The Status panel on the File (stage63, audit ROSTER-7; Amir: "a status: active, paused, former"). One tap sets it; the note is optional.
+// The Status row on the File (stage63, audit ROSTER-7; Amir: "a status: active, paused, former"). One tap sets it; the note is optional.
+const STATUS_HOW = '<b>Paused</b> takes them out of Needs you and Gone quiet while they are away, and they still count. <b>Former</b> also takes them out of the totals and the main list (they stay under the Former chip, and everything they logged stays). A note they send still reaches Needs you. Write a note first if you want one.';
 function statusPanelHtml(D) {
   const { athleteId, a } = D;
   if (isDemoRow(a)) return '';
   const st = a.status || 'active';
-  const btn = (k, l) => `<button class="btn sm ${st === k ? 'primary' : ''}" aria-pressed="${st === k}" onclick="setAthleteStatus(${jsq(athleteId)}, '${k}')">${l}</button>`;
+  const btn = (k, l) => `<button class="btn sm" aria-pressed="${st === k}" onclick="setAthleteStatus(${jsq(athleteId)}, '${k}')">${l}</button>`;
   const now = st === 'active' ? 'Active: the normal case.'
     : `${st === 'paused' ? 'On a break' : 'A former client'} since ${esc(prettyDate(a.statusSince))}${a.statusNote ? ': ' + esc(a.statusNote) : ''}.`;
-  return `<div class="sec"><span>Status</span></div>
-    <section class="panel">
-      <p class="empty" style="padding:0 0 10px">${now} <b>Paused</b> takes them out of Needs you and Gone quiet while they are away, and they still count. <b>Former</b> also takes them out of the totals and the main list (they stay under the Former chip, and everything they logged stays). A note they send still reaches Needs you. Write a note first if you want one.</p>
-      <div class="stbtns">${btn('active', 'Active')}${btn('paused', 'Paused')}${btn('former', 'Former')}</div>
-      <div class="waform"><input id="stNote" class="pwin" aria-label="Note about their status" placeholder="note (optional): back in January, moved abroad…" autocomplete="off" value="${esc(a.statusNote || '')}"></div>
-    </section>`;
+  return fRow('Status', {
+    val: now,
+    acts: `<div class="stbtns">${btn('active', 'Active')}${btn('paused', 'Paused')}${btn('former', 'Former')}</div>`,
+    hint: 'Paused or Former takes them out of Needs you.',
+    full: `<div class="waform"><input id="stNote" class="pwin" aria-label="Note about their status" placeholder="note (optional): back in January, moved abroad…" autocomplete="off" value="${esc(a.statusNote || '')}"></div>`,
+  });
 }
 async function setAthleteStatus(athleteId, status) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
@@ -4787,20 +4888,21 @@ async function setAthleteStatus(athleteId, status) {
   toast(status === 'active' ? 'Active again' : status === 'paused' ? 'Paused' : 'Marked as a former client');
 }
 window.setAthleteStatus = setAthleteStatus;
-// The WhatsApp number box on the File (stage62). Saving calls coach_set_whatsapp(); an empty box (or Remove) clears the number.
+// The WhatsApp number row on the File (stage62). Saving calls coach_set_whatsapp(); an empty box (or Remove) clears the number.
+// (The paragraph that used to sit above the box is in the group's How this works: the number is in the header now, beside the name.)
+function waHowText(a) {
+  return `The number you reach ${esc(a.name)} on. It shows in the header with a WhatsApp button, and it gives <b>Copy message</b> on a new login a WhatsApp button too. Only you can see it. Write it with the country code (+44 7700 900123) or the Iranian way (0912 123 4567).`;
+}
 function waPanelHtml(D) {
   const { athleteId, a } = D;
   const cur = (a.contact && a.contact.whatsapp) || '';
-  return `<div class="sec"><span>WhatsApp number</span></div>
-    <section class="panel">
-      <p class="empty" style="padding:0 0 10px">The number you reach ${esc(a.name)} on. It shows under their name with a WhatsApp button, and it gives <b>Copy message</b> on a new login a WhatsApp button too. Only you can see it. Write it with the country code (+44 7700 900123) or the Iranian way (0912 123 4567).</p>
-      <div class="waform">
-        <input id="waNum" class="pwin" aria-label="WhatsApp number" placeholder="+44 7700 900123" inputmode="tel" autocomplete="off" spellcheck="false" value="${esc(cur)}"
-               onkeydown="if(event.key==='Enter') saveWhatsApp(${jsq(athleteId)})">
-        <button class="btn sm primary" onclick="saveWhatsApp(${jsq(athleteId)})">Save number</button>
-        ${cur ? `<button class="btn sm" onclick="saveWhatsApp(${jsq(athleteId)}, '')">Remove</button>` : ''}
-      </div>
-    </section>`;
+  return fRow('WhatsApp', {
+    form: true,
+    val: `<input id="waNum" class="pwin" aria-label="WhatsApp number" placeholder="+44 7700 900123" inputmode="tel" autocomplete="off" spellcheck="false" value="${esc(cur)}"
+               onkeydown="if(event.key==='Enter') saveWhatsApp(${jsq(athleteId)})">`,
+    acts: `<button class="btn sm" onclick="saveWhatsApp(${jsq(athleteId)})">Save number</button>${cur ? `<button class="btn sm" onclick="saveWhatsApp(${jsq(athleteId)}, '')">Remove</button>` : ''}`,
+    hint: 'Shown in the header with a WhatsApp button. Only you can see it.',
+  });
 }
 async function saveWhatsApp(athleteId, forced) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
@@ -4822,16 +4924,17 @@ window.saveWhatsApp = saveWhatsApp;
 function cameFromHtml(athleteId) {
   const apps = (S.intake || []).filter(i => i.athlete_id === athleteId).sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)));
   if (!apps.length) return '';
-  return `<tr><td class="k">Came from</td><td class="v">${apps.map(i => `${esc(prettyDate(String(i.created_at || '').slice(0, 10)))} application${i.programme ? ' · ' + esc(i.programme) : ''}${i.outcome ? ' · ' + esc(intakeOutcomeLabel(i.outcome)) : ''} · <a href="#intake">open Intake</a>`).join('<br>')}</td></tr>`;
+  return fRow('Came from', { val: apps.map(i => `${esc(prettyDate(String(i.created_at || '').slice(0, 10)))} application${i.programme ? ' · ' + esc(i.programme) : ''}${i.outcome ? ' · ' + esc(intakeOutcomeLabel(i.outcome)) : ''} · <a href="#intake">open Intake</a>`).join('<br>') });
 }
 // The sessions the coach hid (stage60), newest first, each with Restore and, for a genuine erasure request, Delete for good. Absent when there are none.
+const HIDDEN_HOW = 'Left out of their numbers, the roster\'s warnings and the history their app shows, and kept in the database. If their phone sends one again it stays hidden. <b>Restore</b> brings it back; <b>Delete for good</b> removes it, and it can then only come back from a backup file.';
 function hiddenSessionsHtml(D) {
   const { athleteId, a } = D;
   const hid = (a.hidden || []).slice().sort((x, y) => String(y.completed_on).localeCompare(String(x.completed_on)) || Number(y.day) - Number(x.day));
   if (!hid.length) return '';
-  return `<div class="sec"><span>Hidden sessions · ${hid.length}</span></div>
-    <section class="panel" id="hidden-sessions">
-      <p class="empty" style="padding:0 0 10px">Left out of their numbers, the roster's warnings and the history their app shows, and kept in the database. If their phone sends one again it stays hidden. <b>Restore</b> brings it back; <b>Delete for good</b> removes it, and it can then only come back from a backup file.</p>
+  return `<div class="frec" id="hidden-sessions">
+      <h4 class="frec-h">Hidden sessions · ${hid.length}</h4>
+      <p class="frec-t">Left out of their numbers and kept. Restore brings one back.</p>
       ${hid.map(h => `<div class="hidrow">
         <b class="hw">Day ${esc(h.day)} · ${esc(prettyDate(h.completed_on))}</b>
         <span class="acts">
@@ -4842,104 +4945,121 @@ function hiddenSessionsHtml(D) {
       </div>`).join('')}
     </section>`;
 }
+// Which tier the Proof funnel treats a contact as: the programme's (S.ath), not the contact row's second copy. A coached client who signed up
+// through Proof first is "converted", and is never offered Forget. renderProof() and the File's Danger zone ask the same question.
+function contactTierOf(c) { return (S.ath[c.athlete_id] && S.ath[c.athlete_id].tier) || c.tier || 'free'; }
+// The File tab: four groups, in this order, each one white panel with label / value / action rows between hairlines, and the longer
+// explanations folded at the end of their group (How this works). The Danger zone is shut until it is needed (or while Erase is open).
+const THEIR_APP_HOW = id => `Open ${esc(id)}'s programme in the same screens and words as their phone. It shows the programme only: what they have logged (sets, weights, records, habits) is not in it, and that is under The work and Proof here. It is read-only: nothing you tap is saved.`;
+const NO_LOGIN_HOW = 'The old secret links were retired on 7 Sep 2026. Create a username and password here, then send it on WhatsApp (it waits under “Logins to send” on the Athletes tab until you mark it sent, or they sign in with it).';
+const DELETE_HISTORY_HOW = 'Deletes every finished session (the hidden ones too) and everything the app keeps for them on the server (habit log, body weight, personal records). Their programme, login, coaching log and calls stay, and so do they on the roster.';
+const ERASE_HOW = 'Or remove them completely: the programme and its saved versions, the login and sign-in account, sessions, app data, coaching log, calls, reports, titles, board place and contact, in one step. You see the exact list first and type their id to confirm. Intake forms that carry their email, WhatsApp number or name are offered, and you can look for any other form there.';
+const FORGET_HOW = 'Forget deletes the Proof contact details of someone who signed up for the free habit tracker, their whole habit log and progress, their board place and their roll-call lines. Their programme, login, session history, titles and season results stay. It is not offered for a coached athlete. To remove everything about a person, use Erase completely.';
 function fileTabHtml(D) {
   const { athleteId, a, program, programDays } = D;
   const cycles = (program && program.cycles) || [];
   const ci = (program && Number.isInteger(program.currentCycleIndex)) ? program.currentCycleIndex : 0;
   const login = (S.logins || {})[athleteId];
-  return `<div class="sec"><span>Their app</span></div>
-    <section class="panel">
-      <p class="empty" style="padding:0 0 10px">
-        Open ${esc(athleteId)}'s programme in the same screens and words as their phone. It shows
-        the programme only: what they have logged (sets, weights, records, habits) is not in it,
-        and that is under The work and Proof here. It is read-only: nothing you tap is saved.
-      </p>
-      <div class="note-actions">
-        <button class="btn sm primary" onclick="viewAsAthlete(${jsq(athleteId)})">View their app</button>
-        <button class="btn sm" onclick="viewAsAthlete(${jsq(athleteId)}, 'habits')">View their Proof</button>
-      </div>
-    </section>
-    ${statusPanelHtml(D)}
-    ${waPanelHtml(D)}
-    <div class="sec"><span>Login</span></div>
-    <section class="panel">
-      ${login ? `
-        <p class="empty" style="padding:0 0 10px">
-          <b>${esc(athleteId)}</b> has a username and password — created ${esc(prettyDate(String(login.linked_at).slice(0,10)))}.
-          They sign in at <code>${esc(SITE)}/${a.tier === 'free' ? 'habits.html' : 'program.html'}</code> with no link needed.
-        </p>
-        ${login.initial_password ? `<div class="credrow" style="border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px">
+  const onDb = S.progSrc[athleteId] === 'db';
+  const pwOpen = _athPwOpen === athleteId;
+
+  // ── Contact and access ──
+  const loginRow = login ? fRow('Login', {
+      val: `<b>${esc(athleteId)}</b> has a username and password — created ${esc(prettyDate(String(login.linked_at).slice(0, 10)))}.`,
+      acts: pwOpen ? '' : `<button class="btn sm" onclick="openAthletePw(${jsq(athleteId)})">Change password</button><button class="btn sm danger" onclick="revokeAthleteLogin(${jsq(athleteId)})">Remove login</button>`,
+      hint: `They sign in at <code>${esc(SITE)}/${a.tier === 'free' ? 'habits.html' : 'program.html'}</code> with no link needed.`,
+      full: `${login.initial_password ? `<div class="credrow">
           <span class="credname">Not sent yet</span>
           <code class="credpass">${esc(login.initial_password)}</code>${usedMark('athlete', athleteId)}
           <span class="acts">
-            <button class="btn sm primary" onclick="copyLoginFor(${jsq(athleteId)})">Copy message</button>
+            <button class="btn sm ${pwOpen ? '' : 'primary'}" onclick="copyLoginFor(${jsq(athleteId)})">Copy message</button>
             ${a.contact && waLink(a.contact.whatsapp) ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(waLink(a.contact.whatsapp))}?text=${encodeURIComponent(loginMessage(athleteId, login.initial_password))}">WhatsApp ↗</a>` : ''}
             <button class="btn sm" onclick="markLoginSent(${jsq(athleteId)})">Mark sent</button>
           </span>
-        </div>` : ''}
-        ${_athPwOpen === athleteId ? `
-        <div class="pwform">
+        </div>` : ''}${pwOpen ? `<div class="pwform">
           <input id="athPw" class="pwin" aria-label="New password (empty to generate one)" placeholder="new password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false"
                  onkeydown="if(event.key==='Enter') athleteSavePw(${jsq(athleteId)},'reset')">
           <button class="btn sm primary" onclick="athleteSavePw(${jsq(athleteId)},'reset')">Save password</button>
           <button class="btn sm" onclick="closeAthletePw()">Cancel</button>
           <p class="pwhint">${PW_HINT} The old password stops working straight away.</p>
-        </div>` : `
-        <div class="note-actions">
-          <button class="btn sm" onclick="openAthletePw(${jsq(athleteId)})">Change password</button>
-          <button class="btn sm danger" onclick="revokeAthleteLogin(${jsq(athleteId)})">Remove login</button>
-        </div>`}`
-      : `
-        <p class="empty" style="padding:0 0 10px">
-          <b style="color:var(--clay-ink)">No login yet: ${esc(athleteId)} cannot open the app.</b> The old secret links
-          were retired on 7 Sep 2026. Create a username and password here, then send it on WhatsApp
-          (it waits under “Logins to send” on the Athletes tab until you mark it sent, or they sign in with it).
-        </p>
-        <div class="pwform">
+        </div>` : ''}`,
+    })
+    : fRow('Login', {
+      val: `<b style="color:var(--clay-ink)">No login yet: ${esc(athleteId)} cannot open the app.</b>`,
+      hint: 'Create one here, then send it on WhatsApp.',
+      full: `<div class="pwform">
           <input id="athPw" class="pwin" aria-label="Password (empty to generate one)" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false"
                  onkeydown="if(event.key==='Enter') athleteSavePw(${jsq(athleteId)},'create')">
           <button class="btn sm primary" onclick="athleteSavePw(${jsq(athleteId)},'create')">Create login</button>
           <p class="pwhint">${PW_HINT}</p>
-        </div>`}
-    </section>
-    <div class="sec"><span>Program file</span></div>
-    <section class="panel">
-      <table class="meta-table">
-        <tr><td class="k">Athlete id</td><td class="v">${esc(athleteId)}</td></tr>
-        ${cameFromHtml(athleteId)}
-        <tr><td class="k">Stored in</td><td class="v">${S.progSrc[athleteId] === 'db'
-            ? '<b>the database</b> — editable here; only this athlete and you can read it'
-            : '<span style="color:var(--clay-ink)">no programme row</span>'}</td></tr>
-        ${S.progMeta[athleteId] ? `<tr><td class="k">Last saved</td><td class="v">${esc(fmtLocalStamp(S.progMeta[athleteId].updated_at))}${S.progMeta[athleteId].updated_by ? ' · ' + esc(S.progMeta[athleteId].updated_by) : ''}</td></tr>` : ''}
-        <tr><td class="k">Tier</td><td class="v">${esc(a.tier)}</td></tr>
-        <tr><td class="k">Days / week</td><td class="v">${programDays.length || '—'}</td></tr>
-        <tr><td class="k">Cycle</td><td class="v">${cycles[ci] ? esc(cycles[ci].name || '') + (cycles[ci].weeks ? ' · ' + esc(cycles[ci].weeks) : '') : '—'}</td></tr>
-        <tr><td class="k">Roadmap</td><td class="v">${cycles.length ? esc(ci + 1) + ' of ' + esc(cycles.length) : '—'}</td></tr>
-      </table>
-      ${S.progSrc[athleteId] === 'db' ? `
-      <details class="rawlog" id="pvdet" ontoggle="if(this.open)loadProgramVersions(${jsq(athleteId)})">
+        </div>`,
+    });
+  const appRow = fRow('Their app', {
+    val: 'Their programme, read-only. Nothing you tap is saved.',
+    acts: `<button class="btn sm" onclick="viewAsAthlete(${jsq(athleteId)})">View their app</button><button class="btn sm" onclick="viewAsAthlete(${jsq(athleteId)}, 'habits')">View their Proof</button>`,
+  });
+  const contactHow = howFold('how-contact', [`<b>WhatsApp.</b> ${waHowText(a)}`]
+    .concat(isDemoRow(a) ? [] : [`<b>Status.</b> ${STATUS_HOW}`])
+    .concat([`<b>Their app.</b> ${THEIR_APP_HOW(athleteId)}`])
+    .concat(login ? [] : [`<b>Login.</b> ${NO_LOGIN_HOW}`]));
+  const contactGroup = `<section class="fgroup"><h3 class="fh">Contact and access</h3>
+    <div class="panel fpanel">${waPanelHtml(D)}${loginRow}${statusPanelHtml(D)}${appRow}${cameFromHtml(athleteId)}${contactHow}</div></section>`;
+
+  // ── Programme ──
+  const prow = S.progMeta[athleteId];
+  const facts = [
+    ['Athlete id', esc(athleteId)],
+    ['Tier', esc(a.tier)],
+    ['Days a week', programDays.length || '—'],
+    ['Cycle', cycles[ci] ? esc(cycles[ci].name || '') + (cycles[ci].weeks ? ' · ' + esc(cycles[ci].weeks) : '') : '—'],
+    ['Roadmap', cycles.length ? esc(ci + 1) + ' of ' + esc(cycles.length) : '—'],
+  ];
+  if (prow) facts.push(['Last saved', esc(fmtLocalStamp(prow.updated_at)) + (prow.updated_by ? ' · ' + esc(prow.updated_by) : '')]);
+  if (!onDb) facts.push(['Stored in', 'no programme row', 'warn']);   // only said when it is wrong: a programme in the database is the normal case
+  const programmeGroup = `<section class="fgroup"><h3 class="fh">Programme</h3>
+    <div class="panel fpanel">
+      <dl class="ffacts">${facts.map(([k, v, c]) => `<div><dt>${k}</dt><dd${c ? ` class="${c}"` : ''}>${v}</dd></div>`).join('')}</dl>
+      <details class="rawlog" id="clogdet" ontoggle="if(this.open)openCoachingLog(${jsq(athleteId)})">
+        <summary>Coaching log${(S.clogs || {})[athleteId] ? '' : ' — none yet'}
+          &nbsp;<span class="muted">coach only, never shown to the athlete</span></summary>
+        <div class="elog-body" id="clog-body">Loading…</div>
+      </details>
+      ${onDb ? `<details class="rawlog" id="pvdet" ontoggle="if(this.open)loadProgramVersions(${jsq(athleteId)})">
         <summary>Version history — undo an edit</summary>
         <div id="pvlist" class="pvlist">Loading…</div>
       </details>` : ''}
-      <details class="rawlog" id="clogdet" ontoggle="if(this.open)openCoachingLog(${jsq(athleteId)})">
-        <summary>Coaching log${(S.clogs || {})[athleteId] ? '' : ' — none yet'}
-          &nbsp;<span class="muted" style="font-weight:400">coach only, never shown to the athlete</span></summary>
-        <div class="elog-body" id="clog-body">Loading…</div>
-      </details>
-    </section>
-    ${oldCallLogsHtml(D)}
-    ${hiddenSessionsHtml(D)}
-    <div class="sec"><span>Danger zone</span></div>
-    <section class="panel">
-      <p class="empty" style="padding:0 0 10px">Deletes every finished session (the hidden ones too) and everything the app keeps for them on the server (habit log, body weight, personal records). Their programme, login, coaching log and calls stay, and so do they on the roster.</p>
-      <button class="btn sm danger" onclick="deleteAthlete(${jsq(athleteId)})">Delete training history</button>
-      <p class="empty" style="padding:18px 0 10px">Or remove them completely: the programme and its saved versions, the login and sign-in account, sessions, app data, coaching log, calls, reports, titles, board place and contact, in one step. You see the exact list first and type their id to confirm. Intake forms that carry their email, WhatsApp number or name are offered, and you can look for any other form there.</p>
-      ${SYSTEM_IDS.includes(athleteId) || athleteId === AMIR_ATHLETE_ID
-        ? `<p class="empty" style="padding:0 0 4px">Not offered here: this is the public demo, or the identity the dashboard reads the board through.</p>`
-        : (_erase && _erase.kind === 'athlete' && _erase.key === athleteId
-            ? erasePanelHtml('athlete', athleteId)
-            : `<button class="btn sm danger" onclick="eraseOpen('athlete', ${jsq(athleteId)})">Erase completely…</button>`)}
-    </section>`;
+      ${onDb ? howFold('how-programme', ['<b>Stored in.</b> The database — editable here; only this athlete and you can read it.']) : ''}
+    </div></section>`;
+
+  // ── Records (absent when there is nothing to show) ──
+  const hid = hiddenSessionsHtml(D), calls = oldCallLogsHtml(D);
+  const recordsGroup = hid || calls ? `<section class="fgroup"><h3 class="fh">Records</h3>
+    <div class="panel fpanel">${hid}${calls}${howFold('how-records', [hid ? `<b>Hidden sessions.</b> ${HIDDEN_HOW}` : '', calls ? `<b>Old call logs.</b> ${CALLS_HOW}` : ''].filter(Boolean))}</div></section>` : '';
+
+  // ── Danger zone: shut by default, open while Erase… is open for this athlete (and kept open across a redraw by snapTabBody) ──
+  const eraseHere = !!(_erase && _erase.kind === 'athlete' && _erase.key === athleteId);
+  const noErase = SYSTEM_IDS.includes(athleteId) || athleteId === AMIR_ATHLETE_ID;
+  const eraseRow = noErase
+    ? fRow('Erase person', { val: 'Not offered here: this is the public demo, or the identity the dashboard reads the board through.' })
+    : eraseHere ? fRow('Erase person', { val: 'Removes the person and everything stored for them, in one step.', full: erasePanelHtml('athlete', athleteId) })
+      : fRow('Erase person', {
+          val: 'Removes the person and everything stored for them, in one step.',
+          acts: `<button class="btn sm danger" onclick="eraseOpen('athlete', ${jsq(athleteId)})">Erase completely…</button>`,
+          hint: 'You see the exact list first and type their id to confirm.' });
+  // Forget used to sit in the Proof funnel's row, a click from WhatsApp and copy email. It is offered here, to the people the funnel offered it to.
+  const forgetRow = isSignup(a.contact) && contactTierOf(a.contact) !== 'coached'
+    ? fRow('Proof data', {
+        val: 'Deletes their Proof contact details, habit log and board place.',
+        acts: `<button class="btn sm danger" onclick="forgetContact(${jsq(athleteId)})">Forget their Proof data…</button>`,
+        hint: 'You are asked to confirm first. There is no undo.' }) : '';
+  const dangerGroup = `<details class="fgroup fdanger" id="dangerzone"${eraseHere ? ' open' : ''}><summary class="fh">Danger zone</summary>
+    <div class="panel fpanel">${fRow('Training history', {
+        val: 'Deletes every finished session and the app data kept for them.',
+        acts: `<button class="btn sm danger" onclick="deleteAthlete(${jsq(athleteId)})">Delete training history</button>`,
+        hint: 'Their programme, login and coaching log stay, and so do they on the roster.' })}${eraseRow}${forgetRow}${
+      howFold('how-danger', [`<b>Delete training history.</b> ${DELETE_HISTORY_HOW}`, `<b>Erase completely.</b> ${ERASE_HOW}`].concat(forgetRow ? [`<b>Forget.</b> ${FORGET_HOW}`] : []))}</div></details>`;
+
+  return contactGroup + programmeGroup + recordsGroup + dangerGroup;
 }
 
 // --- session notes -----------------------------------------------------------
@@ -5421,9 +5541,10 @@ async function renderProof() {
 
   // The tier is the programme's (S.ath), not the contact row's second copy. A coached client who
   // signed up through Proof first is "converted": listed, but not counted as a free signup, and
-  // never offered forget (forget_contact() deletes the whole progress row: their training app's
-  // records, body weight and check-ins).
-  const tierOf = c => (S.ath[c.athlete_id] && S.ath[c.athlete_id].tier) || c.tier || 'free';
+  // never offered Forget (forget_contact() deletes the whole progress row: their training app's
+  // records, body weight and check-ins). Forget is not a button on this row any more (2026-10-12):
+  // it is in the person's File, under Danger zone, for the people this funnel would have offered it to.
+  const tierOf = contactTierOf;
   const funnel = (S.contacts || []).filter(isSignup).sort((a, b) => String(b.signed_up).localeCompare(String(a.signed_up)));
   const freeFunnel = funnel.filter(c => tierOf(c) !== 'coached');
   // Signed up and never logged a single day is its own bucket, and the biggest
@@ -5450,7 +5571,6 @@ async function renderProof() {
       <div class="days">${c.days_logged}<small>days logged</small></div>
       <div class="acts">${wa}${mail}
         <button class="abtn" onclick="location.hash=${jsq('a/' + encodeURIComponent(c.athlete_id))}">open</button>
-        ${coached ? '' : `<button class="abtn" style="color:var(--clay-ink)" onclick="forgetContact(${jsq(c.athlete_id)})">forget</button>`}
       </div>
     </div>`;
   }).join('') : '<p class="empty">No signups recorded yet. /proof-signup writes them here.</p>';

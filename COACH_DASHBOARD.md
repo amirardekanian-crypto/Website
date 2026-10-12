@@ -546,6 +546,16 @@ into an open editor, and (since 2026-10-11) what you typed or opened in the tab 
 Version history, the Coaching log, a day's raw log, Earlier cycles and the live snapshot. That holds for the same athlete's same
 screen only; another athlete or screen starts clean.
 
+**The header** (2026-10-12, round 1 of the UX redesign; the same on every sub-tab): `← Roster`, a 44 px avatar, the name, one line
+(tier, status and level chips, then *N sessions · Proof n/7 · last active …*), then a **cycle line** and a **Needs you line**, and on the
+right (below the name on a phone) the **WhatsApp** button and **View their app** (or **View their Proof** for someone with habits and no
+training days). The cycle line (`cycleLineHtml()`) is the old dark green block on The work, moved up and made one line:
+*Cycle 3 — Foundations · week 2 of 4 · 12 Oct – 9 Nov · 28 days left*, then the focuses in grey. The week is the app's own
+(`cycleWeekOnC()`); a cycle with no dates has no week text (its roadmap label, *Weeks 1–5*, stands in), and the wording *ends today* and
+*ended N days ago* is as it was. The Needs you line (`needsLineHtml()`) says why this person is in front of you: each of their reasons from
+`reasonsOf()` (`a.reasons`, plus the quiet flag a gone-quiet athlete keeps, never computed here) as a link to the sub-tab that has it, joined by
+" · ", the ones that need you in clay. `file-groups` drives both.
+
 ### The work — prescribed vs done, on one line
 
 **One card per program day**, in program order, whether or not it has ever been trained. The header
@@ -694,20 +704,26 @@ here and one lift there — both sides run the same name matcher, on purpose.
   prompt** are gone. The old logs stay readable, and deletable one by one, in the File tab under **Old call
   logs** (the section is absent when there are none). An old `#a/<id>/calls` link opens the athlete on The
   work. `call-log.html` and `CALL_LOG.md` still exist but nothing in the dashboard links to them.
-- **File** — *View their app* / *View their Proof* (read-only previews of the programme: what they have logged is not in them, it is under The work and Proof here; audit TOOLS-11), the **login** (create,
-  change password, remove; an unsent password shows here with Copy message, WhatsApp when the
-  number is known, and Mark sent), the programme row (tier, days/week, which cycle of the roadmap,
-  when it was last saved and by whom, Version history), the coaching log, **Old call logs** and the
-  **Danger zone**, which has **Delete training history**: every finished session (the hidden ones too) plus what the app keeps for them on the server (habit log, body
-  weight, personal records). Their programme, login, coaching log, calls and wall lines stay, and so
-  do they on the roster. (It was called *Delete all data* until 2026-10-10, which it never was.) It is
-  one call, `coach_delete_training_history()` (stage48): the sessions and the progress snapshot go
-  together or not at all, and the counts come back. It used to be two deletes from this page, and a
-  failure between them left one gone and one standing. Under it, **Erase completely…** removes the whole
-  person (see *Erasing a person* below).
+- **File** — four groups in this order (2026-10-12), each one white panel of label / value / action rows between hairlines, with the longer
+  explanations folded at the end of their group under **How this works** (nothing was removed: each short hint on a row has its full text there):
+  1. **Contact and access:** **WhatsApp** (the number box, *Save number*, *Remove*), **Login** (create, change password, remove; an unsent
+     password shows here with Copy message, WhatsApp when the number is known, and Mark sent; *No login yet* stays in clay), **Status**,
+     **Their app** (*View their app* / *View their Proof*: read-only previews of the programme; what they have logged is not in them, it is
+     under The work and Proof here; audit TOOLS-11) and **Came from** (the applications linked to them on the Intake tab).
+  2. **Programme:** the facts (athlete id, tier, days a week, cycle, roadmap n of m, when it was last saved and by whom; *Stored in: no
+     programme row* only when there is none), then the **Coaching log** and **Version history** folds.
+  3. **Records** (absent when there is nothing to show): **Hidden sessions** and **Old call logs**.
+  4. **Danger zone**, a fold shut by default, open while **Erase completely…** is open for this person, and kept open across a redraw once
+     you have opened it (`#dangerzone`, through `snapTabBody()`). Inside: **Delete training history**: every finished session (the hidden ones too) plus what the app keeps for them on the server (habit log, body
+     weight, personal records). Their programme, login, coaching log, calls and wall lines stay, and so
+     do they on the roster. (It was called *Delete all data* until 2026-10-10, which it never was.) It is
+     one call, `coach_delete_training_history()` (stage48): the sessions and the progress snapshot go
+     together or not at all, and the counts come back. It used to be two deletes from this page, and a
+     failure between them left one gone and one standing. Next, **Erase completely…**, which removes the whole
+     person (see *Erasing a person* below), and **Forget their Proof data…** for a free signup (see *Proof*, section 7).
 - **A WhatsApp number on every File** (stage62, 2026-10-11; audit FLOW-8; Amir: "a WhatsApp number field on each coached athlete's File, shown in
   the header with a WhatsApp button"). Most coached athletes had no contact record (9 of 49, all made from an intake form), so a new login's
-  *Copy message* had no WhatsApp button for them. The File has a **WhatsApp number** box (*Save number*, *Remove*); the header under the name
+  *Copy message* had no WhatsApp button for them. The File has a **WhatsApp number** box (*Save number*, *Remove*); the header (right of the name, 2026-10-12)
   shows a **WhatsApp ↗** button and the number, or *add a WhatsApp number* for a coached athlete with none. The page checks that `waLink()` can open the
   number (the country code, or an Iranian 09…; Persian digits are folded) before it sends it; `coach_set_whatsapp()` stores it as typed on the athlete's
   `hab_contacts` record, making one only when there is a number to keep (`source 'coach'`, tier from the programme). **A contact the coach made is
@@ -817,7 +833,9 @@ earned rather than cold. The headline counts **free** signups; someone who becam
 client is listed as *coached · converted* (the tier comes from their programme). WhatsApp opens a
 chat (one link builder for the whole page: Persian digits and Iranian 09… numbers handled).
 
-**forget** (free and Proof-only people only) calls `forget_contact()`, which PERMANENTLY deletes their
+**Forget** (free and Proof-only people only; since 2026-10-12 it is **not a button on the funnel row** (a permanent delete one click from WhatsApp and
+copy email) but **File → Danger zone → Forget their Proof data…**, offered to the people the funnel would have offered it to: a signup who is not a
+coached athlete) calls `forget_contact()`, which PERMANENTLY deletes their
 contact details, their whole progress row (habit log, body weight, records), their board place and
 their roll-call lines. Their programme, login, session history, titles and season results stay.
 It is not offered for coached clients: on them the progress row is their training app's cloud
@@ -854,7 +872,7 @@ drive create, copy, mark sent, Manage, change password, revoke, restore and a fa
 ### Erasing a person
 
 One panel, three kinds of person (stage54, Amir 2026-10-11: *"both athletes and buyers"*): an athlete (File →
-Danger zone → **Erase completely…**), a course buyer or a testing-app buyer (**Erase…** on the row). It opens by
+Danger zone, which is folded until you open it → **Erase completely…**; it is open while the panel is), a course buyer or a testing-app buyer (**Erase…** on the row). It opens by
 asking the server for a **dry run** of `coach_erase_person(kind, key, confirm, intake_ids, dry_run)`: the function
 does exactly the work of a real erasure and then undoes it, so the list shown (rows per table, the sign-in
 account) is what a real run would delete. Nothing is erased until the id (athlete) or username (buyer) is typed;

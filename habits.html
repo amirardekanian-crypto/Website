@@ -2008,6 +2008,66 @@
   #app .logquick .clear { border-color: var(--clay); color: var(--clay-deep); }
   #app .logquick .clear.armed { background: var(--clay); color: #FFFFFF; }
   #app .logsheet .sh-voice { font-size: 13.5px; line-height: 1.4; color: var(--muted); }
+  /* ── TODAY'S CARD AND PROGRESS'S WEEK (2026-10-12, the UX audit's batch B) ── */
+  #app .hero-lv { padding: 12px 14px 12px; gap: 10px; }
+  #app .hero-lv.past { box-shadow: 0 0 0 2px var(--clay), var(--shadow); }
+  #app .hero-top { gap: 10px; }
+  #app .hero-lv .lvring { width: 46px; height: 46px; flex: none; }
+  #app .hero-lv .lvring .lbl { display: none; }
+  #app .hero-lv .lvring .figure { font-size: 18px !important; }
+  #app .herobody { gap: 3px; }
+  #app .heroxp { font-size: 13px; }
+  #app .hero-lv .ranklink .hd { white-space: nowrap; }
+  #app .herobar { height: 5px; }
+  #app .hero-top .dayflame { flex-direction: row; align-items: center; gap: 5px; padding: 6px 9px; border-radius: 12px; text-align: left; }
+  #app .hero-top .dayflame .flame { width: 14px; height: 18px; }
+  #app .hero-top .dayflame .n { font-size: 19px; }
+  #app .hero-top .dayflame .u { font-size: 11px; line-height: 1.05; }
+  #app .wkrow { padding-top: 10px; }
+  #app .herosay { border-top: 1px solid var(--rule); padding-top: 10px; display: flex; flex-direction: column; gap: 3px; }
+  #app .herosay .say { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14.5px; line-height: 1.4; color: var(--ink); min-height: 1.4em; }
+  #app .herosay .sayk { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--clay-deep); }
+  #app .herosay.risk .say { color: var(--clay-deep); }
+  #app .hero-lv .backfill { margin: 0; padding: 10px 12px; border-radius: 14px; }
+  #app .hero-lv .backfill .bf-day { font-size: 17px; }
+  #app .rcprompt.qline { margin: 2px 16px 10px; width: auto; border: 0; border-radius: 20px; background: var(--card);
+    box-shadow: inset 0 0 0 1.5px var(--accent), var(--shadow); padding: 12px 16px; }
+  @media (max-width: 359px) {
+    #app .apphd .title.hd { font-size: 22px; }
+    #app .hero-top .dayflame .u { display: none; }
+    #app .herosay .say { font-size: 13.5px; }
+  }
+  #app .weektable { margin: 0 16px 8px; padding: 12px 12px 10px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 2px; }
+  #app .wt-r { display: grid; grid-template-columns: minmax(0, 92px) repeat(7, minmax(0, 1fr)) 40px; gap: 4px; align-items: center;
+    width: 100%; padding: 5px 2px; border-radius: 10px; background: none; border: 0; color: inherit; text-align: left; }
+  #app button.wt-r:active { background: var(--accent-100); }
+  #app .wt-h { padding: 0 2px 4px; }
+  #app .wt-h span { font-size: 11px; font-weight: 700; color: var(--muted-soft); text-align: center; }
+  #app .wt-h span.now { color: var(--accent); }
+  #app .wt-n { display: flex; align-items: center; gap: 6px; min-width: 0; font-weight: 700; font-size: 13.5px; }
+  #app .wt-n > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #app .wt-e { flex: none; font-size: 14px; }
+  #app .wt-c { display: block; height: 18px; border-radius: 5px; background: var(--track); }
+  #app .wt-c.hit { background: var(--accent); }
+  #app .wt-c.part { background: var(--accent-100); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 45%, transparent); }
+  #app .wt-c.pre { background: none; box-shadow: inset 0 0 0 1.5px var(--rule); }
+  #app .wt-c.now { outline: 2px solid var(--ink); outline-offset: -2px; }
+  #app .wt-r .hring { width: 34px; height: 34px; justify-self: end; }
+  #app .wt-r .hring .figure { font-size: 13px; }
+  #app .wt-off { opacity: .55; }
+  #app .wt-offt { grid-column: 2 / -1; font-size: 12px; color: var(--muted); }
+  #app .wt-empty { font-size: 13px; color: var(--muted); padding: 6px 4px; }
+  #app .wt-key { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 8px 2px 0; font-size: 11px; color: var(--muted); }
+  #app .wt-key span { display: flex; align-items: center; gap: 5px; }
+  #app .wt-key .wt-c { width: 12px; height: 12px; border-radius: 3px; }
+  /* Progress's four stats in one row */
+  #app .statgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  #app .statgrid > div, #app .statgrid > div:nth-child(odd), #app .statgrid > div:nth-last-child(-n+2) { padding: 10px 8px; }
+  #app .statgrid .figure, #app .statgrid .statfrac { font-size: 22px; }
+  #app .statgrid .statfrac .of { font-size: 13px; }
+  #app .statgrid .eyebrow { letter-spacing: .03em; line-height: 1.2; }
+  @media (max-width: 359px) { #app .wt-r { grid-template-columns: minmax(0, 70px) repeat(7, minmax(0, 1fr)) 34px; gap: 3px; } #app .wt-r .hring { width: 30px; height: 30px; } }
   #app .wins-share { flex: none; min-height: 44px; padding: 0 18px; border-radius: 999px; background: none;
     border: 1.5px solid rgba(246,244,255,.35); color: #F6F4FF; font-weight: 700; font-size: 13.5px; }
 
@@ -8150,242 +8210,106 @@ function renderToday(LI, doneCount) {
   const n = nudge();
   const past = editingPast();
   const risk = !past && n.risk;
-  // The recap half of "nudge and recap": last seven days at a glance.
-  const weekStart = addDays(today(), -6);
-  const weekXp = xpBetween(weekStart, today());
-  let goodDays = 0;
-  for (let i = 0; i < 7; i++) if (dayQualifies(fmtKey(addDays(today(), -i)))) goodDays++;
-  const ranked = hs.map(h => ({ h, w: habitWeek(h) })).sort((a, b) => b.w - a.w);
-  const strongest = ranked[0], weakest = ranked[ranked.length - 1];
-  // The heat map. Oldest day on the left, because that is the direction a week
-  // runs in. Rows are ordered strongest-first so the eye lands on the solid
-  // bands and finds the gap-toothed ones underneath — the opposite order opens
-  // the block on the athlete's worst habit, which is a scolding, not a recap.
-  // ⚠️ rosterOn(k), not live(): a habit switched on midweek did not exist on
-  // Monday, and drawing it as three misses is the app inventing failures. Those
-  // cells read `pre`, exactly like days before the athlete joined.
-  const firstDay = firstLoggedDay();
-  const heatDays = [];
-  for (let i = 6; i >= 0; i--) heatDays.push(fmtKey(addDays(today(), -i)));
-  const heatRows = ranked.map(r => ({
-    h: r.h,
-    cells: heatDays.map(k => {
-      if (firstDay && k < firstDay) return 'pre';
-      // Compared by ID, never by object identity. allHabits() builds a fresh
-      // object for every CUSTOM habit on each call, and rosterOn() serves ones
-      // built by a different call, so indexOf() could never match a custom
-      // habit — every cell on an athlete's own habit drew as `pre`, the shade
-      // meaning "you had not started yet". Weeks of real work rendered as
-      // nothing, on the one screen that reports the week, while the day scores
-      // beside it counted that habit perfectly well. The id is the stable key
-      // the rest of the app files everything under; use it here too.
-      if (!rosterOn(k).some(x => x.id === r.h.id)) return 'pre';
-      const v = valOf(k, r.h.id);
-      return v >= r.h.target ? 'hit' : (v > 0 ? 'part' : '');
-    })
-  }));
-
+  const qrun = past ? null : activeQuestRun();
   return `
     <div data-k="screen:today" style="${screenAnim()}">
-      <!-- The hero carries the LEVEL only. The day's own progress used to sit
-           directly beneath it as a second green bar of identical shape, which
-           read as one broken double-bar and stated a number the header and the
-           day strip were both already showing. -->
-      <!-- THE HERO IS A CARD (Amir, 2026-08-01), and it carries the week. Ring,
-           rank and distance-to-next on the top row with the streak tile on the
-           right; the last seven days underneath, inside the same card. The two
-           belong together — the ring is where you are, the week is how you got
-           here — and as two separate blocks they were the first 300px of the
-           screen saying one thing twice. -->
-      <div class="block hero-lv">
+      <!-- TODAY IS A LOGBOOK (2026-10-12, the UX audit's batch B). The card carries three things, in
+           this order: the game on one line (ring, rank, XP to next, the day-streak flame), the verdict
+           and the week (the day picker), and ONE line that says what to do now. That line is the
+           nudge; it turns clay when the streak is at risk (it was a separate strip above the list) and
+           becomes the "filling in" bar on an earlier day (it was a separate banner). The card went from
+           about 360 px to about 200, so most of the list is above the fold again. -->
+      <div class="block hero-lv${past ? ' past' : ''}">
         <div class="hero-top">
-          <!-- The XP ring: how far through this level, drawn AROUND the level
-               number rather than as a bar under the block — the number and its
-               progress are one object. r=15.5 in a 36 viewBox → C≈97.4. -->
           <button class="lvring" data-k="lvring" ${on(() => go('pass'))} aria-label="Open the Locker — the ladder and the rewards">
             <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rail" cx="18" cy="18" r="15.5"></circle><circle class="run" cx="18" cy="18" r="15.5" style="stroke-dashoffset:${(97.4 * (1 - LI.pct / 100)).toFixed(1)}"></circle></svg>
-            <span class="in"><span class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:${LI.lv > 99 ? 18 : 22}px;line-height:1">${LI.lv}</span><span class="lbl">LEVEL</span></span>
+            <span class="in"><span class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:${LI.lv > 99 ? 15 : 18}px;line-height:1">${LI.lv}</span><span class="lbl">LEVEL</span></span>
           </button>
           <div class="herobody">
             <button class="ranklink" ${on(() => go('pass'))} aria-label="Open the Locker — the ladder and the rewards">
-              ${rankCrest(LI.rank, 24)}
+              ${rankCrest(LI.rank, 20)}
               <span class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</span>
-              <span class="go">→</span>
+              <span class="go">›</span>
             </button>
-            <!-- Was the running XP total then the distance to next, e.g.
-                 "1,799 XP · 131 XP to level 5" — the total meant nothing on
-                 its own (Amir, 2026-07-30: "we dont want to know how many xp
-                 we have, its useless, just how many xp to next level is
-                 enough") and repeated the unit right next to itself. Distance
-                 alone is the number that is actually actionable today. -->
             <div class="heroxp"><b>${esc(String(LI.toNext).replace(/\B(?=(\d{3})+(?!\d))/g, ','))}</b> XP to level ${LI.lv + 1}</div>
-            <!-- The ring is the same fraction bent round a circle. Both, because
-                 the ring reads at a glance and the bar reads precisely — and
-                 because this is the bar Amir picked out of the reference. -->
-            <div class="herobar"><span data-fill style="width:${LI.pct}%"></span></div>
           </div>
-          <!-- The day streak sits ON the hero, not in a band under it. Amir
-               asked for the number he already had to be made louder, and the
-               band was a new field instead — a whole strip of screen to say one
-               integer. It renders ONLY while a streak is actually running:
-               streakFlame() returns nothing on day one and nothing on a broken
-               one, because neither is a report worth a tile. -->
           ${streakFlame(currentDayStreak(), bestDayStreak())}
         </div>
-        <!-- THE VERDICT LEADS THE WEEK (PRF-03): "2 to go", then On target, then Perfect, for the day
-             being logged. It replaced the percentage, which was what the day was worth, not whether it
-             counts. The week beside it is the day picker (PRF-05): the four day chips that sat under
-             the card went, so the list starts a chip-row higher. -->
+        <div class="herobar"><span data-fill style="width:${LI.pct}%"></span></div>
         <div class="wkrow" data-k="wkrow">${verdictTile(AKEY())}${weekStrip()}</div>
+        ${past ? `<div class="backfill" data-k="backfill">
+          <div>
+            <div class="eyebrow">Filling in</div>
+            <div class="bf-day">${esc(dayLong(AKEY()))}</div>
+          </div>
+          <button ${on(() => setDay(TKEY()))}>Back to today</button>
+        </div>` : `<div class="herosay${risk ? ' risk' : ''}" data-k="nudge">
+          ${risk ? `<div class="sayk">Streak at risk · ${shortOfQualifying()} to go before midnight</div>` : ''}
+          <div class="say" data-k="say:${esc(n.key)}" data-static data-type data-full="${esc(n.line)}">${esc(n.line)}</div>
+        </div>`}
       </div>
 
-      <!-- What was just won (PRF-02): a medal, a tier, a perfect day... under the card that carries the
-           level, until it is tapped. Only a level, a rank and a 7-day streak still take the screen. -->
+      <!-- What was just won (PRF-02): a medal, a tier, a perfect day... under the card, until it is tapped. -->
       ${past ? '' : winsCard()}
 
-      <!-- The habits come directly under the hero. The list is what the screen is FOR; it used to
-           start ~1,400px down, behind the nudge and the quest block, so opening the app to log meant
-           scrolling to log. -->
-      ${past ? `<div class="backfill" data-k="backfill">
-        <div>
-          <div class="eyebrow">Filling in</div>
-          <div class="bf-day">${esc(dayLong(AKEY()))}</div>
-        </div>
-        <button ${on(() => setDay(TKEY()))}>Back to today</button>
-      </div>` : ''}
-      <!-- What RESCUES the day, not what is left of it. "3 to go" was every
-           remaining habit; under a weighted score those are not the same
-           number, and the smaller one is the true one. -->
-      ${risk ? `<div class="riskbar" data-k="riskbar">Streak at risk · ${shortOfQualifying()} to go before midnight</div>` : ''}
-
-      <!-- What you can tick first; the programme's session last, as one slim line (PRF-01). It led the
-           list, so the first habit an athlete could tick started 466 px down. -->
+      <!-- What you can tick first; the programme's session last, as one slim line (PRF-01). -->
       ${(() => { const lead = leadStreak(); return rows.filter(h => !h.locked).concat(rows.filter(h => h.locked))
           .map(h => habitRow(h, 'today', lead, past && CFG.on[h.id] === false)).join(''); })()}
 
-      <!-- DIRECTLY UNDER THE LIST IT DESCRIBES. This line used to be the very
-           last element on the screen — measured 580px below the fold, at the
-           bottom of a 1,310px scroll, in the smallest and faintest type in the
-           app — which meant the only permanent explanation of the row's three
-           tap targets sat two screens past the moment anyone needed it. It
-           still goes BELOW the list (the list is what the screen is for), just
-           immediately below rather than after everything else. -->
       ${dayNumber() <= 7 ? `<div class="rowhint" data-k="rowhint">
         Tap the <strong>circle</strong> when it's done${live().some(h => h.kind === 'count' && !h.locked) ? ' (on a habit you count it opens the number), <strong>+</strong> to add one (hold it to go faster)' : ''},
         the <strong>name</strong> for its history.
       </div>` : ''}
 
-      <!-- BELOW the list, and below the hint that explains the list — the hint
-           belongs to the rows it describes and must not be cut off from them.
-           Weight is not one of the day's jobs so it does not sit among them; it
-           reports, and it is the only thing on this screen that shows a trend
-           without being tapped. On by default: for most athletes it is here
-           whether they asked for it or not, which is exactly what the notice
-           directly below is for. -->
+      <!-- Under the list, only what matters today: an offer the library earned, the board notice, the
+           week's quests while a run is on (a run is the one thing here with a deadline; Amir, 2026-10-12,
+           "3 yes"), the tour until it has run, and for a free athlete the way to coaching. The heat map
+           moved to Progress, the roll call row went (Crew keeps roll call; Amir, "2 demote"), and a
+           coached athlete's programme card went: the session row and Settings both open the programme. -->
       ${renderLibOffer()}
       ${renderBoardNotice()}
+      ${qrun ? questLine(qrun) : ''}
 
-      ${past ? '' : `<div class="coachcard ${risk ? 'risk' : ''}" data-k="nudge">
-        <div class="eyebrow">${risk ? 'While there is still time' : 'One nudge, as agreed'}</div>
-        <div class="say" data-k="say:${esc(n.key)}" data-static data-type data-full="${esc(n.line)}">${esc(n.line)}</div>
-        <button class="cta" ${on(() => (n.target === 'program' ? goProgram() : n.target ? openHabit(n.target, 'today') : go('progress')))}>${esc(n.cta)}</button>
-      </div>`}
-
-
-      <!-- The way back in for anyone who skipped the tour, and the way in for
-           every athlete who has been using the app since before it existed.
-           Below the habit list, like everything else on this screen that is not
-           the job — and it deletes itself the moment the tour has been run
-           once, so it costs a returning athlete nothing for ever. -->
       ${past || CFG.toured ? '' : `
         <button class="rcprompt" data-k="tourprompt" ${on(() => startTour('today'))}>
           <span>
             <span class="eyebrow">The tour</span>
-            <!-- Not "New here". This row shows to anyone who has not been through
-                 the tour, which on the day it ships is EVERY existing athlete —
-                 greeting someone on day 240 as a newcomer is the app not knowing
-                 who it is talking to. They are not new; the tour is. -->
             <span class="rcq">${loggedDays().length
               ? 'New: five steps on what the buttons in here do.'
               : 'Want the five-step tour of what everything does?'}</span>
           </span>
-          <!-- Purple, not clay: clay/orange is reserved for streak & urgency
-               (embers, risk banners) elsewhere in the app; purple is the
-               "this leads somewhere" affordance everywhere else a row navigates. -->
           <span class="hd" style="font-size:19px;color:var(--accent);flex:none">→</span>
         </button>`}
 
-      <!-- A pointer, not a second copy. The compose box itself lives in CREW
-           with the feed it posts to; this row exists so an athlete who only
-           ever opens Today still discovers there is a conversation. It shows
-           only while today's line is unwritten, so it disappears once done. -->
-      ${past || window.IS_DEMO || myNote(TKEY()) ? '' : `
-        <button class="rcprompt" data-k="rcprompt" ${on(() => { LB.view = 'roll'; go('crew'); })}>
-          <span>
-            <span class="eyebrow">Roll call</span>
-            <span class="rcq">${esc(pickLine('prompt', 'rollcall'))}</span>
-          </span>
-          <!-- Purple, not clay: clay/orange is reserved for streak & urgency
-               (embers, risk banners) elsewhere in the app; purple is the
-               "this leads somewhere" affordance everywhere else a row navigates. -->
-          <span class="hd" style="font-size:19px;color:var(--accent);flex:none">→</span>
-        </button>`}
-
-      <div class="block" style="display:flex;flex-direction:column;gap:12px;border-top:2px solid var(--divider)">
-        <!-- Not "The last seven days" any more: the hero card now opens the
-             screen with a seven-day row, and two headings saying the same span
-             read as the same section printed twice. The hero answers "how
-             complete was each day"; this answers "which habit is carrying me",
-             and the heading now says so. -->
-        <div class="eyebrow" style="letter-spacing:.12em">Your week, habit by habit</div>
-        <div style="display:flex;gap:22px">
-          <div><div class="figure" style="font-size:34px;line-height:.95"><span data-static data-num="goodDays" data-to="${goodDays}">${goodDays}</span><span style="font-size:16px;color:var(--muted)">/7</span></div>
-            <div class="eyebrow" style="letter-spacing:.1em;margin-top:4px">Days on target</div></div>
-          <div><div class="figure" data-static data-num="weekXp" data-to="${weekXp}" style="font-size:34px;line-height:.95">${weekXp.toLocaleString()}</div>
-            <div class="eyebrow" style="letter-spacing:.1em;margin-top:4px">XP earned</div></div>
-        </div>
-        <!-- Only once there is something to rank. On a week with nothing in it
-             every habit is 0/7, so this named a "strongest" and a "weakest" out
-             of an eight-way tie — on day one, to someone who has not logged
-             anything yet, which reads as the app having already judged them. -->
-        <!-- The heat map replaces the "strongest / weakest" sentence, which
-             named two habits out of eight and said nothing about the other six.
-             The grid says the same thing and the rest of it at once, and it
-             does not have to pick a loser to make its point. -->
-        ${heatRows.length && strongest.w > 0 ? `<div class="heat" data-k="heat">
-          <div class="hr">
-            <span></span>
-            ${heatDays.map(k => `<span class="hd-lbl ${k === TKEY() ? 'now' : ''}">${k === TKEY() ? 'TDY' : parseKey(k).toLocaleDateString('en-GB', { weekday:'short' }).slice(0, 2).toUpperCase()}</span>`).join('')}
-          </div>
-          ${heatRows.map(r => `<div class="hr">
-            <span class="hl" title="${esc(r.h.name)}">${esc(shortName(r.h))}</span>
-            ${r.cells.map((c, i) => `<span class="hc ${c} ${i === 6 ? 'today' : ''}"></span>`).join('')}
-          </div>`).join('')}
-        </div>` : `<div style="font-size:13px;line-height:1.5;color:var(--muted)">
-          Nothing in the last seven days yet. Tick one thing and this fills up.
-        </div>`}
-      </div>
-
-      <div class="crosslink-wrap">
-        <!-- For a free user this pointed at a programme that does not exist. It
-             is now the one place in the app that mentions coaching, and it says
-             the same thing the locked WORKOUT row says: the training habit is
-             the biggest one here and it comes with a programme. -->
-        <button class="crosslink" ${on(() => (isFree() ? (window.location.href = '/form.html') : goProgram()))}>
+      ${isFree() ? `<div class="crosslink-wrap">
+        <button class="crosslink" ${on(() => { window.location.href = '/form.html'; })}>
           <span class="crosslink-mark">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6M6 5v14M18 5v14M21 9v6M6 12h12"/></svg>
           </span>
           <span class="crosslink-body">
-            <span class="crosslink-title">${isFree() ? 'Want the training too?' : 'Your training programme'}</span>
-            <span class="crosslink-sub">${isFree()
-              ? 'A programme built for you — and WORKOUT stops being locked'
-              : "Today's session, your plan and the library"}</span>
+            <span class="crosslink-title">Want the training too?</span>
+            <span class="crosslink-sub">A programme built for you, and the session stops being locked.</span>
           </span>
           <span class="crosslink-go">→</span>
         </button>
-      </div>
+      </div>` : ''}
 
     </div>`;
+}
+
+// The week's quests on Today: one line while a run is on, into Progress where the card is.
+function questLine(run) {
+  const qs = runQuests(run);
+  if (!qs.length) return '';
+  const prog = qs.map(q => questProgress(q, run)), done = prog.filter(p => p.done).length;
+  const onOffer = qs.reduce((n, q, i) => n + (prog[i].done ? 0 : q.xp), 0), left = runDaysLeft(run);
+  return `<button class="rcprompt qline" data-k="qline" ${on(() => go('progress'))}>
+    <span>
+      <span class="eyebrow">This week's quests</span>
+      <span class="rcq">${done} of ${qs.length} done · ${done === qs.length ? 'all cleared' : onOffer.toLocaleString() + ' XP on the table'} · ${left > 1 ? left + ' days left' : 'last day'}</span>
+    </span>
+    <span class="hd" style="font-size:19px;color:var(--accent);flex:none">→</span>
+  </button>`;
 }
 
 // ── This week's quests ────────────────────────────────────────────────────
@@ -8453,6 +8377,49 @@ function fmtQuestVal(q, v) {
 // ── Progress — habits and achievements in one tab ─────────────────────────
 // These were two views of the same question ("how am I doing"), so they are
 // one screen: overall level, then every habit's own rank, then the milestones.
+// THE WEEK TABLE (2026-10-12, the UX audit). One row per habit, in Today's order: seven day cells
+// and the habit's level ring, the row opening its page. It replaces two drawings of the same habits:
+// the habit list that sat here (rings and five pips) and the heat map at the foot of Today.
+// ⚠️ rosterOn(k), not live(): a habit switched on midweek did not exist on Monday, and drawing it as
+// three misses is the app inventing failures. Those cells read `pre`, like days before the first log.
+// Compared by ID, never by object identity: allHabits() builds a fresh object for every CUSTOM habit.
+function weekTable(hs, off) {
+  const firstDay = firstLoggedDay(), days = [];
+  for (let i = 6; i >= 0; i--) days.push(fmtKey(addDays(today(), -i)));
+  let goodDays = 0;
+  days.forEach(k => { if (dayQualifies(k)) goodDays++; });
+  const weekXp = xpBetween(addDays(today(), -6), today());
+  const order = hs.filter(h => !h.locked).concat(hs.filter(h => h.locked));
+  const cell = (h, k) => {
+    if ((firstDay && k < firstDay) || !firstDay) return 'pre';
+    if (!rosterOn(k).some(x => x.id === h.id)) return 'pre';
+    const v = valOf(k, h.id);
+    return v >= h.target ? 'hit' : (v > 0 ? 'part' : '');
+  };
+  const head = `<div class="wt-r wt-h" aria-hidden="true"><span></span>${days.map(k => `<span class="${k === TKEY() ? 'now' : ''}">${k === TKEY() ? 'Td' : parseKey(k).toLocaleDateString('en-GB', { weekday: 'narrow' })}</span>`).join('')}<span>LV</span></div>`;
+  const row = h => {
+    const ep = splitEmoji(h.name);
+    return `<button class="wt-r" data-k="prow:${h.id}" ${on(() => openHabit(h.id, 'progress'))} aria-label="${esc(ep[1])}: open its history">
+      <span class="wt-n"><span class="wt-e" aria-hidden="true">${ep[0] || ''}</span><span>${esc(shortName(h))}</span></span>
+      ${days.map(k => `<i class="wt-c ${cell(h, k)}${k === TKEY() ? ' now' : ''}"></i>`).join('')}
+      ${habitRing(habitLevel(h))}
+    </button>`;
+  };
+  const offRow = h => {
+    const ep = splitEmoji(h.name), xp = habitLevel(h).xp;
+    return `<div class="wt-r wt-off" data-k="poff:${h.id}">
+      <span class="wt-n"><span class="wt-e" aria-hidden="true">${ep[0] || ''}</span><span>${esc(shortName(h))}</span></span>
+      <span class="wt-offt">${xp > 0 ? 'Paused · ' + xp.toLocaleString() + ' XP banked' : 'Off'} · turn on in Settings</span>
+    </div>`;
+  };
+  return sectionLabel('This week', goodDays + ' of 7 on target · +' + weekXp.toLocaleString() + ' XP') +
+    `<div class="weektable" data-k="weektable">
+      ${order.length ? head + order.map(row).join('') : `<div class="wt-empty">Nothing tracked yet. Switch habits on in Settings.</div>`}
+      ${off.map(offRow).join('')}
+      <div class="wt-key" aria-hidden="true"><span><i class="wt-c hit"></i>Hit</span><span><i class="wt-c part"></i>Part</span><span><i class="wt-c"></i>None</span><span><i class="wt-c pre"></i>Before you started</span></div>
+    </div>`;
+}
+
 function renderProgress(LI, earned, totalAch) {
   const hs = live(), off = offHabits();
   // ⚠️ bestDayStreak(), NOT bestHabitRun(). This tile is captioned DAY STREAK,
@@ -8463,7 +8430,7 @@ function renderProgress(LI, earned, totalAch) {
   // 8 days logged and one of them missed — the 8 was his WATER streak. Exactly
   // the two-scopes collision CLAUDE.md warns about, printed as one number
   // arguing with itself.
-  const bestDay = bestDayStreak(), lead = leadStreak(), dayStreakNow = currentDayStreak();
+  const bestDay = bestDayStreak(), dayStreakNow = currentDayStreak();
   const daysLogged = seasonDays().filter(k => dayPct(k) > 0).length;
   const perfectDays = seasonDays().filter(isPerfect).length;
   return `
@@ -8477,6 +8444,8 @@ function renderProgress(LI, earned, totalAch) {
            for anyone rebuilding, and opening your progress on a pair of zeros
            is a punishment for having had a bad week. Showing up is the stat
            that is almost always positive, and it is the one that earns the rest. -->
+      <!-- QUESTS FIRST while a run is on (2026-10-12): the one thing here that expires. -->
+      ${(run => run && runQuests(run).length ? sectionLabel('Quests', 'Seven days') + renderQuestBlock() : '')(activeQuestRun())}
       <div class="statgrid">
         <div><div class="figure" data-static data-num="logged" data-to="${daysLogged}">${daysLogged}</div>
           <div class="eyebrow">Days logged</div></div>
@@ -8500,7 +8469,7 @@ function renderProgress(LI, earned, totalAch) {
            and one would close it.) -->
       ${daysLogged === 0 ? `<div class="statnote" data-k="statnote">
         A <strong>milestone</strong> is one of the ${ACHIEVEMENTS.length + EVENTS.length} at the foot of this screen;
-        the five squares on a habit are its consistency tiers.
+        a habit's page shows its five consistency tiers.
         Every habit has <strong>its own streak</strong> — consecutive days you did that one thing.
         Your <strong>day streak</strong>, at the top, is consecutive days where you cleared
         ${XP_RULES.streakQualifyPct}% of what you could do that day — or left no more than one thing undone.
@@ -8508,55 +8477,7 @@ function renderProgress(LI, earned, totalAch) {
       </div>` : ''}
 
 
-      ${sectionLabel('Your habits', 'Tap for history')}
-      <div class="pipkey">
-        <span class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i === 0 ? 'on' : ''}"></i>`).join('')}</span>
-        <span>One square per tier — a ${CONSISTENCY_TIERS.slice(0, -1).map(t => t.days).join(', ')} or ${CONSISTENCY_TIERS[CONSISTENCY_TIERS.length - 1].days}-day <strong>streak</strong> on that habit.</span>
-      </div>
-      ${hs.length ? hs.map(h => {
-        const hl = habitLevel(h), c = consistencyFor(h), st = habitStreak(h), done = isDone(h);
-        // splitEmoji: the emoji sits in its own flex-none span so a wrapped
-        // name lines up under its own first word, not under the emoji.
-        const ep = splitEmoji(h.name);
-        return `<button class="row-rule" data-k="prow:${h.id}" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;padding:14px 20px;${done ? 'background:var(--accent-100);' : ''}"
-          ${on(() => openHabit(h.id, 'progress'))}>
-          ${habitRing(hl)}
-          <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
-            <!-- THE NAME GETS THE WHOLE LINE. It used to share it with the streak
-                 chip, which left 99px for a name — every habit here wrapped to
-                 two or three lines, and "Finish your session" took three. The
-                 streak moved down beside the XP, which is where Today already
-                 keeps it: the level anchors the row (there, on the right; here,
-                 as the ring on the left) and the streak rides the line under it,
-                 next to the numbers it belongs with. -->
-            <span class="hd" style="font-size:16px;line-height:1.15;display:flex;gap:7px;min-width:0">${ep[0] ? `<span style="flex:none">${ep[0]}</span>` : ''}<span>${esc(ep[1])}</span></span>
-            <!-- Was rank · XP · today's status, which wrapped to two lines and
-                 restated what Today already says. Then rank · XP — and the rank
-                 name went too (Amir, 2026-07-30): what an athlete reads off this
-                 row is the level NUMBER, the ladder of rank names lives in the
-                 Locker, and dropping it hands the line back to the habit's own
-                 name. The bar that sat under here is now the ring on the left.
-                 The XP figure followed the same day (Amir: "useless there") —
-                 XP is what the ring and the level number already communicate;
-                 restating the raw count added a line without adding information.
-                 Only the streak remains, and only when there is one. -->
-            ${st > 0 ? `<div style="min-width:0;font-size:11px;line-height:1.3">
-              <span class="hlv"><span class="ember${st === lead ? ' lead' : ''}" data-lvl="${emberLevel(st)}">${st}<span class="u">-DAY STREAK</span></span></span>
-            </div>` : ''}
-          </div>
-          <div class="pips" style="flex:none">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < c.tier ? 'on' : ''}" title="${t.days} days"></i>`).join('')}</div>
-        </button>`;
-      }).join('') : `<div style="padding:18px 20px;font-size:13px;color:var(--muted)">Nothing tracked yet. Switch habits on in Settings.</div>`}
-
-      ${off.length ? sectionLabel('Paused', 'Turn on in Settings') +
-        off.map(h => `<div class="row-rule" style="display:flex;gap:14px;align-items:center;padding:13px 20px;opacity:.45">
-          ${habitRing(habitLevel(h))}
-          <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1">
-            <div class="hd" style="font-size:16px;line-height:1.15;display:flex;gap:7px;min-width:0">${(ep => `${ep[0] ? `<span style="flex:none">${ep[0]}</span>` : ''}<span>${esc(ep[1])}</span>`)(splitEmoji(h.name))}</div>
-            <!-- "Off" for an add-on that was never on (POL-02); "Paused · 0 XP banked" said it had been. -->
-            <div style="font-size:11px;line-height:1.3;color:var(--muted)">${habitLevel(h).xp > 0 ? 'Paused · ' + habitLevel(h).xp.toLocaleString() + ' XP banked' : 'Off'}</div>
-          </div>
-        </div>`).join('') : ''}
+      ${weekTable(hs, off)}
 
       <!-- Milestones. These were nine rows at 45% opacity — mostly things the
            athlete had NOT done, greyed out, which reads as a report card rather
@@ -8579,7 +8500,6 @@ function renderProgress(LI, earned, totalAch) {
       <!-- Only while a run is on (PRF-02, Amir's 4A): a run arrives with its card and its takeover, and
            the manual explains quests in between. The idle line was all anyone had seen of quests since
            17 August. -->
-      ${(run => run && runQuests(run).length ? sectionLabel('Quests', 'Seven days') + renderQuestBlock() : '')(activeQuestRun())}
 
       <!-- Milestones, in three tiers. One flat list gave a new athlete a single
            reachable row above nine walls, and gave a two-year athlete nothing
@@ -8675,7 +8595,7 @@ function renderProgress(LI, earned, totalAch) {
       })()}
 
       <div style="padding:18px 20px 12px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
-        The number beside a habit is your level in it — it climbs with how often you do it, not how hard it is, and the ring around it is how far through that level you are. The five squares are consistency tiers, from a 5-day streak up to two months.
+        The ring at the end of a habit's row is your level in it. It climbs with how often you do it, not how hard it is, and the ring is how far through that level you are. Tap a habit for its consistency tiers, from a 5-day streak up to two months.
       </div>
       <!-- A second door to the manual, on the screen that uses the most words
            the app has never defined — badge, tier, run, streak, season, rank.
@@ -9231,7 +9151,7 @@ function renderManual() {
         p(`Older than ${BACKFILL_DAYS} days and the log is closed. That is on purpose: a record you can rewrite whenever you like is a diary, not proof. Filling a day in still counts for everything — points, streaks, milestones, quests.`))}
 
       ${block(h2('Roll call') +
-        p(`Once you're on the leaderboard you get <strong style="color:var(--ink)">one sentence a day</strong>. Write it on the <strong style="color:var(--ink)">CREW</strong> tab, under <strong style="color:var(--ink)">Roll call</strong> (Crew opens on the leaderboard; the Roll call row on Today takes you straight there). Everyone else on the board sees it, next to your name, your rank and how much of that day you finished.`) +
+        p(`Once you're on the leaderboard you get <strong style="color:var(--ink)">one sentence a day</strong>. Write it on the <strong style="color:var(--ink)">CREW</strong> tab, under <strong style="color:var(--ink)">Roll call</strong> (Crew opens on the leaderboard). Everyone else on the board sees it, next to your name, your rank and how much of that day you finished.`) +
         p(`Change it as many times as you like until midnight. After that it stands — you can fix an old day's <em>log</em>, but not what you said about it.`) +
         p(`It is worth <strong style="color:var(--ink)">no points at all</strong>, deliberately. It is not another box to tick; it is the one place in here where you get to say something. Everyone else's lines are right underneath yours.`) +
         p(`Keep it to things you don't mind other athletes reading — this is a shared wall, not a message to your coach.${isFree() ? '' : ' Anything private goes to me on WhatsApp: the button is at the top of the programme app&rsquo;s Coach tab.'}`))}
@@ -9335,7 +9255,7 @@ function renderManual() {
           if (!tot || !lock) return '';
           return p(`<strong style="color:var(--ink)">Your streak does not punish you for that.</strong> It only asks about what you could actually tick, so a locked session you have not earned is left out of the sum entirely. Do everything else on a rest day and the streak sees a full day — even while the score above it reads ${Math.round((tot - lock) / tot * 100)}%. Do the session and it counts twice over: it comes back into the day already finished.`);
         })()) +
-        p(`Your day streak is on the card at the top of <strong style="color:var(--ink)">Today</strong>, above your last seven days, and again on <strong style="color:var(--ink)">Progress</strong> beside the best you have ever had. Each habit carries its own streak in its row.`) +
+        p(`Your day streak is on the card at the top of <strong style="color:var(--ink)">Today</strong>, above your last seven days, and again on <strong style="color:var(--ink)">Progress</strong> beside the best you have ever had. Each habit shows its own streak in its row from 3 days, and Progress shows every habit's week in one table.`) +
         p(`Every tier and milestone is earned on your longest streak ever, the ${CONSISTENCY_TIERS.length} tiers on each habit and the streak milestones alike, so breaking a streak never takes one back.`) +
         // The athlete-facing half of "days are settled units". They will not read
         // the word roster, and they should not have to: what they need to know is
