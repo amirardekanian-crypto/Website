@@ -5030,6 +5030,10 @@
   :where(#home-overview, #screen-plan) .hrow-sp .nc-spark { width: 60px; height: 24px; display: block; }
   :where(#home-overview, #screen-plan) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
   :where(#home-overview, #screen-plan) .hrow-sp + .hrow-a { margin-left: -4px; }
+  @media (max-width: 359px) {   /* the narrowest phone: a shorter sparkline and tighter gaps, so "PERSONAL RECORDS" stays on one line */
+    :where(#home-overview, #screen-plan) .hrow { gap: 10px; padding-right: 12px; }
+    :where(#home-overview, #screen-plan) .hrow-sp .nc-spark { width: 44px; }
+  }
 
   /* 7. Progress: the header (the name as the eyebrow, "Progress" as the title), a section title for each part, and the This cycle
      card on the gutter. The cycle cards and the meter below move onto the same gutter, so the left edge is one line. */
