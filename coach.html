@@ -259,13 +259,83 @@
   .i-contact a { color: var(--court); border-bottom: 1px solid var(--court-100); }
   .i-contact .dot { color: var(--muted-soft); }
   .i-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-  .i-outcome { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--rule); display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: end; }
-  .i-outcome .i-now { flex-basis: 100%; margin: 0; font-size: 13px; }
-  .i-outcome .i-now a { color: var(--court); border-bottom: 1px solid var(--court-100); }
-  .i-outcome label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
-  .i-outcome select { min-height: 36px; font: inherit; font-size: 14px; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; max-width: 100%; }
+  /* The closing row of an application (2026-10-12, round 2 of the coach UX pass): What happened, Which athlete (only when the outcome keeps one),
+     Save outcome as the one primary button, and the quiet ways to close without an outcome (Mark handled, Archive, Reopen) at the right. */
+  .i-outcome { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--rule); }
+  .i-outcome .i-now { margin: 0 0 12px; font-size: 14px; }
+  .i-outcome .i-now a { color: var(--court); border-bottom: 1px solid var(--court-100); text-decoration: none; }
+  .in-close { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+  .in-close label { flex: 1 1 200px; max-width: 260px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
+  .in-close select { width: 100%; min-height: 36px; font: inherit; font-size: 14px; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; max-width: 100%; }
+  .in-close .btn.sm { min-height: 36px; }
+  .in-quiet { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
   .i-outcome [hidden] { display: none; }
   .arch-toggle { cursor: pointer; font-weight: 700; font-size: 13px; color: var(--muted); }
+  /* The Intake tab (2026-10-12, round 2): the list on the left, the chosen application on the right. Below 1000 px the list is the screen
+     until one is chosen, then that application is, with a way back (data-pane says which). The list scrolls by itself so the page does not. */
+  .in-view { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .in-view > .panel { min-width: 0; }
+  .in-view[data-pane="list"] > .in-detail, .in-view[data-pane="detail"] > .in-list { display: none; }
+  .in-list { padding: 8px 0 12px; }
+  .in-gh { display: block; padding: 12px 20px 4px; font-size: 12px; font-weight: 700; color: var(--muted); }
+  .in-gh.hot { color: var(--clay-ink); }
+  .in-none { padding: 4px 20px 8px; font-size: 13px; color: var(--muted); }
+  .in-row { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; width: 100%; min-height: 56px; padding: 8px 20px; text-align: left; }
+  .in-row + .in-row { border-top: 1px solid var(--rule); }
+  .in-row:hover { background: var(--court-100); }
+  /* The row on show is marked beside the application (wide), and on a phone only once one has been opened. */
+  .in-view.touched .in-row.on { background: var(--court-100); box-shadow: inset 3px 0 0 var(--court); }
+  .in-row .ava { width: 32px; height: 32px; border-radius: 999px; background: var(--court); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+  .in-row[data-st="archived"] .ava { background: var(--muted-soft); }
+  .in-main { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .in-n { font-weight: 700; font-size: 14px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .in-s { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 12px; color: var(--muted); }
+  .in-s .ipill.pct { text-transform: none; letter-spacing: 0; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .in-prog { white-space: nowrap; }
+  .in-when { font-size: 12px; color: var(--muted); white-space: nowrap; align-self: start; padding-top: 2px; }
+  .in-arch > summary { list-style: none; }
+  .in-arch > summary::-webkit-details-marker { display: none; }
+  .in-arch > summary::before { content: '▸'; display: inline-block; margin-right: 6px; }
+  .in-arch[open] > summary::before { content: '▾'; }
+  .in-detail { padding: 20px 24px 24px; }
+  .in-back { margin-bottom: 12px; }
+  .in-title { font-size: 28px; line-height: 1.05; overflow-wrap: anywhere; }
+  .in-title:focus { outline: none; }
+  .in-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 8px; font-size: 13px; color: var(--muted); }
+  .in-st.new { color: var(--clay-ink); font-weight: 700; }
+  .in-contact { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; margin-top: 16px; padding: 12px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); font-size: 14px; }
+  .in-c { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }
+  .in-c .k { font-size: 12px; color: var(--muted); }
+  .in-c a { color: var(--court); border-bottom: 1px solid var(--court-100); text-decoration: none; overflow-wrap: anywhere; }
+  .in-h { margin: 20px 0 4px; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .in-qa { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+  .in-q { display: grid; grid-template-columns: minmax(88px, 38%) minmax(0, 1fr); gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--rule); font-size: 14px; }
+  .in-q.long { grid-column: 1 / -1; grid-template-columns: minmax(88px, 19%) minmax(0, 1fr); }
+  .in-q dt { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+  .in-q dd { min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+  .in-q dd.rtl { text-align: right; }
+  .in-empty { padding: 48px 0; text-align: center; color: var(--muted); font-size: 14px; }
+  /* Two question-and-answer pairs to a row only while the application itself is 700 px wide or more (the pane, not the screen: at 1000 px it is 620). */
+  .in-detail { container: intake / inline-size; }
+  @container intake (max-width: 699px) {
+    .in-qa { grid-template-columns: minmax(0, 1fr); }
+    .in-q.long { grid-template-columns: minmax(88px, 38%) minmax(0, 1fr); }
+  }
+  @media (max-width: 699px) {
+    .in-close label { flex-basis: 100%; max-width: none; }
+    .in-detail { padding: 16px 16px 20px; }
+    .in-gh, .in-none { padding-left: 16px; padding-right: 16px; }
+    .in-row { padding-left: 16px; padding-right: 16px; }
+    .in-title { font-size: 26px; }
+  }
+  @media (min-width: 1000px) {
+    .in-view { grid-template-columns: 320px minmax(0, 1fr); align-items: start; }
+    .in-view.solo { grid-template-columns: minmax(0, 1fr); }
+    .in-row.on { background: var(--court-100); box-shadow: inset 3px 0 0 var(--court); }
+    .in-view[data-pane] > .in-list, .in-view[data-pane] > .in-detail { display: block; }
+    .in-list { position: sticky; top: calc(var(--stick) + 66px); max-height: calc(100vh - var(--stick) - 88px); overflow-y: auto; }
+    .in-back { display: none; }
+  }
 
   /* ── Affiliates (referral-code roster — public.affiliates, stage29) ── */
   .aff-code { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 13px; letter-spacing: .02em; }
@@ -7284,52 +7354,155 @@ function intakeGuess(i) {
   });
   return hits.length === 1 ? hits[0].id : '';
 }
-function intakeOutcomeHtml(i) {
+// The closing row of an application (round 2 of the coach UX pass, 2026-10-12; Amir: the outcome is the main way to close one, Mark handled stays as a
+// quiet button for "closed, no outcome", Archive is spam or not a fit, Reopen brings a handled or archived one back). One row: What happened, Which athlete
+// (only when that outcome keeps one), Save outcome as the one primary button, and the quiet buttons at the right. The saved outcome and its athlete sit above it.
+function intakeCloseHtml(i) {
+  const st = intakeGroupOf(i);
   const cur = i.outcome || '', ath = i.athlete_id || '', pick = ath || intakeGuess(i);
   const now = cur ? `<p class="i-now">Outcome: <b>${esc(intakeOutcomeLabel(cur))}</b>${ath ? ` · <a href="#a/${esc(encodeURIComponent(ath))}">${esc(nameOf(ath))}</a>` : ''}</p>` : '';
   const opts = INTAKE_OUTCOMES.map(([k, l]) => `<option value="${k}"${k === cur ? ' selected' : ''}>${esc(l)}</option>`).join('');
   const aths = intakeAthletes().map(a => `<option value="${esc(a.id)}"${a.id === pick ? ' selected' : ''}>${esc(a.name)} · ${esc(a.id)}</option>`).join('');
   // an athlete linked to an id that is no longer on the roster (erased, renamed) stays selectable so saving does not drop it silently
   const gone = ath && !intakeAthletes().some(a => a.id === ath) ? `<option value="${esc(ath)}" selected>${esc(ath)} (not on the roster)</option>` : '';
+  const act = (to, label) => `<button class="btn sm intake-act" data-id="${esc(i.id)}" data-to="${to}">${label}</button>`;
+  const quiet = st === 'new' ? act('handled', 'Mark handled') + act('archived', 'Archive')
+              : st === 'handled' ? act('new', 'Reopen') + act('archived', 'Archive')
+              : act('new', 'Reopen');
   return `<div class="i-outcome" data-id="${esc(i.id)}">${now}
-    <label>What happened<select class="i-out-sel"><option value="">${cur ? 'No outcome (clear it)' : 'Choose…'}</option>${opts}</select></label>
-    <label class="i-who"${intakeKeepsAthlete(cur) ? '' : ' hidden'}>Which athlete<select class="i-ath-sel"><option value="">Choose…</option>${gone}${aths}</select></label>
-    <button class="btn sm intake-outcome-save">Save outcome</button>
+    <div class="in-close">
+      <label>What happened<select class="i-out-sel"><option value="">${cur ? 'No outcome (clear it)' : 'Choose…'}</option>${opts}</select></label>
+      <label class="i-who"${intakeKeepsAthlete(cur) ? '' : ' hidden'}>Which athlete<select class="i-ath-sel"><option value="">Choose…</option>${gone}${aths}</select></label>
+      <button class="btn sm primary intake-outcome-save">Save outcome</button>
+      <span class="in-quiet">${quiet}</span>
+    </div>
   </div>`;
 }
-function intakeCard(i) {
-  const name = intakeName(i);
-  const st = i.status || 'new';
-  const langPill = `<span class="ipill ${i.lang === 'fa' ? 'fa' : 'en'}">${i.lang === 'fa' ? 'FA' : 'EN'}</span>`;
-  const progPill = i.programme ? `<span class="ipill prog">${esc(i.programme)}</span>` : '';
-  const outPill = i.outcome ? `<span class="ipill pct">${esc(intakeOutcomeLabel(i.outcome))}</span>` : '';
-
-  const rows = [];
-  const p = i.payload || {};
+// The state of the Intake view, kept in the page (not the address) so it survives a redraw, a status change and a reload of the data.
+let _intakeSel = '';        // the application on show, by id. When it is handled or archived it stays on show.
+let _intakeOpen = false;    // below 1000 px: the application replaces the list
+let _intakeTouched = false; // one has been chosen by hand (on a phone the list marks the row on show only from then on)
+let _intakeArch = false;    // the Archived group is unfolded
+let _intakeListY = 0;       // below 1000 px: how far the page was scrolled when an application was opened, so "All applications" puts it back
+const intakeGroupOf = i => (i.status === 'handled' || i.status === 'archived') ? i.status : 'new';
+const intakeProgShort = p => String(p || '').split(/\s+[—–]\s+/)[0].trim();   // "Match — $300 / 6 months" → "Match"
+function intakeArrived(i) {   // the full date and time, for a title
+  const d = new Date(i.created_at);
+  return isNaN(d) ? '' : `${prettyDate(dkey(d))}, ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+function intakeRowHtml(i, on) {
+  const name = intakeName(i), fa = i.lang === 'fa';
+  const prog = i.programme ? `<span class="in-prog" title="${esc(i.programme)}">${esc(intakeProgShort(i.programme))}</span>` : '';
+  const out = i.outcome ? `<span class="ipill pct">${esc(intakeOutcomeLabel(i.outcome))}</span>` : '';
+  return `<button type="button" class="in-row${on ? ' on' : ''}" data-id="${esc(i.id)}" data-st="${intakeGroupOf(i)}"${on ? ' aria-current="true"' : ''}>
+    <span class="ava" aria-hidden="true">${esc(initials(name))}</span>
+    <span class="in-main"><span class="in-n"><bdi>${esc(name)}</bdi></span><span class="in-s"><span class="ipill ${fa ? 'fa' : 'en'}">${fa ? 'FA' : 'EN'}</span>${prog}${out}</span></span>
+    <span class="in-when" title="${esc(intakeArrived(i))}">${esc(timeAgo(i.created_at))}</span>
+  </button>`;
+}
+// The questionnaire as a definition grid: each question and its answer side by side in one cell pair, two pairs to a row on a wide screen. An answer
+// in Persian script is right-to-left and right-aligned inside its own cell, never at the far edge of the page.
+function intakeAnswersHtml(i) {
+  const p = i.payload || {}, cells = [];
   Object.keys(p).forEach(k => {
     if (INTAKE_SKIP.has(k)) return;
     const val = intakeVal(p[k], i.lang === 'fa');
     if (!val.trim()) return;
-    const rtl = RTL_RE.test(val);
-    rows.push(`<tr><td class="k" dir="auto">${esc(k)}</td><td class="v${rtl ? ' rtl' : ''}" dir="${rtl ? 'rtl' : 'auto'}">${esc(val)}</td></tr>`);
+    const rtl = RTL_RE.test(Array.isArray(p[k]) ? p[k].join(' ') : val), long = val.length > 70 || /\n/.test(val);   // the Persian comma that joins a list is not Persian script
+    cells.push(`<div class="in-q${long ? ' long' : ''}"><dt dir="auto">${esc(k)}</dt><dd${rtl ? ' class="rtl"' : ''} dir="${rtl ? 'rtl' : 'auto'}">${esc(val)}</dd></div>`);
   });
-  const qa = rows.length ? `<table class="meta-table">${rows.join('')}</table>` : '<p class="empty">No further answers.</p>';
-
+  return cells.length ? `<dl class="in-qa">${cells.join('')}</dl>` : '<p class="empty">No further answers.</p>';
+}
+function intakeDetailHtml(i) {
+  const name = intakeName(i), st = intakeGroupOf(i), fa = i.lang === 'fa';
   const contact = i.contact || '', email = i.email || '', wa = waLink(contact);
   const cbits = [];
-  if (email) cbits.push(`<a href="mailto:${esc(email)}">${esc(email)}</a> <button class="btn sm copy-btn-js" data-url="${esc(email)}">Copy</button>`);
-  if (contact) cbits.push((wa ? `<a href="${esc(wa)}" target="_blank" rel="noopener">${esc(contact)}</a>` : esc(contact)) + ` <button class="btn sm copy-btn-js" data-url="${esc(contact)}">Copy</button>`);
-  const contactLine = cbits.join('<span class="dot">·</span>') || '<span class="muted">No contact given</span>';
-
-  let acts;
-  if (st === 'new')      acts = `<button class="btn sm primary intake-act" data-id="${esc(i.id)}" data-to="handled">Mark handled</button><button class="btn sm intake-act" data-id="${esc(i.id)}" data-to="archived">Archive</button>`;
-  else if (st === 'handled') acts = `<button class="btn sm intake-act" data-id="${esc(i.id)}" data-to="new">Reopen</button><button class="btn sm intake-act" data-id="${esc(i.id)}" data-to="archived">Archive</button>`;
-  else                   acts = `<button class="btn sm intake-act" data-id="${esc(i.id)}" data-to="new">Reopen</button>`;
-
-  return `<details class="intake-card ${st}"${st === 'new' ? ' open' : ''}>
-    <summary><span class="ava">${esc(initials(name))}</span><span class="i-name">${esc(name)}</span>${langPill}${progPill}${outPill}<span class="i-when">${esc(timeAgo(i.created_at))}</span></summary>
-    <div class="i-body"><div class="i-contact">${contactLine}</div>${qa}${intakeOutcomeHtml(i)}<div class="i-actions">${acts}</div></div>
-  </details>`;
+  if (email) cbits.push(`<span class="in-c"><span class="k">Email</span><a href="mailto:${esc(email)}">${esc(email)}</a><button class="btn sm copy-btn-js" data-url="${esc(email)}">Copy</button></span>`);
+  if (contact) cbits.push(`<span class="in-c"><span class="k">Contact</span>${wa ? `<a href="${esc(wa)}" target="_blank" rel="noopener">${esc(contact)}</a>` : `<span dir="auto">${esc(contact)}</span>`}<button class="btn sm copy-btn-js" data-url="${esc(contact)}">Copy</button></span>`);
+  const stText = st === 'new' ? 'New' : st === 'handled' ? (i.handled_at ? 'Handled ' + timeAgo(i.handled_at) : 'Handled') : 'Archived';
+  return `<div class="in-head">
+      <button type="button" class="btn sm in-back">← All applications</button>
+      <h2 class="hd in-title" tabindex="-1"><bdi>${esc(name)}</bdi></h2>
+      <div class="in-meta">
+        <span class="ipill ${fa ? 'fa' : 'en'}">${fa ? 'FA' : 'EN'}</span>${i.programme ? `<span class="ipill prog">${esc(i.programme)}</span>` : ''}
+        <span title="${esc(intakeArrived(i))}">Arrived ${esc(timeAgo(i.created_at))}</span><span class="in-st ${st}">${esc(stText)}</span>
+      </div>
+    </div>
+    <div class="in-contact">${cbits.join('') || '<span class="muted">No contact given</span>'}</div>
+    <h3 class="in-h">Answers</h3>
+    ${intakeAnswersHtml(i)}
+    ${intakeCloseHtml(i)}`;
+}
+// The whole Intake view as one piece of HTML, so a tab can sit this under a bar of its own: put the HTML anywhere, then wireIntake(the element
+// with id inView). Nothing in here reads $('content').
+function intakeViewHtml() {
+  const all = (S.intake || []).slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  const g = { new: [], handled: [], archived: [] };
+  all.forEach(i => g[intakeGroupOf(i)].push(i));
+  if (_intakeSel && !all.some(i => String(i.id) === _intakeSel)) _intakeSel = '';
+  if (!_intakeSel && g.new.length) _intakeSel = String(g.new[0].id);       // the newest new one, else nothing
+  const cur = all.find(i => String(i.id) === _intakeSel) || null;
+  if (!cur) _intakeOpen = false;
+  if (cur && intakeGroupOf(cur) === 'archived') _intakeArch = true;          // the one on show is never hidden in a folded group
+  if (!all.length) {
+    return `<div id="inView" class="in-view solo" data-pane="list"><section class="panel"><p class="empty">No applications yet. When someone submits the apply form (English or Farsi), it lands here, and the Web3Forms email still arrives.</p></section></div>`;
+  }
+  const rows = items => items.map(i => intakeRowHtml(i, cur && String(i.id) === _intakeSel)).join('');
+  let list = `<h3 class="in-gh${g.new.length ? ' hot' : ''}">New · ${g.new.length}</h3>` +
+    (g.new.length ? rows(g.new) : '<p class="in-none">No new applications. A new apply form lands here, and the Web3Forms email still arrives.</p>');
+  if (g.handled.length) list += `<h3 class="in-gh">Handled · ${g.handled.length}</h3>${rows(g.handled)}`;
+  if (g.archived.length) list += `<details class="in-arch"${_intakeArch ? ' open' : ''}><summary class="in-gh arch-toggle">Archived · ${g.archived.length}</summary>${rows(g.archived)}</details>`;
+  return `<div id="inView" class="in-view${_intakeTouched ? ' touched' : ''}" data-pane="${cur && _intakeOpen ? 'detail' : 'list'}">
+    <section class="panel in-list" aria-label="Applications">${list}</section>
+    <section class="panel in-detail"${cur ? ` data-id="${esc(cur.id)}" data-st="${intakeGroupOf(cur)}"` : ''}>${cur ? intakeDetailHtml(cur) : '<p class="in-empty">Pick an application to read it.</p>'}</section>
+  </div>`;
+}
+// Wire everything inside root (the #inView element, or anything that holds it). Safe to call again on a fresh copy of the HTML.
+function wireIntake(root) {
+  if (!root) return;
+  root.querySelectorAll('.copy-btn-js').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); copyText(btn.dataset.url, btn); }));
+  root.querySelectorAll('.intake-act').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); intakeSetStatus(btn.dataset.id, btn.dataset.to, btn); }));
+  root.querySelectorAll('.i-out-sel').forEach(sel => sel.addEventListener('change', () => { const w = sel.closest('.i-outcome').querySelector('.i-who'); if (w) w.hidden = !intakeKeepsAthlete(sel.value); }));
+  root.querySelectorAll('.intake-outcome-save').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); intakeSaveOutcome(btn); }));
+  root.querySelectorAll('.in-row').forEach(btn => btn.addEventListener('click', () => intakePick(btn.dataset.id)));
+  root.querySelectorAll('.in-back').forEach(btn => btn.addEventListener('click', intakeBack));
+  root.querySelectorAll('.in-arch').forEach(d => d.addEventListener('toggle', () => { _intakeArch = d.open; }));
+  // the chosen row stays in view in the list (on a wide screen the list scrolls by itself)
+  const list = root.querySelector('.in-list'), on = list && list.querySelector('.in-row.on');
+  if (list && on && list.scrollHeight > list.clientHeight) {
+    if (on.offsetTop < list.scrollTop) list.scrollTop = on.offsetTop - 8;
+    else if (on.offsetTop + on.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = on.offsetTop + on.offsetHeight - list.clientHeight + 8;
+  }
+}
+// A redraw of the Intake view that is already on the page: it replaces #inView only (so it does nothing if the coach has gone to another tab while a
+// save was out), keeps the list where it was scrolled, and does not replay the panels' entrance.
+function intakeRedraw(focusSel) {
+  const old = $('inView');
+  if (!old) return;
+  const list = old.querySelector('.in-list'), y = list ? list.scrollTop : 0;
+  $('content').classList.add('no-anim');
+  const tmp = document.createElement('div');
+  tmp.innerHTML = intakeViewHtml();
+  const nv = tmp.firstElementChild;
+  old.replaceWith(nv);
+  const nl = nv.querySelector('.in-list');
+  if (nl) nl.scrollTop = y;
+  wireIntake(nv);
+  const f = focusSel && nv.querySelector(focusSel);
+  if (f && f.offsetParent !== null) f.focus({ preventScroll: true });
+}
+function intakePick(id) {
+  if (String(id) === _intakeSel && _intakeOpen) return;
+  const narrow = !window.matchMedia('(min-width: 1000px)').matches;
+  if (narrow) _intakeListY = window.scrollY;
+  _intakeSel = String(id); _intakeOpen = true; _intakeTouched = true;
+  intakeRedraw(narrow ? '.in-back' : '.in-row.on');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+function intakeBack() {
+  _intakeOpen = false;
+  intakeRedraw('.in-row.on');
+  window.scrollTo({ top: _intakeListY, behavior: 'instant' });
 }
 
 async function intakeSetStatus(id, to, btn) {
@@ -7339,8 +7512,8 @@ async function intakeSetStatus(id, to, btn) {
     if (error) { if (btn) btn.disabled = false; fail('Could not update — try Refresh'); return; }
   }
   const row = (S.intake || []).find(x => String(x.id) === String(id));
-  if (row) row.status = to;
-  renderIntake(); renderRail();
+  if (row) { row.status = to; row.handled_at = to === 'new' ? null : (row.handled_at || new Date().toISOString()); }   // the server stamps handled_at the first time it leaves new
+  intakeRedraw('.in-title'); renderRail();
 }
 
 async function intakeSaveOutcome(btn) {
@@ -7365,26 +7538,12 @@ async function intakeSaveOutcome(btn) {
     if (outcome && (row.status || 'new') === 'new') { row.status = 'handled'; row.handled_at = new Date().toISOString(); }
   }
   invalidateDetail();       // the athlete's File says where they came from
-  renderIntake(); renderRail();
+  intakeRedraw('.in-title'); renderRail();
   toast(outcome ? 'Outcome saved' : 'Outcome cleared');
 }
 function renderIntake() {
-  const all = (S.intake || []).slice().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-  const g = { new: [], handled: [], archived: [] };
-  all.forEach(i => (g[i.status] || g.new).push(i));
-
-  let html = `<section class="panel"><div class="phead"><span class="t hd">New applications</span><span class="r">${g.new.length} waiting</span></div>`;
-  html += g.new.length ? g.new.map(intakeCard).join('')
-    : '<p class="empty">No new applications. When someone submits the apply form (English or Farsi), it lands here — and Amir still gets the Web3Forms email.</p>';
-  html += `</section>`;
-  if (g.handled.length) html += `<section class="panel" style="margin-top:16px"><div class="phead"><span class="t hd">Handled</span><span class="r">${g.handled.length}</span></div>${g.handled.map(intakeCard).join('')}</section>`;
-  if (g.archived.length) html += `<section class="panel" style="margin-top:16px"><details><summary class="arch-toggle">Archived · ${g.archived.length}</summary><div style="margin-top:12px">${g.archived.map(intakeCard).join('')}</div></details></section>`;
-
-  $('content').innerHTML = html;
-  $('content').querySelectorAll('.copy-btn-js').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); copyText(btn.dataset.url, btn); }));
-  $('content').querySelectorAll('.intake-act').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); intakeSetStatus(btn.dataset.id, btn.dataset.to, btn); }));
-  $('content').querySelectorAll('.i-out-sel').forEach(sel => sel.addEventListener('change', () => { const w = sel.closest('.i-outcome').querySelector('.i-who'); if (w) w.hidden = !intakeKeepsAthlete(sel.value); }));
-  $('content').querySelectorAll('.intake-outcome-save').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); intakeSaveOutcome(btn); }));
+  $('content').innerHTML = intakeViewHtml();
+  wireIntake($('inView'));
 }
 
 // --- demo fixtures (?demo=1) — layout preview only, nothing is real ----------

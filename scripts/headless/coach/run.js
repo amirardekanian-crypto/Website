@@ -359,27 +359,29 @@ S['intake-status'] = async (b) => {
   const { page } = await L.openCoach(b, { hash: 'intake' });
   const badge = async () => (await page.locator('#rail a.tab', { hasText: 'Intake' }).innerText()).replace(/\s+/g, ' ');
   const b0 = await badge();
-  const card = () => page.locator('.intake-card', { hasText: 'Fixture Applicant One' });
+  // (2026-10-12, round 2: the newest new application is on show in the detail, with the buttons; its row in the list says which group it is in.)
+  const detail = () => page.locator('.in-detail', { hasText: 'Fixture Applicant One' });
+  const grp = () => page.locator('.in-row', { hasText: 'Fixture Applicant One' }).getAttribute('data-st');
   let n0 = await L.nCalls(page);
-  await L.jsClick(card().locator('.intake-act[data-to=handled]'));
+  await L.jsClick(detail().locator('.intake-act[data-to=handled]'));
   await L.settle(page);
   let c = lastOf(await L.callsSince(page, n0), x => x.name === 'set_intake_status');
   check(r, 'Mark handled → set_intake_status(id, handled)', c && c.payload.p_status === 'handled' && /1a1$/.test(c.payload.p_id), c && c.payload);
-  check(r, 'card moves to Handled and the badge drops', (await card().getAttribute('class')).includes('handled') && (await badge()) !== b0, { cls: await card().getAttribute('class'), before: b0, after: await badge() });
+  check(r, 'it moves to Handled (and stays on show) and the badge drops', (await grp()) === 'handled' && (await detail().count()) === 1 && (await badge()) !== b0, { grp: await grp(), before: b0, after: await badge() });
   n0 = await L.nCalls(page);
-  await L.jsClick(card().locator('.intake-act[data-to=archived]'));
+  await L.jsClick(detail().locator('.intake-act[data-to=archived]'));
   await L.settle(page);
   c = lastOf(await L.callsSince(page, n0), x => x.name === 'set_intake_status');
-  check(r, 'Archive → archived', c && c.payload.p_status === 'archived' && (await card().getAttribute('class')).includes('archived'), c && c.payload);
+  check(r, 'Archive → archived', c && c.payload.p_status === 'archived' && (await grp()) === 'archived', c && c.payload);
   n0 = await L.nCalls(page);
-  await L.jsClick(card().locator('.intake-act[data-to=new]'));
+  await L.jsClick(detail().locator('.intake-act[data-to=new]'));
   await L.settle(page);
   c = lastOf(await L.callsSince(page, n0), x => x.name === 'set_intake_status');
-  check(r, 'Reopen → new, badge back', c && c.payload.p_status === 'new' && (await badge()) === b0, { payload: c && c.payload, badge: await badge() });
+  check(r, 'Reopen → new, badge back', c && c.payload.p_status === 'new' && (await grp()) === 'new' && (await badge()) === b0, { payload: c && c.payload, badge: await badge() });
   await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'set_intake_status', message: 'fixture failure', times: 1 }));
-  await L.jsClick(card().locator('.intake-act[data-to=handled]'));
+  await L.jsClick(detail().locator('.intake-act[data-to=handled]'));
   await L.settle(page);
-  check(r, 'a failed update leaves the card as it was and says so', (await card().getAttribute('class')).includes('new') && /Could not update/.test(await L.failText(page)), { cls: await card().getAttribute('class'), failBar: await L.failText(page) });
+  check(r, 'a failed update leaves the application as it was and says so', (await grp()) === 'new' && /Could not update/.test(await L.failText(page)), { grp: await grp(), failBar: await L.failText(page) });
   await page.context().close();
   return r;
 };
@@ -3138,10 +3140,14 @@ S['session-hide-no-false-warning'] = async (b) => {
 S['intake-outcome'] = async (b) => {
   const r = { id: 'intake-outcome', title: "Intake: an application records what happened and the athlete it became; the athlete's File says where they came from", checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'intake' });
-  const card = name => page.locator('.intake-card', { hasText: name });
+  // (2026-10-12, round 2: the application on show is the detail on the right, chosen from the list; its row wears the outcome pill and says which group it is in.)
+  const row = name => page.locator('.in-row', { hasText: name });
+  const choose = async name => { await row(name).click(); await L.settle(page, 200); };
+  const detail = page.locator('.in-detail');
   const badge = async () => (await page.locator('#rail a.tab', { hasText: 'Intake' }).innerText()).replace(/\s+/g, ' ');
   const b0 = await badge();
-  const one = card('Fixture Applicant One');
+  const one = detail;       // the newest new application is on show when the tab opens: Fixture Applicant One
+  check(r, 'the application on show when the tab opens is Fixture Applicant One', /Fixture Applicant One/.test(await detail.locator('.in-title').textContent()), await detail.locator('.in-title').textContent());
   // 1. a client needs an athlete
   await one.locator('.i-out-sel').selectOption('client');
   check(r, 'choosing "Became a client" shows the athlete picker', await one.locator('.i-who').isVisible(), '');
@@ -3153,11 +3159,12 @@ S['intake-outcome'] = async (b) => {
   await one.locator('.intake-outcome-save').click(); await L.settle(page, 900);
   const c1 = lastOf(await L.callsSince(page, n0), c => c.name === 'set_intake_outcome');
   check(r, 'one set_intake_outcome(id, client, ava_test)', !!c1 && /1a1$/.test(c1.payload.p_id) && c1.payload.p_outcome === 'client' && c1.payload.p_athlete_id === 'ava_test', c1 && c1.payload);
-  const t1 = (await one.evaluate(el => el.textContent)).replace(/\s+/g, ' ');      // textContent: the card is folded, its body is not drawn
-  check(r, 'the card moved to Handled, wears the outcome as a pill, names the athlete, and the Intake badge dropped', /handled/.test(await one.getAttribute('class')) && /Became a client/.test(t1) && /Ava Example/.test(t1) && (await badge()) !== b0, { cls: await one.getAttribute('class'), t1: t1.slice(0, 200), badge: await badge() });
+  const t1 = (await row('Fixture Applicant One').evaluate(el => el.textContent) + ' ' + await one.evaluate(el => el.textContent)).replace(/\s+/g, ' ');   // the row wears the pill, the detail names the athlete
+  check(r, 'it moved to Handled (and stays on show), its row wears the outcome as a pill, the detail names the athlete, and the Intake badge dropped', (await row('Fixture Applicant One').getAttribute('data-st')) === 'handled' && /Became a client/.test(await row('Fixture Applicant One').innerText()) && /Ava Example/.test(await one.innerText()) && (await badge()) !== b0, { st: await row('Fixture Applicant One').getAttribute('data-st'), t1: t1.slice(0, 200), badge: await badge() });
   check(r, 'the server row holds the link and the outcome, and marked the application handled', await page.evaluate(() => { const i = window.__DB.hab_intake.find(x => /1a1$/.test(x.id)); return i.athlete_id === 'ava_test' && i.outcome === 'client' && i.status === 'handled' && !!i.linked_at; }), '');
   // 2. an outcome that keeps no athlete
-  const two = card('Fixture Applicant Two');
+  await choose('Fixture Applicant Two');
+  const two = detail;
   await two.locator('.i-out-sel').selectOption('not_a_fit');
   check(r, 'a "Not a fit" has no athlete picker', !(await two.locator('.i-who').isVisible()), '');
   n0 = await L.nCalls(page);
@@ -3172,10 +3179,10 @@ S['intake-outcome'] = async (b) => {
   check(r, 'the File says "Came from" the application, its programme and its outcome, with a link to Intake', /came from/i.test(meta) && /Set — \$180/.test(meta) && /Became a client/.test(meta) && (await cameRow.locator('a[href="#intake"]').count()) === 1, meta.slice(0, 400));
   // 4. clearing it
   await L.go(page, 'intake'); await L.settle(page, 500);
-  await card('Fixture Applicant One').locator('summary').click();
-  await card('Fixture Applicant One').locator('.i-out-sel').selectOption('');
+  await choose('Fixture Applicant One');
+  await detail.locator('.i-out-sel').selectOption('');
   n0 = await L.nCalls(page);
-  await card('Fixture Applicant One').locator('.intake-outcome-save').click(); await L.settle(page, 900);
+  await detail.locator('.intake-outcome-save').click(); await L.settle(page, 900);
   const c3 = lastOf(await L.callsSince(page, n0), c => c.name === 'set_intake_outcome');
   check(r, 'clearing sends a null outcome and no athlete', !!c3 && c3.payload.p_outcome === null && c3.payload.p_athlete_id === null, c3 && c3.payload);
   await L.go(page, 'a/ava_test/file'); await L.settle(page, 700);
@@ -3183,17 +3190,137 @@ S['intake-outcome'] = async (b) => {
   // 5. a server without stage61
   await L.go(page, 'intake'); await L.settle(page, 500);
   await page.evaluate(() => { window.__STUB.missingRpc = ['set_intake_outcome']; });
-  await card('Fixture Applicant One').locator('summary').click();      // a handled card is folded after every redraw
-  await card('Fixture Applicant One').locator('.i-out-sel').selectOption('declined');
-  await card('Fixture Applicant One').locator('.intake-outcome-save').click(); await L.settle(page, 700);
+  await choose('Fixture Applicant One');
+  await detail.locator('.i-out-sel').selectOption('declined');
+  await detail.locator('.intake-outcome-save').click(); await L.settle(page, 700);
   check(r, 'a server that has not had stage61 says so, in words', /set_intake_outcome yet/.test(await L.failText(page)) && /stage61/.test(await L.failText(page)), await L.failText(page));
   // 6. the likely athlete is suggested, never saved on its own
   await page.evaluate(() => { window.__STUB.missingRpc = []; window.__DB.hab_intake.push({ id: 'guess-1', created_at: new Date().toISOString(), lang: 'en', name: 'Ava  Example', email: '', contact: '', programme: 'Set', payload: {}, status: 'new', handled_at: null }); return hardRefresh(); });
   await L.settle(page, 900); await L.go(page, 'intake'); await L.settle(page, 500);
+  await page.locator('.in-row[data-id="guess-1"]').click(); await L.settle(page, 200);
   check(r, 'an application with the same full name as one athlete has that athlete pre-selected', (await page.locator('.i-outcome[data-id="guess-1"] .i-ath-sel').inputValue()) === 'ava_test', await page.locator('.i-outcome[data-id="guess-1"] .i-ath-sel').inputValue());
   check(r, '...and a saved outcome is only what the coach saved (nothing was sent for it)', await page.evaluate(() => { const i = window.__DB.hab_intake.find(x => x.id === 'guess-1'); return !i.athlete_id && !i.outcome; }), '');
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
+  return r;
+};
+
+// ── The Intake tab as a list and a detail (round 2 of the coach UX pass; 2026-10-12) ─────────────────────────────────────────────────────────
+S['intake-list-detail'] = async (b) => {
+  const r = { id: 'intake-list-detail', title: 'Intake: the list and the chosen application side by side at 1440, one at a time below 1000 px, a Farsi answer in its own right-to-left cell, one primary button in the closing row', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'intake' });
+  await page.setViewportSize({ width: 1440, height: 900 }); await L.settle(page, 300);
+  const row = name => page.locator('.in-row', { hasText: name });
+  const title = async () => ((await page.locator('.in-detail .in-title').textContent()) || '').trim();
+  const box = sel => page.locator(sel).first().boundingBox();
+  const heads = async () => (await page.locator('.in-list .in-gh').allInnerTexts()).map(t => t.replace(/\s+/g, ' ').trim());
+  const grp = name => row(name).getAttribute('data-st');
+  const quiet = async () => (await page.locator('.in-detail .in-quiet .btn').allInnerTexts()).map(t => t.trim());
+  const noOverflow = () => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+  // 1. side by side; the newest new application is on show
+  const lb = await box('.in-list'), db = await box('.in-detail');
+  check(r, 'at 1440 the list (about 320 px wide) and the application stand side by side, tops level', !!lb && !!db && lb.width > 300 && lb.width < 340 && db.x >= lb.x + lb.width && Math.abs(db.y - lb.y) < 4, { lb, db });
+  check(r, 'the newest NEW application (Fixture Applicant One, not the older new one or the handled one) is on show and its row is marked', /^Fixture Applicant One$/.test(await title()), await title());
+  check(r, '...the row says so too (aria-current), and no other row does', (await row('Fixture Applicant One').getAttribute('aria-current')) === 'true' && (await page.locator('.in-row[aria-current]').count()) === 1, '');
+  check(r, 'the list has the groups New · 2 and Handled · 1', JSON.stringify(await heads()) === JSON.stringify(['New · 2', 'Handled · 1']), await heads());
+  // more applications: a Farsi one (the newest), an archived one
+  await page.evaluate(() => {
+    const now = Date.now();
+    window.__DB.hab_intake.push(
+      { id: 'fa-1', created_at: new Date(now - 3600e3).toISOString(), lang: 'fa', name: 'سارا محمدی', email: 'sara.fa@example.invalid', contact: '۰۹۱۲۱۲۳۴۵۶۷', programme: 'Set — $180 / 3 months',
+        payload: { 'Age': '29', 'Goals': ['قدرت سرویس', 'استقامت'], 'Current Injury': 'درد شانه راست', 'Level': 'Club', 'Notes': 'من هفته های گذشته بعد از تمرین سنگین سرویس درد دارم و میخوام برنامه ای بگیرم که با سرک من سازگار باشد و بتونم هفته ای چهار روز تمرین کنم' }, status: 'new', handled_at: null },
+      { id: 'arch-1', created_at: new Date(now - 12 * 86400e3).toISOString(), lang: 'en', name: 'Fixture Archived', email: 'arch@example.invalid', contact: '', programme: null, payload: { 'Location': 'Nowhere' }, status: 'archived', handled_at: new Date(now - 11 * 86400e3).toISOString() });
+    return hardRefresh();
+  });
+  await L.settle(page, 900);
+  check(r, 'a newer application arriving does not take the screen away from the one on show', /Fixture Applicant One/i.test(await title()), await title());
+  check(r, 'the groups are New · 3, Handled · 1 and a FOLDED Archived · 1', JSON.stringify(await heads()) === JSON.stringify(['New · 3', 'Handled · 1', 'Archived · 1']) && !(await page.locator('.in-arch').evaluate(d => d.open)) && !(await row('Fixture Archived').isVisible()), await heads());
+  const rowText = (await row('Fixture Applicant One').innerText()).replace(/\s+/g, ' ');
+  check(r, 'a row carries initials, the EN or FA pill, the programme in short and when it arrived', /^FO$/.test((await row('Fixture Applicant One').locator('.ava').innerText()).trim()) && /EN/.test(rowText) && /Set/.test(rowText) && !/\$180/.test(rowText) && /today|yesterday|days ago/.test(rowText), rowText);
+  // 2. choosing another shows it
+  await row('Fixture Applicant Two').click(); await L.settle(page, 250);
+  check(r, 'choosing another application shows it, and the mark moves', /Fixture Applicant Two/i.test(await title()) && (await row('Fixture Applicant Two').getAttribute('aria-current')) === 'true' && !(await row('Fixture Applicant One').getAttribute('aria-current')), await title());
+  // 3. the choice survives a redraw and a status change
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  check(r, 'the choice survives a reload of the data', /Fixture Applicant Two/i.test(await title()), await title());
+  const n0 = await L.nCalls(page);
+  await page.locator('.in-detail .intake-act[data-to=handled]').click(); await L.settle(page, 500);
+  check(r, 'Mark handled sends the status and nothing else', (await L.callsSince(page, n0)).filter(c => c.kind === 'rpc' && /^set_intake/.test(c.name)).map(c => c.name).join() === 'set_intake_status', (await L.callsSince(page, n0)).map(c => c.name));
+  check(r, '...it moves to Handled but stays on show', (await grp('Fixture Applicant Two')) === 'handled' && /Fixture Applicant Two/i.test(await title()) && JSON.stringify(await heads()) === JSON.stringify(['New · 2', 'Handled · 2', 'Archived · 1']), { grp: await grp('Fixture Applicant Two'), title: await title(), heads: await heads() });
+  check(r, '...and, now handled, its quiet buttons are Reopen and Archive (no Mark handled)', JSON.stringify(await quiet()) === JSON.stringify(['Reopen', 'Archive']), await quiet());
+  // 4. a Farsi application: each answer in its own cell, right-to-left inside it
+  await row('سارا محمدی').click(); await L.settle(page, 250);
+  const geo = await page.evaluate(() => {
+    const pane = document.querySelector('.in-detail').getBoundingClientRect();
+    const qs = [...document.querySelectorAll('.in-detail .in-q')].map(q => {
+      const dt = q.querySelector('dt').getBoundingClientRect(), dd = q.querySelector('dd'), d = dd.getBoundingClientRect(), qb = q.getBoundingClientRect(), cs = getComputedStyle(dd);
+      return { label: q.querySelector('dt').textContent, dir: dd.getAttribute('dir'), align: cs.textAlign, direction: cs.direction, long: q.classList.contains('long'), q: { x: qb.x, w: qb.width, top: qb.top }, dt: { r: dt.right }, dd: { x: d.x, r: d.right } };
+    });
+    return { pane: { x: pane.x, w: pane.width }, qs };
+  });
+  const rtl = geo.qs.filter(q => q.dir === 'rtl'), notRtl = geo.qs.filter(q => q.dir !== 'rtl');
+  check(r, 'the Farsi answers (goals, injury, notes) carry dir=rtl and are right-aligned; the Latin ones (age, level) do not', rtl.length === 3 && rtl.every(q => q.direction === 'rtl' && q.align === 'right') && notRtl.length === 2 && notRtl.every(q => q.direction === 'ltr' && q.align !== 'right'), geo.qs.map(q => [q.label, q.dir, q.align]));
+  check(r, 'each answer sits inside its own cell pair, to the right of its label, and a short answer\'s pair is half the pane, so it is not pushed to the far edge', geo.qs.filter(q => !q.long).every(q => q.dd.x >= q.dt.r - 1 && q.dd.r <= q.q.x + q.q.w + 1 && q.q.w < geo.pane.w * 0.55), geo.qs.map(q => [q.label, Math.round(q.q.w), Math.round(q.dd.r)]));
+  const pairs = geo.qs.filter(q => !q.long);
+  check(r, 'two pairs to a row on a wide screen (the first two share a top and are side by side); a long answer takes the whole row', pairs.length >= 2 && Math.abs(pairs[0].q.top - pairs[1].q.top) < 2 && pairs[1].q.x > pairs[0].q.x + 100 && geo.qs.some(q => q.long && q.q.w > geo.pane.w * 0.8), pairs.slice(0, 2).map(q => q.q));
+  const email = await page.locator('.in-contact a[href^="mailto:"]').count(), wa = await page.locator('.in-contact a[href^="https://wa.me/"]').getAttribute('href');
+  check(r, 'the contact row has the email (mailto), a WhatsApp link built from the Persian digits, and a Copy beside each', email === 1 && wa === 'https://wa.me/989121234567' && (await page.locator('.in-contact .copy-btn-js').count()) === 2, wa);
+  // 5. one way to close: Save outcome is the only primary button; the quiet ones sit beside it
+  check(r, 'in the closing row Save outcome is the only primary button', (await page.locator('.in-detail .i-outcome .btn.primary').count()) === 1 && (await page.locator('.in-detail .i-outcome .btn.primary.intake-outcome-save').count()) === 1, '');
+  check(r, '...next to it, the quiet ones: Mark handled and Archive (a new application)', JSON.stringify(await quiet()) === JSON.stringify(['Mark handled', 'Archive']) && (await page.locator('.in-detail .in-quiet .btn.primary').count()) === 0, await quiet());
+  const sb = await box('.in-detail .intake-outcome-save'), mb = await box('.in-detail .intake-act[data-to=handled]');
+  check(r, '...all in one row (What happened, Save outcome and the quiet ones level)', Math.abs(sb.y - mb.y) < 4 && (await page.locator('.in-detail .i-out-sel').isVisible()), { sb, mb });
+  check(r, 'Which athlete shows only when the outcome keeps one', !(await page.locator('.in-detail .i-who').isVisible()) && (await page.locator('.in-detail .i-out-sel').selectOption('client'), await page.locator('.in-detail .i-who').isVisible()) && (await page.locator('.in-detail .i-out-sel').selectOption('not_a_fit'), !(await page.locator('.in-detail .i-who').isVisible())), '');
+  // 6. Mark handled (no outcome), Archive and Reopen still work
+  let n1 = await L.nCalls(page);
+  await page.locator('.in-detail .intake-act[data-to=handled]').click(); await L.settle(page, 500);
+  let cs = await L.callsSince(page, n1);
+  check(r, 'Mark handled closes it with NO outcome: one set_intake_status(handled), no set_intake_outcome', cs.filter(c => c.name === 'set_intake_status').length === 1 && cs.filter(c => c.name === 'set_intake_status')[0].payload.p_status === 'handled' && !cs.some(c => c.name === 'set_intake_outcome') && (await grp('سارا محمدی')) === 'handled', cs.map(c => c.name));
+  n1 = await L.nCalls(page);
+  await page.locator('.in-detail .intake-act[data-to=archived]').click(); await L.settle(page, 500);
+  cs = await L.callsSince(page, n1);
+  check(r, 'Archive → archived; the folded group opens so the one on show is not hidden, and the application is still on show', cs.filter(c => c.name === 'set_intake_status').length === 1 && (await grp('سارا محمدی')) === 'archived' && await page.locator('.in-arch').evaluate(d => d.open) && await row('سارا محمدی').isVisible() && (await title()) === 'سارا محمدی', await grp('سارا محمدی'));
+  check(r, '...an archived application offers only Reopen', JSON.stringify(await quiet()) === JSON.stringify(['Reopen']), await quiet());
+  n1 = await L.nCalls(page);
+  await page.locator('.in-detail .intake-act[data-to=new]').click(); await L.settle(page, 500);
+  check(r, 'Reopen → new again, back under New', (await grp('سارا محمدی')) === 'new' && JSON.stringify(await quiet()) === JSON.stringify(['Mark handled', 'Archive']), await grp('سارا محمدی'));
+  // 7. the list keeps its place when one is chosen (a long list scrolls by itself)
+  await page.evaluate(() => { const D = window.__DB; for (let n = 0; n < 40; n++) D.hab_intake.push({ id: 'bulk-' + n, created_at: new Date(Date.now() - (14 + n) * 86400e3).toISOString(), lang: 'en', name: 'Bulk ' + n, email: '', contact: '', programme: null, payload: {}, status: 'handled', handled_at: null }); return hardRefresh(); });
+  await L.settle(page, 900);
+  await page.evaluate(() => { document.querySelector('.in-list').scrollTop = 500; });
+  const sy0 = await page.evaluate(() => document.querySelector('.in-list').scrollTop);
+  const pick = page.locator('.in-row', { hasText: 'Bulk 9' }).first();
+  await pick.click(); await L.settle(page, 250);
+  const sy1 = await page.evaluate(() => document.querySelector('.in-list').scrollTop);
+  check(r, 'the list is its own scroll box on a wide screen, and choosing a row does not move it', sy0 > 300 && Math.abs(sy1 - sy0) < 3 && /Bulk 9/.test(await title()), { sy0, sy1 });
+  check(r, 'no horizontal overflow at 1440', await noOverflow(), '');
+  // 8. the 1000 px line
+  await page.setViewportSize({ width: 1000, height: 800 }); await L.settle(page, 250);
+  const l1 = await box('.in-list'), d1 = await box('.in-detail');
+  check(r, 'at 1000 px it is still a list beside the application', !!l1 && !!d1 && d1.x >= l1.x + l1.width - 1 && await noOverflow(), { l1, d1 });
+  // 9. below 1000 px: the list, then the application INSTEAD of it, with a way back (a fresh page: nothing chosen by hand yet)
+  await page.context().close();
+  for (const w of [999, 390, 320]) {
+    const o = await L.openCoach(b, { hash: 'intake' });
+    const p = o.page;
+    await p.evaluate(() => { const now = Date.now(); window.__DB.hab_intake.push({ id: 'fa-1', created_at: new Date(now - 3600e3).toISOString(), lang: 'fa', name: 'سارا محمدی', email: 'sara.fa.with.a.rather.long.address@example.invalid', contact: '۰۹۱۲۱۲۳۴۵۶۷', programme: 'Set — $180 / 3 months', payload: { 'Age': '29', 'Goals': ['قدرت سرویس', 'استقامت'], 'Notes': 'من هفته های گذشته بعد از تمرین سنگین سرویس درد دارم و میخوام برنامه ای بگیرم که با سرک من سازگار باشد و بتونم هفته ای چهار روز تمرین کنم' }, status: 'new', handled_at: null }); return hardRefresh(); });
+    await L.settle(p, 900);
+    await p.setViewportSize({ width: w, height: 844 }); await L.settle(p, 300);
+    const vis = sel => p.locator(sel).first().isVisible();
+    const ov = () => p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+    check(r, `at ${w}: the list is the screen and the application is not drawn, with no horizontal overflow`, (await vis('.in-list')) && !(await vis('.in-detail')) && await ov(), '');
+    await p.locator('.in-row', { hasText: 'سارا محمدی' }).click(); await L.settle(p, 250);
+    check(r, `at ${w}: choosing one shows it INSTEAD of the list, with "← All applications" at the top`, !(await vis('.in-list')) && (await vis('.in-detail')) && /All applications/.test(await p.locator('.in-back').innerText()) && (await p.locator('.in-back').isVisible()), '');
+    await p.locator('.in-detail .i-out-sel').selectOption('client'); await L.settle(p, 100);
+    const g = await p.evaluate(() => { const qs = [...document.querySelectorAll('.in-detail .in-q')].map(q => q.getBoundingClientRect()); return { stacked: qs.length >= 2 && qs[1].top > qs[0].bottom - 1 && Math.abs(qs[0].left - qs[1].left) < 2, rtl: document.querySelectorAll('.in-detail dd[dir=rtl]').length }; });
+    // one question per row once the application itself is narrower than about 700 px; at 999 the full-width application is 900 px, so it keeps two
+    check(r, `at ${w}: ${w < 700 ? 'one question per row' : 'two questions to a row'}, the Farsi answers still right-to-left, the athlete picker open, and nothing runs off the screen`, g.stacked === (w < 700) && g.rtl >= 2 && await p.locator('.in-detail .i-who').isVisible() && await ov(), g);
+    await p.locator('.in-back').click(); await L.settle(p, 250);
+    check(r, `at ${w}: "← All applications" returns to the list`, (await vis('.in-list')) && !(await vis('.in-detail')) && (await p.locator('.in-row[aria-current]').count()) === 1, '');
+    check(r, `at ${w}: no page errors`, !o.log.errors.length, o.log.errors);
+    await p.context().close();
+  }
+  check(r, 'no page errors', !log.errors.length, log.errors);
   return r;
 };
 
@@ -3419,7 +3546,7 @@ S['fail-bar'] = async (b) => {
   // 3. a different failure is a second line, and Dismiss all appears
   await L.go(page, 'intake');
   await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'set_intake_status', message: 'fixture failure', times: 1 }));
-  await L.jsClick(page.locator('.intake-card', { hasText: 'Fixture Applicant One' }).locator('.intake-act[data-to=handled]'));
+  await L.jsClick(page.locator('.in-detail', { hasText: 'Fixture Applicant One' }).locator('.intake-act[data-to=handled]'));
   await L.settle(page, 500);
   check(r, 'a different failure is a second line, and Dismiss all appears', (await lines()) === 2 && (await page.locator('#failbar .fb-all').count()) === 1, await L.failText(page));
   // 4. dismissing
