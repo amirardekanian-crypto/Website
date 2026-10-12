@@ -67,6 +67,18 @@ on The work, the Applications list and the failure bar all offset themselves fro
 page is `<header class="topbar">` holding `.tb-top` (the brand and the buttons) and `.rail` (the tabs): from 900 px `.tb-top` is `display: contents`
 and the header is the flex row; under 900 px the header is `display: contents` and `.tb-top` is the sticky row. `nav-seven` measures all of it.
 
+**A phone's bottom bar** (round 3, 2026-10-12; the dashboard is used mostly on a PC, so nothing from 600 px up changed). **Below 600 px** the tab row is hidden and a bar
+fixed to the bottom of the screen takes its place: **Today · Athletes · Exercises · More**, text only, the one you are on marked (green, a clay line above it),
+the Athletes count (notes to read) on its item. **More** opens a small sheet above the bar with **Proof, Leads (with its new-applications count), Library and Buyers**;
+More is marked while one of those is on show and carries the Leads count. The sheet closes on a pick, on a tap outside (a scrim), on Esc, on a second tap on More
+and on **Back**: it is **one history step**, like the athlete app's layers (opening it pushes a guard entry with the address unchanged; Back pops it and nothing else;
+any other way out steps back over it first, and a pick goes there after, so no dead step is left; with the sheet closed Back is exactly what it was). It never shows with
+⚙ Tools. 600-899 px keeps the one scrolling tab row. `--bb` (56 px plus the safe-area inset) is the bar's height: the page gets it as bottom padding and
+`scroll-padding-bottom`, and the toast, the Undo bar, the Exercises editor's Save bar and the Tools panel's height all read it, so nothing hides behind the bar
+(those offsets sit with the bar's CSS, under `body` for specificity; the fail bar is sticky at the top and is unchanged). The markup is `#botbar`, `#moreSheet` and
+`#moreScrim` in `#app`, painted by `paintBotBar()` from `renderRail()` (same badges, same active rule); the tab row's links stay in the page, hidden. `phone-bottom-bar` measures it at 390 and 320 px and
+at 599, 600, 750, 899, 900 and 1440.
+
 | Tab | What it's for |
 |---|---|
 | **Today** | The day's play: who needs you (and why), what else is waiting, and a short Proof column (your line to the crew, today's wall lines, the quest week and who is drifting) |

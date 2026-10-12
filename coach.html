@@ -147,6 +147,55 @@
   @media (min-width: 900px) and (max-width: 1179px) { .tb-lbl { display: none; } .brand span { display: none; } }
   @media (min-width: 900px) and (max-width: 1019px) { .brand { letter-spacing: .1em; } .tab { padding: 0 10px; } }
 
+  /* ── A phone's bottom bar (2026-10-12, round 3 of the coach UX pass; Amir works mostly on a PC, so nothing from 600 px up changes). Below 600 px the tab
+     row is hidden and a bar fixed to the bottom of the screen takes its place: Today · Athletes · Exercises · More, the active one marked, the Athletes
+     badge (notes to read) on its item. More opens a small sheet ABOVE the bar with the other four places (Proof, Leads with its new-applications badge,
+     Library, Buyers); More is marked while one of them is on show and carries the Leads badge. 600-899 px keeps the one row of tabs. --bb is the bar's
+     height, safe-area inset included; everything that sits at the bottom of the screen reads it, so nothing hides behind the bar (the toast, the Undo bar,
+     the Exercises editor's Save bar), and scroll-padding keeps a scrolled-to element above the bar. The offsets
+     of other components are here, next to the bar (`body` in front lifts their specificity over their own rules further down; those rules stay as they are).
+     The top bar is unchanged (brand, ↻, ⚙ Tools, Sign out). z-index: scrim 66, sheet 69, bar 70, above the top bar (60) and the failbar (58). The page
+     gets the bar's height as bottom padding. ── */
+  .botbar, .moresheet, .morescrim { display: none; }
+  @media (max-width: 599px) {
+    :root { --bb: calc(56px + env(safe-area-inset-bottom, 0px)); }
+    .rail { display: none; }
+    #app { padding-bottom: var(--bb); }
+    html { scroll-padding-bottom: var(--bb); }
+    .botbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; height: var(--bb); padding-bottom: env(safe-area-inset-bottom, 0px);
+              background: var(--card); border-top: 1px solid var(--line); box-shadow: 0 -10px 22px -18px rgba(14,74,54,.55); }
+    .bb-item { flex: 1 1 0; min-width: 0; position: relative; display: flex; align-items: center; justify-content: center; text-decoration: none;
+               font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 14px; color: var(--muted); -webkit-tap-highlight-color: transparent; }
+    .bb-item:hover { color: var(--ink); }
+    .bb-item:focus-visible { outline-offset: -4px; border-radius: 10px; }
+    .bb-item.active { color: var(--court); }
+    .bb-item.active::before { content: ''; position: absolute; left: 20%; right: 20%; top: -1px; height: 3px; background: var(--clay); border-radius: 0 0 3px 3px; }
+    .bb-l { position: relative; white-space: nowrap; }
+    .bb-item .n { position: absolute; top: -10px; left: calc(100% - 2px); font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; line-height: 1.3;
+                  background: var(--clay-fill); color: #fff; min-width: 18px; text-align: center; padding: 0 5px; border-radius: 999px; }
+    .morescrim:not([hidden]) { display: block; position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 66; background: rgba(26,26,26,.34); }
+    .moresheet:not([hidden]) { display: block; position: fixed; left: 0; right: 0; bottom: var(--bb); z-index: 69; padding: 8px 8px 12px;
+                               max-height: calc(100vh - var(--bb) - var(--stick) - 12px); overflow-y: auto; overscroll-behavior: contain;
+                               background: var(--card); border: 1px solid var(--line); border-bottom: 0; border-radius: 18px 18px 0 0;
+                               box-shadow: 0 -16px 36px -16px rgba(0,0,0,.4); animation: riseIn .18s ease-out both; }
+    .ms-row { display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 6px 14px; border-radius: 12px; text-decoration: none; color: var(--ink); }
+    .ms-row:focus-visible { outline-offset: -3px; }
+    .ms-row { position: relative; }
+    .ms-row.active { background: var(--court-100); color: var(--court); }
+    .ms-row.active::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 3px; background: var(--clay); }
+    .ms-text { display: grid; min-width: 0; }
+    .ms-name { font-size: 16px; font-weight: 600; line-height: 1.3; }
+    .ms-note { font-size: 12.5px; line-height: 1.35; color: var(--muted); }
+    .ms-row .n { margin-left: auto; flex: none; font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; line-height: 1.3;
+                 background: var(--clay-fill); color: #fff; min-width: 19px; text-align: center; padding: 1px 6px; border-radius: 999px; }
+    body #toast { bottom: calc(26px + var(--bb)); }
+    body .undobar { bottom: calc(76px + var(--bb)); }
+    body .spine-acts { bottom: var(--bb); }
+    body .toolspanel { max-height: calc(100vh - var(--stick) - var(--bb) - 16px); }
+  }
+  /* 320 px: four 80 px items; a two-digit count on Athletes would reach into Exercises, so the labels and the count tuck in a little. */
+  @media (max-width: 340px) { .bb-item { font-size: 13px; } .bb-item .n { left: calc(100% - 5px); padding: 0 4px; min-width: 16px; } }
+
   .wrap { max-width: 1180px; margin: 0 auto; padding: 22px 20px 90px; }
   @media (max-width: 480px) { .wrap { padding: 16px 14px 90px; } }
   /* Jump links (the Today counters) land below the sticky bar, not under it. */
@@ -1292,6 +1341,9 @@
   <div id="loadwarn" class="loadwarn" role="alert" hidden></div>
   <div id="failbar" class="failbar" role="alert" hidden></div>
   <main class="wrap" id="content"><div class="loading"><div class="spinner"></div>Warming up…</div></main>
+  <nav class="botbar" id="botbar" aria-label="Sections"></nav>
+  <div class="morescrim" id="moreScrim" onclick="closeMore()" hidden></div>
+  <nav class="moresheet" id="moreSheet" aria-label="More places" hidden></nav>
 </div>
 
 <div id="toast" role="status" aria-live="polite"></div>
@@ -2792,6 +2844,7 @@ function renderRail() {
     rail.scrollLeft = Math.max(0, on.offsetLeft - (rail.clientWidth - on.offsetWidth) / 2);
   }
   _railActive = active;
+  paintBotBar(active, waiting, newIntake);
   paintLoadWarn();
   paintTools();
   leadsBarRefresh();
@@ -2858,6 +2911,80 @@ window.addEventListener('hashchange', ev => {
   }
   render();
 });
+// ── The phone's bottom bar (round 3 of the coach UX pass, 2026-10-12) ───────────────────────────────────────────────────────────────────
+// Below 600 px (the CSS decides; the markup is always drawn) the tab row is hidden and #botbar takes its place: Today · Athletes · Exercises · More.
+// More opens #moreSheet above the bar with the other places in TABS (Proof, Leads, Library, Buyers; a place added to TABS lands there). The sheet is ONE
+// history step, as the athlete app's layers are: opening it pushes a guard entry with the address unchanged, so Back closes the sheet and nothing else.
+// Every other way out (a pick, a tap on the scrim, Esc, More again, a tap on the bar) goes back over that entry first and a pick navigates after it, so
+// no dead step is left in the history. With the sheet closed nothing here touches the history. Opening it closes ⚙ Tools and the reverse.
+const BAR_IDS = ['today', 'athletes', 'exercises'];
+const MORE_NOTE = { proof: 'Wall, board, quests', leads: 'Applications, signups, codes', links: 'Workouts and articles', buyers: 'Course and Testing app logins' };
+let _moreOpen = false, _moreGuard = false, _moreWait = null, _barHtml = '', _sheetHtml = '', _shownHash = '';
+const isPhoneBar = () => window.matchMedia('(max-width: 599px)').matches;
+function paintBotBar(active, waiting, newIntake) {
+  _shownHash = location.hash;
+  const bar = $('botbar'), sheet = $('moreSheet');
+  if (!bar || !sheet) return;
+  const badge = (n, title) => n > 0 ? `<span class="n" title="${title}">${n}</span>` : '';
+  const notes = badge(waiting, `${waiting} note${waiting === 1 ? '' : 's'} to read`), apps = badge(newIntake, `${newIntake} new application${newIntake === 1 ? '' : 's'}`);
+  const forBar = TABS.filter(t => BAR_IDS.includes(t.id)), forMore = TABS.filter(t => !BAR_IDS.includes(t.id));
+  const on = id => active === id ? ' active' : '', cur = id => active === id ? ' aria-current="page"' : '';
+  const bhtml = forBar.map(t => `<a class="bb-item${on(t.id)}" href="#${t.id}"${cur(t.id)} onclick="return navTap(event)"><span class="bb-l">${t.label}${t.id === 'athletes' ? notes : ''}</span></a>`).join('')
+    + `<button type="button" id="moreBtn" class="bb-item${forMore.some(t => t.id === active) ? ' active' : ''}" aria-haspopup="true" aria-expanded="false" aria-controls="moreSheet" onclick="toggleMore(event)"><span class="bb-l">More${apps}</span></button>`;
+  const shtml = forMore.map(t => `<a class="ms-row${on(t.id)}" href="#${t.id}"${cur(t.id)} onclick="return navTap(event)"><span class="ms-text"><span class="ms-name">${t.label}</span>${MORE_NOTE[t.id] ? `<span class="ms-note">${MORE_NOTE[t.id]}</span>` : ''}</span>${t.id === 'leads' ? apps : ''}</a>`).join('');
+  // Rewritten only when it changed, so a redraw does not take the focus away.
+  const hadFocus = document.activeElement && document.activeElement.id === 'moreBtn';
+  if (bhtml !== _barHtml) { bar.innerHTML = bhtml; _barHtml = bhtml; if (hadFocus && $('moreBtn')) $('moreBtn').focus(); }
+  if (shtml !== _sheetHtml) { sheet.innerHTML = shtml; _sheetHtml = shtml; }
+  paintMore();
+}
+function paintMore() {
+  const sheet = $('moreSheet'), scrim = $('moreScrim'), btn = $('moreBtn');
+  if (sheet) sheet.hidden = !_moreOpen;
+  if (scrim) scrim.hidden = !_moreOpen;
+  if (btn) btn.setAttribute('aria-expanded', String(_moreOpen));
+}
+function openMore(ev) {
+  if (_moreOpen || !isPhoneBar()) return;
+  setTools(false);
+  _moreOpen = true;
+  try { history.pushState({ aa: _lastViewKey, more: 1 }, '', location.href); _moreGuard = true; } catch (e) { _moreGuard = false; /* the sheet still works, Back just leaves the screen */ }
+  paintMore();
+  if (ev && ev.detail === 0) { const f = $('moreSheet').querySelector('.ms-row.active') || $('moreSheet').querySelector('.ms-row'); if (f) f.focus(); }   // from the keyboard
+}
+// `then` runs once the guard entry is gone (a pick navigates there). A timer covers a browser that never answers history.back().
+function closeMore(then) {
+  const next = typeof then === 'function' ? then : null;
+  if (!_moreOpen) { if (next) next(); return; }
+  _moreOpen = false;
+  paintMore();
+  if (!_moreGuard) { if (next) next(); return; }
+  _moreGuard = false;
+  _moreWait = next || (() => {});
+  clearTimeout(closeMore._h); closeMore._h = setTimeout(runMoreWait, 600);
+  history.back();
+}
+function runMoreWait() { clearTimeout(closeMore._h); const f = _moreWait; _moreWait = null; if (f) f(); }
+function toggleMore(ev) { if (_moreOpen) closeMore(); else openMore(ev); }
+// A tap on a place while the sheet is open (in the sheet or on the bar) closes it first. A plain tap only: a modified click opens the address as the browser would.
+function navTap(ev) {
+  if (!_moreOpen || ev.defaultPrevented || ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return true;
+  const href = ev.currentTarget.getAttribute('href');
+  ev.preventDefault();
+  closeMore(() => { if (href && location.hash !== href) location.hash = href; });
+  return false;
+}
+window.toggleMore = toggleMore; window.closeMore = closeMore; window.navTap = navTap;
+// Back (a step over the guard entry) closes the sheet. A step that leaves the address as it was draws nothing, so the router's "this render came from
+// history" mark (set just before, by its own popstate listener) is cleared, or the next tap on a tab would be read as a Back and keep an old scroll place.
+window.addEventListener('popstate', () => {
+  if (location.hash === _shownHash) _viaHistory = false;
+  if (_moreWait) { _viaHistory = false; runMoreWait(); }   // our own step back over the guard: what runs next is a fresh tap, so a new screen starts at the top
+  else if (_moreOpen) { _moreOpen = false; _moreGuard = false; paintMore(); }
+});
+window.addEventListener('hashchange', () => { if (_moreOpen) { _moreOpen = false; _moreGuard = false; paintMore(); } });   // a screen change by any other road
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && _moreOpen) { closeMore(); if ($('moreBtn')) $('moreBtn').focus(); } });
+try { window.matchMedia('(max-width: 599px)').addEventListener('change', e => { if (!e.matches) closeMore(); }); } catch (e) { /* an old browser: the CSS keeps the sheet hidden from 600 px up */ }
 window.addEventListener('beforeunload', ev => {
   if (route().view === 'exercises' && (spineNoteEdits(), spineHasEdits())) { ev.preventDefault(); ev.returnValue = ''; }
 });
@@ -3547,6 +3674,7 @@ function statusChip(a) {
 let _toolsOpen = false, _toolsHtml = '';
 function setTools(open) {
   _toolsOpen = !!open;
+  if (_toolsOpen && _moreOpen) closeMore();   // never together with the phone's More sheet
   const p = $('toolsPanel'), b = $('toolsBtn');
   if (p) p.hidden = !_toolsOpen;
   if (b) b.setAttribute('aria-expanded', String(_toolsOpen));

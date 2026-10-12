@@ -3176,9 +3176,9 @@ S['nav-seven'] = async (b) => {
   const two = await page.evaluate(() => { const tb = document.querySelector('.tb-top').getBoundingClientRect(), rl = document.getElementById('rail').getBoundingClientRect(); return { tbH: Math.round(tb.height), tbPos: getComputedStyle(document.querySelector('.tb-top')).position, railTop: Math.round(rl.top), railPos: getComputedStyle(document.querySelector('.rail')).position, stick: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stick')) }; });
   check(r, 'at 899 px the top bar is its own sticky row (--stick is its height) and the tab row sits under it, not sticky', two.tbPos === 'sticky' && two.tbH === two.stick && two.railTop >= two.tbH && two.railPos === 'static', two);
 
-  // 9. a phone: one row of tabs that scrolls inside itself, the active tab in view, no sideways scroll of the page
+  // 9. a narrow window: one row of tabs (600 px) or, below 600 px, the bottom bar in its place (round 3, scenario `phone-bottom-bar`); the active place in view, no sideways scroll of the page
   const SCREENS = ['today', 'athletes', 'a/ava_test/work', 'a/ava_test/file', 'exercises', 'exercises/coverage', 'proof', 'leads', 'leads/signups', 'leads/codes', 'links', 'buyers', 'buyers/testing'];
-  for (const w of [390, 320]) {
+  for (const w of [600, 390, 320]) {
     await page.setViewportSize({ width: w, height: 800 }); await L.settle(page, 300);
     const bad = [];
     for (const s of SCREENS) {
@@ -3190,18 +3190,223 @@ S['nav-seven'] = async (b) => {
     await L.go(page, 'buyers/testing'); await L.settle(page, 300);
     const row = await page.evaluate(() => { const rl = document.getElementById('rail'), tabs = [...rl.querySelectorAll('a.tab')].map(a => a.getBoundingClientRect()), on = rl.querySelector('a.tab.active').getBoundingClientRect(), box = rl.getBoundingClientRect();
       return { oneRow: tabs.every(x => Math.abs(x.top - tabs[0].top) < 1.5), scrolls: rl.scrollWidth > rl.clientWidth, scrollLeft: Math.round(rl.scrollLeft), activeIn: on.left >= box.left - 1 && on.right <= box.right + 1, active: rl.querySelector('a.tab.active').textContent.trim() }; });
-    check(r, `at ${w} px the seven tabs are ONE row that scrolls sideways inside itself, and the active tab (${row.active}) was scrolled into view`, row.oneRow && row.scrolls && row.scrollLeft > 0 && row.activeIn && row.active === 'Buyers', row);
+    if (w >= 600) {
+      // (the row used to scroll sideways inside itself at 390 and 320 and the check said so; from 600 px up the seven tabs fit, so the row only has to hold the active one in view)
+      check(r, `at ${w} px the seven tabs are ONE row (scrolling sideways inside itself if they must) and the active tab (${row.active}) is in view`, row.oneRow && row.activeIn && row.active === 'Buyers', row);
+    } else {
+      const bb = await page.evaluate(() => { const items = [...document.querySelectorAll('#botbar .bb-item')].map(a => a.getBoundingClientRect()), more = document.getElementById('moreBtn');
+        return { n: items.length, oneRow: items.every(x => Math.abs(x.top - items[0].top) < 1.5), inWindow: items.every(x => x.left >= -0.5 && x.right <= innerWidth + 0.5), railShown: !!document.getElementById('rail').offsetParent, moreOn: more.classList.contains('active'), activeNav: [...document.querySelectorAll('#botbar .bb-item.active')].length }; });
+      check(r, `at ${w} px the tab row gives way to the bottom bar: four items in ONE row inside the window, and the active place (Buyers) is shown by More being marked`, bb.n === 4 && bb.oneRow && bb.inWindow && !bb.railShown && bb.moreOn && bb.activeNav === 1, bb);
+    }
     const tb = await page.evaluate(() => { const bx = [...document.querySelectorAll('.tb-top .brand, .tb-top .tbtn')].map(e => e.getBoundingClientRect()); return { allIn: bx.every(x => x.right <= innerWidth + 0.5 && x.left >= -0.5), tools: !!document.getElementById('toolsBtn').offsetParent }; });
     check(r, `at ${w} px the brand, ↻, ⚙ Tools and Sign out all fit in the top bar`, tb.allIn && tb.tools, tb);
     await page.evaluate(() => window.scrollTo({ top: 400, behavior: 'instant' })); await L.settle(page, 200);
-    const stuck = await page.evaluate(() => ({ barTop: Math.round(document.querySelector('.tb-top').getBoundingClientRect().top), railBottom: Math.round(document.querySelector('.rail').getBoundingClientRect().bottom) }));
-    check(r, `at ${w} px scrolled down the top bar stays at the top of the window and the tab row scrolls away (it does not eat the phone's screen)`, stuck.barTop === 0 && stuck.railBottom < 0, stuck);
+    const stuck = await page.evaluate(() => ({ barTop: Math.round(document.querySelector('.tb-top').getBoundingClientRect().top), railBottom: Math.round(document.querySelector('.rail').getBoundingClientRect().bottom),
+      botBottom: Math.round(document.getElementById('botbar').getBoundingClientRect().bottom), win: innerHeight }));
+    if (w >= 600) check(r, `at ${w} px scrolled down the top bar stays at the top of the window and the tab row scrolls away (it does not eat the phone's screen)`, stuck.barTop === 0 && stuck.railBottom < 0, stuck);
+    else check(r, `at ${w} px scrolled down the top bar stays at the top of the window, the bottom bar at the bottom, and no tab row is drawn (it does not eat the phone's screen)`, stuck.barTop === 0 && stuck.botBottom === stuck.win && stuck.railBottom <= 0, stuck);
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   }
   await L.go(page, 'athletes'); await L.settle(page, 300);
   await page.locator('#toolsBtn').click(); await L.settle(page, 200);
   const pw = await page.evaluate(() => { const p = document.getElementById('toolsPanel').getBoundingClientRect(), t = document.querySelector('.tb-top').getBoundingClientRect(); return { left: Math.round(p.left), right: Math.round(p.right), win: innerWidth, top: Math.round(p.top), barBottom: Math.round(t.bottom), over: document.documentElement.scrollWidth - innerWidth }; });
   check(r, 'on a phone the Tools panel is the full width right under the bar, and the page does not scroll sideways', pw.left <= 0 && pw.right >= pw.win && pw.top === pw.barBottom && pw.over <= 0, pw);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── A phone's bottom bar (round 3 of the coach UX pass, 2026-10-12) ────────────────────────────────────────────────────────────────────────
+// Below 600 px the tab row is hidden and a bar fixed to the bottom takes its place: Today · Athletes · Exercises · More, with the Athletes badge on its item.
+// More opens a small sheet above the bar (Proof, Leads with its badge, Library, Buyers); the sheet is one history step. From 600 px up nothing is different.
+S['phone-bottom-bar'] = async (b) => {
+  const r = { id: 'phone-bottom-bar', title: 'Below 600 px a bottom bar (Today, Athletes, Exercises, More) replaces the tab row; More opens a sheet with the other four places that closes on a pick, outside, Esc and Back; the toast, Undo bar, fail bar and Save bar sit above the bar; from 600 px up nothing changed', checks: [] };
+  const geo = (page) => page.evaluate(() => {
+    const vis = el => { if (!el) return false; const cs = getComputedStyle(el), q = el.getBoundingClientRect(); return cs.display !== 'none' && cs.visibility !== 'hidden' && q.width > 0 && q.height > 0; };
+    const bar = document.getElementById('botbar'), sheet = document.getElementById('moreSheet'), bq = bar.getBoundingClientRect(), sq = sheet.getBoundingClientRect(), tq = document.querySelector('.tb-top').getBoundingClientRect();
+    const rows = [...sheet.querySelectorAll('.ms-row')];
+    return { barShown: vis(bar), barTop: Math.round(bq.top * 10) / 10, barBottom: Math.round(bq.bottom * 10) / 10, barH: Math.round(bq.height), win: innerHeight, winW: innerWidth,
+      items: [...bar.querySelectorAll('.bb-item')].map(a => ({ label: a.querySelector('.bb-l').childNodes[0].textContent.trim(), href: a.getAttribute('href'), n: (a.querySelector('.n') || {}).textContent || '', on: a.classList.contains('active'), cur: a.getAttribute('aria-current') })),
+      railShown: vis(document.getElementById('rail')), railTabs: document.querySelectorAll('#rail a.tab').length, sheetShown: vis(sheet), scrimShown: vis(document.getElementById('moreScrim')), expanded: document.getElementById('moreBtn').getAttribute('aria-expanded'),
+      rows: rows.map(a => ({ label: a.querySelector('.ms-name').textContent, href: a.getAttribute('href'), n: (a.querySelector('.n') || {}).textContent || '', on: a.classList.contains('active'), cur: a.getAttribute('aria-current') })),
+      sheetTop: Math.round(sq.top), sheetBottom: Math.round(sq.bottom * 10) / 10, sheetLeft: Math.round(sq.left), sheetRight: Math.round(sq.right), topBarBottom: Math.round(tq.bottom),
+      toolsShown: vis(document.getElementById('toolsPanel')), over: document.documentElement.scrollWidth - innerWidth };
+  });
+  const SCREENS = ['today', 'athletes', 'a/ava_test/work', 'a/ava_test/file', 'exercises', 'exercises/coverage', 'proof', 'leads', 'leads/signups', 'leads/codes', 'links', 'buyers', 'buyers/testing'];
+  for (const [w, h] of [[390, 844], [320, 640]]) {
+    const { page, log } = await L.openCoach(b, { hash: 'today' });
+    await page.setViewportSize({ width: w, height: h }); await L.settle(page, 500);
+    const hash = () => page.evaluate(() => location.hash);
+    const hlen = () => page.evaluate(() => history.length);
+    const exp = await page.evaluate(() => ({ waiting: Object.values(S.ath).reduce((n, a) => n + a.toReply, 0), apps: newApplications() }));
+    const tapBar = label => page.locator('#botbar .bb-item', { hasText: label }).click();
+    const openMore = async () => { await page.locator('#moreBtn').click(); await L.settle(page, 350); };
+    const prep = async () => { await L.go(page, 'athletes'); await L.go(page, 'exercises'); await L.settle(page, 200); };   // [... #athletes, #exercises]: one step back is #athletes
+    const back = async () => { await page.goBack(); await L.settle(page, 500); };
+
+    // 1. what is drawn
+    let g = await geo(page);
+    check(r, `at ${w} px the bar is fixed to the bottom of the window and holds four items: Today, Athletes, Exercises, More`, g.barShown && g.barBottom === g.win && g.barH >= 48 && JSON.stringify(g.items.map(x => x.label)) === JSON.stringify(['Today', 'Athletes', 'Exercises', 'More']) && g.items.slice(0, 3).map(x => x.href).join() === '#today,#athletes,#exercises', g);
+    check(r, `at ${w} px the tab row is not drawn (its seven links stay in the page, for the code that waits for them)`, !g.railShown && g.railTabs === 7, { railShown: g.railShown, railTabs: g.railTabs });
+    check(r, `at ${w} px the Athletes item carries the notes to read (${exp.waiting}), More carries the new applications (${exp.apps}), and Today and Exercises carry nothing`, exp.waiting > 0 && exp.apps === 2 && g.items.map(x => x.n).join('|') === `|${exp.waiting}||${exp.apps}`, { exp, items: g.items });
+    check(r, `at ${w} px Today is the one item marked (aria-current), and the sheet and its scrim are not shown`, g.items.filter(x => x.on).map(x => x.label).join() === 'Today' && g.items[0].cur === 'page' && !g.sheetShown && !g.scrimShown && g.expanded === 'false', g);
+
+    // 2. each item goes to its screen and is marked
+    const seen = [];
+    for (const [label, href] of [['Athletes', '#athletes'], ['Exercises', '#exercises'], ['Today', '#today'], ['Athletes', '#athletes'], ['Exercises', '#exercises']]) {
+      await tapBar(label); await L.settle(page, 450);
+      g = await geo(page);
+      seen.push([label, await hash(), g.items.filter(x => x.on).map(x => x.label).join()]);
+    }
+    check(r, `at ${w} px each item goes to its screen and is the one marked`, seen.every(([l, hh, on]) => hh === { Athletes: '#athletes', Exercises: '#exercises', Today: '#today' }[l] && on === l), seen);
+
+    // 3. More: the sheet
+    let n0 = await hlen();
+    await openMore();
+    g = await geo(page);
+    check(r, `at ${w} px More opens a sheet above the bar with four places: Proof, Leads (with its badge), Library, Buyers; the scrim is up and More says it is expanded`, g.sheetShown && g.scrimShown && g.expanded === 'true' && JSON.stringify(g.rows.map(x => x.label)) === JSON.stringify(['Proof', 'Leads', 'Library', 'Buyers']) && g.rows.map(x => x.href).join() === '#proof,#leads,#links,#buyers' && g.rows.map(x => x.n).join('|') === `|${exp.apps}||`, g.rows);
+    check(r, `at ${w} px the sheet sits right above the bar, inside the window and under the top bar, and the page does not scroll sideways`, g.sheetBottom <= g.barTop + 0.5 && g.barTop - g.sheetBottom <= 2 && g.sheetTop >= g.topBarBottom && g.sheetLeft >= 0 && g.sheetRight <= g.winW && g.over <= 0, g);
+    check(r, `at ${w} px opening it is one history step`, (await hlen()) === n0 + 1, { before: n0, after: await hlen() });
+    await page.keyboard.press('Escape'); await L.settle(page, 450);
+
+    // 4. a pick goes there, closes the sheet, marks More, and leaves no dead step in the history
+    n0 = await hlen();
+    await openMore();
+    await page.locator('#moreSheet .ms-row', { hasText: 'Leads' }).click(); await L.settle(page, 700);
+    g = await geo(page);
+    check(r, `at ${w} px picking Leads goes to #leads, closes the sheet and the scrim, and marks More (and no other item)`, (await hash()) === '#leads' && !g.sheetShown && !g.scrimShown && g.expanded === 'false' && g.items.filter(x => x.on).map(x => x.label).join() === 'More' && g.items[3].n === String(exp.apps), { hash: await hash(), g });
+    check(r, `at ${w} px Back from the picked place is the screen it was picked on, and Back again the one before it (no dead step left by the sheet)`, await (async () => { await back(); const first = await hash(); await back(); return first === '#exercises' && (await hash()) === '#athletes'; })(), { hash: await hash() });
+    await L.go(page, 'buyers'); await L.settle(page, 300);
+    await openMore();
+    g = await geo(page);
+    check(r, `at ${w} px on Buyers its row is marked in the sheet (aria-current) and More is marked on the bar`, g.rows.filter(x => x.on).map(x => x.label).join() === 'Buyers' && g.rows.find(x => x.on).cur === 'page' && g.items.filter(x => x.on).map(x => x.label).join() === 'More', g);
+    await page.keyboard.press('Escape'); await L.settle(page, 450);
+
+    // 5. a new screen from the sheet starts at the top (a pick is a tap, not a Back)
+    await page.evaluate(() => { document.body.style.minHeight = '3500px'; });
+    await L.go(page, 'proof'); await page.evaluate(() => window.scrollTo({ top: 500, behavior: 'instant' })); await L.settle(page, 300);
+    await L.go(page, 'today'); await L.settle(page, 300);
+    await openMore();
+    await page.locator('#moreSheet .ms-row', { hasText: 'Proof' }).click(); await L.settle(page, 800);
+    const yTop = await page.evaluate(() => Math.round(scrollY));
+    check(r, `at ${w} px a place picked from the sheet starts at the top, even one left scrolled down (the place Back would have kept)`, (await hash()) === '#proof' && yTop === 0, { hash: await hash(), yTop });
+    await page.evaluate(() => { document.body.style.minHeight = ''; });
+
+    // 6. the other ways out: Esc, a tap outside, More again, Back, a tap on the bar. Each closes it, leaves the screen where it was and leaves no dead step.
+    const exits = {
+      'Esc': async () => { await page.keyboard.press('Escape'); },
+      'a tap outside (on the scrim)': async () => { await page.mouse.click(Math.round(w / 2), 120); },
+      'a second tap on More': async () => { await page.locator('#moreBtn').click(); },
+    };
+    for (const [name, fn] of Object.entries(exits)) {
+      await prep(); n0 = await hlen();
+      await openMore(); await fn(); await L.settle(page, 600);
+      g = await geo(page);
+      check(r, `at ${w} px ${name} closes the sheet, stays on the screen, opens nothing else, and Back goes to the screen before (one step)`, !g.sheetShown && !g.scrimShown && g.expanded === 'false' && !g.toolsShown && (await hash()) === '#exercises' && await (async () => { await back(); return (await hash()) === '#athletes'; })(), { name, g: { sheetShown: g.sheetShown, scrimShown: g.scrimShown, toolsShown: g.toolsShown }, hash: await hash(), n0 });
+    }
+    await prep();
+    await openMore(); await back();
+    g = await geo(page);
+    check(r, `at ${w} px Back closes the sheet and nothing else: still on #exercises`, !g.sheetShown && !g.scrimShown && g.expanded === 'false' && (await hash()) === '#exercises', { hash: await hash(), sheetShown: g.sheetShown });
+    await back();
+    check(r, `at ${w} px with the sheet closed, Back does what it always did: the screen before (#athletes)`, (await hash()) === '#athletes', await hash());
+    await prep();
+    await openMore(); await tapBar('Today'); await L.settle(page, 700);
+    g = await geo(page);
+    check(r, `at ${w} px a tap on the bar while the sheet is open closes it and goes there (#today, Today marked), and Back is the screen before`, (await hash()) === '#today' && !g.sheetShown && g.items.filter(x => x.on).map(x => x.label).join() === 'Today' && await (async () => { await back(); return (await hash()) === '#exercises'; })(), { hash: await hash(), g: g.items });
+
+    // 7. never together with ⚙ Tools
+    await L.go(page, 'athletes'); await L.settle(page, 300);
+    await openMore();
+    await page.evaluate(() => toggleTools()); await L.settle(page, 450);
+    g = await geo(page);
+    check(r, `at ${w} px opening ⚙ Tools closes the More sheet`, g.toolsShown && !g.sheetShown && !g.scrimShown, { tools: g.toolsShown, sheet: g.sheetShown });
+    await page.locator('#moreBtn').click(); await L.settle(page, 450);
+    g = await geo(page);
+    check(r, `at ${w} px opening More closes the Tools panel`, !g.toolsShown && g.sheetShown, { tools: g.toolsShown, sheet: g.sheetShown });
+    await page.keyboard.press('Escape'); await L.settle(page, 450);
+
+    // 8. everything fixed at the bottom sits above the bar
+    const rects = () => page.evaluate(() => { const q = id => { const e = document.getElementById(id), x = e.getBoundingClientRect(); return { top: Math.round(x.top * 10) / 10, bottom: Math.round(x.bottom * 10) / 10, shown: getComputedStyle(e).display !== 'none' && getComputedStyle(e).visibility !== 'hidden' && x.height > 0 }; };
+      return { bar: q('botbar'), toast: q('toast'), undo: q('undobar'), fail: q('failbar'), top: document.querySelector('.tb-top').getBoundingClientRect().bottom }; });
+    await page.evaluate(() => toast('Saved. Checking the bar')); await L.settle(page, 450);
+    let q = await rects();
+    check(r, `at ${w} px the toast sits above the bar (and clear of it)`, q.toast.shown && q.toast.bottom <= q.bar.top - 8, q);
+    await page.evaluate(() => offerUndoFn('Hid the session. Checking the bar', () => {})); await L.settle(page, 450);
+    q = await rects();
+    check(r, `at ${w} px the Undo bar sits above the bar and above the toast`, q.undo.shown && q.undo.bottom <= q.bar.top - 8 && q.undo.bottom <= q.toast.top, q);
+    await page.evaluate(() => { dismissUndo(); fail('Fixture: something did not save. Checking the bar'); }); await L.settle(page, 400);
+    q = await rects();
+    check(r, `at ${w} px the fail bar is in view above the bar, under the top bar`, q.fail.shown && q.fail.bottom <= q.bar.top && q.fail.top >= q.top - 0.5, q);
+    await page.evaluate(() => { failDismissAll(); }); await L.settle(page, 300);
+    await L.go(page, 'exercises'); await L.settle(page, 500);
+    await page.locator('.spine-row button[data-open]').first().click(); await L.settle(page, 600);
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' })); await L.settle(page, 200);
+    const sv = await page.evaluate(() => { const a = document.querySelector('#spineEd .spine-acts'), x = a.getBoundingClientRect(), bq = document.getElementById('botbar').getBoundingClientRect(); return { top: Math.round(x.top), bottom: Math.round(x.bottom * 10) / 10, barTop: Math.round(bq.top * 10) / 10, h: Math.round(document.getElementById('spineEd').getBoundingClientRect().height), win: innerHeight }; });
+    check(r, `at ${w} px the Exercises editor's Save bar sticks to the bottom of the window just above the bar, not behind it`, sv.h > sv.win && sv.bottom <= sv.barTop + 0.5 && sv.barTop - sv.bottom <= 2 && sv.top >= 0, sv);
+
+    // 9. the last element of a long screen can be scrolled up above the bar, and nothing scrolls sideways
+    const longs = [];
+    for (const s of ['a/ava_test/work', 'athletes', 'exercises', 'proof', 'today', 'leads']) {
+      await L.go(page, s); await L.settle(page, 300);
+      const info = await page.evaluate(() => ({ h: document.documentElement.scrollHeight, win: innerHeight }));
+      if (info.h <= info.win + 40) continue;
+      await page.evaluate(() => window.scrollTo({ top: 1e6, behavior: 'instant' })); await L.settle(page, 250);
+      const e = await page.evaluate(() => {
+        const bq = document.getElementById('botbar').getBoundingClientRect();
+        const shut = el => { for (let p = el.parentElement; p; p = p.parentElement) if (p.tagName === 'DETAILS' && !p.open && !(el.closest('summary') && el.closest('summary').parentElement === p)) return true; return false; };   // a folded section draws nothing, whatever its boxes say
+        const els = [...document.querySelectorAll('#content *')].filter(el => { const cs = getComputedStyle(el), x = el.getBoundingClientRect(); return cs.display !== 'none' && cs.visibility !== 'hidden' && x.height > 0 && x.width > 0 && !shut(el) && !el.closest('.spine-acts') && !['fixed', 'sticky'].includes(cs.position); });
+        const maxBottom = Math.max(...els.map(el => el.getBoundingClientRect().bottom));
+        // an element from the middle of the page, scrolled to the END of the window: scroll-padding must keep it clear of the bar
+        const docY = el => el.getBoundingClientRect().bottom + scrollY;
+        const mid = els.filter(el => /^(DIV|SECTION|LI|TR)$/.test(el.tagName) && el.getBoundingClientRect().height >= 30 && el.getBoundingClientRect().height <= 400 && docY(el) > innerHeight + 60 && docY(el) < document.documentElement.scrollHeight - 150).sort((a, b) => docY(b) - docY(a))[0];
+        let midBottom = null;
+        if (mid) { mid.scrollIntoView({ block: 'end', behavior: 'instant' }); midBottom = Math.round(mid.getBoundingClientRect().bottom * 10) / 10; }
+        return { barTop: Math.round(bq.top * 10) / 10, maxBottom: Math.round(maxBottom * 10) / 10, midBottom, hasMid: !!mid };
+      });
+      longs.push([s, info.h, e]);
+    }
+    check(r, `at ${w} px on every long screen the last element ends above the bar when scrolled to the end (${longs.map(x => x[0]).join(', ')})`, longs.length >= 3 && longs.every(([, , e]) => e.maxBottom <= e.barTop + 0.5), longs);
+    check(r, `at ${w} px an element scrolled to the end of the window stops above the bar (scroll-padding), on at least one long screen`, longs.some(([, , e]) => e.hasMid) && longs.every(([, , e]) => !e.hasMid || e.midBottom <= e.barTop + 0.5), longs.map(([s, , e]) => [s, e.hasMid, e.midBottom, e.barTop]));
+    const wide = [];
+    for (const open of [false, true]) {
+      for (const s of SCREENS) {
+        await L.go(page, s); await L.settle(page, 200);
+        if (open) await openMore();
+        g = await geo(page);
+        if (g.over > 0 || (open && (g.sheetLeft < 0 || g.sheetRight > g.winW))) wide.push([s, open, g.over]);
+        if (open) { await page.keyboard.press('Escape'); await L.settle(page, 350); }
+      }
+    }
+    check(r, `at ${w} px no screen scrolls sideways, with the sheet closed or open`, !wide.length, wide);
+    check(r, `at ${w} px no page errors`, !log.errors.length, log.errors);
+    if (w === 390) {
+      // a window that grows past 600 px while the sheet is open drops it
+      await L.go(page, 'athletes'); await openMore();
+      await page.setViewportSize({ width: 700, height: 800 }); await L.settle(page, 600);
+      g = await geo(page);
+      check(r, 'widening the window past 600 px with the sheet open closes it, and the bar goes with the phone layout', !g.sheetShown && !g.scrimShown && !g.barShown && g.expanded === 'false', { sheet: g.sheetShown, scrim: g.scrimShown, bar: g.barShown });
+    }
+    await page.context().close();
+  }
+
+  // 10. 599 px is still a phone, 600 px and up is as before
+  const { page, log } = await L.openCoach(b, { hash: 'today' });
+  const CSSV = () => page.evaluate(() => ({ bb: getComputedStyle(document.documentElement).getPropertyValue('--bb').trim(), toastBottom: getComputedStyle(document.getElementById('toast')).bottom, undoBottom: getComputedStyle(document.getElementById('undobar')).bottom,
+    appPad: getComputedStyle(document.getElementById('app')).paddingBottom, scrollPad: getComputedStyle(document.documentElement).scrollPaddingBottom, one: document.querySelector('.topbar').getBoundingClientRect().height, barPos: getComputedStyle(document.querySelector('.topbar')).position }));
+  await page.setViewportSize({ width: 599, height: 800 }); await L.settle(page, 300);
+  let g = await geo(page), c = await CSSV();
+  check(r, 'at 599 px it is still the phone layout: the bottom bar is shown, the tab row is not, and the toast and Undo bar are lifted by the bar', g.barShown && !g.railShown && /56px/.test(c.bb) && c.appPad === '56px' && c.scrollPad === '56px' && c.toastBottom === '82px' && c.undoBottom === '132px', { barShown: g.barShown, railShown: g.railShown, c });
+  for (const [w, h] of [[600, 800], [750, 900], [899, 800], [900, 800], [1440, 900]]) {
+    await page.setViewportSize({ width: w, height: h }); await L.settle(page, 300);
+    g = await geo(page); c = await CSSV();
+    const tabs = await page.evaluate(() => [...document.querySelectorAll('#rail a.tab')].map(a => a.getBoundingClientRect()));
+    const oneRow = tabs.every(x => Math.abs(x.top - tabs[0].top) < 1.5 && x.width > 0);
+    check(r, `at ${w} px nothing changed: no bottom bar, no sheet, the seven tabs in ONE row (${w >= 900 ? 'inside the one sticky bar' : 'under the top bar'}), the toast and Undo bar where they were (26 px and 76 px), no extra page padding`,
+      !g.barShown && !g.sheetShown && !g.scrimShown && g.railShown && g.railTabs === 7 && oneRow && c.bb === '' && c.toastBottom === '26px' && c.undoBottom === '76px' && c.appPad === '0px' && c.scrollPad === 'auto' && (w >= 900 ? c.one <= 64 && c.barPos === 'sticky' : true) && g.over <= 0, { barShown: g.barShown, railShown: g.railShown, oneRow, c, over: g.over });
+  }
+  const noop = await page.evaluate(() => { toggleMore({ detail: 1 }); return { sheetHidden: document.getElementById('moreSheet').hidden, len: history.length }; });
+  check(r, 'from 600 px up the More sheet cannot be opened (and nothing is added to the history)', noop.sheetHidden, noop);
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
