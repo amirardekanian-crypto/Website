@@ -316,14 +316,18 @@ S['quest-week'] = async (b) => {
   check(r, 'the panel shows the live run, and says everyone keeps the XP they earned if it is ended', /Live run/i.test(live) && /End this run today/i.test(live) && /keeps the XP they already earned/.test(live) && !/Cancel this run/i.test(live), live.slice(0, 200));
   log.dialogs.length = 0;
   n0 = await L.nCalls(page);
-  await page.locator('#questPanel .btn.danger').click();
+  await page.locator('#questPanel .btn.danger').click();   // End this run today: round 3 of the UX pass, it opens a panel (dangerAsk), nothing is called yet
+  await page.locator('#questPanel #dangerGo').waitFor();
+  const askTxt = (await page.locator('#questPanel .dangerask').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the button only opens a panel under itself: no call yet, the final button is named for the act', !(await L.callsSince(page, n0)).some(x => x.name === 'end_quests') && /End the run today/.test(await page.locator('#dangerGo').innerText()), askTxt);
+  await page.locator('#dangerGo').click();
   await L.settle(page, 600);
   const cs = await L.callsSince(page, n0);
   const en = lastOf(cs, x => x.kind === 'rpc' && x.name === 'end_quests');
   check(r, 'end_quests(start, today): the run is ended, not removed', en && en.payload.p_start === today && en.payload.p_end === today && !cs.some(x => x.name === 'clear_quests'), en && en.payload);
   const runs = (await L.db(page)).xp_rules[0].rules.questRuns;
   check(r, 'the run is still on the server with its end day, so nobody loses XP', runs.length === 1 && runs[0].start === today && runs[0].end === today && runs[0].ids.length === 2, runs);
-  check(r, 'the confirm tells the coach everyone keeps the XP', log.dialogs.some(d => d.type === 'confirm' && /Everyone keeps the XP they already earned/.test(d.message)), log.dialogs.map(d => d.message.slice(0, 80)));
+  check(r, 'the panel tells the coach everyone keeps the XP (and no confirm() was used)', /Everyone keeps the XP they already earned/.test(askTxt) && /A quest nobody has completed by tonight never pays/.test(askTxt) && /clear the run in the SQL editor/.test(askTxt) && !log.dialogs.some(d => d.type === 'confirm'), askTxt);
   await L.settle(page, 400);
   const ended = (await page.locator('#questPanel').innerText()).replace(/\s+/g, ' ');
   check(r, 'the panel now says the run ended early and everyone keeps the XP; the End button is gone (the run stays live until tonight, then the picker returns)', /ended early/i.test(ended) && /keeps the XP they already earned/.test(ended) && (await page.locator('#questPanel .btn.danger').count()) === 0, ended.slice(0, 260));
@@ -341,6 +345,7 @@ S['quest-week-end-fails'] = async (b) => {
   log.dialogs.length = 0;
   const n0 = await L.nCalls(page);
   await page.locator('#questPanel .btn.danger').click();
+  await page.locator('#questPanel #dangerGo').click();
   await L.settle(page, 600);
   const cs = await L.callsSince(page, n0);
   const alerts = log.dialogs.filter(d => d.type === 'alert').map(d => d.message);
@@ -490,7 +495,8 @@ S['calllog-delete'] = async (b) => {
   const before = await page.locator('details.day-c').count();
   const n0 = await L.nCalls(page);
   await page.locator('details.day-c').first().locator('summary').click();
-  await page.locator('details.day-c').first().locator('.btn.danger').click();
+  await page.locator('details.day-c').first().locator('.btn.danger').first().click();   // Delete: opens the panel (dangerAsk); its final button does the work
+  await page.locator('details.day-c').first().locator('#dangerGo').click();
   await L.settle(page, 800);
   const del = lastOf(await L.callsSince(page, n0), c => c.name === 'call_logs' && c.op === 'delete');
   check(r, 'delete on call_logs by id', del && del.filters.length === 1 && /^id\.eq\./.test(del.filters[0]), del && del.filters);
@@ -498,7 +504,8 @@ S['calllog-delete'] = async (b) => {
   const txt = await page.locator('#content').innerText();
   check(r, 'the deleted call disappears from the list and the count', after === before - 1 && /old call logs\s*·\s*1/i.test(txt), { before, after, inDb: (await L.db(page)).call_logs.length });
   await page.locator('details.day-c').first().locator('summary').click();
-  await page.locator('details.day-c').first().locator('.btn.danger').click();
+  await page.locator('details.day-c').first().locator('.btn.danger').first().click();
+  await page.locator('details.day-c').first().locator('#dangerGo').click();
   await L.settle(page, 800);
   check(r, 'with none left the section is gone (no empty "No call logs yet")', !/old call logs/i.test(await page.locator('#content').innerText()), '');
   await page.context().close();
@@ -774,7 +781,11 @@ S['athlete-delete-all'] = async (b) => {
   await openDanger(page);
   const before = await L.db(page);
   const n0 = await L.nCalls(page);
-  await page.locator('button', { hasText: /Delete training history/ }).click();
+  await page.locator('button', { hasText: /^Delete training history$/ }).click();   // opens the panel (dangerAsk); the final button names the person
+  await page.locator('#dangerGo').waitFor();
+  const askTxt = (await page.locator('.dangerask').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the button only opens a panel: no call yet', !(await L.callsSince(page, n0)).some(c => c.name === 'coach_delete_training_history'), askTxt);
+  await page.locator('#dangerGo').click();
   await L.settle(page, 1200);
   const cs = await L.callsSince(page, n0);
   const rpc = cs.filter(c => c.kind === 'rpc' && c.name === 'coach_delete_training_history');
@@ -786,7 +797,7 @@ S['athlete-delete-all'] = async (b) => {
   check(r, 'another athlete keeps theirs', d.session_history.filter(x => x.athlete_id === 'ava_test').length === before.session_history.filter(x => x.athlete_id === 'ava_test').length && d.athlete_progress.some(x => x.athlete_id === 'ava_test'), '');
   check(r, 'the toast says how many sessions went', /Deleted 2 sessions and the app data/.test(await L.toastText(page)), await L.toastText(page));
   const onRoster = await page.evaluate(() => !!S.ath.ben_test);
-  check(r, 'the confirm says what stays, and they are still on the roster', /programme|login/i.test(log.dialogs.map(x => x.message).join(' ')) && onRoster, { stillOnRoster: onRoster, confirmText: log.dialogs.map(x => x.message.replace(/\n+/g, ' ').slice(0, 160)) });
+  check(r, 'the panel says what goes and what stays, and they are still on the roster', /Goes:/.test(askTxt) && /Stays: .*programme.*login/i.test(askTxt) && /cannot be undone, except from a backup file/.test(askTxt) && /Delete Ben Example's training history/.test(askTxt) && onRoster && !log.dialogs.some(x => x.type === 'confirm'), { stillOnRoster: onRoster, panelText: askTxt.slice(0, 400) });
   await page.context().close();
   return r;
 };
@@ -808,7 +819,8 @@ S['athlete-delete-fails'] = async (b) => {
   for (const c of cases) {
     log.dialogs.length = 0;
     await page.evaluate(c.set);
-    await page.locator('button', { hasText: /Delete training history/ }).click();
+    await page.locator('button', { hasText: /^Delete training history$/ }).click();
+    await page.locator('#dangerGo').click();
     await L.settle(page, 700);
     const alerts = log.dialogs.filter(x => x.type === 'alert').map(x => x.message);
     check(r, c.name + ': the alert says what is known, in words that fit', alerts.length === 1 && c.say.test(alerts[0]) && (c.unsure ? !/Nothing was (removed|deleted)/.test(alerts[0]) : /Nothing was removed/.test(alerts[0])), alerts);
@@ -817,6 +829,270 @@ S['athlete-delete-fails'] = async (b) => {
   }
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
+  return r;
+};
+
+// ── Round 3 of the UX pass (2026-10-12): the long confirm()s and alert()s ─────────────────────────────────────────────────────────────
+// Destroying or ending something asks in a panel under its button (dangerAsk: Delete training history, Forget, End the run today, Delete for
+// good of a hidden session, Delete of an old call log); something to read or copy once is a notice() line in the fail bar. A short yes/no
+// stays a confirm(). The harness records a notice in log.dialogs as an 'alert' with via: 'notice' (lib.js).
+S['danger-panels'] = async (b) => {
+  const r = { id: 'danger-panels', title: 'The five long confirm()s are panels under their buttons, the long alert()s are notice() lines with Copy, and the demo draws neither', checks: [] };
+  const FX = require('./fixtures');
+  const { page, log, today } = await L.openCoach(b, { hash: 'a/ben_test/file' });
+  const asked = () => page.evaluate(() => (typeof _danger !== 'undefined' && _danger) ? _danger.key : null);
+  const ptxt = async () => (await page.locator('.dangerask').innerText()).replace(/\s+/g, ' ');
+  const clip = () => page.evaluate(() => navigator.clipboard.readText());
+  const ncount = () => page.locator('#failbar .fb-notice').count();
+  // One action through the whole life of its panel: it opens under the button and calls nothing; Cancel and Esc close it and call nothing; a
+  // redraw keeps it; leaving the screen drops it; the final button makes exactly the old call, once, even when pressed twice.
+  async function cycle(name, o) {
+    const calls = async n0 => o.calls(await L.callsSince(page, n0));
+    await o.back();
+    let n0 = await L.nCalls(page);
+    const opener = o.opener();
+    await opener.click();
+    await page.locator('#dangerGo').waitFor();
+    const txt = await ptxt();
+    const ob = await opener.boundingBox(), pb = await page.locator('.dangerask').boundingBox();
+    check(r, `${name}: the button opens one panel right under itself`, (await page.locator('.dangerask').count()) === 1 && !!ob && !!pb && pb.y >= ob.y + ob.height - 1 && pb.y - (ob.y + ob.height) < 150, { ob, pb });
+    check(r, `${name}: the final button is named for the act, and Cancel is beside it`, o.final.test((await page.locator('#dangerGo').innerText()).trim()) && (await page.locator('#dangerNo').innerText()).trim() === 'Cancel', await page.locator('#dangerGo').innerText());
+    check(r, `${name}: the panel says what goes and what stays, in the old words`, /Goes:/.test(txt) && /Stays:/.test(txt) && o.words.every(re => re.test(txt)), { missing: o.words.filter(re => !re.test(txt)).map(String), txt });
+    check(r, `${name}: nothing is called until the final button`, (await calls(n0)).length === 0, '');
+    for (const w of [390, 320]) {
+      await page.setViewportSize({ width: w, height: 800 }); await L.settle(page, 250);
+      const fit = await page.evaluate(() => { const p = document.querySelector('.dangerask').getBoundingClientRect(); return { sw: document.documentElement.scrollWidth, iw: innerWidth, left: Math.round(p.left), right: Math.round(p.right) }; });
+      check(r, `${name}: at ${w} px the open panel fits the screen (no sideways scroll)`, fit.sw <= fit.iw && fit.left >= 0 && fit.right <= fit.iw, fit);
+    }
+    await page.setViewportSize({ width: 1280, height: 900 }); await L.settle(page, 250);
+    await page.locator('#dangerNo').click();
+    check(r, `${name}: Cancel closes it and calls nothing`, (await page.locator('.dangerask').count()) === 0 && (await asked()) === null && (await calls(n0)).length === 0, '');
+    await opener.click(); await page.locator('#dangerGo').waitFor();
+    await page.keyboard.press('Escape');
+    check(r, `${name}: Esc closes it and calls nothing`, (await page.locator('.dangerask').count()) === 0 && (await asked()) === null && (await calls(n0)).length === 0, '');
+    await opener.click(); await page.locator('#dangerGo').waitFor();
+    const key = await asked();
+    await page.evaluate(o.redraw); await L.settle(page, 400);
+    check(r, `${name}: a redraw keeps the open panel where it was`, (await page.locator('.dangerask').count()) === 1 && await page.locator('.dangerask').isVisible() && (await asked()) === key && (await ptxt()) === txt, await asked());
+    await L.go(page, 'athletes');
+    check(r, `${name}: leaving the screen drops it, and it is not there on coming back`, (await asked()) === null, await asked());
+    await o.back();
+    check(r, `${name}: ...on coming back there is no panel`, (await page.locator('.dangerask').count()) === 0, '');
+    n0 = await L.nCalls(page);
+    await o.opener().click(); await page.locator('#dangerGo').waitFor();
+    await page.locator('#dangerGo').dblclick(); await L.settle(page, 1300);
+    const done = await calls(n0);
+    check(r, `${name}: the final button makes the old call, exactly once even when pressed twice`, done.length === 1 && o.payload(done[0]), done.map(c => c.payload || c.filters));
+    check(r, `${name}: afterwards the panel is gone`, (await page.locator('.dangerask').count()) === 0 && (await asked()) === null, '');
+  }
+
+  // 1. Delete training history (File → Danger zone)
+  await cycle('Delete training history', {
+    back: async () => { await L.go(page, 'a/ben_test/file'); await openDanger(page); },
+    opener: () => page.locator('button', { hasText: /^Delete training history$/ }),
+    final: /^Delete Ben Example's training history$/,
+    words: [/Delete Ben Example's training history\?/, /every finished session \(the hidden ones too\)/, /It cannot be undone, except from a backup file/, /Stays: Their programme, their login, the coaching log, call logs, Proof contact and wall lines/, /They stay on the roster/, /Erase completely/],
+    redraw: () => { assemble(); render(); },
+    calls: cs => cs.filter(c => c.kind === 'rpc' && c.name === 'coach_delete_training_history'),
+    payload: c => c.payload.p_athlete_id === 'ben_test',
+  });
+  const d1 = await L.db(page);
+  check(r, 'Delete training history: Ben has no sessions left, Ava keeps hers, and the toast says how many went', !d1.session_history.some(x => x.athlete_id === 'ben_test') && d1.session_history.some(x => x.athlete_id === 'ava_test') && /Deleted 2 sessions and the app data/.test(await L.toastText(page)), await L.toastText(page));
+
+  // One panel at a time: the Delete panel's own words say "use Erase completely…", and opening that closes the Delete panel.
+  await L.go(page, 'a/ben_test/file'); await openDanger(page);
+  await page.locator('button', { hasText: /^Delete training history$/ }).click(); await page.locator('#dangerGo').waitFor();
+  await page.locator('button', { hasText: /Erase completely/ }).click(); await page.locator('.erase #eraseIn').waitFor();
+  check(r, 'opening Erase completely… closes an open Delete panel: one panel at a time', (await page.locator('.dangerask').count()) === 0 && (await page.locator('.erase').count()) === 1 && (await asked()) === null, '');
+  await page.locator('.erase button', { hasText: 'Cancel' }).click(); await L.settle(page, 300);
+
+  // 2. Forget (File → Danger zone, a free signup); a coached athlete is refused in the bar before any panel
+  await page.evaluate(() => { window.__DB.hab_contacts.push({ athlete_id: 'ava_test', email: 'ava@example.invalid', whatsapp: '+10000000003', source: 'proof.html', tier: 'free', note: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), display_name: 'Ava' }); return hardRefresh(); });
+  await L.settle(page, 900);
+  await page.evaluate(() => forgetContact('ava_test'));
+  check(r, 'Forget: a coached athlete is refused in the bar and no panel opens', /coached athlete/.test(await L.failText(page)) && (await page.locator('.dangerask').count()) === 0 && (await asked()) === null, await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  await cycle('Forget', {
+    back: async () => { await L.go(page, 'a/cara_free/file'); await openDanger(page); },
+    opener: () => page.locator('#dangerzone button', { hasText: 'Forget their Proof data…' }),
+    final: /^Forget Cara/,
+    words: [/Forget cara_free\?/, /PERMANENTLY deletes their contact details, their whole habit log and progress, their board place and their roll-call lines/, /no undo and no automatic backup: take a ⤓ Backup first/, /Stays: Their programme, login, session history, titles and season results stay/, /Erase completely/],
+    redraw: () => { assemble(); render(); },
+    calls: cs => cs.filter(c => c.kind === 'rpc' && c.name === 'forget_contact'),
+    payload: c => c.payload.p_athlete_id === 'cara_free',
+  });
+  check(r, 'Forget: their contact is gone and the toast says so', !(await L.db(page)).hab_contacts.some(c => c.athlete_id === 'cara_free') && /Forgotten/.test(await L.toastText(page)), await L.toastText(page));
+
+  // 3. End this quest run today (Proof → Quest week)
+  await page.evaluate(([t]) => { window.__DB.xp_rules[0].rules.questRuns = [{ start: t, ids: ['w_water5', 'w_train3'] }]; return hardRefresh(); }, [today]);
+  await L.settle(page, 900);
+  await cycle('End this quest run', {
+    back: async () => { await L.go(page, 'proof'); },
+    opener: () => page.locator('#questPanel .btn.danger', { hasText: 'End this run today' }),
+    final: /^End the run today$/,
+    words: [/End this quest run today\?/, /The quests stop being offered from tomorrow/, /A quest nobody has completed by tonight never pays/, /Everyone keeps the XP they already earned from it, on the board and in the app/, /clear the run in the SQL editor: QUESTS\.md says how/],
+    redraw: () => { render(); },
+    calls: cs => cs.filter(c => c.kind === 'rpc' && ['end_quests', 'clear_quests'].includes(c.name)),
+    payload: c => c.name === 'end_quests' && c.payload.p_start === today && c.payload.p_end === today,
+  });
+
+  // 4. Delete for good of a hidden session (File → Records)
+  const hday = FX.daysAgo(today, 5);
+  await hideFixture(page, hday, false);
+  await page.evaluate(([k]) => hideSession('ava_test', 3, k), [hday]); await L.settle(page, 900);
+  if (await page.locator('#undobar .ux').count()) await page.locator('#undobar .ux').click();
+  await cycle('Delete for good', {
+    back: async () => { await L.go(page, 'a/ava_test/file'); await L.settle(page, 400); },
+    opener: () => page.locator('#hidden-sessions button', { hasText: 'Delete for good' }),
+    final: /^Delete Day 3 log for good$/,
+    words: [/Delete the hidden Day 3 log from \d{4}-\d{2}-\d{2} for good\?/, /This removes it from the database\. It can only come back from a backup file/, /Stays: Their other sessions and the rest of their file/, /If you only want it out of the numbers, leave it hidden/],
+    redraw: () => { assemble(); render(); },
+    calls: cs => cs.filter(c => c.name === 'session_history' && c.op === 'delete'),
+    payload: c => c.filters.length === 4 && c.filters.some(f => /hidden_at/.test(String(f))),
+  });
+  check(r, 'Delete for good: the hidden row is gone from the database', !(await L.db(page)).session_history.some(x => x.athlete_id === 'ava_test' && x.day === 3 && x.completed_on === hday), '');
+
+  // 5. Delete of an old call log (File → Records, inside the log's fold, which a redraw keeps open)
+  await cycle('Delete a call log', {
+    back: async () => { await L.go(page, 'a/ava_test/file'); await L.settle(page, 400); await page.locator('details.day-c').first().locator('summary').click(); },
+    opener: () => page.locator('details.day-c').first().locator('.btn.danger').first(),
+    final: /^Delete this call log$/,
+    words: [/Delete the call log from \d{4}-\d{2}-\d{2}\?/, /This permanently removes that weekly check-in\. It cannot be undone/, /Stays: Their other call logs and the rest of their file/],
+    redraw: () => { assemble(); render(); },
+    calls: cs => cs.filter(c => c.name === 'call_logs' && c.op === 'delete'),
+    payload: c => c.filters.length === 1 && /^id\.eq\./.test(c.filters[0]),
+  });
+  check(r, 'Delete a call log: one of Ava\'s two logs is left', (await L.db(page)).call_logs.filter(c => c.athlete_id === 'ava_test').length === 1, '');
+
+  // ── notice(): a calm line in the fail bar, with Copy ──
+  await L.go(page, 'athletes');
+  await page.evaluate(() => { failDismissAll(); notice('A first password', 'Password: abc12345XYZ\n\nThe WhatsApp message is copied.', { copy: 'abc12345XYZ' }); });
+  const nl = page.locator('#failbar .fb-notice');
+  const geo = await page.evaluate(() => { const l = document.querySelector('#failbar .fb-notice'), c = getComputedStyle(l); return { border: c.borderLeftColor, inBar: !!l.closest('#failbar'), barHidden: document.getElementById('failbar').hidden }; });
+  check(r, 'a notice is a line in the same bar as the failures: a bold title, the body with its new lines, a Copy button and a ✕', geo.inBar && !geo.barHidden && (await nl.count()) === 1 && /A first password/.test(await nl.locator('.fb-title').innerText()) && /Password: abc12345XYZ/.test(await nl.locator('.fb-body').innerText()) && (await nl.locator('.fb-copy').count()) === 1 && (await nl.locator('.fb-x').count()) === 1, geo);
+  check(r, 'its tone is calm: the court green, not the clay of a failure', geo.border === 'rgb(14, 74, 54)', geo.border);
+  await nl.locator('.fb-copy').click(); await L.settle(page, 200);
+  check(r, 'Copy puts exactly the password on the clipboard and says Copied', (await clip()) === 'abc12345XYZ' && /Copied/.test(await nl.locator('.fb-copy').innerText()), await clip());
+  await page.waitForTimeout(2200); await page.evaluate(() => render()); await L.go(page, 'today');
+  check(r, 'it stays until ✕: after a pause, a redraw and another screen it is still there', (await ncount()) === 1, await L.failText(page));
+  await page.evaluate(() => notice('A first password', 'Password: abc12345XYZ\n\nThe WhatsApp message is copied.', { copy: 'abc12345XYZ' }));
+  check(r, 'the same notice twice is one line with a count', (await ncount()) === 1 && /×2/.test(await nl.innerText()), await nl.innerText());
+  await page.evaluate(() => fail('A failure at the same time.'));
+  check(r, 'a failure beside it is a second line, and Dismiss all appears', (await page.locator('#failbar .fb-line').count()) === 2 && (await page.locator('#failbar .fb-all').count()) === 1 && (await page.locator('#failbar .fb-line:not(.fb-notice)').count()) === 1, await L.failText(page));
+  await nl.locator('.fb-x').click();
+  check(r, 'the notice\'s ✕ removes just that line', (await ncount()) === 0 && (await page.locator('#failbar .fb-line').count()) === 1, await L.failText(page));
+  await page.evaluate(() => failDismissAll());
+  // The browser refuses to copy: the text is selected for Ctrl+C instead. And the "Copy failed" notice offers its text selected.
+  await page.evaluate(() => Object.defineProperty(navigator.clipboard, 'writeText', { value: () => Promise.reject(new Error('blocked')), configurable: true }));
+  await page.evaluate(() => notice('Refused', 'Password: refused987654 and some words.', { copy: 'refused987654' }));
+  await nl.locator('.fb-copy').click(); await L.settle(page, 300);
+  const sel1 = await page.evaluate(() => String(getSelection()));
+  check(r, 'when the browser refuses to copy, exactly the password is selected and the button says so', sel1 === 'refused987654' && /Selected/.test(await nl.locator('.fb-copy').innerText()), { sel1 });
+  await page.evaluate(() => failDismissAll());
+  await page.evaluate(() => copyText('Plain text 123\nsecond line'));
+  await L.settle(page, 300);
+  const sel2 = await page.evaluate(() => String(getSelection()));
+  check(r, 'a failed Copy in the page is a notice, "Copy failed — here it is:", with the text selected', /^Copy failed — here it is:/.test((await nl.locator('.fb-title').innerText()).trim()) && sel2.replace(/\s+/g, ' ') === 'Plain text 123 second line' && (await nl.locator('.fb-copy').count()) === 0, { sel2 });
+  await page.evaluate(() => { delete navigator.clipboard.writeText; failDismissAll(); });
+
+  // ── the notices the long alert()s became ──
+  const noticeWords = async () => (await nl.last().locator('.fb-msg').innerText()).replace(/\s+/g, ' ').trim();
+  // a password the server could not store (athlete): the only place it is shown
+  await L.go(page, 'a/eli_new/file'); await page.evaluate(() => failDismissAll());
+  await page.evaluate(() => { const o = sb.functions.invoke.bind(sb.functions); sb.functions.invoke = async (n, a) => { const x = await o(n, a); if (x && x.data && /^(athlete|tps)-login$/.test(n) && !/many/.test(a.body.action)) x.data = Object.assign({}, x.data, { warning: 'the password works, but it was not stored for Logins to send (fixture): copy it now' }); return x; }; });
+  await page.locator('#athPw').fill('');
+  await page.locator('.pwform .btn.primary').click(); await L.settle(page, 900);
+  const pw1 = ((await L.db(page)).athlete_identities.find(x => x.athlete_id === 'eli_new') || {}).initial_password;
+  const t1 = await noticeWords();
+  check(r, 'athlete password the server could not store: a warning notice with the old words, the password and the WhatsApp line', (await ncount()) === 1 && /Password reset for eli_new, but the password works, but it was not stored for Logins to send \(fixture\): copy it now\./.test(t1) && t1.includes('Password: ' + pw1) && /The WhatsApp message is copied to your clipboard\./.test(t1) && (await nl.evaluate(el => el.classList.contains('warn'))), t1);
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 800 }); await L.settle(page, 250);
+    const fit = await page.evaluate(() => { const q = document.getElementById('failbar').getBoundingClientRect(); return { sw: document.documentElement.scrollWidth, iw: innerWidth, left: Math.round(q.left), right: Math.round(q.right) }; });
+    check(r, `...at ${w} px the notice fits the screen (no sideways scroll), Copy still in view`, fit.sw <= fit.iw && fit.left >= 0 && fit.right <= fit.iw && await nl.locator('.fb-copy').isVisible(), fit);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 }); await L.settle(page, 250);
+  await nl.locator('.fb-copy').click(); await L.settle(page, 200);
+  check(r, '...and its Copy puts the password (not the message) on the clipboard', !!pw1 && (await clip()) === pw1, await clip());
+  await page.evaluate(() => render()); await L.settle(page, 300);
+  check(r, '...it survives a redraw and goes with ✕', (await ncount()) === 1 && await (async () => { await nl.locator('.fb-x').click(); return (await ncount()) === 0; })(), '');
+  // a buyer's password the server could not store
+  await L.go(page, 'buyers'); await L.settle(page, 500);
+  await page.locator('#tpUser').fill('warn_buyer'); await page.locator('#tpCreate').click(); await L.settle(page, 900);
+  const pw2 = ((await L.db(page)).tps_accounts.find(x => x.username === 'warn_buyer') || {}).initial_password;
+  const t2 = await noticeWords();
+  check(r, 'buyer password the server could not store: a warning notice with the password, the Farsi message line and the warning', (await ncount()) === 1 && /Login created for warn_buyer/.test(t2) && t2.includes('Password: ' + pw2) && /The Farsi WhatsApp message is copied to your clipboard\./.test(t2) && /⚠ the password works, but it was not stored/.test(t2), t2);
+  await nl.locator('.fb-copy').click(); await L.settle(page, 200);
+  check(r, '...and its Copy puts the password on the clipboard', !!pw2 && (await clip()) === pw2, await clip());
+  await page.evaluate(() => failDismissAll());
+  // the bulk logins result: the old words, in the warning tone when some failed
+  await L.go(page, 'athletes');
+  await page.evaluate(() => { window.__DB.athlete_identities = window.__DB.athlete_identities.filter(x => x.athlete_id !== 'ava_test'); return hardRefresh(); });
+  await L.settle(page, 900);
+  check(r, 'bulk logins: Ava now needs one', await page.evaluate(() => athletesNeedingLogin().includes('ava_test')), await page.evaluate(() => athletesNeedingLogin()));
+  await page.evaluate(() => { const o = sb.functions.invoke.bind(sb.functions); sb.functions.invoke = async (n, a) => (n === 'athlete-login' && a.body.action === 'create_many') ? { data: { created: 1, failed: [{ athlete_id: 'x_fail', error: 'fixture boom' }], skipped: ['y_skip'] }, error: null } : o(n, a); });
+  await page.evaluate(() => bulkCreateLogins()); await L.settle(page, 700);
+  const t3 = await noticeWords();
+  check(r, 'bulk logins: "1 login created.", who already had one, who failed and why, in the warning tone', /^1 login created\. Already had a login, left as it was: y_skip 1 failed: x_fail: fixture boom$/.test(t3) && (await nl.last().evaluate(el => el.classList.contains('warn'))), t3);
+  await page.evaluate(() => failDismissAll());
+  // Add coaching logs: nothing to add, then added
+  const addLogs = async name => {
+    await openTools(page);
+    const [fc] = await Promise.all([page.waitForEvent('filechooser'), page.locator('#toolsPanel button', { hasText: 'Add coaching logs' }).click()]);
+    await fc.setFiles([{ name, mimeType: 'text/markdown', buffer: Buffer.from('# Fixture log\n') }]); await L.settle(page, 900);
+  };
+  await addLogs('ava_test.md');
+  const t4 = await noticeWords();
+  check(r, 'Add coaching logs with nothing new: "Nothing to add." and who is already on the server', /^Nothing to add\. Already on the server \(left exactly as they are\): ava_test$/.test(t4), t4);
+  await page.evaluate(() => failDismissAll());
+  await addLogs('eli_new.md');
+  const t5 = await noticeWords();
+  check(r, 'Add coaching logs that adds one: "Added 1 of 1." and the log is on the server', /^Added 1 of 1\.$/.test(t5) && (await L.db(page)).coaching_logs.some(x => x.athlete_id === 'eli_new'), t5);
+  await page.evaluate(() => failDismissAll());
+  // Library publish with a skipped file
+  await L.go(page, 'links');
+  const [fc2] = await Promise.all([page.waitForEvent('filechooser'), page.getByRole('button', { name: /\+ Publish workout/ }).click()]);
+  await fc2.setFiles([{ name: 'good-one.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ id: 'good-one', title: 'Good One', duration: '10 min', category: 'strength' })) },
+    { name: 'broken.json', mimeType: 'application/json', buffer: Buffer.from('{ not json') }]);
+  await L.settle(page, 900);
+  const t6 = await noticeWords();
+  check(r, 'Library publish with a skipped file: "Published 1." and what was skipped', /^Published 1\. Skipped: broken\.json: not valid JSON$/.test(t6), t6);
+  await page.evaluate(() => failDismissAll());
+  // the backup summary: calm, with the rows per table folded; an INCOMPLETE one in the warning tone, its warning first
+  await takeBackup(page, 'dp-complete');
+  const bn = page.locator('#failbar .fb-notice:not(.warn)');
+  check(r, 'the backup summary is a notice: "Backup downloaded — N rows across M tables.", keep a copy, and the rows per table folded under it', (await bn.count()) === 1 && /^Backup downloaded — [\d,]+ rows across \d+ tables\./.test((await bn.locator('.fb-title').innerText()).trim()) && /Keep a copy somewhere that is not this computer/.test(await bn.innerText()) && (await bn.locator('details.fb-more').getAttribute('open')) === null && /programs: \d+/.test(await bn.locator('details.fb-more').evaluate(el => el.textContent)), await bn.innerText());
+  await page.evaluate(() => failDismissAll());
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'from', name: 'hab_intake', op: 'select', message: 'fixture: cannot read hab_intake', times: 1 }));
+  await takeBackup(page, 'dp-incomplete');
+  const wn = page.locator('#failbar .fb-notice.warn');
+  const wt = (await wn.innerText()).replace(/\s+/g, ' ');
+  check(r, 'an INCOMPLETE backup is a notice in the warning tone that opens with the warning, says it is not a restore point and names what could not be read', (await wn.count()) === 1 && /^⚠ INCOMPLETE backup — saved as aa-backup-INCOMPLETE-/.test(wt) && /NOT a restore point/.test(wt) && /hab_intake: fixture: cannot read hab_intake/.test(wt), wt);
+  await page.evaluate(() => failDismissAll());
+  // none of the five long confirms, and no alert() or prompt() at all, anywhere above
+  const real = log.dialogs.filter(d => d.via === undefined);
+  check(r, 'no alert() or prompt() fired anywhere above', !real.some(d => d.type !== 'confirm'), real.map(d => d.type + ': ' + d.message.slice(0, 50)));
+  check(r, 'the only confirm()s were the short ones that stay (create logins, add coaching logs, publish)', real.every(d => /^(Create logins for|Add \d+ new coaching log|Publish \d+ )/.test(d.message)), real.map(d => d.message.slice(0, 50)));
+  check(r, 'notices are recorded for the harness with via: notice', log.dialogs.filter(d => d.via === 'notice').length >= 8, log.dialogs.filter(d => d.via === 'notice').length);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+
+  // ── the demo draws the slots and opens none ──
+  const dctx = await b.newContext({ viewport: { width: 1280, height: 900 }, timezoneId: 'UTC' });
+  const dp = await dctx.newPage();
+  const derr = [];
+  dp.on('pageerror', e => derr.push(String(e && e.message || e)));
+  dp.on('dialog', d => { derr.push('dialog: ' + d.type()); d.dismiss().catch(() => {}); });
+  await dp.route('**/*', route => route.request().url().startsWith(L.BASE) ? route.continue() : route.fulfill({ status: 204, body: '' }));
+  await dp.goto(L.BASE + '/coach.html?demo=1');
+  await dp.waitForFunction(() => document.querySelector('#rail a.tab') && !document.querySelector('#content .loading'), null, { timeout: 15000 });
+  await dp.waitForTimeout(500);
+  const dId = await dp.evaluate(() => Object.keys(S.ath).find(k => k !== 'demo') || Object.keys(S.ath)[0]);
+  await dp.evaluate(h => { location.hash = h; }, 'a/' + dId + '/file'); await dp.waitForTimeout(700);
+  await dp.evaluate(() => { const d = document.getElementById('dangerzone'); if (d) d.open = true; });
+  const slots = await dp.locator('#dangerzone .dangerslot').count();
+  await dp.evaluate(id => { deleteAthlete(id); forgetContact(id); endQuestRun('2026-01-01'); deleteHiddenSession(id, 1, '2026-01-01'); deleteCallLog('x', id, '2026-01-01'); }, dId);
+  check(r, 'demo: the File draws the Danger zone with its slot, and none of the five opens a panel or a dialog (the demo saves nothing)', slots >= 1 && (await dp.locator('.dangerask').count()) === 0 && (await dp.evaluate(() => _danger)) === null && !derr.length, { slots, derr });
+  await dctx.close();
   return r;
 };
 
@@ -1804,14 +2080,22 @@ S['spine-steps-save'] = async (b) => {
   await box.fill(['a', 'b', 'c', 'd', 'e', 'f', 'g'].map(x => 'Step ' + x + '.').join('\n'));
   let n0 = await L.nCalls(page);
   await page.locator('.sp-save').first().click(); await L.settle(page, 400);
-  check(r, 'seven steps: refused with the reason, nothing sent', log.dialogs.length === 1 && /7 steps: 6 at most/.test(log.dialogs[0].message) && !spineRpcs(await L.callsSince(page, n0)).length, log.dialogs.map(x => x.message));
+  check(r, 'seven steps: refused with the reason, nothing sent (a line in the fail bar since round 3, not a pop-up)', log.dialogs.length === 1 && log.dialogs[0].via === 'bar' && /7 steps: 6 at most/.test(log.dialogs[0].message) && /Nothing was saved/.test(log.dialogs[0].message) && !spineRpcs(await L.callsSince(page, n0)).length, log.dialogs.map(x => x.message));
   // a step of 141 characters
   log.dialogs.length = 0;
   await box.fill('Short step.\n' + 'x'.repeat(141));
   n0 = await L.nCalls(page);
   await page.locator('.sp-save').first().click(); await L.settle(page, 400);
-  check(r, 'a step over 140 characters: refused, naming the step, nothing sent', log.dialogs.length === 1 && /Step 2 of How to do it is 141 characters/.test(log.dialogs[0].message) && !spineRpcs(await L.callsSince(page, n0)).length, log.dialogs.map(x => x.message));
+  check(r, 'a step over 140 characters: refused, naming the step, nothing sent (a fail-bar line)', log.dialogs.length === 1 && log.dialogs[0].via === 'bar' && /Step 2 of How to do it is 141 characters/.test(log.dialogs[0].message) && /Nothing was saved/.test(log.dialogs[0].message) && !spineRpcs(await L.callsSince(page, n0)).length, log.dialogs.map(x => x.message));
   check(r, 'the hint under the box says it will not save', /will not save/.test(await page.locator('[data-steps-hint]').innerText()), await page.locator('[data-steps-hint]').innerText());
+  // the Farsi How to do it has the same limits and the same answer: a fail-bar line, nothing sent (round 3 turned the third pop-up into a line too)
+  log.dialogs.length = 0;
+  await box.fill('Short step.');
+  await page.evaluate(() => { document.querySelector('textarea[data-sf=steps_fa]').value = ['یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت'].map(x => 'گام ' + x).join('\n'); });
+  n0 = await L.nCalls(page);
+  await page.locator('.sp-save').first().click(); await L.settle(page, 400);
+  check(r, 'seven Farsi steps: refused with the reason in a fail-bar line, nothing sent', log.dialogs.length === 1 && log.dialogs[0].via === 'bar' && /The Farsi How to do it has 7 steps: 6 at most/.test(log.dialogs[0].message) && /Nothing was saved/.test(log.dialogs[0].message) && !spineRpcs(await L.callsSince(page, n0)).length, log.dialogs.map(x => x.message));
+  await page.evaluate(() => { document.querySelector('textarea[data-sf=steps_fa]').value = ''; });
   // a good edit: a typed "1." or "2)" and blank lines are dropped; only the steps go up
   log.dialogs.length = 0;
   const want = ['Hold one dumbbell at your chest.', 'Sit down between your heels.', 'Stand back up.'];
@@ -3618,12 +3902,15 @@ S['session-hide-undo'] = async (b) => {
   await page.locator('#undobar .ux').click();
   await L.go(page, 'a/ava_test/file'); await L.settle(page, 700);
   n0 = await L.nCalls(page);
-  await page.locator('#hidden-sessions button', { hasText: 'Delete for good' }).click();
+  await page.locator('#hidden-sessions button', { hasText: 'Delete for good' }).click();   // opens the panel under the row (dangerAsk); nothing is deleted yet
+  await page.locator('#hidden-sessions #dangerGo').waitFor();
+  const confirmText = (await page.locator('#hidden-sessions .dangerask').innerText()).replace(/\s+/g, ' ');
+  check(r, 'it asked first, in a panel under the row: nothing deleted yet', !(await L.callsSince(page, n0)).some(x => x.name === 'session_history' && x.op === 'delete'), confirmText);
+  await page.locator('#hidden-sessions #dangerGo').click();
   await L.settle(page, 900);
   const del = (await L.callsSince(page, n0)).filter(x => x.name === 'session_history' && x.op === 'delete').slice(-1)[0];
   check(r, 'Delete for good deletes by athlete, day, date AND only a hidden row', !!del && del.filters.length === 4 && del.filters.some(f => /hidden_at/.test(String(f))), del && del.filters);
-  const confirmText = ((log.dialogs.filter(d => d.type === 'confirm').slice(-1)[0]) || {}).message || '';
-  check(r, 'it asked first, and said it can only come back from a backup file', /for good/.test(confirmText) && /backup file/.test(confirmText), confirmText);
+  check(r, 'the panel said it can only come back from a backup file, and what stays', /for good/.test(confirmText) && /backup file/.test(confirmText) && /Stays: Their other sessions/.test(confirmText) && !log.dialogs.some(d => d.type === 'confirm'), confirmText);
   check(r, 'the row is gone', !(await row()), '');
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
@@ -4039,7 +4326,7 @@ S['tools-button'] = async (b) => {
 S['fail-bar'] = async (b) => {
   const r = { id: 'fail-bar', title: 'A failure stays on screen until it is dismissed, in view wherever the page is scrolled; a success stays a toast; neither is a pop-up', checks: [] };
   const { page, log } = await L.openCoach(b, {});
-  const pops = () => log.dialogs.filter(d => d.via !== 'bar');
+  const pops = () => log.dialogs.filter(d => d.via === undefined);   // real pop-ups only: a failure line is via 'bar', a notice() via 'notice'
   const lines = () => page.locator('#failbar .fb-line').count();
   const post = async text => { await page.locator('#coachLineInput').fill(text); await page.locator('.mic .row .btn.primary').click(); await L.settle(page, 500); };
   // 1. a failed post on Today
@@ -4215,9 +4502,13 @@ S['file-groups'] = async (b) => {
   check(r, 'the signup funnel row keeps WhatsApp, copy email and open, and has no forget button', /WhatsApp/.test(acts) && /copy email/.test(acts) && /open/.test(acts) && !/forget/i.test(acts) && (await page.locator('.fun button', { hasText: /forget/i }).count()) === 0, acts);
   await L.go(page, 'a/cara_free/file'); await openDanger(page);
   const n0 = await L.nCalls(page);
-  await page.locator('#dangerzone button', { hasText: 'Forget their Proof data…' }).click(); await L.settle(page, 900);
+  await page.locator('#dangerzone button', { hasText: 'Forget their Proof data…' }).click();   // opens the panel (dangerAsk), still inside the Danger zone
+  await page.locator('#dangerzone #dangerGo').waitFor();
+  const forgetAsk = (await page.locator('#dangerzone .dangerask').innerText()).replace(/\s+/g, ' ');
+  check(r, 'it asks first, in a panel: no call yet', !(await L.callsSince(page, n0)).some(c => c.name === 'forget_contact') && /Forget cara_free\?/.test(forgetAsk) && /PERMANENTLY deletes their contact details/.test(forgetAsk), forgetAsk);
+  await page.locator('#dangerGo').click(); await L.settle(page, 900);
   const fg = lastOf(await L.callsSince(page, n0), c => c.name === 'forget_contact');
-  check(r, 'it asks first, then calls forget_contact for that person', !!fg && fg.payload.p_athlete_id === 'cara_free' && log.dialogs.some(d => d.type === 'confirm' && /Forget cara_free\?/.test(d.message)), { fg: fg && fg.payload, dialogs: log.dialogs.map(d => d.type) });
+  check(r, 'then calls forget_contact for that person, with no confirm() dialog', !!fg && fg.payload.p_athlete_id === 'cara_free' && !log.dialogs.some(d => d.type === 'confirm'), { fg: fg && fg.payload, dialogs: log.dialogs.map(d => d.type) });
   check(r, 'and their contact is gone, so the offer goes with it', !(await L.db(page)).hab_contacts.some(c => c.athlete_id === 'cara_free'), '');
 
   // 7. Narrow screens: no sideways scroll, with the Danger zone and every How this works open.

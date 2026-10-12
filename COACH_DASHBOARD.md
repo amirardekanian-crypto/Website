@@ -90,14 +90,27 @@ actions that depend on it are switched off until ↻ Refresh brings it back. Bef
 failed read looked exactly like an empty table. A save that the server did not apply (a lapsed
 sign-in, a record that moved) says so; it used to report success.
 
-**One way to say what happened** (2026-10-11, `fail()` and `toast()` in coach.html). *It worked*: a short toast at the bottom
-that goes away by itself. *It did not*: a red line at the bottom that **stays until you dismiss it** with its ✕, in view wherever
-you have scrolled to, with the words the pop-up used to carry; the same words twice become one line with a count (×2), at most
-four lines stay, and *Dismiss all* clears them. *A question*: a confirm. A pop-up (alert) only when there is something to read or
-copy once: a first password the server could not store, the backup summary, the result of adding coaching logs or logins in
-bulk, an erasure receipt. Before this a failed save was a 2.6-second toast in some tabs (easy to miss: the affiliate and intake
-ones) and a blocking pop-up in others, and a buyer login ended in a pop-up where an athlete's ended in a toast. A buyer login
-(Buyers: the Course and the Testing app) now copies its message and says so in a toast, like an athlete's; the password waits in the list.
+**One way to say what happened** (2026-10-11, `fail()` and `toast()` in coach.html; round 3 of the UX pass, 2026-10-12, added `notice()` and
+`dangerAsk()` and took the last `alert()` off the page). *It worked*: a short toast at the bottom that goes away by itself. *It did not*: a clay
+line in the bar under the tabs that **stays until you dismiss it** with its ✕, in view wherever you have scrolled to, with the words the pop-up
+used to carry; the same words twice become one line with a count (×2), at most four lines of a kind stay, and *Dismiss all* clears them.
+*A short question* (two lines at most, yes or no): a browser confirm. *Destroying or ending something*: a **panel in the page, under the button
+that asked** (`dangerAsk()`, the clay look of the Erase panel). It says what is being done, **what goes and what stays**, and its final button is
+named for the act (*Delete Ben Example's training history*, *Forget Cara*, *End the run today*, *Delete Day 3 log for good*, *Delete this call
+log*) beside **Cancel**. Esc and Cancel close it and call nothing; it survives a redraw while open (`_danger`, like the Erase panel's `_erase`),
+it never follows you to another screen, and while its work runs both buttons are off, which is the double-tap guard. Five actions use it: **Delete
+training history** and **Forget their Proof data…** (File → Danger zone), **End this run today** (Proof → Quest week), **Delete for good** of a
+hidden session and **Delete** of an old call log (File → Records). The button that asked only opens the panel: the guards (demo mode, a failed
+load, a coached athlete for Forget) run first, in front of it, and the final button makes exactly the calls the confirm used to lead to. *Something
+to read or copy once* (a first password the server could not store, the backup summary, an erasure receipt, the result of adding coaching logs,
+logins in bulk or a Library file with a skipped item, the text of a copy the browser refused): a **notice**, a calm green line in the same bar as
+the failures, with the words the pop-up carried. It also **stays until its ✕** (a password the server could not store is shown nowhere else) and has
+a **Copy** button when there is something to copy: the password itself, never the whole message; if the browser refuses, the text is selected for
+Ctrl+C. A notice that is also a warning (a password that was not stored, an incomplete backup, a bulk result with failures) takes the clay tone,
+and the backup's rows per table are folded under its summary. The Spine's three How-to-do-it limits (more than 6 steps, a step over 140 characters,
+the same limits in Farsi) are failure lines: nothing was saved. `danger-panels` drives all of it. Before this a failed save was a 2.6-second toast in
+some tabs (easy to miss: the affiliate and intake ones) and a blocking pop-up in others, and a buyer login ended in a pop-up where an athlete's ended in
+a toast. A buyer login (Buyers: the Course and the Testing app) now copies its message and says so in a toast, like an athlete's; the password waits in the list.
 
 ### Exercises — the Spine
 
@@ -537,7 +550,10 @@ The lever, not just the readout. If a run is live you see its quests, the XP eac
 pays and which day of seven it's on, with **End this run today**. If none is live
 you get the pool as checkboxes — pick one to four, **Start the week**, and it
 runs seven days from today via `set_quests()`.
-**Ending a run keeps what was earned** (stage55, Amir 2026-10-11: *"yes, they keep it"*). The button calls
+**End this run today asks in a panel under the button** (round 3, 2026-10-12; it was a long confirm): *what goes* (the quests stop being offered
+from tomorrow, a quest nobody has completed by tonight never pays), *what stays* (everyone keeps the XP they already earned, on the board and in the
+app), the SQL-editor way to take the XP back instead, and a final button **End the run today** beside Cancel. Nothing is called until that button.
+**Ending a run keeps what was earned** (stage55, Amir 2026-10-11: *"yes, they keep it"*). The final button calls
 `end_quests(start, today)`, which keeps the run and gives it an `end` day: from the day after it is no
 longer live (its quests are not offered), a quest completed on or before that day keeps paying, one not
 completed by then never pays. Both scorers read the `end` (`hab_bonus_xp()`'s `qruns` CTE and `runEndKey()` in
@@ -621,7 +637,9 @@ login for a new password. (The secret-link tools are gone: the links were retire
   **An incomplete backup is a different file** (2026-10-11): `aa-backup-INCOMPLETE-<date>.json`, with `complete: false` and
   `could_not_read` inside. It is not a restore point: it does not count as the weekly backup (Today keeps asking, and says the
   last try was incomplete; the Coach tools line says so too), and the prune script lists it apart, never treats it as the
-  newest backup and deletes it on the same 12-week rule as the others. Fix what the alert lists, back up again, and delete it.
+  newest backup and deletes it on the same 12-week rule as the others. The summary after a backup is a notice (round 3, 2026-10-12): the
+  rows per table sit folded under it, and an incomplete one is a notice in the clay tone that opens with the warning and names what could
+  not be read. Fix what it lists, back up again, and delete the file.
 
 ---
 
@@ -818,11 +836,15 @@ weight comes from the training app, not from Proof, and a coached athlete who ne
      under The work and Proof here; audit TOOLS-11) and **Came from** (the applications linked to them under Leads; each has an *open the application* link).
   2. **Programme:** the facts (athlete id, tier, days a week, cycle, roadmap n of m, when it was last saved and by whom; *Stored in: no
      programme row* only when there is none), then the **Coaching log** and **Version history** folds.
-  3. **Records** (absent when there is nothing to show): **Hidden sessions** and **Old call logs**.
+  3. **Records** (absent when there is nothing to show): **Hidden sessions** and **Old call logs**. Each log's **Delete** and each hidden
+     session's **Delete for good** opens a panel right under it (see *One way to say what happened*): what goes, what stays, a final button
+     named for the act, Cancel. An old call log's fold has an id, so a redraw keeps an open log (and its panel) open.
   4. **Danger zone**, a fold shut by default, open while **Erase completely…** is open for this person, and kept open across a redraw once
      you have opened it (`#dangerzone`, through `snapTabBody()`). Inside: **Delete training history**: every finished session (the hidden ones too) plus what the app keeps for them on the server (habit log, body
      weight, personal records). Their programme, login, coaching log, calls and wall lines stay, and so
-     do they on the roster. (It was called *Delete all data* until 2026-10-10, which it never was.) It is
+     do they on the roster. **It asks in a panel under the button** (round 3, 2026-10-12; it was a long confirm): *what goes* (with "cannot be
+     undone, except from a backup file"), *what stays*, a pointer to **Erase completely…** just below, and a final button named for the person,
+     **Delete Ben Example's training history**, beside Cancel. (It was called *Delete all data* until 2026-10-10, which it never was.) The final button is
      one call, `coach_delete_training_history()` (stage48): the sessions and the progress snapshot go
      together or not at all, and the counts come back. It used to be two deletes from this page, and a
      failure between them left one gone and one standing. Next, **Erase completely…**, which removes the whole
@@ -842,7 +864,8 @@ weight comes from the training app, not from Proof, and a coached athlete who ne
   counts a hidden session as present), the app's history (`get_my_history()`), the WORKOUT tick (`get_workout_days()`) and the pipeline's queries
   (`and hidden_at is null`). The athlete's phone can re-send it as often as it likes and it stays hidden; only a coach's save brings it back. A bar
   with **Undo** follows the hide for 30 seconds. The athlete's File lists every hidden session under **Hidden sessions** with **Restore** and, for a
-  real erasure request about one session, **Delete for good** (only a hidden row can be deleted from there, and it asks first). One coach-only
+  real erasure request about one session, **Delete for good** (only a hidden row can be deleted from there, and it asks first, in a panel under the
+  row: it can only come back from a backup file, the person's other sessions stay, and the final button reads *Delete Day 3 log for good*). One coach-only
   function does both directions, `coach_hide_session()` (it never touches `updated_at`: hiding is not athlete activity). `session-hide-undo` and
   `session-hide-no-false-warning` drive it.
 - **This cycle on the day cards, earlier cycles folded** (2026-10-12; Amir, a day into Elmira's new cycle: *"all im seeing is his
@@ -956,7 +979,9 @@ chat (one link builder for the whole page: Persian digits and Iranian 09… numb
 
 **Forget** (free and Proof-only people only; since 2026-10-12 it is **not a button on the funnel row** (a permanent delete one click from WhatsApp and
 copy email) but **File → Danger zone → Forget their Proof data…**, offered to the people the funnel would have offered it to: a signup who is not a
-coached athlete) calls `forget_contact()`, which PERMANENTLY deletes their
+coached athlete; **it asks in a panel under the button** (round 3, 2026-10-12): the words of the old confirm, a pointer to **Erase completely…** just
+above, and a final button named for the person, *Forget Cara*, beside Cancel; a coached athlete is refused in the bar before any panel opens)
+calls `forget_contact()`, which PERMANENTLY deletes their
 contact details, their whole progress row (habit log, body weight, records), their board place and
 their roll-call lines. Their programme, login, session history, titles and season results stay.
 It is not offered for coached clients: on them the progress row is their training app's cloud
@@ -1019,8 +1044,8 @@ list is long and a phone clips a dialog.
   digits) and a name match (two people can share a name) are offered, never ticked for you. And a
   **finder** under it searches every other form by name, email, contact, programme or date, shows 8 at a time, and
   ticks go into a list *"N intake forms will be erased with them"* by name, each with *remove*. At most 10 per
-  erasure; the server accepts any form that exists and refuses a missing one. The final alert names the forms that went,
-  or says that none did.
+  erasure; the server accepts any form that exists and refuses a missing one. The final receipt (a notice since 2026-10-12, in the bar,
+  until you dismiss it) names the forms that went, or says that none did.
 - **What stays, and the panel says so:** your weekly backup files (the privacy notice promises a deleted record
   leaves them within about three months), emails in your inbox (Web3Forms), WhatsApp, anything on their own phone,
   any copy on your own computer (a `data/<id>.json`, a saved Backup), and, for an athlete, **their board name in
@@ -1042,7 +1067,7 @@ list is long and a phone clips a dialog.
   before they are deleted.
 - **One thing it cannot close:** a phone that saves at the very moment of the erasure can write one last row after it
   (the function cannot see an uncommitted write, and the app's own functions do not lock the athlete). The person
-  then shows in the roster again with tier *unknown*; erase them a second time and it is gone. The final alert says
+  then shows in the roster again with tier *unknown*; erase them a second time and it is gone. The final receipt says
   so. Buyers are not affected (their tables have foreign keys to the account).
 - **The receipt** (`erasure_log`, in the backup): the date, the kind, the counts and a SHA-256 of
   `kind:id` (athlete id or username, lower case). No name, id or email is stored. To ask "did I erase X?", hash

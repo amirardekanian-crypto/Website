@@ -38,16 +38,23 @@ async function openCoach(browser, opts) {
   const seed = buildSeed(Object.assign({ today }, opts.seed || {}));
   const log = { dialogs: [], errors: [], console: [] };
   page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await d.accept().catch(() => {}); });
-  // What did not work is shown as a line at the bottom that stays until dismissed (fail(), pile B5), not as a pop-up. A check that asks
-  // "was the coach told X?" reads log.dialogs, so each new line is recorded there once, as an 'alert' with its words. The bar itself is
+  // What did not work is shown as a line at the bottom that stays until dismissed (fail(), pile B5), not as a pop-up; something to read or copy
+  // once (a first password, the backup summary, the erasure receipt) is a notice(), a calm line in the same bar (round 3, 2026-10-12). A check
+  // that asks "was the coach told X?" reads log.dialogs, so each new line is recorded there once, as an 'alert' with its words: via 'bar' for a
+  // failure, via 'notice' for a notice (its title, body and folded list as one text, the words the pop-up used to carry). The bar itself is
   // asserted on in the scenario `fail-bar`.
-  await page.exposeFunction('__noteFail', m => { log.dialogs.push({ type: 'alert', message: m, via: 'bar' }); });
+  await page.exposeFunction('__noteFail', (m, via) => { log.dialogs.push({ type: 'alert', message: m, via: via || 'bar' }); });
   await page.addInitScript(() => {
     const seen = new Set();
     const scan = () => document.querySelectorAll('#failbar .fb-line').forEach(l => {
       const id = l.getAttribute('data-fid');
       if (seen.has(id)) return;
       seen.add(id);
+      if (l.classList.contains('fb-notice')) {
+        const parts = [l.querySelector('.fb-title'), l.querySelector('.fb-msg > .fb-body'), l.querySelector('.fb-more > .fb-body')].filter(Boolean).map(x => x.textContent.trim()).filter(Boolean);
+        if (window.__noteFail) window.__noteFail(parts.join('\n\n'), 'notice');
+        return;
+      }
       const m = l.querySelector('.fb-msg');
       if (window.__noteFail) window.__noteFail(m && m.childNodes[0] ? m.childNodes[0].textContent : '');
     });

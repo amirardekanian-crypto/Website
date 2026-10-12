@@ -930,6 +930,13 @@
   .erase .typed { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
   .erase .typed label { flex-basis: 100%; font-size: 13.5px; }
   @media (max-width: 640px) { .erase ul { columns: 1; } }
+  /* The short version of the Erase panel (dangerAsk): the same clay look, drawn in a slot right under the button that asked. Four lines:
+     what is being done, what goes, what stays, and the final button named for the act beside Cancel. No slot is drawn until it has a panel. */
+  .dangerslot:empty { display: none; }
+  .erase.dangerask { margin: 8px 0 4px; max-width: 760px; }
+  .erase.dangerask .typed { margin-top: 10px; }
+  .erase.dangerask .typed .btn { max-width: 100%; white-space: normal; text-align: left; }
+  .hidrow + .dangerslot .erase.dangerask { margin: 0 0 10px; }
   .cmp-did { font-family: 'Space Mono', monospace; font-size: 12.5px; line-height: 1.5; }
   .cmp-did > span { display: inline-block; margin-right: 8px; }
   .did-sets.ok { color: var(--court); } .did-sets.warn { color: var(--ochre); } .did-sets.miss { color: var(--clay-ink); }
@@ -1154,6 +1161,18 @@
                    min-width: 34px; min-height: 34px; border-radius: 10px; }
   .failbar .fb-x:hover { background: rgba(0,0,0,.06); }
   .failbar .fb-all { align-self: flex-end; }
+  /* A notice (something to read or copy once: a first password, the backup summary, an erasure receipt) is a line in the same bar, in court green
+     instead of clay; the same ✕. One that is also a warning (.warn: a password the server could not store, an incomplete backup) takes the clay. */
+  .failbar .fb-line.fb-notice { background: var(--court-100); border-left-color: var(--court); }
+  .failbar .fb-line.fb-notice.warn { background: var(--clay-100); border-left-color: var(--clay); }
+  .failbar .fb-title { display: block; font-weight: 700; }
+  .failbar .fb-n { margin-left: 6px; }
+  .failbar .fb-body { display: block; margin-top: 4px; }
+  .failbar .fb-sel { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; user-select: all; overflow-wrap: anywhere; }
+  .failbar .fb-body.fb-sel { font-weight: 400; }
+  .failbar .fb-more { margin-top: 6px; }
+  .failbar .fb-more summary { cursor: pointer; font-weight: 600; font-size: 13px; }
+  .failbar .fb-copy { flex: none; align-self: center; white-space: nowrap; }
   @media (max-width: 1220px) { .failbar { padding: 0 20px; } }
   @media (max-width: 480px) { .failbar { padding: 0 14px; } }
   .demoband { background: var(--ochre); color: #fff; text-align: center; font-size: 12px; font-weight: 700;
@@ -1359,34 +1378,90 @@ function toast(msg) {
 //   it worked           toast()    a line at the bottom that goes away by itself
 //   it did not work     fail()     a line at the bottom that STAYS until you dismiss it. A failed save used to be a 2.6-second toast in
 //                                  some tabs (easy to miss) and a pop-up in others (it stopped everything and was gone once dismissed)
-//   a question          confirm()
-//   something to read or copy once (a first password, the backup summary, an erasure receipt)   alert()
-// A line is the same words the pop-up used to carry. The same words twice become one line with a count; at most four stay.
-const FAILS = []; let _failId = 0;
+//   a short question    confirm()  two lines at most
+//   destroying or ending something   dangerAsk()  a panel in the page, under the button that asked: what goes, what stays, a final button named for the act
+//   something to read or copy once (a first password, the backup summary, an erasure receipt)   notice()  a line in the same bar, calm green, with Copy when
+//                                  there is something to copy; it STAYS until its ✕, like a failure, because the password in it is shown nowhere else
+// A line is the same words the pop-up used to carry. The same words twice become one line with a count; at most four of each kind stay.
+const FAILS = []; let _failId = 0;   // the bar's lines, failures and notices together: { id, kind: 'fail' | 'notice', text, n, … }
+function barPush(line) {
+  const same = FAILS.find(f => f.kind === line.kind && f.text === line.text);
+  if (same) same.n++;
+  else {
+    FAILS.push(Object.assign({ id: ++_failId, n: 1 }, line));
+    const ofKind = FAILS.filter(f => f.kind === line.kind);
+    while (ofKind.length > 4) FAILS.splice(FAILS.indexOf(ofKind.shift()), 1);
+  }
+  renderFails();
+}
 function fail(msg) {
   const text = String(msg == null ? '' : msg).trim();
   if (!text) return;
-  const same = FAILS.find(f => f.text === text);
-  if (same) same.n++;
-  else { FAILS.push({ id: ++_failId, text, n: 1 }); while (FAILS.length > 4) FAILS.shift(); }
-  renderFails();
+  barPush({ kind: 'fail', text });
+}
+// title: the first line, in bold. body: the rest (new lines kept). opts: copy (a Copy button copies this text; if the browser refuses, the text
+// is selected for Ctrl+C), warn (the clay tone, for a notice that is also a warning), more ({label, text}: a long list folded under the body),
+// select (no Copy button, but the body is selected on arrival: the browser would not let the page copy it).
+function notice(title, body, opts) {
+  opts = opts || {};
+  title = String(title == null ? '' : title).trim(); body = String(body == null ? '' : body).trim();
+  const more = opts.more && opts.more.text ? { label: String(opts.more.label || 'More'), text: String(opts.more.text).trim() } : null;
+  if (!title && !body && !more) return;
+  barPush({ kind: 'notice', text: [title, body, more && more.text].filter(Boolean).join('\n\n'), title, body, more,
+    copy: opts.copy == null ? '' : String(opts.copy), warn: !!opts.warn, select: !!opts.select });
 }
 function failDismiss(id) { const i = FAILS.findIndex(f => f.id === id); if (i >= 0) FAILS.splice(i, 1); renderFails(); }
 function failDismissAll() { FAILS.length = 0; renderFails(); }
+// A notice's body, with the text Copy copies marked (a password inside a sentence), so a refused copy can select exactly that.
+function noticeBodyHtml(f) {
+  if (!f.body) return '';
+  const i = f.copy ? f.body.indexOf(f.copy) : -1;
+  if (i >= 0) return `<span class="fb-body">${esc(f.body.slice(0, i))}<span class="fb-sel">${esc(f.copy)}</span>${esc(f.body.slice(i + f.copy.length))}</span>`;
+  return `<span class="fb-body${f.select ? ' fb-sel' : ''}">${esc(f.body)}</span>`;
+}
+function noticeLineHtml(f) {
+  return `<div class="fb-line fb-notice${f.warn ? ' warn' : ''}" data-fid="${f.id}"><span class="fb-msg" dir="auto">` +
+      (f.title ? `<b class="fb-title">${esc(f.title)}</b>` : '') + (f.n > 1 ? `<b class="fb-n">×${f.n}</b>` : '') + noticeBodyHtml(f) +
+      (f.more ? `<details class="fb-more"><summary>${esc(f.more.label)}</summary><span class="fb-body">${esc(f.more.text)}</span></details>` : '') + `</span>` +
+      (f.copy ? `<button class="btn sm fb-copy" onclick="noticeCopy(${f.id}, this)">Copy</button>` : '') +
+      `<button class="fb-x" aria-label="Dismiss" onclick="failDismiss(${f.id})">✕</button></div>`;
+}
 function renderFails() {
   const el = $('failbar');
   if (!el) return;
   el.hidden = !FAILS.length;
-  el.innerHTML = FAILS.map(f => `<div class="fb-line" data-fid="${f.id}"><span class="fb-msg" dir="auto">${esc(f.text)}${f.n > 1 ? ` <b>×${f.n}</b>` : ''}</span>` +
-      `<button class="fb-x" aria-label="Dismiss" onclick="failDismiss(${f.id})">✕</button></div>`).join('') +
+  el.innerHTML = FAILS.map(f => f.kind === 'notice' ? noticeLineHtml(f)
+      : `<div class="fb-line" data-fid="${f.id}"><span class="fb-msg" dir="auto">${esc(f.text)}${f.n > 1 ? ` <b>×${f.n}</b>` : ''}</span>` +
+        `<button class="fb-x" aria-label="Dismiss" onclick="failDismiss(${f.id})">✕</button></div>`).join('') +
     (FAILS.length > 1 ? `<button class="btn sm fb-all" onclick="failDismissAll()">Dismiss all</button>` : '');
+  const sel = FAILS.find(f => f.kind === 'notice' && f.select && !f.selected);
+  if (sel) { sel.selected = true; noticeSelect(sel.id); }
 }
+// Selects the text a notice offers for copying (what Copy would copy, or its whole body), so Ctrl+C takes it.
+function noticeSelect(id) {
+  const line = document.querySelector('#failbar .fb-line[data-fid="' + id + '"]');
+  const s = line && (line.querySelector('.fb-sel') || line.querySelector('.fb-body'));
+  if (!s || !window.getSelection) return false;
+  const rg = document.createRange(); rg.selectNodeContents(s);
+  const g = window.getSelection(); g.removeAllRanges(); g.addRange(rg);
+  return true;
+}
+function noticeCopy(id, btn) {
+  const f = FAILS.find(x => x.id === id);
+  if (!f || !f.copy) return;
+  const label = btn && btn.textContent;
+  const say = t => { if (btn) { btn.textContent = t; setTimeout(() => { if (btn.isConnected) btn.textContent = label; }, 1600); } };
+  const manual = () => { noticeSelect(id); say('Selected: copy it'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(f.copy).then(() => say('Copied ✓'), manual);
+  else manual();
+}
+window.noticeCopy = noticeCopy;
 // quiet: the caller says what it did in its own toast (a login created, a password changed); "Copied" arrived a moment later and replaced it.
 function copyText(t, btn, quiet) {
   navigator.clipboard.writeText(t).then(() => {
     if (!quiet) toast('Copied');
     if (btn) { const o = btn.textContent; btn.textContent = 'Copied ✓'; setTimeout(() => btn.textContent = o, 1400); }
-  }, () => alert('Copy failed — here it is:\n\n' + t));
+  }, () => notice('Copy failed — here it is:', t, { select: true }));
 }
 function isPartialStatus(s) { return String(s || '').toLowerCase().indexOf('partial') === 0; }
 // A "Note:" line with nothing after it is not a note (two old sessions carry one): it is not something to read.
@@ -1804,7 +1879,11 @@ async function athleteLoginAction(athleteId, action, password) {
   // with Copy and Mark sent, so nothing depends on a dialog that is gone once dismissed.
   copyText(loginMessage(data.username, data.password), null, true);
   // Unless the server could not store it (athlete-login v6 says so): then this is the only place it is shown.
-  if (data.warning) { alert('Password ' + (password ? 'changed' : 'reset') + ' for ' + data.username + ', but ' + data.warning + '.\n\nPassword: ' + data.password + '\n\nThe WhatsApp message is copied to your clipboard.'); return; }
+  if (data.warning) {
+    notice('Password ' + (password ? 'changed' : 'reset') + ' for ' + data.username + ', but ' + data.warning + '.',
+      'Password: ' + data.password + '\n\nThe WhatsApp message is copied to your clipboard.', { copy: data.password, warn: true });
+    return;
+  }
   toast((data.created ? 'Login created' : password ? 'Password changed' : 'Password reset') + ' — the message is copied; send it on WhatsApp');
 }
 
@@ -1849,9 +1928,9 @@ async function bulkCreateLogins() {
   // Failures are named, not left in the console where nobody looks.
   const why = f => (f && (f.athlete_id || f.id) ? (f.athlete_id || f.id) + ': ' + (f.error || f.message || 'failed') : String(f));
   const skipped = data.skipped || [];   // already had a login: left exactly as it was
-  if (failed.length || skipped.length) alert(`${data.created} login${data.created === 1 ? '' : 's'} created.` +
-    (skipped.length ? `\n\nAlready had a login, left as it was: ${skipped.join(', ')}` : '') +
-    (failed.length ? `\n\n${failed.length} failed:\n` + failed.map(why).join('\n') : ''));
+  if (failed.length || skipped.length) notice(`${data.created} login${data.created === 1 ? '' : 's'} created.`,
+    (skipped.length ? `Already had a login, left as it was: ${skipped.join(', ')}` : '') +
+    (failed.length ? `${skipped.length ? '\n\n' : ''}${failed.length} failed:\n` + failed.map(why).join('\n') : ''), { warn: failed.length > 0 });
   else toast(`${data.created} login${data.created === 1 ? '' : 's'} created — copy & send from "Logins to send" below`);
 }
 window.bulkCreateLogins = bulkCreateLogins;
@@ -1971,14 +2050,15 @@ async function downloadBackup(btn) {
   try { localStorage.setItem(incomplete ? LAST_BAD_BACKUP_KEY : LAST_BACKUP_KEY, new Date().toISOString()); } catch (e) {}
   paintTools();   // the Tools panel says when the last backup was
   const total =Object.values(out.tables).reduce((s, r) => s + r.length, 0);
-  alert((incomplete
-        ? `⚠ INCOMPLETE backup — saved as ${fileName}.\n\nIt is NOT a restore point and does not count as this week's backup: some tables could not be read, so a restore from it would be missing data. Fix what is listed below, then take the backup again, and delete this file.\n\n`
-        : '') +
-        `Backup downloaded — ${total} rows across ${Object.keys(out.tables).length} tables.\n\n` +
-        counts.join('\n') +
-        (incomplete ? '\n\n⚠ INCOMPLETE — could not read everything:\n' + problems.join('\n') : '') +
-        '\n\nKeep a copy somewhere that is not this computer.' +
-        '\n\nKeep only the last 12 weekly backups, on both, and delete older ones: the privacy notice promises a deleted record leaves the backups within about three months.');
+  // The summary is a notice (round 3 of the UX pass); the rows per table are folded under it. An INCOMPLETE one keeps its warning first, in the clay tone,
+  // and puts what could not be read straight under it, so it cannot be mistaken for a restore point.
+  const summary = `Backup downloaded — ${total} rows across ${Object.keys(out.tables).length} tables.`;
+  const keepCopy = 'Keep a copy somewhere that is not this computer.\n\nKeep only the last 12 weekly backups, on both, and delete older ones: the privacy notice promises a deleted record leaves the backups within about three months.';
+  const perTable = { label: 'Rows in each table', text: counts.join('\n') };
+  if (incomplete) notice(`⚠ INCOMPLETE backup — saved as ${fileName}.`,
+    `It is NOT a restore point and does not count as this week's backup: some tables could not be read, so a restore from it would be missing data. Fix what is listed below, then take the backup again, and delete this file.\n\n` +
+    '⚠ INCOMPLETE — could not read everything:\n' + problems.join('\n') + '\n\n' + summary + '\n\n' + keepCopy, { warn: true, more: perTable });
+  else notice(summary, keepCopy, { more: perTable });
 }
 
 // Add coaching logs from .md files, ONLY for athletes who have none on the server yet.
@@ -2003,8 +2083,8 @@ function pickCoachingLogs() {
       rows.push({ athlete_id: id, body: await f.text() });
     }
     if (!rows.length) {
-      alert('Nothing to add.' + (kept.length ? `\n\nAlready on the server (left exactly as they are):\n${kept.join(', ')}` : '') +
-            (skipped.length ? `\n\nSkipped:\n${skipped.join('\n')}` : ''));
+      notice('Nothing to add.', (kept.length ? `Already on the server (left exactly as they are):\n${kept.join(', ')}` : '') +
+            (skipped.length ? `${kept.length ? '\n\n' : ''}Skipped:\n${skipped.join('\n')}` : ''));
       return;
     }
     if (!confirm(`Add ${rows.length} new coaching log(s)?\n\n${rows.map(r => r.athlete_id).join(', ')}\n\n` +
@@ -2019,9 +2099,9 @@ function pickCoachingLogs() {
     }
     await loadCoachingLogs();
     render();
-    alert(`Added ${rows.length - failed.length} of ${rows.length}.` +
-          (skipped.length ? `\n\nSkipped:\n` + skipped.join('\n') : '') +
-          (failed.length ? `\n\nFailed:\n` + failed.join('\n') : ''));
+    notice(`Added ${rows.length - failed.length} of ${rows.length}.`,
+          (skipped.length ? `Skipped:\n` + skipped.join('\n') : '') +
+          (failed.length ? `${skipped.length ? '\n\n' : ''}Failed:\n` + failed.join('\n') : ''), { warn: failed.length > 0 });
   };
   input.click();
 }
@@ -2111,7 +2191,7 @@ function pickLibraryFile(kind) {
     if (badW) { fail('Could not publish: ' + badW); return; }
     await loadLibrary();
     render();
-    if (skipped) alert('Published ' + rows.length + '.' + skipped); else toast('Published ' + rows.length);
+    if (bad.length) notice('Published ' + rows.length + '.', 'Skipped:' + NL + bad.join(NL)); else toast('Published ' + rows.length);
   };
   input.click();
 }
@@ -2700,6 +2780,7 @@ function renderNow() {
 }
 window.addEventListener('hashchange', ev => {
   if (_erase && _erase.status !== 'busy') _erase = null;   // an open Erase panel never follows the coach to another screen
+  if (_danger && !_danger.busy) _danger = null;            // nor does a dangerAsk panel (Delete training history, Forget, End the run, Delete for good, Delete a call log)
   // Leaving the Exercises tab, or moving between its three sub-tabs (the editor is only on Entries), with typed, unsaved work asks
   // first, and stays put on a no.
   fixLegacyHash();
@@ -3018,7 +3099,7 @@ function questPanelHtml(run) {
           ? `<span class="muted" style="font-size:12px">Ended. The quests stop after ${esc(prettyDate(ends))} and everyone keeps the XP they already earned. A new week can start tomorrow.</span>`
           : `<button class="btn sm danger" onclick="endQuestRun(${jsq(run.start)})">End this run today</button>
         <span class="muted" style="font-size:12px">everyone keeps the XP they already earned</span>`}
-      </div>`;
+      </div>${endedEarly ? '' : dangerSlot('quest:' + run.start)}`;
   }
   const pool = questPool();
   return `
@@ -3059,9 +3140,17 @@ async function startQuestRun() {
 // Ending a run keeps it (with an end day) instead of removing it, so nobody loses XP they already earned (stage55, Amir 2026-10-11:
 // "cancelling a quest week keeps the XP already earned"). The old Cancel called clear_quests(), which took that XP back from everyone who
 // had completed a quest, on the board and in the app. clear_quests() is still in the SQL editor for taking a run's XP back on purpose.
-async function endQuestRun(start) {
+// The button opens the panel (dangerAsk, round 3 of the UX pass); its final button is the work below.
+function endQuestRun(start) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!confirm('End this quest run today?\n\nThe quests stop being offered from tomorrow. Everyone keeps the XP they already earned from it, on the board and in the app; a quest nobody has completed by tonight never pays.\n\n(To take the XP back instead, clear the run in the SQL editor: QUESTS.md says how.)')) return;
+  dangerAsk('quest:' + start, {
+    title: 'End this quest run today?',
+    goes: 'The quests stop being offered from tomorrow. A quest nobody has completed by tonight never pays.',
+    stays: 'Everyone keeps the XP they already earned from it, on the board and in the app.',
+    note: '(To take the XP back instead, clear the run in the SQL editor: QUESTS.md says how.)',
+    button: 'End the run today', busyText: 'Ending the run…', run: () => endQuestRunNow(start) });
+}
+async function endQuestRunNow(start) {
   const { error } = await sb.rpc('end_quests', { p_start: start, p_end: todayKey() });
   if (error) {
     // Never fall back to clear_quests: that is the call that takes the XP back.
@@ -5078,7 +5167,7 @@ function weightPanel(a) {
 // A row: its label, then the value, its actions (right-aligned, wrapping under on a phone), one short muted hint, and `full` (a form, the
 // unsent password, the Erase panel: anything that wants the whole width). Every part but the label is optional.
 function fRow(label, o) {
-  return `<div class="frow"><div class="frow-l">${label}</div><div class="frow-b${o.form ? ' is-form' : ''}">${o.val ? `<div class="frow-v">${o.val}</div>` : ''}${o.acts ? `<div class="frow-a">${o.acts}</div>` : ''}${o.hint ? `<p class="frow-h">${o.hint}</p>` : ''}${o.full ? `<div class="frow-w">${o.full}</div>` : ''}</div></div>`;
+  return `<div class="frow"><div class="frow-l">${label}</div><div class="frow-b${o.form ? ' is-form' : ''}">${o.val ? `<div class="frow-v">${o.val}</div>` : ''}${o.acts ? `<div class="frow-a">${o.acts}</div>` : ''}${o.hint ? `<p class="frow-h">${o.hint}</p>` : ''}${o.full ? `<div class="frow-w">${o.full}</div>` : ''}${o.slot || ''}</div></div>`;
 }
 // The longer text a group's short hints stand for, one tap away at the end of the group. `paras` are HTML strings.
 function howFold(id, paras) {
@@ -5097,7 +5186,8 @@ function oldCallLogsHtml(D) {
     const scoreBits = [['Well',s.well],['Sleep',s.sleep],['Energy',s.energy],['Sore',s.sore],['RPE',s.rpe],['Court',s.court]]
       .filter(([,v]) => v != null).map(([k,v]) => `${k} <b>${esc(v)}</b>`).join(' · ');
     const ansHtml = Object.values(ans).map(x => `<div class="note" style="margin-top:6px"><b>${esc(x.label)}:</b> ${esc(x.value)}</div>`).join('');
-    return `<details class="day-c"><summary><div class="day-c-main">
+    // An id on the fold: a redraw (snapTabBody) keeps an open log open, which keeps its Delete panel in view.
+    return `<details class="day-c" id="calllog-${esc(l.id)}"><summary><div class="day-c-main">
         <h3>${esc(l.call_date)} <span class="muted" style="font-family:'Barlow',sans-serif;font-weight:400;font-size:12px;text-transform:none">${meta ? '· ' + esc(meta) : ''} · call ${esc(stars(l.rating))}</span></h3>
       </div><span class="day-c-chev">▾</span></summary>
       <div class="day-c-body">
@@ -5105,6 +5195,7 @@ function oldCallLogsHtml(D) {
         ${l.win_vault ? `<div class="note green" style="margin-top:6px"><b>🏆 Win vault:</b> ${esc(l.win_vault)}</div>` : ''}
         ${ansHtml}
         <div style="margin-top:10px"><button class="btn sm danger" onclick="deleteCallLog(${jsq(l.id)},${jsq(athleteId)},${jsq(l.call_date)})">Delete</button></div>
+        ${dangerSlot('calllog:' + l.id)}
       </div></details>`;
   }).join('') : `<p class="empty" style="color:var(--clay-ink)">Call logs did not load (${esc(_callErr[athleteId])}). Tap ↻ Refresh to try again.</p>`;
   return `<div class="frec">
@@ -5185,6 +5276,7 @@ function cameFromHtml(athleteId) {
 }
 // The sessions the coach hid (stage60), newest first, each with Restore and, for a genuine erasure request, Delete for good. Absent when there are none.
 const HIDDEN_HOW = 'Left out of their numbers, the roster\'s warnings and the history their app shows, and kept in the database. If their phone sends one again it stays hidden. <b>Restore</b> brings it back; <b>Delete for good</b> removes it, and it can then only come back from a backup file.';
+const hiddenKey = (athleteId, day, completedOn) => 'hidsess:' + athleteId + '|' + Number(day) + '|' + completedOn;   // the slot of that session's Delete for good panel
 function hiddenSessionsHtml(D) {
   const { athleteId, a } = D;
   const hid = (a.hidden || []).slice().sort((x, y) => String(y.completed_on).localeCompare(String(x.completed_on)) || Number(y.day) - Number(x.day));
@@ -5199,8 +5291,8 @@ function hiddenSessionsHtml(D) {
           <button class="btn sm danger" onclick="deleteHiddenSession(${jsq(athleteId)}, ${Number(h.day)}, ${jsq(h.completed_on)})">Delete for good</button>
         </span>
         <span class="hwho">${esc(h.focus || '')}${h.hidden_at ? (h.focus ? ' · ' : '') + 'hidden ' + esc(fmtLocalStamp(h.hidden_at)) : ''}</span>
-      </div>`).join('')}
-    </section>`;
+      </div>${dangerSlot(hiddenKey(athleteId, h.day, h.completed_on))}`).join('')}
+    </div>`;
 }
 // Which tier the Proof funnel treats a contact as: the programme's (S.ath), not the contact row's second copy. A coached client who signed up
 // through Proof first is "converted", and is never offered Forget. renderProof() and the File's Danger zone ask the same question.
@@ -5308,12 +5400,14 @@ function fileTabHtml(D) {
     ? fRow('Proof data', {
         val: 'Deletes their Proof contact details, habit log and board place.',
         acts: `<button class="btn sm danger" onclick="forgetContact(${jsq(athleteId)})">Forget their Proof data…</button>`,
-        hint: 'You are asked to confirm first. There is no undo.' }) : '';
+        hint: 'You are asked to confirm first. There is no undo.',
+        slot: dangerSlot('forget:' + athleteId, 'frow-w') }) : '';
   const dangerGroup = `<details class="fgroup fdanger" id="dangerzone"${eraseHere ? ' open' : ''}><summary class="fh">Danger zone</summary>
     <div class="panel fpanel">${fRow('Training history', {
         val: 'Deletes every finished session and the app data kept for them.',
         acts: `<button class="btn sm danger" onclick="deleteAthlete(${jsq(athleteId)})">Delete training history</button>`,
-        hint: 'Their programme, login and coaching log stay, and so do they on the roster.' })}${eraseRow}${forgetRow}${
+        hint: 'Their programme, login and coaching log stay, and so do they on the roster.',
+        slot: dangerSlot('hist:' + athleteId, 'frow-w') })}${eraseRow}${forgetRow}${
       howFold('how-danger', [`<b>Delete training history.</b> ${DELETE_HISTORY_HOW}`, `<b>Erase completely.</b> ${ERASE_HOW}`].concat(forgetRow ? [`<b>Forget.</b> ${FORGET_HOW}`] : []))}</div></details>`;
 
   return contactGroup + programmeGroup + recordsGroup + dangerGroup;
@@ -5455,9 +5549,17 @@ async function restoreSession(athleteId, day, completedOn) {
   await refetch(['hist']);
 }
 // For a real erasure request about one session: only a HIDDEN session can be deleted from here, so a visible one is never lost by one tap.
-async function deleteHiddenSession(athleteId, day, completedOn) {
+// The button opens the panel (dangerAsk, round 3 of the UX pass); its final button is deleteHiddenSessionNow().
+function deleteHiddenSession(athleteId, day, completedOn) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!confirm(`Delete the hidden Day ${day} log from ${completedOn} for good?\n\nThis removes it from the database. It can only come back from a backup file. If you only want it out of the numbers, leave it hidden.`)) return;
+  dangerAsk(hiddenKey(athleteId, day, completedOn), {
+    title: `Delete the hidden Day ${day} log from ${completedOn} for good?`,
+    goes: 'This removes it from the database. It can only come back from a backup file.',
+    stays: 'Their other sessions and the rest of their file.',
+    note: 'If you only want it out of the numbers, leave it hidden.',
+    button: `Delete Day ${day} log for good`, busyText: 'Deleting…', run: () => deleteHiddenSessionNow(athleteId, day, completedOn) });
+}
+async function deleteHiddenSessionNow(athleteId, day, completedOn) {
   const res = await sb.from('session_history').delete()
     .eq('athlete_id', athleteId).eq('day', day).eq('completed_on', completedOn).not('hidden_at', 'is', null).select('day');
   const bad = writeFailed(res, 'deleted');
@@ -5465,10 +5567,19 @@ async function deleteHiddenSession(athleteId, day, completedOn) {
   toast('Session log deleted');
   await refetch(['hist']);
 }
-async function deleteAthlete(athleteId) {
+// The button opens the panel (dangerAsk, round 3 of the UX pass); its final button is deleteAthleteNow().
+function deleteAthlete(athleteId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   const name = nameOf(athleteId);
-  if (!confirm(`Delete ${name}'s training history?\n\nThis permanently removes every finished session (the hidden ones too), and everything the app keeps for them on the server: habit log, body weight, personal records, the live snapshot. It cannot be undone, except from a backup file.\n\nWhat STAYS: their programme, their login, the coaching log, call logs, Proof contact and wall lines. They stay on the roster. To remove someone completely, cancel this and use "Erase completely…" just below the button.`)) return;
+  dangerAsk('hist:' + athleteId, {
+    title: `Delete ${name}'s training history?`,
+    goes: 'This permanently removes every finished session (the hidden ones too), and everything the app keeps for them on the server: habit log, body weight, personal records, the live snapshot. It cannot be undone, except from a backup file.',
+    stays: 'Their programme, their login, the coaching log, call logs, Proof contact and wall lines. They stay on the roster.',
+    note: 'To remove someone completely, cancel this and use “Erase completely…” just below.',
+    button: `Delete ${name}'s training history`, busyText: 'Deleting…', run: () => deleteAthleteNow(athleteId) });
+}
+async function deleteAthleteNow(athleteId) {
+  const name = nameOf(athleteId);
   // One call, one transaction (stage48): the sessions and the progress snapshot go together or not at all.
   // It used to be two deletes from this page, and a failure between them left one gone and one standing.
   // The function checks the coach itself and counts what it removed, so a lapsed sign-in (which RLS used to
@@ -5493,9 +5604,16 @@ async function deleteAthlete(athleteId) {
   toast(`Deleted ${nS} session${nS === 1 ? '' : 's'}${nP ? ' and the app data' : ''}`);
   hardRefresh();
 }
-async function deleteCallLog(id, athleteId, callDate) {
+// The button opens the panel (dangerAsk, round 3 of the UX pass); its final button is deleteCallLogNow().
+function deleteCallLog(id, athleteId, callDate) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
-  if (!confirm(`Delete the call log from ${callDate}?\n\nThis permanently removes that weekly check-in. It cannot be undone.`)) return;
+  dangerAsk('calllog:' + id, {
+    title: `Delete the call log from ${callDate}?`,
+    goes: 'This permanently removes that weekly check-in. It cannot be undone.',
+    stays: 'Their other call logs and the rest of their file.',
+    button: 'Delete this call log', busyText: 'Deleting…', run: () => deleteCallLogNow(id, athleteId) });
+}
+async function deleteCallLogNow(id, athleteId) {
   const res = await sb.from('call_logs').delete().eq('id', id).select('id');
   const bad = writeFailed(res, 'deleted');
   if (bad) { fail('Could not delete: ' + bad); return; }
@@ -5664,6 +5782,7 @@ async function eraseOpen(kind, key) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   if (_erase && _erase.status === 'busy') return;
   const e = _erase = { kind, key, status: 'loading', pv: null, err: '', typed: '', picked: [], find: '' };
+  if (_danger && !_danger.busy) _danger = null;   // one panel at a time: the short panel's own words send the coach here
   render();
   const res = await sb.rpc('coach_erase_person', { p_kind: kind, p_key: key });   // a dry run by default: nothing is changed
   // Only the panel that asked may use the answer. Cancel is offered while it loads, so a coach can cancel and reopen the same
@@ -5741,7 +5860,9 @@ async function eraseRun() {
   const codes = d.affiliates_unlinked || [];
   const login = Number(counts.auth_users || 0) > 0;
   const nForms = Number(counts.hab_intake || 0);
-  const note = `Erased ${who} for good: ${rows.toLocaleString()} row${rows === 1 ? '' : 's'}${login ? ', the sign-in account included' : ''}.\n\nReceipt #${d.log_id} is kept (a hash, the date and the counts; no name or contact).` +
+  // The receipt is a notice (round 3 of the UX pass): the first line is its title, the rest its body; it stays until the coach dismisses it.
+  const noteTitle = `Erased ${who} for good: ${rows.toLocaleString()} row${rows === 1 ? '' : 's'}${login ? ', the sign-in account included' : ''}.`;
+  const note = `Receipt #${d.log_id} is kept (a hash, the date and the counts; no name or contact).` +
     (e.kind === 'athlete'
       ? (nForms ? `\n\nIntake form${nForms === 1 ? '' : 's'} erased: ${forms.join('; ')}.` : '\n\nNo intake form was erased. If they filled one in, it is still in Leads.')
       : '') +
@@ -5752,10 +5873,60 @@ async function eraseRun() {
   else if (e.kind === 'course') { await loadCourse(); render(); }
   else { await loadAssess(); render(); }
   toast('Erased ' + who);
-  alert(note);
+  notice(noteTitle, note);
 }
 window.eraseOpen = eraseOpen; window.eraseCancel = eraseCancel; window.eraseType = eraseType; window.eraseTick = eraseTick; window.eraseRun = eraseRun;
 window.eraseFind = eraseFind; window.eraseStopWaiting = eraseStopWaiting;
+
+// --- dangerAsk: the short Erase panel (round 3 of the UX pass, 2026-10-12) -------------------------------------------------------------
+// A confirm() is for a question of two lines. Something that DESTROYS or ENDS something gets a panel in the page, in the clay look of the Erase panel,
+// right under the button that asked: what is being done, what goes, what stays, and a final button named for the act beside Cancel (Delete training
+// history, Forget Kian, End the run today). The button that asked only opens it: the guards (demo mode, a failed load, a coached athlete) run first, in
+// the opener, and the old work is the panel's `run`, the same calls in the same order.
+//   dangerSlot(key)       where a panel may appear: drawn by the renderer of the row, so a redraw keeps an open panel (like _erase)
+//   dangerAsk(key, spec)  opens the panel whose slot has this key: spec = { title, goes, stays, note?, button, busyText?, run }
+// One panel at a time, painted straight into its slot (no page redraw: typed work stays). Esc and Cancel close it; it never follows the coach to
+// another screen (the hashchange handler drops it); while its work runs the buttons are off, which is the double-tap guard. Used by Delete training
+// history and Forget (File → Danger zone), End this quest run today (Proof), Delete for good of a hidden session and Delete of an old call log (File → Records).
+let _danger = null;   // { key, title, goes, stays, note, button, busyText, run, busy }
+function dangerSlot(key, cls) { return `<div class="dangerslot${cls ? ' ' + cls : ''}" data-dkey="${esc(key)}">${dangerPanelHtml(key)}</div>`; }
+function dangerPanelHtml(key) {
+  const d = _danger;
+  if (!d || d.key !== key) return '';
+  return `<div class="erase dangerask" role="alertdialog" aria-labelledby="dangerTitle">
+    <p class="eh" id="dangerTitle">${esc(d.title)}</p>
+    <p><b>Goes:</b> ${esc(d.goes)}</p>
+    <p class="stays"><b>Stays:</b> ${esc(d.stays)}</p>${d.note ? `
+    <p class="stays">${esc(d.note)}</p>` : ''}
+    <div class="typed">
+      <button id="dangerGo" class="btn sm danger" onclick="dangerGo()" ${d.busy ? 'disabled' : ''}>${esc(d.busy ? d.busyText : d.button)}</button>
+      <button id="dangerNo" class="btn sm" onclick="dangerCancel()" ${d.busy ? 'disabled' : ''}>Cancel</button>
+    </div>
+  </div>`;
+}
+function dangerPaint() {
+  document.querySelectorAll('.dangerslot').forEach(el => { el.innerHTML = dangerPanelHtml(el.getAttribute('data-dkey')); });
+}
+function dangerAsk(key, spec) {
+  if (_danger && _danger.busy) return;
+  _danger = Object.assign({ note: '', busyText: 'Working…' }, spec, { key, busy: false });
+  dangerPaint();
+  const no = $('dangerNo');
+  if (no) { no.focus({ preventScroll: true }); const p = no.closest('.dangerask'); if (p && p.scrollIntoView) p.scrollIntoView({ block: 'nearest' }); }
+}
+function dangerCancel() {
+  if (!_danger || _danger.busy) return;
+  _danger = null; dangerPaint();
+}
+async function dangerGo() {
+  const d = _danger;
+  if (!d || d.busy) return;
+  d.busy = true; dangerPaint();
+  try { await d.run(); }
+  finally { if (_danger === d) { _danger = null; dangerPaint(); } }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && _danger && !_danger.busy) dangerCancel(); });
+window.dangerAsk = dangerAsk; window.dangerCancel = dangerCancel; window.dangerGo = dangerGo;
 
 // --- PROOF (wall · quest week · pulse · board · titles · season) -------------
 // The board comes from the server's own scorer via leaderboard_top, called as the signed-in
@@ -5906,14 +6077,22 @@ function funnelPanelHtml() {
     </section>`;
 }
 function setBoardScope(s) { _boardScope = s; renderProof(); }
-async function forgetContact(athleteId) {
+// The button opens the panel (dangerAsk, round 3 of the UX pass); its final button is forgetContactNow(). The guards stay in front of it.
+function forgetContact(athleteId) {
   if (DEMO) { toast('Demo mode — nothing saved'); return; }
   // Without the programmes nobody's tier is known, and a coached client would look like a free signup.
   if (LOAD_ERR.programs) { fail('The programmes did not load, so it is not known whether ' + athleteId + ' is a coached client. Forget is switched off until ↻ Refresh loads them.'); return; }
   if ((S.ath[athleteId] || {}).tier === 'coached') { fail('This is a coached athlete. Forget would delete their training app data (records, body weight, check-ins), so it is not offered for them.'); return; }
   // Says exactly what forget_contact() deletes (checked against the live function, 2026-09-26: this
   // used to say "Their logs and board place are untouched", the opposite of what it does).
-  if (!confirm(`Forget ${athleteId}?\n\nThis PERMANENTLY deletes their contact details, their whole habit log and progress, their board place and their roll-call lines. There is no undo and no automatic backup: take a ⤓ Backup first if you are not sure.\n\nTheir programme, login, session history, titles and season results stay. To remove everything about them, cancel this and use "Erase completely…" on their File tab.`)) return;
+  dangerAsk('forget:' + athleteId, {
+    title: `Forget ${athleteId}?`,
+    goes: 'This PERMANENTLY deletes their contact details, their whole habit log and progress, their board place and their roll-call lines. There is no undo and no automatic backup: take a ⤓ Backup first if you are not sure.',
+    stays: 'Their programme, login, session history, titles and season results stay.',
+    note: 'To remove everything about them, cancel this and use “Erase completely…” just above.',
+    button: `Forget ${nameOf(athleteId)}`, busyText: 'Forgetting…', run: () => forgetContactNow(athleteId) });
+}
+async function forgetContactNow(athleteId) {
   const { error } = await sb.rpc('forget_contact', { p_athlete_id: athleteId });
   if (error) { fail('Could not forget: ' + error.message); return; }
   toast('Forgotten');
@@ -6259,7 +6438,7 @@ function buyerLogins(cfg) {
     // Like an athlete's login: the message is on the clipboard and the password waits in the list (Copy, Mark sent) until they sign in with
     // it, so a toast is enough. Only when the server could not store the password is this the one place it is shown.
     const what = (data.created ? 'Login created' : act === 'restore' ? 'Login restored' : password ? 'Password changed' : 'New password') + ' for ' + data.username;
-    if (data.warning) alert(what + '\n\nPassword: ' + data.password + '\n\nThe Farsi WhatsApp message is copied to your clipboard.\n\n⚠ ' + data.warning);
+    if (data.warning) notice(what, 'Password: ' + data.password + '\n\nThe Farsi WhatsApp message is copied to your clipboard.\n\n⚠ ' + data.warning, { copy: data.password, warn: true });
     else toast(what + ' — the message is copied; send it on WhatsApp');
   }
 
@@ -7042,13 +7221,13 @@ async function spineSave(id, approve) {
   const good = spineLines(f('good')), badCues = spineLines(f('bad'));
   // How to do it: the database's own limits (spine_steps_ok), checked here first so the answer names the step.
   const steps = spineSteps(f('steps'));
-  if (steps.length > SPINE_STEPS_MAX) { alert(`How to do it has ${steps.length} steps: ${SPINE_STEPS_MAX} at most (3 to 5, a 6th only for a rack lift's bail). One step per line.\n\nNothing was saved.`); return; }
+  if (steps.length > SPINE_STEPS_MAX) { fail(`How to do it has ${steps.length} steps: ${SPINE_STEPS_MAX} at most (3 to 5, a 6th only for a rack lift's bail). One step per line.\n\nNothing was saved.`); return; }
   const longStep = steps.findIndex(x => x.length > SPINE_STEP_CHARS);
-  if (longStep >= 0) { alert(`Step ${longStep + 1} of How to do it is ${steps[longStep].length} characters: ${SPINE_STEP_CHARS} at most (aim under ${SPINE_STEP_AIM}). Say it shorter, or split it.\n\nNothing was saved.`); return; }
+  if (longStep >= 0) { fail(`Step ${longStep + 1} of How to do it is ${steps[longStep].length} characters: ${SPINE_STEP_CHARS} at most (aim under ${SPINE_STEP_AIM}). Say it shorter, or split it.\n\nNothing was saved.`); return; }
   // The Farsi the course reads (stage65): the same limits as the English steps.
   const stepsFa = spineSteps(f('steps_fa')), goodFa = spineLines(f('good_fa')), badFa = spineLines(f('bad_fa'));
   if (stepsFa.length > SPINE_STEPS_MAX || stepsFa.some(x => x.length > SPINE_STEP_CHARS)) {
-    alert(`The Farsi How to do it has ${stepsFa.length} steps: ${SPINE_STEPS_MAX} at most, each ${SPINE_STEP_CHARS} characters at most.\n\nNothing was saved.`); return; }
+    fail(`The Farsi How to do it has ${stepsFa.length} steps: ${SPINE_STEPS_MAX} at most, each ${SPINE_STEP_CHARS} characters at most.\n\nNothing was saved.`); return; }
   const row = {
     name: f('name').trim() || cur.name, aliases: spineCsv(f('aliases')), pattern: f('pattern') || null,
     steps_fa: stepsFa, cues_fa: (goodFa.length || badFa.length) ? { good: goodFa, bad: badFa } : null,
