@@ -745,7 +745,65 @@ sits in front of the whole site).
   with a finished day (`_awaitingFile()`). Ticks from before 2026-09-26 carry no date and are not filed. The sweep still
   runs at launch only, not when the app returns to the foreground.
 
+## 📊 Home and Progress in the Centre Court look (2026-10-12)
+
+Amir, after the UX audit *Quiet Frame* (claude.ai/artifact/BBWjsR99FqthXmzCkeyK49) and Centre Court: *"moving gameplan tab
+and changing its name, then move the cycle card from home to progress tab … do #6, floating initials"*, then *"yes to both,
+move records and weight too"* (and drop the empty wins line). The look is Centre Court's (*"the redesign of other sections
+should look like this"*): calm paper, rows with hairlines, one strong green thing on a screen. All of it is ONE CSS block,
+**HOME AND PROGRESS IN THE CENTRE COURT LOOK**, the last in the sheet (after CENTRE COURT, so it wins a tie). It declares
+Centre Court's tokens again on `:where(#home-overview, #screen-plan)` (light and dark, the same values: **a twin, change
+both** until the tokens become the whole app's) and one gutter, `--g`: 20 px, 16 under 360.
+
+- **The tab bar**: Home · **Progress** · Library · Coach. Progress is the old Game Plan button (`data-tab="plan"`,
+  `goTo('plan')`, the screen `#screen-plan`: none renamed) with a rising-line icon. Records, Body weight and the archive
+  light it (`goTo()`'s `litTab`).
+- **Progress, top to bottom** (`renderPlan()`): the athlete's name as an eyebrow (`.prog-eyebrow`) over **Progress**
+  (`h1.prog-title`, 44 px), the sport badge and the cycle's dates (`.athlete-card-dates`, unchanged); the **This cycle**
+  card (`#cycle-card-wrap`, `paintCycleCard()`, a plain `div.cyc-card` now: no tap, no ›); the days-left banner; **Your
+  numbers** (`h2.prog-sec`, then `#ceiling-row-wrap` and `#weight-row-wrap`, painted by `paintNumbers()` at boot and on
+  every `goTo('plan')`, so a max saved mid-session or a new weigh-in shows; the Records count-up runs only while Progress
+  is on screen); then **Game Plan** (`h2.prog-sec`) over the meter and the cycle cards, unchanged (the Active card's
+  picture still goes Home, Amir 2026-10-11). Records' ← (`ceilingBack()`, after its own steps and `_ceilReturn`) and
+  Body weight's ← go to Progress.
+- **The This cycle card** has no "Your wins show here" line any more: with no wins it ends after its two bars. With no
+  dates, or before the cycle, nothing is painted (the old `.home-cyc` line is gone).
+- **Home, top to bottom** (`renderHome()`): the greeting as one compact block (the time of day as the eyebrow, the name
+  at 28 px); the offline line and the filed-day card; This Week (the week note in its week, else the heading and the
+  count); **Next up**; the rest of the week; the week-done extra; **Daily habits** and AA Proof's strip. Nothing else.
+- **Next up** (`dayCardHTML(…, { hero: true })`): the suggested day (`suggestedDayId()`: a session under way first, else
+  the first day not done this week, never between cycles; `markSuggestedDay()` asks the same function, so the marked day
+  and the big card are always one day) as the day's own cover: the photo graded into green, *● NEXT UP · DAY 2* (or
+  *IN PROGRESS · DAY 2*), the name in capitals, *N blocks · M movements*, the quality tiles, and one green button,
+  `.dc-go`: **Open Day 2 ▶**, or, for a day under way, *N of M sets* with the ticking clock (`.dc-clock`) and **Resume ▶**.
+  It is the only Home element with `data-dc`. It has no fixed height, so its title is never cut off (the old 5:2 card with a
+  height cap cut "DAY 1" when the line under it wrapped). Resume is green now; it was the only clay-filled button.
+- **The rest of the week** (`dayCardHTML()` with no options, inside `.dc-list`): one row on the paper per day, in day
+  order, `.dc-row` with `data-dl` (never `data-dc`): the day's number as the P24 outlined numeral (`.dc-num`), solid green
+  once done this week, the name, *N blocks · M movements* or *Done this week*, and a grey › or a green **Done**. Enter and
+  Space open a row or the Next up card (a document keydown listener; there was none for the old cards).
+- **The door rows** (`.hrow`, Centre Court's *Your history* recipe): white, rounded 12, a 22 px green line icon
+  (`hrowIc()`), the Space Mono label in green capitals over one line, the value in ink, the sparkline (`ncSpark()` draws
+  in `currentColor` now), a grey ›. **One look with or without data** (`.quiet` changes only the words; the dark green
+  fill and the dashed empty row are gone). The habits verdict *N to go* stays clay; *On target* and *Perfect* are green.
+- **Between cycles** (`betweenCyclesHTML()`): one door row first, **Cycle 2 complete** (or **Roadmap complete**),
+  *Finished Oct 8 · see it on Progress*, which opens Progress, where the card says Cycle complete. Everything after it is
+  unchanged.
+- **The account button** (`.global-account`) is `position: absolute`, not fixed: it sits at the top right of each screen
+  and scrolls away with it, so it never covers content (it sat over the cycle card's ›, the week note's count, Library
+  rows and Records text). `<body>` is not positioned, so the page is its containing block.
+- **The guide**: *Getting around* lists Home · Progress · Library · Coach and says what each holds; *How your program is
+  structured*, *What each day builds*, *Personal Records* and *The ⓘ* say Progress where they said Game Plan or Home.
+- Checked by `scripts/headless/home-progress.js` (116 checks: the tab order, Progress's order, Home's single
+  `data-dc`, the title never clipped at 320, 375 and 390, the green button, Enter and Space, the door rows equal with
+  and without data, the account button over no text on 11 screens and off screen once scrolled, one left edge, no
+  sideways scroll in both themes, Records' and Body weight's ← and Back, Records from an exercise still returning to it),
+  with `smoke.js` and `cycle-end.js` updated.
+
 ## 🏠 Home, led by the training (HOME-02, 2026-09-26)
+
+**Since 2026-10-12 Home leads with the week and its pieces moved: read *Home and Progress in the Centre Court look*
+above first.** What follows is how Home got here; the habits verdict and the all-done week still hold.
 
 Built from Amir's notes on the mockup: "I like how small the other cards like habits, records and weight
 are · I like the in progress day card · I like the small cycle details · If the days are done, make the day
@@ -772,6 +830,9 @@ their rest days, athlete can move the days". So:
 
 ## 🏆 This cycle: where it is, and the wins (PROG-01, 2026-09-27)
 
+**Since 2026-10-12 the card is on Progress, under its header, not a tap and with no empty wins line** (*Home and
+Progress in the Centre Court look*, above). The wins below are unchanged.
+
 "Is this working?" had no answer in the paid app: progress was one exercise at a time. Amir's calls on the
 mockup (https://claude.ai/artifact/JhzKhBvP54ERS3AMiwTcrW): *"a card on home, but remove the card (line) on the
 top of the home page, and replace it with this, when you click, it goes to gameplan"*, and for the lifts, *"not
@@ -794,6 +855,9 @@ with same rpe"*.
 - Checked on crafted history for every kind of win and non-win, and on the demo's (`prog01` suite).
 
 ## 🏁 When the cycle is over: Home between cycles (PROG-02, 2026-10-10)
+
+**Since 2026-10-12 the Cycle complete card is on Progress; Home opens with a *Cycle N complete* door row to it**, then
+Up next and the rest as below (*Home and Progress in the Centre Court look*, above).
 
 Athletes kept training after their cycle ended, taking the cycle for a week. The day after the end date the This cycle
 card shrank to the small line, whose "Weeks 6–10" is the *roadmap's* count, the "days left" banner went (it shows from
@@ -1354,9 +1418,10 @@ lived only in the guide, two tabs away. Now three hints, `paintHints(day)` in `p
 ## 👤 Your account, and Sign out (NAV-02, 2026-09-27)
 
 `signOutAthlete()` existed in both apps and nothing called it: a shared family phone, a lent phone or a
-second account meant clearing the browser. Now the **initials button** sits top right on Home, Coach,
-Library and Game Plan, where the floating dark-mode toggle was (`#global-account`, a solid green disc with the
-athlete's initials; hidden in a day view, whose banner keeps its own moon for mid-session). It opens
+second account meant clearing the browser. Now the **initials button** sits top right on Home, Progress,
+Library and Coach, where the floating dark-mode toggle was (`#global-account`, a solid green disc with the
+athlete's initials; hidden in a day view, whose banner keeps its own moon for mid-session). Since 2026-10-12 it is
+`position: absolute`, in the page: it scrolls away with the screen instead of floating over its content. It opens
 `openAccount()` in the one sheet (`#hist-overlay`, so Back closes it):
 
 - **Theme** — Light / Dark, the athlete's choice as before (`toggleDark()`, `dark_mode`).

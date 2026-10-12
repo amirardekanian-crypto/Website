@@ -241,14 +241,16 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   (the About sheet's door went on 2026-10-12, Amir's call) (`coachWhatsAppUrl(about)`, `COACH_WHATSAPP` = the site's buy-button
   number). coach.html only marks session notes read. The `messages` table stays on the server and
   nothing reads it. Do not bring a chat back unasked. Details in `PROGRAM-APP.md`.
-- **Home leads with the training** (HOME-02, Amir 2026-09-26): the This cycle card (PROG-01, below; the small cycle
-  line only when the cycle has no dates), This Week, then one row each
-  for habits, records and weight. A day done this week is a small row; a day not done stays a big card; a
-  session in progress shows sets, the clock and Resume on its card. **Home never names a rest day**: athletes
-  move their days. **The day after the cycle's end date Home is between cycles** (PROG-02, Amir 2026-10-10, option B):
-  the card says Cycle complete, Up next shows the next cycle, the one ask is **"Ready for Cycle N? Message Amir to start
-  it."** in all situations (never "Amir is building it"), the day cards fold under Repeat a session, and Game Plan
-  marks the cycle Done (`cycleOver()`, `PROGRAM-APP.md` → *When the cycle is over*).
+- **Home leads with the week** (Amir 2026-10-12, Quiet Frame #6; HOME-02 before it; `PROGRAM-APP.md` → *Home and Progress
+  in the Centre Court look*): the greeting, This Week (the week note in its week), **Next up** (the suggested day,
+  `suggestedDayId()`, as the day's cover with one green button: Open Day N, or Resume and its clock), the other days as
+  paper rows (`.dc-row`, `data-dl`, the P24 numeral, solid green when done), then the habits row. Only Next up carries
+  `data-dc`. **The This cycle card, Personal records and Body weight live on Progress**, not Home. **Home never names a rest
+  day**: athletes move their days. **The day after the cycle's end date Home is between cycles** (PROG-02, Amir 2026-10-10,
+  option B): a **Cycle N complete** door row first (it opens Progress, where the card says Cycle complete), Up next shows
+  the next cycle, the one ask is **"Ready for Cycle N? Message Amir to start it."** in all situations (never "Amir is
+  building it"), the day rows fold under Repeat a session, and the Game Plan marks the cycle Done (`cycleOver()`,
+  `PROGRAM-APP.md` → *When the cycle is over*).
   Under the habits row, **today's habits, ticked in place**: AA Proof itself, embedded (`habits.html?embed=1`, `mountProofStrip()`).
   program.html still holds no habit state and writes no `<id>_hab_*` key but body weight; Proof does every write.
 - **Back closes the top layer** (NAV-01, 2026-09-26): one guard history entry while anything is open over
@@ -274,7 +276,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   control goes on that line or under ⋯, measured at 320–390 px: the clock is never cut. The week's limits are the bar's one
   extra row, under it.
 - **Signing out never loses training** (NAV-02, 2026-09-27; `PROGRAM-APP.md` → *Your account*): the initials
-  button (top right, where the floating dark toggle was) → Sign out runs `signOutSafely()`: the waiting report, the
+  button (top right of every tab screen, in the page: it scrolls away with the screen since 2026-10-12, so it never sits
+  over content) → Sign out runs `signOutSafely()`: the waiting report, the
   session queue and the progress go up first, then nothing more is pushed, then `signOutAthlete()`. The athlete's
   keys stay on the phone. Never offered in the demo or the coach preview. AA Proof's Settings has the same.
 - **The signed-out login screen is the one screen Amir never sees, so test it** (2026-10-11: for hours every button on it did
@@ -314,7 +317,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **No yellow, gold, ochre or amber in either app**, AA Proof's metals included (its gold tier became
   emerald on 2026-09-26; Amir, asked whether Proof was an exception: *"fix"*).
 - **The exercise card is not frozen** (Amir, 2026-09-27: *"dont freeze anything"*, lifting Five Forks fork 4 B).
-  Athletes still change to the new card format at their next cycle; the demo is already on it. The tab that holds the whole plan is **Game Plan** (it was My Plan). Only the current cycle opens expanded;
+  Athletes still change to the new card format at their next cycle; the demo is already on it. The tab that holds the whole plan is **Progress**, second in the bar (Amir, 2026-10-12: Home · Progress · Library · Coach; it was Game Plan, and My Plan before that; `data-tab="plan"` and `goTo('plan')` are unchanged). On it: the This cycle card, **Your numbers** (Personal records and Body weight, whose ← comes back here), then the road of cycles, still titled **Game Plan**. Only the current cycle opens expanded;
   past and future cycles are folded (Amir, 2026-09-26, PLAN-01), and the welcome's button opens Day 1.
 
 ## The habit app (`habits.html`, AA Proof) — read `HABITS.md` before changing it
@@ -459,7 +462,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v125` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v126` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

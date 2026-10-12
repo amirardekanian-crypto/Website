@@ -261,10 +261,10 @@ a question. If a line starts explaining HOW, it belongs in the app.
 | a Coach's Note (how to start an exercise, how to film it) | the **clay dot** after the exercise's name; open the card |
 | why they have an exercise (a Because) | the **ⓘ** on the exercise |
 | a week note (week 1, a testing week, the back-off) | **Home → This Week**, shown on its own that week |
-| body weight | **Home → Body Weight → Weigh in** |
+| body weight | **Progress → Body Weight → Weigh in** |
 | a bad day | the **check-in** before every session; the app lowers that day's targets |
 | how the app works (RPE, tempo, Guided) | **Coach** tab → *How the app works* (or their initials, top right) |
-| the whole plan, this cycle and the next | **Game Plan** tab |
+| the whole plan, this cycle and the next, their records and weight | **Progress** tab (the plan is its *Game Plan*; the tab was called Game Plan until 2026-10-12) |
 
 **Length:** about 12 to 15 lines for a returning athlete; about 20 to 25 for a new one. A new athlete's
 extra lines are the sign-in and the tour, never card content.
@@ -274,10 +274,10 @@ extra lines are the sign-in and the tour, never card content.
    a `?client=`/`&key=` link. Every secret link was retired 2026-09-07 and `athlete_keys` is empty, so any
    such URL is refused whatever key it carries.** If they have no login yet, say so in the handoff: Amir
    creates it in coach.html → Athletes → Create login (Claude can't) · add the app to the home screen ·
-   then a short tour, one line each: **Home** (today's training, This Week, Body Weight, Records), the
-   **check-in** before every session, the **Coach** tab (Amir's notes for them, and WhatsApp), the **clay
-   dot** and the **ⓘ** on an exercise, **Game Plan**, and *How the app works* on the Coach tab for RPE and
-   tempo. **A returning athlete:** the new cycle's name, its dates (COM-2's calendar rule) and what changed
+   then a short tour, one line each: **Home** (This Week, the next session, the daily habits), the
+   **check-in** before every session, **Progress** (this cycle, their records and body weight, and the Game
+   Plan), the **Coach** tab (Amir's notes for them, and WhatsApp), the **clay dot** and the **ⓘ** on an
+   exercise, and *How the app works* on the Coach tab for RPE and tempo. **A returning athlete:** the new cycle's name, its dates (COM-2's calendar rule) and what changed
    from the last one.
 2. **Why** the programme looks the way it does: two or three plain sentences they recognise from their own
    body.
