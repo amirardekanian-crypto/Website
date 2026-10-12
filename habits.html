@@ -136,7 +136,7 @@
   html { touch-action: manipulation; }
   body {
     background: var(--bg); color: var(--ink);
-    font-family: 'Barlow', system-ui, sans-serif; font-size: 15px; line-height: 1.55;
+    font-family: 'Barlow', system-ui, sans-serif; font-size: 16px; line-height: 1.55;
     overflow: hidden;
   }
   button, input, textarea { font: inherit; color: inherit; }
@@ -147,7 +147,7 @@
   .hd { font-family: 'Barlow Condensed', system-ui, sans-serif; font-weight: 900; text-transform: uppercase; }
   .mono { font-family: 'Space Mono', ui-monospace, Menlo, monospace; }
   .eyebrow {
-    font-size: 10px; font-weight: 600; letter-spacing: 0.14em;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.14em;
     text-transform: uppercase; color: var(--muted);
   }
 
@@ -180,7 +180,7 @@
     padding: 32px; text-align: center; transition: opacity .4s ease;
   }
   .loading.hidden { opacity: 0; pointer-events: none; }
-  .errmark { font-size: 15px; letter-spacing: .22em; color: var(--accent); margin-bottom: 22px; }
+  .errmark { font-size: 16px; letter-spacing: .22em; color: var(--accent); margin-bottom: 22px; }
   .erracts { margin-top: 24px; width: 100%; max-width: 300px; }
   .erracts:empty { display: none; }
   .erracts .btn { justify-content: center; min-height: 46px; }
@@ -197,12 +197,12 @@
     display: flex; justify-content: space-between; align-items: flex-end; gap: 12px;
     background: var(--bg);
   }
-  .apphd .title { font-size: 24px; line-height: 1; letter-spacing: -.02em; margin-top: 4px; }
+  .apphd .title { font-size: 28px; line-height: 1; letter-spacing: -.02em; margin-top: 4px; }
   /* One line, always. The header's right side now carries a value AND a button,
      so an eyebrow long enough to wrap would push the title down and shift the
      whole screen under the athlete's thumb. */
   .apphd .eyebrow { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .apphd .right { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--clay-deep); white-space: nowrap; }
+  .apphd .right { font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--clay-deep); white-space: nowrap; }
   /* The contextual value and the way into Settings share the header's right
      side, so the value never has the whole edge to itself and never collides
      with the button. */
@@ -210,9 +210,9 @@
   .hdme {
     flex: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
     background: var(--accent); color: var(--bg); border: 0;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 13px; letter-spacing: .02em;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 14px; letter-spacing: .02em;
   }
-  .hdme.closing { background: none; color: var(--ink); border: 2px solid var(--divider); font-size: 15px; }
+  .hdme.closing { background: none; color: var(--ink); border: 2px solid var(--divider); font-size: 16px; }
 
   /* ── Blocks & rules ── */
   .block { padding: 20px; border-bottom: 2px solid var(--divider); }
@@ -259,17 +259,17 @@
   }
   .hrow .body .line1 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
   .hrow .body .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px; line-height: 1; letter-spacing: .01em; text-transform: uppercase; }
-  .hrow .body .stk { font-size: 9px; font-weight: 700; letter-spacing: .06em; color: var(--muted-soft); }
+  .hrow .body .stk { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--muted-soft); }
   /* The status line now carries two things — what you have done, and the streak
      that describes it — so it is a flex row rather than a bare string. `gap` is
      large enough to read as two separate facts; the ember dot supplies the only
      other separator, which is why there is no middot. */
-  .hrow .body .status { font-size: 11px; line-height: 1; color: var(--muted); display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
+  .hrow .body .status { font-size: 12px; line-height: 1; color: var(--muted); display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
   .hrow .body .status .ember {
-    font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .04em;
+    font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: .04em;
     color: var(--clay-deep);
   }
-  .hrow .body .status .ember .u { font-size: 9px; opacity: .8; letter-spacing: .02em; }
+  .hrow .body .status .ember .u { font-size: 12px; opacity: .8; letter-spacing: .02em; }
   /* The best streak on the screen gets a filled pill. One of them, never eight —
      the same reasoning that keeps a single ember animating. */
   .hrow .body .status .ember.lead {
@@ -279,16 +279,16 @@
   .hrow .body .status .ember.lead .u { opacity: .9; }
   .hrow .body .track { display: block; width: 100%; height: 4px; background: var(--track); margin-top: 2px; }
   .hrow .body .track > span { display: block; height: 100%; background: var(--accent); transition: width .3s ease; }
-  .hrow + .rowhint { padding: 10px 20px 14px; font-size: 11px; line-height: 1.5; color: var(--muted-soft); border-bottom: 2px solid var(--divider); }
+  .hrow + .rowhint { padding: 10px 20px 14px; font-size: 12px; line-height: 1.5; color: var(--muted-soft); border-bottom: 2px solid var(--divider); }
   .rowhint strong { color: var(--muted); font-weight: 600; }
-  .statnote { padding: 12px 20px 14px; font-size: 11.5px; line-height: 1.55; color: var(--muted); border-bottom: 2px solid var(--divider); }
+  .statnote { padding: 12px 20px 14px; font-size: 12px; line-height: 1.55; color: var(--muted); border-bottom: 2px solid var(--divider); }
   .statnote strong { color: var(--ink); font-weight: 600; }
   /* No border-left. It only existed on rows that HAVE a plus, so the vertical
      rule appeared on the counter habits and vanished on the check-off ones,
      making the right edge of the list look broken halfway down. */
   .hrow .pluscell {
     flex: none; width: 54px;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 22px; color: var(--accent);
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 20px; color: var(--accent);
   }
   .hrow .pluscell:hover { background: var(--accent-100); }
   /* A locked habit is owned by another system — it reads as unavailable rather
@@ -307,7 +307,7 @@
      length. Without a floor the card resizes on a tick and shoves the habit list
      under the athlete's finger — a smaller version of the scroll bug the renderer
      was rewritten to kill. Four lines holds almost every nudge in the library. */
-  .coachcard .say { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 21px; line-height: 1.08; letter-spacing: -.01em; text-transform: uppercase; text-wrap: pretty; min-height: 3.3em; }
+  .coachcard .say { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 20px; line-height: 1.08; letter-spacing: -.01em; text-transform: uppercase; text-wrap: pretty; min-height: 3.3em; }
 
   /* The level hero. The XP bar is a RING around the level number — the number
      and how far through it you are read as one object.
@@ -330,11 +330,11 @@
                  transition: stroke-dashoffset .35s cubic-bezier(.2,.8,.2,1); }
   .lvring .in, .hring .in { position: absolute; inset: 0; display: flex; flex-direction: column;
                 align-items: center; justify-content: center; gap: 2px; }
-  .lvring .lbl { font-size: 8px; font-weight: 700; letter-spacing: .14em; color: var(--muted-soft); }
+  .lvring .lbl { font-size: 12px; font-weight: 700; letter-spacing: .14em; color: var(--muted-soft); }
   /* The number, and nothing else. The hero has room to caption itself LEVEL;
      a 46px disc in a list does not, and the row it sits in is the caption. */
-  .hring .figure { font-size: 19px; line-height: 1; }
-  .hring.wide .figure { font-size: 15px; }
+  .hring .figure { font-size: 20px; line-height: 1; }
+  .hring.wide .figure { font-size: 16px; }
 
   /* Four season facts, equal weight. The old two-up made the day streak the
      biggest number on the tab, so a rebuilding athlete opened Progress to a
@@ -349,28 +349,28 @@
   }
   .statgrid > div:nth-child(odd) { border-right: 1px solid var(--rule); }
   .statgrid > div:nth-last-child(-n+2) { border-bottom: 0; }
-  .statgrid .figure, .statgrid .statfrac { font-size: 27px; line-height: .95; letter-spacing: -.02em; }
+  .statgrid .figure, .statgrid .statfrac { font-size: 28px; line-height: .95; letter-spacing: -.02em; }
   .statgrid .statfrac { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; color: var(--accent); }
-  .statgrid .statfrac .of { font-size: 15px; color: var(--muted-soft); }
+  .statgrid .statfrac .of { font-size: 16px; color: var(--muted-soft); }
   .statgrid .eyebrow { letter-spacing: .1em; }
 
   /* The pips had no legend anywhere in the app and are empty for the first
      five days, so they read as decoration. Said once, above the list. */
   .pipkey {
     display: flex; align-items: center; gap: 9px; padding: 0 20px 12px;
-    font-size: 11px; line-height: 1.4; color: var(--muted-soft);
+    font-size: 12px; line-height: 1.4; color: var(--muted-soft);
   }
   .pipkey .pips { flex: none; }
 
   /* A figure with its unit set inside it, rather than welded on at full size. */
-  .statnum { font-size: 26px; line-height: 1; letter-spacing: -.02em; }
-  .statnum .su { font-size: 13px; color: var(--muted-soft); margin-left: 2px; letter-spacing: 0; }
+  .statnum { font-size: 28px; line-height: 1; letter-spacing: -.02em; }
+  .statnum .su { font-size: 14px; color: var(--muted-soft); margin-left: 2px; letter-spacing: 0; }
 
   /* Today's cell in the 35-day grid, and the key that says which end is which. */
   .grid35 .c.now { outline: 2px solid var(--clay-deep); outline-offset: 1px; }
   .gridkey {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-soft);
+    font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted-soft);
   }
   .gridkey .gk { display: flex; align-items: center; gap: 5px; }
   .gridkey .gk .c {
@@ -385,7 +385,7 @@
   /* ── The manual ──────────────────────────────────────────────────────────
      A dozen sections of prose. Without a way in it is a wall you scroll past
      rather than a reference you use. */
-  .manh2 { font-size: 22px; line-height: 1; margin-bottom: 10px; scroll-margin-top: 8px; }
+  .manh2 { font-size: 20px; line-height: 1; margin-bottom: 10px; scroll-margin-top: 8px; }
   .manp { font-size: 14px; line-height: 1.62; color: var(--ink); margin-bottom: 12px; }
   .mancontents { border-bottom: 2px solid var(--divider); }
   .manlinks { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -405,8 +405,8 @@
   .boardbar.sub { padding: 11px 20px; border-bottom-width: 1px; border-color: var(--rule); }
   .boardbar .chips { flex: 1; min-width: 0; }
   .boardbar .chip { flex: 1; text-align: center; }
-  .boardday { flex: none; font-size: 10px; letter-spacing: .08em; color: var(--clay-deep); font-weight: 700; }
-  .boardnote { padding: 10px 20px 12px; font-size: 11.5px; line-height: 1.45; color: var(--muted-soft); }
+  .boardday { flex: none; font-size: 12px; letter-spacing: .08em; color: var(--clay-deep); font-weight: 700; }
+  .boardnote { padding: 10px 20px 12px; font-size: 12px; line-height: 1.45; color: var(--muted-soft); }
 
   /* At-risk used to be said three ways at once: a clay card, a clay day-bar and
      a header flag. Now the day bar is gone it gets one unmissable strip, sitting
@@ -414,11 +414,11 @@
   .riskbar {
     background: var(--clay-deep); color: var(--on-clay); padding: 9px 20px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    font-size: 13px; letter-spacing: .05em; text-transform: uppercase;
+    font-size: 14px; letter-spacing: .05em; text-transform: uppercase;
   }
   .coachcard .cta {
     align-self: flex-start; background: var(--on-clay); color: var(--clay); padding: 10px 14px;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 13px; letter-spacing: .04em; text-transform: uppercase;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 14px; letter-spacing: .04em; text-transform: uppercase;
   }
 
   /* ── Buttons ── */
@@ -508,8 +508,8 @@
   }
   .tabs button:last-child { border-right: 0; }
   .tabs button.on { color: var(--bg); }
-  .tabs .num { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .06em; opacity: .6; }
-  .tabs .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 11px; letter-spacing: .01em; text-transform: uppercase; white-space: nowrap; }
+  .tabs .num { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .06em; opacity: .6; }
+  .tabs .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 12px; letter-spacing: .01em; text-transform: uppercase; white-space: nowrap; }
 
   /* ── Grid (35-day history) ── */
   /* Thirty-five squares appearing at once reads as a static block; cascading them
@@ -534,7 +534,7 @@
      thing in here is the trend line itself, because the app has never drawn
      one — and even that takes its colour from the same token as every bar. */
   #app .wtpanel {
-    background: var(--card); border-radius: 18px; box-shadow: var(--shadow);
+    background: var(--card); border-radius: 20px; box-shadow: var(--shadow);
     margin: 4px 16px 14px; padding: 16px;
     display: flex; flex-direction: column; gap: 13px;
   }
@@ -571,7 +571,7 @@
   .wtinput {
     width: 100%; min-width: 0; text-align: center; border: none; background: transparent;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    font-size: 36px; line-height: 1; color: var(--accent); letter-spacing: -.04em;
+    font-size: 40px; line-height: 1; color: var(--accent); letter-spacing: -.04em;
     -moz-appearance: textfield;
   }
   .wtinput::-webkit-outer-spin-button, .wtinput::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -586,7 +586,7 @@
     display: flex; flex-direction: column; gap: 16px;
   }
   .stepper { display: flex; align-items: center; border: 2px solid var(--ink); }
-  .stepper button { width: 58px; height: 64px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; }
+  .stepper button { width: 58px; height: 64px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 28px; }
   .stepper .minus { border-right: 2px solid var(--ink); }
   .stepper .plus { border-left: 2px solid var(--ink); }
   .stepper .val { flex: 1; display: flex; align-items: baseline; justify-content: center; gap: 8px; }
@@ -653,22 +653,22 @@
   .tourcard .tourbody { overflow-y: auto; min-height: 0; display: flex; flex-direction: column; gap: 9px; }
   .tourcard .tourbody::-webkit-scrollbar { width: 0; }
   .tourcard .tourtop { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-  .tourcard .tourn { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; color: var(--clay-deep); flex: none; }
+  .tourcard .tourn { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .12em; color: var(--clay-deep); flex: none; }
   .tourcard h4 {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase;
     font-size: 20px; line-height: 1.02; letter-spacing: -.01em; min-width: 0;
   }
-  .tourcard p { font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+  .tourcard p { font-size: 14px; line-height: 1.5; color: var(--muted); }
   .tourcard p strong { color: var(--ink); font-weight: 600; }
   .tourcard .tournav { display: flex; gap: 8px; align-items: stretch; margin-top: 2px; }
   .tourcard .tournav .btn { flex: 1; justify-content: center; padding: 12px 14px; }
   .tourcard .tournav .tourback {
     flex: none; width: 46px; justify-content: center;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px;
     border: 1px solid var(--divider); color: var(--muted);
   }
   .tourskip {
-    align-self: flex-start; font-family: 'Space Mono', monospace; font-size: 10px;
+    align-self: flex-start; font-family: 'Space Mono', monospace; font-size: 12px;
     letter-spacing: .1em; text-transform: uppercase; color: var(--muted-soft); padding: 4px 0 0;
   }
   /* The pointing finger: a plain clay triangle off the card's edge, aimed at
@@ -756,8 +756,8 @@
     animation: lvBadge .72s cubic-bezier(.2,.8,.25,1) .1s both;
   }
   .lvwrap.rank .lvbadge { border-color: #FAF7F2; color: var(--clay); }
-  .lvbadge .n { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 58px; line-height: .85; letter-spacing: -.04em; }
-  .lvbadge .l { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .18em; color: rgba(26,26,26,.55); }
+  .lvbadge .n { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 40px; line-height: .85; letter-spacing: -.04em; }
+  .lvbadge .l { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .18em; color: rgba(26,26,26,.55); }
   .lvshards { position: absolute; inset: 0; pointer-events: none; }
   .lvshards i {
     position: absolute; top: 50%; left: 50%; width: 9px; height: 9px; background: var(--clay);
@@ -787,7 +787,7 @@
      the button under a band of empty clay and made the stack read top-heavy.
      It belongs with the button it describes: "Next" only means something if
      you can see there is a next. */
-  .lvqueue { margin-top: 14px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .16em; color: rgba(250,247,242,.6); }
+  .lvqueue { margin-top: 14px; font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .16em; color: rgba(250,247,242,.6); }
 
   /* A third ground for the things that are NOT a level: consistency tiers,
      milestones and a perfect day. Deep green with clay-2 rays, so an athlete
@@ -800,22 +800,22 @@
   .lvwrap.badge .lvkicker { color: #E9A183; }
   .lvwrap.badge .lvgo { color: #0B3B2B; }
   /* Milestone codes are two letters, not a two-digit number — same box, smaller type. */
-  .lvbadge .n.code { font-size: 44px; letter-spacing: -.02em; }
+  .lvbadge .n.code { font-size: 40px; letter-spacing: -.02em; }
 
   /* Inline flash for routine habit level-ups (no takeover) */
   @keyframes lvPop { 0% { transform: scale(.4); opacity: 0 } 55% { transform: scale(1.22) } 100% { transform: scale(1); opacity: 1 } }
   .lvchip {
     background: var(--clay); color: #FAF7F2; padding: 3px 7px;
-    font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em;
+    font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: .06em;
     animation: lvPop .45s cubic-bezier(.2,.8,.25,1) both;
   }
-  .hlv { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; color: var(--muted-soft); }
+  .hlv { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--muted-soft); }
   /* The streak was the smallest type in the row and the most motivating number
      in it. It now reads as a figure with a unit rather than "9D". */
-  .hlv .ember { font-size: 11px; }
+  .hlv .ember { font-size: 12px; }
   /* The ember used to sit after "LV 10" and carried a left margin for it. */
   .hlv .ember:first-child { margin-left: 0; }
-  .hlv .ember .u { font-size: 8px; opacity: .75; }
+  .hlv .ember .u { font-size: 12px; opacity: .75; }
 
   /* Cross-link back to the training programme — the other half of the pair.
      Mirrors the Daily Habits card in program.html so the two apps read as one
@@ -836,17 +836,17 @@
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px;
     line-height: 1; text-transform: uppercase; letter-spacing: .02em;
   }
-  .crosslink-sub { font-size: 11px; line-height: 1.3; color: var(--muted); }
+  .crosslink-sub { font-size: 12px; line-height: 1.3; color: var(--muted); }
   .crosslink-go {
     flex: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-    font-size: 19px; color: var(--clay-deep);
+    font-size: 20px; color: var(--clay-deep);
   }
 
   /* Scope chips (leaderboard: this week / all time) */
   .chips { display: flex; gap: 8px; }
   .chip {
     border: 2px solid var(--divider); padding: 8px 12px; color: var(--ink);
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 13px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 14px;
     letter-spacing: .04em; text-transform: uppercase;
   }
   .chip.chip-on { background: var(--accent); border-color: var(--accent); color: var(--bg); }
@@ -863,34 +863,34 @@
   }
   .rcprompt > span:first-child { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .rcprompt .rcq { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-                   font-size: 17px; line-height: 1.1; }
+                   font-size: 16px; line-height: 1.1; }
 
   /* Deliberately small. It exists to teach that quests are a thing, not to
      compete with a live run. */
   .questidle {
     display: flex; align-items: baseline; gap: 10px; padding: 12px 20px;
     border-bottom: 2px solid var(--divider);
-    font-size: 11.5px; line-height: 1.45; color: var(--muted-soft);
+    font-size: 12px; line-height: 1.45; color: var(--muted-soft);
   }
   .questidle .eyebrow { flex: none; letter-spacing: .12em; }
   .noteq { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
            font-size: 20px; line-height: 1.05; letter-spacing: .005em; }
   .noterow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .noterow .mono { font-size: 11px; font-weight: 700; color: var(--muted-soft); }
+  .noterow .mono { font-size: 12px; font-weight: 700; color: var(--muted-soft); }
   .noterow .mono.tight { color: var(--clay-deep); }
   .rccomp .btn[disabled] { opacity: .4; }
 
   .rcday { display: flex; align-items: baseline; justify-content: space-between;
            padding: 16px 20px 8px; font-family: 'Barlow Condensed', sans-serif;
-           font-weight: 900; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; }
-  .rcday .mono { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--muted-soft); }
+           font-weight: 900; font-size: 16px; letter-spacing: .04em; text-transform: uppercase; }
+  .rcday .mono { font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--muted-soft); }
   /* One card per voice — `.rccard`, in the panels layer. `.rcline`, the flat
      bordered row this used to be, is gone; these three are all it left behind
      and the card still uses every one of them. */
   .rc-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
              font-size: 16px; line-height: 1; }
   .rc-meta { flex: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-             font-size: 9px; font-weight: 700; letter-spacing: .07em; color: var(--muted-soft); }
+             font-size: 12px; font-weight: 700; letter-spacing: .07em; color: var(--muted-soft); }
   .rc-say { font-size: 14px; line-height: 1.45; color: var(--ink); }
 
   /* Editing a day that is not today is a state you must never be in by
@@ -899,7 +899,7 @@
               margin: 12px 20px 0; padding: 12px 14px; background: var(--clay-deep); color: var(--on-clay); }
   .backfill .eyebrow { color: var(--on-clay); opacity: .72; }
   .backfill .bf-day { font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-                      font-size: 19px; line-height: 1; text-transform: capitalize; }
+                      font-size: 20px; line-height: 1; text-transform: capitalize; }
   .backfill button { flex: none; border: 2px solid currentColor; background: none;
                      color: var(--on-clay); padding: 7px 11px; font-family: 'Barlow Condensed', sans-serif;
                      font-weight: 900; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
@@ -979,12 +979,12 @@
   }
   .dayflame .flame { width: 15px; height: 19px; }
   .dayflame .n {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 30px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 28px;
     line-height: .85; letter-spacing: -.03em; color: var(--muted);
   }
   .dayflame.lit .n { color: var(--clay-deep); }
   .dayflame .u {
-    font-family: 'Space Mono', monospace; font-size: 7px; line-height: 1.15;
+    font-family: 'Space Mono', monospace; font-size: 12px; line-height: 1.15;
     letter-spacing: .08em; color: var(--muted-soft);
   }
 
@@ -1015,17 +1015,17 @@
   /* The rung numeral. Deliberately quieter than the name — it is which one of
      these you are on, not what it is called. */
   .msrow .ms-mk {
-    font-style: normal; font-size: 11.5px; font-weight: 700; letter-spacing: .06em;
+    font-style: normal; font-size: 12px; font-weight: 700; letter-spacing: .06em;
     margin-left: 5px; opacity: .62; vertical-align: 1px;
   }
-  .msrow .ms-note { font-size: 11px; line-height: 1.3; color: var(--muted-soft); }
+  .msrow .ms-note { font-size: 12px; line-height: 1.3; color: var(--muted-soft); }
   .msrow .ms-bar { height: 5px; background: var(--track); }
   .msrow .ms-bar > span { display: block; height: 100%; background: var(--clay); transition: width .35s cubic-bezier(.2,.8,.2,1); }
   .msrow.got .ms-bar { display: none; }
   .msrow .ms-right { flex: none; display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
-  .msrow .ms-xp { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted-soft); }
+  .msrow .ms-xp { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted-soft); }
   .msrow.got .ms-xp { color: var(--clay-deep); font-weight: 700; }
-  .msrow .ms-cnt { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .08em; color: var(--muted-soft); }
+  .msrow .ms-cnt { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .08em; color: var(--muted-soft); }
   .msrow.got .ms-cnt { color: var(--clay-deep); }
   /* A FEW WEEKS rows: three goals share the note line. A goal never breaks
      mid-phrase — the line wraps between goals, at the separators. */
@@ -1050,7 +1050,7 @@
   .heat { display: flex; flex-direction: column; gap: 5px; }
   .heat .hr { display: grid; grid-template-columns: 66px repeat(7, 1fr); gap: 4px; align-items: center; }
   .heat .hl {
-    font-size: 10px; line-height: 1.1; color: var(--muted); overflow: hidden;
+    font-size: 12px; line-height: 1.1; color: var(--muted); overflow: hidden;
     text-overflow: ellipsis; white-space: nowrap;
   }
   .heat .hc { height: 15px; border: 1px solid var(--rule); background: none; }
@@ -1059,7 +1059,7 @@
   .heat .hc.pre  { border-style: dotted; opacity: .4; }
   .heat .hc.today { outline: 2px solid var(--clay-deep); outline-offset: 1px; }
   .heat .hd-lbl {
-    font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .04em;
+    font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .04em;
     text-align: center; color: var(--muted-soft); text-transform: uppercase;
   }
   .heat .hd-lbl.now { color: var(--clay-deep); font-weight: 700; }
@@ -1077,12 +1077,12 @@
   .evhd { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px 12px; }
   .evcard.live .evhd { background: var(--clay-100); }
   .evhd .evnm {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 21px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 20px;
     line-height: .95; text-transform: uppercase; letter-spacing: -.01em; color: var(--ink);
   }
-  .evhd .evtag { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-top: 5px; display: block; }
+  .evhd .evtag { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-top: 5px; display: block; }
   .evhd .evstate {
-    flex: none; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .09em;
+    flex: none; font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .09em;
     text-transform: uppercase; padding: 4px 7px; white-space: nowrap;
   }
   .evcard.live .evstate { background: var(--clay); color: var(--on-clay); }
@@ -1096,16 +1096,16 @@
   }
   .evgoal.got .g-tick { background: var(--accent); border-color: var(--accent); color: var(--bg); }
   .evgoal .g-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-  .evgoal .g-lbl { font-size: 12.5px; line-height: 1.2; color: var(--ink); }
+  .evgoal .g-lbl { font-size: 12px; line-height: 1.2; color: var(--ink); }
   .evgoal.got .g-lbl { color: var(--muted); text-decoration: line-through; }
   .evgoal .g-bar { height: 4px; background: var(--track); }
   .evgoal .g-bar > span { display: block; height: 100%; background: var(--clay); transition: width .35s cubic-bezier(.2,.8,.2,1); }
   .evgoal.got .g-bar > span { background: var(--accent); }
-  .evgoal .g-cnt { flex: none; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted-soft); white-space: nowrap; }
+  .evgoal .g-cnt { flex: none; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted-soft); white-space: nowrap; }
   .evfoot {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
     padding: 11px 16px; border-top: 2px solid var(--divider);
-    font-family: 'Space Mono', monospace; font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+    font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
   }
   .evgoal .g-cnt.stack { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
   .evgoal .g-cnt .g-xp { color: var(--muted-soft); }
@@ -1113,7 +1113,7 @@
   /* A quest carries a name AND a description; an event goal is one line. Two
      rows rather than one wrapped one, so the bar never sits under a hanging
      word. */
-  .evgoal .g-sub { font-size: 10.5px; line-height: 1.25; color: var(--muted-soft); }
+  .evgoal .g-sub { font-size: 12px; line-height: 1.25; color: var(--muted-soft); }
   .evgoal.got .g-sub { text-decoration: none; }
   .evfoot strong { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 14px; letter-spacing: .02em; color: var(--clay-deep); }
   .evcard.done .evfoot strong { color: var(--accent); }
@@ -1144,12 +1144,12 @@
   /* Leaderboard rows arrive in order — the entrance lives on `.lbrow` now. */
   /* Movement, not just standing. Green for climbing, muted for slipping — a drop
      is information, not a punishment, so it never gets the accent. */
-  .delta { font-size: 9px; font-weight: 700; letter-spacing: .04em; line-height: 1; }
+  .delta { font-size: 12px; font-weight: 700; letter-spacing: .04em; line-height: 1; }
   .delta.up { color: var(--accent); }
   .delta.down { color: var(--muted-soft); }
   .passline {
     background: var(--accent); color: var(--bg); padding: 11px 20px;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 15px;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px;
     line-height: 1.2; text-transform: uppercase; letter-spacing: .01em;
     animation: riseIn .3s cubic-bezier(.16,1,.3,1);
   }
@@ -1158,7 +1158,7 @@
   .rankart { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   /* The rank label on a level hero is a door to the ladder, so it looks like one. */
   .ranklink { display: flex; align-items: center; gap: 8px; text-align: left; color: inherit; }
-  .ranklink .go { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 15px; color: var(--clay-deep); }
+  .ranklink .go { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px; color: var(--clay-deep); }
   /* One row per rank on the ladder screen. */
   .rankrow { display: flex; gap: 14px; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--rule); }
   .rankrow .badge {
@@ -1169,10 +1169,10 @@
   .rankrow.here { background: var(--accent); color: var(--bg); }
   .rankrow.here .badge { border-color: var(--bg); color: var(--bg); }
   .rankrow.locked { opacity: .5; }
-  .rankrow .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px; line-height: 1; text-transform: uppercase; }
-  .rankrow .meta { font-size: 11px; line-height: 1.3; color: var(--muted); }
+  .rankrow .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px; line-height: 1; text-transform: uppercase; }
+  .rankrow .meta { font-size: 12px; line-height: 1.3; color: var(--muted); }
   .rankrow.here .meta { color: rgba(250,247,242,.8); }
-  .rankrow .tag { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .1em; white-space: nowrap; }
+  .rankrow .tag { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .1em; white-space: nowrap; }
   /* Five sub-level ticks per rank. */
   .subs { display: flex; gap: 3px; }
   .subs i { width: 8px; height: 8px; border: 1.5px solid var(--box); display: block; }
@@ -1198,17 +1198,17 @@
   .prow.on { background: var(--accent); color: var(--bg); }
   .prow.on .lvl { border-color: var(--bg); color: var(--bg); }
   .prow.locked { opacity: .48; }
-  .prow .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px; line-height: 1; text-transform: uppercase; }
-  .prow .meta { font-size: 11px; line-height: 1.35; color: var(--muted); }
+  .prow .nm { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 16px; line-height: 1; text-transform: uppercase; }
+  .prow .meta { font-size: 12px; line-height: 1.35; color: var(--muted); }
   .prow.on .meta { color: rgba(250,247,242,.82); }
-  .prow .tag { font-family: 'Space Mono', monospace; font-size: 8px; letter-spacing: .1em; white-space: nowrap; color: var(--clay-deep); }
+  .prow .tag { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .1em; white-space: nowrap; color: var(--clay-deep); }
   .prow.on .tag { color: var(--bg); }
   /* A 34px sample of the card treatment, so a name like NIGHTFALL means
      something before you have ever exported one. */
   .swatch { width: 34px; height: 34px; flex: none; border: 1px solid var(--rule); }
   /* The title, wherever it is shown: small, clay, mono. It is a caption on a
      person, not a heading. */
-  .ttl { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: .12em;
+  .ttl { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .12em;
          text-transform: uppercase; color: var(--clay-deep); }
 
   /* Consistency pip ladder */
@@ -1273,7 +1273,7 @@
   }
   #app .hd { font-weight: 800; text-transform: none; letter-spacing: -0.01em; }
   #app .mono { font-family: 'Outfit', system-ui, sans-serif; font-weight: 700; letter-spacing: 0.02em; }
-  #app .eyebrow { font-weight: 700; letter-spacing: 0.09em; font-size: 10px; }
+  #app .eyebrow { font-weight: 700; letter-spacing: 0.09em; font-size: 12px; }
   #app .figure, #app .statfrac { font-weight: 800; letter-spacing: -0.02em; }
   :focus-visible { outline-color: var(--accent); border-radius: 6px; }
   .spinner { border-radius: 999px; }
@@ -1332,7 +1332,7 @@
     position: relative; width: 48px; height: 48px; border-radius: 999px;
     background: var(--card); box-shadow: inset 0 0 0 2.5px var(--hring);
     display: flex; align-items: center; justify-content: center;
-    font-size: 21px; line-height: 1; transition: background-color .18s ease;
+    font-size: 20px; line-height: 1; transition: background-color .18s ease;
   }
   #app .htile[data-code] { font-size: 12px; font-weight: 800; color: var(--muted); letter-spacing: 0.03em; }
   #app .hrow.done .htile { background: var(--hring); box-shadow: none; animation: pop .28s ease; }
@@ -1349,14 +1349,14 @@
   #app .htile .lockb svg { width: 10px; height: 10px; }
   #app svg.tick path { stroke-linecap: round; stroke-linejoin: round; }
   #app .hrow .body { padding: 13px 12px 13px 6px; }
-  #app .hrow .body .nm { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 15px; line-height: 1.25; letter-spacing: 0; text-transform: none; }
-  #app .hrow .body .status { font-size: 11.5px; line-height: 1.3; }
+  #app .hrow .body .nm { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; line-height: 1.25; letter-spacing: 0; text-transform: none; }
+  #app .hrow .body .status { font-size: 12px; line-height: 1.3; }
   /* + : 44 px, in the habit's own tint (it was the row's loudest thing, a solid grape button). */
   #app .hrow .pluscell {
     flex: none; align-self: center; width: 44px; height: 44px; margin: 0 12px 0 2px;
     border-radius: 999px; background: var(--hbg, var(--surface)); color: var(--ink);
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 22px;
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 20px;
   }
   body[data-dark] #app .hrow .pluscell { background: color-mix(in srgb, var(--hcol, var(--accent)) 22%, var(--card)); }
   #app .hrow .pluscell:hover { filter: brightness(.97); }
@@ -1364,55 +1364,55 @@
   #app .hrow.locked .pluscell, #app .hrow.slim .pluscell { background: var(--surface); color: var(--accent); }
   #app .hrow + .rowhint { border-bottom: 0; padding: 4px 24px 14px; }
   #app .statnote { border-bottom: 0; padding: 8px 24px 14px; }
-  #app .hlv { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 10px; letter-spacing: 0.05em; color: var(--muted-soft); }
+  #app .hlv { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 0.05em; color: var(--muted-soft); }
   #app .lvchip { border-radius: 999px; background: var(--teal); color: #0C4B43; font-family: 'Outfit', sans-serif; letter-spacing: 0.02em; }
 
   /* Streak embers → flames */
-  #app .ember { padding-left: 14px; font-family: 'Outfit', sans-serif; font-size: 10.5px; font-weight: 700; letter-spacing: 0.02em; }
+  #app .ember { padding-left: 14px; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.02em; }
   #app .ember::before {
     content: '🔥'; background: none; width: auto; height: auto;
     margin-top: 0; top: 50%; transform: translateY(-52%);
-    font-size: 10px; line-height: 1; filter: grayscale(1); opacity: 0.55;
+    font-size: 12px; line-height: 1; filter: grayscale(1); opacity: 0.55;
   }
   #app .ember[data-lvl="1"], #app .ember[data-lvl="2"], #app .ember[data-lvl="3"] { color: var(--clay); }
   #app .ember[data-lvl="1"]::before, #app .ember[data-lvl="2"]::before, #app .ember[data-lvl="3"]::before { filter: none; opacity: 1; }
   #app .ember.lead { background: var(--clay-100); color: var(--clay); border-radius: 999px; padding: 2px 8px 2px 19px; margin-left: 5px; }
   #app .ember.lead::before { left: 6px; background: none; }
-  #app .dayflame { border-right: 0; background: var(--clay-100); border-radius: 16px; padding: 8px 12px; align-self: center; gap: 6px; margin-right: 0; }
-  #app .dayflame .n { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 24px; letter-spacing: -0.02em; }
+  #app .dayflame { border-right: 0; background: var(--clay-100); border-radius: 20px; padding: 8px 12px; align-self: center; gap: 6px; margin-right: 0; }
+  #app .dayflame .n { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 28px; letter-spacing: -0.02em; }
   #app .dayflame.lit .n { color: var(--clay); }
-  #app .dayflame .u { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 7.5px; }
+  #app .dayflame .u { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 12px; }
   #app .lit .flame { color: var(--clay); }
 
   /* Coach card → dark ink card */
-  #app .coachcard { margin: 14px 16px; border-radius: 22px; background: #231F35; color: #F6F4FF; border-bottom: 0; padding: 16px; }
+  #app .coachcard { margin: 14px 16px; border-radius: 20px; background: #231F35; color: #F6F4FF; border-bottom: 0; padding: 16px; }
   #app .coachcard .eyebrow { color: #A9A3C9; opacity: 1; }
   /* ~4 lines reserved was mostly-empty card for a short nudge; ~2 lines still
      stops the card resizing on every tick without making short copy look lost. */
-  #app .coachcard .say { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 17.5px; line-height: 1.32; letter-spacing: 0; text-transform: none; min-height: 2.7em; }
-  #app .coachcard .cta { background: var(--accent); color: #fff; border-radius: 999px; padding: 11px 16px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0; text-transform: none; box-shadow: 0 3px 0 var(--accent-700); }
+  #app .coachcard .say { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 16px; line-height: 1.32; letter-spacing: 0; text-transform: none; min-height: 2.7em; }
+  #app .coachcard .cta { background: var(--accent); color: #fff; border-radius: 999px; padding: 11px 16px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0; text-transform: none; box-shadow: 0 3px 0 var(--accent-700); }
   #app .coachcard.risk { background: #C74E28; }
   #app .coachcard.risk .eyebrow { color: rgba(255,246,241,0.75); }
   #app .coachcard.risk .cta { background: #FFF6F1; color: #C74E28; box-shadow: 0 3px 0 rgba(0,0,0,0.2); }
   .caret::before { background: #F6F4FF; }
-  #app .riskbar { margin: 0 16px 10px; border-radius: 14px; background: #C74E28; padding: 10px 14px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 12.5px; letter-spacing: 0.01em; text-transform: none; }
-  #app .backfill { border-radius: 18px; background: #C74E28; color: #FFF6F1; }
+  #app .riskbar { margin: 0 16px 10px; border-radius: 12px; background: #C74E28; padding: 10px 14px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.01em; text-transform: none; }
+  #app .backfill { border-radius: 20px; background: #C74E28; color: #FFF6F1; }
   #app .backfill button { border-radius: 999px; font-family: 'Outfit', sans-serif; text-transform: none; letter-spacing: 0.01em; }
 
   /* Buttons, chips, inputs, toggles */
-  #app .btn { border-radius: 999px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13.5px; letter-spacing: 0; text-transform: none; padding: 13px 18px; }
+  #app .btn { border-radius: 999px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0; text-transform: none; padding: 13px 18px; }
   #app .btn-block { justify-content: center; }
   #app .btn-primary { color: #fff; box-shadow: 0 3px 0 var(--accent-700); }
   #app .btn-primary:active { transform: translateY(1px); box-shadow: 0 2px 0 var(--accent-700); }
   #app .btn-secondary { border: 1.5px solid var(--box); background: var(--card); }
   #app .btn.confirmr { background: #C2365B; border-color: #C2365B; color: #fff; box-shadow: 0 3px 0 #932644; }
-  #app .chip { border: 0; border-radius: 999px; background: var(--card); box-shadow: var(--shadow); padding: 8px 14px; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 12.5px; letter-spacing: 0; text-transform: none; color: var(--muted); }
+  #app .chip { border: 0; border-radius: 999px; background: var(--card); box-shadow: var(--shadow); padding: 8px 14px; font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--muted); }
   #app .chip.chip-on { background: var(--accent); color: #fff; font-weight: 700; }
-  #app .input { border-radius: 14px; border: 1.5px solid var(--box); background: var(--card); padding: 10px 12px; }
+  #app .input { border-radius: 12px; border: 1.5px solid var(--box); background: var(--card); padding: 10px 12px; }
   #app .sw { border-radius: 999px; border-color: var(--box); }
   #app .sw > i { border-radius: 999px; background: var(--box); }
   #app .sw.on > i { background: #fff; }
-  #app .selrow.on { border-radius: 18px; color: #fff; }
+  #app .selrow.on { border-radius: 20px; color: #fff; }
   #app .manlink { border: 1.5px solid var(--box); border-radius: 999px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0; text-transform: none; padding: 8px 13px; }
   #app .manlink:hover { border-color: var(--accent); }
 
@@ -1427,7 +1427,7 @@
   /* Stat grid → cards */
   #app .statgrid { border-bottom: 0; padding: 4px 16px 10px; gap: 10px; }
   #app .statgrid > div, #app .statgrid > div:nth-child(odd), #app .statgrid > div:nth-last-child(-n+2) {
-    border: 0; border-radius: 18px; background: var(--card); box-shadow: var(--shadow); padding: 12px 14px;
+    border: 0; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); padding: 12px 14px;
   }
   /* Grids & heat map */
   #app .grid35 .c { border: 0; border-radius: 6px; background: var(--surface); }
@@ -1455,7 +1455,7 @@
   #app .evcard.live { box-shadow: var(--shadow), 0 0 0 2px var(--accent); }
   #app .evcard.live .evhd { background: var(--surface); }
   #app .evcard.done { background: var(--card); box-shadow: var(--shadow), 0 0 0 2px var(--teal); }
-  #app .evhd .evnm { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 17px; line-height: 1.15; letter-spacing: 0; }
+  #app .evhd .evnm { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 16px; line-height: 1.15; letter-spacing: 0; }
   #app .evhd .evstate { border-radius: 999px; font-family: 'Outfit', sans-serif; font-weight: 700; letter-spacing: 0.04em; padding: 4px 9px; }
   #app .evcard.live .evstate { background: var(--accent); color: #fff; }
   #app .evcard.done .evstate { background: var(--teal); color: #0C4B43; }
@@ -1470,30 +1470,30 @@
   #app .questidle { border-bottom: 1px solid var(--rule); }
 
   /* Milestones, ranks, reward track → cards */
-  #app .msrow, #app .rankrow, #app .prow { margin: 0 16px 8px; border-radius: 18px; background: var(--card); box-shadow: var(--shadow); border-bottom: 0; width: auto; }
+  #app .msrow, #app .rankrow, #app .prow { margin: 0 16px 8px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow); border-bottom: 0; width: auto; }
   #app .prow { width: calc(100% - 32px); }
-  #app .msrow .code { border: 0; border-radius: 16px; background: var(--surface); font-family: 'Outfit', sans-serif; font-weight: 800; }
+  #app .msrow .code { border: 0; border-radius: 20px; background: var(--surface); font-family: 'Outfit', sans-serif; font-weight: 800; }
   #app .msrow.got .code { background: rgba(53,208,186,0.14); color: var(--teal-deep); }
   body[data-dark] #app .msrow.got .code { background: rgba(53,208,186,0.2); color: #35D0BA; }
-  #app .msrow .ms-name, #app .rankrow .nm, #app .prow .nm { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14.5px; letter-spacing: 0; }
+  #app .msrow .ms-name, #app .rankrow .nm, #app .prow .nm { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0; }
   #app .msrow .ms-bar > span { background: var(--accent); }  /* was gold until 2026-09-26; now matches the event goals' bars in the same section */
   #app .msrow .ms-xp, #app .msrow .ms-cnt { font-family: 'Outfit', sans-serif; font-weight: 600; }
   #app .msrow.got .ms-xp, #app .msrow.got .ms-cnt { color: var(--teal-deep); }
   #app .msrow .ms-note .g.got { color: var(--teal-deep); }
-  #app .msrow.evrow .ms-xp { font-size: 11px; letter-spacing: 0.02em; }
+  #app .msrow.evrow .ms-xp { font-size: 12px; letter-spacing: 0.02em; }
   /* The folds (PRF-02): one row that opens everything, and the medals already earned on one row. */
   #app .msall { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: calc(100% - 32px); box-sizing: border-box;
-    margin: 0 16px 12px; min-height: 48px; padding: 0 18px; border: 0; border-radius: 18px; background: var(--card);
-    box-shadow: var(--shadow); color: var(--accent); font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14.5px; text-align: left; cursor: pointer; }
+    margin: 0 16px 12px; min-height: 48px; padding: 0 18px; border: 0; border-radius: 20px; background: var(--card);
+    box-shadow: var(--shadow); color: var(--accent); font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; text-align: left; cursor: pointer; }
   #app .msall .go { font-size: 20px; line-height: 1; }
   #app .msearned { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; width: calc(100% - 32px); box-sizing: border-box; margin: 0 16px 8px;
-    padding: 12px 16px 14px; border: 0; border-radius: 18px; background: var(--card); box-shadow: var(--shadow);
+    padding: 12px 16px 14px; border: 0; border-radius: 20px; background: var(--card); box-shadow: var(--shadow);
     color: inherit; font-family: 'Outfit', sans-serif; text-align: left; cursor: pointer; }
-  #app .msearned .mse-l { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  #app .msearned .mse-l { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
   #app .msearned .mse-m { display: flex; flex-wrap: wrap; gap: 6px; }
   #app .msearned .medal { width: 34px; height: 34px; }
-  #app .msearned .medal-in { width: 27px; height: 27px; font-size: 13px; }
-  #app .msnext { background: var(--surface); border-bottom: 0; margin: 0 16px 10px; border-radius: 16px; }
+  #app .msearned .medal-in { width: 27px; height: 27px; font-size: 14px; }
+  #app .msnext { background: var(--surface); border-bottom: 0; margin: 0 16px 10px; border-radius: 20px; }
   #app .rankrow .badge { border: 0; border-radius: 999px; background: var(--surface); }
   #app .rankrow.passed .badge { background: var(--accent-100); color: var(--accent); }
   #app .rankrow.here { background: var(--accent); color: #fff; }
@@ -1510,15 +1510,15 @@
   #app .prow.on .meta { color: rgba(255,255,255,0.82); }
   #app .prow .tag { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--accent); }
   #app .prow.on .tag { color: #fff; }
-  #app .swatch { border-radius: 10px; border-color: var(--box); }
+  #app .swatch { border-radius: 12px; border-color: var(--box); }
   #app .ttl { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--accent); }
-  #app .passline { border-radius: 16px; margin: 0 16px 10px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13.5px; text-transform: none; letter-spacing: 0; color: #fff; }
+  #app .passline { border-radius: 20px; margin: 0 16px 10px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; text-transform: none; letter-spacing: 0; color: #fff; }
   #app .delta.up { color: var(--teal-deep); }
   #app .medal { flex: none; width: 42px; height: 42px; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
   #app .medal-in { width: 33px; height: 33px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 16px; line-height: 1; }
   #app .rankrow .subs i { transform: rotate(45deg); border-radius: 3px; }
   #app .plate { flex: none; border: 0; padding: 2.5px; border-radius: 999px; background: #E3DFF3; cursor: pointer; font-family: 'Outfit', sans-serif; }
-  #app .plate-in { display: block; border-radius: 999px; background: #231F35; font-weight: 800; font-size: 11px; letter-spacing: .12em; padding: 8px 13px; white-space: nowrap; color: #CBC6E4; text-transform: uppercase; }
+  #app .plate-in { display: block; border-radius: 999px; background: #231F35; font-weight: 800; font-size: 12px; letter-spacing: .12em; padding: 8px 13px; white-space: nowrap; color: #CBC6E4; text-transform: uppercase; }
   #app .plate.locked { opacity: .7; }
   #app .plate.locked .plate-in { background: var(--card); color: var(--muted-soft); }
 
@@ -1530,7 +1530,7 @@
      works by showing you the thing you have not got yet. */
   #app .pass-hero {
     position: relative; overflow: hidden; margin: 14px 16px 0;
-    border-radius: 24px; background: #231F35; color: #F6F4FF; padding: 16px;
+    border-radius: 28px; background: #231F35; color: #F6F4FF; padding: 16px;
     display: flex; flex-direction: column; gap: 13px;
   }
   #app .pass-hero::before {
@@ -1548,34 +1548,34 @@
     width: 65px; height: 65px; border-radius: 999px; background: #231F35;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
   }
-  #app .ph-lv { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 29px; line-height: .88; letter-spacing: -.035em; }
-  #app .ph-lvl { font-style: normal; font-size: 7.5px; font-weight: 700; letter-spacing: .18em; color: #A9A3C9; }
+  #app .ph-lv { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 28px; line-height: .88; letter-spacing: -.035em; }
+  #app .ph-lvl { font-style: normal; font-size: 12px; font-weight: 700; letter-spacing: .18em; color: #A9A3C9; }
   #app .ph-id { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
   #app .ph-rank { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; }
   #app .ph-rank b {
-    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 19px; letter-spacing: -.01em;
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -.01em;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  #app .ph-sub { font-size: 11px; line-height: 1.35; color: #A9A3C9; }
+  #app .ph-sub { font-size: 12px; line-height: 1.35; color: #A9A3C9; }
   #app .ph-kept {
     display: inline-flex; align-items: center; gap: 6px; border-radius: 999px;
     background: rgba(246,244,255,.11); padding: 4px 10px;
-    font-size: 10px; font-weight: 700; letter-spacing: .04em; color: #CBC6E4;
+    font-size: 12px; font-weight: 700; letter-spacing: .04em; color: #CBC6E4;
   }
   #app .ph-kept i { font-style: normal; color: #35D0BA; font-weight: 800; }
   #app .ph-next {
     display: flex; align-items: center; gap: 11px; width: 100%; text-align: left; cursor: pointer;
-    border: 0; border-radius: 17px; background: rgba(246,244,255,.09); padding: 10px 12px;
+    border: 0; border-radius: 20px; background: rgba(246,244,255,.09); padding: 10px 12px;
     font-family: 'Outfit', sans-serif; color: inherit;
   }
   #app .ph-next:active { background: rgba(246,244,255,.16); }
   #app .ph-nb { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
-  #app .ph-nk { font-size: 8.5px; font-weight: 800; letter-spacing: .15em; color: #A99BF5; }
-  #app .ph-nn { font-size: 13.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #app .ph-nx { font-size: 10.5px; color: #A9A3C9; }
+  #app .ph-nk { font-size: 12px; font-weight: 800; letter-spacing: .15em; color: #A99BF5; }
+  #app .ph-nn { font-size: 14px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #app .ph-nx { font-size: 12px; color: #A9A3C9; }
   #app .ph-next .bar { background: rgba(246,244,255,.18); }
   #app .ph-next .bar > span { background: #8B7CFF; }
-  #app .ph-go { flex: none; font-size: 17px; font-weight: 800; color: #CBC6E4; }
+  #app .ph-go { flex: none; font-size: 16px; font-weight: 800; color: #CBC6E4; }
 
   /* Loadout — what you own and what you are wearing. */
   #app .loadout {
@@ -1588,18 +1588,18 @@
     box-shadow: 0 8px 18px -10px rgba(35,31,53,.85);
   }
   #app .lo-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-  #app .lo-line { font-size: 11.5px; line-height: 1.45; color: var(--muted); }
+  #app .lo-line { font-size: 12px; line-height: 1.45; color: var(--muted); }
   #app .lo-rail { margin-top: 11px; display: flex; flex-direction: column; gap: 7px; }
-  #app .lo-rl { padding: 0 20px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; color: var(--muted-soft); }
+  #app .lo-rl { padding: 0 20px; font-size: 12px; font-weight: 800; letter-spacing: .16em; color: var(--muted-soft); }
   #app .rail { display: flex; gap: 8px; overflow-x: auto; padding: 2px 20px 4px; scrollbar-width: none; }
   #app .rail::-webkit-scrollbar { display: none; }
   #app .lo-empty {
     flex: none; border-radius: 999px; border: 1.5px dashed var(--box); padding: 8px 13px;
-    font-size: 10.5px; font-weight: 700; color: var(--muted-soft); white-space: nowrap;
+    font-size: 12px; font-weight: 700; color: var(--muted-soft); white-space: nowrap;
   }
 
   /* Reward art — the real swatch, greyed while locked so it still tempts. */
-  #app .rart { position: relative; flex: none; border-radius: 10px; overflow: hidden; display: block; box-shadow: 0 5px 12px -6px rgba(35,31,53,.7); }
+  #app .rart { position: relative; flex: none; border-radius: 12px; overflow: hidden; display: block; box-shadow: 0 5px 12px -6px rgba(35,31,53,.7); }
   /* Locked art keeps its HUE — the tier escalation from bronze to prismatic is
      the thing worth wanting, so it is dimmed rather than drained. */
   #app .rart.lockd { filter: grayscale(.5); opacity: .5; box-shadow: none; }
@@ -1627,12 +1627,12 @@
   #app .tn-you { position: relative; flex: none; width: 17px; height: 17px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 3.5px var(--bg), 0 0 0 6.5px var(--accent); }
   #app .youtag {
     display: inline-flex; align-items: center; border-radius: 999px; background: var(--accent);
-    color: #FFF; padding: 4px 11px; font-size: 9px; font-weight: 800; letter-spacing: .12em;
+    color: #FFF; padding: 4px 11px; font-size: 12px; font-weight: 800; letter-spacing: .12em;
   }
   #app .tn-wrap { flex: 1; min-width: 0; padding: 4px 0; }
   #app .tn-dot {
     position: relative; flex: none; width: 30px; height: 30px; border-radius: 999px;
-    display: grid; place-items: center; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 11.5px;
+    display: grid; place-items: center; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 12px;
     background: var(--bg); border: 2.5px solid var(--track); color: var(--muted);
   }
   #app .trow.got .tn-dot { background: #35D0BA; border-color: #35D0BA; color: #0C4B43; }
@@ -1643,39 +1643,39 @@
   #app .trow.now .tn-gate { background: var(--accent); box-shadow: 0 0 0 5px rgba(108,92,231,.18); }
   #app .tn-card {
     display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; border: 0; cursor: pointer;
-    font-family: 'Outfit', sans-serif; border-radius: 18px; background: var(--card);
+    font-family: 'Outfit', sans-serif; border-radius: 20px; background: var(--card);
     box-shadow: var(--shadow); padding: 11px 12px;
   }
   #app .trow.lockd .tn-card { background: transparent; box-shadow: none; padding: 8px 12px; }
   #app .trow.next .tn-card { box-shadow: 0 0 0 2px var(--accent), 0 16px 28px -18px rgba(108,92,231,.95); }
   #app .tn-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-  #app .tn-kind { font-size: 8.5px; font-weight: 800; letter-spacing: .14em; color: var(--muted-soft); }
+  #app .tn-kind { font-size: 12px; font-weight: 800; letter-spacing: .14em; color: var(--muted-soft); }
   #app .trow.next .tn-kind { color: var(--accent); }
   #app .tn-name { font-size: 14px; font-weight: 800; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #app .trow.lockd .tn-name { color: var(--muted); }
-  #app .tn-note { font-size: 11px; line-height: 1.35; color: var(--muted-soft); }
+  #app .tn-note { font-size: 12px; line-height: 1.35; color: var(--muted-soft); }
   #app .tn-bar { margin-top: 4px; }
-  #app .tn-xp { font-size: 10.5px; font-weight: 700; color: var(--accent); }
-  #app .tn-flag { flex: none; align-self: flex-start; font-size: 8.5px; font-weight: 800; letter-spacing: .1em; border-radius: 999px; padding: 3px 8px; }
+  #app .tn-xp { font-size: 12px; font-weight: 700; color: var(--accent); }
+  #app .tn-flag { flex: none; align-self: flex-start; font-size: 12px; font-weight: 800; letter-spacing: .1em; border-radius: 999px; padding: 3px 8px; }
   #app .trow.got .tn-flag { background: rgba(53,208,186,.22); color: var(--teal-deep); }
   #app .trow.next .tn-flag { background: var(--accent); color: #FFF; }
 
   /* Rank gates — the chapter headings of the pass. */
-  #app .tband { display: flex; gap: 11px; align-items: center; border-radius: 18px; background: var(--surface); padding: 11px 13px; }
+  #app .tband { display: flex; gap: 11px; align-items: center; border-radius: 20px; background: var(--surface); padding: 11px 13px; }
   #app .trow.now .tband { background: #231F35; color: #F6F4FF; box-shadow: 0 16px 30px -20px rgba(35,31,53,.95); }
   #app .trow.lockd .tband { background: transparent; padding: 9px 13px; }
   #app .trow.band.lockd { opacity: .66; }
   #app .tb-mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
   #app .tb-name { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: -.01em; }
-  #app .tb-meta { font-size: 10.5px; line-height: 1.35; color: var(--muted); }
+  #app .tb-meta { font-size: 12px; line-height: 1.35; color: var(--muted); }
   #app .trow.now .tb-meta { color: #A9A3C9; }
   #app .trow.now .tb-meta strong { color: #35D0BA; font-weight: 700; }
-  #app .tb-right { flex: none; font-size: 8.5px; font-weight: 800; letter-spacing: .11em; color: var(--muted-soft); text-align: right; white-space: nowrap; }
+  #app .tb-right { flex: none; font-size: 12px; font-weight: 800; letter-spacing: .11em; color: var(--muted-soft); text-align: right; white-space: nowrap; }
   #app .trow.now .tb-right { color: #35D0BA; }
   #app .trow.done .tb-right { color: var(--teal-deep); }
   #app .trow.now .pips i { border-color: rgba(246,244,255,.38); }
   #app .trow.now .pips i.on { background: #35D0BA; border-color: #35D0BA; }
-  #app .tstar { border-radius: 18px; border: 1.5px dashed var(--box); background: transparent; padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; }
+  #app .tstar { border-radius: 20px; border: 1.5px dashed var(--box); background: transparent; padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; }
 
   /* ── Share picker ── the card is previewed by the same painter that exports it. */
   #app .sharesheet { padding: 16px 16px calc(18px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; max-height: 92%; overflow-y: auto; }
@@ -1776,15 +1776,15 @@
 
   /* Roll call */
   #app .rcprompt .rcq { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; line-height: 1.25; }
-  #app .noteq { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 17px; line-height: 1.3; letter-spacing: 0; }
+  #app .noteq { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; line-height: 1.3; letter-spacing: 0; }
   #app .rc-name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; }
   #app .rcday { font-family: 'Outfit', sans-serif; font-weight: 700; text-transform: none; letter-spacing: 0.01em; }
   #app .boardday { color: var(--muted-soft); }
 
   /* Crosslink */
   #app .crosslink { border: 0; border-radius: 20px; background: var(--surface); }
-  #app .crosslink-mark { border-radius: 14px; color: #fff; }
-  #app .crosslink-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 15px; text-transform: none; letter-spacing: 0; }
+  #app .crosslink-mark { border-radius: 12px; color: #fff; }
+  #app .crosslink-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; text-transform: none; letter-spacing: 0; }
   #app .crosslink-go { font-family: 'Outfit', sans-serif; color: var(--accent); }
   #app .ranklink .go { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--accent); }
   #app .ranklink.tight { gap: 6px; }
@@ -1793,14 +1793,14 @@
   #app .ranklink.tighter > span:first-child { display: none; }
 
   /* Sheet & stepper & toast */
-  #app .sheet { border-top: 0; border-radius: 26px 26px 0 0; box-shadow: 0 -18px 44px -20px rgba(35,31,53,0.4); }
+  #app .sheet { border-top: 0; border-radius: 28px 28px 0 0; box-shadow: 0 -18px 44px -20px rgba(35,31,53,0.4); }
   #app .stepper { border: 0; gap: 16px; justify-content: center; align-items: center; }
-  #app .stepper button { width: 54px; height: 54px; border-radius: 999px; background: var(--surface); color: var(--accent); border: 0; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 24px; }
+  #app .stepper button { width: 54px; height: 54px; border-radius: 999px; background: var(--surface); color: var(--accent); border: 0; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 28px; }
   #app .stepper .minus { border-right: 0; }
   #app .stepper .plus { border-left: 0; background: var(--accent); color: #fff; box-shadow: 0 4px 0 var(--accent-700); }
   #app .stepper .plus:active { transform: translateY(1px); box-shadow: 0 3px 0 var(--accent-700); }
   #app .savexp { margin-left: 10px; background: rgba(255,255,255,0.18); border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; color: #B7F0E4; }
-  #app .toast { border-radius: 16px; background: #231F35; color: #F6F4FF; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13.5px; text-transform: none; letter-spacing: 0; box-shadow: 0 14px 30px -16px rgba(35,31,53,0.7); }
+  #app .toast { border-radius: 20px; background: #231F35; color: #F6F4FF; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; text-transform: none; letter-spacing: 0; box-shadow: 0 14px 30px -16px rgba(35,31,53,0.7); }
   .demo-banner { background: var(--accent); color: #fff; font-family: 'Outfit', sans-serif; letter-spacing: 0.08em; }
 
   /* XP flight */
@@ -1836,12 +1836,12 @@
 
   /* Tour */
   .tourcard { border-radius: 20px; border: 1.5px solid var(--box); background: var(--card); box-shadow: 0 18px 40px -18px rgba(35,31,53,0.5); }
-  .tourring { border-radius: 16px; border-color: var(--accent); }
+  .tourring { border-radius: 20px; border-color: var(--accent); }
   @keyframes tourPulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(108,92,231,0.5); }
     50%      { box-shadow: 0 0 0 8px rgba(108,92,231,0); }
   }
-  .tourcard h4 { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 18px; text-transform: none; letter-spacing: 0; }
+  .tourcard h4 { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 20px; text-transform: none; letter-spacing: 0; }
   .tourcard .tourn { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--accent); }
   .tourcard .tourtip.up { border-bottom-color: var(--card); }
   .tourcard .tourtip.down { border-top-color: var(--card); }
@@ -1871,15 +1871,15 @@
   /* ── 1. The hero card, and the week under it ── */
   #app .hero-lv {
     margin: 4px 16px 12px; padding: 14px 16px; gap: 12px;
-    border-radius: 24px; background: var(--card); box-shadow: var(--shadow); border-bottom: 0;
+    border-radius: 28px; background: var(--card); box-shadow: var(--shadow); border-bottom: 0;
   }
   #app .hero-top { display: flex; align-items: center; gap: 12px; }
   /* A size smaller since PRF-05 (74 → 62 px), so the week and the list come up the screen. */
   #app .hero-lv .lvring { width: 62px; height: 62px; }
   #app .hero-lv .lvring circle { stroke-width: 4; }
-  #app .hero-lv .lvring .figure { font-size: 22px !important; }
+  #app .hero-lv .lvring .figure { font-size: 20px !important; }
   #app .herobody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
-  #app .heroxp { font-size: 12.5px; line-height: 1.25; color: var(--muted); }
+  #app .heroxp { font-size: 12px; line-height: 1.25; color: var(--muted); }
   #app .heroxp b { color: var(--accent); font-weight: 800; }
   #app .herobar { height: 9px; border-radius: 999px; background: var(--track); overflow: hidden; }
   #app .herobar > span {
@@ -1890,9 +1890,9 @@
   /* The streak tile keeps its own colour and sits on the right of the row, so
      the level and the streak are two objects rather than one crowded lockup. It
      renders only when there IS a streak — see streakFlame(). */
-  #app .hero-top .dayflame { flex-direction: column; gap: 1px; padding: 7px 10px; border-radius: 16px; text-align: center; }
+  #app .hero-top .dayflame { flex-direction: column; gap: 1px; padding: 7px 10px; border-radius: 20px; text-align: center; }
   #app .hero-top .dayflame .flame { width: 17px; height: 21px; }
-  #app .hero-top .dayflame .n { font-size: 22px; }
+  #app .hero-top .dayflame .n { font-size: 20px; }
   #app .hero-top .dayflame .u { line-height: 1.1; }
 
   /* The verdict (PRF-03) leads the week: "2 TO GO" on the dark card, then ON TARGET or PERFECT in the
@@ -1900,12 +1900,12 @@
      tile its room. Dark mode fills with --accent-700: white on the dark accent is 3.35:1. */
   #app .wkrow { display: flex; align-items: center; gap: 12px; padding-top: 12px; border-top: 1px solid var(--rule); }
   #app .vd {
-    flex: none; width: 68px; height: 48px; border-radius: 14px; display: flex; flex-direction: column;
+    flex: none; width: 68px; height: 48px; border-radius: 12px; display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 4px; background: var(--ink-card); color: #FFFFFF;
   }
-  #app .vd b { display: flex; font-size: 22px; font-weight: 800; line-height: 1; letter-spacing: -.02em; }
+  #app .vd b { display: flex; font-size: 20px; font-weight: 800; line-height: 1; letter-spacing: -.02em; }
   #app .vd b svg.tick { width: 20px; height: 20px; }
-  #app .vd span { font-size: 10px; font-weight: 800; letter-spacing: .05em; line-height: 1; white-space: nowrap; }
+  #app .vd span { font-size: 12px; font-weight: 800; letter-spacing: .05em; line-height: 1; white-space: nowrap; }
   #app .vd.on, #app .vd.perfect { background: var(--accent); }
   body[data-dark] #app .vd.on, body[data-dark] #app .vd.perfect { background: var(--accent-fill); }
   /* ONE WEEK (PRF-05): seven days, ticked when on target, and the last four are the day picker (they
@@ -1925,27 +1925,27 @@
   #app .wk2 .sq.pre { background: none; box-shadow: inset 0 0 0 1.5px var(--rule); }
   #app .wk2 .sq.open { background: none; box-shadow: inset 0 0 0 2px var(--accent); }
   #app .wk2 .c.sel:not(.today) .sq { outline: 2.5px solid var(--ink); outline-offset: 2px; }
-  #app .wk2 .l { font-size: 11px; font-weight: 600; color: var(--muted-soft); line-height: 1; white-space: nowrap; }
+  #app .wk2 .l { font-size: 12px; font-weight: 600; color: var(--muted-soft); line-height: 1; white-space: nowrap; }
   /* "Today" is five letters in a cell sized for one: it may sit over its neighbours' spare room. */
-  #app .wk2 .c.today .l { color: var(--accent); font-weight: 800; font-size: 11px; letter-spacing: -.01em; }
+  #app .wk2 .c.today .l { color: var(--accent); font-weight: 800; font-size: 12px; letter-spacing: -.01em; }
   #app .wk2 .c.sel:not(.today) .l { color: var(--ink); font-weight: 800; }
   /* THE WINS CARD (PRF-02): what used to take the whole screen for a medal, a tier, a habit's rank,
      a perfect day, a comeback or the 3-day streak, under the hero until it is tapped. The inverted
      card, so it reads as news rather than one more row. */
   @keyframes winIn { from { opacity: 0; transform: translateY(-6px) scale(.98); } }
-  #app .wins { margin: 0 16px 12px; padding: 14px 16px; border-radius: 22px; background: var(--ink-card); color: #F6F4FF;
+  #app .wins { margin: 0 16px 12px; padding: 14px 16px; border-radius: 20px; background: var(--ink-card); color: #F6F4FF;
     box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; animation: winIn .4s cubic-bezier(.2,.8,.2,1); }
   #app .wins-hd { display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
-    font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(246,244,255,.72); }
-  #app .wins-hd b { font-size: 13px; letter-spacing: .02em; color: #B7F0E4; }
+    font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(246,244,255,.72); }
+  #app .wins-hd b { font-size: 14px; letter-spacing: .02em; color: #B7F0E4; }
   #app .win { display: flex; align-items: center; gap: 12px; }
   #app .win .we { flex: none; width: 40px; height: 40px; border-radius: 999px; background: rgba(246,244,255,.1);
     display: flex; align-items: center; justify-content: center; font-size: 20px; }
   #app .win .wt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-  #app .win .wt b { font-size: 15px; font-weight: 800; line-height: 1.2; }
-  #app .win .wt span { font-size: 12.5px; color: rgba(246,244,255,.72); line-height: 1.3; }
-  #app .win .wx { flex: none; font-size: 13px; font-weight: 800; color: #B7F0E4; }
-  #app .wins-more { font-size: 12.5px; color: rgba(246,244,255,.72); padding-left: 52px; }
+  #app .win .wt b { font-size: 16px; font-weight: 800; line-height: 1.2; }
+  #app .win .wt span { font-size: 12px; color: rgba(246,244,255,.72); line-height: 1.3; }
+  #app .win .wx { flex: none; font-size: 14px; font-weight: 800; color: #B7F0E4; }
+  #app .wins-more { font-size: 12px; color: rgba(246,244,255,.72); padding-left: 52px; }
   #app .wins-ft { display: flex; align-items: center; gap: 10px; padding-top: 2px; }
   #app .wins-ok { flex: 1; min-height: 44px; justify-content: center; }
   /* A11Y-01, Proof's half (2026-09-27): white text on the dark accent (#8F7BF0) was 3.35:1, so every fill
@@ -1972,16 +1972,16 @@
   #app .ph-kept, #app .ph-kept i, #app .ph-nk, #app .ph-nx, #app .hdright .right,
   #app .lvring .lbl, #app .wk2 .l, #app .vd span, #app .lvqueue,
   #app .evgoal .g-sub, #app .evgoal .g-cnt, #app .evgoal .g-cnt span, #app .evhd .evtag, #app .evhd .evstate, #app .evfoot,
-  #app .evfoot span { font-size: 11px; }
+  #app .evfoot span { font-size: 12px; }
   #app .evhd .evtag { letter-spacing: .05em; }
-  .tourlay .tourn, .tourlay .tourskip { font-size: 11px; }
+  .tourlay .tourn, .tourlay .tourskip { font-size: 12px; }
   #app .lvring .lbl { letter-spacing: .08em; }
   #app .heat .hd-lbl { letter-spacing: 0; }
   #app .tn-kind, #app .tn-flag, #app .tb-right, #app .lo-rl, #app .ph-nk, #app .youtag { letter-spacing: .06em; }
   #app .vd span { letter-spacing: .03em; }
   /* The flame tile's caption and the word "LEVEL" in the Locker's ring: 11 px, and the boxes make room. */
-  #app .hero-top .dayflame .u, #app .dayflame .u { font-size: 11px; letter-spacing: .02em; }
-  #app .ph-lvl { font-size: 11px; letter-spacing: .06em; }
+  #app .hero-top .dayflame .u, #app .dayflame .u { font-size: 12px; letter-spacing: .02em; }
+  #app .ph-lvl { font-size: 12px; letter-spacing: .06em; }
   /* The 35-day grid's key ("Five weeks ago · the legend · Today") no longer fits one line on a narrow phone
      at 11 px: the legend takes a line of its own under the two ends. */
   @media (max-width: 439px) {
@@ -1997,10 +1997,10 @@
   #app .logsheet { gap: 14px; padding-top: 16px; }
   #app .logsheet .sh-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
   #app .logsheet .sh-t { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 20px; line-height: 1.2; color: var(--ink); }
-  #app .logsheet .sh-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  #app .logsheet .sh-sub { font-size: 14px; color: var(--muted); margin-top: 2px; }
   #app .logsheet .sh-x { flex: none; width: 40px; height: 40px; border-radius: 999px; background: var(--surface); color: var(--muted);
-    border: 0; font-size: 15px; display: flex; align-items: center; justify-content: center; }
-  #app .logfield { display: flex; align-items: baseline; gap: 10px; border: 2px solid var(--accent); border-radius: 16px;
+    border: 0; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+  #app .logfield { display: flex; align-items: baseline; gap: 10px; border: 2px solid var(--accent); border-radius: 20px;
     padding: 10px 14px; background: var(--card); cursor: text; }
   #app .logfield input { flex: 1; min-width: 0; width: 100%; border: 0; background: transparent; color: var(--ink); outline: none; padding: 0;
     font: 800 38px/1.1 'Outfit', sans-serif; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
@@ -2013,45 +2013,45 @@
     color: var(--ink); font: 700 14px 'Outfit', sans-serif; }
   #app .logquick .clear { border-color: var(--clay); color: var(--clay-deep); }
   #app .logquick .clear.armed { background: var(--clay); color: #FFFFFF; }
-  #app .logsheet .sh-voice { font-size: 13.5px; line-height: 1.4; color: var(--muted); }
+  #app .logsheet .sh-voice { font-size: 14px; line-height: 1.4; color: var(--muted); }
   /* ── TODAY'S CARD AND PROGRESS'S WEEK (2026-10-12, the UX audit's batch B) ── */
   #app .hero-lv { padding: 12px 14px 12px; gap: 10px; }
   #app .hero-lv.past { box-shadow: 0 0 0 2px var(--clay), var(--shadow); }
   #app .hero-top { gap: 10px; }
   #app .hero-lv .lvring { width: 46px; height: 46px; flex: none; }
   #app .hero-lv .lvring .lbl { display: none; }
-  #app .hero-lv .lvring .figure { font-size: 18px !important; }
+  #app .hero-lv .lvring .figure { font-size: 20px !important; }
   #app .herobody { gap: 3px; }
-  #app .heroxp { font-size: 13px; }
+  #app .heroxp { font-size: 14px; }
   #app .hero-lv .ranklink .hd { white-space: nowrap; }
   #app .herobar { height: 5px; }
   #app .hero-top .dayflame { flex-direction: row; align-items: center; gap: 5px; padding: 6px 9px; border-radius: 12px; text-align: left; }
   #app .hero-top .dayflame .flame { width: 14px; height: 18px; }
-  #app .hero-top .dayflame .n { font-size: 19px; }
-  #app .hero-top .dayflame .u { font-size: 11px; line-height: 1.05; }
+  #app .hero-top .dayflame .n { font-size: 20px; }
+  #app .hero-top .dayflame .u { font-size: 12px; line-height: 1.05; }
   #app .wkrow { padding-top: 10px; }
   #app .herosay { border-top: 1px solid var(--rule); padding-top: 10px; display: flex; flex-direction: column; gap: 3px; }
-  #app .herosay .say { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14.5px; line-height: 1.4; color: var(--ink); min-height: 1.4em; }
-  #app .herosay .sayk { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--clay-deep); }
+  #app .herosay .say { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14px; line-height: 1.4; color: var(--ink); min-height: 1.4em; }
+  #app .herosay .sayk { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--clay-deep); }
   #app .herosay.risk .say { color: var(--clay-deep); }
-  #app .hero-lv .backfill { margin: 0; padding: 10px 12px; border-radius: 14px; }
-  #app .hero-lv .backfill .bf-day { font-size: 17px; }
+  #app .hero-lv .backfill { margin: 0; padding: 10px 12px; border-radius: 12px; }
+  #app .hero-lv .backfill .bf-day { font-size: 16px; }
   #app .rcprompt.qline { margin: 2px 16px 10px; width: auto; border: 0; border-radius: 20px; background: var(--card);
     box-shadow: inset 0 0 0 1.5px var(--accent), var(--shadow); padding: 12px 16px; }
   @media (max-width: 359px) {
-    #app .apphd .title.hd { font-size: 22px; }
+    #app .apphd .title.hd { font-size: 20px; }
     #app .hero-top .dayflame .u { display: none; }
-    #app .herosay .say { font-size: 13.5px; }
+    #app .herosay .say { font-size: 14px; }
   }
   #app .weektable { margin: 0 16px 8px; padding: 12px 12px 10px; border-radius: 20px; background: var(--card); box-shadow: var(--shadow);
     display: flex; flex-direction: column; gap: 2px; }
   #app .wt-r { display: grid; grid-template-columns: minmax(0, 92px) repeat(7, minmax(0, 1fr)) 40px; gap: 4px; align-items: center;
-    width: 100%; padding: 5px 2px; border-radius: 10px; background: none; border: 0; color: inherit; text-align: left; }
+    width: 100%; padding: 5px 2px; border-radius: 12px; background: none; border: 0; color: inherit; text-align: left; }
   #app button.wt-r:active { background: var(--accent-100); }
   #app .wt-h { padding: 0 2px 4px; }
-  #app .wt-h span { font-size: 11px; font-weight: 700; color: var(--muted-soft); text-align: center; }
+  #app .wt-h span { font-size: 12px; font-weight: 700; color: var(--muted-soft); text-align: center; }
   #app .wt-h span.now { color: var(--accent); }
-  #app .wt-n { display: flex; align-items: center; gap: 6px; min-width: 0; font-weight: 700; font-size: 13.5px; }
+  #app .wt-n { display: flex; align-items: center; gap: 6px; min-width: 0; font-weight: 700; font-size: 14px; }
   #app .wt-n > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   #app .wt-e { flex: none; font-size: 14px; }
   #app .wt-c { display: block; height: 18px; border-radius: 5px; background: var(--track); }
@@ -2060,39 +2060,46 @@
   #app .wt-c.pre { background: none; box-shadow: inset 0 0 0 1.5px var(--rule); }
   #app .wt-c.now { outline: 2px solid var(--ink); outline-offset: -2px; }
   #app .wt-r .hring { width: 34px; height: 34px; justify-self: end; }
-  #app .wt-r .hring .figure { font-size: 13px; }
+  #app .wt-r .hring .figure { font-size: 14px; }
   #app .wt-off { opacity: .55; }
   #app .wt-offt { grid-column: 2 / -1; font-size: 12px; color: var(--muted); }
-  #app .wt-empty { font-size: 13px; color: var(--muted); padding: 6px 4px; }
-  #app .wt-key { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 8px 2px 0; font-size: 11px; color: var(--muted); }
+  #app .wt-empty { font-size: 14px; color: var(--muted); padding: 6px 4px; }
+  #app .wt-key { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 8px 2px 0; font-size: 12px; color: var(--muted); }
   #app .wt-key span { display: flex; align-items: center; gap: 5px; }
   #app .wt-key .wt-c { width: 12px; height: 12px; border-radius: 3px; }
   /* Progress's four stats in one row */
   #app .statgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
   #app .statgrid > div, #app .statgrid > div:nth-child(odd), #app .statgrid > div:nth-last-child(-n+2) { padding: 10px 8px; }
-  #app .statgrid .figure, #app .statgrid .statfrac { font-size: 22px; }
-  #app .statgrid .statfrac .of { font-size: 13px; }
+  #app .statgrid .figure, #app .statgrid .statfrac { font-size: 20px; }
+  #app .statgrid .statfrac .of { font-size: 14px; }
   #app .statgrid .eyebrow { letter-spacing: .03em; line-height: 1.2; }
-  @media (max-width: 359px) { #app .wt-r { grid-template-columns: minmax(0, 70px) repeat(7, minmax(0, 1fr)) 34px; gap: 3px; } #app .wt-r .hring { width: 30px; height: 30px; } }
+  /* A small phone (2026-10-12, after the type pass): the stats go two by two, and the week table gives
+     the names the room the emoji had, so Protein and Mobility are not cut. */
+  @media (max-width: 379px) {
+    #app .statgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #app .wt-e { display: none; }
+    #app .wt-r { grid-template-columns: minmax(0, 66px) repeat(7, minmax(0, 1fr)) 32px; gap: 3px; }
+    #app .wt-r .hring { width: 30px; height: 30px; }
+  }
   /* ── A HABIT'S PAGE (2026-10-12, the UX audit) ── */
   #app .dt-ctl { display: flex; gap: 10px; align-items: center; }
-  #app .dt-ctl .dt-sq { flex: none; width: 52px; min-width: 52px; height: 48px; padding: 0; font-size: 22px; display: flex; align-items: center; justify-content: center; }
-  #app .g35h span { text-align: center; font-size: 11px; font-weight: 700; color: var(--muted-soft); }
+  #app .dt-ctl .dt-sq { flex: none; width: 52px; min-width: 52px; height: 48px; padding: 0; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+  #app .g35h span { text-align: center; font-size: 12px; font-weight: 700; color: var(--muted-soft); }
   #app .dt-level { display: flex; gap: 14px; align-items: center; }
   #app .wins-share { flex: none; min-height: 44px; padding: 0 18px; border-radius: 999px; background: none;
-    border: 1.5px solid rgba(246,244,255,.35); color: #F6F4FF; font-weight: 700; font-size: 13.5px; }
+    border: 1.5px solid rgba(246,244,255,.35); color: #F6F4FF; font-weight: 700; font-size: 14px; }
 
   /* ── 2. Settings as grouped cards ── */
   #app .hdleft { display: flex; align-items: center; gap: 10px; min-width: 0; }
   #app .hdback {
     flex: none; width: 32px; height: 32px; border-radius: 999px;
     background: var(--card); border: 1.5px solid var(--box); box-shadow: var(--shadow);
-    color: var(--accent); font-size: 17px; font-weight: 800; line-height: 1;
+    color: var(--accent); font-size: 16px; font-weight: 800; line-height: 1;
     display: flex; align-items: center; justify-content: center; padding-bottom: 2px;
   }
   #app .hdback:hover { border-color: var(--accent); }
   #app .profcard {
-    margin: 4px 16px 14px; padding: 15px 16px; border-radius: 22px;
+    margin: 4px 16px 14px; padding: 15px 16px; border-radius: 20px;
     background: var(--card); box-shadow: var(--shadow);
     display: flex; align-items: center; gap: 14px; width: auto; text-align: left;
   }
@@ -2102,7 +2109,7 @@
     display: flex; align-items: center; justify-content: center;
   }
   #app .cardgrp {
-    margin: 0 16px 14px; border-radius: 22px; overflow: hidden;
+    margin: 0 16px 14px; border-radius: 20px; overflow: hidden;
     background: var(--card); box-shadow: var(--shadow);
   }
   #app .navrow {
@@ -2112,14 +2119,14 @@
   #app .cardgrp > *:last-child, #app .cardgrp > *:last-child.navrow { border-bottom: 0; }
   #app .navrow:hover { background: var(--surface); }
   #app .navtile {
-    flex: none; width: 38px; height: 38px; border-radius: 13px; background: var(--surface);
-    display: flex; align-items: center; justify-content: center; font-size: 18px; line-height: 1;
+    flex: none; width: 38px; height: 38px; border-radius: 12px; background: var(--surface);
+    display: flex; align-items: center; justify-content: center; font-size: 20px; line-height: 1;
   }
   #app .navmid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-  #app .navnm { font-weight: 700; font-size: 15px; line-height: 1.25; }
-  #app .navsub { font-size: 11.5px; line-height: 1.35; color: var(--muted); }
-  #app .navval { flex: none; font-size: 12.5px; font-weight: 600; color: var(--muted-soft); white-space: nowrap; }
-  #app .navgo { flex: none; font-size: 17px; font-weight: 700; color: var(--box); line-height: 1; }
+  #app .navnm { font-weight: 700; font-size: 16px; line-height: 1.25; }
+  #app .navsub { font-size: 12px; line-height: 1.35; color: var(--muted); }
+  #app .navval { flex: none; font-size: 12px; font-weight: 600; color: var(--muted-soft); white-space: nowrap; }
+  #app .navgo { flex: none; font-size: 16px; font-weight: 700; color: var(--box); line-height: 1; }
   #app .navrow.danger .navtile { background: var(--danger-100); }
   #app .navrow.danger .navnm { color: var(--danger); }
   #app .navpill {
@@ -2127,16 +2134,16 @@
     background: none; padding: 7px 13px; font-size: 12px; font-weight: 700; line-height: 1;
   }
   #app .navrow.armed .navpill { background: var(--danger); color: #fff; }
-  #app .setnote { padding: 0 26px 16px; font-size: 11.5px; line-height: 1.55; color: var(--muted-soft); }
+  #app .setnote { padding: 0 26px 16px; font-size: 12px; line-height: 1.55; color: var(--muted-soft); }
   #app .setnote strong { color: var(--muted); font-weight: 700; }
   /* Habit rows inside the Habits & targets sub-screen. */
   #app .hsrow { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-bottom: 1px solid var(--rule); }
-  #app .hstile { flex: none; width: 38px; height: 38px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 18px; line-height: 1; }
-  #app .hslock { flex: none; border-radius: 999px; background: var(--surface); color: var(--muted-soft); padding: 5px 10px; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+  #app .hstile { flex: none; width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; line-height: 1; }
+  #app .hslock { flex: none; border-radius: 999px; background: var(--surface); color: var(--muted-soft); padding: 5px 10px; font-size: 12px; font-weight: 700; letter-spacing: .04em; }
 
   /* ── 3. Roll call: the dark composer, one card per voice ── */
   #app .rccomp {
-    margin: 0 16px 14px; padding: 16px; border-radius: 24px;
+    margin: 0 16px 14px; padding: 16px; border-radius: 28px;
     background: var(--ink-card); color: #F6F4FF; border-bottom: 0;
     display: flex; flex-direction: column; gap: 12px;
   }
@@ -2144,7 +2151,7 @@
   #app .rccomp .noteq { color: #F6F4FF; }
   #app .rccomp .input {
     background: rgba(246,244,255,.07); border: 1.5px solid rgba(246,244,255,.18);
-    color: #F6F4FF; border-radius: 16px; min-height: 64px; padding: 13px 14px; font-size: 14px;
+    color: #F6F4FF; border-radius: 20px; min-height: 64px; padding: 13px 14px; font-size: 14px;
   }
   #app .rccomp .input::placeholder { color: rgba(246,244,255,.42); }
   #app .rccomp .input:focus-visible { border-color: var(--accent); }
@@ -2154,12 +2161,12 @@
   @supports (-webkit-touch-callout: none) {
     #app .input, #app .rccomp .input { font-size: 16px; }
   }
-  #app .rccomp .noterow .mono { color: #A9A3C9; font-size: 11.5px; }
+  #app .rccomp .noterow .mono { color: #A9A3C9; font-size: 12px; }
   #app .rccomp .noterow .mono.tight { color: var(--clay); }
   #app .rccomp .btn-secondary { background: none; border-color: rgba(246,244,255,.28); color: #F6F4FF; }
   #app .rccomp .setnote { padding: 0; color: rgba(246,244,255,.5); }
   #app .rccard {
-    margin: 0 16px 10px; padding: 14px 15px; border-radius: 22px;
+    margin: 0 16px 10px; padding: 14px 15px; border-radius: 20px;
     background: var(--card); box-shadow: var(--shadow); border-bottom: 0; border-left: 0;
     display: flex; flex-direction: column; gap: 10px;
     animation: riseIn .34s cubic-bezier(.16,1,.3,1) both;
@@ -2170,50 +2177,50 @@
   #app .rccard.coach .rc-say { color: #F6F4FF; }
   #app .rccard.coach .rchip { background: rgba(246,244,255,.10); color: #CBC6E4; }
   #app .rc-head { display: flex; align-items: center; gap: 10px; }
-  #app .rccard .rc-name { flex: 1; min-width: 0; font-size: 15px; }
-  #app .rccard .rc-meta { border-radius: 999px; background: var(--surface); color: var(--muted); padding: 4px 9px; font-size: 10.5px; font-weight: 700; letter-spacing: .02em; }
+  #app .rccard .rc-name { flex: 1; min-width: 0; font-size: 16px; }
+  #app .rccard .rc-meta { border-radius: 999px; background: var(--surface); color: var(--muted); padding: 4px 9px; font-size: 12px; font-weight: 700; letter-spacing: .02em; }
   #app .rccard.coach .rc-meta { background: rgba(246,244,255,.12); color: #CBC6E4; }
   #app .rccard .rc-say { font-size: 14px; line-height: 1.5; }
   #app .rc-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
   #app .rchip {
     display: inline-flex; align-items: center; gap: 5px; border-radius: 999px;
     background: var(--surface); color: var(--muted); padding: 5px 10px;
-    font-size: 11px; font-weight: 700; line-height: 1; white-space: nowrap;
+    font-size: 12px; font-weight: 700; line-height: 1; white-space: nowrap;
   }
   #app .rchip.pct { background: rgba(53,208,186,.16); color: var(--teal-deep); }
   #app .rchip.fire { background: var(--clay-100); color: var(--clay); }
   body[data-dark] #app .rchip.pct { background: rgba(53,208,186,.16); color: #6FE3D0; }
 
   /* ── 4. The board as a standings panel ── */
-  #app .lbwrap { margin: 0 16px 14px; padding: 14px 13px 13px; border-radius: 24px; background: var(--surface); }
+  #app .lbwrap { margin: 0 16px 14px; padding: 14px 13px 13px; border-radius: 28px; background: var(--surface); }
   #app .lbhd { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 0 4px 12px; }
-  #app .lbhd .h { font-weight: 800; font-size: 19px; letter-spacing: -.01em; }
-  #app .lbhd .r { font-size: 11.5px; color: var(--muted-soft); }
+  #app .lbhd .h { font-weight: 800; font-size: 20px; letter-spacing: -.01em; }
+  #app .lbhd .r { font-size: 12px; color: var(--muted-soft); }
   #app .lbwrap .boardbar { padding: 0 0 12px; border-bottom: 0; }
   #app .lbwrap .chips { display: flex; gap: 7px; }
   #app .lbrow {
     display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
-    padding: 11px 12px; margin-bottom: 8px; border-radius: 18px;
+    padding: 11px 12px; margin-bottom: 8px; border-radius: 20px;
     background: var(--card); box-shadow: var(--shadow);
     animation: riseIn .34s cubic-bezier(.16,1,.3,1) both;
   }
   #app .lbrow.me { background: var(--accent); color: #fff; box-shadow: 0 10px 20px -14px var(--accent-700); }
-  #app .lbpos { flex: none; width: 24px; text-align: center; font-size: 15px; font-weight: 800; color: var(--muted-soft); line-height: 1; }
+  #app .lbpos { flex: none; width: 24px; text-align: center; font-size: 16px; font-weight: 800; color: var(--muted-soft); line-height: 1; }
   #app .lbrow.me .lbpos { color: rgba(255,255,255,.75); }
-  #app .lbpos.medal { font-size: 19px; }
+  #app .lbpos.medal { font-size: 20px; }
   #app .lbmid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-  #app .lbnm { font-weight: 700; font-size: 15px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  #app .lbsub { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 11.5px; line-height: 1.2; color: var(--muted); }
+  #app .lbnm { font-weight: 700; font-size: 16px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #app .lbsub { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: 12px; line-height: 1.2; color: var(--muted); }
   #app .lbrow.me .lbsub { color: rgba(255,255,255,.8); }
   #app .lbright { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
   /* teal-deep is a 4.5:1 near-miss on a #282250 card, so the score — the one
      number on the row anybody actually reads — brightens with the theme. */
-  #app .lbxp { font-weight: 800; font-size: 14.5px; line-height: 1.1; color: var(--teal-deep); }
+  #app .lbxp { font-weight: 800; font-size: 14px; line-height: 1.1; color: var(--teal-deep); }
   body[data-dark] #app .lbxp { color: var(--teal); }
   #app .lbrow.me .lbxp { color: #fff; }
-  #app .lbgap { font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,.78); }
-  #app .lbfoot { border-radius: 16px; background: var(--accent-100); color: var(--accent); padding: 12px 14px; font-size: 12px; line-height: 1.45; font-weight: 600; }
-  #app .lbsplit { padding: 6px 4px 8px; font-size: 10px; font-weight: 700; letter-spacing: .09em; color: var(--muted-soft); }
+  #app .lbgap { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.78); }
+  #app .lbfoot { border-radius: 20px; background: var(--accent-100); color: var(--accent); padding: 12px 14px; font-size: 12px; line-height: 1.45; font-weight: 600; }
+  #app .lbsplit { padding: 6px 4px 8px; font-size: 12px; font-weight: 700; letter-spacing: .09em; color: var(--muted-soft); }
 
   /* ── 5. Counted habits get a segmented meter, not a straight bar ── */
   #app .segbar { display: flex; gap: 3px; width: 100%; margin-top: 4px; }
@@ -2264,12 +2271,12 @@
   #app .tabs[hidden] { display: none; }
   #app .lbwrap { background: var(--card); box-shadow: var(--shadow); padding: 10px 8px 10px; }
   #app .lbhd { align-items: center; padding: 2px 6px 8px; }
-  #app .lbhd .h { font-size: 15px; }
+  #app .lbhd .h { font-size: 16px; }
   #app .lbhd .chips { display: flex; gap: 6px; }
-  #app .lbhd .chip { min-height: 32px; padding: 0 12px; font-size: 12.5px; }
+  #app .lbhd .chip { min-height: 32px; padding: 0 12px; font-size: 12px; }
   #app .lbrow { margin: 0; border-radius: 0; box-shadow: none; background: none; border-top: 1px solid var(--rule); padding: 10px 8px; }
   #app .lbrow:first-of-type, #app .passline + .lbrow { border-top: 0; }
-  #app .lbrow.me { border-radius: 14px; border-top-color: transparent; }
+  #app .lbrow.me { border-radius: 12px; border-top-color: transparent; }
   #app .lbrow.me + .lbrow { border-top-color: transparent; }
   #app .lbxp, body[data-dark] #app .lbxp { color: var(--ink); }
   #app .lbrow.me .lbxp { color: #fff; }
@@ -2282,11 +2289,11 @@
   #app .lbleave.armed { border-color: var(--clay); color: var(--clay-deep); }
   #app .ph-ring { background: conic-gradient(#8B7CFF var(--p,0%), rgba(246,244,255,.16) 0); }
   #app .ph-rank b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-  @media (max-width: 359px) { #app .ph-rank b { font-size: 17px; } }
+  @media (max-width: 359px) { #app .ph-rank b { font-size: 16px; } }
   /* ── THE MANUAL FOLDS, THE TOUR'S BUTTONS (2026-10-12, the UX audit's batch E) ── */
   #app .mantog { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; text-align: left;
     background: none; border: 0; padding: 0; color: inherit; cursor: pointer; }
-  #app .mantog .chev { flex: none; font-size: 22px; color: var(--accent); transition: transform .2s ease; }
+  #app .mantog .chev { flex: none; font-size: 20px; color: var(--accent); transition: transform .2s ease; }
   #app .mantog.on .chev { transform: rotate(90deg); }
   #app .mansec:not(.open) > :not(.manh2) { display: none !important; }
   #app .mansec:not(.open) .manh2 { margin-bottom: 0; }
@@ -3035,7 +3042,7 @@ function titleMetalKey(p) {
 function titlePlate(p, small) {
   const m = METALS[titleMetalKey(p)];
   return '<span style="display:inline-flex;vertical-align:middle;padding:' + (small ? 1.5 : 2.5) + 'px;border-radius:999px;background:' + m.rim + '">'
-       + '<span style="border-radius:999px;background:#231F35;color:' + (titleMetalKey(p) === 'prisma' ? '#CBC6E4' : m.ink) + ';font-weight:800;font-size:11px;letter-spacing:' + (small ? '.08em' : '.13em') + ';padding:' + (small ? '3px 8px' : '8px 13px') + ';white-space:nowrap;text-transform:uppercase">' + esc(p.name) + '</span></span>';
+       + '<span style="border-radius:999px;background:#231F35;color:' + (titleMetalKey(p) === 'prisma' ? '#CBC6E4' : m.ink) + ';font-weight:800;font-size:12px;letter-spacing:' + (small ? '.08em' : '.13em') + ';padding:' + (small ? '3px 8px' : '8px 13px') + ';white-space:nowrap;text-transform:uppercase">' + esc(p.name) + '</span></span>';
 }
 // ── Medals ── milestones as emblems: metal rim by tier, habit-tint disc, the
 // habit's own emoji in the middle. Events wear the prismatic rim.
@@ -5756,11 +5763,11 @@ function renderInstall() {
         <img src="/assets/img/icon-192.png" alt="" width="54" height="54"
              style="width:54px;height:54px;flex:none;display:block;border:1px solid var(--rule)">
         <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
-          <span class="hd" style="font-size:23px;line-height:1">AA Proof</span>
-          <span class="mono" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">On your home screen</span>
+          <span class="hd" style="font-size:20px;line-height:1">AA Proof</span>
+          <span class="mono" style="font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">On your home screen</span>
         </span>
       </div>
-      <div style="font-size:13.5px;line-height:1.55">
+      <div style="font-size:14px;line-height:1.55">
         ${how}
         Nothing to download. It is this, kept where you can reach it.
       </div>
@@ -7196,7 +7203,7 @@ function renderOnboarding() {
       <div style="flex:1;display:flex;flex-direction:column;padding-top:26px;overflow:hidden;animation:riseIn .3s ease">
         <!-- The one screen where using their name actually lands: it is the
              first thing they ever see, and it is a coach talking to a person. -->
-        <div class="hd" style="font-size:38px;line-height:.98;letter-spacing:-.03em">${(ATHLETE.firstName || '').trim()
+        <div class="hd" style="font-size:40px;line-height:.98;letter-spacing:-.03em">${(ATHLETE.firstName || '').trim()
           ? esc(ATHLETE.firstName.trim()) + ',<br>here is what<br>I\'d track'
           : 'Here\'s what<br>I\'d track'}</div>
         <p style="margin:14px 0 4px;font-size:14px;color:var(--muted)">
@@ -7206,14 +7213,14 @@ function renderOnboarding() {
           <div class="eyebrow" style="display:flex;justify-content:space-between;gap:12px;padding:18px 0 8px;border-bottom:2px solid var(--divider)">
             <span>The five</span><span>Everyone tracks these</span>
           </div>
-          <div style="padding:10px 0 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
+          <div style="padding:10px 0 12px;font-size:12px;line-height:1.5;color:var(--muted)">
             These are the same for every athlete on the board, which is what makes a day
             score mean the same thing for all of you. There is no off switch.
           </div>
           ${core.map(h => `<div class="row-rule" style="padding:13px 2px;display:flex;justify-content:space-between;align-items:center;gap:12px">
             <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
               <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
-              <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
+              <span style="font-size:12px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
               <!-- This screen used to sell WORKOUT as a normal habit worth more
                    points than any other, switch already on, and say nothing
                    about the padlock waiting on the next screen. For a free
@@ -7227,7 +7234,7 @@ function renderOnboarding() {
                    only my coached athletes can reach" — so an onboarding line
                    suggesting they switch it off to reach 100% would quietly
                    undo the one honest thing the funnel says. -->
-              ${h.locked ? `<span style="font-size:11px;line-height:1.35;color:var(--muted)">${isFree()
+              ${h.locked ? `<span style="font-size:12px;line-height:1.35;color:var(--muted)">${isFree()
                 ? 'Locked. This is the one that comes with a programme. It stays on your list, and it stays a padlock.'
                 : 'Locked. You cannot tick this one. Finishing a session in your programme ticks it for you.'}</span>` : ''}
             </span>
@@ -7241,7 +7248,7 @@ function renderOnboarding() {
                not a free bonus, it is a habit that counts against you the
                moment it is on. Better said before they pick than discovered
                on the first day one of them costs points. -->
-          <div style="padding:10px 0 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
+          <div style="padding:10px 0 12px;font-size:12px;line-height:1.5;color:var(--muted)">
             Optional, and worth real points on top of the five. <strong style="color:var(--ink)">They
             start off</strong>. Switch on only what you will actually do, because
             <strong style="color:var(--ink)">once one is on it counts</strong> and missing it costs you
@@ -7251,7 +7258,7 @@ function renderOnboarding() {
             ${on(() => { CFG.on[h.id] = CFG.on[h.id] === false; saveCfg(); render(); })}>
             <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
               <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
-              <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
+              <span style="font-size:12px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
             </span>
             <span class="sw ${CFG.on[h.id] !== false ? 'on' : ''}"><i></i></span>
           </button>`).join('')}
@@ -7266,14 +7273,14 @@ function renderOnboarding() {
           <div class="eyebrow" style="display:flex;justify-content:space-between;gap:12px;padding:22px 0 8px;border-bottom:2px solid var(--divider)">
             <span>Your own</span><span>${XP_RULES.customXp} XP a day</span>
           </div>
-          <div style="padding:10px 0 12px;font-size:11.5px;line-height:1.5;color:var(--muted)">
+          <div style="padding:10px 0 12px;font-size:12px;line-height:1.5;color:var(--muted)">
             Anything you want to hold yourself to, like no screens in bed or ten minutes of reading.
             It scores like everything else, and you can keep up to ${MAX_CUSTOM} of them.
           </div>
           ${customRoom() ? `<div style="display:flex;gap:8px;padding-bottom:2px">
             <input class="input" id="newhabit" maxlength="40" placeholder="e.g. No screens in bed" value="${esc(UI._newName || '')}" style="flex:1">
             <button class="btn btn-primary" style="padding:0 16px" ${on(addCustomHabit)}>Add</button>
-          </div>` : `<div style="padding-bottom:2px;font-size:11.5px;color:var(--muted)">That is all ${MAX_CUSTOM} of your own. Remove one to make room.</div>`}
+          </div>` : `<div style="padding-bottom:2px;font-size:12px;color:var(--muted)">That is all ${MAX_CUSTOM} of your own. Remove one to make room.</div>`}
           <!-- Their own habits get the ✕ here as well as in Settings: this is
                the screen where the typo happens, so it is the screen that has
                to be able to undo it. A row with two controls cannot be one big
@@ -7282,7 +7289,7 @@ function renderOnboarding() {
           ${customs.map(h => `<div class="row-rule" style="padding:13px 2px;display:flex;justify-content:space-between;align-items:center;gap:12px">
             <span style="display:flex;flex-direction:column;gap:3px;min-width:0">
               <span class="hd" style="font-size:16px;line-height:1">${esc(h.name)}</span>
-              <span style="font-size:11px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
+              <span style="font-size:12px;line-height:1.2;color:var(--muted)">${esc(h.goal || h.source)} · ${baseXp(h)} XP</span>
             </span>
             <span style="display:flex;gap:10px;align-items:center">
               <button class="mono" style="font-size:12px;color:var(--clay-deep);padding:4px 6px"
@@ -8034,7 +8041,7 @@ function fitRankName(root) {
   const hd = root.querySelector('.hero-lv .ranklink .hd');
   if (!hd) return;
   const link = hd.closest('.ranklink'), over = () => link.scrollWidth > link.clientWidth + 0.5;
-  let px = 17;
+  let px = 16;
   link.classList.remove('tight', 'tighter');
   hd.style.fontSize = px + 'px';
   while (px > 13 && over()) hd.style.fontSize = (--px) + 'px';
@@ -8185,7 +8192,7 @@ function renderNoteBox() {
     // The join box lives on the OTHER view of this tab, so that is where it goes.
     return `<div class="rccomp" data-k="notejoin">
       <div class="eyebrow" style="letter-spacing:.12em">Roll call</div>
-      <div style="font-size:13.5px;line-height:1.5;color:#CBC6E4">
+      <div style="font-size:14px;line-height:1.5;color:#CBC6E4">
         Every athlete gets one sentence a day, and everyone else sees it. Join the
         board and you can leave yours. It uses the same name and nothing more.
       </div>
@@ -8257,12 +8264,12 @@ function renderToday(LI, doneCount) {
         <div class="hero-top">
           <button class="lvring" data-k="lvring" ${on(() => go('pass'))} aria-label="Open the Locker. The ladder and the rewards">
             <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rail" cx="18" cy="18" r="15.5"></circle><circle class="run" cx="18" cy="18" r="15.5" style="stroke-dashoffset:${(97.4 * (1 - LI.pct / 100)).toFixed(1)}"></circle></svg>
-            <span class="in"><span class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:${LI.lv > 99 ? 15 : 18}px;line-height:1">${LI.lv}</span><span class="lbl">LEVEL</span></span>
+            <span class="in"><span class="figure" data-hero data-static data-num="lv" data-to="${LI.lv}" style="font-size:${LI.lv > 99 ? 16 : 20}px;line-height:1">${LI.lv}</span><span class="lbl">LEVEL</span></span>
           </button>
           <div class="herobody">
             <button class="ranklink" ${on(() => go('pass'))} aria-label="Open the Locker. The ladder and the rewards">
               ${rankCrest(LI.rank, 20)}
-              <span class="hd" style="font-size:17px;line-height:1">${esc(LI.label)}</span>
+              <span class="hd" style="font-size:16px;line-height:1">${esc(LI.label)}</span>
               <span class="go">›</span>
             </button>
             <div class="heroxp"><b>${esc(String(LI.toNext).replace(/\B(?=(\d{3})+(?!\d))/g, ','))}</b> XP to level ${LI.lv + 1}</div>
@@ -8312,7 +8319,7 @@ function renderToday(LI, doneCount) {
               ? 'New: five steps on what the buttons in here do.'
               : 'Want the five-step tour of what everything does?'}</span>
           </span>
-          <span class="hd" style="font-size:19px;color:var(--accent);flex:none">→</span>
+          <span class="hd" style="font-size:20px;color:var(--accent);flex:none">→</span>
         </button>`}
 
       ${isFree() ? `<div class="crosslink-wrap">
@@ -8342,7 +8349,7 @@ function questLine(run) {
       <span class="eyebrow">This week's quests</span>
       <span class="rcq">${done} of ${qs.length} done · ${done === qs.length ? 'all cleared' : onOffer.toLocaleString() + ' XP on the table'} · ${left > 1 ? left + ' days left' : 'last day'}</span>
     </span>
-    <span class="hd" style="font-size:19px;color:var(--accent);flex:none">→</span>
+    <span class="hd" style="font-size:20px;color:var(--accent);flex:none">→</span>
   </button>`;
 }
 
@@ -8628,7 +8635,7 @@ function renderProgress(LI, earned, totalAch) {
           + `<button class="msall" data-k="msall" ${on(flip)}><span>All ${total} milestones</span><span class="go">›</span></button>`;
       })()}
 
-      <div style="padding:18px 20px 12px;font-size:11px;line-height:1.5;color:var(--muted-soft)">
+      <div style="padding:18px 20px 12px;font-size:12px;line-height:1.5;color:var(--muted-soft)">
         The ring at the end of a habit's row is your level in it. It climbs with how often you do it, not how hard it is, and the ring is how far through that level you are. Tap a habit for its consistency tiers, from a 5-day streak up to two months.
       </div>
       <!-- A second door to the manual, on the screen that uses the most words
@@ -8694,7 +8701,7 @@ function renderDetail(h) {
         </div>
         ${h.locked
           ? `<div style="display:flex;flex-direction:column;gap:10px">
-               <div style="font-size:13px;line-height:1.5;color:var(--muted)">${esc((isFree() && h.freeHint) || h.lockedHint || '')}</div>
+               <div style="font-size:14px;line-height:1.5;color:var(--muted)">${esc((isFree() && h.freeHint) || h.lockedHint || '')}</div>
                <button class="btn btn-primary btn-block" ${on(() => (isFree() ? (window.location.href = '/form.html') : goProgram()))}>${isFree() ? 'See about coaching' : 'Open your programme'}</button>
              </div>`
           : h.kind === 'count'
@@ -8704,7 +8711,7 @@ function renderDetail(h) {
               <button class="btn btn-secondary dt-sq" aria-label="One more" ${on(() => bump(h))}>+</button>
             </div>`
           : `<button class="btn ${done ? 'btn-secondary' : 'btn-primary'} btn-block" ${on(() => toggleHabit(h))}>${done ? 'Undo ' + (editingPast() ? esc(dayLong(AKEY()).toLowerCase()) : 'today') : 'Mark done'}</button>`}
-        <div style="font-size:11px;color:var(--muted-soft)">Worth ${baseXp(h)} XP a day · ${Math.round(baseXp(h) * XP_RULES.completionBonus)} XP when you finish it</div>
+        <div style="font-size:12px;color:var(--muted-soft)">Worth ${baseXp(h)} XP a day · ${Math.round(baseXp(h) * XP_RULES.completionBonus)} XP when you finish it</div>
       </div>
 
       <div class="block" style="display:flex;flex-direction:column;gap:10px">
@@ -8732,7 +8739,7 @@ function renderDetail(h) {
           <span>Consistency</span><span>${con.tier} of ${con.total}</span>
         </div>
         <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < con.tier ? 'on' : ''}" title="${t.days} days · ${tierXp(h, i)} XP"></i>`).join('')}</div>
-        <div style="font-size:12.5px;line-height:1.5;color:var(--muted)">
+        <div style="font-size:12px;line-height:1.5;color:var(--muted)">
           ${con.next
             ? 'Next: <strong style="color:var(--ink)">' + esc(con.next.name) + '</strong> at a ' + con.next.days
               + '-day streak · <strong style="color:var(--clay-deep)">+' + tierXp(h, con.tier) + ' XP</strong>'
@@ -8746,9 +8753,9 @@ function renderDetail(h) {
       <div class="block dt-level">
         ${habitRing(hl)}
         <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
-          <div class="hd" style="font-size:15px;line-height:1.1">Level ${hl.lv} · ${esc(hl.label)}</div>
+          <div class="hd" style="font-size:16px;line-height:1.1">Level ${hl.lv} · ${esc(hl.label)}</div>
           <div style="font-size:12px;line-height:1.3;color:var(--muted)"><span data-static data-num="hxp:${h.id}" data-to="${hl.xp}">${hl.xp.toLocaleString()}</span> XP banked · ${hl.toNext} to level ${hl.lv + 1}</div>
-          <div style="font-size:13px;line-height:1.4;color:var(--muted)">${esc(QUIPS[h.id] || h.goal || '')}</div>
+          <div style="font-size:14px;line-height:1.4;color:var(--muted)">${esc(QUIPS[h.id] || h.goal || '')}</div>
         </div>
       </div>
 
@@ -8756,14 +8763,14 @@ function renderDetail(h) {
         ${logRows.length ? logRows.map(l => `<div class="row-rule" style="padding:13px 20px;display:flex;justify-content:space-between;align-items:baseline;gap:12px">
           <span style="display:flex;flex-direction:column;gap:3px">
             <span class="hd" style="font-size:14px;line-height:1">${esc(l.day)}</span>
-            <span style="font-size:11px;line-height:1;color:var(--muted)">${esc(l.note)}</span>
+            <span style="font-size:12px;line-height:1;color:var(--muted)">${esc(l.note)}</span>
           </span>
           <span style="text-align:right">
-            <span class="mono" style="display:block;font-size:11px;font-weight:700;color:${l.hit ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${l.val}</span>
-            <span class="mono" style="display:block;font-size:11px;color:var(--muted-soft);margin-top:3px">${l.pre ? 'BEFORE THE SEASON' : '+' + l.xp + ' XP'}</span>
+            <span class="mono" style="display:block;font-size:12px;font-weight:700;color:${l.hit ? 'var(--clay-deep)' : 'var(--muted-soft)'}">${l.val}</span>
+            <span class="mono" style="display:block;font-size:12px;color:var(--muted-soft);margin-top:3px">${l.pre ? 'BEFORE THE SEASON' : '+' + l.xp + ' XP'}</span>
           </span>
         </div>`).join('')
-        : `<div style="padding:16px 20px;font-size:12.5px;line-height:1.5;color:var(--muted)">
+        : `<div style="padding:16px 20px;font-size:12px;line-height:1.5;color:var(--muted)">
             No days behind you yet. Once there are, the last five sit here with what each one earned.
           </div>`}
       </div>
@@ -8808,7 +8815,7 @@ function renderLibOffer() {
       <span class="eyebrow">${esc(did)}</span>
       <span class="rcq">A workout you finished counts towards this habit, but you are not tracking it yet. Turn it on and it pays.</span>
     </span>
-    <span class="hd" style="font-size:19px;color:var(--accent);flex:none">&rarr;</span>
+    <span class="hd" style="font-size:20px;color:var(--accent);flex:none">&rarr;</span>
   </button>`;
 }
 
@@ -8832,7 +8839,7 @@ function renderBoardNotice() {
         <b>${esc(CFG.boardName || defaultDisplayName())}</b>, your level and your rank.
         Leave any time in Settings.</span>
     </span>
-    <span class="hd" style="font-size:19px;color:var(--accent);flex:none">&rarr;</span>
+    <span class="hd" style="font-size:20px;color:var(--accent);flex:none">&rarr;</span>
   </button>`;
 }
 
@@ -8857,7 +8864,7 @@ function renderCrew() {
   if (LB.loading && !LB.rows.length) {
     body = `<div style="padding:26px 20px;display:flex;align-items:center;gap:12px">
       <span class="spinner" style="width:22px;height:22px;border-width:2px"></span>
-      <span style="font-size:13px;color:var(--muted)">Scoring everyone…</span></div>`;
+      <span style="font-size:14px;color:var(--muted)">Scoring everyone…</span></div>`;
   } else if (LB.error === 'demo') {
     body = boardNote('The leaderboard is live for real athletes only. The demo has nobody to compete with.');
   } else if (LB.error === 'notdeployed') {
@@ -8930,7 +8937,7 @@ function renderRollCall() {
   if (RC.loading && !RC.rows.length) {
     return `<div style="padding:26px 20px;display:flex;align-items:center;gap:12px">
       <span class="spinner" style="width:22px;height:22px;border-width:2px"></span>
-      <span style="font-size:13px;color:var(--muted)">Reading the wall…</span></div>`;
+      <span style="font-size:14px;color:var(--muted)">Reading the wall…</span></div>`;
   }
   if (RC.error === 'demo')        return boardNote('The wall is live for real athletes only. The demo has nobody to talk to.');
   if (RC.error === 'notdeployed') return boardNote('Roll call is not switched on yet. Your coach needs to run the migration. Nothing is wrong with your app.');
@@ -9008,7 +9015,7 @@ function rollLine(r, i) {
   </div>`;
 }
 function boardNote(text) {
-  return `<div style="padding:24px 20px;font-size:13px;line-height:1.55;color:var(--muted)">${esc(text)}</div>`;
+  return `<div style="padding:24px 20px;font-size:14px;line-height:1.55;color:var(--muted)">${esc(text)}</div>`;
 }
 // ── One standing, as a card ───────────────────────────────────────────────
 // Amir picked this shape out (2026-08-01): medal or place, a face, the name,
@@ -9067,7 +9074,7 @@ function renderBoardJoin() {
     return `
       <div class="block" data-k="join" data-tour="join" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
         <div class="hd" style="font-size:20px;line-height:1">You go on after your first session</div>
-        <div style="font-size:13px;line-height:1.5;color:var(--muted)">
+        <div style="font-size:14px;line-height:1.5;color:var(--muted)">
           Everyone training with me is on the board. Finish your first session in the programme app and you appear here as <b style="color:var(--ink)">${esc(nm)}</b>, with your points, your rank and the title you wear. No habits, no logs, no real name unless you use it. Rename or leave any time after.
         </div>
         <div style="display:flex;gap:8px">
@@ -9089,14 +9096,14 @@ function renderBoardJoin() {
     return `
       <div class="block" data-k="join" data-tour="join" style="border-top:2px solid var(--divider);display:flex;flex-direction:column;gap:12px">
         <div class="hd" style="font-size:20px;line-height:1">Join the board</div>
-        <div style="font-size:13px;line-height:1.5;color:var(--muted)">
+        <div style="font-size:14px;line-height:1.5;color:var(--muted)">
           Other athletes will see the name you pick here, your points, your rank and the title you wear. No habits, no logs, no real name unless you use it. You can leave any time.
         </div>
         <div style="display:flex;gap:8px">
           <input class="input" id="boardname" maxlength="24" placeholder="${esc(defaultDisplayName())}" value="${esc(LB.nameDraft)}" style="flex:1">
           <button class="btn btn-primary" style="padding:0 16px" ${on(() => joinBoard(LB.nameDraft.trim(), true))}>Join</button>
         </div>
-        <div style="font-size:11px;color:var(--muted-soft)">Leave it blank to appear as ${esc(defaultDisplayName())}.</div>
+        <div style="font-size:12px;color:var(--muted-soft)">Leave it blank to appear as ${esc(defaultDisplayName())}.</div>
       </div>`;
   }
   return `
@@ -9160,7 +9167,7 @@ function renderManual() {
            offers to just SHOW them instead. -->
       ${block(h2('Start here') +
         p(`Four things and you have the whole app.`) +
-        `<div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.55;color:var(--muted);margin-bottom:14px">
+        `<div style="display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.55;color:var(--muted);margin-bottom:14px">
           <div>▸ <strong style="color:var(--ink)">Every habit row takes three different taps.</strong> The
             <strong style="color:var(--ink)">circle</strong> logs it. On a habit you count it opens the number with the target
             filled in: save it, or type what you really did. The <strong style="color:var(--ink)">name</strong>
@@ -9198,9 +9205,9 @@ function renderManual() {
           ${hs.map(h => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0">
             <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
               <span class="hd" style="font-size:14px;line-height:1">${esc(h.name)}</span>
-              <span style="font-size:11px;color:var(--muted)">${esc(h.goal || h.source)}</span>
+              <span style="font-size:12px;color:var(--muted)">${esc(h.goal || h.source)}</span>
             </span>
-            <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap">${baseXp(h)} <span style="font-size:11px;color:var(--muted-soft)">XP</span></span>
+            <span class="mono" style="font-size:14px;font-weight:700;white-space:nowrap">${baseXp(h)} <span style="font-size:12px;color:var(--muted-soft)">XP</span></span>
           </div>`).join('')}
         </div>` +
         `<div style="height:12px"></div>` +
@@ -9209,7 +9216,7 @@ function renderManual() {
         p(`There is a ceiling on what a counter will take in one day: <strong style="color:var(--ink)">${XP_RULES.dailyCap}× the target</strong>${steps ? `, so ${fmtVal(steps, steps.target * XP_RULES.dailyCap)} steps` : ''}. Going past your target never paid extra anyway; the ceiling is there so a stuck thumb on the + button cannot hand you a quest you did not walk.`))}
 
       ${block(h2('How to earn more') +
-        `<div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.55;color:var(--muted)">
+        `<div style="display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.55;color:var(--muted)">
           <div>▸ <strong style="color:var(--ink)">Train.</strong> It is worth more than anything else on the list. You cannot tick it here. ${isFree()
             ? `it unlocks when you are on a coaching programme, and then it ticks itself every time you finish a session.`
             : `finish a session in your programme and it ticks itself, whether you got through all of it or not.`}</div>
@@ -9225,7 +9232,7 @@ function renderManual() {
         p(`There are <strong style="color:var(--ink)">${RANKS.length} ranks with ${SUBS_PER_RANK} levels each</strong>. Level ${SUBS_PER_RANK + 1} makes you ${esc(rankFor(SUBS_PER_RANK + 1).label)}, level 20 is ${esc(rankFor(20).label)}. Every rank has its own insignia. <strong style="color:var(--ink)">tap your rank anywhere in the app</strong> to see the whole ladder and what each one costs.`) +
         `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
           ${RANKS.map(r => `<span style="display:flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid var(--rule);color:var(--muted)">
-            ${rankIcon(r, 14, 'stroke-width:2.4')}<span class="mono" style="font-size:11px;letter-spacing:.04em">${esc(r)}</span>
+            ${rankIcon(r, 14, 'stroke-width:2.4')}<span class="mono" style="font-size:12px;letter-spacing:.04em">${esc(r)}</span>
           </span>`).join('')}
         </div>` +
         p(`Past level ${RANKS.length * SUBS_PER_RANK} you start again carrying a star (${esc(rankFor(RANKS.length * SUBS_PER_RANK + 1).label)}), and there is no ceiling after that.`) +
@@ -9256,9 +9263,9 @@ function renderManual() {
             ${qs.map(q => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0">
               <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
                 <span class="hd" style="font-size:14px;line-height:1">${esc(q.title)}</span>
-                <span style="font-size:11px;color:var(--muted)">${esc(q.note)}</span>
+                <span style="font-size:12px;color:var(--muted)">${esc(q.note)}</span>
               </span>
-              <span class="mono" style="font-size:13px;font-weight:700;white-space:nowrap">+${q.xp}</span>
+              <span class="mono" style="font-size:14px;font-weight:700;white-space:nowrap">+${q.xp}</span>
             </div>`).join('')}
           </div>` +
           `<div style="height:12px"></div>` +
@@ -9306,7 +9313,7 @@ function renderManual() {
           ${CONSISTENCY_TIERS.map((t, i) => `<div class="row-rule" style="display:flex;justify-content:space-between;align-items:baseline;padding:9px 0">
             <span class="hd" style="font-size:14px">${esc(t.name)}</span>
             <span style="display:flex;gap:10px;align-items:baseline;white-space:nowrap">
-              <span class="mono" style="font-size:11px;color:var(--muted)">${t.days} DAYS IN A ROW</span>
+              <span class="mono" style="font-size:12px;color:var(--muted)">${t.days} DAYS IN A ROW</span>
               <span class="mono" style="font-size:12px;font-weight:700;color:var(--clay-deep)">+${tierXp(live()[0] || HABITS[0], i)}</span>
             </span>
           </div>`).join('')}
@@ -9441,7 +9448,7 @@ function renderPass() {
     const isOn = eqC.id === p.id;
     return `<button data-k="rw:${p.id}" style="flex:none;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;padding:0;cursor:pointer;font-family:inherit" ${on(() => wear(p))}>
       <span style="width:48px;height:60px;border-radius:12px;${CARD_LOOK[p.id] || CARD_LOOK.c_paper};${isOn ? 'box-shadow:0 0 0 2.5px var(--accent),0 6px 14px -6px rgba(108,92,231,.8);' : ''}"></span>
-      <span style="font-size:11px;font-weight:${isOn ? 800 : 700};letter-spacing:.02em;color:${isOn ? 'var(--accent)' : 'var(--muted)'}">${esc(p.name)}${isOn ? ' ✓' : ''}</span></button>`;
+      <span style="font-size:12px;font-weight:${isOn ? 800 : 700};letter-spacing:.02em;color:${isOn ? 'var(--accent)' : 'var(--muted)'}">${esc(p.name)}${isOn ? ' ✓' : ''}</span></button>`;
   };
 
   // ── The track ───────────────────────────────────────────────────────────
@@ -9579,7 +9586,7 @@ function renderPass() {
         </span>
         <span class="lo-body">
           <span class="lo-line">${eqT ? 'Wearing ' + titlePlate(eqT, true) : 'No title'} on the <strong style="color:var(--ink)">${esc(eqC.name)}</strong> skin. The crew sees your title; the skin is yours alone.</span>
-          <button class="btn btn-primary" style="padding:9px 16px;font-size:12.5px" ${on(() => openShare('rank'))}>Share it →</button>
+          <button class="btn btn-primary" style="padding:9px 16px;font-size:12px" ${on(() => openShare('rank'))}>Share it →</button>
         </span>
       </div>
 
@@ -9593,7 +9600,7 @@ function renderPass() {
         <span class="lo-rl">CARD SKINS · ${myCards.length} OF ${cards.length}</span>
         <div class="rail">${myCards.map(skinBtn).join('')}</div>
       </div>
-      <div style="padding:8px 20px 2px;font-size:11px;line-height:1.45;color:var(--muted-soft)">The title you wear rides on the board, the wall and your card${eqT ? '. Tap it again to show none' : ''}.</div>
+      <div style="padding:8px 20px 2px;font-size:12px;line-height:1.45;color:var(--muted-soft)">The title you wear rides on the board, the wall and your card${eqT ? '. Tap it again to show none' : ''}.</div>
 
       <!-- ── SEASONS ────────────────────────────────────────────────────────
            Only once there IS one. A heading over an empty box on the screen a
@@ -9628,7 +9635,7 @@ function renderPass() {
       <button class="msall" data-k="roadall" ${on(flipRoad)}>${roadOpen
         ? '<span>Show the next three only</span><span class="go">‹</span>'
         : `<span>The whole road to level ${RANKS.length * SUBS_PER_RANK}</span><span class="go">›</span>`}</button>
-      <div style="margin:10px 16px 14px;border-radius:16px;background:var(--surface);padding:11px 14px;font-size:11.5px;line-height:1.5;color:var(--accent);font-weight:600">A new season resets your points, never this shelf. Everything here is kept for good.</div>
+      <div style="margin:10px 16px 14px;border-radius:20px;background:var(--surface);padding:11px 14px;font-size:12px;line-height:1.5;color:var(--accent);font-weight:600">A new season resets your points, never this shelf. Everything here is kept for good.</div>
 
       <div style="padding:0 20px 34px">
         <button class="btn btn-secondary btn-block" ${on(() => openManual('The Locker', 'pass'))}>How rewards work</button>
@@ -9797,7 +9804,7 @@ function renderShareSheet() {
     <div class="scrim" data-k="scrim:share" ${on(() => { UI.share = null; render(); })}></div>
     <div class="sheet sharesheet" data-k="sharesheet">
         <div class="sharehd">
-          <span class="hd" style="font-size:19px">Share your proof</span>
+          <span class="hd" style="font-size:20px">Share your proof</span>
           <button class="sharex" ${on(() => { UI.share = null; render(); })} aria-label="Close">&#10005;</button>
         </div>
         <div id="sharepwrap" class="sharepwrap" style="aspect-ratio:${dim[0]} / ${dim[1]}">
@@ -10397,7 +10404,7 @@ function renderSettings() {
       <button class="profcard" ${on(() => go('pass'))} aria-label="Open the Locker">
         <span class="profav">${esc(initials)}</span>
         <span class="navmid">
-          <span class="navnm" style="font-size:17px">${esc(ATHLETE_NAME || 'Athlete')}</span>
+          <span class="navnm" style="font-size:16px">${esc(ATHLETE_NAME || 'Athlete')}</span>
           <!-- A free athlete is not coached by anyone, and telling them they are
                is the first line of the first screen behind their own initials. -->
           <span class="navsub">Day ${dayNumber()} · ${esc(LI.label)} · ${esc(isFree() ? 'AA Proof · free' : 'Coached by Amir')}</span>
