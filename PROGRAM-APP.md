@@ -906,7 +906,8 @@ tints, the running bar, labels, and so it marked nothing. Now:
   the numbers in a week note's headline (Front Page, 2026-10-12: *RPE 7*, *One set fewer*), and the same numbers on
   the session bar's limits row (*Max RPE 7 · 1 set fewer*; only the numbers, light clay `#E06B43` on the green bar
   since Centre Court, the words white and the label a paler white),
-  and the one number on a dark Home card (*Week 2*, the habits row's *2 to go*). The Library's Playbook door keeps its clay: it is a brand tile, not a signal.
+  the one number on a dark Home card (*Week 2*, the habits row's *2 to go*), and the fault cue's bar in How to do it (the one fault, written
+  fault-then-fix, CUE-7: Amir, 2026-10-12, Centre Court round 2: *"3 clay"*; it was red `#E74C3C`). The Library's Playbook door keeps its clay: it is a brand tile, not a signal.
 - **Green or grey for everything else**: every block's title, stripe and done tint are the same green (warm-up
   and power were clay and strength green, and a block the app did not recognise took its colour from its
   position, so *Core* was clay because it was third; `blockClass()` still names the type for the code); the
@@ -980,7 +981,7 @@ dashboard do not change.
   Fills and anything 18.66 px bold or more keep `#C7552F`; in dark only clay TEXT moves to `#E06B43` (`--clay-ink`),
   `--clay` stays the brand fill (the note's dot, the fault cue's bar). `--g` is the gutter: 20 px, 16 under 360. The panel is **full-bleed**: `.day-content` has no side padding (the rail's 32 px went with the rail).
 - **The cover** (D's P4): the day's photo graded into the green, ← and the moon as 44 px glass buttons, the
-  *● DAY 1* eyebrow (a mint dot), the focus in 44 px capitals, and what the day builds as tiles with a › (each still opens its
+  *● DAY 1* eyebrow (dot and words mint since round 2), the focus in 44 px capitals, and what the day builds as tiles with a › (each still opens its
   quality, `paintDayQualities()`; the first is white). About 270 px at 390. *N blocks · M movements* is hidden.
   `dayCardHTML()` draws Home's cards too, so the cover is CSS on `#day-view-card` only: its markup is unchanged.
   The focus keeps every word whole (no mid-word break) and is `clamp(32px, 11.3vw, 44px)`; its 900 face is also our own
@@ -999,25 +1000,39 @@ dashboard do not change.
   never a cut-off sliver under the bar.
 - **The cards** (section 7 of the block, Centre Court 2/3). No card is a box any more: a row on the paper, a
   hairline from the name column between rows, no white, no shadow, no stripe, no press scale.
-  - **Closed**: the tick-all ring (30 px drawn, 44 to hit) with the **exercise's number inside it** (Amir: *"exercise
-    number inside the circle"*). `.ex-num` stays in `.item-name-row` in the DOM; CSS lays it on the ring with
-    `pointer-events: none`, so a tap on it is a tap on `.check-box`. Then the name (18 px), the line of numbers (15 px,
-    the dose bold, the tempo's hot digits clay), the intent pill, and the ⓘ: a plain one is a 22 px grey ring, a Because
-    the 28 px clay disc. A row with no ⓘ (a circuit, a simple item) shows a grey ›.
-  - **Done**: a receipt. The ring fills green with a white tick (the number steps aside), the name 15 px grey, what was
+  - **Closed: the number is the tick** (round 2, P24; Amir: *"i want to use p24 to number the exercises, so if the exercise
+    is done, the number would turn green meaning its done"*). The left column holds the exercise's number as a big
+    OUTLINED numeral, zero-padded (*01*, *06*, *10*: `renderExercise()` and `renderCircuit()` write
+    `String(num).padStart(2, '0')`; nothing reads `.ex-num`'s text): Barlow Condensed 900, 32 px, no fill, a 1.5 px
+    `--green-ink` stroke (mint in dark). `.ex-num` stays in `.item-name-row` in the DOM: that row is a baseline flex, so the
+    numeral sits on the name's first line (dropped 4 px so its middle meets the middle of the name's capitals), pulled into
+    the 44 px column by a -56 px margin, with `pointer-events: none`. Under it `.check-box` draws nothing any more (the ring
+    and its white ✓ are gone): it is the invisible tap target, the whole height of the row's left column, and a tap ticks
+    everything as before (`onCheckBoxTap()`; a first-timer's tap on a lift still opens it). It keeps its focus outline.
+    Then the name (18 px), the line of numbers (15 px, the dose bold, the tempo's hot digits clay), the intent pill.
+  - **A row shows that it opens and closes** (round 2; Amir: *"how can we show in a way that these exercises are clickable?
+    and then can be clicked back to make it small?"*): a drawn chevron (CSS mask, 18 px, `--chev-down`) in the right column
+    on the NAME line, grey ⌄ on a closed row. The ⓘ moves under it to the numbers line, its centre 28 px below the
+    chevron's (a plain ⓘ is a 22 px grey ring, a Because the 28 px clay disc, both 44 px to hit); a row with no ⓘ has just
+    the chevron. The chevron is `.item-main::after`, not a button: the whole row is the tap (`onExerciseRowTap()`), and it
+    lets taps through to the ⓘ. Open, it turns up: a white ⌃ top right of the green head (on a lift's eyebrow line, the ⓘ
+    on the name line under it; on a circuit's or a Library exercise's name line), a grey ⌃ on a warm-up's paper. A done
+    row shows no chevron and keeps its ⓘ centred (a tap still opens it). The closed line of numbers no longer runs under
+    the ⓘ (the old -40 px). `smoke.js` measures every closed row at 390, 390 dark and 320.
+  - **Done**: a receipt. The numeral turns SOLID green (its fill takes the stroke's colour), the name 15 px grey, what was
     done on one 13 px grey line, *4 · 4 · 4 · 4 · RPE 7 7 7 7* (a move with no weight drops the leading *×*).
   - **A warm-up is known by its title, `.is-prep`.** Both block templates (the day and a Library session) add `is-prep`
     when `isPrepBlockTitle()` says so, and every warm-up rule in the block keys on it. `block-warmup` is only
     `blockCategory()`'s colour class, and its index fallback hands it to any unknown title (*Core* at index 6), so it
     must never decide the look: a Core lift would lose its head and its Rest.
-  - **Open, the head** (a lift, and a circuit that logs; a warm-up stays on paper): the cover's green, *● 6* as its
-    eyebrow, the name in 28 px capitals, a hairline, then the **scoreboard**: one grid of four equal tracks, each a value
+  - **Open, the head** (a lift, and a circuit that logs; a warm-up stays on paper): the cover's green, *● 06* as its
+    eyebrow (mint, no stroke), the name in 28 px capitals, a hairline, then the **scoreboard**: one grid of four equal tracks, each a value
     over its caption (*4 × 6* SETS×REPS, *7* RPE, *3-1-1* TEMPO, *2:30* REST), then the pill. The captions are in the
     markup: `renderNumLine()` writes the dose's as `.nl-lab.nl-cap` (so `numLineText()` leaves it out) and RPE's word as
     `.nl-k`; a circuit's *×2* and *Rounds* are split the same way. The text of the line is unchanged. A caption keeps 12 px
-    clear of the next cell. **An open lift has no tick-all ring** when it has its own set circles (`:has(.ex-set-log
-    .ex-set-row)`); a working circuit keeps its ring, its one *done*, and so does an open Library exercise (no set table:
-    the ring is its only done, on the left of the head).
+    clear of the next cell. **An open lift has no tick-all numeral** when it has its own set circles (`:has(.ex-set-log
+    .ex-set-row)`): its number is the eyebrow. A working circuit keeps its numeral on the left of the head, its one *done*
+    (outlined in mint on the green, solid mint once done, no eyebrow), and so does an open Library exercise (no set table).
   - **Open, the body** on the paper: the Coach's Note as a pull quote (the clay quote mark on the ring column, 16 px,
     **3 lines**, then *More* with a drawn chevron: `fitNotes()` still decides), **How to do it** as one white rounded row
     (the About sheet's Your history recipe: a green ▶ only with a video, else a list glyph; *HOW TO DO IT* over the count
@@ -1035,8 +1050,14 @@ dashboard do not change.
     runs full width under them. A warm-up ends the same way with an outlined Rest.
   - **Circuits**: a warm-up stays on paper with plain letters, *5 / side* doses (`itemDose()` writes the card's
     spacing), a ▶ disc only with a video and the chevron for its steps and cues. A working circuit has the green head, its
-    items as letter · name and dose · kg box (· ▶), its cues open, the small *How to do it* line, and one How hard? row per
-    round (the words take their own line under 375 px).
+    *Last time* line right under it (round 2, E's **t**: `renderCircuit()` gives a working circuit's body an `.lt-slot` as its
+    first child, so `paintLastTime()` places the strip there, not before the rounds' RPE rows), its items as letter · name
+    and dose · kg box, its cues open, the small *How to do it* line, and one How hard? row per round (the words take their
+    own line under 375 px). **An item's ▶ is in its How to do it line** (round 2, E's **s**): no disc beside the kg box;
+    the line reads *▶ HOW TO DO IT · video · 4 steps* (`.round-how-play` drawn in CSS, `.round-how-v`) and shows even with no
+    steps yet (`.has-vid`, the URL in `data-vid`); its tap opens the card's player, Open in YouTube bar and all, above the
+    steps (`toggleRoundSteps()` builds it on the first open, `.round-how-vid`, so a closed row holds no player). A warm-up
+    item keeps its ▶ disc and the pop-up.
   - **Guided** borrows the same body (`.step-scroll`, gutter 16): its pinned set keeps its tint across the full width.
     Guided's own layout (the pinned current row, the rest screen, its header and footer) is unchanged: *Guided Mode's
     layout* below still holds.
@@ -1072,15 +1093,25 @@ dashboard do not change.
   close their gap to 16. Measured on every state: no sideways scroll, no text under 11 px, every control 44 px to hit (the TEMPO caption reaches it through a ::after).
 - **Taps and keys** (E's build notes n and o): an open card folds from its name row only. A thumb on the scoreboard
   (*4 × 6*, *2:30*) or the pill mid-set leaves it open (`onExerciseRowTap()`); a closed row still opens from anywhere.
-  The tick-all ring is `role="button"`, `tabindex="0"` with an `aria-label`, and Enter or Space ticks it like a tap
-  (`onCheckBoxKey()`; a Library session wires its own listener, as it does for the tap).
-- **Waiting for Amir's word** (left as they are until he says): (1) E's **p** (a per-side move with no kg box shows *4*
-  in its reps box, not *4 / side*), **s** (a working circuit's ▶ is still the disc beside the kg box, not in its How to
-  do it line) and **t** (a circuit's Last time strip sits above the rounds' RPE rows, not under the head); (2) with ⋯
-  open, **Pause** moves to the second row beside Guided and Reset (A's and E's frames keep it on the first row);
-  (3) the cover's *● DAY 1* has white words and a mint dot, as P4's picture draws it (the spec's words said a mint
-  eyebrow); (4) the fault cue's bar is clay (it was red `#E74C3C`): if it counts as *look here* it joins the list in
-  *Clay means look here*, if not it goes grey or steel.
+  The tick-all target (`.check-box`, under the numeral) is `role="button"`, `tabindex="0"` with an `aria-label`, and Enter
+  or Space ticks it like a tap (`onCheckBoxKey()`; a Library session wires its own listener, as it does for the tap).
+- **A per-side move with no kg box says so in its reps box** (round 2, E's **p**): *4 / side*. `paintKgCol()` writes the
+  placeholder (`cardReps()` or the range, plus *" / side"* when the box is hidden and `data-dose` ends in */ side*; with a kg
+  box the column is too narrow, so it stays *4*). It is the placeholder only: a tick records the plan's reps
+  (`setReps(s, plannedReps(ex))` in `buildSessionData()`, never this text), Guided's rest screen reads the number with
+  `parseInt()` (`paintTimerLog()`, which also drops the words when it shows a range). `smoke.js` ticks such a set and checks
+  the session records 4 and Guided reads 4.
+- **Amir's answers on round 1's open calls** (2026-10-12, *"1 keep, 2 mint, 3 clay, 4 yes build them"*): (1) with ⋯ open,
+  **Pause** stays on the second row beside Guided and Reset; (2) the cover's *● DAY 1* is mint, the words with the dot
+  (`#day-view-card .cm-name`); (3) the fault cue's bar stays clay and is on the *Clay means look here* list; (4) E's p, s
+  and t are built (above; u was already: `itemDose()` writes *5 / side*).
+- **The old card CSS that Centre Court fully overrode is gone** (round 2): 118 pre-Centre-Court rules on the card shell, the
+  set log, the Note row, the circuits and their `body[data-dark]` copies. Each was switched off in the browser, one at a time
+  and then all together, in five day, Guided and Library states at 320, 390 and 600 px, light and dark, with transitions
+  stopped: none changed a computed style (the element's, its `::before` / `::after`, its descendants' inherited ones). Full-page
+  screenshots of the day view, Guided, a Library session, Home, Game Plan, Records and the About sheet matched before and after.
+  Two that looked dead while a transition ran were kept (Guided's dimmed sets, a circuit's How to do it chevron turning). What is
+  left above the block still sets something: a `:hover` or `:active`, a transition, or a state those runs never drew.
 
 ## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26 and 2026-09-27)
 
@@ -1596,9 +1627,10 @@ middle of the screen** (Amir: "all the notes should appear in a box in the middl
 **Not now** for the clock offer), gone by itself after six seconds (twenty for the clock offer). It never dims or blocks the page, so logging can go on
 under it. Checked in `scripts/headless/first-timer.js`.
 
-- **A first-timer's circle on a closed card opens it** (`toggleCheckOnly()`): ticking every set at once logs no weight and no RPE, so nothing to
+- **A first-timer's tap on a closed card's number opens it** (`toggleCheckOnly()`; the number has been the tick-all since Centre Court
+  round 2): ticking every set at once logs no weight and no RPE, so nothing to
   remember. Until `onbVeteran()` (cycle 2 or later, a finished session, or a stored last-time weight) it opens the card and says "Log each set in the open
-  card: the weight, the circle, then how hard it was." After that the circle is the as-written shortcut it always was.
+  card: the weight, the circle, then how hard it was." (the circle there is the set's own). After that the number is the as-written shortcut it always was.
 - **A set ticked with an empty kg box nudges** (`kgNudge()`): the box pulses and a note says "No weight saved on that set. Type it in the
   kg box." The 2026-09-26 rule stands (a tick on an empty box still records no weight; nothing is invented). A first-timer is told every time,
   a returning athlete once a session (per day, in memory). Never in Guided, whose rest screen asks for the weight; no nudge where the kg box is hidden.

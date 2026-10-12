@@ -1873,17 +1873,8 @@
   /* Press feedback — small scale on tap for tactile feel */
   .checklist-item:active { transform: scale(0.99); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
   /* Checked state — base styling; the done tint below is green for every block (DS-01). */
-  .checklist-item.checked .item-name { text-decoration: line-through; color: #888; }
   .checklist-item.checked .check-box::after { opacity: 1; transform: scale(1); }
 
-  /* The "done" tint, the same green for every block (DS-01): a finished warm-up turned clay where a
-     finished strength card turned green. */
-  .checklist-item.checked[class*="block-"] {
-    background: var(--yellow-dim);
-    border-color: rgba(14,74,54,0.40);
-  }
-  .checklist-item.checked[class*="block-"] .check-box { background: var(--yellow); border-color: var(--yellow); }
-  body[data-dark] .checklist-item.checked[class*="block-"] { background: rgba(109,190,149,0.08); border-color: rgba(109,190,149,0.30); }
 
   /* Left-edge accent stripe — one colour for every block (DS-01) */
   .checklist-item::before {
@@ -1898,7 +1889,6 @@
   body[data-dark] .checklist-item[class*="block-"]::before { background: var(--green-ink); }
   .checklist-item.checked::before        { opacity: 0.45; }
 
-  .item-main { display: flex; align-items: center; padding: 16px 18px; gap: 14px; }
   /* Bigger check circle — feels more tappable and gives a clearer "done" feedback */
   .check-box { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--grey-mid); background: transparent; flex-shrink: 0; position: relative; transition: background 0.2s, border-color 0.2s, transform 0.2s; }
   .check-box::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: var(--fs-lead); font-weight: 700; color: var(--on-accent); opacity: 0; transform: scale(0.5); transition: opacity 0.2s, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -1907,28 +1897,11 @@
   /* The number stays beside the name; a long name wraps inside its own box (it used to
      wrap under the number, leaving the number alone on a line). */
   .item-name-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: nowrap; }
-  .item-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-title); line-height: 1.1; letter-spacing: 0; color: var(--grey-dark); transition: color 0.2s; min-width: 0; }
 
-  /* Exercise number (1, 2, 3 within a block) — paired in-line with the name,
-     bigger and bolder so it reads as "1. Glute Bridge Hold" at a glance. */
-  .ex-num {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900;
-    font-size: 36px;
-    color: #8a8a8a;   /* #999 was 2.85:1 (A11Y-01) */
-    line-height: 1;
-    flex-shrink: 0;
-    letter-spacing: -1px;
-    transition: color 0.2s, font-size 0.2s;
-  }
-  .checklist-item.checked .ex-num { color: #c5c5c5; }
-  body[data-dark] .ex-num { color: #8a8a8a; }
-  body[data-dark] .checklist-item.checked .ex-num { color: #444; }
 
   /* Collapsed state is now the DEFAULT — every exercise starts as a thin row
      and expands when tapped. Hides the expandable detail area + the inline
      chip/rest/log/etc. sections that exist on circuits. */
-  .checklist-item.collapsed .ex-detail { display: none !important; }
   .checklist-item.collapsed .item-chips,
   .checklist-item.collapsed .item-rest,
   .checklist-item.collapsed .weight-log,
@@ -1936,8 +1909,6 @@
   .checklist-item.collapsed .note-row,
   .checklist-item.collapsed .round-list,
   .checklist-item.collapsed .item-actions { display: none !important; }
-  .checklist-item.collapsed .item-name { font-size: var(--fs-lead); font-weight: 700; }
-  .checklist-item.collapsed .ex-num { font-size: var(--fs-title); }
 
   /* ── THE EXERCISE CARD ─────────────────────────────────────────────
      Tap-to-expand list view; its layout since 2026-09-27 is "The working card"
@@ -1970,19 +1941,8 @@
   .ex-summary-pill.modifier { background: var(--yellow); color: var(--on-accent); }
   body[data-dark] .ex-summary-pill.modifier { background: var(--yellow); color: var(--on-accent); }
   .ex-summary-pill.modifier.priority { box-shadow: 0 0 0 1.5px rgba(14,74,54,0.30); }
-  .checklist-item.checked .ex-summary { opacity: 0.5; }
 
 
-  /* The expandable detail block — sits below .item-main */
-  .ex-detail {
-    padding: 4px 18px 16px;
-    border-top: 1px solid var(--grey-card);
-    background: rgba(0,0,0,0.015);
-  }
-  body[data-dark] .ex-detail {
-    background: rgba(255,255,255,0.015);
-    border-top-color: #2a2a2a;
-  }
 
   /* Section labels inside the detail (LOG, COACHING CUES, etc.) */
   .ex-section-label {
@@ -2133,33 +2093,7 @@
   }
   body[data-dark] .ex-coach-note { background: rgba(199,85,47,0.16); color: #e8e8e8; }
 
-  /* Cues nested inside a circuit's round-row — slightly tighter spacing. */
-  .round-row .round-cues { margin-top: 2px; }
-  .round-row .ex-cue {
-    font-size: var(--fs-small);
-    padding: 8px 0;
-  }
 
-  /* Log section wraps the per-set log table + the personal note row. */
-  .ex-log {
-    margin-top: 4px;
-    border: 1px solid var(--grey-mid);
-    border-radius: 8px;
-    background: var(--white);
-    overflow: hidden;
-  }
-  body[data-dark] .ex-log {
-    background: rgba(255,255,255,0.02);
-    border-color: #333;
-  }
-  .ex-log .note-row,
-  .ex-log .rpe-row,
-  .ex-log .weight-log {
-    border-top: 1px solid var(--grey-card);
-  }
-  .ex-log > :first-child { border-top: none; }
-  /* Force RPE row visible inside the log (old default was hidden until checked). */
-  .ex-log .rpe-row { display: flex; }
 
   /* ── Per-set log table (standard exercises) ──────────────────────
      The header and the rows below are two separate grids that MUST stay on the
@@ -2185,7 +2119,6 @@
     text-transform: uppercase;
     color: var(--grey-text);
   }
-  body[data-dark] .ex-set-header { color: var(--grey-text); }
   .ex-set-row {
     display: grid;
     grid-template-columns: 26px minmax(0, 1fr) 54px 44px;
@@ -2199,7 +2132,6 @@
   /* Sets that aren't the active one fade slightly so the eye lands on the
      current set first. The "active" set is the first one not yet marked done. */
   .ex-set-row.dim { opacity: 0.55; }
-  .ex-set-row.done .ex-set-num { color: var(--green-ink); }
   .ex-set-num {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 900;
@@ -2207,7 +2139,6 @@
     text-align: center;
     color: var(--grey-dark);
   }
-  body[data-dark] .ex-set-num { color: #ddd; }
   .ex-set-weight {
     width: 100%;
     background: var(--grey-card);
@@ -2223,7 +2154,6 @@
   }
   .ex-set-weight:focus { border-color: var(--yellow); }
   .ex-set-weight::placeholder { color: #bbb; }
-  body[data-dark] .ex-set-weight { background: #2a2a2a; color: #ddd; }
   body[data-dark] .ex-set-weight::placeholder { color: #555; }
   .ex-set-rpe {
     display: flex;
@@ -2249,13 +2179,6 @@
     padding: 0;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
-  .ex-set-rpe .rpe-btn.selected {
-    background: var(--yellow);
-    border-color: var(--yellow);
-    color: var(--on-accent);
-  }
-  body[data-dark] .ex-set-rpe .rpe-btn { border-color: #444; color: #9a9a9a; }
-  body[data-dark] .ex-set-rpe .rpe-btn.selected { color: var(--on-accent); }
 
   /* Per-set check circle */
   .ex-set-check {
@@ -2279,9 +2202,6 @@
     transform: scale(0.5);
     transition: opacity 0.15s, transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
-  .ex-set-row.done .ex-set-check { background: var(--yellow); border-color: var(--yellow); }
-  .ex-set-row.done .ex-set-check::after { opacity: 1; transform: scale(1); }
-  body[data-dark] .ex-set-check { border-color: #444; }
 
   /* REPS column (2026-09-24, The Card Remembers). Only on exercises prescribed a
      rep count. Amir prescribes ONE number, never a range, so the box shows that
@@ -2289,59 +2209,24 @@
      else: an empty box means "as prescribed", which is zero taps on a normal set.
      A typed number turns clay, so a short set is visible at a glance. Both grids
      move to the same five-track template together (see the note above). */
-  .ex-set-log.has-reps .ex-set-header,
-  .ex-set-log.has-reps .ex-set-row {
-    grid-template-columns: 26px minmax(0, 1fr) minmax(0, .78fr) 54px 44px;
-  }
-  .ex-set-reps {
-    width: 100%;
-    background: var(--grey-card);
-    border: 1px solid transparent;
-    border-radius: 5px;
-    padding: 7px 0;
-    font-size: var(--fs-field);
-    font-family: 'Barlow', sans-serif;
-    text-align: center;
-    color: var(--clay-ink);
-    font-weight: 600;
-    outline: none;
-    box-sizing: border-box;
-    -moz-appearance: textfield;
-  }
   .ex-set-reps::-webkit-outer-spin-button,
   .ex-set-reps::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .ex-set-reps::placeholder { color: var(--grey-dark); opacity: 0.55; font-weight: 400; }
   .ex-set-reps:focus { border-color: var(--yellow); }
-  body[data-dark] .ex-set-reps { background: #2a2a2a; }
   body[data-dark] .ex-set-reps::placeholder { color: #ddd; }
 
   /* ── Countersign rows (2026-09-24) ── see attachSetLog()/paintSets().
      16px text in both inputs: below 16px iOS zooms the whole page on focus, which
      is what the old 13px fields did mid-set. */
-  .ex-set-header, .ex-set-row { gap: 8px; }
-  .ex-set-header > div:nth-child(3) { text-align: center; }
   .ex-set-log:not(.has-reps) .ex-set-header > div:nth-child(3) { text-align: left; }
-  .ex-set-weight, .ex-set-reps { height: 40px; font-size: var(--fs-field); border-radius: 8px; }
-  .ex-set-weight { padding: 0 10px; }
-  .ex-set-reps { padding: 0; }
   .ex-set-row { transition: background 0.2s, opacity 0.2s; }
-  /* The set about to be done. Same tint Guided Mode uses for its current set. */
-  .ex-set-row.live { background: var(--yellow-dim); border-top-color: transparent; border-radius: 10px; }
-  .ex-set-row.live + .ex-set-row { border-top-color: transparent; }
-  body[data-dark] .ex-set-row.live { background: rgba(14,74,54,0.28); }
-  /* A countersigned set reads as a receipt: flat, bold, still editable on tap. */
-  .ex-set-row.done .ex-set-weight,
-  .ex-set-row.done .ex-set-reps { background: transparent; font-weight: 700; color: var(--grey-dark); }
   /* A typed rep count is a set that went differently: it keeps its clay as a receipt. */
   .ex-set-row.done .ex-set-reps:not(:placeholder-shown) { color: var(--clay-ink); }
   .ex-set-row.done .ex-set-reps:placeholder-shown::placeholder { color: var(--grey-dark); opacity: 1; font-weight: 700; }
   .ex-set-row.done .ex-set-weight:focus,
   .ex-set-row.done .ex-set-reps:focus { background: var(--grey-card); }
-  body[data-dark] .ex-set-row.done .ex-set-weight,
-  body[data-dark] .ex-set-row.done .ex-set-reps { background: transparent; color: #eee; }
   body[data-dark] .ex-set-row.done .ex-set-reps:not(:placeholder-shown) { color: var(--clay-ink); }
   body[data-dark] .ex-set-row.done .ex-set-reps:placeholder-shown::placeholder { color: #eee; }
-  .ex-set-check { width: 36px; height: 36px; justify-self: center; }
   .ex-set-check::after { font-size: var(--fs-lead); }
   /* RPE tag: invisible until the set is ticked. */
   .ex-set-rpetag {
@@ -2351,47 +2236,13 @@
     letter-spacing: 0.3px; color: var(--green-ink); white-space: nowrap;
   }
   .ex-set-row.done .ex-set-rpetag { visibility: visible; }
-  .ex-set-rpetag.empty { color: var(--grey-text); border: 1px dashed var(--grey-mid); font-weight: 600; }
-  .ex-set-row.rpe-open .ex-set-rpetag { border-color: var(--yellow); border-style: solid; }
-  body[data-dark] .ex-set-rpetag { color: #9fd3bd; }
-  body[data-dark] .ex-set-rpetag.empty { color: #888; border-color: #444; }
-  /* The strip: full width under its row, only while open. */
-  .ex-set-rpe {
-    grid-column: 1 / -1; display: none; align-items: center; gap: 6px;
-    padding: 4px 0 2px;
-  }
-  .ex-set-row.rpe-open .ex-set-rpe { display: flex; }
-  .ex-set-rpe-q {
-    font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.8px;
-    text-transform: uppercase; color: var(--grey-text); white-space: nowrap; margin-right: 2px;
-    /* A button (COACH-02): the word is the way to what RPE means. */
-    background: none; border: 0; padding: 0 2px; min-height: 40px; cursor: pointer;
-    text-decoration: underline dotted; text-underline-offset: 3px;
-  }
-  .ex-set-rpe .rpe-btn { flex: 1 1 0; max-width: none; height: 44px; font-size: var(--fs-lead); border-radius: 10px; }
   /* RPE against target (rpeVs): clay over, steel blue under, green on target. */
-  .ex-set-rpetag.over  { color: var(--clay-ink); }
   .ex-set-rpetag.under { color: var(--rpe-under); }
-  body[data-dark] .ex-set-rpetag.over { color: #E06B43; }
   body[data-dark] .ex-set-rpetag.under { color: var(--rpe-under); }
   .ex-set-rpe .rpe-btn.selected.over,  .tl-rpe-btn.selected.over  { background: var(--ice); border-color: var(--ice); color: #fff; }
   .ex-set-rpe .rpe-btn.selected.under, .tl-rpe-btn.selected.under { background: #3E6A92; border-color: #3E6A92; color: #fff; }
   b.rpe-under, .lt-rpe b.rpe-under, .lt-ghost b.rpe-under, .hs-d b.rpe-under,
   body[data-dark] .lt-rpe b.rpe-under, body[data-dark] .hs-d b.rpe-under { color: var(--rpe-under); }
-  body[data-dark] .ex-set-row.done .ex-set-num { color: #9fd3bd; }
-  /* The narrowest phones (320px): every fixed track gives a little so a load like
-     "102.5" still fits the weight box. */
-  @media (max-width: 360px) {
-    .ex-set-header, .ex-set-row { gap: 5px; padding-left: 6px; padding-right: 6px; }
-    .ex-set-header, .ex-set-row { grid-template-columns: 20px minmax(0, 1fr) 46px 40px; }
-    .ex-set-header { font-size: var(--fs-label); letter-spacing: 0.2px; }   /* "SET" fits its 20 px column */
-    .ex-set-log.has-reps .ex-set-header,
-    .ex-set-log.has-reps .ex-set-row { grid-template-columns: 20px minmax(0, 1fr) minmax(0, .7fr) 46px 40px; }
-    .ex-set-weight { padding: 0 6px; }
-    .ex-set-rpetag { font-size: var(--fs-small); }
-    .ex-set-check { width: 34px; height: 34px; }
-    .ex-set-rpe-q { display: none; }
-  }
 
   /* ── Today's targets (Fork 2A, 2026-09-26) — see paintToday() ──
      Clay for a lower or short day, like every other "off the written plan" mark in the
@@ -2433,17 +2284,9 @@
      it. The card's "Same as last" button went on 2026-09-27, and the open card's Last
      time box on 2026-10-12 (Amir: "their last time, is actually already in the reps,
      weight box"): this caption is the card's one reminder of last time. */
-  .ex-set-wbox { position: relative; min-width: 0; }
-  .ex-set-wlast {
-    display: none; position: absolute; left: 10px; top: 3px; pointer-events: none;
-    font-family: 'Space Mono', monospace; font-size: var(--fs-label); line-height: 1; letter-spacing: 1px;
-    text-transform: uppercase; color: var(--grey-text);
-  }
   .ex-set-wbox.show-last .ex-set-wlast { display: block; }
   .ex-set-wbox.show-last .ex-set-weight::placeholder { font-size: var(--fs-body); color: var(--grey-text); opacity: 0.8; }
-  body[data-dark] .ex-set-wlast { color: #8a8a8a; }
   body[data-dark] .ex-set-wbox.show-last .ex-set-weight::placeholder { color: #8a8a8a; opacity: 1; }
-  @media (max-width: 360px) { .ex-set-wlast { left: 6px; } }
 
   /* ── The Card Remembers (2026-09-24) — see paintLastTime() ──
      Since 2026-10-12 a standard card carries no Last time box (the ⓘ's Your history has
@@ -2543,8 +2386,6 @@
      the ⓘ at the right end, and no history. Open: the note in two lines, the First time line
      on a lift never logged, How to do it folded, the sets, Rest (no Last time box since 2026-10-12). A finished card is a small done row. */
   .ex-side { flex: none; align-self: flex-start; display: flex; justify-content: flex-end; padding-top: 1px; }
-  .ex-side:empty { display: none; }
-  .ex-side .ex-about { width: 26px; height: 26px; font-size: var(--fs-body); }
   .ex-side .ex-about::after { inset: -9px; }   /* 26 to see, 44 to hit */
   .ex-note-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ice);
     margin-left: 7px; vertical-align: 0.18em; }
@@ -2573,7 +2414,6 @@
      is 2s or more, plus any non-zero pause. This is what replaced writing "3s eccentric" a
      second time beside it (the tempo has had four shapes: do not re-litigate it). */
   .ex-numline .t-hot { color: var(--clay-ink); font-weight: 700; }
-  .checklist-item.collapsed .nl-lab { display: none; }
   .nl-lab { font-weight: 400; color: var(--grey-text); }
   body[data-dark] .ex-numline { color: #ddd; }
   .ex-summary { margin-top: 7px; }
@@ -2581,19 +2421,7 @@
   .step-ex-pills { margin: 8px 0 2px; }
 
   /* The done row: small, and it says what was done (paintDoneLines()). */
-  .ex-doneline { display: none; }
-  .checklist-item.is-done.collapsed .ex-doneline { display: block; margin-top: 3px; font-family: 'Space Mono', monospace;
-    font-size: var(--fs-label); font-weight: 700; line-height: 1.4; color: var(--grey-text);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }   /* one line: the open card has the rest */
-  .checklist-item.is-done.collapsed .ex-numline,
-  .checklist-item.is-done.collapsed .ex-setup,
-  .checklist-item.is-done.collapsed .ex-summary { display: none; }
-  .checklist-item.is-done.collapsed .item-main { padding-top: 10px; padding-bottom: 10px; }
-  .checklist-item.is-done.collapsed .check-box { width: 30px; height: 30px; }
   .checklist-item.is-done.collapsed .check-box::after { font-size: var(--fs-body); }
-  .checklist-item.is-done.collapsed .ex-num { font-size: var(--fs-lead); }
-  .checklist-item.is-done.collapsed .item-name { font-size: var(--fs-body); color: var(--grey-text); }
-  .checklist-item.is-done.collapsed .ex-about { opacity: 0.7; }
   /* The next card opens under the sticky session bar, not behind it (foldWhenDone()). */
 
   /* The Coach's Note: two lines, then More › (fitNotes()). */
@@ -2653,14 +2481,6 @@
   .ex-set-log.no-kg .ex-set-dose { display: block; font-family: 'Barlow', sans-serif; font-weight: 600; font-size: var(--fs-body);
     color: var(--grey-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   body[data-dark] .ex-set-log.no-kg .ex-set-dose { color: #ddd; }
-  .ex-set-log.no-kg.has-reps .ex-set-header,
-  .ex-set-log.no-kg.has-reps .ex-set-row { grid-template-columns: 26px minmax(0, 96px) minmax(0, 1fr) 54px 44px; }
-  .ex-set-log.no-kg.has-reps .ex-set-rpetag { grid-column: 4; }
-  .ex-set-log.no-kg.has-reps .ex-set-check { grid-column: 5; }
-  @media (max-width: 360px) {
-    .ex-set-log.no-kg.has-reps .ex-set-header,
-    .ex-set-log.no-kg.has-reps .ex-set-row { grid-template-columns: 20px minmax(0, 80px) minmax(0, 1fr) 46px 40px; }
-  }
   .sp-purpose { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); line-height: 1.45; color: var(--grey-dark); margin: 2px 0 10px; }
   body[data-dark] .sp-purpose { color: #e8e8e8; }
   .sp-sec { display: grid; gap: 6px; margin-top: 14px; }
@@ -3304,7 +3124,6 @@
   }
   .round-wt::placeholder { color: #b3ada2; }
   .round-wt:focus { border-color: var(--yellow); }
-  body[data-dark] .round-wt { background: #2a2a2a; color: #ddd; }
   body[data-dark] .round-wt::placeholder { color: #555; }
 
   /* Rest button row at the bottom of the detail */
@@ -3404,10 +3223,8 @@
   /* ── Round Groups ── */
   .round-list { margin-top: 10px; display: flex; flex-direction: column; gap: 0; }
   .round-row { display: flex; flex-direction: column; border-bottom: 1px solid var(--grey-card); padding: 10px 0; }
-  .round-row:last-child { border-bottom: none; }
   /* Main row (letter · name · detail) — the round name is the primary text;
      letter and detail are supporting info; cues underneath are even smaller. */
-  .round-row-main { display: flex; align-items: center; padding: 2px 0; gap: 12px; }
   .round-letter {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 900;
@@ -3425,7 +3242,6 @@
     letter-spacing: 0.2px;
     line-height: 1.2;
   }
-  body[data-dark] .round-name { color: #f0f0f0; }
   .round-detail {
     font-family: 'Space Mono', monospace;
     font-weight: 700;
@@ -3434,7 +3250,6 @@
     margin-left: auto;
     flex-shrink: 0;
   }
-  body[data-dark] .round-detail { color: #999; }
   /* Under 360 px a row with a kg box puts the dose under the name (POL-01, 2026-09-27): on one line with
      the name and the box, a superset's row ran 34-42 px wide of a 320 px phone and cut the box off the
      card. A warm-up's rows have no box and stay one line (WK-05). */
@@ -3462,25 +3277,13 @@
   }
   .round-play-btn:hover { transform: scale(1.08); }
   .round-play-btn:active { transform: scale(0.95); }
-  .round-play-btn svg { width: 12px; height: 12px; margin-left: 1px; }
-  body[data-dark] .round-play-btn { background: var(--yellow); color: var(--on-accent); }
-  .round-group.checked .round-row { opacity: 0.5; }
-  /* Round cues (inside a circuit) reuse the same details.cues styling as the
-     main exercise cues — single source of truth so they look identical. */
   /* A warm-up is a list (WK-05): one line per movement, its cues folded under a chevron. */
-  .round-row.prep { padding: 4px 0; }
-  .round-row.prep .round-row-main { min-height: 44px; gap: 10px; }
-  .round-row.prep.has-cues .round-row-main { cursor: pointer; }
   .round-row.prep .round-cues,
   .round-row.prep .round-cues-slot,
   .round-row.prep .round-steps-slot { display: none; }
   .round-row.prep.cues-open .round-cues-slot { display: block; }
-  .round-row.prep.cues-open .round-cues { display: block; padding: 0 0 6px 26px; }
-  .round-row.prep.cues-open .round-steps-slot { display: block; padding: 0 0 2px 26px; }
   /* A circuit item's steps (2026-10-11): in a warm-up under the same tap as its cues; in a working circuit,
      whose cues stay open, behind one small How to do it line, so the circuit does not grow by them. */
-  .round-row .ex-kit { margin: 4px 0 0; }
-  .round-row .ex-steps li { font-size: var(--fs-small); padding: 4px 0; }
   .round-row:not(.prep) .round-steps-slot { display: none; }
   .round-row.steps-open:not(.prep) .round-steps-slot { display: block; padding-bottom: 2px; }
   .round-how-tog { display: none; position: relative; align-self: flex-start; align-items: center; gap: 0; min-height: 36px; margin-top: 2px;
@@ -3490,13 +3293,9 @@
   .round-how-n { font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--grey-text); white-space: pre; }
   .round-how-tog i { font-style: normal; color: var(--grey-text); margin-left: 8px; transition: transform 0.2s; }
   .round-row.steps-open .round-how-tog i { transform: rotate(90deg); }
-  .round-row.has-steps:not(.prep) .round-how-tog { display: inline-flex; }
   .round-cue-tog { display: none; order: 10; flex: none; width: 44px; height: 44px; margin: -8px -10px -8px -6px;
     align-items: center; justify-content: center; background: transparent; border: 0; padding: 0;
     color: var(--grey-text); cursor: pointer; }
-  .round-cue-tog svg { width: 18px; height: 18px; transition: transform 0.15s; }
-  .round-row.prep.has-cues .round-cue-tog { display: inline-flex; }
-  .round-row.prep.cues-open .round-cue-tog svg { transform: rotate(90deg); }
   .round-row-main .rd-item { order: 5; }
 
   /* ── Session Complete ── */
@@ -3840,7 +3639,7 @@
   .timer-sound.off { color: var(--grey-text); text-decoration: line-through; }
   body[data-dark] .timer-sound { border-color: #444; }
   /* A note in a box in the middle of the screen (first-timer pass, 2026-10-11): one at a time, never dims or blocks the page,
-     gone by itself or on its button. Used for a first-timer's note on the closed circle, the empty-weight nudge and the clock offer. */
+     gone by itself or on its button. Used for a first-timer's note on the closed number, the empty-weight nudge and the clock offer. */
   .aa-toast { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 71; box-sizing: border-box;
     width: min(86vw, 340px); display: flex; flex-direction: column; gap: 14px; padding: 20px 18px 16px; border-radius: 16px;
     background: #1c2420; color: #fff; box-shadow: 0 12px 40px rgba(0,0,0,0.4); animation: aaToastIn 0.18s ease; }
@@ -3962,14 +3761,12 @@
      relocated in here it is no longer that card's descendant, so it shows with no CSS of ours. */
   .step-scroll .ex-rest-bottom { display: none; }   /* Guided rests itself — see stepAfterDone() */
   .ex-set-row.step-current { background: var(--yellow-dim); border-radius: 10px; margin: 0 -8px; padding-left: 18px; padding-right: 18px; }
-  body[data-dark] .ex-set-row.step-current { background: rgba(14,74,54,0.28); }
   /* The current row is PINNED (WK-01, 2026-09-27): in place when it is on screen, and held
      just above the footer (or under the top bar) when the card above it is long, so the
      set Done records is always the one in view. It sat under the footer on 4 of 14 steps
      at 375×667 and 8 of 14 at 320×568. Sticky needs every box up to the scroll area to let
      it out, hence the log's visible overflow; the tint is solid, because the pinned row
      passes over the rows above it. A circuit round pins its RPE row the same way. */
-  .step-scroll .ex-log { overflow: visible; }
   .step-scroll .ex-set-row.step-current,
   .step-scroll .rpe-row.step-current { position: sticky; top: 0; bottom: 0; z-index: 3;
     background: #EDF1EE; box-shadow: 0 -6px 14px rgba(0,0,0,0.07), 0 6px 14px rgba(0,0,0,0.05); }
@@ -3994,7 +3791,6 @@
 
   /* ── Weight Log ── */
   /* ── Personal note per exercise (saves to localStorage per athlete + exercise) ── */
-  .note-row { border-top: 1px solid var(--grey-card); }
   .note-row summary {
     padding: 10px 16px;
     font-family: 'Barlow Condensed', sans-serif;
@@ -4006,9 +3802,6 @@
     transition: color 0.15s, background 0.15s;
   }
   .note-row summary::-webkit-details-marker { display: none; }
-  .note-row summary .chev { width: 9px; height: 9px; transition: transform 0.25s ease; flex-shrink: 0; }
-  .note-row[open] summary .chev { transform: rotate(90deg); }
-  .note-row summary .chev path { stroke: currentColor; stroke-width: 2; fill: none; }
   .note-row summary .note-preview {
     font-family: 'Barlow', sans-serif;
     font-size: var(--fs-label); font-weight: 400;
@@ -4022,25 +3815,7 @@
     .note-row summary:hover { color: var(--grey-dark); background: rgba(0,0,0,0.025); }
   }
   .note-row summary:active { background: rgba(0,0,0,0.05); }
-  .note-row textarea {
-    width: 100%;
-    min-height: 70px;
-    padding: 10px 16px 12px;
-    font-family: 'Barlow', sans-serif;
-    font-size: var(--fs-field); line-height: 1.5;   /* 16 px: iPhone zooms into a smaller field (A11Y-01) */
-    color: var(--grey-dark);
-    background: transparent;
-    border: none;
-    border-top: 1px solid var(--grey-card);
-    outline: none;
-    resize: vertical;
-    display: block;
-    box-sizing: border-box;
-  }
-  body[data-dark] .note-row textarea { color: #ddd; }
   body[data-dark] .note-row { border-color: #333; }
-  body[data-dark] .note-row textarea { border-top-color: #333; }
-  .checklist-item.checked .note-row { opacity: 0.4; }
 
   .weight-log { border-top: 1px solid var(--grey-card); padding: 9px 16px; display: flex; align-items: center; gap: 10px; }
   .weight-log label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-label); letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); white-space: nowrap; flex-shrink: 0; }
@@ -4062,18 +3837,12 @@
     text-decoration: underline dotted; text-underline-offset: 3px; }
   .rpe-btn { flex: 1 1 0; min-width: 0; height: 44px; padding: 0; border-radius: 10px; border: 1px solid var(--grey-mid); background: transparent; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); cursor: pointer; color: var(--grey-text); transition: background 0.15s, border-color 0.15s; }
   .rpe-btn.selected { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
-  /* A circuit's round: the words on their own line, so the five numbers get the whole width
-     (inline, "R2 · How hard?" left them 11 px wide at 320). */
-  .checklist-item .rpe-row { flex-wrap: wrap; row-gap: 0; }
-  .checklist-item .rpe-row .rpe-label { flex: 0 0 100%; min-height: 32px; text-align: left; }
 
   /* ── Dark Mode ── */
   body[data-dark] { --grey-bg: #181818; --grey-card: #252525; --grey-mid: #383838; --grey-text: #8f8f8f; --white: #202020; --grey-dark: #e8e8e8; --rpe-under: #8DB3D6;
     --green-ink: #6DBE95; --clay-ink: #E06B43; }
   /* The rest timer stayed a light sheet in dark mode while its digits turned light: "2:00" at 1.08:1. */
   body[data-dark] .timer-overlay { background: #161616; }
-  body[data-dark] .checklist-item { border-color: #333; }
-  body[data-dark] .item-name { color: #ddd; }
   body[data-dark] .weight-input { background: #2a2a2a; color: #ddd; }
   body[data-dark] .weight-input::placeholder { color: #555; }
   body[data-dark] .rpe-btn { border-color: #444; color: #9a9a9a; }
@@ -4289,6 +4058,8 @@
     --field: #A89F92; --mark: var(--fill);
     /* the one chevron for every text link, drawn as a mask in the link's colour */
     --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M3 1L7 5 3 9' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    /* a row's open/close chevron, ⌄ (turned for ⌃) */
+    --chev-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5l6 6 6-6'/%3E%3C/svg%3E");
     /* the greens: the cover, a button, a tile, the session bar's foot before Start, the slim bar, a button on the green */
     --hero: radial-gradient(125% 90% at 100% 0%, #1B7254 0%, #0E4A36 46%, #082D20 100%);
     --btn: radial-gradient(120% 120% at 0% 0%, #1B6A4E 0%, #0E4A36 55%, #0B3E2D 100%);
@@ -4342,7 +4113,7 @@
     background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
   #day-view-card .cm-banner-caption { position: relative; z-index: 2; width: auto; align-self: auto; padding: 74px var(--g) 24px; }
   #day-view-card .cm-name { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace;
-    letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.84); }   /* P4: the dot mint, the words white */
+    letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }   /* the dot and the words mint (Amir r2: "2 mint") */
   #day-view-card .cm-name::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
   /* The focus title keeps every word whole. Its face is also our own file (the site's, assets/fonts/), so a phone that is
      offline or cannot reach Google Fonts still draws it condensed instead of breaking "ACCELERA / TION" in a wide fallback;
@@ -4520,7 +4291,10 @@
   /* 7. THE CARDS (Centre Court 2/3). Calm paper: a card is a row on the paper with a hairline between rows, not a box.
      The one strong green thing is the open card's head. Selectors repeat the old rule they replace, so the weight ties
      and this block (later) wins; the old card look further up (white boxes, shadows, the stripe, the bordered log) is
-     overruled here and goes when the re-skin is folded in. --g is the gutter; in Guided the scroll area's own 16 px. */
+     overruled here. Round 2 deleted the 118 old card, set-log, Note-row and circuit rules this block overrode in full
+     (switched off, one by one and all together, they changed no computed style in any day, Guided or Library state at
+     320, 390 and 600 px, light and dark; screenshots of every screen matched); what is left up there still sets
+     something (a :hover or :active, a transition, a state not drawn here). --g is the gutter; in Guided the scroll area's own 16 px. */
   .step-scroll { --g: 16px; }
   #ws-body { --g: 20px; }
   :where(#ws-body) .checklist-item { margin-left: calc(-1 * var(--g)); margin-right: calc(-1 * var(--g)); }
@@ -4538,40 +4312,54 @@
   :where(#day-view, .step-scroll, #ws-body) .checklist-item > .item-main { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px;
     gap: 0 12px; align-items: center; min-height: 74px; padding: 14px var(--g); cursor: pointer; }
 
-  /* The tick-all ring, with the exercise's number INSIDE it (Amir: "exercise number inside the circle"). The number stays in
-     .item-name-row in the DOM; CSS lays it on the ring, and it lets taps through to the ring (.check-box). Done: the ring
-     fills green with a white tick and the number steps aside. 30 px drawn, 44 px to hit. */
-  :where(#day-view, .step-scroll, #ws-body) .check-box { position: relative; grid-column: 1; width: 44px; height: 44px; margin: 0; padding: 0; border: 0;
-    border-radius: 50%; background: transparent; cursor: pointer; transition: none; }
+  /* The exercise's NUMBER is the tick (P24, Amir r2: "use p24 to number the exercises, so if the exercise is done, the number
+     would turn green"): a big outlined numeral, "06", on the left column; solid green once the exercise is done (.checked).
+     .ex-num stays in .item-name-row in the DOM: the row is a baseline flex, so the numeral sits on the name's first line,
+     pulled into the 44 px column by its negative margin (44 + the 12 px gap), and it lets taps through (pointer-events).
+     Under it .check-box is the invisible tap target: the whole left column of the row (tap = tick all, as before). */
+  :where(#day-view, .step-scroll, #ws-body) .check-box { position: relative; grid-column: 1; align-self: stretch; width: 44px; height: auto; min-height: 44px;
+    margin: -14px 0; padding: 0; border: 0; border-radius: 10px; background: transparent; cursor: pointer; transition: none; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked[class*="block-"] .check-box { background: transparent; border-color: transparent; }
-  :where(#day-view, .step-scroll, #ws-body) .check-box::before { content: ''; position: absolute; inset: 7px; border-radius: 50%; border: 1.5px solid var(--ring); }
-  :where(#day-view, .step-scroll, #ws-body) .check-box::after { content: ''; position: absolute; inset: 0; display: block; opacity: 0; transform: none;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l3.8 3.8L18 8'/%3E%3C/svg%3E") center / 18px no-repeat; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .check-box::before { background: var(--mark); border-color: var(--mark); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .check-box::after { opacity: 1; transform: none; }
-  :where(#day-view, .step-scroll, #ws-body) .check-box:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  :where(#day-view, .step-scroll, #ws-body) .check-box::before, :where(#day-view, .step-scroll, #ws-body) .check-box::after,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .check-box::before, :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .check-box::after { content: none; }
+  :where(#day-view, .step-scroll, #ws-body) .check-box:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
   :where(#day-view, .step-scroll, #ws-body) .item-body { min-width: 0; }
-  :where(#day-view, .step-scroll, #ws-body) .item-name-row { display: block; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item .ex-num { position: absolute; left: var(--g); top: 50%; width: 44px; height: 20px; margin: -10px 0 0;
-    text-align: center; pointer-events: none; letter-spacing: 0; transition: none;
-    font: 700 var(--fs-body)/20px 'Barlow Condensed', sans-serif; color: var(--num); font-variant-numeric: tabular-nums; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-num { visibility: hidden; }
+  :where(#day-view, .step-scroll, #ws-body) .item-name-row { display: flex; align-items: baseline; gap: 0; }
+  /* line-height 12 px: the numeral's own line box stays shorter than the name's, so the baseline match never pushes the
+     name down; the glyph overflows it, drawn, untouchable. top: 4px drops it from the shared baseline so its middle sits on
+     the middle of the name's capitals (a 22 px figure beside 13 px capitals) */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item .ex-num { position: relative; top: 4px; flex: none; width: 44px; height: auto; margin: 0 12px 0 -56px; padding: 0;
+    text-align: center; pointer-events: none; letter-spacing: 0; transition: none; visibility: visible;
+    font: 900 32px/12px 'Barlow Condensed', 'AA Barlow Condensed', sans-serif;   /* display: P24 numeral */
+    color: transparent; -webkit-text-stroke: 1.5px var(--green-ink); paint-order: stroke fill; font-variant-numeric: tabular-nums; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-num { visibility: visible; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .item-name-row .item-name { flex: 1 1 auto; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .item-name { text-decoration: none; color: var(--grey); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item .item-name { min-width: 0; letter-spacing: 0; transition: none; text-decoration: none;
     font: 600 var(--fs-lead)/22px 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; text-wrap: pretty; }
   /* the old closed-row sizes (.checklist-item.collapsed .item-name 700, .ex-num 22 px; 0,3,0) matched at their weight, so a
-     closed row and an open warm-up draw the same name and the same 16 px number in the ring */
+     closed row and an open warm-up draw the same name and the same 32 px numeral */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed .item-name { font-size: var(--fs-lead); font-weight: 600; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed .ex-num { font-size: var(--fs-body); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed .ex-num { font-size: 32px; }   /* display: P24 numeral */
   :where(#day-view, .step-scroll, #ws-body) .ex-note-dot { display: inline-block; width: 7px; height: 7px; margin: 0 0 3px 7px; border-radius: 50%; background: var(--clay);
     vertical-align: middle; }
-  /* a row with no ⓘ (a circuit, a simple item) shows that it opens: a grey › in the ⓘ column (turned up on an open warm-up) */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed:not(.is-done) > .item-main:not(:has(.ex-side .ex-about))::after,
-  :where(#day-view, .step-scroll, #ws-body) .round-group.is-prep:not(.collapsed) > .item-main::after {
-    content: ''; grid-column: 3; grid-row: 1; justify-self: center; width: 44px; height: 44px; background-color: var(--grey);
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 7l5 5-5 5'/%3E%3C/svg%3E") center / 18px no-repeat;
-            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 7l5 5-5 5'/%3E%3C/svg%3E") center / 18px no-repeat; }
-  :where(#day-view, .step-scroll, #ws-body) .round-group.is-prep:not(.collapsed) > .item-main::after { transform: rotate(-90deg); }
+  /* Every row shows that it opens and closes (Amir r2: "how can we show in a way that these exercises are clickable? and then
+     can be clicked back to make it small?"): a drawn chevron in the right column, on the NAME line. Closed: a grey ⌄; open: ⌃
+     (white on the green head, grey on a warm-up's paper). It is not a button: the whole row is the tap (onExerciseRowTap()),
+     and it lets taps through to the ⓘ under it. The ⓘ moves down to the numbers line, its centre 28 px under the chevron's.
+     A done row stays quiet: no chevron, its ⓘ centred as before (a tap still opens it). */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed:not(.checked) > .item-main,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-prep:not(.collapsed) > .item-main { align-items: start; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed:not(.checked) > .item-main::after,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-prep:not(.collapsed) > .item-main::after {
+    content: ''; grid-column: 3; grid-row: 1; align-self: start; justify-self: center; width: 44px; height: 22px; pointer-events: none;
+    background-color: var(--grey); -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-prep:not(.collapsed) > .item-main::after { transform: rotate(180deg); }
+  /* the ⓘ on the numbers line: its centre 53 px down the row, 28 under the chevron's (the -17 keeps the row its height).
+     So the line no longer runs under it (the old rule's -40 px, 0,4,0, is matched here) */
+  :where(#day-view, .step-scroll, #ws-body) .item-main:has(> .ex-side:not(:empty)) .ex-numline { margin-right: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed:not(.checked) .ex-side,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-prep:not(.collapsed) .ex-side { align-self: start; margin: 17px 0 -17px; }
   :where(#day-view, .step-scroll, #ws-body) .ex-doneline { display: none; }
   /* the line of numbers: 15 px, the dose bold, "·" between the parts; the tempo's hot digits clay */
   :where(#day-view, .step-scroll, #ws-body) .ex-numline { display: flex; flex-wrap: wrap; align-items: baseline; margin: 4px 0 0; letter-spacing: 0;
@@ -4596,7 +4384,7 @@
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.rd-optional .item-name { opacity: 1; color: var(--grey); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.rd-skip .item-name { opacity: 1; color: var(--grey); text-decoration: line-through; text-decoration-thickness: 1.5px; }
   /* the ⓘ: a plain one is a 22 px grey ring with a 13 px i, a Because the 28 px clay disc; both 44 px to hit */
-  :where(#day-view, .step-scroll, #ws-body) .ex-side { grid-column: 3; display: flex; justify-content: center; align-self: center; padding: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-side { grid-column: 3; grid-row: 1; display: flex; justify-content: center; align-self: center; padding: 0; }
   :where(#day-view, .step-scroll, #ws-body) .ex-side:empty { display: none; }
   :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about { position: relative; z-index: 0; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
     border: 0; border-radius: 50%; background: none; font: 700 var(--fs-small)/1 'Barlow', sans-serif; color: var(--grey); opacity: 1; }
@@ -4608,9 +4396,10 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-about:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed > .ex-detail, :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed > .note-row { display: none; }
 
-  /* 7b. The DONE row: a receipt on the paper. The filled ring, the name grey 15 px, what was done 13 px grey on one line. */
+  /* 7b. The DONE row: a receipt on the paper. The solid green numeral, the name grey 15 px, what was done 13 px grey on one line. */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-main { min-height: 54px; padding-top: 5px; padding-bottom: 5px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .check-box { width: 44px; height: 44px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .check-box { width: 44px; height: auto; margin: -5px 0; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-num { font-size: 32px; }   /* display: P24 numeral (the old 18 px is 0,4,0) */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-name { font: 600 var(--fs-body)/20px 'Barlow', sans-serif; color: var(--grey); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-note-dot { background: var(--ring); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-doneline { display: block; margin-top: 2px; letter-spacing: 0; word-spacing: 1px;
@@ -4623,20 +4412,29 @@
      "● 6" as its eyebrow, the name 28 px capitals, a hairline, the scoreboard (four equal tracks, value over caption), the
      pill. An open LIFT has no tick-all ring (every set has its own circle under it); a working circuit keeps its ring,
      its one "done". */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep)::before,
+  /* (the open head's own hairline at its top edge: [class*="block-"] so this ties the row rule's 0,4,1 and wins by order) */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item[class*="block-"]:not(.collapsed):not(.is-prep)::before,
   :where(#day-view, .step-scroll, #ws-body) .checklist-item[class*="block-"]:not(.collapsed):not(.is-prep) + .checklist-item[class*="block-"]::before { display: none; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) > .item-main { grid-template-areas: "chk name side" ". nums nums" ". pill pill";
     align-items: center; min-height: 0; padding: 12px var(--g) 14px; background: var(--hero); color: #fff; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-body { display: contents; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .check-box { grid-area: chk; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .check-box::before { border-color: rgba(255,255,255,.85); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) > .item-main { grid-template-areas: "name name side" "nums nums nums" "pill pill pill"; }
-  /* only when the card has its own set circles: an open Library exercise (no set table) keeps its ring in the head */
+  /* only when the card has its own set circles: an open working circuit and an open Library exercise (no set table) keep their
+     tick in the head, the numeral, outlined in mint on the green (solid mint once done) */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .check-box { display: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-name-row { grid-area: name; display: flex; flex-direction: column; align-items: flex-start; gap: 0; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-num { position: static; display: flex; align-items: center; gap: 8px; width: auto; height: auto;
-    margin: 0 0 6px; visibility: visible; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 2px; color: var(--mint); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-num::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .check-box { margin: -12px 0 -14px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-name-row { grid-area: name; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-num { -webkit-text-stroke-color: var(--mint); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked:not(.collapsed):not(.is-prep) .ex-num { color: var(--mint); }
+  /* an open lift (its sets have their own circles): the number is the head's eyebrow, "● 06" in mint, no stroke */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .item-name-row { flex-direction: column;
+    align-items: flex-start; gap: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .ex-num { position: static; display: flex;
+    align-items: center; gap: 8px; width: auto; height: auto; margin: 0 0 6px; visibility: visible; -webkit-text-stroke: 0; text-align: left;
+    font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 2px; color: var(--mint); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .ex-num::before { content: ''; width: 7px; height: 7px;
+    border-radius: 50%; background: var(--mint); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-name { font: 900 var(--fs-head)/.94 'Barlow Condensed', sans-serif; letter-spacing: .4px;
     text-transform: uppercase; color: #fff; text-wrap: balance; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-note-dot { display: none; }
@@ -4644,11 +4442,14 @@
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-about:not(.has-why) { color: #fff; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-side .ex-about:not(.has-why)::before { border-color: rgba(255,255,255,.7); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-side .ex-about.has-why::before { box-shadow: 0 0 0 1.5px rgba(255,255,255,.85); }
-  /* an open working circuit: its › turns up, in white */
-  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed):not(.is-prep) > .item-main::after { content: ''; grid-area: side; justify-self: center; width: 44px; height: 44px;
-    transform: rotate(-90deg); background-color: #fff;
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 7l5 5-5 5'/%3E%3C/svg%3E") center / 18px no-repeat;
-            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 7l5 5-5 5'/%3E%3C/svg%3E") center / 18px no-repeat; }
+  /* the open head's ⌃, white, top right: on the eyebrow line of a lift, on the name line of a circuit or a Library exercise;
+     the ⓘ under it on the name line (28 px between their centres) */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) > .item-main::after { content: ''; grid-area: side; align-self: start; justify-self: center;
+    width: 44px; height: 22px; margin-top: 2px; pointer-events: none; transform: rotate(180deg); background-color: #fff;
+    -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) > .item-main::after { margin-top: -5px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-side { margin: 19px 0 -19px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .ex-side { margin: 12px 0 -12px; }
   /* the scoreboard: one grid of four equal tracks under a hairline; each cell a value over its caption (.nl-cap, .nl-k,
      .nl-lab). A long dose widens only its own track. */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline { grid-area: nums; display: grid; grid-auto-flow: column;
@@ -4940,6 +4741,18 @@
     font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--green-ink); }
   :where(#day-view, .step-scroll, #ws-body) .round-how-n { font: 500 var(--fs-small)/1 'Barlow', sans-serif; letter-spacing: 0; text-transform: none; color: var(--grey); }
   :where(#day-view, .step-scroll, #ws-body) .round-row.steps-open:not(.prep) .round-steps-slot { padding-bottom: 6px; }
+  /* an item with a video (E's s): its ▶ is the How to do it line's first mark (a bare green triangle, the card's How to do it
+     ▶) and the line shows even with no steps yet; a tap opens the player above the steps (toggleRoundSteps()) */
+  :where(#day-view, .step-scroll, #ws-body) .round-row.has-vid:not(.prep) .round-how-tog { display: inline-flex; margin: 2px 0 0 56px; gap: 0;
+    font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .round-how-play { position: relative; flex: none; width: 14px; height: 14px; margin-right: 8px; overflow: hidden;
+    color: transparent; font-size: var(--fs-label); }
+  :where(#day-view, .step-scroll, #ws-body) .round-how-play::before { content: ''; position: absolute; left: 2px; top: 1px; width: 10px; height: 12px;
+    background: var(--green-ink); clip-path: polygon(0 0, 100% 50%, 0 100%); }
+  :where(#day-view, .step-scroll, #ws-body) .round-how-v { font: 500 var(--fs-small)/1 'Barlow', sans-serif; letter-spacing: 0; text-transform: none; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .round-how-vid { margin: 8px 0 6px 56px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row:not(.steps-open) .round-how-vid { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .round-how-vid .ex-vunit { margin: 0; border-radius: 14px; }
   :where(#day-view, .step-scroll, #ws-body) .round-row .rpe-row, :where(#day-view, .step-scroll, #ws-body) .ex-log .rpe-row,
   :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row { position: relative; display: flex; flex-wrap: nowrap; align-items: center; gap: 6px; min-height: 64px; padding: 8px 0; border-top: 0; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row::before { content: ''; position: absolute; top: 0; left: 56px; right: calc(-1 * var(--g)); height: 1px; background: var(--hair); }
@@ -4961,8 +4774,10 @@
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .item-name { color: var(--ink); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-name { color: var(--grey); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-name { color: #fff; }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-num, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-num { color: var(--num); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-num { color: var(--mint); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-num { color: transparent; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-num { color: var(--green-ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked:not(.collapsed):not(.is-prep) .ex-num,
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .ex-num { color: var(--mint); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-numline { color: var(--ink); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline { color: #fff; }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.modifier { background: var(--tint); color: var(--green-ink); }
@@ -9262,7 +9077,9 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
         restSec ? `Rest ${REST_IC} <span class="rest-t">${formatRestLabel(restSec)}</span>` : `Rest timer ${REST_IC}`}</button></div>`
     : '';
 
-  const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
+  // The exercise's number, zero-padded ("06"): P24's outlined numeral on the left, solid green once done (Centre Court r2).
+  // Nothing reads its text; .item-name is the key.
+  const numBadge = num ? `<div class="ex-num">${String(num).padStart(2, '0')}</div>` : '';
   // Sets count drives how many rows the per-set log will render.
   const setsCount = parseInt(rx.sets, 10) || 1;
   // The prescribed reps ride along on the card for the set log's pre-filled reps
@@ -9350,7 +9167,10 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
     // Per-item play button — only renders if this sub-exercise has a video
     // (either an explicit videoUrl, or its Spine entry's video: getVideoUrl()).
     const itemVid = getVideoUrl(item);
-    const itemPlay = itemVid
+    // A warm-up row keeps its ▶ disc (the pop-up player). A working circuit's ▶ is in its How to do it line
+    // (Centre Court r2, E's s): the line says "▶ How to do it · video · 4 steps" and opens the player at the top of
+    // the steps (toggleRoundSteps()), as How to do it does on a card. The kg box keeps the row's right edge.
+    const itemPlay = itemVid && isPrep
       ? `<button class="round-play-btn" type="button" onclick="event.stopPropagation(); handlePlayVideo('${itemVid}');" aria-label="Play ${esc(item.name)} video">
            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
          </button>`
@@ -9365,9 +9185,12 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
       : '';
     // A working circuit keeps its cues open (WK-05), so the steps go behind one small How to do it line
     // under them, shown once the entry has steps (paintSpine()), and the circuit does not grow by them.
-    const howTog = isPrep ? '' : `<button class="round-how-tog" type="button" aria-expanded="false" onclick="toggleRoundSteps(event, this.closest('.round-row'))">How to do it<span class="round-how-n"></span><i aria-hidden="true">›</i></button>`;
+    const howVid = !isPrep && itemVid;
+    const howTog = isPrep ? '' : `<button class="round-how-tog" type="button" aria-expanded="false" onclick="toggleRoundSteps(event, this.closest('.round-row'))">${
+      howVid ? '<span class="round-how-play" aria-hidden="true">▶</span>' : ''}How to do it${
+      howVid ? '<span class="round-how-v">\u00a0·\u00a0video</span>' : ''}<span class="round-how-n"></span><i aria-hidden="true">›</i></button>`;
     const fold = isPrep ? itemSteps + itemCues : itemCues + howTog + itemSteps;
-    return `<div class="round-row${isPrep ? ' prep' : ''}${isPrep && ownCues ? ' has-cues' : ''}">
+    return `<div class="round-row${isPrep ? ' prep' : ''}${isPrep && ownCues ? ' has-cues' : ''}${howVid ? ' has-vid' : ''}"${howVid ? ` data-vid="${esc(itemVid)}"` : ''}>
       <div class="round-row-main"${isPrep ? ` onclick="togglePrepCues(event, this.closest('.round-row'))"` : ''}>
         <span class="round-letter">${letter}</span>
         <span class="round-name">${esc(item.name)}</span>
@@ -9414,7 +9237,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   if (_rxC.rest)      nlBits.push(`<span class="nl-rest"><span class="nl-lab">rest </span>${esc(formatRestLabel(_rxC.rest))}</span>`);
   const numLine = nlBits.length ? `<div class="ex-numline">${nlBits.join('')}</div>` : '';
 
-  const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
+  const numBadge = num ? `<div class="ex-num">${String(num).padStart(2, '0')}</div>` : '';   // "09", as on a card
 
   // How many rounds? The first number in rx.rounds or a legacy "×3 Rounds" string. Drives one RPE
   // row per round below. Min 1. (2026-09-26: this read parseInt("×3 Rounds") = NaN → 1 for every
@@ -9439,7 +9262,8 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
         ${numLine}
       </div>
     </div>
-    <div class="ex-detail">
+    <div class="ex-detail">${isPrep ? '' : `
+      <div class="lt-slot"></div>`}
       ${renderCoachNote(ex.note)}
       <div class="ex-section-label">Rounds</div>
       <div class="round-list">${roundsHtml}</div>
@@ -9605,6 +9429,14 @@ function toggleRoundSteps(ev, row) {
   if (ev) ev.stopPropagation();
   if (!row) return;
   const open = row.classList.toggle('steps-open');
+  // An item with a video (E's s): the player goes at the top of its steps the first time they open, the card's
+  // How to do it player (Open in YouTube under it). Built on demand, so a closed row holds no player.
+  if (open && row.dataset.vid && !row.querySelector('.round-how-vid')) {
+    const v = document.createElement('div');
+    v.className = 'round-how-vid';
+    v.innerHTML = renderVideoBlock(row.dataset.vid);
+    row.insertBefore(v, row.querySelector('.round-steps-slot'));
+  }
   const b = row.querySelector('.round-how-tog');
   if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
@@ -9733,7 +9565,7 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its number sits in the circle on the left.</p><p>Tap it to open it: its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues; it opens by itself the first time you meet an exercise and is folded after that, and the ▶ on it means there is a video; if the video won't play on your phone, tap <strong>Open in YouTube</strong> under it), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and the circle ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow on the right means it opens.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues; it opens by itself the first time you meet an exercise and is folded after that, and the ▶ on it means there is a video; if the video won't play on your phone, tap <strong>Open in YouTube</strong> under it), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. When the rest is over it moves you to the next set. Supersets and circuits come round by round; warm-ups stay in the list. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
@@ -14384,7 +14216,16 @@ function kgWanted(card) {
 function paintKgCol(card) {
   const d = cardDetail(card);
   const wrap = d && d.querySelector('.ex-set-log');
-  if (wrap) wrap.classList.toggle('no-kg', !kgWanted(card));
+  if (!wrap) return;
+  const noKg = !kgWanted(card);
+  wrap.classList.toggle('no-kg', noKg);
+  // A per-side move with no kg box says so in its reps box, "4 / side" (Centre Court r2, E's p). The placeholder
+  // only: a tick records the card's reps (cardReps(), never this text), and Guided's rest screen reads the number with
+  // parseInt() (paintTimerLog()). With a kg box the column is too narrow for the words, so it stays "4".
+  const base = cardReps(card) || repRangeText(card);
+  if (!base) return;
+  const ph = base + (noKg && / \/ side$/.test(card.dataset.dose || '') ? ' / side' : '');
+  wrap.querySelectorAll('.ex-set-reps').forEach(i => { if (i.getAttribute('placeholder') !== ph) i.setAttribute('placeholder', ph); });
 }
 
 // Reflect "all sets done?" on the exercise-level check and the day progress.
@@ -14796,7 +14637,7 @@ async function restWake(on) {
 }
 
 // A note in a box in the middle of the screen: one at a time, a button, gone by itself. It never dims or blocks the page, so the athlete
-// can keep logging with it showing. Used for a first-timer's note on the closed circle, the empty-weight nudge and the clock offer.
+// can keep logging with it showing. Used for a first-timer's note on the closed number, the empty-weight nudge and the clock offer.
 let _toastT = null, _toastRun = null;
 function aaToast(text, opts) {
   const el = document.getElementById('aaToast');
@@ -15116,7 +14957,7 @@ function paintTimerLog(row, item) {
       ${repsIn ? `<div class="tl-line">
         <span class="tl-lab">Reps</span>
         <button type="button" class="tl-step" data-d="-1" aria-label="One rep fewer">−</button>
-        <span class="tl-val${off ? ' off' : ''}">${n != null ? n : esc(repsIn.getAttribute('placeholder') || '')}</span>
+        <span class="tl-val${off ? ' off' : ''}">${n != null ? n : esc((repsIn.getAttribute('placeholder') || '').replace(/ \/ side$/, ''))}</span>
         <button type="button" class="tl-step" data-d="1" aria-label="One rep more">+</button>
       </div>` : ''}
       <div class="tl-line tl-rpe">
