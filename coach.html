@@ -507,6 +507,7 @@
   .mic textarea:focus { border-color: var(--court); }
   .mic .row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 9px; }
   .mic .count { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted-soft); margin-left: auto; }
+  .mic .how { margin-top: 10px; }
   .wallday { margin: 16px 0 8px; display: flex; align-items: center; gap: 10px; }
   .wallday .d { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
   .wallday::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
@@ -608,6 +609,7 @@
   .tools > summary::before { content: '▸ '; } .tools[open] > summary::before { content: '▾ '; }
   .tools-in { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .tools-note { flex-basis: 100%; font-size: 12px; color: var(--muted); }
+  .tools > .how { margin-top: 10px; }
   .toolspanel .creds { margin: 0; padding: 12px 0 0; border: 0; border-top: 1px solid var(--rule); border-radius: 0; box-shadow: none; animation: none; background: none; }
   .stbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
   .stbtns .btn[aria-pressed="true"] { background: var(--court-100); border-color: var(--court); color: var(--court); font-weight: 700; }
@@ -1930,12 +1932,7 @@ function pendingCredsHtml() {
       <span class="creds-chev">${credsOpen(pending.length) ? '▴' : '▾'}</span>
     </button>
     ${credsOpen(pending.length) ? `
-      <p class="empty" style="padding:6px 0 12px">
-        Copy each one and send it on WhatsApp, then mark it sent. A password is stored here
-        only until you do, or until the person signs in with it: the database then clears it by
-        itself (stage51) and they drop out of this list. After that the only way to see one again
-        is a reset. <b>Signed in with it</b> can only show for a moment, or for one stored before stage51.
-      </p>
+      <p class="empty" data-hint="creds" style="padding:6px 0 12px">Copy each one, send it on WhatsApp, then mark it sent.</p>
       ${pending.map(r => `
         <div class="credrow">
           <span class="credname">${esc(r.athlete_id)}</span>
@@ -1945,6 +1942,7 @@ function pendingCredsHtml() {
             <button class="btn sm" onclick="markLoginSent(${jsq(r.athlete_id)})">Mark sent</button>
           </span>
         </div>`).join('')}
+      ${howFold('how-creds', ['Copy each one and send it on WhatsApp, then mark it sent. A password is stored here only until you do, or until the person signs in with it: the database then clears it by itself (stage51) and they drop out of this list. After that the only way to see one again is a reset. <b>Signed in with it</b> can only show for a moment, or for one stored before stage51.'])}
     ` : ''}
   </section>`;
 }
@@ -3042,12 +3040,13 @@ function coachLineComposerHtml() {
   return `<div class="mic">
       <div class="cap"><span class="eyebrow">Your line to the crew</span></div>
       <textarea id="coachLineInput" maxlength="200" placeholder="No line yet today. Say something to everyone…">${esc(_coachLineDraft != null ? _coachLineDraft : (mine ? mine.body : ''))}</textarea>
-      <div class="muted" style="font-size:12px;margin:4px 0 0">Pinned on today's wall. Quotes, &lt; &gt; and backslashes are removed when you post, and line breaks become spaces.</div>
+      <div class="muted" data-hint="wall" style="font-size:12px;margin:4px 0 0">Pinned on today's wall. Some characters are removed.</div>
       <div class="row">
         <button class="btn primary sm" onclick="postCoachLine()">${mine ? 'Update the line' : "Post today's line"}</button>
         ${mine ? `<button class="btn sm danger" onclick="clearCoachLine()">Take it down</button>` : ''}
         <span class="count" id="coachLineCount"></span>
       </div>
+      ${howFold('how-wall', ['Pinned on today\'s wall. Quotes, &lt; &gt; and backslashes are removed when you post, and line breaks become spaces.'])}
     </div>`;
 }
 // The crew's lines grouped by day, newest day first. The coach's own line for today is the composer's, so it is left out.
@@ -3692,10 +3691,12 @@ function toolsPanelHtml() {
       <div class="tools-in">
         <button class="btn sm" onclick="pickCoachingLogs()" title="Add a coaching log from a .md file for an athlete who has none on the server yet. Never replaces one.">↑ Add coaching logs</button>
         <button class="btn sm" onclick="downloadBackup(this)">⤓ Backup</button>
-        <span class="tools-note">New athletes and new cycles go up through the pipeline (publish_cycle); there is no upload button.
-          Back up weekly: the free plan keeps no backups. Keep the last 12 files, on this computer and off it, and delete older ones (the privacy notice promises about three months).
-          The way back is written down and rehearsed: scripts/restore/README.md in the repo.</span>
+        <span class="tools-note" data-hint="tools">Back up weekly: the free plan keeps no backups.</span>
       </div>
+      ${howFold('how-tools', [
+        'New athletes and new cycles go up through the pipeline (publish_cycle); there is no upload button.',
+        'Back up weekly: the free plan keeps no backups. Keep the last 12 files, on this computer and off it, and delete older ones (the privacy notice promises about three months).',
+        'The way back is written down and rehearsed: scripts/restore/README.md in the repo.'])}
     </details>
     ${pendingCredsHtml()}`;
 }
@@ -5077,8 +5078,8 @@ function maxesPanel(D) {
 
   return `<div class="sec"><span>Personal records</span></div>
     <section class="panel"><div class="prlist">${rows.join('')}</div>
-      <p class="empty" style="padding:10px 0 0">Estimated one-rep maxes, worked out from their
-      logged sets or entered after a test. They own the record — this is read-only.</p>
+      <p class="empty" data-hint="prs" style="padding:10px 0 0">Estimated one-rep maxes. Read-only: they own the record.</p>
+      ${howFold('how-prs', ['Estimated one-rep maxes, worked out from their logged sets or entered after a test. They own the record — this is read-only.'])}
     </section>`;
 }
 
@@ -6263,8 +6264,9 @@ function boardPanelHtml(rows) {
         </div>`).join('')
       : '<p class="empty">Nobody on the board yet.</p>';
   return `${head}
-    <p class="psub">Scored by the server — exactly what the crew sees in the app.${at ? ` As of ${pad2(at.getHours())}:${pad2(at.getMinutes())}. <button class="btn sm" onclick="reloadBoard()">↻ Reload</button>` : ''}</p>
-    ${list}`;
+    <p class="psub" data-hint="board">${at ? `As of ${pad2(at.getHours())}:${pad2(at.getMinutes())}. <button class="btn sm" onclick="reloadBoard()">↻ Reload</button>` : 'Scored by the server.'}</p>
+    ${list}
+    ${howFold('how-board', ['Scored by the server — exactly what the crew sees in the app.'])}`;
 }
 function titlesPanelHtml() {
   const titles = (S.titles || []).length ? S.titles.map(x => `
@@ -6285,7 +6287,8 @@ function seasonPanelHtml() {
         <div class="proofstrip">
           <div class="big">${esc(season.name)}<br><small>opened ${esc(prettyDate(season.starts_on))}</small></div>
         </div>
-        <p class="psub" style="margin-top:12px">Starting or closing a season stays in the Supabase SQL editor on purpose — it resets every score. See XP_SYSTEM.md.</p>`
+        <p class="psub" data-hint="season" style="margin-top:12px">A season resets every score, so it stays in the SQL editor.</p>
+        ${howFold('how-season', ['Starting or closing a season stays in the Supabase SQL editor on purpose — it resets every score. See XP_SYSTEM.md.'])}`
       : '<p class="empty">No season live.</p>'}
     </section>`;
 }
@@ -6329,8 +6332,9 @@ function funnelPanelHtml() {
   }).join('') : '<p class="empty">No signups recorded yet. /proof-signup writes them here.</p>';
   return `<section class="panel" id="funnelPanel">
       <div class="phead"><span class="t hd">The funnel</span><span class="r">${freeFunnel.length} free signup${freeFunnel.length === 1 ? '' : 's'}${funnel.length > freeFunnel.length ? ` · ${funnel.length - freeFunnel.length} converted` : ''}</span></div>
-      <p class="psub">Free signups from proof.html — days logged is the qualifying signal. ${UPGRADE_DAYS}+ days on the free tier = worth a WhatsApp.${neverStarted ? ` <b>${neverStarted} of ${freeFunnel.length} have never logged a day</b> — they need a first-day nudge, not a pitch.` : ''}</p>
+      <p class="psub" data-hint="funnel">${neverStarted ? `<b>${neverStarted} of ${freeFunnel.length} have never logged a day.</b>` : 'Free signups from proof.html.'}</p>
       ${funnelHtml}
+      ${howFold('how-funnel', [`Free signups from proof.html — days logged is the qualifying signal. ${UPGRADE_DAYS}+ days on the free tier = worth a WhatsApp.${neverStarted ? ` <b>${neverStarted} of ${freeFunnel.length} have never logged a day</b> — they need a first-day nudge, not a pitch.` : ''}`])}
     </section>`;
 }
 function setBoardScope(s) { _boardScope = s; renderProof(); }
@@ -6537,9 +6541,10 @@ function affForm(a) {
   return `<div class="aff-form" data-new="${isNew ? 1 : 0}">
     <div class="exed-grid">${AFF_FIELDS.map(field).join('')}</div>
     <label class="exf exf-wide"><span>Notes</span><textarea data-k="notes" rows="3">${esc(v.notes || '')}</textarea></label>
-    ${isNew ? '<p class="empty" style="padding:8px 0 0">Convention is NAME10 — uppercase letters and digits, no spaces. Payout / card details stay in the application email, never here.</p>'
+    ${isNew ? '<p class="empty" data-hint="aff-new" style="padding:8px 0 0">Use NAME10: capitals and digits, no spaces. No payout details here.</p>'
             : '<p class="empty" style="padding:8px 0 0">A code can’t be renamed — it is the key. Retire it and add the new one, so intakes that used the old code still add up.</p>'}
     <div class="i-actions"><button class="btn sm primary aff-save">${isNew ? 'Add code' : 'Save'}</button><button class="btn sm aff-cancel">Cancel</button></div>
+    ${isNew ? howFold('how-aff-new', ['Convention is NAME10 — uppercase letters and digits, no spaces. Payout / card details stay in the application email, never here.']) : ''}
   </div>`;
 }
 
@@ -6640,13 +6645,14 @@ function affiliatesViewHtml() {
 
   let html = `<div id="affView"><div class="controls">
       <button class="btn primary sm" id="affAdd">+ Add code</button>
-      <span class="empty" style="align-self:center">These are the codes both apply forms accept. Add or retire one and it takes effect straight away — no deploy.</span>
+      <span class="empty" data-hint="aff" style="align-self:center">Both apply forms accept these. Changes are live at once.</span>
     </div>`;
   if (_affEditing === '__new__') html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New code</span></div>${affForm(null)}</section>`;
   html += `<section class="panel"><div class="phead"><span class="t hd">Live codes</span><span class="r">${live.length} live${orphans ? ` · <span style="color:var(--clay-ink)">${orphans} with no owner</span>` : ''}</span></div>`;
   html += live.length ? live.map(affCard).join('')
     : '<p class="empty">No live codes. When you accept a coach from partner-fa.html, add their code here.</p>';
-  html += `<p class="psub" style="margin:12px 0 0">The deal: the client gets the code's % off; the coach earns 10% of what the client actually pays — first payment and every renewal. Payout details stay in the application email (Gmail, subject:(Affiliate)).</p></section>`;
+  html += `<p class="psub" data-hint="aff-deal" style="margin:12px 0 0">The coach earns 10% of what the client pays.</p>
+    ${howFold('how-aff', ['These are the codes both apply forms accept. Add or retire one and it takes effect straight away — no deploy.', 'The deal: the client gets the code\'s % off; the coach earns 10% of what the client actually pays — first payment and every renewal. Payout details stay in the application email (Gmail, subject:(Affiliate)).'])}</section>`;
   if (retired.length) {
     const openRetired = retired.some(a => a.code === _affEditing) ? ' open' : '';
     html += `<section class="panel" style="margin-top:16px"><details${openRetired}><summary class="arch-toggle">Retired · ${retired.length}</summary><div style="margin-top:12px">${retired.map(affCard).join('')}</div></details></section>`;
@@ -6710,7 +6716,7 @@ function withBuyerNotes(rows, notes) {
 
 // cfg: key (S[key] and LOAD_ERR[key]), kind (what usedMark() and the Erase panel call it), P (the two-letter prefix of its ids and classes), table, fn
 // (the Edge Function), noun (for the error line), demo (the one row demo mode shows), message(username, password) (the Farsi WhatsApp text),
-// revokeConfirm(username), introHtml, newNote. Everything else is the same for both.
+// revokeConfirm(username), introHtml (the full intro, kept in the How this works fold), introShort (the one visible line), newNote. Everything else is the same for both.
 function buyerLogins(cfg) {
   const { key, kind, P, table, fn } = cfg;
   // busy: one call at a time (a double tap would be a second one); pw: the username whose password form is open (Change password or Restore);
@@ -6798,7 +6804,7 @@ function buyerLogins(cfg) {
       <p class="pwhint">${PW_HINT}${r.revoked_at ? '' : ' The old password stops working straight away.'}</p>
     </div>` : '') + erasePanelHtml(kind, r.username);
     const field = 'flex:1;min-width:190px;font:inherit;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fff';
-    let html = `<div class="controls"><span class="empty" style="align-self:center">${cfg.introHtml}</span></div>`;
+    let html = `<div class="controls"><span class="empty" data-hint="buyers" style="align-self:center">${cfg.introShort}</span></div>`;
     html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">New login</span></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <input id="${P}User" aria-label="Username" placeholder="username: a-z, 0-9, _" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field}">
@@ -6806,7 +6812,8 @@ function buyerLogins(cfg) {
       <input id="${P}Pass" aria-label="Password (empty to generate one)" placeholder="password, or empty to generate one" autocomplete="off" autocapitalize="none" spellcheck="false" style="${field};font-family:'Space Mono',monospace">
       <button class="btn primary sm" id="${P}Create">Create login</button>
     </div>
-    <p class="psub" style="margin:10px 0 0">${cfg.newNote} ${PW_HINT}</p></section>`;
+    <p class="psub" data-hint="buyers-new" style="margin:10px 0 0">Creates the login and copies the Farsi WhatsApp message.</p>
+    ${howFold('how-buyers', [cfg.introHtml, `${cfg.newNote} ${PW_HINT}`])}</section>`;
     html += `<section class="panel"><div class="phead"><span class="t hd">Logins</span><span class="r">${active.length} active${toSend ? ` · <span style="color:var(--clay-ink)">${toSend} to send</span>` : ''}</span></div>` +
       (active.length ? active.map(row).join('') : '<p class="empty">No logins yet.</p>') + `</section>`;
     if (revoked.length) html += `<section class="panel" style="margin-top:16px"><details${revoked.some(r => manageOpen(r.username)) ? ' open' : ''}><summary class="arch-toggle">Revoked · ${revoked.length}</summary><div style="margin-top:12px">${revoked.map(row).join('')}</div></details></section>`;
@@ -6864,6 +6871,7 @@ const BUYER = {
       'برای افزودن به صفحهٔ اصلی گوشی: لینک را باز کنید، بعد Share و Add to Home Screen.',
     revokeConfirm: u => 'Revoke ' + u + '?\n\nThey can no longer sign in. Their saved players and results are kept, and Restore brings the login back with a new password.',
     introHtml: `Logins for the tennis testing app, <a href="${ASSESS_URL}" target="_blank" rel="noopener">${ASSESS_URL}</a>. One login per buyer; an academy's coaches share it.`,
+    introShort: `Logins for the <a href="${ASSESS_URL}" target="_blank" rel="noopener">testing app</a>. One per buyer.`,
     newNote: 'Creates the account and copies a Farsi WhatsApp message with the link, username and password.' }),
   course: buyerLogins({ key: 'course', kind: 'course', P: 'tp', table: 'tps_accounts', fn: 'tps-login', noun: 'course logins', loadFn: 'loadCourse', renderFn: 'renderCourse',
     demo: { username: 'player_demo', label: 'Demo buyer', initial_password: 'cedar-harbor-kite-17' },
@@ -6877,6 +6885,7 @@ const BUYER = {
       'وقتی گوشی پیشنهاد ذخیرهٔ رمز داد، ذخیره کنید.',
     revokeConfirm: u => 'Revoke ' + u + '?\n\nThey can no longer sign in, and the app deletes the handbook from their phone the next time it opens online. Restore brings the login back with a new password.',
     introHtml: `Logins for the Tennis Performance System course (Level 2), <a href="${COURSE_URL}" target="_blank" rel="noopener">${COURSE_URL}</a>. One login per buyer.`,
+    introShort: `Logins for the <a href="${COURSE_URL}" target="_blank" rel="noopener">course app</a>. One per buyer.`,
     newNote: 'Creates the account and copies a Farsi WhatsApp message with the link, username, password and install steps.' }),
 };
 // The names the router, the Erase panel and the inline "Try again" buttons call.
@@ -7768,7 +7777,7 @@ function qualityPanels(idx, byId) {
   // measured | status and buttons), the same boxes stacked with their labels on a phone. The data-qf / data-q / data-ap hooks are
   // the old ones. One plain button each: a primary button on every row would be ten of them.
   let h = `<section class="panel"><div class="phead"><span class="t hd">The ten qualities</span><span class="r">${nAp} of ${quals.length} approved</span></div>
-    <p class="psub" style="margin:0 0 12px">What each day card on Home says it builds. A quality reaches a phone only when it is approved and the day's exercises carry it.</p>
+    <p class="psub" data-hint="qm" style="margin:0 0 12px">What each day card on Home says it builds. Only approved ones reach a phone.</p>
     <div class="qm-head" aria-hidden="true"><span>Quality</span><span>One line, for everyone</span><span>On court</span><span>How we measure it</span><span>Status</span></div>` +
     quals.map(q => `<div class="qm-row">
         <div class="qm-c"><input data-qf="${q.id}:name" aria-label="${esc(q.name)}: name" value="${esc(q.name)}" style="${field};font-weight:700"><div class="muted sp-fam">${esc(q.family || 'no picture')}</div></div>
@@ -7797,7 +7806,7 @@ function qualityPanels(idx, byId) {
   // Open by default on this sub-tab (it used to open only when a block was flagged, because it sat under five other panels).
   h += `<section class="panel"><details open><summary class="arch-toggle">Quality check · ${
     nFlag ? `${nFlag} block${nFlag === 1 ? '' : 's'} to look at` : 'every block trains what it says'}</summary>
-    <p class="psub" style="margin:10px 0">For each athlete: what their current week trains most, in working sets a week, and what each day card on their phone will say.</p>` +
+    <p class="psub" data-hint="qc" style="margin:10px 0">What each athlete's week trains most, and what their day cards say.</p>` +
     rows.map(r => {
       const top = r.ranked.slice(0, 4).map(q => `${esc(qn(q))} ${sets(r.score[q])}`).join(' · ');
       const aim = r.head ? `meant to build <b>${esc(qn(r.head))}</b>` : (QM_PHASE[String(r.art).toLowerCase()] || 'no picture word');
@@ -8005,9 +8014,9 @@ function renderExercises() {
         withDraft.length ? ` · <b style="color:var(--clay-ink)">${withDraft.length} with Claude’s draft to read</b>` : ''} · ${noSteps} approved with no How to do it. ${counted}${
         differ.length ? ` <b style="color:var(--clay-ink)">${differ.length} card name${differ.length === 1 ? '' : 's'} show${differ.length === 1 ? 's' : ''} something else on a phone until the draft is approved</b> (listed below).` : ''}`]) + `</section>`;
     if (differ.length) html += `<section class="panel"><details open><summary class="arch-toggle">Cards that show something else on a phone · ${differ.length} name${differ.length === 1 ? '' : 's'}</summary><div style="margin-top:12px">
-      <p class="psub" style="margin:0 0 8px">A phone is served approved entries only. These cards find a draft here, so on a phone they show nothing (a card that names its entry shows that entry or nothing) or, with no entry named, the closest approved one. Approve the draft and both agree.</p>${
+      <p class="psub" data-hint="cov-differ" style="margin:0 0 8px">A phone is served approved entries only. Approve the draft and both agree.</p>${
       differ.slice(0, 60).map(d => `<div class="credrow"><span class="credname">${esc(d.u.name)}</span><span class="muted">${Object.keys(d.u.athletes).length} athlete${Object.keys(d.u.athletes).length === 1 ? '' : 's'} · here: ${esc((byId[d.a] || {}).name || d.a)} (${byId[d.a] && byId[d.a].status === 'approved' ? 'approved' : 'draft'}) · phone: ${d.p ? esc((phone.byId[d.p] || {}).name || d.p) : 'nothing'}</span></div>`).join('')
-    }${differ.length > 60 ? `<p class="psub">…and ${differ.length - 60} more.</p>` : ''}</div></details></section>`;
+    }${differ.length > 60 ? `<p class="psub">…and ${differ.length - 60} more.</p>` : ''}${howFold('cov-differ-how', ['A phone is served approved entries only. These cards find a draft here, so on a phone they show nothing (a card that names its entry shows that entry or nothing) or, with no entry named, the closest approved one. Approve the draft and both agree.'])}</div></details></section>`;
     if (unmapped.length) html += `<section class="panel"><details open><summary class="arch-toggle">Not in the Spine yet · ${unmapped.length} names</summary><div style="margin-top:12px">${
       `<div class="note-actions" style="margin:0 0 10px"><button class="btn sm" onclick="copyText(${jsq('/spine add\n' + unmapped.map(u => '- ' + u.name).join('\n'))}, this)">Copy /spine add for all ${unmapped.length}</button>
         <span class="muted" style="font-size:12px">paste it to Claude: each becomes a draft entry for you to approve</span></div>` +

@@ -56,6 +56,8 @@ funnel are now **Leads**; the Testing app and the Course are now **Buyers**; ⚙
 Exercises are the daily work; Proof, Leads, Library and Buyers are opened now and then, but all seven sit in the same row, in this order, with no
 divider and no "more".
 
+**Explain once** (round 3 of the UX pass, 2026-10-12): every panel keeps its long explanation, word for word, in a *How this works* fold at its end (`howFold()`, `<details class="how">`) and shows one short hint line above it; a warning beside a destructive action stays where it is.
+
 **The bar.** From 900 px up it is **one sticky bar, 56 px** (it was a 58 px top bar over a 61 px tab rail, 119 px in all): the brand, the seven tabs
 and, on the right, the signed-in address, **↻ Refresh**, **⚙ Tools** and **Sign out**. The tabs are sentence case, Barlow 600, 14.5 px; the one you are on
 is white with an underline, and *Athletes* (notes to read) and *Leads* (new applications) carry a clay count. What gives way as the window narrows,

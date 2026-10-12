@@ -562,7 +562,7 @@ S['no-program-file-button'] = async (b) => {
   const { page, log } = await L.openCoach(b, {});
   await L.go(page, 'athletes');
   await openTools(page);
-  const tools = (await page.locator('details.tools').innerText()).replace(/\s+/g, ' ');
+  const tools = (await page.locator('details.tools').evaluate(el => el.textContent)).replace(/\s+/g, ' ');   // textContent: the note's long text sits in the "How this works" fold
   check(r, 'the Coach tools line still offers Add coaching logs and Backup', /Add coaching logs/.test(tools) && /Backup/.test(tools), tools);
   check(r, 'and no programme-file upload, in the line or its note', !/programme file|Publish programme|upload button/i.test(tools.replace(/there is no upload button/i, '')), tools);
   check(r, 'the function is gone from the page', await page.evaluate(() => typeof pickProgramFile === 'undefined'), '');
@@ -623,7 +623,7 @@ S['backup-incomplete'] = async (b) => {
   check(r, 'Today still asks for the weekly backup and says the last try was INCOMPLETE', /No complete backup taken/.test(row) && /INCOMPLETE and does not count/.test(row), row);
   await L.go(page, 'athletes');
   await openTools(page);
-  const sum = (await page.locator('details.tools summary').innerText()).replace(/\s+/g, ' ');
+  const sum = (await page.locator('details.tools > summary').innerText()).replace(/\s+/g, ' ');
   check(r, 'the Coach tools line says there is no complete backup and the last try was INCOMPLETE', /no complete backup on this computer yet/.test(sum) && /last try was INCOMPLETE/.test(sum), sum);
   // A complete one afterwards: plain name, counts, and the memory of the bad try goes.
   const good = await takeBackup(page, 'complete-after');
@@ -634,7 +634,7 @@ S['backup-incomplete'] = async (b) => {
   check(r, 'Today no longer asks', (await page.locator('.need', { hasText: 'Weekly backup' }).count()) === 0, '');
   await L.go(page, 'athletes');
   await openTools(page);
-  const sum2 = (await page.locator('details.tools summary').innerText()).replace(/\s+/g, ' ');
+  const sum2 = (await page.locator('details.tools > summary').innerText()).replace(/\s+/g, ' ');
   check(r, 'the Coach tools line says when the last complete backup was, with no INCOMPLETE note', /last complete backup today/.test(sum2) && !/INCOMPLETE/.test(sum2), sum2);
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
@@ -684,7 +684,7 @@ S['login-used-mark'] = async (b) => {
   await openTools(page);
   check(r, 'an unused stored password carries no mark', (await page.locator('.creds .credrow', { hasText: 'ben_test' }).locator('.fl.good').count()) === 0, '');
   await page.evaluate(() => { const el = document.querySelector('.creds-top'); if (el && el.getAttribute('aria-expanded') !== 'true') el.click(); });
-  const credsText = (await page.locator('.creds').innerText()).replace(/\s+/g, ' ');
+  const credsText = (await page.locator('.creds').evaluate(el => el.textContent)).replace(/\s+/g, ' ');   // textContent: the stage51 sentence is in the panel's "How this works" fold
   check(r, 'the panel says the database clears a password by itself once they sign in with it (stage51)', /signs in with it: the database then clears it by itself/.test(credsText), credsText.slice(0, 400));
   await page.evaluate(() => { window.__DB.athlete_identities.find(x => x.athlete_id === 'ben_test').signed_in_test = true; });
   await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
@@ -2649,9 +2649,148 @@ S['today-small-truths'] = async (b) => {
   await L.settle(page, 700);
   const wall = (await page.locator('#proofToday').innerText()).replace(/\s+/g, ' ');
   check(r, 'a line filed under tomorrow (an athlete whose clock is ahead) says "Tomorrow, their time", not a bare date', /Tomorrow, their time/i.test(wall) && /Early riser line/.test(wall), wall);
-  check(r, 'the line box says that quotes, < > and backslashes are removed and line breaks become spaces', /Quotes, < > and backslashes are removed when you post, and line breaks become spaces/.test(wall), wall);
+  const wallHow = ((await page.locator('#proofToday #how-wall').evaluate(el => el.textContent)) || '').replace(/\s+/g, ' ');   // the strip warning is in the composer's "How this works" fold
+  check(r, 'the line box says that quotes, < > and backslashes are removed and line breaks become spaces', /Quotes, < > and backslashes are removed when you post, and line breaks become spaces/.test(wallHow) && /characters are removed/.test(wall), wallHow);
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
+  return r;
+};
+
+// ── Explain once (round 3 of the coach UX pass, 2026-10-12) ───────────────────────────────────────────────────────────
+// A panel shows ONE short hint line (plain words, about 15 at most, no em-dash); the longer text stays, word for word, in a "How this works" fold at the
+// end of the panel (<details class="how">, shut until it is opened). The hints carry data-hint, the folds an id (how-…). A warning next to a destructive
+// action is not a hint and keeps its words (the Erase panel, the Danger zone, the confirms).
+S['hints-once'] = async (b) => {
+  const r = { id: 'hints-once', title: 'Explain once: every panel shows one short hint line at 1440 px and keeps its long text in a "How this works" fold (Tools, Logins to send, Referral codes, Buyers, Proof, Free signups, Today, the work tab, Qualities, Coverage)', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'athletes' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  // How many lines of text a hint takes up: text nodes only (a button inside the hint is not text), rects within 4 px of each other are one line.
+  const linesOf = sel => page.evaluate(s => {
+    const el = document.querySelector(s);
+    if (!el) return -1;
+    const tops = [];
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let n;
+    while ((n = w.nextNode())) {
+      if (!n.textContent.trim() || (n.parentElement && n.parentElement.closest('button'))) continue;
+      const rg = document.createRange(); rg.selectNodeContents(n);
+      for (const rc of rg.getClientRects()) { if (rc.width > 0.5 && !tops.some(t => Math.abs(t - rc.top) < 4)) tops.push(rc.top); }
+    }
+    return tops.length;
+  }, sel);
+  const hintText = sel => page.evaluate(s => { const el = document.querySelector(s); return el ? el.textContent.replace(/\s+/g, ' ').trim() : null; }, sel);
+  const foldInfo = id => page.evaluate(i => {
+    const el = document.getElementById(i);
+    return el ? { tag: el.tagName, cls: el.className, open: el.open === true, summary: (el.querySelector('summary') || {}).textContent || '', text: el.textContent.replace(/\s+/g, ' ') } : null;
+  }, id);
+  // One panel: its hint is a single line of at most 15 words with no em-dash, and its fold holds each original phrase word for word.
+  const panel = async (what, hintSel, foldId, phrases) => {
+    const t = await hintText(hintSel), n = await linesOf(hintSel);
+    check(r, `${what}: the hint is on the page`, t != null && t.length > 0, t);
+    check(r, `${what}: the hint is one line at 1440 px`, n === 1, { lines: n, text: t });
+    check(r, `${what}: at most 15 words and no em-dash`, t != null && t.split(' ').length <= 15 && !/—/.test(t), t);
+    const f = await foldInfo(foldId);
+    check(r, `${what}: a shut "How this works" fold at the end`, !!f && f.tag === 'DETAILS' && /\bhow\b/.test(f.cls) && !f.open && /How this works/.test(f.summary), f && { tag: f.tag, cls: f.cls, open: f.open, summary: f.summary });
+    check(r, `${what}: the fold holds the original words`, !!f && phrases.every(p => f.text.includes(p)), { missing: f ? phrases.filter(p => !f.text.includes(p)) : phrases });
+  };
+
+  // 1. The work tab. The logs warning first (before the athlete's logs are read once), then the Personal records note.
+  await page.evaluate(() => window.__STUB.fail.push({ kind: 'from', name: 'session_history', op: 'select', message: 'fixture: logs unavailable', times: 1 }));
+  await L.go(page, 'a/ava_test/work'); await L.settle(page, 700);
+  const warn = ((await hintText('#tabbody .loadwarn')) || '');
+  check(r, 'work tab: the session-logs warning is still said in full', /Their session logs did not load\./.test(warn) && /not because they skipped the work/.test(warn) && /fixture: logs unavailable/.test(warn), warn);
+  check(r, 'work tab: and it takes two lines at most at 1440 px', (await linesOf('#tabbody .loadwarn')) >= 1 && (await linesOf('#tabbody .loadwarn')) <= 2, await linesOf('#tabbody .loadwarn'));
+  await page.evaluate(() => {
+    const row = window.__DB.programs.find(p => p.athlete_id === 'ava_test');
+    const d = JSON.parse(JSON.stringify(row.data));
+    d.workouts.days[0].blocks[1].exercises[0].test = '3RM';
+    row.data = d; row.updated_at = new Date(Date.now() + 1000).toISOString();
+  });
+  await page.evaluate(() => reloadPrograms().then(render)); await L.settle(page, 700);
+  await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/work'); await L.settle(page, 700);
+  await panel('work tab, Personal records', '[data-hint=prs]', 'how-prs', ['Estimated one-rep maxes, worked out from their logged sets or entered after a test.', 'They own the record — this is read-only.']);
+  const stripSubs = await page.evaluate(() => [...document.querySelectorAll('.mstrip .mp-s')].map(e => e.textContent.trim()));
+  check(r, 'work tab: the metric strip\'s sub-lines were already short and are unchanged (each under 8 words)', stripSubs.length === 3 && stripSubs.every(s => s.split(' ').length < 8), stripSubs);
+  check(r, 'work tab: Earlier cycles and the Live app snapshot are folded rows, not paragraphs of intro', await page.evaluate(() => [...document.querySelectorAll('#earlier-cycles > summary, #livesnap > summary')].every(s => s.textContent.trim().split(/\s+/).length <= 10)), '');
+
+  // 2. The ⚙ Tools panel: the Coach tools note and the Logins to send paragraph.
+  await L.go(page, 'athletes');
+  await openTools(page);
+  await panel('Tools, Coach tools', '#toolsPanel [data-hint=tools]', 'how-tools', ['New athletes and new cycles go up through the pipeline (publish_cycle); there is no upload button.', 'Back up weekly: the free plan keeps no backups. Keep the last 12 files, on this computer and off it, and delete older ones (the privacy notice promises about three months).', 'The way back is written down and rehearsed: scripts/restore/README.md in the repo.']);
+  await panel('Tools, Logins to send', '#toolsPanel [data-hint=creds]', 'how-creds', ['Copy each one and send it on WhatsApp, then mark it sent. A password is stored here only until you do, or until the person signs in with it: the database then clears it by itself (stage51) and they drop out of this list.', 'After that the only way to see one again is a reset.', 'Signed in with it can only show for a moment, or for one stored before stage51.']);
+  await page.locator('#toolsBtn').click(); await L.settle(page, 150);
+
+  // 3. Leads → Referral codes: the intro, the deal, and the new-code form's hint.
+  await L.go(page, 'leads/codes'); await L.settle(page, 500);
+  await panel('Referral codes, intro', '[data-hint=aff]', 'how-aff', ['These are the codes both apply forms accept. Add or retire one and it takes effect straight away — no deploy.', 'The deal: the client gets the code\'s % off; the coach earns 10% of what the client actually pays — first payment and every renewal. Payout details stay in the application email (Gmail, subject:(Affiliate)).']);
+  const deal = await hintText('[data-hint=aff-deal]');
+  check(r, 'Referral codes, the deal: one short line, no em-dash', deal != null && (await linesOf('[data-hint=aff-deal]')) === 1 && deal.split(' ').length <= 15 && !/—/.test(deal), deal);
+  await page.locator('#affAdd').click(); await L.settle(page, 300);
+  await panel('Referral codes, the new-code form', '[data-hint=aff-new]', 'how-aff-new', ['Convention is NAME10 — uppercase letters and digits, no spaces. Payout / card details stay in the application email, never here.']);
+
+  // 4. Buyers, both tabs: the intro, the New login hint (the long password text is in the fold).
+  await L.go(page, 'buyers'); await L.settle(page, 700);
+  await panel('Buyers, Course', '[data-hint=buyers]', 'how-buyers', ['Logins for the Tennis Performance System course (Level 2),', 'One login per buyer.', 'Creates the account and copies a Farsi WhatsApp message with the link, username, password and install steps.', 'Password: 8+ characters, English letters, numbers and symbols, no spaces. Leave it empty to generate one.']);
+  const bn = await hintText('[data-hint=buyers-new]');
+  check(r, 'Buyers, Course: the New login hint is one short line', bn != null && (await linesOf('[data-hint=buyers-new]')) === 1 && bn.split(' ').length <= 15 && !/—/.test(bn), bn);
+  await L.go(page, 'buyers/testing'); await L.settle(page, 700);
+  await panel('Buyers, Testing app', '[data-hint=buyers]', 'how-buyers', ['Logins for the tennis testing app,', 'One login per buyer; an academy\'s coaches share it.', 'Creates the account and copies a Farsi WhatsApp message with the link, username and password.', 'Password: 8+ characters, English letters, numbers and symbols, no spaces. Leave it empty to generate one.']);
+
+  // 5. Proof: the board's subtitle (the time and Reload stay), the Season paragraph, the wall composer.
+  await L.go(page, 'proof'); await L.settle(page, 900);
+  await panel('Proof, the board', '#boardPanel [data-hint=board]', 'how-board', ['Scored by the server — exactly what the crew sees in the app.']);
+  const bt = await hintText('#boardPanel [data-hint=board]');
+  check(r, 'Proof, the board: "As of hh:mm." and Reload are still in the hint', /^As of \d\d:\d\d\./.test(bt || '') && (await page.locator('#boardPanel [data-hint=board] button', { hasText: 'Reload' }).count()) === 1, bt);
+  await panel('Proof, Season', '[data-hint=season]', 'how-season', ['Starting or closing a season stays in the Supabase SQL editor on purpose — it resets every score. See XP_SYSTEM.md.']);
+  await panel('Proof, the wall composer', '#wallPanel [data-hint=wall]', 'how-wall', ['Pinned on today\'s wall. Quotes, < > and backslashes are removed when you post, and line breaks become spaces.']);
+  check(r, 'Proof, the wall composer: the visible hint still says that characters are removed (the reason a typed quote disappears)', /removed/.test((await hintText('#wallPanel [data-hint=wall]')) || ''), await hintText('#wallPanel [data-hint=wall]'));
+
+  // 6. Leads → Free signups: the funnel's intro.
+  await L.go(page, 'leads/signups'); await L.settle(page, 600);
+  await panel('Free signups, the funnel', '#funnelPanel [data-hint=funnel]', 'how-funnel', ['Free signups from proof.html — days logged is the qualifying signal.', '+ days on the free tier = worth a WhatsApp.']);
+  const fh = await hintText('#funnelPanel [data-hint=funnel]'), ff = await foldInfo('how-funnel');
+  check(r, 'Free signups: when some have never logged a day, the hint says how many of how many and the fold says what to do about it', !/have never logged a day/.test(ff.text) || (/^\d+ of \d+ have never logged a day\.$/.test(fh) && /they need a first-day nudge, not a pitch\./.test(ff.text)), { fh, fold: ff.text.slice(0, 300) });
+
+  // 7. Today: the same composer in the short Proof column.
+  await L.go(page, 'today'); await L.settle(page, 500);
+  await panel('Today, the wall composer', '#proofToday [data-hint=wall]', 'how-wall', ['Pinned on today\'s wall. Quotes, < > and backslashes are removed when you post, and line breaks become spaces.']);
+  check(r, 'Today: only one composer and one fold on the page', (await page.locator('#coachLineInput').count()) === 1 && (await page.locator('#how-wall').count()) === 1, '');
+
+  // 8. Exercises: Qualities and Coverage.
+  await L.go(page, 'exercises/qualities'); await L.settle(page, 700);
+  await panel('Qualities, The ten qualities', '[data-hint=qm]', 'qm-how', ['What each day card on Home says it builds. A quality reaches a phone only when it is approved and the day\'s exercises carry it.']);
+  await panel('Qualities, Quality check', '[data-hint=qc]', 'qc-how', ['For each athlete: what their current week trains most, in working sets a week']);
+
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+
+  // 9. Coverage: the "Cards that show something else on a phone" hint (a draft twin of an approved entry, as in spine-phone-view).
+  const c2 = await L.openCoach(b, { hash: 'athletes' });
+  await c2.page.setViewportSize({ width: 1440, height: 900 });
+  await c2.page.evaluate(() => {
+    const now = new Date().toISOString();
+    const E = (id, name, status) => ({ id, name, aliases: [], pattern: 'isolation', qualities: ['strength'], purpose: 'Fixture.', tennis: null, cues: { good: ['Fixture cue'], bad: [] },
+      equipment: [], loads: [], easier: [], harder: [], alts: [], video: null, status, updated_at: now, updated_by: 'coach', impact: 'none', muscles: null });
+    window.__DB.exercises.splice(0, window.__DB.exercises.length, E('seated-leg-curl', 'Seated Leg Curl', 'approved'), E('machine-seated-leg-curl', 'Machine Seated Leg Curl', 'draft'));
+    window.__DB.exercise_coach.splice(0, window.__DB.exercise_coach.length);
+    const row = window.__DB.programs.find(p => p.athlete_id === 'ava_test');
+    const d = JSON.parse(JSON.stringify(row.data));
+    d.workouts.days = [{ id: 1, focusTag: 'Legs First (fixture)', blocks: [{ icon: '💪', title: 'Primary', exercises: [{ name: 'Machine Seated Leg Curl', exId: 'machine-seated-leg-curl', type: 'standard', rx: { sets: 3, reps: 10, rpe: 7 } }] }] }, { id: 2, focusTag: 'Upper Push (fixture)', blocks: [] }, { id: 3, focusTag: 'Pull Day (fixture)', blocks: [] }];
+    row.data = d; row.updated_at = new Date(Date.now() + 1000).toISOString();
+  });
+  await c2.page.evaluate(() => { S.spine = null; return reloadPrograms(); });
+  await L.go(c2.page, 'exercises/coverage'); await L.settle(c2.page, 900);
+  // `panel` closes over the first page, so this one is checked inline.
+  const cd = await c2.page.evaluate(() => {
+    const el = document.querySelector('[data-hint=cov-differ]'), f = document.getElementById('cov-differ-how');
+    return { hint: el ? el.textContent.replace(/\s+/g, ' ').trim() : null, fold: f ? { open: f.open, text: f.textContent.replace(/\s+/g, ' '), summary: (f.querySelector('summary') || {}).textContent } : null };
+  });
+  check(r, 'Coverage, Cards that show something else: the hint is at most 15 words with no em-dash', cd.hint != null && cd.hint.split(' ').length <= 15 && !/—/.test(cd.hint), cd.hint);
+  check(r, 'Coverage, Cards that show something else: a shut fold holds the original paragraph', !!cd.fold && !cd.fold.open && /How this works/.test(cd.fold.summary) && cd.fold.text.includes('These cards find a draft here, so on a phone they show nothing (a card that names its entry shows that entry or nothing) or, with no entry named, the closest approved one.'), cd.fold);
+  const cl = await c2.page.evaluate(() => { const el = document.querySelector('[data-hint=cov-differ]'); if (!el) return -1; const tops = []; const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { const rg = document.createRange(); rg.selectNodeContents(n); for (const rc of rg.getClientRects()) if (rc.width > 0.5 && !tops.some(t => Math.abs(t - rc.top) < 4)) tops.push(rc.top); } return tops.length; });
+  check(r, 'Coverage, Cards that show something else: one line at 1440 px', cl === 1, cl);
+  check(r, 'no page errors (Coverage)', !c2.log.errors.length, c2.log.errors);
+  await c2.page.context().close();
   return r;
 };
 
