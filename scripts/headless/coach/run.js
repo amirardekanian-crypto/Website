@@ -4223,7 +4223,7 @@ S['r3-library-charts-editor'] = async (b) => {
   const hd = await page.evaluate(() => ({ primary: document.querySelectorAll('#content .btn.primary').length,
     btns: [...document.querySelectorAll('.lib-acts .btn')].map(x => x.textContent.trim()),
     sentence: [...document.querySelectorAll('#content p')].filter(p => /changes every athlete's app at once/.test(p.textContent)).map(p => !!p.closest('details.how')),
-    howLast: document.querySelector('#content').lastElementChild === document.querySelector('details.how'), howOpen: document.querySelector('details.how').open }));
+    howLast: document.querySelector('#content').lastElementChild === document.querySelector('#content > details.how'), howOpen: document.querySelector('#content > details.how').open }));
   check(r, 'the two publish buttons are plain buttons in the header line, and there is no primary button on the screen', hd.primary === 0 && JSON.stringify(hd.btns) === JSON.stringify(['+ Publish workout', '+ Publish article']), hd);
   check(r, 'the sentence about what publishing does is in the How this works fold at the foot, shut', hd.sentence.length === 1 && hd.sentence[0] && hd.howLast && !hd.howOpen, hd);
   // Hide still goes through the same guarded write
@@ -4882,6 +4882,10 @@ S['tools-button'] = async (b) => {
   check(r, 'it stays open through a redraw', await page.locator('#toolsPanel').isVisible(), '');
   await page.locator('#toolsBtn').click();
   check(r, 'and closes again', await page.locator('#toolsPanel').isHidden(), '');
+  // A menu closes when you go somewhere (round 3 merge, 2026-10-12): left open, it sat over the Library's publish buttons.
+  await page.locator('#toolsBtn').click();
+  await L.go(page, 'links');
+  check(r, 'it closes when you go to another screen, and its button says so', await page.locator('#toolsPanel').isHidden() && (await page.locator('#toolsBtn').getAttribute('aria-expanded')) === 'false', '');
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

@@ -2899,6 +2899,7 @@ function renderNow() {
 window.addEventListener('hashchange', ev => {
   if (_erase && _erase.status !== 'busy') _erase = null;   // an open Erase panel never follows the coach to another screen
   if (_danger && !_danger.busy) _danger = null;            // nor does a dangerAsk panel (Delete training history, Forget, End the run, Delete for good, Delete a call log)
+  if (_toolsOpen) setTools(false);                         // a menu closes when you go somewhere: on Library it sat over the publish buttons
   // Leaving the Exercises tab, or moving between its three sub-tabs (the editor is only on Entries), with typed, unsaved work asks
   // first, and stays put on a no.
   fixLegacyHash();
