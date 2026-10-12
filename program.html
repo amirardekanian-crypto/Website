@@ -712,7 +712,7 @@
   }
   /* This cycle (PROG-01): where the small cycle line was, the top of Home. */
   .cyc-card { display: block; width: calc(100% - 48px); margin: 0 24px 22px; padding: 16px 16px 10px; border: 0; border-radius: 16px;
-    background: #122A22; color: #fff; text-align: left; cursor: pointer; font: inherit; box-shadow: 0 8px 24px rgba(14,74,54,0.16); }   /* the Home rows' green */
+    background: #122A22; color: #fff; text-align: left; cursor: pointer; font: inherit; box-shadow: 0 8px 24px rgba(14,74,54,0.16); }   /* the dark green of the Cycle complete card, on Progress */
   .cyc-card > span { display: block; }
   .cyc-top { display: flex !important; align-items: center; justify-content: space-between; gap: 10px;
     font: 700 var(--fs-label)/1.35 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.78); }
@@ -5002,9 +5002,9 @@
   #home-overview .dc-row + .dc-row { border-top: 1px solid var(--hair); }
   #home-overview .dc-row:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
   #home-overview .dc-row:active { background: rgba(14,74,54,.05); }
-  #home-overview .dc-num { font: 900 32px/1 'Barlow Condensed', sans-serif;   /* display: the day's number, as the exercise numerals on the training day */
+  #home-overview .dc-num { font: 900 32px/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif;   /* display: the day's number, P24 as the exercise numerals on the training day */
     color: transparent; -webkit-text-stroke: 1.5px var(--green-ink); paint-order: stroke fill; font-variant-numeric: tabular-nums; }
-  #home-overview .dc-row.is-done .dc-num { color: var(--green-ink); -webkit-text-stroke: 0; }
+  #home-overview .dc-row.is-done .dc-num { color: var(--green-ink); }
   #home-overview .dc-row .dc-nm { display: block; min-width: 0; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; text-transform: none; color: var(--ink); text-wrap: balance; }
   #home-overview .dc-row .dc-nm small { display: block; margin-top: 3px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   #home-overview .dc-row.is-done .dc-nm { font-size: var(--fs-body); color: var(--grey); }
@@ -5020,8 +5020,9 @@
   :where(#home-overview, #screen-plan) .hrow-ic svg { width: 22px; height: 22px; }
   :where(#home-overview, #screen-plan) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
   :where(#home-overview, #screen-plan) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
-  :where(#home-overview, #screen-plan) .hrow-v { display: block; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
-  :where(#home-overview, #screen-plan) .hrow-v small { display: inline-block; margin-left: 8px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  :where(#home-overview, #screen-plan) .hrow-v { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
+  :where(#home-overview, #screen-plan) .hrow-vv { white-space: nowrap; }   /* the value never breaks; the small line under it wraps whole */
+  :where(#home-overview, #screen-plan) .hrow-v small { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
   :where(#home-overview, #screen-plan) .hrow-v.is-togo { color: var(--clay-ink); }   /* "2 to go" asks for something */
   :where(#home-overview, #screen-plan) .hrow-v.is-ok { color: var(--green-ink); }
   :where(#home-overview, #screen-plan) .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); }
@@ -5038,7 +5039,7 @@
   .prog-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--green-ink); }
   .prog-title { margin: 0; font: 900 var(--fs-display)/1 'Barlow Condensed', sans-serif; letter-spacing: .3px; text-transform: uppercase; color: var(--ink); }
   #screen-plan .athlete-header .sport-badge { margin-top: 14px; }
-  #screen-plan .cyc-card { width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 22px; cursor: default; }
+  #screen-plan .cyc-card { width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 22px; padding-bottom: 16px; cursor: default; }
   #screen-plan .sub-banner { margin: 0 var(--g) 20px; }
   #screen-plan .prog-sec { display: flex; align-items: center; gap: 12px; margin: 26px 0 12px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
     letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
@@ -5187,15 +5188,14 @@
   <!-- All future cycles (next + upcoming), unified layout -->
   <div id="upcoming-wrap"></div>
 
-  <!-- Personal Records and Daily Habits used to sit here. They moved to the
-       bottom of Home, under the week's day cards (Amir, 2026-09-12) — Home is
-       the screen athletes actually land on. -->
+  <!-- Daily Habits are on Home, under the week's days (Amir, 2026-09-12). Personal Records and Body weight are
+       the "Your numbers" rows above (2026-10-12). -->
 
 </div>
 
 <!-- ═══ PERSONAL RECORDS ═══ the athlete's estimated 1RM per lift, built from the
-     sets they already log. A sub-screen of Home (reached from its row under the
-     week or an exercise's History sheet, never from the tab bar), with its own
+     sets they already log. A sub-screen of Progress (reached from its row under "Your numbers"
+     or an exercise's History sheet, never from the tab bar), with its own
      per-lift history view. Everything here reads from "<id>_1rm"; body weight
      comes from this app's own <id>_hab_wt so relative strength can be shown. -->
 <div id="screen-ceiling" class="screen">
@@ -10090,7 +10090,7 @@ function habitCardHtml() {
   const tone = fresh && s.verdict === 'togo' ? ' is-togo' : fresh && (s.verdict === 'on' || s.verdict === 'perfect') ? ' is-ok' : '';
   return `<button type="button" class="hrow" onclick="goHabits()">
     ${hrowIc('habits')}<span class="hrow-b"><span class="hrow-l">Daily habits</span>
-      <span class="hrow-v${tone}">${said}<small>${s.streak} day${s.streak === 1 ? '' : 's'} in a row</small></span></span>
+      <span class="hrow-v${tone}"><span class="hrow-vv">${said}</span><small>${s.streak} day${s.streak === 1 ? '' : 's'} in a row</small></span></span>
     <span class="hrow-a" aria-hidden="true">›</span></button>`;
 
 }
@@ -10105,7 +10105,7 @@ function hrowIc(kind) {
   return `<span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${draw}</svg></span>`;
 }
 
-// ── PERSONAL RECORDS — the Home row + its own screen ───────────────────
+// ── PERSONAL RECORDS — the row on Progress + its own screen ───────────────────
 // Same grammar as the habit row above: one tappable row (the best lift, its
 // change and a sparkline), and the depth one tap in.
 function ceilingCardHtml() {
@@ -10131,7 +10131,7 @@ function ceilingCardHtml() {
 
   return `<button type="button" class="hrow" onclick="goTo('ceiling')">
     ${hrowIc('records')}<span class="hrow-b"><span class="hrow-l">Personal records</span>
-      <span class="hrow-v"><span class="hrow-n" data-to="${best.latest.kg}"${from != null ? ` data-from="${from}"` : ''}>${from != null ? from : best.latest.kg}</span> kg<small>${esc(shortLift(best.lift))}${delta ? ' · ' + delta : ''}</small></span></span>
+      <span class="hrow-v"><span class="hrow-vv"><span class="hrow-n" data-to="${best.latest.kg}"${from != null ? ` data-from="${from}"` : ''}>${from != null ? from : best.latest.kg}</span> kg</span><small>${esc(shortLift(best.lift))}${delta ? ' · ' + delta : ''}</small></span></span>
     <span class="hrow-sp">${ncSpark(best.entries)}</span><span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
 
@@ -10193,7 +10193,7 @@ function ncSpark(entries) {
     <polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="${last[0]}" cy="${last[1]}" r="3.2" fill="#E06B43"/></svg>`;
 }
-// "Barbell Back Squat" → "Back Squat" for the short name on the Home row.
+// "Barbell Back Squat" → "Back Squat" for the short name on the Records row (Progress).
 function shortLift(name) {
   const t = String(name || '').replace(/^(barbell|dumbbell|machine|cable|smith machine)\s+/i, '');
   return t.length > 13 ? t.slice(0, 12).trim() + '…' : t;
@@ -14040,7 +14040,7 @@ function daysSince(iso) {
 // 2026-09-12 (it writes, pushes and merges it; see "moved here from AA Proof" above and
 // wtKey() below). This comment used to say AA Proof owned it and this app never wrote it,
 // which stopped being true that day.
-// Every real reading, oldest first, for the Home card's trend. Tombstones
+// Every real reading, oldest first, for the Body weight row's trend (Progress). Tombstones
 // (kg: null, a deleted reading) are skipped, same as latestBodyWeight().
 function bodyWeightSeries() {
   let wt = null;
@@ -14050,7 +14050,7 @@ function bodyWeightSeries() {
     .map(d => ({ d: d, kg: wt[d].kg }));
 }
 
-// ── Body weight, on Home ───────────────────────────────────────────────────
+// ── Body weight, on Progress (it was a Home row until 2026-10-12) ──────────────────────────────
 // This app owns <id>_hab_wt (it writes, pushes and merges it; see "Writing body
 // weight" below). The row reads the series; a tap opens the Body Weight screen
 // (goWeight()), the one place a reading is logged.
@@ -14076,7 +14076,7 @@ function weightCardHtml() {
 
   return `<button type="button" class="hrow" onclick="goWeight()">
     ${hrowIc('weight')}<span class="hrow-b"><span class="hrow-l">Body weight</span>
-      <span class="hrow-v">${last.kg} kg<small>${esc(trend)}</small></span></span>
+      <span class="hrow-v"><span class="hrow-vv">${last.kg} kg</span><small>${esc(trend)}</small></span></span>
     <span class="hrow-sp">${ncSpark(series.map(e => ({ kg: e.kg })))}</span><span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
 
@@ -16135,7 +16135,7 @@ window.openWhyPlan = openWhyPlan;
 // through get_qualities() — APPROVED ONLY. Each Spine entry carries up to three in
 // `qualities`, the first being its primary. A day's mix is worked out here from
 // the exercises in it; nothing is tagged on a programme. Amir's calls: shown on
-// the DAY CARDS on Home for every athlete; words only, never set counts.
+// the Next up card on Home and each day's cover for every athlete; words only, never set counts.
 let QUALS = null, QUALS_BY_ID = {};
 function setQualities(list) {
   QUALS = Array.isArray(list) ? list.slice().sort((a, b) => (a.sort || 0) - (b.sort || 0)) : null;

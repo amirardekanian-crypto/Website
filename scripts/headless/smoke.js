@@ -16,9 +16,16 @@ const H = require('./lib');
   for (const [w, dark] of [[390, false], [390, true], [320, false]]) {
     const tag = `${w}${dark ? ' dark' : ''}`, file = `program-${w}${dark ? '-dark' : ''}`;
     const { ctx, p } = await H.openProgram(browser, { w, dark });
+    // The This cycle card moved to Progress (2026-10-12): Home opens with This Week and Next up (or the day rows), Progress shows the card.
     const home = await p.evaluate(() => ({ on: document.getElementById('screen-home').classList.contains('active'),
-      cycle: !!document.querySelector('.cyc-card'), text: document.getElementById('screen-home').innerText.length }));
-    t.check(`program ${tag}: Home opens with the This cycle card`, home.on && home.cycle && home.text > 100, JSON.stringify(home));
+      week: !!document.querySelector('#home-week-wrap .home-section-title, #home-week-wrap .week-note'),
+      next: !!document.querySelector('#day-cards-wrap .dc-hero, #day-cards-wrap .dc-row'), cycle: !!document.querySelector('#screen-home .cyc-card'),
+      text: document.getElementById('screen-home').innerText.length }));
+    t.check(`program ${tag}: Home opens with This Week and a Next up card or day rows, no This cycle card`, home.on && home.week && home.next && !home.cycle && home.text > 100, JSON.stringify(home));
+    const prog = await p.evaluate(() => { goTo('plan'); return { on: document.getElementById('screen-plan').classList.contains('active'), cycle: !!document.querySelector('#screen-plan .cyc-card') }; });
+    t.check(`program ${tag}: Progress opens with the This cycle card`, prog.on && prog.cycle, JSON.stringify(prog));
+    t.check(`program ${tag}: Progress has no sideways scroll`, (await noSideways(p)) <= 0);
+    await p.evaluate(() => goTo('home'));
     t.check(`program ${tag}: Home has no sideways scroll`, (await noSideways(p)) <= 0);
     await shot(p, file + '-home');
 

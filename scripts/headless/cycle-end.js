@@ -1,6 +1,7 @@
 // When the cycle is over (PROG-02): the day after the current cycle's endDate, Home says Cycle complete,
 // shows the next cycle under Up next, asks "Ready for Cycle N?" (always, the last cycle included) and folds
-// the day cards under Repeat a session; Game Plan marks the cycle Done. Serve the repo first
+// the day cards under Repeat a session; Progress marks the cycle Done. Since 2026-10-12 the Cycle complete / Roadmap complete CARD (and its
+// wins) is on Progress, and Home says the cycle ended with one door row, Cycle N complete (.bt-done). Serve the repo first
 // (python3 -m http.server 8765 --bind 127.0.0.1, see lib.js), then: node scripts/headless/cycle-end.js [--out <dir>]
 'use strict';
 const path = require('path');
@@ -23,7 +24,7 @@ function hist(endedAgo) {
     { ex: 'Barbell Back Squat', block: 'Strength', reps: 6, note: '', sets: [1, 2, 3].map(() => ({ w: String(w), n: 6, r: '7', d: true })) }] });
   return [sq(70, 1), sq(75, 29)];
 }
-// Game Plan's pill on the current cycle's card, and which meter segment is current.
+// The Game Plan's pill on the current cycle's card (on Progress), and which meter segment is current.
 const plan = p => p.evaluate(() => {
   goTo('plan');
   const segs = [...document.querySelectorAll('.cycle-meter-seg')].map(x => x.classList.contains('current') ? 'current' : x.classList.contains('done') ? 'done' : '-');
@@ -32,9 +33,12 @@ const plan = p => p.evaluate(() => {
   return out;
 });
 const state = p => p.evaluate(() => ({
-  fin: (document.querySelector('.cyc-fin-h') || {}).textContent || null,
-  sub: (document.querySelector('.cyc-fin-s') || {}).textContent || null,
-  wins: document.querySelectorAll('.cyc-card .cyc-win').length,
+  fin: (document.querySelector('#screen-plan .cyc-fin-h') || {}).textContent || null,
+  sub: (document.querySelector('#screen-plan .cyc-fin-s') || {}).textContent || null,
+  wins: document.querySelectorAll('#screen-plan .cyc-card .cyc-win').length,
+  cardOnHome: !!document.querySelector('#screen-home .cyc-card, #screen-home .home-cyc'),
+  bt: (document.querySelector('#home-week-wrap .bt-done .hrow-l') || {}).textContent || null,
+  btSub: (document.querySelector('#home-week-wrap .bt-done .hrow-q') || {}).textContent || null,
   upnext: !!document.querySelector('.bt-next .current-message'),
   building: /building it/i.test(document.getElementById('screen-home').innerText),
   door: (document.querySelector('.bt-wa b') || {}).textContent || null,
@@ -55,7 +59,8 @@ const state = p => p.evaluate(() => ({
   for (const [ago, tag] of [[-4, 'week 5'], [0, 'the end date']]) {
     const { ctx, p } = await H.openProgram(browser, { prog: prog(ago), hist: hist(ago) });
     const s = await state(p);
-    t.check(`${tag}: the running card and This Week, nothing between cycles`, !s.fin && !s.upnext && !s.rep && s.weekSum && !s.folded, JSON.stringify(s));
+    t.check(`${tag}: This Week, nothing between cycles (no Cycle complete card on Progress, no row on Home)`, !s.fin && !s.bt && !s.upnext && !s.rep && s.weekSum && !s.folded, JSON.stringify(s));
+    t.check(`${tag}: the This cycle card is on Progress and not on Home`, !s.cardOnHome && await p.evaluate(() => !!document.querySelector('#screen-plan .cyc-card .cyc-k')), JSON.stringify(s));
     const g = await plan(p);
     t.check(`${tag}: Game Plan says Active, the meter on cycle 2`, g.pill === 'Active' && g.segs === 'done current -', JSON.stringify(g));
     await ctx.close();
@@ -65,8 +70,12 @@ const state = p => p.evaluate(() => ({
   {
     const { ctx, p } = await H.openProgram(browser, { prog: prog(4), hist: hist(4) });
     let s = await state(p);
-    t.check('4 days past: Cycle complete, with the full 5 weeks', s.fin === 'Cycle complete' && /5 of 5 weeks/.test(s.sub), JSON.stringify(s));
-    t.check('4 days past: the cycle\'s win is still on the card', s.wins === 1, s.wins);
+    t.check('4 days past: Progress says Cycle complete, with the full 5 weeks', s.fin === 'Cycle complete' && /5 of 5 weeks/.test(s.sub), JSON.stringify(s));
+    t.check('4 days past: Home has the one door row, Cycle 2 complete, and no card', s.bt === 'Cycle 2 complete' && /^Finished [A-Z][a-z]{2} \d{1,2} · see it on Progress$/.test(s.btSub || '') && !s.cardOnHome, JSON.stringify(s));
+    const door = await p.evaluate(() => { document.querySelector('#home-week-wrap .bt-done').click(); return document.querySelector('.screen.active').id; });
+    t.check('4 days past: the door row opens Progress', door === 'screen-plan', door);
+    await p.evaluate(() => goTo('home'));
+    t.check('4 days past: the cycle\'s win is still on the card (on Progress)', s.wins === 1, s.wins);
     t.check('4 days past: Up next and Ready for Cycle 3?, nothing about Amir building it', s.upnext && !s.building && s.door === 'Ready for Cycle 3?', JSON.stringify(s));
     const g = await plan(p);
     t.check('4 days past: Game Plan says Done, the meter has no current cycle', g.pill === 'Done' && g.segs === 'done done -', JSON.stringify(g));
@@ -99,8 +108,8 @@ const state = p => p.evaluate(() => ({
   for (const [w, dark, name] of [[390, false, 'cycle-end-last'], [390, true, 'cycle-end-last-dark'], [320, false, 'cycle-end-last-320']]) {
     const { ctx, p } = await H.openProgram(browser, { prog: prog(4, 2), hist: hist(4), w, dark });
     const s = await state(p);
-    t.check(`last cycle ${w}${dark ? ' dark' : ''}: Roadmap complete, 3 cycles · 15 weeks, Ready for Cycle 4?`,
-      s.fin === 'Roadmap complete' && /3 cycles · 15 weeks/.test(s.sub) && !s.upnext && !s.building && s.door === 'Ready for Cycle 4?' && s.folded, JSON.stringify(s));
+    t.check(`last cycle ${w}${dark ? ' dark' : ''}: Roadmap complete (Progress, and the row on Home), 3 cycles · 15 weeks, Ready for Cycle 4?`,
+      s.fin === 'Roadmap complete' && s.bt === 'Roadmap complete' && /3 cycles · 15 weeks/.test(s.sub) && !s.upnext && !s.building && s.door === 'Ready for Cycle 4?' && s.folded, JSON.stringify(s));
     t.check(`last cycle ${w}${dark ? ' dark' : ''}: no sideways scroll, no page errors`, s.sideways <= 0 && p.errs.length === 0, p.errs.join(' | '));
     await shot(p, name);
     await ctx.close();
@@ -134,11 +143,12 @@ const state = p => p.evaluate(() => ({
     await live.ctx.close();
   }
 
-  // A cycle with no dates cannot end: the small line, the week, the day cards.
+  // A cycle with no dates cannot end: no card on Progress and no small line anywhere (the old .home-cyc is gone), the week, the day cards.
   {
     const { ctx, p } = await H.openProgram(browser, { prog: H.fixture({ dated: false }) });
     const s = await state(p);
-    t.check('no dates: nothing between cycles', !s.fin && !s.rep && s.weekSum && !s.folded && !!(await p.$('.home-cyc')), JSON.stringify(s));
+    t.check('no dates: nothing between cycles, no card and no small cycle line', !s.fin && !s.bt && !s.rep && s.weekSum && !s.folded && !(await p.$('.cyc-card')) && !(await p.$('.home-cyc')), JSON.stringify(s));
+    t.check('no dates: the This cycle slot on Progress is empty', await p.evaluate(() => document.getElementById('cycle-card-wrap').innerHTML.trim() === ''));
     await ctx.close();
   }
 
