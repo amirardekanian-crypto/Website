@@ -1456,6 +1456,9 @@ to explain the decision to the athlete.
 
 ## The tour — the game-style first run
 
+> **2026-10-12 (the UX audit's batch E):** each step is under 40 words (the row step says the circle opens the number on a counted habit; the board step rings the *You appear as* row), and the tour's buttons are the app's pill buttons (the tour lives outside `#app`, so it had square, uppercase ones). The same pass made **the manual fold**: every section is a heading you tap (`UI.manOpen`, *Start here* open on arrival), the contents list opens and goes to a section, and `openManual(section, from)` opens the right one from Progress (*Consistency*), the Locker (*The Locker*) and Crew (*The leaderboard*). **The wins card shows two lines at most**, then *and N more*. **No em-dash in anything an athlete reads** (COM-3): 95 lines of toasts, notes, onboarding, Settings and the manual were rewritten; the session's locked hint says *Finish any session in your programme and this ticks itself.*, and onboarding's ALWAYS ON is Settings' pill.
+
+
 **One screen of onboarding said what to track and not one word about how any of it
 works.** The athlete was then handed a scoring system, three tabs, a header button
 labelled with their own initials, and a habit row with **three different tap targets and
