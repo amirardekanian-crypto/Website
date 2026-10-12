@@ -5629,7 +5629,11 @@ async function forgetContact(athleteId) {
   if (error) { fail('Could not forget: ' + error.message); return; }
   toast('Forgotten');
   resetBoard();                                        // their board place went too
-  refetch(['contacts', 'notes', 'prog', 'optin']);   // forget_contact() deletes all four
+  await refetch(['contacts', 'notes', 'prog', 'optin']);   // forget_contact() deletes all four
+  // Forget lives on the person's File (Danger zone, 2026-10-12). Someone with no programme leaves the store with it, and their File
+  // would then say "No athlete … in the store": land on the roster instead.
+  const r = route();
+  if (r.view === 'detail' && r.id === athleteId && !S.ath[athleteId]) location.hash = '#athletes';
 }
 window.setBoardScope = setBoardScope;
 window.forgetContact = forgetContact;
