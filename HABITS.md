@@ -927,7 +927,7 @@ one word for both, the scope is all that keeps them apart. Today's seven-day rec
 longer names a "strongest" and "weakest" habit out of an eight-way tie at 0/7. The foot of
 Progress carries a second door to the manual.
 
-**Habit detail** (reached from here or from Today) shows that habit's rank and level
+**Habit detail** (since 2026-10-12, the UX audit: ‹ in the header, back to where it was opened, and no *Back to today* button at the foot; today's control first, *– · Log a number · +* on a counted habit; the 35-day grid with weekday letters; the stats; the ladder; the level as one line with its quip; the last five days; the header's streak from 3 days. The older order follows.) Reached from here or from Today, it shows that habit's rank and level
 progress, a log button, its consistency ladder, this-week / best-streak / 35-day-rate
 stats, a 35-day grid, and the last five days with the XP each earned. A day before the
 season earned nothing and says **BEFORE THE SEASON** instead of an XP figure (2026-09-26;

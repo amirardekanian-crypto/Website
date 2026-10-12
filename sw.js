@@ -247,7 +247,8 @@
 // v116: program.html changed (2026-10-12): Guided shows the week's limits row (under its top bar and on the rest screen).
 // v117: habits.html changed (2026-10-12, UX audit batch A): a counted habit's circle opens the log sheet, which takes a typed number.
 // v118: habits.html changed (2026-10-12, UX audit batch B): Today's card is one game line, the week and one nudge line; Progress has one week table.
-const CACHE = 'aap-v118';
+// v119: habits.html changed (2026-10-12, UX audit batch C): a habit's page has ‹ and leads with today's control.
+const CACHE = 'aap-v119';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

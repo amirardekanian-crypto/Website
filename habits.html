@@ -1978,7 +1978,7 @@
   #app .ph-lvl { font-size: 11px; letter-spacing: .06em; }
   /* The 35-day grid's key ("Five weeks ago · the legend · Today") no longer fits one line on a narrow phone
      at 11 px: the legend takes a line of its own under the two ends. */
-  @media (max-width: 379px) {
+  @media (max-width: 439px) {
     #app .gridkey { flex-wrap: wrap; row-gap: 6px; }
     #app .gridkey .gk { order: 3; flex-basis: 100%; justify-content: center; flex-wrap: wrap; }
   }
@@ -2068,6 +2068,11 @@
   #app .statgrid .statfrac .of { font-size: 13px; }
   #app .statgrid .eyebrow { letter-spacing: .03em; line-height: 1.2; }
   @media (max-width: 359px) { #app .wt-r { grid-template-columns: minmax(0, 70px) repeat(7, minmax(0, 1fr)) 34px; gap: 3px; } #app .wt-r .hring { width: 30px; height: 30px; } }
+  /* ── A HABIT'S PAGE (2026-10-12, the UX audit) ── */
+  #app .dt-ctl { display: flex; gap: 10px; align-items: center; }
+  #app .dt-ctl .dt-sq { flex: none; width: 52px; min-width: 52px; height: 48px; padding: 0; font-size: 22px; display: flex; align-items: center; justify-content: center; }
+  #app .g35h span { text-align: center; font-size: 11px; font-weight: 700; color: var(--muted-soft); }
+  #app .dt-level { display: flex; gap: 14px; align-items: center; }
   #app .wins-share { flex: none; min-height: 44px; padding: 0 18px; border-radius: 999px; background: none;
     border: 1.5px solid rgba(246,244,255,.35); color: #F6F4FF; font-weight: 700; font-size: 13.5px; }
 
@@ -7697,7 +7702,7 @@ function renderApp() {
     // Today's header says nothing on the right: the verdict tile in the hero answers (PRF-03).
     today: '', progress: '',   // the stat grid states the badge count
     detail: (() => { const s = habitStreak(openH);       // not the level — the hero says it
-                     return s > 0 ? s + '-DAY STREAK' : ''; })(),
+                     return s >= BADGE_FROM ? s + '-DAY STREAK' : ''; })(),
     crew: (() => {
       if (LB.view === 'roll') {
         const n = RC.rows.filter(r => r.day === TKEY() && !r.is_coach).length;
@@ -7749,6 +7754,7 @@ function renderApp() {
              the way out. This goes exactly one step: sub-screen → the list →
              back where you came from. See overlayBack(). -->
         ${OVERLAY ? `<button class="hdback" data-k="hdback" aria-label="Back" ${on(overlayBack)}>&#8249;</button>` : ''}
+        ${UI.screen === 'detail' ? `<button class="hdback" data-k="hdback" aria-label="Back to ${UI.from === 'today' ? 'Today' : 'Progress'}" ${on(() => go(UI.from === 'today' ? 'today' : 'progress'))}>&#8249;</button>` : ''}
         <div style="min-width:0">
           <div class="eyebrow">${esc(head[0])}</div>
           <div class="title hd">${esc(head[1])}</div>
@@ -8645,21 +8651,16 @@ function renderDetail(h) {
   ];
   const hl = habitLevel(h), con = consistencyFor(h), done = isDone(h, AKEY());
   const v = valOf(AKEY(), h.id);
+  // THE HABIT'S PAGE LEADS WITH TODAY (2026-10-12, the UX audit). It opened on a 76 px level number;
+  // the one thing you come here to do, fix a day's number, sat second, and the only way out was a
+  // button at the foot of a 1,300 px page (the header has ‹ now). Order: today's control, the 35-day
+  // grid (weekday letters on top), the three stats, the consistency ladder, the level as one line with
+  // its quip, the last five days.
+  const g0 = addDays(today(), -34);
+  const letters = [0, 1, 2, 3, 4, 5, 6].map(n => addDays(g0, n).toLocaleDateString('en-GB', { weekday: 'narrow' }));
   return `
     <div data-k="screen:detail:${h.id}" style="${screenAnim()}">
-      <div class="block" style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;align-items:flex-end;gap:14px">
-          <div class="figure" data-hero data-static data-num="hlv:${h.id}" data-to="${hl.lv}" style="font-size:76px;line-height:.8">${hl.lv}</div>
-          <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:6px">
-            <div class="hd" style="font-size:16px;line-height:1">${esc(hl.label)}</div>
-            <div style="font-size:12px;line-height:1.3;color:var(--muted)"><span data-static data-num="hxp:${h.id}" data-to="${hl.xp}">${hl.xp.toLocaleString()}</span> XP banked · ${hl.toNext} to LV ${hl.lv + 1}</div>
-          </div>
-        </div>
-        <div class="bar thin"><span data-fill style="width:${hl.pct}%"></span></div>
-        <p style="margin:2px 0 0;font-size:13px;color:var(--muted)">${esc(QUIPS[h.id] || h.goal || '')}</p>
-      </div>
-
-      <div class="block" style="display:flex;flex-direction:column;gap:10px">
+      <div class="block dt-today" style="display:flex;flex-direction:column;gap:10px">
         <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
           <span>${editingPast() ? esc(dayLong(AKEY())) : 'Today'}</span><span>${done ? 'DONE' : fmtVal(h, v) + ' / ' + fmtVal(h, h.target) + ' ' + h.unit.toUpperCase()}</span>
         </div>
@@ -8668,30 +8669,26 @@ function renderDetail(h) {
                <div style="font-size:13px;line-height:1.5;color:var(--muted)">${esc((isFree() && h.freeHint) || h.lockedHint || '')}</div>
                <button class="btn btn-primary btn-block" ${on(() => (isFree() ? (window.location.href = '/form.html') : goProgram()))}>${isFree() ? 'See about coaching' : 'Open your programme'}</button>
              </div>`
-          : `<div style="display:flex;gap:10px">
-          <button class="btn ${done ? 'btn-secondary' : 'btn-primary'}" style="flex:1"
-            ${on(() => (h.kind === 'count' ? openSheet(h) : toggleHabit(h)))}>${h.kind === 'count' ? 'Log a number' : (done ? 'Undo today' : 'Mark done')}</button>
-          ${h.kind === 'count' && !done ? `<button class="btn btn-secondary" ${on(() => bump(h))}>+${h.step || 1}</button>` : ''}
-        </div>`}
+          : h.kind === 'count'
+          ? `<div class="dt-ctl">
+              <button class="btn btn-secondary dt-sq" aria-label="One less" ${on(() => { setVal(h.id, Math.max(0, v - (h.step || 1))); render(); })}>–</button>
+              <button class="btn btn-primary" style="flex:1" ${on(() => openSheet(h))}>Log a number</button>
+              <button class="btn btn-secondary dt-sq" aria-label="One more" ${on(() => bump(h))}>+</button>
+            </div>`
+          : `<button class="btn ${done ? 'btn-secondary' : 'btn-primary'} btn-block" ${on(() => toggleHabit(h))}>${done ? 'Undo ' + (editingPast() ? esc(dayLong(AKEY()).toLowerCase()) : 'today') : 'Mark done'}</button>`}
         <div style="font-size:11px;color:var(--muted-soft)">Worth ${baseXp(h)} XP a day · ${Math.round(baseXp(h) * XP_RULES.completionBonus)} XP when you finish it</div>
       </div>
 
       <div class="block" style="display:flex;flex-direction:column;gap:10px">
-        <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
-          <span>Consistency</span><span>${con.tier} of ${con.total}</span>
+        <div class="eyebrow" style="letter-spacing:.12em;display:flex;justify-content:space-between">
+          <span>Last 35 days</span><span>${habitRate35(h)}% hit</span>
         </div>
-        <!-- Was pips on the left and a right-aligned two-line block opposite
-             them, which left "best run 3d" orphaned against the right margin
-             and read as a layout accident. One column, one line each. -->
-        <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < con.tier ? 'on' : ''}" title="${t.days} days · ${tierXp(h, i)} XP"></i>`).join('')}</div>
-        <div style="font-size:12.5px;line-height:1.5;color:var(--muted)">
-          ${con.next
-            ? 'Next: <strong style="color:var(--ink)">' + esc(con.next.name) + '</strong> at a ' + con.next.days
-              + '-day streak · <strong style="color:var(--clay-deep)">+' + tierXp(h, con.tier) + ' XP</strong>'
-            : '<strong style="color:var(--ink)">UNBREAKABLE</strong> — every tier cleared.'}
-        </div>
-        <div style="font-size:12px;line-height:1.4;color:var(--muted-soft)">
-          Longest streak: ${con.best} day${con.best === 1 ? '' : 's'}${con.cur > 0 ? ' · on ' + con.cur + ' now' : ''}.
+        <div class="grid35 g35h" aria-hidden="true">${letters.map(l => `<span>${l}</span>`).join('')}</div>
+        <div class="grid35">${cells.map((c, i) => `<div class="c ${c}${i === cells.length - 1 ? ' now' : ''}" style="animation-delay:${(i * 0.011).toFixed(3)}s"></div>`).join('')}</div>
+        <div class="gridkey">
+          <span>Five weeks ago</span>
+          <span class="gk"><i class="c hit"></i>hit <i class="c part"></i>part <i class="c"></i>none${cells.indexOf('pre') >= 0 ? ' <i class="c pre"></i>before you started' : ''}</span>
+          <span>Today</span>
         </div>
       </div>
 
@@ -8702,22 +8699,32 @@ function renderDetail(h) {
         </div>`).join('')}
       </div>
 
-      <!-- The grid had no anchoring at all: 35 identical squares with nothing
-           saying which one is today, so the empty leading row read as broken
-           rather than as "before you started". -->
       <div class="block" style="display:flex;flex-direction:column;gap:10px">
-        <div class="eyebrow" style="letter-spacing:.12em;display:flex;justify-content:space-between">
-          <span>Last 35 days</span><span>${habitRate35(h)}% hit</span>
+        <div class="eyebrow" style="display:flex;justify-content:space-between;letter-spacing:.12em">
+          <span>Consistency</span><span>${con.tier} of ${con.total}</span>
         </div>
-        <div class="grid35">${cells.map((c, i) => `<div class="c ${c}${i === cells.length - 1 ? ' now' : ''}" style="animation-delay:${(i * 0.011).toFixed(3)}s"></div>`).join('')}</div>
-        <div class="gridkey">
-          <span>Five weeks ago</span>
-          <span class="gk"><i class="c hit"></i>hit <i class="c part"></i>part <i class="c"></i>none${cells.indexOf('pre') >= 0 ? ' <i class="c pre"></i>before you started' : ''}</span>
-          <span>Today</span>
+        <div class="pips">${CONSISTENCY_TIERS.map((t, i) => `<i class="${i < con.tier ? 'on' : ''}" title="${t.days} days · ${tierXp(h, i)} XP"></i>`).join('')}</div>
+        <div style="font-size:12.5px;line-height:1.5;color:var(--muted)">
+          ${con.next
+            ? 'Next: <strong style="color:var(--ink)">' + esc(con.next.name) + '</strong> at a ' + con.next.days
+              + '-day streak · <strong style="color:var(--clay-deep)">+' + tierXp(h, con.tier) + ' XP</strong>'
+            : '<strong style="color:var(--ink)">UNBREAKABLE</strong>, every tier cleared.'}
+        </div>
+        <div style="font-size:12px;line-height:1.4;color:var(--muted-soft)">
+          Longest streak: ${con.best} day${con.best === 1 ? '' : 's'}${con.cur > 0 ? ' · on ' + con.cur + ' now' : ''}.
         </div>
       </div>
 
-      <div>
+      <div class="block dt-level">
+        ${habitRing(hl)}
+        <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+          <div class="hd" style="font-size:15px;line-height:1.1">Level ${hl.lv} · ${esc(hl.label)}</div>
+          <div style="font-size:12px;line-height:1.3;color:var(--muted)"><span data-static data-num="hxp:${h.id}" data-to="${hl.xp}">${hl.xp.toLocaleString()}</span> XP banked · ${hl.toNext} to level ${hl.lv + 1}</div>
+          <div style="font-size:13px;line-height:1.4;color:var(--muted)">${esc(QUIPS[h.id] || h.goal || '')}</div>
+        </div>
+      </div>
+
+      <div style="padding-bottom:28px">
         ${logRows.length ? logRows.map(l => `<div class="row-rule" style="padding:13px 20px;display:flex;justify-content:space-between;align-items:baseline;gap:12px">
           <span style="display:flex;flex-direction:column;gap:3px">
             <span class="hd" style="font-size:14px;line-height:1">${esc(l.day)}</span>
@@ -8728,15 +8735,9 @@ function renderDetail(h) {
             <span class="mono" style="display:block;font-size:11px;color:var(--muted-soft);margin-top:3px">${l.pre ? 'BEFORE THE SEASON' : '+' + l.xp + ' XP'}</span>
           </span>
         </div>`).join('')
-        // On day one every one of these rows would be a day from before the
-        // athlete had the app — five MISSes for a period they were not here.
         : `<div style="padding:16px 20px;font-size:12.5px;line-height:1.5;color:var(--muted)">
             No days behind you yet. Once there are, the last five sit here with what each one earned.
           </div>`}
-      </div>
-
-      <div style="padding:18px 20px 34px">
-        <button class="btn btn-secondary btn-block" ${on(() => go(UI.from === 'today' ? 'today' : 'progress'))}>Back to ${UI.from === 'today' ? 'today' : 'progress'}</button>
       </div>
     </div>`;
 }
