@@ -356,8 +356,8 @@ S['quest-week-end-fails'] = async (b) => {
 // ── 11. Intake ───────────────────────────────────────────────────────────────
 S['intake-status'] = async (b) => {
   const r = { id: 'intake-status', title: 'Intake → Mark handled / Archive / Reopen (+ a failure)', checks: [] };
-  const { page } = await L.openCoach(b, { hash: 'intake' });
-  const badge = async () => (await page.locator('#rail a.tab', { hasText: 'Intake' }).innerText()).replace(/\s+/g, ' ');
+  const { page } = await L.openCoach(b, { hash: 'intake' });   // the old address: it lands on Leads
+  const badge = async () => (await page.locator('#rail a.tab', { hasText: 'Leads' }).innerText()).replace(/\s+/g, ' ');
   const b0 = await badge();
   // (2026-10-12, round 2: the newest new application is on show in the detail, with the buttons; its row in the list says which group it is in.)
   const detail = () => page.locator('.in-detail', { hasText: 'Fixture Applicant One' });
@@ -388,7 +388,7 @@ S['intake-status'] = async (b) => {
 
 // ── 12. Affiliates ───────────────────────────────────────────────────────────
 S['affiliates'] = async (b) => {
-  const r = { id: 'affiliates', title: 'Affiliates → add a code, retire one, and a refused write', checks: [] };
+  const r = { id: 'affiliates', title: 'Leads → Referral codes (the old #affiliates address): add a code, retire one, and a refused write', checks: [] };
   const { page, today, log } = await L.openCoach(b, { hash: 'affiliates' });
   await page.locator('#affAdd').click();
   const form = page.locator('.aff-form[data-new="1"]');
@@ -872,7 +872,7 @@ S['erase-athlete'] = async (b) => {
   const waPick = page.locator('.erase .pick', { hasText: 'same WhatsApp number' }).locator('input');
   check(r, 'three intake forms are offered: only the same-EMAIL one is ticked (a number can be a foreign number or a handle), the same-number and same-name ones are not, the stranger\'s is not listed', (await page.locator('.erase .pick').count()) === 3 && await emailPick.isChecked() && !(await waPick.isChecked()) && !(await namePick.isChecked()) && !/Someone Else/.test(text), text.slice(0, 900));
   check(r, 'the finder box is there, and the panel says one form will go, by name', (await page.locator('#eraseFindIn').count()) === 1 && /1 intake form will be erased with them/.test(text), text.slice(0, 1100));
-  check(r, 'it says what stays: backups, the inbox, and that the partner record stays with only its link removed', /weekly backup files/.test(text) && /inbox/.test(text) && /FIXTURE10 stays on the Affiliates tab/.test(text), text.slice(-420));
+  check(r, 'it says what stays: backups, the inbox, and that the partner record stays with only its link removed', /weekly backup files/.test(text) && /inbox/.test(text) && /FIXTURE10 stays under Leads, in Referral codes/.test(text), text.slice(-420));
   check(r, 'it says when the last backup was taken (none yet here), because that file is the only way back from a mistake', /last ⤓ Backup on this computer: none yet/.test(text) && /only way back/.test(text), text.slice(-520));
   const go = page.locator('#eraseGo');
   check(r, 'Erase for good is disabled until the id is typed', await go.isDisabled(), '');
@@ -1042,7 +1042,7 @@ S['erase-forms'] = async (b) => {
     (await waRow.count()) === 1 && !(await waRow.locator('input').isChecked()) && /also another athlete's/i.test(await waRow.innerText()) && /not ticked for you/.test(await page.locator('.erase').innerText())
     && await page.locator('.erase .pick', { hasText: 'same email' }).locator('input').isChecked(), t.slice(0, 900));
   const others = (await L.db(page)).hab_intake.length - 3;   // every form except the three the panel offers
-  check(r, 'the panel says one form will go, by name, and the finder lists how many others there are', /1 intake form will be erased with them/.test(t) && /Z\. E\./.test(t) && new RegExp(others + ' other forms in the Intake tab').test(t), t.slice(0, 1100) + ' | others=' + others);
+  check(r, 'the panel says one form will go, by name, and the finder lists how many others there are', /1 intake form will be erased with them/.test(t) && /Z\. E\./.test(t) && new RegExp(others + ' other forms in Leads').test(t), t.slice(0, 1100) + ' | others=' + others);
   // the finder: typing redraws only its results, so the box keeps focus
   const find = page.locator('#eraseFindIn');
   await find.click(); await find.pressSequentially('someone');
@@ -2468,7 +2468,7 @@ S['proof-board-truth'] = async (b) => {
 // Now Proof holds all of it, Today keeps a short Proof column that links to it, and body weight (which comes from the training app, not from
 // Proof) moved from the athlete's Proof sub-tab to The work, folded under one header line.
 S['proof-home'] = async (b) => {
-  const r = { id: 'proof-home', title: 'Proof holds the whole crew (wall, quest lever, pulse, board, titles, season, funnel); Today keeps a short Proof column that links to it; body weight is on The work', checks: [] };
+  const r = { id: 'proof-home', title: 'Proof holds the whole crew (wall, quest lever, pulse, board, titles, season); the signup funnel is on Leads → Free signups, not here; Today keeps a short Proof column that links to it; body weight is on The work', checks: [] };
   const { page, log, today } = await L.openCoach(b, {});
   const txt = async sel => (await page.locator(sel).innerText()).replace(/\s+/g, ' ').trim();
   const dayOf = n => page.evaluate(n => addDays(todayKey(), n), n);
@@ -2509,19 +2509,19 @@ S['proof-home'] = async (b) => {
   await page.locator('.board .counter').nth(0).click(); await L.settle(page, 600);
   check(r, 'the "on court today" counter opens Proof', (await page.evaluate(() => location.hash)) === '#proof' && (await page.locator('#wallPanel').count()) === 1, await page.evaluate(() => location.hash));
   n = await ids();
-  check(r, 'Proof: one #coachLineInput; the wall, quest lever, pulse, board and funnel once each; Today\'s column is gone', n.coachLineInput === 1 && n.wallPanel === 1 && n.questPanel === 1 && n.pulsePanel === 1 && n.boardPanel === 1 && n.funnelPanel === 1 && !n.proofToday, n);
+  check(r, 'Proof: one #coachLineInput; the wall, quest lever, pulse and board once each; the funnel is NOT here (it is Leads → Free signups); Today\'s column is gone', n.coachLineInput === 1 && n.wallPanel === 1 && n.questPanel === 1 && n.pulsePanel === 1 && n.boardPanel === 1 && n.funnelPanel === 0 && !n.proofToday, n);
   const geo = await page.evaluate(() => {
     const by = t => [...document.querySelectorAll('#content .panel')].find(p => (p.querySelector('.phead .t') || {}).textContent === t);
-    const P = { wall: by('The wall'), board: by('The board'), quest: by('Quest week'), pulse: by('Proof pulse'), titles: by('Titles minted'), season: by('Season'), funnel: by('The funnel') };
+    const P = { wall: by('The wall'), board: by('The board'), quest: by('Quest week'), pulse: by('Proof pulse'), titles: by('Titles minted'), season: by('Season') };
     const missing = Object.keys(P).filter(k => !P[k]);
     if (missing.length) return { missing };
     const R = {}; Object.keys(P).forEach(k => { const q = P[k].getBoundingClientRect(); R[k] = { l: Math.round(q.left), t: Math.round(q.top + scrollY), w: Math.round(q.width) }; });
     return R;
   });
   const colsOk = !geo.missing && geo.wall.l === geo.board.l && geo.wall.t < geo.board.t
-    && ['pulse', 'titles', 'season', 'funnel'].every(k => geo[k].l === geo.quest.l) && geo.quest.l > geo.wall.l + geo.wall.w - 1
-    && geo.quest.t < geo.pulse.t && geo.pulse.t < geo.titles.t && geo.titles.t < geo.season.t && geo.season.t < geo.funnel.t && Math.abs(geo.wall.t - geo.quest.t) < 3;
-  check(r, 'two columns: The wall then The board on the left; Quest week, Proof pulse, Titles minted, Season and The funnel (last) on the right, level at the top', colsOk, geo);
+    && ['pulse', 'titles', 'season'].every(k => geo[k].l === geo.quest.l) && geo.quest.l > geo.wall.l + geo.wall.w - 1
+    && geo.quest.t < geo.pulse.t && geo.pulse.t < geo.titles.t && geo.titles.t < geo.season.t && Math.abs(geo.wall.t - geo.quest.t) < 3;
+  check(r, 'two columns: The wall then The board on the left; Quest week, Proof pulse, Titles minted and Season (last) on the right, level at the top', colsOk, geo);
   check(r, 'the left column is the wider one (about 1.3 to 1)', !geo.missing && geo.wall.w / geo.quest.w > 1.2 && geo.wall.w / geo.quest.w < 1.4, geo.missing || [geo.wall.w, geo.quest.w]);
   const wallTxt = await txt('#wallPanel');
   check(r, 'the full wall: the composer holds the line posted from Today; yesterday\'s lines (the crew\'s with Hide, and yours) are here; Show the full week', (await page.locator('#wallPanel #coachLineInput').inputValue()) === 'Line from Today' && /Fixture wall line from Cara/.test(wallTxt) && /Fixture coach line yesterday/.test(wallTxt) && (await page.locator('#wallPanel .modbtn').count()) === 2 && /Show the full week/.test(wallTxt), wallTxt);
@@ -2544,13 +2544,15 @@ S['proof-home'] = async (b) => {
   await L.settle(page, 300);
   check(r, 'after the redraw Start the week is still on (questPickCount runs after the panel is drawn)', !(await startDisabled()), '');
   await page.evaluate(() => { document.querySelectorAll('#questPanel input:checked').forEach(i => { i.checked = false; }); questPickCount(); });
-  // the pulse, titles, season, funnel
+  // the pulse, titles, season; the funnel is on Leads → Free signups now
   const pulse = await page.evaluate(() => [...document.querySelectorAll('#pulsePanel .pulse')].map(x => x.innerText.replace(/\s+/g, ' ').trim()));
   check(r, 'Proof pulse lists every Proof athlete, most silent first (Dan, 5d silent, on top)', pulse.length === 3 && /^Dan/.test(pulse[0]) && /5d silent/.test(pulse[0]), pulse);
   const rest = await txt('#content');
-  check(r, 'Titles minted and Season are on Proof', /FIXTURE TITLE/.test(rest) && /Fixture Season/.test(rest), '');
+  check(r, 'Titles minted and Season are on Proof, and The funnel is not', /FIXTURE TITLE/.test(rest) && /Fixture Season/.test(rest) && !/The funnel/.test(rest), '');
+  await L.go(page, 'leads/signups');
   const fn = await page.evaluate(() => { const h = funnelPanelHtml(); return { section: /^\s*<section[^>]*id="funnelPanel"/.test(h), head: /The funnel/.test(h), rows: document.querySelectorAll('#funnelPanel .fun').length, acts: [...document.querySelectorAll('#funnelPanel .fun')].map(f => f.querySelector('.acts').innerText.replace(/\s+/g, ' ').trim()) }; });
-  check(r, 'The funnel comes from funnelPanelHtml() (one self-contained section) and keeps WhatsApp, copy email and open on each row', fn.section && fn.head && fn.rows === 2 && fn.acts.every(a => /WhatsApp/.test(a) && /copy email/.test(a) && /open/.test(a)), fn);
+  check(r, 'The funnel (Leads → Free signups) comes from funnelPanelHtml() (one self-contained section) and keeps WhatsApp, copy email and open on each row', fn.section && fn.head && fn.rows === 2 && fn.acts.every(a => /WhatsApp/.test(a) && /copy email/.test(a) && /open/.test(a)), fn);
+  await L.go(page, 'proof');
 
   // 3. posting and hiding from Proof; a redraw never blanks the page to "Fetching the board…" once the board is held
   await page.evaluate(() => { window.__sawFetching = false; const c = document.getElementById('content'); new MutationObserver(() => { if (c.innerText.includes('Fetching the board')) window.__sawFetching = true; }).observe(c, { childList: true, subtree: true, characterData: true }); });
@@ -2564,8 +2566,8 @@ S['proof-home'] = async (b) => {
   check(r, 'a redraw draws the held board AT ONCE: no "Fetching the board…" at any moment of the post, the hide or a render(), and the board rows and its time are there', !sync.spinner && sync.rows >= 1 && sync.asOf && (await page.evaluate(() => window.__sawFetching)) === false, { sync, saw: await page.evaluate(() => window.__sawFetching) });
   // a real first read waits inside the board's own panel only
   await page.evaluate(() => { resetBoard(); window.__STUB.delay.leaderboard_top = 1200; render(); });
-  const first = await page.evaluate(() => ({ board: document.getElementById('boardPanel').innerText.replace(/\s+/g, ' '), mic: !!document.querySelector('#wallPanel .mic'), quest: !!document.getElementById('questPanel'), pulse: document.querySelectorAll('#pulsePanel .pulse').length, funnel: !!document.getElementById('funnelPanel') }));
-  check(r, 'a real first read shows "Fetching the board…" in the board\'s own panel only, with the wall, quest lever, pulse and funnel already on screen', /Fetching the board/.test(first.board) && first.mic && first.quest && first.pulse === 3 && first.funnel, first);
+  const first = await page.evaluate(() => ({ board: document.getElementById('boardPanel').innerText.replace(/\s+/g, ' '), mic: !!document.querySelector('#wallPanel .mic'), quest: !!document.getElementById('questPanel'), pulse: document.querySelectorAll('#pulsePanel .pulse').length }));
+  check(r, 'a real first read shows "Fetching the board…" in the board\'s own panel only, with the wall, quest lever and pulse already on screen', /Fetching the board/.test(first.board) && first.mic && first.quest && first.pulse === 3, first);
   await L.settle(page, 1700);
   await page.evaluate(() => { window.__STUB.delay.leaderboard_top = 0; });
   check(r, 'and the rows arrive in that panel with their time', !/Fetching/.test(await txt('#boardPanel')) && /As of \d\d:\d\d/.test(await txt('#boardPanel')) && (await page.locator('#boardPanel .lbrow').count()) >= 1, await txt('#boardPanel'));
@@ -2728,6 +2730,192 @@ S['back-keeps-place'] = async (b) => {
   await page.evaluate(() => { location.hash = '#a/ava_test/work'; }); await L.settle(page, 700);
   await page.locator('#rail a.tab', { hasText: 'Athletes' }).first().click(); await L.settle(page, 700);
   check(r, 'tapping the Athletes tab (not Back) starts the roster at the top', (await y()) === 0, await y());
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Seven places, one sticky bar, ⚙ Tools in it (round 2 of the coach UX pass, 2026-10-12; Amir: "D1 yes") ───────────────────────────────────
+// Nine tabs became seven: Today, Athletes, Exercises, Proof, Leads (Intake + the signup funnel + Affiliates), Library, Buyers (the Course + the Testing app).
+// From 900 px the brand, the tabs, the signed-in label, ↻ Refresh, ⚙ Tools and Sign out are ONE sticky bar (it was a 58 px bar over a 61 px rail); under 900 px
+// the top bar and one row of tabs that scrolls sideways inside itself. ⚙ Tools hangs under the bar on every screen. The old addresses still land.
+S['nav-seven'] = async (b) => {
+  const r = { id: 'nav-seven', title: 'Seven places in one sticky bar with ⚙ Tools in it; Leads and Buyers have sub-tabs; the four old addresses land in the right place and are rewritten; Back keeps the place; no sideways scroll at 390 and 320', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'today' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await L.settle(page, 500);
+  const hash = () => page.evaluate(() => location.hash);
+  const tabsOf = () => page.evaluate(() => [...document.querySelectorAll('#rail a.tab')].map(a => ({ label: a.childNodes[0].textContent.trim(), href: a.getAttribute('href'), n: (a.querySelector('.n') || {}).textContent || '', on: a.classList.contains('active') })));
+  const subsOf = sel => page.evaluate(s => [...document.querySelectorAll(s + ' .stab')].map(a => ({ label: a.childNodes[0].textContent.trim(), href: a.getAttribute('href'), n: (a.querySelector('.n') || {}).textContent || '', on: a.classList.contains('active') })), sel);
+
+  // 1. the seven places and their two badges
+  const tabs = await tabsOf();
+  check(r, 'seven tabs, in this order, with these addresses: Today, Athletes, Exercises, Proof, Leads, Library, Buyers', JSON.stringify(tabs.map(t => t.label)) === JSON.stringify(['Today', 'Athletes', 'Exercises', 'Proof', 'Leads', 'Library', 'Buyers']) && JSON.stringify(tabs.map(t => t.href)) === JSON.stringify(['#today', '#athletes', '#exercises', '#proof', '#leads', '#links', '#buyers']), tabs);
+  const exp = await page.evaluate(() => ({ waiting: Object.values(S.ath).reduce((n, a) => n + a.toReply, 0), apps: newApplications() }));
+  check(r, 'two badges: Athletes (notes to read) and Leads (new applications), and none on the others', exp.apps === 2 && exp.waiting > 0 && tabs.filter(t => t.n).map(t => t.label + ':' + t.n).join() === `Athletes:${exp.waiting},Leads:${exp.apps}`, { exp, tabs: tabs.filter(t => t.n) });
+  check(r, 'Today is the one marked (aria-current), and the page title says Today\'s own: the Coach\'s Box alone', tabs.filter(t => t.on).map(t => t.label).join() === 'Today' && (await page.title()) === "The Coach's Box" && (await page.locator('#rail a.tab[aria-current="page"]').count()) === 1, await page.title());
+
+  // 2. one sticky bar
+  await page.evaluate(() => { document.getElementById('app').style.minHeight = '3500px'; });   // a sticky bar sticks inside its parent: the fixtures' pages are short, so the page is given room to scroll
+  const geo = () => page.evaluate(() => {
+    const t = document.querySelector('.topbar'), q = t.getBoundingClientRect(), cs = getComputedStyle(t);
+    const inside = sel => { const e = document.querySelector(sel), x = e.getBoundingClientRect(); return x.width > 0 && x.top >= q.top - 0.5 && x.bottom <= q.bottom + 0.5 && x.left >= q.left - 0.5 && x.right <= q.right + 0.5; };
+    const rail = [...document.querySelectorAll('#rail a.tab')].map(a => a.getBoundingClientRect());
+    return { h: Math.round(q.height), pos: cs.position, top: Math.round(q.top), allInside: ['.brand', '#rail', '#who', '.tbtn[aria-label=Refresh]', '#toolsBtn', '#logoutBtn'].filter(s => !inside(s)),
+      oneLine: rail.every(x => Math.abs(x.top - rail[0].top) < 1.5), tabsEnd: Math.round(rail[rail.length - 1].right), rightStart: Math.round(document.querySelector('.topbar .right').getBoundingClientRect().left),
+      stick: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stick')), contentTop: Math.round(document.getElementById('content').getBoundingClientRect().top), over: document.documentElement.scrollWidth - innerWidth };
+  });
+  let g = await geo();
+  check(r, 'at 1440 the bar is ONE sticky row of at most 64 px (it was 119: a top bar and a rail) and holds the brand, the seven tabs, the signed-in label, ↻ Refresh, ⚙ Tools and Sign out', g.h <= 64 && g.pos === 'sticky' && !g.allInside.length && g.oneLine, g);
+  check(r, 'the tabs end before the right-hand buttons begin, and --stick is the bar\'s own height, with the page content starting under it', g.tabsEnd <= g.rightStart && g.stick === g.h && g.contentTop >= g.h, g);
+  await page.evaluate(() => window.scrollTo({ top: 900, behavior: 'instant' })); await L.settle(page, 200);
+  g = await geo();
+  check(r, 'scrolled 900 px down the bar is still at the top of the window', g.top === 0, g.top);
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  const offs = { st: g.stick };
+  // what is offset under the bar: the comparison header (The work), the Applications list, the Exercises split
+  await L.go(page, 'a/ava_test/work'); await L.settle(page, 400);
+  const cmpTop = await page.evaluate(() => { const h = document.querySelector('.cmp-head'); return h ? getComputedStyle(h).top : null; });
+  check(r, 'the comparison header on The work sticks right under the bar (its top is --stick)', cmpTop === `${offs.st}px`, { cmpTop, stick: offs.st });
+  await L.go(page, 'leads'); await L.settle(page, 400);
+  await page.evaluate(() => window.scrollTo({ top: 100, behavior: 'instant' })); await L.settle(page, 200);
+  const listTop = await page.evaluate(() => Math.round(document.querySelector('.in-list').getBoundingClientRect().top));
+  check(r, 'the Applications list sticks 12 px under the bar while the page scrolls', listTop === offs.st + 12, { listTop, stick: offs.st });
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await L.go(page, 'exercises'); await L.settle(page, 500);
+  const split = await page.evaluate(() => { const s = document.querySelector('.sp-split').getBoundingClientRect(); return { bottom: Math.round(s.bottom), win: innerHeight, sy: Math.round(scrollY) }; });
+  check(r, 'the Exercises split still fits the window (spineFit measures from its own top)', split.bottom <= split.win && split.sy === 0, split);
+
+  // 3. ⚙ Tools: in the bar, on every screen
+  await page.evaluate(() => { window.__DB.athlete_identities = window.__DB.athlete_identities.filter(x => x.athlete_id !== 'ava_test'); return hardRefresh(); });   // a coached athlete with sessions and no login
+  await L.settle(page, 900);
+  await L.go(page, 'athletes'); await L.settle(page, 300);
+  check(r, 'one #toolsBtn, in the bar; the roster\'s controls keep the search, the sort and the filter chips and no longer hold it', (await page.locator('#toolsBtn').count()) === 1 && (await page.locator('.topbar #toolsBtn').count()) === 1 && (await page.locator('#content #toolsBtn, #content #toolsPanel').count()) === 0 && (await page.locator('#searchBox, #sortSel').count()) === 2 && (await page.locator('.rfilters .rf').count()) > 2, '');
+  const panelGeo = () => page.evaluate(() => { const p = document.getElementById('toolsPanel').getBoundingClientRect(), t = document.querySelector('.topbar').getBoundingClientRect(); return { top: Math.round(p.top), barBottom: Math.round(t.bottom), right: Math.round(p.right), w: Math.round(p.width), win: innerWidth, expanded: document.getElementById('toolsBtn').getAttribute('aria-expanded') }; });
+  for (const h of ['today', 'athletes', 'a/ben_test/file']) {
+    await L.go(page, h); await L.settle(page, 300);
+    check(r, `on ${h}: closed at first, the badge says one login waits`, await page.locator('#toolsPanel').isHidden() && (await page.locator('#toolsBtn .tn').innerText()) === '1' && (await page.locator('#toolsBtn').getAttribute('aria-expanded')) === 'false', await page.locator('#toolsBtn').innerText());
+    await page.locator('#toolsBtn').click(); await L.settle(page, 200);
+    const pg = await panelGeo(), ptxt = (await page.locator('#toolsPanel').innerText()).replace(/\s+/g, ' ');
+    check(r, `on ${h}: one tap opens it under the bar at the right (520 px wide at most), with Create 1 missing login, Backup and Logins to send`, await page.locator('#toolsPanel').isVisible() && pg.expanded === 'true' && pg.top === pg.barBottom && pg.w <= 520 && pg.right <= pg.win && /Create 1 missing login/.test(ptxt) && /Backup/.test(ptxt) && /Logins to send/i.test(ptxt), { pg, ptxt: ptxt.slice(0, 160) });
+    await page.locator('#toolsBtn').click(); await L.settle(page, 150);
+    check(r, `on ${h}: a second tap closes it`, await page.locator('#toolsPanel').isHidden() && (await page.locator('#toolsBtn').getAttribute('aria-expanded')) === 'false', '');
+  }
+  await L.go(page, 'athletes'); await L.settle(page, 300);
+  await page.locator('#toolsBtn').click(); await page.keyboard.press('Escape'); await L.settle(page, 150);
+  check(r, 'Esc closes it', await page.locator('#toolsPanel').isHidden(), '');
+  await page.locator('#toolsBtn').click();
+  await page.locator('#toolsPanel .tools-note').click(); await L.settle(page, 150);
+  check(r, 'a click inside the panel keeps it open', await page.locator('#toolsPanel').isVisible(), '');
+  await page.mouse.click(40, 500); await L.settle(page, 150);   // the margin left of the page: nothing there to open
+  check(r, 'a click outside it closes it', await page.locator('#toolsPanel').isHidden(), '');
+  await page.locator('#toolsBtn').click();
+  await page.evaluate(() => render()); await L.settle(page, 200);
+  check(r, 'it stays open through a redraw', await page.locator('#toolsPanel').isVisible(), '');
+  await page.locator('#searchBox').focus();
+  await page.evaluate(() => { S.logins.extra_x = { athlete_id: 'extra_x', initial_password: 'extra-pw-9' }; paintTools(); });
+  check(r, 'a change to what the panel holds is drawn without taking the focus off the box being typed in', (await page.evaluate(() => document.activeElement.id)) === 'searchBox' && /extra_x/.test(await page.locator('#toolsPanel').innerText()) && (await page.locator('#toolsBtn .tn').innerText()) === '2', await page.evaluate(() => document.activeElement.id));
+  await page.evaluate(() => { delete S.logins.extra_x; paintTools(); });
+  await page.mouse.click(40, 500);
+
+  // 4. the nine-tab addresses still land, in the new place, and the address bar is rewritten without an extra history entry
+  const OLD = [['intake', '#leads', 'Leads'], ['affiliates', '#leads/codes', 'Leads'], ['assess', '#buyers/testing', 'Buyers'], ['course', '#buyers', 'Buyers']];
+  for (const [old, now, tab] of OLD) {
+    await L.go(page, 'today'); await L.settle(page, 200);
+    await L.go(page, old); await L.settle(page, 300);
+    const act = (await tabsOf()).filter(t => t.on).map(t => t.label).join();
+    check(r, `#${old} lands on ${now} (the ${tab} tab marked) and the address bar says so`, (await hash()) === now && act === tab, { hash: await hash(), act });
+    await page.goBack(); await L.settle(page, 300);
+    check(r, `...and the rewrite is no extra history entry: one step Back from it is Today, not #${old}`, (await hash()) === '#today', await hash());
+  }
+  const o2 = await L.openCoach(b, { hash: 'assess' });
+  check(r, 'opening the page ON an old address (a bookmark) lands in the new place and rewrites it: #assess → #buyers/testing, the Testing app sub-tab on show', (await o2.page.evaluate(() => location.hash)) === '#buyers/testing' && (await o2.page.locator('.buy-subrail .stab.active').textContent()).startsWith('Testing app') && (await o2.page.locator('#asUser').count()) === 1, await o2.page.evaluate(() => location.hash));
+  await o2.page.context().close();
+
+  // 5. Leads: Applications · Free signups · Referral codes
+  await L.go(page, 'leads'); await L.settle(page, 400);
+  let subs = await subsOf('.lead-subrail');
+  check(r, 'Leads has three sub-tabs, Applications first and marked, with a count of the new ones; its address is #leads', JSON.stringify(subs.map(s => s.label)) === JSON.stringify(['Applications', 'Free signups', 'Referral codes']) && JSON.stringify(subs.map(s => s.href)) === JSON.stringify(['#leads', '#leads/signups', '#leads/codes']) && subs[0].on && subs[0].n === '2' && !subs[1].n && !subs[2].n && (await page.locator('#inView').count()) === 1, subs);
+  check(r, 'the page title names the screen: Applications · Leads', (await page.title()) === "Applications · Leads · The Coach's Box", await page.title());
+  await page.locator('.lead-subrail .stab', { hasText: 'Free signups' }).click(); await L.settle(page, 400);
+  check(r, 'Free signups (#leads/signups) is the funnel: its section, two rows, and no applications view', (await hash()) === '#leads/signups' && (await page.locator('#funnelPanel').count()) === 1 && (await page.locator('#funnelPanel .fun').count()) === 2 && (await page.locator('#inView').count()) === 0 && (await page.title()) === "Free signups · Leads · The Coach's Box", await hash());
+  await L.go(page, 'proof'); await L.settle(page, 500);
+  check(r, 'and the funnel is no longer on Proof', (await page.locator('#funnelPanel').count()) === 0 && !/The funnel/.test(await page.locator('#content').innerText()), '');
+  await page.locator('#rail a.tab', { hasText: 'Leads' }).click(); await L.settle(page, 300);
+  await page.locator('.lead-subrail .stab', { hasText: 'Referral codes' }).click(); await L.settle(page, 400);
+  check(r, 'Referral codes (#leads/codes) is the code roster, with + Add code', (await hash()) === '#leads/codes' && (await page.locator('#affAdd').count()) === 1 && /Live codes/i.test(await page.locator('#content').innerText()) && (await page.title()) === "Referral codes · Leads · The Coach's Box", await hash());
+  await page.locator('#affAdd').click();
+  const form = page.locator('.aff-form[data-new="1"]');
+  await form.locator('[data-k=code]').fill('nav15'); await form.locator('[data-k=percent]').fill('15'); await form.locator('[data-k=coach_name]').fill('Nav Coach');
+  let n0 = await L.nCalls(page);
+  await form.locator('.aff-save').click(); await L.settle(page, 600);
+  const ins = lastOf(await L.callsSince(page, n0), x => x.name === 'affiliates' && x.op === 'insert');
+  check(r, 'adding a code still works from here: insert {NAV15, 15} and the code is listed', !!ins && ins.payload.code === 'NAV15' && ins.payload.percent === 15 && (await page.locator('.intake-card', { hasText: 'NAV15' }).count()) === 1, ins && ins.payload);
+  n0 = await L.nCalls(page);
+  await L.jsClick(page.locator('.aff-retire[data-code=NAV15]')); await L.settle(page, 600);
+  const upd = lastOf(await L.callsSince(page, n0), x => x.name === 'affiliates' && x.op === 'update');
+  check(r, 'retiring one still works: update {active: false} for that code, and it moves to Retired', !!upd && upd.payload.active === false && upd.filters.join() === 'code.eq."NAV15"' && /Retired · \d/.test(await page.locator('#content').innerText()), upd && { payload: upd.payload, filters: upd.filters });
+  await page.locator('.lead-subrail .stab', { hasText: 'Applications' }).click(); await L.settle(page, 300);
+  check(r, 'Applications is back, with its list and the application on show', (await hash()) === '#leads' && (await page.locator('#inView .in-row').count()) >= 3 && (await page.locator('.in-detail .in-title').count()) === 1, await hash());
+
+  // 6. Buyers: Course · Testing app, each with its count, and a login can be made on each
+  await page.locator('#rail a.tab', { hasText: 'Buyers' }).click(); await L.settle(page, 700);
+  subs = await subsOf('.buy-subrail');
+  check(r, 'Buyers has two sub-tabs: the Course (marked, #buyers) and the Testing app (#buyers/testing), each with its count of active logins (1 and 1)', JSON.stringify(subs.map(s => [s.label, s.href, s.n, s.on])) === JSON.stringify([['Course', '#buyers', '1', true], ['Testing app', '#buyers/testing', '1', false]]) && (await page.title()) === "Course · Buyers · The Coach's Box", subs);
+  const fnCalls = async (n, fn) => (await L.callsSince(page, n)).filter(c => c.kind === 'fn' && c.name === fn);
+  await page.locator('#tpUser').fill('nav_course'); n0 = await L.nCalls(page);
+  await page.locator('#tpCreate').click(); await L.settle(page, 900);
+  let calls = await fnCalls(n0, 'tps-login');
+  check(r, 'a course login is created from here (one tps-login create) and the Course count goes to 2', calls.length === 1 && calls[0].payload.action === 'create' && calls[0].payload.username === 'nav_course' && (await subsOf('.buy-subrail'))[0].n === '2', { calls: calls.map(c => c.payload), subs: await subsOf('.buy-subrail') });
+  await page.locator('.buy-subrail .stab', { hasText: 'Testing app' }).click(); await L.settle(page, 500);
+  check(r, 'the Testing app sub-tab: #buyers/testing, its own list (fixture_academy) and form, and the Course\'s list is not drawn there', (await hash()) === '#buyers/testing' && (await page.locator('#asUser').count()) === 1 && (await page.locator('#tpUser').count()) === 0 && /fixture_academy/.test(await page.locator('#buyersBody').innerText()) && (await page.title()) === "Testing app · Buyers · The Coach's Box", await hash());
+  await page.locator('#asUser').fill('nav_academy'); n0 = await L.nCalls(page);
+  await page.locator('#asCreate').click(); await L.settle(page, 900);
+  calls = await fnCalls(n0, 'assess-login');
+  check(r, 'a testing-app login is created from here (one assess-login create) and the Testing app count goes to 2', calls.length === 1 && calls[0].payload.action === 'create' && calls[0].payload.username === 'nav_academy' && (await subsOf('.buy-subrail'))[1].n === '2' && (await subsOf('.buy-subrail'))[1].on, { calls: calls.map(c => c.payload), subs: await subsOf('.buy-subrail') });
+
+  // 7. Back from an athlete returns to the roster at the same place
+  await L.go(page, 'athletes'); await L.settle(page, 300);
+  await page.evaluate(() => { document.body.style.minHeight = '3500px'; window.scrollTo({ top: 600, behavior: 'instant' }); }); await L.settle(page, 300);
+  await page.evaluate(() => { location.hash = '#a/ava_test/work'; }); await L.settle(page, 700);
+  await page.goBack(); await L.settle(page, 700);
+  const yBack = await page.evaluate(() => Math.round(scrollY));
+  check(r, 'Back from an athlete lands on the roster where it was left (600)', (await hash()) === '#athletes' && Math.abs(yBack - 600) <= 2, { hash: await hash(), yBack });
+
+  // 8. 900 px is the narrowest single bar; 899 px is two rows
+  await page.setViewportSize({ width: 900, height: 800 }); await L.settle(page, 300);
+  g = await geo();
+  check(r, 'at 900 px it is still ONE bar of at most 64 px with the seven tabs on one line, and the tabs end before the buttons begin', g.h <= 64 && g.oneLine && g.tabsEnd <= g.rightStart && !g.allInside.filter(s => s !== '#who').length && g.over <= 0, g);
+  await page.setViewportSize({ width: 899, height: 800 }); await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' })); await L.settle(page, 300);
+  const two = await page.evaluate(() => { const tb = document.querySelector('.tb-top').getBoundingClientRect(), rl = document.getElementById('rail').getBoundingClientRect(); return { tbH: Math.round(tb.height), tbPos: getComputedStyle(document.querySelector('.tb-top')).position, railTop: Math.round(rl.top), railPos: getComputedStyle(document.querySelector('.rail')).position, stick: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stick')) }; });
+  check(r, 'at 899 px the top bar is its own sticky row (--stick is its height) and the tab row sits under it, not sticky', two.tbPos === 'sticky' && two.tbH === two.stick && two.railTop >= two.tbH && two.railPos === 'static', two);
+
+  // 9. a phone: one row of tabs that scrolls inside itself, the active tab in view, no sideways scroll of the page
+  const SCREENS = ['today', 'athletes', 'a/ava_test/work', 'a/ava_test/file', 'exercises', 'exercises/coverage', 'proof', 'leads', 'leads/signups', 'leads/codes', 'links', 'buyers', 'buyers/testing'];
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 800 }); await L.settle(page, 300);
+    const bad = [];
+    for (const s of SCREENS) {
+      await L.go(page, s); await L.settle(page, 250);
+      const m = await page.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, wide: [...document.querySelectorAll('.tb-top *, #rail *, #content *')].filter(el => { const x = el.getBoundingClientRect(); return x.width > 0 && x.right > innerWidth + 1 && !el.closest('#rail'); }).slice(0, 3).map(el => el.tagName + '.' + el.className) }));
+      if (m.over > 0) bad.push([s, m]);
+    }
+    check(r, `at ${w} px no screen scrolls sideways (the tab row scrolls inside itself)`, !bad.length, bad);
+    await L.go(page, 'buyers/testing'); await L.settle(page, 300);
+    const row = await page.evaluate(() => { const rl = document.getElementById('rail'), tabs = [...rl.querySelectorAll('a.tab')].map(a => a.getBoundingClientRect()), on = rl.querySelector('a.tab.active').getBoundingClientRect(), box = rl.getBoundingClientRect();
+      return { oneRow: tabs.every(x => Math.abs(x.top - tabs[0].top) < 1.5), scrolls: rl.scrollWidth > rl.clientWidth, scrollLeft: Math.round(rl.scrollLeft), activeIn: on.left >= box.left - 1 && on.right <= box.right + 1, active: rl.querySelector('a.tab.active').textContent.trim() }; });
+    check(r, `at ${w} px the seven tabs are ONE row that scrolls sideways inside itself, and the active tab (${row.active}) was scrolled into view`, row.oneRow && row.scrolls && row.scrollLeft > 0 && row.activeIn && row.active === 'Buyers', row);
+    const tb = await page.evaluate(() => { const bx = [...document.querySelectorAll('.tb-top .brand, .tb-top .tbtn')].map(e => e.getBoundingClientRect()); return { allIn: bx.every(x => x.right <= innerWidth + 0.5 && x.left >= -0.5), tools: !!document.getElementById('toolsBtn').offsetParent }; });
+    check(r, `at ${w} px the brand, ↻, ⚙ Tools and Sign out all fit in the top bar`, tb.allIn && tb.tools, tb);
+    await page.evaluate(() => window.scrollTo({ top: 400, behavior: 'instant' })); await L.settle(page, 200);
+    const stuck = await page.evaluate(() => ({ barTop: Math.round(document.querySelector('.tb-top').getBoundingClientRect().top), railBottom: Math.round(document.querySelector('.rail').getBoundingClientRect().bottom) }));
+    check(r, `at ${w} px scrolled down the top bar stays at the top of the window and the tab row scrolls away (it does not eat the phone's screen)`, stuck.barTop === 0 && stuck.railBottom < 0, stuck);
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  }
+  await L.go(page, 'athletes'); await L.settle(page, 300);
+  await page.locator('#toolsBtn').click(); await L.settle(page, 200);
+  const pw = await page.evaluate(() => { const p = document.getElementById('toolsPanel').getBoundingClientRect(), t = document.querySelector('.tb-top').getBoundingClientRect(); return { left: Math.round(p.left), right: Math.round(p.right), win: innerWidth, top: Math.round(p.top), barBottom: Math.round(t.bottom), over: document.documentElement.scrollWidth - innerWidth }; });
+  check(r, 'on a phone the Tools panel is the full width right under the bar, and the page does not scroll sideways', pw.left <= 0 && pw.right >= pw.win && pw.top === pw.barBottom && pw.over <= 0, pw);
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
@@ -2908,7 +3096,7 @@ S['today-also-waiting'] = async (b) => {
   check(r, 'an "Also waiting" group under the people', !!also && also.label === 'Also waiting' && also.after, also);
   const rowOf = t => (also && also.rows.find(x => x.title === t)) || {};
   check(r, 'it holds the applications, the logins to send, the weekly backup and the older notes, each with its own button',
-    JSON.stringify(rowOf('2 new applications').btns) === JSON.stringify(['Open Intake']) && JSON.stringify(rowOf('Login to send · Ben Example').btns) === JSON.stringify(['Copy message', 'Mark sent'])
+    JSON.stringify(rowOf('2 new applications').btns) === JSON.stringify(['Open Leads']) && JSON.stringify(rowOf('Login to send · Ben Example').btns) === JSON.stringify(['Copy message', 'Mark sent'])
     && JSON.stringify(rowOf('Weekly backup').btns) === JSON.stringify(['⤓ Back up now']) && JSON.stringify(rowOf('1 older note').btns) === JSON.stringify(['Clear']), also);
   check(r, 'only a login that still holds its first password is listed (Ava\'s was sent)', also.rows.filter(x => /^Login to send/.test(x.title)).length === 1, also.rows.map(x => x.title));
   const people0 = await peopleText();
@@ -3463,13 +3651,13 @@ S['session-hide-no-false-warning'] = async (b) => {
 
 // ── What became of an application (audit FLOW-17, SPINE-11; pile A8, stage61; 2026-10-11) ───────────────────────────────────────────────────
 S['intake-outcome'] = async (b) => {
-  const r = { id: 'intake-outcome', title: "Intake: an application records what happened and the athlete it became; the athlete's File says where they came from", checks: [] };
-  const { page, log } = await L.openCoach(b, { hash: 'intake' });
+  const r = { id: 'intake-outcome', title: "Leads → Applications: an application records what happened and the athlete it became; the athlete's File says where they came from and opens that application", checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'intake' });   // the old address: it lands on Leads
   // (2026-10-12, round 2: the application on show is the detail on the right, chosen from the list; its row wears the outcome pill and says which group it is in.)
   const row = name => page.locator('.in-row', { hasText: name });
   const choose = async name => { await row(name).click(); await L.settle(page, 200); };
   const detail = page.locator('.in-detail');
-  const badge = async () => (await page.locator('#rail a.tab', { hasText: 'Intake' }).innerText()).replace(/\s+/g, ' ');
+  const badge = async () => (await page.locator('#rail a.tab', { hasText: 'Leads' }).innerText()).replace(/\s+/g, ' ');
   const b0 = await badge();
   const one = detail;       // the newest new application is on show when the tab opens: Fixture Applicant One
   check(r, 'the application on show when the tab opens is Fixture Applicant One', /Fixture Applicant One/.test(await detail.locator('.in-title').textContent()), await detail.locator('.in-title').textContent());
@@ -3485,7 +3673,7 @@ S['intake-outcome'] = async (b) => {
   const c1 = lastOf(await L.callsSince(page, n0), c => c.name === 'set_intake_outcome');
   check(r, 'one set_intake_outcome(id, client, ava_test)', !!c1 && /1a1$/.test(c1.payload.p_id) && c1.payload.p_outcome === 'client' && c1.payload.p_athlete_id === 'ava_test', c1 && c1.payload);
   const t1 = (await row('Fixture Applicant One').evaluate(el => el.textContent) + ' ' + await one.evaluate(el => el.textContent)).replace(/\s+/g, ' ');   // the row wears the pill, the detail names the athlete
-  check(r, 'it moved to Handled (and stays on show), its row wears the outcome as a pill, the detail names the athlete, and the Intake badge dropped', (await row('Fixture Applicant One').getAttribute('data-st')) === 'handled' && /Became a client/.test(await row('Fixture Applicant One').innerText()) && /Ava Example/.test(await one.innerText()) && (await badge()) !== b0, { st: await row('Fixture Applicant One').getAttribute('data-st'), t1: t1.slice(0, 200), badge: await badge() });
+  check(r, 'it moved to Handled (and stays on show), its row wears the outcome as a pill, the detail names the athlete, and the Leads badge dropped', (await row('Fixture Applicant One').getAttribute('data-st')) === 'handled' && /Became a client/.test(await row('Fixture Applicant One').innerText()) && /Ava Example/.test(await one.innerText()) && (await badge()) !== b0, { st: await row('Fixture Applicant One').getAttribute('data-st'), t1: t1.slice(0, 200), badge: await badge() });
   check(r, 'the server row holds the link and the outcome, and marked the application handled', await page.evaluate(() => { const i = window.__DB.hab_intake.find(x => /1a1$/.test(x.id)); return i.athlete_id === 'ava_test' && i.outcome === 'client' && i.status === 'handled' && !!i.linked_at; }), '');
   // 2. an outcome that keeps no athlete
   await choose('Fixture Applicant Two');
@@ -3501,9 +3689,11 @@ S['intake-outcome'] = async (b) => {
   // (2026-10-12: Came from is a row of Contact and access, no longer a line of the Program file table.)
   const cameRow = page.locator('.frow', { has: page.locator('.frow-l', { hasText: /^came from$/i }) });
   const meta = (await cameRow.first().innerText()).replace(/\s+/g, ' ');
-  check(r, 'the File says "Came from" the application, its programme and its outcome, with a link to Intake', /came from/i.test(meta) && /Set — \$180/.test(meta) && /Became a client/.test(meta) && (await cameRow.locator('a[href="#intake"]').count()) === 1, meta.slice(0, 400));
+  check(r, 'the File says "Came from" the application, its programme and its outcome, with a link that opens it in Leads', /came from/i.test(meta) && /Set — \$180/.test(meta) && /Became a client/.test(meta) && (await cameRow.locator('a[href="#leads"]').count()) === 1, meta.slice(0, 400));
+  await cameRow.locator('a[href="#leads"]').first().click(); await L.settle(page, 700);
+  check(r, 'the link goes to Leads with THAT application on show (Application One, not the Two chosen a moment ago)', (await page.evaluate(() => location.hash)) === '#leads' && /Fixture Applicant One/.test(await detail.locator('.in-title').textContent()), { hash: await page.evaluate(() => location.hash), shown: await detail.locator('.in-title').textContent() });
   // 4. clearing it
-  await L.go(page, 'intake'); await L.settle(page, 500);
+  await L.go(page, 'leads'); await L.settle(page, 500);
   await choose('Fixture Applicant One');
   await detail.locator('.i-out-sel').selectOption('');
   n0 = await L.nCalls(page);
@@ -3710,8 +3900,8 @@ S['whatsapp-number'] = async (b) => {
   // 4. it is not a signup anywhere
   check(r, 'it is not a "new signup" reason', await page.evaluate(() => !reasonsOf(S.ath.ben_test).some(x => x.key === 'signup')), '');
   check(r, 'it gives them no Proof tab', !/proof/i.test(await page.locator('.subrail').innerText()), await page.locator('.subrail').innerText());
-  await L.go(page, 'proof'); await L.settle(page, 600);
-  check(r, 'and it is not in the Proof signup funnel', !/ben_test/.test(await page.locator('#content').innerText()) && /cara_free/.test(await page.locator('#content').innerText()), '');
+  await L.go(page, 'leads/signups'); await L.settle(page, 600);   // the signup funnel is Leads → Free signups since 2026-10-12
+  check(r, 'and it is not in the signup funnel (Leads → Free signups)', !/ben_test/.test(await page.locator('#content').innerText()) && /cara_free/.test(await page.locator('#content').innerText()), '');
   // 5. remove it
   await L.go(page, 'a/ben_test/file'); await L.settle(page, 500);
   n0 = await L.nCalls(page);
@@ -3822,7 +4012,7 @@ S['roster-demo-out'] = async (b) => {
 };
 
 S['tools-button'] = async (b) => {
-  const r = { id: 'tools-button', title: 'The roster starts under the filter chips: Coach tools, Logins to send and Create missing logins sit behind one ⚙ Tools button (360 px phone)', checks: [] };
+  const r = { id: 'tools-button', title: 'The roster starts under the filter chips: Coach tools, Logins to send and Create missing logins sit behind one ⚙ Tools button, now in the top bar (360 px phone)', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'athletes' });
   await page.setViewportSize({ width: 360, height: 780 });
   await page.evaluate(() => { window.__DB.athlete_identities = window.__DB.athlete_identities.filter(x => x.athlete_id !== 'ava_test'); return hardRefresh(); });   // a coached athlete with sessions and no login
@@ -3833,7 +4023,7 @@ S['tools-button'] = async (b) => {
   check(r, 'none of the tools is on screen: no Backup button, no Logins to send, no Create missing logins', !(await page.locator('details.tools button', { hasText: 'Backup' }).isVisible()) && !(await page.locator('.creds').isVisible()) && !(await page.locator('button', { hasText: /missing login/ }).isVisible()), '');
   await page.locator('#toolsBtn').click();
   check(r, 'the button opens the panel, and it holds Backup, Logins to send and Create 1 missing login', await page.locator('#toolsPanel').isVisible() && (await page.locator('#toolsBtn').getAttribute('aria-expanded')) === 'true' && await page.locator('details.tools button', { hasText: 'Backup' }).isVisible() && await page.locator('#toolsPanel .creds').isVisible() && await page.locator('#toolsPanel button', { hasText: 'Create 1 missing login' }).isVisible(), await page.locator('#toolsPanel').innerText());
-  await page.evaluate(() => renderAthletes());
+  await page.evaluate(() => render());   // a whole-screen redraw (the button is in the top bar now, not in the roster that redraws)
   check(r, 'it stays open through a redraw', await page.locator('#toolsPanel').isVisible(), '');
   await page.locator('#toolsBtn').click();
   check(r, 'and closes again', await page.locator('#toolsPanel').isHidden(), '');
@@ -4019,10 +4209,10 @@ S['file-groups'] = async (b) => {
   await L.go(page, 'a/cara_free/file'); await openDanger(page);
   const fb = page.locator('#dangerzone button', { hasText: 'Forget their Proof data…' });
   check(r, 'a free person with a signup record is offered "Forget their Proof data…" in their Danger zone', (await fb.count()) === 1 && await fb.isVisible(), await page.locator('#dangerzone').innerText());
-  await L.go(page, 'proof'); await L.settle(page, 700);
+  await L.go(page, 'leads/signups'); await L.settle(page, 700);   // the funnel moved from Proof to Leads → Free signups (2026-10-12)
   const funRow = page.locator('.fun', { hasText: 'cara_free' });
   const acts = (await funRow.locator('.acts').innerText()).replace(/\s+/g, ' ');
-  check(r, 'the Proof funnel row keeps WhatsApp, copy email and open, and has no forget button', /WhatsApp/.test(acts) && /copy email/.test(acts) && /open/.test(acts) && !/forget/i.test(acts) && (await page.locator('.fun button', { hasText: /forget/i }).count()) === 0, acts);
+  check(r, 'the signup funnel row keeps WhatsApp, copy email and open, and has no forget button', /WhatsApp/.test(acts) && /copy email/.test(acts) && /open/.test(acts) && !/forget/i.test(acts) && (await page.locator('.fun button', { hasText: /forget/i }).count()) === 0, acts);
   await L.go(page, 'a/cara_free/file'); await openDanger(page);
   const n0 = await L.nCalls(page);
   await page.locator('#dangerzone button', { hasText: 'Forget their Proof data…' }).click(); await L.settle(page, 900);

@@ -54,7 +54,7 @@
     /* Clay as TEXT, and as the fill under white text: #C7552F is 4.1-4.4:1 there. The brand clay
        stays for bars, borders and dots. */
     --clay-ink: #B04A27; --clay-fill: #B04A27;
-    --stick: 58px;   /* height of the sticky top bar; the tab rail sits under it */
+    --stick: 54px;   /* what stays on screen at the top: the top bar under 900 px, the one bar from 900 px up (56 px, set below). Everything that offsets itself under it reads this. */
     --track: rgba(26,26,26,0.10);
     --shadow: 0 10px 24px -18px rgba(14,74,54,0.35);
   }
@@ -69,7 +69,8 @@
   :focus-visible { outline: 2px solid var(--court); outline-offset: 2px; border-radius: 6px; }
   /* On the dark green surfaces a green ring is invisible. The ring sits 2px OUTSIDE the element, over what
      surrounds it, so a green button or the active tab on a light page keeps the green ring (white vanished there). */
-  .topbar :focus-visible, .board :focus-visible, .wline.coachline :focus-visible { outline-color: #fff; }
+  .tb-top :focus-visible, .board :focus-visible, .wline.coachline :focus-visible { outline-color: #fff; }
+  @media (min-width: 900px) { .topbar :focus-visible { outline-color: #fff; } }
 
   .hd { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: .01em; }
   .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
@@ -79,75 +80,77 @@
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
 
-  /* ── Top bar ── */
-  .topbar { position: sticky; top: 0; z-index: 60; background: var(--court);
-            display: flex; align-items: center; justify-content: space-between; gap: 12px;
-            padding: 13px 22px; }
-  .topbar::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--clay); }
+  /* ── The bar (2026-10-12, round 2 of the coach UX pass: nine tabs became seven places). From 900 px up it is ONE sticky bar, 56 px: the brand, the
+     seven tabs and, on the right, the signed-in label, ↻ Refresh, ⚙ Tools and Sign out (it was a 58 px top bar over a 61 px tab rail). Under 900 px
+     it is the top bar (brand, ↻, ⚙, Sign out; sticky) and ONE row of tabs under it that scrolls sideways inside itself; that row is not sticky,
+     so it does not eat a phone's screen. One <header> holds .tb-top (the brand and the buttons) and .rail (the tabs). Under 900 px the header is
+     display:contents, so .tb-top is the sticky row and .rail a row of the page; from 900 px up .tb-top is display:contents and the header is the
+     flex row (brand, tabs, buttons: put in that order by `order`). --stick is what stays on screen at the top, so everything that offsets itself
+     under the bar reads it. ── */
+  .topbar { display: contents; }
+  .tb-top { position: sticky; top: 0; z-index: 60; height: var(--stick); background: var(--court);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 3px 22px 0; }
+  .tb-top::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--clay); }
   .brand { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: .18em;
            color: #fff; text-decoration: none; text-transform: uppercase; white-space: nowrap; }
   .brand span { opacity: .6; font-weight: 400; }
-  .topbar .right { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .topbar .right { display: flex; align-items: center; gap: 8px; min-width: 0; }
   .who { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .06em; color: rgba(255,255,255,.75);
          white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tbtn { font-size: 12px; font-weight: 600; color: #fff; border: 1px solid rgba(255,255,255,.4);
-          padding: 6px 12px; border-radius: 999px; white-space: nowrap; transition: background .15s, border-color .15s; }
+          padding: 6px 12px; border-radius: 999px; white-space: nowrap; transition: background .15s, border-color .15s;
+          display: inline-flex; align-items: center; gap: 4px; }
   .tbtn:hover { background: rgba(255,255,255,.12); border-color: #fff; }
-  /* The signed-in address is reassurance, not navigation — drop it before it
-     crushes the brand on a phone. */
-  @media (max-width: 560px) { .who { display: none; } }
-  @media (max-width: 480px) { .tb-lbl { display: none; } .tbtn { padding: 6px 10px; } }
-  @media (max-width: 360px) { .topbar { padding: 12px 14px; } .brand { letter-spacing: .08em; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-                              .brand span { display: none; } }
+  .tbtn[aria-expanded="true"] { background: rgba(255,255,255,.18); border-color: #fff; }
+  .tbtn .tn { margin-left: 2px; background: var(--clay-fill); color: #fff; border-radius: 999px; font-size: 12px; font-weight: 700; line-height: 1.3; padding: 0 6px; }
+  /* The signed-in address is reassurance, not navigation: it goes first, then the button words, then the brand's second half. */
+  @media (max-width: 719px) { .who { display: none; } }
+  @media (max-width: 599px) { .tb-lbl { display: none; } .tbtn { padding: 6px 10px; } }
+  @media (max-width: 480px) { .brand span { display: none; } }
+  @media (max-width: 360px) { .tb-top { padding: 3px 12px 0; gap: 8px; } .brand { letter-spacing: .08em; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+                              .topbar .right { gap: 6px; } .tbtn { padding: 6px 8px; } }
 
-  /* ── Tab rail ── */
-  .rail { position: sticky; top: var(--stick); z-index: 55; background: var(--paper);
-          border-bottom: 1px solid var(--line); }
-  .rail-in { max-width: 1180px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 8px; align-items: center;
-             overflow-x: auto; scrollbar-width: none; }
+  /* ── The tabs: seven places, sentence case, the active one underlined (the athlete file's .subrail does the same) ── */
+  .rail { background: var(--paper); border-bottom: 1px solid var(--line); }
+  .rail-in { position: relative; display: flex; align-items: stretch; overflow-x: auto; scrollbar-width: none; padding: 0 6px 0 8px;
+             -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); }
   .rail-in::-webkit-scrollbar { display: none; }
-  .tab { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
-         font-size: 16px; color: var(--muted); padding: 7px 16px; border-radius: 999px; border: 1px solid transparent;
-         display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; transition: color .15s, background .15s; }
-  .tab { text-decoration: none; }
-  .tab:hover { color: var(--ink); background: var(--court-100); }
-  /* The second group: product and marketing admin, used now and then. Same pages, quieter. */
-  .tab.more { font-size: 14px; padding: 6px 12px; }
-  .rail-sep { width: 1px; align-self: stretch; background: var(--line); margin: 4px 4px; flex: none; }
-  .rail-grp { display: flex; gap: 8px; align-items: center; }
-  /* On a phone: the four daily tabs on one row, the occasional five on a second row that scrolls
-     sideways with a fade at the edge (it used to hide six of nine tabs with no sign they were there).
-     The rail stops being sticky, so it does not eat the screen. */
-  @media (max-width: 760px) {
-    .rail { position: static; }
-    .rail-in { flex-direction: column; align-items: stretch; gap: 6px; padding: 8px 12px 6px; overflow: visible; }
-    .rail-grp { gap: 4px; }
-    /* Scrolls in place if it is ever wider than the phone (a slow font, big counts), never the page. */
-    .rail-grp.main { justify-content: space-between; overflow-x: auto; scrollbar-width: none; }
-    .rail-grp.main::-webkit-scrollbar { display: none; }
-    .rail-grp.main .tab { font-size: 14px; letter-spacing: .03em; padding: 6px 9px; gap: 5px; }
-    .rail-grp.more { overflow-x: auto; scrollbar-width: none; padding-bottom: 2px;
-                     -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
-    .rail-grp.more::-webkit-scrollbar { display: none; }
-    .tab.more { font-size: 12.5px; padding: 4px 10px; }
-    .rail-sep { display: none; }
-  }
-  @media (max-width: 370px) {
-    .rail-grp.main .tab { font-size: 12.5px; letter-spacing: 0; padding: 5px 7px; }
-    .rail-grp.main .tab .n { padding: 1px 5px; min-width: 16px; }
-  }
-  .tab.active { background: var(--court); color: #fff; }
+  .rail-in::after { content: ''; flex: none; width: 26px; }   /* the last tab ends clear of the fade when the row is scrolled to its end */
+  .tab { flex: none; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; text-decoration: none;
+         font-family: 'Barlow', sans-serif; font-weight: 600; font-size: 14.5px; color: var(--muted);
+         padding: 11px 12px 8px; border-bottom: 3px solid transparent; margin-bottom: -1px; transition: color .15s; }
+  .tab:hover { color: var(--ink); }
+  .tab:focus-visible { outline-offset: -4px; border-radius: 8px; }
+  .tab.active { color: var(--court); border-bottom-color: var(--clay); }
   .tab .n { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; background: var(--clay-fill); color: #fff;
-            min-width: 19px; text-align: center; padding: 2px 6px; border-radius: 999px; line-height: 1.2; }
-  .tab.active .n { background: rgba(255,255,255,.22); }
-  .refresh { font-size: 12px; font-weight: 600; color: var(--muted); padding: 6px 12px; border-radius: 999px;
-             border: 1px solid var(--line); background: var(--card); white-space: nowrap; }
-  .refresh:hover { color: var(--court); border-color: var(--court); }
+            min-width: 19px; text-align: center; padding: 1px 6px; border-radius: 999px; line-height: 1.3; }
+  @media (max-width: 360px) { .tab { padding: 11px 9px 8px; gap: 5px; } }
+  @media (min-width: 900px) {
+    :root { --stick: 56px; }
+    .topbar { display: flex; align-items: stretch; gap: 18px; position: sticky; top: 0; z-index: 60; height: var(--stick);
+              background: var(--court); padding: 3px 20px 0; }
+    .topbar::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--clay); }
+    .tb-top { display: contents; }
+    .tb-top::before { content: none; }
+    .brand { order: 1; align-self: center; }
+    .rail { order: 2; flex: 1 1 auto; min-width: 0; display: flex; background: none; border: 0; }
+    .topbar .right { order: 3; align-self: center; }
+    .rail-in { flex: 1 1 auto; min-width: 0; padding: 0; -webkit-mask-image: none; mask-image: none; }
+    .rail-in::after { content: none; }
+    .tab { color: rgba(255,255,255,.76); padding: 0 11px; margin-bottom: 0; }
+    .tab:hover { color: #fff; }
+    .tab.active { color: #fff; border-bottom-color: #fff; }
+  }
+  /* What gives way as the window narrows, measured with the real address (24 characters) and the real fonts: the signed-in label below 1340 px, the brand's
+     second half and the button words below 1180 px, then a little air in the tabs and the brand below 1020 px. At 900 px the seven tabs still fit the bar. */
+  @media (min-width: 900px) and (max-width: 1339px) { .who { display: none; } }
+  @media (min-width: 900px) and (max-width: 1179px) { .tb-lbl { display: none; } .brand span { display: none; } }
+  @media (min-width: 900px) and (max-width: 1019px) { .brand { letter-spacing: .1em; } .tab { padding: 0 10px; } }
 
   .wrap { max-width: 1180px; margin: 0 auto; padding: 22px 20px 90px; }
   @media (max-width: 480px) { .wrap { padding: 16px 14px 90px; } }
-  /* Jump links (the Today counters) land below the sticky bar and rail, not under them. */
-  .panel, section, .wday { scroll-margin-top: calc(var(--stick) + 64px); }
+  /* Jump links (the Today counters) land below the sticky bar, not under it. */
+  .panel, section, .wday { scroll-margin-top: calc(var(--stick) + 16px); }
   .loadwarn { max-width: 1180px; margin: 12px auto 0; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5;
               background: var(--clay-100); color: var(--ink); border-left: 3px solid var(--clay); }
   .loadwarn .btn { margin-left: 8px; }
@@ -241,13 +244,14 @@
      (spineFit(): from the top of the split to the bottom of the window); below that the list is the page and an open entry
      replaces it, with "← All exercises" above. ── */
   .sp-subrail { margin-bottom: 12px; }
-  @media (max-width: 400px) { .sp-subrail { gap: 0; } .sp-subrail .stab { font-size: 14px; letter-spacing: .02em; padding: 9px 8px; gap: 4px; } }
-  @media (max-width: 340px) { .sp-subrail .stab { font-size: 13px; letter-spacing: .01em; padding: 9px 6px; } }
+  /* The sub-tabs of Leads and Buyers (same round) are drawn the same way, and tighten the same way on a phone. */
+  @media (max-width: 400px) { .sp-subrail, .lead-subrail, .buy-subrail { gap: 0; } .sp-subrail .stab, .lead-subrail .stab, .buy-subrail .stab { font-size: 14px; letter-spacing: .02em; padding: 9px 8px; gap: 4px; } }
+  @media (max-width: 340px) { .sp-subrail .stab, .lead-subrail .stab, .buy-subrail .stab { font-size: 13px; letter-spacing: .01em; padding: 9px 6px; } }
   .sp-intro { font-size: 13.5px; color: var(--muted); margin: 0 0 8px; }
   .sp-warn { display: block; margin: 0 0 12px; font-size: 13.5px; font-weight: 600; color: var(--clay-ink); text-underline-offset: 3px; }
   .sp-split + .how { margin-top: 16px; }
   .sp-stack { display: grid; gap: 16px; min-width: 0; }
-  .sp-split { --sp-h: calc(100vh - 290px); display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+  .sp-split { --sp-h: calc(100vh - 230px); display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
   .sp-listpane { min-width: 0; padding: 14px 16px 6px; display: flex; flex-direction: column; }
   .sp-listhead { flex: none; }
   .sp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
@@ -396,7 +400,7 @@
     .in-view.solo { grid-template-columns: minmax(0, 1fr); }
     .in-row.on { background: var(--court-100); box-shadow: inset 3px 0 0 var(--court); }
     .in-view[data-pane] > .in-list, .in-view[data-pane] > .in-detail { display: block; }
-    .in-list { position: sticky; top: calc(var(--stick) + 66px); max-height: calc(100vh - var(--stick) - 88px); overflow-y: auto; }
+    .in-list { position: sticky; top: calc(var(--stick) + 12px); max-height: calc(100vh - var(--stick) - 28px); overflow-y: auto; }
     .in-back { display: none; }
   }
 
@@ -539,17 +543,23 @@
   .lvchip { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; color: var(--court);
             border: 1px solid var(--court); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
 
-  /* ── Coach tools (Athletes tab): occasional, global, kept out of the roster's way ── */
-  .tools { margin-bottom: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
-  .tools > summary { cursor: pointer; list-style: none; padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--muted); }
+  /* ── ⚙ Tools (2026-10-12, round 2 of the coach UX pass): the button is in the bar on every screen; its panel hangs under the bar at the right,
+     above the page (a phone: the full width under the bar). Coach tools, Create missing logins and Logins to send: occasional and global.
+     It sits inside .tb-top, which is the bar's own box under 900 px and a box-less wrapper over .topbar from 900 px up, so `top: 100%` is the foot of
+     the sticky bar wherever the page is scrolled to, and a demo band above the bar cannot cover it. ── */
+  .toolspanel { position: absolute; z-index: 2; top: 100%; right: 16px; width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - var(--stick) - 16px);
+                overflow-y: auto; overscroll-behavior: contain; background: var(--card); border: 1px solid var(--line); border-top: 0; border-radius: 0 0 18px 18px;
+                box-shadow: 0 18px 40px -16px rgba(0,0,0,.4); padding: 14px 16px 16px; }
+  .toolspanel[hidden] { display: none; }
+  @media (max-width: 899px) { .toolspanel { left: 0; right: 0; width: auto; border-left: 0; border-right: 0; border-radius: 0 0 18px 18px; } }
+  .toolspanel .tools-row { margin-bottom: 12px; }
+  .tools { margin-bottom: 12px; }
+  .tools > summary { cursor: pointer; list-style: none; padding: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--muted); }
   .tools > summary::-webkit-details-marker { display: none; }
   .tools > summary::before { content: '▸ '; } .tools[open] > summary::before { content: '▾ '; }
-  .tools-in { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 14px 12px; align-items: center; }
+  .tools-in { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .tools-note { flex-basis: 100%; font-size: 12px; color: var(--muted); }
-  .toolspanel[hidden] { display: none; }
-  .toolspanel { margin: -4px 0 12px; }
-  .toolspanel .tools-row { margin-bottom: 10px; }
-  #toolsBtn .tn { margin-left: 6px; background: var(--clay-fill); color: #fff; border-radius: 999px; font-size: 12px; font-weight: 700; padding: 0 7px; }
+  .toolspanel .creds { margin: 0; padding: 12px 0 0; border: 0; border-top: 1px solid var(--rule); border-radius: 0; box-shadow: none; animation: none; background: none; }
   .stbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
   .stbtns .btn[aria-pressed="true"] { background: var(--court-100); border-color: var(--court); color: var(--court); font-weight: 700; }
   .hidrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 0; border-top: 1px solid var(--rule); }
@@ -774,7 +784,7 @@
   .cmp-head, .cmp-row { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.15fr) minmax(0, 1.5fr) minmax(0, .95fr);
                         gap: 12px; align-items: start; }
   .cmp-head { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-soft);
-              padding: 14px 0 0; position: sticky; top: calc(var(--stick) + 54px); background: var(--card); z-index: 2; }
+              padding: 14px 0 0; position: sticky; top: var(--stick); background: var(--card); z-index: 2; }
   .cmp-row { padding: 10px 0; border-bottom: 1px solid var(--rule); position: relative; }
   .cmp-row:last-child { border-bottom: 0; }
   .cmp-row::before { content: ''; position: absolute; left: -12px; top: 12px; bottom: 12px; width: 3px; border-radius: 3px; }
@@ -1181,14 +1191,18 @@
 <div id="app" style="display:none">
   <div id="demoband" class="demoband" style="display:none">Demo data — remove ?demo=1 for the real thing</div>
   <header class="topbar">
-    <a class="brand" href="#today">AMIR ARDEKANI <span>· THE BOX</span></a>
-    <div class="right">
-      <span class="who" id="who"></span>
-      <button class="tbtn" onclick="hardRefresh()" title="Reload everything from the server" aria-label="Refresh">↻<span class="tb-lbl"> Refresh</span></button>
-      <button id="logoutBtn" class="tbtn">Sign out</button>
+    <div class="tb-top">
+      <a class="brand" href="#today">AMIR ARDEKANI <span>· THE BOX</span></a>
+      <div class="right">
+        <span class="who" id="who"></span>
+        <button class="tbtn" onclick="hardRefresh()" title="Reload everything from the server" aria-label="Refresh">↻<span class="tb-lbl"> Refresh</span></button>
+        <button id="toolsBtn" class="tbtn" aria-expanded="false" aria-controls="toolsPanel" onclick="toggleTools()" title="Coach tools, the backup, and the logins waiting to be sent">⚙<span class="tb-lbl"> Tools</span></button>
+        <button id="logoutBtn" class="tbtn">Sign out</button>
+      </div>
+      <div id="toolsPanel" class="toolspanel" hidden></div>
     </div>
+    <nav class="rail" aria-label="Sections"><div class="rail-in" id="rail"></div></nav>
   </header>
-  <nav class="rail" aria-label="Sections"><div class="rail-in" id="rail"></div></nav>
   <div id="loadwarn" class="loadwarn" role="alert" hidden></div>
   <div id="failbar" class="failbar" role="alert" hidden></div>
   <main class="wrap" id="content"><div class="loading"><div class="spinner"></div>Warming up…</div></main>
@@ -1955,7 +1969,8 @@ async function downloadBackup(btn) {
   if (btn) { btn.disabled = false; btn.textContent = label; }
   // A complete backup is "the last backup"; an incomplete one is remembered separately, so the reminder keeps asking.
   try { localStorage.setItem(incomplete ? LAST_BAD_BACKUP_KEY : LAST_BACKUP_KEY, new Date().toISOString()); } catch (e) {}
-  const total = Object.values(out.tables).reduce((s, r) => s + r.length, 0);
+  paintTools();   // the Tools panel says when the last backup was
+  const total =Object.values(out.tables).reduce((s, r) => s + r.length, 0);
   alert((incomplete
         ? `⚠ INCOMPLETE backup — saved as ${fileName}.\n\nIt is NOT a restore point and does not count as this week's backup: some tables could not be read, so a restore from it would be missing data. Fix what is listed below, then take the backup again, and delete this file.\n\n`
         : '') +
@@ -2553,19 +2568,20 @@ function coachLine(day) {
 function nameOf(id) { return S.ath[id] ? S.ath[id].name : (S.optin[id] && S.optin[id].display_name) || unslug(id); }
 
 // --- router -----------------------------------------------------------------
-// Two groups. The first is the daily coaching work; the second is the habit app's board and the
-// product and marketing admin, opened now and then. Every address (#links, #assess …) is unchanged.
+// Seven places in one row (2026-10-12, round 2 of the coach UX pass; Amir: "D1 yes"). Intake, Affiliates and the signup funnel are Leads; the Course and
+// the Testing app are Buyers. The Library keeps its address (#links). The nine-tab addresses still work (LEGACY_ADDR, below).
 const TABS = [
   { id: 'today', label: 'Today' },
   { id: 'athletes', label: 'Athletes' },
-  { id: 'intake', label: 'Intake' },
   { id: 'exercises', label: 'Exercises' },
-  { id: 'proof', label: 'Proof', more: true },
-  { id: 'links', label: 'Library', more: true },
-  { id: 'affiliates', label: 'Affiliates', more: true },
-  { id: 'assess', label: 'Testing app', more: true },
-  { id: 'course', label: 'Course', more: true },
+  { id: 'proof', label: 'Proof' },
+  { id: 'leads', label: 'Leads' },
+  { id: 'links', label: 'Library' },
+  { id: 'buyers', label: 'Buyers' },
 ];
+// The sub-tabs of Leads and Buyers: the address part (the first has none), the label, and what it shows (renderLeads(), renderBuyers()).
+const LEAD_TABS = [{ sub: '', label: 'Applications' }, { sub: 'signups', label: 'Free signups' }, { sub: 'codes', label: 'Referral codes' }];
+const BUYER_TABS = [{ sub: '', key: 'course', label: 'Course' }, { sub: 'testing', key: 'assess', label: 'Testing app' }];
 // #a/<id> opens an athlete's file; #a/<id>/<sub> opens it on one of its four
 // screens, so any of them can be bookmarked or reloaded in place. A retired
 // screen's old link (/chat, removed 2026-09-26) still reads as a screen, so it
@@ -2577,9 +2593,22 @@ const EX_SUBS = ['qualities', 'coverage'];
 function route() { return routeOf((location.hash || '#today').slice(1)); }
 // The same reading for any address (the hashchange guard asks what the OLD address was).
 function routeOfUrl(url) { const i = String(url || '').indexOf('#'); return routeOf(i < 0 ? 'today' : String(url).slice(i + 1) || 'today'); }
+// #leads opens the applications; #leads/signups the free signups; #leads/codes the referral codes. #buyers opens the course logins; #buyers/testing the
+// testing app's. As with Exercises, anything else after the slash reads as the first one.
+const LEAD_SUBS = ['signups', 'codes'];
+const BUYER_SUBS = ['testing'];
+// The addresses of the nine-tab dashboard (until 2026-10-12): bookmarks, old links and the harness still use them. They land in the new place and the
+// address bar is rewritten in place (fixLegacyHash), so there is no extra history entry.
+const LEGACY_ADDR = { intake: 'leads', affiliates: 'leads/codes', assess: 'buyers/testing', course: 'buyers' };
+function fixLegacyHash() {
+  const h = (location.hash || '').slice(1);
+  if (!Object.prototype.hasOwnProperty.call(LEGACY_ADDR, h)) return;
+  try { history.replaceState(history.state, '', location.pathname + location.search + '#' + LEGACY_ADDR[h]); } catch (e) { /* the page reads the old address as the new one anyway */ }
+}
 function routeOf(h) {
-  const ex = /^exercises(?:\/(.*))?$/.exec(h);
-  if (ex) return { view: 'exercises', sub: EX_SUBS.indexOf(ex[1]) >= 0 ? ex[1] : '' };
+  if (Object.prototype.hasOwnProperty.call(LEGACY_ADDR, h)) h = LEGACY_ADDR[h];
+  const ex = /^(exercises|leads|buyers)(?:\/(.*))?$/.exec(h);
+  if (ex) return { view: ex[1], sub: ({ exercises: EX_SUBS, leads: LEAD_SUBS, buyers: BUYER_SUBS })[ex[1]].indexOf(ex[2]) >= 0 ? ex[2] : '' };
   if (h.startsWith('a/')) {
     const rest = h.slice(2);
     const cut = rest.lastIndexOf('/');
@@ -2593,23 +2622,36 @@ function routeOf(h) {
   }
   return { view: TABS.some(t => t.id === h) ? h : 'today' };
 }
+// The number of applications nobody has opened yet: the Leads badge and the Applications sub-tab's count.
+const newApplications = () => (S.intake || []).filter(i => (i.status || 'new') === 'new').length;
+let _railHtml = '', _railActive = '';
 function renderRail() {
   const r = route();
   const active = r.view === 'detail' ? 'athletes' : r.view;
   const waiting = Object.values(S.ath).reduce((n, a) => n + a.toReply, 0);
-  const newIntake = (S.intake || []).filter(i => (i.status || 'new') === 'new').length;
+  const newIntake = newApplications();
   const tabHtml = t => {
     const badge = (t.id === 'athletes' && waiting > 0) ? `<span class="n" title="${waiting} note${waiting === 1 ? '' : 's'} to read">${waiting}</span>`
-                : (t.id === 'intake' && newIntake > 0) ? `<span class="n" title="${newIntake} new application${newIntake === 1 ? '' : 's'}">${newIntake}</span>` : '';
-    return `<a class="tab ${t.more ? 'more' : ''} ${active === t.id ? 'active' : ''}" href="#${t.id}"${active === t.id ? ' aria-current="page"' : ''}>${t.label}${badge}</a>`;
+                : (t.id === 'leads' && newIntake > 0) ? `<span class="n" title="${newIntake} new application${newIntake === 1 ? '' : 's'}">${newIntake}</span>` : '';
+    return `<a class="tab${active === t.id ? ' active' : ''}" href="#${t.id}"${active === t.id ? ' aria-current="page"' : ''}>${t.label}${badge}</a>`;
   };
-  $('rail').innerHTML = `<div class="rail-grp main">${TABS.filter(t => !t.more).map(tabHtml).join('')}</div>` +
-    `<span class="rail-sep" aria-hidden="true"></span><div class="rail-grp more">${TABS.filter(t => t.more).map(tabHtml).join('')}</div>`;
-  const on = document.querySelector('#rail .rail-grp.more .tab.active');
-  if (on) on.scrollIntoView({ inline: 'center', block: 'nearest' });
+  // The row is rewritten only when it changed (a redraw otherwise took the keyboard's place away), and a tab out of sight is scrolled into view
+  // inside the row, never the page: on a phone the row scrolls sideways.
+  const html = TABS.map(tabHtml).join('');
+  const rail = $('rail');
+  if (html !== _railHtml) { rail.innerHTML = html; _railHtml = html; }
+  const on = rail.querySelector('.tab.active');
+  if (on && (active !== _railActive || on.offsetLeft < rail.scrollLeft || on.offsetLeft + on.offsetWidth > rail.scrollLeft + rail.clientWidth)) {
+    rail.scrollLeft = Math.max(0, on.offsetLeft - (rail.clientWidth - on.offsetWidth) / 2);
+  }
+  _railActive = active;
   paintLoadWarn();
+  paintTools();
+  leadsBarRefresh();
   const tab = TABS.find(t => t.id === active);
-  document.title = (r.view === 'detail' ? nameOf(r.id) + ' · ' : tab && r.view !== 'today' ? tab.label + ' · ' : '') + "The Coach's Box";
+  const subs = r.view === 'leads' ? LEAD_TABS : r.view === 'buyers' ? BUYER_TABS : null;
+  const subLabel = subs ? (subs.find(s => s.sub === (r.sub || '')) || subs[0]).label + ' · ' : '';
+  document.title = (r.view === 'detail' ? nameOf(r.id) + ' · ' : tab && r.view !== 'today' ? subLabel + tab.label + ' · ' : '') + "The Coach's Box";
 }
 async function hardRefresh() {
   if (route().view === 'exercises' && !spineMayLeave('Refresh')) return;
@@ -2633,11 +2675,12 @@ function render() { withEraseFocus(renderNow); }   // withEraseFocus: the Erase 
 function renderNow() {
   if (!S.ready) return;
   $('content').classList.remove('no-anim');
+  fixLegacyHash();
   renderRail();
   const r = route();
   // A new screen starts at the top. Same-page hash links keep the scroll offset, so a long roster
   // used to drop the coach halfway down a short screen. A redraw of the same screen keeps its place.
-  const viewKey = r.view === 'detail' ? 'a/' + r.id + '/' + r.sub : r.view === 'exercises' && r.sub ? 'exercises/' + r.sub : r.view;
+  const viewKey = r.view === 'detail' ? 'a/' + r.id + '/' + r.sub : r.sub ? r.view + '/' + r.sub : r.view;
   if (viewKey !== _lastViewKey) {
     const prev = _lastViewKey;
     _lastViewKey = viewKey;
@@ -2646,14 +2689,12 @@ function renderNow() {
   _viaHistory = false;
   try { history.replaceState({ aa: viewKey }, '', location.href); } catch (e) { /* the page still works without the stamp */ }
   if (r.view === 'today') renderToday();
-  else if (r.view === 'intake') renderIntake();
   else if (r.view === 'athletes') renderAthletes();
   else if (r.view === 'detail') renderDetail(r.id, r.sub);
   else if (r.view === 'proof') renderProof();
+  else if (r.view === 'leads') renderLeads();
   else if (r.view === 'links') renderLinks();
-  else if (r.view === 'affiliates') renderAffiliates();
-  else if (r.view === 'assess') renderAssess();
-  else if (r.view === 'course') renderCourse();
+  else if (r.view === 'buyers') renderBuyers();
   else if (r.view === 'exercises') renderExercises();
   if (_pendingScroll != null) { const y = _pendingScroll; _pendingScroll = null; window.scrollTo({ top: y, behavior: 'instant' }); }
 }
@@ -2661,6 +2702,7 @@ window.addEventListener('hashchange', ev => {
   if (_erase && _erase.status !== 'busy') _erase = null;   // an open Erase panel never follows the coach to another screen
   // Leaving the Exercises tab, or moving between its three sub-tabs (the editor is only on Entries), with typed, unsaved work asks
   // first, and stays put on a no.
+  fixLegacyHash();
   const was = routeOfUrl(ev.oldURL), now = route();
   if (was.view === 'exercises' && (now.view !== 'exercises' || now.sub !== was.sub)
       && !spineMayLeave(now.view === 'exercises' ? 'Switch to another part of Exercises' : 'Leave the Exercises tab')) {
@@ -2847,7 +2889,7 @@ window.toggleHide = toggleHide;
 // urgent first. A note row opens the day the note is on. Each row has ONE button on the right that names what the tap
 // does (2026-10-12, round 1 of the coach UX pass); the words and the reasons stay a button too and open the athlete, as the
 // whole row used to. Under the people, "Also waiting": things to do that are NOT a person and NOT a reason, so reasonsOf() and
-// the count above do not change: new applications in Intake, logins not yet sent, an overdue backup, and older notes.
+// the count above do not change: new applications in Leads, logins not yet sent, an overdue backup, and older notes.
 // (Unread chat messages left with the in-app chat on 2026-09-26: athletes reach Amir on WhatsApp.)
 let _needAll = false;
 // The button label for the top reason's key. The three below are WhatsApp links when the person has a number, else "Open".
@@ -2892,9 +2934,9 @@ function needPanelHtml() {
       <span class="needgo static"><span class="dot ${dotClass}"></span><span class="b"><span class="l1"><span class="n">${title}</span></span><span class="s">${text}</span></span></span>
       <span class="nacts">${buttons}</span>
     </div>`;
-  const newIntake = (S.intake || []).filter(i => (i.status || 'new') === 'new').length;
-  if (newIntake) also.push(housekeeping('clay', `${newIntake} new application${newIntake === 1 ? '' : 's'}`, 'Coaching apply forms waiting in Intake',
-    `<a class="btn sm" href="#intake">Open Intake</a>`));
+  const newIntake = newApplications();
+  if (newIntake) also.push(housekeeping('clay', `${newIntake} new application${newIntake === 1 ? '' : 's'}`, 'Coaching apply forms waiting in Leads',
+    `<a class="btn sm" href="#leads">Open Leads</a>`));
   // Logins created and not yet sent (the same rule as the Tools panel's list, pendingCredsHtml(): a stored first password is what makes a login "unsent").
   // Nothing while the list of logins failed to load: it would be a list of nobody.
   const unsent = LOAD_ERR.logins ? [] : Object.values(S.logins || {}).filter(r => r.initial_password).sort((x, y) => x.athlete_id.localeCompare(y.athlete_id));
@@ -3307,40 +3349,23 @@ const R_FILTERS = [
 function statusChip(a) {
   return a.status === 'paused' ? '<span class="chip">Paused</span>' : a.status === 'former' ? '<span class="chip">Former</span>' : '';
 }
-// The roster's tools (Coach tools, Logins to send, Create missing logins) sit behind one button (audit ROSTER-12, stage63 round: Amir "a ⚙ Tools button"),
-// so the list starts right under the filter chips on a phone. The badge counts the logins waiting to be sent.
-let _toolsOpen = false;
-function toggleTools() {
-  _toolsOpen = !_toolsOpen;
+// ⚙ Tools: Coach tools, Logins to send and Create missing logins sit behind one button (audit ROSTER-12, stage63 round: Amir "a ⚙ Tools button"). It was in the
+// roster's controls; since round 2 of the UX pass (2026-10-12, Amir: "D1 yes") it is in the top bar on every screen, and the panel hangs under the bar.
+// The badge counts the logins waiting to be sent. The panel is not part of #content, so a redraw of the screen leaves it open; paintTools() (from
+// renderRail) rewrites its contents only when they changed. It closes on a second tap, on Esc, and on a click outside it.
+let _toolsOpen = false, _toolsHtml = '';
+function setTools(open) {
+  _toolsOpen = !!open;
   const p = $('toolsPanel'), b = $('toolsBtn');
   if (p) p.hidden = !_toolsOpen;
   if (b) b.setAttribute('aria-expanded', String(_toolsOpen));
 }
+function toggleTools() { setTools(!_toolsOpen); }
 window.toggleTools = toggleTools;
-function setRosterFilter(id) { _rFilter = id; renderAthletes(); }
-window.setRosterFilter = setRosterFilter;
-
-// Why this person is in front of you, in plain words: reasonsOf(), the one rule (above).
-function rosterReasons(a) { return a.reasons || []; }
-function renderAthletes() {
-  const list = Object.values(S.ath);
-  const counts = {};
-  R_FILTERS.forEach(f => counts[f.id] = list.filter(f.test).length);
+function toolsPanelHtml() {
   const lb = lastBackupAt(), lbBad = lastBadBackupAt();
   const needLogin = athletesNeedingLogin();
-  const toolsN = Object.values(S.logins || {}).filter(r => r.initial_password).length;
-  $('content').innerHTML = `
-    <div class="controls">
-      <input type="search" id="searchBox" aria-label="Search the roster" placeholder="Search name, id, board name, email…" oninput="_rSearch=this.value;renderRoster()" value="${esc(_rSearch)}">
-      <select id="sortSel" aria-label="Sort the roster" onchange="_rSort=this.value;renderRoster()">
-        <option value="attention"${_rSort === 'attention' ? ' selected' : ''}>Sort: needs attention</option>
-        <option value="recent"${_rSort === 'recent' ? ' selected' : ''}>Sort: recently active</option>
-        <option value="name"${_rSort === 'name' ? ' selected' : ''}>Sort: name</option>
-      </select>
-      <button id="toolsBtn" class="btn sm" aria-expanded="${_toolsOpen}" aria-controls="toolsPanel" onclick="toggleTools()" title="Coach tools, the backup, and the logins waiting to be sent">⚙ Tools${toolsN ? `<span class="tn" title="${toolsN} login${toolsN === 1 ? '' : 's'} waiting to be sent">${toolsN}</span>` : ''}</button>
-    </div>
-    <div id="toolsPanel" class="toolspanel"${_toolsOpen ? '' : ' hidden'}>
-    ${needLogin.length && !LOAD_ERR.logins
+  return `${needLogin.length && !LOAD_ERR.logins
         ? `<div class="tools-row"><button class="btn sm primary" onclick="bulkCreateLogins()" title="${esc(needLogin.join(', '))} — coached, trained, no login yet">Create ${needLogin.length} missing login${needLogin.length === 1 ? '' : 's'}</button></div>`
         : ''}
     <details class="tools" open>
@@ -3353,7 +3378,41 @@ function renderAthletes() {
           The way back is written down and rehearsed: scripts/restore/README.md in the repo.</span>
       </div>
     </details>
-    ${pendingCredsHtml()}
+    ${pendingCredsHtml()}`;
+}
+function paintTools() {
+  const b = $('toolsBtn'), p = $('toolsPanel');
+  if (!b || !p) return;
+  const toolsN = S.ready ? Object.values(S.logins || {}).filter(r => r.initial_password).length : 0;
+  const label = '⚙<span class="tb-lbl"> Tools</span>' + (toolsN ? `<span class="tn" title="${toolsN} login${toolsN === 1 ? '' : 's'} waiting to be sent">${toolsN}</span>` : '');
+  if (b.innerHTML !== label) b.innerHTML = label;
+  b.setAttribute('aria-label', 'Tools' + (toolsN ? `, ${toolsN} login${toolsN === 1 ? '' : 's'} waiting to be sent` : ''));
+  const html = S.ready ? toolsPanelHtml() : '';
+  if (html !== _toolsHtml) { p.innerHTML = html; _toolsHtml = html; }
+  p.hidden = !_toolsOpen;
+  b.setAttribute('aria-expanded', String(_toolsOpen));
+}
+window.paintTools = paintTools;
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && _toolsOpen) { const had = $('toolsPanel') && $('toolsPanel').contains(document.activeElement); setTools(false); if (had && $('toolsBtn')) $('toolsBtn').focus(); } });
+// composedPath() is taken when the click starts: a button in the panel that a redraw replaces while its own click is still on its way up is still "inside".
+document.addEventListener('click', e => { if (_toolsOpen && !e.composedPath().some(n => n && (n.id === 'toolsPanel' || n.id === 'toolsBtn'))) setTools(false); });
+function setRosterFilter(id) { _rFilter = id; renderAthletes(); }
+window.setRosterFilter = setRosterFilter;
+
+// Why this person is in front of you, in plain words: reasonsOf(), the one rule (above).
+function rosterReasons(a) { return a.reasons || []; }
+function renderAthletes() {
+  const list = Object.values(S.ath);
+  const counts = {};
+  R_FILTERS.forEach(f => counts[f.id] = list.filter(f.test).length);
+  $('content').innerHTML = `
+    <div class="controls">
+      <input type="search" id="searchBox" aria-label="Search the roster" placeholder="Search name, id, board name, email…" oninput="_rSearch=this.value;renderRoster()" value="${esc(_rSearch)}">
+      <select id="sortSel" aria-label="Sort the roster" onchange="_rSort=this.value;renderRoster()">
+        <option value="attention"${_rSort === 'attention' ? ' selected' : ''}>Sort: needs attention</option>
+        <option value="recent"${_rSort === 'recent' ? ' selected' : ''}>Sort: recently active</option>
+        <option value="name"${_rSort === 'name' ? ' selected' : ''}>Sort: name</option>
+      </select>
     </div>
     <div class="controls rfilters">${R_FILTERS.filter(f => counts[f.id] > 0 || ['all', 'needs'].includes(f.id) || f.id === _rFilter).map(f =>
       `<button class="rf ${_rFilter === f.id ? 'on' : ''}" onclick="setRosterFilter('${f.id}')">${f.label}<span class="c">${counts[f.id]}</span></button>`).join('')}</div>
@@ -5117,11 +5176,12 @@ async function saveWhatsApp(athleteId, forced) {
   toast(num ? 'WhatsApp number saved' : 'WhatsApp number removed');
 }
 window.saveWhatsApp = saveWhatsApp;
-// The application(s) this athlete came from (stage61): the ones linked to them on the Intake tab. Nothing when none is linked.
+// The application(s) this athlete came from (stage61): the ones linked to them under Leads. Nothing when none is linked. "open the application" sets the
+// application on show (openApplication) and goes to Leads, which draws that one.
 function cameFromHtml(athleteId) {
   const apps = (S.intake || []).filter(i => i.athlete_id === athleteId).sort((x, y) => String(x.created_at).localeCompare(String(y.created_at)));
   if (!apps.length) return '';
-  return fRow('Came from', { val: apps.map(i => `${esc(prettyDate(String(i.created_at || '').slice(0, 10)))} application${i.programme ? ' · ' + esc(i.programme) : ''}${i.outcome ? ' · ' + esc(intakeOutcomeLabel(i.outcome)) : ''} · <a href="#intake">open Intake</a>`).join('<br>') });
+  return fRow('Came from', { val: apps.map(i => `${esc(prettyDate(String(i.created_at || '').slice(0, 10)))} application${i.programme ? ' · ' + esc(i.programme) : ''}${i.outcome ? ' · ' + esc(intakeOutcomeLabel(i.outcome)) : ''} · <a href="#leads" onclick="openApplication(${jsq(i.id)})">open the application</a>`).join('<br>') });
 }
 // The sessions the coach hid (stage60), newest first, each with Restore and, for a genuine erasure request, Delete for good. Absent when there are none.
 const HIDDEN_HOW = 'Left out of their numbers, the roster\'s warnings and the history their app shows, and kept in the database. If their phone sends one again it stays hidden. <b>Restore</b> brings it back; <b>Delete for good</b> removes it, and it can then only come back from a backup file.';
@@ -5508,7 +5568,7 @@ function eraseFoundHtml(e) {
   const offered = new Set(((e.pv && e.pv.intake_candidates) || []).map(c => String(c.id)));
   const rest = (S.intake || []).filter(i => !offered.has(String(i.id)));
   const q = eraseFold(e.find || '').trim();
-  if (!q) return `<p class="stays">${rest.length} other form${rest.length === 1 ? '' : 's'} in the Intake tab. Type part of a name, an email or a number to look for theirs.</p>`;
+  if (!q) return `<p class="stays">${rest.length} other form${rest.length === 1 ? '' : 's'} in Leads. Type part of a name, an email or a number to look for theirs.</p>`;
   const toks = q.split(/\s+/).filter(Boolean);
   const hits = rest.filter(i => { const hay = eraseFold([intakeName(i), i.email, i.contact, i.programme, String(i.created_at || '').slice(0, 10)].join(' ')); return toks.every(t => hay.includes(t)); });
   if (!hits.length) return `<p class="stays">No other form matches “${esc(String(e.find).trim())}”.</p>`;
@@ -5570,7 +5630,7 @@ function erasePanelHtml(kind, key) {
   const coached = kind === 'athlete' && (S.ath[key] || {}).tier === 'coached';
   const how = { linked: 'linked to them', email: 'same email', whatsapp: 'same WhatsApp number', name: 'same name' };
   const forms = kind !== 'athlete' ? '' : `<div class="forms">
-    ${cands.length ? `<p><b>${cands.length} intake form${cands.length === 1 ? '' : 's'}</b> may be theirs: linked to them on the Intake tab, or carrying their email, WhatsApp number or full name. They hold the answers about injuries, sleep and health. Tick the ones that are theirs and they go too:</p>
+    ${cands.length ? `<p><b>${cands.length} intake form${cands.length === 1 ? '' : 's'}</b> may be theirs: linked to them in Leads, or carrying their email, WhatsApp number or full name. They hold the answers about injuries, sleep and health. Tick the ones that are theirs and they go too:</p>
       ${cands.map(c => `<label class="pick"><input type="checkbox" data-eid="${esc(c.id)}" ${e.picked.includes(String(c.id)) ? 'checked' : ''} ${busy ? 'disabled' : ''} onchange="eraseTick(${jsq(c.id)}, this.checked)">
         <span>${esc(prettyDate(String(c.created_at || '').slice(0, 10)))} · <bdi>${esc(c.name || 'no name')}</bdi>${c.programme ? ' · ' + esc(c.programme) : ''}
         <span class="chip ${c.matched_on === 'name' ? '' : 'court'}">${esc(how[c.matched_on] || c.matched_on)}</span>${c.shared ? ' <span class="chip" title="Another athlete\'s contact record carries the same email or number, for example a parent\'s">also another athlete\'s</span>' : ''}</span></label>`).join('')}${cands.some(c => c.shared) ? '<p class="stays">A form marked <i>also another athlete\'s</i> carries an email or number that another athlete\'s contact record has too (a parent\'s, for two children), so it is not ticked for you.</p>' : ''}`
@@ -5590,7 +5650,7 @@ function erasePanelHtml(kind, key) {
     <p>${esc(ERASE_KIND[kind] || kind)} <code>${esc(key)}</code>. This permanently deletes everything the server keeps for them, in one step. There is no undo.${coached ? ' <b style="color:var(--clay-ink)">This is a coached athlete with a live programme.</b>' : ''}</p>
     <ul>${eraseCountLines(pv.counts)}</ul>
     ${forms}
-    <p class="stays"><b>Stays:</b> ${stays} Your last ⤓ Backup on this computer: <b>${lastBackup ? esc(timeAgo(lastBackup)) : 'none yet'}</b>. If this might be a mistake, that file is the only way back.${codes.length ? ` The partner record${codes.length === 1 ? '' : 's'} <b>${esc(codes.join(', '))}</b> stays on the Affiliates tab: only the link to this athlete is removed.` : ''}</p>
+    <p class="stays"><b>Stays:</b> ${stays} Your last ⤓ Backup on this computer: <b>${lastBackup ? esc(timeAgo(lastBackup)) : 'none yet'}</b>. If this might be a mistake, that file is the only way back.${codes.length ? ` The partner record${codes.length === 1 ? '' : 's'} <b>${esc(codes.join(', '))}</b> stays under Leads, in Referral codes: only the link to this athlete is removed.` : ''}</p>
     <div class="typed">
       <label for="eraseIn">Type <code>${esc(pv.confirm_word || key)}</code> to confirm</label>
       <input id="eraseIn" class="pwin" autocomplete="off" autocapitalize="none" spellcheck="false" value="${esc(e.typed || '')}" ${busy ? 'disabled' : ''}
@@ -5683,10 +5743,10 @@ async function eraseRun() {
   const nForms = Number(counts.hab_intake || 0);
   const note = `Erased ${who} for good: ${rows.toLocaleString()} row${rows === 1 ? '' : 's'}${login ? ', the sign-in account included' : ''}.\n\nReceipt #${d.log_id} is kept (a hash, the date and the counts; no name or contact).` +
     (e.kind === 'athlete'
-      ? (nForms ? `\n\nIntake form${nForms === 1 ? '' : 's'} erased: ${forms.join('; ')}.` : '\n\nNo intake form was erased. If they filled one in, it is still in the Intake tab.')
+      ? (nForms ? `\n\nIntake form${nForms === 1 ? '' : 's'} erased: ${forms.join('; ')}.` : '\n\nNo intake form was erased. If they filled one in, it is still in Leads.')
       : '') +
     `\n\nStill yours to do if they asked for it all:\n• they leave your weekly backup files as those roll off (about three months);\n• emails about them in your inbox, and WhatsApp, are not touched by this.` +
-    (codes.length ? `\n• the partner record${codes.length === 1 ? '' : 's'} ${codes.join(', ')} stays on the Affiliates tab (only its link to the athlete was removed).` : '') +
+    (codes.length ? `\n• the partner record${codes.length === 1 ? '' : 's'} ${codes.join(', ')} stays under Leads, in Referral codes (only its link to the athlete was removed).` : '') +
     (e.kind === 'athlete' ? '\n\nIf their app was open on a phone just now, one last save can still land after this. Look at the roster in a minute: if they are back, erase them again.' : '');
   if (e.kind === 'athlete') { if (!elsewhere) location.hash = 'athletes'; await hardRefresh(); }
   else if (e.kind === 'course') { await loadCourse(); render(); }
@@ -5697,7 +5757,7 @@ async function eraseRun() {
 window.eraseOpen = eraseOpen; window.eraseCancel = eraseCancel; window.eraseType = eraseType; window.eraseTick = eraseTick; window.eraseRun = eraseRun;
 window.eraseFind = eraseFind; window.eraseStopWaiting = eraseStopWaiting;
 
-// --- PROOF (wall · quest week · pulse · board · titles · season · funnel) ----
+// --- PROOF (wall · quest week · pulse · board · titles · season) -------------
 // The board comes from the server's own scorer via leaderboard_top, called as the signed-in
 // coach (the function lets is_coach() through, with no key): the rows and the order are the ones athletes
 // see. `amir_ardekani` is only the row it marks as "you".
@@ -5719,7 +5779,8 @@ function reloadBoard() { S.board[_boardScope] = null; delete S.boardAt[_boardSco
 window.reloadBoard = reloadBoard;
 let _boardScope = 'season';
 // Proof is the community's home (round 2, 2026-10-12), so running the crew is one screen: the wall and the board on the left; the quest lever,
-// the pulse, Titles minted, the season and the funnel on the right. Today keeps only a short Proof column (proofTodayHtml).
+// the pulse, Titles minted and the season on the right. Today keeps only a short Proof column (proofTodayHtml). The signup funnel moved to Leads →
+// Free signups (round 2 of the UX pass, 2026-10-12): the people who signed up are a lead to follow, not part of running the crew.
 // A redraw (a line posted, a line hidden, a quest week started) is drawn AT ONCE from what the page holds. The board is read once and kept, so
 // only a real first read (or a Reload) waits, and it waits inside the board's own panel: the wall and the lever never blank out under the coach's
 // hands (it used to replace the whole screen with "Fetching the board…" on every redraw).
@@ -5748,7 +5809,6 @@ function drawProof(rows) {
         <section class="panel" id="pulsePanel">${pulsePanelHtml(habAthletes)}</section>
         ${titlesPanelHtml()}
         ${seasonPanelHtml()}
-        ${funnelPanelHtml()}
       </div>
     </div>`;
   wireWallComposer();
@@ -5801,8 +5861,8 @@ function seasonPanelHtml() {
       : '<p class="empty">No season live.</p>'}
     </section>`;
 }
-// The funnel: everyone who signed up through proof.html, newest first. One self-contained function that returns the whole section, so
-// a screen of its own can take it whole (round 2 plans a Leads tab); today it is the last panel on Proof.
+// The funnel: everyone who signed up through proof.html, newest first. One self-contained function that returns the whole section; it is Leads →
+// Free signups (it was the last panel on Proof until 2026-10-12).
 function funnelPanelHtml() {
   // The tier is the programme's (S.ath), not the contact row's second copy. A coached client who
   // signed up through Proof first is "converted": listed, but not counted as a free signup, and
@@ -6083,13 +6143,15 @@ async function affSetActive(code, active, btn) {
   if (DEMO) renderAffiliates(); else await refetch(['affiliates']);
 }
 
-function renderAffiliates() {
+// The referral codes view as one piece of HTML (Leads → Referral codes, round 2 of the UX pass, 2026-10-12), as intakeViewHtml() is for the applications:
+// put it anywhere, then wireAffiliates(the element with id affView). Nothing in here reads $('content').
+function affiliatesViewHtml() {
   const all = (S.affiliates || []).slice().sort((a, b) =>
     String(b.applied_on || '').localeCompare(String(a.applied_on || '')) || String(a.code).localeCompare(String(b.code)));
   const live = all.filter(a => a.active), retired = all.filter(a => !a.active);
   const orphans = live.filter(a => !a.coach_name && !a.coach_name_fa).length;
 
-  let html = `<div class="controls">
+  let html = `<div id="affView"><div class="controls">
       <button class="btn primary sm" id="affAdd">+ Add code</button>
       <span class="empty" style="align-self:center">These are the codes both apply forms accept. Add or retire one and it takes effect straight away — no deploy.</span>
     </div>`;
@@ -6102,10 +6164,12 @@ function renderAffiliates() {
     const openRetired = retired.some(a => a.code === _affEditing) ? ' open' : '';
     html += `<section class="panel" style="margin-top:16px"><details${openRetired}><summary class="arch-toggle">Retired · ${retired.length}</summary><div style="margin-top:12px">${retired.map(affCard).join('')}</div></details></section>`;
   }
-
-  const c = $('content');
-  c.innerHTML = html;
-  const on = (sel, fn) => c.querySelectorAll(sel).forEach(el => el.addEventListener('click', e => { e.preventDefault(); fn(el); }));
+  return html + '</div>';
+}
+// Wire everything inside root (the #affView element, or anything that holds it). Safe to call again on a fresh copy of the HTML.
+function wireAffiliates(root) {
+  if (!root) return;
+  const on = (sel, fn) => root.querySelectorAll(sel).forEach(el => el.addEventListener('click', e => { e.preventDefault(); fn(el); }));
   on('.copy-btn-js', el => copyText(el.dataset.url, el));
   on('#affAdd', () => { _affEditing = '__new__'; renderAffiliates(); });
   on('.aff-edit', el => { _affEditing = el.dataset.code; renderAffiliates(); });
@@ -6113,6 +6177,18 @@ function renderAffiliates() {
   on('.aff-save', el => affSave(el.closest('.aff-form'), el));
   on('.aff-retire', el => affSetActive(el.dataset.code, false, el));
   on('.aff-reactivate', el => affSetActive(el.dataset.code, true, el));
+}
+// A redraw of the codes view that is on the page: it replaces #affView only (so it does nothing if the coach has gone to another screen while a save
+// was out), and does not replay the panels' entrance. Edit, Cancel, Add and a demo-mode save call this.
+function renderAffiliates() {
+  const old = $('affView');
+  if (!old) return;
+  $('content').classList.add('no-anim');
+  const tmp = document.createElement('div');
+  tmp.innerHTML = affiliatesViewHtml();
+  const nv = tmp.firstElementChild;
+  old.replaceWith(nv);
+  wireAffiliates(nv);
 }
 
 // --- BUYER LOGINS: the testing app and the course (one block, built twice: audit MKT-6, 2026-10-11; it was two copies that had drifted) ----------------
@@ -6197,8 +6273,11 @@ function buyerLogins(cfg) {
     render();
   }
 
-  function render() {
-    const c = $('content');
+  // box: the element to draw into (Buyers → this tab's body, #buyersBody). Without one it is that body if it is on the page AND is this block's, so a redraw that
+  // comes back after a call (a login created, a list loaded) does nothing when the coach has gone to the other tab or another screen meanwhile.
+  function render(box) {
+    const c = box || $('buyersBody');
+    if (!c || c.dataset.buyer !== key) return;
     if (!S[key] && LOAD_ERR[key]) {
       c.innerHTML = `<section class="panel"><p class="empty" style="color:var(--clay-ink)">The ${cfg.noun} did not load: ${esc(LOAD_ERR[key])}. Nothing here can be changed until they do.</p>
         <button class="btn sm" onclick="LOAD_ERR.${key}='';${cfg.loadFn}().then(${cfg.renderFn})">↻ Try again</button></section>`;
@@ -6206,7 +6285,7 @@ function buyerLogins(cfg) {
     }
     if (!S[key]) {
       c.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
-      load().then(render);
+      load().then(() => render());
       return;
     }
     const rows = S[key];
@@ -6279,6 +6358,7 @@ function buyerLogins(cfg) {
       const r = rows.find(x => x.username === el.dataset.u);
       if (r && r.initial_password) { copyText(cfg.message(r.username, r.initial_password), el, true); toast('Message copied — paste it into WhatsApp'); }
     });
+    buyersBarRefresh();   // the sub-tab's count of active logins follows a create, a revoke and a restore
   }
   return { load, render, action, markSent, st };
 }
@@ -6317,6 +6397,42 @@ function loadAssess() { return BUYER.assess.load(); }
 function renderAssess() { return BUYER.assess.render(); }
 function loadCourse() { return BUYER.course.load(); }
 function renderCourse() { return BUYER.course.render(); }
+
+// --- BUYERS (round 2 of the UX pass, 2026-10-12): the Course and the Testing app were two tabs; they are one place with two sub-tabs, styled like the athlete
+// file's (.subrail / .stab). #buyers is the Course, #buyers/testing the Testing app; each sub-tab's count is its active logins. The block above draws into
+// #buyersBody; the other sub-tab's list is read in the background so both counts show.
+function buyersBarHtml(sub) {
+  return `<div class="subrail buy-subrail" data-sub="${esc(sub)}" role="navigation" aria-label="Buyers">${BUYER_TABS.map(t => {
+    const rows = S[t.key], n = rows ? rows.filter(r => !r.revoked_at).length : 0;
+    const on = (sub || '') === t.sub;
+    return `<a class="stab${on ? ' active' : ''}"${on ? ' aria-current="page"' : ''} href="#buyers${t.sub ? '/' + t.sub : ''}">${t.label}${rows ? `<span class="n quiet" title="${n} active login${n === 1 ? '' : 's'}">${n}</span>` : ''}</a>`;
+  }).join('')}</div>`;
+}
+function buyersBarRefresh() {
+  const bar = document.querySelector('.buy-subrail');
+  if (!bar) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = buyersBarHtml(bar.dataset.sub);
+  bar.replaceWith(tmp.firstElementChild);
+}
+const _buyerWarm = {};
+function buyersWarm(current) {
+  BUYER_TABS.forEach(t => {
+    if (t.key === current || S[t.key] || LOAD_ERR[t.key] || _buyerWarm[t.key]) return;
+    _buyerWarm[t.key] = true;
+    BUYER[t.key].load().then(() => { _buyerWarm[t.key] = false; buyersBarRefresh(); paintLoadWarn(); });
+  });
+}
+function renderBuyers() {
+  const sub = route().sub || '';
+  const tab = BUYER_TABS.find(t => t.sub === sub) || BUYER_TABS[0];
+  const c = $('content');
+  const prev = c.querySelector('.buy-subrail');
+  c.classList.toggle('no-anim', !!prev && prev.dataset.sub === sub);   // a redraw of the sub-tab already showing does not replay the entrance
+  c.innerHTML = buyersBarHtml(sub) + `<div id="buyersBody" data-buyer="${tab.key}"></div>`;
+  BUYER[tab.key].render($('buyersBody'));
+  buyersWarm(tab.key);
+}
 
 // --- EXERCISES (The Spine, 2026-09-24) ---------------------------------------
 // One record per exercise Amir programmes: supabase/stage31_spine.sql. Claude
@@ -7772,9 +7888,38 @@ async function intakeSaveOutcome(btn) {
   intakeRedraw('.in-title'); renderRail();
   toast(outcome ? 'Outcome saved' : 'Outcome cleared');
 }
-function renderIntake() {
-  $('content').innerHTML = intakeViewHtml();
-  wireIntake($('inView'));
+// "Came from" on an athlete's File opens the application it names: it becomes the one on show (on a phone, open), and the link then goes to Leads.
+function openApplication(id) { _intakeSel = String(id); _intakeOpen = true; _intakeTouched = true; }
+window.openApplication = openApplication;
+
+// --- LEADS (round 2 of the UX pass, 2026-10-12): the apply-form applications (Intake), the free signups (the Proof funnel) and the referral codes
+// (Affiliates) were three places; they are one, with three sub-tabs styled like the athlete file's (.subrail / .stab). #leads is the applications,
+// #leads/signups the free signups, #leads/codes the referral codes. Each sub-tab is a view that returns its HTML and a function that wires it.
+function leadsBarHtml(sub) {
+  const newN = newApplications();
+  return `<div class="subrail lead-subrail" data-sub="${esc(sub)}" role="navigation" aria-label="Leads">${LEAD_TABS.map(t => {
+    const on = (sub || '') === t.sub;
+    return `<a class="stab${on ? ' active' : ''}"${on ? ' aria-current="page"' : ''} href="#leads${t.sub ? '/' + t.sub : ''}">${t.label}${!t.sub && newN ? `<span class="n" title="${newN} new application${newN === 1 ? '' : 's'}">${newN}</span>` : ''}</a>`;
+  }).join('')}</div>`;
+}
+// The count on Applications follows a status change (renderRail() runs after one).
+function leadsBarRefresh() {
+  const bar = document.querySelector('.lead-subrail');
+  if (!bar) return;
+  const html = leadsBarHtml(bar.dataset.sub);
+  if (bar.outerHTML === html) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  bar.replaceWith(tmp.firstElementChild);
+}
+function renderLeads() {
+  const sub = route().sub || '';
+  const c = $('content');
+  const prev = c.querySelector('.lead-subrail');
+  c.classList.toggle('no-anim', !!prev && prev.dataset.sub === sub);   // a redraw of the sub-tab already showing does not replay the entrance
+  c.innerHTML = leadsBarHtml(sub) + (sub === 'signups' ? funnelPanelHtml() : sub === 'codes' ? affiliatesViewHtml() : intakeViewHtml());
+  if (sub === 'codes') wireAffiliates($('affView'));
+  else if (!sub) wireIntake($('inView'));
 }
 
 // --- demo fixtures (?demo=1) — layout preview only, nothing is real ----------
