@@ -421,20 +421,9 @@
      cycle-hero and the upcoming-section blocks. */
   @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-  /* The big athlete name (used inside the athlete card). The first name is
-     dark; the last name is wrapped in <span> to drop to its own line in green. */
-  .home-name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(42px, 12vw, 64px);
-    font-weight: 900; letter-spacing: -2px;
-    line-height: 0.95; margin-bottom: 10px;
-    color: var(--grey-dark); text-transform: uppercase;
-  }
-  .home-name span { color: var(--green-ink); display: block; }
-
-  /* ─── Athlete header ─────────────────────────────────────────────
-     Plain page header at the top of the plan: big stacked name (last name
-     in green via .home-name) + goal + dates. No card chrome, no avatar. */
+  /* ─── Progress header ────────────────────────────────────────────
+     Plain page header at the top of Progress: the name as a small eyebrow, "Progress" as the title (.prog-eyebrow,
+     .prog-title: the HOME AND PROGRESS block at the end of this sheet) + goal + dates. No card chrome, no avatar. */
   .athlete-header {
     margin: 8px 24px 26px;
     opacity: 0; transform: translateY(16px);
@@ -728,7 +717,6 @@
   .cyc-top { display: flex !important; align-items: center; justify-content: space-between; gap: 10px;
     font: 700 var(--fs-label)/1.35 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.78); }
   .cyc-top b { color: #fff; font-weight: 700; }
-  .cyc-top i { font-style: normal; font-size: var(--fs-title); line-height: 1; color: #FAF7F2; }
   .cyc-row { display: grid !important; grid-template-columns: minmax(96px, auto) 1fr; align-items: center; gap: 14px; margin-top: 12px; }
   .cyc-k { font: 900 var(--fs-title)/1 'Barlow Condensed', sans-serif; color: #E06B43; white-space: nowrap; }
   .cyc-k small { font: 700 var(--fs-label) 'Space Mono', monospace; color: rgba(255,255,255,.82); margin-left: 6px; letter-spacing: .02em; }
@@ -739,7 +727,6 @@
   .cyc-win { display: flex !important; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0;
     border-top: 1px solid rgba(255,255,255,.12); font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; }
   .cyc-win b { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: #A9E2C8; text-align: right; }
-  .cyc-none { margin: 14px 0 4px; font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; color: rgba(255,255,255,.74); }
   @media (max-width: 380px) {   /* a narrow phone: the lift, and its win under it */
     .cyc-win { display: block !important; }
     .cyc-win b { display: block; text-align: left; margin-top: 2px; }
@@ -1232,17 +1219,7 @@
   #home-overview[hidden], #day-view[hidden] { display: none; }
   /* Give the overview a little top breathing room now that the nav bar is gone */
   #home-overview { padding-top: 8px; }
-  /* "Good morning/afternoon/evening" + first name — same scale/weight as Game Plan's athlete name (.home-name) */
-  .home-greet {
-    margin: 18px 24px 24px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(42px, 12vw, 64px);
-    font-weight: 900; letter-spacing: -2px; line-height: 0.95;
-    color: var(--grey-dark); text-transform: uppercase;
-    opacity: 0; transform: translateY(16px);
-    animation: fadeInUp 0.6s ease 0.1s forwards;
-  }
-  .home-greet span { color: var(--grey-dark); display: block; }
+  /* The greeting (.home-greet, Good morning + first name) is drawn by the HOME AND PROGRESS block at the end of this sheet. */
   /* The plan saved on this phone (REL-01, 2026-09-26): one quiet line under the
      greeting while this run shows the phone's copy. Card grey and ink, no alarm
      colour, and the tokens carry it into dark mode. */
@@ -1265,13 +1242,6 @@
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body);
     letter-spacing: 1px; text-transform: uppercase;
   }
-  /* Small "Good morning/afternoon/evening" eyebrow above the big first name */
-  .home-greet .home-greet-hi {
-    display: block; color: var(--grey-text);   /* grey (DS-01): a greeting is not "look here" */
-    font-family: 'Space Mono', monospace;
-    font-size: var(--fs-small); font-weight: 700; letter-spacing: 2px;
-    text-transform: uppercase; line-height: 1; margin-bottom: 8px;
-  }
   /* Section header ("This Week") */
   .home-section-head {
     display: flex; align-items: baseline; justify-content: space-between;
@@ -1284,41 +1254,11 @@
   }
   /* ── HOME-02 (Amir, 2026-09-26): the small cycle line, done days as rows, the in-progress
      card, and habits / records / weight as one row each. ── */
-  .home-cyc { display: flex; align-items: center; gap: 8px; width: calc(100% - 48px); margin: 12px 24px 4px;
-    padding: 11px 14px; border: 0; border-radius: 10px; background: var(--grey-card); cursor: pointer; text-align: left;
-    font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .03em; text-transform: uppercase; color: var(--grey-dark); }
-  .home-cyc .ct { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .home-cyc b { color: var(--green-ink); }
-  .home-cyc i { font-style: normal; color: var(--green-ink); font-size: var(--fs-body); }
-  .dc-row { display: flex; align-items: center; gap: 12px; margin: 0 24px 10px; padding: 12px 14px; cursor: pointer;
-    border-radius: 12px; background: var(--white); border: 1px solid var(--grey-mid); }
-  .dc-tick { width: 24px; height: 24px; border-radius: 50%; flex: none; display: grid; place-items: center;
-    background: var(--yellow); color: #fff; font: 600 var(--fs-small)/1 'Barlow', sans-serif; }
+  /* Home's day rows (.dc-row) and the door rows (.hrow): the HOME AND PROGRESS block at the end of this sheet. These two
+     rules are the name and small line of Repeat a session (.bt-rep) only. */
   .dc-nm { min-width: 0; font: 900 var(--fs-body)/1.1 'Barlow Condensed', sans-serif; text-transform: uppercase; color: var(--grey-dark); }
   .dc-nm small { display: block; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; text-transform: none; color: var(--grey-text);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-  .dc-st { margin-left: auto; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
-  .dc-live { padding: 12px 16px 14px; display: grid; gap: 9px; background: var(--white); }
-  .dc-live-k { display: flex; justify-content: space-between; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .08em;
-    text-transform: uppercase; color: var(--clay-ink); font-variant-numeric: tabular-nums; }
-  .dc-bar { height: 6px; border-radius: 3px; background: var(--grey-card); overflow: hidden; }
-  .dc-bar i { display: block; height: 100%; background: var(--ice); }
-  .dc-resume { min-height: 46px; border: 0; border-radius: 10px; background: var(--ice); color: #fff; cursor: pointer;
-    font: 900 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
-  .hrow { display: flex; align-items: center; gap: 12px; width: calc(100% - 48px); margin: 0 24px 10px; padding: 12px 14px;
-    border: 0; border-radius: 12px; background: #122A22; color: #fff; cursor: pointer; text-align: left; }
-  .hrow-b { display: grid; gap: 5px; min-width: 0; }
-  .hrow-l { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.74); }
-  .hrow-v { font: 900 var(--fs-title)/1 'Barlow Condensed', sans-serif; color: #E06B43; white-space: nowrap; }
-  .hrow-v small { font: 700 var(--fs-label)/1 'Space Mono', monospace; color: rgba(255,255,255,.8); margin-left: 8px; letter-spacing: .03em; }
-  .hrow-sp { margin-left: auto; flex: none; }
-  .hrow-sp .nc-spark { width: 60px; height: 24px; display: block; }
-  .hrow-a { margin-left: auto; color: #FAF7F2; font-size: var(--fs-title); flex: none; }
-  .hrow-sp + .hrow-a { margin-left: 4px; }
-  .hrow.quiet { background: var(--white); color: var(--grey-text); border: 1px dashed var(--grey-mid); }
-  .hrow.quiet .hrow-l { color: var(--grey-text); }
-  .hrow-q { font: 400 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--grey-dark); }
-  .hrow.quiet .hrow-a { color: var(--grey-text); }
   #home-habits-wrap { margin-top: 24px; }
   /* A session at the right moment (LIB-01, Amir 2026-09-27, pick C): Home offers one when the week is done, the
      finished card one after a sore check-in. Its kicker is clay because it asks the athlete to look (DS-01's
@@ -1412,11 +1352,14 @@
   /* The day card above already names the day, so hide the redundant focus chip. */
   #day-view .day-focus-tag { display: none; }
   /* The account button (NAV-02, 2026-09-27), where the floating dark-mode toggle sat: top
-     right on Home / Coach / Library / Game Plan, the athlete's initials. It opens Theme,
+     right on Home / Progress / Library / Coach, the athlete's initials. It opens Theme,
      Install, Help, Privacy and Sign out (openAccount()). The day view keeps its own
      .day-view-dark on the banner, one tap mid-session, so this hides there. */
+  /* ABSOLUTE, not fixed (Amir, 2026-10-12): a fixed button floated over whatever scrolled under it (Home's week count, the
+     Records text, Library rows). It sits at the top of each screen now and scrolls away with it. <body> is not positioned, so
+     the page itself is its containing block. */
   .global-account {
-    position: fixed; top: 14px; right: 14px; z-index: 65;
+    position: absolute; top: 14px; right: 14px; z-index: 65;
     width: 40px; height: 40px; border-radius: 50%;
     background: var(--yellow); border: 2px solid rgba(255,255,255,0.92); cursor: pointer;
     box-shadow: 0 2px 8px rgba(0,0,0,0.18);
@@ -1430,62 +1373,7 @@
   .global-account:active { transform: scale(0.9); }
   .global-account.is-hidden { display: none; }
   body[data-dark] .global-account { background: var(--yellow); border-color: rgba(255,255,255,0.35); }
-  /* Day cards: stacked image-banner cards. Fade them in like the cycle cards. */
-  #day-cards-wrap .current-message {
-    opacity: 0; transform: translateY(12px);
-    animation: fadeInUp 0.5s ease 0.18s forwards;
-  }
-  /* Optimized day-card proportion: a calm 5:2 banner, clamped so the card stays
-     comfortable on narrow phones and wide screens without going letterbox-thin.
-     Stripes are layered directly here (over the green gradient) so the texture
-     shows while the photo loads or if it fails. */
-  #day-cards-wrap .cm-banner {
-    background-color: #0E4A36;   /* solid green base — never let card white show */
-    background-image:
-      repeating-linear-gradient(135deg,
-        rgba(255,255,255,0.05) 0 16px, rgba(255,255,255,0) 16px 32px),
-      linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-  #day-cards-wrap .cm-banner {
-    /* width:100% first — otherwise aspect-ratio + the max-height cap makes the
-       browser derive width FROM the clamped height (170×5/2 = 425px), leaving a
-       white strip where the banner doesn't reach the card edge. With full width
-       the photo just crops to the height band instead. */
-    width: 100%;
-    aspect-ratio: 5 / 2;
-    min-height: 100px;
-    /* Cap raised from 120→170: at typical phone widths (~360–430px) the 5:2 ratio
-       now resolves to ~144–172px and stays UNDER the cap, so the whole 5:2 photo
-       shows with no top/bottom crop. The cap only re-engages on wide/desktop
-       viewports, keeping the band from becoming a letterbox there. */
-    max-height: 170px;
-  }
-  /* While a category image is still cascading/erroring, keep the <img> from
-     painting a white placeholder box over the green banner. */
-  #day-cards-wrap .cm-banner-img { background: transparent; }
-  /* A touch more space between stacked day cards. */
-  #day-cards-wrap .current-message { margin-bottom: 14px; }
-  /* Day cards lead with "Day N"; the day name sits a little smaller beneath it,
-     with even, tight spacing between Day N → name → blocks·movements. */
-  #day-cards-wrap .day-card-num { font-size: var(--fs-title); line-height: 1; margin-bottom: 5px; }
-  .day-card-name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700; font-size: var(--fs-body); line-height: 1.15;
-    text-transform: uppercase; letter-spacing: 0.5px;
-    color: rgba(255,255,255,0.92);
-    margin-bottom: 5px;   /* matches the gap above, so the three lines are even */
-  }
-  #day-cards-wrap .cm-weeks { font-size: var(--fs-label); }
-  /* Lift the whole caption up off the bottom edge so Day N + name sit higher. */
-  #day-cards-wrap .cm-banner-caption { padding-bottom: 22px; }
-  /* Suggested day card (next incomplete day) — soft green ring */
-  .day-ov-card.suggested {
-    border-color: var(--yellow) !important;
-    box-shadow: 0 0 0 1px var(--yellow-mid), 0 10px 30px rgba(14,74,54,0.12) !important;
-  }
-  body[data-dark] .home-greet { color: #f0f0f0; }
+  /* Home's day cards (Next up) and rows: the HOME AND PROGRESS block at the end of this sheet. */
   body[data-dark] .home-section-title { color: #f0f0f0; }
 
   /* ── Current Program Header ── */
@@ -3088,7 +2976,7 @@
      markup and every number arrive from Proof; nothing here re-derives them. ── */
   /* Today's habits, embedded from AA Proof (mountProofStrip()). The frame draws its own
      card; it only needs to sit flush under the Daily habits row. */
-  .proof-strip { margin: -2px 24px 14px; }       /* in line with the Home rows (.hrow) */
+  .proof-strip { margin: -2px 24px 14px; }       /* in line with the Home rows (.hrow); the gutter is set by the HOME AND PROGRESS block */
   /* Collapsed, NOT display:none, while Proof loads: a frame that is not laid out
      measures its page at 0px, and the strip would wait for ever for a height. */
   .proof-strip.off { height: 0; margin: 0; overflow: hidden; visibility: hidden; }
@@ -3688,7 +3576,7 @@
   .coach-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .coach-avatar-initials { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title); letter-spacing: 0.5px; color: #fff; }
   .coach-hero-main { flex: 1; min-width: 0; }
-  /* Same weight as the athlete name on Game Plan (.home-name), one step smaller */
+  /* Same weight as the title on Progress (.prog-title), one step smaller */
   .coach-name {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: clamp(38px, 11vw, 60px);
@@ -5196,6 +5084,153 @@
   /* a Library session: its block titles' hairline runs to the edge like its rows' (the day view's do) */
   :where(#ws-body) .section-header-prog { margin-right: calc(-1 * var(--g)); }
   :where(#ws-body) .section-rest { margin-right: var(--g); }
+  /* ══ HOME AND PROGRESS IN THE CENTRE COURT LOOK (2026-10-12) ═════════════════════════════════════════════════════════════
+     Amir, 2026-10-12: Home and Progress wear the training day's look (calm paper, one strong green thing a screen, hairlines
+     between rows). This block covers: the tokens and the one gutter (--g) for #home-overview and #screen-plan · the Home
+     greeting · Next up (.dc-hero, the suggested day's card) · the rest of the week (.dc-list, .dc-row) · the door rows (.hrow:
+     habits on Home; Records and Body weight on Progress; Cycle complete between cycles) · Progress's header, its section
+     titles and its This cycle card. It is LAST in the sheet and after the CENTRE COURT block on purpose: it wins a tie. The
+     day view's own cover (#day-view-card) is not here. */
+
+  /* 1. Tokens: same values as CENTRE COURT §1; change both. Green and clay TEXT keep the app's own --green-ink and --clay-ink
+     (the same in dark mode), so nothing else on these screens moves. --g is the gutter (16 px under 360). */
+  :where(#home-overview, #screen-plan) {
+    --g: 20px;
+    --row: #FFFFFF; --hair: #E4DDD1; --ink: #1A1A1A; --grey: #5C5C5C; --mint: #6DBE95;
+    --hero: radial-gradient(125% 90% at 100% 0%, #1B7254 0%, #0E4A36 46%, #082D20 100%);
+    --hero-end: #06241A; --hero-end-a: rgba(6,36,26,.55);
+    --tile-on-green: radial-gradient(120% 150% at 0% 0%, #24855F 0%, #16603F 52%, #0E4A36 100%);
+  }
+  body[data-dark] :where(#home-overview, #screen-plan) {
+    --row: #242424; --hair: #2C2C2C; --ink: #EDEDED; --grey: #9A9A9A;
+    --hero: radial-gradient(125% 90% at 100% 0%, #17654A 0%, #0D4532 46%, #072A1E 100%);
+    --hero-end: #051F16; --hero-end-a: rgba(5,31,22,.55);
+    --tile-on-green: radial-gradient(120% 150% at 0% 0%, #1F7655 0%, #13573F 52%, #0D4532 100%);
+  }
+  @media (max-width: 359px) { :where(#home-overview, #screen-plan) { --g: 16px; } }
+
+  /* 2. Home's greeting: one compact block. The time of day is the eyebrow (a green dot), the first name under it. 64 px stay free
+     on the right for the account button. */
+  #home-overview .home-greet { display: block; margin: 0; padding: 18px 64px 14px var(--g); font: 900 var(--fs-head)/1 'Barlow Condensed', sans-serif;
+    letter-spacing: .5px; text-transform: uppercase; color: var(--ink); opacity: 0; transform: translateY(16px); animation: fadeInUp 0.6s ease 0.1s forwards; }
+  #home-overview .home-greet > span { display: block; color: inherit; }
+  #home-overview .home-greet .home-greet-hi { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--grey); }
+  #home-overview .home-greet .home-greet-hi::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--green-ink); }
+
+  /* 3. One gutter on Home: every piece starts at --g, not 24 px. */
+  #home-overview .plan-offline { margin: 0 var(--g) 14px; }
+  #home-overview .uf-card { margin: 0 var(--g) 16px; }
+  #home-overview .home-section-head { margin: 24px var(--g) 12px; }
+  #home-overview .home-week-sum { margin: -4px var(--g) 12px; }
+  #home-overview .wn { margin: 24px var(--g) 22px; }
+  #home-overview #home-sugg-wrap:not(:empty) { margin: 14px var(--g) 0; }
+  #home-overview .proof-strip:not(.off) { margin: -2px var(--g) 14px; }
+  #home-overview .bt-sum { margin: -6px var(--g) 12px; }
+  #home-overview .bt-wa { margin: 0 var(--g) 26px; }
+  #home-overview .bt-next .current-message { margin-left: var(--g); margin-right: var(--g); }
+  #home-overview .bt-rep { width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 10px; }
+  #home-overview #home-habits-wrap { margin-top: 20px; }
+
+  /* 4. Next up (.dc-hero): the suggested day as ONE card, the training day's cover on Home. The photo graded into the green
+     (luminosity at .7, masked from the left), a scrim to the cover's last colour, "● NEXT UP · DAY 1" in Space Mono with a mint
+     dot, the day's name in Barlow Condensed capitals, what it builds as tiles, and the green button. The card has no fixed
+     height and no aspect ratio: it grows with its text, so the name is never clipped. */
+  #home-overview .dc-hero { margin: 4px var(--g) 10px; padding: 0; border: 0; border-radius: 16px; background: var(--hero); color: #fff; box-shadow: none; overflow: hidden; }
+  #home-overview .dc-hero:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  #home-overview .dc-hero .cm-banner { display: block; position: relative; isolation: isolate; overflow: hidden; width: 100%; aspect-ratio: auto;
+    min-height: 0; max-height: none; border-radius: 0; background: var(--hero); color: #fff; }
+  #home-overview .dc-hero .cm-banner-img { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; object-position: 84% 58%;
+    background: transparent; mix-blend-mode: luminosity; opacity: .7; pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); }
+  #home-overview .dc-hero .cm-banner-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
+  #home-overview .dc-hero .cm-banner-caption { position: relative; z-index: 2; width: auto; align-self: auto; padding: 56px var(--g) 20px; }
+  #home-overview .dc-hero .cm-name { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace;
+    letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.84); }
+  #home-overview .dc-hero .cm-name::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  #home-overview .dc-hero .day-card-name { margin: 10px 0 0; max-width: 330px;
+    font: 900 clamp(28px, 8.4vw, 36px)/.96 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the suggested day's name, 28 to 36 px */
+    letter-spacing: .3px; text-transform: uppercase; color: #fff; text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+  #home-overview .dc-hero .cm-weeks { margin: 10px 0 0; padding: 0; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1px;
+    text-transform: uppercase; color: rgba(255,255,255,.7); }
+  #home-overview .dc-hero .dq-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  #home-overview .dc-hero .dq-row:empty { display: none; }
+  #home-overview .dc-hero .dq-chip { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px 0 14px; border: 0;
+    border-radius: 10px; cursor: pointer; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1.2px; text-transform: uppercase;
+    color: #fff; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,.3); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  #home-overview .dc-hero .dq-chip::after { content: '\203A'; margin-top: -2px; font: 500 var(--fs-lead)/1 'Barlow', sans-serif; opacity: .6; }
+  #home-overview .dc-hero .dq-chip.main { background: #fff; color: #0E4A36; box-shadow: none; }
+  #home-overview .dc-hero .dq-chip:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  /* a session under way: where it is, and its clock (paintLiveClocks() ticks .dc-clock) */
+  #home-overview .dc-hero .dc-prog { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace;
+    letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,.84); font-variant-numeric: tabular-nums; }
+  #home-overview .dc-hero .dc-clock { color: var(--mint); }
+  /* the button: the cover's Start (the lighter green and a light ring), full width of the caption. Green, never clay. */
+  #home-overview .dc-hero .dc-go { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px; margin-top: 18px; padding: 0 14px;
+    border: 0; border-radius: 8px; cursor: pointer; white-space: nowrap; color: #fff; background: var(--tile-on-green);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 10px 22px -10px rgba(0,0,0,.6);
+    font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; transition: transform 0.1s; }
+  #home-overview .dc-hero .dc-go:active { transform: scale(0.98); }
+  #home-overview .dc-hero .dc-go:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  /* ▶ drawn in mint: the glyph renders as a colour emoji on some phones, so its text moves out of the box (as the session bar's Start does) */
+  #home-overview .dc-hero .dc-g { position: relative; flex: none; display: inline-block; width: 10px; height: 12px; overflow: hidden; text-indent: 40px; white-space: nowrap; }
+  #home-overview .dc-hero .dc-g::before { content: ''; position: absolute; left: 1px; top: 0; border-style: solid; border-width: 6px 0 6px 9px;
+    border-color: transparent transparent transparent var(--mint); }
+
+  /* 5. The rest of the week: rows on the paper. A hairline between rows (not above the first), no box. The day's number is the
+     outlined numeral (Barlow Condensed 900, 32 px, a green outline) and goes solid green once the day is done. */
+  #home-overview .dc-list { margin: 6px var(--g) 0; }
+  #home-overview .dc-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; column-gap: 10px; min-height: 64px; margin: 0; padding: 10px 0;
+    border: 0; border-radius: 0; background: transparent; cursor: pointer; }
+  #home-overview .dc-row + .dc-row { border-top: 1px solid var(--hair); }
+  #home-overview .dc-row:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  #home-overview .dc-row:active { background: rgba(14,74,54,.05); }
+  #home-overview .dc-num { font: 900 32px/1 'Barlow Condensed', sans-serif;   /* display: the day's number, as the exercise numerals on the training day */
+    color: transparent; -webkit-text-stroke: 1.5px var(--green-ink); paint-order: stroke fill; font-variant-numeric: tabular-nums; }
+  #home-overview .dc-row.is-done .dc-num { color: var(--green-ink); -webkit-text-stroke: 0; }
+  #home-overview .dc-row .dc-nm { display: block; min-width: 0; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; text-transform: none; color: var(--ink); text-wrap: balance; }
+  #home-overview .dc-row .dc-nm small { display: block; margin-top: 3px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  #home-overview .dc-row.is-done .dc-nm { font-size: var(--fs-body); color: var(--grey); }
+  #home-overview .dc-row .dc-st { text-align: right; font: 700 var(--fs-label)/1 'Barlow Condensed', sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
+  #home-overview .dc-row .dc-ar { text-align: right; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
+
+  /* 6. The door rows: the About sheet's "Your history" row. White, rounded 12, a 1 px edge, a 22 px green line icon, a green Space
+     Mono label over one line, a grey ›. One look with or without data (.quiet only changes the words). No dark fill, no dashes. */
+  :where(#home-overview, #screen-plan) .hrow { display: flex; align-items: center; gap: 14px; width: calc(100% - 2 * var(--g)); min-height: 64px; margin: 0 var(--g) 10px;
+    padding: 12px 14px 12px 16px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); color: var(--ink); cursor: pointer; text-align: left; }
+  :where(#home-overview, #screen-plan) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  :where(#home-overview, #screen-plan) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  :where(#home-overview, #screen-plan) .hrow-ic svg { width: 22px; height: 22px; }
+  :where(#home-overview, #screen-plan) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
+  :where(#home-overview, #screen-plan) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#home-overview, #screen-plan) .hrow-v { display: block; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
+  :where(#home-overview, #screen-plan) .hrow-v small { display: inline-block; margin-left: 8px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  :where(#home-overview, #screen-plan) .hrow-v.is-togo { color: var(--clay-ink); }   /* "2 to go" asks for something */
+  :where(#home-overview, #screen-plan) .hrow-v.is-ok { color: var(--green-ink); }
+  :where(#home-overview, #screen-plan) .hrow-q { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); }
+  :where(#home-overview, #screen-plan) .hrow-sp { flex: none; color: var(--green-ink); }
+  :where(#home-overview, #screen-plan) .hrow-sp .nc-spark { width: 60px; height: 24px; display: block; }
+  :where(#home-overview, #screen-plan) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
+  :where(#home-overview, #screen-plan) .hrow-sp + .hrow-a { margin-left: -4px; }
+
+  /* 7. Progress: the header (the name as the eyebrow, "Progress" as the title), a section title for each part, and the This cycle
+     card on the gutter. The cycle cards and the meter below move onto the same gutter, so the left edge is one line. */
+  #screen-plan .athlete-header { margin: 14px var(--g) 22px; }
+  .prog-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0 56px 8px 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--green-ink); }
+  .prog-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--green-ink); }
+  .prog-title { margin: 0; font: 900 var(--fs-display)/1 'Barlow Condensed', sans-serif; letter-spacing: .3px; text-transform: uppercase; color: var(--ink); }
+  #screen-plan .athlete-header .sport-badge { margin-top: 14px; }
+  #screen-plan .cyc-card { width: calc(100% - 2 * var(--g)); margin: 0 var(--g) 22px; cursor: default; }
+  #screen-plan .sub-banner { margin: 0 var(--g) 20px; }
+  #screen-plan .prog-sec { display: flex; align-items: center; gap: 12px; margin: 26px 0 12px; padding-left: var(--g); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
+  #screen-plan .prog-sec::after { content: ''; flex: 1; height: 1px; background: var(--hair); }   /* to the right edge, as the training day's block titles */
+  #screen-plan .cycle-meter { margin-left: var(--g); margin-right: var(--g); }
+  #screen-plan .current-message { margin-left: var(--g); margin-right: var(--g); }
+  #screen-plan .why-plan-btn { width: calc(100% - 2 * var(--g)); margin-left: var(--g); margin-right: var(--g); }
 </style>
 </head>
 <body>
@@ -5303,17 +5338,26 @@
   }
 </script>
 
-<!-- ═══ GAME PLAN ═══ -->
+<!-- ═══ PROGRESS ═══ (the Progress tab, data-tab="plan"; it was Game Plan until 2026-10-12, whose name stays on the road of cycles below) -->
 <div id="screen-plan" class="screen planlike">
 
 
-  <!-- Athlete header (name + goal + optional current-cycle dates) -->
+  <!-- Header: the athlete's name as the eyebrow, "Progress" as the title, then the sport badge and the current cycle's dates -->
   <div id="athlete-card-wrap"></div>
+
+  <!-- This cycle card (PROG-01, paintCycleCard()): where the cycle is, sessions done, the wins. It lived on Home until 2026-10-12. -->
+  <div id="cycle-card-wrap"></div>
 
   <!-- Subscription banner (only when ≤14 days remain) -->
   <div id="sub-banner-wrap"></div>
 
-  <!-- Cycle meter (segments + C1/C2/C3 labels) -->
+  <!-- Your numbers (Amir, 2026-10-12: Personal records and Body weight moved here from Home): two door rows,
+       painted by paintNumbers(). -->
+  <h2 class="prog-sec" id="numbers-title">Your numbers</h2>
+  <div id="ceiling-row-wrap"></div>
+  <div id="weight-row-wrap"></div>
+
+  <!-- The Game Plan: its section title, then the cycle meter (segments + C1/C2/C3 labels) -->
   <div id="cycle-meter-wrap"></div>
 
   <!-- Simple fallback for athletes without cycles -->
@@ -5350,10 +5394,10 @@
 
 <!-- ═══ BODY WEIGHT ═══ moved here from AA Proof (Amir, 2026-09-12). This app
      owns <id>_hab_wt now: it writes it, pushes it, and merges it. Reached from
-     the Body Weight card on Home. -->
+     the Body Weight row on Progress (under "Your numbers"; it was on Home until 2026-10-12). -->
 <div id="screen-weight" class="screen">
   <div class="ceil-head">
-    <button class="nav-back" onclick="goTo('home')" aria-label="Back to Home">←</button>
+    <button class="nav-back" onclick="goTo('plan')" aria-label="Back to Progress">←</button>
     <div class="ceil-kick">— Your numbers</div>
     <div class="ceil-title">Body Weight</div>
   </div>
@@ -5478,10 +5522,10 @@
 </div>
 
 <!-- ═══ ARCHIVE ═══ a single completed past program. Not a bottom-nav tab —
-     opened only by the "Done" card on the Game Plan screen. -->
+     opened only by the "Done" card on the Progress screen. -->
 <div id="screen-archive" class="screen">
   <div class="archive-banner" id="archive-banner" data-watermark="">
-    <button class="archive-back" onclick="goTo('plan')" aria-label="Back to Game Plan">←</button>
+    <button class="archive-back" onclick="goTo('plan')" aria-label="Back to Progress">←</button>
     <div class="archive-label">Completed</div>
     <div class="archive-title" id="archive-title"></div>
   </div>
@@ -5491,28 +5535,25 @@
 <!-- ═══ HOME ═══ -->
 <div id="screen-home" class="screen">
 
-  <!-- ── OVERVIEW (the landing page): greeting · This cycle card · "This Week" ·
-       day cards · habits, records and weight rows. .planlike reuses Game Plan's
-       cycle-card styling so the day cards match its cards. ── -->
+  <!-- ── OVERVIEW (the landing page): greeting · "This Week" · Next up (the suggested day) ·
+       the rest of the week as rows · habits, records and weight rows. The This cycle card moved to Progress
+       (2026-10-12). .planlike reuses the cycle-card styling for the Next up card's photo band. ── -->
   <div id="home-overview" class="planlike">
 
-    <!-- "Good morning/afternoon/evening" + first name — same scale as Game Plan's name (.home-name) -->
+    <!-- "Good morning/afternoon/evening" + first name, one compact block (the account button owns the top right) -->
     <div id="home-greeting-wrap"></div>
 
     <!-- Opened from the plan saved on this phone (REL-01): one quiet line, painted by
          paintPlanOffline(), gone once the server has confirmed the plan. Under the
-         greeting, not above it: the fixed account button owns the top right corner. -->
+         greeting, not above it: the account button owns the top right corner. -->
     <div id="home-offline" class="plan-offline" role="status" hidden></div>
-
-    <!-- This cycle card (PROG-01, paintCycleCard()) → Game Plan -->
-    <div id="home-cycle-wrap"></div>
 
     <!-- What fileUnfinished() filed (DATA-02), then "This Week": its header and the week's
          session count (paintWeek()), or, in a week with a note, the note in their place (weekNoteHTML) -->
     <div id="home-unfinished-wrap"></div>
     <div id="home-week-wrap"></div>
 
-    <!-- Day cards — each opens that day's workout -->
+    <!-- The week's days (homeDaysHTML()): Next up as one card, the others as rows. Each opens that day's workout. -->
     <div id="day-cards-wrap"></div>
     <!-- The week is done: one short extra from the Library, until it has been opened (LIB-01, paintWeekSugg()) -->
     <div id="home-sugg-wrap"></div>
@@ -5525,11 +5566,8 @@
     <!-- Today's habits, ticked right here: AA Proof itself, embedded (mountProofStrip()). -->
     <div id="home-proof-strip" class="proof-strip off"></div>
 
-    <!-- Personal Records stays below the week: it is about the training just
-         above it, and it only changes when a lift moves. Body weight sits
-         under it — the other number an athlete watches, logged in this app. -->
-    <div id="home-ceiling-wrap"></div>
-    <div id="home-weight-wrap"></div>
+    <!-- Personal Records and Body weight were the last two rows of Home. They are on Progress now (Amir, 2026-10-12),
+         under "Your numbers": #ceiling-row-wrap and #weight-row-wrap. The habits row and the Proof strip end Home. -->
   </div>
 
   <!-- ── DAY VIEW: a single day's workout, opened from a day card. Holds the
@@ -5570,7 +5608,7 @@
 
 <!-- ═══ GLOBAL BOTTOM TAB BAR ═══ Shown on every nav screen; hidden while loading
      and during a session (WK-03).
-     Order: Home · Coach · Library · Game Plan (data-tab home / notes / workouts / plan,
+     Order: Home · Progress · Library · Coach (data-tab home / plan / workouts / notes,
      the screen names goTo() routes by).
      Icons are inline SVGs (line-art) so they inherit currentColor and look crisp at any size. -->
 <div class="global-tabs is-hidden" id="global-tabs">
@@ -5578,19 +5616,20 @@
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9v6M6 5v14M18 5v14M21 9v6M6 12h12"/></svg></span>
     <span class="nav-label">Home</span>
   </button>
-  <button class="nav-item" data-tab="notes" onclick="goTo('notes')">
-    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.6-.8L3 21l1.8-5.9A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg></span>
-    <span class="nav-label">Coach</span>
+  <!-- "Progress" since 2026-10-12 (Amir); it was "Game Plan" (2026-09-26, picked from four names; before that "My Plan"
+       with a person icon). The screen is this cycle so far, then the Game Plan: the road of cycles from where they
+       started to where they go, whose name stays on that road. data-tab and goTo('plan') are unchanged. -->
+  <button class="nav-item" data-tab="plan" onclick="goTo('plan')">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 3 7-8"/><path d="M15 7h4v4"/></svg></span>
+    <span class="nav-label">Progress</span>
   </button>
   <button class="nav-item" data-tab="workouts" onclick="goLibrary()">
     <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
     <span class="nav-label">Library</span>
   </button>
-  <!-- "Game Plan" since 2026-09-26 (Amir picked it from four names; it was "My Plan"
-       with a person icon). A route: the cycles from where they started to where they go. -->
-  <button class="nav-item" data-tab="plan" onclick="goTo('plan')">
-    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19h8a3.5 3.5 0 0 0 0-7h-9a3.5 3.5 0 0 1 0-7h8"/></svg></span>
-    <span class="nav-label">Game Plan</span>
+  <button class="nav-item" data-tab="notes" onclick="goTo('notes')">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.6-.8L3 21l1.8-5.9A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg></span>
+    <span class="nav-label">Coach</span>
   </button>
 </div>
 
@@ -7817,30 +7856,17 @@ function dayImageCategory(day) {
   return best || 'default';
 }
 
-// One day card for the home overview — image-banner look matching the cycle
-// cards (.planlike .cm-*). The banner image comes from the shared CATEGORY POOL
-// (assets/art/days/<category>-v1.webp through APP_ART.days, the category chosen
-// by dayImageCategory). Missing files fall
-// back to the green gradient via dayImgError(). Tapping opens openDayView().
-// opts.static → a non-clickable repeat of the card (top of a day view).
+// The day's card, three ways (Home and Progress in the Centre Court look, Amir 2026-10-12). Home draws the week through
+// homeDaysHTML(): the suggested day as ONE big card (opts.hero), every other day as a row on the paper (no opts). The day
+// view's cover is opts.static: a non-clickable repeat of the card, styled only by the CENTRE COURT block (#day-view-card);
+// its markup below is byte for byte what it was, so change nothing in that branch without that block.
+// The image comes from the shared CATEGORY POOL (assets/art/days/<category>-v1.webp through APP_ART.days, the category
+// chosen by dayImageCategory); a missing file falls back to the green gradient via dayImgError().
 function dayCardHTML(day, dayNum, total, opts) {
   opts = opts || {};
   const id = day.id != null ? day.id : dayNum;
-  // Done this week → one small row (HOME-02, Amir 2026-09-26: "If the days are done, make the
-  // day card into that small one, if not, still big"). Home never names a rest day: athletes
-  // move their days, so the app cannot know one.
-  if (!opts.static && weekDoneDays().has(String(id))) {
-    const nm = day.title || day.focusTag || ('Day ' + dayNum);
-    return `<div class="dc-row" data-dc="${esc(String(id))}" role="button" tabindex="0" onclick="openDayView('${esc(String(id))}')">
-      <span class="dc-tick" aria-hidden="true">✓</span>
-      <span class="dc-nm">Day ${dayNum}<small>${esc(nm)}</small></span>
-      <span class="dc-st">Done</span></div>`;
-  }
   // Descriptive day name = title, else focusTag (e.g. "Squat & Glute Activation").
   const name = day.title || day.focusTag || ('Day ' + dayNum);
-  // Shared category image — one of the eight in assets/art/days/. A missing file
-  // falls back to the green gradient via dayImgError().
-  const catImg = ART_DAYS + (APP_ART.days[dayImageCategory(day)] || APP_ART.days.default) + '.webp';
   const idStr = esc(String(id));
 
   // Subtitle = "N blocks · M movements". Each exercise entry counts as one
@@ -7850,16 +7876,50 @@ function dayCardHTML(day, dayNum, total, opts) {
   const moveCount = blocks.reduce((n, b) => n + ((b.exercises || []).length), 0);
   const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
   const sub = `${plural(blockCount, 'block')} · ${plural(moveCount, 'movement')}`;
+  const attr = s => esc(s).replace(/"/g, '&quot;');   // esc() leaves a quote alone, and these go inside attributes
 
+  // The rest of the week (HOME-02, Amir 2026-09-26: "If the days are done, make the day card into that small one"; the
+  // Centre Court look, 2026-10-12): a row on the paper, the day's number as an outlined numeral, a green Done once it is
+  // done this week. Home never names a rest day: athletes move their days, so the app cannot know one. It is data-dl,
+  // never data-dc: only the Next up card carries data-dc (markSuggestedDay() and the tests look for it there).
+  if (!opts.static && !opts.hero) {
+    const done = weekDoneDays().has(String(id));
+    return `<div class="dc-row${done ? ' is-done' : ''}" data-dl="${idStr}" role="button" tabindex="0" onclick="openDayView('${idStr}')" aria-label="Day ${dayNum}, ${attr(name)}${done ? ', done this week' : ''}">`
+      + `<span class="dc-num" aria-hidden="true">${dayNum}</span>`
+      + `<span class="dc-nm">${esc(name)}<small>${done ? 'Done this week' : esc(sub)}</small></span>`
+      + (done ? `<span class="dc-st">Done</span>` : `<span class="dc-ar" aria-hidden="true">›</span>`) + `</div>`;
+  }
 
-  const cls = 'current-message day-ov-card' + (opts.static ? '' : ' is-clickable');
-  const attrs = opts.static ? '' : ` role="button" tabindex="0" onclick="openDayView('${idStr}')"`;
-  let h = `<div class="${cls}"${attrs}${opts.static ? '' : ` data-dc="${idStr}"`}>`;
+  // Shared category image — one of the eight in assets/art/days/.
+  const catImg = ART_DAYS + (APP_ART.days[dayImageCategory(day)] || APP_ART.days.default) + '.webp';
+
+  // Next up (the suggested day, suggestedDayId()): the day's cover on Home, with its button. A session under way (a
+  // clock running or paused today, or a set already ticked: dayInProgress()) says so and Resumes it (WK-03). The title is
+  // never clipped: the card has no fixed height. The button is green (Amir's rule: buttons are green, never clay).
+  if (opts.hero) {
+    const live = dayInProgress(id);
+    let st = { done: 0, total: 0 };
+    if (live) { try { st = getDayCompletion(String(id)); } catch (e) {} }
+    return `<div class="current-message day-ov-card is-clickable dc-hero${live ? ' is-live' : ''}" role="button" tabindex="0" onclick="openDayView('${idStr}')" data-dc="${idStr}">`
+      + `<div class="cm-banner"><img class="cm-banner-img" alt="" src="${catImg}" onerror="dayImgError(this)"><div class="cm-banner-scrim"></div>`
+      + `<div class="cm-banner-caption">`
+      + `<div class="cm-name day-card-num">${live ? 'In progress' : 'Next up'} · Day ${dayNum}</div>`
+      + `<div class="day-card-name">${esc(name)}</div>`
+      + `<div class="cm-weeks">${esc(sub)}</div>`
+      // The Quality Map: what this day builds. Filled by paintDayQualities() once the Spine and the approved
+      // qualities are in memory; empty (and invisible) until then.
+      + `<div class="dq-row" data-dq="${idStr}"></div>`
+      + (live ? `<div class="dc-prog"><span>${st.done} of ${st.total} sets</span><span class="dc-clock" data-day="${idStr}">${fmtClock(timerElapsedMs(String(id)))}</span></div>` : '')
+      + `<button type="button" class="dc-go" onclick="event.stopPropagation(); openDayView('${idStr}')">${live ? 'Resume' : 'Open Day ' + dayNum}<span class="dc-g" aria-hidden="true"> ▶</span></button>`
+      + `</div></div></div>`;
+  }
+
+  // The day view's cover (static): never clickable, no progress, no data-dc.
+  let h = `<div class="current-message day-ov-card">`;
   h += `<div class="cm-banner">`;
   h += `<img class="cm-banner-img" alt="${esc(name)}" ` +
        `src="${catImg}" onerror="dayImgError(this)">`;
   h += `<div class="cm-banner-scrim"></div>`;
-  if (!opts.static && dayInProgress(id)) h += `<div class="cm-pill cm-pill-live">In progress</div>`;
   h += `<div class="cm-banner-caption">`;
   h += `<div class="cm-name day-card-num">Day ${dayNum}</div>`;
   h += `<div class="day-card-name">${esc(name)}</div>`;
@@ -7867,27 +7927,38 @@ function dayCardHTML(day, dayNum, total, opts) {
   // The Quality Map: what this day builds. Filled by paintDayQualities() once the
   // Spine and the approved qualities are in memory; empty (and invisible) until then.
   h += `<div class="dq-row" data-dq="${idStr}"></div>`;
-  h += `</div></div>`;
-  // A session under way: the card says where it is and Resumes it (HOME-02).
-  if (!opts.static && dayInProgress(id)) {
-    let st = { done: 0, total: 0 };
-    try { st = getDayCompletion(String(id)); } catch (e) {}
-    const pct = st.total ? Math.round(st.done / st.total * 100) : 0;
-    h += `<div class="dc-live">
-      <div class="dc-live-k"><span>${st.done} of ${st.total} sets</span><span class="dc-clock" data-day="${idStr}">${fmtClock(timerElapsedMs(String(id)))}</span></div>
-      <div class="dc-bar"><i style="width:${pct}%"></i></div>
-      <button type="button" class="dc-resume" onclick="event.stopPropagation(); openDayView('${idStr}')">Resume ▶</button>
-    </div>`;
-  }
-  h += `</div>`;
+  h += `</div></div></div>`;
   return h;
 }
 
-// A Home day card: a small Done row once the day is done this week (HOME-02), or an
-// In progress pill and a Resume button for a day started today and not finished (WK-03,
-// 2026-09-26): a clock running or paused today, or a set already ticked. Before this,
-// leaving a session for another tab left no trace on Home of where the athlete was.
-// paintWeek() rebuilds the cards whenever the day view closes.
+// The suggested day, by id (HOME-01): a session under way today first; otherwise, unless the cycle is over (PROG-02: nothing is
+// suggested between cycles), the first day not done THIS WEEK (it used to be the first day without today's stamp, so every
+// morning said Day 1). Every day done this week: null. markSuggestedDay() and homeDaysHTML() both ask it, so the card that is
+// marked and the card that is big can never be two different days.
+function suggestedDayId() {
+  const ids = (DATA.workouts && DATA.workouts.days || []).map((d, i) => String(d.id != null ? d.id : i + 1));
+  const done = weekDoneDays();
+  let i = ids.findIndex(id => dayInProgress(id));
+  if (i < 0 && !cycleOver()) i = ids.findIndex(id => !done.has(id));
+  return i >= 0 ? ids[i] : null;
+}
+
+// Home's days, one string for #day-cards-wrap (renderHome() and paintWeek() both write it): the suggested day as the Next up
+// card, then every other day, in day order, as rows on the paper. No suggested day (the week is done, or between cycles): rows only.
+function homeDaysHTML(days) {
+  days = days || [];
+  const sid = suggestedDayId();
+  let hero = '', rows = '';
+  days.forEach((d, i) => {
+    if (sid != null && String(d.id != null ? d.id : i + 1) === sid) hero = dayCardHTML(d, i + 1, days.length, { hero: true });
+    else rows += dayCardHTML(d, i + 1, days.length);
+  });
+  return hero + (rows ? `<div class="dc-list">${rows}</div>` : '');
+}
+
+// A day started today and not finished (WK-03, 2026-09-26): a clock running or paused today, or a set already ticked. It is
+// always Home's Next up card, says In progress and Resumes (before this, leaving a session for another tab left no trace
+// on Home of where the athlete was). paintWeek() rebuilds the cards whenever the day view closes.
 function dayInProgress(id) {
   if (completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + id))) return false;
   // Done earlier this week and not touched today → Done, not in progress.
@@ -8154,47 +8225,43 @@ function cycDate(iso) {
   return isNaN(d) ? '' : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate();
 }
 function paintCycleCard() {
-  const wrap = document.getElementById('home-cycle-wrap');
+  const wrap = document.getElementById('cycle-card-wrap');   // on Progress since 2026-10-12 (it was the top of Home)
   if (!wrap || !DATA) return;
   const cycles = DATA.cycles || [];
   const cIdx = Number.isInteger(DATA.currentCycleIndex) ? DATA.currentCycleIndex : 0;
   const cur = cycles[cIdx];
-  if (!cur) { wrap.innerHTML = ''; return; }
-  const p = cycleProgress();
-  if (!p) {   // no dates (5 of 35 live programmes), or before the cycle: the small line
-    const wk = cycleWeekInfo(cur);
-    wrap.innerHTML = `<button type="button" class="home-cyc" onclick="goTo('plan')"><span class="ct">Cycle ${cIdx + 1} of ${cycles.length} · <b>${esc(cur.name || '')}</b>${
-      wk && !wk.before && !wk.after ? ` · Week ${wk.wk} of ${wk.total}` : (cur.weeks ? ' · ' + esc(cur.weeks) : '')}</span><i aria-hidden="true">›</i></button>`;
-    return;
-  }
+  const p = cur ? cycleProgress() : null;
+  if (!p) { wrap.innerHTML = ''; return; }   // no dates (5 of 35 live programmes), or before the cycle: nothing to count yet. The old small line is gone.
   const bar = (n, on) => n > 24
     ? `<span class="cyc-bar cyc-bar-solid"><i style="width:${Math.min(100, Math.round(on / n * 100))}%"></i></span>`
     : `<span class="cyc-bar">${Array.from({ length: n }, (_, i) => `<i${i < on ? ' class="on"' : ''}></i>`).join('')}</span>`;
+  // No wins yet: nothing in that place (Amir, 2026-10-12: the "Your wins show here" line is gone).
   const wins = p.wins.length
     ? `<span class="cyc-wins-h">Wins this cycle</span>` + p.wins.map(w => `<span class="cyc-win"><span>${esc(w.name)}</span><b>${esc(w.txt)}</b></span>`).join('')
-    : p.over ? '' : `<span class="cyc-none">Your wins show here: heavier, more reps or easier than your first session of the cycle.</span>`;
+    : '';
   if (p.over) {   // the day after the end date (PROG-02): the same card, saying the cycle is complete
     const last = !p.over.next;
     const lens = cycles.map(c => (cycleWeekInfo(c) || {}).total);
     const weeks = lens.every(n => n) ? lens.reduce((a, n) => a + n, 0) : 0;   // the roadmap's weeks, when every cycle is dated
     const what = last ? `${cycles.length} cycle${cycles.length === 1 ? '' : 's'}${weeks ? ' · ' + weeks + ' weeks' : ''}` : `${p.wk.total} of ${p.wk.total} weeks`;
-    wrap.innerHTML = `<button type="button" class="cyc-card" onclick="goTo('plan')" aria-label="${last ? 'Roadmap' : 'Cycle'} complete: open Game Plan">
-      <span class="cyc-top"><span>Cycle ${p.cIdx + 1} of ${p.count} · <b>${esc(p.cur.name || '')}</b></span><i aria-hidden="true">›</i></span>
+    wrap.innerHTML = `<div class="cyc-card">
+      <span class="cyc-top"><span>Cycle ${p.cIdx + 1} of ${p.count} · <b>${esc(p.cur.name || '')}</b></span></span>
       <span class="cyc-fin-h"><span class="cyc-fin-tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>${last ? 'Roadmap complete' : 'Cycle complete'}</span>
       <span class="cyc-fin-s">Finished ${cycDate(p.cur.endDate)} · ${what}</span>
       ${last ? `<span class="cyc-fin-meter">${cycles.map((c, i) => `<span>C${i + 1}</span>`).join('')}</span>`
              : `<span class="cyc-row"><span class="cyc-k">Week ${p.wk.total}<small>of ${p.wk.total}</small></span>${bar(p.wk.total, p.wk.total)}</span>`}
       <span class="cyc-row"><span class="cyc-k">${p.done}<small>of ${p.planned} sessions</small></span>${bar(p.planned, p.done)}</span>
       ${wins}
-    </button>`;
+    </div>`;
     return;
   }
-  wrap.innerHTML = `<button type="button" class="cyc-card" onclick="goTo('plan')" aria-label="This cycle: open Game Plan">
-      <span class="cyc-top"><span>Cycle ${p.cIdx + 1} of ${p.count} · <b>${esc(p.cur.name || '')}</b></span><i aria-hidden="true">›</i></span>
+  // It is ON Progress now, so it is a plain card: no tap, no ›.
+  wrap.innerHTML = `<div class="cyc-card">
+      <span class="cyc-top"><span>Cycle ${p.cIdx + 1} of ${p.count} · <b>${esc(p.cur.name || '')}</b></span></span>
       <span class="cyc-row"><span class="cyc-k">Week ${p.wk.wk}<small>of ${p.wk.total}</small></span>${bar(p.wk.total, p.wk.wk)}</span>
       <span class="cyc-row"><span class="cyc-k">${p.done}<small>of ${p.planned} sessions</small></span>${bar(p.planned, p.done)}</span>
       ${wins}
-    </button>`;
+    </div>`;
 }
 window.paintCycleCard = paintCycleCard;
 
@@ -8203,13 +8270,17 @@ window.paintCycleCard = paintCycleCard;
 function betweenCyclesHTML(o) {
   const n = o.cIdx + 1, nDays = ((DATA.workouts && DATA.workouts.days) || []).length;
   const ask = `<div class="bt-wa">${waInlineHtml(coachWhatsAppUrl('About Cycle ' + (n + 1) + ': '), 'Ready for Cycle ' + (n + 1) + '?', 'Message Amir to start it.')}</div>`;
-  const h = o.next
+  // The Cycle complete card is on Progress now (paintCycleCard()), so Home still says the cycle ended: one door row, first.
+  const fin = `<button type="button" class="hrow bt-done" onclick="goTo('plan')">
+    <span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16 9.5"/></svg></span>
+    <span class="hrow-b"><span class="hrow-l">${o.next ? 'Cycle ' + n : 'Roadmap'} complete</span><span class="hrow-q">Finished ${cycDate(o.cur.endDate)} · see it on Progress</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
+  const h = fin + (o.next
     ? `<div class="home-section-head"><div class="home-section-title">Up next</div></div>
       <div class="bt-next">${cycleCardHTML(o.next, { folded: true, pill: 'Up next!', pillStyle: 'next', total: o.count,
         paragraphs: (o.next.teaser || {}).paragraphs, italicLast: true, onclick: "goTo('plan')" })}</div>${ask}`
     : `<div class="home-section-head"><div class="home-section-title">What's next</div></div>
-      <div class="bt-sum">You've trained the whole plan.</div>${ask}`;
-  return h + `<div class="home-section-head"><div class="home-section-title">${o.next ? 'Between cycles' : 'Keep moving'}</div></div>
+      <div class="bt-sum">You've trained the whole plan.</div>${ask}`);
+  return h +`<div class="home-section-head"><div class="home-section-title">${o.next ? 'Between cycles' : 'Keep moving'}</div></div>
     <div class="bt-sum">No new week until Cycle ${n + 1} starts. Want to keep moving? Any session from ${esc(o.cur.name || 'this cycle')} still works.</div>
     <button type="button" class="bt-rep" id="bt-rep" aria-expanded="false" aria-controls="day-cards-wrap" onclick="toggleBetweenDays()">
       <span class="bt-rep-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/></svg></span>
@@ -8242,12 +8313,12 @@ function paintWeek() {
   const cw = document.getElementById('day-cards-wrap');
   const days = (DATA.workouts && DATA.workouts.days) || [];
   if (cw && days.length) {
-    cw.innerHTML = days.map((d, i) => dayCardHTML(d, i + 1, days.length)).join('');
+    cw.innerHTML = homeDaysHTML(days);
     if (typeof paintDayQualities === 'function') paintDayQualities();
   }
   paintLiveClocks();
   markSuggestedDay();
-  paintCycleCard();   // the history may just have arrived
+  paintCycleCard();   // the history may just have arrived (the card is on Progress)
   paintBetweenFold();
   if (cycleOver()) {   // between cycles (PROG-02): no week to count, so no week-done extra either
     const sg = document.getElementById('home-sugg-wrap');
@@ -8278,6 +8349,16 @@ function paintLiveClocks() {
     els.forEach(el => { el.textContent = fmtClock(timerElapsedMs(el.dataset.day)); });
   }, 1000);
 }
+
+// Home's day rows and the Next up card are role="button" divs: Enter and Space open them, as a real button would. Only when the
+// row itself has the focus, so the card's own Open Day button (a real <button>) keeps its own Enter and Space.
+document.addEventListener('keydown', ev => {
+  if (ev.key !== 'Enter' && ev.key !== ' ') return;
+  const el = ev.target && ev.target.closest ? ev.target.closest('.dc-row, .dc-hero') : null;
+  if (!el || ev.target !== el) return;
+  ev.preventDefault();
+  el.click();
+});
 
 // Show a single day's workout (the day panels + program header) and hide the
 // overview. switchDay() activates the right panel + recomputes progress.
@@ -8372,9 +8453,9 @@ function renderPlan() {
     return Math.round((end - today) / 86400000);
   };
 
-  // ── ATHLETE HEADER (big name + goal + dates) ─────────────────────
-  // Plain page header — no card chrome, no avatar. First name is dark, last
-  // name drops to its own line in brand green (see .home-name). The goal badge
+  // ── PROGRESS HEADER (name as the eyebrow, "Progress" as the title, goal + dates) ──────
+  // Plain page header — no card chrome, no avatar. The athlete's name is the small eyebrow and the screen's name is the
+  // title (Amir, 2026-10-12: the Game Plan tab became Progress). The goal badge
   // may carry a leading emoji (e.g. "🎾 Tennis Performance"); strip it so the
   // subtitle reads as clean mono caps like the rest of the page.
   const rawGoal = (DATA.sport && DATA.sport.badge) ? DATA.sport.badge : '';
@@ -8393,7 +8474,8 @@ function renderPlan() {
   // here. Just show the dates if available.
   document.getElementById('athlete-card-wrap').innerHTML = `
     <div class="athlete-header">
-      <div class="home-name">${esc(a.firstName)}<span>${esc(a.lastName)}</span></div>
+      <div class="prog-eyebrow">${esc([a.firstName, a.lastName].filter(Boolean).join(' '))}</div>
+      <h1 class="prog-title">Progress</h1>
       ${sportBadgeHtml(rawGoal) || (goalText ? `<div class="athlete-card-detail">${goalText}</div>` : '')}
       ${datesText ? `<div class="athlete-card-dates">${datesText}</div>` : ''}
     </div>`;
@@ -8449,6 +8531,7 @@ function renderPlan() {
       return `<div class="cycle-meter-label ${cls}">C${i+1}</div>`;
     }).join('');
     document.getElementById('cycle-meter-wrap').innerHTML = `
+      <h2 class="prog-sec">Game Plan</h2>
       <div class="cycle-meter">
         <div class="cycle-meter-bars">${segs}</div>
         <div class="cycle-meter-labels">${labels}</div>
@@ -8513,8 +8596,8 @@ function renderPlan() {
     document.getElementById('upcoming-wrap').innerHTML = html;
   }
 
-  // Personal Records and Daily Habits are rendered by renderHome() now — they
-  // live under the day cards on Home. Nothing to draw here.
+  // Your numbers: Personal records and Body weight (they were Home's last two rows until 2026-10-12). Daily habits stay on Home.
+  paintNumbers();
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -8545,7 +8628,7 @@ function renderHome() {
   }
 
   // ── HOME OVERVIEW (landing) ──────────────────────────────────────
-  // "Good morning/afternoon/evening" + first name, same scale as Game Plan's .home-name.
+  // "Good morning/afternoon/evening" as the eyebrow, the first name under it (one compact block).
   const greetEl = document.getElementById('home-greeting-wrap');
   if (greetEl) {
     const hr = new Date().getHours();
@@ -8553,10 +8636,8 @@ function renderHome() {
     greetEl.innerHTML = `<div class="home-greet"><span class="home-greet-hi">${greetWord}</span><span>${esc(DATA.athlete.firstName || '')}</span></div>`;
   }
 
-  // The cycle is one small line under the greeting (HOME-02, Amir 2026-09-26: "I like the small
-  // cycle details"). It was a full photo card; the photos now belong to the day cards below.
-  // Since PROG-01 (Amir, 2026-09-27: "a card on home, but remove the line on the top … replace
-  // it with this, when you click, it goes to gameplan") it is the This cycle card: paintCycleCard().
+  // The This cycle card (PROG-01) is on Progress now (Amir, 2026-10-12), under its header: paintCycleCard() fills #cycle-card-wrap.
+  // Home keeps no cycle line at all; between cycles it has one door row to Progress (betweenCyclesHTML()).
   paintCycleCard();
 
   // "This Week": its header and the week's session count (paintWeek()); in a week with a note, the note IS the
@@ -8577,20 +8658,14 @@ function renderHome() {
   const days = w.days || [];
   dayTotals = {};
 
-  // Day cards — each looks like a cycle card and opens that day's workout.
+  // The week's days: Next up as a card, the others as rows on the paper (homeDaysHTML()). Each opens that day's workout.
   const cardsWrap = document.getElementById('day-cards-wrap');
   if (cardsWrap) {
-    cardsWrap.innerHTML = days.map((d, i) => dayCardHTML(d, i + 1, days.length)).join('');
+    cardsWrap.innerHTML = homeDaysHTML(days);
   }
 
-  // The three companion rows under the week: Daily habits (AA Proof's strip under it),
-  // Personal records, Body weight. All three are also refreshed on
-  // every goTo('home') — renderHome() runs once at boot, so a max saved during
-  // today's session would otherwise not show until the app was reloaded.
-  const homeCeil = document.getElementById('home-ceiling-wrap');
-  if (homeCeil) { homeCeil.innerHTML = ceilingCardHtml(); ceilingCountUp(homeCeil); }
-  const homeWt = document.getElementById('home-weight-wrap');
-  if (homeWt) homeWt.innerHTML = weightCardHtml();
+  // The row under the week: Daily habits (AA Proof's strip under it), refreshed on every goTo('home') — renderHome() runs
+  // once at boot. Personal records and Body weight are on Progress now (paintNumbers(), Amir 2026-10-12).
   const habWrap = document.getElementById('home-habits-wrap');
   if (habWrap) habWrap.innerHTML = habitCardHtml();
 
@@ -9725,9 +9800,9 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
-    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, my note for the week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so: your cycle card reads <strong>Cycle complete</strong>, and there's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The "Why This Cycle Matters" note on <strong>Game Plan</strong> explains what we're chasing right now.</p>` },
+    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, my note for the week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The "Why This Cycle Matters" note on <strong>Progress</strong>, in the Game Plan, explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
     body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
   { icon: 'mindset', title: 'The readiness check',
@@ -9737,13 +9812,13 @@ const APP_GUIDE = [
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. When the rest is over it moves you to the next set. Supersets and circuits come round by round; warm-ups stay in the list. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
-    body: `<p>The small <strong>i</strong> at the right end of every exercise answers what you'd ask me about it. <strong>What does it do?</strong> and the qualities it builds (tap one to read what it means). <strong>How does it help on court?</strong> <strong>Where will I feel it?</strong> shows your body front and back with the working muscles in green, and a line under it names them, the main ones first.</p><p>Then three short lists. Under <strong>Too hard?</strong> are the <strong>Regressions</strong>, easier versions of the same movement. Under <strong>Too easy?</strong> are the <strong>Progressions</strong>, harder versions. Under <strong>Other kit?</strong> are the <strong>Alternatives</strong>, the same movement on other equipment. Tap a name to read about it. A name marked <em>Not in the app yet</em> has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why am I doing this?</strong>, signed by me. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p><strong>Your history</strong> at the bottom says how many times you've done it and what you did last time. Tap it for every session.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with <strong>How do I do it?</strong> (the video when there is one, the steps and the cues), and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
+    body: `<p>The small <strong>i</strong> at the right end of every exercise answers what you'd ask me about it. <strong>What does it do?</strong> and the qualities it builds (tap one to read what it means). <strong>How does it help on court?</strong> <strong>Where will I feel it?</strong> shows your body front and back with the working muscles in green, and a line under it names them, the main ones first.</p><p>Then three short lists. Under <strong>Too hard?</strong> are the <strong>Regressions</strong>, easier versions of the same movement. Under <strong>Too easy?</strong> are the <strong>Progressions</strong>, harder versions. Under <strong>Other kit?</strong> are the <strong>Alternatives</strong>, the same movement on other equipment. Tap a name to read about it. A name marked <em>Not in the app yet</em> has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why am I doing this?</strong>, signed by me. All of them are on one page too: tap <strong>Why your plan looks like this</strong> on <strong>Progress</strong>, under your current cycle in the Game Plan.</p><p><strong>Your history</strong> at the bottom says how many times you've done it and what you did last time. Tap it for every session.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with <strong>How do I do it?</strong> (the video when there is one, the steps and the cues), and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
-    body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
+    body: `<p>The <strong>Next up</strong> card on Home, and the top of each day, show up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
   { icon: 'activity', title: 'Your history on every exercise',
     body: `<p>Every exercise remembers what you did. An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. A set that ran <strong>over</strong> its target last time also shows a faint "last" line under today's row.</p><p>For the whole story, tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>: every time you've done it, your reps, your RPEs and your notes, and how your best set has moved.</p><p>A superset or circuit still shows <strong>Last time</strong> when you open it, because its boxes don't show last time's weights.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'Personal Records — the most you could lift once',
-    body: `<p>Open <strong>Home</strong> and tap <strong>Personal Records</strong> to see this for every
+    body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
     body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal; the card says where it is. In <strong>Guided</strong> mode, <strong>Finish Session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. The card lists what's not done; rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Change the rating or the note after Done and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> (in the bar at the top, under <strong>⋯</strong> once the clock is going; tap it twice) clears the clock, the check-in, your ticks and your RPEs. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
@@ -9851,7 +9926,7 @@ function goTo(screen, historyId, keepContent) {
   // Home tab always lands on the overview (not a previously opened day view).
   if (screen === 'home') closeDayView();
 
-  // Archive view (opened from the Game Plan "Done" card) — show the requested
+  // Archive view (opened from the Progress screen's "Done" card) — show the requested
   // past program, or the most recent one if none specified.
   if (screen === 'archive') {
     const list = (DATA.programHistory && DATA.programHistory.length) ? DATA.programHistory : [];
@@ -9863,19 +9938,21 @@ function goTo(screen, historyId, keepContent) {
   // Library tab — the doors, or the world last open. Each world is built lazily on first visit.
   if (screen === 'workouts') renderLibrary();
 
-  // Home — rebuild all three companion rows. renderHome() only runs at boot, so
-  // without this a max saved during today's session, or habits ticked in AA
-  // Proof and navigated back from, would show stale numbers until a reload.
-  // The habit row is the one that matters most: leaving to Proof and coming
-  // back is its single most common journey.
+  // Home — rebuild the habit row. renderHome() only runs at boot, so without this habits ticked in AA
+  // Proof and navigated back from would show stale numbers until a reload. Leaving to Proof and coming
+  // back is the habit row's single most common journey.
   if (screen === 'home') {
-    const hc = document.getElementById('home-ceiling-wrap');
-    if (hc) { hc.innerHTML = ceilingCardHtml(); ceilingCountUp(hc); }
     const hh = document.getElementById('home-habits-wrap');
     if (hh) hh.innerHTML = habitCardHtml();
-    const hw = document.getElementById('home-weight-wrap');
-    if (hw) hw.innerHTML = weightCardHtml();
     paintWeekSugg();   // gone once its session has been opened (LIB-01)
+  }
+
+  // Progress — rebuild the two number rows and the cycle card. They were Home's until 2026-10-12 and had the same
+  // reason: a max saved during today's session, or a weight logged, would show stale until a reload. The Records
+  // row counts up to a new best here (paintNumbers() runs ceilingCountUp() while Progress is the screen on show).
+  if (screen === 'plan') {
+    paintNumbers();
+    paintCycleCard();
   }
 
   // Leaving Personal Records by any route other than its own back chevron drops the
@@ -9889,10 +9966,10 @@ function goTo(screen, historyId, keepContent) {
   if (screen === 'ceiling' && !keepContent) renderCeiling();
   if (screen === 'weight') renderWeightScreen();
 
-  // Update the global tab bar's active button. Personal Records is reached from
-  // Home, so that tab stays lit while you are inside it.
+  // Update the global tab bar's active button. Personal Records and Body weight are reached from
+  // Progress (Amir, 2026-10-12), so that tab stays lit while you are inside them.
   // Every screen lights the tab it belongs to (POL-01: Workout, Article and Archive lit none).
-  const litTab = ({ ceiling: 'home', weight: 'home', workout: 'workouts', article: 'workouts', archive: 'plan' })[screen] || screen;
+  const litTab = ({ ceiling: 'plan', weight: 'plan', workout: 'workouts', article: 'workouts', archive: 'plan' })[screen] || screen;
   document.querySelectorAll('#global-tabs .nav-item').forEach(n => {
     n.classList.toggle('active', n.dataset.tab === litTab);
   });
@@ -9937,7 +10014,7 @@ function topLayer() {
   const id = scr ? scr.id.replace('screen-', '') : 'home';
   if (id !== 'home') {
     // The screen's own ← first: it knows where it came from (Records → the exercise,
-    // an article → its Library pane, the archive → Game Plan). A tab has none: Home.
+    // an article → its Library pane, the archive, Records and Body weight → Progress). A tab has none: Home.
     const b = _visibleBtn(scr, '.nav-back, .archive-back');
     return b ? () => b.click() : () => goTo('home');
   }
@@ -10161,9 +10238,11 @@ function habitCardHtml() {
 
   // HOME-02 (Amir 2026-09-26: "I like how small the other cards are"): one row, the count and
   // the streak. Today's habits are ticked right under it, in AA Proof's own strip (fork 1B).
+  // The three number rows (this one, Records, Body weight) are one door-row look, with or without data (Amir,
+  // 2026-10-12: "one look, always"): a green line icon, the label, one line, a ›. .quiet only changes the line's words.
   if (!s) {
     return `<button type="button" class="hrow quiet" onclick="goHabits()">
-      <span class="hrow-b"><span class="hrow-l">Daily habits</span><span class="hrow-q">Sleep, steps, water, protein: tick them in AA Proof.</span></span><span class="hrow-a">›</span></button>`;
+      ${hrowIc('habits')}<span class="hrow-b"><span class="hrow-l">Daily habits</span><span class="hrow-q">Sleep, steps, water, protein: tick them in AA Proof.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
   }
   // PRF-03: the verdict AA Proof leads with, the same words in both apps ("2 to go", On target,
   // Perfect), never "day complete" beside the strip's "1 of 5 done". It is about the day Proof wrote it:
@@ -10175,11 +10254,23 @@ function habitCardHtml() {
     : s.verdict === 'on' ? 'On target'
     : s.verdict === 'perfect' ? 'Perfect'
     : (s.done != null && s.total ? `${s.done} of ${s.total}` : `Level ${s.lv}`);
+  // "N to go" asks for something, so it stays clay; On target and Perfect are the good news, green.
+  const tone = fresh && s.verdict === 'togo' ? ' is-togo' : fresh && (s.verdict === 'on' || s.verdict === 'perfect') ? ' is-ok' : '';
   return `<button type="button" class="hrow" onclick="goHabits()">
-    <span class="hrow-b"><span class="hrow-l">Daily habits</span>
-      <span class="hrow-v">${said}<small>${s.streak} day${s.streak === 1 ? '' : 's'} in a row</small></span></span>
-    <span class="hrow-a">›</span></button>`;
+    ${hrowIc('habits')}<span class="hrow-b"><span class="hrow-l">Daily habits</span>
+      <span class="hrow-v${tone}">${said}<small>${s.streak} day${s.streak === 1 ? '' : 's'} in a row</small></span></span>
+    <span class="hrow-a" aria-hidden="true">›</span></button>`;
 
+}
+// The line icon at the left of a door row (Home's habits row, Progress's Records and Body weight rows). A function, not a const:
+// the rows are drawn from boot(), which can run before this line of the script has been evaluated (the temporal dead zone).
+function hrowIc(kind) {
+  const draw = {
+    habits: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16 9.5"/>',
+    records: '<path d="M5 20v-6M12 20V9M19 20V4"/>',
+    weight: '<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 10.5a4.5 4.5 0 0 1 8 0"/><path d="M12 10.5l1.7-2"/>',
+  }[kind] || '';
+  return `<span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${draw}</svg></span>`;
 }
 
 // ── PERSONAL RECORDS — the Home row + its own screen ───────────────────
@@ -10190,7 +10281,7 @@ function ceilingCardHtml() {
 
   if (!lifts.length) {
     return `<button type="button" class="hrow quiet" onclick="goTo('ceiling')">
-      <span class="hrow-b"><span class="hrow-l">Personal records</span><span class="hrow-q">Fill in by themselves as you train.</span></span><span class="hrow-a">›</span></button>`;
+      ${hrowIc('records')}<span class="hrow-b"><span class="hrow-l">Personal records</span><span class="hrow-q">Fill in by themselves as you train.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
   }
 
   const best = lifts.reduce((a, b) => (b.latest.kg > a.latest.kg ? b : a));
@@ -10207,10 +10298,28 @@ function ceilingCardHtml() {
   const from = (seen != null && seen !== best.latest.kg) ? seen : null;
 
   return `<button type="button" class="hrow" onclick="goTo('ceiling')">
-    <span class="hrow-b"><span class="hrow-l">Personal records</span>
+    ${hrowIc('records')}<span class="hrow-b"><span class="hrow-l">Personal records</span>
       <span class="hrow-v"><span class="hrow-n" data-to="${best.latest.kg}"${from != null ? ` data-from="${from}"` : ''}>${from != null ? from : best.latest.kg}</span> kg<small>${esc(shortLift(best.lift))}${delta ? ' · ' + delta : ''}</small></span></span>
-    <span class="hrow-sp">${ncSpark(best.entries)}</span><span class="hrow-a">›</span></button>`;
+    <span class="hrow-sp">${ncSpark(best.entries)}</span><span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
+
+// Progress's "Your numbers" rows (Amir, 2026-10-12: Personal records and Body weight moved here from Home). renderPlan() paints
+// them at boot; goTo('plan') paints them again on every visit, and the Records row also when the history arrives
+// (fillRecordsFrom()) or a weight is logged. The count-up to a new best runs only while Progress is the screen on show,
+// so the athlete sees the number move when they get here, not unseen at boot (ceilingCountUp() also records what was shown).
+function paintCeilingRow() {
+  const hc = document.getElementById('ceiling-row-wrap');
+  if (!hc) return;
+  hc.innerHTML = ceilingCardHtml();
+  const scr = document.getElementById('screen-plan');
+  if (scr && scr.classList.contains('active')) ceilingCountUp(hc);
+}
+function paintWeightRow() {
+  const hw = document.getElementById('weight-row-wrap');
+  if (hw) hw.innerHTML = weightCardHtml();
+}
+function paintNumbers() { paintCeilingRow(); paintWeightRow(); }
+window.paintNumbers = paintNumbers;
 
 // The best figure the athlete has already been shown, so a number that has not
 // moved never animates. Stored per-device; it is a "have you seen this yet"
@@ -10249,7 +10358,7 @@ function ncSpark(entries) {
   const pts = v.map((n, i) => `${(i / (v.length - 1)) * 63 + 3},${23 - ((n - lo) / span) * 20}`).join(' ');
   const last = pts.split(' ').pop().split(',');
   return `<svg class="nc-spark" viewBox="0 0 70 28">
-    <polyline points="${pts}" fill="none" stroke="#FAF7F2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="${last[0]}" cy="${last[1]}" r="3.2" fill="#E06B43"/></svg>`;
 }
 // "Barbell Back Squat" → "Back Squat" for the short name on the Home row.
@@ -10277,7 +10386,7 @@ function fmtCeilDate(iso) {
 
 // Which lift's history is open, or null on the all-lifts view. Drives the back
 // chevron, which goes exactly ONE step — out of a lift to the list, and only
-// from the list back to Home (or to the exercise it was opened from: _ceilReturn).
+// from the list back to Progress (or to the exercise it was opened from: _ceilReturn).
 let _ceilLift = null;
 
 // Where the athlete is inside "log a max": null on every other view, {} on the
@@ -10325,7 +10434,7 @@ function ceilingDue() {
 
 // Where to land when the athlete leaves Personal Records. Set only when they arrived
 // from inside an exercise mid-session (its History sheet), so the back chevron puts them back in
-// that exercise rather than dumping them on Home with their place lost.
+// that exercise rather than dumping them on Progress with their place lost.
 // Cleared by goTo() the moment they leave by any other route.
 let _ceilReturn = null;
 
@@ -10334,7 +10443,7 @@ function ceilingBack() {
   if (_ceilAdd) { renderCeiling(); return; }                     // picker -> the list
   if (_ceilLift) { renderCeiling(); return; }                    // one step: out of a lift
   if (_ceilReturn) { returnFromCeiling(); return; }
-  goTo('home');
+  goTo('plan');   // Progress, where the row is (Amir, 2026-10-12)
 }
 window.ceilingBack = ceilingBack;
 
@@ -12712,14 +12821,11 @@ function markSuggestedDay() {
   document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('suggested'));
   document.querySelectorAll('.day-ov-card').forEach(c => c.classList.remove('suggested'));
   const tabs = document.querySelectorAll('.day-tab');
-  const cards = document.querySelectorAll('.day-ov-card');
   const dayIds = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
-  // A session under way today first; otherwise the first day not done THIS WEEK (HOME-01:
-  // it used to be the first day without today's stamp, so every morning said Day 1).
-  // Every day done this week → nothing suggested.
-  const done = weekDoneDays();
-  let i = dayIds.findIndex(id => dayInProgress(id));
-  if (i < 0 && !cycleOver()) i = dayIds.findIndex(id => !done.has(id));   // between cycles nothing is suggested (PROG-02)
+  // suggestedDayId(): a session under way today first; otherwise the first day not done THIS WEEK (HOME-01); every day
+  // done this week, or between cycles (PROG-02): nothing. The same day is Home's big Next up card (homeDaysHTML()).
+  const sid = suggestedDayId();
+  const i = sid == null ? -1 : dayIds.indexOf(sid);
   if (i >= 0) {
     tabs[i]?.classList.add('suggested');
     const c = document.querySelector(`.day-ov-card[data-dc="${dayIds[i]}"]`);
@@ -13978,10 +14084,9 @@ function fillRecords(sessions, celebrate) {
   });
   if (!changed) return;
   writeCeiling(all);
-  // The Home card is drawn at boot and on every visit to Home; history arrives after
-  // the first paint, so bring the card up to date now.
-  const hc = document.getElementById('home-ceiling-wrap');
-  if (hc && hc.innerHTML) { hc.innerHTML = ceilingCardHtml(); ceilingCountUp(hc); }
+  // The Records row (Progress) is drawn at boot and on every visit to Progress; history arrives after
+  // the first paint, so bring the row up to date now.
+  paintCeilingRow();
 }
 // ── Renames, and why this is an ALIAS rather than a rewrite ──────────────
 // Every entry is filed under the exercise's DISPLAY NAME, so the cycle that
@@ -14122,7 +14227,7 @@ function weightCardHtml() {
 
   if (!series.length) {
     return `<button type="button" class="hrow quiet" onclick="goWeight()">
-      <span class="hrow-b"><span class="hrow-l">Body weight</span><span class="hrow-q">Tap to add your first reading.</span></span><span class="hrow-a">›</span></button>`;
+      ${hrowIc('weight')}<span class="hrow-b"><span class="hrow-l">Body weight</span><span class="hrow-q">Tap to add your first reading.</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
   }
 
   const last = series[series.length - 1];
@@ -14138,9 +14243,9 @@ function weightCardHtml() {
     : `${diff > 0 ? '▲' : '▼'} ${Math.abs(diff)} kg since ${fmtCeilDate(older.d)}`;
 
   return `<button type="button" class="hrow" onclick="goWeight()">
-    <span class="hrow-b"><span class="hrow-l">Body weight</span>
+    ${hrowIc('weight')}<span class="hrow-b"><span class="hrow-l">Body weight</span>
       <span class="hrow-v">${last.kg} kg<small>${esc(trend)}</small></span></span>
-    <span class="hrow-sp">${ncSpark(series.map(e => ({ kg: e.kg })))}</span><span class="hrow-a">›</span></button>`;
+    <span class="hrow-sp">${ncSpark(series.map(e => ({ kg: e.kg })))}</span><span class="hrow-a" aria-hidden="true">›</span></button>`;
 }
 
 // ── Writing body weight ────────────────────────────────────────────────────
@@ -14284,8 +14389,7 @@ function logWeightToday() {
   if (!kg) { if (el) { el.focus(); } return; }
   saveWeight(ceilingToday(), kg);
   renderWeightScreen();
-  const hw = document.getElementById('home-weight-wrap');
-  if (hw) hw.innerHTML = weightCardHtml();
+  paintWeightRow();
 }
 window.logWeightToday = logWeightToday;
 
@@ -14342,8 +14446,7 @@ function confirmClearWeight(btn) {
   }
   clearAllWeight();
   renderWeightScreen();
-  const hw = document.getElementById('home-weight-wrap');
-  if (hw) hw.innerHTML = weightCardHtml();
+  paintWeightRow();
 }
 window.confirmClearWeight = confirmClearWeight;
 
