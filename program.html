@@ -1408,29 +1408,9 @@
   /* These carry CSS display rules that beat the bare [hidden] attribute, so
      force them off when hidden inside the day view. */
   #day-view .day-tabs[hidden], #day-view .prog-cycle-hero[hidden] { display: none !important; }
-  /* Full-bleed: the card fills the whole top of the screen — no top gap, no side
-     margins, no rounding. Override the .current-message card chrome + the
-     banner's height clamps so the banner alone spans edge to edge. */
-  #day-view-card { position: relative; }
-  #day-view-card .current-message {
-    margin: 0; border: none; border-radius: 0; box-shadow: none;
-  }
-  #day-view-card .cm-banner {
-    border-radius: 0; max-height: none;
-  }
+  /* The day's cover (its card, the ← and the moon) is drawn by the CENTRE COURT block at the end of this sheet. */
   /* The day card above already names the day, so hide the redundant focus chip. */
   #day-view .day-focus-tag { display: none; }
-  .day-view-back, .day-view-dark {
-    position: absolute; top: 14px; z-index: 5;
-    width: 34px; height: 34px; border-radius: 50%;
-    background: rgba(0,0,0,0.34); border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; line-height: 1; -webkit-tap-highlight-color: transparent;
-  }
-  .day-view-back { left: 14px; font-size: var(--fs-lead); }
-  .day-view-dark { right: 14px; font-size: var(--fs-body); }
-  .day-view-dark svg { width: 18px; height: 18px; }
-  .day-view-back:active, .day-view-dark:active { transform: scale(0.9); }
   /* The account button (NAV-02, 2026-09-27), where the floating dark-mode toggle sat: top
      right on Home / Coach / Library / Game Plan, the athlete's initials. It opens Theme,
      Install, Help, Privacy and Sign out (openAccount()). The day view keeps its own
@@ -1459,8 +1439,7 @@
      comfortable on narrow phones and wide screens without going letterbox-thin.
      Stripes are layered directly here (over the green gradient) so the texture
      shows while the photo loads or if it fails. */
-  #day-cards-wrap .cm-banner,
-  #day-view-card .cm-banner {
+  #day-cards-wrap .cm-banner {
     background-color: #0E4A36;   /* solid green base — never let card white show */
     background-image:
       repeating-linear-gradient(135deg,
@@ -1485,12 +1464,7 @@
   }
   /* While a category image is still cascading/erroring, keep the <img> from
      painting a white placeholder box over the green banner. */
-  #day-cards-wrap .cm-banner-img,
-  #day-view-card .cm-banner-img { background: transparent; }
-  /* The day view repeats the same card, so it must repeat the same CROP. It was
-     inheriting 16:9 from .planlike while the Home card is 5:2, which cut one file
-     two different ways — and the art is composed for one of them. */
-  #day-view-card .cm-banner { aspect-ratio: 5 / 2; min-height: 100px; max-height: 170px; }
+  #day-cards-wrap .cm-banner-img { background: transparent; }
   /* A touch more space between stacked day cards. */
   #day-cards-wrap .current-message { margin-bottom: 14px; }
   /* Day cards lead with "Day N"; the day name sits a little smaller beneath it,
@@ -1617,19 +1591,8 @@
   .day-content { display: none; padding: 20px 32px 120px 20px; }
   .day-content.active { display: block; animation: fadeUp 0.3s ease both; }
 
-  /* ── Vertical Progress Bar ── */
-  .v-progress {
-    position: fixed; right: 0; top: 120px; bottom: 70px;
-    width: 12px; background: var(--grey-mid);
-    border-radius: 6px 0 0 6px; z-index: 35; overflow: hidden;   /* under every overlay (POL-01) */
-    display: none;
-  }
-  .v-progress.active { display: block; }
-  .v-progress-fill {
-    position: absolute; top: 0; left: 0; right: 0;
-    background: var(--yellow); border-radius: 6px 0 0 6px;
-    height: 0%; transition: height 0.5s cubic-bezier(0.4,0,0.2,1);
-  }
+  /* The progress rail at the right edge is gone (#v-progress stays in the DOM, hidden): the slim bar's line
+     replaced it (CENTRE COURT, at the end of this sheet). */
 
   /* ── Suggested Day Dot ── */
   .day-tab.suggested::after {
@@ -1666,9 +1629,8 @@
     font-size: var(--fs-small); white-space: nowrap;
   }
   .demo-banner-exit:hover { opacity: 1; }
-  /* Push everything below the fixed banner; park the sticky timer beneath it. */
+  /* Push everything below the fixed banner (the slim session bar parks under it: CENTRE COURT). */
   body.is-demo { padding-top: 44px; }
-  body.is-demo .session-timer { top: 52px; }
   /* The fixed demo banner (44 px, z 120) sat on the top-right button (the account button since NAV-02) and on Guided's ✕ (POL-01). */
   body.is-demo .global-account { top: 58px; }
   body.is-demo .step-overlay { top: 44px; }
@@ -1676,65 +1638,8 @@
     .demo-banner { gap: 8px; padding: 7px 10px; font-size: var(--fs-label); }
   }
 
-  /* ── Session Timer (sRPE duration) ──
-     Inline card at the top of each day. Tracks wall-clock session time so the
-     coach email can report Duration and Session Load (AU = sRPE × minutes). */
-  .session-timer {
-    display: flex; align-items: flex-end; gap: 16px;
-    background: var(--white);
-    border: 1px solid var(--grey-mid);
-    border-radius: 14px;
-    padding: 14px 18px;
-    margin: 0 0 18px;
-    position: sticky; top: 8px; z-index: 40;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-  }
-  /* Green while it runs (DS-01): the running bar was the loudest clay on screen, and the one thing the
-     athlete is not looking at. */
-  .session-timer.running { border-color: var(--yellow); box-shadow: 0 0 0 3px var(--yellow-dim); }
-  body[data-dark] .session-timer.running { border-color: var(--green-ink); box-shadow: 0 0 0 3px rgba(109,190,149,0.14); }
-  .session-timer.finished { opacity: 0.85; }
-  .session-timer-body { flex: 1; min-width: 0; }
-  .session-timer-label {
-    font-family: 'Space Mono', monospace;
-    font-size: var(--fs-label); letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--grey-text); margin-bottom: 2px;
-  }
-  .session-timer-time {
-    font-family: 'Space Mono', monospace;
-    font-weight: 700; font-size: 30px; line-height: 1;   /* display: the session clock */
-    color: var(--grey-dark);
-    font-variant-numeric: tabular-nums;
-  }
-  .session-timer.running .session-timer-time { color: var(--green-ink); }
-  .session-timer-btn {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
-    font-size: var(--fs-body); letter-spacing: 1px; text-transform: uppercase;
-    background: var(--yellow); color: var(--on-accent);
-    border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer;
-    white-space: nowrap; flex-shrink: 0;
-    transition: background 0.15s, transform 0.1s;
-  }
-  .session-timer-btn:active { transform: scale(0.96); }
-  .session-timer.running .session-timer-btn { background: var(--yellow); }
-  .session-timer.finished .session-timer-btn { display: none; }
-  .session-timer-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  /* The clock never shrinks: at any width, the buttons wrap under it before it is cut. */
-  .session-timer { flex-wrap: wrap; }
-  .session-timer-body { flex: 1 0 auto; }
-  /* Under 480 px the clock was cut to "00:" and the label broke over 3–4 lines (WK-03,
-     2026-09-26): the body and the buttons could not share one row. Two rows instead, about
-     the same height: label and clock on one line, the buttons full width under it. */
-  @media (max-width: 479px) {
-    .session-timer { flex-wrap: wrap; align-items: center; gap: 10px 8px; padding: 12px 14px; }
-    .session-timer-body { flex: 1 1 100%; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-    .session-timer-label { margin-bottom: 0; }
-    .session-timer-time { font-size: 26px; flex: none; }   /* display: the clock, narrower */
-    .session-timer-actions { flex: 1 1 100%; }
-    .session-timer-actions .session-timer-btn { flex: 1; padding: 11px 10px; }
-  }
-  body[data-dark] .session-timer { background: #202020; border-color: #333; }
-  body[data-dark] .session-timer-time { color: #f0f0f0; }
+  /* ── Session Timer (sRPE duration) ── tracks wall-clock session time so the coach email can report Duration and
+     Session Load (AU = sRPE × minutes). Its look, before Start and as the slim bar, is the CENTRE COURT block. */
 
   /* ── Readiness Check ──
      Modal shown when the athlete taps Start, BEFORE the timer begins. Records a
@@ -1919,58 +1824,8 @@
     font-size: var(--fs-label); letter-spacing: 1px; text-transform: uppercase;
     color: #A8431F; white-space: nowrap;
   }
-  /* The session bar's Reset (Amir, 2026-09-27): once the day has started, until it is finished. */
-  .session-timer-reset { flex: none; min-height: 44px; padding: 0 14px; border-radius: 8px; cursor: pointer;
-    background: transparent; border: 1px solid var(--grey-mid); color: var(--grey-text);
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 1px; text-transform: uppercase; }
-  .session-timer-reset[hidden] { display: none; }
-  .session-timer-reset.armed { background: #C7552F; border-color: #C7552F; color: #fff; }
-  body[data-dark] .session-timer-reset:not(.armed) { border-color: #444; color: #aaa; }
-  /* Three buttons on a narrow phone: at 360 px Resume + Guided + Reset ran 22 px past the bar,
-     at 320 px 44 px. While Reset shows (.has-reset, paintResetBtn()), the row tightens so
-     every state fits in one row down to 320 px, its armed "Reset?" included, and the width is
-     held so arming does not shove its neighbours. It wraps rather than clips if it ever can't
-     (large text settings). */
-  .session-timer-actions { flex-wrap: wrap; }
-  @media (max-width: 479px) {
-    .session-timer.has-reset .session-timer-actions { gap: 6px; }
-    .session-timer.has-reset .session-timer-actions .session-timer-btn,
-    .session-timer.has-reset .session-timer-reset { font-size: var(--fs-small); letter-spacing: 0.5px; }
-    .session-timer.has-reset .session-timer-actions .session-timer-btn { padding: 11px 6px; }
-    .session-timer.has-reset .session-timer-reset { padding: 0 10px; min-width: 76px; }
-  }
-  @media (max-width: 359px) {
-    .session-timer.has-reset .session-timer-actions .session-timer-btn,
-    .session-timer.has-reset .session-timer-reset { letter-spacing: 0; }
-    .session-timer.has-reset .session-timer-actions .session-timer-btn { padding: 11px 4px; }
-    .session-timer.has-reset .session-timer-reset { padding: 0 8px; min-width: 69px; }
-  }
-  /* The slim bar (WK-03, Amir 2026-09-27, option C of the mockup): from Start until Done the
-     bar is one line, ← Home · the clock · Pause · ⋯, and ⋯ opens Pause, Guided and Reset on a
-     second row. A week whose note sets a limit adds one thin row under all of it (.session-timer-week). The label goes (the clay clock and Pause / Resume say it); the tab bar hides
-     (body.session-on, paintSessionChrome()). Before Start and after Done it is the full bar. */
-  .session-timer-leave, .session-timer-more { display: none; }
-  .session-timer.slim { flex-wrap: nowrap; align-items: center; gap: 6px; padding: 4px 4px 4px 2px; }
-  .session-timer.slim .session-timer-leave { display: inline-flex; align-items: center; justify-content: center; gap: 4px; flex: none;
-    min-height: 44px; min-width: 44px; padding: 0 8px; border: 0; background: transparent; cursor: pointer; color: var(--green-ink);
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 1px; text-transform: uppercase; }
-  .session-timer.slim .session-timer-leave span[aria-hidden] { font-size: var(--fs-lead); letter-spacing: 0; }
-  .session-timer.slim .session-timer-body { flex: 1 0 auto; display: flex; align-items: center; justify-content: flex-start; }   /* the clock never shrinks */
-  .session-timer.slim .session-timer-label { display: none; }
-  .session-timer.slim .session-timer-time { font-size: 24px; }   /* display: the slim bar's clock (WK-03: never cut) */
-  .session-timer.slim .session-timer-actions { flex: none; flex-wrap: nowrap; gap: 6px; }
-  .session-timer.slim .session-timer-actions .session-timer-btn { flex: none; min-height: 44px; padding: 0 14px; }
-  .session-timer.slim .session-timer-btn.guided,
-  .session-timer.slim .session-timer-reset { display: none; }
-  .session-timer.slim .session-timer-more { display: inline-flex; align-items: center; justify-content: center; flex: none;
-    width: 44px; height: 44px; border: 0; border-radius: 8px; background: transparent; cursor: pointer;
-    color: var(--grey-text); font-size: var(--fs-title); line-height: 1; }
-  .session-timer.slim.open { flex-wrap: wrap; }
-  .session-timer.slim.open .session-timer-more { order: 2; color: var(--grey-dark); background: var(--grey-card); }
-  .session-timer.slim.open .session-timer-actions { order: 3; flex: 1 1 100%; flex-wrap: wrap; padding: 0 0 2px 6px; }
-  .session-timer.slim.open .session-timer-actions > * { flex: 1 1 0; }
-  .session-timer.slim.open .session-timer-btn.guided { display: inline-flex; align-items: center; justify-content: center; }
-  .session-timer.slim.open .session-timer-reset:not([hidden]) { display: inline-flex; align-items: center; justify-content: center; }
+  /* The session bar (Reset, the slim bar from Start until Done, ⋯) is drawn by the CENTRE COURT block. While a
+     session is on, the tab bar hides (body.session-on, paintSessionChrome()). */
   body.session-on .global-tabs { display: none !important; }
   /* The week's limits (weekLimitsHTML, Amir 2026-10-12): the bar's last row, full width, so it never shares the clock's
      line. Before Start and all through the slim bar; gone after Done. The numbers are clay (they ask the athlete to hold
@@ -1980,41 +1835,12 @@
   .session-timer-week b { font-weight: 600; white-space: nowrap; }
   .session-timer-week i { font-style: normal; color: var(--grey-text); margin-right: 8px; }
   .stw-k { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--grey-text); }
-  .session-timer.slim.has-week { flex-wrap: wrap; }
-  .session-timer.slim.has-week:not(.open) { row-gap: 0; }   /* the open ⋯ row keeps its 6 px */
-  .session-timer.slim .session-timer-week { margin: 0 8px 4px 10px; padding-top: 6px; }
   .session-timer.finished .session-timer-week, .session-timer.day-done .session-timer-week { display: none; }
-  #day-view .day-content.has-week .checklist-item { scroll-margin-top: 175px; }   /* the bar is taller by the row */
   @media (max-width: 359px) {   /* so "Back-off week · Max RPE 7 · 1 set fewer" stays one line at 320 px */
     .session-timer-week { gap: 2px 6px; }
     .session-timer-week i { margin-right: 6px; }
     .stw-k { letter-spacing: 0; }
   }
-  body[data-dark] .session-timer.slim.open .session-timer-more { background: #2a2a2a; color: #eee; }
-  /* The narrowest phones: the arrow alone ("Home" is its label for a screen reader). */
-  /* Past an hour the clock is seven characters ("1:05:12"): "Home" gives it the room. */
-  @media (max-width: 419px) {
-    .session-timer.slim.long .stl-txt { display: none; }
-    .session-timer.slim.long .session-timer-time { font-size: var(--fs-title); }
-    .session-timer.slim.long:not(.open) .session-timer-actions .session-timer-btn { padding: 0 10px; }
-  }
-  @media (max-width: 359px) {
-    .session-timer.slim .stl-txt { display: none; }
-    .session-timer.slim .session-timer-time { font-size: var(--fs-title); }
-    /* The symbol alone, drawn (the ⏸ glyph on its own renders as a square, which reads as stop);
-       the button's aria-label names it. */
-    .session-timer.slim:not(.open) .session-timer-actions .session-timer-btn:not(.guided) { padding: 0; min-width: 44px;
-      display: inline-flex; align-items: center; justify-content: center; }
-    .session-timer.slim:not(.open) .session-timer-btn .stb-w,
-    .session-timer.slim:not(.open) .session-timer-btn .stb-g { display: none; }
-    .session-timer.slim:not(.open) .session-timer-btn[data-sym="pause"]::before { content: ''; width: 4px; height: 15px;
-      margin-right: 7px; border-radius: 1px; background: currentColor; box-shadow: 7px 0 0 currentColor; }
-    .session-timer.slim:not(.open) .session-timer-btn[data-sym="play"]::before { content: ''; width: 0; height: 0; margin-left: 3px;
-      border-style: solid; border-width: 8px 0 8px 13px; border-color: transparent transparent transparent currentColor; }
-    .session-timer.slim.open .session-timer-actions .session-timer-btn { padding: 0 6px; }
-  }
-  /* Every button on the bar is a 44 px target, before Start too (they were 41). */
-  .session-timer-actions .session-timer-btn { min-height: 44px; }
   @keyframes armPulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(199,85,47,0.55); }
     50%      { box-shadow: 0 0 0 8px rgba(199,85,47,0); }
@@ -2027,28 +1853,8 @@
     color: var(--green-ink); margin-bottom: 4px; text-align: center;
   }
 
-  /* ── Section Headers ── */
-  .section-header-prog { display: flex; align-items: center; gap: 14px; margin: 38px 0 14px; }
-  .section-icon { display: none; }
-  /* Bigger, bolder title — green for every block (DS-01, below) */
-  .section-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title); letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); flex-shrink: 0; line-height: 1; transition: color 0.2s; }
-  /* Trailing line for a strong section break — grey under every block (DS-01, below) */
-  .section-header-prog::after { content: ''; flex: 1; height: 3px; border-radius: 2px; background: var(--grey-mid); transition: background 0.2s; }
-  /* Block rest — said ONCE for the whole section instead of repeated on every
-     card in it. Sits at the end of the section rule, quiet but findable. */
-  .section-rest {
-    font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 1.2px;
-    text-transform: uppercase; color: var(--grey-text); flex-shrink: 0; white-space: nowrap;
-  }
-  body[data-dark] .section-rest { color: #888; }
-
-  /* ONE COLOUR FOR EVERY BLOCK (DS-01, Amir's A, 2026-09-27: clay means "look here"). Warm-up and power
-     were clay and strength green, and a block the app did not recognise took its colour from its position
-     ("Core" was clay because it was third), so a block's colour meant nothing an athlete could learn, and
-     it drowned the clay that does: the Coach's note, a Because, an RPE over target, the tempo digit. Every
-     block's title is green, the rule under it grey; blockCategory() still names the type for the code. */
-  .section-header-prog[class*="block-"] .section-title { color: var(--green-ink); }
-  .section-header-prog[class*="block-"]::after         { background: var(--grey-mid); height: 2px; }
+  /* ── Section Headers ── (a block's title, and its rest when written): the CENTRE COURT block. One colour for every
+     block (DS-01): green, so a block's colour means nothing an athlete has to learn and clay stays for "look here". */
 
   /* ── Checklist Items ── */
   /* ── Exercise card (refreshed: softer shadow, larger radius, premium feel) ── */
@@ -2789,8 +2595,6 @@
   .checklist-item.is-done.collapsed .item-name { font-size: var(--fs-body); color: var(--grey-text); }
   .checklist-item.is-done.collapsed .ex-about { opacity: 0.7; }
   /* The next card opens under the sticky session bar, not behind it (foldWhenDone()). */
-  #day-view .checklist-item { scroll-margin-top: 150px; }
-  body.is-demo #day-view .checklist-item { scroll-margin-top: 196px; }
 
   /* The Coach's Note: two lines, then More › (fitNotes()). */
   .ex-coach-note .ex-coach-note-label { display: inline; font-family: 'Barlow', sans-serif; font-weight: 600;
@@ -3195,26 +2999,9 @@
   .wel-go { display: block; width: 100%; margin-top: 18px; padding: 15px; font-size: var(--fs-lead); }   /* look: the one primary button */
   .wel-skip { display: block; width: 100%; margin-top: 10px; padding: 12px; border: 0; background: none;
     color: var(--grey-text); font-size: var(--fs-body); cursor: pointer; }
-  /* First-session hints (ONB-01, 2026-09-27): one at a time, in the flow right under the thing
-     it explains (the session bar, the set to tick, the RPE strip that just opened), its arrow
-     pointing up at it. paintHints() places it; nothing here is positioned over the work. */
-  .onb-hint { position: relative; display: flex; align-items: flex-start; gap: 4px;
-    margin: 10px 0 12px; padding: 12px 6px 6px 14px; border-radius: 12px;
-    background: var(--yellow); color: var(--on-accent); box-shadow: 0 6px 18px rgba(0,0,0,0.16);
-    animation: onbIn 0.22s ease both; cursor: default; text-align: left; }
-  .onb-hint::before { content: ''; position: absolute; top: -6px; left: 30px; width: 12px; height: 12px;
-    background: inherit; border-radius: 2px; transform: rotate(45deg); }
-  .onb-hint[data-k="set"]::before { left: auto; right: 24px; }       /* at the set's circle */
-  .onb-hint[data-k="rpe"]::before { left: 58%; }                      /* at the 6–10 buttons */
-  .onb-hint p { flex: 1; margin: 0; padding-bottom: 6px; font-family: 'Barlow', sans-serif;
-    font-size: var(--fs-body); line-height: 1.45; letter-spacing: 0; text-transform: none; }
-  .onb-hint b { font-weight: 700; }
-  .onb-hint-ok { flex: none; min-width: 44px; min-height: 44px; margin-top: -10px; padding: 0 10px;
-    background: transparent; border: 0; color: inherit; cursor: pointer; opacity: 0.9;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-small);
-    letter-spacing: 1px; text-transform: uppercase; }
-  .ex-set-log .onb-hint { margin: 6px 8px 10px; }
-  body[data-dark] .onb-hint { box-shadow: 0 0 0 1px rgba(255,255,255,0.10), 0 6px 18px rgba(0,0,0,0.4); }
+  /* First-session hints (ONB-01, 2026-09-27): one at a time, in the flow right under the thing it explains (the
+     session bar, the set to tick, the RPE strip that just opened). paintHints() places it; its look is the CENTRE
+     COURT block. */
   @keyframes onbIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
   /* Your account (NAV-02): drawn into the one sheet (#hist-overlay) by openAccount(). */
   .acct-list { display: flex; flex-direction: column; margin-top: 14px; border-top: 1px solid var(--grey-mid); }
@@ -3720,8 +3507,7 @@
      text over it, and the card's own padding is cancelled so it runs edge to
      edge. scroll-margin-top keeps the sticky session timer off the band when
      finishDay() scrolls the card into view. */
-  .session-complete { overflow: hidden; scroll-margin-top: 84px; }
-  body.is-demo .session-complete { scroll-margin-top: 128px; }
+  .session-complete { overflow: hidden; }   /* its scroll-margin-top: the CENTRE COURT block */
   .complete-art { position: relative; margin: -36px -24px 0; aspect-ratio: 5 / 2; max-height: 150px; background: #122A22; overflow: hidden; }
   .complete-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .complete-art::after { content: ''; position: absolute; inset: 0;
@@ -4141,13 +3927,7 @@
   .btn-reset { background: var(--grey-card); color: var(--grey-text); border: 1px solid var(--grey-mid); }
   body[data-dark] .btn-add { background: #2a2a2a; border-color: #444; }
 
-  /* ── Guided Mode entry point (session-timer bar) ── */
-  .session-timer-actions { display: flex; gap: 8px; flex-shrink: 0; }
-  .session-timer-btn.guided { background: transparent; color: var(--green-ink); border: 1.5px solid var(--yellow); }
-  body[data-dark] .session-timer-btn.guided { background: transparent; border-color: var(--green-ink); }
-  /* `.session-timer.running .session-timer-btn` fills every timer button, which would leave Guided as
-     green text on green, a blank block, for the whole of a running session. */
-  .session-timer.running .session-timer-btn.guided { background: transparent; }
+  /* ── Guided Mode entry point: Guided ▶ on the session bar, outlined (the CENTRE COURT block). */
 
   /* ── Guided Mode — walks the day's standard exercises one set at a time. See
      openStepMode() in the script: it relocates the REAL .ex-detail node (the note, Last
@@ -4294,8 +4074,6 @@
   body[data-dark] .timer-overlay { background: #161616; }
   body[data-dark] .checklist-item { border-color: #333; }
   body[data-dark] .item-name { color: #ddd; }
-  body[data-dark] .section-title { color: #666; }
-  body[data-dark] .section-header-prog::after { background: #333; }
   body[data-dark] .weight-input { background: #2a2a2a; color: #ddd; }
   body[data-dark] .weight-input::placeholder { color: #555; }
   body[data-dark] .rpe-btn { border-color: #444; color: #9a9a9a; }
@@ -4461,7 +4239,6 @@
     left: var(--app-gutter); right: var(--app-gutter);
   }
   .global-account { right: calc(var(--app-gutter) + 14px); }
-  .v-progress { right: var(--app-gutter); }
   /* .a2hs-toast already centres itself on the viewport at max-width 380px,
      so it lands inside the column without help. */
 
@@ -4486,6 +4263,252 @@
     cursor: pointer;
   }
   .ceil-add, .wt-save, .ex-1rm-save { font-size: var(--fs-body); }   /* they were Space Mono at the label size */
+  /* ══ CENTRE COURT: the training day, re-skinned (Amir, 2026-10-12: "lets go with E. exercise number inside the circle.
+     but with P4, P5, P9, P50, P66") ═════════════════════════════════════════════════════════════════════════════════════
+     ONE block for the training day, last in the sheet so it wins a tie: the day view (#day-view), Guided's moved card
+     parts (.step-scroll) and Library sessions (#ws-body, the same renderExercise()). Rules are scoped with :where(), so
+     the scope adds no weight; a rule that has to beat an older one says which. The design is direction E "Centre Court"
+     (calm paper, one strong green thing on screen at a time) with D's short cover (P4), A's session bar inside the green
+     before Start (P5), A's slim green bar with its progress line (P9), A's Note and Rest foot row (P50) and A's hint
+     bubble with Amir's photo (P66). PROGRAM-APP.md has the account.
+     The panel is FULL-BLEED: .day-content has no side padding, and every piece carries the gutter itself, var(--g).
+     1 tokens · 2 the cover · 3 the session bar (before Start, slim, ⋯ open) · 4 the first-session hint · 5 block titles
+     · 6 scroll margins · then the cards, the circuits and the finish. */
+
+  /* 1. Tokens. The day's paper and ink, light and dark. Green and clay FILLS keep the brand in both; small clay TEXT on the
+     paper is #B5461F in light mode here only (5.1:1; #C7552F is 4.1:1), anything 18.66 px bold or more and every fill
+     stays #C7552F. On green, clay text is --clay-on-green. --g is the gutter (16 px under 360). */
+  :where(#day-view, .step-scroll, #ws-body) {
+    --g: 20px;
+    --paper: #FAF7F2; --sand: #F1ECE3; --row: #FFFFFF; --hair: #E4DDD1; --box: #D8D1C5;
+    --ink: #1A1A1A; --grey: #5C5C5C; --ring: #8A8378; --num: #5C5C5C; --info: var(--ring);
+    --fill: #0E4A36; --green-ink: #0E4A36; --mint: #6DBE95;
+    --clay: #C7552F; --clay-ink: #B5461F; --clay-fill: #C2512C; --clay-on-green: #E06B43; --steel: #3E6A92;
+    --tint: rgba(14,74,54,.08); --prog-track: rgba(14,74,54,.12); --ph: #6B6B6B;
+    /* --field: the edge of a box a set is typed into (2.44:1 on paper, it holds in sun); --mark: a made tick, the live set */
+    --field: #A89F92; --mark: var(--fill);
+    /* the one chevron for every text link, drawn as a mask in the link's colour */
+    --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M3 1L7 5 3 9' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    /* the greens: the cover, a button, a tile, the session bar's foot before Start, the slim bar, a button on the green */
+    --hero: radial-gradient(125% 90% at 100% 0%, #1B7254 0%, #0E4A36 46%, #082D20 100%);
+    --btn: radial-gradient(120% 120% at 0% 0%, #1B6A4E 0%, #0E4A36 55%, #0B3E2D 100%);
+    --tile: var(--btn);
+    --foot: radial-gradient(110% 170% at 100% 0%, #0C3F2E 0%, #083024 55%, #06241A 100%);
+    --bar: radial-gradient(160% 260% at 100% 0%, #17664B 0%, #0E4A36 45%, #0A3829 100%);
+    --tile-on-green: radial-gradient(120% 150% at 0% 0%, #24855F 0%, #16603F 52%, #0E4A36 100%);
+  }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) {
+    --paper: #181818; --sand: #202020; --row: #242424; --hair: #2C2C2C; --box: #4A4A4A;
+    --ink: #EDEDED; --grey: #9A9A9A; --ring: #666666; --num: #9A9A9A;
+    --green-ink: #6DBE95; --clay: #E06B43; --clay-ink: #E06B43; --steel: #8DB3D6;
+    --tint: rgba(109,190,149,.13); --prog-track: rgba(109,190,149,.16); --ph: #8F8F8F;
+    --field: #5A5A5A; --mark: #1B7254;   /* #0E4A36 sinks on #181818 (1.73:1); #1B7254 is 3.03:1 */
+    --hero: radial-gradient(125% 90% at 100% 0%, #17654A 0%, #0D4532 46%, #072A1E 100%);
+    --btn: radial-gradient(120% 120% at 0% 0%, #1A6A4D 0%, #12573F 55%, #0D4532 100%);
+    --foot: radial-gradient(110% 170% at 100% 0%, #0A3828 0%, #072A1E 55%, #051F16 100%);
+    --bar: radial-gradient(160% 260% at 100% 0%, #155E45 0%, #0D4532 45%, #082F22 100%);
+    --tile-on-green: radial-gradient(120% 150% at 0% 0%, #1F7655 0%, #13573F 52%, #0D4532 100%);
+  }
+  @media (max-width: 359px) { :where(#day-view, .step-scroll, #ws-body) { --g: 16px; } }
+
+  /* 2. The cover (P4, D's short one, about 270 px): the day's photo graded into the green, ← and the moon as 44 px glass
+     buttons, the "● DAY 1" eyebrow (a mint dot), the focus in 44 px capitals, what the day builds as tiles with a › (each still
+     opens its quality: paintDayQualities()). dayCardHTML() draws Home's cards too: everything here is CSS on
+     #day-view-card, and its markup is untouched. "7 blocks · 10 movements" goes; the list says so. */
+  #day-view-card { position: relative; }
+  #day-view-card .current-message { margin: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none; background: none; overflow: hidden;
+    opacity: 1; animation: fadeUp 0.3s ease both; }   /* it moves with the panel under it, so no seam opens between them */
+  #day-view-card .current-message::before, #day-view-card .current-message::after { display: none; }
+  #day-view-card .day-view-back, #day-view-card .day-view-dark { position: absolute; top: 8px; z-index: 5; display: grid; place-items: center;
+    width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; color: #fff; background: rgba(0,0,0,.22);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); font: 500 var(--fs-title)/1 'Barlow', sans-serif; line-height: 1;
+    -webkit-tap-highlight-color: transparent; }
+  #day-view-card .day-view-back { left: 8px; }
+  #day-view-card .day-view-dark { right: 8px; }
+  #day-view-card .day-view-dark svg { width: 20px; height: 20px; }
+  #day-view-card .day-view-back:active, #day-view-card .day-view-dark:active { transform: scale(0.92); }
+  #day-view-card .day-view-back:focus-visible, #day-view-card .day-view-dark:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  #day-view-card .cm-banner { display: block; position: relative; isolation: isolate; overflow: hidden; width: 100%; aspect-ratio: auto;
+    min-height: 0; max-height: none; border-radius: 0; background: var(--hero); color: #fff; }
+  #day-view-card .cm-banner-img { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; object-position: 84% 58%;
+    background: transparent; mix-blend-mode: luminosity; opacity: .7; pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); }
+  #day-view-card .cm-banner-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(180deg, rgba(8,45,32,0) 30%, rgba(8,45,32,.55) 100%); }
+  #day-view-card .cm-banner-caption { position: relative; z-index: 2; width: auto; align-self: auto; padding: 74px var(--g) 24px; }
+  #day-view-card .cm-name { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace;
+    letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.84); }   /* P4: the dot mint, the words white */
+  #day-view-card .cm-name::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  #day-view-card .day-card-name { margin: 10px 0 0; max-width: 330px; font: 900 var(--fs-display)/.94 'Barlow Condensed', sans-serif;
+    letter-spacing: .3px; text-transform: uppercase; color: #fff; text-wrap: balance; overflow-wrap: break-word; hyphens: auto; }
+  #day-view-card .cm-weeks { display: none; }
+  #day-view-card .dq-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  #day-view-card .dq-row:empty { display: none; }
+  #day-view-card .dq-chip { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px 0 14px; border: 0;
+    border-radius: 10px; cursor: pointer; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1.2px; text-transform: uppercase;
+    color: #fff; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,.3); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  #day-view-card .dq-chip::after { content: '\203A'; margin-top: -2px; font: 500 var(--fs-lead)/1 'Barlow', sans-serif; opacity: .6; }
+  #day-view-card .dq-chip.main { background: #fff; color: #0E4A36; box-shadow: none; }
+  #day-view-card .dq-chip:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+  /* 3. The panel and the session bar. The rail at the right edge is gone (the slim bar's line replaced it), and so is the
+     32 px it kept free. */
+  .v-progress { display: none; }
+  :where(#day-view) .day-content { padding: 0 0 120px; }
+  /* INTERIM: the pieces this block does not draw yet keep the gutter the full-bleed panel took away. Delete this rule when
+     the cards, the circuits and the finish move into this block. */
+  :where(#day-view) .day-content > :is(.checklist-item, .rd-banner, .session-confirm, .session-complete) { margin-left: var(--g); margin-right: var(--g); }
+
+  /* Before Start (P5): the bar is the cover's foot, inside the green, in the flow (not sticky): "Ready when you are", the
+     clock in white, Start (the lighter green, a light ring) and Guided (outlined white), then a hairline and the week's
+     limits with only their numbers in light clay. Reset joins the row when sets were logged without the clock. After
+     Done it says "Session duration" and the clock, nothing else. The first .session-timer-btn is Start/Pause, always
+     (renderTimer()). Grid areas place everything, so the DOM order (the limits row last) never matters. */
+  :where(#day-view) .session-timer { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "label time" "acts acts" "week week"; align-items: center; column-gap: 12px;
+    margin: 0; padding: 16px var(--g) 20px; border-top: 1px solid rgba(255,255,255,.08); background: var(--foot); color: #fff; }
+  :where(#day-view) .session-timer-leave, :where(#day-view) .session-timer-more, :where(#day-view) .stb-prog { display: none; }
+  :where(#day-view) .session-timer-body { display: contents; }
+  :where(#day-view) .session-timer-label { grid-area: label; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font: 400 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.6px; text-transform: uppercase; color: rgba(255,255,255,.72); }
+  :where(#day-view) .session-timer-time { grid-area: time; white-space: nowrap; color: #fff;
+    font: 700 32px/1 'Space Mono', monospace; letter-spacing: -.5px; font-variant-numeric: tabular-nums; }   /* display: the session clock, its box 32 px tall */
+  :where(#day-view) .session-timer-actions { grid-area: acts; display: flex; gap: 10px; min-width: 0; margin-top: 16px; }
+  :where(#day-view) .session-timer.finished .session-timer-actions { display: none; }
+  /* Start: beats the ONE PRIMARY BUTTON rule by weight (two classes, later) */
+  :where(#day-view) .session-timer .session-timer-btn { flex: 1.3 1 0; min-width: 0; display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; min-height: 52px; padding: 0 14px; border: 0; border-radius: 8px; cursor: pointer; white-space: nowrap; color: #fff;
+    background: var(--tile-on-green); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 10px 22px -10px rgba(0,0,0,.6);
+    font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; transition: transform 0.1s; }
+  :where(#day-view) .session-timer .session-timer-btn:active { transform: scale(0.97); }
+  :where(#day-view) .session-timer .session-timer-btn.guided { flex: 1 1 0; background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.5); }
+  :where(#day-view) .session-timer-reset[hidden] { display: none; }
+  :where(#day-view) .session-timer-reset:not([hidden]) { flex: none; display: inline-flex; align-items: center; justify-content: center; min-height: 52px;
+    padding: 0 14px; border: 0; border-radius: 8px; cursor: pointer; white-space: nowrap; color: #fff; background: transparent;
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.3); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+    text-transform: uppercase; }
+  :where(#day-view) .session-timer-reset.armed { background: var(--clay-fill); box-shadow: none; }   /* "Reset?": the second tap resets */
+  :where(#day-view) .session-timer button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  /* ▶ and the pause mark, drawn in mint: the glyphs (setTimerBtn()) render as colour emoji on some phones. The word stays text. */
+  :where(#day-view) .session-timer .stb-g { position: relative; flex: none; display: inline-block; width: 10px; height: 12px; overflow: hidden;
+    text-indent: 40px; white-space: nowrap; }
+  :where(#day-view) .session-timer .stb-g::before { content: ''; position: absolute; left: 1px; top: 0; border-style: solid;
+    border-width: 6px 0 6px 9px; border-color: transparent transparent transparent var(--mint); }
+  :where(#day-view) .session-timer [data-sym="pause"] .stb-g::before { top: 1px; width: 3px; height: 10px; border: 0; border-radius: 1px;
+    background: var(--mint); box-shadow: 5px 0 0 var(--mint); }
+  /* The week's limits (weekLimitsHTML()): "THIS WEEK  MAX RPE 7 · 1 SET FEWER", the numbers in light clay (they ask the
+     athlete to hold back; #E06B43 reads on the green). It flows as text and wraps at a word. */
+  :where(#day-view) .session-timer-week { grid-area: week; display: block; margin: 16px 0 0; padding: 13px 0 0; border-top: 1px solid rgba(255,255,255,.10);
+    font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: #fff; }
+  :where(#day-view) .session-timer-week .stw-k { margin-right: 10px; font: inherit; font-weight: 400; letter-spacing: inherit; color: rgba(255,255,255,.62); }
+  :where(#day-view) .session-timer-week b { font-weight: 700; white-space: nowrap; }
+  :where(#day-view) .session-timer-week em { color: var(--clay-on-green); }
+  :where(#day-view) .session-timer-week i { margin: 0 8px 0 0; color: rgba(255,255,255,.4); }   /* the space before it is the markup's */
+  .session-timer-week em { font-style: normal; }   /* the numbers' wrapper, wherever the row is drawn (Guided too) */
+
+  /* The SLIM bar (P9), from Start until Done: a 56 px green strip, sticky at the top: ← HOME · the clock (centred between
+     ← Home and Pause) · PAUSE outlined white with the mint pause mark · ⋯, and a 3 px mint line along the bar's foot that
+     fills as sets are done (updateProgress() writes its width). The week's limits stay under the strip, on a darker green.
+     At 320 px no word goes. */
+  :where(#day-view) .session-timer.slim { position: sticky; top: 0; z-index: 40; grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-rows: 56px auto; grid-template-areas: "leave time acts more" "week week week week"; column-gap: 4px;
+    padding: 0 4px 0 2px; border-top: 0; background: var(--bar); }
+  body.is-demo :where(#day-view) .session-timer.slim { top: 44px; }   /* under the demo banner */
+  :where(#day-view) .session-timer.slim .session-timer-leave { grid-area: leave; display: inline-flex; align-items: center; gap: 6px; min-width: 44px;
+    min-height: 44px; padding: 0 10px; border: 0; background: none; cursor: pointer; color: #fff; white-space: nowrap;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  /* the ← drawn (P9's short, bold arrow; the glyph is a thin long one in most fonts): the text moves out of its box */
+  :where(#day-view) .session-timer.slim .session-timer-leave span[aria-hidden] { flex: none; width: 18px; height: 18px; overflow: hidden;
+    text-indent: 40px; white-space: nowrap; background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M11 18l-6-6 6-6'/%3E%3C/svg%3E") center / 18px no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M11 18l-6-6 6-6'/%3E%3C/svg%3E") center / 18px no-repeat; }
+  :where(#day-view) .session-timer.slim .session-timer-label { display: none; }
+  :where(#day-view) .session-timer.slim .session-timer-time { justify-self: center; font-size: var(--fs-title); letter-spacing: 0; }
+  :where(#day-view) .session-timer.slim .session-timer-actions { gap: 6px; margin: 0; }
+  :where(#day-view) .session-timer.slim .session-timer-btn { flex: none; min-height: 44px; padding: 0 14px; gap: 7px; font-size: var(--fs-body);
+    background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.45); }
+  :where(#day-view) .session-timer.slim .session-timer-btn.guided, :where(#day-view) .session-timer.slim .session-timer-reset { display: none; }
+  :where(#day-view) .session-timer.slim .session-timer-more { grid-area: more; display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; padding: 0; border: 0; border-radius: 8px; background: none; cursor: pointer; color: #fff;
+    font: 700 var(--fs-title)/1 'Barlow', sans-serif; letter-spacing: 1px; }
+  :where(#day-view) .session-timer.slim .session-timer-week { margin: 0 -4px 0 -2px; padding: 7px var(--g) 10px; border-top: 0; background: rgba(0,0,0,.18); }
+  :where(#day-view) .session-timer.slim .stb-prog { display: block; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: rgba(255,255,255,.12); pointer-events: none; }
+  :where(#day-view) .stb-prog i { display: block; width: 0; height: 100%; border-radius: 0 2px 2px 0; background: var(--mint);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+  /* ⋯ open: Pause, Guided and Reset on a second row, still on the green (the first row keeps ← Home, the clock and ⋯) */
+  :where(#day-view) .session-timer.slim.open { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: 56px auto auto;
+    grid-template-areas: "leave time more" "acts acts acts" "week week week"; }
+  :where(#day-view) .session-timer.slim.open .session-timer-actions { gap: 8px; padding: 6px 8px 12px 10px; }
+  :where(#day-view) .session-timer.slim.open .session-timer-actions > * { flex: 1 1 0; min-width: 0; }
+  :where(#day-view) .session-timer.slim.open .session-timer-btn.guided { display: inline-flex; }
+  :where(#day-view) .session-timer.slim.open .session-timer-reset:not([hidden]) { display: inline-flex; min-height: 44px; }
+  :where(#day-view) .session-timer.slim.open .session-timer-more { background: rgba(255,255,255,.12); color: var(--mint); }
+  @media (max-width: 359px) {
+    :where(#day-view) .session-timer-actions { gap: 8px; }
+    :where(#day-view) .session-timer.has-reset:not(.slim) .session-timer-btn { padding: 0 8px; font-size: var(--fs-body); }
+    :where(#day-view) .session-timer-reset:not([hidden]) { padding: 0 10px; }
+    :where(#day-view) .session-timer-week, :where(#day-view) .session-timer-week .stw-k { letter-spacing: .4px; }
+    :where(#day-view) .session-timer-week .stw-k { margin-right: 8px; }
+    :where(#day-view) .session-timer-week i { margin: 0 6px 0 0; }
+    :where(#day-view) .session-timer.slim .session-timer-leave { padding: 0 8px 0 10px; gap: 5px; }
+    :where(#day-view) .session-timer.slim .session-timer-btn { padding: 0 10px; gap: 6px; }
+    :where(#day-view) .session-timer.slim.long .session-timer-time { font-size: var(--fs-lead); }   /* "1:05:12", so every word stays */
+  }
+
+  /* 4. The first-session hint (P66): a green tile with Amir's photo (the week note's .wn-av), his words in white with the
+     named controls bold, GOT IT in mint, a notch at what it explains. paintHints() places it after the bar, the live set
+     or the set whose How hard? just opened; ONB_TEXT holds the words. */
+  :where(#day-view) .onb-hint { position: relative; grid-column: 1 / -1; display: flex; align-items: flex-start; gap: 12px; margin: 14px var(--g) 6px;
+    padding: 14px 6px 10px 14px; border-radius: 14px; cursor: default; text-align: left; color: #fff; background: var(--tile);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 10px 24px -14px rgba(0,0,0,.5); animation: onbIn 0.22s ease both; }
+  :where(#day-view) .onb-hint::before { content: ''; position: absolute; top: -6px; left: 30px; width: 12px; height: 12px; border-radius: 2px;
+    background: #175F46; transform: rotate(45deg); }
+  /* the notch under Start's middle: Start is 1.3 of the row's 2.3 shares, less the 10 px gap */
+  :where(#day-view) .onb-hint[data-k="bar"]::before { left: calc((100% - 10px) * 0.2826 - 6px); }
+  :where(#day-view) .ex-set-log .onb-hint { margin: 6px 0 10px; }
+  :where(#day-view) .onb-hint[data-k="set"]::before { left: auto; right: 16px; }   /* at the set's circle, the row's last 44 px */
+  :where(#day-view) .onb-hint[data-k="rpe"]::before { left: 58%; }                  /* at the 6 to 10 keys */
+  :where(#day-view) .onb-hint .wn-av { width: 32px; height: 32px; margin: 0; box-shadow: 0 0 0 2px rgba(255,255,255,.85); }
+  :where(#day-view) .onb-hint p { flex: 1; min-width: 0; margin: 0; padding-bottom: 4px; font: 500 var(--fs-body)/1.45 'Barlow', sans-serif;
+    letter-spacing: 0; text-transform: none; color: #fff; text-wrap: pretty; }
+  :where(#day-view) .onb-hint b { font-weight: 700; color: #fff; }
+  :where(#day-view) .onb-hint-ok { flex: none; min-width: 44px; min-height: 44px; margin-top: -10px; padding: 0 10px; border: 0; background: none;
+    cursor: pointer; color: var(--mint); font: 700 var(--fs-small)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* 5. Block titles, quiet: 15 px condensed capitals in green and a hairline to the edge, the block's rest at its end. A
+     block whose only item has its name (.same-name, sameNameBlock()) hides its title; the header node stays. */
+  :where(#day-view, #ws-body) .section-header-prog { display: flex; align-items: center; gap: 12px; margin: 0; padding: 28px 0 4px; }
+  :where(#day-view) .section-header-prog { padding-left: var(--g); }
+  :where(#ws-body) .section-header-prog:first-child { padding-top: 0; }   /* #ws-body's own 22 px margin is the air above */
+  :where(#day-view, #ws-body) .section-icon { display: none; }
+  :where(#day-view, #ws-body) .section-title { flex: none; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .8px;
+    text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view, #ws-body) .section-header-prog::after { content: ''; order: 1; flex: 1; height: 1px; background: var(--hair); }
+  :where(#day-view, #ws-body) .section-rest { order: 2; flex: none; white-space: nowrap; font: 400 var(--fs-label)/1 'Space Mono', monospace;
+    letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  :where(#day-view) .section-rest { margin-right: var(--g); }
+  :where(#day-view, #ws-body) .checklist-item.block-warmup + .section-header-prog.block-warmup { padding-top: 18px; }
+  :where(#day-view, #ws-body) .section-header-prog.same-name { display: none; }
+  :where(#day-view, #ws-body) .section-header-prog.same-name + .checklist-item { margin-top: 18px; }
+  :where(#day-view, #ws-body) .section-header-prog:has(+ .checklist-item:not(.collapsed):not(.block-warmup)) { margin-bottom: 12px; }
+
+  /* 6. Scroll margins. foldWhenDone() scrolls the next card to the top (block: start), under the slim bar (56 px, 87 with
+     the week's limits row, 14 more when that row wraps at 320 px) and the demo banner's 44 px, plus 16 px: Chrome's
+     smooth scroll stops about 16 px short of an instant one (measured 2026-10-12, before this re-skin too), and the open
+     card's head must never slide under the bar. Done turns the bar back into the full one, in the flow, so the finished
+     card goes to the top. */
+  :where(#day-view) .checklist-item { scroll-margin-top: 72px; }
+  :where(#day-view) .day-content.has-week .checklist-item { scroll-margin-top: 104px; }
+  body.is-demo :where(#day-view) .checklist-item { scroll-margin-top: 116px; }
+  body.is-demo :where(#day-view) .day-content.has-week .checklist-item { scroll-margin-top: 148px; }
+  @media (max-width: 359px) {
+    :where(#day-view) .day-content.has-week .checklist-item { scroll-margin-top: 118px; }
+    body.is-demo :where(#day-view) .day-content.has-week .checklist-item { scroll-margin-top: 162px; }
+  }
+  :where(#day-view) .session-complete { scroll-margin-top: 16px; }
+  body.is-demo :where(#day-view) .session-complete { scroll-margin-top: 60px; }
 </style>
 </head>
 <body>
@@ -6761,7 +6784,9 @@ function paintHints(day) {
   el.className = 'onb-hint';
   el.dataset.k = want.k;
   el.setAttribute('role', 'note');
-  el.innerHTML = `<p>${ONB_TEXT[want.k](want.at)}</p><button type="button" class="onb-hint-ok">Got it</button>`;
+  // Amir's photo, the one the week note signs with (Centre Court, P66): the hint is his voice.
+  el.innerHTML = `<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span>`
+    + `<p>${ONB_TEXT[want.k](want.at)}</p><button type="button" class="onb-hint-ok">Got it</button>`;
   el.addEventListener('click', e => e.stopPropagation());   // a tap on it never folds the card under it
   el.querySelector('.onb-hint-ok').addEventListener('click', () => { onbSeen(want.k); dropHint(); paintHints(day); });
   want.at.after(el);
@@ -7066,8 +7091,10 @@ function weekLimitsHTML(cycle, day) {
   if (!bits.length) return '';
   const name = n.title || (weekNoteLast(cycle, n) ? 'Back-off week' : 'This week');
   // Each dot rides with the item after it, so a wrapped line never ends on a dot. The spaces between the pieces are
-  // for a screen reader (a flex row does not draw them).
-  return `<div class="session-timer-week"><span class="stw-k">${esc(name)}</span> ${bits.map((b, i) => `<b>${i ? '<i aria-hidden="true">·</i>' : ''}${esc(b)}</b>`).join(' ')}</div>`;
+  // for a screen reader (a flex row does not draw them). The numbers sit in <em>, so the day view's green bar can colour
+  // only them (Centre Court, 2026-10-12); Guided's copies colour the whole row and keep em upright.
+  const nums = s => String(s).split(/(\d+)/).map((x, k) => k % 2 ? `<em>${x}</em>` : esc(x)).join('');
+  return `<div class="session-timer-week"><span class="stw-k">${esc(name)}</span> ${bits.map((b, i) => `<b>${i ? '<i aria-hidden="true">·</i>' : ''}${nums(b)}</b>`).join(' ')}</div>`;
 }
 
 // Map a day to ONE of eight category pictures. Eight files cover every day of
@@ -7906,10 +7933,11 @@ function renderHome() {
       </div>
       <div class="session-timer-actions">
         <button type="button" class="session-timer-btn" onclick="toggleSessionTimer('${day.id}')">Start ▶</button>
-        ${hasStandard ? `<button type="button" class="session-timer-btn guided" onclick="openGuided('${day.id}')">Guided ▶</button>` : ''}
+        ${hasStandard ? `<button type="button" class="session-timer-btn guided" onclick="openGuided('${day.id}')">Guided<span class="stb-g" aria-hidden="true"> ▶</span></button>` : ''}
         <button type="button" class="session-timer-reset" hidden onclick="armedTap(this, 'Reset?', () => resetDay('${day.id}'))">Reset</button>
       </div>
       <button type="button" class="session-timer-more" aria-expanded="false" aria-label="More: Guided and Reset" onclick="toggleBarMore('${day.id}')">⋯</button>
+      <div class="stb-prog" role="progressbar" aria-label="Sets done in this session" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div>
       ${limits}
     </div>`;
     // Today's targets: filled by paintToday() after a lower-day check-in (REC-2).
@@ -7924,7 +7952,7 @@ function renderHome() {
       // times; stating it on the section header says it once and still lets any
       // exercise override with its own rx.rest.
       const blockRest = (typeof block.rest === 'number' && block.rest > 0) ? block.rest : 0;
-      html += `<div class="section-header-prog ${blockClass}"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span>${
+      html += `<div class="section-header-prog ${blockClass}${sameNameBlock(block, blockRest) ? ' same-name' : ''}"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span>${
         blockRest ? `<span class="section-rest">Rest ${esc(formatRestLabel(blockRest))}</span>` : ''}</div>`;
       block.exercises.forEach(ex => {
         html += renderExercise(ex, day.id, exerciseNum++, blockClass, block.title, blockRest);
@@ -8050,6 +8078,14 @@ function blockCategory(title, blockIndex) {
   // Fallback for unknown / future block types — cycles warmup → strength → power → warmup …
   const fallback = ['block-warmup', 'block-strength', 'block-power'];
   return fallback[(blockIndex || 0) % fallback.length];
+}
+// A block whose only item carries the block's own name ("Dynamic Mobility" over "Dynamic Mobility") and no written
+// rest says its name twice: its header gets .same-name and the day view hides the title (Centre Court, Amir 2026-10-12).
+// The header node stays. Both block-header templates (the training day and a Library session) ask it.
+function sameNameBlock(block, rest) {
+  const list = block && block.exercises;
+  const norm = s => String(s || '').trim().toLowerCase();
+  return !rest && Array.isArray(list) && list.length === 1 && !!norm(block.title) && norm(list[0] && list[0].name) === norm(block.title);
 }
 
 // Convert a duration string into seconds. Handles "2 min", "2m", "90 sec",
@@ -8983,7 +9019,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). In a week where my note sets a limit, a thin line under it keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, my note for the week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so: your cycle card reads <strong>Cycle complete</strong>, and there's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The "Why This Cycle Matters" note on <strong>Game Plan</strong> explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -10697,7 +10733,7 @@ async function openWorkout(file) {
     // the training day: the header says it once, every timer in the section uses it, and an exercise's own
     // rx.rest overrides it. The training-day header (search section-rest) is the other copy: change both.
     const blockRest = (typeof block.rest === 'number' && block.rest > 0) ? block.rest : 0;
-    html += `<div class="section-header-prog ${blockClass}"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span>${
+    html += `<div class="section-header-prog ${blockClass}${sameNameBlock(block, blockRest) ? ' same-name' : ''}"><div class="section-icon">${block.icon || ''}</div><span class="section-title">${esc(block.title)}</span>${
       blockRest ? `<span class="section-rest">Rest ${esc(formatRestLabel(blockRest))}</span>` : ''}</div>`;
     (block.exercises || []).forEach(ex => {
       html += renderExercise(ex, 'ws', num++, blockClass, block.title, blockRest);
@@ -11091,7 +11127,13 @@ function updateProgress(day) {
     }
   }
 
-  document.getElementById('v-fill').style.height = (done / total * 100) + '%';
+  // The progress line along the foot of the slim session bar (Centre Court, Amir 2026-10-12: P9). It replaced the
+  // rail at the screen's right edge; #v-fill stays in the DOM (hidden) and gets the same width.
+  const pct = done / total * 100;
+  const vFill = document.getElementById('v-fill');
+  if (vFill) vFill.style.width = pct + '%';
+  const line = document.querySelector('#timer-' + day + ' .stb-prog');
+  if (line) { line.firstElementChild.style.width = pct + '%'; line.setAttribute('aria-valuenow', String(Math.round(pct))); }
 
   const confirmEl  = document.getElementById('confirm-'  + day);
   const completeEl = document.getElementById('complete-' + day);

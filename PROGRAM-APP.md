@@ -903,12 +903,13 @@ tints, the running bar, labels, and so it marked nothing. Now:
   button, a circuit's Last time strip and the ghost line under a set that ran over), the tempo digit, a banner that asks
   for something (a day filed unfinished, a report waiting), a suggestion's kicker (LIB-01: *Sore today*, *Week done*),
   the numbers in a week note's headline (Front Page, 2026-10-12: *RPE 7*, *One set fewer*), and the same numbers on
-  the session bar's limits row (*Max RPE 7 · 1 set fewer*; its label stays grey),
+  the session bar's limits row (*Max RPE 7 · 1 set fewer*; only the numbers, light clay `#E06B43` on the green bar
+  since Centre Court, the words white and the label a paler white),
   and the one number on a dark Home card (*Week 2*, the habits row's *2 to go*). The Library's Playbook door keeps its clay: it is a brand tile, not a signal.
 - **Green or grey for everything else**: every block's title, stripe and done tint are the same green (warm-up
   and power were clay and strength green, and a block the app did not recognise took its colour from its
   position, so *Core* was clay because it was third; `blockClass()` still names the type for the code); the
-  rule under a block title is grey; the running session bar, its clock and Pause; Guided; *Good afternoon*
+  rule under a block title is grey; the session bar (green since Centre Court), its clock and Pause; Guided; *Good afternoon*
   (grey); Game Plan's labels, aim numbers and *Up next!*; *+ Log a max* and *How this works* on Records; and the
   Log a max form (2026-09-27, found by DOC-01): its estimate green like Records' own number, its unit and a *good*
   grade grey, the picker's chevrons grey, its inputs' borders neutral in dark mode, and Save the primary button.
@@ -962,32 +963,69 @@ size is a token in `:root`, picked by its job:
   joins that list; a secondary one is outlined** (Guided, Reset).
 - AA Proof's type (Outfit, its own sizes) goes with SEAM-01; its labels are 11 px at the least since #286.
 
+## 🎾 Centre Court: the training day, re-skinned (2026-10-12)
+
+Amir: *"lets go with E. exercise number inside the circle. but with P4, P5, P9, P50, P66."* E is the design
+direction "Centre Court": the day reads like a calm programme on paper, and only one strong green thing is on
+screen at a time (the cover before Start, the open lift's head mid-session, the finish band at the end). The
+P-numbers are parts he picked from the other directions. All of it is ONE CSS block at the end of
+`program.html`'s stylesheet (**CENTRE COURT**), scoped to the day view, Guided's moved card parts and Library
+sessions (`:where(#day-view, .step-scroll, #ws-body)`); Home, Game Plan, Records, the About sheet and the
+dashboard do not change.
+
+- **Tokens.** The block declares the day's paper and ink (`--paper`, `--sand`, `--hair`, `--ink`, `--grey`, …)
+  for light and dark, the greens (`--hero`, `--foot`, `--bar`, `--tile`, `--tile-on-green`), and **`--clay-ink`
+  `#B5461F` in light mode inside that scope only**: small clay text on the paper reads 5.1:1 (`#C7552F` is 4.1:1).
+  Fills and anything 18.66 px bold or more keep `#C7552F`; dark keeps `#E06B43`. `--g` is the gutter: 20 px, 16
+  under 360. The panel is **full-bleed**: `.day-content` has no side padding (the rail's 32 px went with the rail).
+- **The cover** (D's P4): the day's photo graded into the green, ← and the moon as 44 px glass buttons, the
+  *● DAY 1* eyebrow (a mint dot), the focus in 44 px capitals, and what the day builds as tiles with a › (each still opens its
+  quality, `paintDayQualities()`; the first is white). About 270 px at 390. *N blocks · M movements* is hidden.
+  `dayCardHTML()` draws Home's cards too, so the cover is CSS on `#day-view-card` only: its markup is unchanged.
+- **The session bar** (A's P5 before Start, P9 after it) and its progress line: *The session bar* below.
+- **The first-session hint** (A's P66): *First-session hints* below.
+- **Block titles**, quiet: 15 px condensed capitals in green with a hairline to the screen's edge and the block's
+  rest at its end. A block whose only item has the block's name (*Dynamic Mobility* over *Dynamic Mobility*) and no
+  written rest hides its title: `sameNameBlock()` adds `.same-name` in both block-header templates (the day and a
+  Library session); the header node stays.
+- **Scroll margins**: `foldWhenDone()` lands the next card right under the slim bar: 72 px, 104 with the week's
+  limits row (118 under 360, where that row can wrap), plus 44 in the demo. The 16 px over the bar's height is
+  Chrome's smooth scroll stopping short of an instant one (measured on the old bar too).
+
 ## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26 and 2026-09-27)
 
-**Before Start** the session bar (`.session-timer`) is the full bar: under 480 px two rows (label and clock on
-one line, Start and Guided full width under it; three with the week's limits row), and at any width the buttons wrap before the clock shrinks. The
-label is one line ("Ready when you are", "In progress", "Paused", "Session duration"). A Home day card
+**Before Start** the session bar (`.session-timer`) is the full bar, and since Centre Court (2026-10-12, A's P5) it is
+the day's cover's foot, inside the green and in the flow (not sticky): the label and the 32 px white clock on one
+line, **Start** (the lighter green, a light ring) and **Guided** (outlined white) under it, then a hairline and the
+week's limits row. **Reset** joins that row when sets were logged without the clock. After Done it is the label
+(*Session duration*) and the clock. The label is one line ("Ready when you are", "In progress", "Paused",
+"Session duration"). A Home day card
 started today and not finished (`dayInProgress()`) shows *In progress* on its banner and **Resume ▶** under
 it (`.dc-live`); a day done this week is a small `.dc-row` (HOME-02). `paintWeek()` redraws them whenever
 the day view closes (`paintDayCardPills()` is no longer called).
 
 **From Start until Done it is the slim bar** (Amir, 2026-09-27, option C of the mockup at
 https://claude.ai/artifact/CiUjm5sF3cz4YhGzJCR1WY). `renderTimer()` sets `.slim` when the day's clock has
-started, is not finished and is inside the 6 h grace. One line, 54 px: **← Home** · the clock · **Pause** (or
-Resume) · **⋯**. The label goes (the clay clock and Pause / Resume say it). In a week whose note sets a limit the bar
-also has a thin last row, the week's limits (`weekLimitsHTML()`, *Week notes* above): about 82 px then. **⋯** (`toggleBarMore()`) opens
+started, is not finished and is inside the 6 h grace. Since Centre Court (A's P9) it is a green strip, 56 px, sticky
+at the top (under the demo banner in the demo): **← Home** · the white clock, centred between ← Home and Pause ·
+**Pause** (or Resume) outlined white with the mint pause mark · **⋯**, and a **3 px mint line along the bar's foot**
+that fills as sets are done. That line replaced the grey rail at the screen's right edge (`#v-progress`, hidden;
+`updateProgress()` writes the same width to `#v-fill` and to the bar's `.stb-prog`, which carries the progressbar
+role). The label goes (the clock and Pause / Resume say it). In a week whose note sets a limit the bar
+also has a last row on a darker green, the week's limits (`weekLimitsHTML()`, *Week notes* above): 87 px then. **⋯** (`toggleBarMore()`) opens
 Pause, Guided and Reset on a row under the first line (the limits row stays last); `foldBarMore()` folds it (and resets `aria-expanded`) when Guided opens,
 the day closes or the bar stops being slim. **The tab bar hides** while a slim day is open (`body.session-on`,
 `paintSessionChrome()`, called from `renderTimer()`, `switchDay()` and `closeDayView()`): ← Home or the
 phone's Back closes the day, the clock keeps running and Home shows In progress · Resume. On an iPhone SE the
 two bars covered 26% of the screen mid-session; now 9% (about 12% in a week with the limits row).
 
-- **It never cuts the clock.** Past an hour the clock is seven characters (`.long`, set by `renderTimer()` and
-  the 1 s tick): under 420 px "Home" becomes the arrow alone and the clock steps to 22 px. Under 360 px the
-  arrow is always alone and Pause / Resume shows its symbol only, drawn in CSS (`data-sym`; the ⏸ glyph alone
-  renders as a square, which reads as stop), with the word as its aria-label. Measured in every state (before,
-  running, past an hour, paused, ⋯ open) at 320, 360, 375 and 390 px in both themes: nothing overlaps, every
-  button is 44 px.
+- **It never cuts the clock, and since Centre Court it never drops a word.** ▶ and the pause mark are drawn in CSS
+  in mint on every button (`data-sym`; the glyphs render as colour emoji or a square on some phones), and the word
+  stays text. At 320 px ← HOME, the 22 px clock, PAUSE and ⋯ fit with room to spare; past an hour (`.long`, seven
+  characters, set by `renderTimer()` and the 1 s tick) the clock steps to 18 px under 360 px so every word stays.
+  Measured before Start, running and with ⋯ open at 320 and 390 px, light and dark: nothing overlaps, every
+  button is 44 px (52 before Start), no sideways scroll. (Before Centre Court the narrow bar dropped "Home" and
+  showed Pause as its symbol alone.)
 - A control added to the session bar goes on the slim line or under ⋯, and is measured the same way.
 
 ## ⏲️ The rest timer keeps time in a pocket (WK-02, 2026-09-27)
@@ -1158,6 +1196,11 @@ lived only in the guide, two tabs away. Now three hints, `paintHints(day)` in `p
   preview; always in the demo, where everyone is new.
 - The words name real controls, like the guide (CNT-01): rename Start, Guided or the circle and change
   `ONB_TEXT` in the same PR.
+- **The look** (Centre Court, A's P66, 2026-10-12): a green tile with Amir's photo (the week note's `.wn-av`, so the
+  hint is his voice), his words in white with the named controls bold, **GOT IT** in mint, and a notch pointing at
+  what it explains: under Start's middle for `bar` (the hint sits under the green bar, on the paper), at the set's
+  circle for `set`, at the 6 to 10 keys for `rpe`. Move the circle or the keys and re-aim the notch in the Centre
+  Court block.
 
 ## 🔥 Warm-ups are a list, and a circuit's rest is never invented (WK-05, 2026-09-27)
 
