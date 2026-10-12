@@ -119,7 +119,8 @@ const state = p => p.evaluate(() => ({
   // same day number, sits in this Monday–Sunday. It must not tick the new cycle's day; a cycle that has started still counts.
   {
     const monday = new Date(); monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
-    const old = [{ completed_on: ymd(new Date(monday.getTime() - monday.getTimezoneOffset() * 60000)), day: '1', readiness: 4, log: [
+    // ymd() already reads the LOCAL day. (It used to shift by the zone's offset first, which made "this Monday" read as the next day when run on a Monday between 23:00 and midnight in BST: the check failed for that hour.)
+    const old = [{ completed_on: ymd(monday), day: '1', readiness: 4, log: [
       { ex: 'Barbell Back Squat', block: 'Strength', reps: 6, note: '', sets: [{ w: '70', n: 6, r: '7', d: true }] }] }];
     const startsIn = (n, idx = 1) => {
       const P = H.fixture(); P.currentCycleIndex = idx;
