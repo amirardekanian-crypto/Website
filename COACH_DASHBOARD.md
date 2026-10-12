@@ -107,10 +107,35 @@ reads; the phone gets only the muscles from *Counts toward* and whether each is 
 `/program-design` filters on the flags and `check_program.py` counts volume and day load from the
 counts and cost.
 
+**The layout: three sub-tabs, and the editor beside the list (2026-10-12, round 2 of the coach UX pass).** The tab was six panels on one
+page (an intro, Coverage, the ten qualities, the Quality check, the list, two warning folds) and the editor, 1,500 px tall, opened inside
+a list of 370. It is three sub-tabs now, styled like the athlete file's (`.subrail` / `.stab`), each with its own address so it can be
+bookmarked and reloaded: **Entries** (`#exercises`), **Qualities** (`#exercises/qualities`), **Coverage** (`#exercises/coverage`);
+anything else after the slash reads as Entries (`routeOf()`, `EX_SUBS`). The Coverage label carries a clay count: the cards that show
+something else on a phone plus the names not in the Spine.
+- **Entries** is the daily work: one short line, the search box and the three filters (Drafts, Claude's drafts, Approved), and, when Coverage
+  has something to fix, one clay line that links to it. **From 1000 px up the list (about 380 px wide) and the editor sit side by side**,
+  each scrolling on its own inside the height the window leaves (`spineFit()` measures it from the top of the split to the bottom of the
+  window, so the page does not scroll; the editor's Save bar is stuck to the bottom of its own pane). Nothing open: the right side says *Pick an
+  exercise to edit it.* The open row is highlighted and says *Editing*; tapping it does nothing, **Close** closes. **Below 1000 px** the list is the
+  page and an open entry takes its place, full width, with **← All exercises** above it (it is Close, guard included); the page jumps to the
+  editor when it opens and back to where the list was when it closes. A redraw (a search, a save, the levels arriving) puts both scroll
+  positions back; a new search or filter starts the list at the top and a different entry starts the editor at the top. The editor lives
+  beside the list now, so **a filter or a search no longer closes it**: what is typed in it is carried across. The editor's content, field order,
+  folds, History and buttons are unchanged; it gained a heading with the entry's name and its status, because it no longer sits under its row.
+  The long explanation that used to be the page's first line is in a *How this works* fold at the bottom.
+- **Qualities** is the ten qualities as a table (name, one line, on court, how it is measured, status and its buttons), stacked with labels on a
+  phone, with the **Quality check** under it, open. Its long paragraphs are in *How this works* folds.
+- **Coverage** is the bar, four counts (approved entries, drafts waiting, entries with Claude's draft to read, approved with no How to do it),
+  then *Cards that show something else on a phone* and *Not in the Spine yet*, both open. The long sentence is in a fold.
+- **Typed work is guarded across the three.** The editor is only on Entries, so moving to another sub-tab, to another tab, or ↻ Refresh with
+  unsaved changes (an entry, or the quality texts) asks first (`spineMayLeave()`, in the `hashchange` listener); a No stays where you were
+  with the typing. A sub-tab and the open entry are remembered: leave and come back and the same entry is open.
+
 The tab opens on **Drafts** while there are any, else on **Approved**, and the search box finds an
 entry across both by name, other name, pattern, equipment or id. *Coverage* and *Doing it now* count
 every card in a programme with workouts, **circuit items included** (before 2026-10-10 they skipped
-circuits, a third of all cards). *Not in the Spine yet* lists the names still without an entry,
+circuits, a third of all cards). *Not in the Spine yet* (Coverage) lists the names still without an entry,
 most-used first, each with **Copy /spine add** (one tap puts `/spine add <name>` on the clipboard for Claude) and a **Copy /spine add for all N** at
 the top (the command, then one `- name` per line; each becomes a draft for you to approve) (audit FLOW-13, 2026-10-11).
 **The entry editor folds what you rarely touch** (audit SPINE-7): *Body parts and the body map* and *Coach only: SFR, flags, counts, cost* are closed
@@ -121,7 +146,7 @@ open across a redraw, and a save sends whatever is in the folded parts exactly a
 is found among those. A card that names its entry (`exId`) shows that entry **or nothing** on the phone and on the dashboard alike: a
 card on a draft has no cues and no video until you approve it (it used to fall back to the closest approved entry by name, so
 "Machine Seated Leg Curl" showed "Seated Leg Curl"'s cues and video). A card with no `exId` is found by its name tiers, as before.
-*Coverage* says how many card names show something else on a phone, and the list at the bottom, *Cards that show something else on a
+*Coverage* (the sub-tab; Entries has a clay line that links to it) says how many card names show something else on a phone, and the list under it, *Cards that show something else on a
 phone*, gives each one: what you see here, and what the phone shows (nothing, or the closest approved entry). The video next to an
 exercise in the compare view is the phone's too, so a draft's video does not appear until the draft is approved.
 
@@ -135,7 +160,7 @@ while you review them. A save sends **only the fields you changed**, so a court 
 or a cost Claude wrote after you opened the tab survives your edit to a video. If Claude (or another
 tab) changed one of the *same* fields, nothing is saved and a box shows both values: Save again puts
 yours over theirs, Close keeps theirs. Typed work survives a redraw (a search, a quality save, the
-levels arriving), and opening another entry, switching the list, ↻ Refresh or leaving the tab with
+levels arriving, a filter), and opening another entry, switching sub-tab, ↻ Refresh or leaving the tab with
 unsaved changes asks first. A **rename** of an entry live cards use is refused with the cards it would
 break: one name per exercise, and a rename has to move the cards and their logged history too, which
 is `/spine`'s *One name in live programmes* job. A name or other name that is already another entry's
@@ -183,7 +208,7 @@ and names a step over 90 characters (aim shorter) or over 140 (it will not save)
 or a step over 140 characters before anything leaves the page: those are the database's own limits
 (`spine_steps_ok()`), so nothing is refused twice. The steps reach phones with the entry, in `get_exercises()`.
 They are in History as **Steps**, numbered, and Undo puts them back like any other field. The list marks an
-entry with **no steps** in clay, and the Coverage line counts the approved entries with no How to do it. The
+entry with **no steps** in clay, and Coverage counts the approved entries with no How to do it. The
 cue boxes now say what each line is for (CUE-1): **Cues** is the key point, then a feel or a check; **Don't** is
 the one fault, then the fix.
 
@@ -199,8 +224,8 @@ drafts waiting and does not ask, because a draft is not your unsaved work; a dis
 first. A draft is shown only while its `old` still equals what the entry holds. One that no longer matches (you
 edited the field since) is stale: it is not shown, a quiet line says so, and Claude's next `/spine` run drops
 it. When two drafts wait for one field, the newest is shown and the line says so. Other proposals on the list (a
-link, a count) are never touched by Save: they stay for Claude's `/spine` yes/no. The Coverage line
-says how many entries have **Claude's draft to read**, the list marks each one, and a **Claude's drafts** filter
+link, a count) are never touched by Save: they stay for Claude's `/spine` yes/no. Coverage
+says how many entries have **Claude's draft to read** (a clay count), the list marks each one, and a **Claude's drafts** filter
 (beside Drafts and Approved) lists them; the tab opens on it when there are no new drafts to approve. If Claude
 adds a draft while you have the entry open, your Save is refused whole (the list changed under you), the box
 shows the list as it is now, and Save again goes through.
@@ -212,7 +237,7 @@ shows the list as it is now, and Save again goes through.
 - **Qualities on every entry.** Three selects, first = primary. Where Claude suggested tags for
   an entry you had already approved, they arrive pre-filled and marked, and are saved only when
   you save.
-- **Quality check.** One row per athlete, in plain words: the cycle and what its picture word says
+- **Quality check** (the Qualities sub-tab, under the ten, open). One row per athlete, in plain words: the cycle and what its picture word says
   it is meant to build (iron = Strength, voltage = Power …), what the current week trains most in
   working sets a week (an exercise's second quality counts half a set, warm-ups don't count), and a
   verdict: ✓ in the top two, or ⚠ *only #4 this week*. Foundation (bedrock), peaking and recovery

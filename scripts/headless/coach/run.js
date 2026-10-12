@@ -1841,8 +1841,10 @@ S['spine-draft-prefill'] = async (b) => {
   const r = { id: 'spine-draft-prefill', title: "Claude's drafts: counted, listed, pre-filled and marked; a stale one is not shown; closing asks nothing", checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'exercises' });
   dismissDialogs(page, log);
+  await L.go(page, 'exercises/coverage');   // the counts are on the Coverage sub-tab, as tiles
   const cov = await page.locator('#content').innerText();
-  check(r, "the page says how many entries have a draft from Claude to read", /1 with Claude’s draft to read/.test(cov), cov.slice(0, 500));
+  check(r, "the page says how many entries have a draft from Claude to read", /1\s+With Claude’s draft to read/.test(cov), cov.slice(0, 500));
+  await L.go(page, 'exercises');
   const fb = page.locator('.sp-filter[data-f="claude"]');
   check(r, "a Claude's drafts filter, with the count", (await fb.count()) === 1 && /Claude’s drafts · 1/.test(await fb.innerText()), (await fb.count()) ? await fb.innerText() : 'no button');
   await fb.click(); await L.settle(page, 300);
@@ -2266,7 +2268,7 @@ S['quality-day-cards'] = async (b) => {
     row.data = d; row.updated_at = new Date(Date.now() + 1000).toISOString();
   });
   await page.evaluate(() => { S.spine = null; return reloadPrograms(); });
-  await L.go(page, 'exercises'); await L.settle(page, 900);
+  await L.go(page, 'exercises/qualities'); await L.settle(page, 900);   // the Quality check is on the Qualities sub-tab
   const avaRow = () => page.evaluate(() => {
     document.querySelectorAll('#content details').forEach(d => { d.open = true; });
     const row = [...document.querySelectorAll('#content .credrow')].find(x => /Ava Example/.test(x.textContent) && /Trains most/.test(x.textContent));
@@ -2327,8 +2329,8 @@ S['spine-phone-view'] = async (b) => {
   check(r, 'the card on the DRAFT has no video link (a phone has nothing for it; the draft\'s own video is not shown here)', (await vid('Machine Seated Leg Curl')) === null, await vid('Machine Seated Leg Curl'));
   check(r, 'the card on the approved entry has its video', (await vid('Seated Leg Curl')) === 'https://www.youtube.com/watch?v=APPROVED001', await vid('Seated Leg Curl'));
   check(r, 'the card with no exId finds the approved twin\'s video, as a phone does', (await vid('Machine Hip Abduction')) === 'https://www.youtube.com/watch?v=HIPABD00001', await vid('Machine Hip Abduction'));
-  // 2. the Exercises tab
-  await L.go(page, 'exercises'); await L.settle(page, 900);
+  // 2. the Exercises tab, Coverage sub-tab
+  await L.go(page, 'exercises/coverage'); await L.settle(page, 900);
   const txt = await page.evaluate(() => { document.querySelectorAll('#content details').forEach(d => { d.open = true; }); return document.getElementById('content').textContent.replace(/\s+/g, ' '); });
   check(r, 'Coverage says two card names show something else on a phone until the drafts are approved', /2 card names show something else on a phone until the draft is approved/.test(txt), txt.slice(0, 500));
   const list = (/Cards that show something else on a phone · 2 names(.*?)(?:Not in the Spine yet|$)/.exec(txt) || [])[1] || '';
@@ -2951,7 +2953,7 @@ S['today-also-waiting'] = async (b) => {
 
 S['spine-copy-add'] = async (b) => {
   const r = { id: 'spine-copy-add', title: 'Exercises → Not in the Spine yet: one tap copies "/spine add <name>" for Claude', checks: [] };
-  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  const { page, log } = await L.openCoach(b, { hash: 'exercises/coverage' });   // Not in the Spine yet is on the Coverage sub-tab
   await L.settle(page, 700);
   await page.evaluate(() => document.querySelectorAll('#content details').forEach(d => { d.open = true; }));
   const panel = page.locator('details', { hasText: 'Not in the Spine yet' }).first();
@@ -2994,6 +2996,164 @@ S['spine-editor-folds'] = async (b) => {
   await page.locator('#spineEd .sp-save').first().click(); await L.settle(page, 800);
   const upd = lastOf(await L.callsSince(page, c0), c => c.kind === 'rpc' && c.name === 'coach_save_spine');
   check(r, 'a save from the folded editor still sends what was typed (the SFR)', !!upd && JSON.stringify(upd.payload).includes('"sfr":3'), upd && JSON.stringify(upd.payload).slice(0, 200));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Exercises sub-tabs and the side-by-side editor (round 2 of the coach UX pass, 2026-10-12) ──
+// Entries / Qualities / Coverage have their own addresses; from 1000 px the editor opens beside the list (each scrolls on its own),
+// below that it replaces the list with "← All exercises"; leaving a sub-tab with typed, unsaved work asks first.
+S['spine-subtabs'] = async (b) => {
+  const r = { id: 'spine-subtabs', title: 'Exercises: three sub-tabs with their own addresses; the editor beside the list from 1000 px, in place of it on a phone; the guard when leaving a sub-tab', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  dismissDialogs(page, log);   // a confirm is answered No
+  const noOverflow = () => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
+  const vis = sel => page.locator(sel).first().isVisible();
+  const url = () => page.url().replace(/^.*coach\.html/, '');
+  await page.setViewportSize({ width: 1440, height: 900 }); await L.settle(page, 300);
+
+  // 1. the three sub-tabs and their addresses
+  const tabs = await page.locator('.sp-subrail .stab').allInnerTexts();
+  check(r, 'three sub-tabs: Entries, Qualities, Coverage (Coverage with a count)', tabs.length === 3 && /^Entries$/i.test(tabs[0].trim()) && /^Qualities$/i.test(tabs[1].trim()) && /^Coverage\s*\d+$/i.test(tabs[2].replace(/\s+/g, ' ').trim()), tabs);
+  check(r, '#exercises is Entries: the search box and the list are there, the sub-tab is marked', (await page.locator('#spineQ').count()) === 1 && /Entries/i.test(await page.locator('.sp-subrail .stab.active').innerText()), '');
+  await page.locator('.sp-subrail .stab', { hasText: 'Qualities' }).click(); await L.settle(page, 400);
+  check(r, 'Qualities has its own address, a row per quality, and no list', /#exercises\/qualities$/.test(url()) && (await page.locator('.qm-row').count()) === 10 && (await page.locator('#spineQ').count()) === 0, url());
+  check(r, 'the Quality check is open under it', await page.locator('#content details', { hasText: 'Quality check' }).first().evaluate(d => d.open), '');
+  await page.locator('.sp-subrail .stab', { hasText: 'Coverage' }).click(); await L.settle(page, 400);
+  const covN = await page.locator('.sp-subrail .stab.active .n').innerText();
+  const sections = await page.evaluate(() => [...document.querySelectorAll('#content details')].filter(d => d.querySelector(':scope > summary.arch-toggle')).map(d => [d.querySelector('summary').textContent.trim(), d.open]));
+  const fixN = sections.reduce((n, s) => n + (+((/·\s*(\d+) names?/.exec(s[0]) || [])[1] || 0)), 0);
+  check(r, 'Coverage has its own address, four count tiles and the bar', /#exercises\/coverage$/.test(url()) && (await page.locator('.sp-tile').count()) === 4, url());
+  check(r, 'the two lists are open there, and the tab\'s count is what they hold', sections.length >= 1 && sections.every(s => s[1]) && +covN === fixN && fixN > 0, { covN, sections });
+  await page.evaluate(() => { location.hash = 'exercises/nonsense'; }); await L.settle(page, 400);
+  check(r, 'an unknown part reads as Entries', (await page.locator('#spineQ').count()) === 1, url());
+  await page.evaluate(() => { location.hash = 'exercises'; }); await L.settle(page, 300);
+
+  // 2. the Coverage warning line on Entries
+  const warn = page.locator('.sp-warn');
+  check(r, 'Entries says in one clay line what Coverage has to fix, and links to it', (await warn.count()) === 1 && /not in the Spine/.test(await warn.innerText()) && /exercises\/coverage$/.test(await warn.getAttribute('href')), (await warn.count()) ? await warn.innerText() : 'no line');
+  await warn.click(); await L.settle(page, 400);
+  check(r, 'the line opens Coverage', /#exercises\/coverage$/.test(url()) && (await page.locator('.sp-tile').count()) === 4, url());
+  await page.locator('.sp-subrail .stab', { hasText: 'Entries' }).click(); await L.settle(page, 300);
+
+  // 3. a long list, and a desktop width: the editor opens beside it
+  await page.evaluate(() => {
+    const now = new Date().toISOString();
+    for (let i = 0; i < 70; i++) {
+      const id = 'bulk-lift-' + String(i).padStart(2, '0');
+      window.__DB.exercises.push({ id, name: 'Bulk Lift ' + String(i).padStart(2, '0'), aliases: [], pattern: 'squat', qualities: ['strength'], purpose: 'Fixture.', tennis: null, cues: null,
+        equipment: [], loads: [], easier: [], harder: [], alts: [], video: null, status: 'approved', updated_at: now, updated_by: 'coach', impact: 'none', muscles: null, steps: [] });
+      window.__DB.exercise_coach.push({ id, sfr: null, flags: [], notes: null, suggested_qualities: null, links_before: null, links_history: null, credits: null, cost: null, suggested_changes: null });
+    }
+    S.spine = null; renderExercises();
+  });
+  await page.waitForFunction(() => document.querySelector('#spineQ')); await L.settle(page, 300);
+  await page.locator('.sp-filter[data-f="approved"]').click(); await L.settle(page, 300);
+  check(r, 'nothing open: the right side says so', (await vis('.sp-empty')) && /Pick an exercise to edit it/.test(await page.locator('.sp-empty').innerText()), '');
+  const list = page.locator('.sp-list');
+  const dims = await list.evaluate(el => ({ ch: el.clientHeight, sh: el.scrollHeight, oy: getComputedStyle(el).overflowY }));
+  check(r, 'the list scrolls on its own (taller than its box, overflow auto)', dims.sh > dims.ch + 200 && dims.oy === 'auto', dims);
+  await list.evaluate(el => { el.scrollTop = 600; });
+  check(r, 'scrolling the list does not move the page', (await page.evaluate(() => window.scrollY)) === 0 && (await list.evaluate(el => el.scrollTop)) > 400, '');
+  // open a row that is on screen, by a JS click (no scrolling), so the list's own scroll is what is being tested
+  const picked = await page.evaluate(() => {
+    const l = document.querySelector('.sp-list').getBoundingClientRect();
+    const row = [...document.querySelectorAll('.sp-list .spine-row')].find(x => x.getBoundingClientRect().top > l.top + 40 && x.getBoundingClientRect().bottom < l.bottom - 40);
+    row.querySelector('button[data-open]').click();
+    return row.dataset.open;
+  });
+  await page.locator('#spineEd').waitFor(); await L.settle(page, 300);
+  const side = await page.evaluate(() => {
+    const l = document.querySelector('.sp-listpane').getBoundingClientRect(), e = document.getElementById('spineEd').getBoundingClientRect(), a = document.querySelector('#spineEd .spine-acts').getBoundingClientRect();
+    return { listRight: l.right, edLeft: e.left, listTop: l.top, edTop: e.top, actsBottom: a.bottom, vh: window.innerHeight, listScroll: document.querySelector('.sp-list').scrollTop,
+      on: document.querySelector('.spine-row.on') ? document.querySelector('.spine-row.on').dataset.open : null };
+  });
+  check(r, 'at 1440 the editor opens beside the list, level with it', side.edLeft >= side.listRight && Math.abs(side.edTop - side.listTop) < 8, side);
+  check(r, 'the open row is highlighted, and the list kept its place', side.on === picked && side.listScroll > 400, { picked, ...side });
+  check(r, 'the editor has its own scroll and its Save bar is in view at the bottom', (await page.locator('#spineEd').evaluate(el => getComputedStyle(el).overflowY === 'auto' && el.scrollHeight > el.clientHeight + 300)) && side.actsBottom <= side.vh && side.actsBottom > side.vh - 80, side);
+  await page.locator('#spineEd').evaluate(el => { el.scrollTop = 500; });
+  await page.evaluate(() => renderExercises()); await L.settle(page, 200);
+  check(r, 'a redraw keeps both scroll positions', (await page.locator('#spineEd').evaluate(el => el.scrollTop)) === 500 && (await list.evaluate(el => el.scrollTop)) > 400, '');
+  const before = await page.evaluate(() => document.querySelector('.sp-list').scrollTop);
+  log.dialogs.length = 0;
+  await page.locator('.spine-row.on button[data-open]').click(); await L.settle(page, 200);
+  check(r, 'tapping the open row does nothing', !log.dialogs.length && (await page.locator('#spineEd').evaluate(el => el.scrollTop)) === 500 && (await page.locator('#spineEd').count()) === 1, log.dialogs);
+  // typed work: another row asks first and a No keeps the editor and the typing
+  await page.locator('[data-sf=purpose]').fill('Typed beside the list');
+  const other = await page.evaluate(id => [...document.querySelectorAll('.sp-list .spine-row')].map(x => x.dataset.open).find(x => x !== id), picked);
+  await page.locator(`.spine-row[data-open="${other}"] button[data-open]`).click({ force: true }); await L.settle(page, 300);
+  check(r, 'another row asks first, and a No keeps this editor and the typing', log.dialogs.some(x => x.type === 'confirm' && /unsaved changes/.test(x.message)) && (await page.locator('[data-sf=purpose]').inputValue()) === 'Typed beside the list' && (await page.evaluate(() => document.querySelector('.spine-row.on').dataset.open)) === picked, log.dialogs);
+  // a filter or a search does not close the editor or lose the typing
+  await page.locator('#spineQ').fill('bulk lift 0'); await L.settle(page, 300);
+  check(r, 'a search keeps the editor and the typing', (await page.locator('[data-sf=purpose]').inputValue()) === 'Typed beside the list', '');
+  await page.locator('#spineQ').fill(''); await L.settle(page, 200);
+
+  // 4. leaving a sub-tab with typed work asks, and a No stays put with the typing
+  log.dialogs.length = 0;
+  await page.locator('.sp-subrail .stab', { hasText: 'Qualities' }).click(); await L.settle(page, 400);
+  check(r, 'switching to Qualities with unsaved typing asks, and a No stays on Entries with the typing', log.dialogs.some(x => x.type === 'confirm') && /#exercises$/.test(url()) && (await page.locator('[data-sf=purpose]').inputValue()) === 'Typed beside the list', { url: url(), dialogs: log.dialogs });
+  log.dialogs.length = 0;
+  await page.evaluate(() => { location.hash = 'exercises/coverage'; }); await L.settle(page, 400);
+  check(r, 'so does a link to Coverage', log.dialogs.some(x => x.type === 'confirm') && /#exercises$/.test(url()), { url: url(), dialogs: log.dialogs });
+  log.dialogs.length = 0;
+  await page.evaluate(() => { location.hash = 'today'; }); await L.settle(page, 400);
+  check(r, 'leaving the tab still asks', log.dialogs.some(x => x.type === 'confirm') && /#exercises$/.test(url()), { url: url(), dialogs: log.dialogs });
+  // a Yes: the typing is dropped, and Entries comes back with the entry as saved
+  page.removeAllListeners('dialog'); page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await d.accept().catch(() => {}); });
+  log.dialogs.length = 0;
+  await page.locator('.sp-subrail .stab', { hasText: 'Qualities' }).click(); await L.settle(page, 400);
+  check(r, 'a Yes goes to Qualities', /#exercises\/qualities$/.test(url()) && (await page.locator('.qm-row').count()) === 10 && (await page.locator('#spineEd').count()) === 0, url());
+  await page.locator('.sp-subrail .stab', { hasText: 'Entries' }).click(); await L.settle(page, 400);
+  check(r, 'back on Entries the entry is open again, as saved (the typing was dropped)', (await page.locator('[data-sf=purpose]').count()) === 1 && (await page.locator('[data-sf=purpose]').inputValue()) !== 'Typed beside the list', '');
+  // typed quality text: leaving that sub-tab asks, too
+  dismissDialogs(page, log);
+  await page.locator('.sp-subrail .stab', { hasText: 'Qualities' }).click(); await L.settle(page, 400);
+  await page.locator('[data-qf="strength:line"]').fill('Typed quality line');
+  log.dialogs.length = 0;
+  await page.evaluate(() => { location.hash = 'exercises'; }); await L.settle(page, 400);
+  check(r, 'leaving Qualities with a typed line asks, and a No keeps it', log.dialogs.some(x => x.type === 'confirm') && /#exercises\/qualities$/.test(url()) && (await page.locator('[data-qf="strength:line"]').inputValue()) === 'Typed quality line', { url: url(), dialogs: log.dialogs });
+  page.removeAllListeners('dialog'); page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await d.accept().catch(() => {}); });
+  await page.evaluate(() => { location.hash = 'exercises'; }); await L.settle(page, 400);   // a Yes: Entries, the typed line dropped
+  await page.locator('.sp-close').first().click(); await L.settle(page, 300);
+  check(r, 'Close closes it, and the empty state is back', (await page.locator('#spineEd').count()) === 0 && (await vis('.sp-empty')), '');
+
+  // 5. a phone: the editor takes the list's place, with "← All exercises"
+  await page.setViewportSize({ width: 390, height: 844 }); await L.settle(page, 400);
+  check(r, 'at 390 the list is full width and the empty state is not shown', (await page.locator('.sp-listpane').evaluate(el => el.getBoundingClientRect().width)) > 340 && !(await vis('.sp-empty')) && !(await vis('.sp-back')), '');
+  await page.evaluate(() => window.scrollTo({ top: 900, behavior: 'instant' }));
+  const y1 = await page.evaluate(() => window.scrollY);
+  const pick2 = await page.evaluate(() => {
+    const row = [...document.querySelectorAll('.sp-list .spine-row')].find(x => x.getBoundingClientRect().top > 160 && x.getBoundingClientRect().bottom < innerHeight);
+    row.querySelector('button[data-open]').click(); return row.dataset.open;
+  });
+  await page.locator('#spineEd').waitFor(); await L.settle(page, 300);
+  const ph = await page.evaluate(() => ({ listShown: !!document.querySelector('.sp-listpane') && getComputedStyle(document.querySelector('.sp-listpane')).display !== 'none', backTop: document.querySelector('.sp-back').getBoundingClientRect().top,
+    backShown: getComputedStyle(document.querySelector('.sp-back')).display !== 'none', edW: document.getElementById('spineEd').getBoundingClientRect().width, vw: innerWidth }));
+  check(r, 'the editor replaces the list at full width, with ← All exercises in view at the top', !ph.listShown && ph.backShown && ph.backTop >= 0 && ph.backTop < 150 && ph.edW > 340 && ph.edW <= ph.vw, ph);
+  check(r, '...and the page has no sideways scroll', await noOverflow(), '');
+  await page.locator('[data-sf=purpose]').fill('Typed on a phone');
+  log.dialogs.length = 0; dismissDialogs(page, log);
+  await page.locator('.sp-back').click(); await L.settle(page, 300);
+  check(r, '← All exercises asks like Close does, and a No keeps the editor and the typing', log.dialogs.some(x => x.type === 'confirm') && (await page.locator('[data-sf=purpose]').inputValue()) === 'Typed on a phone', log.dialogs);
+  page.removeAllListeners('dialog'); page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await d.accept().catch(() => {}); });
+  await page.locator('.sp-back').click(); await L.settle(page, 400);
+  const y2 = await page.evaluate(() => window.scrollY);
+  check(r, 'a Yes brings the list back, where it was', (await page.locator('#spineEd').count()) === 0 && (await vis('.sp-listpane')) && Math.abs(y2 - y1) < 6, { y1, y2 });
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 700 }); await L.settle(page, 300);
+    const res = {};
+    res.entries = await noOverflow();
+    await page.locator(`button[data-open="${pick2}"]`).click({ force: true }); await page.locator('#spineEd').waitFor(); await L.settle(page, 200);
+    res.editor = await noOverflow();
+    await page.locator('.sp-back').click(); await L.settle(page, 200);
+    await page.locator('.sp-subrail .stab', { hasText: 'Qualities' }).click(); await L.settle(page, 300);
+    res.qualities = await noOverflow();
+    await page.locator('.sp-subrail .stab', { hasText: 'Coverage' }).click(); await L.settle(page, 300);
+    res.coverage = await noOverflow();
+    await page.locator('.sp-subrail .stab', { hasText: 'Entries' }).click(); await L.settle(page, 300);
+    check(r, `no sideways scroll at ${w}px on Entries, an open entry, Qualities or Coverage`, Object.values(res).every(Boolean), res);
+  }
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;

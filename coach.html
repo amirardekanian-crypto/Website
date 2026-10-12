@@ -236,6 +236,67 @@
   .spine-acts { position: sticky; bottom: 0; z-index: 2; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
                 margin: 14px -20px -18px; padding: 10px 20px; background: var(--paper, #FAF7F2); border-top: 1px solid var(--line);
                 border-radius: 0 0 22px 22px; }
+  /* ── Exercises (round 2 of the coach UX pass, 2026-10-12): three sub-tabs (the athlete file's .subrail / .stab). On Entries the list
+     and the editor sit side by side from 1000 px up, each scrolling on its own inside the height the page measures for them
+     (spineFit(): from the top of the split to the bottom of the window); below that the list is the page and an open entry
+     replaces it, with "← All exercises" above. ── */
+  .sp-subrail { margin-bottom: 12px; }
+  @media (max-width: 400px) { .sp-subrail { gap: 0; } .sp-subrail .stab { font-size: 14px; letter-spacing: .02em; padding: 9px 8px; gap: 4px; } }
+  @media (max-width: 340px) { .sp-subrail .stab { font-size: 13px; letter-spacing: .01em; padding: 9px 6px; } }
+  .sp-intro { font-size: 13.5px; color: var(--muted); margin: 0 0 8px; }
+  .sp-warn { display: block; margin: 0 0 12px; font-size: 13.5px; font-weight: 600; color: var(--clay-ink); text-underline-offset: 3px; }
+  .sp-split + .how { margin-top: 16px; }
+  .sp-stack { display: grid; gap: 16px; min-width: 0; }
+  .sp-split { --sp-h: calc(100vh - 290px); display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+  .sp-listpane { min-width: 0; padding: 14px 16px 6px; display: flex; flex-direction: column; }
+  .sp-listhead { flex: none; }
+  .sp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  #spineQ { margin: 0; }
+  .sp-count { font-size: 12px; color: var(--muted); margin: 8px 0 2px; }
+  .sp-list { min-height: 0; margin: 0 -16px; }
+  .sp-edpane { min-width: 0; scroll-margin-top: calc(var(--stick) + 12px); }
+  .sp-empty { display: none; align-items: center; justify-content: center; min-height: 240px; padding: 20px; text-align: center;
+              border: 1px dashed var(--line); border-radius: 22px; color: var(--muted); font-size: 14px; }
+  .sp-back { margin-bottom: 10px; }
+  .sp-split.has-ed .sp-listpane { display: none; }
+  .credrow.spine-row { cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1px 10px; align-items: center; padding: 8px 16px; }
+  .credrow.spine-row:hover { background: var(--court-100); }
+  .credrow.spine-row.on { background: var(--court-100); box-shadow: inset 3px 0 0 var(--court); }
+  .spine-row .credname { min-width: 0; grid-column: 1; grid-row: 1; font-size: 14px; }
+  .spine-row .sp-st { grid-column: 1; grid-row: 2; font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
+  .spine-row .acts { grid-column: 2; grid-row: 1 / span 2; }
+  @media (min-width: 1000px) {
+    .sp-split { grid-template-columns: 380px minmax(0, 1fr); }
+    .sp-split.has-ed .sp-listpane { display: flex; }
+    .sp-listpane { max-height: var(--sp-h); }
+    .sp-list { overflow: auto; overscroll-behavior: contain; }
+    .sp-edpane .spine-ed { max-height: var(--sp-h); overflow: auto; overscroll-behavior: contain; padding-bottom: 0; }
+    .sp-edpane .spine-acts { margin-bottom: 0; }
+    .sp-empty { display: flex; }
+    .sp-back { display: none; }
+  }
+  .sp-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 14px 0 4px; }
+  .sp-tile { background: var(--paper); border-radius: 12px; padding: 10px 14px; min-width: 0; }
+  .sp-tile .sp-n { display: block; font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; line-height: 1.25; }
+  .sp-tile .sp-l { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+  .sp-tile.hot .sp-n { color: var(--clay-ink); }
+  @media (max-width: 640px) { .sp-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  /* The ten qualities: a row each on a desktop, the same boxes stacked (with their labels) on a phone. */
+  .qm-head, .qm-row { display: grid; grid-template-columns: 140px minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1fr) 200px; gap: 8px 12px; align-items: start; }
+  .qm-head { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-soft); padding: 0 0 6px; border-bottom: 1px solid var(--line); }
+  .qm-row { padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  .qm-row:last-of-type { border-bottom: 0; }
+  .qm-c { min-width: 0; }
+  .qm-lab { display: none; font-size: 12px; color: var(--muted); margin: 0 0 3px; }
+  .sp-fam { font-size: 12px; margin-top: 4px; }
+  .qm-st { font-size: 12.5px; margin: 7px 0 6px; }
+  .qm-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  @media (max-width: 899px) {
+    .qm-head { display: none; }
+    .qm-row { grid-template-columns: minmax(0, 1fr); }
+    .qm-lab { display: block; }
+    .qm-st { margin-top: 0; }
+  }
   .phead { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin-bottom: 12px; flex-wrap: wrap; }
   .phead .t { font-size: 21px; }
   .phead .r { font-size: 12px; color: var(--muted); }
@@ -2510,8 +2571,15 @@ const TABS = [
 // screen's old link (/chat, removed 2026-09-26) still reads as a screen, so it
 // lands on The work instead of being taken for part of the athlete's id.
 const RETIRED_SUBS = ['chat'];
-function route() {
-  const h = (location.hash || '#today').slice(1);
+// #exercises opens the Spine's entries; #exercises/qualities and #exercises/coverage open its other two sub-tabs. Anything
+// else after the slash is the entries (the address stays as typed).
+const EX_SUBS = ['qualities', 'coverage'];
+function route() { return routeOf((location.hash || '#today').slice(1)); }
+// The same reading for any address (the hashchange guard asks what the OLD address was).
+function routeOfUrl(url) { const i = String(url || '').indexOf('#'); return routeOf(i < 0 ? 'today' : String(url).slice(i + 1) || 'today'); }
+function routeOf(h) {
+  const ex = /^exercises(?:\/(.*))?$/.exec(h);
+  if (ex) return { view: 'exercises', sub: EX_SUBS.indexOf(ex[1]) >= 0 ? ex[1] : '' };
   if (h.startsWith('a/')) {
     const rest = h.slice(2);
     const cut = rest.lastIndexOf('/');
@@ -2569,7 +2637,7 @@ function renderNow() {
   const r = route();
   // A new screen starts at the top. Same-page hash links keep the scroll offset, so a long roster
   // used to drop the coach halfway down a short screen. A redraw of the same screen keeps its place.
-  const viewKey = r.view === 'detail' ? 'a/' + r.id + '/' + r.sub : r.view;
+  const viewKey = r.view === 'detail' ? 'a/' + r.id + '/' + r.sub : r.view === 'exercises' && r.sub ? 'exercises/' + r.sub : r.view;
   if (viewKey !== _lastViewKey) {
     const prev = _lastViewKey;
     _lastViewKey = viewKey;
@@ -2591,8 +2659,11 @@ function renderNow() {
 }
 window.addEventListener('hashchange', ev => {
   if (_erase && _erase.status !== 'busy') _erase = null;   // an open Erase panel never follows the coach to another screen
-  // Leaving the Exercises tab with typed, unsaved work asks first, and stays put on a no.
-  if (/#exercises$/.test(ev.oldURL || '') && route().view !== 'exercises' && !spineMayLeave('Leave the Exercises tab')) {
+  // Leaving the Exercises tab, or moving between its three sub-tabs (the editor is only on Entries), with typed, unsaved work asks
+  // first, and stays put on a no.
+  const was = routeOfUrl(ev.oldURL), now = route();
+  if (was.view === 'exercises' && (now.view !== 'exercises' || now.sub !== was.sub)
+      && !spineMayLeave(now.view === 'exercises' ? 'Switch to another part of Exercises' : 'Leave the Exercises tab')) {
     history.replaceState(null, '', ev.oldURL); renderRail(); return;
   }
   render();
@@ -6354,6 +6425,9 @@ let _spineQ = '';           // the search box: matches across drafts and approve
 let _spineBase = null;      // { id, state }: the open editor as it was drawn from the server copy
 let _spineDraft = null;     // { id, edits }: only the fields the coach changed, carried across redraws
 let _qualDraft = {};        // 'id:field' -> typed text in the ten qualities, carried across redraws
+let _spListReset = false;   // the next drawing starts the list at the top (a new search or filter)
+let _spEdShown = null;      // the entry whose editor the last drawing showed, so a different one starts at the top
+let _spListY = null;        // a phone: where the page was when an entry opened over the list
 
 async function loadSpine() {
   if (DEMO) {   // layout preview only
@@ -7087,19 +7161,22 @@ function qualityPanels(idx, byId) {
   const quals = S.spine.quals || [];
   const field = 'width:100%;font:inherit;font-size:14px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:#fff;box-sizing:border-box';
   const nAp = quals.filter(q => q.status === 'approved').length;
-  let h = `<section class="panel" style="margin-bottom:16px"><details${nAp < quals.length ? ' open' : ''}><summary class="arch-toggle">The ten qualities · ${nAp} of ${quals.length} approved</summary>
-    <p class="psub" style="margin:10px 0">What each day card on Home says it builds. A quality reaches a phone only when it is approved <b>and</b> the day's exercises carry it. Athletes see the words, never your numbers. The court line shows to tennis and padel players only.</p>` +
-    quals.map(q => `<div class="credrow" style="display:block;padding:10px 0">
-      <div style="display:grid;grid-template-columns:minmax(0,140px) minmax(0,1fr);gap:8px;align-items:start">
-        <div><input data-qf="${q.id}:name" aria-label="${esc(q.name)}: name" value="${esc(q.name)}" style="${field};font-weight:700"><div class="muted" style="font-size:12px;margin-top:4px">${esc(q.family || 'no picture')} · ${q.status === 'approved' ? '<b style="color:#1E7A55">approved</b>' : 'draft'}</div></div>
-        <div style="display:grid;gap:6px">
-          <input data-qf="${q.id}:line" aria-label="${esc(q.name)}: one line" value="${esc(q.line || '')}" placeholder="One line, for everyone" style="${field}">
-          <input data-qf="${q.id}:tennis" aria-label="${esc(q.name)}: on court" value="${esc(q.tennis || '')}" placeholder="On court (tennis and padel only)" style="${field}">
-          <input data-qf="${q.id}:tests" aria-label="${esc(q.name)}: how it is measured" value="${esc((q.tests || []).join(', '))}" placeholder="How we measure it (comma)" style="${field}">
-          <div style="display:flex;gap:8px">${q.status === 'draft'
-            ? `<button class="btn primary sm qm-save" data-q="${q.id}" data-ap="1">Approve</button><button class="btn sm qm-save" data-q="${q.id}">Save draft</button>`
-            : `<button class="btn primary sm qm-save" data-q="${q.id}">Save</button><button class="btn sm qm-save" data-q="${q.id}" data-ap="0" title="Takes it off every day card">Move back to draft…</button>`}</div>
-        </div></div></div>`).join('') + `</details></section>`;
+  // The Qualities sub-tab (round 2 of the coach UX pass): one row per quality on a desktop (name | one line | on court | how it is
+  // measured | status and buttons), the same boxes stacked with their labels on a phone. The data-qf / data-q / data-ap hooks are
+  // the old ones. One plain button each: a primary button on every row would be ten of them.
+  let h = `<section class="panel"><div class="phead"><span class="t hd">The ten qualities</span><span class="r">${nAp} of ${quals.length} approved</span></div>
+    <p class="psub" style="margin:0 0 12px">What each day card on Home says it builds. A quality reaches a phone only when it is approved and the day's exercises carry it.</p>
+    <div class="qm-head" aria-hidden="true"><span>Quality</span><span>One line, for everyone</span><span>On court</span><span>How we measure it</span><span>Status</span></div>` +
+    quals.map(q => `<div class="qm-row">
+        <div class="qm-c"><input data-qf="${q.id}:name" aria-label="${esc(q.name)}: name" value="${esc(q.name)}" style="${field};font-weight:700"><div class="muted sp-fam">${esc(q.family || 'no picture')}</div></div>
+        <div class="qm-c"><span class="qm-lab" aria-hidden="true">One line, for everyone</span><input data-qf="${q.id}:line" aria-label="${esc(q.name)}: one line" value="${esc(q.line || '')}" placeholder="One line, for everyone" style="${field}"></div>
+        <div class="qm-c"><span class="qm-lab" aria-hidden="true">On court (tennis and padel only)</span><input data-qf="${q.id}:tennis" aria-label="${esc(q.name)}: on court" value="${esc(q.tennis || '')}" placeholder="On court (tennis and padel only)" style="${field}"></div>
+        <div class="qm-c"><span class="qm-lab" aria-hidden="true">How we measure it (comma)</span><input data-qf="${q.id}:tests" aria-label="${esc(q.name)}: how it is measured" value="${esc((q.tests || []).join(', '))}" placeholder="How we measure it (comma)" style="${field}"></div>
+        <div class="qm-c qm-act"><div class="qm-st">${q.status === 'approved' ? '<b style="color:#1E7A55">Approved</b>' : 'Draft'}</div><div class="qm-btns">${q.status === 'draft'
+          ? `<button class="btn sm qm-save" data-q="${q.id}" data-ap="1">Approve</button><button class="btn sm qm-save" data-q="${q.id}">Save draft</button>`
+          : `<button class="btn sm qm-save" data-q="${q.id}">Save</button><button class="btn sm qm-save" data-q="${q.id}" data-ap="0" title="Takes it off every day card">Move back to draft…</button>`}</div></div>
+      </div>`).join('') +
+    howFold('qm-how', ['What each day card on Home says it builds. A quality reaches a phone only when it is approved <b>and</b> the day\'s exercises carry it. Athletes see the words, never your numbers. The court line shows to tennis and padel players only.']) + `</section>`;
   const phone = qualityLensC(S.spine.list, quals, true), all = qualityLensC(S.spine.list, quals, false);
   const rows = Object.entries(S.programs || {}).filter(([k, v]) => v && k !== 'demo' && v.workouts)
     .map(([aid, data]) => Object.assign({ aid, data }, qualityCheckC(data, idx, byId)))
@@ -7114,9 +7191,10 @@ function qualityPanels(idx, byId) {
     : '<i>blank (too few sets to name a quality)</i>');
   const dayLine = (data, lens) => ((data.workouts && data.workouts.days) || []).map(d => dayTxt({ id: d.id, m: qualityDayC(d, lens) })).join(' <span style="opacity:.5">|</span> ');
   const noQual = !Object.keys(phone.qById).length;
-  h += `<section class="panel" style="margin-bottom:16px"><details${nFlag ? ' open' : ''}><summary class="arch-toggle">Quality check · ${
+  // Open by default on this sub-tab (it used to open only when a block was flagged, because it sat under five other panels).
+  h += `<section class="panel"><details open><summary class="arch-toggle">Quality check · ${
     nFlag ? `${nFlag} block${nFlag === 1 ? '' : 's'} to look at` : 'every block trains what it says'}</summary>
-    <p class="psub" style="margin:10px 0">For each athlete: what their current week trains most, in working sets a week (a quality an exercise trains second counts as half a set; warm-ups don't count). The block's picture word says what it is <i>meant</i> to build (iron = Strength, voltage = Power …). If that isn't in the top two, it's flagged. Foundation, peaking and recovery blocks train a mix on purpose, so they are never flagged. Under each, day by day, what that day's card on their phone will say (three words at most, by the app's own rule): <i>blank</i> when under 70% of the day's working sets sit on approved, tagged exercises, or when no quality reaches 12% of the day.</p>` +
+    <p class="psub" style="margin:10px 0">For each athlete: what their current week trains most, in working sets a week, and what each day card on their phone will say.</p>` +
     rows.map(r => {
       const top = r.ranked.slice(0, 4).map(q => `${esc(qn(q))} ${sets(r.score[q])}`).join(' · ');
       const aim = r.head ? `meant to build <b>${esc(qn(r.head))}</b>` : (QM_PHASE[String(r.art).toLowerCase()] || 'no picture word');
@@ -7131,7 +7209,8 @@ function qualityPanels(idx, byId) {
         <div><b>${esc(nameOf(r.aid))}</b> <span class="muted">· ${r.cycle ? `cycle "${esc(r.cycle)}" · ` : ''}${aim}</span></div>
         <div class="muted" style="margin-top:3px">Trains most: ${top || '—'} <span style="opacity:.8">(sets a week)</span></div>
         <div style="margin-top:3px;font-size:14px">${verdict} <span class="muted">· ${cov}</span></div>${dayHtml}</div>`;
-    }).join('') + `</details></section>`;
+    }).join('') +
+    howFold('qc-how', ['For each athlete: what their current week trains most, in working sets a week (a quality an exercise trains second counts as half a set; warm-ups don\'t count). The block\'s picture word says what it is <i>meant</i> to build (iron = Strength, voltage = Power …). If that isn\'t in the top two, it\'s flagged. Foundation, peaking and recovery blocks train a mix on purpose, so they are never flagged. Under each, day by day, what that day\'s card on their phone will say (three words at most, by the app\'s own rule): <i>blank</i> when under 70% of the day\'s working sets sit on approved, tagged exercises, or when no quality reaches 12% of the day.']) + `</details></section>`;
   return h;
 }
 
@@ -7147,7 +7226,9 @@ function renderExercises() {
       <p style="text-align:center"><button class="btn primary sm" onclick="S.spine=null;renderExercises()">↻ Try again</button></p></section>`;
     return;
   }
-  c.classList.toggle('no-anim', !!$('spineQ'));
+  const sub = route().sub || '';   // '' = Entries, 'qualities', 'coverage'
+  const prevBar = c.querySelector('.sp-subrail');
+  c.classList.toggle('no-anim', !!prevBar && prevBar.dataset.sub === sub);   // a redraw of the part already showing does not replay the entrance
   if (_spineHistId && _spineHistId !== _spineOpen) _spineHistId = null;   // History belongs to the entry it was opened on
   const list = S.spine.list, byId = {};
   list.forEach(e => { byId[e.id] = e; });
@@ -7203,7 +7284,8 @@ function renderExercises() {
     const k = S.spine.coach[e.id] || {};
     const names = Object.keys((who[e.id] || {}).athletes || {}).map(a => esc(nameOf(a))).join(', ');
     const ow = oneWay(e);
-    return `<div class="panel spine-ed" id="spineEd" style="margin:8px 0 14px;background:var(--paper, #FAF7F2)">
+    return `<div class="panel spine-ed" id="spineEd">
+      <div class="phead" style="margin-bottom:6px"><span class="t hd">${esc(e.name)}</span><span class="r">${e.status === 'approved' ? '<b style="color:var(--green-ink, #1E7A55)">Approved</b>' : 'Draft'}</span></div>
       <p class="psub" style="margin:0 0 4px">${names ? 'Doing it now: ' + names : 'Nobody has this in their programme right now.'} <span class="muted">· id ${esc(e.id)}${e.updated_by ? ' · last saved by ' + esc(e.updated_by) + (e.updated_at ? ', ' + esc(fmtLocalStamp(e.updated_at)) : '') : ''}</span></p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 14px">
         <div>${lbl('Name')}<input data-sf="name" value="${esc(e.name)}" style="${field}"></div>
@@ -7284,50 +7366,102 @@ function renderExercises() {
     </div>`;
   };
   const pill = e => q ? ` · ${e.status === 'approved' ? '<b style="color:var(--green-ink, #1E7A55)">approved</b>' : 'draft'}` : '';
-  const row = e => `<div class="credrow spine-row" style="cursor:pointer" data-open="${esc(e.id)}">
-      <span class="credname">${esc(e.name)} <span class="muted">· ${esc(e.pattern || 'no pattern')} · ${nAth(e.id)} athlete${nAth(e.id) === 1 ? '' : 's'}${pill(e)}</span></span>
-      <span class="muted">${(e.steps || []).length ? 'steps ✓ · ' : '<b style="color:var(--clay-ink)">no steps</b> · '}${e.cues ? 'cues ✓' : 'no cues'}${e.video ? ' · video ✓' : ''}${
-        spineHasDraft(e) ? ' · <b style="color:var(--clay-ink)">Claude’s draft to read</b>' : ''}${(e.qualities || []).length ? ' · ' + esc(e.qualities.join(', ')) : ' · <b style="color:var(--clay-ink)">no qualities</b>'}${(S.spine.coach[e.id] || {}).credits == null ? ' · <b style="color:var(--clay-ink)">no count</b>' : ''}${
-        (() => { const cc = (S.spine.coach[e.id] || {}).credits; return cc && !Object.keys(cc).length && !(e.muscles && Object.keys(e.muscles).length); })() ? ' · <b style="color:var(--clay-ink)">no muscles on the map</b>' : ''}</span>
-      <span class="acts"><button class="btn sm" data-open="${esc(e.id)}" aria-expanded="${_spineOpen === e.id}">${_spineOpen === e.id ? 'Close' : 'Open'}</button></span>
-    </div>` + (_spineOpen === e.id ? editor(e) : '');
+  // An entry that is open but no longer in the list (the list was reloaded without it) is closed, not left half open.
+  if (_spineOpen && !byId[_spineOpen]) { _spineOpen = null; _spineDraft = null; spineDiscReset(); }
+  const openE = _spineOpen ? byId[_spineOpen] : null;
+  const clay = t => `<b style="color:var(--clay-ink)">${t}</b>`;
+  // A list row: the name, then one muted line (pattern, athletes, and what the entry is missing in clay), Open at the right.
+  const row = e => {
+    const on = _spineOpen === e.id, cc = (S.spine.coach[e.id] || {}).credits;
+    return `<div class="credrow spine-row${on ? ' on' : ''}" data-open="${esc(e.id)}">
+      <span class="credname">${esc(e.name)}</span>
+      <span class="muted sp-st">${esc(e.pattern || 'no pattern')} · ${nAth(e.id)} athlete${nAth(e.id) === 1 ? '' : 's'}${pill(e)} · ${(e.steps || []).length ? 'steps ✓' : clay('no steps')} · ${e.cues ? 'cues ✓' : 'no cues'}${e.video ? ' · video ✓' : ''}${
+        spineHasDraft(e) ? ' · ' + clay('Claude’s draft to read') : ''}${(e.qualities || []).length ? ' · ' + esc(e.qualities.join(', ')) : ' · ' + clay('no qualities')}${cc == null ? ' · ' + clay('no count') : ''}${
+        cc && !Object.keys(cc).length && !(e.muscles && Object.keys(e.muscles).length) ? ' · ' + clay('no muscles on the map') : ''}</span>
+      <span class="acts"><button class="btn sm" data-open="${esc(e.id)}" aria-expanded="${on}">${on ? 'Editing' : 'Open'}</button></span>
+    </div>`;
+  };
 
-  let html = `<div class="controls"><span class="empty" style="align-self:center">The Spine: one entry per exercise you programme. Cues written here fill every card that has none of its own, and the athlete's <b>i</b> opens the rest. Nothing shows on a phone until it is <b>Approved</b>.</span></div>`;
-  html += `<section class="panel" style="margin-bottom:16px"><div class="phead"><span class="t hd">Coverage</span><span class="r">${namesMapped} of ${usage.length} card names · ${pct}% of exercise slots</span></div>
-    <div style="height:10px;border-radius:999px;background:var(--line);overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--clay)"></div></div>
-    <p class="psub" style="margin:10px 0 0">${approved.length} approved · ${drafts.length} draft${drafts.length === 1 ? '' : 's'} waiting for you${
-      withDraft.length ? ` · <b style="color:var(--clay-ink)">${withDraft.length} with Claude’s draft to read</b>` : ''} · ${noSteps} approved with no How to do it. Counted across the ${nLive} programme${nLive === 1 ? '' : 's'} with workouts, circuit items included.${
-      differ.length ? ` <b style="color:var(--clay-ink)">${differ.length} card name${differ.length === 1 ? '' : 's'} show${differ.length === 1 ? 's' : ''} something else on a phone until the draft is approved</b> (listed at the bottom).` : ''}</p></section>`;
-  html += qualityPanels(idx, byId);
-  const fbtn = (f, t) => `<button class="btn sm sp-filter${filter === f && !q ? ' primary' : ''}" data-f="${f}" aria-pressed="${filter === f && !q}">${t}</button>`;
-  html += `<section class="panel"><div class="phead"><span class="t hd">${q ? 'Matches' : filter === 'approved' ? 'Approved' : filter === 'claude' ? 'Claude’s drafts to read' : 'Waiting for you'}</span>
-    <span class="r">${fbtn('draft', 'Drafts · ' + drafts.length)} ${withDraft.length || filter === 'claude' ? fbtn('claude', 'Claude’s drafts · ' + withDraft.length) + ' ' : ''}${fbtn('approved', 'Approved · ' + approved.length)}</span></div>
-    <input id="spineQ" type="search" value="${esc(_spineQ)}" placeholder="Find an exercise: name, other name, pattern, equipment or id" aria-label="Find an exercise" style="${field};margin:0 0 8px">` +
-    (shown.length ? shown.slice().sort((a, b) => nAth(b.id) - nAth(a.id) || a.name.localeCompare(b.name)).map(row).join('')
-      : `<p class="empty">${q ? 'No entry matches “' + esc(_spineQ) + '”.' : filter === 'draft' ? 'No drafts waiting. Ask Claude to draft the next batch.'
-        : filter === 'claude' ? 'No drafts from Claude waiting. Each one you open and Save leaves this list.' : 'Nothing approved yet: open a draft and tap Approve.'}</p>`) + `</section>`;
-  if (differ.length) html += `<section class="panel" style="margin-top:16px"><details><summary class="arch-toggle">Cards that show something else on a phone · ${differ.length} name${differ.length === 1 ? '' : 's'}</summary><div style="margin-top:12px">
-    <p class="psub" style="margin:0 0 8px">A phone is served approved entries only. These cards find a draft here, so on a phone they show nothing (a card that names its entry shows that entry or nothing) or, with no entry named, the closest approved one. Approve the draft and both agree.</p>${
-    differ.slice(0, 60).map(d => `<div class="credrow"><span class="credname">${esc(d.u.name)}</span><span class="muted">${Object.keys(d.u.athletes).length} athlete${Object.keys(d.u.athletes).length === 1 ? '' : 's'} · here: ${esc((byId[d.a] || {}).name || d.a)} (${byId[d.a] && byId[d.a].status === 'approved' ? 'approved' : 'draft'}) · phone: ${d.p ? esc((phone.byId[d.p] || {}).name || d.p) : 'nothing'}</span></div>`).join('')
-  }${differ.length > 60 ? `<p class="psub">…and ${differ.length - 60} more.</p>` : ''}</div></details></section>`;
-  if (unmapped.length) html += `<section class="panel" style="margin-top:16px"><details><summary class="arch-toggle">Not in the Spine yet · ${unmapped.length} names</summary><div style="margin-top:12px">${
-    `<div class="note-actions" style="margin:0 0 10px"><button class="btn sm" onclick="copyText(${jsq('/spine add\n' + unmapped.map(u => '- ' + u.name).join('\n'))}, this)">Copy /spine add for all ${unmapped.length}</button>
-      <span class="muted" style="font-size:12px">paste it to Claude: each becomes a draft entry for you to approve</span></div>` +
-    unmapped.slice(0, 60).map(u => `<div class="credrow"><span class="credname">${esc(u.name)}</span><span class="muted">${Object.keys(u.athletes).length} athlete${Object.keys(u.athletes).length === 1 ? '' : 's'} · ${u.slots} slot${u.slots === 1 ? '' : 's'}</span>
-      <span class="acts"><button class="btn sm" onclick="copyText(${jsq('/spine add ' + u.name)}, this)">Copy /spine add</button></span></div>`).join('')
-  }${unmapped.length > 60 ? `<p class="psub">…and ${unmapped.length - 60} more.</p>` : ''}</div></details></section>`;
-  html += `<datalist id="spineIds">${list.map(e => `<option value="${esc(e.id)}">${esc(e.name)}</option>`).join('')}</datalist>`;
+  // What Coverage has to fix, said on the other two sub-tabs too: on the tab label and (Entries) as one clay line.
+  const nFix = differ.length + unmapped.length;
+  const plural = (n, one, many) => n + ' ' + (n === 1 ? one : many);
+  const subLink = (id, label, n, title) => `<a class="stab${sub === id ? ' active' : ''}"${sub === id ? ' aria-current="page"' : ''} href="#exercises${id ? '/' + id : ''}">${label}${n ? `<span class="n" title="${esc(title)}">${n}</span>` : ''}</a>`;
+  let html = `<div class="subrail sp-subrail" data-sub="${sub}" role="navigation" aria-label="Exercises">${subLink('', 'Entries')}${subLink('qualities', 'Qualities')}${
+    subLink('coverage', 'Coverage', nFix, `${plural(differ.length, 'card name shows', 'card names show')} something else on a phone · ${plural(unmapped.length, 'name', 'names')} not in the Spine`)}</div>`;
+
+  if (sub === 'qualities') {
+    html += `<div class="sp-stack">${qualityPanels(idx, byId)}</div>`;
+  } else if (sub === 'coverage') {
+    const tile = (n, label, hot) => `<div class="sp-tile${hot && n ? ' hot' : ''}"><span class="sp-n">${n}</span> <span class="sp-l">${label}</span></div>`;
+    const counted = `Counted across the ${plural(nLive, 'programme', 'programmes')} with workouts, circuit items included.`;
+    html += `<div class="sp-stack"><section class="panel"><div class="phead"><span class="t hd">Coverage</span><span class="r">${namesMapped} of ${usage.length} card names · ${pct}% of exercise slots</span></div>
+      <div style="height:10px;border-radius:999px;background:var(--line);overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--court)"></div></div>
+      <div class="sp-tiles">${tile(approved.length, 'Approved entries')}${tile(drafts.length, 'Drafts waiting for you')}${tile(withDraft.length, 'With Claude’s draft to read', true)}${tile(noSteps, 'Approved with no How to do it')}</div>
+      <p class="psub" style="margin:10px 0 0">${counted}</p>` +
+      howFold('cov-how', [`${approved.length} approved · ${drafts.length} draft${drafts.length === 1 ? '' : 's'} waiting for you${
+        withDraft.length ? ` · <b style="color:var(--clay-ink)">${withDraft.length} with Claude’s draft to read</b>` : ''} · ${noSteps} approved with no How to do it. ${counted}${
+        differ.length ? ` <b style="color:var(--clay-ink)">${differ.length} card name${differ.length === 1 ? '' : 's'} show${differ.length === 1 ? 's' : ''} something else on a phone until the draft is approved</b> (listed below).` : ''}`]) + `</section>`;
+    if (differ.length) html += `<section class="panel"><details open><summary class="arch-toggle">Cards that show something else on a phone · ${differ.length} name${differ.length === 1 ? '' : 's'}</summary><div style="margin-top:12px">
+      <p class="psub" style="margin:0 0 8px">A phone is served approved entries only. These cards find a draft here, so on a phone they show nothing (a card that names its entry shows that entry or nothing) or, with no entry named, the closest approved one. Approve the draft and both agree.</p>${
+      differ.slice(0, 60).map(d => `<div class="credrow"><span class="credname">${esc(d.u.name)}</span><span class="muted">${Object.keys(d.u.athletes).length} athlete${Object.keys(d.u.athletes).length === 1 ? '' : 's'} · here: ${esc((byId[d.a] || {}).name || d.a)} (${byId[d.a] && byId[d.a].status === 'approved' ? 'approved' : 'draft'}) · phone: ${d.p ? esc((phone.byId[d.p] || {}).name || d.p) : 'nothing'}</span></div>`).join('')
+    }${differ.length > 60 ? `<p class="psub">…and ${differ.length - 60} more.</p>` : ''}</div></details></section>`;
+    if (unmapped.length) html += `<section class="panel"><details open><summary class="arch-toggle">Not in the Spine yet · ${unmapped.length} names</summary><div style="margin-top:12px">${
+      `<div class="note-actions" style="margin:0 0 10px"><button class="btn sm" onclick="copyText(${jsq('/spine add\n' + unmapped.map(u => '- ' + u.name).join('\n'))}, this)">Copy /spine add for all ${unmapped.length}</button>
+        <span class="muted" style="font-size:12px">paste it to Claude: each becomes a draft entry for you to approve</span></div>` +
+      unmapped.slice(0, 60).map(u => `<div class="credrow"><span class="credname">${esc(u.name)}</span><span class="muted">${Object.keys(u.athletes).length} athlete${Object.keys(u.athletes).length === 1 ? '' : 's'} · ${u.slots} slot${u.slots === 1 ? '' : 's'}</span>
+        <span class="acts"><button class="btn sm" onclick="copyText(${jsq('/spine add ' + u.name)}, this)">Copy /spine add</button></span></div>`).join('')
+    }${unmapped.length > 60 ? `<p class="psub">…and ${unmapped.length - 60} more.</p>` : ''}</div></details></section>`;
+    if (!nFix) html += `<section class="panel"><p class="empty" style="padding:0">Nothing to fix here: every card name has an entry, and every card shows the same on a phone.</p></section>`;
+    html += `</div>`;
+  } else {
+    const fbtn = (f, t) => `<button class="btn sm sp-filter${filter === f && !q ? ' primary' : ''}" data-f="${f}" aria-pressed="${filter === f && !q}">${t}</button>`;
+    const listLabel = q ? 'Matches' : filter === 'approved' ? 'Approved' : filter === 'claude' ? 'Claude’s drafts to read' : 'Waiting for you';
+    const warn = [differ.length ? `${plural(differ.length, 'card name shows', 'card names show')} something else on a phone` : '', unmapped.length ? `${plural(unmapped.length, 'name', 'names')} not in the Spine` : ''].filter(Boolean).join(' · ');
+    html += `<p class="sp-intro">One entry per exercise you programme. Nothing shows on a phone until it is <b>Approved</b>.</p>` +
+      (warn ? `<a class="sp-warn" href="#exercises/coverage">${warn} → Coverage</a>` : '') +
+      `<div class="sp-split${openE ? ' has-ed' : ''}">
+      <section class="panel sp-listpane">
+        <div class="sp-listhead">
+          <div class="sp-chips">${fbtn('draft', 'Drafts · ' + drafts.length)}${withDraft.length || filter === 'claude' ? fbtn('claude', 'Claude’s drafts · ' + withDraft.length) : ''}${fbtn('approved', 'Approved · ' + approved.length)}</div>
+          <input id="spineQ" type="search" value="${esc(_spineQ)}" placeholder="Find an exercise: name, other name, pattern, equipment or id" aria-label="Find an exercise" style="${field}">
+          <div class="sp-count">${listLabel} · ${shown.length}</div>
+        </div>
+        <div class="sp-list">${shown.length ? shown.slice().sort((a, b) => nAth(b.id) - nAth(a.id) || a.name.localeCompare(b.name)).map(row).join('')
+          : `<p class="empty" style="padding:10px 16px">${q ? 'No entry matches “' + esc(_spineQ) + '”.' : filter === 'draft' ? 'No drafts waiting. Ask Claude to draft the next batch.'
+            : filter === 'claude' ? 'No drafts from Claude waiting. Each one you open and Save leaves this list.' : 'Nothing approved yet: open a draft and tap Approve.'}</p>`}</div>
+      </section>
+      <div class="sp-edpane">${openE ? `<button class="btn sm sp-back">← All exercises</button>${editor(openE)}` : '<div class="sp-empty">Pick an exercise to edit it.</div>'}</div>
+    </div>` +
+      howFold('sp-how', ['The Spine: one entry per exercise you programme. Cues written here fill every card that has none of its own, and the athlete\'s <b>i</b> opens the rest. Nothing shows on a phone until it is <b>Approved</b>.']) +
+      `<datalist id="spineIds">${list.map(e => `<option value="${esc(e.id)}">${esc(e.name)}</option>`).join('')}</datalist>`;
+  }
+
+  // A redraw replaces the whole tab, so what scrolls inside it is put back: the list where it was (a new search or filter starts it at
+  // the top), the editor where it was (a different entry starts at the top), and on a phone the page, which jumps to the editor when
+  // an entry opens and goes back to where the list was when it closes.
+  const oldList = c.querySelector('.sp-list'), oldEd = $('spineEd'), y0 = window.scrollY;
+  const listTop = oldList && !_spListReset ? oldList.scrollTop : 0;
+  const edTop = oldEd && _spEdShown === _spineOpen ? oldEd.scrollTop : 0;
+  const wasShown = _spEdShown;
+  _spListReset = false;
   c.innerHTML = html;
+  const ed = $('spineEd');
+  _spEdShown = ed ? _spineOpen : null;
+  spineFit();
+  const newList = c.querySelector('.sp-list');
+  if (newList && listTop) newList.scrollTop = listTop;
+  if (!window.matchMedia('(min-width: 1000px)').matches) {
+    if (ed && wasShown !== _spineOpen) { if (!wasShown) _spListY = y0; c.querySelector('.sp-edpane').scrollIntoView({ block: 'start', behavior: 'instant' }); }
+    else if (!ed && wasShown && _spListY != null) { window.scrollTo({ top: _spListY, behavior: 'instant' }); _spListY = null; }
+  }
 
   // The open editor: remember it as drawn, then put back what the coach had typed before this redraw.
-  const ed = $('spineEd');
   if (ed && _spineHistId === _spineOpen) loadSpineVersions(_spineHistId);   // History was open: it redraws closed-then-open, so refill it
   if (ed) {
     _spineBase = { id: _spineOpen, state: spineFormState(ed) };
     // Claude's drafts go in after the base is taken, so they count as changes and go up with Save (stage64); then what
     // the coach had typed, over them.
-    const eOpen = byId[_spineOpen];
-    const pf = eOpen ? spinePrefill(eOpen) : {};
+    const pf = openE ? spinePrefill(openE) : {};
     _spinePF = { id: _spineOpen, state: pf };
     spineFormSet(ed, pf);
     Object.keys(pf).forEach(k => { const el = ed.querySelector(`[data-sf="${k.slice(3)}"]`); if (el) el.classList.add('sp-drafted'); });
@@ -7335,6 +7469,7 @@ function renderExercises() {
     spineStepsHint(ed.querySelector('[data-sf="steps"]'));
     const note = () => spineNoteEdits();
     ed.addEventListener('input', note); ed.addEventListener('change', note);
+    if (edTop) ed.scrollTop = edTop;
   } else _spineBase = null;
   // The quality texts: the same, keyed 'id:field'.
   c.querySelectorAll('[data-qf]').forEach(el => {
@@ -7343,9 +7478,9 @@ function renderExercises() {
     el.addEventListener('input', () => { if (el.value !== el.defaultValue) _qualDraft[k] = el.value; else delete _qualDraft[k]; });
   });
   const sq = $('spineQ');
-  sq.addEventListener('input', () => {
+  if (sq) sq.addEventListener('input', () => {
     spineNoteEdits();
-    _spineQ = sq.value;
+    _spineQ = sq.value; _spListReset = true;
     const at = sq.selectionStart;
     renderExercises();
     const n = $('spineQ'); n.focus(); try { n.setSelectionRange(at, at); } catch (e) { /* type=search */ }
@@ -7354,18 +7489,16 @@ function renderExercises() {
     if (ev.target.closest('.spine-ed')) return;
     ev.preventDefault(); ev.stopPropagation();
     const id = el.dataset.open;
-    if (!spineMayLeave(_spineOpen === id ? 'Close it' : 'Open another entry')) return;
-    _spineOpen = _spineOpen === id ? null : id; _spineDraft = null; spineDiscReset(); renderExercises();
-    // Keep the row the coach tapped under their finger: an editor closing above it used to throw it
-    // a thousand pixels up the page.
-    const r = _spineOpen && c.querySelector(`.spine-row[data-open="${CSS.escape(_spineOpen)}"]`);
-    if (r) window.scrollTo({ top: r.getBoundingClientRect().top + window.scrollY - 70, behavior: 'instant' });
+    if (_spineOpen === id) return;   // the one already open: nothing to do (Close closes it)
+    if (!spineMayLeave('Open another entry')) return;
+    _spineOpen = id; _spineDraft = null; spineDiscReset(); renderExercises();
   }));
+  // The editor sits beside the list now, so a filter or a search no longer has to close it: what is typed in it is carried across.
   c.querySelectorAll('.sp-filter').forEach(el => el.addEventListener('click', () => {
-    if (_spineOpen && !spineMayLeave('Switch the list')) return;
-    _spineFilter = el.dataset.f; _spineQ = ''; _spineOpen = null; _spineDraft = null; spineDiscReset(); renderExercises();
+    spineNoteEdits();
+    _spineFilter = el.dataset.f; _spineQ = ''; _spListReset = true; renderExercises();
   }));
-  c.querySelectorAll('.sp-close').forEach(el => el.addEventListener('click', () => {
+  c.querySelectorAll('.sp-close, .sp-back').forEach(el => el.addEventListener('click', () => {
     if (!spineMayLeave('Close it')) return;
     _spineOpen = null; _spineDraft = null; spineDiscReset(); renderExercises();
   }));
@@ -7379,6 +7512,16 @@ function renderExercises() {
     spineSave(el.dataset.id, el.dataset.ap === '1' ? true : el.dataset.ap === '0' ? false : undefined).finally(() => { el.disabled = false; });
   }));
 }
+// From a desktop width the list and the editor are as tall as the window leaves room for, measured from the top of the split (the
+// bars and the intro above it change with the width and with the warning line). CSS has a fallback for the moment before this runs.
+function spineFit() {
+  const sp = document.querySelector('.sp-split');
+  if (!sp) return;
+  if (!window.matchMedia('(min-width: 1000px)').matches) { sp.style.removeProperty('--sp-h'); return; }
+  const top = sp.getBoundingClientRect().top + window.scrollY;
+  sp.style.setProperty('--sp-h', Math.max(420, Math.round(window.innerHeight - top - 16)) + 'px');
+}
+window.addEventListener('resize', spineFit);
 window.renderExercises = renderExercises;
 
 // --- INTAKE (coaching apply-form submissions) -------------------------------
