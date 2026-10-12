@@ -79,7 +79,7 @@ WhatsApp message. Sign-in
 folds Persian and Arabic-Indic digits to 0-9 (`foldDigits()` in program.html, habits.html and the two
 tennis apps, the same fold as `typedPassword()`): the username always, the password only on a retry
 after the typed one fails (2026-10-10; a Farsi keyboard failed every sign-in before). The
-Testing app and Course tabs work the same way. `demo` is named explicitly as
+Course and Testing app logins (coach.html → Buyers) work the same way. `demo` is named explicitly as
 public inside `get_program()` so the marketing link still opens.
 
 **The coaching pipeline writes to the server.** It may still produce a local
@@ -115,7 +115,7 @@ PUBLIC repo — world-readable, despite each opening with "Never published". The
 in `public.coaching_logs`, coach-only, with no athlete arm at all.
 
 **⚠️ There are NO automatic backups.** The Supabase project is on the free plan. 378
-session logs and every progress blob exist in exactly one place. coach.html → Athletes →
+session logs and every progress blob exist in exactly one place. coach.html → ⚙ Tools →
 **⤓ Backup** downloads the whole database as one JSON file; do it weekly and keep a copy
 off the machine. **Keep only the last 12 weekly files** (`aa-backup-<date>.json`), on this PC
 and on the off-machine copy, and delete older ones (Amir, 2026-10-04: "rolling"). The privacy

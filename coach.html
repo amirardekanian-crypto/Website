@@ -100,14 +100,13 @@
   /* A group label: small letter-spaced capitals (the other place they are allowed is a column head). */
   .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
   .muted { color: var(--muted); }
-  .tnum { font-variant-numeric: tabular-nums; }
   .t-sm { font-size: 12px; }
   .t-clay { color: var(--clay-ink); }
   .t-green { color: var(--court); }
   .uc { text-transform: uppercase; }   /* a field that takes a code typed in capitals */
   /* The tone of a figure: a class, so a colour is never typed into a template. */
   .tone-green { color: var(--court); } .tone-plum { color: var(--ochre); } .tone-clay { color: var(--clay-ink); } .tone-ink { color: var(--ink); } .tone-muted { color: var(--muted); }
-  .bar-fill.tone-green { background: var(--court); } .bar-fill.tone-plum { background: var(--ochre); } .bar-fill.tone-clay { background: var(--clay); } .bar-fill.tone-ink, .bar-fill.tone-muted { background: var(--muted); }
+  .bar-fill.tone-green { background: var(--court); } .bar-fill.tone-plum { background: var(--ochre); } .bar-fill.tone-clay { background: var(--clay); } .bar-fill.tone-muted { background: var(--muted); }
   /* A number that lines up with others: Barlow's tabular figures (Space Mono is for numbers that must be exact: see THE LOOK). */
   .brand span, .who, .counter .n, .stab .n, .tab .n, .mp-v, .chart-big, .sp-n, .sp, .wday-n, .pct, .qday, .lib-n, .rf .c, .rgroup .c, .ffacts dd,
   .meta-table td.v, .fun .days, .dv-sub, .tfeed .td, .pulse .tag, .readiness .r b, .wallday .d, .proofstrip .big, .bb-item .n, .ms-row .n, .tbtn .tn { font-variant-numeric: tabular-nums; }
@@ -124,23 +123,21 @@
   .btn.primary:hover { background: var(--court-deep); border-color: var(--court-deep); color: #fff; }
   .btn.quiet { background: none; border-color: transparent; color: var(--muted); padding: 0 8px; }
   .btn.quiet:hover { background: var(--court-100); border-color: transparent; color: var(--court); }
-  .btn.danger, .abtn.danger, .modbtn.danger { color: var(--clay-ink); border-color: var(--clay); background: var(--card); }
-  .btn.danger:hover, .abtn.danger:hover, .modbtn.danger:hover { background: var(--clay-100); border-color: var(--clay); color: var(--clay-ink); }
+  .btn.danger { color: var(--clay-ink); border-color: var(--clay); background: var(--card); }
+  .btn.danger:hover { background: var(--clay-100); border-color: var(--clay); color: var(--clay-ink); }
   /* The FINAL button of a panel that asks first (Erase for good, the dangerAsk panels) is the one place clay is a fill. */
   #eraseGo.danger, #dangerGo.danger { background: var(--clay-fill); border-color: var(--clay-fill); color: #fff; }
   #eraseGo.danger:hover, #dangerGo.danger:hover { background: var(--clay-ink); border-color: var(--clay-ink); color: #fff; }
-  .btn.clay { background: var(--clay-fill); border-color: var(--clay-fill); color: #fff; }
-  .btn.clay:hover { opacity: .92; color: #fff; border-color: var(--clay-fill); }
   .btn[disabled] { opacity: .45; cursor: not-allowed; }
   @media (pointer: coarse) { .btn, .btn.sm, .abtn, .modbtn, .tbtn, .rf, .sp-filter, .sp { min-height: 40px; } .seg { min-height: 36px; } }
   /* A pill that says something: one shape (999, 12, 600) in four tones, neutral (an outline), green, clay and plum. .chip, .ipill, .fl, .zpill, .tag and .hidetag are all it. */
   .chip, .ipill, .fl, .zpill, .tag, .hidetag { display: inline-block; padding: 1px 8px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted);
                                                 font-size: 12px; font-weight: 600; line-height: 1.4; letter-spacing: 0; text-transform: none; white-space: nowrap; }
-  .chip.court, .ipill.en, .ipill.pct, .fl.good, .zpill.green, .tag.done { background: var(--court-100); border-color: transparent; color: var(--court); }
-  .chip.clay, .ipill.fa, .ipill.warn, .fl.warn, .zpill.red, .zpill.reply, .tag.warn, .hidetag { background: var(--clay-100); border-color: transparent; color: var(--clay-ink); }
-  .chip.ochre, .fl.note, .zpill.amber, .tag.partial { background: var(--ochre-100); border-color: transparent; color: var(--ochre); }
+  .chip.court, .ipill.en, .ipill.pct, .fl.good, .tag.done { background: var(--court-100); border-color: transparent; color: var(--court); }
+  .chip.clay, .ipill.fa, .ipill.warn, .fl.warn, .zpill.reply, .tag.warn, .hidetag { background: var(--clay-100); border-color: transparent; color: var(--clay-ink); }
+  .tag.partial { background: var(--ochre-100); border-color: transparent; color: var(--ochre); }
   .fl.under { background: var(--rpe-under-100); border-color: transparent; color: var(--rpe-under); }
-  .chip.solid, .ipill.prog { background: var(--court); border-color: transparent; color: #fff; }
+  .ipill.prog { background: var(--court); border-color: transparent; color: #fff; }
   .fl.miss { background: var(--clay-fill); border-color: transparent; color: #fff; }
   .fl.quiet, .ipill.used { background: transparent; border-color: var(--line); color: var(--muted); }
   /* A fold: ONE style, for every <details>. The chevron is on the left and turns when the fold opens, then the label (14 px, 600), then the count in muted text after it.
@@ -155,7 +152,6 @@
   .how > summary { font-size: 12px; font-weight: 400; color: var(--muted); }
 
   @keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
 
   /* ── The bar (2026-10-12, round 2 of the coach UX pass: nine tabs became seven places). From 900 px up it is ONE sticky bar, 56 px: the brand, the
@@ -419,14 +415,13 @@
   .psub { font-size: 12px; color: var(--muted); margin: -8px 0 12px; }
 
   .empty { color: var(--muted); font-size: 14px; padding: 12px 0 4px; }
-  /* ── Intake (coaching apply-form submissions) ── */
+  /* ── Leads: the referral-code cards (.intake-card and .i-*, named for the Intake they were first drawn for) and an application's closing row ── */
   /* A card in a panel is a hairline-divided row (one level of container): its header is the fold's summary, its body opens under it. */
   .intake-card { border-top: 1px solid var(--rule); }
   .intake-card:first-of-type { border-top: 0; }
   .intake-card.archived { opacity: .7; }
   .intake-card > summary { display: flex; align-items: center; gap: 12px; padding: 12px 0; flex-wrap: wrap; row-gap: 8px; }
   .intake-card > summary:hover { background: none; }
-  .intake-card .ava { width: 32px; height: 32px; border-radius: 999px; background: var(--court); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex: none; }
   .intake-card .i-name { font-weight: 600; font-size: 14px; }
   .intake-card .i-when { margin-left: auto; font-size: 12px; color: var(--muted); white-space: nowrap; }
   .i-body { padding: 4px 0 16px 28px; }
@@ -446,7 +441,7 @@
   .in-quiet .btn { background: none; border-color: transparent; color: var(--muted); }
   .in-quiet .btn:hover { background: var(--court-100); border-color: transparent; color: var(--court); }
   .i-outcome [hidden] { display: none; }
-  /* The Intake tab (2026-10-12, round 2): the list on the left, the chosen application on the right. Below 1000 px the list is the screen
+  /* Leads → Applications (2026-10-12, round 2): the list on the left, the chosen application on the right. Below 1000 px the list is the screen
      until one is chosen, then that application is, with a way back (data-pane says which). The list scrolls by itself so the page does not. */
   .in-view { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); }
   .in-view > .panel { min-width: 0; }
@@ -580,7 +575,7 @@
   .wline .modbtn:hover { color: var(--clay-ink); background: var(--clay-100); border-color: transparent; }
   .wline.coachline { background: var(--court); color: #fff; border-radius: 12px; padding: 12px 12px; }
   .wline.coachline .ava { background: #fff; color: var(--court); }
-  .wline.coachline .nm, .wline.coachline .pct { color: #fff; }
+  .wline.coachline .nm { color: #fff; }
   .showweek { width: 100%; text-align: center; font-size: 14px; font-weight: 600; color: var(--muted);
               padding: 12px 0 4px; }
   .showweek:hover { color: var(--court); }
@@ -717,7 +712,6 @@
   .dethead .det-wa a:not(.abtn) { color: var(--court); border-bottom: 1px solid var(--court-100); }
   .sec { font-weight: 600; font-size: 17px; color: var(--ink); margin: 24px 0 12px; display: flex; align-items: center;
          justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-  .sec .acts { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   /* ── Athlete → File: four groups, one white panel each; label / value / action rows between hairlines (2026-10-12) ── */
   .fgroup { margin-top: 24px; }
   .fgroup:first-child { margin-top: 4px; }
@@ -1061,7 +1055,7 @@
   .did-sets.ok { color: var(--court); } .did-sets.warn { color: var(--ochre); } .did-sets.miss { color: var(--clay-ink); }
   .did-sets.note { color: var(--muted); }
   .did-load { color: var(--ink); }
-  .did-rpe.ok { color: var(--muted); } .did-rpe.warn { color: var(--clay-ink); font-weight: 700; } .did-rpe.note { color: var(--ochre); }
+  .did-rpe.ok { color: var(--muted); } .did-rpe.warn { color: var(--clay-ink); font-weight: 700; }
   .did-none { color: var(--muted-soft); }
   .did-detail { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
   .cmp-flags { display: flex; flex-wrap: wrap; gap: 4px; align-content: start; }
@@ -1170,8 +1164,6 @@
   .meta-table td { padding: 4px 0; border: none; font-size: 14px; vertical-align: top; }
   .meta-table td.k { color: var(--muted); width: 128px; font-size: 12px; font-weight: 600; padding-right: 12px; }
   .meta-table td.v { font-size: 14px; overflow-wrap: anywhere; }
-  /* A Farsi answer: right to left, in the page's own font (Space Mono has no Persian letters). */
-  .meta-table td.v.rtl { font-family: inherit; font-size: 14px; line-height: 1.6; }
   .empty code, .pr-n, .credname { overflow-wrap: anywhere; }
   .note { background: var(--paper); border-left: 3px solid var(--line); padding: 8px 12px; border-radius: 8px; margin-top: 12px; font-size: 14px; }
   .note.green { border-left-color: var(--court); }
@@ -1180,9 +1172,6 @@
   .readiness { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
   .readiness .r { font-size: 12px; color: var(--muted); }
   .readiness .r b { font-weight: 600; color: var(--ink); }
-  .pex { padding: 8px 0; border-bottom: 1px solid var(--rule); }
-  .pex:last-child { border-bottom: none; }
-  .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
 
   /* Session-note actions (Mark read). Amir answers only on WhatsApp, 2026-09-26. */
   .note-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
@@ -1470,6 +1459,10 @@ function prettyDate(iso) {
   const d = new Date(+p[0], +p[1] - 1, +p[2]);
   return `${DOWS[d.getDay()]} ${+p[2]} ${MONTHS[+p[1] - 1]} ${p[0]}`;
 }
+// "12 Oct": the day and month of a YYYY-MM-DD date. The roster's Cycle column and the athlete header's cycle line say it this way.
+function dayMonth(iso) { const q = pDate(iso); return `${q.getDate()} ${MONTHS[q.getMonth()]}`; }
+// "Mon 12 Oct 2026" from a Date: Today's strip and a version's stamp.
+function longDay(d) { return `${DOWS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; }
 function wallDayLabel(iso) {
   const t = todayKey();
   if (iso === t) return 'Today';
@@ -1635,8 +1628,8 @@ const S = {
   clogs: {},       // athlete_id -> coaching_logs row (metadata only; the body is
                    // fetched on demand, it is long prose).
   affiliates: [],  // public.affiliates rows — the referral-code roster (coach only).
-  assess: null,    // public.assess_accounts rows — testing-app logins, loaded when that tab opens.
-  course: null,    // public.tps_accounts rows — course app (/tennis/app/) logins, loaded when that tab opens.
+  assess: null,    // public.assess_accounts rows — testing-app logins, loaded when Buyers opens.
+  course: null,    // public.tps_accounts rows — course app (/tennis/app/) logins, loaded when Buyers opens.
   ath: {},         // assembled per-athlete records
   levels: {},      // athlete_id -> server season level
   board: { season: null, week: null },
@@ -1908,7 +1901,7 @@ function copyLoginFor(athleteId) {
 }
 
 // null = decide by length: open while 3 or fewer wait (a collapsed list got forgotten), folded when
-// longer (ten open rows pushed the roster below the fold on a phone). A tap overrides it.
+// longer (ten open rows filled a phone's screen). A tap overrides it.
 let _credsOpen = null;
 function credsOpen(n) { return _credsOpen == null ? n <= 3 : _credsOpen; }
 function toggleCreds() { const n = Object.values(S.logins || {}).filter(r => r.initial_password).length; _credsOpen = !credsOpen(n); render(); }
@@ -2607,7 +2600,7 @@ function assemble() {
 }
 
 // ── Who needs you, and why: ONE rule ─────────────────────────────────────────
-// Used by Today's Needs you, the roster's reason chips, its "Needs you" group and filter, and its
+// Used by Today's Needs you, the roster's Why column, its "Needs you" group and filter, and its
 // sort. Until 2026-10-10 there were four versions (the Today panel, rosterReasons, the roster
 // sort and the counters), and they disagreed: sync gaps and upgrade leads never reached Today,
 // new signups never reached the roster, and a run of low days did not move the sort.
@@ -2774,7 +2767,7 @@ const TABS = [
 // The sub-tabs of Leads and Buyers: the address part (the first has none), the label, and what it shows (renderLeads(), renderBuyers()).
 const LEAD_TABS = [{ sub: '', label: 'Applications' }, { sub: 'signups', label: 'Free signups' }, { sub: 'codes', label: 'Referral codes' }];
 const BUYER_TABS = [{ sub: '', key: 'course', label: 'Course' }, { sub: 'testing', key: 'assess', label: 'Testing app' }];
-// #a/<id> opens an athlete's file; #a/<id>/<sub> opens it on one of its four
+// #a/<id> opens an athlete's file; #a/<id>/<sub> opens it on one of its three
 // screens, so any of them can be bookmarked or reloaded in place. A retired
 // screen's old link (/chat, removed 2026-09-26) still reads as a screen, so it
 // lands on The work instead of being taken for part of the athlete's id.
@@ -2999,7 +2992,7 @@ function renderToday() {
   $('content').innerHTML = `
     <section class="board">
       <div class="board-top">
-        <span class="board-date">${DOWS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}</span>
+        <span class="board-date">${longDay(now)}</span>
         ${season ? `<span class="board-season">${esc(season.name)} · <b>Day ${sd}</b></span>` : ''}
       </div>
       <div class="counters">
@@ -3506,15 +3499,9 @@ function adherence(sessions, daysPerWeek, weeks, ref) {
   return { done, expected, pct: Math.min(100, raw), extra: Math.max(0, done - expected), days: effDays,
            weeks: effWeeks, perWeek: daysPerWeek };
 }
-function athleteMetrics(sessions, lastActive, daysPerWeek) {
+function athleteMetrics(sessions, daysPerWeek) {
   const daily = dailyLoad(sessions);
   const rser  = readinessSeries(sessions);
-  const loadPts = sessions
-    .filter(s => s.session_rpe != null && s.duration_min != null && s.completed_on)
-    .slice().sort((a, b) => String(a.completed_on).localeCompare(String(b.completed_on)))
-    .map(s => Number(s.session_rpe) * Number(s.duration_min));
-  const byRecent = sessions.slice().sort((a, b) => String(b.completed_on).localeCompare(String(a.completed_on)));
-  const lastPartial = byRecent.length ? isPartialStatus(byRecent[0].status) : false;
   const latestRd = sessions
     .map(s => { const rd = jparse(s.readiness); return { iso: s.completed_on, at: rd && rd.timestamp, rd }; })
     .filter(x => x.iso && x.rd && typeof x.rd === 'object' && !x.rd.skipped && (x.rd.level || x.rd.composite != null))
@@ -3526,8 +3513,7 @@ function athleteMetrics(sessions, lastActive, daysPerWeek) {
   if (cover.total > cover.withLoad) { acwr.enough = false; acwr.partial = true; }
   return { daily, acwr, cover, rser, readiness: readinessStats(rser),
            latestPlan: latestRd && latestRd.rd.level ? latestRd.rd : null,
-           adherence: adherence(sessions, daysPerWeek), loadPts, lastPartial,
-           daysIdle: daysSince(lastActive), neverActive: !lastActive && !sessions.length };
+           adherence: adherence(sessions, daysPerWeek) };
 }
 
 // --- tiny inline-SVG charts (ported) ----------------------------------------
@@ -3757,15 +3743,14 @@ function rosterCycleHtml(a) {
   if (!p) return '<span class="muted">no programme</span>';
   if (!c) return '<span class="muted">no cycle</span>';
   if (!c.start || !c.end) return `<span class="muted">${esc([c.name, c.weeks].filter(Boolean).join(' · ') || 'no cycle')}</span>`;   // undated: its name and length
-  const dayMon = iso => { const q = iso.split('-'); return +q[2] + ' ' + MONTHS[+q[1] - 1]; };
   const t = todayKey();
   const w = cycleWeekOnC({ startDate: c.start, endDate: c.end }, t);
   const n = (Number.isInteger(p.currentCycleIndex) ? p.currentCycleIndex : 0) + 1;
   if (!w) return `<span class="muted">${esc(c.name || 'C' + n)}</span>`;
-  if (w.before) return `<b>C${n}</b><span class="muted"> · starts ${dayMon(c.start)}</span>`;
+  if (w.before) return `<b>C${n}</b><span class="muted"> · starts ${dayMonth(c.start)}</span>`;
   const left = daysBetween(t, c.end);   // days to go; below 0 once it has ended
   const soon = left <= CYCLE_SOON_DAYS;
-  const end = left < 0 ? `ended ${-left} d ago` : left === 0 ? 'ends today' : soon ? `ends in ${left} d` : `ends ${dayMon(c.end)}`;
+  const end = left < 0 ? `ended ${-left} d ago` : left === 0 ? 'ends today' : soon ? `ends in ${left} d` : `ends ${dayMonth(c.end)}`;
   const warn = soon && a.tier === 'coached' && a.status === 'active';
   return `<b>C${n}</b><span class="muted"> · wk ${w.wk}/${w.total} · </span>${warn ? `<span class="warn">${end}</span>` : `<span class="muted">${end}</span>`}`;
 }
@@ -3783,7 +3768,7 @@ function renderRoster() {
   // The column heads (a PC only: CSS hides them on a phone, where a row is two lines).
   const head = '<div class="rhead" aria-hidden="true"><span class="h-ath">Athlete</span><span>Cycle</span><span>Last session</span><span>Proof</span><span>Why</span></div>';
   const rowHtml = (a) => {
-    const m = athleteMetrics(a.sessions, a.lastActive, a.tier === 'coached' ? a.perWeek : 0);
+    const m = athleteMetrics(a.sessions, a.tier === 'coached' ? a.perWeek : 0);
     const az = acwrZone(m.acwr.enough ? m.acwr.ratio : null);
     // Only a load spike earns a word, in plum. "Low load" looked the same as "climbing", and an
     // idle athlete's "ACWR 0" repeated the no-session reason.
@@ -3838,7 +3823,6 @@ function renderRoster() {
     `<p class="empty">${q ? `No one matches “${esc(q)}” here.` : `Nobody in ${esc(filt.label)} right now.`}</p>`;
 }
 window.renderRoster = renderRoster;
-window.renderAthletes = renderAthletes;
 
 window.copyText = copyText;
 
@@ -4850,7 +4834,7 @@ window.explainVersion = explainVersion;
 function fmtLocalStamp(iso) {
   const d = new Date(iso);
   if (isNaN(d)) return String(iso || '');
-  return `${DOWS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()} · ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  return `${longDay(d)} · ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
 
 // Roll one athlete's programme back to a stored version. The trigger snapshots
@@ -5172,7 +5156,7 @@ function liveSnapshotHtml(D) {
 }
 
 // --- athlete file ------------------------------------------------------------
-// One person, five screens. It used to be eight sections on a single scroll —
+// One person, three screens. It used to be eight sections on a single scroll —
 // three of which rendered the same program days three different ways — so the
 // page opened at four thousand pixels and buried the only thing worth reading.
 let _D = null;
@@ -5206,13 +5190,12 @@ function cycleLineHtml(D) {
   const cyc = (p && p.cycles || [])[(p && Number.isInteger(p.currentCycleIndex)) ? p.currentCycleIndex : 0];
   if (!cyc) return '';
   const cd = D.a && D.a.cycle, dated = !!(cd && (cd.start || cd.end));
-  const fmtD = iso => { const q = pDate(iso); return `${q.getDate()} ${MONTHS[q.getMonth()]}`; };
   const wk = dated ? cycleWeekOnC(cyc, todayKey()) : null;
   const left = cd && cd.end ? daysBetween(todayKey(), cd.end) : null;
   const bits = [];
   if (wk && !wk.before && !wk.after) bits.push(`week ${wk.wk} of ${wk.total}`);
   else if (!dated && cyc.weeks) bits.push(esc(cyc.weeks));
-  if (dated) bits.push(`${cd.start ? esc(fmtD(cd.start)) : '?'} – ${cd.end ? esc(fmtD(cd.end)) : '?'}`);
+  if (dated) bits.push(`${cd.start ? esc(dayMonth(cd.start)) : '?'} – ${cd.end ? esc(dayMonth(cd.end)) : '?'}`);
   if (left != null) bits.push(left > 0 ? `${left} day${left === 1 ? '' : 's'} left` : left === 0 ? 'ends today' : `ended ${-left} day${left === -1 ? '' : 's'} ago`);
   const fo = cyc.focuses && cyc.focuses.length ? `<span class="det-fo">· ${cyc.focuses.map(esc).join(', ')}</span>` : '';
   return `<div class="det-cycle"><b>${esc(cyc.name || 'This cycle')}</b>${bits.length ? `<span>· ${bits.join(' · ')}</span>` : ''}${fo}</div>`;
@@ -5262,7 +5245,7 @@ async function renderDetail(athleteId, sub) {
       callLogs,
       lib,
       logsErr: full.ok ? '' : full.error,
-      metrics: athleteMetrics(history, a.lastActive, programDays.length),
+      metrics: athleteMetrics(history, programDays.length),
       stamp: S.stamp,
     };
     // A rebuild of the SAME athlete (after a save or a refresh) keeps the days the coach had
@@ -5549,7 +5532,7 @@ function hiddenSessionsHtml(D) {
     </div>`;
 }
 // Which tier the Proof funnel treats a contact as: the programme's (S.ath), not the contact row's second copy. A coached client who signed up
-// through Proof first is "converted", and is never offered Forget. renderProof() and the File's Danger zone ask the same question.
+// through Proof first is "converted", and is never offered Forget. funnelPanelHtml() (Leads → Free signups) and the File's Danger zone ask the same question.
 function contactTierOf(c) { return (S.ath[c.athlete_id] && S.ath[c.athlete_id].tier) || c.tier || 'free'; }
 // The File tab: four groups, in this order, each one white panel with label / value / action rows between hairlines, and the longer
 // explanations folded at the end of their group (How this works). The Danger zone is shut until it is needed (or while Erase is open).
@@ -6090,7 +6073,7 @@ async function eraseRun() {
   if (!e || e.status !== 'ready' || !e.pv) return;
   if (!eraseMatches(e)) { toast('Type ' + e.pv.confirm_word + ' exactly to confirm'); return; }
   const who = e.pv.shown_as || e.key;
-  const forms = e.picked.map(id => eraseFormLabel(id));   // plain text for the alert; taken now, the lists reload after a success
+  const forms = e.picked.map(id => eraseFormLabel(id));   // plain text for the receipt; taken now, the lists reload after a success
   e.status = 'busy'; e.slow = false; e.stopped = false; render();
   e.timer = setTimeout(() => { if (_erase === e && e.status === 'busy') { e.slow = true; render(); } }, 30000);
   const res = await sb.rpc('coach_erase_person', { p_kind: e.kind, p_key: e.key, p_confirm: String(e.typed).trim(), p_intake_ids: e.picked, p_dry_run: false });
@@ -6498,8 +6481,6 @@ const AFF_FIELDS = [
 ];
 let _affEditing = null;   // the code whose card is in edit mode, '__new__' for the add form, or null
 
-// Iranian mobiles are typed 09…; wa.me needs the country code instead of the 0.
-function affWa(num) { return waLink(num); }   // one builder: waLink() (Intake) handles Persian digits too
 function affIg(handle) {
   const h = String(handle || '').trim().replace(/^@/, '');
   return h ? 'https://instagram.com/' + encodeURIComponent(h) : '';
@@ -6556,7 +6537,7 @@ function affCard(a) {
 
   const cbits = [];
   if (a.instagram) cbits.push(`<a href="${esc(affIg(a.instagram))}" target="_blank" rel="noopener">${esc(a.instagram)}</a>`);
-  if (a.whatsapp) cbits.push(`<a href="${esc(affWa(a.whatsapp))}" target="_blank" rel="noopener">${esc(a.whatsapp)}</a> <button class="btn sm copy-btn-js" data-url="${esc(a.whatsapp)}">Copy</button>`);
+  if (a.whatsapp) cbits.push(`<a href="${esc(waLink(a.whatsapp))}" target="_blank" rel="noopener">${esc(a.whatsapp)}</a> <button class="btn sm copy-btn-js" data-url="${esc(a.whatsapp)}">Copy</button>`);
   if (a.email) cbits.push(`<a href="mailto:${esc(a.email)}">${esc(a.email)}</a> <button class="btn sm copy-btn-js" data-url="${esc(a.email)}">Copy</button>`);
   const contactLine = cbits.join('<span class="dot">·</span>') || '<span class="muted">No contact on file</span>';
 
@@ -7475,7 +7456,7 @@ window.undoSpineVersion = undoSpineVersion;
 // The identity rules, shared by Save and Undo (Undo can bring an old name, alias or link back, so it meets the same
 // rules). A new name or alias must not take a card away from this entry or from another one; an entry that live
 // cards use cannot be renamed from here (the cards and their logged history have to move with it: /spine's "One name
-// in live programmes"); and a link that looks like an id must be an entry. Returns the text for an alert, or '' when
+// in live programmes"); and a link that looks like an id must be an entry. Returns the text for the failure line, or '' when
 // the change is fine. `undoing` only changes the closing words.
 function spineIdentityProblem(id, cur, name, aliases, undoing) {
   const tail = undoing ? 'Nothing was changed.' : 'Nothing was saved.';
