@@ -4356,9 +4356,6 @@
      32 px it kept free. */
   .v-progress { display: none; }
   :where(#day-view) .day-content { padding: 0 0 120px; }
-  /* INTERIM: the pieces this block does not draw yet keep the gutter the full-bleed panel took away. Delete this rule when
-     the cards, the circuits and the finish move into this block. */
-  :where(#day-view) .day-content > :is(.rd-banner, .session-confirm, .session-complete) { margin-left: var(--g); margin-right: var(--g); }
 
   /* Before Start (P5): the bar is the cover's foot, inside the green, in the flow (not sticky): "Ready when you are", the
      clock in white, Start (the lighter green, a light ring) and Guided (outlined white), then a hairline and the week's
@@ -5029,6 +5026,166 @@
     :where(#day-view, .step-scroll, #ws-body) .ex-rest-bottom .rest-btn { min-width: 0; padding: 0 14px; gap: 8px; }
     :where(#day-view, .step-scroll, #ws-body) .round-wt { width: 58px; }
   }
+  /* 8. THE FINISH (Centre Court 3/3). One strong green thing at a time: in progress the card is one quiet line (the slim bar's
+     line is the progress bar now); ready, the green moves here: a band that says so, then the rating, the note, the WhatsApp
+     row and one Done; after Done the finished card is signed the way the About sheet signs its reason. refreshConfirmCard()
+     and finishDay() set the same classes as before (partial, ready, early, visible). Full-bleed; each part carries --g. */
+  :where(#day-view) .session-confirm { margin: 0; padding: 0; gap: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+  /* in progress: IN PROGRESS over the count, Finish early (outlined grey: it ends the session, two taps) on the right */
+  :where(#day-view) .session-confirm.partial { flex-direction: row; align-items: center; gap: 12px; margin: 28px var(--g) 8px; padding-top: 16px;
+    border-top: 1px solid var(--hair); }
+  :where(#day-view) .session-confirm.partial .confirm-body { flex: 1; }
+  :where(#day-view) .session-confirm.partial .confirm-top { flex-direction: column; align-items: flex-start; gap: 4px; }
+  :where(#day-view) .session-confirm.partial .confirm-bar { display: none; }
+  :where(#day-view) .session-confirm .confirm-text { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view) .session-confirm .confirm-count { font: 500 var(--fs-small)/1.2 'Barlow', sans-serif; letter-spacing: 0; color: var(--grey); white-space: nowrap; }
+  :where(#day-view) .session-confirm .confirm-foot { margin: 0; }
+  :where(#day-view) .session-confirm.partial .confirm-btn { min-height: 44px; padding: 0 18px; border: 0; border-radius: 8px; background: transparent; color: var(--ink);
+    box-shadow: inset 0 0 0 1.5px var(--box); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; }
+  :where(#day-view) .session-confirm .confirm-btn.armed { background: var(--clay-fill); color: #fff; box-shadow: none; }
+  /* ready (every set done, or Finish early taken twice): the green band, the eyebrow in mint, the words at 44 px */
+  :where(#day-view) .session-confirm.ready { flex-direction: column; margin: 28px 0 0; background: none; }
+  :where(#day-view) .session-confirm.ready .confirm-body { padding: 26px var(--g) 28px; background: var(--hero); color: #fff; }
+  :where(#day-view) .session-confirm.ready .confirm-top { flex-direction: column; align-items: flex-start; gap: 0; }
+  :where(#day-view) .session-confirm.ready .confirm-count { order: -1; display: flex; align-items: center; gap: 8px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
+  :where(#day-view) .session-confirm.ready .confirm-count::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  :where(#day-view) .session-confirm.ready .confirm-text { margin-top: 12px; font: 900 var(--fs-display)/.92 'Barlow Condensed', sans-serif; letter-spacing: .4px; color: #fff; text-wrap: balance; }
+  :where(#day-view) .session-confirm.ready .confirm-bar { display: none; }
+  /* finishing early: what is not done, listed on the green (the one place "not done" is said) */
+  :where(#day-view) .session-confirm.early .confirm-missing { margin-top: 18px; }
+  :where(#day-view) .session-confirm.early .confirm-missing-label { margin-bottom: 4px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; color: var(--mint); }
+  :where(#day-view) .session-confirm.early .confirm-missing ul { font: 500 var(--fs-body)/1.3 'Barlow', sans-serif; color: #fff; }
+  :where(#day-view) .session-confirm.early .confirm-missing li { min-height: 40px; padding: 8px 0; border-top: 1px solid rgba(255,255,255,.16); }
+  :where(#day-view) .session-confirm.early .confirm-missing li:first-child { border-top: 0; }
+  :where(#day-view) .session-confirm.early .confirm-missing-tag { font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; color: var(--clay-on-green); }
+  /* the rating: two rows of five big keys; the note; the WhatsApp row (the About sheet's Your history recipe) */
+  :where(#day-view) .finish-rate { padding: 28px var(--g) 0; text-align: left; }
+  :where(#day-view) .complete-rate-slot .finish-rate { margin-top: 0; }
+  :where(#day-view) .complete-rpe { max-width: none; margin: 0; }
+  :where(#day-view) .complete-rpe-label { margin: 0; font: 700 var(--fs-title)/1.05 'Barlow Condensed', sans-serif; letter-spacing: .5px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view) .complete-rpe-hint { margin: 6px 0 0; font: 500 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  :where(#day-view) .complete-rpe-buttons { gap: 8px; margin-top: 16px; }
+  :where(#day-view) .complete-rpe-btn { height: 52px; border: 0; border-radius: 10px; background: var(--row); box-shadow: inset 0 0 0 1px var(--box);
+    font: 700 var(--fs-title)/1 'Barlow Condensed', sans-serif; color: var(--ink); }
+  :where(#day-view) .complete-rpe-btn.selected { background: var(--fill); color: #fff; box-shadow: none; }
+  :where(#day-view) .complete-note { max-width: none; margin: 28px 0 0; }
+  :where(#day-view) .complete-note-label { margin: 0; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view) .complete-note-input { min-height: 96px; margin-top: 10px; padding: 12px 14px; border: 1px solid var(--box); border-radius: 12px; background: var(--row);
+    color: var(--ink); font: 400 var(--fs-field)/1.4 'Barlow', sans-serif; }
+  :where(#day-view) .complete-note-input::placeholder { color: var(--ph); }
+  :where(#day-view) .complete-note-input:focus { border-color: var(--green-ink); }
+  :where(#day-view) .wa-inline, :where(#day-view) .session-complete .complete-habit { display: flex; align-items: center; gap: 24px; width: 100%; min-height: 64px; margin: 12px 0 0;
+    padding: 12px 14px 12px 11px; border: 1px solid var(--box); border-radius: 14px; background: var(--row); color: var(--ink); text-decoration: none; text-align: left; box-sizing: border-box; }
+  :where(#day-view) .wa-inline > svg { flex: none; width: 20px; height: 20px; color: var(--green-ink); }
+  :where(#day-view) .wa-inline-txt { flex: 1; min-width: 0; display: grid; gap: 5px; }
+  :where(#day-view) .wa-inline-txt b { font: 700 var(--fs-label)/1.1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view) .wa-inline-txt small { font: 500 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  /* the → is drawn as the one grey chevron */
+  :where(#day-view) .wa-inline-go, :where(#day-view) .session-complete .complete-habit::after { flex: none; width: 12px; height: 12px; overflow: hidden; color: transparent;
+    font: 400 var(--fs-label)/1 'Barlow', sans-serif; background: var(--grey); -webkit-mask: var(--chev) center / 12px no-repeat; mask: var(--chev) center / 12px no-repeat; }
+  :where(#day-view) .finish-hint { padding: 14px var(--g) 0; font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--clay-ink); text-align: left; }
+  :where(#day-view) .session-confirm.ready .confirm-foot { flex-direction: column; align-items: stretch; gap: 4px; padding: 20px var(--g) 30px; }
+  :where(#day-view) .session-confirm.ready .confirm-btn { width: 100%; min-height: 56px; border: 0; border-radius: 8px; background: var(--btn); color: #fff; box-shadow: none;
+    font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; }
+  :where(#day-view) .session-confirm.ready .confirm-btn.armed { background: var(--clay-fill); }
+  :where(#day-view) .confirm-back { align-self: center; min-height: 44px; color: var(--grey); }
+
+  /* 9. After Done: the finished card, signed. A grid; its ::before paints the green band behind the picture (when the session
+     was finished whole), DAY N DONE, the message with the clay quote and Amir's signature and photo (.complete-by: WN_SIG and
+     .wn-av, the About sheet's sign-off). On the paper under it: the send status (the card's one ✓), AA Proof as a row with an
+     open-out glyph, the day-after suggestion, the rating and note (moveRatePanel() moves them here), then Send the update and
+     Reset Session. Rows are placed by class, so the DOM order stays as it was. */
+  :where(#day-view) .session-complete { margin: 28px 0 0; padding: 0 0 32px; border: 0; border-radius: 0; background: none; text-align: left; overflow: hidden; }
+  :where(#day-view) .session-complete.visible { display: grid; grid-template-columns: minmax(0, 1fr); }
+  :where(#day-view) .session-complete::before { content: ''; grid-column: 1; grid-row: 1 / 6; background: var(--hero); }
+  :where(#day-view) .session-complete > * { grid-column: 1; position: relative; min-width: 0; }
+  :where(#day-view) .session-complete .complete-art { grid-row: 1; margin: 0; height: 120px; aspect-ratio: auto; max-height: none; background: none; }
+  :where(#day-view) .session-complete .complete-art[hidden] { display: none; }
+  :where(#day-view) .session-complete .complete-art img { mix-blend-mode: luminosity; opacity: .6;
+    -webkit-mask-image: linear-gradient(180deg, #000 20%, transparent 100%); mask-image: linear-gradient(180deg, #000 20%, transparent 100%); }
+  :where(#day-view) .session-complete .complete-art::after { display: none; }
+  :where(#day-view) .session-complete .complete-emoji { display: none; }   /* DAY 1 DONE says it, the way the About sheet opens on its words */
+  :where(#day-view) .session-complete .complete-title { grid-row: 2; margin: 0; padding: 30px var(--g) 0; font: 900 var(--fs-display)/.92 'Barlow Condensed', sans-serif;
+    letter-spacing: .4px; text-transform: uppercase; color: #fff; text-wrap: balance; }
+  :where(#day-view) .session-complete .complete-art:not([hidden]) ~ .complete-title { padding-top: 0; margin-top: -18px; }
+  :where(#day-view) .session-complete .complete-sub { grid-row: 3; margin: 18px var(--g) 0; padding: 16px 0 0 44px; border-top: 1px solid rgba(255,255,255,.16);
+    font: 500 var(--fs-lead)/1.42 'Barlow', sans-serif; color: #fff; text-wrap: pretty; }
+  :where(#day-view) .session-complete .complete-sub:empty { display: none; }
+  :where(#day-view) .session-complete .complete-sub::before { content: '\201C'; position: absolute; left: 0; top: 15px; width: 32px; text-align: left;
+    font: 900 var(--fs-display)/1 'Barlow Condensed', sans-serif; color: var(--clay-on-green); }
+  :where(#day-view) .session-complete .complete-by { grid-row: 4; display: flex; align-items: flex-end; justify-content: flex-end; gap: 10px; padding: 8px var(--g) 24px; color: #fff; }
+  :where(#day-view) .session-complete .complete-by .wn-sig { width: 104px; height: 37px; margin: 0; color: #fff; }
+  :where(#day-view) .session-complete .complete-by .wn-av { width: 40px; height: 40px; margin: 0; box-shadow: 0 0 0 2px rgba(255,255,255,.92); }
+  :where(#day-view) .session-complete > .complete-habit + .complete-actions { grid-row: 6; display: block; margin: 0; padding: 20px var(--g) 0; }
+  :where(#day-view) .session-complete > .complete-habit { grid-row: 7; width: auto; max-width: none; margin: 12px var(--g) 0; cursor: pointer; }
+  :where(#day-view) .session-complete > .complete-habit[hidden] { display: none; }
+  :where(#day-view) .session-complete > .complete-sugg-slot { grid-row: 8; margin: 0 var(--g); }
+  :where(#day-view) .session-complete > .complete-sugg-slot:not(:empty) { margin-top: 12px; }
+  :where(#day-view) .session-complete .lib-sugg { min-height: 64px; border-color: var(--box); border-radius: 14px; background: var(--row); }
+  :where(#day-view) .session-complete > .complete-rate-slot { grid-row: 9; }
+  :where(#day-view) .session-complete > .complete-rate-slot + .complete-actions { grid-row: 10; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px;
+    margin: 0; padding: 28px var(--g) 0; }
+  :where(#day-view) .send-session-status { min-height: 0; text-align: left; font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--grey); }
+  :where(#day-view) .send-session-status.success { color: var(--green-ink); }
+  :where(#day-view) .send-session-status.pending { color: var(--clay-ink); }
+  :where(#day-view) .send-retry { min-height: 44px; }
+  :where(#day-view) .send-session-btn { min-width: 0; min-height: 44px; padding: 0 18px; border: 0; border-radius: 8px; background: var(--btn); color: #fff;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  :where(#day-view) .reset-session-btn { min-height: 44px; margin: 0; padding: 0 18px; border: 0; border-radius: 8px; background: transparent; color: var(--ink);
+    box-shadow: inset 0 0 0 1.5px var(--box); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; }
+  :where(#day-view) .reset-session-btn.armed { background: var(--clay-fill); color: #fff; box-shadow: none; }
+  /* AA Proof's row opens the other app: an open-out glyph (its ✓ is transparent), so the only ✓ on the card is the send status */
+  :where(#day-view) .session-complete .complete-habit-mark { flex: none; width: 20px; height: 20px; border-radius: 0; overflow: hidden; color: transparent;
+    font: 400 var(--fs-label)/1 'Barlow', sans-serif; background: var(--green-ink);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5'/%3E%3C/svg%3E") center / 20px no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5'/%3E%3C/svg%3E") center / 20px no-repeat; }
+  /* the label on top, the line under it (a first-timer's intro stays one paragraph) */
+  :where(#day-view) .session-complete .complete-habit-text { flex: 1; min-width: 0; font: 500 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); }
+  :where(#day-view) .session-complete .complete-habit:not(.is-intro) .complete-habit-text { display: flex; flex-direction: column-reverse; gap: 5px; }
+  :where(#day-view) .session-complete .complete-habit-text b { color: var(--green-ink); }
+  :where(#day-view) .session-complete .complete-habit:not(.is-intro) .complete-habit-text b { display: block; font: 700 var(--fs-label)/1.1 'Space Mono', monospace;
+    letter-spacing: 1.2px; text-transform: uppercase; }
+  :where(#day-view) .session-complete .complete-habit::after { content: '\203A'; }
+
+  /* 10. The lower-day banner (readinessBannerHtml()): a white row under the bar, full width, a 4 px stripe in the colour that
+     asks (clay a lower or short day, steel blue a sore one, none when training as written), its label in that colour, the
+     sentence in ink, and Train as written as the one text link (green condensed capitals, the chevron). The cards' pills are
+     section 7's clay pills. */
+  :where(#day-view) .rd-banner { margin: 0; }
+  :where(#day-view) .rd-in, :where(#day-view) .rd-in.rd-sore, :where(#day-view) .rd-in.rd-plain { gap: 6px; padding: 16px var(--g) 6px; border-radius: 0; background: var(--row);
+    box-shadow: inset 4px 0 0 var(--clay-fill); border-bottom: 1px solid var(--hair); }
+  :where(#day-view) .rd-in.rd-sore { box-shadow: inset 4px 0 0 #3E6A92; }
+  :where(#day-view) .rd-in.rd-plain { box-shadow: none; }
+  :where(#day-view) .rd-k { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--clay-ink); }
+  :where(#day-view) .rd-in.rd-sore .rd-k { color: var(--steel); }
+  :where(#day-view) .rd-in.rd-plain .rd-k { color: var(--grey); }
+  :where(#day-view) .rd-t { font: 500 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  :where(#day-view) .rd-btn { display: inline-flex; align-items: center; gap: 6px; justify-self: start; min-height: 44px; margin: 0; padding: 0 12px 0 0; border: 0; border-radius: 0;
+    background: none; box-shadow: none; white-space: nowrap; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view) .rd-btn::after { content: ''; flex: none; width: 12px; height: 12px; background: var(--green-ink); -webkit-mask: var(--chev) center / 12px no-repeat; mask: var(--chev) center / 12px no-repeat; }
+
+  /* 8-10 in dark mode: the old dark rules name these parts at body[data-dark] weight; these repeat them with the tokens */
+  body[data-dark] :where(#day-view) .session-confirm.ready .confirm-text { color: #fff; }
+  body[data-dark] :where(#day-view) .session-confirm.early .confirm-missing-tag { color: var(--clay-on-green); }
+  body[data-dark] :where(#day-view) .wa-inline { border-color: var(--box); color: var(--ink); }
+  body[data-dark] :where(#day-view) .session-complete .complete-title { color: #fff; }
+  body[data-dark] :where(#day-view) .session-complete .complete-habit-text { color: var(--ink); }
+  body[data-dark] :where(#day-view) .session-complete .complete-habit-text b { color: var(--green-ink); }
+  body[data-dark] :where(#day-view) .rd-in, body[data-dark] :where(#day-view) .rd-in.rd-sore, body[data-dark] :where(#day-view) .rd-in.rd-plain { background: var(--row); }
+  body[data-dark] :where(#day-view) .rd-in.rd-sore { box-shadow: inset 4px 0 0 #8DB3D6; }
+  body[data-dark] :where(#day-view) .rd-k { color: var(--clay-ink); }
+  body[data-dark] :where(#day-view) .rd-in.rd-sore .rd-k { color: var(--steel); }
+  body[data-dark] :where(#day-view) .rd-in.rd-plain .rd-k { color: var(--grey); }
+  body[data-dark] :where(#day-view) .rd-t { color: var(--ink); }
+  body[data-dark] :where(#day-view) .rd-btn { color: var(--green-ink); box-shadow: none; }
+  body[data-dark] :where(#day-view) .complete-rpe-btn.selected { background: var(--mark); }   /* #0E4A36 sinks on #181818 */
+  @media (max-width: 359px) {
+    :where(#day-view) .wa-inline, :where(#day-view) .session-complete .complete-habit { gap: 16px; }
+  }
+  /* a Library session: its block titles' hairline runs to the edge like its rows' (the day view's do) */
+  :where(#ws-body) .section-header-prog { margin-right: calc(-1 * var(--g)); }
+  :where(#ws-body) .section-rest { margin-right: var(--g); }
 </style>
 </head>
 <body>
@@ -8522,13 +8679,14 @@ function renderHome() {
       <div class="complete-emoji">✓</div>
       <div class="complete-title">${esc(day.completionTitle)}</div>
       <div class="complete-sub">${esc(day.completionMessage)}</div>
+      <div class="complete-by">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>
       <!-- After a sore check-in: the day-after session, until it has been opened (LIB-01, paintSoreSugg()) -->
       <div class="complete-sugg-slot" id="sugg-${day.id}"></div>
       <!-- Confirms the WORKOUT habit was ticked in Proof, so the athlete can
            see the two apps agreed without leaving this screen. -->
       <button type="button" class="complete-habit" id="habit-tick-${day.id}" hidden onclick="goHabits()">
         <span class="complete-habit-mark">✓</span>
-        <span class="complete-habit-text">Counts as your Session habit <b>·&nbsp;open AA Proof</b></span>
+        <span class="complete-habit-text">Counts as your Session habit <b>open AA Proof</b></span>
       </button>
       <div class="complete-actions">
         <div class="send-session-status" id="send-status-${day.id}" aria-live="polite"></div>

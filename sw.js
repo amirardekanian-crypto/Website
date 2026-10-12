@@ -245,7 +245,8 @@
 //      (rpeTargetOn(), paintWeekTargets()); the bar drops "except the retest" on a lower day. Without the bump a phone keeps the old colours.
 // v115: program.html changed (2026-10-12): a tennis or padel athlete's goal on Game Plan is a sport badge (ball or racket).
 // v116: program.html changed (2026-10-12): Guided shows the week's limits row (under its top bar and on the rest screen).
-const CACHE = 'aap-v116';
+// v117: program.html changed (2026-10-12): Centre Court, the training day re-skinned (the cover, the session bar, the cards, the finish).
+const CACHE = 'aap-v117';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

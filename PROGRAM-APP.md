@@ -901,7 +901,8 @@ tints, the running bar, labels, and so it marked nothing. Now:
 - **Clay stays on what asks the athlete to look**: the Coach's note (since Centre Court its quote mark and the
   dot after the name; *More* is green), a Because (the solid clay ⓘ), an RPE over its target (the set's RPE tag, the selected
   button, a circuit's Last time strip and the ghost line under a set that ran over), the tempo digit, a banner that asks
-  for something (a day filed unfinished, a report waiting), a suggestion's kicker (LIB-01: *Sore today*, *Week done*),
+  for something (a day filed unfinished, a report waiting, the lower-day banner's stripe and label), a suggestion's kicker (LIB-01: *Sore today*, *Week done*),
+  the finished card's quote mark (Amir's voice, as on the Coach's note), what is not done when finishing early (only the tags),
   the numbers in a week note's headline (Front Page, 2026-10-12: *RPE 7*, *One set fewer*), and the same numbers on
   the session bar's limits row (*Max RPE 7 · 1 set fewer*; only the numbers, light clay `#E06B43` on the green bar
   since Centre Court, the words white and the label a paler white),
@@ -1026,6 +1027,38 @@ dashboard do not change.
     items as letter · name and dose · kg box (· ▶), its cues open, the small *How to do it* line, and one How hard? row per
     round (the words take their own line under 375 px).
   - **Guided** borrows the same body (`.step-scroll`, gutter 16): its pinned set keeps its tint across the full width.
+    Guided's own layout (the pinned current row, the rest screen, its header and footer) is unchanged: *Guided Mode's
+    layout* below still holds.
+- **The finish** (sections 8 and 9 of the block, Centre Court 3/3). The same three states `refreshConfirmCard()` always
+  set (`partial`, `ready`, `early`); only their look changed. *One finish* below has the behaviour.
+  - **In progress**: one quiet line under a hairline, *IN PROGRESS* over *6 of 26 sets*, and **Finish early** on the
+    right, outlined grey (it ends the session; two taps, clay while armed). No bar: the slim bar's line is the progress.
+  - **Ready**: the green moves here. A full-width band, *● 26 OF 26 SETS* in mint over *ALL DONE WITH DAY 1* in 44 px
+    capitals; then on the paper *How hard was this session?* as a 22 px green heading and two rows of five 52 px keys,
+    *Notes for Coach* and its box, the WhatsApp row (the Your history recipe: icon, a mono label over the line, a grey ›;
+    the template's → is hidden and the chevron drawn), and **Done · send to coach ✓** full width, 56 px. Finishing early
+    uses the same band (*FINISHING DAY 1 EARLY*) and lists what is not done on the green, each tag in light clay; **Keep
+    going** sits under Done.
+  - **Finished**: the card is signed the way the About sheet signs its reason. A grid whose `::before` paints the green
+    band behind the finish picture (a whole session only, graded into the green), *DAY 1 DONE*, the message with the clay
+    quote mark, and Amir's signature and photo (`.complete-by`: `WN_SIG` and `.wn-av`, added to the template after
+    `.complete-sub`). The tick medallion is gone (the words say it). On the paper under the band: the send status (the
+    card's one ✓), AA Proof as a row with an open-out glyph and its label *OPEN AA PROOF* over *Counts as your Session
+    habit* (the template's `<b>` lost its "· "), the day-after suggestion, the rating and note (`moveRatePanel()` moves
+    them here), then **Send the update** (primary, only when changed) and **Reset Session** (outlined grey, 44 px). Rows
+    are placed by class with grid rows, so the DOM order is unchanged.
+- **The lower-day banner** (section 10): a white row under the bar, full width, with a 4 px stripe in the colour that asks
+  (clay for a lower or short day, steel blue for a sore one, none while training as written), its label in that colour,
+  the sentence in ink and **Train as written** as the one text link (green condensed capitals and the chevron). Its words
+  are unchanged. The cards' pills (*RPE 7 → 6 today*, *2 of 4 sets today*) are section 7's clay pills.
+- **Library sessions** (`#ws-body`) get every card rule above through the same `renderExercise()`; a block title's
+  hairline runs to the screen's edge like the rows'. Their own top and Done (`#ws-finish`) are unchanged.
+- **Dark mode** is the same page: the tokens flip (paper `#181818`, rows `#242424`, green text mint, clay text `#E06B43`),
+  the greens stay brand, and a made tick, the live set's disc and a selected rating key lift to `#1B7254` (`--mark`) so
+  they still read on the charcoal. Old `body[data-dark]` rules that hard-code colours on these parts are matched at their
+  weight by `body[data-dark] :where(…)` rules in the block.
+- **320 px**: the gutter is 16; the set table's columns narrow; the slim bar never drops a word; the finish's tap rows
+  close their gap to 16. Measured on every state: no sideways scroll, no text under 11 px, every control 44 px to hit (the TEMPO caption and More reach it through a ::after).
 
 ## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26 and 2026-09-27)
 
@@ -1181,7 +1214,7 @@ then the athlete rated it and had to tap **Send Session Info to Coach**. With no
 went wrong" and kept nothing, and every extra tap sent another email. Now:
 
 - **The finish card** (`refreshConfirmCard()`) shows from the first logged set, in three states: *In progress ·
-  4 of 11 sets* with a bar and **Finish early**; *All done with Day N* once every set is done; and *Finishing
+  4 of 11 sets* and **Finish early** (its bar is hidden since Centre Court: the slim bar's line is the progress); *All done with Day N* once every set is done; and *Finishing
   Day N early* after two taps on Finish early (`finishTap()` → `armedTap()`), which lists what is not done and
   offers **Keep going** (`keepGoing()`). Nothing says "skipped" until the athlete chooses to stop.
 - **Ready or early, the rating and the note sit in that card** (`.finish-rate`, moved between the finish card

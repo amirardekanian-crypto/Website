@@ -205,7 +205,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **The working card** (Fresh Eyes, Amir 2026-09-27; `PROGRAM-APP.md` → *The working card*): a closed card shows
   **no history** (*"no history on the exercise card when not opened"*); its numbers are one line and a pill that says
   something stays a pill (the green `intent` pill, the check-in's pills); the ⓘ sits at the right end, clay for a
-  Because, and a clay dot after the name is a Coach's Note. **No Last time box on the open card either** (Amir,
+  Because, a clay dot after the name is a Coach's Note, and the exercise's number sits inside the tick-all ring (Centre Court,
+  Amir 2026-10-12: the day's look is ONE CSS block, `PROGRAM-APP.md` → *Centre Court*). **No Last time box on the open card either** (Amir,
   2026-10-12: *"their last time, is actually already in the reps, weight box"*): last time's weight is each empty kg
   box's LAST, a set that ran over keeps its faint line, the whole history is the ⓘ's **Your history**, and only a
   circuit keeps its strip. The kg box follows the Spine's equipment (`kgWanted()`): hidden, never removed.
@@ -443,7 +444,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v116` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v117` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
