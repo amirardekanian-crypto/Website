@@ -4093,6 +4093,7 @@
   .timer-log { width: min(360px, calc(100vw - 32px)); margin-top: 18px; padding: 14px 14px 12px;
     background: var(--white, #fff); border: 1px solid var(--grey-mid); border-radius: 14px; box-sizing: border-box; }
   .timer-log[hidden] { display: none; }
+  .timer-log .session-timer-week { margin-top: 12px; }   /* the week's limits under the RPE buttons (weekLimitsHTML) */
   .tl-head { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 1.4px; text-transform: uppercase;
     color: var(--grey-text); margin-bottom: 10px; }
   .tl-line { display: flex; align-items: center; gap: 8px; }
@@ -4119,10 +4120,16 @@
   /* A rest screen with the log panel can outgrow a short phone: it scrolls, and the ring
      gives up more height, rather than cutting the panel off. */
   .timer-overlay.has-log { justify-content: flex-start; overflow-y: auto; padding: 18px 0 calc(env(safe-area-inset-bottom, 0px) + 18px); }
+  /* It scrolls, never squashes: a shrunk ring box left its SVG full size, drawn over Pause and +15s (2026-10-12). */
+  .timer-overlay.has-log > * { flex-shrink: 0; }
   @media (max-height: 720px) {
     .timer-overlay.has-log .timer-ring { width: 140px; height: 140px; }
     .timer-overlay.has-log .timer-display { font-size: 58px; }
     .timer-overlay.has-log .timer-sound { margin-bottom: 6px; }
+  }
+  @media (max-height: 620px) {   /* a 568-600 px phone: the log and the week's limits still fit on the first screen */
+    .timer-overlay.has-log .timer-ring { width: 104px; height: 104px; }
+    .timer-overlay.has-log .timer-display { font-size: var(--fs-display); }
   }
   body[data-dark] .timer-log { background: #202020; border-color: #383838; }
   body[data-dark] .tl-step, body[data-dark] .tl-rpe-btn { border-color: #444; color: #ccc; }
@@ -4162,6 +4169,10 @@
   body[data-dark] .step-help { background: #202020; border-color: #333; color: #bbb; }
   body[data-dark] .step-exit { background: #202020; border-color: #333; color: #eee; }
   .step-topbar-text { flex: 1; min-width: 0; }
+  /* This week's limits (weekLimitsHTML(), Amir 2026-10-12: "show the cap row in Guided too"): the session bar's row,
+     under Guided's top bar on every step, so a set coloured against the cap always has the cap on screen. */
+  .step-week { flex-shrink: 0; padding: 0 16px 10px; }
+  .step-week .session-timer-week { padding-top: 8px; }
   .step-eyebrow { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 2px; text-transform: uppercase; color: var(--grey-text); }
   .step-pill { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); color: var(--green-ink); }
   .step-scroll { flex: 1; overflow-y: auto; padding: 0 16px 16px; }
@@ -4937,6 +4948,7 @@
     <button type="button" class="step-help" onclick="openHelp('guided')" aria-label="How Guided works">?</button>
     <button type="button" class="step-exit" onclick="closeStepMode()" aria-label="Exit guided mode">✕</button>
   </div>
+  <div class="step-week" id="step-week" hidden></div>
   <div class="step-scroll" id="step-scroll"></div>
   <div class="step-footer" id="step-footer"></div>
 </div>
@@ -8981,7 +8993,7 @@ const APP_GUIDE = [
   { icon: 'edit', title: 'Logging your sets',
     body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues; it opens by itself the first time you meet an exercise and is folded after that, and the ▶ on it means there is a video; if the video won't play on your phone, tap <strong>Open in YouTube</strong> under it), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and the circle ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
-    body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. When the rest is over it moves you to the next set. Supersets and circuits come round by round; warm-ups stay in the list.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
+    body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. When the rest is over it moves you to the next set. Supersets and circuits come round by round; warm-ups stay in the list. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
     body: `<p>The small <strong>i</strong> at the right end of every exercise answers what you'd ask me about it. <strong>What does it do?</strong> and the qualities it builds (tap one to read what it means). <strong>How does it help on court?</strong> <strong>Where will I feel it?</strong> shows your body front and back with the working muscles in green, and a line under it names them, the main ones first.</p><p>Then three short lists. Under <strong>Too hard?</strong> are the <strong>Regressions</strong>, easier versions of the same movement. Under <strong>Too easy?</strong> are the <strong>Progressions</strong>, harder versions. Under <strong>Other kit?</strong> are the <strong>Alternatives</strong>, the same movement on other equipment. Tap a name to read about it. A name marked <em>Not in the app yet</em> has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why am I doing this?</strong>, signed by me. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p><strong>Your history</strong> at the bottom says how many times you've done it and what you did last time. Tap it for every session.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with <strong>How do I do it?</strong> (the video when there is one, the steps and the cues), and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
@@ -14235,6 +14247,13 @@ function renderStep() {
     row.classList.toggle('dim', i !== item.setI);
   });
 
+  // This week's limits, the session bar's row (weekLimitsHTML()), on every step.
+  const wk = document.getElementById('step-week');
+  if (wk) {
+    const lim = weekLimitsHTML(currentCycleData(), ((DATA && DATA.workouts && DATA.workouts.days) || []).find(d => String(d.id) === String(STEP.day)));
+    if (wk.innerHTML !== lim) wk.innerHTML = lim;
+    wk.hidden = !lim;
+  }
   document.getElementById('step-eyebrow').textContent = `Exercise ${item.exI + 1} of ${item.exCount}`;
   document.getElementById('step-pill').textContent = `${item.circuit ? 'Round' : 'Set'} ${item.setI + 1} of ${item.total}`;
   renderStepFooter();
@@ -14330,6 +14349,8 @@ function paintTimerLog(row, item) {
   const isRange = !!(repsIn && /–/.test(repsIn.getAttribute('placeholder') || ''));
   const repsNow = () => parseInt(repsIn.value, 10) || (isRange ? null : planned);
   const selRpe = () => { const b = row.querySelector('.rpe-btn.selected'); return b ? b.dataset.rpe : ''; };
+  // This week's limits under the RPE buttons, where the colour shows (Amir, 2026-10-12: "show the cap row in Guided too").
+  const lim = STEP ? weekLimitsHTML(currentCycleData(), ((DATA && DATA.workouts && DATA.workouts.days) || []).find(d => String(d.id) === String(STEP.day))) : '';
   function draw() {
     const n = repsIn ? repsNow() : null;
     const off = repsIn && repsIn.value !== '';
@@ -14351,7 +14372,7 @@ function paintTimerLog(row, item) {
         <span class="tl-lab">RPE</span>
         ${[6,7,8,9,10].map(v => { const on = selRpe() === String(v), vs = on ? rpeVs(v, rpeTargetOf(item.card)) : '';
           return `<button type="button" class="tl-rpe-btn${on ? ' selected' : ''}${vs ? ' ' + vs : ''}" data-rpe="${v}">${v}</button>`; }).join('')}
-      </div>`;
+      </div>${lim}`;
     const kgBox = tl.querySelector('.tl-kg');
     if (kgBox) kgBox.addEventListener('input', () => {
       const v = normDigits(kgBox.value);
@@ -14393,6 +14414,8 @@ function paintRoundLog(row, item) {
   const tl = document.getElementById('timerLog');
   if (!tl) return;
   if (!row) { tl.dataset.ready = ''; return; }
+  // This week's limits under the RPE buttons, as on a set's rest screen (paintTimerLog()).
+  const lim = STEP ? weekLimitsHTML(currentCycleData(), ((DATA && DATA.workouts && DATA.workouts.days) || []).find(d => String(d.id) === String(STEP.day))) : '';
   function draw() {
     const sel = row.querySelector('.rpe-btn.selected');
     tl.innerHTML = `
@@ -14400,7 +14423,7 @@ function paintRoundLog(row, item) {
       <div class="tl-line tl-rpe">
         <span class="tl-lab">RPE</span>
         ${[6,7,8,9,10].map(v => `<button type="button" class="tl-rpe-btn${sel && sel.textContent.trim() === String(v) ? ' selected' : ''}" data-rpe="${v}">${v}</button>`).join('')}
-      </div>`;
+      </div>${lim}`;
     tl.querySelectorAll('.tl-rpe-btn').forEach(b => b.addEventListener('click', () => {
       const rb = [...row.querySelectorAll('.rpe-btn')].find(x => x.textContent.trim() === b.dataset.rpe);
       if (rb) rb.click();

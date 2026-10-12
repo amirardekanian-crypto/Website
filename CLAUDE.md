@@ -176,7 +176,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   athlete's first name, the text's first sentence as the headline with its numbers in clay, then Amir's signature and photo. So
   the pipeline writes the rule as the first sentence, under 100 characters, with no greeting, name or sign-off (COM-16).
   **In a session its numbers sit on the session bar** (`weekLimitsHTML()`, Amir 2026-10-12): a thin last row, *Max RPE 7 · 1 set
-  fewer*, never the words, never on the clock's line; on a day with a test-flagged lift in the closing week it says *except the retest* (TST-4; not on a lower day). An untitled note
+  fewer*, never the words, never on the clock's line, and the same row in Guided (under its top bar and on the rest screen); on a day with a test-flagged lift in the closing week it says *except the retest* (TST-4; not on a lower day). An untitled note
   on the cycle's final week is the *Back-off week* (`weekNoteLast()`).
   **Every RPE logged that week is coloured against them, every day** (Amir 2026-10-12: *"colour against the cap in those weeks"*;
   `rpeTargetOn()`, `paintWeekTargets()`), check-in or not, trained as written or not. The card keeps its printed RPE, *RPE 8 → 7 today*
@@ -443,7 +443,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v115` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v116` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

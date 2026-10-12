@@ -232,6 +232,70 @@ function expectOk(s, want) {
     await ctx.close();
   }
 
+  // ── The same row in Guided: under its top bar on every step, and under the RPE buttons on the rest screen ──────────
+  const guided = p => p.evaluate(() => {
+    const id = String(DATA.workouts.days[0].id);
+    openDayView(id); openStepMode(id);
+    const wk = document.getElementById('step-week');
+    const step = wk && !wk.hidden ? wk.textContent.replace(/\s+/g, ' ').trim() : null;
+    const b = [...document.querySelectorAll('#step-footer button')].find(x => /Start Rest/.test(x.textContent));
+    if (b) b.click();
+    const t = document.getElementById('aaToast'); if (t && !t.hidden) { const k = t.querySelector('button'); if (k) k.click(); }
+    const log = document.getElementById('timerLog');
+    const row = log && !log.hidden ? log.querySelector('.session-timer-week') : null;
+    return { step, rest: row ? row.textContent.replace(/\s+/g, ' ').trim() : null, restShown: !!(log && !log.hidden),
+      sideways: document.documentElement.scrollWidth - window.innerWidth };
+  });
+  for (const [tag, dayIn, notes, want, w] of [
+    ['back-off week: the row under the top bar and on the rest screen', MID(5), { '5': BACKOFF }, 'Back-off week Max RPE 7 ·1 set fewer', 390],
+    ['week 1 cap at 320 px', MID(1), { '1': WEEK1 }, 'This week Max RPE 7', 320],
+    ['a week with no note: no row in Guided', MID(2), { '1': WEEK1 }, null, 390],
+  ]) {
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(dayIn, notes), w });
+    const g = await guided(p);
+    t.check('Guided: ' + tag, g.step === want && g.restShown && g.rest === want && g.sideways <= 0 && p.errs.length === 0,
+      JSON.stringify(g) + (p.errs.length ? ' ERR ' + p.errs.join(' | ') : ''));
+    await ctx.close();
+  }
+
+  // The rest screen scrolls, never squashes: on a short phone the ring's box kept shrinking while its drawing did not,
+  // and the circle sat over Pause and +15s once the limits row made the log taller.
+  for (const [w, h] of [[320, 568], [360, 600]]) {
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(MID(5), { '5': BACKOFF }), w, h });
+    await guided(p);
+    const g = await p.evaluate(() => {
+      const ring = document.querySelector('#timerOverlay .timer-ring').getBoundingClientRect();
+      const svg = document.querySelector('#timerOverlay .timer-ring svg').getBoundingClientRect();
+      const ctl = document.querySelector('#timerOverlay .timer-controls').getBoundingClientRect();
+      return { ringH: Math.round(ring.height), svgH: Math.round(svg.height), svgBottom: Math.round(svg.bottom), controlsTop: Math.round(ctl.top),
+        row: !!document.querySelector('#timerLog .session-timer-week') };
+    });
+    t.check(`Guided rest screen at ${w}x${h}: the ring keeps its size and sits above the controls, the row is there`,
+      Math.abs(g.ringH - g.svgH) <= 1 && g.svgBottom <= g.controlsTop + 1 && g.row, JSON.stringify(g));
+    await ctx.close();
+  }
+  {   // A circuit round's rest screen asks for the RPE too, so it carries the row.
+    const P = prog(MID(5), { '5': BACKOFF });
+    P.workouts.days[0].blocks.push({ title: 'Conditioning', exercises: [{ type: 'circuit', name: 'Engine', rx: { rounds: 3, rest: 60 },
+      items: [{ name: 'Kettlebell Swing', rx: { reps: 12 } }] }] });
+    const { ctx, p } = await H.openProgram(browser, { prog: P });
+    const r = await p.evaluate(() => {
+      const id = String(DATA.workouts.days[0].id);
+      openDayView(id); openStepMode(id);
+      const k = STEP.seq.findIndex(it => it.circuit);
+      if (k < 0) return { circuit: false };
+      STEP.pos = k; renderStep();
+      const b = [...document.querySelectorAll('#step-footer button')].find(x => /Start Rest/.test(x.textContent));
+      if (b) b.click();
+      const log = document.getElementById('timerLog');
+      const row = log && !log.hidden ? log.querySelector('.session-timer-week') : null;
+      return { circuit: true, head: (log.querySelector('.tl-head') || {}).textContent || '', row: row ? row.textContent.replace(/\s+/g, ' ').trim() : null };
+    });
+    t.check('Guided: a circuit round\'s rest screen carries the row', r.circuit && /Round 1/.test(r.head) && r.row === 'Back-off week Max RPE 7 ·1 set fewer'
+      && p.errs.length === 0, JSON.stringify(r) + (p.errs.length ? ' ERR ' + p.errs.join(' | ') : ''));
+    await ctx.close();
+  }
+
   // ── How Home draws it (Front Page) ─────────────────────────────────────────────────────────────────────────────────
   const look = p => p.evaluate(() => {
     const n = document.querySelector('#home-week-wrap .week-note');

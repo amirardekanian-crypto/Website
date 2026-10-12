@@ -244,7 +244,8 @@
 // v114: program.html changed (2026-10-12): in a week whose note sets an RPE limit, every logged RPE is coloured against it on every day
 //      (rpeTargetOn(), paintWeekTargets()); the bar drops "except the retest" on a lower day. Without the bump a phone keeps the old colours.
 // v115: program.html changed (2026-10-12): a tennis or padel athlete's goal on Game Plan is a sport badge (ball or racket).
-const CACHE = 'aap-v115';
+// v116: program.html changed (2026-10-12): Guided shows the week's limits row (under its top bar and on the rest screen).
+const CACHE = 'aap-v116';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

@@ -150,7 +150,9 @@ any week: a note can sit on a test week or a lighter week, and shows only during
   and opening a day calls it, so an app left open across a week boundary shows the right week. It never shares the
   clock's line (`.has-week` lets the slim bar wrap onto it); with the usual labels it is one line at 320 px, and a
   long title or the retest words wrap it to two (about 100 px for the slim bar). A panel whose bar has the row gives
-  its cards `scroll-margin-top: 175px`.
+  its cards `scroll-margin-top: 175px`. **Guided shows the same row** (Amir, 2026-10-12: *"show the cap row in Guided
+  too"*): `#step-week` under its top bar, redrawn by `renderStep()` on every step, and under the RPE buttons of the
+  rest screen's log (`paintTimerLog()`, and a circuit round's, `paintRoundLog()`), where the RPE is chosen, so the cap is on screen wherever the colour is. The rest screen scrolls rather than squash its ring (`.timer-overlay.has-log > *` never shrinks), with a 104 px ring under 620 px of height.
   **The look is Front Page** (Amir chose A of three on the Week Note Lookbook, claude.ai/artifact/9Y4Rf1eBQ7DB1DJ9rKqBym,
   with his own changes: *"instead of from amir at the bottom add my sign and image but not the "your coach" text and
   use their name in the text"*). No box and no tint: in its week the note IS the This Week section. `renderHome()`
@@ -178,7 +180,7 @@ any week: a note can sit on a test week or a lighter week, and shows only during
   The numbers never change what a card prints. In that week only, they are the target its logged RPEs are
   coloured against on every day (`rpeTargetOn()`, `paintWeekTargets()`, below), and a lower day takes the lower of
   the two. **A number covers every lift that week** (Amir chose it, 2026-10-12): a limit on only some lifts is
-  written in the note's words with no `rpeCap` or `rpeDrop` (PRC-15). `scripts/headless/week-notes.js` (95 checks)
+  written in the note's words with no `rpeCap` or `rpeDrop` (PRC-15). `scripts/headless/week-notes.js` (101 checks)
   covers every row above and the Front Page look (the name, the clay, the count in the kicker, the dose line,
   the signature and photo, no note in a session, the session bar's limits row, 320 px), and fails on the old `weekNoteNow()`.
 - **The pipeline owns it:** /program-design decides both doses as numbers (`week1:` / `lastweek:`),

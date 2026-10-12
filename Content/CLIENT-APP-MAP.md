@@ -268,6 +268,7 @@ Top to bottom:
 **Guided mode** (the ▶ next to Start, or under ⋯). One exercise and one set at a time, the current set pinned.
 - Footer: **Done — Start Rest ✓** (ticks the set as written, then rests), **‹ Prev**, then **Next →**, and **Finish Session ✓** on the last set.
 - While you rest it asks the **Kg** (with **Same as last**), the **Reps** (− / +) and the **RPE** (6–10). On the last set there's no rest screen, so type the weight and RPE in the pinned row.
+- In a week where my note sets a limit, the same thin line as the session bar (*Max RPE 7 · 1 set fewer*) sits under Guided's top bar and under the RPE buttons while you rest.
 - Warm-ups and circuits that log nothing are skipped; they stay in the list.
 - **✕** top right leaves Guided; everything logged stays. **?** opens the Guided guide. **Skip →** on a rest moves on without logging weight or RPE.
 - **Finish Session ✓** doesn't finish the day: it takes you to the finish card, where you still rate and tap **Done**.
