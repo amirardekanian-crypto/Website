@@ -4358,7 +4358,7 @@
   :where(#day-view) .day-content { padding: 0 0 120px; }
   /* INTERIM: the pieces this block does not draw yet keep the gutter the full-bleed panel took away. Delete this rule when
      the cards, the circuits and the finish move into this block. */
-  :where(#day-view) .day-content > :is(.checklist-item, .rd-banner, .session-confirm, .session-complete) { margin-left: var(--g); margin-right: var(--g); }
+  :where(#day-view) .day-content > :is(.rd-banner, .session-confirm, .session-complete) { margin-left: var(--g); margin-right: var(--g); }
 
   /* Before Start (P5): the bar is the cover's foot, inside the green, in the flow (not sticky): "Ready when you are", the
      clock in white, Start (the lighter green, a light ring) and Guided (outlined white), then a hairline and the week's
@@ -4509,6 +4509,526 @@
   }
   :where(#day-view) .session-complete { scroll-margin-top: 16px; }
   body.is-demo :where(#day-view) .session-complete { scroll-margin-top: 60px; }
+
+
+
+
+
+
+  /* 7. THE CARDS (Centre Court 2/3). Calm paper: a card is a row on the paper with a hairline between rows, not a box.
+     The one strong green thing is the open card's head. Selectors repeat the old rule they replace, so the weight ties
+     and this block (later) wins; the old card look further up (white boxes, shadows, the stripe, the bordered log) is
+     overruled here and goes when the re-skin is folded in. --g is the gutter; in Guided the scroll area's own 16 px. */
+  .step-scroll { --g: 16px; }
+  #ws-body { --g: 20px; }
+  :where(#ws-body) .checklist-item { margin-left: calc(-1 * var(--g)); margin-right: calc(-1 * var(--g)); }
+
+  /* 7a. The row. No card: no white, no shadow, no stripe, no press scale; a hairline from the name column between rows. */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item { position: relative; margin-top: 0; margin-bottom: 0; padding: 0; border: 0; border-radius: 0;
+    background: transparent; box-shadow: none; overflow: visible; transition: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:active { transform: none; box-shadow: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked[class*="block-"] { background: transparent; border-color: transparent; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item[class*="block-"]::before { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item[class*="block-"] + .checklist-item[class*="block-"]::before,
+  :where(#day-view, .step-scroll, #ws-body) .section-header-prog.same-name + .checklist-item[class*="block-"]::before { content: ''; display: block; position: absolute;
+    z-index: 1; top: 0; bottom: auto; left: calc(var(--g) + 56px); right: 0; width: auto; height: 1px; opacity: 1; background: var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .section-header-prog.same-name + .checklist-item { margin-top: 18px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item > .item-main { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px;
+    column-gap: 12px; align-items: center; min-height: 74px; padding: 14px var(--g); cursor: pointer; }
+
+  /* The tick-all ring, with the exercise's number INSIDE it (Amir: "exercise number inside the circle"). The number stays in
+     .item-name-row in the DOM; CSS lays it on the ring, and it lets taps through to the ring (.check-box). Done: the ring
+     fills green with a white tick and the number steps aside. 30 px drawn, 44 px to hit. */
+  :where(#day-view, .step-scroll, #ws-body) .check-box { position: relative; grid-column: 1; width: 44px; height: 44px; margin: 0; padding: 0; border: 0;
+    border-radius: 50%; background: transparent; cursor: pointer; transition: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked[class*="block-"] .check-box { background: transparent; border-color: transparent; }
+  :where(#day-view, .step-scroll, #ws-body) .check-box::before { content: ''; position: absolute; inset: 7px; border-radius: 50%; border: 1.5px solid var(--ring); }
+  :where(#day-view, .step-scroll, #ws-body) .check-box::after { content: ''; position: absolute; inset: 0; display: block; opacity: 0; transform: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l3.8 3.8L18 8'/%3E%3C/svg%3E") center / 18px no-repeat; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .check-box::before { background: var(--mark); border-color: var(--mark); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .check-box::after { opacity: 1; transform: none; }
+  :where(#day-view, .step-scroll, #ws-body) .check-box:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  :where(#day-view, .step-scroll, #ws-body) .item-body { min-width: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .item-name-row { display: block; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item .ex-num { position: absolute; left: var(--g); top: 50%; width: 44px; height: 20px; margin: -10px 0 0;
+    text-align: center; pointer-events: none; letter-spacing: 0; transition: none;
+    font: 700 var(--fs-body)/20px 'Barlow Condensed', sans-serif; color: var(--num); font-variant-numeric: tabular-nums; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-num { visibility: hidden; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .item-name { text-decoration: none; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item .item-name { min-width: 0; letter-spacing: 0; transition: none; text-decoration: none;
+    font: 600 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; text-wrap: pretty; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-note-dot { display: inline-block; width: 7px; height: 7px; margin: 0 0 3px 7px; border-radius: 50%; background: var(--clay);
+    vertical-align: middle; }
+  /* a row with no ⓘ (a circuit, a simple item) shows that it opens: a grey › in the ⓘ column (turned up on an open warm-up) */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed:not(.is-done) > .item-main:not(:has(.ex-side .ex-about))::after,
+  :where(#day-view, .step-scroll, #ws-body) .round-group.block-warmup:not(.collapsed) > .item-main::after {
+    content: ''; grid-column: 3; grid-row: 1; justify-self: center; width: 44px; height: 44px; background-color: var(--grey);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 7l5 5-5 5'/%3E%3C/svg%3E") center / 18px no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 7l5 5-5 5'/%3E%3C/svg%3E") center / 18px no-repeat; }
+  :where(#day-view, .step-scroll, #ws-body) .round-group.block-warmup:not(.collapsed) > .item-main::after { transform: rotate(-90deg); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-doneline { display: none; }
+  /* the line of numbers: 15 px, the dose bold, "·" between the parts; the tempo's hot digits clay */
+  :where(#day-view, .step-scroll, #ws-body) .ex-numline { display: flex; flex-wrap: wrap; align-items: baseline; margin: 4px 0 0; letter-spacing: 0;
+    font: 500 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-numline > span:not(:last-child)::after { content: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-numline > span + span::before { content: '\00B7'; margin: 0 7px; font-weight: 400; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-numline b { font-weight: 700; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-numline .t-hot { color: var(--clay-ink); font-weight: 700; }
+  :where(#day-view, .step-scroll, #ws-body) .nl-cap { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed .nl-lab,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.block-warmup .nl-lab { display: none; }
+  .step-ex-nums .nl-cap { display: none; }   /* Guided's header copies the line: the scoreboard's captions stay off it */
+  /* the intent pill, and the lower day's clay pills in its shape */
+  :where(#day-view, .step-scroll, #ws-body) .ex-summary { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-summary:empty { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.modifier { padding: 6px 10px; border-radius: 999px; background: var(--tint); color: var(--green-ink); box-shadow: none;
+    font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.rd-pill, :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.rd-tag,
+  :where(#day-view, .step-scroll, #ws-body) .rd-tag.rd-item { display: inline-block; margin-left: 0; padding: 6px 10px; border-radius: 999px; box-shadow: none;
+    background: var(--clay-fill); color: #fff; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-summary { opacity: 1; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.rd-optional .item-name { opacity: 1; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.rd-skip .item-name { opacity: 1; color: var(--grey); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+  /* the ⓘ: a plain one is a 22 px grey ring with a 13 px i, a Because the 28 px clay disc; both 44 px to hit */
+  :where(#day-view, .step-scroll, #ws-body) .ex-side { grid-column: 3; display: flex; justify-content: center; align-self: center; padding: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-side:empty { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about { position: relative; z-index: 0; display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+    border: 0; border-radius: 50%; background: none; font: 700 var(--fs-small)/1 'Barlow', sans-serif; color: var(--grey); opacity: 1; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about::after { content: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about::before { content: ''; position: absolute; z-index: -1; inset: 11px; border-radius: 50%; border: 1.5px solid var(--ring); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-about.has-why { background: none; border-color: transparent; color: #fff; font-size: var(--fs-body); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-side .ex-about.has-why::before { inset: 8px; background: var(--clay-fill); border-color: var(--clay-fill); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-about:hover, :where(#day-view, .step-scroll, #ws-body) .ex-about:focus-visible { border-color: transparent; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-about:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed > .ex-detail, :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed > .note-row { display: none; }
+
+  /* 7b. The DONE row: a receipt on the paper. The filled ring, the name grey 15 px, what was done 13 px grey on one line. */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-main { min-height: 54px; padding-top: 5px; padding-bottom: 5px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .check-box { width: 44px; height: 44px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-name { font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-note-dot { background: var(--ring); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-doneline { display: block; margin-top: 2px; letter-spacing: 0; word-spacing: 1px;
+    font: 500 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-numline,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-summary { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .ex-about { opacity: 1; }
+
+  /* 7c. The OPEN card's head, centre court (a lift, and a circuit that logs; a warm-up stays on paper): the hero's green,
+     "● 6" as its eyebrow, the name 28 px capitals, a hairline, the scoreboard (four equal tracks, value over caption), the
+     pill. An open LIFT has no tick-all ring (every set has its own circle under it); a working circuit keeps its ring,
+     its one "done". */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup)::before,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item[class*="block-"]:not(.collapsed):not(.block-warmup) + .checklist-item[class*="block-"]::before { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) > .item-main { grid-template-areas: "chk name side" ". nums nums" ". pill pill";
+    align-items: center; min-height: 0; padding: 12px var(--g) 14px; background: var(--hero); color: #fff; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .item-body { display: contents; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .check-box { grid-area: chk; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .check-box::before { border-color: rgba(255,255,255,.85); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup):not(.round-group) > .item-main { grid-template-areas: "name name side" "nums nums nums" "pill pill pill"; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup):not(.round-group) .check-box { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .item-name-row { grid-area: name; display: flex; flex-direction: column; align-items: flex-start; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-num { position: static; display: flex; align-items: center; gap: 8px; width: auto; height: auto;
+    margin: 0 0 6px; visibility: visible; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 2px; color: var(--mint); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-num::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .item-name { font: 900 var(--fs-head)/.94 'Barlow Condensed', sans-serif; letter-spacing: .4px;
+    text-transform: uppercase; color: #fff; text-wrap: balance; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-note-dot { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-side { grid-area: side; align-self: start; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-about:not(.has-why) { color: #fff; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-side .ex-about:not(.has-why)::before { border-color: rgba(255,255,255,.7); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-side .ex-about.has-why::before { box-shadow: 0 0 0 1.5px rgba(255,255,255,.85); }
+  /* an open working circuit: its › turns up, in white */
+  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed):not(.block-warmup) > .item-main::after { content: ''; grid-area: side; justify-self: center; width: 44px; height: 44px;
+    transform: rotate(-90deg); background-color: #fff;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 7l5 5-5 5'/%3E%3C/svg%3E") center / 18px no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 7l5 5-5 5'/%3E%3C/svg%3E") center / 18px no-repeat; }
+  /* the scoreboard: one grid of four equal tracks under a hairline; each cell a value over its caption (.nl-cap, .nl-k,
+     .nl-lab). A long dose widens only its own track. */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline { grid-area: nums; display: grid; grid-auto-flow: column;
+    grid-template-columns: minmax(25%, max-content); grid-auto-columns: minmax(0, 25%); align-items: stretch; gap: 0; margin: 12px 0 0; padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.16); font: 700 var(--fs-head)/.86 'Barlow Condensed', sans-serif; letter-spacing: .3px; color: #fff; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline > span { display: grid; grid-auto-flow: column; grid-template-rows: auto auto;
+    justify-content: start; justify-items: start; align-items: end; row-gap: 7px; min-width: 0; padding: 0; white-space: nowrap; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline > span + span::before { content: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline b { font-weight: 700; color: #fff; padding-right: 16px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-lab,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-k { display: block; grid-row: 2; grid-column: 1 / span 5; white-space: nowrap;
+    font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.72); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-lab.nl-help { position: relative; justify-self: start; padding: 0; border: 0;
+    background: none; cursor: pointer; text-decoration: underline dotted rgba(255,255,255,.6); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+  /* the tempo caption opens the tempo guide: its tap area covers the cell */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-help::after { content: ''; position: absolute; left: -12px; right: -12px; top: -34px; bottom: -14px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .t-hot { color: var(--clay-on-green); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-summary { grid-area: pill; margin-top: 14px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-summary-pill.modifier { background: rgba(255,255,255,.14); color: #fff; }
+
+  /* 7d. The open card's body, on the paper: Coach's Note, How to do it, the First time line, the set table, then ONE foot
+     row (P50): Note on the left, Rest ⏱ with its time on the right. Not sticky. An open Note's box spans the row under it. */
+  :where(#day-view, .step-scroll, #ws-body) .ex-detail { padding: 0; border-top: 0; background: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center;
+    padding: 0 var(--g) 18px; border-top: 0; background: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) > .ex-detail { border-bottom: 1px solid var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > *,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > .ex-log > * { grid-column: 1 / -1; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > .ex-coach-note { order: -2; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > .ex-how { order: -1; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail .ex-log { display: contents; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-log { margin: 0; border: 0; border-radius: 0; background: none; overflow: visible; }
+  /* the foot row: both on the same grid row, the last (Note spans it, so its open box runs under Rest) */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail .note-row,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .note-row { grid-column: 1 / -1; grid-row: 30; align-self: start; margin-top: 14px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > .ex-rest-bottom,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > .ex-log > .ex-rest-bottom { grid-column: 2; grid-row: 30; align-self: start; justify-self: end;
+    position: relative; z-index: 1; margin-top: 14px; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-rest-bottom { display: flex; justify-content: flex-end; margin-top: 14px; }
+
+  /* Rest ⏱ 2:30: the primary button, its time on it; the stopwatch drawn in mint (the glyph is a colour emoji on some phones).
+     A warm-up's Rest is outlined: green fills are for work you log. */
+  :where(#day-view, .step-scroll, #ws-body) .ex-rest-bottom .rest-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 132px; min-height: 48px;
+    padding: 0 18px; border: 0; border-radius: 8px; background: var(--btn); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
+    font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+  :where(#day-view, .step-scroll, #ws-body) .rest-btn .rest-ic { flex: none; width: 18px; height: 18px; overflow: hidden; text-indent: 40px; white-space: nowrap; background: var(--mint);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='13.5' r='7.5'/%3E%3Cpath d='M12 10v3.5l2.3 2.3M9.5 3h5'/%3E%3C/svg%3E") center / 18px no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='13.5' r='7.5'/%3E%3Cpath d='M12 10v3.5l2.3 2.3M9.5 3h5'/%3E%3C/svg%3E") center / 18px no-repeat; }
+  :where(#day-view, .step-scroll, #ws-body) .rest-btn .rest-t { text-transform: none; }
+  :where(#day-view, .step-scroll, #ws-body) .block-warmup .ex-rest-bottom .rest-btn { background: transparent; color: var(--green-ink); box-shadow: inset 0 0 0 1.5px var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .block-warmup .rest-btn .rest-ic { background: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .rest-btn:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+
+  /* Note: a 32 px outlined circle with its chevron, then NOTE in green condensed capitals; 44 px to hit. */
+  :where(#day-view, .step-scroll, #ws-body) .note-row { border: 0; opacity: 1; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .note-row { opacity: 1; }
+  :where(#day-view, .step-scroll, #ws-body) .note-row summary { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 12px 0 0; background: none;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .note-row summary:hover, :where(#day-view, .step-scroll, #ws-body) .note-row summary:active { background: none; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .note-row summary .chev { flex: none; width: 32px; height: 32px; padding: 10px 10px 10px 11px; box-sizing: border-box; border: 1.5px solid var(--green-ink);
+    border-radius: 50%; overflow: visible; transition: transform .2s; }
+  :where(#day-view, .step-scroll, #ws-body) .note-row summary .chev path { stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  :where(#day-view, .step-scroll, #ws-body) .note-row[open] summary .chev { transform: rotate(90deg); }
+  :where(#day-view, .step-scroll, #ws-body) .note-row summary .note-preview { max-width: 120px; margin-left: 0; font: 400 var(--fs-small)/1.2 'Barlow', sans-serif; letter-spacing: 0;
+    text-transform: none; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .note-row summary .note-preview:empty { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .note-row textarea { display: block; width: 100%; min-height: 88px; margin: 6px 0 2px; padding: 12px 14px; border: 1px solid var(--box);
+    border-radius: 12px; background: var(--row); color: var(--ink); font: 400 var(--fs-field)/1.4 'Barlow', sans-serif; resize: vertical; }
+  :where(#day-view, .step-scroll, #ws-body) .note-row textarea:focus { border-color: var(--green-ink); }
+
+  /* 7e. The Coach's Note: Amir's voice with no box, the clay quote on the ring column, 3 lines then MORE (fitNotes()). */
+  :where(#day-view, .step-scroll, #ws-body) .ex-coach-note { position: relative; margin: 0; padding: 16px 0 0 56px; border: 0; border-radius: 0; background: none;
+    font: 500 var(--fs-field)/1.42 'Barlow', sans-serif; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-coach-note::before { content: '\201C'; position: absolute; left: 0; top: 14px; width: 44px; text-align: center;
+    font: 900 var(--fs-display)/1 'Barlow Condensed', sans-serif; color: var(--clay); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-note-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-coach-note.open .ex-note-text { display: block; overflow: visible; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-coach-note .ex-coach-note-label { display: inline; margin: 0; font: inherit; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-note-more { position: relative; display: flex; align-items: center; gap: 6px; width: max-content; height: 18px; margin-top: 6px; padding: 0;
+    border: 0; background: none; cursor: pointer; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-note-more::before { content: ''; order: 9; flex: none; width: 12px; height: 12px; background: var(--green-ink); transition: transform .2s;
+    -webkit-mask: var(--chev) center / 12px no-repeat; mask: var(--chev) center / 12px no-repeat; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-coach-note.open .ex-note-more::before { transform: rotate(-90deg); }
+  /* 44 px to hit: up over the note's last line, never down into How to do it */
+  :where(#day-view, .step-scroll, #ws-body) .ex-note-more::after { content: ''; position: absolute; left: -10px; right: -14px; top: -20px; bottom: -6px; }
+
+  /* 7f. How to do it: ONE white rounded row (the About sheet's Your history recipe): a bare green ▶ only with a video
+     (else a list glyph), "HOW TO DO IT" in mono over the count on its own line, a grey ›. The text stays
+     "How to do it · video · 5 steps · 4 cues": the count's leading dot (.ex-how-lead) is hidden by CSS. */
+  :where(#day-view, .step-scroll, #ws-body) .ex-how { margin: 16px 0 0; border: 0; border-radius: 0; background: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how-sum { position: relative; display: flex; align-items: center; gap: 24px; min-height: 56px; padding: 0 14px 0 11px;
+    border: 1px solid var(--box); border-radius: 14px; background: var(--row); cursor: pointer; letter-spacing: 0; text-transform: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how-play { position: relative; flex: none; width: 20px; height: 20px; padding: 0; border-radius: 0; background: none;
+    color: transparent; overflow: hidden; font-size: var(--fs-label); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how-play::before { content: ''; position: absolute; left: 4px; top: 2px; width: 14px; height: 16px; background: var(--green-ink);
+    clip-path: polygon(0 0, 100% 50%, 0 100%); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how-sum:not(:has(.ex-how-play:not([hidden])))::before { content: ''; flex: none; width: 20px; height: 20px; background: var(--green-ink);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01'/%3E%3C/svg%3E") center / 20px no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01'/%3E%3C/svg%3E") center / 20px no-repeat; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; padding: 10px 0; line-height: 1.2; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how-t { font: 700 var(--fs-label)/1.1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how-n { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; letter-spacing: 0; text-transform: none;
+    font: 500 var(--fs-body)/1.2 'Barlow', sans-serif; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how-n .ex-how-lead { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how-sum i { flex: none; margin: -2px 0 0; font: 500 var(--fs-title)/1 'Barlow', sans-serif; font-style: normal; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how-sum:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  /* opened: the video, You need, the steps, the cues, on the paper under the row (numbers on the ring column, words at 56) */
+  :where(#day-view, .step-scroll, #ws-body) .ex-how-body { padding: 14px 0 4px; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how .ex-vunit { margin: 0 0 14px; border-radius: 14px; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-kit { margin: 0 0 6px 56px; font: 500 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-kit b { margin-right: 4px; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-steps { list-style: none; margin: 0; padding: 0; counter-reset: st; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-steps li { counter-increment: st; display: grid; grid-template-columns: 44px minmax(0, 1fr); column-gap: 12px; align-items: baseline;
+    padding: 7px 0; font: 500 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-steps li::before { content: counter(st); justify-self: center; width: auto; height: auto; border-radius: 0; box-shadow: none; transform: none;
+    font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how .ex-steps-slot:not(:empty) + .ex-cues-slot .ex-section-label { display: block; margin: 16px 0 8px 56px;
+    font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-how-body .ex-cues { display: grid; gap: 10px; margin-left: 56px; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-cue { display: flex; gap: 12px; padding: 0; border: 0; font: 500 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-cue::before { content: ''; flex: none; width: 3px; border-radius: 2px; background: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-cue.bad::before { background: var(--clay); }
+
+  /* the First time line (paintLastTime()): no box, at the name column just above the table; a circuit's Last time the same */
+  :where(#day-view, .step-scroll, #ws-body) .lt-slot:empty { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .lt-strip { display: block; margin: 16px 0 0; padding: 0 0 0 56px; border: 0; border-radius: 0; background: none; }
+  :where(#day-view, .step-scroll, #ws-body) .lt-first { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+  :where(#day-view, .step-scroll, #ws-body) .lt-when { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .lt-first-txt { font: 500 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .lt-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  :where(#day-view, .step-scroll, #ws-body) .lt-hist { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 0 0 12px; border: 0; background: none; cursor: pointer;
+    white-space: nowrap; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .lt-big { margin-top: -6px; font: 500 var(--fs-small)/1.35 'Barlow', sans-serif; letter-spacing: 0; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .lt-big b { font-weight: 700; color: var(--ink); }
+
+  /* 7g. The set table: calm, on the paper. White boxes edged --field, the set numbers grey and the live set the ONE green
+     number (a disc), LAST inside an empty kg box, the RPE tag in its own column 40+ px clear of the tick, How hard? a sand
+     band with big keys that hangs off its own set. Columns are tokens so the header, the rows and the caret agree. */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log { --c-set: 44px; --c-tag: 92px; --c-tick: 44px; --c-gap: 12px; position: relative; margin-top: 24px; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log .ex-set-header, :where(#day-view, .step-scroll, #ws-body) .ex-set-log .ex-set-row {
+    grid-template-columns: var(--c-set) minmax(0, 1fr) var(--c-tag) var(--c-tick); gap: 0 var(--c-gap); padding-left: 0; padding-right: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log.has-reps .ex-set-header, :where(#day-view, .step-scroll, #ws-body) .ex-set-log.has-reps .ex-set-row {
+    grid-template-columns: var(--c-set) minmax(0, 1fr) minmax(0, 1fr) var(--c-tag) var(--c-tick); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg.has-reps .ex-set-header, :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg.has-reps .ex-set-row,
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg .ex-set-header, :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg .ex-set-row {
+    grid-template-columns: var(--c-set) minmax(0, 1fr) var(--c-tag) var(--c-tick); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-header { align-items: center; padding: 0 0 7px; font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-header > div { text-align: center; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log:not(.has-reps) .ex-set-header > div:nth-child(3) { text-align: center; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg .ex-set-header > div:nth-child(3) { text-align: left; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg:not(.has-reps) .ex-set-header { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log .ex-set-row { position: relative; align-items: center; min-height: 60px; padding-top: 6px; padding-bottom: 6px; border-top: 0;
+    border-radius: 0; background: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row::before { content: ''; position: absolute; top: 0; left: calc(var(--c-set) + var(--c-gap)); right: calc(-1 * var(--g)); height: 1px; background: var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log::after { content: ''; display: block; height: 1px; margin: 0 calc(-1 * var(--g)) 0 calc(var(--c-set) + var(--c-gap)); background: var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.live { background: none; border-radius: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.live + .ex-set-row { border-top-color: transparent; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-num { justify-self: center; font: 700 var(--fs-title)/1 'Barlow Condensed', sans-serif; color: var(--num); font-variant-numeric: tabular-nums; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-num { color: var(--num); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.live .ex-set-num { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--mark);
+    color: #fff; font-size: var(--fs-lead); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-wbox { position: relative; min-width: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-weight, :where(#day-view, .step-scroll, #ws-body) .ex-set-reps { display: block; width: 100%; height: 48px; margin: 0; padding: 0 2px;
+    border: 1px solid var(--field); border-radius: 10px; background: var(--row); outline: none; -webkit-appearance: none; appearance: none; box-sizing: border-box;
+    font: 500 var(--fs-field)/1 'Barlow', sans-serif; color: var(--ink); text-align: center; font-variant-numeric: tabular-nums; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.live .ex-set-weight, :where(#day-view, .step-scroll, #ws-body) .ex-set-row.live .ex-set-reps { border: 1.5px solid var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-weight::placeholder, :where(#day-view, .step-scroll, #ws-body) .ex-set-reps::placeholder { color: var(--ph); opacity: 1; font-weight: 500; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-weight:focus, :where(#day-view, .step-scroll, #ws-body) .ex-set-reps:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
+  /* LAST shows inside the kg box, and last time's weight sits under it, only while the box is empty */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-wlast { display: none; position: absolute; left: 0; right: 0; top: 7px; text-align: center; pointer-events: none;
+    font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-wbox.show-last .ex-set-wlast { display: block; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-wbox.show-last:has(.ex-set-weight:not(:placeholder-shown)) .ex-set-wlast { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-wbox.show-last .ex-set-weight:placeholder-shown { padding-top: 15px; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-wbox.show-last .ex-set-weight::placeholder { font-size: var(--fs-body); color: var(--ph); opacity: 1; }
+  /* a done set is 700 with no box (a carried weight in a box is 500, so it never reads as logged) */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-weight, :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-reps { border-color: transparent; background: transparent;
+    font-weight: 700; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-reps:placeholder-shown::placeholder { color: var(--ink); opacity: 1; font-weight: 700; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-reps:not(:placeholder-shown) { color: var(--clay-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-weight:focus, :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-reps:focus { background: var(--row);
+    border-color: var(--green-ink); }
+  /* no kg box (bodyweight, a band, a hold): one wide column, the reps box or the dose, starting at the name column */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-dose { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg .ex-set-dose { display: block; padding: 0; font: 600 var(--fs-body)/1.2 'Barlow', sans-serif; color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg.has-reps .ex-set-dose { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg .ex-set-reps { text-align: left; padding: 0 14px; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg .ex-set-row.done .ex-set-reps { padding-left: 0; }
+  /* the RPE tag after a tick: a 32 px chip in a 44 px button, green on target, clay over, steel blue under, dashed while waiting */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log .ex-set-row .ex-set-rpetag, :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg.has-reps .ex-set-rpetag {
+    position: relative; z-index: 0; grid-column: -3 / -2; grid-row: 1; justify-self: start; height: 44px; min-width: 44px; padding: 0 12px; border: 0; border-radius: 0;
+    background: none; white-space: nowrap; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .6px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-log .ex-set-row .ex-set-check, :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg.has-reps .ex-set-check { grid-column: -2 / -1; grid-row: 1; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag::before { content: ''; position: absolute; z-index: -1; inset: 6px 0; border-radius: 999px; background: var(--tint); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag:empty { visibility: hidden; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag.empty { color: var(--grey); border: 0; font-weight: 700; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag.empty::before { background: none; border: 1.5px dashed var(--ring); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.rpe-open .ex-set-rpetag { border: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.rpe-open .ex-set-rpetag.empty { visibility: hidden; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag.over { color: #fff; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag.over::before { background: var(--clay-fill); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag.under { color: #fff; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag.under::before { background: var(--steel); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 0; }
+  /* the circle on a set: 32 px drawn, 44 to hit; the live set's edged green, a done one filled with a white tick */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-check { position: relative; justify-self: center; width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: 50%;
+    background: transparent; cursor: pointer; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-check::before { content: ''; position: absolute; inset: 6px; border-radius: 50%; border: 1.5px solid var(--ring); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-check::after { content: ''; inset: 0; opacity: 0; transform: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l3.8 3.8L18 8'/%3E%3C/svg%3E") center / 18px no-repeat; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.live .ex-set-check::before { border: 2px solid var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-check { background: transparent; border-color: transparent; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-check::before { background: var(--mark); border-color: var(--mark); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-check::after { opacity: 1; transform: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-check:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 0; }
+  /* How hard?: a sand band that hangs off its set, a caret up at that set's RPE slot, big keys */
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe { grid-column: 1 / -1; display: none; position: relative; align-items: center; gap: 6px;
+    margin: 6px calc(-1 * var(--g)) -6px; padding: 10px var(--g) 12px; background: var(--sand); box-shadow: inset 0 -1px 0 var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe::before { content: ''; position: absolute; top: -6px;
+    left: calc(100% - var(--g) - var(--c-tick) - var(--c-gap) - var(--c-tag) + 22px); width: 12px; height: 12px; border-radius: 2px 0 0 0; background: var(--sand); transform: rotate(45deg); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.rpe-open .ex-set-rpe { display: flex; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.rpe-open + .ex-set-row { margin-top: 6px; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.rpe-open + .ex-set-row::before { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe-q { display: block; flex: 1 0 auto; min-width: 44px; min-height: 44px; margin-right: 2px; padding: 0; border: 0; background: none;
+    text-align: left; white-space: nowrap; cursor: pointer; font: 600 var(--fs-small)/1 'Barlow', sans-serif; letter-spacing: 0; text-transform: none; color: var(--green-ink);
+    text-decoration: underline dotted; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe .rpe-btn { flex: 0 1 52px; min-width: 44px; max-width: none; height: 48px; padding: 0; border: 0; border-radius: 10px;
+    background: var(--row); box-shadow: inset 0 0 0 1px var(--box); font: 700 var(--fs-title)/1 'Barlow Condensed', sans-serif; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe .rpe-btn.selected { background: var(--fill); border-color: transparent; color: #fff; box-shadow: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe .rpe-btn.selected.over { background: var(--clay-fill); border-color: transparent; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe .rpe-btn.selected.under { background: var(--steel); border-color: transparent; }
+  /* last time, only on a set that ran over: "LAST 5 @ 9" in the RPE slot, in the LAST caption's grammar, until the set is ticked */
+  :where(#day-view, .step-scroll, #ws-body) .lt-ghost { grid-column: -3 / -2; grid-row: 1; align-self: center; justify-self: start; margin: 0; padding-left: 4px; white-space: nowrap;
+    pointer-events: none; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .lt-ghost b { font-weight: 700; color: var(--clay-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .lt-ghost { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row.rd-extra { opacity: .45; }
+
+  /* 7h. CIRCUITS. A warm-up stays on paper when open (green is for work you log): plain letters A to D, the dose "5 / side",
+     a ▶ disc only with a video, a chevron that unfolds the steps and cues, then the foot row (Note, an outlined Rest). */
+  :where(#day-view, .step-scroll, #ws-body) .round-group > .ex-detail > .ex-section-label { display: none; }
+  /* an open circuit is one grid: its body (display: contents) flows into the card, so the Note (after the body on a warm-up,
+     inside the log on a working circuit) and Rest share the last row whichever box they sit in */
+  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 0 var(--g) 16px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed):not(.block-warmup) { border-bottom: 1px solid var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) > .item-main { grid-column: 1 / -1; margin: 0 calc(-1 * var(--g)); }
+  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) > .ex-detail { display: contents; }
+  :where(#day-view, .step-scroll, #ws-body) .round-list { display: block; margin: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row, :where(#day-view, .step-scroll, #ws-body) .round-row.prep { position: relative; display: block; padding: 0; border: 0; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .round-row::before { content: ''; position: absolute; top: 0; left: 56px; right: calc(-1 * var(--g)); height: 1px; background: var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .round-row .round-row-main, :where(#day-view, .step-scroll, #ws-body) .round-row.prep .round-row-main { display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto; grid-template-areas: "l n p" "l d p"; column-gap: 12px; align-items: center; min-height: 60px; padding: 8px 0; gap: 0 12px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row.prep.has-cues .round-row-main { cursor: pointer; }
+  :where(#day-view, .step-scroll, #ws-body) .round-letter { grid-area: l; justify-self: center; width: auto; font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .round-name { grid-area: n; align-self: end; letter-spacing: 0; font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .round-detail { grid-area: d; align-self: start; margin: 2px 0 0; letter-spacing: 0; font: 500 var(--fs-small)/1.3 'Barlow', sans-serif;
+    color: var(--grey); font-variant-numeric: tabular-nums; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row-main > :not(.round-letter):not(.round-name):not(.round-detail) { grid-row: 1 / span 2; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row-main .rd-item { grid-row: auto; grid-column: 2; justify-self: start; margin-top: 4px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-play-btn { position: relative; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
+    background: none; box-shadow: none; color: #fff; }
+  :where(#day-view, .step-scroll, #ws-body) .round-play-btn::before { content: ''; position: absolute; inset: 4px; border-radius: 50%; background: var(--fill); }
+  :where(#day-view, .step-scroll, #ws-body) .round-play-btn svg { position: relative; width: 14px; height: 14px; margin-left: 2px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row.prep.has-cues .round-cue-tog { display: grid; place-items: center; width: 44px; height: 44px; margin: 0; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .round-row-main:has(> .round-play-btn):has(> .round-cue-tog) { grid-template-columns: 44px minmax(0, 1fr) auto auto; grid-template-areas: "l n p t" "l d p t"; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row.prep .round-cue-tog svg { width: 16px; height: 16px; transform: rotate(90deg); transition: transform .2s; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row.prep.cues-open .round-cue-tog svg { transform: rotate(-90deg); color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .round-row.prep.cues-open .round-steps-slot { display: block; padding: 0 0 4px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row.prep.cues-open .round-cues { display: grid; gap: 10px; padding: 0 0 16px 56px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row .round-cues { display: grid; gap: 10px; margin: 0; padding: 0 0 16px 56px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row .ex-cue { padding: 0; font-size: var(--fs-body); }
+  :where(#day-view, .step-scroll, #ws-body) .round-row .ex-kit { margin: 0 0 6px 56px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row .ex-steps li { font-size: var(--fs-body); padding: 5px 0; }
+  :where(#day-view, .step-scroll, #ws-body) .round-group.checked .round-row { opacity: 1; }
+  /* a working circuit: the green head (above), its rows on the paper: letter · name and dose · kg on the right edge, open cues,
+     a small How to do it line under an item with steps, then one How hard? row per round */
+  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.block-warmup) .round-row-main { grid-template-columns: 44px minmax(0, 1fr) auto auto; grid-template-areas: "l n w p" "l d w p"; cursor: default; }
+  :where(#day-view, .step-scroll, #ws-body) .round-wt { grid-area: w; justify-self: end; width: 68px; height: 48px; margin: 0; padding: 0 2px; border: 1px solid var(--field); border-radius: 10px;
+    background: var(--row); outline: none; font: 500 var(--fs-field)/1 'Barlow', sans-serif; color: var(--ink); text-align: center; font-variant-numeric: tabular-nums; }
+  :where(#day-view, .step-scroll, #ws-body) .round-wt::placeholder { color: var(--ph); opacity: 1; font-weight: 500; }
+  :where(#day-view, .step-scroll, #ws-body) .round-wt:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .round-row:not(.prep) .round-cues-slot { display: block; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row:not(.prep) .round-cues { padding-bottom: 4px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row.has-steps:not(.prep) .round-how-tog { display: inline-flex; margin: 2px 0 0 56px; gap: 0;
+    font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .round-how-n { font: 500 var(--fs-small)/1 'Barlow', sans-serif; letter-spacing: 0; text-transform: none; color: var(--grey); }
+  :where(#day-view, .step-scroll, #ws-body) .round-row.steps-open:not(.prep) .round-steps-slot { padding-bottom: 6px; }
+  :where(#day-view, .step-scroll, #ws-body) .round-row .rpe-row, :where(#day-view, .step-scroll, #ws-body) .ex-log .rpe-row,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row { position: relative; display: flex; flex-wrap: nowrap; align-items: center; gap: 6px; min-height: 64px; padding: 8px 0; border-top: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row::before { content: ''; position: absolute; top: 0; left: 56px; right: calc(-1 * var(--g)); height: 1px; background: var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-label { flex: 1 0 auto; min-height: 44px; margin: 0; padding: 0; text-align: left; white-space: nowrap;
+    font: 600 var(--fs-small)/1 'Barlow', sans-serif; letter-spacing: 0; text-transform: none; color: var(--green-ink); text-decoration: underline dotted;
+    text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-btn { flex: 0 1 46px; min-width: 44px; height: 48px; padding: 0; border: 0; border-radius: 10px; background: var(--row);
+    box-shadow: inset 0 0 0 1px var(--box); font: 700 var(--fs-title)/1 'Barlow Condensed', sans-serif; color: var(--ink); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-btn.selected { background: var(--fill); color: #fff; box-shadow: none; }
+  .step-scroll .rpe-row.step-current::before { display: none; }
+  /* Guided pins its current set (WK-01): full width in its tint, the same columns as the rows above it */
+  .step-scroll .ex-set-log .ex-set-row.step-current { margin: 0 calc(-1 * var(--g)); padding-left: var(--g); padding-right: var(--g); border-radius: 0; }
+  .step-scroll .ex-set-log .ex-set-row.step-current::before { display: none; }
+
+  /* 7i. Dark mode: the old dark rules hard-code colours on the same parts, at the same weight plus body[data-dark]; these
+     mirror them with the day's tokens (which flip on their own). */
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item { border-color: transparent; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked[class*="block-"] { background: transparent; border-color: transparent; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .item-name { color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-name { color: var(--grey); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .item-name { color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-num, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-num { color: var(--num); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-num { color: var(--mint); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-numline { color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline { color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.modifier { background: var(--tint); color: var(--green-ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-summary-pill.modifier { background: rgba(255,255,255,.14); color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.rd-pill { color: #fff; box-shadow: none; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-about { color: var(--grey); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-about.has-why { background: none; border-color: transparent; color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-about:not(.has-why) { color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-detail { background: none; border-top-color: transparent; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-coach-note { background: none; color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-log { background: none; border-color: transparent; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-how { background: none; border-color: transparent; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-kit { color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-kit b { color: var(--green-ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-steps li, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-cue { color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .lt-strip { background: none; border-color: transparent; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .lt-first-txt, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .lt-big { color: var(--grey); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .lt-ghost b { color: var(--clay-ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-header { color: var(--grey); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-row, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-row.live { background: none; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-num, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-num { color: var(--num); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-row.live .ex-set-num { color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-weight, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-reps { background: var(--row); color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-weight::placeholder, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-reps::placeholder,
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-wbox.show-last .ex-set-weight::placeholder { color: var(--ph); opacity: 1; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-wlast { color: var(--grey); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-weight, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-reps { background: transparent; color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-reps:placeholder-shown::placeholder { color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-reps:not(:placeholder-shown) { color: var(--clay-ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-log.no-kg .ex-set-dose { color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-check { border-color: transparent; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag { color: var(--green-ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag.empty { color: var(--grey); border-color: transparent; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag.over, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-rpetag.under { color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe .rpe-btn { background: #2A2A2A; border-color: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--box); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe .rpe-btn.selected { background: var(--mark); color: #fff; box-shadow: none; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe .rpe-btn.selected.over { background: var(--clay-fill); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe .rpe-btn.selected.under { background: #3E6A92; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-btn { background: #2A2A2A; color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-btn.selected { background: var(--mark); color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .rpe-label { color: var(--green-ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .note-row, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .note-row textarea { border-color: var(--box); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .note-row textarea { color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .round-row { color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .round-name { color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .round-detail { color: var(--grey); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .round-wt { background: var(--row); color: var(--ink); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .round-wt::placeholder { color: var(--ph); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .round-play-btn { background: none; color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .round-play-btn::before { background: var(--mark); }
+
+  /* a round's words take their own line where they and five 44 px keys do not fit in one */
+  @media (max-width: 374px) {
+    :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row { flex-wrap: wrap; gap: 0 4px; }
+    :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-label { flex: 0 0 100%; min-height: 36px; }
+    :where(#day-view, .step-scroll, #ws-body) .checklist-item .rpe-row .rpe-btn { flex: 1 1 0; }
+  }
+
+  /* 7j. 320 px: the gutter is 16 (--g); the set table narrows its fixed columns so the kg and reps boxes hold "102.5", and
+     How hard? keeps its word on one line beside five 44 px keys. */
+  @media (max-width: 359px) {
+    :where(#day-view, .step-scroll, #ws-body) .ex-set-log { --c-set: 32px; --c-tag: 80px; --c-gap: 6px; margin-top: 20px; }
+    :where(#day-view, .step-scroll, #ws-body) .ex-set-log .ex-set-row .ex-set-rpetag { padding: 0 9px; }
+    :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe { flex-wrap: nowrap; gap: 4px; padding-left: 8px; padding-right: 8px; }
+    :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe-q { display: block; flex: 1 0 auto; margin-right: 0; }
+    :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe .rpe-btn { flex: 0 0 44px; width: 44px; }
+    :where(#day-view, .step-scroll, #ws-body) .ex-set-wlast { left: 0; }
+    :where(#day-view, .step-scroll, #ws-body) .lt-ghost { letter-spacing: .3px; padding-left: 0; }
+    :where(#day-view, .step-scroll, #ws-body) .ex-how { margin-top: 12px; }
+    :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-lab,
+    :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-k { letter-spacing: .3px; }
+    :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-help::after { left: -10px; right: -8px; }
+    :where(#day-view, .step-scroll, #ws-body) .ex-rest-bottom .rest-btn { min-width: 0; padding: 0 14px; gap: 8px; }
+    :where(#day-view, .step-scroll, #ws-body) .round-wt { width: 58px; }
+  }
 </style>
 </head>
 <body>
@@ -8333,10 +8853,13 @@ function repCount(ex) {
 function renderNumLine(rx, rest) {
   const bits = [];
   const dose = rx.dose ? rx.dose.value + (rx.dose.side ? ' / side' : '') : '';
-  if (rx.sets && dose) bits.push(`<span class="nl-dose"><b>${esc(rx.sets)} × ${esc(dose)}</b></span>`);
+  // The open card's scoreboard puts a caption under each value (Centre Court, 2026-10-12): the dose's is .nl-cap (an
+  // .nl-lab, so numLineText() leaves it out), RPE's word is .nl-k. The text of the line is unchanged.
+  const cap = rx.dose ? String(rx.dose.label || DOSE_LABEL[rx.dose.kind] || '').toLowerCase() : '';
+  if (rx.sets && dose) bits.push(`<span class="nl-dose"><b>${esc(rx.sets)} × ${esc(dose)}</b>${cap ? `<span class="nl-lab nl-cap">sets×${esc(cap)}</span>` : ''}</span>`);
   else if (rx.sets)    bits.push(`<span class="nl-dose"><b>${esc(rx.sets)} sets</b></span>`);
-  else if (dose)       bits.push(`<span class="nl-dose"><b>${esc(dose)}</b></span>`);
-  if (rx.rpe) bits.push(`<span class="nl-rpe">RPE ${esc(rx.rpe)}</span>`);
+  else if (dose)       bits.push(`<span class="nl-dose"><b>${esc(dose)}</b>${cap ? `<span class="nl-lab nl-cap">${esc(cap)}</span>` : ''}</span>`);
+  if (rx.rpe) bits.push(`<span class="nl-rpe"><span class="nl-k">RPE </span>${esc(rx.rpe)}</span>`);
   const tempo = tempoDisplay(rx.tempo);
   // "tempo" shows in an open card only, and is the way to what the numbers mean (COACH-02).
   if (tempo) bits.push(`<span class="nl-tempo"><button type="button" class="nl-lab nl-help" onclick="event.stopPropagation(); openHelp('tempo')" aria-label="Tempo: what the numbers mean">tempo </button>${tempo.html}</span>`);
@@ -8375,13 +8898,15 @@ function renderExSummary(rx) {
 function renderCoachNote(note) {
   if (!note) return '';
   return `<div class="ex-coach-note"><div class="ex-note-text"><span class="ex-coach-note-label">Coach's note.</span> ${esc(note)}</div>`
-    + `<button type="button" class="ex-note-more" onclick="toggleNoteMore(this, event)">More ›</button></div>`;
+    + `<button type="button" class="ex-note-more" onclick="toggleNoteMore(this, event)">More</button></div>`;
 }
 const NOTE_DOT = `<span class="ex-note-dot" role="img" aria-label="Has a coach's note"></span>`;
+// Rest ⏱'s stopwatch: the glyph stays in the button's text (its name, "Rest ⏱ 2:30"); CSS draws it (Centre Court).
+const REST_IC = `<span class="rest-ic" aria-hidden="true">⏱</span>`;
 function toggleNoteMore(btn, ev) {
   if (ev) ev.stopPropagation();
   const n = btn.closest('.ex-coach-note');
-  btn.textContent = n.classList.toggle('open') ? 'Less' : 'More ›';
+  btn.textContent = n.classList.toggle('open') ? 'Less' : 'More';   // the chevron is CSS (Centre Court)
 }
 // "More ›" stays only on a note the two-line cut really shortens. Measured, not guessed
 // from its length: that depends on the phone's width. A note inside a closed card has no
@@ -8485,7 +9010,7 @@ function paintHowTo(card) {
   if (steps) parts.push(steps + (steps === 1 ? '\u00a0step' : '\u00a0steps'));
   if (cues) parts.push(cues + (cues === 1 ? '\u00a0cue' : '\u00a0cues'));
   const n = how.querySelector('.ex-how-n');
-  if (n) n.textContent = parts.map(x => '\u00a0· ' + x).join('');
+  if (n) n.innerHTML = parts.length ? '<span class="ex-how-lead">\u00a0· </span>' + parts.map(esc).join('\u00a0· ') : '';
   const play = how.querySelector('.ex-how-play');
   if (play) play.hidden = !hasVid;
 }
@@ -8565,7 +9090,7 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   const timerSec = restSec || 120;
   const restBottom = isStandard
     ? `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${timerSec}" onclick="openTimer(event)">${
-        restSec ? `Rest ⏱ ${formatRestLabel(restSec)}` : 'Rest timer ⏱'}</button></div>`
+        restSec ? `Rest ${REST_IC} <span class="rest-t">${formatRestLabel(restSec)}</span>` : `Rest timer ${REST_IC}`}</button></div>`
     : '';
 
   const numBadge = num ? `<div class="ex-num">${num}</div>` : '';
@@ -8639,7 +9164,7 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   const itemDose = item => {
     const r = rxOf(item);
     if (!r.dose) return item.detail || '';
-    const bits = [r.dose.value + (r.dose.side ? '/side' : '')];
+    const bits = [r.dose.value + (r.dose.side ? ' / side' : '')];   // "5 / side", as on a card's line
     if (r.rpe) bits.push('RPE ' + r.rpe);
     return bits.join(' · ');
   };
@@ -8711,9 +9236,12 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // The same line of numbers as a single exercise (CARD-02): rounds, the dose, RPE and
   // the rest that paces the round. The Coach's Note is the clay dot after the name.
   const nlBits = [];
-  if (roundsLabel)    nlBits.push(`<span class="nl-dose"><b>${esc(roundsLabel)}</b></span>`);
+  // "×2 Rounds": the number is the scoreboard's value and "Rounds" its caption (Centre Court); the text is unchanged.
+  if (roundsLabel)    nlBits.push(/^×\d+ Rounds$/.test(roundsLabel)
+    ? `<span class="nl-dose"><b>${esc(roundsLabel.replace(/ Rounds$/, ''))}</b><span class="nl-k"> Rounds</span></span>`
+    : `<span class="nl-dose"><b>${esc(roundsLabel)}</b></span>`);
   if (_rxC.dose)      nlBits.push(`<span>${esc(_rxC.dose.value + (_rxC.dose.side ? ' / side' : ''))}</span>`);
-  if (_rxC.rpe)       nlBits.push(`<span class="nl-rpe">RPE ${esc(_rxC.rpe)}</span>`);
+  if (_rxC.rpe)       nlBits.push(`<span class="nl-rpe"><span class="nl-k">RPE </span>${esc(_rxC.rpe)}</span>`);
   if (_rxC.rest)      nlBits.push(`<span class="nl-rest"><span class="nl-lab">rest </span>${esc(formatRestLabel(_rxC.rest))}</span>`);
   const numLine = nlBits.length ? `<div class="ex-numline">${nlBits.join('')}</div>` : '';
 
@@ -8729,9 +9257,9 @@ function renderCircuit(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // with none opens the timer at a neutral minute and says so ("Rest timer"), like a single
   // exercise; a warm-up with none has no rest button at all (it flows).
   const restBottom = circuitRestSec
-    ? `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${circuitRestSec}" onclick="openTimer(event)">Rest ⏱ ${formatRestLabel(circuitRestSec)}</button></div>`
+    ? `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="${circuitRestSec}" onclick="openTimer(event)">Rest ${REST_IC} <span class="rest-t">${formatRestLabel(circuitRestSec)}</span></button></div>`
     : isPrep ? ''
-    : `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="60" onclick="openTimer(event)">Rest timer ⏱</button></div>`;
+    : `<div class="ex-rest-bottom"><button class="rest-btn" data-rest="60" onclick="openTimer(event)">Rest timer ${REST_IC}</button></div>`;
 
   return `<div class="checklist-item round-group collapsed ${blockClass}" data-day="${dayId}" data-rounds="${roundCount}" data-log-weight="${logWeight ? '1' : '0'}" data-log-rpe="${logRPE ? '1' : '0'}">
     <div class="item-main" onclick="onExerciseRowTap(event, this.parentElement, '${dayId}')">
@@ -9027,7 +9555,7 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues; it opens by itself the first time you meet an exercise and is folded after that, and the ▶ on it means there is a video; if the video won't play on your phone, tap <strong>Open in YouTube</strong> under it), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and the circle ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its number sits in the circle on the left.</p><p>Tap it to open it: its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues; it opens by itself the first time you meet an exercise and is folded after that, and the ▶ on it means there is a video; if the video won't play on your phone, tap <strong>Open in YouTube</strong> under it), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and the circle ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. When the rest is over it moves you to the next set. Supersets and circuits come round by round; warm-ups stay in the list. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
@@ -11067,7 +11595,9 @@ function doneLineText(card) {
   const done = loadSetLog(name, parseInt(card.dataset.sets, 10) || 1).filter(s => s.d);
   if (!done.length) return 'done';
   const rs = done.map(s => s.r).filter(Boolean);
-  return (histSetsText(done, cardReps(card)) || done.length + ' sets') + (rs.length ? ' · RPE ' + rs.join(' ') : '');
+  // A move with no weight reads "4 · 4 · 4 · 4", not "× 4 · 4 …" (Centre Court): the History sheet keeps its own form.
+  const sets = (histSetsText(done, cardReps(card)) || done.length + ' sets').replace(/^× /, '');
+  return sets + (rs.length ? ' · RPE ' + rs.join(' ') : '');
 }
 
 // After the last set's RPE the card folds to its done row and the next unfinished one
@@ -14735,7 +15265,8 @@ function paintLastTime(card) {
       const g = document.createElement('div');
       g.className = 'lt-ghost';
       const w = histKg(s.w), n = (s.n != null && s.n !== '') ? s.n : (e.reps || null);
-      g.innerHTML = `last · ${w ? esc(w) : 'BW'}${n ? ' × ' + esc(String(n)) : ''} @ <b>${esc(String(s.r))}</b>`;
+      // "last 5 @ 9": the weight is in the kg box already (Centre Court, 2026-10-12). w stays for a bodyweight set.
+      g.innerHTML = `last${n ? ' ' + esc(String(n)) : (w ? ' ' + esc(w) : '')} @ <b>${esc(String(s.r))}</b>`;
       row.appendChild(g);
     });
   }

@@ -898,8 +898,8 @@ opened from it (`_libScrollY` in `goTo()`; the Library tab, or any other way in,
 Amir's pick A (*"Clay's Jobs"* page): the brand's one accent marked almost everything, block headers, done
 tints, the running bar, labels, and so it marked nothing. Now:
 
-- **Clay stays on what asks the athlete to look**: the Coach's note (the box, its label, *More*, and the dot
-  after the name), a Because (the solid clay ⓘ), an RPE over its target (the set's RPE tag, the selected
+- **Clay stays on what asks the athlete to look**: the Coach's note (since Centre Court its quote mark and the
+  dot after the name; *More* is green), a Because (the solid clay ⓘ), an RPE over its target (the set's RPE tag, the selected
   button, a circuit's Last time strip and the ghost line under a set that ran over), the tempo digit, a banner that asks
   for something (a day filed unfinished, a report waiting), a suggestion's kicker (LIB-01: *Sore today*, *Week done*),
   the numbers in a week note's headline (Front Page, 2026-10-12: *RPE 7*, *One set fewer*), and the same numbers on
@@ -991,6 +991,41 @@ dashboard do not change.
 - **Scroll margins**: `foldWhenDone()` lands the next card right under the slim bar: 72 px, 104 with the week's
   limits row (118 under 360, where that row can wrap), plus 44 in the demo. The 16 px over the bar's height is
   Chrome's smooth scroll stopping short of an instant one (measured on the old bar too).
+- **The cards** (section 7 of the block, Centre Court 2/3). No card is a box any more: a row on the paper, a
+  hairline from the name column between rows, no white, no shadow, no stripe, no press scale.
+  - **Closed**: the tick-all ring (30 px drawn, 44 to hit) with the **exercise's number inside it** (Amir: *"exercise
+    number inside the circle"*). `.ex-num` stays in `.item-name-row` in the DOM; CSS lays it on the ring with
+    `pointer-events: none`, so a tap on it is a tap on `.check-box`. Then the name (18 px), the line of numbers (15 px,
+    the dose bold, the tempo's hot digits clay), the intent pill, and the ⓘ: a plain one is a 22 px grey ring, a Because
+    the 28 px clay disc. A row with no ⓘ (a circuit, a simple item) shows a grey ›.
+  - **Done**: a receipt. The ring fills green with a white tick (the number steps aside), the name 15 px grey, what was
+    done on one 13 px grey line, *4 · 4 · 4 · 4 · RPE 7 7 7 7* (a move with no weight drops the leading *×*).
+  - **Open, the head** (a lift, and a circuit that logs; a warm-up stays on paper): the cover's green, *● 6* as its
+    eyebrow, the name in 28 px capitals, a hairline, then the **scoreboard**: one grid of four equal tracks, each a value
+    over its caption (*4 × 6* SETS×REPS, *7* RPE, *3-1-1* TEMPO, *2:30* REST), then the pill. The captions are in the
+    markup: `renderNumLine()` writes the dose's as `.nl-lab.nl-cap` (so `numLineText()` leaves it out) and RPE's word as
+    `.nl-k`; a circuit's *×2* and *Rounds* are split the same way. The text of the line is unchanged. **An open lift has
+    no tick-all ring** (every set has its own circle under it); a working circuit keeps its ring, its one *done*.
+  - **Open, the body** on the paper: the Coach's Note as a pull quote (the clay quote mark on the ring column, 16 px,
+    **3 lines**, then *More* with a drawn chevron: `fitNotes()` still decides), **How to do it** as one white rounded row
+    (the About sheet's Your history recipe: a green ▶ only with a video, else a list glyph; *HOW TO DO IT* over the count
+    on its own line; its text stays *How to do it · video · 5 steps · 4 cues*: `paintHowTo()` puts the leading dot in
+    `.ex-how-lead`, which CSS hides), the *First time* line with no box, then the set table.
+  - **The set table**: white boxes edged `--field`, the set numbers grey and the live set the one green number (a
+    disc), LAST inside an empty kg box, a done set 700 with no box, the RPE tag in its own column 40+ px clear of the
+    tick, **How hard?** a sand band that hangs off its set with 48 px keys, and the ghost line in that row's RPE slot,
+    *LAST 5 @ 9* (`paintLastTime()` writes `last 5 @ <b>9</b>`: the weight is in the box already). Columns are tokens on
+    `.ex-set-log` (`--c-set`, `--c-tag`, `--c-tick`, `--c-gap`), narrower under 360 so the boxes hold *102.5*.
+  - **The foot row** (A's P50): **Note** on the left (a 32 px outlined circle with its chevron, then *NOTE*) and **Rest ⏱
+    2:30** on the right, the primary button with its time, the stopwatch drawn in mint (the button's text keeps the ⏱
+    glyph in `.rest-ic`; the time is `.rest-t`). One row, not sticky. Both keep their nodes: `.ex-log` and the open
+    card's body are `display: contents` / a grid, and the Note and `.ex-rest-bottom` share its last row; an open Note's box
+    runs full width under them. A warm-up ends the same way with an outlined Rest.
+  - **Circuits**: a warm-up stays on paper with plain letters, *5 / side* doses (`itemDose()` writes the card's
+    spacing), a ▶ disc only with a video and the chevron for its steps and cues. A working circuit has the green head, its
+    items as letter · name and dose · kg box (· ▶), its cues open, the small *How to do it* line, and one How hard? row per
+    round (the words take their own line under 375 px).
+  - **Guided** borrows the same body (`.step-scroll`, gutter 16): its pinned set keeps its tint across the full width.
 
 ## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26 and 2026-09-27)
 
@@ -1060,14 +1095,16 @@ Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8r
   takes `RPE 7` out of the line and adds the clay **RPE 7 → 6 today** pill, so the number is said once;
   `paintToday()`'s undo puts it back.
 - **The Coach's Note is a clay dot after the name** (`NOTE_DOT`, an empty span inside `.item-name`, so the
-  name's text is unchanged); open, the note is cut to two lines with **More ›** (`fitNotes()` measures it
-  when the card opens: `toggleExpand()`, Guided's `renderStep()`).
-- **The ⓘ sits at the right end** (`.ex-side`, `paintSpine()`), 26 px, and a Because fills it clay.
+  name's text is unchanged); open, the note is cut to three lines with **More** (its chevron drawn by CSS since
+  Centre Court; `fitNotes()` measures it when the card opens: `toggleExpand()`, Guided's `renderStep()`).
+- **The ⓘ sits at the right end** (`.ex-side`, `paintSpine()`): a 22 px grey ring, 44 to hit, and a Because is the 28 px clay disc (Centre Court).
 - **No history on a closed card** (Amir: *"no history on the exercise card when not opened"*): the *Last*
   pill is gone.
-- **A long name wraps beside its number** (`.item-name-row` no longer wraps), never under it.
+- **The number sits in the tick-all ring** since Centre Court (CSS only; `.ex-num` is still the name's sibling), so a
+  long name wraps on its own.
 
-**Open**, in this order: the note, **How to do it**, the sets, Rest. There is no *Log Sets* label.
+**Open**, in this order: the green head with the scoreboard (Centre Court), the note, **How to do it**, the sets, then
+Note and Rest on one row. There is no *Log Sets* label.
 - **No Last time box** (Amir, 2026-10-12: *"the history ... should be removed from exercise cards. because their last
   time, is actually already in the reps, weight box"*). It was a box under the note (CARD-01, 2026-09-27: the last set,
   tapped open to every set and History ›). Now last time's weight is each empty kg box's LAST, a set that ran over its
@@ -1101,7 +1138,7 @@ Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8r
   `APP_GUIDE`. Check: `scripts/headless/youtube.js`.
 
 **Done**: a finished exercise's closed row is small and says what was done, *72.5 kg × 6 · 6 · 6 · 6 ·
-RPE 7 7 7 8* (`paintDoneLines()` from `updateProgress()`, one line with an ellipsis; `.is-done`). After
+RPE 7 7 7 8* (a bodyweight move *4 · 4 · 4 · 4 · RPE 7 7 7 7*) (`paintDoneLines()` from `updateProgress()`, one line with an ellipsis; `.is-done`). After
 the last set's RPE (or a tick-all on an open card) the card folds and the **next unfinished card opens in
 view** (`foldWhenDone()`, 700 ms): a set still waiting for its RPE keeps it open, Guided never folds,
 a tick-all on a closed card opens nothing. Library cards never become done rows.
