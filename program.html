@@ -2610,8 +2610,9 @@
   /* ── Last time's weight (Fork 3B, 2026-09-26) — see paintSets()/carrySet() ──
      The number in an empty box is history, not something a tick records, so it
      wears a LAST caption and sits smaller and paler than the prescribed reps beside
-     it. The card's "Same as last" button went on 2026-09-27: the open card's Last
-     time box already says it. */
+     it. The card's "Same as last" button went on 2026-09-27, and the open card's Last
+     time box on 2026-10-12 (Amir: "their last time, is actually already in the reps,
+     weight box"): this caption is the card's one reminder of last time. */
   .ex-set-wbox { position: relative; min-width: 0; }
   .ex-set-wlast {
     display: none; position: absolute; left: 10px; top: 3px; pointer-events: none;
@@ -2625,9 +2626,9 @@
   @media (max-width: 360px) { .ex-set-wlast { left: 6px; } }
 
   /* ── The Card Remembers (2026-09-24) — see paintLastTime() ──
-     Last time is a box in the OPEN card (CARD-01, 2026-09-27: its closed-card pill is
-     gone, "no history on the exercise card when not opened"), and a faint line under the
-     one set that ran over target. Clay marks only what ran over target. */
+     Since 2026-10-12 a standard card carries no Last time box (the ⓘ's Your history has
+     it), only a faint line under the one set that ran over target, and a "First time" line
+     on a lift never logged; a circuit keeps its strip. Clay marks only what ran over target. */
   .lt-strip {
     background: var(--white);
     border: 1px solid var(--grey-card);
@@ -2719,8 +2720,8 @@
 
   /* ── The working card (CARD-01/02/03, Amir 2026-09-27) — see renderExercise() ──
      Closed: the name (a clay dot for a Coach's Note), one line of numbers, the pills,
-     the ⓘ at the right end, and no history. Open: the note in two lines, Last time as
-     a box, How to do it folded, the sets, Rest. A finished card is a small done row. */
+     the ⓘ at the right end, and no history. Open: the note in two lines, the First time line
+     on a lift never logged, How to do it folded, the sets, Rest (no Last time box since 2026-10-12). A finished card is a small done row. */
   .ex-side { flex: none; align-self: flex-start; display: flex; justify-content: flex-end; padding-top: 1px; }
   .ex-side:empty { display: none; }
   .ex-side .ex-about { width: 26px; height: 26px; font-size: var(--fs-body); }
@@ -2823,28 +2824,8 @@
   .sp-how .ex-vunit { margin: 2px 0 4px; }
   .sp-how .ex-kit { margin-top: 4px; }
 
-  /* Last time as a box: closed, the last set; open, every set (paintLastTime()). */
+  /* The open card's Last time slot: the "First time" line only since 2026-10-12 (paintLastTime()). */
   .lt-slot:empty { display: none; }
-  .lt-strip.lt-box { display: block; padding: 0; }
-  .lt-head { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 8px 12px;
-    background: none; border: 0; cursor: pointer; text-align: left; color: inherit; font: inherit; box-sizing: border-box; }
-  .lt-head .lt-when { flex: 1; min-width: 0; line-height: 1.35; }
-  .lt-w-l { display: none; }
-  .lt-box.open .lt-w-l { display: inline; }
-  .lt-box.open .lt-w-s { display: none; }
-  .lt-one { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); line-height: 1;
-    color: var(--grey-dark); white-space: nowrap; }
-  .lt-box.open .lt-one { display: none; }
-  .lt-one .lt-r { font-family: 'Space Mono', monospace; font-style: normal; font-weight: 700; font-size: var(--fs-label);
-    margin-left: 3px; color: var(--grey-text); }
-  .lt-one .lt-r.over { color: var(--clay-ink); }
-  .lt-one .lt-r.under { color: var(--rpe-under); }
-  .lt-cv { color: var(--grey-text); font-size: var(--fs-label); transition: transform 0.2s; }
-  .lt-box.open .lt-cv { transform: rotate(180deg); }
-  .lt-more { display: none; padding: 0 12px 10px; }
-  .lt-box.open .lt-more { display: grid; gap: 5px; }
-  .lt-foot { display: flex; justify-content: flex-end; }
-  body[data-dark] .lt-one { color: #eee; }
 
   /* The kg box follows the work (paintKgCol()). Hidden, never removed. A row with no
      box to type in says its dose instead ("30 s / side"). */
@@ -2864,11 +2845,6 @@
   }
   .sp-purpose { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); line-height: 1.45; color: var(--grey-dark); margin: 2px 0 10px; }
   body[data-dark] .sp-purpose { color: #e8e8e8; }
-  .sp-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
-  .sp-chip {
-    font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 0.3px;
-    background: var(--yellow); color: var(--on-accent); border-radius: 999px; padding: 5px 9px;
-  }
   .sp-sec { display: grid; gap: 6px; margin-top: 14px; }
   .sp-lbl {
     font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 1.3px;
@@ -2876,18 +2852,10 @@
   }
   .sp-court { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); color: var(--grey-dark); margin: 0; }
   body[data-dark] .sp-court { color: #ddd; }
-  .sp-alts { display: flex; flex-wrap: wrap; gap: 6px; }
-  /* Body parts involved: the course app's regions as soft pills, its impact word in clay. */
-  .sp-parts { display: flex; flex-wrap: wrap; gap: 6px; }
-  .sp-part {
-    font-family: 'Barlow', sans-serif; font-weight: 600; font-size: var(--fs-small); color: var(--grey-dark);
-    background: var(--grey-card); border-radius: 999px; padding: 5px 11px;
-  }
-  .sp-part.impact { color: var(--clay-ink); background: var(--ice-dim); }
-  body[data-dark] .sp-part.impact { color: #E06B43; }
   /* The muscle map (stage42) — see bodyMapSvg() / bodyPartsHtml(). The body sits on the sheet itself (Amir:
      "the body should be on a light background, whatever it is in that page"): warm greys on paper,
-     dark greys in dark mode. Main muscle = full clay, helper = soft clay. */
+     dark greys in dark mode. These are the drawing's base colours; the About sheet (.ax-sheet, below)
+     lights it in a green ramp, because clay on that sheet is Amir's voice. */
   .bmap { --skin: #ECE6DC; --mus: #CBC1B2; --line: #A89D8C; --main: #C7552F; --help: #E8A68B; --cap: #9A9184; }
   body[data-dark] .bmap { --skin: #242424; --mus: #3A3A3A; --line: #5A5A5A; --main: #E06B43; --help: #94553F; --cap: #7A7A7A; }
   .bmap svg { display: block; margin: 2px auto 0; height: 300px; width: auto; max-width: 100%; }
@@ -2900,31 +2868,161 @@
   .bmap text { font: 400 58px 'Space Mono', monospace; letter-spacing: 8px; fill: var(--cap); text-anchor: middle; }
   .bmap .ring { display: none; fill: rgba(199,85,47,0.15); stroke: var(--main); stroke-width: 7; }
   .bmap .ring[data-on] { display: inline; }
-  .bmap-who { display: grid; grid-template-columns: 62px 1fr; gap: 8px 6px; align-items: start; margin-top: 10px; }
-  .bmap-k { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey-text); padding-top: 7px; }
-  .sp-part i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin: 0 7px 0 -2px; }
-  .bmap-main i { background: #C7552F; }
-  .bmap-help i { background: #E8A68B; }
-  body[data-dark] .bmap-main i { background: #E06B43; }
-  body[data-dark] .bmap-help i { background: #94553F; }
-  .bmap-imp { margin-top: 10px; }
-  .sp-part.quiet { background: transparent; color: #8A8378; box-shadow: inset 0 0 0 1px #DDD5C8; }
-  body[data-dark] .sp-part.quiet { color: #8A8A8A; box-shadow: inset 0 0 0 1px #333; }
-  .sp-alt {
-    font-family: 'Barlow', sans-serif; font-weight: 600; font-size: var(--fs-small); color: var(--clay-ink);
-    background: transparent; border: 1.5px solid var(--ice); border-radius: 999px; padding: 6px 11px; cursor: pointer;
+
+  /* ── The About sheet: CHANGEOVER (Amir, 2026-10-12: "lets go with A", from the About Sheet board,
+     claude.ai/artifact/JhXuZuWHAVTzqg6NaEDHK9) — see openExerciseSheet() ──
+     The questions an athlete asks between sets, each answered at a glance: a green top with the name
+     and, when there is one, Amir's reason, signed the way he signs his week notes; then bands of paper
+     and sand (the Farsi site's banding), one question each. Clay is only Amir's voice: the reason's
+     quote mark and its tag, and the fault cue in the Library. No WhatsApp door and no impact here
+     (Amir: "remove the whatsapp button", "remove the impact data from everywhere"). Every rule sits
+     under .readiness-modal.ax-sheet, which openExerciseSheet() adds and sheetWrap() takes off before
+     any other page (History, a quality, Why, Account, Help) draws into the same frame. */
+  .readiness-modal.ax-sheet {
+    --ax-paper: var(--grey-bg); --ax-sand: #F1ECE3; --ax-line: #D8D1C5; --ax-row: #FFFFFF;
+    --ax-ink: var(--grey-dark); --ax-grey: var(--grey-text); --ax-mint: #6DBE95; --ax-chev: #0E4A36;
+    --ax-hero: radial-gradient(125% 90% at 100% 0%, #1B7254 0%, #0E4A36 46%, #082D20 100%);
+    --ax-tile: radial-gradient(120% 120% at 0% 0%, #1B6A4E 0%, #0E4A36 55%, #0B3E2D 100%);
+    position: relative; padding: 0; border-top: 0; background: var(--ax-paper);
   }
-  body[data-dark] .sp-alt { color: #E06B43; border-color: #E06B43; }
-  /* A plain name, no entry behind it yet: same pill, quiet, nothing to tap. */
-  .sp-alt-name { color: var(--grey-dark); font-weight: 500; border: 1.5px dashed var(--grey-text); cursor: default; }
-  body[data-dark] .sp-alt-name { color: #ccc; border-color: #444; }
-  .sp-where {
-    display: flex; justify-content: space-between; gap: 10px; align-items: baseline;
-    background: var(--white); border: 1px solid var(--grey-card); border-radius: 9px; padding: 8px 11px;
-    font-family: 'Barlow', sans-serif; font-size: var(--fs-body); color: var(--grey-dark);
+  body[data-dark] .readiness-modal.ax-sheet {
+    --ax-paper: #181818; --ax-sand: #202020; --ax-line: #333333; --ax-row: #242424;
+    --ax-ink: #EDEDED; --ax-grey: #9A9A9A; --ax-chev: #1F5A44;
+    --ax-hero: radial-gradient(125% 90% at 100% 0%, #17654A 0%, #0D4532 46%, #072A1E 100%);
+    --ax-tile: radial-gradient(120% 120% at 0% 0%, #1A6A4D 0%, #12573F 55%, #0D4532 100%);
   }
-  .sp-where small { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.8px; text-transform: uppercase; color: var(--grey-text); }
-  body[data-dark] .sp-where { background: #1e1e1e; border-color: #2a2a2a; color: #eee; }
+  .readiness-modal.ax-sheet::before { display: none; }
+  /* ‹ Back (SHEET-01) sits on the green, top left, and the hero makes room for it. */
+  .readiness-modal.ax-sheet > .sheet-back { position: absolute; z-index: 2; top: 10px; left: 10px; margin: 0; color: #fff; }
+  .readiness-modal.ax-sheet > .sheet-back + .ax-hero { padding-top: 52px; }
+
+  .ax-hero { position: relative; color: #fff; padding: 12px 20px 26px; background: var(--ax-hero); }
+  .ax-handle { width: 40px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.38); margin: 0 auto 18px; }
+  @media (min-width: 560px) { .ax-handle { visibility: hidden; } }
+  .ax-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace;
+    letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.8); }
+  .ax-eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: var(--ax-mint); }
+  .ax-name { margin: 10px 0 0; font: 900 var(--fs-display)/.94 'Barlow Condensed', sans-serif; text-transform: uppercase;
+    letter-spacing: .3px; color: #fff; overflow-wrap: anywhere; text-wrap: balance; }
+  .ax-name.ax-long { font-size: var(--fs-head); line-height: 1; }
+  .ax-hq { margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.16); }
+  .ax-hq .ax-q { color: #fff; font-size: var(--fs-head); font-weight: 900; }
+  .ax-q .ax-m { color: var(--ax-mint); }
+  .ax-because { position: relative; margin-top: 14px; padding-left: 30px; }
+  .ax-qm { position: absolute; left: -2px; top: -5px; font: 900 var(--fs-display)/1 'Barlow Condensed', sans-serif; color: var(--ice); }
+  body[data-dark] .ax-qm { color: #E06B43; }
+  .ax-say { margin: 0; font: 500 var(--fs-lead)/1.42 'Barlow', sans-serif; color: #fff; }
+  /* Signed the way the week note is (Front Page): his signature and his photo. */
+  .ax-sig { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 10px 12px; margin-top: 16px; }
+  .ax-src { display: inline-block; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase;
+    background: #C2512C; color: #fff; border-radius: 999px; padding: 6px 10px; }
+  .ax-by { display: inline-flex; align-items: flex-end; gap: 8px; margin-left: auto; }
+  .ax-by .wn-sig { width: 104px; height: 37px; color: #fff; }
+  .ax-by .wn-av { width: 40px; height: 40px; margin-top: 0; box-shadow: 0 0 0 2px rgba(255,255,255,.9), 0 3px 10px rgba(0,0,0,.25); }
+  /* Library only: Is it in my plan? A darker strip at the foot of the green. */
+  .ax-inplan { display: grid; grid-template-columns: 112px 1fr; gap: 14px; align-items: start; margin: 22px -20px -26px;
+    padding: 16px 20px 18px; background: rgba(0,0,0,.2); border-top: 1px solid rgba(255,255,255,.1); }
+  .ax-ip-q { font: 700 var(--fs-lead)/1.15 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .4px; color: #fff; }
+  .ax-ip-days { display: grid; gap: 8px; }
+  .ax-ip-day { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; }
+  .ax-ip-day .ax-d { font: 700 var(--fs-lead)/1.15 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .4px; color: #fff; }
+  .ax-ip-day .ax-b { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--ax-mint); }
+
+  .ax-band { position: relative; padding: 24px 20px 26px; overflow: hidden; background: var(--ax-paper); }
+  .ax-band.ax-s { background: var(--ax-sand); }
+  .ax-q { margin: 0; font: 700 var(--fs-title)/1.05 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .5px; color: var(--green-ink); }
+  .ax-q + .ax-q, .ax-cues + .ax-q, .ax-steps + .ax-q, .ax-unfold + .ax-q, .ax-how + .ax-q { margin-top: 26px; }
+  .ax-ans { margin: 10px 0 0; font: 500 var(--fs-lead)/1.42 'Barlow', sans-serif; color: var(--ax-ink); }
+  .ax-lbl { font: 400 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.3px; text-transform: uppercase; color: var(--ax-grey); }
+  /* What it builds: the qualities as green tiles (Amir's pick, 2026-10-12), each opens its page. */
+  .ax-builds { margin-top: 16px; }
+  .ax-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 8px; margin-top: 8px; }
+  .ax-tile { position: relative; display: block; min-height: 76px; padding: 12px 12px 11px; border: 0; border-radius: 12px; cursor: pointer;
+    text-align: left; color: #fff; background: var(--ax-tile); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+  .ax-tile svg { display: block; width: 22px; height: 22px; opacity: .92; }
+  .ax-tile b { display: block; margin-top: 9px; font: 900 var(--fs-title)/1 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .7px; }
+  .ax-tile .ax-go { position: absolute; right: 12px; top: 11px; font: 600 var(--fs-lead)/1 'Barlow', sans-serif; opacity: .65; }
+  .ax-tile:active { transform: scale(.98); }
+  .ax-tile:focus-visible, .ax-nlink:focus-visible, .ax-hist:focus-visible, .ax-unfold:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  /* How does it help on court? One big line over a faint court (a padel court for padel players). */
+  .ax-court { position: absolute; right: -40px; bottom: -118px; width: 236px; opacity: .14; color: var(--green-ink);
+    transform: perspective(520px) rotateX(54deg) rotateZ(-14deg); transform-origin: 50% 100%; pointer-events: none; }
+  .ax-big { position: relative; margin: 10px 0 0; max-width: 290px; font: 700 var(--fs-head)/1.08 'Barlow Condensed', sans-serif; color: var(--ax-ink); }
+  /* Where will I feel it? (Amir, 2026-10-12: "use the previous image sizes, you can turn them to green instead of
+     clay"; then "that body part is too busy, remove the text and arrows in middle, and use texts like this, under the
+     image"). The front-and-back body at its old 300 px, lit in a green ramp, and under it a sentence per kind
+     ("Mostly your ● quads." / "Your ● glutes help.") whose dots are the colours on the body. */
+  .readiness-modal.ax-sheet .bmap { --skin: #E9E2D6; --mus: #D2C8B9; --line: #B3A795; --main: #0E4A36; --help: #79AE93; }
+  body[data-dark] .readiness-modal.ax-sheet .bmap { --skin: #262626; --mus: #3A3A3A; --line: #555555; --main: #6DBE95; --help: #2F6F53; }
+  .readiness-modal.ax-sheet .bmap svg { margin: 16px auto 0; }
+  .readiness-modal.ax-sheet .bmap .ring { fill: rgba(14,74,54,.14); }
+  .ax-feel { margin: 14px 0 0; font: 500 var(--fs-lead)/1.45 'Barlow', sans-serif; color: var(--ax-ink); }
+  .ax-feel > span { display: block; }
+  .ax-feel b { font-weight: 700; }
+  .ax-mw { white-space: nowrap; }
+  .ax-dot { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin: 0 6px 1px 1px; vertical-align: middle; }
+  .ax-dot.main { background: #0E4A36; }
+  .ax-dot.help { background: #79AE93; }
+  body[data-dark] .ax-dot.main { background: #6DBE95; }
+  body[data-dark] .ax-dot.help { background: #2F6F53; }
+  /* Too hard? Too easy? Other kit? A two-column table, never a staircase (rungs are gone for good). */
+  .ax-opts { display: grid; }
+  .ax-qa { display: grid; grid-template-columns: 112px 1fr; gap: 14px; padding: 18px 0; border-top: 1px solid var(--ax-line); }
+  .ax-qa:first-child { border-top: 0; padding-top: 0; }
+  .ax-qa:last-child { padding-bottom: 0; }
+  .ax-oq { font: 700 var(--fs-title)/1 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: .4px; color: var(--green-ink); }
+  .ax-ow { margin-top: 7px; font: 400 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--ax-grey); }
+  .ax-names { display: grid; gap: 2px; align-content: start; }
+  .ax-nlink { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 48px; padding: 4px 0;
+    background: none; border: 0; border-bottom: 1px solid var(--ax-line); cursor: pointer; text-align: left;
+    font: 600 var(--fs-body)/1.3 'Barlow', sans-serif; color: var(--green-ink); }
+  .ax-nlink:first-child { margin-top: -10px; }
+  .ax-nlink:last-child { border-bottom: 0; }
+  .ax-ch { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--ax-chev); color: #fff; font: 600 var(--fs-lead)/1 'Barlow', sans-serif; }
+  .ax-nplain { font: 500 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ax-ink); }
+  .ax-nplain + .ax-nplain, .ax-nlink + .ax-nplain { margin-top: 10px; }
+  .ax-nnote { display: block; margin-top: 4px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--ax-grey); }
+  /* Your history (Amir's pick, 2026-10-12): one row, what they did, never what to lift. */
+  .ax-hist { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 12px 14px 12px 16px; cursor: pointer;
+    text-align: left; background: var(--ax-row); border: 1px solid var(--ax-line); border-radius: 14px; color: var(--ax-ink); }
+  .ax-hist > svg { flex: none; width: 22px; height: 22px; color: var(--green-ink); }
+  .ax-hist-t { flex: 1; min-width: 0; display: grid; gap: 4px; }
+  .ax-hist-t b { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  .ax-hist-t small { font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--ax-grey); }
+  .ax-hist .ax-go { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--ax-grey); }
+  /* Library only: How do I do it? The app's own player, kit line and steps, set for this sheet. */
+  .ax-how { margin-top: 16px; }
+  .ax-how .ex-vunit { margin: 0; }
+  .ax-how .ex-kit { margin: 16px 0 0; font-size: var(--fs-body); color: var(--ax-grey); }
+  .ax-how .ex-kit b { color: var(--ax-ink); }
+  .ax-steps { list-style: none; margin: 8px 0 0; padding: 0; counter-reset: st; }
+  .ax-steps li { counter-increment: st; display: flex; gap: 12px; align-items: baseline; padding: 10px 0; border-top: 1px solid var(--ax-line);
+    font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--ax-ink); }
+  .ax-steps li:first-child { border-top: 0; }
+  .ax-steps li::before { content: counter(st); flex: none; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
+    border-radius: 50%; background: var(--ax-chev); color: #fff; font: 700 var(--fs-label)/1 'Space Mono', monospace; transform: translateY(-2px); }
+  .ax-steps li.ax-more { display: none; }
+  .ax-steps.open li.ax-more { display: flex; }
+  .ax-unfold { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 48px; margin-top: 2px; padding: 0;
+    border: 0; border-top: 1px solid var(--ax-line); background: none; cursor: pointer; text-align: left;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
+  .ax-unfold .ax-ch { background: none; color: var(--green-ink); border: 1.5px solid var(--green-ink); font-size: var(--fs-body); }
+  .ax-cues { display: grid; gap: 12px; margin-top: 14px; }
+  .ax-cue { display: flex; gap: 14px; font: 500 var(--fs-lead)/1.38 'Barlow', sans-serif; color: var(--ax-ink); }
+  .ax-cue::before { content: ''; flex: none; width: 4px; border-radius: 2px; background: var(--green-ink); }
+  .ax-cue.bad::before { background: var(--ice); }
+  body[data-dark] .ax-cue.bad::before { background: #E06B43; }
+  .ax-foot { display: flex; justify-content: center; padding: 6px 20px calc(14px + env(safe-area-inset-bottom)); background: var(--ax-paper); }
+  .ax-foot .readiness-skip { min-height: 44px; }
+  @media (max-width: 359px) {
+    .ax-hero, .ax-band { padding-left: 18px; padding-right: 18px; }
+    .ax-inplan { grid-template-columns: 98px 1fr; gap: 12px; margin-left: -18px; margin-right: -18px; padding-left: 18px; padding-right: 18px; }
+    .ax-feel { font-size: var(--fs-field); }
+    .ax-qa { grid-template-columns: 98px 1fr; gap: 12px; }
+    .ax-oq { font-size: var(--fs-lead); }
+    .ax-by .wn-sig { width: 92px; height: 33px; }
+  }
 
 
   /* ── The Quality Map (2026-09-24) — see qualityMix() / paintDayQualities() ──
@@ -2940,7 +3038,6 @@
   }
   .dq-chip.main { background: #fff; color: #0E4A36; border-color: #fff; }
   .dq-chip:focus-visible { outline: 2px solid #E06B43; outline-offset: 2px; }
-  .sp-q { border: 0; cursor: pointer; font: inherit; font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 0.3px; }
 
   /* ── Because (2026-09-24) — see whyOfCard() / whyBlock() / openWhyPlan() ──
      The card gains nothing but a clay ⓘ; the reason itself lives in the About sheet and
@@ -2948,13 +3045,6 @@
      (2026-09-27): a clay dot after the name means a Coach's Note now. */
   .ex-about.has-why { background: var(--ice); border-color: var(--ice); color: #fff; }
   body[data-dark] .ex-about.has-why { background: #C7552F; border-color: #C7552F; color: #fff; }
-  .sp-why {
-    display: grid; gap: 7px; background: var(--grey-bg); border: 1px solid var(--grey-card);
-    border-left: 3px solid var(--ice); border-radius: 10px; padding: 11px 12px; margin-bottom: 4px;
-  }
-  .sp-why p { margin: 0; font-family: 'Barlow', sans-serif; font-weight: 500; font-size: var(--fs-body); line-height: 1.4; color: var(--grey-dark); }
-  body[data-dark] .sp-why { background: #1a1a1a; border-color: #2a2a2a; border-left-color: #E06B43; }
-  body[data-dark] .sp-why p { color: #eee; }
   .why-src {
     justify-self: start; font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label);
     letter-spacing: 0.8px; text-transform: uppercase; border-radius: 999px; padding: 4px 8px;
@@ -8380,7 +8470,7 @@ function renderExercise(ex, dayId, num, blockClass, blockTitle, blockRest) {
   // A PREP ITEM IS A NAME AND A DOSE: its line of numbers is just "5 minutes".
   // The working card (CARD-01/02, Amir 2026-09-27). Closed: the name (a clay dot when
   // there is a Coach's Note), one line of numbers, the pills, the ⓘ at the right end.
-  // Open: the note in two lines, Last time as a box, How to do it folded, the sets, Rest.
+  // Open: the note in two lines, How to do it folded, the sets, Rest (no Last time box since 2026-10-12).
   const summary    = renderExSummary(rx);
   const numLine    = renderNumLine(rx, restCell);
   const noteHtml   = renderCoachNote(ex.note);
@@ -8871,15 +8961,15 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up — five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly — there are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>Last time</strong>, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues; it opens by itself the first time you meet an exercise and is folded after that, and the ▶ on it means there is a video; if the video won't play on your phone, tap <strong>Open in YouTube</strong> under it), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and the circle ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and next time it shows under <em>Last time</em>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>.</p><p>Tap it to open it: the note first, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues; it opens by itself the first time you meet an exercise and is folded after that, and the ▶ on it means there is a video; if the video won't play on your phone, tap <strong>Open in YouTube</strong> under it), then your sets. Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box; once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and the circle ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps.</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done — Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. When the rest is over it moves you to the next set. Supersets and circuits come round by round; warm-ups stay in the list.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top; once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ — what an exercise is for',
-    body: `<p>The small <strong>i</strong> at the right end of every exercise tells you what it does, which qualities it builds, where it shows up on court, which parts of your body it works (and whether it jumps, lands or runs), and three short lists: <strong>Regressions</strong> (easier versions of the same movement), <strong>Progressions</strong> (harder versions) and <strong>Alternatives</strong> (the same movement on other equipment). Tap a name to read about it. A name in a dashed outline has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why you</strong>. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with its <strong>How to do it</strong> (the video when there is one, the steps and the cues), and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
+    body: `<p>The small <strong>i</strong> at the right end of every exercise answers what you'd ask me about it. <strong>What does it do?</strong> and the qualities it builds (tap one to read what it means). <strong>How does it help on court?</strong> <strong>Where will I feel it?</strong> shows your body front and back with the working muscles in green, and a line under it names them, the main ones first.</p><p>Then three short lists. Under <strong>Too hard?</strong> are the <strong>Regressions</strong>, easier versions of the same movement. Under <strong>Too easy?</strong> are the <strong>Progressions</strong>, harder versions. Under <strong>Other kit?</strong> are the <strong>Alternatives</strong>, the same movement on other equipment. Tap a name to read about it. A name marked <em>Not in the app yet</em> has no page of its own yet.</p><p>When the <strong>i</strong> is orange, I picked that exercise because of something about <em>you</em>: your goal, your knee, your last test. The sheet opens with that reason under <strong>Why am I doing this?</strong>, signed by me. All of them are on one page too: tap <strong>Why your plan looks like this</strong> under your cycle card.</p><p><strong>Your history</strong> at the bottom says how many times you've done it and what you did last time. Tap it for every session.</p><p>Every exercise is also in <strong>Library → Exercises</strong>, with <strong>How do I do it?</strong> (the video when there is one, the steps and the cues), and there you can also see every day of your plan that uses it. Moving to a harder version is my call, made when I write your next cycle. If your gym doesn't have the equipment, message me and I'll swap it.</p>` },
   { icon: 'compass', title: 'What each day builds',
     body: `<p>Each day card on Home shows up to three words, like <strong>Strength · Brakes · Spring</strong>. They're what that day trains most, strongest first, worked out from the exercises in it. Warm-ups don't count.</p><p>Tap one to see what it means. The same words show on an exercise's <strong>i</strong> sheet.</p>` },
-  { icon: 'activity', title: 'Last time — your history on every exercise',
-    body: `<p>Each exercise shows what you did <strong>the last time you did it</strong>, on any day: the weight, your reps, your RPE, and the note you left. Open the card and it's the <strong>Last time</strong> box, under the Coach's Note: it shows the last set you did, like <strong>70 kg × 5 @ 8</strong>, and a tap opens every set, your RPEs and your note. It stays open or closed the way you left it. A closed card shows no history.</p><p>An RPE in orange ran <strong>over</strong> the target, and that set also shows a faint "last" line under today's row.</p><p>Tap <strong>History ›</strong> to see every time you've done it, with how your best set has moved.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
+  { icon: 'activity', title: 'Your history on every exercise',
+    body: `<p>Every exercise remembers what you did. An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. A set that ran <strong>over</strong> its target last time also shows a faint "last" line under today's row.</p><p>For the whole story, tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>: every time you've done it, your reps, your RPEs and your notes, and how your best set has moved.</p><p>A superset or circuit still shows <strong>Last time</strong> when you open it, because its boxes don't show last time's weights.</p><p>It shows what you did, never what to lift. Train to today's RPE target, and I'll put a weight in the Coach's Note when I want one.</p>` },
   { icon: 'activity', title: 'Personal Records — the most you could lift once',
     body: `<p>Open <strong>Home</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
@@ -8892,7 +8982,7 @@ const APP_GUIDE = [
   { icon: 'tool', title: 'Built-in tools',
     body: `<ul><li><strong>Rest timer</strong> — the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (<strong>Sound on/off</strong> on the timer; iPhones don&rsquo;t buzz).</li><li><strong>How to do it</strong> — inside an exercise: the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong> — tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
-    body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab, in every exercise's ⓘ, and at the end of every session, where your message already says which day or exercise it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days; quick check-ins beat long waits.</p>` },
+    body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine — what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days; quick check-ins beat long waits.</p>` },
 ];
 
 function buildAppGuideCards(openKey) {
@@ -8926,7 +9016,8 @@ function buildAppGuideCards(openKey) {
 // opened it knows. Amir answers ONLY on WhatsApp (2026-09-26: "Im only gonna reply
 // to them when they send me a message on whatsapp ... put sth there so they can
 // whatsapp me quicker"), so every place an athlete might ask something has a door:
-// the Coach tab, the end of a session, and each exercise's About sheet.
+// the Coach tab and the end of a session. The About sheet's went on 2026-10-12 (Amir:
+// "remove the whatsapp button ... not on the card i sent you, not in library").
 function coachWhatsAppUrl(about) {
   let text;
   if (window.IS_DEMO) {
@@ -12645,7 +12736,7 @@ function attachSetLog(card) {
   wrap.addEventListener('click', e => e.stopPropagation());
 
   // No "Same as last" button above the table (removed 2026-09-27, Amir: "its a duplicate
-  // of what can be seen in history"): the open card's Last time box shows last time, and a
+  // of what can be seen in history"): each empty kg box shows last time's weight, and a
   // weight typed in set 1 fills the empty sets below it.
   let html = `<div class="ex-set-header"><div>SET</div><div>${repsCol ? 'KG' : 'WEIGHT'}</div>${repsCol ? '<div>REPS</div>' : ''}<div></div><div></div></div>`;
   log.forEach((s, i) => {
@@ -13600,8 +13691,8 @@ function saveCircuitWeights(name, g) {
 // stored as { d: 'YYYY-MM-DD' (local), v: text } under <id>_snote_<Name>, shown and
 // sent only on that day. A date stamp rather than a clear-on-reset, because the
 // cloud merge prefers real text over a blank and would hand a cleared note straight
-// back from another device. Last session's note is not lost: the Last time strip
-// shows it (it comes from the session record). The old <id>_note_ keys are no
+// back from another device. Last session's note is not lost: the History sheet
+// shows it (the ⓘ's Your history; a circuit's strip too; it comes from the session record). The old <id>_note_ keys are no
 // longer read.
 function sessionNoteKey(name) { return ATHLETE_ID + '_snote_' + String(name).replace(/\s+/g, '_'); }
 function loadSessionNote(name) {
@@ -14064,7 +14155,7 @@ function renderStep() {
     STEP.homeCard = item.card;
     STEP.homeDetail = item.card.querySelector('.ex-detail');
     // The exercise name lives in .item-main, not the relocated .ex-detail, so it's
-    // repainted here — everything below it (the note, Last time, How to do it with its steps, the
+    // repainted here — everything below it (the note, a circuit's Last time, How to do it with its steps, the
     // set-log table) is the real node, moved in whole.
     // The numbers and the pills live in the header now (CARD-02), so they are copied too.
     const nl = item.card.querySelector('.ex-numline'), pl = item.card.querySelector('.ex-summary');
@@ -14089,7 +14180,7 @@ function renderStep() {
   document.getElementById('step-eyebrow').textContent = `Exercise ${item.exI + 1} of ${item.exCount}`;
   document.getElementById('step-pill').textContent = `${item.circuit ? 'Round' : 'Set'} ${item.setI + 1} of ${item.total}`;
   renderStepFooter();
-  // The top of the exercise first (its name, note, Last time); the current row is sticky
+  // The top of the exercise first (its name, note); the current row is sticky
   // (CSS), so it stays on screen above the footer however long the card above it is. It
   // sat under the footer on 4 of 14 steps at 375×667, 8 of 14 at 320×568 (WK-01). Sticky
   // cannot lift a row above the top of its own table, so when the whole table starts below
@@ -14456,36 +14547,12 @@ function histTopSet(sets, planned) {
   return best;
 }
 
-// LAST TIME IS A BOX (CARD-01, Amir 2026-09-27: "the history of an exercise shouldn't be
-// text, they should have a box … show only last set, and it can be toggled"). Closed it
-// shows last session's LAST set, "70 kg × 5 @ 8"; tapped it opens to every set, the RPEs
-// against the target, the note and History ›. Open or closed is one setting for the phone
-// (lt_open, never synced), so every box follows the one the athlete tapped. It sits under
-// the Coach's Note in the open card only: a closed card shows no history ("no history on
-// the exercise card when not opened"). A circuit keeps its strip, always open.
-function ltOpen() { try { return localStorage.getItem('lt_open') === '1'; } catch (e) { return false; } }
-function ltToggle(box) {
-  const open = !box.classList.contains('open');
-  try { localStorage.setItem('lt_open', open ? '1' : '0'); } catch (e) { /* the box still opens */ }
-  document.querySelectorAll('.lt-box').forEach(b => {
-    b.classList.toggle('open', open);
-    const h = b.querySelector('.lt-head');
-    if (h) h.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-}
-// Last session's last logged set: "70 kg × 5", "× 4", or for a hold "3 sets"; its RPE
-// against the target, clay over and steel blue under (rpeVs()).
-function ltLastSetHtml(e, target) {
-  const ls = [...(e.sets || [])].reverse().find(histSetLogged);
-  if (!ls) return '';
-  const w = histKg(ls.w);
-  const n = (ls.n != null && ls.n !== '') ? ls.n : (e.reps || null);
-  let txt = w ? w + ' kg' : '';
-  if (n) txt += (txt ? ' × ' : '× ') + n;
-  if (!txt) txt = histSetsText(e.sets, e.reps || null);
-  const vs = ls.r ? rpeVs(ls.r, target) : '';
-  return esc(txt) + (ls.r ? ` <i class="lt-r${vs ? ' ' + vs : ''}">@ ${esc(String(ls.r))}</i>` : '');
-}
+// NO HISTORY ON THE EXERCISE CARD (Amir, 2026-10-12: "the history ... should be removed from exercise cards.
+// because their last time, is actually already in the reps, weight box"). The Last time box (CARD-01,
+// 2026-09-27) is gone from every standard card: last time's weight is in each empty kg box under LAST
+// (carrySet()), a set that ran over target last time keeps its faint line under today's row, and the whole
+// story is the ⓘ's Your history, which opens the History sheet. What stays here: the "First time" line on a
+// lift never logged, and a circuit's strip, always open, because a circuit's kg boxes show nothing of last time.
 function paintLastTime(card) {
   if (!card || !card.querySelector('.item-name')) return;
   const detail = cardDetail(card);
@@ -14502,6 +14569,7 @@ function paintLastTime(card) {
   if (!isCircuit) {
     paintKgCol(card);                             // a weight logged before keeps the kg box
     openHowFirstTime(card, !hist.length);          // video and cues open the first time only
+    paintAbout(card);                             // history alone earns the ⓘ: it is the way to History now
   }
 
   if (!hist.length) {
@@ -14517,54 +14585,25 @@ function paintLastTime(card) {
 
   const last = hist[0], e = last.entry, dl = histDateLabel(last.date);
   const target = card.dataset.target || null;
-  const strip = document.createElement('div');
-  strip.addEventListener('click', ev => ev.stopPropagation());
-
-  let big = '', rpeLine = '';
   if (e.circuit) {
+    const strip = document.createElement('div');
+    strip.addEventListener('click', ev => ev.stopPropagation());
     const parts = (e.items || []).filter(it => it.w).map(it => `${esc(it.name)} <b>${esc(histKg(it.w) || it.w)}</b>`);
-    big = parts.length ? parts.join(' · ') : esc(e.gear || '');
-  } else {
-    big = esc(histSetsText(e.sets, e.reps || null));
-    const rs = (e.sets || []).filter(histSetLogged).map(s => Number(s.r) || null);
-    if (rs.some(r => r)) {
-      rpeLine = 'RPE ' + rs.map(r => r ? rpeMark(r, target) : '–').join(' · ')
-              + (target ? ` — target ${target}` : '');
-    }
-  }
-  const low = last.readiness != null && last.readiness <= 2.5;
-  const rest = `
-    <div class="lt-big">${big}</div>
-    ${rpeLine || low ? `<div class="lt-rpe">${rpeLine}${low ? `${rpeLine ? ' · ' : ''}<span class="lt-low">low-readiness day</span>` : ''}</div>` : ''}
-    ${e.note ? `<div class="lt-note">“${esc(e.note)}”</div>` : ''}`;
-  if (e.circuit) {
+    const low = last.readiness != null && last.readiness <= 2.5;
     strip.className = 'lt-strip';
     strip.innerHTML = `
       <div class="lt-top"><span class="lt-when">Last time · ${esc(dl.when)} · ${esc(dl.ago)}</span>
-        <button type="button" class="lt-hist">History ›</button></div>${rest}`;
-  } else {
-    // Closed, the label is short: the weekday inside a week, the date after that.
-    const days = Math.round((new Date(ymdLocal(new Date()) + 'T12:00:00') - new Date(last.date + 'T12:00:00')) / 86400000);
-    const w = String(dl.when || '').split(' ');
-    const short = days < 7 ? w[0] : w.slice(1).join(' ');
-    const open = ltOpen();
-    strip.className = 'lt-strip lt-box' + (open ? ' open' : '');
-    strip.innerHTML = `
-      <button type="button" class="lt-head" aria-expanded="${open ? 'true' : 'false'}">
-        <span class="lt-when"><span class="lt-w-s">Last time · ${esc(short)}</span><span class="lt-w-l">Last time · ${esc(dl.when)} · ${esc(dl.ago)}</span></span>
-        <span class="lt-one">${ltLastSetHtml(e, target)}</span>
-        <span class="lt-cv" aria-hidden="true">▾</span>
-      </button>
-      <div class="lt-more">${rest}
-        <div class="lt-foot"><button type="button" class="lt-hist">History ›</button></div>
-      </div>`;
-    strip.querySelector('.lt-head').addEventListener('click', ev => { ev.stopPropagation(); ltToggle(strip); });
+        <button type="button" class="lt-hist">History ›</button></div>
+      <div class="lt-big">${parts.length ? parts.join(' · ') : esc(e.gear || '')}</div>
+      ${low ? `<div class="lt-rpe"><span class="lt-low">low-readiness day</span></div>` : ''}
+      ${e.note ? `<div class="lt-note">“${esc(e.note)}”</div>` : ''}`;
+    strip.querySelector('.lt-hist').addEventListener('click', ev => { ev.stopPropagation(); openHistorySheet(card); });
+    place(strip);
+    return;
   }
-  strip.querySelector('.lt-hist').addEventListener('click', ev => { ev.stopPropagation(); openHistorySheet(card); });
-  place(strip);
 
   // The ghost line: only under the set(s) that ran OVER target last time.
-  if (!e.circuit && target) {
+  if (target) {
     const lastSets = e.sets || [];
     detail.querySelectorAll('.ex-set-row').forEach(row => {
       const i = parseInt(row.dataset.setIdx, 10);
@@ -14745,6 +14784,9 @@ window.closeHistorySheet = closeHistorySheet;
 // it, a "‹ Back" button sits at the top, and the phone's Back steps back a page first
 // (topLayer() → sheetBack()). Closing the sheet forgets the trail.
 const _SHEET = { cur: null, stack: [], restoring: false };
+// The About sheet wears its own look (.ax-sheet, Changeover); every other page draws on the plain frame, so the
+// class comes off before any page draws (a ‹ Back too), and goes back on if the opener drew nothing.
+function sheetPlain(m) { if (m) m.classList.remove('ax-sheet'); }
 function sheetWrap(fn) {
   return function () {
     const args = arguments, self = this;
@@ -14752,14 +14794,19 @@ function sheetWrap(fn) {
     const m = ov && ov.querySelector('.readiness-modal');
     const was = !!(ov && ov.classList.contains('visible'));
     const before = m ? m.innerHTML : '', prevCur = _SHEET.cur, depth = _SHEET.stack.length;
+    const hadAx = !!(m && m.classList.contains('ax-sheet'));
     if (!_SHEET.restoring) {
       if (was && _SHEET.cur) _SHEET.stack.push(_SHEET.cur);
       else if (!was) _SHEET.stack = [];
     }
-    _SHEET.cur = () => fn.apply(self, args);
+    _SHEET.cur = () => { sheetPlain(m); return fn.apply(self, args); };
+    sheetPlain(m);
     const r = fn.apply(self, args);
     // An opener that drew nothing (no data for that page) is not a step: undo the push.
-    if (was && !_SHEET.restoring && m && m.innerHTML === before) { _SHEET.stack.length = depth; _SHEET.cur = prevCur; }
+    if (was && !_SHEET.restoring && m && m.innerHTML === before) {
+      _SHEET.stack.length = depth; _SHEET.cur = prevCur;
+      if (hadAx) m.classList.add('ax-sheet');
+    }
     paintSheetBack();
     return r;
   };
@@ -14835,10 +14882,13 @@ const SPINE_PATTERN = {
 const SPINE_REGION = { 'ankle-foot': 'Ankle & foot', 'calf-achilles': 'Calf & Achilles', knee: 'Knee',
   'hip-groin': 'Hip & groin', hamstring: 'Hamstring', 'low-back': 'Low back', trunk: 'Trunk',
   shoulder: 'Shoulder', 'elbow-forearm-wrist': 'Elbow, forearm & wrist', neck: 'Neck' };
+// The impact words. Not drawn anywhere since 2026-10-12 (Amir: "remove the impact data from everywhere"): the
+// entry keeps its impact for the app's own rules (isImpactEx(), recordsItself()) and the coach's editor, and this
+// list stays as program.html's copy of the words for scripts/check_parity.py.
 const SPINE_IMPACT = { plyometric: 'Jumping', landing: 'Landing', running: 'Running', none: 'No impact' };
 // The muscle map (stage42, Amir 2026-09-26: "this is amazing, lets build"). The section is a
-// front-and-back body with the worked muscles lit: main (1) in full clay, helpers (0.5) in soft
-// clay. `e.muscles` comes from get_exercises(): the entry's volume credits when they name a muscle,
+// front-and-back body with the worked muscles lit: main (1) full, helpers (0.5) soft (green on the
+// About sheet since 2026-10-12, .ax-sheet .bmap; the base .bmap values are clay). `e.muscles` comes from get_exercises(): the entry's volume credits when they name a muscle,
 // else its display-only `muscles` (stretches, jumps, sprints count toward no volume but still work
 // something). An entry with neither falls back to its body parts, lit on the same drawing, with a
 // ring on the knee and the ankle because those are joints, not muscles.
@@ -14863,27 +14913,41 @@ function bodyMapSvg(lit, rings) {
   Object.keys(rings).forEach(r => { s = s.split(`data-r="${r}"`).join(`data-r="${r}" data-on="1"`); });
   return `<div class="bmap">${s}</div>`;
 }
+// Where will I feel it? (Amir, 2026-10-12: "keep where will i feel it, use the previous image sizes, you can turn
+// them to green instead of clay"; then "that body part is too busy, remove the text and arrows in middle, and use
+// texts like this, under the image": "Mostly your ● quads. Your ● glutes help."). The front-and-back body at its old
+// size, lit in the sheet's green ramp, and under it one line per kind whose dots are the colours on the body. An
+// entry with no muscles lights its body parts instead, the knee and the ankle as rings, and names them the same
+// way. '' when it has neither. coach.html's spineMapHtml() lights the same drawing with the same rules: change both.
+const MAP_ONE = { back: 1, chest: 1, core: 1, neck: 1 };   // a muscle named in the singular: "your core helps"
 function bodyPartsHtml(e) {
-  const im = SPINE_IMPACT[e.impact];
-  const imp = im ? `<div class="bmap-imp"><span class="sp-part ${e.impact === 'none' ? 'quiet' : 'impact'}">${esc(im)}</span></div>` : '';
+  if (!BODYMAP_SVG) return '';
   const ms = Object.entries(e.muscles && typeof e.muscles === 'object' ? e.muscles : {})
     .filter(([m, w]) => MAP_MUSCLE[m] && Number(w) > 0);
-  const lit = {}, rings = {};
-  if (ms.length && BODYMAP_SVG) {
+  const lit = {}, rings = {}, lines = [];
+  const mw = (name, cls) => `<span class="ax-mw"><span class="ax-dot ${cls}"></span><b>${esc(name)}</b></span>`;
+  const and = xs => xs.length < 2 ? xs.join('') : xs.slice(0, -1).join(', ') + ' and ' + xs[xs.length - 1];
+  if (ms.length) {
     ms.forEach(([m, w]) => (MAP_CREDIT_GROUPS[m] || [m]).forEach(g => { if (lit[g] !== '1') lit[g] = Number(w) >= 1 ? '1' : 'h'; }));
     const by = (a, b) => MAP_ORDER.indexOf(a) - MAP_ORDER.indexOf(b);
     const main = ms.filter(([, w]) => Number(w) >= 1).map(([m]) => m).sort(by);
     const help = ms.filter(([, w]) => Number(w) < 1).map(([m]) => m).sort(by);
-    const row = (k, xs, cls) => xs.length ? `<div class="bmap-k">${k}</div><div class="sp-parts">${
-      xs.map(m => `<span class="sp-part bmap-${cls}"><i></i>${esc(MAP_MUSCLE[m])}</span>`).join('')}</div>` : '';
-    return `<div class="sp-sec"><div class="sp-lbl">Muscles worked</div>${bodyMapSvg(lit, rings)}<div class="bmap-who">${
-      row('Main', main, 'main')}${row('Helping', help, 'help')}</div>${imp}</div>`;
+    const nm = m => MAP_MUSCLE[m].toLowerCase();
+    const verb = (xs, one, many) => (xs.length === 1 && MAP_ONE[xs[0]] ? one : many);
+    if (main.length) lines.push(`Mostly your ${and(main.slice(0, 2).map(m => mw(nm(m), 'main')))}.`);
+    if (main.length > 2) {
+      const more = main.slice(2);
+      lines.push(`Your ${and(more.map(m => mw(nm(m), 'main')))} ${verb(more, 'works', 'work')} hard too.`);
+    }
+    if (help.length) lines.push(`${main.length ? '' : 'No one muscle does the main work here. '}Your ${
+      and(help.map(m => mw(nm(m), 'help')))} ${verb(help, 'helps', 'help')}.`);
+  } else {
+    const rs = (e.loads || []).filter(r => SPINE_REGION[r]);
+    if (!rs.length) return '';
+    rs.forEach(z => { (MAP_ZONE_GROUPS[z] || []).forEach(g => { lit[g] = '1'; }); (MAP_ZONE_RINGS[z] || []).forEach(r => { rings[r] = 1; }); });
+    lines.push(`It loads your ${and(rs.map(z => mw(SPINE_REGION[z].toLowerCase().replace('achilles', 'Achilles'), 'main')))}.`);
   }
-  const rs = (e.loads || []).filter(r => SPINE_REGION[r]);
-  if (!rs.length) return '';
-  rs.forEach(z => { (MAP_ZONE_GROUPS[z] || []).forEach(g => { lit[g] = '1'; }); (MAP_ZONE_RINGS[z] || []).forEach(r => { rings[r] = 1; }); });
-  return `<div class="sp-sec"><div class="sp-lbl">Body parts involved</div>${BODYMAP_SVG ? bodyMapSvg(lit, rings) : ''}<div class="sp-parts" style="margin-top:10px">${
-    rs.map(r => `<span class="sp-part">${esc(SPINE_REGION[r])}</span>`).join('')}</div>${imp}</div>`;
+  return `${bodyMapSvg(lit, rings)}<p class="ax-feel">${lines.map(l => `<span>${l}</span>`).join('')}</p>`;
 }
 
 function setSpine(list) {
@@ -14963,11 +15027,6 @@ function whyOfCard(card) {
     if (ex.type !== 'circuit' && ex.name === name && whyValid(ex.why)) return ex.why;
   return null;
 }
-function whyBlock(w) {
-  if (!whyValid(w)) return '';
-  return `<div class="sp-sec"><div class="sp-lbl">Why you</div><div class="sp-why"><span class="why-src ${esc(w.src)}">${
-    esc(whyLabel(w))}</span><p>${esc(w.text.trim())}</p></div></div>`;
-}
 // Every reason in the current programme, in the order the athlete meets them.
 function whyList() {
   const out = [], seen = {};
@@ -15021,26 +15080,39 @@ function paintSpine() {
     }
     paintHowTo(card);
     if (entry) paintKgCol(card);
-    // The ⓘ sits at the right end of the row and of the open card's header (CARD-01, Amir
-    // 2026-09-27), so a long name never pushes it onto a line of its own.
-    const row = card.querySelector('.ex-side') || card.querySelector('.item-name-row');
-    const btn = card.querySelector('.ex-about');
-    if ((entry || why) && row && !btn) {
-      const b = document.createElement('button');
-      b.type = 'button'; b.className = 'ex-about' + (why ? ' has-why' : ''); b.textContent = 'i';
-      b.setAttribute('aria-label', (why ? 'Why you have ' : 'About ') + nameEl.textContent.trim());
-      // Resolve at tap time: the Spine can arrive after the card was painted.
-      b.addEventListener('click', ev => {
-        ev.stopPropagation();
-        const e = SPINE ? spineFor(nameEl.textContent.trim(), card.dataset.exid) : null;
-        openExerciseSheet(e ? e.id : null, card);
-      });
-      row.appendChild(b);
-    } else if (btn) {
-      if (!entry && !why) btn.remove();
-      else btn.classList.toggle('has-why', !!why);
-    }
+    paintAbout(card);
   });
+}
+// The ⓘ sits at the right end of the row and of the open card's header (CARD-01, Amir 2026-09-27), so a long
+// name never pushes it onto a line of its own. It is there for an approved entry, a reason (solid clay), and,
+// since the open card lost its Last time box (2026-10-12), any lift with history: the sheet's Your history is
+// the card's one door to the History sheet, so a lift whose entry is a draft, or a phone that has no Spine yet,
+// keeps it. paintSpine() and paintLastTime() (when the history arrives) both call this. Safe to call again.
+function paintAbout(card) {
+  if (!card || card.classList.contains('round-group')) return;
+  const nameEl = card.querySelector('.item-name');
+  if (!nameEl) return;
+  const name = nameEl.textContent.trim();
+  const entry = SPINE ? spineFor(name, card.dataset.exid) : null;
+  const why = whyOfCard(card);
+  const hist = !!(HIST && historyFor(name).length);
+  const row = card.querySelector('.ex-side') || card.querySelector('.item-name-row');
+  const btn = card.querySelector('.ex-about');
+  if ((entry || why || hist) && row && !btn) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'ex-about' + (why ? ' has-why' : ''); b.textContent = 'i';
+    b.setAttribute('aria-label', (why ? 'Why you have ' : 'About ') + name);
+    // Resolve at tap time: the Spine can arrive after the card was painted.
+    b.addEventListener('click', ev => {
+      ev.stopPropagation();
+      const e = SPINE ? spineFor(nameEl.textContent.trim(), card.dataset.exid) : null;
+      openExerciseSheet(e ? e.id : null, card);
+    });
+    row.appendChild(b);
+  } else if (btn) {
+    if (!entry && !why && !hist) btn.remove();
+    else btn.classList.toggle('has-why', !!why);
+  }
 }
 
 // Where this entry appears in the athlete's current programme.
@@ -15055,95 +15127,162 @@ function spineUsesInProgramme(id) {
   return out;
 }
 
-// The About sheet. Uses the History sheet's own frame (#hist-overlay), so the
-// two never stack: History › from here swaps the content in place.
-// Opened WITHOUT a card (from the Exercises library, or tapping a linked exercise
-// that is not on the athlete's page) the sheet is the whole entry: it also carries How
-// to do it (the video, the steps, the cues), because there is no card on screen showing them.
+// ── THE ABOUT SHEET: CHANGEOVER (Amir, 2026-10-12: "lets go with A", from the About Sheet board,
+// claude.ai/artifact/JhXuZuWHAVTzqg6NaEDHK9) ──────────────────────────────────────────────────────
+// The questions an athlete asks between sets, each answered at a glance, in the History sheet's frame
+// (#hist-overlay): History › from here swaps the page in place and ‹ Back comes back (SHEET-01). A green
+// top: the movement, the name and, when Amir picked it for this athlete, his reason under "Why am I doing
+// this?", signed the way his week notes are (WN_SIG and his photo). Then one band per question, paper and
+// sand in turn, and a question with nothing to say is not asked:
+//   What does it do?            the purpose, and what it builds as green tiles (each opens its quality's page)
+//   How does it help on court?  the On court line, tennis and padel players only, over their own court
+//   Where will I feel it?       the body, front and back, and a line under it naming the muscles (bodyPartsHtml())
+//   Too hard? Too easy? Other kit?   Regressions, Progressions and Alternatives: a table, never a ladder
+//   Your history                opened from a card with history: the count and last time; a tap opens History
+// There is no WhatsApp door and no impact here (Amir, 2026-10-12: "remove the whatsapp button ... not on the
+// card i sent you, not in library", "remove the impact data from everywhere"). Opened WITHOUT a card (Library →
+// Exercises, or a linked exercise that is not on the page) the sheet is the whole entry: In my plan? at the foot
+// of the green, then How do I do it? (the video, You need, the steps) and the cues, because no card on screen
+// shows them.
+// The ten qualities' marks for the tiles (Amir's pick, 2026-10-12: the Autograph tiles), one stroke on 24 × 24.
+const QUAL_ICON = {
+  armour:   '<path d="M12 2.8 19.5 5.6v6c0 4.7-3.1 8.1-7.5 9.6-4.4-1.5-7.5-4.9-7.5-9.6v-6z"/><path d="M8.8 11.9l2.3 2.3 4.1-4.5"/>',
+  brakes:   '<path d="M3 12h10"/><path d="M9.5 7.5 14 12l-4.5 4.5"/><path d="M19 4.5v15"/>',
+  engine:   '<path d="M2 12.5h4l2.2-5.5 3.8 11 2.6-7 1.4 1.5H22"/>',
+  movement: '<circle cx="12" cy="4.5" r="2"/><path d="M12 6.5v6l-5 7.5M12 12.5l5.5 3 1 4.5M7 9.5h10"/>',
+  muscle:   '<path d="M3 20h15c1.6 0 2.6-1.4 2.3-3l-1.6-8.2L20 6l-1.6-2.5h-3.6L13.5 6l1.6 3.3-.6 3.4c-1.4-2.3-4.1-3.4-6.9-2.6C4.9 10.9 3 13.6 3 16.6z"/><path d="M9 16c1.6.5 3.4.3 4.8-.6"/>',
+  power:    '<path d="M13.5 2.5 5 13.5h6l-1 8 8.5-11h-6z"/>',
+  rotation: '<path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M18 2.5v4h-4"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+  speed:    '<path d="M2.5 8h6M1.5 12h8M2.5 16h6"/><path d="M13 5.5 19.5 12 13 18.5"/>',
+  spring:   '<path d="M6 3.5h12M6 20.5h12"/><path d="M12 3.5v2.5l5 2-10 3 10 3-10 3 5 2v2.5"/>',
+  strength: '<path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/>',
+};
+// The court behind How does it help on court?: a tennis court, or a padel court (walls, no tramlines).
+const AX_COURT = {
+  tennis: '<svg class="ax-court" viewBox="0 0 360 780" fill="none" stroke="currentColor" stroke-width="7" aria-hidden="true">'
+    + '<rect x="10" y="10" width="340" height="760"/><path d="M54 10v760M306 10v760M54 185h252M54 595h252M180 185v410"/>'
+    + '<path d="M0 390h360" stroke-width="12"/></svg>',
+  padel: '<svg class="ax-court" viewBox="0 0 360 720" fill="none" stroke="currentColor" stroke-width="7" aria-hidden="true">'
+    + '<rect x="10" y="10" width="340" height="700" stroke-width="16"/><path d="M10 117h340M10 603h340M180 117v486"/>'
+    + '<path d="M0 360h360" stroke-width="12"/></svg>',
+};
+const AX_HIST_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+  + '<path d="M3 17l5-5 4 3 7-8"/><path d="M15 7h4v4"/></svg>';
+function axHero(name, pattern, why, inProg) {
+  return `<header class="ax-hero"><div class="ax-handle" aria-hidden="true"></div>
+    ${pattern ? `<p class="ax-eyebrow"><i></i>${esc(pattern)}</p>` : ''}
+    <h2 class="ax-name${String(name).length > 32 ? ' ax-long' : ''}">${esc(name)}</h2>
+    ${why ? `<section class="ax-hq"><h3 class="ax-q">Why am I doing this<span class="ax-m">?</span></h3>
+      <div class="ax-because"><span class="ax-qm" aria-hidden="true">&ldquo;</span><p class="ax-say">${esc(why.text.trim())}</p></div>
+      <div class="ax-sig"><span class="ax-src">${esc(whyLabel(why))}</span><span class="ax-by">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></span></div>
+    </section>` : ''}
+    ${inProg && inProg.length ? `<div class="ax-inplan"><div class="ax-ip-q">In my plan<span class="ax-m">?</span></div><div class="ax-ip-days">${
+      inProg.map(w => `<div class="ax-ip-day"><span class="ax-d">Day ${esc(String(w.day))}${w.focus ? ' · ' + esc(w.focus) : ''}</span>${
+        w.block ? `<span class="ax-b">${esc(w.block)}</span>` : ''}</div>`).join('')}</div></div>` : ''}
+  </header>`;
+}
+// What it builds: only qualities whose text is approved; each tile opens its Quality Map page.
+function axTiles(e) {
+  const qs = (e.qualities || []).filter(q => QUALS_BY_ID[q]);
+  if (!qs.length) return '';
+  return `<div class="ax-builds"><div class="ax-lbl">Builds</div><div class="ax-tiles">${qs.map(q =>
+    `<button type="button" class="ax-tile" data-q="${esc(q)}" aria-label="${esc(QUALS_BY_ID[q].name)}: what it means"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${
+      QUAL_ICON[q] || ''}</svg><b>${esc(QUALS_BY_ID[q].name)}</b><span class="ax-go" aria-hidden="true">›</span></button>`).join('')}</div></div>`;
+}
+// Three plain lists (Amir, 2026-09-24: "remove the rung, too much information"). Regressions and progressions
+// are the SAME movement made easier or harder; alternatives are the same movement on other equipment or a
+// machine. A link is an entry id, or (Amir, 2026-09-24: "if we already have it, link it, if not, just put the
+// name") the plain name of an exercise with no entry yet, which turns into a link on its own once an approved
+// entry carries that name. An id whose entry is still a draft shows nothing. Each list asks its question first.
+function axLists(e) {
+  const row = (ask, word, items) => {
+    const seen = {};
+    const xs = (items || []).map(a => SPINE_BY_ID[a] || (/^[a-z0-9]+(-[a-z0-9]+)*$/.test(a) ? null : (spineFor(a) || { name: a })))
+      .filter(a => a && a.id !== e.id && !seen[a.id || a.name] && (seen[a.id || a.name] = 1));
+    return xs.length ? `<div class="ax-qa"><div><div class="ax-oq">${ask}</div><div class="ax-ow">${word}</div></div><div class="ax-names">${
+      xs.map(a => a.id ? `<button type="button" class="ax-nlink" data-id="${esc(a.id)}">${esc(a.name)}<span class="ax-ch" aria-hidden="true">›</span></button>`
+        : `<span class="ax-nplain">${esc(a.name)}<span class="ax-nnote">Not in the app yet</span></span>`).join('')}</div></div>` : '';
+  };
+  const rows = row('Too hard?', 'Regressions', e.easier) + row('Too easy?', 'Progressions', e.harder) + row('Other kit?', 'Alternatives', e.alts);
+  return rows ? `<div class="ax-opts">${rows}</div>` : '';
+}
+// How do I do it? (opened whole only): the app's own player, You need and the steps (folded after two when
+// there are four or more); then, a band of their own, the two cues to think about and the one fault.
+function axHow(e) {
+  const st = stepsOf(e), good = (e.cues && e.cues.good) || [], bad = (e.cues && e.cues.bad) || [];
+  const fold = st.length > 3;
+  const how = (e.video || st.length) ? `<h3 class="ax-q">How do I do it?</h3><div class="ax-how">${e.video ? renderVideoBlock(e.video) : ''}${st.length ? kitLine(e) : ''}</div>${
+    st.length ? `<ol class="ax-steps${fold ? '' : ' open'}">${st.map((s, i) => `<li${fold && i >= 2 ? ' class="ax-more"' : ''}>${esc(s.trim())}</li>`).join('')}</ol>${
+      fold ? `<button type="button" class="ax-unfold" aria-expanded="false"><span>All ${st.length} steps</span><span class="ax-ch" aria-hidden="true">↓</span></button>` : ''}` : ''}` : '';
+  const think = good.length ? `<h3 class="ax-q">What should I think about?</h3><div class="ax-cues">${good.map(c => `<div class="ax-cue">${esc(c)}</div>`).join('')}</div>` : '';
+  const wrong = bad.length ? `<h3 class="ax-q">What do people get wrong?</h3><div class="ax-cues">${bad.map(c => `<div class="ax-cue bad">${esc(c)}</div>`).join('')}</div>` : '';
+  return [how, think + wrong];
+}
+// Your history (Amir's pick, 2026-10-12): one row for a card with history, the count and last time in words,
+// opening the History sheet. "Last time 70 kg × 6 · 6 · 5", or for a lift with no weight "3 × 4" / "4 · 4 · 3
+// reps" (histSetsText()'s "× 4 · 4 · 3" is a box's shorthand, not a sentence). What they did, never what to lift.
+function axHistRow(card, name) {
+  const hist = card ? historyFor(name) : [];
+  if (!hist.length) return '';
+  const last = hist[0].entry;
+  let lt = last.circuit ? '' : histSetsText(last.sets, last.reps || null);
+  if (lt.startsWith('×')) {
+    const ns = lt.slice(1).trim().split(' · ');
+    lt = ns.every(n => n === ns[0]) ? `${ns.length} × ${ns[0]}` : ns.join(' · ') + ' reps';
+  }
+  return `<button type="button" class="ax-hist" id="ax-hist">${AX_HIST_ICON}<span class="ax-hist-t"><b>Your history</b><small>${
+    hist.length} session${hist.length === 1 ? '' : 's'}.${lt ? ' Last time ' + esc(lt) + '.' : ''}</small></span><span class="ax-go" aria-hidden="true">›</span></button>`;
+}
 function openExerciseSheet(id, card, fromLib) {
   const e = id ? SPINE_BY_ID[id] : null;
   const full = !!fromLib || !card;
   const ov = document.getElementById('hist-overlay');
   if (!ov) return;
-  // Because: the reason for THIS athlete leads the sheet. Found on the card, or —
-  // opened from the library or the Why page — on any programme exercise that
-  // resolves to this entry.
+  const m = ov.querySelector('.readiness-modal');
+  const cardName = card ? card.querySelector('.item-name').textContent.trim() : '';
+  // Because: the reason for THIS athlete leads the sheet. Found on the card, or (opened from the library or
+  // the Why page) on any programme exercise that resolves to this entry.
   let why = whyOfCard(card);
   if (!why && e) {
     const hit = whyList().find(w => { const x = spineFor(w.name, w.exId); return x && x.id === e.id; });
     if (hit) why = hit.why;
   }
+  const foot = `<div class="ax-foot"><button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button></div>`;
   if (!e) {
-    // A reason with no approved Spine entry yet: the sheet is just the reason.
-    if (!why || !card) return;
-    ov.querySelector('.readiness-modal').innerHTML = `
-      <div class="readiness-eyebrow">About this exercise</div>
-      <h2 class="readiness-title">${esc(card.querySelector('.item-name').textContent.trim())}</h2>
-      ${whyBlock(why)}
-      ${waInlineHtml(coachWhatsAppUrl('About ' + card.querySelector('.item-name').textContent.trim() + (card.dataset.day ? ' (Day ' + card.dataset.day + ')' : '') + ': '), 'Ask me about this exercise', 'Form check, a swap, anything that hurts. On WhatsApp.')}
-      <div class="hs-actions">
-        <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
-      </div>`;
+    // No approved Spine entry (a draft, or a phone with no Spine yet): the reason, and the way to History,
+    // which no card has any more but through this sheet.
+    if (!card) return;
+    const hr = axHistRow(card, cardName);
+    if (!why && !hr) return;
+    m.innerHTML = axHero(cardName, '', why, null) + (hr ? `<section class="ax-band">${hr}</section>` : '') + foot;
+    m.classList.add('ax-sheet');
+    const hb0 = m.querySelector('#ax-hist');
+    if (hb0) hb0.addEventListener('click', () => openHistorySheet(card));
     ov.classList.add('visible');
     return;
   }
-  const inProg = spineUsesInProgramme(id);
-  // Three plain lists (Amir, 2026-09-24: "remove the rung, too much information").
-  // Regressions and progressions are the SAME movement made easier or harder;
-  // alternatives are the same movement on other equipment or a machine.
-  // A link is an entry id, or (Amir, 2026-09-24: "if we already have it, link it, if not,
-  // just put the name") the plain name of an exercise with no entry yet. A name resolves at
-  // read time like a card does, so it turns into a tappable link on its own once an approved
-  // entry carries that name or alias. An id whose entry is still a draft shows nothing.
-  const linkList = (label, items) => {
-    const seen = {};
-    const xs = (items || []).map(a => SPINE_BY_ID[a] || (/^[a-z0-9]+(-[a-z0-9]+)*$/.test(a) ? null : (spineFor(a) || { name: a })))
-      .filter(a => a && a.id !== e.id && !seen[a.id || a.name] && (seen[a.id || a.name] = 1));
-    return xs.length ? `<div class="sp-sec"><div class="sp-lbl">${label}</div><div class="sp-alts">${
-      xs.map(a => a.id ? `<button type="button" class="sp-alt" data-id="${esc(a.id)}">${esc(a.name)}</button>`
-        : `<span class="sp-alt sp-alt-name">${esc(a.name)}</span>`).join('')}</div></div>` : '';
-  };
-  // Amir, 2026-09-24: the three lists show everywhere ("i liked how regression
-  // progression and alternatives lives in i"). "In your programme" shows ONLY in
-  // Library → Exercises: on a card the athlete is already in their programme.
-  const linksHtml = linkList('Regressions', e.easier) + linkList('Progressions', e.harder) + linkList('Alternatives', e.alts);
-  const whereHtml = inProg.length ? `<div class="sp-sec"><div class="sp-lbl">In your programme</div>${
-    inProg.map(w => `<div class="sp-where"><span>Day ${esc(String(w.day))}${w.focus ? ' · ' + esc(w.focus) : ''}</span><small>${esc(w.block)}</small></div>`).join('')}</div>` : '';
-  // Opened whole (Library → Exercises, or no card on screen), How to do it comes before the body map
-  // (2026-10-11): the video, then "You need" and the steps, then the cues. From a card it stays out:
-  // the card is right there with its own.
-  const stepsHtml = renderSteps(e);
-  const howHtml = (e.video || stepsHtml ? `<div class="sp-sec sp-how"><div class="sp-lbl">How to do it</div>${
-    e.video ? renderVideoBlock(e.video) : ''}${stepsHtml}</div>` : '')
-    + (hasCues(e.cues) ? `<div class="sp-sec sp-cues">${renderInlineCues(e.cues)}</div>` : '');
-  const hist = card ? historyFor(card.querySelector('.item-name').textContent.trim()) : historyFor(e.name);
-  const histBtn = (card && hist.length) ? `<button type="button" class="hs-link" id="sp-hist">Your history · ${hist.length} session${hist.length === 1 ? '' : 's'} ›</button>` : '';
-
-  ov.querySelector('.readiness-modal').innerHTML = `
-    <div class="readiness-eyebrow">About this exercise</div>
-    <h2 class="readiness-title">${esc(e.name)}</h2>
-    ${whyBlock(why)}
-    ${why && e.purpose ? `<div class="sp-lbl" style="margin-top:14px">What it does</div>` : ''}
-    ${e.purpose ? `<p class="sp-purpose">${esc(e.purpose)}</p>` : ''}
-    <div class="sp-chips">${e.pattern ? `<span class="sp-chip">${esc(SPINE_PATTERN[e.pattern] || e.pattern)}</span>` : ''}${
-      // Qualities only once their text is approved; each opens its Quality Map page.
-      (e.qualities || []).filter(q => QUALS_BY_ID[q]).map(q =>
-        `<button type="button" class="sp-chip sp-q" data-q="${esc(q)}">${esc(QUALS_BY_ID[q].name)}</button>`).join('')}</div>
-    ${e.tennis && isRacketSport() ? `<div class="sp-sec"><div class="sp-lbl">On court</div><p class="sp-court">${esc(e.tennis)}</p></div>` : ''}
-    ${full ? howHtml : ''}
-    ${bodyPartsHtml(e)}
-    ${linksHtml}
-    ${fromLib ? whereHtml : ''}
-    ${waInlineHtml(coachWhatsAppUrl('About ' + e.name + (card && card.dataset.day ? ' (Day ' + card.dataset.day + ')' : '') + ': '), 'Ask me about this exercise', 'Form check, a swap, anything that hurts. On WhatsApp.')}
-    <div class="hs-actions">
-      ${histBtn}
-      <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
-    </div>`;
-  ov.querySelectorAll('.sp-q[data-q]').forEach(b => b.addEventListener('click', () => {
+  const bands = [];
+  if (full) { const [h, c] = axHow(e); if (h) bands.push(h); if (c) bands.push(c); }
+  const tiles = axTiles(e);
+  if (e.purpose || tiles) bands.push(`<h3 class="ax-q">What does it do?</h3>${e.purpose ? `<p class="ax-ans">${esc(e.purpose)}</p>` : ''}${tiles}`);
+  if (e.tennis && isRacketSport()) {
+    const badge = String((DATA && DATA.sport && DATA.sport.badge) || '');
+    bands.push(`${AX_COURT[/tennis/i.test(badge) ? 'tennis' : 'padel']}<h3 class="ax-q">How does it help on court?</h3><p class="ax-big">${esc(e.tennis)}</p>`);
+  }
+  const body = bodyPartsHtml(e);
+  if (body) bands.push(`<h3 class="ax-q">Where will I feel it?</h3>${body}`);
+  const lists = axLists(e);
+  if (lists) bands.push(lists);
+  const histRow = axHistRow(card, cardName);
+  if (histRow) bands.push(histRow);
+  m.innerHTML = axHero(e.name, SPINE_PATTERN[e.pattern] || e.pattern || '', why, fromLib ? spineUsesInProgramme(id) : null)
+    + bands.map((b, i) => `<section class="ax-band${i % 2 ? ' ax-s' : ''}">${b}</section>`).join('') + foot;
+  m.classList.add('ax-sheet');
+  m.querySelectorAll('.ax-tile[data-q]').forEach(b => b.addEventListener('click', () => {
     openQualitySheet(b.dataset.q, fromLib);
-    ov.querySelector('.readiness-modal').scrollTop = 0;
+    m.scrollTop = 0;
   }));
-  ov.querySelectorAll('.sp-alt[data-id]').forEach(b => b.addEventListener('click', () => {
+  m.querySelectorAll('.ax-nlink[data-id]').forEach(b => b.addEventListener('click', () => {
     const other = b.dataset.id;
     // The card only comes along if that exercise is on today's page.
     const oc = [...document.querySelectorAll('.checklist-item')].find(c => {
@@ -15151,10 +15290,17 @@ function openExerciseSheet(id, card, fromLib) {
       return x && x.id === other;
     }) || null;
     openExerciseSheet(other, oc, fromLib);
-    ov.querySelector('.readiness-modal').scrollTop = 0;
+    m.scrollTop = 0;
   }));
-  const hb = document.getElementById('sp-hist');
+  const hb = m.querySelector('#ax-hist');
   if (hb) hb.addEventListener('click', () => openHistorySheet(card));
+  const uf = m.querySelector('.ax-unfold');
+  if (uf) uf.addEventListener('click', () => {
+    const open = m.querySelector('.ax-steps').classList.toggle('open');
+    uf.setAttribute('aria-expanded', open ? 'true' : 'false');
+    uf.firstElementChild.textContent = open ? 'Fewer steps' : `All ${stepsOf(e).length} steps`;
+    uf.lastElementChild.textContent = open ? '↑' : '↓';
+  });
   ov.classList.add('visible');
 }
 window.openExerciseSheet = openExerciseSheet;

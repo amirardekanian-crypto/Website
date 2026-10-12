@@ -56,7 +56,7 @@ A private app on your phone with the programme I wrote for you. You open it at `
 
 1. **Your plan is layers.** A **cycle** (about 5 weeks, one clear goal) is made of **days** (Day 1, Day 2…), each day of **blocks** (warm-up, strength, power…), each block of **exercises**. The plan *will* change every few weeks. That's by design.
 2. **You log, you rate, you tap Done.** You record each set (weight, reps, how hard it felt). At the end you give the whole session one rating from 1 to 10 and tap **Done · send to coach ✓**. That tap finishes the day and sends it to me.
-3. **I answer only on WhatsApp.** There is no chat inside the app. Anywhere you might want to ask me something (the Coach tab, the end of a session, every exercise's ⓘ), a button opens WhatsApp with the message already started, saying who you are and which day or exercise it's about.
+3. **I answer only on WhatsApp.** There is no chat inside the app. Anywhere you might want to ask me something (the Coach tab, the end of a session), a button opens WhatsApp with the message already started, saying who you are and which day it's about.
 
 The app never tells you which weight to lift mid-set. Your programme is set by **RPE** (how hard a set felt), and I use what you log to set your next weights.
 
@@ -111,7 +111,7 @@ DAY  (opened from a day card; the tab bar hides once you tap Begin or Skip)
    TODAY'S TARGETS banner  (only on a lower, short or sore day)
    BLOCKS ─► EXERCISE CARDS
         closed: ○ number name ●  numbers line  pill  ⓘ
-        open:   Coach's note · Last time · How to do it · sets · Rest
+        open:   Coach's note · How to do it · sets · Rest
         ⓘ ─► About this exercise ─► Your history
         Rest ─► Rest Timer
    FINISH CARD ─► rate 1–10 ─► Done · send to coach ✓
@@ -233,15 +233,15 @@ Top to bottom:
 - A number, the **name**, and a small **orange dot** if I left you a **Coach's note**.
 - **The line of numbers:** `4 × 6 · RPE 7 · 3-1-1 · 2:30` = sets × reps · target RPE · tempo · rest. Only what's prescribed shows. A rest for a whole block sits on the block's header instead (*Rest 2m*).
 - A **green pill** when there's a grip or one intention (for example *neutral grip*).
-- **ⓘ** at the right end. Plain = what the exercise is for. **Orange** = I wrote you a personal reason for having it ("Why you").
+- **ⓘ** at the right end. Plain = what the exercise is for. **Orange** = I wrote you a personal reason for having it ("Why am I doing this?").
 - A closed card shows **no history**. Open it to see last time.
 
 **The exercise card — open** (tap the row; tap it again to close), in this order:
 1. **Coach's note** (orange box; **More ›** / **Less** if long).
-2. **Last time** (below), or **First time — "Today sets your baseline."**
+2. **First time — "Today sets your baseline."** on an exercise you have never logged. There is no Last time box (since 2026-10-12): the grey **LAST** weight in each empty box is last time.
 3. **Video & cues** — the row reads *Video & 4 cues*, *Video* or *3 cues*. Open it for the video (tap ▶) and the cues (green lines to do, red lines to avoid; the heading **Coaching Cues** appears only in the exercise's ⓘ sheet). Under the video, **Open in YouTube** opens the YouTube app or browser if the player won't play. It opens by itself the first time you meet an exercise.
 4. **The sets** — see "Logging a set".
-5. **Note** — a private note for today's sets ("Anything about today's sets? Your coach sees it with this session."). It then shows up under *Last time* next session.
+5. **Note** — a private note for today's sets ("Anything about today's sets? Your coach sees it with this session."). It then shows up in **Your history** (the ⓘ).
 6. **Rest ⏱ 2m** (or **Rest timer ⏱** if I set no rest) — opens the Rest Timer.
 
 **Logging a set.** Each row: **SET · KG · REPS**, an **RPE** tag and a **circle**.
@@ -261,7 +261,7 @@ Top to bottom:
 | **Superset / circuit** | A **Rounds** list (A, B, C…, each with its dose, a kg box on every item of a working circuit, and a ▶ video) and a **Log** with one **How hard?** row per round. The big circle is the only "done" mark; rating the rounds alone doesn't tick it. |
 | **Warm-up** | A list. Open a row for its cues. One circle ticks the whole warm-up. No weights, no RPE. |
 
-**Last time and History.** In an open card: **Last time · Tue** and the last set (*70 kg × 5 @ 8*). A tap shows every set, your RPEs against the target, your note and **History ›** (a chart and the last sessions). A faint *"last · 80 × 4 @ 9"* under a set means that set ran over target last time. It never tells you what to lift. A different version of an exercise (a progression) counts as new: *"First time"* again.
+**Last time and History.** In an open card, last time is the grey **LAST** weight in each empty box. The whole story is the ⓘ's **Your history** row (*6 sessions. Last time 70 kg × 6 · 6 · 5.*): a tap opens **History** (a chart and the last sessions, your RPEs against the card's own RPE and your notes, under a line with today's target). A superset or circuit keeps its **Last time** strip. A faint *"last · 80 × 4 @ 9"* under a set means that set ran over target last time. It never tells you what to lift. A different version of an exercise (a progression) counts as new: *"First time"* again.
 
 **The Rest Timer.** Full-screen. Opens already running. **Pause**, **+15s**, **Reset**, **Close** and **Sound on/off** (a beep and a buzz at zero; iPhones don't buzz). The screen stays awake. At zero it shows **GO!** and closes. The card's button shows my rest for that exercise (for example *Rest ⏱ 2:30*); when I wrote none it says *Rest timer* and opens a neutral 2:00.
 
@@ -355,14 +355,15 @@ From the **Body weight** row on Home. **←** goes Home.
 
 *Screens: [36-about-sheet](client-app-map/36-about-sheet.jpg)*
 
-Tap the **ⓘ** on a card, a row in Library → Exercises, or a linked name. A sheet slides up with:
-- **Why you** — only when I wrote a reason: a tag (*Your goal · Your body · Your test · Last cycle · You said · Your game*; a body reason names the part, like *Your knee*) and a sentence about you. Then **What it does**.
-- Chips for the **movement pattern** (Squat, Hinge, Single leg, Pull, Anti-rotation, Jump & land…) and **qualities** (tap one for **What you're building**).
-- **On court** (tennis and padel players): where it shows up in your game.
-- **Muscles worked** (or **Body parts involved**, when I've listed parts but not muscles) — a front and back body drawing; **Main** muscles in full orange, **Helping** in soft orange; and whether it is **Jumping, Landing, Running** or **No impact**.
-- **Regressions** (easier), **Progressions** (harder), **Alternatives** (same movement, other kit). Tap a name to read it; a dashed-outline name has no page yet.
-- **Ask me about this exercise** — a WhatsApp button, pre-filled with the exercise and day.
-- **Your history · N sessions ›** and **Close**.
+Tap the **ⓘ** on a card, a row in Library → Exercises, or a linked name. A sheet slides up (since 2026-10-12, "Changeover"), each part a question:
+- **The green top**: the movement pattern as a small word and the name. When I wrote a reason: **Why am I doing this?**, my sentence, its tag (*Your goal · Your body · Your test · Last cycle · You said · Your game*; a body reason names the part, like *Your knee*) and my signature and photo.
+- From the Library only: **In my plan?** at the foot of the green, then **How do I do it?** (the video with **Open in YouTube**, *You need*, the steps, two shown and **All N steps**), **What should I think about?** and **What do people get wrong?**
+- **What does it do?** and **Builds**: green tiles for the qualities, each with its mark (tap one for **What you're building**).
+- **How does it help on court?** (tennis and padel players), over a faint court.
+- **Where will I feel it?** a front and back body drawing; **Main** muscles in full green, **Helping** in soft green; under it *Mostly your ● quads. Your ● glutes help.*
+- **Too hard?** (Regressions), **Too easy?** (Progressions), **Other kit?** (Alternatives). Tap a name to read it; *Not in the app yet* means it has no page yet.
+- **Your history** (from a card, once you have logged it): how many sessions and last time; a tap opens History. Then **Close**.
+- No WhatsApp button and no impact on this sheet (my call, 2026-10-12). Ask me from the Coach tab or the end of a session.
 
 **Why your plan looks like this** (under Game Plan's Active card): every exercise with a personal reason, grouped by the six tags above; tap one to open its sheet.
 
@@ -375,7 +376,7 @@ Tap the **ⓘ** on a card, a row in Library → Exercises, or a linked name. A s
 Your **initials**, top right of every main screen (inside a day it becomes a 🌙):
 - **Theme: Light | Dark.** Your choice, per phone. It never follows the phone's setting.
 - **Install the app ›** (only if not installed).
-- **How the app works ›** — 15 cards: Getting around · How your program is structured · RPE & Tempo · The readiness check · Logging your sets · Guided mode · The ⓘ — what an exercise is for · What each day builds · Last time — your history on every exercise · Personal Records — the most you could lift once · Finishing a session · What to report & how often · Install the app on your home screen · Built-in tools · Questions or problems. The dotted words **How hard?** and **tempo** open the right card.
+- **How the app works ›** — 15 cards: Getting around · How your program is structured · RPE & Tempo · The readiness check · Logging your sets · Guided mode · The ⓘ — what an exercise is for · What each day builds · Your history on every exercise · Personal Records — the most you could lift once · Finishing a session · What to report & how often · Install the app on your home screen · Built-in tools · Questions or problems. The dotted words **How hard?** and **tempo** open the right card.
 - **Privacy ›** (opens in the browser).
 - **Sign out** — two taps (**Tap again to sign out**). It first sends anything waiting, which can take several seconds on a weak signal; your training stays saved. If a report is still waiting for signal, it says so and goes when you sign in again.
 
@@ -404,8 +405,8 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 
 **What changes when you're not new.**
 - No Welcome and no first-session notes after your first cycle or first finished session.
-- **Last time** now fills every card; a progression or a new exercise says *"First time"*.
-- **Wins** and **Personal records** have data. New plans carry fresh **Why you** reasons.
+- The grey **LAST** weights fill every empty box; a progression or a new exercise says *"First time"*.
+- **Wins** and **Personal records** have data. New plans carry fresh **Why am I doing this?** reasons.
 - A day you finished earlier shows as a small ✓ row; the green ring moves on.
 - Game Plan shows only the previous cycle as a **Done** card (older ones are just segments on the meter).
 
@@ -448,8 +449,8 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 | **Lower day** | The label when the check-in comes out low. |
 | **Optional today** | An exercise my plan lets you drop on a short day. |
 | **Coach's note** | A message about this exercise for you (the orange dot). |
-| **Because / "Why you"** | The reason I picked an exercise for you (the orange ⓘ). |
-| **Last time** | What you did on this exercise last time. |
+| **Because / "Why am I doing this?"** | The reason I picked an exercise for you (the orange ⓘ). |
+| **Your history** | What you did on this exercise before: the last row of its ⓘ sheet. |
 | **LAST** | The grey weight in an empty box. A reminder only. |
 | **Guided** | One set at a time, with rest timed for you. |
 | **Round** | One pass through a superset or circuit. |
@@ -485,7 +486,7 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 
 - **Every session:** rate it 1–10 and tap **Done · send to coach ✓**. That is the report.
 - **Every Sunday:** a short WhatsApp on how the week felt: sleep, stress, niggles, tennis load.
-- **Any time:** pain that lasts more than 48 hours, missed sessions, anything that feels off, an equipment swap, form-check videos. Use the buttons in the Coach tab, at the end of a session, and in every exercise's ⓘ: the message already says which day or exercise.
+- **Any time:** pain that lasts more than 48 hours, missed sessions, anything that feels off, an equipment swap, form-check videos. Use the buttons in the Coach tab and at the end of a session: the message already says which day.
 - Notes you type in the app I read, but I **don't answer them there**.
 
 ---
@@ -498,7 +499,7 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 | See which day is next | Home → This Week (the green ring) |
 | Train one set at a time | In a day: Guided ▶ (or ⋯ → Guided) |
 | Rest between sets | The card's **Rest ⏱** button (Guided rests for you) |
-| See what I lifted last time | Open the exercise → **Last time** → **History ›** |
+| See what I lifted last time | The grey LAST weight in the box, or the exercise's ⓘ → **Your history** |
 | Know why this exercise is here | The ⓘ at the right end of the card |
 | Watch how to do it | Open the card → **How to do it**; or Library → Exercises |
 | Find an easier or harder version | ⓘ → **Regressions** / **Progressions** |
@@ -538,7 +539,7 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 | [09-lower-day-banner](client-app-map/09-lower-day-banner.jpg) | The Short day banner | 5.2 |
 | [10-cards-closed](client-app-map/10-cards-closed.jpg) | Closed cards: dot, pill, orange ⓘ, tempo digit | 5.2 |
 | [11-card-open](client-app-map/11-card-open.jpg) | An open card, first time | 5.2 |
-| [12-card-open-last-time](client-app-map/12-card-open-last-time.jpg) | Last time box and LAST weights | 5.2 |
+| [12-card-open-last-time](client-app-map/12-card-open-last-time.jpg) | LAST weights (taken before 2026-10-12: the Last time box in it is gone) | 5.2 |
 | [13-history-sheet](client-app-map/13-history-sheet.jpg) | The History sheet | 5.2 |
 | [14-rpe-strip](client-app-map/14-rpe-strip.jpg) | The RPE strip after a tick | 5.2 |
 | [16-rest-timer](client-app-map/16-rest-timer.jpg) | The Rest Timer | 5.2 |
@@ -561,7 +562,7 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 | [33-library-session](client-app-map/33-library-session.jpg) | A Library session, Before you start | 5.4 |
 | [34-playbook](client-app-map/34-playbook.jpg) | The Playbook | 5.4 |
 | [35-exercises-list](client-app-map/35-exercises-list.jpg) | Exercises: search, chips, list | 5.4 |
-| [36-about-sheet](client-app-map/36-about-sheet.jpg) | The About sheet with the muscle map | 5.8 |
+| [36-about-sheet](client-app-map/36-about-sheet.jpg) | The About sheet (Changeover, 2026-10-12): the green top with the reason, What does it do? and its tiles | 5.8 |
 | [37-game-plan](client-app-map/37-game-plan.jpg) | Game Plan: banner, meter, Done, Active | 5.5 |
 | [38-records-empty](client-app-map/38-records-empty.jpg) | Personal Records, empty | 5.6 |
 | [39-records-with-lift](client-app-map/39-records-with-lift.jpg) | Personal Records with a lift | 5.6 |

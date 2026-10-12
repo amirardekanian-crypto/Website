@@ -201,9 +201,14 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **The working card** (Fresh Eyes, Amir 2026-09-27; `PROGRAM-APP.md` → *The working card*): a closed card shows
   **no history** (*"no history on the exercise card when not opened"*); its numbers are one line and a pill that says
   something stays a pill (the green `intent` pill, the check-in's pills); the ⓘ sits at the right end, clay for a
-  Because, and a clay dot after the name is a Coach's Note. Last time is a box in the open card (the last set; a tap
-  shows every set; `lt_open` is one setting per phone). The kg box follows the Spine's equipment (`kgWanted()`): hidden,
-  never removed.
+  Because, and a clay dot after the name is a Coach's Note. **No Last time box on the open card either** (Amir,
+  2026-10-12: *"their last time, is actually already in the reps, weight box"*): last time's weight is each empty kg
+  box's LAST, a set that ran over keeps its faint line, the whole history is the ⓘ's **Your history**, and only a
+  circuit keeps its strip. The kg box follows the Spine's equipment (`kgWanted()`): hidden, never removed.
+- **The ⓘ's About sheet is Changeover** (Amir, 2026-10-12: *"lets go with A"*; `PROGRAM-APP.md` → *The About sheet*): a
+  green top with Amir's reason signed as the week note signs (`WN_SIG` and his photo), then one question per band. Its look
+  is `.ax-sheet`, which `sheetWrap()` takes off before any other page draws into the shared frame. **No WhatsApp door and
+  no impact on it**: impact is drawn nowhere in the athlete app (the entry keeps it for the app's rules and the coach).
 - **Personal Records fill themselves** (2026-09-26): a finished session's best set goes on when it beats every
   earlier number for the lift, marked `auto` and written with `t: 0` so anything the athlete does to that day wins.
   New bests only: every screen leads with the latest entry. "The Ceiling" is retired from the screens.
@@ -224,8 +229,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   only accent", through `rpeVs()`/`rpeMark()` on every screen.
 - **There is no in-app chat, and Amir answers ONLY on WhatsApp (2026-09-26: *"Im only gonna reply to
   them when they send me a message on whatsapp"*).** The app's job is to get athletes there fast, with
-  context: the Coach tab, the end of every session (the note comes along) and every exercise's About
-  sheet open WhatsApp pre-filled (`coachWhatsAppUrl(about)`, `COACH_WHATSAPP` = the site's buy-button
+  context: the Coach tab and the end of every session (the note comes along) open WhatsApp pre-filled
+  (the About sheet's door went on 2026-10-12, Amir's call) (`coachWhatsAppUrl(about)`, `COACH_WHATSAPP` = the site's buy-button
   number). coach.html only marks session notes read. The `messages` table stays on the server and
   nothing reads it. Do not bring a chat back unasked. Details in `PROGRAM-APP.md`.
 - **Home leads with the training** (HOME-02, Amir 2026-09-26): the This cycle card (PROG-01, below; the small cycle
@@ -431,7 +436,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v112` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v113` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

@@ -29,8 +29,9 @@ const H = require('./lib');
 
     await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; if (c.classList.contains('collapsed')) toggleExpand(c); c.scrollIntoView({ block: 'start' }); })()`);
     await p.waitForTimeout(300);
-    const sets = await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; return { rows: c.querySelectorAll('.ex-set-row').length, want: parseInt(c.dataset.sets, 10), last: !!c.querySelector('.lt-box') }; })()`);
-    t.check(`program ${tag}: the squat card opens with its sets and Last time`, sets.rows === sets.want && sets.rows > 0 && sets.last, JSON.stringify(sets));
+    // No Last time box on the card since 2026-10-12 (Amir: "the history ... should be removed from exercise cards").
+    const sets = await p.evaluate(`(() => { const c = ${H.card('Barbell Back Squat')}; return { rows: c.querySelectorAll('.ex-set-row').length, want: parseInt(c.dataset.sets, 10), last: !!c.querySelector('.lt-box, .lt-strip:not(.lt-first)') }; })()`);
+    t.check(`program ${tag}: the squat card opens with its sets and no Last time box`, sets.rows === sets.want && sets.rows > 0 && !sets.last, JSON.stringify(sets));
     t.check(`program ${tag}: the open card has no sideways scroll`, (await noSideways(p)) <= 0);
     await shot(p, file + '-card');
 

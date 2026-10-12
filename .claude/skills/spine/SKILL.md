@@ -106,8 +106,10 @@ the existing ids for the links, and they show you which names are only variants.
 - **tennis:** the court moment it serves, or `""` when there honestly isn't one. Do not stretch. Never the
   purpose again and never how (CUE-7).
 - **loads + impact = "Body parts involved"** (Amir, 2026-09-24, from the course app's
-  «بخش‌هایی از بدن که درگیر است»; stage36). The athlete sees them in the About sheet: the regions as
-  soft pills, the impact word in clay. **Every entry gets both, and `draft_sql.py` refuses one without.**
+  «بخش‌هایی از بدن که درگیر است»; stage36). The athlete sees the regions in the About sheet only when the entry has no muscles (lit on the
+  body and named under it); since 2026-10-12 the athlete never sees impact (Amir: *"remove the impact data from
+  everywhere"*), but the app's own rules read it (a jump or a landing on a sore day, which lifts file a
+  record). **Every entry gets both, and `draft_sql.py` refuses one without.**
   - `loads`: 1 to 4 (more only when copying the course, whose Trap Bar Deadlift has five) of `ankle-foot · calf-achilles · knee · hip-groin · hamstring · low-back · trunk ·
     shoulder · elbow-forearm-wrist · neck` (the course's own ids plus `neck`; the database refuses
     anything else). Name what the exercise really loads, not every joint that moves. The calibration,
@@ -116,8 +118,8 @@ the existing ids for the links, and they show you which names are only variants.
     hamstring`; pull or press = `shoulder, elbow-forearm-wrist`; trunk work = `trunk` (+ `low-back`
     when it rotates or lifts the back); calf work = `calf-achilles, ankle-foot`; running =
     `ankle-foot, calf-achilles` (+ `hamstring` for sprints, + `knee, hip-groin` for change of direction).
-  - `impact`: one of `none · running · plyometric · landing` (the app says No impact, Running,
-    Jumping, Landing). Only jumps, hops and bounds are `plyometric`; drop-and-stick drills are
+  - `impact`: one of `none · running · plyometric · landing` (coach.html says No impact, Running,
+    Jumping, Landing; the athlete app shows none of them). Only jumps, hops and bounds are `plyometric`; drop-and-stick drills are
     `landing`; anything run is `running`; walking, bikes and every lift are `none`.
   - **If the course has the same exercise, copy its tags exactly** so the two apps agree:
     `select v->'tags', v->>'impact' from public.tps_content c, jsonb_each(c.body->'exercises') e(k, v)

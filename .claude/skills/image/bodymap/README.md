@@ -1,6 +1,6 @@
 # The muscle map's drawing (program.html, stage42, 2026-09-26)
 
-The body in the About sheet's *Muscles worked* section. Everything the app draws comes from here;
+The body in the About sheet's *Where will I feel it?* band (and coach.html's Exercises editor). Everything the app draws comes from here;
 never hand-edit `BODYMAP_SVG` in program.html.
 
 | File | What it is |

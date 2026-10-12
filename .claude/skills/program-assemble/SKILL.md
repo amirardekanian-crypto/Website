@@ -531,7 +531,7 @@ or missing some info, or can be updated, it should be updated there at the end �
 write a program for an athlete, this gets more complete."* Run **`/spine` → Upkeep** on this
 athlete's programme: draft every exercise with no entry, fill every empty field (video,
 equipment, regressions/progressions/alternatives, SFR, flags, **qualities**, **body parts**: `loads` +
-`impact`, which the athlete sees as *Body parts involved*), stamp `exId` on every card that resolves,
+`impact`; the athlete sees the regions on the ⓘ's body when an entry has no muscles, and never the impact), stamp `exId` on every card that resolves,
 link a new exercise to its regressions, progressions and alternatives from both sides, apply design's `spine_cue:` lines to drafts
 and propose them for approved entries **on the pending list** (`/spine` → *The pending list*, so a
 proposal outlives this handoff). Upkeep reads the published row, which is why it runs after Step 7.

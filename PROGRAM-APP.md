@@ -259,8 +259,10 @@ day, across cycles via `matchRenamed()`), and **History ›** opens the History 
   implement, so a dumbbell lift logged as `20` one day and `2×20` the next is the same lift. Only a
   count of 1 to 4 before the sign counts as a pair (`20x2` stays 20). coach.html's `loadSummary()`
   does no maths on any weight that is not a plain number (`24` or `24kg`): it prints `2×20` as typed.
-- **Only in the open card** (2026-09-27, *The working card*): the **Last time** box under the Coach's Note. The closed
-  card's clay *Last* pill is gone (Amir: *"no history on the exercise card when not opened"*).
+- **Not on the card any more** (2026-10-12, *The working card*): the open card has no **Last time** box (it was under
+  the Coach's Note from 2026-09-27; the closed card's clay *Last* pill went before that). The history is the ⓘ's
+  **Your history** row, each empty kg box shows last time's weight as LAST, and a circuit keeps its Last time strip.
+  The ⓘ is there for any lift with history, entry or not (`paintAbout()`), so History is always one tap behind it.
 - **`<id>_histcache` is a cache and never syncs** (`_snapshot()` skips it; written with
   `_lsRawSet` so it never stamps `lastEditAt`). The source is `get_my_history()`, stage30; since stage60 it leaves out a session the coach hid, so the next
   online open drops it from Last time and the Records.
@@ -287,9 +289,32 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   flags stays in the scratchpad, never in this public repo.
 - **The card gains ONE thing:** a small ⓘ, only for an approved entry, at the right end of the row (after the name until 2026-09-27, *The working card*). Everything
   else is in the About sheet (`openExerciseSheet()`), which reuses the History sheet's frame.
-  ⚠ **Opened from a CARD** (Amir, 2026-09-24): Why you, what it does, pattern and quality chips,
-  On court, the three lists, History. *In your programme* shows **only when it is opened from
-  Library → Exercises** (`fromLib`); the lists stay in both (Amir: *"i liked how regression
+- **The About sheet is Changeover** (Amir, 2026-10-12: *"lets go with A"*, from three directions on the About Sheet board,
+  claude.ai/artifact/JhXuZuWHAVTzqg6NaEDHK9, with his changes). The questions an athlete asks between sets, one per band,
+  paper and sand in turn, and a question with nothing to say is not asked:
+  - **The green top** (`axHero()`): the pattern as a small word, the name (28 px past 32 characters), and when Amir picked it
+    for this athlete, **Why am I doing this?** with his reason, its clay tag (*Your game*, *Your knee* …) and his sign-off as
+    the week note signs (`WN_SIG` in white and his photo; Amir: *"Get how i sign my name from the new design i did for week
+    notes"*). Opened from the Library, **In my plan?** sits at its foot, one row per day.
+  - **What does it do?** the purpose, then **Builds**: the qualities as green tiles, each with its mark (`QUAL_ICON`, one per
+    quality) and a ›, each opening its Quality page (Amir picked the tiles from the board).
+  - **How does it help on court?** the On court line over a faint court (a padel court for a padel badge), racket players only.
+  - **Where will I feel it?** the front-and-back body at its old size, lit green, and under it one line per kind whose dots
+    are the colours on the body (*Mostly your ● quads. Your ● glutes help.*; Amir: *"remove the text and arrows in middle,
+    and use texts like this, under the image"*). See *The muscle map*, below.
+  - **Too hard? / Too easy? / Other kit?** over **Regressions / Progressions / Alternatives**: a two-column table, a linked
+    name with a round ›, a name with no entry marked *Not in the app yet*.
+  - **Your history** (opened from a card that has history): one row, *N sessions. Last time 70 kg × 6 · 6 · 5.*, opening the
+    History sheet. It is the card's history now: the open card has no Last time box (*The working card*).
+  - Opened **whole** (Library → Exercises, or no card on screen), **How do I do it?** comes first: the player, You need and the
+    steps (folded after two when there are four or more), then **What should I think about?** (the two good cues) and **What
+    do people get wrong?** (the fault, the one clay bar besides the reason).
+  - **No WhatsApp door and no impact** (Amir: *"remove the whatsapp button ... not on the card i sent you, not in library"*,
+    *"remove the impact data from everywhere"*). Its look is `.ax-sheet` on the frame: `sheetWrap()` takes it off before any
+    other page (History, a quality, Why, Account, Help) draws, and puts it back when an opener drew nothing; ‹ Back sits white
+    on the green. `scripts/headless/about-sheet.js` checks all of it at 390, 390 dark and 320.
+  ⚠ **Opened from a CARD** (Amir, 2026-09-24): no How do I do it? (the card under it has its own). *In my plan?* shows
+  **only when it is opened from Library → Exercises** (`fromLib`); the lists stay in both (Amir: *"i liked how regression
   progresion and alternatives lives in i"*). The three plain lists: **Regressions** (`easier`: the same movement made easier),
   **Progressions** (`harder`: the same movement made harder) and **Alternatives** (`alts`: the
   same movement on other equipment or a machine). ⚠ **Rungs are GONE** (Amir, 2026-09-24:
@@ -301,8 +326,8 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   the old links are in `exercise_coach.links_before` (stage33).
   ⚠ **A link is an id OR A PLAIN NAME** (Amir, 2026-09-24: *"if we already have it, link it, if
   not, just put the name"*). An item shaped like an id (`goblet-squat`) must be an entry; anything
-  else (`Nordic Hamstring Curl`) is the name of an exercise with no entry yet, drawn as a quiet
-  dashed pill with nothing to tap. The name resolves at READ time like a card does (`spineFor()`),
+  else (`Nordic Hamstring Curl`) is the name of an exercise with no entry yet, drawn as a plain
+  name marked *Not in the app yet*, nothing to tap. The name resolves at READ time like a card does (`spineFor()`),
   so it becomes a real link on its own once an approved entry carries that name or alias. Only id
   links are mirrored both ways. The same day's link pass (stage34) took the Spine from 255
   links to 387 (103 of them names); then stage35 (Amir: *"apply the fixes"*) corrected the
@@ -319,27 +344,31 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
 - **Body parts involved** (Amir, 2026-09-24, from the course app's «بخش‌هایی از بدن که درگیر است»;
   `supabase/stage36_body_parts.sql`). `loads` = the course's region ids (`ankle-foot · calf-achilles ·
   knee · hip-groin · hamstring · low-back · trunk · shoulder · elbow-forearm-wrist`, plus `neck`),
-  `impact` = `none · running · plyometric · landing` (shown as No impact, Running, Jumping, Landing).
-  The About sheet draws them as *Body parts involved* (`bodyPartsHtml()`), regions as soft pills, only
-  for an entry with no muscles (one with muscles gets the muscle map, below); the impact pill is clay
-  under either (*No impact* quiet). coach.html edits them as tick boxes and a menu; the database refuses any other
-  word. **All 209 entries were set by hand** (stage36 the 100 most-used, stage37 the other 109, on
+  `impact` = `none · running · plyometric · landing`. The About sheet lights the regions on the body only
+  for an entry with no muscles (one with muscles gets the muscle map, below), and names them under it
+  (*It loads your knee and hip & groin.*). **Impact is drawn nowhere in the athlete app since 2026-10-12**
+  (Amir: *"remove the impact data from everywhere"*): the entry keeps it for the app's own rules (a jump or a
+  landing on a sore day, which lifts file a record) and for the coach. coach.html edits them as tick boxes and a
+  menu; the database refuses any other word. **All 209 entries were set by hand** (stage36 the 100 most-used, stage37 the other 109, on
   Amir's *"do all 109 now"*), 56 of them copied exactly from the course where it has the same
   exercise. ⚠ **`impact` null means never checked**, and **every programme write fills both** for a
   new or touched exercise through `/spine` → Upkeep, which flags a missing one.
   The region and impact lists exist FOUR times (program.html `SPINE_REGION`/`SPINE_IMPACT`,
   coach.html `SPINE_REGIONS`/`SPINE_IMPACTS`, `draft_sql.py`, the stage36 checks): change all four.
 - **The muscle map** (Amir, 2026-09-26: *"this is amazing, lets build"*; `supabase/stage42_muscle_map.sql`).
-  The About sheet's body section is a **front-and-back body with the worked muscles lit**: main (`1`)
-  in full clay, helpers (`0.5`) in soft clay, listed under it as *Main* and *Helping*, then the impact
-  pill (*No impact* is quiet now; Jumping, Landing, Running stay clay). The body sits on the sheet
-  itself, warm greys on paper and dark greys in dark mode (Amir: *"the body should be on a light
-  background, whatever it is in that page"*). `bodyPartsHtml()` draws it; `BODYMAP_SVG` is the drawing.
+  The About sheet's body section (*Where will I feel it?*) is a **front-and-back body with the worked muscles lit**,
+  at 300 px as it always was: main (`1`) in full green, helpers (`0.5`) in soft green since 2026-10-12 (Amir: *"you can
+  turn them to green instead of clay"*; clay on that sheet is his voice), named under it in one line per kind whose
+  dots are the colours (*Mostly your ● quads and ● glutes. Your ● core helps.*; a helper alone reads *No one muscle
+  does the main work here.*; `MAP_ONE` holds the singular names). Nothing is drawn between the figures (Amir: *"too
+  busy"*). The body sits on the sheet itself, warm greys on paper and dark greys in dark mode (Amir: *"the body should be on a light
+  background, whatever it is in that page"*). `bodyPartsHtml()` draws it; `BODYMAP_SVG` is the drawing. coach.html's
+  map keeps its own (clay) colours.
   - **What lights:** `get_exercises()` sends `muscles` = the entry's volume **credits** when they name a
     muscle, else its display-only **`exercises.muscles`** (the 60 stretches, jumps, sprints and rides
     whose credits are `{}` still work something). Only muscle names and 1/0.5 reach a phone, never cost,
     SFR or flags. An entry with neither falls back to *Body parts involved* on the same drawing: the
-    zones light their muscles, and the knee and the ankle get a clay ring, since they are joints.
+    zones light their muscles, and the knee and the ankle get a ring, since they are joints.
     `core` also lights the low back.
   - **Every new entry needs it:** `credits: {}` means `muscles` is required (`draft_sql.py` refuses the
     batch without it, `/spine` → Upkeep lists it as a gap, coach.html marks the entry *no muscles on
@@ -456,7 +485,7 @@ you recommend."* Server: `supabase/stage32_qualities.sql`.
 Idea #4 of `/ideas` round 1 (brief: claude.ai/artifact/WtZ4xfq38dV7zZwRu926jw; Amir: *"go"*, on the
 recommended picks). `ex.why = { src, part?, text }`, spec in `SCHEMA.md` → *`why` — Because*.
 - **The card gains only a clay ⓘ** (`.ex-about.has-why`; a clay dot on its corner until 2026-09-27, when the clay dot after the name became the Coach's Note). The sentence opens the About
-  sheet under **Why you** (`whyBlock()`), and **Why your plan looks like this**, a button under the
+  sheet under **Why am I doing this?**, signed (`axHero()`; *Why you* until 2026-10-12), and **Why your plan looks like this**, a button under the
   current cycle card (three or more reasons), groups them by source (`openWhyPlan()`). A card with a
   `why` gets the ⓘ even before its Spine entry is approved.
 - **Personal or nothing, 5–10 per cycle, written fresh each cycle**:
@@ -486,8 +515,8 @@ costs more than one tap.
 - **The note is per SESSION**: `<id>_snote_<Name>` = `{ d: local date, v }`, shown and sent only on
   day `d`. The old `<id>_note_` was never cleared, so half the notes Amir received were re-runs
   (522 sent, 259 distinct). A date stamp, not a clear, because the cloud merge prefers text over a
-  blank and would hand a cleared note back. Last session's note shows in the Last time box once it
-  is tapped open (a circuit's strip shows it always). coach.html reads `snote_` ahead of `note_`.
+  blank and would hand a cleared note back. Last session's note shows in the History sheet (the ⓘ's
+  Your history; a circuit's strip shows it always). coach.html reads `snote_` ahead of `note_`.
 - **Leftover rep ranges are never guessed.** `cardReps()`/`plannedReps()` return null for one, so the
   box shows `8–10` and reps are recorded only when typed. `repCount()` still takes the low end,
   for Personal Records only.
@@ -506,8 +535,8 @@ costs more than one tap.
     `last 80` placeholder was tried first: at 375px the box holds about 38px of text, so `last 22.5`
     was cut off. A ticked set shows no hint.
   - **No Same as last on the card** (removed 2026-09-27, Amir: *"its a duplicate of what can be seen
-    in history"*). It sat above the table as `Same as last · 80 kg` and filled every empty set; the open
-    card's Last time box already shows last time, and one number typed in set 1 fills the sets below.
+    in history"*). It sat above the table as `Same as last · 80 kg` and filled every empty set; each
+    empty kg box already shows last time's weight, and one number typed in set 1 fills the sets below.
     `sameAsLastFills()` / `sameAsLastLabel()` went with it. **Guided's rest screen keeps its own**
     (`.tl-same`, in `paintTimerLog()`): that screen has no Last time box, and the button types last
     time's weight into that set's box, which then fills the sets below like any typed number.
@@ -560,8 +589,8 @@ athlete to WhatsApp from wherever the question comes up, with the context alread
   buy buttons use.**
 - **Two more doors, each saying what the message is about** (`waInlineHtml()`, `coachWhatsAppUrl(about)`):
   *Ask me on WhatsApp* under the note at the end of every session (`sessionWaUrl()` adds the day, its
-  title and whatever is typed in the note, at tap time), and *Ask me about this exercise* in every
-  exercise's About sheet (the exercise, plus the day when opened from a card). The session note's
+  title and whatever is typed in the note, at tap time). The About sheet had *Ask me about this exercise*
+  until 2026-10-12, when Amir took it off (*"remove the whatsapp button"*). The session note's
   placeholder no longer invites swap requests: a note is read, never answered, so anything that needs
   an answer goes through the door.
 - **Gone:** the thread, the composer, the unread dot on the Coach tab, the boot-time fetch of messages
@@ -840,7 +869,7 @@ tints, the running bar, labels, and so it marked nothing. Now:
 
 - **Clay stays on what asks the athlete to look**: the Coach's note (the box, its label, *More*, and the dot
   after the name), a Because (the solid clay ⓘ), an RPE over its target (the set's RPE tag, the selected
-  button, the Last time box and the ghost line under a set that ran over), the tempo digit, a banner that asks
+  button, a circuit's Last time strip and the ghost line under a set that ran over), the tempo digit, a banner that asks
   for something (a day filed unfinished, a report waiting), a suggestion's kicker (LIB-01: *Sore today*, *Week done*),
   the numbers in a week note's headline (Front Page, 2026-10-12: *RPE 7*, *One set fewer*), and the same numbers on
   the session bar's limits row (*Max RPE 7 · 1 set fewer*; its label stays grey),
@@ -969,12 +998,13 @@ Built from Amir's notes on two mockups (claude.ai/artifact/EzD59Z2yYA2pXWyqFxQ8r
   pill is gone.
 - **A long name wraps beside its number** (`.item-name-row` no longer wraps), never under it.
 
-**Open**, in this order: the note, **Last time**, **How to do it**, the sets, Rest. There is no *Log Sets* label.
-- **Last time is a box** (`paintLastTime()` into `.lt-slot`): closed it shows last session's **last set**,
-  `70 kg × 5 @ 8` (the RPE clay over target, steel blue under; `ltLastSetHtml()`); tapped, every set, the
-  RPEs against the target, the note and **History ›**. Open or closed is ONE setting for the phone,
-  `lt_open` (`ltToggle()`: every box follows the one tapped; unprefixed, so it never syncs). A first
-  meeting shows the **First time** box. A circuit keeps its old strip, always open.
+**Open**, in this order: the note, **How to do it**, the sets, Rest. There is no *Log Sets* label.
+- **No Last time box** (Amir, 2026-10-12: *"the history ... should be removed from exercise cards. because their last
+  time, is actually already in the reps, weight box"*). It was a box under the note (CARD-01, 2026-09-27: the last set,
+  tapped open to every set and History ›). Now last time's weight is each empty kg box's LAST, a set that ran over its
+  target keeps its faint ghost line, and the history is the ⓘ's **Your history** row, which opens the History sheet.
+  `paintLastTime()` still draws a first meeting's **First time** line and a circuit's strip (always open: a circuit's kg
+  boxes show nothing of last time). The phone's old `lt_open` setting is read by nothing.
 - **How to do it** (`renderHowTo()`, a `<details class="ex-how">`; the steps since 2026-10-11): one folded row that
   holds, in this order, the video when there is one, **You need:**, the entry's numbered steps, then the cues (with
   steps above them the cues take back their *Coaching Cues* label). The row reads **How to do it** with a quiet count

@@ -205,23 +205,27 @@ const HIST_MET = H.HISTORY.map(s => Object.assign({}, s, { log: s.log.concat([{ 
     t.check(`${tag}: Guided carries the steps with the card`, g.steps === 5 && /5 steps/.test(g.label), JSON.stringify(g));
     await p.evaluate(() => closeStepMode());
 
-    // 6. the About sheet: from Library → Exercises the video, steps and cues sit above the body map; from a card, none
+    // 6. the About sheet (Changeover, 2026-10-12): from Library → Exercises "How do I do it?" (the video, You need, the
+    // steps, the cues) is the first band, above "What does it do?"; from a card, none of it (scripts/headless/about-sheet.js has the rest)
     const sheet = await p.evaluate(`(() => {
       openExerciseSheet('barbell-back-squat', xlCardFor('barbell-back-squat'), true);
       const m = document.querySelector('#hist-overlay .readiness-modal');
       const y = sel => { const e = m.querySelector(sel); return e ? Math.round(e.getBoundingClientRect().top + m.scrollTop) : null; };
-      const lib = { video: y('.ex-vunit'), kit: y('.ex-kit'), steps: y('.ex-steps'), cues: y('.sp-cues'), body: y('.bmap, .sp-parts'),
-        n: m.querySelectorAll('.ex-steps li').length, label: (m.querySelector('.sp-how .sp-lbl') || {}).textContent, over: m.scrollWidth - m.clientWidth };
+      const qs = [...m.querySelectorAll('.ax-band h3.ax-q')];
+      const does = qs.find(q => q.textContent === 'What does it do?');
+      const lib = { video: y('.ax-how .ex-vunit'), kit: y('.ax-how .ex-kit'), steps: y('.ax-steps'), cues: y('.ax-cues'),
+        does: does ? Math.round(does.getBoundingClientRect().top + m.scrollTop) : null,
+        n: m.querySelectorAll('.ax-steps li').length, label: qs.length ? qs[0].textContent : '', over: m.scrollWidth - m.clientWidth };
       closeHistorySheet();
       openExerciseSheet('barbell-back-squat', ${H.card('Barbell Back Squat')});
-      const fromCard = { steps: m.querySelectorAll('.ex-steps').length, video: m.querySelectorAll('.ex-vunit').length, cues: m.querySelectorAll('.sp-cues').length };
+      const fromCard = { steps: m.querySelectorAll('.ax-steps, .ex-steps').length, video: m.querySelectorAll('.ex-vunit').length, cues: m.querySelectorAll('.ax-cues').length };
       closeHistorySheet();
       return { lib, fromCard };
     })()`);
     const L = sheet.lib;
-    t.check(`${tag}: About sheet from Library: How to do it (video, You need, steps, cues) above the body map`,
-      L.label === 'How to do it' && L.n === 5 && L.video < L.kit && L.kit < L.steps && L.steps < L.cues && L.body != null && L.cues < L.body && L.over <= 0, JSON.stringify(L));
-    t.check(`${tag}: About sheet from a card: unchanged, no video, steps or cues`, sheet.fromCard.steps === 0 && sheet.fromCard.video === 0 && sheet.fromCard.cues === 0, JSON.stringify(sheet.fromCard));
+    t.check(`${tag}: About sheet from Library: How do I do it? (video, You need, steps, cues) before What does it do?`,
+      L.label === 'How do I do it?' && L.n === 5 && L.video < L.kit && L.kit < L.steps && L.steps < L.cues && (L.does == null || L.cues < L.does) && L.over <= 0, JSON.stringify(L));
+    t.check(`${tag}: About sheet from a card: no video, steps or cues`, sheet.fromCard.steps === 0 && sheet.fromCard.video === 0 && sheet.fromCard.cues === 0, JSON.stringify(sheet.fromCard));
     if (w === 360 && !dark) {
       await p.evaluate(() => { openExerciseSheet('box-jump', null, true); });
       await p.waitForTimeout(400);

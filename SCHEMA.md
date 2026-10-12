@@ -844,8 +844,9 @@ bodyweight version (Box Step-Up vs Dumbbell Box Step-Up, NAM-2).
   circuit item, the circuit's note). So the entry must be **approved** before a programme that uses it
   goes live, or the card shows no cues.
 - The card gains one small **ⓘ** after the name when the entry is **approved**. It opens the
-  About sheet: purpose, on court (tennis/padel only), Body parts involved, Regressions · Progressions · Alternatives,
-  where it sits in the programme, History.
+  About sheet (Changeover, 2026-10-12; `PROGRAM-APP.md` → *The About sheet is Changeover*): the Because, purpose and
+  qualities, on court (tennis/padel only), the muscles (or body parts) lit and named, Regressions · Progressions ·
+  Alternatives, where it sits in the programme, Your history. `impact` is not shown (it stays for the app's rules).
 - Drafts are invisible to athletes: `get_exercises()` serves approved entries only, and never
   the coach half (`exercise_coach`: SFR rank, restriction flags, the muscle credits and cost tier).
 - **Every change is kept** (stage49, 2026-10-10): `spine_versions` holds the row as it was before each change

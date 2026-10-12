@@ -239,7 +239,9 @@
 // v111: program.html changed (2026-10-12, Front Page): a week's note is the This Week section on Home (the athlete's name, the first
 //      sentence as the headline, Amir's signature and photo) and no longer sits at the top of a session. Without the bump a phone keeps the box.
 // v112: program.html changed (2026-10-12): the session bar shows the week's limits on a thin last row (Max RPE 7 · 1 set fewer).
-const CACHE = 'aap-v112';
+// v113: program.html changed (2026-10-12, Changeover): the ⓘ's About sheet is new (questions, green tiles, the body in green with
+//      a line under it, Your history; no WhatsApp door, no impact), and the open exercise card has no Last time box.
+const CACHE = 'aap-v113';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
