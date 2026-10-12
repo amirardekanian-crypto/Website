@@ -250,7 +250,8 @@
 // v119: habits.html changed (2026-10-12, UX audit batch C): a habit's page has ‹ and leads with today's control.
 // v120: habits.html changed (2026-10-12, UX audit batch D): Crew is one list with your name in a sheet, the Locker says each count once, Settings has headings and no tab bar.
 // v121: habits.html changed (2026-10-12, UX audit batch E): the manual folds, the tour is shorter with pill buttons, no em-dashes in athlete copy.
-const CACHE = 'aap-v121';
+// v122: habits.html changed (2026-10-12, UX audit): Outfit is our own file (/assets/fonts/Outfit-Variable.woff2), the takeover's Continue is the app's primary.
+const CACHE = 'aap-v122';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

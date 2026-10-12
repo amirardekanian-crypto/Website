@@ -70,7 +70,10 @@
     document.head.appendChild(link);
   })();
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Outfit is our own file since 2026-10-12 (the UX audit): the site stopped asking Google for its fonts
+     on 2026-10-02, and whether Google Fonts reach athletes in Iran was never confirmed. Latin, 400-800, OFL. -->
+<style>@font-face { font-family: 'Outfit'; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url('/assets/fonts/Outfit-Variable.woff2') format('woff2'); }</style>
 <!-- onerror (REL-01, 2026-09-26): with no signal this CDN download fails (the service
      worker keeps only this site's own files); the flag stops _sbReady() polling for it. -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.SB_FAILED=true"></script>
@@ -166,6 +169,8 @@
     background: var(--bg);
   }
   .app.on { display: flex; }
+  /* On a wide screen the phone column reads as a column (2026-10-12). */
+  @media (min-width: 600px) { html:not(.embed) .app { border-left: 1px solid var(--rule); border-right: 1px solid var(--rule); } }
   .scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   .scroll::-webkit-scrollbar { width: 0; }
 
@@ -1823,7 +1828,8 @@
   .lvwrap.rank .lvkicker { color: rgba(255,255,255,0.85); }
   .lvwrap.badge .lvkicker { color: #CFF7EC; }
   .lvrank { font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.01em; }
-  .lvgo { border-radius: 999px; background: #35D0BA; color: #0C4B43; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 14px; letter-spacing: 0.02em; text-transform: none; box-shadow: 0 4px 0 #1FA791; }
+  /* The app's primary (2026-10-12): it was the only teal button in the app. */
+  .lvgo { border-radius: 999px; background: #6C5CE7; color: #FFFFFF; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 14px; letter-spacing: 0.02em; text-transform: none; box-shadow: 0 4px 0 #4B3DC4; }
   .lvwrap.rank .lvgo { background: #fff; color: #6C5CE7; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
   .lvwrap.badge .lvgo { color: #14806E; background: #fff; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
   .lvqueue { font-family: 'Outfit', sans-serif; font-weight: 600; letter-spacing: 0.1em; }
