@@ -132,9 +132,28 @@ any week: a note can sit on a test week or a lighter week, and shows only during
   written with them; no migration), and a numeric key wins over the alias for the same week.
   ⚠️ **Not `weeks`**, which is the "Weeks 1–5" label string; the first build used that name and
   would have broken every cycle card.
-- **program.html `weekNoteNow()` / `weekNoteHTML()`** show the text (in the Coach's Note look) under
-  **This Week** on Home and at the top of every session, **only inside the note's own week**, from the
-  same `cycleWeekInfo()` that draws "Week X of Y". With today's week `wk` of `total`, a note shows only
+- **program.html `weekNoteNow()` / `weekNoteHTML()`** show the note **on Home only, inside its own week**, from
+  the same `cycleWeekInfo()` that draws "Week X of Y". Never at the top of a session (Amir, 2026-10-12: *"dont show
+  this at the top of each day workout, just in the home tab"*). In a session the note's numbers reach a target only on a
+  lower day (`dayRpe()`, below); on a normal day the session shows the card as written, so Home is the one place the
+  athlete reads the week's cap.
+  **The look is Front Page** (Amir chose A of three on the Week Note Lookbook, claude.ai/artifact/9Y4Rf1eBQ7DB1DJ9rKqBym,
+  with his own changes: *"instead of from amir at the bottom add my sign and image but not the "your coach" text and
+  use their name in the text"*). No box and no tint: in its week the note IS the This Week section. `renderHome()`
+  draws `weekNoteHTML(cur) ||` the usual heading, so a week with no note is unchanged. From the top: a 2px rule and a
+  Space Mono kicker (*This week*, or the week's name when it has one and the headline is a sentence) with the week's
+  count on its right (`#home-week-sum` is the kicker's `.wn-count`, and `paintWeek()` writes its short form, *1 of 2
+  done*); the athlete's first name (*Alex,*, from `DATA.athlete.firstName`, left out when there is none); the text's
+  **first sentence as a sentence-case headline** (Barlow Condensed 900 at `--fs-head`, never louder than the day
+  cards), with clay only on the words that ARE the note's numbers (`mark()`: *RPE 7* for `rpeCap`, *one set fewer*
+  for `setsDrop`, an `rpeDrop` only when there is no cap, as `dayRpe()` reads them); the rest of the text at full
+  size; a number the words did not say on its own small line; then a hairline, his signature (`WN_SIG`, a drawn
+  stand-in until he sends his own) in green ink and his photo (`assets/img/coach.jpg`, the Coach tab's). Three
+  shapes so any note reads: `sentence` (the first sentence, 100 characters or fewer, is the headline), `name` (a
+  longer one: the week's name is the headline and the whole text sits under it), `lead` (no title and no numbers:
+  one calm paragraph). Amir's words are never changed, only set: `tie()` adds non-breaking spaces (*RPE 7*, *3 to 5*).
+  The section keeps `week-note week-note-<key>`, `data-label` (the week's name) and `data-t` on the parts that are
+  the note's own words, which the test reads. With today's week `wk` of `total`, a note shows only
   while the cycle has started and not ended (`!before && !after`): `notes[String(wk)]`, else
   `notes.first` when `wk` is 1, else `notes.last` when `wk` is the last of more than one. Before the
   start date nothing shows (until 2026-10-11 `cycleWeekInfo()` clamped to week 1 and the `first` note
@@ -143,10 +162,12 @@ any week: a note can sit on a test week or a lighter week, and shows only during
   `last`, else *Week N*. The result carries the note's fields plus `key` (`first` / `last` for the
   aliases, `week` for a numeric key, the CSS class `week-note-<key>`; all look the same) and `wk`.
   The numbers never change a card on their own: only a lower day's target reads them (`dayRpe()`,
-  below), in that week only, and the lower of the two wins. `scripts/headless/week-notes.js` (61 checks)
-  covers every row above and fails on the old `weekNoteNow()`.
+  below), in that week only, and the lower of the two wins. `scripts/headless/week-notes.js` (70 checks)
+  covers every row above and the Front Page look (the name, the clay, the count in the kicker, the dose line,
+  the signature and photo, no note in a session, 320 px), and fails on the old `weekNoteNow()`.
 - **The pipeline owns it:** /program-design decides both doses as numbers (`week1:` / `lastweek:`),
-  /program-engage writes the words (PART 3c), /program-assemble stores them, and
+  /program-engage writes the words (PART 3c: the first sentence is the rule, under 100 characters, with no greeting,
+  name or sign-off, COM-16; the checker warns on each), /program-assemble stores them, and
   `scripts/check_program.py` FAILs a cycle with no note on its final week (and a first cycle with no
   week 1 note). The 32 older programmes gain it with their next cycle, not by a bulk write.
   (What the pipeline writes and checks is in SCHEMA.md and the rule index; the app reads both shapes.)
@@ -191,7 +212,7 @@ off in their notes.
   written number, and it does not stack with the week note (`weekNoteNow()`): the lower target wins.
   The week note's own number is floored at 6 too (CHP-4; until 2026-09-27 a written 6 in a week with
   `rpeDrop: 1` read *6 → 5 today* on a lower day, a target no RPE button can log).
-  ⚠️ **coach.html's `dayTargetC()` is its twin** (without the week note): change both.
+  ⚠️ **coach.html's `dayTargetC()` is its twin** (week note included, `check_twins.js` §4): change both.
 - **Completion follows the day.** `getDayCompletion()` does not count optional or skipped work as
   missing, and a halved exercise asks for its halved sets, so a red day with its core done is
   *Complete*, not *Partial*. The report tags that work `(optional today)` / `(skipped today: sore)`
@@ -674,7 +695,8 @@ their rest days, athlete can move the days". So:
   habits · day complete" beside the strip's "1 of 5 done", two answers to one question. `habitCardHtml()` reads
   `verdict` and `togo` from Proof's snapshot and never works them out (`HABITS.md` → *card snapshot*). A
   snapshot from an earlier day shows the level until the strip writes today's.
-- A week where every day is done says "All 3 sessions done this week", with every day a row. Nothing more.
+- A week where every day is done says "All 3 sessions done this week" (in a week with a note, "All 3 done" on the
+  note's top line), with every day a row. Nothing more.
 
 ## 🏆 This cycle: where it is, and the wins (PROG-01, 2026-09-27)
 
@@ -808,6 +830,7 @@ tints, the running bar, labels, and so it marked nothing. Now:
   after the name), a Because (the solid clay ⓘ), an RPE over its target (the set's RPE tag, the selected
   button, the Last time box and the ghost line under a set that ran over), the tempo digit, a banner that asks
   for something (a day filed unfinished, a report waiting), a suggestion's kicker (LIB-01: *Sore today*, *Week done*),
+  the numbers in a week note's headline (Front Page, 2026-10-12: *RPE 7*, *One set fewer*),
   and the one number on a dark Home card (*Week 2*, the habits row's *2 to go*). The Library's Playbook door keeps its clay: it is a brand tile, not a signal.
 - **Green or grey for everything else**: every block's title, stripe and done tint are the same green (warm-up
   and power were clay and strength green, and a block the app did not recognise took its colour from its
@@ -1194,7 +1217,7 @@ the minutes, "no kit" (equipment *Bodyweight*) and "ticks Mobility" are read off
   finished card offers *The Morning After* under its message: *"The Morning After: keep moving, tonight or
   tomorrow. 17 min, no kit."* About one check-in in twelve (25 of 302 in the 90 days to 2026-09-27).
 - **Week done** (`paintWeekSugg()`): every session of this week is done (`weekDoneOn()`, the same sources as
-  `weekDoneDays()`, so it shows exactly when This Week says *All N sessions done*), so Home offers *Green Light*
+  `weekDoneDays()`, so it shows exactly when This Week says *All N sessions done*, or *All N done* in a week with a note), so Home offers *Green Light*
   in one row under the week's days. It goes when the week turns.
 - **Each line goes once its session has been opened** after the moment began (the check-in's time; the day the
   week's last session was done). The phone keeps only when each pick was last opened, `<id>_libseen`

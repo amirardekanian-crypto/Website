@@ -310,6 +310,12 @@ the principles (their *How to add*).
 - `COM-16` **A week note is short and says it once.**
   - It lived in /program-engage PART 3c, and the checker already warned on the length and the label.
   - Registered as it was on 2026-09-26 (Amir: yes to numbering the rules that lived only in skills).
+  - 2026-10-12: Amir did not like the note's look (a pale clay box with a stripe) and asked for three directions
+    (the Week Note Lookbook, claude.ai/artifact/9Y4Rf1eBQ7DB1DJ9rKqBym). He chose A, Front Page: *"lets go with A but:
+    instead of from amir at the bottom add my sign and image but not the "your coach" text and use their name in the
+    text. dont show this at the top of each day workout, just in the home tab. update the rules and pipeline if
+    needed"*. The first sentence became the headline, so it must be the rule and short; the name and the sign-off
+    became the app's job, so the text carries neither. The note left the top of each session the same day (PRC-15).
 - `COM-17` **The WhatsApp messages point into the app; they never rewrite it.**
   - Amir, 2026-10-11, after a cycle's two handoff messages restated the cards (the cough rule, the food, the period week) in full: "if something is inside the app show them how to find those with a very brief explanation of how to find them … if the info exist in their app, show them how to find them instead of writring the whole thing again in a very long message."
   - 2026-10-11

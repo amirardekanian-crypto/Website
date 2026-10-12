@@ -342,8 +342,11 @@ it in that week only: not before the cycle starts, not after it ends.
 | `.rpeCap` | number | Optional, 6–9: no set above this RPE this week. |
 
 The final week's note must carry at least one of the three numbers, so the dose is a decision and not only a
-feeling. The numbers never change a card: the app shows `text` only (`weekNoteHTML()` in
-`program.html`, under **This Week** on Home and at the top of every session that week). `rpeCap` and `rpeDrop`
+feeling. The numbers never change a card: the app shows the note on Home only, as the This Week section that week
+(`weekNoteHTML()` in `program.html`, Front Page since 2026-10-12: the athlete's first name, the text's first
+sentence as the headline with `rpeCap` / `setsDrop` coloured where the words say them, the rest, Amir's signature;
+a number the words do not say gets its own small line). So `text` opens with the rule in one sentence under 100
+characters and carries no greeting, name or sign-off (COM-16). It is not shown in a session. `rpeCap` and `rpeDrop`
 also move that week's daily RPE target, and only that week's (`dayRpe()`); `setsDrop` is a decision the text tells
 the athlete, and nothing in the app applies it. `scripts/check_program.py` reads all three. A cycle without
 `weekNotes` (every programme written before 2026-09-26) shows nothing: the app never invents a

@@ -203,12 +203,20 @@ opens the About sheet under **Why you**, and the cycle's Why page groups them by
 
 **PART 3c — Week notes (2026-09-26; any week since 2026-10-11).** From design's `weeknotes:` lines,
 write the words the app shows the athlete during that week and only then (`cycles[n].weekNotes`,
-SCHEMA.md), under This Week on Home and at the top of every session. Amir: *"update the app in a way
-that it can show first week or last week"*, then *"only make it appear on the assigned week, for example
-when some one has a testing week, or reduced load"*.
+SCHEMA.md), on Home only, where the note IS the This Week section (PRC-15; never at the top of a session).
+Amir: *"update the app in a way that it can show first week or last week"*, then *"only make it appear on the
+assigned week, for example when some one has a testing week, or reduced load"*.
+**How Home sets it (Front Page, 2026-10-12):** the athlete's first name (*"Alex,"*), then your **first sentence
+as the week's headline** with its numbers in clay, then the rest of the text, then Amir's signature and photo.
 - **One or two short sentences, under ~260 characters, in Amir's voice** (COM-16). Start with the
-  instruction, never with the label: the app already prints the note's title, or **Week N**, above it.
+  instruction, never with the label: the app already names the week above it.
   A testing or lighter week has a title, which design names on its line.
+- **The first sentence is the rule, under 100 characters**, with its number in the words the app colours:
+  *"RPE 7"* (or *"RPE at 7"*) for an `rpeCap`, *"one set fewer"* for a `setsDrop`, *"one point lower"* for an `rpeDrop`. Good: *"Keep every set at RPE 7 or under this
+  week."* · *"One set fewer on every exercise and nothing above RPE 7."* The why and any exception go in the second
+  sentence. A first sentence over 100 characters loses the headline (the app falls back to the week's name).
+- **No greeting, no name, no sign-off.** The app opens with their name and closes with Amir's signature; written
+  in the text they would show twice. The checker warns on all three.
 - **The numbers exactly as design decided, in words:** "one set fewer on every exercise",
   "every RPE at 6". An RPE going down names the floor in the same sentence ("never below 6").
 - A few words of why, when it helps: *"You get stronger in the easy week, not only the hard ones."*

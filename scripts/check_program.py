@@ -763,6 +763,20 @@ def check_week_notes(data, args):
         label = (n.get('title') or ('Back-off week' if key == 'last' else f'Week {wk}')).lower()
         if text and text.lower().startswith(label):
             warn(f"{where}: the text starts by repeating its label ('{label}'); start with the instruction", 'COM-16')
+        # Home sets the note as a cover (Front Page, 2026-10-12): the athlete's first name, the FIRST sentence as the
+        # headline (only up to 100 characters, its numbers in clay), the rest under it, Amir's signature and photo.
+        # The same sentence split as program.html weekNoteHTML().
+        if text:
+            m = re.match(r'^(.+?[.!?])\s+(?=[A-Z0-9"\'(“])', text)
+            head = m.group(1) if m else text
+            if len(head) > 100:
+                warn(f"{where}: the first sentence is {len(head)} characters; Home sets it as the week's headline only up to 100, "
+                     "so lead with the rule in one short sentence (\"Keep every set at RPE 7 or under this week.\")", 'COM-16')
+            fn = str((data.get('athlete') or {}).get('firstName') or '').strip()
+            if re.match(r"(hi|hey|hello|dear|salam)\b", text, re.I) or (fn and re.match(re.escape(fn) + r'\b', text, re.I)):
+                warn(f"{where}: the text opens with a greeting or the name; Home already opens the note with \"{fn or 'their name'},\"", 'COM-16')
+            if re.search(r"(^|[\s,.!\-–—])(amir|coach amir|your coach)\.?\s*$", text, re.I):
+                warn(f"{where}: the text ends with a sign-off; Home signs every note with Amir's signature and photo", 'COM-16')
         if key not in ('first', 'last') and wk > 1 and not n.get('title'):
             warn(f"{where}: give week {wk}'s note a title (Testing week, Lighter week) so the athlete sees what kind of week it is", 'PRC-15')
     key, last = found.get(total, (None, None))

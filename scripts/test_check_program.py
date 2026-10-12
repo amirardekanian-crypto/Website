@@ -131,6 +131,15 @@ out = run(with_notes({"5": BACKOFF}, startDate="2026-10-12", endDate="2026-11-22
 expect('...so a note on week 5 is not its back-off', has(out, 'FAIL', 'no week note on the final week (week 6)'), out)
 d = with_notes({"3": dict(TEST, text="Take 1 off every RPE this week."), "5": BACKOFF})
 expect('a middle week\'s words are read too (RPE drop without the floor)', has(run(d, ctx=CTX), 'FAIL', 'lowers the RPE without naming the floor'))
+# Home sets the first sentence as the headline and adds the name and the signature itself (Front Page, 2026-10-12).
+out = run(with_notes({"1": W1, "5": BACKOFF}), ctx=CTX)
+expect('short first sentences, no greeting, no sign-off: no headline warning', not has(out, 'WARN', 'first sentence is') and not has(out, 'WARN', 'greeting') and not has(out, 'WARN', 'sign-off'), out)
+long_first = dict(BACKOFF, text="One set fewer on every exercise and nothing above RPE 6, except the test sets on bench and leg press today. Easy.")
+expect('a first sentence over 100 characters warns', has(run(with_notes({"5": long_first}), ctx=CTX), 'WARN', 'the first sentence is'))
+expect('a note that opens with the name warns', has(run(with_notes({"5": dict(BACKOFF, text="Test, one set fewer on everything and every RPE at 6.")}), ctx=CTX), 'WARN', 'opens with a greeting or the name'))
+expect('a note that opens with Hi warns', has(run(with_notes({"5": dict(BACKOFF, text="Hi! One set fewer on everything and every RPE at 6.")}), ctx=CTX), 'WARN', 'opens with a greeting'))
+expect('a note signed off warns', has(run(with_notes({"5": dict(BACKOFF, text="One set fewer on everything and every RPE at 6. Amir")}), ctx=CTX), 'WARN', 'sign-off'))
+expect('a word that only starts like the name does not warn', not has(run(with_notes({"5": dict(BACKOFF, text="Testing aside, one set fewer on everything and every RPE at 6.")}), ctx=CTX), 'WARN', 'opens with a greeting'))
 
 # Prep is a circuit and every working exercise and circuit has its own rest (2026-10-11).
 def set_prep(d, day, exercises): d['workouts']['days'][day]['blocks'][0]['exercises'] = exercises; return d

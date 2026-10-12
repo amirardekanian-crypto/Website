@@ -191,7 +191,7 @@ stale copy reached athletes.
 | COM-13 | When a cycle turns on body mass, a card sends the athlete to Home → Body Weight in the programme app, never AA Proof. | engage | ✓ (weighing in + Proof) · oblig `weigh-in` |
 | COM-14 | A Coach's Note is one to three sentences about this athlete, point first: start weight, limit, kit, checked fallback. Never general how-to, cue or dose. | engage · edit | warn (over 3 sentences or 300 characters) |
 | COM-15 | A Because is one sentence of 140 characters at most, written fresh each cycle, never carried over. | engage | ✓ (140 characters) |
-| COM-16 | A week note is one or two short sentences under about 260 characters, starting with the instruction; no notes card repeats it. | engage | warn (length, label) |
+| COM-16 | A week note is one or two sentences under ~260 characters, the first the rule under 100; no greeting, no sign-off, said once. | engage | warn (length, label, headline, greeting, sign-off) |
 | COM-17 | The handoff message points into the app: each action is a one-line gist plus where it is; never a card's full text. | engage | |
 
 ### Coaching cues & the library
@@ -233,7 +233,7 @@ stale copy reached athletes.
 | PRC-12 | Every build ends with a coach handoff: measurements, gates, films, dated escalations and decisions made for Amir, each with its reason. | assemble | |
 | PRC-13 | Reassessment is scheduled: every cycle has a set length and a trigger (a primary stalled about two weeks). | design | |
 | PRC-14 | The roadmap is 5 cycles of 5 weeks, each 4 loading weeks and 1 back-off. Deviate only on Amir's word, and say so. | roadmap | |
-| PRC-15 | A week note is assigned to one week and shows only then: design sets the numbers, engage the words, assemble stores them as `weekNotes`. | design · engage · assemble | ✓ |
+| PRC-15 | A week note belongs to one week and shows only then, on Home: design sets numbers, engage the words, assemble stores `weekNotes`. | design · engage · assemble | ✓ |
 | PRC-16 | One current athlete profile heads the coaching log: intake drafts it, every run keeps it current, and the checker reads it. | intake · design · edit | warn (missing) |
 | PRC-17 | The roadmap is written once and locked. A change goes through design's `roadmap_amend:` line at the checkpoint, never a quiet rewrite. | roadmap · design | |
 | PRC-18 | Every cycle's rationale is appended to the coach-only coaching log and never overwritten. | assemble | |
@@ -977,7 +977,12 @@ same ID. Read a rule's story and its history before changing it.
   the grip (the pill, NAM-5). The checker warns past three sentences or 300 characters, on a note that repeats
   its own pill or its entry's steps or cues (CUE-7), and on a grip written in a note.
 - `COM-15` **A Because is one sentence of 140 characters at most, written fresh each cycle.** A reason from Cycle 1 is stale by Cycle 3, so it is never carried over.
-- `COM-16` **A week note is short and says it once.** One or two short sentences under about 260 characters, starting with the instruction (the app already prints its label above it: the note's title, or *Week N*), and no notes card repeats it.
+- `COM-16` **A week note is short and says it once.** One or two short sentences under about 260 characters, starting with the instruction (the app already names the week above it), and no notes card repeats it.
+  Home sets it as a cover (Front Page, 2026-10-12): the athlete's first name, then the **first sentence as the
+  week's headline**, its numbers in clay, the rest under it, then Amir's signature and photo. So the first sentence
+  IS the rule, with the number in the words the app colours (*"Keep every set at RPE 7 or under this week."*,
+  *"One set fewer on every exercise and nothing above RPE 7."*), and under 100 characters (longer, and the headline
+  falls back to the week's name). No greeting, no name, no sign-off: the app adds all three. The checker warns on each.
 - `COM-17` **The handoff message points into the app; it never rewrites it.** The cards, Coach's Notes and
   week notes hold everything in full, so a line about anything the app holds is a short gist in the athlete's
   language (what to do) plus where it is, by the app's own names: *"if the cough won't settle, stop and
@@ -1318,8 +1323,9 @@ same ID. Read a rule's story and its history before changing it.
   **A week note belongs to one week (2026-09-26, widened 2026-10-11).** /program-design decides a special
   week's dose as numbers (how many sets fewer, how many RPE points off, or an RPE cap, never below 6),
   /program-engage writes the athlete's words, and /program-assemble stores both in the cycle's `weekNotes`
-  under that week's number (`"1"`, `"4"`, `"5"`). The app shows a note only in its own week, under This Week
-  on Home and at the top of every session, and nowhere else: not before the cycle starts, not after it ends.
+  under that week's number (`"1"`, `"4"`, `"5"`). The app shows a note only in its own week, on Home, where it
+  IS the This Week section (since 2026-10-12), and nowhere else: not at the top of a session (there its numbers
+  reach a target only on a lower day, through dayRpe()), not before the cycle starts, not after it ends.
   Every cycle has the back-off on its final week, and week 1 has a note when it differs (always for a new
   athlete). Any other week that differs from the card, a testing week or a reduced-load week, gets its own
   note with a title (*Testing week*, *Lighter week*). `first` and `last` still read as week 1 and the final

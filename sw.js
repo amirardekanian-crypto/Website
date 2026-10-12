@@ -236,7 +236,9 @@
 // v110: program.html changed (2026-10-12): a finished session goes into the phone's queue BEFORE it is sent and leaves it only when the server
 //      has it (10 sessions of 4 athletes were lost when the call never came back), a day left unfinished is filed by itself at the next open
 //      (no more Send it / Clear it), and the phone keeps a synced list of the sessions it finished. Without the bump a phone keeps the old save.
-const CACHE = 'aap-v110';
+// v111: program.html changed (2026-10-12, Front Page): a week's note is the This Week section on Home (the athlete's name, the first
+//      sentence as the headline, Amir's signature and photo) and no longer sits at the top of a session. Without the bump a phone keeps the box.
+const CACHE = 'aap-v111';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

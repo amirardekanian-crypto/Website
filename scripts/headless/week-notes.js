@@ -4,6 +4,10 @@
 // numeric key wins over the alias for the same week. Nothing shows before the start date (it used to: the clamped
 // week 1 picked `first` the day before the cycle began, 2026-10-11) or after the end date. A note's rpeCap /
 // rpeDrop reach today's targets (dayRpe(), paintToday()) in that week only.
+// Since 2026-10-12 (Front Page, Amir: "just in the home tab") a note shows on Home ONLY, as the This Week section
+// itself: the kicker carries the week's count, the athlete's first name opens it, the numbers in the headline are
+// clay, a number the headline did not say goes on its own line, and Amir's signature and photo close it. A session's
+// panel never shows it.
 // Serve the repo first (python3 -m http.server 8765 --bind 127.0.0.1, see lib.js), then:
 //   node scripts/headless/week-notes.js [--out <dir>]
 'use strict';
@@ -32,28 +36,31 @@ function prog(dayIn, notes, { len = 34, rpe = 9 } = {}) {
 const MID = n => (n - 1) * 7 + 3;
 const END_DATE = 34, AFTER_END = 35, STARTS_TOMORROW = -1, STARTS_IN_9 = -9, STARTS_TODAY = 0;
 
-// Home's note, every day panel's top note, and weekNoteNow(), as the page has them.
+// Home's note, any note inside a day panel, and weekNoteNow(), as the page has them. A note reads as { cls, label, body }:
+// its week-note-<key> class, the week's name (data-label) and the note's own words (the [data-t] parts, which split
+// Amir's text into the headline and the rest; joined back, with the non-breaking spaces tie() puts in read as spaces).
 const seen = p => p.evaluate(() => {
-  const label = n => (n.querySelector('.week-note-label') || {}).textContent || '';
-  const read = n => n ? { cls: n.className.replace('week-note ', ''), label: label(n), body: n.textContent.slice(label(n).length) } : null;
-  const panels = [...document.querySelectorAll('#day-view .day-content')].map(d => {
-    const n = d.querySelector('.day-focus-tag').nextElementSibling;
-    return read(n && n.classList.contains('week-note') ? n : null);
-  });
+  const read = n => n ? {
+    cls: [...n.classList].find(c => c.startsWith('week-note-')) || '',
+    label: n.dataset.label || '',
+    body: [...n.querySelectorAll('[data-t]')].map(x => x.textContent).join(' ').replace(/ /g, ' '),
+  } : null;
   const now = weekNoteNow(currentCycleData());
   return {
     home: read(document.querySelector('#home-week-wrap .week-note')),
     homeCount: document.querySelectorAll('#home-week-wrap .week-note').length,
-    panels,
+    inPanels: document.querySelectorAll('#day-view .day-content .week-note').length,
+    heading: !!document.querySelector('#home-week-wrap .home-section-title'),
     total: document.querySelectorAll('.week-note').length,
     now: now ? { key: now.key, wk: now.wk } : null,
   };
 });
-// What a note should look like on every screen: { cls, label, body }, or null for none.
+// What Home's note should be: { cls, label, body }, or null for none. Never in a session's panel, and in its week the
+// note stands in for the This Week heading.
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 function expectOk(s, want) {
   if (!want) return s.home === null && s.total === 0 && s.now === null;
-  return same(s.home, want) && s.homeCount === 1 && s.panels.length === 2 && s.panels.every(x => same(x, want)) && s.total === 3
+  return same(s.home, want) && s.homeCount === 1 && s.inPanels === 0 && s.total === 1 && !s.heading
     && s.now && s.now.key === want.cls.replace('week-note-', '');
 }
 
@@ -117,29 +124,71 @@ function expectOk(s, want) {
   for (const [tag, wn] of [['no weekNotes', undefined], ['an empty object', {}], ['null', null], ['an array', []], ['a string', 'x']])
     await run(`${tag}: nothing, no errors`, MID(3), wn, null);
 
-  // ── The open day: the note is the first thing under the focus tag, above the session bar ──────────────────────────
+  // ── The open day: no note at the top of a session (Home only since 2026-10-12) ─────────────────────────────────────
   for (const [dark, name] of [[false, 'week-notes-day'], [true, 'week-notes-day-dark']]) {
     const { ctx, p } = await H.openProgram(browser, { prog: prog(MID(3), { '3': { text: 'Test week: we find your best set of the cycle. Warm up well and go to RPE 8 on the last set only.', title: 'Test week' } }), dark });
     await shot(p, name.replace('day', 'home'));
     await p.evaluate(() => openDayView('1'));
     const top = await p.evaluate(() => {
       const d = document.querySelector('#day-view .day-content.active');
-      const n = d.querySelector('.day-focus-tag').nextElementSibling;
-      const bar = d.querySelector('.session-timer');
-      return { isNote: n.classList.contains('week-note'), shown: n.getBoundingClientRect().height > 0 && !document.getElementById('day-view').hidden,
-        aboveBar: !!(n.compareDocumentPosition(bar) & Node.DOCUMENT_POSITION_FOLLOWING), label: (n.querySelector('.week-note-label') || {}).textContent,
-        sideways: document.documentElement.scrollWidth - window.innerWidth };
+      return { notes: d.querySelectorAll('.week-note').length, next: d.querySelector('.day-focus-tag').nextElementSibling.className,
+        home: (document.querySelector('#home-week-wrap .week-note') || {}).dataset, sideways: document.documentElement.scrollWidth - window.innerWidth };
     });
-    t.check(`open day${dark ? ' (dark)' : ''}: the Test week note is at the top, shown, above the session bar`, top.isNote && top.shown && top.aboveBar && top.label === 'Test week', JSON.stringify(top));
+    t.check(`open day${dark ? ' (dark)' : ''}: no week note in the session, the session bar right under the focus tag; Home still has it`,
+      top.notes === 0 && /session-timer/.test(top.next) && top.home && top.home.label === 'Test week', JSON.stringify(top));
     t.check(`open day${dark ? ' (dark)' : ''}: no sideways scroll, no page errors`, top.sideways <= 0 && p.errs.length === 0, p.errs.join(' | '));
     await shot(p, name);
     await ctx.close();
   }
-  {   // The same day, the week after: the note is gone from the open day.
-    const { ctx, p } = await H.openProgram(browser, { prog: prog(MID(4), { '3': { text: 'THREE TEXT' } }) });
-    await p.evaluate(() => openDayView('1'));
-    const gone = await p.evaluate(() => !document.querySelector('#day-view .week-note'));
-    t.check('open day in week 4: no "3" note', gone);
+
+  // ── How Home draws it (Front Page) ─────────────────────────────────────────────────────────────────────────────────
+  const look = p => p.evaluate(() => {
+    const n = document.querySelector('#home-week-wrap .week-note');
+    const q = s => n && n.querySelector(s);
+    const txt = el => el ? el.textContent.replace(/ /g, ' ') : null;
+    return { hi: txt(q('.wn-hi')), kick: txt(q('.wn-name')), count: txt(q('.wn-count')), countIsSum: !!q('.wn-count#home-week-sum'),
+      clay: n ? [...n.querySelectorAll('.wn-head em')].map(txt) : [], head: txt(q('.wn-head')), dose: txt(q('.wn-dose')),
+      sig: !!q('svg.wn-sig'), photo: (q('.wn-av img') || {}).getAttribute ? q('.wn-av img').getAttribute('src') : null,
+      byline: n ? /your coach|from amir/i.test(n.textContent) : null, sideways: document.documentElement.scrollWidth - window.innerWidth };
+  });
+  const WEEK1 = { text: 'Keep every set at RPE 7 or under this week. Most of these exercises are new, so find your weights first. From week 2 the card is your target.', rpeCap: 7 };
+  const BACKOFF = { text: 'One set fewer on every exercise and nothing above RPE 7. Bench, leg press and hip thrust get one test set instead: as many good reps as you can, 3 to 5, and stop at the first rep that slows.', rpeCap: 7, setsDrop: 1 };
+  for (const [tag, dayIn, notes, w, check] of [
+    ['week 1: "Alex," opens it, RPE 7 is clay, the count is in the kicker, signed with no byline', MID(1), { '1': WEEK1 }, 390,
+      l => l.hi === 'Alex,' && l.kick === 'This week' && same(l.clay, ['RPE 7']) && l.head === 'Keep every set at RPE 7 or under this week.'
+        && l.countIsSum && /^(\d+ of 2|All 2) done$/.test(l.count) && l.dose === null && l.sig && l.photo === 'assets/img/coach.jpg' && !l.byline],
+    ['back-off: its name in the kicker, both numbers clay in the headline, nothing left for the dose line', MID(5), { last: BACKOFF }, 390,
+      l => l.kick === 'Back-off week' && same(l.clay, ['One set fewer', 'RPE 7']) && l.dose === null],
+    ['numbers the words do not say go on the dose line, a cap hides the drop', MID(5), { '5': { text: 'Easy week. Lift light and leave early.', title: 'Lighter week', rpeCap: 7, setsDrop: 2, rpeDrop: 1 } }, 390,
+      l => same(l.clay, []) && l.dose === 'Max RPE 7·2 sets fewer'],
+    ['a first sentence over 100 characters: the week\'s name is the headline', MID(5), { last: { text: 'One set fewer on every exercise and nothing above RPE 7, except the test sets on bench and leg press and hip thrust today. Done.', rpeCap: 7, setsDrop: 1 } }, 390,
+      l => l.head === 'Back-off week' && l.kick === 'This week'],
+    ['"every RPE at 6" (the older wording) is clay too, so the cap is not said twice', MID(5), { last: { setsDrop: 1, rpeCap: 6, text: 'One set fewer on every exercise and every RPE at 6. You get stronger in the easy week too.' } }, 390,
+      l => same(l.clay, ['One set fewer', 'RPE at 6']) && l.dose === null],
+    ['an RPE drop: "one point lower" is clay, and "One less round" never claims it', MID(3), { '3': { title: 'Lighter week', rpeDrop: 1, text: 'One less round on every circuit, and every RPE one point lower. Rest well.' } }, 390,
+      l => same(l.clay, ['one point lower']) && l.dose === null],
+    ['a drop the words do not name goes on the dose line', MID(3), { '3': { title: 'Lighter week', rpeDrop: 1, setsDrop: 1, text: 'One less set on every exercise. Rest well.' } }, 390,
+      l => same(l.clay, []) && l.dose === '1 set fewer·RPE 1 lower'],
+    ['at 320 px nothing goes sideways', MID(5), { last: BACKOFF }, 320, l => l.sideways <= 0],
+  ]) {
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(dayIn, notes), w });
+    const l = await look(p);
+    t.check(tag, check(l) && p.errs.length === 0, JSON.stringify(l) + (p.errs.length ? ' ERR ' + p.errs.join(' | ') : ''));
+    if (w === 320) await shot(p, 'week-notes-home-320');
+    await ctx.close();
+  }
+  {   // No first name on the programme: no greeting line, nothing else changes.
+    const P = prog(MID(1), { '1': WEEK1 }); P.athlete.firstName = '';
+    const { ctx, p } = await H.openProgram(browser, { prog: P });
+    const l = await look(p);
+    t.check('no first name: no greeting, the note still shows', l.hi === null && l.head === 'Keep every set at RPE 7 or under this week.' && p.errs.length === 0, JSON.stringify(l));
+    await ctx.close();
+  }
+  {   // A week with no note keeps the This Week heading and its long count.
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(MID(2), { '1': WEEK1 }) });
+    const s = await p.evaluate(() => ({ head: !!document.querySelector('#home-week-wrap .home-section-title'),
+      sum: (document.getElementById('home-week-sum') || {}).textContent }));
+    t.check('week 2, no note: This Week heading and "N of 2 sessions done this week"', s.head && /sessions done this week$/.test(s.sum || ''), JSON.stringify(s));
     await ctx.close();
   }
 

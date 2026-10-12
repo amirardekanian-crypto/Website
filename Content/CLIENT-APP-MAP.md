@@ -104,7 +104,6 @@ ON EVERY MAIN SCREEN
 ```
 DAY  (opened from a day card; the tab bar hides once you tap Begin or Skip)
    Top: the day's card, ← back, 🌙 dark toggle
-   Week note  (only in week 1 and the back-off week)
    SESSION BAR:  ← Home · clock · Start ▶ / Pause ⏸ · Guided ▶ · ⋯ (Reset)
         Start ▶ ─► READINESS CHECK ─► clock starts
         Guided ▶ ─► one set at a time, rest timed
@@ -185,7 +184,7 @@ Top to bottom:
 | **Offline note** | One quiet line only when the app opened from the saved copy: *"Offline · your plan as saved on this phone, {when}"*. Or *"Your plan was updated"* with **Refresh**. Or *"The server didn't confirm your plan. Your sets are saved on this phone."* |
 | **This cycle** card | **Cycle 3 of 6 · NAME ›**, **Week 2 of 5** with a bar, **4 of 15 sessions** with a bar, and **Wins this cycle** (up to three). Tap it for Game Plan. A new athlete sees *"Your wins show here: heavier, more reps or easier than your first session of the cycle."* See "wins" below. |
 | **Not finished** card | Only if you left a day open: *"{Weekday}'s Day 2 was never sent"*, *"4 of 11 sets logged. Send it to me as it is, or clear it."* **Send it** / **Clear it** (two taps). |
-| **This Week** | A count: *"2 of 3 sessions done this week"* or *"All 3 sessions done this week"*. In week 1 and the back-off week, a note from me sits here too. |
+| **This Week** | A count: *"2 of 3 sessions done this week"* or *"All 3 sessions done this week"*. In a week with a note from me (week 1, a test week, the back-off) the note IS this section: your first name, my rule for the week in big type, the rest of my words, my signature and photo, with the count on its top line (*"2 of 3 done"*). |
 | **Day cards** | **Not done:** a big card. **In progress:** an *In progress* pill, *"4 of 11 sets"*, a live clock and **Resume ▶**. **Done this week:** a one-line row, ✓ *Day 1 … Done* (still tappable). |
 | **Week-done extra** | When every session of the week is done: *"Week done ✓ · something extra"* with a short Library session. It goes once you've opened it. |
 | **Daily habits** | A row: *"Daily habits"* and your verdict (*"2 to go"*, *"On target"*, *"Perfect"*) plus *"4 days in a row"*. Before you ever open AA Proof it says *"Sleep, steps, water, protein: tick them in AA Proof."* Tapping it leaves this app for AA Proof. Under it, **today's habits can be ticked in place** (a small AA Proof window) once you've set Proof up. |
@@ -418,7 +417,7 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 | **The server turns you away** | *"Plan not available"*, **Sign in again**, **Message Amir on WhatsApp**. |
 | **You left a day open** | The next morning (after a six-hour grace past midnight) a **Not finished** card: **Send it** files and sends it under the day you trained; **Clear it** (two taps) throws the ticks away. |
 | **Lower / short / sore day** | A banner under the session bar and a *"RPE 7 → 6 today"* pill on cards. **Train as written** reverses it. |
-| **Week 1 / last week** | A note from me on Home and at the top of each session. |
+| **Week 1 / last week** | A note from me on Home: in that week it is the This Week section. Not in the session. |
 | **Last 14 days of a cycle** | *"N days left in cycle"* on Game Plan. |
 | **The cycle is over** | See §6. |
 | **Cycle has no dates** | Only a small line, *"Cycle 1 of 6 · NAME · Weeks 1–5"*, and no week features. |

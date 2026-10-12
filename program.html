@@ -1335,22 +1335,38 @@
     margin: -6px 24px 12px; }
   .home-week-sum:empty { display: none; }
   .home-week-sum.all { color: var(--green-ink); font-weight: 600; }
-  /* A week note, any week of a cycle (weekNoteHTML + cycles[n].weekNotes, 2026-09-26; any week 2026-10-11). Deliberately the
-     Coach's Note callout (.ex-coach-note): it IS the coach's instruction for the week,
-     and athletes already read clay callouts that way. Under "This Week" on Home, and
-     at the top of every session in that week. .week-note-first, -last and -week (the legacy aliases and a
-     numeric key) carry no rules of their own: every week's note looks the same. */
-  .week-note {
-    margin: -4px 24px 18px; padding: 10px 12px 11px;
-    background: rgba(199,85,47,0.08); border-left: 3px solid #C7552F; border-radius: 8px;
-    font-family: 'Barlow', sans-serif; font-size: var(--fs-body); line-height: 1.55; color: var(--grey-dark);
-  }
-  .week-note-label {
-    display: block; font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
-    font-size: var(--fs-small); letter-spacing: 1.2px; text-transform: uppercase; color: #C7552F; margin-bottom: 3px;
-  }
-  .day-content .week-note { margin: 0 0 16px; }
-  body[data-dark] .week-note { background: rgba(199,85,47,0.16); color: #e8e8e8; }
+  /* A week note, any week of a cycle (weekNoteHTML + cycles[n].weekNotes, 2026-09-26; any week 2026-10-11). FRONT PAGE
+     (Amir, 2026-10-12: "lets go with A", from the three directions on the Week Note Lookbook): no box, no tint. In its
+     week the note IS the This Week section on Home, and only there (never at the top of a session): a heavy rule, a
+     Space Mono kicker with the week's count on its right, the athlete's first name, Amir's first sentence as a
+     sentence-case headline with only its numbers in clay, the rest of his words at full size, then his signature and
+     photo. Every colour is a token, so dark mode needs no rules of its own. The headline stays at --fs-head: the day
+     card's DAY 1 below it is 22px capitals, so the cover line never out-shouts the training. .week-note-first, -last
+     and -week stay on the section (the legacy aliases and a numeric key) and carry no rules of their own. */
+  .wn { margin: 28px 24px 24px; font-family: 'Barlow', sans-serif; color: var(--grey-dark); }
+  .wn-kick { display: flex; align-items: baseline; gap: 12px; padding-top: 10px; border-top: 2px solid var(--grey-dark);
+    font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .14em; text-transform: uppercase; }
+  .wn-name { min-width: 0; color: var(--grey-dark); }
+  .wn-count { margin-left: auto; color: var(--grey-text); letter-spacing: .08em; white-space: nowrap; }
+  .wn-count:empty { display: none; }
+  .wn-count.all { color: var(--green-ink); }
+  .wn-hi { margin: 14px 0 0; font: 500 var(--fs-lead)/1.2 'Barlow', sans-serif; color: var(--grey-text); }
+  .wn-head { margin: 12px 0 0; font: 900 var(--fs-head)/1.08 'Barlow Condensed', sans-serif; color: var(--grey-dark);
+    text-wrap: balance; overflow-wrap: break-word; }
+  .wn-hi + .wn-head, .wn-hi + .wn-lead { margin-top: 4px; }
+  .wn-head em { font-style: normal; color: var(--clay-ink); }
+  .wn-stand { margin: 10px 0 0; font-size: var(--fs-lead); line-height: 1.45; text-wrap: pretty; }
+  .wn-lead { margin: 12px 0 0; font-size: var(--fs-lead); line-height: 1.5; text-wrap: pretty; }
+  .wn-dose { margin: 14px 0 0; font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
+  .wn-dose i { font-style: normal; color: var(--grey-text); margin: 0 4px; }
+  /* Signed: his signature in green ink and his photo (the Coach tab's), on a hairline. No "your coach": it is his note. */
+  .wn-sign { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 6px;
+    border-top: 1px solid var(--grey-mid); }
+  .wn-sig { display: block; width: 124px; height: 44px; margin-left: -3px; color: var(--green-ink); }
+  .wn-av { position: relative; flex: none; display: grid; place-items: center; width: 44px; height: 44px; margin-top: 8px;
+    border-radius: 50%; overflow: hidden; background: var(--yellow); box-shadow: 0 0 0 2px var(--white), 0 3px 10px rgba(0,0,0,.14); }
+  .wn-av img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .wn-av i { font: 900 var(--fs-small)/1 'Barlow Condensed', sans-serif; font-style: normal; color: var(--on-accent); }
 
   /* "Ticked in your habits" confirmation inside the completion card */
   .complete-habit {
@@ -4648,8 +4664,8 @@
     <!-- This cycle card (PROG-01, paintCycleCard()) → Game Plan -->
     <div id="home-cycle-wrap"></div>
 
-    <!-- What fileUnfinished() filed (DATA-02), then "This Week": its header, the week's
-         session count (paintWeek()) and the week note, when this week has one -->
+    <!-- What fileUnfinished() filed (DATA-02), then "This Week": its header and the week's
+         session count (paintWeek()), or, in a week with a note, the note in their place (weekNoteHTML) -->
     <div id="home-unfinished-wrap"></div>
     <div id="home-week-wrap"></div>
 
@@ -6817,11 +6833,69 @@ function weekNoteNow(cycle) {
   // The note's fields first, so a stored `key` or `wk` can never reach the class name below.
   return n ? Object.assign({}, n, { key: key, wk: w.wk }) : null;
 }
+// The note as Home's This Week section (Front Page, Amir 2026-10-12), or '' when this week has none. Home only:
+// renderHome() draws this INSTEAD of the This Week heading, and the kicker's count is #home-week-sum (paintWeek()
+// writes its short form). It is not drawn at the top of a session any more (Amir: "dont show this at the top of each
+// day workout, just in the home tab"). In a session dayRpe() reads the note's numbers only on a lower day (the check-in's
+// drop); on a normal day the session shows the card as written. Three shapes, so any note reads:
+//   sentence  the first sentence (100 characters or fewer) is the headline, the rest of the text the standfirst
+//   name      a longer first sentence: the week's name is the headline and the whole text the standfirst
+//   lead      no title and no numbers: no headline, one calm paragraph
+// Amir's words are never changed, only set: tie() keeps a number with its word, and mark() turns clay only the words
+// that ARE the note's numbers ("RPE 7" for rpeCap, "one set fewer" for setsDrop), in dayRpe()'s order (a cap wins, so
+// an rpeDrop never shows beside one). A number the headline did not show goes on a small line above the signature.
+// The athlete's first name opens it and Amir's signature and photo close it (COM-16: the text has neither).
+// scripts/headless/week-notes.js reads data-label (the week's name) and the [data-t] parts (the note's own words).
+const WN_SIG = '<svg class="wn-sig" viewBox="0 0 130 46" role="img" aria-label="Amir"><g transform="skewX(-12) translate(8 0)" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'
+  + '<path stroke-width="2.2" d="M5 40 C11 28 17 14 24 4 C25 15 27 28 30 38 C31 41 28 37 22 31 C17 27 11 26 9 28 C16 25 30 25 38 28 C40 29 41 33 41 38 C42 32 45 27 48 28 C51 29 51 34 51 38 C52 32 55 27 58 28 C61 29 61 34 62 38 C63 34 65 31 67 30 C67 33 67 36 69 38 C70 35 71 32 72 29 C72 32 72 35 73 38 C74 33 77 29 81 29 C84 29 85 31 87 32 C97 37 112 31 124 21"/>'
+  + '<path stroke-width="2.7" d="M66.5 22.5 l1.6 -1.2"/></g></svg>';
 function weekNoteHTML(cycle) {
   const n = weekNoteNow(cycle);
   if (!n) return '';
-  const label = n.title || (n.key === 'last' ? 'Back-off week' : 'Week ' + n.wk);
-  return `<div class="week-note week-note-${n.key}"><span class="week-note-label">${esc(label)}</span>${esc(n.text)}</div>`;
+  const attr = s => esc(String(s)).replace(/"/g, '&quot;');
+  const NB = String.fromCharCode(160);   // a non-breaking space; esc() writes it as &nbsp;
+  const tie = s => String(s)
+    .replace(/\b(RPE)\s+(\d+(?:\.\d+)?)/gi, '$1' + NB + '$2')
+    .replace(/(\d+(?:\.\d+)?)\s+(to|or)\s+(\d+(?:\.\d+)?)/gi, '$1' + NB + '$2' + NB + '$3')
+    .replace(/\b(one|two|three|four|five|\d+)\s+(sets?|reps?)(\s+(?:fewer|less))?\b/gi, (m, a, b, c) => a + NB + b + (c ? NB + c.trim() : ''))
+    .replace(/\b(week|day)\s+(\d+)\b/gi, '$1' + NB + '$2');
+  const capOn = Number(n.rpeCap) > 0, setsOn = Number(n.setsDrop) > 0, dropOn = !capOn && Number(n.rpeDrop) > 0;
+  const name = n.title || (n.key === 'last' ? 'Back-off week' : 'Week ' + n.wk);
+  const named = !!n.title || n.key === 'last';
+  const text = String(n.text).trim();
+  // The first sentence: up to . ! or ? followed by a space and a capital, a digit or an opening quote.
+  const m = text.match(/^(.+?[.!?])\s+(?=[A-Z0-9"'(“])/);
+  const first = m ? m[1] : text, rest = m ? text.slice(m[0].length) : '';
+  const shape = (!named && !capOn && !setsOn && !dropOn) ? 'lead' : first.length > 100 ? 'name' : 'sentence';
+  const WORD = { one: 1, two: 2, three: 3, four: 4, five: 5 };
+  const marked = { cap: false, sets: false, drop: false };
+  const cap = String(n.rpeCap).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const mark = h => {   // h is already escaped, so a tied space reads &nbsp; here
+    // "RPE 7", and the older "every RPE at 6".
+    if (capOn) h = h.replace(new RegExp('RPE(?:\\s|&nbsp;)?(?:at(?:\\s|&nbsp;))?' + cap + '(?![\\d.]*\\d)', 'i'), s => { marked.cap = true; return '<em>' + s + '</em>'; });
+    if (setsOn) h = h.replace(/\b(one|two|three|four|five|\d+)(?:\s|&nbsp;)(sets?)(?:\s|&nbsp;)(fewer|less)\b/i,
+      (s, a) => (WORD[a.toLowerCase()] || Number(a)) === Number(n.setsDrop) ? (marked.sets = true, '<em>' + s + '</em>') : s);
+    // "one point lower", "1 RPE lower": the RPE or point word is required, so "one less set" never claims the drop.
+    if (dropOn) h = h.replace(/\b(one|two|three|\d+(?:\.\d+)?)(?:\s|&nbsp;)(?:RPE|points?)(?:\s|&nbsp;)(lower|less|down)\b/i,
+      (s, a) => (WORD[a.toLowerCase()] || Number(a)) === Number(n.rpeDrop) ? (marked.drop = true, '<em>' + s + '</em>') : s);
+    return h;
+  };
+  const body = shape === 'sentence'
+    ? `<h3 class="wn-head" data-t>${mark(esc(tie(first)))}</h3>` + (rest ? `<p class="wn-stand" data-t>${esc(tie(rest))}</p>` : '')
+    : shape === 'name'
+      ? `<h3 class="wn-head">${esc(name)}</h3><p class="wn-stand" data-t>${esc(tie(text))}</p>`
+      : `<p class="wn-lead" data-t>${esc(tie(text))}</p>`;
+  const dose = [];
+  if (capOn && !marked.cap) dose.push('Max RPE ' + n.rpeCap);
+  if (setsOn && !marked.sets) dose.push(n.setsDrop + (Number(n.setsDrop) === 1 ? ' set fewer' : ' sets fewer'));
+  if (dropOn && !marked.drop) dose.push('RPE ' + n.rpeDrop + ' lower');
+  const who = (DATA && DATA.athlete && DATA.athlete.firstName) || '';
+  return `<section class="wn week-note week-note-${n.key}" data-shape="${shape}" data-label="${attr(name)}" aria-label="${attr(name)}">
+    <div class="wn-kick"><span class="wn-name">${esc(shape === 'sentence' && named ? name : 'This week')}</span><span class="wn-count" id="home-week-sum"></span></div>
+    ${who ? `<p class="wn-hi">${esc(who)},</p>` : ''}${body}
+    ${dose.length ? `<p class="wn-dose">${dose.map(d => esc(tie(d))).join('<i>·</i>')}</p>` : ''}
+    <div class="wn-sign">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>
+  </section>`;
 }
 
 // Map a day to ONE of eight category pictures. Eight files cover every day of
@@ -7299,9 +7373,10 @@ function paintWeek() {
   const ids = (DATA.workouts && DATA.workouts.days || []).map(d => String(d.id));
   if (!ids.length) { el.textContent = ''; return; }
   const n = ids.filter(id => weekDoneDays().has(id)).length;
-  el.textContent = n >= ids.length
-    ? `All ${ids.length} sessions done this week`
-    : `${n} of ${ids.length} sessions done this week`;
+  // In a week with a note the count sits in the note's kicker (weekNoteHTML), in its short form.
+  el.textContent = el.classList.contains('wn-count')
+    ? (n >= ids.length ? `All ${ids.length} done` : `${n} of ${ids.length} done`)
+    : n >= ids.length ? `All ${ids.length} sessions done this week` : `${n} of ${ids.length} sessions done this week`;
   el.classList.toggle('all', n >= ids.length);
   paintWeekSugg();   // the week is done: one short extra (LIB-01)
 }
@@ -7596,18 +7671,19 @@ function renderHome() {
   // it with this, when you click, it goes to gameplan") it is the This cycle card: paintCycleCard().
   paintCycleCard();
 
-  // "This Week" header, the week's session count (paintWeek()) and this week's note, if it has one;
-  // past the cycle's end date, Up next and Between cycles instead (PROG-02).
+  // "This Week": its header and the week's session count (paintWeek()); in a week with a note, the note IS the
+  // section (Front Page, 2026-10-12: its kicker carries the count); past the cycle's end date, Up next and Between
+  // cycles instead (PROG-02).
   const weekWrap = document.getElementById('home-week-wrap');
   const over = cycleOver();
   if (weekWrap && over) {
     weekWrap.innerHTML = betweenCyclesHTML(over);
   } else if (weekWrap) {
-    weekWrap.innerHTML = `
+    weekWrap.innerHTML = weekNoteHTML(cur) || `
       <div class="home-section-head">
         <div class="home-section-title">This Week</div>
       </div>
-      <div class="home-week-sum" id="home-week-sum"></div>${weekNoteHTML(cur)}`;
+      <div class="home-week-sum" id="home-week-sum"></div>`;
   }
 
   const days = w.days || [];
@@ -7646,8 +7722,7 @@ function renderHome() {
     const hasStandard = (day.blocks || []).some(b => (b.exercises || []).some(ex => ex.type === 'standard'));
     let html = `<div id="day${day.id}" class="day-content${i === 0 ? ' active' : ''}">`;
     html += `<div class="day-focus-tag">${esc(day.focusTag)}</div>`;
-    // This week's note, if it has one (week 1, a test week, the back-off): the same as Home, where the athlete trains.
-    html += weekNoteHTML(cur);
+    // No week note here: it lives on Home only (Amir, 2026-10-12: "dont show this at the top of each day workout").
     html += `<div class="session-timer" id="timer-${day.id}" data-day="${day.id}">
       <button type="button" class="session-timer-leave" onclick="closeDayView()" aria-label="Home (the session keeps running)"><span aria-hidden="true">←</span><span class="stl-txt">Home</span></button>
       <div class="session-timer-body">
@@ -8734,7 +8809,7 @@ const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
     body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
-    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, a note under <strong>This Week</strong> and at the top of each session tells you exactly what changes. When the last week is over, Home says so: your cycle card reads <strong>Cycle complete</strong>, and there's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The "Why This Cycle Matters" note on <strong>Game Plan</strong> explains what we're chasing right now.</p>` },
+    body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, my note for the week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so: your cycle card reads <strong>Cycle complete</strong>, and there's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The "Why This Cycle Matters" note on <strong>Game Plan</strong> explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
     body: `<p><strong>RPE</strong> (Rate of Perceived Exertion) = how hard a set felt, on a scale of 1–10. RPE 7 means you finished with about 3 reps left in the tank. RPE 10 means you couldn't have done another rep.</p><p><strong>Tempo</strong> = the speed of each rep, written as 4 numbers like <strong>3-1-1-0</strong>. Example for a squat: 3 sec down, 1 sec pause at the bottom, 1 sec up, 0 sec pause at the top.</p>` },
   { icon: 'mindset', title: 'The readiness check',
@@ -11202,7 +11277,7 @@ function currentCycleData() {
 // with the week note (week 1, a test week, the back-off week): the lower of the two targets wins, and
 // the week's own number is floored at 6 too (CHP-4: "No RPE below 6 anywhere"; a written 6
 // in a week with rpeDrop 1 read "6 → 5 today" until 2026-09-27, a target no button can log).
-// ⚠ coach.html's dayTargetC() is the same rule without the week note. Change both.
+// ⚠ coach.html's dayTargetC() is the same rule, week note included (check_twins.js §4). Change both.
 function dayRpe(written, drop, note) {
   const m = String(written == null ? '' : written).match(/(\d+(?:\.\d+)?)(?:\s*[-–]\s*(\d+(?:\.\d+)?))?/);
   if (!m || !drop) return '';
