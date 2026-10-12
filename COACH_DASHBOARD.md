@@ -56,11 +56,11 @@ a second row that scrolls sideways) are opened now and then.
 
 | Tab | What it's for |
 |---|---|
-| **Today** | The day's play: who's on court, who needs you (and why), the wall, the quest lever |
+| **Today** | The day's play: who needs you (and why), what else is waiting, and a short Proof column (your line to the crew, today's wall lines, the quest week and who is drifting) |
 | **Athletes** | The whole roster — coached and Proof-only — and each person's file, opening on prescribed-vs-done (a habit-only athlete opens on Proof) |
 | **Intake** | New coaching applications from the apply form (English & Farsi) — the whole questionnaire, per lead |
 | **Exercises** | The Spine (2026-09-24): one entry per exercise you programme. Coverage of the names in live programmes, Claude's drafts waiting for you, a search, and an editor (purpose, How to do it, cues, links, body parts and the muscle map, video, and the coach-only SFR rank, flags, counts and cost) showing who is doing each exercise now. Claude's draft steps, cues or purpose for an approved entry wait in the editor's boxes, and your Save approves them. A save sends only what you changed. **Approve** is what puts an entry on athletes' phones |
-| **Proof** | The board, the season, the signup funnel, titles minted |
+| **Proof** | The crew's home: the wall and your line, the quest lever, the pulse, the board, titles minted, the season, the signup funnel |
 | **Library** | Publishes workouts and articles into the app's Library, and copies a link to each (the address is still `#links`; the tab was called Links until 2026-10-10) |
 | **Affiliates** | The referral-code roster: who holds which discount code, how to reach them, which intakes used it. The apply forms accept exactly the live codes listed here |
 | **Testing app** | Buyer logins for the tennis testing app (`/tennis-testing/app/`) |
@@ -331,12 +331,26 @@ Action first: what needs you is the first thing on the screen, and it is wide.
 - **A slim strip** (about 70 px on a desktop, under 150 px on a phone) instead of the old banner and its headline: the date and the season pill, then the
   four counters on one line, each as number + label (*2/3 on court today*, *1 note to read*). Each counter is still a link to the panel that explains it
   (`scrollPanel`). On a phone the counters wrap 2 x 2.
-- **Two columns from 900 px**, `minmax(0,2fr) minmax(0,1fr)` (`.tcols`): **Needs you** on the left (`#needPanel`); on the right **the wall** (`#wallPanel`),
-  **Quest week** (`#questPanel`) and **Proof pulse** (`#pulsePanel`), stacked. Under 900 px it is one column in that same order, Needs you first: there is
-  no reordering on a phone any more (`.cols`, whose last column jumps first on a phone, is now only the Proof screen's). The wall's composer, the quest picker and
-  the pulse rows are laid out for the narrow column (about 330 px at 1180 wide): no box around the composer or the live run, a quest's note under its name,
-  the pulse row wraps instead of crushing the name.
+- **Two columns from 900 px**, `minmax(0,2fr) minmax(0,1fr)` (`.tcols`): **Needs you** on the left (`#needPanel`); on the right **Proof today** (`#proofToday`),
+  one short panel (round 2, 2026-10-12; see below). Under 900 px it is one column in that same order, Needs you first: there is
+  no reordering on a phone. The full wall, the full quest lever and the full pulse moved to **Proof** (section 7), so none of `#wallPanel`, `#questPanel` or
+  `#pulsePanel` is on Today: one copy of an id in the page at a time.
 - One white panel per section and **no card inside a card**: Needs you's rows are divided by hairlines.
+
+### Proof today — the short Proof column
+
+One panel (`proofTodayHtml()`), four parts with a hairline between them, in this order:
+
+1. **Your line to the crew**: the composer (`coachLineComposerHtml()`, the same `#coachLineInput` as on Proof: the draft, the strip hint, Post / Update the
+   line / Take it down; see *The wall* below).
+2. **Today's wall lines** with Hide (lines filed under today, and any filed under tomorrow under *Tomorrow, their time*), then **Earlier lines on Proof →**.
+3. **One quest line**, linking to Proof: the live run (*Quest week · day 3 of 7 · 3 quests · ends Fri*, from `activeQuestRun()` and `questRunEnd()`, so it is the
+   app's run and its real last day) or *No quest week live · start one on Proof →*.
+4. **One drifting line**, linking to Proof: the Proof athletes silent for `QUIET_HABIT_DAYS` (3) days or more, the pulse's own rule, most silent first (*Drifting:
+   Kian 4 d, Omid 3 d*), four names at most and then *+ N more*. Nothing at all (no empty part) when nobody is.
+
+Needs you and Also waiting are unchanged. The *on court today* counter opens Proof (the pulse is there); *wall lines today* scrolls to this panel.
+`proof-home` drives it.
 
 | Counter | What it counts |
 |---|---|
@@ -346,6 +360,8 @@ Action first: what needs you is the first thing on the screen, and it is wide.
 | **Notes to read** | Session notes that arrived in the last 14 days and are not yet marked read (the same number as the badge on Athletes). It was called *Waiting on you* until 2026-10-10 |
 
 ### The wall — read it *and* write it
+
+*(Round 2, 2026-10-12: the full wall is on **Proof**; Today keeps the composer and today's lines in its Proof column, above.)*
 
 The roll call, straight from `hab_notes`, newest day first. Two days by default,
 **Show the full week** for all seven.
@@ -458,6 +474,8 @@ on render.
 
 ### Quest week
 
+*(Round 2, 2026-10-12: the lever is on **Proof**; Today shows one line about it.)*
+
 The lever, not just the readout. If a run is live you see its quests, the XP each
 pays and which day of seven it's on, with **End this run today**. If none is live
 you get the pool as checkboxes — pick one to four, **Start the week**, and it
@@ -476,6 +494,8 @@ XP back, now only from the SQL editor (`QUESTS.md`). Until 2026-10-11 the button
 take the XP back from everyone (the dialog had promised the opposite until 2026-10-10).
 
 ### Proof pulse
+
+*(Round 2, 2026-10-12: the full pulse is on **Proof**; Today's *Drifting* line is its short form.)*
 
 Every Proof athlete, **most silent first**, with seven presence dots (one per
 day, today ringed in clay) and their server-scored level. This is the retention
@@ -709,10 +729,19 @@ Read-only. The athlete owns the record: they log a max from **Personal Records �
 their app, and they can delete any entry. A lift they have renamed between cycles reads as one lift
 here and one lift there — both sides run the same name matcher, on purpose.
 
+### Body weight — on The work, folded
+
+Under the Personal records (and above the day cards) sits **one compact panel** with the body weight the athlete logs in their training app: its header line reads
+*Body weight · 64.7 kg · today · −1.3 kg over 30 days · −2.5 over 90* (the latest reading and how long ago, then the change of the 7-day average over 30 and
+over 90 days, the same average the app draws), and the chart is folded under it in `<details id="wtdet">`, **shut until you open it** and kept open through
+a redraw (`snapTabBody()` collects every `details[id]`). It is **absent, not empty, when there is no reading**. It moved here on 2026-10-12 (round 2): the
+weight comes from the training app, not from Proof, and a coached athlete who never ticks a habit has no Proof tab to find it on. Read-only, never scored
+(`weightPanel()`; `proof-home` drives it).
+
 ### Proof · File (and the retired Calls)
 
 - **Proof** (only for people who log habits) — server-scored level, 14 presence dots, their week,
-  board name and worn title, WhatsApp and email, and their wall lines with hide/show on each.
+  board name and worn title, WhatsApp and email, and their wall lines with hide/show on each. (Body weight is not here any more: it is on The work, above.)
 - ~~**Chat**~~ — **removed 2026-09-26** (Amir: *"whatsapp first, remove in app chat from app and
   coach.html"*). The `messages` table and its three functions stay on the server untouched, so no
   past thread is lost; nothing reads or writes them now.
@@ -829,6 +858,21 @@ read 33%). Shown up to 100%, with "N more than planned" when they did extra. Gre
 
 ## 7. PROOF
 
+**Proof is the community's home** (round 2, 2026-10-12): everything about the crew is on this one screen, in two columns from 900 px (the left, about 1.3 to 1, is
+the wider; one column below that, the left first). **Left:** **The wall**, then **The board**. **Right:** **Quest week**, **Proof pulse**, **Titles minted**,
+**Season** and **The funnel**, last. The wall, the quest lever and the pulse used to be on Today; Today keeps a short Proof column that links here
+(section 3, *Proof today*). One copy of each id is in the page at a time (`#wallPanel`, `#questPanel`, `#pulsePanel`, `#coachLineInput`: Today draws its own, `#proofToday`).
+A redraw (a line posted, a line hidden, a quest week started) is drawn at once from what the page holds: the board is read once and kept, and only a real first
+read (or a **Reload**) waits, inside the board's own panel as *Fetching the board…*, so the wall and the lever never blank out under your hands.
+
+**The wall** — the full wall (`wallPanelHtml()`): the composer, every day's lines newest first, Hide / Show on the crew's, **Show the full week**. Everything in
+section 3, *The wall*, applies unchanged.
+
+**Quest week** — the full lever (`questPanelHtml()`): the live run with **End this run today**, or the picker with **Start the week**. Section 3, *Quest week*,
+has the rules (ending keeps the XP already earned; never `clear_quests()` from the page).
+
+**Proof pulse** — every Proof athlete, most silent first, seven presence dots each (section 3, *Proof pulse*).
+
 **The board** — `leaderboard_top()`, the server's own scorer, season or week.
 These are the exact rows and the exact order the crew sees in their app. It is read once and kept (so a long Proof visit does not re-score the
 board on every redraw), and it says **when it was read** (*As of 14:32*) with a **Reload** button; starting or ending a quest week reads it again,
@@ -843,7 +887,7 @@ for four days — see stage23).
 in the SQL editor deliberately: it resets every score, and that shouldn't be a
 button on a dashboard.
 
-**The funnel** — everyone from `contact_list()`, newest first, with **days
+**The funnel** (`funnelPanelHtml()`, one self-contained function that returns the whole section, so a screen of its own can take it) — everyone from `contact_list()`, newest first, with **days
 logged** as the qualifying signal. A free athlete past **14 logged days** is
 flagged *ready to upgrade?* — they've proven the habit, so the coaching pitch is
 earned rather than cold. The headline counts **free** signups; someone who became a coached

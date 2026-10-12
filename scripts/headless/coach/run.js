@@ -303,8 +303,8 @@ S['wall-hide'] = async (b) => {
 
 // ── 10. Quest week ───────────────────────────────────────────────────────────
 S['quest-week'] = async (b) => {
-  const r = { id: 'quest-week', title: 'Today → start a quest week and end it: the XP already earned is kept (stage55)', checks: [] };
-  const { page, today, log } = await L.openCoach(b, {});
+  const r = { id: 'quest-week', title: 'Proof → start a quest week and end it: the XP already earned is kept (stage55)', checks: [] };
+  const { page, today, log } = await L.openCoach(b, { hash: 'proof' });   // the lever moved from Today to Proof (round 2, 2026-10-12)
   const boxes = page.locator('#questPanel input[type=checkbox]');
   await boxes.nth(0).check(); await boxes.nth(1).check();
   let n0 = await L.nCalls(page);
@@ -334,7 +334,7 @@ S['quest-week'] = async (b) => {
 
 S['quest-week-end-fails'] = async (b) => {
   const r = { id: 'quest-week-end-fails', title: 'Ending a quest run when stage55 is not applied: nothing changes, and it never falls back to the call that takes the XP back', checks: [] };
-  const { page, log } = await L.openCoach(b, {});
+  const { page, log } = await L.openCoach(b, { hash: 'proof' });
   await page.evaluate(() => { const x = window.__DB.xp_rules[0]; x.rules.questRuns = [{ start: new Date().toISOString().slice(0, 10), ids: ['w_water5'] }]; });
   await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
   await page.evaluate(() => { window.__STUB.missingRpc = ['end_quests']; });
@@ -2347,7 +2347,7 @@ S['spine-phone-view'] = async (b) => {
 
 // ── Small truthfulness fixes on Today and the board (audit TODAY-3, TODAY-4, TODAY-13, TODAY-14, TODAY-15, MKT-3, MKT-8; 2026-10-11, pile B8) ─────────
 S['today-small-truths'] = async (b) => {
-  const r = { id: 'today-small-truths', title: 'Today: a blank exercise note is no note, a line from tomorrow says so, and the line box says what it strips', checks: [] };
+  const r = { id: 'today-small-truths', title: 'Today: a blank exercise note is no note, a line from tomorrow says so, and the line box says what it strips', checks: [] };   // the wall column is #proofToday since round 2
   const { page, log } = await L.openCoach(b, {});
   const has = await page.evaluate(() => [
     sessionHasNote({ day_note: '', summary: 'Day 1\n\nExercise log:\n[Primary]\n• Squat (✓)\n    Set 1: 20 ✓\n    Note:  \n' }),
@@ -2359,7 +2359,7 @@ S['today-small-truths'] = async (b) => {
     return refetch(['notes']);
   });
   await L.settle(page, 700);
-  const wall = (await page.locator('#wallPanel').innerText()).replace(/\s+/g, ' ');
+  const wall = (await page.locator('#proofToday').innerText()).replace(/\s+/g, ' ');
   check(r, 'a line filed under tomorrow (an athlete whose clock is ahead) says "Tomorrow, their time", not a bare date', /Tomorrow, their time/i.test(wall) && /Early riser line/.test(wall), wall);
   check(r, 'the line box says that quotes, < > and backslashes are removed and line breaks become spaces', /Quotes, < > and backslashes are removed when you post, and line breaks become spaces/.test(wall), wall);
   check(r, 'no page errors', !log.errors.length, log.errors);
@@ -2397,8 +2397,8 @@ S['refetch-failures'] = async (b) => {
 };
 
 S['quest-run-window'] = async (b) => {
-  const r = { id: 'quest-run-window', title: 'Today → the live quest run and its last day are the app\'s: latest-starting run, clipped where the next one starts', checks: [] };
-  const { page, log } = await L.openCoach(b, {});
+  const r = { id: 'quest-run-window', title: 'Proof → the live quest run and its last day are the app\'s: latest-starting run, clipped where the next one starts', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'proof' });
   const day = n => page.evaluate(n => addDays(todayKey(), n), n);
   const pretty = async n => page.evaluate(k => prettyDate(k), await day(n));
   const setRuns = async runs => { await page.evaluate(runs => { window.__DB.xp_rules[0].rules.questRuns = runs; return refetch(['rules']); }, runs); await L.settle(page, 600); };
@@ -2447,13 +2447,177 @@ S['proof-board-truth'] = async (b) => {
   let n0 = await L.nCalls(page);
   await L.go(page, 'today'); await L.go(page, 'proof'); await L.settle(page, 500);
   check(r, 'leaving and coming back to Proof does not read the board again (it is kept)', (await boardCalls(n0)) === 0, await boardCalls(n0));
-  await L.go(page, 'today'); await L.settle(page, 500);
+  // (the quest lever is on Proof since round 2, so the week is started where the board is: the redraw that follows reads the board again)
   await page.locator('#questPanel input[type=checkbox]').first().check();
-  await page.locator('#questStartBtn').click();
-  await L.settle(page, 700);
   n0 = await L.nCalls(page);
-  await L.go(page, 'proof'); await L.settle(page, 700);
+  await page.locator('#questStartBtn').click();
+  await L.settle(page, 900);
   check(r, 'after a quest week starts the board is read again (its XP moved)', (await boardCalls(n0)) === 1, await boardCalls(n0));
+  n0 = await L.nCalls(page);
+  await L.go(page, 'today'); await L.go(page, 'proof'); await L.settle(page, 500);
+  check(r, 'and then it is kept again: leaving and coming back reads nothing', (await boardCalls(n0)) === 0, await boardCalls(n0));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Proof is the community's home (round 2 of the coach.html redesign, 2026-10-12) ───────────────────────────────────────────────────
+// Running the crew used to be split: the wall, the quest lever and the pulse on Today, the board, titles, season and the signup funnel on Proof.
+// Now Proof holds all of it, Today keeps a short Proof column that links to it, and body weight (which comes from the training app, not from
+// Proof) moved from the athlete's Proof sub-tab to The work, folded under one header line.
+S['proof-home'] = async (b) => {
+  const r = { id: 'proof-home', title: 'Proof holds the whole crew (wall, quest lever, pulse, board, titles, season, funnel); Today keeps a short Proof column that links to it; body weight is on The work', checks: [] };
+  const { page, log, today } = await L.openCoach(b, {});
+  const txt = async sel => (await page.locator(sel).innerText()).replace(/\s+/g, ' ').trim();
+  const dayOf = n => page.evaluate(n => addDays(todayKey(), n), n);
+  const ids = () => page.evaluate(() => ['coachLineInput', 'wallPanel', 'questPanel', 'pulsePanel', 'proofToday', 'boardPanel', 'funnelPanel'].reduce((o, id) => { o[id] = document.querySelectorAll('#' + id).length; return o; }, {}));
+  const overflow = () => page.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, wide: [...document.querySelectorAll('#content *')].filter(el => el.getBoundingClientRect().right > innerWidth + 1).slice(0, 4).map(el => el.tagName + '.' + el.className) }));
+  const post = async (sel, text) => { await page.locator(sel + ' #coachLineInput').fill(text); const n0 = await L.nCalls(page); await page.locator(sel + ' .mic .row .btn.primary').click(); await L.settle(page, 700); return lastOf(await L.callsSince(page, n0), c => c.kind === 'rpc' && c.name === 'set_coach_note'); };
+
+  // 1. Today's Proof column: one panel, the composer, today's lines, a quest line, a drifting line; none of the full panels
+  let n = await ids();
+  check(r, 'Today: one #coachLineInput and one #proofToday, and none of the full wall, quest lever or pulse (#wallPanel, #questPanel, #pulsePanel)', n.coachLineInput === 1 && n.proofToday === 1 && !n.wallPanel && !n.questPanel && !n.pulsePanel, n);
+  let col = await txt('#proofToday');
+  check(r, 'it holds the composer and only TODAY\'s lines: Ava\'s line (with Hide) is there, yesterday\'s (Cara\'s, the coach\'s) are not', (await page.locator('#proofToday .mic textarea').count()) === 1 && /Fixture wall line from Ava/.test(col) && (await page.locator('#proofToday .wline .modbtn').count()) === 1 && !/Fixture wall line from Cara/.test(col) && !/Fixture coach line yesterday/.test(col), col);
+  const linkTexts = () => page.evaluate(() => [...document.querySelectorAll('#proofToday a')].map(a => ({ t: a.textContent.replace(/\s+/g, ' ').trim(), h: a.getAttribute('href') })));
+  let lk = await linkTexts();
+  check(r, 'three links, all to Proof: the earlier lines, the quest line (nothing live: start one on Proof) and who is drifting (Dan, silent 5 days)', lk.length === 3 && lk.every(x => x.h === '#proof') && lk[0].t === 'Earlier lines on Proof →' && lk[1].t === 'No quest week live · start one on Proof →' && lk[2].t === 'Drifting: Dan 5 d →', lk);
+  // a live run: "Quest week · day 3 of 7 · 2 quests · ends <weekday>"
+  await page.evaluate(async d => { window.__DB.xp_rules[0].rules.questRuns = [{ start: d, ids: ['w_water5', 'w_train3'] }]; await refetch(['rules']); }, await dayOf(-2));
+  const dow = await page.evaluate(() => DOWS[pDate(addDays(todayKey(), 4)).getDay()]);
+  lk = await linkTexts();
+  check(r, 'a live run reads "Quest week · day 3 of 7 · 2 quests · ends <weekday>" and opens Proof', lk[1] && lk[1].t === `Quest week · day 3 of 7 · 2 quests · ends ${dow} →` && lk[1].h === '#proof', lk[1]);
+  // drifting: most silent first, four names at most, then "+ N more"; nothing at all when nobody drifts
+  await page.evaluate(() => {
+    const mk = (id, name, gap) => { S.ath[id] = { id, name, tier: 'free', isHab: true, habGap: gap, habDays: {}, habLast: null, habToday: false, hab7: 0, reasons: [], toReply: 0, needReplyStale: 0, needReplyRecent: [], needReplySessions: [], onBoard: false }; };
+    mk('zz_c', 'Cy', 7); mk('zz_a', 'Ann', 9); mk('zz_e', 'Ed', 3); mk('zz_b', 'Bo', 8); mk('zz_d', 'Di', 6); render();
+  });
+  check(r, 'drifting lists the most silent first, four names at most, then "+ 2 more" (Dan 5 d and Ed 3 d)', (await txt('#proofToday .ptline.drift')) === 'Drifting: Ann 9 d, Bo 8 d, Cy 7 d, Di 6 d, + 2 more →', await txt('#proofToday .ptline.drift'));
+  await page.evaluate(() => { Object.keys(S.ath).filter(k => k.startsWith('zz_')).forEach(k => delete S.ath[k]); S.ath.dan_proof.habGap = 0; render(); });
+  check(r, 'when nobody has been silent for 3 days there is no drifting line (and no empty part)', (await page.locator('#proofToday .ptline.drift').count()) === 0 && (await page.locator('#proofToday .pt').count()) === 3, await page.locator('#proofToday .pt').count());
+  await page.evaluate(() => { S.ath.dan_proof.habGap = 5; render(); });
+  // the counters: "on court" opens Proof (the pulse is there), "wall lines today" scrolls to Today's column
+  await page.locator('.board .counter').nth(1).click(); await L.settle(page, 300);
+  check(r, 'the "wall lines today" counter stays on Today and scrolls to the Proof column', (await page.evaluate(() => location.hash)) !== '#proof' && (await page.locator('#proofToday').count()) === 1, await page.evaluate(() => location.hash));
+  // posting from Today
+  let up = await post('#proofToday', 'Line from Today');
+  check(r, 'posting from Today works: set_coach_note with the local day, and Take it down is offered', up && up.payload.p_body === 'Line from Today' && up.payload.p_day === today && (await page.locator('#proofToday .mic .btn.danger').count()) === 1, up && up.payload);
+
+  // 2. Proof: the whole crew, two columns
+  await page.locator('.board .counter').nth(0).click(); await L.settle(page, 600);
+  check(r, 'the "on court today" counter opens Proof', (await page.evaluate(() => location.hash)) === '#proof' && (await page.locator('#wallPanel').count()) === 1, await page.evaluate(() => location.hash));
+  n = await ids();
+  check(r, 'Proof: one #coachLineInput; the wall, quest lever, pulse, board and funnel once each; Today\'s column is gone', n.coachLineInput === 1 && n.wallPanel === 1 && n.questPanel === 1 && n.pulsePanel === 1 && n.boardPanel === 1 && n.funnelPanel === 1 && !n.proofToday, n);
+  const geo = await page.evaluate(() => {
+    const by = t => [...document.querySelectorAll('#content .panel')].find(p => (p.querySelector('.phead .t') || {}).textContent === t);
+    const P = { wall: by('The wall'), board: by('The board'), quest: by('Quest week'), pulse: by('Proof pulse'), titles: by('Titles minted'), season: by('Season'), funnel: by('The funnel') };
+    const missing = Object.keys(P).filter(k => !P[k]);
+    if (missing.length) return { missing };
+    const R = {}; Object.keys(P).forEach(k => { const q = P[k].getBoundingClientRect(); R[k] = { l: Math.round(q.left), t: Math.round(q.top + scrollY), w: Math.round(q.width) }; });
+    return R;
+  });
+  const colsOk = !geo.missing && geo.wall.l === geo.board.l && geo.wall.t < geo.board.t
+    && ['pulse', 'titles', 'season', 'funnel'].every(k => geo[k].l === geo.quest.l) && geo.quest.l > geo.wall.l + geo.wall.w - 1
+    && geo.quest.t < geo.pulse.t && geo.pulse.t < geo.titles.t && geo.titles.t < geo.season.t && geo.season.t < geo.funnel.t && Math.abs(geo.wall.t - geo.quest.t) < 3;
+  check(r, 'two columns: The wall then The board on the left; Quest week, Proof pulse, Titles minted, Season and The funnel (last) on the right, level at the top', colsOk, geo);
+  check(r, 'the left column is the wider one (about 1.3 to 1)', !geo.missing && geo.wall.w / geo.quest.w > 1.2 && geo.wall.w / geo.quest.w < 1.4, geo.missing || [geo.wall.w, geo.quest.w]);
+  const wallTxt = await txt('#wallPanel');
+  check(r, 'the full wall: the composer holds the line posted from Today; yesterday\'s lines (the crew\'s with Hide, and yours) are here; Show the full week', (await page.locator('#wallPanel #coachLineInput').inputValue()) === 'Line from Today' && /Fixture wall line from Cara/.test(wallTxt) && /Fixture coach line yesterday/.test(wallTxt) && (await page.locator('#wallPanel .modbtn').count()) === 2 && /Show the full week/.test(wallTxt), wallTxt);
+  await page.evaluate(async d => { window.__DB.hab_notes.push({ athlete_id: 'dan_proof', day: d, body: 'Five days back line', pct: 40, hidden: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }); await refetch(['notes']); }, await dayOf(-5));
+  check(r, 'a line from five days ago is not in the two-day view', !/Five days back line/.test(await txt('#wallPanel')), '');
+  await page.locator('#wallPanel .showweek').click(); await L.settle(page, 400);
+  const wk = await txt('#wallPanel');
+  check(r, 'Show the full week lists it, says last 7 days and offers Show less', /Five days back line/.test(wk) && /last 7 days/.test(wk) && /Show less/.test(wk), wk);
+  await page.locator('#wallPanel .showweek').click(); await L.settle(page, 400);
+  check(r, 'Show less puts it back', !/Five days back line/.test(await txt('#wallPanel')) && /last 2 days/.test(await txt('#wallPanel')), '');
+  // the quest lever, with the live run set in step 1: the run and End this run today (never the picker)
+  const qTxt = await txt('#questPanel');
+  check(r, 'Quest week shows the live run (Day 3/7, both quests) with End this run today, and no picker', /Live run/i.test(qTxt) && /Day 3\/7/i.test(qTxt) && /FIXTURE WELL/.test(qTxt) && /FIXTURE SHOW-UP/.test(qTxt) && (await page.locator('#questPanel .btn.danger', { hasText: 'End this run today' }).count()) === 1 && (await page.locator('#questPanel input[type=checkbox]').count()) === 0, qTxt);
+  await page.evaluate(async () => { window.__DB.xp_rules[0].rules.questRuns = []; await refetch(['rules']); });
+  const pick = page.locator('#questPanel input[type=checkbox]');
+  const startDisabled = () => page.locator('#questStartBtn').isDisabled();
+  check(r, 'with no run live: the picker (3 quests) and Start the week, switched off until one is ticked', (await pick.count()) === 3 && (await startDisabled()), await pick.count());
+  await pick.nth(0).check();
+  check(r, 'ticking one switches Start the week on, and a redraw keeps the tick', !(await startDisabled()) && (await page.evaluate(() => { render(); return document.querySelectorAll('#questPanel input:checked').length; })) === 1, '');
+  await L.settle(page, 300);
+  check(r, 'after the redraw Start the week is still on (questPickCount runs after the panel is drawn)', !(await startDisabled()), '');
+  await page.evaluate(() => { document.querySelectorAll('#questPanel input:checked').forEach(i => { i.checked = false; }); questPickCount(); });
+  // the pulse, titles, season, funnel
+  const pulse = await page.evaluate(() => [...document.querySelectorAll('#pulsePanel .pulse')].map(x => x.innerText.replace(/\s+/g, ' ').trim()));
+  check(r, 'Proof pulse lists every Proof athlete, most silent first (Dan, 5d silent, on top)', pulse.length === 3 && /^Dan/.test(pulse[0]) && /5d silent/.test(pulse[0]), pulse);
+  const rest = await txt('#content');
+  check(r, 'Titles minted and Season are on Proof', /FIXTURE TITLE/.test(rest) && /Fixture Season/.test(rest), '');
+  const fn = await page.evaluate(() => { const h = funnelPanelHtml(); return { section: /^\s*<section[^>]*id="funnelPanel"/.test(h), head: /The funnel/.test(h), rows: document.querySelectorAll('#funnelPanel .fun').length, acts: [...document.querySelectorAll('#funnelPanel .fun')].map(f => f.querySelector('.acts').innerText.replace(/\s+/g, ' ').trim()) }; });
+  check(r, 'The funnel comes from funnelPanelHtml() (one self-contained section) and keeps WhatsApp, copy email and open on each row', fn.section && fn.head && fn.rows === 2 && fn.acts.every(a => /WhatsApp/.test(a) && /copy email/.test(a) && /open/.test(a)), fn);
+
+  // 3. posting and hiding from Proof; a redraw never blanks the page to "Fetching the board…" once the board is held
+  await page.evaluate(() => { window.__sawFetching = false; const c = document.getElementById('content'); new MutationObserver(() => { if (c.innerText.includes('Fetching the board')) window.__sawFetching = true; }).observe(c, { childList: true, subtree: true, characterData: true }); });
+  up = await post('#wallPanel', 'Line from Proof');
+  check(r, 'posting from Proof works: set_coach_note with the local day, one composer, and the composer shows the line', up && up.payload.p_body === 'Line from Proof' && up.payload.p_day === today && (await ids()).coachLineInput === 1 && (await page.locator('#wallPanel #coachLineInput').inputValue()) === 'Line from Proof', up && up.payload);
+  const n1 = await L.nCalls(page);
+  await page.locator('#wallPanel .wline', { hasText: 'Fixture wall line from Cara.' }).locator('.modbtn').click(); await L.settle(page, 700);
+  const hide = lastOf(await L.callsSince(page, n1), c => c.kind === 'rpc' && c.name === 'hide_note');
+  check(r, 'hiding a line from Proof works: hide_note(cara_free, yesterday, true), and the line redraws greyed with Show', hide && hide.payload.p_athlete_id === 'cara_free' && hide.payload.p_day === await dayOf(-1) && hide.payload.p_hidden === true && (await page.locator('#wallPanel .wline.hid .modbtn', { hasText: 'Show' }).count()) === 1, hide && hide.payload);
+  const sync = await page.evaluate(() => { render(); return { spinner: document.getElementById('content').innerText.includes('Fetching the board'), rows: document.querySelectorAll('#boardPanel .lbrow').length, asOf: /As of \d\d:\d\d/.test(document.getElementById('boardPanel').innerText) }; });
+  check(r, 'a redraw draws the held board AT ONCE: no "Fetching the board…" at any moment of the post, the hide or a render(), and the board rows and its time are there', !sync.spinner && sync.rows >= 1 && sync.asOf && (await page.evaluate(() => window.__sawFetching)) === false, { sync, saw: await page.evaluate(() => window.__sawFetching) });
+  // a real first read waits inside the board's own panel only
+  await page.evaluate(() => { resetBoard(); window.__STUB.delay.leaderboard_top = 1200; render(); });
+  const first = await page.evaluate(() => ({ board: document.getElementById('boardPanel').innerText.replace(/\s+/g, ' '), mic: !!document.querySelector('#wallPanel .mic'), quest: !!document.getElementById('questPanel'), pulse: document.querySelectorAll('#pulsePanel .pulse').length, funnel: !!document.getElementById('funnelPanel') }));
+  check(r, 'a real first read shows "Fetching the board…" in the board\'s own panel only, with the wall, quest lever, pulse and funnel already on screen', /Fetching the board/.test(first.board) && first.mic && first.quest && first.pulse === 3 && first.funnel, first);
+  await L.settle(page, 1700);
+  await page.evaluate(() => { window.__STUB.delay.leaderboard_top = 0; });
+  check(r, 'and the rows arrive in that panel with their time', !/Fetching/.test(await txt('#boardPanel')) && /As of \d\d:\d\d/.test(await txt('#boardPanel')) && (await page.locator('#boardPanel .lbrow').count()) >= 1, await txt('#boardPanel'));
+  // going back to Today: the composer there shows the line posted from Proof, and only one composer is in the page
+  await L.go(page, 'today');
+  n = await ids();
+  check(r, 'back on Today: the composer shows the line posted from Proof, and there is still one #coachLineInput', n.coachLineInput === 1 && (await page.locator('#proofToday #coachLineInput').inputValue()) === 'Line from Proof', n);
+
+  // 4. no sideways scroll on Today or Proof at 390 and 320
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 844 });
+    for (const h of ['today', 'proof']) { await L.go(page, h); await L.settle(page, 250); const o = await overflow(); check(r, `${h === 'today' ? 'Today' : 'Proof'} at ${w} px: no sideways scroll`, o.over <= 0, o); }
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  // 5. body weight: on The work, one compact panel with the chart folded; gone from the athlete's Proof sub-tab; absent with no reading
+  await page.evaluate(() => {
+    const row = window.__DB.athlete_progress.find(p => p.athlete_id === 'ava_test');
+    const wt = {};
+    for (let i = 0; i < 40; i++) wt[addDays(todayKey(), -i)] = { kg: i === 0 ? 64.7 : Math.round((64.7 + i * 0.08) * 10) / 10, t: Date.now() - i * 86400000 };
+    row.data.ava_test_hab_wt = JSON.stringify(wt);
+    row.data.ava_test_1rm = [{ lift: 'Goblet Squat', kg: 40, w: 30, r: 5, rpe: 8, d: addDays(todayKey(), -3), t: Date.now() }];
+    return refetch(['prog']);
+  });
+  await L.go(page, 'a/ava_test/work'); await L.settle(page, 500);
+  const wt = await page.evaluate(() => {
+    const d = document.getElementById('wtdet'), box = document.getElementById('tabbody');
+    const pos = (a, c) => !!(a && c && (a.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING));
+    return d ? { n: document.querySelectorAll('#wtdet').length, inWork: box.contains(d), open: d.open, head: d.querySelector('summary').textContent.replace(/\s+/g, ' ').trim(),
+      afterPr: pos(document.querySelector('.prlist'), d), beforeCards: pos(d, document.querySelector('.wday')), svgShown: !!d.querySelector('.chart-svg') && d.querySelector('.chart-svg').checkVisibility() } : null;
+  });
+  check(r, 'The work: ONE #wtdet panel, shut, after the Personal records panel and before the day cards', !!wt && wt.n === 1 && wt.inWork && !wt.open && wt.afterPr && wt.beforeCards, wt);
+  check(r, 'its header line reads "Body weight · 64.7 kg · today · −x.x kg over 30 days · −x.x over 90" (the app\'s own numbers)', !!wt && /^Body weight · 64\.7 kg · today · −\d\.\d kg over 30 days · −\d\.\d over 90$/.test(wt.head), wt && wt.head);
+  check(r, 'the chart is not on screen until it is opened', !!wt && wt.svgShown === false, wt);
+  await page.locator('#wtdet summary').click(); await L.settle(page, 200);
+  const opened = () => page.evaluate(() => { const d = document.getElementById('wtdet'); return { open: !!d && d.open, svg: !!d && !!d.querySelector('.chart-svg') && d.querySelector('.chart-svg').checkVisibility(), w: d ? Math.round(d.querySelector('.chart-svg').getBoundingClientRect().width) : 0 }; });
+  const o1 = await opened();
+  check(r, 'a tap on the header opens it and shows the chart (not wider than 520 px)', o1.open && o1.svg && o1.w <= 520, o1);
+  await page.evaluate(() => renderDetailBody()); await L.settle(page, 200);
+  const o2 = await opened();
+  await page.evaluate(() => { assemble(); render(); }); await L.settle(page, 500);
+  const o3 = await opened();
+  check(r, 'it stays open through a redraw of the tab and a full redraw (snapTabBody keeps it)', o2.open && o3.open, [o2, o3]);
+  await L.go(page, 'a/ava_test/proof'); await L.settle(page, 400);
+  check(r, 'the athlete\'s Proof sub-tab no longer has it', (await page.locator('#wtdet').count()) === 0 && !/body weight/i.test(await txt('#tabbody')) && /habit tracking/i.test(await txt('#tabbody')), await txt('#tabbody'));
+  await L.go(page, 'a/ben_test/work'); await L.settle(page, 400);
+  check(r, 'an athlete with no reading has no body weight panel at all (absent, not empty)', (await page.locator('#wtdet').count()) === 0 && !/body weight/i.test(await txt('#tabbody')), '');
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 844 });
+    await L.go(page, 'a/ava_test/work'); await L.settle(page, 250);
+    await page.evaluate(() => { document.getElementById('wtdet').open = true; });
+    const o = await overflow();
+    check(r, `The work with body weight open at ${w} px: no sideways scroll`, o.over <= 0, o);
+  }
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
@@ -2677,21 +2841,22 @@ S['today-also-waiting'] = async (b) => {
   const r = { id: 'today-also-waiting', title: 'Today: Needs you first and wide, a button on each row that names what it does, and "Also waiting" with the logins to send', checks: [] };
   const { page, log } = await L.openCoach(b, {});
   const peopleText = () => page.locator('#needPanel .phead .r').innerText().then(s => s.replace(/\s+/g, ' ').trim());
-  // 1. layout: Needs you first in the page, left of the wall and about twice as wide; the other three panels follow in order; no banner headline
+  // 1. layout: Needs you first in the page, left of Proof today (one short panel, round 2) and about twice as wide; no banner headline.
+  // The full wall, the quest lever and the pulse are on Proof only, so none of their ids is on Today (one copy of an id at a time).
   const lay = await page.evaluate(() => {
-    const n = document.getElementById('needPanel'), w = document.getElementById('wallPanel'), q = document.getElementById('questPanel'), p = document.getElementById('pulsePanel');
+    const n = document.getElementById('needPanel'), w = document.getElementById('proofToday');
     const rn = n.getBoundingClientRect(), rw = w.getBoundingClientRect(), F = Node.DOCUMENT_POSITION_FOLLOWING;
-    return { order: !!(n.compareDocumentPosition(w) & F) && !!(w.compareDocumentPosition(q) & F) && !!(q.compareDocumentPosition(p) & F),
+    return { order: !!(n.compareDocumentPosition(w) & F), fullOnToday: ['wallPanel', 'questPanel', 'pulsePanel'].filter(id => document.getElementById(id)),
       left: rn.right <= rw.left + 1, ratio: Math.round(rn.width / rw.width * 100) / 100, top: Math.abs(rn.top - rw.top) < 2,
       h1: document.querySelectorAll('#content h1').length, strip: Math.round(document.querySelector('.board').getBoundingClientRect().height),
       counters: [...document.querySelectorAll('.board .counter')].map(a => a.textContent.replace(/\s+/g, ' ').trim()) };
   });
-  check(r, '#needPanel comes before #wallPanel, then #questPanel, then #pulsePanel, in the page', lay.order, lay);
-  check(r, 'on a wide screen Needs you is the left column, level with the wall and about twice as wide', lay.left && lay.top && lay.ratio > 1.8 && lay.ratio < 2.3, lay);
+  check(r, '#needPanel comes before #proofToday in the page, and the full wall, quest lever and pulse are not on Today', lay.order && !lay.fullOnToday.length, lay);
+  check(r, 'on a wide screen Needs you is the left column, level with Proof today and about twice as wide', lay.left && lay.top && lay.ratio > 1.8 && lay.ratio < 2.3, lay);
   check(r, 'the strip has no headline and is slim (under 110 px), with the four counters on it as number + label', lay.h1 === 0 && lay.strip < 110 && lay.counters.length === 4 && /^\d+\/\d+ on court today$/.test(lay.counters[0]) && /^\d+ notes? to read$/.test(lay.counters[3]), lay);
   for (const w of [390, 320]) {
     await page.setViewportSize({ width: w, height: 844 }); await L.settle(page, 250);
-    const ph = await page.evaluate(() => { const n = document.getElementById('needPanel').getBoundingClientRect(), wl = document.getElementById('wallPanel').getBoundingClientRect();
+    const ph = await page.evaluate(() => { const n = document.getElementById('needPanel').getBoundingClientRect(), wl = document.getElementById('proofToday').getBoundingClientRect();
       return { stacked: wl.top >= n.bottom - 1, sw: document.documentElement.scrollWidth, iw: innerWidth, strip: Math.round(document.querySelector('.board').getBoundingClientRect().height) }; });
     check(r, `at ${w} px one column with Needs you first, and no sideways scroll`, ph.stacked && ph.sw <= ph.iw, ph);
     if (w === 390) check(r, 'at 390 px the strip stays under 150 px (counters 2 x 2)', ph.strip < 150, ph);

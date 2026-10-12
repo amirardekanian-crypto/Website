@@ -215,15 +215,17 @@
   }
 
   /* ── Panels ── */
-  .cols { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; margin-top: 16px; align-items: start; }
+  /* Proof (round 2: the community's home): the wall and the board on the left (the wider column), the quest lever, the pulse,
+     titles, the season and the funnel stacked on the right. One column below 900 px, the left column first. */
+  .cols { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
   .colstack { display: grid; gap: 16px; }
-  /* Today: Needs you wide on the left, the wall, the quest week and the pulse stacked on the right. One column
+  /* Today: Needs you wide on the left, Proof today (one short panel) on the right. One column
      below 900 px, in the same order (Needs you first): no reordering on a phone. */
   .tcols { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
   /* Grid items default to min-width:auto, so one nowrap label inside a panel
      can push the whole column past its track and scroll the page sideways. */
   .cols > *, .tcols > *, .colstack > *, .counters > * { min-width: 0; }
-  @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } .cols > .colstack:last-child { order: -1; } }
+  @media (max-width: 899px) { .cols { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 899px) { .tcols { grid-template-columns: minmax(0, 1fr); } }
   .panel { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 18px 20px;
            box-shadow: var(--shadow); animation: riseIn .4s cubic-bezier(.16,1,.3,1) both; }
@@ -382,8 +384,8 @@
   }
 
   /* ── The wall ── */
-  /* The wall sits in Today's narrow right column (about 330 px wide at most, 240 px at 900 px): the composer is no box
-     of its own (the textarea is the box) and its buttons wrap. */
+  /* The composer shows in two places: the full wall on Proof, and Today's Proof column (about 330 px wide at most, 240 px at 900 px).
+     It is no box of its own (the textarea is the box) and its buttons wrap. */
   .mic { margin-bottom: 14px; }
   .mic .cap { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
   .mic textarea { width: 100%; min-height: 44px; resize: vertical; border: 1px solid var(--line); border-radius: 10px;
@@ -417,10 +419,23 @@
   .showweek { width: 100%; text-align: center; font-size: 12px; font-weight: 600; color: var(--muted);
               padding: 9px 0 3px; }
   .showweek:hover { color: var(--court); }
+  /* Today's Proof column (round 2): ONE panel, its parts (the composer, today's lines, the quest line, who is drifting) divided by
+     hairlines, with no card inside the card. The last two are one line each and link to Proof, where the full lever and the pulse are. */
+  .pt + .pt { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); }
+  .pt .mic { margin-bottom: 0; }
+  .pt .wallday:first-child { margin-top: 0; }
+  .pt .empty { padding-top: 0; }
+  .ptlink { display: inline-block; margin-top: 6px; font-size: 12.5px; font-weight: 600; color: var(--muted); text-decoration: none; }
+  .ptlink:hover { color: var(--court); text-decoration: underline; }
+  .ptline { display: block; font-size: 13.5px; line-height: 1.45; color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+  .ptline:hover { color: var(--court); }
+  .ptline b { font-weight: 700; }
+  .ptline .dim { color: var(--muted); }
+  .ptline.drift b.lead { color: var(--clay-ink); }
 
   /* ── Quest panel ── */
-  /* In the narrow right column: no box around the live run (rows divided by hairlines), and a quest's note drops under its
-     name and XP instead of squeezing between them. */
+  /* Proof's right column (about 490 px wide at most): no box around the live run (rows divided by hairlines), and a quest's note drops
+     under its name and XP instead of squeezing between them. */
   .questrun .qtop { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
   .questrun .qday { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; color: var(--clay-ink); }
   .qchip { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 9px; padding: 8px 0; border-top: 1px solid var(--rule); }
@@ -911,6 +926,15 @@
   .chart-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
   .chart-svg { display: block; width: 100%; height: auto; margin-top: 12px; }
   .chart-legend { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+  /* Body weight on The work: ONE compact panel. The figures are its header line (the summary) and the chart folds under it. */
+  .wtpanel { padding: 12px 20px; margin-bottom: 12px; }
+  .wtdet > summary { cursor: pointer; list-style: none; font-size: 14px; line-height: 1.5; }
+  .wtdet > summary::-webkit-details-marker { display: none; }
+  .wtdet > summary::before { content: '▸ '; color: var(--muted); }
+  .wtdet[open] > summary::before { content: '▾ '; }
+  .wtdet > summary:hover { color: var(--court); }
+  .wtdet .wt-t { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase; font-size: 17px; letter-spacing: .01em; }
+  .wtdet .chart-svg { max-width: 520px; }
 
   /* Personal records — one line per lift on The work tab */
   .pr-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline;
@@ -2589,7 +2613,6 @@ function renderToday() {
   const waiting = Object.values(S.ath).reduce((n, a) => n + a.toReply, 0);
   const season = currentSeason();
   const sd = seasonDay();
-  const run = activeQuestRun();
 
   $('content').innerHTML = `
     <section class="board">
@@ -2598,9 +2621,9 @@ function renderToday() {
         ${season ? `<span class="board-season">${esc(season.name)} · <b>Day ${sd}</b></span>` : ''}
       </div>
       <div class="counters">
-        <a class="counter" href="#today" onclick="scrollPanel(event,'pulsePanel')">
+        <a class="counter" href="#proof">
           <span class="n">${onCourt}<small>/${habAthletes.length}</small></span> <span class="l">on court today</span></a>
-        <a class="counter" href="#today" onclick="scrollPanel(event,'wallPanel')">
+        <a class="counter" href="#today" onclick="scrollPanel(event,'proofToday')">
           <span class="n">${wallToday}</span> <span class="l">wall line${wallToday === 1 ? '' : 's'} today</span></a>
         <a class="counter" href="#athletes"><span class="n">${sessions7}</span> <span class="l">session${sessions7 === 1 ? '' : 's'}, last 7 days</span></a>
         <a class="counter ${waiting ? 'hot' : ''}" href="#today" onclick="scrollPanel(event,'needPanel')">
@@ -2610,13 +2633,10 @@ function renderToday() {
     <div class="tcols">
       <section class="panel" id="needPanel" style="animation-delay:.05s">${needPanelHtml()}</section>
       <div class="colstack">
-        <section class="panel" id="wallPanel" style="animation-delay:.08s">${wallPanelHtml()}</section>
-        <section class="panel" id="questPanel" style="animation-delay:.12s">${questPanelHtml(run)}</section>
-        <section class="panel" id="pulsePanel" style="animation-delay:.16s">${pulsePanelHtml(habAthletes)}</section>
+        <section class="panel" id="proofToday" style="animation-delay:.08s">${proofTodayHtml(habAthletes)}</section>
       </div>
     </div>`;
   wireWallComposer();
-  if (_questPicked.size) questPickCount();
 }
 function scrollPanel(ev, id) {
   if (route().view !== 'today') return; // let the href navigate first
@@ -2625,25 +2645,13 @@ function scrollPanel(ev, id) {
 }
 window.scrollPanel = scrollPanel;
 
-// The wall: coach-line composer on top, then the crew's lines, newest day
-// first. Coach reads hidden lines too (greyed) and can hide/show any line.
-function wallPanelHtml() {
-  const t = todayKey();
-  const mine = coachLine(t);
-  const showWeek = !!wallPanelHtml._week;
-  const lines = wallLines(showWeek ? 7 : 2).filter(n => !(n.athlete_id === COACH_NOTE_ID && n.day === t));
-  const byDay = {};
-  lines.forEach(n => (byDay[n.day] = byDay[n.day] || []).push(n));
-  const days = Object.keys(byDay).sort((a, b) => b.localeCompare(a));
-
-  const feed = days.map(day => `
-    <div class="wallday"><span class="d">${esc(wallDayLabel(day))}</span></div>
-    ${byDay[day].map(n => wallLineHtml(n)).join('')}
-  `).join('') || `<p class="empty">Nothing on the wall ${showWeek ? 'this week' : 'yet today'}. The crew posts one line a day from their app.</p>`;
-
-  return `
-    <div class="phead"><span class="t hd">The wall</span><span class="r">roll call · last ${showWeek ? '7 days' : '2 days'}</span></div>
-    <div class="mic">
+// The wall, in two places (round 2, 2026-10-12): the FULL wall lives on Proof (wallPanelHtml: the composer, every day's lines, Show the full
+// week) and Today keeps a short Proof column (proofTodayHtml: the composer, today's lines, one quest line, one drifting line). The coach
+// reads hidden lines too (greyed) and can hide/show any line. Only one copy of #coachLineInput is ever in the page: Today draws the
+// composer inside #proofToday, Proof inside #wallPanel.
+function coachLineComposerHtml() {
+  const mine = coachLine(todayKey());
+  return `<div class="mic">
       <div class="cap"><span class="eyebrow">Your line to the crew</span></div>
       <textarea id="coachLineInput" maxlength="200" placeholder="No line yet today. Say something to everyone…">${esc(_coachLineDraft != null ? _coachLineDraft : (mine ? mine.body : ''))}</textarea>
       <div class="muted" style="font-size:12px;margin:4px 0 0">Pinned on today's wall. Quotes, &lt; &gt; and backslashes are removed when you post, and line breaks become spaces.</div>
@@ -2652,9 +2660,58 @@ function wallPanelHtml() {
         ${mine ? `<button class="btn sm danger" onclick="clearCoachLine()">Take it down</button>` : ''}
         <span class="count" id="coachLineCount"></span>
       </div>
-    </div>
-    ${feed}
+    </div>`;
+}
+// The crew's lines grouped by day, newest day first. The coach's own line for today is the composer's, so it is left out.
+function wallFeedHtml(lines, emptyText) {
+  const t = todayKey();
+  const byDay = {};
+  lines.filter(n => !(n.athlete_id === COACH_NOTE_ID && n.day === t)).forEach(n => (byDay[n.day] = byDay[n.day] || []).push(n));
+  const days = Object.keys(byDay).sort((a, b) => b.localeCompare(a));
+  return days.map(day => `
+    <div class="wallday"><span class="d">${esc(wallDayLabel(day))}</span></div>
+    ${byDay[day].map(n => wallLineHtml(n)).join('')}
+  `).join('') || `<p class="empty">${emptyText}</p>`;
+}
+// Proof's wall: the composer on top, then the crew's lines, newest day first; two days, or the full week on a tap.
+function wallPanelHtml() {
+  const showWeek = !!wallPanelHtml._week;
+  return `
+    <div class="phead"><span class="t hd">The wall</span><span class="r">roll call · last ${showWeek ? '7 days' : '2 days'}</span></div>
+    ${coachLineComposerHtml()}
+    ${wallFeedHtml(wallLines(showWeek ? 7 : 2), `Nothing on the wall ${showWeek ? 'this week' : 'yet today'}. The crew posts one line a day from their app.`)}
     <button class="showweek" onclick="toggleWallWeek()">${showWeek ? 'Show less' : 'Show the full week ↓'}</button>`;
+}
+// Today's Proof column: ONE panel, four parts between hairlines. The full wall, the quest lever and the pulse are on Proof.
+function proofTodayHtml(habAthletes) {
+  const drift = driftLineHtml(habAthletes);
+  return `
+    <div class="phead"><span class="t hd">Proof today</span></div>
+    <div class="pt">${coachLineComposerHtml()}</div>
+    <div class="pt">
+      ${wallFeedHtml(wallLines(1), 'Nothing on the wall yet today. The crew posts one line a day from their app.')}
+      <a class="ptlink" href="#proof">Earlier lines on Proof →</a>
+    </div>
+    <div class="pt">${questLineHtml()}</div>
+    ${drift ? `<div class="pt">${drift}</div>` : ''}`;
+}
+// One line about the quest week: the live run, or the nudge to start one. Both open Proof, where the lever is.
+function questLineHtml() {
+  const run = activeQuestRun();
+  if (!run) return `<a class="ptline" href="#proof"><b>No quest week live</b> <span class="dim">· start one on Proof →</span></a>`;
+  const t = todayKey(), ends = questRunEnd(run);
+  const dayN = daysBetween(run.start, t) + 1, total = daysBetween(run.start, ends) + 1, n = run.ids.length;
+  return `<a class="ptline" href="#proof"><b>Quest week</b> <span class="dim">· day ${dayN} of ${total} · ${n} quest${n === 1 ? '' : 's'} · ends ${ends === t ? 'today' : DOWS[pDate(ends).getDay()]} →</span></a>`;
+}
+// One line about who is drifting: the habit athletes silent for QUIET_HABIT_DAYS or more (the pulse's own rule), most silent first, four
+// names at most. Nothing at all when nobody is.
+function driftLineHtml(habAthletes) {
+  const quiet = habAthletes.filter(a => a.habGap >= QUIET_HABIT_DAYS)
+    .sort((a, b) => (b.habGap - a.habGap) || a.name.localeCompare(b.name));
+  if (!quiet.length) return '';
+  const SHOW = 4;
+  const names = quiet.slice(0, SHOW).map(a => `${esc(a.name)} <span class="dim">${a.habGap} d</span>`).join(', ');
+  return `<a class="ptline drift" href="#proof"><b class="lead">Drifting:</b> ${names}${quiet.length > SHOW ? `, <span class="dim">+ ${quiet.length - SHOW} more</span>` : ''} <span class="dim">→</span></a>`;
 }
 function wallLineHtml(n) {
   const isCoach = n.athlete_id === COACH_NOTE_ID;
@@ -4474,6 +4531,7 @@ function workTabHtml(D) {
   return `${logsWarn}
     ${metricStripHtml(metrics)}
     ${maxesPanel(D)}
+    ${weightPanel(D.a)}
     ${cards.length ? cards.join('') : `<p class="empty">${D.a.tier === 'coached' || S.progSrc[athleteId] !== 'db'
         ? 'No training programme published yet, and no finished sessions.'
         : 'No training programme: this is a habit-only (Proof) athlete. Their habits are under Proof.'}</p>`}
@@ -4854,7 +4912,6 @@ function proofTabHtml(D) {
       <span class="chip ${c.tier === 'free' ? 'ochre' : 'court'}">${esc(c.tier || '')}</span>
     </div>` : ''}
   </section>
-  ${weightPanel(a)}
   <div class="sec"><span>Their wall lines this week</span></div>
   ${myLines.length ? `<section class="panel">${myLines.map(n => `<div class="wline ${n.hidden ? 'hid' : ''}">
       <div class="bd"><div class="wtop"><span class="nm">${esc(wallDayLabel(n.day))}</span>${n.pct != null ? `<span class="pct">${esc(n.pct)}%</span>` : ''}${n.hidden ? '<span class="hidetag">hidden</span>' : ''}</div>
@@ -4865,7 +4922,9 @@ function proofTabHtml(D) {
 // Weight is opt-in in the app and most athletes will never switch it on, so
 // this panel is absent rather than empty when there is nothing to show — an
 // empty chart on every athlete's page trains you to scroll past the one that
-// has something in it.
+// has something in it. It sits on The work (round 2, 2026-10-12: the weight comes from the training app, not from Proof, and a coached
+// athlete who never ticks a habit has no Proof tab): ONE compact panel, the figures on its header line and the chart folded under them in
+// #wtdet, shut until it is opened (snapTabBody() keeps it open through a redraw).
 function weightPanel(a) {
   const wt = a.wt || {};
   const keys = wtDaysOf(wt);
@@ -4877,16 +4936,13 @@ function weightPanel(a) {
   const vals = ser.map(p => p.v);
   const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
   const pad = Math.max(0.5, (hi - lo) * 0.18);
-  return `<div class="sec"><span>Body weight</span></div>
-  <section class="panel"><div class="chart-card">
-    <h4>Trend</h4>
-    <div class="chart-big">${round1(kg).toFixed(1)}<span style="font-size:13px;color:var(--muted);margin-left:6px">kg · ${gap === 0 ? 'today' : gap === 1 ? 'yesterday' : gap + ' days ago'}</span></div>
-    <div class="chart-sub">${c30 ? fmtDeltaKg(c30.delta) + ' kg over 30 days' : 'not enough readings for a 30-day change'}${c90 ? ' · ' + fmtDeltaKg(c90.delta) + ' kg over 90' : ''}</div>
+  return `<section class="panel wtpanel"><details class="wtdet" id="wtdet">
+    <summary><span class="wt-t">Body weight</span> · <b>${round1(kg).toFixed(1)} kg</b> · ${gap === 0 ? 'today' : gap === 1 ? 'yesterday' : gap + ' days ago'} · ${c30 ? fmtDeltaKg(c30.delta) + ' kg over 30 days' : 'not enough readings for a 30-day change'}${c90 ? ' · ' + fmtDeltaKg(c90.delta) + ' over 90' : ''}</summary>
     ${ser.length > 1
       ? lineSVG(ser, { color: C.green, yMin: lo - pad, yMax: hi + pad, dots: false })
         + `<div class="chart-legend">${WT_AVG_WINDOW}-day rolling average, last 90 days · ${keys.length} reading${keys.length === 1 ? '' : 's'} all time</div>`
       : `<p class="empty">One reading so far — a line needs a few more.</p>`}
-  </div></section>`;
+  </details></section>`;
 }
 // ── The File tab's building blocks (2026-10-12: four groups, one white panel each; label / value / action rows between hairlines) ──
 // A row: its label, then the value, its actions (right-aligned, wrapping under on a phone), one short muted hint, and `full` (a form, the
@@ -5570,7 +5626,7 @@ async function eraseRun() {
 window.eraseOpen = eraseOpen; window.eraseCancel = eraseCancel; window.eraseType = eraseType; window.eraseTick = eraseTick; window.eraseRun = eraseRun;
 window.eraseFind = eraseFind; window.eraseStopWaiting = eraseStopWaiting;
 
-// --- PROOF (board · funnel · titles · season) --------------------------------
+// --- PROOF (wall · quest week · pulse · board · titles · season · funnel) ----
 // The board comes from the server's own scorer via leaderboard_top, called as the signed-in
 // coach (the function lets is_coach() through, with no key): the rows and the order are the ones athletes
 // see. `amir_ardekani` is only the row it marks as "you".
@@ -5591,14 +5647,53 @@ async function loadBoard(scope) {
 function reloadBoard() { S.board[_boardScope] = null; delete S.boardAt[_boardScope]; renderProof(); }
 window.reloadBoard = reloadBoard;
 let _boardScope = 'season';
+// Proof is the community's home (round 2, 2026-10-12), so running the crew is one screen: the wall and the board on the left; the quest lever,
+// the pulse, Titles minted, the season and the funnel on the right. Today keeps only a short Proof column (proofTodayHtml).
+// A redraw (a line posted, a line hidden, a quest week started) is drawn AT ONCE from what the page holds. The board is read once and kept, so
+// only a real first read (or a Reload) waits, and it waits inside the board's own panel: the wall and the lever never blank out under the coach's
+// hands (it used to replace the whole screen with "Fetching the board…" on every redraw).
 async function renderProof() {
-  const season = currentSeason();
-  const sd = seasonDay();
-  $('content').innerHTML = '<div class="loading"><div class="spinner"></div>Fetching the board…</div>';
-  const rows = await loadBoard(_boardScope);
-  if (route().view !== 'proof') return;   // user navigated away mid-fetch
-
-  const boardHtml = rows === null
+  const scope = _boardScope;
+  const held = DEMO ? (S.board[scope] || []) : S.board[scope];
+  drawProof(held || undefined);                           // undefined = still to be read
+  if (held) return;
+  const rows = await loadBoard(scope);
+  if (route().view !== 'proof' || _boardScope !== scope) return;   // user navigated away, or switched Season/Week, mid-fetch
+  const el = $('boardPanel');
+  if (el) el.innerHTML = boardPanelHtml(rows);
+}
+function drawProof(rows) {
+  const habAthletes = Object.values(S.ath).filter(a => a.isHab);
+  // A redraw of Proof over Proof does not replay the panels' entrance.
+  $('content').classList.toggle('no-anim', !!$('boardPanel'));
+  $('content').innerHTML = `
+    <div class="cols" style="margin-top:0">
+      <div class="colstack">
+        <section class="panel" id="wallPanel">${wallPanelHtml()}</section>
+        <section class="panel" id="boardPanel">${boardPanelHtml(rows)}</section>
+      </div>
+      <div class="colstack">
+        <section class="panel" id="questPanel">${questPanelHtml(activeQuestRun())}</section>
+        <section class="panel" id="pulsePanel">${pulsePanelHtml(habAthletes)}</section>
+        ${titlesPanelHtml()}
+        ${seasonPanelHtml()}
+        ${funnelPanelHtml()}
+      </div>
+    </div>`;
+  wireWallComposer();
+  if (_questPicked.size) questPickCount();
+}
+// The board panel's inside: the Season / Week switch, when it was read, and the rows. `rows` is undefined while the first read is on its way,
+// null when it failed, else the rows.
+function boardPanelHtml(rows) {
+  const at = S.boardAt[_boardScope];
+  const head = `<div class="phead"><span class="t hd">The board</span>
+      <span class="segs">
+        <button class="seg ${_boardScope === 'season' ? 'active' : ''}" onclick="setBoardScope('season')">Season</button>
+        <button class="seg ${_boardScope === 'week' ? 'active' : ''}" onclick="setBoardScope('week')">Week</button>
+      </span></div>`;
+  if (rows === undefined) return `${head}<div class="loading" style="padding:28px 0"><div class="spinner"></div>Fetching the board…</div>`;
+  const list = rows === null
     ? `<p class="empty">Couldn't fetch the board: ${esc(S.boardErr || 'no answer')}. <button class="btn sm" onclick="reloadBoard()">↻ Try again</button></p>`
     : rows.length
       ? rows.map(r => `
@@ -5608,7 +5703,36 @@ async function renderProof() {
           <span class="xp">LV ${esc(r.level)} · ${esc(r.rank_label)}<small>${Number(r.xp).toLocaleString()} XP</small></span>
         </div>`).join('')
       : '<p class="empty">Nobody on the board yet.</p>';
-
+  return `${head}
+    <p class="psub">Scored by the server — exactly what the crew sees in the app.${at ? ` As of ${pad2(at.getHours())}:${pad2(at.getMinutes())}. <button class="btn sm" onclick="reloadBoard()">↻ Reload</button>` : ''}</p>
+    ${list}`;
+}
+function titlesPanelHtml() {
+  const titles = (S.titles || []).length ? S.titles.map(x => `
+    <div class="tfeed"><span class="tnm">${esc(nameOf(x.athlete_id))}</span>
+      <span>earned</span><span class="ttl">${esc(x.title)}</span>
+      <span class="td">${esc(prettyDate(x.earned_on))}</span></div>`).join('')
+    : '<p class="empty">No titles minted yet.</p>';
+  return `<section class="panel">
+      <div class="phead"><span class="t hd">Titles minted</span><span class="r">latest ${Math.min(S.titles.length, 30)}</span></div>
+      ${titles}
+    </section>`;
+}
+function seasonPanelHtml() {
+  const season = currentSeason(), sd = seasonDay();
+  return `<section class="panel">
+      <div class="phead"><span class="t hd">Season</span><span class="r">${season ? 'day ' + sd : ''}</span></div>
+      ${season ? `
+        <div class="proofstrip">
+          <div class="big">${esc(season.name)}<br><small>opened ${esc(prettyDate(season.starts_on))}</small></div>
+        </div>
+        <p class="psub" style="margin-top:12px">Starting or closing a season stays in the Supabase SQL editor on purpose — it resets every score. See XP_SYSTEM.md.</p>`
+      : '<p class="empty">No season live.</p>'}
+    </section>`;
+}
+// The funnel: everyone who signed up through proof.html, newest first. One self-contained function that returns the whole section, so
+// a screen of its own can take it whole (round 2 plans a Leads tab); today it is the last panel on Proof.
+function funnelPanelHtml() {
   // The tier is the programme's (S.ath), not the contact row's second copy. A coached client who
   // signed up through Proof first is "converted": listed, but not counted as a free signup, and
   // never offered Forget (forget_contact() deletes the whole progress row: their training app's
@@ -5644,47 +5768,11 @@ async function renderProof() {
       </div>
     </div>`;
   }).join('') : '<p class="empty">No signups recorded yet. /proof-signup writes them here.</p>';
-
-  const titlesHtml = (S.titles || []).length ? S.titles.map(x => `
-    <div class="tfeed"><span class="tnm">${esc(nameOf(x.athlete_id))}</span>
-      <span>earned</span><span class="ttl">${esc(x.title)}</span>
-      <span class="td">${esc(prettyDate(x.earned_on))}</span></div>`).join('')
-    : '<p class="empty">No titles minted yet.</p>';
-
-  $('content').innerHTML = `
-    <div class="cols" style="margin-top:0">
-      <div class="colstack">
-        <section class="panel">
-          <div class="phead"><span class="t hd">The board</span>
-            <span class="segs">
-              <button class="seg ${_boardScope === 'season' ? 'active' : ''}" onclick="setBoardScope('season')">Season</button>
-              <button class="seg ${_boardScope === 'week' ? 'active' : ''}" onclick="setBoardScope('week')">Week</button>
-            </span></div>
-          <p class="psub">Scored by the server — exactly what the crew sees in the app.${S.boardAt[_boardScope] ? ` As of ${pad2(S.boardAt[_boardScope].getHours())}:${pad2(S.boardAt[_boardScope].getMinutes())}. <button class="btn sm" onclick="reloadBoard()">↻ Reload</button>` : ''}</p>
-          ${boardHtml}
-        </section>
-        <section class="panel">
-          <div class="phead"><span class="t hd">Titles minted</span><span class="r">latest ${Math.min(S.titles.length, 30)}</span></div>
-          ${titlesHtml}
-        </section>
-      </div>
-      <div class="colstack">
-        <section class="panel">
-          <div class="phead"><span class="t hd">Season</span><span class="r">${season ? 'day ' + sd : ''}</span></div>
-          ${season ? `
-            <div class="proofstrip">
-              <div class="big">${esc(season.name)}<br><small>opened ${esc(prettyDate(season.starts_on))}</small></div>
-            </div>
-            <p class="psub" style="margin-top:12px">Starting or closing a season stays in the Supabase SQL editor on purpose — it resets every score. See XP_SYSTEM.md.</p>`
-          : '<p class="empty">No season live.</p>'}
-        </section>
-        <section class="panel">
-          <div class="phead"><span class="t hd">The funnel</span><span class="r">${freeFunnel.length} free signup${freeFunnel.length === 1 ? '' : 's'}${funnel.length > freeFunnel.length ? ` · ${funnel.length - freeFunnel.length} converted` : ''}</span></div>
-          <p class="psub">Free signups from proof.html — days logged is the qualifying signal. ${UPGRADE_DAYS}+ days on the free tier = worth a WhatsApp.${neverStarted ? ` <b>${neverStarted} of ${freeFunnel.length} have never logged a day</b> — they need a first-day nudge, not a pitch.` : ''}</p>
-          ${funnelHtml}
-        </section>
-      </div>
-    </div>`;
+  return `<section class="panel" id="funnelPanel">
+      <div class="phead"><span class="t hd">The funnel</span><span class="r">${freeFunnel.length} free signup${freeFunnel.length === 1 ? '' : 's'}${funnel.length > freeFunnel.length ? ` · ${funnel.length - freeFunnel.length} converted` : ''}</span></div>
+      <p class="psub">Free signups from proof.html — days logged is the qualifying signal. ${UPGRADE_DAYS}+ days on the free tier = worth a WhatsApp.${neverStarted ? ` <b>${neverStarted} of ${freeFunnel.length} have never logged a day</b> — they need a first-day nudge, not a pitch.` : ''}</p>
+      ${funnelHtml}
+    </section>`;
 }
 function setBoardScope(s) { _boardScope = s; renderProof(); }
 async function forgetContact(athleteId) {
