@@ -135,8 +135,20 @@ any week: a note can sit on a test week or a lighter week, and shows only during
 - **program.html `weekNoteNow()` / `weekNoteHTML()`** show the note **on Home only, inside its own week**, from
   the same `cycleWeekInfo()` that draws "Week X of Y". Never at the top of a session (Amir, 2026-10-12: *"dont show
   this at the top of each day workout, just in the home tab"*). In a session the note's numbers reach a target only on a
-  lower day (`dayRpe()`, below); on a normal day the session shows the card as written, so Home is the one place the
-  athlete reads the week's cap.
+  lower day (`dayRpe()`, below); on a normal day the session shows the card as written. **So the session bar carries
+  the numbers** (Amir, 2026-10-12: *"add the cap reminder to the session bar"*): `weekLimitsHTML()` draws one row at the
+  foot of the sticky bar, *This week · Max RPE 7*, *Back-off week · Max RPE 7 · 1 set fewer*, *Lighter week · RPE 1
+  lower, not below 6* (an `rpeDrop` only without a cap, as `dayRpe()` reads them, and with its floor, CHP-4), before
+  Start and all through the slim bar, gone after Done (the timer's `finished` or the day's completion, `.day-done`).
+  Never the note's words, and nothing when the note has no numbers. **On a day with a flagged retest while retests
+  are due** (`exTestSpec()`, `inRetestWindow()`, i.e. the back-off week) the RPE line reads *Max RPE 7 except the
+  retest* (TST-4: two lines never give opposite instructions for the same set). The label is the note's title, else
+  *Back-off week* for the cycle's final week (`weekNoteLast()`: the legacy `last` or a numeric key on the last week;
+  Home's kicker uses the same test), else *This week*. `renderTimer()` redraws the row from the cycle as it is now,
+  and opening a day calls it, so an app left open across a week boundary shows the right week. It never shares the
+  clock's line (`.has-week` lets the slim bar wrap onto it); with the usual labels it is one line at 320 px, and a
+  long title or the retest words wrap it to two (about 100 px for the slim bar). A panel whose bar has the row gives
+  its cards `scroll-margin-top: 175px`.
   **The look is Front Page** (Amir chose A of three on the Week Note Lookbook, claude.ai/artifact/9Y4Rf1eBQ7DB1DJ9rKqBym,
   with his own changes: *"instead of from amir at the bottom add my sign and image but not the "your coach" text and
   use their name in the text"*). No box and no tint: in its week the note IS the This Week section. `renderHome()`
@@ -162,9 +174,9 @@ any week: a note can sit on a test week or a lighter week, and shows only during
   `last`, else *Week N*. The result carries the note's fields plus `key` (`first` / `last` for the
   aliases, `week` for a numeric key, the CSS class `week-note-<key>`; all look the same) and `wk`.
   The numbers never change a card on their own: only a lower day's target reads them (`dayRpe()`,
-  below), in that week only, and the lower of the two wins. `scripts/headless/week-notes.js` (70 checks)
+  below), in that week only, and the lower of the two wins. `scripts/headless/week-notes.js` (84 checks)
   covers every row above and the Front Page look (the name, the clay, the count in the kicker, the dose line,
-  the signature and photo, no note in a session, 320 px), and fails on the old `weekNoteNow()`.
+  the signature and photo, no note in a session, the session bar's limits row, 320 px), and fails on the old `weekNoteNow()`.
 - **The pipeline owns it:** /program-design decides both doses as numbers (`week1:` / `lastweek:`),
   /program-engage writes the words (PART 3c: the first sentence is the rule, under 100 characters, with no greeting,
   name or sign-off, COM-16; the checker warns on each), /program-assemble stores them, and
@@ -830,7 +842,8 @@ tints, the running bar, labels, and so it marked nothing. Now:
   after the name), a Because (the solid clay ⓘ), an RPE over its target (the set's RPE tag, the selected
   button, the Last time box and the ghost line under a set that ran over), the tempo digit, a banner that asks
   for something (a day filed unfinished, a report waiting), a suggestion's kicker (LIB-01: *Sore today*, *Week done*),
-  the numbers in a week note's headline (Front Page, 2026-10-12: *RPE 7*, *One set fewer*),
+  the numbers in a week note's headline (Front Page, 2026-10-12: *RPE 7*, *One set fewer*), and the same numbers on
+  the session bar's limits row (*Max RPE 7 · 1 set fewer*; its label stays grey),
   and the one number on a dark Home card (*Week 2*, the habits row's *2 to go*). The Library's Playbook door keeps its clay: it is a brand tile, not a signal.
 - **Green or grey for everything else**: every block's title, stripe and done tint are the same green (warm-up
   and power were clay and strength green, and a block the app did not recognise took its colour from its
@@ -892,7 +905,7 @@ size is a token in `:root`, picked by its job:
 ## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26 and 2026-09-27)
 
 **Before Start** the session bar (`.session-timer`) is the full bar: under 480 px two rows (label and clock on
-one line, Start and Guided full width under it), and at any width the buttons wrap before the clock shrinks. The
+one line, Start and Guided full width under it; three with the week's limits row), and at any width the buttons wrap before the clock shrinks. The
 label is one line ("Ready when you are", "In progress", "Paused", "Session duration"). A Home day card
 started today and not finished (`dayInProgress()`) shows *In progress* on its banner and **Resume ▶** under
 it (`.dc-live`); a day done this week is a small `.dc-row` (HOME-02). `paintWeek()` redraws them whenever
@@ -901,12 +914,13 @@ the day view closes (`paintDayCardPills()` is no longer called).
 **From Start until Done it is the slim bar** (Amir, 2026-09-27, option C of the mockup at
 https://claude.ai/artifact/CiUjm5sF3cz4YhGzJCR1WY). `renderTimer()` sets `.slim` when the day's clock has
 started, is not finished and is inside the 6 h grace. One line, 54 px: **← Home** · the clock · **Pause** (or
-Resume) · **⋯**. The label goes (the clay clock and Pause / Resume say it). **⋯** (`toggleBarMore()`) opens
-Pause, Guided and Reset on a second row; `foldBarMore()` folds it (and resets `aria-expanded`) when Guided opens,
+Resume) · **⋯**. The label goes (the clay clock and Pause / Resume say it). In a week whose note sets a limit the bar
+also has a thin last row, the week's limits (`weekLimitsHTML()`, *Week notes* above): about 82 px then. **⋯** (`toggleBarMore()`) opens
+Pause, Guided and Reset on a row under the first line (the limits row stays last); `foldBarMore()` folds it (and resets `aria-expanded`) when Guided opens,
 the day closes or the bar stops being slim. **The tab bar hides** while a slim day is open (`body.session-on`,
 `paintSessionChrome()`, called from `renderTimer()`, `switchDay()` and `closeDayView()`): ← Home or the
 phone's Back closes the day, the clock keeps running and Home shows In progress · Resume. On an iPhone SE the
-two bars covered 26% of the screen mid-session; now 9%.
+two bars covered 26% of the screen mid-session; now 9% (about 12% in a week with the limits row).
 
 - **It never cuts the clock.** Past an hour the clock is seven characters (`.long`, set by `renderTimer()` and
   the 1 s tick): under 420 px "Home" becomes the arrow alone and the clock steps to 22 px. Under 360 px the

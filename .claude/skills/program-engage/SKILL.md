@@ -215,6 +215,9 @@ as the week's headline** with its numbers in clay, then the rest of the text, th
   *"RPE 7"* (or *"RPE at 7"*) for an `rpeCap`, *"one set fewer"* for a `setsDrop`, *"one point lower"* for an `rpeDrop`. Good: *"Keep every set at RPE 7 or under this
   week."* · *"One set fewer on every exercise and nothing above RPE 7."* The why and any exception go in the second
   sentence. A first sentence over 100 characters loses the headline (the app falls back to the week's name).
+- **The numbers also show in every session that week**, on the session bar (*Max RPE 7 · 1 set fewer*), without your
+  words. An exception they do not hold goes in the text only (the bar adds *except the retest* by itself on a day
+  with a flagged retest, TST-4); never on a card, which would show it all cycle (PRG-4).
 - **No greeting, no name, no sign-off.** The app opens with their name and closes with Amir's signature; written
   in the text they would show twice. The checker warns on all three.
 - **The numbers exactly as design decided, in words:** "one set fewer on every exercise",

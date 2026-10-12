@@ -862,7 +862,8 @@ same ID. Read a rule's story and its history before changing it.
   all-out set.** The set ends at the first rep that slows, shortens, or breaks position
   (~2 shy of grind), and if the cycle carries an RPE ceiling, the test is written as an
   explicit, stated exception to it — two lines of a program must never give opposite
-  instructions for the same set. It never runs in a first cycle (TST-3).
+  instructions for the same set. It never runs in a first cycle (TST-3). The app keeps to it too: on a day with a
+  flagged retest while retests are due, the session bar's cap reads *Max RPE 7 except the retest* (2026-10-12).
 - `TST-2` `TST-3` **No test goes to a grind: every max-effort set stops at the first rep that slows, shortens or
   breaks position.** A flagged rep-max retest (`test: 5RM`) is one set of 3–5 reps at about
   **RPE 9**, one rep left, never RPE 10. That is accurate enough for The Ceiling (a *Good*
@@ -1325,7 +1326,8 @@ same ID. Read a rule's story and its history before changing it.
   /program-engage writes the athlete's words, and /program-assemble stores both in the cycle's `weekNotes`
   under that week's number (`"1"`, `"4"`, `"5"`). The app shows a note only in its own week, on Home, where it
   IS the This Week section (since 2026-10-12), and nowhere else: not at the top of a session (there its numbers
-  reach a target only on a lower day, through dayRpe()), not before the cycle starts, not after it ends.
+  sit on the session bar's last row, and reach a target only on a lower day, through dayRpe()), not before the
+  cycle starts, not after it ends.
   Every cycle has the back-off on its final week, and week 1 has a note when it differs (always for a new
   athlete). Any other week that differs from the card, a testing week or a reduced-load week, gets its own
   note with a title (*Testing week*, *Lighter week*). `first` and `last` still read as week 1 and the final

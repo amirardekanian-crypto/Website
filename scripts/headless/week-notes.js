@@ -99,7 +99,8 @@ function expectOk(s, want) {
   await run('"3": nothing before the start date', STARTS_TOMORROW, three, null);
   await run('"3": nothing after the end date', AFTER_END, three, null);
   const many = { '1': { text: 'ONE' }, '3': { text: 'THREE' }, '5': { text: 'FIVE' } };
-  for (const wk of [1, 3, 5]) await run(`"1", "3", "5": week ${wk} shows its own note`, MID(wk), many, note('week', 'Week ' + wk, ['', 'ONE', '', 'THREE', '', 'FIVE'][wk]));
+  // The final week is the back-off (REC-4): an untitled numeric note there is named Back-off week, like the legacy last.
+  for (const wk of [1, 3, 5]) await run(`"1", "3", "5": week ${wk} shows its own note`, MID(wk), many, note('week', wk === 5 ? 'Back-off week' : 'Week ' + wk, ['', 'ONE', '', 'THREE', '', 'FIVE'][wk]));
   for (const wk of [2, 4]) await run(`"1", "3", "5": nothing in week ${wk}`, MID(wk), many, null);
   await run('"1": nothing the day before the cycle starts', STARTS_TOMORROW, many, null);
   await run('keys outside the cycle ("0", "6", "9") never show', MID(3), { '0': { text: 'Z' }, '6': { text: 'S' }, '9': { text: 'N' } }, null);
@@ -141,6 +142,95 @@ function expectOk(s, want) {
     await ctx.close();
   }
 
+  const WEEK1 = { text: 'Keep every set at RPE 7 or under this week. Most of these exercises are new, so find your weights first. From week 2 the card is your target.', rpeCap: 7 };
+  const BACKOFF = { text: 'One set fewer on every exercise and nothing above RPE 7. Bench, leg press and hip thrust get one test set instead: as many good reps as you can, 3 to 5, and stop at the first rep that slows.', rpeCap: 7, setsDrop: 1 };
+  // ── The week's limits on the session bar (weekLimitsHTML, Amir 2026-10-12: "add the cap reminder to the session bar") ──
+  // Its own row at the foot of the sticky bar: before Start and in the slim running bar, never on the clock's line.
+  const bar = (p, running) => p.evaluate(run => {
+    const id = String(DATA.workouts.days[0].id);
+    if (run) { const t0 = Date.now() - 754000; localStorage.setItem(timerKey(id), JSON.stringify({ running: true, resumeAt: t0, acc: 0, sessionStart: t0 })); }
+    openDayView(id); renderTimer(id);
+    const b = document.querySelector('#day-view .day-content.active .session-timer');
+    const wk = b.querySelector('.session-timer-week');
+    const c = b.querySelector('.session-timer-time').getBoundingClientRect(), r = b.getBoundingClientRect();
+    const parts = wk ? [...wk.children] : [];
+    return { week: wk ? parts.map(e => e.textContent.replace('·', '').trim()).join(' | ') : null,
+      oneLine: wk ? Math.max(...parts.map(e => e.offsetTop)) - Math.min(...parts.map(e => e.offsetTop)) < 6 : null,
+      slim: b.classList.contains('slim'), clockWhole: c.left >= r.left && c.right <= r.right && c.height < 40,
+      sideways: document.documentElement.scrollWidth - window.innerWidth };
+  }, running);
+  for (const [tag, dayIn, notes, want, w, running] of [
+    ['week 1 cap, before Start', MID(1), { '1': WEEK1 }, 'This week | Max RPE 7', 390, false],
+    ['week 1 cap, running (slim bar)', MID(1), { '1': WEEK1 }, 'This week | Max RPE 7', 390, true],
+    ['back-off, running at 320 px: one line, the clock whole', MID(5), { last: BACKOFF }, 'Back-off week | Max RPE 7 | 1 set fewer', 320, true],
+    ['back-off, before Start at 320 px', MID(5), { last: BACKOFF }, 'Back-off week | Max RPE 7 | 1 set fewer', 320, false],
+    ['a drop with no cap shows the drop and its floor (CHP-4)', MID(3), { '3': { title: 'Lighter week', rpeDrop: 1, text: 'Lighter week.' } }, 'Lighter week | RPE 1 lower, not below 6', 390, false],
+    ['the back-off written as "5" (no title) is the Back-off week', MID(5), { '5': BACKOFF }, 'Back-off week | Max RPE 7 | 1 set fewer', 390, false],
+    ['a cap hides the drop (dayRpe() order)', MID(3), { '3': { title: 'Lighter week', rpeCap: 7, rpeDrop: 1, text: 'Lighter week.' } }, 'Lighter week | Max RPE 7', 390, false],
+    ['a note with no numbers: no row', MID(3), { '3': { title: 'Test week', text: 'Day 1 opens with the jump test.' } }, null, 390, false],
+    ['a week with no note: no row', MID(2), { '1': WEEK1 }, null, 390, true],
+  ]) {
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(dayIn, notes), w });
+    const b = await bar(p, running);
+    const ok = b.week === want && (want === null || b.oneLine) && b.slim === running && b.clockWhole && b.sideways <= 0;
+    t.check(`session bar: ${tag}`, ok && p.errs.length === 0, JSON.stringify(b) + (p.errs.length ? ' ERR ' + p.errs.join(' | ') : ''));
+    if (tag.startsWith('back-off, running')) await shot(p, 'week-notes-bar-320');
+    await ctx.close();
+  }
+
+  {   // A day with a flagged retest, while retests are due (the back-off week): the cap names the exception (TST-4).
+    const P = prog(MID(5), { '5': BACKOFF }); P.workouts.days[0].blocks[1].exercises.find(x => x.name === 'Barbell Back Squat').test = '5RM';
+    const { ctx, p } = await H.openProgram(browser, { prog: P });
+    const b = await bar(p, false);
+    t.check('session bar: a retest day in the back-off week says "except the retest"', b.week === 'Back-off week | Max RPE 7 except the retest | 1 set fewer', JSON.stringify(b));
+    await ctx.close();
+    const Q = prog(MID(1), { '1': WEEK1 }); Q.workouts.days[0].blocks[1].exercises.find(x => x.name === 'Barbell Back Squat').test = '5RM';
+    const o = await H.openProgram(browser, { prog: Q });
+    const c = await bar(o.p, false);
+    t.check('session bar: the same flag in week 1 (no retest due) adds nothing', c.week === 'This week | Max RPE 7', JSON.stringify(c));
+    await o.ctx.close();
+  }
+  {   // Finished without the clock ever starting: the row goes with Done all the same.
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(MID(1), { '1': WEEK1 }) });
+    const r = await p.evaluate(() => {
+      const id = String(DATA.workouts.days[0].id);
+      openDayView(id);
+      localStorage.setItem(ATHLETE_ID + '_completed_d' + id, stampCompleted());
+      paintResetBtn(id);
+      const wk = document.querySelector('#timer-' + id + ' .session-timer-week');
+      return { row: !!wk, shown: !!wk && wk.getBoundingClientRect().height > 0 };
+    });
+    t.check('session bar: a day done without the clock hides the row', r.row && !r.shown, JSON.stringify(r));
+    await ctx.close();
+  }
+  {   // The ⋯ row keeps its gap under the first line, and the row stays the last thing in the bar.
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(MID(5), { last: BACKOFF }), w: 360 });
+    await bar(p, true);
+    const g = await p.evaluate(() => {
+      const id = String(DATA.workouts.days[0].id); toggleBarMore(id);
+      const b = document.getElementById('timer-' + id);
+      const more = b.querySelector('.session-timer-more').getBoundingClientRect(), act = b.querySelector('.session-timer-actions').getBoundingClientRect();
+      const wk = b.querySelector('.session-timer-week').getBoundingClientRect();
+      return { gap: Math.round(act.top - more.bottom), rowLast: wk.top >= act.bottom - 1 };
+    });
+    t.check('session bar: with ⋯ open the second row keeps a gap and the limits row sits under it', g.gap >= 4 && g.rowLast, JSON.stringify(g));
+    await ctx.close();
+  }
+  {   // An app left open across a week boundary: opening the day redraws the row from the cycle as it is now.
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(MID(1), { '1': WEEK1 }) });
+    const r = await p.evaluate(() => {
+      const c = currentCycleData(), id = String(DATA.workouts.days[0].id);
+      const before = !!document.querySelector('#timer-' + id + ' .session-timer-week');
+      const shift = (v, d) => { const x = new Date(v + 'T12:00:00'); x.setDate(x.getDate() - d); return x.toISOString().slice(0, 10); };
+      c.startDate = shift(c.startDate, 7); c.endDate = shift(c.endDate, 7);   // today is now week 2
+      openDayView(id);
+      const b = document.getElementById('timer-' + id);
+      return { before, after: !!b.querySelector('.session-timer-week'), cls: b.classList.contains('has-week') };
+    });
+    t.check('session bar: a week later the row is gone on the next open', r.before && !r.after && !r.cls, JSON.stringify(r));
+    await ctx.close();
+  }
+
   // ── How Home draws it (Front Page) ─────────────────────────────────────────────────────────────────────────────────
   const look = p => p.evaluate(() => {
     const n = document.querySelector('#home-week-wrap .week-note');
@@ -151,8 +241,6 @@ function expectOk(s, want) {
       sig: !!q('svg.wn-sig'), photo: (q('.wn-av img') || {}).getAttribute ? q('.wn-av img').getAttribute('src') : null,
       byline: n ? /your coach|from amir/i.test(n.textContent) : null, sideways: document.documentElement.scrollWidth - window.innerWidth };
   });
-  const WEEK1 = { text: 'Keep every set at RPE 7 or under this week. Most of these exercises are new, so find your weights first. From week 2 the card is your target.', rpeCap: 7 };
-  const BACKOFF = { text: 'One set fewer on every exercise and nothing above RPE 7. Bench, leg press and hip thrust get one test set instead: as many good reps as you can, 3 to 5, and stop at the first rep that slows.', rpeCap: 7, setsDrop: 1 };
   for (const [tag, dayIn, notes, w, check] of [
     ['week 1: "Alex," opens it, RPE 7 is clay, the count is in the kicker, signed with no byline', MID(1), { '1': WEEK1 }, 390,
       l => l.hi === 'Alex,' && l.kick === 'This week' && same(l.clay, ['RPE 7']) && l.head === 'Keep every set at RPE 7 or under this week.'
@@ -168,7 +256,7 @@ function expectOk(s, want) {
     ['an RPE drop: "one point lower" is clay, and "One less round" never claims it', MID(3), { '3': { title: 'Lighter week', rpeDrop: 1, text: 'One less round on every circuit, and every RPE one point lower. Rest well.' } }, 390,
       l => same(l.clay, ['one point lower']) && l.dose === null],
     ['a drop the words do not name goes on the dose line', MID(3), { '3': { title: 'Lighter week', rpeDrop: 1, setsDrop: 1, text: 'One less set on every exercise. Rest well.' } }, 390,
-      l => same(l.clay, []) && l.dose === '1 set fewer·RPE 1 lower'],
+      l => same(l.clay, []) && l.dose === '1 set fewer·RPE 1 lower, not below 6'],
     ['at 320 px nothing goes sideways', MID(5), { last: BACKOFF }, 320, l => l.sideways <= 0],
   ]) {
     const { ctx, p } = await H.openProgram(browser, { prog: prog(dayIn, notes), w });

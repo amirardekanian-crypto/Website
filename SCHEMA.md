@@ -346,7 +346,10 @@ feeling. The numbers never change a card: the app shows the note on Home only, a
 (`weekNoteHTML()` in `program.html`, Front Page since 2026-10-12: the athlete's first name, the text's first
 sentence as the headline with `rpeCap` / `setsDrop` coloured where the words say them, the rest, Amir's signature;
 a number the words do not say gets its own small line). So `text` opens with the rule in one sentence under 100
-characters and carries no greeting, name or sign-off (COM-16). It is not shown in a session. `rpeCap` and `rpeDrop`
+characters and carries no greeting, name or sign-off (COM-16). Its words are not shown in a session; its numbers are, on the session bar's last row (*Max RPE 7 · 1 set fewer*), so an
+exception the numbers do not hold belongs in the note's text. The bar knows one: on a day with a flagged retest while
+retests are due it reads *Max RPE 7 except the retest*. An untitled note on the cycle's final week shows as the
+*Back-off week*, so the back-off needs no title. `rpeCap` and `rpeDrop`
 also move that week's daily RPE target, and only that week's (`dayRpe()`); `setsDrop` is a decision the text tells
 the athlete, and nothing in the app applies it. `scripts/check_program.py` reads all three. A cycle without
 `weekNotes` (every programme written before 2026-09-26) shows nothing: the app never invents a

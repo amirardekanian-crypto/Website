@@ -113,6 +113,7 @@ out = run(with_notes({"1": W1, "3": TEST, "5": BACKOFF}), ctx=CTX)
 expect('a testing week on week 3 passes', not has(out, 'FAIL', 'week note') and not has(out, 'WARN', 'give week 3'), out)
 untitled = {k: v for k, v in TEST.items() if k != 'title'}
 expect('a note on a middle week without a title warns', has(run(with_notes({"3": untitled, "5": BACKOFF}), ctx=CTX), 'WARN', "give week 3's note a title"))
+expect('the final week needs no title (the app calls it the Back-off week)', not has(run(with_notes({"5": BACKOFF}), ctx=CTX), 'WARN', "give week 5's note a title"))
 out = run(with_notes({"3": TEST}), ctx=CTX)
 expect('only a middle week: the back-off is still missing', has(out, 'FAIL', 'no week note on the final week'), out)
 out = run(with_notes({"5": BACKOFF}), ctx=CTX)

@@ -175,6 +175,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   **It shows on Home only, as the This Week section itself** (Front Page, Amir 2026-10-12; never at the top of a session): the
   athlete's first name, the text's first sentence as the headline with its numbers in clay, then Amir's signature and photo. So
   the pipeline writes the rule as the first sentence, under 100 characters, with no greeting, name or sign-off (COM-16).
+  **In a session its numbers sit on the session bar** (`weekLimitsHTML()`, Amir 2026-10-12): a thin last row, *Max RPE 7 · 1 set
+  fewer*, never the words, never on the clock's line; on a day with a due retest it says *except the retest* (TST-4). An untitled note
+  on the cycle's final week is the *Back-off week* (`weekNoteLast()`).
 - **The Spine**: only approved entries reach a phone, and **a card that names its entry (`exId`) shows that entry or nothing** (a draft's card has
   no cues or video until approved: `spineFor()` / `spineForC()`, TWIN-1); cues and **videos** live on the entry (a video is added
   in coach.html → Exercises; `exercise_library.json` and its Notion sync were retired 2026-09-26);
@@ -255,7 +258,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Mid-session the tab bar hides** (WK-03, Amir 2026-09-27, option C; `PROGRAM-APP.md` → *The session bar*): from
   Start until Done the session bar is one slim line (← Home · clock · Pause · ⋯, with Guided and Reset under ⋯) and
   `body.session-on` hides the tabs; ← Home or Back is the way out and the clock keeps running. A new session-bar
-  control goes on that line or under ⋯, measured at 320–390 px: the clock is never cut.
+  control goes on that line or under ⋯, measured at 320–390 px: the clock is never cut. The week's limits are the bar's one
+  extra row, under it.
 - **Signing out never loses training** (NAV-02, 2026-09-27; `PROGRAM-APP.md` → *Your account*): the initials
   button (top right, where the floating dark toggle was) → Sign out runs `signOutSafely()`: the waiting report, the
   session queue and the progress go up first, then nothing more is pushed, then `signOutAthlete()`. The athlete's
@@ -287,7 +291,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Dark mode is the athlete's choice** (Amir, 2026-09-27: *"Let the client choose dark mode"*): both apps start
   light and switch only on the athlete's tap; neither follows the phone's setting.
 - **Clay means "look here"** (DS-01, Amir 2026-09-27; `PROGRAM-APP.md` → *Clay means look here*): the Coach's note,
-  a Because, an RPE over target, the tempo digit, a banner that asks for something, the one number on a dark Home card, the numbers in a week note's headline.
+  a Because, an RPE over target, the tempo digit, a banner that asks for something, the one number on a dark Home card, the numbers in a week note's headline and on the session bar's limits row.
   Block titles, stripes and done tints, the running bar, labels and buttons are green or grey.
 - **The Library offers a session at two moments only** (LIB-01, Amir 2026-09-27; `PROGRAM-APP.md` → *The Library's
   Sessions*): a sore check-in (soreness 1 or 2, on the finished card) and a finished week (Home, under This Week), never
@@ -427,7 +431,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v111` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v112` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

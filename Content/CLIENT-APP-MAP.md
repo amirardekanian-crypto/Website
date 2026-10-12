@@ -105,6 +105,7 @@ ON EVERY MAIN SCREEN
 DAY  (opened from a day card; the tab bar hides once you tap Begin or Skip)
    Top: the day's card, ← back, 🌙 dark toggle
    SESSION BAR:  ← Home · clock · Start ▶ / Pause ⏸ · Guided ▶ · ⋯ (Reset)
+        + a thin row under it in a week where the note sets a limit ("Back-off week · Max RPE 7 · 1 set fewer")
         Start ▶ ─► READINESS CHECK ─► clock starts
         Guided ▶ ─► one set at a time, rest timed
    TODAY'S TARGETS banner  (only on a lower, short or sore day)
@@ -156,7 +157,7 @@ This is the order of a real first session, as the app behaves.
 1. **Home → pick a day.** Under **This Week** each day is a big card: a photo, **Day 1**, its name, *"N blocks · M movements"* and up to three words such as *Strength · Brakes · Spring* (what the day builds). A faint green ring marks the day to do next. Tap the card.
 2. **The day opens.** The card repeats at the top with a **←**. Under it is the **session bar**: *"Ready when you are"*, **00:00**, **Start ▶** and **Guided ▶**. A green note appears: *"Tap **Start** as you begin, so I know how long the session took. Or **Guided**: one set at a time, with your rest timed."* (tap **Got it**). Below are the blocks with their exercises, all folded.
 3. **Tap Start ▶.** The **Readiness check** slides up (§5.2). Answer five questions, 1–5 each.
-4. **Tap Begin session ▶.** (If you tick a set before pressing Start, a note box offers it once: *"The session clock isn't running."* with **Start** and **Not now**.) The clock starts and the bar shrinks to one slim line (**← Home · clock · Pause ⏸ · ⋯**). The tab bar disappears so the workout has the screen.
+4. **Tap Begin session ▶.** (If you tick a set before pressing Start, a note box offers it once: *"The session clock isn't running."* with **Start** and **Not now**.) The clock starts and the bar shrinks to one slim line (**← Home · clock · Pause ⏸ · ⋯**), with a thin line under it in a week where my note sets a limit (*Max RPE 7 · 1 set fewer*). The tab bar disappears so the workout has the screen.
 5. **Open an exercise** by tapping its row. Read my note if there is one. Open the **Video & cues** row if you want the video and the cues.
 6. **Log set 1.** Type the weight in the **kg** box (the reps box already shows the prescribed number in grey), then tap the **circle** on the right. Tick with no weight and a note appears in the middle of the screen: *"No weight saved on that set. Type it in the kg box."* (tap **Got it**) A note says: *"Weight in, set done: tap the **circle**. One tap means done as written. Different reps? Type them first."*
 7. **Say how hard it was.** A strip opens: **How hard?** and **6 7 8 9 10**. A note says: *"How hard was that set? **10**: not one more rep. **8**: two left. I set your weights from it."* Tap a number.
@@ -202,6 +203,7 @@ Top to bottom:
 **The session bar.**
 - Before you start: *"Ready when you are"*, **00:00**, **Start ▶**, **Guided ▶** (Guided only appears if the day has lifts to log).
 - From Start until Done it's one slim line: **← Home** · clock · **Pause ⏸** · **⋯**. Under **⋯**: **Guided ▶** and **Reset** (Reset takes two taps: **Reset?**).
+- In a week where my note sets a limit, a thin line sits at the bottom of the bar, before Start and all session: *"This week · Max RPE 7"*, *"Back-off week · Max RPE 7 · 1 set fewer"*, or *"… except the retest"* on a day with a retest. It goes when the day is done.
 - **← Home** leaves the day but **the clock keeps running**. Use **Pause** if you stop.
 - The slim bar stays pinned to the top as you scroll. A thin rail down the right edge of the screen shows the sets you've done.
 - The clock keeps counting with the app closed or the phone locked. A session that began the evening before survives midnight; after about six hours past midnight it's treated as an old, unfinished day.
@@ -417,7 +419,7 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 | **The server turns you away** | *"Plan not available"*, **Sign in again**, **Message Amir on WhatsApp**. |
 | **You left a day open** | The next morning (after a six-hour grace past midnight) a **Not finished** card: **Send it** files and sends it under the day you trained; **Clear it** (two taps) throws the ticks away. |
 | **Lower / short / sore day** | A banner under the session bar and a *"RPE 7 → 6 today"* pill on cards. **Train as written** reverses it. |
-| **Week 1 / last week** | A note from me on Home: in that week it is the This Week section. Not in the session. |
+| **Week 1 / last week** | A note from me on Home: in that week it is the This Week section. In the session, the bar at the top keeps its numbers in view (*Max RPE 7 · 1 set fewer*). |
 | **Last 14 days of a cycle** | *"N days left in cycle"* on Game Plan. |
 | **The cycle is over** | See §6. |
 | **Cycle has no dates** | Only a small line, *"Cycle 1 of 6 · NAME · Weeks 1–5"*, and no week features. |

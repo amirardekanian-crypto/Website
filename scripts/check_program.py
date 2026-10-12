@@ -777,7 +777,8 @@ def check_week_notes(data, args):
                 warn(f"{where}: the text opens with a greeting or the name; Home already opens the note with \"{fn or 'their name'},\"", 'COM-16')
             if re.search(r"(^|[\s,.!\-–—])(amir|coach amir|your coach)\.?\s*$", text, re.I):
                 warn(f"{where}: the text ends with a sign-off; Home signs every note with Amir's signature and photo", 'COM-16')
-        if key not in ('first', 'last') and wk > 1 and not n.get('title'):
+        # The final week is the back-off and the app names it so (weekNoteLast() in program.html): no title needed.
+        if key not in ('first', 'last') and 1 < wk < total and not n.get('title'):
             warn(f"{where}: give week {wk}'s note a title (Testing week, Lighter week) so the athlete sees what kind of week it is", 'PRC-15')
     key, last = found.get(total, (None, None))
     if args.no_backoff:

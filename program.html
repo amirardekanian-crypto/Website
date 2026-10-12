@@ -1933,7 +1933,7 @@
   }
   /* The slim bar (WK-03, Amir 2026-09-27, option C of the mockup): from Start until Done the
      bar is one line, ← Home · the clock · Pause · ⋯, and ⋯ opens Pause, Guided and Reset on a
-     second row. The label goes (the clay clock and Pause / Resume say it); the tab bar hides
+     second row. A week whose note sets a limit adds one thin row under all of it (.session-timer-week). The label goes (the clay clock and Pause / Resume say it); the tab bar hides
      (body.session-on, paintSessionChrome()). Before Start and after Done it is the full bar. */
   .session-timer-leave, .session-timer-more { display: none; }
   .session-timer.slim { flex-wrap: nowrap; align-items: center; gap: 6px; padding: 4px 4px 4px 2px; }
@@ -1958,6 +1958,24 @@
   .session-timer.slim.open .session-timer-btn.guided { display: inline-flex; align-items: center; justify-content: center; }
   .session-timer.slim.open .session-timer-reset:not([hidden]) { display: inline-flex; align-items: center; justify-content: center; }
   body.session-on .global-tabs { display: none !important; }
+  /* The week's limits (weekLimitsHTML, Amir 2026-10-12): the bar's last row, full width, so it never shares the clock's
+     line. Before Start and all through the slim bar; gone after Done. The numbers are clay (they ask the athlete to hold
+     back), the label grey. .has-week lets the slim bar wrap onto that row, and only then. */
+  .session-timer-week { order: 9; flex: 1 1 100%; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px;
+    padding-top: 8px; border-top: 1px solid var(--grey-mid); font: 600 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--clay-ink); }
+  .session-timer-week b { font-weight: 600; white-space: nowrap; }
+  .session-timer-week i { font-style: normal; color: var(--grey-text); margin-right: 8px; }
+  .stw-k { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--grey-text); }
+  .session-timer.slim.has-week { flex-wrap: wrap; }
+  .session-timer.slim.has-week:not(.open) { row-gap: 0; }   /* the open ⋯ row keeps its 6 px */
+  .session-timer.slim .session-timer-week { margin: 0 8px 4px 10px; padding-top: 6px; }
+  .session-timer.finished .session-timer-week, .session-timer.day-done .session-timer-week { display: none; }
+  #day-view .day-content.has-week .checklist-item { scroll-margin-top: 175px; }   /* the bar is taller by the row */
+  @media (max-width: 359px) {   /* so "Back-off week · Max RPE 7 · 1 set fewer" stays one line at 320 px */
+    .session-timer-week { gap: 2px 6px; }
+    .session-timer-week i { margin-right: 6px; }
+    .stw-k { letter-spacing: 0; }
+  }
   body[data-dark] .session-timer.slim.open .session-timer-more { background: #2a2a2a; color: #eee; }
   /* The narrowest phones: the arrow alone ("Home" is its label for a screen reader). */
   /* Past an hour the clock is seven characters ("1:05:12"): "Home" gives it the room. */
@@ -6833,6 +6851,12 @@ function weekNoteNow(cycle) {
   // The note's fields first, so a stored `key` or `wk` can never reach the class name below.
   return n ? Object.assign({}, n, { key: key, wk: w.wk }) : null;
 }
+// Is this note the cycle's final week, the back-off (REC-4)? The legacy `last`, or a numeric key on the last week of
+// more than one: the pipeline writes the back-off as "5" since 2026-10-11, untitled, and the app names it.
+function weekNoteLast(cycle, n) {
+  const w = cycleWeekInfo(cycle);
+  return n.key === 'last' || !!(w && w.total > 1 && n.wk === w.total);
+}
 // The note as Home's This Week section (Front Page, Amir 2026-10-12), or '' when this week has none. Home only:
 // renderHome() draws this INSTEAD of the This Week heading, and the kicker's count is #home-week-sum (paintWeek()
 // writes its short form). It is not drawn at the top of a session any more (Amir: "dont show this at the top of each
@@ -6860,8 +6884,9 @@ function weekNoteHTML(cycle) {
     .replace(/\b(one|two|three|four|five|\d+)\s+(sets?|reps?)(\s+(?:fewer|less))?\b/gi, (m, a, b, c) => a + NB + b + (c ? NB + c.trim() : ''))
     .replace(/\b(week|day)\s+(\d+)\b/gi, '$1' + NB + '$2');
   const capOn = Number(n.rpeCap) > 0, setsOn = Number(n.setsDrop) > 0, dropOn = !capOn && Number(n.rpeDrop) > 0;
-  const name = n.title || (n.key === 'last' ? 'Back-off week' : 'Week ' + n.wk);
-  const named = !!n.title || n.key === 'last';
+  const last = weekNoteLast(cycle, n);
+  const name = n.title || (last ? 'Back-off week' : 'Week ' + n.wk);
+  const named = !!n.title || last;
   const text = String(n.text).trim();
   // The first sentence: up to . ! or ? followed by a space and a capital, a digit or an opening quote.
   const m = text.match(/^(.+?[.!?])\s+(?=[A-Z0-9"'(“])/);
@@ -6888,7 +6913,7 @@ function weekNoteHTML(cycle) {
   const dose = [];
   if (capOn && !marked.cap) dose.push('Max RPE ' + n.rpeCap);
   if (setsOn && !marked.sets) dose.push(n.setsDrop + (Number(n.setsDrop) === 1 ? ' set fewer' : ' sets fewer'));
-  if (dropOn && !marked.drop) dose.push('RPE ' + n.rpeDrop + ' lower');
+  if (dropOn && !marked.drop) dose.push('RPE ' + n.rpeDrop + ' lower, not below 6');   // CHP-4; 6 is RPE_FLOOR, see weekLimitsHTML()
   const who = (DATA && DATA.athlete && DATA.athlete.firstName) || '';
   return `<section class="wn week-note week-note-${n.key}" data-shape="${shape}" data-label="${attr(name)}" aria-label="${attr(name)}">
     <div class="wn-kick"><span class="wn-name">${esc(shape === 'sentence' && named ? name : 'This week')}</span><span class="wn-count" id="home-week-sum"></span></div>
@@ -6896,6 +6921,34 @@ function weekNoteHTML(cycle) {
     ${dose.length ? `<p class="wn-dose">${dose.map(d => esc(tie(d))).join('<i>·</i>')}</p>` : ''}
     <div class="wn-sign">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div>
   </section>`;
+}
+
+// The week's limits on the session bar (Amir, 2026-10-12: "add the cap reminder to the session bar"). The note lives
+// on Home only, and on a normal day the cards show their written RPE, so without this nothing in a session said "max
+// RPE 7 this week". One row at the foot of the sticky bar, before Start and all through the slim bar (it never shares
+// the clock's line, so WK-03's "the clock is never cut" holds), gone after Done. Only the note's own numbers, in
+// dayRpe()'s order (a cap wins, so an rpeDrop shows only without one), plus the sets it drops; never its words.
+// The label is the week's name when it has one (a title, or Back-off week for the cycle's final week), else This week.
+// A drop names the floor (CHP-4). On a day that holds a flagged retest while retests are due (exTestSpec(),
+// inRetestWindow(): the back-off week), the RPE line says so, or the bar would forbid the one hard set the week asks
+// for (TST-4: two lines must never give opposite instructions for the same set). '' when there is nothing to say.
+function weekLimitsHTML(cycle, day) {
+  const n = weekNoteNow(cycle);
+  if (!n) return '';
+  const capOn = Number(n.rpeCap) > 0, setsOn = Number(n.setsDrop) > 0, dropOn = !capOn && Number(n.rpeDrop) > 0;
+  const tests = day && inRetestWindow()
+    ? (day.blocks || []).reduce((k, b) => k + (b.exercises || []).filter(ex => exTestSpec(ex)).length, 0) : 0;
+  const but = tests ? (tests === 1 ? ' except the retest' : ' except retests') : '';
+  const bits = [];
+  if (capOn) bits.push('Max RPE ' + n.rpeCap + but);
+  // 6 is RPE_FLOOR, written out: that const is declared far below boot(), and Home can be drawn before it is reached.
+  if (dropOn) bits.push('RPE ' + n.rpeDrop + ' lower, not below 6' + but);
+  if (setsOn) bits.push(n.setsDrop + (Number(n.setsDrop) === 1 ? ' set fewer' : ' sets fewer'));
+  if (!bits.length) return '';
+  const name = n.title || (weekNoteLast(cycle, n) ? 'Back-off week' : 'This week');
+  // Each dot rides with the item after it, so a wrapped line never ends on a dot. The spaces between the pieces are
+  // for a screen reader (a flex row does not draw them).
+  return `<div class="session-timer-week"><span class="stw-k">${esc(name)}</span> ${bits.map((b, i) => `<b>${i ? '<i aria-hidden="true">·</i>' : ''}${esc(b)}</b>`).join(' ')}</div>`;
 }
 
 // Map a day to ONE of eight category pictures. Eight files cover every day of
@@ -7422,6 +7475,7 @@ function openDayView(dayId) {
   // so coerce numeric strings back to Number before handing it over.
   const n = (typeof dayId === 'string' && /^\d+$/.test(dayId)) ? Number(dayId) : dayId;
   switchDay(n);
+  renderTimer(String(dayId));   // the bar as of now (the week's limits row may have changed since boot)
   paintSoreSugg(String(dayId));
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
@@ -7723,7 +7777,8 @@ function renderHome() {
     let html = `<div id="day${day.id}" class="day-content${i === 0 ? ' active' : ''}">`;
     html += `<div class="day-focus-tag">${esc(day.focusTag)}</div>`;
     // No week note here: it lives on Home only (Amir, 2026-10-12: "dont show this at the top of each day workout").
-    html += `<div class="session-timer" id="timer-${day.id}" data-day="${day.id}">
+    const limits = weekLimitsHTML(cur, day);   // this week's cap and sets fewer, the bar's last row (renderTimer() keeps it current)
+    html += `<div class="session-timer${limits ? ' has-week' : ''}" id="timer-${day.id}" data-day="${day.id}">
       <button type="button" class="session-timer-leave" onclick="closeDayView()" aria-label="Home (the session keeps running)"><span aria-hidden="true">←</span><span class="stl-txt">Home</span></button>
       <div class="session-timer-body">
         <div class="session-timer-label">Ready when you are</div>
@@ -7735,6 +7790,7 @@ function renderHome() {
         <button type="button" class="session-timer-reset" hidden onclick="armedTap(this, 'Reset?', () => resetDay('${day.id}'))">Reset</button>
       </div>
       <button type="button" class="session-timer-more" aria-expanded="false" aria-label="More: Guided and Reset" onclick="toggleBarMore('${day.id}')">⋯</button>
+      ${limits}
     </div>`;
     // Today's targets: filled by paintToday() after a lower-day check-in (REC-2).
     html += `<div class="rd-banner" hidden></div>`;
@@ -8807,7 +8863,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). In a week where my note sets a limit, a thin line under it keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, my note for the week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so: your cycle card reads <strong>Cycle complete</strong>, and there's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The "Why This Cycle Matters" note on <strong>Game Plan</strong> explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -11043,7 +11099,17 @@ function renderTimer(day) {
   }
   el.classList.toggle('long', timeEl.textContent.length > 5);
   paintResetBtn(day);
-  // The slim bar (WK-03, Amir 2026-09-27: "C"): from Start until Done, one line.
+  // The week's limits row, from the cycle as it is now: an app left open across a week boundary redraws it here.
+  const dayObj = ((DATA && DATA.workouts && DATA.workouts.days) || []).find(d => String(d.id) === String(day));
+  const lim = weekLimitsHTML(currentCycleData(), dayObj);
+  const row = el.querySelector('.session-timer-week');
+  if (!lim) { if (row) row.remove(); }
+  else if (!row || row.outerHTML !== lim) { if (row) row.remove(); el.insertAdjacentHTML('beforeend', lim); }
+  el.classList.toggle('has-week', !!lim);
+  const panel = el.closest('.day-content');
+  if (panel) panel.classList.toggle('has-week', !!lim);   // a taller bar: the cards scroll in under it with more room
+  // The slim bar (WK-03, Amir 2026-09-27: "C"): from Start until Done, one line, plus the week's limits row when
+  // this week's note sets one.
   const slim = !!(t && t.sessionStart && !finished && !sessionIsStale(t.sessionStart));
   el.classList.toggle('slim', slim);
   if (!slim) foldBarMore(el);
@@ -11733,6 +11799,7 @@ function paintResetBtn(day) {
   b.hidden = finished || !started;
   const bar = document.getElementById('timer-' + day);
   if (bar) bar.classList.toggle('has-reset', !b.hidden);   // the tighter row on a narrow phone
+  if (bar) bar.classList.toggle('day-done', finished);   // the week's limits row goes after Done, clock or no clock
 }
 
 function markSuggestedDay() {
