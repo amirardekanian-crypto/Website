@@ -243,7 +243,8 @@
 //      a line under it, Your history; no WhatsApp door, no impact), and the open exercise card has no Last time box.
 // v114: program.html changed (2026-10-12): in a week whose note sets an RPE limit, every logged RPE is coloured against it on every day
 //      (rpeTargetOn(), paintWeekTargets()); the bar drops "except the retest" on a lower day. Without the bump a phone keeps the old colours.
-const CACHE = 'aap-v114';
+// v115: program.html changed (2026-10-12): a tennis or padel athlete's goal on Game Plan is a sport badge (ball or racket).
+const CACHE = 'aap-v115';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

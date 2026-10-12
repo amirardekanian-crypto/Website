@@ -449,6 +449,20 @@
     margin-top: 4px;
     line-height: 1.5;
   }
+  /* The sport badge (Amir, 2026-10-12: "design nice sport badges for tennis and padel"): a tennis or padel
+     athlete's goal as a badge, a green disc with the ball or the racket, the sport bold and the rest of the
+     goal under it. Green, never clay (DS-01). Any other goal keeps the mono line above. See sportBadgeHtml(). */
+  .sport-badge { display: inline-flex; align-items: center; gap: 10px; max-width: 100%; margin-top: 6px;
+    padding: 6px 16px 6px 6px; border-radius: 999px; background: var(--yellow-dim); box-shadow: inset 0 0 0 1.5px var(--yellow-mid); }
+  .sb-ico { flex: none; display: inline-flex; gap: 3px; }
+  .sb-ico svg { width: 34px; height: 34px; padding: 6px; box-sizing: border-box; border-radius: 50%;
+    background: #0E4A36; color: #fff; }
+  .sb-txt { display: grid; min-width: 0; line-height: 1.05; }
+  .sb-txt b { font: 900 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: .6px; text-transform: uppercase; color: var(--green-ink); }
+  .sb-txt small { margin-top: 3px; font: 700 var(--fs-label)/1.25 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--grey-text); overflow-wrap: anywhere; }
+  body[data-dark] .sport-badge { background: rgba(109,190,149,.10); box-shadow: inset 0 0 0 1.5px rgba(109,190,149,.30); }
+  body[data-dark] .sb-ico svg { background: #14684C; }
   .athlete-card-dates {
     font-family: 'Space Mono', monospace;
     font-size: var(--fs-label); letter-spacing: 1.5px;
@@ -7654,7 +7668,7 @@ function renderPlan() {
   document.getElementById('athlete-card-wrap').innerHTML = `
     <div class="athlete-header">
       <div class="home-name">${esc(a.firstName)}<span>${esc(a.lastName)}</span></div>
-      ${goalText ? `<div class="athlete-card-detail">${goalText}</div>` : ''}
+      ${sportBadgeHtml(rawGoal) || (goalText ? `<div class="athlete-card-detail">${goalText}</div>` : '')}
       ${datesText ? `<div class="athlete-card-dates">${datesText}</div>` : ''}
     </div>`;
 
@@ -15424,6 +15438,27 @@ async function refreshQualities() {
     setQualities(res.data);
     paintDayQualities();
   } catch (e) { /* offline: the cached copy stays */ }
+}
+// The sport badge on Game Plan's header (Amir, 2026-10-12): for a tennis or padel goal ("🎾 Tennis Performance",
+// "🎾 Padel — Return to Performance", "🎾 Tennis / Padel Performance") a badge with the ball, the racket or both, the
+// sport bold and the rest of the goal under it; '' for any other goal, which keeps its mono line.
+const SPORT_ICON = {
+  tennis: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">'
+    + '<circle cx="12" cy="12" r="9"/><path d="M5.3 5.7c3.2 3.4 3.2 9.2 0 12.6M18.7 5.7c-3.2 3.4-3.2 9.2 0 12.6"/></svg>',
+  padel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" aria-hidden="true">'
+    + '<path d="M12 1.6c4.3 0 7.2 3 7.2 7.1 0 3.6-2.4 6.5-5.5 7.2v1.3h-3.4v-1.3c-3.1-.7-5.5-3.6-5.5-7.2 0-4.1 2.9-7.1 7.2-7.1z"/>'
+    + '<path d="M10.4 17.2h3.2v5.2h-3.2z"/><g fill="currentColor" stroke="none"><circle cx="9.3" cy="6.6" r="1.05"/><circle cx="12" cy="5.4" r="1.05"/>'
+    + '<circle cx="14.7" cy="6.6" r="1.05"/><circle cx="9.3" cy="9.9" r="1.05"/><circle cx="12" cy="11.1" r="1.05"/><circle cx="14.7" cy="9.9" r="1.05"/></g></svg>',
+};
+function sportBadgeHtml(raw) {
+  const g = String(raw || '').replace(/^[^A-Za-z0-9]+/, '').trim();
+  const t = /tennis/i.test(g), p = /padel/i.test(g);
+  if (!t && !p) return '';
+  const sport = t && p ? 'Tennis · Padel' : /beach tennis/i.test(g) ? 'Beach Tennis' : t ? 'Tennis' : 'Padel';
+  const rest = g.replace(/beach tennis|tennis|padel/ig, ' ').replace(/\s*\/\s*/g, ' ')
+    .replace(/^[\s·—–&-]+|[\s·—–&-]+$/g, '').replace(/\s{2,}/g, ' ');
+  return `<div class="sport-badge" aria-label="${esc(g)}"><span class="sb-ico">${t ? SPORT_ICON.tennis : ''}${p ? SPORT_ICON.padel : ''}</span>`
+    + `<span class="sb-txt"><b>${esc(sport)}</b>${rest ? `<small>${esc(rest)}</small>` : ''}</span></div>`;
 }
 function isRacketSport() {
   return /tennis|padel/i.test(String((DATA && DATA.sport && DATA.sport.badge) || ''));

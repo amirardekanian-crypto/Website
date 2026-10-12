@@ -281,6 +281,10 @@ day, across cycles via `matchRenamed()`), and **History ›** opens the History 
   implement, so a dumbbell lift logged as `20` one day and `2×20` the next is the same lift. Only a
   count of 1 to 4 before the sign counts as a pair (`20x2` stays 20). coach.html's `loadSummary()`
   does no maths on any weight that is not a plain number (`24` or `24kg`): it prints `2×20` as typed.
+- **The sport badge** (Amir, 2026-10-12: *"design nice sport badges for tennis and padel"*): on Game Plan's header a
+  tennis or padel goal (`sport.badge`) is a green badge with a drawn ball, racket or both, the sport bold and the rest of
+  the goal under it (`sportBadgeHtml()`, `SPORT_ICON`); any other goal keeps its mono line. `isRacketSport()` reads the
+  same badge, so a tennis or padel player's badge must name the sport, or On court never shows.
 - **Not on the card any more** (2026-10-12, *The working card*): the open card has no **Last time** box (it was under
   the Coach's Note from 2026-09-27; the closed card's clay *Last* pill went before that). The history is the ⓘ's
   **Your history** row, each empty kg box shows last time's weight as LAST, and a circuit keeps its Last time strip.
