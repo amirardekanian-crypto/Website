@@ -59,7 +59,7 @@ The two apps are **linked both ways**:
 | From | To | Where |
 |---|---|---|
 | `program.html` | Proof | **Daily Habits card** on Home *and* at the end of Game Plan (a plain shortcut — it shows no level or XP, because that is Proof's job). On Home it sits **below** This Week and the day cards since 2026-09-26: training leads, habits follow. Under it on Home, **today's habits, ticked in place** (Proof embedded, `?embed=1`; see *Embedded on the training app's Home*) |
-| Proof | `program.html` | **Your training programme** card at the bottom of Today, and a row in Settings (behind the initials button) |
+| Proof | `program.html` | The session row at the end of Today's list (its → opens the programme), and a row in Settings (behind the initials button). The **Your training programme** card at the bottom of Today went on 2026-10-12; a free athlete keeps **Want the training too?** there |
 
 Both are the same origin with the same PWA scope, so tapping through from an installed
 app stays inside the app shell — no browser bounce, no second install. The handover
@@ -247,6 +247,22 @@ on the phone either way. Never in the demo or a coach preview; the embed has no 
 ### 01 · TODAY — the daily loop
 The screen they actually live on. **In this order, and the order is the point:**
 
+> **A logbook, not a dashboard (2026-10-12, the UX audit's batch B; the audit is the private page
+> https://claude.ai/artifact/NcodiruuPzbdiwZ13FQMsM).** Everything on Today must be logged or must say
+> whether today counts. The card carries the game on **one line** (the level ring at 46 px with no
+> LEVEL caption, the rank, XP to next, the day-streak flame as a small tile), the bar, the verdict and
+> the week, then **one line that says what to do now: the nudge**, typed, with no button (its button
+> opened the habit's history page, not a way to log it). That line is the one "what now" slot: clay
+> with *Streak at risk · N to go before midnight* when the streak is at risk (the separate strip went),
+> and the *Filling in* bar on an earlier day (the separate banner went, the card gets a clay ring). The
+> card went from about 360 px to about 195, so five rows sit fully above the fold at 390 × 844 (it was
+> about three). Under the list: the library offer, the board notice, **one quest line while a run is
+> on** (`questLine()`, into Progress; Amir, "3 yes"), the tour prompt until it has run, and for a free
+> athlete *Want the training too?*. **Gone from Today:** the dark nudge card, the roll call row (Crew
+> keeps roll call; Amir, "2 demote", after 0 lines in 7 days), the week's heat map with "days on
+> target" and XP (they are Progress's week table now) and a coached athlete's programme card.
+> The numbered list below is the older account, kept for its reasons; where it disagrees, this note wins.
+
 1. **The hero card** — a floating white card (Amir, 2026-08-01: *"i like the design of the
    hero that looks like a card"*) carrying, on one row: the **level ring**, the **rank**
    (a link into the Locker), **distance to the next level** and its bar, and the **streak
@@ -314,7 +330,23 @@ The screen they actually live on. **In this order, and the order is the point:**
    the day you are almost always logging at the far left), and `canLog()` owns the window
    (the chips' `editableDays()` was removed with the rest of the dead code on 2026-09-27).
 4. **The habit list** — tap the **circle** to tick, tap the name for that habit's history, tap
-   `+` on counter habits. Each row shows that habit's own level and current streak.
+   `+` on counter habits. A row's one badge slot, right of the name, shows its streak from 3 days
+   (`BADGE_FROM`), or a new habit level for a moment.
+   **On a counted habit the circle opens the log sheet** (Amir, 2026-10-12, the UX audit's 1A;
+   `toggleHabit()`): with the target filled in when the day is short of it, otherwise at what is
+   logged. A full day is still two taps (circle, Save) and any real number is three. Until then one
+   tap wrote the full target and the next wrote **0**: 4,500 real steps became 10,000 (with the XP, and
+   a level-up), then nothing, with no undo. **The sheet takes a typed number** (`#logval`, the phone's
+   number pad; `foldDigits()` folds Persian and Arabic digits, as sign-in does), beside the stepper,
+   *Hit the target*, a quick add on steps and water, and *Clear*, which takes two taps. In 30 days
+   before this, not one of 45 step entries was off the 500 grid: nobody could enter a real count.
+   The field is a live input, so the renderer never writes its value (`morphAttrs()`): a button that
+   changes the number sets `UI._logSync` and `syncLogField()` writes it once after the render. The
+   save is `saveSheetLog()` (⚠️ not `saveLog()`, which writes the log to the phone). In the strip on the
+   training app's Home the same tap opens the strip's own number row under the habit (`embedEdit()`).
+   **No level on the row at rest, and the help line only in the first week** (`dayNumber() <= 7`):
+   a habit's level lives on Progress and its page; seven `LV n` chips and a "1-day streak" on most rows,
+   in three different places, were noise beside the thing being ticked.
    **The circle is the tick** (PRF-01, 2026-09-27): the emoji sits in a 48 px circle ringed in the
    habit's colour, and a tap fills it with that colour and a white tick. It used to be a 22 px ring
    on the tile's corner while `+` was a 36 px solid grape button, so the main action was the quietest
@@ -370,8 +402,8 @@ The screen they actually live on. **In this order, and the order is the point:**
 > list rather than a wall in front of it. If you add anything to this screen, it goes
 > *below* the habit list unless it is something the athlete must act on first.
 
-**Streak at risk** gets one clay strip immediately above the list, rather than being
-said three ways at once (card, day-bar and header flag) as it was before.
+**Streak at risk** is said once, in the card's nudge line, in clay with the count (since 2026-10-12; it
+was a clay strip above the list, and before that three things at once: card, day-bar and header flag).
 
 **The wins card** (`winsCard()`, PRF-02) sits between the hero and the list while it holds
 anything, until it is tapped, and stands down while a past day is being filled in. What lands
@@ -808,6 +840,14 @@ the hero tile and the wall chip can never disagree about the same integer.
 ### 02 · PROGRESS — where do I stand
 Habits and achievements merged, because they were two views of one question.
 
+> **Since 2026-10-12 (the UX audit):** quests come **first** while a run is on (the one thing here that
+> expires), the four stats sit in **one row**, and one **week table** (`weekTable()`) replaces both the
+> habit list that sat here (rings, five pips, a lavender tint on rows done today that had no key) and
+> the heat map at the foot of Today: a row per habit in Today's order, seven day cells (hit, part,
+> none, before you started; `rosterOn(k)` per day, compared by id), the habit's level ring at the end,
+> the row opening the habit's page, and paused add-ons as dim rows. Its heading carries *N of 7 on
+> target · +XP*. The five consistency pips are on the habit's page. Milestones below are unchanged.
+
 Opens straight on **four season stats**: days logged, **milestones** (the same count as the
 section at the foot, since POL-02; the tile said *Badges 8/72*, tiers included), **day streak** (as the
 flame) and perfect days → a one-line **key explaining the consistency pips**, which had
@@ -887,7 +927,7 @@ one word for both, the scope is all that keeps them apart. Today's seven-day rec
 longer names a "strongest" and "weakest" habit out of an eight-way tie at 0/7. The foot of
 Progress carries a second door to the manual.
 
-**Habit detail** (reached from here or from Today) shows that habit's rank and level
+**Habit detail** (since 2026-10-12, the UX audit: ‹ in the header, back to where it was opened, and no *Back to today* button at the foot; today's control first, *– · Log a number · +* on a counted habit; the 35-day grid with weekday letters; the stats; the ladder; the level as one line with its quip; the last five days; the header's streak from 3 days. The older order follows.) Reached from here or from Today, it shows that habit's rank and level
 progress, a log button, its consistency ladder, this-week / best-streak / 35-day-rate
 stats, a 35-day grid, and the last five days with the XP each earned. A day before the
 season earned nothing and says **BEFORE THE SEASON** instead of an XP figure (2026-09-26;
@@ -908,14 +948,22 @@ the hero directly beneath it is a 76px level. The **35-day grid marks today** an
 a key; without either it was 35 identical squares with no anchor, and the empty leading
 row read as broken rather than as "before you started".
 
-**A note on the habit-row badge.** A row on Today shows **both**: the level (`LV n`) always
-on the right, and the streak, when there is one, on the status line under the name. They
-used to share one slot (the streak when there was one, the level otherwise), so a habit's
-level vanished the moment it started going well. Levels still
-announce themselves the moment they change, through the flash chip in the level's place — which is when they
-actually matter — and both Progress and the detail screen carry the level permanently.
+**A note on the habit-row badge.** Since 2026-10-12 a row on Today has **one badge slot**, right of the
+name: the habit's streak from 3 days (a flame and the number), or, for a moment, a new level (`LV 9 ↑`,
+`UI.flash`). The level at rest is on Progress and the habit's page. (Until then the row showed the level
+always on the right and the streak on the status line, from 1 day.)
 
 ### 03 · CREW — everyone else
+
+> **Since 2026-10-12 (the UX audit):** the header says **Crew** once (eyebrow *Season 1 · day 31*;
+> "Leaderboard" was written three times), one switch **Board | Roll call**, and *This season / Past
+> week* sits in the list's heading (*Top 10*). The board is **one grouped list** with hairlines, your
+> row in the accent, scores in ink (teal went), the rule as a footnote, and no "Server-scored". Your
+> name is one row, **You appear as … · Edit ›**, which opens a sheet (`renderBoardSheet()`, in
+> `topLayer()`) with the name, *Rename* and *Leave the leaderboard* on two taps; Settings' *Board name*
+> opens the same sheet. Join and *Keep me off* (not on the board yet) are unchanged. The roll call
+> composer is one line, its prompt as the placeholder, and grows its counter and *Post it* once you
+> type. Settings and the manual hide the tab bar (`hidden`): ‹ and ✕ are their ways out.
 It holds the **whole** social layer. Two views, switched at the top: **Leaderboard** (the
 default since PRF-02, Amir's 6A, 2026-09-27) and **Roll call**. Who is on the board, and how
 they got there, is under *The leaderboard* below.
@@ -988,6 +1036,12 @@ Nobody else's streak or days-on-target is ever invented. Teaching either RPC to 
 per-athlete streak is the whole change needed for everyone's cards to carry one.
 
 ### 04 · LOCKER — the long game
+
+> **Since 2026-10-12 (the UX audit), the order stays and the repeats go:** no *4/14* in the header
+> (eyebrow *Kept for good*), *4 of 14 rewards kept* once, in the hero; *What you have* has no count; the
+> title you wear is first in its rail (*Titles · tap to wear*); on the road the NEXT reward keeps its pill
+> and drops the bar and XP line the hero already shows; the level ring and the next bar are the accent,
+> not teal; the rank name no longer wraps at 320 px.
 The reward track, as a tab of its own (screen id `pass`, drawn by `renderPass()`). Four ways
 in: the tab bar; the **level ring** or the **rank** on Today's hero, both `go('pass')` — the
 rank lives here and nowhere else now that Progress dropped its strip; the profile card at
@@ -1011,6 +1065,10 @@ the top of Settings; and Settings → *Locker*. Top to bottom it draws:
 
 *How rewards work* at the foot opens the manual. The design, and the three shapes it went
 through, are in *The long game* below.
+
+### The type scale (2026-10-12, the UX audit's last pass)
+
+**Six font sizes and four corners.** Every `font-size` in the stylesheet and the templates is one of **12, 14, 16, 20, 28, 40 px** (it was 39 sizes in the file, 24 on screen), and every card or control corner is **12, 20, 28 px or round** (cells, pips and thin bars keep their small 3-6 px corners). Measured after the pass on every screen at 390 and 320 px: 12/14/16/20/28 on screen, no text clipped, no sideways scroll. **The label floor is now 12 px** (A11Y-01 set 11). Left alone on purpose: the takeovers and share cards (posters), the strip on the training app's Home (its own clothes), and `fitRankName()`, which still shrinks a long rank a pixel at a time to fit (15 px on a 320 px phone). Under 380 px Progress's stats go two by two and the week table drops the emoji so names fit. **A new style uses the scale**: pick the nearest step, never a new size.
 
 ### One word each, and the small things (POL-02, 2026-09-27)
 
@@ -1298,7 +1356,12 @@ each row a door with an icon tile, a name, a line of explanation and its current
 | Card | Rows |
 |---|---|
 | — | **Profile** — name, `Day N · rank · coached/free`. Tapping it opens the **Locker**, because that is where the rank lives. |
-| Tracking | **Habits & targets** (`N of M add-ons on`) · **Appearance** (`Dark`/`Light`) · **Install on your phone** (only while `installable()`) |
+| *Since 2026-10-12 (the UX audit) the groups have visible headings and are:* | |
+| Your habits | **Your habits** (`N of M add-ons on`; it was *Habits & targets*, but targets cannot be changed) |
+| App | **Dark mode** and **Tick sound** as switches in the list (the Appearance screen went) · **Install on your phone** (only while `installable()`) · **Open your programme** / **See about coaching** |
+| Help | **The tour** · **The manual** (the Locker row went: the tab and the profile card both open it) |
+| Account | **Board name** (opens the same sheet as Crew's *You appear as*, `renderBoardSheet()`) · **Sync** · **Reset today's log** · **Sign out** |
+| *Until then:* Tracking | **Habits & targets** (`N of M add-ons on`) · **Appearance** (`Dark`/`Light`) · **Install on your phone** (only while `installable()`) |
 | How this works | **The tour** · **The manual — how XP works** · **Locker** · **Open your programme** / **See about coaching** |
 | Crew & data | **Crew board** (your board name; `Not yet` for a coached athlete the sweep will list after their first session; `Not joined` otherwise) · **Sync** (live `syncLabel()`, tap to sync now) · **Reset today's log** (destructive, still two-tap armed; it wipes the day picked on Today's week, `AKEY()`, and names it: *Reset yesterday's log* when yesterday is picked. It used to wipe today whatever the strip showed.) · **Sign out** (two-tap, never in the demo or a coach preview; see *The four tabs*) |
 
@@ -1396,6 +1459,9 @@ to explain the decision to the athlete.
 ---
 
 ## The tour — the game-style first run
+
+> **2026-10-12 (the UX audit's batch E):** each step is under 40 words (the row step says the circle opens the number on a counted habit; the board step rings the *You appear as* row), and the tour's buttons are the app's pill buttons (the tour lives outside `#app`, so it had square, uppercase ones). The same pass made **the manual fold**: every section is a heading you tap (`UI.manOpen`, *Start here* open on arrival), the contents list opens and goes to a section, and `openManual(section, from)` opens the right one from Progress (*Consistency*), the Locker (*The Locker*) and Crew (*The leaderboard*). **The wins card shows two lines at most**, then *and N more*. **No em-dash in anything an athlete reads** (COM-3): 95 lines of toasts, notes, onboarding, Settings and the manual were rewritten; the session's locked hint says *Finish any session in your programme and this ticks itself.*, and onboarding's ALWAYS ON is Settings' pill.
+
 
 **One screen of onboarding said what to track and not one word about how any of it
 works.** The athlete was then handed a scoring system, three tabs, a header button
@@ -2252,7 +2318,7 @@ sheet.
 > forever, clicking a control nobody was touching: the number drained 500 at a time
 > while the athlete watched it.
 
-**Sound** is off unless the athlete turns it on (Settings → Appearance → Sound). It is *synthesised*,
+**Sound** is off unless the athlete turns it on (Settings → App → Tick sound; it was under Appearance until 2026-10-12). It is *synthesised*,
 not loaded — a short square blip through WebAudio, so it costs no bytes and cannot fail
 to download. It rides inside `haptic()`, so every existing call site gets it for free.
 This is also the only feedback an iPhone actually gets, since Safari exposes no

@@ -401,7 +401,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   `account_id`, and undoes everything if one still holds a row. **A table you add that holds a person's data goes into its table list
   the day you create it** (`supabase/stage54_erase_person.sql`), and into `BACKUP_TABLES`; the one-off rollback copies the pipeline
   makes live in the `backup` schema and are emptied for the person automatically. Intake forms are the coach's pick (matches by email,
-  WhatsApp number or name are offered, and one you linked to the athlete on the Intake tab (stage61) comes first; a linked or same-email one is ticked for you; a finder lists any other, at most 10; a linked form left unticked keeps its answers and loses only the link). An affiliate partner record stays when its athlete
+  WhatsApp number or name are offered, and one you linked to the athlete under Leads → Applications (stage61) comes first; a linked or same-email one is ticked for you; a finder lists any other, at most 10; a linked form left unticked keeps its answers and loses only the link). An affiliate partner record stays when its athlete
   is erased (only the link is cleared). The private note about a buyer lives in `buyer_notes`, coach-only; the account rows' `label`
   stays empty (a trigger moves anything written there). Tables are emptied in `publish_cycle()`'s lock order (programme first).
 - **A finished session is hidden, never deleted, from the dashboard** (stage60, 2026-10-11; Amir: "hide it, keep it recoverable"): `session_history.hidden_at`,
@@ -414,14 +414,24 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   "i will never do that manually"); `parseSessionEmail()` stays only as the tested reader that `scripts/restore/sessions_from_email.js` uses.
 - **A paused or former athlete is nobody's chase** (stage63, 2026-10-11; Amir: "active, paused, former"): `athlete_status` (coach only, in the backup, emptied by an erasure) holds only
   those two; `reasonsOf()` returns only a note they sent and a session that did not sync for them; a former athlete and the demo and your own identity are in no roster
-  total (`inTotals()`). The roster's tools sit behind one ⚙ Tools button. A new table with an `athlete_id` column goes into `coach_erase_person()`'s list the day you create it (stage63 did it by patching the live function).
+  total (`inTotals()`). The tools (Backup, Add coaching logs, Create missing logins, Logins to send) sit behind one ⚙ Tools button in the top bar (moved from the roster, Amir 2026-10-12). A new table with an `athlete_id` column goes into `coach_erase_person()`'s list the day you create it (stage63 did it by patching the live function).
 - **A contact record with `source 'coach'` is a WhatsApp number the coach typed, not a signup** (stage62, 2026-10-11): `isSignup()` keeps it out of the Proof signup
   funnel, the "new signup" reason, `lastSeen` and the Proof tab. A new place that reads `S.contacts` or `a.contact` as "this person signed up" must use it.
 - **The weekly call log is retired** (Amir, 2026-10-11): no Calls tab, no new call logs, no Copy cycle prompt; old logs are read and
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (105 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (112 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+- **The UX pass (2026-10-12; Amir's answers in memory `coach-redesign-2026-10-12`)**, round 1 shipped: Today puts Needs you first and wide,
+  each row's button names what it does, and **"Also waiting"** (applications, logins to send, backup, older notes) is NOT a reason, so it never
+  touches `reasonsOf()` or the people count. The roster is one aligned table (Athlete · Cycle · Last session · Proof · Why); the athlete header
+  carries the cycle line and the reasons as links; the File is four groups with the **Danger zone folded**, and **Forget lives there** (not on the
+  Proof funnel). A shortened explanation keeps its full text in that group's "How this works" fold. **Round 2 shipped:** seven places in
+  one bar (Today · Athletes · Exercises · Proof · **Leads** · Library · **Buyers**; `#intake`, `#affiliates`, `#assess`, `#course` are rewritten to
+  their new homes by `fixLegacyHash()`, keep them working); Leads = Applications (`intakeViewHtml()`, a list and the chosen one) · Free signups
+  (`funnelPanelHtml()`) · Referral codes; Buyers = Course · Testing app; Exercises = Entries (the editor beside the list) · Qualities · Coverage;
+  Proof is the crew's home (wall, quest lever, pulse, board) and Today keeps a short Proof column; body weight is on The work. Round 3 (type,
+  colour and corners, long confirms as inline panels, Library rows, the phone bottom bar) is planned, not built.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.
@@ -444,7 +454,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v117` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v124` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

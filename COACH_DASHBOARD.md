@@ -43,7 +43,7 @@ safe to open anywhere — handy for screenshots or design work.
 
 ---
 
-## 2. The nine tabs, in two groups
+## 2. The seven places, in one bar
 
 **Back keeps your place** (audit BROWSER-4, 2026-10-11). A new screen opens at the top; going Back to a screen you left lands where you were on it,
 so the roster no longer jumps to the first athlete after you open someone and come back. A tap on a tab or a link is a new screen and starts at
@@ -51,25 +51,38 @@ the top. (The page stamps each screen on its history entry and switches the brow
 drew and was then overwritten.) Every label is at least 12 px: `scripts/check_site_style.py` guards `coach.html` too since 2026-10-11, so
 text under 12 px cannot come back.
 
-The first four are the daily coaching work. The other five (smaller, after a divider; on a phone
-a second row that scrolls sideways) are opened now and then.
+**Seven places, one row** (round 2 of the UX pass, 2026-10-12; Amir: *"D1 yes"*). It was nine tabs in two groups. Intake, Affiliates and the signup
+funnel are now **Leads**; the Testing app and the Course are now **Buyers**; ⚙ Tools moved from the roster into the top bar. Today, Athletes and
+Exercises are the daily work; Proof, Leads, Library and Buyers are opened now and then, but all seven sit in the same row, in this order, with no
+divider and no "more".
+
+**The bar.** From 900 px up it is **one sticky bar, 56 px** (it was a 58 px top bar over a 61 px tab rail, 119 px in all): the brand, the seven tabs
+and, on the right, the signed-in address, **↻ Refresh**, **⚙ Tools** and **Sign out**. The tabs are sentence case, Barlow 600, 14.5 px; the one you are on
+is white with an underline, and *Athletes* (notes to read) and *Leads* (new applications) carry a clay count. What gives way as the window narrows,
+measured with the real address and the real fonts: the signed-in address below 1340 px, the brand's second half (*· THE BOX*) and the words *Refresh* and
+*Tools* below 1180 px, then a little air in the tabs below 1020 px; at 900 px all seven still fit. **Under 900 px** it is the top bar (brand, ↻, ⚙, Sign out;
+sticky, 54 px) and **one row of tabs under it that scrolls sideways inside itself** (the one you are on is scrolled into view; the row is not sticky,
+so it does not eat a phone's screen). `--stick` is what stays on screen at the top (56 px, or 54 px under 900); the jump links, the comparison header
+on The work, the Applications list and the failure bar all offset themselves from it, and the Exercises split measures its own top (`spineFit()`). The
+page is `<header class="topbar">` holding `.tb-top` (the brand and the buttons) and `.rail` (the tabs): from 900 px `.tb-top` is `display: contents`
+and the header is the flex row; under 900 px the header is `display: contents` and `.tb-top` is the sticky row. `nav-seven` measures all of it.
 
 | Tab | What it's for |
 |---|---|
-| **Today** | The day's play: who's on court, who needs you (and why), the wall, the quest lever |
+| **Today** | The day's play: who needs you (and why), what else is waiting, and a short Proof column (your line to the crew, today's wall lines, the quest week and who is drifting) |
 | **Athletes** | The whole roster — coached and Proof-only — and each person's file, opening on prescribed-vs-done (a habit-only athlete opens on Proof) |
-| **Intake** | New coaching applications from the apply form (English & Farsi) — the whole questionnaire, per lead |
 | **Exercises** | The Spine (2026-09-24): one entry per exercise you programme. Coverage of the names in live programmes, Claude's drafts waiting for you, a search, and an editor (purpose, How to do it, cues, links, body parts and the muscle map, video, and the coach-only SFR rank, flags, counts and cost) showing who is doing each exercise now. Claude's draft steps, cues or purpose for an approved entry wait in the editor's boxes, and your Save approves them. A save sends only what you changed. **Approve** is what puts an entry on athletes' phones |
-| **Proof** | The board, the season, the signup funnel, titles minted |
+| **Proof** | The crew's home: the wall and your line, the quest lever, the pulse, the board, titles minted, the season. (The signup funnel is no longer here: it is Leads → Free signups) |
+| **Leads** | Everyone who might become a client, in three sub-tabs: **Applications** (the coaching apply forms, English and Farsi, the whole questionnaire per lead; a clay count of the new ones), **Free signups** (the Proof funnel: everyone who signed up on `proof.html`, days logged, who is ready to upgrade) and **Referral codes** (who holds which discount code; the apply forms accept exactly the live codes listed here) |
 | **Library** | Publishes workouts and articles into the app's Library, and copies a link to each (the address is still `#links`; the tab was called Links until 2026-10-10) |
-| **Affiliates** | The referral-code roster: who holds which discount code, how to reach them, which intakes used it. The apply forms accept exactly the live codes listed here |
-| **Testing app** | Buyer logins for the tennis testing app (`/tennis-testing/app/`) |
-| **Course** | Buyer logins for the paid course app (`/tennis/app/`) |
+| **Buyers** | Logins for the two apps people pay for, in two sub-tabs: the **Course** (the paid course app, `/tennis/app/`) and the **Testing app** (`/tennis-testing/app/`); each sub-tab shows its count of active logins |
 
-The URL carries the view (`#today`, `#athletes`, `#intake`, `#exercises`, `#proof`, `#links`,
-`#affiliates`, `#assess`, `#course`, `#a/<athlete_id>`, `#a/<athlete_id>/<sub-tab>`), so any
-screen can be bookmarked or reloaded in place. The browser tab's title names the screen.
-**↻ Refresh** (top right) re-pulls everything.
+The URL carries the view (`#today`, `#athletes`, `#exercises`, `#exercises/qualities`, `#exercises/coverage`, `#proof`, `#leads`, `#leads/signups`,
+`#leads/codes`, `#links`, `#buyers`, `#buyers/testing`, `#a/<athlete_id>`, `#a/<athlete_id>/<sub-tab>`), so any screen can be bookmarked or reloaded in place.
+Anything else after the slash of `leads`, `buyers` or `exercises` reads as the first sub-tab. **The nine-tab addresses still work and land in the new
+place**, and the address bar is rewritten in place (`history.replaceState`, no extra history entry, so Back goes where it should): `#intake` → `#leads`,
+`#affiliates` → `#leads/codes`, `#assess` → `#buyers/testing`, `#course` → `#buyers` (`LEGACY_ADDR`, `fixLegacyHash()`). The browser tab's title names the
+screen and, in Leads and Buyers, the sub-tab (*Free signups · Leads · The Coach's Box*). **↻ Refresh** (top bar) re-pulls everything.
 
 **When something does not load or save.** A red line under the tabs names anything that failed
 to load (programmes, logins, contacts, intake forms, codes, the library, coaching logs), and the
@@ -84,7 +97,7 @@ four lines stay, and *Dismiss all* clears them. *A question*: a confirm. A pop-u
 copy once: a first password the server could not store, the backup summary, the result of adding coaching logs or logins in
 bulk, an erasure receipt. Before this a failed save was a 2.6-second toast in some tabs (easy to miss: the affiliate and intake
 ones) and a blocking pop-up in others, and a buyer login ended in a pop-up where an athlete's ended in a toast. A buyer login
-(testing app, course) now copies its message and says so in a toast, like an athlete's; the password waits in the list.
+(Buyers: the Course and the Testing app) now copies its message and says so in a toast, like an athlete's; the password waits in the list.
 
 ### Exercises — the Spine
 
@@ -107,10 +120,35 @@ reads; the phone gets only the muscles from *Counts toward* and whether each is 
 `/program-design` filters on the flags and `check_program.py` counts volume and day load from the
 counts and cost.
 
+**The layout: three sub-tabs, and the editor beside the list (2026-10-12, round 2 of the coach UX pass).** The tab was six panels on one
+page (an intro, Coverage, the ten qualities, the Quality check, the list, two warning folds) and the editor, 1,500 px tall, opened inside
+a list of 370. It is three sub-tabs now, styled like the athlete file's (`.subrail` / `.stab`), each with its own address so it can be
+bookmarked and reloaded: **Entries** (`#exercises`), **Qualities** (`#exercises/qualities`), **Coverage** (`#exercises/coverage`);
+anything else after the slash reads as Entries (`routeOf()`, `EX_SUBS`). The Coverage label carries a clay count: the cards that show
+something else on a phone plus the names not in the Spine.
+- **Entries** is the daily work: one short line, the search box and the three filters (Drafts, Claude's drafts, Approved), and, when Coverage
+  has something to fix, one clay line that links to it. **From 1000 px up the list (about 380 px wide) and the editor sit side by side**,
+  each scrolling on its own inside the height the window leaves (`spineFit()` measures it from the top of the split to the bottom of the
+  window, so the page does not scroll; the editor's Save bar is stuck to the bottom of its own pane). Nothing open: the right side says *Pick an
+  exercise to edit it.* The open row is highlighted and says *Editing*; tapping it does nothing, **Close** closes. **Below 1000 px** the list is the
+  page and an open entry takes its place, full width, with **← All exercises** above it (it is Close, guard included); the page jumps to the
+  editor when it opens and back to where the list was when it closes. A redraw (a search, a save, the levels arriving) puts both scroll
+  positions back; a new search or filter starts the list at the top and a different entry starts the editor at the top. The editor lives
+  beside the list now, so **a filter or a search no longer closes it**: what is typed in it is carried across. The editor's content, field order,
+  folds, History and buttons are unchanged; it gained a heading with the entry's name and its status, because it no longer sits under its row.
+  The long explanation that used to be the page's first line is in a *How this works* fold at the bottom.
+- **Qualities** is the ten qualities as a table (name, one line, on court, how it is measured, status and its buttons), stacked with labels on a
+  phone, with the **Quality check** under it, open. Its long paragraphs are in *How this works* folds.
+- **Coverage** is the bar, four counts (approved entries, drafts waiting, entries with Claude's draft to read, approved with no How to do it),
+  then *Cards that show something else on a phone* and *Not in the Spine yet*, both open. The long sentence is in a fold.
+- **Typed work is guarded across the three.** The editor is only on Entries, so moving to another sub-tab, to another tab, or ↻ Refresh with
+  unsaved changes (an entry, or the quality texts) asks first (`spineMayLeave()`, in the `hashchange` listener); a No stays where you were
+  with the typing. A sub-tab and the open entry are remembered: leave and come back and the same entry is open.
+
 The tab opens on **Drafts** while there are any, else on **Approved**, and the search box finds an
 entry across both by name, other name, pattern, equipment or id. *Coverage* and *Doing it now* count
 every card in a programme with workouts, **circuit items included** (before 2026-10-10 they skipped
-circuits, a third of all cards). *Not in the Spine yet* lists the names still without an entry,
+circuits, a third of all cards). *Not in the Spine yet* (Coverage) lists the names still without an entry,
 most-used first, each with **Copy /spine add** (one tap puts `/spine add <name>` on the clipboard for Claude) and a **Copy /spine add for all N** at
 the top (the command, then one `- name` per line; each becomes a draft for you to approve) (audit FLOW-13, 2026-10-11).
 **The entry editor folds what you rarely touch** (audit SPINE-7): *Body parts and the body map* and *Coach only: SFR, flags, counts, cost* are closed
@@ -121,7 +159,7 @@ open across a redraw, and a save sends whatever is in the folded parts exactly a
 is found among those. A card that names its entry (`exId`) shows that entry **or nothing** on the phone and on the dashboard alike: a
 card on a draft has no cues and no video until you approve it (it used to fall back to the closest approved entry by name, so
 "Machine Seated Leg Curl" showed "Seated Leg Curl"'s cues and video). A card with no `exId` is found by its name tiers, as before.
-*Coverage* says how many card names show something else on a phone, and the list at the bottom, *Cards that show something else on a
+*Coverage* (the sub-tab; Entries has a clay line that links to it) says how many card names show something else on a phone, and the list under it, *Cards that show something else on a
 phone*, gives each one: what you see here, and what the phone shows (nothing, or the closest approved entry). The video next to an
 exercise in the compare view is the phone's too, so a draft's video does not appear until the draft is approved.
 
@@ -135,7 +173,7 @@ while you review them. A save sends **only the fields you changed**, so a court 
 or a cost Claude wrote after you opened the tab survives your edit to a video. If Claude (or another
 tab) changed one of the *same* fields, nothing is saved and a box shows both values: Save again puts
 yours over theirs, Close keeps theirs. Typed work survives a redraw (a search, a quality save, the
-levels arriving), and opening another entry, switching the list, ↻ Refresh or leaving the tab with
+levels arriving, a filter), and opening another entry, switching sub-tab, ↻ Refresh or leaving the tab with
 unsaved changes asks first. A **rename** of an entry live cards use is refused with the cards it would
 break: one name per exercise, and a rename has to move the cards and their logged history too, which
 is `/spine`'s *One name in live programmes* job. A name or other name that is already another entry's
@@ -183,7 +221,7 @@ and names a step over 90 characters (aim shorter) or over 140 (it will not save)
 or a step over 140 characters before anything leaves the page: those are the database's own limits
 (`spine_steps_ok()`), so nothing is refused twice. The steps reach phones with the entry, in `get_exercises()`.
 They are in History as **Steps**, numbered, and Undo puts them back like any other field. The list marks an
-entry with **no steps** in clay, and the Coverage line counts the approved entries with no How to do it. The
+entry with **no steps** in clay, and Coverage counts the approved entries with no How to do it. The
 cue boxes now say what each line is for (CUE-1): **Cues** is the key point, then a feel or a check; **Don't** is
 the one fault, then the fix.
 
@@ -199,8 +237,8 @@ drafts waiting and does not ask, because a draft is not your unsaved work; a dis
 first. A draft is shown only while its `old` still equals what the entry holds. One that no longer matches (you
 edited the field since) is stale: it is not shown, a quiet line says so, and Claude's next `/spine` run drops
 it. When two drafts wait for one field, the newest is shown and the line says so. Other proposals on the list (a
-link, a count) are never touched by Save: they stay for Claude's `/spine` yes/no. The Coverage line
-says how many entries have **Claude's draft to read**, the list marks each one, and a **Claude's drafts** filter
+link, a count) are never touched by Save: they stay for Claude's `/spine` yes/no. Coverage
+says how many entries have **Claude's draft to read** (a clay count), the list marks each one, and a **Claude's drafts** filter
 (beside Drafts and Approved) lists them; the tab opens on it when there are no new drafts to approve. If Claude
 adds a draft while you have the entry open, your Save is refused whole (the list changed under you), the box
 shows the list as it is now, and Save again goes through.
@@ -212,7 +250,7 @@ shows the list as it is now, and Save again goes through.
 - **Qualities on every entry.** Three selects, first = primary. Where Claude suggested tags for
   an entry you had already approved, they arrive pre-filled and marked, and are saved only when
   you save.
-- **Quality check.** One row per athlete, in plain words: the cycle and what its picture word says
+- **Quality check** (the Qualities sub-tab, under the ten, open). One row per athlete, in plain words: the cycle and what its picture word says
   it is meant to build (iron = Strength, voltage = Power …), what the current week trains most in
   working sets a week (an exercise's second quality counts half a set, warm-ups don't count), and a
   verdict: ✓ in the top two, or ⚠ *only #4 this week*. Foundation (bedrock), peaking and recovery
@@ -225,43 +263,75 @@ shows the list as it is now, and Save again goes through.
   (The week's number used to be read as "below 70% the day cards show nothing", which is not the app's rule: each day is judged on its
   own sets, so a week at 77% can have four blank cards out of five.)
 
-### Intake — where the apply form lands
+### Leads — Applications, Free signups and Referral codes
+
+One place with three sub-tabs, styled like the athlete file's (`.subrail` / `.stab`): **Applications** (`#leads`, with a clay count of the new ones),
+**Free signups** (`#leads/signups`) and **Referral codes** (`#leads/codes`). Each sub-tab is a view that returns its HTML and a function that wires it
+(`intakeViewHtml()` + `wireIntake()`, `funnelPanelHtml()`, `affiliatesViewHtml()` + `wireAffiliates()`); `renderLeads()` draws the bar and the one on show.
+The Leads tab's own badge counts the new applications too (`newApplications()`, the same number as Today's *N new applications* row, whose button is
+**Open Leads**).
+
+### Leads → Applications — where the apply form lands
 
 `form.html` and `form-fa.html` used to depend entirely on **Web3Forms**: the form
 turned into an email, and when that relay was unreachable the submission was lost —
 the athlete saw an error and nobody found out. Now each form **also** writes straight
 to Amir's own Supabase (`submit_intake` → the `hab_intake` table), and counts as sent
-if *either* path succeeds. The email still fires as a notification; **this tab is the
+if *either* path succeeds. The email still fires as a notification; **this view is the
 durable record**, so a Web3Forms outage can no longer swallow a lead.
 
-Each submission is a card: name, an **EN/FA** flag, the programme they picked, when it
-arrived, their email and contact (with copy buttons; a WhatsApp number becomes a
-`wa.me` link), and the whole questionnaire underneath. Three states drive the workflow
-and the **badge on the tab counts the new ones**:
+**A list and the application on show** (round 2 of the UX pass, 2026-10-12). On a screen 1000 px wide or more the view is two panels: **the list**
+on the left (about 320 px, its own scroll box, so a list of 64 does not push the page) and **the chosen application** on the right. The list has
+**New · n**, **Handled · n** and a folded **Archived · n**; a row is initials, the name, an **EN/FA** pill, the programme in short (*Match*, *Set*,
+*Game*; the full line is its tooltip), when it arrived and, once there is one, the outcome as a small pill. **The application on show is kept in the
+page** (`_intakeSel`, not the address): it starts as the newest *new* one (or nothing, with "Pick an application to read it."), survives a redraw, a
+reload of the data and a status change, and **stays on show when it leaves its group** (handled, archived; archiving it unfolds the Archived group so
+its row is not hidden). Below 1000 px the list is the screen until one is chosen; the application then replaces it, with **← All applications** at the
+top (it puts the list back where it was scrolled). `data-pane` on `#inView` says which of the two shows, so this is CSS and no second render.
 
-- **Mark handled** — you've replied or converted them (they move to *Handled*).
-- **Archive** — spam or not a fit (collapsed at the bottom; **Reopen** brings it back).
-- **Reopen** — send a handled/archived lead back to *New*.
+The application: the name, an **EN/FA** pill, the programme, *Arrived today* (the date and time are its tooltip) and its state (*New* in clay);
+a contact row (email as `mailto`, the contact as a `wa.me` link when `waLink()` says it is a number, a Copy beside each); then **Answers** as a
+definition grid, each question and its answer side by side in one cell pair, **two pairs to a row while the application is 700 px wide or more**
+(a container query on the pane: at a 1000 px screen the pane is 620, so it is one to a row) and one to a row below that. An answer in Persian script
+is `dir="rtl"` and right-aligned inside its own cell, never at the far edge of the page; a long answer takes the whole row. `INTAKE_SKIP` and
+`intakeVal()` still decide what is shown.
+
+**One way to close** (Amir, 2026-10-12: the outcome is the main way; *Mark handled* stays as a quiet button). Under the answers is one row:
+**What happened**, **Which athlete** (only when the outcome keeps one), **Save outcome** (the one primary button) and, at the right and quiet:
+**Mark handled** (a *new* application only: it closes it with **no outcome**), **Archive** (spam or not a fit) and **Reopen** (a handled or archived
+one goes back to *New*). The saved outcome and its athlete are written above the row. The **badge on the Leads tab and the count on this sub-tab are the new ones**.
 
 **What became of it** (stage61, 2026-10-11; audit FLOW-17 and SPINE-11; Amir: "link an application to the athlete it became, and let Handled
-record an outcome"). Every card has a small form: **What happened** (*Became a client*, *Joined the free tracker*, *Not a fit*, *No reply*,
-*Said no*, *Something else*) and, for the first two, **Which athlete** (a list of the roster by name; when one athlete has the application's
+record an outcome"). The closing row's **What happened** offers *Became a client*, *Joined the free tracker*, *Not a fit*, *No reply*,
+*Said no* and *Something else*, and for the first two, **Which athlete** (a list of the roster by name; when one athlete has the application's
 email, WhatsApp number or full name they are pre-selected, never saved for you). **Save outcome** calls `set_intake_outcome()`: a new application
 becomes *Handled* by it, a client needs an athlete, only a client or a free-tracker joiner keeps one, and "No outcome (clear it)" removes both. The
-card wears the outcome as a pill, and **the athlete's File says where they came from** (*Came from · date application · programme · outcome · open
-Intake*). A linked application is also the surest way to find the right form when you erase the athlete (see *Erasing a person*). The tab reads
-`hab_intake` itself, paged, under the "coach manage intake" policy (`intake_list()` still exists and is no longer called). `intake-outcome` and
-`erase-linked-form` drive it.
+list row wears the outcome as a pill, and **the athlete's File says where they came from** (*Came from · date application · programme · outcome · open the
+application*, a link that makes that application the one on show, `openApplication()`, and goes to Leads). A linked application is also the surest way to find the right form when you erase the athlete (see *Erasing a person*). The view reads
+`hab_intake` itself, paged, under the "coach manage intake" policy (`intake_list()` still exists and is no longer called). `intake-outcome`,
+`intake-list-detail` and `erase-linked-form` drive it.
+
+**In the code:** `intakeViewHtml()` returns the whole view (`#inView`) and `wireIntake(root)` wires whatever it is put inside; `renderLeads()` puts it under
+the sub-tab bar. A change inside it goes through `intakeRedraw()`, which replaces
+`#inView` only (it does nothing if the coach has already gone to another screen while a save was out), keeps the list's scroll and does not replay the
+panels' entrance.
 
 Nothing here joins anyone to Proof or writes a programme — it's an inbox. When you take
 a lead on, onboard them the usual way (`/athlete-intake`). Backend, and the coach-only
 guard on every read/write: [`supabase/stage27_intake.sql`](supabase/stage27_intake.sql).
 
-### Affiliates — the referral-code roster
+### Leads → Free signups — the funnel
+
+Everyone who signed up through `proof.html`, newest first (`funnelPanelHtml()`; it was the last panel on Proof until 2026-10-12, and is described under
+*The funnel* in §7). Days logged is the qualifying signal; a free athlete past 14 logged days is flagged *ready to upgrade?*. A row keeps **WhatsApp**,
+**copy email** and **open**. `leads/signups` is the only place the funnel is drawn; `proof-home` checks it is not on Proof, `whatsapp-number` and `file-groups`
+read it here.
+
+### Leads → Referral codes — the referral-code roster
 
 Coaches who refer clients apply through `partner-fa.html` (Farsi only); the application
 arrives as a Web3Forms email — search Gmail for `subject:(Affiliate)`, and check Trash
-too, one has landed there. **This tab is the one list of codes.** `form.html` and
+too, one has landed there. **This view is the one list of codes.** `form.html` and
 `form-fa.html` ask the database whether a typed code is live (`check_discount()`), so a
 code added here works on **both** forms the moment you save it, and a retired one stops
 just as fast. Until 2026-09-13 the codes were hand-copied into both form files and the
@@ -297,6 +367,10 @@ also train with you — their athlete id, which links the card to their file.
 The table is coach-only, but every **⤓ Backup** file carries the whole of it, and that file
 sits on your PC.
 
+**In the code:** `affiliatesViewHtml()` returns the view (`#affView`), `wireAffiliates(root)` wires it, and `renderAffiliates()` is the thin wrapper
+that redraws `#affView` in place (Add, Edit, Cancel, and a demo-mode save); it does nothing if the coach has gone to another screen. The `affiliates`
+scenario drives it through the old `#affiliates` address, `nav-seven` through `#leads/codes`.
+
 Backend: [`supabase/stage29_affiliates.sql`](supabase/stage29_affiliates.sql). Coach-only
 RLS, and anon has no privileges on the table at all; the forms' only door is
 `check_discount()`, which returns the percent for one exact live code — never the list,
@@ -307,20 +381,44 @@ every code sat in the forms' page source.
 
 ## 3. TODAY
 
-### The scoreboard
+### The layout (2026-10-12, round 1 of the coach UX pass)
 
-Four counters across the hero, each one a link to the panel that explains it:
+Action first: what needs you is the first thing on the screen, and it is wide.
+
+- **A slim strip** (about 70 px on a desktop, under 150 px on a phone) instead of the old banner and its headline: the date and the season pill, then the
+  four counters on one line, each as number + label (*2/3 on court today*, *1 note to read*). Each counter is still a link to the panel that explains it
+  (`scrollPanel`). On a phone the counters wrap 2 x 2.
+- **Two columns from 900 px**, `minmax(0,2fr) minmax(0,1fr)` (`.tcols`): **Needs you** on the left (`#needPanel`); on the right **Proof today** (`#proofToday`),
+  one short panel (round 2, 2026-10-12; see below). Under 900 px it is one column in that same order, Needs you first: there is
+  no reordering on a phone. The full wall, the full quest lever and the full pulse moved to **Proof** (section 7), so none of `#wallPanel`, `#questPanel` or
+  `#pulsePanel` is on Today: one copy of an id in the page at a time.
+- One white panel per section and **no card inside a card**: Needs you's rows are divided by hairlines.
+
+### Proof today — the short Proof column
+
+One panel (`proofTodayHtml()`), four parts with a hairline between them, in this order:
+
+1. **Your line to the crew**: the composer (`coachLineComposerHtml()`, the same `#coachLineInput` as on Proof: the draft, the strip hint, Post / Update the
+   line / Take it down; see *The wall* below).
+2. **Today's wall lines** with Hide (lines filed under today, and any filed under tomorrow under *Tomorrow, their time*), then **Earlier lines on Proof →**.
+3. **One quest line**, linking to Proof: the live run (*Quest week · day 3 of 7 · 3 quests · ends Fri*, from `activeQuestRun()` and `questRunEnd()`, so it is the
+   app's run and its real last day) or *No quest week live · start one on Proof →*.
+4. **One drifting line**, linking to Proof: the Proof athletes silent for `QUIET_HABIT_DAYS` (3) days or more, the pulse's own rule, most silent first (*Drifting:
+   Kian 4 d, Omid 3 d*), four names at most and then *+ N more*. Nothing at all (no empty part) when nobody is.
+
+Needs you and Also waiting are unchanged. The *on court today* counter opens Proof (the pulse is there); *wall lines today* scrolls to this panel.
+`proof-home` drives it.
 
 | Counter | What it counts |
 |---|---|
 | **On court today** | Proof athletes with a log entry for today ÷ everyone on Proof |
 | **Wall lines today** | Roll-call posts today, hidden ones excluded |
-| **Sessions this week** | Finished training sessions in the last 7 days, whole roster |
+| **Sessions, last 7 days** | Finished training sessions in the last 7 days, whole roster |
 | **Notes to read** | Session notes that arrived in the last 14 days and are not yet marked read (the same number as the badge on Athletes). It was called *Waiting on you* until 2026-10-10 |
 
-Beside them: the current season and how many days into it you are.
-
 ### The wall — read it *and* write it
+
+*(Round 2, 2026-10-12: the full wall is on **Proof**; Today keeps the composer and today's lines in its Proof column, above.)*
 
 The roll call, straight from `hab_notes`, newest day first. Two days by default,
 **Show the full week** for all seven.
@@ -350,8 +448,24 @@ chips, its *Needs you* group and filter, and its default sort use the same funct
 screens always agree. (Until 2026-10-10 four places counted "needs you" four different ways:
 sync gaps and upgrade leads never reached Today, signups never reached the roster, and Today cut
 off at 10 rows of notes.) The header counts **people**; the counter above counts **notes**.
-**A note that needs no action is cleared from here** (audit FLOW-7, 2026-10-11): its row has **Mark read** beside *open →*, which marks the one session
+**A note that needs no action is cleared from here** (audit FLOW-7, 2026-10-11): its row has **Mark read**, which marks the one session
 quoted in the row and then shows the next one, or the row goes. The athlete does not have to be opened.
+
+**Each row says what you will do** (2026-10-12). A row is the dot, the name, the top reason (clay when its tone is *warn*, ink otherwise), the other reasons in
+grey underneath, and **one button on the right named for what happens**. The name and reasons are a button too and open the athlete, exactly as the whole row used to
+(a note opens the day it is on). The button comes from the top reason's `key` (`NEED_ACT` and `NEED_WA_KEYS` in `needPanelHtml()`):
+
+| Top reason | Button | What it does |
+|---|---|---|
+| `note` | **Mark read** and **Open day** | marks the one session quoted read / opens the day the note is on |
+| `sync` | **Open sessions** | opens their work |
+| `lowrun`, `idle` | **Open** | opens their work |
+| `cycle` | **Open cycle** | opens their work |
+| `renew` | **Open file** | opens their File |
+| `login` | **Set up login** | opens their File and puts the cursor in the password box (`openAthleteLogin()`) |
+| `signup`, `silent`, `upgrade` | **WhatsApp ↗** | their number as a `wa.me` link in a new tab (`waLink()`); a plain **Open** (their Proof) when there is no number it can open |
+
+Only one reason's button per row, and none is the green primary button: a list of rows has no single "main" action.
 
 | Reason | Trigger | Weight |
 |---|---|---|
@@ -379,15 +493,24 @@ nudge): they still count in Everyone and their tier chip, and sit under a **Paus
 the main list; they stay under the **Former** chip and everything they logged stays. A **note they send** and a **session that did not sync** still reach
 Needs you for both, because those are messages and data problems, not chasing. The mark lives in `athlete_status` (only a paused or former athlete has a row,
 coach-only, in the backup, emptied by an erasure); `coach_set_status()` sets it and *Active* removes the row. `status-paused-former` drives it.
-Above the people: a row for **new applications** in Intake, and a **weekly backup** row when
-this computer has not taken one for 7 days. Tap a person to open them on the right screen (a note
-opens the day the note is on; a Proof reason opens Proof). **Show all** lists everyone past the
-first 12. (An *N unread messages* row sat here until 2026-09-26, when the in-app chat was removed
-from both apps: athletes message you on WhatsApp now.)
+Tap a person's words to open them on the right screen (a note opens the day the note is on; a Proof
+reason opens Proof). **Show all** lists everyone past the first 12. (An *N unread messages* row sat here
+until 2026-09-26, when the in-app chat was removed from both apps: athletes message you on WhatsApp now.)
+
+**Also waiting** (2026-10-12). Under the people, after a hairline and a small label, four kinds of row that are **not a person and not a reason**: `reasonsOf()` does not
+know them, they are not in the header's *N people*, and they are not in the Athletes badge. Each has its own button:
+
+| Row | Shown when | Button |
+|---|---|---|
+| **N new applications** | a coaching apply form in Leads is still `new` | **Open Leads** |
+| **Login to send · <name>** (new, Amir's yes) | an athlete login still holds its first password (`S.logins`, `initial_password`: the same rule as the Tools panel's *Logins to send*, `pendingCredsHtml()`); nothing is shown while the list of logins failed to load (`LOAD_ERR.logins`), because it would be a list of nobody. A password the athlete has already signed in with says so (the database clears it by itself soon after, stage51) | **Copy message** (`copyLoginFor()`) and **Mark sent** (`markLoginSent()`, which asks first: the very write the Tools panel makes) |
+| **Weekly backup** | this computer has not taken a complete backup for 7 days (never in the demo); it says when the last try was INCOMPLETE and does not count | **⤓ Back up now** |
+| **N older notes** | notes that arrived more than 14 days ago and were never marked read | **Clear** |
 
 **Clear** on the *older notes* row (notes that arrived more than 14 days ago and were never marked
 read) marks exactly the notes it counted, by their key. It used to mark every unread session
-older than 14 days on the server, including notes that arrived after the page loaded.
+older than 14 days on the server, including notes that arrived after the page loaded. `today-also-waiting` drives the
+layout, the buttons and the login rows; `today-mark-read`, `backlog-clear` and `backup-incomplete` keep the older ones.
 
 **Today's targets on a session (2026-09-26).** When an athlete's check-in eased the day (REC-2), the
 session line on The work says *lower day*, *short day* or *sore* (and *trained as written* if they
@@ -408,6 +531,8 @@ on render.
 
 ### Quest week
 
+*(Round 2, 2026-10-12: the lever is on **Proof**; Today shows one line about it.)*
+
 The lever, not just the readout. If a run is live you see its quests, the XP each
 pays and which day of seven it's on, with **End this run today**. If none is live
 you get the pool as checkboxes — pick one to four, **Start the week**, and it
@@ -427,6 +552,8 @@ take the XP back from everyone (the dialog had promised the opposite until 2026-
 
 ### Proof pulse
 
+*(Round 2, 2026-10-12: the full pulse is on **Proof**; Today's *Drifting* line is its short form.)*
+
 Every Proof athlete, **most silent first**, with seven presence dots (one per
 day, today ringed in clay) and their server-scored level. This is the retention
 screen — a row of grey dots is someone drifting before they churn.
@@ -443,22 +570,34 @@ with nobody in it is not drawn, except Everyone, Needs you and the one you are o
 name, email and WhatsApp digits (Persian ی/ک and extra spaces are normalised); the sort and the
 search survive a redraw.
 
-Each row carries a tier chip — **Coached**, **Free**, **Proof only** (they log
-habits but have no programme row) or **No file** — their level, a **load** pill only for a real
-spike (`load 1.6 · high load`, `· climbing`), their session count, their Proof week (`n/7`) and
-seven presence dots.
+**The list is one dense white surface** (redesign round 1, 2026-10-12; `roster-dense`): the groups are quiet label bands inside it, and each
+person is one row, a single `<button class="ath">` that opens their file. On a PC (900 px and up) the rows are aligned columns under a
+head row, about 52 px each (it was about 100 px a card, 4,000 px for 38 athletes): **Athlete** (a 28 px initials disc, court green, an
+outline for the free tier because plum means a warning; the name; the tier as small grey text: coached, free, Proof only, no file; the
+Paused or Former chip), **Cycle** (`C2 · wk 3/5 · ends 22 Oct`, from `rosterCycleHtml()`: the number is the programme's current cycle
+index + 1, the week is `cycleWeekOnC()`; in the last 7 days it says `ends in 3 d` / `ends today` and after the end `ended 5 d ago`, in clay
+for an active coached athlete; an undated cycle shows its name and length, then `no cycle`, or `no programme` for someone with no
+programme row), **Last session** (how long ago and how many; `no sessions yet` for a coached athlete with none, a dash for anyone
+else), **Proof** (seven presence dots, `n/7`, and the level as plain text, filled in place by `paintLevels()` when the levels arrive;
+empty for a person with no habits) and **Why** (the reasons from §3's one rule, clay when it is a warning and grey when it is only worth knowing,
+a pause or former status in words, and a load spike in plum: `load 1.6 · high load`, `· climbing`). A note waiting keeps a clay mark on
+the left edge. On a phone (under 900 px) there are no column heads and a row is two lines: the name, tier and Why, then the cycle, the last
+session and Proof (the dots wrap to a third line when there is no room); nothing is ever clipped.
 
 **A flagged row says why, in words:** the reasons in §3's table, from the same function.
 
-**Behind the ⚙ Tools button** (stage63 round, 2026-10-11; audit ROSTER-12; Amir: "a ⚙ Tools button"), so the roster starts right under the filter chips (at 360 px the first athlete was at
-y = 495; it is above 400 now): *Create N missing logins* (coached athletes who have trained and have no
+**Behind the ⚙ Tools button, in the top bar on every screen** (stage63 round, 2026-10-11; audit ROSTER-12; Amir: "a ⚙ Tools button"; **moved from the roster's controls into
+the bar on 2026-10-12, round 2 of the UX pass, on Amir's word**, so the roster starts right under the filter chips and the tools are one tap away from any screen). The
+roster keeps the search, the sort and the filter chips. The button keeps `id="toolsBtn"`, `toggleTools()`, `aria-expanded` and its badge, and opens `#toolsPanel`, a panel hanging under the bar
+at the right (520 px wide at most; the full width under the bar on a phone), above the page. It holds *Create N missing logins* (coached athletes who have trained and have no
 login), the **Coach tools** line: *↑ Add coaching logs* and
 *⤓ Backup*, with when this computer last took a backup, then **Logins to send** (open while three
 or fewer wait, folded above that: each unsent password with Copy message and Mark sent). The button's badge counts the logins waiting to be sent; the panel is folded when
-you arrive, stays open through a redraw, and closes on a second tap (`tools-button`). **A stored
+you arrive and **closes on a second tap, on Esc and on a click outside it**; it **stays open through a redraw** (it is not part of `#content`; `paintTools()`, called from `renderRail()`
+and after a backup, rewrites its contents only when they changed, and never takes the focus off a box being typed in) (`tools-button`, `nav-seven`). **A stored
 password clears by itself** (stage51, 2026-10-11): the database removes it the moment the person signs in
 with it and stamps *sent* with that time, so they drop out of the list. *Signed in with it* can only show
-for a moment, or on a password stored before stage51; the Course and Testing app lists behave the same.
+for a moment, or on a password stored before stage51; the Buyers lists (Course and Testing app) behave the same.
 If you sign in as the person yourself to test a login before sending it, that clears it too: reset the
 login for a new password. (The secret-link tools are gone: the links were retired on 2026-09-07.)
 
@@ -474,7 +613,7 @@ login for a new password. (The secret-link tools are gone: the links were retire
   and a restore is not a plain import, because the login tables point at sign-in accounts that must exist first.
   **The way back is written and rehearsed (2026-10-11, audit TOOLS-4): `scripts/restore/README.md`.** `restore_backup.py` turns a
   backup into SQL files and leaves out everyone a receipt in `erasure_log` names, so give it the NEWEST backup as `--receipts`
-  even when you restore an older one; the logins are re-created from this dashboard (Create missing logins; the Course and Testing app tabs with the
+  even when you restore an older one; the logins are re-created from this dashboard (Create missing logins; Buyers → Course and Testing app with the
   same usernames), then `20-after-logins.sql` puts back what belongs to a login. A table added to the schema goes in `BACKUP_TABLES` the
   same day (`scripts/test_restore_backup.py`, pre-commit guard 17, fails when the list and the snapshot disagree). Keep the last 12
   weekly files and delete older ones: `python scripts/prune_backups.py <folder>` lists them, `--delete`
@@ -503,6 +642,16 @@ A save or a refresh keeps the days you had open, the session you were comparing 
 into an open editor, and (since 2026-10-11) what you typed or opened in the tab itself: the password box with the cursor in it,
 Version history, the Coaching log, a day's raw log, Earlier cycles and the live snapshot. That holds for the same athlete's same
 screen only; another athlete or screen starts clean.
+
+**The header** (2026-10-12, round 1 of the UX redesign; the same on every sub-tab): `← Roster`, a 44 px avatar, the name, one line
+(tier, status and level chips, then *N sessions · Proof n/7 · last active …*), then a **cycle line** and a **Needs you line**, and on the
+right (below the name on a phone) the **WhatsApp** button and **View their app** (or **View their Proof** for someone with habits and no
+training days). The cycle line (`cycleLineHtml()`) is the old dark green block on The work, moved up and made one line:
+*Cycle 3 — Foundations · week 2 of 4 · 12 Oct – 9 Nov · 28 days left*, then the focuses in grey. The week is the app's own
+(`cycleWeekOnC()`); a cycle with no dates has no week text (its roadmap label, *Weeks 1–5*, stands in), and the wording *ends today* and
+*ended N days ago* is as it was. The Needs you line (`needsLineHtml()`) says why this person is in front of you: each of their reasons from
+`reasonsOf()` (`a.reasons`, plus the quiet flag a gone-quiet athlete keeps, never computed here) as a link to the sub-tab that has it, joined by
+" · ", the ones that need you in clay. `file-groups` drives both.
 
 ### The work — prescribed vs done, on one line
 
@@ -640,10 +789,19 @@ Read-only. The athlete owns the record: they log a max from **Personal Records �
 their app, and they can delete any entry. A lift they have renamed between cycles reads as one lift
 here and one lift there — both sides run the same name matcher, on purpose.
 
+### Body weight — on The work, folded
+
+Under the Personal records (and above the day cards) sits **one compact panel** with the body weight the athlete logs in their training app: its header line reads
+*Body weight · 64.7 kg · today · −1.3 kg over 30 days · −2.5 over 90* (the latest reading and how long ago, then the change of the 7-day average over 30 and
+over 90 days, the same average the app draws), and the chart is folded under it in `<details id="wtdet">`, **shut until you open it** and kept open through
+a redraw (`snapTabBody()` collects every `details[id]`). It is **absent, not empty, when there is no reading**. It moved here on 2026-10-12 (round 2): the
+weight comes from the training app, not from Proof, and a coached athlete who never ticks a habit has no Proof tab to find it on. Read-only, never scored
+(`weightPanel()`; `proof-home` drives it).
+
 ### Proof · File (and the retired Calls)
 
 - **Proof** (only for people who log habits) — server-scored level, 14 presence dots, their week,
-  board name and worn title, WhatsApp and email, and their wall lines with hide/show on each.
+  board name and worn title, WhatsApp and email, and their wall lines with hide/show on each. (Body weight is not here any more: it is on The work, above.)
 - ~~**Chat**~~ — **removed 2026-09-26** (Amir: *"whatsapp first, remove in app chat from app and
   coach.html"*). The `messages` table and its three functions stay on the server untouched, so no
   past thread is lost; nothing reads or writes them now.
@@ -652,20 +810,26 @@ here and one lift there — both sides run the same name matcher, on purpose.
   prompt** are gone. The old logs stay readable, and deletable one by one, in the File tab under **Old call
   logs** (the section is absent when there are none). An old `#a/<id>/calls` link opens the athlete on The
   work. `call-log.html` and `CALL_LOG.md` still exist but nothing in the dashboard links to them.
-- **File** — *View their app* / *View their Proof* (read-only previews of the programme: what they have logged is not in them, it is under The work and Proof here; audit TOOLS-11), the **login** (create,
-  change password, remove; an unsent password shows here with Copy message, WhatsApp when the
-  number is known, and Mark sent), the programme row (tier, days/week, which cycle of the roadmap,
-  when it was last saved and by whom, Version history), the coaching log, **Old call logs** and the
-  **Danger zone**, which has **Delete training history**: every finished session (the hidden ones too) plus what the app keeps for them on the server (habit log, body
-  weight, personal records). Their programme, login, coaching log, calls and wall lines stay, and so
-  do they on the roster. (It was called *Delete all data* until 2026-10-10, which it never was.) It is
-  one call, `coach_delete_training_history()` (stage48): the sessions and the progress snapshot go
-  together or not at all, and the counts come back. It used to be two deletes from this page, and a
-  failure between them left one gone and one standing. Under it, **Erase completely…** removes the whole
-  person (see *Erasing a person* below).
+- **File** — four groups in this order (2026-10-12), each one white panel of label / value / action rows between hairlines, with the longer
+  explanations folded at the end of their group under **How this works** (nothing was removed: each short hint on a row has its full text there):
+  1. **Contact and access:** **WhatsApp** (the number box, *Save number*, *Remove*), **Login** (create, change password, remove; an unsent
+     password shows here with Copy message, WhatsApp when the number is known, and Mark sent; *No login yet* stays in clay), **Status**,
+     **Their app** (*View their app* / *View their Proof*: read-only previews of the programme; what they have logged is not in them, it is
+     under The work and Proof here; audit TOOLS-11) and **Came from** (the applications linked to them under Leads; each has an *open the application* link).
+  2. **Programme:** the facts (athlete id, tier, days a week, cycle, roadmap n of m, when it was last saved and by whom; *Stored in: no
+     programme row* only when there is none), then the **Coaching log** and **Version history** folds.
+  3. **Records** (absent when there is nothing to show): **Hidden sessions** and **Old call logs**.
+  4. **Danger zone**, a fold shut by default, open while **Erase completely…** is open for this person, and kept open across a redraw once
+     you have opened it (`#dangerzone`, through `snapTabBody()`). Inside: **Delete training history**: every finished session (the hidden ones too) plus what the app keeps for them on the server (habit log, body
+     weight, personal records). Their programme, login, coaching log, calls and wall lines stay, and so
+     do they on the roster. (It was called *Delete all data* until 2026-10-10, which it never was.) It is
+     one call, `coach_delete_training_history()` (stage48): the sessions and the progress snapshot go
+     together or not at all, and the counts come back. It used to be two deletes from this page, and a
+     failure between them left one gone and one standing. Next, **Erase completely…**, which removes the whole
+     person (see *Erasing a person* below), and **Forget their Proof data…** for a free signup (see *Proof*, section 7).
 - **A WhatsApp number on every File** (stage62, 2026-10-11; audit FLOW-8; Amir: "a WhatsApp number field on each coached athlete's File, shown in
   the header with a WhatsApp button"). Most coached athletes had no contact record (9 of 49, all made from an intake form), so a new login's
-  *Copy message* had no WhatsApp button for them. The File has a **WhatsApp number** box (*Save number*, *Remove*); the header under the name
+  *Copy message* had no WhatsApp button for them. The File has a **WhatsApp number** box (*Save number*, *Remove*); the header (right of the name, 2026-10-12)
   shows a **WhatsApp ↗** button and the number, or *add a WhatsApp number* for a coached athlete with none. The page checks that `waLink()` can open the
   number (the country code, or an Iranian 09…; Persian digits are folded) before it sends it; `coach_set_whatsapp()` stores it as typed on the athlete's
   `hab_contacts` record, making one only when there is a number to keep (`source 'coach'`, tier from the programme). **A contact the coach made is
@@ -754,6 +918,21 @@ read 33%). Shown up to 100%, with "N more than planned" when they did extra. Gre
 
 ## 7. PROOF
 
+**Proof is the community's home** (round 2, 2026-10-12): everything about the crew is on this one screen, in two columns from 900 px (the left, about 1.3 to 1, is
+the wider; one column below that, the left first). **Left:** **The wall**, then **The board**. **Right:** **Quest week**, **Proof pulse**, **Titles minted** and
+**Season**, last. (**The funnel** was the last panel here until 2026-10-12; it is Leads → Free signups now, because the people who signed up are leads to follow, not part of running the crew.) The wall, the quest lever and the pulse used to be on Today; Today keeps a short Proof column that links here
+(section 3, *Proof today*). One copy of each id is in the page at a time (`#wallPanel`, `#questPanel`, `#pulsePanel`, `#coachLineInput`: Today draws its own, `#proofToday`).
+A redraw (a line posted, a line hidden, a quest week started) is drawn at once from what the page holds: the board is read once and kept, and only a real first
+read (or a **Reload**) waits, inside the board's own panel as *Fetching the board…*, so the wall and the lever never blank out under your hands.
+
+**The wall** — the full wall (`wallPanelHtml()`): the composer, every day's lines newest first, Hide / Show on the crew's, **Show the full week**. Everything in
+section 3, *The wall*, applies unchanged.
+
+**Quest week** — the full lever (`questPanelHtml()`): the live run with **End this run today**, or the picker with **Start the week**. Section 3, *Quest week*,
+has the rules (ending keeps the XP already earned; never `clear_quests()` from the page).
+
+**Proof pulse** — every Proof athlete, most silent first, seven presence dots each (section 3, *Proof pulse*).
+
 **The board** — `leaderboard_top()`, the server's own scorer, season or week.
 These are the exact rows and the exact order the crew sees in their app. It is read once and kept (so a long Proof visit does not re-score the
 board on every redraw), and it says **when it was read** (*As of 14:32*) with a **Reload** button; starting or ending a quest week reads it again,
@@ -768,14 +947,16 @@ for four days — see stage23).
 in the SQL editor deliberately: it resets every score, and that shouldn't be a
 button on a dashboard.
 
-**The funnel** — everyone from `contact_list()`, newest first, with **days
+**The funnel** (Leads → Free signups; `funnelPanelHtml()`, one self-contained function that returns the whole section) — everyone from `contact_list()`, newest first, with **days
 logged** as the qualifying signal. A free athlete past **14 logged days** is
 flagged *ready to upgrade?* — they've proven the habit, so the coaching pitch is
 earned rather than cold. The headline counts **free** signups; someone who became a coached
 client is listed as *coached · converted* (the tier comes from their programme). WhatsApp opens a
 chat (one link builder for the whole page: Persian digits and Iranian 09… numbers handled).
 
-**forget** (free and Proof-only people only) calls `forget_contact()`, which PERMANENTLY deletes their
+**Forget** (free and Proof-only people only; since 2026-10-12 it is **not a button on the funnel row** (a permanent delete one click from WhatsApp and
+copy email) but **File → Danger zone → Forget their Proof data…**, offered to the people the funnel would have offered it to: a signup who is not a
+coached athlete) calls `forget_contact()`, which PERMANENTLY deletes their
 contact details, their whole progress row (habit log, body weight, records), their board place and
 their roll-call lines. Their programme, login, session history, titles and season results stay.
 It is not offered for coached clients: on them the progress row is their training app's cloud
@@ -790,23 +971,32 @@ back. The list is read in pages (audit SERVER-10), so a server with a row cap st
 (audit TOOLS-6, 2026-10-11): the confirm says per item whether it is *new*, *replaces the live one* or *replaces a hidden one, which STAYS hidden*
 (publish it from its row when you want it live); a file whose id is already on **another shelf** is refused, naming the shelf (hide that one first,
 then publish again), so an item moved to another category is no longer published twice; a Farsi translation or a workout picked as an article is
-refused as before. **Testing app** and **Course** list buyer logins; a failed load says so with *↻ Try again*
+refused as before. **Buyers** (the **Course** and the **Testing app**, two sub-tabs) list buyer logins; a failed load says so with *↻ Try again*
 instead of "No logins yet", and *Mark sent* asks first (it clears the only stored copy of the password).
 The **private note** typed when a login is made lives in `buyer_notes`, which only the coach can read (stage53, Amir
 2026-10-11): it used to be the account row's `label`, which the buyer could read through their own account. A trigger
 moves any label the Edge Functions still write into `buyer_notes` and leaves the row's label empty, so the Edge
 Functions did not change; the lists read the note from `buyer_notes` (applied 2026-10-11) and still fall back to the old
-column on a project that has not run stage53. Each buyer row has **Erase…**.
-**The two buyer tabs are one block** (`buyerLogins()`, audit MKT-6, 2026-10-11), built twice with their own table, Edge Function, address and
-Farsi message; before that they were two copied blocks that had drifted. A login call runs one at a time on a buyer tab and on an athlete's
+column on a project that has not run stage53. **A buyer row keeps what is done every day in view and the rest behind one button**
+(redesign round 1, 2026-10-12): the name, then the stored password or the state (*sent*, *created*, *revoked*), then **Copy message**
+(the primary button) and **Mark sent** while a password waits, or **Restore** on a revoked row, and always **Manage**. Manage opens one line
+under the row with **Change password**, **Revoke** (not on a revoked row) and **Erase…**. Which row's Manage is open lives in the tab's
+state (`st.manage`, one at a time), so it survives a redraw; it is also open while that row's password form or Erase panel is open, so the
+button that led there stays in view; a second tap on Manage folds it and closes what it opened (the password form, an Erase panel that has not
+started); a finished action (a new password, a revoke, a restore) folds it by itself; and the *Revoked* section opens for a row whose Manage is open.
+**The two buyer lists are one block** (`buyerLogins()`, audit MKT-6, 2026-10-11), built twice with their own table, Edge Function, address and
+Farsi message; before that they were two copied blocks that had drifted. Since round 2 of the UX pass (2026-10-12) each draws into the container it is given
+(`#buyersBody`, which says which list it is for, so a redraw that comes back after a call does nothing when you have gone to the other sub-tab), under the **Course · Testing app**
+bar (`renderBuyers()`); each sub-tab's count of active logins is read in the background so both show, and follows a create, a revoke and a restore.
+`#buyers` is the Course, `#buyers/testing` the Testing app. A login call runs one at a time on a buyer tab and on an athlete's
 File tab (a double tap on *Save password* used to make two passwords and leave the message with the first), and after a create, reset or restore
 the page keeps saying what it did (*Login created for …*) instead of "Copied" a moment later. `buyer-logins-course` and `buyer-logins-assess`
-drive create, copy, mark sent, change password, revoke, restore and a failing function through both.
+drive create, copy, mark sent, Manage, change password, revoke, restore and a failing function through both.
 
 ### Erasing a person
 
 One panel, three kinds of person (stage54, Amir 2026-10-11: *"both athletes and buyers"*): an athlete (File →
-Danger zone → **Erase completely…**), a course buyer or a testing-app buyer (**Erase…** on the row). It opens by
+Danger zone, which is folded until you open it → **Erase completely…**; it is open while the panel is), a course buyer or a testing-app buyer (**Erase…** on the row). It opens by
 asking the server for a **dry run** of `coach_erase_person(kind, key, confirm, intake_ids, dry_run)`: the function
 does exactly the work of a real erasure and then undoes it, so the list shown (rows per table, the sign-in
 account) is what a real run would delete. Nothing is erased until the id (athlete) or username (buyer) is typed;
@@ -823,8 +1013,7 @@ list is long and a phone clips a dialog.
 - **Intake forms are the coach's pick** (Amir, 2026-10-11: *"pick any form in the Erase panel"*). Most forms cannot
   be tied to an athlete by data (the Farsi forms are in Persian script, the programmes in Latin letters, and 30 of 52
   athletes have no email or number stored), so the panel does two things. It **offers** the forms that carry their
-  email, their WhatsApp number (last 9 digits, Persian digits folded) or their full name, and **first the ones you linked to them on the Intake
-  tab** (stage61: *linked to them*; ticked for you, because you did the linking). **A linked form and a same-email form
+  email, their WhatsApp number (last 9 digits, Persian digits folded) or their full name, and **first the ones you linked to them in Leads** (stage61: *linked to them*; ticked for you, because you did the linking). **A linked form and a same-email form
   start ticked**, and not when another athlete's contact carries the same email (a parent's, for two children: flagged
   *also another athlete's*); a number match (it can be a foreign number with the same last digits, or a handle that holds
   digits) and a name match (two people can share a name) are offered, never ticked for you. And a
@@ -837,7 +1026,7 @@ list is long and a phone clips a dialog.
   any copy on your own computer (a `data/<id>.json`, a saved Backup), and, for an athlete, **their board name in
   other athletes' last-seen standings** (`lbSeen` inside each athlete's app data; every phone rewrites it from the
   current board at its next board view, so it clears itself), and **an affiliate partner record** (Amir,
-  2026-10-11): an athlete who is also a partner keeps the record on the Affiliates tab; only its link to the athlete
+  2026-10-11): an athlete who is also a partner keeps the record under Leads, in Referral codes; only its link to the athlete
   is cleared. Not removable by this: free-text mentions in *other* athletes' coaching logs, and ids named in the
   migration history.
 - **Never erased:** the public demo, the identity the dashboard reads the board through (`amir_ardekani`), a login
@@ -869,7 +1058,7 @@ list is long and a phone clips a dialog.
   while it loaded and reopened) is dropped, so it can never overwrite a newer panel or flip a running erasure back to
   *ready*. The Erase boxes keep focus across a redraw of the page, without scrolling it. When the intake forms did not load
   the finder says so and is switched off (it never says "0 other forms").
-- **A revoked buyer** has the same Erase… button; the *Revoked* section opens for the person whose panel is open
+- **A revoked buyer** has the same Erase… button (behind Manage); the *Revoked* section opens for the person whose panel is open
   (it used to draw the panel inside the closed section, invisible).
 
 ---
@@ -918,10 +1107,10 @@ it in this file.
 | `library`, `library_categories` | The Library tab |
 | `exercises`, `exercise_coach`, `qualities` | The Exercises tab (the Spine) |
 | `spine_versions` | An entry's History: every row of those three as it was before a change, kept by a trigger (stage49); the weekly backup reads it |
-| `hab_intake` (read as a table, paged: stage61) | The Intake tab, the athlete's *Came from* line and the erase panel's forms |
-| `affiliates` | The Affiliates tab |
-| `assess_accounts`, `tps_accounts` | The Testing app and Course tabs (loaded when opened) |
-| `buyer_notes` | The private note beside each buyer in those two tabs (stage53); coach-only |
+| `hab_intake` (read as a table, paged: stage61) | Leads → Applications, the athlete's *Came from* line and the erase panel's forms |
+| `affiliates` | Leads → Referral codes |
+| `assess_accounts`, `tps_accounts` | Buyers (the Testing app and the Course; read when Buyers is opened, both, so each sub-tab can show its count) |
+| `buyer_notes` | The private note beside each buyer in Buyers (stage53); coach-only |
 | `erasure_log` | Receipts of full erasures (stage54); only the backup reads it |
 
 `data/<id>.json` is no longer read at all (2026-10-10): it has not been served since 2026-09-07, and

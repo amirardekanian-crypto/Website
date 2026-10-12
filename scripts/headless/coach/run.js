@@ -17,6 +17,8 @@ const only = process.argv.slice(2);
 
 const lastOf = (cs, pred) => cs.filter(pred).slice(-1)[0];
 const isUpd = (t) => c => c.kind === 'from' && c.name === t && c.op === 'update';
+// The File's Danger zone is folded until it is needed (2026-10-12): open it the way the coach would, before touching what is inside it.
+const openDanger = async (page) => { await page.evaluate(() => { const d = document.getElementById('dangerzone'); if (d) d.open = true; }); };
 const rowLoc = (page, name) => page.locator('.wday.open .cmp-row', { hasText: name }).first();
 async function openEditor(page, exName) {
   await rowLoc(page, exName).locator('.rx-edit').click();
@@ -301,8 +303,8 @@ S['wall-hide'] = async (b) => {
 
 // ── 10. Quest week ───────────────────────────────────────────────────────────
 S['quest-week'] = async (b) => {
-  const r = { id: 'quest-week', title: 'Today → start a quest week and end it: the XP already earned is kept (stage55)', checks: [] };
-  const { page, today, log } = await L.openCoach(b, {});
+  const r = { id: 'quest-week', title: 'Proof → start a quest week and end it: the XP already earned is kept (stage55)', checks: [] };
+  const { page, today, log } = await L.openCoach(b, { hash: 'proof' });   // the lever moved from Today to Proof (round 2, 2026-10-12)
   const boxes = page.locator('#questPanel input[type=checkbox]');
   await boxes.nth(0).check(); await boxes.nth(1).check();
   let n0 = await L.nCalls(page);
@@ -332,7 +334,7 @@ S['quest-week'] = async (b) => {
 
 S['quest-week-end-fails'] = async (b) => {
   const r = { id: 'quest-week-end-fails', title: 'Ending a quest run when stage55 is not applied: nothing changes, and it never falls back to the call that takes the XP back', checks: [] };
-  const { page, log } = await L.openCoach(b, {});
+  const { page, log } = await L.openCoach(b, { hash: 'proof' });
   await page.evaluate(() => { const x = window.__DB.xp_rules[0]; x.rules.questRuns = [{ start: new Date().toISOString().slice(0, 10), ids: ['w_water5'] }]; });
   await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
   await page.evaluate(() => { window.__STUB.missingRpc = ['end_quests']; });
@@ -354,37 +356,39 @@ S['quest-week-end-fails'] = async (b) => {
 // ── 11. Intake ───────────────────────────────────────────────────────────────
 S['intake-status'] = async (b) => {
   const r = { id: 'intake-status', title: 'Intake → Mark handled / Archive / Reopen (+ a failure)', checks: [] };
-  const { page } = await L.openCoach(b, { hash: 'intake' });
-  const badge = async () => (await page.locator('#rail a.tab', { hasText: 'Intake' }).innerText()).replace(/\s+/g, ' ');
+  const { page } = await L.openCoach(b, { hash: 'intake' });   // the old address: it lands on Leads
+  const badge = async () => (await page.locator('#rail a.tab', { hasText: 'Leads' }).innerText()).replace(/\s+/g, ' ');
   const b0 = await badge();
-  const card = () => page.locator('.intake-card', { hasText: 'Fixture Applicant One' });
+  // (2026-10-12, round 2: the newest new application is on show in the detail, with the buttons; its row in the list says which group it is in.)
+  const detail = () => page.locator('.in-detail', { hasText: 'Fixture Applicant One' });
+  const grp = () => page.locator('.in-row', { hasText: 'Fixture Applicant One' }).getAttribute('data-st');
   let n0 = await L.nCalls(page);
-  await L.jsClick(card().locator('.intake-act[data-to=handled]'));
+  await L.jsClick(detail().locator('.intake-act[data-to=handled]'));
   await L.settle(page);
   let c = lastOf(await L.callsSince(page, n0), x => x.name === 'set_intake_status');
   check(r, 'Mark handled → set_intake_status(id, handled)', c && c.payload.p_status === 'handled' && /1a1$/.test(c.payload.p_id), c && c.payload);
-  check(r, 'card moves to Handled and the badge drops', (await card().getAttribute('class')).includes('handled') && (await badge()) !== b0, { cls: await card().getAttribute('class'), before: b0, after: await badge() });
+  check(r, 'it moves to Handled (and stays on show) and the badge drops', (await grp()) === 'handled' && (await detail().count()) === 1 && (await badge()) !== b0, { grp: await grp(), before: b0, after: await badge() });
   n0 = await L.nCalls(page);
-  await L.jsClick(card().locator('.intake-act[data-to=archived]'));
+  await L.jsClick(detail().locator('.intake-act[data-to=archived]'));
   await L.settle(page);
   c = lastOf(await L.callsSince(page, n0), x => x.name === 'set_intake_status');
-  check(r, 'Archive → archived', c && c.payload.p_status === 'archived' && (await card().getAttribute('class')).includes('archived'), c && c.payload);
+  check(r, 'Archive → archived', c && c.payload.p_status === 'archived' && (await grp()) === 'archived', c && c.payload);
   n0 = await L.nCalls(page);
-  await L.jsClick(card().locator('.intake-act[data-to=new]'));
+  await L.jsClick(detail().locator('.intake-act[data-to=new]'));
   await L.settle(page);
   c = lastOf(await L.callsSince(page, n0), x => x.name === 'set_intake_status');
-  check(r, 'Reopen → new, badge back', c && c.payload.p_status === 'new' && (await badge()) === b0, { payload: c && c.payload, badge: await badge() });
+  check(r, 'Reopen → new, badge back', c && c.payload.p_status === 'new' && (await grp()) === 'new' && (await badge()) === b0, { payload: c && c.payload, badge: await badge() });
   await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'set_intake_status', message: 'fixture failure', times: 1 }));
-  await L.jsClick(card().locator('.intake-act[data-to=handled]'));
+  await L.jsClick(detail().locator('.intake-act[data-to=handled]'));
   await L.settle(page);
-  check(r, 'a failed update leaves the card as it was and says so', (await card().getAttribute('class')).includes('new') && /Could not update/.test(await L.failText(page)), { cls: await card().getAttribute('class'), failBar: await L.failText(page) });
+  check(r, 'a failed update leaves the application as it was and says so', (await grp()) === 'new' && /Could not update/.test(await L.failText(page)), { grp: await grp(), failBar: await L.failText(page) });
   await page.context().close();
   return r;
 };
 
 // ── 12. Affiliates ───────────────────────────────────────────────────────────
 S['affiliates'] = async (b) => {
-  const r = { id: 'affiliates', title: 'Affiliates → add a code, retire one, and a refused write', checks: [] };
+  const r = { id: 'affiliates', title: 'Leads → Referral codes (the old #affiliates address): add a code, retire one, and a refused write', checks: [] };
   const { page, today, log } = await L.openCoach(b, { hash: 'affiliates' });
   await page.locator('#affAdd').click();
   const form = page.locator('.aff-form[data-new="1"]');
@@ -767,6 +771,7 @@ S['backlog-late-note'] = async (b) => {
 S['athlete-delete-all'] = async (b) => {
   const r = { id: 'athlete-delete-all', title: 'File → Danger zone → Delete training history: one call, one transaction', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'a/ben_test/file' });
+  await openDanger(page);
   const before = await L.db(page);
   const n0 = await L.nCalls(page);
   await page.locator('button', { hasText: /Delete training history/ }).click();
@@ -791,6 +796,7 @@ S['athlete-delete-all'] = async (b) => {
 S['athlete-delete-fails'] = async (b) => {
   const r = { id: 'athlete-delete-fails', title: 'Delete training history when the server refuses: nothing goes, and the message fits the cause', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'a/ben_test/file' });
+  await openDanger(page);
   const cases = [
     { name: 'a server error', set: () => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_delete_training_history', message: 'fixture: connection reset', times: 1 }), say: /Nothing was deleted: fixture: connection reset/ },
     { name: 'a lapsed sign-in', set: () => window.__STUB.fail.push({ kind: 'rpc', name: 'coach_delete_training_history', message: 'permission denied for function coach_delete_training_history', times: 1 }), say: /sign-in may have lapsed/ },
@@ -850,7 +856,7 @@ S['erase-athlete'] = async (b) => {
   const r = { id: 'erase-athlete', title: 'File → Danger zone → Erase completely…: a dry run first, the id typed, one real call, everything gone', checks: [] };
   const { page, log } = await L.openCoach(b, {});
   await seedErasable(page);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   const before = JSON.stringify(await L.db(page));
   const n0 = await L.nCalls(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
@@ -866,7 +872,7 @@ S['erase-athlete'] = async (b) => {
   const waPick = page.locator('.erase .pick', { hasText: 'same WhatsApp number' }).locator('input');
   check(r, 'three intake forms are offered: only the same-EMAIL one is ticked (a number can be a foreign number or a handle), the same-number and same-name ones are not, the stranger\'s is not listed', (await page.locator('.erase .pick').count()) === 3 && await emailPick.isChecked() && !(await waPick.isChecked()) && !(await namePick.isChecked()) && !/Someone Else/.test(text), text.slice(0, 900));
   check(r, 'the finder box is there, and the panel says one form will go, by name', (await page.locator('#eraseFindIn').count()) === 1 && /1 intake form will be erased with them/.test(text), text.slice(0, 1100));
-  check(r, 'it says what stays: backups, the inbox, and that the partner record stays with only its link removed', /weekly backup files/.test(text) && /inbox/.test(text) && /FIXTURE10 stays on the Affiliates tab/.test(text), text.slice(-420));
+  check(r, 'it says what stays: backups, the inbox, and that the partner record stays with only its link removed', /weekly backup files/.test(text) && /inbox/.test(text) && /FIXTURE10 stays under Leads, in Referral codes/.test(text), text.slice(-420));
   check(r, 'it says when the last backup was taken (none yet here), because that file is the only way back from a mistake', /last ⤓ Backup on this computer: none yet/.test(text) && /only way back/.test(text), text.slice(-520));
   const go = page.locator('#eraseGo');
   check(r, 'Erase for good is disabled until the id is typed', await go.isDisabled(), '');
@@ -915,7 +921,7 @@ S['erase-guards'] = async (b) => {
     D.programs.push({ athlete_id: 'amir_ardekani', data: p, updated_at: new Date().toISOString(), updated_by: null });
   });
   await page.evaluate(() => hardRefresh()); await L.settle(page, 800);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('#eraseIn').waitFor();
   const n0 = await L.nCalls(page);
@@ -926,9 +932,9 @@ S['erase-guards'] = async (b) => {
   await page.locator('.erase button', { hasText: 'Cancel' }).click();
   check(r, 'Cancel closes the panel and brings the button back', (await page.locator('.erase').count()) === 0 && (await page.locator('button', { hasText: /Erase completely/ }).count()) === 1, '');
   await page.locator('button', { hasText: /Erase completely/ }).click(); await page.locator('#eraseIn').waitFor();
-  await L.go(page, 'athletes'); await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'athletes'); await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   check(r, 'an open panel does not follow the coach to another screen', (await page.locator('.erase').count()) === 0, '');
-  await L.go(page, 'a/amir_ardekani/file');
+  await L.go(page, 'a/amir_ardekani/file'); await openDanger(page);
   const t = (await page.locator('#content').innerText()).replace(/\s+/g, ' ');
   check(r, 'the board identity gets no Erase button and the page says why', (await page.locator('button', { hasText: /Erase completely/ }).count()) === 0 && /Not offered here/.test(t), t.slice(-300));
   const d = await L.db(page);
@@ -943,7 +949,7 @@ S['erase-fails'] = async (b) => {
   const r = { id: 'erase-fails', title: 'Erase completely… when the server cannot or will not: nothing goes, and the words fit the cause', checks: [] };
   const { page, log } = await L.openCoach(b, {});
   await seedErasable(page);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   const open = async () => { await page.locator('button', { hasText: /Erase completely/ }).click(); await page.waitForFunction(() => !!document.querySelector('.erase #eraseIn, .erase .eh'), null, { timeout: 5000 }); await L.settle(page, 250); };
   const intact = async () => { const d = await L.db(page); return d.programs.some(x => x.athlete_id === 'zed_erase') && d.session_history.filter(x => x.athlete_id === 'zed_erase').length === 2 && d.erasure_log.length === 0; };
 
@@ -1027,7 +1033,7 @@ S['erase-forms'] = async (b) => {
     NAMES.forEach((n, i) => D.hab_intake.push({ id: 'bulk-' + (i + 1), created_at: now, lang: 'fa', name: 'Bulk ' + n, email: 'bulk' + (i + 1) + '@example.invalid', contact: '@bulk' + (i + 1), programme: 'Set', payload: {}, status: 'handled', handled_at: now }));
   }, NAMES);
   await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   let t = await erasePanelText(page);
@@ -1036,7 +1042,7 @@ S['erase-forms'] = async (b) => {
     (await waRow.count()) === 1 && !(await waRow.locator('input').isChecked()) && /also another athlete's/i.test(await waRow.innerText()) && /not ticked for you/.test(await page.locator('.erase').innerText())
     && await page.locator('.erase .pick', { hasText: 'same email' }).locator('input').isChecked(), t.slice(0, 900));
   const others = (await L.db(page)).hab_intake.length - 3;   // every form except the three the panel offers
-  check(r, 'the panel says one form will go, by name, and the finder lists how many others there are', /1 intake form will be erased with them/.test(t) && /Z\. E\./.test(t) && new RegExp(others + ' other forms in the Intake tab').test(t), t.slice(0, 1100) + ' | others=' + others);
+  check(r, 'the panel says one form will go, by name, and the finder lists how many others there are', /1 intake form will be erased with them/.test(t) && /Z\. E\./.test(t) && new RegExp(others + ' other forms in Leads').test(t), t.slice(0, 1100) + ' | others=' + others);
   // the finder: typing redraws only its results, so the box keeps focus
   const find = page.locator('#eraseFindIn');
   await find.click(); await find.pressSequentially('someone');
@@ -1114,7 +1120,7 @@ S['erase-forms'] = async (b) => {
     D.hab_contacts.push({ athlete_id: 'uno_erase', email: 'uno@example.invalid', whatsapp: null, source: 'proof.html', tier: 'coached', note: null, created_at: now, updated_at: now, display_name: 'Uno' });
     D.hab_intake.push({ id: 'uno-form', created_at: now, lang: 'en', name: 'Uno Erase', email: 'uno@example.invalid', contact: '', programme: 'Set', payload: {}, status: 'handled', handled_at: now }); });
   await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
-  await L.go(page, 'a/uno_erase/file');
+  await L.go(page, 'a/uno_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   t = await erasePanelText(page);
@@ -1124,7 +1130,7 @@ S['erase-forms'] = async (b) => {
   // an athlete with no login and no form: the alert does not claim a sign-in account, and says that no form went
   await seedBare(page, 'nolo_erase', 'Nolo', 'Erase');
   await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
-  await L.go(page, 'a/nolo_erase/file');
+  await L.go(page, 'a/nolo_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   t = await erasePanelText(page);
@@ -1155,6 +1161,7 @@ S['erase-revoked'] = async (b) => {
   const det = page.locator('details', { has: page.locator('summary', { hasText: /Revoked/ }) });
   check(r, 'the Revoked section is closed until something in it is opened', (await det.count()) === 1 && (await det.getAttribute('open')) === null, '');
   await det.locator('summary').click();
+  await det.locator('.credrow', { hasText: 'revoked_course' }).locator('.tp-manage').click();   // Erase… waits behind Manage
   await det.locator('.credrow', { hasText: 'revoked_course' }).locator('.tp-erase').click();
   await page.locator('.erase #eraseIn').waitFor({ state: 'visible', timeout: 5000 });
   check(r, 'Erase… on a revoked course buyer: the panel is VISIBLE', await page.locator('.erase').isVisible() && await page.locator('#eraseIn').isVisible(), '');
@@ -1164,6 +1171,7 @@ S['erase-revoked'] = async (b) => {
   await L.go(page, 'assess');
   const det2 = page.locator('details', { has: page.locator('summary', { hasText: /Revoked/ }) });
   await det2.locator('summary').click();
+  await det2.locator('.credrow', { hasText: 'revoked_academy' }).locator('.as-manage').click();
   await det2.locator('.credrow', { hasText: 'revoked_academy' }).locator('.as-erase').click();
   await page.locator('.erase #eraseIn').waitFor({ state: 'visible', timeout: 5000 });
   await page.evaluate(() => render());
@@ -1178,7 +1186,7 @@ S['erase-slow'] = async (b) => {
   const r = { id: 'erase-slow', title: 'Erase completely… when the server is slow: Stop waiting after 30 s, and a late success still finishes (fake clock)', checks: [] };
   const { page, log } = await L.openCoach(b, {});
   await seedErasable(page);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   await page.locator('#eraseIn').fill('zed_erase');
@@ -1197,7 +1205,7 @@ S['erase-slow'] = async (b) => {
   // meanwhile the coach opens ANOTHER athlete's panel and starts typing the id
   await page.locator('.erase button', { hasText: 'Close' }).click();
   await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 0; });
-  await L.go(page, 'a/ben_test/file');
+  await L.go(page, 'a/ben_test/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.clock.runFor(200); await L.settle(page, 300); await page.clock.runFor(200);
   await page.locator('.erase #eraseIn').waitFor();
@@ -1219,7 +1227,7 @@ S['erase-stale'] = async (b) => {
   const r = { id: 'erase-stale', title: 'Erase completely…: an old preview answer never overwrites a newer panel (cancel while loading, then reopen)', checks: [] };
   const { page, log } = await L.openCoach(b, {});
   await seedErasable(page);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   const reopenAfterCancel = async () => {
     await page.evaluate(() => { window.__STUB.delay.coach_erase_person = 2500; });
     await page.locator('button', { hasText: /Erase completely/ }).click();       // answer #1 will take 2.5 s
@@ -1261,7 +1269,7 @@ S['erase-forms-unreadable'] = async (b) => {
   const r = { id: 'erase-forms-unreadable', title: 'Erase completely… when the intake forms did not load: the finder says so and is switched off', checks: [] };
   const { page, log } = await L.openCoach(b, { seed: { stub: { fail: [{ kind: 'from', name: 'hab_intake', op: 'select', message: 'fixture: the forms are unreadable', times: 99 }] } } });
   await seedErasable(page);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   const t = await erasePanelText(page);
@@ -1281,10 +1289,12 @@ S['erase-buyers'] = async (b) => {
   const sel = (await L.calls(page)).filter(c => c.kind === 'from' && c.name === 'tps_accounts' && c.op === 'select')[0];
   check(r, 'the list asks for the account\'s user_id (to match the note) and reads buyer_notes', !!sel && (await L.calls(page)).some(c => c.kind === 'from' && c.name === 'buyer_notes' && c.op === 'select'), sel && sel.mods);
   const n0 = await L.nCalls(page);
+  await row.locator('.tp-manage').click();
   await row.locator('.tp-erase').click();
   await page.locator('.erase #eraseIn').waitFor();
   const rpc0 = (await L.callsSince(page, n0)).filter(c => c.kind === 'rpc' && c.name === 'coach_erase_person');
   check(r, 'Erase… on a course buyer makes one dry-run call keyed on the username', rpc0.length === 1 && JSON.stringify(rpc0[0].payload) === JSON.stringify({ p_kind: 'course', p_key: 'fixture_buyer' }), rpc0.map(c => c.payload));
+  check(r, 'while the Erase panel is open, Manage stays open with Erase… in view (also after a redraw)', await (async () => { const ok = async () => (await row.locator('.tp-manage').getAttribute('aria-expanded')) === 'true' && await row.locator('.tp-erase').isVisible(); const a = await ok(); await page.evaluate(() => render()); return a && await ok(); })(), '');
   let t = await erasePanelText(page);
   check(r, 'the panel names them by the note, lists the login, the note and the sign-in account, and asks for the username', /Erase Fixture note about a course buyer completely/.test(t) && /1 course login/.test(t) && /1 note of yours about them/.test(t) && /1 sign-in account/.test(t) && /Type fixture_buyer to confirm/.test(t) && !/intake form/.test(t), t.slice(0, 500));
   await page.locator('#eraseIn').fill('fixture_buyer');
@@ -1303,6 +1313,7 @@ S['erase-buyers'] = async (b) => {
   row = page.locator('.credrow', { hasText: 'fixture_academy' });
   rowText = (await row.innerText()).replace(/\s+/g, ' ');
   check(r, 'the testing list shows its note from buyer_notes too', /Fixture academy note/.test(rowText), rowText);
+  await row.locator('.as-manage').click();
   await row.locator('.as-erase').click();
   await page.locator('.erase #eraseIn').waitFor();
   t = await erasePanelText(page);
@@ -1322,6 +1333,7 @@ S['buyer-notes-fallback'] = async (b) => {
   const r = { id: 'buyer-notes-fallback', title: 'Course list when buyer_notes cannot be read (stage53 not applied): the account\'s own label shows, nothing breaks', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'course', seed: { stub: { fail: [{ kind: 'from', name: 'buyer_notes', message: 'relation "public.buyer_notes" does not exist', code: '42P01', times: 99 }] } } });
   const rowText = (await page.locator('.credrow', { hasText: 'fixture_buyer' }).innerText()).replace(/\s+/g, ' ');
+  await page.locator('.credrow .tp-manage').click();   // Erase… waits behind Manage
   check(r, 'the old label is shown, and the list still loads with its buttons', /· Fixture/.test(rowText) && !/Fixture note about/.test(rowText) && (await page.locator('.credrow .tp-erase').count()) === 1, rowText);
   check(r, 'there is no load-error banner for a missing notes table (before stage53 that is expected)', !/Not everything loaded/.test(await page.locator('#loadwarn').innerText()), await page.locator('#loadwarn').innerText());
   check(r, 'no page errors', !log.errors.length, log.errors);
@@ -1333,6 +1345,7 @@ S['buyer-notes-error'] = async (b) => {
   const { page, log } = await L.openCoach(b, { hash: 'course', seed: { stub: { fail: [{ kind: 'from', name: 'buyer_notes', message: 'fixture: the server fell over', code: 'XX000', times: 99 }] } } });
   const banner = (await page.locator('#loadwarn').innerText()).replace(/\s+/g, ' ');
   check(r, 'the banner says your notes about buyers did not load, with the reason', /Not everything loaded/.test(banner) && /your notes about buyers/.test(banner) && /fixture: the server fell over/.test(banner), banner);
+  await page.locator('.credrow .tp-manage').click();   // Erase… waits behind Manage
   check(r, 'the list still loads, with the account\'s own label as the fallback', (await page.locator('.credrow .tp-erase').count()) === 1 && /· Fixture/.test((await page.locator('.credrow', { hasText: 'fixture_buyer' }).innerText()).replace(/\s+/g, ' ')), '');
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
@@ -1828,8 +1841,10 @@ S['spine-draft-prefill'] = async (b) => {
   const r = { id: 'spine-draft-prefill', title: "Claude's drafts: counted, listed, pre-filled and marked; a stale one is not shown; closing asks nothing", checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'exercises' });
   dismissDialogs(page, log);
+  await L.go(page, 'exercises/coverage');   // the counts are on the Coverage sub-tab, as tiles
   const cov = await page.locator('#content').innerText();
-  check(r, "the page says how many entries have a draft from Claude to read", /1 with Claude’s draft to read/.test(cov), cov.slice(0, 500));
+  check(r, "the page says how many entries have a draft from Claude to read", /1\s+With Claude’s draft to read/.test(cov), cov.slice(0, 500));
+  await L.go(page, 'exercises');
   const fb = page.locator('.sp-filter[data-f="claude"]');
   check(r, "a Claude's drafts filter, with the count", (await fb.count()) === 1 && /Claude’s drafts · 1/.test(await fb.innerText()), (await fb.count()) ? await fb.innerText() : 'no button');
   await fb.click(); await L.settle(page, 300);
@@ -2253,7 +2268,7 @@ S['quality-day-cards'] = async (b) => {
     row.data = d; row.updated_at = new Date(Date.now() + 1000).toISOString();
   });
   await page.evaluate(() => { S.spine = null; return reloadPrograms(); });
-  await L.go(page, 'exercises'); await L.settle(page, 900);
+  await L.go(page, 'exercises/qualities'); await L.settle(page, 900);   // the Quality check is on the Qualities sub-tab
   const avaRow = () => page.evaluate(() => {
     document.querySelectorAll('#content details').forEach(d => { d.open = true; });
     const row = [...document.querySelectorAll('#content .credrow')].find(x => /Ava Example/.test(x.textContent) && /Trains most/.test(x.textContent));
@@ -2314,8 +2329,8 @@ S['spine-phone-view'] = async (b) => {
   check(r, 'the card on the DRAFT has no video link (a phone has nothing for it; the draft\'s own video is not shown here)', (await vid('Machine Seated Leg Curl')) === null, await vid('Machine Seated Leg Curl'));
   check(r, 'the card on the approved entry has its video', (await vid('Seated Leg Curl')) === 'https://www.youtube.com/watch?v=APPROVED001', await vid('Seated Leg Curl'));
   check(r, 'the card with no exId finds the approved twin\'s video, as a phone does', (await vid('Machine Hip Abduction')) === 'https://www.youtube.com/watch?v=HIPABD00001', await vid('Machine Hip Abduction'));
-  // 2. the Exercises tab
-  await L.go(page, 'exercises'); await L.settle(page, 900);
+  // 2. the Exercises tab, Coverage sub-tab
+  await L.go(page, 'exercises/coverage'); await L.settle(page, 900);
   const txt = await page.evaluate(() => { document.querySelectorAll('#content details').forEach(d => { d.open = true; }); return document.getElementById('content').textContent.replace(/\s+/g, ' '); });
   check(r, 'Coverage says two card names show something else on a phone until the drafts are approved', /2 card names show something else on a phone until the draft is approved/.test(txt), txt.slice(0, 500));
   const list = (/Cards that show something else on a phone · 2 names(.*?)(?:Not in the Spine yet|$)/.exec(txt) || [])[1] || '';
@@ -2334,7 +2349,7 @@ S['spine-phone-view'] = async (b) => {
 
 // ── Small truthfulness fixes on Today and the board (audit TODAY-3, TODAY-4, TODAY-13, TODAY-14, TODAY-15, MKT-3, MKT-8; 2026-10-11, pile B8) ─────────
 S['today-small-truths'] = async (b) => {
-  const r = { id: 'today-small-truths', title: 'Today: a blank exercise note is no note, a line from tomorrow says so, and the line box says what it strips', checks: [] };
+  const r = { id: 'today-small-truths', title: 'Today: a blank exercise note is no note, a line from tomorrow says so, and the line box says what it strips', checks: [] };   // the wall column is #proofToday since round 2
   const { page, log } = await L.openCoach(b, {});
   const has = await page.evaluate(() => [
     sessionHasNote({ day_note: '', summary: 'Day 1\n\nExercise log:\n[Primary]\n• Squat (✓)\n    Set 1: 20 ✓\n    Note:  \n' }),
@@ -2346,7 +2361,7 @@ S['today-small-truths'] = async (b) => {
     return refetch(['notes']);
   });
   await L.settle(page, 700);
-  const wall = (await page.locator('#wallPanel').innerText()).replace(/\s+/g, ' ');
+  const wall = (await page.locator('#proofToday').innerText()).replace(/\s+/g, ' ');
   check(r, 'a line filed under tomorrow (an athlete whose clock is ahead) says "Tomorrow, their time", not a bare date', /Tomorrow, their time/i.test(wall) && /Early riser line/.test(wall), wall);
   check(r, 'the line box says that quotes, < > and backslashes are removed and line breaks become spaces', /Quotes, < > and backslashes are removed when you post, and line breaks become spaces/.test(wall), wall);
   check(r, 'no page errors', !log.errors.length, log.errors);
@@ -2384,8 +2399,8 @@ S['refetch-failures'] = async (b) => {
 };
 
 S['quest-run-window'] = async (b) => {
-  const r = { id: 'quest-run-window', title: 'Today → the live quest run and its last day are the app\'s: latest-starting run, clipped where the next one starts', checks: [] };
-  const { page, log } = await L.openCoach(b, {});
+  const r = { id: 'quest-run-window', title: 'Proof → the live quest run and its last day are the app\'s: latest-starting run, clipped where the next one starts', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'proof' });
   const day = n => page.evaluate(n => addDays(todayKey(), n), n);
   const pretty = async n => page.evaluate(k => prettyDate(k), await day(n));
   const setRuns = async runs => { await page.evaluate(runs => { window.__DB.xp_rules[0].rules.questRuns = runs; return refetch(['rules']); }, runs); await L.settle(page, 600); };
@@ -2434,13 +2449,179 @@ S['proof-board-truth'] = async (b) => {
   let n0 = await L.nCalls(page);
   await L.go(page, 'today'); await L.go(page, 'proof'); await L.settle(page, 500);
   check(r, 'leaving and coming back to Proof does not read the board again (it is kept)', (await boardCalls(n0)) === 0, await boardCalls(n0));
-  await L.go(page, 'today'); await L.settle(page, 500);
+  // (the quest lever is on Proof since round 2, so the week is started where the board is: the redraw that follows reads the board again)
   await page.locator('#questPanel input[type=checkbox]').first().check();
-  await page.locator('#questStartBtn').click();
-  await L.settle(page, 700);
   n0 = await L.nCalls(page);
-  await L.go(page, 'proof'); await L.settle(page, 700);
+  await page.locator('#questStartBtn').click();
+  await L.settle(page, 900);
   check(r, 'after a quest week starts the board is read again (its XP moved)', (await boardCalls(n0)) === 1, await boardCalls(n0));
+  n0 = await L.nCalls(page);
+  await L.go(page, 'today'); await L.go(page, 'proof'); await L.settle(page, 500);
+  check(r, 'and then it is kept again: leaving and coming back reads nothing', (await boardCalls(n0)) === 0, await boardCalls(n0));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── Proof is the community's home (round 2 of the coach.html redesign, 2026-10-12) ───────────────────────────────────────────────────
+// Running the crew used to be split: the wall, the quest lever and the pulse on Today, the board, titles, season and the signup funnel on Proof.
+// Now Proof holds all of it, Today keeps a short Proof column that links to it, and body weight (which comes from the training app, not from
+// Proof) moved from the athlete's Proof sub-tab to The work, folded under one header line.
+S['proof-home'] = async (b) => {
+  const r = { id: 'proof-home', title: 'Proof holds the whole crew (wall, quest lever, pulse, board, titles, season); the signup funnel is on Leads → Free signups, not here; Today keeps a short Proof column that links to it; body weight is on The work', checks: [] };
+  const { page, log, today } = await L.openCoach(b, {});
+  const txt = async sel => (await page.locator(sel).innerText()).replace(/\s+/g, ' ').trim();
+  const dayOf = n => page.evaluate(n => addDays(todayKey(), n), n);
+  const ids = () => page.evaluate(() => ['coachLineInput', 'wallPanel', 'questPanel', 'pulsePanel', 'proofToday', 'boardPanel', 'funnelPanel'].reduce((o, id) => { o[id] = document.querySelectorAll('#' + id).length; return o; }, {}));
+  const overflow = () => page.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, wide: [...document.querySelectorAll('#content *')].filter(el => el.getBoundingClientRect().right > innerWidth + 1).slice(0, 4).map(el => el.tagName + '.' + el.className) }));
+  const post = async (sel, text) => { await page.locator(sel + ' #coachLineInput').fill(text); const n0 = await L.nCalls(page); await page.locator(sel + ' .mic .row .btn.primary').click(); await L.settle(page, 700); return lastOf(await L.callsSince(page, n0), c => c.kind === 'rpc' && c.name === 'set_coach_note'); };
+
+  // 1. Today's Proof column: one panel, the composer, today's lines, a quest line, a drifting line; none of the full panels
+  let n = await ids();
+  check(r, 'Today: one #coachLineInput and one #proofToday, and none of the full wall, quest lever or pulse (#wallPanel, #questPanel, #pulsePanel)', n.coachLineInput === 1 && n.proofToday === 1 && !n.wallPanel && !n.questPanel && !n.pulsePanel, n);
+  let col = await txt('#proofToday');
+  check(r, 'it holds the composer and only TODAY\'s lines: Ava\'s line (with Hide) is there, yesterday\'s (Cara\'s, the coach\'s) are not', (await page.locator('#proofToday .mic textarea').count()) === 1 && /Fixture wall line from Ava/.test(col) && (await page.locator('#proofToday .wline .modbtn').count()) === 1 && !/Fixture wall line from Cara/.test(col) && !/Fixture coach line yesterday/.test(col), col);
+  const linkTexts = () => page.evaluate(() => [...document.querySelectorAll('#proofToday a')].map(a => ({ t: a.textContent.replace(/\s+/g, ' ').trim(), h: a.getAttribute('href') })));
+  let lk = await linkTexts();
+  check(r, 'three links, all to Proof: the earlier lines, the quest line (nothing live: start one on Proof) and who is drifting (Dan, silent 5 days)', lk.length === 3 && lk.every(x => x.h === '#proof') && lk[0].t === 'Earlier lines on Proof →' && lk[1].t === 'No quest week live · start one on Proof →' && lk[2].t === 'Drifting: Dan 5 d →', lk);
+  // a live run: "Quest week · day 3 of 7 · 2 quests · ends <weekday>"
+  await page.evaluate(async d => { window.__DB.xp_rules[0].rules.questRuns = [{ start: d, ids: ['w_water5', 'w_train3'] }]; await refetch(['rules']); }, await dayOf(-2));
+  const dow = await page.evaluate(() => DOWS[pDate(addDays(todayKey(), 4)).getDay()]);
+  lk = await linkTexts();
+  check(r, 'a live run reads "Quest week · day 3 of 7 · 2 quests · ends <weekday>" and opens Proof', lk[1] && lk[1].t === `Quest week · day 3 of 7 · 2 quests · ends ${dow} →` && lk[1].h === '#proof', lk[1]);
+  // drifting: most silent first, four names at most, then "+ N more"; nothing at all when nobody drifts
+  await page.evaluate(() => {
+    const mk = (id, name, gap) => { S.ath[id] = { id, name, tier: 'free', isHab: true, habGap: gap, habDays: {}, habLast: null, habToday: false, hab7: 0, reasons: [], toReply: 0, needReplyStale: 0, needReplyRecent: [], needReplySessions: [], onBoard: false }; };
+    mk('zz_c', 'Cy', 7); mk('zz_a', 'Ann', 9); mk('zz_e', 'Ed', 3); mk('zz_b', 'Bo', 8); mk('zz_d', 'Di', 6); render();
+  });
+  check(r, 'drifting lists the most silent first, four names at most, then "+ 2 more" (Dan 5 d and Ed 3 d)', (await txt('#proofToday .ptline.drift')) === 'Drifting: Ann 9 d, Bo 8 d, Cy 7 d, Di 6 d, + 2 more →', await txt('#proofToday .ptline.drift'));
+  await page.evaluate(() => { Object.keys(S.ath).filter(k => k.startsWith('zz_')).forEach(k => delete S.ath[k]); S.ath.dan_proof.habGap = 0; render(); });
+  check(r, 'when nobody has been silent for 3 days there is no drifting line (and no empty part)', (await page.locator('#proofToday .ptline.drift').count()) === 0 && (await page.locator('#proofToday .pt').count()) === 3, await page.locator('#proofToday .pt').count());
+  await page.evaluate(() => { S.ath.dan_proof.habGap = 5; render(); });
+  // the counters: "on court" opens Proof (the pulse is there), "wall lines today" scrolls to Today's column
+  await page.locator('.board .counter').nth(1).click(); await L.settle(page, 300);
+  check(r, 'the "wall lines today" counter stays on Today and scrolls to the Proof column', (await page.evaluate(() => location.hash)) !== '#proof' && (await page.locator('#proofToday').count()) === 1, await page.evaluate(() => location.hash));
+  // posting from Today
+  let up = await post('#proofToday', 'Line from Today');
+  check(r, 'posting from Today works: set_coach_note with the local day, and Take it down is offered', up && up.payload.p_body === 'Line from Today' && up.payload.p_day === today && (await page.locator('#proofToday .mic .btn.danger').count()) === 1, up && up.payload);
+
+  // 2. Proof: the whole crew, two columns
+  await page.locator('.board .counter').nth(0).click(); await L.settle(page, 600);
+  check(r, 'the "on court today" counter opens Proof', (await page.evaluate(() => location.hash)) === '#proof' && (await page.locator('#wallPanel').count()) === 1, await page.evaluate(() => location.hash));
+  n = await ids();
+  check(r, 'Proof: one #coachLineInput; the wall, quest lever, pulse and board once each; the funnel is NOT here (it is Leads → Free signups); Today\'s column is gone', n.coachLineInput === 1 && n.wallPanel === 1 && n.questPanel === 1 && n.pulsePanel === 1 && n.boardPanel === 1 && n.funnelPanel === 0 && !n.proofToday, n);
+  const geo = await page.evaluate(() => {
+    const by = t => [...document.querySelectorAll('#content .panel')].find(p => (p.querySelector('.phead .t') || {}).textContent === t);
+    const P = { wall: by('The wall'), board: by('The board'), quest: by('Quest week'), pulse: by('Proof pulse'), titles: by('Titles minted'), season: by('Season') };
+    const missing = Object.keys(P).filter(k => !P[k]);
+    if (missing.length) return { missing };
+    const R = {}; Object.keys(P).forEach(k => { const q = P[k].getBoundingClientRect(); R[k] = { l: Math.round(q.left), t: Math.round(q.top + scrollY), w: Math.round(q.width) }; });
+    return R;
+  });
+  const colsOk = !geo.missing && geo.wall.l === geo.board.l && geo.wall.t < geo.board.t
+    && ['pulse', 'titles', 'season'].every(k => geo[k].l === geo.quest.l) && geo.quest.l > geo.wall.l + geo.wall.w - 1
+    && geo.quest.t < geo.pulse.t && geo.pulse.t < geo.titles.t && geo.titles.t < geo.season.t && Math.abs(geo.wall.t - geo.quest.t) < 3;
+  check(r, 'two columns: The wall then The board on the left; Quest week, Proof pulse, Titles minted and Season (last) on the right, level at the top', colsOk, geo);
+  check(r, 'the left column is the wider one (about 1.3 to 1)', !geo.missing && geo.wall.w / geo.quest.w > 1.2 && geo.wall.w / geo.quest.w < 1.4, geo.missing || [geo.wall.w, geo.quest.w]);
+  const wallTxt = await txt('#wallPanel');
+  check(r, 'the full wall: the composer holds the line posted from Today; yesterday\'s lines (the crew\'s with Hide, and yours) are here; Show the full week', (await page.locator('#wallPanel #coachLineInput').inputValue()) === 'Line from Today' && /Fixture wall line from Cara/.test(wallTxt) && /Fixture coach line yesterday/.test(wallTxt) && (await page.locator('#wallPanel .modbtn').count()) === 2 && /Show the full week/.test(wallTxt), wallTxt);
+  await page.evaluate(async d => { window.__DB.hab_notes.push({ athlete_id: 'dan_proof', day: d, body: 'Five days back line', pct: 40, hidden: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }); await refetch(['notes']); }, await dayOf(-5));
+  check(r, 'a line from five days ago is not in the two-day view', !/Five days back line/.test(await txt('#wallPanel')), '');
+  await page.locator('#wallPanel .showweek').click(); await L.settle(page, 400);
+  const wk = await txt('#wallPanel');
+  check(r, 'Show the full week lists it, says last 7 days and offers Show less', /Five days back line/.test(wk) && /last 7 days/.test(wk) && /Show less/.test(wk), wk);
+  await page.locator('#wallPanel .showweek').click(); await L.settle(page, 400);
+  check(r, 'Show less puts it back', !/Five days back line/.test(await txt('#wallPanel')) && /last 2 days/.test(await txt('#wallPanel')), '');
+  // the quest lever, with the live run set in step 1: the run and End this run today (never the picker)
+  const qTxt = await txt('#questPanel');
+  check(r, 'Quest week shows the live run (Day 3/7, both quests) with End this run today, and no picker', /Live run/i.test(qTxt) && /Day 3\/7/i.test(qTxt) && /FIXTURE WELL/.test(qTxt) && /FIXTURE SHOW-UP/.test(qTxt) && (await page.locator('#questPanel .btn.danger', { hasText: 'End this run today' }).count()) === 1 && (await page.locator('#questPanel input[type=checkbox]').count()) === 0, qTxt);
+  await page.evaluate(async () => { window.__DB.xp_rules[0].rules.questRuns = []; await refetch(['rules']); });
+  const pick = page.locator('#questPanel input[type=checkbox]');
+  const startDisabled = () => page.locator('#questStartBtn').isDisabled();
+  check(r, 'with no run live: the picker (3 quests) and Start the week, switched off until one is ticked', (await pick.count()) === 3 && (await startDisabled()), await pick.count());
+  await pick.nth(0).check();
+  check(r, 'ticking one switches Start the week on, and a redraw keeps the tick', !(await startDisabled()) && (await page.evaluate(() => { render(); return document.querySelectorAll('#questPanel input:checked').length; })) === 1, '');
+  await L.settle(page, 300);
+  check(r, 'after the redraw Start the week is still on (questPickCount runs after the panel is drawn)', !(await startDisabled()), '');
+  await page.evaluate(() => { document.querySelectorAll('#questPanel input:checked').forEach(i => { i.checked = false; }); questPickCount(); });
+  // the pulse, titles, season; the funnel is on Leads → Free signups now
+  const pulse = await page.evaluate(() => [...document.querySelectorAll('#pulsePanel .pulse')].map(x => x.innerText.replace(/\s+/g, ' ').trim()));
+  check(r, 'Proof pulse lists every Proof athlete, most silent first (Dan, 5d silent, on top)', pulse.length === 3 && /^Dan/.test(pulse[0]) && /5d silent/.test(pulse[0]), pulse);
+  const rest = await txt('#content');
+  check(r, 'Titles minted and Season are on Proof, and The funnel is not', /FIXTURE TITLE/.test(rest) && /Fixture Season/.test(rest) && !/The funnel/.test(rest), '');
+  await L.go(page, 'leads/signups');
+  const fn = await page.evaluate(() => { const h = funnelPanelHtml(); return { section: /^\s*<section[^>]*id="funnelPanel"/.test(h), head: /The funnel/.test(h), rows: document.querySelectorAll('#funnelPanel .fun').length, acts: [...document.querySelectorAll('#funnelPanel .fun')].map(f => f.querySelector('.acts').innerText.replace(/\s+/g, ' ').trim()) }; });
+  check(r, 'The funnel (Leads → Free signups) comes from funnelPanelHtml() (one self-contained section) and keeps WhatsApp, copy email and open on each row', fn.section && fn.head && fn.rows === 2 && fn.acts.every(a => /WhatsApp/.test(a) && /copy email/.test(a) && /open/.test(a)), fn);
+  await L.go(page, 'proof');
+
+  // 3. posting and hiding from Proof; a redraw never blanks the page to "Fetching the board…" once the board is held
+  await page.evaluate(() => { window.__sawFetching = false; const c = document.getElementById('content'); new MutationObserver(() => { if (c.innerText.includes('Fetching the board')) window.__sawFetching = true; }).observe(c, { childList: true, subtree: true, characterData: true }); });
+  up = await post('#wallPanel', 'Line from Proof');
+  check(r, 'posting from Proof works: set_coach_note with the local day, one composer, and the composer shows the line', up && up.payload.p_body === 'Line from Proof' && up.payload.p_day === today && (await ids()).coachLineInput === 1 && (await page.locator('#wallPanel #coachLineInput').inputValue()) === 'Line from Proof', up && up.payload);
+  const n1 = await L.nCalls(page);
+  await page.locator('#wallPanel .wline', { hasText: 'Fixture wall line from Cara.' }).locator('.modbtn').click(); await L.settle(page, 700);
+  const hide = lastOf(await L.callsSince(page, n1), c => c.kind === 'rpc' && c.name === 'hide_note');
+  check(r, 'hiding a line from Proof works: hide_note(cara_free, yesterday, true), and the line redraws greyed with Show', hide && hide.payload.p_athlete_id === 'cara_free' && hide.payload.p_day === await dayOf(-1) && hide.payload.p_hidden === true && (await page.locator('#wallPanel .wline.hid .modbtn', { hasText: 'Show' }).count()) === 1, hide && hide.payload);
+  const sync = await page.evaluate(() => { render(); return { spinner: document.getElementById('content').innerText.includes('Fetching the board'), rows: document.querySelectorAll('#boardPanel .lbrow').length, asOf: /As of \d\d:\d\d/.test(document.getElementById('boardPanel').innerText) }; });
+  check(r, 'a redraw draws the held board AT ONCE: no "Fetching the board…" at any moment of the post, the hide or a render(), and the board rows and its time are there', !sync.spinner && sync.rows >= 1 && sync.asOf && (await page.evaluate(() => window.__sawFetching)) === false, { sync, saw: await page.evaluate(() => window.__sawFetching) });
+  // a real first read waits inside the board's own panel only
+  await page.evaluate(() => { resetBoard(); window.__STUB.delay.leaderboard_top = 1200; render(); });
+  const first = await page.evaluate(() => ({ board: document.getElementById('boardPanel').innerText.replace(/\s+/g, ' '), mic: !!document.querySelector('#wallPanel .mic'), quest: !!document.getElementById('questPanel'), pulse: document.querySelectorAll('#pulsePanel .pulse').length }));
+  check(r, 'a real first read shows "Fetching the board…" in the board\'s own panel only, with the wall, quest lever and pulse already on screen', /Fetching the board/.test(first.board) && first.mic && first.quest && first.pulse === 3, first);
+  await L.settle(page, 1700);
+  await page.evaluate(() => { window.__STUB.delay.leaderboard_top = 0; });
+  check(r, 'and the rows arrive in that panel with their time', !/Fetching/.test(await txt('#boardPanel')) && /As of \d\d:\d\d/.test(await txt('#boardPanel')) && (await page.locator('#boardPanel .lbrow').count()) >= 1, await txt('#boardPanel'));
+  // going back to Today: the composer there shows the line posted from Proof, and only one composer is in the page
+  await L.go(page, 'today');
+  n = await ids();
+  check(r, 'back on Today: the composer shows the line posted from Proof, and there is still one #coachLineInput', n.coachLineInput === 1 && (await page.locator('#proofToday #coachLineInput').inputValue()) === 'Line from Proof', n);
+
+  // 4. no sideways scroll on Today or Proof at 390 and 320
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 844 });
+    for (const h of ['today', 'proof']) { await L.go(page, h); await L.settle(page, 250); const o = await overflow(); check(r, `${h === 'today' ? 'Today' : 'Proof'} at ${w} px: no sideways scroll`, o.over <= 0, o); }
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+
+  // 5. body weight: on The work, one compact panel with the chart folded; gone from the athlete's Proof sub-tab; absent with no reading
+  await page.evaluate(() => {
+    const row = window.__DB.athlete_progress.find(p => p.athlete_id === 'ava_test');
+    const wt = {};
+    for (let i = 0; i < 40; i++) wt[addDays(todayKey(), -i)] = { kg: i === 0 ? 64.7 : Math.round((64.7 + i * 0.08) * 10) / 10, t: Date.now() - i * 86400000 };
+    row.data.ava_test_hab_wt = JSON.stringify(wt);
+    row.data.ava_test_1rm = [{ lift: 'Goblet Squat', kg: 40, w: 30, r: 5, rpe: 8, d: addDays(todayKey(), -3), t: Date.now() }];
+    return refetch(['prog']);
+  });
+  await L.go(page, 'a/ava_test/work'); await L.settle(page, 500);
+  const wt = await page.evaluate(() => {
+    const d = document.getElementById('wtdet'), box = document.getElementById('tabbody');
+    const pos = (a, c) => !!(a && c && (a.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING));
+    return d ? { n: document.querySelectorAll('#wtdet').length, inWork: box.contains(d), open: d.open, head: d.querySelector('summary').textContent.replace(/\s+/g, ' ').trim(),
+      afterPr: pos(document.querySelector('.prlist'), d), beforeCards: pos(d, document.querySelector('.wday')), svgShown: !!d.querySelector('.chart-svg') && d.querySelector('.chart-svg').checkVisibility() } : null;
+  });
+  check(r, 'The work: ONE #wtdet panel, shut, after the Personal records panel and before the day cards', !!wt && wt.n === 1 && wt.inWork && !wt.open && wt.afterPr && wt.beforeCards, wt);
+  check(r, 'its header line reads "Body weight · 64.7 kg · today · −x.x kg over 30 days · −x.x over 90" (the app\'s own numbers)', !!wt && /^Body weight · 64\.7 kg · today · −\d\.\d kg over 30 days · −\d\.\d over 90$/.test(wt.head), wt && wt.head);
+  check(r, 'the chart is not on screen until it is opened', !!wt && wt.svgShown === false, wt);
+  await page.locator('#wtdet summary').click(); await L.settle(page, 200);
+  const opened = () => page.evaluate(() => { const d = document.getElementById('wtdet'); return { open: !!d && d.open, svg: !!d && !!d.querySelector('.chart-svg') && d.querySelector('.chart-svg').checkVisibility(), w: d ? Math.round(d.querySelector('.chart-svg').getBoundingClientRect().width) : 0 }; });
+  const o1 = await opened();
+  check(r, 'a tap on the header opens it and shows the chart (not wider than 520 px)', o1.open && o1.svg && o1.w <= 520, o1);
+  await page.evaluate(() => renderDetailBody()); await L.settle(page, 200);
+  const o2 = await opened();
+  await page.evaluate(() => { assemble(); render(); }); await L.settle(page, 500);
+  const o3 = await opened();
+  check(r, 'it stays open through a redraw of the tab and a full redraw (snapTabBody keeps it)', o2.open && o3.open, [o2, o3]);
+  await L.go(page, 'a/ava_test/proof'); await L.settle(page, 400);
+  check(r, 'the athlete\'s Proof sub-tab no longer has it', (await page.locator('#wtdet').count()) === 0 && !/body weight/i.test(await txt('#tabbody')) && /habit tracking/i.test(await txt('#tabbody')), await txt('#tabbody'));
+  await L.go(page, 'a/ben_test/work'); await L.settle(page, 400);
+  check(r, 'an athlete with no reading has no body weight panel at all (absent, not empty)', (await page.locator('#wtdet').count()) === 0 && !/body weight/i.test(await txt('#tabbody')), '');
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 844 });
+    await L.go(page, 'a/ava_test/work'); await L.settle(page, 250);
+    await page.evaluate(() => { document.getElementById('wtdet').open = true; });
+    const o = await overflow();
+    check(r, `The work with body weight open at ${w} px: no sideways scroll`, o.over <= 0, o);
+  }
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
@@ -2554,6 +2735,192 @@ S['back-keeps-place'] = async (b) => {
   return r;
 };
 
+// ── Seven places, one sticky bar, ⚙ Tools in it (round 2 of the coach UX pass, 2026-10-12; Amir: "D1 yes") ───────────────────────────────────
+// Nine tabs became seven: Today, Athletes, Exercises, Proof, Leads (Intake + the signup funnel + Affiliates), Library, Buyers (the Course + the Testing app).
+// From 900 px the brand, the tabs, the signed-in label, ↻ Refresh, ⚙ Tools and Sign out are ONE sticky bar (it was a 58 px bar over a 61 px rail); under 900 px
+// the top bar and one row of tabs that scrolls sideways inside itself. ⚙ Tools hangs under the bar on every screen. The old addresses still land.
+S['nav-seven'] = async (b) => {
+  const r = { id: 'nav-seven', title: 'Seven places in one sticky bar with ⚙ Tools in it; Leads and Buyers have sub-tabs; the four old addresses land in the right place and are rewritten; Back keeps the place; no sideways scroll at 390 and 320', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'today' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await L.settle(page, 500);
+  const hash = () => page.evaluate(() => location.hash);
+  const tabsOf = () => page.evaluate(() => [...document.querySelectorAll('#rail a.tab')].map(a => ({ label: a.childNodes[0].textContent.trim(), href: a.getAttribute('href'), n: (a.querySelector('.n') || {}).textContent || '', on: a.classList.contains('active') })));
+  const subsOf = sel => page.evaluate(s => [...document.querySelectorAll(s + ' .stab')].map(a => ({ label: a.childNodes[0].textContent.trim(), href: a.getAttribute('href'), n: (a.querySelector('.n') || {}).textContent || '', on: a.classList.contains('active') })), sel);
+
+  // 1. the seven places and their two badges
+  const tabs = await tabsOf();
+  check(r, 'seven tabs, in this order, with these addresses: Today, Athletes, Exercises, Proof, Leads, Library, Buyers', JSON.stringify(tabs.map(t => t.label)) === JSON.stringify(['Today', 'Athletes', 'Exercises', 'Proof', 'Leads', 'Library', 'Buyers']) && JSON.stringify(tabs.map(t => t.href)) === JSON.stringify(['#today', '#athletes', '#exercises', '#proof', '#leads', '#links', '#buyers']), tabs);
+  const exp = await page.evaluate(() => ({ waiting: Object.values(S.ath).reduce((n, a) => n + a.toReply, 0), apps: newApplications() }));
+  check(r, 'two badges: Athletes (notes to read) and Leads (new applications), and none on the others', exp.apps === 2 && exp.waiting > 0 && tabs.filter(t => t.n).map(t => t.label + ':' + t.n).join() === `Athletes:${exp.waiting},Leads:${exp.apps}`, { exp, tabs: tabs.filter(t => t.n) });
+  check(r, 'Today is the one marked (aria-current), and the page title says Today\'s own: the Coach\'s Box alone', tabs.filter(t => t.on).map(t => t.label).join() === 'Today' && (await page.title()) === "The Coach's Box" && (await page.locator('#rail a.tab[aria-current="page"]').count()) === 1, await page.title());
+
+  // 2. one sticky bar
+  await page.evaluate(() => { document.getElementById('app').style.minHeight = '3500px'; });   // a sticky bar sticks inside its parent: the fixtures' pages are short, so the page is given room to scroll
+  const geo = () => page.evaluate(() => {
+    const t = document.querySelector('.topbar'), q = t.getBoundingClientRect(), cs = getComputedStyle(t);
+    const inside = sel => { const e = document.querySelector(sel), x = e.getBoundingClientRect(); return x.width > 0 && x.top >= q.top - 0.5 && x.bottom <= q.bottom + 0.5 && x.left >= q.left - 0.5 && x.right <= q.right + 0.5; };
+    const rail = [...document.querySelectorAll('#rail a.tab')].map(a => a.getBoundingClientRect());
+    return { h: Math.round(q.height), pos: cs.position, top: Math.round(q.top), allInside: ['.brand', '#rail', '#who', '.tbtn[aria-label=Refresh]', '#toolsBtn', '#logoutBtn'].filter(s => !inside(s)),
+      oneLine: rail.every(x => Math.abs(x.top - rail[0].top) < 1.5), tabsEnd: Math.round(rail[rail.length - 1].right), rightStart: Math.round(document.querySelector('.topbar .right').getBoundingClientRect().left),
+      stick: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stick')), contentTop: Math.round(document.getElementById('content').getBoundingClientRect().top), over: document.documentElement.scrollWidth - innerWidth };
+  });
+  let g = await geo();
+  check(r, 'at 1440 the bar is ONE sticky row of at most 64 px (it was 119: a top bar and a rail) and holds the brand, the seven tabs, the signed-in label, ↻ Refresh, ⚙ Tools and Sign out', g.h <= 64 && g.pos === 'sticky' && !g.allInside.length && g.oneLine, g);
+  check(r, 'the tabs end before the right-hand buttons begin, and --stick is the bar\'s own height, with the page content starting under it', g.tabsEnd <= g.rightStart && g.stick === g.h && g.contentTop >= g.h, g);
+  await page.evaluate(() => window.scrollTo({ top: 900, behavior: 'instant' })); await L.settle(page, 200);
+  g = await geo();
+  check(r, 'scrolled 900 px down the bar is still at the top of the window', g.top === 0, g.top);
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  const offs = { st: g.stick };
+  // what is offset under the bar: the comparison header (The work), the Applications list, the Exercises split
+  await L.go(page, 'a/ava_test/work'); await L.settle(page, 400);
+  const cmpTop = await page.evaluate(() => { const h = document.querySelector('.cmp-head'); return h ? getComputedStyle(h).top : null; });
+  check(r, 'the comparison header on The work sticks right under the bar (its top is --stick)', cmpTop === `${offs.st}px`, { cmpTop, stick: offs.st });
+  await L.go(page, 'leads'); await L.settle(page, 400);
+  await page.evaluate(() => window.scrollTo({ top: 100, behavior: 'instant' })); await L.settle(page, 200);
+  const listTop = await page.evaluate(() => Math.round(document.querySelector('.in-list').getBoundingClientRect().top));
+  check(r, 'the Applications list sticks 12 px under the bar while the page scrolls', listTop === offs.st + 12, { listTop, stick: offs.st });
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await L.go(page, 'exercises'); await L.settle(page, 500);
+  const split = await page.evaluate(() => { const s = document.querySelector('.sp-split').getBoundingClientRect(); return { bottom: Math.round(s.bottom), win: innerHeight, sy: Math.round(scrollY) }; });
+  check(r, 'the Exercises split still fits the window (spineFit measures from its own top)', split.bottom <= split.win && split.sy === 0, split);
+
+  // 3. ⚙ Tools: in the bar, on every screen
+  await page.evaluate(() => { window.__DB.athlete_identities = window.__DB.athlete_identities.filter(x => x.athlete_id !== 'ava_test'); return hardRefresh(); });   // a coached athlete with sessions and no login
+  await L.settle(page, 900);
+  await L.go(page, 'athletes'); await L.settle(page, 300);
+  check(r, 'one #toolsBtn, in the bar; the roster\'s controls keep the search, the sort and the filter chips and no longer hold it', (await page.locator('#toolsBtn').count()) === 1 && (await page.locator('.topbar #toolsBtn').count()) === 1 && (await page.locator('#content #toolsBtn, #content #toolsPanel').count()) === 0 && (await page.locator('#searchBox, #sortSel').count()) === 2 && (await page.locator('.rfilters .rf').count()) > 2, '');
+  const panelGeo = () => page.evaluate(() => { const p = document.getElementById('toolsPanel').getBoundingClientRect(), t = document.querySelector('.topbar').getBoundingClientRect(); return { top: Math.round(p.top), barBottom: Math.round(t.bottom), right: Math.round(p.right), w: Math.round(p.width), win: innerWidth, expanded: document.getElementById('toolsBtn').getAttribute('aria-expanded') }; });
+  for (const h of ['today', 'athletes', 'a/ben_test/file']) {
+    await L.go(page, h); await L.settle(page, 300);
+    check(r, `on ${h}: closed at first, the badge says one login waits`, await page.locator('#toolsPanel').isHidden() && (await page.locator('#toolsBtn .tn').innerText()) === '1' && (await page.locator('#toolsBtn').getAttribute('aria-expanded')) === 'false', await page.locator('#toolsBtn').innerText());
+    await page.locator('#toolsBtn').click(); await L.settle(page, 200);
+    const pg = await panelGeo(), ptxt = (await page.locator('#toolsPanel').innerText()).replace(/\s+/g, ' ');
+    check(r, `on ${h}: one tap opens it under the bar at the right (520 px wide at most), with Create 1 missing login, Backup and Logins to send`, await page.locator('#toolsPanel').isVisible() && pg.expanded === 'true' && pg.top === pg.barBottom && pg.w <= 520 && pg.right <= pg.win && /Create 1 missing login/.test(ptxt) && /Backup/.test(ptxt) && /Logins to send/i.test(ptxt), { pg, ptxt: ptxt.slice(0, 160) });
+    await page.locator('#toolsBtn').click(); await L.settle(page, 150);
+    check(r, `on ${h}: a second tap closes it`, await page.locator('#toolsPanel').isHidden() && (await page.locator('#toolsBtn').getAttribute('aria-expanded')) === 'false', '');
+  }
+  await L.go(page, 'athletes'); await L.settle(page, 300);
+  await page.locator('#toolsBtn').click(); await page.keyboard.press('Escape'); await L.settle(page, 150);
+  check(r, 'Esc closes it', await page.locator('#toolsPanel').isHidden(), '');
+  await page.locator('#toolsBtn').click();
+  await page.locator('#toolsPanel .tools-note').click(); await L.settle(page, 150);
+  check(r, 'a click inside the panel keeps it open', await page.locator('#toolsPanel').isVisible(), '');
+  await page.mouse.click(40, 500); await L.settle(page, 150);   // the margin left of the page: nothing there to open
+  check(r, 'a click outside it closes it', await page.locator('#toolsPanel').isHidden(), '');
+  await page.locator('#toolsBtn').click();
+  await page.evaluate(() => render()); await L.settle(page, 200);
+  check(r, 'it stays open through a redraw', await page.locator('#toolsPanel').isVisible(), '');
+  await page.locator('#searchBox').focus();
+  await page.evaluate(() => { S.logins.extra_x = { athlete_id: 'extra_x', initial_password: 'extra-pw-9' }; paintTools(); });
+  check(r, 'a change to what the panel holds is drawn without taking the focus off the box being typed in', (await page.evaluate(() => document.activeElement.id)) === 'searchBox' && /extra_x/.test(await page.locator('#toolsPanel').innerText()) && (await page.locator('#toolsBtn .tn').innerText()) === '2', await page.evaluate(() => document.activeElement.id));
+  await page.evaluate(() => { delete S.logins.extra_x; paintTools(); });
+  await page.mouse.click(40, 500);
+
+  // 4. the nine-tab addresses still land, in the new place, and the address bar is rewritten without an extra history entry
+  const OLD = [['intake', '#leads', 'Leads'], ['affiliates', '#leads/codes', 'Leads'], ['assess', '#buyers/testing', 'Buyers'], ['course', '#buyers', 'Buyers']];
+  for (const [old, now, tab] of OLD) {
+    await L.go(page, 'today'); await L.settle(page, 200);
+    await L.go(page, old); await L.settle(page, 300);
+    const act = (await tabsOf()).filter(t => t.on).map(t => t.label).join();
+    check(r, `#${old} lands on ${now} (the ${tab} tab marked) and the address bar says so`, (await hash()) === now && act === tab, { hash: await hash(), act });
+    await page.goBack(); await L.settle(page, 300);
+    check(r, `...and the rewrite is no extra history entry: one step Back from it is Today, not #${old}`, (await hash()) === '#today', await hash());
+  }
+  const o2 = await L.openCoach(b, { hash: 'assess' });
+  check(r, 'opening the page ON an old address (a bookmark) lands in the new place and rewrites it: #assess → #buyers/testing, the Testing app sub-tab on show', (await o2.page.evaluate(() => location.hash)) === '#buyers/testing' && (await o2.page.locator('.buy-subrail .stab.active').textContent()).startsWith('Testing app') && (await o2.page.locator('#asUser').count()) === 1, await o2.page.evaluate(() => location.hash));
+  await o2.page.context().close();
+
+  // 5. Leads: Applications · Free signups · Referral codes
+  await L.go(page, 'leads'); await L.settle(page, 400);
+  let subs = await subsOf('.lead-subrail');
+  check(r, 'Leads has three sub-tabs, Applications first and marked, with a count of the new ones; its address is #leads', JSON.stringify(subs.map(s => s.label)) === JSON.stringify(['Applications', 'Free signups', 'Referral codes']) && JSON.stringify(subs.map(s => s.href)) === JSON.stringify(['#leads', '#leads/signups', '#leads/codes']) && subs[0].on && subs[0].n === '2' && !subs[1].n && !subs[2].n && (await page.locator('#inView').count()) === 1, subs);
+  check(r, 'the page title names the screen: Applications · Leads', (await page.title()) === "Applications · Leads · The Coach's Box", await page.title());
+  await page.locator('.lead-subrail .stab', { hasText: 'Free signups' }).click(); await L.settle(page, 400);
+  check(r, 'Free signups (#leads/signups) is the funnel: its section, two rows, and no applications view', (await hash()) === '#leads/signups' && (await page.locator('#funnelPanel').count()) === 1 && (await page.locator('#funnelPanel .fun').count()) === 2 && (await page.locator('#inView').count()) === 0 && (await page.title()) === "Free signups · Leads · The Coach's Box", await hash());
+  await L.go(page, 'proof'); await L.settle(page, 500);
+  check(r, 'and the funnel is no longer on Proof', (await page.locator('#funnelPanel').count()) === 0 && !/The funnel/.test(await page.locator('#content').innerText()), '');
+  await page.locator('#rail a.tab', { hasText: 'Leads' }).click(); await L.settle(page, 300);
+  await page.locator('.lead-subrail .stab', { hasText: 'Referral codes' }).click(); await L.settle(page, 400);
+  check(r, 'Referral codes (#leads/codes) is the code roster, with + Add code', (await hash()) === '#leads/codes' && (await page.locator('#affAdd').count()) === 1 && /Live codes/i.test(await page.locator('#content').innerText()) && (await page.title()) === "Referral codes · Leads · The Coach's Box", await hash());
+  await page.locator('#affAdd').click();
+  const form = page.locator('.aff-form[data-new="1"]');
+  await form.locator('[data-k=code]').fill('nav15'); await form.locator('[data-k=percent]').fill('15'); await form.locator('[data-k=coach_name]').fill('Nav Coach');
+  let n0 = await L.nCalls(page);
+  await form.locator('.aff-save').click(); await L.settle(page, 600);
+  const ins = lastOf(await L.callsSince(page, n0), x => x.name === 'affiliates' && x.op === 'insert');
+  check(r, 'adding a code still works from here: insert {NAV15, 15} and the code is listed', !!ins && ins.payload.code === 'NAV15' && ins.payload.percent === 15 && (await page.locator('.intake-card', { hasText: 'NAV15' }).count()) === 1, ins && ins.payload);
+  n0 = await L.nCalls(page);
+  await L.jsClick(page.locator('.aff-retire[data-code=NAV15]')); await L.settle(page, 600);
+  const upd = lastOf(await L.callsSince(page, n0), x => x.name === 'affiliates' && x.op === 'update');
+  check(r, 'retiring one still works: update {active: false} for that code, and it moves to Retired', !!upd && upd.payload.active === false && upd.filters.join() === 'code.eq."NAV15"' && /Retired · \d/.test(await page.locator('#content').innerText()), upd && { payload: upd.payload, filters: upd.filters });
+  await page.locator('.lead-subrail .stab', { hasText: 'Applications' }).click(); await L.settle(page, 300);
+  check(r, 'Applications is back, with its list and the application on show', (await hash()) === '#leads' && (await page.locator('#inView .in-row').count()) >= 3 && (await page.locator('.in-detail .in-title').count()) === 1, await hash());
+
+  // 6. Buyers: Course · Testing app, each with its count, and a login can be made on each
+  await page.locator('#rail a.tab', { hasText: 'Buyers' }).click(); await L.settle(page, 700);
+  subs = await subsOf('.buy-subrail');
+  check(r, 'Buyers has two sub-tabs: the Course (marked, #buyers) and the Testing app (#buyers/testing), each with its count of active logins (1 and 1)', JSON.stringify(subs.map(s => [s.label, s.href, s.n, s.on])) === JSON.stringify([['Course', '#buyers', '1', true], ['Testing app', '#buyers/testing', '1', false]]) && (await page.title()) === "Course · Buyers · The Coach's Box", subs);
+  const fnCalls = async (n, fn) => (await L.callsSince(page, n)).filter(c => c.kind === 'fn' && c.name === fn);
+  await page.locator('#tpUser').fill('nav_course'); n0 = await L.nCalls(page);
+  await page.locator('#tpCreate').click(); await L.settle(page, 900);
+  let calls = await fnCalls(n0, 'tps-login');
+  check(r, 'a course login is created from here (one tps-login create) and the Course count goes to 2', calls.length === 1 && calls[0].payload.action === 'create' && calls[0].payload.username === 'nav_course' && (await subsOf('.buy-subrail'))[0].n === '2', { calls: calls.map(c => c.payload), subs: await subsOf('.buy-subrail') });
+  await page.locator('.buy-subrail .stab', { hasText: 'Testing app' }).click(); await L.settle(page, 500);
+  check(r, 'the Testing app sub-tab: #buyers/testing, its own list (fixture_academy) and form, and the Course\'s list is not drawn there', (await hash()) === '#buyers/testing' && (await page.locator('#asUser').count()) === 1 && (await page.locator('#tpUser').count()) === 0 && /fixture_academy/.test(await page.locator('#buyersBody').innerText()) && (await page.title()) === "Testing app · Buyers · The Coach's Box", await hash());
+  await page.locator('#asUser').fill('nav_academy'); n0 = await L.nCalls(page);
+  await page.locator('#asCreate').click(); await L.settle(page, 900);
+  calls = await fnCalls(n0, 'assess-login');
+  check(r, 'a testing-app login is created from here (one assess-login create) and the Testing app count goes to 2', calls.length === 1 && calls[0].payload.action === 'create' && calls[0].payload.username === 'nav_academy' && (await subsOf('.buy-subrail'))[1].n === '2' && (await subsOf('.buy-subrail'))[1].on, { calls: calls.map(c => c.payload), subs: await subsOf('.buy-subrail') });
+
+  // 7. Back from an athlete returns to the roster at the same place
+  await L.go(page, 'athletes'); await L.settle(page, 300);
+  await page.evaluate(() => { document.body.style.minHeight = '3500px'; window.scrollTo({ top: 600, behavior: 'instant' }); }); await L.settle(page, 300);
+  await page.evaluate(() => { location.hash = '#a/ava_test/work'; }); await L.settle(page, 700);
+  await page.goBack(); await L.settle(page, 700);
+  const yBack = await page.evaluate(() => Math.round(scrollY));
+  check(r, 'Back from an athlete lands on the roster where it was left (600)', (await hash()) === '#athletes' && Math.abs(yBack - 600) <= 2, { hash: await hash(), yBack });
+
+  // 8. 900 px is the narrowest single bar; 899 px is two rows
+  await page.setViewportSize({ width: 900, height: 800 }); await L.settle(page, 300);
+  g = await geo();
+  check(r, 'at 900 px it is still ONE bar of at most 64 px with the seven tabs on one line, and the tabs end before the buttons begin', g.h <= 64 && g.oneLine && g.tabsEnd <= g.rightStart && !g.allInside.filter(s => s !== '#who').length && g.over <= 0, g);
+  await page.setViewportSize({ width: 899, height: 800 }); await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' })); await L.settle(page, 300);
+  const two = await page.evaluate(() => { const tb = document.querySelector('.tb-top').getBoundingClientRect(), rl = document.getElementById('rail').getBoundingClientRect(); return { tbH: Math.round(tb.height), tbPos: getComputedStyle(document.querySelector('.tb-top')).position, railTop: Math.round(rl.top), railPos: getComputedStyle(document.querySelector('.rail')).position, stick: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--stick')) }; });
+  check(r, 'at 899 px the top bar is its own sticky row (--stick is its height) and the tab row sits under it, not sticky', two.tbPos === 'sticky' && two.tbH === two.stick && two.railTop >= two.tbH && two.railPos === 'static', two);
+
+  // 9. a phone: one row of tabs that scrolls inside itself, the active tab in view, no sideways scroll of the page
+  const SCREENS = ['today', 'athletes', 'a/ava_test/work', 'a/ava_test/file', 'exercises', 'exercises/coverage', 'proof', 'leads', 'leads/signups', 'leads/codes', 'links', 'buyers', 'buyers/testing'];
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 800 }); await L.settle(page, 300);
+    const bad = [];
+    for (const s of SCREENS) {
+      await L.go(page, s); await L.settle(page, 250);
+      const m = await page.evaluate(() => ({ over: document.documentElement.scrollWidth - innerWidth, wide: [...document.querySelectorAll('.tb-top *, #rail *, #content *')].filter(el => { const x = el.getBoundingClientRect(); return x.width > 0 && x.right > innerWidth + 1 && !el.closest('#rail'); }).slice(0, 3).map(el => el.tagName + '.' + el.className) }));
+      if (m.over > 0) bad.push([s, m]);
+    }
+    check(r, `at ${w} px no screen scrolls sideways (the tab row scrolls inside itself)`, !bad.length, bad);
+    await L.go(page, 'buyers/testing'); await L.settle(page, 300);
+    const row = await page.evaluate(() => { const rl = document.getElementById('rail'), tabs = [...rl.querySelectorAll('a.tab')].map(a => a.getBoundingClientRect()), on = rl.querySelector('a.tab.active').getBoundingClientRect(), box = rl.getBoundingClientRect();
+      return { oneRow: tabs.every(x => Math.abs(x.top - tabs[0].top) < 1.5), scrolls: rl.scrollWidth > rl.clientWidth, scrollLeft: Math.round(rl.scrollLeft), activeIn: on.left >= box.left - 1 && on.right <= box.right + 1, active: rl.querySelector('a.tab.active').textContent.trim() }; });
+    check(r, `at ${w} px the seven tabs are ONE row that scrolls sideways inside itself, and the active tab (${row.active}) was scrolled into view`, row.oneRow && row.scrolls && row.scrollLeft > 0 && row.activeIn && row.active === 'Buyers', row);
+    const tb = await page.evaluate(() => { const bx = [...document.querySelectorAll('.tb-top .brand, .tb-top .tbtn')].map(e => e.getBoundingClientRect()); return { allIn: bx.every(x => x.right <= innerWidth + 0.5 && x.left >= -0.5), tools: !!document.getElementById('toolsBtn').offsetParent }; });
+    check(r, `at ${w} px the brand, ↻, ⚙ Tools and Sign out all fit in the top bar`, tb.allIn && tb.tools, tb);
+    await page.evaluate(() => window.scrollTo({ top: 400, behavior: 'instant' })); await L.settle(page, 200);
+    const stuck = await page.evaluate(() => ({ barTop: Math.round(document.querySelector('.tb-top').getBoundingClientRect().top), railBottom: Math.round(document.querySelector('.rail').getBoundingClientRect().bottom) }));
+    check(r, `at ${w} px scrolled down the top bar stays at the top of the window and the tab row scrolls away (it does not eat the phone's screen)`, stuck.barTop === 0 && stuck.railBottom < 0, stuck);
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  }
+  await L.go(page, 'athletes'); await L.settle(page, 300);
+  await page.locator('#toolsBtn').click(); await L.settle(page, 200);
+  const pw = await page.evaluate(() => { const p = document.getElementById('toolsPanel').getBoundingClientRect(), t = document.querySelector('.tb-top').getBoundingClientRect(); return { left: Math.round(p.left), right: Math.round(p.right), win: innerWidth, top: Math.round(p.top), barBottom: Math.round(t.bottom), over: document.documentElement.scrollWidth - innerWidth }; });
+  check(r, 'on a phone the Tools panel is the full width right under the bar, and the page does not scroll sideways', pw.left <= 0 && pw.right >= pw.win && pw.top === pw.barBottom && pw.over <= 0, pw);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 S['roster-tier-chips'] = async (b) => {
   const r = { id: 'roster-tier-chips', title: 'Roster: the tier chips add up to Everyone, and a chip with nobody in it is not shown', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'athletes' });
@@ -2569,6 +2936,69 @@ S['roster-tier-chips'] = async (b) => {
   await page.locator('.rfilters .rf', { hasText: 'No file' }).click(); await L.settle(page, 400);
   const list = (await page.locator('#content .ath').allInnerTexts()).join(' ').replace(/\s+/g, ' ');
   check(r, 'the chip lists exactly them', /zed/i.test(list) && !/ava/i.test(list), list.slice(0, 200));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// The roster as one dense list (2026-10-12, redesign round 1): a PC row is 60 px or less with aligned columns under column heads, a phone row is two lines.
+S['roster-dense'] = async (b) => {
+  const r = { id: 'roster-dense', title: 'Roster: a dense row per person (column heads, aligned columns, 60 px or less) on a PC, two lines and no sideways scroll on a phone; the cycle with its week, its end in clay near the end; the level still fills in place', checks: [] };
+  const FX = require('./fixtures');
+  const { page, log, today } = await L.openCoach(b, { hash: 'athletes', seed: { stub: { delay: { coach_season_levels: 1500 } } } });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const row = name => page.locator('#content .ath', { hasText: name });
+  // 1. the levels arrive into the Proof column of the rows that are already on screen
+  await row('Ava Example').locator('.a-proof').waitFor();
+  check(r, 'the roster is drawn before the levels arrive: Ava has her seven dots and no level yet', (await row('Ava Example').locator('.a-proof .dt').count()) === 7 && !/LV/.test(await row('Ava Example').locator('.a-proof').innerText()), await row('Ava Example').locator('.a-proof').innerText());
+  await page.evaluate(() => { window.__row = document.querySelector('#content .ath'); });
+  await L.settle(page, 2200);
+  check(r, 'when the levels arrive the rows are the same elements, and the level is plain text in the Proof column', await page.evaluate(() => document.querySelector('#content .ath') === window.__row) && /^LV \d+$/.test(await row('Ava Example').locator('.a-proof .lvtext').innerText()) && (await row('Ava Example').locator('.a-proof .lvchip').count()) === 0, await row('Ava Example').locator('.a-proof').innerText());
+  // 2. dated cycles: Ava is 10 days into 4 weeks, Ben's (4 weeks) ends in 3 days, Eli's (5 weeks) ended 5 days ago
+  await page.evaluate(([s, e, s2, e2, s3, e3]) => {
+    const set = (id, a, z) => { const p = window.__DB.programs.find(x => x.athlete_id === id); p.data.cycles[0].startDate = a; p.data.cycles[0].endDate = z; };
+    set('ava_test', s, e); set('ben_test', s2, e2); set('eli_new', s3, e3);
+    return hardRefresh();
+  }, [FX.daysAgo(today, 10), FX.daysAgo(today, -18), FX.daysAgo(today, 25), FX.daysAgo(today, -3), FX.daysAgo(today, 40), FX.daysAgo(today, 5)]);
+  await L.settle(page, 900);
+  const clay = await page.evaluate(() => { const i = document.createElement('i'); i.style.color = 'var(--clay-ink)'; document.body.appendChild(i); const c = getComputedStyle(i).color; i.remove(); return c; });
+  const colourOf = loc => loc.evaluate(el => getComputedStyle(el).color);
+  const heads = await page.locator('.rhead > span').evaluateAll(els => els.map(e => e.textContent));
+  check(r, 'the column heads are there: Athlete, Cycle, Last session, Proof, Why, in small capitals', JSON.stringify(heads) === JSON.stringify(['Athlete', 'Cycle', 'Last session', 'Proof', 'Why']) && await page.locator('.rhead').isVisible() && await page.locator('.rhead').evaluate(el => getComputedStyle(el).textTransform === 'uppercase' && getComputedStyle(el).fontSize === '12px'), heads);
+  const heights = await page.locator('#content .ath').evaluateAll(els => els.map(e => Math.round(e.getBoundingClientRect().height)));
+  check(r, 'every athlete row is 60 px or less at 1440 px', heights.length >= 5 && Math.max(...heights) <= 60, heights);
+  const lefts = await page.evaluate(() => ['a-cycle', 'a-last', 'a-proof', 'a-why'].map(c => [...new Set([...document.querySelectorAll('#content .ath .' + c)].map(e => Math.round(e.getBoundingClientRect().left)))].length));
+  check(r, 'the columns line up: every row starts each of Cycle, Last session, Proof and Why at the same x', JSON.stringify(lefts) === '[1,1,1,1]', lefts);
+  const cyc = async name => (await row(name).locator('.a-cycle').innerText()).replace(/\s+/g, ' ');
+  check(r, 'a dated cycle says its number, the week and its end: "C1 · wk 2/4 · ends 30 Oct"', /^C1 · wk 2\/4 · ends \d{1,2} [A-Z][a-z]{2}$/.test(await cyc('Ava Example')) && (await row('Ava Example').locator('.a-cycle .warn').count()) === 0, await cyc('Ava Example'));
+  check(r, 'a cycle that ends in 3 days says so, in clay', /^C1 · wk 4\/4 · ends in 3 d$/.test(await cyc('Ben Example')) && (await colourOf(row('Ben Example').locator('.a-cycle .warn'))) === clay, [await cyc('Ben Example'), await colourOf(row('Ben Example').locator('.a-cycle .warn'))]);
+  check(r, 'a cycle that ended 5 days ago says so, in clay', /^C1 · wk 5\/5 · ended 5 d ago$/.test(await cyc('Eli Example')) && (await colourOf(row('Eli Example').locator('.a-cycle .warn'))) === clay, await cyc('Eli Example'));
+  check(r, 'a free athlete with no cycle and a person with no programme say so, quietly', /^no cycle$/.test(await cyc('Cara')) && /^no programme$/.test(await cyc('Dan')) && (await row('Dan').locator('.a-cycle .warn').count()) === 0, [await cyc('Cara'), await cyc('Dan')]);
+  const last = async name => (await row(name).locator('.a-last').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the last session and the session count share a cell; no sessions reads "no sessions yet" for a coached athlete and a dash for anyone else', /^yesterday · 3 sessions$/.test(await last('Ava Example')) && /^no sessions yet$/.test(await last('Eli Example')) && /^—$/.test(await last('Dan')), [await last('Ava Example'), await last('Eli Example'), await last('Dan')]);
+  check(r, 'Proof: seven dots, n/7 and the level for Ava; nothing at all for Ben, who has no habits', (await row('Ava Example').locator('.a-proof .dt').count()) === 7 && /4\/7/.test(await row('Ava Example').locator('.a-proof .n7').innerText()) && (await row('Ben Example').locator('.a-proof').innerText()) === '' && (await row('Ben Example').locator('.dt').count()) === 0, '');
+  check(r, 'the old "on court ✓ / N d off" tag is gone (the dots say it)', !/on court|d off/.test(await page.locator('#rosterBox').innerText()), '');
+  const whyAva = await row('Ava Example').locator('.a-why').innerText();
+  check(r, 'Why: Ava\'s unread note is in clay, in words', /note/.test(whyAva) && (await colourOf(row('Ava Example').locator('.a-why .warn').first())) === clay, whyAva);
+  const ava = await row('Ava Example').locator('.ava').evaluate(el => getComputedStyle(el).backgroundColor), cara = await row('Cara').locator('.ava').evaluate(el => getComputedStyle(el).backgroundColor);
+  check(r, 'the avatar is court green for a coached athlete, and a plain outline (not plum) for a free one, whose tier reads "free"', ava === 'rgb(14, 74, 54)' && cara !== 'rgb(122, 78, 110)' && cara !== ava && (await row('Cara').locator('.tier').innerText()) === 'free' && (await row('Ava Example').locator('.tier').innerText()) === 'coached', [ava, cara]);
+  check(r, 'a row is still one button that opens the athlete, and a note waiting leaves its clay mark', (await row('Ava Example').evaluate(el => el.tagName)) === 'BUTTON' && await row('Ava Example').evaluate(el => el.classList.contains('flag') && /inset/.test(getComputedStyle(el).boxShadow)), '');
+  // 3. no sideways scroll at any width, and on a phone a row is two lines
+  const overflow = () => page.evaluate(() => ({ page: document.documentElement.scrollWidth - window.innerWidth, roster: document.getElementById('rosterBox').scrollWidth - document.getElementById('rosterBox').clientWidth,
+    rows: Math.max(...[...document.querySelectorAll('#content .ath')].map(e => e.scrollWidth - e.clientWidth)) }));
+  for (const w of [1180, 900]) {
+    await page.setViewportSize({ width: w, height: 800 }); await L.settle(page, 250);
+    const o = await overflow();
+    check(r, w + ' px: no sideways scroll, on the page, the roster or any row', o.page <= 0 && o.roster <= 0 && o.rows <= 0, o);
+  }
+  for (const [w, h] of [[390, 844], [320, 640]]) {
+    await page.setViewportSize({ width: w, height: h }); await L.settle(page, 250);
+    const o = await overflow();
+    check(r, w + ' px: no sideways scroll, on the page, the roster or any row', o.page <= 0 && o.roster <= 0 && o.rows <= 0, o);
+    const g = await row('Ava Example').evaluate(el => { const t = s => el.querySelector(s).getBoundingClientRect().top; return { head: getComputedStyle(document.querySelector('.rhead')).display, id: t('.a-id'), why: t('.a-why'), cycle: t('.a-cycle'), h: el.getBoundingClientRect().height }; });
+    // at 390 px the name and "1 note to read" share line 1; at 320 px the words may wrap under the name, but the cycle is always below both
+    check(r, w + ' px: no column heads; line 1 is the name and why (wrapping under the name when there is no room), then the cycle line', g.head === 'none' && (w < 360 || Math.abs(g.why - g.id) <= 6) && g.cycle > g.why - 2 && g.cycle > g.id + 14 && g.h <= (w < 360 ? 150 : 110), g);
+  }
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
   return r;
@@ -2595,9 +3025,123 @@ S['today-mark-read'] = async (b) => {
 };
 function location_is_today(h) { return h === '' || h === '#today'; }
 
+// Round 1 of the coach UX pass (2026-10-12): Today is Needs you first and wide, every person row has ONE button named for what it does,
+// and the things that are not a person sit under "Also waiting", with the logins that were created and not sent (new).
+S['today-also-waiting'] = async (b) => {
+  const r = { id: 'today-also-waiting', title: 'Today: Needs you first and wide, a button on each row that names what it does, and "Also waiting" with the logins to send', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  const peopleText = () => page.locator('#needPanel .phead .r').innerText().then(s => s.replace(/\s+/g, ' ').trim());
+  // 1. layout: Needs you first in the page, left of Proof today (one short panel, round 2) and about twice as wide; no banner headline.
+  // The full wall, the quest lever and the pulse are on Proof only, so none of their ids is on Today (one copy of an id at a time).
+  const lay = await page.evaluate(() => {
+    const n = document.getElementById('needPanel'), w = document.getElementById('proofToday');
+    const rn = n.getBoundingClientRect(), rw = w.getBoundingClientRect(), F = Node.DOCUMENT_POSITION_FOLLOWING;
+    return { order: !!(n.compareDocumentPosition(w) & F), fullOnToday: ['wallPanel', 'questPanel', 'pulsePanel'].filter(id => document.getElementById(id)),
+      left: rn.right <= rw.left + 1, ratio: Math.round(rn.width / rw.width * 100) / 100, top: Math.abs(rn.top - rw.top) < 2,
+      h1: document.querySelectorAll('#content h1').length, strip: Math.round(document.querySelector('.board').getBoundingClientRect().height),
+      counters: [...document.querySelectorAll('.board .counter')].map(a => a.textContent.replace(/\s+/g, ' ').trim()) };
+  });
+  check(r, '#needPanel comes before #proofToday in the page, and the full wall, quest lever and pulse are not on Today', lay.order && !lay.fullOnToday.length, lay);
+  check(r, 'on a wide screen Needs you is the left column, level with Proof today and about twice as wide', lay.left && lay.top && lay.ratio > 1.8 && lay.ratio < 2.3, lay);
+  check(r, 'the strip has no headline and is slim (under 110 px), with the four counters on it as number + label', lay.h1 === 0 && lay.strip < 110 && lay.counters.length === 4 && /^\d+\/\d+ on court today$/.test(lay.counters[0]) && /^\d+ notes? to read$/.test(lay.counters[3]), lay);
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 844 }); await L.settle(page, 250);
+    const ph = await page.evaluate(() => { const n = document.getElementById('needPanel').getBoundingClientRect(), wl = document.getElementById('proofToday').getBoundingClientRect();
+      return { stacked: wl.top >= n.bottom - 1, sw: document.documentElement.scrollWidth, iw: innerWidth, strip: Math.round(document.querySelector('.board').getBoundingClientRect().height) }; });
+    check(r, `at ${w} px one column with Needs you first, and no sideways scroll`, ph.stacked && ph.sw <= ph.iw, ph);
+    if (w === 390) check(r, 'at 390 px the strip stays under 150 px (counters 2 x 2)', ph.strip < 150, ph);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 }); await L.settle(page, 250);
+
+  // 2. each person's button, from the top reason
+  const info = await page.evaluate(() => [...document.querySelectorAll('#needPanel .need')].filter(el => el.querySelector('.needgo:not(.static)')).map(el => ({
+    name: el.querySelector('.n').textContent.trim(), btns: [...el.querySelectorAll('.nacts .btn')].map(x => x.textContent.trim()), tags: [...el.querySelectorAll('.nacts .btn')].map(x => x.tagName),
+    href: (el.querySelector('.nacts a.btn') || {}).href || '', target: (el.querySelector('.nacts a.btn') || {}).target || '',
+    go: el.querySelector('.needgo').getAttribute('onclick'), open: [...el.querySelectorAll('.nacts button')].map(x => x.getAttribute('onclick')) })));
+  const by = n => info.find(x => x.name === n) || {};
+  check(r, 'a note row (Ava): Mark read and Open day, and Open day does what the row does', JSON.stringify(by('Ava Example').btns) === JSON.stringify(['Mark read', 'Open day']) && by('Ava Example').open[1] === by('Ava Example').go, by('Ava Example'));
+  check(r, 'a no-login row (Eli) says Set up login', JSON.stringify(by('Eli Example').btns) === JSON.stringify(['Set up login']), by('Eli Example'));
+  check(r, 'a new signup with a number (Dan) says WhatsApp, a link that opens in a new tab', JSON.stringify(by('Dan').btns) === JSON.stringify(['WhatsApp ↗']) && by('Dan').tags[0] === 'A' && /^https:\/\/wa\.me\/\d+$/.test(by('Dan').href) && by('Dan').target === '_blank', by('Dan'));
+  // every key, on made-up people (so the table is checked for all of them, with and without a number)
+  const KEYS = [['sync', 'Open sessions'], ['lowrun', 'Open'], ['cycle', 'Open cycle'], ['renew', 'Open file'], ['idle', 'Open'], ['login', 'Set up login'], ['signup', 'WhatsApp ↗'], ['silent', 'WhatsApp ↗'], ['upgrade', 'WhatsApp ↗']];
+  const synth = await page.evaluate(KEYS => {
+    _needAll = true;
+    const mk = (id, key, wa) => { S.ath[id] = { id, name: 'Zz ' + id, tier: 'coached', reasons: [{ key, tone: key === 'sync' ? 'warn' : 'note', text: 'fixture ' + key, weight: 1, sub: key === 'sync' ? 'work' : key === 'signup' || key === 'silent' || key === 'upgrade' ? 'proof' : 'file' }],
+      needReplyRecent: [], needReplyStale: 0, needReplySessions: [], toReply: 0, contact: { whatsapp: wa }, isHab: false }; };
+    KEYS.forEach(([k]) => mk('zz_' + k, k, '+447700900123'));
+    ['signup', 'silent', 'upgrade'].forEach(k => mk('zz_nowa_' + k, k, '@just_a_handle'));
+    render();
+    const out = [...document.querySelectorAll('#needPanel .need')].filter(el => /^Zz /.test((el.querySelector('.n') || {}).textContent || '')).map(el => ({
+      id: el.querySelector('.n').textContent.trim().slice(3), btns: [...el.querySelectorAll('.nacts .btn')].map(x => x.textContent.trim()),
+      tag: (el.querySelector('.nacts .btn') || {}).tagName, href: (el.querySelector('.nacts a.btn') || {}).href || '', rel: (el.querySelector('.nacts a.btn') || {}).rel || '',
+      sameAsRow: el.querySelector('.nacts button') ? el.querySelector('.nacts button').getAttribute('onclick') === el.querySelector('.needgo').getAttribute('onclick') : null,
+      warn: el.querySelector('.r1').classList.contains('warn') }));
+    Object.keys(S.ath).filter(k => k.startsWith('zz_')).forEach(k => delete S.ath[k]);
+    _needAll = false; render();
+    return out;
+  }, KEYS);
+  const bad = [];
+  KEYS.forEach(([k, label]) => { const x = synth.find(s => s.id === 'zz_' + k) || {};
+    if (JSON.stringify(x.btns) !== JSON.stringify([label])) bad.push([k, x.btns]);
+    if (label === 'WhatsApp ↗' ? !(x.tag === 'A' && x.href === 'https://wa.me/447700900123' && /noopener/.test(x.rel)) : (k !== 'login' && x.sameAsRow !== true)) bad.push([k, 'link or handler', x]); });
+  ['signup', 'silent', 'upgrade'].forEach(k => { const x = synth.find(s => s.id === 'zz_nowa_' + k) || {}; if (JSON.stringify(x.btns) !== JSON.stringify(['Open']) || x.sameAsRow !== true) bad.push(['nowa ' + k, x]); });
+  check(r, 'every reason key has the button in the brief: Open sessions / Open / Open cycle / Open file / Set up login, WhatsApp for signup, silent and upgrade (a plain Open when there is no number), and the plain ones do what the row does', synth.length === KEYS.length + 3 && !bad.length, bad.length ? bad : synth.length);
+  check(r, 'only a warn reason is clay (the sync row), the others are ink', synth.find(s => s.id === 'zz_sync').warn === true && synth.filter(s => s.id !== 'zz_sync').every(s => s.warn === false), synth.map(s => s.id + ':' + s.warn));
+
+  // 3. Also waiting
+  const also = await page.evaluate(() => { const a = document.querySelector('#needPanel .also'); if (!a) return null;
+    const last = [...document.querySelectorAll('#needPanel .need')].filter(el => el.querySelector('.needgo:not(.static)')).pop();
+    return { label: (a.querySelector('.eyebrow') || {}).textContent, after: !!(last.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING),
+      rows: [...a.querySelectorAll('.need')].map(el => ({ title: el.querySelector('.n').textContent.trim(), btns: [...el.querySelectorAll('.nacts .btn')].map(x => x.textContent.trim()) })) }; });
+  check(r, 'an "Also waiting" group under the people', !!also && also.label === 'Also waiting' && also.after, also);
+  const rowOf = t => (also && also.rows.find(x => x.title === t)) || {};
+  check(r, 'it holds the applications, the logins to send, the weekly backup and the older notes, each with its own button',
+    JSON.stringify(rowOf('2 new applications').btns) === JSON.stringify(['Open Leads']) && JSON.stringify(rowOf('Login to send · Ben Example').btns) === JSON.stringify(['Copy message', 'Mark sent'])
+    && JSON.stringify(rowOf('Weekly backup').btns) === JSON.stringify(['⤓ Back up now']) && JSON.stringify(rowOf('1 older note').btns) === JSON.stringify(['Clear']), also);
+  check(r, 'only a login that still holds its first password is listed (Ava\'s was sent)', also.rows.filter(x => /^Login to send/.test(x.title)).length === 1, also.rows.map(x => x.title));
+  const people0 = await peopleText();
+  const nPeople = await page.evaluate(() => Object.values(S.ath).filter(a => (a.reasons || []).length).length);
+  const asReason = await page.evaluate(() => Object.values(S.ath).some(a => (a.reasons || []).some(x => /login to send/i.test(x.text + x.key))));
+  check(r, 'the header counts people only: the rows under Also waiting are not reasons', people0 === `${nPeople} people` && nPeople === 4 && !asReason, { people0, nPeople, asReason });
+  await page.evaluate(() => { LOAD_ERR.logins = 'fixture: logins did not load'; render(); });
+  check(r, 'when the list of logins did not load, no login row is shown', (await page.locator('#needPanel .also .need', { hasText: 'Login to send' }).count()) === 0, '');
+  await page.evaluate(() => { LOAD_ERR.logins = ''; render(); });
+  check(r, 'and it comes back when it did', (await page.locator('#needPanel .also .need', { hasText: 'Login to send · Ben Example' }).count()) === 1, '');
+
+  // 4. Copy message, then Mark sent: the same write as the Tools panel's
+  const row = () => page.locator('#needPanel .also .need', { hasText: 'Login to send · Ben Example' });
+  await row().getByRole('button', { name: 'Copy message' }).click(); await L.settle(page, 300);
+  const clip = await page.evaluate(() => navigator.clipboard.readText());
+  check(r, 'Copy message puts their login message on the clipboard', /ben_test/.test(clip) && /fixture-unsent-pw-1/.test(clip), clip.slice(0, 120));
+  const d0 = log.dialogs.length, n0 = await L.nCalls(page);
+  await row().getByRole('button', { name: 'Mark sent' }).click(); await L.settle(page, 800);
+  const todayUpd = lastOf(await L.callsSince(page, n0), isUpd('athlete_identities'));
+  check(r, 'Mark sent asks first, then clears the stored password and stamps sent, for that athlete', log.dialogs.slice(d0).some(x => x.type === 'confirm' && /ben_test/.test(x.message)) && !!todayUpd && todayUpd.payload.initial_password === null && typeof todayUpd.payload.sent_at === 'string' && todayUpd.filters.includes('athlete_id.eq."ben_test"'), todayUpd && { payload: todayUpd.payload, filters: todayUpd.filters });
+  check(r, 'the row goes and the people count does not change', (await row().count()) === 0 && (await peopleText()) === people0 && location_is_today(await page.evaluate(() => location.hash)), await peopleText());
+  await page.evaluate(() => { const x = window.__DB.athlete_identities.find(i => i.athlete_id === 'ben_test'); x.initial_password = 'fixture-unsent-pw-1'; x.sent_at = null; return hardRefresh(); }); await L.settle(page, 800);
+  await L.go(page, 'athletes'); await openTools(page);
+  await page.evaluate(() => { const el = document.querySelector('.creds-top'); if (el && el.getAttribute('aria-expanded') !== 'true') el.click(); });
+  const n1 = await L.nCalls(page);
+  await page.locator('.creds .credrow', { hasText: 'ben_test' }).getByRole('button', { name: 'Mark sent' }).click(); await L.settle(page, 800);
+  const toolsUpd = lastOf(await L.callsSince(page, n1), isUpd('athlete_identities'));
+  check(r, 'it is the very write the Tools panel makes (same columns, same filter)', !!toolsUpd && !!todayUpd && JSON.stringify(Object.keys(toolsUpd.payload).sort()) === JSON.stringify(Object.keys(todayUpd.payload).sort()) && toolsUpd.payload.initial_password === null && JSON.stringify(toolsUpd.filters) === JSON.stringify(todayUpd.filters), toolsUpd && { payload: toolsUpd.payload, filters: toolsUpd.filters });
+
+  // 5. Set up login opens the File and puts the cursor in the password box; a note's Open day opens that day
+  await L.go(page, 'today');
+  await page.locator('#needPanel .need', { hasText: 'Eli Example' }).first().getByRole('button', { name: 'Set up login' }).click(); await L.settle(page, 400);
+  const st = await page.evaluate(() => ({ hash: location.hash, focus: document.activeElement && document.activeElement.id }));
+  check(r, 'Set up login opens their File with the cursor in the password box', st.hash === '#a/eli_new/file' && st.focus === 'athPw', st);
+  await L.go(page, 'today');
+  await page.locator('#needPanel .need', { hasText: 'Ava Example' }).first().getByRole('button', { name: 'Open day' }).click(); await L.settle(page, 400);
+  check(r, 'a note\'s Open day opens the day the note is on', await page.evaluate(() => location.hash) === '#a/ava_test/work', await page.evaluate(() => location.hash));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 S['spine-copy-add'] = async (b) => {
   const r = { id: 'spine-copy-add', title: 'Exercises → Not in the Spine yet: one tap copies "/spine add <name>" for Claude', checks: [] };
-  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  const { page, log } = await L.openCoach(b, { hash: 'exercises/coverage' });   // Not in the Spine yet is on the Coverage sub-tab
   await L.settle(page, 700);
   await page.evaluate(() => document.querySelectorAll('#content details').forEach(d => { d.open = true; }));
   const panel = page.locator('details', { hasText: 'Not in the Spine yet' }).first();
@@ -2645,6 +3189,164 @@ S['spine-editor-folds'] = async (b) => {
   return r;
 };
 
+// ── Exercises sub-tabs and the side-by-side editor (round 2 of the coach UX pass, 2026-10-12) ──
+// Entries / Qualities / Coverage have their own addresses; from 1000 px the editor opens beside the list (each scrolls on its own),
+// below that it replaces the list with "← All exercises"; leaving a sub-tab with typed, unsaved work asks first.
+S['spine-subtabs'] = async (b) => {
+  const r = { id: 'spine-subtabs', title: 'Exercises: three sub-tabs with their own addresses; the editor beside the list from 1000 px, in place of it on a phone; the guard when leaving a sub-tab', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'exercises' });
+  dismissDialogs(page, log);   // a confirm is answered No
+  const noOverflow = () => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
+  const vis = sel => page.locator(sel).first().isVisible();
+  const url = () => page.url().replace(/^.*coach\.html/, '');
+  await page.setViewportSize({ width: 1440, height: 900 }); await L.settle(page, 300);
+
+  // 1. the three sub-tabs and their addresses
+  const tabs = await page.locator('.sp-subrail .stab').allInnerTexts();
+  check(r, 'three sub-tabs: Entries, Qualities, Coverage (Coverage with a count)', tabs.length === 3 && /^Entries$/i.test(tabs[0].trim()) && /^Qualities$/i.test(tabs[1].trim()) && /^Coverage\s*\d+$/i.test(tabs[2].replace(/\s+/g, ' ').trim()), tabs);
+  check(r, '#exercises is Entries: the search box and the list are there, the sub-tab is marked', (await page.locator('#spineQ').count()) === 1 && /Entries/i.test(await page.locator('.sp-subrail .stab.active').innerText()), '');
+  await page.locator('.sp-subrail .stab', { hasText: 'Qualities' }).click(); await L.settle(page, 400);
+  check(r, 'Qualities has its own address, a row per quality, and no list', /#exercises\/qualities$/.test(url()) && (await page.locator('.qm-row').count()) === 10 && (await page.locator('#spineQ').count()) === 0, url());
+  check(r, 'the Quality check is open under it', await page.locator('#content details', { hasText: 'Quality check' }).first().evaluate(d => d.open), '');
+  await page.locator('.sp-subrail .stab', { hasText: 'Coverage' }).click(); await L.settle(page, 400);
+  const covN = await page.locator('.sp-subrail .stab.active .n').innerText();
+  const sections = await page.evaluate(() => [...document.querySelectorAll('#content details')].filter(d => d.querySelector(':scope > summary.arch-toggle')).map(d => [d.querySelector('summary').textContent.trim(), d.open]));
+  const fixN = sections.reduce((n, s) => n + (+((/·\s*(\d+) names?/.exec(s[0]) || [])[1] || 0)), 0);
+  check(r, 'Coverage has its own address, four count tiles and the bar', /#exercises\/coverage$/.test(url()) && (await page.locator('.sp-tile').count()) === 4, url());
+  check(r, 'the two lists are open there, and the tab\'s count is what they hold', sections.length >= 1 && sections.every(s => s[1]) && +covN === fixN && fixN > 0, { covN, sections });
+  await page.evaluate(() => { location.hash = 'exercises/nonsense'; }); await L.settle(page, 400);
+  check(r, 'an unknown part reads as Entries', (await page.locator('#spineQ').count()) === 1, url());
+  await page.evaluate(() => { location.hash = 'exercises'; }); await L.settle(page, 300);
+
+  // 2. the Coverage warning line on Entries
+  const warn = page.locator('.sp-warn');
+  check(r, 'Entries says in one clay line what Coverage has to fix, and links to it', (await warn.count()) === 1 && /not in the Spine/.test(await warn.innerText()) && /exercises\/coverage$/.test(await warn.getAttribute('href')), (await warn.count()) ? await warn.innerText() : 'no line');
+  await warn.click(); await L.settle(page, 400);
+  check(r, 'the line opens Coverage', /#exercises\/coverage$/.test(url()) && (await page.locator('.sp-tile').count()) === 4, url());
+  await page.locator('.sp-subrail .stab', { hasText: 'Entries' }).click(); await L.settle(page, 300);
+
+  // 3. a long list, and a desktop width: the editor opens beside it
+  await page.evaluate(() => {
+    const now = new Date().toISOString();
+    for (let i = 0; i < 70; i++) {
+      const id = 'bulk-lift-' + String(i).padStart(2, '0');
+      window.__DB.exercises.push({ id, name: 'Bulk Lift ' + String(i).padStart(2, '0'), aliases: [], pattern: 'squat', qualities: ['strength'], purpose: 'Fixture.', tennis: null, cues: null,
+        equipment: [], loads: [], easier: [], harder: [], alts: [], video: null, status: 'approved', updated_at: now, updated_by: 'coach', impact: 'none', muscles: null, steps: [] });
+      window.__DB.exercise_coach.push({ id, sfr: null, flags: [], notes: null, suggested_qualities: null, links_before: null, links_history: null, credits: null, cost: null, suggested_changes: null });
+    }
+    S.spine = null; renderExercises();
+  });
+  await page.waitForFunction(() => document.querySelector('#spineQ')); await L.settle(page, 300);
+  await page.locator('.sp-filter[data-f="approved"]').click(); await L.settle(page, 300);
+  check(r, 'nothing open: the right side says so', (await vis('.sp-empty')) && /Pick an exercise to edit it/.test(await page.locator('.sp-empty').innerText()), '');
+  const list = page.locator('.sp-list');
+  const dims = await list.evaluate(el => ({ ch: el.clientHeight, sh: el.scrollHeight, oy: getComputedStyle(el).overflowY }));
+  check(r, 'the list scrolls on its own (taller than its box, overflow auto)', dims.sh > dims.ch + 200 && dims.oy === 'auto', dims);
+  await list.evaluate(el => { el.scrollTop = 600; });
+  check(r, 'scrolling the list does not move the page', (await page.evaluate(() => window.scrollY)) === 0 && (await list.evaluate(el => el.scrollTop)) > 400, '');
+  // open a row that is on screen, by a JS click (no scrolling), so the list's own scroll is what is being tested
+  const picked = await page.evaluate(() => {
+    const l = document.querySelector('.sp-list').getBoundingClientRect();
+    const row = [...document.querySelectorAll('.sp-list .spine-row')].find(x => x.getBoundingClientRect().top > l.top + 40 && x.getBoundingClientRect().bottom < l.bottom - 40);
+    row.querySelector('button[data-open]').click();
+    return row.dataset.open;
+  });
+  await page.locator('#spineEd').waitFor(); await L.settle(page, 300);
+  const side = await page.evaluate(() => {
+    const l = document.querySelector('.sp-listpane').getBoundingClientRect(), e = document.getElementById('spineEd').getBoundingClientRect(), a = document.querySelector('#spineEd .spine-acts').getBoundingClientRect();
+    return { listRight: l.right, edLeft: e.left, listTop: l.top, edTop: e.top, actsBottom: a.bottom, vh: window.innerHeight, listScroll: document.querySelector('.sp-list').scrollTop,
+      on: document.querySelector('.spine-row.on') ? document.querySelector('.spine-row.on').dataset.open : null };
+  });
+  check(r, 'at 1440 the editor opens beside the list, level with it', side.edLeft >= side.listRight && Math.abs(side.edTop - side.listTop) < 8, side);
+  check(r, 'the open row is highlighted, and the list kept its place', side.on === picked && side.listScroll > 400, { picked, ...side });
+  check(r, 'the editor has its own scroll and its Save bar is in view at the bottom', (await page.locator('#spineEd').evaluate(el => getComputedStyle(el).overflowY === 'auto' && el.scrollHeight > el.clientHeight + 300)) && side.actsBottom <= side.vh && side.actsBottom > side.vh - 80, side);
+  await page.locator('#spineEd').evaluate(el => { el.scrollTop = 500; });
+  await page.evaluate(() => renderExercises()); await L.settle(page, 200);
+  check(r, 'a redraw keeps both scroll positions', (await page.locator('#spineEd').evaluate(el => el.scrollTop)) === 500 && (await list.evaluate(el => el.scrollTop)) > 400, '');
+  const before = await page.evaluate(() => document.querySelector('.sp-list').scrollTop);
+  log.dialogs.length = 0;
+  await page.locator('.spine-row.on button[data-open]').click(); await L.settle(page, 200);
+  check(r, 'tapping the open row does nothing', !log.dialogs.length && (await page.locator('#spineEd').evaluate(el => el.scrollTop)) === 500 && (await page.locator('#spineEd').count()) === 1, log.dialogs);
+  // typed work: another row asks first and a No keeps the editor and the typing
+  await page.locator('[data-sf=purpose]').fill('Typed beside the list');
+  const other = await page.evaluate(id => [...document.querySelectorAll('.sp-list .spine-row')].map(x => x.dataset.open).find(x => x !== id), picked);
+  await page.locator(`.spine-row[data-open="${other}"] button[data-open]`).click({ force: true }); await L.settle(page, 300);
+  check(r, 'another row asks first, and a No keeps this editor and the typing', log.dialogs.some(x => x.type === 'confirm' && /unsaved changes/.test(x.message)) && (await page.locator('[data-sf=purpose]').inputValue()) === 'Typed beside the list' && (await page.evaluate(() => document.querySelector('.spine-row.on').dataset.open)) === picked, log.dialogs);
+  // a filter or a search does not close the editor or lose the typing
+  await page.locator('#spineQ').fill('bulk lift 0'); await L.settle(page, 300);
+  check(r, 'a search keeps the editor and the typing', (await page.locator('[data-sf=purpose]').inputValue()) === 'Typed beside the list', '');
+  await page.locator('#spineQ').fill(''); await L.settle(page, 200);
+
+  // 4. leaving a sub-tab with typed work asks, and a No stays put with the typing
+  log.dialogs.length = 0;
+  await page.locator('.sp-subrail .stab', { hasText: 'Qualities' }).click(); await L.settle(page, 400);
+  check(r, 'switching to Qualities with unsaved typing asks, and a No stays on Entries with the typing', log.dialogs.some(x => x.type === 'confirm') && /#exercises$/.test(url()) && (await page.locator('[data-sf=purpose]').inputValue()) === 'Typed beside the list', { url: url(), dialogs: log.dialogs });
+  log.dialogs.length = 0;
+  await page.evaluate(() => { location.hash = 'exercises/coverage'; }); await L.settle(page, 400);
+  check(r, 'so does a link to Coverage', log.dialogs.some(x => x.type === 'confirm') && /#exercises$/.test(url()), { url: url(), dialogs: log.dialogs });
+  log.dialogs.length = 0;
+  await page.evaluate(() => { location.hash = 'today'; }); await L.settle(page, 400);
+  check(r, 'leaving the tab still asks', log.dialogs.some(x => x.type === 'confirm') && /#exercises$/.test(url()), { url: url(), dialogs: log.dialogs });
+  // a Yes: the typing is dropped, and Entries comes back with the entry as saved
+  page.removeAllListeners('dialog'); page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await d.accept().catch(() => {}); });
+  log.dialogs.length = 0;
+  await page.locator('.sp-subrail .stab', { hasText: 'Qualities' }).click(); await L.settle(page, 400);
+  check(r, 'a Yes goes to Qualities', /#exercises\/qualities$/.test(url()) && (await page.locator('.qm-row').count()) === 10 && (await page.locator('#spineEd').count()) === 0, url());
+  await page.locator('.sp-subrail .stab', { hasText: 'Entries' }).click(); await L.settle(page, 400);
+  check(r, 'back on Entries the entry is open again, as saved (the typing was dropped)', (await page.locator('[data-sf=purpose]').count()) === 1 && (await page.locator('[data-sf=purpose]').inputValue()) !== 'Typed beside the list', '');
+  // typed quality text: leaving that sub-tab asks, too
+  dismissDialogs(page, log);
+  await page.locator('.sp-subrail .stab', { hasText: 'Qualities' }).click(); await L.settle(page, 400);
+  await page.locator('[data-qf="strength:line"]').fill('Typed quality line');
+  log.dialogs.length = 0;
+  await page.evaluate(() => { location.hash = 'exercises'; }); await L.settle(page, 400);
+  check(r, 'leaving Qualities with a typed line asks, and a No keeps it', log.dialogs.some(x => x.type === 'confirm') && /#exercises\/qualities$/.test(url()) && (await page.locator('[data-qf="strength:line"]').inputValue()) === 'Typed quality line', { url: url(), dialogs: log.dialogs });
+  page.removeAllListeners('dialog'); page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await d.accept().catch(() => {}); });
+  await page.evaluate(() => { location.hash = 'exercises'; }); await L.settle(page, 400);   // a Yes: Entries, the typed line dropped
+  await page.locator('.sp-close').first().click(); await L.settle(page, 300);
+  check(r, 'Close closes it, and the empty state is back', (await page.locator('#spineEd').count()) === 0 && (await vis('.sp-empty')), '');
+
+  // 5. a phone: the editor takes the list's place, with "← All exercises"
+  await page.setViewportSize({ width: 390, height: 844 }); await L.settle(page, 400);
+  check(r, 'at 390 the list is full width and the empty state is not shown', (await page.locator('.sp-listpane').evaluate(el => el.getBoundingClientRect().width)) > 340 && !(await vis('.sp-empty')) && !(await vis('.sp-back')), '');
+  await page.evaluate(() => window.scrollTo({ top: 900, behavior: 'instant' }));
+  const y1 = await page.evaluate(() => window.scrollY);
+  const pick2 = await page.evaluate(() => {
+    const row = [...document.querySelectorAll('.sp-list .spine-row')].find(x => x.getBoundingClientRect().top > 160 && x.getBoundingClientRect().bottom < innerHeight);
+    row.querySelector('button[data-open]').click(); return row.dataset.open;
+  });
+  await page.locator('#spineEd').waitFor(); await L.settle(page, 300);
+  const ph = await page.evaluate(() => ({ listShown: !!document.querySelector('.sp-listpane') && getComputedStyle(document.querySelector('.sp-listpane')).display !== 'none', backTop: document.querySelector('.sp-back').getBoundingClientRect().top,
+    backShown: getComputedStyle(document.querySelector('.sp-back')).display !== 'none', edW: document.getElementById('spineEd').getBoundingClientRect().width, vw: innerWidth }));
+  check(r, 'the editor replaces the list at full width, with ← All exercises in view at the top', !ph.listShown && ph.backShown && ph.backTop >= 0 && ph.backTop < 150 && ph.edW > 340 && ph.edW <= ph.vw, ph);
+  check(r, '...and the page has no sideways scroll', await noOverflow(), '');
+  await page.locator('[data-sf=purpose]').fill('Typed on a phone');
+  log.dialogs.length = 0; dismissDialogs(page, log);
+  await page.locator('.sp-back').click(); await L.settle(page, 300);
+  check(r, '← All exercises asks like Close does, and a No keeps the editor and the typing', log.dialogs.some(x => x.type === 'confirm') && (await page.locator('[data-sf=purpose]').inputValue()) === 'Typed on a phone', log.dialogs);
+  page.removeAllListeners('dialog'); page.on('dialog', async d => { log.dialogs.push({ type: d.type(), message: d.message() }); await d.accept().catch(() => {}); });
+  await page.locator('.sp-back').click(); await L.settle(page, 400);
+  const y2 = await page.evaluate(() => window.scrollY);
+  check(r, 'a Yes brings the list back, where it was', (await page.locator('#spineEd').count()) === 0 && (await vis('.sp-listpane')) && Math.abs(y2 - y1) < 6, { y1, y2 });
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 700 }); await L.settle(page, 300);
+    const res = {};
+    res.entries = await noOverflow();
+    await page.locator(`button[data-open="${pick2}"]`).click({ force: true }); await page.locator('#spineEd').waitFor(); await L.settle(page, 200);
+    res.editor = await noOverflow();
+    await page.locator('.sp-back').click(); await L.settle(page, 200);
+    await page.locator('.sp-subrail .stab', { hasText: 'Qualities' }).click(); await L.settle(page, 300);
+    res.qualities = await noOverflow();
+    await page.locator('.sp-subrail .stab', { hasText: 'Coverage' }).click(); await L.settle(page, 300);
+    res.coverage = await noOverflow();
+    await page.locator('.sp-subrail .stab', { hasText: 'Entries' }).click(); await L.settle(page, 300);
+    check(r, `no sideways scroll at ${w}px on Entries, an open entry, Qualities or Coverage`, Object.values(res).every(Boolean), res);
+  }
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 S['levels-in-place'] = async (b) => {
   const r = { id: 'levels-in-place', title: 'The Proof levels arrive without redrawing the page that is already on screen', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'athletes', seed: { stub: { delay: { coach_season_levels: 1500 } } } });
@@ -2680,6 +3382,8 @@ for (const [tab, P, fn, table, urlPart] of [['course', 'tp', 'tps-login', 'tps_a
     let calls = await fnCalls(n0);
     check(r, 'Create calls the login function once even on a double tap, with the username and the note', calls.length === 1 && calls[0].payload.action === 'create' && calls[0].payload.username === 'new_buyer' && calls[0].payload.label === 'who bought it', calls.map(c => c.payload));
     check(r, 'the new login is in the list with its stored password and a Copy message button', (await row('new_buyer').locator('.credpass').count()) === 1 && (await row('new_buyer').locator('.' + P + '-copy').count()) === 1, '');
+    const rowBtns = async cls => (await row('new_buyer').locator(cls.map(c => '.' + P + '-' + c).join(', ')).count());
+    check(r, 'a row with a password waiting shows Copy message (the primary button), Mark sent and Manage, and none of Change password, Revoke or Erase…', (await row('new_buyer').locator('.' + P + '-copy.primary').count()) === 1 && (await rowBtns(['sent'])) === 1 && (await rowBtns(['manage'])) === 1 && (await rowBtns(['pw', 'act', 'erase'])) === 0, '');
     const msg = await clip();
     check(r, 'the Farsi message with the link, username and password is on the clipboard', msg.includes(urlPart) && msg.includes('new_buyer') && /رمز عبور/.test(msg), msg.slice(0, 120));
     check(r, 'the page says Login created for them', /Login created for new_buyer/.test(await L.toastText(page)), await L.toastText(page));
@@ -2693,6 +3397,16 @@ for (const [tab, P, fn, table, urlPart] of [['course', 'tp', 'tps-login', 'tps_a
     const upd = lastOf(await L.callsSince(page, n0), isUpd(table));
     check(r, 'Mark sent clears the stored password and stamps sent, for that username', !!upd && upd.payload.initial_password === null && !!upd.payload.sent_at && upd.filters.some(f => /^username\.eq\./.test(f)), upd && upd.payload);
     check(r, 'the row now says sent and has no password or Copy message', /sent \d{4}-\d{2}-\d{2}/.test((await row('new_buyer').innerText()).replace(/\s+/g, ' ')) && (await row('new_buyer').locator('.credpass').count()) === 0, (await row('new_buyer').innerText()).replace(/\s+/g, ' '));
+    // Change password, Revoke and Erase… sit behind Manage; it stays open through a redraw
+    const mg = row('new_buyer').locator('.' + P + '-manage');
+    check(r, 'a row with nothing to send shows only Manage, folded: Change password, Revoke and Erase… are not on it yet', (await rowBtns(['manage'])) === 1 && (await rowBtns(['pw', 'act', 'erase', 'copy', 'sent'])) === 0 && (await mg.getAttribute('aria-expanded')) === 'false', '');
+    await mg.click(); await L.settle(page, 300);
+    check(r, 'Manage opens Change password, Revoke and Erase… under the row, and says it is expanded', (await rowBtns(['pw'])) === 1 && (await rowBtns(['act'])) === 1 && (await rowBtns(['erase'])) === 1 && (await mg.getAttribute('aria-expanded')) === 'true', '');
+    await page.evaluate(() => render()); await L.settle(page, 200);
+    check(r, 'it is still open after the page redraws', (await rowBtns(['pw', 'act', 'erase'])) === 3 && (await mg.getAttribute('aria-expanded')) === 'true', '');
+    await mg.click(); await L.settle(page, 200);
+    check(r, 'a second tap on Manage folds it again', (await rowBtns(['pw', 'act', 'erase'])) === 0 && (await mg.getAttribute('aria-expanded')) === 'false', '');
+    await mg.click(); await L.settle(page, 200);
     // change the password: a typed one, then the function's
     await row('new_buyer').locator('.' + P + '-pw').click(); await L.settle(page, 300);
     check(r, 'Change password opens a form under the row, focused', (await page.locator('.' + P + '-pwin').count()) === 1 && await page.evaluate(sel => document.activeElement && document.activeElement.matches(sel), '.' + P + '-pwin'), '');
@@ -2702,6 +3416,8 @@ for (const [tab, P, fn, table, urlPart] of [['course', 'tp', 'tps-login', 'tps_a
     calls = await fnCalls(n0);
     check(r, 'Save password calls reset with the typed password', calls.length === 1 && calls[0].payload.action === 'reset' && calls[0].payload.username === 'new_buyer' && calls[0].payload.password === 'AbcdEfgh12', calls.map(c => c.payload));
     check(r, 'and says Password changed', /Password changed for new_buyer/.test(await L.toastText(page)), await L.toastText(page));
+    check(r, 'a finished action folds Manage again (the row has a new password to send: Copy message, Mark sent and Manage)', (await rowBtns(['pw', 'act', 'erase'])) === 0 && (await rowBtns(['copy', 'sent', 'manage'])) === 3, '');
+    await mg.click(); await L.settle(page, 200);
     await row('new_buyer').locator('.' + P + '-pw').click(); await L.settle(page, 300);
     await page.locator('.' + P + '-pwin').fill('short');
     n0 = await L.nCalls(page);
@@ -2709,12 +3425,16 @@ for (const [tab, P, fn, table, urlPart] of [['course', 'tp', 'tps-login', 'tps_a
     check(r, 'a password that breaks the rule is refused before the function is called', (await fnCalls(n0)).length === 0 && /8/.test(await L.failText(page)), await L.failText(page));
     await page.evaluate(() => failDismissAll());
     await page.locator('.' + P + '-pwcancel').click(); await L.settle(page, 300);
+    check(r, 'Cancel closes the password form and leaves Manage open', (await page.locator('.' + P + '-pwin').count()) === 0 && (await rowBtns(['pw', 'act', 'erase'])) === 3, '');
     // revoke and restore
     n0 = await L.nCalls(page);
     await row('new_buyer').locator('.' + P + '-act').click(); await L.settle(page, 800);
     calls = await fnCalls(n0);
     check(r, 'Revoke (after the confirm) calls revoke, and the login moves to Revoked', calls.length === 1 && calls[0].payload.action === 'revoke' && /new_buyer revoked/.test(await L.toastText(page)), { calls: calls.map(c => c.payload), toast: await L.toastText(page) });
     await page.evaluate(() => { document.querySelectorAll('#content details').forEach(d => { d.open = true; }); });
+    check(r, 'a revoked row shows Restore and Manage; Manage holds only Erase… (no Revoke, no Change password), and keeps the Revoked section open', (await row('new_buyer').locator('.' + P + '-pw').innerText()) === 'Restore' && (await rowBtns(['manage'])) === 1 && (await rowBtns(['act', 'erase'])) === 0, '');
+    await row('new_buyer').locator('.' + P + '-manage').click(); await L.settle(page, 300);
+    check(r, '...and opening it shows Erase… alone, with the Revoked section still open', (await rowBtns(['erase'])) === 1 && (await rowBtns(['act'])) === 0 && (await rowBtns(['pw'])) === 1 && await row('new_buyer').isVisible(), '');
     await row('new_buyer').locator('.' + P + '-pw').click(); await L.settle(page, 300);
     n0 = await L.nCalls(page);
     await page.locator('.' + P + '-pwsave').click(); await L.settle(page, 800);
@@ -2807,18 +3527,22 @@ S['library-publish-guards'] = async (b) => {
 S['file-preview-wording'] = async (b) => {
   const r = { id: 'file-preview-wording', title: 'The File tab says the preview shows the programme only, and the preview bar in program.html says the same', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'a/ava_test/file' });
+  // Since 2026-10-12 Their app is a row of Contact and access: its one-line hint is on the row and its full explanation (what the preview
+  // shows and does not) is the group's How this works, one tap away. textContent reads a folded fold too.
   const panel = await page.evaluate(() => {
-    const h = [...document.querySelectorAll('.sec')].find(x => /their app/i.test(x.innerText));   // the heading is drawn in capitals, which innerText returns
-    const p = h && h.nextElementSibling;
-    return p ? p.innerText.replace(/\s+/g, ' ').trim() : '';
+    const row = [...document.querySelectorAll('.frow')].find(x => /their app/i.test(x.querySelector('.frow-l').textContent));
+    const how = document.getElementById('how-contact');
+    const theirs = how ? [...how.querySelectorAll('p')].find(p => /their app/i.test(p.textContent)) : null;
+    return ((row ? row.innerText : '') + ' ' + (theirs ? theirs.textContent : '')).replace(/\s+/g, ' ').trim();
   });
   check(r, 'the File tab does not promise "their real data" or "exactly as they see it"', !!panel && !/real data|exactly as they see/i.test(panel), panel);
   check(r, 'it says the preview shows the programme only', /programme only/.test(panel), panel);
   check(r, 'it says what is not in it (sets, weights, records, habits) and where to read that (The work and Proof)', /sets, weights, records, habits/.test(panel) && /The work and Proof/.test(panel), panel);
   // The two buttons still open the read-only preview of this athlete.
   await page.evaluate(() => { window.__opened = []; window.open = u => { window.__opened.push(String(u)); return null; }; });
-  await page.getByRole('button', { name: 'View their app' }).click();
-  await page.getByRole('button', { name: 'View their Proof' }).click();
+  // (The header carries a View their app too, on every sub-tab: these are the File's own two buttons.)
+  await page.locator('#tabbody').getByRole('button', { name: 'View their app' }).click();
+  await page.locator('#tabbody').getByRole('button', { name: 'View their Proof' }).click();
   const opened = await page.evaluate(() => window.__opened);
   check(r, 'View their app opens program.html for that athlete in preview mode', /\/program\.html\?client=ava_test&preview=1$/.test(opened[0] || ''), opened);
   check(r, 'View their Proof opens habits.html for that athlete in preview mode', /\/habits\.html\?client=ava_test&preview=1$/.test(opened[1] || ''), opened);
@@ -2927,12 +3651,16 @@ S['session-hide-no-false-warning'] = async (b) => {
 
 // ── What became of an application (audit FLOW-17, SPINE-11; pile A8, stage61; 2026-10-11) ───────────────────────────────────────────────────
 S['intake-outcome'] = async (b) => {
-  const r = { id: 'intake-outcome', title: "Intake: an application records what happened and the athlete it became; the athlete's File says where they came from", checks: [] };
-  const { page, log } = await L.openCoach(b, { hash: 'intake' });
-  const card = name => page.locator('.intake-card', { hasText: name });
-  const badge = async () => (await page.locator('#rail a.tab', { hasText: 'Intake' }).innerText()).replace(/\s+/g, ' ');
+  const r = { id: 'intake-outcome', title: "Leads → Applications: an application records what happened and the athlete it became; the athlete's File says where they came from and opens that application", checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'intake' });   // the old address: it lands on Leads
+  // (2026-10-12, round 2: the application on show is the detail on the right, chosen from the list; its row wears the outcome pill and says which group it is in.)
+  const row = name => page.locator('.in-row', { hasText: name });
+  const choose = async name => { await row(name).click(); await L.settle(page, 200); };
+  const detail = page.locator('.in-detail');
+  const badge = async () => (await page.locator('#rail a.tab', { hasText: 'Leads' }).innerText()).replace(/\s+/g, ' ');
   const b0 = await badge();
-  const one = card('Fixture Applicant One');
+  const one = detail;       // the newest new application is on show when the tab opens: Fixture Applicant One
+  check(r, 'the application on show when the tab opens is Fixture Applicant One', /Fixture Applicant One/.test(await detail.locator('.in-title').textContent()), await detail.locator('.in-title').textContent());
   // 1. a client needs an athlete
   await one.locator('.i-out-sel').selectOption('client');
   check(r, 'choosing "Became a client" shows the athlete picker', await one.locator('.i-who').isVisible(), '');
@@ -2944,11 +3672,12 @@ S['intake-outcome'] = async (b) => {
   await one.locator('.intake-outcome-save').click(); await L.settle(page, 900);
   const c1 = lastOf(await L.callsSince(page, n0), c => c.name === 'set_intake_outcome');
   check(r, 'one set_intake_outcome(id, client, ava_test)', !!c1 && /1a1$/.test(c1.payload.p_id) && c1.payload.p_outcome === 'client' && c1.payload.p_athlete_id === 'ava_test', c1 && c1.payload);
-  const t1 = (await one.evaluate(el => el.textContent)).replace(/\s+/g, ' ');      // textContent: the card is folded, its body is not drawn
-  check(r, 'the card moved to Handled, wears the outcome as a pill, names the athlete, and the Intake badge dropped', /handled/.test(await one.getAttribute('class')) && /Became a client/.test(t1) && /Ava Example/.test(t1) && (await badge()) !== b0, { cls: await one.getAttribute('class'), t1: t1.slice(0, 200), badge: await badge() });
+  const t1 = (await row('Fixture Applicant One').evaluate(el => el.textContent) + ' ' + await one.evaluate(el => el.textContent)).replace(/\s+/g, ' ');   // the row wears the pill, the detail names the athlete
+  check(r, 'it moved to Handled (and stays on show), its row wears the outcome as a pill, the detail names the athlete, and the Leads badge dropped', (await row('Fixture Applicant One').getAttribute('data-st')) === 'handled' && /Became a client/.test(await row('Fixture Applicant One').innerText()) && /Ava Example/.test(await one.innerText()) && (await badge()) !== b0, { st: await row('Fixture Applicant One').getAttribute('data-st'), t1: t1.slice(0, 200), badge: await badge() });
   check(r, 'the server row holds the link and the outcome, and marked the application handled', await page.evaluate(() => { const i = window.__DB.hab_intake.find(x => /1a1$/.test(x.id)); return i.athlete_id === 'ava_test' && i.outcome === 'client' && i.status === 'handled' && !!i.linked_at; }), '');
   // 2. an outcome that keeps no athlete
-  const two = card('Fixture Applicant Two');
+  await choose('Fixture Applicant Two');
+  const two = detail;
   await two.locator('.i-out-sel').selectOption('not_a_fit');
   check(r, 'a "Not a fit" has no athlete picker', !(await two.locator('.i-who').isVisible()), '');
   n0 = await L.nCalls(page);
@@ -2957,32 +3686,156 @@ S['intake-outcome'] = async (b) => {
   check(r, 'it is saved with no athlete', !!c2 && c2.payload.p_outcome === 'not_a_fit' && c2.payload.p_athlete_id === null, c2 && c2.payload);
   // 3. the athlete's File says where they came from
   await L.go(page, 'a/ava_test/file'); await L.settle(page, 700);
-  const meta = (await page.locator('.meta-table').first().innerText()).replace(/\s+/g, ' ');
-  check(r, 'the File says "Came from" the application, its programme and its outcome, with a link to Intake', /came from/i.test(meta) && /Set — \$180/.test(meta) && /Became a client/.test(meta) && (await page.locator('.meta-table a[href="#intake"]').count()) === 1, meta.slice(0, 400));
+  // (2026-10-12: Came from is a row of Contact and access, no longer a line of the Program file table.)
+  const cameRow = page.locator('.frow', { has: page.locator('.frow-l', { hasText: /^came from$/i }) });
+  const meta = (await cameRow.first().innerText()).replace(/\s+/g, ' ');
+  check(r, 'the File says "Came from" the application, its programme and its outcome, with a link that opens it in Leads', /came from/i.test(meta) && /Set — \$180/.test(meta) && /Became a client/.test(meta) && (await cameRow.locator('a[href="#leads"]').count()) === 1, meta.slice(0, 400));
+  await cameRow.locator('a[href="#leads"]').first().click(); await L.settle(page, 700);
+  check(r, 'the link goes to Leads with THAT application on show (Application One, not the Two chosen a moment ago)', (await page.evaluate(() => location.hash)) === '#leads' && /Fixture Applicant One/.test(await detail.locator('.in-title').textContent()), { hash: await page.evaluate(() => location.hash), shown: await detail.locator('.in-title').textContent() });
   // 4. clearing it
-  await L.go(page, 'intake'); await L.settle(page, 500);
-  await card('Fixture Applicant One').locator('summary').click();
-  await card('Fixture Applicant One').locator('.i-out-sel').selectOption('');
+  await L.go(page, 'leads'); await L.settle(page, 500);
+  await choose('Fixture Applicant One');
+  await detail.locator('.i-out-sel').selectOption('');
   n0 = await L.nCalls(page);
-  await card('Fixture Applicant One').locator('.intake-outcome-save').click(); await L.settle(page, 900);
+  await detail.locator('.intake-outcome-save').click(); await L.settle(page, 900);
   const c3 = lastOf(await L.callsSince(page, n0), c => c.name === 'set_intake_outcome');
   check(r, 'clearing sends a null outcome and no athlete', !!c3 && c3.payload.p_outcome === null && c3.payload.p_athlete_id === null, c3 && c3.payload);
   await L.go(page, 'a/ava_test/file'); await L.settle(page, 700);
-  check(r, 'and the File no longer says where they came from', !/came from/i.test(await page.locator('.meta-table').first().innerText()), '');
+  check(r, 'and the File no longer says where they came from', !/came from/i.test(await page.locator('#tabbody').innerText()), '');
   // 5. a server without stage61
   await L.go(page, 'intake'); await L.settle(page, 500);
   await page.evaluate(() => { window.__STUB.missingRpc = ['set_intake_outcome']; });
-  await card('Fixture Applicant One').locator('summary').click();      // a handled card is folded after every redraw
-  await card('Fixture Applicant One').locator('.i-out-sel').selectOption('declined');
-  await card('Fixture Applicant One').locator('.intake-outcome-save').click(); await L.settle(page, 700);
+  await choose('Fixture Applicant One');
+  await detail.locator('.i-out-sel').selectOption('declined');
+  await detail.locator('.intake-outcome-save').click(); await L.settle(page, 700);
   check(r, 'a server that has not had stage61 says so, in words', /set_intake_outcome yet/.test(await L.failText(page)) && /stage61/.test(await L.failText(page)), await L.failText(page));
   // 6. the likely athlete is suggested, never saved on its own
   await page.evaluate(() => { window.__STUB.missingRpc = []; window.__DB.hab_intake.push({ id: 'guess-1', created_at: new Date().toISOString(), lang: 'en', name: 'Ava  Example', email: '', contact: '', programme: 'Set', payload: {}, status: 'new', handled_at: null }); return hardRefresh(); });
   await L.settle(page, 900); await L.go(page, 'intake'); await L.settle(page, 500);
+  await page.locator('.in-row[data-id="guess-1"]').click(); await L.settle(page, 200);
   check(r, 'an application with the same full name as one athlete has that athlete pre-selected', (await page.locator('.i-outcome[data-id="guess-1"] .i-ath-sel').inputValue()) === 'ava_test', await page.locator('.i-outcome[data-id="guess-1"] .i-ath-sel').inputValue());
   check(r, '...and a saved outcome is only what the coach saved (nothing was sent for it)', await page.evaluate(() => { const i = window.__DB.hab_intake.find(x => x.id === 'guess-1'); return !i.athlete_id && !i.outcome; }), '');
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();
+  return r;
+};
+
+// ── The Intake tab as a list and a detail (round 2 of the coach UX pass; 2026-10-12) ─────────────────────────────────────────────────────────
+S['intake-list-detail'] = async (b) => {
+  const r = { id: 'intake-list-detail', title: 'Intake: the list and the chosen application side by side at 1440, one at a time below 1000 px, a Farsi answer in its own right-to-left cell, one primary button in the closing row', checks: [] };
+  const { page, log } = await L.openCoach(b, { hash: 'intake' });
+  await page.setViewportSize({ width: 1440, height: 900 }); await L.settle(page, 300);
+  const row = name => page.locator('.in-row', { hasText: name });
+  const title = async () => ((await page.locator('.in-detail .in-title').textContent()) || '').trim();
+  const box = sel => page.locator(sel).first().boundingBox();
+  const heads = async () => (await page.locator('.in-list .in-gh').allInnerTexts()).map(t => t.replace(/\s+/g, ' ').trim());
+  const grp = name => row(name).getAttribute('data-st');
+  const quiet = async () => (await page.locator('.in-detail .in-quiet .btn').allInnerTexts()).map(t => t.trim());
+  const noOverflow = () => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+  // 1. side by side; the newest new application is on show
+  const lb = await box('.in-list'), db = await box('.in-detail');
+  check(r, 'at 1440 the list (about 320 px wide) and the application stand side by side, tops level', !!lb && !!db && lb.width > 300 && lb.width < 340 && db.x >= lb.x + lb.width && Math.abs(db.y - lb.y) < 4, { lb, db });
+  check(r, 'the newest NEW application (Fixture Applicant One, not the older new one or the handled one) is on show and its row is marked', /^Fixture Applicant One$/.test(await title()), await title());
+  check(r, '...the row says so too (aria-current), and no other row does', (await row('Fixture Applicant One').getAttribute('aria-current')) === 'true' && (await page.locator('.in-row[aria-current]').count()) === 1, '');
+  check(r, 'the list has the groups New · 2 and Handled · 1', JSON.stringify(await heads()) === JSON.stringify(['New · 2', 'Handled · 1']), await heads());
+  // more applications: a Farsi one (the newest), an archived one
+  await page.evaluate(() => {
+    const now = Date.now();
+    window.__DB.hab_intake.push(
+      { id: 'fa-1', created_at: new Date(now - 3600e3).toISOString(), lang: 'fa', name: 'سارا محمدی', email: 'sara.fa@example.invalid', contact: '۰۹۱۲۱۲۳۴۵۶۷', programme: 'Set — $180 / 3 months',
+        payload: { 'Age': '29', 'Goals': ['قدرت سرویس', 'استقامت'], 'Current Injury': 'درد شانه راست', 'Level': 'Club', 'Notes': 'من هفته های گذشته بعد از تمرین سنگین سرویس درد دارم و میخوام برنامه ای بگیرم که با سرک من سازگار باشد و بتونم هفته ای چهار روز تمرین کنم' }, status: 'new', handled_at: null },
+      { id: 'arch-1', created_at: new Date(now - 12 * 86400e3).toISOString(), lang: 'en', name: 'Fixture Archived', email: 'arch@example.invalid', contact: '', programme: null, payload: { 'Location': 'Nowhere' }, status: 'archived', handled_at: new Date(now - 11 * 86400e3).toISOString() });
+    return hardRefresh();
+  });
+  await L.settle(page, 900);
+  check(r, 'a newer application arriving does not take the screen away from the one on show', /Fixture Applicant One/i.test(await title()), await title());
+  check(r, 'the groups are New · 3, Handled · 1 and a FOLDED Archived · 1', JSON.stringify(await heads()) === JSON.stringify(['New · 3', 'Handled · 1', 'Archived · 1']) && !(await page.locator('.in-arch').evaluate(d => d.open)) && !(await row('Fixture Archived').isVisible()), await heads());
+  const rowText = (await row('Fixture Applicant One').innerText()).replace(/\s+/g, ' ');
+  check(r, 'a row carries initials, the EN or FA pill, the programme in short and when it arrived', /^FO$/.test((await row('Fixture Applicant One').locator('.ava').innerText()).trim()) && /EN/.test(rowText) && /Set/.test(rowText) && !/\$180/.test(rowText) && /today|yesterday|days ago/.test(rowText), rowText);
+  // 2. choosing another shows it
+  await row('Fixture Applicant Two').click(); await L.settle(page, 250);
+  check(r, 'choosing another application shows it, and the mark moves', /Fixture Applicant Two/i.test(await title()) && (await row('Fixture Applicant Two').getAttribute('aria-current')) === 'true' && !(await row('Fixture Applicant One').getAttribute('aria-current')), await title());
+  // 3. the choice survives a redraw and a status change
+  await page.evaluate(() => hardRefresh()); await L.settle(page, 900);
+  check(r, 'the choice survives a reload of the data', /Fixture Applicant Two/i.test(await title()), await title());
+  const n0 = await L.nCalls(page);
+  await page.locator('.in-detail .intake-act[data-to=handled]').click(); await L.settle(page, 500);
+  check(r, 'Mark handled sends the status and nothing else', (await L.callsSince(page, n0)).filter(c => c.kind === 'rpc' && /^set_intake/.test(c.name)).map(c => c.name).join() === 'set_intake_status', (await L.callsSince(page, n0)).map(c => c.name));
+  check(r, '...it moves to Handled but stays on show', (await grp('Fixture Applicant Two')) === 'handled' && /Fixture Applicant Two/i.test(await title()) && JSON.stringify(await heads()) === JSON.stringify(['New · 2', 'Handled · 2', 'Archived · 1']), { grp: await grp('Fixture Applicant Two'), title: await title(), heads: await heads() });
+  check(r, '...and, now handled, its quiet buttons are Reopen and Archive (no Mark handled)', JSON.stringify(await quiet()) === JSON.stringify(['Reopen', 'Archive']), await quiet());
+  // 4. a Farsi application: each answer in its own cell, right-to-left inside it
+  await row('سارا محمدی').click(); await L.settle(page, 250);
+  const geo = await page.evaluate(() => {
+    const pane = document.querySelector('.in-detail').getBoundingClientRect();
+    const qs = [...document.querySelectorAll('.in-detail .in-q')].map(q => {
+      const dt = q.querySelector('dt').getBoundingClientRect(), dd = q.querySelector('dd'), d = dd.getBoundingClientRect(), qb = q.getBoundingClientRect(), cs = getComputedStyle(dd);
+      return { label: q.querySelector('dt').textContent, dir: dd.getAttribute('dir'), align: cs.textAlign, direction: cs.direction, long: q.classList.contains('long'), q: { x: qb.x, w: qb.width, top: qb.top }, dt: { r: dt.right }, dd: { x: d.x, r: d.right } };
+    });
+    return { pane: { x: pane.x, w: pane.width }, qs };
+  });
+  const rtl = geo.qs.filter(q => q.dir === 'rtl'), notRtl = geo.qs.filter(q => q.dir !== 'rtl');
+  check(r, 'the Farsi answers (goals, injury, notes) carry dir=rtl and are right-aligned; the Latin ones (age, level) do not', rtl.length === 3 && rtl.every(q => q.direction === 'rtl' && q.align === 'right') && notRtl.length === 2 && notRtl.every(q => q.direction === 'ltr' && q.align !== 'right'), geo.qs.map(q => [q.label, q.dir, q.align]));
+  check(r, 'each answer sits inside its own cell pair, to the right of its label, and a short answer\'s pair is half the pane, so it is not pushed to the far edge', geo.qs.filter(q => !q.long).every(q => q.dd.x >= q.dt.r - 1 && q.dd.r <= q.q.x + q.q.w + 1 && q.q.w < geo.pane.w * 0.55), geo.qs.map(q => [q.label, Math.round(q.q.w), Math.round(q.dd.r)]));
+  const pairs = geo.qs.filter(q => !q.long);
+  check(r, 'two pairs to a row on a wide screen (the first two share a top and are side by side); a long answer takes the whole row', pairs.length >= 2 && Math.abs(pairs[0].q.top - pairs[1].q.top) < 2 && pairs[1].q.x > pairs[0].q.x + 100 && geo.qs.some(q => q.long && q.q.w > geo.pane.w * 0.8), pairs.slice(0, 2).map(q => q.q));
+  const email = await page.locator('.in-contact a[href^="mailto:"]').count(), wa = await page.locator('.in-contact a[href^="https://wa.me/"]').getAttribute('href');
+  check(r, 'the contact row has the email (mailto), a WhatsApp link built from the Persian digits, and a Copy beside each', email === 1 && wa === 'https://wa.me/989121234567' && (await page.locator('.in-contact .copy-btn-js').count()) === 2, wa);
+  // 5. one way to close: Save outcome is the only primary button; the quiet ones sit beside it
+  check(r, 'in the closing row Save outcome is the only primary button', (await page.locator('.in-detail .i-outcome .btn.primary').count()) === 1 && (await page.locator('.in-detail .i-outcome .btn.primary.intake-outcome-save').count()) === 1, '');
+  check(r, '...next to it, the quiet ones: Mark handled and Archive (a new application)', JSON.stringify(await quiet()) === JSON.stringify(['Mark handled', 'Archive']) && (await page.locator('.in-detail .in-quiet .btn.primary').count()) === 0, await quiet());
+  const sb = await box('.in-detail .intake-outcome-save'), mb = await box('.in-detail .intake-act[data-to=handled]');
+  check(r, '...all in one row (What happened, Save outcome and the quiet ones level)', Math.abs(sb.y - mb.y) < 4 && (await page.locator('.in-detail .i-out-sel').isVisible()), { sb, mb });
+  check(r, 'Which athlete shows only when the outcome keeps one', !(await page.locator('.in-detail .i-who').isVisible()) && (await page.locator('.in-detail .i-out-sel').selectOption('client'), await page.locator('.in-detail .i-who').isVisible()) && (await page.locator('.in-detail .i-out-sel').selectOption('not_a_fit'), !(await page.locator('.in-detail .i-who').isVisible())), '');
+  // 6. Mark handled (no outcome), Archive and Reopen still work
+  let n1 = await L.nCalls(page);
+  await page.locator('.in-detail .intake-act[data-to=handled]').click(); await L.settle(page, 500);
+  let cs = await L.callsSince(page, n1);
+  check(r, 'Mark handled closes it with NO outcome: one set_intake_status(handled), no set_intake_outcome', cs.filter(c => c.name === 'set_intake_status').length === 1 && cs.filter(c => c.name === 'set_intake_status')[0].payload.p_status === 'handled' && !cs.some(c => c.name === 'set_intake_outcome') && (await grp('سارا محمدی')) === 'handled', cs.map(c => c.name));
+  n1 = await L.nCalls(page);
+  await page.locator('.in-detail .intake-act[data-to=archived]').click(); await L.settle(page, 500);
+  cs = await L.callsSince(page, n1);
+  check(r, 'Archive → archived; the folded group opens so the one on show is not hidden, and the application is still on show', cs.filter(c => c.name === 'set_intake_status').length === 1 && (await grp('سارا محمدی')) === 'archived' && await page.locator('.in-arch').evaluate(d => d.open) && await row('سارا محمدی').isVisible() && (await title()) === 'سارا محمدی', await grp('سارا محمدی'));
+  check(r, '...an archived application offers only Reopen', JSON.stringify(await quiet()) === JSON.stringify(['Reopen']), await quiet());
+  n1 = await L.nCalls(page);
+  await page.locator('.in-detail .intake-act[data-to=new]').click(); await L.settle(page, 500);
+  check(r, 'Reopen → new again, back under New', (await grp('سارا محمدی')) === 'new' && JSON.stringify(await quiet()) === JSON.stringify(['Mark handled', 'Archive']), await grp('سارا محمدی'));
+  // 7. the list keeps its place when one is chosen (a long list scrolls by itself)
+  await page.evaluate(() => { const D = window.__DB; for (let n = 0; n < 40; n++) D.hab_intake.push({ id: 'bulk-' + n, created_at: new Date(Date.now() - (14 + n) * 86400e3).toISOString(), lang: 'en', name: 'Bulk ' + n, email: '', contact: '', programme: null, payload: {}, status: 'handled', handled_at: null }); return hardRefresh(); });
+  await L.settle(page, 900);
+  await page.evaluate(() => { document.querySelector('.in-list').scrollTop = 500; });
+  const sy0 = await page.evaluate(() => document.querySelector('.in-list').scrollTop);
+  const pick = page.locator('.in-row', { hasText: 'Bulk 9' }).first();
+  await pick.click(); await L.settle(page, 250);
+  const sy1 = await page.evaluate(() => document.querySelector('.in-list').scrollTop);
+  check(r, 'the list is its own scroll box on a wide screen, and choosing a row does not move it', sy0 > 300 && Math.abs(sy1 - sy0) < 3 && /Bulk 9/.test(await title()), { sy0, sy1 });
+  check(r, 'no horizontal overflow at 1440', await noOverflow(), '');
+  // 8. the 1000 px line
+  await page.setViewportSize({ width: 1000, height: 800 }); await L.settle(page, 250);
+  const l1 = await box('.in-list'), d1 = await box('.in-detail');
+  check(r, 'at 1000 px it is still a list beside the application', !!l1 && !!d1 && d1.x >= l1.x + l1.width - 1 && await noOverflow(), { l1, d1 });
+  // 9. below 1000 px: the list, then the application INSTEAD of it, with a way back (a fresh page: nothing chosen by hand yet)
+  await page.context().close();
+  for (const w of [999, 390, 320]) {
+    const o = await L.openCoach(b, { hash: 'intake' });
+    const p = o.page;
+    await p.evaluate(() => { const now = Date.now(); window.__DB.hab_intake.push({ id: 'fa-1', created_at: new Date(now - 3600e3).toISOString(), lang: 'fa', name: 'سارا محمدی', email: 'sara.fa.with.a.rather.long.address@example.invalid', contact: '۰۹۱۲۱۲۳۴۵۶۷', programme: 'Set — $180 / 3 months', payload: { 'Age': '29', 'Goals': ['قدرت سرویس', 'استقامت'], 'Notes': 'من هفته های گذشته بعد از تمرین سنگین سرویس درد دارم و میخوام برنامه ای بگیرم که با سرک من سازگار باشد و بتونم هفته ای چهار روز تمرین کنم' }, status: 'new', handled_at: null }); return hardRefresh(); });
+    await L.settle(p, 900);
+    await p.setViewportSize({ width: w, height: 844 }); await L.settle(p, 300);
+    const vis = sel => p.locator(sel).first().isVisible();
+    const ov = () => p.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+    check(r, `at ${w}: the list is the screen and the application is not drawn, with no horizontal overflow`, (await vis('.in-list')) && !(await vis('.in-detail')) && await ov(), '');
+    await p.locator('.in-row', { hasText: 'سارا محمدی' }).click(); await L.settle(p, 250);
+    check(r, `at ${w}: choosing one shows it INSTEAD of the list, with "← All applications" at the top`, !(await vis('.in-list')) && (await vis('.in-detail')) && /All applications/.test(await p.locator('.in-back').innerText()) && (await p.locator('.in-back').isVisible()), '');
+    await p.locator('.in-detail .i-out-sel').selectOption('client'); await L.settle(p, 100);
+    const g = await p.evaluate(() => { const qs = [...document.querySelectorAll('.in-detail .in-q')].map(q => q.getBoundingClientRect()); return { stacked: qs.length >= 2 && qs[1].top > qs[0].bottom - 1 && Math.abs(qs[0].left - qs[1].left) < 2, rtl: document.querySelectorAll('.in-detail dd[dir=rtl]').length }; });
+    // one question per row once the application itself is narrower than about 700 px; at 999 the full-width application is 900 px, so it keeps two
+    check(r, `at ${w}: ${w < 700 ? 'one question per row' : 'two questions to a row'}, the Farsi answers still right-to-left, the athlete picker open, and nothing runs off the screen`, g.stacked === (w < 700) && g.rtl >= 2 && await p.locator('.in-detail .i-who').isVisible() && await ov(), g);
+    await p.locator('.in-back').click(); await L.settle(p, 250);
+    check(r, `at ${w}: "← All applications" returns to the list`, (await vis('.in-list')) && !(await vis('.in-detail')) && (await p.locator('.in-row[aria-current]').count()) === 1, '');
+    check(r, `at ${w}: no page errors`, !o.log.errors.length, o.log.errors);
+    await p.context().close();
+  }
+  check(r, 'no page errors', !log.errors.length, log.errors);
   return r;
 };
 
@@ -2997,7 +3850,7 @@ S['erase-linked-form'] = async (b) => {
     return hardRefresh();
   });
   await L.settle(page, 900);
-  await L.go(page, 'a/zed_erase/file');
+  await L.go(page, 'a/zed_erase/file'); await openDanger(page);
   await page.locator('button', { hasText: /Erase completely/ }).click();
   await page.locator('.erase #eraseIn').waitFor();
   const t = await erasePanelText(page);
@@ -3047,8 +3900,8 @@ S['whatsapp-number'] = async (b) => {
   // 4. it is not a signup anywhere
   check(r, 'it is not a "new signup" reason', await page.evaluate(() => !reasonsOf(S.ath.ben_test).some(x => x.key === 'signup')), '');
   check(r, 'it gives them no Proof tab', !/proof/i.test(await page.locator('.subrail').innerText()), await page.locator('.subrail').innerText());
-  await L.go(page, 'proof'); await L.settle(page, 600);
-  check(r, 'and it is not in the Proof signup funnel', !/ben_test/.test(await page.locator('#content').innerText()) && /cara_free/.test(await page.locator('#content').innerText()), '');
+  await L.go(page, 'leads/signups'); await L.settle(page, 600);   // the signup funnel is Leads → Free signups since 2026-10-12
+  check(r, 'and it is not in the signup funnel (Leads → Free signups)', !/ben_test/.test(await page.locator('#content').innerText()) && /cara_free/.test(await page.locator('#content').innerText()), '');
   // 5. remove it
   await L.go(page, 'a/ben_test/file'); await L.settle(page, 500);
   n0 = await L.nCalls(page);
@@ -3159,7 +4012,7 @@ S['roster-demo-out'] = async (b) => {
 };
 
 S['tools-button'] = async (b) => {
-  const r = { id: 'tools-button', title: 'The roster starts under the filter chips: Coach tools, Logins to send and Create missing logins sit behind one ⚙ Tools button (360 px phone)', checks: [] };
+  const r = { id: 'tools-button', title: 'The roster starts under the filter chips: Coach tools, Logins to send and Create missing logins sit behind one ⚙ Tools button, now in the top bar (360 px phone)', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'athletes' });
   await page.setViewportSize({ width: 360, height: 780 });
   await page.evaluate(() => { window.__DB.athlete_identities = window.__DB.athlete_identities.filter(x => x.athlete_id !== 'ava_test'); return hardRefresh(); });   // a coached athlete with sessions and no login
@@ -3170,7 +4023,7 @@ S['tools-button'] = async (b) => {
   check(r, 'none of the tools is on screen: no Backup button, no Logins to send, no Create missing logins', !(await page.locator('details.tools button', { hasText: 'Backup' }).isVisible()) && !(await page.locator('.creds').isVisible()) && !(await page.locator('button', { hasText: /missing login/ }).isVisible()), '');
   await page.locator('#toolsBtn').click();
   check(r, 'the button opens the panel, and it holds Backup, Logins to send and Create 1 missing login', await page.locator('#toolsPanel').isVisible() && (await page.locator('#toolsBtn').getAttribute('aria-expanded')) === 'true' && await page.locator('details.tools button', { hasText: 'Backup' }).isVisible() && await page.locator('#toolsPanel .creds').isVisible() && await page.locator('#toolsPanel button', { hasText: 'Create 1 missing login' }).isVisible(), await page.locator('#toolsPanel').innerText());
-  await page.evaluate(() => renderAthletes());
+  await page.evaluate(() => render());   // a whole-screen redraw (the button is in the top bar now, not in the roster that redraws)
   check(r, 'it stays open through a redraw', await page.locator('#toolsPanel').isVisible(), '');
   await page.locator('#toolsBtn').click();
   check(r, 'and closes again', await page.locator('#toolsPanel').isHidden(), '');
@@ -3208,7 +4061,7 @@ S['fail-bar'] = async (b) => {
   // 3. a different failure is a second line, and Dismiss all appears
   await L.go(page, 'intake');
   await page.evaluate(() => window.__STUB.fail.push({ kind: 'rpc', name: 'set_intake_status', message: 'fixture failure', times: 1 }));
-  await L.jsClick(page.locator('.intake-card', { hasText: 'Fixture Applicant One' }).locator('.intake-act[data-to=handled]'));
+  await L.jsClick(page.locator('.in-detail', { hasText: 'Fixture Applicant One' }).locator('.intake-act[data-to=handled]'));
   await L.settle(page, 500);
   check(r, 'a different failure is a second line, and Dismiss all appears', (await lines()) === 2 && (await page.locator('#failbar .fb-all').count()) === 1, await L.failText(page));
   // 4. dismissing
@@ -3278,6 +4131,106 @@ S['file-redraw-keeps-work'] = async (b) => {
   for (const [name, fn] of [['toggling a day card (a tab-body redraw)', () => toggleWorkDay(2)], ['a full redraw', () => { assemble(); render(); }]]) {
     await page.evaluate(fn); await L.settle(page, 700);
     check(r, name + ': the raw log is still open', await rawOpen(), '');
+  }
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
+// ── The athlete header and the File's four groups (2026-10-12, round 1 of the coach.html redesign) ──────────────────────────────────────
+// The header says why this person needs you and where their cycle is, on every sub-tab (the dark cycle block on The work is gone); the File is
+// four groups in one order, the Danger zone is shut until it is needed, and Forget lives there, not in the Proof funnel's row.
+S['file-groups'] = async (b) => {
+  const r = { id: 'file-groups', title: 'The athlete header (cycle, Needs you, actions) and the File tab: four groups, a folded Danger zone, Forget out of the funnel row', checks: [] };
+  const { page, log, today } = await L.openCoach(b, { hash: 'a/ben_test/file' });
+  const FX = require('./fixtures');
+  const head = async () => (await page.locator('.dethead').innerText()).replace(/\s+/g, ' ');
+  const headings = async () => (await page.locator('#tabbody .fh').allInnerTexts()).map(x => x.replace(/\s+/g, ' ').trim());
+  const dangerOpen = () => page.evaluate(() => { const d = document.getElementById('dangerzone'); return !!d && d.open; });
+  // 1. An undated cycle: its name and focus, and no "week x of y".
+  const h0 = await head();
+  check(r, 'an undated cycle: the header names the cycle and its focus and has no week text', /Cycle 2 — Made-Up Block/.test(h0) && /Strength base/.test(h0) && !/week \d+ of \d+/i.test(h0), h0);
+  // 2. The four groups, in order (Records appears because Ava has old call logs; Ben has nothing for it).
+  check(r, 'Ben has no records to show: three groups, in order', JSON.stringify(await headings()) === JSON.stringify(['Contact and access', 'Programme', 'Danger zone']), await headings());
+  await L.go(page, 'a/ava_test/file');
+  check(r, 'Ava has old call logs: the four groups, in order', JSON.stringify(await headings()) === JSON.stringify(['Contact and access', 'Programme', 'Records', 'Danger zone']), await headings());
+  const rowsOf = async () => (await page.locator('#tabbody .fgroup').first().locator('.frow-l').allInnerTexts()).map(x => x.trim());
+  check(r, 'Contact and access holds WhatsApp, Login, Status and Their app, in that order', JSON.stringify(await rowsOf()) === JSON.stringify(['WhatsApp', 'Login', 'Status', 'Their app']), await rowsOf());
+  check(r, 'no card inside a card: no old section heading or second-level panel is left on the File', (await page.locator('#tabbody .sec').count()) === 0 && (await page.locator('#tabbody .panel .panel').count()) === 0, '');
+  // 3. A dated cycle: week x of y, the dates, the days left; Needs you as links to the screen that has each reason.
+  await page.evaluate(([as, ae, bs, be]) => {
+    const pa = window.__DB.programs.find(x => x.athlete_id === 'ava_test'); pa.data.cycles[0].startDate = as; pa.data.cycles[0].endDate = ae;
+    const pb = window.__DB.programs.find(x => x.athlete_id === 'ben_test'); pb.data.cycles[0].startDate = bs; pb.data.cycles[0].endDate = be;
+    return hardRefresh();
+  }, [FX.daysAgo(today, 8), FX.daysAgo(today, -20), FX.daysAgo(today, 33), FX.daysAgo(today, 5)]);
+  await L.settle(page, 900);
+  await L.go(page, 'a/ava_test/file'); await L.settle(page, 500);
+  const h1 = await head();
+  check(r, 'a dated cycle: "week 2 of 4", the dates and "20 days left" sit under the name', /Cycle 2 — Made-Up Block · week 2 of 4 · \d{1,2} [A-Z][a-z]{2} – \d{1,2} [A-Z][a-z]{2} · 20 days left/.test(h1) && /Strength base/.test(h1), h1);
+  const needs = await page.locator('.dethead .det-need a').evaluateAll(as => as.map(a => [a.textContent.trim(), a.getAttribute('href'), a.className]));
+  check(r, 'Needs you lists each reason as a link to its own sub-tab (the unread note goes to The work, in clay)', /^Needs you:/.test((await page.locator('.det-need').innerText()).trim()) && needs.some(n => /note/.test(n[0]) && n[1] === '#a/ava_test/work' && /warn/.test(n[2])), needs);
+  const cycbarFile = await page.locator('.cycbar').count();
+  await L.go(page, 'a/ava_test/work'); await L.settle(page, 400);
+  check(r, 'the same header (cycle line) is on The work, and the green cycle block is gone from it and from the File', (await page.locator('.dethead .det-cycle').count()) === 1 && (await page.locator('.cycbar').count()) === 0 && cycbarFile === 0, await head());
+  await L.go(page, 'a/ava_test/proof'); await L.settle(page, 400);
+  check(r, 'and on Proof', (await page.locator('.dethead .det-cycle').count()) === 1 && (await page.locator('.dethead .det-need').count()) === 1, await head());
+  await L.go(page, 'a/ben_test/file'); await L.settle(page, 400);
+  const h2 = await head();
+  const bn = await page.locator('.dethead .det-need a').evaluateAll(as => as.map(a => [a.textContent.trim(), a.getAttribute('href')]));
+  check(r, 'a cycle that ended: "ended 5 days ago", and its reason links to the File', /ended 5 days ago/.test(h2) && !/week \d+ of \d+/i.test(h2) && bn.some(n => /renew/.test(n[0]) && n[1] === '#a/ben_test/file'), { h2, bn });
+  // 4. The actions on the right: WhatsApp (three cases are in whatsapp-number), View their app with programme days, View their Proof without.
+  check(r, 'View their app is in the header when they have programme days', (await page.locator('.dethead .det-acts button', { hasText: 'View their app' }).count()) === 1, await head());
+  await L.go(page, 'a/dan_proof/file'); await L.settle(page, 500);
+  check(r, 'a habit-only person gets View their Proof instead', (await page.locator('.dethead .det-acts button', { hasText: 'View their Proof' }).count()) === 1 && (await page.locator('.dethead .det-acts button', { hasText: 'View their app' }).count()) === 0, await head());
+
+  // 5. The Danger zone: shut on arrival, open while Erase… is open, kept open across a redraw, shut again on another visit.
+  await L.go(page, 'a/ava_test/file'); await L.settle(page, 500);
+  check(r, 'the Danger zone is folded on arrival, and what is inside is not on screen', !(await dangerOpen()) && !(await page.locator('button', { hasText: /Erase completely/ }).isVisible()), '');
+  const sum = await page.locator('#dangerzone > summary').evaluate(el => ({ t: el.textContent.trim(), c: getComputedStyle(el).color }));
+  check(r, 'its summary reads "Danger zone", in clay', sum.t === 'Danger zone' && sum.c === 'rgb(176, 74, 39)', sum);
+  await page.locator('#dangerzone > summary').click();
+  check(r, 'a tap opens it: Delete training history and Erase completely… are there, each with a line', (await dangerOpen()) && await page.locator('button', { hasText: /Delete training history/ }).isVisible() && await page.locator('button', { hasText: /Erase completely/ }).isVisible() && /one step/.test(await page.locator('#dangerzone').innerText()), '');
+  await page.evaluate(() => { assemble(); render(); }); await L.settle(page, 600);
+  check(r, 'opened by hand, it is still open after a full redraw', await dangerOpen(), '');
+  await page.locator('button', { hasText: /Erase completely/ }).click(); await page.locator('.erase #eraseIn').waitFor();
+  check(r, 'with Erase… open the Danger zone is open and the panel is inside it', (await dangerOpen()) && (await page.locator('#dangerzone .erase').count()) === 1, '');
+  await page.evaluate(() => { document.getElementById('dangerzone').open = false; assemble(); render(); }); await L.settle(page, 600);
+  check(r, 'folded by hand while Erase… is open, a redraw opens it again (the panel is never hidden)', (await dangerOpen()) && (await page.locator('#dangerzone .erase').count()) === 1, '');
+  await page.locator('.erase button', { hasText: 'Cancel' }).click(); await L.settle(page, 400);
+  check(r, 'Cancel closes the panel and leaves the Danger zone open', (await dangerOpen()) && (await page.locator('.erase').count()) === 0, '');
+  await L.go(page, 'athletes'); await L.go(page, 'a/ava_test/file'); await L.settle(page, 400);
+  check(r, 'coming back to the File later finds it folded again', !(await dangerOpen()), '');
+
+  // 6. Forget: offered in the File for a free person who signed up, not for a coached athlete, and gone from the funnel row.
+  await page.evaluate(() => { window.__DB.hab_contacts.push({ athlete_id: 'ava_test', email: 'ava@example.invalid', whatsapp: '+10000000003', source: 'proof.html', tier: 'free', note: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), display_name: 'Ava' }); return hardRefresh(); });
+  await L.settle(page, 900);
+  await L.go(page, 'a/ava_test/file'); await openDanger(page);
+  check(r, 'a coached athlete who signed up through Proof first is not offered Forget', await page.evaluate(() => isSignup(S.ath.ava_test.contact)) && (await page.locator('button', { hasText: /Forget/ }).count()) === 0, '');
+  await L.go(page, 'a/cara_free/file'); await openDanger(page);
+  const fb = page.locator('#dangerzone button', { hasText: 'Forget their Proof data…' });
+  check(r, 'a free person with a signup record is offered "Forget their Proof data…" in their Danger zone', (await fb.count()) === 1 && await fb.isVisible(), await page.locator('#dangerzone').innerText());
+  await L.go(page, 'leads/signups'); await L.settle(page, 700);   // the funnel moved from Proof to Leads → Free signups (2026-10-12)
+  const funRow = page.locator('.fun', { hasText: 'cara_free' });
+  const acts = (await funRow.locator('.acts').innerText()).replace(/\s+/g, ' ');
+  check(r, 'the signup funnel row keeps WhatsApp, copy email and open, and has no forget button', /WhatsApp/.test(acts) && /copy email/.test(acts) && /open/.test(acts) && !/forget/i.test(acts) && (await page.locator('.fun button', { hasText: /forget/i }).count()) === 0, acts);
+  await L.go(page, 'a/cara_free/file'); await openDanger(page);
+  const n0 = await L.nCalls(page);
+  await page.locator('#dangerzone button', { hasText: 'Forget their Proof data…' }).click(); await L.settle(page, 900);
+  const fg = lastOf(await L.callsSince(page, n0), c => c.name === 'forget_contact');
+  check(r, 'it asks first, then calls forget_contact for that person', !!fg && fg.payload.p_athlete_id === 'cara_free' && log.dialogs.some(d => d.type === 'confirm' && /Forget cara_free\?/.test(d.message)), { fg: fg && fg.payload, dialogs: log.dialogs.map(d => d.type) });
+  check(r, 'and their contact is gone, so the offer goes with it', !(await L.db(page)).hab_contacts.some(c => c.athlete_id === 'cara_free'), '');
+
+  // 7. Narrow screens: no sideways scroll, with the Danger zone and every How this works open.
+  await L.go(page, 'a/dan_proof/file'); await L.settle(page, 400);
+  await page.evaluate(() => { const d = document.getElementById('dangerzone'); if (d) d.open = true; document.querySelectorAll('details.how').forEach(x => x.open = true); });
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 800 }); await L.settle(page, 300);
+    const sw = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth }));
+    check(r, `at ${w} px the File fits the screen (no sideways scroll)`, sw.sw <= sw.iw, sw);
+    await L.go(page, 'a/ava_test/work'); await L.settle(page, 300);
+    const sw2 = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth }));
+    check(r, `at ${w} px the header fits the screen on The work`, sw2.sw <= sw2.iw, sw2);
+    await L.go(page, 'a/dan_proof/file'); await L.settle(page, 300);
   }
   check(r, 'no page errors', !log.errors.length, log.errors);
   await page.context().close();

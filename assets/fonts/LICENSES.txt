@@ -1,8 +1,9 @@
 Barlow and Barlow Condensed: Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow)
 JetBrains Mono: Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
 DM Sans: Copyright 2014 The DM Sans Project Authors (https://github.com/googlefonts/dm-fonts)
+Outfit: Copyright 2021 The Outfit Project Authors (https://github.com/Outfitio/Outfit-Fonts), used by AA Proof (habits.html)
 
-All three are licensed under the SIL Open Font License, Version 1.1 (latin subsets, from Google Fonts).
+All four are licensed under the SIL Open Font License, Version 1.1 (latin subsets, from Google Fonts).
 The licence text is below and at https://openfontlicense.org. Vazirmatn has its own notice next to it (Vazirmatn-OFL.txt).
 
 -----------------------------------------------------------

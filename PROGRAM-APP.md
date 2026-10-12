@@ -1522,7 +1522,7 @@ the quests, because that is the tab an athlete opens to check progress. `renderW
 pills** for the **7 day / 1 month / 3 month** ranges, the same control Crew uses to swap
 Roll call for the Leaderboard. **Invent no new component here**: every earlier attempt to
 (a tinted band, a segmented tab box, a bespoke input) was the thing that read as foreign. `renderSettingsWeight()` holds the switch and **never deletes readings
-when switched off**; `weightPanel()` in `coach.html` → Proof shows Amir the trend. The
+when switched off**; `weightPanel()` in `coach.html` → an athlete → The work shows Amir the trend (it moved from their Proof screen on 2026-10-12). The
 chart is the app's **first and only chart** — line is a 7-day rolling average, dots are the
 raw readings, every quoted change compares average to average, because daily weight swings
 a kilo on water alone. Never put it on the board, the wall, or the programme record.

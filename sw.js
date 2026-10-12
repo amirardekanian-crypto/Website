@@ -245,8 +245,15 @@
 //      (rpeTargetOn(), paintWeekTargets()); the bar drops "except the retest" on a lower day. Without the bump a phone keeps the old colours.
 // v115: program.html changed (2026-10-12): a tennis or padel athlete's goal on Game Plan is a sport badge (ball or racket).
 // v116: program.html changed (2026-10-12): Guided shows the week's limits row (under its top bar and on the rest screen).
-// v117: program.html changed (2026-10-12): Centre Court, the training day re-skinned (the cover, the session bar, the cards, the finish).
-const CACHE = 'aap-v117';
+// v117: habits.html changed (2026-10-12, UX audit batch A): a counted habit's circle opens the log sheet, which takes a typed number.
+// v118: habits.html changed (2026-10-12, UX audit batch B): Today's card is one game line, the week and one nudge line; Progress has one week table.
+// v119: habits.html changed (2026-10-12, UX audit batch C): a habit's page has ‹ and leads with today's control.
+// v120: habits.html changed (2026-10-12, UX audit batch D): Crew is one list with your name in a sheet, the Locker says each count once, Settings has headings and no tab bar.
+// v121: habits.html changed (2026-10-12, UX audit batch E): the manual folds, the tour is shorter with pill buttons, no em-dashes in athlete copy.
+// v122: habits.html changed (2026-10-12, UX audit): Outfit is our own file (/assets/fonts/Outfit-Variable.woff2), the takeover's Continue is the app's primary.
+// v123: habits.html changed (2026-10-12, UX audit type pass): six font sizes (12-40) and four corner radii across the app.
+// v124: program.html changed (2026-10-12): Centre Court, the training day re-skinned (the cover, the session bar, the cards, the finish).
+const CACHE = 'aap-v124';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
