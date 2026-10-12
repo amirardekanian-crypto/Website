@@ -247,7 +247,7 @@ const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .n
     t.check('door rows with data: not quiet, the same background, edge and corners as without data, never dark green, never dashed',
       b.quiet === 'false,false,false' && b.icons === 'true,true,true' && !b.dark && !b.dashed && b.habits === a.habits && b.records === a.records && b.weight === a.weight, JSON.stringify([a.habits, b]));
     const togo = await verdict('togo'), on = await verdict('on'), perfect = await verdict('perfect');
-    t.check('habits verdict: "2 to go" is clay, On target and Perfect are green ink', togo.text === '2 to go' && togo.color === 'rgb(199, 85, 47)' && on.text === 'On target' && on.color === 'rgb(14, 74, 54)' && perfect.text === 'Perfect' && perfect.color === 'rgb(14, 74, 54)', JSON.stringify([togo, on, perfect]));
+    t.check('habits verdict: "2 to go" is clay ink (#B5461F, small text on the paper), On target and Perfect are green ink', togo.text === '2 to go' && togo.color === 'rgb(181, 70, 31)' && on.text === 'On target' && on.color === 'rgb(14, 74, 54)' && perfect.text === 'Perfect' && perfect.color === 'rgb(14, 74, 54)', JSON.stringify([togo, on, perfect]));
     // dark: the row is #242424 on #181818 like the day's rows
     const d = await H.openProgram(browser, { prog: prog(), dark: true, seed: Object.assign({ _hab_card: hab('on') }, SEED_NUMBERS) });
     const dk = await d.p.evaluate(() => { const r = document.querySelector('#home-habits-wrap .hrow'); const c = getComputedStyle(r); return { row: c.backgroundColor, page: getComputedStyle(document.body).backgroundColor, edge: c.borderTopColor, on: getComputedStyle(r.querySelector('.hrow-v')).color }; });

@@ -187,43 +187,6 @@
 <script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
 <style>
   :root {
-    /* Primary brand = Roland-Garros green; the one accent = clay. There is no
-       third colour: the ochre that sat in --purple was retired with the rest of
-       the gold (2026-09-26). Token names kept (--yellow/--ice) so the existing
-       refs need no renaming; only their values changed for the warm-paper theme. */
-    --yellow: #0E4A36;
-    --yellow-dim: rgba(14,74,54,0.08);
-    --yellow-mid: rgba(14,74,54,0.22);
-    --yellow-glow: rgba(14,74,54,0.2);
-
-    --ice: #C7552F;
-    --ice-dim: rgba(199,85,47,0.08);
-    --ice-mid: rgba(199,85,47,0.22);
-    --ice-glow: rgba(199,85,47,0.2);
-
-    /* RPE UNDER the prescribed target (2026-09-24, Amir). Over target is clay
-       (--ice); under is this muted steel blue: warm = harder, cool = easier, and
-       orange-vs-blue stays distinct for colour-blind athletes, which red-vs-green
-       would not. Used ONLY for an RPE against its target, nowhere else. */
-    --rpe-under: #3E6A92;
-
-    /* TEXT in the brand colours (A11Y-01, 2026-09-26). Every `color:` that was var(--yellow) or
-       var(--ice) reads these instead; fills and borders keep the brand tokens. In light mode they
-       ARE the brand colours, so nothing changes; in dark mode (body[data-dark]) they turn into tints
-       that read on #202020 (green 7.3:1, clay 4.9:1). Before, green text sat on near-black at
-       1.4–1.7:1: the tab bar, section titles, doses, the RPE target. ⚠️ New text in green or clay
-       uses these, never the fill tokens. */
-    --green-ink: #0E4A36;
-    --clay-ink: #C7552F;
-
-    --grey-bg: #FAF7F2;
-    --grey-mid: #D8D1C5;
-    --grey-dark: #1A1A1A;
-    --grey-card: #EDE8E0;
-    --grey-text: #5C5C5C;
-    --white: #FFFFFF;
-    --on-accent: #FFFFFF;  /* text/icons that sit on green/clay fills */
-
     /* THE TYPE SCALE (DS-03, 2026-09-27). Seven sizes and the field size; every font size in this
        file is one of them. It replaced 46 sizes, 22 of them between 6 and 20 px, and nothing is
        smaller than 11 px (A11Y-01). Clocks, timers, record numbers and the clamp() heroes are
@@ -239,6 +202,76 @@
     --fs-head: 28px;     /* a heading inside a screen, a day's number */
     --fs-display: 44px;  /* the title at the top of a screen */
   }
+
+  /* ══ THE APP'S ONE COLOUR SET (Amir, 2026-10-12: "go ahead with the shared colours") ══════════════════════════════════════
+     Centre Court's tokens, moved here from the training day's CSS (2026-10-12), so that every screen reads ONE set, declared
+     ONCE. Before: CENTRE COURT §1 kept them for the day, HOME AND PROGRESS §1 kept a partial copy ("change both"), and the rest
+     of the app used the older names in :root with their own dark values. The copies are gone. The older names (--yellow, --ice,
+     --grey-bg, --grey-card, --grey-mid, --grey-text, --grey-dark, --white, --rpe-under) are aliases of the new ones, so no
+     rule had to be rewritten; a new rule uses the new names. Primary brand = Roland-Garros green; the one accent = clay. There
+     is no third colour (the ochre that sat in --purple was retired with the rest of the gold, 2026-09-26).
+     ⚠️ DECLARE EVERY COLOUR TOKEN ON body (light) AND body[data-dark] (dark), NEVER ON :root. A custom property whose value
+     holds var(...) is resolved on the element where it is DECLARED, and children inherit the resolved value. Dark mode is the
+     attribute data-dark on <body>, so an alias such as --grey-bg: var(--paper) declared on <html> would be resolved there with
+     the LIGHT --paper and dark mode would never reach it. The same goes for --mark: var(--fill), --info: var(--ring),
+     --tile: var(--btn) and --foot (it holds var(--hero-end)). :root keeps only the tokens that are not colours (the type scale
+     below, and --app-w and --app-gutter further down). A new colour token joins this block, light and dark, and nowhere else.
+     CLAY (A11Y-01): a fill and a border are --clay (#C7552F, the brand in both modes). Small clay TEXT on the paper is
+     --clay-ink (#B5461F in light mode, 5.1:1; #C7552F is only 4.1:1, under the 4.5:1 a small text needs; #E06B43 in dark).
+     Every `color:` that was var(--yellow) or var(--ice) reads --green-ink or --clay-ink instead (A11Y-01, 2026-09-26): fills and
+     borders keep the brand tokens, and a new text in green or clay never uses the fill tokens.
+     Clay TEXT at 18.66 px bold or larger (or 24 px and up) is --clay-big (#C7552F in light, #E06B43 in dark: big text needs
+     only 3:1, so it keeps the brand shade). Clay text on the green is --clay-on-green. Green TEXT is --green-ink, in the same
+     way; --fill is the green fill. --g is the gutter (20 px, 16 px under 360). ═══════════════════════════════════════════════ */
+  body {
+    --g: 20px;
+    --paper: #FAF7F2; --sand: #F1ECE3; --row: #FFFFFF; --hair: #E4DDD1; --box: #D8D1C5;
+    --ink: #1A1A1A; --grey: #5C5C5C; --ring: #8A8378; --num: #5C5C5C; --info: var(--ring);
+    --fill: #0E4A36; --green-ink: #0E4A36; --mint: #6DBE95;
+    --clay: #C7552F; --clay-ink: #B5461F; --clay-big: #C7552F; --clay-fill: #C2512C; --clay-on-green: #E06B43; --steel: #3E6A92;
+    --tint: rgba(14,74,54,.08); --prog-track: rgba(14,74,54,.12); --ph: #6B6B6B;
+    /* --field: the edge of a box a set is typed into (2.44:1 on paper, it holds in sun); --mark: a made tick, the live set */
+    --field: #A89F92; --mark: var(--fill);
+    /* the one chevron for every text link, drawn as a mask in the link's colour */
+    --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M3 1L7 5 3 9' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    /* a row's open/close chevron, ⌄ (turned for ⌃) */
+    --chev-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5l6 6 6-6'/%3E%3C/svg%3E");
+    /* the greens: the cover, a button, a tile, the session bar's foot before Start, the slim bar, a button on the green */
+    --hero: radial-gradient(125% 90% at 100% 0%, #1B7254 0%, #0E4A36 46%, #082D20 100%);
+    --btn: radial-gradient(120% 120% at 0% 0%, #1B6A4E 0%, #0E4A36 55%, #0B3E2D 100%);
+    --tile: var(--btn);
+    /* the cover ends on ONE colour (--hero-end, its scrim's last row) and the bar before Start starts on it: no seam. The
+       foot's light sits at its bottom right, so its top edge is --hero-end all the way across. */
+    --hero-end: #06241A; --hero-end-a: rgba(6,36,26,.55);
+    --foot: radial-gradient(120% 140% at 100% 100%, #0C3F2E 0%, #083024 40%, var(--hero-end) 68%);
+    --bar: radial-gradient(160% 260% at 100% 0%, #17664B 0%, #0E4A36 45%, #0A3829 100%);
+    --tile-on-green: radial-gradient(120% 150% at 0% 0%, #24855F 0%, #16603F 52%, #0E4A36 100%);
+    /* the older names: aliases of the set above (they follow it into dark mode, which is why they sit on body too) */
+    --yellow: var(--fill); --ice: var(--clay);
+    --grey-bg: var(--paper); --grey-card: var(--sand); --grey-mid: var(--box); --grey-text: var(--grey); --grey-dark: var(--ink); --white: var(--row);
+    /* RPE UNDER the prescribed target (2026-09-24, Amir). Over target is clay (--ice); under is this muted steel blue: warm = harder,
+       cool = easier, and orange-vs-blue stays distinct for colour-blind athletes, which red-vs-green would not. Used ONLY for an RPE
+       against its target, nowhere else. */
+    --rpe-under: var(--steel);
+    --yellow-dim: rgba(14,74,54,0.08); --yellow-mid: rgba(14,74,54,0.22); --yellow-glow: rgba(14,74,54,0.2);
+    --ice-dim: rgba(199,85,47,0.08); --ice-mid: rgba(199,85,47,0.22); --ice-glow: rgba(199,85,47,0.2);
+    --court: var(--fill);   /* the sign-in screen's green (it had a #0E4A36 fallback each time it was read) */
+    --on-accent: #FFFFFF;   /* text/icons that sit on green/clay fills */
+  }
+  body[data-dark] {
+    --paper: #181818; --sand: #202020; --row: #242424; --hair: #2C2C2C; --box: #4A4A4A;
+    --ink: #EDEDED; --grey: #9A9A9A; --ring: #666666; --num: #9A9A9A;
+    --green-ink: #6DBE95; --clay-ink: #E06B43; --clay-big: #E06B43; --steel: #8DB3D6;   /* --clay stays the brand fill; only clay TEXT moves */
+    --tint: rgba(109,190,149,.13); --prog-track: rgba(109,190,149,.16); --ph: #8F8F8F;
+    --field: #5A5A5A; --mark: #1B7254;   /* #0E4A36 sinks on #181818 (1.73:1); #1B7254 is 3.03:1 */
+    --hero: radial-gradient(125% 90% at 100% 0%, #17654A 0%, #0D4532 46%, #072A1E 100%);
+    --btn: radial-gradient(120% 120% at 0% 0%, #1A6A4D 0%, #12573F 55%, #0D4532 100%);
+    --hero-end: #051F16; --hero-end-a: rgba(5,31,22,.55);
+    --foot: radial-gradient(120% 140% at 100% 100%, #0A3828 0%, #072A1E 40%, var(--hero-end) 68%);
+    --bar: radial-gradient(160% 260% at 100% 0%, #155E45 0%, #0D4532 45%, #082F22 100%);
+    --tile-on-green: radial-gradient(120% 150% at 0% 0%, #1F7655 0%, #13573F 52%, #0D4532 100%);
+  }
+  @media (max-width: 359px) { body { --g: 16px; } }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   /* A button or a field takes the page's font (DS-03): the browser's default is Arial at 13.3 px,
@@ -381,7 +414,7 @@
   .signin-foot { margin: auto 0 0; padding-top: 22px; text-align: center;
     font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700;
     letter-spacing: .16em; text-transform: uppercase; color: #bdb5a8; }
-  .error-icon { margin-bottom: 16px; color: var(--clay-ink); }
+  .error-icon { margin-bottom: 16px; color: var(--clay-big); }   /* a 46 px drawn icon, not text: it keeps the brand clay it had */
   .error-icon svg { width: 46px; height: 46px; display: block; }
   .error-title {
     font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
@@ -937,7 +970,7 @@
   }
   .archive-back { position: absolute; top: 14px; left: 18px; z-index: 2; background: transparent; border: none; color: #fff; font-size: var(--fs-title); line-height: 1; cursor: pointer; padding: 6px 8px; }
   .archive-back:active { transform: scale(0.9); }
-  .archive-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-label); letter-spacing: 3px; text-transform: uppercase; color: var(--clay-ink); margin-bottom: 8px; }
+  .archive-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-label); letter-spacing: 3px; text-transform: uppercase; color: var(--clay-big); margin-bottom: 8px; }   /* on the dark green banner, not the paper: it keeps the shade it had (--clay-ink is for small text on paper) */
   .archive-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px; color: #fff; text-transform: uppercase; line-height: 1; }
   .archive-title span { color: rgba(255,255,255,0.65); }
   .archive-scroll { padding: 20px 20px 100px; }
@@ -1187,7 +1220,7 @@
   #ar-body { padding: 22px 20px 110px; }
   #ar-body .ar-p { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); line-height: 1.7; color: var(--ink); margin: 0 0 14px; }
   /* Drop-cap on the opening paragraph (one per article) */
-  #ar-body .ar-p.ar-lead::first-letter { float: left; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 58px; line-height: 0.7; color: var(--clay-ink); margin: 7px 10px 0 0; text-transform: uppercase; }
+  #ar-body .ar-p.ar-lead::first-letter { float: left; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 58px; line-height: 0.7; color: var(--clay-big); margin: 7px 10px 0 0; text-transform: uppercase; }   /* 58 px, 900: big clay text keeps #C7552F */
   /* Section heading = §NN + condensed title + a scoreboard divider rule */
   #ar-body .ar-h { display: flex; align-items: center; gap: 10px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title); text-transform: uppercase; color: var(--ink); letter-spacing: 0.3px; margin: 26px 0 11px; }
   #ar-body .ar-h::before { content: ''; width: 22px; height: 2px; background: var(--ice); flex-shrink: 0; }
@@ -1308,7 +1341,7 @@
   .wn-head { margin: 12px 0 0; font: 900 var(--fs-head)/1.08 'Barlow Condensed', sans-serif; color: var(--grey-dark);
     text-wrap: balance; overflow-wrap: break-word; }
   .wn-hi + .wn-head, .wn-hi + .wn-lead { margin-top: 4px; }
-  .wn-head em { font-style: normal; color: var(--clay-ink); }
+  .wn-head em { font-style: normal; color: var(--clay-big); }   /* 28 px, 900: big clay text keeps #C7552F */
   .wn-stand { margin: 10px 0 0; font-size: var(--fs-lead); line-height: 1.45; text-wrap: pretty; }
   .wn-lead { margin: 12px 0 0; font-size: var(--fs-lead); line-height: 1.5; text-wrap: pretty; }
   .wn-dose { margin: 14px 0 0; font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
@@ -2826,6 +2859,7 @@
   .ceil-up { color: var(--green-ink); }
   body[data-dark] .ceil-up { color: #4e9d7e; }
   .ceil-down { color: var(--clay-ink); }
+  .ceil-down .ceil-spark { color: var(--clay-big); }   /* a drawn line or dot, not text: it keeps the brand clay it had */
 
   /* Per-lift history */
   .ceil-card { background: var(--white); border: 1px solid var(--grey-mid); border-radius: 12px;
@@ -3576,7 +3610,7 @@
   .tl-step { width: 48px; height: 44px; border-radius: 10px; border: 1px solid var(--grey-mid); background: transparent;
     font-size: 24px; line-height: 1; color: var(--grey-dark); cursor: pointer; }   /* display: Guided's − and + */
   .tl-val { flex: 1; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 30px; color: var(--grey-dark); }   /* display: Guided's reps and RPE */
-  .tl-val.off { color: var(--clay-ink); }
+  .tl-val.off { color: var(--clay-big); }   /* 30 px, 900: big clay text keeps #C7552F */
   .tl-rpe-btn { flex: 1 1 0; height: 44px; border-radius: 10px; border: 1px solid var(--grey-mid); background: transparent;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); color: var(--grey-text); cursor: pointer; }
   .tl-rpe-btn.selected { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
@@ -3727,8 +3761,8 @@
   .rpe-btn.selected { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
 
   /* ── Dark Mode ── */
-  body[data-dark] { --grey-bg: #181818; --grey-card: #252525; --grey-mid: #383838; --grey-text: #8f8f8f; --white: #202020; --grey-dark: #e8e8e8; --rpe-under: #8DB3D6;
-    --green-ink: #6DBE95; --clay-ink: #E06B43; }
+  /* Dark mode's colours are the dark half of THE APP'S ONE COLOUR SET, at the top of this sheet. The rules below are the non-token
+     dark rules: a colour that has no token. */
   /* The rest timer stayed a light sheet in dark mode while its digits turned light: "2:00" at 1.08:1. */
   body[data-dark] .timer-overlay { background: #161616; }
   body[data-dark] .weight-input { background: #2a2a2a; color: #ddd; }
@@ -3932,47 +3966,10 @@
      1 tokens · 2 the cover · 3 the session bar (before Start, slim, ⋯ open) · 4 the first-session hint · 5 block titles
      · 6 scroll margins · then the cards, the circuits and the finish. */
 
-  /* 1. Tokens. The day's paper and ink, light and dark. Green and clay FILLS keep the brand in both; small clay TEXT on the
-     paper is #B5461F in light mode here only (5.1:1; #C7552F is 4.1:1), anything 18.66 px bold or more and every fill
-     stays #C7552F. On green, clay text is --clay-on-green. --g is the gutter (16 px under 360). */
-  :where(#day-view, .step-scroll, #ws-body) {
-    --g: 20px;
-    --paper: #FAF7F2; --sand: #F1ECE3; --row: #FFFFFF; --hair: #E4DDD1; --box: #D8D1C5;
-    --ink: #1A1A1A; --grey: #5C5C5C; --ring: #8A8378; --num: #5C5C5C; --info: var(--ring);
-    --fill: #0E4A36; --green-ink: #0E4A36; --mint: #6DBE95;
-    --clay: #C7552F; --clay-ink: #B5461F; --clay-fill: #C2512C; --clay-on-green: #E06B43; --steel: #3E6A92;
-    --tint: rgba(14,74,54,.08); --prog-track: rgba(14,74,54,.12); --ph: #6B6B6B;
-    /* --field: the edge of a box a set is typed into (2.44:1 on paper, it holds in sun); --mark: a made tick, the live set */
-    --field: #A89F92; --mark: var(--fill);
-    /* the one chevron for every text link, drawn as a mask in the link's colour */
-    --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M3 1L7 5 3 9' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    /* a row's open/close chevron, ⌄ (turned for ⌃) */
-    --chev-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9.5l6 6 6-6'/%3E%3C/svg%3E");
-    /* the greens: the cover, a button, a tile, the session bar's foot before Start, the slim bar, a button on the green */
-    --hero: radial-gradient(125% 90% at 100% 0%, #1B7254 0%, #0E4A36 46%, #082D20 100%);
-    --btn: radial-gradient(120% 120% at 0% 0%, #1B6A4E 0%, #0E4A36 55%, #0B3E2D 100%);
-    --tile: var(--btn);
-    /* the cover ends on ONE colour (--hero-end, its scrim's last row) and the bar before Start starts on it: no seam. The
-       foot's light sits at its bottom right, so its top edge is --hero-end all the way across. */
-    --hero-end: #06241A; --hero-end-a: rgba(6,36,26,.55);
-    --foot: radial-gradient(120% 140% at 100% 100%, #0C3F2E 0%, #083024 40%, var(--hero-end) 68%);
-    --bar: radial-gradient(160% 260% at 100% 0%, #17664B 0%, #0E4A36 45%, #0A3829 100%);
-    --tile-on-green: radial-gradient(120% 150% at 0% 0%, #24855F 0%, #16603F 52%, #0E4A36 100%);
-  }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) {
-    --paper: #181818; --sand: #202020; --row: #242424; --hair: #2C2C2C; --box: #4A4A4A;
-    --ink: #EDEDED; --grey: #9A9A9A; --ring: #666666; --num: #9A9A9A;
-    --green-ink: #6DBE95; --clay-ink: #E06B43; --steel: #8DB3D6;   /* --clay stays the brand fill; only clay TEXT moves */
-    --tint: rgba(109,190,149,.13); --prog-track: rgba(109,190,149,.16); --ph: #8F8F8F;
-    --field: #5A5A5A; --mark: #1B7254;   /* #0E4A36 sinks on #181818 (1.73:1); #1B7254 is 3.03:1 */
-    --hero: radial-gradient(125% 90% at 100% 0%, #17654A 0%, #0D4532 46%, #072A1E 100%);
-    --btn: radial-gradient(120% 120% at 0% 0%, #1A6A4D 0%, #12573F 55%, #0D4532 100%);
-    --hero-end: #051F16; --hero-end-a: rgba(5,31,22,.55);
-    --foot: radial-gradient(120% 140% at 100% 100%, #0A3828 0%, #072A1E 40%, var(--hero-end) 68%);
-    --bar: radial-gradient(160% 260% at 100% 0%, #155E45 0%, #0D4532 45%, #082F22 100%);
-    --tile-on-green: radial-gradient(120% 150% at 0% 0%, #1F7655 0%, #13573F 52%, #0D4532 100%);
-  }
-  @media (max-width: 359px) { :where(#day-view, .step-scroll, #ws-body) { --g: 16px; } }
+  /* 1. Tokens: none here. The day's paper and ink, light and dark, are the app's ONE shared colour set now (THE APP'S ONE COLOUR
+     SET, declared on body and body[data-dark] at the top of this sheet), and so is --g, the gutter (16 px under 360). The clay
+     rule moved with them: --clay for a fill, --clay-ink for small clay text (#B5461F on the paper in light mode), --clay-big for
+     text of 18.66 px bold or more (#C7552F), --clay-on-green on the green. */
 
   /* 2. The cover (P4, D's short one, about 270 px): the day's photo graded into the green, ← and the moon as 44 px glass
      buttons, the "● DAY 1" eyebrow (a mint dot), the focus in 44 px capitals, what the day builds as tiles with a › (each still
@@ -4907,22 +4904,8 @@
      titles and its This cycle card. It is LAST in the sheet and after the CENTRE COURT block on purpose: it wins a tie. The
      day view's own cover (#day-view-card) is not here. */
 
-  /* 1. Tokens: same values as CENTRE COURT §1; change both. Green and clay TEXT keep the app's own --green-ink and --clay-ink
-     (the same in dark mode), so nothing else on these screens moves. --g is the gutter (16 px under 360). */
-  :where(#home-overview, #screen-plan) {
-    --g: 20px;
-    --row: #FFFFFF; --hair: #E4DDD1; --ink: #1A1A1A; --grey: #5C5C5C; --mint: #6DBE95;
-    --hero: radial-gradient(125% 90% at 100% 0%, #1B7254 0%, #0E4A36 46%, #082D20 100%);
-    --hero-end: #06241A; --hero-end-a: rgba(6,36,26,.55);
-    --tile-on-green: radial-gradient(120% 150% at 0% 0%, #24855F 0%, #16603F 52%, #0E4A36 100%);
-  }
-  body[data-dark] :where(#home-overview, #screen-plan) {
-    --row: #242424; --hair: #2C2C2C; --ink: #EDEDED; --grey: #9A9A9A;
-    --hero: radial-gradient(125% 90% at 100% 0%, #17654A 0%, #0D4532 46%, #072A1E 100%);
-    --hero-end: #051F16; --hero-end-a: rgba(5,31,22,.55);
-    --tile-on-green: radial-gradient(120% 150% at 0% 0%, #1F7655 0%, #13573F 52%, #0D4532 100%);
-  }
-  @media (max-width: 359px) { :where(#home-overview, #screen-plan) { --g: 16px; } }
+  /* 1. Tokens: none here. Home and Progress read the app's ONE shared colour set (declared on body and body[data-dark] at the top
+     of this sheet), the same one the training day reads, and its gutter --g (16 px under 360). */
 
   /* 2. Home's greeting: one compact block. The time of day is the eyebrow (a green dot), the first name under it. 64 px stay free
      on the right for the account button. */
