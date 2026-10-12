@@ -255,7 +255,8 @@
 // v124: program.html changed (2026-10-12): Centre Court, the training day re-skinned (the cover, the session bar, the cards, the finish).
 // v125: program.html changed (2026-10-12): Centre Court round 2 (the number is the tick, the chevrons, a working circuit's ▶ in How to do it, "4 / side").
 // v126: program.html changed (2026-10-12): Game Plan became Progress (second tab; the This cycle card, Personal records and Body weight on it), Home in the Centre Court look (Next up, day rows, one door row), the account button scrolls with its screen.
-const CACHE = 'aap-v126';
+// v127: program.html changed (2026-10-13): one shared colour set for the whole app (Centre Court's tokens on body, the older names aliases of them).
+const CACHE = 'aap-v127';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

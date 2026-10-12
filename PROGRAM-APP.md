@@ -751,9 +751,9 @@ Amir, after the UX audit *Quiet Frame* (claude.ai/artifact/BBWjsR99FqthXmzCkeyK4
 and changing its name, then move the cycle card from home to progress tab … do #6, floating initials"*, then *"yes to both,
 move records and weight too"* (and drop the empty wins line). The look is Centre Court's (*"the redesign of other sections
 should look like this"*): calm paper, rows with hairlines, one strong green thing on a screen. All of it is ONE CSS block,
-**HOME AND PROGRESS IN THE CENTRE COURT LOOK**, the last in the sheet (after CENTRE COURT, so it wins a tie). It declares
-Centre Court's tokens again on `:where(#home-overview, #screen-plan)` (light and dark, the same values: **a twin, change
-both** until the tokens become the whole app's) and one gutter, `--g`: 20 px, 16 under 360.
+**HOME AND PROGRESS IN THE CENTRE COURT LOOK**, the last in the sheet (after CENTRE COURT, so it wins a tie). Its colours
+and its gutter `--g` (20 px, 16 under 360) are the app's ONE colour set since 2026-10-13 (it kept a copy of Centre Court's
+tokens for one day; the copy is gone).
 
 - **The tab bar**: Home · **Progress** · Library · Coach. Progress is the old Game Plan button (`data-tab="plan"`,
   `goTo('plan')`, the screen `#screen-plan`: none renamed) with a rising-line icon. Records, Body weight and the archive
@@ -945,6 +945,9 @@ opened from it (`_libScrollY` in `goTo()`; the Library tab, or any other way in,
 - **Text tokens.** `--green-ink` and `--clay-ink` carry every green or clay *text* colour (37 + 58 rules were
   swapped by pattern: `color: var(--yellow|--ice)`). Light mode: the brand colours, so nothing moved. Dark mode
   (`body[data-dark]`): #6DBE95 and #E06B43. `#screen-plan`'s single-accent remap covers `--clay-ink` too.
+  **Since 2026-10-13 they belong to the app's ONE colour set** (see *Centre Court* → *Tokens*): small clay text is #B5461F
+  in light mode everywhere (it was #C7552F outside the training day, 4.1:1), and clay text of 18.66 px bold or more reads
+  `--clay-big`, which keeps #C7552F.
 - **Dark mode fixes that were plain bugs:** the rest timer overlay stayed light while its digits went light
   ("2:00" at 1.08:1); the Home habits card coloured its arrows and streak count with `--grey-bg`, near-black in
   dark, on a card that is always dark green.
@@ -1039,11 +1042,20 @@ P-numbers are parts he picked from the other directions. All of it is ONE CSS bl
 sessions (`:where(#day-view, .step-scroll, #ws-body)`); Home, Game Plan, Records, the About sheet and the
 dashboard do not change.
 
-- **Tokens.** The block declares the day's paper and ink (`--paper`, `--sand`, `--hair`, `--ink`, `--grey`, …)
-  for light and dark, the greens (`--hero`, `--foot`, `--bar`, `--tile`, `--tile-on-green`), and **`--clay-ink`
-  `#B5461F` in light mode inside that scope only**: small clay text on the paper reads 5.1:1 (`#C7552F` is 4.1:1).
-  Fills and anything 18.66 px bold or more keep `#C7552F`; in dark only clay TEXT moves to `#E06B43` (`--clay-ink`),
-  `--clay` stays the brand fill (the note's dot, the fault cue's bar). `--g` is the gutter: 20 px, 16 under 360. The panel is **full-bleed**: `.day-content` has no side padding (the rail's 32 px went with the rail).
+- **Tokens: the app's ONE colour set** (since 2026-10-13; Amir, 2026-10-12: *"go ahead with the shared colours"*). Centre
+  Court's paper and ink (`--paper`, `--sand`, `--row`, `--hair`, `--box`, `--ink`, `--grey`, …), the greens (`--hero`,
+  `--foot`, `--bar`, `--tile`, `--tile-on-green`) and the clay rule were declared inside the day's scope until then; they are
+  now the block **THE APP'S ONE COLOUR SET** at the top of the sheet, light on `body` and dark on `body[data-dark]` (never
+  `:root`: a custom property holding `var()` resolves where it is declared, and dark mode is an attribute on `body`). The
+  older names are aliases of it (`--grey-bg` → `--paper`, `--grey-card` → `--sand`, `--grey-mid` → `--box`, `--grey-text`
+  → `--grey`, `--grey-dark` → `--ink`, `--white` → `--row`, `--yellow` → `--fill`, `--ice` → `--clay`, `--rpe-under` →
+  `--steel`), so a new rule uses the new names and no screen keeps a copy. The clay rule: `--clay` is the brand fill
+  (`#C7552F`, the note's dot, the fault cue's bar); small clay TEXT is `--clay-ink`, `#B5461F` in light (5.1:1; `#C7552F`
+  is 4.1:1); clay text 18.66 px bold or more is `--clay-big`, `#C7552F` (the week note's headline numbers, the article's
+  drop cap, Guided's off-plan number); on the green it is `--clay-on-green`; in dark every clay TEXT is `#E06B43`. `--ink`
+  and `--court` are defined at last (D7). The move was checked by a before/after diff of every element's computed colours on
+  68 screens and states, light and dark: only small clay text outside the day, `--grey-card` fills (#EDE8E0 → #F1ECE3) and
+  five dark greys moved. `--g` is the gutter: 20 px, 16 under 360. The panel is **full-bleed**: `.day-content` has no side padding (the rail's 32 px went with the rail).
 - **The cover** (D's P4): the day's photo graded into the green, ← and the moon as 44 px glass buttons, the
   *● DAY 1* eyebrow (dot and words mint since round 2), the focus in 44 px capitals, and what the day builds as tiles with a › (each still opens its
   quality, `paintDayQualities()`; the first is white). About 270 px at 390. *N blocks · M movements* is hidden.

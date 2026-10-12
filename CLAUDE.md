@@ -259,9 +259,16 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   or Back closes whatever sits under it. **One close grammar** (2026-09-27): ← top left for a screen, ✕ top right
   for a full-screen overlay, a sheet slides down (`initSheetSwipe()`, its handle, a tap above it).
   `history.scrollRestoration` is `manual`: the layer's own button places the page, never the browser.
-- **Green or clay TEXT reads `--green-ink` / `--clay-ink`, never the fill tokens** (A11Y-01, 2026-09-26). In light
-  mode they are the brand colours; in dark mode they are tints that read on #202020. `--yellow` (green) and
-  `--ice` (clay) stay for fills and borders. Before this, green text sat on near-black at 1.4–1.7:1.
+- **The app has ONE colour set, declared once, on `body` and `body[data-dark]`, never on `:root`** (Amir, 2026-10-12:
+  "go ahead with the shared colours"; the block *THE APP'S ONE COLOUR SET* at the top of the sheet). It is Centre Court's
+  (`--paper`, `--sand`, `--row`, `--hair`, `--box`, `--ink`, `--grey`, `--fill`, `--clay`, `--hero`…); the older names
+  (`--grey-bg`, `--grey-card`, `--white`, `--yellow`, `--ice`…) are aliases of it. A custom property holding `var()` resolves
+  where it is declared and dark mode is an attribute on `body`, so a token on `:root` would never turn dark. A new colour
+  joins that block, light and dark, and nowhere else: no screen keeps its own copy.
+- **Green or clay TEXT reads `--green-ink` / `--clay-ink`, never the fill tokens** (A11Y-01, 2026-09-26). Small clay text is
+  `--clay-ink` (#B5461F in light, 5.1:1; the brand #C7552F is only 4.1:1), clay text 18.66 px bold or larger is
+  `--clay-big` (#C7552F), clay on the green is `--clay-on-green`; in dark mode clay text is #E06B43 and green text #6DBE95.
+  `--fill` / `--yellow` (green) and `--clay` / `--ice` stay for fills and borders.
 - **Anything that deletes takes two taps** (LOG-02, 2026-09-26): `armedTap(btn, label, run)` arms on the first
   tap (the label says what the next tap does) and acts on a second within 4 s. Reset Session, the session bar's Reset,
   Finish early, a weight reading and a Personal Record go through it. A new delete button uses it.
@@ -462,7 +469,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v126` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v127` on 2026-10-13). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache
