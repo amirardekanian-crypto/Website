@@ -181,38 +181,50 @@
              border-top-color: var(--court); margin: 0 auto 14px; animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Scoreboard hero (TODAY) ── */
-  .board { position: relative; overflow: hidden; border-radius: 26px; color: #fff; padding: 26px 28px 24px;
-           background: radial-gradient(120% 160% at 12% 0%, #14684C 0%, var(--court) 46%, var(--court-deep) 100%);
+  /* ── Today's strip: the date, the season and the four counters on one line where they fit (2026-10-12, round 1 of the
+     coach UX pass; it was a 200 px banner with a headline). The counters wrap 2 x 2 on a phone. ── */
+  .board { position: relative; overflow: hidden; border-radius: 16px; color: #fff; padding: 14px 18px 17px;
+           display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+           background: radial-gradient(120% 260% at 12% 0%, #14684C 0%, var(--court) 46%, var(--court-deep) 100%);
            box-shadow: var(--shadow); animation: riseIn .4s cubic-bezier(.16,1,.3,1) both; }
   .board::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--clay); }
-  .board-top { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
-  .board-date { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
-                color: rgba(255,255,255,.72); }
-  .board-season { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+  .board-top { display: flex; align-items: center; gap: 6px 12px; flex-wrap: wrap; }
+  .board-date { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+                color: rgba(255,255,255,.78); white-space: nowrap; }
+  .board-season { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
                   color: #fff; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
-                  padding: 5px 12px; border-radius: 999px; }
+                  padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
   .board-season b { color: #FFD9C9; font-weight: 700; }
-  .board h1 { font-size: clamp(34px, 5vw, 52px); line-height: .92; letter-spacing: -.01em; margin: 14px 0 20px; }
-  .board h1 span { color: rgba(255,255,255,.5); }
-  .counters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .counter { display: block; text-decoration: none; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.16);
-             border-radius: 18px; padding: 13px 16px 12px; transition: background .15s, transform .15s; }
-  .counter:hover { background: rgba(255,255,255,.14); transform: translateY(-2px); }
-  .counter .n { font-family: 'Space Mono', monospace; font-size: 30px; font-weight: 700; line-height: 1; }
-  .counter .n small { font-size: 15px; color: rgba(255,255,255,.55); }
-  .counter .l { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
-                color: rgba(255,255,255,.66); margin-top: 6px; }
+  .counters { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+  .counter { display: inline-flex; align-items: baseline; gap: 6px; text-decoration: none; background: rgba(255,255,255,.07);
+             border: 1px solid rgba(255,255,255,.18); border-radius: 999px; padding: 6px 14px; transition: background .15s; }
+  .counter:hover { background: rgba(255,255,255,.16); }
+  .counter .n { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+  .counter .n small { font-size: 12px; color: rgba(255,255,255,.66); }
+  .counter .l { min-width: 0; font-size: 13px; font-weight: 500; line-height: 1.3; color: rgba(255,255,255,.86); }
   .counter.hot .n { color: #FFB99F; }
-  @media (max-width: 760px) { .counters { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 760px) {
+    .counters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; margin-left: 0; }
+    .counter { border-radius: 12px; padding: 6px 12px; }
+  }
+  /* A phone: the date and the season stay on one line, so the strip is date + two rows of counters (under 150 px at 390). */
+  @media (max-width: 560px) {
+    .board { padding: 12px 14px 15px; }
+    .board-date { letter-spacing: .06em; }
+    .board-season { letter-spacing: 0; text-transform: none; }
+  }
 
   /* ── Panels ── */
   .cols { display: grid; grid-template-columns: 7fr 5fr; gap: 16px; margin-top: 16px; align-items: start; }
   .colstack { display: grid; gap: 16px; }
+  /* Today: Needs you wide on the left, the wall, the quest week and the pulse stacked on the right. One column
+     below 900 px, in the same order (Needs you first): no reordering on a phone. */
+  .tcols { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
   /* Grid items default to min-width:auto, so one nowrap label inside a panel
      can push the whole column past its track and scroll the page sideways. */
-  .cols > *, .colstack > *, .counters > * { min-width: 0; }
+  .cols > *, .tcols > *, .colstack > *, .counters > * { min-width: 0; }
   @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } .cols > .colstack:last-child { order: -1; } }
+  @media (max-width: 899px) { .tcols { grid-template-columns: minmax(0, 1fr); } }
   .panel { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 18px 20px;
            box-shadow: var(--shadow); animation: riseIn .4s cubic-bezier(.16,1,.3,1) both; }
   .panel + .panel { margin-top: 0; }
@@ -264,31 +276,50 @@
   .aff-form .exf input { min-width: 160px; }
   .aff-uses { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
 
-  /* ── Needs you ── */
-  .need { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
-          padding: 10px 12px; border-radius: 14px; border: 1px solid var(--rule); margin-bottom: 8px;
-          background: var(--paper); transition: border-color .15s, transform .12s; }
-  .need:hover { border-color: var(--court); transform: translateY(-1px); }
-  .need:last-child { margin-bottom: 0; }
-  .need .dot { flex: none; width: 8px; height: 8px; border-radius: 999px; }
+  /* ── Needs you (2026-10-12, round 1 of the coach UX pass): ONE white panel, rows divided by hairlines (no card inside the
+     card), and one button on the right of each row that names what the tap does. The name and reasons are a button too: it opens
+     the athlete, as the whole row used to. .needrow marks a note row, the one that can also be cleared from here. ── */
+  .need { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 10px 0; }
+  .need + .need { border-top: 1px solid var(--rule); }
+  .need .dot { flex: none; width: 8px; height: 8px; border-radius: 999px; margin-top: 6px; }   /* level with the first line of words, not the middle of the row */
   .need .dot.clay { background: var(--clay); } .need .dot.ochre { background: var(--ochre); }
+  .need .dot.court { background: var(--court); } .need .dot.grey { background: var(--muted-soft); }
   .need .b { flex: 1; min-width: 0; }
-  .need .n { font-weight: 700; font-size: 13.5px; }
-  .need .s { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .need .s.more { font-size: 12px; }
-  .need .dot.court { background: var(--court); }
-  a.need { text-decoration: none; color: inherit; }
-  .need .go { flex: none; font-size: 12px; color: var(--muted-soft); }
-  .need.needrow { cursor: default; }
-  .need .needgo { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+  /* The name and the top reason share a line; a long reason (a note quoted in full) wraps in its own column, two lines at most. */
+  .need .l1 { display: flex; align-items: flex-start; gap: 4px 10px; min-width: 0; font-size: 13.5px; line-height: 1.4; }
+  .need .n { flex: 0 1 auto; min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
+  .need .r1 { flex: 1 1 10em; min-width: 0; color: var(--ink); overflow-wrap: anywhere;
+              display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  .need .r1.warn { color: var(--clay-ink); }
+  .need .s { display: block; font-size: 12px; line-height: 1.4; color: var(--muted); }
+  .need .needgo { flex: 1; min-width: 0; display: flex; align-items: flex-start; gap: 12px; background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+  .need .needgo:hover .n { text-decoration: underline; }
+  .need .needgo.static { cursor: default; }
+  .need .needgo.static:hover .n { text-decoration: none; }
+  .need .nacts { flex: none; display: flex; align-items: center; gap: 8px; }
+  .need .nacts .btn { white-space: nowrap; }
+  .need .nacts a.btn { text-decoration: none; }
+  /* The housekeeping under the people: things to do that are not a person, so not a reason and not in the count. */
+  .also { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .also .eyebrow { margin-bottom: 2px; }
+  /* A phone: the buttons drop under the words, in line with the text and not the dot. */
+  @media (max-width: 560px) {
+    .need .l1 { flex-direction: column; }
+    .need .r1 { flex-basis: auto; }
+    .need { flex-wrap: wrap; row-gap: 8px; }
+    .need .needgo { flex: 1 1 100%; }
+    .need .nacts { flex-wrap: wrap; margin-left: 20px; }
+  }
 
   /* ── The wall ── */
-  .mic { border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; background: var(--paper); margin-bottom: 14px; }
-  .mic .cap { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  /* The wall sits in Today's narrow right column (about 330 px wide at most, 240 px at 900 px): the composer is no box
+     of its own (the textarea is the box) and its buttons wrap. */
+  .mic { margin-bottom: 14px; }
+  .mic .cap { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
   .mic textarea { width: 100%; min-height: 44px; resize: vertical; border: 1px solid var(--line); border-radius: 10px;
                   background: var(--card); padding: 9px 11px; font-size: 14px; line-height: 1.45; }
   .mic textarea:focus { border-color: var(--court); }
-  .mic .row { display: flex; align-items: center; gap: 10px; margin-top: 9px; }
+  .mic .row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; margin-top: 9px; }
   .mic .count { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted-soft); margin-left: auto; }
   .wallday { margin: 16px 0 8px; display: flex; align-items: center; gap: 10px; }
   .wallday .d { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
@@ -318,34 +349,38 @@
   .showweek:hover { color: var(--court); }
 
   /* ── Quest panel ── */
-  .questrun { border: 1px solid var(--line); border-radius: 16px; padding: 13px 15px; background: var(--paper); }
-  .questrun .qtop { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
+  /* In the narrow right column: no box around the live run (rows divided by hairlines), and a quest's note drops under its
+     name and XP instead of squeezing between them. */
+  .questrun .qtop { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
   .questrun .qday { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; color: var(--clay-ink); }
-  .qchip { display: flex; align-items: baseline; gap: 9px; padding: 7px 0; border-top: 1px solid var(--rule); }
-  .qchip .qn { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 15px; letter-spacing: .03em; }
-  .qchip .qd { font-size: 12px; color: var(--muted); flex: 1; }
+  .qchip { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 9px; padding: 8px 0; border-top: 1px solid var(--rule); }
+  .qchip .qn { flex: 1 1 0; min-width: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 15px; letter-spacing: .03em; }
+  .qchip .qd { order: 3; flex: 1 0 100%; font-size: 12px; color: var(--muted); }
   .qchip .qx { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--court); white-space: nowrap; }
   .qpick { border-top: 1px solid var(--rule); margin-top: 12px; padding-top: 12px; }
-  .qopt { display: flex; align-items: baseline; gap: 10px; padding: 6px 2px; border-radius: 10px; cursor: pointer; }
+  .qopt { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; padding: 6px 2px; border-radius: 10px; cursor: pointer; }
   .qopt:hover { background: var(--court-100); }
   .qopt input { accent-color: var(--court); transform: translateY(1px); }
-  .qopt .qn { font-weight: 700; font-size: 13px; }
-  .qopt .qd { font-size: 12px; color: var(--muted); flex: 1; }
+  .qopt .qn { flex: 1 1 0; min-width: 0; font-weight: 700; font-size: 13px; }
+  .qopt .qd { order: 3; flex: 1 0 100%; padding-left: 26px; font-size: 12px; color: var(--muted); }
   .qopt .qx { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
 
   /* ── Pulse (7-day presence) ── */
-  .pulse { display: flex; align-items: center; gap: 11px; width: 100%; text-align: left; padding: 8px 6px;
+  /* The row wraps instead of crushing the name when the column is at its narrowest (about 240 px at 900 px wide). */
+  .pulse { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 11px; width: 100%; text-align: left; padding: 8px 6px;
            border-radius: 12px; border-bottom: 1px solid var(--rule); }
   .pulse:last-of-type { border-bottom: 0; }
   .pulse:hover { background: var(--court-100); }
-  .pulse .nm { flex: 1; min-width: 0; font-weight: 600; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pulse .nm { flex: 1 1 96px; min-width: 0; font-weight: 600; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pulse .dots { gap: 3px; }
+  .pulse .dt { width: 11px; height: 11px; border-radius: 4px; }
   .pulse .nm small { display: block; font-weight: 400; font-size: 12px; color: var(--muted-soft); }
   .dots { display: inline-flex; gap: 4px; flex: none; }
   .dt { width: 13px; height: 13px; border-radius: 5px; background: var(--track); }
   .dt.on { background: var(--court); }
   .dt.today { box-shadow: inset 0 0 0 2px var(--clay); background: var(--card); }
   .dt.today.on { background: var(--court); box-shadow: inset 0 0 0 2px var(--clay); }
-  .pulse .tag { flex: none; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .pulse .tag { flex: none; margin-left: auto; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
   .pulse .tag.warn { color: var(--clay-ink); font-weight: 700; }
 
   /* ── Chips ── */
@@ -2396,23 +2431,20 @@ function renderToday() {
         <span class="board-date">${DOWS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}</span>
         ${season ? `<span class="board-season">${esc(season.name)} · <b>Day ${sd}</b></span>` : ''}
       </div>
-      <h1 class="hd">The Coach's Box <span>— today's play</span></h1>
       <div class="counters">
         <a class="counter" href="#today" onclick="scrollPanel(event,'pulsePanel')">
-          <div class="n">${onCourt}<small>/${habAthletes.length}</small></div><div class="l">On court today</div></a>
+          <span class="n">${onCourt}<small>/${habAthletes.length}</small></span> <span class="l">on court today</span></a>
         <a class="counter" href="#today" onclick="scrollPanel(event,'wallPanel')">
-          <div class="n">${wallToday}</div><div class="l">Wall lines today</div></a>
-        <a class="counter" href="#athletes"><div class="n">${sessions7}</div><div class="l">Sessions, last 7 days</div></a>
+          <span class="n">${wallToday}</span> <span class="l">wall line${wallToday === 1 ? '' : 's'} today</span></a>
+        <a class="counter" href="#athletes"><span class="n">${sessions7}</span> <span class="l">session${sessions7 === 1 ? '' : 's'}, last 7 days</span></a>
         <a class="counter ${waiting ? 'hot' : ''}" href="#today" onclick="scrollPanel(event,'needPanel')">
-          <div class="n">${waiting}</div><div class="l">Notes to read</div></a>
+          <span class="n">${waiting}</span> <span class="l">note${waiting === 1 ? '' : 's'} to read</span></a>
       </div>
     </section>
-    <div class="cols">
+    <div class="tcols">
+      <section class="panel" id="needPanel" style="animation-delay:.05s">${needPanelHtml()}</section>
       <div class="colstack">
-        <section class="panel" id="wallPanel" style="animation-delay:.05s">${wallPanelHtml()}</section>
-      </div>
-      <div class="colstack">
-        <section class="panel" id="needPanel" style="animation-delay:.08s">${needPanelHtml()}</section>
+        <section class="panel" id="wallPanel" style="animation-delay:.08s">${wallPanelHtml()}</section>
         <section class="panel" id="questPanel" style="animation-delay:.12s">${questPanelHtml(run)}</section>
         <section class="panel" id="pulsePanel" style="animation-delay:.16s">${pulsePanelHtml(habAthletes)}</section>
       </div>
@@ -2446,9 +2478,9 @@ function wallPanelHtml() {
   return `
     <div class="phead"><span class="t hd">The wall</span><span class="r">roll call · last ${showWeek ? '7 days' : '2 days'}</span></div>
     <div class="mic">
-      <div class="cap"><span class="eyebrow">Your line to the crew — pinned on today's wall</span></div>
+      <div class="cap"><span class="eyebrow">Your line to the crew</span></div>
       <textarea id="coachLineInput" maxlength="200" placeholder="No line yet today. Say something to everyone…">${esc(_coachLineDraft != null ? _coachLineDraft : (mine ? mine.body : ''))}</textarea>
-      <div class="muted" style="font-size:12px;margin:4px 0 0">Quotes, &lt; &gt; and backslashes are removed when you post, and line breaks become spaces.</div>
+      <div class="muted" style="font-size:12px;margin:4px 0 0">Pinned on today's wall. Quotes, &lt; &gt; and backslashes are removed when you post, and line breaks become spaces.</div>
       <div class="row">
         <button class="btn primary sm" onclick="postCoachLine()">${mine ? 'Update the line' : "Post today's line"}</button>
         ${mine ? `<button class="btn sm danger" onclick="clearCoachLine()">Take it down</button>` : ''}
@@ -2518,10 +2550,15 @@ window.clearCoachLine = clearCoachLine;
 window.toggleHide = toggleHide;
 
 // Who needs the coach: one row per PERSON, from reasonsOf() (the same rule the roster uses), most
-// urgent first. A note row opens the day the note is on. Plus two things that are not a person:
-// new applications in Intake, and an overdue backup. (Unread chat messages left with the in-app
-// chat on 2026-09-26: athletes reach Amir on WhatsApp.)
+// urgent first. A note row opens the day the note is on. Each row has ONE button on the right that names what the tap
+// does (2026-10-12, round 1 of the coach UX pass); the words and the reasons stay a button too and open the athlete, as the
+// whole row used to. Under the people, "Also waiting": things to do that are NOT a person and NOT a reason, so reasonsOf() and
+// the count above do not change: new applications in Intake, logins not yet sent, an overdue backup, and older notes.
+// (Unread chat messages left with the in-app chat on 2026-09-26: athletes reach Amir on WhatsApp.)
 let _needAll = false;
+// The button label for the top reason's key. The three below are WhatsApp links when the person has a number, else "Open".
+const NEED_ACT = { sync: 'Open sessions', lowrun: 'Open', cycle: 'Open cycle', renew: 'Open file', login: 'Set up login', idle: 'Open' };
+const NEED_WA_KEYS = ['signup', 'silent', 'upgrade'];
 function needPanelHtml() {
   const people = Object.values(S.ath).filter(a => (a.reasons || []).length)
     .sort((x, y) => rosterAttention(y) - rosterAttention(x) || x.name.localeCompare(y.name));
@@ -2533,44 +2570,68 @@ function needPanelHtml() {
     const say = note ? `Day ${note.day} note: “${sessionNoteText(note)}”` : top.text;
     const more = a.reasons.slice(1).map(r => r.text).join(' · ');
     const dot = `<span class="dot ${top.tone === 'warn' ? 'clay' : top.tone === 'good' ? 'court' : 'ochre'}"></span>`;
-    const body = `<span class="b"><span class="n">${esc(a.name)}</span><div class="s">${esc(say)}</div>${more ? `<div class="s more">${esc(more)}</div>` : ''}</span>`;
-    // A note that needs no action can be cleared from here (audit FLOW-7, 2026-10-11): Mark read marks the one quoted, then the row shows the
-    // next, or goes. The row is a box with two buttons (a button inside a button is not valid), so open → is the left part.
-    if (note) return `<div class="need needrow">
-      <button class="needgo" onclick="${go}">${dot}${body}<span class="go">open →</span></button>
-      <button class="btn sm" onclick="markNoteRead(${jsq(a.id)}, ${Number(note.day)}, ${jsq(note.completed_on)})" title="Clear this note without opening ${esc(a.name)}">Mark read</button>
+    const body = `<span class="b"><span class="l1"><span class="n">${esc(a.name)}</span> <span class="r1${top.tone === 'warn' ? ' warn' : ''}">${esc(say)}</span></span>${more ? `<span class="s more">${esc(more)}</span>` : ''}</span>`;
+    const wa = NEED_WA_KEYS.includes(top.key) ? waLink(a.contact && a.contact.whatsapp) : '';
+    let acts;
+    if (note) {
+      // A note that needs no action can be cleared from here (audit FLOW-7, 2026-10-11): Mark read marks the one quoted, then the row shows the
+      // next, or goes. The row is a box with buttons (a button inside a button is not valid), so the words are the left part.
+      acts = `<button class="btn sm" onclick="markNoteRead(${jsq(a.id)}, ${Number(note.day)}, ${jsq(note.completed_on)})" title="Clear this note without opening ${esc(a.name)}">Mark read</button>
+        <button class="btn sm" onclick="${go}">Open day</button>`;
+    } else if (wa) {
+      acts = `<a class="btn sm" target="_blank" rel="noopener" href="${esc(wa)}" title="Open a WhatsApp chat with ${esc(a.name)}">WhatsApp ↗</a>`;
+    } else if (top.key === 'login') {
+      acts = `<button class="btn sm" onclick="openAthleteLogin(${jsq(a.id)})">${NEED_ACT.login}</button>`;
+    } else {
+      acts = `<button class="btn sm" onclick="${go}">${esc(NEED_ACT[top.key] || 'Open')}</button>`;
+    }
+    return `<div class="need${note ? ' needrow' : ''}">
+      <button class="needgo" onclick="${go}">${dot}${body}</button>
+      <span class="nacts">${acts}</span>
     </div>`;
-    return `<button class="need" onclick="${go}">${dot}${body}<span class="go">open →</span></button>`;
   };
   const CAP = 12;
   const shown = _needAll ? people : people.slice(0, CAP);
-  const extra = [];
+  // Also waiting. One row each, each with its own button.
+  const also = [];
+  const housekeeping = (dotClass, title, text, buttons) => `<div class="need">
+      <span class="needgo static"><span class="dot ${dotClass}"></span><span class="b"><span class="l1"><span class="n">${title}</span></span><span class="s">${text}</span></span></span>
+      <span class="nacts">${buttons}</span>
+    </div>`;
   const newIntake = (S.intake || []).filter(i => (i.status || 'new') === 'new').length;
-  if (newIntake) extra.push(`<a class="need" href="#intake"><span class="dot clay"></span>
-      <span class="b"><span class="n">${newIntake} new application${newIntake === 1 ? '' : 's'}</span><div class="s">Coaching apply forms waiting in Intake</div></span>
-      <span class="go">open →</span></a>`);
+  if (newIntake) also.push(housekeeping('clay', `${newIntake} new application${newIntake === 1 ? '' : 's'}`, 'Coaching apply forms waiting in Intake',
+    `<a class="btn sm" href="#intake">Open Intake</a>`));
+  // Logins created and not yet sent (the same rule as the Tools panel's list, pendingCredsHtml(): a stored first password is what makes a login "unsent").
+  // Nothing while the list of logins failed to load: it would be a list of nobody.
+  const unsent = LOAD_ERR.logins ? [] : Object.values(S.logins || {}).filter(r => r.initial_password).sort((x, y) => x.athlete_id.localeCompare(y.athlete_id));
+  unsent.forEach(r => also.push(housekeeping('clay', `Login to send · ${esc(nameOf(r.athlete_id))}`, `Copy the message, send it on WhatsApp, then mark it sent${usedMark('athlete', r.athlete_id)}`,
+    `<button class="btn sm" onclick="copyLoginFor(${jsq(r.athlete_id)})">Copy message</button>
+      <button class="btn sm" onclick="markLoginSent(${jsq(r.athlete_id)})">Mark sent</button>`)));
   const lb = lastBackupAt(), lbDays = lb ? daysSince(lb) : null, lbBad = lastBadBackupAt();
-  if (!DEMO && (lbDays == null || lbDays >= 7)) extra.push(`<div class="need" style="border-style:dashed">
-      <span class="dot ochre"></span>
-      <span class="b"><span class="n">Weekly backup</span><div class="s" style="white-space:normal">${lb ? 'Last complete one taken on this computer ' + timeAgo(lb) : 'No complete backup taken on this computer yet'}${
-        lbBad ? `; the try ${esc(timeAgo(lbBad))} was INCOMPLETE and does not count` : ''} — the free plan keeps none</div></span>
-      <button class="btn sm" onclick="downloadBackup(this)">⤓ Back up now</button>
-    </div>`);
+  if (!DEMO && (lbDays == null || lbDays >= 7)) also.push(housekeeping('ochre', 'Weekly backup',
+    `${lb ? 'Last complete one taken on this computer ' + timeAgo(lb) : 'No complete backup taken on this computer yet'}${
+      lbBad ? `; the try ${esc(timeAgo(lbBad))} was INCOMPLETE and does not count` : ''} — the free plan keeps none`,
+    `<button class="btn sm" onclick="downloadBackup(this)">⤓ Back up now</button>`));
   const stale = Object.values(S.ath).reduce((n, a) => n + a.needReplyStale, 0);
-  const staleRow = stale ? `
-    <div class="need" style="border-style:dashed">
-      <span class="dot" style="background:var(--muted-soft)"></span>
-      <span class="b"><span class="n">${stale} older note${stale === 1 ? '' : 's'}</span>
-        <div class="s">Never marked read, arrived more than ${NEEDS_WINDOW_DAYS} days ago — history, not today's work</div></span>
-      <button class="btn sm" onclick="clearNoteBacklog()">Clear</button>
-    </div>` : '';
+  if (stale) also.push(housekeeping('grey', `${stale} older note${stale === 1 ? '' : 's'}`,
+    `Never marked read, arrived more than ${NEEDS_WINDOW_DAYS} days ago — history, not today's work`,
+    `<button class="btn sm" onclick="clearNoteBacklog()">Clear</button>`));
   return `
     <div class="phead"><span class="t hd">Needs you</span><span class="r">${people.length ? people.length + (people.length === 1 ? ' person' : ' people') : ''}</span></div>
-    ${extra.join('')}
     ${shown.map(row).join('') || '<p class="empty">Nobody is waiting on you. Clean bench. ✓</p>'}
     ${people.length > CAP ? `<button class="showweek" onclick="_needAll=!_needAll;render()">${_needAll ? 'Show fewer' : 'Show all ' + people.length}</button>` : ''}
-    ${staleRow}`;
+    ${also.length ? `<div class="also"><div class="eyebrow">Also waiting</div>${also.join('')}</div>` : ''}`;
 }
+// "Set up login": open their File, where a person with no login has the password box drawn already, and put the cursor in it.
+// The File is drawn synchronously by the hashchange; the check is that it IS that athlete's File before anything takes focus.
+function openAthleteLogin(id) {
+  openAthlete(id, 'file');
+  setTimeout(() => {
+    const r = route(), el = document.getElementById('athPw');
+    if (el && r.view === 'detail' && r.id === id) el.focus();
+  }, 60);
+}
+window.openAthleteLogin = openAthleteLogin;
 // Open an athlete on a given screen; for a note, open the day it is on and pick that session.
 let _pendingFocus = null;
 function openAthlete(id, sub, day, completedOn) {

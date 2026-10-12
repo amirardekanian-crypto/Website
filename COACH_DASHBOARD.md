@@ -307,18 +307,26 @@ every code sat in the forms' page source.
 
 ## 3. TODAY
 
-### The scoreboard
+### The layout (2026-10-12, round 1 of the coach UX pass)
 
-Four counters across the hero, each one a link to the panel that explains it:
+Action first: what needs you is the first thing on the screen, and it is wide.
+
+- **A slim strip** (about 70 px on a desktop, under 150 px on a phone) instead of the old banner and its headline: the date and the season pill, then the
+  four counters on one line, each as number + label (*2/3 on court today*, *1 note to read*). Each counter is still a link to the panel that explains it
+  (`scrollPanel`). On a phone the counters wrap 2 x 2.
+- **Two columns from 900 px**, `minmax(0,2fr) minmax(0,1fr)` (`.tcols`): **Needs you** on the left (`#needPanel`); on the right **the wall** (`#wallPanel`),
+  **Quest week** (`#questPanel`) and **Proof pulse** (`#pulsePanel`), stacked. Under 900 px it is one column in that same order, Needs you first: there is
+  no reordering on a phone any more (`.cols`, whose last column jumps first on a phone, is now only the Proof screen's). The wall's composer, the quest picker and
+  the pulse rows are laid out for the narrow column (about 330 px at 1180 wide): no box around the composer or the live run, a quest's note under its name,
+  the pulse row wraps instead of crushing the name.
+- One white panel per section and **no card inside a card**: Needs you's rows are divided by hairlines.
 
 | Counter | What it counts |
 |---|---|
 | **On court today** | Proof athletes with a log entry for today ÷ everyone on Proof |
 | **Wall lines today** | Roll-call posts today, hidden ones excluded |
-| **Sessions this week** | Finished training sessions in the last 7 days, whole roster |
+| **Sessions, last 7 days** | Finished training sessions in the last 7 days, whole roster |
 | **Notes to read** | Session notes that arrived in the last 14 days and are not yet marked read (the same number as the badge on Athletes). It was called *Waiting on you* until 2026-10-10 |
-
-Beside them: the current season and how many days into it you are.
 
 ### The wall — read it *and* write it
 
@@ -350,8 +358,24 @@ chips, its *Needs you* group and filter, and its default sort use the same funct
 screens always agree. (Until 2026-10-10 four places counted "needs you" four different ways:
 sync gaps and upgrade leads never reached Today, signups never reached the roster, and Today cut
 off at 10 rows of notes.) The header counts **people**; the counter above counts **notes**.
-**A note that needs no action is cleared from here** (audit FLOW-7, 2026-10-11): its row has **Mark read** beside *open →*, which marks the one session
+**A note that needs no action is cleared from here** (audit FLOW-7, 2026-10-11): its row has **Mark read**, which marks the one session
 quoted in the row and then shows the next one, or the row goes. The athlete does not have to be opened.
+
+**Each row says what you will do** (2026-10-12). A row is the dot, the name, the top reason (clay when its tone is *warn*, ink otherwise), the other reasons in
+grey underneath, and **one button on the right named for what happens**. The name and reasons are a button too and open the athlete, exactly as the whole row used to
+(a note opens the day it is on). The button comes from the top reason's `key` (`NEED_ACT` and `NEED_WA_KEYS` in `needPanelHtml()`):
+
+| Top reason | Button | What it does |
+|---|---|---|
+| `note` | **Mark read** and **Open day** | marks the one session quoted read / opens the day the note is on |
+| `sync` | **Open sessions** | opens their work |
+| `lowrun`, `idle` | **Open** | opens their work |
+| `cycle` | **Open cycle** | opens their work |
+| `renew` | **Open file** | opens their File |
+| `login` | **Set up login** | opens their File and puts the cursor in the password box (`openAthleteLogin()`) |
+| `signup`, `silent`, `upgrade` | **WhatsApp ↗** | their number as a `wa.me` link in a new tab (`waLink()`); a plain **Open** (their Proof) when there is no number it can open |
+
+Only one reason's button per row, and none is the green primary button: a list of rows has no single "main" action.
 
 | Reason | Trigger | Weight |
 |---|---|---|
@@ -379,15 +403,24 @@ nudge): they still count in Everyone and their tier chip, and sit under a **Paus
 the main list; they stay under the **Former** chip and everything they logged stays. A **note they send** and a **session that did not sync** still reach
 Needs you for both, because those are messages and data problems, not chasing. The mark lives in `athlete_status` (only a paused or former athlete has a row,
 coach-only, in the backup, emptied by an erasure); `coach_set_status()` sets it and *Active* removes the row. `status-paused-former` drives it.
-Above the people: a row for **new applications** in Intake, and a **weekly backup** row when
-this computer has not taken one for 7 days. Tap a person to open them on the right screen (a note
-opens the day the note is on; a Proof reason opens Proof). **Show all** lists everyone past the
-first 12. (An *N unread messages* row sat here until 2026-09-26, when the in-app chat was removed
-from both apps: athletes message you on WhatsApp now.)
+Tap a person's words to open them on the right screen (a note opens the day the note is on; a Proof
+reason opens Proof). **Show all** lists everyone past the first 12. (An *N unread messages* row sat here
+until 2026-09-26, when the in-app chat was removed from both apps: athletes message you on WhatsApp now.)
+
+**Also waiting** (2026-10-12). Under the people, after a hairline and a small label, four kinds of row that are **not a person and not a reason**: `reasonsOf()` does not
+know them, they are not in the header's *N people*, and they are not in the Athletes badge. Each has its own button:
+
+| Row | Shown when | Button |
+|---|---|---|
+| **N new applications** | a coaching apply form in Intake is still `new` | **Open Intake** |
+| **Login to send · <name>** (new, Amir's yes) | an athlete login still holds its first password (`S.logins`, `initial_password`: the same rule as the Tools panel's *Logins to send*, `pendingCredsHtml()`); nothing is shown while the list of logins failed to load (`LOAD_ERR.logins`), because it would be a list of nobody. A password the athlete has already signed in with says so (the database clears it by itself soon after, stage51) | **Copy message** (`copyLoginFor()`) and **Mark sent** (`markLoginSent()`, which asks first: the very write the Tools panel makes) |
+| **Weekly backup** | this computer has not taken a complete backup for 7 days (never in the demo); it says when the last try was INCOMPLETE and does not count | **⤓ Back up now** |
+| **N older notes** | notes that arrived more than 14 days ago and were never marked read | **Clear** |
 
 **Clear** on the *older notes* row (notes that arrived more than 14 days ago and were never marked
 read) marks exactly the notes it counted, by their key. It used to mark every unread session
-older than 14 days on the server, including notes that arrived after the page loaded.
+older than 14 days on the server, including notes that arrived after the page loaded. `today-also-waiting` drives the
+layout, the buttons and the login rows; `today-mark-read`, `backlog-clear` and `backup-incomplete` keep the older ones.
 
 **Today's targets on a session (2026-09-26).** When an athlete's check-in eased the day (REC-2), the
 session line on The work says *lower day*, *short day* or *sore* (and *trained as written* if they

@@ -2595,6 +2595,119 @@ S['today-mark-read'] = async (b) => {
 };
 function location_is_today(h) { return h === '' || h === '#today'; }
 
+// Round 1 of the coach UX pass (2026-10-12): Today is Needs you first and wide, every person row has ONE button named for what it does,
+// and the things that are not a person sit under "Also waiting", with the logins that were created and not sent (new).
+S['today-also-waiting'] = async (b) => {
+  const r = { id: 'today-also-waiting', title: 'Today: Needs you first and wide, a button on each row that names what it does, and "Also waiting" with the logins to send', checks: [] };
+  const { page, log } = await L.openCoach(b, {});
+  const peopleText = () => page.locator('#needPanel .phead .r').innerText().then(s => s.replace(/\s+/g, ' ').trim());
+  // 1. layout: Needs you first in the page, left of the wall and about twice as wide; the other three panels follow in order; no banner headline
+  const lay = await page.evaluate(() => {
+    const n = document.getElementById('needPanel'), w = document.getElementById('wallPanel'), q = document.getElementById('questPanel'), p = document.getElementById('pulsePanel');
+    const rn = n.getBoundingClientRect(), rw = w.getBoundingClientRect(), F = Node.DOCUMENT_POSITION_FOLLOWING;
+    return { order: !!(n.compareDocumentPosition(w) & F) && !!(w.compareDocumentPosition(q) & F) && !!(q.compareDocumentPosition(p) & F),
+      left: rn.right <= rw.left + 1, ratio: Math.round(rn.width / rw.width * 100) / 100, top: Math.abs(rn.top - rw.top) < 2,
+      h1: document.querySelectorAll('#content h1').length, strip: Math.round(document.querySelector('.board').getBoundingClientRect().height),
+      counters: [...document.querySelectorAll('.board .counter')].map(a => a.textContent.replace(/\s+/g, ' ').trim()) };
+  });
+  check(r, '#needPanel comes before #wallPanel, then #questPanel, then #pulsePanel, in the page', lay.order, lay);
+  check(r, 'on a wide screen Needs you is the left column, level with the wall and about twice as wide', lay.left && lay.top && lay.ratio > 1.8 && lay.ratio < 2.3, lay);
+  check(r, 'the strip has no headline and is slim (under 110 px), with the four counters on it as number + label', lay.h1 === 0 && lay.strip < 110 && lay.counters.length === 4 && /^\d+\/\d+ on court today$/.test(lay.counters[0]) && /^\d+ notes? to read$/.test(lay.counters[3]), lay);
+  for (const w of [390, 320]) {
+    await page.setViewportSize({ width: w, height: 844 }); await L.settle(page, 250);
+    const ph = await page.evaluate(() => { const n = document.getElementById('needPanel').getBoundingClientRect(), wl = document.getElementById('wallPanel').getBoundingClientRect();
+      return { stacked: wl.top >= n.bottom - 1, sw: document.documentElement.scrollWidth, iw: innerWidth, strip: Math.round(document.querySelector('.board').getBoundingClientRect().height) }; });
+    check(r, `at ${w} px one column with Needs you first, and no sideways scroll`, ph.stacked && ph.sw <= ph.iw, ph);
+    if (w === 390) check(r, 'at 390 px the strip stays under 150 px (counters 2 x 2)', ph.strip < 150, ph);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 }); await L.settle(page, 250);
+
+  // 2. each person's button, from the top reason
+  const info = await page.evaluate(() => [...document.querySelectorAll('#needPanel .need')].filter(el => el.querySelector('.needgo:not(.static)')).map(el => ({
+    name: el.querySelector('.n').textContent.trim(), btns: [...el.querySelectorAll('.nacts .btn')].map(x => x.textContent.trim()), tags: [...el.querySelectorAll('.nacts .btn')].map(x => x.tagName),
+    href: (el.querySelector('.nacts a.btn') || {}).href || '', target: (el.querySelector('.nacts a.btn') || {}).target || '',
+    go: el.querySelector('.needgo').getAttribute('onclick'), open: [...el.querySelectorAll('.nacts button')].map(x => x.getAttribute('onclick')) })));
+  const by = n => info.find(x => x.name === n) || {};
+  check(r, 'a note row (Ava): Mark read and Open day, and Open day does what the row does', JSON.stringify(by('Ava Example').btns) === JSON.stringify(['Mark read', 'Open day']) && by('Ava Example').open[1] === by('Ava Example').go, by('Ava Example'));
+  check(r, 'a no-login row (Eli) says Set up login', JSON.stringify(by('Eli Example').btns) === JSON.stringify(['Set up login']), by('Eli Example'));
+  check(r, 'a new signup with a number (Dan) says WhatsApp, a link that opens in a new tab', JSON.stringify(by('Dan').btns) === JSON.stringify(['WhatsApp ↗']) && by('Dan').tags[0] === 'A' && /^https:\/\/wa\.me\/\d+$/.test(by('Dan').href) && by('Dan').target === '_blank', by('Dan'));
+  // every key, on made-up people (so the table is checked for all of them, with and without a number)
+  const KEYS = [['sync', 'Open sessions'], ['lowrun', 'Open'], ['cycle', 'Open cycle'], ['renew', 'Open file'], ['idle', 'Open'], ['login', 'Set up login'], ['signup', 'WhatsApp ↗'], ['silent', 'WhatsApp ↗'], ['upgrade', 'WhatsApp ↗']];
+  const synth = await page.evaluate(KEYS => {
+    _needAll = true;
+    const mk = (id, key, wa) => { S.ath[id] = { id, name: 'Zz ' + id, tier: 'coached', reasons: [{ key, tone: key === 'sync' ? 'warn' : 'note', text: 'fixture ' + key, weight: 1, sub: key === 'sync' ? 'work' : key === 'signup' || key === 'silent' || key === 'upgrade' ? 'proof' : 'file' }],
+      needReplyRecent: [], needReplyStale: 0, needReplySessions: [], toReply: 0, contact: { whatsapp: wa }, isHab: false }; };
+    KEYS.forEach(([k]) => mk('zz_' + k, k, '+447700900123'));
+    ['signup', 'silent', 'upgrade'].forEach(k => mk('zz_nowa_' + k, k, '@just_a_handle'));
+    render();
+    const out = [...document.querySelectorAll('#needPanel .need')].filter(el => /^Zz /.test((el.querySelector('.n') || {}).textContent || '')).map(el => ({
+      id: el.querySelector('.n').textContent.trim().slice(3), btns: [...el.querySelectorAll('.nacts .btn')].map(x => x.textContent.trim()),
+      tag: (el.querySelector('.nacts .btn') || {}).tagName, href: (el.querySelector('.nacts a.btn') || {}).href || '', rel: (el.querySelector('.nacts a.btn') || {}).rel || '',
+      sameAsRow: el.querySelector('.nacts button') ? el.querySelector('.nacts button').getAttribute('onclick') === el.querySelector('.needgo').getAttribute('onclick') : null,
+      warn: el.querySelector('.r1').classList.contains('warn') }));
+    Object.keys(S.ath).filter(k => k.startsWith('zz_')).forEach(k => delete S.ath[k]);
+    _needAll = false; render();
+    return out;
+  }, KEYS);
+  const bad = [];
+  KEYS.forEach(([k, label]) => { const x = synth.find(s => s.id === 'zz_' + k) || {};
+    if (JSON.stringify(x.btns) !== JSON.stringify([label])) bad.push([k, x.btns]);
+    if (label === 'WhatsApp ↗' ? !(x.tag === 'A' && x.href === 'https://wa.me/447700900123' && /noopener/.test(x.rel)) : (k !== 'login' && x.sameAsRow !== true)) bad.push([k, 'link or handler', x]); });
+  ['signup', 'silent', 'upgrade'].forEach(k => { const x = synth.find(s => s.id === 'zz_nowa_' + k) || {}; if (JSON.stringify(x.btns) !== JSON.stringify(['Open']) || x.sameAsRow !== true) bad.push(['nowa ' + k, x]); });
+  check(r, 'every reason key has the button in the brief: Open sessions / Open / Open cycle / Open file / Set up login, WhatsApp for signup, silent and upgrade (a plain Open when there is no number), and the plain ones do what the row does', synth.length === KEYS.length + 3 && !bad.length, bad.length ? bad : synth.length);
+  check(r, 'only a warn reason is clay (the sync row), the others are ink', synth.find(s => s.id === 'zz_sync').warn === true && synth.filter(s => s.id !== 'zz_sync').every(s => s.warn === false), synth.map(s => s.id + ':' + s.warn));
+
+  // 3. Also waiting
+  const also = await page.evaluate(() => { const a = document.querySelector('#needPanel .also'); if (!a) return null;
+    const last = [...document.querySelectorAll('#needPanel .need')].filter(el => el.querySelector('.needgo:not(.static)')).pop();
+    return { label: (a.querySelector('.eyebrow') || {}).textContent, after: !!(last.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING),
+      rows: [...a.querySelectorAll('.need')].map(el => ({ title: el.querySelector('.n').textContent.trim(), btns: [...el.querySelectorAll('.nacts .btn')].map(x => x.textContent.trim()) })) }; });
+  check(r, 'an "Also waiting" group under the people', !!also && also.label === 'Also waiting' && also.after, also);
+  const rowOf = t => (also && also.rows.find(x => x.title === t)) || {};
+  check(r, 'it holds the applications, the logins to send, the weekly backup and the older notes, each with its own button',
+    JSON.stringify(rowOf('2 new applications').btns) === JSON.stringify(['Open Intake']) && JSON.stringify(rowOf('Login to send · Ben Example').btns) === JSON.stringify(['Copy message', 'Mark sent'])
+    && JSON.stringify(rowOf('Weekly backup').btns) === JSON.stringify(['⤓ Back up now']) && JSON.stringify(rowOf('1 older note').btns) === JSON.stringify(['Clear']), also);
+  check(r, 'only a login that still holds its first password is listed (Ava\'s was sent)', also.rows.filter(x => /^Login to send/.test(x.title)).length === 1, also.rows.map(x => x.title));
+  const people0 = await peopleText();
+  const nPeople = await page.evaluate(() => Object.values(S.ath).filter(a => (a.reasons || []).length).length);
+  const asReason = await page.evaluate(() => Object.values(S.ath).some(a => (a.reasons || []).some(x => /login to send/i.test(x.text + x.key))));
+  check(r, 'the header counts people only: the rows under Also waiting are not reasons', people0 === `${nPeople} people` && nPeople === 4 && !asReason, { people0, nPeople, asReason });
+  await page.evaluate(() => { LOAD_ERR.logins = 'fixture: logins did not load'; render(); });
+  check(r, 'when the list of logins did not load, no login row is shown', (await page.locator('#needPanel .also .need', { hasText: 'Login to send' }).count()) === 0, '');
+  await page.evaluate(() => { LOAD_ERR.logins = ''; render(); });
+  check(r, 'and it comes back when it did', (await page.locator('#needPanel .also .need', { hasText: 'Login to send · Ben Example' }).count()) === 1, '');
+
+  // 4. Copy message, then Mark sent: the same write as the Tools panel's
+  const row = () => page.locator('#needPanel .also .need', { hasText: 'Login to send · Ben Example' });
+  await row().getByRole('button', { name: 'Copy message' }).click(); await L.settle(page, 300);
+  const clip = await page.evaluate(() => navigator.clipboard.readText());
+  check(r, 'Copy message puts their login message on the clipboard', /ben_test/.test(clip) && /fixture-unsent-pw-1/.test(clip), clip.slice(0, 120));
+  const d0 = log.dialogs.length, n0 = await L.nCalls(page);
+  await row().getByRole('button', { name: 'Mark sent' }).click(); await L.settle(page, 800);
+  const todayUpd = lastOf(await L.callsSince(page, n0), isUpd('athlete_identities'));
+  check(r, 'Mark sent asks first, then clears the stored password and stamps sent, for that athlete', log.dialogs.slice(d0).some(x => x.type === 'confirm' && /ben_test/.test(x.message)) && !!todayUpd && todayUpd.payload.initial_password === null && typeof todayUpd.payload.sent_at === 'string' && todayUpd.filters.includes('athlete_id.eq."ben_test"'), todayUpd && { payload: todayUpd.payload, filters: todayUpd.filters });
+  check(r, 'the row goes and the people count does not change', (await row().count()) === 0 && (await peopleText()) === people0 && location_is_today(await page.evaluate(() => location.hash)), await peopleText());
+  await page.evaluate(() => { const x = window.__DB.athlete_identities.find(i => i.athlete_id === 'ben_test'); x.initial_password = 'fixture-unsent-pw-1'; x.sent_at = null; return hardRefresh(); }); await L.settle(page, 800);
+  await L.go(page, 'athletes'); await openTools(page);
+  await page.evaluate(() => { const el = document.querySelector('.creds-top'); if (el && el.getAttribute('aria-expanded') !== 'true') el.click(); });
+  const n1 = await L.nCalls(page);
+  await page.locator('.creds .credrow', { hasText: 'ben_test' }).getByRole('button', { name: 'Mark sent' }).click(); await L.settle(page, 800);
+  const toolsUpd = lastOf(await L.callsSince(page, n1), isUpd('athlete_identities'));
+  check(r, 'it is the very write the Tools panel makes (same columns, same filter)', !!toolsUpd && !!todayUpd && JSON.stringify(Object.keys(toolsUpd.payload).sort()) === JSON.stringify(Object.keys(todayUpd.payload).sort()) && toolsUpd.payload.initial_password === null && JSON.stringify(toolsUpd.filters) === JSON.stringify(todayUpd.filters), toolsUpd && { payload: toolsUpd.payload, filters: toolsUpd.filters });
+
+  // 5. Set up login opens the File and puts the cursor in the password box; a note's Open day opens that day
+  await L.go(page, 'today');
+  await page.locator('#needPanel .need', { hasText: 'Eli Example' }).first().getByRole('button', { name: 'Set up login' }).click(); await L.settle(page, 400);
+  const st = await page.evaluate(() => ({ hash: location.hash, focus: document.activeElement && document.activeElement.id }));
+  check(r, 'Set up login opens their File with the cursor in the password box', st.hash === '#a/eli_new/file' && st.focus === 'athPw', st);
+  await L.go(page, 'today');
+  await page.locator('#needPanel .need', { hasText: 'Ava Example' }).first().getByRole('button', { name: 'Open day' }).click(); await L.settle(page, 400);
+  check(r, 'a note\'s Open day opens the day the note is on', await page.evaluate(() => location.hash) === '#a/ava_test/work', await page.evaluate(() => location.hash));
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 S['spine-copy-add'] = async (b) => {
   const r = { id: 'spine-copy-add', title: 'Exercises → Not in the Spine yet: one tap copies "/spine add <name>" for Claude', checks: [] };
   const { page, log } = await L.openCoach(b, { hash: 'exercises' });

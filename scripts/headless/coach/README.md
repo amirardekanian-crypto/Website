@@ -61,7 +61,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 - Mutate `window.__DB.<table>` directly to simulate another writer (the pipeline's `publish_cycle`, another tab).
 - `openCoach(b, {tz:'Asia/Tehran', fixedTime:'2026-10-09T22:00:00Z'})` — page clock and time zone.
 
-## Scenarios (2026-10-12: 105 scenarios; the Add past session ones went with the box, `work-this-cycle`, `sync-finished-list` and `work-week-cap` came in; 32 failing checks before the audit's fixes, 0 after)
+## Scenarios (2026-10-12: 106 scenarios, `today-also-waiting` came in with the Today redesign; the Add past session ones went with the box, `work-this-cycle`, `sync-finished-list` and `work-week-cap` came in; 32 failing checks before the audit's fixes, 0 after)
 
 | id | covers | before the fixes |
 |---|---|---|
@@ -134,6 +134,7 @@ set `PLAYWRIGHT` (its module path) and `CHROMIUM` (a browser binary). coach.html
 | back-keeps-place | The roster scrolled, an athlete opened, Back; then a tap on the Athletes tab | (pile B10, BROWSER-4) Back landed at the top of the roster |
 | roster-tier-chips | The tier chips with and without a person who has no file | (pile B10, ROSTER-11) the chips did not add up to Everyone and a chip with nobody in it was drawn |
 | today-mark-read | Needs you → a note → Mark read | (pile B10, FLOW-7) a note could only be cleared by opening the athlete |
+| today-also-waiting | Today after the round-1 redesign (2026-10-12): `#needPanel` first in the page, left of and twice as wide as the wall, then quest and pulse, one column with Needs you first at 390 and 320 px with no sideways scroll, a slim strip (no headline, under 150 px at 390); each person's button for every reason key (made-up people: Open sessions / Open / Open cycle / Open file / Set up login, WhatsApp for signup, silent and upgrade, a plain Open with no number, the plain ones calling what the row calls); an Also waiting group with the applications, the logins to send (Copy message, Mark sent), the backup and the older notes; the header counts people only; no login row while the logins failed to load; Mark sent is the very write the Tools panel makes; Set up login puts the cursor in `#athPw`; a note's Open day opens that day | (new, 2026-10-12) the rows were one grey "open →" and the logins to send were only in the Athletes tab's Tools |
 | spine-copy-add | Exercises → Not in the Spine yet → the two copy buttons | (pile B10, FLOW-13) no one-tap way to hand a missing exercise to Claude |
 | spine-editor-folds | An approved entry and a draft with no count: which parts of the editor are folded, redraw, save | (pile B10, SPINE-7) the editor was one long form |
 | levels-in-place | Athletes with the levels held back 1.5 s | (pile B10, ROSTER-15) the whole page was replaced when the Proof levels arrived |
