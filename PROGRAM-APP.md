@@ -977,21 +977,26 @@ dashboard do not change.
 - **Tokens.** The block declares the day's paper and ink (`--paper`, `--sand`, `--hair`, `--ink`, `--grey`, …)
   for light and dark, the greens (`--hero`, `--foot`, `--bar`, `--tile`, `--tile-on-green`), and **`--clay-ink`
   `#B5461F` in light mode inside that scope only**: small clay text on the paper reads 5.1:1 (`#C7552F` is 4.1:1).
-  Fills and anything 18.66 px bold or more keep `#C7552F`; dark keeps `#E06B43`. `--g` is the gutter: 20 px, 16
-  under 360. The panel is **full-bleed**: `.day-content` has no side padding (the rail's 32 px went with the rail).
+  Fills and anything 18.66 px bold or more keep `#C7552F`; in dark only clay TEXT moves to `#E06B43` (`--clay-ink`),
+  `--clay` stays the brand fill (the note's dot, the fault cue's bar). `--g` is the gutter: 20 px, 16 under 360. The panel is **full-bleed**: `.day-content` has no side padding (the rail's 32 px went with the rail).
 - **The cover** (D's P4): the day's photo graded into the green, ← and the moon as 44 px glass buttons, the
   *● DAY 1* eyebrow (a mint dot), the focus in 44 px capitals, and what the day builds as tiles with a › (each still opens its
   quality, `paintDayQualities()`; the first is white). About 270 px at 390. *N blocks · M movements* is hidden.
   `dayCardHTML()` draws Home's cards too, so the cover is CSS on `#day-view-card` only: its markup is unchanged.
+  The focus keeps every word whole (no mid-word break) and is `clamp(32px, 11.3vw, 44px)`; its 900 face is also our own
+  file under the name *AA Barlow Condensed* (`/assets/fonts/BarlowCondensed-900.woff2`, pre-cached in `sw.js`), so a phone
+  offline or without Google Fonts still draws it condensed. The cover ends on ONE colour, `--hero-end` (its scrim's last
+  row), and the bar before Start starts on it (its light sits at its bottom right, no border): no seam between them.
 - **The session bar** (A's P5 before Start, P9 after it) and its progress line: *The session bar* below.
 - **The first-session hint** (A's P66): *First-session hints* below.
 - **Block titles**, quiet: 15 px condensed capitals in green with a hairline to the screen's edge and the block's
   rest at its end. A block whose only item has the block's name (*Dynamic Mobility* over *Dynamic Mobility*) and no
   written rest hides its title: `sameNameBlock()` adds `.same-name` in both block-header templates (the day and a
   Library session); the header node stays.
-- **Scroll margins**: `foldWhenDone()` lands the next card right under the slim bar: 72 px, 104 with the week's
-  limits row (118 under 360, where that row can wrap), plus 44 in the demo. The 16 px over the bar's height is
-  Chrome's smooth scroll stopping short of an instant one (measured on the old bar too).
+- **Scroll margins**: `foldWhenDone()` lands the next card under the slim bar with the row it just folded showing
+  whole above it: 110 px, 142 with the week's limits row (156 under 360, where that row can wrap), plus 44 in the demo.
+  That is the bar, 16 px for Chrome's smooth scroll stopping short of an instant one, and 38 px so the 54 px done row is
+  never a cut-off sliver under the bar (`RESKIN/tools/b1-fold.js` measures it).
 - **The cards** (section 7 of the block, Centre Court 2/3). No card is a box any more: a row on the paper, a
   hairline from the name column between rows, no white, no shadow, no stripe, no press scale.
   - **Closed**: the tick-all ring (30 px drawn, 44 to hit) with the **exercise's number inside it** (Amir: *"exercise
@@ -1001,16 +1006,22 @@ dashboard do not change.
     the 28 px clay disc. A row with no ⓘ (a circuit, a simple item) shows a grey ›.
   - **Done**: a receipt. The ring fills green with a white tick (the number steps aside), the name 15 px grey, what was
     done on one 13 px grey line, *4 · 4 · 4 · 4 · RPE 7 7 7 7* (a move with no weight drops the leading *×*).
+  - **A warm-up is known by its title, `.is-prep`.** Both block templates (the day and a Library session) add `is-prep`
+    when `isPrepBlockTitle()` says so, and every warm-up rule in the block keys on it. `block-warmup` is only
+    `blockCategory()`'s colour class, and its index fallback hands it to any unknown title (*Core* at index 6), so it
+    must never decide the look: a Core lift would lose its head and its Rest.
   - **Open, the head** (a lift, and a circuit that logs; a warm-up stays on paper): the cover's green, *● 6* as its
     eyebrow, the name in 28 px capitals, a hairline, then the **scoreboard**: one grid of four equal tracks, each a value
     over its caption (*4 × 6* SETS×REPS, *7* RPE, *3-1-1* TEMPO, *2:30* REST), then the pill. The captions are in the
     markup: `renderNumLine()` writes the dose's as `.nl-lab.nl-cap` (so `numLineText()` leaves it out) and RPE's word as
-    `.nl-k`; a circuit's *×2* and *Rounds* are split the same way. The text of the line is unchanged. **An open lift has
-    no tick-all ring** (every set has its own circle under it); a working circuit keeps its ring, its one *done*.
+    `.nl-k`; a circuit's *×2* and *Rounds* are split the same way. The text of the line is unchanged. A caption keeps 12 px
+    clear of the next cell. **An open lift has no tick-all ring** when it has its own set circles (`:has(.ex-set-log
+    .ex-set-row)`); a working circuit keeps its ring, its one *done*, and so does an open Library exercise (no set table:
+    the ring is its only done, on the left of the head).
   - **Open, the body** on the paper: the Coach's Note as a pull quote (the clay quote mark on the ring column, 16 px,
     **3 lines**, then *More* with a drawn chevron: `fitNotes()` still decides), **How to do it** as one white rounded row
     (the About sheet's Your history recipe: a green ▶ only with a video, else a list glyph; *HOW TO DO IT* over the count
-    on its own line; its text stays *How to do it · video · 5 steps · 4 cues*: `paintHowTo()` puts the leading dot in
+    on its own line; *More* is 44 px tall itself; its text stays *How to do it · video · 5 steps · 4 cues*: `paintHowTo()` puts the leading dot in
     `.ex-how-lead`, which CSS hides), the *First time* line with no box, then the set table.
   - **The set table**: white boxes edged `--field`, the set numbers grey and the live set the one green number (a
     disc), LAST inside an empty kg box, a done set 700 with no box, the RPE tag in its own column 40+ px clear of the
@@ -1040,7 +1051,7 @@ dashboard do not change.
     uses the same band (*FINISHING DAY 1 EARLY*) and lists what is not done on the green, each tag in light clay; **Keep
     going** sits under Done.
   - **Finished**: the card is signed the way the About sheet signs its reason. A grid whose `::before` paints the green
-    band behind the finish picture (a whole session only, graded into the green), *DAY 1 DONE*, the message with the clay
+    band, *DAY 1 DONE* first (as E draws it: the finish picture, `.complete-art`, is filled but not shown in the day view), the message with the clay
     quote mark, and Amir's signature and photo (`.complete-by`: `WN_SIG` and `.wn-av`, added to the template after
     `.complete-sub`). The tick medallion is gone (the words say it). On the paper under the band: the send status (the
     card's one ✓), AA Proof as a row with an open-out glyph and its label *OPEN AA PROOF* over *Counts as your Session
@@ -1058,7 +1069,7 @@ dashboard do not change.
   they still read on the charcoal. Old `body[data-dark]` rules that hard-code colours on these parts are matched at their
   weight by `body[data-dark] :where(…)` rules in the block.
 - **320 px**: the gutter is 16; the set table's columns narrow; the slim bar never drops a word; the finish's tap rows
-  close their gap to 16. Measured on every state: no sideways scroll, no text under 11 px, every control 44 px to hit (the TEMPO caption and More reach it through a ::after).
+  close their gap to 16. Measured on every state: no sideways scroll, no text under 11 px, every control 44 px to hit (the TEMPO caption reaches it through a ::after).
 
 ## ⏱️ The session bar and "In progress" (WK-03, 2026-09-26 and 2026-09-27)
 
@@ -1076,7 +1087,7 @@ the day view closes (`paintDayCardPills()` is no longer called).
 https://claude.ai/artifact/CiUjm5sF3cz4YhGzJCR1WY). `renderTimer()` sets `.slim` when the day's clock has
 started, is not finished and is inside the 6 h grace. Since Centre Court (A's P9) it is a green strip, 56 px, sticky
 at the top (under the demo banner in the demo): **← Home** · the white clock, centred between ← Home and Pause ·
-**Pause** (or Resume) outlined white with the mint pause mark · **⋯**, and a **3 px mint line along the bar's foot**
+**Pause** (or Resume) outlined white with the mint pause mark · **⋯**, and a **3 px mint line along the strip's foot** (53 px down, above the limits row)
 that fills as sets are done. That line replaced the grey rail at the screen's right edge (`#v-progress`, hidden;
 `updateProgress()` writes the same width to `#v-fill` and to the bar's `.stb-prog`, which carries the progressbar
 role). The label goes (the clock and Pause / Resume say it). In a week whose note sets a limit the bar

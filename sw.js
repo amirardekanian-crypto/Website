@@ -267,6 +267,8 @@ const SHELL = [
   '/assets/js/shared.js',
   '/assets/img/icon-192.png',
   '/assets/img/icon-512.png',
+  // The training day's focus title (Centre Court, v124): our own copy, so it is condensed with no signal too.
+  '/assets/fonts/BarlowCondensed-900.woff2',
 ];
 
 // Install: pre-cache the shell, then activate immediately (don't wait for old tabs to close).

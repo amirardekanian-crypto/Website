@@ -4293,19 +4293,23 @@
     --hero: radial-gradient(125% 90% at 100% 0%, #1B7254 0%, #0E4A36 46%, #082D20 100%);
     --btn: radial-gradient(120% 120% at 0% 0%, #1B6A4E 0%, #0E4A36 55%, #0B3E2D 100%);
     --tile: var(--btn);
-    --foot: radial-gradient(110% 170% at 100% 0%, #0C3F2E 0%, #083024 55%, #06241A 100%);
+    /* the cover ends on ONE colour (--hero-end, its scrim's last row) and the bar before Start starts on it: no seam. The
+       foot's light sits at its bottom right, so its top edge is --hero-end all the way across. */
+    --hero-end: #06241A; --hero-end-a: rgba(6,36,26,.55);
+    --foot: radial-gradient(120% 140% at 100% 100%, #0C3F2E 0%, #083024 40%, var(--hero-end) 68%);
     --bar: radial-gradient(160% 260% at 100% 0%, #17664B 0%, #0E4A36 45%, #0A3829 100%);
     --tile-on-green: radial-gradient(120% 150% at 0% 0%, #24855F 0%, #16603F 52%, #0E4A36 100%);
   }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) {
     --paper: #181818; --sand: #202020; --row: #242424; --hair: #2C2C2C; --box: #4A4A4A;
     --ink: #EDEDED; --grey: #9A9A9A; --ring: #666666; --num: #9A9A9A;
-    --green-ink: #6DBE95; --clay: #E06B43; --clay-ink: #E06B43; --steel: #8DB3D6;
+    --green-ink: #6DBE95; --clay-ink: #E06B43; --steel: #8DB3D6;   /* --clay stays the brand fill; only clay TEXT moves */
     --tint: rgba(109,190,149,.13); --prog-track: rgba(109,190,149,.16); --ph: #8F8F8F;
     --field: #5A5A5A; --mark: #1B7254;   /* #0E4A36 sinks on #181818 (1.73:1); #1B7254 is 3.03:1 */
     --hero: radial-gradient(125% 90% at 100% 0%, #17654A 0%, #0D4532 46%, #072A1E 100%);
     --btn: radial-gradient(120% 120% at 0% 0%, #1A6A4D 0%, #12573F 55%, #0D4532 100%);
-    --foot: radial-gradient(110% 170% at 100% 0%, #0A3828 0%, #072A1E 55%, #051F16 100%);
+    --hero-end: #051F16; --hero-end-a: rgba(5,31,22,.55);
+    --foot: radial-gradient(120% 140% at 100% 100%, #0A3828 0%, #072A1E 40%, var(--hero-end) 68%);
     --bar: radial-gradient(160% 260% at 100% 0%, #155E45 0%, #0D4532 45%, #082F22 100%);
     --tile-on-green: radial-gradient(120% 150% at 0% 0%, #1F7655 0%, #13573F 52%, #0D4532 100%);
   }
@@ -4335,13 +4339,19 @@
     -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%);
             mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); }
   #day-view-card .cm-banner-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background: linear-gradient(180deg, rgba(8,45,32,0) 30%, rgba(8,45,32,.55) 100%); }
+    background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
   #day-view-card .cm-banner-caption { position: relative; z-index: 2; width: auto; align-self: auto; padding: 74px var(--g) 24px; }
   #day-view-card .cm-name { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace;
     letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.84); }   /* P4: the dot mint, the words white */
   #day-view-card .cm-name::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
-  #day-view-card .day-card-name { margin: 10px 0 0; max-width: 330px; font: 900 var(--fs-display)/.94 'Barlow Condensed', sans-serif;
-    letter-spacing: .3px; text-transform: uppercase; color: #fff; text-wrap: balance; overflow-wrap: break-word; hyphens: auto; }
+  /* The focus title keeps every word whole. Its face is also our own file (the site's, assets/fonts/), so a phone that is
+     offline or cannot reach Google Fonts still draws it condensed instead of breaking "ACCELERA / TION" in a wide fallback;
+     sw.js pre-caches it. It shrinks with the screen under 400 px so the longest word fits at 320. */
+  @font-face { font-family: 'AA Barlow Condensed'; font-style: normal; font-weight: 900; font-display: swap;
+    src: url('/assets/fonts/BarlowCondensed-900.woff2') format('woff2'); }
+  #day-view-card .day-card-name { margin: 10px 0 0; max-width: 330px;
+    font: 900 clamp(32px, 11.3vw, var(--fs-display))/.94 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the day's focus, 35 to 44 px */
+    letter-spacing: .3px; text-transform: uppercase; color: #fff; text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual; }
   #day-view-card .cm-weeks { display: none; }
   #day-view-card .dq-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
   #day-view-card .dq-row:empty { display: none; }
@@ -4364,7 +4374,7 @@
      (renderTimer()). Grid areas place everything, so the DOM order (the limits row last) never matters. */
   :where(#day-view) .session-timer { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas: "label time" "acts acts" "week week"; align-items: center; column-gap: 12px;
-    margin: 0; padding: 16px var(--g) 20px; border-top: 1px solid rgba(255,255,255,.08); background: var(--foot); color: #fff; }
+    margin: 0; padding: 16px var(--g) 20px; border-top: 0; background: var(--foot); color: #fff; }
   :where(#day-view) .session-timer-leave, :where(#day-view) .session-timer-more, :where(#day-view) .stb-prog { display: none; }
   :where(#day-view) .session-timer-body { display: contents; }
   :where(#day-view) .session-timer-label { grid-area: label; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -4405,7 +4415,7 @@
   .session-timer-week em { font-style: normal; }   /* the numbers' wrapper, wherever the row is drawn (Guided too) */
 
   /* The SLIM bar (P9), from Start until Done: a 56 px green strip, sticky at the top: ← HOME · the clock (centred between
-     ← Home and Pause) · PAUSE outlined white with the mint pause mark · ⋯, and a 3 px mint line along the bar's foot that
+     ← Home and Pause) · PAUSE outlined white with the mint pause mark · ⋯, and a 3 px mint line along the strip's foot that
      fills as sets are done (updateProgress() writes its width). The week's limits stay under the strip, on a darker green.
      At 320 px no word goes. */
   :where(#day-view) .session-timer.slim { position: sticky; top: 0; z-index: 40; grid-template-columns: auto minmax(0, 1fr) auto auto;
@@ -4430,7 +4440,8 @@
     width: 44px; height: 44px; padding: 0; border: 0; border-radius: 8px; background: none; cursor: pointer; color: #fff;
     font: 700 var(--fs-title)/1 'Barlow', sans-serif; letter-spacing: 1px; }
   :where(#day-view) .session-timer.slim .session-timer-week { margin: 0 -4px 0 -2px; padding: 7px var(--g) 10px; border-top: 0; background: rgba(0,0,0,.18); }
-  :where(#day-view) .session-timer.slim .stb-prog { display: block; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+  :where(#day-view) .session-timer.slim .stb-prog { display: block; position: absolute; left: 0; right: 0; top: 53px; height: 3px;   /* the 56 px strip's foot, above the limits row */
+   
     background: rgba(255,255,255,.12); pointer-events: none; }
   :where(#day-view) .stb-prog i { display: block; width: 0; height: 100%; border-radius: 0 2px 2px 0; background: var(--mint);
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -4486,23 +4497,23 @@
   :where(#day-view, #ws-body) .section-rest { order: 2; flex: none; white-space: nowrap; font: 400 var(--fs-label)/1 'Space Mono', monospace;
     letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
   :where(#day-view) .section-rest { margin-right: var(--g); }
-  :where(#day-view, #ws-body) .checklist-item.block-warmup + .section-header-prog.block-warmup { padding-top: 18px; }
+  :where(#day-view, #ws-body) .checklist-item.is-prep + .section-header-prog.is-prep { padding-top: 18px; }
   :where(#day-view, #ws-body) .section-header-prog.same-name { display: none; }
-  :where(#day-view, #ws-body) .section-header-prog.same-name + .checklist-item { margin-top: 18px; }
-  :where(#day-view, #ws-body) .section-header-prog:has(+ .checklist-item:not(.collapsed):not(.block-warmup)) { margin-bottom: 12px; }
+  :where(#day-view, #ws-body) .section-header-prog:has(+ .checklist-item:not(.collapsed):not(.is-prep)) { margin-bottom: 12px; }
 
   /* 6. Scroll margins. foldWhenDone() scrolls the next card to the top (block: start), under the slim bar (56 px, 87 with
      the week's limits row, 14 more when that row wraps at 320 px) and the demo banner's 44 px, plus 16 px: Chrome's
      smooth scroll stops about 16 px short of an instant one (measured 2026-10-12, before this re-skin too), and the open
-     card's head must never slide under the bar. Done turns the bar back into the full one, in the flow, so the finished
-     card goes to the top. */
-  :where(#day-view) .checklist-item { scroll-margin-top: 72px; }
-  :where(#day-view) .day-content.has-week .checklist-item { scroll-margin-top: 104px; }
-  body.is-demo :where(#day-view) .checklist-item { scroll-margin-top: 116px; }
-  body.is-demo :where(#day-view) .day-content.has-week .checklist-item { scroll-margin-top: 148px; }
+     card's head must never slide under the bar. Then 38 px more, so the row just folded (a done row is 54 px) shows whole
+     above it, never a cut-off sliver under the bar. Done turns the bar back into the full one, in the flow, so the
+     finished card goes to the top. */
+  :where(#day-view) .checklist-item { scroll-margin-top: 110px; }
+  :where(#day-view) .day-content.has-week .checklist-item { scroll-margin-top: 142px; }
+  body.is-demo :where(#day-view) .checklist-item { scroll-margin-top: 154px; }
+  body.is-demo :where(#day-view) .day-content.has-week .checklist-item { scroll-margin-top: 186px; }
   @media (max-width: 359px) {
-    :where(#day-view) .day-content.has-week .checklist-item { scroll-margin-top: 118px; }
-    body.is-demo :where(#day-view) .day-content.has-week .checklist-item { scroll-margin-top: 162px; }
+    :where(#day-view) .day-content.has-week .checklist-item { scroll-margin-top: 156px; }
+    body.is-demo :where(#day-view) .day-content.has-week .checklist-item { scroll-margin-top: 200px; }
   }
   :where(#day-view) .session-complete { scroll-margin-top: 16px; }
   body.is-demo :where(#day-view) .session-complete { scroll-margin-top: 60px; }
@@ -4554,15 +4565,19 @@
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .item-name { text-decoration: none; color: var(--grey); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item .item-name { min-width: 0; letter-spacing: 0; transition: none; text-decoration: none;
     font: 600 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; text-wrap: pretty; }
+  /* the old closed-row sizes (.checklist-item.collapsed .item-name 700, .ex-num 22 px; 0,3,0) matched at their weight, so a
+     closed row and an open warm-up draw the same name and the same 16 px number in the ring */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed .item-name { font-size: var(--fs-lead); font-weight: 600; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed .ex-num { font-size: var(--fs-body); }
   :where(#day-view, .step-scroll, #ws-body) .ex-note-dot { display: inline-block; width: 7px; height: 7px; margin: 0 0 3px 7px; border-radius: 50%; background: var(--clay);
     vertical-align: middle; }
   /* a row with no ⓘ (a circuit, a simple item) shows that it opens: a grey › in the ⓘ column (turned up on an open warm-up) */
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed:not(.is-done) > .item-main:not(:has(.ex-side .ex-about))::after,
-  :where(#day-view, .step-scroll, #ws-body) .round-group.block-warmup:not(.collapsed) > .item-main::after {
+  :where(#day-view, .step-scroll, #ws-body) .round-group.is-prep:not(.collapsed) > .item-main::after {
     content: ''; grid-column: 3; grid-row: 1; justify-self: center; width: 44px; height: 44px; background-color: var(--grey);
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 7l5 5-5 5'/%3E%3C/svg%3E") center / 18px no-repeat;
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 7l5 5-5 5'/%3E%3C/svg%3E") center / 18px no-repeat; }
-  :where(#day-view, .step-scroll, #ws-body) .round-group.block-warmup:not(.collapsed) > .item-main::after { transform: rotate(-90deg); }
+  :where(#day-view, .step-scroll, #ws-body) .round-group.is-prep:not(.collapsed) > .item-main::after { transform: rotate(-90deg); }
   :where(#day-view, .step-scroll, #ws-body) .ex-doneline { display: none; }
   /* the line of numbers: 15 px, the dose bold, "·" between the parts; the tempo's hot digits clay */
   :where(#day-view, .step-scroll, #ws-body) .ex-numline { display: flex; flex-wrap: wrap; align-items: baseline; margin: 4px 0 0; letter-spacing: 0;
@@ -4573,7 +4588,7 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-numline .t-hot { color: var(--clay-ink); font-weight: 700; }
   :where(#day-view, .step-scroll, #ws-body) .nl-cap { display: none; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item.collapsed .nl-lab,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item.block-warmup .nl-lab { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-prep .nl-lab { display: none; }
   .step-ex-nums .nl-cap { display: none; }   /* Guided's header copies the line: the scoreboard's captions stay off it */
   /* the intent pill, and the lower day's clay pills in its shape */
   :where(#day-view, .step-scroll, #ws-body) .ex-summary { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
@@ -4614,57 +4629,61 @@
      "● 6" as its eyebrow, the name 28 px capitals, a hairline, the scoreboard (four equal tracks, value over caption), the
      pill. An open LIFT has no tick-all ring (every set has its own circle under it); a working circuit keeps its ring,
      its one "done". */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup)::before,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item[class*="block-"]:not(.collapsed):not(.block-warmup) + .checklist-item[class*="block-"]::before { display: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) > .item-main { grid-template-areas: "chk name side" ". nums nums" ". pill pill";
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep)::before,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item[class*="block-"]:not(.collapsed):not(.is-prep) + .checklist-item[class*="block-"]::before { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) > .item-main { grid-template-areas: "chk name side" ". nums nums" ". pill pill";
     align-items: center; min-height: 0; padding: 12px var(--g) 14px; background: var(--hero); color: #fff; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .item-body { display: contents; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .check-box { grid-area: chk; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .check-box::before { border-color: rgba(255,255,255,.85); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup):not(.round-group) > .item-main { grid-template-areas: "name name side" "nums nums nums" "pill pill pill"; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup):not(.round-group) .check-box { display: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .item-name-row { grid-area: name; display: flex; flex-direction: column; align-items: flex-start; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-num { position: static; display: flex; align-items: center; gap: 8px; width: auto; height: auto;
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-body { display: contents; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .check-box { grid-area: chk; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .check-box::before { border-color: rgba(255,255,255,.85); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) > .item-main { grid-template-areas: "name name side" "nums nums nums" "pill pill pill"; }
+  /* only when the card has its own set circles: an open Library exercise (no set table) keeps its ring in the head */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep):not(.round-group):has(.ex-set-log .ex-set-row) .check-box { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-name-row { grid-area: name; display: flex; flex-direction: column; align-items: flex-start; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-num { position: static; display: flex; align-items: center; gap: 8px; width: auto; height: auto;
     margin: 0 0 6px; visibility: visible; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 2px; color: var(--mint); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-num::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .item-name { font: 900 var(--fs-head)/.94 'Barlow Condensed', sans-serif; letter-spacing: .4px;
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-num::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-name { font: 900 var(--fs-head)/.94 'Barlow Condensed', sans-serif; letter-spacing: .4px;
     text-transform: uppercase; color: #fff; text-wrap: balance; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-note-dot { display: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-side { grid-area: side; align-self: start; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-about:not(.has-why) { color: #fff; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-side .ex-about:not(.has-why)::before { border-color: rgba(255,255,255,.7); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-side .ex-about.has-why::before { box-shadow: 0 0 0 1.5px rgba(255,255,255,.85); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-note-dot { display: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-side { grid-area: side; align-self: start; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-about:not(.has-why) { color: #fff; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-side .ex-about:not(.has-why)::before { border-color: rgba(255,255,255,.7); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-side .ex-about.has-why::before { box-shadow: 0 0 0 1.5px rgba(255,255,255,.85); }
   /* an open working circuit: its › turns up, in white */
-  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed):not(.block-warmup) > .item-main::after { content: ''; grid-area: side; justify-self: center; width: 44px; height: 44px;
+  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed):not(.is-prep) > .item-main::after { content: ''; grid-area: side; justify-self: center; width: 44px; height: 44px;
     transform: rotate(-90deg); background-color: #fff;
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 7l5 5-5 5'/%3E%3C/svg%3E") center / 18px no-repeat;
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 7l5 5-5 5'/%3E%3C/svg%3E") center / 18px no-repeat; }
   /* the scoreboard: one grid of four equal tracks under a hairline; each cell a value over its caption (.nl-cap, .nl-k,
      .nl-lab). A long dose widens only its own track. */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline { grid-area: nums; display: grid; grid-auto-flow: column;
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline { grid-area: nums; display: grid; grid-auto-flow: column;
     grid-template-columns: minmax(25%, max-content); grid-auto-columns: minmax(0, 25%); align-items: stretch; gap: 0; margin: 12px 0 0; padding-top: 12px;
     border-top: 1px solid rgba(255,255,255,.16); font: 700 var(--fs-head)/.86 'Barlow Condensed', sans-serif; letter-spacing: .3px; color: #fff; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline > span { display: grid; grid-auto-flow: column; grid-template-rows: auto auto;
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline > span { display: grid; grid-auto-flow: column; grid-template-rows: auto auto;
     justify-content: start; justify-items: start; align-items: end; row-gap: 7px; min-width: 0; padding: 0; white-space: nowrap; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline > span + span::before { content: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline b { font-weight: 700; color: #fff; padding-right: 16px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-lab,
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-k { display: block; grid-row: 2; grid-column: 1 / span 5; white-space: nowrap;
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline > span + span::before { content: none; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline b { font-weight: 700; color: #fff; padding-right: 16px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-lab,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-k { display: block; grid-row: 2; grid-column: 1 / span 5; white-space: nowrap;
     font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.72); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-lab.nl-help { position: relative; justify-self: start; padding: 0; border: 0;
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-lab.nl-help { position: relative; justify-self: start; padding: 0; border: 0;
     background: none; cursor: pointer; text-decoration: underline dotted rgba(255,255,255,.6); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+  /* a caption keeps 12 px clear of the next cell (SETS×REPS ran into RPE at 320 px): its track grows, never the text */
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-k,
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-lab:not(.nl-help) { padding-right: 12px; }
   /* the tempo caption opens the tempo guide: its tap area covers the cell */
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-help::after { content: ''; position: absolute; left: -12px; right: -12px; top: -34px; bottom: -14px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .t-hot { color: var(--clay-on-green); }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-summary { grid-area: pill; margin-top: 14px; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-summary-pill.modifier { background: rgba(255,255,255,.14); color: #fff; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-help::after { content: ''; position: absolute; left: -12px; right: -12px; top: -34px; bottom: -14px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .t-hot { color: var(--clay-on-green); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-summary { grid-area: pill; margin-top: 14px; }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-summary-pill.modifier { background: rgba(255,255,255,.14); color: #fff; }
 
   /* 7d. The open card's body, on the paper: Coach's Note, How to do it, the First time line, the set table, then ONE foot
      row (P50): Note on the left, Rest ⏱ with its time on the right. Not sticky. An open Note's box spans the row under it. */
   :where(#day-view, .step-scroll, #ws-body) .ex-detail { padding: 0; border-top: 0; background: none; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center;
     padding: 0 var(--g) 18px; border-top: 0; background: none; }
-  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) > .ex-detail { border-bottom: 1px solid var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) > .ex-detail { border-bottom: 1px solid var(--hair); }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > *,
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > .ex-log > * { grid-column: 1 / -1; }
   :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed) > .ex-detail > .ex-coach-note { order: -2; }
@@ -4688,8 +4707,8 @@
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='13.5' r='7.5'/%3E%3Cpath d='M12 10v3.5l2.3 2.3M9.5 3h5'/%3E%3C/svg%3E") center / 18px no-repeat;
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='13.5' r='7.5'/%3E%3Cpath d='M12 10v3.5l2.3 2.3M9.5 3h5'/%3E%3C/svg%3E") center / 18px no-repeat; }
   :where(#day-view, .step-scroll, #ws-body) .rest-btn .rest-t { text-transform: none; }
-  :where(#day-view, .step-scroll, #ws-body) .block-warmup .ex-rest-bottom .rest-btn { background: transparent; color: var(--green-ink); box-shadow: inset 0 0 0 1.5px var(--green-ink); }
-  :where(#day-view, .step-scroll, #ws-body) .block-warmup .rest-btn .rest-ic { background: var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .is-prep .ex-rest-bottom .rest-btn { background: transparent; color: var(--green-ink); box-shadow: inset 0 0 0 1.5px var(--green-ink); }
+  :where(#day-view, .step-scroll, #ws-body) .is-prep .rest-btn .rest-ic { background: var(--green-ink); }
   :where(#day-view, .step-scroll, #ws-body) .rest-btn:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
 
   /* Note: a 32 px outlined circle with its chevron, then NOTE in green condensed capitals; 44 px to hit. */
@@ -4717,13 +4736,12 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-note-text { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   :where(#day-view, .step-scroll, #ws-body) .ex-coach-note.open .ex-note-text { display: block; overflow: visible; }
   :where(#day-view, .step-scroll, #ws-body) .ex-coach-note .ex-coach-note-label { display: inline; margin: 0; font: inherit; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ink); }
-  :where(#day-view, .step-scroll, #ws-body) .ex-note-more { position: relative; display: flex; align-items: center; gap: 6px; width: max-content; height: 18px; margin-top: 6px; padding: 0;
+  :where(#day-view, .step-scroll, #ws-body) .ex-note-more { position: relative; display: flex; align-items: center; gap: 6px; width: max-content; min-height: 44px; margin: -7px 0 -13px; padding: 0 14px 0 0;
     border: 0; background: none; cursor: pointer; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
   :where(#day-view, .step-scroll, #ws-body) .ex-note-more::before { content: ''; order: 9; flex: none; width: 12px; height: 12px; background: var(--green-ink); transition: transform .2s;
     -webkit-mask: var(--chev) center / 12px no-repeat; mask: var(--chev) center / 12px no-repeat; }
   :where(#day-view, .step-scroll, #ws-body) .ex-coach-note.open .ex-note-more::before { transform: rotate(-90deg); }
-  /* 44 px to hit: up over the note's last line, never down into How to do it */
-  :where(#day-view, .step-scroll, #ws-body) .ex-note-more::after { content: ''; position: absolute; left: -10px; right: -14px; top: -20px; bottom: -6px; }
+  /* 44 px tall itself (the negative margins keep the line where an 18 px one sat); no reach over the note's text */
 
   /* 7f. How to do it: ONE white rounded row (the About sheet's Your history recipe): a bare green ▶ only with a video
      (else a list glyph), "HOW TO DO IT" in mono over the count on its own line, a grey ›. The text stays
@@ -4885,7 +4903,7 @@
   /* an open circuit is one grid: its body (display: contents) flows into the card, so the Note (after the body on a warm-up,
      inside the log on a working circuit) and Rest share the last row whichever box they sit in */
   :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 0 var(--g) 16px; }
-  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed):not(.block-warmup) { border-bottom: 1px solid var(--hair); }
+  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed):not(.is-prep) { border-bottom: 1px solid var(--hair); }
   :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) > .item-main { grid-column: 1 / -1; margin: 0 calc(-1 * var(--g)); }
   :where(#day-view, .step-scroll, #ws-body) .round-group:not(.collapsed) > .ex-detail { display: contents; }
   :where(#day-view, .step-scroll, #ws-body) .round-list { display: block; margin: 0; }
@@ -4917,7 +4935,7 @@
   :where(#day-view, .step-scroll, #ws-body) .round-group.checked .round-row { opacity: 1; }
   /* a working circuit: the green head (above), its rows on the paper: letter · name and dose · kg on the right edge, open cues,
      a small How to do it line under an item with steps, then one How hard? row per round */
-  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.block-warmup) .round-row-main { grid-template-columns: 44px minmax(0, 1fr) auto auto; grid-template-areas: "l n w p" "l d w p"; cursor: default; }
+  :where(#day-view, .step-scroll, #ws-body) .round-group:not(.is-prep) .round-row-main { grid-template-columns: 44px minmax(0, 1fr) auto auto; grid-template-areas: "l n w p" "l d w p"; cursor: default; }
   :where(#day-view, .step-scroll, #ws-body) .round-wt { grid-area: w; justify-self: end; width: 68px; height: 48px; margin: 0; padding: 0 2px; border: 1px solid var(--field); border-radius: 10px;
     background: var(--row); outline: none; font: 500 var(--fs-field)/1 'Barlow', sans-serif; color: var(--ink); text-align: center; font-variant-numeric: tabular-nums; }
   :where(#day-view, .step-scroll, #ws-body) .round-wt::placeholder { color: var(--ph); opacity: 1; font-weight: 500; }
@@ -4948,17 +4966,19 @@
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked[class*="block-"] { background: transparent; border-color: transparent; }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .item-name { color: var(--ink); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.is-done.collapsed .item-name { color: var(--grey); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .item-name { color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .item-name { color: #fff; }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-num, body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item.checked .ex-num { color: var(--num); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-num { color: var(--mint); }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-num { color: var(--mint); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-numline { color: var(--ink); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline { color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline { color: #fff; }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.modifier { background: var(--tint); color: var(--green-ink); }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-summary-pill.modifier { background: rgba(255,255,255,.14); color: #fff; }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill.rd-pill { color: #fff; box-shadow: none; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-summary-pill.modifier { background: rgba(255,255,255,.14); color: #fff; }
+  /* the lower day's pills keep their clay fill in dark (they ask to look); the old dark .ex-summary-pill grey is 0,2,1 */
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-summary-pill:is(.rd-pill, .rd-tag) { background: var(--clay-fill); color: #fff; box-shadow: none; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-coach-note::before { color: var(--clay-ink); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-about { color: var(--grey); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-about.has-why { background: none; border-color: transparent; color: #fff; }
-  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-about:not(.has-why) { color: #fff; }
+  body[data-dark] :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-about:not(.has-why) { color: #fff; }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-detail { background: none; border-top-color: transparent; }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-coach-note { background: none; color: var(--ink); }
   body[data-dark] :where(#day-view, .step-scroll, #ws-body) .ex-log { background: none; border-color: transparent; }
@@ -5020,9 +5040,9 @@
     :where(#day-view, .step-scroll, #ws-body) .ex-set-wlast { left: 0; }
     :where(#day-view, .step-scroll, #ws-body) .lt-ghost { letter-spacing: .3px; padding-left: 0; }
     :where(#day-view, .step-scroll, #ws-body) .ex-how { margin-top: 12px; }
-    :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-lab,
-    :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-k { letter-spacing: .3px; }
-    :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.block-warmup) .ex-numline .nl-help::after { left: -10px; right: -8px; }
+    :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-lab,
+    :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-k { letter-spacing: .3px; }
+    :where(#day-view, .step-scroll, #ws-body) .checklist-item:not(.collapsed):not(.is-prep) .ex-numline .nl-help::after { left: -10px; right: -8px; }
     :where(#day-view, .step-scroll, #ws-body) .ex-rest-bottom .rest-btn { min-width: 0; padding: 0 14px; gap: 8px; }
     :where(#day-view, .step-scroll, #ws-body) .round-wt { width: 58px; }
   }
@@ -5100,15 +5120,11 @@
   :where(#day-view) .session-complete.visible { display: grid; grid-template-columns: minmax(0, 1fr); }
   :where(#day-view) .session-complete::before { content: ''; grid-column: 1; grid-row: 1 / 6; background: var(--hero); }
   :where(#day-view) .session-complete > * { grid-column: 1; position: relative; min-width: 0; }
-  :where(#day-view) .session-complete .complete-art { grid-row: 1; margin: 0; height: 120px; aspect-ratio: auto; max-height: none; background: none; }
-  :where(#day-view) .session-complete .complete-art[hidden] { display: none; }
-  :where(#day-view) .session-complete .complete-art img { mix-blend-mode: luminosity; opacity: .6;
-    -webkit-mask-image: linear-gradient(180deg, #000 20%, transparent 100%); mask-image: linear-gradient(180deg, #000 20%, transparent 100%); }
-  :where(#day-view) .session-complete .complete-art::after { display: none; }
+  /* E opens the card on its words: no photo band (paintCompleteArt() still fills the node; the day view never shows it) */
+  :where(#day-view) .session-complete .complete-art { display: none; }
   :where(#day-view) .session-complete .complete-emoji { display: none; }   /* DAY 1 DONE says it, the way the About sheet opens on its words */
   :where(#day-view) .session-complete .complete-title { grid-row: 2; margin: 0; padding: 30px var(--g) 0; font: 900 var(--fs-display)/.92 'Barlow Condensed', sans-serif;
     letter-spacing: .4px; text-transform: uppercase; color: #fff; text-wrap: balance; }
-  :where(#day-view) .session-complete .complete-art:not([hidden]) ~ .complete-title { padding-top: 0; margin-top: -18px; }
   :where(#day-view) .session-complete .complete-sub { grid-row: 3; margin: 18px var(--g) 0; padding: 16px 0 0 44px; border-top: 1px solid rgba(255,255,255,.16);
     font: 500 var(--fs-lead)/1.42 'Barlow', sans-serif; color: #fff; text-wrap: pretty; }
   :where(#day-view) .session-complete .complete-sub:empty { display: none; }
@@ -8623,7 +8639,8 @@ function renderHome() {
     // Continuous numbering across the whole day (1 → total exercises)
     let exerciseNum = 1;
     day.blocks.forEach((block, bIdx) => {
-      const blockClass = blockCategory(block.title, bIdx);
+      // is-prep: a warm-up by its TITLE (isPrepBlockTitle()), never by blockCategory()'s index fallback. The day's look (Centre Court) keys the warm-up's paper card on it; block-warmup only picks a colour.
+      const blockClass = blockCategory(block.title, bIdx) + (isPrepBlockTitle(block.title) ? ' is-prep' : '');
       // A block can prescribe ONE rest for everything in it (`block.rest`, seconds).
       // Eight cards in a Primary block repeating "REST 2m" is the same fact eight
       // times; stating it on the section header says it once and still lets any
@@ -11414,7 +11431,8 @@ async function openWorkout(file) {
   let num = 1;
   let html = '';
   (wk.blocks || []).forEach((block, bIdx) => {
-    const blockClass = blockCategory(block.title, bIdx);
+    // is-prep: a warm-up by its TITLE (isPrepBlockTitle()), never by blockCategory()'s index fallback. The day's look (Centre Court) keys the warm-up's paper card on it; block-warmup only picks a colour.
+    const blockClass = blockCategory(block.title, bIdx) + (isPrepBlockTitle(block.title) ? ' is-prep' : '');
     // A section can prescribe ONE rest for everything in it (`block.rest`, seconds; CHP-7), exactly as on
     // the training day: the header says it once, every timer in the section uses it, and an exercise's own
     // rx.rest overrides it. The training-day header (search section-rest) is the other copy: change both.
