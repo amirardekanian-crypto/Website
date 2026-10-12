@@ -394,10 +394,17 @@ session line on The work says *lower day*, *short day* or *sore* (and *trained a
 chose to), the prescribed column prints `RPE 7 → 6 that day`, and the sets are judged against that
 number. Work the day left optional or skipped reads *optional today* / *skipped today: sore*, in grey,
 and is not counted as *not done*. The athlete's app decided the day and stored it with the
-check-in; nothing here recomputes it. `dayTargetC()` is the twin of `dayRpe()` in program.html, week note included (2026-10-11): a
-lower day inside a week that carries a note with `rpeCap` or `rpeDrop` is judged against the lower of the two targets, never under 6, the
-week being the one the SESSION fell in (`weekNoteOnC(cycle, completed_on)`); a normal day ignores the note, exactly as the app does, and a
-session from before the cycle began or after it ended has no note.
+check-in; nothing here recomputes it. `dayTargetC()` is the twin of `rpeTargetOn()` in program.html, week note included (2026-10-11),
+drop optional (2026-10-12; `check_twins.js` §4). **Every session in a week whose note sets `rpeCap` (else `rpeDrop`) is judged against the
+note's target, on every day** (Amir, 2026-10-12: *"colour against the cap in those weeks"*), with or without a check-in, skipped or trained as
+written (`dayDropC()` gives those a drop of 0, and the note still counts), exactly as the app colours it. A lower day takes the lower of the
+two targets, never under 6. The week is the one the SESSION fell in (`weekNoteOnC(cycle, completed_on)`), and a session from before the
+cycle began or after it ended has no note. The prescribed column says what lowered it (the row's `tgtBy`, `'day'` or `'week'`):
+`RPE 8 → 7 that week` when only the week note did, `RPE 8 → 6 that day` when a lower check-in did. A flagged retest (`exTestSpecC()`) on a
+session inside the retest window (`retestWindowOnC(cycle, completed_on)`, the app's `inRetestWindow()` on the session's date) keeps its
+card's target on a normal day (on a lower day it is capped like every lift, as in the app), as the athlete's bar says *Max RPE 7 except the retest* (TST-4). The per-set colours, the *over / under target RPE* flags and
+the *off plan* verdict all follow that target (`compareDay()`). Nothing is stored, so sessions already logged this cycle are judged again
+on render.
 
 ### Quest week
 
@@ -932,7 +939,7 @@ covered by the real-mode harness in `scripts/headless/coach/`.
 **Logic that exists in both apps is guarded** (`scripts/check_twins.js`, pre-commit guard 15, 2026-10-10).
 It cuts each twin out of both files and runs the same vectors through both: the exercise-name
 tiers (`exNameVariants` / `exNameVariantsC`; the programme checker's `norm_name()` and SQL are held to the same cases, `scripts/name_cases.json`), a renamed lift (`ceilAliasMap` / `ceilAliasMapC`), the
-Spine lookup (`spineFor` / `spineForC`), today's RPE target on a lower day with the week note (`dayRpe` / `dayTargetC`), the week a day
+Spine lookup (`spineFor` / `spineForC`), the RPE target a set is judged against, from the week note on every day and a lower day (`rpeTargetOn` / `dayTargetC`), the week a day
 falls in and its note (`cycleWeekInfo`, `weekNoteNow` / `cycleWeekOnC`, `weekNoteOnC`: about 40,000 checks, run with the athlete's clock in eight time zones), what
 the Quality check counts (`qmSets`, `isPrepBlockTitle` / `qmSetsC`, `QM_PREP`), and the check-in line's
 writer and reader (`readinessPlanLine` / `parseCheckinPlan`). It also fails a change to `assets/js/chips.js`

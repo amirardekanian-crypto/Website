@@ -3261,11 +3261,15 @@ function rpeTarget(target) {
 // Today's targets (program.html, REC-2, 2026-09-26). The athlete's app works the day's
 // level out at the check-in and stores it with the check-in: { level, sore, drop,
 // asWritten }. Nothing here recomputes it; it reads what the athlete was shown.
-// ⚠ dayTargetC() is dayRpe() in program.html: 1 off each end, never below 6, never above what was written, and a lower day
-// does not stack with the week note (week 1, a test week, the back-off week): the lower of the two targets wins. The week note
-// is the cycle's note for the week the SESSION fell in (weekNoteOnC), because a session does not record which week it was;
-// the app asks the same question about today (cycleWeekInfo() / weekNoteNow()). scripts/check_twins.js runs both on the same
-// cycles and days (it was a known difference, WORK-11, until 2026-10-11).
+// ⚠ dayTargetC() is rpeTargetOn() in program.html (its dayRpe() is the same rule, drawn as a pill on a lower day only): the target
+// a logged RPE is judged against. The week note's rpeCap (else its rpeDrop) sets it on EVERY day of its week (week 1, a test week,
+// the back-off week; Amir, 2026-10-12: "colour against the cap in those weeks"), a lower check-in day takes 1 off each end, and
+// the two do not stack: the lower target wins. Never below 6, never above what was written; drop may be 0, null or missing, and
+// then only the note moves it. The week note is the cycle's note for the week the SESSION fell in (weekNoteOnC), because a session
+// does not record which week it was; the app asks the same question about today (cycleWeekInfo() / weekNoteNow()). A flagged
+// retest in the closing week keeps its own card's target on a normal day (TST-4, retestWindowOnC(); compareDay()), as the app's
+// session bar says "except the retest". scripts/check_twins.js runs both on the same cycles and days (it was a known difference,
+// WORK-11, until 2026-10-11).
 function dayNumC(iso) {   // a calendar day as a whole number, whatever the time zone
   const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
   return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) / 86400000 : NaN;
@@ -3290,12 +3294,36 @@ function weekNoteOnC(cycle, dayKey) {
   else if (w.total > 1 && w.wk === w.total && ok(notes.last)) n = notes.last;
   return n ? Object.assign({}, n, { wk: w.wk }) : null;
 }
+// The closing week of the cycle, or any day after it should have ended, on the day a session was trained: inRetestWindow() in
+// program.html asks the same about today. A cycle with no end date, or one that cannot be read, is always in it.
+const RETEST_WINDOW_DAYS_C = 7;
+function retestWindowOnC(cycle, dayKey) {
+  if (!cycle || !cycle.endDate) return true;
+  const end = dayNumC(cycle.endDate);
+  if (isNaN(end)) return true;
+  return end - dayNumC(dayKey) <= RETEST_WINDOW_DAYS_C;
+}
+// The coach's retest flag the way program.html's exTestSpec() reads it (TWIN-7, 2026-10-11): true is the 5RM default, "<n>RM" with n from
+// 1 to 10 is that test, anything else is no flag at all, because the flag decides what nags an athlete. The dashboard showed any text
+// as a tag, so a flag the app ignores looked live here. scripts/check_twins.js runs both on the same values. (Here, in the comparison
+// block, since 2026-10-12: compareDay() reads it, and scripts/test_coach_compare.js runs this block without the page.)
+const DEFAULT_TEST_REPS_C = 5, ONE_RM_MAX_EFFECTIVE_C = 10;
+function exTestSpecC(ex) {
+  const raw = ex && ex.test;
+  if (raw === true) return { reps: DEFAULT_TEST_REPS_C, label: DEFAULT_TEST_REPS_C + 'RM' };
+  const m = String(raw || '').match(/^(\d+)\s*rm$/i);
+  if (!m) return null;
+  const reps = parseInt(m[1], 10);
+  if (!(reps > 0) || reps > ONE_RM_MAX_EFFECTIVE_C) return null;
+  return { reps: reps, label: reps + 'RM' };
+}
 function dayTargetC(t, drop, note) {
-  if (!t || !drop) return t;
+  if (!t) return t;
+  const d = Number(drop) > 0 ? Number(drop) : 0;
   const floored = (v, x) => Math.min(v, Math.max(6, x));   // never under 6, never over what was written
   const week = v => (note && Number(note.rpeCap) > 0) ? floored(v, Number(note.rpeCap))
                   : (note && Number(note.rpeDrop) > 0) ? floored(v, v - Number(note.rpeDrop)) : v;
-  const one = v => Math.min(v, week(v), floored(v, v - drop));
+  const one = v => Math.min(v, week(v), floored(v, v - d));
   const lo = one(t.lo), hi = one(t.hi);
   if (lo === t.lo && hi === t.hi) return t;
   return { lo, hi, label: lo === hi ? String(lo) : `${lo}–${hi}`, written: t.label };
@@ -3357,8 +3385,11 @@ function compareExercise(pex, logged, drop, rd, note) {
   const rx = legacyRx(pex);
   const want = rx.sets ? parseInt(rx.sets, 10) : null;
   const tgt = dayTargetC(rpeTarget(rx.target), drop, note);
+  // What moved the target, for the Prescribed column: 'day' a lower check-in (with the week's note, if lower still), 'week' the
+  // week's note alone. Kept out of dayTargetC(), whose answer is the app's twin.
+  const tgtBy = tgt && tgt.written !== undefined ? (Number(drop) > 0 ? 'day' : 'week') : '';
   const c = {
-    name: (pex && pex.name) || (logged && logged.name) || '', pex, rx, tgt, logged,
+    name: (pex && pex.name) || (logged && logged.name) || '', pex, rx, tgt, tgtBy, logged,
     state: 'none', doneSets: 0, allSets: 0, load: '', rpeMean: null, rpePer: '', repsPer: '',
     flags: [], extra: !pex, want,
   };
@@ -3441,10 +3472,15 @@ function compareDay(programDay, session, cycle) {
   const groups = [];
   const drop = dayDropC(session && session.readiness);
   const rd = jparse(session && session.readiness);
-  const note = drop && cycle && session && session.completed_on ? weekNoteOnC(cycle, session.completed_on) : null;
+  // The note of the week the session fell in, on every day of that week (Amir, 2026-10-12: "colour against the cap in those weeks").
+  // A flagged retest in the closing week keeps its own card's target on a normal day (TST-4): the app leaves it out of the week's
+  // colours (paintWeekTargets()) and its session bar says "Max RPE 7 except the retest". A lower day's pill still reads the note, so
+  // on a lower day the retest is judged like every other lift.
+  const note = cycle && session && session.completed_on ? weekNoteOnC(cycle, session.completed_on) : null;
+  const retest = !!(note && !drop && retestWindowOnC(cycle, session.completed_on));
   ((programDay && programDay.blocks) || []).forEach((b, bi) => {
     const rows = (b.exercises || []).map((pex, ei) => {
-      const row = compareExercise(pex, take(pex.name), drop, rd, note);
+      const row = compareExercise(pex, take(pex.name), drop, rd, retest && exTestSpecC(pex) ? null : note);
       // Where this exercise lives in the programme, so the editor can write it
       // back. Index-based rather than name-based: two blocks can hold the same
       // movement, and a rename would otherwise lose the row.
@@ -3528,7 +3564,7 @@ function cmpRowHtml(c, lib, athleteId) {
   const rxBits = [];
   if (dose) rxBits.push(`<span class="rx-dose">${esc(dose)}</span>`);
   if (rx.target) rxBits.push(`<span class="rx-rpe">RPE ${esc(rpeTarget(rx.target) ? rpeTarget(rx.target).label : rx.target.replace(/^@/, ''))}${
-    c.tgt && c.tgt.written ? ` → ${esc(c.tgt.label)} that day` : ''}</span>`);
+    c.tgt && c.tgt.written ? ` → ${esc(c.tgt.label)} ${c.tgtBy === 'week' ? 'that week' : 'that day'}` : ''}</span>`);
   const rxSub = [];
   if (rx.tempo) rxSub.push('tempo ' + esc(rx.tempo));
   (rx.extras || []).forEach(x => rxSub.push(esc(x.label)));
@@ -4227,19 +4263,7 @@ function earlierCyclesHtml(D, earlier) {
 // in — the athlete's strip waits for the closing week so it does not nag, but
 // Amir is the one deciding when to ask, so he needs it early.
 const RETEST_MIN_DAYS_C = 28;
-// The coach's retest flag the way program.html's exTestSpec() reads it (TWIN-7, 2026-10-11): true is the 5RM default, "<n>RM" with n from
-// 1 to 10 is that test, anything else is no flag at all, because the flag decides what nags an athlete. The dashboard showed any text
-// as a tag, so a flag the app ignores looked live here. scripts/check_twins.js runs both on the same values.
-const DEFAULT_TEST_REPS_C = 5, ONE_RM_MAX_EFFECTIVE_C = 10;
-function exTestSpecC(ex) {
-  const raw = ex && ex.test;
-  if (raw === true) return { reps: DEFAULT_TEST_REPS_C, label: DEFAULT_TEST_REPS_C + 'RM' };
-  const m = String(raw || '').match(/^(\d+)\s*rm$/i);
-  if (!m) return null;
-  const reps = parseInt(m[1], 10);
-  if (!(reps > 0) || reps > ONE_RM_MAX_EFFECTIVE_C) return null;
-  return { reps: reps, label: reps + 'RM' };
-}
+// (The retest flag itself, exTestSpecC(), sits in the comparison block above: compareDay() reads it too.)
 function maxesPanel(D) {
   const a = D.a || {};
   const entries = a.oneRm || [];

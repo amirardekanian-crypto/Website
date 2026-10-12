@@ -3,7 +3,8 @@
 // legacy aliases for week 1 and for the final week (about 35 live programmes were written with them), and a
 // numeric key wins over the alias for the same week. Nothing shows before the start date (it used to: the clamped
 // week 1 picked `first` the day before the cycle began, 2026-10-11) or after the end date. A note's rpeCap /
-// rpeDrop reach today's targets (dayRpe(), paintToday()) in that week only.
+// rpeDrop is the colours' target on every day of its week (rpeTargetOn(), paintWeekTargets()) and lowers a lower
+// day's pill (dayRpe(), paintToday()), in that week only.
 // Since 2026-10-12 (Front Page, Amir: "just in the home tab") a note shows on Home ONLY, as the This Week section
 // itself: the kicker carries the week's count, the athlete's first name opens it, the numbers in the headline are
 // clay, a number the headline did not say goes on its own line, and Amir's signature and photo close it. A session's
@@ -277,6 +278,98 @@ function expectOk(s, want) {
     const s = await p.evaluate(() => ({ head: !!document.querySelector('#home-week-wrap .home-section-title'),
       sum: (document.getElementById('home-week-sum') || {}).textContent }));
     t.check('week 2, no note: This Week heading and "N of 2 sessions done this week"', s.head && /sessions done this week$/.test(s.sum || ''), JSON.stringify(s));
+    await ctx.close();
+  }
+
+  // ── The week's limit is the colours' target on every day of its week (Amir, 2026-10-12: "colour against the cap in
+  // those weeks"). The card still prints its own RPE; "RPE 9 → 7 today" still means a lower check-in day only. ───────
+  {
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(MID(1), three) });
+    const u = await p.evaluate(() => ({
+      cap: rpeTargetOn('9', 0, { rpeCap: 7 }), drop: rpeTargetOn('8', 0, { rpeDrop: 1 }), sets: rpeTargetOn('8', 0, { setsDrop: 1 }),
+      none: rpeTargetOn('8', undefined, null), floor: rpeTargetOn('7', 0, { rpeDrop: 2 }), above: rpeTargetOn('7', 0, { rpeCap: 9 }),
+      lower: rpeTargetOn('9', 1, null), both: rpeTargetOn('9', 1, { rpeCap: 7 }), pill: dayRpe('9', 0, { rpeCap: 7 }), pillLower: dayRpe('9', 1, { rpeCap: 7 }),
+    }));
+    t.check('rpeTargetOn: a cap or a drop moves the target with no check-in; never under 6, never above the card; dayRpe (the pill) only on a lower day',
+      u.cap === '7' && u.drop === '7' && u.sets === '' && u.none === '' && u.floor === '6' && u.above === '' && u.lower === '8'
+        && u.both === '7' && u.pill === '' && u.pillLower === '7', JSON.stringify(u));
+    await ctx.close();
+  }
+  const LOGGED = [{ w: '60', n: '', r: '7', d: true }, { w: '60', n: '', r: '8', d: true }, { w: '60', n: '', r: '9', d: true }, { w: '', n: '', r: '', d: false }];
+  // The squat card (written RPE 9) as the page has it: its targets, its pill, and each logged set's colour.
+  const squat = (p, check) => p.evaluate(([chk, cardSel]) => {
+    const id = String(DATA.workouts.days[0].id);
+    if (chk) localStorage.setItem(readinessKey(id), JSON.stringify(Object.assign({ timestamp: new Date().toISOString(), level: 'amber', sore: '', skipped: false }, chk)));
+    openDayView(id);
+    if (chk) paintToday(id);
+    const c = eval(cardSel);
+    const tags = [...c.querySelectorAll('.ex-set-rpetag')].slice(0, 3).map(x => x.classList.contains('over') ? 'over' : x.classList.contains('under') ? 'under' : 'on');
+    return { week: c.dataset.targetWeek || '', today: c.dataset.targetToday || '', pill: !!c.querySelector('.rd-pill'),
+      numline: (c.querySelector('.ex-numline') || {}).textContent || '', tags };
+  }, [check || null, H.card('Barbell Back Squat')]);
+  const seed = { _setlog_Barbell_Back_Squat: LOGGED };
+  const CAP7 = { '1': { text: 'Keep every set at RPE 7 or under this week.', rpeCap: 7 } };
+  for (const [tag, dayIn, notes, check, want] of [
+    ['cap week, no check-in: 7 on target, 8 and 9 over, the card still says RPE 9, no pill', MID(1), CAP7, null,
+      q => q.week === '7' && !q.today && !q.pill && /RPE 9/.test(q.numline) && same(q.tags, ['on', 'over', 'over'])],
+    ['week 2 (no note): back to the card, 7 and 8 under, 9 on target', MID(2), CAP7, null,
+      q => !q.week && same(q.tags, ['under', 'under', 'on'])],
+    ['cap week, Train as written: the cap still colours, no pill', MID(1), CAP7, { drop: 1, asWritten: true },
+      q => q.week === '7' && !q.today && !q.pill && same(q.tags, ['on', 'over', 'over'])],
+    ['cap week, a lower day: the pill says 9 → 7 today, the colours agree', MID(1), CAP7, { drop: 1, asWritten: false },
+      q => q.today === '7' && q.pill && same(q.tags, ['on', 'over', 'over'])],
+    ['a drop week (no cap): every RPE 1 lower, 8 on target', MID(3), { '3': { title: 'Lighter week', text: 'Lighter week.', rpeDrop: 1 } }, null,
+      q => q.week === '8' && same(q.tags, ['under', 'on', 'over'])],
+  ]) {
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(dayIn, notes), seed });
+    const q = await squat(p, check);
+    t.check('colours: ' + tag, want(q) && p.errs.length === 0, JSON.stringify(q) + (p.errs.length ? ' ERR ' + p.errs.join(' | ') : ''));
+    await ctx.close();
+  }
+  {   // A flagged retest while retests are due keeps its own card's target, as the bar says "except the retest" (TST-4).
+    const P = prog(MID(5), { '5': BACKOFF }); P.workouts.days[0].blocks[1].exercises.find(x => x.name === 'Barbell Back Squat').test = '5RM';
+    const { ctx, p } = await H.openProgram(browser, { prog: P, seed });
+    const q = await squat(p, null);
+    t.check('colours: a retest in the back-off week is judged against its own card (9 on target)', !q.week && same(q.tags, ['under', 'under', 'on']), JSON.stringify(q));
+    await ctx.close();
+    const Q = prog(MID(5), { '5': BACKOFF });   // the same lift, not flagged: the cap
+    const o = await H.openProgram(browser, { prog: Q, seed });
+    const r = await squat(o.p, null);
+    t.check('colours: the same lift unflagged in the back-off week is judged against the cap', r.week === '7' && same(r.tags, ['on', 'over', 'over']), JSON.stringify(r));
+    await o.ctx.close();
+  }
+  {   // A lower check-in day caps the retest like every lift (it waits for a green day): the bar drops "except the retest".
+    const P = prog(MID(5), { '5': BACKOFF }); P.workouts.days[0].blocks[1].exercises.find(x => x.name === 'Barbell Back Squat').test = '5RM';
+    const { ctx, p } = await H.openProgram(browser, { prog: P, seed });
+    const q = await squat(p, { drop: 1, asWritten: false });
+    const barTxt = await p.evaluate(() => (document.querySelector('#day-view .day-content.active .session-timer-week') || {}).textContent || '');
+    t.check('lower day in the back-off week: the retest is capped and the bar says no exception', q.today === '7' && !/except/.test(barTxt) && /Max RPE 7/.test(barTxt), JSON.stringify(q) + ' | ' + barTxt);
+    await ctx.close();
+  }
+  {   // An app left open across a week boundary: opening the day re-reads the week.
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(MID(1), CAP7), seed });
+    const r = await p.evaluate(cardSel => {
+      const c = currentCycleData(), id = String(DATA.workouts.days[0].id);
+      openDayView(id);
+      const before = eval(cardSel).dataset.targetWeek || '';
+      const shift = (v, d) => { const x = new Date(v + 'T12:00:00'); x.setDate(x.getDate() - d); return x.toISOString().slice(0, 10); };
+      c.startDate = shift(c.startDate, 7); c.endDate = shift(c.endDate, 7);   // today is week 2 now
+      openDayView(id);
+      const card = eval(cardSel);
+      return { before, after: card.dataset.targetWeek || '', first: card.querySelector('.ex-set-rpetag').className };
+    }, H.card('Barbell Back Squat'));
+    t.check('colours: a week later the cap is gone on the next open', r.before === '7' && !r.after && /under/.test(r.first), JSON.stringify(r));
+    await ctx.close();
+  }
+  {   // The History sheet's caption names today's target, the one the colours use.
+    const { ctx, p } = await H.openProgram(browser, { prog: prog(MID(1), CAP7), seed });
+    const cap = await p.evaluate(cardSel => {
+      openDayView(String(DATA.workouts.days[0].id));
+      openHistorySheet(eval(cardSel));
+      const sub = document.querySelector('#hist-overlay .readiness-sub');
+      return sub ? sub.textContent : '';
+    }, H.card('Barbell Back Squat'));
+    t.check("History: the caption names the card's target its rows use, then today's (target RPE 9 · 7 today)", /target RPE 9 · 7 today\./.test(cap), cap);
     await ctx.close();
   }
 

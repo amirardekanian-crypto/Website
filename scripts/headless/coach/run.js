@@ -3319,6 +3319,81 @@ S['work-this-cycle'] = async (b) => {
   return r;
 };
 
+// ── The week's cap judges every session of its week (Amir, 2026-10-12: "colour against the cap in those weeks"; dayTargetC / rpeTargetOn) ─────────
+S['work-week-cap'] = async (b) => {
+  const r = { id: 'work-week-cap', title: "The work: in a week capped at RPE 7 every session is judged against 7, check-in or not; a lower day still reads 'that day'; a retest in the closing week keeps its own", checks: [] };
+  const { page, log, today } = await L.openCoach(b, { hash: 'a/ava_test/work' });
+  const FX = require('./fixtures');
+  const LOG1 = ['Day 1 — Legs First (fixture)', 'Status: Complete', '', 'Exercise log:', '', '[Primary]',
+    '• Goblet Squat (✓)', '    Set 1: 20 @7 ✓ ×10', '    Set 2: 20 @7 ✓ ×10', '    Set 3: 20 @7 ✓ ×10', '    Set 4: 20 @7 ✓ ×10',
+    '• Chest-Supported Dumbbell Row (✓)', '    Set 1: 14 @7 ✓', '    Set 2: 14 @8 ✓', '    Set 3: 14 @9 ✓',
+    '', '[Accessory]', '• Machine Leg Press (✓)', '    Set 1: 60 @7 ✓', '    Set 2: 60 @7 ✓', '    Set 3: 60 @7 ✓'].join('\n');
+  const LOG2 = ['Day 2 — Upper Push (fixture)', 'Status: Complete', '', 'Exercise log:', '', '[Primary]',
+    '• Dumbbell Bench Press (✓)', '    Set 1: 24 @9 ✓ ×8', '    Set 2: 24 @9 ✓ ×8', '    Set 3: 24 @9 ✓ ×8', '    Set 4: 24 @9 ✓ ×8',
+    '• Lateral Bound (✓)', '    Set 1: ×6 @6 ✓', '    Set 2: ×6 @6 ✓', '    Set 3: ×6 @6 ✓'].join('\n');
+  // The cycle: began 3 days ago (Day 2's session is its first day, Day 1's is yesterday), week 1 capped at RPE 7. Set through the stub's tables, then reloaded.
+  const setUp = (o) => page.evaluate(o => {
+    const p = window.__DB.programs.find(x => x.athlete_id === 'ava_test');
+    Object.assign(p.data.cycles[0], { startDate: o.start, endDate: o.end, weekNotes: { '1': { text: 'Keep every set at RPE 7 or under.', rpeCap: 7 } } });
+    p.data.workouts.days[0].blocks[1].exercises[1].test = o.rowTest || undefined;
+    const ss = window.__DB.session_history.filter(s => s.athlete_id === 'ava_test');
+    const d1 = ss.find(s => s.day === 1 && s.completed_on === o.d1), d2 = ss.find(s => s.day === 2 && s.completed_on === o.d2);
+    Object.assign(d1, { summary: o.log1, log: null, readiness: o.rd1 });
+    Object.assign(d2, { summary: o.log2, log: null });
+    return hardRefresh();
+  }, Object.assign({ log1: LOG1, log2: LOG2, d1: FX.daysAgo(today, 1), d2: FX.daysAgo(today, 3), rd1: null }, o));
+  const rowOf = (day, name) => page.evaluate(([day, name]) => {
+    const card = document.getElementById('wday-' + day);
+    const row = card && [...card.querySelectorAll('.cmp-row')].find(x => ((x.querySelector('.cmp-nm') || {}).textContent || '').trim().startsWith(name));
+    if (!row) return null;
+    const t = el => (el ? el.textContent : '').replace(/\s+/g, ' ').trim();
+    return { rx: t(row.querySelector('.rx-rpe')), over: [...row.querySelectorAll('.rpe-set.over')].map(t), under: [...row.querySelectorAll('.rpe-set.under')].map(t),
+      perSet: t(row.querySelector('.did-detail')), flags: [...row.querySelectorAll('.cmp-flags .fl')].map(t), meta: t(card.querySelector('.wday-meta')), verdict: t(card.querySelector('.dv')) };
+  }, [day, name]);
+  const ROW = 'Chest-Supported Dumbbell Row', BENCH = 'Dumbbell Bench Press';
+
+  // 1. A normal day (no check-in) in the capped week.
+  await setUp({ start: FX.daysAgo(today, 3), end: FX.daysAgo(today, -32) });
+  await L.settle(page, 900);
+  let row = await rowOf(1, ROW);
+  check(r, 'no check-in, week 1: the RPE-8 row reads "RPE 8 → 7 that week"', row && row.rx === 'RPE 8 → 7 that week', row);
+  check(r, '...its 8 and 9 are over (clay), its 7 plain', row && row.over.join() === '8,9' && !row.under.length && /per set: 7 · 8 · 9/.test(row.perSet), row);
+  check(r, '...a mean of 8 against 7 is not a flag (under 1.5)', row && !row.flags.length, row && row.flags);
+  check(r, 'the day card does not call it a lower day (the meta is the check-in\'s)', row && !/lower day/.test(row.meta), row && row.meta);
+  const gob = await rowOf(1, 'Goblet Squat');
+  check(r, 'an RPE-7 card is not moved by a cap of 7 (no arrow), and its 7s are plain', gob && gob.rx === 'RPE 7' && !gob.over.length && !gob.under.length, gob);
+  const bench = await rowOf(2, BENCH);
+  check(r, 'Day 2 (an older check-in with no level), 9s on an RPE-8 card: "→ 7 that week" and "2 over target RPE"', bench && bench.rx === 'RPE 8 → 7 that week' && bench.flags.includes('2 over target RPE'), bench);
+  check(r, '...so the day reads off plan', bench && /1 off plan/.test(bench.verdict), bench && bench.verdict);
+  const bound = await rowOf(2, 'Lateral Bound');
+  check(r, 'an RPE-6 card under a cap of 7 is left alone', bound && bound.rx === 'RPE 6' && !bound.flags.length, bound);
+
+  // 2. The same sessions when the cycle began 10 days ago: yesterday is week 2, which has no note.
+  await setUp({ start: FX.daysAgo(today, 10), end: FX.daysAgo(today, -32) });
+  await L.settle(page, 900);
+  row = await rowOf(1, ROW);
+  check(r, 'week 2 (no note): the card as written, no arrow', row && row.rx === 'RPE 8', row);
+  check(r, '...its 7 is under (blue), its 8 plain, its 9 over', row && row.under.join() === '7' && row.over.join() === '9', row);
+
+  // 3. A lower day in the capped week: the day moved it, and it says so.
+  await setUp({ start: FX.daysAgo(today, 3), end: FX.daysAgo(today, -32), rd1: { level: 'amber', drop: 1, score: 3 } });
+  await L.settle(page, 900);
+  row = await rowOf(1, ROW);
+  check(r, 'a lower day in the capped week reads "RPE 8 → 7 that day"', row && row.rx === 'RPE 8 → 7 that day', row);
+  check(r, '...and the day card says lower day', row && /lower day/.test(row.meta), row && row.meta);
+
+  // 4. The closing week (the cycle ends in 4 days) with the row flagged as a retest: it keeps its own target, the lift beside it does not (TST-4).
+  await setUp({ start: FX.daysAgo(today, 3), end: FX.daysAgo(today, -4), rowTest: true });
+  await L.settle(page, 900);
+  row = await rowOf(1, ROW);
+  check(r, 'a flagged retest in the closing week keeps RPE 8: no arrow, 7 under, 8 plain, 9 over', row && row.rx === 'RPE 8' && row.under.join() === '7' && row.over.join() === '9', row);
+  const bench2 = await rowOf(2, BENCH);
+  check(r, '...while the unflagged lift that week is judged against the cap', bench2 && bench2.rx === 'RPE 8 → 7 that week', bench2);
+  check(r, 'no page errors', !log.errors.length, log.errors);
+  await page.context().close();
+  return r;
+};
+
 // ── The phone's finished-sessions list (program.html _noteFinished(), 2026-10-12): "session not synced" with no email report ─────────
 S['sync-finished-list'] = async (b) => {
   const r = { id: 'sync-finished-list', title: "A session on the phone's finished list with no row is a sync warning, email or not", checks: [] };

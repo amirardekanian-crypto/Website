@@ -233,7 +233,7 @@ stale copy reached athletes.
 | PRC-12 | Every build ends with a coach handoff: measurements, gates, films, dated escalations and decisions made for Amir, each with its reason. | assemble | |
 | PRC-13 | Reassessment is scheduled: every cycle has a set length and a trigger (a primary stalled about two weeks). | design | |
 | PRC-14 | The roadmap is 5 cycles of 5 weeks, each 4 loading weeks and 1 back-off. Deviate only on Amir's word, and say so. | roadmap | |
-| PRC-15 | A week note belongs to one week and shows only then, on Home: design sets numbers, engage the words, assemble stores `weekNotes`. | design · engage · assemble | ✓ |
+| PRC-15 | A week note belongs to one week, shows on Home, and its number covers every lift: design sets numbers, engage the words. | design · engage · assemble | ✓ (warn: a scoped number) |
 | PRC-16 | One current athlete profile heads the coaching log: intake drafts it, every run keeps it current, and the checker reads it. | intake · design · edit | warn (missing) |
 | PRC-17 | The roadmap is written once and locked. A change goes through design's `roadmap_amend:` line at the checkpoint, never a quiet rewrite. | roadmap · design | |
 | PRC-18 | Every cycle's rationale is appended to the coach-only coaching log and never overwritten. | assemble | |
@@ -521,8 +521,10 @@ same ID. Read a rule's story and its history before changing it.
     at half the sets, rounded down, at least one; at 1, skipped. Lifts are unchanged: a sore muscle
     can still be lifted, and RPE already regulates it.
   - **Never** below RPE 6 (CHP-4), below the warm-up and the minimum dose, or an edit to the card
-    (PRG-4). Week notes and readiness do not stack: the lower target wins, floor 6. A flagged retest
-    (TST-1) waits for a green day. The athlete may always train as written, and that choice is logged.
+    (PRG-4). Week notes and readiness do not stack: a week note's limit is already the target on every
+    day of its week (PRC-15), a lower day moves only what is still above it, and the lower target wins,
+    floor 6. A flagged retest (TST-1) waits for a green day. The athlete may always train as written, and
+    that choice is logged. Training as written undoes the check-in, never the week note's limit.
   - **A run of low days is Amir's call, not the rule's**: three amber or red check-ins in five, or
     stress 2 or lower on three of five (REC-3, PRG-1).
   - **Why these numbers.** Simulated on 348 answered check-ins (27 athletes, April to September
@@ -693,7 +695,9 @@ same ID. Read a rule's story and its history before changing it.
   app shows during that week (2026-09-26, Amir: *"update the app in a way that it can show first
   week or last week"*); a low-readiness day, a medication change, a period week are
   **notes-card instructions to the athlete**. None of them is a lower number authored onto the
-  exercise. The card is a stable reference she reads all cycle;
+  exercise. In a week whose note sets an RPE limit, the app colours every logged RPE against that
+  limit on every day, and the card still prints its own number (PRC-15, 2026-10-12).
+  The card is a stable reference she reads all cycle;
   rewriting it for a temporary condition breaks the week-to-week progression read (a logged
   RPE 6 then means two different things) and forces a mid-cycle edit the program is not
   supposed to need. A genuinely light day in the design — an undulation choice, a low-CNS
@@ -709,7 +713,9 @@ same ID. Read a rule's story and its history before changing it.
   longer start-lower, like a staged return, is a notes card. Either way it names: **the reduced
   RPE as an actual number** (≥6 — see the RPE-floor
   rules in "Chips & modifiers"), **which exercises it applies to**, and **what moves her back
-  to the number on the card**. Triggers: a layoff or detraining, week-1 recalibration, a
+  to the number on the card**. A week note's `rpeCap` or `rpeDrop` covers every lift that week
+  (PRC-15), so a limit on only some exercises names its number in the note's words, with no
+  `rpeCap` or `rpeDrop`, or goes on a notes card. Triggers: a layoff or detraining, week-1 recalibration, a
   deload/back-off week, a movement new to the client, a staged return from injury, a period
   week.
 - `PRG-6` **Never prescribe a rep range — always a single rep number.** The app has no rep-range
@@ -863,7 +869,10 @@ same ID. Read a rule's story and its history before changing it.
   (~2 shy of grind), and if the cycle carries an RPE ceiling, the test is written as an
   explicit, stated exception to it — two lines of a program must never give opposite
   instructions for the same set. It never runs in a first cycle (TST-3). The app keeps to it too: on a day with a
-  flagged retest while retests are due, the session bar's cap reads *Max RPE 7 except the retest* (2026-10-12).
+  test-flagged lift in the closing week (the retest window), the session bar's cap reads *Max RPE 7 except the
+  retest* (2026-10-12), and that lift's logged RPEs are coloured against its own card, not the cap, in the app and
+  on the dashboard (the session's date decides there). On a lower check-in day neither applies: the retest waits for
+  a green day, so it is capped like every lift and the bar says no exception.
 - `TST-2` `TST-3` **No test goes to a grind: every max-effort set stops at the first rep that slows, shortens or
   breaks position.** A flagged rep-max retest (`test: 5RM`) is one set of 3–5 reps at about
   **RPE 9**, one rep left, never RPE 10. That is accurate enough for The Ceiling (a *Good*
@@ -1326,8 +1335,16 @@ same ID. Read a rule's story and its history before changing it.
   /program-engage writes the athlete's words, and /program-assemble stores both in the cycle's `weekNotes`
   under that week's number (`"1"`, `"4"`, `"5"`). The app shows a note only in its own week, on Home, where it
   IS the This Week section (since 2026-10-12), and nowhere else: not at the top of a session (there its numbers
-  sit on the session bar's last row, and reach a target only on a lower day, through dayRpe()), not before the
-  cycle starts, not after it ends.
+  sit on the session bar's last row), not before the cycle starts, not after it ends.
+  **In its week the note's numbers are also the target every logged RPE is coloured against** (2026-10-12), on every
+  day of that week, with or without a check-in, skipped or trained as written: the card's RPE lowered by the
+  `rpeCap` (else the `rpeDrop`), never below 6 (CHP-4) and never above the card. The card still prints its own
+  RPE (PRG-4), a lower check-in day takes the lower of the two (REC-2), and a test-flagged lift in the closing
+  week keeps its own card on a normal day (TST-4; on a lower day it waits for a green day, capped like every lift). The dashboard judges each session against the week it fell in, the same way.
+  **A number in a week note covers every lift that week**, because the session bar and the set colours read it
+  for every card. A limit on only some lifts (*new exercises stay at RPE 7, known lifts go to the card*) is
+  written in the note's words with no `rpeCap` or `rpeDrop`, and `scripts/check_program.py` warns when a note
+  with a number scopes it in words to some lifts.
   Every cycle has the back-off on its final week, and week 1 has a note when it differs (always for a new
   athlete). Any other week that differs from the card, a testing week or a reduced-load week, gets its own
   note with a title (*Testing week*, *Lighter week*). `first` and `last` still read as week 1 and the final

@@ -22,7 +22,7 @@ vm.runInContext(fs.readFileSync('assets/js/chips.js', 'utf8'), chipsCtx);
 // jparse is coach.html's own JSON-or-object reader (compareDay reads session.log with it).
 const jparse = v => { if (v == null) return null; if (typeof v === 'object') return v; try { return JSON.parse(v); } catch { return null; } };
 const sandbox = { round1: n => Math.round(n * 10) / 10, window: chipsCtx.window, jparse };
-new Function('ctx', 'with (ctx) {' + code + '\nObject.assign(ctx, {parseSetLine, parseSessionLog, parseChips, compareExercise, compareDay, dayVerdict, loadSummary, rpeTarget, normEx, logIndex, rxLine, dayTargetC, dayDropC, planLabelC, weekNoteOnC, cycleWeekOnC});}')(sandbox);
+new Function('ctx', 'with (ctx) {' + code + '\nObject.assign(ctx, {parseSetLine, parseSessionLog, parseChips, compareExercise, compareDay, dayVerdict, loadSummary, rpeTarget, normEx, logIndex, rxLine, dayTargetC, dayDropC, planLabelC, weekNoteOnC, cycleWeekOnC, retestWindowOnC, exTestSpecC});}')(sandbox);
 const { parseSessionLog, parseChips, compareDay, compareExercise, dayVerdict, loadSummary } = sandbox;
 // The email reader (the page's "Add past session from email" box is gone since 2026-10-12; scripts/restore/sessions_from_email.js uses it).
 const emailCode = grab('function parseSessionEmail(text) {', '// ── end of the email reader');
@@ -403,7 +403,7 @@ console.log('12. email import: the check-in line');
   const pex = { name: 'X', chips: c('3 Sets', '×5 Reps', 'RPE 9') };
   is(compareExercise(pex, mk([9, 9, 9]), 1, null, null).flags.length, 0, 'lower day, no note: target 8, a 9 is one over, not flagged');
   is(compareExercise(pex, mk([9, 9, 9]), 1, null, { text: 'w', rpeCap: 7 }).flags.map(f => f.text), ['2 over target RPE'], 'lower day in a capped week: target 7, a 9 is two over');
-  is(compareExercise(pex, mk([9, 9, 9]), 0, null, { text: 'w', rpeCap: 7 }).flags.length, 0, 'a normal day ignores the note (the app only reads it on a lower day)');
+  is(compareExercise(pex, mk([9, 9, 9]), 0, null, { text: 'w', rpeCap: 7 }).flags.map(f => f.text), ['2 over target RPE'], 'a normal day in a capped week is judged against the cap (Amir 2026-10-12: "colour against the cap in those weeks")');
   is(compareExercise(pex, mk([9, 9, 9]), 1, null, { text: 'w', rpeDrop: 3 }).flags.map(f => f.text), ['3 over target RPE'], 'rpeDrop 3 from 9 gives 6 and the drop gives 8: the lower wins, 6 is also the floor');
   const cycle = { startDate: '2026-09-01', endDate: '2026-10-06', weekNotes: { '1': { text: 'week one', rpeCap: 7 }, last: { text: 'back-off', rpeCap: 6 } } };
   const plan = { id: 1, blocks: [{ title: 'Primary', exercises: [{ name: 'Back Squat', chips: c('3 Sets', '×5 Reps', 'RPE 9') }] }] };
@@ -416,6 +416,50 @@ console.log('12. email import: the check-in line');
   is(row('2026-09-03').tgt.label, '8', 'no cycle given: the check-in alone');
   is(weekNoteOnC(cycle, '2026-09-03').wk, 1, 'the note carries its week');
   is(cycleWeekOnC({ startDate: '2026-09-01', endDate: '2026-10-06' }, '2026-10-06'), { wk: 5, total: 5, before: false, after: false }, 'the last day is still the last week');
+
+  // The week's cap on EVERY day of its week (Amir, 2026-10-12: "colour against the cap in those weeks"), not only on a lower day.
+  const { dayTargetC, rpeTarget, retestWindowOnC, exTestSpecC } = sandbox;
+  const cap7 = { text: 'w', rpeCap: 7 };
+  const p8 = { name: 'X', chips: c('3 Sets', '×5 Reps', 'RPE 8') };
+  is(compareExercise(p8, mk([7, 7, 7]), 0, null, cap7).tgt, { lo: 7, hi: 7, label: '7', written: '8' }, 'a normal day in a capped week: an RPE-8 card is judged against 7');
+  is(compareExercise(p8, mk([7, 7, 7]), 0, null, cap7).flags.length, 0, '...and 7s on it are on target');
+  is([compareExercise(pex, mk([9, 9, 9]), 0, null, { text: 'w', rpeDrop: 1 }).tgt.label, compareExercise(pex, mk([9, 9, 9]), 0, null, { text: 'w', rpeDrop: 1 }).flags.length], ['8', 0], 'a normal day in a week one RPE lower: 9 → 8, a 9 is one over, not flagged');
+  is([compareExercise(pex, mk([9, 9, 9]), 0, null, { text: 'w', rpeDrop: 2 }).tgt.label, compareExercise(pex, mk([9, 9, 9]), 0, null, { text: 'w', rpeDrop: 2 }).flags.map(f => f.text)], ['7', ['2 over target RPE']], 'two lower: 9 → 7, a 9 is two over');
+  is(compareExercise(p8, mk([8, 8, 8]), 0, null, { text: 'w', rpeCap: 9 }).tgt, { lo: 8, hi: 8, label: '8' }, 'a cap above the card changes nothing');
+  is(compareExercise(p8, mk([8, 8, 8]), 0, null, { text: 'w', setsDrop: 1 }).tgt, { lo: 8, hi: 8, label: '8' }, 'a week that only drops a set leaves the RPE alone');
+  is(compareExercise(pex, mk([9, 9, 9])).tgt, { lo: 9, hi: 9, label: '9' }, 'no drop and no note given: the card as written (never a NaN target)');
+  is([dayTargetC(rpeTarget('8'), undefined, cap7).label, dayTargetC(rpeTarget('8'), null, cap7).label], ['7', '7'], 'a missing or null drop is a normal day');
+  is([compareExercise(p8, mk([7]), 0, null, cap7).tgtBy, compareExercise(p8, mk([7]), 1, null, cap7).tgtBy, compareExercise(p8, mk([7]), 1, null, null).tgtBy, compareExercise(p8, mk([8])).tgtBy, compareExercise(p8, mk([8]), 0, null, { text: 'w', rpeCap: 9 }).tgtBy],
+    ['week', 'day', 'day', '', ''], 'what moved the target: the week, the day (with or without a note), or nothing');
+
+  // compareDay: every kind of normal day in the capped week is judged against the cap; outside a note's week the card as written.
+  const plan9 = { id: 1, blocks: [{ title: 'Primary', exercises: [{ name: 'Back Squat', chips: c('3 Sets', '×5 Reps', 'RPE 9') }] }] };
+  const sessRd = (day, rd) => ({ completed_on: day, readiness: rd, summary: 'Exercise log:\n[Primary]\n• Back Squat (✓)\n    Set 1: 100 ×5 @9 ✓\n    Set 2: 100 ×5 @9 ✓\n    Set 3: 100 ×5 @9 ✓\n' });
+  const rowRd = (plan, day, rd, cyc) => compareDay(plan, sessRd(day, rd), cyc).groups.flatMap(g => g.rows)[0];
+  const NORMAL = [['no check-in', null], ['a green day', { level: 'green', drop: 0 }], ['a skipped check-in', { skipped: true }], ['a lower day trained as written', { level: 'amber', drop: 1, asWritten: true }]];
+  NORMAL.forEach(([what, rd]) => {
+    const w1 = rowRd(plan9, '2026-09-03', rd, cycle);
+    is([w1.tgt.label, w1.tgtBy, w1.flags.map(f => f.text)], ['7', 'week', ['2 over target RPE']], what + ' in week 1: judged against the cap of 7');
+    is([rowRd(plan9, '2026-09-12', rd, cycle).tgt.label, rowRd(plan9, '2026-09-12', rd, cycle).tgtBy], ['9', ''], what + ' in week 2 (no note): the card as written');
+    is([rowRd(plan9, '2026-10-02', rd, cycle).tgt.label, rowRd(plan9, '2026-10-02', rd, cycle).tgtBy], ['6', 'week'], what + ' in the back-off week: its cap of 6');
+    is([rowRd(plan9, '2026-08-30', rd, cycle).tgt.label, rowRd(plan9, '2026-10-07', rd, cycle).tgt.label, rowRd(plan9, '2026-09-03', rd).tgt.label], ['9', '9', '9'], what + ' before or after the cycle, or with no cycle: the card as written');
+  });
+  is(rowRd(plan9, '2026-09-03', { level: 'amber', drop: 1 }, cycle).tgtBy, 'day', 'a lower day in the capped week still reads as the day');
+
+  // The retest exception (TST-4): in the cycle's closing week a flagged retest keeps its own card's target on a normal day, as the app's bar
+  // says "Max RPE 7 except the retest". On a lower day the app's pill reads the note for every lift, so the dashboard does too.
+  is([retestWindowOnC(cycle, '2026-09-28'), retestWindowOnC(cycle, '2026-09-29'), retestWindowOnC(cycle, '2026-10-06'), retestWindowOnC(cycle, '2026-10-20')], [false, true, true, true], 'the closing week is the last 7 days and on, by calendar day');
+  is([retestWindowOnC({ startDate: '2026-09-01' }, '2026-09-03'), retestWindowOnC({ endDate: 'soon' }, '2026-09-03'), retestWindowOnC(null, '2026-09-03')], [true, true, true], 'no end date, or one that cannot be read: always in it (as the app)');
+  is([exTestSpecC({ test: true }), exTestSpecC({ test: 'heavy' })], [{ reps: 5, label: '5RM' }, null], 'the retest flag is read in the comparison block');
+  const planT = test => ({ id: 1, blocks: [{ title: 'Primary', exercises: [{ name: 'Back Squat', test, chips: c('3 Sets', '×5 Reps', 'RPE 9') }] }] });
+  is([rowRd(planT(true), '2026-10-02', null, cycle).tgt.label, rowRd(planT(true), '2026-10-02', null, cycle).flags.length], ['9', 0], 'a flagged retest in the closing week keeps its own target: 9s are on target');
+  is(rowRd(planT('5RM'), '2026-10-02', { level: 'green', drop: 0 }, cycle).tgt.label, '9', '...a "5RM" flag on a green day too');
+  is(rowRd(planT('heavy'), '2026-10-02', null, cycle).tgt.label, '6', 'a value the app does not read as a flag is an ordinary lift: the cap');
+  is(rowRd(planT(true), '2026-09-03', null, cycle).tgt.label, '7', 'the same lift in week 1 (not the closing week) gets the cap');
+  is([rowRd(planT(true), '2026-10-02', { level: 'amber', drop: 1 }, cycle).tgt.label, rowRd(planT(true), '2026-10-02', { level: 'amber', drop: 1 }, cycle).tgtBy], ['6', 'day'], 'on a lower day in the closing week the retest is judged like every lift (the lower of 8 and 6)');
+  const twoLifts = { id: 1, blocks: [{ title: 'Primary', exercises: [{ name: 'Back Squat', test: true, chips: c('1 Sets', '×5 Reps', 'RPE 9') }, { name: 'Row', chips: c('3 Sets', '×8 Reps', 'RPE 8') }] }] };
+  const both = compareDay(twoLifts, { completed_on: '2026-10-02', readiness: null, summary: 'Exercise log:\n[Primary]\n• Back Squat (✓)\n    Set 1: 100 ×5 @9 ✓\n• Row (✓)\n    Set 1: 30 ×8 @6 ✓\n    Set 2: 30 ×8 @6 ✓\n    Set 3: 30 ×8 @6 ✓\n' }, cycle).groups[0].rows;
+  is(both.map(r => [r.tgt.label, r.tgtBy, r.flags.length]), [['9', '', 0], ['6', 'week', 0]], 'the retest keeps 9 while the lift beside it is judged against the back-off cap of 6');
 }
 
 // ── 14. The Readiness chart plots the app's own score against the app's own usual (TWIN-3, TODAY-11, 2026-10-11) ────

@@ -203,7 +203,7 @@ Top to bottom:
 **The session bar.**
 - Before you start: *"Ready when you are"*, **00:00**, **Start ▶**, **Guided ▶** (Guided only appears if the day has lifts to log).
 - From Start until Done it's one slim line: **← Home** · clock · **Pause ⏸** · **⋯**. Under **⋯**: **Guided ▶** and **Reset** (Reset takes two taps: **Reset?**).
-- In a week where my note sets a limit, a thin line sits at the bottom of the bar, before Start and all session: *"This week · Max RPE 7"*, *"Back-off week · Max RPE 7 · 1 set fewer"*, or *"… except the retest"* on a day with a retest. It goes when the day is done.
+- In a week where my note sets a limit, a thin line sits at the bottom of the bar, before Start and all session: *"This week · Max RPE 7"*, *"Back-off week · Max RPE 7 · 1 set fewer"*, or *"… except the retest"* on a day with a retest. It goes when the day is done. That week no target is above my limit. A lift written above it counts at the limit, one written below keeps its own number. Over shows in orange, under in blue. A lift you retest in the last week keeps its own number, except on a lower day.
 - **← Home** leaves the day but **the clock keeps running**. Use **Pause** if you stop.
 - The slim bar stays pinned to the top as you scroll. A thin rail down the right edge of the screen shows the sets you've done.
 - The clock keeps counting with the app closed or the phone locked. A session that began the evening before survives midnight; after about six hours past midnight it's treated as an old, unfinished day.
@@ -219,14 +219,14 @@ Top to bottom:
 | 5 | Overall, how ready do you feel? | Not ready · Bit off · OK · Good · Fully ready |
 
 - The button is grey and counts your answers (**3 of 5 answered**), then becomes **Begin session ▶** at five.
-- **Skip for today** starts the clock without the questions (no banner and no adjustments; I just see that you skipped).
+- **Skip for today** starts the clock without the questions (no banner and no adjustments; I just see that you skipped). A limit from my week note still counts.
 - To cancel: tap the dark area outside, swipe the sheet down, or press Back. Nothing is saved.
 
 **Today's targets (only on a lower day).** If your answers come out low, a banner under the session bar says **Lower day**, **Short day** or **Sore today**, and what changed:
 - *"Every RPE is 1 lower today, never below 6. Same sets and reps."*
 - On a really rough day: the session becomes the warm-up, your first power move and your first main lift; the rest is marked **Optional today**, drop it from the end.
 - When sore: jumps and landings at half the sets (or none).
-- Your programme itself never changes, only today's targets. **Train as written** reverses it all (the banner then offers **Use today's targets**). I see which one you chose.
+- Your programme itself never changes, only today's targets. **Train as written** reverses it all (the banner then offers **Use today's targets**). I see which one you chose. A limit from my week note still counts either way. On a lower day the lower number wins.
 
 **The exercise card — closed.** One row per exercise, in order:
 - **A circle on the left.** Until you've finished your first session it **opens the card** (with a note on how to log). After that it ticks **every set at once, as written**, with no weight and no RPE, and folds the card (the name is struck through and the line shows only the reps): a shortcut for when you did exactly what was written. For normal logging, open the card and use the per-set circles.
@@ -249,7 +249,7 @@ Top to bottom:
 - **KG:** type the weight you used. A grey figure with a tiny **LAST** under it is last time's weight, as a reminder only: it is **not saved unless you type it**. A tick on an empty weight box records no weight, and the app tells you (the box pulses and a note says *"No weight saved on that set. Type it in the kg box."*; once a session after your first). A weight typed in one set fills the empty sets below it.
 - **REPS:** the grey number is the prescription. It looks filled but holds nothing. Type only if your reps differed. Typing the prescribed number stores nothing.
 - **Circle:** tick = "done as written".
-- **After a tick,** a **How hard?** strip opens: **6 7 8 9 10**. Tap one (tap it again to clear). An RPE over the target shows in **orange**, under it in **blue**. **How hard?** itself opens the short guide.
+- **After a tick,** a **How hard?** strip opens: **6 7 8 9 10**. Tap one (tap it again to clear). An RPE over the target shows in **orange**, under it in **blue**. In a week where my note sets a limit, no target is above it. The card still shows its own number. **How hard?** itself opens the short guide.
 - Not rated yet? The tag reads a dashed **RPE**; tap it to reopen the strip.
 - After the last set is rated, the card folds into one line (like `70 · 72.5 kg × 6 · 6 · 6 · 5 · RPE 6 7 7 8`, cut short on a small phone) and the next card opens.
 
@@ -420,7 +420,7 @@ AA Proof is a separate habit app (sleep, steps, protein, water, your session…)
 | **The server turns you away** | *"Plan not available"*, **Sign in again**, **Message Amir on WhatsApp**. |
 | **You left a day open** | The next morning (after a six-hour grace past midnight) a **Not finished** card: **Send it** files and sends it under the day you trained; **Clear it** (two taps) throws the ticks away. |
 | **Lower / short / sore day** | A banner under the session bar and a *"RPE 7 → 6 today"* pill on cards. **Train as written** reverses it. |
-| **Week 1 / last week** | A note from me on Home: in that week it is the This Week section. In the session, the bar at the top keeps its numbers in view (*Max RPE 7 · 1 set fewer*). |
+| **Week 1 / last week** | A note from me on Home: in that week it is the This Week section. In the session, the bar at the top keeps its numbers in view (*Max RPE 7 · 1 set fewer*), and your RPE colours follow them every day of that week. |
 | **Last 14 days of a cycle** | *"N days left in cycle"* on Game Plan. |
 | **The cycle is over** | See §6. |
 | **Cycle has no dates** | Only a small line, *"Cycle 1 of 6 · NAME · Weeks 1–5"*, and no week features. |

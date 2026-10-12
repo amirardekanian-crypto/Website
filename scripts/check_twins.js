@@ -19,9 +19,12 @@
      ceilAliasMap (matchRenamed) / ceilAliasMapC                  a renamed lift is one lift
      setSpine + spineFor         / spineIndexC + spineForC        a card finds its Spine entry (an exId is the entry or nothing), in the phone's
                                                                   view (approved entries) and the coach's (all), spineLensC()
-     dayRpe                      / rpeTarget + dayTargetC         today's RPE target on a lower day (REC-2), with the week note
+     rpeTargetOn (+ dayRpe)      / rpeTarget + dayTargetC         the RPE target a logged set is judged against (REC-2): the week note's cap on
+                                                                  every day of its week (2026-10-12), a lower day one off each end, the lower
+                                                                  wins; dayRpe() (the app's lower-day pill) is that target on a lower day only
      cycleWeekInfo, weekNoteNow  / cycleWeekOnC, weekNoteOnC      the week a day falls in and the cycle's note for it (the app asks about today,
                                                                   the dashboard about the day a session was trained)
+     inRetestWindow              / retestWindowOnC                the cycle's closing week, where a flagged retest keeps its own target (TST-4)
      sessionIsStale              / sessionIsStaleC                is a started session over (the live app snapshot's "in progress", TWIN-6)
      habits.html runEndKey, activeQuestRun / questRunEnd, activeQuestRun   the live quest run and its last day, with runs overlapping or scheduled ahead (TODAY-14)
      exTestSpec                  / exTestSpecC                    which values of a lift's `test` are a retest flag (TWIN-7)
@@ -259,29 +262,60 @@ run('Spine lookup (spineFor)', () => {
   expect('spineFor before the Spine loads', 'SPINE = null', vm.runInContext('SPINE = null; spineFor("Goblet Squat", "")', A_SPINE.ctx), null);
 });
 
-/* ── 4. today's RPE target on a lower day (REC-2), with the week note ─────── */
-const A_RPE = sandbox(null, [lineSrc(A_SRC, 'const READY_BASE_N', 'program.html')].concat(fromA('dayRpe')), ['dayRpe']);
+/* ── 4. the RPE target a logged set is judged against (REC-2): the week note, a lower day ─────── */
+// The app's rpeTargetOn() colours the sets (paintWeekTargets(), rpeTargetOf()); its dayRpe() is the same target drawn as the "RPE 8 → 7 today" pill,
+// on a lower day only. The dashboard's dayTargetC() judges a session's sets (compareExercise()); '' on the app's side is "nothing moved it".
+const A_RPE = sandbox(null, [lineSrc(A_SRC, 'const READY_BASE_N', 'program.html')].concat(fromA('rpeTargetOn', 'dayRpe')), ['rpeTargetOn', 'dayRpe']);
 const D_RPE = sandbox(null, fromD('rpeTarget', 'dayTargetC'), ['rpeTarget', 'dayTargetC']);
 const WRITTEN = ['8', 8, '7-8', '7–8', '7 - 8', '6', 6, '6-7', '5', '5-6', '9', '10', '8.5', '7.5-8', '@8', '9-10', '', null, undefined, 'easy', '7-9', '6.5', '10-10'];
-// A week note can lower the target further on a lower day (the lower of the two wins, never under 6); a note alone changes nothing.
+// The week note's rpeCap (else its rpeDrop) lowers the target on EVERY day of its week (Amir, 2026-10-12: "colour against the cap in those weeks");
+// a lower day takes one off each end; the lower of the two wins, never under 6 and never above what was written. A drop of 0, null or none is a normal day.
 const NOTES = [null, { text: 'n' }, { text: 'n', rpeCap: 7 }, { text: 'n', rpeCap: 6 }, { text: 'n', rpeCap: 5 }, { text: 'n', rpeCap: 9 }, { text: 'n', rpeDrop: 1 },
-  { text: 'n', rpeDrop: 2 }, { text: 'n', rpeDrop: 0 }, { text: 'n', rpeCap: 7, rpeDrop: 1 }, { text: 'n', setsDrop: 1 }, { text: 'n', rpeCap: '7' }, { text: 'n', rpeCap: 'x' }];
-run('lower-day RPE target (dayRpe), with and without a week note', () => WRITTEN.forEach(w => [0, 1, 2].forEach(drop => NOTES.forEach(note => {
-  const t = D_RPE.rpeTarget(w), r = D_RPE.dayTargetC(t, drop, note);
-  same('dayRpe vs dayTargetC', { written: w, drop, note }, A_RPE.dayRpe(w, drop, note), r && r.written !== undefined ? r.label : '');
+  { text: 'n', rpeDrop: 2 }, { text: 'n', rpeDrop: 0 }, { text: 'n', rpeCap: 7, rpeDrop: 1 }, { text: 'n', setsDrop: 1 }, { text: 'n', rpeCap: '7' }, { text: 'n', rpeCap: 'x' },
+  { text: 'n', rpeDrop: '1' }, { text: 'n', rpeCap: 8.5 }, { text: 'n', rpeCap: 10 }];
+const DROPS = [0, 1, 2, undefined, null];
+const dLabel = (w, drop, note) => { const r = D_RPE.dayTargetC(D_RPE.rpeTarget(w), drop, note); return r && r.written !== undefined ? r.label : ''; };
+run('the RPE target (rpeTargetOn, dayRpe), on a normal and a lower day, with and without a week note', () => WRITTEN.forEach(w => DROPS.forEach(drop => NOTES.forEach(note => {
+  const input = { written: w, drop, note };
+  same('rpeTargetOn vs dayTargetC', input, A_RPE.rpeTargetOn(w, drop, note), dLabel(w, drop, note));
+  if (drop) same('dayRpe vs dayTargetC (a lower day: the pill is the target)', input, A_RPE.dayRpe(w, drop, note), dLabel(w, drop, note));
+  else expect('dayRpe is empty on a normal day (no pill; the note moves only the colours)', input, A_RPE.dayRpe(w, drop, note), '');
 }))));
+// Pinned answers on both sides: same() only sees drift, and the two copies going back to the old rule together would pass it.
+run('the RPE target, pinned', () => {
+  const cap7 = { text: 'n', rpeCap: 7 }, drop1 = { text: 'n', rpeDrop: 1 }, sets1 = { text: 'n', setsDrop: 1 };
+  [['8', 0, cap7, '7', 'a normal day in a week capped at 7: an 8 is judged against 7'],
+   ['9', 0, drop1, '8', 'a normal day in a week one RPE lower: a 9 is judged against 8'],
+   ['8', 0, sets1, '', 'a week that only drops a set leaves the RPE alone'],
+   ['8', undefined, null, '', 'no drop and no note: the card as written'],
+   ['9', 1, cap7, '7', 'a lower day in a capped week: the lower of 8 and 7'],
+   ['8', 1, null, '7', 'a lower day alone: one off'],
+   ['6', 0, { text: 'n', rpeCap: 5 }, '', 'a cap under 6 stops at 6'],
+  ].forEach(([w, drop, note, want, label]) => {
+    expect('rpeTargetOn: ' + label, { written: w, drop, note }, A_RPE.rpeTargetOn(w, drop, note), want);
+    expect('dayTargetC: ' + label, { written: w, drop, note }, dLabel(w, drop, note), want);
+    expect('dayRpe: ' + label, { written: w, drop, note }, A_RPE.dayRpe(w, drop, note), drop ? want : '');
+  });
+  const t = D_RPE.rpeTarget('8');
+  expect('dayTargetC hands back the written target itself when nothing moves it', { written: '8', drop: undefined, note: null }, D_RPE.dayTargetC(t, undefined, null) === t, true);
+});
 
 /* ── 4b. the week a day falls in, and the note for it (WORK-11) ────────────── */
 // The app reads the clock (cycleWeekInfo / weekNoteNow ask about TODAY); the dashboard is told the day (cycleWeekOnC / weekNoteOnC: the day a
 // session was trained). So the app's functions run in a sandbox whose clock is set to LOCAL NOON of each day in turn, in the time zone being tested.
-const D_WEEK = sandbox(null, fromD('dayNumC', 'cycleWeekOnC', 'weekNoteOnC'), ['cycleWeekOnC', 'weekNoteOnC']);
+// The closing week (inRetestWindow / retestWindowOnC, TST-4) rides along: the app reads it from the cycle in DATA, so each cycle is put there in turn.
+const D_WEEK = sandbox(null, [lineSrc(D_SRC, 'const RETEST_WINDOW_DAYS_C =', 'coach.html')].concat(fromD('dayNumC', 'cycleWeekOnC', 'weekNoteOnC', 'retestWindowOnC')),
+  ['cycleWeekOnC', 'weekNoteOnC', 'retestWindowOnC']);
 function appWeekAt(dayIso) {
   const [y, m, d] = dayIso.split('-').map(Number);
   const noon = new Date(y, m - 1, d, 12, 0, 0).getTime();      // local noon of that calendar day, in the zone under test (process.env.TZ)
   const Fixed = class extends Date { constructor(...a) { if (a.length) super(...a); else super(noon); } static now() { return noon; } };
   const ctx = vm.createContext({ console, Date: Fixed });
-  vm.runInContext(fromA('cycleDayNo', 'todayDayNo', 'cycleWeekInfo', 'weekNoteNow').join('\n'), ctx);
-  return { info: vm.runInContext('cycleWeekInfo', ctx), note: vm.runInContext('weekNoteNow', ctx) };
+  vm.runInContext(['var DATA = null;', lineSrc(A_SRC, 'const RETEST_WINDOW_DAYS =', 'program.html')]
+    .concat(fromA('cycleDayNo', 'todayDayNo', 'cycleWeekInfo', 'weekNoteNow', 'currentCycle', 'inRetestWindow')).join('\n'), ctx);
+  const inWindow = vm.runInContext('inRetestWindow', ctx);
+  return { info: vm.runInContext('cycleWeekInfo', ctx), note: vm.runInContext('weekNoteNow', ctx),
+    retest: c => { ctx.DATA = { cycles: [c], currentCycleIndex: 0 }; return inWindow(); } };
 }
 // The athletes' clocks: UTC, the Americas (west of Greenwich, where the app was a day early), Europe, Iran, and the two southern zones that change their
 // clocks inside the days below (Sydney on 4 Oct, Auckland on 27 Sep). New York and Europe change theirs inside the spring and autumn ranges.
@@ -302,6 +336,7 @@ const WEEK_CYCLES = [
   { startDate: '2026-09-01', endDate: '2026-10-13', weekNotes: { '6': { text: 'six weeks', rpeCap: 7 } } },
   { startDate: '2026-03-01', endDate: '2026-04-05', weekNotes: { '1': { text: 'across the spring clock changes', rpeCap: 7 }, '4': { text: 'w4' }, last: { text: 'last' } } },
   { startDate: '2026-10-05', endDate: '2026-11-09', weekNotes: { first: { text: 'across the autumn clock changes' }, '4': { text: 'w4', rpeDrop: 1 } } },
+  { startDate: '2026-09-01', endDate: 'soon', weekNotes: { first: { text: 'an end date that cannot be read' } } },
   null, undefined, {}];
 const WEEK_DAYS = []; for (let n = -4; n <= 46; n++) WEEK_DAYS.push(new Date(Date.UTC(2026, 7, 29 + n)).toISOString().slice(0, 10));
 // the spring clock changes (20 Feb to 12 Apr) and the autumn ones (20 Oct to 12 Nov)
@@ -309,7 +344,7 @@ for (let n = 0; n < 52; n++) WEEK_DAYS.push(new Date(Date.UTC(2026, 1, 20 + n)).
 for (let n = 0; n < 24; n++) WEEK_DAYS.push(new Date(Date.UTC(2026, 9, 20 + n)).toISOString().slice(0, 10));
 // The dashboard returns { wk } on a note; the app also returns its `key` ('first' | 'last' | 'week'), which the dashboard does not need.
 const noteView = n => n && { text: n.text, title: n.title, setsDrop: n.setsDrop, rpeDrop: n.rpeDrop, rpeCap: n.rpeCap, wk: n.wk };
-WEEK_ZONES.forEach(zone => run(`week of a day and its note (cycleWeekInfo / weekNoteNow), the athlete's clock in ${zone}`, () => {
+WEEK_ZONES.forEach(zone => run(`week of a day, its note and the retest window (cycleWeekInfo / weekNoteNow / inRetestWindow), the athlete's clock in ${zone}`, () => {
   process.env.TZ = zone;
   try {
     WEEK_DAYS.forEach(day => {
@@ -317,6 +352,7 @@ WEEK_ZONES.forEach(zone => run(`week of a day and its note (cycleWeekInfo / week
       WEEK_CYCLES.forEach(c => {
         same(`cycleWeekInfo vs cycleWeekOnC (${zone})`, { cycle: c, day, zone }, app.info(c), D_WEEK.cycleWeekOnC(c, day));
         same(`weekNoteNow vs weekNoteOnC (${zone})`, { cycle: c, day, zone }, noteView(app.note(c)), noteView(D_WEEK.weekNoteOnC(c, day)));
+        same(`inRetestWindow vs retestWindowOnC (${zone})`, { cycle: c, day, zone }, app.retest(c), D_WEEK.retestWindowOnC(c, day));
       });
     });
   } finally { process.env.TZ = 'UTC'; }

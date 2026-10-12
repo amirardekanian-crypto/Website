@@ -323,7 +323,7 @@ it in that week only: not before the cycle starts, not after it ends.
 ```json
 "weekNotes": {
   "1": { "rpeCap": 7,
-         "text": "Start lighter than you think on the new exercises and keep every set at RPE 7 or under. From week 2 the card is your target." },
+         "text": "Start lighter than you think and keep every set at RPE 7 or under. From week 2 the card is your target." },
   "3": { "title": "Testing week", "setsDrop": 1,
          "text": "Bench, leg press and hip thrust get one test set instead: as many good reps as you can, 3 to 5, and stop at the first rep that slows." },
   "5": { "setsDrop": 1, "rpeCap": 6,
@@ -338,8 +338,8 @@ it in that week only: not before the cycle starts, not after it ends.
 | `.text` | string | What the athlete reads, in Amir's voice: plain, short, under ~260 characters, the numbers in words. Starts with the instruction, never with its own label. An RPE going down names the floor in the same sentence ("never below 6"). |
 | `.title` | string | The label above the text. Defaults to **Week N** (and **Back-off week** for the older `last`). Give a week other than 1 a title: *Testing week*, *Lighter week*. |
 | `.setsDrop` | number | Optional, 1–3: how many sets fewer on every exercise. |
-| `.rpeDrop` | number | Optional, 1–3: how many points off every RPE, never below 6. |
-| `.rpeCap` | number | Optional, 6–9: no set above this RPE this week. |
+| `.rpeDrop` | number | Optional, 1–3: how many points off every RPE on every lift that week, never below 6. Ignored when there is a cap. |
+| `.rpeCap` | number | Optional, 6–9: no set above this RPE this week, on every lift. A limit on only some lifts goes in `text` with neither number (PRC-15). |
 
 The final week's note must carry at least one of the three numbers, so the dose is a decision and not only a
 feeling. The numbers never change a card: the app shows the note on Home only, as the This Week section that week
@@ -347,11 +347,13 @@ feeling. The numbers never change a card: the app shows the note on Home only, a
 sentence as the headline with `rpeCap` / `setsDrop` coloured where the words say them, the rest, Amir's signature;
 a number the words do not say gets its own small line). So `text` opens with the rule in one sentence under 100
 characters and carries no greeting, name or sign-off (COM-16). Its words are not shown in a session; its numbers are, on the session bar's last row (*Max RPE 7 · 1 set fewer*), so an
-exception the numbers do not hold belongs in the note's text. The bar knows one: on a day with a flagged retest while
-retests are due it reads *Max RPE 7 except the retest*. An untitled note on the cycle's final week shows as the
-*Back-off week*, so the back-off needs no title. `rpeCap` and `rpeDrop`
-also move that week's daily RPE target, and only that week's (`dayRpe()`); `setsDrop` is a decision the text tells
-the athlete, and nothing in the app applies it. `scripts/check_program.py` reads all three. A cycle without
+exception the numbers do not hold means no number (words only). The app knows one by itself: a test-flagged lift in the
+closing week (the retest window), where the bar reads *Max RPE 7 except the retest*, except on a lower check-in day. An untitled note on the cycle's final week shows as the
+*Back-off week*, so the back-off needs no title. `rpeCap` (else `rpeDrop`)
+is that week's RPE target, on every lift and every day of it, and only that week's (2026-10-12): every logged RPE is
+coloured against it in the app and judged against it on the dashboard, a lower day takes the lower of the two, and a
+test-flagged lift in the closing week keeps its own card on a normal day (`paintWeekTargets()`, `compareDay()`, TST-4). The card's printed RPE never
+changes. `setsDrop` is a decision the text tells the athlete, and nothing in the app applies it. `scripts/check_program.py` reads all three. A cycle without
 `weekNotes` (every programme written before 2026-09-26) shows nothing: the app never invents a
 back-off. `/program-design` decides which weeks get a note and the dose, `/program-engage` writes the text,
 `/program-assemble` writes the object on `cycles[currentCycleIndex]`.

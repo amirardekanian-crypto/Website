@@ -134,14 +134,16 @@ any week: a note can sit on a test week or a lighter week, and shows only during
   would have broken every cycle card.
 - **program.html `weekNoteNow()` / `weekNoteHTML()`** show the note **on Home only, inside its own week**, from
   the same `cycleWeekInfo()` that draws "Week X of Y". Never at the top of a session (Amir, 2026-10-12: *"dont show
-  this at the top of each day workout, just in the home tab"*). In a session the note's numbers reach a target only on a
-  lower day (`dayRpe()`, below); on a normal day the session shows the card as written. **So the session bar carries
+  this at the top of each day workout, just in the home tab"*). In a session every card still prints its own RPE, but
+  the note's limit is the target every logged RPE is coloured against, on every day of that week (Amir, 2026-10-12:
+  *"colour against the cap in those weeks"*; `paintWeekTargets()`, *Today's targets* below). **So the session bar carries
   the numbers** (Amir, 2026-10-12: *"add the cap reminder to the session bar"*): `weekLimitsHTML()` draws one row at the
   foot of the sticky bar, *This week · Max RPE 7*, *Back-off week · Max RPE 7 · 1 set fewer*, *Lighter week · RPE 1
-  lower, not below 6* (an `rpeDrop` only without a cap, as `dayRpe()` reads them, and with its floor, CHP-4), before
+  lower, not below 6* (an `rpeDrop` only without a cap, as `rpeTargetOn()` reads them, and with its floor, CHP-4), before
   Start and all through the slim bar, gone after Done (the timer's `finished` or the day's completion, `.day-done`).
-  Never the note's words, and nothing when the note has no numbers. **On a day with a flagged retest while retests
-  are due** (`exTestSpec()`, `inRetestWindow()`, i.e. the back-off week) the RPE line reads *Max RPE 7 except the
+  Never the note's words, and nothing when the note has no numbers. **On a day with a test-flagged lift in the
+  closing week** (`exTestSpec()`, `inRetestWindow()`: the window, whether or not that retest is due; not on a lower
+  check-in day, when the retest waits and is capped like every lift) the RPE line reads *Max RPE 7 except the
   retest* (TST-4: two lines never give opposite instructions for the same set). The label is the note's title, else
   *Back-off week* for the cycle's final week (`weekNoteLast()`: the legacy `last` or a numeric key on the last week;
   Home's kicker uses the same test), else *This week*. `renderTimer()` redraws the row from the cycle as it is now,
@@ -158,7 +160,7 @@ any week: a note can sit on a test week or a lighter week, and shows only during
   done*); the athlete's first name (*Alex,*, from `DATA.athlete.firstName`, left out when there is none); the text's
   **first sentence as a sentence-case headline** (Barlow Condensed 900 at `--fs-head`, never louder than the day
   cards), with clay only on the words that ARE the note's numbers (`mark()`: *RPE 7* for `rpeCap`, *one set fewer*
-  for `setsDrop`, an `rpeDrop` only when there is no cap, as `dayRpe()` reads them); the rest of the text at full
+  for `setsDrop`, an `rpeDrop` only when there is no cap, as `rpeTargetOn()` reads them); the rest of the text at full
   size; a number the words did not say on its own small line; then a hairline, his signature (`WN_SIG`, a drawn
   stand-in until he sends his own) in green ink and his photo (`assets/img/coach.jpg`, the Coach tab's). Three
   shapes so any note reads: `sentence` (the first sentence, 100 characters or fewer, is the headline), `name` (a
@@ -173,8 +175,10 @@ any week: a note can sit on a test week or a lighter week, and shows only during
   app never invents a back-off. The label is the note's `title`, else *Back-off week* for the legacy
   `last`, else *Week N*. The result carries the note's fields plus `key` (`first` / `last` for the
   aliases, `week` for a numeric key, the CSS class `week-note-<key>`; all look the same) and `wk`.
-  The numbers never change a card on their own: only a lower day's target reads them (`dayRpe()`,
-  below), in that week only, and the lower of the two wins. `scripts/headless/week-notes.js` (84 checks)
+  The numbers never change what a card prints. In that week only, they are the target its logged RPEs are
+  coloured against on every day (`rpeTargetOn()`, `paintWeekTargets()`, below), and a lower day takes the lower of
+  the two. **A number covers every lift that week** (Amir chose it, 2026-10-12): a limit on only some lifts is
+  written in the note's words with no `rpeCap` or `rpeDrop` (PRC-15). `scripts/headless/week-notes.js` (95 checks)
   covers every row above and the Front Page look (the name, the clay, the count in the kicker, the dose line,
   the signature and photo, no note in a session, the session bar's limits row, 320 px), and fails on the old `weekNoteNow()`.
 - **The pipeline owns it:** /program-design decides both doses as numbers (`week1:` / `lastweek:`),
@@ -211,20 +215,38 @@ off in their notes.
   (`parseCheckinPlan()`); `scripts/check_twins.js` fails a commit that rewords one side only.
 - **`paintToday(day)` paints it; nothing is written but the check-in.** A banner under the timer
   says what changed and offers **Train as written** (`setAsWritten()`, kept as `asWritten` and sent
-  with the session). Every card with an RPE shows `RPE 8 → 7 today` (one clay pill: `rdTarget()`
+  with the session). On a lower day every card with an RPE shows `RPE 8 → 7 today` (one clay pill: `rdTarget()`
   takes the RPE out of the line of numbers); `data-target-today` makes the set-log and Guided
-  colours compare against today's number.
+  colours compare against today's number. The pill still means a lower day only: a week note's limit
+  colours the sets with no pill (`paintWeekTargets()`, below).
   Red: `redDayCore()` keeps the warm-up (`isPrepBlockTitle()`), the first exercise of the first
   power block and of the first Primary/Strength block; the rest is tagged *Optional today*. A day
   with no Primary block keeps the warm-up and the whole first working block. Sore: exercises whose
   Spine entry has `impact` plyometric or landing (a name match when there is no entry) show
   *2 of 4 sets today* with the extra rows dimmed, or *Skip today · sore* at soreness 1; circuit items get
   *Every other round* / *Skip today*.
-- **`dayRpe()`** is the one place a target moves: 1 off each end, never below 6, never above the
-  written number, and it does not stack with the week note (`weekNoteNow()`): the lower target wins.
-  The week note's own number is floored at 6 too (CHP-4; until 2026-09-27 a written 6 in a week with
-  `rpeDrop: 1` read *6 → 5 today* on a lower day, a target no RPE button can log).
-  ⚠️ **coach.html's `dayTargetC()` is its twin** (week note included, `check_twins.js` §4): change both.
+- **`rpeTargetOn(written, drop, note)`** is the one place a target moves (2026-10-12; until then it was
+  `dayRpe()`, and the week note moved it only on a lower day). Two things move it: the week note's `rpeCap`
+  (else its `rpeDrop`) on every day of its week (`weekNoteNow()`), and a lower day, 1 off each end. Never below
+  6, never above the written number, and the two do not stack: the lower target wins. `drop` may be 0, null or
+  missing, and then only the note moves it. The week note's own number is floored at 6 too (CHP-4; until
+  2026-09-27 a written 6 in a week with `rpeDrop: 1` read *6 → 5 today* on a lower day, a target no RPE button
+  can log). **`dayRpe()`** is now its lower-day wrapper: it returns a target only when the check-in dropped the
+  day, and it alone draws the pill and `data-target-today` (`rdTarget()`).
+  ⚠️ **coach.html's `dayTargetC()` is its twin** (week note included, drop optional, `check_twins.js` §4 runs
+  `rpeTargetOn` against it): change both.
+- **The week's target colours every day of a capped week** (Amir, 2026-10-12: *"colour against the cap in those
+  weeks"*). `paintWeekTargets(day)` puts the week note's target on each card as `data-target-week`, with or
+  without a check-in: a normal day, *Skip for today*, and **Train as written**, which undoes the check-in, never
+  the week's limit. It skips circuits, and a test-flagged lift in the closing week (`exTestSpec()` and
+  `inRetestWindow()`) keeps its own card's target, as the bar's *except the retest* says (TST-4); on a lower day
+  `rdTarget()` caps it like every lift and the bar drops the exception (`paintToday()` redraws the bar). `paintToday()`
+  calls it, and so does opening a day, so an app left open across a week boundary follows the week. Nothing is
+  stored. **`rpeTargetOf(card)`** is the target the live set rows and Guided's rest screen colour against: the
+  lower day's (`data-target-today`), else the week's (`data-target-week`), else the card's (`data-target`). A set
+  under it is steel blue, the same rule as a lower day. Last time, the History rows and the ghost line keep judging
+  a past set against the card's written RPE (`data-target`), or last week's on-target 8s would turn clay. The
+  History sheet's caption, *today's target RPE N*, shows `rpeTargetOf()`.
 - **Completion follows the day.** `getDayCompletion()` does not count optional or skipped work as
   missing, and a halved exercise asks for its halved sets, so a red day with its core done is
   *Complete*, not *Partial*. The report tags that work `(optional today)` / `(skipped today: sore)`
@@ -553,8 +575,11 @@ costs more than one tap.
   its target: warm = harder, cool = easier, and orange-vs-blue survives colour blindness where
   red-vs-green does not. Every screen goes through `rpeVs()`/`rpeMark()` (row tag, the strip, Guided
   rest screen, Last time, History), which treats a target range like `7-8` as on target inside it —
-  the old `parseInt` read `7-8` as 7 and called an 8 "over".
-  **coach.html matches it:** each set in *per set:* is coloured the same way, and the average's
+  the old `parseInt` read `7-8` as 7 and called an 8 "over". In a session the target is
+  `rpeTargetOf(card)`: the card's RPE, lowered by the week note on every day of its week and by a lower
+  day (2026-10-12, *Today's targets* above). Last time and History judge a past set against the card as written.
+  **coach.html matches it:** each set in *per set:* is coloured the same way, against the same target for the
+  week the session fell in (`compareDay()`, COACH_DASHBOARD.md *Today's targets on a session*), and the average's
   *under target RPE* pill is steel blue (it was ochre, the colour of "extra set"). The average still
   flags only past `RPE_OVER`/`RPE_UNDER` (1.5); the per-set colours are exact, like the athlete's.
 - **One RPE control everywhere (CONS-01, 2026-09-27).** A set's strip, a circuit's rounds, Guided's

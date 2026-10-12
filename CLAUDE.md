@@ -176,8 +176,12 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   athlete's first name, the text's first sentence as the headline with its numbers in clay, then Amir's signature and photo. So
   the pipeline writes the rule as the first sentence, under 100 characters, with no greeting, name or sign-off (COM-16).
   **In a session its numbers sit on the session bar** (`weekLimitsHTML()`, Amir 2026-10-12): a thin last row, *Max RPE 7 · 1 set
-  fewer*, never the words, never on the clock's line; on a day with a due retest it says *except the retest* (TST-4). An untitled note
+  fewer*, never the words, never on the clock's line; on a day with a test-flagged lift in the closing week it says *except the retest* (TST-4; not on a lower day). An untitled note
   on the cycle's final week is the *Back-off week* (`weekNoteLast()`).
+  **Every RPE logged that week is coloured against them, every day** (Amir 2026-10-12: *"colour against the cap in those weeks"*;
+  `rpeTargetOn()`, `paintWeekTargets()`), check-in or not, trained as written or not. The card keeps its printed RPE, *RPE 8 → 7 today*
+  still means a lower day only, and that retest keeps its own card on a normal day. **A number in a week note covers every lift**: a limit on only
+  some lifts is words with no `rpeCap` / `rpeDrop` (PRC-15; `check_program.py` warns).
 - **The Spine**: only approved entries reach a phone, and **a card that names its entry (`exId`) shows that entry or nothing** (a draft's card has
   no cues or video until approved: `spineFor()` / `spineForC()`, TWIN-1); cues and **videos** live on the entry (a video is added
   in coach.html → Exercises; `exercise_library.json` and its Notion sync were retired 2026-09-26);
@@ -218,7 +222,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   history"*); Guided's rest screen keeps its own.
 - **The check-in sets today's targets, never the programme** (REC-2, 2026-09-26): the level is worked out once
   at the check-in and stored with it (`level`, `sore`, `drop`, `asWritten`); `paintToday()` only paints. The
-  target rule exists twice, `dayRpe()` here and `dayTargetC()` in coach.html: change both.
+  target rule exists twice, `rpeTargetOn()` here (`dayRpe()` is its lower-day wrapper, which draws the pill) and
+  `dayTargetC()` in coach.html, both with the week note and the drop optional: change both (`check_twins.js` §4).
 - **Body weight lives in `program.html`** under the key `<id>_hab_wt`; AA Proof must never write it, and it
   is never scored.
 - **Caches never sync**: `<id>_histcache`, `spinecache`, `qualcache`, and **`plancache`**, the one saved plan
@@ -226,7 +231,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   demo, the coach preview or Proof's strip), opened only when the server cannot be reached, deleted when it
   answers no. `habits.html` keeps the same key, so change both. Details: `PROGRAM-APP.md` → *No signal*.
 - **An RPE off its target is coloured** clay (over) or steel blue (under), the one exception to "clay is the
-  only accent", through `rpeVs()`/`rpeMark()` on every screen.
+  only accent", through `rpeVs()`/`rpeMark()` on every screen. A live set's target is `rpeTargetOf(card)`: a lower
+  day's, else the week note's (every day of its week), else the card's. Last time, History and the ghost line judge a
+  past set against the card as written. coach.html judges each session against its own week (`compareDay()`).
 - **There is no in-app chat, and Amir answers ONLY on WhatsApp (2026-09-26: *"Im only gonna reply to
   them when they send me a message on whatsapp"*).** The app's job is to get athletes there fast, with
   context: the Coach tab and the end of every session (the note comes along) open WhatsApp pre-filled
@@ -413,7 +420,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   deleted in the athlete's File. **A session with no duration or RPE is left out of the load ratio and the ratio is not shown while any
   exist in the last 4 weeks** ("not enough data"), never counted as zero.
 - **Run the harness after any change to a data or write path:** `node scripts/headless/coach/run.js`
-  (104 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
+  (105 scenarios, made-up data, stubbed Supabase; README there). The compare tests stay in pre-commit.
 - **A rule the dashboard copies from the athlete app goes into `scripts/check_twins.js` the same day**
   (2026-10-10, pre-commit guard 15): it runs both copies on the same vectors and fails a commit that changes one.
   After editing `assets/js/chips.js`, bump its `?v=` in coach.html, then `node scripts/check_twins.js --stamp`.
@@ -436,7 +443,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v113` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v114` on 2026-10-12). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

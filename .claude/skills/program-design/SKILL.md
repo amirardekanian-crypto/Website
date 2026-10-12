@@ -329,13 +329,17 @@ Day count + type of each day; one line of rationale per day citing Step 1.
     The usual shape is one set fewer and every RPE at 6 or 7. The one exception is a cycle Amir
     said has no back-off, and then say so at the checkpoint.
   - **Week 1, when it differs:** always for a new athlete, and for a returning one after a
-    layoff, a return from injury, or a cycle full of new patterns. Usually an `rpeCap` of 7 on
-    what's new, or `rpeDrop` 1 across the board, and what moves them back to the card from week 2.
+    layoff, a return from injury, or a cycle full of new patterns. Usually an `rpeCap` of 7 or an
+    `rpeDrop` of 1, which covers every lift that week (PRC-15), and what moves them back to the card
+    from week 2. A limit on only the new exercises is not a number: write it on the line as words for
+    engage, with no `rpeCap` or `rpeDrop` (the checker warns on a number scoped to some lifts).
   - **Any other week that differs from the card** (Amir, 2026-10-11: *"for example when some one has a
     testing week, or reduced load"*): a testing week (which lifts get one test set, and what the rest
     of the week does) or a reduced-load week (a mid-cycle deload, a travel or exam week, a staged
     return). Name the week number, a short title (*Testing week*, *Lighter week*) and the dose in the
-    same three numbers. Never a note for a week that matches the card.
+    same three numbers. Never a note for a week that matches the card. A week whose tests go past its cap
+    carries no `rpeCap` (the colours would mark every test set over): the cap goes in words, or the tests
+    sit in the closing week, where the app exempts a flagged retest by itself (TST-4, PRC-15).
   Engage writes the athlete's words for each; you write the decision, one `weeknotes:` line per week.
 - **DAY NAMING:** just note *what each day trains* in a plain working title (e.g. "Lower —
   squat/quad", "Upper push & pull"). The **vivid, banner-correct `focusTag` is finalized in
@@ -571,7 +575,7 @@ SPORT_BADGE: [emoji] [label]
 PROGRAM: [number] | [N] days | [one-line focus]
 week: [the usual training week, e.g. Sat:1, Mon:2, Wed:3 — turns on the back-to-back check]
 weeknotes:
-- 1 | [rpeCap 7 / rpeDrop 1 on what, and what moves them back to the card] (leave the line out when week 1 is "same as the card")
+- 1 | [rpeCap 7 / rpeDrop 1 (every lift, PRC-15), and what moves them back to the card] (leave the line out when week 1 is "same as the card")
 - [N] | [title: Testing week / Lighter week] | [the dose, and what changes] (any other week that differs from the card)
 - 5 | [setsDrop 1 · rpeCap 6, plus anything else that changes] (the final week, every cycle)
 bans: [one line, if any]

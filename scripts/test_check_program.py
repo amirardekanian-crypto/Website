@@ -49,7 +49,7 @@ BASE = {
     {"num": 1, "name": "One", "art": "bedrock"},
     {"num": 2, "name": "Two", "art": "iron", "weeks": "Weeks 6-10",
      "weekNotes": {
-       "first": {"rpeCap": 7, "text": "Start lighter than you think on the new exercises and keep every set at RPE 7 or under."},
+       "first": {"rpeCap": 7, "text": "Start lighter than you think and keep every set at RPE 7 or under."},
        "last": {"setsDrop": 1, "rpeDrop": 1, "text": "One set fewer on every exercise, and take 1 off every RPE, never below 6."}}}
   ],
   "workouts": {"days": [
@@ -140,6 +140,11 @@ expect('a first sentence over 100 characters warns', has(run(with_notes({"5": lo
 expect('a note that opens with the name warns', has(run(with_notes({"5": dict(BACKOFF, text="Test, one set fewer on everything and every RPE at 6.")}), ctx=CTX), 'WARN', 'opens with a greeting or the name'))
 expect('a note that opens with Hi warns', has(run(with_notes({"5": dict(BACKOFF, text="Hi! One set fewer on everything and every RPE at 6.")}), ctx=CTX), 'WARN', 'opens with a greeting'))
 expect('a note signed off warns', has(run(with_notes({"5": dict(BACKOFF, text="One set fewer on everything and every RPE at 6. Amir")}), ctx=CTX), 'WARN', 'sign-off'))
+scoped = {"rpeCap": 7, "text": "New exercises and the pulldown stay at RPE 7 or under this week. The lifts you already know go straight to the card."}
+expect('a number on a limit meant for some lifts warns (it covers every lift)', has(run(with_notes({"1": scoped, "5": BACKOFF}), ctx=CTX), 'WARN', 'limits only some lifts'))
+expect('the same words with no number do not warn', not has(run(with_notes({"1": {k: v for k, v in scoped.items() if k != 'rpeCap'}, "5": BACKOFF}), ctx=CTX), 'WARN', 'limits only some lifts'))
+expect('new exercises named, but the limit is on every set: no warning', not has(run(with_notes({"1": dict(W1, text="Start lighter on the new exercises and keep every set at RPE 7 or under."), "5": BACKOFF}), ctx=CTX), 'WARN', 'limits only some lifts'))
+expect('a note about new exercises in general does not warn', not has(run(with_notes({"1": dict(W1, text="Keep every set at RPE 7 or under this week. Most of these exercises are new."), "5": BACKOFF}), ctx=CTX), 'WARN', 'limits only some lifts'))
 expect('a word that only starts like the name does not warn', not has(run(with_notes({"5": dict(BACKOFF, text="Testing aside, one set fewer on everything and every RPE at 6.")}), ctx=CTX), 'WARN', 'opens with a greeting'))
 
 # Prep is a circuit and every working exercise and circuit has its own rest (2026-10-11).

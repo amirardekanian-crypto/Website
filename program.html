@@ -6926,8 +6926,8 @@ function cycleWeekInfo(cycle) {
 // there, so the week-1 note used to show the day before the cycle began) and not after endDate
 // (an athlete still training past the end is not in a back-off week for ever).
 // The week note in force today, or null: the note's own fields plus `key` ('first' | 'last' for
-// the aliases, 'week' for a numeric key) and `wk`. weekNoteHTML() draws it; dayRpe() reads its
-// numbers, so they apply in that week only, and a lower day and a note never stack (REC-2).
+// the aliases, 'week' for a numeric key) and `wk`. weekNoteHTML() draws it; rpeTargetOn() reads its numbers on every
+// day of its week (paintWeekTargets(), the colours) and dayRpe() on a lower day (the pill); the lower target wins (REC-2).
 function weekNoteNow(cycle) {
   const notes = cycle && cycle.weekNotes;
   if (!notes || typeof notes !== 'object') return null;
@@ -6950,8 +6950,8 @@ function weekNoteLast(cycle, n) {
 // The note as Home's This Week section (Front Page, Amir 2026-10-12), or '' when this week has none. Home only:
 // renderHome() draws this INSTEAD of the This Week heading, and the kicker's count is #home-week-sum (paintWeek()
 // writes its short form). It is not drawn at the top of a session any more (Amir: "dont show this at the top of each
-// day workout, just in the home tab"). In a session dayRpe() reads the note's numbers only on a lower day (the check-in's
-// drop); on a normal day the session shows the card as written. Three shapes, so any note reads:
+// day workout, just in the home tab"). In a session its numbers sit on the bar (weekLimitsHTML()) and set the colours'
+// target every day (paintWeekTargets()); the card still prints its own RPE. Three shapes, so any note reads:
 //   sentence  the first sentence (100 characters or fewer) is the headline, the rest of the text the standfirst
 //   name      a longer first sentence: the week's name is the headline and the whole text the standfirst
 //   lead      no title and no numbers: no headline, one calm paragraph
@@ -7014,8 +7014,8 @@ function weekNoteHTML(cycle) {
 }
 
 // The week's limits on the session bar (Amir, 2026-10-12: "add the cap reminder to the session bar"). The note lives
-// on Home only, and on a normal day the cards show their written RPE, so without this nothing in a session said "max
-// RPE 7 this week". One row at the foot of the sticky bar, before Start and all through the slim bar (it never shares
+// on Home only, and the cards print their written RPE, so without this nothing in a session said "max RPE 7 this
+// week" (the colours judge against it: paintWeekTargets()). One row at the foot of the sticky bar, before Start and all through the slim bar (it never shares
 // the clock's line, so WK-03's "the clock is never cut" holds), gone after Done. Only the note's own numbers, in
 // dayRpe()'s order (a cap wins, so an rpeDrop shows only without one), plus the sets it drops; never its words.
 // The label is the week's name when it has one (a title, or Back-off week for the cycle's final week), else This week.
@@ -7026,7 +7026,10 @@ function weekLimitsHTML(cycle, day) {
   const n = weekNoteNow(cycle);
   if (!n) return '';
   const capOn = Number(n.rpeCap) > 0, setsOn = Number(n.setsDrop) > 0, dropOn = !capOn && Number(n.rpeDrop) > 0;
-  const tests = day && inRetestWindow()
+  // A lower check-in day caps the retest like every lift (a retest waits for a green day, REC-2): no exception then.
+  const plan = day ? todayPlan(String(day.id)) : null;
+  const lower = !!(plan && plan.drop && !plan.asWritten);
+  const tests = day && !lower && inRetestWindow()
     ? (day.blocks || []).reduce((k, b) => k + (b.exercises || []).filter(ex => exTestSpec(ex)).length, 0) : 0;
   const but = tests ? (tests === 1 ? ' except the retest' : ' except retests') : '';
   const bits = [];
@@ -7566,6 +7569,7 @@ function openDayView(dayId) {
   const n = (typeof dayId === 'string' && /^\d+$/.test(dayId)) ? Number(dayId) : dayId;
   switchDay(n);
   renderTimer(String(dayId));   // the bar as of now (the week's limits row may have changed since boot)
+  paintWeekTargets(String(dayId)).forEach(c => { if (c._paintSets) c._paintSets(); });   // and the colours' target
   paintSoreSugg(String(dayId));
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
@@ -8953,7 +8957,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). In a week where my note sets a limit, a thin line under it keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> — your training: this cycle so far (the week, sessions done and your wins; tap it for the whole plan), this week's days (tap one to open its workout), your daily habits, your Personal Records and your body weight.</li><li><strong>Coach</strong> — the notes I write for you and the button to message me on WhatsApp.</li><li><strong>Library</strong> — extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Game Plan</strong> — the whole plan: every cycle, what it's for and what comes next.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). In a week where my note sets a limit, a thin line under it keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, my note for the week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so: your cycle card reads <strong>Cycle complete</strong>, and there's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The "Why This Cycle Matters" note on <strong>Game Plan</strong> explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -11429,23 +11433,30 @@ function currentCycleData() {
   return DATA && (DATA.cycles || [])[DATA.currentCycleIndex || 0];
 }
 
-// A written RPE ("8", "7-8") as today's target, or '' when today changes nothing. One off
-// each end, never below 6, never above what was written; and a lower day does not stack
-// with the week note (week 1, a test week, the back-off week): the lower of the two targets wins, and
-// the week's own number is floored at 6 too (CHP-4: "No RPE below 6 anywhere"; a written 6
-// in a week with rpeDrop 1 read "6 → 5 today" until 2026-09-27, a target no button can log).
-// ⚠ coach.html's dayTargetC() is the same rule, week note included (check_twins.js §4). Change both.
-function dayRpe(written, drop, note) {
+// The target a written RPE ("8", "7-8") moves to, or '' when nothing moves it. Two things can: this week's note
+// (its rpeCap, else its rpeDrop) on EVERY day of its week (Amir, 2026-10-12: "colour against the cap in those
+// weeks"), and a lower check-in day (one off each end). They do not stack: the lower target wins. Never below 6,
+// never above what was written (CHP-4: "No RPE below 6 anywhere"; a written 6 in a week with rpeDrop 1 read
+// "6 → 5 today" until 2026-09-27, a target no button can log). drop may be 0, null or missing: then only the note
+// moves it. This is the target a logged RPE is coloured against (paintWeekTargets(), rpeTargetOf()).
+// ⚠ coach.html's dayTargetC() is the same rule, week note included, drop optional (check_twins.js §4). Change both.
+function rpeTargetOn(written, drop, note) {
   const m = String(written == null ? '' : written).match(/(\d+(?:\.\d+)?)(?:\s*[-–]\s*(\d+(?:\.\d+)?))?/);
-  if (!m || !drop) return '';
+  if (!m) return '';
+  const d = Number(drop) > 0 ? Number(drop) : 0;
   const lo = Number(m[1]), hi = m[2] ? Number(m[2]) : lo;
   const floored = (v, t) => Math.min(v, Math.max(RPE_FLOOR, t));   // never under 6, never over what was written
   const week = v => (note && Number(note.rpeCap) > 0) ? floored(v, Number(note.rpeCap))
                   : (note && Number(note.rpeDrop) > 0) ? floored(v, v - Number(note.rpeDrop)) : v;
-  const one = v => Math.min(v, week(v), floored(v, v - drop));
+  const one = v => Math.min(v, week(v), floored(v, v - d));
   const a = one(lo), b = one(hi);
   if (a === lo && b === hi) return '';
   return a === b ? String(a) : a + '–' + b;
+}
+// A LOWER day's target, or '' on any other day: what draws "RPE 8 → 7 today" (rdTarget()). The pill still means a
+// lower check-in day only; the week note alone moves the colours (rpeTargetOn()), never the card.
+function dayRpe(written, drop, note) {
+  return drop ? rpeTargetOn(written, drop, note) : '';
 }
 
 // A red day's session (REC-2): the warm-up, the first power move and the first primary
@@ -11592,6 +11603,7 @@ function paintToday(day) {
     delete c.dataset.targetToday;
     delete c.dataset.rdSets;
   });
+  paintWeekTargets(day);   // this week's note sets the colours' target on every day, check-in or not
   const banner = panel.querySelector('.rd-banner');
   if (banner) {
     const h = r ? readinessBannerHtml(day, r, dayData) : '';
@@ -11632,6 +11644,32 @@ function paintToday(day) {
   }
   cards.forEach(c => { if (c._paintSets) c._paintSets(); });
   updateProgress(day);
+  renderTimer(day);   // the bar's limits row follows the check-in (a lower day drops "except the retest")
+}
+
+// The week's target on each card of a day (data-target-week), from the week note in force now: a card whose RPE
+// the note lowers gets it, every other card loses it. It moves only the colours (rpeTargetOf()); the card still
+// prints its own RPE, and a lower day's pill and data-target-today stay paintToday()'s. Circuits are never coloured.
+// A flagged retest while retests are due keeps its own card's target (TST-4), as the session bar says "except the
+// retest" (weekLimitsHTML()). paintToday() calls it, and so does opening a day, so an app left open across a week
+// boundary follows the week. Returns the cards.
+function paintWeekTargets(day) {
+  const panel = document.getElementById('day' + day);
+  if (!panel || !DATA || !DATA.workouts) return [];
+  const cards = [...panel.querySelectorAll('.checklist-item')];
+  const dayData = (DATA.workouts.days || []).find(d => String(d.id) === String(day));
+  const flat = [];
+  if (dayData) (dayData.blocks || []).forEach(b => (b.exercises || []).forEach(ex => flat.push(ex)));
+  const note = weekNoteNow(currentCycleData());
+  const retest = !!note && inRetestWindow();
+  cards.forEach((card, i) => {
+    delete card.dataset.targetWeek;
+    const ex = flat[i];
+    if (!note || !ex || ex.type === 'circuit' || (retest && exTestSpec(ex))) return;
+    const w = rxOf(ex).rpe, t = w ? rpeTargetOn(w, 0, note) : '';
+    if (t) card.dataset.targetWeek = t;
+  });
+  return cards;
 }
 
 function setAsWritten(day, on) {
@@ -12660,14 +12698,20 @@ function loadSetLog(exName, totalSets) {
 // The prescribed rep count on a card, or null (holds, carries, intervals).
 // ── RPE against the prescribed target ── 'over' | 'under' | '' (on target, or
 // nothing to compare). The target may be a range ("7-8"): anything inside it is
-// on target. Every screen that marks an RPE goes through this, so a set can never
-// be "over" on the card and "on target" in History.
+// on target. Every screen that marks an RPE goes through this. The live set log and Guided
+// colour against today's target (rpeTargetOf()); Last time, History and the ghost line judge a
+// past set against the card's written RPE.
 function rpeVs(r, target) {
   const m = String(target == null ? '' : target).match(/(\d+(?:\.\d+)?)(?:\s*[-–]\s*(\d+(?:\.\d+)?))?/);
   const v = Number(r);
   if (!m || !(v > 0)) return '';
   const lo = Number(m[1]), hi = m[2] ? Number(m[2]) : lo;
   return v > hi ? 'over' : v < lo ? 'under' : '';
+}
+// Today's target for a card's sets: a lower day's (paintToday()), else this week's note (paintWeekTargets()),
+// else the card as written. The card's printed RPE never changes.
+function rpeTargetOf(card) {
+  return card.dataset.targetToday || card.dataset.targetWeek || card.dataset.target;
 }
 // An RPE as text, wrapped in <b class="rpe-over|rpe-under"> when off target.
 function rpeMark(r, target) {
@@ -12798,10 +12842,10 @@ function attachSetLog(card) {
       const tag = row.querySelector('.ex-set-rpetag');
       tag.textContent = (s.d && s.r) ? 'RPE ' + s.r : (s.d ? 'RPE' : '');
       tag.classList.toggle('empty', !s.r);
-      // Off target: clay when harder than prescribed, steel blue when easier. Against
-      // TODAY's target when a lower day moved it (paintToday()), or a set done exactly as
-      // asked would read "over".
-      const vs = s.r ? rpeVs(s.r, card.dataset.targetToday || card.dataset.target) : '';
+      // Off target: clay when harder than prescribed, steel blue when easier. Against TODAY's target
+      // (rpeTargetOf()): a lower day's, or this week's note's on every day of its week (Amir, 2026-10-12:
+      // "colour against the cap in those weeks"), or a set done exactly as asked would read wrong.
+      const vs = s.r ? rpeVs(s.r, rpeTargetOf(card)) : '';
       tag.classList.toggle('over', vs === 'over');
       tag.classList.toggle('under', vs === 'under');
       tag.setAttribute('aria-label', s.r ? `RPE ${s.r}${vs ? (vs === 'over' ? ', above' : ', below') + ' target' : ''}. Tap to change` : `Rate set ${i + 1}`);
@@ -14291,7 +14335,7 @@ function paintTimerLog(row, item) {
       </div>` : ''}
       <div class="tl-line tl-rpe">
         <span class="tl-lab">RPE</span>
-        ${[6,7,8,9,10].map(v => { const on = selRpe() === String(v), vs = on ? rpeVs(v, item.card.dataset.targetToday || item.card.dataset.target) : '';
+        ${[6,7,8,9,10].map(v => { const on = selRpe() === String(v), vs = on ? rpeVs(v, rpeTargetOf(item.card)) : '';
           return `<button type="button" class="tl-rpe-btn${on ? ' selected' : ''}${vs ? ' ' + vs : ''}" data-rpe="${v}">${v}</button>`; }).join('')}
       </div>`;
     const kgBox = tl.querySelector('.tl-kg');
@@ -14695,7 +14739,8 @@ async function loadHistory() {
 function openHistorySheet(card) {
   const name = card.querySelector('.item-name').textContent.trim();
   const planned = cardReps(card);
-  const target = card.dataset.target || null;
+  const target = card.dataset.target || null;   // the rows: a past set against the card as written
+  const today = rpeTargetOf(card) || null;       // the caption: today's target (this week's cap, a lower day)
   const hist = historyFor(name).slice(0, 12);
   const ov = document.getElementById('hist-overlay');
   if (!ov) return;
@@ -14753,7 +14798,7 @@ function openHistorySheet(card) {
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">Your history</div>
     <h2 class="readiness-title">${esc(name)}</h2>
-    <p class="readiness-sub">${hist.length} time${hist.length === 1 ? '' : 's'} logged${target ? ` · today's target RPE ${target}` : ''}. What you did, never what to lift: your coach sets the load.</p>
+    <p class="readiness-sub">${hist.length} time${hist.length === 1 ? '' : 's'} logged${target ? ` · target RPE ${target}${today && today !== target ? ` · ${today} today` : ''}` : ''}. What you did, never what to lift: your coach sets the load.</p>
     ${chart}
     <div class="hs-list">${rows}</div>
     <div class="hs-actions">

@@ -36,7 +36,17 @@ function want(name, mutate, expectCode, mustSay, opts) {
 want('untouched files pass', null, 0, /all \d+ checks agree/);
 want('the prep-block words drift (Quality check)', swap('coach.html', '/warm|mobility|activation|cool|prime|prep/i', '/warm|mobility|activation|cool|prep/i'), 1, /isPrepBlockTitle vs QM_PREP/);
 want('the RPE floor drifts (6 -> 5 on the dashboard)', swap('coach.html', 'Math.min(v, Math.max(6, x));', 'Math.min(v, Math.max(5, x));'), 1, /dayRpe vs dayTargetC/);
-want('the week note stops lowering a lower day on the dashboard (rpeCap ignored)', swap('coach.html', '(note && Number(note.rpeCap) > 0) ? floored(', '(false) ? floored('), 1, /dayRpe vs dayTargetC/);
+want('the week note stops lowering the target on the dashboard (rpeCap ignored)', swap('coach.html', '(note && Number(note.rpeCap) > 0) ? floored(', '(false) ? floored('), 1, /dayRpe vs dayTargetC/);
+// The week's cap on every day of the week (Amir, 2026-10-12: "colour against the cap in those weeks"), and the closing week's retest exception (TST-4).
+want('the dashboard ignores the week note on a normal day again (the old rule)', swap('coach.html', 'if (!t) return t;', 'if (!t || !drop) return t;'), 1, /rpeTargetOn vs dayTargetC/);
+want('the dashboard stops treating a missing drop as 0 (an undefined drop makes a NaN target)', swap('coach.html', 'Number(drop) > 0 ? Number(drop) : 0', 'drop'), 1, /rpeTargetOn vs dayTargetC/);
+want('both copies go back to the old rule together (only the pinned answers can see it)', (get, put) => {
+  swap('coach.html', 'if (!t) return t;', 'if (!t || !drop) return t;')(get, put);
+  swap('program.html', "if (!m) return '';", "if (!m || !drop) return '';")(get, put);
+}, 1, /rpeTargetOn: a normal day in a week capped at 7/);
+want('the app draws the lower-day pill on a normal day too', swap('program.html', "return drop ? rpeTargetOn(written, drop, note) : '';", 'return rpeTargetOn(written, drop, note);'), 1, /dayRpe is empty on a normal day/);
+want('the retest window drifts (the dashboard opens it a day late)', swap('coach.html', 'return end - dayNumC(dayKey) <= RETEST_WINDOW_DAYS_C;', 'return end - dayNumC(dayKey) < RETEST_WINDOW_DAYS_C;'), 1, /inRetestWindow vs retestWindowOnC/);
+want('a cycle with no end date is never in the retest window on the dashboard', swap('coach.html', 'if (!cycle || !cycle.endDate) return true;', 'if (!cycle || !cycle.endDate) return false;'), 1, /inRetestWindow vs retestWindowOnC/);
 want('the week boundary drifts (the dashboard starts week 2 a day late)', swap('coach.html', 'Math.floor((d - s) / 7) + 1', 'Math.floor((d - s - 1) / 7) + 1'), 1, /cycleWeekInfo vs cycleWeekOnC/);
 want('the app reads a cycle date as a UTC instant again (a day early west of Greenwich: "Cycle complete" the day before the end)', swap('program.html', 'if (m) return Date.UTC(+m[1], +m[2] - 1, +m[3]) / 86400000;', 'if (m) { const u = new Date(v); return Date.UTC(u.getFullYear(), u.getMonth(), u.getDate()) / 86400000; }'), 1, /cycleWeekInfo vs cycleWeekOnC \((America|Pacific|Europe)/);
 want('the app\'s today is the UTC day again (a day off in New Zealand)', swap('program.html', 'return Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()) / 86400000;', 'return Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate()) / 86400000;'), 1, /cycleWeekInfo vs cycleWeekOnC \(Pacific\/Auckland\)/);

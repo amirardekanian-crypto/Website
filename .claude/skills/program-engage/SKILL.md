@@ -216,8 +216,13 @@ as the week's headline** with its numbers in clay, then the rest of the text, th
   week."* · *"One set fewer on every exercise and nothing above RPE 7."* The why and any exception go in the second
   sentence. A first sentence over 100 characters loses the headline (the app falls back to the week's name).
 - **The numbers also show in every session that week**, on the session bar (*Max RPE 7 · 1 set fewer*), without your
-  words. An exception they do not hold goes in the text only (the bar adds *except the retest* by itself on a day
-  with a flagged retest, TST-4); never on a card, which would show it all cycle (PRG-4).
+  words, and every RPE logged that week is coloured against them, on every lift (PRC-15). So write a number as a
+  rule for every lift. A limit on only some lifts (*"new exercises stay at RPE 7, known lifts go to the card"*) is
+  words only, and design's line for it carries no `rpeCap` or `rpeDrop` (PRC-15; the checker warns on a scoped
+  number). The app honours ONE exception by itself: a test-flagged lift in the closing week (the bar says *except the
+  retest* and its sets keep their card, TST-4). Any other exception to a limit means no number, words only, like a
+  scoped limit: a testing week whose tests go past a cap carries no `rpeCap`. Never on a card, which would show it all
+  cycle (PRG-4).
 - **No greeting, no name, no sign-off.** The app opens with their name and closes with Amir's signature; written
   in the text they would show twice. The checker warns on all three.
 - **The numbers exactly as design decided, in words:** "one set fewer on every exercise",
