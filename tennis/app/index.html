@@ -19,8 +19,9 @@
   and must never deploy over it). After any edit here run python scripts/stamp_tps_app.py. The handbook itself comes from Supabase (tps_content,
   readable only by an active buyer account) and
   is kept on the phone in IndexedDB, so after the first sign-in the app opens with no connection.
-  Nothing about the buyer is stored or sent. Two things are kept in localStorage: the age version
-  ("tps.prefs") and whether the guided tour has run ("tps.toured"). The tour (?tour=1 replays it) and
+  Nothing about the buyer is sent. Three choices are kept in localStorage, on this phone only: the age
+  version ("tps.prefs"), whether the guided tour has run ("tps.toured") and the last week opened
+  ("tps.lastweek", for Start's «ادامه» button). The tour (?tour=1 replays it) and
   the guide screen it leaves behind, #/guide, live in app.js under "The tour and the guide".
   ?demo=1: the demo. No sign-in; Supabase tps_demo() sends only the free parts (supabase/tps_02_demo.sql),
   and this mode alone loads Plausible for a few anonymous events.
@@ -162,6 +163,6 @@
 <div id="tour" class="tour" hidden></div>
 
 <script defer src="lib/supabase.js"></script>
-<script src="app.js?v=ebadf16f" defer></script>
+<script src="app.js?v=b90298ff" defer></script>
 </body>
 </html>

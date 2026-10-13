@@ -212,11 +212,11 @@ const AUDIT = scope => {
     await p.evaluate(() => document.querySelector('.step-foot [data-step="done"]').click());   // a set with a rest: the rest screen
     await p.waitForTimeout(300);
     if (await p.evaluate(() => !!document.querySelector('.ring .time') && !document.querySelector('.step-body .wlist'))) await stepCheck('rest', ['[data-step="skip"]']);
-    for (let i = 0; i < 80 && await p.evaluate(() => !document.querySelector('.done-screen')); i++) {
+    for (let i = 0; i < 80 && await p.evaluate(() => !document.querySelector('.done-cover')); i++) {
       await p.evaluate(() => { const s = document.querySelector('[data-step="skip"]'); if (s) s.click(); else { const n = document.querySelector('[data-step="next"]'); if (n) n.click(); } });
     }
     await p.waitForTimeout(400);
-    await stepCheck('the finish', ['.done-screen', '.step-foot .btn.primary']);
+    await stepCheck('the finish', ['.done-cover', '.step-foot .btn.primary']);
     await p.evaluate(() => document.querySelector('[data-step="close"]').click());
     t.check(`${w}: no page errors on any screen`, p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();

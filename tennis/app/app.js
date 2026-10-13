@@ -1,9 +1,12 @@
 /* Tennis Performance System, Level 2 · app logic.
    A content reader, not a fitness app. Nothing about the player is stored or sent.
-   Nothing is stored but two things, both in localStorage: the chosen version, "tps.prefs":
-   { age: "adult" | "u16" }, and whether the guided tour has run, "tps.toured" (see "The tour and
-   the guide"). The tour is kept out of tps.prefs on purpose: a prefs object existing before a
-   version is chosen would read as "already chosen" everywhere in this file.
+   Three choices are kept, in localStorage, on this phone only and never sent: the chosen version,
+   "tps.prefs": { age: "adult" | "u16" }; whether the guided tour has run, "tps.toured" (see "The tour
+   and the guide"); and the last week opened, "tps.lastweek": { week }, so Start's button can say
+   «ادامه: هفتهٔ ۵» (Amir, 2026-10-13). The tour is kept out of tps.prefs on purpose: a prefs object
+   existing before a version is chosen would read as "already chosen" everywhere in this file. The
+   last week is NOT "tps.last", which is the buyer's offline sign-in record ({ uid, username }).
+   The look is Centre Court in Farsi (app.css says how; FARSI-PRODUCTS.md → The course app's look).
    Signed in (the default): the handbook comes from Supabase and is kept on the phone in IndexedDB,
    so it opens with no connection (see "Account and the offline copy" below). ?local=1 or
    ?content=<folder> reads the JSON files next to the app instead (needs a content folder, which the
@@ -613,7 +616,7 @@
     if (!id) return '';   // no demo yet: show nothing (Amir, step 2)
     const short = ytShort(url), watch = ytWatch(url);
     return `<div class="vunit${short ? ' short' : ''}"><div class="video${short ? ' short' : ''}" data-yt="${id}"><button class="play" aria-label="پخش ویدیو">▶</button>
-      <div class="vnote">ویدیو از یوتیوب · در ایران ممکن است فیلترشکن لازم باشد</div></div>${watch
+      <div class="vnote">ویدیو از یوتیوب، در ایران ممکن است فیلترشکن لازم باشد</div></div>${watch
         ? `<a class="vyt" href="${watch}" target="_blank" rel="noopener noreferrer">${YT_MARK}<span>باز کردن در یوتیوب</span>${YT_ARROW}</a>` : ''}</div>`;
   }
 
@@ -904,7 +907,7 @@
     let h = banner({ back: `#/programme/week/${week}`, kicker: `هفتهٔ ${fa(week)}، ${addon ? 'جلسهٔ انتخابی' : 'جلسهٔ ' + esc(s.code)}`,
       title: addon ? addonTitle(s) : dots(esc(s.title)), art: artFor('place', s.place), cover: true,
       meta: sepJoin([s.minutes ? fa(s.minutes) + ' دقیقه' : '', s.place ? (PLACE[s.place] || esc(s.place)) : '', AGE_LABEL[r.v.age]]),
-      foot: `<div class="cta-bar"><button class="btn primary" data-step-open="${week}|${esc(s.code)}">شروع، قدم‌به‌قدم${GO_TRI}</button></div>` });
+      foot: `<div class="cta-bar"><button class="btn primary" data-step-open="${week}|${esc(s.code)}">شروع جلسه، قدم‌به‌قدم${GO_TRI}</button></div>` });
     h += `<div class="section">`;
     (s.groups || []).forEach(g => {
       if (g.slot === 'W') { h += `<div class="sec">${dots(esc(g.title))}</div>` + warmCard(g); return; }
@@ -1466,7 +1469,7 @@
   //
   //   THE TOUR  — a clay ring around a real control, a card beside it, the rest
   //               dimmed. It walks all five tabs AND opens step-by-step mode for
-  //               real, because the green button at the foot of a session is the
+  //               real, because the green step-by-step button (in the session's cover since 2026-10-13) is the
   //               part nobody finds on their own. Runs once on a first open,
   //               replayable for ever from the guide or ?tour=1.
   //   THE GUIDE — #/guide, the map the tour leaves behind: every section, every
@@ -1652,7 +1655,7 @@
     } : {
       title: 'همین بود',
       body: `پشت این دکمه هر وقت خواستی برمی‌گردی: هم <b>نقشهٔ کامل اپ</b>، هم همین راهنما دوباره.
-             حالا از <b>▶ شروع هفتهٔ ۱</b> در صفحهٔ شروع راه بیفت — اپ بعد از اولین ورود
+             حالا از <b>شروع هفتهٔ ۱</b> در صفحهٔ شروع راه بیفت — اپ بعد از اولین ورود
              <b>بدون اینترنت</b> هم باز می‌شود، پس در باشگاه و روی زمین هم در دسترس است.`,
       hash: '#/tests', sel: () => tq('.bhelp'), cta: 'برویم سراغ برنامه', last: true
     });
@@ -1922,7 +1925,7 @@
 
       <div class="sec">چیزهایی که دیر پیدا می‌شوند</div>
       ${gRow('#/setup', GEAR, 'عوض کردن نسخه', 'چرخ‌دندهٔ بالای صفحهٔ شروع و برنامه. بین «۱۶ سال و بالاتر» و «زیر ۱۶ سال» جابه‌جا شو؛ برنامه همان لحظه عوض می‌شود.')}
-      ${gRow(null, IC.play, 'حالت قدم‌به‌قدم', 'دکمهٔ سبز پایین هر جلسه. تمرین‌ها را یکی‌یکی جلو می‌برد، ست‌ها را می‌شمارد، تایمر استراحت را نگه می‌دارد و ته آن زنگ می‌زند. صفحهٔ گوشی هم خاموش نمی‌شود.')}
+      ${gRow(null, IC.play, 'حالت قدم‌به‌قدم', 'دکمهٔ سبز بالای هر جلسه. تمرین‌ها را یکی‌یکی جلو می‌برد، ست‌ها را می‌شمارد، تایمر استراحت را نگه می‌دارد و ته آن زنگ می‌زند. صفحهٔ گوشی هم خاموش نمی‌شود.')}
       ${gRow(null, IC.timer, 'تایمر گرم کردن', 'داخل همان حالت، روی کارت گرم کردن. ده دقیقه را برایت می‌گیرد و می‌توانی حرکت‌ها را تیک بزنی.')}
       ${gRow('#/exercises', IC.search, 'جست‌وجوی تمرین', 'اسم حرکت، یا اسم ناحیه مثل «زانو». هر تمرین می‌گوید در کدام هفته‌ها و جلسه‌ها می‌آید.')}
       ${gRow(testHref('strength-check'), IC.calc, 'حساب‌گر سقف', 'یک‌تکرار بیشینه‌ات را از وزن، تکرار و RPE حساب می‌کند. داخل صفحهٔ آزمون قدرت.')}
