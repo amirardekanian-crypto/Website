@@ -121,7 +121,8 @@
   const withTimeout = (p, ms) => Promise.race([p, new Promise(res => setTimeout(() => res(null), ms))]);
   const lsGet = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* full or blocked */ } };
-  const showMessage = (h, p) => { view().innerHTML = `<div class="section"><div class="card clay"><h3>${h}</h3><p class="lead">${p}</p></div></div>`; };
+  // A full-screen notice (the book is not on this phone yet): the paper header and one clay card, no emoji.
+  const showMessage = (h, p) => { view().innerHTML = banner({ kicker: 'سیستم آمادگی جسمانی تنیس', title: h }) + `<div class="section"><div class="card clay"><p>${p}</p></div></div>`; };
 
   // Every key supabase-js keeps for this app ("tps-auth", and any "tps-auth-…" beside it).
   function clearAuth() {
@@ -340,14 +341,15 @@
     startApp();
   }
 
-  // The setup page's account card: who is signed in, how to install, and sign-out. Nothing in the local modes.
+  // The setup page's account block: who is signed in, how to install, and sign-out. Nothing in the local modes.
   function accountBlock() {
     if (window.LOCAL) return '';
-    if (DEMO) return `<div class="section"><div class="card clay"><h3>نسخهٔ نمایشی</h3>
-      <p class="lead">در نسخهٔ نمایشی فقط بخشی از دوره باز است.</p>${buyActions('setup')}</div></div>`;
-    return `<div class="section"><div class="card"><h3>حساب</h3>
+    if (DEMO) return `<div class="section"><div class="sec">نسخهٔ نمایشی</div>
+      <p class="lead">در نسخهٔ نمایشی فقط بخشی از دوره باز است.</p>${buyActions('setup')}</div>`;
+    const lat = s => `<bdi>${s}</bdi>`;   // the phone's own English button names sit inside the Farsi sentence
+    return `<div class="section"><div class="sec">حساب</div>
       <div class="acct"><span class="who">وارد شده با <b dir="ltr">${esc(ACC.username || '—')}</b></span><button class="btn ghost" data-signout>خروج</button></div>
-      <p class="lead" style="margin-top:10px">نصب روی گوشی: در آیفون، در Safari دکمهٔ Share و بعد Add to Home Screen. در اندروید، از منوی ⋮ مرورگر گزینهٔ Install app یا Add to Home screen. کتاب روی همین گوشی می‌ماند و بدون اینترنت هم باز می‌شود.</p></div></div>`;
+      <p class="lead">نصب روی گوشی: در آیفون، در ${lat('Safari')} دکمهٔ ${lat('Share')} و بعد ${lat('Add to Home Screen')}. در اندروید، از منوی ⋮ مرورگر گزینهٔ ${lat('Install app')} یا ${lat('Add to Home screen')}. کتاب روی همین گوشی می‌ماند و بدون اینترنت هم باز می‌شود.</p></div>`;
   }
 
   /* ── Demo (?demo=1) ────────────────────────────────────────────────── */
@@ -390,28 +392,52 @@
       `<div class="section"><div class="card clay"><h3>اتصال برقرار نشد</h3>
         <p class="lead">اینترنت را بررسی کنید و دوباره امتحان کنید. اگر باز نشد، با فیلترشکن امتحان کنید.</p>
         <button class="btn primary" data-retry>دوباره امتحان کنید</button></div>
-        <div class="card"><h3>سیستم آمادگی جسمانی تنیس</h3>${buyActions('failed')}</div></div>`;
+        <div class="sec">سیستم آمادگی جسمانی تنیس</div>${buyActions('failed', true)}</div>`;
   }
 
-  // Buy on WhatsApp (the message already typed), read the product page, or sign in if already bought.
-  const buyActions = from => `<div class="demo-actions">
-      <a class="btn clay" href="${BUY_URL}" target="_blank" rel="noopener" data-buy="${from}">خرید نسخهٔ کامل از واتساپ</a>
+  // Buy on WhatsApp (the message already typed), read the product page, or sign in if already bought. The buy button is the screen's one
+  // green button; `quiet` makes it the outlined one on a screen whose main job is another button (the retry, the guide's replay).
+  const buyActions = (from, quiet) => `<div class="demo-actions">
+      <a class="btn ${quiet ? 'ghost' : 'primary'}" href="${BUY_URL}" target="_blank" rel="noopener" data-buy="${from}">خرید نسخهٔ کامل از واتساپ</a>
       <a class="btn ghost" href="/tennis/">دربارهٔ دوره و قیمت</a>
       <p class="lead">قبلاً خریده‌اید؟ <a class="link-btn" href="./">ورود</a></p></div>`;
+
+  // Line icons for the door rows (.d-ic) and the guide's rows (.g-ic): a 24 box, stroke currentColor, drawn by the CSS. Never an emoji.
+  const IC = {
+    person: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>',
+    lock: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+    play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5l11 6.5-11 6.5z"/></svg>',
+    timer: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V10M10 3h4M18.5 6.5l1.5-1.5"/></svg>',
+    search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>',
+    calc: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 7.5h7M9 11.5h.01M12 11.5h.01M15 11.5h.01M9 15h.01M12 15h.01M15 15h.01M9 18h.01M12 18h.01M15 18h.01"/></svg>',
+    speaker: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg>',
+    print: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v6H7z"/></svg>'
+  };
+
+  // The phone paints an emoji in its own yellow, so none is drawn: a lesson's or test's `icon`, a 🔊 in a pill, a 🔒 in a kicker. Whatever calls
+  // viewLocked() (they pass these in o.kicker, o.title, o.pills) loses its emoji, with the space it left. Digits (also "emoji" to Unicode) stay.
+  const EMO_MOD = '[\\uFE0E\\uFE0F\\u20E3\\p{Emoji_Modifier}]*';
+  const EMOJI_RE = new RegExp('(?:\\p{Extended_Pictographic}|\\p{Regional_Indicator}|\\p{Emoji_Modifier})' + EMO_MOD +
+    '(?:\\u200D\\p{Extended_Pictographic}' + EMO_MOD + ')*|[0-9#*]\\uFE0F?\\u20E3', 'gu');
+  const noEmoji = s => String(s == null ? '' : s).replace(EMOJI_RE, '').replace(/[ \t]{2,}/g, ' ').trim();
 
   // A locked item: its card, and the way to unlock it. Everything else about it stayed on the server.
   function viewLocked(o) {
     track('Demo locked', { kind: o.kind, item: o.item });
-    view().innerHTML = banner({ back: o.back, kicker: '🔒 ' + o.kicker, title: o.title, sub: o.sub || '', art: artFor('locked', '*') }) +
+    const pills = noEmoji(o.pills);
+    view().innerHTML = banner({ back: o.back, kicker: noEmoji(o.kicker).replace(/\s+·\s+/g, '، ') + '، قفل', title: dots(noEmoji(o.title)),
+        sub: dots(noEmoji(o.sub)), art: artFor('locked', '*') }) +
       `<div class="section"><div class="card clay"><h3>این بخش در نسخهٔ کامل باز می‌شود</h3>
-        ${o.pills ? `<div class="tags" style="margin:2px 0 8px">${o.pills}</div>` : ''}${o.why ? `<p>${esc(o.why)}</p>` : ''}
-        <p class="lead" style="margin-top:8px">${o.line}</p>${buyActions(o.kind)}</div></div>`;
+        ${pills ? `<div class="tags" style="margin:2px 0 8px">${pills}</div>` : ''}${o.why ? `<p>${dots(esc(noEmoji(o.why)))}</p>` : ''}
+        <p class="lead" style="margin-top:8px">${dots(o.line)}</p>${buyActions(o.kind)}</div></div>`;
   }
 
-  // The Start page's first card in the demo: what is open, counted from the content itself.
+  // The Start page's demo door: what is open, counted from the content itself. It leads to the buy message in WhatsApp, as the demo bar does.
   function demoIntro() {
     const L = (C.learn && C.learn.lessons) || [], T = (C.tests && C.tests.tests) || [];
-    return `<div class="card clay"><h3>نسخهٔ نمایشی</h3><p>هفتهٔ ${openWeeksText()} برنامه، ${fa(T.length - lockedCount(T))} آزمون و ${fa(L.length - lockedCount(L))} درس باز است. بقیه قفل است و در نسخهٔ کامل باز می‌شود.</p></div>`;
+    const weeks = (((C.programme && C.programme.weeks) || []).length > 1 ? 'هفته‌های ' : 'هفتهٔ ') + openWeeksText();
+    return `<a class="door" href="${BUY_URL}" target="_blank" rel="noopener" data-buy="start"><span class="d-ic">${IC.lock}</span>
+      <span class="d-b"><span class="d-l">نسخهٔ نمایشی</span><span class="d-v">${weeks}، ${fa(T.length - lockedCount(T))} آزمون و ${fa(L.length - lockedCount(L))} درس باز است</span></span>${GO}</a>`;
   }
 
   /* ── Pictures (the demo) ───────────────────────────────────────────── */
@@ -644,15 +670,17 @@
     </div>`;
   }
 
+  // The version picker: a label line and the two-way switch. data-k / data-v are what the click handler reads.
   function setupControls(p) {
     const b = (v, t) => `<button data-k="age" data-v="${v}" class="${p.age === v ? 'on' : ''}">${t}</button>`;
     return `<div class="setup-row"><div class="lbl">چند سالته؟</div>
         <div class="seg">${b('adult', '۱۶ سال و بالاتر')}${b('u16', 'زیر ۱۶ سال')}</div></div>
-      <p class="lead" style="margin:6px 0 0">هر هفته ۳ جلسهٔ اصلی داری؛ جلسه‌های انتخابی را بر اساس نیازت اضافه کن.</p>`;
+      <p class="lead" style="margin:8px 0 0">هر هفته ۳ جلسهٔ اصلی داری؛ جلسه‌های انتخابی را بر اساس نیازت اضافه کن.</p>`;
   }
+  // Short, because Programme and Week draw it too (only when no version is chosen yet): a pill that opens Setup, or a banner that asks.
   const versionLine = () => prefs && prefs.age
-    ? `<div class="version-line">${pill(AGE_LABEL[prefs.age], 'green')}<a class="link-btn" href="#/setup">تغییر</a></div>`
-    : `<div class="card clay"><h3>هنوز نسخه‌ات را انتخاب نکرده‌ای</h3><p>الان نسخهٔ «۱۶ سال و بالاتر» نشان داده می‌شود.</p><p><a class="link-btn" href="#/setup">انتخاب نسخه</a></p></div>`;
+    ? `<a class="pill green" href="#/setup">نسخهٔ ${AGE_LABEL[prefs.age] || AGE_LABEL.adult}</a>`
+    : `<div class="card clay"><h3>هنوز نسخه‌ات را انتخاب نکرده‌ای</h3><p>الان نسخهٔ «۱۶ سال و بالاتر» نشان داده می‌شود.</p><a class="link-btn" href="#/setup">انتخاب نسخه</a></div>`;
 
   const PLACE = { gym: 'باشگاه', court: 'زمین تنیس', home: 'خانه' };
   const placePill = (s, cls) => (s && s.place ? pill(PLACE[s.place] || esc(s.place), cls) : '');
@@ -679,35 +707,48 @@
       <div class="acc-body">${body}</div></div>`;
   }
 
+  // START: the cover (the walk-on picture, the level in the eyebrow, the one green button), then the intro, the version, the folds, how the book works.
+  // The anchors #/start/safety, #/start/howto, #/start/u16 and #/start/whofor scroll to those ids (a fold opens too).
   function viewStart(anchor) {
     const s = C.start || {};
     const ul = a => `<ul class="list">${(a || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
-    let h = banner({ kicker: 'کتاب راهنمای آمادگی جسمانی تنیس', title: esc(s.title || ''), sub: esc(s.subtitle || ''), gear: true, help: true });
+    // «سیستم آمادگی جسمانی تنیس · سطح ۲»: the name is the title, the level goes in the eyebrow with the length of the plan.
+    const tp = String(s.title || '').split(' · '), lvl = tp.slice(1).join('، ');
+    const kicker = lvl ? `${fa(esc(lvl))}، ${fa(16)} هفته` : 'کتاب راهنمای آمادگی جسمانی تنیس';
+    // The one button: carry on where this phone left off (a week that exists), else week 1.
+    const last = lastWeek(), N = last && C.programme && weekData(last) ? last : 0;
+    const go = `<a class="btn primary big" href="#/programme/week/${N || 1}">${N ? 'ادامه: هفتهٔ ' + fa(N) : 'شروع هفتهٔ ۱'}${GO_TRI}</a>`;
+    let h = banner({ art: artFor('start', '*'), tall: true, gear: true, help: true, kicker, title: esc(tp[0]), sub: dots(esc(s.subtitle || '')), foot: go });
     h += `<div class="section">`;
     if ((s.intro || []).length) h += `<p class="intro">${esc(s.intro[0])}</p>`;
+    // The version: a door once chosen (it opens Setup); until then the picker itself, so the first tap is the choice.
+    h += prefs
+      ? `<a class="door" data-tour="version" href="#/setup"><span class="d-ic">${IC.person}</span><span class="d-b"><span class="d-l">نسخهٔ تو</span><span class="d-v">${AGE_LABEL[cur().age]}</span></span>${GO}</a>`
+      : `<div class="card" data-tour="version"><h3>اول نسخهٔ خودت را انتخاب کن</h3><p class="lead">یک بار انتخاب کن؛ هر وقت خواستی عوضش کن. این انتخاب فقط روی همین گوشی می‌ماند.</p>${setupControls(draft)}</div>`;
     if (DEMO) h += demoIntro();
-    if (!prefs) {
-      h += `<div class="card green" data-tour="version"><h3>اول نسخهٔ خودت را انتخاب کن</h3><p class="lead">یک بار انتخاب کن؛ هر وقت خواستی عوضش کن. این انتخاب فقط روی همین گوشی می‌ماند.</p>${setupControls(draft)}</div>`;
-    } else {
-      h += `<div class="card" data-tour="version"><h3>نسخهٔ تو</h3>${versionLine()}</div>`;
-    }
-    h += `<a class="btn primary big" href="#/programme/week/1">▶ شروع هفتهٔ ۱</a>`;
+    // Before you start: three folds. The safety one asks the reader to look (the clay dot); so does the under-16 one for an under-16.
+    let folds = '';
     if (s.safety) {
       const sf = s.safety;
-      const body = `${sf.intro ? `<p style="margin-top:10px">${esc(sf.intro)}</p>` : ''}${ul(sf.items)}
-        ${(sf.redFlags || []).length ? `<div class="label" style="color:var(--red)">فوراً دست نگه دار و به پزشک مراجعه کن اگر…</div>${ul(sf.redFlags)}` : ''}`;
-      h += acc('safety', 'clay', '⚠️ ' + esc(sf.title), body, anchor === 'safety');
+      const body = `${sf.intro ? `<p class="acc-p">${esc(sf.intro)}</p>` : ''}${ul(sf.items)}
+        ${(sf.redFlags || []).length ? `<div class="label" style="color:var(--clay-ink)">فوراً دست نگه دار و به پزشک مراجعه کن اگر…</div>${ul(sf.redFlags)}` : ''}`;
+      folds += acc('safety', 'clay', esc(sf.title), body, anchor === 'safety');
     }
-    const more = (s.intro || []).slice(1).map(p => `<p style="margin-top:10px">${esc(p)}</p>`).join('');
-    const how = (s.howToUse || []).length ? `<div class="grid2">${s.howToUse.map(c => `<div class="card howto"><span class="ic">${esc(c.icon)}</span><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p></div>`).join('')}</div>` : '';
-    if (more || how) h += acc('howto', '', '📖 این کتاب چطور کار می‌کند', more + how, anchor === 'howto');
-    if (s.u16) h += acc('u16', prefs && prefs.age === 'u16' ? 'clay' : '', '🧒 ' + esc(s.u16.title), ul(s.u16.items), anchor === 'u16');
-    if (s.whoFor) h += acc('whofor', '', '🎾 ' + esc(s.whoFor.title), ul(s.whoFor.items), anchor === 'whofor');
+    if (s.whoFor) folds += acc('whofor', '', esc(s.whoFor.title), ul(s.whoFor.items), anchor === 'whofor');
+    if (s.u16) folds += acc('u16', prefs && prefs.age === 'u16' ? 'clay' : '', esc(s.u16.title), ul(s.u16.items), anchor === 'u16');
+    if (folds) h += `<div class="sec">قبل از شروع</div>${folds}`;
+    // How the book works: numbered rows (not links), then the rest of the intro.
+    const how = s.howToUse || [];
+    if (how.length) h += `<div class="sec" id="howto">این کتاب چطور کار می‌کند</div>` + how.map((c, i) =>
+      `<div class="list-row has-num">${pnum(i + 1)}<div class="lr-body"><span class="lr-title">${dots(esc(c.title))}</span><span class="lr-sub">${dots(esc(c.text))}</span></div></div>`).join('');
+    const more = (s.intro || []).slice(1).map(p => `<p class="lead">${esc(p)}</p>`).join('');
+    if (more) h += `<div class="more">${more}</div>`;
     h += `</div>`;
     view().innerHTML = h;
     if (anchor) { const el = document.getElementById(anchor); if (el) el.scrollIntoView({ block: 'start' }); }
   }
 
+  // SETUP: the paper header, the picker, the account block (the buy block in the demo).
   function viewSetup() {
     viewSetupBase();
     const acc = accountBlock();
@@ -715,9 +756,9 @@
   }
   function viewSetupBase() {
     view().innerHTML = banner({ back: '#/start', kicker: 'تنظیم', title: 'نسخهٔ تو', sub: 'برنامه فقط نسخه‌ای را نشان می‌دهد که انتخاب کنی.' }) +
-      `<div class="section"><div class="card">${setupControls(draft)}</div>
-       <p class="lead">این انتخاب فقط روی همین گوشی ذخیره می‌شود و به هیچ جا فرستاده نمی‌شود. هر وقت خواستی عوضش کن.</p>
-       <a class="btn ghost" href="#/programme">رفتن به برنامه</a></div>`;
+      `<div class="section">${setupControls(draft)}
+       <p class="lead" style="margin-top:14px">این انتخاب فقط روی همین گوشی ذخیره می‌شود و به هیچ جا فرستاده نمی‌شود. هر وقت خواستی عوضش کن.</p>
+       <a class="btn ghost setup-go" href="#/programme">رفتن به برنامه</a></div>`;
   }
 
   function viewProgramme() {
@@ -1793,10 +1834,10 @@
   /* ── The guide screen (#/guide) ────────────────────────────────────── */
   // A map, not an essay: every row is a real link, so reading where something
   // lives and going there are the same tap.
+  // One row of the map: a line icon at the start, the name, a grey line, and (when it goes somewhere) the go chevron at the end.
   function gRow(href, icon, title, sub) {
-    const inner = `<span class="gi">${icon}</span><span class="gb"><span class="gt">${title}</span><span class="gs">${sub}</span></span>` +
-      (href ? '<span class="gg">←</span>' : '');
-    return href ? `<a class="guide-row" href="${href}">${inner}</a>` : `<div class="guide-row">${inner}</div>`;
+    const inner = `<span class="g-ic">${icon}</span><span class="lr-body"><span class="lr-title">${title}</span><span class="lr-sub">${sub}</span></span>${href ? GO : ''}`;
+    return href ? `<a class="list-row guide-row" href="${href}">${inner}</a>` : `<div class="list-row guide-row">${inner}</div>`;
   }
 
   // Link straight at a test when the content has it open, and at the list when
@@ -1812,36 +1853,32 @@
     let h = banner({ back: '#/start', kicker: 'راهنما', title: 'نقشهٔ اپ',
       sub: 'چه چیزی کجاست، و آن چند چیزی که معمولاً پیدا نمی‌شود.' });
     h += `<div class="section">
-      <div class="card clay"><h3>راهنمای تصویری · یک دقیقه</h3>
+      <div class="card"><h3>راهنمای تصویری، یک دقیقه</h3>
         <p>خود اپ را نشانت می‌دهد: هر دکمه را می‌گیرد و می‌گوید چه کار می‌کند.</p>
-        <button class="btn primary" style="margin-top:12px" data-tour-start>▶ پخش راهنما</button></div>
+        <button class="btn primary" style="margin-top:12px" data-tour-start>پخش راهنما${GO_TRI}</button></div>
 
-      <div class="h2">پنج بخش</div>
-      <div class="card">
-        ${gRow('#/start', tabIcon('start'), 'شروع', 'نسخه‌ات را انتخاب کن، ایمنی را بخوان، و از همین‌جا وارد هفتهٔ ۱ شو.')}
-        ${gRow('#/programme', tabIcon('programme'), 'برنامه', '۱۶ هفته در ۴ بلوک. هر هفته سه جلسهٔ اصلی، به‌علاوهٔ جلسه‌های انتخابی. هفته‌های ۴، ۸، ۱۲ و ۱۶ روز آزمون دارند.')}
-        ${gRow('#/exercises', tabIcon('exercises'), 'تمرین‌ها', 'کتابخانهٔ حرکت‌ها. جست‌وجو کن یا دسته انتخاب کن؛ هر تمرین نکته‌ها، اشتباه‌های رایج، جایگزین و ویدیو دارد.')}
-        ${gRow('#/learn', tabIcon('learn'), 'آموزش', `${fa(L.length)} درس کوتاه: چرا قدرت، گرم کردن، خواب، تغذیه، درد و علائم خطر، راهنمای پدر و مادر.`)}
-        ${gRow('#/tests', tabIcon('tests'), 'آزمون', `${fa(T.length)} آزمون ساده با روش دقیق اجرا و برگهٔ نتایج.`)}
-      </div>
+      <div class="sec">پنج بخش</div>
+      ${gRow('#/start', tabIcon('start'), 'شروع', 'نسخه‌ات را انتخاب کن، ایمنی را بخوان، و از همین‌جا وارد هفتهٔ ۱ شو.')}
+      ${gRow('#/programme', tabIcon('programme'), 'برنامه', '۱۶ هفته در ۴ بلوک. هر هفته سه جلسهٔ اصلی، به‌علاوهٔ جلسه‌های انتخابی. هفته‌های ۴، ۸، ۱۲ و ۱۶ روز آزمون دارند.')}
+      ${gRow('#/exercises', tabIcon('exercises'), 'تمرین‌ها', 'کتابخانهٔ حرکت‌ها. جست‌وجو کن یا دسته انتخاب کن؛ هر تمرین نکته‌ها، اشتباه‌های رایج، جایگزین و ویدیو دارد.')}
+      ${gRow('#/learn', tabIcon('learn'), 'آموزش', `${fa(L.length)} درس کوتاه: چرا قدرت، گرم کردن، خواب، تغذیه، درد و علائم خطر، راهنمای پدر و مادر.`)}
+      ${gRow('#/tests', tabIcon('tests'), 'آزمون', `${fa(T.length)} آزمون ساده با روش دقیق اجرا و برگهٔ نتایج.`)}
 
-      <div class="h2">چیزهایی که دیر پیدا می‌شوند</div>
-      <div class="card">
-        ${gRow('#/setup', '⚙️', 'عوض کردن نسخه', 'چرخ‌دندهٔ بالای صفحهٔ شروع و برنامه. بین «۱۶ سال و بالاتر» و «زیر ۱۶ سال» جابه‌جا شو؛ برنامه همان لحظه عوض می‌شود.')}
-        ${gRow(null, '▶', 'حالت قدم‌به‌قدم', 'دکمهٔ سبز پایین هر جلسه. تمرین‌ها را یکی‌یکی جلو می‌برد، ست‌ها را می‌شمارد، تایمر استراحت را نگه می‌دارد و ته آن زنگ می‌زند. صفحهٔ گوشی هم خاموش نمی‌شود.')}
-        ${gRow(null, '⏱', 'تایمر گرم کردن', 'داخل همان حالت، روی کارت گرم کردن. ده دقیقه را برایت می‌گیرد و می‌توانی حرکت‌ها را تیک بزنی.')}
-        ${gRow('#/exercises', '🔍', 'جست‌وجوی تمرین', 'اسم حرکت، یا اسم ناحیه مثل «زانو». هر تمرین می‌گوید در کدام هفته‌ها و جلسه‌ها می‌آید.')}
-        ${gRow(testHref('strength-check'), '🧮', 'حساب‌گر سقف', 'یک‌تکرار بیشینه‌ات را از وزن، تکرار و RPE حساب می‌کند. داخل صفحهٔ آزمون قدرت.')}
-        ${gRow(testHref('yo-yo-ir1'), '🔊', 'صدای آزمون یو-یو', 'زنگ‌های آزمون یو-یو را خود اپ می‌زند. بلندگو را بلند کن و گوشی را کنار زمین بگذار.')}
-        ${gRow(null, '🖨', 'چاپ برگهٔ نتایج', 'پایین هر صفحهٔ آزمون. جدول را چاپ کن یا روی کاغذ بکش؛ اپ نتیجه‌ای ذخیره نمی‌کند.')}
-      </div>`;
+      <div class="sec">چیزهایی که دیر پیدا می‌شوند</div>
+      ${gRow('#/setup', GEAR, 'عوض کردن نسخه', 'چرخ‌دندهٔ بالای صفحهٔ شروع و برنامه. بین «۱۶ سال و بالاتر» و «زیر ۱۶ سال» جابه‌جا شو؛ برنامه همان لحظه عوض می‌شود.')}
+      ${gRow(null, IC.play, 'حالت قدم‌به‌قدم', 'دکمهٔ سبز پایین هر جلسه. تمرین‌ها را یکی‌یکی جلو می‌برد، ست‌ها را می‌شمارد، تایمر استراحت را نگه می‌دارد و ته آن زنگ می‌زند. صفحهٔ گوشی هم خاموش نمی‌شود.')}
+      ${gRow(null, IC.timer, 'تایمر گرم کردن', 'داخل همان حالت، روی کارت گرم کردن. ده دقیقه را برایت می‌گیرد و می‌توانی حرکت‌ها را تیک بزنی.')}
+      ${gRow('#/exercises', IC.search, 'جست‌وجوی تمرین', 'اسم حرکت، یا اسم ناحیه مثل «زانو». هر تمرین می‌گوید در کدام هفته‌ها و جلسه‌ها می‌آید.')}
+      ${gRow(testHref('strength-check'), IC.calc, 'حساب‌گر سقف', 'یک‌تکرار بیشینه‌ات را از وزن، تکرار و RPE حساب می‌کند. داخل صفحهٔ آزمون قدرت.')}
+      ${gRow(testHref('yo-yo-ir1'), IC.speaker, 'صدای آزمون یو-یو', 'زنگ‌های آزمون یو-یو را خود اپ می‌زند. بلندگو را بلند کن و گوشی را کنار زمین بگذار.')}
+      ${gRow(null, IC.print, 'چاپ برگهٔ نتایج', 'پایین هر صفحهٔ آزمون. جدول را چاپ کن یا روی کاغذ بکش؛ اپ نتیجه‌ای ذخیره نمی‌کند.')}`;
 
     h += DEMO
-      ? `<div class="card clay"><h3>این نسخهٔ نمایشی است</h3>
+      ? `<div class="card clay" style="margin-top:26px"><h3>این نسخهٔ نمایشی است</h3>
            <p>هفتهٔ ${openWeeksText()}، ${fa(T.length - lockedCount(T))} آزمون و ${fa(L.length - lockedCount(L))} درس باز است.
               نسخهٔ کامل هر ۱۶ هفته، ${fa(L.length)} درس و ${fa(T.length)} آزمون را باز می‌کند.</p>
-           ${buyActions('guide')}</div>`
-      : `<div class="card green"><h3>بدون اینترنت هم باز می‌شود</h3>
+           ${buyActions('guide', true)}</div>`
+      : `<div class="card green" style="margin-top:26px"><h3>بدون اینترنت هم باز می‌شود</h3>
            <p>بعد از اولین ورود، کل کتاب روی گوشی می‌ماند. در باشگاه و روی زمین، با یا بدون اینترنت، باز می‌شود.
               اپ هیچ چیزی دربارهٔ تو ذخیره یا ارسال نمی‌کند؛ تنها چیزی که روی گوشی می‌ماند نسخه‌ای است که انتخاب کرده‌ای.</p></div>`;
 
