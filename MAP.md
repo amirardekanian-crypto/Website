@@ -34,6 +34,9 @@ This is the **index**; the deep guides it points to (`CODEBASE.md`, `SCHEMA.md`,
 | The coach dashboard ("The Coach's Box") | [`coach.html`](coach.html) · manual: [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | Where one athlete's program lives | a row in `public.programs` (Supabase; `data/<id>.json` is local scratch only) → [`SCHEMA.md`](SCHEMA.md) |
 | Brand images / icons / photos | [Assets ↓](#-assets--every-image-icon--photo) |
+| The checks (pre-commit guards, headless suites, restore, site audit) | [Scripts ↓](#-scripts--checks-and-tools) |
+| The athlete-app redesign audit (Quiet Frame) | <https://claude.ai/artifact/BBWjsR99FqthXmzCkeyK49> · local working kit `.claude/audit-kit/` (gitignored, never committed) |
+| Which doc owns a topic | [`CLAUDE.md`](CLAUDE.md) → *Reference docs* |
 
 ---
 
@@ -68,9 +71,9 @@ English is the default (`/`); Farsi (`index-fa.html`) is for tennis and padel pl
 
 | File | What it is | Manual |
 |---|---|---|
-| [`program.html`](program.html) | The athlete PWA — Home · Progress (the This cycle card, Personal Records, Body weight, then the Game Plan; the tab was Game Plan until 2026-10-12) · Library (Sessions · Playbook · Exercises) · Coach; AA Proof (`habits.html`) opens from Home's Daily habits row and is embedded on Home. **Personal Records** (estimated 1RM per lift; "The Ceiling" until 2026-09-26) is reached from its row on Progress: a finished session's best set goes on by itself when it beats the lift's best (`auto`), or one is **entered directly via + Log a max** (any `standard` lift in the current cycle, with a date and an optional rep-max test framing), saved to `<id>_1rm`, and shown against the athlete's body weight. Weight boxes open empty with last time's weight under a LAST caption; a weight typed in a set fills the empty sets below (the card's *Same as last* went on 2026-09-27; Guided's rest screen keeps one). Lifts the programme marks `"test": "5RM"` get a *Due for a retest* nudge in the cycle's closing week; the coach sees the same records on `coach.html` → The work. **The Card Remembers** (2026-09-24): an open exercise card shows last time (a Last time box: the last set, a tap shows every set; a faint line under a set that ran over target; since CARD-01 a closed card shows none) and **History ›** opens every past session of that lift with a trend; sets log reps (`n`, empty = as prescribed). Server half: `supabase/stage30_session_log.sql`. **The Spine** (2026-09-24): a small ⓘ at the right end of an exercise's row opens the About sheet (purpose, on court for tennis/padel, then **Regressions · Progressions · Alternatives**) and every card shows the entry's **How to do it** (the steps, stage64) and its cues, which win over a card's own (2026-10-11); edited in coach.html → **Exercises**; server `supabase/stage31_spine.sql`. The same entries are the **Library → Exercises** pane (search, pattern chips, the athlete's own first). **The Quality Map** (2026-09-24): Home's Next up card and each day's cover show up to three things that day builds (Strength · Brakes · Spring), tap one for its page; server `supabase/stage32_qualities.sql`. Loads the athlete's row in `public.programs` (`get_program()`, after sign-in). Demo: `?client=demo` | [`SCHEMA.md`](SCHEMA.md) |
+| [`program.html`](program.html) | The athlete PWA. Four tabs: **Home** (greeting, This Week, Next up, the other days, today's habits) · **Progress** (the This cycle card, **Your numbers**: Personal Records and Body weight, then the Game Plan road of cycles) · **Library** (one screen: Sessions · Playbook · Exercises; no doors page since 2026-10-13) · **Coach** (WhatsApp). Every screen is drawn in the **Centre Court look** (the Quiet Frame redesign, 2026-10-12/13; one CSS block per screen, headed "… IN THE CENTRE COURT LOOK"). Sheets: the ⓘ **About sheet** (Changeover), How to do it (steps and cues from the Spine), History. AA Proof (`habits.html`) opens from Home and is embedded on it. Loads the athlete's row in `public.programs` after sign-in (`get_program()`). Offline: `sw.js` cache `aap-v137`. Demo: `?client=demo`. Features in full: [`PROGRAM-APP.md`](PROGRAM-APP.md); a first-timer's walk-through: [`Content/CLIENT-APP-MAP.md`](Content/CLIENT-APP-MAP.md); the redesign audit, **Quiet Frame**: <https://claude.ai/artifact/BBWjsR99FqthXmzCkeyK49> | [`PROGRAM-APP.md`](PROGRAM-APP.md) · [`SCHEMA.md`](SCHEMA.md) |
 | [`habits.html`](habits.html) | **AA Proof** — habit tracker. Four tabs: Today · Progress · Crew · Locker (no chat; Settings sits behind the initials button in the header). **Per-habit levels + an overall level** on a 10-name × 5-sub rank ladder (ROOKIE→IMMORTAL, then prestige stars), **The long game** (a 14-reward track of titles + shareable-card looks, kept for good across season resets), full-screen level-up celebration, 5-tier consistency ladders, server-scored **leaderboard** (every athlete joins once, automatically, after a first finished workout; leaving sticks), **Roll Call** (one sentence a day, shared), a **3-day backfill window** on the log, offline-durable saving. **Installs to the home screen** (own manifest, `start_url` carries the athlete's link; offered once after their first log, plus a permanent Settings row). Reached from `program.html` (Home's Daily habits row, and a finished session's "open AA Proof" line), and **embedded on that app's Home** (`?embed=1`: today's rows only, ticked in place, `renderEmbed()`). Same login as the program — username and password (⚠️ the old `?client=<id>&key=<key>` links are retired and refused). **Also runs standalone for free (non-coached) users** — `"tier": "free"` in the `athlete` block of their `public.programs` row locks WORKOUT and swaps the programme links for coaching CTAs; they sign up at [`proof.html`](proof.html). Demo: `?client=demo` | [`HABITS.md`](HABITS.md) · [`XP_SYSTEM.md`](XP_SYSTEM.md) · [`QUESTS.md`](QUESTS.md) |
-| [`coach.html`](coach.html) | **The Coach's Box** — mission control for coaching *and* Proof, five tabs: **Today** (on-court count, the roll-call wall with the coach-line composer + hide/show moderation, a needs-you queue, the quest-week lever, a 7-day Proof pulse) · **Intake** (coaching apply-form submissions landed straight in the database — new/handled/archived) · **Athletes** (one roster across both systems, grouped by who needs you; one file per person in three sub-tabs — **The work** = prescribed vs done, day by day · Proof · File (old call logs live there; the Calls tab was retired 2026-10-11); the in-app chat was removed 2026-09-26, athletes message on WhatsApp) · **Proof** (server-scored board, season, signup funnel with upgrade flags, titles minted) · **Links**. Google sign-in. Preview the layout with `?demo=1`. ⚠ Never scores Proof itself — presence facts + server RPCs only | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
+| [`coach.html`](coach.html) | **The Coach's Box**, mission control for coaching *and* Proof. Seven places in one bar: **Today** (Needs you first, Also waiting, a short Proof column) · **Athletes** (one roster; one file per person: The work · Proof · File, Danger zone folded) · **Exercises** (Entries · Qualities · Coverage: the Spine) · **Proof** (the crew's home: wall, quest lever, board) · **Leads** (Applications · Free signups · Referral codes) · **Library** · **Buyers** (Course · Testing app). **⚙ Tools** (Backup, logins) sits in the top bar. Old hashes (`#intake`, `#affiliates`, `#assess`, `#course`) are rewritten by `fixLegacyHash()`. Google sign-in. Layout preview: `?demo=1`. Tested by the harness in [`scripts/headless/coach/`](scripts/headless/coach/README.md). ⚠ Never scores Proof itself | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) |
 | [`jump.html`](jump.html) | **Jump test** — measures countermovement jump and squat jump height, drop-jump RSI and the 10-5 repeated hop test from a phone video. Entirely on-device: the video is read in the browser, nothing is uploaded, there is no account and no backend. Opens as coaching (what the test is for, how to film it, how to perform it) and only then asks for a clip. Refuses clips under 120 fps, because below that the camera's own error is too big for the change rule. **History is split by athlete, scores each session by its best good rep, and only calls a change real past a line built from published test-retest error** (sessions and baseline in [`progress.js`](assets/js/jump/progress.js), the lines in each test's `changeRule`, no verdict yet for drop jump and the 10-5). **All the knowledge lives outside the page**, one file per thing that might change: [`assets/js/jump/`](assets/js/jump/) holds the physics, the change rule, the camera guide, the athlete questions and one file per test. Companion dev page [`jump-selftest.html`](jump-selftest.html) runs synthetic jumps with a known answer against the engine. `noindex`, not in the nav | [`assets/js/jump/README.md`](assets/js/jump/README.md) |
 | [`reach/`](reach/index.html) | **Reachability probe** (Farsi, Phase 0 of the Tennis Performance System plan). Athletes in Iran open it with the VPN off and then on. It times a same-site download (`reach/pad.bin`), Supabase sign-in/data/upload, YouTube, Aparat, jsDelivr and Google Fonts; records browser, storage and clock facts; and prints one line to screenshot and send Amir. Stores nothing and sends nothing else. **Fully self-contained** (no external CSS, JS or fonts, because any of those could be what is blocked). `sw.js` deliberately leaves `/reach/` alone, or it would answer from cache and fake a pass. `noindex`, not in the nav | — |
 | [`call-log.html`](call-log.html) | Weekly check-in tool — 8-section script, scores, AI summary prompts | [`CALL_LOG.md`](CALL_LOG.md) |
@@ -190,6 +193,7 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
   [`stage28_library_sessions`](supabase/stage28_library_sessions.sql) (a Library workout
   can be marked done — `log_library_session` writes it, `get_library_days` ticks the
   habit it actually is in Proof, coach-only `library_sessions_for` is the report).
+- **Later stages (29 to 65):** one line each in [`CODEBASE.md`](CODEBASE.md) → *`supabase/*.sql`*. Also: [`schema_snapshot.sql`](supabase/schema_snapshot.sql), [`tests/`](supabase/tests/) (run by `scripts/test_spine_sql.sh`), the course and testing app files (`tps_*`, `assess_*`), and [`functions/`](supabase/functions/README.md) (Edge Function source; deploy with the Supabase MCP).
 - **Exercise videos:** on the Spine entries, edited in coach.html → Exercises (the Notion sync
   was retired 2026-09-26).
 - **The way back from a lost database** (2026-10-11, rehearsed): [`scripts/restore/README.md`](scripts/restore/README.md): the structure is
@@ -197,6 +201,28 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
   [`restore_backup.py`](scripts/restore/restore_backup.py) is the step between (it leaves out everyone you erased). Proved by
   [`rehearse.mjs`](scripts/restore/rehearse.mjs) on a throwaway PostgreSQL; pre-commit guard 17 runs [`test_restore_backup.py`](scripts/test_restore_backup.py).
 - **Importing reports:** [`IMPORTING_SESSION_REPORTS.md`](IMPORTING_SESSION_REPORTS.md).
+
+---
+
+## 🧪 Scripts — checks and tools
+
+`scripts/` is never served (excluded in `_config.yml`). Pre-commit guards are wired in `.githooks/pre-commit` (run `git config core.hooksPath .githooks` once per clone). Detail for each: [`CODEBASE.md`](CODEBASE.md) → *Headless checks* and the guard sections after it.
+
+| What | Where |
+|---|---|
+| Programme checker (the house rules; `/program-assemble` runs it) | [`scripts/check_program.py`](scripts/check_program.py) · tests `test_check_program.py` |
+| Rule index guard (principles, checker and skills agree) | [`scripts/check_rule_index.py`](scripts/check_rule_index.py) |
+| Twin guard (dashboard/app pairs of one rule) | [`scripts/check_twins.js`](scripts/check_twins.js) · `check_rx.js` · `check_setlog.js` · `check_parity.py` |
+| App guards: type scale, JS syntax, habits boots, XP rules, Library/Spine, circuit logging, fetch retry | `check_type_scale.py` · `check_js_syntax.py` · `check_habits_boots.py` · `check_xp_rules.py` · `check_library_spine.py` · `check_circuit_logging.py` · `test_fetch_retry.js` |
+| Public-page style guard (ratchet on `site_style_baseline.json`) | [`scripts/check_site_style.py`](scripts/check_site_style.py) |
+| Article pages + sitemap builder | [`scripts/build_article_pages.py`](scripts/build_article_pages.py) |
+| Course app stamp (after any edit in `tennis/app/`) | [`scripts/stamp_tps_app.py`](scripts/stamp_tps_app.py) |
+| Headless suites for `program.html` (22: one per Centre Court screen, plus sign-in, session queue, clock skew, cycle dates, YouTube) | [`scripts/headless/`](scripts/headless/) (`smoke.js`, `home-progress.js`, `library.js`, `about-sheet.js`, `sheets-notices.js` …; `lib.js`, `stub.js`, `fixture.json` are the harness) |
+| Headless harness for `coach.html` (117 scenarios) | [`scripts/headless/coach/`](scripts/headless/coach/README.md) |
+| Restore from a lost database (rehearsed) | [`scripts/restore/README.md`](scripts/restore/README.md) |
+| Website audit tools (screenshots, scoreboard, link check) | [`scripts/site_audit/README.md`](scripts/site_audit/README.md) |
+| Backups: prune the weekly files · the local backup script | `scripts/prune_backups.py` · [`backup_supabase.py`](backup_supabase.py) |
+| Course art grade · Spine SQL tests | `scripts/grade_tps_art.py` · `scripts/test_spine_sql.sh` |
 
 ---
 
@@ -210,7 +236,7 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
 | [`assets/cycles/`](assets/cycles/) | The old name-matched cycle covers (Foundation Forge, Strength Engine, …), retired for the app (it uses `assets/art/cycles/`); kept for studio reuse → see [`README`](assets/cycles/README.md) |
 | [`assets/days/`](assets/days/) | Per-day-type thumbnails (upper, lower, power, core, recovery…), retired for the app (it uses `assets/art/days/`); the homepages and the studio still load `lower.webp` → [`README`](assets/days/README.md) |
 | [`assets/img/workouts/`](assets/img/workouts/) | The five older Library category banners, retired for the app (it uses `assets/art/library/`); kept as the design atlas's grade reference → [`IMAGES.md`](IMAGES.md) §2 |
-| root `*.jpg` | Marketing/preview shots (court-sessions, court-playbook, library-doors, library-playbook, library-sessions…) — see [`IMAGES.md`](IMAGES.md) |
+| root `*.jpg`, `*.png` | `court-sessions.jpg` and `court-playbook.jpg` are used by the app. The rest (`library-*.jpg` and nine screenshots such as `home.png`, `plan.png`) are old preview shots that nothing links to, and they are served publicly. See [`IMAGES.md`](IMAGES.md) |
 
 ---
 
@@ -254,18 +280,12 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
   Claude's own procedural motion-design reel, **not an Amir brand piece and not site content**. Eight shots on a 128 BPM bar
   grid (point · type · form · depth · flow · interface · rhythm · lockup), seven designed transitions, a soundtrack synthesized
   from the picture's own cue sheet. Canvas engine + Playwright renderer + numpy audio, **no generation credits**.
-  Since 2026-10-01 every shot and scene change is built from **named kit pieces** ([`motion/kit/`](Content/motion/kit/README.md)) and a tool proves it renders the same 450 frames.
+  Every shot and scene change is built from named kit pieces, and a tool proves it renders the same 450 frames (see Motion Menu below).
   Live page [`reel.html`](Content/showreel/reel.html) (serve `Content/`, not this folder) · the file [`claude-motion-reel.mp4`](Content/showreel/claude-motion-reel.mp4) (+ `poster.jpg`) · rebuild steps in its README.
-- **Motion Menu** (2026-10-01) — [`motion/`](Content/motion/README.md): every move, look and sound in the showreel, and the ingredients for Amir's reels, each with a **number**,
-  a name and a playable sample (**183 items**: 69 moves · 31 reel ingredients · 27 design items · 56 sounds), so a later video can be built from a list: *"use 14, 22 and the Kick"*.
-  The **Reels** tab holds 31 ingredients for talking-head reels (numbers that count up, word-timed text, a court to scale with distances, an athlete and force arrows,
-  force-time graphs, the app's muscle map lit muscle by muscle, chapters, camera moves, two metaphors): tall 9:16 samples with a **Farsi draft** to read. Amir's ideas and what became of them: [`INGREDIENTS.md`](Content/motion/INGREDIENTS.md).
-  Every item is **callable by name** from the kit ([`motion/kit/`](Content/motion/kit/README.md); every piece and knob in [`PIECES.md`](Content/motion/kit/PIECES.md)), and any Menu sound can be named in a cue and played in a soundtrack.
-  Claude's own kit, **not Amir's brand system** (a switch to the brand look is step 3 of its plan). This folder is the **lab**: the lab's list is [`catalog.json`](Content/motion/catalog.json) (183 pieces).
-  Moves are cut from the real reel; Reels are drawn in the lab ([`lab.html`](Content/motion/lab.html)).
-  **One source (Amir, 2026-10-01):** the published page (private; Amir marks Keep / Maybe / Drop there and Claude reads the marks): <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA> is the **tidied menu, 78 cards
-  each with a When and a How**, and it is built ONLY from the `/cut` skill's [`menu.json`](.claude/skills/cut/kit/menu/menu.json) (how: [`MENU.md`](.claude/skills/cut/kit/MENU.md)). This folder no longer publishes it.
-  Menu numbers have one ledger, [`numbers.json`](Content/motion/numbers.json): never changed, never reused.
+- **Motion Menu** (2026-10-01): Claude's own list of moves, looks and sounds for reels. The lab folder `Content/motion/` was emptied (only the number ledger
+  [`numbers.json`](Content/motion/numbers.json) stays: menu numbers are never changed or reused). The menu now has **one source**, the `/cut` skill's
+  [`menu.json`](.claude/skills/cut/kit/menu/menu.json) (how: [`MENU.md`](.claude/skills/cut/kit/MENU.md)), published as a private page where Amir marks Keep / Maybe / Drop:
+  <https://claude.ai/artifact/REg9vwGxmf4pddShMtZemA>. The kit that builds the showreel from named pieces lives under `.claude/skills/cut/kit/`; start at [`HANDOFF.md`](.claude/skills/cut/kit/HANDOFF.md).
 - **Result cards / app mockups:** [`card-preview.html`](Content/card-preview.html)
   (rebuilds every app card with real class names) → exports in
   [`instagram-cards/`](Content/instagram-cards/) (legacy style, off-palette).
@@ -299,6 +319,13 @@ posts. Build rules + asset shelf live in [`DESIGN-ATLAS.md`](Content/DESIGN-ATLA
 | [`Content/FRESH-EYES.md`](Content/FRESH-EYES.md) | **The app audit** (2026-09-24) — what has shipped, what is next in order, the open calls, and how to continue |
 | [`Content/SITE-AUDIT.md`](Content/SITE-AUDIT.md) | **The website audit** (2026-10-02) — 25 packages, the baseline scoreboard, the open questions, how to continue. Reviews in [`Content/site-audit/`](Content/site-audit/), measuring tools in [`scripts/site_audit/`](scripts/site_audit/README.md) |
 | [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) | `coach.html` manual |
+| [`Content/COACH-AUDIT.md`](Content/COACH-AUDIT.md) | The coach dashboard audit (2026-10-10); §12 is the list to continue from |
+| [`PROGRAM-APP.md`](PROGRAM-APP.md) | The athlete app's features in full (read before changing `program.html`) |
+| [`HABITS.md`](HABITS.md) | AA Proof brief (start here for the habit tracker) |
+| [`FARSI-PRODUCTS.md`](FARSI-PRODUCTS.md) | The paid course app, the testing app and the Farsi product pages |
+| [`Content/SET-LOGGING-DESIGN.md`](Content/SET-LOGGING-DESIGN.md) | How set logging was designed |
+| [`Content/parity-drafts/`](Content/parity-drafts/) | Drafts for [`CONTENT-PARITY.md`](Content/CONTENT-PARITY.md): one folder per topic (lesson, article, verification notes) |
+| [`Content/exercise-demos/README.md`](Content/exercise-demos/README.md) | Plan for short exercise demo loops |
 | [`CALL_LOG.md`](CALL_LOG.md) | `call-log.html` manual |
 | [`supabase/stage29_affiliates.sql`](supabase/stage29_affiliates.sql) | **Affiliate coaches** — the referral-code roster moved out of the public `AFFILIATES.md` into the coach-only `public.affiliates` table (2026-09-13). Manage it in `coach.html` → Affiliates; the deal and how-to are in [`COACH_DASHBOARD.md`](COACH_DASHBOARD.md) §2 |
 | [`IMAGES.md`](IMAGES.md) | What every marketing image is + how to make more |
