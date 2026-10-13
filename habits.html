@@ -76,7 +76,9 @@
   src: url('/assets/fonts/Outfit-Variable.woff2') format('woff2'); }</style>
 <!-- onerror (REL-01, 2026-09-26): with no signal this CDN download fails (the service
      worker keeps only this site's own files); the flag stops _sbReady() polling for it. -->
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.SB_FAILED=true"></script>
+<!-- Pinned (Line Call, 2026-10-13): "@2" let any new 2.x reach every phone untested. The same file and version coach.html loads;
+     bump all three together, with scripts/headless/coach/reallib.js and scripts/headless/signin.js run first. -->
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js" onerror="window.SB_FAILED=true"></script>
 <style>
   /* ── Tokens ────────────────────────────────────────────────────────────
      PROOF's modernist structure on the AA Performance palette (the "green

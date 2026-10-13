@@ -271,7 +271,8 @@
 // v140: program.html changed (2026-10-13): the finished card's line follows the session's record too, and Done on a full phone says so.
 // v141: program.html changed (2026-10-13): a weight far above the lift's own numbers asks once before the tick keeps it.
 // v142: program.html changed (2026-10-13): a Persian note reads right to left (dir=auto on the note boxes, <bdi> where a note is shown back).
-const CACHE = 'aap-v142';
+// v143: program.html and habits.html changed (2026-10-13): supabase-js pinned to 2.117.3 (it was a floating @2).
+const CACHE = 'aap-v143';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [

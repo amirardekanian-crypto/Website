@@ -45,7 +45,7 @@ for (const f of FILES) {
 }
 
 // ── the real library, a mock server ──────────────────────────────────────────────────────────────────────────────────────
-// SUPABASE_LIB=<a supabase-js UMD build> runs the same vectors on another version (program.html and habits.html load whatever jsDelivr serves for @2).
+// SUPABASE_LIB=<a supabase-js UMD build> runs the same vectors on another version (program.html, habits.html and coach.html load 2.117.3 from jsDelivr, pinned since 2026-10-13).
 vm.runInThisContext(fs.readFileSync(process.env.SUPABASE_LIB || path.join(ROOT, 'tennis/app/lib/supabase.js'), 'utf8'));   // → a global named supabase
 const lib = globalThis.supabase;
 check('the real supabase-js bundle loads', lib && typeof lib.createClient === 'function');

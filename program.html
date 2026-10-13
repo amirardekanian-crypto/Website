@@ -181,7 +181,9 @@
      onerror (REL-01, 2026-09-26): the service worker keeps only this site's own files, so
      with no signal this download simply fails. The flag lets _sbReady() stop at once
      instead of polling ~3s for a library that is not coming, before every server call. -->
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.SB_FAILED=true"></script>
+<!-- Pinned (Line Call, 2026-10-13): "@2" let any new 2.x reach every phone untested. The same file and version coach.html loads;
+     bump all three together, with scripts/headless/coach/reallib.js and scripts/headless/signin.js run first. -->
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js" onerror="window.SB_FAILED=true"></script>
 <!-- `async`, not `defer`: analytics has no ordering dependency on anything, and
      on `defer` it shares one ordered execution queue with the SDK above. -->
 <script async data-domain="amirardekani.com" src="https://plausible.io/js/script.js"></script>
