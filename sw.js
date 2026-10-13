@@ -262,7 +262,8 @@
 // v131: program.html changed (2026-10-13): Guided's top bar and the rest timer in the Centre Court look.
 // v132: program.html changed (2026-10-13): Personal Records and Body weight in the Centre Court look.
 // v133: program.html changed (2026-10-13): the Library in the Centre Court look, with no doors page.
-const CACHE = 'aap-v133';
+// v134: program.html changed (2026-10-13): sign-in, the Welcome, Loading and the error screen in the Centre Court look.
+const CACHE = 'aap-v134';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
