@@ -278,7 +278,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   RPE, more reps at the same weight, the same set at a lower RPE); only when two things moved at once is it "about X%
   stronger", from the effort-adjusted index, as a percentage only. Holds log no seconds, so a hold's win is an easier RPE.
 - **Mid-session the tab bar hides** (WK-03, Amir 2026-09-27, option C; `PROGRAM-APP.md` → *The session bar*): from
-  Start until Done the session bar is one slim line (← Home · clock · Pause · ⋯, with Guided and Reset under ⋯) and
+  Start until Done the session bar is one slim line (← Home · clock · Pause · ⋯; under ⋯ Pause, Guided, Reset and, once a
+  set is logged and the day is not ready, **Finish early**, two taps, `finishEarlyStep()` shared with the finish card's
+  button, laid out 2 × 2 so nothing moves while a label is armed; 2026-10-13) and
   `body.session-on` hides the tabs; ← Home or Back is the way out and the clock keeps running. A new session-bar
   control goes on that line or under ⋯, measured at 320–390 px: the clock is never cut. The week's limits are the bar's one
   extra row, under it.
@@ -469,7 +471,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v127` on 2026-10-13). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v128` on 2026-10-13). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

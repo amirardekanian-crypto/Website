@@ -1143,8 +1143,10 @@ dashboard do not change.
     right, outlined grey (it ends the session; two taps, clay while armed). No bar: the slim bar's line is the progress.
   - **Ready**: the green moves here. A full-width band, *● 26 OF 26 SETS* in mint over *ALL DONE WITH DAY 1* in 44 px
     capitals; then on the paper *How hard was this session?* as a 22 px green heading and two rows of five 52 px keys,
-    *Notes for Coach* and its box, the WhatsApp row (the Your history recipe: icon, a mono label over the line, a grey ›;
-    the template's → is hidden and the chevron drawn), and **Done · send to coach ✓** full width, 56 px. Finishing early
+    *Notes for Coach* and its box, and **Done · send to coach ✓** full width, 56 px, then the WhatsApp row UNDER Done
+    (`.finish-wa`, since 2026-10-13: it sat between the note and Done and competed with it; the Your history recipe: icon, a
+    mono label over the line, a grey ›; `sessionWaUrl()` reads the note from the finish card too now, so a note typed before
+    Done comes along, which it did not). Finishing early
     uses the same band (*FINISHING DAY 1 EARLY*) and lists what is not done on the green, each tag in light clay; **Keep
     going** sits under Done.
   - **Finished**: the card is signed the way the About sheet signs its reason. A grid whose `::before` paints the green
@@ -1152,9 +1154,12 @@ dashboard do not change.
     quote mark, and Amir's signature and photo (`.complete-by`: `WN_SIG` and `.wn-av`, added to the template after
     `.complete-sub`). The tick medallion is gone (the words say it). On the paper under the band: the send status (the
     card's one ✓), AA Proof as a row with an open-out glyph and its label *OPEN AA PROOF* over *Counts as your Session
-    habit* (the template's `<b>` lost its "· "), the day-after suggestion, the rating and note (`moveRatePanel()` moves
-    them here), then **Send the update** (primary, only when changed) and **Reset Session** (outlined grey, 44 px). Rows
-    are placed by class with grid rows, so the DOM order is unchanged.
+    habit* (the template's `<b>` lost its "· "), its own WhatsApp row (`.complete-wa`, never folded), the day-after
+    suggestion, then **Your rating** (since 2026-10-13): one door row, `.rate-fold`, *7 of 10 · No note* or *7 of 10 · Note:
+    "…"* (40 characters), that folds the rating keys and the note box (`moveRatePanel()` still moves them into
+    `#rate-slot-N`; `setRateFold()`, `paintRateFold()`; closed after Done, on a reload and after a reset), then **Send the
+    update** (primary, only when changed, OUTSIDE the fold) and **Reset Session** (outlined grey, 44 px). Rows are placed by
+    class with grid rows, so the DOM order is unchanged. `scripts/headless/day-finish.js` (104 checks) covers all three.
 - **The lower-day banner** (section 10): a white row under the bar, full width, with a 4 px stripe in the colour that asks
   (clay for a lower or short day, steel blue for a sore one, none while training as written), its label in that colour,
   the sentence in ink and **Train as written** as the one text link (green condensed capitals and the chevron). Its words
@@ -1210,7 +1215,11 @@ that fills as sets are done. That line replaced the grey rail at the screen's ri
 `updateProgress()` writes the same width to `#v-fill` and to the bar's `.stb-prog`, which carries the progressbar
 role). The label goes (the clock and Pause / Resume say it). In a week whose note sets a limit the bar
 also has a last row on a darker green, the week's limits (`weekLimitsHTML()`, *Week notes* above): 87 px then. **⋯** (`toggleBarMore()`) opens
-Pause, Guided and Reset on a row under the first line (the limits row stays last); `foldBarMore()` folds it (and resets `aria-expanded`) when Guided opens,
+Pause, Guided and Reset on a row under the first line (the limits row stays last), and since 2026-10-13 **Finish early**
+(`.session-timer-finish`, `paintFinishBtn()`: shown once a set is logged while the day is neither ready nor finishing early;
+two taps; `finishEarlyFromBar()` runs the same `finishEarlyStep()` as the finish card's button, folds ⋯ and lands the
+finish card under the bar). With Finish early the row is a fixed 2 × 2 grid (Pause, Guided / Reset, Finish early): four
+never fit one row at 390 px, and an armed label must not move its neighbours between the two taps. `foldBarMore()` folds it (and resets `aria-expanded`) when Guided opens,
 the day closes or the bar stops being slim. **The tab bar hides** while a slim day is open (`body.session-on`,
 `paintSessionChrome()`, called from `renderTimer()`, `switchDay()` and `closeDayView()`): ← Home or the
 phone's Back closes the day, the clock keeps running and Home shows In progress · Resume. On an iPhone SE the

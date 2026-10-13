@@ -3731,6 +3731,10 @@
     box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.3); font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px;
     text-transform: uppercase; }
   :where(#day-view) .session-timer-reset.armed { background: var(--clay-fill); box-shadow: none; }   /* "Reset?": the second tap resets */
+  /* Finish early, the fourth button under ⋯ (Amir 2026-10-13): drawn like Reset, and only ever on the OPEN slim bar (the finish
+     card has its own); paintFinishBtn() shows it. */
+  :where(#day-view) .session-timer-finish { display: none; }
+  :where(#day-view) .session-timer-finish.armed { background: var(--clay-fill); box-shadow: none; }   /* "Finish early?": the second tap finishes */
   :where(#day-view) .session-timer button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   /* ▶ and the pause mark, drawn in mint: the glyphs (setTimerBtn()) render as colour emoji on some phones. The word stays text. */
   :where(#day-view) .session-timer .stb-g { position: relative; flex: none; display: inline-block; width: 10px; height: 12px; overflow: hidden;
@@ -3786,6 +3790,16 @@
   :where(#day-view) .session-timer.slim.open .session-timer-actions > * { flex: 1 1 0; min-width: 0; }
   :where(#day-view) .session-timer.slim.open .session-timer-btn.guided { display: inline-flex; }
   :where(#day-view) .session-timer.slim.open .session-timer-reset:not([hidden]) { display: inline-flex; min-height: 44px; }
+  :where(#day-view) .session-timer.slim.open .session-timer-finish:not([hidden]) { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 14px;
+    border: 0; border-radius: 8px; cursor: pointer; white-space: nowrap; color: #fff; background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.3);
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  :where(#day-view) .session-timer.slim.open .session-timer-finish.armed { background: var(--clay-fill); box-shadow: none; }
+  /* Four buttons do not fit on one row at ANY phone width (measured at 390 px: 101 + 109 + 83 + 153 px with their labels armed,
+     against the 372 px the row has), and a label that changes when it is armed must never push a neighbour between the two taps:
+     with Finish early showing, the row is a 2 x 2 grid of equal cells (Pause, Guided / Reset, Finish early). A day with no Guided
+     has three: Pause takes the first row on its own, Reset and Finish early share the second. */
+  :where(#day-view) .session-timer.slim.open.has-finish .session-timer-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :where(#day-view) .session-timer.slim.open.has-finish .session-timer-btn:not(.guided):nth-last-child(3) { grid-column: 1 / -1; }
   :where(#day-view) .session-timer.slim.open .session-timer-more { background: rgba(255,255,255,.12); color: var(--mint); }
   @media (max-width: 359px) {
     :where(#day-view) .session-timer-actions { gap: 8px; }
@@ -3851,6 +3865,16 @@
   }
   :where(#day-view) .session-complete { scroll-margin-top: 16px; }
   body.is-demo :where(#day-view) .session-complete { scroll-margin-top: 60px; }
+  /* The finish card lands under the slim bar when Finish early (under ⋯) takes the athlete to it (finishEarlyFromBar(), block:
+     start): the bar's 56 px (87 with the limits row, 14 more when that wraps at 320 px) and the demo banner's 44 px, plus 16 px. */
+  :where(#day-view) .session-confirm { scroll-margin-top: 72px; }
+  :where(#day-view) .day-content.has-week .session-confirm { scroll-margin-top: 103px; }
+  body.is-demo :where(#day-view) .session-confirm { scroll-margin-top: 116px; }
+  body.is-demo :where(#day-view) .day-content.has-week .session-confirm { scroll-margin-top: 147px; }
+  @media (max-width: 359px) {
+    :where(#day-view) .day-content.has-week .session-confirm { scroll-margin-top: 117px; }
+    body.is-demo :where(#day-view) .day-content.has-week .session-confirm { scroll-margin-top: 161px; }
+  }
 
   /* 7. THE CARDS (Centre Court 2/3). Calm paper: a card is a row on the paper with a hairline between rows, not a box.
      The one strong green thing is the open card's head. Selectors repeat the old rule they replace, so the weight ties
@@ -4478,7 +4502,12 @@
   :where(#day-view) .wa-inline-go, :where(#day-view) .session-complete .complete-habit::after { flex: none; width: 12px; height: 12px; overflow: hidden; color: transparent;
     font: 400 var(--fs-label)/1 'Barlow', sans-serif; background: var(--grey); -webkit-mask: var(--chev) center / 12px no-repeat; mask: var(--chev) center / 12px no-repeat; }
   :where(#day-view) .finish-hint { padding: 14px var(--g) 0; font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--clay-ink); text-align: left; }
-  :where(#day-view) .session-confirm.ready .confirm-foot { flex-direction: column; align-items: stretch; gap: 4px; padding: 20px var(--g) 30px; }
+  :where(#day-view) .session-confirm.ready .confirm-foot { flex-direction: column; align-items: stretch; gap: 4px; padding: 20px var(--g) 16px; }
+  /* the WhatsApp row is its OWN row under Done (Amir 2026-10-13: it competed with Done inside the note's box): quiet, the same
+     door look it had, shown when the card is ready or early like the rating. The finished card has the same row (.complete-wa). */
+  :where(#day-view) .finish-wa { display: none; padding: 0 var(--g) 32px; }
+  :where(#day-view) .session-confirm.ready .finish-wa { display: block; }
+  :where(#day-view) .finish-wa .wa-inline, :where(#day-view) .complete-wa .wa-inline { margin: 0; }
   :where(#day-view) .session-confirm.ready .confirm-btn { width: 100%; min-height: 56px; border: 0; border-radius: 8px; background: var(--btn); color: #fff; box-shadow: none;
     font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; }
   :where(#day-view) .session-confirm.ready .confirm-btn.armed { background: var(--clay-fill); }
@@ -4487,8 +4516,10 @@
   /* 9. After Done: the finished card, signed. A grid; its ::before paints the green band behind the picture (when the session
      was finished whole), DAY N DONE, the message with the clay quote and Amir's signature and photo (.complete-by: WN_SIG and
      .wn-av, the About sheet's sign-off). On the paper under it: the send status (the card's one ✓), AA Proof as a row with an
-     open-out glyph, the day-after suggestion, the rating and note (moveRatePanel() moves them here), then Send the update and
-     Reset Session. Rows are placed by class, so the DOM order stays as it was. */
+     open-out glyph, the WhatsApp row (.complete-wa, Amir 2026-10-13: always one tap, outside the fold), the day-after suggestion,
+     the "Your rating" row (.rate-fold) with the rating and the note folded behind it (moveRatePanel() moves them into the slot;
+     closed every time the card is shown), then Send the update and Reset Session. Send the update and the send status stay
+     outside the fold. Rows are placed by class, so the DOM order stays as it was. */
   :where(#day-view) .session-complete { margin: 28px 0 0; padding: 0 0 32px; border: 0; border-radius: 0; background: none; text-align: left; overflow: hidden; }
   :where(#day-view) .session-complete.visible { display: grid; grid-template-columns: minmax(0, 1fr); }
   :where(#day-view) .session-complete::before { content: ''; grid-column: 1; grid-row: 1 / 6; background: var(--hero); }
@@ -4509,11 +4540,26 @@
   :where(#day-view) .session-complete > .complete-habit + .complete-actions { grid-row: 6; display: block; margin: 0; padding: 20px var(--g) 0; }
   :where(#day-view) .session-complete > .complete-habit { grid-row: 7; width: auto; max-width: none; margin: 12px var(--g) 0; cursor: pointer; }
   :where(#day-view) .session-complete > .complete-habit[hidden] { display: none; }
-  :where(#day-view) .session-complete > .complete-sugg-slot { grid-row: 8; margin: 0 var(--g); }
+  /* the WhatsApp row (outside the fold), then the day-after suggestion, then the "Your rating" row and the folded panel */
+  :where(#day-view) .session-complete > .complete-wa { grid-row: 8; margin: 12px var(--g) 0; }
+  :where(#day-view) .session-complete > .complete-sugg-slot { grid-row: 9; margin: 0 var(--g); }
   :where(#day-view) .session-complete > .complete-sugg-slot:not(:empty) { margin-top: 12px; }
   :where(#day-view) .session-complete .lib-sugg { min-height: 64px; border-color: var(--box); border-radius: 14px; background: var(--row); }
-  :where(#day-view) .session-complete > .complete-rate-slot { grid-row: 9; }
-  :where(#day-view) .session-complete > .complete-rate-slot + .complete-actions { grid-row: 10; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px;
+  /* "Your rating": a door row (Home's .hrow recipe): white, 1 px edge, 12 px corners, 64 px tall, the label in Space Mono over
+     the saved rating and note, a grey ⌄ that turns when it is open. Folded every time the card is shown (setRateFold()). */
+  :where(#day-view) .session-complete > .rate-fold { grid-row: 10; display: flex; align-items: center; gap: 14px; width: auto; min-height: 64px; margin: 12px var(--g) 0;
+    padding: 12px 14px 12px 16px; border: 1px solid var(--hair); border-radius: 12px; background: var(--row); color: var(--ink); cursor: pointer; text-align: left; }
+  :where(#day-view) .rate-fold:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  :where(#day-view) .rate-fold .rf-txt { flex: 1; min-width: 0; display: grid; gap: 4px; }
+  :where(#day-view) .rate-fold .rf-txt b { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#day-view) .rate-fold .rf-line { min-width: 0; overflow-wrap: anywhere; font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); }
+  :where(#day-view) .rate-fold .rf-go { flex: none; width: 18px; height: 18px; background: var(--grey); transition: transform .2s ease;
+    -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
+  :where(#day-view) .session-complete.rate-open .rate-fold .rf-go { transform: rotate(180deg); }
+  :where(#day-view) .session-complete > .complete-rate-slot { grid-row: 11; display: none; }
+  :where(#day-view) .session-complete.rate-open > .complete-rate-slot { display: block; }
+  :where(#day-view) .session-complete > .complete-rate-slot .finish-rate { padding-top: 24px; }
+  :where(#day-view) .session-complete > .complete-rate-slot + .complete-actions { grid-row: 12; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px;
     margin: 0; padding: 28px var(--g) 0; }
   :where(#day-view) .send-session-status { min-height: 0; text-align: left; font: 600 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--grey); }
   :where(#day-view) .send-session-status.success { color: var(--green-ink); }
@@ -8151,8 +8197,9 @@ function renderHome() {
         <button type="button" class="session-timer-btn" onclick="toggleSessionTimer('${day.id}')">Start ▶</button>
         ${hasStandard ? `<button type="button" class="session-timer-btn guided" onclick="openGuided('${day.id}')">Guided<span class="stb-g" aria-hidden="true"> ▶</span></button>` : ''}
         <button type="button" class="session-timer-reset" hidden onclick="armedTap(this, 'Reset?', () => resetDay('${day.id}'))">Reset</button>
+        <button type="button" class="session-timer-finish" hidden onclick="armedTap(this, 'Finish early?', () => finishEarlyFromBar('${day.id}'))">Finish early</button>
       </div>
-      <button type="button" class="session-timer-more" aria-expanded="false" aria-label="More: Guided and Reset" onclick="toggleBarMore('${day.id}')">⋯</button>
+      <button type="button" class="session-timer-more" aria-expanded="false" aria-label="More: Pause, ${hasStandard ? 'Guided, ' : ''}Reset and Finish early" onclick="toggleBarMore('${day.id}')">⋯</button>
       <div class="stb-prog" role="progressbar" aria-label="Sets done in this session" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div>
       ${limits}
     </div>`;
@@ -8186,6 +8233,10 @@ function renderHome() {
     // and the note in place, and ONE button, Done, locks the clock, saves the session and
     // sends it to the coach. It used to be Finish, then a separate Send that emailed again
     // on every tap. The rating panel (.finish-rate) moves into the finished card on Done.
+    // The WhatsApp door after a session (Amir: every session ends with one). It is its OWN row, under Done on the finish card and
+    // on the finished card outside the rating's fold (not inside .complete-note: it competed with Done there). One call, so both
+    // rows build the same link at tap time and the note typed in the box comes along (sessionWaUrl()).
+    const sessionWa = waInlineHtml(coachWhatsAppUrl('About Day ' + day.id + ': '), 'Ask me on WhatsApp', 'Pain, a swap, a question: I answer there, not in the app. Your note comes along.', 'this.href=sessionWaUrl(\'' + day.id + '\')');
     html += `<div class="session-confirm" id="confirm-${day.id}">
       <div class="confirm-body">
         <div class="confirm-top"><span class="confirm-text">In progress</span><span class="confirm-count"></span></div>
@@ -8205,7 +8256,6 @@ function renderHome() {
         <div class="complete-note">
           <div class="complete-note-label">Notes for Coach (optional)</div>
           <textarea class="complete-note-input" data-key="${noteKey}" placeholder="How it went, anything that felt off…">${esc(savedNote)}</textarea>
-          ${waInlineHtml(coachWhatsAppUrl('About Day ' + day.id + ': '), 'Ask me on WhatsApp', 'Pain, a swap, a question: I answer there, not in the app. Your note comes along.', 'this.href=sessionWaUrl(\'' + day.id + '\')')}
         </div>
       </div>
       <div class="finish-hint" aria-live="polite"></div>
@@ -8213,6 +8263,7 @@ function renderHome() {
         <button type="button" class="confirm-btn" onclick="finishTap('${day.id}', this)">Finish early</button>
         <button type="button" class="confirm-back" hidden onclick="keepGoing('${day.id}')">Keep going</button>
       </div>
+      <div class="finish-wa">${sessionWa}</div>
     </div>`;
     html += `<div class="session-complete" id="complete-${day.id}">
       <div class="complete-art" id="complete-art-${day.id}" hidden aria-hidden="true"></div>
@@ -8231,7 +8282,14 @@ function renderHome() {
       <div class="complete-actions">
         <div class="send-session-status" id="send-status-${day.id}" aria-live="polite"></div>
       </div>
-      <div class="complete-rate-slot"></div>
+      <div class="complete-wa">${sessionWa}</div>
+      <!-- The rating and the note fold behind this one row after Done (the panel moves into the slot, moveRatePanel()). Send the
+           update and the send status stay outside the fold. paintRateFold() writes the line; toggleRateFold() opens it. -->
+      <button type="button" class="rate-fold" aria-expanded="false" aria-controls="rate-slot-${day.id}" onclick="toggleRateFold('${day.id}')">
+        <span class="rf-txt"><b>Your rating</b><span class="rf-line"></span></span>
+        <span class="rf-go" aria-hidden="true"></span>
+      </button>
+      <div class="complete-rate-slot" id="rate-slot-${day.id}"></div>
       <div class="complete-actions">
         <button class="send-session-btn" hidden onclick="sendReport('${day.id}')">Send the update to your coach</button>
         <button class="reset-session-btn" onclick="armedTap(this, 'Tap again to reset', () => resetDay('${day.id}'))">Reset Session</button>
@@ -9326,7 +9384,7 @@ const APP_GUIDE = [
     body: `<p>Open <strong>Progress</strong> and tap <strong>Personal Records</strong> to see this for every
     exercise you train, and how it has moved.</p>` + CEILING_HELP },
   { icon: 'check-circle', title: 'Finishing a session',
-    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal; the card says where it is. In <strong>Guided</strong> mode, <strong>Finish Session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. The card lists what's not done; rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>Change the rating or the note after Done and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> (in the bar at the top, under <strong>⋯</strong> once the clock is going; tap it twice) clears the clock, the check-in, your ticks and your RPEs. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
+    body: `<p>As soon as you log your first set, a card at the bottom of the session shows how far you are, like <strong>In progress · 4 of 11 sets</strong>. When every set is done it reads <strong>All done</strong>.</p><p>Rate how hard the whole session was, from 1 to 10, add a note if you want, and tap <strong>Done · send to coach ✓</strong>. That one tap finishes the session and sends it to me. No signal? It waits on your phone and goes by itself when you have signal; the card says where it is. In <strong>Guided</strong> mode, <strong>Finish Session ✓</strong> brings you to this card.</p><p>Stopping early? Tap <strong>Finish early</strong>, then again to confirm, so a stray tap can't end your session. You'll also find it under <strong>⋯</strong> in the bar at the top. The card lists what's not done; rate it and tap Done the same way, or <strong>Keep going</strong>.</p><p>After Done, your rating and note sit under <strong>Your rating</strong>. Change either and a <strong>Send the update</strong> button appears.</p><p>Started the wrong day, or want to start again? <strong>Reset</strong> (in the bar at the top, under <strong>⋯</strong> once the clock is going; tap it twice) clears the clock, the check-in, your ticks and your RPEs. The weights you typed stay.</p><p><strong>Finish every session you train.</strong> It's how I see your numbers and feedback for the week. Without it I can't adjust your program properly.</p>` },
   { icon: 'clipboard', title: 'What to report & how often',
     body: `<p><strong>Every session</strong> → rate it and tap <strong>Done</strong> (above).</p><p><strong>Every Sunday</strong> → quick WhatsApp with how the week felt: sleep, stress, niggles, tennis load.</p><p><strong>Anytime</strong> → pain that lasts more than 48 hours, missed sessions, or anything that feels off.</p>` },
   { icon: 'phone-install', title: 'Install the app on your home screen',
@@ -9398,7 +9456,8 @@ function sessionWaUrl(dayId) {
   const days = (DATA && DATA.workouts && DATA.workouts.days) || [];
   const d = days.find(x => String(x.id) === String(dayId));
   const title = d && (d.title || d.focusTag) ? ', ' + (d.title || d.focusTag) : '';
-  const ta = document.querySelector('#complete-' + dayId + ' .complete-note-input');
+  // The note's box is in the finish card until Done, in the finished card after it (moveRatePanel()): the row under Done reads it too.
+  const ta = document.querySelector('#confirm-' + dayId + ' .complete-note-input, #complete-' + dayId + ' .complete-note-input');
   const note = ta ? ta.value.trim() : '';
   return coachWhatsAppUrl('About Day ' + dayId + title + ': ' + (note ? note + ' ' : ''));
 }
@@ -11334,6 +11393,7 @@ function refreshConfirmCard(day, status) {
   const back = card.querySelector('.confirm-back');
   if (back) back.hidden = !early;
   if (!ready) { const h = card.querySelector('.finish-hint'); if (h) h.textContent = ''; }
+  paintFinishBtn(day, status);   // the bar's Finish early (under ⋯) goes when the card is ready or early
 }
 
 // The card's one button. Ready: Done (finishDay()). In progress: "Finish early", which
@@ -11343,11 +11403,29 @@ function finishTap(day, btn) {
   if (!card) return;
   if (card.classList.contains('ready')) { finishDay(day); return; }
   armedTap(btn, 'Tap again to finish early', () => {
-    card.dataset.early = '1';
-    refreshConfirmCard(day);
+    finishEarlyStep(day);
     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 }
+// The early step of finishing, in ONE place: the finish card's Finish early (finishTap()) and the session bar's, under ⋯
+// (finishEarlyFromBar()), both end up here after their two taps. The card turns "early": the rating, the list of what is not
+// done and Done. Returns the card.
+function finishEarlyStep(day) {
+  const card = document.getElementById('confirm-' + day);
+  if (!card) return null;
+  card.dataset.early = '1';
+  refreshConfirmCard(day);
+  return card;
+}
+// Finish early from ⋯ on the slim bar: the same early step, then ⋯ folds and the finish card lands right under the bar (its
+// scroll-margin-top keeps the card's green band clear of the sticky bar).
+function finishEarlyFromBar(day) {
+  const card = finishEarlyStep(day);
+  if (!card) return;
+  foldBarMore(document.getElementById('timer-' + day));
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+window.finishEarlyFromBar = finishEarlyFromBar;
 // Changed their mind about finishing early: back to the session.
 function keepGoing(day) {
   const card = document.getElementById('confirm-' + day);
@@ -12135,6 +12213,10 @@ window.finishDay = finishDay;
 // where they can still be changed (a change updates the record; "Send the update"
 // appears only when something changed after the report went).
 function moveRatePanel(day, toFinished) {
+  // The finished card folds the panel behind its "Your rating" row: it is closed whenever the panel changes place (after Done, on
+  // a reload of a finished day) and a reset clears it, so the panel never comes back into the finish card hidden.
+  setRateFold(day, false);
+  paintRateFold(day);
   const panel = document.querySelector(`#confirm-${day} .finish-rate, #complete-${day} .finish-rate`);
   if (!panel) return;
   if (toFinished) {
@@ -12145,6 +12227,36 @@ function moveRatePanel(day, toFinished) {
     const foot = card && card.querySelector('.finish-hint');
     if (foot && panel.parentElement !== card) card.insertBefore(panel, foot);
   }
+}
+
+// ── The finished card's "Your rating" row (Amir, 2026-10-13: the rating and the note fold behind one row after Done) ──
+// The state lives on the finished card only (`rate-open` on #complete-N, aria-expanded on the row), never in storage: it is
+// closed every time the finished card is shown. Send the update and the send status sit OUTSIDE the fold, so a change made
+// in it is always one tap from being sent. The row's line is painted from the same two saved values the report reads.
+function setRateFold(day, open) {
+  const card = document.getElementById('complete-' + day);
+  if (!card) return;
+  card.classList.toggle('rate-open', !!open);
+  const b = card.querySelector('.rate-fold');
+  if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function toggleRateFold(day) {
+  const card = document.getElementById('complete-' + day);
+  if (card) setRateFold(day, !card.classList.contains('rate-open'));
+}
+window.toggleRateFold = toggleRateFold;
+// "7 of 10 · No note" or `7 of 10 · Note: "the first 40 characters…"`. Plain text, set with textContent (a note is the athlete's).
+function rateFoldLine(day) {
+  const rate = localStorage.getItem(ATHLETE_ID + '_srpe_' + day) || '';
+  const note = (localStorage.getItem(ATHLETE_ID + '_daynote_' + day) || '').replace(/\s+/g, ' ').trim();
+  return (rate ? rate + ' of 10' : 'Not rated') + ' · '
+    + (note ? 'Note: "' + (note.length > 40 ? note.slice(0, 40).trimEnd() + '…' : note) + '"' : 'No note');
+}
+function paintRateFold(day) {
+  const el = document.querySelector(`#complete-${day} .rate-fold .rf-line`);
+  if (!el) return;
+  const txt = rateFoldLine(day);
+  if (el.textContent !== txt) el.textContent = txt;
 }
 
 // ── The report's way to the coach: an outbox on this phone (WK-04) ──
@@ -12270,6 +12382,7 @@ window.sendReport = sendReport;
 function paintSendStatus(day) {
   const el = document.getElementById('send-status-' + day);
   if (!el) return;
+  paintRateFold(day);   // a reload, a reset or a synced change: the "Your rating" row's line says what is saved
   const upd = document.querySelector(`#complete-${day} .send-session-btn`);
   if (upd) upd.hidden = true;
   if (window.IS_DEMO) {
@@ -12308,14 +12421,39 @@ function paintSendStatus(day) {
 function paintResetBtn(day) {
   const b = document.querySelector(`#timer-${day} .session-timer-reset`);
   if (!b) return;
-  if (window.IS_PREVIEW) { b.hidden = true; return; }
+  if (window.IS_PREVIEW) { b.hidden = true; paintFinishBtn(day); return; }
   const t = loadTimer(day);
   const finished = !!(t && t.finished) || completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + day));
-  const started = !!(t && t.sessionStart && !sessionIsStale(t.sessionStart)) || getDayCompletion(day).done > 0;
+  const status = getDayCompletion(day);
+  const started = !!(t && t.sessionStart && !sessionIsStale(t.sessionStart)) || status.done > 0;
   b.hidden = finished || !started;
   const bar = document.getElementById('timer-' + day);
   if (bar) bar.classList.toggle('has-reset', !b.hidden);   // the tighter row on a narrow phone
   if (bar) bar.classList.toggle('day-done', finished);   // the week's limits row goes after Done, clock or no clock
+  paintFinishBtn(day, status);
+}
+// The bar's Finish early, the fourth button under ⋯ (Amir, 2026-10-13: it joins Pause, Guided and Reset). Painted wherever Reset
+// is (paintResetBtn()) and whenever the finish card changes state (refreshConfirmCard()). Shown while a set is logged, the day
+// is not finished and the card is still "in progress": not every set done (then the card asks the rating and Done) and not
+// already early. The finish card keeps its own. Never in the coach preview. Two taps (armedTap(), LOG-02), then
+// finishEarlyFromBar(). `has-finish` lets the open row lay four buttons out as a 2 x 2 grid (a Reset? / Finish early? label
+// must never move between the two taps).
+function paintFinishBtn(day, status) {
+  const b = document.querySelector(`#timer-${day} .session-timer-finish`);
+  if (!b) return;
+  let show = false;
+  if (!window.IS_PREVIEW) {
+    const t = loadTimer(day);
+    const finished = !!(t && t.finished) || completedHere(localStorage.getItem(ATHLETE_ID + '_completed_d' + day));
+    const st = status || getDayCompletion(day);
+    const conf = document.getElementById('confirm-' + day);
+    const full = st.total > 0 && st.done === st.total;
+    const early = !full && !!conf && conf.dataset.early === '1';   // refreshConfirmCard()'s own test for "early"
+    show = !finished && st.done > 0 && !full && !early;
+  }
+  b.hidden = !show;
+  const bar = document.getElementById('timer-' + day);
+  if (bar) bar.classList.toggle('has-finish', show);
 }
 
 function markSuggestedDay() {
@@ -12799,6 +12937,7 @@ function initDayWrapup() {
     let _noteT = null;
     ta.addEventListener('input', e => {
       localStorage.setItem(key, e.target.value);
+      paintRateFold(dayOf(key));   // the "Your rating" row's line follows the note as it is typed
       // Debounced: refresh the cloud record so a late-added note reaches the coach.
       clearTimeout(_noteT);
       _noteT = setTimeout(() => { recordSessionToCloud(dayOf(key)); refreshPendingReport(dayOf(key)); paintSendStatus(dayOf(key)); }, 1200);
@@ -12823,6 +12962,7 @@ function initDayWrapup() {
         }
         // Update the cloud record so the dashboard shows the session RPE.
         recordSessionToCloud(dayOf(key));
+        paintRateFold(dayOf(key));   // and the "Your rating" row's line
         // Rated: the finish card's hint goes; after Done, a change offers "Send the update".
         const h = document.querySelector('#confirm-' + dayOf(key) + ' .finish-hint');
         if (h && !wasSelected) h.textContent = '';
