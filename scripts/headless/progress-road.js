@@ -16,14 +16,15 @@ const active = p => p.evaluate(() => document.querySelector('.screen.active').id
 const norm = s => String(s || '').replace(/\s+/g, ' ').trim();
 
 // Five cycles, the current one at idx, ending `endsIn` days from today (negative: ended that many days ago), five weeks each. Cycle 2 has its tagline, two aims, two paragraphs
-// and two outcomes; cycle 3 a teaser (subtitle and two paragraphs); cycle 4 a teaser, cycle 5 none. Three exercises carry a reason (so Why your plan has its door row),
+// and two outcomes; cycle 3 its tagline, an aim and a teaser (subtitle and two paragraphs); cycle 4 the same; cycle 5 whatever `c5` says. Three exercises carry a reason (so Why your plan has its door row),
 // and the archive has two days.
-function prog({ endsIn = 20, idx = 1, whys = 3, name } = {}) {
+function prog({ endsIn = 20, idx = 1, whys = 3, name, c5 = 'tagline' } = {}) {
   const P = H.fixture();
   P.currentCycleIndex = idx;
   P.cycles.push(
     { art: 'brakes', num: 4, name: 'Brake Check', weeks: 'Weeks 16–20', focuses: ['Land softly.'], tagline: 'Stop well', teaser: { subtitle: 'Control the stop.', paragraphs: ['Cycle 4 teaches you to stop.', 'Then you go again.'] } },
-    { art: 'peak', num: 5, name: 'Peak Season', weeks: 'Weeks 21–25', focuses: ['Peak.'], tagline: 'Peak' });
+    // cycle 5 (Locked) carries only what c5 names: a tagline, aims, a teaser, or nothing at all (then it is a plain row)
+    Object.assign({ art: 'peak', num: 5, name: 'Peak Season', weeks: 'Weeks 21–25' }, { tagline: { tagline: 'Peak' }, aims: { focuses: ['Peak.'] }, teaser: { teaser: { paragraphs: ['Peak.'] } }, none: {} }[c5]));
   const c2 = P.cycles[1];
   c2.tagline = 'Earn the adaptation';
   c2.focuses = ['Progress the squat and hinge with real, trackable load.', 'Keep the knee quiet.'];
@@ -158,8 +159,8 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     const { ctx, p } = await H.openProgram(browser, { prog: prog(), w: 390, h: 844 });
     await toPlan(p);
     const rows = await roadOf(p);
-    t.check('folds: Now is open by default (aria-expanded true), Up next and the teased Locked are closed, the untouched ones are not folds',
-      rows[1].open && rows[1].exp === 'true' && !rows[2].open && rows[2].exp === 'false' && !rows[3].open && rows[3].exp === 'false' && rows[3].button && !rows[4].button && rows[4].exp === null && !rows[0].exp, JSON.stringify(rows.map(r => [r.n, r.state, r.exp, r.button])));
+    t.check('folds: Now is open by default (aria-expanded true), Up next and both Locked rows (a tagline, aims and a teaser; a tagline alone) are closed folds, a Done row is not a fold',
+      rows[1].open && rows[1].exp === 'true' && !rows[2].open && rows[2].exp === 'false' && !rows[3].open && rows[3].exp === 'false' && rows[3].button && !rows[4].open && rows[4].exp === 'false' && rows[4].button && !rows[0].exp, JSON.stringify(rows.map(r => [r.n, r.state, r.exp, r.button])));
     t.check('folds: every fold\'s aria-controls names its body (road-body-N), which exists', await p.evaluate(() => [...document.querySelectorAll('#road-wrap .road-head[aria-controls]')].every(h => { const b = document.getElementById(h.getAttribute('aria-controls')); return b && /^road-body-\d$/.test(b.id) && b.classList.contains('road-body'); })));
     const vis = sel => p.isVisible(sel);
     t.check('folds: Now shows its body, Up next shows none of it', await vis('#road-body-2 .road-aims') && await vis('#road-body-2 .road-why') && !(await vis('#road-body-3 .road-lead')) && !(await vis('#road-body-3 .road-paras')), 'now ' + await vis('#road-body-2 .road-aims') + ' next ' + await vis('#road-body-3 .road-lead'));
@@ -169,7 +170,15 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     let s = await state(3);
     t.check('folds: a tap on Up next opens it (aria-expanded true, the body grows, the chevron turns), and stays on Progress', s.open && s.exp === 'true' && s.height > 60 && s.turn !== 'none' && s.on === 'screen-plan' && await vis('#road-body-3 .road-lead') && await vis('#road-body-3 .road-paras'), JSON.stringify(s));
     const teaser = await p.evaluate(() => ({ lead: document.querySelector('#road-body-3 .road-lead').textContent, paras: [...document.querySelectorAll('#road-body-3 .road-paras p')].map(x => x.textContent), em: [...document.querySelectorAll('#road-body-3 .road-paras p')].map(x => !!x.querySelector('em')).join() }));
-    t.check('folds: Up next\'s body is the teaser: the subtitle as the lead line, the paragraphs, the last one in italics', teaser.lead === 'Strength becomes court speed.' && teaser.paras.length === 2 && teaser.em === 'false,true', JSON.stringify(teaser));
+    t.check('folds: Up next\'s teaser is the subtitle as the lead line, then the paragraphs, the last one in italics', teaser.lead === 'Strength becomes court speed.' && teaser.paras.length === 2 && teaser.em === 'false,true', JSON.stringify(teaser));
+    // nothing the old folded cards showed is lost: the tagline (one italic line), then The aims (01, 02 rows as in Now), then the teaser
+    const fb = n => p.evaluate(n => { const body = document.querySelector('#road-body-' + n), kids = [...body.querySelector('.road-in').children];
+      return { order: kids.map(e => e.className.split(' ')[0] + (e.tagName === 'H3' ? ':' + e.textContent : '')).join(' | '), tagline: (body.querySelector('.road-tagline') || {}).textContent || null, taglineStyle: body.querySelector('.road-tagline') && getComputedStyle(body.querySelector('.road-tagline')).fontStyle,
+        aims: [...body.querySelectorAll('.road-aims li')].map(li => li.querySelector('.road-n').textContent + ' ' + li.querySelector('.road-aim').textContent), nFont: body.querySelector('.road-n') && getComputedStyle(body.querySelector('.road-n')).fontFamily.split(',')[0],
+        nColor: body.querySelector('.road-n') && getComputedStyle(body.querySelector('.road-n')).color, why: !!body.querySelector('.road-why, .road-outs, .road-why-door, .wn-sign') }; }, n);
+    const u = await fb(3);
+    t.check('folds: Up next opens on the tagline (italic), then The aims as 01 rows (Space Mono green), then the teaser, and has no Now-only parts (why, outcomes, door, signature)',
+      u.order === 'road-tagline | road-sec:The aims | road-aims | road-lead | road-paras' && u.tagline === 'Turn strength into speed' && u.taglineStyle === 'italic' && u.aims.join() === '01 Convert strength into usable court speed.' && /Space Mono/.test(u.nFont) && u.nColor === 'rgb(14, 74, 54)' && !u.why, JSON.stringify(u));
     // the keyboard: Enter folds it, Space opens it again
     await p.focus('#road-wrap .road-row[data-cycle="3"] .road-head');
     await p.keyboard.press('Enter'); await p.waitForTimeout(450);
@@ -184,15 +193,18 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     t.check('folds: the current cycle folds (aria-expanded false, no height) and unfolds', !s.open && s.exp === 'false' && s.height === 0 && s.on === 'screen-plan', JSON.stringify(s));
     await p.click('#road-wrap .road-row[data-cycle="2"] .road-head'); await p.waitForTimeout(450);
     t.check('folds: and opens again', (await state(2)).open);
-    // a locked cycle with a teaser folds; the one without is not a tap target
+    // a Locked cycle is a fold: its tagline, its aims, then its teaser
     await p.click('#road-wrap .road-row[data-cycle="4"] .road-head'); await p.waitForTimeout(450);
-    t.check('folds: a Locked cycle with a teaser opens to it', (await state(4)).open && await vis('#road-body-4 .road-lead') && (await p.textContent('#road-body-4 .road-lead')) === 'Control the stop.');
-    await p.evaluate(() => document.querySelector('#road-wrap .road-row[data-cycle="5"] .road-head').click());
-    t.check('folds: a Locked cycle with no teaser does nothing', await p.evaluate(() => { const r = document.querySelector('#road-wrap .road-row[data-cycle="5"]'); return !r.classList.contains('is-open') && !r.querySelector('.road-body') && r.querySelector('.road-head').tagName === 'DIV'; }));
+    const lk = await fb(4);
+    t.check('folds: a Locked cycle opens to its tagline, its aims and its teaser', (await state(4)).open && await vis('#road-body-4 .road-lead') && (await p.textContent('#road-body-4 .road-lead')) === 'Control the stop.'
+      && lk.order === 'road-tagline | road-sec:The aims | road-aims | road-lead | road-paras' && lk.tagline === 'Stop well' && lk.aims.join() === '01 Land softly.' && !lk.why, JSON.stringify(lk));
+    await p.click('#road-wrap .road-row[data-cycle="5"] .road-head'); await p.waitForTimeout(450);
+    const t5 = await fb(5);
+    t.check('folds: a Locked cycle with only a tagline is a fold too, and opens to that line', (await state(5)).open && t5.order === 'road-tagline' && t5.tagline === 'Peak', JSON.stringify(t5));
     // the folds are kept across a tab change
     await p.evaluate(() => { goTo('home'); goTo('plan'); }); await p.waitForTimeout(450);
     const kept = await roadOf(p);
-    t.check('folds: they stay as the athlete left them after leaving Progress and coming back', kept.map(r => r.open ? 1 : 0).join('') === '01110', kept.map(r => r.open ? 1 : 0).join(''));
+    t.check('folds: they stay as the athlete left them after leaving Progress and coming back', kept.map(r => r.open ? 1 : 0).join('') === '01111', kept.map(r => r.open ? 1 : 0).join(''));
     t.check('no page errors (folds)', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }
@@ -217,6 +229,18 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     t.check('Now body: why it matters carries Amir\'s paragraphs behind the clay quote mark of the Coach\'s note', b.paras === 2 && /201C|“/.test(b.quote) && b.quoteColor === 'rgb(199, 85, 47)' && /Barlow Condensed/.test(b.quoteFont), JSON.stringify([b.paras, b.quote, b.quoteColor, b.quoteFont]));
     t.check('Now body: the outcomes are rows with a green tick', b.outs.length === 2 && b.outs.every(o => o[1]) && b.outs[0][0] === 'Measurable strength gains in the back squat', JSON.stringify(b.outs));
     t.check('Now body: Why your plan looks like this is a door row (.hrow) with its 3 reasons, the full width of the road', !!b.door && b.door.tag === 'BUTTON' && /\bhrow\b/.test(b.door.cls) && /^Why your plan looks like this 3 reasons$/i.test(b.door.text.replace(/\s*›$/, '')) && b.doorLeft === 20 && b.doorW === 350 && /Space Mono/.test(b.doorFont), JSON.stringify(b.door) + ' ' + b.doorLeft + ' ' + b.doorW);
+    // Amir's words are signed as the week note and the finished band sign them: his signature (WN_SIG, green ink) and photo, right-aligned, the week note's size, after the paragraphs
+    const sg = await p.evaluate(() => {
+      const why = document.querySelector('#road-body-2 .road-why'), sign = why.querySelector('.wn-sign'), sig = sign && sign.querySelector('svg.wn-sig'), av = sign && sign.querySelector('.wn-av'), img = av && av.querySelector('img');
+      const ps = why.querySelectorAll('p'), r = e => e.getBoundingClientRect(), road = r(document.querySelector('.road'));
+      return { last: why.lastElementChild === sign, below: !!sign && r(sign).top >= r(ps[ps.length - 1]).bottom - 0.5, aria: sig && sig.getAttribute('aria-label'), role: sig && sig.getAttribute('role'), color: sig && getComputedStyle(sig).color,
+        sig: sig && [Math.round(r(sig).width), Math.round(r(sig).height)], av: av && [Math.round(r(av).width), Math.round(r(av).height)], src: img && img.getAttribute('src'), avRight: av && Math.round(r(av).right), roadRight: Math.round(road.right),
+        sigBeforePhoto: !!sig && !!av && r(sig).right <= r(av).left + 0.5, justify: sign && getComputedStyle(sign).justifyContent, week: !!document.querySelector('.wn-sign') && getComputedStyle(sig).width === '124px',
+        quote: getComputedStyle(why, '::before').color, hairline: sign && getComputedStyle(sign).borderTopWidth };
+    });
+    t.check('Now body: why it matters is signed: his signature (green ink, 124 × 44) and photo (44 × 44, assets/img/coach.jpg), after the paragraphs, right-aligned to the road\'s edge',
+      sg.last && sg.below && sg.aria === 'Amir' && sg.role === 'img' && sg.color === 'rgb(14, 74, 54)' && sg.sig.join('x') === '124x44' && sg.av.join('x') === '44x44' && sg.src === 'assets/img/coach.jpg' && sg.justify === 'flex-end' && sg.sigBeforePhoto && Math.abs(sg.avRight - sg.roadRight) <= 1, JSON.stringify(sg));
+    t.check('Now body: the clay quote mark stays with the signed paragraphs', sg.quote === 'rgb(199, 85, 47)', sg.quote);
     await p.click('#road-body-2 .road-why-door'); await p.waitForTimeout(400);
     t.check('Now body: the door opens the Why page', await p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible') && /Why Cycle 2 looks like this|looks like this/.test(document.querySelector('#hist-overlay .readiness-title').textContent)));
     t.check('no page errors (Now body)', p.errs.length === 0, p.errs.join(' | '));
@@ -226,6 +250,59 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     await toPlan(few.p);
     t.check('Why your plan: with only 2 reasons the door row is not there', await few.p.evaluate(() => !document.querySelector('.road-why-door')));
     await few.ctx.close();
+  }
+
+  // ── 6b. Why your plan looks like this keeps showing between cycles: inside Now's body while running, directly under the current cycle's Done row past its end ──
+  {
+    const door = p => p.evaluate(() => {
+      const road = document.querySelector('#road-wrap .road'), d = road.querySelector('.road-why-door'), wrap = d && d.closest('.road-door'), kids = [...road.children];
+      const cur = [...road.querySelectorAll('.road-row')].find(r => r.classList.contains('is-now')) || [...road.querySelectorAll('.road-row')].filter(r => r.classList.contains('is-done')).pop();
+      const after = wrap && wrap.nextElementSibling, b = d && d.getBoundingClientRect();
+      return { n: road.querySelectorAll('.road-why-door').length, inBody: !!(d && d.closest('.road-body')), wrapped: !!wrap, afterCur: !!wrap && wrap.previousElementSibling === cur, curState: cur && cur.className.replace(/\s+/g, ' '), curN: cur && cur.dataset.cycle,
+        nextRow: after ? after.className.split(' ')[0] + ':' + after.dataset.cycle + ':' + getComputedStyle(after).borderTopWidth : null, last: kids[kids.length - 1] === wrap, left: b && Math.round(b.left), width: b && Math.round(b.width),
+        text: d && d.innerText.replace(/\s+/g, ' ').trim(), tall: b && Math.round(b.height) };
+    });
+    const running = await H.openProgram(browser, { prog: prog({ endsIn: 20 }), w: 390, h: 844 });
+    await toPlan(running.p);
+    const dr = await door(running.p);
+    t.check('the Why door while the cycle runs: one door, inside the Now row\'s body, no separate door wrapper', dr.n === 1 && dr.inBody && !dr.wrapped, JSON.stringify(dr));
+    await running.ctx.close();
+    for (const [tag, o, lastRow] of [['4 days past the end', { endsIn: -4 }, false], ['40 days past the end', { endsIn: -40 }, false], ['the last cycle past its end', { endsIn: -4, idx: 4 }, true]]) {
+      const x = await H.openProgram(browser, { prog: prog(o), w: 390, h: 844 });
+      await toPlan(x.p);
+      const d2 = await door(x.p);
+      t.check(`the Why door ${tag}: under the current cycle's Done row (cycle ${o.idx ? o.idx + 1 : 2}), outside any fold, on the gutter, with its 3 reasons`,
+        d2.n === 1 && !d2.inBody && d2.wrapped && d2.afterCur && /is-done/.test(d2.curState) && d2.curN === String((o.idx || 1) + 1) && d2.left === 20 && d2.width === 350 && /^Why your plan looks like this 3 reasons ›?$/i.test(d2.text), JSON.stringify(d2));
+      t.check(`the Why door ${tag}: ${lastRow ? 'it ends the road' : 'the next row (cycle ' + ((o.idx || 1) + 2) + ') still has its hairline under it'}`, lastRow ? d2.last : /^road-row:\d:1px$/.test(d2.nextRow || ''), JSON.stringify([d2.last, d2.nextRow]));
+      await x.p.click('.road-door .road-why-door'); await x.p.waitForTimeout(400);
+      t.check(`the Why door ${tag}: it opens the Why page`, await x.p.evaluate(() => document.getElementById('hist-overlay').classList.contains('visible') && /looks like this/.test(document.querySelector('#hist-overlay .readiness-title').textContent)));
+      t.check(`the Why door ${tag}: no page errors`, x.p.errs.length === 0, x.p.errs.join(' | '));
+      await x.ctx.close();
+    }
+    const two = await H.openProgram(browser, { prog: prog({ endsIn: -4, whys: 2 }), w: 390, h: 844 });
+    await toPlan(two.p);
+    t.check('the Why door past the end with only 2 reasons: not there', await two.p.evaluate(() => !document.querySelector('.road-why-door, .road-door')));
+    await two.ctx.close();
+  }
+
+  // ── 6c. a Locked cycle is a fold whenever it has a tagline, aims or a teaser; a plain row only when it has none of them ──
+  for (const [c5, fold] of [['tagline', true], ['aims', true], ['teaser', true], ['none', false]]) {
+    const { ctx, p } = await H.openProgram(browser, { prog: prog({ c5 }), w: 390, h: 844 });
+    await toPlan(p);
+    const r = await p.evaluate(() => { const row = document.querySelector('#road-wrap .road-row[data-cycle="5"]'), h = row.querySelector('.road-head');
+      return { tag: h.tagName, exp: h.getAttribute('aria-expanded'), body: !!row.querySelector('.road-body'), chev: !!row.querySelector('.road-chev'), lock: !!row.querySelector('.road-lock'), pointer: getComputedStyle(h).cursor === 'pointer',
+        order: row.querySelector('.road-in') ? [...row.querySelector('.road-in').children].map(e => e.className.split(' ')[0] + (e.tagName === 'H3' ? ':' + e.textContent : '')).join(' | ') : null }; });
+    t.check(`a Locked cycle with ${c5 === 'none' ? 'no tagline, aims or teaser' : 'only ' + (c5 === 'aims' ? 'aims' : 'a ' + c5)}: ${fold ? 'a closed fold (a chevron and its lock)' : 'a plain row (no fold, no chevron, not a tap target), still with its lock'}`,
+      fold ? r.tag === 'BUTTON' && r.exp === 'false' && r.body && r.chev && r.lock && r.pointer : r.tag === 'DIV' && r.exp === null && !r.body && !r.chev && r.lock && !r.pointer, JSON.stringify(r));
+    if (fold) {
+      await p.click('#road-wrap .road-row[data-cycle="5"] .road-head'); await p.waitForTimeout(450);
+      const want = { tagline: 'road-tagline', aims: 'road-sec:The aims | road-aims', teaser: 'road-paras' }[c5];
+      const o = await p.evaluate(() => { const row = document.querySelector('#road-wrap .road-row[data-cycle="5"]'); return { open: row.classList.contains('is-open'), h: Math.round(row.querySelector('.road-body').getBoundingClientRect().height),
+        order: [...row.querySelector('.road-in').children].map(e => e.className.split(' ')[0] + (e.tagName === 'H3' ? ':' + e.textContent : '')).join(' | ') }; });
+      t.check(`a Locked cycle with ${c5 === 'aims' ? 'only aims' : 'only a ' + c5}: it opens to just that`, o.open && o.h > 40 && o.order === want, JSON.stringify(o));
+    }
+    t.check(`a Locked cycle (${c5}): no page errors`, p.errs.length === 0, p.errs.join(' | '));
+    await ctx.close();
   }
 
   // ── 7. Done → archive: the cycle before the current one opens its archive, ← comes back to Progress ──
@@ -314,6 +391,9 @@ const toPlan = async p => { await p.evaluate(() => goTo('plan')); await p.waitFo
     const o = await p.evaluate(() => ({ open: document.querySelector('.bt-next .road-row').classList.contains('is-open'), exp: document.querySelector('.bt-next .road-head').getAttribute('aria-expanded'), home: document.getElementById('screen-home').classList.contains('active'),
       lead: document.querySelector('.bt-next .road-lead') && document.querySelector('.bt-next .road-lead').textContent, vis: !!(document.querySelector('.bt-next .road-lead') && document.querySelector('.bt-next .road-lead').getClientRects().length), h: Math.round(document.querySelector('.bt-next .road-body').getBoundingClientRect().height) }));
     t.check('Home between cycles: the row folds open in place (the teaser shows) and Home stays Home', o.open && o.exp === 'true' && o.home && o.lead === 'Strength becomes court speed.' && o.vis && o.h > 60, JSON.stringify(o));
+    const hb = await p.evaluate(() => { const body = document.querySelector('.bt-next .road-in'); return { order: [...body.children].map(e => e.className.split(' ')[0] + (e.tagName === 'H3' ? ':' + e.textContent : '')).join(' | '),
+      tagline: (body.querySelector('.road-tagline') || {}).textContent, aims: [...body.querySelectorAll('.road-aims li')].map(li => li.textContent.replace(/\s+/g, ' ').trim()).join('|') }; });
+    t.check('Home between cycles: Up next opens on the tagline, The aims, then the teaser (the same body as on Progress)', hb.order === 'road-tagline | road-sec:The aims | road-aims | road-lead | road-paras' && hb.tagline === 'Turn strength into speed' && hb.aims === '01Convert strength into usable court speed.', JSON.stringify(hb));
     await p.focus('.bt-next .road-head'); await p.keyboard.press('Enter'); await p.waitForTimeout(450);
     t.check('Home between cycles: Enter folds it again', await p.evaluate(() => !document.querySelector('.bt-next .road-row').classList.contains('is-open') && document.querySelector('.bt-next .road-head').getAttribute('aria-expanded') === 'false'));
     t.check('no page errors (Home between)', p.errs.length === 0, p.errs.join(' | '));

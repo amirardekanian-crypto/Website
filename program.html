@@ -4815,7 +4815,7 @@
      before this one opens its archive), a lock (a cycle that is not open yet) or the Now tag. Done: the numeral solid. Now: outlined
      green, a mint tag, OPEN. Up next: outlined grey-green, closed. Locked: outlined grey, a lock. The same row is Home's Up next. */
   .road { --road-ind: 54px; margin: 0 var(--g); }
-  .road-row + .road-row { border-top: 1px solid var(--hair); }
+  .road-row ~ .road-row { border-top: 1px solid var(--hair); }   /* ~, not +: the Why door can sit between two rows */
   .road-head { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; column-gap: 10px; width: 100%; min-height: 64px; margin: 0; padding: 10px 0;
     border: 0; border-radius: 0; background: transparent; color: var(--ink); text-align: left; font: inherit; cursor: default; }
   button.road-head { cursor: pointer; }
@@ -4867,7 +4867,12 @@
   .road-paras { margin: 8px 0 0 var(--road-ind); }
   .road-paras p { font: 400 var(--fs-body)/1.55 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
   .road-paras p + p { margin-top: 10px; }
+  .road-tagline + .road-lead, .road-tagline + .road-paras { margin-top: 8px; }
+  .road-aims + .road-lead, .road-aims + .road-paras { margin-top: 16px; }   /* the teaser follows the aims */
+  .road-sign { justify-content: flex-end; margin: 12px 0 0; }   /* Amir's signature and photo (the week note's .wn-sign, its size), right-aligned under his words */
   .road .hrow.road-why-door { width: 100%; margin: 20px 0 0; }   /* a door row: the full width of the road, not the gutter twice */
+  .road-door { padding: 2px 0 18px; }   /* past the end date the door sits directly under the current cycle's Done row */
+  .road-door .hrow.road-why-door { margin: 0; }
   .road-why-door .hrow-l { text-wrap: balance; }   /* on the narrowest phone the label breaks in two even halves, never one word on a line of its own */
   .bt-next { margin: 0 0 4px; }   /* Home between cycles: the road's one row, on the gutter (.road) */
 
@@ -7224,6 +7229,11 @@ function roadIc(kind) {
   const d = { lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>' }[kind] || '';
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 }
+// Why your plan looks like this · N reasons: a door row (.hrow) to the Why page. Inside the Now row while the cycle runs, under its Done row after it.
+function roadDoorHTML(n) {
+  return `<button type="button" class="hrow road-why-door" onclick="openWhyPlan()">${hrowIc('why')}`
+    + `<span class="hrow-b"><span class="hrow-l">Why your plan looks like this</span><span class="hrow-q">${n} reasons</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
+}
 function roadRowHTML(c, i, o) {
   o = o || {};
   const state = o.state || 'locked', n = i + 1, idp = o.idp || 'road-body-';
@@ -7231,17 +7241,23 @@ function roadRowHTML(c, i, o) {
   const attr = s => esc(s).replace(/"/g, '&quot;');   // esc() leaves a quote alone, and these go inside attributes
   const name = c.name || ('Cycle ' + n);
   let body = '';
-  if (state === 'now') {
-    const msg = c.message || {}, aims = list(c.focuses), why = list(msg.paragraphs), outs = list(msg.outcomes);
+  // Now, Up next and Locked all open on the cycle's tagline (one italic line) and The aims (01, 02 rows); nothing the old folded cards showed is lost.
+  if (state === 'now' || state === 'next' || state === 'locked') {
+    const aims = list(c.focuses);
     if (c.tagline) body += `<p class="road-tagline">${esc(c.tagline)}</p>`;
     if (aims.length) body += `<h3 class="road-sec">The aims</h3><ol class="road-aims">${aims.map((a, k) =>
       `<li><span class="road-n" aria-hidden="true">${String(k + 1).padStart(2, '0')}</span><span class="road-aim">${esc(a)}</span></li>`).join('')}</ol>`;
-    if (why.length) body += `<h3 class="road-sec">Why this cycle matters</h3><div class="road-why">${why.map(p => `<p>${esc(p)}</p>`).join('')}</div>`;
+  }
+  if (state === 'now') {
+    const msg = c.message || {}, why = list(msg.paragraphs), outs = list(msg.outcomes);
+    // Amir's words, signed as the week note and the finished band sign them: the clay quote, then his signature (green ink) and photo, right-aligned.
+    if (why.length) body += `<h3 class="road-sec">Why this cycle matters</h3><div class="road-why">${why.map(p => `<p>${esc(p)}</p>`).join('')}`
+      + `<div class="wn-sign road-sign">${WN_SIG}<span class="wn-av" aria-hidden="true"><img src="assets/img/coach.jpg" alt="" onerror="this.remove()"><i>AA</i></span></div></div>`;
     if (outs.length) body += `<h3 class="road-sec">Expected outcomes</h3><ul class="road-outs">${outs.map(t =>
       `<li><span class="road-ck">${roadIc('check')}</span><span class="road-out">${esc(t)}</span></li>`).join('')}</ul>`;
-    // Because: the cycle's reasons on one page, only when there are enough of them to read as a plan (three).
-    if (o.whyN >= 3) body += `<button type="button" class="hrow road-why-door" onclick="openWhyPlan()">${hrowIc('why')}`
-      + `<span class="hrow-b"><span class="hrow-l">Why your plan looks like this</span><span class="hrow-q">${o.whyN} reasons</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
+    // Because: the cycle's reasons on one page, only when there are enough of them to read as a plan (three). Past the end date the same door
+    // sits under the current cycle's Done row instead (paintRoad()).
+    if (o.whyN >= 3) body += roadDoorHTML(o.whyN);
   } else if (state === 'next' || state === 'locked') {
     const t = c.teaser || {}, lead = String(t.subtitle || '').trim(), paras = list(t.paragraphs);
     if (lead) body += `<p class="road-lead">${esc(lead)}</p>`;
@@ -7282,7 +7298,8 @@ function paintRoad() {
   const nWhy = whyList().length;
   paintInto(wrap, `<h2 class="prog-sec">Game Plan</h2><div class="road">` + cycles.map((c, i) => {
     const state = roadStateOf(i, idx, over);
-    return roadRowHTML(c, i, { state, whyN: state === 'now' ? nWhy : 0, archive: i === idx - 1 && hist.length ? hist[0].id : '', open: was[i + 1] });
+    return roadRowHTML(c, i, { state, whyN: state === 'now' ? nWhy : 0, archive: i === idx - 1 && hist.length ? hist[0].id : '', open: was[i + 1] })
+      + (i === idx && over && nWhy >= 3 ? `<div class="road-door">${roadDoorHTML(nWhy)}</div>` : '');   // past its end date: directly under the current cycle's Done row
   }).join('') + `</div>`);
 }
 window.paintRoad = paintRoad;
