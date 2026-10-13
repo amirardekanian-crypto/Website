@@ -57,7 +57,10 @@ const CONTROLS = '.sheet-back, .sheet-close, .acct-seg button, .hrow, .acct-sign
   const shots = H.outDir();
   const t = H.checker();
   const browser = await H.launch();
-  const shot = (p, name) => p.screenshot({ path: path.join(shots, name + '.png') });
+  // Screenshots: the three sizes asked for (375 light, 320 light, 390 dark) and the wide account; the other three combinations are checked, not shot.
+  const WANT = ['375x667', '320x568', '390x844-dark'];
+  const shot = (p, name) => { const m = name.match(/(\d+x\d+(-dark)?)/); if (m && /^(375x667|320x568|390x844)/.test(m[1]) && !WANT.includes(m[1])) return Promise.resolve(); return p.screenshot({ path: path.join(shots, name + '.png') }); };
+  const SIX = [[375, 667, false], [320, 568, false], [390, 844, true], [375, 667, true], [320, 568, true], [390, 844, false]];
   // The app, signed in, with the Spine and the qualities, on Day 1 (a card to open an ⓘ from).
   const setup = async (o = {}) => {
     const r = await H.openProgram(browser, Object.assign({ spine: SPINE, prog: programme(), hist: HIST3, seed: { _1rm: LIFTS }, fonts: FONTS }, o));
@@ -85,8 +88,8 @@ const CONTROLS = '.sheet-back, .sheet-close, .acct-seg button, .hrow, .acct-sign
     .map(e => { const r = e.getBoundingClientRect(); return { cls: e.className.toString().slice(0, 30), w: Math.round(r.width), h: Math.round(r.height) }; })
     .filter(x => x.w < 43.5 || x.h < 43.5), [scope, CONTROLS]);
 
-  // ── 1. Every page, every size: the row, Close top right, nothing at the foot, no sideways scroll, every control 44 px ──
-  for (const [w, h, dark] of [[375, 667, false], [320, 568, false], [390, 844, true]]) {
+  // ── 1. Every page, every size and both themes: the row, Close top right, nothing at the foot, no sideways scroll, every control 44 px ──
+  for (const [w, h, dark] of SIX) {
     const tag = `${w}${dark ? ' dark' : ''}`, file = `${w}x${h}${dark ? '-dark' : ''}`;
     const { ctx, p } = await setup({ w, h, dark });
     for (const [name, open, titleRe] of PAGES) {
@@ -388,7 +391,7 @@ const CONTROLS = '.sheet-back, .sheet-close, .acct-seg button, .hrow, .acct-sign
   }
 
   // ── 9. The banner: Home's offline line (three states) and the filed-day card wear the day's lower-day recipe ──
-  for (const [w, h, dark] of [[375, 667, false], [320, 568, false], [390, 844, true]]) {
+  for (const [w, h, dark] of SIX) {
     const tag = `${w}${dark ? ' dark' : ''}`;
     const { ctx, p } = await H.openProgram(browser, { w, h, dark, fonts: FONTS, seed: { _autofiled: [{ on: day(1), day: '1', done: 3, total: 9, at: Date.now() }] } });
     const look = sel => p.evaluate(sel => { const e = document.querySelector(sel); if (!e || e.hidden) return null; const cs = getComputedStyle(e), r = e.getBoundingClientRect(), kk = e.querySelector('.po-k, .uf-k'), tx = e.querySelector('.po-txt, .uf-s'),
