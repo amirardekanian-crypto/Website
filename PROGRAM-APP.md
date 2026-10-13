@@ -837,6 +837,27 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
     (Back to Progress), *● COMPLETED · CYCLE 1*, the name and its weeks; each day as a green section title and its exercises as
     read-only paper rows (outlined numeral, name, the line of numbers); the empty state as one sentence.
 
+- **Guided and the rest timer** (`renderStep()`, `paintStepAbout()`, `paintTimerNext()`, the timer overlay; `scripts/headless/guided-rest.js`,
+  156 checks):
+  - **Guided's top bar is the slim bar's green**, safe-area aware: one eyebrow line *● EXERCISE 3 OF 7 · SET 2 OF 4*
+    (`#step-eyebrow` and `#step-pill` keep their elements; under 390 px the set goes on a second line), the exercise's name in capitals,
+    **the card's own ⓘ** at the right end of the name row (`#step-about` clicks the card's `.ex-about`, so it opens the same About sheet
+    over Guided; a Because is the clay disc), and ? and ✕ as the cover's 44 px glass buttons. The week's limits row (`#step-week`) sits
+    under it on a darker green, its numbers clay-on-green. The body's own name is hidden inside Guided only.
+  - **The footer** is one row on the paper under a hairline: ‹ Prev (outlined, NOT drawn on step 1), the primary green Done — Start Rest ✓
+    (Finish Session ✓ on the last set), Next → outlined. Labels unchanged; `--fs-body` under 400 px.
+  - **The rest timer is a green band, then the paper**: the sound as an icon toggle top left (`aria-pressed`, the same
+    `toggleRestSound()` and `rest_sound`), ✕ top right (`closeTimer()`: it closes in the list and skips in Guided, as the old bottom button
+    did; that button is gone, and Skip → stays on the band in Guided), *● REST · BARBELL BACK SQUAT*, the ring (mint progress, white
+    digits), Pause/Start the biggest button, +15s and Reset outlined. In Guided the log of the set just done sits on the paper under the
+    band in the day's set-table look (48 px RPE keys, over clay, under steel), the limits line under the keys, and **Next: Barbell Back
+    Squat · set 3 of 4** under it (`paintTimerNext()` from `STEP.seq`; *last set* / *last round* on the final step). The ring shrinks at the
+    same 720 / 620 px heights and the screen scrolls rather than squash. Timing, sound, the wake lock, the keys and Back are unchanged.
+  - **The demo banner never covers a full-screen layer** (D9): `--demo-h` is the banner's measured height (a ResizeObserver), and the timer
+    and Guided offset by it (the banner is 54 px at 320 px with fallback fonts, so a fixed 44 px covered the band).
+  - `scripts/headless/lib.js`'s `context()` takes `{ fonts: true }` to let Google Fonts through for screenshots (the checks keep aborting
+    them, as a phone with no signal would).
+
 ## 🏠 Home, led by the training (HOME-02, 2026-09-26)
 
 **Since 2026-10-12 Home leads with the week and its pieces moved: read *Home and Progress in the Centre Court look*
@@ -1273,6 +1294,9 @@ two bars covered 26% of the screen mid-session; now 9% (about 12% in a week with
 
 ## ⏲️ The rest timer keeps time in a pocket (WK-02, 2026-09-27)
 
+**Its look since 2026-10-13: a green band with ✕ and a sound icon, the log on the paper below in Guided** (*Every other screen in the
+Centre Court look*, above). The timing below is unchanged.
+
 - **It counts from a timestamp** (`timerEndsAt`): `timerTick()` reads the clock every 250 ms and paints only
   when the whole second changes, so a phone that sleeps or throttles the page still ends the rest on time, and
   `visibilitychange` catches it up on return. Back more than 30 s after the end: it closes with no alarm.
@@ -1365,6 +1389,9 @@ Guided copies the line of numbers and the pills under its name (`renderStep()`),
 header now. Circuits got the same header (line of numbers, note dot) and lost their Rounds/Rest grid.
 
 ## 🧭 Guided Mode's layout (WK-01, second part, 2026-09-27)
+
+**Since 2026-10-13 its top bar is the slim bar's green with the card's ⓘ, and ‹ Prev is not drawn on step 1** (*Every other screen in
+the Centre Court look*, above). The pinned row and the round-by-round circuits below are unchanged.
 
 - **The current row is pinned** (CSS `position: sticky` on `.step-current` inside `.step-scroll`, whose
   `.ex-log` lets it out with `overflow: visible`): in place when it is on screen, held just above the footer
