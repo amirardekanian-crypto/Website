@@ -131,7 +131,7 @@ const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .n
     t.check('Home: order is the greeting, This Week, the days, then the habits row and the Proof strip', /home-greeting-wrap.*home-offline.*home-unfinished-wrap.*home-week-wrap.*day-cards-wrap.*home-sugg-wrap.*home-habits-wrap.*home-proof-strip/.test(h.order), h.order);
 
     const g = await p.evaluate(() => {
-      const gh = [...APP_GUIDE].find(c => c.title === 'Getting around'), st = [...APP_GUIDE].find(c => c.title === 'How your program is structured'), rec = [...APP_GUIDE].find(c => /Personal Records/.test(c.title));
+      const gh = [...APP_GUIDE].find(c => c.title === 'Getting around'), st = [...APP_GUIDE].find(c => c.title === 'How your programme is structured'), rec = [...APP_GUIDE].find(c => /Personal Records/.test(c.title));
       const labels = (gh.body.match(/<li><strong>([^<]+)<\/strong>/g) || []).map(s => s.replace(/<[^>]+>/g, ''));
       return { labels, game: /<strong>Game Plan<\/strong> —/.test(gh.body), progress: /Progress<\/strong> is how it's going/.test(gh.body), home: /Home<\/strong> is your week/.test(gh.body),
         struct: /Game Plan<\/strong> explains/.test(st.body), structOk: /on <strong>Progress<\/strong>, in the Game Plan/.test(st.body), rec: /Open <strong>Progress<\/strong>/.test(rec.body) };

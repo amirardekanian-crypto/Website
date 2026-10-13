@@ -154,10 +154,10 @@ const t = H.checker();
     // the last step: Finish Session ✓ is the primary again
     await p.evaluate(() => { STEP.pos = STEP.seq.length - 1; renderStep(); });
     const d = await foot();
-    t.check('the last set: ‹ Prev and the green primary; once ticked it is Finish Session ✓', d.labels.join('|') === '‹ Prev|Done · Start Rest ✓' && d.pos === 18, JSON.stringify(d));
+    t.check('the last set: ‹ Prev and the green primary; once ticked it is Finish session ✓', d.labels.join('|') === '‹ Prev|Done · Start Rest ✓' && d.pos === 18, JSON.stringify(d));
     await p.evaluate(() => { currentStepRow().querySelector('.ex-set-check').click(); renderStep(); });
     const e = await foot();
-    t.check('a done last set: Finish Session ✓ is the green primary', e.labels.join('|') === '‹ Prev|Finish Session ✓' && !e.next && e.bg === 'radial-gradient', JSON.stringify(e));
+    t.check('a done last set: Finish session ✓ is the green primary', e.labels.join('|') === '‹ Prev|Finish session ✓' && !e.next && e.bg === 'radial-gradient', JSON.stringify(e));
     t.check('no page errors in the footer checks', p.errs.length === 0, p.errs.join(' | '));
     await ctx.close();
   }

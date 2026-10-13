@@ -281,7 +281,7 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   `--clay-big` (#C7552F), clay on the green is `--clay-on-green`; in dark mode clay text is #E06B43 and green text #6DBE95.
   `--fill` / `--yellow` (green) and `--clay` / `--ice` stay for fills and borders.
 - **Anything that deletes takes two taps** (LOG-02, 2026-09-26): `armedTap(btn, label, run)` arms on the first
-  tap (the label says what the next tap does) and acts on a second within 4 s. Reset Session, the session bar's Reset,
+  tap (the label says what the next tap does) and acts on a second within 4 s. Reset session, the session bar's Reset,
   Finish early, a weight reading and a Personal Record go through it. A new delete button uses it.
 - **A win is effort-matched, and never claimed beyond what the sets show** (PROG-01, Amir 2026-09-27: "celebrate wins
   for every one, when they lift heavier with same rpe"; `PROGRAM-APP.md` → *This cycle*). The Home card compares each

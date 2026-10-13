@@ -453,13 +453,13 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
     const g = await p.evaluate(() => ({ on: !!STEP, steps: STEP && STEP.seq.length }));
     t.check('Guided opens on the day', g.on && g.steps > 0, JSON.stringify(g));
     await p.evaluate(() => { STEP.pos = STEP.seq.length - 1; renderStep(); }); await p.waitForTimeout(300);
-    const lab = await p.evaluate(() => { const b = [...document.querySelectorAll('#step-footer button')].find(x => /Finish Session/.test(x.textContent)); return b ? b.textContent.trim() : null; });
-    t.check('the last step offers Finish Session ✓', !!lab, lab);
-    await p.evaluate(() => { [...document.querySelectorAll('#step-footer button')].find(x => /Finish Session/.test(x.textContent)).click(); });
+    const lab = await p.evaluate(() => { const b = [...document.querySelectorAll('#step-footer button')].find(x => /Finish session/.test(x.textContent)); return b ? b.textContent.trim() : null; });
+    t.check('the last step offers Finish session ✓', !!lab, lab);
+    await p.evaluate(() => { [...document.querySelectorAll('#step-footer button')].find(x => /Finish session/.test(x.textContent)).click(); });
     await p.waitForTimeout(1000);
     const r = await p.evaluate(() => { const c = document.getElementById('confirm-1'), r = c.getBoundingClientRect(), a = c.querySelector('.finish-wa a.wa-inline').getBoundingClientRect(), d = c.querySelector('.confirm-btn').getBoundingClientRect();
       return { closed: !STEP, ready: c.classList.contains('ready'), visible: c.classList.contains('visible'), onScreen: r.bottom > 0 && r.top < innerHeight, doneOn: d.bottom > 0 && d.top < innerHeight, waUnderDone: a.top >= d.bottom - 0.5 }; });
-    t.check('Finish Session ✓ closes Guided and lands on the ready finish card, with the WhatsApp row under Done', r.closed && r.ready && r.visible && r.onScreen && r.waUnderDone, JSON.stringify(r));
+    t.check('Finish session ✓ closes Guided and lands on the ready finish card, with the WhatsApp row under Done', r.closed && r.ready && r.visible && r.onScreen && r.waUnderDone, JSON.stringify(r));
     await done(p, 'via guided');
     const f = await p.evaluate(() => ({ done: !!localStorage.getItem(ATHLETE_ID + '_completed_d1'), shown: document.getElementById('complete-1').classList.contains('visible'), exp: document.querySelector('#complete-1 .rate-fold').getAttribute('aria-expanded'), line: document.querySelector('#complete-1 .rf-line').textContent }));
     t.check('…rate, Done: the finished card with the fold closed', f.done && f.shown && f.exp === 'false' && f.line === '7 of 10 · Note: "via guided"', JSON.stringify(f));

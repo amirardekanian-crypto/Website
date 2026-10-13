@@ -58,7 +58,7 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   sounds and buzzes at zero and keeps the screen awake (PROGRAM-APP.md → *The rest timer*).
   **Entering and leaving (WK-01, 2026-09-26):** `openGuided()` never pauses a running clock (it only
   toggles a session that has not started, a leftover from an earlier day, or a paused one, which
-  resumes); `openStepMode()` starts at the first unticked set; and the last button, **Finish Session ✓**,
+  resumes); `openStepMode()` starts at the first unticked set; and the last button, **Finish session ✓**,
   runs `stepFinish()`: close Guided, refresh the day's finish card (`refreshConfirmCard()`) and scroll to
   it. There the athlete rates and taps Done when every set is done, or gets **Finish early** when a
   circuit or warm-up is still open (WK-04). Guided never finishes a partial session on the athlete's behalf.

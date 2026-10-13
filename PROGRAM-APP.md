@@ -907,7 +907,7 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
     over Guided; a Because is the clay disc), and ? and ✕ as the cover's 44 px glass buttons. The week's limits row (`#step-week`) sits
     under it on a darker green, its numbers clay-on-green. The body's own name is hidden inside Guided only.
   - **The footer** is one row on the paper under a hairline: ‹ Prev (outlined, NOT drawn on step 1), the primary green Done · Start Rest ✓
-    (Finish Session ✓ on the last set), Next → outlined. Labels unchanged; `--fs-body` under 400 px.
+    (Finish session ✓ on the last set), Next → outlined. Labels unchanged; `--fs-body` under 400 px.
   - **The rest timer is a green band, then the paper**: the sound as an icon toggle top left (`aria-pressed`, the same
     `toggleRestSound()` and `rest_sound`), ✕ top right (`closeTimer()`: it closes in the list and skips in Guided, as the old bottom button
     did; that button is gone, and Skip → stays on the band in Guided), *● REST · BARBELL BACK SQUAT*, the ring (mint progress, white
@@ -1373,7 +1373,7 @@ dashboard do not change.
     suggestion, then **Your rating** (since 2026-10-13): one door row, `.rate-fold`, *7 of 10 · No note* or *7 of 10 · Note:
     "…"* (40 characters), that folds the rating keys and the note box (`moveRatePanel()` still moves them into
     `#rate-slot-N`; `setRateFold()`, `paintRateFold()`; closed after Done, on a reload and after a reset), then **Send the
-    update** (primary, only when changed, OUTSIDE the fold) and **Reset Session** (outlined grey, 44 px). Rows are placed by
+    update** (primary, only when changed, OUTSIDE the fold) and **Reset session** (outlined grey, 44 px). Rows are placed by
     class with grid rows, so the DOM order is unchanged. `scripts/headless/day-finish.js` (104 checks) covers all three.
 - **The lower-day banner** (section 10): a white row under the bar, full width, with a 4 px stripe in the colour that asks
   (clay for a lower or short day, steel blue for a sore one, none while training as written), its label in that colour,
@@ -1612,11 +1612,11 @@ went wrong" and kept nothing, and every extra tap sent another email. Now:
   `finishDay()` now runs `finishDayNow()` in a try, and on a failure takes back its finish stamp, shows the card
   again and says *Your phone is full. Free some space, then tap Done again.* (any other failure: *That didn't
   save. Tap Done again.*). `scripts/headless/send-status.js` (7 checks, the full phone filled for real).
-- **Guided's Finish Session ✓** closes Guided on this card (`stepFinish()`); it never finishes for the athlete.
+- **Guided's Finish session ✓** closes Guided on this card (`stepFinish()`); it never finishes for the athlete.
 - **Reset in the session bar** (Amir, 2026-09-27: *"when you start, its locked in and you cant cancle or
   reset"*): `.session-timer-reset`, two taps (`armedTap()`, armed label *Reset?*), shown once the day has started
   (its clock inside the 6 h grace, or a logged set) and until it is finished (`paintResetBtn()`); the finished card
-  keeps its own **Reset Session**. Under 480 px the bar's three buttons tighten while Reset shows (`.has-reset` on
+  keeps its own **Reset session**. Under 480 px the bar's three buttons tighten while Reset shows (`.has-reset` on
   the bar), so every state, armed included, fits one row down to 320 px; the row wraps rather than clips. Both run `resetDay()`: the clock, the check-in, the ticks, reps and RPEs go; the typed
   weights, `lw` and the note stay. A report still waiting for the reset session is dropped (an earlier week's
   still goes), and so is the Rest offer. Done hides the Rest offer too.
@@ -1731,7 +1731,7 @@ a coached athlete to install a second app (HABITS.md → the install offer).
 
 `armedTap(btn, armedLabel, run)` in `program.html`: the first tap arms the button (its label becomes what the
 next tap does, class `armed`, a short vibration), a second tap within 4 s runs the delete, and it disarms by
-itself. **Reset Session** (on the finished card, under the send status line), a **body-weight reading** and a
+itself. **Reset session** (on the finished card, under the send status line), a **body-weight reading** and a
 **Personal Record** go through it, and since WK-04 so do **Finish early** and the session bar's **Reset**.
 "Delete all my weight history" already asked twice with its own code. A delete is still a tombstone underneath
 (`deleteCeilingEntry()`, `saveWeight(d, null)`); only the door changed.
