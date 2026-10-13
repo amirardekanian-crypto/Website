@@ -6,7 +6,7 @@
 //     «۴۰ بلوک»), and no emoji (they paint yellow on most phones); no yellow, gold or amber colour anywhere on screen;
 //   · a screen with a picture opens on the green cover, one without on the paper header; at most one green button on a screen;
 //   · the tour's targets resolve on their screens, and the tour walks all its steps with a ring on each one that has a target;
-//   · Start's button says «شروع هفتهٔ ۱» on a first open and «ادامه: هفتهٔ N» once week N was opened (tps.last, this phone only);
+//   · Start's button says «شروع هفتهٔ ۱» on a first open and «ادامه: هفتهٔ N» once week N was opened (tps.lastweek, this phone only);
 //   · step by step (warm-up, a set, the rest, the finish), the Yo-Yo player, the 1RM calculator, the sign-in screen.
 // The demo's content is fetched ONCE from Supabase (tps_demo(), public) and served to every page, so this needs the network.
 // Three made-up changes let it reach what the demo locks: strength-check and yo-yo-ir1 unlocked (with a line of made-up text),
@@ -222,7 +222,7 @@ const AUDIT = scope => {
     await ctx.close();
   }
 
-  // Start's button: «شروع هفتهٔ ۱» on a first open, «ادامه: هفتهٔ ۱» once week 1 was opened; tps.last holds the week.
+  // Start's button: «شروع هفتهٔ ۱» on a first open, «ادامه: هفتهٔ ۱» once week 1 was opened; tps.lastweek holds the week.
   {
     const { ctx, p } = await newPage(browser, payload, {});
     await go(p, '#/start', true);
@@ -230,12 +230,12 @@ const AUDIT = scope => {
     await go(p, '#/programme/week/1', false);
     await go(p, '#/start', false);
     const after = await p.evaluate(() => [(document.querySelector('#view .banner .btn.primary') || {}).textContent || '',
-      (document.querySelector('#view .banner .btn.primary') || {}).getAttribute && document.querySelector('#view .banner .btn.primary').getAttribute('href'), localStorage.getItem('tps.last')]);
+      (document.querySelector('#view .banner .btn.primary') || {}).getAttribute && document.querySelector('#view .banner .btn.primary').getAttribute('href'), localStorage.getItem('tps.lastweek')]);
     t.check('Start: the button says «شروع هفتهٔ ۱» before any week was opened', /شروع هفتهٔ ۱/.test(before), before);
-    t.check('Start: after week 1, it says «ادامه: هفتهٔ ۱», links to week 1, and tps.last is {"week":1}',
+    t.check('Start: after week 1, it says «ادامه: هفتهٔ ۱», links to week 1, and tps.lastweek is {"week":1}',
       /ادامه: هفتهٔ ۱/.test(after[0]) && after[1] === '#/programme/week/1' && after[2] === '{"week":1}', JSON.stringify(after));
     await go(p, '#/programme/week/2', false);   // a locked week is never remembered
-    t.check('Start: a locked week is not remembered', await p.evaluate(() => localStorage.getItem('tps.last')) === '{"week":1}');
+    t.check('Start: a locked week is not remembered', await p.evaluate(() => localStorage.getItem('tps.lastweek')) === '{"week":1}');
     await ctx.close();
   }
 
