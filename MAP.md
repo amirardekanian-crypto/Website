@@ -236,7 +236,7 @@ Field reference for all three lives in [`SCHEMA.md`](SCHEMA.md).
 | [`assets/cycles/`](assets/cycles/) | The old name-matched cycle covers (Foundation Forge, Strength Engine, …), retired for the app (it uses `assets/art/cycles/`); kept for studio reuse → see [`README`](assets/cycles/README.md) |
 | [`assets/days/`](assets/days/) | Per-day-type thumbnails (upper, lower, power, core, recovery…), retired for the app (it uses `assets/art/days/`); the homepages and the studio still load `lower.webp` → [`README`](assets/days/README.md) |
 | [`assets/img/workouts/`](assets/img/workouts/) | The five older Library category banners, retired for the app (it uses `assets/art/library/`); kept as the design atlas's grade reference → [`IMAGES.md`](IMAGES.md) §2 |
-| root `*.jpg`, `*.png` | `court-sessions.jpg` and `court-playbook.jpg` are used by the app. The rest (`library-*.jpg` and nine screenshots such as `home.png`, `plan.png`) are old preview shots that nothing links to, and they are served publicly. See [`IMAGES.md`](IMAGES.md) |
+| root `court-sessions.jpg`, `court-playbook.jpg` | The two court textures the app uses. (The old root preview screenshots were deleted 2026-10-13.) See [`IMAGES.md`](IMAGES.md) |
 
 ---
 
