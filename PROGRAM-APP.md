@@ -1348,7 +1348,10 @@ dashboard do not change.
   - **In progress**: one quiet line under a hairline, *IN PROGRESS* over *6 of 26 sets*, and **Finish early** on the
     right, outlined grey (it ends the session; two taps, clay while armed). No bar: the slim bar's line is the progress.
   - **Ready**: the green moves here. A full-width band, *● 26 OF 26 SETS* in mint over *ALL DONE WITH DAY 1* in 44 px
-    capitals; then on the paper *How hard was this session?* as a 22 px green heading and two rows of five 52 px keys,
+    capitals; then, when lifts with an RPE written have a ticked set with none, one clay line on the paper, *No RPE on 2 lifts.
+    Add them ›* (`.confirm-norpe`, `noRpeCards()`, `openNoRpe()` opens the first with its How hard? strip; Line Call, 2026-10-13,
+    Second Serve D3: the ring on each closed card logs a whole day with no RPE, `scripts/headless/no-rpe.js`); then on the paper
+    *How hard was this session?* as a 22 px green heading and two rows of five 52 px keys,
     *Notes for Coach* and its box, and **Done · send to coach ✓** full width, 56 px, then the WhatsApp row UNDER Done
     (`.finish-wa`, since 2026-10-13: it sat between the note and Done and competed with it; the Your history recipe: icon, a
     mono label over the line, a grey ›; `sessionWaUrl()` reads the note from the finish card too now, so a note typed before

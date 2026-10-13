@@ -280,7 +280,8 @@
 // v149: program.html changed (2026-10-13): Ask Amir under ⋯ on the session bar, naming the exercise that is open.
 // v150: program.html changed (2026-10-13): the guide promises only what the plan has; the Why door shows from one Because.
 // v151: program.html changed (2026-10-13): the demo is dated to week 2 when it opens, ?pane= opens a Library pane, the demo's account line tells the truth.
-const CACHE = 'aap-v151';
+// v152: program.html changed (2026-10-13): the ready finish card says "No RPE on N lifts. Add them ›" when lifts have none.
+const CACHE = 'aap-v152';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
