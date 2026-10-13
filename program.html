@@ -8146,7 +8146,7 @@ function renderHome() {
         </div>
         <div class="complete-note">
           <div class="complete-note-label">Notes for Coach (optional)</div>
-          <textarea class="complete-note-input" data-key="${noteKey}" placeholder="How it went, anything that felt off…">${esc(savedNote)}</textarea>
+          <textarea class="complete-note-input" dir="auto" data-key="${noteKey}" placeholder="How it went, anything that felt off…">${esc(savedNote)}</textarea>
         </div>
       </div>
       <div class="finish-hint" aria-live="polite"></div>
@@ -12227,7 +12227,11 @@ function paintRateFold(day) {
   const el = document.querySelector(`#complete-${day} .rate-fold .rf-line`);
   if (!el) return;
   const txt = rateFoldLine(day);
-  if (el.textContent !== txt) el.textContent = txt;
+  if (el.textContent === txt) return;
+  // The note keeps its own direction inside the English line (Line Call, 2026-10-13; 24% of day notes are Persian): in a <bdi>,
+  // a Persian note reads right to left and its full stop and the closing quote stay where they belong. The text is unchanged.
+  const m = txt.match(/^(.* · Note: ")([\s\S]*)(")$/);
+  el.innerHTML = m ? esc(m[1]) + '<bdi>' + esc(m[2]) + '</bdi>' + esc(m[3]) : esc(txt);
 }
 
 // ── The report's way to the coach: an outbox on this phone (WK-04) ──
@@ -14419,9 +14423,9 @@ function initNotes() {
       `<summary>
          <svg class="chev" viewBox="0 0 10 10"><path d="M3 1 L7 5 L3 9"/></svg>
          Note
-         <span class="note-preview">${esc(saved)}</span>
+         <span class="note-preview" dir="auto">${esc(saved)}</span>
        </summary>
-       <textarea placeholder="Anything about today's sets? Your coach sees it with this session.">${esc(saved)}</textarea>`;
+       <textarea dir="auto" placeholder="Anything about today's sets? Your coach sees it with this session.">${esc(saved)}</textarea>`;
     const ta = det.querySelector('textarea');
     const preview = det.querySelector('.note-preview');
     ta.addEventListener('input', e => {
@@ -15430,7 +15434,7 @@ function paintLastTime(card) {
         <button type="button" class="lt-hist">History ›</button></div>
       <div class="lt-big">${parts.length ? parts.join(' · ') : esc(e.gear || '')}</div>
       ${low ? `<div class="lt-rpe"><span class="lt-low">low-readiness day</span></div>` : ''}
-      ${e.note ? `<div class="lt-note">“${esc(e.note)}”</div>` : ''}`;
+      ${e.note ? `<div class="lt-note">“<bdi>${esc(e.note)}</bdi>”</div>` : ''}`;
     strip.querySelector('.lt-hist').addEventListener('click', ev => { ev.stopPropagation(); openHistorySheet(card); });
     place(strip);
     return;
@@ -15582,7 +15586,7 @@ function openHistorySheet(card) {
     const low = h.readiness != null && h.readiness <= 2.5;
     return `<div class="hs-row"><span class="hs-d">${esc(dl.when)}${rs ? ' · RPE ' + rs : ''}${low ? ' · low day' : ''}</span>
       <span class="hs-v">${esc(txt)}</span>
-      ${e.note ? `<span class="hs-n">“${esc(e.note)}”</span>` : ''}</div>`;
+      ${e.note ? `<span class="hs-n">“<bdi>${esc(e.note)}</bdi>”</span>` : ''}</div>`;
   }).join('');
 
   const hasRecord = typeof ceilingLifts === 'function' && ceilingLifts().some(l => l.lift === name);

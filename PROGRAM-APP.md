@@ -549,6 +549,12 @@ costs more than one tap.
   box shows `8–10` and reps are recorded only when typed. `repCount()` still takes the low end,
   for Personal Records only.
 - Weight and reps inputs normalise Persian/Arabic digits (`normDigits()`); live logs held `۲۵`.
+- **A Persian note reads right to left** (Line Call, 2026-10-13; Second Serve D6; 24% of day notes are in Persian). The
+  app had no `dir` anywhere, so a Persian note sat left-aligned with its full stop at the start and the "Your rating" line
+  wrapped its quote and full stop to the wrong side. Both text boxes (the day note, an exercise's note) and the note's
+  folded preview are `dir="auto"`, and every place a note is shown back puts it in a `<bdi>`: the rating line
+  (`paintRateFold()`, the same text), a circuit's last time (`.lt-note`) and the History sheet (`.hs-n`). A new place that
+  shows an athlete's own words does the same. `scripts/headless/persian-notes.js` (9 checks).
 - **Weight boxes open EMPTY, with last time's weight as a hint (Fork 3B, 2026-09-26).** Amir picked
   *"Hint plus Same as last"*. They used to open holding last session's weights as real numbers, so a
   bare tick logged last week's load as today's and every number built on the log (records included)
