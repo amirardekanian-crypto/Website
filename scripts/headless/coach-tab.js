@@ -119,15 +119,15 @@ const tap = async (p, sel) => { await p.evaluate(sel => document.querySelector(s
     t.check('panel: the button "Open WhatsApp" has the cover\'s light-ring look (--tile-on-green, a light ring, 8 px corners, 48 px, white Barlow Condensed capitals), never clay',
       o.btn.text === 'Open WhatsApp' && o.btn.bg === btnBg && /rgba\(255, 255, 255, 0\.22\)/.test(o.btn.ring) && o.btn.radius === '8px' && o.btn.h >= 48 && o.btn.color === 'rgb(255, 255, 255)' && o.btn.caps === 'uppercase' && /^Barlow Condensed\|700$/.test(o.btn.font) && !o.btn.clay, JSON.stringify(o.btn));
     t.check('panel: his photo is graded into the green on the right (luminosity), decorative (alt empty)', !!o.img && /coach\.jpg$/.test(o.img.src) && o.img.blend === 'luminosity' && o.img.alt === '' && o.img.pos === 'absolute', JSON.stringify(o.img));
-    t.check('panel: signed at the foot, his signature in white and his photo as the week note signs (.wn-sig, .wn-av with coach.jpg), under the button',
-      !!o.by && o.by.sig && o.by.sigColor === 'rgb(255, 255, 255)' && o.by.sigLabel === 'Amir' && o.by.av && /coach\.jpg$/.test(o.by.avImg) && o.by.avHidden === 'true' && o.by.avSize >= 36 && /255, 255, 255/.test(o.by.avRing) && o.by.sigTop > o.by.btnBottom && o.by.avTop > o.by.btnBottom && o.by.avTop + o.by.avSize <= o.by.panelBottom, JSON.stringify(o.by));
+    t.check('panel: signed at the foot, his signature in white, under the button; his photo shows ONCE, graded into the green (no second avatar by the signature: the audit call of 2026-10-13)',
+      !!o.by && o.by.sig && o.by.sigColor === 'rgb(255, 255, 255)' && o.by.sigLabel === 'Amir' && !o.by.av && o.by.sigTop > o.by.btnBottom, JSON.stringify(o.by));
     // ONE green thing: exactly one element on the screen paints the cover's green (the --hero gradient)
     const greens = await p.evaluate(hero => [...document.querySelectorAll('#screen-notes *')].filter(e => getComputedStyle(e).backgroundImage === hero).map(e => e.className), hero);
     t.check('the screen has exactly one green thing: the panel (no other element paints --hero)', greens.length === 1 && /coach-panel/.test(greens[0]), JSON.stringify(greens));
     // the whole panel is the link: a tap on the title, the button, the signature and the photo all land on the one <a>, with that href
     const hits = [];
     await p.evaluate(() => { window.__hits = []; document.addEventListener('click', e => { const a = e.target.closest('a'); if (a && a.closest('#screen-notes')) { window.__hits.push(a.getAttribute('href')); e.preventDefault(); } }, true); });
-    for (const sel of ['.coach-panel-title', '.coach-panel-btn', '.coach-panel-by .wn-sig', '.coach-panel-by .wn-av', '.coach-panel-line']) { await tap(p, sel); }
+    for (const sel of ['.coach-panel-title', '.coach-panel-btn', '.coach-panel-by .wn-sig', '.coach-panel-img', '.coach-panel-line']) { await tap(p, sel); }
     const got = await p.evaluate(() => window.__hits);
     t.check('panel: a tap on the title, the button, the signature, the photo or the line is the same one link (same href each time)', got.length === 5 && got.every(h => h === want), JSON.stringify(got.map(h => h === want)));
     t.check('no page errors (panel)', p.errs.length === 0, p.errs.join(' | '));

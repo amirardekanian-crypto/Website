@@ -800,6 +800,22 @@ tokens for one day; the copy is gone).
   sideways scroll in both themes, Records' and Body weight's ← and Back, Records from an exercise still returning to it),
   with `smoke.js` and `cycle-end.js` updated.
 
+## 🧩 Every other screen in the Centre Court look (2026-10-13, continuing)
+
+Amir: *"continue until everything has a consistent design"*. One screen at a time, each its own block in the sheet named
+`… IN THE CENTRE COURT LOOK (2026-10-13)`, each with its own headless suite, and the parts are always Centre Court's (a tab
+screen's header as Progress's; ONE green thing per screen; paper rows with hairlines; the door row; the P24 numeral; his
+signature for his voice). The plan and its order are in the audit artifact *Quiet Frame* (v2/v3).
+
+- **Coach** (`renderNotes()`, `coachContactHtml()`; `scripts/headless/coach-tab.js`, 102 checks): the header `● YOUR COACH` ·
+  **Coach Amir** · *Strength & conditioning coach*; the WhatsApp panel is the screen's one green thing (`a.coach-panel`, ONE link,
+  the same `coachWhatsAppUrl()` and pre-filled message, his photo graded into the green, the eyebrow *Questions, swaps, anything
+  that hurts*, **Message me on WhatsApp**, *Form videos welcome. I answer there, not in the app.*, the light-ring **Open WhatsApp**
+  as a span inside the link, his signature at the foot; his photo shows once, so no small avatar by the signature); the number
+  as selectable mono text (`COACH_WHATSAPP_SHOWN`); **Notes from Amir** as fold rows (`button.cn-row`, `toggleCoachNote()`, one
+  open at a time, `aria-expanded`); **How the app works** as one door row. The hero, the coloured icon tiles, *Tap to read* and
+  the section labels are gone.
+
 ## 🏠 Home, led by the training (HOME-02, 2026-09-26)
 
 **Since 2026-10-12 Home leads with the week and its pieces moved: read *Home and Progress in the Centre Court look*
