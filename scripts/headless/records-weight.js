@@ -547,9 +547,10 @@ const COVER = `(() => {
   {
     const src = fs.readFileSync(path.join(__dirname, '..', '..', 'program.html'), 'utf8').replace(/\r\n/g, '\n');
     const head = '/* ══ RECORDS AND BODY WEIGHT IN THE CENTRE COURT LOOK (2026-10-13) ';
-    const i = src.indexOf(head), j = src.indexOf('/* ══ CENTRE COURT:'), k = src.indexOf('/* ══ COACH IN THE CENTRE COURT LOOK');
+    const i = src.indexOf(head), k = src.indexOf('/* ══ COACH IN THE CENTRE COURT LOOK');
+    const j = src.indexOf('/* ══ ', i + head.length);   // the next block's header (SHEETS AND NOTICES, then CENTRE COURT)
     const block = i > 0 ? src.slice(i, j).replace(/\/\*[\s\S]*?\*\//g, '') : '';
-    t.check('CSS: ONE block headed "RECORDS AND BODY WEIGHT IN THE CENTRE COURT LOOK (2026-10-13)", after the COACH block and immediately before CENTRE COURT', i > 0 && k > 0 && k < i && j > i && src.split(head).length === 2 && /^\s*$/.test(src.slice(j - 3, j)), [k, i, j].join());
+    t.check('CSS: ONE block headed "RECORDS AND BODY WEIGHT IN THE CENTRE COURT LOOK (2026-10-13)", after the COACH block and immediately before the next block (SHEETS AND NOTICES, then CENTRE COURT)', i > 0 && k > 0 && k < i && j > i && src.split(head).length === 2 && /^\s*$/.test(src.slice(j - 3, j)), [k, i, j].join());
     const decl = block.match(/(^|[;{\s])--[a-z0-9-]+\s*:/g) || [];
     t.check('CSS: the block declares no custom property (no colour token of its own), and no hex colour but white', decl.length === 0 && !(block.match(/#[0-9a-fA-F]{3,8}\b/g) || []).some(h => !/^#fff$/i.test(h)), JSON.stringify(decl.concat(block.match(/#[0-9a-fA-F]{3,8}\b/g) || []).slice(0, 8)));
     t.check('CSS: the old rules are gone (no .ceil-hero, .ceil-card, .ceil-add, .chip-on, .is-pr in the sheet or the script)', !/\.ceil-hero|\.ceil-card|\.ceil-add\b|\.chip-on|\bis-pr\b|ceil-gain/.test(src), (src.match(/\.ceil-hero|\.ceil-card|\.ceil-add\b|\.chip-on|\bis-pr\b|ceil-gain/g) || []).join());

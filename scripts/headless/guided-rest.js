@@ -75,7 +75,7 @@ const t = H.checker();
     const sheet = await p.evaluate(() => { const ov = document.getElementById('hist-overlay'); return { on: ov.classList.contains('visible'), name: (ov.querySelector('.ax-name') || {}).textContent, guided: document.getElementById('stepOverlay').classList.contains('visible'),
       z: [getComputedStyle(ov).zIndex, getComputedStyle(document.getElementById('stepOverlay')).zIndex].join('/') }; });
     t.check('the ⓘ opens the About sheet over Guided (the sheet above it)', sheet.on && sheet.name === 'Box Jump' && sheet.guided && Number(sheet.z.split('/')[0]) > Number(sheet.z.split('/')[1]), JSON.stringify(sheet));
-    await p.click('#hist-overlay .ax-foot .readiness-skip'); await p.waitForTimeout(300);
+    await p.click('#hist-overlay .sheet-close'); await p.waitForTimeout(300);
     const back = await p.evaluate(() => ({ sheet: document.getElementById('hist-overlay').classList.contains('visible'), guided: document.getElementById('stepOverlay').classList.contains('visible'),
       pos: STEP.pos, name: document.getElementById('step-name').textContent, st: document.getElementById('step-scroll').scrollTop }));
     t.check('closing the About sheet leaves Guided on the same step, name and scroll', !back.sheet && back.guided && back.pos === sc0.pos && back.name === sc0.name && back.st === sc0.st, JSON.stringify([sc0, back]));
@@ -86,7 +86,7 @@ const t = H.checker();
     t.check('a Because: the bar\'s ⓘ is the clay disc, named "Why you have …"', why.shown && why.why && why.bg === 'rgb(194, 81, 44)' && why.label === 'Why you have Barbell Back Squat', JSON.stringify(why));
     await p.click('#step-about'); await p.waitForTimeout(400);
     t.check('…and it opens the sheet with its reason ("Why am I doing this?")', await p.evaluate(() => !!document.querySelector('#hist-overlay.visible .ax-hq')));
-    await p.click('#hist-overlay .ax-foot .readiness-skip'); await p.waitForTimeout(250);
+    await p.click('#hist-overlay .sheet-close'); await p.waitForTimeout(250);
     await goStep(p, 'Mystery Carry');
     t.check('an exercise with no entry, no reason and no history has no ⓘ', await p.evaluate(() => document.getElementById('step-about').hidden && document.getElementById('step-about').getBoundingClientRect().width === 0));
 
@@ -355,7 +355,7 @@ const t = H.checker();
         t.check(`${tag}: a name of seventy characters stays inside two lines`, g2.length === 0, g2.join('; '));
         await goStep(p, 'Barbell Back Squat');
         if (!note || !dark) await p.screenshot({ path: path.join(shots, `guided-${w}x${h}${dark ? '-dark' : ''}${note ? '-limits' : ''}.png`) });
-        if (w === 320 || w === 375 || (w === 390 && dark)) { await p.click('#step-about'); await p.waitForTimeout(450); if (!note) await p.screenshot({ path: path.join(shots, `guided-about-${w}x${h}${dark ? '-dark' : ''}.png`) }); await p.click('#hist-overlay .ax-foot .readiness-skip'); await p.waitForTimeout(250); }
+        if (w === 320 || w === 375 || (w === 390 && dark)) { await p.click('#step-about'); await p.waitForTimeout(450); if (!note) await p.screenshot({ path: path.join(shots, `guided-about-${w}x${h}${dark ? '-dark' : ''}.png`) }); await p.click('#hist-overlay .sheet-close'); await p.waitForTimeout(250); }
         await doneRest(p);
         const r1 = await sweepRest(p, false);
         t.check(`${tag}: the Guided rest screen fits (the band, the log, the keys, Next)`, r1.length === 0, r1.join('; '));

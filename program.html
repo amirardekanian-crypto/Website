@@ -696,28 +696,8 @@
   /* Give the overview a little top breathing room now that the nav bar is gone */
   #home-overview { padding-top: 8px; }
   /* The greeting (.home-greet, Good morning + first name) is drawn by the HOME AND PROGRESS block at the end of this sheet. */
-  /* The plan saved on this phone (REL-01, 2026-09-26): one quiet line under the
-     greeting while this run shows the phone's copy. Card grey and ink, no alarm
-     colour, and the tokens carry it into dark mode. */
-  .plan-offline {
-    display: flex; align-items: center; gap: 9px;
-    margin: -8px 24px 20px; padding: 9px 12px;
-    border: 1px solid var(--grey-mid); border-radius: 10px;
-    background: var(--grey-card); color: var(--grey-text);
-    font-size: var(--fs-small); line-height: 1.35;
-  }
-  .plan-offline[hidden] { display: none; }
-  .plan-offline b { color: var(--grey-dark); font-weight: 600; }
-  .po-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--grey-text); opacity: .6; }
-  .po-dot.on { background: var(--yellow); opacity: 1; }
-  .po-txt { flex: 1; min-width: 0; }
-  .po-when { white-space: nowrap; }   /* "yesterday 19:50" never splits across lines */
-  .po-btn {
-    flex: none; min-height: 34px; padding: 7px 14px; border: 0; border-radius: 8px;
-    background: var(--yellow); color: var(--on-accent); cursor: pointer;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body);
-    letter-spacing: 1px; text-transform: uppercase;
-  }
+  /* The plan saved on this phone (REL-01, 2026-09-26): one banner under the greeting while this run shows the phone's copy (.plan-offline,
+     .po-*: the banner look, the SHEETS AND NOTICES block). */
   /* Section header ("This Week") */
   .home-section-head {
     display: flex; align-items: baseline; justify-content: space-between;
@@ -750,17 +730,7 @@
   .complete-sugg-slot:not(:empty) { margin: 0 0 4px; }
   .session-complete .lib-sugg { background: var(--grey-bg); }
   /* "2 of 3 sessions done this week" (HOME-01), from paintWeek(). */
-  /* An unfinished day filed by itself (DATA-02, fileUnfinished()): one card above This Week, clay edge like a Coach's Note. */
-  .uf-card { margin: 0 24px 16px; padding: 14px 16px; border-radius: 12px; display: grid; gap: 6px;
-    background: rgba(199,85,47,0.08); box-shadow: inset 3px 0 0 var(--ice); }
-  .uf-k { font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700; letter-spacing: 1.2px;
-    text-transform: uppercase; color: var(--clay-ink); }
-  .uf-t { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-lead); color: var(--grey-dark); }
-  .uf-s { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); color: var(--grey-text); }
-  .uf-a { display: flex; gap: 10px; margin-top: 6px; }
-  .uf-send { min-height: 44px; padding: 0 16px; border-radius: 8px; cursor: pointer;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 1px; text-transform: uppercase; }
-  .uf-send { flex: 1; background: var(--yellow); color: var(--on-accent); border: 0; }
+  /* An unfinished day filed by itself (DATA-02, fileUnfinished()): one banner above This Week (.uf-*: the banner look, the SHEETS AND NOTICES block). */
   .home-week-sum { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); color: var(--grey-text);
     margin: -6px 24px 12px; }
   .home-week-sum:empty { display: none; }
@@ -1020,97 +990,15 @@
     padding: 0;
   }
   .readiness-overlay.visible { display: flex; animation: fadeUp 0.25s ease both; }
-  /* The sheet's ‹ Back (SHEET-01): only when a page was opened from another page. */
-  .sheet-back { display: block; margin: -6px 0 8px -8px; padding: 10px 8px; min-height: 44px;
-    background: none; border: 0; cursor: pointer; font-family: 'Space Mono', monospace; font-size: var(--fs-small);
-    font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--green-ink); }
+  /* The sheet's geometry only. Its frame, its top row (the handle, ‹ Back, Close), the pages' parts, the readiness keys and Begin are the
+     SHEETS AND NOTICES IN THE CENTRE COURT LOOK block, before CENTRE COURT. */
   .readiness-modal {
-    background: var(--grey-bg);
     width: 100%; max-width: 520px;
     max-height: 96vh; overflow-y: auto; overscroll-behavior: contain;
-    border-radius: 18px 18px 0 0;
-    padding: 18px 18px 16px;
-    box-shadow: 0 -8px 40px rgba(0,0,0,0.25);
-    border-top: 3px solid var(--ice);
   }
-  /* The handle says "this slides down" (NAV-01's close grammar): initSheetSwipe() closes the sheet on a
-     swipe down from here, or from anywhere while the sheet is scrolled to its top. It stays in view as the
-     sheet scrolls. A wide screen shows a centred dialog instead, with no handle. */
-  .readiness-modal::before { content: ''; display: block; position: sticky; top: -12px; z-index: 1;
-    width: 40px; height: 5px; border-radius: 3px; background: var(--grey-mid); margin: -10px auto 12px; }
-  body[data-dark] .readiness-modal::before { background: #444; }
   @media (min-width: 560px) {
     .readiness-overlay { align-items: center; }
-    .readiness-modal { border-radius: 18px; border-top: 3px solid var(--ice); padding: 26px 24px 22px; }
-    .readiness-modal::before { display: none; }
   }
-  .readiness-eyebrow {
-    font-family: 'Space Mono', monospace;
-    font-size: var(--fs-label); letter-spacing: 2px; text-transform: uppercase;
-    color: var(--clay-ink); margin-bottom: 3px;
-  }
-  .readiness-title {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
-    font-size: var(--fs-title); line-height: 1; letter-spacing: 0.5px;
-    text-transform: uppercase; color: var(--grey-dark); margin: 0 0 4px;
-  }
-  .readiness-sub {
-    font-family: 'Barlow', sans-serif; font-size: var(--fs-small); line-height: 1.35;
-    color: var(--grey-text); margin: 0 0 12px;
-  }
-  .readiness-q { margin-bottom: 12px; }
-  .readiness-q-text {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
-    font-size: var(--fs-body); letter-spacing: 0.4px; color: var(--grey-dark);
-    margin-bottom: 6px;
-  }
-  .readiness-scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-  .readiness-opt {
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
-    background: var(--white); border: 1px solid var(--grey-mid);
-    border-radius: 10px; padding: 7px 3px 6px; cursor: pointer;
-    transition: background 0.12s, border-color 0.12s, transform 0.08s;
-  }
-  .readiness-opt:active { transform: scale(0.95); }
-  .readiness-opt-num {
-    font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-body);
-    color: var(--grey-dark); line-height: 1;
-  }
-  .readiness-opt-lab {
-    font-family: 'Barlow', sans-serif; font-size: var(--fs-label); line-height: 1.15;
-    text-align: center; color: var(--grey-text); min-height: 26px;   /* two lines at 11 px, so every digit sits level */
-    display: flex; align-items: center;
-  }
-  .readiness-opt.selected {
-    background: var(--ice); border-color: var(--ice);
-  }
-  .readiness-opt.selected .readiness-opt-num,
-  .readiness-opt.selected .readiness-opt-lab { color: var(--on-accent); }
-  .readiness-actions { margin-top: 14px; }
-  .readiness-begin {
-    width: 100%;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
-    font-size: var(--fs-body); letter-spacing: 1.5px; text-transform: uppercase;
-    background: var(--yellow); color: var(--on-accent);
-    border: none; padding: 13px; border-radius: 8px; cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-  }
-  .readiness-begin:active { transform: scale(0.98); }
-  .readiness-begin:disabled { opacity: 0.4; cursor: not-allowed; }
-  .readiness-skip {
-    display: block; width: 100%; margin-top: 0; min-height: 44px;   /* a 44 px target: it was 15 px tall (NAV-01) */
-    background: none; border: none; cursor: pointer;
-    font-family: 'Barlow', sans-serif; font-size: var(--fs-small);
-    color: var(--grey-text); text-decoration: underline; text-underline-offset: 3px;
-  }
-  body[data-dark] .readiness-modal { background: #181818; }
-  body[data-dark] .readiness-title { color: #f0f0f0; }
-  body[data-dark] .readiness-q-text { color: #e8e8e8; }
-  body[data-dark] .readiness-opt { background: #242424; border-color: #3a3a3a; }
-  body[data-dark] .readiness-opt-num { color: #f0f0f0; }
-  /* Selected state must out-specify `body[data-dark] .readiness-opt` above, or
-     the accent background never lands and a tapped choice looks unselected. */
-  body[data-dark] .readiness-opt.selected { background: var(--ice); border-color: var(--ice); }
 
   /* ── The finish card (WK-04, 2026-09-27) — see refreshConfirmCard() / finishDay() ──
      In progress: the day's progress and a quiet "Finish early" (two taps). Ready (every set
@@ -1689,37 +1577,10 @@
     margin-top: -3px;
   }
 
-  /* The History sheet — the readiness sheet's own frame, above Guided Mode. */
+  /* The History sheet — the readiness sheet's own frame, above Guided Mode. Its parts are the SHEETS AND NOTICES block. */
   .hist-overlay { z-index: 210; }
-  .hs-lbl {
-    font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 1.3px;
-    text-transform: uppercase; color: var(--grey-text); margin: 2px 0 4px;
-  }
-  .hs-chart { width: 100%; height: auto; display: block; margin-bottom: 8px; overflow: visible; }
-  .hs-base { stroke: var(--grey-mid); stroke-width: 1; }
-  .hs-area { fill: var(--ice); fill-opacity: 0.10; }
-  .hs-line { fill: none; stroke: var(--ice); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
-  .hs-dot { fill: var(--ice); }
-  .hs-tick { font-family: 'Space Mono', monospace; font-size: var(--fs-label); fill: var(--grey-text); }
-  .hs-end { font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700; fill: var(--ice); }
-  body[data-dark] .hs-line { stroke: #E06B43; }
-  body[data-dark] .hs-area, body[data-dark] .hs-dot { fill: #E06B43; }
-  body[data-dark] .hs-end { fill: #E06B43; }
-  .hs-list { display: grid; }
-  .hs-row { display: grid; gap: 3px; padding: 10px 0; border-top: 1px solid var(--grey-card); }
-  body[data-dark] .hs-row { border-top-color: #2a2a2a; }
-  .hs-d { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.6px; text-transform: uppercase; color: var(--grey-text); }
-  .hs-v { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); color: var(--grey-dark); overflow-wrap: anywhere; }
-  body[data-dark] .hs-v { color: #eee; }
   .hs-d b { color: var(--clay-ink); }
   body[data-dark] .hs-d b { color: #E06B43; }
-  .hs-n { font-family: 'Barlow', sans-serif; font-style: italic; font-size: var(--fs-small); color: var(--grey-text); white-space: pre-line; }
-  .hs-actions { display: grid; gap: 4px; margin-top: 12px; }
-  .hs-link {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 0.5px;
-    text-transform: uppercase; color: var(--clay-ink); background: none; border: 1.5px solid var(--ice);
-    border-radius: 10px; padding: 11px; cursor: pointer;
-  }
 
   /* ── The Spine (2026-09-24) — see paintSpine() / openExerciseSheet() ──
      The card gains ONE small thing: an outlined "i" (Amir: "I just dont want to make my
@@ -1877,7 +1738,7 @@
     --ax-ink: var(--grey-dark); --ax-grey: var(--grey-text); --ax-mint: #6DBE95; --ax-chev: #0E4A36;
     --ax-hero: radial-gradient(125% 90% at 100% 0%, #1B7254 0%, #0E4A36 46%, #082D20 100%);
     --ax-tile: radial-gradient(120% 120% at 0% 0%, #1B6A4E 0%, #0E4A36 55%, #0B3E2D 100%);
-    position: relative; padding: 0; border-top: 0; background: var(--ax-paper);
+    position: relative; padding: 0 0 env(safe-area-inset-bottom, 0px); background: var(--ax-paper);
   }
   body[data-dark] .readiness-modal.ax-sheet {
     --ax-paper: #181818; --ax-sand: #202020; --ax-line: #333333; --ax-row: #242424;
@@ -1885,14 +1746,8 @@
     --ax-hero: radial-gradient(125% 90% at 100% 0%, #17654A 0%, #0D4532 46%, #072A1E 100%);
     --ax-tile: radial-gradient(120% 120% at 0% 0%, #1A6A4D 0%, #12573F 55%, #0D4532 100%);
   }
-  .readiness-modal.ax-sheet::before { display: none; }
-  /* ‹ Back (SHEET-01) sits on the green, top left, and the hero makes room for it. */
-  .readiness-modal.ax-sheet > .sheet-back { position: absolute; z-index: 2; top: 10px; left: 10px; margin: 0; color: #fff; }
-  .readiness-modal.ax-sheet > .sheet-back + .ax-hero { padding-top: 52px; }
-
-  .ax-hero { position: relative; color: #fff; padding: 12px 20px 26px; background: var(--ax-hero); }
-  .ax-handle { width: 40px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.38); margin: 0 auto 18px; }
-  @media (min-width: 560px) { .ax-handle { visibility: hidden; } }
+  /* The sheet's top row (the handle, ‹ Back, Close: the SHEETS AND NOTICES block) lies over the green, so the hero makes room for it. */
+  .ax-hero { position: relative; color: #fff; padding: 56px 20px 26px; background: var(--ax-hero); }
   .ax-eyebrow { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace;
     letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.8); }
   .ax-eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: var(--ax-mint); }
@@ -2007,8 +1862,6 @@
   .ax-cue::before { content: ''; flex: none; width: 4px; border-radius: 2px; background: var(--green-ink); }
   .ax-cue.bad::before { background: var(--ice); }
   body[data-dark] .ax-cue.bad::before { background: #E06B43; }
-  .ax-foot { display: flex; justify-content: center; padding: 6px 20px calc(14px + env(safe-area-inset-bottom)); background: var(--ax-paper); }
-  .ax-foot .readiness-skip { min-height: 44px; }
   @media (max-width: 359px) {
     .ax-hero, .ax-band { padding-left: 18px; padding-right: 18px; }
     .ax-inplan { grid-template-columns: 98px 1fr; gap: 12px; margin-left: -18px; margin-right: -18px; padding-left: 18px; padding-right: 18px; }
@@ -2094,31 +1947,7 @@
      session bar, the set to tick, the RPE strip that just opened). paintHints() places it; its look is the CENTRE
      COURT block. */
   @keyframes onbIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
-  /* Your account (NAV-02): drawn into the one sheet (#hist-overlay) by openAccount(). */
-  .acct-list { display: flex; flex-direction: column; margin-top: 14px; border-top: 1px solid var(--grey-mid); }
-  .acct-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px;
-    padding: 0 2px; border: 0; border-bottom: 1px solid var(--grey-mid); background: transparent; width: 100%;
-    font-family: 'Barlow', sans-serif; font-size: var(--fs-body); font-weight: 500; color: var(--grey-dark);
-    text-align: left; text-decoration: none; cursor: pointer; }
-  .acct-theme { cursor: default; }
-  .acct-go { color: var(--grey-text); font-size: var(--fs-title); line-height: 1; }
-  .acct-seg { display: inline-flex; border: 1px solid var(--grey-mid); border-radius: 10px; overflow: hidden; }
-  .acct-seg button { min-width: 64px; min-height: 40px; padding: 0 12px; border: 0; background: transparent; cursor: pointer;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 0.8px; text-transform: uppercase;
-    color: var(--grey-text); }
-  .acct-seg button[aria-pressed="true"] { background: var(--yellow); color: var(--on-accent); }
-  .acct-out { margin-top: 22px; display: flex; flex-direction: column; gap: 8px; }
-  .acct-signout { min-height: 48px; border-radius: 10px; border: 1px solid var(--grey-mid); background: transparent; cursor: pointer;
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 1px; text-transform: uppercase;
-    color: var(--clay-ink); }
-  .acct-signout.armed { background: #C7552F; border-color: #C7552F; color: #fff; }
-  .acct-signout:disabled { opacity: 0.7; cursor: default; }
-  .acct-wait { margin: 0; padding: 10px 12px; border-radius: 10px; background: rgba(199,85,47,0.10); color: var(--grey-dark); font-size: var(--fs-small); line-height: 1.45; }
-  .acct-foot { margin: 0; color: var(--grey-text); font-size: var(--fs-small); text-align: center; }
-  body[data-dark] .acct-row { color: #eaeaea; border-color: #333; }
-  body[data-dark] .acct-list { border-color: #333; }
-  body[data-dark] .acct-seg, body[data-dark] .acct-signout:not(.armed) { border-color: #444; }
-  body[data-dark] .acct-wait { color: #eaeaea; background: rgba(224,107,67,0.14); }
+  /* Your account (NAV-02): drawn into the one sheet (#hist-overlay) by openAccount(); its parts are the SHEETS AND NOTICES block. */
   /* ══ NIGHT COURT — the two companion cards at the bottom of Home ══
      Amir picked this from Content/card-instrument-colours.html (2026-09-12),
      with the clay edge rule removed. Dark green surface, paper-white rules and
@@ -2502,25 +2331,7 @@
   .notes-subtitle { font-size: var(--fs-small); color: rgba(255,255,255,0.72); margin-top: 6px; font-weight: 300; }
 
   .global-tabs .nav-item { position: relative; }
-  .note-card { background: var(--white); border-radius: 8px; margin: 0 20px 12px; overflow: hidden; border: 1px solid var(--grey-mid); }
-  .note-card-header { padding: 16px 18px 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
-  .note-icon { width: 32px; height: 32px; background-color: #C7552F; background-image: linear-gradient(135deg, rgba(199,85,47,0.65) 0%, rgba(199,85,47,0.5) 100%), url('court-playbook.jpg'); background-size: cover; background-position: center; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: var(--fs-body); flex-shrink: 0; }
-  .note-card-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); flex: 1; color: var(--green-ink); }
-  .note-chevron { font-size: var(--fs-small); color: var(--grey-text); transition: transform 0.2s; }
-  .note-card.open .note-chevron { transform: rotate(180deg); }
-  .note-body { display: none; padding: 14px 18px 18px; font-size: var(--fs-body); line-height: 1.65; color: #444; border-top: 1px solid var(--grey-card); }
-  .note-card.open .note-body { display: block; }
-  /* Note bodies render real HTML (paragraphs/lists/bold) — the global `* { margin:0; padding:0 }`
-     reset strips default browser spacing, so restore it explicitly here. Applies to the "Using the app"
-     guide cards in the help sheet (the Coach tab's own notes have .cn-body, in the COACH IN THE CENTRE COURT LOOK block). */
-  .note-body p { margin: 0 0 10px; }
-  .note-body p:last-child { margin-bottom: 0; }
-  .note-body ul { margin: 4px 0 10px; padding-left: 20px; }
-  .note-body ul:last-child { margin-bottom: 0; }
-  .note-body li { margin-bottom: 6px; }
-  .note-body li:last-child { margin-bottom: 0; }
-  .note-body strong { font-weight: 700; color: var(--grey-dark); }
-  body[data-dark] .note-body strong { color: #f0f0f0; }
+  /* The guide's cards (.note-card, the help sheet's fold rows): the SHEETS AND NOTICES block. */
 
   /* ════════════════════════════════════════════════════════════════════
      COACH TAB: the header, the WhatsApp panel, Notes from Amir and the How the app works row are drawn by the COACH IN THE CENTRE
@@ -2538,44 +2349,22 @@
   .wa-inline-go { flex: none; font-size: var(--fs-lead); }
   body[data-dark] .wa-inline { border-color: #3E9C74; color: #7FD0AC; }
 
-  /* ── Note cards (the help sheet's guide): a rounder, taller radius ── */
-  .note-card { border-radius: 14px; }
-
-  /* "Using the app" cards (the guide in the help sheet) — green icon tile + dark title (general, every client).
-     These are constant app-UI icons, so they always use the brand green tile. */
-  .app-card .note-card-title { color: var(--grey-dark); }
-  /* The guide in the sheet (COACH-02). Its one row on the Coach tab is the .hrow in the COACH IN THE CENTRE COURT LOOK block. */
-  .help-list { margin-top: 12px; }
-  .help-list .note-card { margin: 0 0 10px; }
+  /* The guide in the sheet (COACH-02): its cards are fold rows (the SHEETS AND NOTICES block). Its one row on the Coach tab is the .hrow in the
+     COACH IN THE CENTRE COURT LOOK block. */
   .nl-lab.nl-help { background: none; border: 0; padding: 0; margin: 0 1ch 0 0; font-family: inherit; font-size: inherit;
     letter-spacing: inherit; line-height: inherit; font-weight: 400; color: var(--grey-text); cursor: pointer;
     text-decoration: underline dotted; text-underline-offset: 3px; }
-  body[data-dark] .app-card .note-card-title { color: #f0f0f0; }
-  .app-card-icon {
-    width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; overflow: hidden;
-    display: flex; align-items: center; justify-content: center; color: #fff;
-    background-color: #0E4A36;
-    background-image:
-      repeating-linear-gradient(135deg, rgba(255,255,255,0.10) 0 9px, rgba(255,255,255,0) 9px 18px),
-      linear-gradient(135deg, #0E4A36 0%, #14684c 100%);
-  }
-  .app-card-icon svg { width: 24px; height: 24px; }
 
   /* ── Timer ── the rest timer (the overlay, its ring, controls, sound icon, Guided's log and Next line) is drawn by the
      GUIDED AND THE REST TIMER IN THE CENTRE COURT LOOK block, after CENTRE COURT. */
   /* A note in a box in the middle of the screen (first-timer pass, 2026-10-11): one at a time, never dims or blocks the page,
      gone by itself or on its button. Used for a first-timer's note on the closed number, the empty-weight nudge and the clock offer. */
-  .aa-toast { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 71; box-sizing: border-box;
-    width: min(86vw, 340px); display: flex; flex-direction: column; gap: 14px; padding: 20px 18px 16px; border-radius: 16px;
-    background: #1c2420; color: #fff; box-shadow: 0 12px 40px rgba(0,0,0,0.4); animation: aaToastIn 0.18s ease; }
+  .aa-toast { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); box-sizing: border-box;
+    width: min(86vw, 340px); display: flex; flex-direction: column; animation: aaToastIn 0.18s ease; }
   .aa-toast[hidden] { display: none; }
   @keyframes aaToastIn { from { opacity: 0; transform: translate(-50%, -46%); } to { opacity: 1; transform: translate(-50%, -50%); } }
-  .aa-toast-t { font-size: var(--fs-body); line-height: 1.45; }
   .aa-toast-row { display: flex; gap: 10px; justify-content: flex-end; }
-  .aa-toast-go, .aa-toast-x { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); letter-spacing: 1.2px;
-    text-transform: uppercase; min-height: 44px; padding: 0 20px; border-radius: 10px; cursor: pointer; }
-  .aa-toast-go { background: var(--yellow); border: none; color: var(--on-accent); }
-  .aa-toast-x { background: transparent; border: 1px solid rgba(255,255,255,0.4); color: #fff; }
+  /* The note box's look (the cover's green, the eyebrow, the light-ring button) and its place above the sheets: the SHEETS AND NOTICES block. */
   /* A set ticked with no weight in its box: the box pulses once or twice, the toast says why. */
   .ex-set-wbox.kg-nudge .ex-set-weight { border-color: var(--ice); animation: kgNudge 0.9s ease 2; }
   @keyframes kgNudge { 0%, 100% { box-shadow: 0 0 0 3px rgba(199,85,47,0.28); } 50% { box-shadow: 0 0 0 6px rgba(199,85,47,0.45); } }
@@ -2686,8 +2475,6 @@
   body[data-dark] .round-row { border-color: #333; color: #777; }
   body[data-dark] details.cues .cue.good { background: #1a2a0a; color: #7ab040; }
   body[data-dark] details.cues .cue.bad  { background: #2a0a0a; color: #c06060; }
-  body[data-dark] .note-body { color: #aaa; }
-  body[data-dark] .note-card { border-color: #333; background: #202020; }
 
   /* ── Animations ── */
   @keyframes fadeUp   { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -2753,69 +2540,8 @@
   }
   .video-modal-close:active { background: rgba(0,0,0,0.85); }
 
-  /* ═══ A2HS install toast ═══ */
-  .a2hs-toast {
-    position: fixed;
-    left: 50%;
-    bottom: 20px;
-    transform: translateX(-50%) translateY(120%);
-    z-index: 2000;
-    max-width: 380px;
-    width: calc(100% - 40px);
-    background: var(--white);
-    color: var(--grey-dark);
-    border: 1px solid var(--grey-mid);
-    border-radius: 6px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
-    transition: transform 0.25s cubic-bezier(0.16,1,0.3,1);
-    font-family: 'Barlow', system-ui, sans-serif;
-    font-size: var(--fs-small);
-    line-height: 1.4;
-  }
-  .a2hs-toast.is-visible { transform: translateX(-50%) translateY(0); }
-  .a2hs-toast-icon {
-    flex-shrink: 0;
-    width: 36px; height: 36px;
-    border-radius: 3px;
-    background: var(--yellow);
-    color: var(--on-accent);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-family: 'Barlow Condensed', system-ui, sans-serif;
-    font-size: var(--fs-body);
-    letter-spacing: 1px;
-  }
-  .a2hs-toast-body { flex: 1; }
-  .a2hs-toast-body strong {
-    display: block;
-    font-family: 'Barlow Condensed', system-ui, sans-serif;
-    font-weight: 700;
-    letter-spacing: 1px;
-    font-size: var(--fs-small);
-    text-transform: uppercase;
-    margin-bottom: 2px;
-  }
-  .a2hs-toast button {
-    padding: 8px 12px;
-    border-radius: 3px;
-    border: none;
-    background: var(--grey-card);
-    color: var(--grey-text);
-    font-size: var(--fs-small);
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .a2hs-toast button.primary {
-    background: var(--yellow);
-    color: var(--on-accent);
-  }
-  .a2hs-toast-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  /* ═══ A2HS install toast ═══ drawn by assets/js/shared.js (which serves the public site too); its look is the SHEETS AND NOTICES block. */
+  .a2hs-toast { position: fixed; z-index: 2000; transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); }
 
   /* ═══════════════════════════════════════════════════════════════════════
      APP FRAME — phone-width column (same setting as habits.html)
@@ -2842,8 +2568,7 @@
     left: var(--app-gutter); right: var(--app-gutter);
   }
   .global-account { right: calc(var(--app-gutter) + 14px); }
-  /* .a2hs-toast already centres itself on the viewport at max-width 380px,
-     so it lands inside the column without help. */
+  /* .a2hs-toast centres itself on the viewport at max-width var(--app-w), so it lands on the column without help. */
 
   /* Wider than the column: draw its edges so the app reads as a deliberate
      device-width app, not a layout that failed to stretch. */
@@ -2859,7 +2584,7 @@
      its size: the full-width actions at --fs-body (--fs-lead for the welcome and Done · send to coach), the
      compact ones in a card or the session bar smaller, where their widths were measured (WK-02, WK-03).
      A new primary action joins this list; a secondary one is outlined (Guided, Reset). */
-  .signin-go, .wel-go, .readiness-begin, .session-timer-btn:not(.guided), .step-primary-btn, .uf-send,
+  .signin-go, .wel-go, .readiness-begin, .session-timer-btn:not(.guided), .step-primary-btn,
   .session-confirm.ready .confirm-btn, .timer-ctrl-btn.btn-start, .wt-save, .rest-btn, .ex-1rm-save {
     background: var(--yellow); color: var(--on-accent); border: 0; border-radius: 8px; min-height: 44px;
     font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
@@ -3167,6 +2892,225 @@
     #screen-ceiling .cf-rpe .rpe-label { flex: 0 0 100%; }
     #screen-ceiling .cf-rpe .rpe-btn { flex: 1 1 0; }
   }
+  /* ══ SHEETS AND NOTICES IN THE CENTRE COURT LOOK (2026-10-13) ═══════════════════════════════════════════════════════════════
+     Amir, 2026-10-13: "continue until everything has a consistent design". The ONE sheet (#hist-overlay: History, About, Why your plan,
+     a Quality, Account, Help) and the readiness check (#readiness-overlay) share a frame and ONE sticky top row (.sheet-bar): the
+     handle, ‹ Back on the left only when a page is behind (paintSheetBack()), and Close on the right, in green on the paper and white
+     on the About sheet's green. The row is drawn once, by paintSheetBack() for the sheet and by the markup for the check, never in a
+     page; the six grey Close buttons at the foot of the pages are gone (the check keeps Skip for today: an answer, not a close). The
+     pages are Centre Court's parts: the eyebrow with a dot over the name as the title, green section titles with a hairline to the
+     edge, paper rows with a hairline between, door rows (.hrow), the day's 48 px keys, the one primary green button. Notices have
+     THREE looks (they had nine): the banner (the day's lower-day recipe: a white row, a 4 px stripe in the colour that asks, a mono
+     label, the sentence in ink, one green condensed link: Home's offline line and the filed-day card), the note box (aaToast(): the
+     cover's green with the light-ring button, above the sheets) and the first-session hint (P66, unchanged). The install offer is a
+     bottom card in the same parts. The dim behind a sheet covers the whole window (the app column's gutter was on it).
+     Colours are the app's one set (THE APP'S ONE COLOUR SET, on body); none is declared here. The sheet's gutter is the page gutter --g
+     (24 px from 560 px wide). Font sizes are the --fs-* tokens, or a display size with its comment. */
+
+  /* 1. The frame: the paper with 16 px top corners and no clay edge (clay is "look here"). The padding is the gutter at the sides only:
+     the top row and every page carry their own space above, so the row can stick at the very top of the scrolling sheet. The dim covers
+     the window, not the 520 px column. */
+  .readiness-overlay { left: 0; right: 0; }
+  .readiness-modal { padding: 0 var(--g) calc(24px + env(safe-area-inset-bottom, 0px)); border-radius: 16px 16px 0 0; background: var(--paper); scroll-padding-top: 64px; }
+  @media (min-width: 560px) { .readiness-modal { padding-left: 24px; padding-right: 24px; border-radius: 16px; } }
+
+  /* 2. ONE top row. 56 px: the handle at the top (a swipe down from it closes the sheet: initSheetSwipe()), the buttons 44 px under it.
+     Sticky, so it stays while a long page scrolls; a hairline joins it once the page has scrolled (.is-scrolled, from the sheet's own
+     scroll event). From 560 px the sheet is a centred dialog: no handle, the same row. */
+  .sheet-bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: flex-end; min-height: 56px; margin: 0 calc(-1 * var(--g)); padding: 12px calc(var(--g) - 10px) 0;
+    background: var(--paper); }
+  .sheet-bar::before { content: ''; position: absolute; top: 7px; left: 50%; width: 40px; height: 5px; margin-left: -20px; border-radius: 3px; background: var(--box); }
+  @media (min-width: 560px) { .sheet-bar { margin-left: -24px; margin-right: -24px; padding-left: 14px; padding-right: 14px; } .sheet-bar::before { display: none; } }
+  .readiness-modal.is-scrolled > .sheet-bar { box-shadow: 0 1px 0 var(--hair); }
+  .sheet-back, .sheet-close { display: inline-flex; align-items: center; min-height: 44px; margin: 0; padding: 0 10px; border: 0; border-radius: 8px; background: none; cursor: pointer; white-space: nowrap;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
+  .sheet-close { margin-left: auto; }
+  .sheet-back:active, .sheet-close:active { background: var(--tint); }
+  .sheet-back:focus-visible, .sheet-close:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  /* The About sheet: the row lies over its green top (the top is the sheet's first pixel) and goes solid green once the page scrolls under it. */
+  .readiness-modal.ax-sheet > .sheet-bar { margin: 0 0 -56px; padding-left: 10px; padding-right: 10px; background: transparent; }   /* (two classes: it beats the 560 px rule above) */
+  .readiness-modal.ax-sheet > .sheet-bar::before { background: rgba(255,255,255,.38); }
+  .readiness-modal.ax-sheet > .sheet-bar button { color: #fff; }
+  .readiness-modal.ax-sheet > .sheet-bar button:active { background: rgba(255,255,255,.14); }
+  .readiness-modal.ax-sheet > .sheet-bar button:focus-visible { outline-color: #fff; }
+  .readiness-modal.ax-sheet.is-scrolled > .sheet-bar { background: var(--fill); box-shadow: none; }
+
+  /* 3. The head of a page: the eyebrow with a green dot (the Progress header's), the name or the question as the title, one grey line. */
+  .readiness-eyebrow { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--green-ink); }
+  .readiness-eyebrow::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--green-ink); }
+  .readiness-title { margin: 10px 0 0; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', sans-serif; letter-spacing: .3px; text-transform: uppercase; color: var(--ink);
+    text-wrap: balance; overflow-wrap: anywhere; }
+  .readiness-sub, .sp-purpose { margin: 10px 0 0; font: 400 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
+  .readiness-sub.sheet-mono { font: 400 var(--fs-label)/1.5 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* Green section titles (Progress's .prog-sec): condensed capitals in green with a hairline to the edge. */
+  .readiness-q-text, .sp-lbl, .wp-head { display: flex; align-items: center; gap: 12px; margin: 26px 0 8px; font: 700 var(--fs-body)/1.2 'Barlow Condensed', sans-serif; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--green-ink); }
+  .readiness-q-text::after, .sp-lbl::after { content: ''; flex: 1; min-width: 0; height: 1px; background: var(--hair); }
+
+  /* Door rows (Home's and Progress's .hrow recipe): white, rounded 12, a 1 px edge, a 22 px green line icon, the label in Space Mono over the
+     value, a grey ›. Account's three doors and History's way to Personal Records. */
+  :where(#hist-overlay) .hrow { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; margin: 0; padding: 12px 14px 12px 16px; border: 1px solid var(--hair); border-radius: 12px;
+    background: var(--row); color: var(--ink); cursor: pointer; text-align: left; text-decoration: none; }
+  :where(#hist-overlay) .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  :where(#hist-overlay) .hrow:active { background: var(--tint); }
+  :where(#hist-overlay) .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  :where(#hist-overlay) .hrow-ic svg { width: 22px; height: 22px; }
+  :where(#hist-overlay) .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
+  :where(#hist-overlay) .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  :where(#hist-overlay) .hrow-v { font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
+  :where(#hist-overlay) .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
+
+  /* 4. Account (openAccount()): Theme as two buttons (the day's Start and Guided pair: the chosen one filled green, the other outlined), the
+     three doors, and Sign out as quiet clay text at the end (two taps, unchanged; armed, it fills). The waiting note above it is grey. */
+  .acct-list { display: grid; gap: 10px; margin-top: 22px; }
+  .acct-theme { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); margin-bottom: 4px; }
+  .acct-lbl { font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; color: var(--ink); }
+  .acct-seg { display: grid; grid-template-columns: repeat(2, minmax(76px, 1fr)); gap: 4px; min-width: 176px; padding: 4px; border: 1px solid var(--hair); border-radius: 14px; background: var(--sand); }
+  .acct-seg button { min-height: 44px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--grey); cursor: pointer; transition: transform .1s;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .acct-seg button:active { transform: scale(0.97); }
+  .acct-seg button[aria-pressed="true"] { background: var(--btn); color: #fff; }
+  .acct-seg button:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .acct-out { display: grid; justify-items: start; gap: 6px; margin-top: 22px; }
+  .acct-wait { margin: 0 0 6px; font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
+  .acct-signout { min-height: 44px; padding: 0; border: 0; border-radius: 8px; background: none; cursor: pointer;
+    font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .8px; text-transform: uppercase; color: var(--clay-ink); }
+  .acct-signout.armed { padding: 0 16px; background: var(--clay-fill); color: #fff; }
+  .acct-signout:disabled { opacity: .7; cursor: default; }
+  .acct-signout:focus-visible { outline: 2px solid var(--clay-ink); outline-offset: 2px; }
+  .acct-foot { margin: 0; font: 400 var(--fs-small)/1.45 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
+
+  /* 5. Help (openHelp(), APP_GUIDE): each card a fold row on the paper: a 22 px green line icon, the title in Barlow 600, the app's ⌄ (it
+     turns when open), a hairline between; no coloured tiles. The card asked for is open and scrolled to (under the row: scroll-margin). */
+  .help-list { margin: 22px 0 0; border-top: 1px solid var(--hair); }
+  .note-card { margin: 0; border: 0; border-bottom: 1px solid var(--hair); border-radius: 0; background: none; overflow: visible; scroll-margin-top: 64px; }
+  .note-card-header { display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 12px 0; cursor: pointer; user-select: none; }
+  .app-card-icon { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  .app-card-icon svg { width: 22px; height: 22px; }
+  .note-card-title { flex: 1; min-width: 0; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; color: var(--ink); text-wrap: balance; }
+  .note-chevron { flex: none; width: 18px; height: 18px; font-size: 0; background: var(--grey); transition: transform .2s ease;
+    -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
+  .note-card.open .note-chevron { transform: rotate(180deg); }
+  .note-body { display: none; padding: 0 0 22px 36px; font: 400 var(--fs-body)/1.65 'Barlow', sans-serif; color: var(--ink); }
+  .note-card.open .note-body { display: block; }
+  .note-body p { margin: 0 0 11px; }
+  .note-body p:last-child { margin-bottom: 0; }
+  .note-body ul { margin: 4px 0 11px; padding-left: 20px; }
+  .note-body ul:last-child { margin-bottom: 0; }
+  .note-body li { margin-bottom: 6px; }
+  .note-body li:last-child { margin-bottom: 0; }
+  .note-body strong { font-weight: 700; color: var(--green-ink); }
+  @media (prefers-reduced-motion: reduce) { .note-chevron { transition: none; } }
+
+  /* 6. History (openHistorySheet()): the chart on the paper (the line and the dots green), the sessions as paper rows with a hairline between
+     (the date and RPEs in Space Mono, the set line in Barlow bold, the note in italic grey), Personal Records as a door row. */
+  .hs-lbl { margin: 22px 0 6px; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  .hs-chart { display: block; width: 100%; height: auto; margin: 0 0 4px; overflow: visible; }
+  .hs-base { stroke: var(--hair); stroke-width: 1; }
+  .hs-area { fill: var(--green-ink); fill-opacity: .08; }
+  .hs-line { fill: none; stroke: var(--green-ink); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+  .hs-dot { fill: var(--green-ink); }
+  .hs-tick { font: 400 var(--fs-label) 'Space Mono', monospace; fill: var(--grey); }
+  .hs-end { font: 700 var(--fs-label) 'Space Mono', monospace; fill: var(--green-ink); }
+  .hs-list { display: grid; margin-top: 10px; }
+  .hs-row { display: grid; gap: 4px; padding: 14px 0; border-top: 1px solid var(--hair); }
+  .hs-row:first-child { border-top: 0; }
+  .hs-d { font: 400 var(--fs-label)/1.4 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); }
+  .hs-v { font: 700 var(--fs-lead)/1.3 'Barlow', sans-serif; color: var(--ink); overflow-wrap: anywhere; }
+  .hs-n { font: italic 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); white-space: pre-line; }
+  .hs-actions { display: grid; gap: 10px; margin-top: 22px; }
+
+  /* 7. Why your plan looks like this, and a Quality: the groups as green section titles (the reason's kind in green, the count in mono at the right),
+     the items as paper rows with a ›. */
+  .wp-grp { display: block; margin: 0; padding: 0; border: 0; }
+  .wp-head { margin-bottom: 0; }
+  .wp-head::after { content: ''; flex: 1; order: 2; min-width: 0; height: 1px; background: var(--hair); }
+  .wp-head small { order: 3; font: 400 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1px; color: var(--grey); white-space: nowrap; }
+  #hist-overlay .wp-head .why-src { padding: 0; border: 0; border-radius: 0; background: none; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; }
+  .wp-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 12px; width: 100%; min-height: 64px; margin: 0; padding: 10px 0; border: 0; border-radius: 0;
+    background: none; color: var(--ink); text-align: left; cursor: pointer; }
+  .wp-row + .wp-row { border-top: 1px solid var(--hair); }
+  .wp-row:active { background: var(--tint); }
+  .wp-row:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  .wp-row::after { content: '\203A'; grid-column: 2; grid-row: 1 / span 2; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
+  .wp-row b { display: block; grid-column: 1; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; letter-spacing: 0; text-transform: none; text-wrap: balance; }
+  .wp-row b small { display: block; margin-top: 4px; font: 400 var(--fs-label)/1.4 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--grey); white-space: normal; }
+  .wp-row span { grid-column: 1; margin-top: 3px; font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
+  .sp-sec { display: block; margin: 0; }
+  .sp-court { margin: 10px 0 0; font: 400 var(--fs-lead)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+
+  /* 8. The readiness check: the five questions as green section titles, the answers as the day's keys (white, edged, 10 px corners; the chosen one
+     --mark, the day's selected key), the label under each number as before, Begin as the primary green button (grey and counting until every
+     question is answered), Skip for today as quiet text. */
+  .readiness-questions { margin-top: 2px; }
+  .readiness-q { margin: 0; }
+  .readiness-q-text { margin: 24px 0 10px; }
+  .readiness-scale { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .readiness-opt { display: flex; flex-direction: column; align-items: center; min-height: 64px; padding: 8px 2px 7px; gap: 4px; border: 0; border-radius: 10px; background: var(--row); box-shadow: inset 0 0 0 1px var(--box);
+    cursor: pointer; transition: background .12s, transform .08s; }
+  .readiness-opt:active { transform: scale(0.95); }
+  .readiness-opt:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .readiness-opt-num { font: 700 var(--fs-title)/1 'Barlow Condensed', sans-serif; color: var(--ink); }
+  .readiness-opt-lab { display: flex; align-items: center; min-height: 26px; font: 400 var(--fs-label)/1.15 'Barlow', sans-serif; text-align: center; color: var(--grey); }   /* two lines at 11 px, so every digit sits level */
+  .readiness-opt.selected { background: var(--mark); box-shadow: none; }   /* --mark: #0E4A36 in light, #1B7254 in dark (#0E4A36 sinks on #181818) */
+  .readiness-opt.selected .readiness-opt-num, .readiness-opt.selected .readiness-opt-lab { color: #fff; }
+  .readiness-actions { margin-top: 26px; }
+  .readiness-begin { display: block; width: 100%; min-height: 52px; padding: 0 14px; font-size: var(--fs-lead); transition: transform .1s; }
+  .readiness-begin:active { transform: scale(0.98); }
+  .readiness-begin:disabled { opacity: 1; background: var(--sand); color: var(--grey); box-shadow: inset 0 0 0 1px var(--hair); cursor: not-allowed; }
+  .readiness-skip { display: block; width: 100%; min-height: 44px; margin-top: 8px; border: 0; background: none; cursor: pointer; font: 400 var(--fs-body)/1 'Barlow', sans-serif;
+    color: var(--grey); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* 9. The banner: a state that lasts, at the top of the screen it is about. The day's lower-day recipe (readinessBannerHtml()): a white row,
+     a hairline above and below, a 4 px stripe in the colour that asks (grey: offline; clay: look here), the label in that colour in Space Mono
+     capitals, the sentence in ink, one green condensed link with the chevron. Home's offline line and the filed-day card; it is full width,
+     so each piece carries the gutter itself. */
+  #home-overview #home-offline.plan-offline, #home-overview #home-unfinished-wrap .uf-card { display: grid; justify-items: start; gap: 6px; margin: 0 0 16px; padding: 16px var(--g) 6px; border: 0; border-radius: 0;
+    border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); background: var(--row); color: var(--ink); box-shadow: inset 4px 0 0 var(--ring); }
+  #home-overview #home-offline.plan-offline[hidden] { display: none; }
+  #home-overview #home-offline.plan-offline.is-ask, #home-overview #home-unfinished-wrap .uf-card { box-shadow: inset 4px 0 0 var(--clay-fill); }
+  .po-k, .uf-k { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  .is-ask .po-k, .uf-k { color: var(--clay-ink); }
+  .po-txt, .uf-s { margin: 0; font: 500 var(--fs-body)/1.45 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .uf-t { font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
+  .uf-a { display: block; margin: 0; }
+  .po-btn, .uf-card .uf-send { display: inline-flex; align-items: center; gap: 6px; flex: none; min-height: 44px; margin: 0; padding: 0 12px 0 0; border: 0; border-radius: 0; background: none; cursor: pointer;
+    white-space: nowrap; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: .8px; text-transform: uppercase; color: var(--green-ink); }
+  .po-btn::after { content: ''; flex: none; width: 12px; height: 12px; background: var(--green-ink); -webkit-mask: var(--chev) center / 12px no-repeat; mask: var(--chev) center / 12px no-repeat; }
+  .po-btn:focus-visible, .uf-card .uf-send:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+
+  /* 10. The note box (aaToast()): in the middle of the screen, never dimming the page, one at a time. The cover's look: the green, white words, the
+     mint-dot eyebrow when it has a kicker, the light-ring button (a lone Got it is the button; with a Start, Not now is outlined). It sits ABOVE the
+     sheets (they are 200 and 210) and under the video pop-up (1000). */
+  .aa-toast { z-index: 215; gap: 12px; padding: 20px 18px 16px; border-radius: 16px; background: var(--hero); color: #fff; box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,.08); }
+  .aa-toast-k { display: flex; align-items: center; gap: 8px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.84); }
+  .aa-toast-k::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  .aa-toast-t { font: 500 var(--fs-body)/1.45 'Barlow', sans-serif; color: #fff; text-wrap: pretty; }
+  .aa-toast-go, .aa-toast-x { min-height: 44px; padding: 0 20px; border: 0; border-radius: 8px; cursor: pointer; color: #fff;
+    font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .aa-toast-x { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.5); }
+  .aa-toast-go, .aa-toast-x:only-child { background: var(--tile-on-green); box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 10px 22px -10px rgba(0,0,0,.6); }
+  .aa-toast-go:focus-visible, .aa-toast-x:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+  /* 11. The install offer (drawn by assets/js/shared.js, which serves the public site too, so it is styled here and nowhere else): a card that
+     rises from the bottom, white, 16 px top corners, the app's icon, the words as they are, Install as the primary green button and Not now
+     as quiet text (program.html relabels shared.js's "Dismiss"). */
+  .a2hs-toast { left: 50%; bottom: 0; width: 100%; max-width: var(--app-w); display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-areas: "ic body" "act act"; align-items: center; column-gap: 14px; row-gap: 14px;
+    padding: 18px var(--g) calc(14px + env(safe-area-inset-bottom, 0px)); border: 0; border-top: 1px solid var(--hair); border-radius: 16px 16px 0 0; background: var(--row); color: var(--ink);
+    box-shadow: 0 -8px 40px rgba(0,0,0,.25); transform: translateX(-50%) translateY(110%); }
+  .a2hs-toast.is-visible { transform: translateX(-50%) translateY(0); }
+  .a2hs-toast-icon { grid-area: ic; width: 48px; height: 48px; border-radius: 12px; font-size: 0; color: transparent; background: var(--paper) url('/assets/img/icon-192.png') center / cover; box-shadow: inset 0 0 0 1px var(--hair); }
+  .a2hs-toast-body { grid-area: body; min-width: 0; }
+  .a2hs-toast-body strong { display: block; margin-bottom: 4px; font: 700 var(--fs-lead)/1.1 'Barlow Condensed', sans-serif; letter-spacing: .6px; text-transform: uppercase; color: var(--ink); }
+  .a2hs-toast-body span { display: block; font: 400 var(--fs-body)/1.4 'Barlow', sans-serif; color: var(--grey); text-wrap: pretty; }
+  .a2hs-toast-actions { grid-area: act; display: flex; align-items: center; gap: 8px; }
+  .a2hs-toast button { min-height: 48px; padding: 0 16px; border: 0; border-radius: 8px; background: none; cursor: pointer; font: 600 var(--fs-body)/1 'Barlow', sans-serif; color: var(--grey); }
+  .a2hs-toast button.primary { flex: 1; background: var(--fill); color: #fff; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  body[data-dark] .a2hs-toast button.primary { background: var(--mark); }
+  .a2hs-toast-actions button:only-child { margin-left: auto; }
+  .a2hs-toast button:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+
   /* ══ CENTRE COURT: the training day, re-skinned (Amir, 2026-10-12: "lets go with E. exercise number inside the circle.
      but with P4, P5, P9, P50, P66") ═════════════════════════════════════════════════════════════════════════════════════
      ONE block for the training day, last in the sheet so it wins a tie: the day view (#day-view), Guided's moved card
@@ -4597,8 +4541,6 @@
   #home-overview .home-greet .home-greet-hi::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--green-ink); }
 
   /* 3. One gutter on Home: every piece starts at --g, not 24 px. */
-  #home-overview .plan-offline { margin: 0 var(--g) 14px; }
-  #home-overview .uf-card { margin: 0 var(--g) 16px; }
   #home-overview .home-section-head { margin: 24px var(--g) 12px; }
   #home-overview .home-week-sum { margin: -4px var(--g) 12px; }
   #home-overview .wn { margin: 24px var(--g) 22px; }
@@ -5294,6 +5236,7 @@
      on a lower day, eases today's targets (REC-2; never the programme). -->
 <div class="readiness-overlay" id="readiness-overlay" onclick="if(event.target===this)cancelReadiness()">
   <div class="readiness-modal" role="dialog" aria-modal="true" aria-label="Readiness check">
+    <div class="sheet-bar"><button type="button" class="sheet-close" aria-label="Close" onclick="cancelReadiness()">Close</button></div>
     <div class="readiness-eyebrow">Before you start</div>
     <h2 class="readiness-title">Readiness check</h2>
     <p class="readiness-sub">Ten seconds, and honest answers. On a lower day the app eases today's targets for you, and you can still train as written.</p>
@@ -6199,18 +6142,21 @@ function paintPlanOffline(state) {
   const el = document.getElementById('home-offline');
   if (!el) return;
   if (state === 'hide') { el.hidden = true; el.innerHTML = ''; return; }
+  // The banner look (SHEETS AND NOTICES block): a mono label, the sentence, and for an update the one link. A stripe in grey for what is only
+  // so, in clay (.is-ask) for what asks the athlete to do something.
   let html;
   if (state === 'changed') {
-    html = '<span class="po-dot on"></span><span class="po-txt">Your plan was updated</span>' +
+    html = '<span class="po-k">Update</span><span class="po-txt">Your plan was updated</span>' +
            '<button type="button" class="po-btn" onclick="location.reload()">Refresh</button>';
   } else if (state === 'refused') {
-    html = '<span class="po-dot"></span><span class="po-txt">The server didn\'t confirm your plan. ' +
+    html = '<span class="po-k">Heads up</span><span class="po-txt">The server didn\'t confirm your plan. ' +
            'Your sets are saved on this phone.</span>';
   } else {
     const when = PLAN_OFFLINE ? fmtSavedAt(PLAN_OFFLINE.at) : '';
-    html = '<span class="po-dot"></span><span class="po-txt"><b>Offline</b> · your plan as saved on this phone' +
+    html = '<span class="po-k">Offline</span><span class="po-txt">Your plan as saved on this phone' +
            (when ? ', <span class="po-when">' + esc(when) + '</span>' : '') + '</span>';
   }
+  el.classList.toggle('is-ask', state === 'changed');
   el.innerHTML = html;
   el.hidden = false;
 }
@@ -6816,6 +6762,22 @@ function _isStandalone() {
   try { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }
   catch (e) { return false; }
 }
+// The line icon at the left of Account's door rows (the same span and svg as hrowIc()'s: a function, so the sheet can draw it from boot()).
+function acctIc(kind) {
+  if (kind === 'help') return hrowIc('why');
+  const draw = {
+    install: '<rect x="6" y="2" width="12" height="20" rx="2"/><polyline points="9.5 9 12 11.5 14.5 9"/><line x1="12" y1="5.5" x2="12" y2="11.5"/><line x1="10.5" y1="18.5" x2="13.5" y2="18.5"/>',
+    privacy: '<rect x="5" y="11" width="14" height="9.5" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  }[kind] || '';
+  return `<span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${draw}</svg></span>`;
+}
+// The install offer, from shared.js (which serves the public site, so its words are relabelled here): its dismiss button says Not now.
+function showInstallOffer() {
+  if (!window.A2HS || typeof window.A2HS.show !== 'function') return;
+  window.A2HS.show();
+  const b = document.querySelector('.a2hs-toast [data-a2hs-dismiss]');
+  if (b && b.textContent.trim() === 'Dismiss') b.textContent = 'Not now';
+}
 function openAccount(e) {
   if (e) e.stopPropagation();
   const ov = document.getElementById('hist-overlay');
@@ -6827,8 +6789,8 @@ function openAccount(e) {
   const sub = window.IS_DEMO ? 'The demo: nobody is signed in, and nothing is saved.'
     : window.IS_PREVIEW ? 'Coach preview: you are looking at this athlete\'s app as your coach sign-in.'
     : 'Signed in on this phone.';
-  const install = (!_isStandalone() && window.A2HS)
-    ? `<button type="button" class="acct-row" id="acct-install"><span>Install the app</span><span class="acct-go">›</span></button>` : '';
+  const door = (id, ic, words) => `<button type="button" class="hrow" id="${id}">${acctIc(ic)}<span class="hrow-b"><span class="hrow-v">${words}</span></span><span class="hrow-a" aria-hidden="true">›</span></button>`;
+  const install = (!_isStandalone() && window.A2HS) ? door('acct-install', 'install', 'Install the app') : '';
   const out = (window.IS_DEMO || window.IS_PREVIEW) ? '' : `
     <div class="acct-out">
       ${waiting ? `<p class="acct-wait">${waiting === 1 ? 'A session report is' : waiting + ' session reports are'} still waiting for signal. It stays on this phone and goes when you sign in here again.</p>` : ''}
@@ -6838,19 +6800,18 @@ function openAccount(e) {
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">Your account</div>
     <h2 class="readiness-title">${esc(name)}</h2>
-    <p class="readiness-sub">${sub}</p>
+    <p class="readiness-sub sheet-mono">${sub}</p>
     <div class="acct-list">
-      <div class="acct-row acct-theme"><span>Theme</span>
+      <div class="acct-theme"><span class="acct-lbl">Theme</span>
         <span class="acct-seg" role="group" aria-label="Theme">
           <button type="button" data-theme="light" aria-pressed="${!dark}">Light</button>
           <button type="button" data-theme="dark" aria-pressed="${dark}">Dark</button>
         </span></div>
       ${install}
-      <button type="button" class="acct-row" id="acct-help"><span>How the app works</span><span class="acct-go">›</span></button>
-      <a class="acct-row" href="/privacy.html" target="_blank" rel="noopener"><span>Privacy</span><span class="acct-go">›</span></a>
+      ${door('acct-help', 'help', 'How the app works')}
+      <a class="hrow" href="/privacy.html" target="_blank" rel="noopener">${acctIc('privacy')}<span class="hrow-b"><span class="hrow-v">Privacy</span></span><span class="hrow-a" aria-hidden="true">›</span></a>
     </div>
-    ${out}
-    <div class="hs-actions"><button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button></div>`;
+    ${out}`;
   ov.querySelectorAll('.acct-seg button').forEach(b => b.addEventListener('click', () => {
     if ((b.dataset.theme === 'dark') !== document.body.hasAttribute('data-dark')) toggleDark();
   }));
@@ -6858,7 +6819,7 @@ function openAccount(e) {
   if (ins) ins.addEventListener('click', () => {
     closeHistorySheet();
     try { localStorage.removeItem('a2hs_dismissed_v1'); } catch (err) {}   // asked for: always answer
-    window.A2HS.show();
+    showInstallOffer();
   });
   document.getElementById('acct-help').addEventListener('click', () => openHelp());   // ‹ Back returns here
   const so = document.getElementById('acct-signout');
@@ -6877,8 +6838,7 @@ function openHelp(key) {
   ov.querySelector('.readiness-modal').innerHTML = `
     <div class="readiness-eyebrow">Help</div>
     <h2 class="readiness-title">How the app works</h2>
-    <div class="help-list">${buildAppGuideCards(k)}</div>
-    <div class="hs-actions"><button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button></div>`;
+    <div class="help-list">${buildAppGuideCards(k)}</div>`;
   ov.classList.add('visible');
   const open = ov.querySelector('.help-list .note-card.open');
   if (open) setTimeout(() => open.scrollIntoView({ block: 'start' }), 30);
@@ -9342,7 +9302,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your program. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your program. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its top right. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, my note for the week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -9631,7 +9591,7 @@ function initSheetSwipe(overlayId, close) {
     y0 = null;
     if (e.touches.length !== 1 || window.matchMedia('(min-width: 560px)').matches) return;
     const t = e.touches[0];
-    if (m.scrollTop > 0 && t.clientY - m.getBoundingClientRect().top > 32) return;   // mid-scroll, off the handle
+    if (m.scrollTop > 0 && t.clientY - m.getBoundingClientRect().top > 56) return;   // mid-scroll, off the handle and the top row
     y0 = t.clientY; dy = 0; t0 = Date.now(); drag = false;
   }, { passive: true });
   m.addEventListener('touchmove', e => {
@@ -14100,7 +14060,7 @@ function maybeOfferInstall() {
   const signin = document.getElementById('signin-screen');
   if (signin && signin.classList.contains('visible')) return;
   if (!hasFinishedASession()) return;
-  if (window.A2HS && typeof window.A2HS.show === 'function') window.A2HS.show();
+  showInstallOffer();
 }
 window.maybeOfferInstall = maybeOfferInstall;
 
@@ -14621,8 +14581,9 @@ function aaToast(text, opts) {
   if (!el) return;
   opts = opts || {};
   _toastRun = opts.run || null;
-  el.innerHTML = '<div class="aa-toast-t"></div><div class="aa-toast-row">' +
+  el.innerHTML = (opts.kicker ? '<div class="aa-toast-k"></div>' : '') + '<div class="aa-toast-t"></div><div class="aa-toast-row">' +
     (opts.action ? '<button type="button" class="aa-toast-go"></button>' : '') + '<button type="button" class="aa-toast-x"></button></div>';
+  if (opts.kicker) el.querySelector('.aa-toast-k').textContent = opts.kicker;
   el.querySelector('.aa-toast-t').textContent = text;
   const go = el.querySelector('.aa-toast-go');
   if (go) { go.textContent = opts.action; go.addEventListener('click', () => { const r = _toastRun; hideAaToast(); if (r) r(); }); }
@@ -15446,10 +15407,7 @@ function openHistorySheet(card) {
     <p class="readiness-sub">${hist.length} time${hist.length === 1 ? '' : 's'} logged${target ? ` · target RPE ${target}${today && today !== target ? ` · ${today} today` : ''}` : ''}. What you did, never what to lift: your coach sets the load.</p>
     ${chart}
     <div class="hs-list">${rows}</div>
-    <div class="hs-actions">
-      ${hasRecord ? `<button type="button" class="hs-link" id="hs-rec">Open in Personal Records ›</button>` : ''}
-      <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
-    </div>`;
+    ${hasRecord ? `<div class="hs-actions"><button type="button" class="hrow hs-link" id="hs-rec">${hrowIc('records')}<span class="hrow-b"><span class="hrow-l">Open in Personal Records</span></span><span class="hrow-a" aria-hidden="true">›</span></button></div>` : ''}`;
   const rec = document.getElementById('hs-rec');
   if (rec) rec.addEventListener('click', () => {
     closeHistorySheet();
@@ -15492,6 +15450,7 @@ function sheetWrap(fn) {
     _SHEET.cur = () => { sheetPlain(m); return fn.apply(self, args); };
     sheetPlain(m);
     const r = fn.apply(self, args);
+    if (!was && m) m.scrollTop = 0;   // a fresh open starts at the top: the box keeps the scroll it had when it was hidden
     // An opener that drew nothing (no data for that page) is not a step: undo the push.
     if (was && !_SHEET.restoring && m && m.innerHTML === before) {
       _SHEET.stack.length = depth; _SHEET.cur = prevCur;
@@ -15510,12 +15469,28 @@ function sheetBack() {
   paintSheetBack();
 }
 window.sheetBack = sheetBack;
+// The sheet's ONE top row (.sheet-bar, the SHEETS AND NOTICES block): the handle, ‹ Back on the left only while a page is behind, Close on the
+// right. It is the sheet's first child, drawn here and never inside a page, so every page that draws into the frame gets it, and a page that
+// redraws itself later (History fills in after its fetch) keeps it. It is sticky: it stays while a long page scrolls (.is-scrolled joins it
+// to the page with a hairline, and turns the About sheet's row solid green).
 function paintSheetBack() {
   const m = document.querySelector('#hist-overlay .readiness-modal');
   if (!m) return;
-  const has = m.querySelector(':scope > .sheet-back');
-  if (!_SHEET.stack.length) { if (has) has.remove(); return; }
-  if (!has) m.insertAdjacentHTML('afterbegin', '<button type="button" class="sheet-back" onclick="sheetBack()">‹ Back</button>');
+  let bar = m.querySelector(':scope > .sheet-bar');
+  if (!bar) { m.insertAdjacentHTML('afterbegin', '<div class="sheet-bar"><button type="button" class="sheet-close" aria-label="Close" onclick="closeHistorySheet()">Close</button></div>'); bar = m.firstElementChild; }
+  else if (m.firstElementChild !== bar) m.insertBefore(bar, m.firstChild);
+  const has = bar.querySelector('.sheet-back');
+  if (_SHEET.stack.length && !has) bar.insertAdjacentHTML('afterbegin', '<button type="button" class="sheet-back" onclick="sheetBack()">‹ Back</button>');
+  else if (!_SHEET.stack.length && has) has.remove();
+  syncSheetScrolled(m);
+}
+function syncSheetScrolled(m) { if (m) m.classList.toggle('is-scrolled', m.scrollTop > 2); }
+// A sheet's scroll joins its row to the page (the readiness check's too).
+function initSheetBars() {
+  ['hist-overlay', 'readiness-overlay'].forEach(id => {
+    const m = document.querySelector('#' + id + ' .readiness-modal');
+    if (m) m.addEventListener('scroll', () => syncSheetScrolled(m), { passive: true });
+  });
 }
 function wrapSheetOpeners() {
   openHistorySheet = sheetWrap(openHistorySheet);
@@ -15860,7 +15835,7 @@ const AX_COURT = {
 const AX_HIST_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
   + '<path d="M3 17l5-5 4 3 7-8"/><path d="M15 7h4v4"/></svg>';
 function axHero(name, pattern, why, inProg) {
-  return `<header class="ax-hero"><div class="ax-handle" aria-hidden="true"></div>
+  return `<header class="ax-hero">
     ${pattern ? `<p class="ax-eyebrow"><i></i>${esc(pattern)}</p>` : ''}
     <h2 class="ax-name${String(name).length > 32 ? ' ax-long' : ''}">${esc(name)}</h2>
     ${why ? `<section class="ax-hq"><h3 class="ax-q">Why am I doing this<span class="ax-m">?</span></h3>
@@ -15938,14 +15913,13 @@ function openExerciseSheet(id, card, fromLib) {
     const hit = whyList().find(w => { const x = spineFor(w.name, w.exId); return x && x.id === e.id; });
     if (hit) why = hit.why;
   }
-  const foot = `<div class="ax-foot"><button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button></div>`;
   if (!e) {
     // No approved Spine entry (a draft, or a phone with no Spine yet): the reason, and the way to History,
     // which no card has any more but through this sheet.
     if (!card) return;
     const hr = axHistRow(card, cardName);
     if (!why && !hr) return;
-    m.innerHTML = axHero(cardName, '', why, null) + (hr ? `<section class="ax-band">${hr}</section>` : '') + foot;
+    m.innerHTML = axHero(cardName, '', why, null) + (hr ? `<section class="ax-band">${hr}</section>` : '');
     m.classList.add('ax-sheet');
     const hb0 = m.querySelector('#ax-hist');
     if (hb0) hb0.addEventListener('click', () => openHistorySheet(card));
@@ -15967,7 +15941,7 @@ function openExerciseSheet(id, card, fromLib) {
   const histRow = axHistRow(card, cardName);
   if (histRow) bands.push(histRow);
   m.innerHTML = axHero(e.name, SPINE_PATTERN[e.pattern] || e.pattern || '', why, fromLib ? spineUsesInProgramme(id) : null)
-    + bands.map((b, i) => `<section class="ax-band${i % 2 ? ' ax-s' : ''}">${b}</section>`).join('') + foot;
+    + bands.map((b, i) => `<section class="ax-band${i % 2 ? ' ax-s' : ''}">${b}</section>`).join('');
   m.classList.add('ax-sheet');
   m.querySelectorAll('.ax-tile[data-q]').forEach(b => b.addEventListener('click', () => {
     openQualitySheet(b.dataset.q, fromLib);
@@ -16023,10 +15997,7 @@ function openWhyPlan() {
       return `<div class="wp-grp"><div class="wp-head"><span class="why-src ${esc(w0.src)}">${esc(whyLabel(w0))}</span><small>${
         g.length} exercise${g.length === 1 ? '' : 's'}</small></div>${
         g.map(r => `<button type="button" class="wp-row" data-i="${r.i}"><b>${esc(r.name)}<small>${esc(days(r.days))}</small></b><span>${esc(r.why.text.trim())}</span></button>`).join('')}</div>`;
-    }).join('')}
-    <div class="hs-actions">
-      <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
-    </div>`;
+    }).join('')}`;
   ov.querySelectorAll('.wp-row').forEach(b => b.addEventListener('click', () => {
     const w = list[+b.dataset.i];
     const card = [...document.querySelectorAll('#screen-home .checklist-item')].find(c => {
@@ -16195,10 +16166,7 @@ function openQualitySheet(qid, fromLib) {
     ${q.tennis && isRacketSport() ? `<div class="sp-sec"><div class="sp-lbl">On court</div><p class="sp-court">${esc(q.tennis)}</p></div>` : ''}
     ${uses.length ? `<div class="sp-sec"><div class="sp-lbl">In your plan</div>${
       uses.map(u => `<button type="button" class="wp-row qm-use" data-id="${esc(u.entry.id)}"><b>${esc(u.entry.name)}<small>Day ${
-        esc(u.days.join(' · '))}</small></b></button>`).join('')}</div>` : ''}
-    <div class="hs-actions">
-      <button type="button" class="readiness-skip" onclick="closeHistorySheet()">Close</button>
-    </div>`;
+        esc(u.days.join(' · '))}</small></b></button>`).join('')}</div>` : ''}`;
   ov.querySelectorAll('.qm-use').forEach(b => b.addEventListener('click', () => {
     openExerciseSheet(b.dataset.id, xlCardFor(b.dataset.id), true);
     ov.querySelector('.readiness-modal').scrollTop = 0;
@@ -16283,6 +16251,7 @@ function esc(str) {
     navigator.serviceWorker.register('/sw.js');
   }
   wrapSheetOpeners();   // the sheet's ‹ Back (SHEET-01)
+  initSheetBars();      // its top row joins the page once it has scrolled
   // Back closes the top layer instead of leaving the app (NAV-01).
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initBackNav);
   else initBackNav();

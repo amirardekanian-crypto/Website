@@ -306,10 +306,12 @@ const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .n
     const e = await p.evaluate(() => {
       const left = (sel, text) => { const el = document.querySelector(sel); if (!el) return null; if (!text) return Math.round(el.getBoundingClientRect().left * 10) / 10;
         const n = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: x => x.textContent.trim() ? 1 : 3 }).nextNode(); const r = document.createRange(); r.selectNodeContents(n); return Math.round(r.getClientRects()[0].left * 10) / 10; };
+      // the banners (offline line, filed-day card) are full width, white rows; their content starts at the gutter, inside their padding
+      const padded = sel => { const el = document.querySelector(sel); if (!el) return null; return Math.round((el.getBoundingClientRect().left + parseFloat(getComputedStyle(el).paddingLeft)) * 10) / 10; };
       const off = document.getElementById('home-offline'); off.hidden = false; off.textContent = 'Saved plan';
       document.getElementById('home-sugg-wrap').innerHTML = '<div class="lib-sugg">Extra</div>';
       document.getElementById('home-proof-strip').classList.remove('off');   // the strip is hidden until AA Proof says it is ready: show it to measure it
-      return { greeting: null, name: left('.home-greet > span:last-child', true), offline: left('#home-offline'), unfinished: left('.uf-card'), thisWeek: left('.wn-kick .wn-name', true) || left('.home-section-title', true),
+      return { greeting: null, name: left('.home-greet > span:last-child', true), offline: padded('#home-offline'), unfinished: padded('.uf-card'), thisWeek: left('.wn-kick .wn-name', true) || left('.home-section-title', true),
         note: left('.wn'), hero: left('.dc-hero'), rows: left('.dc-row'), rowNum: left('.dc-row .dc-num', true), sugg: left('#home-sugg-wrap .lib-sugg'), habits: left('#home-habits-wrap .hrow'), proof: left('#home-proof-strip') };
     });
     // the greeting's eyebrow starts after its 7 px dot and 8 px gap: its box, not the text, is the gutter
