@@ -258,7 +258,8 @@
 // v127: program.html changed (2026-10-13): one shared colour set for the whole app (Centre Court's tokens on body, the older names aliases of them).
 // v128: program.html changed (2026-10-13): the day's leftovers (WhatsApp under Done, the Your rating fold after Done, Finish early under the bar's dots).
 // v129: program.html changed (2026-10-13): the Coach tab in the Centre Court look (the signed WhatsApp panel, notes as fold rows).
-const CACHE = 'aap-v129';
+// v130: program.html changed (2026-10-13): Progress's road (one row per cycle) and the archive in the Centre Court look; the This cycle card is Progress's cover.
+const CACHE = 'aap-v130';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
