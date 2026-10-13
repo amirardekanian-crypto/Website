@@ -162,8 +162,9 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   region and impact lists (four copies) · the muscle list of the Spine's volume credits (SIX copies since the
   muscle map: `spine_credits_ok()`, coach.html, `check_program.py`, `draft_sql.py`, program.html `MAP_MUSCLE` and
   the body drawing's groups; see PROGRAM-APP.md *The muscle map*) · the set-log line grammar (`buildSessionData()`, `parseSetLine()`,
-  `parseSetText()`) · the records rename matcher (`matchRenamed()` / `ceilAliasMapC()`) · how a session's set ends (`carrySet()`, called by
-  the midnight sweep, the cloud copy and a rename) · whether a session is over (`sessionIsStale()`, 6 h grace past
+  `parseSetText()`) · the records rename matcher (`matchRenamed()` / `ceilAliasMapC()`) · how a session's set ends (`carrySet()`, called at
+  Done, by the midnight sweep, the cloud copy and a rename; Done keeps the day's own copy, `<id>_donelog_d<N>`, and a reader of a
+  set log or a round rating passes its day, `loadSetLog(name, total, day)` / `rpeOn(day, key)`: PROGRAM-APP.md → *A session closes at Done*) · whether a session is over (`sessionIsStale()`, 6 h grace past
   midnight; DATA-02) · the live quest run and its last day (`runEndKey()` / `activeQuestRun()` in habits.html, `questRunEnd()` / `activeQuestRun()` in coach.html) and the date it is filed under (`sessionDateFor()`, the local day it was finished) · the Supabase client's retry on an expired token (`fetchRetryExpired()`, FOUR copies: program.html, habits.html and the two tennis apps; a phone with a wrong clock sends a token the server has expired and the app used to say "Plan not available"; `scripts/test_fetch_retry.js`, pre-commit guard 18; `PROGRAM-APP.md` → *No signal*).
 - **A cycle's `startDate` and `endDate` are CALENDAR days, read in whole days** (pile C, 2026-10-11): `cycleDayNo()` / `todayDayNo()` (never `new Date('2026-10-06')`,
   which is the evening of the 5th west of Greenwich: the app said "Cycle complete" a day early in the Americas). `cycleWeekInfo()`, `weekWindow()` and `inRetestWindow()` use them;

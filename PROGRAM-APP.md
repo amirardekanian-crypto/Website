@@ -554,10 +554,27 @@ costs more than one tap.
   bare tick logged last week's load as today's and every number built on the log (records included)
   was quietly a repeat. Now:
   - A set carries `lw`, **last time's weight**, and `w` is only ever today's. ONE function,
-    `carrySet()`, ends a session's set for all three places that do it: `autoResetStaleDays()` on the
-    phone, `stripSetLogSession()` on the cloud's copy, and a rename carried by
-    `adoptRenamedExercises()`. `mergeStoredValue()` merges `lw` like the other fields. A skipped
-    weight keeps the last one ever typed (`s.w || s.lw`).
+    `carrySet()`, ends a session's set for every place that does it: Done (`closeSessionAtDone()`, below),
+    `autoResetStaleDays()` on the phone (both through `carryExerciseKeys()`), `stripSetLogSession()` on the
+    cloud's copy, and a rename carried by `adoptRenamedExercises()`. `mergeStoredValue()` merges `lw` like
+    the other fields. A skipped weight keeps the last one ever typed (`s.w || s.lw`).
+  - **A session closes at Done** (Line Call, 2026-10-13; Amir: *"yes to all recommended, start with closing
+    the session at Done"*). The set log, an exercise's RPE and a circuit's round ratings are kept per exercise
+    NAME, and 36 of 37 live programmes repeat a name across days. They used to keep a finished day's ticks
+    until the midnight sweep, so right after Done Home called the next day that shares a name "In progress"
+    with Resume, and a second day trained the same evening opened with the first day's sets and would have
+    reported them as its own (found by the second audit, Second Serve). Now `finishDay()`, after the record
+    and the report are built, calls `closeSessionAtDone()`: the day's own copy of its sets and round ratings
+    goes into ONE per-day key, `<id>_donelog_d<N>` = `{ sess, sets: { name: [set…] }, rpe: { key: value } }`,
+    tied by `sess` to the finish stamp it belongs to, and the per-name keys are carried as the sweep carries
+    them (`carryExerciseKeys()`). Names a day still under way today shares are left alone. **A reader of a
+    set log or a round rating passes its day**: `loadSetLog(name, total, day)`, `saveSetLogValue(name, log,
+    day)`, `rpeOn(day, key)` / `setRpeOn()` read and write a finished day's copy, so its cards still look
+    done, its counts hold and a rating or note changed later re-saves the record it had; any other day gets
+    the per-name keys. The copy is a per-day key like the rating: the sweep removes it, `staleCloudPlan()`
+    restores it only while its day is today's and never lets the cloud tick a finished day's per-name keys
+    again (the cloud's stamp or this phone's), and `resetDay()` puts its sets back before the reset.
+    `scripts/headless/close-at-done.js` (24 checks).
   - The empty box shows that number under a small **LAST** caption (`.ex-set-wlast`), smaller and
     paler than the prescribed reps beside it, because a tick records the reps and not this. A bare
     `last 80` placeholder was tried first: at 375px the box holds about 38px of text, so `last 22.5`

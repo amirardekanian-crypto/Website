@@ -52,6 +52,8 @@ Object.assign(P, {
 vm.runInContext([
   slice(prog, 'program.html', 'function parseDurationToSec(', 'function renderNumLine(rx, rest) {'),   // rxOf, plannedReps
   slice(prog, 'program.html', 'function setReps(s, planned) {', 'function saveSetLogValue('),
+  // A finished day's own copy (closeSessionAtDone(), 2026-10-13): buildSessionData() reads it first. None is stored here.
+  slice(prog, 'program.html', 'function doneLogKey(day) {', 'function loadSetLog('),
   slice(prog, 'program.html', 'function normDigits(v) {', 'const ONE_RM_MAX_EFFECTIVE'),   // ends on code, not a comment a docs pass may reword
   slice(prog, 'program.html', 'function parseLoggedKg(v) {', '// The set that produces the HIGHEST'),
   slice(prog, 'program.html', 'function buildSessionData(day) {', '// Saves a permanent session record'),

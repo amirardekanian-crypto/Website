@@ -5657,7 +5657,7 @@ function staleCloudPlan(data, prefix) {
     if (k.indexOf(prefix) !== 0) return;
     const rel = k.slice(prefix.length);
     // Exactly the per-day keys autoResetStaleDays() owns.
-    const dm = rel.match(/^(?:completed_d|daynote_|srpe_|sent_d|sentsig_d|senton_d|timer_|readiness_|touched_d)(\d+)$/);
+    const dm = rel.match(/^(?:completed_d|daynote_|srpe_|sent_d|sentsig_d|senton_d|timer_|readiness_|touched_d|donelog_d)(\d+)$/);
     if (dm && over[dm[1]]) { plan.skip.add(k); return; }
     // A timer/readiness for a day with no completed stamp at all still carries its
     // own date — a session abandoned last week must not come back running.
@@ -5694,7 +5694,10 @@ function staleCloudPlan(data, prefix) {
   const seen = {};                                    // exercise key -> {any, live}
   days.forEach(day => {
     const id   = String(day.id);
-    const live = hasStamp[id] ? !over[id] : !!startedToday[id];
+    // A finished day is never live for its exercises (2026-10-13): Done closed its per-name keys (closeSessionAtDone()),
+    // so the cloud's copy of them, pushed while the session ran, must not tick them again. This phone's own stamp counts
+    // too: a finish whose push never went still closed the keys here.
+    const live = (hasStamp[id] || completedDate(localStorage.getItem(prefix + 'completed_d' + id))) ? false : !!startedToday[id];
     (day.blocks || []).forEach(block => {
       (block.exercises || []).forEach(ex => {
         const k = String(ex.name || '').replace(/\s+/g, '_');
@@ -11270,7 +11273,7 @@ function getDayCompletion(day) {
     } else {
       // Standard — count done sets from the per-set log
       const totalSets = parseInt(item.dataset.sets, 10) || 1;
-      const log = loadSetLog(name, totalSets);
+      const log = loadSetLog(name, totalSets, day);
       const doneSets = log.filter(s => s.d).length;
       done += doneSets;
       if (off) {
@@ -11392,7 +11395,7 @@ function doneLineText(card) {
     return (base ? base + ' · ' : '') + 'done';
   }
   const name = card.querySelector('.item-name').textContent.trim();
-  const done = loadSetLog(name, parseInt(card.dataset.sets, 10) || 1).filter(s => s.d);
+  const done = loadSetLog(name, parseInt(card.dataset.sets, 10) || 1, card.dataset.day).filter(s => s.d);
   if (!done.length) return 'done';
   const rs = done.map(s => s.r).filter(Boolean);
   // A move with no weight reads "4 · 4 · 4 · 4", not "× 4 · 4 …" (Centre Court): the History sheet keeps its own form.
@@ -12114,6 +12117,9 @@ function finishDay(day) {
   // until it goes: sendReport()).
   recordSessionToCloud(day);
   sendReport(day);
+  // Both above built the record from the live keys before their first await. Now the session closes: the day keeps its
+  // own copy and the per-name keys start the next day clean (closeSessionAtDone()).
+  closeSessionAtDone(day);
   // recordSessionToCloud() above already told the server this session happened.
   // The habit tracker reads that record itself — this app writes nothing into
   // Proof's space — so all we do here is say so.
@@ -12406,6 +12412,11 @@ function markSuggestedDay() {
 }
 
 function resetDay(day) {
+  // A finished day's own copy (closeSessionAtDone()) goes back into the per-name keys first, so the reset below starts the
+  // SAME session again from what it held: its typed weights stay, as they always did.
+  const dl = loadDoneLog(day);
+  if (dl) Object.keys(dl.sets || {}).forEach(nm => saveSetLogValue(nm, dl.sets[nm]));
+  if (localStorage.getItem(doneLogKey(day)) != null) localStorage.removeItem(doneLogKey(day));
   localStorage.removeItem(ATHLETE_ID + '_touched_d' + day);   // nothing left to call unfinished (DATA-02)
   localStorage.removeItem(ATHLETE_ID + '_clockasked_d' + day);  // the next start may be asked about again
   // A report still waiting in the outbox for the session being reset never goes (an
@@ -12670,6 +12681,55 @@ function liveExerciseKeys(days, today) {
 // Preserves: last time's weights (as the hint, carrySet), per-exercise notes.
 // Clears: exercise checks, per-exercise RPE, day note, session RPE, sent timestamp,
 // and the weights themselves from today's boxes.
+// One exercise's per-name keys as a session that is over leaves them (ONE rule with carrySet()): its RPE and every circuit
+// round's rating go, its set log keeps only last time's weight. The midnight sweep and Done (closeSessionAtDone()) both use it.
+// Circuit RPE: round 1 uses the legacy (no-suffix) key, later rounds use _r<round>. The rounds are counted as the card counts
+// them (rxOf(ex).rounds, else an old circuit's own "×3 Rounds"); reading only ex.rounds cleared round 1 alone on rx cards (2026-09-26 fix).
+function carryExerciseKeys(ex) {
+  const k = String((ex && ex.name) || '').replace(/\s+/g, '_');
+  if (!k) return;
+  const rounds = ex.type === 'circuit' ? parseRoundCount(rxOf(ex).rounds || ex.rounds) : 1;
+  localStorage.removeItem(ATHLETE_ID + '_rpe_' + k);
+  for (let round = 2; round <= rounds; round++) localStorage.removeItem(circuitRpeKey(ex.name, round));
+  // Per-set log: clear reps, RPE + done; the weight becomes last time's hint
+  const setKey = ATHLETE_ID + '_setlog_' + k;
+  let log = [];
+  try { log = JSON.parse(localStorage.getItem(setKey)) || []; } catch (e) {}
+  if (log.length) localStorage.setItem(setKey, JSON.stringify(log.map(carrySet)));
+}
+// Done closes the session (see "A SESSION CLOSES AT DONE" by loadSetLog()). Called by finishDay() after the record and the
+// report were built from the live keys. Names another day still needs are left alone: a day under way today and not finished,
+// or one waiting to be filed (liveExerciseKeys()'s rule without the finished days, whose own copies are closed already).
+function closeSessionAtDone(day) {
+  const days = (DATA && DATA.workouts && DATA.workouts.days) || [];
+  const dayData = days.find(d => String(d.id) === String(day));
+  const stamp = localStorage.getItem(ATHLETE_ID + '_completed_d' + day);
+  if (!dayData || !stamp) return;
+  const today = new Date().toDateString();
+  const keep = new Set();
+  days.forEach(d => {
+    if (String(d.id) === String(day)) return;
+    if (completedDate(localStorage.getItem(ATHLETE_ID + '_completed_d' + d.id))) return;
+    if (!sessionStartedToday(d.id, today) && !_awaitingFile(d.id)) return;
+    (d.blocks || []).forEach(b => (b.exercises || []).forEach(ex => keep.add(String(ex.name || '').replace(/\s+/g, '_'))));
+  });
+  const exs = [];
+  (dayData.blocks || []).forEach(b => (b.exercises || []).forEach(ex => { if (ex && ex.name) exs.push(ex); }));
+  const dl = { sess: stamp, sets: {}, rpe: {} };
+  exs.forEach(ex => {
+    if (ex.type === 'circuit') {
+      const rounds = parseRoundCount(rxOf(ex).rounds || ex.rounds);
+      for (let r = 1; r <= rounds; r++) { const key = circuitRpeKey(ex.name, r); dl.rpe[key] = localStorage.getItem(key) || ''; }
+    } else {
+      let log = [];
+      try { log = JSON.parse(localStorage.getItem(setLogKey(ex.name))) || []; } catch (e) {}
+      dl.sets[ex.name] = Array.isArray(log) ? log : [];
+    }
+  });
+  saveDoneLog(day, dl);
+  if (!loadDoneLog(day)) return;   // the copy did not keep (storage full): the per-name keys stay as they are, as before
+  exs.forEach(ex => { if (!keep.has(String(ex.name).replace(/\s+/g, '_'))) carryExerciseKeys(ex); });
+}
 function autoResetStaleDays() {
   if (!DATA || !DATA.workouts) return;
   const today = new Date().toDateString();
@@ -12733,29 +12793,13 @@ function autoResetStaleDays() {
       localStorage.removeItem(ATHLETE_ID + '_timer_'   + day.id);
       localStorage.removeItem(ATHLETE_ID + '_readiness_' + day.id);
       localStorage.removeItem(ATHLETE_ID + '_touched_d' + day.id);
+      localStorage.removeItem(doneLogKey(day.id));
       // Per-exercise RPE + per-set RPE/done for this day's exercises. The weights
-      // move out of the boxes into last time's hint (carrySet); personal notes stay.
+      // move out of the boxes into last time's hint (carryExerciseKeys()); personal notes stay.
       (day.blocks || []).forEach(block => {
         (block.exercises || []).forEach(ex => {
-          const k = ex.name.replace(/\s+/g, '_');
-          if (liveNames.has(k)) return;             // same name also sits in a day that isn't over
-          // Circuit RPE: round 1 uses the legacy (no-suffix) key, later rounds
-          // use _r<round>. Clear every round this exercise has.
-          // rx.rounds (a number) on every programme written since 2026-09-20, ex.rounds on older
-          // ones. Reading only ex.rounds cleared round 1 alone on the new ones (2026-09-26 fix).
-          const rounds = ex.type === 'circuit' ? parseRoundCount((ex.rx && ex.rx.rounds) || ex.rounds) : 1;
-          localStorage.removeItem(ATHLETE_ID + '_rpe_' + k);
-          for (let round = 2; round <= rounds; round++) {
-            localStorage.removeItem(circuitRpeKey(ex.name, round));
-          }
-          // Per-set log: clear reps, RPE + done; the weight becomes last time's hint
-          const setKey = ATHLETE_ID + '_setlog_' + k;
-          let log = [];
-          try { log = JSON.parse(localStorage.getItem(setKey)) || []; } catch (e) {}
-          if (log.length) {
-            log = log.map(carrySet);
-            localStorage.setItem(setKey, JSON.stringify(log));
-          }
+          if (liveNames.has(ex.name.replace(/\s+/g, '_'))) return;   // same name also sits in a day that isn't over
+          carryExerciseKeys(ex);
         });
       });
       // Drop this day's check state from the global state object
@@ -12846,7 +12890,7 @@ function restoreState() {
     if (card.classList.contains('round-group')) return;
     const name  = card.querySelector('.item-name').textContent.trim();
     const total = parseInt(card.dataset.sets, 10) || 1;
-    const log   = loadSetLog(name, total);
+    const log   = loadSetLog(name, total, card.dataset.day);
     syncExerciseCheck(card, log);
   });
 
@@ -13016,13 +13060,15 @@ function buildSessionData(day) {
       }
       const rpeRounds = [];
       for (let round = 1; round <= total; round++) {
-        const r = localStorage.getItem(circuitRpeKey(name, round)) || '';
+        const r = rpeOn(day, circuitRpeKey(name, round));
         if (r) rpeRounds.push({ round, r });
       }
       return { kind: 'circuit', itemNames, weights, logWeight, rpeRounds, n };
     }
     let log = [];
-    try { log = JSON.parse(localStorage.getItem(ATHLETE_ID + '_setlog_' + k)) || []; } catch (e) {}
+    const dl = loadDoneLog(day);   // a finished day's own copy (closeSessionAtDone())
+    if (dl && dl.sets && Array.isArray(dl.sets[name])) log = dl.sets[name];
+    else { try { log = JSON.parse(localStorage.getItem(ATHLETE_ID + '_setlog_' + k)) || []; } catch (e) {} }
     return { kind: 'sets', log, n };
   };
 
@@ -13142,13 +13188,55 @@ function logSlotFor(card) {
 function setLogKey(exName) {
   return ATHLETE_ID + '_setlog_' + exName.replace(/\s+/g, '_');
 }
-function loadSetLog(exName, totalSets) {
+// ── A SESSION CLOSES AT DONE (Line Call, Amir 2026-10-13: "yes to all recommended, start with closing the session at Done") ──
+// The set log, an exercise's RPE and a circuit's round ratings are kept per exercise NAME (setLogKey(), circuitRpeKey()), and
+// 36 of 37 live programmes repeat a name across days. Until now a finished day's ticks stayed in those keys until the midnight
+// sweep, so right after Done Home called the next day that shares a name "In progress" (Resume), and a second day trained the
+// same evening opened with the first day's sets and would have reported them as its own. Done now closes the session
+// (closeSessionAtDone(), from finishDay()): the day's own copy of its sets and round ratings goes into ONE per-day key,
+// <id>_donelog_d<N> = { sess, sets: { name: [set, …] }, rpe: { key: value } }, tied by `sess` to the finish stamp it belongs
+// to, and the per-name keys are carried exactly as the sweep carries them (carryExerciseKeys(): the weight becomes last time's,
+// ticks, reps and ratings go). A card of the finished day reads and writes its own copy (loadSetLog(…, day),
+// saveSetLogValue(…, day), rpeOn()), so the day still looks done, its counts hold, and a rating or note changed later re-saves
+// the record it had. Every other day reads the per-name keys, which now start clean. The copy is a per-day key like the rating:
+// the sweep removes it, the cloud hands it back only while its day is today's (staleCloudPlan()), and a Reset puts its sets
+// back first (resetDay()). scripts/headless/close-at-done.js.
+function doneLogKey(day) { return ATHLETE_ID + '_donelog_d' + day; }
+function loadDoneLog(day) {
+  if (day == null || day === '') return null;
+  const stamp = localStorage.getItem(ATHLETE_ID + '_completed_d' + day);
+  if (!stamp) return null;
+  try {
+    const o = JSON.parse(localStorage.getItem(doneLogKey(day)) || 'null');
+    return o && o.sess === stamp ? o : null;
+  } catch (e) { return null; }
+}
+function saveDoneLog(day, o) {
+  try { localStorage.setItem(doneLogKey(day), JSON.stringify(o)); } catch (e) { /* storage full: closeSessionAtDone() then leaves the per-name keys alone */ }
+}
+// A circuit round's rating as a card of `day` sees it: the finished day's own copy, else the per-name key.
+function rpeOn(day, key) {
+  const dl = loadDoneLog(day);
+  if (dl && dl.rpe && Object.prototype.hasOwnProperty.call(dl.rpe, key)) return dl.rpe[key] || '';
+  return localStorage.getItem(key) || '';
+}
+function setRpeOn(day, key, v) {
+  const dl = loadDoneLog(day);
+  if (dl && dl.rpe && Object.prototype.hasOwnProperty.call(dl.rpe, key)) { dl.rpe[key] = v || ''; saveDoneLog(day, dl); return; }
+  if (v) localStorage.setItem(key, v); else localStorage.removeItem(key);
+}
+function loadSetLog(exName, totalSets, day) {
   let log = [];
-  try { log = JSON.parse(localStorage.getItem(setLogKey(exName))) || []; }
-  catch (e) {}
+  const dl = loadDoneLog(day);
+  const own = !!(dl && dl.sets && Array.isArray(dl.sets[exName]));
+  if (own) log = dl.sets[exName].map(s => Object.assign({}, s));
+  else {
+    try { log = JSON.parse(localStorage.getItem(setLogKey(exName))) || []; }
+    catch (e) {}
+  }
   // First time? Seed set 1 with the legacy single weight + RPE so athletes
   // who already had values entered don't lose them.
-  if (log.length === 0) {
+  if (log.length === 0 && !own) {
     const k = exName.replace(/\s+/g, '_');
     const oldW = localStorage.getItem(ATHLETE_ID + '_wlog_' + k) || '';
     const oldR = localStorage.getItem(ATHLETE_ID + '_rpe_'  + k) || '';
@@ -13196,7 +13284,9 @@ function setReps(s, planned) {
   const n = parseInt(s && s.n, 10);
   return n > 0 ? n : (planned || null);
 }
-function saveSetLogValue(exName, log) {
+function saveSetLogValue(exName, log, day) {
+  const dl = loadDoneLog(day);
+  if (dl && dl.sets && Array.isArray(dl.sets[exName])) { dl.sets[exName] = log; saveDoneLog(day, dl); return; }
   localStorage.setItem(setLogKey(exName), JSON.stringify(log));
 }
 
@@ -13226,13 +13316,14 @@ function repRangeText(card) {
 function attachSetLog(card) {
   const name  = card.querySelector('.item-name').textContent.trim();
   const total = parseInt(card.dataset.sets, 10) || 1;
-  const log   = loadSetLog(name, total);
+  const day   = card.dataset.day;   // a finished day reads and writes its own copy (closeSessionAtDone())
+  const log   = loadSetLog(name, total, day);
   // Persist seeding ONLY when it carries real content (e.g. migrated legacy
   // weights/RPE). Saving an all-blank seed would push empty arrays to the cloud,
   // and the server-side merge would let those blanks overwrite real data synced
   // from another device. Blank logs are simply (re)created in memory each load.
   if (log.some(s => (s.w && s.w !== '') || (s.r && s.r !== '') || s.d)) {
-    saveSetLogValue(name, log);
+    saveSetLogValue(name, log, day);
   }
 
   const slot = logSlotFor(card);
@@ -13281,7 +13372,7 @@ function attachSetLog(card) {
   // list, Guided Mode, "tick all" and Reset can never leave two rows disagreeing.
   // That includes the weight boxes: their value, and last time's hint.
   function paintSets() {
-    const cur = loadSetLog(name, total);
+    const cur = loadSetLog(name, total, day);
     const liveIdx = cur.findIndex(s => !s.d);
     rows.forEach((row, i) => {
       const s = cur[i] || {};
@@ -13326,10 +13417,10 @@ function attachSetLog(card) {
   rows.forEach(row => {
     const idx = parseInt(row.dataset.setIdx, 10);
     const edit = fn => {
-      const cur = loadSetLog(name, total);
+      const cur = loadSetLog(name, total, day);
       cur[idx] = cur[idx] || { w: '', n: '', r: '', d: false };
       fn(cur[idx]);
-      saveSetLogValue(name, cur);
+      saveSetLogValue(name, cur, day);
       return cur;
     };
     // Weight — saves on every keystroke. Persian/Arabic digits and decimal marks are
@@ -13340,7 +13431,7 @@ function attachSetLog(card) {
     row.querySelector('.ex-set-weight').addEventListener('input', e => {
       const v = normDigits(e.target.value);
       if (v !== e.target.value) e.target.value = v;
-      const cur = loadSetLog(name, total);
+      const cur = loadSetLog(name, total, day);
       cur[idx] = cur[idx] || { w: '', n: '', r: '', d: false };
       cur[idx].w = v;
       carried.delete(idx);
@@ -13350,7 +13441,7 @@ function attachSetLog(card) {
         cur[j].w = v;
         if (v) carried.add(j); else carried.delete(j);
       }
-      saveSetLogValue(name, cur);
+      saveSetLogValue(name, cur, day);
       paintSets();
     });
     // Reps — only typed when the set was NOT the prescribed number. Typing the
@@ -14059,7 +14150,7 @@ const KG_LOADED = /barbell|dumbbell|kettlebell|cable|machine|landmine|trap bar|e
 const KG_NOT    = /treadmill|bike|rower|row machine|ski ?erg|assault/i;
 function kgWanted(card) {
   const name = card.querySelector('.item-name').textContent.trim();
-  if (loadSetLog(name, parseInt(card.dataset.sets, 10) || 1).some(s => s.w || s.lw)) return true;
+  if (loadSetLog(name, parseInt(card.dataset.sets, 10) || 1, card.dataset.day).some(s => s.w || s.lw)) return true;
   if (HIST && historyFor(name).some(h => !h.entry.circuit && (h.entry.sets || []).some(s => histKg(s.w) != null))) return true;
   const entry = SPINE ? spineFor(name, card.dataset.exid) : null;
   const eq = (entry && Array.isArray(entry.equipment)) ? entry.equipment : [];
@@ -14095,8 +14186,8 @@ function syncExerciseCheck(card, log) {
 function setAllSetsDone(card, done) {
   const name  = card.querySelector('.item-name').textContent.trim();
   const total = parseInt(card.dataset.sets, 10) || 1;
-  const cur = loadSetLog(name, total).map(s => Object.assign({}, s, { n: s.n || '', d: !!done }));
-  saveSetLogValue(name, cur);
+  const cur = loadSetLog(name, total, card.dataset.day).map(s => Object.assign({}, s, { n: s.n || '', d: !!done }));
+  saveSetLogValue(name, cur, card.dataset.day);
   // Reflect on the rendered rows
   // Reflect on the rendered rows — through the set log's own painter, so the live
   // row and the RPE tags follow. "Tick all" means all as written: no strip opens.
@@ -14167,7 +14258,7 @@ function attachCircuitLog(card) {
     const slot = logSlotFor(card);
     for (let round = 1; round <= rounds; round++) {
       const rpeKey = circuitRpeKey(name, round);
-      const saved  = localStorage.getItem(rpeKey);
+      const saved  = rpeOn(card.dataset.day, rpeKey);
       const div    = document.createElement('div');
       div.className = 'rpe-row';
       const label = rounds > 1 ? `R${round} · How hard?` : 'How hard?';
@@ -14256,10 +14347,11 @@ function selectRPE(btn, key, e) {
   // Tap the picked number again to clear it, as on a set (CONS-01). removeItem is hooked:
   // the delete goes up as a drop, so the cloud does not hand the rating back.
   const was = btn.classList.contains('selected');
+  const onDay = (btn.closest('.checklist-item') || { dataset: {} }).dataset.day;   // a finished day keeps its own copy
   btn.closest('.rpe-row').querySelectorAll('.rpe-btn').forEach(b => b.classList.remove('selected'));
-  if (was) { localStorage.removeItem(key); return; }
+  if (was) { setRpeOn(onDay, key, ''); return; }
   btn.classList.add('selected');
-  localStorage.setItem(key, btn.textContent.trim());
+  setRpeOn(onDay, key, btn.textContent.trim());
 
   // Collapse the card once the client has logged everything we need. For a
   // multi-round circuit that means every round row has a rating — don't
@@ -14632,7 +14724,7 @@ function stepDone(it) {
   }
   if (it.card.classList.contains('checked')) return true;
   if (STEP && STEP.doneRounds && STEP.doneRounds.has(it.name + '#' + it.setI)) return true;
-  return !!localStorage.getItem(circuitRpeKey(it.name, it.setI + 1));
+  return !!rpeOn(it.card.dataset.day, circuitRpeKey(it.name, it.setI + 1));
 }
 function finishRound(it) {
   (STEP.doneRounds = STEP.doneRounds || new Set()).add(it.name + '#' + it.setI);
@@ -14826,7 +14918,7 @@ function paintTimerLog(row, item) {
   // the empty sets below exactly as the card does. Not for work with no kg box (paintKgCol()).
   const wIn = row.querySelector('.ex-set-weight');
   const kgOn = !!(wIn && !row.closest('.ex-set-log.no-kg'));
-  const lastKg = () => { const s = loadSetLog(item.name, item.total)[item.setI] || {}; return s.lw || ''; };
+  const lastKg = () => { const s = loadSetLog(item.name, item.total, item.card && item.card.dataset.day)[item.setI] || {}; return s.lw || ''; };
   const planned = repsIn ? parseInt(repsIn.getAttribute('placeholder'), 10) || null : null;
   const isRange = !!(repsIn && /–/.test(repsIn.getAttribute('placeholder') || ''));
   const repsNow = () => parseInt(repsIn.value, 10) || (isRange ? null : planned);

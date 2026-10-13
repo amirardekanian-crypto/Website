@@ -85,8 +85,9 @@ No build step. When you edit a page, it's live the moment it's pushed to GitHub.
   `{ d, v }`, valid only on day `d` (`loadSessionNote()`); `<id>_note_` is no longer read. Design:
   `Content/SET-LOGGING-DESIGN.md`. **Since 2026-09-26 a set is `{ w, n, r, d, lw? }`**: `lw` is last
   time's weight, shown under a LAST caption in an empty box, and `w` is only ever today's. A
-  session's set is ended by ONE function, `carrySet()` (the midnight sweep, the cloud copy and a
-  rename all call it), the setlog merge carries `lw`, and typing a weight fills the empty sets
+  session's set is ended by ONE function, `carrySet()` (Done, the midnight sweep, the cloud copy and a
+  rename all call it; since 2026-10-13 Done keeps the day's own copy in `<id>_donelog_d<N>` and a reader
+  passes its day: `loadSetLog(name, total, day)`, PROGRAM-APP.md → *A session closes at Done*), the setlog merge carries `lw`, and typing a weight fills the empty sets
   below (the card's **Same as last** button went on 2026-09-27; Guided's rest screen keeps one).
   A tick on an empty box records no weight. **One RPE control everywhere (CONS-01, 2026-09-27)**:
   the set strip, a circuit's rounds (`selectRPE()`), Guided, the session rating and Log a max
