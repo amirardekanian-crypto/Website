@@ -42,6 +42,51 @@ publicly (Amir, 2026-09-15, before his Iran test): from `/tennis/` (menu, hero l
 screenshot, the inside section, the price card, an FAQ), the course card on `index-fa.html`, and
 `links.html`. If it will not open in Iran without a VPN, move the free parts to static files on the website.
 
+## The course app's look: Centre Court, in Farsi (2026-10-13)
+
+Amir, 2026-10-13: *"Im ok with your recommendations start"*, after the direction board
+(claude.ai/artifact/92KNKRwtzBvvReRTu3TifC: the rules, then Start, Programme, a session and Learn, before and after). The
+course wears the English athlete app's look (`program.html`'s Centre Court; `Content/APP-UI-KIT.md`, §9 for Farsi), adapted to
+Farsi and right to left. `tennis/app/app.css` is in sections: tokens, base, **THE SHARED PARTS**, then one section per screen
+group (DOORS: Start, Setup, the guide, the locked page, sign in, the tour's card · TRAINING: Programme, Week, Session,
+Exercises · STEP, LEARN AND TESTS). A part two screens use lives in the shared parts; a screen's own rule in its section.
+- **One colour set, program.html's**, declared on `body` (paper, sand, rows, hairlines, ink, grey, one green, mint, the clay
+  family). The greens' lights are **mirrored**: they sit at the left, where every course picture keeps its subject. No gold is
+  left (the speed stripe, the Yo-Yo VO2 number and the calculator's middle grade were ochre). No dark mode (the course never had one).
+- **A picture earns a cover.** `banner()` draws a green cover (the picture in luminosity at .7, masked so it shows at the left,
+  a scrim to the cover's last colour, the eyebrow in mint, the title white at the right) when it gets `art` (or `cover: true`),
+  and a paper header (the eyebrow and a 36 px title; 28 px on an inner page) when not. Covers: Start (the walk-on, `ART.start`),
+  a week (its block), a session (its room), a test day, a lesson, Tests, a test, a locked page, the finish of step by step.
+  Paper headers: Programme, Exercises and an exercise, Learn, Setup, the guide. **`.ph` has no z-index**: with one, the
+  luminosity blend sees an empty backdrop and the picture comes out in its own orange.
+- **The eyebrow** is a dot and plain Farsi (13 px bold); no capitals and no letter-spacing anywhere; nothing under 12 px.
+- **Rows, not boxes** (`.list-row`, hairlines between rows) with the **outlined numeral** (`pnum()`, P24) in Persian digits:
+  exercises, lessons, the five on-the-day tests, the how-it-works list, the warm-up's ticks (the number IS the tick and turns
+  solid green when ticked), the sets in step by step (the current one a green disc). Two-digit numbers use `pnum(n, 'sm')`.
+- **Door rows** (`.door`: white, rounded, a green line icon) for what takes you somewhere: the version, the demo.
+- **Shelves** (`.band`): the four blocks on Programme (each with its four week tiles; the block's last week is captioned
+  «آزمون») and the six lesson groups on Learn.
+- **One green button per screen**, inside the cover where there is one. **The session's step-by-step button moved from the
+  sticky bottom bar into the session's cover**, still `.cta-bar .btn.primary`, labelled «شروع جلسه، قدم‌به‌قدم». Buy buttons
+  are green too (`.btn.clay` draws green); the demo bar stays the one clay band (it asks for something).
+- **⚠️ No middle dot "·" next to a Persian digit.** In Vazirmatn it is the Persian zero «۰»: «۱۶ هفته · ۴ بلوک» read
+  «۱۶ هفته ۴۰ بلوک». The shell uses «،» in eyebrows and sentences and `SEP` (a short drawn bar, `sepJoin()`) between items on
+  one line; `dots()` (and `tx()` in lessons and tests) turns the " · " inside content strings into that bar.
+- **No emoji drawn by the shell** (they paint yellow): the lessons' and tests' `icon` fields are no longer shown, the lock is a
+  drawn icon (`LOCK`), the places are words (`PLACE`), the guide's icons are line drawings (`IC`).
+- **Right to left:** back (→) at the right, the go chevron (‹, drawn) at the left, ⌄ opens a fold; a video's ▶ still points
+  right. A number line keeps the course's order: «۳ × ۸» reads sets first from the right, as the lessons teach the card.
+- **Start's button remembers the week** (Amir, 2026-10-13): «ادامه: هفتهٔ N» once week N was opened on this phone, else
+  «شروع هفتهٔ ۱». The week is `localStorage` **`tps.lastweek`** (`rememberWeek()` in `viewWeek()`/`viewSession()`, never for
+  a locked week), on this phone only and never sent. ⚠️ Not `tps.last`: that key is the buyer's offline sign-in record
+  (`{uid, username}`, `bootCloud()`), and sharing it broke both (caught in the build).
+- **Checked by `scripts/headless/course-centre-court.js`** (515 checks: every screen of the demo at 390, 375 and 320 px for
+  sideways scroll, text under 12 px, "·" beside a Persian digit, emoji, yellow, 44 px targets, cover or paper header, one
+  green button; the tour's targets on their screens and all 15 tour steps with a ring; Start's button before and after a week;
+  step by step, the Yo-Yo player, the 1RM calculator and sign in). It fetches the public demo once from Supabase (so it needs
+  the network) and unlocks two tests and makes a test day in memory; no course content is kept in the repo. Run it, and
+  `youtube-course.js`, after any change to the course app.
+
 ## Exercises come from the Spine
 
 **The course's exercises are fed from the Spine** (stage65, 2026-10-12; Amir: "fed from spine", one live source). Each course exercise in `tps_content` names its entry (`spine`); the entry's `steps_fa`, `cues_fa`, `purpose_fa` and `tennis_fa`, and its video, reach the course live through `get_exercises_fa()` (kept on the phone as `tps.spinefa` for offline) and replace the course's own copies; the Spine's one fault replaces the old list of common mistakes (CUE-7). **A change to an entry's English steps, cues, purpose or On court line changes its Farsi in the same run.** The course's own `easier`, `harder`, `equipment`, `noEquipment` and `u16` stay in the course. A new course exercise needs a Spine entry with its Farsi before it ships.
@@ -58,7 +103,7 @@ visitor alike** — the demo's copy names what is locked and its last card carri
 - **The tour** is habits.html's, ported: a clay ring around a real control, a card beside it, four
   mask panes with a **real hole** so a step marked `act` is finished by doing the thing. 15 steps
   across all five tabs, and it **opens step-by-step mode for real** (three steps: the warm-up card
-  and its timer, a real set, the ✕) because the green button at the foot of a session is the part
+  and its timer, a real set, the ✕) because the green step-by-step button (at the foot of a session until 2026-10-13, in its cover since) was the part
   nobody finds alone. It runs **once** on a first open — not on a deep link, which is somebody who
   came for a page — and `?tour=1` always replays it. Whether it has run is `localStorage` key
   **`tps.toured`**, deliberately NOT inside `tps.prefs`: a prefs object existing before a version is
@@ -71,8 +116,10 @@ visitor alike** — the demo's copy names what is locked and its last card carri
 - ⚠️ **Move a control, rename a tab, or change what a tap does and the tour is actively lying**, on
   the first screen a new buyer or a demo visitor sees. The same rule habits.html's `tourSteps()`
   carries. Its targets are resolved out of the live DOM per step, so a renamed class silently rings
-  nothing rather than erroring: `.block-card .weeks`, `.session-card`, `.ex`, `.cta-bar .btn.primary`,
-  `.step-body .rest`, `.step-foot .btn.primary`, `.step-top`, `.search`, `.card.tap`, `#tabs`,
+  nothing rather than erroring: `.block-card .weeks`, `.session-card`, `.ex`, `.cta-bar .btn.primary` (in the
+  session's cover since 2026-10-13, at the top: the tour and the guide say «بالای هر جلسه»),
+  `.step-body .rest`, `.step-foot .btn.primary`, `.step-top`, `.search`, `.section .list-row` (Learn and Tests,
+  `.card.tap` until 2026-10-13), `#tabs`,
   `.bhelp` and `[data-tour="version"]`.
 - ⚠️ **`sel` is lazy; `when` is EAGER — never let a `when` test the DOM.** A step's `sel` runs each
   time that step opens, so it sees the right screen. A step's `when` runs when the list is *built*,
@@ -110,7 +157,7 @@ every locked page, one room per session card, one for the session-complete scree
 the image, subject on the LEFT and the right and bottom calm (the app is right-to-left, so titles sit there), no yellow
 or gold, no faces, never teach exercise form. After regrading a file raise `ART_V`: the root `sw.js` keeps `/assets/`
 files cache-first by full URL. **All 42 pictures exist** (40 on 2026-09-20; `warm-seat` and `long-way-back` were added on 2026-10-02 for the lessons `training-on-period` and `training-with-injury`, 3 credits; 2026-09-20: 4 block covers, 3 session rooms, the test-day card, the session-complete picture, the locked-page tarp, the sign-in walk-on, and 22 lesson and 7 test covers). The last 12 covers were generated on 2026-09-20 with the Higgsfield connector (`/image` skill; `gpt_image_2_5`, medium, 1 credit each, 3 candidates per slot, best of three) and graded through the same script, except `tennis-fitness`, which came from the program.html session's set. ⚠️ **Before generating anything, run `git status --short` and look at `assets/tps/` and the other sessions' scratchpads**: on 2026-09-20 two sessions were asked for the same 12 covers and both generated them, which cost credits twice. The sign-in walk-on is not gated at all: it replaces `court-sessions.jpg` for everyone, because it swaps a picture rather than adding one. Nine of the covers are program.html stills (its art is composed with the subject on the RIGHT, the opposite of this RTL app), reused by mirroring them: `FLIPPED` in `scripts/grade_tps_art.py`. Like the rest of the demo it was built in this folder.
-*Checked 2026-09-26:* `assets/tps/` holds exactly 40 WebP files; `ART` maps 39 of them and the 40th
+*2026-10-13:* the walk-on is also the Start screen's cover now, as `ART.start` (so `ART` maps it too). *Checked 2026-09-26:* `assets/tps/` holds exactly 40 WebP files; `ART` maps 39 of them and the 40th
 is the sign-in walk-on (`tennis/app/index.html`).
 
 ## `/tennis/`: the course's product page

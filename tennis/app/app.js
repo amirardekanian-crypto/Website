@@ -1,9 +1,12 @@
 /* Tennis Performance System, Level 2 · app logic.
    A content reader, not a fitness app. Nothing about the player is stored or sent.
-   Nothing is stored but two things, both in localStorage: the chosen version, "tps.prefs":
-   { age: "adult" | "u16" }, and whether the guided tour has run, "tps.toured" (see "The tour and
-   the guide"). The tour is kept out of tps.prefs on purpose: a prefs object existing before a
-   version is chosen would read as "already chosen" everywhere in this file.
+   Three choices are kept, in localStorage, on this phone only and never sent: the chosen version,
+   "tps.prefs": { age: "adult" | "u16" }; whether the guided tour has run, "tps.toured" (see "The tour
+   and the guide"); and the last week opened, "tps.lastweek": { week }, so Start's button can say
+   «ادامه: هفتهٔ ۵» (Amir, 2026-10-13). The tour is kept out of tps.prefs on purpose: a prefs object
+   existing before a version is chosen would read as "already chosen" everywhere in this file. The
+   last week is NOT "tps.last", which is the buyer's offline sign-in record ({ uid, username }).
+   The look is Centre Court in Farsi (app.css says how; FARSI-PRODUCTS.md → The course app's look).
    Signed in (the default): the handbook comes from Supabase and is kept on the phone in IndexedDB,
    so it opens with no connection (see "Account and the offline copy" below). ?local=1 or
    ?content=<folder> reads the JSON files next to the app instead (needs a content folder, which the
@@ -51,6 +54,11 @@
   (() => { const ag = new URLSearchParams(location.search).get('age');
     if (AGE_LABEL[ag]) { prefs = { age: ag }; writePrefs(prefs); } })();
   let draft = prefs ? Object.assign({}, prefs) : { age: null };
+  // The last week opened, so Start's button says «ادامه: هفتهٔ ۵» (Amir, 2026-10-13). On this phone only, like the version;
+  // never sent. viewWeek() and viewSession() call rememberWeek() for a week that is open (never a locked one).
+  const LAST_KEY = 'tps.lastweek';   // NOT 'tps.last': that key is the buyer's offline sign-in record ({uid, username}, bootCloud())
+  const lastWeek = () => { try { const v = JSON.parse(localStorage.getItem(LAST_KEY)); return v && v.week > 0 ? v.week : 0; } catch (e) { return 0; } };
+  const rememberWeek = w => { try { localStorage.setItem(LAST_KEY, JSON.stringify({ week: +w })); } catch (e) { /* private mode: fine */ } };
   const cur = () => ({ age: (prefs && prefs.age) || 'adult' });
 
   // ?content=_fixtures loads a test set instead of the real content, and ?local=1 the real files
@@ -116,7 +124,8 @@
   const withTimeout = (p, ms) => Promise.race([p, new Promise(res => setTimeout(() => res(null), ms))]);
   const lsGet = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
   const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* full or blocked */ } };
-  const showMessage = (h, p) => { view().innerHTML = `<div class="section"><div class="card clay"><h3>${h}</h3><p class="lead">${p}</p></div></div>`; };
+  // A full-screen notice (the book is not on this phone yet): the paper header and one clay card, no emoji.
+  const showMessage = (h, p) => { view().innerHTML = banner({ kicker: 'سیستم آمادگی جسمانی تنیس', title: h }) + `<div class="section"><div class="card clay"><p>${p}</p></div></div>`; };
 
   // Every key supabase-js keeps for this app ("tps-auth", and any "tps-auth-…" beside it).
   function clearAuth() {
@@ -335,14 +344,15 @@
     startApp();
   }
 
-  // The setup page's account card: who is signed in, how to install, and sign-out. Nothing in the local modes.
+  // The setup page's account block: who is signed in, how to install, and sign-out. Nothing in the local modes.
   function accountBlock() {
     if (window.LOCAL) return '';
-    if (DEMO) return `<div class="section"><div class="card clay"><h3>نسخهٔ نمایشی</h3>
-      <p class="lead">در نسخهٔ نمایشی فقط بخشی از دوره باز است.</p>${buyActions('setup')}</div></div>`;
-    return `<div class="section"><div class="card"><h3>حساب</h3>
+    if (DEMO) return `<div class="section"><div class="sec">نسخهٔ نمایشی</div>
+      <p class="lead">در نسخهٔ نمایشی فقط بخشی از دوره باز است.</p>${buyActions('setup')}</div>`;
+    const lat = s => `<bdi>${s}</bdi>`;   // the phone's own English button names sit inside the Farsi sentence
+    return `<div class="section"><div class="sec">حساب</div>
       <div class="acct"><span class="who">وارد شده با <b dir="ltr">${esc(ACC.username || '—')}</b></span><button class="btn ghost" data-signout>خروج</button></div>
-      <p class="lead" style="margin-top:10px">نصب روی گوشی: در آیفون، در Safari دکمهٔ Share و بعد Add to Home Screen. در اندروید، از منوی ⋮ مرورگر گزینهٔ Install app یا Add to Home screen. کتاب روی همین گوشی می‌ماند و بدون اینترنت هم باز می‌شود.</p></div></div>`;
+      <p class="lead">نصب روی گوشی: در آیفون، در ${lat('Safari')} دکمهٔ ${lat('Share')} و بعد ${lat('Add to Home Screen')}. در اندروید، از منوی ⋮ مرورگر گزینهٔ ${lat('Install app')} یا ${lat('Add to Home screen')}. کتاب روی همین گوشی می‌ماند و بدون اینترنت هم باز می‌شود.</p></div>`;
   }
 
   /* ── Demo (?demo=1) ────────────────────────────────────────────────── */
@@ -356,7 +366,7 @@
   const DEMO = !!window.DEMO;
   const COURSE = 'سیستم آمادگی جسمانی تنیس · سطح ۲';   // the name in the product page's buy message (tennis/level-test.js)
   const BUY_URL = 'https://wa.me/447435363461?text=' + encodeURIComponent('سلام امیر، نسخه‌ی نمایشی رو دیدم و می‌خوام «' + COURSE + '» رو بخرم.');
-  const LOCK = '<span class="lock" aria-label="قفل">🔒</span>';
+  const LOCK = '<span class="lock" role="img" aria-label="قفل"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>';
   const isLocked = o => !!(o && o.locked);
   const lockedCount = list => list.filter(isLocked).length;
   const openWeeksText = () => fa(((C.programme && C.programme.weeks) || []).map(w => w.week).join('، '));
@@ -385,28 +395,52 @@
       `<div class="section"><div class="card clay"><h3>اتصال برقرار نشد</h3>
         <p class="lead">اینترنت را بررسی کنید و دوباره امتحان کنید. اگر باز نشد، با فیلترشکن امتحان کنید.</p>
         <button class="btn primary" data-retry>دوباره امتحان کنید</button></div>
-        <div class="card"><h3>سیستم آمادگی جسمانی تنیس</h3>${buyActions('failed')}</div></div>`;
+        <div class="sec">سیستم آمادگی جسمانی تنیس</div>${buyActions('failed', true)}</div>`;
   }
 
-  // Buy on WhatsApp (the message already typed), read the product page, or sign in if already bought.
-  const buyActions = from => `<div class="demo-actions">
-      <a class="btn clay" href="${BUY_URL}" target="_blank" rel="noopener" data-buy="${from}">خرید نسخهٔ کامل از واتساپ</a>
+  // Buy on WhatsApp (the message already typed), read the product page, or sign in if already bought. The buy button is the screen's one
+  // green button; `quiet` makes it the outlined one on a screen whose main job is another button (the retry, the guide's replay).
+  const buyActions = (from, quiet) => `<div class="demo-actions">
+      <a class="btn ${quiet ? 'ghost' : 'primary'}" href="${BUY_URL}" target="_blank" rel="noopener" data-buy="${from}">خرید نسخهٔ کامل از واتساپ</a>
       <a class="btn ghost" href="/tennis/">دربارهٔ دوره و قیمت</a>
       <p class="lead">قبلاً خریده‌اید؟ <a class="link-btn" href="./">ورود</a></p></div>`;
+
+  // Line icons for the door rows (.d-ic) and the guide's rows (.g-ic): a 24 box, stroke currentColor, drawn by the CSS. Never an emoji.
+  const IC = {
+    person: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>',
+    lock: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+    play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5l11 6.5-11 6.5z"/></svg>',
+    timer: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V10M10 3h4M18.5 6.5l1.5-1.5"/></svg>',
+    search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>',
+    calc: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 7.5h7M9 11.5h.01M12 11.5h.01M15 11.5h.01M9 15h.01M12 15h.01M15 15h.01M9 18h.01M12 18h.01M15 18h.01"/></svg>',
+    speaker: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg>',
+    print: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v6H7z"/></svg>'
+  };
+
+  // The phone paints an emoji in its own yellow, so none is drawn: a lesson's or test's `icon`, a 🔊 in a pill, a 🔒 in a kicker. Whatever calls
+  // viewLocked() (they pass these in o.kicker, o.title, o.pills) loses its emoji, with the space it left. Digits (also "emoji" to Unicode) stay.
+  const EMO_MOD = '[\\uFE0E\\uFE0F\\u20E3\\p{Emoji_Modifier}]*';
+  const EMOJI_RE = new RegExp('(?:\\p{Extended_Pictographic}|\\p{Regional_Indicator}|\\p{Emoji_Modifier})' + EMO_MOD +
+    '(?:\\u200D\\p{Extended_Pictographic}' + EMO_MOD + ')*|[0-9#*]\\uFE0F?\\u20E3', 'gu');
+  const noEmoji = s => String(s == null ? '' : s).replace(EMOJI_RE, '').replace(/[ \t]{2,}/g, ' ').trim();
 
   // A locked item: its card, and the way to unlock it. Everything else about it stayed on the server.
   function viewLocked(o) {
     track('Demo locked', { kind: o.kind, item: o.item });
-    view().innerHTML = banner({ back: o.back, kicker: '🔒 ' + o.kicker, title: o.title, sub: o.sub || '', art: artFor('locked', '*') }) +
+    const pills = noEmoji(o.pills);
+    view().innerHTML = banner({ back: o.back, kicker: noEmoji(o.kicker).replace(/\s+·\s+/g, '، ') + '، قفل', title: dots(noEmoji(o.title)),
+        sub: dots(noEmoji(o.sub)), art: artFor('locked', '*') }) +
       `<div class="section"><div class="card clay"><h3>این بخش در نسخهٔ کامل باز می‌شود</h3>
-        ${o.pills ? `<div class="tags" style="margin:2px 0 8px">${o.pills}</div>` : ''}${o.why ? `<p>${esc(o.why)}</p>` : ''}
-        <p class="lead" style="margin-top:8px">${o.line}</p>${buyActions(o.kind)}</div></div>`;
+        ${pills ? `<div class="tags" style="margin:2px 0 8px">${pills}</div>` : ''}${o.why ? `<p>${dots(esc(noEmoji(o.why)))}</p>` : ''}
+        <p class="lead" style="margin-top:8px">${dots(o.line)}</p>${buyActions(o.kind)}</div></div>`;
   }
 
-  // The Start page's first card in the demo: what is open, counted from the content itself.
+  // The Start page's demo door: what is open, counted from the content itself. It leads to the buy message in WhatsApp, as the demo bar does.
   function demoIntro() {
     const L = (C.learn && C.learn.lessons) || [], T = (C.tests && C.tests.tests) || [];
-    return `<div class="card clay"><h3>نسخهٔ نمایشی</h3><p>هفتهٔ ${openWeeksText()} برنامه، ${fa(T.length - lockedCount(T))} آزمون و ${fa(L.length - lockedCount(L))} درس باز است. بقیه قفل است و در نسخهٔ کامل باز می‌شود.</p></div>`;
+    const weeks = (((C.programme && C.programme.weeks) || []).length > 1 ? 'هفته‌های ' : 'هفتهٔ ') + openWeeksText();
+    return `<a class="door" href="${BUY_URL}" target="_blank" rel="noopener" data-buy="start"><span class="d-ic">${IC.lock}</span>
+      <span class="d-b"><span class="d-l">نسخهٔ نمایشی</span><span class="d-v">${weeks}، ${fa(T.length - lockedCount(T))} آزمون و ${fa(L.length - lockedCount(L))} درس باز است</span></span>${GO}</a>`;
   }
 
   /* ── Pictures (the demo) ───────────────────────────────────────────── */
@@ -474,6 +508,7 @@
     },
     testday: { '*': { f: 'test-day', pos: '50% 50%' } },                   // the test-day card and its page (weeks 4, 8, 12, 16)
     done: { '*': { f: 'last-ball', pos: '50% 50%' } },                     // the session-complete screen
+    start: { '*': { f: 'walk-on', pos: '22% 30%' } },                      // the Start screen's cover (the sign-in picture too, index.html)
     locked: { '*': { f: 'under-covers', pos: '50% 55%' } }                 // every locked item's page
   };
   const artFor = (kind, key) => (ART[kind] && ART[kind][key]) || null;
@@ -486,12 +521,31 @@
   // The Spine's video first (stage65: the course reads its exercises from the Spine), then the old name list, then the file.
   const videoFor = ex => (ex && ex.spineVideo) || (C.libIndex && C.libIndex[libKey(exName(ex))]) || (ex && ex.video) || '';
   const pill = (t, cls) => `<span class="pill ${cls || ''}">${t}</span>`;
-  const GEAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>';
+  const GEAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const BACK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12h15M13.5 6l6 6-6 6"/></svg>';   // → : back points right in RTL
 
+  /* Centre Court's small parts (app.css, section 3). Each is a string or a tiny function, so a screen never redraws one by hand. */
+  // The separator. NEVER a middle dot next to a Persian digit: in Vazirmatn "·" is the Persian zero "۰", so
+  // «۱۶ هفته · ۴ بلوک» reads «۴۰ بلوک». SEP is a short drawn bar; sepJoin() joins the non-empty parts with it;
+  // dots() turns the " · " inside a content string (session and week titles) into it, after esc().
+  const SEP = '<span class="sep" aria-hidden="true"></span>';
+  const sepJoin = parts => parts.filter(Boolean).join(SEP);
+  const dots = html => String(html == null ? '' : html).replace(/\s+·\s+/g, SEP);
+  // The numeral (P24): Persian digits, outlined; cls 'solid' when done or open, 'off' when locked, 'sm' smaller.
+  const pnum = (n, cls) => `<span class="pnum ${cls || ''}" aria-hidden="true">${fa(n)}</span>`;
+  const CHEV = '<span class="chev" aria-hidden="true"></span>';     // ⌄ a fold opens; turns over when open
+  const GO = '<span class="lr-go" aria-hidden="true"></span>';      // the go chevron, pointing left
+  const GO_TRI = '<span class="go-tri" aria-hidden="true"></span>'; // after a cover button's words
+
+  // The screen's head (app.css 3.3). A picture earns a COVER: o.art (or o.cover for the green with no picture). No picture:
+  // the PAPER HEADER. o.kicker is the eyebrow (plain Farsi, no "·"), o.title the title, o.sub a sentence, o.meta one line
+  // (sepJoin its parts), o.foot anything that belongs inside the cover under them (its one green button), o.tall a tall
+  // cover (Start). .banner, .back, .gear and .bhelp are the tour's and the tests' selectors: keep them.
   function banner(o) {
-    return `<header class="banner ${o.back ? 'has-back' : ''} ${o.art ? 'has-art' : ''}">
+    const cover = !!(o.art || o.cover);
+    return `<header class="banner ${cover ? 'is-cover' : 'is-paper'} ${o.back ? 'has-back' : ''} ${o.art ? 'has-art' : ''} ${o.tall ? 'is-tall' : ''}">
       ${artLayer(o.art)}
-      ${o.back ? `<button class="back" data-back="${esc(o.back)}" aria-label="بازگشت">→</button>` : ''}
+      ${o.back ? `<button class="back" data-back="${esc(o.back)}" aria-label="بازگشت">${BACK}</button>` : ''}
       ${o.gear || o.help ? `<div class="bnav">
         ${o.gear ? `<a class="gear" href="#/setup" aria-label="تنظیم نسخه">${GEAR}</a>` : ''}
         ${o.help ? `<a class="bhelp" href="#/guide" aria-label="راهنما">؟</a>` : ''}</div>` : ''}
@@ -499,6 +553,7 @@
       <h1>${o.title}</h1>
       ${o.sub ? `<div class="sub">${o.sub}</div>` : ''}
       ${o.meta ? `<div class="meta">${o.meta}</div>` : ''}
+      ${o.foot || ''}
     </header>`;
   }
 
@@ -512,6 +567,20 @@
 
   const roundName = it => (it && it.roundName) || 'دور';   // e.g. «گیم» for point games
   const totalSets = it => (it.sets || 1) * (it.rounds || 1);
+  // The dose as one line: "۳ × ۸ هر طرف | RPE ۶ | استراحت ۲:۳۰" (the bars are SEP). The first part is bold. The sets × reps keep
+  // the course's own right-to-left order (sets first, read from the right), as its lessons teach the card.
+  function doseLine(it) {
+    const p = [];
+    if (it.rounds && it.sets && it.reps) p.push(fa(it.rounds) + ' ' + roundName(it) + ' × ' + fa(it.sets) + ' × ' + faU(it.reps));
+    else if (it.sets && it.reps) p.push(fa(it.sets) + ' × ' + faU(it.reps) + (it.per ? ' ' + faPer(it.per) : ''));
+    else if (it.reps) p.push(faU(it.reps) + (it.per ? ' ' + faPer(it.per) : ''));
+    if (it.time) p.push(faU(it.time));
+    if (p.length) p[0] = `<b>${p[0]}</b>`;
+    if (it.rpe) p.push('RPE ' + fa(it.rpe));
+    if (it.rest) p.push('استراحت ' + fmtRest(it.rest));
+    if (it.rounds && it.roundRest) p.push('بین ' + roundName(it) + '\u200cها ' + fmtRest(it.roundRest));
+    return sepJoin(p);
+  }
   function dosePills(it) {
     const p = [];
     if (it.rounds && it.sets && it.reps) p.push(pill(fa(it.rounds) + ' ' + roundName(it) + ' × ' + fa(it.sets) + ' × ' + faU(it.reps)));
@@ -547,7 +616,7 @@
     if (!id) return '';   // no demo yet: show nothing (Amir, step 2)
     const short = ytShort(url), watch = ytWatch(url);
     return `<div class="vunit${short ? ' short' : ''}"><div class="video${short ? ' short' : ''}" data-yt="${id}"><button class="play" aria-label="پخش ویدیو">▶</button>
-      <div class="vnote">ویدیو از یوتیوب · در ایران ممکن است فیلترشکن لازم باشد</div></div>${watch
+      <div class="vnote">ویدیو از یوتیوب، در ایران ممکن است فیلترشکن لازم باشد</div></div>${watch
         ? `<a class="vyt" href="${watch}" target="_blank" rel="noopener noreferrer">${YT_MARK}<span>باز کردن در یوتیوب</span>${YT_ARROW}</a>` : ''}</div>`;
   }
 
@@ -562,13 +631,15 @@
     </div>${it.rounds && it.roundRest ? `<div class="lead" style="margin:6px 2px 0">بین ${roundName(it)}\u200cها: ${fmtRest(it.roundRest)} آرام راه بروید</div>` : ''}${it.per ? `<div class="lead" style="margin:6px 2px 0">${faPer(it.per)}</div>` : ''}`;
   }
 
+  // What an exercise says, on its row in a session (with `it`: the numbers first, then the coach's line) and on its own page
+  // (opts.full: the video first, then the equipment and the body parts). Labels are .label; the reading is on the paper.
   function exFacts(ex, it, opts) {
     const o = opts || {};
-    let h = videoBlock(videoFor(ex));
-    if (it) h += statsGrid(it);
-    if (it && it.note) h += `<div class="note">${esc(it.note)}</div>`;
-    if (ex.purpose) h += `<div class="label">چرا این تمرین؟</div><p>${esc(ex.purpose)}</p>`;
-    if (ex.tennis) h += `<div class="label">در تنیس</div><p>${esc(ex.tennis)}</p>`;
+    const para = t => `<p class="fact">${esc(t)}</p>`;
+    const video = videoBlock(videoFor(ex));
+    let h = it ? statsGrid(it) + (it.note ? `<div class="note">${esc(it.note)}</div>` : '') + video : video;
+    if (ex.purpose) h += `<div class="label">چرا این تمرین؟</div>${para(ex.purpose)}`;
+    if (ex.tennis) h += `<div class="label">در تنیس</div>${para(ex.tennis)}`;
     // How to do it (stage65), from the exercise's Spine entry: numbered, before the cues, which finish it (CUE-7).
     if (ex.steps && ex.steps.length) h += `<div class="label">روش انجام</div><ol class="steps">${ex.steps.map(x => `<li>${esc(x)}</li>`).join('')}</ol>`;
     if ((ex.cues && ex.cues.length) || ex.avoid) {
@@ -579,42 +650,51 @@
     if (ex.mistakes && ex.mistakes.length) h += `<div class="label">اشتباه‌های رایج</div><ul class="list">${ex.mistakes.map(m => `<li>${esc(m)}</li>`).join('')}</ul>`;
     if (ex.easier || ex.harder) h += `<div class="label">ساده‌تر یا سخت‌تر</div><div class="alt">
       <div><b>ساده‌تر</b>${esc(ex.easier || '—')}</div><div><b>سخت‌تر</b>${esc(ex.harder || '—')}</div></div>`;
-    if (o.full) {
-      if (ex.equipment) h += `<div class="label">وسایل</div><p>${esc(ex.equipment)}${ex.noEquipment ? `<br><span class="lead">بدون وسیله: ${esc(ex.noEquipment)}</span>` : ''}</p>`;
+    if (!it && o.full) {
+      if (ex.equipment) h += `<div class="label">وسایل</div>${para(ex.equipment)}${ex.noEquipment ? `<p class="fact quiet">بدون وسیله: ${esc(ex.noEquipment)}</p>` : ''}`;
       if (ex.tags && ex.tags.length) h += `<div class="label">بخش‌هایی از بدن که درگیر است</div><div class="tags">${ex.tags.map(t => pill(esc(REGION_FA[t] || t))).join('')}${ex.impact ? pill(esc(IMPACT_FA[ex.impact] || ex.impact), 'clay') : ''}</div>`;
     }
-    if (ex.u16) h += `<div class="label">زیر ۱۶ سال</div><p>${esc(ex.u16)}</p>`;
+    if (ex.u16) h += `<div class="label">زیر ۱۶ سال</div>${para(ex.u16)}`;
     return h;
   }
 
   const altEx = it => (it && it.alt && C.exercises[it.alt]) || null;   // the other main-lift choice
+  // «یا Barbell Back Squat»: the English name sits in a <bdi> INSIDE the block, so the block stays right-aligned.
   const altLine = it => { const a = altEx(it); return a ? `<span class="ex-alt">یا <bdi>${esc(exName(a))}</bdi></span>` : ''; };
+  // One exercise: a paper row (the numeral at the start, the name, the dose, the ⌄ at the end) that opens in place. .ex, .ex-main
+  // and .ex-detail are the tour's and the click handler's selectors (the handler toggles .open on .ex).
   function exRow(it, n) {
     const ex = C.exercises[it.ex] || { name: it.ex, slot: '' };
-    return `<div class="ex ${family(ex.slot || '')}">
+    const alt = altEx(it);
+    return `<div class="ex">
       <button class="ex-main" aria-expanded="false">
-        <span class="ex-num">${fa(n)}</span>
+        ${pnum(n, n > 9 ? 'sm' : '')}
         <span class="ex-body">
           <span class="ex-name"><bdi>${esc(exName(ex))}</bdi></span>${altLine(it)}
-          <span class="ex-pills">${dosePills(it)}</span>
+          <span class="ex-dose">${doseLine(it)}</span>
         </span>
-        <span class="ex-chev">▼</span>
+        ${CHEV}
       </button>
-      <div class="ex-detail">${exFacts(ex, it)}<p style="margin-top:12px"><a class="link-btn" href="#/exercises/${encodeURIComponent(it.ex)}">صفحهٔ کامل این تمرین</a>${altEx(it) ? ` · <a class="link-btn" href="#/exercises/${encodeURIComponent(it.alt)}"><bdi>${esc(exName(altEx(it)))}</bdi></a>` : ''}</p>${it.test ? `<p><a class="link-btn" href="#/tests/${encodeURIComponent(it.test)}">راهنمای آزمون ←</a></p>` : ''}</div>
+      <div class="ex-detail">${exFacts(ex, it)}<div class="ex-links">
+        <a class="link-btn" href="#/exercises/${encodeURIComponent(it.ex)}">صفحهٔ کامل این تمرین</a>${alt ? `
+        <a class="link-btn" href="#/exercises/${encodeURIComponent(it.alt)}"><bdi>${esc(exName(alt))}</bdi></a>` : ''}${it.test ? `
+        <a class="link-btn" href="#/tests/${encodeURIComponent(it.test)}">راهنمای آزمون</a>` : ''}</div></div>
     </div>`;
   }
 
+  // The version picker: a label line and the two-way switch. data-k / data-v are what the click handler reads.
   function setupControls(p) {
     const b = (v, t) => `<button data-k="age" data-v="${v}" class="${p.age === v ? 'on' : ''}">${t}</button>`;
     return `<div class="setup-row"><div class="lbl">چند سالته؟</div>
         <div class="seg">${b('adult', '۱۶ سال و بالاتر')}${b('u16', 'زیر ۱۶ سال')}</div></div>
-      <p class="lead" style="margin:6px 0 0">هر هفته ۳ جلسهٔ اصلی داری؛ جلسه‌های انتخابی را بر اساس نیازت اضافه کن.</p>`;
+      <p class="lead" style="margin:8px 0 0">هر هفته ۳ جلسهٔ اصلی داری؛ جلسه‌های انتخابی را بر اساس نیازت اضافه کن.</p>`;
   }
+  // Short, because Programme and Week draw it too (only when no version is chosen yet): a pill that opens Setup, or a banner that asks.
   const versionLine = () => prefs && prefs.age
-    ? `<div class="version-line">${pill(AGE_LABEL[prefs.age], 'green')}<a class="link-btn" href="#/setup">تغییر</a></div>`
-    : `<div class="card clay"><h3>هنوز نسخه‌ات را انتخاب نکرده‌ای</h3><p>الان نسخهٔ «۱۶ سال و بالاتر» نشان داده می‌شود.</p><p><a class="link-btn" href="#/setup">انتخاب نسخه</a></p></div>`;
+    ? `<a class="pill green" href="#/setup">نسخهٔ ${AGE_LABEL[prefs.age] || AGE_LABEL.adult}</a>`
+    : `<div class="card clay"><h3>هنوز نسخه‌ات را انتخاب نکرده‌ای</h3><p>الان نسخهٔ «۱۶ سال و بالاتر» نشان داده می‌شود.</p><a class="link-btn" href="#/setup">انتخاب نسخه</a></div>`;
 
-  const PLACE = { gym: '🏋️ باشگاه', court: '🎾 زمین تنیس', home: '🏠 خانه' };
+  const PLACE = { gym: 'باشگاه', court: 'زمین تنیس', home: 'خانه' };
   const placePill = (s, cls) => (s && s.place ? pill(PLACE[s.place] || esc(s.place), cls) : '');
   const addonTitle = s => esc(String((s && s.title) || '').replace(/^\+\s*/, ''));   // the app adds its own "+"
   const sessionShort = s => (s.type === 'test' ? 'روز آزمون' : s.kind === 'addon' ? addonTitle(s) : `جلسهٔ ${esc(s.code)}`);
@@ -635,39 +715,52 @@
 
   function acc(id, cls, title, body, open) {
     return `<div class="acc ${cls || ''} ${open ? 'open' : ''}" id="${id}">
-      <button class="acc-head" aria-expanded="${open ? 'true' : 'false'}"><span>${title}</span><span class="chev">▼</span></button>
+      <button class="acc-head" aria-expanded="${open ? 'true' : 'false'}"><span>${title}</span>${CHEV}</button>
       <div class="acc-body">${body}</div></div>`;
   }
 
+  // START: the cover (the walk-on picture, the level in the eyebrow, the one green button), then the intro, the version, the folds, how the book works.
+  // The anchors #/start/safety, #/start/howto, #/start/u16 and #/start/whofor scroll to those ids (a fold opens too).
   function viewStart(anchor) {
     const s = C.start || {};
     const ul = a => `<ul class="list">${(a || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
-    let h = banner({ kicker: 'کتاب راهنمای آمادگی جسمانی تنیس', title: esc(s.title || ''), sub: esc(s.subtitle || ''), gear: true, help: true });
+    // «سیستم آمادگی جسمانی تنیس · سطح ۲»: the name is the title, the level goes in the eyebrow with the length of the plan.
+    const tp = String(s.title || '').split(' · '), lvl = tp.slice(1).join('، ');
+    const kicker = lvl ? `${fa(16)} هفته، ${fa(esc(lvl))}` : 'کتاب راهنمای آمادگی جسمانی تنیس';   // number then word: «۱۶ هفته، سطح ۲», never «سطح ۲، ۱۶»
+    // The one button: carry on where this phone left off (a week that exists), else week 1.
+    const last = lastWeek(), N = last && C.programme && weekData(last) ? last : 0;
+    const go = `<a class="btn primary big" href="#/programme/week/${N || 1}">${N ? 'ادامه: هفتهٔ ' + fa(N) : 'شروع هفتهٔ ۱'}${GO_TRI}</a>`;
+    let h = banner({ art: artFor('start', '*'), tall: true, gear: true, help: true, kicker, title: esc(tp[0]), sub: dots(esc(s.subtitle || '')), foot: go });
     h += `<div class="section">`;
     if ((s.intro || []).length) h += `<p class="intro">${esc(s.intro[0])}</p>`;
+    // The version: a door once chosen (it opens Setup); until then the picker itself, so the first tap is the choice.
+    h += prefs
+      ? `<a class="door" data-tour="version" href="#/setup"><span class="d-ic">${IC.person}</span><span class="d-b"><span class="d-l">نسخهٔ تو</span><span class="d-v">${AGE_LABEL[cur().age]}</span></span>${GO}</a>`
+      : `<div class="card" data-tour="version"><h3>اول نسخهٔ خودت را انتخاب کن</h3><p class="lead">یک بار انتخاب کن؛ هر وقت خواستی عوضش کن. این انتخاب فقط روی همین گوشی می‌ماند.</p>${setupControls(draft)}</div>`;
     if (DEMO) h += demoIntro();
-    if (!prefs) {
-      h += `<div class="card green" data-tour="version"><h3>اول نسخهٔ خودت را انتخاب کن</h3><p class="lead">یک بار انتخاب کن؛ هر وقت خواستی عوضش کن. این انتخاب فقط روی همین گوشی می‌ماند.</p>${setupControls(draft)}</div>`;
-    } else {
-      h += `<div class="card" data-tour="version"><h3>نسخهٔ تو</h3>${versionLine()}</div>`;
-    }
-    h += `<a class="btn primary big" href="#/programme/week/1">▶ شروع هفتهٔ ۱</a>`;
+    // Before you start: three folds. The safety one asks the reader to look (the clay dot); so does the under-16 one for an under-16.
+    let folds = '';
     if (s.safety) {
       const sf = s.safety;
-      const body = `${sf.intro ? `<p style="margin-top:10px">${esc(sf.intro)}</p>` : ''}${ul(sf.items)}
-        ${(sf.redFlags || []).length ? `<div class="label" style="color:var(--red)">فوراً دست نگه دار و به پزشک مراجعه کن اگر…</div>${ul(sf.redFlags)}` : ''}`;
-      h += acc('safety', 'clay', '⚠️ ' + esc(sf.title), body, anchor === 'safety');
+      const body = `${sf.intro ? `<p class="acc-p">${esc(sf.intro)}</p>` : ''}${ul(sf.items)}
+        ${(sf.redFlags || []).length ? `<div class="label" style="color:var(--clay-ink)">فوراً دست نگه دار و به پزشک مراجعه کن اگر…</div>${ul(sf.redFlags)}` : ''}`;
+      folds += acc('safety', 'clay', esc(sf.title), body, anchor === 'safety');
     }
-    const more = (s.intro || []).slice(1).map(p => `<p style="margin-top:10px">${esc(p)}</p>`).join('');
-    const how = (s.howToUse || []).length ? `<div class="grid2">${s.howToUse.map(c => `<div class="card howto"><span class="ic">${esc(c.icon)}</span><h3>${esc(c.title)}</h3><p>${esc(c.text)}</p></div>`).join('')}</div>` : '';
-    if (more || how) h += acc('howto', '', '📖 این کتاب چطور کار می‌کند', more + how, anchor === 'howto');
-    if (s.u16) h += acc('u16', prefs && prefs.age === 'u16' ? 'clay' : '', '🧒 ' + esc(s.u16.title), ul(s.u16.items), anchor === 'u16');
-    if (s.whoFor) h += acc('whofor', '', '🎾 ' + esc(s.whoFor.title), ul(s.whoFor.items), anchor === 'whofor');
+    if (s.whoFor) folds += acc('whofor', '', esc(s.whoFor.title), ul(s.whoFor.items), anchor === 'whofor');
+    if (s.u16) folds += acc('u16', prefs && prefs.age === 'u16' ? 'clay' : '', esc(s.u16.title), ul(s.u16.items), anchor === 'u16');
+    if (folds) h += `<div class="sec">قبل از شروع</div>${folds}`;
+    // How the book works: numbered rows (not links), then the rest of the intro.
+    const how = s.howToUse || [];
+    if (how.length) h += `<div class="sec" id="howto">این کتاب چطور کار می‌کند</div>` + how.map((c, i) =>
+      `<div class="list-row has-num">${pnum(i + 1)}<div class="lr-body"><span class="lr-title">${dots(esc(c.title))}</span><span class="lr-sub">${dots(esc(c.text))}</span></div></div>`).join('');
+    const more = (s.intro || []).slice(1).map(p => `<p class="lead">${esc(p)}</p>`).join('');
+    if (more) h += `<div class="more">${more}</div>`;
     h += `</div>`;
     view().innerHTML = h;
     if (anchor) { const el = document.getElementById(anchor); if (el) el.scrollIntoView({ block: 'start' }); }
   }
 
+  // SETUP: the paper header, the picker, the account block (the buy block in the demo).
   function viewSetup() {
     viewSetupBase();
     const acc = accountBlock();
@@ -675,71 +768,82 @@
   }
   function viewSetupBase() {
     view().innerHTML = banner({ back: '#/start', kicker: 'تنظیم', title: 'نسخهٔ تو', sub: 'برنامه فقط نسخه‌ای را نشان می‌دهد که انتخاب کنی.' }) +
-      `<div class="section"><div class="card">${setupControls(draft)}</div>
-       <p class="lead">این انتخاب فقط روی همین گوشی ذخیره می‌شود و به هیچ جا فرستاده نمی‌شود. هر وقت خواستی عوضش کن.</p>
-       <a class="btn ghost" href="#/programme">رفتن به برنامه</a></div>`;
+      `<div class="section">${setupControls(draft)}
+       <p class="lead" style="margin-top:14px">این انتخاب فقط روی همین گوشی ذخیره می‌شود و به هیچ جا فرستاده نمی‌شود. هر وقت خواستی عوضش کن.</p>
+       <a class="btn ghost setup-go" href="#/programme">رفتن به برنامه</a></div>`;
   }
 
+  // The 16 weeks: four blocks, each a picture band, its goal as a grey line and four week tiles (a link each). An open week is a
+  // white tile with the numeral solid; a locked one (the demo) is outlined grey on the paper; one not written yet is faded. The
+  // last week of every block is its test week, captioned «آزمون». .block-card .weeks is the tour's selector.
   function viewProgramme() {
     const P = C.programme;
-    let h = banner({ kicker: 'برنامهٔ ۱۶ هفته‌ای · ۴ بلوک', title: 'برنامه', gear: true, help: true,
-      meta: prefs ? pill(AGE_LABEL[cur().age], 'light') : '' });
+    let h = banner({ kicker: '۱۶ هفته، ۴ بلوک', title: 'برنامه', gear: true, help: true, meta: prefs ? versionLine() : '' });
     h += `<div class="section">${prefs ? '' : versionLine()}
-      <div class="card green"><h3>هر هفته</h3><p>۳ جلسهٔ اصلی: دو جلسه در باشگاه و یک جلسه روی زمین تنیس. اگر لازم داری، جلسه‌های انتخابی را هم اضافه کن.</p></div>`;
+      <p class="lead">هر هفته ۳ جلسهٔ اصلی: دو جلسه در باشگاه و یک جلسه روی زمین تنیس. اگر لازم داری، جلسه‌های انتخابی را هم اضافه کن.</p>`;
     (P.blocks || []).forEach((bl, i) => {
       const [a, b] = blockRange(bl);
       let weeks = '';
       for (let w = a; w <= b; w++) {
-        weeks += weekData(w) ? `<a class="week open" href="#/programme/week/${w}">${fa(w)}</a>`
-          : DEMO ? `<a class="week locked" href="#/programme/week/${w}" aria-label="هفتهٔ ${fa(w)}، قفل">${fa(w)}</a>`
-          : `<span class="week soon" title="به‌زودی">${fa(w)}</span>`;
+        const test = w === b, cap = `<span class="wl${test ? ' test' : ''}">${test ? 'آزمون' : 'هفته'}</span>`;
+        const name = `هفتهٔ ${fa(w)}${test ? '، آزمون' : ''}`;
+        weeks += weekData(w) ? `<a class="week open" href="#/programme/week/${w}" aria-label="${name}">${cap}${pnum(w, 'solid sm')}</a>`
+          : DEMO ? `<a class="week locked" href="#/programme/week/${w}" aria-label="${name}، قفل">${cap}${pnum(w, 'off sm')}</a>`
+          : `<span class="week soon" title="به‌زودی">${cap}${pnum(w, 'off sm')}</span>`;
       }
       const art = artFor('block', i + 1);
-      h += `<div class="block-card"><div class="bc-top ${art ? 'has-art' : ''}">${artLayer(art)}<div class="bc-t"><b>بلوک ${fa(i + 1)} · ${esc(bl.name)}</b><span dir="ltr">${esc(bl.nameEn)}</span></div></div>
-        <div class="bc-body"><div class="bc-goal">${esc(bl.goal || '')}</div><div class="weeks">${weeks}</div></div></div>`;
+      h += `<div class="block-card"><div class="band ${art ? 'has-art' : ''}">${artLayer(art)}<div class="b-cap">
+          <div class="eb">${a === b ? `بلوک ${fa(i + 1)}، هفتهٔ ${fa(a)}` : `بلوک ${fa(i + 1)}، هفته‌های ${fa(a)} تا ${fa(b)}`}</div><div class="b-t">${esc(bl.name)}</div></div></div>
+        ${bl.goal ? `<p class="bc-goal">${esc(bl.goal)}</p>` : ''}<div class="weeks">${weeks}</div></div>`;
     });
     const ready = (P.weeks || []).map(w => w.week);
-    h += DEMO ? `<p class="lead">🔒 در نسخهٔ نمایشی فقط هفتهٔ ${openWeeksText()} باز است. همهٔ ۱۶ هفته در نسخهٔ کامل است.</p></div>`
+    h += DEMO ? `<p class="lead">در نسخهٔ نمایشی فقط هفتهٔ ${openWeeksText()} باز است. همهٔ ۱۶ هفته در نسخهٔ کامل است.</p></div>`
       : ready.length < 16 ? `<p class="lead">در این نسخهٔ نمونه این هفته‌ها آماده است: ${fa(ready.join('، '))}</p></div>` : `</div>`;
     view().innerHTML = h;
   }
 
+  // A session on a week page: one paper row that opens the session. A core session's code is its numeral (an outlined letter);
+  // an add-on has none; the test day wears a small stopwatch where the numeral would be. .session-card is the tour's selector.
   function sessionCard(week, s) {
     const href = `#/programme/week/${week}/${encodeURIComponent(s.code)}`;
-    const mins = s.minutes ? pill(fa(s.minutes) + ' دقیقه') : '';
+    const mins = s.minutes ? fa(s.minutes) + ' دقیقه' : '';
+    const place = s.place ? (PLACE[s.place] || esc(s.place)) : '';
     if (s.type === 'test') {
-      const tart = artFor('testday', '*');
-      return `<a class="session-card test" href="${href}"><div class="sc-top ${tart ? 'has-art' : ''}">${artLayer(tart)}<div class="sc-code">روز آزمون</div><div class="sc-title">${esc(s.title || '')}</div></div>
-        <div class="sc-meta">${placePill(s)}${mins}${pill(fa((s.tests || []).length) + ' آزمون')}</div></a>`;
+      const glyph = '<span class="lr-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V10M10 3h4M18.5 6.5l1.5-1.5"/></svg></span>';
+      return `<a class="list-row has-num session-card test" href="${href}">${glyph}<span class="lr-body"><span class="lr-title">روز آزمون</span>
+        <span class="lr-sub">${sepJoin([dots(esc(s.title || '')), fa((s.tests || []).length) + ' آزمون'])}</span></span>${GO}</a>`;
+    }
+    if (s.kind === 'addon') {
+      return `<a class="list-row session-card addon" href="${href}"><span class="lr-body"><span class="lr-title">${addonTitle(s)}</span>
+        <span class="lr-sub">${sepJoin([mins, esc(s.forWhom || '')])}</span></span>${GO}</a>`;
     }
     const count = (s.groups || []).filter(g => g.slot !== 'W').reduce((n, g) => n + (g.items || []).length, 0);
-    const addon = s.kind === 'addon';
-    const art = artFor('place', s.place);   // the test day keeps its clay banner: it has no picture yet
-    return `<a class="session-card ${addon ? 'addon' : ''}" href="${href}">
-      <div class="sc-top ${art ? 'has-art' : ''}">${artLayer(art)}<div class="sc-code">${addon ? '+ ' + addonTitle(s) : 'جلسهٔ ' + esc(s.code)}</div><div class="sc-title">${addon ? esc(s.forWhom || '') : esc(s.title)}</div></div>
-      <div class="sc-meta">${placePill(s)}${mins}${count ? pill('گرم کردن + ' + fa(count) + ' تمرین') : ''}</div></a>`;
+    return `<a class="list-row has-num session-card" href="${href}">${pnum(s.code)}<span class="lr-body"><span class="lr-title">${dots(esc(s.title))}</span>
+      <span class="lr-sub">${sepJoin([place, mins, count ? 'گرم کردن و ' + fa(count) + ' تمرین' : ''])}</span></span>${GO}</a>`;
   }
 
+  // One week: the block's picture as a cover, the week's note (Amir's line), the three core sessions, then the optional ones.
   function viewWeek(week) {
     const r = sessionsFor(week);
     if (!r && DEMO && blockOf(week)) {
       return viewLocked({ kind: 'week', item: String(week), back: '#/programme', kicker: 'برنامه', title: `هفتهٔ ${fa(week)}`,
-        sub: esc('بلوک · ' + (blockOf(week).name || '')),
+        sub: esc('بلوک ' + (blockOf(week).name || '')),
         line: `در نسخهٔ نمایشی فقط هفتهٔ ${openWeeksText()} باز است. همهٔ ۱۶ هفته، با جلسه‌های اصلی و انتخابی، در نسخهٔ کامل است.` });
     }
     if (!r) { view().innerHTML = banner({ back: '#/programme', title: 'این هفته هنوز آماده نیست' }); return; }
-    const bl = blockOf(week) || {};
-    let h = banner({ back: '#/programme', kicker: `بلوک · ${esc(bl.name || '')}`, title: `هفتهٔ ${fa(week)}`, sub: esc(r.w.title || ''),
-      meta: pill(AGE_LABEL[r.v.age], 'light'), art: artFor('block', (C.programme.blocks || []).indexOf(bl) + 1) });
+    rememberWeek(week);
+    const bl = blockOf(week) || {}, bi = (C.programme.blocks || []).indexOf(bl);
+    let h = banner({ back: '#/programme', kicker: bi >= 0 ? `بلوک ${fa(bi + 1)}، ${esc(bl.name || '')}` : '', title: `هفتهٔ ${fa(week)}`,
+      sub: dots(esc(String(r.w.title || '').replace(/^هفت(?:ه\u0654|\u06C0|ه)\s*[0-9۰-۹]+\s*[·،:\-–—]?\s*/, ''))), meta: AGE_LABEL[r.v.age], art: artFor('block', bi + 1), cover: true });
     h += `<div class="section">${prefs ? '' : versionLine()}`;
-    if (r.w.note) h += `<div class="card green"><p>${esc(r.w.note)}</p></div>`;
-    h += `<div class="h2">جلسه‌های اصلی</div>`;
+    if (r.w.note) h += `<div class="note">${esc(r.w.note)}</div>`;
+    h += `<div class="sec">جلسه‌های اصلی</div>`;
     r.core.forEach(s => { h += sessionCard(week, s); });
     if (r.addons.length) {
       const g = C.programme.addonGuide;
-      h += `<div class="h2">جلسه‌های انتخابی · بر اساس نیازت</div>`;
-      if (g) h += acc('addonguide', '', '🧭 ' + esc(g.title || 'کدام جلسهٔ انتخابی؟'),
-        `${g.intro ? `<p style="margin-top:10px">${esc(g.intro)}</p>` : ''}<ul class="list">${(g.rules || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>${g.note ? `<p class="lead">${esc(g.note)}</p>` : ''}`, false);
+      h += `<div class="sec">جلسه‌های انتخابی، بر اساس نیازت</div>`;
+      if (g) h += acc('addonguide', '', esc(g.title || 'کدام جلسهٔ انتخابی؟'),
+        `${g.intro ? `<p class="fact">${esc(g.intro)}</p>` : ''}<ul class="list">${(g.rules || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>${g.note ? `<p class="lead">${esc(g.note)}</p>` : ''}`, false);
       r.addons.forEach(s => { h += sessionCard(week, s); });
     }
     h += `</div>`;
@@ -751,17 +855,20 @@
     return items.map((it, k) => {
       const ex = C.exercises[it.ex] || { name: it.ex };
       const name = stepMode ? `<span class="wname"><bdi>${esc(exName(ex))}</bdi></span>` : `<a class="wname" href="#/exercises/${encodeURIComponent(it.ex)}"><bdi>${esc(exName(ex))}</bdi></a>`;
-      return `<div class="wrow ${stepMode && ST.wDone.has(k) ? 'done' : ''}" data-wi="${k}"><button class="wchk" aria-label="انجام شد"></button>${name}<span class="ex-pills">${dosePills(it)}</span></div>`;
+      return `<div class="wrow ${stepMode && ST.wDone.has(k) ? 'done' : ''}" data-wi="${k}"><button class="wchk" aria-label="تیک: ${fa(k + 1)}">${fa(k + 1)}</button><span>${name}<span class="wdose">${doseLine(it)}</span></span></div>`;
     }).join('');
   }
+  // The warm-up is ONE row that opens into the tick list. It keeps the exercise row's parts (.ex, .ex-main, .ex-detail), so the
+  // same click toggles it; the thirteen movements and their ticks are warmRows().
   function warmCard(g) {
     const items = g.items || [];
-    return `<div class="ex f-warm warm">
-      <button class="ex-main" aria-expanded="false"><span class="ex-num">W</span>
-        <span class="ex-body"><span class="ex-name">${esc(g.title)}</span><span class="ex-pills">${pill(fa(items.length) + ' حرکت')}</span></span>
-        <span class="ex-chev">▼</span></button>
-      <div class="ex-detail"><p class="lead" style="margin-top:10px">حرکت‌ها را به ترتیب انجام بده. تیک زدن فقط برای راحتی خودت است و جایی ذخیره نمی‌شود.</p>
-        <div class="wlist">${warmRows(items, false)}</div></div></div>`;
+    return `<div class="ex warm">
+      <button class="ex-main" aria-expanded="false">
+        <span class="ex-body"><span class="ex-name">${fa(items.length)} حرکت، به ترتیب</span><span class="ex-sub">تیک زدن فقط برای راحتی خودت است</span></span>
+        ${CHEV}
+      </button>
+      <div class="ex-detail"><div class="wlist">${warmRows(items, false)}</div></div>
+    </div>`;
   }
 
   function findSession(week, code) {
@@ -773,35 +880,41 @@
   // Test day (replaces the last session of weeks 4, 8, 12 and 16). Links to the test pages.
   function viewTestDay(week, r, s) {
     const T = (C.tests && C.tests.tests) || [];
-    let h = banner({ back: `#/programme/week/${week}`, kicker: `هفتهٔ ${fa(week)} · ${AGE_LABEL[r.v.age]}`,
-      title: `روز آزمون · ${esc(s.title || '')}`, art: artFor('testday', '*'), meta: placePill(s, 'light') + (s.minutes ? pill(fa(s.minutes) + ' دقیقه', 'light') : '') });
-    h += `<div class="section">${s.note ? `<div class="card green"><p>${esc(s.note)}</p></div>` : ''}`;
+    let h = banner({ back: `#/programme/week/${week}`, kicker: `هفتهٔ ${fa(week)}، ${AGE_LABEL[r.v.age]}`, title: 'روز آزمون', sub: dots(esc(s.title || '')),
+      art: artFor('testday', '*'), cover: true, meta: sepJoin([s.place ? (PLACE[s.place] || esc(s.place)) : '', s.minutes ? fa(s.minutes) + ' دقیقه' : '']) });
+    h += `<div class="section">${s.note ? `<div class="note">${esc(s.note)}</div>` : ''}<div class="sec">آزمون‌های این روز</div>`;
     (s.tests || []).forEach((id, k) => {
       const t = T.find(x => x.id === id);
       const name = t ? t.title : ((s.testTitles || {})[id] || id);
-      h += t ? `<a class="list-row" href="#/tests/${encodeURIComponent(id)}"><span class="ex-num">${fa(k + 1)}</span><span class="lr-body"><span class="lr-title">${esc(t.icon || '')} ${esc(name)}</span><br><span class="lr-sub">${esc(t.record || '')}</span></span><span class="lr-go">←</span></a>`
-             : `<div class="list-row" style="opacity:.55"><span class="ex-num">${fa(k + 1)}</span><span class="lr-body"><span class="lr-title">${esc(name)}</span><br><span class="lr-sub">راهنمای این آزمون به‌زودی</span></span></div>`;
+      h += t ? `<a class="list-row has-num" href="#/tests/${encodeURIComponent(id)}">${pnum(k + 1)}<span class="lr-body"><span class="lr-title">${esc(name)}</span>${t.record ? `<span class="lr-sub">${esc(t.record)}</span>` : ''}</span>${GO}</a>`
+             : `<div class="list-row has-num soon">${pnum(k + 1, 'off')}<span class="lr-body"><span class="lr-title">${esc(name)}</span><span class="lr-sub">راهنمای این آزمون به‌زودی</span></span></div>`;
     });
-    h += `<p class="lead" style="margin-top:10px">نتیجه‌ها را روی برگهٔ نتایج بنویس. اینجا چیزی ذخیره نمی‌شود.</p></div>`;
+    h += `<p class="lead closing">نتیجه‌ها را روی برگهٔ نتایج بنویس. اینجا چیزی ذخیره نمی‌شود.</p></div>`;
     view().innerHTML = h;
   }
 
+  // A session: the room's picture as a cover with the one green button (step by step) inside it, then the warm-up and each
+  // group of exercises as a titled list of paper rows. The groups' slot codes (P1, L2…) sit quiet at the end of the title line.
   function viewSession(week, code) {
     const f = findSession(week, code);
     if (!f && DEMO && !weekData(week) && blockOf(week)) return viewWeek(week);   // a locked week
     if (!f) { view().innerHTML = banner({ back: `#/programme/week/${week}`, title: 'این جلسه پیدا نشد' }); return; }
     const { r, s } = f;
+    rememberWeek(week);
     if (s.type === 'test') return viewTestDay(week, r, s);
+    const addon = s.kind === 'addon';
     let n = 0;
-    let h = banner({ back: `#/programme/week/${week}`, kicker: `هفتهٔ ${fa(week)} · ${AGE_LABEL[r.v.age]}`,
-      title: s.kind === 'addon' ? `+ ${addonTitle(s)}` : `جلسهٔ ${esc(s.code)} · ${esc(s.title)}`, art: artFor('place', s.place), meta: placePill(s, 'light') + (s.minutes ? pill(fa(s.minutes) + ' دقیقه', 'light') : '') });
+    let h = banner({ back: `#/programme/week/${week}`, kicker: `هفتهٔ ${fa(week)}، ${addon ? 'جلسهٔ انتخابی' : 'جلسهٔ ' + esc(s.code)}`,
+      title: addon ? addonTitle(s) : dots(esc(s.title)), art: artFor('place', s.place), cover: true,
+      meta: sepJoin([s.minutes ? fa(s.minutes) + ' دقیقه' : '', s.place ? (PLACE[s.place] || esc(s.place)) : '', AGE_LABEL[r.v.age]]),
+      foot: `<div class="cta-bar"><button class="btn primary" data-step-open="${week}|${esc(s.code)}">شروع جلسه، قدم‌به‌قدم${GO_TRI}</button></div>` });
     h += `<div class="section">`;
     (s.groups || []).forEach(g => {
-      if (g.slot === 'W') { h += warmCard(g); return; }
-      h += `<div class="group-title">${g.slot ? `<span class="slot" dir="ltr">${esc(g.slot)}</span>` : ''}${esc(g.title)}</div>`;
+      if (g.slot === 'W') { h += `<div class="sec">${dots(esc(g.title))}</div>` + warmCard(g); return; }
+      h += `<div class="sec">${dots(esc(g.title))}${g.slot ? `<span class="sec-code" dir="ltr">${esc(g.slot)}</span>` : ''}</div>`;
       (g.items || []).forEach(it => { n++; h += exRow(it, n); });
     });
-    h += `</div><div class="cta-bar"><button class="btn primary" data-step-open="${week}|${esc(s.code)}">▶ شروع جلسه، قدم‌به‌قدم</button></div>`;
+    h += `</div>`;
     view().innerHTML = h;
   }
 
@@ -817,15 +930,15 @@
       .sort((a, b) => (isLocked(a[1]) - isLocked(b[1])) || String(a[1].slot).localeCompare(String(b[1].slot)));   // demo: open ones first
     if (!rows.length) return `<div class="empty">تمرینی پیدا نشد.</div>`;
     return rows.map(([id, ex]) => `<a class="list-row ${isLocked(ex) ? 'locked' : ''}" href="#/exercises/${encodeURIComponent(id)}">
-      <span class="lr-body"><span class="lr-title"><bdi>${esc(exName(ex))}</bdi></span><br><span class="lr-sub">${esc(ex.slotTitle || '')}</span></span>
-      <span class="lr-go">${isLocked(ex) ? LOCK : '←'}</span></a>`).join('');
+      <span class="lr-body"><span class="lr-title"><bdi>${esc(exName(ex))}</bdi></span><span class="lr-sub">${esc(ex.slotTitle || '')}</span></span>
+      ${isLocked(ex) ? LOCK : GO}</a>`).join('');
   }
   function viewExercises() {
     const all = Object.values(C.exercises), open = all.filter(ex => !isLocked(ex)).length;
-    view().innerHTML = banner({ kicker: 'کتابخانهٔ تمرین‌ها', title: 'تمرین‌ها', help: true,
-      sub: DEMO ? `${fa(all.length)} تمرین · ${fa(open)} تمرین هفتهٔ ${openWeeksText()} باز است` : `${fa(all.length)} تمرین · جست‌وجو کن یا یک دسته انتخاب کن` }) +
+    view().innerHTML = banner({ kicker: 'کتابخانهٔ حرکت‌ها', title: 'تمرین‌ها', help: true,
+      sub: sepJoin([fa(all.length) + ' تمرین', DEMO ? `${fa(open)} تمرین هفتهٔ ${openWeeksText()} باز است` : 'جست‌وجو کن یا یک دسته انتخاب کن']) }) +
       `<div class="section"><input class="search" id="exq" type="search" placeholder="جست‌وجو: زانو، پرش، اسکوات…" value="${esc(exQuery)}">
-       <div class="chips" style="margin-top:10px">${GROUPS.map(g => `<button class="chip ${exFilter === g.key ? 'on' : ''}" data-filter="${g.key}">${g.label}</button>`).join('')}</div>
+       <div class="chips">${GROUPS.map(g => `<button class="chip ${exFilter === g.key ? 'on' : ''}" data-filter="${g.key}">${g.label}</button>`).join('')}</div>
        <div id="exlist">${exListHtml()}</div></div>`;
   }
 
@@ -844,36 +957,51 @@
     let h = banner({ back: '#/exercises', kicker: esc(ex.slotTitle || ''), title: `<bdi>${esc(exName(ex))}</bdi>` });
     h += `<div class="section">${exFacts(ex, null, { full: true })}`;
     if (uses.length) {
-      h += `<div class="label">در برنامهٔ تو</div>` + uses.map(u =>
-        `<a class="list-row" href="#/programme/week/${u.w}/${encodeURIComponent(u.s.code)}"><span class="lr-body"><span class="lr-title">هفتهٔ ${fa(u.w)} · ${sessionShort(u.s)}</span><br><span class="lr-sub">${esc(u.s.title)}</span></span><span class="lr-go">←</span></a>`).join('');
+      h += `<div class="sec">در برنامهٔ تو</div>` + uses.map(u =>
+        `<a class="list-row" href="#/programme/week/${u.w}/${encodeURIComponent(u.s.code)}"><span class="lr-body"><span class="lr-title">هفتهٔ ${fa(u.w)}، ${sessionShort(u.s)}</span><span class="lr-sub">${u.s.kind === 'addon' ? 'جلسهٔ انتخابی' : dots(esc(u.s.title))}</span></span>${GO}</a>`).join('');
     }
     view().innerHTML = h + `</div>`;
   }
 
+  // The lessons in reading order (by `order`); a lesson's number is its place here, on Learn's rows and in its own kicker.
+  const lessonsOrdered = () => ((C.learn && C.learn.lessons) || []).slice().sort((x, y) => (x.order || 999) - (y.order || 999));
+  const lessonGroup = l => l.group || 'درس‌ها';
+  // Lesson and test TEXT is content: esc() it, and draw a " · " in it as the short bar (never a dot next to a Persian digit).
+  const tx = s => dots(esc(s));
+
+  // Learn (Centre Court): the paper header, then one shelf per group: a photo band over its lessons as numbered rows. Locked rows
+  // keep their numeral (grey) and a drawn lock. The tour rings the first `.section .list-row`.
   function viewLearn() {
-    const L = ((C.learn && C.learn.lessons) || []).slice().sort((x, y) => (x.order || 999) - (y.order || 999));
+    const L = lessonsOrdered();
     const groups = [];
-    L.forEach(l => { const name = l.group || 'درس‌ها'; let g = groups.find(x => x.name === name); if (!g) groups.push(g = { name, items: [] }); g.items.push(l); });
-    const card = l => { const art = artFor('lesson', l.id);
-      const body = `<h3>${esc(l.icon || '')} ${esc(l.title)}${isLocked(l) ? LOCK : ''}</h3><p>${esc(l.summary || '')}</p>${l.audience ? `<p class="lead" style="margin:4px 0 0">برای: ${esc(l.audience)}</p>` : ''}`;
-      return `<a class="card tap ${isLocked(l) ? 'locked' : 'green'} ${art ? 'has-cover' : ''}" href="#/learn/${encodeURIComponent(l.id)}">${art ? `<div class="cover has-art">${artLayer(art)}</div><div class="cbody">${body}</div>` : body}</a>`; };
-    view().innerHTML = banner({ kicker: 'درس‌ها', title: 'آموزش', help: true, sub: 'هر چیزی که برای تمرین درست باید بدانی، کوتاه و ساده.' }) +
-      `<div class="section">${groups.map(g => (groups.length > 1 ? `<div class="h2">${esc(g.name)}</div>` : '') + g.items.map(card).join('')).join('')}</div>`;
+    L.forEach(l => { const name = lessonGroup(l); let g = groups.find(x => x.name === name); if (!g) groups.push(g = { name, items: [] }); g.items.push(l); });
+    // 'For: …' only where a lesson is for someone other than the usual reader (the parents' guide): on every row it was noise.
+    const usual = (() => { const n = {}; L.forEach(l => { if (l.audience) n[l.audience] = (n[l.audience] || 0) + 1; }); return Object.keys(n).sort((a, b) => n[b] - n[a])[0] || ''; })();
+    const row = l => { const pos = L.indexOf(l) + 1, lk = isLocked(l);
+      const sub = [tx(l.summary || ''), l.audience && l.audience !== usual ? `برای: ${tx(l.audience)}` : ''].filter(Boolean).join(' ');
+      // two digits at the full numeral size are exactly the 44 px column, so a lesson numbered 10 or more takes the small numeral
+      return `<a class="list-row has-num ${lk ? 'locked' : ''}" href="#/learn/${encodeURIComponent(l.id)}">${pnum(pos, [lk ? 'off' : '', pos > 9 ? 'sm' : ''].filter(Boolean).join(' '))}<span class="lr-body"><span class="lr-title">${esc(l.title)}</span>${sub ? `<span class="lr-sub clamp">${sub}</span>` : ''}</span>${lk ? LOCK : GO}</a>`; };
+    const shelf = (g, i) => (groups.length > 1
+      ? `<div class="band">${artLayer(artFor('lesson', g.items[0].id))}<div class="b-cap"><div class="eb">بخش ${fa(i + 1)}</div><div class="b-t">${esc(g.name)}</div></div></div>` : '') + g.items.map(row).join('');
+    view().innerHTML = banner({ kicker: `${fa(L.length)} درس کوتاه`, title: 'آموزش', help: true, sub: 'هر چیزی که برای تمرین درست باید بدانی، کوتاه و ساده.' }) +
+      `<div class="section">${groups.map(shelf).join('')}</div>`;
   }
 
+  // A lesson: a cover with its picture, then the prose on the paper (app.css, "Lessons & tests").
   function viewLesson(id) {
-    const L = (C.learn && C.learn.lessons) || [], l = L.find(x => x.id === id);
+    const L = lessonsOrdered(), at = L.findIndex(x => x.id === id), l = L[at];
     if (!l) { view().innerHTML = banner({ back: '#/learn', title: 'این درس پیدا نشد' }); return; }
-    if (isLocked(l)) return viewLocked({ kind: 'lesson', item: id, back: '#/learn', kicker: 'درس', title: `${esc(l.icon || '')} ${esc(l.title)}`,
-      sub: esc(l.summary || ''), line: `این درس و ${fa(lockedCount(L) - 1)} درس دیگر در نسخهٔ کامل است.` });
-    let h = banner({ back: '#/learn', kicker: 'درس', title: `${esc(l.icon || '')} ${esc(l.title)}`, sub: esc(l.summary || ''), art: artFor('lesson', id) }) + `<div class="section prose">`;
+    const kicker = `درس ${fa(at + 1)}، ${esc(lessonGroup(l))}`;
+    if (isLocked(l)) return viewLocked({ kind: 'lesson', item: id, back: '#/learn', kicker, title: esc(l.title),
+      sub: tx(l.summary || ''), line: `این درس و ${fa(lockedCount(L) - 1)} درس دیگر در نسخهٔ کامل است.` });
+    let h = banner({ back: '#/learn', kicker, title: esc(l.title), sub: tx(l.summary || ''), art: artFor('lesson', id) }) + `<div class="section prose">`;
     (l.sections || []).forEach(sec => {
-      if (sec.h) h += `<h3>${esc(sec.h)}</h3>`;
-      (sec.p || []).forEach(p => { h += `<p>${esc(p)}</p>`; });
-      if (sec.list && sec.list.length) h += `<ul class="list">${sec.list.map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
-      if (sec.ol && sec.ol.length) h += `<ol class="steps">${sec.ol.map(i => `<li>${esc(i)}</li>`).join('')}</ol>`;
-      if (sec.callout) h += `<div class="callout">${esc(sec.callout)}</div>`;
-      if (sec.warn) h += `<div class="card warn"><p>${esc(sec.warn)}</p></div>`;
+      if (sec.h) h += `<h3>${tx(sec.h)}</h3>`;
+      (sec.p || []).forEach(p => { h += `<p>${tx(p)}</p>`; });
+      if (sec.list && sec.list.length) h += `<ul class="list">${sec.list.map(i => `<li>${tx(i)}</li>`).join('')}</ul>`;
+      if (sec.ol && sec.ol.length) h += `<ol class="steps">${sec.ol.map(i => `<li>${tx(i)}</li>`).join('')}</ol>`;
+      if (sec.callout) h += `<div class="callout">${tx(sec.callout)}</div>`;
+      if (sec.warn) h += `<div class="card warn"><p>${tx(sec.warn)}</p></div>`;
     });
     view().innerHTML = h + `</div>`;
   }
@@ -920,7 +1048,7 @@
       ${field('bw', 'وزن بدن (اختیاری)', 'decimal', 'wide')}
       <div class="orm-ratio"></div>
       <p class="orm-note">اینجا چیزی ذخیره نمی‌شود. عدد را روی برگهٔ نتایج بنویس.</p>
-    </div>` + (help ? acc('ormhelp', '', '❓ ' + esc(t.calcHelpTitle || 'این چطور کار می‌کند؟'), help, false) : '');
+    </div>` + (help ? acc('ormhelp', '', esc(t.calcHelpTitle || 'این چطور کار می‌کند؟'), help, false) : '');
   }
   // Live recompute; tells "not filled in yet" apart from "too many reps to be honest about".
   const faN = v => fa(v).replace(/\./g, '٫');   // Persian decimal separator
@@ -940,7 +1068,7 @@
     const rir = Math.max(0, 10 - rpe), eff = rp + rir, q = ormQuality(eff);
     const tank = rir === 0 ? 'هیچ تکراری در تو نمانده بود' : `${faN(rir)} تکرار دیگر در تو مانده بود`;
     out.innerHTML = `<b>≈ ${faN(est)}</b><i>کیلوگرم برای یک تکرار</i>`;
-    grade.innerHTML = `${q.label} <em>· چقدر به آن اعتماد کنی</em>`;
+    grade.innerHTML = `${q.label}${SEP}<em>چقدر به آن اعتماد کنی</em>`;
     grade.className = 'orm-grade ' + q.cls;
     from.innerHTML = `${tank}<br>${q.hint}`;
     ratio.textContent = bw > 0 ? `یعنی ${faN((est / bw).toFixed(2))} برابر وزن بدنت. در زمین تنیس، قدرت نسبت به جثه از خودِ کیلوها مهم‌تر است.` : '';
@@ -1013,7 +1141,7 @@
     const nx = R[i + 1];
     return { phase: 'rest', left: nx ? nx.go - now : 0, r: nx || r, next: !!nx, done };
   }
-  const yyLevelText = (r, next) => `${next ? 'بعدی: ' : ''}سطح ${fa(r.lv)} · رفت‌وبرگشت ${fa(r.b)} از ${fa(r.n)}`;
+  const yyLevelText = (r, next) => `${next ? 'بعدی: ' : ''}سطح ${fa(r.lv)}، رفت‌وبرگشت ${fa(r.b)} از ${fa(r.n)}`;
   function yyPaint(now) {
     const el = $('#yoyo'); if (!el || !YY.running) return;
     const st = yyState(now);
@@ -1064,14 +1192,14 @@
     yyShell(`<div class="yy-level">آزمون یو-یو (Yo-Yo IR1)</div>
       <div class="yy-phase">پشت خط شروع بایست</div>
       <p class="yy-hint">صدای گوشی را تا آخر زیاد کن و صدا را امتحان کن. صفحه تا آخر آزمون روشن می‌ماند؛ از این صفحه بیرون نرو. کمک‌کننده اخطارها را می‌شمارد و بعد از دومین دیر رسیدن، «پایان آزمون» را دو بار می‌زند.</p>
-      <button class="btn ghost" data-yy="testsound">🔊 امتحان صدا</button>
-      <button class="btn primary" data-yy="start">▶ شروع آزمون</button>`, true);
+      <button class="btn ghost" data-yy="testsound">امتحان صدا</button>
+      <button class="btn primary" data-yy="start">شروع آزمون${GO_TRI}</button>`, true);
   }
   function yyRenderRunning() {
     yyShell(`<div class="yy-level"></div><div class="yy-speed"></div>
       <div class="yy-left"></div><div class="yy-phase"></div>
       <div class="yy-dist-l">مسافتِ تمام‌شده</div><div class="yy-dist"></div>
-      <button class="btn stop" data-yy="stop">⏹ پایان آزمون</button>`, false);
+      <button class="btn stop" data-yy="stop">پایان آزمون</button>`, false);
   }
   function yyRenderResult() {
     const R = YY.runs, n = YY.result, r = n > 0 ? R[n - 1] : null, dist = n * 40;
@@ -1083,7 +1211,7 @@
       <p class="yy-note">این تخمین از فرمول Bangsbo است و برای یک نفر ممکن است چند واحد اشتباه باشد. برای مقایسه با خودت، مسافت را بنویس. اینجا چیزی ذخیره نمی‌شود.</p>
       <button class="btn primary" data-yy="close">بستن</button>`, true);
   }
-  const yoyoCard = () => `<div class="card yy-card"><h3>🔊 صدای آزمون</h3><p>بوق‌ها طبق جدول منتشرشدهٔ Yo-Yo IR1 پخش می‌شوند: هر رفت‌وبرگشت ۲ × ۲۰ متر، بعد ۱۰ ثانیه ریکاوری، و هر سطح سریع‌تر. در پایان، مسافت و VO2max تخمینی را نشان می‌دهد. چیزی ذخیره نمی‌شود.</p><button class="btn primary" data-yy="open">▶ باز کردن صفحهٔ آزمون</button></div>`;
+  const yoyoCard = () => `<div class="card yy-card"><h3>صدای آزمون</h3><p>بوق‌ها طبق جدول منتشرشدهٔ Yo-Yo IR1 پخش می‌شوند: هر رفت‌وبرگشت ۲ × ۲۰ متر، بعد ۱۰ ثانیه ریکاوری، و هر سطح سریع‌تر. در پایان، مسافت و VO2max تخمینی را نشان می‌دهد. چیزی ذخیره نمی‌شود.</p><button class="btn primary" data-yy="open">باز کردن صفحهٔ آزمون${GO_TRI}</button></div>`;
   document.addEventListener('click', e => {
     const b = e.target && e.target.closest && e.target.closest('[data-yy]'); if (!b) return;
     const a = b.dataset.yy;
@@ -1093,7 +1221,7 @@
     else if (a === 'stop') {
       // Two taps, so a brush against the screen can't end a test.
       if (YY.armed && Date.now() - YY.armed < 3000) { YY.armed = 0; yyStop(false); }
-      else { YY.armed = Date.now(); b.textContent = 'برای پایان، دوباره بزن'; setTimeout(() => { if (YY.running && b.isConnected) b.textContent = '⏹ پایان آزمون'; }, 3000); }
+      else { YY.armed = Date.now(); b.textContent = 'برای پایان، دوباره بزن'; setTimeout(() => { if (YY.running && b.isConnected) b.textContent = 'پایان آزمون'; }, 3000); }
     }
     else if (a === 'minus' || a === 'plus') { YY.result = Math.min(YY.runs.length, Math.max(0, YY.result + (a === 'plus' ? 1 : -1))); yyRenderResult(); }
     else if (a === 'close' && !YY.running) { const el = $('#yoyo'); if (el) { el.hidden = true; el.innerHTML = ''; } document.body.style.overflow = ''; }
@@ -1103,65 +1231,69 @@
     yyKeepAwake(true); if (YY.ctx && YY.ctx.state === 'suspended') YY.ctx.resume();
   });
 
-  const ulist = a => (a && a.length) ? `<ul class="list">${a.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : '';
-  const olist = a => (a && a.length) ? `<ol class="steps">${a.map(i => `<li>${esc(i)}</li>`).join('')}</ol>` : '';
+  const ulist = a => (a && a.length) ? `<ul class="list">${a.map(i => `<li>${tx(i)}</li>`).join('')}</ul>` : '';
+  const olist = a => (a && a.length) ? `<ol class="steps">${a.map(i => `<li>${tx(i)}</li>`).join('')}</ol>` : '';
 
   function testDayBody(D) {
     let b = '';
-    if (D.intro) b += `<p>${esc(D.intro)}</p>`;
+    if (D.intro) b += `<p>${tx(D.intro)}</p>`;
     if (D.ready) b += `<div class="label">فقط اگر همهٔ این‌ها درست است، امروز آزمون بده</div>${ulist(D.ready)}`;
-    if (D.readyNote) b += `<p class="lead">${esc(D.readyNote)}</p>`;
+    if (D.readyNote) b += `<p class="lead">${tx(D.readyNote)}</p>`;
     if (D.order) b += `<div class="label">ترتیب و استراحت</div>${olist(D.order)}`;
-    if (D.orderNote) b += `<p class="lead">${esc(D.orderNote)}</p>`;
-    if (D.warmup) b += `<div class="label">گرم کردن روز آزمون · هر بار همین، به همین ترتیب</div>${ulist(D.warmup)}`;
-    if (D.split) b += `<p>${esc(D.split)}</p>`;
+    if (D.orderNote) b += `<p class="lead">${tx(D.orderNote)}</p>`;
+    if (D.warmup) b += `<div class="label">گرم کردن روز آزمون، هر بار همین، به همین ترتیب</div>${ulist(D.warmup)}`;
+    if (D.split) b += `<p>${tx(D.split)}</p>`;
     return b;
   }
 
+  // Tests (Centre Court): a cover with the test-day picture; the why as a quiet sand note; the test-day fold; the tests as numbered
+  // rows (a numeral for the ones on test day, none for the optional ones). The tour rings the first `.section .list-row`, and the
+  // last tour step rings the cover's ؟ (.bhelp) here.
   function viewTests() {
     const T = (C.tests && C.tests.tests) || [], D = C.tests && C.tests.day;
-    const card = t => { const art = artFor('test', t.id);
-      const body = `<h3>${esc(t.icon || '')} ${esc(t.title)}${isLocked(t) ? LOCK : ''}</h3>${t.badge ? pill(esc(t.badge)) : ''}<p>${esc(t.why || '')}</p>`;
-      return `<a class="card tap ${isLocked(t) ? 'locked' : 'green'} ${art ? 'has-cover' : ''}" href="#/tests/${encodeURIComponent(t.id)}">${art ? `<div class="cover has-art">${artLayer(art)}</div><div class="cbody">${body}</div>` : body}</a>`; };
+    const row = (t, k) => { const lk = isLocked(t), sub = sepJoin([t.badge ? `<b>${tx(t.badge)}</b>` : '', tx(t.why || '')]);
+      return `<a class="list-row ${k ? 'has-num' : ''} ${lk ? 'locked' : ''}" href="#/tests/${encodeURIComponent(t.id)}">${k ? pnum(k, lk ? 'off' : '') : ''}<span class="lr-body"><span class="lr-title">${esc(t.title)}</span>${sub ? `<span class="lr-sub clamp">${sub}</span>` : ''}</span>${lk ? LOCK : GO}</a>`; };
     const onDay = T.filter(t => !t.optional), extra = T.filter(t => t.optional);
-    let h = banner({ kicker: 'آزمون‌های ساده', title: 'آزمون', help: true, sub: 'با متر، کرنومتر و یک همراه. ببین تمرین‌ها جواب می‌دهند یا نه.' }) +
-      `<div class="section"><div class="card"><h3>چرا آزمون می‌دهیم؟</h3><p>قبل از شروع، و در هفتهٔ کم‌حجم هر بلوک (هفته‌های ۴، ۸، ۱۲ و ۱۶)، چند آزمون ساده بده. اگر هر بار شرایط را یکسان نگه داری، می‌بینی بدنت واقعاً بهتر می‌شود یا نه. آزمون اختیاری است؛ برنامه بدون آن هم کار می‌کند.</p></div>`;
-    if (D) h += acc('testday', '', '📋 ' + esc(D.title || 'روز آزمون'), testDayBody(D), false);
-    if (onDay.length) h += `<div class="h2">روز آزمون · به همین ترتیب</div>${onDay.map(card).join('')}`;
-    if (extra.length) h += `<div class="h2">بیرون از روز آزمون</div>${extra.map(card).join('')}`;
+    let h = banner({ kicker: 'آزمون‌های ساده', title: 'آزمون', help: true, sub: 'با متر، کرنومتر و یک همراه. ببین تمرین‌ها جواب می‌دهند یا نه.', art: artFor('testday', '*') }) +
+      `<div class="section"><div class="card green"><h3>چرا آزمون می‌دهیم؟</h3><p>قبل از شروع، و در هفتهٔ کم‌حجم هر بلوک (هفته‌های ۴، ۸، ۱۲ و ۱۶)، چند آزمون ساده بده. اگر هر بار شرایط را یکسان نگه داری، می‌بینی بدنت واقعاً بهتر می‌شود یا نه. آزمون اختیاری است؛ برنامه بدون آن هم کار می‌کند.</p></div>`;
+    if (D) h += acc('testday', '', esc(D.title || 'روز آزمون'), testDayBody(D), false);
+    if (onDay.length) h += `<div class="sec">روز آزمون، به همین ترتیب</div>${onDay.map((t, k) => row(t, k + 1)).join('')}`;
+    if (extra.length) h += `<div class="sec">بیرون از روز آزمون</div>${extra.map(t => row(t, 0)).join('')}`;
     view().innerHTML = h + `</div>`;
   }
 
+  // One test: a cover with its picture, then the prose on the paper (the same as a lesson's), the calculator or the Yo-Yo card where
+  // the test has one, and the two tables (the RM guide, the results sheet) as clean tables that scroll sideways inside their own box.
   function viewTest(id) {
     const T = (C.tests && C.tests.tests) || [], t = T.find(x => x.id === id);
     if (!t) { view().innerHTML = banner({ back: '#/tests', title: 'این آزمون پیدا نشد' }); return; }
-    if (isLocked(t)) return viewLocked({ kind: 'test', item: id, back: '#/tests', kicker: 'آزمون', title: `${esc(t.icon || '')} ${esc(t.title)}`,
-      why: t.why, pills: (t.player ? pill('🔊 صدای آزمون داخل اپ', 'green') : '') + (t.calc ? pill('🧮 ماشین‌حساب سقف داخل اپ', 'green') : ''),
+    if (isLocked(t)) return viewLocked({ kind: 'test', item: id, back: '#/tests', kicker: 'آزمون', title: esc(t.title),
+      why: t.why, pills: (t.player ? pill('صدای آزمون داخل اپ', 'green') : '') + (t.calc ? pill('ماشین‌حساب سقف داخل اپ', 'green') : ''),
       line: `این آزمون و ${fa(lockedCount(T) - 1)} آزمون دیگر، با راهنمای کامل و برگهٔ نتایج، در نسخهٔ کامل است.` });
     const sh = t.sheet || {};
     const cols = sh.cols || ['تلاش ۱', 'تلاش ۲', 'تلاش ۳', 'عدد نهایی'];
-    const rows = sh.rows || ['هفتهٔ ۰ · روز اول', 'هفتهٔ ۰ · روز دوم', 'هفتهٔ ۴', 'هفتهٔ ۸', 'هفتهٔ ۱۲', 'هفتهٔ ۱۶'];
-    let h = banner({ back: '#/tests', kicker: t.badge ? `آزمون · ${esc(t.badge)}` : 'آزمون', title: `${esc(t.icon || '')} ${esc(t.title)}`, art: artFor('test', id) }) + `<div class="section prose">`;
-    if (t.why) h += `<h3>چرا این آزمون؟</h3><p>${esc(t.why)}</p>`;
-    if (t.caution) h += `<div class="card warn"><h3>${esc(t.cautionTitle || 'احتیاط')}</h3><p>${esc(t.caution)}</p></div>`;
-    if (t.rmGuide) h += `<h3>${esc(t.rmTitle || 'کدام RM؟')}</h3><div class="table-wrap"><table class="rmg"><thead><tr><th>شما</th><th>آزمون</th><th>برچسب</th></tr></thead><tbody>${t.rmGuide.map(r => `<tr><td>${esc(r.who)}</td><td><bdi>${esc(r.rm)}</bdi></td><td>${esc(r.note || '')}</td></tr>`).join('')}</tbody></table></div>`;
-    if (t.rmWhy) h += t.rmWhy.map(x => `<p>${x.b ? `<b>${esc(x.b)}</b> ` : ''}${esc(x.t || '')}</p>`).join('');
+    const rows = sh.rows || ['هفتهٔ ۰، روز اول', 'هفتهٔ ۰، روز دوم', 'هفتهٔ ۴', 'هفتهٔ ۸', 'هفتهٔ ۱۲', 'هفتهٔ ۱۶'];
+    let h = banner({ back: '#/tests', kicker: t.badge ? `آزمون، ${tx(t.badge)}` : 'آزمون', title: esc(t.title), art: artFor('test', id) }) + `<div class="section prose">`;
+    if (t.why) h += `<h3>چرا این آزمون؟</h3><p>${tx(t.why)}</p>`;
+    if (t.caution) h += `<div class="card warn"><h3>${tx(t.cautionTitle || 'احتیاط')}</h3><p>${tx(t.caution)}</p></div>`;
+    if (t.rmGuide) h += `<h3>${tx(t.rmTitle || 'کدام RM؟')}</h3><div class="table-wrap"><table class="rmg"><thead><tr><th>شما</th><th>آزمون</th><th>برچسب</th></tr></thead><tbody>${t.rmGuide.map(r => `<tr><td>${tx(r.who)}</td><td><bdi>${esc(r.rm)}</bdi></td><td>${tx(r.note || '')}</td></tr>`).join('')}</tbody></table></div>`;
+    if (t.rmWhy) h += t.rmWhy.map(x => `<p>${x.b ? `<b>${tx(x.b)}</b> ` : ''}${tx(x.t || '')}</p>`).join('');
     if (t.equipment) h += `<h3>وسایل</h3>${ulist(t.equipment)}`;
     if (t.setup) h += `<h3>آماده‌سازی</h3>${olist(t.setup)}`;
-    if (t.helper) h += `<div class="card green"><h3>${esc(t.helperTitle || 'کار همراه تو')}</h3><p>${esc(t.helper)}</p></div>`;
+    if (t.helper) h += `<div class="card green"><h3>${tx(t.helperTitle || 'کار همراه تو')}</h3><p>${tx(t.helper)}</p></div>`;
     if (t.steps) h += `<h3>انجام آزمون</h3>${olist(t.steps)}`;
-    if (t.tries) h += `<h3>چند بار؟</h3><p>${esc(t.tries)}</p>`;
-    if (t.record) h += `<div class="callout">چه عددی یادداشت کنی: ${esc(t.record)}</div>`;
+    if (t.tries) h += `<h3>چند بار؟</h3><p>${tx(t.tries)}</p>`;
+    if (t.record) h += `<div class="callout">چه عددی یادداشت کنی: ${tx(t.record)}</div>`;
     if (t.calc === 'one-rep-max') h += ormCalc(t);
     if (t.player === 'yo-yo-ir1') h += yoyoCard();
     if (t.mistakes) h += `<h3>اشتباه‌هایی که نتیجه را خراب می‌کند</h3>${ulist(t.mistakes)}`;
     if (t.standard) h += `<h3>هر بار یکسان</h3>${ulist(t.standard)}`;
-    if (t.clearChange) h += `<h3>${esc(t.clearTitle || 'تغییر واقعی چقدر است؟')}</h3><div class="callout">${esc(t.clearChange)}</div>`;
-    if (t.when) h += `<h3>کِی آزمون بدهی؟</h3><p>${esc(t.when)}</p>`;
+    if (t.clearChange) h += `<h3>${tx(t.clearTitle || 'تغییر واقعی چقدر است؟')}</h3><div class="callout">${tx(t.clearChange)}</div>`;
+    if (t.when) h += `<h3>کِی آزمون بدهی؟</h3><p>${tx(t.when)}</p>`;
     h += `<h3>برگهٔ نتایج</h3><p class="lead">این جدول را روی کاغذ بکش یا چاپ کن. اینجا چیزی ذخیره نمی‌شود.</p>
-      <div class="table-wrap"><table class="sheet"><thead><tr><th>${esc(sh.first || 'روز')}</th>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>
-      <tbody>${rows.map(r => `<tr><td>${esc(r)}</td>${cols.map(() => '<td></td>').join('')}</tr>`).join('')}</tbody></table></div>
-      <button class="btn ghost" style="margin-top:12px" data-print>چاپ این صفحه</button>`;
+      <div class="table-wrap"><table class="sheet"><thead><tr><th>${tx(sh.first || 'روز')}</th>${cols.map(c => `<th>${tx(c)}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r => `<tr><td>${tx(r)}</td>${cols.map(() => '<td></td>').join('')}</tr>`).join('')}</tbody></table></div>
+      <button class="btn ghost print-btn" data-print>چاپ این صفحه</button>`;
     view().innerHTML = h + `</div>`;
   }
 
@@ -1263,30 +1395,37 @@
     if (c) c.style.strokeDashoffset = String(2 * Math.PI * 85 * (1 - left / total));
     if (left <= 0) { stopTick(); ST.wEnd = null; ST.wLeft = 0; beep(); renderStep(); }
   }
+  // The foot's two outlined buttons under the primary one: → back (right), next ← (left). Back is off on the first exercise.
+  const stepNav = () => `<div class="step-nav"><button class="btn ghost" data-step="prev" ${ST.i === 0 ? 'disabled' : ''}>→ قبلی</button><button class="btn ghost" data-step="next">بعدی ←</button></div>`;
+  // The countdown ring both timers share (app.css, "Step by step"): the drawing is 190 units, and tickRest()/tickWarm() redraw `.ring .time` and `.ring .prog`.
+  const ringHtml = (L, offset, text) => `<div class="ring"><svg viewBox="0 0 190 190" aria-hidden="true"><circle class="track" cx="95" cy="95" r="85"/><circle class="prog" cx="95" cy="95" r="85" stroke-dasharray="${L}" stroke-dashoffset="${offset}"/></svg><div class="time">${text}</div></div>`;
+
   function renderWarmStep(top) {
     const e = ST.items[ST.i], items = e.g.items || [], total = warmSeconds(e.g), left = warmLeft(total);
     const L = 2 * Math.PI * 85;
-    const label = ST.wEnd ? '❚❚ مکث' : left === 0 ? '↻ دوباره' : left < total ? '▶ ادامه' : `▶ شروع ${fa(Math.round(total / 60))} دقیقه`;
+    const label = ST.wEnd ? 'مکث' : left === 0 ? 'دوباره' : left < total ? 'ادامه' : `شروع ${fa(Math.round(total / 60))} دقیقه`;
     stepEl().innerHTML = top + `<div class="step-body">
-        <div class="step-slot">W</div><div class="step-name">${esc(e.g.title)}</div>
-        <div class="rest" style="padding-top:2px">
-          <div class="ring"><svg viewBox="0 0 190 190"><circle class="track" cx="95" cy="95" r="85"/><circle class="prog" cx="95" cy="95" r="85" stroke-dasharray="${L}" stroke-dashoffset="${L * (1 - left / total)}"/></svg><div class="time">${mmss(left)}</div></div>
-          <div class="rest-actions"><button data-step="wtimer">${label}</button></div></div>
+        <div class="eb">${fa(items.length)} حرکت، به ترتیب</div><div class="step-name">${esc(e.g.title)}</div>
+        <div class="rest">
+          ${ringHtml(L, L * (1 - left / total), mmss(left))}
+          <div class="rest-actions"><button class="chip" data-step="wtimer">${label}</button></div></div>
         <div class="label">حرکت‌ها</div><div class="wlist">${warmRows(items, true)}</div>
       </div>
-      <div class="step-foot"><button class="btn primary" data-step="done">✓ گرم کردن تمام شد · بعدی</button>
-        <div class="step-nav"><button class="btn ghost" data-step="prev" ${ST.i === 0 ? 'disabled style="opacity:.4"' : ''}>→ قبلی</button><button class="btn ghost" data-step="next">بعدی ←</button></div></div>`;
+      <div class="step-foot"><button class="btn primary" data-step="done">✓ گرم کردن تمام شد، بعدی</button>${stepNav()}</div>`;
   }
 
   function renderStep() {
     const n = ST.items.length;
-    const top = `<div class="step-top"><div class="row"><button class="x" data-step="close" aria-label="بستن">✕</button>
-      <div class="where">هفتهٔ ${fa(ST.week)} · ${sessionShort(ST.s)} · ${ST.phase === 'done' ? 'تمام شد' : `تمرین ${fa(ST.i + 1)} از ${fa(n)}`}</div></div>
+    const where = sepJoin([`هفتهٔ ${fa(ST.week)}`, sessionShort(ST.s), ST.phase === 'done' ? 'تمام شد' : `تمرین ${fa(ST.i + 1)} از ${fa(n)}`]);
+    // The slim green bar (the training app's Guided): where you are at the start (right), ✕ at the end (left), the progress line along its foot.
+    const top = `<div class="step-top"><div class="row"><div class="where">${where}</div><button class="x" data-step="close" aria-label="بستن">✕</button></div>
       <div class="bar"><i style="width:${ST.phase === 'done' ? 100 : Math.round((ST.i / n) * 100)}%"></i></div></div>`;
     if (ST.phase === 'done') {
+      // The last ball: a green band in the cover treatment (the classes of app.css 3.3's cover, written here because banner() has no
+      // class of its own to add), the sentence on the paper, one button. If the picture fails, the band is simply the green.
       const dart = artFor('done', '*');
-      stepEl().innerHTML = top + `<div class="step-body"><div class="done-screen">${dart ? `<div class="done-art has-art">${artLayer(dart)}</div>` : `<div class="big">🎾</div>`}<h2>جلسه تمام شد</h2>
-        <p>آفرین. چیزی ذخیره نمی‌شود؛ هر وقت خواستی جلسهٔ بعدی را از برنامه باز کن.</p></div></div>
+      stepEl().innerHTML = top + `<header class="banner is-cover done-cover ${dart ? 'has-art' : ''}">${artLayer(dart)}<div class="kicker">هفتهٔ ${fa(ST.week)}، ${sessionShort(ST.s)}</div><h1>جلسه تمام شد</h1></header>
+        <div class="step-body"><p class="done-line">آفرین. چیزی ذخیره نمی‌شود؛ هر وقت خواستی جلسهٔ بعدی را از برنامه باز کن.</p></div>
         <div class="step-foot"><button class="btn primary" data-step="close">بستن</button></div>`;
       return;
     }
@@ -1294,34 +1433,35 @@
     const { g, it, ex } = ST.items[ST.i];
     const per = it.sets || 1, R = it.rounds || 0, sets = R ? totalSets(it) : (it.sets || 0);
     const pos = k => ({ r: Math.ceil(k / per), k: ((k - 1) % per) + 1 });
-    const setText = k => R ? `${roundName(it)} ${fa(pos(k).r)} از ${fa(R)} · تکرار ${fa(pos(k).k)} از ${fa(per)}` : `ست ${fa(k)} از ${fa(sets)}`;
+    const setText = k => R ? `${roundName(it)} ${fa(pos(k).r)} از ${fa(R)}، تکرار ${fa(pos(k).k)} از ${fa(per)}` : `ست ${fa(k)} از ${fa(sets)}`;
     const curDot = R ? pos(ST.set).k : ST.set;
     if (ST.phase === 'rest') {
       const L = 2 * Math.PI * 85;
-      const nextLabel = `${setText(ST.set + 1)} · <bdi>${esc(exName(ex))}</bdi>`;
-      stepEl().innerHTML = top + `<div class="step-body"><div class="rest"><div class="rest-label">${R && ST.set % per === 0 ? `استراحت بین ${roundName(it)}\u200cها · آرام راه بروید` : 'استراحت'}</div>
-        <div class="ring"><svg viewBox="0 0 190 190"><circle class="track" cx="95" cy="95" r="85"/><circle class="prog" cx="95" cy="95" r="85" stroke-dasharray="${L}" stroke-dashoffset="0"/></svg><div class="time">${mmss(ST.total)}</div></div>
-        <div class="rest-actions"><button data-step="add15">+۱۵ ثانیه</button><button data-step="skip">رد کردن استراحت</button></div>
-        <p class="lead" style="margin-top:16px">بعدی: ${nextLabel}</p></div></div>`;
+      const nextLabel = sepJoin([setText(ST.set + 1), `<bdi>${esc(exName(ex))}</bdi>`]);
+      stepEl().innerHTML = top + `<div class="step-body"><div class="rest"><div class="rest-label">${R && ST.set % per === 0 ? `استراحت بین ${roundName(it)}\u200cها، آرام راه بروید` : 'استراحت'}</div>
+        ${ringHtml(L, 0, mmss(ST.total))}
+        <div class="rest-actions"><button class="chip" data-step="add15">+۱۵ ثانیه</button></div>
+        <p class="rest-next">بعدی: ${nextLabel}</p></div></div>
+        <div class="step-foot"><button class="btn ghost" data-step="skip">رد کردن استراحت</button></div>`;
       tickRest();
       return;
     }
-    const dots = sets > 1 ? `<div class="set-dots">${Array.from({ length: R ? per : sets }, (_, k) => `<i class="${k + 1 < curDot ? 'done' : k + 1 === curDot ? 'now' : ''}"></i>`).join('')}</div>
+    // The sets as numerals: done = solid green, now = a green disc with a white numeral, still to come = outlined.
+    const dots = sets > 1 ? `<div class="set-dots">${Array.from({ length: R ? per : sets }, (_, k) => `<i class="${k + 1 < curDot ? 'done' : k + 1 === curDot ? 'now' : ''}">${fa(k + 1)}</i>`).join('')}</div>
       <div class="set-label">${setText(ST.set)}</div>` : '';
     const cues = (ex.cues || []).slice(0, 3).map(c => `<div class="cue">${esc(c)}</div>`).join('') + (ex.avoid ? `<div class="cue bad">${esc(ex.avoid)}</div>` : '');
-    const doneLabel = sets > 1 ? (R ? '✓ تکرار انجام شد' : '✓ ست انجام شد') : '✓ انجام شد · بعدی';
+    const doneLabel = sets > 1 ? (R ? '✓ تکرار انجام شد' : '✓ ست انجام شد') : '✓ انجام شد، بعدی';
     stepEl().innerHTML = top + `<div class="step-body">
-        <div class="step-slot">${esc(g.title || '')}</div>
+        <div class="eb">${esc(g.title || '')}</div>
         <div class="step-name"><bdi>${esc(exName(ex))}</bdi></div>
         ${altEx(it) ? `<div class="step-alt">${altLine(it)}</div>` : ''}
-        <div class="step-dose">${dosePills(it)}</div>
+        ${statsGrid(it)}
         ${dots}
         ${it.note ? `<div class="note">${esc(it.note)}</div>` : ''}
         ${cues ? `<div class="label">نکته‌ها</div>${cues}` : ''}
         ${videoBlock(videoFor(ex))}
       </div>
-      <div class="step-foot"><button class="btn primary" data-step="done">${doneLabel}</button>
-        <div class="step-nav"><button class="btn ghost" data-step="prev" ${ST.i === 0 ? 'disabled style="opacity:.4"' : ''}>→ قبلی</button><button class="btn ghost" data-step="next">بعدی ←</button></div></div>`;
+      <div class="step-foot"><button class="btn primary" data-step="done">${doneLabel}</button>${stepNav()}</div>`;
   }
 
   /* ── The tour and the guide (راهنما) ───────────────────────────────── */
@@ -1329,7 +1469,7 @@
   //
   //   THE TOUR  — a clay ring around a real control, a card beside it, the rest
   //               dimmed. It walks all five tabs AND opens step-by-step mode for
-  //               real, because the green button at the foot of a session is the
+  //               real, because the green step-by-step button (in the session's cover since 2026-10-13) is the
   //               part nobody finds on their own. Runs once on a first open,
   //               replayable for ever from the guide or ?tour=1.
   //   THE GUIDE — #/guide, the map the tour leaves behind: every section, every
@@ -1450,7 +1590,7 @@
 
     if (sess) S.push({
       title: 'جلسه را قدم‌به‌قدم ببر',
-      body: `دکمهٔ سبز پایین هر جلسه. تمرین‌ها را یکی‌یکی جلویت می‌گذارد، ست‌ها را می‌شمارد و
+      body: `دکمهٔ سبز بالای هر جلسه. تمرین‌ها را یکی‌یکی جلویت می‌گذارد، ست‌ها را می‌شمارد و
              استراحت را خودش نگه می‌دارد. بیشترِ آدم‌ها همین را باز می‌کنند و گوشی را کنار می‌گذارند.`,
       hash: sess.hash, sel: () => tq('.cta-bar .btn.primary'),
       act: true, hint: 'بزنش — یا «بعدی» را بزن، خودم بازش می‌کنم.'
@@ -1492,7 +1632,7 @@
       body: `چرا قدرت، چطور گرم کنی، خواب، تغذیه، درد و علائم خطر، راهنمای پدر و مادر…
              ${DEMO ? `${fa(openL)} درس در نسخهٔ نمایشی باز است` : `${fa(L.length)} درس`}، هر کدام دو-سه دقیقه.
              اگر جایی از برنامه برایت سؤال شد، جوابش معمولاً اینجاست.`,
-      hash: '#/learn', sel: () => tq('.section .card.tap')
+      hash: '#/learn', sel: () => tq('.section .list-row')
     });
 
     S.push({
@@ -1500,7 +1640,7 @@
       body: `${DEMO ? `${fa(openT)} آزمون از ${fa(T.length)} آزمون` : `${fa(T.length)} آزمون`} ساده، با متر و کرنومتر و یک همراه.
              هر کدام روش دقیق اجرا و <b>برگهٔ نتایج</b> دارد. آزمون یو-یو زنگ‌هایش را خود اپ می‌زند،
              و آزمون قدرت <b>سقفت</b> (یک‌تکرار بیشینه) را برایت حساب می‌کند.`,
-      hash: '#/tests', sel: () => tq('.section .card.tap')
+      hash: '#/tests', sel: () => tq('.section .list-row')
     });
 
     // The last step rings the way back IN — the "؟" — so the tour ends pointing at
@@ -1515,7 +1655,7 @@
     } : {
       title: 'همین بود',
       body: `پشت این دکمه هر وقت خواستی برمی‌گردی: هم <b>نقشهٔ کامل اپ</b>، هم همین راهنما دوباره.
-             حالا از <b>▶ شروع هفتهٔ ۱</b> در صفحهٔ شروع راه بیفت — اپ بعد از اولین ورود
+             حالا از <b>شروع هفتهٔ ۱</b> در صفحهٔ شروع راه بیفت — اپ بعد از اولین ورود
              <b>بدون اینترنت</b> هم باز می‌شود، پس در باشگاه و روی زمین هم در دسترس است.`,
       hash: '#/tests', sel: () => tq('.bhelp'), cta: 'برویم سراغ برنامه', last: true
     });
@@ -1753,10 +1893,10 @@
   /* ── The guide screen (#/guide) ────────────────────────────────────── */
   // A map, not an essay: every row is a real link, so reading where something
   // lives and going there are the same tap.
+  // One row of the map: a line icon at the start, the name, a grey line, and (when it goes somewhere) the go chevron at the end.
   function gRow(href, icon, title, sub) {
-    const inner = `<span class="gi">${icon}</span><span class="gb"><span class="gt">${title}</span><span class="gs">${sub}</span></span>` +
-      (href ? '<span class="gg">←</span>' : '');
-    return href ? `<a class="guide-row" href="${href}">${inner}</a>` : `<div class="guide-row">${inner}</div>`;
+    const inner = `<span class="g-ic">${icon}</span><span class="lr-body"><span class="lr-title">${title}</span><span class="lr-sub">${sub}</span></span>${href ? GO : ''}`;
+    return href ? `<a class="list-row guide-row" href="${href}">${inner}</a>` : `<div class="list-row guide-row">${inner}</div>`;
   }
 
   // Link straight at a test when the content has it open, and at the list when
@@ -1772,36 +1912,32 @@
     let h = banner({ back: '#/start', kicker: 'راهنما', title: 'نقشهٔ اپ',
       sub: 'چه چیزی کجاست، و آن چند چیزی که معمولاً پیدا نمی‌شود.' });
     h += `<div class="section">
-      <div class="card clay"><h3>راهنمای تصویری · یک دقیقه</h3>
+      <div class="card"><h3>راهنمای تصویری، یک دقیقه</h3>
         <p>خود اپ را نشانت می‌دهد: هر دکمه را می‌گیرد و می‌گوید چه کار می‌کند.</p>
-        <button class="btn primary" style="margin-top:12px" data-tour-start>▶ پخش راهنما</button></div>
+        <button class="btn primary" style="margin-top:12px" data-tour-start>پخش راهنما${GO_TRI}</button></div>
 
-      <div class="h2">پنج بخش</div>
-      <div class="card">
-        ${gRow('#/start', tabIcon('start'), 'شروع', 'نسخه‌ات را انتخاب کن، ایمنی را بخوان، و از همین‌جا وارد هفتهٔ ۱ شو.')}
-        ${gRow('#/programme', tabIcon('programme'), 'برنامه', '۱۶ هفته در ۴ بلوک. هر هفته سه جلسهٔ اصلی، به‌علاوهٔ جلسه‌های انتخابی. هفته‌های ۴، ۸، ۱۲ و ۱۶ روز آزمون دارند.')}
-        ${gRow('#/exercises', tabIcon('exercises'), 'تمرین‌ها', 'کتابخانهٔ حرکت‌ها. جست‌وجو کن یا دسته انتخاب کن؛ هر تمرین نکته‌ها، اشتباه‌های رایج، جایگزین و ویدیو دارد.')}
-        ${gRow('#/learn', tabIcon('learn'), 'آموزش', `${fa(L.length)} درس کوتاه: چرا قدرت، گرم کردن، خواب، تغذیه، درد و علائم خطر، راهنمای پدر و مادر.`)}
-        ${gRow('#/tests', tabIcon('tests'), 'آزمون', `${fa(T.length)} آزمون ساده با روش دقیق اجرا و برگهٔ نتایج.`)}
-      </div>
+      <div class="sec">پنج بخش</div>
+      ${gRow('#/start', tabIcon('start'), 'شروع', 'نسخه‌ات را انتخاب کن، ایمنی را بخوان، و از همین‌جا وارد هفتهٔ ۱ شو.')}
+      ${gRow('#/programme', tabIcon('programme'), 'برنامه', '۱۶ هفته در ۴ بلوک. هر هفته سه جلسهٔ اصلی، به‌علاوهٔ جلسه‌های انتخابی. هفته‌های ۴، ۸، ۱۲ و ۱۶ روز آزمون دارند.')}
+      ${gRow('#/exercises', tabIcon('exercises'), 'تمرین‌ها', 'کتابخانهٔ حرکت‌ها. جست‌وجو کن یا دسته انتخاب کن؛ هر تمرین نکته‌ها، اشتباه‌های رایج، جایگزین و ویدیو دارد.')}
+      ${gRow('#/learn', tabIcon('learn'), 'آموزش', `${fa(L.length)} درس کوتاه: چرا قدرت، گرم کردن، خواب، تغذیه، درد و علائم خطر، راهنمای پدر و مادر.`)}
+      ${gRow('#/tests', tabIcon('tests'), 'آزمون', `${fa(T.length)} آزمون ساده با روش دقیق اجرا و برگهٔ نتایج.`)}
 
-      <div class="h2">چیزهایی که دیر پیدا می‌شوند</div>
-      <div class="card">
-        ${gRow('#/setup', '⚙️', 'عوض کردن نسخه', 'چرخ‌دندهٔ بالای صفحهٔ شروع و برنامه. بین «۱۶ سال و بالاتر» و «زیر ۱۶ سال» جابه‌جا شو؛ برنامه همان لحظه عوض می‌شود.')}
-        ${gRow(null, '▶', 'حالت قدم‌به‌قدم', 'دکمهٔ سبز پایین هر جلسه. تمرین‌ها را یکی‌یکی جلو می‌برد، ست‌ها را می‌شمارد، تایمر استراحت را نگه می‌دارد و ته آن زنگ می‌زند. صفحهٔ گوشی هم خاموش نمی‌شود.')}
-        ${gRow(null, '⏱', 'تایمر گرم کردن', 'داخل همان حالت، روی کارت گرم کردن. ده دقیقه را برایت می‌گیرد و می‌توانی حرکت‌ها را تیک بزنی.')}
-        ${gRow('#/exercises', '🔍', 'جست‌وجوی تمرین', 'اسم حرکت، یا اسم ناحیه مثل «زانو». هر تمرین می‌گوید در کدام هفته‌ها و جلسه‌ها می‌آید.')}
-        ${gRow(testHref('strength-check'), '🧮', 'حساب‌گر سقف', 'یک‌تکرار بیشینه‌ات را از وزن، تکرار و RPE حساب می‌کند. داخل صفحهٔ آزمون قدرت.')}
-        ${gRow(testHref('yo-yo-ir1'), '🔊', 'صدای آزمون یو-یو', 'زنگ‌های آزمون یو-یو را خود اپ می‌زند. بلندگو را بلند کن و گوشی را کنار زمین بگذار.')}
-        ${gRow(null, '🖨', 'چاپ برگهٔ نتایج', 'پایین هر صفحهٔ آزمون. جدول را چاپ کن یا روی کاغذ بکش؛ اپ نتیجه‌ای ذخیره نمی‌کند.')}
-      </div>`;
+      <div class="sec">چیزهایی که دیر پیدا می‌شوند</div>
+      ${gRow('#/setup', GEAR, 'عوض کردن نسخه', 'چرخ‌دندهٔ بالای صفحهٔ شروع و برنامه. بین «۱۶ سال و بالاتر» و «زیر ۱۶ سال» جابه‌جا شو؛ برنامه همان لحظه عوض می‌شود.')}
+      ${gRow(null, IC.play, 'حالت قدم‌به‌قدم', 'دکمهٔ سبز بالای هر جلسه. تمرین‌ها را یکی‌یکی جلو می‌برد، ست‌ها را می‌شمارد، تایمر استراحت را نگه می‌دارد و ته آن زنگ می‌زند. صفحهٔ گوشی هم خاموش نمی‌شود.')}
+      ${gRow(null, IC.timer, 'تایمر گرم کردن', 'داخل همان حالت، روی کارت گرم کردن. ده دقیقه را برایت می‌گیرد و می‌توانی حرکت‌ها را تیک بزنی.')}
+      ${gRow('#/exercises', IC.search, 'جست‌وجوی تمرین', 'اسم حرکت، یا اسم ناحیه مثل «زانو». هر تمرین می‌گوید در کدام هفته‌ها و جلسه‌ها می‌آید.')}
+      ${gRow(testHref('strength-check'), IC.calc, 'حساب‌گر سقف', 'یک‌تکرار بیشینه‌ات را از وزن، تکرار و RPE حساب می‌کند. داخل صفحهٔ آزمون قدرت.')}
+      ${gRow(testHref('yo-yo-ir1'), IC.speaker, 'صدای آزمون یو-یو', 'زنگ‌های آزمون یو-یو را خود اپ می‌زند. بلندگو را بلند کن و گوشی را کنار زمین بگذار.')}
+      ${gRow(null, IC.print, 'چاپ برگهٔ نتایج', 'پایین هر صفحهٔ آزمون. جدول را چاپ کن یا روی کاغذ بکش؛ اپ نتیجه‌ای ذخیره نمی‌کند.')}`;
 
     h += DEMO
-      ? `<div class="card clay"><h3>این نسخهٔ نمایشی است</h3>
+      ? `<div class="card clay" style="margin-top:26px"><h3>این نسخهٔ نمایشی است</h3>
            <p>هفتهٔ ${openWeeksText()}، ${fa(T.length - lockedCount(T))} آزمون و ${fa(L.length - lockedCount(L))} درس باز است.
               نسخهٔ کامل هر ۱۶ هفته، ${fa(L.length)} درس و ${fa(T.length)} آزمون را باز می‌کند.</p>
-           ${buyActions('guide')}</div>`
-      : `<div class="card green"><h3>بدون اینترنت هم باز می‌شود</h3>
+           ${buyActions('guide', true)}</div>`
+      : `<div class="card green" style="margin-top:26px"><h3>بدون اینترنت هم باز می‌شود</h3>
            <p>بعد از اولین ورود، کل کتاب روی گوشی می‌ماند. در باشگاه و روی زمین، با یا بدون اینترنت، باز می‌شود.
               اپ هیچ چیزی دربارهٔ تو ذخیره یا ارسال نمی‌کند؛ تنها چیزی که روی گوشی می‌ماند نسخه‌ای است که انتخاب کرده‌ای.</p></div>`;
 
