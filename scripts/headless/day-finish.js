@@ -296,7 +296,7 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
     t.check('mid-session (a set done, not all): Finish early is for the bar', !(await hidden()));
     const closed = await R(p, '#timer-1 .session-timer-finish');
     t.check('…but it is only drawn on the open row (⋯ closed: not drawn)', !closed.shown, JSON.stringify(closed));
-    t.check('⋯ names what is under it', (await p.getAttribute('#timer-1 .session-timer-more', 'aria-label')) === 'More: Pause, Guided, Reset and Finish early');
+    t.check('⋯ names what is under it', (await p.getAttribute('#timer-1 .session-timer-more', 'aria-label')) === 'More: Pause, Guided, Reset, Finish early and Ask Amir');   // Ask Amir under ⋯ since 2026-10-13
     await p.click('#timer-1 .session-timer-more'); await p.waitForTimeout(200);
     const f = await fit(p);
     t.check('⋯ open: Pause, Guided, Reset and Finish early in a 2 x 2 grid, each 44 px to hit, nothing cut', f.count === 4 && f.actionRows === 2 && fitOk(f), JSON.stringify(f.rows.map(x => [x.n, x.text, x.h, Math.round(x.l), Math.round(x.t)])));
@@ -371,7 +371,7 @@ const disarm = (p, sel) => p.evaluate(sel => { const b = document.querySelector(
     await clock(p);
     await p.evaluate(() => { const c = document.querySelector('#day1 .checklist-item'); if (c.classList.contains('collapsed')) toggleExpand(c); toggleCheckOnly(c, '1'); hideAaToast(); });
     await p.waitForTimeout(300);
-    t.check('no Guided on the day: the label does not name it', (await p.getAttribute('#timer-1 .session-timer-more', 'aria-label')) === 'More: Pause, Reset and Finish early');
+    t.check('no Guided on the day: the label does not name it', (await p.getAttribute('#timer-1 .session-timer-more', 'aria-label')) === 'More: Pause, Reset, Finish early and Ask Amir');
     await p.click('#timer-1 .session-timer-more'); await p.waitForTimeout(200);
     const f = await fit(p);
     t.check('no Guided: Pause on its own row, Reset and Finish early under it, all whole', f.count === 3 && f.actionRows === 2 && fitOk(f), JSON.stringify(f.rows.map(x => [x.n, x.text, x.h, Math.round(x.l), Math.round(x.t)])));

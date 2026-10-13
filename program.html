@@ -3059,8 +3059,15 @@
   :where(#day-view) .stb-prog i { display: block; width: 0; height: 100%; border-radius: 0 2px 2px 0; background: var(--mint);
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
   /* ⋯ open: Pause, Guided and Reset on a second row, still on the green (the first row keeps ← Home, the clock and ⋯) */
-  :where(#day-view) .session-timer.slim.open { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: 56px auto auto;
-    grid-template-areas: "leave time more" "acts acts acts" "week week week"; }
+  :where(#day-view) .session-timer.slim.open { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: 56px auto auto auto;
+    grid-template-areas: "leave time more" "acts acts acts" "ask ask ask" "week week week"; }
+  /* Ask Amir under ⋯ (2026-10-13): one row, the whole width, WhatsApp with the open exercise named (askAmirUrl()). */
+  :where(#day-view) .session-timer-ask { display: none; }
+  :where(#day-view) .session-timer.slim.open .session-timer-ask { grid-area: ask; display: flex; align-items: center; gap: 10px; min-height: 44px;
+    margin: 0 8px 10px 10px; padding: 0 14px; border-radius: 8px; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.3); color: #fff;
+    text-decoration: none; font-size: var(--fs-body); font-weight: 600; }
+  :where(#day-view) .session-timer-ask svg { flex: none; width: 18px; height: 18px; }
+  :where(#day-view) .session-timer-ask .sta-txt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   :where(#day-view) .session-timer.slim.open .session-timer-actions { gap: 8px; padding: 6px 8px 12px 10px; }
   :where(#day-view) .session-timer.slim.open .session-timer-actions > * { flex: 1 1 0; min-width: 0; }
   :where(#day-view) .session-timer.slim.open .session-timer-btn.guided { display: inline-flex; }
@@ -8201,7 +8208,8 @@ function renderHome() {
         <button type="button" class="session-timer-reset" hidden onclick="armedTap(this, 'Reset?', () => resetDay('${day.id}'))">Reset</button>
         <button type="button" class="session-timer-finish" hidden onclick="armedTap(this, 'Finish early?', () => finishEarlyFromBar('${day.id}'))">Finish early</button>
       </div>
-      <button type="button" class="session-timer-more" aria-expanded="false" aria-label="More: Pause, ${hasStandard ? 'Guided, ' : ''}Reset and Finish early" onclick="toggleBarMore('${day.id}')">⋯</button>
+      <a class="session-timer-ask" href="#" target="_blank" rel="noopener" onclick="this.href=askAmirUrl('${day.id}')">${WA_ICON}<span class="sta-txt">Ask Amir</span></a>
+      <button type="button" class="session-timer-more" aria-expanded="false" aria-label="More: Pause, ${hasStandard ? 'Guided, ' : ''}Reset, Finish early and Ask Amir" onclick="toggleBarMore('${day.id}')">⋯</button>
       <div class="stb-prog" role="progressbar" aria-label="Sets done in this session" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i></i></div>
       ${limits}
     </div>`;
@@ -9390,7 +9398,7 @@ const APP_GUIDE = [
   { icon: 'tool', title: 'Built-in tools',
     body: `<ul><li><strong>Rest timer</strong>: the <strong>Rest ⏱</strong> button under an exercise&rsquo;s sets starts the countdown (Guided starts it for you after every set). It shows the rest I wrote for you, when I wrote one, keeps the screen on, and beeps and buzzes when the rest is over (tap the <strong>speaker</strong> at the top left of the timer to turn the beep off or on. iPhones don&rsquo;t buzz). <strong>✕</strong> at the top right closes it.</li><li><strong>How to do it</strong>: inside an exercise, the steps, the cues and, when there is one, a video. Unsure of form? Read the steps first. If a video won't play on your phone, tap <strong>Open in YouTube</strong> under it and it opens in your YouTube app or your browser.</li><li><strong>Dark mode</strong>: tap your initials (top right) and pick <strong>Light</strong> or <strong>Dark</strong>, or the moon on a day's banner mid-session.</li></ul>` },
   { icon: 'help', title: 'Questions or problems',
-    body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine, what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days. Quick check-ins beat long waits.</p>` },
+    body: `<p>Got a question, an equipment swap ("my gym doesn't have this machine, what should I do instead?"), or something that feels off? Message me on WhatsApp, which is where I answer. The button is at the top of the Coach tab and at the end of every session, where your message already says which day it's about. During a session it's under <strong>⋯</strong> on the bar too, as <strong>Ask Amir</strong>, and it names the exercise you have open. Send form-check videos there too.</p><p>The notes you leave with a session reach me and I read them, but I answer on WhatsApp. Don't sit on something for days. Quick check-ins beat long waits.</p>` },
 ];
 
 function buildAppGuideCards(openKey) {
@@ -11794,7 +11802,23 @@ function toggleBarMore(day) {
   const open = bar.classList.toggle('open');
   const m = bar.querySelector('.session-timer-more');
   if (m) m.setAttribute('aria-expanded', String(open));
+  // Ask Amir names what is open (askAmirFor()): "Ask Amir about Barbell Back Squat".
+  const t = bar.querySelector('.session-timer-ask .sta-txt');
+  if (open && t) { const ex = askAmirFor(day); t.textContent = ex ? 'Ask Amir about ' + ex : 'Ask Amir about this session'; }
 }
+// ── ASK AMIR, MID-SESSION (Line Call, 2026-10-13; Amir: "yes to all recommended", decision 5, "under ⋯ only") ──
+// The questions that cannot wait (the machine is taken, this hurts) come mid-set, and the way to WhatsApp was ← Home, Coach,
+// Open WhatsApp, with a message that named nothing. Under ⋯ on the slim bar, one row opens WhatsApp with the day and the exercise
+// that is open: "About Day 1, Barbell Back Squat: ". The ⓘ sheet stays without a door (Amir's 2026-10-12 call).
+function askAmirFor(day) {
+  const card = document.querySelector('#day' + day + ' .checklist-item:not(.collapsed) .item-name');
+  return card ? card.textContent.trim() : '';
+}
+function askAmirUrl(day) {
+  const ex = askAmirFor(day);
+  return coachWhatsAppUrl('About Day ' + day + (ex ? ', ' + ex : '') + ': ');
+}
+window.askAmirUrl = askAmirUrl;
 window.toggleBarMore = toggleBarMore;
 // While a session is on in the open day, the tab bar hides (body.session-on): ← Home in the
 // bar, or the phone's Back, is the way out, and the clock keeps running. Mid-session the two

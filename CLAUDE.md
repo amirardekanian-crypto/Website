@@ -244,7 +244,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   past set against the card as written. coach.html judges each session against its own week (`compareDay()`).
 - **There is no in-app chat, and Amir answers ONLY on WhatsApp (2026-09-26: *"Im only gonna reply to
   them when they send me a message on whatsapp"*).** The app's job is to get athletes there fast, with
-  context: the Coach tab and the end of every session (the note comes along) open WhatsApp pre-filled
+  context: the Coach tab, the end of every session (the note comes along) and, mid-session, **Ask Amir** under ⋯ (the open exercise
+  named, `askAmirUrl()`, 2026-10-13, Amir's decision 5) open WhatsApp pre-filled
   (the About sheet's door went on 2026-10-12, Amir's call) (`coachWhatsAppUrl(about)`, `COACH_WHATSAPP` = the site's buy-button
   number). coach.html only marks session notes read. The `messages` table stays on the server and
   nothing reads it. Do not bring a chat back unasked. Details in `PROGRAM-APP.md`.
@@ -290,7 +291,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
 - **Mid-session the tab bar hides** (WK-03, Amir 2026-09-27, option C; `PROGRAM-APP.md` → *The session bar*): from
   Start until Done the session bar is one slim line (← Home · clock · Pause · ⋯; under ⋯ Pause, Guided, Reset and, once a
   set is logged and the day is not ready, **Finish early**, two taps, `finishEarlyStep()` shared with the finish card's
-  button, laid out 2 × 2 so nothing moves while a label is armed; 2026-10-13) and
+  button, laid out 2 × 2 so nothing moves while a label is armed; 2026-10-13; under them one full-width **Ask Amir** row,
+  `.session-timer-ask`) and
   `body.session-on` hides the tabs; ← Home or Back is the way out and the clock keeps running. A new session-bar
   control goes on that line or under ⋯, measured at 320–390 px: the clock is never cut. The week's limits are the bar's one
   extra row, under it.
