@@ -726,6 +726,10 @@ phone's sets from the next open. `scripts/headless/phone-first.js`.
   *Offline · your plan as saved on this phone, Tue 18:40* (`paintPlanOffline()`, `#home-offline`).
   With no copy: *No connection*, with *Try again*. The error screen's ⚠️ emoji (yellow) is now an
   icon in clay.
+- **An installed app asks the browser to keep its storage** (2026-10-13, Second Serve N3): `navigator.storage.persist()` after the
+  first paint, standalone only, silent either way, because Safari clears a site's storage after about 7 days unused and a session still
+  waiting to send lives only there. Still to check on a real iPhone: whether it is granted, and the safe areas (no `viewport-fit=cover`,
+  so the 12 `env(safe-area-inset-*)` rules return 0).
 - **The library is our own file since 2026-10-13** (Line Call, Second Serve N1/N2; Amir: *"yes to all recommended"*):
   `/assets/js/supabase-2.117.3.js`, the same bytes jsDelivr and unpkg serve for 2.117.3 (sha256 `d6a5c441…`), precached
   by `sw.js` (`SHELL`), so a repeat open reads it from the phone instead of fetching `@2` from jsDelivr every time (the

@@ -290,14 +290,14 @@
     font-family: 'Barlow', sans-serif;
     background: var(--grey-bg);
     color: var(--grey-dark);
-    min-height: 100vh;
+    min-height: 100vh; min-height: 100dvh;
     overflow-x: hidden;
   }
 
   /* Loading, Error and Sign in (.loading-*, .error-*, .signin-*, .si-*, @keyframes spin): their look is the SIGN-IN, WELCOME, LOADING AND ERROR IN THE CENTRE COURT LOOK block, the last in this sheet. */
 
   /* ── Screens ── */
-  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen { display: none; min-height: 100vh; min-height: 100dvh; flex-direction: column; }
   .screen.active { display: flex; }
 
   /* ═══════════════════════════════════════════════════════════════════════
@@ -6536,6 +6536,9 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   if (!_spineFresh) refreshSpine();   // boot may already have fetched it (a first-ever open)
   refreshQualities();
   isLoading = false;
+  // Ask the browser to keep this app's storage (2026-10-13; Second Serve N3): Safari clears a site's storage after about 7 days
+  // unused, and a session still waiting to send lives only there. Installed apps only; silent whether granted or refused.
+  try { if (_isStandalone() && navigator.storage && navigator.storage.persist) navigator.storage.persisted().then(p => p || navigator.storage.persist()).catch(() => {}); } catch (e) {}
   paintWeek();   // pills, suggested day and the week's count (HOME-01)
   paintUnfinished();   // "Tuesday's Day 2 wasn't finished. I still got it" (DATA-02)
   setTimeout(flushOutbox, 2500);   // a report left waiting for signal goes now (WK-04)

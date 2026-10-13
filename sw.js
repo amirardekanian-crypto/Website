@@ -285,7 +285,8 @@
 // v154: program.html changed (2026-10-13): one vocabulary (Finish session, Reset session, programme, Once a week, the RPE hint).
 // v155: program.html changed (2026-10-13): a rough day keeps the first lift of the Strength block that is not a jump.
 // v156: program.html changed (2026-10-13): names a screen reader says well (session rating, rest RPE keys, the open tab) and Guided's tempo link at 44 px.
-const CACHE = 'aap-v156';
+// v157: program.html changed (2026-10-13): 100dvh beside 100vh (iPhone's toolbar), and an installed app asks to keep its storage.
+const CACHE = 'aap-v157';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
