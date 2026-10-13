@@ -251,6 +251,7 @@ html.is-demo .demo-bar { display: flex; justify-content: center; align-items: ce
 .pill.green { background: var(--tint); color: var(--green-ink); }
 .pill.clay { background: var(--clay-tint); color: var(--clay-ink); }
 .pill.light { background: rgba(255,255,255,.14); color: #fff; }
+a.pill { min-height: 44px; padding: 0 16px; text-decoration: none; font-size: var(--fs-small); }   /* a pill that is a link (the version, on Programme) is 44 px to hit */
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: none; }
 .chips::-webkit-scrollbar { display: none; }
@@ -335,6 +336,7 @@ ol.steps li::before { content: counter(s, persian); font-size: 19px; font-weight
 .wrow.done .wchk { color: var(--green-ink); }
 @supports not (-webkit-text-stroke: 1px black) { .wchk { color: var(--ring); } .wrow.done .wchk { color: var(--green-ink); } }
 .wname { display: block; min-width: 0; font-size: 16px; font-weight: 700; line-height: 1.5; text-decoration: none; }
+a.wname { padding-block: 10px; margin-block: -10px; }   /* a warm-up name that links to its exercise: 44 px to hit, the row unchanged */
 .wrow .wdose { display: block; font-size: var(--fs-small); font-weight: 500; color: var(--grey); }
 .wrow.done .wname { color: var(--grey); }
 
