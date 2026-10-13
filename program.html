@@ -3528,6 +3528,7 @@
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-check::before { background: var(--mark); border-color: var(--mark); }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-row.done .ex-set-check::after { opacity: 1; transform: none; }
   :where(#day-view, .step-scroll, #ws-body) .ex-set-check:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 0; }
+  :where(#day-view, .step-scroll, #ws-body) .ex-set-row .ex-set-check.kg-armed::before { border: 2px solid var(--clay); }   /* the weight asks first (kgLooksWrong()) */
   /* How hard?: a sand band that hangs off its set, a caret up at that set's RPE slot, big keys */
   :where(#day-view, .step-scroll, #ws-body) .ex-set-rpe { grid-column: 1 / -1; display: none; position: relative; align-items: center; gap: 6px;
     margin: 6px calc(-1 * var(--g)) -6px; padding: 10px var(--g) 12px; background: var(--sand); box-shadow: inset 0 -1px 0 var(--hair); }
@@ -9257,7 +9258,7 @@ const APP_GUIDE = [
   { icon: 'mindset', title: 'The readiness check',
     body: `<p>Before a session, a quick <strong>readiness check</strong> pops up: five questions (1–5) on sleep, energy, soreness, stress, and how ready you feel overall. It takes about ten seconds.</p><p>Answer honestly. There are no right answers. On a lower day the app changes <strong>today's targets</strong>, never your programme: every RPE 1 lower (never below 6), and on a really rough day the session is just the warm-up, your first power move and your first main lift, with the rest optional. Sore? Jumps and landings are halved, or skipped if it's bad. A line at the top of the session says what changed, and <strong>Train as written</strong> puts it all back. It also tells me how you're walking in, so I can adjust your <em>next</em> week. Skip it and I'm coaching with less information.</p>` },
   { icon: 'edit', title: 'Logging your sets',
-    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow on the right means it opens.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
+    body: `<p>A closed exercise shows its numbers on one line, like <strong>4 × 6 · RPE 7 · 3-1-1 · 2:30</strong> (sets × reps, the RPE target, the tempo, the rest), my green pill when there's a grip or an intention, and a small orange dot when I've left you a <strong>Coach's Note</strong>. Its big number on the left turns solid green once it's done. The small arrow on the right means it opens.</p><p>Tap it to open it (tap its name again to close it): its numbers go big in the green top, then my note, then <strong>How to do it</strong> (the video when there is one, what you need, the steps, then the cues), then your sets. How to do it opens by itself the first time you meet an exercise and is folded after that. The ▶ on it means there is a video. If the video won't play on your phone, tap <strong>Open in YouTube</strong> under it.</p><p>Every set is already written for you: the <strong>reps</strong> box shows the number I prescribed.</p><p>Put in the weight you used, then <strong>tap the circle</strong> when the set is done. A jump, a hold or a bodyweight move has no kg box. Once you've logged a weight on an exercise, it keeps one. That one tap means "done as written". Did fewer (or more)? Type what you actually did: it turns orange, and I see it.</p><p>An empty weight box shows last time's weight in grey, under a small <em>LAST</em>. That is only a reminder: it is not saved until you type a number. A weight you type fills the empty sets below it, so one number in set 1 does the lot. If a weight is far above your numbers for that lift, the circle asks once first: tap it again to keep it.</p><p>Once a set is ticked, <strong>How hard?</strong> opens under it. Tap your RPE, 6 to 10. It folds into a small tag you can tap to change, and tapping the number you picked clears it. A superset or circuit asks once a round, with the same buttons.</p><p>When the last set has its RPE, the card folds into one small line of what you did, and the next exercise opens.</p><p>A <strong>warm-up</strong> is a short list: tap a movement for its steps and cues, ▶ plays its video (with <strong>Open in YouTube</strong> under the player if it won't play), and its number ticks the whole warm-up. In a superset or circuit each movement's cues stay open, and <strong>How to do it</strong> under them shows its steps (and its video, when the line starts with ▶).</p><p>In <strong>Guided</strong> mode you log each set on the rest screen, while you rest: the weight, the reps and your RPE. Supersets and circuits come round by round.</p><p>Under the sets, <strong>Note</strong> sits on the left and <strong>Rest ⏱</strong> on the right. The <strong>Note</strong> is for today's session: I get it with this session only, and it stays in your history. Tap the <strong>i</strong> on the exercise, then <strong>Your history</strong>.</p>` },
   { icon: 'tracking', key: 'guided', title: 'Guided mode',
     body: `<p><strong>Guided</strong> takes you through the session one set at a time, with the set you're on pinned on screen. Do the set and tap <strong>Done · Start Rest ✓</strong>: the rest starts, and while you rest it asks the weight, your reps and your RPE. The rest screen also says what comes next. When the rest is over it moves you to the next set, or tap <strong>Skip →</strong> to start it early. The small <strong>i</strong> by the exercise&rsquo;s name in the top bar says what it is for. Supersets and circuits come round by round. It starts with your warm-up: tick each part as you do it, or tap <strong>Done ✓</strong> for all of it. <strong>Skip</strong> moves on, and I see it was skipped. In a week where my note sets a limit, it sits under the top bar and under the RPE buttons while you rest, like <strong>Max RPE 7</strong>.</p><p>At the end, <strong>Finish Session ✓</strong> takes you to the card to rate the session and tap <strong>Done</strong>. <strong>✕</strong> closes Guided at any point, and everything you logged stays.</p><p>Before you start, Guided is on the bar at the top. Once the clock is going, it's under <strong>⋯</strong>.</p>` },
   { icon: 'compass', title: 'The ⓘ: what an exercise is for',
@@ -13467,6 +13468,11 @@ function attachSetLog(card) {
       saveSetLogValue(name, cur, day);
       return cur;
     };
+    // A weight typed into a set already ticked: no tick is left to ask on, so a number far above the lift's says so once.
+    row.querySelector('.ex-set-weight').addEventListener('change', () => {
+      const s0 = loadSetLog(name, total, day)[idx] || {};
+      if (s0.d) kgCheckTicked(name, s0.w, card);
+    });
     // Weight — saves on every keystroke. Persian/Arabic digits and decimal marks are
     // normalised on the way in (live logs held "۲۵" and "٫20", which nothing can read).
     // A number typed in a set also fills the empty sets below it (Fork 3B), and keeps
@@ -13525,6 +13531,22 @@ function attachSetLog(card) {
     // an RPE is already there; unticking closes it. Nothing is erased either way.
     row.querySelector('.ex-set-check').addEventListener('click', ev => {
       ev.stopPropagation();
+      // A weight far above this lift's numbers asks once before the tick keeps it (kgLooksWrong()): the first tap arms the
+      // tick (a clay ring) and says so, a second within 4 s keeps it.
+      const pre = loadSetLog(name, total, day)[idx] || {}, btn = ev.currentTarget;
+      if (!pre.d && kgLooksWrong(name, pre.w, card)) {
+        if (btn.dataset.kgArmed !== String(pre.w)) {
+          clearTimeout(btn._kgT);
+          btn.dataset.kgArmed = String(pre.w); btn.classList.add('kg-armed');
+          btn._kgT = setTimeout(() => { btn.dataset.kgArmed = ''; btn.classList.remove('kg-armed'); }, 4000);
+          aaToast(`${pre.w} kg? That's far above your numbers for this lift. Tap ✓ again to keep it.`, { kicker: 'Check the weight' });
+          if (navigator.vibrate) navigator.vibrate([10, 40, 10]);
+          return;
+        }
+        clearTimeout(btn._kgT); btn.dataset.kgArmed = ''; btn.classList.remove('kg-armed');
+        kgKept(card, pre.w);
+        hideAaToast();
+      }
       carried.delete(idx);                          // countersigned: its weight is the athlete's now
       const cur = edit(s => { s.d = !s.d; });
       if (cur[idx].d && !cur[idx].r) open.add(idx); else open.delete(idx);
@@ -13537,6 +13559,37 @@ function attachSetLog(card) {
     });
   });
   paintSets();
+}
+
+// ── A WEIGHT FAR ABOVE THE LIFT'S OWN NUMBERS ASKS ONCE (Line Call, 2026-10-13; Second Serve D5; Amir: "yes to all recommended") ──
+// A fat finger ("600" for 60) filled the sets below, stayed on a ticked set after the fix, became an automatic Personal Record of
+// about 760 kg, led Records and blocked every real one (37 of 41 records are automatic). "Far above": over 1.5 × the heaviest
+// this lift has seen on this phone (last time's weights on the card, its history, its records), or over 300 kg when it has none
+// yet. The tick asks (two taps, the clay ring); a set already ticked says so in the note box. A weight kept once on a card never
+// asks again this session (card._kgOk). Nothing is ever changed for the athlete.
+function kgRefFor(name, card) {
+  let best = 0;
+  const add = v => { const k = parseLoggedKg(v); if (k != null && k > best) best = k; };
+  loadSetLog(name, parseInt(card.dataset.sets, 10) || 1, card.dataset.day).forEach(s => add(s.lw));
+  historyFor(name).forEach(h => ((h.entry && h.entry.sets) || []).forEach(s => add(s.w)));
+  loadCeiling().forEach(e => { if (histNorm(e.lift) === histNorm(name)) add(e.w); });
+  return best;
+}
+function kgLooksWrong(name, w, card) {
+  const k = parseLoggedKg(w);
+  if (k == null || !(k > 0) || !card) return false;
+  if (card._kgOk && card._kgOk.has(String(k))) return false;
+  const ref = kgRefFor(name, card);
+  return ref > 0 ? k > ref * 1.5 : k > 300;
+}
+function kgKept(card, w) {
+  const k = parseLoggedKg(w);
+  if (k != null) (card._kgOk = card._kgOk || new Set()).add(String(k));
+}
+function kgCheckTicked(name, w, card) {
+  if (!kgLooksWrong(name, w, card)) return;
+  kgKept(card, w);
+  aaToast(`${w} kg? That's far above your numbers for this lift. If it's a typo, fix it in the kg box.`, { kicker: 'Check the weight' });
 }
 
 // Persian (۰-۹) and Arabic-Indic (٠-٩) digits to ASCII, and their decimal marks
@@ -14974,7 +15027,10 @@ function stepPrimary() {
   }
   if (!stepDone(item)) {
     if (item.circuit) finishRound(item);
-    else currentStepRow().querySelector('.ex-set-check').click();
+    else {
+      currentStepRow().querySelector('.ex-set-check').click();
+      if (!stepDone(item)) return;   // the weight asked first (kgLooksWrong()): the next tap of Done keeps it
+    }
     stepAfterDone();
   } else if (STEP.pos === STEP.seq.length - 1) {
     stepFinish();
@@ -15052,6 +15108,7 @@ function paintTimerLog(row, item) {
           return `<button type="button" class="tl-rpe-btn${on ? ' selected' : ''}${vs ? ' ' + vs : ''}" data-rpe="${v}">${v}</button>`; }).join('')}
       </div>${lim}`;
     const kgBox = tl.querySelector('.tl-kg');
+    if (kgBox) kgBox.addEventListener('change', () => kgCheckTicked(item.name, wIn.value, item.card));   // the set is ticked by now
     if (kgBox) kgBox.addEventListener('input', () => {
       const v = normDigits(kgBox.value);
       if (v !== kgBox.value) kgBox.value = v;

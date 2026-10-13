@@ -590,6 +590,16 @@ costs more than one tap.
     and skips ticked sets. Which rows were filled this way is kept in memory only.
   - **A tick on an empty box records no weight.** The summary grammar did not change, so History,
     coach.html and the email read the log exactly as before.
+  - **A weight far above the lift's own numbers asks once** (Line Call, 2026-10-13; Second Serve D5; Amir: *"yes to
+    all recommended"*). "600" typed for 60 filled down, stayed on a ticked set after the fix, and became an automatic
+    Personal Record of about 760 kg that blocked every real one (37 of 41 records are automatic). `kgLooksWrong()`:
+    over 1.5 × the heaviest this lift has seen on the phone (`kgRefFor()`: last time's weights, its history, its
+    records), or over 300 kg with no numbers yet. The tick's first tap arms it (`.kg-armed`, a clay ring) and the note
+    box says *600 kg? That's far above your numbers for this lift. Tap ✓ again to keep it.*; a second within 4 s keeps
+    it, and that weight never asks again on the card this session (`card._kgOk`, `kgKept()`). A big weight typed into a
+    set already ticked (the list, or Guided's rest screen) says so once (`kgCheckTicked()`), and Guided's Done goes
+    through the same tick, so an armed tick opens no rest. Nothing is ever changed for the athlete.
+    `scripts/headless/kg-check.js` (12 checks).
   - `migrateCarriedWeights()` converts, once per phone, the weights every sweep before this left in
     `w` (a set holding only a weight, on an exercise no live day holds). Its marker `aap_lw1_<id>`
     sits outside the athlete's key prefix so it never syncs.

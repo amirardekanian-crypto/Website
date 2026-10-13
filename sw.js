@@ -269,7 +269,8 @@
 // v138: program.html changed (2026-10-13): a session closes at Done (the day keeps its own copy, the next day starts clean; Line Call).
 // v139: program.html changed (2026-10-13): Guided starts with the warm-up as one step (tick each, Done, or Skip), so a session done in Guided is not filed Partial.
 // v140: program.html changed (2026-10-13): the finished card's line follows the session's record too, and Done on a full phone says so.
-const CACHE = 'aap-v140';
+// v141: program.html changed (2026-10-13): a weight far above the lift's own numbers asks once before the tick keeps it.
+const CACHE = 'aap-v141';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
