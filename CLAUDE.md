@@ -189,8 +189,8 @@ is in **`PROGRAM-APP.md`** (moved 2026-09-26 to keep this file small). The data 
   its entry's exact name, Claude adds NO aliases (coach.html keeps the field for Amir's own use), a different version
   (equipment, setup) is its own entry and a name with no equipment word means bodyweight;
   a rename in a live programme must move the athlete's logged history with it (`/spine` → *One name in live
-  programmes*); rungs are gone for good; Library has three doors (Sessions,
-  Playbook, Exercises) and **no Qualities door**.
+  programmes*); rungs are gone for good; the Library is one screen with a three-way switch (Sessions,
+  Playbook, Exercises; no doors page since 2026-10-13) and **no Qualities door**.
 - **Seven pieces, seven jobs** (CUE-7; the Exercise Card Blueprint, Amir 2026-10-11: *"all recommended, go ahead"*; CUE-6, CUE-7,
   `Content/exercise-card/`): the entry's **steps** (`exercises.steps`, stage64: How to do it, for anyone, enough with no
   video) and its **three cues** (key point, feel or check, the one fault written fault-then-fix), the card's **pill**
@@ -471,7 +471,7 @@ Audited 2026-10-10 (`Content/COACH-AUDIT.md`: findings, what changed, what is op
   CSS lives in `assets/css/` (`tokens.css` → `base.css` → `components.css`); page-specific styles are inline.
 - Green hero + green nav are **homepage-only**, scoped via `body.is-home`. The nav logo mark is global.
 - **`sw.js` (scope `/`) sits in front of the WHOLE origin, not just program.html** (since v7, 2026-09-13;
-  the cache is `aap-v132` on 2026-10-13). It must keep leaving `/reach/` (the Iran reachability probe),
+  the cache is `aap-v133` on 2026-10-13). It must keep leaving `/reach/` (the Iran reachability probe),
   `/tennis/` (the paid course, whose app at `/tennis/app/` ships its own worker and `tps-shell-*`
   caches) and `/tennis-testing/` untouched. Otherwise the probe reports a cached pass
   and the course gets stale files pinned. Its `activate` deletes **only `aap-*` caches**: Cache

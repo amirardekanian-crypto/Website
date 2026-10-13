@@ -457,7 +457,7 @@ there so we dont write the cues for each exercise everytime."* Server: `supabase
   approved entries only, so a card on a DRAFT shows no cues or video until it is approved; it used to guess an approved entry from the name, and the loose
   tiers found a different exercise's), and with no `exId` the tightest tier with ONE entry. `scripts/headless/spine-link.js` covers it in the app.
 - `spinecache` (localStorage, no athlete prefix) is a cache of `get_exercises()` and never syncs.
-- **Library → Exercises is the third door** (Amir, 2026-09-24: *"something like the one i have in tps
+- **Library → Exercises is the switch's third pane** (a door until 2026-10-13; Amir, 2026-09-24: *"something like the one i have in tps
   course"*): search, pattern chips, *In your plan* first. Every row opens the same About sheet
   (`renderExerciseLibrary()` → `openExerciseSheet(id, card, true)`); opened from the library, or with
   no card on screen, the sheet also carries **How to do it** (2026-10-11): the video, then You need and the
@@ -505,8 +505,8 @@ you recommend."* Server: `supabase/stage32_qualities.sql`.
   day card will show (or why it will be blank).
 - `qualcache` (localStorage, no prefix) caches `get_qualities()` and never syncs.
 - **There is NO Library → Qualities door.** It shipped and was removed the same day (Amir,
-  2026-09-24: *"remove the qualities from library, bad decision"*). Library has three doors:
-  Sessions, Playbook, Exercises. Do not bring a qualities door back.
+  2026-09-24: *"remove the qualities from library, bad decision"*). The Library has three panes:
+  Sessions, Playbook, Exercises. Do not bring a qualities pane back.
 
 ## 🎯 Because — why THIS athlete has this exercise (2026-09-24)
 
@@ -875,6 +875,29 @@ signature for his voice). The plan and its order are in the audit artifact *Quie
     restyled them). Every ✕ is a 44 px target (it was 26). *Delete all my weight history* is quiet clay text, two taps as before.
   - Every write is the same (`<id>_1rm`, the tombstones, `<id>_hab_wt`, one reading a day), checked field by field.
 
+- **The Library** (`goLibrary()`, `setLibPane()`, `renderSessionsWorld()`, `renderBefore()` / `toggleBefore()`, `renderExerciseLibrary()`;
+  `scripts/headless/library.js`, 140 checks; Amir, 2026-10-13: *"Remove the doors"*, *"Fold after first view"*):
+  - **No doors page.** The tab opens straight to a pane under the header (*● TRAIN IT, LEARN IT, KNOW IT* · **LIBRARY**): one switch,
+    Sessions · Playbook · Exercises (`#lib-switch`, `role=tablist`, each tab with its count in mono under the word; arrow keys, Home and
+    End move along it). The counts are bare numbers, blank (never 0) after a failed load. **The last pane used opens next time**
+    (`lib_pane` in localStorage: no athlete prefix, never synced, a value that is not a pane is ignored), else Sessions.
+    `enterWorld()` / `exitWorld()` and the doors are gone: a pane is a tab root, so it has no ← and Back goes Home.
+  - **A session or article returns to its pane at the same scroll** (`_libScrollY`) by its ← or the phone's Back. A suggested
+    session's ← still goes back to where it was offered (LIB-01).
+  - **Sessions**: each shelf band is a short cover (its picture graded into green, *● 01 · TRAIN*, the shelf in capitals, **All N ›** as
+    the light-ring pill; the band is still the button). Sessions are paper rows with a mono line (*50 MIN · BARBELL · ✓ SESSION*).
+  - **Playbook**: the latest read is the cover (*● LATEST · TRAINING*, *5 MIN READ*); each category with reads is a green section title
+    with its count, then paper rows; an empty category is not drawn. No clay.
+  - **Exercises**: the search box in the set table's input look, one pill style for the chips (the chosen one green), paper rows with a
+    green mono *IN YOUR PLAN*.
+  - **A Library session**: a cover with its shelf's picture and the 44 px glass ←, the focus tag as the eyebrow, the name, *50 MIN ·
+    BARBELL*. **Before you start** is the day's banner (white row, 4 px clay stripe) in its own section, never inside the Why fold:
+    **open the first time each session is opened, folded after that**, a tap opens it (`ws_before_seen` = `{"<id>": 1}`: no athlete
+    prefix, never synced; with storage blocked it is open every time, the safe way round). The words are unchanged. **Why this session**
+    is a fold row; **Mark as done** the one primary green button, behaviour unchanged.
+  - **An article**: the same cover; a callout takes the Coach's-note pull-quote look; an embedded session is a door row. The reading
+    layout (the clay heading bar, the drop cap) is unchanged.
+
 ## 🏠 Home, led by the training (HOME-02, 2026-09-26)
 
 **Since 2026-10-12 Home leads with the week and its pieces moved: read *Home and Progress in the Centre Court look*
@@ -988,7 +1011,7 @@ untouched). Back pops it; `topLayer()` names what is visibly on top and it is cl
 open the guard is re-armed. Top first: the video pop-up, the rest timer (in Guided this ends the rest, as Skip
 does), the readiness check (cancelled, nothing starts), the sheet (History, About, Why, Quality), Guided (the
 clock keeps running), then a non-Home screen, which presses **its own ←** (Records → the exercise it was opened
-from, a session → its Library pane → the doors, the archive → Game Plan) or goes Home for a tab, then the day
+from, a session → its Library pane at the same scroll, the archive → Progress; a Library pane is a tab root since 2026-10-13) or goes Home for a tab, then the day
 view. When the last layer closes through its own button, `navSync()` takes the guard back off quietly, so Back
 on Home still leaves the app, with no dead press. Nothing is tracked in a parallel stack: the page is the state,
 so it cannot drift. `initBackNav()` watches the overlays' `visible` class, the day view's `hidden` and each
@@ -1049,7 +1072,7 @@ tints, the running bar, labels, and so it marked nothing. Now:
   the session bar's limits row (*Max RPE 7 · 1 set fewer*; only the numbers, light clay `#E06B43` on the green bar
   since Centre Court, the words white and the label a paler white),
   the one number on a dark Home card (*Week 2*, the habits row's *2 to go*), and the fault cue's bar in How to do it (the one fault, written
-  fault-then-fix, CUE-7: Amir, 2026-10-12, Centre Court round 2: *"3 clay"*; it was red `#E74C3C`). The Library's Playbook door keeps its clay: it is a brand tile, not a signal.
+  fault-then-fix, CUE-7: Amir, 2026-10-12, Centre Court round 2: *"3 clay"*; it was red `#E74C3C`). The Library's clay Playbook door went with the doors page (2026-10-13); the article reader keeps its clay heading bar and drop cap.
 - **Green or grey for everything else**: every block's title, stripe and done tint are the same green (warm-up
   and power were clay and strength green, and a block the app did not recognise took its colour from its
   position, so *Core* was clay because it was third; `blockClass()` still names the type for the code); the
@@ -1601,6 +1624,9 @@ will give one: `_wsHabitOn()` reads `<id>_hab_cfg` (never writes it); WORKOUT is
 Mobility and Breathe are add-ons that count only when switched on, and no config on the phone reads as off.
 
 ## 📚 The Library's Sessions: a list, and a session at the right moment (LIB-01, 2026-09-27)
+
+**Since 2026-10-13 the Library has no doors page and its look is Centre Court's: read *The Library* under *Every other screen in the
+Centre Court look* above first.** The shelves, the ticks and the two moments below are unchanged.
 
 Amir's picks A and C (*"Library Shelves"* page). Before: every card wore its shelf's one photo (the flour bowl on
 all five strength sessions), two showed per shelf and the other 28 of 42 sat behind a sideways swipe, the ›

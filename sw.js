@@ -261,7 +261,8 @@
 // v130: program.html changed (2026-10-13): Progress's road (one row per cycle) and the archive in the Centre Court look; the This cycle card is Progress's cover.
 // v131: program.html changed (2026-10-13): Guided's top bar and the rest timer in the Centre Court look.
 // v132: program.html changed (2026-10-13): Personal Records and Body weight in the Centre Court look.
-const CACHE = 'aap-v132';
+// v133: program.html changed (2026-10-13): the Library in the Centre Court look, with no doors page.
+const CACHE = 'aap-v133';
 
 // Pre-cached on install — the minimum needed to open the app offline.
 const SHELL = [
