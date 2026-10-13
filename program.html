@@ -649,7 +649,6 @@
 
   /* Reserve space so content isn't hidden behind the global tab bar */
   #screen-plan { padding-bottom: 90px; }
-  #screen-workouts .archive-scroll { padding-bottom: 100px; }
 
   /* Fallback simple intro for JSONs with no cycle data */
   .home-simple-meta {
@@ -666,246 +665,13 @@
   .home-simple-meta-row span { color: var(--grey-dark); font-weight: 600; }
 
   /* ═══════════════════════════════════════════════════════════════════════
-     REMAINING SCREENS — UNCHANGED LAYOUT, UPDATED COLORS ONLY
+     THE LIBRARY'S SCREENS: Sessions, Playbook, Exercises, a Library session and an article's cover, callouts and
+     session cards are drawn by THE LIBRARY IN THE CENTRE COURT LOOK block near the end of this sheet. What stays here is
+     the article's reading layout (the body's paragraphs, headings, lists and pictures).
      ═══════════════════════════════════════════════════════════════════════ */
 
-  /* ── Archive ── */
-  #screen-workouts { background: var(--grey-bg); }
-  /* ── Workout session (a single opened library workout) ── */
-  #screen-workout { background: var(--grey-bg); padding-bottom: 110px; }
-  .ws-header { background: var(--yellow); padding: 48px 24px 24px; position: relative; }
-  /* A workout opens on its shelf's picture instead of the flat green. Set as a
-     background-image on the header itself (scrim baked into the gradient), so
-     nothing in the header markup has to move. */
-  .ws-header.has-art { background-size: cover; background-position: center; }
-  .ws-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--ice); }
-  .ws-eyebrow { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
-  .ws-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 38px; line-height: 1; text-transform: uppercase; color: #fff; }
-  .ws-meta { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.78); margin-top: 8px; }
-
-  /* "Why this session" — the workout's own explainer, inside the green header.
-     Open by default; closing it is remembered for every workout, not just this
-     one, because it is a preference about how much preamble you want. */
-  .ws-why { margin-top: 18px; border-top: 1px solid rgba(255,255,255,0.18); padding-top: 12px; }
-  .ws-why-toggle {
-    font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 2px;
-    text-transform: uppercase; color: rgba(255,255,255,0.72);
-    background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .ws-why-toggle:hover { color: #fff; }
-  .ws-why-toggle .chev { transition: transform 0.18s; font-size: var(--fs-small); }
-  .ws-why.is-closed .ws-why-toggle .chev { transform: rotate(-90deg); }
-  .ws-why.is-closed .ws-why-body { display: none; }
-  .ws-why-body { margin-top: 10px; }
-  .ws-why-body p {
-    font-size: var(--fs-body); line-height: 1.65; color: rgba(255,255,255,0.86);
-    margin: 0 0 10px;
-  }
-  .ws-why-body p:last-child { margin-bottom: 0; }
-
-  /* "Before you start" — a light card in the green header. Always visible: no toggle, and
-     nothing about it is remembered between workouts. Rows are a bold lead-in and a sentence;
-     the colon after the lead-in is drawn here so the data stays a plain noun phrase. */
-  .ws-before {
-    margin-top: 16px; padding: 11px 14px 3px;
-    background: #fff; border-radius: 12px; border-left: 4px solid var(--ice);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.18);
-  }
-  .ws-before-h {
-    font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 2px;
-    text-transform: uppercase; color: var(--clay-ink); margin-bottom: 8px;
-  }
-  .ws-before p { font-size: var(--fs-small); line-height: 1.45; color: #2b2b2b; margin: 0 0 7px; }
-  .ws-before p b {
-    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-body);
-    letter-spacing: 0.4px; text-transform: uppercase; color: var(--grey-dark);
-  }
-  .ws-before p b::after { content: ':'; }
-  body[data-dark] .ws-before { background: #1f1f1f; box-shadow: none; }
-  body[data-dark] .ws-before p { color: rgba(255,255,255,0.86); }
-  body[data-dark] .ws-before p b { color: #fff; }
-
-  /* Finish bar for a LIBRARY workout. Deliberately not the programme's
-     finish card: that one closes a programme day and emails the coach (WK-04).
-     This one writes a single row and says what it counted as. */
-  .ws-finish { padding: 8px 24px 40px; text-align: center; }
-  .ws-done-btn {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700; font-size: var(--fs-small);
-    letter-spacing: 1.5px; text-transform: uppercase;
-    background: var(--yellow);
-    color: var(--on-accent);
-    border: 2px solid var(--yellow);
-    padding: 14px 28px;
-    border-radius: 4px;
-    cursor: pointer;
-    min-width: 260px; max-width: 100%;
-    transition: background 0.15s, opacity 0.15s;
-  }
-  .ws-done-btn:disabled { opacity: 0.55; cursor: default; }
-  /* Done: hollow rather than filled, so a finished workout reads as settled
-     instead of still asking to be pressed. */
-  .ws-done-btn.is-done { background: transparent; color: var(--green-ink); }
-  .ws-done-note {
-    font-size: var(--fs-small); line-height: 1.6; color: var(--grey-text);
-    margin-top: 12px; max-width: 340px; margin-left: auto; margin-right: auto;
-  }
-  #ws-body { padding: 0 20px; }
-  /* The shared exercise cards use a big top margin on the first section header
-     (designed to sit under the day-tabs); trim it inside the workout body. */
-  #ws-body .section-header-prog:first-child { margin-top: 22px; }
-
-  /* ── Workouts library (shared, app-wide) ── */
-  #screen-workouts { background: var(--grey-bg); }
-  .wl-header { padding: 40px 24px 20px; }
-  .wl-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-display); line-height: 1; text-transform: uppercase; color: var(--ink); letter-spacing: -0.5px; }
-  .wl-subtitle { font-family: 'Space Mono', monospace; font-size: var(--fs-label); color: var(--grey-text); margin-top: 8px; line-height: 1.5; }
-  .wl-scroll { padding: 0 20px 100px; }
-  .wl-empty { padding: 40px 20px; text-align: center; font-family: 'Barlow', sans-serif; color: #888; font-size: var(--fs-body); line-height: 1.6; }
-  /* Empty-category note (no workouts yet) */
-  .wl-coming { padding: 18px 16px; background: var(--white); border: 1px dashed var(--grey-mid); border-radius: 12px; font-family: 'Barlow', sans-serif; font-size: var(--fs-small); color: var(--grey-text); line-height: 1.5; text-align: center; }
-
-  /* ── Library segmented control (Read | Train) ── */
-  .lib-seg-btn { flex: 1; padding: 9px 0; border: none; border-radius: 7px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-body); letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; background: transparent; color: var(--grey-text); transition: background .18s ease, color .18s ease; }
-  .lib-seg-btn.active { background: var(--white); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.10); }
-
-  /* ════ LIBRARY — Three Doors landing + Sessions / Playbook / Exercises worlds ════ */
-  .lib-pane { position: relative; }
-  .lib-pane[hidden] { display: none; }
-  .lib-back { position: absolute; top: 16px; left: 18px; z-index: 6; background: none; border: none; color: rgba(255,255,255,0.82); font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; padding: 4px 0; }
-  .lib-back:active { opacity: 0.65; }
-
-  /* Landing — three doors */
-  .lib-head { padding: 48px 24px 18px; }
-  .lib-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-display); line-height: 1; letter-spacing: -0.6px; text-transform: uppercase; color: var(--ink); }
-  .lib-sub { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); margin-top: 9px; }
-  .lib-doors { padding: 0 18px 110px; }
-  .lib-door { position: relative; overflow: hidden; height: 248px; border-radius: 22px; margin-bottom: 16px; display: flex; flex-direction: column; justify-content: flex-end; padding: 22px; cursor: pointer; transition: transform .12s ease; }
-  .lib-door:active { transform: scale(0.985); }
-  .lib-door.door-sessions { background: #0E4A36 url('court-sessions.jpg') center/cover no-repeat; background-image: linear-gradient(to top, rgba(14,74,54,0.82) 0%, rgba(14,74,54,0.28) 65%), url('court-sessions.jpg'); }
-  .lib-door.door-playbook { background: #C7552F url('court-playbook.jpg') center/cover no-repeat; background-image: linear-gradient(to top, rgba(199,85,47,0.82) 0%, rgba(199,85,47,0.28) 65%), url('court-playbook.jpg'); }
-  /* The third door (2026-09-24): the exercise library, from the Spine. Ink, so it
-     reads as its own world beside the green and the clay; picture reused, not new. */
-  .lib-door.door-exercises { background: #141A17 url('assets/art/days/fullbody-v1.webp') center/cover no-repeat; background-image: linear-gradient(to top, rgba(20,26,23,0.9) 0%, rgba(20,26,23,0.35) 65%), url('assets/art/days/fullbody-v1.webp'); background-position: center, 70% center; }
-  .w-head.w-head-ex { background-color: #141A17; background-image: linear-gradient(to top, rgba(20,26,23,0.92) 0%, rgba(20,26,23,0.45) 100%), url('assets/art/days/fullbody-v1.webp'); background-position: center, 72% center; }
-  .xl-tools { padding: 16px 18px 6px; display: grid; gap: 10px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--grey-bg); }
-  .xl-search { width: 100%; box-sizing: border-box; font: var(--fs-field) 'Barlow', sans-serif; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--grey-mid); background: var(--white); color: var(--grey-dark); outline: none; }
-  .xl-search:focus { border-color: var(--yellow); }
-  .xl-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
-  .xl-chips::-webkit-scrollbar { display: none; }
-  .xl-chip { flex: none; font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 0.04em; text-transform: uppercase; padding: 7px 11px; border-radius: 999px; border: 1px solid var(--grey-mid); background: transparent; color: var(--grey-text); cursor: pointer; white-space: nowrap; }
-  .xl-chip.on { background: var(--yellow); border-color: var(--yellow); color: var(--on-accent); }
-  .xl-list { padding: 8px 18px 110px; display: grid; gap: 8px; }
-  .xl-group { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 1.3px; text-transform: uppercase; color: var(--grey-text); margin: 10px 2px 0; }
-  .xl-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; width: 100%; background: var(--white); border: 1px solid var(--grey-card); border-left: 3px solid var(--grey-mid); border-radius: 12px; padding: 12px 14px; cursor: pointer; font: inherit; color: var(--grey-dark); }
-  .xl-row.mine { border-left-color: var(--ice); }
-  .xl-row b { display: block; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: var(--fs-lead); letter-spacing: 0.2px; line-height: 1.1; }
-  .xl-row small { display: block; font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey-text); margin-top: 4px; }
-  .xl-row small em { font-style: normal; color: var(--clay-ink); }
-  .xl-row .xl-arr { color: var(--grey-text); font-size: var(--fs-lead); flex: none; }
-  .xl-empty { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); line-height: 1.5; color: var(--grey-text); background: var(--white); border: 1px dashed var(--grey-mid); border-radius: 12px; padding: 16px; }
-  body[data-dark] .xl-tools { background: #121212; }
-  body[data-dark] .xl-search, body[data-dark] .xl-row, body[data-dark] .xl-empty { background: #1e1e1e; border-color: #2a2a2a; color: #eee; }
-  body[data-dark] .xl-row.mine { border-left-color: #E06B43; }
-  body[data-dark] .xl-row small em { color: #E06B43; }
-  .lib-door-court { display: none; }
-  .lib-door-court svg { width: 100%; height: 100%; display: block; }
-  .lib-door > *:not(.lib-door-court) { position: relative; z-index: 2; }
-  .lib-door-k { font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.82); }
-  .lib-door-big { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 58px; line-height: 0.84; letter-spacing: -1px; text-transform: uppercase; color: #fff; margin-top: 5px; }
-  .lib-door-d { font-family: 'Barlow', sans-serif; font-size: var(--fs-small); line-height: 1.4; color: rgba(255,255,255,0.9); margin-top: 9px; max-width: 92%; }
-  .lib-door-row { display: flex; align-items: center; justify-content: space-between; margin-top: 15px; }
-  .lib-door-ct { font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 0.08em; text-transform: uppercase; color: #fff; min-height: 13px; }
-  .lib-door-arr { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.16); border: 1.5px solid rgba(255,255,255,0.7); color: #fff; display: flex; align-items: center; justify-content: center; font-size: var(--fs-lead); flex-shrink: 0; }
-
-  /* Sessions world — green hero header + numbered shelves */
-  .w-head { position: relative; overflow: hidden; background-color: #0E4A36; background-image: linear-gradient(to top, rgba(14,74,54,0.88) 0%, rgba(14,74,54,0.4) 100%), url('court-sessions.jpg'); background-size: cover; background-position: center; min-height: 220px; padding: 54px 22px 26px; display: flex; flex-direction: column; justify-content: flex-end; }
-  .w-head > *:not(.pb-court):not(.nav-back) { position: relative; z-index: 2; }
-  .w-kick { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.75); }
-  .w-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-display); line-height: 1; letter-spacing: -0.5px; text-transform: uppercase; color: #fff; margin-top: 7px; }
-  .w-sub { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-top: 8px; }
-  .w-scroll { padding: 0 0 110px; }
-  /* The shelves as a list (LIB-01, Amir 2026-09-27, pick A): the shelf's photo once, as a band holding its
-     number, name and All N ›, then three sessions as rows. No clay here: a row is not a "look here" (DS-01). */
-  .w-shelf { margin: 0 0 6px; }
-  .shelf-band { position: relative; display: flex; align-items: flex-end; gap: 10px; box-sizing: border-box;
-    width: calc(100% - 36px); height: 84px; margin: 18px 18px 0; padding: 12px 14px; border: 0; border-radius: 16px; overflow: hidden;
-    background-color: #0E4A36; background-size: cover; background-position: center; color: #fff; text-align: left; font: inherit; }
-  button.shelf-band { cursor: pointer; }
-  .shelf-band::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(8,18,13,0.86) 0%, rgba(8,18,13,0.45) 70%, rgba(8,18,13,0.25) 100%); }
-  .shelf-band > * { position: relative; }
-  .shelf-n { font: 700 var(--fs-small)/1 'Space Mono', monospace; color: rgba(255,255,255,0.8); }
-  .shelf-t { font: 900 var(--fs-title)/1 'Barlow Condensed', sans-serif; letter-spacing: 0.4px; text-transform: uppercase; color: #fff;
-    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .shelf-all { margin-left: auto; flex: none; font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase;
-    color: #fff; background: rgba(255,255,255,0.16); border-radius: 99px; padding: 8px 11px; white-space: nowrap; }
-  .shelf-list { margin: 2px 18px 0; }
-  .shelf-row { display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; padding: 13px 4px; border: 0; background: none;
-    text-align: left; cursor: pointer; font: inherit; color: var(--grey-dark); }
-  .shelf-row + .shelf-row { border-top: 1px solid var(--grey-card); }
-  .w-shelf:not(.open) .shelf-row.more { display: none; }
-  .shelf-row:active { background: rgba(0,0,0,0.03); }
-  .sr-b { display: grid; gap: 3px; min-width: 0; }
-  .sr-name { font: 900 var(--fs-lead)/1.05 'Barlow Condensed', sans-serif; text-transform: uppercase; color: var(--grey-dark); }
-  .sr-for { font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey-text); }
-  .sr-meta { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); }
-  .sr-meta:empty { display: none; }
-  .sr-tick { color: var(--green-ink); white-space: nowrap; }
-  .sr-go { margin-left: auto; flex: none; color: var(--grey-text); font-size: var(--fs-title); }
-  .shelf-list .wl-coming { margin: 10px 0 0; }
-
-  /* Playbook world — clay hero + paper body */
-  .lib-pane-dark { background: var(--grey-bg); min-height: 100vh; padding-bottom: 90px; }
-  .pb-hero { position: relative; overflow: hidden; min-height: 220px; background-color: #C7552F; background-image: linear-gradient(to top, rgba(199,85,47,0.88) 0%, rgba(199,85,47,0.4) 100%), url('court-playbook.jpg'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; padding: 54px 22px 26px; }
-  .pb-court { display: none; }
-  .pb-court svg { width: 100%; height: 100%; display: block; }
-  .pb-hero > *:not(.pb-court):not(.nav-back) { position: relative; z-index: 2; }
-  .pb-tag { font-family: 'Space Mono', monospace; font-weight: 700; font-size: var(--fs-label); letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 8px; }
-  .pb-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.75); }
-  .pb-hk { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-top: 14px; }
-  .pb-ht { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-display); line-height: 1; letter-spacing: -0.4px; text-transform: uppercase; color: #fff; margin-top: 7px; }
-  .pb-hm { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-top: 10px; }
-  .pb-block { display: flex; align-items: center; gap: 10px; padding: 20px 18px 12px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-lead); letter-spacing: 1.5px; text-transform: uppercase; color: var(--grey-dark); }
-  .pb-s { font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700; color: var(--clay-ink); }
-  .pb-ct { font-family: 'Space Mono', monospace; font-weight: 400; font-size: var(--fs-label); letter-spacing: 0.08em; color: var(--grey-text); margin-left: auto; }
-  .pb-disp { display: flex; align-items: center; gap: 13px; padding: 13px 18px; border-top: 1px solid var(--grey-mid); cursor: pointer; }
-  .pb-disp:active { background: rgba(0,0,0,0.03); }
-  .pb-dn { width: 46px; height: 46px; flex-shrink: 0; border-radius: 10px; background-color: #C7552F; background-image: linear-gradient(135deg, rgba(199,85,47,0.65) 0%, rgba(199,85,47,0.5) 100%), url('court-playbook.jpg'); background-size: cover; background-position: center; position: relative; }
-  .pb-dn b { position: absolute; left: 8px; top: 9px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-title); color: #fff; }
-  .pb-dn i { position: absolute; right: 6px; bottom: 6px; width: 8px; height: 8px; border-radius: 50%; background: #fff; opacity: 0.85; }
-  .pb-db { flex: 1; min-width: 0; }
-  .pb-dk { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.1em; text-transform: uppercase; color: var(--clay-ink); }
-  .pb-dt { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-lead); line-height: 1.02; text-transform: uppercase; color: var(--grey-dark); margin-top: 2px; }
-  .pb-dm { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.04em; text-transform: uppercase; color: var(--grey-text); margin-top: 3px; }
-  .pb-dgo { margin-left: auto; flex-shrink: 0; color: var(--clay-ink); font-size: var(--fs-lead); }
-  .pb-empty { padding: 70px 24px; text-align: center; font-family: 'Barlow', sans-serif; color: var(--grey-text); font-size: var(--fs-body); line-height: 1.6; }
-  .pb-latest { margin: 18px 18px 8px; background-color: #0E4A36; background-image: linear-gradient(135deg, rgba(14,74,54,0.72) 0%, rgba(14,74,54,0.55) 100%), url('court-sessions.jpg'); background-size: cover; background-position: center; border-radius: 16px; padding: 22px 20px 20px; cursor: pointer; transition: opacity .15s ease; }
-  .pb-latest:active { opacity: 0.75; }
-  .pb-latest-label { font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-bottom: 10px; }
-  .pb-latest-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 34px; line-height: 0.95; letter-spacing: -0.3px; text-transform: uppercase; color: #fff; }
-  .pb-latest-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
-  .pb-latest-go { font-size: var(--fs-title); color: rgba(255,255,255,0.85); }
-  body[data-dark] .pb-disp:active { background: rgba(255,255,255,0.04); }
-
-  /* ════ ARTICLE READER — "Center Court" (broadcast scoreboard) ════ */
-  #screen-article { background: var(--grey-bg); }
-  /* Hero: deep-green band with court lines + grain; clay kicker, scoreboard meta */
-  .ar-hero { position: relative; overflow: hidden; background-color: #0E4A36; background-image: linear-gradient(to top, rgba(14,74,54,0.88) 0%, rgba(14,74,54,0.45) 100%), url('court-sessions.jpg'); background-size: cover; background-position: center; padding: 46px 20px 22px; }
-  .ar-hero .ar-court { display: none; }
-  .ar-hero .ar-court svg { width: 100%; height: 100%; display: block; }
-  .ar-hero::after { display: none; }
-  .ar-hero > *:not(.ar-court) { position: relative; z-index: 2; }
-  .ar-hero .nav-back { position: absolute; top: 12px; left: 12px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,0.28); color: #fff; border: none; font-size: var(--fs-lead); line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-  .ar-hero .nav-back:active { transform: scale(0.9); }
-  .ar-kicker { display: inline-flex; align-items: center; gap: 11px; font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.12em; text-transform: uppercase; color: #E06B43; margin-top: 12px; }
-  .ar-kicker::before { content: ''; width: 34px; height: 2px; background: #E06B43; }
-  .ar-htitle { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: clamp(33px, 9vw, 44px); line-height: 0.94; letter-spacing: -0.3px; text-transform: uppercase; color: var(--grey-bg); margin: 12px 0 14px; }
-  .ar-htitle .hl { background: var(--ice); color: #fff; padding: 0 0.1em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-  .ar-hmeta { font-family: 'Space Mono', monospace; font-size: var(--fs-label); letter-spacing: 0.04em; text-transform: uppercase; color: rgba(250,247,242,0.72); padding-top: 11px; border-top: 1px solid rgba(250,247,242,0.18); }
-
+  /* ════ ARTICLE READER: the reading layout ════ */
   /* Body */
-  #ar-body { padding: 22px 20px 110px; }
   #ar-body .ar-p { font-family: 'Barlow', sans-serif; font-size: var(--fs-body); line-height: 1.7; color: var(--ink); margin: 0 0 14px; }
   /* Drop-cap on the opening paragraph (one per article) */
   #ar-body .ar-p.ar-lead::first-letter { float: left; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 58px; line-height: 0.7; color: var(--clay-big); margin: 7px 10px 0 0; text-transform: uppercase; }   /* 58 px, 900: big clay text keeps #C7552F */
@@ -918,20 +684,9 @@
   #ar-body .ar-list { list-style: none; padding-left: 0; margin: 0 0 14px; }
   #ar-body .ar-list li { position: relative; padding-left: 28px; margin-bottom: 7px; font-family: 'Barlow', sans-serif; font-size: var(--fs-body); line-height: 1.7; color: var(--ink); }
   #ar-body .ar-list li::before { content: ''; position: absolute; left: 1px; top: 4px; width: 17px; height: 17px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='9' fill='%23C7552F'/%3E%3Cpath d='M3.2 6 Q10 11 3.2 16 M16.8 4 Q10 9 16.8 14' stroke='%23FAF7F2' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat; }
-  /* Callout = RULE card */
-  #ar-body .ar-callout { position: relative; background: rgba(199,85,47,0.06); border-left: 3px solid var(--ice); border-radius: 0 10px 10px 0; padding: 20px 16px 13px; margin: 0 0 16px; font-family: 'Barlow', sans-serif; font-size: var(--fs-body); line-height: 1.6; color: var(--ink); }
-  #ar-body .ar-callout::before { content: attr(data-label); position: absolute; top: 0; left: 13px; font-family: 'Space Mono', monospace; font-size: var(--fs-label); font-weight: 700; letter-spacing: 0.1em; color: var(--clay-ink); background: var(--ice-dim); padding: 3px 7px; border-radius: 0 0 4px 4px; }
   #ar-body img.ar-img { width: 100%; border-radius: 12px; margin: 4px 0 6px; display: block; filter: saturate(0.94) contrast(1.02); }
   #ar-body figcaption.ar-caption { font-family: 'Space Mono', monospace; font-size: var(--fs-label); color: var(--grey-text); text-align: center; margin: 0 0 18px; }
   #ar-body figcaption.ar-caption::before { content: '▸ '; color: var(--clay-ink); }
-  /* Inline workout = a scoreboard fixture card */
-  #ar-body .ar-workout-card { display: flex; align-items: center; gap: 13px; background: var(--white); border: 1px solid var(--grey-card); border-left: 3px solid var(--ice); border-radius: 0 12px 12px 0; padding: 13px; margin: 18px 0 6px; cursor: pointer; transition: border-color .15s ease; }
-  #ar-body .ar-workout-card-icon { width: 44px; height: 44px; flex-shrink: 0; border-radius: 8px; background: var(--ice-dim); display: flex; align-items: center; justify-content: center; color: var(--clay-ink); font-size: var(--fs-body); }
-  #ar-body .ar-workout-card-body { flex: 1; }
-  #ar-body .ar-workout-card-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: var(--fs-lead); text-transform: uppercase; color: var(--ink); }
-  #ar-body .ar-workout-card-sub { font-family: 'Space Mono', monospace; font-size: var(--fs-label); color: var(--grey-text); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
-  #ar-body .ar-workout-card-play { width: 32px; height: 32px; flex-shrink: 0; margin-left: auto; border-radius: 50%; border: 1.5px solid var(--ice); color: var(--clay-ink); display: flex; align-items: center; justify-content: center; font-size: var(--fs-label); }
-  body[data-dark] #ar-body .ar-callout { background: rgba(199,85,47,0.10); }
 
   /* ═══ HOME OVERVIEW (the landing page on #screen-home) ═══
      Greeting · This cycle card · "This Week" · day cards · habits, records and weight rows.
@@ -4679,6 +4434,233 @@
     .timer-log .session-timer-week i { margin: 0 6px 0 0; }
   }
 
+  /* ══ THE LIBRARY IN THE CENTRE COURT LOOK (2026-10-13) ═══════════════════════════════════════════════════════════════════════
+     Amir, 2026-10-13: "continue until everything has a consistent design", and two answers: the doors page goes (the Library opens
+     straight to its content under ONE switch, Sessions · Playbook · Exercises, remembering the last pane on this phone), and "Before
+     you start" is open the first time a session is opened and one folded row after that. Behaviour is otherwise untouched
+     (renderSessionsWorld(), toggleShelf(), renderPlaybook(), renderExerciseLibrary(), openWorkout(), openArticle(), markLibraryDone());
+     this block is how the Library looks, with the little markup it needed. Colours are the app's one set (THE APP'S ONE COLOUR SET,
+     on body); no colour token is declared here. The gutter is --g. A size is a --fs- token, or a display piece with its comment.
+     1 header and switch · 2 Sessions (a cover band per shelf, then paper rows) · 3 Playbook (the latest read as the cover, green
+     section titles, paper rows) · 4 Exercises · 5 a Library session (cover, Before you start, Why this session, Mark as done) ·
+     6 an article (cover, pull-quote callouts, a session as a door row). It sits before HOME AND PROGRESS and touches nothing of the day. */
+
+  /* 1. The header is Progress's and Coach's (.prog-eyebrow with its dot, .prog-title at 44 px). Under it ONE switch: a track on the
+     sand with three equal tabs, each a word in condensed capitals over its count in mono. The chosen tab is the green fill. 52 px tall. */
+  .lib-head { margin: 14px var(--g) 18px; }
+  .lib-switch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin: 0 var(--g); padding: 4px; border: 1px solid var(--hair);
+    border-radius: 14px; background: var(--sand); }
+  .lib-tab { display: grid; align-content: center; justify-items: center; gap: 4px; min-width: 0; min-height: 52px; padding: 6px 4px; border: 0; border-radius: 10px;
+    background: transparent; color: var(--grey); cursor: pointer; text-align: center; transition: transform .1s; }
+  .lib-tab:active { transform: scale(0.97); }
+  .lib-tab:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .lib-tab-w { font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .lib-tab-n { min-height: 13px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: .5px; font-variant-numeric: tabular-nums; }
+  .lib-tab[aria-selected="true"] { background: var(--btn); color: #fff; }
+  .lib-tab[aria-selected="true"] .lib-tab-n { color: var(--mint); }
+  .lib-pane { position: relative; }
+  .lib-pane[hidden] { display: none; }
+  #lib-playbook { padding-bottom: 110px; }
+  .wl-empty { padding: 40px var(--g); text-align: center; font: 400 var(--fs-body)/1.6 'Barlow', sans-serif; color: var(--grey); }
+  .pb-empty { padding: 56px var(--g); text-align: center; font: 400 var(--fs-body)/1.6 'Barlow', sans-serif; color: var(--grey); }
+
+  /* One look for every list row on the Library's paper (a shelf's sessions, a category's reads): a hairline between rows (none above
+     the first), no box. The name is Barlow 600 at the lead size, what it is for in Barlow grey, then one mono line, and a grey ›. */
+  .shelf-row, .pb-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; margin: 0; padding: 12px 0; border: 0; border-radius: 0;
+    background: transparent; color: var(--ink); text-align: left; cursor: pointer; }
+  .shelf-row + .shelf-row, .pb-row + .pb-row { border-top: 1px solid var(--hair); }
+  .shelf-row:active, .pb-row:active { background: var(--tint); }
+  .shelf-row:focus-visible, .pb-row:focus-visible, .xl-row:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  .sr-b { display: grid; gap: 4px; min-width: 0; }
+  .sr-name { display: block; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; text-transform: none; color: var(--ink); text-wrap: balance; }
+  .sr-for { display: block; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  .sr-meta { display: block; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  .sr-meta:empty { display: none; }
+  .sr-tick { font-weight: 700; color: var(--green-ink); white-space: nowrap; }
+  .sr-go { flex: none; margin-left: auto; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
+
+  /* 2. Sessions. Each shelf is a short cover band (--hero, 12 px corners, inside the gutter): the shelf's own picture graded into the
+     green (luminosity at .7, masked from the left, a scrim to the cover's last colour), the eyebrow "● 01 · TRAIN" in Space Mono with a
+     mint dot, the shelf's name in condensed capitals, and All N › as a small light-ring pill on the right. The band is the button
+     (toggleShelf(); aria-expanded) when the shelf has more than three; a shelf of three has a plain band. Under it, three sessions
+     and the rest when it is open. */
+  #lib-sessions .w-scroll { padding: 0 0 110px; }
+  .w-shelf { margin: 22px 0 0; }
+  .shelf-band { position: relative; isolation: isolate; display: flex; align-items: center; justify-content: space-between; gap: 12px; box-sizing: border-box;
+    width: calc(100% - 2 * var(--g)); min-height: 96px; margin: 0 var(--g); padding: 16px var(--g); border: 0; border-radius: 12px; overflow: hidden;
+    background: var(--hero); color: #fff; text-align: left; font: inherit; }
+  button.shelf-band { cursor: pointer; }
+  button.shelf-band:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .shelf-img { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; background: transparent;
+    mix-blend-mode: luminosity; opacity: .7; pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); }
+  .shelf-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
+  .shelf-tx { position: relative; z-index: 2; display: block; min-width: 0; }
+  .shelf-n { display: flex; align-items: center; gap: 8px; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
+  .shelf-n::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+  .shelf-t { display: block; margin-top: 8px; font: 900 var(--fs-head)/1 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;
+    letter-spacing: .3px; text-transform: uppercase; color: #fff; text-wrap: balance; overflow-wrap: normal; word-break: normal; }
+  .shelf-all { position: relative; z-index: 2; flex: none; display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 999px;
+    background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.5); white-space: nowrap;
+    font: 700 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: #fff; }
+  .shelf-list { margin: 2px var(--g) 0; }
+  .w-shelf:not(.open) .shelf-row.more { display: none; }
+  .shelf-list .wl-coming { margin: 14px 0 0; font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--grey); text-align: left; }
+
+  /* 3. Playbook. The latest read is the pane's cover (the whole cover is the link): its category's picture graded in, "● LATEST ·
+     TRAINING", the title in condensed capitals, "5 MIN READ" in mono. Each category with reads is a green section title with a
+     hairline and its count at the right in mono; a category with none is not drawn. Then its reads as paper rows. No clay here:
+     clay is "look here", and nothing in a list asks to be looked at. */
+  .pb-cover { position: relative; isolation: isolate; display: block; width: calc(100% - 2 * var(--g)); margin: 20px var(--g) 0; padding: 0; overflow: hidden;
+    border: 0; border-radius: 16px; background: var(--hero); color: #fff; text-align: left; font: inherit; cursor: pointer; }
+  .pb-cover:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .pb-img { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; background: transparent;
+    mix-blend-mode: luminosity; opacity: .66; pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.16) 40%, #000 82%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.16) 40%, #000 82%); }
+  .pb-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
+  .pb-body { position: relative; z-index: 2; display: block; padding: 44px var(--g) 20px; }
+  .pb-eb { display: flex; align-items: flex-start; gap: 8px; font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.88); }
+  .pb-eb::before { content: ''; flex: none; width: 7px; height: 7px; margin-top: 3px; border-radius: 50%; background: var(--mint); }
+  .pb-title { display: block; margin: 10px 0 0; max-width: 330px;
+    font: 900 clamp(28px, 8.4vw, 36px)/.96 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the latest read's title, 28 to 36 px */
+    letter-spacing: .3px; text-transform: uppercase; color: #fff; text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+  .pb-min { display: block; margin: 12px 0 0; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.8); }
+  .pb-min:empty { display: none; }
+  .lib-sec, .xl-group { display: flex; align-items: center; gap: 12px; margin: 26px var(--g) 2px; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--green-ink); }
+  .lib-sec-t { flex: 1; display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .lib-sec-t::after, .xl-group::after { content: ''; flex: 1; min-width: 12px; height: 1px; background: var(--hair); }   /* to the count, or the edge */
+  .lib-sec-n { flex: none; font: 400 var(--fs-label)/1 'Space Mono', monospace; letter-spacing: 1.2px; color: var(--grey); }
+  .pb-list { margin: 0 var(--g); }
+
+  /* 4. Exercises. The search box is the set table's input (white, edged --field, 16 px text, 48 px tall); the chips are ONE pill style, the
+     chosen one the green fill. A chip is a 44 px control whose pill is drawn 36 px tall inside it. The list is paper rows: the name in
+     Barlow 600, its pattern in mono grey, IN YOUR PLAN as a small green mono tag, a grey ›. The tools stay under the top edge as you scroll. */
+  .xl-tools { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: grid; gap: 4px; padding: 8px var(--g) 4px; background: var(--paper); }
+  .xl-search { display: block; width: 100%; height: 48px; margin: 0; padding: 0 14px; border: 1px solid var(--field); border-radius: 10px; background: var(--row); color: var(--ink);
+    font: 500 var(--fs-field)/1 'Barlow', sans-serif; outline: none; -webkit-appearance: none; appearance: none; }
+  .xl-search::placeholder { color: var(--ph); opacity: 1; }
+  .xl-search:focus { border-color: var(--green-ink); box-shadow: 0 0 0 1px var(--green-ink); }
+  .xl-chips { display: flex; gap: 4px; margin: 0 calc(-1 * var(--g)); padding: 0 var(--g); overflow-x: auto; scrollbar-width: none; }
+  .xl-chips::-webkit-scrollbar { display: none; }
+  .xl-chip { position: relative; isolation: isolate; flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 0; background: none;
+    color: var(--grey); cursor: pointer; white-space: nowrap; font: 700 var(--fs-body)/1 'Barlow Condensed', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+  .xl-chip::before { content: ''; position: absolute; z-index: -1; inset: 4px 0; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--box); }
+  .xl-chip.on { color: #fff; }
+  .xl-chip.on::before { background: var(--btn); box-shadow: none; }
+  .xl-chip:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; border-radius: 999px; }
+  .xl-list { display: block; margin: 0; padding: 4px var(--g) 110px; }
+  .xl-group { margin: 22px 0 2px; }
+  .xl-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; margin: 0; padding: 12px 0; border: 0; border-radius: 0; background: transparent;
+    color: var(--ink); text-align: left; cursor: pointer; }
+  .xl-row + .xl-row { border-top: 1px solid var(--hair); }
+  .xl-row:active { background: var(--tint); }
+  .xl-row > span:first-child { flex: 1; min-width: 0; }
+  .xl-row b { display: block; font: 600 var(--fs-lead)/1.2 'Barlow', sans-serif; color: var(--ink); text-wrap: balance; }
+  .xl-row small { display: block; margin-top: 4px; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grey); }
+  .xl-row small em { font-style: normal; font-weight: 700; color: var(--green-ink); }
+  .xl-row .xl-arr { flex: none; margin-left: auto; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
+  .xl-empty { margin: 16px 0 0; font: 400 var(--fs-body)/1.5 'Barlow', sans-serif; color: var(--grey); }
+
+  /* 5. A Library session. The top is a cover: the shelf's picture graded into the green (none: the plain green), ← as the day cover's
+     44 px glass button, "● LOWER-BODY STRENGTH & POWER" (its focus) in mint, the name in condensed capitals, "50 MIN · BARBELL" in mono. */
+  #screen-workout { background: var(--paper); padding-bottom: 110px; }
+  .ws-header { position: relative; isolation: isolate; overflow: hidden; background: var(--hero); color: #fff; }
+  .ws-img { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: 84% 58%; background: transparent;
+    mix-blend-mode: luminosity; opacity: .7; pointer-events: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%);
+            mask-image: linear-gradient(90deg, transparent 0%, rgba(0,0,0,.2) 28%, #000 70%); }
+  .ws-img[hidden] { display: none; }
+  .ws-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, transparent 30%, var(--hero-end-a) 78%, var(--hero-end) 100%); }
+  #screen-workout .nav-back, #screen-article .nav-back { position: absolute; top: 8px; left: 8px; z-index: 5; display: grid; place-items: center; width: 44px; height: 44px;
+    padding: 0; border: 0; border-radius: 50%; cursor: pointer; color: #fff; background: rgba(0,0,0,.22); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    font: 500 var(--fs-title)/1 'Barlow', sans-serif; -webkit-tap-highlight-color: transparent; }
+  #screen-workout .nav-back:active, #screen-article .nav-back:active { transform: scale(0.92); }
+  #screen-workout .nav-back:focus-visible, #screen-article .nav-back:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .ws-cap, .ar-cap { position: relative; z-index: 2; padding: 74px var(--g) 22px; }
+  .ws-eyebrow, .ar-kicker { display: flex; align-items: flex-start; gap: 8px; margin: 0; font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 2px; text-transform: uppercase; color: var(--mint); }
+  .ws-eyebrow::before, .ar-kicker::before { content: ''; flex: none; width: 7px; height: 7px; margin-top: 3px; border-radius: 50%; background: var(--mint); }
+  .ar-kicker:empty { display: none; }
+  .ws-title, .ar-htitle { display: block; margin: 10px 0 0; max-width: 330px;
+    font: 900 clamp(28px, 8.4vw, 36px)/.96 'Barlow Condensed', 'AA Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif-condensed, sans-serif;   /* display: the session's or the article's name, 28 to 36 px */
+    letter-spacing: .3px; text-transform: uppercase; color: #fff; text-wrap: balance; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+  .ws-meta, .ar-hmeta { margin: 10px 0 0; font: 400 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.8); }
+  .ws-meta:empty, .ar-hmeta:empty { display: none; }
+  .ws-eyebrow, .ws-title, .ws-meta, .ar-kicker, .ar-htitle, .ar-hmeta, .shelf-n, .shelf-t, .pb-eb, .pb-title, .pb-min { text-shadow: 0 1px 10px rgba(6,36,26,.55); }   /* the picture can pass behind a line, as on Progress's cover */
+  .ws-eyebrow, .ar-kicker, .shelf-n, .pb-eb { text-shadow: 0 1px 2px rgba(6,36,26,.6), 0 0 12px rgba(6,36,26,.75); }   /* the small mono lines get a tighter halo: a long one can run over the bright part of the picture */
+  .lib-head .prog-eyebrow { text-wrap: balance; }   /* 320 px: "TRAIN IT, LEARN IT, / KNOW IT", not one word alone */
+
+  /* Before you start: the lower-day banner's recipe (a white row on the paper, a 4 px clay stripe: clay because it is a "look here"). The
+     row is the fold: BEFORE YOU START in clay mono over "Safety checks: what to stop for", the app's ⌄ at the right (turned when open). It is
+     open the first time each session is opened on this phone and one folded row after that (renderBefore()); it folds by its own tap only,
+     never by Why this session's. Its paragraphs are at reading size. */
+  .ws-before { margin: 0; background: var(--row); box-shadow: inset 4px 0 0 var(--clay-fill); border-bottom: 1px solid var(--hair); }
+  .ws-before[hidden] { display: none; }
+  .ws-before-h { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; margin: 0; padding: 14px var(--g); border: 0; border-radius: 0; background: transparent;
+    color: var(--ink); text-align: left; cursor: pointer; }
+  .ws-before-h:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  .wb-t { flex: 1; min-width: 0; display: grid; gap: 5px; }
+  .wb-k { font: 700 var(--fs-label)/1.3 'Space Mono', monospace; letter-spacing: 1.2px; text-transform: uppercase; color: var(--clay-ink); }
+  .wb-l { font: 500 var(--fs-body)/1.35 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .wb-c, .ws-fold-c { flex: none; width: 18px; height: 18px; background: var(--grey); transition: transform .2s ease;
+    -webkit-mask: var(--chev-down) center / 18px no-repeat; mask: var(--chev-down) center / 18px no-repeat; }
+  .ws-before-h[aria-expanded="true"] .wb-c, .ws-why-toggle[aria-expanded="true"] .ws-fold-c { transform: rotate(180deg); }
+  .ws-before-b { padding: 0 var(--g) 14px; }
+  .ws-before-b[hidden] { display: none; }
+  .ws-before-b p { margin: 0 0 10px; font: 400 var(--fs-body)/1.55 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .ws-before-b p:last-child { margin-bottom: 0; }
+  .ws-before-b p b { font: 900 var(--fs-body)/1.55 'Barlow Condensed', sans-serif; letter-spacing: .4px; text-transform: uppercase; color: var(--ink); }
+  .ws-before-b p b::after { content: ':'; }
+
+  /* Why this session: a fold row on the paper (a green mono label, the app's ⌄), its paragraphs at reading size. Open by default when short;
+     the choice is remembered for every session (toggleWhy()). */
+  .ws-why { margin: 0 var(--g); }
+  .ws-why[hidden] { display: none; }
+  .ws-why-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 56px; margin: 0; padding: 0; border: 0; background: transparent;
+    cursor: pointer; text-align: left; font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  .ws-why-toggle:focus-visible { outline: 2px solid var(--green-ink); outline-offset: -2px; }
+  .ws-why.is-closed .ws-why-body { display: none; }
+  .ws-why-body { padding: 0 0 16px; }
+  .ws-why-body p { margin: 0 0 10px; font: 400 var(--fs-body)/1.6 'Barlow', sans-serif; color: var(--ink); text-wrap: pretty; }
+  .ws-why-body p:last-child { margin-bottom: 0; }
+
+  /* The cards: the day's rows (CENTRE COURT). The gutter is --g, which the block titles' hairline needs to run to the edge. */
+  #screen-workout #ws-body { padding: 0 var(--g); }
+
+  /* Mark as done: the screen's one primary button (the day's Send), full width, its note under it in grey. Done is the same size, hollow, in green text. */
+  .ws-finish { margin: 0 var(--g); padding: 28px 0 40px; text-align: left; }
+  .ws-finish[hidden] { display: none; }
+  .ws-done-btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 56px; margin: 0; padding: 0 16px; border: 0; border-radius: 8px; cursor: pointer;
+    background: var(--btn); color: #fff; font: 700 var(--fs-lead)/1 'Barlow Condensed', sans-serif; letter-spacing: 1.2px; text-transform: uppercase; transition: opacity .15s; }
+  .ws-done-btn:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  .ws-done-btn:disabled { opacity: .55; cursor: default; }
+  .ws-done-btn.is-done { background: transparent; color: var(--green-ink); box-shadow: inset 0 0 0 1.5px var(--green-ink); }
+  .ws-done-note { margin: 12px 0 0; font: 400 var(--fs-small)/1.6 'Barlow', sans-serif; color: var(--grey); }
+
+  /* 6. An article. The cover is the session's: --hero, the category as the mint-dot eyebrow, the title in condensed capitals, the date and
+     minutes in mono, ← as the glass button. The body keeps its reading layout (the paragraphs, headings, lists and pictures are above, in the
+     ARTICLE READER rules). A callout takes the Coach's note's pull-quote look: Amir's voice with no box and the clay quote on the left. A session
+     inside an article is a door row (Home's .hrow look). */
+  #screen-article { background: var(--paper); }
+  .ar-hero { position: relative; isolation: isolate; overflow: hidden; background: var(--hero); color: #fff; }
+  #ar-body { padding: 22px var(--g) 110px; }
+  #ar-body .ar-callout { position: relative; margin: 6px 0 18px; padding: 16px 0 0 56px; font: 500 var(--fs-field)/1.42 'Barlow', sans-serif; color: var(--ink); }
+  #ar-body .ar-callout::before { content: '\201C'; position: absolute; left: 0; top: 14px; width: 44px; text-align: center;
+    font: 900 var(--fs-display)/1 'Barlow Condensed', sans-serif; color: var(--clay); }
+  #ar-body .ar-callout .ar-cl { font-weight: 700; color: var(--ink); }
+  #ar-body .hrow { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; margin: 18px 0 6px; padding: 12px 14px 12px 16px; border: 1px solid var(--hair);
+    border-radius: 12px; background: var(--row); color: var(--ink); cursor: pointer; text-align: left; }
+  #ar-body .hrow:focus-visible { outline: 2px solid var(--green-ink); outline-offset: 2px; }
+  #ar-body .hrow-ic { flex: none; display: inline-flex; width: 22px; height: 22px; color: var(--green-ink); }
+  #ar-body .hrow-ic svg { width: 22px; height: 22px; }
+  #ar-body .hrow-b { flex: 1; min-width: 0; display: grid; gap: 4px; }
+  #ar-body .hrow-l { font: 700 var(--fs-label)/1.2 'Space Mono', monospace; letter-spacing: 1.4px; text-transform: uppercase; color: var(--green-ink); }
+  #ar-body .hrow-v { display: block; font: 700 var(--fs-lead)/1.25 'Barlow', sans-serif; color: var(--ink); }
+  #ar-body .hrow-v small { display: block; margin-top: 3px; font: 400 var(--fs-small)/1.3 'Barlow', sans-serif; color: var(--grey); }
+  #ar-body .hrow-a { flex: none; font: 600 var(--fs-title)/1 'Barlow', sans-serif; color: var(--grey); }
+
   /* ══ HOME AND PROGRESS IN THE CENTRE COURT LOOK (2026-10-12) ═════════════════════════════════════════════════════════════
      Amir, 2026-10-12: Home and Progress wear the training day's look (calm paper, one strong green thing a screen, hairlines
      between rows). This block covers: the tokens and the one gutter (--g) for #home-overview and #screen-plan · the Home
@@ -5131,65 +5113,35 @@
   <div id="wt-body" style="padding: 0 18px 110px;"></div>
 </div>
 
-<!-- ═══ LIBRARY ═══ shared, app-wide content. A three-door landing — Sessions
-     (free workouts), Playbook (blog articles) and Exercises (the Spine) — each
-     opening into its own world. data-tab stays 'workouts' so all goTo() routing is untouched. -->
+<!-- ═══ LIBRARY ═══ shared, app-wide content, in the Centre Court look (2026-10-13). One tab with a header (the eyebrow, the 44 px title) and ONE
+     switch, Sessions · Playbook · Exercises, under which the chosen pane shows. The doors page is gone (Amir, 2026-10-13); the last pane used
+     is remembered on this phone (localStorage 'lib_pane', not athlete-prefixed, never synced). The panes are tab roots: no ← in them, and the
+     phone's Back from one goes Home (topLayer()). The counts keep their ids: loadLibCounts() and paintExerciseCount() fill them (blank, never
+     "0", when a load fails). data-tab stays 'workouts' so all goTo() routing is untouched. -->
 <div id="screen-workouts" class="screen">
 
-  <!-- Landing: the three doors -->
-  <div id="lib-doors" class="lib-pane">
-    <div class="lib-head">
-      <div class="lib-title">Library</div>
-      <div class="lib-sub">Train it, learn it, know it.</div>
-    </div>
-    <div class="lib-doors">
-      <div class="lib-door door-sessions" role="button" tabindex="0" onclick="enterWorld('sessions')">
-        <div class="lib-door-court" aria-hidden="true"><svg viewBox="0 0 360 250" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M108 70 L252 70 L320 250 L40 250 Z"/><line x1="74" y1="172" x2="286" y2="172"/><line x1="180" y1="70" x2="180" y2="250"/></g></svg></div>
-        <div class="lib-door-k">— Train</div>
-        <div class="lib-door-big">Sessions</div>
-        <div class="lib-door-d">Workouts, drills &amp; resets — ready to run on your own.</div>
-        <div class="lib-door-row"><span class="lib-door-ct" id="sessions-count">&nbsp;</span><span class="lib-door-arr" aria-hidden="true">→</span></div>
-      </div>
-      <div class="lib-door door-playbook" role="button" tabindex="0" onclick="enterWorld('playbook')">
-        <div class="lib-door-court" aria-hidden="true"><svg viewBox="0 0 360 250" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M108 70 L252 70 L320 250 L40 250 Z"/><line x1="74" y1="172" x2="286" y2="172"/><line x1="180" y1="70" x2="180" y2="250"/></g></svg></div>
-        <div class="lib-door-k">— Learn</div>
-        <div class="lib-door-big">Playbook</div>
-        <div class="lib-door-d">Everything you need to know to play better tennis — in one place.</div>
-        <div class="lib-door-row"><span class="lib-door-ct" id="playbook-count">&nbsp;</span><span class="lib-door-arr" aria-hidden="true">→</span></div>
-      </div>
-      <div class="lib-door door-exercises" role="button" tabindex="0" onclick="enterWorld('exercises')">
-        <div class="lib-door-k">— Know</div>
-        <div class="lib-door-big">Exercises</div>
-        <div class="lib-door-d">Every exercise: what it's for, how to do it, and its easier, harder and other-equipment versions.</div>
-        <div class="lib-door-row"><span class="lib-door-ct" id="exercises-count">&nbsp;</span><span class="lib-door-arr" aria-hidden="true">→</span></div>
-      </div>
-    </div>
+  <div class="lib-head">
+    <div class="prog-eyebrow">Train it, learn it, know it</div>
+    <h1 class="prog-title">Library</h1>
   </div>
 
-  <!-- Sessions world: numbered photo shelves (no tabs / no filters) -->
-  <div id="lib-sessions" class="lib-pane" hidden>
-    <div class="w-head">
-      <button class="nav-back" onclick="exitWorld()" aria-label="Back to Library">←</button>
-      <div class="pb-court" aria-hidden="true"><svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M90 100 L270 100 L340 220 L20 220 Z"/><line x1="56" y1="178" x2="304" y2="178"/><line x1="180" y1="100" x2="180" y2="220"/></g></svg></div>
-      <div class="w-kick">— Train</div>
-      <div class="w-title">Sessions</div>
-      <div class="w-sub">Pick a session and press play.</div>
-    </div>
+  <div class="lib-switch" id="lib-switch" role="tablist" aria-label="Library">
+    <button type="button" class="lib-tab" role="tab" id="lib-tab-sessions" data-pane="sessions" aria-selected="true" aria-controls="lib-sessions" onclick="setLibPane('sessions')"><span class="lib-tab-w">Sessions</span><span class="lib-tab-n" id="sessions-count">&nbsp;</span></button>
+    <button type="button" class="lib-tab" role="tab" id="lib-tab-playbook" data-pane="playbook" aria-selected="false" aria-controls="lib-playbook" tabindex="-1" onclick="setLibPane('playbook')"><span class="lib-tab-w">Playbook</span><span class="lib-tab-n" id="playbook-count">&nbsp;</span></button>
+    <button type="button" class="lib-tab" role="tab" id="lib-tab-exercises" data-pane="exercises" aria-selected="false" aria-controls="lib-exercises" tabindex="-1" onclick="setLibPane('exercises')"><span class="lib-tab-w">Exercises</span><span class="lib-tab-n" id="exercises-count">&nbsp;</span></button>
+  </div>
+
+  <!-- Sessions: a cover band for each shelf, then its sessions as paper rows (filled by renderSessionsWorld) -->
+  <div id="lib-sessions" class="lib-pane" role="tabpanel" aria-labelledby="lib-tab-sessions">
     <div class="w-scroll" id="wl-scroll-train"></div>
   </div>
 
-  <!-- Playbook world: broadcast feed — latest hero + list (filled by renderPlaybook) -->
-  <div id="lib-playbook" class="lib-pane lib-pane-dark" hidden></div>
+  <!-- Playbook: the latest read as the cover, then each category's reads as paper rows (filled by renderPlaybook) -->
+  <div id="lib-playbook" class="lib-pane" role="tabpanel" aria-labelledby="lib-tab-playbook" hidden></div>
 
-  <!-- Exercises world (2026-09-24): the Spine as a library, like the course app's.
+  <!-- Exercises (2026-09-24): the Spine as a library, like the course app's.
        Every row opens the same About sheet as the ⓘ on a card (renderExerciseLibrary). -->
-  <div id="lib-exercises" class="lib-pane" hidden>
-    <div class="w-head w-head-ex">
-      <button class="nav-back" onclick="exitWorld()" aria-label="Back to Library">←</button>
-      <div class="w-kick">— Know</div>
-      <div class="w-title">Exercises</div>
-      <div class="w-sub" id="xl-sub">What it's for, how to do it, and what to swap it for.</div>
-    </div>
+  <div id="lib-exercises" class="lib-pane" role="tabpanel" aria-labelledby="lib-tab-exercises" hidden>
     <div class="xl-tools">
       <input id="xl-q" class="xl-search" type="search" placeholder="Search exercises" autocomplete="off" aria-label="Search exercises">
       <div class="xl-chips" id="xl-chips"></div>
@@ -5202,31 +5154,43 @@
      Library → Sessions (or a LIB-01 suggestion). Reuses the exercise-card visuals, but with its OWN local-only
      check-off (keyed by workout id) — no athlete data, no cloud, no set-logs.
 
+     The top is a cover in the Centre Court look (2026-10-13): the shelf's picture graded into the green (none: the plain green), ← as the
+     day cover's glass button, the session's focus as the eyebrow, its name, minutes and kit. Under it, on the paper: Before you start (open
+     the first time each session is opened on this phone, one folded row after that) and Why this session (a fold row).
+
      The one thing here that DOES reach the server is the Done button below:
      it writes a row to public.library_sessions, which feeds both the athlete's
      Proof habits and the coach's report. See supabase/stage28_library_sessions.sql. -->
 <div id="screen-workout" class="screen">
   <div class="ws-header">
+    <img class="ws-img" id="ws-img" alt="" aria-hidden="true" decoding="async" hidden onerror="this.hidden=true">
+    <div class="ws-scrim" aria-hidden="true"></div>
     <button class="nav-back" onclick="wsBack()" aria-label="Back">←</button>
-    <div class="ws-eyebrow" id="ws-eyebrow"></div>
-    <div class="ws-title" id="ws-title"></div>
-    <div class="ws-meta" id="ws-meta"></div>
-    <!-- Before you start: the workout's own `before` rows — what to stop for, and the
-         rules that keep it safe. Its OWN element, deliberately outside "Why this
-         session" below: that block can be closed, the choice is remembered for every
-         workout, and a red flag must never be the thing a closed toggle hides. -->
-    <section class="ws-before" id="ws-before" aria-labelledby="ws-before-h" hidden>
-      <div class="ws-before-h" id="ws-before-h">Before you start</div>
-      <div id="ws-before-body"></div>
-    </section>
-    <!-- Why this session: 1-2 paragraphs from the workout's own `intro`. Sits in
-         the header under the duration line. Open by default when short, closed when
-         long (see WS_WHY_LONG), and the athlete's own choice is remembered across
-         every workout. -->
-    <div class="ws-why" id="ws-why" hidden>
-      <button type="button" class="ws-why-toggle" id="ws-why-toggle" onclick="toggleWhy()"></button>
-      <div class="ws-why-body" id="ws-why-body"></div>
+    <div class="ws-cap">
+      <div class="ws-eyebrow" id="ws-eyebrow"></div>
+      <div class="ws-title" id="ws-title"></div>
+      <div class="ws-meta" id="ws-meta"></div>
     </div>
+  </div>
+  <!-- Before you start: the workout's own `before` rows — what to stop for, and the
+       rules that keep it safe. Its OWN element, deliberately outside "Why this
+       session" below: that block can be closed, the choice is remembered for every
+       workout, and a red flag must never be the thing a closed toggle hides. The row
+       folds ONLY by its own tap: open the first time a session is opened (renderBefore()). -->
+  <section class="ws-before" id="ws-before" aria-labelledby="ws-before-h" hidden>
+    <button type="button" class="ws-before-h" id="ws-before-btn" aria-expanded="true" aria-controls="ws-before-body" onclick="toggleBefore()">
+      <span class="wb-t"><span class="wb-k" id="ws-before-h">Before you start</span><span class="wb-l">Safety checks: what to stop for</span></span>
+      <span class="wb-c" aria-hidden="true"></span>
+    </button>
+    <div class="ws-before-b" id="ws-before-body"></div>
+  </section>
+  <!-- Why this session: 1-2 paragraphs from the workout's own `intro`, a fold row on
+       the paper under Before you start. Open by default when short, closed when
+       long (see WS_WHY_LONG), and the athlete's own choice is remembered across
+       every workout. -->
+  <div class="ws-why" id="ws-why" hidden>
+    <button type="button" class="ws-why-toggle" id="ws-why-toggle" onclick="toggleWhy()"></button>
+    <div class="ws-why-body" id="ws-why-body"></div>
   </div>
   <div id="ws-body"></div>
   <div id="ws-finish" class="ws-finish" hidden>
@@ -5236,14 +5200,15 @@
 </div>
 
 <!-- ═══ ARTICLE ═══ a single blog/read article opened from Library → Playbook
-     or via ?article= deep-link. Mirrors #screen-workout. -->
+     or via ?article= deep-link. Mirrors #screen-workout: a cover in the Centre Court look, then the reading layout. -->
 <div id="screen-article" class="screen">
   <div class="ar-hero">
     <button class="nav-back" onclick="goTo('workouts')" aria-label="Back to library">←</button>
-    <div class="ar-court" aria-hidden="true"><svg viewBox="0 0 330 150" preserveAspectRatio="xMidYMax slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M95 80 L235 80 L300 150 L30 150 Z"/><line x1="60" y1="118" x2="270" y2="118"/><line x1="165" y1="80" x2="165" y2="150"/></g></svg></div>
-    <div class="ar-kicker" id="ar-eyebrow"></div>
-    <h1 class="ar-htitle" id="ar-title"></h1>
-    <div class="ar-hmeta" id="ar-meta"></div>
+    <div class="ar-cap">
+      <div class="ar-kicker" id="ar-eyebrow"></div>
+      <h1 class="ar-htitle" id="ar-title"></h1>
+      <div class="ar-hmeta" id="ar-meta"></div>
+    </div>
   </div>
   <div id="ar-body"></div>
 </div>
@@ -6665,7 +6630,7 @@ const COACH_WHATSAPP_SHOWN = '+44 7435 363461';
   // The Spine: cues and the ⓘ from the phone's copy now, then from the server.
   paintSpine();
   paintDayQualities();
-  // Library door counts from the phone's copies, so they never wait on a manifest.
+  // The Library switch's Exercises count from the phone's copy, so it never waits on a manifest.
   paintExerciseCount();
   if (!_spineFresh) refreshSpine();   // boot may already have fetched it (a first-ever open)
   refreshQualities();
@@ -9456,7 +9421,7 @@ const CEILING_HELP = `
 
 const APP_GUIDE = [
   { icon: 'compass', title: 'Getting around',
-    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions and articles, separate from your program. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
+    body: `<p>Everything lives under the four tabs along the bottom:</p><ul><li><strong>Home</strong> is your week. The next session comes first, then the rest of the week's days (tap one to open its workout), then your daily habits.</li><li><strong>Progress</strong> is how it's going. It shows this cycle so far (the week, sessions done and your wins), then your numbers (Personal Records and body weight), then the Game Plan: every cycle, what it's for and what comes next.</li><li><strong>Library</strong> is extra, on-demand sessions, articles and every exercise, separate from your program. A switch at the top picks <strong>Sessions</strong>, <strong>Playbook</strong> or <strong>Exercises</strong>, and it opens on the one you used last. <strong>Sessions</strong> sit on shelves (Strength, Mobility, Recovery…): each shows three, with what it's for, its minutes and kit, and <strong>✓</strong> the AA Proof habit it ticks; <strong>All 7 ›</strong> on a shelf's picture shows the rest. Ticking exercises off in there doesn't change your week's plan, but <strong>Mark as done</strong> at the end of a workout lets me see you did it, and ticks the matching habit in AA Proof when that habit is switched on there. Two moments bring one to you: after a check-in that says you're sore, the finished session offers a day-after session, and once every session of the week is done, Home offers a short extra. Each goes once you've opened it.</li><li><strong>Coach</strong> is where I talk to you. It has the notes I write for you and the button to message me on WhatsApp.</li></ul><p><strong>Your initials</strong>, top right, open your account: the theme, installing the app, this guide, the privacy notice, and <strong>Sign out</strong>. A word with a dotted line under it, like <strong>How hard?</strong> or <strong>tempo</strong>, opens its part of this guide too.</p><p><strong>During a session</strong> the tabs hide so the workout has the screen. The green bar at the top is the clock, <strong>Pause</strong> and <strong>⋯</strong> (Guided and Reset are in there). The line along its bottom fills as your sets get done. In a week where my note sets a limit, a row under the clock keeps that limit in view, like <strong>Max RPE 7 · 1 set fewer</strong>. That week an RPE you log over the limit turns orange. <strong>← Home</strong> takes you back, and the clock keeps running.</p><p><strong>Closing things</strong>: <strong>←</strong> at the top left takes a screen back, <strong>✕</strong> at the top right closes Guided or a video, and a sheet that slides up from the bottom closes with a swipe down, a tap above it, or <strong>Close</strong> at its end. Your phone's Back button closes whatever is on top.</p>` },
   { icon: 'cycle', title: 'How your program is structured',
     body: `<p>Your whole plan is built in layers, each with a purpose:</p><ul><li><strong>Cycles</strong> — ~5-week blocks, each with one clear goal that builds on the last (foundation → strength → power…). Your plan <em>will</em> change every few weeks — that's by design, not a glitch. The first week is for finding your weights and the last week is a lighter back-off week. Some cycles have another week that works differently, like a test week or a lighter week. In any of those weeks, my note for the week opens <strong>This Week</strong> on Home and tells you exactly what changes. When the last week is over, Home says so with a <strong>Cycle complete</strong> row, and your cycle card on <strong>Progress</strong> reads <strong>Cycle complete</strong> too. There's no new week to train until the next cycle starts. Ready for it? Message me from the button on Home and we'll start it. Want to keep moving meanwhile? <strong>Repeat a session</strong> opens the cycle's days.</li><li><strong>Days</strong> — each cycle has a few training days (D1, D2, D3…), each with its own focus.</li><li><strong>Blocks</strong> — inside a day: warm-up, strength, power, and so on, in order.</li><li><strong>Exercises</strong> — each carries its sets, reps, tempo and target RPE, and <strong>How to do it</strong>: plain steps, coaching cues, and a demo video when there is one.</li></ul><p>The <strong>Why this cycle matters</strong> note on <strong>Progress</strong>, in the Game Plan (your current cycle opens by itself, tap any other to open it), explains what we're chasing right now.</p>` },
   { icon: 'activity', key: 'rpe', title: 'RPE & Tempo',
@@ -9602,7 +9567,7 @@ function goTo(screen, historyId, keepContent) {
     else renderArchiveEmpty();
   }
 
-  // Library tab — the doors, or the world last open. Each world is built lazily on first visit.
+  // Library tab — the pane last open (else Sessions). Each pane is built lazily on first visit.
   if (screen === 'workouts') renderLibrary();
 
   // Home — rebuild the habit row. renderHome() only runs at boot, so without this habits ticked in AA
@@ -9681,8 +9646,9 @@ function topLayer() {
   const scr = document.querySelector('.screen.active');
   const id = scr ? scr.id.replace('screen-', '') : 'home';
   if (id !== 'home') {
-    // The screen's own ← first: it knows where it came from (Records → the exercise,
-    // an article → its Library pane, the archive, Records and Body weight → Progress). A tab has none: Home.
+    // The screen's own ← first: it knows where it came from (Records → the exercise, a Library session or an
+    // article → its Library pane, the archive, Records and Body weight → Progress). A tab has none: Home.
+    // The Library's three panes are a tab's own (no ← in them since 2026-10-13), so Back from one goes Home.
     const b = _visibleBtn(scr, '.nav-back, .archive-back');
     return b ? () => b.click() : () => goTo('home');
   }
@@ -9784,30 +9750,42 @@ function renderArchiveEmpty() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-//  LIBRARY — three doors: Sessions (extra workouts) and Playbook (blog
-//  articles), grouped by category and built lazily from get_library() (the
-//  index.json manifests are only a fallback), and Exercises (the Spine).
-//  Same for every user — not tied to the athlete's data.
+//  LIBRARY — one tab, ONE switch: Sessions (extra workouts), Playbook (blog
+//  articles) and Exercises (the Spine). Sessions and Playbook are grouped by
+//  category and built lazily from get_library() (the index.json manifests
+//  are only a fallback). Same for every user — not tied to the athlete's data.
+//  The doors page that sat in front of them went on 2026-10-13 (Amir): the
+//  Library opens on the last pane used on this phone, else Sessions.
 // ═══════════════════════════════════════════════════════════════════════
 
-// Which Library pane is showing: 'doors' | 'sessions' | 'playbook' | 'exercises'. Remembered
-// so returning from an opened session/article lands back in the right world.
-let _libPane = 'doors';
+// Which Library pane is showing: 'sessions' | 'playbook' | 'exercises', or null until the Library is first opened.
+// Kept in memory so that coming back from a session or an article lands in the pane it came from, and on the phone
+// (LIB_PANE_KEY) so that the tab opens on the last pane used.
+const LIB_PANES = ['sessions', 'playbook', 'exercises'];
+// NOT athlete-prefixed on purpose: which pane was last open is this phone's own view, so it is never pushed or pulled
+// (syncFromCloud() takes only <id>_ keys, and the write hook stamps only those).
+const LIB_PANE_KEY = 'lib_pane';
+let _libPane = null;
 let _trainManifest = null, _readManifest = null;
 let _sessionsRendered = false, _playbookRendered = false, _libCountsLoaded = false;
+function libPaneStored() {
+  try { const v = localStorage.getItem(LIB_PANE_KEY); if (LIB_PANES.indexOf(v) >= 0) return v; } catch (e) { /* private window */ }
+  return 'sessions';
+}
 
-// Entry point — called by goTo('workouts'). Shows the remembered pane and makes
-// sure the door counts are filled. The bottom-nav Library tab uses goLibrary(),
-// which resets to the doors first.
+// Entry point — called by goTo('workouts'). Shows the pane in memory (else the one remembered on the phone, else
+// Sessions) WITHOUT moving the page (goTo() places it: the top, or where a session or an article was opened from),
+// and makes sure the switch's counts are filled. The bottom-nav Library tab uses goLibrary(), which forgets the
+// pane in memory first so the phone's memory decides.
 function renderLibrary() {
-  showLibPane(_libPane);
+  setLibPane(_libPane || libPaneStored(), { keep: true });
   loadLibCounts();
 }
 
-// Bottom-nav "Library" tap → always open on the three doors.
+// Bottom-nav "Library" tap → the last pane used on this phone, at the top.
 function goLibrary() {
-  _libPane = 'doors';
-  _libScrollY = null;   // the tab opens on the doors, at the top
+  _libPane = null;
+  _libScrollY = null;   // the tab opens at the top
   goTo('workouts');
 }
 window.goLibrary = goLibrary;
@@ -10589,36 +10567,58 @@ window.renderCeiling = renderCeiling;
 
 function showLibPane(which) {
   _libPane = which;
-  ['doors', 'sessions', 'playbook', 'exercises'].forEach(p => {
+  LIB_PANES.forEach(p => {
     const el = document.getElementById('lib-' + p);
     if (el) el.hidden = (p !== which);
+    const tab = document.getElementById('lib-tab-' + p);
+    if (tab) { tab.setAttribute('aria-selected', String(p === which)); tab.tabIndex = (p === which) ? 0 : -1; }
   });
 }
 
-async function enterWorld(which) {
+// The switch's three tabs (and renderLibrary(), with keep: true). A tap remembers the pane on this phone and starts it
+// at the top; coming back from a session or an article keeps the page where goTo() puts it (_libScrollY).
+async function setLibPane(which, opts) {
+  if (LIB_PANES.indexOf(which) < 0) which = 'sessions';
+  const keep = !!(opts && opts.keep);
   showLibPane(which);
+  if (!keep) {
+    try { localStorage.setItem(LIB_PANE_KEY, which); } catch (e) { /* private window: it just forgets */ }
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
   if (which === 'sessions') await renderSessionsWorld();
-  if (which === 'playbook') await renderPlaybook();
-  if (which === 'exercises') renderExerciseLibrary();
-  window.scrollTo({ top: 0, behavior: 'instant' });
+  else if (which === 'playbook') await renderPlaybook();
+  else renderExerciseLibrary();
 }
-function exitWorld() { showLibPane('doors'); window.scrollTo({ top: 0, behavior: 'instant' }); }
-window.enterWorld = enterWorld;
-window.exitWorld = exitWorld;
+window.setLibPane = setLibPane;
+// A tablist moves with the arrow keys, Home and End.
+(function () {
+  const sw = document.getElementById('lib-switch');
+  if (!sw) return;
+  sw.addEventListener('keydown', e => {
+    const i = Math.max(0, LIB_PANES.indexOf(_libPane || libPaneStored()));
+    const j = e.key === 'ArrowRight' ? (i + 1) % LIB_PANES.length : e.key === 'ArrowLeft' ? (i + LIB_PANES.length - 1) % LIB_PANES.length
+            : e.key === 'Home' ? 0 : e.key === 'End' ? LIB_PANES.length - 1 : -1;
+    if (j < 0) return;
+    e.preventDefault();
+    setLibPane(LIB_PANES[j]);
+    const t = document.getElementById('lib-tab-' + LIB_PANES[j]);
+    if (t) t.focus();
+  });
+})();
 
-// Fetch both manifests once and fill the "N Sessions / N Reads" door counts.
+// Fetch both manifests once and fill the Sessions / Playbook counts on the switch.
 async function loadLibCounts() {
   if (_libCountsLoaded) return;
   await ensureLibManifests();
-  // A load that failed (offline on the first visit) must not be written as "0 Sessions" and then
+  // A load that failed (offline on the first visit) must not be written as "0" and then
   // never retried: leave the counts blank, and the next visit to the Library asks again.
   if (!_trainManifest || !_readManifest) return;
   const sCount = ((_trainManifest && _trainManifest.categories) || []).reduce((n, c) => n + ((c.workouts || []).length), 0);
   const rCount = ((_readManifest && _readManifest.categories) || []).reduce((n, c) => n + ((c.articles || []).length), 0);
   const sEl = document.getElementById('sessions-count');
   const rEl = document.getElementById('playbook-count');
-  if (sEl) sEl.textContent = sCount + ' ' + (sCount === 1 ? 'Session' : 'Sessions');
-  if (rEl) rEl.textContent = rCount + ' ' + (rCount === 1 ? 'Read' : 'Reads');
+  if (sEl) sEl.textContent = String(sCount);
+  if (rEl) rEl.textContent = String(rCount);
   paintExerciseCount();
   _libCountsLoaded = true;
 }
@@ -10635,7 +10635,14 @@ const _libItems = {};
 //
 // The shape handed to the renderers is deliberately unchanged, so every screen
 // below still works exactly as it did.
-async function ensureLibManifests() {
+// The pane and the switch's counts both ask on a first visit: they share one load, not two get_library() calls.
+let _libLoading = null;
+function ensureLibManifests() {
+  if (_trainManifest && _readManifest) return Promise.resolve();
+  if (!_libLoading) _libLoading = _loadLibManifests().then(() => { _libLoading = null; }, () => { _libLoading = null; });
+  return _libLoading;
+}
+async function _loadLibManifests() {
   if (_trainManifest && _readManifest) return;
 
   try {
@@ -10669,8 +10676,8 @@ async function ensureLibManifests() {
   }
 }
 
-// ── SESSIONS world — the shelves as a list (LIB-01, Amir 2026-09-27, pick A) ─────────────────
-// Each shelf's photo once, as a band holding its number and name; under it, the first three sessions as rows
+// ── SESSIONS pane — the shelves as a list (LIB-01, Amir 2026-09-27, pick A) ─────────────────
+// Each shelf's photo once, as a cover band (2026-10-13: the Centre Court look) holding its number and name; under it, the first three sessions as rows
 // that say what each is for, its minutes and kit, and ✓ the AA Proof habit it ticks (only when Proof will give
 // one: libTickLabel()). A longer shelf wears "All N ›" on its band, which shows the rest in place. Before, every
 // card wore its shelf's one photo, two showed per shelf, the other 28 sat behind a sideways swipe, and the ›
@@ -10683,20 +10690,21 @@ async function renderSessionsWorld() {
   await ensureLibManifests();
   if (!_trainManifest) { scroll.innerHTML = '<div class="wl-empty">Couldn\'t load sessions. Check your connection and try again.</div>'; return; }
   const cats = _trainManifest.categories || [];
-  if (!cats.length) { scroll.innerHTML = '<div class="wl-empty">No sessions yet — check back soon.</div>'; return; }
+  if (!cats.length) { scroll.innerHTML = '<div class="wl-empty">No sessions yet. Check back soon.</div>'; return; }
   scroll.innerHTML = cats.map((cat, i) => {
     const list = Array.isArray(cat.workouts) ? cat.workouts : [];
     const num = String(i + 1).padStart(2, '0');
     const more = list.length > SHELF_SHOWN;
-    const bg = cat.banner ? ` style="background-image:url('${esc(cat.banner)}')"` : '';
-    const band = `<span class="shelf-n">${num}</span><span class="shelf-t">${esc(cat.title || '')}</span>`
+    // The cover band: the shelf's own picture graded into the green, "● 01 · TRAIN", the shelf's name, All N › on the right.
+    const img = cat.banner ? `<img class="shelf-img" src="${esc(cat.banner)}" alt="" aria-hidden="true" decoding="async" onerror="this.remove()">` : '';
+    const band = `${img}<span class="shelf-scrim" aria-hidden="true"></span><span class="shelf-tx"><span class="shelf-n">${num} · Train</span><span class="shelf-t">${esc(cat.title || '')}</span></span>`
       + (more ? `<span class="shelf-all">All ${list.length} ›</span>` : '');
     const head = more
-      ? `<button type="button" class="shelf-band" aria-expanded="false" aria-label="${esc(cat.title || '')}: all ${list.length} sessions" data-n="${list.length}" onclick="toggleShelf(this)"${bg}>${band}</button>`
-      : `<div class="shelf-band"${bg}>${band}</div>`;
+      ? `<button type="button" class="shelf-band" aria-expanded="false" aria-label="${esc(cat.title || '')}: all ${list.length} sessions" data-n="${list.length}" onclick="toggleShelf(this)">${band}</button>`
+      : `<div class="shelf-band">${band}</div>`;
     const rows = list.length
       ? list.map((w, j) => shelfRowHtml(w, j >= SHELF_SHOWN)).join('')
-      : `<div class="wl-coming">Your coach is adding ${esc((cat.title || '').toLowerCase())} sessions — check back soon.</div>`;
+      : `<div class="wl-coming">Your coach is adding ${esc((cat.title || '').toLowerCase())} sessions. Check back soon.</div>`;
     return `<div class="w-shelf">${head}<div class="shelf-list">${rows}</div></div>`;
   }).join('');
   _sessionsRendered = true;
@@ -10825,31 +10833,28 @@ function wsBack() {
 }
 window.wsBack = wsBack;
 
-// ── PLAYBOOK world — latest-article card + per-category numbered sections. ──
+// ── PLAYBOOK pane — the latest read as the cover, then each category with reads as a section of rows (2026-10-13). ──
+// A category with no reads is not drawn (it used to say "coming soon").
 async function renderPlaybook() {
   if (_playbookRendered) return;
   const host = document.getElementById('lib-playbook');
   if (!host) return;
   await ensureLibManifests();
-  const backBtn = '<button class="nav-back" onclick="event.stopPropagation(); exitWorld()" aria-label="Back to Library">←</button>';
-  if (!_readManifest) { host.innerHTML = backBtn + '<div class="pb-empty">Couldn\'t load the Playbook. Check your connection and try again.</div>'; return; }
-  const all = [];
-  (_readManifest.categories || []).forEach(c => (c.articles || []).forEach(a => all.push({ title: a.title, file: a.file, readMins: a.readMins, cat: c.title })));
-  if (!all.length) { host.innerHTML = backBtn + '<div class="pb-empty">Your coach is adding the Playbook — check back soon.</div>'; _playbookRendered = true; return; }
-  const court = '<div class="pb-court" aria-hidden="true"><svg viewBox="0 0 360 220" preserveAspectRatio="xMidYMax slice"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M90 100 L270 100 L340 220 L20 220 Z"/><line x1="56" y1="178" x2="304" y2="178"/><line x1="180" y1="100" x2="180" y2="220"/></g></svg></div>';
-  const heroHtml = `<div class="pb-hero">${backBtn}${court}<div class="pb-hk">— Learn</div><div class="pb-ht">Playbook</div><div class="pb-hm">${all.length} ${all.length === 1 ? 'article' : 'articles'} inside</div></div>`;
-  const latest = all[0];
-  const latestCard = `<div class="pb-latest" role="button" tabindex="0" data-file="${esc(latest.file || '')}" onclick="openArticle(this.dataset.file)"><div class="pb-latest-label">— Latest · ${esc(latest.cat || '')}</div><div class="pb-latest-title">${esc(latest.title || '')}</div><div class="pb-latest-meta"><span>${latest.readMins ? esc(String(latest.readMins)) + ' min read' : ''}</span><span class="pb-latest-go">→</span></div></div>`;
-  let catNum = 0;
-  const catSections = (_readManifest.categories || []).map(c => {
-    catNum++;
-    const num = String(catNum).padStart(2, '0');
-    const count = (c.articles || []).length;
-    const header = `<div class="pb-block"><span class="pb-s">${num}</span>${esc(c.title)}<span class="pb-ct">${count ? count + ' ' + (count === 1 ? 'article' : 'articles') : 'coming soon'}</span></div>`;
-    const rows = (c.articles || []).map((a, i) => `<div class="pb-disp" role="button" tabindex="0" data-file="${esc(a.file || '')}" onclick="openArticle(this.dataset.file)"><div class="pb-dn"><b>${String(i + 1).padStart(2, '0')}</b><i></i></div><div class="pb-db"><div class="pb-dk">${a.readMins ? esc(String(a.readMins)) + ' min read' : ''}</div><div class="pb-dt">${esc(a.title || '')}</div></div><span class="pb-dgo" aria-hidden="true">›</span></div>`).join('');
-    return header + rows;
+  if (!_readManifest) { host.innerHTML = '<div class="pb-empty">Couldn\'t load the Playbook. Check your connection and try again.</div>'; return; }
+  const cats = (_readManifest.categories || []).filter(c => (c.articles || []).length);
+  if (!cats.length) { host.innerHTML = '<div class="pb-empty">Your coach is adding the Playbook. Check back soon.</div>'; _playbookRendered = true; return; }
+  const mins = n => n ? esc(String(n)) + ' min read' : '';
+  const first = cats[0], latest = first.articles[0];
+  const cover = `<button type="button" class="pb-cover" data-file="${esc(latest.file || '')}" onclick="openArticle(this.dataset.file)">`
+    + (first.banner ? `<img class="pb-img" src="${esc(first.banner)}" alt="" aria-hidden="true" decoding="async" onerror="this.remove()">` : '')
+    + `<span class="pb-scrim" aria-hidden="true"></span><span class="pb-body"><span class="pb-eb">Latest · ${esc(first.title || '')}</span>`
+    + `<span class="pb-title">${esc(latest.title || '')}</span><span class="pb-min">${mins(latest.readMins)}</span></span></button>`;
+  const sections = cats.map(c => {
+    const n = c.articles.length;
+    const rows = c.articles.map(a => `<button type="button" class="pb-row" data-file="${esc(a.file || '')}" onclick="openArticle(this.dataset.file)"><span class="sr-b"><span class="sr-name">${esc(a.title || '')}</span><span class="sr-meta">${mins(a.readMins)}</span></span><span class="sr-go" aria-hidden="true">›</span></button>`).join('');
+    return `<div class="lib-sec"><span class="lib-sec-t">${esc(c.title || '')}</span><span class="lib-sec-n">${n} ${n === 1 ? 'read' : 'reads'}</span></div><div class="pb-list">${rows}</div>`;
   }).join('');
-  host.innerHTML = heroHtml + latestCard + catSections;
+  host.innerHTML = cover + sections;
   _playbookRendered = true;
 }
 
@@ -10884,15 +10889,7 @@ async function openArticle(file) {
   }
 
   eyebrow.textContent = article.category || '';
-  // Title with the last word wrapped in the clay highlight block (the scoreboard
-  // "on-air" word). esc() each part so the title stays safe.
-  const words = String(article.title || '').trim().split(/\s+/);
-  if (words.length > 1) {
-    const last = words.pop();
-    titleEl.innerHTML = esc(words.join(' ')) + ' <span class="hl">' + esc(last) + '</span>';
-  } else {
-    titleEl.innerHTML = '<span class="hl">' + esc(words[0] || '') + '</span>';
-  }
+  titleEl.textContent = article.title || '';
   metaEl.textContent  = [
     article.readMins ? article.readMins + ' min read' : '',
     article.date || ''
@@ -10919,21 +10916,18 @@ function renderArticleBlocks(blocks) {
       case 'list':
         return `<ul class="ar-list">${(b.items || []).map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
       case 'callout':
-        return `<div class="ar-callout" data-label="${esc(b.label || 'Rule')}">${esc(b.text || '')}</div>`;
+        return `<div class="ar-callout"><b class="ar-cl">${esc(b.label || 'Rule')}.</b> ${esc(b.text || '')}</div>`;   // the Coach's note's pull-quote look
       case 'img':
         return `<figure style="margin:0 0 4px">
           <img class="ar-img" src="${esc(b.src || '')}" alt="${esc(b.caption || '')}" loading="lazy">
           ${b.caption ? `<figcaption class="ar-caption">${esc(b.caption)}</figcaption>` : ''}
         </figure>`;
       case 'workout':
-        return `<div class="ar-workout-card" role="button" tabindex="0" onclick="openWorkout('${esc(b.file || '')}')">
-          <div class="ar-workout-card-icon">▶</div>
-          <div class="ar-workout-card-body">
-            <div class="ar-workout-card-label">${esc(b.label || b.id || 'Workout')}</div>
-            ${b.meta ? `<div class="ar-workout-card-sub">${esc(b.meta)}</div>` : ''}
-          </div>
-          <div class="ar-workout-card-play">›</div>
-        </div>`;
+        // A session inside an article is a door row (Home's .hrow look).
+        return `<button type="button" class="hrow ar-workout-card" data-file="${esc(b.file || '')}" onclick="openWorkout(this.dataset.file)">
+          <span class="hrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5.5 3.5-5.5 3.5z"/></svg></span>
+          <span class="hrow-b"><span class="hrow-l">Session</span><span class="hrow-v">${esc(b.label || b.id || 'Workout')}${b.meta ? `<small>${esc(b.meta)}</small>` : ''}</span></span>
+          <span class="hrow-a" aria-hidden="true">›</span></button>`;
       default:
         return '';
     }
@@ -11099,12 +11093,34 @@ function renderWhy(wk) {
   const hasBefore = Array.isArray(wk && wk.before) && wk.before.length > 0;
   const closed = _wsWhyClosed(hasBefore && words > WS_WHY_LONG);
   wrap.classList.toggle('is-closed', closed);
-  btn.innerHTML = `Why this session <span class="chev">▾</span>`;
+  btn.innerHTML = `<span>Why this session</span><span class="ws-fold-c" aria-hidden="true"></span>`;
   btn.setAttribute('aria-expanded', String(!closed));
 }
 // The card itself. `before` is an array of { label, text } rows; a bare string is accepted too,
 // so a hand-written file with a plain list still shows. Absent or empty → the card stays hidden,
 // which is every session written before 2026-09-20.
+//
+// Open the FIRST time each session is opened on this phone, one folded row after that (Amir, 2026-10-13: "open the first
+// time each session is opened; afterwards one row titled Before you start that opens with a tap"). The phone keeps which
+// sessions it has shown, { "<workout id>": 1 } under WS_BEFORE_KEY: NOT athlete-prefixed and never synced, because it is
+// about this phone's reading, not the athlete's record. Where it cannot be read or written (a private window) the card is
+// simply open every time, the safe way round. The row folds by its OWN tap only: nothing else hides these rows.
+const WS_BEFORE_KEY = 'ws_before_seen';
+function _wsBeforeSeen() {
+  try { const o = JSON.parse(localStorage.getItem(WS_BEFORE_KEY) || '{}'); return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}; }
+  catch (e) { return {}; }
+}
+function _wsBeforeMark(id) {
+  try { const o = _wsBeforeSeen(); if (o[id]) return; o[id] = 1; localStorage.setItem(WS_BEFORE_KEY, JSON.stringify(o)); } catch (e) { /* private window */ }
+}
+function _wsBeforeOpen(open) {
+  const wrap = document.getElementById('ws-before');
+  const body = document.getElementById('ws-before-body');
+  const btn  = document.getElementById('ws-before-btn');
+  if (wrap) wrap.classList.toggle('is-open', open);
+  if (body) body.hidden = !open;
+  if (btn)  btn.setAttribute('aria-expanded', String(open));
+}
 function renderBefore(wk) {
   const wrap = document.getElementById('ws-before');
   const body = document.getElementById('ws-before-body');
@@ -11115,7 +11131,15 @@ function renderBefore(wk) {
     ? `<p>${esc(r)}</p>`
     : `<p>${r.label ? `<b>${esc(r.label)}</b> ` : ''}${esc(r.text)}</p>`).join('');
   wrap.hidden = false;
+  const id = wk && wk.id ? String(wk.id) : '';
+  _wsBeforeOpen(!(id && _wsBeforeSeen()[id]));
+  if (id) _wsBeforeMark(id);
 }
+function toggleBefore() {
+  const btn = document.getElementById('ws-before-btn');
+  _wsBeforeOpen(!(btn && btn.getAttribute('aria-expanded') === 'true'));
+}
+window.toggleBefore = toggleBefore;
 function toggleWhy() {
   const wrap = document.getElementById('ws-why');
   const btn  = document.getElementById('ws-why-toggle');
@@ -11184,14 +11208,11 @@ async function openWorkout(file) {
   _wsCurrent = { id, checkKey: 'wkout_' + id, slug: _wsSlug(wk, file), countsAs: wk.countsAs || '' };
   markLibSeen(wk.id);   // a suggestion for this session has done its job (LIB-01)
 
-  // Header — on the shelf's picture when there is one, flat green when there is not.
-  const wsHead = document.querySelector('#screen-workout .ws-header');
-  if (wsHead) {
+  // The cover — the shelf's picture graded into the green when there is one, the plain green when there is not.
+  const wsImg = document.getElementById('ws-img');
+  if (wsImg) {
     const art = libBannerFor(file);
-    wsHead.classList.toggle('has-art', !!art);
-    wsHead.style.backgroundImage = art
-      ? `linear-gradient(to top, rgba(8,38,27,0.95) 0%, rgba(8,38,27,0.62) 55%, rgba(8,38,27,0.34) 100%), url('${art}')`
-      : '';
+    if (art) { wsImg.hidden = false; wsImg.src = art; } else { wsImg.hidden = true; wsImg.removeAttribute('src'); }
   }
   document.getElementById('ws-eyebrow').textContent = wk.focusTag || 'Workout';
   document.getElementById('ws-title').textContent = wk.title || 'Workout';
@@ -16277,7 +16298,7 @@ function paintExerciseCount() {
   const el = document.getElementById('exercises-count');
   if (!el) return;
   const n = (SPINE || []).length;
-  el.textContent = n ? n + ' ' + (n === 1 ? 'Exercise' : 'Exercises') : '\u00a0';
+  el.textContent = n ? String(n) : '\u00a0';
 }
 function xlCardFor(id) {
   return [...document.querySelectorAll('#screen-home .checklist-item')].find(c => {
@@ -16313,7 +16334,7 @@ function renderExerciseLibrary() {
     (_xlPattern === 'all' || (_xlPattern === 'mine' ? mine[e.id] : e.pattern === _xlPattern)) &&
     words.every(w => hay(e).indexOf(w) !== -1));
   const row = e => `<button type="button" class="xl-row${mine[e.id] ? ' mine' : ''}" data-id="${esc(e.id)}"><span><b>${esc(e.name)}</b><small>${
-    esc(SPINE_PATTERN[e.pattern] || '')}${mine[e.id] ? ' · <em>In your plan</em>' : ''}</small></span><span class="xl-arr" aria-hidden="true">›</span></button>`;
+    [esc(SPINE_PATTERN[e.pattern] || ''), mine[e.id] ? '<em>In your plan</em>' : ''].filter(Boolean).join(' · ')}</small></span><span class="xl-arr" aria-hidden="true">›</span></button>`;
   const byName = (a, b) => a.name.localeCompare(b.name);
   const own = shown.filter(e => mine[e.id]).sort(byName), rest = shown.filter(e => !mine[e.id]).sort(byName);
   list.innerHTML = !shown.length

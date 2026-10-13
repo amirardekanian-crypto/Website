@@ -264,8 +264,8 @@ const lit = p => p.evaluate(() => [...document.querySelectorAll('#global-tabs .n
     t.check('the initials button is position: absolute, at the top right of the page', pos.position === 'absolute' && pos.top === '14px' && pos.right === '14px' && (pos.op === 'BODY' || pos.op === null), JSON.stringify(pos));
     const screens = [
       ['Home', () => goTo('home')], ['Progress', () => goTo('plan')], ['Coach', () => goTo('notes')],
-      ['Library doors', () => goLibrary()], ['Library: Sessions', async () => { goLibrary(); await enterWorld('sessions'); }], ['Library: Playbook', async () => { goLibrary(); await enterWorld('playbook'); }],
-      ['Library: Exercises', async () => { goLibrary(); await enterWorld('exercises'); }],
+      ['Library', () => goLibrary()], ['Library: Sessions', async () => { goLibrary(); await setLibPane('sessions'); }], ['Library: Playbook', async () => { goLibrary(); await setLibPane('playbook'); }],
+      ['Library: Exercises', async () => { goLibrary(); await setLibPane('exercises'); }],
       ['Personal Records', () => goTo('ceiling')], ['Body weight', () => goTo('weight')],
       ['an article', async () => { await openArticle('articles/training/what-tennis-demands.json'); }], ['a Library session', async () => { await openWorkout('workouts/strength/full-body-power.json'); }],
     ];

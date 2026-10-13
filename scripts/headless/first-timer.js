@@ -106,7 +106,7 @@ const t = H.checker();
     await p.unroute('**/workouts/index.json'); await p.unroute('**/articles/index.json');
     await p.evaluate(() => { goTo('home'); goLibrary(); }); await p.waitForTimeout(2000);
     const b = await p.evaluate(() => ({ s: document.getElementById('sessions-count').textContent.trim(), r: document.getElementById('playbook-count').textContent.trim() }));
-    t.check('the next visit loads them', /^\d+ Sessions?$/.test(b.s) && /^\d+ Reads?$/.test(b.r) && b.s !== '0 Sessions', JSON.stringify(b));
+    t.check('the next visit loads them', /^\d+$/.test(b.s) && /^\d+$/.test(b.r) && b.s !== '0', JSON.stringify(b));
     await ctx.close();
   }
 
